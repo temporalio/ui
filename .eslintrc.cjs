@@ -21,4 +21,14 @@ module.exports = {
     es2017: true,
     node: true,
   },
+  overrides: [
+    {
+      files: ['src/**/*.test.js'],
+      extends: ['plugin:jest/recommended'],
+    },
+    {
+      files: ['cypress/**/*.js'],
+      extends: ['plugin:cypress/recommended'],
+    },
+  ],
 };
