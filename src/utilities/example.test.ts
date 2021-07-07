@@ -3,5 +3,3 @@ describe('A unit test setup', () => {
     expect(true).toBe(true);
   });
 });
-
-export {};
