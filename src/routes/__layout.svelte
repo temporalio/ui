@@ -1,3 +1,7 @@
+<script>
+  import NavigationLink from '../components/navigation-link.svelte';
+</script>
+
 <svelte:head>
   <title>Temporal</title>
 
@@ -10,4 +14,10 @@
   <meta property="og:image" content="/banner.png" />
 </svelte:head>
 
-<slot />
+<main>
+  <nav>
+    <NavigationLink href="/">Home</NavigationLink>
+    <NavigationLink href="/workflows">Workflows</NavigationLink>
+  </nav>
+  <slot />
+</main>
