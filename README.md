@@ -11,8 +11,8 @@ npm start
 By default, the application will start up with a version of the UI for the local version of Temporal. You can start the UI for Temporal Cloud by setting the `TEMPORAL_UI_BUILD_TARGET` target to `cloud`. Alternatively, you can use either of the following scripts:
 
 ```bash
-npm run build:local
-npm run build:cloud
+npm run dev:local
+npm run dev:cloud
 ```
 
 ## Building
