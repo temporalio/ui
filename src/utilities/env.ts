@@ -1,8 +1,6 @@
 const validTargets = ['local', 'cloud'];
 
-const throwErrorIfInvalid = (
-  callback: typeof isCloud | typeof isLocal,
-) => () => {
+const throwErrorIfInvalid = (callback: () => boolean) => () => {
   const buildTarget = getEnvironment();
   const validOptions = `Valid options: ${validTargets.join(', ')}.`;
 
