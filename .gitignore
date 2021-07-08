@@ -3,3 +3,5 @@ node_modules
 /.svelte-kit
 /package
 /cypress/videos
+/build-local
+/build-cloud
