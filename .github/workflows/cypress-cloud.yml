@@ -1,4 +1,4 @@
-name: Cypress (Local)
+name: Cypress (Cloud)
 
 on:
   push:
@@ -16,6 +16,6 @@ jobs:
       - name: Cypress
         uses: cypress-io/github-action@v2
         with:
-          build: npm run build:local
-          start: npm run preview:local
+          build: npm run build:cloud
+          start: npm run preview:cloud
           wait-on: http://localhost:3000
