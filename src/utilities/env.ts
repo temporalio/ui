@@ -21,7 +21,7 @@ const throwErrorIfInvalid = (
   return callback();
 };
 
-export const getEnvironment = () => {
+export const getEnvironment: () => string = () => {
   return process.env.TEMPORAL_UI_BUILD_TARGET || 'local';
 };
 
