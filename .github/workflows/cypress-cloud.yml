@@ -1,0 +1,21 @@
+name: Cypress (Cloud)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - run: npm ci
+      - name: Cypress
+        uses: cypress-io/github-action@v2
+        with:
+          build: npm run build:cloud
+          start: npm run preview:cloud
+          wait-on: http://localhost:3000
