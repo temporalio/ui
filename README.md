@@ -5,18 +5,25 @@
 Once you've created a project and installed dependencies with `npm install`, start a development server:
 
 ```bash
-npm run dev
+npm start
+```
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+By default, the application will start up with a version of the UI for the local version of Temporal. You can start the UI for Temporal Cloud by setting the `TEMPORAL_UI_BUILD_TARGET` target to `cloud`. Alternatively, you can use either of the following scripts:
+
+```bash
+npm run build:local
+npm run build:cloud
 ```
 
 ## Building
 
-Before creating a production version of your app, install an [adapter](https://kit.svelte.dev/docs#adapters) for your target environment. Then:
+The Temporal UI _must_ be built for either the local version or Temporal Cloud. You must set the `TEMPORAL_UI_BUILD_TARGET` environment variable in order to build the assets. This will be set for you if you use either of the following `npm` scripts.
 
 ```bash
-npm run build
+npm run build:local
+npm run build:cloud
 ```
+
+The resulting assets will be placed in either `build-local` or `build-cloud` respectively.
 
 > You can preview the built app with `npm run preview`, regardless of whether you installed an adapter. This should _not_ be used to serve your app in production.
