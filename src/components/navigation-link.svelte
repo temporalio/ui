@@ -1,11 +1,11 @@
 <script>
   import { page } from '$app/stores';
 
-  $: ({ href, icon, ...inputProps } = $$props);
+  $: ({ href, src, alt, ...inputProps } = $$props);
   $: isActive = href === $page.path;
 </script>
 
-<a {href} class:active={isActive}><img class:active={isActive} src={icon} alt="home"/><slot /></a>
+<a {href} class:active={isActive}><img class:active={isActive} {src} {alt} /><slot /></a>
 
 <style>
   a.active {

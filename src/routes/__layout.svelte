@@ -18,8 +18,8 @@
   <nav id="sidebar">
     <img id="logo" src="/logo.png" alt="Temporal Logo" />
     <p>Namespace: <br/> default </p>
-    <NavigationLink href="/" icon="/home.svg">Dashboard</NavigationLink>
-    <NavigationLink href="/workflows" icon="/workflow.svg">Workflows</NavigationLink>
+    <NavigationLink href="/" src="/home.svg" alt="Dashboard Icon">Dashboard</NavigationLink>
+    <NavigationLink href="/workflows" src="/workflow.svg" alt="Workflow Icon">Workflows</NavigationLink>
   </nav>
   <div>
     <slot />
