@@ -18,17 +18,19 @@
   <nav id="sidebar">
     <img id="logo" src="/logo.png" alt="gun" />
     <p>Namespace: <br/> default </p>
-    <NavigationLink href="/">Home</NavigationLink>
-    <NavigationLink href="/workflows">Workflows</NavigationLink>
+    <NavigationLink href="/" icon="/home.svg">Dashboard</NavigationLink>
+    <NavigationLink href="/workflows" icon="/workflow.svg">Workflows</NavigationLink>
   </nav>
-  <slot />
+  <div>
+    <slot />
+  </div>
 </main>
 
 <style>
   main {
     display: grid;
     grid-gap: 24px;
-    grid-template-columns: 1fr;
+    grid-template-columns: 0fr 1fr;
   }
   #logo {
     margin-bottom: 20px;
@@ -42,6 +44,7 @@
     flex-direction: column;
     align-items: center;
     width: 112px;
+    height: 100vh;
     padding: 24px 0px;
     background-color: #4338CA;
   }
