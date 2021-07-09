@@ -16,7 +16,7 @@
 
 <main>
   <nav id="sidebar">
-    <img id="logo" src="/logo.png" alt="gun" />
+    <img id="logo" src="/logo.png" alt="Temporal Logo" />
     <p>Namespace: <br/> default </p>
     <NavigationLink href="/" icon="/home.svg">Dashboard</NavigationLink>
     <NavigationLink href="/workflows" icon="/workflow.svg">Workflows</NavigationLink>
