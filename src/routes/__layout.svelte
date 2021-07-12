@@ -15,9 +15,41 @@
 </svelte:head>
 
 <main>
-  <nav>
-    <NavigationLink href="/">Home</NavigationLink>
-    <NavigationLink href="/workflows">Workflows</NavigationLink>
+  <nav id="sidebar">
+    <img id="logo" src="/logo.png" alt="Temporal Logo" />
+    <p>Namespace: <br /> default</p>
+    <NavigationLink href="/" src="/home.svg" alt="Dashboard Icon"
+      >Dashboard</NavigationLink
+    >
+    <NavigationLink href="/workflows" src="/workflow.svg" alt="Workflow Icon"
+      >Workflows</NavigationLink
+    >
   </nav>
-  <slot />
+  <div>
+    <slot />
+  </div>
 </main>
+
+<style>
+  main {
+    display: grid;
+    grid-gap: 24px;
+    grid-template-columns: 0fr 1fr;
+  }
+  #logo {
+    margin-bottom: 20px;
+  }
+  p {
+    color: #fff;
+    text-align: center;
+  }
+  #sidebar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 112px;
+    height: 100vh;
+    padding: 24px 0px;
+    background-color: #4338ca;
+  }
+</style>
