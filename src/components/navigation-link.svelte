@@ -5,14 +5,16 @@
   $: isActive = href === $page.path;
 </script>
 
-<a {href} class:active={isActive}><img class:active={isActive} {src} {alt} {...props} /><slot /></a>
+<a {href} class:active={isActive}
+  ><img class:active={isActive} {src} {alt} {...props} /><slot /></a
+>
 
 <style>
   a.active {
-    background-color: #3730A3;
-    color: #FFF;
+    background-color: #3730a3;
+    color: #fff;
   }
-  
+
   img.active {
     filter: sepia() saturate(0%) hue-rotate(30deg);
   }
@@ -23,7 +25,7 @@
 
   a {
     width: 90px;
-    color: #E0E7FF;
+    color: #e0e7ff;
     margin-bottom: 18px;
     display: flex;
     flex-flow: column;
