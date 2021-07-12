@@ -17,9 +17,13 @@
 <main>
   <nav id="sidebar">
     <img id="logo" src="/logo.png" alt="Temporal Logo" />
-    <p>Namespace: <br/> default </p>
-    <NavigationLink href="/" src="/home.svg" alt="Dashboard Icon">Dashboard</NavigationLink>
-    <NavigationLink href="/workflows" src="/workflow.svg" alt="Workflow Icon">Workflows</NavigationLink>
+    <p>Namespace: <br /> default</p>
+    <NavigationLink href="/" src="/home.svg" alt="Dashboard Icon"
+      >Dashboard</NavigationLink
+    >
+    <NavigationLink href="/workflows" src="/workflow.svg" alt="Workflow Icon"
+      >Workflows</NavigationLink
+    >
   </nav>
   <div>
     <slot />
@@ -36,7 +40,7 @@
     margin-bottom: 20px;
   }
   p {
-    color: #FFF;
+    color: #fff;
     text-align: center;
   }
   #sidebar {
@@ -46,6 +50,6 @@
     width: 112px;
     height: 100vh;
     padding: 24px 0px;
-    background-color: #4338CA;
+    background-color: #4338ca;
   }
 </style>
