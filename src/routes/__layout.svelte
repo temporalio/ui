@@ -31,6 +31,12 @@
 </main>
 
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+
+  :global(body) {
+    font-family: Inter;
+  }
+
   main {
     display: grid;
     grid-gap: 24px;
@@ -42,6 +48,7 @@
   p {
     color: #fff;
     text-align: center;
+    font-size: 12px;
   }
   #sidebar {
     display: flex;

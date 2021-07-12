@@ -25,6 +25,7 @@
 
   a {
     width: 90px;
+    font-size: 12px;
     color: #e0e7ff;
     margin-bottom: 18px;
     display: flex;
