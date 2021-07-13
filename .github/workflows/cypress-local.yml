@@ -15,8 +15,8 @@ jobs:
       - name: Cypress
         uses: cypress-io/github-action@v2
         env:
-          CYPRESS_API_HOST: "http://localhost:8088/"
-          TEMPORAL_API_HOST: "http://localhost:3000/"
+          CYPRESS_API_HOST: 'http://localhost:8088/'
+          TEMPORAL_API_HOST: 'http://localhost:3000/'
         with:
           build: npm run build:local
           start: npm run preview:local
