@@ -1,11 +1,11 @@
 /// <reference types="@sveltejs/kit" />
 
 type WorkflowsAPIResponse = {
-  executions: WorkflowExecutionAPIReponse[];
+  executions: WorkflowExecutionAPIResponse[];
   nextPageToken: string;
 };
 
-type WorkflowExecutionAPIReponse = {
+type WorkflowExecutionAPIResponse = {
   execution: {
     workflowId: string;
     runId: string;
