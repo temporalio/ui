@@ -1,5 +1,6 @@
 name: Cypress (Local)
-
+env: 
+  TEMPORAL_API_HOST: http://localhost:3000
 on:
   push:
     branches: [main]
@@ -16,7 +17,6 @@ jobs:
       - name: Cypress
         uses: cypress-io/github-action@v2
         with:
-          env: TEMPORAL_API_HOST=http://localhost:3000
           build: npm run build:local
           start: npm run preview:local
           wait-on: http://localhost:3000
