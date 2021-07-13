@@ -12,9 +12,6 @@ const fetchWorkflows: (
   type: string,
   query: URLSearchParams,
 ) => Promise<WorkflowsAPIResponse> = async (type, query) => {
-  console.log(
-    `${apiHost}/api/namespaces/default/workflows/${type}?${query.toString()}`,
-  );
   const response = await fetch(
     `${apiHost}/api/namespaces/default/workflows/${type}?${query.toString()}`,
   );
