@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  CYPRESS_API_HOST: 'http://localhost:8088/'
+  TEMPORAL_API_HOST: 'http://localhost:3000/'
+
 jobs:
   cypress-run:
     runs-on: ubuntu-20.04
@@ -13,9 +17,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - run: npm ci
+      - run: echo "API Host - $TEMPORAL_API_HOST"
       - name: Cypress
         uses: cypress-io/github-action@v2
         with:
           build: npm run build:local
           start: npm run preview:local
           wait-on: http://localhost:3000
+
