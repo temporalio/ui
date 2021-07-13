@@ -26,7 +26,7 @@
 </script>
 
 <script>
-	export let workflows;
+  export let workflows;
 </script>
 
 <h2>Workflows</h2>
