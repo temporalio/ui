@@ -18,7 +18,7 @@
     "check:cloud:watch": "TEMPORAL_UI_BUILD_TARGET=local svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
     "format": "prettier --write --plugin-search-dir=. .",
-    "cypress:open": "cypress open"
+    "cypress:open": "TEMPORAL_API_HOST=http://localhost:3000 cypress open"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^1.0.0-next.13",
