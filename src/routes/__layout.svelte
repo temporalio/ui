@@ -1,5 +1,5 @@
 <script>
-  import NavigationLink from '../components/navigation-link.svelte';
+  import NavigationLink from '$lib/components/navigation-link.svelte';
 </script>
 
 <svelte:head>

@@ -1,9 +1,20 @@
 const apiHost = process.env.TEMPORAL_API_HOST || 'http://localhost:8088';
 
+/*
+ * TODO: Add better error handling.
+ * - If one request has a 400- 500-level error, they both should.
+ * - The current implementation is naive. It only deals with
+ *   an error state if the promises outright reject, which will
+ *   only happen in the event that there is no error handling.
+ */
+
 const fetchWorkflows: (
   type: string,
   query: URLSearchParams,
 ) => Promise<WorkflowsAPIResponse> = async (type, query) => {
+  console.log(
+    `${apiHost}/api/namespaces/default/workflows/${type}?${query.toString()}`,
+  );
   const response = await fetch(
     `${apiHost}/api/namespaces/default/workflows/${type}?${query.toString()}`,
   );
