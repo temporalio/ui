@@ -33,7 +33,6 @@
 <style>
   main {
     display: grid;
-    grid-gap: 24px;
     grid-template-columns: 0fr 1fr;
   }
 

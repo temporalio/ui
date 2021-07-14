@@ -25,20 +25,156 @@
   }
 </script>
 
-<script>
+<script lang="ts">
+  import { format } from 'date-fns';
+
+  function formatDate(date: string | null): string {
+    if (!date) return '';
+    return format(new Date(date), 'MMMM dd, yyyy — h:mm a');
+  }
+
   export let workflows;
 </script>
 
-<h2>Workflows</h2>
+<section id="workflows">
+  <table>
+    <thead>
+      <tr>
+        <th>Workflow/Run ID</th>
+        <th>Status</th>
+        <th>Started</th>
+        <th>Ended</th>
+      </tr>
+    </thead>
+    <tbody>
+      {#await workflows}
+        <p>Loading…</p>
+      {:then workflows}
+        {#each workflows.executions as workflow}
+          <tr>
+            <td>
+              <a
+                href="/workflows/{workflow.execution.workflowId}/{workflow
+                  .execution.runId}"
+              >
+                <h3>
+                  {workflow.type.name}
+                </h3>
+                <p>
+                  {workflow.execution.runId}
+                </p>
+              </a>
+            </td>
+            <td>
+              <a
+                href="/workflows/{workflow.execution.workflowId}/{workflow
+                  .execution.runId}"
+              >
+                <p class="workflow-status">{workflow.status}</p>
+              </a>
+            </td>
+            <td>
+              <a
+                href="/workflows/{workflow.execution.workflowId}/{workflow
+                  .execution.runId}"
+              >
+                <p>{formatDate(workflow.startTime)}</p>
+              </a>
+            </td>
+            <td>
+              <a
+                href="/workflows/{workflow.execution.workflowId}/{workflow
+                  .execution.runId}"
+              >
+                <p>{formatDate(workflow.closeTime)}</p>
+              </a>
+            </td>
+          </tr>
+        {/each}
+      {:catch}
+        <p>There was an error.</p>
+      {/await}
+    </tbody>
+  </table>
+  <slot />
+</section>
 
-{#await workflows}
-  <p>Loading…</p>
-{:then workflows}
-  {#each workflows.executions as workflow}
-    <p>{workflow.execution.workflowId}</p>
-  {/each}
-{:catch}
-  <p>There was an error.</p>
-{/await}
+<style>
+  #workflows {
+    display: flex;
+  }
 
-<slot />
+  a {
+    text-decoration: none;
+    display: block;
+    padding: 16px 24px;
+    height: 100%;
+    width: 100%;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  thead tr {
+    background: #f9fafb;
+  }
+
+  th {
+    background: #f9fafb;
+    color: #6b7280;
+    font-size: 12px;
+    height: 40px;
+    letter-spacing: 0.05em;
+    line-height: 16px;
+    margin: 0;
+    padding: 12px 24px;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  tbody {
+    background: #f3f4f6;
+  }
+
+  tbody tr {
+    background: #f3f4f6;
+  }
+
+  tbody tr:hover {
+    background: #eeeff1;
+  }
+
+  tbody td {
+    padding: 0;
+  }
+
+  tbody h3 {
+    color: #111827;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 20px;
+    margin: 0;
+  }
+
+  tbody p {
+    color: #6b7280;
+    font-size: 14px;
+    margin: 0;
+  }
+
+  tbody p.workflow-status {
+    font-family: Inter;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 16px;
+    text-align: center;
+    color: #065f46;
+    padding: 2px 10px;
+    background: #d1fae5;
+    border-radius: 10px;
+  }
+</style>
