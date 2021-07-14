@@ -36,13 +36,17 @@
     grid-gap: 24px;
     grid-template-columns: 0fr 1fr;
   }
+
   #logo {
     margin-bottom: 20px;
   }
+
   p {
     color: #fff;
     text-align: center;
+    font-size: 12px;
   }
+
   #sidebar {
     display: flex;
     flex-direction: column;

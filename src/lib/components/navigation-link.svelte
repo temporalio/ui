@@ -1,8 +1,9 @@
 <script>
   import { page } from '$app/stores';
+  import { pathMatches } from '$lib/utilities/path-matches.ts';
 
   $: ({ href, src, alt, ...props } = $$props);
-  $: isActive = href === $page.path;
+  $: isActive = pathMatches(href, $page.path);
 </script>
 
 <a {href} class:active={isActive}
@@ -25,6 +26,7 @@
 
   a {
     width: 90px;
+    font-size: 12px;
     color: #e0e7ff;
     margin-bottom: 18px;
     display: flex;
