@@ -21,6 +21,7 @@
     "cypress:open": "TEMPORAL_API_HOST=http://localhost:3000 cypress open"
   },
   "devDependencies": {
+    "@storybook/svelte": "^6.3.4",
     "@sveltejs/adapter-static": "^1.0.0-next.13",
     "@sveltejs/kit": "next",
     "@types/jest": "^26.0.24",
