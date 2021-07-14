@@ -1,8 +1,9 @@
 <script>
   import { page } from '$app/stores';
+  import { pathMatches } from '$lib/utilities/path-matches.ts';
 
   $: ({ href, src, alt, ...props } = $$props);
-  $: isActive = href === $page.path;
+  $: isActive = pathMatches(href, $page.path);
 </script>
 
 <a {href} class:active={isActive}
