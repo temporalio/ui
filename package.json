@@ -23,6 +23,11 @@
     "build-stories": "build-storybook"
   },
   "devDependencies": {
+    "@storybook/addon-a11y": "^6.3.4",
+    "@storybook/addon-actions": "^6.3.4",
+    "@storybook/addon-notes": "^5.3.21",
+    "@storybook/addon-storysource": "^6.3.4",
+    "@storybook/addon-viewport": "^6.3.4",
     "@storybook/svelte": "^6.3.4",
     "@sveltejs/adapter-static": "^1.0.0-next.13",
     "@sveltejs/kit": "next",
