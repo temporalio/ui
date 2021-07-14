@@ -46,7 +46,7 @@
     text-align: center;
     font-size: 12px;
   }
-  
+
   #sidebar {
     display: flex;
     flex-direction: column;
