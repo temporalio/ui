@@ -6,8 +6,7 @@
     const endTime = addDays(new Date(), 30).toISOString();
 
     const query = new URLSearchParams({ startTime, endTime });
-
-    const response = await fetch(`/api/workflows.json?${query.toString()}`);
+    const response = await fetch(`/api/workflows?${query}`);
 
     if (!response.ok) {
       const message = `An error has occured: ${response.status}`;
