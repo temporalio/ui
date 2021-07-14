@@ -1,16 +1,44 @@
+<script context="module">
+  import { subDays, addDays } from 'date-fns';
+
+  export async function load({ fetch }) {
+    const startTime = subDays(new Date(), 30).toISOString();
+    const endTime = addDays(new Date(), 30).toISOString();
+
+    const query = new URLSearchParams({ startTime, endTime });
+
+    const response = await fetch(`/api/workflows.json?${query.toString()}`);
+
+    if (!response.ok) {
+      const message = `An error has occured: ${response.status}`;
+      throw new Error(message);
+    }
+
+    const body = await response.json();
+    const workflows = body.workflows;
+
+    return {
+      props: {
+        workflows,
+      },
+    };
+  }
+</script>
+
+<script>
+  export let workflows;
+</script>
+
 <h2>Workflows</h2>
-<nav>
-  <ul>
-    <li>
-      <a href="/workflows/63531530-8912-4313-9461-c0dc88f1428c"
-        >63531530-8912-4313-9461-c0dc88f1428c</a
-      >
-    </li>
-    <li>
-      <a href="/workflows/bf9e0fce-94d9-4f7e-9fc6-c8225d538010"
-        >bf9e0fce-94d9-4f7e-9fc6-c8225d538010</a
-      >
-    </li>
-  </ul>
-</nav>
+
+{#await workflows}
+  <p>Loading…</p>
+{:then workflows}
+  {#each workflows.executions as workflow}
+    <p>{workflow.execution.workflowId}</p>
+  {/each}
+{:catch}
+  <p>There was an error.</p>
+{/await}
+
 <slot />
