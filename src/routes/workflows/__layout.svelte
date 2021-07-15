@@ -25,12 +25,7 @@
 </script>
 
 <script lang="ts">
-  import { format } from 'date-fns';
-
-  function formatDate(date: string | null): string {
-    if (!date) return '';
-    return format(new Date(date), 'MMMM dd, yyyy — h:mm a');
-  }
+  import { formatDate } from '$lib/utilities/format-date';
 
   export let workflows;
 </script>
