@@ -15,6 +15,12 @@ npm run dev:local
 npm run dev:cloud
 ```
 
+To run storyboard components, start a development server:
+
+```bash
+npm run stories
+```
+
 ## Building
 
 The Temporal UI _must_ be built for either the local version or Temporal Cloud. You must set the `TEMPORAL_UI_BUILD_TARGET` environment variable in order to build the assets. This will be set for you if you use either of the following `npm` scripts.
