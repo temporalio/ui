@@ -101,6 +101,7 @@
 <style>
   #workflows {
     display: flex;
+    align-items: flex-start;
   }
 
   a {

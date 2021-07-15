@@ -22,35 +22,115 @@
     const name = workflow.workflowExecutionInfo.type.name;
     const workflowId = workflow.workflowExecutionInfo.execution.workflowId;
     const runId = workflow.workflowExecutionInfo.execution.runId;
+    const events = history.events;
+
+    const lastEvent = events[events.length - 1];
+    const input = lastEvent.details.input && lastEvent.details.input.payloads;
+    const result =
+      lastEvent.details.result && lastEvent.details.result.payloads;
 
     return {
       props: {
+        workflow,
         name,
         workflowId,
         runId,
+        events,
+        input,
+        result,
       },
     };
   }
 </script>
 
 <script lang="ts">
-  export const name;
-  export const workflowId;
-  export const runId;
+  import { formatDate } from '$lib/utilities/format-date';
+
+  export let workflow;
+  export let name;
+  export let workflowId;
+  export let runId;
+  export let events;
+  export let input;
+  export let result;
+
+  console.log(workflow);
 </script>
 
 <section>
-  <h1>{name}</h1>
-  <p>{runId}</p>
-  <p>
-    <a href="/workflows">Close</a>
-  </p>
+  <header>
+    <h1>{name}</h1>
+    <p>{runId}</p>
+  </header>
+  <main>
+    <h3>Start Time</h3>
+    <p>{formatDate(workflow.workflowExecutionInfo.startTime)}</p>
+    <h3>End Time</h3>
+    {#if workflow.workflowExecutionInfo.closeTime}
+      <p>{formatDate(workflow.workflowExecutionInfo.closeTime)}</p>
+    {:else}
+      <p>Still running…</p>
+    {/if}
+    <h3>Task Queue</h3>
+    <p>{workflow.workflowExecutionInfo.taskQueue || '(None)'}</p>
+    <h3>History Events</h3>
+    <p>{events.length}</p>
+    {#if input}
+      <h3>Input</h3>
+      <code>
+        <pre>
+          {JSON.stringify(input)}
+        </pre>
+      </code>
+    {/if}
+    {#if result}
+      <h3>Result</h3>
+      <code>
+        <pre>
+          {JSON.stringify(result)}
+        </pre>
+      </code>
+    {/if}
+  </main>
 </section>
 
 <style>
   section {
     min-width: 400px;
     width: 33%;
-    padding: 1em;
+    border-left: 1px solid #e5e7eb;
+    height: 100vh;
+  }
+
+  header {
+    padding: 24px 16px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  header h1 {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 24px;
+    margin: 0;
+  }
+
+  header p {
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 20px;
+    margin: 0;
+  }
+
+  main {
+    padding: 24px 16px;
+  }
+
+  code {
+  }
+
+  pre {
+    padding: 16px;
+    background-color: #f3f4f6;
+    overflow-x: scroll;
   }
 </style>
