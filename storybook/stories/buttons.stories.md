@@ -1,10 +1,7 @@
 # Buttons
 
-_Examples of building buttons with Tailwind CSS._
+_Examples of building buttons with storyboard._
 
 ---
 
-Tailwind doesn't include pre-designed button styles out of the box, but they're easy to build using
-existing utilities.
-
-Here are a few examples to help you get an idea of how to build components like this using Tailwind.
+This is an example for storyboarding a Svelte Component
