@@ -25,7 +25,7 @@
 </script>
 
 <script lang="ts">
-  import { formatDate } from '$lib/utilities/format-date';
+  import WorkflowSummaryRow from './_workflow-summary-row.svelte';
 
   export let workflows;
 </script>
@@ -45,45 +45,7 @@
         <p>Loading…</p>
       {:then workflows}
         {#each workflows.executions as workflow}
-          <tr>
-            <td>
-              <a
-                href="/workflows/{workflow.execution.workflowId}/{workflow
-                  .execution.runId}"
-              >
-                <h3>
-                  {workflow.type.name}
-                </h3>
-                <p>
-                  {workflow.execution.runId}
-                </p>
-              </a>
-            </td>
-            <td>
-              <a
-                href="/workflows/{workflow.execution.workflowId}/{workflow
-                  .execution.runId}"
-              >
-                <p class="workflow-status">{workflow.status}</p>
-              </a>
-            </td>
-            <td>
-              <a
-                href="/workflows/{workflow.execution.workflowId}/{workflow
-                  .execution.runId}"
-              >
-                <p>{formatDate(workflow.startTime)}</p>
-              </a>
-            </td>
-            <td>
-              <a
-                href="/workflows/{workflow.execution.workflowId}/{workflow
-                  .execution.runId}"
-              >
-                <p>{formatDate(workflow.closeTime)}</p>
-              </a>
-            </td>
-          </tr>
+          <WorkflowSummaryRow {workflow} />
         {/each}
       {:catch}
         <p>There was an error.</p>
@@ -97,14 +59,6 @@
   #workflows {
     display: flex;
     align-items: flex-start;
-  }
-
-  a {
-    text-decoration: none;
-    display: block;
-    padding: 16px 24px;
-    height: 100%;
-    width: 100%;
   }
 
   table {
@@ -131,45 +85,5 @@
 
   tbody {
     background: #f3f4f6;
-  }
-
-  tbody tr {
-    background: #f3f4f6;
-  }
-
-  tbody tr:hover {
-    background: #eeeff1;
-  }
-
-  tbody td {
-    padding: 0;
-  }
-
-  tbody h3 {
-    color: #111827;
-    font-style: normal;
-    font-weight: normal;
-    font-size: 14px;
-    line-height: 20px;
-    margin: 0;
-  }
-
-  tbody p {
-    color: #6b7280;
-    font-size: 14px;
-    margin: 0;
-  }
-
-  tbody p.workflow-status {
-    font-family: Inter;
-    font-style: normal;
-    font-weight: 500;
-    font-size: 12px;
-    line-height: 16px;
-    text-align: center;
-    color: #065f46;
-    padding: 2px 10px;
-    background: #d1fae5;
-    border-radius: 10px;
   }
 </style>

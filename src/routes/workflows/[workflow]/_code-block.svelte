@@ -4,12 +4,14 @@
 </script>
 
 {#if content}
-  <h3>{heading}</h3>
-  <code>
-    <pre>
-      {JSON.stringify(content)}
-    </pre>
-  </code>
+  <div>
+    <h3>{heading}</h3>
+    <code>
+      <pre>
+        {JSON.stringify(content)}
+      </pre>
+    </code>
+  </div>
 {/if}
 
 <style>
