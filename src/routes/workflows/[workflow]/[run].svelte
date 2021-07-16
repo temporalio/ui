@@ -44,6 +44,7 @@
 </script>
 
 <script lang="ts">
+  import CodeBlock from './_code-block.svelte';
   import { formatDate } from '$lib/utilities/format-date';
 
   export let workflow;
@@ -53,8 +54,6 @@
   export let events;
   export let input;
   export let result;
-
-  console.log(workflow);
 </script>
 
 <section>
@@ -75,22 +74,8 @@
     <p>{workflow.workflowExecutionInfo.taskQueue || '(None)'}</p>
     <h3>History Events</h3>
     <p>{events.length}</p>
-    {#if input}
-      <h3>Input</h3>
-      <code>
-        <pre>
-          {JSON.stringify(input)}
-        </pre>
-      </code>
-    {/if}
-    {#if result}
-      <h3>Result</h3>
-      <code>
-        <pre>
-          {JSON.stringify(result)}
-        </pre>
-      </code>
-    {/if}
+    <CodeBlock heading="Input" content={input} />
+    <CodeBlock heading="Result" content={result} />
   </main>
 </section>
 
@@ -123,14 +108,5 @@
 
   main {
     padding: 24px 16px;
-  }
-
-  code {
-  }
-
-  pre {
-    padding: 16px;
-    background-color: #f3f4f6;
-    overflow-x: scroll;
   }
 </style>
