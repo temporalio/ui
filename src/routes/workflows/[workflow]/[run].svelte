@@ -1,6 +1,8 @@
 <script context="module">
   export async function load({ fetch, page }) {
     const { workflow: id, run } = page.params;
+
+    // TODO: Make these concurrent. This can wait until we implement the Redux store.
     const workflowResponse = await fetch(`/api/workflows/${id}/${run}`);
     const historyResponse = await fetch(
       `/api/workflows/${id}/${run}/history?waitForHistory=true`,
@@ -12,22 +14,22 @@
     }
 
     if (!historyResponse.ok) {
-      const message = `An error has occured: ${workflowResponse.status}`;
+      const message = `An error has occured: ${historyResponse.status}`;
       throw new Error(message);
     }
 
-    const workflow = await workflowResponse.json();
+    const { workflowExecutionInfo: workflow } = await workflowResponse.json();
     const { history } = await historyResponse.json();
 
-    const name = workflow.workflowExecutionInfo.type.name;
-    const workflowId = workflow.workflowExecutionInfo.execution.workflowId;
-    const runId = workflow.workflowExecutionInfo.execution.runId;
-    const events = history.events;
+    const { type, execution } = workflow;
+    const { events } = history;
 
-    const lastEvent = events[events.length - 1];
-    const input = lastEvent.details.input && lastEvent.details.input.payloads;
-    const result =
-      lastEvent.details.result && lastEvent.details.result.payloads;
+    const { name } = type;
+    const { workflowId, runId } = execution;
+
+    const { details: lastEventDetails } = events[events.length - 1];
+    const input = lastEventDetails.input && lastEventDetails.input.payloads;
+    const result = lastEventDetails.result && lastEventDetails.result.payloads;
 
     return {
       props: {
@@ -62,18 +64,26 @@
     <p>{runId}</p>
   </header>
   <main>
-    <h3>Start Time</h3>
-    <p>{formatDate(workflow.workflowExecutionInfo.startTime)}</p>
-    <h3>End Time</h3>
-    {#if workflow.workflowExecutionInfo.closeTime}
-      <p>{formatDate(workflow.workflowExecutionInfo.closeTime)}</p>
-    {:else}
-      <p>Still running…</p>
-    {/if}
-    <h3>Task Queue</h3>
-    <p>{workflow.workflowExecutionInfo.taskQueue || '(None)'}</p>
-    <h3>History Events</h3>
-    <p>{events.length}</p>
+    <div>
+      <h3>Start Time</h3>
+      <p>{formatDate(workflow.startTime)}</p>
+    </div>
+    <div>
+      <h3>End Time</h3>
+      {#if workflow.closeTime}
+        <p>{formatDate(workflow.closeTime)}</p>
+      {:else}
+        <p>Still running…</p>
+      {/if}
+    </div>
+    <div>
+      <h3>Task Queue</h3>
+      <p>{workflow.taskQueue || '(None)'}</p>
+    </div>
+    <div>
+      <h3>History Events</h3>
+      <p>{events.length}</p>
+    </div>
     <CodeBlock heading="Input" content={input} />
     <CodeBlock heading="Result" content={result} />
   </main>
