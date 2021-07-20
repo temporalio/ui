@@ -61,6 +61,7 @@
 <section>
   <header>
     <h1>{name}</h1>
+    <p>{workflowId}</p>
     <p>{runId}</p>
   </header>
   <main>
