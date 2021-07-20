@@ -36,7 +36,7 @@ describe(pathMatches, () => {
   });
 
   it('should ignore query params if both the paths and parameters do not match', () => {
-    expect(pathMatches('/workflows?query=param', '/workflows?foo=bar')).toBe(
+    expect(pathMatches('/workflows?query=param', '/queries?foo=bar')).toBe(
       false,
     );
   });
