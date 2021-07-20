@@ -1,7 +1,7 @@
-<script>
+<script lang="ts">
   import { formatDate } from '$lib/utilities/format-date';
 
-  export let workflow;
+  export let workflow: WorkflowExecutionAPIResponse;
 
   let workflowUrl = `/workflows/${workflow.execution.workflowId}/${workflow.execution.runId}`;
 </script>

@@ -28,7 +28,7 @@
   import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
 
-  export let workflows;
+  export let workflows: WorkflowsAPIResponse;
 </script>
 
 <section id="workflows">

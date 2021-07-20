@@ -51,11 +51,11 @@
   import CodeBlock from './_code-block.svelte';
   import { formatDate } from '$lib/utilities/format-date';
 
-  export let workflow;
+  export let workflow: WorkflowExecutionAPIResponse;
   export let name: string;
   export let workflowId: string;
   export let runId: string;
-  export let events;
+  export let events: any[];
   export let input: string;
   export let result: string;
 </script>
