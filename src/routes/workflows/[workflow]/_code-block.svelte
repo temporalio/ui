@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   export let heading = '';
   export let content = '';
 </script>

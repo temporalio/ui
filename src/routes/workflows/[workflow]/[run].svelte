@@ -1,5 +1,7 @@
-<script context="module">
-  export async function load({ fetch, page }) {
+<script context="module" lang="ts">
+  import type { LoadInput } from '@sveltejs/kit';
+
+  export async function load({ fetch, page }: LoadInput) {
     const { workflow: id, run } = page.params;
 
     // TODO: Make these concurrent. This can wait until we implement the Redux store.
@@ -50,12 +52,12 @@
   import { formatDate } from '$lib/utilities/format-date';
 
   export let workflow;
-  export let name;
-  export let workflowId;
-  export let runId;
+  export let name: string;
+  export let workflowId: string;
+  export let runId: string;
   export let events;
-  export let input;
-  export let result;
+  export let input: string;
+  export let result: string;
 </script>
 
 <section>
