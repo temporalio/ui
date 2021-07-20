@@ -17,7 +17,7 @@ describe(pathMatches, () => {
     expect(pathMatches('/workflows', '/workflows?query=param')).toBe(true);
   });
 
-  it('should ignore query params if missing from the second path ?query=param', () => {
+  it('should ignore query params if missing from the second path and the paths otherwise match', () => {
     expect(pathMatches('/workflows?query=param', '/workflows')).toBe(true);
   });
 
@@ -29,13 +29,15 @@ describe(pathMatches, () => {
     expect(pathMatches('/workflows?query=param', '/queries')).toBe(false);
   });
 
-  it('should query params ignore do not match and the paths match', () => {
+  it('should ignore query params if the paths match but the parameters do not', () => {
     expect(pathMatches('/workflows?foo=bar', '/workflows?query=param')).toBe(
       true,
     );
   });
 
-  it('should query params ignore do not match and the paths do not match', () => {
-    expect(pathMatches('/workflows?query=param', '/query?foo=bar')).toBe(false);
+  it('should ignore query params if both the paths and parameters do not match', () => {
+    expect(pathMatches('/workflows?query=param', '/workflows?foo=bar')).toBe(
+      false,
+    );
   });
 });
