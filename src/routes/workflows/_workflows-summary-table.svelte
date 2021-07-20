@@ -11,11 +11,6 @@
 </table>
 
 <style>
-  #workflows {
-    display: flex;
-    align-items: flex-start;
-  }
-
   table {
     border-collapse: collapse;
     width: 100%;
@@ -36,9 +31,5 @@
     padding: 12px 24px;
     text-align: left;
     text-transform: uppercase;
-  }
-
-  tbody {
-    background: #f3f4f6;
   }
 </style>

@@ -1,7 +1,8 @@
-<script context="module">
+<script context="module" lang="ts">
+  import type { LoadInput } from '@sveltejs/kit';
   import { subDays, addDays } from 'date-fns';
 
-  export async function load({ fetch }) {
+  export async function load({ fetch }: LoadInput) {
     const startTime = subDays(new Date(), 30).toISOString();
     const endTime = addDays(new Date(), 30).toISOString();
 
@@ -27,7 +28,7 @@
   import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
 
-  export let workflows;
+  export let workflows: WorkflowsAPIResponse;
 </script>
 
 <section id="workflows">
