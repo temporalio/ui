@@ -1,4 +1,5 @@
 <script>
+  import '../app.postcss';
   import NavigationLink from '$lib/components/navigation-link.svelte';
 </script>
 
@@ -29,6 +30,8 @@
     <slot />
   </div>
 </main>
+
+<slot />
 
 <style>
   main {
