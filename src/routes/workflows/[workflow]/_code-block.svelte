@@ -5,19 +5,11 @@
 
 {#if content}
   <div>
-    <h3>{heading}</h3>
+    <h3 class="mt-6 mb-2 font-semibold text-lg overflow-x-scroll">{heading}</h3>
     <code>
-      <pre>
+      <pre class="p-6 bg-gray-200">
         {JSON.stringify(content)}
       </pre>
     </code>
   </div>
 {/if}
-
-<style>
-  pre {
-    padding: 16px;
-    background-color: #f3f4f6;
-    overflow-x: scroll;
-  }
-</style>

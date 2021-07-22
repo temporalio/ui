@@ -1,6 +1,6 @@
-<table>
+<table class="border-collapse w-full">
   <thead>
-    <tr>
+    <tr class="bg-gray-200">
       <th>Workflow/Run ID</th>
       <th>Status</th>
       <th>Started</th>
@@ -10,26 +10,15 @@
   <slot name="rows" />
 </table>
 
-<style>
-  table {
-    border-collapse: collapse;
-    width: 100%;
-  }
-
-  thead tr {
-    background: #f9fafb;
-  }
-
+<style lang="postcss">
   th {
-    background: #f9fafb;
-    color: #6b7280;
-    font-size: 12px;
-    height: 40px;
-    letter-spacing: 0.05em;
-    line-height: 16px;
-    margin: 0;
-    padding: 12px 24px;
-    text-align: left;
-    text-transform: uppercase;
+    @apply bg-gray-200;
+    @apply text-gray-500;
+    @apply text-xs;
+    @apply h-6;
+    @apply m-0;
+    @apply p-3;
+    @apply text-left;
+    @apply uppercase;
   }
 </style>
