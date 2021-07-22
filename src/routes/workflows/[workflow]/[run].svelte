@@ -49,6 +49,8 @@
 
 <script lang="ts">
   import CodeBlock from './_code-block.svelte';
+  import WorkflowStatus from '$lib/components/workflow-status.svelte';
+
   import { formatDate } from '$lib/utilities/format-date';
 
   export let workflow: WorkflowExecutionAPIResponse;
@@ -60,14 +62,17 @@
   export let result: string;
 </script>
 
-<section>
-  <main>
-    <header>
-      <h1>{name}</h1>
-      <p>{workflowId}</p>
-      <p>{runId}</p>
-    </header>
-    <div id="workflow-info">
+<section class="border-l-2 border-gray-200 h-screen">
+  <header class="border-b-2 border-gray-200 p-6">
+    <h1 class="m-0 text-lg">{name}</h1>
+    <p class="text-gray-500 text-sm">{workflowId}</p>
+    <p class="text-gray-500 text-sm">{runId}</p>
+  </header>
+  <main class="p-6">
+    <div>
+      <WorkflowStatus status={workflow.status} />
+    </div>
+    <div>
       <h3>Start Time</h3>
       <p>{formatDate(workflow.startTime)}</p>
     </div>
@@ -94,50 +99,10 @@
 </section>
 
 <style>
-  section {
-    display: flex;
-    flex-flow: column;
-    justify-content: space-between;
-    min-width: 400px;
-    width: 33%;
-    border-left: 1px solid #e5e7eb;
-    height: 100vh;
-  }
-
-  a {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 50px;
-    width: 100%;
-    background-color: red;
-    color: white;
-  }
-
-  header {
-    padding: 24px 16px;
-    border-bottom: 1px solid #e5e7eb;
-  }
-
-  #workflow-info {
-    margin-top: 10px;
-  }
-
-  header h1 {
-    font-size: 18px;
-    font-weight: 500;
-    line-height: 24px;
-    margin: 0;
-  }
-
-  header p {
-    color: #6b7280;
-    font-size: 14px;
-    line-height: 20px;
-    margin: 0;
-  }
-
-  main {
-    padding: 24px 16px;
+  h3 {
+    @apply text-lg;
+    @apply mt-6;
+    @apply mb-2;
+    @apply font-semibold;
   }
 </style>
