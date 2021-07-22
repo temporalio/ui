@@ -69,37 +69,43 @@
 </script>
 
 <section class="border-l-2 border-gray-200 h-screen">
-  <header class="border-b-2 border-gray-200 p-6">
-    <h1 class="m-0 text-lg">{name}</h1>
-    <p class="text-gray-500 text-sm">{workflowId}</p>
-    <p class="text-gray-500 text-sm">{runId}</p>
-  </header>
-  <main class="p-6">
-    <div>
-      <WorkflowStatus status={workflow.status} />
-    </div>
-    <div>
-      <h3>Start Time</h3>
-      <p>{formatDate(workflow.startTime)}</p>
-    </div>
-    <div>
-      <h3>End Time</h3>
-      {#if workflow.closeTime}
-        <p>{formatDate(workflow.closeTime)}</p>
-      {:else}
-        <p>Still running…</p>
-      {/if}
-    </div>
-    <div>
-      <h3>Task Queue</h3>
-      <p>{workflow.taskQueue || '(None)'}</p>
-    </div>
-    <div>
-      <h3>History Events</h3>
-      <p>{events.length}</p>
-    </div>
-    <CodeBlock heading="Input" content={input} />
-    <CodeBlock heading="Result" content={result} />
+  <a class="absolute right-2 top-2 text-gray-500" href="/workflows"
+    ><img class="fill-current w-8 h-8" src="/icons/x.svg" /></a
+  >
+  <main>
+    <header class="border-b-2 border-gray-200 px-6 pb-6">
+      <h1 class="m-0 mt-6 text-lg">{name}</h1>
+      <p class="text-gray-500 text-sm">{workflowId}</p>
+      <p class="text-gray-500 text-sm">{runId}</p>
+    </header>
+    <section class="p-6">
+      <div class="m-4">
+        <WorkflowStatus status={workflow.status} />
+      </div>
+      <div>
+        <h3>Start Time</h3>
+        <p>{formatDate(workflow.startTime)}</p>
+      </div>
+      <div>
+        <h3>End Time</h3>
+        {#if workflow.closeTime}
+          <p>{formatDate(workflow.closeTime)}</p>
+        {:else}
+          <p>Still running…</p>
+        {/if}
+      </div>
+      <div>
+        <h3>Task Queue</h3>
+        <p>{workflow.taskQueue || '(None)'}</p>
+      </div>
+      <div>
+        <h3>History Events</h3>
+        <p>{events.length}</p>
+      </div>
+      <CodeBlock heading="Input" content={input} />
+      <CodeBlock heading="Result" content={result} />
+      <section />
+    </section>
   </main>
 </section>
 
