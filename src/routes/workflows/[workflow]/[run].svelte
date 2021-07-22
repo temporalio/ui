@@ -49,6 +49,8 @@
 
 <script lang="ts">
   import CodeBlock from './_code-block.svelte';
+  import WorkflowStatus from '$lib/components/workflow-status.svelte';
+
   import { formatDate } from '$lib/utilities/format-date';
 
   export let workflow: WorkflowExecutionAPIResponse;
@@ -67,6 +69,9 @@
     <p class="text-gray-500 text-sm">{runId}</p>
   </header>
   <main class="p-6">
+    <div>
+      <WorkflowStatus status={workflow.status} />
+    </div>
     <div>
       <h3>Start Time</h3>
       <p>{formatDate(workflow.startTime)}</p>

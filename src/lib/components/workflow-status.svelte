@@ -2,15 +2,6 @@
   export let status: string;
 </script>
 
-<div>{status}</div>
-
-<style lang="postcss">
-  div {
-    @apply bg-green-200;
-    @apply px-2;
-    @apply rounded-xl;
-    @apply text-center;
-    @apply text-green-600;
-    @apply text-sm;
-  }
-</style>
+<div class="bg-green-200 px-2 rounded-xl text-center text-green-600 text-sm">
+  {status}
+</div>

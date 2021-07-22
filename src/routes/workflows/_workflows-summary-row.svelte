@@ -1,6 +1,7 @@
 <script lang="ts">
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Cell from './_workflows-summary-cell.svelte';
+
   import { formatDate } from '$lib/utilities/format-date';
 
   export let workflow: WorkflowExecutionAPIResponse;
