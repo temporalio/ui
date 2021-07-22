@@ -5,9 +5,12 @@
     const { workflow: id, run } = page.params;
 
     // TODO: Make these concurrent. This can wait until we implement the Redux store.
-    const workflowResponse = await fetch(`/api/workflows/${id}/${run}`);
+    const workflowResponse = await fetch(
+      encodeURI(`/api/workflows/${id}/${run}`),
+    );
+
     const historyResponse = await fetch(
-      `/api/workflows/${id}/${run}/history?waitForHistory=true`,
+      encodeURI(`/api/workflows/${id}/${run}/history?waitForHistory=true`),
     );
 
     if (!workflowResponse.ok) {

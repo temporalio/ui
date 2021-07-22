@@ -4,7 +4,7 @@
 
 <nav
   id="sidebar"
-  class="w-28 h-screen py-6 flex flex-col items-center bg-purple-800"
+  class="w-28 h-screen py-6 flex flex-col items-center bg-black"
 >
   <img src="/logo.svg" alt="Temporal Logo" class="rounded-full w-12" />
   <div class="m-6 text-white text-center">

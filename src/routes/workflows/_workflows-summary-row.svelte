@@ -7,7 +7,9 @@
   import { formatDate } from '$lib/utilities/format-date';
 
   export let workflow: WorkflowExecutionAPIResponse;
-  let workflowUrl = `/workflows/${workflow.execution.workflowId}/${workflow.execution.runId}`;
+  let workflowUrl = encodeURI(
+    `/workflows/${workflow.execution.workflowId}/${workflow.execution.runId}`,
+  );
 
   $: isActive = pathMatches(workflowUrl, $page.path);
   $: rowStyle = isActive ? 'bg-yellow-200' : 'bg-gray-50 hover:bg-gray-100';
