@@ -31,7 +31,7 @@
   export let workflows: WorkflowsAPIResponse;
 </script>
 
-<section id="workflows">
+<section class="flex items-start">
   <WorkflowsSummaryTable>
     <tbody slot="rows">
       {#await workflows}
@@ -47,10 +47,3 @@
   </WorkflowsSummaryTable>
   <slot />
 </section>
-
-<style>
-  #workflows {
-    display: flex;
-    align-items: flex-start;
-  }
-</style>

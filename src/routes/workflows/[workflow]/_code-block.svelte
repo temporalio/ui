@@ -5,7 +5,7 @@
 
 {#if content}
   <div>
-    <h3>{heading}</h3>
+    <h3 class="mt-6 mb-2 font-semibold text-lg">{heading}</h3>
     <code>
       <pre>
         {JSON.stringify(content)}

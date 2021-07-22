@@ -7,35 +7,34 @@
 </script>
 
 <a {href} class:active={isActive}
-  ><img class:active={isActive} {src} {alt} {...props} /><slot /></a
+  ><img
+    class:hue-rotate-30={isActive}
+    class="mb-2 mx-auto text-white fill-current w-8 h-8"
+    {src}
+    {alt}
+    {...props}
+  /><slot /></a
 >
 
-<style>
+<style lang="postcss">
   a.active {
-    background-color: #3730a3;
-    color: #fff;
+    @apply bg-purple-900;
+    @apply text-white;
+    @apply opacity-100;
   }
 
-  img.active {
-    filter: sepia() saturate(0%) hue-rotate(30deg);
-  }
-
-  img {
-    margin-bottom: 10px;
+  a:hover {
+    @apply opacity-100;
   }
 
   a {
-    width: 90px;
-    font-size: 12px;
-    color: #e0e7ff;
-    margin-bottom: 18px;
-    display: flex;
-    flex-flow: column;
-    align-items: center;
-    justify-content: center;
-    width: 96px;
-    height: 72px;
-    text-decoration: none;
-    position: relative;
+    @apply mb-4;
+    @apply no-underline;
+    @apply p-4;
+    @apply text-center;
+    @apply text-gray-400;
+    @apply text-xs;
+    @apply w-24;
+    @apply opacity-70;
   }
 </style>

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import Cell from './_workflows-summary-cell.svelte';
   import { formatDate } from '$lib/utilities/format-date';
 
   export let workflow: WorkflowExecutionAPIResponse;
@@ -6,80 +8,45 @@
   let workflowUrl = `/workflows/${workflow.execution.workflowId}/${workflow.execution.runId}`;
 </script>
 
-<tr>
-  <td>
-    <a href={workflowUrl}>
-      <h3>
-        {workflow.type.name}
-      </h3>
-      <p>
-        {workflow.execution.runId}
-      </p>
-    </a>
-  </td>
-  <td>
-    <a href={workflowUrl}>
-      <p class="workflow-status">{workflow.status}</p>
-    </a>
-  </td>
-  <td>
-    <a href={workflowUrl}>
-      <p>{formatDate(workflow.startTime)}</p>
-    </a>
-  </td>
-  <td>
-    <a href={workflowUrl}>
-      <p>{formatDate(workflow.closeTime)}</p>
-    </a>
-  </td>
+<tr class="bg-gray-50 hover:bg-gray-100">
+  <Cell {workflowUrl}>
+    <h3>
+      {workflow.type.name}
+    </h3>
+    <p>
+      {workflow.execution.runId}
+    </p>
+  </Cell>
+  <Cell {workflowUrl}>
+    <WorkflowStatus status={workflow.status} />
+  </Cell>
+  <Cell {workflowUrl}>
+    <p>{formatDate(workflow.startTime)}</p>
+  </Cell>
+  <Cell {workflowUrl}>
+    <p>{formatDate(workflow.closeTime)}</p>
+  </Cell>
 </tr>
 
-<style>
-  a {
-    text-decoration: none;
-    display: block;
-    padding: 16px 24px;
-    height: 100%;
-    width: 100%;
-  }
-
-  tr {
-    background: #f3f4f6;
-  }
-
-  tr:hover {
-    background: #eeeff1;
-  }
-
-  td {
-    padding: 0;
-  }
-
+<style lang="postcss">
   h3 {
-    color: #111827;
-    font-style: normal;
-    font-weight: normal;
-    font-size: 14px;
-    line-height: 20px;
-    margin: 0;
+    @apply font-normal;
+    @apply m-0;
+    @apply text-base;
+    @apply text-gray-900;
   }
 
   p {
-    color: #6b7280;
-    font-size: 14px;
-    margin: 0;
+    @apply m-0;
+    @apply text-gray-500;
+    @apply text-sm;
   }
 
-  p.workflow-status {
-    font-family: Inter;
-    font-style: normal;
-    font-weight: 500;
-    font-size: 12px;
-    line-height: 16px;
-    text-align: center;
-    color: #065f46;
-    padding: 2px 10px;
-    background: #d1fae5;
-    border-radius: 10px;
+  .workflow-status {
+    @apply bg-green-200;
+    @apply text-center;
+    @apply text-green-600;
+    @apply text-sm;
+    @apply rounded-xl;
   }
 </style>
