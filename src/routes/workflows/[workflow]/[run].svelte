@@ -1,16 +1,19 @@
 <script context="module" lang="ts">
   import type { LoadInput } from '@sveltejs/kit';
+  import { encodeURISegments } from '$lib/utilities/encode-uri-segments';
 
   export async function load({ fetch, page }: LoadInput) {
     const { workflow: id, run } = page.params;
 
     // TODO: Make these concurrent. This can wait until we implement the Redux store.
     const workflowResponse = await fetch(
-      encodeURI(`/api/workflows/${id}/${run}`),
+      encodeURISegments(`/api/workflows/${id}/${run}`),
     );
 
     const historyResponse = await fetch(
-      encodeURI(`/api/workflows/${id}/${run}/history?waitForHistory=true`),
+      encodeURISegments(
+        `/api/workflows/${id}/${run}/history?waitForHistory=true`,
+      ),
     );
 
     if (!workflowResponse.ok) {
@@ -20,6 +23,7 @@
 
     if (!historyResponse.ok) {
       const message = `An error has occured: ${historyResponse.status}`;
+      console.log('historyResponse failed');
       throw new Error(message);
     }
 
