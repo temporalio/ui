@@ -2,14 +2,18 @@
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Cell from './_workflows-summary-cell.svelte';
 
+  import { page } from '$app/stores';
+  import { pathMatches } from '$lib/utilities/path-matches';
   import { formatDate } from '$lib/utilities/format-date';
 
   export let workflow: WorkflowExecutionAPIResponse;
-
   let workflowUrl = `/workflows/${workflow.execution.workflowId}/${workflow.execution.runId}`;
+
+  $: isActive = pathMatches(workflowUrl, $page.path);
+  $: rowStyle = isActive ? 'bg-yellow-200' : 'bg-gray-50 hover:bg-gray-100';
 </script>
 
-<tr class="bg-gray-50 hover:bg-gray-100">
+<tr class={rowStyle}>
   <Cell {workflowUrl}>
     <h3>
       {workflow.type.name}
