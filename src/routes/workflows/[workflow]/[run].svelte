@@ -62,9 +62,10 @@
   export let result: string;
 </script>
 
-<section
-  class="border-l-2 border-gray-200 h-screen flex flex-col justify-between"
->
+<section class="border-l-2 border-gray-200 h-screen">
+  <a class="absolute right-0" href="/workflows"
+    ><img class="fill-current w-8 h-8" src="/icons/x.svg" /></a
+  >
   <main class="p-6">
     <header class="border-b-2 border-gray-200 p-6">
       <h1 class="m-0 text-lg">{name}</h1>
@@ -97,10 +98,6 @@
     <CodeBlock heading="Input" content={input} />
     <CodeBlock heading="Result" content={result} />
   </main>
-  <a
-    class="w-full bg-red-500 h-14 flex justify-center text-white"
-    href="/workflows"><button>Close</button></a
-  >
 </section>
 
 <style>
