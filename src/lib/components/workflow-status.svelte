@@ -6,11 +6,11 @@
 
 <style lang="postcss">
   div {
-    @apply px-2;
     @apply bg-green-200;
+    @apply px-2;
+    @apply rounded-xl;
     @apply text-center;
     @apply text-green-600;
     @apply text-sm;
-    @apply rounded-xl;
   }
 </style>
