@@ -6,6 +6,7 @@
 
 <style lang="postcss">
   div {
+    @apply px-2;
     @apply bg-green-200;
     @apply text-center;
     @apply text-green-600;

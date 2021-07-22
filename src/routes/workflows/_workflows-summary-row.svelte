@@ -41,12 +41,4 @@
     @apply text-gray-500;
     @apply text-sm;
   }
-
-  .workflow-status {
-    @apply bg-green-200;
-    @apply text-center;
-    @apply text-green-600;
-    @apply text-sm;
-    @apply rounded-xl;
-  }
 </style>

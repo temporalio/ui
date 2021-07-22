@@ -1,5 +1,5 @@
 <script>
-  import NavigationLink from '$lib/components/navigation-link.svelte';
+  import NavigationLink from './_navigation-link.svelte';
 </script>
 
 <nav

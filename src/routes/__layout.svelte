@@ -1,6 +1,6 @@
 <script>
   import '../app.postcss';
-  import Sidebar from './_sidebar.svelte';
+  import Navigation from './_navigation.svelte';
 </script>
 
 <svelte:head>
@@ -16,7 +16,7 @@
 </svelte:head>
 
 <main class="flex align-start">
-  <Sidebar />
+  <Navigation />
   <div class="w-full">
     <slot />
   </div>
