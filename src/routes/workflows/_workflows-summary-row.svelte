@@ -5,9 +5,12 @@
   import { page } from '$app/stores';
   import { pathMatches } from '$lib/utilities/path-matches';
   import { formatDate } from '$lib/utilities/format-date';
+  import { encodeURISegments } from '$lib/utilities/encode-uri-segments';
 
   export let workflow: WorkflowExecutionAPIResponse;
-  let workflowUrl = `/workflows/${workflow.execution.workflowId}/${workflow.execution.runId}`;
+  let workflowUrl = encodeURISegments(
+    `/workflows/${workflow.execution.workflowId}/${workflow.execution.runId}`,
+  );
 
   $: isActive = pathMatches(workflowUrl, $page.path);
   $: rowStyle = isActive ? 'bg-yellow-200' : 'bg-gray-50 hover:bg-gray-100';
