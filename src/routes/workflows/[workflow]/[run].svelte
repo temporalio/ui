@@ -62,14 +62,16 @@
   export let result: string;
 </script>
 
-<section class="border-l-2 border-gray-200 h-screen">
-  <header class="border-b-2 border-gray-200 p-6">
-    <h1 class="m-0 text-lg">{name}</h1>
-    <p class="text-gray-500 text-sm">{workflowId}</p>
-    <p class="text-gray-500 text-sm">{runId}</p>
-  </header>
+<section
+  class="border-l-2 border-gray-200 h-screen flex flex-col justify-between"
+>
   <main class="p-6">
-    <div>
+    <header class="border-b-2 border-gray-200 p-6">
+      <h1 class="m-0 text-lg">{name}</h1>
+      <p class="text-gray-500 text-sm">{workflowId}</p>
+      <p class="text-gray-500 text-sm">{runId}</p>
+    </header>
+    <div class="m-4">
       <WorkflowStatus status={workflow.status} />
     </div>
     <div>
@@ -95,7 +97,10 @@
     <CodeBlock heading="Input" content={input} />
     <CodeBlock heading="Result" content={result} />
   </main>
-  <a href="/workflows"><button>Close</button></a>
+  <a
+    class="w-full bg-red-500 h-14 flex justify-center text-white"
+    href="/workflows"><button>Close</button></a
+  >
 </section>
 
 <style>
