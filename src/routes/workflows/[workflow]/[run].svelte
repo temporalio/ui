@@ -61,13 +61,13 @@
 </script>
 
 <section>
-  <header>
-    <h1>{name}</h1>
-    <p>{workflowId}</p>
-    <p>{runId}</p>
-  </header>
   <main>
-    <div>
+    <header>
+      <h1>{name}</h1>
+      <p>{workflowId}</p>
+      <p>{runId}</p>
+    </header>
+    <div id="workflow-info">
       <h3>Start Time</h3>
       <p>{formatDate(workflow.startTime)}</p>
     </div>
@@ -90,19 +90,37 @@
     <CodeBlock heading="Input" content={input} />
     <CodeBlock heading="Result" content={result} />
   </main>
+  <a href="/workflows"><button>Close</button></a>
 </section>
 
 <style>
   section {
+    display: flex;
+    flex-flow: column;
+    justify-content: space-between;
     min-width: 400px;
     width: 33%;
     border-left: 1px solid #e5e7eb;
     height: 100vh;
   }
 
+  a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+    width: 100%;
+    background-color: red;
+    color: white;
+  }
+
   header {
     padding: 24px 16px;
     border-bottom: 1px solid #e5e7eb;
+  }
+
+  #workflow-info {
+    margin-top: 10px;
   }
 
   header h1 {
