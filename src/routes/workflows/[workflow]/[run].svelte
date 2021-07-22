@@ -23,7 +23,6 @@
 
     if (!historyResponse.ok) {
       const message = `An error has occured: ${historyResponse.status}`;
-      console.log('historyResponse failed');
       throw new Error(message);
     }
 
