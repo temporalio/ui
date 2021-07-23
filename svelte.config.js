@@ -39,6 +39,11 @@ const config = {
       assets: outputDirectory,
       fallback: null,
     }),
+    vite: {
+      optimizeDeps: {
+        include: ['svelte-hero-icons'],
+      },
+    },
   },
 };
 
