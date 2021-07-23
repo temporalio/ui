@@ -54,6 +54,7 @@
 </script>
 
 <script lang="ts">
+  import Icon, { X } from 'svelte-hero-icons';
   import CodeBlock from './_code-block.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
 
@@ -69,9 +70,9 @@
 </script>
 
 <section class="border-l-2 border-gray-200 h-screen">
-  <a class="absolute right-2 top-2 text-gray-500" href="/workflows"
-    ><img class="fill-current w-8 h-8" src="/icons/x.svg" /></a
-  >
+  <a href="/workflows">
+    <Icon src={X} class="absolute right-2 top-2 w-8 h-8 text-gray-400" />
+  </a>
   <main>
     <header class="border-b-2 border-gray-200 px-6 pb-6">
       <h1 class="m-0 mt-6 text-lg">{name}</h1>

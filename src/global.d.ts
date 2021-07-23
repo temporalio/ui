@@ -1,5 +1,7 @@
 /// <reference types="@sveltejs/kit" />
 
+type Heroicon = { [key: string]: string }[][];
+
 type WorkflowsAPIResponse = {
   executions: WorkflowExecutionAPIResponse[];
   nextPageToken: string;

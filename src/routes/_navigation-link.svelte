@@ -1,20 +1,19 @@
-<script>
+<script lang="ts">
   import { page } from '$app/stores';
   import { pathMatches } from '$lib/utilities/path-matches';
+  import Icon from 'svelte-hero-icons';
 
-  $: ({ href, src, alt, ...props } = $$props);
+  export let href: string;
+  export let label: string;
+  export let icon: Heroicon;
+
   $: isActive = pathMatches(href, $page.path);
 </script>
 
-<a {href} class:active={isActive}
-  ><img
-    class:hue-rotate-30={isActive}
-    class="mb-2 mx-auto text-white fill-current w-8 h-8"
-    {src}
-    {alt}
-    {...props}
-  /><slot /></a
->
+<a {href} class:active={isActive}>
+  <Icon src={icon} class="mb-2 mx-auto text-white w-8 h-8" />
+  <p>{label}</p>
+</a>
 
 <style lang="postcss">
   a.active {
@@ -28,13 +27,14 @@
   }
 
   a {
-    @apply mb-4;
+    @apply m-4;
     @apply no-underline;
+    @apply opacity-70;
     @apply p-4;
+    @apply rounded-lg;
     @apply text-center;
     @apply text-gray-400;
     @apply text-xs;
     @apply w-24;
-    @apply opacity-70;
   }
 </style>
