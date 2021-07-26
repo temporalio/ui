@@ -48,6 +48,7 @@
         events,
         input,
         result,
+        workflowURL: `/workflow/${workflowId}/${runId}`,
       },
     };
   }
@@ -67,10 +68,11 @@
   export let events: any[];
   export let input: string;
   export let result: string;
+  export let workflowURL: string;
 </script>
 
 <section class="border-l-2 border-gray-200 h-screen">
-  <a href="/workflows">
+  <a href={workflowURL}>
     <Icon
       src={ArrowsExpand}
       class="absolute right-10 top-2 w-8 h-8 text-gray-400"
