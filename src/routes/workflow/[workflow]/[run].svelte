@@ -48,15 +48,13 @@
         events,
         input,
         result,
-        workflowUrl: encodeURISegments(`/workflow/${workflowId}/${runId}`),
+        workflowUrl: encodeURISegments(`/workflows/${workflowId}/${runId}`),
       },
     };
   }
 </script>
 
 <script lang="ts">
-  import Icon, { X, ArrowsExpand } from 'svelte-hero-icons';
-  import CodeBlock from './_code-block.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
 
   import { formatDate } from '$lib/utilities/format-date';
@@ -71,58 +69,6 @@
   export let workflowUrl: string;
 </script>
 
-<section class="border-l-2 border-gray-200 h-screen">
-  <a href={workflowUrl}>
-    <Icon
-      src={ArrowsExpand}
-      class="absolute right-10 top-2 w-8 h-8 text-gray-400"
-    />
-  </a>
-  <a href="/workflows">
-    <Icon src={X} class="absolute right-2 top-2 w-8 h-8 text-gray-400" />
-  </a>
-  <main>
-    <header class="border-b-2 border-gray-200 px-6 pb-6">
-      <h1 class="m-0 mt-6 text-lg">{name}</h1>
-      <p class="text-gray-500 text-sm">{workflowId}</p>
-      <p class="text-gray-500 text-sm">{runId}</p>
-    </header>
-    <section class="p-6">
-      <div class="m-4">
-        <WorkflowStatus status={workflow.status} />
-      </div>
-      <div>
-        <h3>Start Time</h3>
-        <p>{formatDate(workflow.startTime)}</p>
-      </div>
-      <div>
-        <h3>End Time</h3>
-        {#if workflow.closeTime}
-          <p>{formatDate(workflow.closeTime)}</p>
-        {:else}
-          <p>Still running…</p>
-        {/if}
-      </div>
-      <div>
-        <h3>Task Queue</h3>
-        <p>{workflow.taskQueue || '(None)'}</p>
-      </div>
-      <div>
-        <h3>History Events</h3>
-        <p>{events.length}</p>
-      </div>
-      <CodeBlock heading="Input" content={input} />
-      <CodeBlock heading="Result" content={result} />
-      <section />
-    </section>
-  </main>
+<section class="flex items-start">
+  <a href={workflowUrl}><button>Contract</button></a>
 </section>
-
-<style>
-  h3 {
-    @apply text-lg;
-    @apply mt-6;
-    @apply mb-2;
-    @apply font-semibold;
-  }
-</style>
