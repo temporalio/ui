@@ -83,7 +83,7 @@
       <p class="text-gray-500 text-sm">{workflowId}</p>
       <p class="text-gray-500 text-sm">{runId}</p>
       <a
-        class="bg-indigo-500 text-white active:bg-indigo-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+        class="bg-indigo-500 text-white text-center	w-min active:bg-indigo-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
         href={workflowUrl}><button>Contract</button></a
       >
     </header>
