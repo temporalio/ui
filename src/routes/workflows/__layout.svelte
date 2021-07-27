@@ -10,11 +10,11 @@
     const response = await fetch(`/api/workflows?${query}`);
 
     if (!response.ok) {
-      const message = `An error has occured: ${response.status}`;
+      const message = `An error has occurred: ${response.status}`;
       throw new Error(message);
     }
 
-    const { workflows } = await response.json();
+    const { workflows }: { WorkflowsAPIResponse } = await response.json();
 
     return {
       props: {
