@@ -36,7 +36,7 @@ build-types: install-tools
 	;)
 
 clean:
-	rm -rf ./src/types
+	rm -rf $(PROTO_OUT)
 
 ##### Install dependencies #####
 install: install-tools
