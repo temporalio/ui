@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Home, Photograph } from 'svelte-hero-icons';
+  import { Home, Photograph, Collection } from 'svelte-hero-icons';
   import NavigationLink from './_navigation-link.svelte';
 </script>
 
@@ -14,4 +14,5 @@
   </div>
   <NavigationLink href="/" label="Home" icon={Home} />
   <NavigationLink href="/workflows" label="Workflows" icon={Photograph} />
+  <NavigationLink href="/settings" label="Settings" icon={Collection} />
 </nav>
