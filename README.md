@@ -2,6 +2,17 @@
 
 ## Developing
 
+### First run
+
+Install dependencies and build Typescript definitions:
+
+```bash
+npm install
+npm run build-types
+```
+
+### Starting UI
+
 Once you've created a project and installed dependencies with `npm install`, start a development server:
 
 ```bash
