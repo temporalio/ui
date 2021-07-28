@@ -5,6 +5,7 @@
 ### First run
 
 Install dependencies and build Typescript definitions:
+
 ```bash
 npm install
 npm run build-types
