@@ -56,12 +56,3 @@
     </header>
   </main>
 </section>
-
-<style>
-  h3 {
-    @apply text-lg;
-    @apply mt-6;
-    @apply mb-2;
-    @apply font-semibold;
-  }
-</style>
