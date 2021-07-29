@@ -1,27 +1,16 @@
 <script context="module" lang="ts">
+  import type { WorkflowExecutionInfo } from '$types/temporal/api/workflow/v1/message';
+  import type { ListWorkflowExecutionsResponse } from '$types/temporal/api/workflowservice/v1/request_response';
   import type { LoadInput } from '@sveltejs/kit';
-  import { subDays, addDays } from 'date-fns';
 
   export async function load({ fetch }: LoadInput) {
-    const startTime = subDays(new Date(), 30).toISOString();
-    const endTime = addDays(new Date(), 30).toISOString();
-
-    const query = new URLSearchParams({
-      'start_time_filter.earliest_time': startTime, // TODO field names should come from ListWorkflowExecutionsRequest
-      'start_time_filter.latest_time': endTime,
-    });
-    const response = await fetch(`/api/workflows?${query}`);
-
-    if (!response.ok) {
-      const message = `An error has occurred: ${response.status}`;
-      throw new Error(message);
-    }
-
-    const { workflows }: { WorkflowsAPIResponse } = await response.json();
+    const { executions }: ListWorkflowExecutionsResponse = await fetch(
+      `http://localhost:8080/api/v1/namespaces/default/workflows/open`,
+    ).then((response) => response.json());
 
     return {
       props: {
-        workflows,
+        executions,
       },
     };
   }
@@ -31,16 +20,16 @@
   import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
 
-  export let workflows: WorkflowsAPIResponse;
+  export let executions: WorkflowExecutionInfo[];
 </script>
 
 <section class="flex items-start">
   <WorkflowsSummaryTable>
     <tbody slot="rows">
-      {#await workflows}
+      {#await executions}
         <p>Loading…</p>
-      {:then workflows}
-        {#each workflows.executions as workflow}
+      {:then executions}
+        {#each executions as workflow}
           <WorkflowsSummaryRow {workflow} />
         {/each}
       {:catch}
