@@ -1,9 +1,10 @@
 <script context="module" lang="ts">
-  import { WorkflowExecutionInfo } from '$types/temporal/api/workflow/v1/message.ts';
+  import type { WorkflowExecutionInfo } from '$types/temporal/api/workflow/v1/message';
+  import type { ListWorkflowExecutionsResponse } from '$types/temporal/api/workflowservice/v1/request_response';
   import type { LoadInput } from '@sveltejs/kit';
 
   export async function load({ fetch }: LoadInput) {
-    const { executions }: ListOpenWorkflowExecutionsResponse = await fetch(
+    const { executions }: ListWorkflowExecutionsResponse = await fetch(
       `http://localhost:8080/api/v1/namespaces/default/workflows/open`,
     ).then((response) => response.json());
 
@@ -19,7 +20,7 @@
   import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
 
-  export let executions;
+  export let executions: WorkflowExecutionInfo[];
 </script>
 
 <section class="flex items-start">

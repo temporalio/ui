@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { WorkflowExecutionInfo } from '$types/temporal/api/workflow/v1/message';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Cell from './_workflows-summary-cell.svelte';
 
@@ -7,7 +8,7 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { encodeURISegments } from '$lib/utilities/encode-uri-segments';
 
-  export let workflow: WorkflowExecutionAPIResponse;
+  export let workflow: WorkflowExecutionInfo;
   let workflowUrl = encodeURISegments(
     `/workflows/${workflow.execution.workflowId}/${workflow.execution.runId}`,
   );

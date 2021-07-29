@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
-  import { DescribeWorkflowExecutionResponse } from '$types/temporal/api/workflowservice/v1/request_response.ts';
+  import type { DescribeWorkflowExecutionResponse } from '$types/temporal/api/workflowservice/v1/request_response';
   import type { LoadInput } from '@sveltejs/kit';
 
   export async function load({ fetch, page }: LoadInput) {
@@ -9,7 +9,7 @@
       `http://localhost:8080/api/v1/namespaces/default/workflows/${id}/executions/${run}`,
     )
       .then((response) => response.json())
-      .catch(console.error());
+      .catch(console.error);
 
     return {
       props: {
@@ -19,10 +19,10 @@
   }
 </script>
 
-<script>
+<script lang="typescript">
   import Icon, { X, ArrowsExpand } from 'svelte-hero-icons';
 
-  export let execution;
+  export let execution: DescribeWorkflowExecutionResponse;
 
   $: name = execution.workflowExecutionInfo.type.name;
   $: workflowId = execution.workflowExecutionInfo.execution.workflowId;
