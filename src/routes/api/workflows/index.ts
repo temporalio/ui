@@ -1,4 +1,6 @@
-const apiHost = process.env.TEMPORAL_API_HOST || 'http://localhost:8088';
+import type { ListWorkflowExecutionsResponse } from '$types/temporal/api/workflowservice/v1/request_response';
+
+const apiHost = process.env.TEMPORAL_API_HOST || 'http://localhost:8080';
 
 /*
  * TODO: Add better error handling.
@@ -11,9 +13,9 @@ const apiHost = process.env.TEMPORAL_API_HOST || 'http://localhost:8088';
 const fetchWorkflows: (
   type: string,
   query: URLSearchParams,
-) => Promise<WorkflowsAPIResponse> = async (type, query) => {
+) => Promise<ListWorkflowExecutionsResponse> = async (type, query) => {
   const response = await fetch(
-    `${apiHost}/api/namespaces/default/workflows/${type}?${query.toString()}`,
+    `${apiHost}/api/v1/namespaces/default/workflows/${type}?${query.toString()}`,
   );
   return await response.json();
 };

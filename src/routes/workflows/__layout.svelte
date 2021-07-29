@@ -6,7 +6,10 @@
     const startTime = subDays(new Date(), 30).toISOString();
     const endTime = addDays(new Date(), 30).toISOString();
 
-    const query = new URLSearchParams({ startTime, endTime });
+    const query = new URLSearchParams({
+      'start_time_filter.earliest_time': startTime, // TODO field names should come from ListWorkflowExecutionsRequest
+      'start_time_filter.latest_time': endTime,
+    });
     const response = await fetch(`/api/workflows?${query}`);
 
     if (!response.ok) {
