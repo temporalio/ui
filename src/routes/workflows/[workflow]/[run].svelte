@@ -1,77 +1,37 @@
 <script context="module" lang="ts">
+  import { DescribeWorkflowExecutionResponse } from '$types/temporal/api/workflowservice/v1/request_response.ts';
   import type { LoadInput } from '@sveltejs/kit';
-  import { encodeURISegments } from '$lib/utilities/encode-uri-segments';
 
   export async function load({ fetch, page }: LoadInput) {
     const { workflow: id, run } = page.params;
 
-    // TODO: Make these concurrent. This can wait until we implement the Redux store.
-    const workflowResponse = await fetch(
-      encodeURISegments(`/api/workflows/${id}/${run}`),
-    );
-
-    const historyResponse = await fetch(
-      encodeURISegments(
-        `/api/workflows/${id}/${run}/history?waitForHistory=true`,
-      ),
-    );
-
-    if (!workflowResponse.ok) {
-      const message = `An error has occured: ${workflowResponse.status}`;
-      throw new Error(message);
-    }
-
-    if (!historyResponse.ok) {
-      const message = `An error has occured: ${historyResponse.status}`;
-      throw new Error(message);
-    }
-
-    const { workflowExecutionInfo: workflow } = await workflowResponse.json();
-    const { history } = await historyResponse.json();
-
-    const { type, execution } = workflow;
-    const { events } = history;
-
-    const { name } = type;
-    const { workflowId, runId } = execution;
-
-    const { details: lastEventDetails } = events[events.length - 1];
-    const input = lastEventDetails.input && lastEventDetails.input.payloads;
-    const result = lastEventDetails.result && lastEventDetails.result.payloads;
+    const execution: DescribeWorkflowExecutionResponse = await fetch(
+      `http://localhost:8080/api/v1/namespaces/default/workflows/${id}/executions/${run}`,
+    )
+      .then((response) => response.json())
+      .catch(console.error());
 
     return {
       props: {
-        workflow,
-        name,
-        workflowId,
-        runId,
-        events,
-        input,
-        result,
-        workflowUrl: encodeURISegments(`/workflow/${workflowId}/${runId}`),
+        execution,
       },
     };
   }
 </script>
 
-<script lang="ts">
+<script>
   import Icon, { X, ArrowsExpand } from 'svelte-hero-icons';
-  import CodeBlock from './_code-block.svelte';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import { page } from '$app/stores';
 
-  import { formatDate } from '$lib/utilities/format-date';
+  export let execution;
 
-  export let workflow: WorkflowExecutionAPIResponse;
-  export let name: string;
-  export let workflowId: string;
-  export let runId: string;
-  export let events: any[];
-  export let input: string;
-  export let result: string;
-  export let workflowUrl: string;
+  $: name = execution.workflowExecutionInfo.type.name;
+  $: workflowId = execution.workflowExecutionInfo.execution.workflowId;
+  $: runId = execution.workflowExecutionInfo.execution.runId;
+  $: workflowUrl = `/workflow/${workflowId}/${runId}`;
 </script>
 
-<section class="border-l-2 border-gray-200 h-screen">
+<section class="flex items-start border-l-2 h-screen w-96">
   <a href={workflowUrl}>
     <Icon
       src={ArrowsExpand}
@@ -81,40 +41,20 @@
   <a href="/workflows">
     <Icon src={X} class="absolute right-2 top-2 w-8 h-8 text-gray-400" />
   </a>
-  <main>
-    <header class="border-b-2 border-gray-200 px-6 pb-6">
-      <h1 class="m-0 mt-6 text-lg">{name}</h1>
-      <p class="text-gray-500 text-sm">{workflowId}</p>
-      <p class="text-gray-500 text-sm">{runId}</p>
+  <main class="w-full">
+    <header
+      class="border-b-2 border-gray-200 px-6 pb-6 flex flex-col justify-between"
+    >
+      <h1 class="m-0 mt-6 text-lg">
+        {name}
+      </h1>
+      <p class="text-gray-500 text-sm">
+        {workflowId}
+      </p>
+      <p class="text-gray-500 text-sm">
+        {runId}
+      </p>
     </header>
-    <section class="p-6">
-      <div class="m-4">
-        <WorkflowStatus status={workflow.status} />
-      </div>
-      <div>
-        <h3>Start Time</h3>
-        <p>{formatDate(workflow.startTime)}</p>
-      </div>
-      <div>
-        <h3>End Time</h3>
-        {#if workflow.closeTime}
-          <p>{formatDate(workflow.closeTime)}</p>
-        {:else}
-          <p>Still running…</p>
-        {/if}
-      </div>
-      <div>
-        <h3>Task Queue</h3>
-        <p>{workflow.taskQueue || '(None)'}</p>
-      </div>
-      <div>
-        <h3>History Events</h3>
-        <p>{events.length}</p>
-      </div>
-      <CodeBlock heading="Input" content={input} />
-      <CodeBlock heading="Result" content={result} />
-      <section />
-    </section>
   </main>
 </section>
 
