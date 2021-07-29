@@ -1,3 +1,4 @@
+import path from 'path';
 import preprocess from 'svelte-preprocess';
 import adapter from '@sveltejs/adapter-static';
 import chalk from 'chalk';
@@ -42,6 +43,11 @@ const config = {
     vite: {
       optimizeDeps: {
         include: ['svelte-hero-icons'],
+      },
+      resolve: {
+        alias: {
+          $types: path.resolve('./src/types'),
+        },
       },
     },
   },
