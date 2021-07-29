@@ -24,22 +24,17 @@ PROTO_REFS := Mgoogle/protobuf/wrappers.proto=github.com/gogo/protobuf/types,Mgo
 ##### Build #####
 build: clean build-types
 
-build-types: install-tools
+build-types:
 	git submodule update --init
 	printf $(COLOR) "Compiling Typescript types..."
 	rm -rf $(PROTO_OUT)/*
 	mkdir -p $(PROTO_OUT)
 	$(foreach PROTO_DIR,$(PROTO_DIRS),\
 		protoc $(PROTO_IMPORTS) \
-			--ts_out=$(PROTO_REFS):$(PROTO_OUT) \
+			--plugin=node_modules/ts-proto/protoc-gen-ts_proto \
+			--ts_proto_out=esModuleInterop=true,$(PROTO_REFS):$(PROTO_OUT) \
 		$(PROTO_DIR)*.proto \
 	;)
 
 clean:
 	rm -rf $(PROTO_OUT)
-
-##### Install dependencies #####
-install: install-tools
-
-install-tools:
-	npm install -g protoc-gen-ts
