@@ -25,7 +25,7 @@ export class WorkflowExecutionResponse {
     this.historyEvents = response.workflowExecutionInfo.historyLength;
   }
 
-  toggleUrl(isFullScreen: boolean) {
+  toggleUrl(isFullScreen: boolean): string {
     return `/workflows/${this.id}/${this.runId}?${new URLSearchParams({
       fullScreen: (!isFullScreen).toString(),
     })}`;
