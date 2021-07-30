@@ -22,13 +22,16 @@
 <script lang="typescript">
   import { isFullScreen } from '$lib/stores/full-screen';
   import Icon, { X, ArrowsExpand } from 'svelte-hero-icons';
+  import { page } from '$app/stores';
 
   export let execution: DescribeWorkflowExecutionResponse;
 
   $: name = execution.workflowExecutionInfo.type.name;
   $: workflowId = execution.workflowExecutionInfo.execution.workflowId;
   $: runId = execution.workflowExecutionInfo.execution.runId;
-  $: workflowUrl = `/workflows/${workflowId}/${runId}`;
+  $: workflowUrl = `/workflows/${workflowId}/${runId}?${new URLSearchParams({
+    fullScreen: !$isFullScreen,
+  })}`;
 </script>
 
 <section
@@ -39,7 +42,7 @@
     <header
       class="border-b-2 border-gray-200 px-6 pb-6 flex flex-col justify-between"
     >
-      <a href={workflowUrl} on:click|preventDefault={isFullScreen.toggle}>
+      <a href={workflowUrl}>
         <Icon
           src={ArrowsExpand}
           class="absolute right-10 top-2 w-8 h-8 text-gray-400"
