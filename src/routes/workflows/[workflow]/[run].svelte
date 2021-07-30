@@ -1,5 +1,8 @@
 <script context="module" lang="ts">
-  import type { DescribeWorkflowExecutionResponse } from '$types/temporal/api/workflowservice/v1/request_response';
+  import type {
+    DescribeWorkflowExecutionResponse,
+    GetWorkflowExecutionHistoryResponse,
+  } from '$types/temporal/api/workflowservice/v1/request_response';
   import type { LoadInput } from '@sveltejs/kit';
 
   export async function load({ fetch, page }: LoadInput) {
@@ -11,9 +14,16 @@
       .then((response) => response.json())
       .catch(console.error);
 
+    const events: GetWorkflowExecutionHistoryResponse = await fetch(
+      `http://localhost:8080/api/v1/namespaces/default/workflows/${id}/executions/${run}/events`,
+    )
+      .then((response) => response.json())
+      .catch(console.error);
+
     return {
       props: {
         execution,
+        events,
       },
     };
   }
@@ -27,8 +37,12 @@
   import Header from './_header.svelte';
   import ExecutionInformation from './_execution-information.svelte';
   import PendingActivities from './_pending-activities.svelte';
+  import Events from './_events.svelte';
 
   export let execution: DescribeWorkflowExecutionResponse;
+  export let events: GetWorkflowExecutionHistoryResponse;
+
+  let { history } = events;
 
   $: workflow = new WorkflowExecutionResponse(execution);
 </script>
@@ -54,6 +68,11 @@
         <PendingActivities activities={workflow.pendingActivities} />
       </div>
     </div>
+    {#if $isFullScreen}
+      <div class="px-6 py-6">
+        <Events {history} />
+      </div>
+    {/if}
   </main>
 </section>
 
@@ -64,6 +83,7 @@
 
   .sidebar {
     width: 600px;
+    overflow-y: scroll;
   }
 
   .full .execution-information {
