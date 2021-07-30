@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 
-export function formatDate(date: Date | null): string {
+export function formatDate(date: Date | string | null): string {
   if (!date) return '';
-  return format(date, 'MMMM dd, yyyy — h:mm a');
+  return format(new Date(date), 'MMMM dd, yyyy — h:mm a');
 }
