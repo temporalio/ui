@@ -21,48 +21,53 @@
 
 <script lang="typescript">
   import { isFullScreen } from '$lib/stores/full-screen';
-  import Icon, { X, ArrowsExpand } from 'svelte-hero-icons';
+
+  import { WorkflowExecutionResponse } from '$lib/models/workflow-execution';
+
+  import Header from './_header.svelte';
+  import ExecutionInformation from './_execution-information.svelte';
 
   export let execution: DescribeWorkflowExecutionResponse;
 
-  $: name = execution.workflowExecutionInfo.type.name;
-  $: workflowId = execution.workflowExecutionInfo.execution.workflowId;
-  $: runId = execution.workflowExecutionInfo.execution.runId;
-  $: workflowUrl = `/workflows/${workflowId}/${runId}`;
+  $: workflow = new WorkflowExecutionResponse(execution);
 </script>
 
 <section
-  class="flex items-start border-l-2 h-screen w-1/3"
+  class="flex items-start border-l-2 h-screen"
   class:full={$isFullScreen}
+  class:sidebar={!$isFullScreen}
 >
   <main class="w-full">
-    <header
-      class="border-b-2 border-gray-200 px-6 pb-6 flex flex-col justify-between"
-    >
-      <a href={workflowUrl} on:click|preventDefault={isFullScreen.toggle}>
-        <Icon
-          src={ArrowsExpand}
-          class="absolute right-10 top-2 w-8 h-8 text-gray-400"
+    <Header {workflow} />
+    <div class="px-6 py-6">
+      <div class="execution-information flex">
+        <ExecutionInformation title="Start Time" value={workflow.startTime} />
+        <ExecutionInformation title="End Time" value={workflow.endTime} />
+        <ExecutionInformation title="Task Queue" value={workflow.taskQueue} />
+        <ExecutionInformation
+          title="History Events"
+          value={workflow.historyEvents}
         />
-      </a>
-      <a href="/workflows">
-        <Icon src={X} class="absolute right-2 top-2 w-8 h-8 text-gray-400" />
-      </a>
-      <h1 class="m-0 mt-6 text-lg">
-        {name}
-      </h1>
-      <p class="text-gray-500 text-sm">
-        {workflowId}
-      </p>
-      <p class="text-gray-500 text-sm">
-        {runId}
-      </p>
-    </header>
+      </div>
+    </div>
   </main>
 </section>
 
 <style>
   .full {
     width: 100%;
+  }
+
+  .sidebar {
+    width: 600px;
+  }
+
+  .full .execution-information {
+    flex-direction: row;
+    justify-content: space-around;
+  }
+
+  .sidebar .execution-information {
+    flex-flow: column wrap;
   }
 </style>
