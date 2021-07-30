@@ -6,7 +6,7 @@
  * @param uri string
  * @returns string
  */
-export const encodeURISegments = (uri: string) => {
+export const encodeURISegments = (uri: string): string => {
   const queryParameterIndex = uri.indexOf('?');
 
   return (
