@@ -17,6 +17,8 @@
 </script>
 
 <script lang="ts">
+  import { isFullScreen } from '$lib/stores/full-screen';
+
   import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
 
@@ -24,18 +26,20 @@
 </script>
 
 <section class="flex items-start">
-  <WorkflowsSummaryTable>
-    <tbody slot="rows">
-      {#await executions}
-        <p>Loading…</p>
-      {:then executions}
-        {#each executions as workflow}
-          <WorkflowsSummaryRow {workflow} />
-        {/each}
-      {:catch}
-        <p>There was an error.</p>
-      {/await}
-    </tbody>
-  </WorkflowsSummaryTable>
+  {#if !$isFullScreen}
+    <WorkflowsSummaryTable>
+      <tbody slot="rows">
+        {#await executions}
+          <p>Loading…</p>
+        {:then executions}
+          {#each executions as workflow}
+            <WorkflowsSummaryRow {workflow} />
+          {/each}
+        {:catch}
+          <p>There was an error.</p>
+        {/await}
+      </tbody>
+    </WorkflowsSummaryTable>
+  {/if}
   <slot />
 </section>
