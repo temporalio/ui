@@ -31,7 +31,7 @@
   $: workflowUrl = `/workflows/${workflowId}/${runId}`;
 </script>
 
-<section class="flex items-start border-l-2 h-screen w-full flex-grow">
+<section class="flex items-start border-l-2 h-screen w-1/4">
   <main class="w-full">
     <header
       class="border-b-2 border-gray-200 px-6 pb-6 flex flex-col justify-between"

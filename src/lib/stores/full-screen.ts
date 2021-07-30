@@ -19,5 +19,5 @@ const { subscribe, update } = writable(false, function (set) {
 
 export const isFullScreen = {
   subscribe,
-  toggle: () => update((status) => setQueryParam(!status)),
+  toggle: (): void => update((status) => setQueryParam(!status)),
 };
