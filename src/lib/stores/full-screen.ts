@@ -1,23 +1,9 @@
 import { page } from '$app/stores';
-import { get, writable } from 'svelte/store';
+import { derived } from 'svelte/store';
 
-const getQueryParam = () => !!+get(page).query.has('fullScreen');
-const setQueryParam = (status: boolean): boolean => {
-  const query = new URLSearchParams();
-  if (status) {
-    query.append('fullScreen', '1');
-  } else {
-    query.delete('fullScreen');
-  }
-  history.pushState(null, '', `?${query}`);
-  return status;
-};
-
-const { subscribe, update } = writable(false, function (set) {
-  set(getQueryParam());
+export const isFullScreen = derived(page, ($page) => {
+  const { query } = $page;
+  if (!query.has('fullScreen')) return false;
+  if (query.get('fullScreen') === 'false') return false;
+  return true;
 });
-
-export const isFullScreen = {
-  subscribe,
-  toggle: (): void => update((status) => setQueryParam(!status)),
-};
