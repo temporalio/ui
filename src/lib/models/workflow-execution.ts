@@ -1,5 +1,6 @@
 import { formatDate } from '$lib/utilities/format-date';
 import type { WorkflowExecutionStatus } from '$types/temporal/api/enums/v1/workflow';
+import type { PendingActivityInfo } from '$types/temporal/api/workflow/v1/message';
 import type { DescribeWorkflowExecutionResponse } from '$types/temporal/api/workflowservice/v1/request_response';
 
 export interface WorkflowExecutionResponse {
@@ -11,6 +12,7 @@ export interface WorkflowExecutionResponse {
   status: WorkflowExecutionStatus;
   taskQueue: string;
   historyEvents: number;
+  pendingActivities: PendingActivityInfo[];
 }
 
 export class WorkflowExecutionResponse {
@@ -23,6 +25,7 @@ export class WorkflowExecutionResponse {
     this.status = response.workflowExecutionInfo.status;
     this.taskQueue = response.executionConfig.taskQueue.name;
     this.historyEvents = response.workflowExecutionInfo.historyLength;
+    this.pendingActivities = response.pendingActivities;
   }
 
   toggleUrl(isFullScreen: boolean): string {

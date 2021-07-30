@@ -22,10 +22,11 @@
 <script lang="typescript">
   import { isFullScreen } from '$lib/stores/full-screen';
 
-  import { WorkflowExecutionResponse } from '$lib/models/workflow-execution';
+  import { WorkflowExecutionResponse } from '$lib/models/workflow-execution.ts';
 
   import Header from './_header.svelte';
   import ExecutionInformation from './_execution-information.svelte';
+  import PendingActivities from './_pending-activities.svelte';
 
   export let execution: DescribeWorkflowExecutionResponse;
 
@@ -39,8 +40,8 @@
 >
   <main class="w-full">
     <Header {workflow} />
-    <div class="px-6 py-6">
-      <div class="execution-information flex">
+    <div class="execution-information px-6 py-6 flex">
+      <div class="w-1/3">
         <ExecutionInformation title="Start Time" value={workflow.startTime} />
         <ExecutionInformation title="End Time" value={workflow.endTime} />
         <ExecutionInformation title="Task Queue" value={workflow.taskQueue} />
@@ -48,6 +49,9 @@
           title="History Events"
           value={workflow.historyEvents}
         />
+      </div>
+      <div class="pending-activities w-full">
+        <PendingActivities activities={workflow.pendingActivities} />
       </div>
     </div>
   </main>
