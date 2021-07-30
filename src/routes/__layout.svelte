@@ -17,7 +17,7 @@
 
 <main class="flex align-start">
   <Navigation />
-  <div class="w-full">
+  <div class="w-full overflow-y-scroll">
     <slot />
   </div>
 </main>

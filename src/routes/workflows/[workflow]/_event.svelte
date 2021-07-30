@@ -1,0 +1,37 @@
+<script lang="ts">
+  import beautify from 'json-beautify';
+  import { formatDate } from '$lib/utilities/format-date';
+  import { HistoryEvent } from '$types/temporal/api/history/v1/message';
+  export let event: HistoryEvent;
+  export let index: number;
+
+  let even = !(index % 2);
+  let odd = !even;
+</script>
+
+<tr class:even class:odd>
+  <td>{event.eventId}</td>
+  <td>{event.eventType}</td>
+  <td>{formatDate(event.eventTime)}</td>
+  <td><pre><code>{beautify(event, null, 2, 80)}</code></pre></td>
+</tr>
+
+<style>
+  tr {
+    @apply my-4;
+    @apply py-4;
+  }
+
+  td {
+    vertical-align: top;
+    @apply p-4;
+  }
+
+  .even {
+    @apply bg-gray-100;
+  }
+
+  .even {
+    @apply bg-gray-50;
+  }
+</style>

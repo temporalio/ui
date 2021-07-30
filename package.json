@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "date-fns": "^2.22.1",
+    "json-beautify": "^1.1.1",
     "svelte-hero-icons": "^2.2.0"
   },
   "devDependencies": {
