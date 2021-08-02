@@ -1,7 +1,8 @@
 <script lang="ts">
   import beautify from 'json-beautify';
   import { formatDate } from '$lib/utilities/format-date';
-  import { HistoryEvent } from '$types/temporal/api/history/v1/message';
+  import type { HistoryEvent } from '$types/temporal/api/history/v1/message';
+
   export let event: HistoryEvent;
   export let index: number;
 
