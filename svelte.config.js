@@ -6,6 +6,10 @@ import chalk from 'chalk';
 const buildTarget = process.env.TEMPORAL_UI_BUILD_TARGET;
 const validBuildTargets = ['local', 'cloud'];
 
+if (process.env.NODE_ENV !== 'production' && !buildTarget) {
+  process.env.TEMPORAL_UI_BUILD_TARGET = 'local';
+}
+
 // Don't build anything unless a valid build target has been set.
 if (!buildTarget || !validBuildTargets.includes(buildTarget)) {
   const valid = validBuildTargets.map((t) => chalk.blue(t)).join(', ');

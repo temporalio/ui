@@ -1,6 +1,6 @@
 <script lang="ts">
   import Event from './_event.svelte';
-  import { History } from '$types/temporal/api/history/v1/message';
+  import type { History } from '$types/temporal/api/history/v1/message';
 
   export let history: History;
 </script>
