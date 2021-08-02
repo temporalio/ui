@@ -1,6 +1,6 @@
 import { encodeURISegments } from './encode-uri-segments';
 
-describe(encodeURISegments, () => {
+describe('encodeURISegments', () => {
   it('should not modify a URI that does not need to be encoded', () => {
     expect(encodeURISegments('/hello/world')).toBe('/hello/world');
   });

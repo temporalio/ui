@@ -1,6 +1,6 @@
 import { pathMatches } from './path-matches';
 
-describe(pathMatches, () => {
+describe('pathMatches', () => {
   it('should return true if given two of the exact same paths', () => {
     expect(pathMatches('/workflows', '/workflows')).toBe(true);
   });
