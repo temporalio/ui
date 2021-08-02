@@ -19,8 +19,8 @@ jobs:
       - name: ESLint and Jest
         uses: actions/setup-node@v2
         with:
-          node-version: 16.x
-          cache: 'npm'
+          node-version: 16
+          cache: npm
       - run: npm ci
       - run: npm run lint --if-present
-      - run: npm test
+      - run: npm test --coverage --verbose
