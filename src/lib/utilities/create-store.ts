@@ -1,25 +1,24 @@
-import type { ApplicationDispatch } from './../state/index';
 import { derived } from 'svelte/store';
-import { state, dispatch, ApplicationState } from '$lib/state';
+import { AnyAction, bindActionCreators } from '@reduxjs/toolkit';
 import {
-  CaseReducerActions,
-  bindActionCreators,
-  AnyAction,
-} from '@reduxjs/toolkit';
+  state,
+  dispatch,
+  ApplicationState,
+  ApplicationDispatch,
+} from '$lib/state';
 
-export type CreateStoreFromStateType = (
-  state: ApplicationState,
-  actions: CaseReducerActions<AnyAction>,
-) => any;
+type ActionCreators = { [key: string]: AnyAction };
+
+export type CreateStoreFromStateType<T = any> = (
+  selector: (state: ApplicationState) => T,
+  actions: ActionCreators,
+) => T;
 
 export const createStore: CreateStoreFromStateType = (selector, actions) => {
   const { subscribe } = derived(state, selector);
 
   return {
     subscribe,
-    ...bindActionCreators<CaseReducerActions<AnyAction>, ApplicationDispatch>(
-      actions,
-      dispatch,
-    ),
+    ...bindActionCreators<any, ApplicationDispatch>(actions, dispatch),
   };
 };

@@ -32,7 +32,7 @@
 <script lang="typescript">
   import { isFullScreen } from '$lib/stores/full-screen';
 
-  import { WorkflowExecutionResponse } from '$lib/models/workflow-execution.ts';
+  import { WorkflowExecutionResponse } from '$lib/models/workflow-execution';
 
   import Header from './_header.svelte';
   import ExecutionInformation from './_execution-information.svelte';
