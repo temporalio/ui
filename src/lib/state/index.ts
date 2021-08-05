@@ -2,9 +2,10 @@ import { readable } from 'svelte/store';
 import { configureStore } from '@reduxjs/toolkit';
 
 import counter from './features/counter';
+import workflowExecutions from './features/workflow-executions';
 
 export const store = configureStore({
-  reducer: { counter },
+  reducer: { counter, workflowExecutions },
 });
 
 export type ApplicationState = ReturnType<typeof store.getState>;

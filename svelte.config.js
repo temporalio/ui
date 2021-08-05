@@ -5,8 +5,9 @@ import chalk from 'chalk';
 
 const buildTarget = process.env.TEMPORAL_UI_BUILD_TARGET;
 const validBuildTargets = ['local', 'cloud'];
+const isProduction = process.env.NODE_ENV === 'production';
 
-if (process.env.NODE_ENV !== 'production' && !buildTarget) {
+if (!isProduction && !buildTarget) {
   process.env.TEMPORAL_UI_BUILD_TARGET = 'local';
 }
 
@@ -23,7 +24,7 @@ if (!buildTarget || !validBuildTargets.includes(buildTarget)) {
     console.error(`You provided: ${chalk.bgYellowBright(buildTarget)}.`);
   }
 
-  process.exit(1);
+  if (isProduction) process.exit(1);
 }
 
 let outputDirectory = `build-${buildTarget}`;

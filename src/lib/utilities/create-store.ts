@@ -1,24 +1,34 @@
-import { derived } from 'svelte/store';
-import { AnyAction, bindActionCreators } from '@reduxjs/toolkit';
+import { derived, Readable } from 'svelte/store';
 import {
-  state,
-  dispatch,
-  ApplicationState,
-  ApplicationDispatch,
-} from '$lib/state';
+  ActionCreator,
+  ActionCreatorsMapObject,
+  AnyAction,
+  bindActionCreators,
+} from '@reduxjs/toolkit';
+import { state, dispatch, ApplicationState } from '$lib/state';
 
-type ActionCreators = { [key: string]: AnyAction };
+type Selector<T> = (state: ApplicationState) => T;
 
-export type CreateStoreFromStateType<T = any> = (
-  selector: (state: ApplicationState) => T,
-  actions: ActionCreators,
-) => T;
+interface Store<T, A> extends Readable<T> {
+  actions: ActionCreatorsMapObject<A>;
+}
 
-export const createStore: CreateStoreFromStateType = (selector, actions) => {
-  const { subscribe } = derived(state, selector);
+export const createStore = <T, A>(
+  selector: Selector<T>,
+  actions: ActionCreatorsMapObject<A>,
+  initialAction?: () => void,
+): Store<T, A> => {
+  const boundActions: ActionCreatorsMapObject<A> = bindActionCreators(
+    actions,
+    dispatch,
+  );
+
+  if (initialAction) {
+    dispatch((initialAction as ActionCreator<AnyAction>)());
+  }
 
   return {
-    subscribe,
-    ...bindActionCreators<any, ApplicationDispatch>(actions, dispatch),
+    ...derived(state, selector),
+    actions: { ...boundActions },
   };
 };
