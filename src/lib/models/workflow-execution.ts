@@ -3,33 +3,54 @@ import type { WorkflowExecutionStatus } from '$types/temporal/api/enums/v1/workf
 import type { PendingActivityInfo } from '$types/temporal/api/workflow/v1/message';
 import type { DescribeWorkflowExecutionResponse } from '$types/temporal/api/workflowservice/v1/request_response';
 
-export interface WorkflowExecutionResponse {
+type Optional<T extends object, K extends keyof T = keyof T> = Omit<T, K> &
+  Partial<Pick<T, K>>;
+
+export interface WorkflowExecution {
   name: string;
   id: string;
   runId: string;
   startTime: string;
   endTime: string;
   status: WorkflowExecutionStatus;
-  taskQueue: string;
+  taskQueue?: string;
   historyEvents: number;
   pendingActivities: PendingActivityInfo[];
 }
 
-export class WorkflowExecutionResponse {
-  constructor(response: DescribeWorkflowExecutionResponse) {
-    this.name = response.workflowExecutionInfo.type.name;
-    this.id = response.workflowExecutionInfo.execution.workflowId;
-    this.runId = response.workflowExecutionInfo.execution.runId;
-    this.startTime = formatDate(response.workflowExecutionInfo.startTime);
-    this.endTime = formatDate(response.workflowExecutionInfo.closeTime);
-    this.status = response.workflowExecutionInfo.status;
-    this.taskQueue = response.executionConfig.taskQueue.name;
-    this.historyEvents = response.workflowExecutionInfo.historyLength;
-    this.pendingActivities = response.pendingActivities;
+type WorkflowExecutionAPIResponse = Optional<
+  DescribeWorkflowExecutionResponse,
+  'executionConfig' | 'pendingActivities' | 'pendingChildren'
+>;
+
+export class WorkflowExecution {
+  constructor({
+    executionConfig,
+    workflowExecutionInfo,
+    pendingActivities,
+  }: WorkflowExecutionAPIResponse) {
+    console.log(workflowExecutionInfo);
+    this.name = workflowExecutionInfo.type.name;
+    this.id = workflowExecutionInfo.execution.workflowId;
+    this.runId = workflowExecutionInfo.execution.runId;
+    this.startTime = formatDate(workflowExecutionInfo.startTime);
+    this.endTime = formatDate(workflowExecutionInfo.closeTime);
+    this.status = workflowExecutionInfo.status;
+    this.historyEvents = workflowExecutionInfo.historyLength;
+
+    if (executionConfig) {
+      this.taskQueue = executionConfig.taskQueue.name;
+    }
+
+    this.pendingActivities = pendingActivities || [];
+  }
+
+  get url(): string {
+    return `/workflows/${this.id}/${this.runId}`;
   }
 
   toggleUrl(isFullScreen: boolean): string {
-    return `/workflows/${this.id}/${this.runId}?${new URLSearchParams({
+    return `${this.url}?${new URLSearchParams({
       fullScreen: (!isFullScreen).toString(),
     })}`;
   }
