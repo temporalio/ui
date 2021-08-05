@@ -1,53 +1,74 @@
 <script lang="ts">
-  import type { WorkflowExecutionInfo } from '$types/temporal/api/workflow/v1/message';
+  import type { WorkflowExecution } from '$lib/models/workflow-execution';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import Cell from './_workflows-summary-cell.svelte';
 
   import { page } from '$app/stores';
   import { pathMatches } from '$lib/utilities/path-matches';
-  import { formatDate } from '$lib/utilities/format-date';
-  import { encodeURISegments } from '$lib/utilities/encode-uri-segments';
 
-  export let workflow: WorkflowExecutionInfo;
-  let workflowUrl = encodeURISegments(
-    `/workflows/${workflow.execution.workflowId}/${workflow.execution.runId}`,
-  );
+  export let workflow: WorkflowExecution;
 
-  $: isActive = pathMatches(workflowUrl, $page.path);
-  $: rowStyle = isActive ? 'bg-yellow-200' : 'bg-gray-50 hover:bg-gray-100';
+  $: href = workflow.url;
+  $: isActive = pathMatches(href, $page.path);
 </script>
 
-<tr class={rowStyle}>
-  <Cell {workflowUrl}>
-    <h3>
-      {workflow.type.name}
-    </h3>
-    <p>
-      {workflow.execution.runId}
-    </p>
-  </Cell>
-  <Cell {workflowUrl}>
-    <WorkflowStatus status={workflow.status} />
-  </Cell>
-  <Cell {workflowUrl}>
-    <p>{formatDate(workflow.startTime)}</p>
-  </Cell>
-  <Cell {workflowUrl}>
-    <p>{formatDate(workflow.closeTime)}</p>
-  </Cell>
+<tr class:active={isActive}>
+  <td>
+    <a {href}>
+      <h3>
+        {workflow.name}
+      </h3>
+      <p>
+        {workflow.runId}
+      </p>
+    </a>
+  </td>
+  <td>
+    <a {href}>
+      <WorkflowStatus status={workflow.status} />
+    </a>
+  </td>
+  <td>
+    <a {href}>
+      <p>{workflow.startTime}</p>
+    </a>
+  </td>
+  <td>
+    <a {href}>
+      <p>{workflow.endTime}</p>
+    </a>
+  </td>
 </tr>
 
 <style lang="postcss">
   h3 {
-    @apply font-normal;
-    @apply m-0;
-    @apply text-base;
-    @apply text-gray-900;
+    @apply font-normal m-0 text-base text-gray-900;
   }
 
   p {
-    @apply m-0;
-    @apply text-gray-500;
-    @apply text-sm;
+    @apply m-0 text-gray-500 text-sm;
+  }
+
+  tr {
+    @apply bg-gray-50;
+  }
+
+  tr:hover {
+    @apply bg-gray-100;
+  }
+
+  td {
+    @apply p-0;
+  }
+
+  a {
+    @apply w-full h-full block no-underline p-6;
+  }
+
+  .active {
+    @apply bg-yellow-200;
+  }
+
+  .active:hover {
+    @apply bg-yellow-200;
   }
 </style>

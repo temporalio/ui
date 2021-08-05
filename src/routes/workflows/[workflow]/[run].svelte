@@ -1,24 +1,18 @@
 <script context="module" lang="ts">
-  import type {
-    DescribeWorkflowExecutionResponse,
-    GetWorkflowExecutionHistoryResponse,
-  } from '$types/temporal/api/workflowservice/v1/request_response';
+  import { WorkflowExecutionAPI } from '$lib/services/workflow-execution-service';
+
   import type { LoadInput } from '@sveltejs/kit';
 
   export async function load({ fetch, page }: LoadInput) {
-    const { workflow: id, run } = page.params;
+    const { workflow: executionId, run: runId } = page.params;
 
-    const execution: DescribeWorkflowExecutionResponse = await fetch(
-      `http://localhost:8080/api/v1/namespaces/default/workflows/${id}/executions/${run}`,
-    )
-      .then((response) => response.json())
-      .catch(console.error);
-
-    const events: GetWorkflowExecutionHistoryResponse = await fetch(
-      `http://localhost:8080/api/v1/namespaces/default/workflows/${id}/executions/${run}/events`,
-    )
-      .then((response) => response.json())
-      .catch(console.error);
+    const { execution, events } = await WorkflowExecutionAPI.get(
+      {
+        executionId,
+        runId,
+      },
+      fetch,
+    );
 
     return {
       props: {
@@ -32,7 +26,12 @@
 <script lang="typescript">
   import { isFullScreen } from '$lib/stores/full-screen';
 
-  import { WorkflowExecutionResponse } from '$lib/models/workflow-execution';
+  import type {
+    DescribeWorkflowExecutionResponse,
+    GetWorkflowExecutionHistoryResponse,
+  } from '$types/temporal/api/workflowservice/v1/request_response';
+
+  import { WorkflowExecution } from '$lib/models/workflow-execution';
 
   import Header from './_header.svelte';
   import ExecutionInformation from './_execution-information.svelte';
@@ -44,7 +43,7 @@
 
   let { history } = events;
 
-  $: workflow = new WorkflowExecutionResponse(execution);
+  $: workflow = new WorkflowExecution(execution);
 </script>
 
 <section
