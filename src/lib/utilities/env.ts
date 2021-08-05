@@ -4,6 +4,10 @@ const throwErrorIfInvalid = (callback: () => boolean) => () => {
   const buildTarget = getEnvironment();
   const validOptions = `Valid options: ${validTargets.join(', ')}.`;
 
+  if (process.env.NODE_ENV !== 'production' && !buildTarget) {
+    process.env.TEMPORAL_UI_BUILD_TARGET = 'local';
+  }
+
   if (!buildTarget) {
     throw new Error(
       `No TEMPORAL_UI_BUILD_TARGET environment variable provided. ${validOptions}`,
