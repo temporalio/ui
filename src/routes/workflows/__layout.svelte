@@ -13,16 +13,14 @@
   import type { WorkflowExecutionInfo } from '$types/temporal/api/workflow/v1/message';
 
   import { isFullScreen } from '$lib/stores/full-screen';
-  import { WorkflowExecution } from '$lib/models/workflow-execution';
+  import { toWorkflowExecutions } from '$lib/models/workflow-execution';
 
   import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
 
   export let executions: WorkflowExecutionInfo[];
 
-  $: workflowExecutions = executions.map(
-    (workflowExecutionInfo) => new WorkflowExecution({ workflowExecutionInfo }),
-  );
+  $: workflowExecutions = toWorkflowExecutions(executions);
 </script>
 
 <section class="flex items-start">

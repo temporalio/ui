@@ -31,7 +31,7 @@
     GetWorkflowExecutionHistoryResponse,
   } from '$types/temporal/api/workflowservice/v1/request_response';
 
-  import { WorkflowExecution } from '$lib/models/workflow-execution';
+  import { toWorkflowExecution } from '$lib/models/workflow-execution';
 
   import Header from './_header.svelte';
   import ExecutionInformation from './_execution-information.svelte';
@@ -43,7 +43,7 @@
 
   let { history } = events;
 
-  $: workflow = new WorkflowExecution(execution);
+  $: workflow = toWorkflowExecution(execution);
 </script>
 
 <section
