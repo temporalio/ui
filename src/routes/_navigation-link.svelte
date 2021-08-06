@@ -17,9 +17,7 @@
 
 <style lang="postcss">
   a.active {
-    @apply bg-purple-900;
-    @apply text-white;
-    @apply opacity-100;
+    @apply bg-purple-900 text-white opacity-100;
   }
 
   a:hover {
@@ -27,14 +25,6 @@
   }
 
   a {
-    @apply m-4;
-    @apply no-underline;
-    @apply opacity-70;
-    @apply p-4;
-    @apply rounded-lg;
-    @apply text-center;
-    @apply text-gray-400;
-    @apply text-xs;
-    @apply w-24;
+    @apply m-4 no-underline opacity-70 p-4 rounded-lg text-center text-gray-400 text-xs w-24;
   }
 </style>

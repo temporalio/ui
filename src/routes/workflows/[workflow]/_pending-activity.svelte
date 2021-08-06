@@ -53,13 +53,11 @@
 
 <style lang="postcss">
   h4 {
-    @apply mb-4;
-    @apply font-semibold;
+    @apply mb-4 font-semibold;
   }
 
   table {
-    @apply w-full;
-    @apply text-sm;
+    @apply w-full text-sm;
   }
 
   td {
