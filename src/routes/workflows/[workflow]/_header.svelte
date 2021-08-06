@@ -1,11 +1,11 @@
 <script lang="ts">
   import Icon, { X, ArrowsExpand, ArrowRight } from 'svelte-hero-icons';
   import { isFullScreen } from '$lib/stores/full-screen';
-  import type { WorkflowExecutionResponse } from '$lib/models/workflow-execution';
+  import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
 
-  export let workflow: WorkflowExecutionResponse;
+  export let workflow: WorkflowExecution;
 </script>
 
 <header

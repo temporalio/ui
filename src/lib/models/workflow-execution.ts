@@ -29,7 +29,6 @@ export class WorkflowExecution {
     workflowExecutionInfo,
     pendingActivities,
   }: WorkflowExecutionAPIResponse) {
-    console.log(workflowExecutionInfo);
     this.name = workflowExecutionInfo.type.name;
     this.id = workflowExecutionInfo.execution.workflowId;
     this.runId = workflowExecutionInfo.execution.runId;
