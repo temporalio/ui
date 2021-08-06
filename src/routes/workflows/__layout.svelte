@@ -3,13 +3,9 @@
   import type { LoadInput } from '@sveltejs/kit';
 
   export async function load({ fetch }: LoadInput) {
-    const { executions } = await WorkflowExecutionAPI.getAll(fetch);
-
-    return {
-      props: {
-        executions,
-      },
-    };
+    return await WorkflowExecutionAPI.getAll(fetch).then((executions) => ({
+      props: { executions },
+    }));
   }
 </script>
 

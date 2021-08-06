@@ -8,11 +8,17 @@ const base = 'http://localhost:8080/api/v1';
 
 export const WorkflowExecutionAPI = {
   async getAll(request = fetch) {
-    const { executions }: ListWorkflowExecutionsResponse = await request(
+    const { executions: open }: ListWorkflowExecutionsResponse = await request(
       `${base}/namespaces/default/workflows/open`,
     ).then((response) => response.json());
 
-    return { executions };
+    const {
+      executions: closed,
+    }: ListWorkflowExecutionsResponse = await request(
+      `${base}/namespaces/default/workflows/closed`,
+    ).then((response) => response.json());
+
+    return [...open, ...closed];
   },
 
   async get({ executionId, runId }, request = fetch) {
