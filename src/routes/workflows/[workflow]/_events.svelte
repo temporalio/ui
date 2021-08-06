@@ -27,13 +27,6 @@
 
 <style lang="postcss">
   th {
-    @apply bg-gray-200;
-    @apply text-gray-500;
-    @apply text-xs;
-    @apply h-6;
-    @apply m-0;
-    @apply p-3;
-    @apply text-left;
-    @apply uppercase;
+    @apply bg-gray-200 text-gray-500 text-xs h-6 m-0 p-3 text-left uppercase;
   }
 </style>

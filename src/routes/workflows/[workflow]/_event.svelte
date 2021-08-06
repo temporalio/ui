@@ -7,20 +7,19 @@
   export let index: number;
 
   let even = !(index % 2);
-  let odd = !even;
 </script>
 
-<tr class:even class:odd>
+<tr class:even>
   <td>{event.eventId}</td>
   <td>{event.eventType}</td>
   <td>{formatDate(event.eventTime)}</td>
   <td><pre><code>{beautify(event, null, 2, 80)}</code></pre></td>
 </tr>
 
-<style>
+<style lang="postcss">
   tr {
-    @apply my-4;
-    @apply py-4;
+    @apply py-4 my-4;
+    @apply bg-gray-50;
   }
 
   td {
@@ -30,9 +29,5 @@
 
   .even {
     @apply bg-gray-100;
-  }
-
-  .even {
-    @apply bg-gray-50;
   }
 </style>
