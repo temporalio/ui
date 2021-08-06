@@ -3,7 +3,7 @@ import type { WorkflowExecutionStatus } from '$types/temporal/api/enums/v1/workf
 import type { PendingActivityInfo } from '$types/temporal/api/workflow/v1/message';
 import type { DescribeWorkflowExecutionResponse } from '$types/temporal/api/workflowservice/v1/request_response';
 
-type Optional<T extends object, K extends keyof T = keyof T> = Omit<T, K> &
+type Optional<T extends {}, K extends keyof T = keyof T> = Omit<T, K> &
   Partial<Pick<T, K>>;
 
 export interface WorkflowExecution {
