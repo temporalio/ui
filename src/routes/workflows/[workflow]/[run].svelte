@@ -54,7 +54,7 @@
   <main class="w-full">
     <Header {workflow} />
     <div class="execution-information px-6 py-6 flex">
-      <div class="w-1/3">
+      <div class={$isFullScreen ? 'w-1/3' : 'w-full'}>
         <ExecutionInformation title="Start Time" value={workflow.startTime} />
         <ExecutionInformation title="End Time" value={workflow.endTime} />
         <ExecutionInformation title="Task Queue" value={workflow.taskQueue} />

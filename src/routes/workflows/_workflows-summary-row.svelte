@@ -57,7 +57,7 @@
   }
 
   td {
-    @apply p-0;
+    @apply p-0 w-1/4;
   }
 
   a {
