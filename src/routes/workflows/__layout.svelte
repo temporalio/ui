@@ -1,35 +1,40 @@
 <script context="module" lang="ts">
-  import { WorkflowExecutionAPI } from '$lib/services/workflow-execution-service';
   import type { LoadInput } from '@sveltejs/kit';
+  import { WorkflowExecutionAPI } from '$lib/services/workflow-execution-service';
+  import {
+    toWorkflowExecutions,
+    WorkflowExecution,
+  } from '$lib/models/workflow-execution';
 
   export async function load({ fetch }: LoadInput) {
-    return await WorkflowExecutionAPI.getAll(fetch).then((executions) => ({
-      props: { executions },
-    }));
+    return await WorkflowExecutionAPI.getAll(fetch)
+      .then(toWorkflowExecutions)
+      .then((executions) => ({
+        props: { executions },
+      }));
   }
 </script>
 
 <script lang="ts">
-  import type { WorkflowExecutionInfo } from '$types/temporal/api/workflow/v1/message';
-
+  import { query } from '$lib/stores/data';
   import { isFullScreen } from '$lib/stores/full-screen';
-  import { WorkflowExecution } from '$lib/models/workflow-execution';
 
   import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
 
-  export let executions: WorkflowExecutionInfo[];
+  export let executions: WorkflowExecution[];
 
-  $: workflowExecutions = executions.map(
-    (workflowExecutionInfo) => new WorkflowExecution({ workflowExecutionInfo }),
-  );
+  let request = query.request('executions', WorkflowExecutionAPI.getAll, {
+    format: toWorkflowExecutions,
+    initialData: executions,
+  });
 </script>
 
 <section class="flex items-start">
   {#if !$isFullScreen}
     <WorkflowsSummaryTable>
       <tbody slot="rows">
-        {#each workflowExecutions as workflow}
+        {#each $request.data as workflow}
           <WorkflowsSummaryRow {workflow} />
         {/each}
       </tbody>

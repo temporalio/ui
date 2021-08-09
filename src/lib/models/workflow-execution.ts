@@ -1,10 +1,31 @@
-import { formatDate } from '$lib/utilities/format-date';
 import type { WorkflowExecutionStatus } from '$types/temporal/api/enums/v1/workflow';
-import type { PendingActivityInfo } from '$types/temporal/api/workflow/v1/message';
+import type {
+  PendingActivityInfo,
+  WorkflowExecutionInfo,
+} from '$types/temporal/api/workflow/v1/message';
 import type { DescribeWorkflowExecutionResponse } from '$types/temporal/api/workflowservice/v1/request_response';
+
+import { formatDate } from '$lib/utilities/format-date';
 
 type Optional<T extends unknown, K extends keyof T = keyof T> = Omit<T, K> &
   Partial<Pick<T, K>>;
+
+export const toWorkflowExecution = (response: WorkflowExecutionAPIResponse) => {
+  return new WorkflowExecution(response);
+};
+
+export const toWorkflowExecutions = (
+  workflowExecutions: WorkflowExecutionInfo[],
+) => {
+  return workflowExecutions.map(
+    (workflowExecutionInfo) => new WorkflowExecution({ workflowExecutionInfo }),
+  );
+};
+
+/*
+ * Internal use only. Use the utility methods above for formatting workflow
+ * execution API responses.
+ */
 
 export interface WorkflowExecution {
   name: string;
