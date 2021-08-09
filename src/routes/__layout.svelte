@@ -15,7 +15,7 @@
   <meta property="og:image" content="/banner.png" />
 </svelte:head>
 
-<main class="flex align-start">
+<main class="flex align-start h-screen">
   <Navigation />
   <div class="w-full overflow-y-scroll">
     <slot />

@@ -21,24 +21,47 @@
 
   import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
+  import WorkflowFilters from './_workflow-filters.svelte';
+  import { unique } from '$lib/utilities/unique';
 
   export let executions: WorkflowExecution[];
+
+  let status = null;
+  let workflowType = null;
 
   let request = query.request('executions', WorkflowExecutionAPI.getAll, {
     format: toWorkflowExecutions,
     initialData: executions,
   });
+
+  let workflowTypes = $request.data
+    .map((execution) => execution.name)
+    .filter(unique);
+
+  $: workflows = $request.data.filter((execution) => {
+    // Right now, the type generated does not match the actual API response.
+    // This is a temporary fix.
+    const executionStatus = (execution.status as unknown) as WorkflowStatus;
+
+    if (status && executionStatus !== status) return false;
+    if (workflowType && execution.name !== workflowType) return false;
+    return true;
+  });
 </script>
 
 <section class="flex items-start">
   {#if !$isFullScreen}
-    <WorkflowsSummaryTable>
-      <tbody slot="rows">
-        {#each $request.data as workflow}
-          <WorkflowsSummaryRow {workflow} />
-        {/each}
-      </tbody>
-    </WorkflowsSummaryTable>
+    <div class="w-full h-screen overflow-x-scroll">
+      <WorkflowFilters bind:status bind:workflowType {workflowTypes} />
+      <WorkflowsSummaryTable>
+        <tbody slot="rows">
+          {#each workflows as workflow}
+            <WorkflowsSummaryRow {workflow} />
+          {/each}
+        </tbody>
+      </WorkflowsSummaryTable>
+    </div>
   {/if}
+
   <slot />
 </section>
