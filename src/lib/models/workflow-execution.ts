@@ -1,10 +1,11 @@
-import { formatDate } from '$lib/utilities/format-date';
 import type { WorkflowExecutionStatus } from '$types/temporal/api/enums/v1/workflow';
 import type {
   PendingActivityInfo,
   WorkflowExecutionInfo,
 } from '$types/temporal/api/workflow/v1/message';
 import type { DescribeWorkflowExecutionResponse } from '$types/temporal/api/workflowservice/v1/request_response';
+
+import { formatDate } from '$lib/utilities/format-date';
 
 type Optional<T extends unknown, K extends keyof T = keyof T> = Omit<T, K> &
   Partial<Pick<T, K>>;
