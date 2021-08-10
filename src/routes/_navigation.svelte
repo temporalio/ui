@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Photograph, Collection } from 'svelte-hero-icons';
+  import { Photograph, Collection, DocumentSearch } from 'svelte-hero-icons';
   import NavigationLink from './_navigation-link.svelte';
 </script>
 
@@ -13,5 +13,10 @@
     <p class="text-sm">default</p>
   </div>
   <NavigationLink href="/workflows" label="Workflows" icon={Photograph} />
-  <NavigationLink href="/settings" label="Settings" icon={Collection} />
+  <NavigationLink href="/cluster" label="Cluster" icon={Collection} />
+  <NavigationLink
+    href="/search-attributes"
+    label="Search Attributes"
+    icon={DocumentSearch}
+  />
 </nav>
