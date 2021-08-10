@@ -36,6 +36,7 @@
   import Header from './_header.svelte';
   import ExecutionInformation from './_execution-information.svelte';
   import PendingActivities from './_pending-activities.svelte';
+  import CodeBlock from './_code-block.svelte';
   import Events from './_events.svelte';
 
   export let execution: DescribeWorkflowExecutionResponse;
@@ -58,6 +59,7 @@
         <ExecutionInformation title="Start Time" value={workflow.startTime} />
         <ExecutionInformation title="End Time" value={workflow.endTime} />
         <ExecutionInformation title="Task Queue" value={workflow.taskQueue} />
+        <CodeBlock heading="Input" content={workflow.taskQueue} />
         <ExecutionInformation
           title="History Events"
           value={workflow.historyEvents}
