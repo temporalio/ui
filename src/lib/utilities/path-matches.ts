@@ -1,3 +1,5 @@
+import UrlPattern from 'url-pattern';
+
 const dropQueryParameters = (url: string) => {
   const queryParameterIndex = url.indexOf('?');
   if (queryParameterIndex > -1) return url.slice(0, queryParameterIndex);
@@ -17,3 +19,8 @@ export const pathMatches = (first: string, second: string): boolean => {
 
   return true;
 };
+
+// export const pathMatches = (first: string, second: string) => {
+//   const reference = new UrlPattern(first);
+//   return !!reference.match(second);
+// };
