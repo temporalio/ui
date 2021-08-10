@@ -15,7 +15,7 @@
 
 <tr class:active={isActive}>
   <td class="workflow">
-    <a {href}>
+    <a sveltekit:noscroll {href}>
       <h3>
         {workflow.name}
       </h3>
@@ -30,17 +30,17 @@
     </a>
   </td>
   <td>
-    <a {href}>
+    <a sveltekit:noscroll {href}>
       <WorkflowStatus status={workflow.status} />
     </a>
   </td>
   <td>
-    <a {href}>
+    <a sveltekit:noscroll {href}>
       <p>{workflow.startTime}</p>
     </a>
   </td>
   <td>
-    <a {href}>
+    <a sveltekit:noscroll {href}>
       <p>{workflow.endTime}</p>
     </a>
   </td>

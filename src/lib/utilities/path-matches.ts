@@ -19,8 +19,3 @@ export const pathMatches = (first: string, second: string): boolean => {
 
   return true;
 };
-
-// export const pathMatches = (first: string, second: string) => {
-//   const reference = new UrlPattern(first);
-//   return !!reference.match(second);
-// };
