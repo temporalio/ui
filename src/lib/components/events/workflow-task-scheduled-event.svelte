@@ -4,5 +4,4 @@
   export let event: WorkflowTaskScheduledEvent;
 </script>
 
- <KeyValueTable data={event.workflowTaskScheduledEventAttributes} />
-
+<KeyValueTable data={event.workflowTaskScheduledEventAttributes} />

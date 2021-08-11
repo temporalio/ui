@@ -4,5 +4,4 @@
   export let event: ChildWorkflowExecutionStartedEvent;
 </script>
 
- <KeyValueTable data={event.childWorkflowExecutionStartedEventAttributes} />
-
+<KeyValueTable data={event.childWorkflowExecutionStartedEventAttributes} />

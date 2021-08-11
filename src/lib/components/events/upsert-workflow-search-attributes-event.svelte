@@ -4,5 +4,4 @@
   export let event: UpsertWorkflowSearchAttributesEvent;
 </script>
 
- <KeyValueTable data={event.upsertWorkflowSearchAttributesEventAttributes} />
-
+<KeyValueTable data={event.upsertWorkflowSearchAttributesEventAttributes} />

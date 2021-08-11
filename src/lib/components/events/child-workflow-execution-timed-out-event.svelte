@@ -4,5 +4,4 @@
   export let event: ChildWorkflowExecutionTimedOutEvent;
 </script>
 
- <KeyValueTable data={event.childWorkflowExecutionTimedOutEventAttributes} />
-
+<KeyValueTable data={event.childWorkflowExecutionTimedOutEventAttributes} />

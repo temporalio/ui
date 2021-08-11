@@ -4,5 +4,4 @@
   export let event: ActivityTaskCompletedEvent;
 </script>
 
- <KeyValueTable data={event.activityTaskCompletedEventAttributes} />
-
+<KeyValueTable data={event.activityTaskCompletedEventAttributes} />

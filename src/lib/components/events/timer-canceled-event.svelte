@@ -4,5 +4,4 @@
   export let event: TimerCanceledEvent;
 </script>
 
- <KeyValueTable data={event.timerCanceledEventAttributes} />
-
+<KeyValueTable data={event.timerCanceledEventAttributes} />

@@ -4,5 +4,4 @@
   export let event: TimerStartedEvent;
 </script>
 
- <KeyValueTable data={event.timerStartedEventAttributes} />
-
+<KeyValueTable data={event.timerStartedEventAttributes} />

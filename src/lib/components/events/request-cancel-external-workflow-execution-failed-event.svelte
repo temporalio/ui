@@ -4,5 +4,6 @@
   export let event: RequestCancelExternalWorkflowExecutionFailedEvent;
 </script>
 
- <KeyValueTable data={event.requestCancelExternalWorkflowExecutionFailedEventAttributes} />
-
+<KeyValueTable
+  data={event.requestCancelExternalWorkflowExecutionFailedEventAttributes}
+/>

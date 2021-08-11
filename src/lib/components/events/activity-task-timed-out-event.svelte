@@ -4,5 +4,4 @@
   export let event: ActivityTaskTimedOutEvent;
 </script>
 
- <KeyValueTable data={event.activityTaskTimedOutEventAttributes} />
-
+<KeyValueTable data={event.activityTaskTimedOutEventAttributes} />

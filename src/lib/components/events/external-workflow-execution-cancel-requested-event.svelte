@@ -4,5 +4,6 @@
   export let event: ExternalWorkflowExecutionCancelRequestedEvent;
 </script>
 
- <KeyValueTable data={event.externalWorkflowExecutionCancelRequestedEventAttributes} />
-
+<KeyValueTable
+  data={event.externalWorkflowExecutionCancelRequestedEventAttributes}
+/>

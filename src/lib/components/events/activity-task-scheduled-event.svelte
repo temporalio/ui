@@ -4,5 +4,4 @@
   export let event: ActivityTaskScheduledEvent;
 </script>
 
- <KeyValueTable data={event.activityTaskScheduledEventAttributes} />
-
+<KeyValueTable data={event.activityTaskScheduledEventAttributes} />
