@@ -1,18 +1,8 @@
 <script context="module" lang="ts">
-  import { WorkflowExecutionAPI } from '$lib/services/workflow-execution-service';
-
   import type { LoadInput } from '@sveltejs/kit';
 
-  export async function load({ fetch, page }: LoadInput) {
-    const { workflow: executionId, run: runId } = page.params;
-
-    const { execution } = await WorkflowExecutionAPI.get(
-      {
-        executionId,
-        runId,
-      },
-      fetch,
-    );
+  export async function load({ context }: LoadInput) {
+    const { execution } = context;
 
     return {
       props: {

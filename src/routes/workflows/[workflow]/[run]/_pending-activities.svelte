@@ -4,11 +4,14 @@
   import PendingActivity from './_pending-activity.svelte';
 
   export let activities: PendingActivityInfo[];
+  let showActivities = activities && activities.length;
 </script>
 
-<div>
-  <h3 class="text-lg mt-6 mb-2">Pending Activities</h3>
-  {#each activities as activity}
-    <PendingActivity {activity} />
-  {/each}
-</div>
+{#if showActivities}
+  <div>
+    <h3 class="text-lg mt-6 mb-2">Pending Activities</h3>
+    {#each activities as activity}
+      <PendingActivity {activity} />
+    {/each}
+  </div>
+{/if}

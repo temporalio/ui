@@ -62,7 +62,7 @@ export class WorkflowExecution {
       this.taskQueue = executionConfig.taskQueue.name;
     }
 
-    this.pendingActivities = pendingActivities || [];
+    this.pendingActivities = pendingActivities;
   }
 
   get url(): string {
