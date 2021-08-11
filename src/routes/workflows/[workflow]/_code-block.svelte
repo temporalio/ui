@@ -1,17 +1,11 @@
 <script lang="ts">
-  import CopyClipBoard from '$lib/components/copy-clipboard.svelte';
   import Icon, { Clipboard } from 'svelte-hero-icons';
 
   export let heading = '';
   export let content = '';
 
-  const copy = () => {
-    const app = new CopyClipBoard({
-      target: document.getElementById('clipboard'),
-      props: { content },
-    });
-    app.$destroy();
-  };
+  const copy = () => navigator.clipboard.writeText(content).then(() => console.log('success')).catch(error => console.error(error));
+
 </script>
 
 {#if content}
