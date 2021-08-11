@@ -3,6 +3,7 @@
 </script>
 
 <div>
-  <strong>StartChildWorkflowExecutionFailedEvent</strong>: {JSON.stringify(event)}
+  <strong>StartChildWorkflowExecutionFailedEvent</strong>: {JSON.stringify(
+    event,
+  )}
 </div>
-

@@ -5,4 +5,3 @@
 <div>
   <strong>WorkflowExecutionFailedEvent</strong>: {JSON.stringify(event)}
 </div>
-

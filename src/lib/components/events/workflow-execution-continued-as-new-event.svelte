@@ -5,4 +5,3 @@
 <div>
   <strong>WorkflowExecutionContinuedAsNewEvent</strong>: {JSON.stringify(event)}
 </div>
-

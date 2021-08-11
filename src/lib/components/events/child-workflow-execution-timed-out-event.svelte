@@ -5,4 +5,3 @@
 <div>
   <strong>ChildWorkflowExecutionTimedOutEvent</strong>: {JSON.stringify(event)}
 </div>
-

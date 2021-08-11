@@ -5,4 +5,3 @@
 <div>
   <strong>ActivityTaskCanceledEvent</strong>: {JSON.stringify(event)}
 </div>
-

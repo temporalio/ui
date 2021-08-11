@@ -5,4 +5,3 @@
 <div>
   <strong>UpsertWorkflowSearchAttributesEvent</strong>: {JSON.stringify(event)}
 </div>
-

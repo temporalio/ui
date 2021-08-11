@@ -5,4 +5,3 @@
 <div>
   <strong>MarkerRecordedEvent</strong>: {JSON.stringify(event)}
 </div>
-

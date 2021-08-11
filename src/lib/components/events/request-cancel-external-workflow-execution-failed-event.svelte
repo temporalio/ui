@@ -3,6 +3,7 @@
 </script>
 
 <div>
-  <strong>RequestCancelExternalWorkflowExecutionFailedEvent</strong>: {JSON.stringify(event)}
+  <strong>RequestCancelExternalWorkflowExecutionFailedEvent</strong>: {JSON.stringify(
+    event,
+  )}
 </div>
-

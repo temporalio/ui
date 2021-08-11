@@ -5,4 +5,3 @@
 <div>
   <strong>WorkflowTaskScheduledEvent</strong>: {JSON.stringify(event)}
 </div>
-

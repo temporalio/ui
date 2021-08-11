@@ -5,4 +5,3 @@
 <div>
   <strong>TimerFiredEvent</strong>: {JSON.stringify(event)}
 </div>
-

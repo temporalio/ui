@@ -5,4 +5,3 @@
 <div>
   <strong>ActivityTaskTimedOutEvent</strong>: {JSON.stringify(event)}
 </div>
-
