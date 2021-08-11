@@ -8,8 +8,8 @@
 </script>
 
 {#if showActivities}
-  <div>
-    <h3 class="text-lg mt-6 mb-2">Pending Activities</h3>
+  <div class="mb-6">
+    <h3 class="text-lg mb-2">Pending Activities</h3>
     {#each activities as activity}
       <PendingActivity {activity} />
     {/each}

@@ -1,48 +1,88 @@
 <script lang="ts">
-  import beautify from 'json-beautify';
-  export let headings: [string, string] = ['Key', 'Value'];
-  export let data: { [key: string]: any };
+  export let headings: [string, string] = null;
+  export let data: any;
+  export let child: boolean = false;
+  export let full: boolean = false;
+
+  let isNumber = typeof data === 'number';
+  let isString = typeof data === 'string';
+  let isUndefined = typeof data === 'undefined';
+  let isBoolean = typeof data === 'boolean';
+  let isNaN = Number.isNaN(data);
+  let isArray = Array.isArray(data);
+  let isNull = data === null;
+  let isObject = typeof data === 'object' && !isArray && !isNull && !isNaN;
 </script>
 
-<table>
-  <thead>
-    <tr>
-      {#each headings as heading}
-        <th>{heading}</th>
+{#if isObject && Object.keys(data).length}
+  <table class:child class:full>
+    {#if headings}
+      <thead>
+        <tr>
+          {#each headings as heading}
+            <th>{heading}</th>
+          {/each}
+        </tr>
+      </thead>
+    {/if}
+    <tbody>
+      {#each Object.entries(data) as [key, value]}
+        <tr>
+          <th>{key}</th>
+          <td><svelte:self data={value} child={true} /></td>
+        </tr>
       {/each}
-    </tr>
-  </thead>
-  <tbody>
-    {#each Object.entries(data) as [key, value]}
-      <tr>
-        <td>{key}</td>
-        {#if typeof value === 'string'}
-          <td>{value}</td>
-        {:else if typeof value === 'object'}
-          <td>{beautify(value, null, 2, 80)}</td>
-        {:else}
-          <td>{String(value)}</td>
-        {/if}
-      </tr>
+    </tbody>
+  </table>
+{:else if isArray}
+  {#if data.length}
+    {#each data as datum}
+      <svelte:self data={datum} child={true} />
     {/each}
-  </tbody>
-</table>
+  {:else}
+    <div class="text-gray-500">(Empty)</div>
+  {/if}
+{:else if isString || isNumber}
+  <div>{String(data)}</div>
+{:else if isNull || isBoolean || isNaN}
+  <div><code>{String(data)}</code></div>
+{:else if isUndefined}
+  <div class="text-gray-500">(Undefined)</div>
+{:else}
+  <div class="text-gray-500">(Empty)</div>
+{/if}
 
 <style lang="postcss">
   table {
-    @apply border-collapse w-full border-2 mb-8;
+    @apply border-2 border-gray-500 w-full border-collapse;
+  }
+
+  table.child {
+    @apply border-2 border-l-4 border-gray-500;
+  }
+
+  table.full {
+    @apply border-l-0 border-r-0;
   }
 
   th {
-    @apply bg-gray-200 text-gray-500 text-xs h-6 m-0 p-3 text-left uppercase;
+    @apply bg-gray-300 text-left;
+  }
+
+  tbody th {
+    @apply bg-gray-200 w-48;
   }
 
   tr {
-    @apply py-4 my-4;
     @apply bg-gray-50;
   }
 
+  tr:nth-child(odd) {
+    @apply bg-gray-100;
+  }
+
+  th,
   td {
-    @apply p-4;
+    @apply p-2;
   }
 </style>

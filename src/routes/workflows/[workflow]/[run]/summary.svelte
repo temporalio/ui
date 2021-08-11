@@ -27,8 +27,8 @@
   $: workflow = toWorkflowExecution(execution);
 </script>
 
-<div class="execution-information px-6 py-6 flex">
-  <div class={$isFullScreen ? 'w-1/3' : 'w-full'}>
+<div class="execution-information px-6 py-6">
+  <div class="w-full flex">
     <ExecutionInformation title="Start Time" value={workflow.startTime} />
     <ExecutionInformation title="End Time" value={workflow.endTime} />
     <ExecutionInformation title="Task Queue" value={workflow.taskQueue} />

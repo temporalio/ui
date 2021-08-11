@@ -5,8 +5,6 @@
   export async function load({ fetch, page }: LoadInput) {
     const { namespace } = page.params;
 
-    console.log('params', page.params);
-
     const settings: DescribeNamespaceResponse = await fetch(
       'http://localhost:8080/api/v1/namespaces/' + namespace,
     ).then((response) => response.json());
@@ -29,16 +27,27 @@
   } = settings;
 </script>
 
-<main>
-  <h2 class="text-4xl my-6 font-bold mx-4">Namespace Information</h2>
-  <KeyValueTable headings={['Key', 'Value']} data={namespaceInfo} />
-
-  <h2 class="text-4xl my-6 font-bold mx-4">Configuation</h2>
-  <KeyValueTable headings={['Key', 'Value']} data={config} />
-
-  <h2 class="text-4xl my-6 font-bold mx-4">Replication</h2>
-  <KeyValueTable headings={['Key', 'Value']} data={replicationConfig} />
-
-  <h2 class="text-4xl my-6 font-bold mx-4">Other Settings</h2>
-  <KeyValueTable headings={['Key', 'Value']} data={otherSettings} />
+<main class="flex flex-wrap">
+  <section>
+    <h2 class="text-4xl my-6 font-bold mx-4">Namespace Information</h2>
+    <KeyValueTable headings={['Key', 'Value']} data={namespaceInfo} />
+  </section>
+  <section>
+    <h2 class="text-4xl my-6 font-bold mx-4">Configuation</h2>
+    <KeyValueTable headings={['Key', 'Value']} data={config} />
+  </section>
+  <section>
+    <h2 class="text-4xl my-6 font-bold mx-4">Replication</h2>
+    <KeyValueTable headings={['Key', 'Value']} data={replicationConfig} />
+  </section>
+  <section>
+    <h2 class="text-4xl my-6 font-bold mx-4">Other Settings</h2>
+    <KeyValueTable headings={['Key', 'Value']} data={otherSettings} />
+  </section>
 </main>
+
+<style lang="postcss">
+  section {
+    @apply w-1/2 p-6;
+  }
+</style>

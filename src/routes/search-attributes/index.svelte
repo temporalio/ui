@@ -24,5 +24,6 @@
   <KeyValueTable
     headings={['Attribute', 'Type']}
     data={searchAttributes.keys}
+    full={true}
   />
 </main>
