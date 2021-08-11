@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { getComponentForEventType } from '$lib/utilities/get-component-for-event-type';
   import beautify from 'json-beautify';
   import { formatDate } from '$lib/utilities/format-date';
   import type { HistoryEvent } from '$types/temporal/api/history/v1/message';
@@ -7,23 +8,20 @@
   export let event: HistoryEvent;
   export let index: number;
 
-  let baseTypes = ['eventId', 'eventTime', 'eventType', 'version', 'taskId'];
-  let [type] = Object.keys(event).filter((key) => !baseTypes.includes(key));
-
   let even = !(index % 2);
 </script>
 
 <tr class:even>
   <td>{event.eventId}</td>
-  <td>{event.eventType} ({type})</td>
+  <td>{event.eventType}</td>
   <td>{formatDate(event.eventTime)}</td>
-  <td>
+  <td class="w-1/2">
     <div class="flex">
       <ExecutionInformation title="Version" value={event.version} />
       <ExecutionInformation title="Task ID" value={event.taskId} />
     </div>
 
-    <pre><code>{beautify(event, null, 2, 80)}</code></pre>
+    <svelte:component this={getComponentForEventType(event)} {event} />
   </td>
 </tr>
 

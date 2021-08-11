@@ -2,6 +2,7 @@
   export let headings: [string, string] = null;
   export let data: any;
   export let child: boolean = false;
+  export let full: boolean = false;
 
   let isNumber = typeof data === 'number';
   let isString = typeof data === 'string';
@@ -14,7 +15,7 @@
 </script>
 
 {#if isObject && Object.keys(data).length}
-  <table class:child>
+  <table class:child class:full>
     {#if headings}
       <thead>
         <tr>
@@ -53,11 +54,15 @@
 
 <style lang="postcss">
   table {
-    @apply border-t-2 border-b-2 border-gray-500 w-full border-collapse;
+    @apply border-2 border-gray-500 w-full border-collapse;
   }
 
   table.child {
     @apply border-2 border-l-4 border-gray-500;
+  }
+
+  table.full {
+    @apply border-l-0 border-r-0;
   }
 
   th {
@@ -78,6 +83,6 @@
 
   th,
   td {
-    @apply p-6;
+    @apply p-2;
   }
 </style>

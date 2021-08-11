@@ -21,9 +21,13 @@
   const { supportedClients, ...clusterInformation } = cluster;
 </script>
 
-<main>
-  <h2 class="text-4xl my-6 font-bold mx-4">Supported Clients</h2>
-  <KeyValueTable headings={['Client', 'Version']} data={supportedClients} />
-  <h2 class="text-4xl my-6 font-bold mx-4">Cluster Information</h2>
-  <KeyValueTable headings={['Key', 'Value']} data={clusterInformation} />
+<main class="flex flex-wrap">
+  <section class="p-6 w-1/2">
+    <h2 class="text-4xl my-6 font-bold mx-4">Supported Clients</h2>
+    <KeyValueTable headings={['Client', 'Version']} data={supportedClients} />
+  </section>
+  <section class="p-6 w-1/2">
+    <h2 class="text-4xl my-6 font-bold mx-4">Cluster Information</h2>
+    <KeyValueTable headings={['Key', 'Value']} data={clusterInformation} />
+  </section>
 </main>
