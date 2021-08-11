@@ -4,5 +4,4 @@
   export let event: ActivityTaskCancelRequestedEvent;
 </script>
 
- <KeyValueTable data={event.activityTaskCancelRequestedEventAttributes} />
-
+<KeyValueTable data={event.activityTaskCancelRequestedEventAttributes} />

@@ -4,5 +4,4 @@
   export let event: WorkflowExecutionCanceledEvent;
 </script>
 
- <KeyValueTable data={event.workflowExecutionCanceledEventAttributes} />
-
+<KeyValueTable data={event.workflowExecutionCanceledEventAttributes} />

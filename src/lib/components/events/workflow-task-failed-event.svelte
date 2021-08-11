@@ -4,5 +4,4 @@
   export let event: WorkflowTaskFailedEvent;
 </script>
 
- <KeyValueTable data={event.workflowTaskFailedEventAttributes} />
-
+<KeyValueTable data={event.workflowTaskFailedEventAttributes} />

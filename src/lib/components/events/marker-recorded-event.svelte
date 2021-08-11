@@ -4,5 +4,4 @@
   export let event: MarkerRecordedEvent;
 </script>
 
- <KeyValueTable data={event.markerRecordedEventAttributes} />
-
+<KeyValueTable data={event.markerRecordedEventAttributes} />

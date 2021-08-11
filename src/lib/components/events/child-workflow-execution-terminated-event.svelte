@@ -4,5 +4,4 @@
   export let event: ChildWorkflowExecutionTerminatedEvent;
 </script>
 
- <KeyValueTable data={event.childWorkflowExecutionTerminatedEventAttributes} />
-
+<KeyValueTable data={event.childWorkflowExecutionTerminatedEventAttributes} />

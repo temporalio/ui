@@ -4,5 +4,4 @@
   export let event: WorkflowExecutionContinuedAsNewEvent;
 </script>
 
- <KeyValueTable data={event.workflowExecutionContinuedAsNewEventAttributes} />
-
+<KeyValueTable data={event.workflowExecutionContinuedAsNewEventAttributes} />

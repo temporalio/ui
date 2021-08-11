@@ -4,5 +4,4 @@
   export let event: ExternalWorkflowExecutionSignaledEvent;
 </script>
 
- <KeyValueTable data={event.externalWorkflowExecutionSignaledEventAttributes} />
-
+<KeyValueTable data={event.externalWorkflowExecutionSignaledEventAttributes} />
