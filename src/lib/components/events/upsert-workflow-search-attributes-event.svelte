@@ -1,7 +1,8 @@
 <script lang="ts">
+  import KeyValueTable from '/components/key-value-table.svelte';
+
   export let event: UpsertWorkflowSearchAttributesEvent;
 </script>
 
-<div>
-  <strong>UpsertWorkflowSearchAttributesEvent</strong>: {JSON.stringify(event)}
-</div>
+ <KeyValueTable data={event.upsertWorkflowSearchAttributesEventAttributes} />
+

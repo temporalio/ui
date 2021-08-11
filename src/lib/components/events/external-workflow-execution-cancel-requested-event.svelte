@@ -1,9 +1,8 @@
 <script lang="ts">
+  import KeyValueTable from '/components/key-value-table.svelte';
+
   export let event: ExternalWorkflowExecutionCancelRequestedEvent;
 </script>
 
-<div>
-  <strong>ExternalWorkflowExecutionCancelRequestedEvent</strong>: {JSON.stringify(
-    event,
-  )}
-</div>
+ <KeyValueTable data={event.externalWorkflowExecutionCancelRequestedEventAttributes} />
+

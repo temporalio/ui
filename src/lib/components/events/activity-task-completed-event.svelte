@@ -1,7 +1,8 @@
 <script lang="ts">
+  import KeyValueTable from '/components/key-value-table.svelte';
+
   export let event: ActivityTaskCompletedEvent;
 </script>
 
-<div>
-  <strong>ActivityTaskCompletedEvent</strong>: {JSON.stringify(event)}
-</div>
+ <KeyValueTable data={event.activityTaskCompletedEventAttributes} />
+

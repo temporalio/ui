@@ -1,9 +1,8 @@
 <script lang="ts">
+  import KeyValueTable from '/components/key-value-table.svelte';
+
   export let event: StartChildWorkflowExecutionFailedEvent;
 </script>
 
-<div>
-  <strong>StartChildWorkflowExecutionFailedEvent</strong>: {JSON.stringify(
-    event,
-  )}
-</div>
+ <KeyValueTable data={event.startChildWorkflowExecutionFailedEventAttributes} />
+
