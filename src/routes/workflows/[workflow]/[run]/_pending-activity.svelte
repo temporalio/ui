@@ -1,5 +1,7 @@
 <script lang="ts">
+  import beautify from 'json-beautify';
   import type { PendingActivityInfo } from '$types/temporal/api/workflow/v1/message';
+  import { formatDate } from '$lib/utilities/format-date';
 
   export let activity: PendingActivityInfo;
 </script>
@@ -9,46 +11,50 @@
     {activity.activityType.name}
     <code>#{activity.activityId}</code>
   </h4>
-  <table>
-    <tbody>
-      <tr>
-        <td><code>state</code></td>
-        <td>{activity.state}</td>
-      </tr>
-      <tr>
-        <td><code>heartbeatDetails</code></td>
-        <td>{activity.heartbeatDetails}</td>
-      </tr>
-      <tr>
-        <td><code>lastHeartbeatTime</code></td>
-        <td>{activity.lastHeartbeatTime}</td>
-      </tr>
-      <tr>
-        <td><code>lastStartedTime</code></td>
-        <td>{activity.lastStartedTime}</td>
-      </tr>
-      <tr>
-        <td><code>attempt</code></td>
-        <td>{activity.attempt}</td>
-      </tr>
-      <tr>
-        <td><code>maximumAttempts</code></td>
-        <td>{activity.maximumAttempts}</td>
-      </tr>
-      <tr>
-        <td><code>scheduledTime</code></td>
-        <td>{activity.scheduledTime}</td>
-      </tr>
-      <tr>
-        <td><code>expirationTime</code></td>
-        <td>{activity.expirationTime}</td>
-      </tr>
-      <tr>
-        <td><code>lastWorkerIdentity</code></td>
-        <td>{activity.lastWorkerIdentity}</td>
-      </tr>
-    </tbody>
-  </table>
+  <section>
+    <div class="row">
+      <div class="key">State</div>
+      <div class="value">{activity.state}</div>
+    </div>
+    <div class="row">
+      <div class="key">Heartbeat Detaults</div>
+      <div class="value">{activity.heartbeatDetails}</div>
+    </div>
+    <div class="row">
+      <div class="key">Last Heartbeat Time</div>
+      <div class="value">{formatDate(activity.lastHeartbeatTime)}</div>
+    </div>
+    <div class="row">
+      <div class="key">Last Started Time</div>
+      <div class="value">{formatDate(activity.lastStartedTime)}</div>
+    </div>
+    <div class="row">
+      <div class="key">Attempt</div>
+      <div class="value">{activity.attempt}</div>
+    </div>
+    <div class="row">
+      <div class="key">Maximum Attempts</div>
+      <div class="value">{activity.maximumAttempts}</div>
+    </div>
+    <div class="row">
+      <div class="key">Scheduled Time</div>
+      <div class="value">{formatDate(activity.scheduledTime)}</div>
+    </div>
+    <div class="row">
+      <div class="key">Expiration Time</div>
+      <div class="value">{formatDate(activity.expirationTime)}</div>
+    </div>
+    <div class="row">
+      <div class="key">Last Failure</div>
+      <div class="value overflow-y-scroll whitespace-pre font-mono">
+        {beautify(activity.lastFailure, null, 2, 80)}
+      </div>
+    </div>
+    <div class="row">
+      <div class="key">Last Worker Identity</div>
+      <div class="value">{activity.lastWorkerIdentity}</div>
+    </div>
+  </section>
 </article>
 
 <style lang="postcss">
@@ -56,19 +62,20 @@
     @apply mb-4 font-semibold;
   }
 
-  table {
-    @apply w-full text-sm;
+  .row {
+    @apply flex p-4;
   }
 
-  td {
-    @apply p-2;
+  .key,
+  .value {
+    @apply w-full;
   }
 
-  tr {
-    @apply bg-gray-50;
+  .key {
+    @apply font-semibold max-w-sm;
   }
 
-  tr:nth-child(even) {
+  .row:nth-child(even) {
     @apply bg-gray-100;
   }
 </style>
