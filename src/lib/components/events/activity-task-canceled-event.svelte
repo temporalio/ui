@@ -1,7 +1,8 @@
 <script lang="ts">
-  import KeyValueTable from '/components/key-value-table.svelte';
+  import KeyValueTable from '$lib/components/key-value-table.svelte';
 
   export let event: ActivityTaskCanceledEvent;
 </script>
 
-<KeyValueTable data={event.activityTaskCanceledEventAttributes} />
+ <KeyValueTable data={event.activityTaskCanceledEventAttributes} />
+

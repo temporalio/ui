@@ -1,9 +1,8 @@
 <script lang="ts">
-  import KeyValueTable from '/components/key-value-table.svelte';
+  import KeyValueTable from '$lib/components/key-value-table.svelte';
 
   export let event: SignalExternalWorkflowExecutionInitiatedEvent;
 </script>
 
-<KeyValueTable
-  data={event.signalExternalWorkflowExecutionInitiatedEventAttributes}
-/>
+ <KeyValueTable data={event.signalExternalWorkflowExecutionInitiatedEventAttributes} />
+
