@@ -1,5 +1,6 @@
 <script lang="ts">
-  export let headings: [string, string];
+  import beautify from 'json-beautify';
+  export let headings: [string, string] = ['Key', 'Value'];
   export let data: { [key: string]: any };
 </script>
 
@@ -15,7 +16,13 @@
     {#each Object.entries(data) as [key, value]}
       <tr>
         <td>{key}</td>
-        <td>{value}</td>
+        {#if typeof value === 'string'}
+          <td>{value}</td>
+        {:else if typeof value === 'object'}
+          <td>{beautify(value, null, 2, 80)}</td>
+        {:else}
+          <td>{String(value)}</td>
+        {/if}
       </tr>
     {/each}
   </tbody>

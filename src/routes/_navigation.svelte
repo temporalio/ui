@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { Photograph, Collection, DocumentSearch } from 'svelte-hero-icons';
+  import {
+    Photograph,
+    Collection,
+    DocumentSearch,
+    Identification,
+  } from 'svelte-hero-icons';
   import NavigationLink from './_navigation-link.svelte';
 </script>
 
@@ -18,5 +23,10 @@
     href="/search-attributes"
     label="Search Attributes"
     icon={DocumentSearch}
+  />
+  <NavigationLink
+    href="/namespaces/default"
+    label="Settings"
+    icon={Identification}
   />
 </nav>
