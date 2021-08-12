@@ -1,39 +1,46 @@
 <script lang="ts">
-  import type { WorkflowExecution } from '$lib/models/workflow-execution';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
-
   import { page } from '$app/stores';
+
+  import type { WorkflowExecution } from '$lib/models/workflow-execution';
+  import { getWorkflowExecutionUrl } from '$lib/utilities/get-workflow-execution-url';
   import { pathMatches } from '$lib/utilities/path-matches';
+
+  import WorkflowStatus from '$lib/components/workflow-status.svelte';
 
   export let workflow: WorkflowExecution;
 
-  $: href = workflow.url;
+  $: href = getWorkflowExecutionUrl(workflow, $page.query);
   $: isActive = pathMatches(href, $page.path);
 </script>
 
 <tr class:active={isActive}>
-  <td>
-    <a {href}>
+  <td class="workflow">
+    <a sveltekit:noscroll {href}>
       <h3>
         {workflow.name}
       </h3>
       <p>
+        <strong>Workflow:</strong>
+        {workflow.id}
+      </p>
+      <p>
+        <strong>Execution:</strong>
         {workflow.runId}
       </p>
     </a>
   </td>
   <td>
-    <a {href}>
+    <a sveltekit:noscroll {href}>
       <WorkflowStatus status={workflow.status} />
     </a>
   </td>
   <td>
-    <a {href}>
+    <a sveltekit:noscroll {href}>
       <p>{workflow.startTime}</p>
     </a>
   </td>
   <td>
-    <a {href}>
+    <a sveltekit:noscroll {href}>
       <p>{workflow.endTime}</p>
     </a>
   </td>
@@ -57,7 +64,11 @@
   }
 
   td {
-    @apply p-0 w-1/4;
+    @apply p-0;
+  }
+
+  td.workflow {
+    @apply w-1/3;
   }
 
   a {

@@ -27,7 +27,6 @@ export const WorkflowExecutionAPI = {
     request = fetch,
   ): Promise<{
     execution: DescribeWorkflowExecutionResponse;
-    events: GetWorkflowExecutionHistoryResponse;
   }> {
     const execution: DescribeWorkflowExecutionResponse = await request(
       `${base}/namespaces/default/workflows/${executionId}/executions/${runId}`,
@@ -35,6 +34,17 @@ export const WorkflowExecutionAPI = {
       .then((response) => response.json())
       .catch(console.error);
 
+    return {
+      execution,
+    };
+  },
+
+  async getEvents(
+    { executionId, runId }: { [key: string]: string },
+    request = fetch,
+  ): Promise<{
+    events: GetWorkflowExecutionHistoryResponse;
+  }> {
     const events: GetWorkflowExecutionHistoryResponse = await request(
       `${base}/namespaces/default/workflows/${executionId}/executions/${runId}/events`,
     )
@@ -42,7 +52,6 @@ export const WorkflowExecutionAPI = {
       .catch(console.error);
 
     return {
-      execution,
       events,
     };
   },

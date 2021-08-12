@@ -6,8 +6,6 @@
 </script>
 
 <section>
-  <h2 class="text-lg">Events</h2>
-
   <table class="border-collapse w-full border-2">
     <thead>
       <tr>

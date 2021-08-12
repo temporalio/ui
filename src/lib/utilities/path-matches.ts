@@ -1,3 +1,5 @@
+import UrlPattern from 'url-pattern';
+
 const dropQueryParameters = (url: string) => {
   const queryParameterIndex = url.indexOf('?');
   if (queryParameterIndex > -1) return url.slice(0, queryParameterIndex);
