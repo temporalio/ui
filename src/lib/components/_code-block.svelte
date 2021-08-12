@@ -5,11 +5,14 @@
   export let content = '';
   export let copied = false;
 
-  const copy = () => navigator.clipboard.writeText(content).then(() => {
-    copied = !copied;
-    setTimeout(() => copied = false, 2000);
-  }).catch(error => console.error(error));
-
+  const copy = () =>
+    navigator.clipboard
+      .writeText(content)
+      .then(() => {
+        copied = !copied;
+        setTimeout(() => (copied = false), 2000);
+      })
+      .catch((error) => console.error(error));
 </script>
 
 {#if content}

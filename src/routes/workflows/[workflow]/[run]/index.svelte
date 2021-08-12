@@ -18,10 +18,10 @@
   import type { DescribeWorkflowExecutionResponse } from '$types/temporal/api/workflowservice/v1/request_response';
 
   import { toWorkflowExecution } from '$lib/models/workflow-execution';
-  import CodeBlock from '$lib/components/_code-block.svelte'
+  import CodeBlock from '$lib/components/_code-block.svelte';
 
   import ExecutionInformation from './_execution-information.svelte';
-  import PendingActivities from './_pending-activities.svelte';  
+  import PendingActivities from './_pending-activities.svelte';
 
   export let execution: DescribeWorkflowExecutionResponse;
 
@@ -33,7 +33,7 @@
     <ExecutionInformation title="Start Time" value={workflow.startTime} />
     <ExecutionInformation title="End Time" value={workflow.endTime} />
     <ExecutionInformation title="Task Queue" value={workflow.taskQueue} />
-    <CodeBlock heading="Input" content={"Hello World!"} />
+    <CodeBlock heading="Input" content={'Hello World!'} />
     <ExecutionInformation
       title="History Events"
       value={workflow.historyEvents}
