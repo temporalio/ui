@@ -33,7 +33,7 @@
 
   td {
     vertical-align: top;
-    @apply p-4;
+    @apply p-4 overflow-x-scroll;
   }
 
   h3 {

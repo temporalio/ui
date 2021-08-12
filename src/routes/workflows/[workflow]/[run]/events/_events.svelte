@@ -6,13 +6,13 @@
 </script>
 
 <section>
-  <table class="border-collapse w-full border-2">
+  <table class="border-collapse w-full border-2 table-fixed">
     <thead>
       <tr>
-        <th>ID</th>
-        <th>Type</th>
-        <th>Time</th>
-        <th>Details</th>
+        <th class="w-1/12">ID</th>
+        <th class="w-2/12">Type</th>
+        <th class="w-2/12">Time</th>
+        <th class="w-7/12">Details</th>
       </tr>
     </thead>
     <tbody>
