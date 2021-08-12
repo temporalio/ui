@@ -18,7 +18,7 @@
     <code class="relative group">
       <div id="clipboard" />
       <pre
-        class="p-6 bg-gray-200 relative">
+        class="p-6 bg-gray-200 relative w-full mb-6">
         {JSON.stringify(content)}
         <button on:click={copy}> 
           {#if copied}
