@@ -2,11 +2,12 @@
   import type { LoadInput } from '@sveltejs/kit';
 
   export async function load({ context }: LoadInput) {
-    const { execution } = context;
+    const { execution, events } = context;
 
     return {
       props: {
         execution,
+        events,
       },
     };
   }
