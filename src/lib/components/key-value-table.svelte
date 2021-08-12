@@ -28,8 +28,8 @@
     <tbody>
       {#each Object.entries(data) as [key, value]}
         <tr>
-          <th>{key}</th>
-          <td><svelte:self data={value} child={true} /></td>
+          <th class="w-1/3">{key}</th>
+          <td class="w-2/3"><svelte:self data={value} child={true} /></td>
         </tr>
       {/each}
     </tbody>
@@ -54,11 +54,11 @@
 
 <style lang="postcss">
   table {
-    @apply border-2 border-gray-500 w-full border-collapse;
+    @apply border-2 border-gray-500 border-collapse w-full table-fixed;
   }
 
   table.child {
-    @apply border-2 border-l-4 border-gray-500;
+    @apply border-2 border-l-4 border-gray-500 table-fixed;
   }
 
   table.full {
@@ -66,7 +66,11 @@
   }
 
   th {
-    @apply bg-gray-300 text-left;
+    @apply bg-gray-300 text-left overflow-x-hidden overflow-ellipsis;
+  }
+
+  .child tr {
+    @apply overflow-x-scroll;
   }
 
   tbody th {
@@ -83,6 +87,6 @@
 
   th,
   td {
-    @apply p-2;
+    @apply p-2 overflow-x-scroll;
   }
 </style>

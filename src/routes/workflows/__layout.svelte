@@ -57,6 +57,14 @@
         <tbody slot="rows">
           {#each workflows as workflow}
             <WorkflowsSummaryRow {workflow} />
+          {:else}
+            <tr>
+              <td
+                colspan="4"
+                class="m-auto p-12 text-center font-extralight text-2xl"
+                >No Results</td
+              >
+            </tr>
           {/each}
         </tbody>
       </WorkflowsSummaryTable>
