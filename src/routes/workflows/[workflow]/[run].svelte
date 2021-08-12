@@ -36,7 +36,7 @@
   import Header from './_header.svelte';
   import ExecutionInformation from './_execution-information.svelte';
   import PendingActivities from './_pending-activities.svelte';
-  import CodeBlock from './_code-block.svelte';
+  import CodeBlock from '$lib/components/_code-block.svelte';
   import Events from './_events.svelte';
 
   export let execution: DescribeWorkflowExecutionResponse;
