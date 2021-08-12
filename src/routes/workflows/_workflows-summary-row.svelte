@@ -20,11 +20,9 @@
         {workflow.name}
       </h3>
       <p>
-        <strong>Workflow:</strong>
         {workflow.id}
       </p>
       <p>
-        <strong>Execution:</strong>
         {workflow.runId}
       </p>
     </a>

@@ -28,6 +28,8 @@
 
   let status = null;
   let workflowType = null;
+  let executionId = null;
+  let runId = null;
 
   let request = query.request('executions', WorkflowExecutionAPI.getAll, {
     format: toWorkflowExecutions,
@@ -45,6 +47,8 @@
 
     if (status && executionStatus !== status) return false;
     if (workflowType && execution.name !== workflowType) return false;
+    if (executionId && !execution.id.startsWith(executionId)) return false;
+    if (runId && !execution.runId.startsWith(runId)) return false;
     return true;
   });
 </script>
@@ -52,7 +56,13 @@
 <section class="flex items-start">
   {#if !$isFullScreen}
     <div class="w-full h-screen overflow-x-scroll">
-      <WorkflowFilters bind:status bind:workflowType {workflowTypes} />
+      <WorkflowFilters
+        bind:status
+        bind:workflowType
+        bind:runId
+        bind:executionId
+        {workflowTypes}
+      />
       <WorkflowsSummaryTable>
         <tbody slot="rows">
           {#each workflows as workflow}
