@@ -16,13 +16,19 @@
         setTimeout(() => (copied = false), 2000);
       })
       .catch((error) => console.error(error));
+
+  const formatJSON = (jsonData) => {
+    const parsedData = JSON.parse(jsonData);
+    const formated = JSON.stringify(parsedData, undefined, 4);
+    return formated;
+  };
 </script>
 
 {#if content}
   <div class="relative group w-full mb-2">
     <div id="clipboard" />
     <h3 class="text-lg mb-2 w-full">{heading}</h3>
-    <Highlight language={json} code={content} />
+    <Highlight language={json} code={formatJSON(content)} />
     <button on:click={copy}>
       {#if copied}
         <Icon
