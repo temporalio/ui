@@ -61,6 +61,7 @@
     "prettier-plugin-svelte": "^2.2.0",
     "svelte": "^3.34.0",
     "svelte-check": "^2.0.0",
+    "svelte-highlight": "^3.2.0",
     "svelte-preprocess": "^4.7.3",
     "tailwindcss": "^2.2.4",
     "ts-jest": "^27.0.3",

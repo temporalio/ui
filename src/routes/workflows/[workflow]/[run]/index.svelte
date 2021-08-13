@@ -26,6 +26,12 @@
   export let execution: DescribeWorkflowExecutionResponse;
 
   $: workflow = toWorkflowExecution(execution);
+
+  const testSnippet = `
+  {
+    "value": "hello world!"
+  }
+  `;
 </script>
 
 <div class="execution-information px-6 py-6 flex flex-col">
@@ -33,7 +39,7 @@
     <ExecutionInformation title="Start Time" value={workflow.startTime} />
     <ExecutionInformation title="End Time" value={workflow.endTime} />
     <ExecutionInformation title="Task Queue" value={workflow.taskQueue} />
-    <CodeBlock heading="Input" content={'Hello World!'} />
+    <CodeBlock heading="Input" content={testSnippet} />
     <ExecutionInformation
       title="History Events"
       value={workflow.historyEvents}
