@@ -25,6 +25,7 @@
     "build-stories": "build-storybook"
   },
   "dependencies": {
+    "base-64": "^1.0.0",
     "date-fns": "^2.22.1",
     "json-beautify": "^1.1.1",
     "svelte-hero-icons": "^2.2.0",
@@ -40,6 +41,7 @@
     "@storybook/svelte": "^6.3.4",
     "@sveltejs/adapter-static": "^1.0.0-next.13",
     "@sveltejs/kit": "next",
+    "@types/base-64": "^1.0.0",
     "@types/jest": "^26.0.24",
     "@typescript-eslint/eslint-plugin": "^4.19.0",
     "@typescript-eslint/parser": "^4.19.0",
