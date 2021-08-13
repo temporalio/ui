@@ -10,8 +10,6 @@
       props: { user },
     };
   }
-
-  // import NavigationLink from './_navigation-link.svelte';
 </script>
 
 <script lang="ts">
@@ -20,23 +18,6 @@
 
   export let user: { name?: string; email?: string; picture?: string } = {};
   export let showMenu = false;
-
-  // const signin = async () => {
-  //   window.location.assign('http://localhost:8080/auth/sso');
-  //   // await fetch('http://localhost:8080/auth/sso', {
-  //   //   // redirect: 'manual',
-  //   // })
-  //   //   .then((resp) => {
-  //   //     if (resp.redirected) {
-  //   //       window.location.href = resp.url;
-  //   //     }
-  //   //   })
-  //   //   .catch((error) => console.error(error));
-  // };
-
-  // const signout = () => {
-  //   window.location.assign('/auth/logout');
-  // };
 </script>
 
 <div
@@ -73,12 +54,6 @@
           class="block px-4 py-2 hover:bg-green-500 hover:text-green-100"
           >Sign In</a
         >
-
-        <!-- <button
-          on:click={signin}
-          class="block px-4 py-2 w-full hover:bg-green-500 hover:text-green-100 text-left"
-          >Sign In</button
-        > -->
       {/if}
       <a
         href="/settings"
@@ -86,12 +61,6 @@
         >Settings</a
       >
       {#if user.email}
-        <!-- <a
-          href="/auth/signout"
-          class="block px-4 py-2 hover:bg-green-500 hover:text-green-100"
-          >Sign Out</a
-        > -->
-
         <a
           href="http://localhost:8080/auth/signout"
           class="block px-4 py-2 hover:bg-green-500 hover:text-green-100"
@@ -100,6 +69,4 @@
       {/if}
     </div>
   {/if}
-
-  <!-- <Icon src={User} class="text-red-500" /> -->
 </div>
