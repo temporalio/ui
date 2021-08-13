@@ -1,6 +1,7 @@
 <script>
   import '../app.postcss';
   import Navigation from './_navigation.svelte';
+  import Header from './_header.svelte';
 </script>
 
 <svelte:head>
@@ -18,6 +19,9 @@
 <main class="flex align-start h-screen">
   <Navigation />
   <div class="w-full overflow-y-scroll">
-    <slot />
+    <Header />
+    <div class="w-full">
+      <slot />
+    </div>
   </div>
 </main>
