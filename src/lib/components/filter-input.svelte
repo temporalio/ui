@@ -6,13 +6,11 @@
 
 <div>
   <label for={id} class="text-gray-600 text-xs block">{name}</label>
-  <select class="block border-2 text-base p-2" {id} bind:value>
-    <slot />
-  </select>
+  <input class="block border-2 text-sm p-2" {id} bind:value />
 </div>
 
 <style>
-  select {
+  input {
     height: 40px;
   }
 </style>

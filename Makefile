@@ -21,11 +21,17 @@ PROTO_IMPORTS := \
 	-I $(PROTO_ROOT)
 PROTO_REFS := Mgoogle/protobuf/wrappers.proto=github.com/gogo/protobuf/types,Mgoogle/protobuf/duration.proto=github.com/gogo/protobuf/types,Mgoogle/protobuf/empty.proto=github.com/gogo/protobuf/types,Mgoogle/protobuf/descriptor.proto=github.com/gogo/protobuf/protoc-gen-gogo/descriptor,Mgoogle/protobuf/timestamp.proto=github.com/gogo/protobuf/types,Mgoogle/api/annotations.proto=github.com/gogo/googleapis/google/api
 
+##### Install dependencies #####
+install: install-submodules
+
+install-submodules:
+	printf $(COLOR) "fetching submudules..."
+	git submodule update --init
+
 ##### Build #####
-build: clean build-types
+build: build-types
 
 build-types:
-	git submodule update --init
 	printf $(COLOR) "Compiling Typescript types..."
 	rm -rf $(PROTO_OUT)/*
 	mkdir -p $(PROTO_OUT)

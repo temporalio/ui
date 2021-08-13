@@ -1,10 +1,10 @@
 <table class="border-collapse w-full">
   <thead>
     <tr class="bg-gray-200">
-      <th class="w-4/12">Workflow/Run ID</th>
+      <th class="w-6/12">Workflow/Run ID</th>
       <th class="w-2/12">Status</th>
-      <th class="w-3/12">Started</th>
-      <th class="w-3/12">Ended</th>
+      <th class="w-2/12">Started</th>
+      <th class="w-2/12">Ended</th>
     </tr>
   </thead>
   <slot name="rows" />
