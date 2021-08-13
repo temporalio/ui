@@ -47,7 +47,7 @@ const config = {
     }),
     vite: {
       optimizeDeps: {
-        include: ['svelte-hero-icons'],
+        include: ['svelte-hero-icons', 'highlight.js/lib/core'],
       },
       resolve: {
         alias: {
