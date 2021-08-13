@@ -41,14 +41,12 @@
     <ExecutionInformation title="Start Time" value={workflow.startTime} />
     <ExecutionInformation title="End Time" value={workflow.endTime} />
     <ExecutionInformation title="Task Queue" value={workflow.taskQueue} />
-    {#if inputAndResults.input}<CodeBlock
-        heading="Input"
-        content={inputAndResults.input.toString()}
-      />{/if}
-    {#if inputAndResults.result}<CodeBlock
-        heading="Result"
-        content={inputAndResults.result.toString()}
-      />{/if}
+    {#if inputAndResults.input}
+      <CodeBlock heading="Input" content={inputAndResults.input.toString()} />
+    {/if}
+    {#if inputAndResults.result}
+      <CodeBlock heading="Result" content={inputAndResults.result.toString()} />
+    {/if}
     <ExecutionInformation
       title="History Events"
       value={workflow.historyEvents}
