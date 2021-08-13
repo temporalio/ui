@@ -4,13 +4,13 @@ import { convertPayloadToJson } from './decode-payload';
 export const getWorkflowStartedAndCompletedEvents = (
   events: GetWorkflowExecutionHistoryResponse,
 ) => {
-  let workflowStartedEvent: WorkflowExecutionStartedEvent = events.history.events.find(
+  const workflowStartedEvent: WorkflowExecutionStartedEvent = events.history.events.find(
     (event) => {
       return !!event.workflowExecutionStartedEventAttributes;
     },
   );
 
-  let workflowCompletedEvent: WorkflowExecutionCompletedEvent = events.history.events.find(
+  const workflowCompletedEvent: WorkflowExecutionCompletedEvent = events.history.events.find(
     (event) => {
       return !!event.workflowTaskCompletedEventAttributes;
     },
