@@ -27,7 +27,6 @@
     <option value="TimedOut">Timed Out</option>
     <option value="Completed">Completed</option>
     <option value="Failed">Failed</option>
-    <option value="Completed">Completed</option>
     <option value="ContinuedAsNew">Continued as New</option>
     <option value="Canceled">Canceled</option>
     <option value="Terminated">Terminated</option>
