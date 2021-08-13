@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-
+  import Time from "svelte-time";
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
   import { getWorkflowExecutionUrl } from '$lib/utilities/get-workflow-execution-url';
   import { pathMatches } from '$lib/utilities/path-matches';
@@ -36,7 +36,7 @@
   </td>
   <td>
     <a sveltekit:noscroll {href}>
-      <p>{workflow.startTime}</p>
+      <Time live relative timestamp={new Date(workflow.startTime.split(' —').join('')).getTime()} />
     </a>
   </td>
   <td>
