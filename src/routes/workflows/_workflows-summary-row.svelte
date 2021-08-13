@@ -7,6 +7,7 @@
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
 
   export let workflow: WorkflowExecution;
+  export let relativeTime: boolean;
 
   $: href = getWorkflowExecutionUrl(workflow, $page.query);
   $: isActive = pathMatches(href, $page.path);
@@ -33,12 +34,12 @@
   </td>
   <td>
     <a sveltekit:noscroll {href}>
-      <Time time={workflow.startTime} />
+      <Time time={workflow.startTime} {relativeTime} />
     </a>
   </td>
   <td>
     <a sveltekit:noscroll {href}>
-      <Time time={workflow.endTime} />
+      <Time time={workflow.endTime} {relativeTime} />
     </a>
   </td>
 </tr>

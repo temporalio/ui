@@ -30,6 +30,7 @@
   let workflowType = null;
   let executionId = null;
   let runId = null;
+  let relativeTime = true;
 
   let request = query.request('executions', WorkflowExecutionAPI.getAll, {
     format: toWorkflowExecutions,
@@ -61,12 +62,13 @@
         bind:workflowType
         bind:runId
         bind:executionId
+        bind:relativeTime
         {workflowTypes}
       />
       <WorkflowsSummaryTable>
         <tbody slot="rows">
           {#each workflows as workflow}
-            <WorkflowsSummaryRow {workflow} />
+            <WorkflowsSummaryRow {workflow} {relativeTime} />
           {:else}
             <tr>
               <td
