@@ -9,7 +9,7 @@
   import Tabs from './_tabs.svelte';
 
   export let workflow: WorkflowExecution;
-  let workflowUrl = getWorkflowExecutionUrl(workflow);
+  $: workflowUrl = getWorkflowExecutionUrl(workflow);
 </script>
 
 <header class="flex flex-col justify-between">

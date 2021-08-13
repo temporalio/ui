@@ -2,7 +2,7 @@ export type URLSearchParamLike =
   | { [key: string]: string | number | boolean }
   | URLSearchParams;
 
-export const toSearchParams = (query: URLSearchParamLike) => {
+export const toSearchParams = (query: URLSearchParamLike): URLSearchParams => {
   if (query instanceof URLSearchParams) return query;
   return new URLSearchParams(query as Record<string, string>);
 };

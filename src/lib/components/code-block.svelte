@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon, { Clipboard } from 'svelte-hero-icons';
+  import Icon, { Clipboard, Check } from 'svelte-hero-icons';
   import { Highlight } from 'svelte-highlight';
   import json from 'svelte-highlight/src/languages/json';
   import 'svelte-highlight/src/styles/agate.css';
@@ -21,15 +21,14 @@
 {#if content}
   <div class="relative group w-full mb-2">
     <div id="clipboard" />
-    <h3 class="text-lg mt-6 mb-2 w-full">{heading}</h3>
+    <h3 class="text-lg mb-2 w-full">{heading}</h3>
     <Highlight language={json} code={content} />
     <button on:click={copy}>
       {#if copied}
-        <p
-          class="w-20 h-6 text-purple-900 bg-gray-300 absolute right-0 top-9 text-center"
-        >
-          Copied!
-        </p>
+        <Icon
+          src={Check}
+          class="w-8 h-8 text-purple-900 bg-gray-300 border-2 border-gray-200 absolute right-0 top-9 hidden group-hover:block hover:bg-gray-400 hover:border-gray-400"
+        />
       {:else}
         <Icon
           src={Clipboard}
@@ -39,10 +38,3 @@
     </button>
   </div>
 {/if}
-
-<style>
-  .hljs {
-    height: 10em;
-    overflow-y: scroll;
-  }
-</style>

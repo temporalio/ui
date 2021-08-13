@@ -14,12 +14,21 @@
       fetch,
     );
 
+    const { events } = await WorkflowExecutionAPI.getEvents(
+      {
+        executionId,
+        runId,
+      },
+      fetch,
+    );
+
     return {
       props: {
         execution,
       },
       context: {
         execution,
+        events,
       },
     };
   }
