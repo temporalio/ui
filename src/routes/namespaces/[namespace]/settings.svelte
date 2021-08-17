@@ -2,7 +2,7 @@
   import type { LoadInput } from '@sveltejs/kit';
   import type { DescribeNamespaceResponse } from '$types/temporal/api/workflowservice/v1/request_response';
 
-  export async function load({ fetch, page }: LoadInput) {
+  export async function load({ fetch, page, context }: LoadInput) {
     const { namespace } = page.params;
 
     const settings: DescribeNamespaceResponse = await fetch(
@@ -19,6 +19,7 @@
   import KeyValueTable from '$lib/components/key-value-table.svelte';
 
   export let settings: DescribeNamespaceResponse;
+
   const {
     namespaceInfo,
     config,

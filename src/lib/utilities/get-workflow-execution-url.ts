@@ -7,11 +7,12 @@ import {
 } from './url-search-params';
 
 export const getWorkflowExecutionUrl = (
+  namespace: string,
   workflow: WorkflowExecution,
   query?: URLSearchParamLike,
   queryOverrides?: URLSearchParamLike,
 ) => {
-  const url = `/workflows/${workflow.id}/${workflow.runId}`;
+  const url = `/namespaces/${namespace}/workflows/${workflow.id}/${workflow.runId}`;
 
   const search = queryOverrides
     ? mergeSearchParams(toSearchParams(query), toSearchParams(queryOverrides))

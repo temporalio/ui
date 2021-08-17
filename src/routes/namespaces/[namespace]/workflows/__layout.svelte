@@ -6,8 +6,10 @@
     WorkflowExecution,
   } from '$lib/models/workflow-execution';
 
-  export async function load({ fetch }: LoadInput) {
-    return await WorkflowExecutionAPI.getAll(fetch)
+  export async function load({ fetch, page }: LoadInput) {
+    const { namespace } = page.params;
+
+    return await WorkflowExecutionAPI.getAll({ namespace }, fetch)
       .then(toWorkflowExecutions)
       .then((executions) => ({
         props: { executions },
@@ -16,7 +18,6 @@
 </script>
 
 <script lang="ts">
-  import { query } from '$lib/stores/data';
   import { isFullScreen } from '$lib/stores/full-screen';
 
   import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
@@ -32,16 +33,11 @@
   let runId = null;
   let relativeTime = true;
 
-  let request = query.request('executions', WorkflowExecutionAPI.getAll, {
-    format: toWorkflowExecutions,
-    initialData: executions,
-  });
-
-  let workflowTypes = $request.data
+  let workflowTypes = executions
     .map((execution) => execution.name)
     .filter(unique);
 
-  $: workflows = $request.data.filter((execution) => {
+  $: workflows = executions.filter((execution) => {
     // Right now, the type generated does not match the actual API response.
     // This is a temporary fix.
     const executionStatus = (execution.status as unknown) as WorkflowStatus;

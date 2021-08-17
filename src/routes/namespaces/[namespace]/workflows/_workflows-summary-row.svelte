@@ -5,11 +5,13 @@
   import { pathMatches } from '$lib/utilities/path-matches';
   import Time from '$lib/components/workflow-time.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import { getContext } from 'svelte';
 
   export let workflow: WorkflowExecution;
   export let relativeTime: boolean;
 
-  $: href = getWorkflowExecutionUrl(workflow, $page.query);
+  $: namespace = getContext('namespace') as string;
+  $: href = getWorkflowExecutionUrl(namespace, workflow, $page.query);
   $: isActive = pathMatches(href, $page.path);
 </script>
 
