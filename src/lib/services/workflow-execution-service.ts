@@ -7,29 +7,38 @@ import type {
 
 const base = 'http://localhost:8080/api/v1';
 
+type GetAllWorkflowExecutionsRequest = { namespace: string };
+type GetWorkflowExecutionRequest = GetAllWorkflowExecutionsRequest & {
+  executionId: string;
+  runId: string;
+};
+
 export const WorkflowExecutionAPI = {
-  async getAll(request = fetch): Promise<WorkflowExecutionInfo[]> {
+  async getAll(
+    { namespace }: GetAllWorkflowExecutionsRequest,
+    request = fetch,
+  ): Promise<WorkflowExecutionInfo[]> {
     const { executions: open }: ListWorkflowExecutionsResponse = await request(
-      `${base}/namespaces/default/workflows/open`,
+      `${base}/namespaces/${namespace}/workflows/open`,
     ).then((response) => response.json());
 
     const {
       executions: closed,
     }: ListWorkflowExecutionsResponse = await request(
-      `${base}/namespaces/default/workflows/closed`,
+      `${base}/namespaces/${namespace}/workflows/closed`,
     ).then((response) => response.json());
 
     return [...open, ...closed];
   },
 
   async get(
-    { executionId, runId }: { [key: string]: string },
+    { executionId, runId, namespace }: GetWorkflowExecutionRequest,
     request = fetch,
   ): Promise<{
     execution: DescribeWorkflowExecutionResponse;
   }> {
     const execution: DescribeWorkflowExecutionResponse = await request(
-      `${base}/namespaces/default/workflows/${executionId}/executions/${runId}`,
+      `${base}/namespaces/${namespace}/workflows/${executionId}/executions/${runId}`,
     )
       .then((response) => response.json())
       .catch(console.error);
@@ -40,13 +49,13 @@ export const WorkflowExecutionAPI = {
   },
 
   async getEvents(
-    { executionId, runId }: { [key: string]: string },
+    { executionId, runId, namespace }: GetWorkflowExecutionRequest,
     request = fetch,
   ): Promise<{
     events: GetWorkflowExecutionHistoryResponse;
   }> {
     const events: GetWorkflowExecutionHistoryResponse = await request(
-      `${base}/namespaces/default/workflows/${executionId}/executions/${runId}/events`,
+      `${base}/namespaces/${namespace}/workflows/${executionId}/executions/${runId}/events`,
     )
       .then((response) => response.json())
       .catch(console.error);

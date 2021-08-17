@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { getContext } from 'svelte';
   import Icon, { X, ArrowLeft, ArrowRight } from 'svelte-hero-icons';
 
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
@@ -9,7 +10,9 @@
   import Tabs from './_tabs.svelte';
 
   export let workflow: WorkflowExecution;
-  $: workflowUrl = getWorkflowExecutionUrl(workflow);
+
+  $: namespace = getContext('namespace') as string;
+  $: workflowUrl = getWorkflowExecutionUrl(namespace, workflow);
 </script>
 
 <header class="flex flex-col justify-between">

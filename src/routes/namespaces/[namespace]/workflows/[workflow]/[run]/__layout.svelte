@@ -4,12 +4,13 @@
   import type { LoadInput } from '@sveltejs/kit';
 
   export async function load({ fetch, page }: LoadInput) {
-    const { workflow: executionId, run: runId } = page.params;
+    const { workflow: executionId, run: runId, namespace } = page.params;
 
     const { execution } = await WorkflowExecutionAPI.get(
       {
         executionId,
         runId,
+        namespace,
       },
       fetch,
     );
@@ -18,6 +19,7 @@
       {
         executionId,
         runId,
+        namespace,
       },
       fetch,
     );
