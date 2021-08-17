@@ -22,8 +22,8 @@
     Terminated: 'pink',
   };
 
-  let color = colors[status];
-  let label = humanFriendlyNames[status];
+  $: color = colors[status];
+  $: label = humanFriendlyNames[status];
 </script>
 
 <div class={`px-2 rounded-xl text-center text-sm ${color}`}>
