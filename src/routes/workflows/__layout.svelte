@@ -56,7 +56,7 @@
 
 <section class="flex items-start">
   {#if !$isFullScreen}
-    <div class="w-full h-screen overflow-x-scroll">
+    <div class="w-full h-full overflow-x-scroll">
       <WorkflowFilters
         bind:status
         bind:workflowType
