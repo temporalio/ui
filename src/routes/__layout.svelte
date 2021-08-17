@@ -48,7 +48,7 @@
   <Navigation />
   <div class="w-full overflow-y-scroll">
     <Header />
-    <div class="w-full">
+    <div class="w-full relative">
       <slot />
     </div>
   </div>

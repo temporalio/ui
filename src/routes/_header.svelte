@@ -1,7 +1,7 @@
 <script context="module" lang="ts">
   import type { LoadInput } from '@sveltejs/kit';
 
-  export async function load({ fetch, page }: LoadInput) {
+  export async function load({ fetch }: LoadInput) {
     const user = await fetch(
       'http://localhost:8080/api/v1/me/',
     ).then((response) => response.json());
@@ -22,7 +22,7 @@
 
 <div
   id="header"
-  class="h-16 w-full px-6 flex flex-row items-center justify-end static"
+  class="h-16 w-full px-6 flex flex-row items-center justify-end static border-b-2"
 >
   <button
     on:click={() => (showMenu = !showMenu)}
@@ -46,14 +46,16 @@
         <span
           href="/settings"
           class="block px-4 py-2 hover:bg-green-500 hover:text-green-100"
-          >{user.email}</span
         >
+          {user.email}
+        </span>
       {:else}
         <a
           href="http://localhost:8080/auth/sso"
           class="block px-4 py-2 hover:bg-green-500 hover:text-green-100"
-          >Sign In</a
         >
+          Sign In
+        </a>
       {/if}
       <a
         href="/settings"
@@ -64,8 +66,9 @@
         <a
           href="http://localhost:8080/auth/signout"
           class="block px-4 py-2 hover:bg-green-500 hover:text-green-100"
-          >Sign Out</a
         >
+          Sign Out
+        </a>
       {/if}
     </div>
   {/if}

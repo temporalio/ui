@@ -3,6 +3,7 @@
   import Icon, { X, ArrowLeft, ArrowRight } from 'svelte-hero-icons';
 
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
+
   import { isFullScreen } from '$lib/stores/full-screen';
   import { getWorkflowExecutionUrl } from '$lib/utilities/get-workflow-execution-url';
 
@@ -32,7 +33,7 @@
         />
       </a>
     {/if}
-    <a href="/workflows">
+    <a href={`/namespaces/${namespace}/workflows`}>
       <Icon src={X} class="absolute right-2 top-2 w-8 h-8 text-gray-400" />
     </a>
     <h1 class="m-0 mt-6 text-lg">
