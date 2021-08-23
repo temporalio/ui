@@ -12,7 +12,7 @@ export const getWorkflowStartedAndCompletedEvents = (
 
   const workflowCompletedEvent: WorkflowExecutionCompletedEvent = events.history.events.find(
     (event) => {
-      return !!event.workflowTaskCompletedEventAttributes;
+      return !!event.workflowExecutionCompletedEventAttributes;
     },
   );
 
