@@ -30,10 +30,3 @@
     <CodeBlock heading="" content={JSON.stringify(history.events)} />
   {/if}
 </section>
-
-<style lang="postcss">
-  .hljs {
-    height: 30em;
-    overflow-y: scroll;
-  }
-</style>
