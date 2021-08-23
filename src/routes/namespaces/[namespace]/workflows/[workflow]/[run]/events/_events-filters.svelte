@@ -1,7 +1,8 @@
 <script lang="ts">
   import type { History } from '$types/temporal/api/history/v1/message';
+  import { convertToJSON } from '$lib/utilities/convert-to-json';
   import Icon, { Download } from 'svelte-hero-icons';
-  
+
   export let eventFormat: string = 'grid';
   export let history: History;
   export let execution;
@@ -10,12 +11,10 @@
     eventFormat = format;
   }
 
-  let eventsString = JSON.stringify(history.events);
-  let dataUri =
-    'data:application/json;charset=utf-8,' + encodeURIComponent(eventsString);
+  $: dataUri = convertToJSON(history.events);
 </script>
 
-<section class="p-4 flex gap-2 items-center">
+<section class="p-4 flex gap-2 items-center justify-between">
   <div>
     <label for="format">View Format</label>
     <button
@@ -29,12 +28,12 @@
   </div>
   <div>
     <a
-    class="text-black-500 font-bold uppercase px-3 py-1 text-xs flex"
-    href={dataUri}
-    download={`${execution.workflowExecutionInfo.type.name}.json`}
-  >
-    <Icon src={Download} class="text-black w-4 h-4" />export</a
-  >
+      class="text-black-500 font-bold uppercase px-3 py-1 text-xs flex"
+      href={dataUri}
+      download={`${execution.workflowExecutionInfo.type.name}.json`}
+    >
+      <Icon src={Download} class="text-black w-4 h-4" />export</a
+    >
   </div>
 </section>
 
