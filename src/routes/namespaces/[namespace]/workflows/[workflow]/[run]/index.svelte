@@ -20,11 +20,12 @@
     DescribeWorkflowExecutionResponse,
     GetWorkflowExecutionHistoryResponse,
   } from '$types/temporal/api/workflowservice/v1/request_response';
-
+  import { getContext } from 'svelte';
   import { toWorkflowExecution } from '$lib/models/workflow-execution';
   import CodeBlock from '$lib/components/code-block.svelte';
-
+  import { getTaskQueueUrl } from '$lib/utilities/get-task-queue-url';
   import ExecutionInformation from './_execution-information.svelte';
+  import TaskQueueInformation from './_task-queue-information.svelte';
   import PendingActivities from './_pending-activities.svelte';
   import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
 
@@ -32,15 +33,17 @@
   export let events: GetWorkflowExecutionHistoryResponse;
 
   $: workflow = toWorkflowExecution(execution);
+  $: namespace = getContext('namespace') as string;
   $: inputAndResults = getWorkflowStartedAndCompletedEvents(events);
   $: pendingActivities = workflow.pendingActivities;
+  $: href = getTaskQueueUrl(namespace, workflow.taskQueue);
 </script>
 
 <div class="execution-information px-6 py-6 flex flex-col">
   <div class={$isFullScreen ? 'w-1/3' : 'w-full'}>
     <ExecutionInformation title="Start Time" value={workflow.startTime} />
     <ExecutionInformation title="End Time" value={workflow.endTime} />
-    <ExecutionInformation title="Task Queue" value={workflow.taskQueue} />
+    <TaskQueueInformation title='Task Queue' value={workflow.taskQueue} {href} />
     {#if inputAndResults.input}
       <CodeBlock heading="Input" content={inputAndResults.input.toString()} />
     {/if}
