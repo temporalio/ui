@@ -8,8 +8,14 @@
 
 <section class="p-4 flex gap-2 items-center">
   <label for="format">View Format</label>
-  <button on:click={() => setFormat('grid')}>GRID</button>
-  <button on:click={() => setFormat('json')}>JSON</button>
+  <button
+    class:active={eventFormat === 'grid'}
+    on:click={() => setFormat('grid')}>GRID</button
+  >
+  <button
+    class:active={eventFormat === 'json'}
+    on:click={() => setFormat('json')}>JSON</button
+  >
 </section>
 
 <style lang="postcss">
@@ -22,5 +28,13 @@
 
   button:hover {
     @apply bg-purple-100;
+  }
+
+  .active:hover {
+    @apply text-purple-500;
+  }
+
+  .active {
+    @apply text-purple-100 bg-purple-500;
   }
 </style>
