@@ -3,9 +3,11 @@
   import type { History } from '$types/temporal/api/history/v1/message';
 
   export let history: History;
+  export let eventFormat;
 </script>
 
 <section>
+  {#if eventFormat === 'grid'}
   <table class="border-collapse w-full border-2 table-fixed">
     <thead>
       <tr>
@@ -21,6 +23,7 @@
       {/each}
     </tbody>
   </table>
+{/if}
 </section>
 
 <style lang="postcss">
