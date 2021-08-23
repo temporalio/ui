@@ -44,3 +44,10 @@
     </button>
   </div>
 {/if}
+
+<style lang="postcss">
+  .hljs {
+    height: 10em;
+    overflow-y: scroll;
+  }
+</style>
