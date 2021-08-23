@@ -43,7 +43,11 @@
   <div class={$isFullScreen ? 'w-1/3' : 'w-full'}>
     <ExecutionInformation title="Start Time" value={workflow.startTime} />
     <ExecutionInformation title="End Time" value={workflow.endTime} />
-    <TaskQueueInformation title='Task Queue' value={workflow.taskQueue} {href} />
+    <TaskQueueInformation
+      title="Task Queue"
+      value={workflow.taskQueue}
+      {href}
+    />
     {#if inputAndResults.input}
       <CodeBlock heading="Input" content={inputAndResults.input.toString()} />
     {/if}

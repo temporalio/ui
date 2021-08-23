@@ -1,4 +1,5 @@
 import type { WorkflowExecutionInfo } from '$types/temporal/api/workflow/v1/message';
+import type { GetPollerRequest } from '$types//temporal/api/taskqueue/v1/message';
 import type {
   DescribeWorkflowExecutionResponse,
   GetWorkflowExecutionHistoryResponse,
@@ -63,5 +64,18 @@ export const WorkflowExecutionAPI = {
     return {
       events,
     };
+  },
+
+  async getPollers(
+    { queue, namespace }: { queue: string; namespace: string },
+    request = fetch,
+  ): Promise<GetPollerRequest> {
+    const pollers: GetPollerRequest = await request(
+      `${base}/namespaces/${namespace}/task-queues/${queue}`,
+    )
+      .then((response) => response.json())
+      .catch(console.error);
+
+    return pollers;
   },
 };
