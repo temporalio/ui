@@ -14,6 +14,7 @@ export const convertPayloadToJson = (event: DecodeEvent) => {
 
   if (event.workflowExecutionStartedEventAttributes) {
     const input = event.workflowExecutionStartedEventAttributes.input;
+    if (input === null) return 'null';
     if (input) {
       const [data] = input.payloads.map((payload) => payload.data);
       return base64.decode(String(data));
@@ -22,6 +23,7 @@ export const convertPayloadToJson = (event: DecodeEvent) => {
 
   if (event.workflowExecutionCompletedEventAttributes) {
     const result = event.workflowExecutionCompletedEventAttributes.result;
+    if (result === null) return 'null';
     if (result) {
       const [data] = result.payloads.map((payload) => payload.data);
       return base64.decode(String(data));
