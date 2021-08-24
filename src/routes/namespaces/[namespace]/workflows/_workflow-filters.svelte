@@ -43,7 +43,11 @@
       <option>{name}</option>
     {/each}
   </Select>
-  <Select id="filter-by-relative-time" name="Time" bind:value={timeFormat}>
+  <Select
+    id="filter-by-relative-time"
+    name="Time Format"
+    bind:value={timeFormat}
+  >
     <option value={'relative'}>Relative</option>
     <option value={'UTC'}>UTC</option>
     <option value={'current'}>Current</option>
