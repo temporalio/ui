@@ -1,17 +1,20 @@
 <script lang="ts">
   import Time from 'svelte-time';
-  export let time: string; //needs type;
-  export let relativeTime;
+  export let time: string;
+  export let timeFormat: string;
+
+  $: utc = new Date(String(time).split(' —').join('')).toUTCString();
+  $: relative = new Date(time.split(' —').join('')).getTime();
 </script>
 
-{#if time && relativeTime}
-  <Time
-    live
-    relative
-    timestamp={new Date(time.split(' —').join('')).getTime()}
-  />
+{#if time && timeFormat === 'relative'}
+  <Time live relative timestamp={relative} />
 {/if}
 
-{#if time && !relativeTime}
+{#if time && timeFormat === 'current'}
   <p>{time}</p>
+{/if}
+
+{#if time && timeFormat === 'UTC'}
+  <p>{utc}</p>
 {/if}

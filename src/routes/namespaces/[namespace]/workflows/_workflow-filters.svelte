@@ -6,7 +6,7 @@
   export let workflowType: WorkflowType = null;
   export let executionId: string = null;
   export let runId: string = null;
-  export let relativeTime: boolean = true;
+  export let timeFormat: string = 'relative';
   export let workflowTypes: string[];
 
   function clear() {
@@ -14,7 +14,7 @@
     workflowType = null;
     executionId = null;
     runId = null;
-    relativeTime = true;
+    timeFormat = 'relative';
   }
 </script>
 
@@ -43,13 +43,10 @@
       <option>{name}</option>
     {/each}
   </Select>
-  <Select
-    id="filter-by-relative-time"
-    name="Relative Time"
-    bind:value={relativeTime}
-  >
-    <option value={true}>True</option>
-    <option value={false}>False</option>
+  <Select id="filter-by-relative-time" name="Time" bind:value={timeFormat}>
+    <option value={'relative'}>Relative</option>
+    <option value={'UTC'}>UTC</option>
+    <option value={'current'}>Current</option>
   </Select>
   <Input
     name="Execution ID"
