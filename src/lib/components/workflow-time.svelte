@@ -3,7 +3,7 @@
   export let time: string;
   export let timeFormat: string;
 
-  $: utc = new Date(String(time).split(' —').join('')).toUTCString();
+  $: utc = new Date(time.split(' —').join('')).toUTCString();
   $: relative = new Date(time.split(' —').join('')).getTime();
 </script>
 
