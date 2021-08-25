@@ -9,10 +9,10 @@
 
   export let workflow: WorkflowExecution;
 
-  const namespace = getContext('namespace') as string;
-  const workflowUrl = getWorkflowExecutionUrl(namespace, workflow);
-  const summaryUrl = workflowUrl + '/summary';
-  const eventsUrl = workflowUrl + '/events';
+  $: namespace = getContext('namespace') as string;
+  $: workflowUrl = getWorkflowExecutionUrl(namespace, workflow);
+  $: summaryUrl = workflowUrl + '/summary';
+  $: eventsUrl = workflowUrl + '/events';
 </script>
 
 <nav class="mt-6 border-b-2 px-2 flex">
