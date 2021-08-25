@@ -4,7 +4,7 @@
       <th class="w-6/12">Identity</th>
       <th class="w-2/12">Last Access Time</th>
       <th class="w-2/12">WORKFLOW TASK HANDLER</th>
-      <th class="w-2/12">ACTIVITY HANDLER </th>
+      <th class="w-2/12">ACTIVITY HANDLER</th>
     </tr>
   </thead>
   <slot name="rows" />
