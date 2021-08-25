@@ -1,5 +1,8 @@
 import type { WorkflowExecutionInfo } from '$types/temporal/api/workflow/v1/message';
-import type { PollerInfo, TaskQueueStatus } from '$types//temporal/api/taskqueue/v1/message';
+import type {
+  PollerInfo,
+  TaskQueueStatus,
+} from '$types//temporal/api/taskqueue/v1/message';
 import type {
   DescribeWorkflowExecutionResponse,
   GetWorkflowExecutionHistoryResponse,
@@ -14,7 +17,7 @@ type GetWorkflowExecutionRequest = GetAllWorkflowExecutionsRequest & {
   runId: string;
 };
 
-type getAllPollersRequest = { namespace: string, queue: string };
+type getAllPollersRequest = { namespace: string; queue: string };
 type getPollersResponse = getAllPollersRequest & {
   pollers: PollerInfo[];
   taskQueueStatus: TaskQueueStatus;
@@ -76,8 +79,8 @@ export const WorkflowExecutionAPI = {
     { queue, namespace }: getAllPollersRequest,
     request = fetch,
   ): Promise<{
-    pollers: PollerInfo[],
-    taskQueueStatus: TaskQueueStatus
+    pollers: PollerInfo[];
+    taskQueueStatus: TaskQueueStatus;
   }> {
     const pollersWorkflow: getPollersResponse = await request(
       `${base}/namespaces/${namespace}/task-queues/${queue}?task_queue_type=1`,
@@ -131,7 +134,7 @@ export const WorkflowExecutionAPI = {
       r('ACTIVITY'),
       pollersWorkflow.pollers.reduce(r('WORKFLOW'), {}),
     );
-    
+
     return {
       pollers: pollersActivity.pollers,
       taskQueueStatus: pollersActivity.taskQueueStatus,
