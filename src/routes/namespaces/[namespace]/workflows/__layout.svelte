@@ -31,7 +31,7 @@
   let workflowType = null;
   let executionId = null;
   let runId = null;
-  let relativeTime = true;
+  let timeFormat = 'relative';
 
   let workflowTypes = executions
     .map((execution) => execution.name)
@@ -58,13 +58,13 @@
         bind:workflowType
         bind:runId
         bind:executionId
-        bind:relativeTime
+        bind:timeFormat
         {workflowTypes}
       />
       <WorkflowsSummaryTable>
         <tbody slot="rows">
           {#each workflows as workflow}
-            <WorkflowsSummaryRow {workflow} {relativeTime} />
+            <WorkflowsSummaryRow {workflow} {timeFormat} />
           {:else}
             <tr>
               <td

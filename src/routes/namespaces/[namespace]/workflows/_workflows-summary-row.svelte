@@ -8,7 +8,7 @@
   import { getContext } from 'svelte';
 
   export let workflow: WorkflowExecution;
-  export let relativeTime: boolean;
+  export let timeFormat: string;
 
   $: namespace = getContext('namespace') as string;
   $: href = getWorkflowExecutionUrl(namespace, workflow, $page.query);
@@ -36,12 +36,12 @@
   </td>
   <td>
     <a sveltekit:noscroll {href}>
-      <Time time={workflow.startTime} {relativeTime} />
+      <Time time={workflow.startTime} {timeFormat} />
     </a>
   </td>
   <td>
     <a sveltekit:noscroll {href}>
-      <Time time={workflow.endTime} {relativeTime} />
+      <Time time={workflow.endTime} {timeFormat} />
     </a>
   </td>
 </tr>
