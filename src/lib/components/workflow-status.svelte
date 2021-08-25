@@ -26,8 +26,10 @@
   $: label = humanFriendlyNames[status];
 </script>
 
-<div class={`px-2 rounded-xl text-center text-sm ${color}`}>
-  {label}
+<div class={`flex justify-center text-sm `}>
+  <span class={`block ${color} rounded-xl text-center px-2 `}>
+    {label}
+  </span>
 </div>
 
 <style lang="postcss">
