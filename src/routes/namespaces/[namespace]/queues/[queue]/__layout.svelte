@@ -16,10 +16,8 @@
 <script lang="ts">
   import QueuePollersTable from './_queue-pollers-table.svelte';
   import QueuePollersRow from './_queue-pollers-row.svelte';
-  import type { GetPollerRequest } from '$types//temporal/api/taskqueue/v1/message';
 
-  export let pollers: GetPollerRequest;
-  console.log(pollers);
+  export let pollers;
 </script>
 
 <section class="flex flex-col items-start">

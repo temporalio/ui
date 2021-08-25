@@ -47,11 +47,6 @@ export interface PollerInfo {
   ratePerSecond: number;
 }
 
-export type GetPollerRequest = {
-  pollers: PollerInfo[];
-  taskQueueStatus: TaskQueueStatus;
-};
-
 export interface StickyExecutionAttributes {
   workerTaskQueue: TaskQueue | undefined;
   /**

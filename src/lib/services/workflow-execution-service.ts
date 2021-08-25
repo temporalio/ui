@@ -1,5 +1,5 @@
 import type { WorkflowExecutionInfo } from '$types/temporal/api/workflow/v1/message';
-import type { GetPollerRequest } from '$types//temporal/api/taskqueue/v1/message';
+import type { PollerInfo, TaskQueueStatus } from '$types//temporal/api/taskqueue/v1/message';
 import type {
   DescribeWorkflowExecutionResponse,
   GetWorkflowExecutionHistoryResponse,
@@ -12,6 +12,12 @@ type GetAllWorkflowExecutionsRequest = { namespace: string };
 type GetWorkflowExecutionRequest = GetAllWorkflowExecutionsRequest & {
   executionId: string;
   runId: string;
+};
+
+type getAllPollersRequest = { namespace: string, queue: string };
+type getPollersResponse = getAllPollersRequest & {
+  pollers: PollerInfo[];
+  taskQueueStatus: TaskQueueStatus;
 };
 
 export const WorkflowExecutionAPI = {
@@ -67,16 +73,19 @@ export const WorkflowExecutionAPI = {
   },
 
   async getPollers(
-    { queue, namespace }: { queue: string; namespace: string },
+    { queue, namespace }: getAllPollersRequest,
     request = fetch,
-  ): Promise<GetPollerRequest> {
-    const pollersWorkflow: GetPollerRequest = await request(
+  ): Promise<{
+    pollers: PollerInfo[],
+    taskQueueStatus: TaskQueueStatus
+  }> {
+    const pollersWorkflow: getPollersResponse = await request(
       `${base}/namespaces/${namespace}/task-queues/${queue}?task_queue_type=1`,
     )
       .then((response) => response.json())
       .catch(console.error);
 
-    const pollersActivity: GetPollerRequest = await request(
+    const pollersActivity: getPollersResponse = await request(
       `${base}/namespaces/${namespace}/task-queues/${queue}?task_queue_type=2`,
     )
       .then((response) => response.json())
@@ -122,7 +131,7 @@ export const WorkflowExecutionAPI = {
       r('ACTIVITY'),
       pollersWorkflow.pollers.reduce(r('WORKFLOW'), {}),
     );
-
+    
     return {
       pollers: pollersActivity.pollers,
       taskQueueStatus: pollersActivity.taskQueueStatus,
