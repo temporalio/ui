@@ -1,6 +1,8 @@
 <script context="module" lang="ts">
   import type { LoadInput } from '@sveltejs/kit';
 
+  import NamespaceSelect from '$lib/components/namespace-select.svelte';
+
   export async function load({ fetch }: LoadInput) {
     const user = await fetch(
       'http://localhost:8080/api/v1/me/',
@@ -22,8 +24,9 @@
 
 <div
   id="header"
-  class="h-16 w-full px-6 flex flex-row items-center justify-end static border-b-2"
+  class="h-16 w-full px-6 flex flex-row items-center justify-between static border-b-2"
 >
+  <NamespaceSelect />
   <button
     on:click={() => (showMenu = !showMenu)}
     class="menu focus:outline-none focus:shadow-solid w-8 h-8"

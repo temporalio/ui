@@ -26,14 +26,16 @@
   <td>
     <a sveltekit:noscroll {href}>
       <p>
-        {workflow.id} /
-        <span class="run-id">{workflow.runId}</span>
+        {workflow.id}
+        <!-- / <span class="run-id">{workflow.runId}</span> -->
       </p></a
     >
   </td>
   <td>
     <a sveltekit:noscroll {href}>
-      <WorkflowStatus status={workflow.status} />
+      <div class={`flex justify-center  `}>
+        <WorkflowStatus status={workflow.status} />
+      </div>
     </a>
   </td>
   <td>
