@@ -4,11 +4,13 @@
   import { formatDate } from '$lib/utilities/format-date';
   import type { HistoryEvent } from '$types/temporal/api/history/v1/message';
   import ExecutionInformation from '../_execution-information.svelte';
+  import CodeBlock from '$lib/components/code-block.svelte';
 
   export let event: HistoryEvent;
   export let index: number;
 
   let even = !(index % 2);
+  $: isJSONView = false;
 </script>
 
 <tr class:even>
@@ -21,7 +23,15 @@
       <ExecutionInformation title="Task ID" value={event.taskId} />
     </div>
 
-    <svelte:component this={getComponentForEventType(event)} {event} />
+    <button on:click={() => (isJSONView = !isJSONView)}
+      >{!isJSONView ? 'GRID' : 'JSON'} VIEW</button
+    >
+
+    {#if isJSONView}
+      <CodeBlock heading={``} content={JSON.stringify(event)} />
+    {:else}
+      <svelte:component this={getComponentForEventType(event)} {event} />
+    {/if}
   </td>
 </tr>
 
@@ -42,5 +52,18 @@
 
   .even {
     @apply bg-gray-100;
+  }
+
+  button {
+    font-weight: bold;
+    text-align: center;
+    background: #343436;
+    color: #fff;
+    height: 25px;
+    width: 15%;
+  }
+
+  button:hover {
+    @apply bg-purple-400;
   }
 </style>

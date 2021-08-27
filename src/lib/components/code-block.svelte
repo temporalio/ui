@@ -27,18 +27,21 @@
 {#if content}
   <div class="relative group w-full mb-2">
     <div id="clipboard" />
-    <h3 class="text-lg mb-2 w-full">{heading}</h3>
+
+    {#if heading}
+      <h3 class="text-lg mb-2 w-full">{heading}</h3>
+    {/if}
     <Highlight class="p-4" language={json} code={formatJSON(content)} />
     <button on:click={copy}>
       {#if copied}
         <Icon
           src={Check}
-          class="w-8 h-8 text-purple-900 bg-gray-300 border-2 border-gray-200 absolute right-0 top-9 hidden group-hover:block hover:bg-gray-400 hover:border-gray-400"
+          class="w-8 h-8 text-purple-900 bg-gray-300 border-2 border-gray-200 absolute right-0 top-0 hidden group-hover:block hover:bg-gray-400 hover:border-gray-400"
         />
       {:else}
         <Icon
           src={Clipboard}
-          class="w-8 h-8 text-purple-900 bg-gray-300 border-2 border-gray-200 absolute right-0 top-9 hidden group-hover:block hover:bg-gray-400 hover:border-gray-400"
+          class="w-8 h-8 text-purple-900 bg-gray-300 border-2 border-gray-200 absolute right-0 top-0 hidden group-hover:block hover:bg-gray-400 hover:border-gray-400"
         />
       {/if}
     </button>
