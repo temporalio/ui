@@ -28,7 +28,7 @@
   <div class="relative group w-full mb-2">
     <div id="clipboard" />
     <h3 class="text-lg mb-2 w-full">{heading}</h3>
-    <Highlight language={json} code={formatJSON(content)} />
+    <Highlight class="p-4" language={json} code={formatJSON(content)} />
     <button on:click={copy}>
       {#if copied}
         <Icon

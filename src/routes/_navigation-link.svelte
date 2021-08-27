@@ -10,9 +10,8 @@
   $: isActive = pathMatches(href, $page.path);
 </script>
 
-<a {href} class:active={isActive}>
-  <Icon src={icon} class="mb-2 mx-auto text-white w-8 h-8" />
-  <p>{label}</p>
+<a {href} class:active={isActive} class="relative" data-tooltip={label}>
+  <Icon src={icon} alt={label} class="mx-auto text-white w-8 h-8" />
 </a>
 
 <style lang="postcss">
@@ -25,6 +24,6 @@
   }
 
   a {
-    @apply m-4 no-underline opacity-70 p-4 rounded-lg text-center text-gray-400 text-xs w-24;
+    @apply no-underline opacity-70 rounded-lg text-center text-gray-400 text-xs;
   }
 </style>

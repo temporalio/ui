@@ -36,16 +36,22 @@
     <a href={`/namespaces/${namespace}/workflows`}>
       <Icon src={X} class="absolute right-2 top-2 w-8 h-8 text-gray-400" />
     </a>
-    <h1 class="m-0 mt-6 text-lg">
-      {workflow.name}
-    </h1>
+    <div class="flex m-0 mt-6 justify-between items-center">
+      <h1 class="text-lg">
+        {workflow.name}
+      </h1>
+      <span class="inline">
+        <WorkflowStatus status={workflow.status} />
+      </span>
+    </div>
     <p class="text-gray-500 text-sm">
+      <span class=" uppercase text-gray-400">Workflow ID</span>
       {workflow.id}
     </p>
-    <p class="text-gray-500 text-sm">
+    <p class="text-gray-500 text-xs">
+      <span class=" uppercase text-gray-400">Run ID</span>
       {workflow.runId}
     </p>
-    <div class="mt-4"><WorkflowStatus status={workflow.status} /></div>
   </main>
   <Tabs {workflow} />
 </header>

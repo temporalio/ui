@@ -16,31 +16,35 @@
 </script>
 
 <tr class:active={isActive}>
-  <td class="workflow">
+  <td class="">
     <a sveltekit:noscroll {href}>
       <h3>
         {workflow.name}
       </h3>
+    </a>
+  </td>
+  <td>
+    <a sveltekit:noscroll {href}>
       <p>
         {workflow.id}
-      </p>
-      <p>
-        {workflow.runId}
-      </p>
-    </a>
+        <!-- / <span class="run-id">{workflow.runId}</span> -->
+      </p></a
+    >
   </td>
   <td>
     <a sveltekit:noscroll {href}>
-      <WorkflowStatus status={workflow.status} />
+      <div class={`flex justify-center  `}>
+        <WorkflowStatus status={workflow.status} />
+      </div>
     </a>
   </td>
   <td>
-    <a sveltekit:noscroll {href}>
+    <a sveltekit:noscroll {href} class="font-mono text-right">
       <Time time={workflow.startTime} {timeFormat} />
     </a>
   </td>
   <td>
-    <a sveltekit:noscroll {href}>
+    <a sveltekit:noscroll {href} class="font-mono text-right">
       <Time time={workflow.endTime} {timeFormat} />
     </a>
   </td>
@@ -72,7 +76,7 @@
   }
 
   a {
-    @apply w-full h-full block no-underline p-6;
+    @apply w-full h-full block no-underline p-2;
   }
 
   .active {
@@ -81,5 +85,8 @@
 
   .active:hover {
     @apply bg-yellow-200;
+  }
+  .run-id {
+    font-size: 0.5rem;
   }
 </style>
