@@ -8,7 +8,6 @@
 
   export async function load({ fetch, page }: LoadInput) {
     const { namespace } = page.params;
-
     return await WorkflowExecutionAPI.getAll({ namespace }, fetch)
       .then(toWorkflowExecutions)
       .then((executions) => ({
