@@ -27,6 +27,11 @@
   {/if}
 
   {#if eventFormat === 'json'}
-    <CodeBlock heading="" content={JSON.stringify(history.events)} />
+    {#each history.events as event}
+      <CodeBlock
+        heading={`Event ID: ${event.eventId}`}
+        content={JSON.stringify(event)}
+      />
+    {/each}
   {/if}
 </section>
