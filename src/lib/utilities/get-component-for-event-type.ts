@@ -87,6 +87,5 @@ type EventTypes = typeof eventTypes;
 export const getComponentForEventType = (
   event: HistoryEvent,
 ): EventTypes[keyof EventTypes] => {
-  console.log(event.eventType);
   return eventTypes[event.eventType];
 };
