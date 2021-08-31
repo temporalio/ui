@@ -17,7 +17,7 @@
       })
       .catch((error) => console.error(error));
 
-  const formatJSON = (jsonData) => {
+  const formatJSON = (jsonData: string) => {
     const parsedData = JSON.parse(jsonData);
     const formated = JSON.stringify(parsedData, undefined, 4);
     return formated;

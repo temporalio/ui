@@ -1,5 +1,8 @@
 <script context="module" lang="ts">
-  import type { GetWorkflowExecutionHistoryResponse } from '$types/temporal/api/workflowservice/v1/request_response';
+  import type {
+    GetWorkflowExecutionHistoryResponse,
+    DescribeWorkflowExecutionResponse,
+  } from '$types/temporal/api/workflowservice/v1/request_response';
   import type { LoadInput } from '@sveltejs/kit';
 
   export async function load({ context }: LoadInput) {
@@ -17,10 +20,10 @@
   import Events from './_events.svelte';
   import EventsFilters from './_events-filters.svelte';
   export let events: GetWorkflowExecutionHistoryResponse;
-  export let execution;
+  export let execution: DescribeWorkflowExecutionResponse;
 
   let { history } = events;
-  let eventFormat = 'grid';
+  let eventFormat: EventFormat = 'grid';
 </script>
 
 <div class="px-6 py-6">

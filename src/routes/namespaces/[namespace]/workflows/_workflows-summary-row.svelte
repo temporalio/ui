@@ -51,10 +51,6 @@
 </tr>
 
 <style lang="postcss">
-  h3 {
-    @apply font-normal m-0 text-base text-gray-900;
-  }
-
   p {
     @apply m-0 text-gray-500 text-sm;
   }

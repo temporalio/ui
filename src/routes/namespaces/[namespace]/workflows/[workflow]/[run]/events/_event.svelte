@@ -1,6 +1,5 @@
 <script lang="ts">
   import { getComponentForEventType } from '$lib/utilities/get-component-for-event-type';
-  import beautify from 'json-beautify';
   import { formatDate } from '$lib/utilities/format-date';
   import type { HistoryEvent } from '$types/temporal/api/history/v1/message';
   import ExecutionInformation from '../_execution-information.svelte';
@@ -36,18 +35,9 @@
 </tr>
 
 <style lang="postcss">
-  tr {
-    @apply py-4 my-4;
-    @apply bg-gray-50;
-  }
-
   td {
     vertical-align: top;
     @apply p-4 overflow-x-scroll;
-  }
-
-  h3 {
-    @apply font-semibold;
   }
 
   .even {

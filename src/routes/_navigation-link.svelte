@@ -11,7 +11,7 @@
 </script>
 
 <a {href} class:active={isActive} class="relative" data-tooltip={label}>
-  <Icon src={icon} alt={label} class="mx-auto text-white w-8 h-8" />
+  <Icon src={icon} class="mx-auto text-white w-8 h-8" />
 </a>
 
 <style lang="postcss">

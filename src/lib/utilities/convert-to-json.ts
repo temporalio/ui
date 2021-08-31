@@ -1,7 +1,7 @@
-export const convertToJSON = (events) => {
-  const eventsString = JSON.stringify(events);
+export const convertToJSON = (events: {}) => {
+  const data = JSON.stringify(events);
   const dataUri =
-    'data:application/json;charset=utf-8,' + encodeURIComponent(eventsString);
+    'data:application/json;charset=utf-8,' + encodeURIComponent(data);
 
   return dataUri;
 };
