@@ -67,10 +67,6 @@
     @apply p-0;
   }
 
-  td.workflow {
-    @apply w-1/3;
-  }
-
   a {
     @apply w-full h-full block no-underline p-2;
   }
