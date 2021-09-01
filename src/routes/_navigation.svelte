@@ -8,7 +8,6 @@
     Identification,
   } from 'svelte-hero-icons';
   import NavigationLink from './_navigation-link.svelte';
-  import { goto } from '$app/navigation';
 
   $: namespace = getContext('namespace') as string;
 </script>
@@ -36,10 +35,3 @@
     icon={Identification}
   />
 </nav>
-
-<style lang="postcss">
-  select {
-    background: black;
-    @apply text-xs w-full;
-  }
-</style>

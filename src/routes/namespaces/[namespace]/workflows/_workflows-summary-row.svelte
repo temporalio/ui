@@ -51,10 +51,6 @@
 </tr>
 
 <style lang="postcss">
-  h3 {
-    @apply font-normal m-0 text-base text-gray-900;
-  }
-
   p {
     @apply m-0 text-gray-500 text-sm;
   }
@@ -69,10 +65,6 @@
 
   td {
     @apply p-0;
-  }
-
-  td.workflow {
-    @apply w-1/3;
   }
 
   a {

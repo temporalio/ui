@@ -1,13 +1,14 @@
 <script lang="ts">
+  import type { DescribeWorkflowExecutionResponse } from '$types/temporal/api/workflowservice/v1/request_response';
   import type { History } from '$types/temporal/api/history/v1/message';
   import { convertToJSON } from '$lib/utilities/convert-to-json';
   import Icon, { Download } from 'svelte-hero-icons';
 
   export let eventFormat: string = 'grid';
   export let history: History;
-  export let execution;
+  export let execution: DescribeWorkflowExecutionResponse;
 
-  function setFormat(format) {
+  function setFormat(format: EventFormat) {
     eventFormat = format;
   }
 

@@ -25,22 +25,12 @@
       userSelectedNamespace = namespaces[idx];
     }
   }
-  function switchNamespace(newNamespace) {
+  function switchNamespace(newNamespace: string) {
     showDropdown = false;
     goto('/namespaces/' + newNamespace);
     // todo: this somehow doesnt update the getContext('namespace') correctly
   }
 </script>
-
-<!-- <div class="inline-flex space-x-2">
-  <h3 class="text-sm font-bold">Namespace</h3>
-svelte-ignore a11y-no-onchange 
-  <select bind:value={namespace} on:change={changeNamespace}>
-    {#each namespaces as namespace}
-      <option value={namespace}>{namespace}</option>
-    {/each}
-  </select>
-</div> -->
 
 <div class="inline-flex space-x-2 items-center">
   <!-- svelte-ignore a11y-label-has-associated-control -->

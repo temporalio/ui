@@ -11,14 +11,14 @@ import type {
 
 const base = 'http://localhost:8080/api/v1';
 
-type GetAllWorkflowExecutionsRequest = { namespace: string };
-type GetWorkflowExecutionRequest = GetAllWorkflowExecutionsRequest & {
+export type GetAllWorkflowExecutionsRequest = { namespace: string };
+export type GetWorkflowExecutionRequest = GetAllWorkflowExecutionsRequest & {
   executionId: string;
   runId: string;
 };
 
-type getAllPollersRequest = { namespace: string; queue: string };
-type getPollersResponse = getAllPollersRequest & {
+export type GetAllPollersRequest = { namespace: string; queue: string };
+export type GetPollersResponse = {
   pollers: PollerInfo[];
   taskQueueStatus: TaskQueueStatus;
 };
@@ -76,19 +76,16 @@ export const WorkflowExecutionAPI = {
   },
 
   async getPollers(
-    { queue, namespace }: getAllPollersRequest,
+    { queue, namespace }: GetAllPollersRequest,
     request = fetch,
-  ): Promise<{
-    pollers: PollerInfo[];
-    taskQueueStatus: TaskQueueStatus;
-  }> {
-    const pollersWorkflow: getPollersResponse = await request(
+  ): Promise<GetPollersResponse> {
+    const pollersWorkflow: GetPollersResponse = await request(
       `${base}/namespaces/${namespace}/task-queues/${queue}?task_queue_type=1`,
     )
       .then((response) => response.json())
       .catch(console.error);
 
-    const pollersActivity: getPollersResponse = await request(
+    const pollersActivity: GetPollersResponse = await request(
       `${base}/namespaces/${namespace}/task-queues/${queue}?task_queue_type=2`,
     )
       .then((response) => response.json())

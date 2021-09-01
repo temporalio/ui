@@ -31,9 +31,6 @@
 </span>
 
 <style lang="postcss">
-  div {
-    max-width: 300px;
-  }
   .green {
     @apply bg-green-200 text-green-600;
   }

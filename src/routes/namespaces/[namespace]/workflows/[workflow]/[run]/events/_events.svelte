@@ -4,7 +4,7 @@
   import CodeBlock from '$lib/components/code-block.svelte';
 
   export let history: History;
-  export let eventFormat;
+  export let eventFormat: EventFormat;
 </script>
 
 <section>

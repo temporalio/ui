@@ -19,3 +19,5 @@ type WorkflowExecutionFilters = {
   type: WorkflowType;
   status: WorkflowStatus;
 };
+
+type EventFormat = 'grid' | 'json';
