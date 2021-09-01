@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
   import { pathMatches } from '$lib/utilities/path-matches';
   import Icon from 'svelte-hero-icons';
+  import Tooltip from '$lib/components/tooltip.svelte';
 
   export let href: string;
   export let label: string;
@@ -10,9 +11,11 @@
   $: isActive = pathMatches(href, $page.path);
 </script>
 
-<a {href} class:active={isActive} class="relative" data-tooltip={label}>
-  <Icon src={icon} class="mx-auto text-white w-8 h-8" />
-</a>
+<Tooltip text={label}>
+  <a {href} class:active={isActive} class="relative" data-tooltip={label}>
+    <Icon src={icon} class="mx-auto text-white w-8 h-8" />
+  </a>
+</Tooltip>
 
 <style lang="postcss">
   a.active {
