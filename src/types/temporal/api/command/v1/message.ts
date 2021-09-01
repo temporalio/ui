@@ -2610,82 +2610,86 @@ export const Command = {
           message.commandType = reader.int32() as any;
           break;
         case 2:
-          message.scheduleActivityTaskCommandAttributes = ScheduleActivityTaskCommandAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.scheduleActivityTaskCommandAttributes =
+            ScheduleActivityTaskCommandAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 3:
-          message.startTimerCommandAttributes = StartTimerCommandAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.startTimerCommandAttributes =
+            StartTimerCommandAttributes.decode(reader, reader.uint32());
           break;
         case 4:
-          message.completeWorkflowExecutionCommandAttributes = CompleteWorkflowExecutionCommandAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.completeWorkflowExecutionCommandAttributes =
+            CompleteWorkflowExecutionCommandAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 5:
-          message.failWorkflowExecutionCommandAttributes = FailWorkflowExecutionCommandAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.failWorkflowExecutionCommandAttributes =
+            FailWorkflowExecutionCommandAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 6:
-          message.requestCancelActivityTaskCommandAttributes = RequestCancelActivityTaskCommandAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.requestCancelActivityTaskCommandAttributes =
+            RequestCancelActivityTaskCommandAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 7:
-          message.cancelTimerCommandAttributes = CancelTimerCommandAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.cancelTimerCommandAttributes =
+            CancelTimerCommandAttributes.decode(reader, reader.uint32());
           break;
         case 8:
-          message.cancelWorkflowExecutionCommandAttributes = CancelWorkflowExecutionCommandAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.cancelWorkflowExecutionCommandAttributes =
+            CancelWorkflowExecutionCommandAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 9:
-          message.requestCancelExternalWorkflowExecutionCommandAttributes = RequestCancelExternalWorkflowExecutionCommandAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.requestCancelExternalWorkflowExecutionCommandAttributes =
+            RequestCancelExternalWorkflowExecutionCommandAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 10:
-          message.recordMarkerCommandAttributes = RecordMarkerCommandAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.recordMarkerCommandAttributes =
+            RecordMarkerCommandAttributes.decode(reader, reader.uint32());
           break;
         case 11:
-          message.continueAsNewWorkflowExecutionCommandAttributes = ContinueAsNewWorkflowExecutionCommandAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.continueAsNewWorkflowExecutionCommandAttributes =
+            ContinueAsNewWorkflowExecutionCommandAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 12:
-          message.startChildWorkflowExecutionCommandAttributes = StartChildWorkflowExecutionCommandAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.startChildWorkflowExecutionCommandAttributes =
+            StartChildWorkflowExecutionCommandAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 13:
-          message.signalExternalWorkflowExecutionCommandAttributes = SignalExternalWorkflowExecutionCommandAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.signalExternalWorkflowExecutionCommandAttributes =
+            SignalExternalWorkflowExecutionCommandAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 14:
-          message.upsertWorkflowSearchAttributesCommandAttributes = UpsertWorkflowSearchAttributesCommandAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.upsertWorkflowSearchAttributesCommandAttributes =
+            UpsertWorkflowSearchAttributesCommandAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         default:
           reader.skipType(tag & 7);
@@ -2706,9 +2710,10 @@ export const Command = {
       object.scheduleActivityTaskCommandAttributes !== undefined &&
       object.scheduleActivityTaskCommandAttributes !== null
     ) {
-      message.scheduleActivityTaskCommandAttributes = ScheduleActivityTaskCommandAttributes.fromJSON(
-        object.scheduleActivityTaskCommandAttributes,
-      );
+      message.scheduleActivityTaskCommandAttributes =
+        ScheduleActivityTaskCommandAttributes.fromJSON(
+          object.scheduleActivityTaskCommandAttributes,
+        );
     } else {
       message.scheduleActivityTaskCommandAttributes = undefined;
     }
@@ -2716,9 +2721,10 @@ export const Command = {
       object.startTimerCommandAttributes !== undefined &&
       object.startTimerCommandAttributes !== null
     ) {
-      message.startTimerCommandAttributes = StartTimerCommandAttributes.fromJSON(
-        object.startTimerCommandAttributes,
-      );
+      message.startTimerCommandAttributes =
+        StartTimerCommandAttributes.fromJSON(
+          object.startTimerCommandAttributes,
+        );
     } else {
       message.startTimerCommandAttributes = undefined;
     }
@@ -2726,9 +2732,10 @@ export const Command = {
       object.completeWorkflowExecutionCommandAttributes !== undefined &&
       object.completeWorkflowExecutionCommandAttributes !== null
     ) {
-      message.completeWorkflowExecutionCommandAttributes = CompleteWorkflowExecutionCommandAttributes.fromJSON(
-        object.completeWorkflowExecutionCommandAttributes,
-      );
+      message.completeWorkflowExecutionCommandAttributes =
+        CompleteWorkflowExecutionCommandAttributes.fromJSON(
+          object.completeWorkflowExecutionCommandAttributes,
+        );
     } else {
       message.completeWorkflowExecutionCommandAttributes = undefined;
     }
@@ -2736,9 +2743,10 @@ export const Command = {
       object.failWorkflowExecutionCommandAttributes !== undefined &&
       object.failWorkflowExecutionCommandAttributes !== null
     ) {
-      message.failWorkflowExecutionCommandAttributes = FailWorkflowExecutionCommandAttributes.fromJSON(
-        object.failWorkflowExecutionCommandAttributes,
-      );
+      message.failWorkflowExecutionCommandAttributes =
+        FailWorkflowExecutionCommandAttributes.fromJSON(
+          object.failWorkflowExecutionCommandAttributes,
+        );
     } else {
       message.failWorkflowExecutionCommandAttributes = undefined;
     }
@@ -2746,9 +2754,10 @@ export const Command = {
       object.requestCancelActivityTaskCommandAttributes !== undefined &&
       object.requestCancelActivityTaskCommandAttributes !== null
     ) {
-      message.requestCancelActivityTaskCommandAttributes = RequestCancelActivityTaskCommandAttributes.fromJSON(
-        object.requestCancelActivityTaskCommandAttributes,
-      );
+      message.requestCancelActivityTaskCommandAttributes =
+        RequestCancelActivityTaskCommandAttributes.fromJSON(
+          object.requestCancelActivityTaskCommandAttributes,
+        );
     } else {
       message.requestCancelActivityTaskCommandAttributes = undefined;
     }
@@ -2756,9 +2765,10 @@ export const Command = {
       object.cancelTimerCommandAttributes !== undefined &&
       object.cancelTimerCommandAttributes !== null
     ) {
-      message.cancelTimerCommandAttributes = CancelTimerCommandAttributes.fromJSON(
-        object.cancelTimerCommandAttributes,
-      );
+      message.cancelTimerCommandAttributes =
+        CancelTimerCommandAttributes.fromJSON(
+          object.cancelTimerCommandAttributes,
+        );
     } else {
       message.cancelTimerCommandAttributes = undefined;
     }
@@ -2766,9 +2776,10 @@ export const Command = {
       object.cancelWorkflowExecutionCommandAttributes !== undefined &&
       object.cancelWorkflowExecutionCommandAttributes !== null
     ) {
-      message.cancelWorkflowExecutionCommandAttributes = CancelWorkflowExecutionCommandAttributes.fromJSON(
-        object.cancelWorkflowExecutionCommandAttributes,
-      );
+      message.cancelWorkflowExecutionCommandAttributes =
+        CancelWorkflowExecutionCommandAttributes.fromJSON(
+          object.cancelWorkflowExecutionCommandAttributes,
+        );
     } else {
       message.cancelWorkflowExecutionCommandAttributes = undefined;
     }
@@ -2777,19 +2788,22 @@ export const Command = {
         undefined &&
       object.requestCancelExternalWorkflowExecutionCommandAttributes !== null
     ) {
-      message.requestCancelExternalWorkflowExecutionCommandAttributes = RequestCancelExternalWorkflowExecutionCommandAttributes.fromJSON(
-        object.requestCancelExternalWorkflowExecutionCommandAttributes,
-      );
+      message.requestCancelExternalWorkflowExecutionCommandAttributes =
+        RequestCancelExternalWorkflowExecutionCommandAttributes.fromJSON(
+          object.requestCancelExternalWorkflowExecutionCommandAttributes,
+        );
     } else {
-      message.requestCancelExternalWorkflowExecutionCommandAttributes = undefined;
+      message.requestCancelExternalWorkflowExecutionCommandAttributes =
+        undefined;
     }
     if (
       object.recordMarkerCommandAttributes !== undefined &&
       object.recordMarkerCommandAttributes !== null
     ) {
-      message.recordMarkerCommandAttributes = RecordMarkerCommandAttributes.fromJSON(
-        object.recordMarkerCommandAttributes,
-      );
+      message.recordMarkerCommandAttributes =
+        RecordMarkerCommandAttributes.fromJSON(
+          object.recordMarkerCommandAttributes,
+        );
     } else {
       message.recordMarkerCommandAttributes = undefined;
     }
@@ -2797,9 +2811,10 @@ export const Command = {
       object.continueAsNewWorkflowExecutionCommandAttributes !== undefined &&
       object.continueAsNewWorkflowExecutionCommandAttributes !== null
     ) {
-      message.continueAsNewWorkflowExecutionCommandAttributes = ContinueAsNewWorkflowExecutionCommandAttributes.fromJSON(
-        object.continueAsNewWorkflowExecutionCommandAttributes,
-      );
+      message.continueAsNewWorkflowExecutionCommandAttributes =
+        ContinueAsNewWorkflowExecutionCommandAttributes.fromJSON(
+          object.continueAsNewWorkflowExecutionCommandAttributes,
+        );
     } else {
       message.continueAsNewWorkflowExecutionCommandAttributes = undefined;
     }
@@ -2807,9 +2822,10 @@ export const Command = {
       object.startChildWorkflowExecutionCommandAttributes !== undefined &&
       object.startChildWorkflowExecutionCommandAttributes !== null
     ) {
-      message.startChildWorkflowExecutionCommandAttributes = StartChildWorkflowExecutionCommandAttributes.fromJSON(
-        object.startChildWorkflowExecutionCommandAttributes,
-      );
+      message.startChildWorkflowExecutionCommandAttributes =
+        StartChildWorkflowExecutionCommandAttributes.fromJSON(
+          object.startChildWorkflowExecutionCommandAttributes,
+        );
     } else {
       message.startChildWorkflowExecutionCommandAttributes = undefined;
     }
@@ -2817,9 +2833,10 @@ export const Command = {
       object.signalExternalWorkflowExecutionCommandAttributes !== undefined &&
       object.signalExternalWorkflowExecutionCommandAttributes !== null
     ) {
-      message.signalExternalWorkflowExecutionCommandAttributes = SignalExternalWorkflowExecutionCommandAttributes.fromJSON(
-        object.signalExternalWorkflowExecutionCommandAttributes,
-      );
+      message.signalExternalWorkflowExecutionCommandAttributes =
+        SignalExternalWorkflowExecutionCommandAttributes.fromJSON(
+          object.signalExternalWorkflowExecutionCommandAttributes,
+        );
     } else {
       message.signalExternalWorkflowExecutionCommandAttributes = undefined;
     }
@@ -2827,9 +2844,10 @@ export const Command = {
       object.upsertWorkflowSearchAttributesCommandAttributes !== undefined &&
       object.upsertWorkflowSearchAttributesCommandAttributes !== null
     ) {
-      message.upsertWorkflowSearchAttributesCommandAttributes = UpsertWorkflowSearchAttributesCommandAttributes.fromJSON(
-        object.upsertWorkflowSearchAttributesCommandAttributes,
-      );
+      message.upsertWorkflowSearchAttributesCommandAttributes =
+        UpsertWorkflowSearchAttributesCommandAttributes.fromJSON(
+          object.upsertWorkflowSearchAttributesCommandAttributes,
+        );
     } else {
       message.upsertWorkflowSearchAttributesCommandAttributes = undefined;
     }
@@ -2841,11 +2859,12 @@ export const Command = {
     message.commandType !== undefined &&
       (obj.commandType = commandTypeToJSON(message.commandType));
     message.scheduleActivityTaskCommandAttributes !== undefined &&
-      (obj.scheduleActivityTaskCommandAttributes = message.scheduleActivityTaskCommandAttributes
-        ? ScheduleActivityTaskCommandAttributes.toJSON(
-            message.scheduleActivityTaskCommandAttributes,
-          )
-        : undefined);
+      (obj.scheduleActivityTaskCommandAttributes =
+        message.scheduleActivityTaskCommandAttributes
+          ? ScheduleActivityTaskCommandAttributes.toJSON(
+              message.scheduleActivityTaskCommandAttributes,
+            )
+          : undefined);
     message.startTimerCommandAttributes !== undefined &&
       (obj.startTimerCommandAttributes = message.startTimerCommandAttributes
         ? StartTimerCommandAttributes.toJSON(
@@ -2853,23 +2872,26 @@ export const Command = {
           )
         : undefined);
     message.completeWorkflowExecutionCommandAttributes !== undefined &&
-      (obj.completeWorkflowExecutionCommandAttributes = message.completeWorkflowExecutionCommandAttributes
-        ? CompleteWorkflowExecutionCommandAttributes.toJSON(
-            message.completeWorkflowExecutionCommandAttributes,
-          )
-        : undefined);
+      (obj.completeWorkflowExecutionCommandAttributes =
+        message.completeWorkflowExecutionCommandAttributes
+          ? CompleteWorkflowExecutionCommandAttributes.toJSON(
+              message.completeWorkflowExecutionCommandAttributes,
+            )
+          : undefined);
     message.failWorkflowExecutionCommandAttributes !== undefined &&
-      (obj.failWorkflowExecutionCommandAttributes = message.failWorkflowExecutionCommandAttributes
-        ? FailWorkflowExecutionCommandAttributes.toJSON(
-            message.failWorkflowExecutionCommandAttributes,
-          )
-        : undefined);
+      (obj.failWorkflowExecutionCommandAttributes =
+        message.failWorkflowExecutionCommandAttributes
+          ? FailWorkflowExecutionCommandAttributes.toJSON(
+              message.failWorkflowExecutionCommandAttributes,
+            )
+          : undefined);
     message.requestCancelActivityTaskCommandAttributes !== undefined &&
-      (obj.requestCancelActivityTaskCommandAttributes = message.requestCancelActivityTaskCommandAttributes
-        ? RequestCancelActivityTaskCommandAttributes.toJSON(
-            message.requestCancelActivityTaskCommandAttributes,
-          )
-        : undefined);
+      (obj.requestCancelActivityTaskCommandAttributes =
+        message.requestCancelActivityTaskCommandAttributes
+          ? RequestCancelActivityTaskCommandAttributes.toJSON(
+              message.requestCancelActivityTaskCommandAttributes,
+            )
+          : undefined);
     message.cancelTimerCommandAttributes !== undefined &&
       (obj.cancelTimerCommandAttributes = message.cancelTimerCommandAttributes
         ? CancelTimerCommandAttributes.toJSON(
@@ -2877,18 +2899,20 @@ export const Command = {
           )
         : undefined);
     message.cancelWorkflowExecutionCommandAttributes !== undefined &&
-      (obj.cancelWorkflowExecutionCommandAttributes = message.cancelWorkflowExecutionCommandAttributes
-        ? CancelWorkflowExecutionCommandAttributes.toJSON(
-            message.cancelWorkflowExecutionCommandAttributes,
-          )
-        : undefined);
+      (obj.cancelWorkflowExecutionCommandAttributes =
+        message.cancelWorkflowExecutionCommandAttributes
+          ? CancelWorkflowExecutionCommandAttributes.toJSON(
+              message.cancelWorkflowExecutionCommandAttributes,
+            )
+          : undefined);
     message.requestCancelExternalWorkflowExecutionCommandAttributes !==
       undefined &&
-      (obj.requestCancelExternalWorkflowExecutionCommandAttributes = message.requestCancelExternalWorkflowExecutionCommandAttributes
-        ? RequestCancelExternalWorkflowExecutionCommandAttributes.toJSON(
-            message.requestCancelExternalWorkflowExecutionCommandAttributes,
-          )
-        : undefined);
+      (obj.requestCancelExternalWorkflowExecutionCommandAttributes =
+        message.requestCancelExternalWorkflowExecutionCommandAttributes
+          ? RequestCancelExternalWorkflowExecutionCommandAttributes.toJSON(
+              message.requestCancelExternalWorkflowExecutionCommandAttributes,
+            )
+          : undefined);
     message.recordMarkerCommandAttributes !== undefined &&
       (obj.recordMarkerCommandAttributes = message.recordMarkerCommandAttributes
         ? RecordMarkerCommandAttributes.toJSON(
@@ -2896,29 +2920,33 @@ export const Command = {
           )
         : undefined);
     message.continueAsNewWorkflowExecutionCommandAttributes !== undefined &&
-      (obj.continueAsNewWorkflowExecutionCommandAttributes = message.continueAsNewWorkflowExecutionCommandAttributes
-        ? ContinueAsNewWorkflowExecutionCommandAttributes.toJSON(
-            message.continueAsNewWorkflowExecutionCommandAttributes,
-          )
-        : undefined);
+      (obj.continueAsNewWorkflowExecutionCommandAttributes =
+        message.continueAsNewWorkflowExecutionCommandAttributes
+          ? ContinueAsNewWorkflowExecutionCommandAttributes.toJSON(
+              message.continueAsNewWorkflowExecutionCommandAttributes,
+            )
+          : undefined);
     message.startChildWorkflowExecutionCommandAttributes !== undefined &&
-      (obj.startChildWorkflowExecutionCommandAttributes = message.startChildWorkflowExecutionCommandAttributes
-        ? StartChildWorkflowExecutionCommandAttributes.toJSON(
-            message.startChildWorkflowExecutionCommandAttributes,
-          )
-        : undefined);
+      (obj.startChildWorkflowExecutionCommandAttributes =
+        message.startChildWorkflowExecutionCommandAttributes
+          ? StartChildWorkflowExecutionCommandAttributes.toJSON(
+              message.startChildWorkflowExecutionCommandAttributes,
+            )
+          : undefined);
     message.signalExternalWorkflowExecutionCommandAttributes !== undefined &&
-      (obj.signalExternalWorkflowExecutionCommandAttributes = message.signalExternalWorkflowExecutionCommandAttributes
-        ? SignalExternalWorkflowExecutionCommandAttributes.toJSON(
-            message.signalExternalWorkflowExecutionCommandAttributes,
-          )
-        : undefined);
+      (obj.signalExternalWorkflowExecutionCommandAttributes =
+        message.signalExternalWorkflowExecutionCommandAttributes
+          ? SignalExternalWorkflowExecutionCommandAttributes.toJSON(
+              message.signalExternalWorkflowExecutionCommandAttributes,
+            )
+          : undefined);
     message.upsertWorkflowSearchAttributesCommandAttributes !== undefined &&
-      (obj.upsertWorkflowSearchAttributesCommandAttributes = message.upsertWorkflowSearchAttributesCommandAttributes
-        ? UpsertWorkflowSearchAttributesCommandAttributes.toJSON(
-            message.upsertWorkflowSearchAttributesCommandAttributes,
-          )
-        : undefined);
+      (obj.upsertWorkflowSearchAttributesCommandAttributes =
+        message.upsertWorkflowSearchAttributesCommandAttributes
+          ? UpsertWorkflowSearchAttributesCommandAttributes.toJSON(
+              message.upsertWorkflowSearchAttributesCommandAttributes,
+            )
+          : undefined);
     return obj;
   },
 
@@ -2933,9 +2961,10 @@ export const Command = {
       object.scheduleActivityTaskCommandAttributes !== undefined &&
       object.scheduleActivityTaskCommandAttributes !== null
     ) {
-      message.scheduleActivityTaskCommandAttributes = ScheduleActivityTaskCommandAttributes.fromPartial(
-        object.scheduleActivityTaskCommandAttributes,
-      );
+      message.scheduleActivityTaskCommandAttributes =
+        ScheduleActivityTaskCommandAttributes.fromPartial(
+          object.scheduleActivityTaskCommandAttributes,
+        );
     } else {
       message.scheduleActivityTaskCommandAttributes = undefined;
     }
@@ -2943,9 +2972,10 @@ export const Command = {
       object.startTimerCommandAttributes !== undefined &&
       object.startTimerCommandAttributes !== null
     ) {
-      message.startTimerCommandAttributes = StartTimerCommandAttributes.fromPartial(
-        object.startTimerCommandAttributes,
-      );
+      message.startTimerCommandAttributes =
+        StartTimerCommandAttributes.fromPartial(
+          object.startTimerCommandAttributes,
+        );
     } else {
       message.startTimerCommandAttributes = undefined;
     }
@@ -2953,9 +2983,10 @@ export const Command = {
       object.completeWorkflowExecutionCommandAttributes !== undefined &&
       object.completeWorkflowExecutionCommandAttributes !== null
     ) {
-      message.completeWorkflowExecutionCommandAttributes = CompleteWorkflowExecutionCommandAttributes.fromPartial(
-        object.completeWorkflowExecutionCommandAttributes,
-      );
+      message.completeWorkflowExecutionCommandAttributes =
+        CompleteWorkflowExecutionCommandAttributes.fromPartial(
+          object.completeWorkflowExecutionCommandAttributes,
+        );
     } else {
       message.completeWorkflowExecutionCommandAttributes = undefined;
     }
@@ -2963,9 +2994,10 @@ export const Command = {
       object.failWorkflowExecutionCommandAttributes !== undefined &&
       object.failWorkflowExecutionCommandAttributes !== null
     ) {
-      message.failWorkflowExecutionCommandAttributes = FailWorkflowExecutionCommandAttributes.fromPartial(
-        object.failWorkflowExecutionCommandAttributes,
-      );
+      message.failWorkflowExecutionCommandAttributes =
+        FailWorkflowExecutionCommandAttributes.fromPartial(
+          object.failWorkflowExecutionCommandAttributes,
+        );
     } else {
       message.failWorkflowExecutionCommandAttributes = undefined;
     }
@@ -2973,9 +3005,10 @@ export const Command = {
       object.requestCancelActivityTaskCommandAttributes !== undefined &&
       object.requestCancelActivityTaskCommandAttributes !== null
     ) {
-      message.requestCancelActivityTaskCommandAttributes = RequestCancelActivityTaskCommandAttributes.fromPartial(
-        object.requestCancelActivityTaskCommandAttributes,
-      );
+      message.requestCancelActivityTaskCommandAttributes =
+        RequestCancelActivityTaskCommandAttributes.fromPartial(
+          object.requestCancelActivityTaskCommandAttributes,
+        );
     } else {
       message.requestCancelActivityTaskCommandAttributes = undefined;
     }
@@ -2983,9 +3016,10 @@ export const Command = {
       object.cancelTimerCommandAttributes !== undefined &&
       object.cancelTimerCommandAttributes !== null
     ) {
-      message.cancelTimerCommandAttributes = CancelTimerCommandAttributes.fromPartial(
-        object.cancelTimerCommandAttributes,
-      );
+      message.cancelTimerCommandAttributes =
+        CancelTimerCommandAttributes.fromPartial(
+          object.cancelTimerCommandAttributes,
+        );
     } else {
       message.cancelTimerCommandAttributes = undefined;
     }
@@ -2993,9 +3027,10 @@ export const Command = {
       object.cancelWorkflowExecutionCommandAttributes !== undefined &&
       object.cancelWorkflowExecutionCommandAttributes !== null
     ) {
-      message.cancelWorkflowExecutionCommandAttributes = CancelWorkflowExecutionCommandAttributes.fromPartial(
-        object.cancelWorkflowExecutionCommandAttributes,
-      );
+      message.cancelWorkflowExecutionCommandAttributes =
+        CancelWorkflowExecutionCommandAttributes.fromPartial(
+          object.cancelWorkflowExecutionCommandAttributes,
+        );
     } else {
       message.cancelWorkflowExecutionCommandAttributes = undefined;
     }
@@ -3004,19 +3039,22 @@ export const Command = {
         undefined &&
       object.requestCancelExternalWorkflowExecutionCommandAttributes !== null
     ) {
-      message.requestCancelExternalWorkflowExecutionCommandAttributes = RequestCancelExternalWorkflowExecutionCommandAttributes.fromPartial(
-        object.requestCancelExternalWorkflowExecutionCommandAttributes,
-      );
+      message.requestCancelExternalWorkflowExecutionCommandAttributes =
+        RequestCancelExternalWorkflowExecutionCommandAttributes.fromPartial(
+          object.requestCancelExternalWorkflowExecutionCommandAttributes,
+        );
     } else {
-      message.requestCancelExternalWorkflowExecutionCommandAttributes = undefined;
+      message.requestCancelExternalWorkflowExecutionCommandAttributes =
+        undefined;
     }
     if (
       object.recordMarkerCommandAttributes !== undefined &&
       object.recordMarkerCommandAttributes !== null
     ) {
-      message.recordMarkerCommandAttributes = RecordMarkerCommandAttributes.fromPartial(
-        object.recordMarkerCommandAttributes,
-      );
+      message.recordMarkerCommandAttributes =
+        RecordMarkerCommandAttributes.fromPartial(
+          object.recordMarkerCommandAttributes,
+        );
     } else {
       message.recordMarkerCommandAttributes = undefined;
     }
@@ -3024,9 +3062,10 @@ export const Command = {
       object.continueAsNewWorkflowExecutionCommandAttributes !== undefined &&
       object.continueAsNewWorkflowExecutionCommandAttributes !== null
     ) {
-      message.continueAsNewWorkflowExecutionCommandAttributes = ContinueAsNewWorkflowExecutionCommandAttributes.fromPartial(
-        object.continueAsNewWorkflowExecutionCommandAttributes,
-      );
+      message.continueAsNewWorkflowExecutionCommandAttributes =
+        ContinueAsNewWorkflowExecutionCommandAttributes.fromPartial(
+          object.continueAsNewWorkflowExecutionCommandAttributes,
+        );
     } else {
       message.continueAsNewWorkflowExecutionCommandAttributes = undefined;
     }
@@ -3034,9 +3073,10 @@ export const Command = {
       object.startChildWorkflowExecutionCommandAttributes !== undefined &&
       object.startChildWorkflowExecutionCommandAttributes !== null
     ) {
-      message.startChildWorkflowExecutionCommandAttributes = StartChildWorkflowExecutionCommandAttributes.fromPartial(
-        object.startChildWorkflowExecutionCommandAttributes,
-      );
+      message.startChildWorkflowExecutionCommandAttributes =
+        StartChildWorkflowExecutionCommandAttributes.fromPartial(
+          object.startChildWorkflowExecutionCommandAttributes,
+        );
     } else {
       message.startChildWorkflowExecutionCommandAttributes = undefined;
     }
@@ -3044,9 +3084,10 @@ export const Command = {
       object.signalExternalWorkflowExecutionCommandAttributes !== undefined &&
       object.signalExternalWorkflowExecutionCommandAttributes !== null
     ) {
-      message.signalExternalWorkflowExecutionCommandAttributes = SignalExternalWorkflowExecutionCommandAttributes.fromPartial(
-        object.signalExternalWorkflowExecutionCommandAttributes,
-      );
+      message.signalExternalWorkflowExecutionCommandAttributes =
+        SignalExternalWorkflowExecutionCommandAttributes.fromPartial(
+          object.signalExternalWorkflowExecutionCommandAttributes,
+        );
     } else {
       message.signalExternalWorkflowExecutionCommandAttributes = undefined;
     }
@@ -3054,9 +3095,10 @@ export const Command = {
       object.upsertWorkflowSearchAttributesCommandAttributes !== undefined &&
       object.upsertWorkflowSearchAttributesCommandAttributes !== null
     ) {
-      message.upsertWorkflowSearchAttributesCommandAttributes = UpsertWorkflowSearchAttributesCommandAttributes.fromPartial(
-        object.upsertWorkflowSearchAttributesCommandAttributes,
-      );
+      message.upsertWorkflowSearchAttributesCommandAttributes =
+        UpsertWorkflowSearchAttributesCommandAttributes.fromPartial(
+          object.upsertWorkflowSearchAttributesCommandAttributes,
+        );
     } else {
       message.upsertWorkflowSearchAttributesCommandAttributes = undefined;
     }

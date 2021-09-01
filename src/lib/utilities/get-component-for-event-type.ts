@@ -64,11 +64,15 @@ const eventTypes = {
   WorkflowExecutionTerminated: WorkflowExecutionTerminatedEvent,
   WorkflowExecutionCancelRequested: WorkflowExecutionCancelRequestedEvent,
   WorkflowExecutionCanceled: WorkflowExecutionCanceledEvent,
-  RequestCancelExternalWorkflowExecutionInitiated: RequestCancelExternalWorkflowExecutionInitiatedEvent,
-  RequestCancelExternalWorkflowExecutionFailed: RequestCancelExternalWorkflowExecutionFailedEvent,
-  ExternalWorkflowExecutionCancelRequested: ExternalWorkflowExecutionCancelRequestedEvent,
+  RequestCancelExternalWorkflowExecutionInitiated:
+    RequestCancelExternalWorkflowExecutionInitiatedEvent,
+  RequestCancelExternalWorkflowExecutionFailed:
+    RequestCancelExternalWorkflowExecutionFailedEvent,
+  ExternalWorkflowExecutionCancelRequested:
+    ExternalWorkflowExecutionCancelRequestedEvent,
   WorkflowExecutionContinuedAsNew: WorkflowExecutionContinuedAsNewEvent,
-  StartChildWorkflowExecutionInitiated: StartChildWorkflowExecutionInitiatedEvent,
+  StartChildWorkflowExecutionInitiated:
+    StartChildWorkflowExecutionInitiatedEvent,
   StartChildWorkflowExecutionFailed: StartChildWorkflowExecutionFailedEvent,
   ChildWorkflowExecutionStarted: ChildWorkflowExecutionStartedEvent,
   ChildWorkflowExecutionCompleted: ChildWorkflowExecutionCompletedEvent,
@@ -76,8 +80,10 @@ const eventTypes = {
   ChildWorkflowExecutionCanceled: ChildWorkflowExecutionCanceledEvent,
   ChildWorkflowExecutionTimedOut: ChildWorkflowExecutionTimedOutEvent,
   ChildWorkflowExecutionTerminated: ChildWorkflowExecutionTerminatedEvent,
-  SignalExternalWorkflowExecutionInitiated: SignalExternalWorkflowExecutionInitiatedEvent,
-  SignalExternalWorkflowExecutionFailed: SignalExternalWorkflowExecutionFailedEvent,
+  SignalExternalWorkflowExecutionInitiated:
+    SignalExternalWorkflowExecutionInitiatedEvent,
+  SignalExternalWorkflowExecutionFailed:
+    SignalExternalWorkflowExecutionFailedEvent,
   ExternalWorkflowExecutionSignaled: ExternalWorkflowExecutionSignaledEvent,
   UpsertWorkflowSearchAttributes: UpsertWorkflowSearchAttributesEvent,
 };

@@ -1077,7 +1077,8 @@ export const WorkflowExecutionStartedEventAttributes = {
         : undefined);
     message.attempt !== undefined && (obj.attempt = message.attempt);
     message.workflowExecutionExpirationTime !== undefined &&
-      (obj.workflowExecutionExpirationTime = message.workflowExecutionExpirationTime.toISOString());
+      (obj.workflowExecutionExpirationTime =
+        message.workflowExecutionExpirationTime.toISOString());
     message.cronSchedule !== undefined &&
       (obj.cronSchedule = message.cronSchedule);
     message.firstWorkflowTaskBackoff !== undefined &&
@@ -5036,12 +5037,13 @@ export const WorkflowExecutionTerminatedEventAttributes = {
   },
 };
 
-const baseRequestCancelExternalWorkflowExecutionInitiatedEventAttributes: object = {
-  workflowTaskCompletedEventId: 0,
-  namespace: '',
-  control: '',
-  childWorkflowOnly: false,
-};
+const baseRequestCancelExternalWorkflowExecutionInitiatedEventAttributes: object =
+  {
+    workflowTaskCompletedEventId: 0,
+    namespace: '',
+    control: '',
+    childWorkflowOnly: false,
+  };
 
 export const RequestCancelExternalWorkflowExecutionInitiatedEventAttributes = {
   encode(
@@ -5220,13 +5222,14 @@ export const RequestCancelExternalWorkflowExecutionInitiatedEventAttributes = {
   },
 };
 
-const baseRequestCancelExternalWorkflowExecutionFailedEventAttributes: object = {
-  cause: 0,
-  workflowTaskCompletedEventId: 0,
-  namespace: '',
-  initiatedEventId: 0,
-  control: '',
-};
+const baseRequestCancelExternalWorkflowExecutionFailedEventAttributes: object =
+  {
+    cause: 0,
+    workflowTaskCompletedEventId: 0,
+    namespace: '',
+    initiatedEventId: 0,
+    control: '',
+  };
 
 export const RequestCancelExternalWorkflowExecutionFailedEventAttributes = {
   encode(
@@ -8397,94 +8400,88 @@ export const HistoryEvent = {
           message.taskId = longToNumber(reader.int64() as Long);
           break;
         case 6:
-          message.workflowExecutionStartedEventAttributes = WorkflowExecutionStartedEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.workflowExecutionStartedEventAttributes =
+            WorkflowExecutionStartedEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 7:
-          message.workflowExecutionCompletedEventAttributes = WorkflowExecutionCompletedEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.workflowExecutionCompletedEventAttributes =
+            WorkflowExecutionCompletedEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 8:
-          message.workflowExecutionFailedEventAttributes = WorkflowExecutionFailedEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.workflowExecutionFailedEventAttributes =
+            WorkflowExecutionFailedEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 9:
-          message.workflowExecutionTimedOutEventAttributes = WorkflowExecutionTimedOutEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.workflowExecutionTimedOutEventAttributes =
+            WorkflowExecutionTimedOutEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 10:
-          message.workflowTaskScheduledEventAttributes = WorkflowTaskScheduledEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.workflowTaskScheduledEventAttributes =
+            WorkflowTaskScheduledEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 11:
-          message.workflowTaskStartedEventAttributes = WorkflowTaskStartedEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.workflowTaskStartedEventAttributes =
+            WorkflowTaskStartedEventAttributes.decode(reader, reader.uint32());
           break;
         case 12:
-          message.workflowTaskCompletedEventAttributes = WorkflowTaskCompletedEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.workflowTaskCompletedEventAttributes =
+            WorkflowTaskCompletedEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 13:
-          message.workflowTaskTimedOutEventAttributes = WorkflowTaskTimedOutEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.workflowTaskTimedOutEventAttributes =
+            WorkflowTaskTimedOutEventAttributes.decode(reader, reader.uint32());
           break;
         case 14:
-          message.workflowTaskFailedEventAttributes = WorkflowTaskFailedEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.workflowTaskFailedEventAttributes =
+            WorkflowTaskFailedEventAttributes.decode(reader, reader.uint32());
           break;
         case 15:
-          message.activityTaskScheduledEventAttributes = ActivityTaskScheduledEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.activityTaskScheduledEventAttributes =
+            ActivityTaskScheduledEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 16:
-          message.activityTaskStartedEventAttributes = ActivityTaskStartedEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.activityTaskStartedEventAttributes =
+            ActivityTaskStartedEventAttributes.decode(reader, reader.uint32());
           break;
         case 17:
-          message.activityTaskCompletedEventAttributes = ActivityTaskCompletedEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.activityTaskCompletedEventAttributes =
+            ActivityTaskCompletedEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 18:
-          message.activityTaskFailedEventAttributes = ActivityTaskFailedEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.activityTaskFailedEventAttributes =
+            ActivityTaskFailedEventAttributes.decode(reader, reader.uint32());
           break;
         case 19:
-          message.activityTaskTimedOutEventAttributes = ActivityTaskTimedOutEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.activityTaskTimedOutEventAttributes =
+            ActivityTaskTimedOutEventAttributes.decode(reader, reader.uint32());
           break;
         case 20:
-          message.timerStartedEventAttributes = TimerStartedEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.timerStartedEventAttributes =
+            TimerStartedEventAttributes.decode(reader, reader.uint32());
           break;
         case 21:
           message.timerFiredEventAttributes = TimerFiredEventAttributes.decode(
@@ -8493,148 +8490,163 @@ export const HistoryEvent = {
           );
           break;
         case 22:
-          message.activityTaskCancelRequestedEventAttributes = ActivityTaskCancelRequestedEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.activityTaskCancelRequestedEventAttributes =
+            ActivityTaskCancelRequestedEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 23:
-          message.activityTaskCanceledEventAttributes = ActivityTaskCanceledEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.activityTaskCanceledEventAttributes =
+            ActivityTaskCanceledEventAttributes.decode(reader, reader.uint32());
           break;
         case 24:
-          message.timerCanceledEventAttributes = TimerCanceledEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.timerCanceledEventAttributes =
+            TimerCanceledEventAttributes.decode(reader, reader.uint32());
           break;
         case 25:
-          message.markerRecordedEventAttributes = MarkerRecordedEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.markerRecordedEventAttributes =
+            MarkerRecordedEventAttributes.decode(reader, reader.uint32());
           break;
         case 26:
-          message.workflowExecutionSignaledEventAttributes = WorkflowExecutionSignaledEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.workflowExecutionSignaledEventAttributes =
+            WorkflowExecutionSignaledEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 27:
-          message.workflowExecutionTerminatedEventAttributes = WorkflowExecutionTerminatedEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.workflowExecutionTerminatedEventAttributes =
+            WorkflowExecutionTerminatedEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 28:
-          message.workflowExecutionCancelRequestedEventAttributes = WorkflowExecutionCancelRequestedEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.workflowExecutionCancelRequestedEventAttributes =
+            WorkflowExecutionCancelRequestedEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 29:
-          message.workflowExecutionCanceledEventAttributes = WorkflowExecutionCanceledEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.workflowExecutionCanceledEventAttributes =
+            WorkflowExecutionCanceledEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 30:
-          message.requestCancelExternalWorkflowExecutionInitiatedEventAttributes = RequestCancelExternalWorkflowExecutionInitiatedEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.requestCancelExternalWorkflowExecutionInitiatedEventAttributes =
+            RequestCancelExternalWorkflowExecutionInitiatedEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 31:
-          message.requestCancelExternalWorkflowExecutionFailedEventAttributes = RequestCancelExternalWorkflowExecutionFailedEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.requestCancelExternalWorkflowExecutionFailedEventAttributes =
+            RequestCancelExternalWorkflowExecutionFailedEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 32:
-          message.externalWorkflowExecutionCancelRequestedEventAttributes = ExternalWorkflowExecutionCancelRequestedEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.externalWorkflowExecutionCancelRequestedEventAttributes =
+            ExternalWorkflowExecutionCancelRequestedEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 33:
-          message.workflowExecutionContinuedAsNewEventAttributes = WorkflowExecutionContinuedAsNewEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.workflowExecutionContinuedAsNewEventAttributes =
+            WorkflowExecutionContinuedAsNewEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 34:
-          message.startChildWorkflowExecutionInitiatedEventAttributes = StartChildWorkflowExecutionInitiatedEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.startChildWorkflowExecutionInitiatedEventAttributes =
+            StartChildWorkflowExecutionInitiatedEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 35:
-          message.startChildWorkflowExecutionFailedEventAttributes = StartChildWorkflowExecutionFailedEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.startChildWorkflowExecutionFailedEventAttributes =
+            StartChildWorkflowExecutionFailedEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 36:
-          message.childWorkflowExecutionStartedEventAttributes = ChildWorkflowExecutionStartedEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.childWorkflowExecutionStartedEventAttributes =
+            ChildWorkflowExecutionStartedEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 37:
-          message.childWorkflowExecutionCompletedEventAttributes = ChildWorkflowExecutionCompletedEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.childWorkflowExecutionCompletedEventAttributes =
+            ChildWorkflowExecutionCompletedEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 38:
-          message.childWorkflowExecutionFailedEventAttributes = ChildWorkflowExecutionFailedEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.childWorkflowExecutionFailedEventAttributes =
+            ChildWorkflowExecutionFailedEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 39:
-          message.childWorkflowExecutionCanceledEventAttributes = ChildWorkflowExecutionCanceledEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.childWorkflowExecutionCanceledEventAttributes =
+            ChildWorkflowExecutionCanceledEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 40:
-          message.childWorkflowExecutionTimedOutEventAttributes = ChildWorkflowExecutionTimedOutEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.childWorkflowExecutionTimedOutEventAttributes =
+            ChildWorkflowExecutionTimedOutEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 41:
-          message.childWorkflowExecutionTerminatedEventAttributes = ChildWorkflowExecutionTerminatedEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.childWorkflowExecutionTerminatedEventAttributes =
+            ChildWorkflowExecutionTerminatedEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 42:
-          message.signalExternalWorkflowExecutionInitiatedEventAttributes = SignalExternalWorkflowExecutionInitiatedEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.signalExternalWorkflowExecutionInitiatedEventAttributes =
+            SignalExternalWorkflowExecutionInitiatedEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 43:
-          message.signalExternalWorkflowExecutionFailedEventAttributes = SignalExternalWorkflowExecutionFailedEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.signalExternalWorkflowExecutionFailedEventAttributes =
+            SignalExternalWorkflowExecutionFailedEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 44:
-          message.externalWorkflowExecutionSignaledEventAttributes = ExternalWorkflowExecutionSignaledEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.externalWorkflowExecutionSignaledEventAttributes =
+            ExternalWorkflowExecutionSignaledEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         case 45:
-          message.upsertWorkflowSearchAttributesEventAttributes = UpsertWorkflowSearchAttributesEventAttributes.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.upsertWorkflowSearchAttributesEventAttributes =
+            UpsertWorkflowSearchAttributesEventAttributes.decode(
+              reader,
+              reader.uint32(),
+            );
           break;
         default:
           reader.skipType(tag & 7);
@@ -8675,9 +8687,10 @@ export const HistoryEvent = {
       object.workflowExecutionStartedEventAttributes !== undefined &&
       object.workflowExecutionStartedEventAttributes !== null
     ) {
-      message.workflowExecutionStartedEventAttributes = WorkflowExecutionStartedEventAttributes.fromJSON(
-        object.workflowExecutionStartedEventAttributes,
-      );
+      message.workflowExecutionStartedEventAttributes =
+        WorkflowExecutionStartedEventAttributes.fromJSON(
+          object.workflowExecutionStartedEventAttributes,
+        );
     } else {
       message.workflowExecutionStartedEventAttributes = undefined;
     }
@@ -8685,9 +8698,10 @@ export const HistoryEvent = {
       object.workflowExecutionCompletedEventAttributes !== undefined &&
       object.workflowExecutionCompletedEventAttributes !== null
     ) {
-      message.workflowExecutionCompletedEventAttributes = WorkflowExecutionCompletedEventAttributes.fromJSON(
-        object.workflowExecutionCompletedEventAttributes,
-      );
+      message.workflowExecutionCompletedEventAttributes =
+        WorkflowExecutionCompletedEventAttributes.fromJSON(
+          object.workflowExecutionCompletedEventAttributes,
+        );
     } else {
       message.workflowExecutionCompletedEventAttributes = undefined;
     }
@@ -8695,9 +8709,10 @@ export const HistoryEvent = {
       object.workflowExecutionFailedEventAttributes !== undefined &&
       object.workflowExecutionFailedEventAttributes !== null
     ) {
-      message.workflowExecutionFailedEventAttributes = WorkflowExecutionFailedEventAttributes.fromJSON(
-        object.workflowExecutionFailedEventAttributes,
-      );
+      message.workflowExecutionFailedEventAttributes =
+        WorkflowExecutionFailedEventAttributes.fromJSON(
+          object.workflowExecutionFailedEventAttributes,
+        );
     } else {
       message.workflowExecutionFailedEventAttributes = undefined;
     }
@@ -8705,9 +8720,10 @@ export const HistoryEvent = {
       object.workflowExecutionTimedOutEventAttributes !== undefined &&
       object.workflowExecutionTimedOutEventAttributes !== null
     ) {
-      message.workflowExecutionTimedOutEventAttributes = WorkflowExecutionTimedOutEventAttributes.fromJSON(
-        object.workflowExecutionTimedOutEventAttributes,
-      );
+      message.workflowExecutionTimedOutEventAttributes =
+        WorkflowExecutionTimedOutEventAttributes.fromJSON(
+          object.workflowExecutionTimedOutEventAttributes,
+        );
     } else {
       message.workflowExecutionTimedOutEventAttributes = undefined;
     }
@@ -8715,9 +8731,10 @@ export const HistoryEvent = {
       object.workflowTaskScheduledEventAttributes !== undefined &&
       object.workflowTaskScheduledEventAttributes !== null
     ) {
-      message.workflowTaskScheduledEventAttributes = WorkflowTaskScheduledEventAttributes.fromJSON(
-        object.workflowTaskScheduledEventAttributes,
-      );
+      message.workflowTaskScheduledEventAttributes =
+        WorkflowTaskScheduledEventAttributes.fromJSON(
+          object.workflowTaskScheduledEventAttributes,
+        );
     } else {
       message.workflowTaskScheduledEventAttributes = undefined;
     }
@@ -8725,9 +8742,10 @@ export const HistoryEvent = {
       object.workflowTaskStartedEventAttributes !== undefined &&
       object.workflowTaskStartedEventAttributes !== null
     ) {
-      message.workflowTaskStartedEventAttributes = WorkflowTaskStartedEventAttributes.fromJSON(
-        object.workflowTaskStartedEventAttributes,
-      );
+      message.workflowTaskStartedEventAttributes =
+        WorkflowTaskStartedEventAttributes.fromJSON(
+          object.workflowTaskStartedEventAttributes,
+        );
     } else {
       message.workflowTaskStartedEventAttributes = undefined;
     }
@@ -8735,9 +8753,10 @@ export const HistoryEvent = {
       object.workflowTaskCompletedEventAttributes !== undefined &&
       object.workflowTaskCompletedEventAttributes !== null
     ) {
-      message.workflowTaskCompletedEventAttributes = WorkflowTaskCompletedEventAttributes.fromJSON(
-        object.workflowTaskCompletedEventAttributes,
-      );
+      message.workflowTaskCompletedEventAttributes =
+        WorkflowTaskCompletedEventAttributes.fromJSON(
+          object.workflowTaskCompletedEventAttributes,
+        );
     } else {
       message.workflowTaskCompletedEventAttributes = undefined;
     }
@@ -8745,9 +8764,10 @@ export const HistoryEvent = {
       object.workflowTaskTimedOutEventAttributes !== undefined &&
       object.workflowTaskTimedOutEventAttributes !== null
     ) {
-      message.workflowTaskTimedOutEventAttributes = WorkflowTaskTimedOutEventAttributes.fromJSON(
-        object.workflowTaskTimedOutEventAttributes,
-      );
+      message.workflowTaskTimedOutEventAttributes =
+        WorkflowTaskTimedOutEventAttributes.fromJSON(
+          object.workflowTaskTimedOutEventAttributes,
+        );
     } else {
       message.workflowTaskTimedOutEventAttributes = undefined;
     }
@@ -8755,9 +8775,10 @@ export const HistoryEvent = {
       object.workflowTaskFailedEventAttributes !== undefined &&
       object.workflowTaskFailedEventAttributes !== null
     ) {
-      message.workflowTaskFailedEventAttributes = WorkflowTaskFailedEventAttributes.fromJSON(
-        object.workflowTaskFailedEventAttributes,
-      );
+      message.workflowTaskFailedEventAttributes =
+        WorkflowTaskFailedEventAttributes.fromJSON(
+          object.workflowTaskFailedEventAttributes,
+        );
     } else {
       message.workflowTaskFailedEventAttributes = undefined;
     }
@@ -8765,9 +8786,10 @@ export const HistoryEvent = {
       object.activityTaskScheduledEventAttributes !== undefined &&
       object.activityTaskScheduledEventAttributes !== null
     ) {
-      message.activityTaskScheduledEventAttributes = ActivityTaskScheduledEventAttributes.fromJSON(
-        object.activityTaskScheduledEventAttributes,
-      );
+      message.activityTaskScheduledEventAttributes =
+        ActivityTaskScheduledEventAttributes.fromJSON(
+          object.activityTaskScheduledEventAttributes,
+        );
     } else {
       message.activityTaskScheduledEventAttributes = undefined;
     }
@@ -8775,9 +8797,10 @@ export const HistoryEvent = {
       object.activityTaskStartedEventAttributes !== undefined &&
       object.activityTaskStartedEventAttributes !== null
     ) {
-      message.activityTaskStartedEventAttributes = ActivityTaskStartedEventAttributes.fromJSON(
-        object.activityTaskStartedEventAttributes,
-      );
+      message.activityTaskStartedEventAttributes =
+        ActivityTaskStartedEventAttributes.fromJSON(
+          object.activityTaskStartedEventAttributes,
+        );
     } else {
       message.activityTaskStartedEventAttributes = undefined;
     }
@@ -8785,9 +8808,10 @@ export const HistoryEvent = {
       object.activityTaskCompletedEventAttributes !== undefined &&
       object.activityTaskCompletedEventAttributes !== null
     ) {
-      message.activityTaskCompletedEventAttributes = ActivityTaskCompletedEventAttributes.fromJSON(
-        object.activityTaskCompletedEventAttributes,
-      );
+      message.activityTaskCompletedEventAttributes =
+        ActivityTaskCompletedEventAttributes.fromJSON(
+          object.activityTaskCompletedEventAttributes,
+        );
     } else {
       message.activityTaskCompletedEventAttributes = undefined;
     }
@@ -8795,9 +8819,10 @@ export const HistoryEvent = {
       object.activityTaskFailedEventAttributes !== undefined &&
       object.activityTaskFailedEventAttributes !== null
     ) {
-      message.activityTaskFailedEventAttributes = ActivityTaskFailedEventAttributes.fromJSON(
-        object.activityTaskFailedEventAttributes,
-      );
+      message.activityTaskFailedEventAttributes =
+        ActivityTaskFailedEventAttributes.fromJSON(
+          object.activityTaskFailedEventAttributes,
+        );
     } else {
       message.activityTaskFailedEventAttributes = undefined;
     }
@@ -8805,9 +8830,10 @@ export const HistoryEvent = {
       object.activityTaskTimedOutEventAttributes !== undefined &&
       object.activityTaskTimedOutEventAttributes !== null
     ) {
-      message.activityTaskTimedOutEventAttributes = ActivityTaskTimedOutEventAttributes.fromJSON(
-        object.activityTaskTimedOutEventAttributes,
-      );
+      message.activityTaskTimedOutEventAttributes =
+        ActivityTaskTimedOutEventAttributes.fromJSON(
+          object.activityTaskTimedOutEventAttributes,
+        );
     } else {
       message.activityTaskTimedOutEventAttributes = undefined;
     }
@@ -8815,9 +8841,10 @@ export const HistoryEvent = {
       object.timerStartedEventAttributes !== undefined &&
       object.timerStartedEventAttributes !== null
     ) {
-      message.timerStartedEventAttributes = TimerStartedEventAttributes.fromJSON(
-        object.timerStartedEventAttributes,
-      );
+      message.timerStartedEventAttributes =
+        TimerStartedEventAttributes.fromJSON(
+          object.timerStartedEventAttributes,
+        );
     } else {
       message.timerStartedEventAttributes = undefined;
     }
@@ -8835,9 +8862,10 @@ export const HistoryEvent = {
       object.activityTaskCancelRequestedEventAttributes !== undefined &&
       object.activityTaskCancelRequestedEventAttributes !== null
     ) {
-      message.activityTaskCancelRequestedEventAttributes = ActivityTaskCancelRequestedEventAttributes.fromJSON(
-        object.activityTaskCancelRequestedEventAttributes,
-      );
+      message.activityTaskCancelRequestedEventAttributes =
+        ActivityTaskCancelRequestedEventAttributes.fromJSON(
+          object.activityTaskCancelRequestedEventAttributes,
+        );
     } else {
       message.activityTaskCancelRequestedEventAttributes = undefined;
     }
@@ -8845,9 +8873,10 @@ export const HistoryEvent = {
       object.activityTaskCanceledEventAttributes !== undefined &&
       object.activityTaskCanceledEventAttributes !== null
     ) {
-      message.activityTaskCanceledEventAttributes = ActivityTaskCanceledEventAttributes.fromJSON(
-        object.activityTaskCanceledEventAttributes,
-      );
+      message.activityTaskCanceledEventAttributes =
+        ActivityTaskCanceledEventAttributes.fromJSON(
+          object.activityTaskCanceledEventAttributes,
+        );
     } else {
       message.activityTaskCanceledEventAttributes = undefined;
     }
@@ -8855,9 +8884,10 @@ export const HistoryEvent = {
       object.timerCanceledEventAttributes !== undefined &&
       object.timerCanceledEventAttributes !== null
     ) {
-      message.timerCanceledEventAttributes = TimerCanceledEventAttributes.fromJSON(
-        object.timerCanceledEventAttributes,
-      );
+      message.timerCanceledEventAttributes =
+        TimerCanceledEventAttributes.fromJSON(
+          object.timerCanceledEventAttributes,
+        );
     } else {
       message.timerCanceledEventAttributes = undefined;
     }
@@ -8865,9 +8895,10 @@ export const HistoryEvent = {
       object.markerRecordedEventAttributes !== undefined &&
       object.markerRecordedEventAttributes !== null
     ) {
-      message.markerRecordedEventAttributes = MarkerRecordedEventAttributes.fromJSON(
-        object.markerRecordedEventAttributes,
-      );
+      message.markerRecordedEventAttributes =
+        MarkerRecordedEventAttributes.fromJSON(
+          object.markerRecordedEventAttributes,
+        );
     } else {
       message.markerRecordedEventAttributes = undefined;
     }
@@ -8875,9 +8906,10 @@ export const HistoryEvent = {
       object.workflowExecutionSignaledEventAttributes !== undefined &&
       object.workflowExecutionSignaledEventAttributes !== null
     ) {
-      message.workflowExecutionSignaledEventAttributes = WorkflowExecutionSignaledEventAttributes.fromJSON(
-        object.workflowExecutionSignaledEventAttributes,
-      );
+      message.workflowExecutionSignaledEventAttributes =
+        WorkflowExecutionSignaledEventAttributes.fromJSON(
+          object.workflowExecutionSignaledEventAttributes,
+        );
     } else {
       message.workflowExecutionSignaledEventAttributes = undefined;
     }
@@ -8885,9 +8917,10 @@ export const HistoryEvent = {
       object.workflowExecutionTerminatedEventAttributes !== undefined &&
       object.workflowExecutionTerminatedEventAttributes !== null
     ) {
-      message.workflowExecutionTerminatedEventAttributes = WorkflowExecutionTerminatedEventAttributes.fromJSON(
-        object.workflowExecutionTerminatedEventAttributes,
-      );
+      message.workflowExecutionTerminatedEventAttributes =
+        WorkflowExecutionTerminatedEventAttributes.fromJSON(
+          object.workflowExecutionTerminatedEventAttributes,
+        );
     } else {
       message.workflowExecutionTerminatedEventAttributes = undefined;
     }
@@ -8895,9 +8928,10 @@ export const HistoryEvent = {
       object.workflowExecutionCancelRequestedEventAttributes !== undefined &&
       object.workflowExecutionCancelRequestedEventAttributes !== null
     ) {
-      message.workflowExecutionCancelRequestedEventAttributes = WorkflowExecutionCancelRequestedEventAttributes.fromJSON(
-        object.workflowExecutionCancelRequestedEventAttributes,
-      );
+      message.workflowExecutionCancelRequestedEventAttributes =
+        WorkflowExecutionCancelRequestedEventAttributes.fromJSON(
+          object.workflowExecutionCancelRequestedEventAttributes,
+        );
     } else {
       message.workflowExecutionCancelRequestedEventAttributes = undefined;
     }
@@ -8905,9 +8939,10 @@ export const HistoryEvent = {
       object.workflowExecutionCanceledEventAttributes !== undefined &&
       object.workflowExecutionCanceledEventAttributes !== null
     ) {
-      message.workflowExecutionCanceledEventAttributes = WorkflowExecutionCanceledEventAttributes.fromJSON(
-        object.workflowExecutionCanceledEventAttributes,
-      );
+      message.workflowExecutionCanceledEventAttributes =
+        WorkflowExecutionCanceledEventAttributes.fromJSON(
+          object.workflowExecutionCanceledEventAttributes,
+        );
     } else {
       message.workflowExecutionCanceledEventAttributes = undefined;
     }
@@ -8917,11 +8952,13 @@ export const HistoryEvent = {
       object.requestCancelExternalWorkflowExecutionInitiatedEventAttributes !==
         null
     ) {
-      message.requestCancelExternalWorkflowExecutionInitiatedEventAttributes = RequestCancelExternalWorkflowExecutionInitiatedEventAttributes.fromJSON(
-        object.requestCancelExternalWorkflowExecutionInitiatedEventAttributes,
-      );
+      message.requestCancelExternalWorkflowExecutionInitiatedEventAttributes =
+        RequestCancelExternalWorkflowExecutionInitiatedEventAttributes.fromJSON(
+          object.requestCancelExternalWorkflowExecutionInitiatedEventAttributes,
+        );
     } else {
-      message.requestCancelExternalWorkflowExecutionInitiatedEventAttributes = undefined;
+      message.requestCancelExternalWorkflowExecutionInitiatedEventAttributes =
+        undefined;
     }
     if (
       object.requestCancelExternalWorkflowExecutionFailedEventAttributes !==
@@ -8929,30 +8966,35 @@ export const HistoryEvent = {
       object.requestCancelExternalWorkflowExecutionFailedEventAttributes !==
         null
     ) {
-      message.requestCancelExternalWorkflowExecutionFailedEventAttributes = RequestCancelExternalWorkflowExecutionFailedEventAttributes.fromJSON(
-        object.requestCancelExternalWorkflowExecutionFailedEventAttributes,
-      );
+      message.requestCancelExternalWorkflowExecutionFailedEventAttributes =
+        RequestCancelExternalWorkflowExecutionFailedEventAttributes.fromJSON(
+          object.requestCancelExternalWorkflowExecutionFailedEventAttributes,
+        );
     } else {
-      message.requestCancelExternalWorkflowExecutionFailedEventAttributes = undefined;
+      message.requestCancelExternalWorkflowExecutionFailedEventAttributes =
+        undefined;
     }
     if (
       object.externalWorkflowExecutionCancelRequestedEventAttributes !==
         undefined &&
       object.externalWorkflowExecutionCancelRequestedEventAttributes !== null
     ) {
-      message.externalWorkflowExecutionCancelRequestedEventAttributes = ExternalWorkflowExecutionCancelRequestedEventAttributes.fromJSON(
-        object.externalWorkflowExecutionCancelRequestedEventAttributes,
-      );
+      message.externalWorkflowExecutionCancelRequestedEventAttributes =
+        ExternalWorkflowExecutionCancelRequestedEventAttributes.fromJSON(
+          object.externalWorkflowExecutionCancelRequestedEventAttributes,
+        );
     } else {
-      message.externalWorkflowExecutionCancelRequestedEventAttributes = undefined;
+      message.externalWorkflowExecutionCancelRequestedEventAttributes =
+        undefined;
     }
     if (
       object.workflowExecutionContinuedAsNewEventAttributes !== undefined &&
       object.workflowExecutionContinuedAsNewEventAttributes !== null
     ) {
-      message.workflowExecutionContinuedAsNewEventAttributes = WorkflowExecutionContinuedAsNewEventAttributes.fromJSON(
-        object.workflowExecutionContinuedAsNewEventAttributes,
-      );
+      message.workflowExecutionContinuedAsNewEventAttributes =
+        WorkflowExecutionContinuedAsNewEventAttributes.fromJSON(
+          object.workflowExecutionContinuedAsNewEventAttributes,
+        );
     } else {
       message.workflowExecutionContinuedAsNewEventAttributes = undefined;
     }
@@ -8961,9 +9003,10 @@ export const HistoryEvent = {
         undefined &&
       object.startChildWorkflowExecutionInitiatedEventAttributes !== null
     ) {
-      message.startChildWorkflowExecutionInitiatedEventAttributes = StartChildWorkflowExecutionInitiatedEventAttributes.fromJSON(
-        object.startChildWorkflowExecutionInitiatedEventAttributes,
-      );
+      message.startChildWorkflowExecutionInitiatedEventAttributes =
+        StartChildWorkflowExecutionInitiatedEventAttributes.fromJSON(
+          object.startChildWorkflowExecutionInitiatedEventAttributes,
+        );
     } else {
       message.startChildWorkflowExecutionInitiatedEventAttributes = undefined;
     }
@@ -8971,9 +9014,10 @@ export const HistoryEvent = {
       object.startChildWorkflowExecutionFailedEventAttributes !== undefined &&
       object.startChildWorkflowExecutionFailedEventAttributes !== null
     ) {
-      message.startChildWorkflowExecutionFailedEventAttributes = StartChildWorkflowExecutionFailedEventAttributes.fromJSON(
-        object.startChildWorkflowExecutionFailedEventAttributes,
-      );
+      message.startChildWorkflowExecutionFailedEventAttributes =
+        StartChildWorkflowExecutionFailedEventAttributes.fromJSON(
+          object.startChildWorkflowExecutionFailedEventAttributes,
+        );
     } else {
       message.startChildWorkflowExecutionFailedEventAttributes = undefined;
     }
@@ -8981,9 +9025,10 @@ export const HistoryEvent = {
       object.childWorkflowExecutionStartedEventAttributes !== undefined &&
       object.childWorkflowExecutionStartedEventAttributes !== null
     ) {
-      message.childWorkflowExecutionStartedEventAttributes = ChildWorkflowExecutionStartedEventAttributes.fromJSON(
-        object.childWorkflowExecutionStartedEventAttributes,
-      );
+      message.childWorkflowExecutionStartedEventAttributes =
+        ChildWorkflowExecutionStartedEventAttributes.fromJSON(
+          object.childWorkflowExecutionStartedEventAttributes,
+        );
     } else {
       message.childWorkflowExecutionStartedEventAttributes = undefined;
     }
@@ -8991,9 +9036,10 @@ export const HistoryEvent = {
       object.childWorkflowExecutionCompletedEventAttributes !== undefined &&
       object.childWorkflowExecutionCompletedEventAttributes !== null
     ) {
-      message.childWorkflowExecutionCompletedEventAttributes = ChildWorkflowExecutionCompletedEventAttributes.fromJSON(
-        object.childWorkflowExecutionCompletedEventAttributes,
-      );
+      message.childWorkflowExecutionCompletedEventAttributes =
+        ChildWorkflowExecutionCompletedEventAttributes.fromJSON(
+          object.childWorkflowExecutionCompletedEventAttributes,
+        );
     } else {
       message.childWorkflowExecutionCompletedEventAttributes = undefined;
     }
@@ -9001,9 +9047,10 @@ export const HistoryEvent = {
       object.childWorkflowExecutionFailedEventAttributes !== undefined &&
       object.childWorkflowExecutionFailedEventAttributes !== null
     ) {
-      message.childWorkflowExecutionFailedEventAttributes = ChildWorkflowExecutionFailedEventAttributes.fromJSON(
-        object.childWorkflowExecutionFailedEventAttributes,
-      );
+      message.childWorkflowExecutionFailedEventAttributes =
+        ChildWorkflowExecutionFailedEventAttributes.fromJSON(
+          object.childWorkflowExecutionFailedEventAttributes,
+        );
     } else {
       message.childWorkflowExecutionFailedEventAttributes = undefined;
     }
@@ -9011,9 +9058,10 @@ export const HistoryEvent = {
       object.childWorkflowExecutionCanceledEventAttributes !== undefined &&
       object.childWorkflowExecutionCanceledEventAttributes !== null
     ) {
-      message.childWorkflowExecutionCanceledEventAttributes = ChildWorkflowExecutionCanceledEventAttributes.fromJSON(
-        object.childWorkflowExecutionCanceledEventAttributes,
-      );
+      message.childWorkflowExecutionCanceledEventAttributes =
+        ChildWorkflowExecutionCanceledEventAttributes.fromJSON(
+          object.childWorkflowExecutionCanceledEventAttributes,
+        );
     } else {
       message.childWorkflowExecutionCanceledEventAttributes = undefined;
     }
@@ -9021,9 +9069,10 @@ export const HistoryEvent = {
       object.childWorkflowExecutionTimedOutEventAttributes !== undefined &&
       object.childWorkflowExecutionTimedOutEventAttributes !== null
     ) {
-      message.childWorkflowExecutionTimedOutEventAttributes = ChildWorkflowExecutionTimedOutEventAttributes.fromJSON(
-        object.childWorkflowExecutionTimedOutEventAttributes,
-      );
+      message.childWorkflowExecutionTimedOutEventAttributes =
+        ChildWorkflowExecutionTimedOutEventAttributes.fromJSON(
+          object.childWorkflowExecutionTimedOutEventAttributes,
+        );
     } else {
       message.childWorkflowExecutionTimedOutEventAttributes = undefined;
     }
@@ -9031,9 +9080,10 @@ export const HistoryEvent = {
       object.childWorkflowExecutionTerminatedEventAttributes !== undefined &&
       object.childWorkflowExecutionTerminatedEventAttributes !== null
     ) {
-      message.childWorkflowExecutionTerminatedEventAttributes = ChildWorkflowExecutionTerminatedEventAttributes.fromJSON(
-        object.childWorkflowExecutionTerminatedEventAttributes,
-      );
+      message.childWorkflowExecutionTerminatedEventAttributes =
+        ChildWorkflowExecutionTerminatedEventAttributes.fromJSON(
+          object.childWorkflowExecutionTerminatedEventAttributes,
+        );
     } else {
       message.childWorkflowExecutionTerminatedEventAttributes = undefined;
     }
@@ -9042,20 +9092,23 @@ export const HistoryEvent = {
         undefined &&
       object.signalExternalWorkflowExecutionInitiatedEventAttributes !== null
     ) {
-      message.signalExternalWorkflowExecutionInitiatedEventAttributes = SignalExternalWorkflowExecutionInitiatedEventAttributes.fromJSON(
-        object.signalExternalWorkflowExecutionInitiatedEventAttributes,
-      );
+      message.signalExternalWorkflowExecutionInitiatedEventAttributes =
+        SignalExternalWorkflowExecutionInitiatedEventAttributes.fromJSON(
+          object.signalExternalWorkflowExecutionInitiatedEventAttributes,
+        );
     } else {
-      message.signalExternalWorkflowExecutionInitiatedEventAttributes = undefined;
+      message.signalExternalWorkflowExecutionInitiatedEventAttributes =
+        undefined;
     }
     if (
       object.signalExternalWorkflowExecutionFailedEventAttributes !==
         undefined &&
       object.signalExternalWorkflowExecutionFailedEventAttributes !== null
     ) {
-      message.signalExternalWorkflowExecutionFailedEventAttributes = SignalExternalWorkflowExecutionFailedEventAttributes.fromJSON(
-        object.signalExternalWorkflowExecutionFailedEventAttributes,
-      );
+      message.signalExternalWorkflowExecutionFailedEventAttributes =
+        SignalExternalWorkflowExecutionFailedEventAttributes.fromJSON(
+          object.signalExternalWorkflowExecutionFailedEventAttributes,
+        );
     } else {
       message.signalExternalWorkflowExecutionFailedEventAttributes = undefined;
     }
@@ -9063,9 +9116,10 @@ export const HistoryEvent = {
       object.externalWorkflowExecutionSignaledEventAttributes !== undefined &&
       object.externalWorkflowExecutionSignaledEventAttributes !== null
     ) {
-      message.externalWorkflowExecutionSignaledEventAttributes = ExternalWorkflowExecutionSignaledEventAttributes.fromJSON(
-        object.externalWorkflowExecutionSignaledEventAttributes,
-      );
+      message.externalWorkflowExecutionSignaledEventAttributes =
+        ExternalWorkflowExecutionSignaledEventAttributes.fromJSON(
+          object.externalWorkflowExecutionSignaledEventAttributes,
+        );
     } else {
       message.externalWorkflowExecutionSignaledEventAttributes = undefined;
     }
@@ -9073,9 +9127,10 @@ export const HistoryEvent = {
       object.upsertWorkflowSearchAttributesEventAttributes !== undefined &&
       object.upsertWorkflowSearchAttributesEventAttributes !== null
     ) {
-      message.upsertWorkflowSearchAttributesEventAttributes = UpsertWorkflowSearchAttributesEventAttributes.fromJSON(
-        object.upsertWorkflowSearchAttributesEventAttributes,
-      );
+      message.upsertWorkflowSearchAttributesEventAttributes =
+        UpsertWorkflowSearchAttributesEventAttributes.fromJSON(
+          object.upsertWorkflowSearchAttributesEventAttributes,
+        );
     } else {
       message.upsertWorkflowSearchAttributesEventAttributes = undefined;
     }
@@ -9092,89 +9147,103 @@ export const HistoryEvent = {
     message.version !== undefined && (obj.version = message.version);
     message.taskId !== undefined && (obj.taskId = message.taskId);
     message.workflowExecutionStartedEventAttributes !== undefined &&
-      (obj.workflowExecutionStartedEventAttributes = message.workflowExecutionStartedEventAttributes
-        ? WorkflowExecutionStartedEventAttributes.toJSON(
-            message.workflowExecutionStartedEventAttributes,
-          )
-        : undefined);
+      (obj.workflowExecutionStartedEventAttributes =
+        message.workflowExecutionStartedEventAttributes
+          ? WorkflowExecutionStartedEventAttributes.toJSON(
+              message.workflowExecutionStartedEventAttributes,
+            )
+          : undefined);
     message.workflowExecutionCompletedEventAttributes !== undefined &&
-      (obj.workflowExecutionCompletedEventAttributes = message.workflowExecutionCompletedEventAttributes
-        ? WorkflowExecutionCompletedEventAttributes.toJSON(
-            message.workflowExecutionCompletedEventAttributes,
-          )
-        : undefined);
+      (obj.workflowExecutionCompletedEventAttributes =
+        message.workflowExecutionCompletedEventAttributes
+          ? WorkflowExecutionCompletedEventAttributes.toJSON(
+              message.workflowExecutionCompletedEventAttributes,
+            )
+          : undefined);
     message.workflowExecutionFailedEventAttributes !== undefined &&
-      (obj.workflowExecutionFailedEventAttributes = message.workflowExecutionFailedEventAttributes
-        ? WorkflowExecutionFailedEventAttributes.toJSON(
-            message.workflowExecutionFailedEventAttributes,
-          )
-        : undefined);
+      (obj.workflowExecutionFailedEventAttributes =
+        message.workflowExecutionFailedEventAttributes
+          ? WorkflowExecutionFailedEventAttributes.toJSON(
+              message.workflowExecutionFailedEventAttributes,
+            )
+          : undefined);
     message.workflowExecutionTimedOutEventAttributes !== undefined &&
-      (obj.workflowExecutionTimedOutEventAttributes = message.workflowExecutionTimedOutEventAttributes
-        ? WorkflowExecutionTimedOutEventAttributes.toJSON(
-            message.workflowExecutionTimedOutEventAttributes,
-          )
-        : undefined);
+      (obj.workflowExecutionTimedOutEventAttributes =
+        message.workflowExecutionTimedOutEventAttributes
+          ? WorkflowExecutionTimedOutEventAttributes.toJSON(
+              message.workflowExecutionTimedOutEventAttributes,
+            )
+          : undefined);
     message.workflowTaskScheduledEventAttributes !== undefined &&
-      (obj.workflowTaskScheduledEventAttributes = message.workflowTaskScheduledEventAttributes
-        ? WorkflowTaskScheduledEventAttributes.toJSON(
-            message.workflowTaskScheduledEventAttributes,
-          )
-        : undefined);
+      (obj.workflowTaskScheduledEventAttributes =
+        message.workflowTaskScheduledEventAttributes
+          ? WorkflowTaskScheduledEventAttributes.toJSON(
+              message.workflowTaskScheduledEventAttributes,
+            )
+          : undefined);
     message.workflowTaskStartedEventAttributes !== undefined &&
-      (obj.workflowTaskStartedEventAttributes = message.workflowTaskStartedEventAttributes
-        ? WorkflowTaskStartedEventAttributes.toJSON(
-            message.workflowTaskStartedEventAttributes,
-          )
-        : undefined);
+      (obj.workflowTaskStartedEventAttributes =
+        message.workflowTaskStartedEventAttributes
+          ? WorkflowTaskStartedEventAttributes.toJSON(
+              message.workflowTaskStartedEventAttributes,
+            )
+          : undefined);
     message.workflowTaskCompletedEventAttributes !== undefined &&
-      (obj.workflowTaskCompletedEventAttributes = message.workflowTaskCompletedEventAttributes
-        ? WorkflowTaskCompletedEventAttributes.toJSON(
-            message.workflowTaskCompletedEventAttributes,
-          )
-        : undefined);
+      (obj.workflowTaskCompletedEventAttributes =
+        message.workflowTaskCompletedEventAttributes
+          ? WorkflowTaskCompletedEventAttributes.toJSON(
+              message.workflowTaskCompletedEventAttributes,
+            )
+          : undefined);
     message.workflowTaskTimedOutEventAttributes !== undefined &&
-      (obj.workflowTaskTimedOutEventAttributes = message.workflowTaskTimedOutEventAttributes
-        ? WorkflowTaskTimedOutEventAttributes.toJSON(
-            message.workflowTaskTimedOutEventAttributes,
-          )
-        : undefined);
+      (obj.workflowTaskTimedOutEventAttributes =
+        message.workflowTaskTimedOutEventAttributes
+          ? WorkflowTaskTimedOutEventAttributes.toJSON(
+              message.workflowTaskTimedOutEventAttributes,
+            )
+          : undefined);
     message.workflowTaskFailedEventAttributes !== undefined &&
-      (obj.workflowTaskFailedEventAttributes = message.workflowTaskFailedEventAttributes
-        ? WorkflowTaskFailedEventAttributes.toJSON(
-            message.workflowTaskFailedEventAttributes,
-          )
-        : undefined);
+      (obj.workflowTaskFailedEventAttributes =
+        message.workflowTaskFailedEventAttributes
+          ? WorkflowTaskFailedEventAttributes.toJSON(
+              message.workflowTaskFailedEventAttributes,
+            )
+          : undefined);
     message.activityTaskScheduledEventAttributes !== undefined &&
-      (obj.activityTaskScheduledEventAttributes = message.activityTaskScheduledEventAttributes
-        ? ActivityTaskScheduledEventAttributes.toJSON(
-            message.activityTaskScheduledEventAttributes,
-          )
-        : undefined);
+      (obj.activityTaskScheduledEventAttributes =
+        message.activityTaskScheduledEventAttributes
+          ? ActivityTaskScheduledEventAttributes.toJSON(
+              message.activityTaskScheduledEventAttributes,
+            )
+          : undefined);
     message.activityTaskStartedEventAttributes !== undefined &&
-      (obj.activityTaskStartedEventAttributes = message.activityTaskStartedEventAttributes
-        ? ActivityTaskStartedEventAttributes.toJSON(
-            message.activityTaskStartedEventAttributes,
-          )
-        : undefined);
+      (obj.activityTaskStartedEventAttributes =
+        message.activityTaskStartedEventAttributes
+          ? ActivityTaskStartedEventAttributes.toJSON(
+              message.activityTaskStartedEventAttributes,
+            )
+          : undefined);
     message.activityTaskCompletedEventAttributes !== undefined &&
-      (obj.activityTaskCompletedEventAttributes = message.activityTaskCompletedEventAttributes
-        ? ActivityTaskCompletedEventAttributes.toJSON(
-            message.activityTaskCompletedEventAttributes,
-          )
-        : undefined);
+      (obj.activityTaskCompletedEventAttributes =
+        message.activityTaskCompletedEventAttributes
+          ? ActivityTaskCompletedEventAttributes.toJSON(
+              message.activityTaskCompletedEventAttributes,
+            )
+          : undefined);
     message.activityTaskFailedEventAttributes !== undefined &&
-      (obj.activityTaskFailedEventAttributes = message.activityTaskFailedEventAttributes
-        ? ActivityTaskFailedEventAttributes.toJSON(
-            message.activityTaskFailedEventAttributes,
-          )
-        : undefined);
+      (obj.activityTaskFailedEventAttributes =
+        message.activityTaskFailedEventAttributes
+          ? ActivityTaskFailedEventAttributes.toJSON(
+              message.activityTaskFailedEventAttributes,
+            )
+          : undefined);
     message.activityTaskTimedOutEventAttributes !== undefined &&
-      (obj.activityTaskTimedOutEventAttributes = message.activityTaskTimedOutEventAttributes
-        ? ActivityTaskTimedOutEventAttributes.toJSON(
-            message.activityTaskTimedOutEventAttributes,
-          )
-        : undefined);
+      (obj.activityTaskTimedOutEventAttributes =
+        message.activityTaskTimedOutEventAttributes
+          ? ActivityTaskTimedOutEventAttributes.toJSON(
+              message.activityTaskTimedOutEventAttributes,
+            )
+          : undefined);
     message.timerStartedEventAttributes !== undefined &&
       (obj.timerStartedEventAttributes = message.timerStartedEventAttributes
         ? TimerStartedEventAttributes.toJSON(
@@ -9186,17 +9255,19 @@ export const HistoryEvent = {
         ? TimerFiredEventAttributes.toJSON(message.timerFiredEventAttributes)
         : undefined);
     message.activityTaskCancelRequestedEventAttributes !== undefined &&
-      (obj.activityTaskCancelRequestedEventAttributes = message.activityTaskCancelRequestedEventAttributes
-        ? ActivityTaskCancelRequestedEventAttributes.toJSON(
-            message.activityTaskCancelRequestedEventAttributes,
-          )
-        : undefined);
+      (obj.activityTaskCancelRequestedEventAttributes =
+        message.activityTaskCancelRequestedEventAttributes
+          ? ActivityTaskCancelRequestedEventAttributes.toJSON(
+              message.activityTaskCancelRequestedEventAttributes,
+            )
+          : undefined);
     message.activityTaskCanceledEventAttributes !== undefined &&
-      (obj.activityTaskCanceledEventAttributes = message.activityTaskCanceledEventAttributes
-        ? ActivityTaskCanceledEventAttributes.toJSON(
-            message.activityTaskCanceledEventAttributes,
-          )
-        : undefined);
+      (obj.activityTaskCanceledEventAttributes =
+        message.activityTaskCanceledEventAttributes
+          ? ActivityTaskCanceledEventAttributes.toJSON(
+              message.activityTaskCanceledEventAttributes,
+            )
+          : undefined);
     message.timerCanceledEventAttributes !== undefined &&
       (obj.timerCanceledEventAttributes = message.timerCanceledEventAttributes
         ? TimerCanceledEventAttributes.toJSON(
@@ -9210,130 +9281,150 @@ export const HistoryEvent = {
           )
         : undefined);
     message.workflowExecutionSignaledEventAttributes !== undefined &&
-      (obj.workflowExecutionSignaledEventAttributes = message.workflowExecutionSignaledEventAttributes
-        ? WorkflowExecutionSignaledEventAttributes.toJSON(
-            message.workflowExecutionSignaledEventAttributes,
-          )
-        : undefined);
+      (obj.workflowExecutionSignaledEventAttributes =
+        message.workflowExecutionSignaledEventAttributes
+          ? WorkflowExecutionSignaledEventAttributes.toJSON(
+              message.workflowExecutionSignaledEventAttributes,
+            )
+          : undefined);
     message.workflowExecutionTerminatedEventAttributes !== undefined &&
-      (obj.workflowExecutionTerminatedEventAttributes = message.workflowExecutionTerminatedEventAttributes
-        ? WorkflowExecutionTerminatedEventAttributes.toJSON(
-            message.workflowExecutionTerminatedEventAttributes,
-          )
-        : undefined);
+      (obj.workflowExecutionTerminatedEventAttributes =
+        message.workflowExecutionTerminatedEventAttributes
+          ? WorkflowExecutionTerminatedEventAttributes.toJSON(
+              message.workflowExecutionTerminatedEventAttributes,
+            )
+          : undefined);
     message.workflowExecutionCancelRequestedEventAttributes !== undefined &&
-      (obj.workflowExecutionCancelRequestedEventAttributes = message.workflowExecutionCancelRequestedEventAttributes
-        ? WorkflowExecutionCancelRequestedEventAttributes.toJSON(
-            message.workflowExecutionCancelRequestedEventAttributes,
-          )
-        : undefined);
+      (obj.workflowExecutionCancelRequestedEventAttributes =
+        message.workflowExecutionCancelRequestedEventAttributes
+          ? WorkflowExecutionCancelRequestedEventAttributes.toJSON(
+              message.workflowExecutionCancelRequestedEventAttributes,
+            )
+          : undefined);
     message.workflowExecutionCanceledEventAttributes !== undefined &&
-      (obj.workflowExecutionCanceledEventAttributes = message.workflowExecutionCanceledEventAttributes
-        ? WorkflowExecutionCanceledEventAttributes.toJSON(
-            message.workflowExecutionCanceledEventAttributes,
-          )
-        : undefined);
+      (obj.workflowExecutionCanceledEventAttributes =
+        message.workflowExecutionCanceledEventAttributes
+          ? WorkflowExecutionCanceledEventAttributes.toJSON(
+              message.workflowExecutionCanceledEventAttributes,
+            )
+          : undefined);
     message.requestCancelExternalWorkflowExecutionInitiatedEventAttributes !==
       undefined &&
-      (obj.requestCancelExternalWorkflowExecutionInitiatedEventAttributes = message.requestCancelExternalWorkflowExecutionInitiatedEventAttributes
-        ? RequestCancelExternalWorkflowExecutionInitiatedEventAttributes.toJSON(
-            message.requestCancelExternalWorkflowExecutionInitiatedEventAttributes,
-          )
-        : undefined);
+      (obj.requestCancelExternalWorkflowExecutionInitiatedEventAttributes =
+        message.requestCancelExternalWorkflowExecutionInitiatedEventAttributes
+          ? RequestCancelExternalWorkflowExecutionInitiatedEventAttributes.toJSON(
+              message.requestCancelExternalWorkflowExecutionInitiatedEventAttributes,
+            )
+          : undefined);
     message.requestCancelExternalWorkflowExecutionFailedEventAttributes !==
       undefined &&
-      (obj.requestCancelExternalWorkflowExecutionFailedEventAttributes = message.requestCancelExternalWorkflowExecutionFailedEventAttributes
-        ? RequestCancelExternalWorkflowExecutionFailedEventAttributes.toJSON(
-            message.requestCancelExternalWorkflowExecutionFailedEventAttributes,
-          )
-        : undefined);
+      (obj.requestCancelExternalWorkflowExecutionFailedEventAttributes =
+        message.requestCancelExternalWorkflowExecutionFailedEventAttributes
+          ? RequestCancelExternalWorkflowExecutionFailedEventAttributes.toJSON(
+              message.requestCancelExternalWorkflowExecutionFailedEventAttributes,
+            )
+          : undefined);
     message.externalWorkflowExecutionCancelRequestedEventAttributes !==
       undefined &&
-      (obj.externalWorkflowExecutionCancelRequestedEventAttributes = message.externalWorkflowExecutionCancelRequestedEventAttributes
-        ? ExternalWorkflowExecutionCancelRequestedEventAttributes.toJSON(
-            message.externalWorkflowExecutionCancelRequestedEventAttributes,
-          )
-        : undefined);
+      (obj.externalWorkflowExecutionCancelRequestedEventAttributes =
+        message.externalWorkflowExecutionCancelRequestedEventAttributes
+          ? ExternalWorkflowExecutionCancelRequestedEventAttributes.toJSON(
+              message.externalWorkflowExecutionCancelRequestedEventAttributes,
+            )
+          : undefined);
     message.workflowExecutionContinuedAsNewEventAttributes !== undefined &&
-      (obj.workflowExecutionContinuedAsNewEventAttributes = message.workflowExecutionContinuedAsNewEventAttributes
-        ? WorkflowExecutionContinuedAsNewEventAttributes.toJSON(
-            message.workflowExecutionContinuedAsNewEventAttributes,
-          )
-        : undefined);
+      (obj.workflowExecutionContinuedAsNewEventAttributes =
+        message.workflowExecutionContinuedAsNewEventAttributes
+          ? WorkflowExecutionContinuedAsNewEventAttributes.toJSON(
+              message.workflowExecutionContinuedAsNewEventAttributes,
+            )
+          : undefined);
     message.startChildWorkflowExecutionInitiatedEventAttributes !== undefined &&
-      (obj.startChildWorkflowExecutionInitiatedEventAttributes = message.startChildWorkflowExecutionInitiatedEventAttributes
-        ? StartChildWorkflowExecutionInitiatedEventAttributes.toJSON(
-            message.startChildWorkflowExecutionInitiatedEventAttributes,
-          )
-        : undefined);
+      (obj.startChildWorkflowExecutionInitiatedEventAttributes =
+        message.startChildWorkflowExecutionInitiatedEventAttributes
+          ? StartChildWorkflowExecutionInitiatedEventAttributes.toJSON(
+              message.startChildWorkflowExecutionInitiatedEventAttributes,
+            )
+          : undefined);
     message.startChildWorkflowExecutionFailedEventAttributes !== undefined &&
-      (obj.startChildWorkflowExecutionFailedEventAttributes = message.startChildWorkflowExecutionFailedEventAttributes
-        ? StartChildWorkflowExecutionFailedEventAttributes.toJSON(
-            message.startChildWorkflowExecutionFailedEventAttributes,
-          )
-        : undefined);
+      (obj.startChildWorkflowExecutionFailedEventAttributes =
+        message.startChildWorkflowExecutionFailedEventAttributes
+          ? StartChildWorkflowExecutionFailedEventAttributes.toJSON(
+              message.startChildWorkflowExecutionFailedEventAttributes,
+            )
+          : undefined);
     message.childWorkflowExecutionStartedEventAttributes !== undefined &&
-      (obj.childWorkflowExecutionStartedEventAttributes = message.childWorkflowExecutionStartedEventAttributes
-        ? ChildWorkflowExecutionStartedEventAttributes.toJSON(
-            message.childWorkflowExecutionStartedEventAttributes,
-          )
-        : undefined);
+      (obj.childWorkflowExecutionStartedEventAttributes =
+        message.childWorkflowExecutionStartedEventAttributes
+          ? ChildWorkflowExecutionStartedEventAttributes.toJSON(
+              message.childWorkflowExecutionStartedEventAttributes,
+            )
+          : undefined);
     message.childWorkflowExecutionCompletedEventAttributes !== undefined &&
-      (obj.childWorkflowExecutionCompletedEventAttributes = message.childWorkflowExecutionCompletedEventAttributes
-        ? ChildWorkflowExecutionCompletedEventAttributes.toJSON(
-            message.childWorkflowExecutionCompletedEventAttributes,
-          )
-        : undefined);
+      (obj.childWorkflowExecutionCompletedEventAttributes =
+        message.childWorkflowExecutionCompletedEventAttributes
+          ? ChildWorkflowExecutionCompletedEventAttributes.toJSON(
+              message.childWorkflowExecutionCompletedEventAttributes,
+            )
+          : undefined);
     message.childWorkflowExecutionFailedEventAttributes !== undefined &&
-      (obj.childWorkflowExecutionFailedEventAttributes = message.childWorkflowExecutionFailedEventAttributes
-        ? ChildWorkflowExecutionFailedEventAttributes.toJSON(
-            message.childWorkflowExecutionFailedEventAttributes,
-          )
-        : undefined);
+      (obj.childWorkflowExecutionFailedEventAttributes =
+        message.childWorkflowExecutionFailedEventAttributes
+          ? ChildWorkflowExecutionFailedEventAttributes.toJSON(
+              message.childWorkflowExecutionFailedEventAttributes,
+            )
+          : undefined);
     message.childWorkflowExecutionCanceledEventAttributes !== undefined &&
-      (obj.childWorkflowExecutionCanceledEventAttributes = message.childWorkflowExecutionCanceledEventAttributes
-        ? ChildWorkflowExecutionCanceledEventAttributes.toJSON(
-            message.childWorkflowExecutionCanceledEventAttributes,
-          )
-        : undefined);
+      (obj.childWorkflowExecutionCanceledEventAttributes =
+        message.childWorkflowExecutionCanceledEventAttributes
+          ? ChildWorkflowExecutionCanceledEventAttributes.toJSON(
+              message.childWorkflowExecutionCanceledEventAttributes,
+            )
+          : undefined);
     message.childWorkflowExecutionTimedOutEventAttributes !== undefined &&
-      (obj.childWorkflowExecutionTimedOutEventAttributes = message.childWorkflowExecutionTimedOutEventAttributes
-        ? ChildWorkflowExecutionTimedOutEventAttributes.toJSON(
-            message.childWorkflowExecutionTimedOutEventAttributes,
-          )
-        : undefined);
+      (obj.childWorkflowExecutionTimedOutEventAttributes =
+        message.childWorkflowExecutionTimedOutEventAttributes
+          ? ChildWorkflowExecutionTimedOutEventAttributes.toJSON(
+              message.childWorkflowExecutionTimedOutEventAttributes,
+            )
+          : undefined);
     message.childWorkflowExecutionTerminatedEventAttributes !== undefined &&
-      (obj.childWorkflowExecutionTerminatedEventAttributes = message.childWorkflowExecutionTerminatedEventAttributes
-        ? ChildWorkflowExecutionTerminatedEventAttributes.toJSON(
-            message.childWorkflowExecutionTerminatedEventAttributes,
-          )
-        : undefined);
+      (obj.childWorkflowExecutionTerminatedEventAttributes =
+        message.childWorkflowExecutionTerminatedEventAttributes
+          ? ChildWorkflowExecutionTerminatedEventAttributes.toJSON(
+              message.childWorkflowExecutionTerminatedEventAttributes,
+            )
+          : undefined);
     message.signalExternalWorkflowExecutionInitiatedEventAttributes !==
       undefined &&
-      (obj.signalExternalWorkflowExecutionInitiatedEventAttributes = message.signalExternalWorkflowExecutionInitiatedEventAttributes
-        ? SignalExternalWorkflowExecutionInitiatedEventAttributes.toJSON(
-            message.signalExternalWorkflowExecutionInitiatedEventAttributes,
-          )
-        : undefined);
+      (obj.signalExternalWorkflowExecutionInitiatedEventAttributes =
+        message.signalExternalWorkflowExecutionInitiatedEventAttributes
+          ? SignalExternalWorkflowExecutionInitiatedEventAttributes.toJSON(
+              message.signalExternalWorkflowExecutionInitiatedEventAttributes,
+            )
+          : undefined);
     message.signalExternalWorkflowExecutionFailedEventAttributes !==
       undefined &&
-      (obj.signalExternalWorkflowExecutionFailedEventAttributes = message.signalExternalWorkflowExecutionFailedEventAttributes
-        ? SignalExternalWorkflowExecutionFailedEventAttributes.toJSON(
-            message.signalExternalWorkflowExecutionFailedEventAttributes,
-          )
-        : undefined);
+      (obj.signalExternalWorkflowExecutionFailedEventAttributes =
+        message.signalExternalWorkflowExecutionFailedEventAttributes
+          ? SignalExternalWorkflowExecutionFailedEventAttributes.toJSON(
+              message.signalExternalWorkflowExecutionFailedEventAttributes,
+            )
+          : undefined);
     message.externalWorkflowExecutionSignaledEventAttributes !== undefined &&
-      (obj.externalWorkflowExecutionSignaledEventAttributes = message.externalWorkflowExecutionSignaledEventAttributes
-        ? ExternalWorkflowExecutionSignaledEventAttributes.toJSON(
-            message.externalWorkflowExecutionSignaledEventAttributes,
-          )
-        : undefined);
+      (obj.externalWorkflowExecutionSignaledEventAttributes =
+        message.externalWorkflowExecutionSignaledEventAttributes
+          ? ExternalWorkflowExecutionSignaledEventAttributes.toJSON(
+              message.externalWorkflowExecutionSignaledEventAttributes,
+            )
+          : undefined);
     message.upsertWorkflowSearchAttributesEventAttributes !== undefined &&
-      (obj.upsertWorkflowSearchAttributesEventAttributes = message.upsertWorkflowSearchAttributesEventAttributes
-        ? UpsertWorkflowSearchAttributesEventAttributes.toJSON(
-            message.upsertWorkflowSearchAttributesEventAttributes,
-          )
-        : undefined);
+      (obj.upsertWorkflowSearchAttributesEventAttributes =
+        message.upsertWorkflowSearchAttributesEventAttributes
+          ? UpsertWorkflowSearchAttributesEventAttributes.toJSON(
+              message.upsertWorkflowSearchAttributesEventAttributes,
+            )
+          : undefined);
     return obj;
   },
 
@@ -9368,9 +9459,10 @@ export const HistoryEvent = {
       object.workflowExecutionStartedEventAttributes !== undefined &&
       object.workflowExecutionStartedEventAttributes !== null
     ) {
-      message.workflowExecutionStartedEventAttributes = WorkflowExecutionStartedEventAttributes.fromPartial(
-        object.workflowExecutionStartedEventAttributes,
-      );
+      message.workflowExecutionStartedEventAttributes =
+        WorkflowExecutionStartedEventAttributes.fromPartial(
+          object.workflowExecutionStartedEventAttributes,
+        );
     } else {
       message.workflowExecutionStartedEventAttributes = undefined;
     }
@@ -9378,9 +9470,10 @@ export const HistoryEvent = {
       object.workflowExecutionCompletedEventAttributes !== undefined &&
       object.workflowExecutionCompletedEventAttributes !== null
     ) {
-      message.workflowExecutionCompletedEventAttributes = WorkflowExecutionCompletedEventAttributes.fromPartial(
-        object.workflowExecutionCompletedEventAttributes,
-      );
+      message.workflowExecutionCompletedEventAttributes =
+        WorkflowExecutionCompletedEventAttributes.fromPartial(
+          object.workflowExecutionCompletedEventAttributes,
+        );
     } else {
       message.workflowExecutionCompletedEventAttributes = undefined;
     }
@@ -9388,9 +9481,10 @@ export const HistoryEvent = {
       object.workflowExecutionFailedEventAttributes !== undefined &&
       object.workflowExecutionFailedEventAttributes !== null
     ) {
-      message.workflowExecutionFailedEventAttributes = WorkflowExecutionFailedEventAttributes.fromPartial(
-        object.workflowExecutionFailedEventAttributes,
-      );
+      message.workflowExecutionFailedEventAttributes =
+        WorkflowExecutionFailedEventAttributes.fromPartial(
+          object.workflowExecutionFailedEventAttributes,
+        );
     } else {
       message.workflowExecutionFailedEventAttributes = undefined;
     }
@@ -9398,9 +9492,10 @@ export const HistoryEvent = {
       object.workflowExecutionTimedOutEventAttributes !== undefined &&
       object.workflowExecutionTimedOutEventAttributes !== null
     ) {
-      message.workflowExecutionTimedOutEventAttributes = WorkflowExecutionTimedOutEventAttributes.fromPartial(
-        object.workflowExecutionTimedOutEventAttributes,
-      );
+      message.workflowExecutionTimedOutEventAttributes =
+        WorkflowExecutionTimedOutEventAttributes.fromPartial(
+          object.workflowExecutionTimedOutEventAttributes,
+        );
     } else {
       message.workflowExecutionTimedOutEventAttributes = undefined;
     }
@@ -9408,9 +9503,10 @@ export const HistoryEvent = {
       object.workflowTaskScheduledEventAttributes !== undefined &&
       object.workflowTaskScheduledEventAttributes !== null
     ) {
-      message.workflowTaskScheduledEventAttributes = WorkflowTaskScheduledEventAttributes.fromPartial(
-        object.workflowTaskScheduledEventAttributes,
-      );
+      message.workflowTaskScheduledEventAttributes =
+        WorkflowTaskScheduledEventAttributes.fromPartial(
+          object.workflowTaskScheduledEventAttributes,
+        );
     } else {
       message.workflowTaskScheduledEventAttributes = undefined;
     }
@@ -9418,9 +9514,10 @@ export const HistoryEvent = {
       object.workflowTaskStartedEventAttributes !== undefined &&
       object.workflowTaskStartedEventAttributes !== null
     ) {
-      message.workflowTaskStartedEventAttributes = WorkflowTaskStartedEventAttributes.fromPartial(
-        object.workflowTaskStartedEventAttributes,
-      );
+      message.workflowTaskStartedEventAttributes =
+        WorkflowTaskStartedEventAttributes.fromPartial(
+          object.workflowTaskStartedEventAttributes,
+        );
     } else {
       message.workflowTaskStartedEventAttributes = undefined;
     }
@@ -9428,9 +9525,10 @@ export const HistoryEvent = {
       object.workflowTaskCompletedEventAttributes !== undefined &&
       object.workflowTaskCompletedEventAttributes !== null
     ) {
-      message.workflowTaskCompletedEventAttributes = WorkflowTaskCompletedEventAttributes.fromPartial(
-        object.workflowTaskCompletedEventAttributes,
-      );
+      message.workflowTaskCompletedEventAttributes =
+        WorkflowTaskCompletedEventAttributes.fromPartial(
+          object.workflowTaskCompletedEventAttributes,
+        );
     } else {
       message.workflowTaskCompletedEventAttributes = undefined;
     }
@@ -9438,9 +9536,10 @@ export const HistoryEvent = {
       object.workflowTaskTimedOutEventAttributes !== undefined &&
       object.workflowTaskTimedOutEventAttributes !== null
     ) {
-      message.workflowTaskTimedOutEventAttributes = WorkflowTaskTimedOutEventAttributes.fromPartial(
-        object.workflowTaskTimedOutEventAttributes,
-      );
+      message.workflowTaskTimedOutEventAttributes =
+        WorkflowTaskTimedOutEventAttributes.fromPartial(
+          object.workflowTaskTimedOutEventAttributes,
+        );
     } else {
       message.workflowTaskTimedOutEventAttributes = undefined;
     }
@@ -9448,9 +9547,10 @@ export const HistoryEvent = {
       object.workflowTaskFailedEventAttributes !== undefined &&
       object.workflowTaskFailedEventAttributes !== null
     ) {
-      message.workflowTaskFailedEventAttributes = WorkflowTaskFailedEventAttributes.fromPartial(
-        object.workflowTaskFailedEventAttributes,
-      );
+      message.workflowTaskFailedEventAttributes =
+        WorkflowTaskFailedEventAttributes.fromPartial(
+          object.workflowTaskFailedEventAttributes,
+        );
     } else {
       message.workflowTaskFailedEventAttributes = undefined;
     }
@@ -9458,9 +9558,10 @@ export const HistoryEvent = {
       object.activityTaskScheduledEventAttributes !== undefined &&
       object.activityTaskScheduledEventAttributes !== null
     ) {
-      message.activityTaskScheduledEventAttributes = ActivityTaskScheduledEventAttributes.fromPartial(
-        object.activityTaskScheduledEventAttributes,
-      );
+      message.activityTaskScheduledEventAttributes =
+        ActivityTaskScheduledEventAttributes.fromPartial(
+          object.activityTaskScheduledEventAttributes,
+        );
     } else {
       message.activityTaskScheduledEventAttributes = undefined;
     }
@@ -9468,9 +9569,10 @@ export const HistoryEvent = {
       object.activityTaskStartedEventAttributes !== undefined &&
       object.activityTaskStartedEventAttributes !== null
     ) {
-      message.activityTaskStartedEventAttributes = ActivityTaskStartedEventAttributes.fromPartial(
-        object.activityTaskStartedEventAttributes,
-      );
+      message.activityTaskStartedEventAttributes =
+        ActivityTaskStartedEventAttributes.fromPartial(
+          object.activityTaskStartedEventAttributes,
+        );
     } else {
       message.activityTaskStartedEventAttributes = undefined;
     }
@@ -9478,9 +9580,10 @@ export const HistoryEvent = {
       object.activityTaskCompletedEventAttributes !== undefined &&
       object.activityTaskCompletedEventAttributes !== null
     ) {
-      message.activityTaskCompletedEventAttributes = ActivityTaskCompletedEventAttributes.fromPartial(
-        object.activityTaskCompletedEventAttributes,
-      );
+      message.activityTaskCompletedEventAttributes =
+        ActivityTaskCompletedEventAttributes.fromPartial(
+          object.activityTaskCompletedEventAttributes,
+        );
     } else {
       message.activityTaskCompletedEventAttributes = undefined;
     }
@@ -9488,9 +9591,10 @@ export const HistoryEvent = {
       object.activityTaskFailedEventAttributes !== undefined &&
       object.activityTaskFailedEventAttributes !== null
     ) {
-      message.activityTaskFailedEventAttributes = ActivityTaskFailedEventAttributes.fromPartial(
-        object.activityTaskFailedEventAttributes,
-      );
+      message.activityTaskFailedEventAttributes =
+        ActivityTaskFailedEventAttributes.fromPartial(
+          object.activityTaskFailedEventAttributes,
+        );
     } else {
       message.activityTaskFailedEventAttributes = undefined;
     }
@@ -9498,9 +9602,10 @@ export const HistoryEvent = {
       object.activityTaskTimedOutEventAttributes !== undefined &&
       object.activityTaskTimedOutEventAttributes !== null
     ) {
-      message.activityTaskTimedOutEventAttributes = ActivityTaskTimedOutEventAttributes.fromPartial(
-        object.activityTaskTimedOutEventAttributes,
-      );
+      message.activityTaskTimedOutEventAttributes =
+        ActivityTaskTimedOutEventAttributes.fromPartial(
+          object.activityTaskTimedOutEventAttributes,
+        );
     } else {
       message.activityTaskTimedOutEventAttributes = undefined;
     }
@@ -9508,9 +9613,10 @@ export const HistoryEvent = {
       object.timerStartedEventAttributes !== undefined &&
       object.timerStartedEventAttributes !== null
     ) {
-      message.timerStartedEventAttributes = TimerStartedEventAttributes.fromPartial(
-        object.timerStartedEventAttributes,
-      );
+      message.timerStartedEventAttributes =
+        TimerStartedEventAttributes.fromPartial(
+          object.timerStartedEventAttributes,
+        );
     } else {
       message.timerStartedEventAttributes = undefined;
     }
@@ -9528,9 +9634,10 @@ export const HistoryEvent = {
       object.activityTaskCancelRequestedEventAttributes !== undefined &&
       object.activityTaskCancelRequestedEventAttributes !== null
     ) {
-      message.activityTaskCancelRequestedEventAttributes = ActivityTaskCancelRequestedEventAttributes.fromPartial(
-        object.activityTaskCancelRequestedEventAttributes,
-      );
+      message.activityTaskCancelRequestedEventAttributes =
+        ActivityTaskCancelRequestedEventAttributes.fromPartial(
+          object.activityTaskCancelRequestedEventAttributes,
+        );
     } else {
       message.activityTaskCancelRequestedEventAttributes = undefined;
     }
@@ -9538,9 +9645,10 @@ export const HistoryEvent = {
       object.activityTaskCanceledEventAttributes !== undefined &&
       object.activityTaskCanceledEventAttributes !== null
     ) {
-      message.activityTaskCanceledEventAttributes = ActivityTaskCanceledEventAttributes.fromPartial(
-        object.activityTaskCanceledEventAttributes,
-      );
+      message.activityTaskCanceledEventAttributes =
+        ActivityTaskCanceledEventAttributes.fromPartial(
+          object.activityTaskCanceledEventAttributes,
+        );
     } else {
       message.activityTaskCanceledEventAttributes = undefined;
     }
@@ -9548,9 +9656,10 @@ export const HistoryEvent = {
       object.timerCanceledEventAttributes !== undefined &&
       object.timerCanceledEventAttributes !== null
     ) {
-      message.timerCanceledEventAttributes = TimerCanceledEventAttributes.fromPartial(
-        object.timerCanceledEventAttributes,
-      );
+      message.timerCanceledEventAttributes =
+        TimerCanceledEventAttributes.fromPartial(
+          object.timerCanceledEventAttributes,
+        );
     } else {
       message.timerCanceledEventAttributes = undefined;
     }
@@ -9558,9 +9667,10 @@ export const HistoryEvent = {
       object.markerRecordedEventAttributes !== undefined &&
       object.markerRecordedEventAttributes !== null
     ) {
-      message.markerRecordedEventAttributes = MarkerRecordedEventAttributes.fromPartial(
-        object.markerRecordedEventAttributes,
-      );
+      message.markerRecordedEventAttributes =
+        MarkerRecordedEventAttributes.fromPartial(
+          object.markerRecordedEventAttributes,
+        );
     } else {
       message.markerRecordedEventAttributes = undefined;
     }
@@ -9568,9 +9678,10 @@ export const HistoryEvent = {
       object.workflowExecutionSignaledEventAttributes !== undefined &&
       object.workflowExecutionSignaledEventAttributes !== null
     ) {
-      message.workflowExecutionSignaledEventAttributes = WorkflowExecutionSignaledEventAttributes.fromPartial(
-        object.workflowExecutionSignaledEventAttributes,
-      );
+      message.workflowExecutionSignaledEventAttributes =
+        WorkflowExecutionSignaledEventAttributes.fromPartial(
+          object.workflowExecutionSignaledEventAttributes,
+        );
     } else {
       message.workflowExecutionSignaledEventAttributes = undefined;
     }
@@ -9578,9 +9689,10 @@ export const HistoryEvent = {
       object.workflowExecutionTerminatedEventAttributes !== undefined &&
       object.workflowExecutionTerminatedEventAttributes !== null
     ) {
-      message.workflowExecutionTerminatedEventAttributes = WorkflowExecutionTerminatedEventAttributes.fromPartial(
-        object.workflowExecutionTerminatedEventAttributes,
-      );
+      message.workflowExecutionTerminatedEventAttributes =
+        WorkflowExecutionTerminatedEventAttributes.fromPartial(
+          object.workflowExecutionTerminatedEventAttributes,
+        );
     } else {
       message.workflowExecutionTerminatedEventAttributes = undefined;
     }
@@ -9588,9 +9700,10 @@ export const HistoryEvent = {
       object.workflowExecutionCancelRequestedEventAttributes !== undefined &&
       object.workflowExecutionCancelRequestedEventAttributes !== null
     ) {
-      message.workflowExecutionCancelRequestedEventAttributes = WorkflowExecutionCancelRequestedEventAttributes.fromPartial(
-        object.workflowExecutionCancelRequestedEventAttributes,
-      );
+      message.workflowExecutionCancelRequestedEventAttributes =
+        WorkflowExecutionCancelRequestedEventAttributes.fromPartial(
+          object.workflowExecutionCancelRequestedEventAttributes,
+        );
     } else {
       message.workflowExecutionCancelRequestedEventAttributes = undefined;
     }
@@ -9598,9 +9711,10 @@ export const HistoryEvent = {
       object.workflowExecutionCanceledEventAttributes !== undefined &&
       object.workflowExecutionCanceledEventAttributes !== null
     ) {
-      message.workflowExecutionCanceledEventAttributes = WorkflowExecutionCanceledEventAttributes.fromPartial(
-        object.workflowExecutionCanceledEventAttributes,
-      );
+      message.workflowExecutionCanceledEventAttributes =
+        WorkflowExecutionCanceledEventAttributes.fromPartial(
+          object.workflowExecutionCanceledEventAttributes,
+        );
     } else {
       message.workflowExecutionCanceledEventAttributes = undefined;
     }
@@ -9610,11 +9724,13 @@ export const HistoryEvent = {
       object.requestCancelExternalWorkflowExecutionInitiatedEventAttributes !==
         null
     ) {
-      message.requestCancelExternalWorkflowExecutionInitiatedEventAttributes = RequestCancelExternalWorkflowExecutionInitiatedEventAttributes.fromPartial(
-        object.requestCancelExternalWorkflowExecutionInitiatedEventAttributes,
-      );
+      message.requestCancelExternalWorkflowExecutionInitiatedEventAttributes =
+        RequestCancelExternalWorkflowExecutionInitiatedEventAttributes.fromPartial(
+          object.requestCancelExternalWorkflowExecutionInitiatedEventAttributes,
+        );
     } else {
-      message.requestCancelExternalWorkflowExecutionInitiatedEventAttributes = undefined;
+      message.requestCancelExternalWorkflowExecutionInitiatedEventAttributes =
+        undefined;
     }
     if (
       object.requestCancelExternalWorkflowExecutionFailedEventAttributes !==
@@ -9622,30 +9738,35 @@ export const HistoryEvent = {
       object.requestCancelExternalWorkflowExecutionFailedEventAttributes !==
         null
     ) {
-      message.requestCancelExternalWorkflowExecutionFailedEventAttributes = RequestCancelExternalWorkflowExecutionFailedEventAttributes.fromPartial(
-        object.requestCancelExternalWorkflowExecutionFailedEventAttributes,
-      );
+      message.requestCancelExternalWorkflowExecutionFailedEventAttributes =
+        RequestCancelExternalWorkflowExecutionFailedEventAttributes.fromPartial(
+          object.requestCancelExternalWorkflowExecutionFailedEventAttributes,
+        );
     } else {
-      message.requestCancelExternalWorkflowExecutionFailedEventAttributes = undefined;
+      message.requestCancelExternalWorkflowExecutionFailedEventAttributes =
+        undefined;
     }
     if (
       object.externalWorkflowExecutionCancelRequestedEventAttributes !==
         undefined &&
       object.externalWorkflowExecutionCancelRequestedEventAttributes !== null
     ) {
-      message.externalWorkflowExecutionCancelRequestedEventAttributes = ExternalWorkflowExecutionCancelRequestedEventAttributes.fromPartial(
-        object.externalWorkflowExecutionCancelRequestedEventAttributes,
-      );
+      message.externalWorkflowExecutionCancelRequestedEventAttributes =
+        ExternalWorkflowExecutionCancelRequestedEventAttributes.fromPartial(
+          object.externalWorkflowExecutionCancelRequestedEventAttributes,
+        );
     } else {
-      message.externalWorkflowExecutionCancelRequestedEventAttributes = undefined;
+      message.externalWorkflowExecutionCancelRequestedEventAttributes =
+        undefined;
     }
     if (
       object.workflowExecutionContinuedAsNewEventAttributes !== undefined &&
       object.workflowExecutionContinuedAsNewEventAttributes !== null
     ) {
-      message.workflowExecutionContinuedAsNewEventAttributes = WorkflowExecutionContinuedAsNewEventAttributes.fromPartial(
-        object.workflowExecutionContinuedAsNewEventAttributes,
-      );
+      message.workflowExecutionContinuedAsNewEventAttributes =
+        WorkflowExecutionContinuedAsNewEventAttributes.fromPartial(
+          object.workflowExecutionContinuedAsNewEventAttributes,
+        );
     } else {
       message.workflowExecutionContinuedAsNewEventAttributes = undefined;
     }
@@ -9654,9 +9775,10 @@ export const HistoryEvent = {
         undefined &&
       object.startChildWorkflowExecutionInitiatedEventAttributes !== null
     ) {
-      message.startChildWorkflowExecutionInitiatedEventAttributes = StartChildWorkflowExecutionInitiatedEventAttributes.fromPartial(
-        object.startChildWorkflowExecutionInitiatedEventAttributes,
-      );
+      message.startChildWorkflowExecutionInitiatedEventAttributes =
+        StartChildWorkflowExecutionInitiatedEventAttributes.fromPartial(
+          object.startChildWorkflowExecutionInitiatedEventAttributes,
+        );
     } else {
       message.startChildWorkflowExecutionInitiatedEventAttributes = undefined;
     }
@@ -9664,9 +9786,10 @@ export const HistoryEvent = {
       object.startChildWorkflowExecutionFailedEventAttributes !== undefined &&
       object.startChildWorkflowExecutionFailedEventAttributes !== null
     ) {
-      message.startChildWorkflowExecutionFailedEventAttributes = StartChildWorkflowExecutionFailedEventAttributes.fromPartial(
-        object.startChildWorkflowExecutionFailedEventAttributes,
-      );
+      message.startChildWorkflowExecutionFailedEventAttributes =
+        StartChildWorkflowExecutionFailedEventAttributes.fromPartial(
+          object.startChildWorkflowExecutionFailedEventAttributes,
+        );
     } else {
       message.startChildWorkflowExecutionFailedEventAttributes = undefined;
     }
@@ -9674,9 +9797,10 @@ export const HistoryEvent = {
       object.childWorkflowExecutionStartedEventAttributes !== undefined &&
       object.childWorkflowExecutionStartedEventAttributes !== null
     ) {
-      message.childWorkflowExecutionStartedEventAttributes = ChildWorkflowExecutionStartedEventAttributes.fromPartial(
-        object.childWorkflowExecutionStartedEventAttributes,
-      );
+      message.childWorkflowExecutionStartedEventAttributes =
+        ChildWorkflowExecutionStartedEventAttributes.fromPartial(
+          object.childWorkflowExecutionStartedEventAttributes,
+        );
     } else {
       message.childWorkflowExecutionStartedEventAttributes = undefined;
     }
@@ -9684,9 +9808,10 @@ export const HistoryEvent = {
       object.childWorkflowExecutionCompletedEventAttributes !== undefined &&
       object.childWorkflowExecutionCompletedEventAttributes !== null
     ) {
-      message.childWorkflowExecutionCompletedEventAttributes = ChildWorkflowExecutionCompletedEventAttributes.fromPartial(
-        object.childWorkflowExecutionCompletedEventAttributes,
-      );
+      message.childWorkflowExecutionCompletedEventAttributes =
+        ChildWorkflowExecutionCompletedEventAttributes.fromPartial(
+          object.childWorkflowExecutionCompletedEventAttributes,
+        );
     } else {
       message.childWorkflowExecutionCompletedEventAttributes = undefined;
     }
@@ -9694,9 +9819,10 @@ export const HistoryEvent = {
       object.childWorkflowExecutionFailedEventAttributes !== undefined &&
       object.childWorkflowExecutionFailedEventAttributes !== null
     ) {
-      message.childWorkflowExecutionFailedEventAttributes = ChildWorkflowExecutionFailedEventAttributes.fromPartial(
-        object.childWorkflowExecutionFailedEventAttributes,
-      );
+      message.childWorkflowExecutionFailedEventAttributes =
+        ChildWorkflowExecutionFailedEventAttributes.fromPartial(
+          object.childWorkflowExecutionFailedEventAttributes,
+        );
     } else {
       message.childWorkflowExecutionFailedEventAttributes = undefined;
     }
@@ -9704,9 +9830,10 @@ export const HistoryEvent = {
       object.childWorkflowExecutionCanceledEventAttributes !== undefined &&
       object.childWorkflowExecutionCanceledEventAttributes !== null
     ) {
-      message.childWorkflowExecutionCanceledEventAttributes = ChildWorkflowExecutionCanceledEventAttributes.fromPartial(
-        object.childWorkflowExecutionCanceledEventAttributes,
-      );
+      message.childWorkflowExecutionCanceledEventAttributes =
+        ChildWorkflowExecutionCanceledEventAttributes.fromPartial(
+          object.childWorkflowExecutionCanceledEventAttributes,
+        );
     } else {
       message.childWorkflowExecutionCanceledEventAttributes = undefined;
     }
@@ -9714,9 +9841,10 @@ export const HistoryEvent = {
       object.childWorkflowExecutionTimedOutEventAttributes !== undefined &&
       object.childWorkflowExecutionTimedOutEventAttributes !== null
     ) {
-      message.childWorkflowExecutionTimedOutEventAttributes = ChildWorkflowExecutionTimedOutEventAttributes.fromPartial(
-        object.childWorkflowExecutionTimedOutEventAttributes,
-      );
+      message.childWorkflowExecutionTimedOutEventAttributes =
+        ChildWorkflowExecutionTimedOutEventAttributes.fromPartial(
+          object.childWorkflowExecutionTimedOutEventAttributes,
+        );
     } else {
       message.childWorkflowExecutionTimedOutEventAttributes = undefined;
     }
@@ -9724,9 +9852,10 @@ export const HistoryEvent = {
       object.childWorkflowExecutionTerminatedEventAttributes !== undefined &&
       object.childWorkflowExecutionTerminatedEventAttributes !== null
     ) {
-      message.childWorkflowExecutionTerminatedEventAttributes = ChildWorkflowExecutionTerminatedEventAttributes.fromPartial(
-        object.childWorkflowExecutionTerminatedEventAttributes,
-      );
+      message.childWorkflowExecutionTerminatedEventAttributes =
+        ChildWorkflowExecutionTerminatedEventAttributes.fromPartial(
+          object.childWorkflowExecutionTerminatedEventAttributes,
+        );
     } else {
       message.childWorkflowExecutionTerminatedEventAttributes = undefined;
     }
@@ -9735,20 +9864,23 @@ export const HistoryEvent = {
         undefined &&
       object.signalExternalWorkflowExecutionInitiatedEventAttributes !== null
     ) {
-      message.signalExternalWorkflowExecutionInitiatedEventAttributes = SignalExternalWorkflowExecutionInitiatedEventAttributes.fromPartial(
-        object.signalExternalWorkflowExecutionInitiatedEventAttributes,
-      );
+      message.signalExternalWorkflowExecutionInitiatedEventAttributes =
+        SignalExternalWorkflowExecutionInitiatedEventAttributes.fromPartial(
+          object.signalExternalWorkflowExecutionInitiatedEventAttributes,
+        );
     } else {
-      message.signalExternalWorkflowExecutionInitiatedEventAttributes = undefined;
+      message.signalExternalWorkflowExecutionInitiatedEventAttributes =
+        undefined;
     }
     if (
       object.signalExternalWorkflowExecutionFailedEventAttributes !==
         undefined &&
       object.signalExternalWorkflowExecutionFailedEventAttributes !== null
     ) {
-      message.signalExternalWorkflowExecutionFailedEventAttributes = SignalExternalWorkflowExecutionFailedEventAttributes.fromPartial(
-        object.signalExternalWorkflowExecutionFailedEventAttributes,
-      );
+      message.signalExternalWorkflowExecutionFailedEventAttributes =
+        SignalExternalWorkflowExecutionFailedEventAttributes.fromPartial(
+          object.signalExternalWorkflowExecutionFailedEventAttributes,
+        );
     } else {
       message.signalExternalWorkflowExecutionFailedEventAttributes = undefined;
     }
@@ -9756,9 +9888,10 @@ export const HistoryEvent = {
       object.externalWorkflowExecutionSignaledEventAttributes !== undefined &&
       object.externalWorkflowExecutionSignaledEventAttributes !== null
     ) {
-      message.externalWorkflowExecutionSignaledEventAttributes = ExternalWorkflowExecutionSignaledEventAttributes.fromPartial(
-        object.externalWorkflowExecutionSignaledEventAttributes,
-      );
+      message.externalWorkflowExecutionSignaledEventAttributes =
+        ExternalWorkflowExecutionSignaledEventAttributes.fromPartial(
+          object.externalWorkflowExecutionSignaledEventAttributes,
+        );
     } else {
       message.externalWorkflowExecutionSignaledEventAttributes = undefined;
     }
@@ -9766,9 +9899,10 @@ export const HistoryEvent = {
       object.upsertWorkflowSearchAttributesEventAttributes !== undefined &&
       object.upsertWorkflowSearchAttributesEventAttributes !== null
     ) {
-      message.upsertWorkflowSearchAttributesEventAttributes = UpsertWorkflowSearchAttributesEventAttributes.fromPartial(
-        object.upsertWorkflowSearchAttributesEventAttributes,
-      );
+      message.upsertWorkflowSearchAttributesEventAttributes =
+        UpsertWorkflowSearchAttributesEventAttributes.fromPartial(
+          object.upsertWorkflowSearchAttributesEventAttributes,
+        );
     } else {
       message.upsertWorkflowSearchAttributesEventAttributes = undefined;
     }
