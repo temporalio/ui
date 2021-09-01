@@ -99,7 +99,7 @@
               {namespace}
             </span>
             <span
-              class:text-indigo-600={$currentNamespace == namespace}
+              class:text-indigo-600={$currentNamespace === namespace}
               class="text-white absolute inset-y-0 right-0 flex items-center pr-4"
             >
               <!-- Heroicon name: solid/check -->
