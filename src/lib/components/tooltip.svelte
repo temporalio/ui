@@ -5,7 +5,7 @@
 <div class="wrapper relative inline-block">
   <slot />
   <div class="tooltip">
-    <div class=" bg-gray-800 inline-block px-2 py-2 rounded-lg">
+    <div class="bg-gray-800 inline-block px-2 py-2 rounded-lg">
       <span class="text-gray-100">{text}</span>
     </div>
   </div>
