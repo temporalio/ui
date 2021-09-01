@@ -1,18 +1,18 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
-
+  import { namespace as currentNamespace } from '$lib/stores/namespace';
   import { getContext } from 'svelte';
+  import { goto } from '$app/navigation';
 
   import type { DescribeNamespaceResponse } from '$types/temporal/api/workflowservice/v1/request_response';
 
-  $: currentNamespace = getContext('namespace') as string;
-  $: namespaces = (getContext('namespaces') as DescribeNamespaceResponse[]).map(
+  $: namespaces = getContext<DescribeNamespaceResponse[]>('namespaces').map(
     (namespace) => namespace.namespaceInfo.name,
   );
 
   let showDropdown = false;
   let userSelectedNamespace = null;
   let idx = 0;
+
   function nextNamespace() {
     if (userSelectedNamespace)
       idx = namespaces.findIndex(userSelectedNamespace);
@@ -25,10 +25,10 @@
       userSelectedNamespace = namespaces[idx];
     }
   }
+
   function switchNamespace(newNamespace: string) {
     showDropdown = false;
     goto('/namespaces/' + newNamespace);
-    // todo: this somehow doesnt update the getContext('namespace') correctly
   }
 </script>
 
@@ -46,7 +46,7 @@
       aria-labelledby="listbox-label"
       on:click={() => (showDropdown = !showDropdown)}
     >
-      <span class="block truncate"> {currentNamespace} </span>
+      <span class="block truncate"> {$currentNamespace} </span>
       <span
         class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"
       >
@@ -93,13 +93,13 @@
             role="option"
           >
             <span
-              class:font-semibold={currentNamespace === namespace}
+              class:font-semibold={$currentNamespace === namespace}
               class="font-normal block truncate"
             >
               {namespace}
             </span>
             <span
-              class:text-indigo-600={currentNamespace === namespace}
+              class:text-indigo-600={$currentNamespace === namespace}
               class="text-white absolute inset-y-0 right-0 flex items-center pr-4"
             >
               <!-- Heroicon name: solid/check -->
