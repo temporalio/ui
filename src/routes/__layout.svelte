@@ -6,14 +6,12 @@
   } from '$types/temporal/api/workflowservice/v1/request_response';
 
   export async function load({ fetch, page }: LoadInput) {
-    const { namespace } = page.params;
-
     const { namespaces }: ListNamespacesResponse = await fetch(
       'http://localhost:8080/api/v1/namespaces',
     ).then((response) => response.json());
 
     return {
-      props: { namespaces, namespace },
+      props: { namespaces },
       context: { namespaces },
     };
   }
@@ -26,9 +24,7 @@
   import { setContext } from 'svelte';
 
   export let namespaces: DescribeNamespaceResponse[];
-  export let namespace: string;
 
-  setContext('namespace', namespace);
   setContext('namespaces', namespaces);
 </script>
 

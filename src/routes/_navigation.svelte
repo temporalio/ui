@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
+  import { namespace } from '$lib/stores/namespace';
 
   import {
     Photograph,
@@ -8,8 +8,6 @@
     Identification,
   } from 'svelte-hero-icons';
   import NavigationLink from './_navigation-link.svelte';
-
-  $: namespace = getContext('namespace') as string;
 </script>
 
 <nav
@@ -19,7 +17,7 @@
   <img src="/logo.svg" alt="Temporal Logo" class="rounded-full w-12" />
 
   <NavigationLink
-    href={`/namespaces/${namespace}/workflows`}
+    href={`/namespaces/${$namespace}/workflows`}
     label="Workflows"
     icon={Photograph}
   />
@@ -30,7 +28,7 @@
     icon={DocumentSearch}
   />
   <NavigationLink
-    href={`/namespaces/${namespace}/settings`}
+    href={`/namespaces/${$namespace}/settings`}
     label="Settings"
     icon={Identification}
   />
