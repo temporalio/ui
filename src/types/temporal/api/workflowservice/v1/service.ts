@@ -393,58 +393,43 @@ export class WorkflowServiceClientImpl implements WorkflowService {
     this.UpdateNamespace = this.UpdateNamespace.bind(this);
     this.DeprecateNamespace = this.DeprecateNamespace.bind(this);
     this.StartWorkflowExecution = this.StartWorkflowExecution.bind(this);
-    this.GetWorkflowExecutionHistory = this.GetWorkflowExecutionHistory.bind(
-      this,
-    );
+    this.GetWorkflowExecutionHistory =
+      this.GetWorkflowExecutionHistory.bind(this);
     this.PollWorkflowTaskQueue = this.PollWorkflowTaskQueue.bind(this);
-    this.RespondWorkflowTaskCompleted = this.RespondWorkflowTaskCompleted.bind(
-      this,
-    );
+    this.RespondWorkflowTaskCompleted =
+      this.RespondWorkflowTaskCompleted.bind(this);
     this.RespondWorkflowTaskFailed = this.RespondWorkflowTaskFailed.bind(this);
     this.PollActivityTaskQueue = this.PollActivityTaskQueue.bind(this);
-    this.RecordActivityTaskHeartbeat = this.RecordActivityTaskHeartbeat.bind(
-      this,
-    );
-    this.RecordActivityTaskHeartbeatById = this.RecordActivityTaskHeartbeatById.bind(
-      this,
-    );
-    this.RespondActivityTaskCompleted = this.RespondActivityTaskCompleted.bind(
-      this,
-    );
-    this.RespondActivityTaskCompletedById = this.RespondActivityTaskCompletedById.bind(
-      this,
-    );
+    this.RecordActivityTaskHeartbeat =
+      this.RecordActivityTaskHeartbeat.bind(this);
+    this.RecordActivityTaskHeartbeatById =
+      this.RecordActivityTaskHeartbeatById.bind(this);
+    this.RespondActivityTaskCompleted =
+      this.RespondActivityTaskCompleted.bind(this);
+    this.RespondActivityTaskCompletedById =
+      this.RespondActivityTaskCompletedById.bind(this);
     this.RespondActivityTaskFailed = this.RespondActivityTaskFailed.bind(this);
-    this.RespondActivityTaskFailedById = this.RespondActivityTaskFailedById.bind(
-      this,
-    );
-    this.RespondActivityTaskCanceled = this.RespondActivityTaskCanceled.bind(
-      this,
-    );
-    this.RespondActivityTaskCanceledById = this.RespondActivityTaskCanceledById.bind(
-      this,
-    );
-    this.RequestCancelWorkflowExecution = this.RequestCancelWorkflowExecution.bind(
-      this,
-    );
+    this.RespondActivityTaskFailedById =
+      this.RespondActivityTaskFailedById.bind(this);
+    this.RespondActivityTaskCanceled =
+      this.RespondActivityTaskCanceled.bind(this);
+    this.RespondActivityTaskCanceledById =
+      this.RespondActivityTaskCanceledById.bind(this);
+    this.RequestCancelWorkflowExecution =
+      this.RequestCancelWorkflowExecution.bind(this);
     this.SignalWorkflowExecution = this.SignalWorkflowExecution.bind(this);
-    this.SignalWithStartWorkflowExecution = this.SignalWithStartWorkflowExecution.bind(
-      this,
-    );
+    this.SignalWithStartWorkflowExecution =
+      this.SignalWithStartWorkflowExecution.bind(this);
     this.ResetWorkflowExecution = this.ResetWorkflowExecution.bind(this);
-    this.TerminateWorkflowExecution = this.TerminateWorkflowExecution.bind(
-      this,
-    );
-    this.ListOpenWorkflowExecutions = this.ListOpenWorkflowExecutions.bind(
-      this,
-    );
-    this.ListClosedWorkflowExecutions = this.ListClosedWorkflowExecutions.bind(
-      this,
-    );
+    this.TerminateWorkflowExecution =
+      this.TerminateWorkflowExecution.bind(this);
+    this.ListOpenWorkflowExecutions =
+      this.ListOpenWorkflowExecutions.bind(this);
+    this.ListClosedWorkflowExecutions =
+      this.ListClosedWorkflowExecutions.bind(this);
     this.ListWorkflowExecutions = this.ListWorkflowExecutions.bind(this);
-    this.ListArchivedWorkflowExecutions = this.ListArchivedWorkflowExecutions.bind(
-      this,
-    );
+    this.ListArchivedWorkflowExecutions =
+      this.ListArchivedWorkflowExecutions.bind(this);
     this.ScanWorkflowExecutions = this.ScanWorkflowExecutions.bind(this);
     this.CountWorkflowExecutions = this.CountWorkflowExecutions.bind(this);
     this.GetSearchAttributes = this.GetSearchAttributes.bind(this);
@@ -627,9 +612,8 @@ export class WorkflowServiceClientImpl implements WorkflowService {
   RecordActivityTaskHeartbeatById(
     request: RecordActivityTaskHeartbeatByIdRequest,
   ): Promise<RecordActivityTaskHeartbeatByIdResponse> {
-    const data = RecordActivityTaskHeartbeatByIdRequest.encode(
-      request,
-    ).finish();
+    const data =
+      RecordActivityTaskHeartbeatByIdRequest.encode(request).finish();
     const promise = this.rpc.request(
       'temporal.api.workflowservice.v1.WorkflowService',
       'RecordActivityTaskHeartbeatById',
@@ -657,9 +641,8 @@ export class WorkflowServiceClientImpl implements WorkflowService {
   RespondActivityTaskCompletedById(
     request: RespondActivityTaskCompletedByIdRequest,
   ): Promise<RespondActivityTaskCompletedByIdResponse> {
-    const data = RespondActivityTaskCompletedByIdRequest.encode(
-      request,
-    ).finish();
+    const data =
+      RespondActivityTaskCompletedByIdRequest.encode(request).finish();
     const promise = this.rpc.request(
       'temporal.api.workflowservice.v1.WorkflowService',
       'RespondActivityTaskCompletedById',
@@ -715,9 +698,8 @@ export class WorkflowServiceClientImpl implements WorkflowService {
   RespondActivityTaskCanceledById(
     request: RespondActivityTaskCanceledByIdRequest,
   ): Promise<RespondActivityTaskCanceledByIdResponse> {
-    const data = RespondActivityTaskCanceledByIdRequest.encode(
-      request,
-    ).finish();
+    const data =
+      RespondActivityTaskCanceledByIdRequest.encode(request).finish();
     const promise = this.rpc.request(
       'temporal.api.workflowservice.v1.WorkflowService',
       'RespondActivityTaskCanceledById',
@@ -759,9 +741,8 @@ export class WorkflowServiceClientImpl implements WorkflowService {
   SignalWithStartWorkflowExecution(
     request: SignalWithStartWorkflowExecutionRequest,
   ): Promise<SignalWithStartWorkflowExecutionResponse> {
-    const data = SignalWithStartWorkflowExecutionRequest.encode(
-      request,
-    ).finish();
+    const data =
+      SignalWithStartWorkflowExecutionRequest.encode(request).finish();
     const promise = this.rpc.request(
       'temporal.api.workflowservice.v1.WorkflowService',
       'SignalWithStartWorkflowExecution',

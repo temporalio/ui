@@ -32,11 +32,10 @@ export const WorkflowExecutionAPI = {
       `${base}/namespaces/${namespace}/workflows/open`,
     ).then((response) => response.json());
 
-    const {
-      executions: closed,
-    }: ListWorkflowExecutionsResponse = await request(
-      `${base}/namespaces/${namespace}/workflows/closed`,
-    ).then((response) => response.json());
+    const { executions: closed }: ListWorkflowExecutionsResponse =
+      await request(`${base}/namespaces/${namespace}/workflows/closed`).then(
+        (response) => response.json(),
+      );
 
     return [...open, ...closed];
   },

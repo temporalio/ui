@@ -903,9 +903,10 @@ export const RegisterNamespaceRequest = {
       (obj.description = message.description);
     message.ownerEmail !== undefined && (obj.ownerEmail = message.ownerEmail);
     message.workflowExecutionRetentionPeriod !== undefined &&
-      (obj.workflowExecutionRetentionPeriod = message.workflowExecutionRetentionPeriod
-        ? Duration.toJSON(message.workflowExecutionRetentionPeriod)
-        : undefined);
+      (obj.workflowExecutionRetentionPeriod =
+        message.workflowExecutionRetentionPeriod
+          ? Duration.toJSON(message.workflowExecutionRetentionPeriod)
+          : undefined);
     if (message.clusters) {
       obj.clusters = message.clusters.map((e) =>
         e ? ClusterReplicationConfig.toJSON(e) : undefined,
@@ -3695,10 +3696,11 @@ export const RespondWorkflowTaskCompletedRequest = {
           message.binaryChecksum = reader.string();
           break;
         case 8:
-          const entry8 = RespondWorkflowTaskCompletedRequest_QueryResultsEntry.decode(
-            reader,
-            reader.uint32(),
-          );
+          const entry8 =
+            RespondWorkflowTaskCompletedRequest_QueryResultsEntry.decode(
+              reader,
+              reader.uint32(),
+            );
           if (entry8.value !== undefined) {
             message.queryResults[entry8.key] = entry8.value;
           }
@@ -4763,7 +4765,8 @@ export const PollActivityTaskQueueResponse = {
     message.scheduledTime !== undefined &&
       (obj.scheduledTime = message.scheduledTime.toISOString());
     message.currentAttemptScheduledTime !== undefined &&
-      (obj.currentAttemptScheduledTime = message.currentAttemptScheduledTime.toISOString());
+      (obj.currentAttemptScheduledTime =
+        message.currentAttemptScheduledTime.toISOString());
     message.startedTime !== undefined &&
       (obj.startedTime = message.startedTime.toISOString());
     message.attempt !== undefined && (obj.attempt = message.attempt);

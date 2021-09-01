@@ -20,12 +20,8 @@
 
   export let settings: DescribeNamespaceResponse;
 
-  const {
-    namespaceInfo,
-    config,
-    replicationConfig,
-    ...otherSettings
-  } = settings;
+  const { namespaceInfo, config, replicationConfig, ...otherSettings } =
+    settings;
 </script>
 
 <main class="flex flex-wrap">

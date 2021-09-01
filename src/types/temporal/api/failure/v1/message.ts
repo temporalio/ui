@@ -1015,10 +1015,8 @@ export const Failure = {
           );
           break;
         case 12:
-          message.childWorkflowExecutionFailureInfo = ChildWorkflowExecutionFailureInfo.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.childWorkflowExecutionFailureInfo =
+            ChildWorkflowExecutionFailureInfo.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -1124,9 +1122,10 @@ export const Failure = {
       object.childWorkflowExecutionFailureInfo !== undefined &&
       object.childWorkflowExecutionFailureInfo !== null
     ) {
-      message.childWorkflowExecutionFailureInfo = ChildWorkflowExecutionFailureInfo.fromJSON(
-        object.childWorkflowExecutionFailureInfo,
-      );
+      message.childWorkflowExecutionFailureInfo =
+        ChildWorkflowExecutionFailureInfo.fromJSON(
+          object.childWorkflowExecutionFailureInfo,
+        );
     } else {
       message.childWorkflowExecutionFailureInfo = undefined;
     }
@@ -1169,11 +1168,12 @@ export const Failure = {
         ? ActivityFailureInfo.toJSON(message.activityFailureInfo)
         : undefined);
     message.childWorkflowExecutionFailureInfo !== undefined &&
-      (obj.childWorkflowExecutionFailureInfo = message.childWorkflowExecutionFailureInfo
-        ? ChildWorkflowExecutionFailureInfo.toJSON(
-            message.childWorkflowExecutionFailureInfo,
-          )
-        : undefined);
+      (obj.childWorkflowExecutionFailureInfo =
+        message.childWorkflowExecutionFailureInfo
+          ? ChildWorkflowExecutionFailureInfo.toJSON(
+              message.childWorkflowExecutionFailureInfo,
+            )
+          : undefined);
     return obj;
   },
 
@@ -1273,9 +1273,10 @@ export const Failure = {
       object.childWorkflowExecutionFailureInfo !== undefined &&
       object.childWorkflowExecutionFailureInfo !== null
     ) {
-      message.childWorkflowExecutionFailureInfo = ChildWorkflowExecutionFailureInfo.fromPartial(
-        object.childWorkflowExecutionFailureInfo,
-      );
+      message.childWorkflowExecutionFailureInfo =
+        ChildWorkflowExecutionFailureInfo.fromPartial(
+          object.childWorkflowExecutionFailureInfo,
+        );
     } else {
       message.childWorkflowExecutionFailureInfo = undefined;
     }

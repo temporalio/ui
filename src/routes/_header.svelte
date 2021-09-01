@@ -4,9 +4,9 @@
   import NamespaceSelect from '$lib/components/namespace-select.svelte';
 
   export async function load({ fetch }: LoadInput) {
-    const user = await fetch(
-      'http://localhost:8080/api/v1/me/',
-    ).then((response) => response.json());
+    const user = await fetch('http://localhost:8080/api/v1/me/').then(
+      (response) => response.json(),
+    );
 
     return {
       props: { user },

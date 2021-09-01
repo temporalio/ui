@@ -1,44 +1,85 @@
-type HistoryEvent = import('$types/temporal/api/history/v1/message').HistoryEvent;
-type WorkflowExecutionStartedEventAttributes = import('$types/temporal/api/history/v1/message').WorkflowExecutionStartedEventAttributes;
-type WorkflowExecutionCompletedEventAttributes = import('$types/temporal/api/history/v1/message').WorkflowExecutionCompletedEventAttributes;
-type WorkflowExecutionFailedEventAttributes = import('$types/temporal/api/history/v1/message').WorkflowExecutionFailedEventAttributes;
-type WorkflowExecutionTimedOutEventAttributes = import('$types/temporal/api/history/v1/message').WorkflowExecutionTimedOutEventAttributes;
-type WorkflowTaskScheduledEventAttributes = import('$types/temporal/api/history/v1/message').WorkflowTaskScheduledEventAttributes;
-type WorkflowTaskStartedEventAttributes = import('$types/temporal/api/history/v1/message').WorkflowTaskStartedEventAttributes;
-type WorkflowTaskCompletedEventAttributes = import('$types/temporal/api/history/v1/message').WorkflowTaskCompletedEventAttributes;
-type WorkflowTaskTimedOutEventAttributes = import('$types/temporal/api/history/v1/message').WorkflowTaskTimedOutEventAttributes;
-type WorkflowTaskFailedEventAttributes = import('$types/temporal/api/history/v1/message').WorkflowTaskFailedEventAttributes;
-type ActivityTaskScheduledEventAttributes = import('$types/temporal/api/history/v1/message').ActivityTaskScheduledEventAttributes;
-type ActivityTaskStartedEventAttributes = import('$types/temporal/api/history/v1/message').ActivityTaskStartedEventAttributes;
-type ActivityTaskCompletedEventAttributes = import('$types/temporal/api/history/v1/message').ActivityTaskCompletedEventAttributes;
-type ActivityTaskFailedEventAttributes = import('$types/temporal/api/history/v1/message').ActivityTaskFailedEventAttributes;
-type ActivityTaskTimedOutEventAttributes = import('$types/temporal/api/history/v1/message').ActivityTaskTimedOutEventAttributes;
-type TimerStartedEventAttributes = import('$types/temporal/api/history/v1/message').TimerStartedEventAttributes;
-type TimerFiredEventAttributes = import('$types/temporal/api/history/v1/message').TimerFiredEventAttributes;
-type ActivityTaskCancelRequestedEventAttributes = import('$types/temporal/api/history/v1/message').ActivityTaskCancelRequestedEventAttributes;
-type ActivityTaskCanceledEventAttributes = import('$types/temporal/api/history/v1/message').ActivityTaskCanceledEventAttributes;
-type TimerCanceledEventAttributes = import('$types/temporal/api/history/v1/message').TimerCanceledEventAttributes;
-type MarkerRecordedEventAttributes = import('$types/temporal/api/history/v1/message').MarkerRecordedEventAttributes;
-type WorkflowExecutionSignaledEventAttributes = import('$types/temporal/api/history/v1/message').WorkflowExecutionSignaledEventAttributes;
-type WorkflowExecutionTerminatedEventAttributes = import('$types/temporal/api/history/v1/message').WorkflowExecutionTerminatedEventAttributes;
-type WorkflowExecutionCancelRequestedEventAttributes = import('$types/temporal/api/history/v1/message').WorkflowExecutionCancelRequestedEventAttributes;
-type WorkflowExecutionCanceledEventAttributes = import('$types/temporal/api/history/v1/message').WorkflowExecutionCanceledEventAttributes;
-type RequestCancelExternalWorkflowExecutionInitiatedEventAttributes = import('$types/temporal/api/history/v1/message').RequestCancelExternalWorkflowExecutionInitiatedEventAttributes;
-type RequestCancelExternalWorkflowExecutionFailedEventAttributes = import('$types/temporal/api/history/v1/message').RequestCancelExternalWorkflowExecutionFailedEventAttributes;
-type ExternalWorkflowExecutionCancelRequestedEventAttributes = import('$types/temporal/api/history/v1/message').ExternalWorkflowExecutionCancelRequestedEventAttributes;
-type WorkflowExecutionContinuedAsNewEventAttributes = import('$types/temporal/api/history/v1/message').WorkflowExecutionContinuedAsNewEventAttributes;
-type StartChildWorkflowExecutionInitiatedEventAttributes = import('$types/temporal/api/history/v1/message').StartChildWorkflowExecutionInitiatedEventAttributes;
-type StartChildWorkflowExecutionFailedEventAttributes = import('$types/temporal/api/history/v1/message').StartChildWorkflowExecutionFailedEventAttributes;
-type ChildWorkflowExecutionStartedEventAttributes = import('$types/temporal/api/history/v1/message').ChildWorkflowExecutionStartedEventAttributes;
-type ChildWorkflowExecutionCompletedEventAttributes = import('$types/temporal/api/history/v1/message').ChildWorkflowExecutionCompletedEventAttributes;
-type ChildWorkflowExecutionFailedEventAttributes = import('$types/temporal/api/history/v1/message').ChildWorkflowExecutionFailedEventAttributes;
-type ChildWorkflowExecutionCanceledEventAttributes = import('$types/temporal/api/history/v1/message').ChildWorkflowExecutionCanceledEventAttributes;
-type ChildWorkflowExecutionTimedOutEventAttributes = import('$types/temporal/api/history/v1/message').ChildWorkflowExecutionTimedOutEventAttributes;
-type ChildWorkflowExecutionTerminatedEventAttributes = import('$types/temporal/api/history/v1/message').ChildWorkflowExecutionTerminatedEventAttributes;
-type SignalExternalWorkflowExecutionInitiatedEventAttributes = import('$types/temporal/api/history/v1/message').SignalExternalWorkflowExecutionInitiatedEventAttributes;
-type SignalExternalWorkflowExecutionFailedEventAttributes = import('$types/temporal/api/history/v1/message').SignalExternalWorkflowExecutionFailedEventAttributes;
-type ExternalWorkflowExecutionSignaledEventAttributes = import('$types/temporal/api/history/v1/message').ExternalWorkflowExecutionSignaledEventAttributes;
-type UpsertWorkflowSearchAttributesEventAttributes = import('$types/temporal/api/history/v1/message').UpsertWorkflowSearchAttributesEventAttributes;
+type HistoryEvent =
+  import('$types/temporal/api/history/v1/message').HistoryEvent;
+type WorkflowExecutionStartedEventAttributes =
+  import('$types/temporal/api/history/v1/message').WorkflowExecutionStartedEventAttributes;
+type WorkflowExecutionCompletedEventAttributes =
+  import('$types/temporal/api/history/v1/message').WorkflowExecutionCompletedEventAttributes;
+type WorkflowExecutionFailedEventAttributes =
+  import('$types/temporal/api/history/v1/message').WorkflowExecutionFailedEventAttributes;
+type WorkflowExecutionTimedOutEventAttributes =
+  import('$types/temporal/api/history/v1/message').WorkflowExecutionTimedOutEventAttributes;
+type WorkflowTaskScheduledEventAttributes =
+  import('$types/temporal/api/history/v1/message').WorkflowTaskScheduledEventAttributes;
+type WorkflowTaskStartedEventAttributes =
+  import('$types/temporal/api/history/v1/message').WorkflowTaskStartedEventAttributes;
+type WorkflowTaskCompletedEventAttributes =
+  import('$types/temporal/api/history/v1/message').WorkflowTaskCompletedEventAttributes;
+type WorkflowTaskTimedOutEventAttributes =
+  import('$types/temporal/api/history/v1/message').WorkflowTaskTimedOutEventAttributes;
+type WorkflowTaskFailedEventAttributes =
+  import('$types/temporal/api/history/v1/message').WorkflowTaskFailedEventAttributes;
+type ActivityTaskScheduledEventAttributes =
+  import('$types/temporal/api/history/v1/message').ActivityTaskScheduledEventAttributes;
+type ActivityTaskStartedEventAttributes =
+  import('$types/temporal/api/history/v1/message').ActivityTaskStartedEventAttributes;
+type ActivityTaskCompletedEventAttributes =
+  import('$types/temporal/api/history/v1/message').ActivityTaskCompletedEventAttributes;
+type ActivityTaskFailedEventAttributes =
+  import('$types/temporal/api/history/v1/message').ActivityTaskFailedEventAttributes;
+type ActivityTaskTimedOutEventAttributes =
+  import('$types/temporal/api/history/v1/message').ActivityTaskTimedOutEventAttributes;
+type TimerStartedEventAttributes =
+  import('$types/temporal/api/history/v1/message').TimerStartedEventAttributes;
+type TimerFiredEventAttributes =
+  import('$types/temporal/api/history/v1/message').TimerFiredEventAttributes;
+type ActivityTaskCancelRequestedEventAttributes =
+  import('$types/temporal/api/history/v1/message').ActivityTaskCancelRequestedEventAttributes;
+type ActivityTaskCanceledEventAttributes =
+  import('$types/temporal/api/history/v1/message').ActivityTaskCanceledEventAttributes;
+type TimerCanceledEventAttributes =
+  import('$types/temporal/api/history/v1/message').TimerCanceledEventAttributes;
+type MarkerRecordedEventAttributes =
+  import('$types/temporal/api/history/v1/message').MarkerRecordedEventAttributes;
+type WorkflowExecutionSignaledEventAttributes =
+  import('$types/temporal/api/history/v1/message').WorkflowExecutionSignaledEventAttributes;
+type WorkflowExecutionTerminatedEventAttributes =
+  import('$types/temporal/api/history/v1/message').WorkflowExecutionTerminatedEventAttributes;
+type WorkflowExecutionCancelRequestedEventAttributes =
+  import('$types/temporal/api/history/v1/message').WorkflowExecutionCancelRequestedEventAttributes;
+type WorkflowExecutionCanceledEventAttributes =
+  import('$types/temporal/api/history/v1/message').WorkflowExecutionCanceledEventAttributes;
+type RequestCancelExternalWorkflowExecutionInitiatedEventAttributes =
+  import('$types/temporal/api/history/v1/message').RequestCancelExternalWorkflowExecutionInitiatedEventAttributes;
+type RequestCancelExternalWorkflowExecutionFailedEventAttributes =
+  import('$types/temporal/api/history/v1/message').RequestCancelExternalWorkflowExecutionFailedEventAttributes;
+type ExternalWorkflowExecutionCancelRequestedEventAttributes =
+  import('$types/temporal/api/history/v1/message').ExternalWorkflowExecutionCancelRequestedEventAttributes;
+type WorkflowExecutionContinuedAsNewEventAttributes =
+  import('$types/temporal/api/history/v1/message').WorkflowExecutionContinuedAsNewEventAttributes;
+type StartChildWorkflowExecutionInitiatedEventAttributes =
+  import('$types/temporal/api/history/v1/message').StartChildWorkflowExecutionInitiatedEventAttributes;
+type StartChildWorkflowExecutionFailedEventAttributes =
+  import('$types/temporal/api/history/v1/message').StartChildWorkflowExecutionFailedEventAttributes;
+type ChildWorkflowExecutionStartedEventAttributes =
+  import('$types/temporal/api/history/v1/message').ChildWorkflowExecutionStartedEventAttributes;
+type ChildWorkflowExecutionCompletedEventAttributes =
+  import('$types/temporal/api/history/v1/message').ChildWorkflowExecutionCompletedEventAttributes;
+type ChildWorkflowExecutionFailedEventAttributes =
+  import('$types/temporal/api/history/v1/message').ChildWorkflowExecutionFailedEventAttributes;
+type ChildWorkflowExecutionCanceledEventAttributes =
+  import('$types/temporal/api/history/v1/message').ChildWorkflowExecutionCanceledEventAttributes;
+type ChildWorkflowExecutionTimedOutEventAttributes =
+  import('$types/temporal/api/history/v1/message').ChildWorkflowExecutionTimedOutEventAttributes;
+type ChildWorkflowExecutionTerminatedEventAttributes =
+  import('$types/temporal/api/history/v1/message').ChildWorkflowExecutionTerminatedEventAttributes;
+type SignalExternalWorkflowExecutionInitiatedEventAttributes =
+  import('$types/temporal/api/history/v1/message').SignalExternalWorkflowExecutionInitiatedEventAttributes;
+type SignalExternalWorkflowExecutionFailedEventAttributes =
+  import('$types/temporal/api/history/v1/message').SignalExternalWorkflowExecutionFailedEventAttributes;
+type ExternalWorkflowExecutionSignaledEventAttributes =
+  import('$types/temporal/api/history/v1/message').ExternalWorkflowExecutionSignaledEventAttributes;
+type UpsertWorkflowSearchAttributesEventAttributes =
+  import('$types/temporal/api/history/v1/message').UpsertWorkflowSearchAttributesEventAttributes;
 
 type BaseEvent = Pick<
   HistoryEvent,

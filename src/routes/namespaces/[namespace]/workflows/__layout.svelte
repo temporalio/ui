@@ -39,7 +39,7 @@
   $: workflows = executions.filter((execution) => {
     // Right now, the type generated does not match the actual API response.
     // This is a temporary fix.
-    const executionStatus = (execution.status as unknown) as WorkflowStatus;
+    const executionStatus = execution.status as unknown as WorkflowStatus;
 
     if (status && executionStatus !== status) return false;
     if (workflowType && execution.name !== workflowType) return false;
