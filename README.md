@@ -9,7 +9,7 @@
 While we're in pre-production, you need to do the following before you spin up the development server:
 
 1. Have Temporal running in development. ([See our documentation](https://docs.temporal.io/docs/server/quick-install) for details.)
-2. Clone, build, and start [the UI API Server](https://github.com/temporalio/ui-server)
+2. Clone, build, and start [the UI API Server](https://github.com/temporalio/ui-server).
 
 Once you've created a project and installed dependencies with `npm install`, start the development server:
 
