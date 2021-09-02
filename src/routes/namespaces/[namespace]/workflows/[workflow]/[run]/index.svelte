@@ -14,6 +14,7 @@
 </script>
 
 <script lang="typescript">
+  import { namespace } from '$lib/stores/namespace';
   import { isFullScreen } from '$lib/stores/full-screen';
 
   import type {
@@ -33,10 +34,9 @@
   export let events: GetWorkflowExecutionHistoryResponse;
 
   $: workflow = toWorkflowExecution(execution);
-  $: namespace = getContext('namespace') as string;
   $: inputAndResults = getWorkflowStartedAndCompletedEvents(events);
   $: pendingActivities = workflow.pendingActivities;
-  $: href = getTaskQueueUrl(namespace, workflow.taskQueue);
+  $: href = getTaskQueueUrl($namespace, workflow.taskQueue);
 </script>
 
 <div class="execution-information px-6 py-6 flex flex-col">

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
+  import { namespace } from '$lib/stores/namespace';
   import Icon, { X, ArrowLeft, ArrowRight } from 'svelte-hero-icons';
 
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
@@ -12,8 +12,7 @@
 
   export let workflow: WorkflowExecution;
 
-  $: namespace = getContext('namespace') as string;
-  $: workflowUrl = getWorkflowExecutionUrl(namespace, workflow);
+  $: workflowUrl = getWorkflowExecutionUrl($namespace, workflow);
 </script>
 
 <header class="flex flex-col justify-between">
@@ -33,7 +32,7 @@
         />
       </a>
     {/if}
-    <a href={`/namespaces/${namespace}/workflows`}>
+    <a href={`/namespaces/${$namespace}/workflows`}>
       <Icon src={X} class="absolute right-2 top-2 w-8 h-8 text-gray-400" />
     </a>
     <div class="flex m-0 mt-6 justify-between items-center">

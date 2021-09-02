@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { namespace } from '$lib/stores/namespace';
   import { page } from '$app/stores';
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
   import { getWorkflowExecutionUrl } from '$lib/utilities/get-workflow-execution-url';
@@ -10,8 +11,7 @@
   export let workflow: WorkflowExecution;
   export let timeFormat: string;
 
-  $: namespace = getContext('namespace') as string;
-  $: href = getWorkflowExecutionUrl(namespace, workflow, $page.query);
+  $: href = getWorkflowExecutionUrl($namespace, workflow, $page.query);
   $: isActive = pathMatches(href, $page.path);
 </script>
 
