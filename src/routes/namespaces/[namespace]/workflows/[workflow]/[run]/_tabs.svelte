@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
+  import { namespace } from '$lib/stores/namespace';
   import { page } from '$app/stores';
 
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
@@ -9,8 +9,7 @@
 
   export let workflow: WorkflowExecution;
 
-  $: namespace = getContext('namespace') as string;
-  $: workflowUrl = getWorkflowExecutionUrl(namespace, workflow);
+  $: workflowUrl = getWorkflowExecutionUrl($namespace, workflow);
   $: summaryUrl = workflowUrl + '/summary';
   $: eventsUrl = workflowUrl + '/events';
 </script>
