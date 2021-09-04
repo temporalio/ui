@@ -5,5 +5,3 @@ node_modules
 /cypress/videos
 /build-local
 /build-cloud
-/proto
-proto/api

@@ -1,7 +1,7 @@
 import type {
   WorkflowExecutionStartedEventAttributes,
   WorkflowExecutionCompletedEventAttributes,
-} from '$types/temporal/api/history/v1/message';
+} from '$types/definitions';
 import base64 from 'base-64';
 
 type DecodeEvent = BaseEvent & {
