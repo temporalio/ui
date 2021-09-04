@@ -1,6 +1,6 @@
 <script lang="ts">
   export let title: string;
-  export let value: string | number;
+  export let value: string | number | Long;
 </script>
 
 {#if value}

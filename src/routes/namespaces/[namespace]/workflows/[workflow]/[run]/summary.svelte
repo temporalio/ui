@@ -15,8 +15,7 @@
 </script>
 
 <script lang="typescript">
-  import type { DescribeWorkflowExecutionResponse } from '$types/temporal/api/workflowservice/v1/request_response';
-  import type { GetWorkflowExecutionHistoryResponse } from '$types/temporal/api/workflowservice/v1/request_response';
+  import type { GetWorkflowExecutionHistoryResponse, DescribeWorkflowExecutionResponse } from '$types';
 
   import { toWorkflowExecution } from '$lib/models/workflow-execution';
   import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';

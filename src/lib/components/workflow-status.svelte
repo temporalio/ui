@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { WorkflowExecutionStatus } from '$types/temporal/api/enums/v1/workflow';
+  import type { WorkflowExecutionStatus } from '$types';
   export let status: WorkflowExecutionStatus;
 
   const humanFriendlyNames = {

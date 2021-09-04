@@ -3,7 +3,7 @@
   import { getContext } from 'svelte';
   import { goto } from '$app/navigation';
 
-  import type { DescribeNamespaceResponse } from '$types/temporal/api/workflowservice/v1/request_response';
+  import type { DescribeNamespaceResponse } from '$types';
 
   $: namespaces = getContext<DescribeNamespaceResponse[]>('namespaces').map(
     (namespace) => namespace.namespaceInfo.name,

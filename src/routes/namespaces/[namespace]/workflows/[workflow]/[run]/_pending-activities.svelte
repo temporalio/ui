@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { PendingActivityInfo } from '$types/temporal/api/workflow/v1/message';
+  import type { PendingActivityInfo } from '$types';
 
   import PendingActivity from './_pending-activity.svelte';
 

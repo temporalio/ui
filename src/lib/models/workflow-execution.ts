@@ -1,9 +1,9 @@
-import type { WorkflowExecutionStatus } from '$types/temporal/api/enums/v1/workflow';
 import type {
+  WorkflowExecutionStatus,
   PendingActivityInfo,
   WorkflowExecutionInfo,
-} from '$types/temporal/api/workflow/v1/message';
-import type { DescribeWorkflowExecutionResponse } from '$types/temporal/api/workflowservice/v1/request_response';
+  DescribeWorkflowExecutionResponse,
+} from '$types';
 
 import { formatDate } from '$lib/utilities/format-date';
 
@@ -35,7 +35,7 @@ export interface WorkflowExecution {
   endTime: string;
   status: WorkflowExecutionStatus;
   taskQueue?: string;
-  historyEvents: number;
+  historyEvents: Long;
   pendingActivities: PendingActivityInfo[];
 }
 

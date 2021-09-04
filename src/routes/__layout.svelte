@@ -3,7 +3,7 @@
   import type {
     DescribeNamespaceResponse,
     ListNamespacesResponse,
-  } from '$types/temporal/api/workflowservice/v1/request_response';
+  } from '$types';
 
   export async function load({ fetch, page }: LoadInput) {
     const { namespaces }: ListNamespacesResponse = await fetch(

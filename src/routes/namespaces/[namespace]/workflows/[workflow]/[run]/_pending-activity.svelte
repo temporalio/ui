@@ -1,6 +1,6 @@
 <script lang="ts">
   import beautify from 'json-beautify';
-  import type { PendingActivityInfo } from '$types/temporal/api/workflow/v1/message';
+  import type { PendingActivityInfo } from '$types';
   import { formatDate } from '$lib/utilities/format-date';
 
   export let activity: PendingActivityInfo;
