@@ -15,7 +15,10 @@
 </script>
 
 <script lang="typescript">
-  import type { GetWorkflowExecutionHistoryResponse, DescribeWorkflowExecutionResponse } from '$types';
+  import type {
+    GetWorkflowExecutionHistoryResponse,
+    DescribeWorkflowExecutionResponse,
+  } from '$types';
 
   import { toWorkflowExecution } from '$lib/models/workflow-execution';
   import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
