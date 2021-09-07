@@ -4,6 +4,7 @@ import type {
   WorkflowExecutionInfo,
   DescribeWorkflowExecutionResponse,
 } from '$types';
+import type { GetAllWorkflowExecutionsResponse } from '../services/workflow-execution-service';
 
 import { formatDate } from '$lib/utilities/format-date';
 
@@ -14,14 +15,15 @@ export const toWorkflowExecution = (response: WorkflowExecutionAPIResponse) => {
   return new WorkflowExecution(response);
 };
 
-export const toWorkflowExecutions = (response: {
-  executions: WorkflowExecutionInfo[];
-}) => {
+export const toWorkflowExecutions = (
+  response: GetAllWorkflowExecutionsResponse,
+) => {
   return {
     executions: response.executions.map(
       (workflowExecutionInfo) =>
         new WorkflowExecution({ workflowExecutionInfo }),
     ),
+    nextPageTokens: response.nextPageTokens,
   };
 };
 
