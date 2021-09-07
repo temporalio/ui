@@ -1,6 +1,5 @@
 <script lang="ts">
-  import type { DescribeWorkflowExecutionResponse } from '$types/temporal/api/workflowservice/v1/request_response';
-  import type { History } from '$types/temporal/api/history/v1/message';
+  import type { History, DescribeWorkflowExecutionResponse } from '$types';
   import { convertToJSON } from '$lib/utilities/convert-to-json';
   import Icon, { Download } from 'svelte-hero-icons';
 

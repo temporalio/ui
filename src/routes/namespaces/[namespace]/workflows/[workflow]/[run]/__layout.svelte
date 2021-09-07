@@ -37,7 +37,7 @@
 </script>
 
 <script lang="typescript">
-  import type { DescribeWorkflowExecutionResponse } from '$types/temporal/api/workflowservice/v1/request_response';
+  import type { DescribeWorkflowExecutionResponse } from '$types';
 
   import { isFullScreen } from '$lib/stores/full-screen';
   import { toWorkflowExecution } from '$lib/models/workflow-execution';

@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
-  import type { GetSearchAttributesResponse } from '$types/temporal/api/workflowservice/v1/request_response';
+  import type { GetSearchAttributesResponse } from '$types';
   import type { LoadInput } from '@sveltejs/kit';
 
   export async function load({ fetch }: LoadInput) {

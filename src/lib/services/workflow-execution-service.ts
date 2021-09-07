@@ -1,13 +1,11 @@
-import type { WorkflowExecutionInfo } from '$types/temporal/api/workflow/v1/message';
 import type {
+  WorkflowExecutionInfo,
   PollerInfo,
   TaskQueueStatus,
-} from '$types//temporal/api/taskqueue/v1/message';
-import type {
   DescribeWorkflowExecutionResponse,
   GetWorkflowExecutionHistoryResponse,
   ListWorkflowExecutionsResponse,
-} from '$types/temporal/api/workflowservice/v1/request_response';
+} from '$types';
 
 const base = 'http://localhost:8080/api/v1';
 

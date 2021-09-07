@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getComponentForEventType } from '$lib/utilities/get-component-for-event-type';
   import { formatDate } from '$lib/utilities/format-date';
-  import type { HistoryEvent } from '$types/temporal/api/history/v1/message';
+  import type { HistoryEvent } from '$types';
   import ExecutionInformation from '../_execution-information.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
 

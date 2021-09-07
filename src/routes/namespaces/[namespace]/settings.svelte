@@ -1,6 +1,6 @@
 <script context="module" lang="ts">
   import type { LoadInput } from '@sveltejs/kit';
-  import type { DescribeNamespaceResponse } from '$types/temporal/api/workflowservice/v1/request_response';
+  import type { DescribeNamespaceResponse } from '$types';
 
   export async function load({ fetch, page }: LoadInput) {
     const { namespace } = page.params;

@@ -1,4 +1,4 @@
-import type { GetWorkflowExecutionHistoryResponse } from '$types/temporal/api/workflowservice/v1/request_response';
+import type { GetWorkflowExecutionHistoryResponse } from '$types';
 import { convertPayloadToJson } from './decode-payload';
 
 export const getWorkflowStartedAndCompletedEvents = (

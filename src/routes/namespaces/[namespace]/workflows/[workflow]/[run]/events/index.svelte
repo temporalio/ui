@@ -2,7 +2,7 @@
   import type {
     GetWorkflowExecutionHistoryResponse,
     DescribeWorkflowExecutionResponse,
-  } from '$types/temporal/api/workflowservice/v1/request_response';
+  } from '$types';
   import type { LoadInput } from '@sveltejs/kit';
 
   export async function load({ context }: LoadInput) {

@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
-  import type { GetClusterInfoResponse } from '$types/temporal/api/workflowservice/v1/request_response';
+  import type { GetClusterInfoResponse } from '$types';
 
   import type { LoadInput } from '@sveltejs/kit';
 

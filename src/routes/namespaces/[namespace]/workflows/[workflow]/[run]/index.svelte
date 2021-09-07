@@ -20,7 +20,7 @@
   import type {
     DescribeWorkflowExecutionResponse,
     GetWorkflowExecutionHistoryResponse,
-  } from '$types/temporal/api/workflowservice/v1/request_response';
+  } from '$types';
   import { getContext } from 'svelte';
   import { toWorkflowExecution } from '$lib/models/workflow-execution';
   import CodeBlock from '$lib/components/code-block.svelte';
