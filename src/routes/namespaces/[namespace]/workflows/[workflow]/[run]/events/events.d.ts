@@ -1,5 +1,4 @@
-type HistoryEvent =
-  import('$types').HistoryEvent;
+type HistoryEvent = import('$types').HistoryEvent;
 type WorkflowExecutionStartedEventAttributes =
   import('$types').WorkflowExecutionStartedEventAttributes;
 type WorkflowExecutionCompletedEventAttributes =
@@ -28,10 +27,8 @@ type ActivityTaskFailedEventAttributes =
   import('$types').ActivityTaskFailedEventAttributes;
 type ActivityTaskTimedOutEventAttributes =
   import('$types').ActivityTaskTimedOutEventAttributes;
-type TimerStartedEventAttributes =
-  import('$types').TimerStartedEventAttributes;
-type TimerFiredEventAttributes =
-  import('$types').TimerFiredEventAttributes;
+type TimerStartedEventAttributes = import('$types').TimerStartedEventAttributes;
+type TimerFiredEventAttributes = import('$types').TimerFiredEventAttributes;
 type ActivityTaskCancelRequestedEventAttributes =
   import('$types').ActivityTaskCancelRequestedEventAttributes;
 type ActivityTaskCanceledEventAttributes =
