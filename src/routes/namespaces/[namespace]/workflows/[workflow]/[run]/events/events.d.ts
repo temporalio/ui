@@ -1,83 +1,82 @@
-type HistoryEvent = import('$types').IHistoryEvent;
+type HistoryEvent = import('$types').HistoryEvent;
 type WorkflowExecutionStartedEventAttributes =
-  import('$types').IWorkflowExecutionStartedEventAttributes;
+  import('$types').WorkflowExecutionStartedEventAttributes;
 type WorkflowExecutionCompletedEventAttributes =
-  import('$types').IWorkflowExecutionCompletedEventAttributes;
+  import('$types').WorkflowExecutionCompletedEventAttributes;
 type WorkflowExecutionFailedEventAttributes =
-  import('$types').IWorkflowExecutionFailedEventAttributes;
+  import('$types').WorkflowExecutionFailedEventAttributes;
 type WorkflowExecutionTimedOutEventAttributes =
-  import('$types').IWorkflowExecutionTimedOutEventAttributes;
+  import('$types').WorkflowExecutionTimedOutEventAttributes;
 type WorkflowTaskScheduledEventAttributes =
-  import('$types').IWorkflowTaskScheduledEventAttributes;
+  import('$types').WorkflowTaskScheduledEventAttributes;
 type WorkflowTaskStartedEventAttributes =
-  import('$types').IWorkflowTaskStartedEventAttributes;
+  import('$types').WorkflowTaskStartedEventAttributes;
 type WorkflowTaskCompletedEventAttributes =
-  import('$types').IWorkflowTaskCompletedEventAttributes;
+  import('$types').WorkflowTaskCompletedEventAttributes;
 type WorkflowTaskTimedOutEventAttributes =
-  import('$types').IWorkflowTaskTimedOutEventAttributes;
+  import('$types').WorkflowTaskTimedOutEventAttributes;
 type WorkflowTaskFailedEventAttributes =
-  import('$types').IWorkflowTaskFailedEventAttributes;
+  import('$types').WorkflowTaskFailedEventAttributes;
 type ActivityTaskScheduledEventAttributes =
-  import('$types').IActivityTaskScheduledEventAttributes;
+  import('$types').ActivityTaskScheduledEventAttributes;
 type ActivityTaskStartedEventAttributes =
-  import('$types').IActivityTaskStartedEventAttributes;
+  import('$types').ActivityTaskStartedEventAttributes;
 type ActivityTaskCompletedEventAttributes =
-  import('$types').IActivityTaskCompletedEventAttributes;
+  import('$types').ActivityTaskCompletedEventAttributes;
 type ActivityTaskFailedEventAttributes =
-  import('$types').IActivityTaskFailedEventAttributes;
+  import('$types').ActivityTaskFailedEventAttributes;
 type ActivityTaskTimedOutEventAttributes =
-  import('$types').IActivityTaskTimedOutEventAttributes;
-type TimerStartedEventAttributes =
-  import('$types').ITimerStartedEventAttributes;
-type TimerFiredEventAttributes = import('$types').ITimerFiredEventAttributes;
+  import('$types').ActivityTaskTimedOutEventAttributes;
+type TimerStartedEventAttributes = import('$types').TimerStartedEventAttributes;
+type TimerFiredEventAttributes = import('$types').TimerFiredEventAttributes;
 type ActivityTaskCancelRequestedEventAttributes =
-  import('$types').IActivityTaskCancelRequestedEventAttributes;
+  import('$types').ActivityTaskCancelRequestedEventAttributes;
 type ActivityTaskCanceledEventAttributes =
-  import('$types').IActivityTaskCanceledEventAttributes;
+  import('$types').ActivityTaskCanceledEventAttributes;
 type TimerCanceledEventAttributes =
-  import('$types').ITimerCanceledEventAttributes;
+  import('$types').TimerCanceledEventAttributes;
 type MarkerRecordedEventAttributes =
-  import('$types').IMarkerRecordedEventAttributes;
+  import('$types').MarkerRecordedEventAttributes;
 type WorkflowExecutionSignaledEventAttributes =
-  import('$types').IWorkflowExecutionSignaledEventAttributes;
+  import('$types').WorkflowExecutionSignaledEventAttributes;
 type WorkflowExecutionTerminatedEventAttributes =
-  import('$types').IWorkflowExecutionTerminatedEventAttributes;
+  import('$types').WorkflowExecutionTerminatedEventAttributes;
 type WorkflowExecutionCancelRequestedEventAttributes =
-  import('$types').IWorkflowExecutionCancelRequestedEventAttributes;
+  import('$types').WorkflowExecutionCancelRequestedEventAttributes;
 type WorkflowExecutionCanceledEventAttributes =
-  import('$types').IWorkflowExecutionCanceledEventAttributes;
+  import('$types').WorkflowExecutionCanceledEventAttributes;
 type RequestCancelExternalWorkflowExecutionInitiatedEventAttributes =
-  import('$types').IRequestCancelExternalWorkflowExecutionInitiatedEventAttributes;
+  import('$types').RequestCancelExternalWorkflowExecutionInitiatedEventAttributes;
 type RequestCancelExternalWorkflowExecutionFailedEventAttributes =
-  import('$types').IRequestCancelExternalWorkflowExecutionFailedEventAttributes;
+  import('$types').RequestCancelExternalWorkflowExecutionFailedEventAttributes;
 type ExternalWorkflowExecutionCancelRequestedEventAttributes =
-  import('$types').IExternalWorkflowExecutionCancelRequestedEventAttributes;
+  import('$types').ExternalWorkflowExecutionCancelRequestedEventAttributes;
 type WorkflowExecutionContinuedAsNewEventAttributes =
-  import('$types').IWorkflowExecutionContinuedAsNewEventAttributes;
+  import('$types').WorkflowExecutionContinuedAsNewEventAttributes;
 type StartChildWorkflowExecutionInitiatedEventAttributes =
-  import('$types').IStartChildWorkflowExecutionInitiatedEventAttributes;
+  import('$types').StartChildWorkflowExecutionInitiatedEventAttributes;
 type StartChildWorkflowExecutionFailedEventAttributes =
-  import('$types').IStartChildWorkflowExecutionFailedEventAttributes;
+  import('$types').StartChildWorkflowExecutionFailedEventAttributes;
 type ChildWorkflowExecutionStartedEventAttributes =
-  import('$types').IChildWorkflowExecutionStartedEventAttributes;
+  import('$types').ChildWorkflowExecutionStartedEventAttributes;
 type ChildWorkflowExecutionCompletedEventAttributes =
-  import('$types').IChildWorkflowExecutionCompletedEventAttributes;
+  import('$types').ChildWorkflowExecutionCompletedEventAttributes;
 type ChildWorkflowExecutionFailedEventAttributes =
-  import('$types').IChildWorkflowExecutionFailedEventAttributes;
+  import('$types').ChildWorkflowExecutionFailedEventAttributes;
 type ChildWorkflowExecutionCanceledEventAttributes =
-  import('$types').IChildWorkflowExecutionCanceledEventAttributes;
+  import('$types').ChildWorkflowExecutionCanceledEventAttributes;
 type ChildWorkflowExecutionTimedOutEventAttributes =
-  import('$types').IChildWorkflowExecutionTimedOutEventAttributes;
+  import('$types').ChildWorkflowExecutionTimedOutEventAttributes;
 type ChildWorkflowExecutionTerminatedEventAttributes =
-  import('$types').IChildWorkflowExecutionTerminatedEventAttributes;
+  import('$types').ChildWorkflowExecutionTerminatedEventAttributes;
 type SignalExternalWorkflowExecutionInitiatedEventAttributes =
-  import('$types').ISignalExternalWorkflowExecutionInitiatedEventAttributes;
+  import('$types').SignalExternalWorkflowExecutionInitiatedEventAttributes;
 type SignalExternalWorkflowExecutionFailedEventAttributes =
-  import('$types').ISignalExternalWorkflowExecutionFailedEventAttributes;
+  import('$types').SignalExternalWorkflowExecutionFailedEventAttributes;
 type ExternalWorkflowExecutionSignaledEventAttributes =
-  import('$types').IExternalWorkflowExecutionSignaledEventAttributes;
+  import('$types').ExternalWorkflowExecutionSignaledEventAttributes;
 type UpsertWorkflowSearchAttributesEventAttributes =
-  import('$types').IUpsertWorkflowSearchAttributesEventAttributes;
+  import('$types').UpsertWorkflowSearchAttributesEventAttributes;
 
 type BaseEvent = Pick<
   HistoryEvent,
