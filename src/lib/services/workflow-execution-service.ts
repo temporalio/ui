@@ -25,17 +25,26 @@ export const WorkflowExecutionAPI = {
   async getAll(
     { namespace }: GetAllWorkflowExecutionsRequest,
     request = fetch,
-  ): Promise<WorkflowExecutionInfo[]> {
-    const { executions: open }: ListWorkflowExecutionsResponse = await request(
+  ): Promise<{
+    executions: WorkflowExecutionInfo[];
+  }> {
+    const {
+      executions: open,
+      nextPageToken: nextPageTokenOpen,
+    }: ListWorkflowExecutionsResponse = await request(
       `${base}/namespaces/${namespace}/workflows/open`,
     ).then((response) => response.json());
 
-    const { executions: closed }: ListWorkflowExecutionsResponse =
-      await request(`${base}/namespaces/${namespace}/workflows/closed`).then(
-        (response) => response.json(),
-      );
+    const {
+      executions: closed,
+      nextPageToken: nextPageTokenClosed,
+    }: ListWorkflowExecutionsResponse = await request(
+      `${base}/namespaces/${namespace}/workflows/closed`,
+    ).then((response) => response.json());
 
-    return [...open, ...closed];
+    return {
+      executions: [...open, ...closed],
+    };
   },
 
   async get(
