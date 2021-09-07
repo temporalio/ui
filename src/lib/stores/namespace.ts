@@ -11,12 +11,12 @@ const onlyInBrowser = <T>(fn: () => T): T => {
 export const namespace = derived(page, ($page) => {
   const match = pattern.match($page.path);
   const namespace =
-    onlyInBrowser<string>(
+    onlyInBrowser(
       () => localStorage.getItem('currentNamespace') || 'default',
     ) || 'default';
 
   if (match) {
-    onlyInBrowser<void>(() =>
+    onlyInBrowser(() =>
       localStorage.setItem('currentNamespace', match.namespace),
     );
     return match.namespace;
