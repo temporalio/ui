@@ -9,6 +9,13 @@ import type {
 
 const base = 'http://localhost:8080/api/v1';
 
+export type GetAllWorkflowExecutionsResponse = {
+  executions: WorkflowExecutionInfo[];
+  nextPageTokens: {
+    open?: string;
+    closed?: string;
+  };
+};
 export type GetAllWorkflowExecutionsRequest = { namespace: string };
 export type GetWorkflowExecutionRequest = GetAllWorkflowExecutionsRequest & {
   executionId: string;
@@ -25,9 +32,7 @@ export const WorkflowExecutionAPI = {
   async getAll(
     { namespace }: GetAllWorkflowExecutionsRequest,
     request = fetch,
-  ): Promise<{
-    executions: WorkflowExecutionInfo[];
-  }> {
+  ): Promise<GetAllWorkflowExecutionsResponse> {
     const {
       executions: open,
       nextPageToken: nextPageTokenOpen,
@@ -43,7 +48,11 @@ export const WorkflowExecutionAPI = {
     ).then((response) => response.json());
 
     return {
-      executions: [...open, ...closed],
+      executions: [].concat(open).concat(closed),
+      nextPageTokens: {
+        open: String(nextPageTokenOpen),
+        closed: String(nextPageTokenClosed),
+      },
     };
   },
 

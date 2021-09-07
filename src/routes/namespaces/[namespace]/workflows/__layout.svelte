@@ -10,9 +10,7 @@
     const { namespace } = page.params;
     return await WorkflowExecutionAPI.getAll({ namespace }, fetch)
       .then(toWorkflowExecutions)
-      .then((executions) => ({
-        props: { executions },
-      }));
+      .then((props) => ({ props }));
   }
 </script>
 

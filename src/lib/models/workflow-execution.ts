@@ -17,9 +17,12 @@ export const toWorkflowExecution = (response: WorkflowExecutionAPIResponse) => {
 export const toWorkflowExecutions = (response: {
   executions: WorkflowExecutionInfo[];
 }) => {
-  return response.executions.map(
-    (workflowExecutionInfo) => new WorkflowExecution({ workflowExecutionInfo }),
-  );
+  return {
+    executions: response.executions.map(
+      (workflowExecutionInfo) =>
+        new WorkflowExecution({ workflowExecutionInfo }),
+    ),
+  };
 };
 
 /*
