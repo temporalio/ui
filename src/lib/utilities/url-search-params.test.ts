@@ -33,6 +33,17 @@ describe(toSearchParams, () => {
     expect(result.get('a')).toBe(expected.get('a'));
     expect(result.get('b')).toBe(expected.get('b'));
   });
+
+  it('should drop undefined parameters', () => {
+    const expected = new URLSearchParams();
+
+    expected.set('a', '1');
+
+    const result = toSearchParams({ a: 1, b: undefined });
+
+    expect(result.get('a')).toBe(expected.get('a'));
+    expect(result.get('b')).toBe(null);
+  });
 });
 
 describe(mergeSearchParams, () => {
