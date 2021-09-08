@@ -11,27 +11,19 @@ import type {
 
 const base = 'http://localhost:8080/api/v1';
 
-export type GetAllWorkflowExecutionsResponse = {
-  executions: WorkflowExecutionInfo[];
-  nextPageTokens: {
-    open?: string;
-    closed?: string;
-  };
-};
-export type GetAllWorkflowExecutionsRequest = { namespace: string };
-export type GetWorkflowExecutionRequest = GetAllWorkflowExecutionsRequest & {
+export type NamespaceScopedRequest = { namespace: string };
+export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   executionId: string;
   runId: string;
 };
 
-export type GetAllPollersRequest = { namespace: string; queue: string };
+export type GetAllPollersRequest = NamespaceScopedRequest & { queue: string };
 export type GetPollersResponse = {
   pollers: PollerInfo[];
   taskQueueStatus: TaskQueueStatus;
 };
 
-type FetchWorkflows = {
-  namespace: string;
+type FetchWorkflows = NamespaceScopedRequest & {
   nextPageToken?: string;
 };
 
@@ -57,7 +49,7 @@ export const fetchClosedWorkflows = fetchWorkflows('closed');
 
 export const WorkflowExecutionAPI = {
   async getAll(
-    { namespace }: GetAllWorkflowExecutionsRequest,
+    { namespace }: NamespaceScopedRequest,
     request = fetch,
   ): Promise<WorkflowExecutionInfo[]> {
     const open = await fetchOpenWorkflows({ namespace }, request);
