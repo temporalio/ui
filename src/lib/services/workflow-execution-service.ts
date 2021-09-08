@@ -28,6 +28,22 @@ export type GetPollersResponse = {
   taskQueueStatus: TaskQueueStatus;
 };
 
+type FetchWorkflows = {
+  namespace: string;
+  nextPageToken?: string;
+};
+
+const fetchWorkflows =
+  (type: string) =>
+  async ({ namespace, nextPageToken }: FetchWorkflows, request = fetch) => {
+    return request(`${base}/namespaces/${namespace}/workflows/${type}`).then(
+      (response) => response.json(),
+    );
+  };
+
+export const fetchOpenWorkflows = fetchWorkflows('open');
+export const fetchClosedWorkflows = fetchWorkflows('closed');
+
 export const WorkflowExecutionAPI = {
   async getAll(
     { namespace }: GetAllWorkflowExecutionsRequest,
@@ -36,16 +52,18 @@ export const WorkflowExecutionAPI = {
     const {
       executions: open,
       nextPageToken: nextPageTokenOpen,
-    }: ListWorkflowExecutionsResponse = await request(
-      `${base}/namespaces/${namespace}/workflows/open`,
-    ).then((response) => response.json());
+    }: ListWorkflowExecutionsResponse = await fetchOpenWorkflows(
+      { namespace },
+      request,
+    );
 
     const {
       executions: closed,
       nextPageToken: nextPageTokenClosed,
-    }: ListWorkflowExecutionsResponse = await request(
-      `${base}/namespaces/${namespace}/workflows/closed`,
-    ).then((response) => response.json());
+    }: ListWorkflowExecutionsResponse = await fetchClosedWorkflows(
+      { namespace },
+      request,
+    );
 
     return {
       executions: [].concat(open).concat(closed),
