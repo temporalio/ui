@@ -1,6 +1,10 @@
 import { writable } from 'svelte/store';
 
-import { WorkflowExecutionAPI } from '$lib/services/workflow-execution-service';
+import {
+  fetchOpenWorkflows,
+  fetchWorkflows,
+  WorkflowExecutionAPI,
+} from '$lib/services/workflow-execution-service';
 import {
   toWorkflowExecutions,
   WorkflowExecution,
@@ -10,10 +14,14 @@ type WorkflowStore = {
   namespace: string;
 };
 
+const types: ('open' | 'closed')[] = ['open', 'closed'];
+
 export const createWorkflowStore = ({ namespace }: WorkflowStore) => {
   const store = writable({});
 
-  WorkflowExecutionAPI.getAll({ namespace }, fetch)
-    .then(toWorkflowExecutions)
-    .then((props) => ({ props }));
+  for (const type of types) {
+    let nextPageToken: string = null;
+    const request = fetchWorkflows(type);
+    request({ namespace });
+  }
 };

@@ -1,16 +1,16 @@
 <script context="module" lang="ts">
   import type { LoadInput } from '@sveltejs/kit';
-  import { WorkflowExecutionAPI } from '$lib/services/workflow-execution-service';
   import {
     toWorkflowExecutions,
     WorkflowExecution,
   } from '$lib/models/workflow-execution';
+  import { WorkflowExecutionAPI } from '$lib/services/workflow-execution-service';
 
   export async function load({ fetch, page }: LoadInput) {
     const { namespace } = page.params;
     return await WorkflowExecutionAPI.getAll({ namespace }, fetch)
       .then(toWorkflowExecutions)
-      .then((props) => ({ props }));
+      .then((executions) => ({ props: { executions } }));
   }
 </script>
 
@@ -48,6 +48,7 @@
 </script>
 
 <section class="flex items-start">
+  <p>{workflows.length}</p>
   {#if !$isFullScreen}
     <div class="w-full  h-screen overflow-scroll">
       <WorkflowFilters

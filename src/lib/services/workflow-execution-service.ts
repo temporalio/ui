@@ -1,3 +1,5 @@
+import { paginated } from '$lib/utilities/paginated';
+import { toURL } from '$lib/utilities/to-url';
 import type {
   WorkflowExecutionInfo,
   PollerInfo,
@@ -34,11 +36,19 @@ type FetchWorkflows = {
 };
 
 const fetchWorkflows =
-  (type: string) =>
-  async ({ namespace, nextPageToken }: FetchWorkflows, request = fetch) => {
-    return request(`${base}/namespaces/${namespace}/workflows/${type}`).then(
-      (response) => response.json(),
+  (type: 'open' | 'closed') =>
+  async ({ namespace }: FetchWorkflows, request = fetch) => {
+    const { executions } = await paginated<ListWorkflowExecutionsResponse>(
+      (token: string) => {
+        const url = toURL(`${base}/namespaces/${namespace}/workflows/${type}`, {
+          next_page_token: token,
+        });
+
+        return request(url).then((response) => response.json());
+      },
     );
+
+    return executions;
   };
 
 export const fetchOpenWorkflows = fetchWorkflows('open');
@@ -48,30 +58,11 @@ export const WorkflowExecutionAPI = {
   async getAll(
     { namespace }: GetAllWorkflowExecutionsRequest,
     request = fetch,
-  ): Promise<GetAllWorkflowExecutionsResponse> {
-    const {
-      executions: open,
-      nextPageToken: nextPageTokenOpen,
-    }: ListWorkflowExecutionsResponse = await fetchOpenWorkflows(
-      { namespace },
-      request,
-    );
+  ): Promise<WorkflowExecutionInfo[]> {
+    const open = await fetchOpenWorkflows({ namespace }, request);
+    const closed = await fetchClosedWorkflows({ namespace }, request);
 
-    const {
-      executions: closed,
-      nextPageToken: nextPageTokenClosed,
-    }: ListWorkflowExecutionsResponse = await fetchClosedWorkflows(
-      { namespace },
-      request,
-    );
-
-    return {
-      executions: [].concat(open).concat(closed),
-      nextPageTokens: {
-        open: String(nextPageTokenOpen),
-        closed: String(nextPageTokenClosed),
-      },
-    };
+    return [].concat(open).concat(closed);
   },
 
   async get(

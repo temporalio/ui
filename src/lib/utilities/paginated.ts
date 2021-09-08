@@ -1,7 +1,7 @@
 import { merge } from './merge';
 
 type NextPageToken = Uint8Array | string;
-type WithNextPageToken = { nextPageToken: NextPageToken };
+type WithNextPageToken = { nextPageToken?: NextPageToken };
 
 export const paginated = async <T extends WithNextPageToken>(
   fn: (token?: NextPageToken) => Promise<T>,
