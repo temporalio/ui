@@ -1,16 +1,6 @@
 <script context="module" lang="ts">
-  import type { LoadInput } from '@sveltejs/kit';
-  import {
-    toWorkflowExecutions,
-    WorkflowExecution,
-  } from '$lib/models/workflow-execution';
-  import { WorkflowExecutionAPI } from '$lib/services/workflow-execution-service';
-
-  export async function load({ fetch, page }: LoadInput) {
-    const { namespace } = page.params;
-    return await WorkflowExecutionAPI.getAll({ namespace }, fetch)
-      .then(toWorkflowExecutions)
-      .then((executions) => ({ props: { executions } }));
+  export async function load({ page }) {
+    return { props: { namespace: page.params.namespace } };
   }
 </script>
 
@@ -21,8 +11,11 @@
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
   import WorkflowFilters from './_workflow-filters.svelte';
   import { unique } from '$lib/utilities/unique';
+  import { createWorkflowStore } from '$lib/stores/workflows';
 
-  export let executions: WorkflowExecution[];
+  export let namespace: string;
+  let store = createWorkflowStore(namespace);
+  let executions = store.all();
 
   let status = null;
   let workflowType = null;
@@ -30,11 +23,11 @@
   let runId = null;
   let timeFormat = 'relative';
 
-  let workflowTypes = executions
+  $: workflowTypes = $executions
     .map((execution) => execution.name)
     .filter(unique);
 
-  $: workflows = executions.filter((execution) => {
+  $: workflows = $executions.filter((execution) => {
     // Right now, the type generated does not match the actual API response.
     // This is a temporary fix.
     const executionStatus = execution.status as unknown as WorkflowStatus;

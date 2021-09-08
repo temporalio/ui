@@ -23,23 +23,27 @@ export type GetPollersResponse = {
   taskQueueStatus: TaskQueueStatus;
 };
 
-type FetchWorkflows = NamespaceScopedRequest & {
-  nextPageToken?: string;
+type FetchWorkflows<T> = {
+  onUpdate?: (results: Omit<T, 'nextPageToken'>) => void;
+  request?: typeof fetch;
 };
 
 const fetchWorkflows =
   (type: 'open' | 'closed') =>
-  async ({ namespace }: FetchWorkflows, request = fetch) => {
-    const { executions } = await paginated<ListWorkflowExecutionsResponse>(
-      async (token: string) => {
-        const url = toURL(`${base}/namespaces/${namespace}/workflows/${type}`, {
-          next_page_token: token,
-        });
+  async ({
+    namespace,
+    onUpdate = (x) => x,
+    request = fetch,
+  }: NamespaceScopedRequest &
+    FetchWorkflows<ListWorkflowExecutionsResponse>) => {
+    const { executions } = await paginated(async (token: string) => {
+      const url = toURL(`${base}/namespaces/${namespace}/workflows/${type}`, {
+        next_page_token: token,
+      });
 
-        const response = await request(url);
-        return await response.json();
-      },
-    );
+      const response = await request(url);
+      return await response.json();
+    }, onUpdate);
 
     return executions;
   };
@@ -52,8 +56,8 @@ export const WorkflowExecutionAPI = {
     { namespace }: NamespaceScopedRequest,
     request = fetch,
   ): Promise<WorkflowExecutionInfo[]> {
-    const open = await fetchOpenWorkflows({ namespace }, request);
-    const closed = await fetchClosedWorkflows({ namespace }, request);
+    const open = await fetchOpenWorkflows({ namespace, request });
+    const closed = await fetchClosedWorkflows({ namespace, request });
 
     return [].concat(open).concat(closed);
   },
