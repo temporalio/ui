@@ -10,11 +10,15 @@ import { formatDate } from '$lib/utilities/format-date';
 type Optional<T extends unknown, K extends keyof T = keyof T> = Omit<T, K> &
   Partial<Pick<T, K>>;
 
-export const toWorkflowExecution = (response: WorkflowExecutionAPIResponse) => {
+export const toWorkflowExecution = (
+  response: WorkflowExecutionAPIResponse,
+): WorkflowExecution => {
   return new WorkflowExecution(response);
 };
 
-export const toWorkflowExecutions = (executions: WorkflowExecutionInfo[]) => {
+export const toWorkflowExecutions = (
+  executions: WorkflowExecutionInfo[],
+): WorkflowExecution[] => {
   return executions.map(
     (workflowExecutionInfo) => new WorkflowExecution({ workflowExecutionInfo }),
   );

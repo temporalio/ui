@@ -1,4 +1,4 @@
-type KeyValue = { [key: string]: any };
+type KeyValue = { [key: string]: string | number | boolean };
 
 export const merge = <T = KeyValue>(
   first: T = {} as T,

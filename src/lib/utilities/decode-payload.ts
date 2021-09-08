@@ -1,7 +1,7 @@
 import type {
   WorkflowExecutionStartedEventAttributes,
   WorkflowExecutionCompletedEventAttributes,
-} from '$types/definitions';
+} from '$types';
 import base64 from 'base-64';
 
 type DecodeEvent = BaseEvent & {
@@ -9,7 +9,7 @@ type DecodeEvent = BaseEvent & {
   workflowExecutionCompletedEventAttributes?: WorkflowExecutionCompletedEventAttributes;
 };
 
-export const convertPayloadToJson = (event: DecodeEvent) => {
+export const convertPayloadToJson = (event: DecodeEvent): string => {
   if (!event) return;
 
   if (event.workflowExecutionStartedEventAttributes) {
