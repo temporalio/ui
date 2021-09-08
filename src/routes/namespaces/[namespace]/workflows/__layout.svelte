@@ -48,7 +48,6 @@
 </script>
 
 <section class="flex items-start">
-  <p>{workflows.length}</p>
   {#if !$isFullScreen}
     <div class="w-full  h-screen overflow-scroll">
       <WorkflowFilters

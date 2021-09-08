@@ -39,12 +39,13 @@ const fetchWorkflows =
   (type: 'open' | 'closed') =>
   async ({ namespace }: FetchWorkflows, request = fetch) => {
     const { executions } = await paginated<ListWorkflowExecutionsResponse>(
-      (token: string) => {
+      async (token: string) => {
         const url = toURL(`${base}/namespaces/${namespace}/workflows/${type}`, {
           next_page_token: token,
         });
 
-        return request(url).then((response) => response.json());
+        const response = await request(url);
+        return await response.json();
       },
     );
 
