@@ -21,12 +21,13 @@
   import EventsFilters from './_events-filters.svelte';
   export let events: GetWorkflowExecutionHistoryResponse;
   export let execution: DescribeWorkflowExecutionResponse;
+  export let eventType;
 
   let { history } = events;
   let eventFormat: EventFormat = 'grid';
 </script>
 
 <div class="px-6 py-6">
-  <EventsFilters bind:eventFormat {history} {execution} />
-  <Events {history} {eventFormat} />
+  <EventsFilters bind:eventFormat bind:eventType {history} {execution} />
+  <Events {history} {eventFormat} {eventType} />
 </div>

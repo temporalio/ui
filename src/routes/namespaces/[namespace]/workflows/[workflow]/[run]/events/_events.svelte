@@ -5,6 +5,13 @@
 
   export let history: History;
   export let eventFormat: EventFormat;
+  export let eventType;
+
+  $: events = history.events.filter((event) => {
+    if (eventType && !String(event.eventType).startsWith(eventType))
+      return false;
+    return true;
+  });
 </script>
 
 <section>
@@ -19,7 +26,7 @@
         </tr>
       </thead>
       <tbody>
-        {#each history.events as event, index}
+        {#each events as event, index}
           <Event {event} {index} />
         {/each}
       </tbody>
@@ -27,7 +34,7 @@
   {/if}
 
   {#if eventFormat === 'json'}
-    {#each history.events as event}
+    {#each events as event}
       <CodeBlock
         heading={`Event ID: ${event.eventId}`}
         content={JSON.stringify(event)}
