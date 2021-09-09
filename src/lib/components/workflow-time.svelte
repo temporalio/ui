@@ -18,3 +18,9 @@
 {#if time && timeFormat === 'UTC'}
   <p>{utc}</p>
 {/if}
+
+<style lang="postcss">
+  p {
+    @apply font-mono;
+  }
+</style>

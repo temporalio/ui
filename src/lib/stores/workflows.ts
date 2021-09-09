@@ -18,6 +18,8 @@ type WorkflowStore = {
   workflows: { [key: string]: WorkflowExecution };
 };
 
+const stores: { [key: string]: ReturnType<typeof createStore> } = {};
+
 const updateWorkflows =
   (store: Writable<WorkflowStore>) =>
   (payload: ListWorkflowExecutionsResponse) => {
@@ -38,7 +40,16 @@ const updateWorkflows =
     }));
   };
 
-export const createWorkflowStore = (namespace: string) => {
+const fetchWorkflows = (
+  options:
+    | Parameters<typeof fetchOpenWorkflows>[0]
+    | Parameters<typeof fetchClosedWorkflows>[0],
+) => {
+  fetchOpenWorkflows(options);
+  fetchClosedWorkflows(options);
+};
+
+export const createStore = (namespace: string) => {
   const store = writable<WorkflowStore>({
     loading: true,
     updating: false,
@@ -46,14 +57,16 @@ export const createWorkflowStore = (namespace: string) => {
     workflows: {},
   });
 
-  const onUpdate = updateWorkflows(store);
-
-  fetchOpenWorkflows({ namespace, onUpdate });
-  fetchClosedWorkflows({ namespace, onUpdate });
+  fetchWorkflows({ namespace, onUpdate: updateWorkflows(store) });
 
   return {
     subscribe: derived(store, ($store) => Object.keys($store.ids)),
     get: (id: string) => derived(store, ($store) => $store.workflows[id]),
     all: () => derived(store, ($store) => Object.values($store.workflows)),
   };
+};
+
+export const createWorkflowStore = (namespace: string) => {
+  if (!stores[namespace]) stores[namespace] = createStore(namespace);
+  return stores[namespace];
 };
