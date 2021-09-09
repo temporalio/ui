@@ -66,7 +66,7 @@
       />
       <WorkflowsSummaryTable>
         <tbody slot="rows">
-          {#each workflows as workflow}
+          {#each visibleWorkflows as workflow}
             <WorkflowsSummaryRow {workflow} {timeFormat} />
           {:else}
             <tr>
