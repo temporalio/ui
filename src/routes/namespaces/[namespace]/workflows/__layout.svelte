@@ -1,6 +1,7 @@
 <script context="module" lang="ts">
   export async function load({ page }) {
-    return { props: { namespace: page.params.namespace } };
+    const namespace = page.params.namespace;
+    return { props: { namespace: namespace } };
   }
 </script>
 
@@ -38,6 +39,17 @@
     if (runId && !execution.runId.startsWith(runId)) return false;
     return true;
   });
+
+  let currentPage = 0;
+  let executionsPerPage = 50;
+
+  $: matchingWorkflows = workflows.length;
+  $: totalExecutions = $executions.length;
+
+  $: visibleWorkflows = workflows.slice(
+    currentPage,
+    currentPage + executionsPerPage,
+  );
 </script>
 
 <section class="flex items-start">
