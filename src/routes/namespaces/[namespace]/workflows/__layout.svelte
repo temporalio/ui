@@ -73,8 +73,9 @@
               <td
                 colspan="4"
                 class="m-auto p-12 text-center font-extralight text-2xl"
-                >No Results</td
               >
+                No Results
+              </td>
             </tr>
           {/each}
         </tbody>
