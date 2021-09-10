@@ -1,19 +1,14 @@
-<script context="module" lang="ts">
-  import { namespace } from '$lib/stores/namespace';
-</script>
-
 <script lang="ts">
   import { isFullScreen } from '$lib/stores/full-screen';
+  import { namespace } from '$lib/stores/namespace';
+  import { createWorkflowStore } from '$lib/stores/workflows';
 
   import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
   import WorkflowFilters from './_workflow-filters.svelte';
-  import { createWorkflowStore } from '$lib/stores/workflows';
 
   $: store = createWorkflowStore($namespace);
   $: workflows = store.filtered;
-
-  console.log($namespace);
 
   let timeFormat = 'relative';
 
@@ -31,7 +26,7 @@
   {#if !$isFullScreen}
     <div class="w-full h-screen overflow-scroll">
       <header>
-        <WorkflowFilters namespace={$namespace} {timeFormat} />
+        <WorkflowFilters {timeFormat} />
         <section class="bg-gray-100 p-4 flex gap-4">
           <button on:click={() => currentPage--} disabled={currentPage <= 0}>
             Previous

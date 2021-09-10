@@ -1,14 +1,20 @@
 <script lang="ts">
-  import Select from '$lib/components/filter-select.svelte';
-  import Input from '$lib/components/filter-input.svelte';
+  import { namespace } from '$lib/stores/namespace';
   import { createWorkflowStore } from '$lib/stores/workflows';
 
-  export let namespace: string;
+  import Select from '$lib/components/filter-select.svelte';
+  import Input from '$lib/components/filter-input.svelte';
+
   export let timeFormat: string = 'relative';
 
-  const store = createWorkflowStore(namespace);
-  const { workflowTypes } = store;
-  const { status, workflowType, executionId, runId } = store.filters;
+  $: store = createWorkflowStore($namespace);
+  $: workflowTypes = store.workflowTypes;
+  $: filters = store.filters;
+
+  $: status = filters.status;
+  $: workflowType = filters.workflowType;
+  $: executionId = filters.executionId;
+  $: runId = filters.runId;
 
   function clear() {
     $status = null;
