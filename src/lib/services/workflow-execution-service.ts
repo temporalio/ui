@@ -50,6 +50,14 @@ const fetchWorkflows =
 
 export const fetchOpenWorkflows = fetchWorkflows('open');
 export const fetchClosedWorkflows = fetchWorkflows('closed');
+export const fetchAllWorkflows = (
+  options:
+    | Parameters<typeof fetchOpenWorkflows>[0]
+    | Parameters<typeof fetchClosedWorkflows>[0],
+) => {
+  fetchOpenWorkflows(options);
+  fetchClosedWorkflows(options);
+};
 
 export const WorkflowExecutionAPI = {
   async getAll(

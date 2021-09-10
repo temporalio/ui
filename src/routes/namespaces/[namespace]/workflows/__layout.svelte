@@ -11,42 +11,18 @@
   import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
   import WorkflowFilters from './_workflow-filters.svelte';
-  import { unique } from '$lib/utilities/unique';
   import { createWorkflowStore } from '$lib/stores/workflows';
 
   export let namespace: string;
   let store = createWorkflowStore(namespace);
-  let executions = store.all();
+  let workflows = store.filtered;
 
-  let status = null;
-  let workflowType = null;
-  let executionId = null;
-  let runId = null;
   let timeFormat = 'relative';
-
-  $: workflowTypes = $executions
-    .map((execution) => execution.name)
-    .filter(unique);
-
-  $: workflows = $executions.filter((execution) => {
-    // Right now, the type generated does not match the actual API response.
-    // This is a temporary fix.
-    const executionStatus = execution.status as unknown as WorkflowStatus;
-
-    if (status && executionStatus !== status) return false;
-    if (workflowType && execution.name !== workflowType) return false;
-    if (executionId && !execution.id.startsWith(executionId)) return false;
-    if (runId && !execution.runId.startsWith(runId)) return false;
-    return true;
-  });
 
   let currentPage = 0;
   let executionsPerPage = 50;
 
-  $: matchingWorkflows = workflows.length;
-  $: totalExecutions = $executions.length;
-
-  $: visibleWorkflows = workflows.slice(
+  $: visibleWorkflows = $workflows.slice(
     currentPage,
     currentPage + executionsPerPage,
   );
@@ -55,15 +31,12 @@
 <section class="flex items-start">
   {#if !$isFullScreen}
     <div class="w-full h-screen overflow-scroll">
-      <p>{workflows.length}</p>
-      <WorkflowFilters
-        bind:status
-        bind:workflowType
-        bind:runId
-        bind:executionId
-        bind:timeFormat
-        {workflowTypes}
-      />
+      <header>
+        <WorkflowFilters {namespace} {timeFormat} />
+        <section class="bg-gray-100 p-4 flex gap-4">
+          <p />
+        </section>
+      </header>
       <WorkflowsSummaryTable>
         <tbody slot="rows">
           {#each visibleWorkflows as workflow}
@@ -71,7 +44,7 @@
           {:else}
             <tr>
               <td
-                colspan="4"
+                colspan="5"
                 class="m-auto p-12 text-center font-extralight text-2xl"
               >
                 No Results
