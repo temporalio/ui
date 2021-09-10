@@ -1,8 +1,5 @@
 <script context="module" lang="ts">
-  export async function load({ page }) {
-    const namespace = page.params.namespace;
-    return { props: { namespace: namespace } };
-  }
+  import { namespace } from '$lib/stores/namespace';
 </script>
 
 <script lang="ts">
@@ -13,8 +10,7 @@
   import WorkflowFilters from './_workflow-filters.svelte';
   import { createWorkflowStore } from '$lib/stores/workflows';
 
-  export let namespace: string;
-  let store = createWorkflowStore(namespace);
+  let store = createWorkflowStore($namespace);
   let workflows = store.filtered;
 
   let timeFormat = 'relative';
@@ -32,7 +28,7 @@
   {#if !$isFullScreen}
     <div class="w-full h-screen overflow-scroll">
       <header>
-        <WorkflowFilters {namespace} {timeFormat} />
+        <WorkflowFilters namespace={$namespace} {timeFormat} />
         <section class="bg-gray-100 p-4 flex gap-4">
           <p />
         </section>
