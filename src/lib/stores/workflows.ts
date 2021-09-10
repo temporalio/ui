@@ -50,7 +50,12 @@ export const createStore = (namespace: string) => {
       fetchAllWorkflows({ namespace, onUpdate: updateWorkflows(store) });
 
       const interval = setInterval(() => {
-        fetchAllWorkflows({ namespace, onUpdate: updateWorkflows(store) });
+        requestIdleCallback(
+          () => {
+            fetchAllWorkflows({ namespace, onUpdate: updateWorkflows(store) });
+          },
+          { timeout: 30000 },
+        );
       }, 30000);
 
       return () => clearInterval(interval);
