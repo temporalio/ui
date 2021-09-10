@@ -1,12 +1,12 @@
 <script lang="ts">
+  import type { WorkflowExecution } from '$lib/models/workflow-execution';
+
   import { namespace } from '$lib/stores/namespace';
   import { page } from '$app/stores';
-  import type { WorkflowExecution } from '$lib/models/workflow-execution';
   import { getWorkflowExecutionUrl } from '$lib/utilities/get-workflow-execution-url';
   import { pathMatches } from '$lib/utilities/path-matches';
   import Time from '$lib/components/workflow-time.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import { getContext } from 'svelte';
 
   export let workflow: WorkflowExecution;
   export let timeFormat: string;

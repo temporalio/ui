@@ -6,13 +6,13 @@ export function formatDate(date: Date | Timestamp | string | null): string {
   if (!date) return '';
 
   if (isTimestamp(date)) {
-    date = tsToDate(date);
+    date = timestampToDate(date);
   }
 
   return format(parseJSON(date), 'MMMM dd, yyyy — h:mm a');
 }
 
-function tsToDate(ts: Timestamp): Date {
+function timestampToDate(ts: Timestamp): Date {
   if (!isTimestamp(ts)) {
     throw new TypeError('provided value is not a timestamp');
   }
@@ -23,6 +23,9 @@ function tsToDate(ts: Timestamp): Date {
   return d;
 }
 
-function isTimestamp(arg: any): arg is Timestamp {
-  return arg.seconds !== undefined && arg.nanos !== undefined;
+function isTimestamp(arg: unknown): arg is Timestamp {
+  if (typeof arg === 'object') {
+    return arg['seconds'] !== undefined && arg['nanos'] !== undefined;
+  }
+  return false;
 }

@@ -1,6 +1,9 @@
 <script context="module" lang="ts">
   import type { LoadInput } from '@sveltejs/kit';
-  import { WorkflowExecutionAPI } from '$lib/services/workflow-execution-service';
+  import {
+    GetPollersResponse,
+    WorkflowExecutionAPI,
+  } from '$lib/services/workflow-execution-service';
 
   export async function load({ fetch, page }: LoadInput) {
     const { namespace, queue } = page.params;
@@ -17,7 +20,7 @@
   import QueuePollersTable from './_queue-pollers-table.svelte';
   import QueuePollersRow from './_queue-pollers-row.svelte';
 
-  export let pollers;
+  export let pollers: GetPollersResponse;
 </script>
 
 <section class="flex flex-col items-start">

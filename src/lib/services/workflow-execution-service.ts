@@ -1,3 +1,5 @@
+import { paginated } from '$lib/utilities/paginated';
+import { toURL } from '$lib/utilities/to-url';
 import type {
   WorkflowExecutionInfo,
   PollerInfo,
@@ -9,33 +11,63 @@ import type {
 
 const base = 'http://localhost:8080/api/v1';
 
-export type GetAllWorkflowExecutionsRequest = { namespace: string };
-export type GetWorkflowExecutionRequest = GetAllWorkflowExecutionsRequest & {
+export type NamespaceScopedRequest = { namespace: string };
+export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   executionId: string;
   runId: string;
 };
 
-export type GetAllPollersRequest = { namespace: string; queue: string };
+export type GetAllPollersRequest = NamespaceScopedRequest & { queue: string };
 export type GetPollersResponse = {
   pollers: PollerInfo[];
   taskQueueStatus: TaskQueueStatus;
 };
 
+type FetchWorkflows<T> = {
+  onUpdate?: (results: Omit<T, 'nextPageToken'>) => void;
+  request?: typeof fetch;
+};
+
+const fetchWorkflows =
+  (type: 'open' | 'closed') =>
+  async ({
+    namespace,
+    onUpdate = (x) => x,
+    request = fetch,
+  }: NamespaceScopedRequest &
+    FetchWorkflows<ListWorkflowExecutionsResponse>) => {
+    const { executions } = await paginated(async (token: string) => {
+      const url = toURL(`${base}/namespaces/${namespace}/workflows/${type}`, {
+        next_page_token: token,
+      });
+
+      const response = await request(url);
+      return await response.json();
+    }, onUpdate);
+
+    return executions;
+  };
+
+export const fetchOpenWorkflows = fetchWorkflows('open');
+export const fetchClosedWorkflows = fetchWorkflows('closed');
+export const fetchAllWorkflows = (
+  options:
+    | Parameters<typeof fetchOpenWorkflows>[0]
+    | Parameters<typeof fetchClosedWorkflows>[0],
+) => {
+  fetchOpenWorkflows(options);
+  fetchClosedWorkflows(options);
+};
+
 export const WorkflowExecutionAPI = {
   async getAll(
-    { namespace }: GetAllWorkflowExecutionsRequest,
+    { namespace }: NamespaceScopedRequest,
     request = fetch,
   ): Promise<WorkflowExecutionInfo[]> {
-    const { executions: open }: ListWorkflowExecutionsResponse = await request(
-      `${base}/namespaces/${namespace}/workflows/open`,
-    ).then((response) => response.json());
+    const open = await fetchOpenWorkflows({ namespace, request });
+    const closed = await fetchClosedWorkflows({ namespace, request });
 
-    const { executions: closed }: ListWorkflowExecutionsResponse =
-      await request(`${base}/namespaces/${namespace}/workflows/closed`).then(
-        (response) => response.json(),
-      );
-
-    return [...open, ...closed];
+    return [].concat(open).concat(closed);
   },
 
   async get(

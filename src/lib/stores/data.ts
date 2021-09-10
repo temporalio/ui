@@ -15,8 +15,10 @@ export type SliceRequestConfiguration<T, U> = {
 
 const store = writable({});
 
-const update = (key: string) => (data: Slice<any>) =>
-  store.update((s) => ({ ...s, [key]: { ...data } }));
+const update =
+  <T>(key: string) =>
+  (data: Slice<T>) =>
+    store.update((s) => ({ ...s, [key]: { ...data } }));
 
 const newSlice = <T>(initialState?: T): Slice<T> => ({
   isLoading: true,

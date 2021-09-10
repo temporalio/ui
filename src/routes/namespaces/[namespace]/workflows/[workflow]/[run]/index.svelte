@@ -21,7 +21,7 @@
     DescribeWorkflowExecutionResponse,
     GetWorkflowExecutionHistoryResponse,
   } from '$types';
-  import { getContext } from 'svelte';
+
   import { toWorkflowExecution } from '$lib/models/workflow-execution';
   import CodeBlock from '$lib/components/code-block.svelte';
   import { getTaskQueueUrl } from '$lib/utilities/get-task-queue-url';

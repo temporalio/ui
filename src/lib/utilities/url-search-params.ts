@@ -1,13 +1,23 @@
-export type URLSearchParamLike =
-  | { [key: string]: string | number | boolean }
-  | URLSearchParams;
+type KeyValue = { [key: string]: string | number | boolean };
+
+export type URLSearchParamLike = KeyValue | URLSearchParams;
+
+const removeUndefinedValues = (obj: KeyValue): KeyValue => {
+  const result = { ...obj };
+  Object.keys(result).forEach(
+    (key) => result[key] === undefined && delete result[key],
+  );
+  return result;
+};
 
 export const toSearchParams = (query: URLSearchParamLike): URLSearchParams => {
   if (query instanceof URLSearchParams) return query;
-  return new URLSearchParams(query as Record<string, string>);
+  return new URLSearchParams(
+    removeUndefinedValues(query) as Record<string, string>,
+  );
 };
 
-export const urlSearchParamsToObject = (search: URLSearchParams) => {
+export const urlSearchParamsToObject = (search: URLSearchParams): KeyValue => {
   return search
     .toString()
     .split('&')

@@ -5,7 +5,7 @@
     ListNamespacesResponse,
   } from '$types';
 
-  export async function load({ fetch, page }: LoadInput) {
+  export async function load({ fetch }: LoadInput) {
     const { namespaces }: ListNamespacesResponse = await fetch(
       'http://localhost:8080/api/v1/namespaces',
     ).then((response) => response.json());

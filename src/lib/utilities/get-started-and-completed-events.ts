@@ -1,9 +1,14 @@
 import type { GetWorkflowExecutionHistoryResponse } from '$types';
 import { convertPayloadToJson } from './decode-payload';
 
+type WorkflowEvents = {
+  input: string;
+  result: string;
+};
+
 export const getWorkflowStartedAndCompletedEvents = (
   events: GetWorkflowExecutionHistoryResponse,
-) => {
+): WorkflowEvents => {
   const workflowStartedEvent: WorkflowExecutionStartedEvent =
     events.history.events.find((event) => {
       return !!event.workflowExecutionStartedEventAttributes;

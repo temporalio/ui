@@ -1,19 +1,26 @@
 <script lang="ts">
+  import { namespace } from '$lib/stores/namespace';
+  import { createWorkflowStore } from '$lib/stores/workflows';
+
   import Select from '$lib/components/filter-select.svelte';
   import Input from '$lib/components/filter-input.svelte';
 
-  export let status: WorkflowStatus = null;
-  export let workflowType: WorkflowType = null;
-  export let executionId: string = null;
-  export let runId: string = null;
   export let timeFormat: string = 'relative';
-  export let workflowTypes: string[];
+
+  $: store = createWorkflowStore($namespace);
+  $: workflowTypes = store.workflowTypes;
+  $: filters = store.filters;
+
+  $: status = filters.status;
+  $: workflowType = filters.workflowType;
+  $: executionId = filters.executionId;
+  $: runId = filters.runId;
 
   function clear() {
-    status = null;
-    workflowType = null;
-    executionId = null;
-    runId = null;
+    $status = null;
+    $workflowType = null;
+    $executionId = null;
+    $runId = null;
     timeFormat = 'relative';
   }
 </script>
@@ -22,7 +29,7 @@
   <Select
     id="filter-by-workflow-status"
     name="Workflow Status"
-    bind:value={status}
+    bind:value={$status}
   >
     <option value={null} />
     <option value="Running">Running</option>
@@ -36,10 +43,10 @@
   <Select
     id="filter-by-workflow-type"
     name="Workflow Type"
-    bind:value={workflowType}
+    bind:value={$workflowType}
   >
     <option value={null} />
-    {#each workflowTypes as name}
+    {#each $workflowTypes as name}
       <option>{name}</option>
     {/each}
   </Select>
@@ -55,9 +62,9 @@
   <Input
     name="Execution ID"
     id="filter-by-execution-id"
-    bind:value={executionId}
+    bind:value={$executionId}
   />
-  <Input name="Run ID" id="filter-by-run-id" bind:value={runId} />
+  <Input name="Run ID" id="filter-by-run-id" bind:value={$runId} />
   <button on:click={clear}>Clear</button>
 </section>
 

@@ -1,76 +1,59 @@
-<script context="module" lang="ts">
-  import type { LoadInput } from '@sveltejs/kit';
-  import { WorkflowExecutionAPI } from '$lib/services/workflow-execution-service';
-  import {
-    toWorkflowExecutions,
-    WorkflowExecution,
-  } from '$lib/models/workflow-execution';
-
-  export async function load({ fetch, page }: LoadInput) {
-    const { namespace } = page.params;
-    return await WorkflowExecutionAPI.getAll({ namespace }, fetch)
-      .then(toWorkflowExecutions)
-      .then((executions) => ({
-        props: { executions },
-      }));
-  }
-</script>
-
 <script lang="ts">
   import { isFullScreen } from '$lib/stores/full-screen';
+  import { namespace } from '$lib/stores/namespace';
+  import { createWorkflowStore } from '$lib/stores/workflows';
 
   import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
   import WorkflowFilters from './_workflow-filters.svelte';
-  import { unique } from '$lib/utilities/unique';
 
-  export let executions: WorkflowExecution[];
+  $: store = createWorkflowStore($namespace);
+  $: workflows = store.filtered;
 
-  let status = null;
-  let workflowType = null;
-  let executionId = null;
-  let runId = null;
   let timeFormat = 'relative';
 
-  let workflowTypes = executions
-    .map((execution) => execution.name)
-    .filter(unique);
+  let currentPage = 0;
+  let executionsPerPage = 50;
+  $: maximumPage = Math.ceil($workflows.length / executionsPerPage);
 
-  $: workflows = executions.filter((execution) => {
-    // Right now, the type generated does not match the actual API response.
-    // This is a temporary fix.
-    const executionStatus = execution.status as unknown as WorkflowStatus;
-
-    if (status && executionStatus !== status) return false;
-    if (workflowType && execution.name !== workflowType) return false;
-    if (executionId && !execution.id.startsWith(executionId)) return false;
-    if (runId && !execution.runId.startsWith(runId)) return false;
-    return true;
-  });
+  $: visibleWorkflows = $workflows.slice(
+    currentPage * executionsPerPage,
+    currentPage * executionsPerPage + executionsPerPage,
+  );
 </script>
 
 <section class="flex items-start">
   {#if !$isFullScreen}
-    <div class="w-full  h-screen overflow-scroll">
-      <WorkflowFilters
-        bind:status
-        bind:workflowType
-        bind:runId
-        bind:executionId
-        bind:timeFormat
-        {workflowTypes}
-      />
+    <div class="w-full h-screen overflow-scroll">
+      <header>
+        <WorkflowFilters {timeFormat} />
+        <section class="bg-gray-100 p-4 flex gap-4">
+          <button on:click={() => currentPage--} disabled={currentPage <= 0}>
+            Previous
+          </button>
+          <p>
+            Page {currentPage + 1} of {maximumPage}
+          </p>
+          <button
+            on:click={() => currentPage++}
+            disabled={currentPage >= maximumPage - 1}
+          >
+            Next
+          </button>
+        </section>
+      </header>
       <WorkflowsSummaryTable>
         <tbody slot="rows">
-          {#each workflows as workflow}
+          {#each visibleWorkflows as workflow}
             <WorkflowsSummaryRow {workflow} {timeFormat} />
           {:else}
             <tr>
               <td
-                colspan="4"
+                colspan="5"
                 class="m-auto p-12 text-center font-extralight text-2xl"
-                >No Results</td
               >
+                No Results
+              </td>
             </tr>
           {/each}
         </tbody>
@@ -80,3 +63,13 @@
 
   <slot />
 </section>
+
+<style lang="postcss">
+  button {
+    @apply rounded-lg border-purple-600 border-2 bg-white text-purple-600 px-2 text-sm;
+  }
+
+  button:disabled {
+    @apply text-purple-400 border-purple-400;
+  }
+</style>

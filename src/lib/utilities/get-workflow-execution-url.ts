@@ -11,7 +11,7 @@ export const getWorkflowExecutionUrl = (
   workflow: WorkflowExecution,
   query?: URLSearchParamLike,
   queryOverrides?: URLSearchParamLike,
-) => {
+): string => {
   const url = `/namespaces/${namespace}/workflows/${workflow.id}/${workflow.runId}`;
 
   const search = queryOverrides
