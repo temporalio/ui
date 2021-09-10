@@ -10,8 +10,10 @@
   import WorkflowFilters from './_workflow-filters.svelte';
   import { createWorkflowStore } from '$lib/stores/workflows';
 
-  let store = createWorkflowStore($namespace);
-  let workflows = store.filtered;
+  $: store = createWorkflowStore($namespace);
+  $: workflows = store.filtered;
+
+  console.log($namespace);
 
   let timeFormat = 'relative';
 
