@@ -10,20 +10,55 @@
 
   let even = !(index % 2);
   $: isJSONView = false;
+  $: isIdJSONView = false;
+  $: isEventTypeJSONView = false;
+  $: isTimeJSONView = false;
+  $: isDetailsJSONView = false;
 </script>
 
 <tr class:even>
-  <td>{event.eventId}</td>
-  <td>{event.eventType}</td>
-  <td>{formatDate(event.eventTime)}</td>
-  <td class="w-1/2">
-    <div class="flex">
-      <ExecutionInformation title="Version" value={event.version} />
-      <ExecutionInformation title="Task ID" value={event.taskId} />
-    </div>
+  <td on:click={() => (isIdJSONView = !isIdJSONView)}>
+    {#if isIdJSONView}
+      <CodeBlock heading={``} content={JSON.stringify(event.eventId)} />
+    {:else}
+      {event.eventId}
+    {/if}
+  </td>
+  <td on:click={() => (isEventTypeJSONView = !isEventTypeJSONView)}>
+    {#if isEventTypeJSONView}
+      <CodeBlock heading={``} content={JSON.stringify(event.eventType)} />
+    {:else}
+      {event.eventType}
+    {/if}
+  </td>
+  <td on:click={() => (isTimeJSONView = !isTimeJSONView)}>
+    {#if isTimeJSONView}
+      <CodeBlock heading={``} content={JSON.stringify(event.eventTime)} />
+    {:else}
+      {formatDate(event.eventTime)}
+    {/if}</td
+  >
+  <td on:click={() => (isDetailsJSONView = !isDetailsJSONView)} class="w-1/2">
+    {#if isDetailsJSONView}
+      <CodeBlock
+        heading={``}
+        content={JSON.stringify({
+          verison: event.version,
+          TaskId: event.taskId,
+        })}
+      />
+    {:else}
+      <div class="flex">
+        <ExecutionInformation title="Version" value={event.version} />
+        <ExecutionInformation title="Task ID" value={event.taskId} />
+      </div>
+    {/if}
 
-    <button on:click={() => (isJSONView = !isJSONView)}
-      >{!isJSONView ? 'GRID' : 'JSON'} VIEW</button
+    <button
+      on:click={(e) => {
+        e.stopPropagation();
+        isJSONView = !isJSONView;
+      }}>{!isJSONView ? 'GRID' : 'JSON'} VIEW</button
     >
 
     {#if isJSONView}
@@ -37,6 +72,7 @@
 <style lang="postcss">
   td {
     vertical-align: top;
+    cursor: pointer;
     @apply p-4 overflow-x-scroll;
   }
 

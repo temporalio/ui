@@ -2,13 +2,19 @@
   import type { History, DescribeWorkflowExecutionResponse } from '$types';
   import { convertToJSON } from '$lib/utilities/convert-to-json';
   import Icon, { Download } from 'svelte-hero-icons';
+  import Input from '$lib/components/filter-input.svelte';
 
   export let eventFormat: string = 'grid';
   export let history: History;
   export let execution: DescribeWorkflowExecutionResponse;
+  export let eventType: string = null;
 
   function setFormat(format: EventFormat) {
     eventFormat = format;
+  }
+
+  function clear() {
+    eventType = null;
   }
 
   $: dataUri = convertToJSON(history.events);
@@ -25,6 +31,14 @@
       class:active={eventFormat === 'json'}
       on:click={() => setFormat('json')}>JSON</button
     >
+  </div>
+  <div class="flex justify-center items-end">
+    <Input
+      name="Event History"
+      id="filter-by-event-history"
+      bind:value={eventType}
+    />
+    <button class="ml-2" on:click={clear}>Clear</button>
   </div>
   <div>
     <a
