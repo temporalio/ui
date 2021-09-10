@@ -17,10 +17,11 @@
 
   let currentPage = 0;
   let executionsPerPage = 50;
+  $: maximumPage = Math.ceil($workflows.length / executionsPerPage);
 
   $: visibleWorkflows = $workflows.slice(
-    currentPage,
-    currentPage + executionsPerPage,
+    currentPage * executionsPerPage,
+    currentPage * executionsPerPage + executionsPerPage,
   );
 </script>
 
@@ -30,7 +31,18 @@
       <header>
         <WorkflowFilters namespace={$namespace} {timeFormat} />
         <section class="bg-gray-100 p-4 flex gap-4">
-          <p />
+          <button on:click={() => currentPage--} disabled={currentPage <= 0}>
+            Previous
+          </button>
+          <p>
+            Page {currentPage + 1} of {maximumPage}
+          </p>
+          <button
+            on:click={() => currentPage++}
+            disabled={currentPage >= maximumPage - 1}
+          >
+            Next
+          </button>
         </section>
       </header>
       <WorkflowsSummaryTable>
@@ -54,3 +66,13 @@
 
   <slot />
 </section>
+
+<style lang="postcss">
+  button {
+    @apply rounded-lg border-purple-600 border-2 bg-white text-purple-600 px-2 text-sm;
+  }
+
+  button:disabled {
+    @apply text-purple-400 border-purple-400;
+  }
+</style>
