@@ -39,12 +39,23 @@ const updateWorkflows =
   };
 
 export const createStore = (namespace: string) => {
-  const store = writable<WorkflowStore>({
-    loading: true,
-    updating: false,
-    ids: {},
-    workflows: {},
-  });
+  const store = writable<WorkflowStore>(
+    {
+      loading: true,
+      updating: false,
+      ids: {},
+      workflows: {},
+    },
+    () => {
+      fetchAllWorkflows({ namespace, onUpdate: updateWorkflows(store) });
+
+      const interval = setInterval(() => {
+        fetchAllWorkflows({ namespace, onUpdate: updateWorkflows(store) });
+      }, 30000);
+
+      return () => clearInterval(interval);
+    },
+  );
 
   const get = (id: string) => derived(store, ($store) => $store.workflows[id]);
   const all = derived(store, ($store) => Object.values($store.workflows));
@@ -75,8 +86,6 @@ export const createStore = (namespace: string) => {
       });
     },
   );
-
-  fetchAllWorkflows({ namespace, onUpdate: updateWorkflows(store) });
 
   return {
     ids,
