@@ -15,8 +15,8 @@ export const paginated = async <T extends WithNextPageToken>(
   const { nextPageToken, ...props } = await fn(token);
   const mergedProps = merge(previousProps, props);
 
+  if (typeof onUpdate === 'function') onUpdate(props, mergedProps);
   if (!nextPageToken) return mergedProps;
-  if (onUpdate) onUpdate(props, mergedProps);
 
   return paginated(fn, onUpdate, nextPageToken, mergedProps);
 };
