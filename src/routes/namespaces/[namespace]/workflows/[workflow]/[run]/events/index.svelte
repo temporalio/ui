@@ -1,16 +1,14 @@
 <script context="module" lang="ts">
-  import type {
-    GetWorkflowExecutionHistoryResponse,
-    DescribeWorkflowExecutionResponse,
-  } from '$types';
   import type { LoadInput } from '@sveltejs/kit';
 
-  export async function load({ context }: LoadInput) {
-    const { events, execution } = context;
+  export async function load({ context, page }: LoadInput) {
+    const { workflow: executionId, run: runId, namespace } = page.params;
+
     return {
       props: {
-        events,
-        execution,
+        executionId,
+        runId,
+        namespace,
       },
     };
   }
@@ -19,15 +17,15 @@
 <script lang="ts">
   import Events from './_events.svelte';
   import EventsFilters from './_events-filters.svelte';
-  export let events: GetWorkflowExecutionHistoryResponse;
-  export let execution: DescribeWorkflowExecutionResponse;
   export let eventType;
+  export let namespace: string;
+  export let executionId: string;
+  export let runId: string;
 
-  let { history } = events;
   let eventFormat: EventFormat = 'grid';
 </script>
 
 <div class="px-6 py-6">
-  <EventsFilters bind:eventFormat bind:eventType {history} {execution} />
-  <Events {history} {eventFormat} {eventType} />
+  <!-- <EventsFilters bind:eventFormat bind:eventType {history} {execution} /> -->
+  <Events {namespace} {executionId} {runId} {eventFormat} {eventType} />
 </div>
