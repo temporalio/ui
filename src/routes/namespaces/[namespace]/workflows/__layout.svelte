@@ -11,15 +11,19 @@
   $: workflows = store.filtered;
 
   let timeFormat = 'relative';
-
   let currentPage = 0;
   let executionsPerPage = 50;
+
   $: maximumPage = Math.ceil($workflows.length / executionsPerPage);
 
   $: visibleWorkflows = $workflows.slice(
     currentPage * executionsPerPage,
     currentPage * executionsPerPage + executionsPerPage,
   );
+
+  $: {
+    if (currentPage > maximumPage) currentPage = maximumPage - 1;
+  }
 </script>
 
 <section class="flex items-start">
