@@ -1,22 +1,9 @@
 <script lang="ts">
   import Event from './_event.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
-  import { createEventStore } from '$lib/stores/events';
 
   export let eventFormat: EventFormat;
-  export let eventType: string;
-
-  export let namespace: string;
-  export let executionId: string;
-  export let runId: string;
-
-  const { all } = createEventStore(namespace, executionId, runId);
-
-  $: events = $all.filter((event) => {
-    if (eventType && !String(event.eventType).startsWith(eventType))
-      return false;
-    return true;
-  });
+  export let events: BaseEvent[];
 </script>
 
 <section>

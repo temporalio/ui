@@ -65,8 +65,23 @@ export const createStore = (
     },
   );
 
+  const all = derived(store, ($store) => Object.values($store.events));
+  const format = writable<EventFormat>('grid');
+  const type = writable<string>(null);
+
+  const filtered = derived([all, type], ([$all, eventType]) => {
+    return $all.filter((event) => {
+      if (eventType && !String(event.eventType).startsWith(eventType))
+        return false;
+      return true;
+    });
+  });
+
   return {
-    all: derived(store, ($store) => Object.values($store.events)),
+    all,
+    filtered,
+    format,
+    type,
   };
 };
 
