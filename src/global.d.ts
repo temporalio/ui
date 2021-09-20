@@ -1,5 +1,11 @@
 /// <reference types="@sveltejs/kit" />
 
+interface Window {
+  Prism: {
+    highlightAll: () => void;
+  };
+}
+
 type Heroicon = { [key: string]: string }[][];
 
 type WorkflowStatus =
