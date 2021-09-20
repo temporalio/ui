@@ -1,34 +1,35 @@
 <script lang="ts">
-  import type { History, DescribeWorkflowExecutionResponse } from '$types';
+  import type { Writable } from 'svelte/store';
+
   import { convertToJSON } from '$lib/utilities/convert-to-json';
   import Icon, { Download } from 'svelte-hero-icons';
   import Input from '$lib/components/filter-input.svelte';
 
-  export let eventFormat: string = 'grid';
-  export let history: History;
-  export let execution: DescribeWorkflowExecutionResponse;
-  export let eventType: string = null;
+  export let events: BaseEvent[];
+  export let eventFormat: Writable<EventFormat>;
+  export let eventType: Writable<string>;
+  export let execution: string;
 
   function setFormat(format: EventFormat) {
-    eventFormat = format;
+    $eventFormat = format;
   }
 
   function clear() {
-    eventType = null;
+    $eventType = null;
   }
 
-  $: dataUri = convertToJSON(history.events);
+  $: dataUri = convertToJSON(events);
 </script>
 
 <section class="p-4 flex gap-2 items-center justify-between">
   <div>
     <label for="format">View Format</label>
     <button
-      class:active={eventFormat === 'grid'}
+      class:active={$eventFormat === 'grid'}
       on:click={() => setFormat('grid')}>GRID</button
     >
     <button
-      class:active={eventFormat === 'json'}
+      class:active={$eventFormat === 'json'}
       on:click={() => setFormat('json')}>JSON</button
     >
   </div>
@@ -36,7 +37,7 @@
     <Input
       name="Event History"
       id="filter-by-event-history"
-      bind:value={eventType}
+      bind:value={$eventType}
     />
     <button class="ml-2" on:click={clear}>Clear</button>
   </div>
@@ -44,7 +45,7 @@
     <a
       class="text-black-500 font-bold uppercase px-3 py-1 text-xs flex"
       href={dataUri}
-      download={`${execution.workflowExecutionInfo.type.name}.json`}
+      download={`${execution}.json`}
     >
       <Icon src={Download} class="text-black w-4 h-4" />export</a
     >

@@ -23,9 +23,14 @@ export type GetPollersResponse = {
   taskQueueStatus: TaskQueueStatus;
 };
 
-type FetchWorkflows<T> = {
+type FetchWorkflows<T> = NamespaceScopedRequest & {
   onUpdate?: (results: Omit<T, 'nextPageToken'>) => void;
   request?: typeof fetch;
+};
+
+type FetchEvents = FetchWorkflows<GetWorkflowExecutionHistoryResponse> & {
+  executionId: string;
+  runId: string;
 };
 
 const fetchWorkflows =
@@ -34,8 +39,7 @@ const fetchWorkflows =
     namespace,
     onUpdate = (x) => x,
     request = fetch,
-  }: NamespaceScopedRequest &
-    FetchWorkflows<ListWorkflowExecutionsResponse>) => {
+  }: FetchWorkflows<ListWorkflowExecutionsResponse>) => {
     const { executions } = await paginated(async (token: string) => {
       const url = toURL(`${base}/namespaces/${namespace}/workflows/${type}`, {
         next_page_token: token,
@@ -57,6 +61,31 @@ export const fetchAllWorkflows = (
 ) => {
   fetchOpenWorkflows(options);
   fetchClosedWorkflows(options);
+};
+
+export const fetchEvents = async ({
+  namespace,
+  executionId,
+  runId,
+  onUpdate = (x) => x,
+  request = fetch,
+}: FetchEvents) => {
+  const events: GetWorkflowExecutionHistoryResponse = await paginated(
+    async (token: string) => {
+      const url = toURL(
+        `${base}/namespaces/${namespace}/workflows/${executionId}/executions/${runId}/events`,
+        {
+          next_page_token: token,
+        },
+      );
+
+      const response = await request(url);
+      return await response.json();
+    },
+    onUpdate,
+  );
+
+  return events;
 };
 
 export const WorkflowExecutionAPI = {

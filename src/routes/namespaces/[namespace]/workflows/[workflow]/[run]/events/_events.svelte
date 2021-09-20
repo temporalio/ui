@@ -1,17 +1,9 @@
 <script lang="ts">
   import Event from './_event.svelte';
-  import type { History } from '$types';
   import CodeBlock from '$lib/components/code-block.svelte';
 
-  export let history: History;
   export let eventFormat: EventFormat;
-  export let eventType;
-
-  $: events = history.events.filter((event) => {
-    if (eventType && !String(event.eventType).startsWith(eventType))
-      return false;
-    return true;
-  });
+  export let events: BaseEvent[];
 </script>
 
 <section>
