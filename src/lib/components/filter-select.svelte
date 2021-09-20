@@ -6,7 +6,7 @@
 
 <div>
   <label for={id} class="text-gray-600 text-xs block">{name}</label>
-  <select class="block border-2 text-base p-2" {id} bind:value>
+  <select class="block border-2 text-base p-2" {id} bind:value on:change>
     <slot />
   </select>
 </div>

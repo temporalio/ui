@@ -4,12 +4,14 @@
 
   import Select from '$lib/components/filter-select.svelte';
   import Input from '$lib/components/filter-input.svelte';
+  import TimeRangeSelect from '$lib/components/time-range-select.svelte';
 
   export let timeFormat: string = 'relative';
 
   $: store = createWorkflowStore($namespace);
   $: workflowTypes = store.workflowTypes;
   $: filters = store.filters;
+  $: range = store.range;
 
   $: status = filters.status;
   $: workflowType = filters.workflowType;
@@ -26,6 +28,21 @@
 </script>
 
 <section class="p-4 flex gap-8">
+  <TimeRangeSelect {range} key="workflows" />
+  <Select
+    id="filter-by-workflow-status"
+    name="Workflow Status"
+    bind:value={$status}
+  >
+    <option value={null} />
+    <option value="Running">Running</option>
+    <option value="TimedOut">Timed Out</option>
+    <option value="Completed">Completed</option>
+    <option value="Failed">Failed</option>
+    <option value="ContinuedAsNew">Continued as New</option>
+    <option value="Canceled">Canceled</option>
+    <option value="Terminated">Terminated</option>
+  </Select>
   <Select
     id="filter-by-workflow-status"
     name="Workflow Status"

@@ -1,3 +1,5 @@
+import { sub, formatISO } from 'date-fns';
+
 import { paginated } from '$lib/utilities/paginated';
 import { toURL } from '$lib/utilities/to-url';
 import type {
@@ -25,6 +27,7 @@ export type GetPollersResponse = {
 
 type FetchWorkflows<T> = NamespaceScopedRequest & {
   onUpdate?: (results: Omit<T, 'nextPageToken'>) => void;
+  startTime?: Duration;
   request?: typeof fetch;
 };
 
@@ -38,11 +41,13 @@ const fetchWorkflows =
   async ({
     namespace,
     onUpdate = (x) => x,
+    startTime = { days: 1 },
     request = fetch,
   }: FetchWorkflows<ListWorkflowExecutionsResponse>) => {
     const { executions } = await paginated(async (token: string) => {
       const url = toURL(`${base}/namespaces/${namespace}/workflows/${type}`, {
         next_page_token: token,
+        'start_time_filter.earliest_time': 1631308914,
       });
 
       const response = await request(url);
