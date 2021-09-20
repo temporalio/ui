@@ -2,7 +2,7 @@
 
 interface Window {
   Prism: {
-    highlightAll: () => {};
+    highlightAll: () => void;
   };
 }
 
