@@ -1,8 +1,6 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import Icon, { Clipboard, Check } from 'svelte-hero-icons';
-  import { Highlight } from 'svelte-highlight';
-  import json from 'svelte-highlight/src/languages/json';
-  import 'svelte-highlight/src/styles/agate.css';
 
   export let heading = '';
   export let content = '';
@@ -22,6 +20,8 @@
     const formated = JSON.stringify(parsedData, undefined, 4);
     return formated;
   };
+
+  onMount(() => window.Prism.highlightAll());
 </script>
 
 {#if content}
@@ -31,7 +31,12 @@
     {#if heading}
       <h3 class="text-lg mb-2 w-full">{heading}</h3>
     {/if}
-    <Highlight class="p-4" language={json} code={formatJSON(content)} />
+    <pre
+      class="p-4">
+      <code class="language-json">
+        {formatJSON(content)}
+      </code>
+    </pre>
     <button on:click={copy}>
       {#if copied}
         <Icon
