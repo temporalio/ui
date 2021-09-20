@@ -21,12 +21,8 @@
     '3 days': { days: 3 },
     '7 days': { days: 7 },
     '30 days': { days: 30 },
-    '3 months': { months: 3 },
+    '90 months': { days: 3 },
   };
-
-  $: {
-    console.log($range);
-  }
 </script>
 
 <Select

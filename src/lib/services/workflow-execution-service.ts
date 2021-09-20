@@ -47,7 +47,9 @@ const fetchWorkflows =
     const { executions } = await paginated(async (token: string) => {
       const url = toURL(`${base}/namespaces/${namespace}/workflows/${type}`, {
         next_page_token: token,
-        'start_time_filter.earliest_time': 1631308914,
+        'start_time_filter.earliest_time': formatISO(
+          sub(new Date(), startTime),
+        ),
       });
 
       const response = await request(url);
