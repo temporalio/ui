@@ -11,9 +11,24 @@ import {
 
 type ActivitiesMap = { [key: string]: Activity };
 
+const setActivityId = (activities: ActivitiesMap) => (id: string) => {
+  if (!activities[id]) activities[id] = {};
+  activities[id].id = id;
+};
+
+const setActivityStatus =
+  (activities: ActivitiesMap) => (id: string, status: ActivityStatus) => {
+    if (!activities[id]) activities[id] = {};
+    activities[id].status = status;
+  };
+
 const addToActivities =
   (activities: ActivitiesMap) =>
-  (id: string, property: keyof Activity, event: HistoryEvent) => {
+  (
+    id: string,
+    property: keyof Omit<Activity, 'id' | 'status'>,
+    event: HistoryEvent,
+  ) => {
     if (!activities[id]) activities[id] = {};
     activities[id][property] = event;
   };
@@ -24,59 +39,72 @@ export const createActivityStore = <
 >(
   eventStore: S,
 ): Readable<Activity[]> => {
-  return derived(eventStore, (events) => {
-    const activities: ActivitiesMap = {};
-    const add = addToActivities(activities);
+  return derived(
+    eventStore,
+    (events) => {
+      const activities: ActivitiesMap = {};
+      const add = addToActivities(activities);
+      const setId = setActivityId(activities);
+      const setStatus = setActivityStatus(activities);
 
-    for (const event of events) {
-      if (isActivityTaskScheduledEvent(event)) {
-        const id = event.activityTaskScheduledEventAttributes.activityId;
-        add(id, 'activityTaskScheduledEvent', event);
+      for (const event of events) {
+        if (isActivityTaskScheduledEvent(event)) {
+          const id = event.activityTaskScheduledEventAttributes.activityId;
+          add(id, 'activityTaskScheduledEvent', event);
+          setId(id);
+          setStatus(id, 'Started');
+        }
+
+        if (isActivityTaskStartedEvent(event)) {
+          const id = String(
+            event.activityTaskStartedEventAttributes.scheduledEventId,
+          );
+          add(id, 'activityTaskStartedEvent', event);
+          setStatus(id, 'Started');
+        }
+
+        if (isActivityTaskCompletedEvent(event)) {
+          const id = String(
+            event.activityTaskCompletedEventAttributes.scheduledEventId,
+          );
+          add(id, 'activityTaskCompletedEvent', event);
+          setStatus(id, 'Completed');
+        }
+
+        if (isActivityTaskFailedEvent(event)) {
+          const id = String(
+            event.activityTaskFailedEventAttributes.scheduledEventId,
+          );
+          add(id, 'activityTaskFailedEvent', event);
+          setStatus(id, 'Failed');
+        }
+
+        if (isActivityTaskTimedOutEvent(event)) {
+          const id = String(
+            event.activityTaskTimedOutEventAttributes.scheduledEventId,
+          );
+          add(id, 'activityTaskTimedOutEvent', event);
+          setStatus(id, 'TimedOut');
+        }
+
+        if (isActivityTaskCancelRequestedEvent(event)) {
+          const id = String(
+            event.activityTaskCancelRequestedEventAttributes.scheduledEventId,
+          );
+          add(id, 'activityTaskCancelRequestedEvent', event);
+          setStatus(id, 'CancelRequested');
+        }
+
+        if (isActivityTaskCanceledEvent(event)) {
+          const id = String(
+            event.activityTaskCanceledEventAttributes.scheduledEventId,
+          );
+          add(id, 'activityTaskCanceledEvent', event);
+          setStatus(id, 'Canceled');
+        }
       }
-
-      if (isActivityTaskStartedEvent(event)) {
-        const id = String(
-          event.activityTaskStartedEventAttributes.scheduledEventId,
-        );
-        add(id, 'activityTaskStartedEvent', event);
-      }
-
-      if (isActivityTaskCompletedEvent(event)) {
-        const id = String(
-          event.activityTaskCompletedEventAttributes.scheduledEventId,
-        );
-        add(id, 'activityTaskCompletedEvent', event);
-      }
-
-      if (isActivityTaskFailedEvent(event)) {
-        const id = String(
-          event.activityTaskFailedEventAttributes.scheduledEventId,
-        );
-        add(id, 'activityTaskFailedEvent', event);
-      }
-
-      if (isActivityTaskTimedOutEvent(event)) {
-        const id = String(
-          event.activityTaskTimedOutEventAttributes.scheduledEventId,
-        );
-        add(id, 'activityTaskTimedOutEvent', event);
-      }
-
-      if (isActivityTaskCancelRequestedEvent(event)) {
-        const id = String(
-          event.activityTaskCancelRequestedEventAttributes.scheduledEventId,
-        );
-        add(id, 'activityTaskCancelRequestedEvent', event);
-      }
-
-      if (isActivityTaskCanceledEvent(event)) {
-        const id = String(
-          event.activityTaskCanceledEventAttributes.scheduledEventId,
-        );
-        add(id, 'activityTaskCanceledEvent', event);
-      }
-
       return Object.values(activities);
-    }
-  });
+    },
+    [],
+  );
 };

@@ -24,7 +24,7 @@
   export let executionId: string;
   export let runId: string;
 
-  const { all, filtered, type, format } = createEventStore(
+  const { all, filtered, type, format, activities } = createEventStore(
     namespace,
     executionId,
     runId,
