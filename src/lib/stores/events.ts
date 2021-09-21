@@ -1,12 +1,12 @@
 import { derived, Writable, writable } from 'svelte/store';
-import type { GetWorkflowExecutionHistoryResponse } from '$types';
+import type { GetWorkflowExecutionHistoryResponse, HistoryEvent } from '$types';
 import { fetchEvents } from '$lib/services/workflow-execution-service';
 
 type EventHistoryStore = {
   loading: boolean;
   updating: boolean;
   ids: { [key: string]: boolean };
-  events: { [key: string]: BaseEvent };
+  events: { [key: string]: HistoryEvent };
 };
 
 const stores: { [key: string]: ReturnType<typeof createStore> } = {};
