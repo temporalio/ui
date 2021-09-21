@@ -27,3 +27,13 @@ type WorkflowExecutionFilters = {
 };
 
 type EventFormat = 'grid' | 'json';
+
+type Activity = {
+  activityTaskStartedEvent?: ActivityTaskStartedEvent;
+  activityTaskScheduledEvent?: ActivityTaskScheduledEvent;
+  activityTaskCompletedEvent?: ActivityTaskCompletedEvent;
+  activityTaskFailedEvent?: ActivityTaskFailedEvent;
+  activityTaskTimedOutEvent?: ActivityTaskTimedOutEvent;
+  activityTaskCancelRequestedEvent?: ActivityTaskCancelRequestedEvent;
+  activityTaskCanceledEvent?: ActivityTaskCanceledEvent;
+};

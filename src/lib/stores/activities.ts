@@ -1,4 +1,4 @@
-import { derived, Readable, Writable } from 'svelte/store';
+import { derived, Readable } from 'svelte/store';
 import {
   isActivityTaskScheduledEvent,
   isActivityTaskStartedEvent,
