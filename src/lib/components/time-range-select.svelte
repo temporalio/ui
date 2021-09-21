@@ -21,7 +21,7 @@
     '3 days': { days: 3 },
     '7 days': { days: 7 },
     '30 days': { days: 30 },
-    '90 months': { days: 3 },
+    '90 days': { days: 3 },
   };
 </script>
 
