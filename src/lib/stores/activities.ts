@@ -1,4 +1,4 @@
-import { derived, Readable } from 'svelte/store';
+import { derived, get, Readable } from 'svelte/store';
 import {
   isActivityTaskScheduledEvent,
   isActivityTaskStartedEvent,
@@ -10,6 +10,9 @@ import {
 } from '$lib/utilities/is-event-type';
 
 type ActivitiesMap = { [key: string]: Activity };
+type ActivityStore = Readable<Activity[]> & {
+  getActivity: (id: string | number) => Readable<Activity>;
+};
 
 const setActivityId = (activities: ActivitiesMap) => (id: string) => {
   if (!activities[id]) activities[id] = {};
@@ -38,8 +41,8 @@ export const createActivityStore = <
   S extends Readable<E>,
 >(
   eventStore: S,
-): Readable<Activity[]> => {
-  return derived(
+): ActivityStore => {
+  const store = derived(
     eventStore,
     (events) => {
       const activities: ActivitiesMap = {};
@@ -103,8 +106,15 @@ export const createActivityStore = <
           setStatus(id, 'Canceled');
         }
       }
-      return Object.values(activities);
+      return activities;
     },
-    [],
+    {},
   );
+
+  const activities = derived(store, ($store) => Object.values($store));
+
+  return {
+    ...activities,
+    getActivity: (id) => derived(store, ($store) => get(store)[id] || {}),
+  };
 };

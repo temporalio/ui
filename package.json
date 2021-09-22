@@ -25,9 +25,11 @@
     "build-stories": "build-storybook"
   },
   "dependencies": {
+    "@types/lodash": "^4.14.173",
     "base-64": "^1.0.0",
     "date-fns": "^2.23.0",
     "json-beautify": "^1.1.1",
+    "lodash": "^4.17.21",
     "svelte-hero-icons": "^2.5.0",
     "url-pattern": "^1.0.3"
   },
