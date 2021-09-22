@@ -3,7 +3,7 @@ import { derived } from 'svelte/store';
 import UrlPattern from 'url-pattern';
 
 const pattern = new UrlPattern(
-  '/namespaces/:namespace/workflows/:executionId/:runId/:view',
+  '/namespaces/:namespace/workflows/:executionId/:runId/:view(/*)',
 );
 
 export const isFullScreen = derived(page, ($page) => {

@@ -12,15 +12,19 @@
   $: workflowUrl = getWorkflowExecutionUrl($namespace, workflow);
   $: summaryUrl = workflowUrl + '/summary';
   $: eventsUrl = workflowUrl + '/events';
+  $: activitiesUrl = workflowUrl + '/activities';
 </script>
 
 <nav class="mt-6 border-b-2 px-2 flex">
-  <a class:active={pathMatches(summaryUrl, $page.path)} href={summaryUrl}
-    >Summary</a
-  >
-  <a class:active={pathMatches(eventsUrl, $page.path)} href={eventsUrl}
-    >Events</a
-  >
+  <a class:active={pathMatches(summaryUrl, $page.path)} href={summaryUrl}>
+    Summary
+  </a>
+  <a class:active={pathMatches(eventsUrl, $page.path)} href={eventsUrl}>
+    Events
+  </a>
+  <a class:active={pathMatches(activitiesUrl, $page.path)} href={activitiesUrl}>
+    Activities
+  </a>
 </nav>
 
 <style lang="postcss">

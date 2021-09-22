@@ -15,28 +15,42 @@
 </script>
 
 <script lang="ts">
+  import Event from './_event.svelte';
+  import CodeBlock from '$lib/components/code-block.svelte';
   import { createEventStore } from '$lib/stores/events';
-
-  import Events from './_events.svelte';
-  import EventsFilters from './_events-filters.svelte';
 
   export let namespace: string;
   export let executionId: string;
   export let runId: string;
 
-  const { all, filtered, type, format } = createEventStore(
-    namespace,
-    executionId,
-    runId,
-  );
+  const { filtered, format } = createEventStore(namespace, executionId, runId);
 </script>
 
-<div class="px-6 py-6">
-  <EventsFilters
-    events={$all}
-    eventType={type}
-    eventFormat={format}
-    execution={executionId}
-  />
-  <Events events={$filtered} eventFormat={$format} />
-</div>
+<section>
+  {#if $format === 'grid'}
+    <table class="border-collapse w-full border-2 table-fixed">
+      <thead>
+        <tr>
+          <th class="w-1/12">ID</th>
+          <th class="w-2/12">Type</th>
+          <th class="w-2/12">Time</th>
+          <th class="w-7/12">Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        {#each $filtered as event, index}
+          <Event {event} {index} />
+        {/each}
+      </tbody>
+    </table>
+  {/if}
+
+  {#if $format === 'json'}
+    {#each $filtered as event}
+      <CodeBlock
+        heading={`Event ID: ${event.eventId}`}
+        content={JSON.stringify(event)}
+      />
+    {/each}
+  {/if}
+</section>

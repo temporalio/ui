@@ -1,12 +1,13 @@
 import { derived, Writable, writable } from 'svelte/store';
-import type { GetWorkflowExecutionHistoryResponse } from '$types';
+import type { GetWorkflowExecutionHistoryResponse, HistoryEvent } from '$types';
 import { fetchEvents } from '$lib/services/workflow-execution-service';
+import { createActivityStore } from './activities';
 
 type EventHistoryStore = {
   loading: boolean;
   updating: boolean;
   ids: { [key: string]: boolean };
-  events: { [key: string]: BaseEvent };
+  events: { [key: string]: HistoryEvent };
 };
 
 const stores: { [key: string]: ReturnType<typeof createStore> } = {};
@@ -65,21 +66,28 @@ export const createStore = (
     },
   );
 
-  const all = derived(store, ($store) => Object.values($store.events));
+  const all = derived(store, ($store) => Object.values($store.events), []);
   const format = writable<EventFormat>('grid');
   const type = writable<string>(null);
 
-  const filtered = derived([all, type], ([$all, eventType]) => {
-    return $all.filter((event) => {
-      if (eventType && !String(event.eventType).startsWith(eventType))
-        return false;
-      return true;
-    });
-  });
+  const filtered = derived(
+    [all, type],
+    ([$all, eventType]) => {
+      return $all.filter((event) => {
+        if (eventType && !String(event.eventType).startsWith(eventType))
+          return false;
+        return true;
+      });
+    },
+    [],
+  );
+
+  const activities = createActivityStore(all);
 
   return {
     all,
     filtered,
+    activities,
     format,
     type,
   };
