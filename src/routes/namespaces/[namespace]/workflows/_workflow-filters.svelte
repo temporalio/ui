@@ -44,20 +44,6 @@
     <option value="Terminated">Terminated</option>
   </Select>
   <Select
-    id="filter-by-workflow-status"
-    name="Workflow Status"
-    bind:value={$status}
-  >
-    <option value={null} />
-    <option value="Running">Running</option>
-    <option value="TimedOut">Timed Out</option>
-    <option value="Completed">Completed</option>
-    <option value="Failed">Failed</option>
-    <option value="ContinuedAsNew">Continued as New</option>
-    <option value="Canceled">Canceled</option>
-    <option value="Terminated">Terminated</option>
-  </Select>
-  <Select
     id="filter-by-workflow-type"
     name="Workflow Type"
     bind:value={$workflowType}

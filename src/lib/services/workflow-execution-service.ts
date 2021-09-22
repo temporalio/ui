@@ -45,11 +45,10 @@ const fetchWorkflows =
     request = fetch,
   }: FetchWorkflows<ListWorkflowExecutionsResponse>) => {
     const { executions } = await paginated(async (token: string) => {
+      const iso = formatISO(sub(new Date(), startTime));
       const url = toURL(`${base}/namespaces/${namespace}/workflows/${type}`, {
         next_page_token: token,
-        'start_time_filter.earliest_time': formatISO(
-          sub(new Date(), startTime),
-        ),
+        'start_time_filter.latest_time': iso,
       });
 
       const response = await request(url);
