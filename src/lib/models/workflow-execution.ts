@@ -19,7 +19,7 @@ export const toWorkflowExecution = (
 export const toWorkflowExecutions = (
   executions: WorkflowExecutionInfo[],
 ): WorkflowExecution[] => {
-  return executions.map(
+  return (executions || []).map(
     (workflowExecutionInfo) => new WorkflowExecution({ workflowExecutionInfo }),
   );
 };

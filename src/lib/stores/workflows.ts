@@ -1,4 +1,4 @@
-import { derived, writable, Writable } from 'svelte/store';
+import { derived, writable, Writable, get } from 'svelte/store';
 import type { ListWorkflowExecutionsResponse } from '$types';
 import { unique } from '$lib/utilities/unique';
 
@@ -8,6 +8,7 @@ import {
 } from '$lib/models/workflow-execution';
 
 import { fetchAllWorkflows } from '$lib/services/workflow-execution-service';
+import { createStoreWithCallback } from '$lib/utilities/create-store-with-callback';
 
 type WorkflowStore = {
   loading: boolean;
@@ -39,6 +40,16 @@ const updateWorkflows =
   };
 
 export const createStore = (namespace: string) => {
+  const update = () => {
+    const startTime = get(range);
+
+    fetchAllWorkflows({
+      namespace,
+      onUpdate: updateWorkflows(store),
+      startTime,
+    });
+  };
+
   const store = writable<WorkflowStore>(
     {
       loading: true,
@@ -47,21 +58,24 @@ export const createStore = (namespace: string) => {
       workflows: {},
     },
     () => {
-      fetchAllWorkflows({ namespace, onUpdate: updateWorkflows(store) });
+      let idleCallback: number;
+
+      update();
 
       const interval = setInterval(() => {
-        fetchAllWorkflows({ namespace, onUpdate: updateWorkflows(store) });
+        idleCallback = requestIdleCallback(update);
       }, 30000);
 
       return () => {
+        if (idleCallback) cancelIdleCallback(idleCallback);
         clearInterval(interval);
       };
     },
   );
 
-  const get = (id: string) => derived(store, ($store) => $store.workflows[id]);
   const all = derived(store, ($store) => Object.values($store.workflows));
   const ids = derived(store, ($store) => Object.keys($store.ids));
+  const range = createStoreWithCallback<Duration>({ hours: 24 }, update);
 
   const status = writable<WorkflowStatus>(null);
   const workflowType = writable<WorkflowType>(null);
@@ -91,10 +105,10 @@ export const createStore = (namespace: string) => {
 
   return {
     ids,
-    get,
     all,
     filtered,
     workflowTypes,
+    range,
     filters: {
       status,
       workflowType,
