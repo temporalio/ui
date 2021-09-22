@@ -6,6 +6,8 @@
   import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
   import WorkflowFilters from './_workflow-filters.svelte';
+  import WorkflowPagination from './_workflow-pagination.svelte';
+  import WorkflowsEmptyState from './_workflows-empty.svelte';
 
   $: store = createWorkflowStore($namespace);
   $: workflows = store.filtered;
@@ -30,35 +32,15 @@
   {#if !$isFullScreen}
     <div class="w-full h-screen overflow-scroll">
       <header>
-        <WorkflowFilters {timeFormat} />
-        <section class="bg-gray-100 p-4 flex gap-4">
-          <button on:click={() => currentPage--} disabled={currentPage <= 0}>
-            Previous
-          </button>
-          <p>
-            Page {currentPage + 1} of {maximumPage}
-          </p>
-          <button
-            on:click={() => currentPage++}
-            disabled={currentPage >= maximumPage - 1}
-          >
-            Next
-          </button>
-        </section>
+        <WorkflowFilters bind:timeFormat />
+        <WorkflowPagination bind:currentPage {maximumPage} />
       </header>
       <WorkflowsSummaryTable>
         <tbody slot="rows">
           {#each visibleWorkflows as workflow}
             <WorkflowsSummaryRow {workflow} {timeFormat} />
           {:else}
-            <tr>
-              <td
-                colspan="5"
-                class="m-auto p-12 text-center font-extralight text-2xl"
-              >
-                No Results
-              </td>
-            </tr>
+            <WorkflowsEmptyState />
           {/each}
         </tbody>
       </WorkflowsSummaryTable>
@@ -67,13 +49,3 @@
 
   <slot />
 </section>
-
-<style lang="postcss">
-  button {
-    @apply rounded-lg border-purple-600 border-2 bg-white text-purple-600 px-2 text-sm;
-  }
-
-  button:disabled {
-    @apply text-purple-400 border-purple-400;
-  }
-</style>
