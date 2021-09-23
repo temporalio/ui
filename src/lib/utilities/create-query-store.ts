@@ -7,11 +7,6 @@ export type QueryStore<T> = T & {
   ids: string[];
 };
 
-export type QueryAction<T = string, P = {}> = {
-  type: T;
-  payload: P;
-};
-
 export const createQueryStore = <T, S = QueryStore<T>>(
   key: string,
   update: () => void,
