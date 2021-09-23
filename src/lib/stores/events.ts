@@ -11,9 +11,9 @@ import {
 } from '$lib/utilities/create-query-store';
 import { createActivityStore } from './activities';
 
-type EventHistoryStore = QueryStore & {
+type EventHistoryStore = QueryStore<{
   events: { [key: string]: HistoryEvent };
-};
+}>;
 
 const stores: { [key: string]: ReturnType<typeof createStore> } = {};
 

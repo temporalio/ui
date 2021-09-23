@@ -1,8 +1,7 @@
 import { browser } from '$app/env';
 import { writable } from 'svelte/store';
 
-export type QueryStore = {
-  [x: string]: {};
+export type QueryStore<T> = T & {
   loading: boolean;
   updating: boolean;
   ids: string[];
@@ -13,23 +12,21 @@ export type QueryAction<T = string, P = {}> = {
   payload: P;
 };
 
-export const createQueryStore = <T extends QueryStore>(
+export const createQueryStore = <T, S = QueryStore<T>>(
   key: string,
   update: () => void,
 ) => {
-  const store = writable<T>(
+  const store = writable<S>(
     {
       loading: true,
       updating: false,
-      ids: {},
+      ids: [],
       [key]: {},
-    } as T,
+    } as unknown as S,
     createIntervalCallback(update),
   );
 
-  return {
-    ...store,
-  };
+  return store;
 };
 
 export const createIntervalCallback = (update: () => void): (() => void) => {

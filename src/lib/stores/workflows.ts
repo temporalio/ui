@@ -14,9 +14,9 @@ import {
   QueryStore,
 } from '$lib/utilities/create-query-store';
 
-type WorkflowStore = QueryStore & {
+type WorkflowStore = QueryStore<{
   workflows: { [key: string]: WorkflowExecution };
-};
+}>;
 
 const stores: { [key: string]: ReturnType<typeof createStore> } = {};
 
