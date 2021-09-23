@@ -31,8 +31,8 @@ const updateEvents =
 
     store.update(($store) => ({
       ...$store,
-      ids: { ...$store.ids, ...ids },
-      events: { ...$store.events, ...events },
+      ids: Object.keys(ids),
+      events,
     }));
   };
 

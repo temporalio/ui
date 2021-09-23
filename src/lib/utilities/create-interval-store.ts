@@ -5,7 +5,7 @@ export type QueryStore = {
   [x: string]: {};
   loading: boolean;
   updating: boolean;
-  ids: { [key: string]: boolean };
+  ids: string[];
 };
 
 export type QueryAction<T = string, P = {}> = {

@@ -9,12 +9,12 @@ import {
 
 import { fetchAllWorkflows } from '$lib/services/workflow-execution-service';
 import { createStoreWithCallback } from '$lib/utilities/create-store-with-callback';
-import { createQueryStore } from '$lib/utilities/create-interval-store';
+import {
+  createQueryStore,
+  QueryStore,
+} from '$lib/utilities/create-interval-store';
 
-type WorkflowStore = {
-  loading: boolean;
-  updating: boolean;
-  ids: { [key: string]: boolean };
+type WorkflowStore = QueryStore & {
   workflows: { [key: string]: WorkflowExecution };
 };
 
@@ -35,8 +35,8 @@ const updateWorkflows =
 
     store.update(($store) => ({
       ...$store,
-      ids: { ...$store.ids, ...ids },
-      workflows: { ...$store.workflows, ...workflows },
+      ids: Object.keys(ids),
+      workflows,
     }));
   };
 
