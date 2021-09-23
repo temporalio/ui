@@ -12,7 +12,7 @@ import { createStoreWithCallback } from '$lib/utilities/create-store-with-callba
 import {
   createQueryStore,
   QueryStore,
-} from '$lib/utilities/create-interval-store';
+} from '$lib/utilities/create-query-store';
 
 type WorkflowStore = QueryStore & {
   workflows: { [key: string]: WorkflowExecution };

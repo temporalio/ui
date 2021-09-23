@@ -1,5 +1,5 @@
 import { browser } from '$app/env';
-import { get, writable } from 'svelte/store';
+import { writable } from 'svelte/store';
 
 export type QueryStore = {
   [x: string]: {};

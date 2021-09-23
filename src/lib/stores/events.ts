@@ -8,7 +8,7 @@ import { fetchEvents } from '$lib/services/workflow-execution-service';
 import {
   createQueryStore,
   QueryStore,
-} from '$lib/utilities/create-interval-store';
+} from '$lib/utilities/create-query-store';
 import { createActivityStore } from './activities';
 
 type EventHistoryStore = QueryStore & {
