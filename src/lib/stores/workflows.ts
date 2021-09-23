@@ -1,4 +1,4 @@
-import { derived, writable, Writable, get } from 'svelte/store';
+import { derived, writable, Writable, get as getFromStore } from 'svelte/store';
 import type { ListWorkflowExecutionsResponse } from '$types';
 import { unique } from '$lib/utilities/unique';
 
@@ -9,6 +9,7 @@ import {
 
 import { fetchAllWorkflows } from '$lib/services/workflow-execution-service';
 import { createStoreWithCallback } from '$lib/utilities/create-store-with-callback';
+import { createQueryStore } from '$lib/utilities/create-interval-store';
 
 type WorkflowStore = {
   loading: boolean;
@@ -41,37 +42,16 @@ const updateWorkflows =
 
 export const createStore = (namespace: string) => {
   const update = () => {
-    const startTime = get(range);
+    const startTime = getFromStore(range);
 
     fetchAllWorkflows({
       namespace,
-      onUpdate: updateWorkflows(store),
       startTime,
+      onUpdate: updateWorkflows(store),
     });
   };
 
-  const store = writable<WorkflowStore>(
-    {
-      loading: true,
-      updating: false,
-      ids: {},
-      workflows: {},
-    },
-    () => {
-      let idleCallback: number;
-
-      update();
-
-      const interval = setInterval(() => {
-        idleCallback = requestIdleCallback(update);
-      }, 30000);
-
-      return () => {
-        if (idleCallback) cancelIdleCallback(idleCallback);
-        clearInterval(interval);
-      };
-    },
-  );
+  const store = createQueryStore<WorkflowStore>('workflows', update);
 
   const all = derived(store, ($store) => Object.values($store.workflows));
   const ids = derived(store, ($store) => Object.keys($store.ids));
@@ -104,6 +84,7 @@ export const createStore = (namespace: string) => {
   );
 
   return {
+    ...store,
     ids,
     all,
     filtered,
