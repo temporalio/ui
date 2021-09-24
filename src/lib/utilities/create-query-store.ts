@@ -35,7 +35,7 @@ export const createIntervalCallback = (update: () => void): (() => void) => {
   };
 
   setTimeout(callback, 0);
-  const interval = setInterval(callback, 3000);
+  const interval = setInterval(callback, 30000);
 
   return () => {
     if (browser && idleCallback) cancelIdleCallback(idleCallback);
