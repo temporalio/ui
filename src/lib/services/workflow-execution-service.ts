@@ -44,30 +44,22 @@ const fetchWorkflows =
     startTime = { days: 1 },
     request = fetch,
   }: FetchWorkflows<ListWorkflowExecutionsResponse>) => {
-    const { executions } = await paginated(async (token: string) => {
-      const iso = formatISO(sub(new Date(), startTime));
-      const url = toURL(`${base}/namespaces/${namespace}/workflows/${type}`, {
-        next_page_token: token,
-        'start_time_filter.earliest_time': iso,
-      });
+    const { executions } = await paginated(
+      async (token: string) => {
+        const iso = formatISO(sub(new Date(), startTime));
+        const url = toURL(`${base}/namespaces/${namespace}/workflows/${type}`, {
+          next_page_token: token,
+          'start_time_filter.earliest_time': iso,
+        });
 
-      const response = await request(url);
-      return await response.json();
-    }, onUpdate);
+        const response = await request(url);
+        return await response.json();
+      },
+      { onUpdate },
+    );
 
     return executions;
   };
-
-export const fetchOpenWorkflows = fetchWorkflows('open');
-export const fetchClosedWorkflows = fetchWorkflows('closed');
-export const fetchAllWorkflows = (
-  options:
-    | Parameters<typeof fetchOpenWorkflows>[0]
-    | Parameters<typeof fetchClosedWorkflows>[0],
-) => {
-  fetchOpenWorkflows(options);
-  fetchClosedWorkflows(options);
-};
 
 export const fetchEvents = async ({
   namespace,
@@ -88,10 +80,21 @@ export const fetchEvents = async ({
       const response = await request(url);
       return await response.json();
     },
-    onUpdate,
+    { onUpdate },
   );
 
   return events;
+};
+
+export const fetchOpenWorkflows = fetchWorkflows('open');
+export const fetchClosedWorkflows = fetchWorkflows('closed');
+export const fetchAllWorkflows = (
+  options:
+    | Parameters<typeof fetchOpenWorkflows>[0]
+    | Parameters<typeof fetchClosedWorkflows>[0],
+) => {
+  fetchOpenWorkflows(options);
+  fetchClosedWorkflows(options);
 };
 
 export const WorkflowExecutionAPI = {

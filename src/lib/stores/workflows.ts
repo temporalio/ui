@@ -1,4 +1,5 @@
 import { derived, writable, Writable, get as getFromStore } from 'svelte/store';
+
 import type { ListWorkflowExecutionsResponse } from '$types';
 import { unique } from '$lib/utilities/unique';
 
@@ -35,8 +36,8 @@ const updateWorkflows =
 
     store.update(($store) => ({
       ...$store,
-      ids: Object.keys(ids),
-      workflows,
+      ids: [...$store.ids, ...Object.keys(ids)],
+      workflows: { ...$store.workflows, ...workflows },
     }));
   };
 
@@ -56,6 +57,15 @@ export const createStore = (namespace: string) => {
   const all = derived(store, ($store) => Object.values($store.workflows));
   const ids = derived(store, ($store) => Object.keys($store.ids));
   const range = createStoreWithCallback<Duration>({ hours: 24 }, update);
+
+  range.subscribe(() =>
+    store.set({
+      loading: false,
+      updating: true,
+      workflows: {},
+      ids: [],
+    }),
+  );
 
   const status = writable<WorkflowStatus>(null);
   const workflowType = writable<WorkflowType>(null);
