@@ -6,8 +6,8 @@ type WithNextPageToken = { nextPageToken?: NextPageToken };
 type PaginatedOptions<T> = {
   onStart?: () => void;
   onUpdate?: (
-    current: Omit<T, keyof WithNextPageToken>,
     full: Omit<T, keyof WithNextPageToken>,
+    current: Omit<T, keyof WithNextPageToken>,
   ) => void;
   onComplete?: (finalProps: Omit<T, keyof WithNextPageToken>) => void;
   token?: NextPageToken;
@@ -19,6 +19,7 @@ export const paginated = async <T extends WithNextPageToken>(
   { onStart, onUpdate, onComplete, token, previousProps }: PaginatedOptions<T>,
 ): Promise<Omit<T, keyof WithNextPageToken>> => {
   if (!previousProps && isFunction(onStart)) onStart();
+
   const { nextPageToken, ...props } = await fn(token);
   const mergedProps = merge(previousProps, props);
 
