@@ -1,14 +1,19 @@
 import { derived, Writable, writable } from 'svelte/store';
+import get from 'lodash/get';
+import set from 'lodash/set';
+
 import type { GetWorkflowExecutionHistoryResponse, HistoryEvent } from '$types';
+
 import { fetchEvents } from '$lib/services/workflow-execution-service';
+import {
+  createQueryStore,
+  QueryStore,
+} from '$lib/utilities/create-query-store';
 import { createActivityStore } from './activities';
 
-type EventHistoryStore = {
-  loading: boolean;
-  updating: boolean;
-  ids: { [key: string]: boolean };
+type EventHistoryStore = QueryStore<{
   events: { [key: string]: HistoryEvent };
-};
+}>;
 
 const stores: { [key: string]: ReturnType<typeof createStore> } = {};
 
@@ -26,8 +31,8 @@ const updateEvents =
 
     store.update(($store) => ({
       ...$store,
-      ids: { ...$store.ids, ...ids },
-      events: { ...$store.events, ...events },
+      ids: Object.keys(ids),
+      events,
     }));
   };
 
@@ -36,35 +41,16 @@ export const createStore = (
   executionId: string,
   runId: string,
 ) => {
-  const store = writable<EventHistoryStore>(
-    {
-      loading: true,
-      updating: false,
-      ids: {},
-      events: {},
-    },
-    () => {
-      fetchEvents({
-        namespace,
-        executionId,
-        runId,
-        onUpdate: updateEvents(store),
-      });
+  const update = () => {
+    fetchEvents({
+      namespace,
+      executionId,
+      runId,
+      onUpdate: updateEvents(store),
+    });
+  };
 
-      const interval = setInterval(() => {
-        fetchEvents({
-          namespace,
-          executionId,
-          runId,
-          onUpdate: updateEvents(store),
-        });
-      }, 30000);
-
-      return () => {
-        clearInterval(interval);
-      };
-    },
-  );
+  const store = createQueryStore<EventHistoryStore>('events', update);
 
   const all = derived(store, ($store) => Object.values($store.events), []);
   const format = writable<EventFormat>('grid');
@@ -85,6 +71,7 @@ export const createStore = (
   const activities = createActivityStore(all);
 
   return {
+    subscribe: store.subscribe,
     all,
     filtered,
     activities,
@@ -98,7 +85,11 @@ export const createEventStore = (
   executionId: string,
   runId: string,
 ) => {
-  if (!stores[namespace])
-    stores[namespace] = createStore(namespace, executionId, runId);
-  return stores[namespace];
+  if (!get(stores, `${namespace}.${executionId}.${runId}`))
+    set(
+      stores,
+      `${namespace}.${executionId}.${runId}`,
+      createStore(namespace, executionId, runId),
+    );
+  return get(stores, `${namespace}.${executionId}.${runId}`);
 };

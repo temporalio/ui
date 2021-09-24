@@ -48,7 +48,7 @@ const fetchWorkflows =
       const iso = formatISO(sub(new Date(), startTime));
       const url = toURL(`${base}/namespaces/${namespace}/workflows/${type}`, {
         next_page_token: token,
-        'start_time_filter.latest_time': iso,
+        'start_time_filter.earliest_time': iso,
       });
 
       const response = await request(url);
