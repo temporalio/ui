@@ -30,17 +30,14 @@ export const createIntervalCallback = (update: () => void): (() => void) => {
   const callback = () => {
     if (browser) {
       if (idleCallback) cancelIdleCallback(idleCallback);
-      update();
-      // idleCallback = requestIdleCallback(update);
+      idleCallback = requestIdleCallback(update);
     }
-    console.log({ browser, idleCallback });
   };
 
   setTimeout(callback, 0);
-  const interval = setInterval(callback, 3000);
+  const interval = setInterval(callback, 30000);
 
   return () => {
-    console.log('unsubscribing');
     if (browser && idleCallback) cancelIdleCallback(idleCallback);
     clearInterval(interval);
   };
