@@ -16,7 +16,13 @@ type PaginatedOptions<T> = {
 
 export const paginated = async <T extends WithNextPageToken>(
   fn: (token?: NextPageToken) => Promise<T>,
-  { onStart, onUpdate, onComplete, token, previousProps }: PaginatedOptions<T>,
+  {
+    onStart,
+    onUpdate,
+    onComplete,
+    token,
+    previousProps,
+  }: PaginatedOptions<T> = {},
 ): Promise<Omit<T, keyof WithNextPageToken>> => {
   if (!previousProps && isFunction(onStart)) onStart();
 

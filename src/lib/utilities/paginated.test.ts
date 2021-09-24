@@ -41,7 +41,9 @@ describe(paginated, () => {
 
   it('should collect incremental updates with an onUpdate callback', () => {
     const mockCallback = jest.fn((x) => x);
-    return paginated((token) => fetchMock(token), mockCallback).then(() => {
+    return paginated((token) => fetchMock(token), {
+      onUpdate: mockCallback,
+    }).then(() => {
       expect(mockCallback.mock.calls.length).toBe(4);
     });
   });
