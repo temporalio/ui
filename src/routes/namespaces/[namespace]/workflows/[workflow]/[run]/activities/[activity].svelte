@@ -32,7 +32,7 @@
   export let activity: string;
 
   const { activities } = createEventStore(namespace, executionId, runId);
-  const selectedActivity = activities.getActivity(activity);
+  $: selectedActivity = activities.getActivity(activity);
 
   $: events = Object.keys(omit($selectedActivity, ['id', 'status']));
 </script>
