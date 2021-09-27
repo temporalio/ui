@@ -15,7 +15,7 @@ Once you have the prerequisites going, run the following:
 
 ```bash
 npm run build:local
-npm run preview:cloud
+npm run preview:local
 ```
 
 ## Developing
