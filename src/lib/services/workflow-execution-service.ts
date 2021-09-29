@@ -9,6 +9,8 @@ import type {
 } from '$types';
 
 const base = import.meta.env.VITE_API;
+const id = <T>(x: T) => x;
+const createDate = (d: Duration) => formatISO(sub(new Date(), d));
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   executionId: string;
@@ -31,17 +33,16 @@ const fetchWorkflows =
   async (
     {
       namespace,
-      onUpdate = (x) => x,
+      onUpdate = id,
       startTime = { days: 1 },
     }: FetchWorkflows<ListWorkflowExecutionsResponse>,
     request = fetch,
-  ) => {
-    const { executions } = await paginated(
+  ): Promise<ListWorkflowExecutionsResponse> => {
+    const response = await paginated(
       async (token: string) => {
-        const iso = formatISO(sub(new Date(), startTime));
         const url = toURL(`${base}/namespaces/${namespace}/workflows/${type}`, {
           next_page_token: token,
-          'start_time_filter.earliest_time': iso,
+          'start_time_filter.earliest_time': createDate(startTime),
         });
 
         const response = await request(url);
@@ -50,11 +51,39 @@ const fetchWorkflows =
       { onUpdate },
     );
 
-    return executions;
+    return response;
   };
 
+export const fetchAllWorkflows = async (
+  options: FetchWorkflows<ListWorkflowExecutionsResponse>,
+) => {
+  const open = await fetchWorkflows('open')(options);
+  const closed = await fetchWorkflows('closed')(options);
+
+  return { ...open.executions, ...closed.executions };
+};
+
+export async function fetchWorkflow(
+  { executionId, runId, namespace }: GetWorkflowExecutionRequest,
+  request = fetch,
+): Promise<{
+  execution: DescribeWorkflowExecutionResponse;
+}> {
+  const url = toURL(
+    `${base}/namespaces/${namespace}/workflows/${executionId}/executions/${runId}`,
+  );
+
+  const execution: DescribeWorkflowExecutionResponse = await request(url)
+    .then((response) => response.json())
+    .catch(console.error);
+
+  return {
+    execution,
+  };
+}
+
 export const fetchEvents = async (
-  { namespace, executionId, runId, onUpdate = (x) => x }: FetchEvents,
+  { namespace, executionId, runId, onUpdate = id }: FetchEvents,
   request = fetch,
 ) => {
   const events: GetWorkflowExecutionHistoryResponse = await paginated(
@@ -74,31 +103,3 @@ export const fetchEvents = async (
 
   return events;
 };
-
-export const fetchOpenWorkflows = fetchWorkflows('open');
-export const fetchClosedWorkflows = fetchWorkflows('closed');
-export const fetchAllWorkflows = (
-  options:
-    | Parameters<typeof fetchOpenWorkflows>[0]
-    | Parameters<typeof fetchClosedWorkflows>[0],
-) => {
-  fetchOpenWorkflows(options);
-  fetchClosedWorkflows(options);
-};
-
-export async function get(
-  { executionId, runId, namespace }: GetWorkflowExecutionRequest,
-  request = fetch,
-): Promise<{
-  execution: DescribeWorkflowExecutionResponse;
-}> {
-  const execution: DescribeWorkflowExecutionResponse = await request(
-    `${base}/namespaces/${namespace}/workflows/${executionId}/executions/${runId}`,
-  )
-    .then((response) => response.json())
-    .catch(console.error);
-
-  return {
-    execution,
-  };
-}

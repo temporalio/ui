@@ -6,30 +6,12 @@ import type {
 } from '$types';
 
 import { formatDate } from '$lib/utilities/format-date';
+import get from 'lodash/get';
 
 type Optional<T extends unknown, K extends keyof T = keyof T> = Omit<T, K> &
   Partial<Pick<T, K>>;
 
-export const toWorkflowExecution = (
-  response: WorkflowExecutionAPIResponse,
-): WorkflowExecution => {
-  return new WorkflowExecution(response);
-};
-
-export const toWorkflowExecutions = (
-  executions: WorkflowExecutionInfo[],
-): WorkflowExecution[] => {
-  return (executions || []).map(
-    (workflowExecutionInfo) => new WorkflowExecution({ workflowExecutionInfo }),
-  );
-};
-
-/*
- * Internal use only. Use the utility methods above for formatting workflow
- * execution API responses.
- */
-
-interface WorkflowExecution {
+export type WorkflowExecution = {
   name: string;
   id: string;
   runId: string;
@@ -39,41 +21,54 @@ interface WorkflowExecution {
   taskQueue?: string;
   historyEvents: Long;
   pendingActivities: PendingActivityInfo[];
-}
+  url: string;
+  toggleUrl: (isFullScreen: boolean) => string;
+};
 
 type WorkflowExecutionAPIResponse = Optional<
   DescribeWorkflowExecutionResponse,
   'executionConfig' | 'pendingActivities' | 'pendingChildren'
 >;
 
-class WorkflowExecution {
-  constructor({
-    executionConfig,
-    workflowExecutionInfo,
-    pendingActivities,
-  }: WorkflowExecutionAPIResponse) {
-    this.name = workflowExecutionInfo.type.name;
-    this.id = workflowExecutionInfo.execution.workflowId;
-    this.runId = workflowExecutionInfo.execution.runId;
-    this.startTime = formatDate(workflowExecutionInfo.startTime);
-    this.endTime = formatDate(workflowExecutionInfo.closeTime);
-    this.status = workflowExecutionInfo.status;
-    this.historyEvents = workflowExecutionInfo.historyLength;
+export const toWorkflowExecution = (
+  response: WorkflowExecutionAPIResponse,
+): WorkflowExecution => {
+  const name = response.workflowExecutionInfo.type.name;
+  const id = response.workflowExecutionInfo.execution.workflowId;
+  const runId = response.workflowExecutionInfo.execution.runId;
+  const startTime = formatDate(response.workflowExecutionInfo.startTime);
+  const endTime = formatDate(response.workflowExecutionInfo.closeTime);
+  const status = response.workflowExecutionInfo.status;
+  const historyEvents = response.workflowExecutionInfo.historyLength;
+  const url = `/workflows/${id}/${runId}`;
+  const taskQueue = get(response, 'executionConfig.taskQueue.name');
+  const pendingActivities = response.pendingActivities || [];
 
-    if (executionConfig) {
-      this.taskQueue = executionConfig.taskQueue.name;
-    }
-
-    this.pendingActivities = pendingActivities;
-  }
-
-  get url(): string {
-    return `/workflows/${this.id}/${this.runId}`;
-  }
-
-  toggleUrl(isFullScreen: boolean): string {
-    return `${this.url}?${new URLSearchParams({
+  const toggleUrl = (isFullScreen: boolean): string => {
+    return `${url}?${new URLSearchParams({
       fullScreen: (!isFullScreen).toString(),
     })}`;
-  }
-}
+  };
+
+  return {
+    name,
+    id,
+    runId,
+    startTime,
+    endTime,
+    status,
+    historyEvents,
+    url,
+    toggleUrl,
+    taskQueue,
+    pendingActivities,
+  };
+};
+
+export const toWorkflowExecutions = (
+  executions: WorkflowExecutionInfo[],
+): WorkflowExecution[] => {
+  return (executions || []).map((workflowExecutionInfo) =>
+    toWorkflowExecution({ workflowExecutionInfo }),
+  );
+};
