@@ -1,9 +1,7 @@
 <script context="module" lang="ts">
   import type { LoadInput } from '@sveltejs/kit';
-  import {
-    GetPollersResponse,
-    getPollers,
-  } from '$lib/services/workflow-execution-service';
+  import type { GetPollersResponse } from '$lib/services/pollers-service';
+  import { getPollers } from '$lib/services/pollers-service';
 
   export async function load({ fetch, page }: LoadInput) {
     const { namespace, queue } = page.params;

@@ -19,6 +19,8 @@ type WorkflowStatus =
   | 'Terminated'
   | null;
 
+type NamespaceScopedRequest = { namespace: string };
+
 type WorkflowType = string | null;
 
 type WorkflowExecutionFilters = {
