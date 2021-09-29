@@ -11,12 +11,16 @@ type PollersData = {
   [key: string]: Poller;
 };
 
+type TaskQueueType = 'ACTIVITY' | 'WORKFLOW';
+
 type Poller = {
   lastAccessTime: PollerInfo['lastAccessTime'];
-  taskQueueTypes: string[];
+  taskQueueTypes: TaskQueueType[];
 };
 
-const base = import.meta.env.VITE_API;
+type PollerWithTaskQueueTypes = PollerInfo & {
+  taskQueueTypes?: TaskQueueType[];
+};
 
 export async function getPollers(
   { queue, namespace }: GetAllPollersRequest,
@@ -28,41 +32,43 @@ export async function getPollers(
   );
 
   const pollersActivity = await requestFromAPI<GetPollersResponse>(
-    `${base}/namespaces/${namespace}/task-queues/${queue}?task_queue_type=2`,
+    `/namespaces/${namespace}/task-queues/${queue}?task_queue_type=2`,
     { request },
   );
 
-  pollersActivity.pollers.forEach((poller) => {
-    poller[`taskQueueTypes`] = ['ACTIVITY'];
+  pollersActivity.pollers.forEach((poller: PollerWithTaskQueueTypes) => {
+    poller.taskQueueTypes = ['ACTIVITY'];
   });
 
-  pollersWorkflow.pollers.forEach((poller) => {
-    poller[`taskQueueTypes`] = ['WORKFLOW'];
+  pollersWorkflow.pollers.forEach((poller: PollerWithTaskQueueTypes) => {
+    poller.taskQueueTypes = ['WORKFLOW'];
   });
 
-  const r = (type: string) => (o: PollersData, poller: PollerInfo) => {
-    const i: Poller = o[poller.identity] || {
-      lastAccessTime: undefined,
-      taskQueueTypes: [],
+  const r =
+    (type: TaskQueueType) => (pollers: PollersData, poller: PollerInfo) => {
+      const currentPoller: Poller = pollers[poller.identity] || {
+        lastAccessTime: undefined,
+        taskQueueTypes: [],
+      };
+
+      pollers[poller.identity] = {
+        lastAccessTime:
+          !currentPoller.lastAccessTime ||
+          currentPoller.lastAccessTime < poller.lastAccessTime
+            ? poller.lastAccessTime
+            : currentPoller.lastAccessTime,
+        taskQueueTypes: currentPoller.taskQueueTypes.concat([type]),
+      };
+
+      return pollers;
     };
 
-    o[poller.identity] = {
-      lastAccessTime:
-        !i.lastAccessTime || i.lastAccessTime < poller.lastAccessTime
-          ? poller.lastAccessTime
-          : i.lastAccessTime,
-      taskQueueTypes: i.taskQueueTypes.concat([type]),
-    };
-
-    return o;
-  };
-
-  pollersActivity.pollers.filter((pollerA) =>
-    pollersWorkflow.pollers.some((pollerW) => {
+  pollersActivity.pollers.filter((pollerA: PollerWithTaskQueueTypes) =>
+    pollersWorkflow.pollers.some((pollerW: PollerWithTaskQueueTypes) => {
       if (pollerA.identity === pollerW.identity) {
-        pollerA['taskQueueTypes'] = [
-          ...pollerW['taskQueueTypes'],
-          ...pollerA['taskQueueTypes'],
+        pollerA.taskQueueTypes = [
+          ...pollerW.taskQueueTypes,
+          ...pollerA.taskQueueTypes,
         ];
         return pollerA;
       }
