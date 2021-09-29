@@ -6,7 +6,7 @@
     const { namespace } = page.params;
 
     const settings: DescribeNamespaceResponse = await fetch(
-      'http://localhost:8080/api/v1/namespaces/' + namespace,
+      import.meta.env.VITE_API + '/namespaces/' + namespace,
     ).then((response) => response.json());
 
     return {

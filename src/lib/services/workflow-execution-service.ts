@@ -11,7 +11,7 @@ import type {
   ListWorkflowExecutionsResponse,
 } from '$types';
 
-const base = 'http://localhost:8080/api/v1';
+const base = import.meta.env.VITE_API;
 
 export type NamespaceScopedRequest = { namespace: string };
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
