@@ -2,6 +2,7 @@ import { requestFromAPI } from '$lib/utilities/request-from-api';
 import type { PollerInfo, TaskQueueStatus } from '$types';
 
 export type GetAllPollersRequest = NamespaceScopedRequest & { queue: string };
+
 export type GetPollersResponse = {
   pollers: PollerInfo[];
   taskQueueStatus: TaskQueueStatus;
@@ -26,21 +27,21 @@ export async function getPollers(
   { queue, namespace }: GetAllPollersRequest,
   request = fetch,
 ): Promise<GetPollersResponse> {
-  const pollersWorkflow = await requestFromAPI<GetPollersResponse>(
+  const workflowPollers = await requestFromAPI<GetPollersResponse>(
     `/namespaces/${namespace}/task-queues/${queue}?task_queue_type=1`,
     { request },
   );
 
-  const pollersActivity = await requestFromAPI<GetPollersResponse>(
+  const activityPollers = await requestFromAPI<GetPollersResponse>(
     `/namespaces/${namespace}/task-queues/${queue}?task_queue_type=2`,
     { request },
   );
 
-  pollersActivity.pollers.forEach((poller: PollerWithTaskQueueTypes) => {
+  activityPollers.pollers.forEach((poller: PollerWithTaskQueueTypes) => {
     poller.taskQueueTypes = ['ACTIVITY'];
   });
 
-  pollersWorkflow.pollers.forEach((poller: PollerWithTaskQueueTypes) => {
+  workflowPollers.pollers.forEach((poller: PollerWithTaskQueueTypes) => {
     poller.taskQueueTypes = ['WORKFLOW'];
   });
 
@@ -63,8 +64,8 @@ export async function getPollers(
       return pollers;
     };
 
-  pollersActivity.pollers.filter((pollerA: PollerWithTaskQueueTypes) =>
-    pollersWorkflow.pollers.some((pollerW: PollerWithTaskQueueTypes) => {
+  activityPollers.pollers.filter((pollerA: PollerWithTaskQueueTypes) =>
+    workflowPollers.pollers.some((pollerW: PollerWithTaskQueueTypes) => {
       if (pollerA.identity === pollerW.identity) {
         pollerA.taskQueueTypes = [
           ...pollerW.taskQueueTypes,
@@ -75,13 +76,13 @@ export async function getPollers(
     }),
   );
 
-  pollersActivity.pollers.reduce(
+  activityPollers.pollers.reduce(
     r('ACTIVITY'),
-    pollersWorkflow.pollers.reduce(r('WORKFLOW'), {}),
+    workflowPollers.pollers.reduce(r('WORKFLOW'), {}),
   );
 
   return {
-    pollers: pollersActivity.pollers,
-    taskQueueStatus: pollersActivity.taskQueueStatus,
+    pollers: activityPollers.pollers,
+    taskQueueStatus: activityPollers.taskQueueStatus,
   };
 }
