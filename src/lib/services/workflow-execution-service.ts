@@ -9,7 +9,6 @@ import type {
 import { paginated } from '$lib/utilities/paginated';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 
-const base = import.meta.env.VITE_API;
 const id = <T>(x: T) => x;
 const createDate = (d: Duration) => formatISO(sub(new Date(), d));
 
