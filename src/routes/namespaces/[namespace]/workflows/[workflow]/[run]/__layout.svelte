@@ -1,9 +1,10 @@
 <script context="module" lang="ts">
+  import type { LoadInput } from '@sveltejs/kit';
+
   import {
     fetchWorkflow,
     fetchEvents,
   } from '$lib/services/workflow-execution-service';
-  import type { LoadInput } from '@sveltejs/kit';
 
   export async function load({ fetch, page }: LoadInput) {
     const { workflow: executionId, run: runId, namespace } = page.params;
