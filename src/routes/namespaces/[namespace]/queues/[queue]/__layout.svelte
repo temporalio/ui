@@ -19,8 +19,8 @@
 </script>
 
 <section class="flex flex-col items-start">
-  <header>
-    <h3>Pollers</h3>
+  <header class="p-3 mb-5">
+    <h3 class="text-2xl">Pollers</h3>
   </header>
   <div class="w-full h-full overflow-x-scroll">
     <QueuePollersTable>
@@ -40,14 +40,3 @@
     </QueuePollersTable>
   </div>
 </section>
-
-<style lang="postcss">
-  header {
-    padding: 12px;
-    margin-bottom: 18px;
-  }
-
-  h3 {
-    font-size: 24px;
-  }
-</style>
