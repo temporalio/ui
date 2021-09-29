@@ -29,7 +29,7 @@ export const toWorkflowExecutions = (
  * execution API responses.
  */
 
-export interface WorkflowExecution {
+interface WorkflowExecution {
   name: string;
   id: string;
   runId: string;
@@ -46,7 +46,7 @@ type WorkflowExecutionAPIResponse = Optional<
   'executionConfig' | 'pendingActivities' | 'pendingChildren'
 >;
 
-export class WorkflowExecution {
+class WorkflowExecution {
   constructor({
     executionConfig,
     workflowExecutionInfo,
