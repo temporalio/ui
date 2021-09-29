@@ -2,15 +2,12 @@
   import type { LoadInput } from '@sveltejs/kit';
   import {
     GetPollersResponse,
-    WorkflowExecutionAPI,
+    getPollers,
   } from '$lib/services/workflow-execution-service';
 
   export async function load({ fetch, page }: LoadInput) {
     const { namespace, queue } = page.params;
-    return await WorkflowExecutionAPI.getPollers(
-      { queue, namespace },
-      fetch,
-    ).then((pollers) => ({
+    return await getPollers({ queue, namespace }, fetch).then((pollers) => ({
       props: { pollers },
     }));
   }

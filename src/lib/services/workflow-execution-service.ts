@@ -97,111 +97,99 @@ export const fetchAllWorkflows = (
   fetchClosedWorkflows(options);
 };
 
-export const WorkflowExecutionAPI = {
-  async getAll(
-    { namespace }: NamespaceScopedRequest,
-    request = fetch,
-  ): Promise<WorkflowExecutionInfo[]> {
-    const open = await fetchOpenWorkflows({ namespace, request });
-    const closed = await fetchClosedWorkflows({ namespace, request });
+export async function getPollers(
+  { queue, namespace }: GetAllPollersRequest,
+  request = fetch,
+): Promise<GetPollersResponse> {
+  const pollersWorkflow: GetPollersResponse = await request(
+    `${base}/namespaces/${namespace}/task-queues/${queue}?task_queue_type=1`,
+  )
+    .then((response) => response.json())
+    .catch(console.error);
 
-    return [].concat(open).concat(closed);
-  },
+  const pollersActivity: GetPollersResponse = await request(
+    `${base}/namespaces/${namespace}/task-queues/${queue}?task_queue_type=2`,
+  )
+    .then((response) => response.json())
+    .catch(console.error);
 
-  async get(
-    { executionId, runId, namespace }: GetWorkflowExecutionRequest,
-    request = fetch,
-  ): Promise<{
-    execution: DescribeWorkflowExecutionResponse;
-  }> {
-    const execution: DescribeWorkflowExecutionResponse = await request(
-      `${base}/namespaces/${namespace}/workflows/${executionId}/executions/${runId}`,
-    )
-      .then((response) => response.json())
-      .catch(console.error);
+  pollersActivity.pollers.forEach((poller) => {
+    poller[`taskQueueTypes`] = ['ACTIVITY'];
+  });
 
-    return {
-      execution,
-    };
-  },
+  pollersWorkflow.pollers.forEach((poller) => {
+    poller[`taskQueueTypes`] = ['WORKFLOW'];
+  });
 
-  async getEvents(
-    { executionId, runId, namespace }: GetWorkflowExecutionRequest,
-    request = fetch,
-  ): Promise<{
-    events: GetWorkflowExecutionHistoryResponse;
-  }> {
-    const events: GetWorkflowExecutionHistoryResponse = await request(
-      `${base}/namespaces/${namespace}/workflows/${executionId}/executions/${runId}/events`,
-    )
-      .then((response) => response.json())
-      .catch(console.error);
+  const r = (type) => (o, poller) => {
+    const i = o[poller.identity] || {};
 
-    return {
-      events,
-    };
-  },
-
-  async getPollers(
-    { queue, namespace }: GetAllPollersRequest,
-    request = fetch,
-  ): Promise<GetPollersResponse> {
-    const pollersWorkflow: GetPollersResponse = await request(
-      `${base}/namespaces/${namespace}/task-queues/${queue}?task_queue_type=1`,
-    )
-      .then((response) => response.json())
-      .catch(console.error);
-
-    const pollersActivity: GetPollersResponse = await request(
-      `${base}/namespaces/${namespace}/task-queues/${queue}?task_queue_type=2`,
-    )
-      .then((response) => response.json())
-      .catch(console.error);
-
-    pollersActivity.pollers.forEach((poller) => {
-      poller[`taskQueueTypes`] = ['ACTIVITY'];
-    });
-
-    pollersWorkflow.pollers.forEach((poller) => {
-      poller[`taskQueueTypes`] = ['WORKFLOW'];
-    });
-
-    const r = (type) => (o, poller) => {
-      const i = o[poller.identity] || {};
-
-      o[poller.identity] = {
-        lastAccessTime:
-          !i.lastAccessTime || i.lastAccessTime < poller.lastAccessTime
-            ? poller.lastAccessTime
-            : i.lastAccessTime,
-        taskQueueTypes: i.taskQueueTypes
-          ? i.taskQueueTypes.concat([type])
-          : [type],
-      };
-
-      return o;
+    o[poller.identity] = {
+      lastAccessTime:
+        !i.lastAccessTime || i.lastAccessTime < poller.lastAccessTime
+          ? poller.lastAccessTime
+          : i.lastAccessTime,
+      taskQueueTypes: i.taskQueueTypes
+        ? i.taskQueueTypes.concat([type])
+        : [type],
     };
 
-    pollersActivity.pollers.filter((pollerA) =>
-      pollersWorkflow.pollers.some((pollerW) => {
-        if (pollerA.identity === pollerW.identity) {
-          pollerA['taskQueueTypes'] = [
-            ...pollerW['taskQueueTypes'],
-            ...pollerA['taskQueueTypes'],
-          ];
-          return pollerA;
-        }
-      }),
-    );
+    return o;
+  };
 
-    pollersActivity.pollers.reduce(
-      r('ACTIVITY'),
-      pollersWorkflow.pollers.reduce(r('WORKFLOW'), {}),
-    );
+  pollersActivity.pollers.filter((pollerA) =>
+    pollersWorkflow.pollers.some((pollerW) => {
+      if (pollerA.identity === pollerW.identity) {
+        pollerA['taskQueueTypes'] = [
+          ...pollerW['taskQueueTypes'],
+          ...pollerA['taskQueueTypes'],
+        ];
+        return pollerA;
+      }
+    }),
+  );
 
-    return {
-      pollers: pollersActivity.pollers,
-      taskQueueStatus: pollersActivity.taskQueueStatus,
-    };
-  },
-};
+  pollersActivity.pollers.reduce(
+    r('ACTIVITY'),
+    pollersWorkflow.pollers.reduce(r('WORKFLOW'), {}),
+  );
+
+  return {
+    pollers: pollersActivity.pollers,
+    taskQueueStatus: pollersActivity.taskQueueStatus,
+  };
+}
+
+export async function get(
+  { executionId, runId, namespace }: GetWorkflowExecutionRequest,
+  request = fetch,
+): Promise<{
+  execution: DescribeWorkflowExecutionResponse;
+}> {
+  const execution: DescribeWorkflowExecutionResponse = await request(
+    `${base}/namespaces/${namespace}/workflows/${executionId}/executions/${runId}`,
+  )
+    .then((response) => response.json())
+    .catch(console.error);
+
+  return {
+    execution,
+  };
+}
+
+export async function getEvents(
+  { executionId, runId, namespace }: GetWorkflowExecutionRequest,
+  request = fetch,
+): Promise<{
+  events: GetWorkflowExecutionHistoryResponse;
+}> {
+  const events: GetWorkflowExecutionHistoryResponse = await request(
+    `${base}/namespaces/${namespace}/workflows/${executionId}/executions/${runId}/events`,
+  )
+    .then((response) => response.json())
+    .catch(console.error);
+
+  return {
+    events,
+  };
+}

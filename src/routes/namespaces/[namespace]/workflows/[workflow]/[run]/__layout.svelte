@@ -1,12 +1,11 @@
 <script context="module" lang="ts">
-  import { WorkflowExecutionAPI } from '$lib/services/workflow-execution-service';
-
+  import { get, getEvents } from '$lib/services/workflow-execution-service';
   import type { LoadInput } from '@sveltejs/kit';
 
   export async function load({ fetch, page }: LoadInput) {
     const { workflow: executionId, run: runId, namespace } = page.params;
 
-    const { execution } = await WorkflowExecutionAPI.get(
+    const { execution } = await get(
       {
         executionId,
         runId,
@@ -15,7 +14,7 @@
       fetch,
     );
 
-    const { events } = await WorkflowExecutionAPI.getEvents(
+    const { events } = await getEvents(
       {
         executionId,
         runId,
