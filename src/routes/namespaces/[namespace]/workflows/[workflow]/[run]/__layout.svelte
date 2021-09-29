@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
-  import { get, getEvents } from '$lib/services/workflow-execution-service';
+  import { get, fetchEvents } from '$lib/services/workflow-execution-service';
   import type { LoadInput } from '@sveltejs/kit';
 
   export async function load({ fetch, page }: LoadInput) {
@@ -14,7 +14,7 @@
       fetch,
     );
 
-    const { events } = await getEvents(
+    const events = await fetchEvents(
       {
         executionId,
         runId,

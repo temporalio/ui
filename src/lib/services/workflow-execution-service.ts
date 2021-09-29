@@ -3,7 +3,6 @@ import { sub, formatISO } from 'date-fns';
 import { paginated } from '$lib/utilities/paginated';
 import { toURL } from '$lib/utilities/to-url';
 import type {
-  WorkflowExecutionInfo,
   PollerInfo,
   TaskQueueStatus,
   DescribeWorkflowExecutionResponse,
@@ -38,12 +37,14 @@ type FetchEvents = FetchWorkflows<GetWorkflowExecutionHistoryResponse> & {
 
 const fetchWorkflows =
   (type: 'open' | 'closed') =>
-  async ({
-    namespace,
-    onUpdate = (x) => x,
-    startTime = { days: 1 },
+  async (
+    {
+      namespace,
+      onUpdate = (x) => x,
+      startTime = { days: 1 },
+    }: FetchWorkflows<ListWorkflowExecutionsResponse>,
     request = fetch,
-  }: FetchWorkflows<ListWorkflowExecutionsResponse>) => {
+  ) => {
     const { executions } = await paginated(
       async (token: string) => {
         const iso = formatISO(sub(new Date(), startTime));
@@ -61,13 +62,10 @@ const fetchWorkflows =
     return executions;
   };
 
-export const fetchEvents = async ({
-  namespace,
-  executionId,
-  runId,
-  onUpdate = (x) => x,
+export const fetchEvents = async (
+  { namespace, executionId, runId, onUpdate = (x) => x }: FetchEvents,
   request = fetch,
-}: FetchEvents) => {
+) => {
   const events: GetWorkflowExecutionHistoryResponse = await paginated(
     async (token: string) => {
       const url = toURL(
@@ -96,6 +94,23 @@ export const fetchAllWorkflows = (
   fetchOpenWorkflows(options);
   fetchClosedWorkflows(options);
 };
+
+export async function get(
+  { executionId, runId, namespace }: GetWorkflowExecutionRequest,
+  request = fetch,
+): Promise<{
+  execution: DescribeWorkflowExecutionResponse;
+}> {
+  const execution: DescribeWorkflowExecutionResponse = await request(
+    `${base}/namespaces/${namespace}/workflows/${executionId}/executions/${runId}`,
+  )
+    .then((response) => response.json())
+    .catch(console.error);
+
+  return {
+    execution,
+  };
+}
 
 export async function getPollers(
   { queue, namespace }: GetAllPollersRequest,
@@ -157,39 +172,5 @@ export async function getPollers(
   return {
     pollers: pollersActivity.pollers,
     taskQueueStatus: pollersActivity.taskQueueStatus,
-  };
-}
-
-export async function get(
-  { executionId, runId, namespace }: GetWorkflowExecutionRequest,
-  request = fetch,
-): Promise<{
-  execution: DescribeWorkflowExecutionResponse;
-}> {
-  const execution: DescribeWorkflowExecutionResponse = await request(
-    `${base}/namespaces/${namespace}/workflows/${executionId}/executions/${runId}`,
-  )
-    .then((response) => response.json())
-    .catch(console.error);
-
-  return {
-    execution,
-  };
-}
-
-export async function getEvents(
-  { executionId, runId, namespace }: GetWorkflowExecutionRequest,
-  request = fetch,
-): Promise<{
-  events: GetWorkflowExecutionHistoryResponse;
-}> {
-  const events: GetWorkflowExecutionHistoryResponse = await request(
-    `${base}/namespaces/${namespace}/workflows/${executionId}/executions/${runId}/events`,
-  )
-    .then((response) => response.json())
-    .catch(console.error);
-
-  return {
-    events,
   };
 }
