@@ -5,7 +5,7 @@
 
   export async function load({ fetch }: LoadInput) {
     const cluster: GetClusterInfoResponse = await fetch(
-      'http://localhost:8080/api/v1/cluster',
+      import.meta.env.VITE_API + '/api/v1/cluster',
     ).then((response) => response.json());
 
     return {

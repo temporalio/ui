@@ -4,7 +4,7 @@
   import NamespaceSelect from '$lib/components/namespace-select.svelte';
 
   export async function load({ fetch }: LoadInput) {
-    const user = await fetch('http://localhost:8080/api/v1/me/').then(
+    const user = await fetch(import.meta.env.VITE_API + '/api/v1/me/').then(
       (response) => response.json(),
     );
 
@@ -54,7 +54,7 @@
         </span>
       {:else}
         <a
-          href="http://localhost:8080/auth/sso"
+          href={import.meta.env.VITE_API + '/auth/sso'}
           class="block px-4 py-2 hover:bg-green-500 hover:text-green-100"
         >
           Sign In
@@ -67,7 +67,7 @@
       >
       {#if user.email}
         <a
-          href="http://localhost:8080/auth/signout"
+          href={import.meta.env.VITE_API + '/auth/signout'}
           class="block px-4 py-2 hover:bg-green-500 hover:text-green-100"
         >
           Sign Out

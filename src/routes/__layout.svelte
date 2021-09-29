@@ -7,7 +7,7 @@
 
   export async function load({ fetch }: LoadInput) {
     const { namespaces }: ListNamespacesResponse = await fetch(
-      'http://localhost:8080/api/v1/namespaces',
+      import.meta.env.VITE_API + '/namespaces',
     ).then((response) => response.json());
 
     return {
