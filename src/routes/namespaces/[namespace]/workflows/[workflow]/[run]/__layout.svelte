@@ -9,7 +9,7 @@
   export async function load({ fetch, page }: LoadInput) {
     const { workflow: executionId, run: runId, namespace } = page.params;
 
-    const { execution } = await fetchWorkflow(
+    const execution = await fetchWorkflow(
       {
         executionId,
         runId,

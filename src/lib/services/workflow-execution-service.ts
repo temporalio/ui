@@ -1,12 +1,13 @@
 import { sub, formatISO } from 'date-fns';
 
-import { paginated } from '$lib/utilities/paginated';
-import { toURL } from '$lib/utilities/to-url';
 import type {
   DescribeWorkflowExecutionResponse,
   GetWorkflowExecutionHistoryResponse,
   ListWorkflowExecutionsResponse,
 } from '$types';
+
+import { paginated } from '$lib/utilities/paginated';
+import { requestFromAPI } from '$lib/utilities/request-from-api';
 
 const base = import.meta.env.VITE_API;
 const id = <T>(x: T) => x;
@@ -38,20 +39,19 @@ const fetchWorkflows =
     }: FetchWorkflows<ListWorkflowExecutionsResponse>,
     request = fetch,
   ): Promise<ListWorkflowExecutionsResponse> => {
-    const response = await paginated(
+    return await paginated(
       async (token: string) => {
-        const url = toURL(`${base}/namespaces/${namespace}/workflows/${type}`, {
-          next_page_token: token,
-          'start_time_filter.earliest_time': createDate(startTime),
-        });
-
-        const response = await request(url);
-        return await response.json();
+        return requestFromAPI<ListWorkflowExecutionsResponse>(
+          `/namespaces/${namespace}/workflows/${type}`,
+          {
+            next_page_token: token,
+            'start_time_filter.earliest_time': createDate(startTime),
+          },
+          { request },
+        );
       },
       { onUpdate },
     );
-
-    return response;
   };
 
 export const fetchAllWorkflows = async (
@@ -66,20 +66,12 @@ export const fetchAllWorkflows = async (
 export async function fetchWorkflow(
   { executionId, runId, namespace }: GetWorkflowExecutionRequest,
   request = fetch,
-): Promise<{
-  execution: DescribeWorkflowExecutionResponse;
-}> {
-  const url = toURL(
-    `${base}/namespaces/${namespace}/workflows/${executionId}/executions/${runId}`,
+): Promise<DescribeWorkflowExecutionResponse> {
+  return requestFromAPI(
+    `/namespaces/${namespace}/workflows/${executionId}/executions/${runId}`,
+    {},
+    { request },
   );
-
-  const execution: DescribeWorkflowExecutionResponse = await request(url)
-    .then((response) => response.json())
-    .catch(console.error);
-
-  return {
-    execution,
-  };
 }
 
 export const fetchEvents = async (
@@ -88,15 +80,13 @@ export const fetchEvents = async (
 ) => {
   const events: GetWorkflowExecutionHistoryResponse = await paginated(
     async (token: string) => {
-      const url = toURL(
-        `${base}/namespaces/${namespace}/workflows/${executionId}/executions/${runId}/events`,
+      return requestFromAPI<GetWorkflowExecutionHistoryResponse>(
+        `/namespaces/${namespace}/workflows/${executionId}/executions/${runId}/events`,
         {
           next_page_token: token,
         },
+        { request },
       );
-
-      const response = await request(url);
-      return await response.json();
     },
     { onUpdate },
   );
