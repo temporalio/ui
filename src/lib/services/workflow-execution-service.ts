@@ -43,10 +43,12 @@ const fetchWorkflows =
         return requestFromAPI<ListWorkflowExecutionsResponse>(
           `/namespaces/${namespace}/workflows/${type}`,
           {
-            next_page_token: token,
-            'start_time_filter.earliest_time': createDate(startTime),
+            params: {
+              'start_time_filter.earliest_time': createDate(startTime),
+            },
+            token,
+            request,
           },
-          { request },
         );
       },
       { onUpdate },
@@ -68,7 +70,6 @@ export async function fetchWorkflow(
 ): Promise<DescribeWorkflowExecutionResponse> {
   return requestFromAPI(
     `/namespaces/${namespace}/workflows/${executionId}/executions/${runId}`,
-    {},
     { request },
   );
 }
@@ -82,9 +83,9 @@ export const fetchEvents = async (
       return requestFromAPI<GetWorkflowExecutionHistoryResponse>(
         `/namespaces/${namespace}/workflows/${executionId}/executions/${runId}/events`,
         {
-          next_page_token: token,
+          token,
+          request,
         },
-        { request },
       );
     },
     { onUpdate },

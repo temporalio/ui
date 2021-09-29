@@ -1,3 +1,4 @@
+import { requestFromAPI } from '$lib/utilities/request-from-api';
 import type { PollerInfo, TaskQueueStatus } from '$types';
 
 export type GetAllPollersRequest = NamespaceScopedRequest & { queue: string };
@@ -6,23 +7,30 @@ export type GetPollersResponse = {
   taskQueueStatus: TaskQueueStatus;
 };
 
+type PollersData = {
+  [key: string]: Poller;
+};
+
+type Poller = {
+  lastAccessTime: PollerInfo['lastAccessTime'];
+  taskQueueTypes: string[];
+};
+
 const base = import.meta.env.VITE_API;
 
 export async function getPollers(
   { queue, namespace }: GetAllPollersRequest,
   request = fetch,
 ): Promise<GetPollersResponse> {
-  const pollersWorkflow: GetPollersResponse = await request(
-    `${base}/namespaces/${namespace}/task-queues/${queue}?task_queue_type=1`,
-  )
-    .then((response) => response.json())
-    .catch(console.error);
+  const pollersWorkflow = await requestFromAPI<GetPollersResponse>(
+    `/namespaces/${namespace}/task-queues/${queue}?task_queue_type=1`,
+    { request },
+  );
 
-  const pollersActivity: GetPollersResponse = await request(
+  const pollersActivity = await requestFromAPI<GetPollersResponse>(
     `${base}/namespaces/${namespace}/task-queues/${queue}?task_queue_type=2`,
-  )
-    .then((response) => response.json())
-    .catch(console.error);
+    { request },
+  );
 
   pollersActivity.pollers.forEach((poller) => {
     poller[`taskQueueTypes`] = ['ACTIVITY'];
@@ -32,17 +40,18 @@ export async function getPollers(
     poller[`taskQueueTypes`] = ['WORKFLOW'];
   });
 
-  const r = (type) => (o, poller) => {
-    const i = o[poller.identity] || {};
+  const r = (type: string) => (o: PollersData, poller: PollerInfo) => {
+    const i: Poller = o[poller.identity] || {
+      lastAccessTime: undefined,
+      taskQueueTypes: [],
+    };
 
     o[poller.identity] = {
       lastAccessTime:
         !i.lastAccessTime || i.lastAccessTime < poller.lastAccessTime
           ? poller.lastAccessTime
           : i.lastAccessTime,
-      taskQueueTypes: i.taskQueueTypes
-        ? i.taskQueueTypes.concat([type])
-        : [type],
+      taskQueueTypes: i.taskQueueTypes.concat([type]),
     };
 
     return o;
