@@ -1,8 +1,8 @@
 import type {
   WorkflowExecutionStatus,
   PendingActivityInfo,
-  WorkflowExecutionInfo,
   DescribeWorkflowExecutionResponse,
+  ListWorkflowExecutionsResponse,
 } from '$types';
 
 import { formatDate } from '$lib/utilities/format-date';
@@ -66,9 +66,9 @@ export const toWorkflowExecution = (
 };
 
 export const toWorkflowExecutions = (
-  executions: WorkflowExecutionInfo[],
+  response: ListWorkflowExecutionsResponse,
 ): WorkflowExecution[] => {
-  return (executions || []).map((workflowExecutionInfo) =>
+  return (response.executions || []).map((workflowExecutionInfo) =>
     toWorkflowExecution({ workflowExecutionInfo }),
   );
 };
