@@ -18,27 +18,26 @@ export const createQueryStore = <T, S = QueryStore<T>>(
       ids: [],
       [key]: {},
     } as unknown as S,
-    createIntervalCallback(update),
+    () => {
+      let idleCallback: number;
+
+      const callback = () => {
+        if (browser) {
+          if (idleCallback) cancelIdleCallback(idleCallback);
+          idleCallback = requestIdleCallback(update);
+        }
+      };
+
+      setTimeout(callback, 0);
+      const interval = setInterval(callback, 30000);
+
+      return () => {
+        if (browser && idleCallback) cancelIdleCallback(idleCallback);
+        console.log('Unsubscribe!');
+        clearInterval(interval);
+      };
+    },
   );
 
   return store;
-};
-
-export const createIntervalCallback = (update: () => void): (() => void) => {
-  let idleCallback: number;
-
-  const callback = () => {
-    if (browser) {
-      if (idleCallback) cancelIdleCallback(idleCallback);
-      idleCallback = requestIdleCallback(update);
-    }
-  };
-
-  setTimeout(callback, 0);
-  const interval = setInterval(callback, 30000);
-
-  return () => {
-    if (browser && idleCallback) cancelIdleCallback(idleCallback);
-    clearInterval(interval);
-  };
 };
