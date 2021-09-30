@@ -3,16 +3,20 @@ import { merge } from './merge';
 
 type NextPageToken = Uint8Array | string;
 type WithNextPageToken = { nextPageToken?: NextPageToken };
+type WithoutNextPageToken<T> = Omit<T, keyof WithNextPageToken>;
 
-type PaginatedOptions<T> = {
+type PaginationCallbacks<T> = {
   onStart?: () => void;
   onUpdate?: (
-    full: Omit<T, keyof WithNextPageToken>,
-    current: Omit<T, keyof WithNextPageToken>,
+    full: WithoutNextPageToken<T>,
+    current: WithoutNextPageToken<T>,
   ) => void;
-  onComplete?: (finalProps: Omit<T, keyof WithNextPageToken>) => void;
+  onComplete?: (finalProps: WithoutNextPageToken<T>) => void;
+};
+
+type PaginatedOptions<T> = PaginationCallbacks<T> & {
   token?: NextPageToken;
-  previousProps?: Omit<T, keyof WithNextPageToken>;
+  previousProps?: WithoutNextPageToken<T>;
 };
 
 /**
@@ -34,7 +38,7 @@ export const paginated = async <T extends WithNextPageToken>(
     token,
     previousProps,
   }: PaginatedOptions<T> = {},
-): Promise<Omit<T, keyof WithNextPageToken>> => {
+): Promise<WithoutNextPageToken<T>> => {
   if (!previousProps && isFunction(onStart)) onStart();
 
   const { nextPageToken, ...props } = await fn(token);
