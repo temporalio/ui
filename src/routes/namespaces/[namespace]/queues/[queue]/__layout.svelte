@@ -1,16 +1,11 @@
 <script context="module" lang="ts">
   import type { LoadInput } from '@sveltejs/kit';
-  import {
-    GetPollersResponse,
-    WorkflowExecutionAPI,
-  } from '$lib/services/workflow-execution-service';
+  import type { GetPollersResponse } from '$lib/services/pollers-service';
+  import { getPollers } from '$lib/services/pollers-service';
 
   export async function load({ fetch, page }: LoadInput) {
     const { namespace, queue } = page.params;
-    return await WorkflowExecutionAPI.getPollers(
-      { queue, namespace },
-      fetch,
-    ).then((pollers) => ({
+    return await getPollers({ queue, namespace }, fetch).then((pollers) => ({
       props: { pollers },
     }));
   }
@@ -24,8 +19,8 @@
 </script>
 
 <section class="flex flex-col items-start">
-  <header>
-    <h3>Pollers</h3>
+  <header class="p-3 mb-5">
+    <h3 class="text-2xl">Pollers</h3>
   </header>
   <div class="w-full h-full overflow-x-scroll">
     <QueuePollersTable>
@@ -45,14 +40,3 @@
     </QueuePollersTable>
   </div>
 </section>
-
-<style lang="postcss">
-  header {
-    padding: 12px;
-    margin-bottom: 18px;
-  }
-
-  h3 {
-    font-size: 24px;
-  }
-</style>

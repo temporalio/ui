@@ -1,28 +1,20 @@
 import { sub, formatISO } from 'date-fns';
 
-import { paginated } from '$lib/utilities/paginated';
-import { toURL } from '$lib/utilities/to-url';
 import type {
-  WorkflowExecutionInfo,
-  PollerInfo,
-  TaskQueueStatus,
   DescribeWorkflowExecutionResponse,
   GetWorkflowExecutionHistoryResponse,
   ListWorkflowExecutionsResponse,
 } from '$types';
 
-const base = import.meta.env.VITE_API;
+import { paginated } from '$lib/utilities/paginated';
+import { requestFromAPI } from '$lib/utilities/request-from-api';
 
-export type NamespaceScopedRequest = { namespace: string };
+const id = <T>(x: T) => x;
+const createDate = (d: Duration) => formatISO(sub(new Date(), d));
+
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   executionId: string;
   runId: string;
-};
-
-export type GetAllPollersRequest = NamespaceScopedRequest & { queue: string };
-export type GetPollersResponse = {
-  pollers: PollerInfo[];
-  taskQueueStatus: TaskQueueStatus;
 };
 
 type FetchWorkflows<T> = NamespaceScopedRequest & {
@@ -38,170 +30,66 @@ type FetchEvents = FetchWorkflows<GetWorkflowExecutionHistoryResponse> & {
 
 const fetchWorkflows =
   (type: 'open' | 'closed') =>
-  async ({
-    namespace,
-    onUpdate = (x) => x,
-    startTime = { days: 1 },
+  async (
+    {
+      namespace,
+      onUpdate = id,
+      startTime = { days: 1 },
+    }: FetchWorkflows<ListWorkflowExecutionsResponse>,
     request = fetch,
-  }: FetchWorkflows<ListWorkflowExecutionsResponse>) => {
-    const { executions } = await paginated(
+  ): Promise<ListWorkflowExecutionsResponse> => {
+    return await paginated(
       async (token: string) => {
-        const iso = formatISO(sub(new Date(), startTime));
-        const url = toURL(`${base}/namespaces/${namespace}/workflows/${type}`, {
-          next_page_token: token,
-          'start_time_filter.earliest_time': iso,
-        });
-
-        const response = await request(url);
-        return await response.json();
+        return requestFromAPI<ListWorkflowExecutionsResponse>(
+          `/namespaces/${namespace}/workflows/${type}`,
+          {
+            params: {
+              'start_time_filter.earliest_time': createDate(startTime),
+            },
+            token,
+            request,
+          },
+        );
       },
       { onUpdate },
     );
-
-    return executions;
   };
 
-export const fetchEvents = async ({
-  namespace,
-  executionId,
-  runId,
-  onUpdate = (x) => x,
+export const fetchAllWorkflows = async (
+  options: FetchWorkflows<ListWorkflowExecutionsResponse>,
+) => {
+  const open = await fetchWorkflows('open')(options);
+  const closed = await fetchWorkflows('closed')(options);
+
+  return { ...open.executions, ...closed.executions };
+};
+
+export async function fetchWorkflow(
+  { executionId, runId, namespace }: GetWorkflowExecutionRequest,
   request = fetch,
-}: FetchEvents) => {
+): Promise<DescribeWorkflowExecutionResponse> {
+  return requestFromAPI(
+    `/namespaces/${namespace}/workflows/${executionId}/executions/${runId}`,
+    { request },
+  );
+}
+
+export const fetchEvents = async (
+  { namespace, executionId, runId, onUpdate = id }: FetchEvents,
+  request = fetch,
+) => {
   const events: GetWorkflowExecutionHistoryResponse = await paginated(
     async (token: string) => {
-      const url = toURL(
-        `${base}/namespaces/${namespace}/workflows/${executionId}/executions/${runId}/events`,
+      return requestFromAPI<GetWorkflowExecutionHistoryResponse>(
+        `/namespaces/${namespace}/workflows/${executionId}/executions/${runId}/events`,
         {
-          next_page_token: token,
+          token,
+          request,
         },
       );
-
-      const response = await request(url);
-      return await response.json();
     },
     { onUpdate },
   );
 
   return events;
-};
-
-export const fetchOpenWorkflows = fetchWorkflows('open');
-export const fetchClosedWorkflows = fetchWorkflows('closed');
-export const fetchAllWorkflows = (
-  options:
-    | Parameters<typeof fetchOpenWorkflows>[0]
-    | Parameters<typeof fetchClosedWorkflows>[0],
-) => {
-  fetchOpenWorkflows(options);
-  fetchClosedWorkflows(options);
-};
-
-export const WorkflowExecutionAPI = {
-  async getAll(
-    { namespace }: NamespaceScopedRequest,
-    request = fetch,
-  ): Promise<WorkflowExecutionInfo[]> {
-    const open = await fetchOpenWorkflows({ namespace, request });
-    const closed = await fetchClosedWorkflows({ namespace, request });
-
-    return [].concat(open).concat(closed);
-  },
-
-  async get(
-    { executionId, runId, namespace }: GetWorkflowExecutionRequest,
-    request = fetch,
-  ): Promise<{
-    execution: DescribeWorkflowExecutionResponse;
-  }> {
-    const execution: DescribeWorkflowExecutionResponse = await request(
-      `${base}/namespaces/${namespace}/workflows/${executionId}/executions/${runId}`,
-    )
-      .then((response) => response.json())
-      .catch(console.error);
-
-    return {
-      execution,
-    };
-  },
-
-  async getEvents(
-    { executionId, runId, namespace }: GetWorkflowExecutionRequest,
-    request = fetch,
-  ): Promise<{
-    events: GetWorkflowExecutionHistoryResponse;
-  }> {
-    const events: GetWorkflowExecutionHistoryResponse = await request(
-      `${base}/namespaces/${namespace}/workflows/${executionId}/executions/${runId}/events`,
-    )
-      .then((response) => response.json())
-      .catch(console.error);
-
-    return {
-      events,
-    };
-  },
-
-  async getPollers(
-    { queue, namespace }: GetAllPollersRequest,
-    request = fetch,
-  ): Promise<GetPollersResponse> {
-    const pollersWorkflow: GetPollersResponse = await request(
-      `${base}/namespaces/${namespace}/task-queues/${queue}?task_queue_type=1`,
-    )
-      .then((response) => response.json())
-      .catch(console.error);
-
-    const pollersActivity: GetPollersResponse = await request(
-      `${base}/namespaces/${namespace}/task-queues/${queue}?task_queue_type=2`,
-    )
-      .then((response) => response.json())
-      .catch(console.error);
-
-    pollersActivity.pollers.forEach((poller) => {
-      poller[`taskQueueTypes`] = ['ACTIVITY'];
-    });
-
-    pollersWorkflow.pollers.forEach((poller) => {
-      poller[`taskQueueTypes`] = ['WORKFLOW'];
-    });
-
-    const r = (type) => (o, poller) => {
-      const i = o[poller.identity] || {};
-
-      o[poller.identity] = {
-        lastAccessTime:
-          !i.lastAccessTime || i.lastAccessTime < poller.lastAccessTime
-            ? poller.lastAccessTime
-            : i.lastAccessTime,
-        taskQueueTypes: i.taskQueueTypes
-          ? i.taskQueueTypes.concat([type])
-          : [type],
-      };
-
-      return o;
-    };
-
-    pollersActivity.pollers.filter((pollerA) =>
-      pollersWorkflow.pollers.some((pollerW) => {
-        if (pollerA.identity === pollerW.identity) {
-          pollerA['taskQueueTypes'] = [
-            ...pollerW['taskQueueTypes'],
-            ...pollerA['taskQueueTypes'],
-          ];
-          return pollerA;
-        }
-      }),
-    );
-
-    pollersActivity.pollers.reduce(
-      r('ACTIVITY'),
-      pollersWorkflow.pollers.reduce(r('WORKFLOW'), {}),
-    );
-
-    return {
-      pollers: pollersActivity.pollers,
-      taskQueueStatus: pollersActivity.taskQueueStatus,
-    };
-  },
 };

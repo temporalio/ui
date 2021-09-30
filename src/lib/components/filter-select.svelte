@@ -6,13 +6,12 @@
 
 <div>
   <label for={id} class="text-gray-600 text-xs block">{name}</label>
-  <select class="block border-2 text-base p-2" {id} bind:value on:change>
+  <select
+    class="block border-2 text-base p-2 w-full h-10"
+    {id}
+    bind:value
+    on:change
+  >
     <slot />
   </select>
 </div>
-
-<style>
-  select {
-    height: 40px;
-  }
-</style>

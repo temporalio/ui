@@ -1,12 +1,15 @@
 <script context="module" lang="ts">
-  import { WorkflowExecutionAPI } from '$lib/services/workflow-execution-service';
-
   import type { LoadInput } from '@sveltejs/kit';
+
+  import {
+    fetchWorkflow,
+    fetchEvents,
+  } from '$lib/services/workflow-execution-service';
 
   export async function load({ fetch, page }: LoadInput) {
     const { workflow: executionId, run: runId, namespace } = page.params;
 
-    const { execution } = await WorkflowExecutionAPI.get(
+    const execution = await fetchWorkflow(
       {
         executionId,
         runId,
@@ -15,7 +18,7 @@
       fetch,
     );
 
-    const { events } = await WorkflowExecutionAPI.getEvents(
+    const events = await fetchEvents(
       {
         executionId,
         runId,
@@ -68,7 +71,7 @@
   .sidebar {
     width: 600px;
     overflow-y: scroll;
-    box-shadow: -5px 5px 10px 2px rgba(0, 0, 0, 0.2);
+    box-shadow: -2px 14px 20px 0px rgb(0 0 0 / 20%);
     z-index: 2;
   }
 </style>
