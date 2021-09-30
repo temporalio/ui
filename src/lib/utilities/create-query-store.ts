@@ -33,7 +33,6 @@ export const createQueryStore = <T, S = QueryStore<T>>(
 
       return () => {
         if (browser && idleCallback) cancelIdleCallback(idleCallback);
-        console.log('Unsubscribe!');
         clearInterval(interval);
       };
     },
