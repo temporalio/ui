@@ -4,7 +4,7 @@ import type { PollerInfo, TaskQueueStatus } from '$types';
 export type GetAllPollersRequest = NamespaceScopedRequest & { queue: string };
 
 export type GetPollersResponse = {
-  pollers: PollerInfo[];
+  pollers: PollerWithTaskQueueTypes[];
   taskQueueStatus: TaskQueueStatus;
 };
 
@@ -14,12 +14,12 @@ type PollersData = {
 
 type TaskQueueType = 'ACTIVITY' | 'WORKFLOW';
 
-type Poller = {
+export type Poller = {
   lastAccessTime: PollerInfo['lastAccessTime'];
   taskQueueTypes: TaskQueueType[];
 };
 
-type PollerWithTaskQueueTypes = PollerInfo & {
+export type PollerWithTaskQueueTypes = PollerInfo & {
   taskQueueTypes?: TaskQueueType[];
 };
 

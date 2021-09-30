@@ -1,6 +1,10 @@
 <script lang="ts">
   import Icon, { Check } from 'svelte-hero-icons';
-  export let poller;
+
+  import type { PollerWithTaskQueueTypes } from '$lib/services/pollers-service';
+  import { formatDate } from '$lib/utilities/format-date';
+
+  export let poller: PollerWithTaskQueueTypes;
 </script>
 
 <tr>
@@ -10,7 +14,7 @@
     </h3>
   </td>
   <td>
-    <p>{new Date(poller.lastAccessTime)}</p>
+    <p>{formatDate(poller.lastAccessTime)}</p>
   </td>
   {#if poller.taskQueueTypes.includes('WORKFLOW')}
     <td>
