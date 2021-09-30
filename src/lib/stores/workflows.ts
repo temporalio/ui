@@ -24,7 +24,7 @@ const stores: { [key: string]: ReturnType<typeof createStore> } = {};
 const updateWorkflows =
   (store: Writable<WorkflowStore>) =>
   (payload: ListWorkflowExecutionsResponse) => {
-    const workflowExecutions = toWorkflowExecutions(payload.executions);
+    const workflowExecutions = toWorkflowExecutions(payload);
     const ids = {};
     const workflows = {};
 
