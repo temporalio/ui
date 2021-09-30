@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "npm run dev:local -- --open",
-    "dev:local": "TEMPORAL_UI_BUILD_TARGET=local svelte-kit dev",
+    "dev:local": "source ./.env && TEMPORAL_UI_BUILD_TARGET=local svelte-kit dev",
     "dev:cloud": "TEMPORAL_UI_BUILD_TARGET=cloud svelte-kit dev",
     "build:local": "TEMPORAL_UI_BUILD_TARGET=local svelte-kit build",
     "build:cloud": "TEMPORAL_UI_BUILD_TARGET=cloud svelte-kit build",

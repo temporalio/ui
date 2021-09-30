@@ -4,7 +4,7 @@
 
   export async function load({ fetch }: LoadInput) {
     const searchAttributes: GetSearchAttributesResponse = await fetch(
-      'http://localhost:8080/api/v1/search-attributes',
+      import.meta.env.VITE_API + '/search-attributes',
     ).then((response) => response.json());
 
     return {
