@@ -21,7 +21,6 @@
     "format": "prettier --write --plugin-search-dir=. .",
     "cypress:open": "TEMPORAL_API_HOST=http://localhost:3000 cypress open",
     "stories": "start-storybook",
-    "build-types": "make build-types",
     "build-stories": "build-storybook"
   },
   "dependencies": {

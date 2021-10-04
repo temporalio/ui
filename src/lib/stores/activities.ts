@@ -1,4 +1,4 @@
-import { derived, get, Readable } from 'svelte/store';
+import { derived, Readable } from 'svelte/store';
 import {
   isActivityTaskScheduledEvent,
   isActivityTaskStartedEvent,
@@ -115,6 +115,6 @@ export const createActivityStore = <
 
   return {
     ...activities,
-    getActivity: (id) => derived(store, ($store) => get(store)[id] || {}),
+    getActivity: (id) => derived(store, ($store) => $store[id] || {}),
   };
 };

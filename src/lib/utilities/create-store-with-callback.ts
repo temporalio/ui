@@ -1,7 +1,8 @@
 import { Updater, Writable, writable } from 'svelte/store';
+import isFunction from 'lodash/isFunction';
 
 const call = (fn: () => void) => {
-  if (fn && typeof fn === 'function') fn();
+  if (isFunction(fn)) fn();
 };
 
 export const createStoreWithCallback = <T>(

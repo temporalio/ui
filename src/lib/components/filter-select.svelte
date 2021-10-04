@@ -9,7 +9,7 @@
 <div>
   <label for={id} class="text-gray-600 text-xs block">{name}</label>
   <select
-    class="bg-white relative w-full border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+    class="block border-2 text-base p-2 w-full h-10"
     {id}
     bind:value
     on:change
@@ -34,9 +34,3 @@
     </span>
   </select>
 </div>
-
-<style>
-  select {
-    height: 40px;
-  }
-</style>
