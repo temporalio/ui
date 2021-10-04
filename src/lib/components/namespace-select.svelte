@@ -2,7 +2,7 @@
   import { namespace as currentNamespace } from '$lib/stores/namespace';
   import { getContext } from 'svelte';
   import { goto } from '$app/navigation';
-
+  import { clickOutside } from '$lib/utilities/click-outside';
   import type { DescribeNamespaceResponse } from '$types';
 
   $: namespaces = getContext<DescribeNamespaceResponse[]>('namespaces').map(
@@ -30,9 +30,16 @@
     showDropdown = false;
     goto('/namespaces/' + newNamespace);
   }
+  function handleClickOutside() {
+    showDropdown = false;
+  }
 </script>
 
-<div class="inline-flex space-x-2 items-center">
+<div
+  class="inline-flex space-x-2 items-center"
+  use:clickOutside
+  on:click_outside={handleClickOutside}
+>
   <!-- svelte-ignore a11y-label-has-associated-control -->
   <label id="listbox-label" class="block text-sm font-medium text-gray-700">
     Namespace
