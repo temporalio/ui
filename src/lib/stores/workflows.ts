@@ -1,6 +1,5 @@
-import { derived, writable, Writable, get as getFromStore } from 'svelte/store';
+import { derived, writable } from 'svelte/store';
 
-import type { ListWorkflowExecutionsResponse } from '$types';
 import { unique } from '$lib/utilities/unique';
 
 import {
@@ -9,63 +8,31 @@ import {
 } from '$lib/models/workflow-execution';
 
 import { fetchAllWorkflows } from '$lib/services/workflow-execution-service';
-import { createStoreWithCallback } from '$lib/utilities/create-store-with-callback';
-import {
-  createQueryStore,
-  QueryStore,
-} from '$lib/utilities/create-query-store';
-
-type WorkflowStore = QueryStore<{
-  workflows: { [key: string]: WorkflowExecution };
-}>;
+import { createQueryStore } from '$lib/utilities/create-query-store';
+import type { ListWorkflowExecutionsResponse } from '$types';
 
 const stores: { [key: string]: ReturnType<typeof createStore> } = {};
 
-const updateWorkflows =
-  (store: Writable<WorkflowStore>) =>
-  (payload: ListWorkflowExecutionsResponse) => {
-    const workflowExecutions = toWorkflowExecutions(payload);
-    const ids = {};
-    const workflows = {};
-
-    for (const execution of workflowExecutions) {
-      const id = execution.id;
-      ids[id] = true;
-      workflows[id] = execution;
-    }
-
-    store.update(($store) => ({
-      ...$store,
-      ids: [...$store.ids, ...Object.keys(ids)],
-      workflows: { ...$store.workflows, ...workflows },
-    }));
-  };
-
 export const createStore = (namespace: string) => {
-  const update = () => {
-    const startTime = getFromStore(range);
+  const range = writable<Duration>({ hours: 24 });
+  const startTime = derived(range, (startTime) => ({ startTime }));
 
-    fetchAllWorkflows({
+  const store = createQueryStore<
+    WorkflowExecution,
+    ListWorkflowExecutionsResponse,
+    typeof fetchAllWorkflows
+  >(
+    fetchAllWorkflows,
+    toWorkflowExecutions,
+    {
       namespace,
-      startTime,
-      onUpdate: updateWorkflows(store),
-    });
-  };
-
-  const store = createQueryStore<WorkflowStore>('workflows', update);
-
-  const all = derived(store, ($store) => Object.values($store.workflows));
-  const ids = derived(store, ($store) => Object.keys($store.ids));
-  const range = createStoreWithCallback<Duration>({ hours: 24 }, update);
-
-  range.subscribe(() =>
-    store.set({
-      loading: false,
-      updating: true,
-      workflows: {},
-      ids: [],
-    }),
+      startTime: { hours: 24 },
+    },
+    [startTime],
   );
+
+  const all = derived(store, ($store) => Object.values($store.data));
+  const ids = derived(store, ($store) => Object.keys($store.ids));
 
   const status = writable<WorkflowStatus>(null);
   const workflowType = writable<WorkflowType>(null);

@@ -1,4 +1,6 @@
 import { sub, formatISO } from 'date-fns';
+import isFunction from 'lodash/isFunction';
+import noop from 'lodash/noop';
 
 import type {
   DescribeWorkflowExecutionResponse,
@@ -17,23 +19,30 @@ export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   runId: string;
 };
 
-type FetchWorkflows<T> = NamespaceScopedRequest & {
-  onUpdate?: (results: Omit<T, 'nextPageToken'>) => void;
-  startTime?: Duration;
-  request?: typeof fetch;
-};
+type FetchWorkflows<T> = NamespaceScopedRequest &
+  PaginationCallbacks<T> & {
+    startTime?: Duration;
+    request?: typeof fetch;
+  };
 
 type FetchEvents = FetchWorkflows<GetWorkflowExecutionHistoryResponse> & {
   executionId: string;
   runId: string;
 };
 
+/**
+ * Utility function to fetch either opened or closed workflows from the
+ * Temporal server. Unless you have a good reason, you should prefer to
+ * use `fetchAllWorkflows`. This function is intentionally _not_ exported.
+ */
 const fetchWorkflows =
   (type: 'open' | 'closed') =>
   async (
     {
       namespace,
+      onStart = noop,
       onUpdate = id,
+      onComplete = id,
       startTime = { days: 1 },
     }: FetchWorkflows<ListWorkflowExecutionsResponse>,
     request = fetch,
@@ -51,17 +60,55 @@ const fetchWorkflows =
           },
         );
       },
-      { onUpdate },
+      { onStart, onUpdate, onComplete },
     );
   };
 
+/**
+ * Fetches both open and closed workflows. Forwards all options to
+ * `fetchWorkflows` except for `onComplete` which is called when
+ * both open and closed requests have completed. If you're relying on
+ * the promise returned from this function, it will only include the
+ * first page of results from each API call.
+ */
 export const fetchAllWorkflows = async (
   options: FetchWorkflows<ListWorkflowExecutionsResponse>,
-) => {
-  const open = await fetchWorkflows('open')(options);
-  const closed = await fetchWorkflows('closed')(options);
+): Promise<WithoutNextPageToken<ListWorkflowExecutionsResponse>> => {
+  const { onComplete } = options;
 
-  return { ...open.executions, ...closed.executions };
+  const result: WithoutNextPageToken<ListWorkflowExecutionsResponse> = {
+    executions: [],
+  };
+
+  const callback = (
+    response: WithoutNextPageToken<ListWorkflowExecutionsResponse>,
+  ) => {
+    result.executions.push(...response.executions);
+    if (openIsComplete && closedIsComplete && isFunction(onComplete)) {
+      onComplete(result);
+    }
+  };
+
+  let openIsComplete = false;
+  let closedIsComplete = false;
+
+  const open = await fetchWorkflows('open')({
+    ...options,
+    onComplete: (response) => {
+      openIsComplete = true;
+      callback(response);
+    },
+  });
+
+  const closed = await fetchWorkflows('closed')({
+    ...options,
+    onComplete: (response) => {
+      closedIsComplete = true;
+      callback(response);
+    },
+  });
+
+  return { executions: [...open.executions, ...closed.executions] };
 };
 
 export async function fetchWorkflow(
@@ -77,7 +124,7 @@ export async function fetchWorkflow(
 export const fetchEvents = async (
   { namespace, executionId, runId, onUpdate = id }: FetchEvents,
   request = fetch,
-) => {
+): Promise<GetWorkflowExecutionHistoryResponse> => {
   const events: GetWorkflowExecutionHistoryResponse = await paginated(
     async (token: string) => {
       return requestFromAPI<GetWorkflowExecutionHistoryResponse>(
