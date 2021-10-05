@@ -15,19 +15,26 @@ import type { ListWorkflowExecutionsResponse } from '$types';
 const stores: { [key: string]: ReturnType<typeof createStore> } = {};
 
 export const createStore = (namespace: string) => {
+  const range = writable<Duration>({ hours: 24 });
+  const startTime = derived(range, (startTime) => ({ startTime }));
+
   const store = createQueryStore<
     WorkflowExecution,
     ListWorkflowExecutionsResponse,
     typeof fetchAllWorkflows
-  >(fetchAllWorkflows, toWorkflowExecutions, {
-    namespace,
-    startTime: { hours: 24 },
-  });
+  >(
+    fetchAllWorkflows,
+    toWorkflowExecutions,
+    {
+      namespace,
+      startTime: { hours: 24 },
+    },
+    [startTime],
+  );
 
   const all = derived(store, ($store) => Object.values($store.data));
   const ids = derived(store, ($store) => Object.keys($store.ids));
 
-  const range = writable<Duration>({ hours: 24 });
   const status = writable<WorkflowStatus>(null);
   const workflowType = writable<WorkflowType>(null);
   const executionId = writable<string>(null);

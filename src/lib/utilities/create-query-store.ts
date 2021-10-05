@@ -1,4 +1,4 @@
-import { derived, Writable } from 'svelte/store';
+import type { Readable, Unsubscriber, Writable } from 'svelte/store';
 import { browser } from '$app/env';
 import { writable } from 'svelte/store';
 
@@ -21,11 +21,24 @@ export const createQueryStore = <
   FormattedType extends HasId,
   ResponseType,
   FetchType extends (options: any) => unknown,
+  Options = Parameters<FetchType>[0],
 >(
   fetch: FetchType,
   format: Formatter<ResponseType, FormattedType>,
-  options: Parameters<FetchType>[0],
+  options: Options,
+  dependencies: Readable<Partial<Options>>[] = [],
 ) => {
+  let parameters = options;
+
+  const request = () => {
+    fetch({ ...parameters, onUpdate: updateStore(store, format) });
+  };
+
+  const updateParameters = (updatedParameters: Partial<typeof parameters>) => {
+    parameters = { ...parameters, ...updatedParameters };
+    request();
+  };
+
   const store = writable<QueryStore<FormattedType>>(
     {
       loading: true,
@@ -34,14 +47,20 @@ export const createQueryStore = <
       data: {},
     } as unknown as QueryStore<FormattedType>,
     () => {
+      const unsubscribers: Unsubscriber[] = [];
       let idleCallback: number;
+
+      for (const dependency of dependencies) {
+        const unsubscribe = dependency.subscribe((value) =>
+          updateParameters(value),
+        );
+        unsubscribers.push(unsubscribe);
+      }
 
       const callback = () => {
         if (browser) {
           if (idleCallback) cancelIdleCallback(idleCallback);
-          idleCallback = requestIdleCallback(() => {
-            fetch({ ...options, onUpdate: updateStore(store, format) });
-          });
+          idleCallback = requestIdleCallback(request);
         }
       };
 
@@ -50,20 +69,14 @@ export const createQueryStore = <
 
       return () => {
         if (browser && idleCallback) cancelIdleCallback(idleCallback);
+        for (const unsubscribe of unsubscribers) unsubscribe();
         clearInterval(interval);
       };
     },
   );
 
   return {
-    subscribe: store.subscribe,
-    updateStore: <ResponseType>(
-      formatter: Formatter<ResponseType, FormattedType>,
-    ) => updateStore(store, formatter),
-    isEmpty: derived(
-      store,
-      ($store) => $store.loading === false && $store.ids.length === 0,
-    ),
+    ...store,
   };
 };
 
@@ -73,6 +86,7 @@ export const updateStore =
     formatter: Formatter<ResponseType, FormattedType>,
   ) =>
   (response: ResponseType) => {
+    console.log(response);
     const formatted = formatter(response);
     const ids = {};
     const result: { [key: string]: FormattedType } = {};
