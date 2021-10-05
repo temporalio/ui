@@ -17,6 +17,24 @@ type Formatter<ResponseType, FormattedType extends HasId> = (
   response: ResponseType,
 ) => FormattedType[];
 
+const collectData = <T extends HasId>(
+  formatted: T[],
+): Pick<QueryStore<T>, 'ids' | 'data'> => {
+  const ids = {};
+  const result: { [key: string]: T } = {};
+
+  for (const datum of formatted) {
+    const id = datum.id;
+    ids[id] = true;
+    result[id] = datum;
+  }
+
+  return {
+    ids: Object.keys(ids),
+    data: result,
+  };
+};
+
 export const createQueryStore = <
   FormattedType extends HasId,
   ResponseType,
@@ -96,19 +114,12 @@ const updateStore =
   ) =>
   (response: ResponseType) => {
     const formatted = formatter(response);
-    const ids = {};
-    const result: { [key: string]: FormattedType } = {};
-
-    for (const datum of formatted) {
-      const id = datum.id;
-      ids[id] = true;
-      result[id] = datum;
-    }
+    const { ids, data } = collectData(formatted);
 
     return store.update(($store) => ({
       ...$store,
       ids: [...$store.ids, ...Object.keys(ids)],
-      data: { ...$store.data, ...result },
+      data: { ...$store.data, ...data },
     }));
   };
 
@@ -119,18 +130,11 @@ const removeStaleData =
   ) =>
   (response: ResponseType) => {
     const formatted = formatter(response);
-    const ids = {};
-    const result: { [key: string]: FormattedType } = {};
-
-    for (const datum of formatted) {
-      const id = datum.id;
-      ids[id] = true;
-      result[id] = datum;
-    }
+    const { ids, data } = collectData(formatted);
 
     return store.update(($store) => ({
       ...$store,
       ids: Object.keys(ids),
-      data: result,
+      data,
     }));
   };
