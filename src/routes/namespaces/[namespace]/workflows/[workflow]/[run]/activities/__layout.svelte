@@ -25,7 +25,7 @@
   export let runId: string;
 
   const { activities } = createEventStore(namespace, executionId, runId);
-  $: urlFor = getActivityUrl.bind(null, namespace, executionId, runId);
+  $: urlFor = getActivityUrl(namespace, executionId, runId);
   $: isActive = (id: string) => pathMatches(urlFor(id), $page.path);
 </script>
 

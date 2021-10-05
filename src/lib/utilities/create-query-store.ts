@@ -11,11 +11,13 @@ export type QueryStore<T> = {
   };
 };
 
-type Formatter<ResponseType, FormattedType extends { id: string }> = (
+type HasId = { id: string };
+
+type Formatter<ResponseType, FormattedType extends HasId> = (
   response: ResponseType,
 ) => FormattedType[];
 
-export const createQueryStore = <FormattedType extends { id: string }>(
+export const createQueryStore = <FormattedType extends HasId>(
   update: () => void,
 ) => {
   const store = writable<QueryStore<FormattedType>>(
@@ -58,7 +60,7 @@ export const createQueryStore = <FormattedType extends { id: string }>(
 };
 
 export const updateStore =
-  <ResponseType, FormattedType extends { id: string }>(
+  <ResponseType, FormattedType extends HasId>(
     store: Writable<QueryStore<FormattedType>>,
     formatter: Formatter<ResponseType, FormattedType>,
   ) =>
@@ -78,11 +80,4 @@ export const updateStore =
       ids: [...$store.ids, ...Object.keys(ids)],
       data: { ...$store.data, ...result },
     }));
-  };
-
-export const setLoading =
-  <S>(store: Writable<S>) =>
-  (value: boolean) =>
-  () => {
-    store.update(($store) => ({ ...$store, loading: value }));
   };
