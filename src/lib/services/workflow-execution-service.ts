@@ -67,7 +67,9 @@ const fetchWorkflows =
 /**
  * Fetches both open and closed workflows. Forwards all options to
  * `fetchWorkflows` except for `onComplete` which is called when
- * both open and closed requests have completed.
+ * both open and closed requests have completed. If you're relying on
+ * the promise returned from this function, it will only include the
+ * first page of results from each API call.
  */
 export const fetchAllWorkflows = async (
   options: FetchWorkflows<ListWorkflowExecutionsResponse>,
