@@ -26,6 +26,7 @@ export const createStore = (namespace: string) => {
   const all = derived(store, ($store) => Object.values($store.data));
   const ids = derived(store, ($store) => Object.keys($store.ids));
 
+  const range = writable<Duration>({ hours: 24 });
   const status = writable<WorkflowStatus>(null);
   const workflowType = writable<WorkflowType>(null);
   const executionId = writable<string>(null);
@@ -58,7 +59,7 @@ export const createStore = (namespace: string) => {
     all,
     filtered,
     workflowTypes,
-    range: writable<Duration>({ hours: 24 }),
+    range,
     filters: {
       status,
       workflowType,
