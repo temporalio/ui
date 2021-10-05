@@ -17,10 +17,14 @@ type Formatter<ResponseType, FormattedType extends HasId> = (
   response: ResponseType,
 ) => FormattedType[];
 
-export const createQueryStore = <FormattedType extends HasId, ResponseType>(
-  fetch: any,
+export const createQueryStore = <
+  FormattedType extends HasId,
+  ResponseType,
+  FetchType extends (options: any) => unknown,
+>(
+  fetch: FetchType,
   format: Formatter<ResponseType, FormattedType>,
-  options: any,
+  options: Parameters<FetchType>[0],
 ) => {
   const store = writable<QueryStore<FormattedType>>(
     {

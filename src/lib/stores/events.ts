@@ -18,7 +18,9 @@ export const createStore = (
 ) => {
   const store = createQueryStore<
     HistoryEventWithId,
-    GetWorkflowExecutionHistoryResponse
+    GetWorkflowExecutionHistoryResponse,
+    Parameters<typeof fetchEvents>,
+    typeof fetchEvents
   >(fetchEvents, toEventHistory, {
     namespace,
     executionId,

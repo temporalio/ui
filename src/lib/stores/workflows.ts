@@ -17,7 +17,8 @@ const stores: { [key: string]: ReturnType<typeof createStore> } = {};
 export const createStore = (namespace: string) => {
   const store = createQueryStore<
     WorkflowExecution,
-    ListWorkflowExecutionsResponse
+    ListWorkflowExecutionsResponse,
+    typeof fetchAllWorkflows
   >(fetchAllWorkflows, toWorkflowExecutions, {
     namespace,
     startTime: { hours: 24 },
