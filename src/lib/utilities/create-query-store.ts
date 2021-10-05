@@ -56,8 +56,9 @@ export const createQueryStore = <
   const request = () => {
     fetch({
       ...parameters,
-      onUpdate: updateStore(store, format),
-      onComplete: removeStaleData(store, format),
+      onStart: start(store),
+      onUpdate: update(store, format),
+      onComplete: complete(store, format),
     });
   };
 
@@ -112,7 +113,23 @@ export const createQueryStore = <
   };
 };
 
-const updateStore =
+const start = <FormattedType extends HasId>(
+  store: Writable<QueryStore<FormattedType>>,
+) => {
+  store.update(($store) => {
+    const hasData = $store.ids.length;
+    const loading = !hasData;
+    const updating = !loading;
+
+    return {
+      ...$store,
+      loading,
+      updating,
+    };
+  });
+};
+
+const update =
   <ResponseType, FormattedType extends HasId>(
     store: Writable<QueryStore<FormattedType>>,
     formatter: Formatter<ResponseType, FormattedType>,
@@ -128,7 +145,7 @@ const updateStore =
     }));
   };
 
-const removeStaleData =
+const complete =
   <ResponseType, FormattedType extends HasId>(
     store: Writable<QueryStore<FormattedType>>,
     formatter: Formatter<ResponseType, FormattedType>,
@@ -139,6 +156,8 @@ const removeStaleData =
 
     return store.update(($store) => ({
       ...$store,
+      loading: false,
+      updating: false,
       ids: Object.keys(ids),
       data,
     }));
