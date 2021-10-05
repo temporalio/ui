@@ -1,4 +1,5 @@
 import { sub, formatISO } from 'date-fns';
+import isFunction from 'lodash/isFunction';
 
 import type {
   DescribeWorkflowExecutionResponse,
@@ -8,7 +9,6 @@ import type {
 
 import { paginated } from '$lib/utilities/paginated';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
-import { isFunction } from 'lodash';
 
 const id = <T>(x: T) => x;
 const noop = () => {};
@@ -59,6 +59,11 @@ const fetchWorkflows =
     );
   };
 
+/**
+ * Fetches both open and closed workflows. Forwards all options to
+ * `fetchWorkflows` except for `onComplete` which is called when
+ * both open and closed requests have completed.
+ */
 export const fetchAllWorkflows = async (
   options: FetchWorkflows<ListWorkflowExecutionsResponse>,
 ) => {
@@ -110,7 +115,7 @@ export async function fetchWorkflow(
 }
 
 export const fetchEvents = async (
-  { namespace, executionId, runId, onUpdate }: FetchEvents,
+  { namespace, executionId, runId, onUpdate = id }: FetchEvents,
   request = fetch,
 ) => {
   const events: GetWorkflowExecutionHistoryResponse = await paginated(
