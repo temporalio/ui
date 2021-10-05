@@ -86,7 +86,6 @@ export const updateStore =
     formatter: Formatter<ResponseType, FormattedType>,
   ) =>
   (response: ResponseType) => {
-    console.log(response);
     const formatted = formatter(response);
     const ids = {};
     const result: { [key: string]: FormattedType } = {};
