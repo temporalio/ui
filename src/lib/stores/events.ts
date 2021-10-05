@@ -7,6 +7,7 @@ import { fetchEvents } from '$lib/services/workflow-execution-service';
 import { createQueryStore } from '$lib/utilities/create-query-store';
 import { createActivityStore } from './activities';
 import { HistoryEventWithId, toEventHistory } from '$lib/models/event-history';
+import type { GetWorkflowExecutionHistoryResponse } from '$types';
 
 const stores: { [key: string]: ReturnType<typeof createStore> } = {};
 
@@ -15,16 +16,14 @@ export const createStore = (
   executionId: string,
   runId: string,
 ) => {
-  const update = () => {
-    fetchEvents({
-      namespace,
-      executionId,
-      runId,
-      onUpdate: store.updateStore(toEventHistory),
-    });
-  };
-
-  const store = createQueryStore<HistoryEventWithId>(update);
+  const store = createQueryStore<
+    HistoryEventWithId,
+    GetWorkflowExecutionHistoryResponse
+  >(fetchEvents, toEventHistory, {
+    namespace,
+    executionId,
+    runId,
+  });
 
   const all = derived(store, ($store) => Object.values($store.data), []);
   const format = writable<EventFormat>('grid');

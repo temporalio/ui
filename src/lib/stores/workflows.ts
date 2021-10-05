@@ -8,27 +8,23 @@ import {
 } from '$lib/models/workflow-execution';
 
 import { fetchAllWorkflows } from '$lib/services/workflow-execution-service';
-import { createStoreWithCallback } from '$lib/utilities/create-store-with-callback';
+// import { createStoreWithCallback } from '$lib/utilities/create-store-with-callback';
 import { createQueryStore } from '$lib/utilities/create-query-store';
+import type { ListWorkflowExecutionsResponse } from '$types';
 
 const stores: { [key: string]: ReturnType<typeof createStore> } = {};
 
 export const createStore = (namespace: string) => {
-  const update = () => {
-    const startTime = getFromStore(range);
-
-    fetchAllWorkflows({
-      namespace,
-      startTime,
-      onUpdate: store.updateStore(toWorkflowExecutions),
-    });
-  };
-
-  const store = createQueryStore<WorkflowExecution>(update);
+  const store = createQueryStore<
+    WorkflowExecution,
+    ListWorkflowExecutionsResponse
+  >(fetchAllWorkflows, toWorkflowExecutions, {
+    namespace,
+    startTime: { hours: 24 },
+  });
 
   const all = derived(store, ($store) => Object.values($store.data));
   const ids = derived(store, ($store) => Object.keys($store.ids));
-  const range = createStoreWithCallback<Duration>({ hours: 24 }, update);
 
   const status = writable<WorkflowStatus>(null);
   const workflowType = writable<WorkflowType>(null);
@@ -62,7 +58,7 @@ export const createStore = (namespace: string) => {
     all,
     filtered,
     workflowTypes,
-    range,
+    range: writable<Duration>({ hours: 24 }),
     filters: {
       status,
       workflowType,

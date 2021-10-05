@@ -17,8 +17,10 @@ type Formatter<ResponseType, FormattedType extends HasId> = (
   response: ResponseType,
 ) => FormattedType[];
 
-export const createQueryStore = <FormattedType extends HasId>(
-  update: () => void,
+export const createQueryStore = <FormattedType extends HasId, ResponseType>(
+  fetch: any,
+  format: Formatter<ResponseType, FormattedType>,
+  options: any,
 ) => {
   const store = writable<QueryStore<FormattedType>>(
     {
@@ -33,7 +35,9 @@ export const createQueryStore = <FormattedType extends HasId>(
       const callback = () => {
         if (browser) {
           if (idleCallback) cancelIdleCallback(idleCallback);
-          idleCallback = requestIdleCallback(update);
+          idleCallback = requestIdleCallback(() => {
+            fetch({ ...options, onUpdate: updateStore(store, format) });
+          });
         }
       };
 
