@@ -29,7 +29,6 @@
     "date-fns": "^2.23.0",
     "json-beautify": "^1.1.1",
     "lodash": "^4.17.21",
-    "svelte-hero-icons": "^2.5.0",
     "url-pattern": "^1.0.3"
   },
   "devDependencies": {
@@ -41,7 +40,7 @@
     "@storybook/addon-viewport": "^6.3.7",
     "@storybook/svelte": "^6.1.21",
     "@sveltejs/adapter-static": "^1.0.0-next.13",
-    "@sveltejs/kit": "next",
+    "@sveltejs/kit": "^1.0.0-next.179",
     "@temporalio/proto": "^0.3.1",
     "@types/base-64": "^1.0.0",
     "@types/jest": "^27.0.1",
@@ -65,6 +64,7 @@
     "prettier-plugin-svelte": "^2.4.0",
     "svelte": "^3.42.4",
     "svelte-check": "^2.2.5",
+    "svelte-hero-icons": "^2.5.0",
     "svelte-highlight": "^3.3.0",
     "svelte-preprocess": "^4.8.0",
     "svelte-time": "^0.4.2",
