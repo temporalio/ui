@@ -17,11 +17,17 @@ export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   runId: string;
 };
 
-type FetchWorkflows<T> = NamespaceScopedRequest & {
+type Callbacks<T> = {
   onUpdate?: (results: Omit<T, 'nextPageToken'>) => void;
-  startTime?: Duration;
-  request?: typeof fetch;
+  onComplete?: (results: Omit<T, 'nextPageToken'>) => void;
+  onStart?: () => void;
 };
+
+type FetchWorkflows<T> = NamespaceScopedRequest &
+  Callbacks<T> & {
+    startTime?: Duration;
+    request?: typeof fetch;
+  };
 
 type FetchEvents = FetchWorkflows<GetWorkflowExecutionHistoryResponse> & {
   executionId: string;
@@ -75,7 +81,7 @@ export async function fetchWorkflow(
 }
 
 export const fetchEvents = async (
-  { namespace, executionId, runId, onUpdate = id }: FetchEvents,
+  { namespace, executionId, runId, onUpdate }: FetchEvents,
   request = fetch,
 ) => {
   const events: GetWorkflowExecutionHistoryResponse = await paginated(
