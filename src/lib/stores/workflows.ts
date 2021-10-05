@@ -1,4 +1,4 @@
-import { derived, writable, get as getFromStore } from 'svelte/store';
+import { derived, writable } from 'svelte/store';
 
 import { unique } from '$lib/utilities/unique';
 
