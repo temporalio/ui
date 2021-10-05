@@ -17,21 +17,26 @@ type Formatter<ResponseType, FormattedType extends HasId> = (
   response: ResponseType,
 ) => FormattedType[];
 
+/**
+ * Takes an array of items and returns an object with an array
+ * of IDs and a hash map where the key is the item's ID and the
+ * value is the item itself.
+ */
 const collectData = <T extends HasId>(
-  formatted: T[],
+  items: T[],
 ): Pick<QueryStore<T>, 'ids' | 'data'> => {
   const ids = {};
-  const result: { [key: string]: T } = {};
+  const data: { [key: string]: T } = {};
 
-  for (const datum of formatted) {
-    const id = datum.id;
+  for (const item of items) {
+    const id = item.id;
     ids[id] = true;
-    result[id] = datum;
+    data[id] = item;
   }
 
   return {
     ids: Object.keys(ids),
-    data: result,
+    data: data,
   };
 };
 
