@@ -8,7 +8,6 @@ import {
 } from '$lib/models/workflow-execution';
 
 import { fetchAllWorkflows } from '$lib/services/workflow-execution-service';
-// import { createStoreWithCallback } from '$lib/utilities/create-store-with-callback';
 import { createQueryStore } from '$lib/utilities/create-query-store';
 import type { ListWorkflowExecutionsResponse } from '$types';
 

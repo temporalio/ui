@@ -21,6 +21,19 @@ type WorkflowStatus =
 
 type NamespaceScopedRequest = { namespace: string };
 
+type NextPageToken = Uint8Array | string;
+type WithNextPageToken = { nextPageToken?: NextPageToken };
+type WithoutNextPageToken<T> = Omit<T, keyof WithNextPageToken>;
+
+type PaginationCallbacks<T> = {
+  onStart?: () => void;
+  onUpdate?: (
+    full: WithoutNextPageToken<T>,
+    current: WithoutNextPageToken<T>,
+  ) => void;
+  onComplete?: (finalProps: WithoutNextPageToken<T>) => void;
+};
+
 type WorkflowType = string | null;
 
 type WorkflowExecutionFilters = {

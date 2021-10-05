@@ -31,7 +31,11 @@ export const createQueryStore = <
   let parameters = options;
 
   const request = () => {
-    fetch({ ...parameters, onUpdate: updateStore(store, format) });
+    fetch({
+      ...parameters,
+      onUpdate: updateStore(store, format),
+      onComplete: removeStaleData(store, format),
+    });
   };
 
   const updateParameters = (updatedParameters: Partial<typeof parameters>) => {
@@ -64,7 +68,12 @@ export const createQueryStore = <
         }
       };
 
-      setTimeout(callback, 0);
+      /*
+       * Dependencies will trigger an update. So, there is no point scheduling
+       * an update.
+       */
+      if (!dependencies.length) setTimeout(callback, 0);
+
       const interval = setInterval(callback, 30000);
 
       return () => {
@@ -80,7 +89,7 @@ export const createQueryStore = <
   };
 };
 
-export const updateStore =
+const updateStore =
   <ResponseType, FormattedType extends HasId>(
     store: Writable<QueryStore<FormattedType>>,
     formatter: Formatter<ResponseType, FormattedType>,
@@ -100,5 +109,28 @@ export const updateStore =
       ...$store,
       ids: [...$store.ids, ...Object.keys(ids)],
       data: { ...$store.data, ...result },
+    }));
+  };
+
+const removeStaleData =
+  <ResponseType, FormattedType extends HasId>(
+    store: Writable<QueryStore<FormattedType>>,
+    formatter: Formatter<ResponseType, FormattedType>,
+  ) =>
+  (response: ResponseType) => {
+    const formatted = formatter(response);
+    const ids = {};
+    const result: { [key: string]: FormattedType } = {};
+
+    for (const datum of formatted) {
+      const id = datum.id;
+      ids[id] = true;
+      result[id] = datum;
+    }
+
+    return store.update(($store) => ({
+      ...$store,
+      ids: Object.keys(ids),
+      data: result,
     }));
   };

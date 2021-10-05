@@ -1,19 +1,6 @@
 import isFunction from 'lodash/isFunction';
 import { merge } from './merge';
 
-type NextPageToken = Uint8Array | string;
-type WithNextPageToken = { nextPageToken?: NextPageToken };
-type WithoutNextPageToken<T> = Omit<T, keyof WithNextPageToken>;
-
-type PaginationCallbacks<T> = {
-  onStart?: () => void;
-  onUpdate?: (
-    full: WithoutNextPageToken<T>,
-    current: WithoutNextPageToken<T>,
-  ) => void;
-  onComplete?: (finalProps: WithoutNextPageToken<T>) => void;
-};
-
 type PaginatedOptions<T> = PaginationCallbacks<T> & {
   token?: NextPageToken;
   previousProps?: WithoutNextPageToken<T>;
