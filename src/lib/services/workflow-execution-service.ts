@@ -1,5 +1,6 @@
 import { sub, formatISO } from 'date-fns';
 import isFunction from 'lodash/isFunction';
+import noop from 'lodash/noop';
 
 import type {
   DescribeWorkflowExecutionResponse,
@@ -11,7 +12,6 @@ import { paginated } from '$lib/utilities/paginated';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 
 const id = <T>(x: T) => x;
-const noop = () => {};
 const createDate = (d: Duration) => formatISO(sub(new Date(), d));
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
@@ -71,7 +71,7 @@ const fetchWorkflows =
  */
 export const fetchAllWorkflows = async (
   options: FetchWorkflows<ListWorkflowExecutionsResponse>,
-) => {
+): Promise<WithoutNextPageToken<ListWorkflowExecutionsResponse>> => {
   const { onComplete } = options;
 
   const result: WithoutNextPageToken<ListWorkflowExecutionsResponse> = {
@@ -106,7 +106,7 @@ export const fetchAllWorkflows = async (
     },
   });
 
-  return { ...open.executions, ...closed.executions };
+  return { executions: [...open.executions, ...closed.executions] };
 };
 
 export async function fetchWorkflow(
@@ -122,7 +122,7 @@ export async function fetchWorkflow(
 export const fetchEvents = async (
   { namespace, executionId, runId, onUpdate = id }: FetchEvents,
   request = fetch,
-) => {
+): Promise<GetWorkflowExecutionHistoryResponse> => {
   const events: GetWorkflowExecutionHistoryResponse = await paginated(
     async (token: string) => {
       return requestFromAPI<GetWorkflowExecutionHistoryResponse>(
