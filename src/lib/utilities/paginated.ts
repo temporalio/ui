@@ -12,6 +12,7 @@ type PaginatedOptions<T> = PaginationCallbacks<T> & {
  * will recursively call the function again, passing in the new
  * `nextPageToken`.
  *
+ * - `onStart` fires at the beginning.
  * - `onUpdate` fires on each exection.
  * - `onComplete` fires when there are no more `nextPageTokens`.
  * - `onError` fires when a promise is rejected.
