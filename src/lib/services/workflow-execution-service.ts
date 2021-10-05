@@ -33,7 +33,7 @@ type FetchEvents = FetchWorkflows<GetWorkflowExecutionHistoryResponse> & {
 /**
  * Utility function to fetch either opened or closed workflows from the
  * Temporal server. Unless you have a good reason, you should prefer to
- * use `fetchAllWorkflows`. This function is intentionall _not_ exported.
+ * use `fetchAllWorkflows`. This function is intentionally _not_ exported.
  */
 const fetchWorkflows =
   (type: 'open' | 'closed') =>
