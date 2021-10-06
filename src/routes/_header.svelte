@@ -35,7 +35,6 @@
 >
   <NamespaceSelect />
   <button
-
     on:click={() => (showMenu = !showMenu)}
     class="menu focus:outline-none focus:shadow-solid w-8 h-8"
   >
