@@ -59,11 +59,11 @@ export const createEventStore = (
   executionId: string,
   runId: string,
 ) => {
-  if (!get(stores, `${namespace}.${executionId}.${runId}`))
-    set(
-      stores,
-      `${namespace}.${executionId}.${runId}`,
-      createStore(namespace, executionId, runId),
-    );
-  return get(stores, `${namespace}.${executionId}.${runId}`);
+  const path = `${namespace}.${executionId}.${runId}`;
+  if (!get(stores, path)) {
+    console.log('no store found');
+    set(stores, path, createStore(namespace, executionId, runId));
+  }
+
+  return get(stores, path);
 };
