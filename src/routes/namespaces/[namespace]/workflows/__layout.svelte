@@ -8,6 +8,7 @@
   import WorkflowFilters from './_workflow-filters.svelte';
   import WorkflowPagination from './_workflow-pagination.svelte';
   import WorkflowsEmptyState from './_workflows-empty.svelte';
+  import Loading from '$lib/components/loading.svelte';
 
   $: store = createWorkflowStore($namespace);
   $: workflows = store.filtered;
@@ -35,6 +36,7 @@
         <WorkflowFilters bind:timeFormat />
         <WorkflowPagination bind:currentPage {maximumPage} />
       </header>
+      <Loading loading={$store.loading} updating={$store.updating} />
       <WorkflowsSummaryTable>
         <tbody slot="rows">
           {#each visibleWorkflows as workflow}

@@ -122,7 +122,14 @@ export async function fetchWorkflow(
 }
 
 export const fetchEvents = async (
-  { namespace, executionId, runId, onUpdate = id }: FetchEvents,
+  {
+    namespace,
+    executionId,
+    runId,
+    onStart = noop,
+    onUpdate = id,
+    onComplete = id,
+  }: FetchEvents,
   request = fetch,
 ): Promise<GetWorkflowExecutionHistoryResponse> => {
   const events: GetWorkflowExecutionHistoryResponse = await paginated(
@@ -135,7 +142,7 @@ export const fetchEvents = async (
         },
       );
     },
-    { onUpdate },
+    { onStart, onUpdate, onComplete },
   );
 
   return events;

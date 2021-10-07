@@ -18,12 +18,16 @@
   import { createEventStore } from '$lib/stores/events';
 
   import EventsFilters from './_events-filters.svelte';
+  import Loading from '$lib/components/loading.svelte';
 
   export let namespace: string;
   export let executionId: string;
   export let runId: string;
 
-  const { all, type, format } = createEventStore(namespace, executionId, runId);
+  $: store = createEventStore(namespace, executionId, runId);
+  $: all = store.all;
+  $: type = store.type;
+  $: format = store.format;
 </script>
 
 <div class="px-6 py-6">
@@ -33,5 +37,6 @@
     eventFormat={format}
     execution={executionId}
   />
+  <Loading loading={$store.loading} updating={$store.updating} />
   <slot />
 </div>
