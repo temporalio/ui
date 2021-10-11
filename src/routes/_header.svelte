@@ -49,7 +49,7 @@
     <div
       in:scale={{ duration: 100, start: 0.95 }}
       out:scale={{ duration: 75, start: 0.95 }}
-      class="origin-top-right absolute top-14 right-8 w-40 py-2 mt-1 border-2
+      class="z-10 origin-top-right absolute top-14 right-8 w-40 py-2 mt-1 border-2
       rounded-md shadow-md bg-white"
     >
       {#if user.email}
@@ -72,6 +72,12 @@
         class="block px-4 py-2 hover:bg-green-500 hover:text-green-100"
         >Settings</a
       >
+      <a
+        href="https://github.com/temporalio/web/issues/new/choose"
+        class="block px-4 py-2 hover:bg-green-500 hover:text-green-100"
+      >
+        Report Bug/Give Feedback
+      </a>
       {#if user.email}
         <a
           href={import.meta.env.VITE_API + '/auth/signout'}
