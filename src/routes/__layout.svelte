@@ -12,7 +12,7 @@
 
     return {
       props: { namespaces },
-      context: { namespaces },
+      stuff: { namespaces },
     };
   }
 </script>
