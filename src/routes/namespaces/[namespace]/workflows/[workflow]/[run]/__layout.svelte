@@ -31,7 +31,7 @@
       props: {
         execution,
       },
-      context: {
+      stuff: {
         execution,
         events,
       },
