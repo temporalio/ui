@@ -1,6 +1,4 @@
 import { sub, formatISO } from 'date-fns';
-import isFunction from 'lodash/isFunction';
-import noop from 'lodash/noop';
 
 import type {
   DescribeWorkflowExecutionResponse,
@@ -10,8 +8,10 @@ import type {
 
 import { paginated } from '$lib/utilities/paginated';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
+import { isFunction } from '$lib/utilities/is-function';
 
 const id = <T>(x: T) => x;
+const noop = () => {};
 const createDate = (d: Duration) => formatISO(sub(new Date(), d));
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {

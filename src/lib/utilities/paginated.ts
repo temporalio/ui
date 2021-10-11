@@ -1,4 +1,4 @@
-import isFunction from 'lodash/isFunction';
+import { isFunction } from '$lib/utilities/is-function';
 import { merge } from './merge';
 
 type PaginatedOptions<T> = PaginationCallbacks<T> & {

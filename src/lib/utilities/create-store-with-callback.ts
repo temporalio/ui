@@ -1,5 +1,5 @@
 import { Updater, Writable, writable } from 'svelte/store';
-import isFunction from 'lodash/isFunction';
+import { isFunction } from '$lib/utilities/is-function';
 
 const call = (fn: () => void) => {
   if (isFunction(fn)) fn();
