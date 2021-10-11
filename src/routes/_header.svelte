@@ -17,14 +17,21 @@
 <script lang="ts">
   import { scale } from 'svelte/transition';
   import Icon, { User } from 'svelte-hero-icons';
+  import { clickOutside } from '$lib/utilities/click-outside';
 
   export let user: { name?: string; email?: string; picture?: string } = {};
   export let showMenu = false;
+
+  function handleClickOutside() {
+    showMenu = false;
+  }
 </script>
 
 <div
   id="header"
   class="h-16 w-full px-6 flex flex-row items-center justify-between static border-b-2"
+  use:clickOutside
+  on:click_outside={handleClickOutside}
 >
   <NamespaceSelect />
   <button
