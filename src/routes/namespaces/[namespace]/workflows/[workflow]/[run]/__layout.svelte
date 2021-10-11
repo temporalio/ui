@@ -39,7 +39,7 @@
   }
 </script>
 
-<script lang="typescript">
+<script lang="ts">
   import type { DescribeWorkflowExecutionResponse } from '$types';
 
   import { isFullScreen } from '$lib/stores/full-screen';
