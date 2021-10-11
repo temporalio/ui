@@ -6,7 +6,6 @@ import type {
 } from '$types';
 
 import { formatDate } from '$lib/utilities/format-date';
-import get from 'lodash/get';
 
 type Optional<T extends unknown, K extends keyof T = keyof T> = Omit<T, K> &
   Partial<Pick<T, K>>;

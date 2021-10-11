@@ -1,14 +1,16 @@
 <script context="module" lang="ts">
   import type { LoadInput } from '@sveltejs/kit';
+  import { requestFromAPI } from '$lib/utilities/request-from-api';
   import type {
     DescribeNamespaceResponse,
     ListNamespacesResponse,
   } from '$types';
 
   export async function load({ fetch }: LoadInput) {
-    const { namespaces }: ListNamespacesResponse = await fetch(
-      import.meta.env.VITE_API + '/namespaces',
-    ).then((response) => response.json());
+    const { namespaces }: ListNamespacesResponse = await requestFromAPI(
+      '/namespaces',
+      { request: fetch },
+    );
 
     return {
       props: { namespaces },
