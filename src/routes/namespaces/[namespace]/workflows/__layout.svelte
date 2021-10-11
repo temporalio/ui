@@ -29,7 +29,7 @@
   }
 </script>
 
-<section class="flex items-start">
+<section class="flex items-start flex-col">
   {#if !$isFullScreen}
     <div class="w-full h-screen overflow-scroll">
       <header>

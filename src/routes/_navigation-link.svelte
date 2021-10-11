@@ -1,19 +1,19 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { pathMatches } from '$lib/utilities/path-matches';
-  import Icon from 'svelte-hero-icons';
+  import HeroIcons from '$lib/components/hero-icons.svelte';
   import Tooltip from '$lib/components/tooltip.svelte';
 
   export let href: string;
   export let label: string;
-  export let icon: Heroicon;
+  export let icon: string;
 
   $: isActive = pathMatches(href, $page.path);
 </script>
 
 <Tooltip text={label}>
   <a {href} class:active={isActive} class="relative" data-tooltip={label}>
-    <Icon src={icon} class="mx-auto text-white w-8 h-8" />
+    <HeroIcons {icon} styles="mx-auto text-white w-8 h-8" />
   </a>
 </Tooltip>
 

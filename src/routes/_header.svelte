@@ -16,7 +16,7 @@
 
 <script lang="ts">
   import { scale } from 'svelte/transition';
-  import Icon, { User } from 'svelte-hero-icons';
+  import HeroIcons from '$lib/components/hero-icons.svelte';
 
   export let user: { name?: string; email?: string; picture?: string } = {};
   export let showMenu = false;
@@ -34,7 +34,7 @@
     {#if user?.picture}
       <img src={user.picture} alt={user.name} class="rounded-full" />
     {:else}
-      <Icon src={User} class="rounded-full" />
+      <HeroIcons icon="User" styles="rounded-full" />
     {/if}
   </button>
 
