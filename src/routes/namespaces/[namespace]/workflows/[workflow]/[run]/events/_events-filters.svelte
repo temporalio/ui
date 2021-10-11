@@ -1,8 +1,9 @@
 <script lang="ts">
+  import Icon from 'svelte-hero-icons/Icon.svelte';
+  import { Download } from 'svelte-hero-icons';
   import type { Writable } from 'svelte/store';
 
   import { convertToJSON } from '$lib/utilities/convert-to-json';
-  import Icon, { Download } from 'svelte-hero-icons';
   import Input from '$lib/components/filter-input.svelte';
 
   export let events: BaseEvent[];
