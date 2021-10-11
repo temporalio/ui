@@ -41,7 +41,7 @@ export const toWorkflowExecution = (
   const status = response.workflowExecutionInfo.status;
   const historyEvents = response.workflowExecutionInfo.historyLength;
   const url = `/workflows/${id}/${runId}`;
-  const taskQueue = get(response, 'executionConfig.taskQueue.name');
+  const taskQueue = response?.executionConfig?.taskQueue?.name;
   const pendingActivities = response.pendingActivities || [];
 
   const toggleUrl = (isFullScreen: boolean): string => {
