@@ -1,5 +1,6 @@
 <script lang="ts">
-  import Icon, { Check } from 'svelte-hero-icons';
+  import Icon from 'svelte-hero-icons/Icon.svelte';
+  import { Check } from 'svelte-hero-icons';
 
   import type { PollerWithTaskQueueTypes } from '$lib/services/pollers-service';
   import { formatDate } from '$lib/utilities/format-date';

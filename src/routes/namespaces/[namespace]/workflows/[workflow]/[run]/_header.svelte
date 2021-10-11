@@ -1,6 +1,7 @@
 <script lang="ts">
   import { namespace } from '$lib/stores/namespace';
-  import Icon, { X, ArrowLeft, ArrowRight } from 'svelte-hero-icons';
+  import Icon from 'svelte-hero-icons/Icon.svelte';
+  import { X, ArrowLeft, ArrowRight } from 'svelte-hero-icons';
 
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
