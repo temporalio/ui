@@ -1,3 +1,4 @@
+import { handleError } from './handle-error';
 import { isFunction } from './is-function';
 import { merge } from './merge';
 
@@ -24,27 +25,33 @@ export const paginated = async <T extends WithNextPageToken>(
     onStart,
     onUpdate,
     onComplete,
+    onError = handleError,
     token,
     previousProps,
   }: PaginatedOptions<T> = {},
 ): Promise<WithoutNextPageToken<T>> => {
   if (!previousProps && isFunction(onStart)) onStart();
 
-  const { nextPageToken, ...props } = await fn(token);
-  const mergedProps = merge(previousProps, props);
+  try {
+    const response = await fn(token);
+    const { nextPageToken, ...props } = response;
+    const mergedProps = merge(previousProps, props);
 
-  if (isFunction(onUpdate)) onUpdate(mergedProps, props);
+    if (isFunction(onUpdate)) onUpdate(mergedProps, props);
 
-  if (!nextPageToken) {
-    if (isFunction(onComplete)) onComplete(mergedProps);
-    return mergedProps;
+    if (!nextPageToken) {
+      if (isFunction(onComplete)) onComplete(mergedProps);
+      return mergedProps;
+    }
+
+    return paginated(fn, {
+      onStart,
+      onUpdate,
+      onComplete,
+      token: nextPageToken,
+      previousProps: mergedProps,
+    });
+  } catch (error: unknown) {
+    onError(error);
   }
-
-  return paginated(fn, {
-    onStart,
-    onUpdate,
-    onComplete,
-    token: nextPageToken,
-    previousProps: mergedProps,
-  });
 };
