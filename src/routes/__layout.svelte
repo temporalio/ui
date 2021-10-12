@@ -24,6 +24,7 @@
   import Navigation from './_navigation.svelte';
   import Header from './_header.svelte';
   import { setContext } from 'svelte';
+  import Notifications from '$lib/components/notifications.svelte';
 
   export let namespaces: DescribeNamespaceResponse[];
 
@@ -43,6 +44,7 @@
 </svelte:head>
 
 <main class="flex align-start h-screen">
+  <Notifications />
   <Navigation />
   <div class="w-full overflow-y-scroll">
     <Header />
