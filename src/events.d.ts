@@ -169,8 +169,3 @@ type ExternalWorkflowExecutionSignaledEvent = BaseEvent &
   Pick<HistoryEvent, 'externalWorkflowExecutionSignaledEventAttributes'>;
 type UpsertWorkflowSearchAttributesEvent = BaseEvent &
   Pick<HistoryEvent, 'upsertWorkflowSearchAttributesEventAttributes'>;
-declare namespace svelte.JSX {
-  interface DOMAttributes<T> {
-    onclick_outside?: CompositionEventHandler<T>;
-  }
-}

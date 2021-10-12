@@ -63,3 +63,9 @@ type Activity = {
   activityTaskCancelRequestedEvent?: ActivityTaskCancelRequestedEvent;
   activityTaskCanceledEvent?: ActivityTaskCanceledEvent;
 };
+
+declare namespace svelte.JSX {
+  interface DOMAttributes<T> {
+    onclick_outside?: CompositionEventHandler<T>;
+  }
+}
