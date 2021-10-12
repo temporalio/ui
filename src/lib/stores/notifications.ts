@@ -1,4 +1,3 @@
-import { browser } from '$app/env';
 import { writable } from 'svelte/store';
 import type { Readable } from 'svelte/store';
 
@@ -13,7 +12,6 @@ type Notifications = Notification[];
 
 const store = writable<Notifications>([], () => {
   const interval = setInterval(() => {
-    if (!browser) return;
     requestIdleCallback(() => {
       const now = Date.now();
       store.update((ns) => {
@@ -23,7 +21,7 @@ const store = writable<Notifications>([], () => {
   }, 5000);
 
   return () => {
-    if (browser) clearInterval(interval);
+    clearInterval(interval);
   };
 });
 
@@ -50,11 +48,17 @@ const dismiss = (id: string) => {
   store.update((ns) => ns.filter((n) => n.id !== id));
 };
 
+const clear = () => {
+  store.set([]);
+};
+
 export const notifications: Readable<Notifications> & {
   add: typeof add;
   dismiss: typeof dismiss;
+  clear: typeof clear;
 } = {
   subscribe: store.subscribe,
   add,
   dismiss,
+  clear,
 };

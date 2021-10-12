@@ -1,7 +1,4 @@
-import { dev } from '$app/env';
-
+// This will eventually be expanded on.
 export const handleError = (error: unknown) => {
-  if (dev) {
-    console.error(error);
-  }
+  console.error(error);
 };
