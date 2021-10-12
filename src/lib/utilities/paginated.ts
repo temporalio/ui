@@ -1,4 +1,4 @@
-import { isFunction } from '$lib/utilities/is-function';
+import { isFunction } from './is-function';
 import { merge } from './merge';
 
 type PaginatedOptions<T> = PaginationCallbacks<T> & {
