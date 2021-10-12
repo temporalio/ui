@@ -1,7 +1,9 @@
+import { is_function } from 'svelte/internal';
 import { Updater, Writable, writable } from 'svelte/store';
 import { isFunction } from './is-function';
 
 const call = (fn: () => void) => {
+  console.log(typeof fn);
   if (isFunction(fn)) fn();
 };
 
