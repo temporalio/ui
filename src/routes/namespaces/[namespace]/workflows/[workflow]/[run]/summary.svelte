@@ -14,7 +14,7 @@
   }
 </script>
 
-<script lang="typescript">
+<script lang="ts">
   import type {
     GetWorkflowExecutionHistoryResponse,
     DescribeWorkflowExecutionResponse,

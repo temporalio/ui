@@ -13,7 +13,7 @@
   }
 </script>
 
-<script lang="typescript">
+<script lang="ts">
   import { namespace } from '$lib/stores/namespace';
   import { isFullScreen } from '$lib/stores/full-screen';
 

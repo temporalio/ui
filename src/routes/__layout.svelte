@@ -1,14 +1,16 @@
 <script context="module" lang="ts">
   import type { LoadInput } from '@sveltejs/kit';
+  import { requestFromAPI } from '$lib/utilities/request-from-api';
   import type {
     DescribeNamespaceResponse,
     ListNamespacesResponse,
   } from '$types';
 
   export async function load({ fetch }: LoadInput) {
-    const { namespaces }: ListNamespacesResponse = await fetch(
-      import.meta.env.VITE_API + '/namespaces',
-    ).then((response) => response.json());
+    const { namespaces }: ListNamespacesResponse = await requestFromAPI(
+      '/namespaces',
+      { request: fetch },
+    );
 
     return {
       props: { namespaces },
@@ -32,7 +34,7 @@
   <title>Temporal</title>
 
   <link rel="manifest" href="/site.webmanifest" />
-  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
   <meta property="og:title" content="Temporal" />
   <meta property="og:type" content="website" />

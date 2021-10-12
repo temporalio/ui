@@ -74,7 +74,9 @@ export const createStore = (namespace: string) => {
   };
 };
 
-export const createWorkflowStore = (namespace: string) => {
+export const createWorkflowStore = (
+  namespace: string,
+): ReturnType<typeof createStore> => {
   if (!stores[namespace]) stores[namespace] = createStore(namespace);
   return stores[namespace];
 };

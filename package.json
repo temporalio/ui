@@ -25,7 +25,6 @@
     "base-64": "^1.0.0",
     "date-fns": "^2.23.0",
     "json-beautify": "^1.1.1",
-    "lodash": "^4.17.21",
     "svelte-hero-icons": "^3.0.0",
     "url-pattern": "^1.0.3"
   },
@@ -36,7 +35,6 @@
     "@temporalio/proto": "^0.3.1",
     "@types/base-64": "^1.0.0",
     "@types/jest": "^27.0.1",
-    "@types/lodash": "^4.14.173",
     "@typescript-eslint/eslint-plugin": "^4.30.0",
     "@typescript-eslint/parser": "^4.30.0",
     "autoprefixer": "^10.3.3",

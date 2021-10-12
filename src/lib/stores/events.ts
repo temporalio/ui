@@ -1,13 +1,14 @@
 import { derived, writable } from 'svelte/store';
 
-import get from 'lodash/get';
-import set from 'lodash/set';
+import type { HistoryEventWithId } from '$lib/models/event-history';
+import type { GetWorkflowExecutionHistoryResponse } from '$types';
 
 import { fetchEvents } from '$lib/services/workflow-execution-service';
 import { createQueryStore } from '$lib/utilities/create-query-store';
+import { toEventHistory } from '$lib/models/event-history';
+import { set } from '$lib/utilities/set-object-key';
+
 import { createActivityStore } from './activities';
-import { HistoryEventWithId, toEventHistory } from '$lib/models/event-history';
-import type { GetWorkflowExecutionHistoryResponse } from '$types';
 
 const stores: { [key: string]: ReturnType<typeof createStore> } = {};
 
@@ -58,12 +59,14 @@ export const createEventStore = (
   namespace: string,
   executionId: string,
   runId: string,
-) => {
+): ReturnType<typeof createStore> => {
+  let store = stores?.[namespace]?.[executionId]?.[runId];
   const path = `${namespace}.${executionId}.${runId}`;
-  if (!get(stores, path)) {
-    console.log('no store found');
-    set(stores, path, createStore(namespace, executionId, runId));
+
+  if (!store) {
+    store = createStore(namespace, executionId, runId);
+    set(stores, path, store);
   }
 
-  return get(stores, path);
+  return store;
 };
