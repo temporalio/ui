@@ -1,7 +1,7 @@
 <script lang="ts">
   import { namespace } from '$lib/stores/namespace';
   import Icon, { X, ArrowLeft, ArrowRight } from 'svelte-hero-icons';
-
+  import { terminateWorkflow } from '$lib/services/terminate-service';
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
   import { isFullScreen } from '$lib/stores/full-screen';
@@ -9,7 +9,6 @@
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Tabs from './_tabs.svelte';
-
   export let workflow: WorkflowExecution;
 
   $: workflowUrl = getWorkflowExecutionUrl($namespace, workflow);
@@ -47,6 +46,13 @@
       <span class="uppercase text-gray-400 mr-2">Run ID</span>
       {workflow.runId}
     </p>
+    {#if String(workflow.status) === 'Running'}
+      <button
+        class="mt-2 bg-red-600 p-1 text-white uppercase rounded text-sm"
+        on:click={() => terminateWorkflow({ workflow, namespace: $namespace })}
+        >Terminate</button
+      >
+    {/if}
   </main>
   <Tabs {workflow} />
 </header>
