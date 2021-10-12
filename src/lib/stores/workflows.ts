@@ -2,10 +2,8 @@ import { derived, writable } from 'svelte/store';
 
 import { unique } from '$lib/utilities/unique';
 
-import {
-  toWorkflowExecutions,
-  WorkflowExecution,
-} from '$lib/models/workflow-execution';
+import type { WorkflowExecution } from '$lib/models/workflow-execution';
+import { toWorkflowExecutions } from '$lib/models/workflow-execution';
 
 import { fetchAllWorkflows } from '$lib/services/workflow-execution-service';
 import { createQueryStore } from '$lib/utilities/create-query-store';
@@ -76,7 +74,9 @@ export const createStore = (namespace: string) => {
   };
 };
 
-export const createWorkflowStore = (namespace: string) => {
+export const createWorkflowStore = (
+  namespace: string,
+): ReturnType<typeof createStore> => {
   if (!stores[namespace]) stores[namespace] = createStore(namespace);
   return stores[namespace];
 };

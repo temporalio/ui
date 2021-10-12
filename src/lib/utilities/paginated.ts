@@ -1,4 +1,4 @@
-import isFunction from 'lodash/isFunction';
+import { isFunction } from './is-function';
 import { merge } from './merge';
 
 type PaginatedOptions<T> = PaginationCallbacks<T> & {
@@ -17,6 +17,7 @@ type PaginatedOptions<T> = PaginationCallbacks<T> & {
  * - `onComplete` fires when there are no more `nextPageTokens`.
  * - `onError` fires when a promise is rejected.
  */
+
 export const paginated = async <T extends WithNextPageToken>(
   fn: (token?: NextPageToken) => Promise<T>,
   {

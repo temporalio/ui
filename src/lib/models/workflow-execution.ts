@@ -6,7 +6,6 @@ import type {
 } from '$types';
 
 import { formatDate } from '$lib/utilities/format-date';
-import get from 'lodash/get';
 
 type Optional<T extends unknown, K extends keyof T = keyof T> = Omit<T, K> &
   Partial<Pick<T, K>>;
@@ -41,7 +40,7 @@ export const toWorkflowExecution = (
   const status = response.workflowExecutionInfo.status;
   const historyEvents = response.workflowExecutionInfo.historyLength;
   const url = `/workflows/${id}/${runId}`;
-  const taskQueue = get(response, 'executionConfig.taskQueue.name');
+  const taskQueue = response?.executionConfig?.taskQueue?.name;
   const pendingActivities = response.pendingActivities || [];
 
   const toggleUrl = (isFullScreen: boolean): string => {

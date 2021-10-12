@@ -1,10 +1,7 @@
 import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
-import {
-  mergeSearchParams,
-  toSearchParams,
-  URLSearchParamLike,
-} from './url-search-params';
+import type { URLSearchParamLike } from './url-search-params';
+import { mergeSearchParams, toSearchParams } from './url-search-params';
 
 export const getWorkflowExecutionUrl = (
   namespace: string,

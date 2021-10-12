@@ -21,10 +21,10 @@
 </script>
 
 <script lang="ts">
-  import omit from 'lodash/omit';
   import { createEventStore } from '$lib/stores/events';
 
   import KeyValueTable from '$lib/components/key-value-table.svelte';
+  import { omit } from '$lib/utilities/omit';
 
   export let namespace: string;
   export let executionId: string;
@@ -34,7 +34,7 @@
   const { activities } = createEventStore(namespace, executionId, runId);
   $: selectedActivity = activities.getActivity(activity);
 
-  $: events = Object.keys(omit($selectedActivity, ['id', 'status']));
+  $: events = Object.keys(omit($selectedActivity, 'id', 'status'));
 </script>
 
 <div class="p-4">

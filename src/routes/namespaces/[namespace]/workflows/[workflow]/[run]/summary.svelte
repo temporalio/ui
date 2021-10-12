@@ -2,8 +2,8 @@
   import { namespace } from '$lib/stores/namespace';
   import type { LoadInput } from '@sveltejs/kit';
 
-  export async function load({ context }: LoadInput) {
-    const { execution, events } = context;
+  export async function load({ stuff }: LoadInput) {
+    const { execution, events } = stuff;
 
     return {
       props: {
@@ -14,7 +14,7 @@
   }
 </script>
 
-<script lang="typescript">
+<script lang="ts">
   import type {
     GetWorkflowExecutionHistoryResponse,
     DescribeWorkflowExecutionResponse,

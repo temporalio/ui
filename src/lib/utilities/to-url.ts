@@ -1,4 +1,5 @@
-import { toSearchParams, URLSearchParamLike } from './url-search-params';
+import type { URLSearchParamLike } from './url-search-params';
+import { toSearchParams } from './url-search-params';
 
 export const toURL = (url: string, params?: URLSearchParamLike): string => {
   let result = url;
