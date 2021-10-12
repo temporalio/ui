@@ -6,7 +6,7 @@ export const toDuration = (value: string): Duration => {
   return { [units]: parseInt(amount, 10) };
 };
 
-export const toString = (duration: Duration) => {
+export const toString = (duration: Duration): string => {
   const units = Object.keys(duration)[0];
   const amount: number = duration[units];
   return `${amount} ${units}`;

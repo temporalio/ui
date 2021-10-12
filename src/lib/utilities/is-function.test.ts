@@ -2,22 +2,26 @@ import { isFunction } from './is-function';
 
 describe(isFunction, () => {
   it('should return true if given an arrow function', () => {
-    const fn = () => {};
+    const fn = () => 2;
     expect(isFunction(fn)).toBe(true);
   });
 
   it('should return true if given a function expression', () => {
-    const fn = function () {};
+    const fn = function () {
+      return 2;
+    };
     expect(isFunction(fn)).toBe(true);
   });
 
   it('should return true if given a function declaration', () => {
-    function fn() {}
+    function fn() {
+      return 2;
+    }
     expect(isFunction(fn)).toBe(true);
   });
 
   it('should return true if given an async function ', () => {
-    const fn = async () => {};
+    const fn = async () => 2;
     expect(isFunction(fn)).toBe(true);
   });
 

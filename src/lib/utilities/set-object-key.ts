@@ -1,9 +1,9 @@
 const isLast = (path: string[]) => path.length === 0;
 
-export const set = <T = { [key: string]: any }>(
+export const set = <T = Record<string, unknown>>(
   object: T,
   path: string | string[],
-  value: any,
+  value: unknown,
 ): T => {
   let current = object;
   if (!Array.isArray(path)) path = path.split('.');
