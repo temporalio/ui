@@ -14,10 +14,7 @@
       return {
         duration: 600,
         easing: quintOut,
-        css: (t) => `
-					transform: ${transform} scale(${t});
-					opacity: ${t}
-				`,
+        css: (t) => `transform: ${transform} scale(${t}); opacity: ${t}`,
       };
     },
   });
