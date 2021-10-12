@@ -1,3 +1,4 @@
+import { handleError } from './handle-error';
 import { toURL } from './to-url';
 
 type toURLParams = Parameters<typeof toURL>;
@@ -25,12 +26,32 @@ const base = import.meta.env.VITE_API;
 export const requestFromAPI = async <T>(
   endpoint: toURLParams[0],
   { params = {}, request = fetch, token }: RequestFromAPIOptions = {},
+  retryCount = 0,
 ): Promise<T> => {
   if (!endpoint.startsWith('/')) endpoint = '/' + endpoint;
   const nextPageToken = token ? { next_page_token: token } : {};
 
   const url = toURL(base + endpoint, { ...params, ...nextPageToken });
 
-  const response = await request(url);
-  return await response.json();
+  try {
+    const response = await request(url);
+    return await response.json();
+  } catch (error: unknown) {
+    handleError(error);
+
+    if (retryCount < 10) {
+      // Try to make the request again in 5 seconds. Give up after 10 tries.
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(
+            requestFromAPI(
+              endpoint,
+              { params, request, token },
+              retryCount + 1,
+            ),
+          );
+        }, 5000);
+      });
+    }
+  }
 };

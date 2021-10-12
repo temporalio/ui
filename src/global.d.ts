@@ -32,7 +32,7 @@ type PaginationCallbacks<T> = {
     current: WithoutNextPageToken<T>,
   ) => void;
   onComplete?: (finalProps: WithoutNextPageToken<T>) => void;
-  onError?: (error: string) => void;
+  onError?: (error: unknown) => void;
 };
 
 type WorkflowType = string | null;

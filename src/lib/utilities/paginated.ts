@@ -1,3 +1,4 @@
+import { handleError } from './handle-error';
 import { isFunction } from './is-function';
 import { merge } from './merge';
 
@@ -24,7 +25,7 @@ export const paginated = async <T extends WithNextPageToken>(
     onStart,
     onUpdate,
     onComplete,
-    onError,
+    onError = handleError,
     token,
     previousProps,
   }: PaginatedOptions<T> = {},
@@ -51,10 +52,6 @@ export const paginated = async <T extends WithNextPageToken>(
       previousProps: mergedProps,
     });
   } catch (error: unknown) {
-    if (typeof error === 'string') {
-      onError(error);
-    } else if (error instanceof Error) {
-      onError(error.message);
-    }
+    onError(error);
   }
 };
