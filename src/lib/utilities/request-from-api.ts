@@ -35,6 +35,11 @@ export const requestFromAPI = async <T>(
 
   try {
     const response = await request(url);
+
+    if (!response.ok) {
+      throw new Error(`${response.status}: ${response.statusText}`);
+    }
+
     return await response.json();
   } catch (error: unknown) {
     handleError(error);
