@@ -28,4 +28,42 @@ describe('notifications', () => {
       expect(notification.message).toBe('This is an error');
     });
   });
+
+  describe('clear', () => {
+    it('should clear out all of the notifications', () => {
+      notifications.add('error', 'This is an error');
+      notifications.add('error', 'This is an error');
+      notifications.add('error', 'This is an error');
+
+      notifications.clear();
+
+      expect(get(notifications)).toHaveLength(0);
+    });
+  });
+
+  describe('dismiss', () => {
+    it('should remove a notification', () => {
+      notifications.add('error', 'This is an error');
+      notifications.add('success', 'Everything went well');
+
+      const [notification] = get(notifications);
+      const { id } = notification;
+
+      notifications.dismiss(id);
+
+      expect(get(notifications)).toHaveLength(1);
+    });
+
+    it('should remove a the correct notification', () => {
+      notifications.add('error', 'This is an error');
+      notifications.add('success', 'Everything went well');
+
+      const [notification] = get(notifications);
+      const { id } = notification;
+
+      notifications.dismiss(id);
+
+      expect(get(notifications)).not.toContain(notification);
+    });
+  });
 });
