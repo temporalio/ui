@@ -38,7 +38,7 @@
 <div
   class="inline-flex space-x-2 items-center"
   use:clickOutside
-  on:click_outside={handleClickOutside}
+  on:ClickOutside={handleClickOutside}
 >
   <!-- svelte-ignore a11y-label-has-associated-control -->
   <label id="listbox-label" class="block text-sm font-medium text-gray-700">

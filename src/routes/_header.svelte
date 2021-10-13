@@ -31,7 +31,7 @@
   id="header"
   class="h-16 w-full px-6 flex flex-row items-center justify-between static border-b-2"
   use:clickOutside
-  on:click_outside={handleClickOutside}
+  on:ClickOutside={handleClickOutside}
 >
   <NamespaceSelect />
   <button
