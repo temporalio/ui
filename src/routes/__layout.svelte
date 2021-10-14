@@ -1,18 +1,20 @@
 <script context="module" lang="ts">
   import type { LoadInput } from '@sveltejs/kit';
+  import { requestFromAPI } from '$lib/utilities/request-from-api';
   import type {
     DescribeNamespaceResponse,
     ListNamespacesResponse,
   } from '$types';
 
   export async function load({ fetch }: LoadInput) {
-    const { namespaces }: ListNamespacesResponse = await fetch(
-      import.meta.env.VITE_API + '/namespaces',
-    ).then((response) => response.json());
+    const { namespaces }: ListNamespacesResponse = await requestFromAPI(
+      '/namespaces',
+      { request: fetch },
+    );
 
     return {
       props: { namespaces },
-      context: { namespaces },
+      stuff: { namespaces },
     };
   }
 </script>
@@ -22,6 +24,7 @@
   import Navigation from './_navigation.svelte';
   import Header from './_header.svelte';
   import { setContext } from 'svelte';
+  import Notifications from '$lib/components/notifications.svelte';
 
   export let namespaces: DescribeNamespaceResponse[];
 
@@ -32,7 +35,7 @@
   <title>Temporal</title>
 
   <link rel="manifest" href="/site.webmanifest" />
-  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
   <meta property="og:title" content="Temporal" />
   <meta property="og:type" content="website" />
@@ -41,6 +44,7 @@
 </svelte:head>
 
 <main class="flex align-start h-screen">
+  <Notifications />
   <Navigation />
   <div class="w-full overflow-y-scroll">
     <Header />

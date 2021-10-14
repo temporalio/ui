@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import Icon, { Clipboard, Check } from 'svelte-hero-icons';
+  import Icon from 'svelte-hero-icons/Icon.svelte';
+  import { Clipboard, Check } from 'svelte-hero-icons';
 
   export let heading = '';
   export let content = '';

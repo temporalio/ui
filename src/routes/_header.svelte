@@ -16,7 +16,8 @@
 
 <script lang="ts">
   import { scale } from 'svelte/transition';
-  import Icon, { User } from 'svelte-hero-icons';
+  import Icon from 'svelte-hero-icons/Icon.svelte';
+  import { User } from 'svelte-hero-icons';
 
   export let user: { name?: string; email?: string; picture?: string } = {};
   export let showMenu = false;
