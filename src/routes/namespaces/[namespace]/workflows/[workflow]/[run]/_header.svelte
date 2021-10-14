@@ -2,7 +2,7 @@
   import { namespace } from '$lib/stores/namespace';
   import Icon from 'svelte-hero-icons/Icon.svelte';
   import { X, ArrowLeft, ArrowRight } from 'svelte-hero-icons';
-
+  import { terminateWorkflow } from '$lib/services/terminate-service';
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
   import { isFullScreen } from '$lib/stores/full-screen';
