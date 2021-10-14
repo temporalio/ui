@@ -55,7 +55,7 @@ describe('sorted', () => {
 
   it.only('should sort have the ability to change property', () => {
     const store = writable(musicians);
-    const sortedStore = sorted(store, 'birthYear', 'descending');
+    const sortedStore = sorted(store, 'birthYear', 'ascending');
 
     sortedStore.setProperty('name');
 
