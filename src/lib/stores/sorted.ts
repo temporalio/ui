@@ -1,23 +1,40 @@
-import type { Readable } from 'svelte/store';
+import type { Readable, Writable } from 'svelte/store';
 import { derived, writable } from 'svelte/store';
 
 type Order = 'ascending' | 'descending';
 
 export type SortedStore<T> = Readable<T[]> & {
-  setProperty: (p: keyof T) => void;
-  setOrder: (o: Order) => void;
+  property: Writable<keyof T>;
+  order: Writable<Order>;
 };
 
-const asc =
-  <T>(property: keyof T) =>
-  (a: T, b: T): number => {
-    return Number(a[property]) - Number(b[property]);
-  };
+const isNumber = (x: unknown): x is number => typeof x === 'number';
+const isString = (x: unknown): x is string => typeof x === 'string';
 
-const desc =
-  <T>(property: keyof T) =>
+const getValues = <T>(
+  values: T[],
+  property: keyof T,
+  order: Order,
+): [T[keyof T], T[keyof T]] => {
+  const [x, y] = values.map((value) => value[property]);
+  if (order === 'ascending') return [x, y];
+  if (order === 'descending') return [y, x];
+};
+
+const compare =
+  <T>(property: keyof T, order: Order) =>
   (a: T, b: T): number => {
-    return Number(b[property]) - Number(a[property]);
+    const [x, y] = getValues([a, b], property, order);
+
+    if (isNumber(x) && isNumber(y)) {
+      return x - y;
+    }
+
+    if (isString(x) && isString(y)) {
+      if (x > y) return 1;
+      if (x < y) return -1;
+      return 0;
+    }
   };
 
 export const sorted = <T>(
@@ -29,22 +46,15 @@ export const sorted = <T>(
   const property = writable<keyof T>(prop);
 
   const sortedStore = derived(
-    [store, order, property],
-    ([$store, $order, $property]) => {
-      const operator =
-        $order === 'ascending' ? asc($property) : desc($property);
-      console.log($order, $property);
-      return $store.sort(operator);
+    [store, property, order],
+    ([$store, $property, $order]) => {
+      return $store.sort(compare($property, $order));
     },
   );
 
   return {
     ...sortedStore,
-    setProperty(p: keyof T) {
-      property.set(p);
-    },
-    setOrder(o: Order) {
-      order.set(o);
-    },
+    order,
+    property,
   };
 };

@@ -46,18 +46,18 @@ describe('sorted', () => {
     const store = writable(musicians);
     const sortedStore = sorted(store, 'birthYear', 'descending');
 
-    sortedStore.setOrder('ascending');
+    sortedStore.order.set('ascending');
 
     const [oldest] = get(sortedStore);
 
     expect(oldest.name).toEqual('J Mascis');
   });
 
-  it.only('should sort have the ability to change property', () => {
+  it('should sort have the ability to change property', () => {
     const store = writable(musicians);
-    const sortedStore = sorted(store, 'birthYear', 'ascending');
+    const sortedStore = sorted(store, 'birthYear', 'descending');
 
-    sortedStore.setProperty('name');
+    sortedStore.property.set('name');
 
     const [kurt] = get(sortedStore);
 
