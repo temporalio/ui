@@ -7,8 +7,9 @@ import { toWorkflowExecutions } from '$lib/models/workflow-execution';
 
 import { fetchAllWorkflows } from '$lib/services/workflow-execution-service';
 import { createQueryStore } from '$lib/utilities/create-query-store';
-import type { ListWorkflowExecutionsResponse } from '$types';
 import { sorted } from './sorted';
+
+import type { ListWorkflowExecutionsResponse } from '$types';
 
 const stores: { [key: string]: ReturnType<typeof createStore> } = {};
 
