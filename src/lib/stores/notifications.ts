@@ -40,15 +40,15 @@ const createNotification = (
   };
 };
 
-const add = (type: NotificationType, message: string, duration = 30) => {
+const add = (type: NotificationType, message: string, duration = 30): void => {
   store.update((ns) => [...ns, createNotification(type, message, duration)]);
 };
 
-const dismiss = (id: string) => {
+const dismiss = (id: string): void => {
   store.update((ns) => ns.filter((n) => n.id !== id));
 };
 
-const clear = () => {
+const clear = (): void => {
   store.set([]);
 };
 

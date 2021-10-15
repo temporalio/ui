@@ -8,6 +8,7 @@ import { toWorkflowExecutions } from '$lib/models/workflow-execution';
 import { fetchAllWorkflows } from '$lib/services/workflow-execution-service';
 import { createQueryStore } from '$lib/utilities/create-query-store';
 import type { ListWorkflowExecutionsResponse } from '$types';
+import { sorted } from './sorted';
 
 const stores: { [key: string]: ReturnType<typeof createStore> } = {};
 
@@ -58,11 +59,13 @@ export const createStore = (namespace: string) => {
     },
   );
 
+  const visible = sorted(filtered);
+
   return {
     ...store,
     ids,
     all,
-    filtered,
+    visible,
     workflowTypes,
     range,
     filters: {
@@ -70,6 +73,10 @@ export const createStore = (namespace: string) => {
       workflowType,
       executionId,
       runId,
+    },
+    sort: {
+      order: visible.order,
+      property: visible.property,
     },
   };
 };

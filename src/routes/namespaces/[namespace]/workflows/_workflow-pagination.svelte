@@ -1,27 +1,53 @@
 <script lang="ts">
+  import { namespace } from '$lib/stores/namespace';
+  import { createWorkflowStore } from '$lib/stores/workflows';
+
+  import Select from '$lib/components/filter-select.svelte';
+
   export let currentPage: number;
   export let maximumPage: number;
 
+  $: store = createWorkflowStore($namespace);
+  $: sort = store.sort;
+  $: sortBy = sort.property;
+  $: sortOrder = sort.order;
+
   const increment = () => currentPage++;
-  const decrement = () => currentPage++;
+  const decrement = () => currentPage--;
 
   $: isFirstPage = currentPage <= 0;
   $: isLastPage = currentPage >= maximumPage - 1;
 </script>
 
-<section class="bg-gray-100 p-4 flex gap-4">
-  <button on:click={decrement} disabled={isFirstPage}> Previous </button>
-  {#if maximumPage > 0}
-    <p>Page {currentPage + 1} of {maximumPage}</p>
-  {:else}
-    <p>No Workflow Executions</p>
-  {/if}
-  <button on:click={increment} disabled={isLastPage}> Next </button>
+<section class="bg-gray-100 p-4 flex gap-20 justify-between">
+  <section class="flex gap-4 items-center">
+    <button on:click={decrement} disabled={isFirstPage}> Previous </button>
+    {#if maximumPage > 0}
+      <p>Page {currentPage + 1} of {maximumPage}</p>
+    {:else}
+      <p>No Workflow Executions</p>
+    {/if}
+    <button on:click={increment} disabled={isLastPage}> Next </button>
+  </section>
+
+  <section class="flex gap-4">
+    <Select id="sort-by" name="Sort By" bind:value={$sortBy} condensed>
+      <option value={null}>Sort By…</option>
+      <option value={'name'}>Sort By Name</option>
+      <option value={'startTime'}>Sort By Start Time</option>
+      <option value={'endTime'}>Sort By End Time</option>
+      <option value={'status'}>Sort By Status</option>
+    </Select>
+    <Select id="sort-order" name="Sort Order" bind:value={$sortOrder} condensed>
+      <option value={'ascending'}>Ascending</option>
+      <option value={'descending'}>Descending</option>
+    </Select>
+  </section>
 </section>
 
 <style lang="postcss">
   button {
-    @apply rounded-lg border-purple-600 border-2 bg-white text-purple-600 px-2 text-sm;
+    @apply rounded-lg border-purple-600 border-2 bg-white text-purple-600 px-2 text-xs block;
   }
 
   button:disabled {
