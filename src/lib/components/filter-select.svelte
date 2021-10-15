@@ -6,12 +6,7 @@
 </script>
 
 <div>
-  <label
-    for={id}
-    class="text-gray-600 text-xs"
-    class:hidden={condensed}
-    class:condensed
-  >
+  <label for={id} class="text-gray-600 text-xs" class:hidden={condensed}>
     {name}
   </label>
   <select
@@ -23,9 +18,3 @@
     <slot />
   </select>
 </div>
-
-<style lang="postcss">
-  .condensed {
-    font-size: 0.8rem;
-  }
-</style>
