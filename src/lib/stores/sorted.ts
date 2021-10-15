@@ -24,7 +24,6 @@ const getValues = <T>(
 const compare =
   <T>(property: keyof T, order: Order) =>
   (a: T, b: T): number => {
-    console.log(a);
     const [x, y] = getValues([a, b], property, order);
 
     if (isNumber(x) && isNumber(y)) {
