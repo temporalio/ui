@@ -11,7 +11,7 @@
   import Loading from '$lib/components/loading.svelte';
 
   $: store = createWorkflowStore($namespace);
-  $: workflows = store.filtered;
+  $: workflows = store.visible;
 
   let timeFormat = 'relative';
   let currentPage = 0;

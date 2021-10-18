@@ -3,8 +3,8 @@
   export let time: string;
   export let timeFormat: string;
 
-  $: utc = new Date(time.split(' —').join('')).toUTCString();
-  $: relative = new Date(time.split(' —').join('')).getTime();
+  $: utc = new Date(time).toUTCString();
+  $: relative = new Date(time).getTime();
 </script>
 
 {#if time && timeFormat === 'relative'}

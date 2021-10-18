@@ -5,8 +5,6 @@ import type {
   ListWorkflowExecutionsResponse,
 } from '$types';
 
-import { formatDate } from '$lib/utilities/format-date';
-
 type Optional<T extends unknown, K extends keyof T = keyof T> = Omit<T, K> &
   Partial<Pick<T, K>>;
 
@@ -35,8 +33,8 @@ export const toWorkflowExecution = (
   const name = response.workflowExecutionInfo.type.name;
   const id = response.workflowExecutionInfo.execution.workflowId;
   const runId = response.workflowExecutionInfo.execution.runId;
-  const startTime = formatDate(response.workflowExecutionInfo.startTime);
-  const endTime = formatDate(response.workflowExecutionInfo.closeTime);
+  const startTime = String(response.workflowExecutionInfo.startTime);
+  const endTime = String(response.workflowExecutionInfo.closeTime);
   const status = response.workflowExecutionInfo.status;
   const historyEvents = response.workflowExecutionInfo.historyLength;
   const url = `/workflows/${id}/${runId}`;
