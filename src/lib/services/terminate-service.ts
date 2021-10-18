@@ -6,6 +6,6 @@ export async function terminateWorkflow(
 ): Promise<any> {
   return await requestFromAPI<any>(
     `/namespaces/${namespace}/workflows/${workflow.id}/executions/${workflow.runId}:terminate`,
-    { request: request.POST },
+    { options: { method: 'POST' } },
   );
 }
