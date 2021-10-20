@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { terminateWorkflow } from '$lib/services/terminate-service';
-  import type { WorkflowExecution } from '$lib/models/workflow-execution';
-  import Icon from 'svelte-hero-icons/Icon.svelte';
   import { ArrowCircleDown, ArrowCircleUp } from 'svelte-hero-icons';
   import { slide } from 'svelte/transition';
+  import Icon from 'svelte-hero-icons/Icon.svelte';
+
+  import { terminateWorkflow } from '$lib/services/terminate-service';
+  import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
