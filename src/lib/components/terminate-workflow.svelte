@@ -29,7 +29,7 @@
 
 {#if isEligibleForTermination(workflow)}
   <div class="flex flex-col border-2 p-2 my-4">
-    <div class="flex gap-2">
+    <div class="flex gap-2" class:mb-2={isOpen}>
       <h4>Terminate Execution</h4>
       <span on:click={() => (isOpen = !isOpen)}>
         <Icon
@@ -41,7 +41,7 @@
 
     {#if isOpen}
       <div transition:slide class="flex gap-4 justify-between">
-        <input placeholder="Enter Reason" bind:value={reason} />
+        <input placeholder="Enter Reason" bind:value={reason} class="w-full" />
         <button class="terminate" disabled={!reason} on:click={terminate}>
           Terminate
         </button>
@@ -56,10 +56,14 @@
   }
 
   input {
-    @apply border-b-2 border-gray-300 py-2 px-4;
+    @apply py-2 px-4;
   }
 
   .terminate {
-    @apply bg-red-200 text-red-600 py-2 px-4 mt-2 rounded text-sm uppercase;
+    @apply text-white border-red-600 bg-red-700 border-2 py-2 px-4 mt-2 rounded text-sm uppercase transition-colors;
+  }
+
+  .terminate:disabled {
+    @apply bg-white text-red-200;
   }
 </style>
