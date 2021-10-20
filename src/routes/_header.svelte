@@ -1,6 +1,7 @@
 <script context="module" lang="ts">
   import type { LoadInput } from '@sveltejs/kit';
 
+  import { clickOutside } from '$lib/utilities/click-outside';
   import NamespaceSelect from '$lib/components/namespace-select.svelte';
 
   export async function load({ fetch }: LoadInput) {
