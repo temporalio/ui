@@ -43,7 +43,7 @@ const config = {
     adapter: adapter({
       pages: outputDirectory,
       assets: outputDirectory,
-      fallback: null,
+      fallback: 'index.html',
     }),
     vite: {
       optimizeDeps: {
@@ -55,6 +55,7 @@ const config = {
         },
       },
     },
+    ssr: false,
   },
 };
 
