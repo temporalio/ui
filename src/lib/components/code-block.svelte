@@ -35,7 +35,7 @@
     <pre
       class="p-4">
       <code class="language-json">
-        {formatJSON(content.toString())}
+        {formatJSON(JSON.stringify(content))}
       </code>
     </pre>
     <button on:click={copy}>
