@@ -49,7 +49,7 @@
     {#each $filtered as event}
       <CodeBlock
         heading={`Event ID: ${event.eventId}`}
-        content={JSON.stringify(event)}
+        content={event}
       />
     {/each}
   {/if}
