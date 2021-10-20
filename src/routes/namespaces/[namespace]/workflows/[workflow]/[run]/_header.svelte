@@ -8,9 +8,12 @@
   import { isFullScreen } from '$lib/stores/full-screen';
   import { getWorkflowExecutionUrl } from '$lib/utilities/get-workflow-execution-url';
 
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Tabs from './_tabs.svelte';
+  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   export let workflow: WorkflowExecution;
+
+  const isEligibleForTermination = (workflow: WorkflowExecution) =>
+    String(workflow.status) === 'Running';
 
   $: workflowUrl = getWorkflowExecutionUrl($namespace, workflow);
 </script>
@@ -47,11 +50,15 @@
       <span class="uppercase text-gray-400 mr-2">Run ID</span>
       {workflow.runId}
     </p>
-    {#if String(workflow.status) === 'Running'}
+    {#if isEligibleForTermination(workflow)}
       <button
         class="mt-2 bg-red-600 p-1 text-white uppercase rounded text-sm"
-        on:click={() => terminateWorkflow({ workflow, namespace: $namespace })}
-        >Terminate</button
+        on:click={() =>
+          terminateWorkflow({
+            workflow,
+            namespace: $namespace,
+            reason: 'REPLACE_ME',
+          })}>Terminate</button
       >
     {/if}
   </main>
