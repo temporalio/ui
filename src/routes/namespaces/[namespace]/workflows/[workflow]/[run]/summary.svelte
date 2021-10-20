@@ -28,6 +28,7 @@
   import TaskQueueInformation from './_task-queue-information.svelte';
   import PendingActivities from './_pending-activities.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
+  import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
 
   export let execution: DescribeWorkflowExecutionResponse;
   export let events: GetWorkflowExecutionHistoryResponse;
@@ -57,7 +58,8 @@
       <CodeBlock heading="Result" content={inputAndResults.result.toString()} />
     {/if}
   </div>
-  <div class="flex w-full">
+  <TerminateWorkflow namespace={$namespace} {workflow} />
+  <div class="flex w-full mt-4">
     <PendingActivities activities={workflow.pendingActivities} />
   </div>
 </div>
