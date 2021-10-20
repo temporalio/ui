@@ -2,7 +2,7 @@
   import { namespace } from '$lib/stores/namespace';
   import Icon from 'svelte-hero-icons/Icon.svelte';
   import { X, ArrowLeft, ArrowRight } from 'svelte-hero-icons';
-  import { terminateWorkflow } from '$lib/services/terminate-service';
+  import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
   import { isFullScreen } from '$lib/stores/full-screen';
@@ -51,15 +51,7 @@
       {workflow.runId}
     </p>
     {#if isEligibleForTermination(workflow)}
-      <button
-        class="mt-2 bg-red-600 p-1 text-white uppercase rounded text-sm"
-        on:click={() =>
-          terminateWorkflow({
-            workflow,
-            namespace: $namespace,
-            reason: 'REPLACE_ME',
-          })}>Terminate</button
-      >
+      <TerminateWorkflow namespace={$namespace} {workflow} />
     {/if}
   </main>
   <Tabs {workflow} />
