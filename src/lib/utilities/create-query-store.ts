@@ -43,14 +43,14 @@ const collectData = <T extends HasId>(
 export const createQueryStore = <
   FormattedType extends HasId,
   ResponseType,
-  FetchType extends (options: any) => unknown,
+  FetchType extends (options: Record<string, unknown>) => unknown,
   Options = Parameters<FetchType>[0],
 >(
   fetch: FetchType,
   format: Formatter<ResponseType, FormattedType>,
   options: Options,
   dependencies: Readable<Partial<Options>>[] = [],
-) => {
+): Writable<QueryStore<FormattedType>> => {
   let parameters = options;
 
   const request = () => {

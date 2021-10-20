@@ -2,13 +2,13 @@ import { derived, writable } from 'svelte/store';
 
 import { unique } from '$lib/utilities/unique';
 
-import {
-  toWorkflowExecutions,
-  WorkflowExecution,
-} from '$lib/models/workflow-execution';
+import type { WorkflowExecution } from '$lib/models/workflow-execution';
+import { toWorkflowExecutions } from '$lib/models/workflow-execution';
 
 import { fetchAllWorkflows } from '$lib/services/workflow-execution-service';
 import { createQueryStore } from '$lib/utilities/create-query-store';
+import { sorted } from './sorted';
+
 import type { ListWorkflowExecutionsResponse } from '$types';
 
 const stores: { [key: string]: ReturnType<typeof createStore> } = {};
@@ -60,11 +60,13 @@ export const createStore = (namespace: string) => {
     },
   );
 
+  const visible = sorted(filtered);
+
   return {
     ...store,
     ids,
     all,
-    filtered,
+    visible,
     workflowTypes,
     range,
     filters: {
@@ -73,10 +75,16 @@ export const createStore = (namespace: string) => {
       executionId,
       runId,
     },
+    sort: {
+      order: visible.order,
+      property: visible.property,
+    },
   };
 };
 
-export const createWorkflowStore = (namespace: string) => {
+export const createWorkflowStore = (
+  namespace: string,
+): ReturnType<typeof createStore> => {
   if (!stores[namespace]) stores[namespace] = createStore(namespace);
   return stores[namespace];
 };

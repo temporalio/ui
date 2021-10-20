@@ -43,11 +43,11 @@ const config = {
     adapter: adapter({
       pages: outputDirectory,
       assets: outputDirectory,
-      fallback: null,
+      fallback: 'index.html',
     }),
     vite: {
       optimizeDeps: {
-        include: ['svelte-hero-icons', 'highlight.js/lib/core'],
+        include: ['svelte-hero-icons'],
       },
       resolve: {
         alias: {
@@ -55,6 +55,7 @@ const config = {
         },
       },
     },
+    ssr: false,
   },
 };
 

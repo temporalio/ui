@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { pathMatches } from '$lib/utilities/path-matches';
-  import Icon from 'svelte-hero-icons';
+  import Icon from 'svelte-hero-icons/Icon.svelte';
   import Tooltip from '$lib/components/tooltip.svelte';
 
   export let href: string;
