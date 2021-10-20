@@ -7,15 +7,13 @@
   $: relative = new Date(time).getTime();
 </script>
 
-{#if time && timeFormat === 'relative'}
+{#if time === 'null'}
+  <p />
+{:else if time && timeFormat === 'relative'}
   <Time live relative timestamp={relative} />
-{/if}
-
-{#if time && timeFormat === 'current'}
+{:else if time && timeFormat === 'current'}
   <p>{time}</p>
-{/if}
-
-{#if time && timeFormat === 'UTC'}
+{:else if time && timeFormat === 'UTC'}
   <p>{utc}</p>
 {/if}
 
