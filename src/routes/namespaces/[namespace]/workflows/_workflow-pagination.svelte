@@ -23,7 +23,7 @@
 <section class="bg-gray-100 p-4 flex gap-20 justify-between">
   <section class="flex gap-4 items-center">
     <Button
-      onClick={decrement}
+      on:click={decrement}
       disabled={isFirstPage}
       styles="rounded-lg px-2 text-xs block">Previous</Button
     >
@@ -33,7 +33,7 @@
       <p>No Workflow Executions</p>
     {/if}
     <Button
-      onClick={increment}
+      on:click={increment}
       disabled={isLastPage}
       styles="rounded-lg px-2 text-xs block">Next</Button
     >

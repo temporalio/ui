@@ -2,13 +2,11 @@
   //Styles passed along to custom Button Component
   export let styles: string = '';
   export let disabled: boolean = false;
-  //Function Passed along to component that is used as a on:click
-  export let onClick;
   //Boolean to state if button is active or not
   export let active: boolean = false;
 </script>
 
-<button on:click={onClick} class={styles} {disabled} class:active
+<button on:click class={styles} {disabled} class:active
   ><slot /></button
 >
 
