@@ -18,7 +18,6 @@
   import { namespace } from '$lib/stores/namespace';
 
   export let user: { name?: string; email?: string; picture?: string } = {};
-  export let showDropdown = false;
 </script>
 
 <div
