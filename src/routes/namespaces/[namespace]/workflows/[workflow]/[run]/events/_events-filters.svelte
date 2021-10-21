@@ -5,6 +5,7 @@
 
   import { convertToJSON } from '$lib/utilities/convert-to-json';
   import Input from '$lib/components/filter-input.svelte';
+  import Button from '$lib/components/main-button.svelte';
 
   export let events: BaseEvent[];
   export let eventFormat: Writable<EventFormat>;
@@ -25,14 +26,8 @@
 <section class="p-4 flex gap-2 items-center justify-between">
   <div>
     <label for="format">View Format</label>
-    <button
-      class:active={$eventFormat === 'grid'}
-      on:click={() => setFormat('grid')}>GRID</button
-    >
-    <button
-      class:active={$eventFormat === 'json'}
-      on:click={() => setFormat('json')}>JSON</button
-    >
+    <Button onClick={() => setFormat('grid')} styles="py-1 px-3">GRID</Button>
+    <Button onClick={() => setFormat('json')} styles="py-1 px-3">JSON</Button>
   </div>
   <div class="flex justify-center items-end">
     <Input
@@ -40,7 +35,7 @@
       id="filter-by-event-history"
       bind:value={$eventType}
     />
-    <button class="ml-2" on:click={clear}>Clear</button>
+    <Button onClick={clear} styles="ml-2 mb-1 px-3 py-1">Clear</Button>
   </div>
   <div>
     <a
@@ -56,20 +51,5 @@
 <style lang="postcss">
   label {
     font-size: 14px;
-  }
-  button {
-    @apply text-purple-700 py-1 px-3 border-purple-400 border-2 rounded-md;
-  }
-
-  button:hover {
-    @apply bg-purple-100;
-  }
-
-  .active:hover {
-    @apply text-purple-500;
-  }
-
-  .active {
-    @apply text-purple-100 bg-purple-500;
   }
 </style>

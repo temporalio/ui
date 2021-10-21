@@ -3,7 +3,7 @@
   import { createWorkflowStore } from '$lib/stores/workflows';
 
   import Select from '$lib/components/filter-select.svelte';
-  import Button from '$lib/components/button.svelte';
+  import Button from '$lib/components/main-button.svelte';
 
   export let currentPage: number;
   export let maximumPage: number;
@@ -23,10 +23,9 @@
 <section class="bg-gray-100 p-4 flex gap-20 justify-between">
   <section class="flex gap-4 items-center">
     <Button
-      on:click={decrement}
+      onClick={decrement}
       disabled={isFirstPage}
-      styles="rounded-lg border-purple-600 border-2 bg-white text-purple-600 px-2 text-xs block"
-      >Previous</Button
+      styles="rounded-lg px-2 text-xs block">Previous</Button
     >
     {#if maximumPage > 0}
       <p>Page {currentPage + 1} of {maximumPage}</p>
@@ -34,10 +33,9 @@
       <p>No Workflow Executions</p>
     {/if}
     <Button
-      on:click={increment}
+      onClick={increment}
       disabled={isLastPage}
-      styles="rounded-lg border-purple-600 border-2 bg-white text-purple-600 px-2 text-xs block"
-      >Next</Button
+      styles="rounded-lg px-2 text-xs block">Next</Button
     >
   </section>
 

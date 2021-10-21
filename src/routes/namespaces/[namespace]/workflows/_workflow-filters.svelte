@@ -5,6 +5,7 @@
   import Select from '$lib/components/filter-select.svelte';
   import Input from '$lib/components/filter-input.svelte';
   import TimeRangeSelect from '$lib/components/time-range-select.svelte';
+  import Button from '$lib/components/main-button.svelte';
 
   export let timeFormat: string = 'relative';
 
@@ -68,6 +69,9 @@
     bind:value={$executionId}
   />
   <Input name="Run ID" id="filter-by-run-id" bind:value={$runId} />
-  <button on:click={clear}>Clear</button>
+  <div class="flex justify-center items-center">
+    <Button onClick={clear} styles="mt-6 rounded-lg py-2 px-6 text-xs block"
+      >Clear</Button
+    >
+  </div>
 </section>
-
