@@ -6,6 +6,7 @@
     Collection,
     DocumentSearch,
     Identification,
+    Home,
   } from 'svelte-hero-icons';
   import NavigationLink from './_navigation-link.svelte';
 </script>
@@ -15,7 +16,11 @@
   class="w-12 h-screen py-6 flex flex-col space-y-6 items-center bg-black"
 >
   <img src="/logo.svg" alt="Temporal Logo" class="rounded-full w-12" />
-
+  <NavigationLink
+    href={`/namespaces/${$namespace}/report`}
+    label="Home"
+    icon={Home}
+  />
   <NavigationLink
     href={`/namespaces/${$namespace}/workflows`}
     label="Workflows"
