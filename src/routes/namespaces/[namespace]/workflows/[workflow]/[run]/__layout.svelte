@@ -42,6 +42,7 @@
 <script lang="ts">
   import type { DescribeWorkflowExecutionResponse } from '$types';
 
+  import { fly } from 'svelte/transition';
   import { isFullScreen } from '$lib/stores/full-screen';
   import { toWorkflowExecution } from '$lib/models/workflow-execution';
 
@@ -56,6 +57,8 @@
   class="border-l-2 h-screen"
   class:full={$isFullScreen}
   class:sidebar={!$isFullScreen}
+  in:fly={{ x: 500, duration: 350 }}
+  out:fly={{ x: 500 }}
 >
   <main class="w-full">
     <Header {workflow} />
