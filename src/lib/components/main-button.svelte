@@ -6,9 +6,7 @@
   export let active: boolean = false;
 </script>
 
-<button on:click class={styles} {disabled} class:active
-  ><slot /></button
->
+<button on:click class={styles} {disabled} class:active><slot /></button>
 
 <style lang="postcss">
   button {
