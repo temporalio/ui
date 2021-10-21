@@ -1,4 +1,6 @@
 <script lang="ts">
+  import CodeBlock from './code-block.svelte';
+
   export let headings: [string, string] = null;
   export let data: any;
   export let child: boolean = false;
@@ -29,6 +31,7 @@
       {#each Object.entries(data) as [key, value]}
         <tr>
           <th class="w-1/3">{key}</th>
+
           <td class="w-2/3"><svelte:self data={value} child={true} /></td>
         </tr>
       {/each}
@@ -45,7 +48,7 @@
 {:else if isString || isNumber}
   <div>{String(data)}</div>
 {:else if isNull || isBoolean || isNaN}
-  <div><code>{String(data)}</code></div>
+  <div><CodeBlock content={data} /></div>
 {:else if isUndefined}
   <div class="text-gray-500">(Undefined)</div>
 {:else}
