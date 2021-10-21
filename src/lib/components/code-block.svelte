@@ -4,7 +4,7 @@
   import { Clipboard, Check } from 'svelte-hero-icons';
 
   export let heading = '';
-  export let content = '';
+  export let content;
   export let copied = false;
 
   const copy = () =>
@@ -35,7 +35,7 @@
     <pre
       class="p-4">
       <code class="language-json">
-        {formatJSON(content)}
+        {formatJSON(JSON.stringify(content))}
       </code>
     </pre>
     <button on:click={copy}>

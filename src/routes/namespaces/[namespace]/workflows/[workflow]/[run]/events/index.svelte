@@ -47,10 +47,7 @@
 
   {#if $format === 'json'}
     {#each $filtered as event}
-      <CodeBlock
-        heading={`Event ID: ${event.eventId}`}
-        content={JSON.stringify(event)}
-      />
+      <CodeBlock heading={`Event ID: ${event.eventId}`} content={event} />
     {/each}
   {/if}
 </section>

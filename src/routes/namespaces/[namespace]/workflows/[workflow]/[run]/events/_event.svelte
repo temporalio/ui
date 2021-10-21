@@ -19,21 +19,21 @@
 <tr class:even>
   <td on:click={() => (isIdJSONView = !isIdJSONView)}>
     {#if isIdJSONView}
-      <CodeBlock heading={``} content={JSON.stringify(event.eventId)} />
+      <CodeBlock content={event.eventId} />
     {:else}
       {event.eventId}
     {/if}
   </td>
   <td on:click={() => (isEventTypeJSONView = !isEventTypeJSONView)}>
     {#if isEventTypeJSONView}
-      <CodeBlock heading={``} content={JSON.stringify(event.eventType)} />
+      <CodeBlock content={event.eventType} />
     {:else}
       {event.eventType}
     {/if}
   </td>
   <td on:click={() => (isTimeJSONView = !isTimeJSONView)}>
     {#if isTimeJSONView}
-      <CodeBlock heading={``} content={JSON.stringify(event.eventTime)} />
+      <CodeBlock content={event.eventTime} />
     {:else}
       {formatDate(event.eventTime)}
     {/if}</td
@@ -41,11 +41,10 @@
   <td on:click={() => (isDetailsJSONView = !isDetailsJSONView)} class="w-1/2">
     {#if isDetailsJSONView}
       <CodeBlock
-        heading={``}
-        content={JSON.stringify({
+        content={{
           verison: event.version,
           TaskId: event.taskId,
-        })}
+        }}
       />
     {:else}
       <div class="flex">
@@ -62,7 +61,7 @@
     >
 
     {#if isJSONView}
-      <CodeBlock heading={``} content={JSON.stringify(event)} />
+      <CodeBlock content={event} />
     {:else}
       <svelte:component this={getComponentForEventType(event)} {event} />
     {/if}
