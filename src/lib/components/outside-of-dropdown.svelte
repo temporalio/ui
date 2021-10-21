@@ -1,5 +1,5 @@
 <script lang="ts">
-  // When using outside of dropdown component binded component must be named showDropdown
+  // When using outside of dropdown component binded variable must be named showDropdown
   export let showDropdown: boolean;
   let node: Node;
 
