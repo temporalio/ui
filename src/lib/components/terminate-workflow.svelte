@@ -5,6 +5,7 @@
 
   import { terminateWorkflow } from '$lib/services/terminate-service';
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
+  import { notifications } from '$lib/stores/notifications';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
@@ -24,6 +25,7 @@
 
     reason = '';
     isOpen = false;
+    notifications.add('success', 'Workflow Terminated');
   };
 </script>
 
