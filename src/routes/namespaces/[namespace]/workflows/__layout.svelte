@@ -29,7 +29,7 @@
   }
 </script>
 
-<section class="flex items-start">
+<section class="flex items-start dark:bg-gray-800 dark:text-gray-200">
   {#if !$isFullScreen}
     <div class="w-full h-screen overflow-scroll">
       <header>

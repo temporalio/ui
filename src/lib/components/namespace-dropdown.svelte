@@ -36,7 +36,10 @@
 <OutsideOfDropdown bind:showDropdown>
   <div class="inline-flex space-x-2 items-center">
     <!-- svelte-ignore a11y-label-has-associated-control -->
-    <label id="listbox-label" class="block text-sm font-medium text-gray-700">
+    <label
+      id="listbox-label"
+      class="block text-sm font-medium text-gray-700 dark:text-gray-200"
+    >
       Namespace
     </label>
     <div class="mt-1 relative">
@@ -48,7 +51,9 @@
         aria-labelledby="listbox-label"
         on:click={() => (showDropdown = !showDropdown)}
       >
-        <span class="block truncate"> {$currentNamespace} </span>
+        <span class="block truncate">
+          {$currentNamespace}
+        </span>
         <span
           class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"
         >

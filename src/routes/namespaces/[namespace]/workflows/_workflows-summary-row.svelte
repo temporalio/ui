@@ -15,7 +15,10 @@
   $: isActive = pathMatches(href, $page.path);
 </script>
 
-<tr class:active={isActive}>
+<tr
+  class:active={isActive}
+  class="dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-500"
+>
   <td class="">
     <a sveltekit:noscroll {href}>
       <h3>
@@ -33,7 +36,7 @@
   </td>
   <td>
     <a sveltekit:noscroll {href}>
-      <div class={`flex justify-center  `}>
+      <div class={`flex justify-center`}>
         <WorkflowStatus status={workflow.status} />
       </div>
     </a>

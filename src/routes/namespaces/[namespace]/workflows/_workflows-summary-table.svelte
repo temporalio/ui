@@ -13,6 +13,6 @@
 
 <style lang="postcss">
   th {
-    @apply bg-gray-200 text-gray-500 text-xs h-6 m-0 p-3 uppercase table-fixed;
+    @apply bg-gray-200 text-gray-500 text-xs h-6 m-0 p-3 uppercase table-fixed dark:bg-gray-800 dark:text-gray-200;
   }
 </style>

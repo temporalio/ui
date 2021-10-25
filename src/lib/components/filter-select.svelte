@@ -6,7 +6,11 @@
 </script>
 
 <div>
-  <label for={id} class="text-gray-600 text-xs " class:hidden={condensed}>
+  <label
+    for={id}
+    class="text-gray-600 text-xs dark:text-gray-200"
+    class:hidden={condensed}
+  >
     {name}
   </label>
   <select

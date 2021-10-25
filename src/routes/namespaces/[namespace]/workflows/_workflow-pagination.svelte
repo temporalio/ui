@@ -19,7 +19,9 @@
   $: isLastPage = currentPage >= maximumPage - 1;
 </script>
 
-<section class="bg-gray-100 p-4 flex gap-20 justify-between">
+<section
+  class="bg-gray-100 p-4 flex gap-20 justify-between dark:bg-gray-800 dark:text-gray-200"
+>
   <section class="flex gap-4 items-center">
     <button on:click={decrement} disabled={isFirstPage}> Previous </button>
     {#if maximumPage > 0}

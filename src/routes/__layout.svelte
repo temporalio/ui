@@ -43,7 +43,7 @@
   <meta property="og:image" content="/banner.png" />
 </svelte:head>
 
-<main class="flex align-start h-screen">
+<main class="flex align-start h-screen dark:bg-gray-800 dark:text-gray-200">
   <Notifications />
   <Navigation />
   <div class="w-full overflow-y-scroll">
