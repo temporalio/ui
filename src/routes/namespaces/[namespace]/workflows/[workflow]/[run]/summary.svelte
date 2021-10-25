@@ -52,10 +52,10 @@
       value={workflow.historyEvents}
     />
     {#if inputAndResults.input}
-      <CodeBlock heading="Input" content={inputAndResults.input.toString()} />
+      <CodeBlock heading="Input" content={inputAndResults.input} />
     {/if}
     {#if inputAndResults.result}
-      <CodeBlock heading="Result" content={inputAndResults.result.toString()} />
+      <CodeBlock heading="Result" content={inputAndResults.result} />
     {/if}
   </div>
   <TerminateWorkflow namespace={$namespace} {workflow} />
