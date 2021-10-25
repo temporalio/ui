@@ -2,15 +2,13 @@
   import { namespace } from '$lib/stores/namespace';
   import Icon from 'svelte-hero-icons/Icon.svelte';
   import { X, ArrowLeft, ArrowRight } from 'svelte-hero-icons';
-
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
   import { isFullScreen } from '$lib/stores/full-screen';
   import { getWorkflowExecutionUrl } from '$lib/utilities/get-workflow-execution-url';
 
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Tabs from './_tabs.svelte';
-
+  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   export let workflow: WorkflowExecution;
 
   $: workflowUrl = getWorkflowExecutionUrl($namespace, workflow);
