@@ -66,13 +66,16 @@
   </main>
 </section>
 
-<style>
+<style type="postcss">
   .full {
-    width: 100%;
+    @apply w-full;
   }
 
   .sidebar {
+    background-color: white;
     width: 600px;
+    left: calc(100% - 600px);
+    position: absolute;
     overflow-y: scroll;
     box-shadow: -2px 14px 20px 0px rgb(0 0 0 / 20%);
     z-index: 2;
