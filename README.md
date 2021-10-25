@@ -11,6 +11,8 @@ While we're in pre-production, you need to do the following before you spin up t
 
 ## Trying it out
 
+Starting the UI API server will give you a somewhat recent version on `localhost:8080`. If you want to use the most recent commit to `main`, you can spin up a bleeding-edge build as described below.
+
 Once you have the prerequisites going, run the following:
 
 ```bash
