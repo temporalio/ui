@@ -13,7 +13,7 @@ export async function terminateWorkflow({
   reason,
 }: TerminateWorkflowOptions): Promise<any> {
   return await requestFromAPI<any>(
-    `/namespaces/${namespace}/workflows/${workflow.id}/executions/${workflow.runId}:terminate`,
+    `/namespaces/${namespace}/workflows/${workflow.id}/executions/${workflow.runId}/terminate`,
     {
       options: { method: 'POST', body: JSON.stringify({ reason }) },
       shouldRetry: false,
