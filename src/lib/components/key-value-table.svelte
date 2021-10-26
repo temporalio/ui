@@ -17,7 +17,7 @@
 </script>
 
 {#if isObject && Object.keys(data).length}
-  <table class:child class:full>
+  <table class="dark:bg-gray-700 dark:text-gray-200" class:child class:full>
     {#if headings}
       <thead>
         <tr>
@@ -30,9 +30,11 @@
     <tbody>
       {#each Object.entries(data) as [key, value]}
         <tr>
-          <th class="w-1/3">{key}</th>
+          <th class="w-1/3 dark:bg-gray-700 dark:text-gray-200">{key}</th>
 
-          <td class="w-2/3"><svelte:self data={value} child={true} /></td>
+          <td class="w-2/3 dark:bg-gray-700 dark:text-gray-200"
+            ><svelte:self data={value} child={true} /></td
+          >
         </tr>
       {/each}
     </tbody>
@@ -50,9 +52,11 @@
 {:else if isNull || isBoolean || isNaN}
   <div><CodeBlock content={data} /></div>
 {:else if isUndefined}
-  <div class="text-gray-500">(Undefined)</div>
+  <div class="text-gray-500 dark:bg-gray-700 dark:text-gray-200">
+    (Undefined)
+  </div>
 {:else}
-  <div class="text-gray-500">(Empty)</div>
+  <div class="text-gray-500 dark:bg-gray-700 dark:text-gray-200">(Empty)</div>
 {/if}
 
 <style lang="postcss">

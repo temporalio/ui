@@ -54,13 +54,13 @@
 </script>
 
 <section
-  class="border-l-2 h-screen"
+  class="border-l-2 h-screen bg-white dark:bg-gray-800 dark:border-gray-300"
   class:full={$isFullScreen}
   class:sidebar={!$isFullScreen}
   in:fly={{ x: 500, duration: 350 }}
   out:fly={{ x: 500 }}
 >
-  <main class="w-full">
+  <main class="w-full dark:bg-gray-800 dark:text-gray-200 dark:border-gray-300">
     <Header {workflow} />
     <slot />
   </main>
@@ -72,7 +72,6 @@
   }
 
   .sidebar {
-    background-color: white;
     width: 600px;
     left: calc(100% - 600px);
     position: absolute;

@@ -17,28 +17,40 @@
 </script>
 
 <tr class:even>
-  <td on:click={() => (isIdJSONView = !isIdJSONView)}>
+  <td
+    class="dark:bg-gray-700 dark:text-gray-200"
+    on:click={() => (isIdJSONView = !isIdJSONView)}
+  >
     {#if isIdJSONView}
       <CodeBlock content={event.eventId} />
     {:else}
       {event.eventId}
     {/if}
   </td>
-  <td on:click={() => (isEventTypeJSONView = !isEventTypeJSONView)}>
+  <td
+    class="dark:bg-gray-700 dark:text-gray-200"
+    on:click={() => (isEventTypeJSONView = !isEventTypeJSONView)}
+  >
     {#if isEventTypeJSONView}
       <CodeBlock content={event.eventType} />
     {:else}
       {event.eventType}
     {/if}
   </td>
-  <td on:click={() => (isTimeJSONView = !isTimeJSONView)}>
+  <td
+    class="dark:bg-gray-700 dark:text-gray-200"
+    on:click={() => (isTimeJSONView = !isTimeJSONView)}
+  >
     {#if isTimeJSONView}
       <CodeBlock content={event.eventTime} />
     {:else}
       {formatDate(event.eventTime)}
     {/if}</td
   >
-  <td on:click={() => (isDetailsJSONView = !isDetailsJSONView)} class="w-1/2">
+  <td
+    on:click={() => (isDetailsJSONView = !isDetailsJSONView)}
+    class="w-1/2 dark:bg-gray-700 dark:text-gray-200"
+  >
     {#if isDetailsJSONView}
       <CodeBlock
         content={{

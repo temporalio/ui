@@ -15,7 +15,9 @@
 </script>
 
 <header class="flex flex-col justify-between">
-  <div class="py-4 px-2 bg-gray-50 border-b-2 border-gray-100 flex justify-end">
+  <div
+    class="py-4 px-2 bg-gray-50 border-b-2 border-gray-100 flex justify-end dark:bg-gray-800"
+  >
     {#if $isFullScreen}
       <a href={workflowUrl}>
         <Icon src={ArrowRight} class="w-8 h-8 text-gray-500" />

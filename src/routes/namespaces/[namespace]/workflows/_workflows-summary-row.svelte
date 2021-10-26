@@ -17,7 +17,7 @@
 
 <tr
   class:active={isActive}
-  class="dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-500"
+  class="dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-200"
 >
   <td class="">
     <a sveltekit:noscroll {href}>
