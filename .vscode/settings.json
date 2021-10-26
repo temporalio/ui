@@ -1,0 +1,8 @@
+{
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.svelte-kit": true,
+    "**/build-local": true,
+    "**/build-cloud": true
+  }
+}
