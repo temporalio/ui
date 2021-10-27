@@ -2,11 +2,12 @@
   import type { GetClusterInfoResponse } from '$types';
 
   import type { LoadInput } from '@sveltejs/kit';
+  import { requestFromAPI } from '$lib/utilities/request-from-api';
 
   export async function load({ fetch }: LoadInput) {
-    const cluster: GetClusterInfoResponse = await fetch(
-      import.meta.env.VITE_API + '/api/v1/cluster',
-    ).then((response) => response.json());
+    const cluster: GetClusterInfoResponse = await requestFromAPI('/cluster', {
+      request: fetch,
+    });
 
     return {
       props: { cluster },
