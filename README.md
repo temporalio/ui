@@ -47,3 +47,12 @@ npm run build:cloud
 The resulting assets will be placed in either `build-local` or `build-cloud` respectively.
 
 > You can preview the built app with `npm run preview`, regardless of whether you installed an adapter. This should _not_ be used to serve your app in production.
+
+## Configuration
+
+Set these environment variables if you want to change their defaults
+
+| Variable  | Description                                                      | Default               | Stage |
+| --------- | ---------------------------------------------------------------- | --------------------- | ----- |
+| VITE_API  | Temporal HTTP API address. Set to empty `` to use relative paths | http://localhost:8080 | Build |
+| VITE_MODE | Build target                                                     | development           | Build |

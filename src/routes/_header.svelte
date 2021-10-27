@@ -1,12 +1,11 @@
 <script context="module" lang="ts">
   import type { LoadInput } from '@sveltejs/kit';
 
+  import { requestFromAPI } from '$lib/utilities/request-from-api';
   import NamespaceDropdown from '$lib/components/namespace-dropdown.svelte';
 
   export async function load({ fetch }: LoadInput) {
-    const user = await fetch(import.meta.env.VITE_API + '/api/v1/me/').then(
-      (response) => response.json(),
-    );
+    const { user }: any = await requestFromAPI('/me', { request: fetch });
 
     return {
       props: { user },

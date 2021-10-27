@@ -43,7 +43,10 @@ export const requestFromAPI = async <T>(
   if (!endpoint.startsWith('/')) endpoint = '/' + endpoint;
   const nextPageToken = token ? { next_page_token: token } : {};
 
-  const url = toURL(base + endpoint, { ...params, ...nextPageToken });
+  const url = toURL(base + '/api/v1' + endpoint, {
+    ...params,
+    ...nextPageToken,
+  });
 
   try {
     const response = await request(url, options);
