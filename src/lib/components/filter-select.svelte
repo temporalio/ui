@@ -5,8 +5,12 @@
   export let condensed = false;
 </script>
 
-<div>
-  <label for={id} class="text-gray-600 text-xs " class:hidden={condensed}>
+<div class="flex flex-col items-start justify-center">
+  <label
+    for={id}
+    class="text-gray-600 text-xs whitespace-nowrap"
+    class:hidden={condensed}
+  >
     {name}
   </label>
   <select
