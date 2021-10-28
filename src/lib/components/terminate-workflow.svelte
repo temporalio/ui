@@ -43,10 +43,12 @@
 
     {#if isOpen}
       <div transition:slide class="flex gap-4 justify-between">
-        <input placeholder="Enter Reason" bind:value={reason} class="w-full" />
-        <button class="terminate" disabled={!reason} on:click={terminate}>
-          Terminate
-        </button>
+        <input
+          placeholder="Enter Reason (Optional)"
+          bind:value={reason}
+          class="w-full"
+        />
+        <button class="terminate" on:click={terminate}> Terminate </button>
       </div>
     {/if}
   </div>
@@ -63,9 +65,5 @@
 
   .terminate {
     @apply text-white border-red-600 bg-red-700 border-2 py-2 px-4 mt-2 rounded text-sm uppercase transition-colors;
-  }
-
-  .terminate:disabled {
-    @apply bg-white text-red-200;
   }
 </style>
