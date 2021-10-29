@@ -42,7 +42,7 @@
     {#if isDetailsJSONView}
       <CodeBlock
         content={{
-          verison: event.version,
+          version: event.version,
           TaskId: event.taskId,
         }}
       />
