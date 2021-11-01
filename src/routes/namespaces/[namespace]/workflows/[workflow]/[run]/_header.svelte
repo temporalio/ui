@@ -15,6 +15,7 @@
   export let loading: boolean;
 
   $: workflowUrl = getWorkflowExecutionUrl($namespace, workflow);
+  $: status = workflow?.status;
 </script>
 
 <header class="flex flex-col justify-between">
@@ -39,7 +40,7 @@
           {workflow.name}
         </h1>
         <span class="inline">
-          <WorkflowStatus status={workflow.status} />
+          <WorkflowStatus {status} />
         </span>
       </div>
       <p class="text-gray-500 text-xs">

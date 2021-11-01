@@ -20,14 +20,17 @@
 
   import Header from './_header.svelte';
   import { getWorkflow } from '$lib/stores/workflow';
+  import { setContext } from 'svelte';
 
   export let executionId: string;
   export let runId: string;
   export let namespace: string;
 
-  let store = getWorkflow({ executionId, runId, namespace });
+  $: store = getWorkflow({ executionId, runId, namespace });
   $: workflow = $store.data;
   $: loading = $store.loading;
+
+  setContext('workflow', store);
 </script>
 
 <section

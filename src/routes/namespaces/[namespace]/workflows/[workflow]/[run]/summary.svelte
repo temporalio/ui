@@ -57,7 +57,7 @@
         <CodeBlock heading="Result" content={inputAndResults.result} />
       {/if}
     </div>
-    <TerminateWorkflow {namespace} {workflow} />
+    <TerminateWorkflow {namespace} {workflow} refresh={workflowStore.refresh} />
     <div class="flex w-full mt-4">
       <PendingActivities activities={pendingActivities} />
     </div>

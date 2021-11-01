@@ -1,4 +1,7 @@
 import { writable } from 'svelte/store';
+import type { Writable } from 'svelte/store';
+
+import { set } from '$lib/utilities/set-object-key';
 
 import { toWorkflowExecution } from '$lib/models/workflow-execution';
 import { fetchWorkflow } from '$lib/services/workflow-execution-service';
@@ -13,6 +16,10 @@ type WorkflowData = {
   data?: WorkflowExecution;
 };
 
+export type WorkflowStore = Writable<WorkflowData> & {
+  refresh: () => void;
+};
+
 const toResponse = (data: WorkflowExecution) => ({
   loading: false,
   updating: false,
@@ -24,11 +31,13 @@ const request = ({ executionId, runId, namespace }: WorkflowRequest) =>
     .then(toWorkflowExecution)
     .then(toResponse);
 
-export const getWorkflow = ({
+const stores: { [key: string]: WorkflowStore } = {};
+
+export const createStore = ({
   executionId,
   runId,
   namespace,
-}: WorkflowRequest) => {
+}: WorkflowRequest): WorkflowStore => {
   const store = writable<WorkflowData>(
     {
       loading: true,
@@ -40,13 +49,30 @@ export const getWorkflow = ({
     },
   );
 
-  const refresh = () =>
+  const refresh = () => {
     request({ executionId, runId, namespace })
       .then(store.set)
       .catch(handleError);
+  };
 
   return {
-    subscribe: store.subscribe,
+    ...store,
     refresh,
   };
+};
+
+export const getWorkflow = ({
+  namespace,
+  executionId,
+  runId,
+}: WorkflowRequest): WorkflowStore => {
+  let store = stores?.[namespace]?.[executionId]?.[runId];
+  const path = `${namespace}.${executionId}.${runId}`;
+
+  if (!store) {
+    store = createStore({ namespace, executionId, runId });
+    set(stores, path, store);
+  }
+
+  return store;
 };

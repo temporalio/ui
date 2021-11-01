@@ -51,12 +51,8 @@
         value={workflow.taskQueue}
         {href}
       />
-      {#if inputAndResults.input}
-        <CodeBlock heading="Input" content={inputAndResults.input} />
-      {/if}
-      {#if inputAndResults.result}
-        <CodeBlock heading="Result" content={inputAndResults.result} />
-      {/if}
+      <CodeBlock heading="Input" content={inputAndResults.input} />
+      <CodeBlock heading="Result" content={inputAndResults.result} />
       <ExecutionInformation
         title="History Events"
         value={workflow.historyEvents}
