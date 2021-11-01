@@ -15,12 +15,8 @@
 </script>
 
 <script lang="ts">
-  import type {
-    GetWorkflowExecutionHistoryResponse,
-    DescribeWorkflowExecutionResponse,
-  } from '$types';
-
-  import { toWorkflowExecution } from '$lib/models/workflow-execution';
+  import { getWorkflow } from '$lib/stores/workflow';
+  import { createEventStore } from '$lib/stores/events';
   import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
   import { getTaskQueueUrl } from '$lib/utilities/get-task-queue-url';
 
@@ -29,8 +25,6 @@
   import PendingActivities from './_pending-activities.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
   import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
-  import { getWorkflow } from '$lib/stores/workflow';
-  import { createEventStore } from '$lib/stores/events';
 
   export let executionId: string;
   export let runId: string;
