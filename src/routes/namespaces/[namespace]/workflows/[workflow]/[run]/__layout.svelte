@@ -1,56 +1,33 @@
 <script context="module" lang="ts">
   import type { LoadInput } from '@sveltejs/kit';
 
-  import {
-    fetchWorkflow,
-    fetchEvents,
-  } from '$lib/services/workflow-execution-service';
-
-  export async function load({ fetch, page }: LoadInput) {
+  export async function load({ page }: LoadInput) {
     const { workflow: executionId, run: runId, namespace } = page.params;
-
-    const execution = await fetchWorkflow(
-      {
-        executionId,
-        runId,
-        namespace,
-      },
-      fetch,
-    );
-
-    const events = await fetchEvents(
-      {
-        executionId,
-        runId,
-        namespace,
-      },
-      fetch,
-    );
 
     return {
       props: {
-        execution,
-      },
-      stuff: {
-        execution,
-        events,
+        executionId,
+        runId,
+        namespace,
       },
     };
   }
 </script>
 
 <script lang="ts">
-  import type { DescribeWorkflowExecutionResponse } from '$types';
-
   import { fly } from 'svelte/transition';
   import { isFullScreen } from '$lib/stores/full-screen';
-  import { toWorkflowExecution } from '$lib/models/workflow-execution';
 
   import Header from './_header.svelte';
+  import { getWorkflow } from '$lib/stores/workflow';
 
-  export let execution: DescribeWorkflowExecutionResponse;
+  export let executionId: string;
+  export let runId: string;
+  export let namespace: string;
 
-  $: workflow = toWorkflowExecution(execution);
+  let store = getWorkflow({ executionId, runId, namespace });
+  $: workflow = $store.data;
+  $: loading = $store.loading;
 </script>
 
 <section
@@ -61,7 +38,7 @@
   out:fly={{ x: 500 }}
 >
   <main class="w-full">
-    <Header {workflow} />
+    <Header {workflow} {loading} />
     <slot />
   </main>
 </section>
