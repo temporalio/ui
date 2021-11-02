@@ -21,24 +21,17 @@
 </script>
 
 <section class="bg-gray-100 p-4 flex gap-20 justify-between">
-  <section class="flex gap-4 items-center">
-    <Button
-      on:click={decrement}
-      disabled={isFirstPage}
-      styles="rounded-lg px-2 text-xs block">Previous</Button
-    >
-    {#if maximumPage > 0}
+  {#if maximumPage > 0}
+    <section class="flex gap-4 items-center">
+      <Button on:click={decrement} disabled={isFirstPage}>Previous</Button>
       <p>Page {currentPage + 1} of {maximumPage}</p>
-    {:else}
+      <Button on:click={increment} disabled={isLastPage}>Next</Button>
+    </section>
+  {:else}
+    <section class="flex gap-4 items-center">
       <p>No Workflow Executions</p>
-    {/if}
-    <Button
-      on:click={increment}
-      disabled={isLastPage}
-      styles="rounded-lg px-2 text-xs block">Next</Button
-    >
-  </section>
-
+    </section>
+  {/if}
   <section class="flex gap-4">
     <Select id="sort-by" name="Sort By" bind:value={$sortBy} condensed>
       <option value={null}>Sort By…</option>
