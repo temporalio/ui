@@ -3,7 +3,7 @@
   import { createWorkflowStore } from '$lib/stores/workflows';
 
   import Select from '$lib/components/filter-select.svelte';
-  import Button from '$lib/components/main-button.svelte';
+  import Button from '$lib/components/button/main-button.svelte';
 
   export let currentPage: number;
   export let maximumPage: number;

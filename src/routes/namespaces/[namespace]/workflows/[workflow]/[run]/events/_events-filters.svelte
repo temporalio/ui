@@ -5,7 +5,7 @@
 
   import { convertToJSON } from '$lib/utilities/convert-to-json';
   import Input from '$lib/components/filter-input.svelte';
-  import Button from '$lib/components/main-button.svelte';
+  import Button from '$lib/components/button/main-button.svelte';
 
   export let events: BaseEvent[];
   export let eventFormat: Writable<EventFormat>;
