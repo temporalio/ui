@@ -26,8 +26,8 @@
 <section class="p-4 flex gap-2 items-center justify-between">
   <div>
     <label for="format">View Format</label>
-    <Button on:click={() => setFormat('grid')} styles="py-1 px-3">GRID</Button>
-    <Button on:click={() => setFormat('json')} styles="py-1 px-3">JSON</Button>
+    <Button on:click={() => setFormat('grid')}>GRID</Button>
+    <Button on:click={() => setFormat('json')}>JSON</Button>
   </div>
   <div class="flex justify-center items-end">
     <Input
@@ -35,7 +35,7 @@
       id="filter-by-event-history"
       bind:value={$eventType}
     />
-    <Button on:click={clear} styles="ml-2 mb-1 px-3 py-1">Clear</Button>
+    <Button on:click={clear}>Clear</Button>
   </div>
   <div>
     <a

@@ -23,9 +23,19 @@
 <section class="bg-gray-100 p-4 flex gap-20 justify-between">
   {#if maximumPage > 0}
     <section class="flex gap-4 items-center">
-      <Button on:click={decrement} disabled={isFirstPage}>Previous</Button>
+      <Button
+        variant="secondary"
+        size="small"
+        on:click={decrement}
+        disabled={isFirstPage}>Previous</Button
+      >
       <p>Page {currentPage + 1} of {maximumPage}</p>
-      <Button on:click={increment} disabled={isLastPage}>Next</Button>
+      <Button
+        variant="secondary"
+        size="small"
+        on:click={increment}
+        disabled={isLastPage}>Next</Button
+      >
     </section>
   {:else}
     <section class="flex gap-4 items-center">
