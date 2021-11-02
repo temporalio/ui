@@ -7,6 +7,8 @@ type RequestFromAPIOptions = {
   request?: typeof fetch;
   options?: Parameters<typeof fetch>[1];
   token?: string;
+  shouldRetry?: boolean;
+  retryInterval?: number;
 };
 
 const base = import.meta.env.VITE_API;
@@ -26,13 +28,25 @@ const base = import.meta.env.VITE_API;
  */
 export const requestFromAPI = async <T>(
   endpoint: toURLParams[0],
-  { params = {}, options, request = fetch, token }: RequestFromAPIOptions = {},
-  retryCount = 0,
+  init: RequestFromAPIOptions = {},
+  retryCount = 10,
 ): Promise<T> => {
+  const {
+    params = {},
+    options,
+    request = fetch,
+    token,
+    shouldRetry = true,
+    retryInterval = 5000,
+  } = init;
+
   if (!endpoint.startsWith('/')) endpoint = '/' + endpoint;
   const nextPageToken = token ? { next_page_token: token } : {};
 
-  const url = toURL(base + endpoint, { ...params, ...nextPageToken });
+  const url = toURL(base + '/api/v1' + endpoint, {
+    ...params,
+    ...nextPageToken,
+  });
 
   try {
     const response = await request(url, options);
@@ -45,18 +59,11 @@ export const requestFromAPI = async <T>(
   } catch (error: unknown) {
     handleError(error);
 
-    if (retryCount < 10) {
-      // Try to make the request again in 5 seconds. Give up after 10 tries.
+    if (shouldRetry && retryCount > 0) {
       return new Promise((resolve) => {
         setTimeout(() => {
-          resolve(
-            requestFromAPI(
-              endpoint,
-              { params, request, token },
-              retryCount + 1,
-            ),
-          );
-        }, 5000);
+          resolve(requestFromAPI(endpoint, init, retryCount - 1));
+        }, retryInterval);
       });
     }
   }

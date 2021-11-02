@@ -1,11 +1,13 @@
 <script context="module" lang="ts">
   import type { GetSearchAttributesResponse } from '$types';
   import type { LoadInput } from '@sveltejs/kit';
+  import { requestFromAPI } from '$lib/utilities/request-from-api';
 
   export async function load({ fetch }: LoadInput) {
-    const searchAttributes: GetSearchAttributesResponse = await fetch(
-      import.meta.env.VITE_API + '/search-attributes',
-    ).then((response) => response.json());
+    const searchAttributes: GetSearchAttributesResponse = await requestFromAPI(
+      '/search-attributes',
+      { request: fetch },
+    );
 
     return {
       props: { searchAttributes },

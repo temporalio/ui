@@ -11,6 +11,8 @@ While we're in pre-production, you need to do the following before you spin up t
 
 ## Trying it out
 
+Starting the UI API server will give you a somewhat recent version on `localhost:8080`. If you want to use the most recent commit to `main`, you can spin up a bleeding-edge build as described below.
+
 Once you have the prerequisites going, run the following:
 
 ```bash
@@ -45,3 +47,12 @@ npm run build:cloud
 The resulting assets will be placed in either `build-local` or `build-cloud` respectively.
 
 > You can preview the built app with `npm run preview`, regardless of whether you installed an adapter. This should _not_ be used to serve your app in production.
+
+## Configuration
+
+Set these environment variables if you want to change their defaults
+
+| Variable  | Description                                                      | Default               | Stage |
+| --------- | ---------------------------------------------------------------- | --------------------- | ----- |
+| VITE_API  | Temporal HTTP API address. Set to empty `` to use relative paths | http://localhost:8080 | Build |
+| VITE_MODE | Build target                                                     | development           | Build |

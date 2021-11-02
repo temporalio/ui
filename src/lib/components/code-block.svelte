@@ -4,7 +4,7 @@
   import { Clipboard, Check } from 'svelte-hero-icons';
 
   export let heading = '';
-  export let content;
+  export let content: string | Parameters<typeof JSON.stringify>[0];
   export let copied = false;
 
   const copy = () =>
