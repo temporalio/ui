@@ -50,12 +50,8 @@
       <ExecutionInformation title="End Time" value={workflow.endTime} />
       <TaskQueueInformation title="Task Queue" value={taskQueue} {href} />
       <ExecutionInformation title="History Events" value={historyEvents} />
-      {#if inputAndResults.input}
-        <CodeBlock heading="Input" content={inputAndResults.input} />
-      {/if}
-      {#if inputAndResults.result}
-        <CodeBlock heading="Result" content={inputAndResults.result} />
-      {/if}
+      <CodeBlock heading="Input" content={inputAndResults.input} />
+      <CodeBlock heading="Result" content={inputAndResults.result} />
     </div>
     <TerminateWorkflow {namespace} {workflow} refresh={workflowStore.refresh} />
     <div class="flex w-full mt-4">
