@@ -1,26 +1,22 @@
 <script context="module" lang="ts">
-  import { namespace } from '$lib/stores/namespace';
   import type { LoadInput } from '@sveltejs/kit';
 
-  export async function load({ stuff }: LoadInput) {
-    const { execution, events } = stuff;
+  export async function load({ page }: LoadInput) {
+    const { workflow: executionId, run: runId, namespace } = page.params;
 
     return {
       props: {
-        execution,
-        events,
+        executionId,
+        runId,
+        namespace,
       },
     };
   }
 </script>
 
 <script lang="ts">
-  import type {
-    GetWorkflowExecutionHistoryResponse,
-    DescribeWorkflowExecutionResponse,
-  } from '$types';
-
-  import { toWorkflowExecution } from '$lib/models/workflow-execution';
+  import { getWorkflow } from '$lib/stores/workflow';
+  import { createEventStore } from '$lib/stores/events';
   import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
   import { getTaskQueueUrl } from '$lib/utilities/get-task-queue-url';
 
@@ -30,36 +26,36 @@
   import CodeBlock from '$lib/components/code-block.svelte';
   import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
 
-  export let execution: DescribeWorkflowExecutionResponse;
-  export let events: GetWorkflowExecutionHistoryResponse;
+  export let executionId: string;
+  export let runId: string;
+  export let namespace: string;
 
-  $: workflow = toWorkflowExecution(execution);
+  let workflowStore = getWorkflow({ executionId, runId, namespace });
+  let eventStore = createEventStore(namespace, executionId, runId);
+
+  $: workflow = $workflowStore.data;
+  $: loading = $workflowStore.loading;
+  $: events = $eventStore.data;
   $: inputAndResults = getWorkflowStartedAndCompletedEvents(events);
-  $: href = getTaskQueueUrl($namespace, workflow.taskQueue);
+  $: pendingActivities = workflow?.pendingActivities;
+  $: taskQueue = workflow?.taskQueue;
+  $: historyEvents = workflow?.historyEvents;
+  $: href = getTaskQueueUrl(namespace, taskQueue);
 </script>
 
 <div class="execution-information px-6 py-6">
-  <div class="w-full flex">
-    <ExecutionInformation title="Start Time" value={workflow.startTime} />
-    <ExecutionInformation title="End Time" value={workflow.endTime} />
-    <TaskQueueInformation
-      title="Task Queue"
-      value={workflow.taskQueue}
-      {href}
-    />
-    <ExecutionInformation
-      title="History Events"
-      value={workflow.historyEvents}
-    />
-    {#if inputAndResults.input}
+  {#if !loading}
+    <div class="w-full flex">
+      <ExecutionInformation title="Start Time" value={workflow.startTime} />
+      <ExecutionInformation title="End Time" value={workflow.endTime} />
+      <TaskQueueInformation title="Task Queue" value={taskQueue} {href} />
+      <ExecutionInformation title="History Events" value={historyEvents} />
       <CodeBlock heading="Input" content={inputAndResults.input} />
-    {/if}
-    {#if inputAndResults.result}
       <CodeBlock heading="Result" content={inputAndResults.result} />
-    {/if}
-  </div>
-  <TerminateWorkflow namespace={$namespace} {workflow} />
-  <div class="flex w-full mt-4">
-    <PendingActivities activities={workflow.pendingActivities} />
-  </div>
+    </div>
+    <TerminateWorkflow {namespace} {workflow} refresh={workflowStore.refresh} />
+    <div class="flex w-full mt-4">
+      <PendingActivities activities={pendingActivities} />
+    </div>
+  {/if}
 </div>
