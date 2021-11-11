@@ -2,7 +2,6 @@ export const getTaskQueueUrl = (
   namespace: string,
   taskQueue: string,
 ): string => {
-  const url = `/namespaces/${namespace}/queues/${taskQueue}`;
-
-  return url;
+  if (!taskQueue) return;
+  return `/namespaces/${namespace}/queues/${taskQueue}`;
 };

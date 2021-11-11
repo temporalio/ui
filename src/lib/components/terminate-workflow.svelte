@@ -7,9 +7,12 @@
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
   import { notifications } from '$lib/stores/notifications';
   import Button from '$lib/components/button/main-button.svelte';
+  import { handleError } from '$lib/utilities/handle-error';
+  import { isFunction } from '$lib/utilities/is-function';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
+  export let refresh: () => void;
 
   let isOpen: boolean = false;
   let reason: string = '';
@@ -22,11 +25,14 @@
       workflow,
       namespace,
       reason,
-    });
-
-    reason = '';
-    isOpen = false;
-    notifications.add('success', 'Workflow Terminated');
+    })
+      .then(() => {
+        reason = '';
+        isOpen = false;
+        notifications.add('success', 'Workflow Terminated');
+        if (isFunction(refresh)) refresh();
+      })
+      .catch(handleError);
   };
 </script>
 
