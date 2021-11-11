@@ -27,7 +27,7 @@
   <div>
     <label for="format">View Format</label>
     <Button on:click={() => setFormat('grid')}>GRID</Button>
-    <Button active={true} on:click={() => setFormat('json')}>JSON</Button>
+    <Button on:click={() => setFormat('json')}>JSON</Button>
   </div>
   <div class="flex justify-center items-end">
     <Input
