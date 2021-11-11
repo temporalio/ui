@@ -5,7 +5,7 @@
   export let size: string = 'small';
 </script>
 
-<button on:click {disabled} class={`${size} ${variant}`} class:active
+<button on:click class:selected={active} {disabled} class={`${size} ${variant}`}
   ><slot /></button
 >
 
@@ -52,5 +52,9 @@
 
   .destroy:hover:enabled {
     @apply bg-white text-red-400 border-red-400;
+  }
+
+  .selected {
+    @apply text-white bg-purple-600 border-purple-200;
   }
 </style>
