@@ -1,47 +1,12 @@
 <script lang="ts">
-  const getButtonState = (disabled?: boolean) => {
-    if (disabled) {
-      return 'disabled';
-    }
-    return 'default';
-  };
-
-  const getButtonStyle = (variant) => {
-    switch (variant) {
-      case 'secondary':
-        return 'secondary';
-      case 'destroy':
-        return 'destroy';
-      case 'primary':
-      default:
-        return 'primary';
-    }
-  };
-
-  const getButtonSize = (size) => {
-    switch (size) {
-      case 'small':
-        return 'small';
-      case 'default':
-      default:
-        return 'default';
-    }
-  };
-
   export let disabled: boolean = false;
-  export let variant: string = '';
+  export let variant: string = 'primary';
   export let active: boolean = false;
-  export let size: string = 'default';
-
-  const buttonState = getButtonState(disabled);
-  const showDisabled = buttonState !== 'default';
+  export let size: string = 'small';
 </script>
 
-<button
-  on:click
-  disabled={showDisabled}
-  class={`${getButtonSize(size)} ${getButtonStyle(variant)}`}
-  class:active><slot /></button
+<button on:click {disabled} class={`${size} ${variant}`} class:active
+  ><slot /></button
 >
 
 <style lang="postcss">

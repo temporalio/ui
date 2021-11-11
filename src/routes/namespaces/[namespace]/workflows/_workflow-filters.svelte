@@ -5,7 +5,7 @@
   import Select from '$lib/components/filter-select.svelte';
   import Input from '$lib/components/filter-input.svelte';
   import TimeRangeSelect from '$lib/components/time-range-select.svelte';
-  import Button from '$lib/components/main-button.svelte';
+  import Button from '$lib/components/button/main-button.svelte';
 
   export let timeFormat: string = 'relative';
 
