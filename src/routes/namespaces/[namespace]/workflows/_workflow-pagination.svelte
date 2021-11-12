@@ -3,6 +3,7 @@
   import { createWorkflowStore } from '$lib/stores/workflows';
 
   import Select from '$lib/components/filter-select.svelte';
+  import Button from '$lib/components/button/main-button.svelte';
 
   export let currentPage: number;
   export let maximumPage: number;
@@ -20,16 +21,27 @@
 </script>
 
 <section class="bg-gray-100 p-4 flex gap-20 justify-between">
-  <section class="flex gap-4 items-center">
-    <button on:click={decrement} disabled={isFirstPage}> Previous </button>
-    {#if maximumPage > 0}
+  {#if maximumPage > 0}
+    <section class="flex gap-4 items-center">
+      <Button
+        variant="secondary"
+        size="small"
+        on:click={decrement}
+        disabled={isFirstPage}>Previous</Button
+      >
       <p>Page {currentPage + 1} of {maximumPage}</p>
-    {:else}
+      <Button
+        variant="secondary"
+        size="small"
+        on:click={increment}
+        disabled={isLastPage}>Next</Button
+      >
+    </section>
+  {:else}
+    <section class="flex gap-4 items-center">
       <p>No Workflow Executions</p>
-    {/if}
-    <button on:click={increment} disabled={isLastPage}> Next </button>
-  </section>
-
+    </section>
+  {/if}
   <section class="flex gap-4">
     <Select id="sort-by" name="Sort By" bind:value={$sortBy} condensed>
       <option value={null}>Sort By…</option>
@@ -44,13 +56,3 @@
     </Select>
   </section>
 </section>
-
-<style lang="postcss">
-  button {
-    @apply rounded-lg border-purple-600 border-2 bg-white text-purple-600 px-2 text-xs block;
-  }
-
-  button:disabled {
-    @apply text-purple-400 border-purple-400;
-  }
-</style>
