@@ -24,6 +24,13 @@
   </td>
   <td>
     <a sveltekit:noscroll {href}>
+      <p>
+        {workflow.id}
+      </p></a
+    >
+  </td>
+  <td>
+    <a sveltekit:noscroll {href}>
       <div class={`flex justify-center  `}>
         <WorkflowStatus status={workflow.status} />
       </div>
