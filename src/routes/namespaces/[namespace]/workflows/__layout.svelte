@@ -2,7 +2,6 @@
   import { isFullScreen } from '$lib/stores/full-screen';
   import { namespace } from '$lib/stores/namespace';
   import { createWorkflowStore } from '$lib/stores/workflows';
-
   import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
   import WorkflowFilters from './_workflow-filters.svelte';
