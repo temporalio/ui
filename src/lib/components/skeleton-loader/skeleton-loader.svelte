@@ -14,8 +14,8 @@
 
 <style lang="postcss">
   span {
-    background-color: #E1E0E7;
-    background-image: linear-gradient(90deg, #eee, #E1E0E7, #eee);
+    background-color: #e1e0e7;
+    background-image: linear-gradient(90deg, #eee, #e1e0e7, #eee);
     background-size: 200px 100%;
     background-repeat: no-repeat;
     display: inline-block;
