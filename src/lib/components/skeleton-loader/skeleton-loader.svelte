@@ -1,5 +1,6 @@
 <script lang="ts">
   export let count = 1;
+  export let radius = 'normal';
 
   const elements = [];
   for (let i = 0; i < count; i++) {
@@ -8,20 +9,28 @@
 </script>
 
 {#each elements as _}
-  <span> &zwnj; </span>
+  <span class={radius}> &zwnj; </span>
 {/each}
 
 <style lang="postcss">
   span {
-    background-color: #eee;
-    background-image: linear-gradient(90deg, #eee, #f5f5f5, #eee);
+    background-color: #E1E0E7;
+    background-image: linear-gradient(90deg, #eee, #E1E0E7, #eee);
     background-size: 200px 100%;
     background-repeat: no-repeat;
-    border-radius: 4px;
     display: inline-block;
     line-height: 1;
     width: 100%;
-    animation: loader 1.2s ease-in-out infinite;
+    height: 100%;
+    animation: loader 1.4s ease-in-out infinite;
+  }
+
+  .normal {
+    border-radius: 15px;
+  }
+
+  .circle {
+    border-radius: 20px;
   }
 
   @keyframes loader {
