@@ -2,7 +2,6 @@ import type {
   WorkflowExecutionStartedEventAttributes,
   WorkflowExecutionCompletedEventAttributes,
 } from '$types';
-import base64 from 'base-64';
 
 type DecodeEvent = BaseEvent & {
   workflowExecutionStartedEventAttributes?: WorkflowExecutionStartedEventAttributes;
@@ -17,7 +16,7 @@ export const convertPayloadToJson = (event: DecodeEvent): string => {
     if (input === null) return 'null';
     if (input) {
       const [data] = input.payloads.map((payload) => payload.data);
-      return base64.decode(String(data));
+      return window.atob(String(data));
     }
   }
 
@@ -26,7 +25,7 @@ export const convertPayloadToJson = (event: DecodeEvent): string => {
     if (result === null) return 'null';
     if (result) {
       const [data] = result.payloads.map((payload) => payload.data);
-      return base64.decode(String(data));
+      return window.atob(String(data));
     }
   }
 };
