@@ -20,15 +20,6 @@
 
 <header class="flex flex-col justify-between">
   <div class="py-4 px-2 bg-gray-50 border-b-2 border-gray-100 flex justify-end">
-    {#if $isFullScreen}
-      <a href={workflowUrl}>
-        <Icon src={ArrowRight} class="w-8 h-8 text-gray-500" />
-      </a>
-    {:else}
-      <a href={workflowUrl + '/summary'}>
-        <Icon src={ArrowLeft} class="w-8 h-8 text-gray-500" />
-      </a>
-    {/if}
     <a href={`/namespaces/${$namespace}/workflows`}>
       <Icon src={X} class="w-8 h-8 text-gray-500" />
     </a>

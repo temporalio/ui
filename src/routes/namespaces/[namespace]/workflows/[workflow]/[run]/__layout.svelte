@@ -15,9 +15,6 @@
 </script>
 
 <script lang="ts">
-  import { fly } from 'svelte/transition';
-  import { isFullScreen } from '$lib/stores/full-screen';
-
   import Header from './_header.svelte';
   import { getWorkflow } from '$lib/stores/workflow';
   import { setContext } from 'svelte';
@@ -33,31 +30,9 @@
   setContext('workflow', store);
 </script>
 
-<section
-  class="border-l-2 h-screen"
-  class:full={$isFullScreen}
-  class:sidebar={!$isFullScreen}
-  in:fly={{ x: 500, duration: 350 }}
-  out:fly={{ x: 500 }}
->
+<section class="border-l-2 h-screen">
   <main class="w-full">
     <Header {workflow} {loading} />
     <slot />
   </main>
 </section>
-
-<style type="postcss">
-  .full {
-    @apply w-full;
-  }
-
-  .sidebar {
-    background-color: white;
-    width: 600px;
-    left: calc(100% - 600px);
-    position: absolute;
-    overflow-y: scroll;
-    box-shadow: -2px 14px 20px 0px rgb(0 0 0 / 20%);
-    z-index: 2;
-  }
-</style>
