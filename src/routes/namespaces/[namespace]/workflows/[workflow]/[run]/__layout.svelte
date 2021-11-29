@@ -17,7 +17,6 @@
 <script lang="ts">
   import Header from './_header.svelte';
   import { getWorkflow } from '$lib/stores/workflow';
-  import { setContext } from 'svelte';
 
   export let executionId: string;
   export let runId: string;
@@ -26,8 +25,6 @@
   $: store = getWorkflow({ executionId, runId, namespace });
   $: workflow = $store.data;
   $: loading = $store.loading;
-
-  setContext('workflow', store);
 </script>
 
 <section class="border-l-2 h-screen">
