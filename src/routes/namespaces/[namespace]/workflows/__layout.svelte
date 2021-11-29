@@ -10,8 +10,7 @@
   import WorkflowsEmptyState from './_workflows-empty.svelte';
   import Loading from '$lib/components/loading.svelte';
 
-  $: store = createWorkflowStore($namespace);
-  $: workflows = store.visible;
+  $: ({ workflows, loading, updating } = createWorkflowStore($namespace));
 
   let timeFormat = 'relative';
   let currentPage = 0;
@@ -36,7 +35,7 @@
         <WorkflowFilters bind:timeFormat />
         <WorkflowPagination bind:currentPage {maximumPage} />
       </header>
-      <Loading loading={$store.loading} updating={$store.updating} />
+      <Loading loading={$loading} updating={$updating} />
       <WorkflowsSummaryTable>
         <tbody slot="rows">
           {#each visibleWorkflows as workflow}
