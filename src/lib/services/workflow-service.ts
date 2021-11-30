@@ -50,24 +50,25 @@ export const fetchWorkflowsByType = (
   );
 };
 
-export const fetchAllWorkflows = (
+export const fetchAllWorkflows = async (
   namespace: string,
   parameters: VisibilityParameters,
   request = fetch,
 ): Promise<CombinedWorkflowExecutionsResponse> => {
-  return Promise.all([
+  const [open, closed] = await Promise.all([
     fetchWorkflowsByType(namespace, 'open', parameters, request),
     fetchWorkflowsByType(namespace, 'closed', parameters, request),
-  ]).then(([open, closed]): CombinedWorkflowExecutionsResponse => {
-    const executions = [...open?.executions, ...closed?.executions];
-    return {
-      workflows: toWorkflowExecutions({ executions }),
-      nextPageTokens: {
-        open: open.nextPageToken,
-        closed: closed.nextPageToken,
-      },
-    };
-  });
+  ]);
+
+  const executions = [...open?.executions, ...closed?.executions];
+
+  return {
+    workflows: toWorkflowExecutions({ executions }),
+    nextPageTokens: {
+      open: open.nextPageToken,
+      closed: closed.nextPageToken,
+    },
+  };
 };
 
 export async function fetchWorkflow(
