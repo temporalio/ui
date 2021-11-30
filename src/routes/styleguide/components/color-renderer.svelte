@@ -10,9 +10,11 @@
 {#if colors}
   {#each Object.entries(colors) as [colorNames, colorValues]}
     {#if typeof colorValues === 'object'}
-      <h3 class="text-2xl capitalize space-y-6">{colorNames}</h3>
-      <div class="grid-cols-5 grid gap-2 ">
-        <svelte:self colors={colorValues} />
+      <div class="mb-20">
+        <h3 class="text-2xl capitalize space-y-6">{colorNames}</h3>
+        <div class="grid-cols-5 grid gap-2 ">
+          <svelte:self colors={colorValues} />
+        </div>
       </div>
     {:else}
       <ColorBox name={colorNames} hexColor={colorValues} />
