@@ -1,4 +1,4 @@
-<script lang="typescript">
+<script lang="ts">
   // This should be a circular reference but am Lazy and couldn't get it working
   type ColorValues = Record<string, Record<string, string> | string>;
 
