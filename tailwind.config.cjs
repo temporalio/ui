@@ -1,8 +1,12 @@
+const { TemporalColors } = require('./theme.ts');
+
 const config = {
   mode: 'jit',
   purge: ['./src/**/*.{html,js,svelte,ts}'],
   theme: {
-    extend: {},
+    extend: {
+      colors: TemporalColors,
+    },
   },
   plugins: [],
 };
