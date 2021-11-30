@@ -55,7 +55,7 @@ export const toWorkflowExecution = (
 };
 
 export const toWorkflowExecutions = (
-  response: ListWorkflowExecutionsResponse,
+  response: Pick<ListWorkflowExecutionsResponse, 'executions'>,
 ): WorkflowExecution[] => {
   return (response.executions || []).map((workflowExecutionInfo) =>
     toWorkflowExecution({ workflowExecutionInfo }),

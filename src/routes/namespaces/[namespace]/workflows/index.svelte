@@ -1,33 +1,39 @@
 <script context="module" lang="ts">
   import type { LoadInput } from '@sveltejs/kit';
-  import { fetchAllWorkflows } from '$lib/services/workflow-service';
-  import { toWorkflowExecutions } from '$lib/models/workflow-execution';
 
-  export async function load({ fetch, page }: LoadInput) {
-    const { namespace } = page.params;
+  export async function load({ page, fetch }: LoadInput) {
+    if (!page.query.has('time-range')) page.query.set('time-range', '24 hours');
 
-    const response = fetchAllWorkflows(namespace, {}, fetch);
-    const workflows = await response.then(toWorkflowExecutions);
-    const { nextPageTokens } = await response;
+    const namespace = page.params.namespace;
+    const timeRange = page.query.get('time-range');
+
+    const initialData = await fetchAllWorkflows(
+      page.params.namespace,
+      { timeRange },
+      fetch,
+    );
 
     return {
-      props: {
-        workflows,
-        nextPageTokens,
-      },
+      props: { initialData, namespace },
     };
   }
 </script>
 
 <script lang="ts">
-  import type { WorkflowExecution } from '$lib/models/workflow-execution';
+  import { page } from '$app/stores';
+  import { fetchAllWorkflows } from '$lib/services/workflow-service';
 
   import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
   import WorkflowFilters from './_workflow-filters.svelte';
   import WorkflowsEmptyState from './_workflows-empty.svelte';
+  import WorkflowsLoadingState from './_workflows-loading.svelte';
 
-  export let workflows: WorkflowExecution[];
+  export let namespace: string;
+  export let initialData: ReturnType<typeof fetchAllWorkflows>;
+
+  $: timeRange = $page.query.get('time-range');
+  $: data = initialData || fetchAllWorkflows(namespace, { timeRange });
 
   let timeFormat = 'relative';
 </script>
@@ -39,11 +45,15 @@
     </header>
     <WorkflowsSummaryTable>
       <tbody slot="rows">
-        {#each workflows as workflow}
-          <WorkflowsSummaryRow {workflow} {timeFormat} />
-        {:else}
-          <WorkflowsEmptyState />
-        {/each}
+        {#await data}
+          <WorkflowsLoadingState />
+        {:then { workflows }}
+          {#each workflows as workflow}
+            <WorkflowsSummaryRow {workflow} {timeFormat} />
+          {:else}
+            <WorkflowsEmptyState />
+          {/each}
+        {/await}
       </tbody>
     </WorkflowsSummaryTable>
   </div>
