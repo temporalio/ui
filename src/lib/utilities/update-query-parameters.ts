@@ -3,8 +3,8 @@ type UpdateQueryParams = {
   value: string;
   query: URLSearchParams;
   path: string;
-  goto: (href: string, options?: { replaceState: boolean }) => Promise<any>;
-  invalidate?: (href: string) => Promise<any>;
+  goto: (href: string, options?: { replaceState: boolean }) => Promise<unknown>;
+  invalidate?: (href: string) => Promise<unknown>;
 };
 
 export const updateQueryParameters = ({
@@ -13,7 +13,7 @@ export const updateQueryParameters = ({
   query,
   path,
   goto,
-}: UpdateQueryParams) => {
+}: UpdateQueryParams): void => {
   if (value) {
     query.set(parameter, value);
   } else {

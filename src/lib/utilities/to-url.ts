@@ -1,11 +1,9 @@
-import type { URLSearchParamLike } from './url-search-params';
-import { toSearchParams } from './url-search-params';
-
-export const toURL = (url: string, params?: URLSearchParamLike): string => {
-  let result = url;
-  const paramsAsString = toSearchParams(params).toString();
-
-  if (paramsAsString) result += '?' + paramsAsString;
-
-  return result;
+export const toURL = (
+  url: string,
+  params?: URLSearchParams | Record<string, string>,
+): string => {
+  const isURLSearchParams = params instanceof URLSearchParams;
+  if (params && !isURLSearchParams) params = new URLSearchParams(params);
+  if (params) return `${url}?${params}`;
+  return url;
 };

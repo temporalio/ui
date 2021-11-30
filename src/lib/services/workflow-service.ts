@@ -17,7 +17,7 @@ type VisibilityParameters = {
 };
 
 const createDate = (timeRange: Duration | string) => {
-  let duration =
+  const duration =
     typeof timeRange === 'string' ? toDuration(timeRange) : timeRange;
   return formatISO(sub(new Date(), duration));
 };
@@ -25,7 +25,7 @@ const createDate = (timeRange: Duration | string) => {
 export const fetchWorkflowsByType = (
   namespace: string,
   type: WorkflowType,
-  { timeRange, status = null }: VisibilityParameters,
+  { timeRange }: VisibilityParameters,
   request = fetch,
 ): Promise<ListWorkflowExecutionsResponse> => {
   return requestFromAPI<ListWorkflowExecutionsResponse>(
