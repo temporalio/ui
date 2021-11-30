@@ -10,6 +10,3 @@
     <span class="text-right text-warmGray-600">{hexColor}</span>
   </div>
 </div>
-
-<style>
-</style>

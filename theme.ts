@@ -1,3 +1,6 @@
+// Ignore this rule because tailwind is all cjs and we need to use requires here
+// Maybe come back to this but this seems to be the easy way out
+/* ts-ignore:@typescript-eslint/no-var-requires */
 const colors = require('tailwindcss/colors');
 
 const TemporalColors = {
