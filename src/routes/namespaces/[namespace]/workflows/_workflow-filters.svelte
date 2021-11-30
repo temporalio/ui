@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Select from '$lib/components/filter-select.svelte';
-  import QuerySelect from '$lib/components/query-param-select.svelte';
+  import Select from '$lib/components/select.svelte';
+  import FilterSelect from '$lib/components/filter-select.svelte';
 
   export let timeFormat: string = 'relative';
 
@@ -28,13 +28,13 @@
 </script>
 
 <section class="p-4 flex gap-8">
-  <QuerySelect
+  <FilterSelect
     label="Time Range"
     parameter="time-range"
     options={durations}
     value="24 hours"
   />
-  <QuerySelect
+  <FilterSelect
     label="Workflow Status"
     parameter="status"
     options={statuses}
@@ -42,7 +42,7 @@
   />
   <Select
     id="filter-by-relative-time"
-    name="Time Format"
+    label="Time Format"
     bind:value={timeFormat}
   >
     <option value={'relative'}>Relative</option>
