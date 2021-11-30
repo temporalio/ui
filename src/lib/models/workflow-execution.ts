@@ -19,7 +19,6 @@ export type WorkflowExecution = {
   historyEvents: Long;
   pendingActivities: PendingActivityInfo[];
   url: string;
-  toggleUrl: (isFullScreen: boolean) => string;
 };
 
 type WorkflowExecutionAPIResponse = Optional<
@@ -41,12 +40,6 @@ export const toWorkflowExecution = (
   const taskQueue = response?.executionConfig?.taskQueue?.name;
   const pendingActivities = response.pendingActivities || [];
 
-  const toggleUrl = (isFullScreen: boolean): string => {
-    return `${url}?${new URLSearchParams({
-      fullScreen: (!isFullScreen).toString(),
-    })}`;
-  };
-
   return {
     name,
     id,
@@ -56,7 +49,6 @@ export const toWorkflowExecution = (
     status,
     historyEvents,
     url,
-    toggleUrl,
     taskQueue,
     pendingActivities,
   };
