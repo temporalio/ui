@@ -1,12 +1,21 @@
 import { sub, formatISO } from 'date-fns';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
-
-import type { ListWorkflowExecutionsResponse } from '$types';
-import { toWorkflowExecutions } from '$lib/models/workflow-execution';
+import {
+  toWorkflowExecution,
+  toWorkflowExecutions,
+} from '$lib/models/workflow-execution';
 import { toDuration } from '$lib/utilities/to-duration';
 
+import type { ListWorkflowExecutionsResponse } from '$types';
+import type { WorkflowExecution } from '$lib/models/workflow-execution';
+
+export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
+  executionId: string;
+  runId: string;
+};
+
 type CombinedWorkflowExecutionsResponse = {
-  workflows: ReturnType<typeof toWorkflowExecutions>;
+  workflows: WorkflowExecution[];
   nextPageTokens: NextPageTokens;
 };
 
@@ -60,3 +69,13 @@ export const fetchAllWorkflows = (
     };
   });
 };
+
+export async function fetchWorkflow(
+  { executionId, runId, namespace }: GetWorkflowExecutionRequest,
+  request = fetch,
+): Promise<WorkflowExecution> {
+  return requestFromAPI(
+    `/namespaces/${namespace}/workflows/${executionId}/executions/${runId}`,
+    { request },
+  ).then(toWorkflowExecution);
+}

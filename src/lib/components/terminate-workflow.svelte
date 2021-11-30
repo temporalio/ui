@@ -12,7 +12,7 @@
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
-  export let refresh: () => void;
+  export let refresh: () => void = null;
 
   let isOpen: boolean = false;
   let reason: string = '';
