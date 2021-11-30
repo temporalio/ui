@@ -24,6 +24,10 @@ type NamespaceScopedRequest = { namespace: string };
 type NextPageToken = Uint8Array | string;
 type WithNextPageToken = { nextPageToken?: NextPageToken };
 type WithoutNextPageToken<T> = Omit<T, keyof WithNextPageToken>;
+type NextPageTokens = {
+  open: NextPageToken;
+  closed: NextPageToken;
+};
 
 type PaginationCallbacks<T> = {
   onStart?: () => void;
