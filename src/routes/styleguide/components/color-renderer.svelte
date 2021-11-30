@@ -1,10 +1,10 @@
 <script lang="ts">
   // This should be a circular reference but am Lazy and couldn't get it working
-  type ColorValues = Record<string, Record<string, string> | string>;
+  type ColorValues = { [key: string]: string | ColorValues };
 
   export let colors: ColorValues;
 
-  import ColorBox from './ColorBox.svelte';
+  import ColorBox from './color-box.svelte';
 </script>
 
 {#if colors}
