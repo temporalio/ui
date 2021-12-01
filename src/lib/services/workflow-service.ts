@@ -90,8 +90,8 @@ export async function fetchWorkflowWithEventHistory(
   request = fetch,
 ): Promise<{ workflow: WorkflowExecution; events: HistoryEventWithId[] }> {
   const [workflow, events] = await Promise.all([
-    fetchWorkflow(parameters),
-    fetchEvents(parameters).then(toEventHistory),
+    fetchWorkflow(parameters, request),
+    fetchEvents(parameters, request).then(toEventHistory),
   ]);
 
   return { workflow, events };

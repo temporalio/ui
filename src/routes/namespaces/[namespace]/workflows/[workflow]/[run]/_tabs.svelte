@@ -7,7 +7,6 @@
   const { namespace, workflow: id, run: runId } = $page.params;
 
   $: workflowUrl = getWorkflowExecutionUrl(namespace, { id, runId });
-  $: activitiesUrl = `${workflowUrl}/activities`;
 </script>
 
 <nav class="mt-6 border-b-2 px-2 flex">

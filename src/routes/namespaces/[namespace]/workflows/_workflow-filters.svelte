@@ -28,22 +28,12 @@
 </script>
 
 <section class="p-4 flex gap-8">
-  <FilterSelect
-    label="Time Range"
-    parameter="time-range"
-    options={durations}
-    value="24 hours"
-  >
+  <FilterSelect label="Time Range" parameter="time-range" value="24 hours">
     {#each durations as value}
       <option {value}>{value}</option>
     {/each}
   </FilterSelect>
-  <FilterSelect
-    label="Workflow Status"
-    parameter="status"
-    options={statuses}
-    value={null}
-  >
+  <FilterSelect label="Workflow Status" parameter="status" value={null}>
     {#each Object.entries(statuses) as [label, value]}
       <option {value}>{label}</option>
     {/each}
