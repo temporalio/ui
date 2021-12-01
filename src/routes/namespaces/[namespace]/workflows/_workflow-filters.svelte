@@ -33,13 +33,21 @@
     parameter="time-range"
     options={durations}
     value="24 hours"
-  />
+  >
+    {#each durations as value}
+      <option {value}>{value}</option>
+    {/each}
+  </FilterSelect>
   <FilterSelect
     label="Workflow Status"
     parameter="status"
     options={statuses}
     value={null}
-  />
+  >
+    {#each Object.entries(statuses) as [label, value]}
+      <option {value}>{label}</option>
+    {/each}
+  </FilterSelect>
   <Select
     id="filter-by-relative-time"
     label="Time Format"

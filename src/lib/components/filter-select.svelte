@@ -32,14 +32,6 @@
     {id}
     bind:value={_value}
   >
-    {#if Array.isArray(options)}
-      {#each options as value}
-        <option {value}>{value}</option>
-      {/each}
-    {:else}
-      {#each Object.entries(options) as [label, value]}
-        <option {value}>{label}</option>
-      {/each}
-    {/if}
+    <slot />
   </select>
 </div>
