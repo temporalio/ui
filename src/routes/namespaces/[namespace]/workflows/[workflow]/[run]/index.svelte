@@ -7,14 +7,12 @@
       workflow: WorkflowExecution;
       events: HistoryEvent[];
     };
-    const { workflow: executionId, run: runId, namespace } = page.params;
+    const { namespace } = page.params;
 
     return {
       props: {
         workflow,
         events,
-        executionId,
-        runId,
         namespace,
       },
     };
@@ -30,12 +28,10 @@
   import PendingActivities from './_pending-activities.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
   import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
-  import Event from './events/_event.svelte';
+  import Event from './_event.svelte';
 
   export let workflow: WorkflowExecution;
   export let events: HistoryEvent[];
-  export let executionId: string;
-  export let runId: string;
   export let namespace: string;
 
   let format: EventFormat = 'grid';
