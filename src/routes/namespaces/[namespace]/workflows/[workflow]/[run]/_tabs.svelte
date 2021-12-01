@@ -17,9 +17,6 @@
   >
     Summary
   </a>
-  <a class:active={pathMatches(activitiesUrl, $page.path)} href={activitiesUrl}>
-    Activities
-  </a>
 </nav>
 
 <style lang="postcss">
