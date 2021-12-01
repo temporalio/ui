@@ -5,7 +5,6 @@
   import Select from './select.svelte';
 
   export let label: string;
-  export let options: string[] | Record<string, string>;
   export let value: string;
   export let parameter: string = null;
 
