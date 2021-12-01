@@ -13,3 +13,9 @@
     <slot />
   </select>
 </div>
+
+<style lang="postcss">
+  select {
+    color: gray;
+  }
+</style>
