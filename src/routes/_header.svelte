@@ -2,7 +2,7 @@
   import type { LoadInput } from '@sveltejs/kit';
 
   import { requestFromAPI } from '$lib/utilities/request-from-api';
-  import NamespaceDropdown from '$lib/components/namespace-dropdown.svelte';
+  import NamespaceSelect from '$lib/components/select/namespace-select.svelte';
 
   export async function load({ fetch }: LoadInput) {
     const { user }: any = await requestFromAPI('/me', { request: fetch });
@@ -23,7 +23,7 @@
   id="header"
   class="h-16 w-full px-6 flex flex-row items-center justify-between static border-b-2"
 >
-  <NamespaceDropdown />
+  <NamespaceSelect />
   <div class="flex flex-row justify-center items-center">
     <a href="https://github.com/temporalio/web/issues/new/choose">
       Report Bug/Give Feedback
