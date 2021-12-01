@@ -46,7 +46,7 @@
     {#await data}
       <WorkflowsLoadingState />
     {:then { workflows }}
-      {#if workflows.length > 0}
+      {#if workflows.length}
         <WorkflowsSummaryTable>
           <tbody slot="rows">
             {#each workflows as workflow}

@@ -6,7 +6,7 @@
   import { terminateWorkflow } from '$lib/services/terminate-service';
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
   import { notifications } from '$lib/stores/notifications';
-  import Button from '$lib/components/button/main-button.svelte';
+  import Button from '$lib/components/button.svelte';
   import { handleError } from '$lib/utilities/handle-error';
   import { isFunction } from '$lib/utilities/is-function';
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Button from '$lib/components/button/main-button.svelte';
+  import Button from '$lib/components/button.svelte';
 </script>
 
 <div class="flex flex-col justify-start items-center gap-2 empty">
