@@ -1,6 +1,7 @@
 <script lang="ts">
   import { namespace as currentNamespace } from '$lib/stores/namespace';
-  import OutsideOfDropdown from '$lib/components/outside-of-dropdown.svelte';
+  import Select from '$lib/components/select/select.svelte';
+  import Option from '$lib/components/select/option.svelte';
   import { getContext } from 'svelte';
   import { goto } from '$app/navigation';
 
@@ -14,28 +15,20 @@
   let userSelectedNamespace = null;
   let idx = 0;
 
-  function nextNamespace() {
-    if (userSelectedNamespace)
-      idx = namespaces.findIndex(userSelectedNamespace);
-    idx++;
-    if (idx > namespaces.length) {
-      // wrap around
-      idx = 0;
-      userSelectedNamespace = namespaces[0];
-    } else {
-      userSelectedNamespace = namespaces[idx];
-    }
-  }
-
   function switchNamespace(newNamespace: string) {
     showDropdown = false;
     goto('/namespaces/' + newNamespace);
   }
 </script>
 
-<OutsideOfDropdown bind:showDropdown>
+<Select value={null}>
+  {#each namespaces as namespace}
+    <Option>{namespace}</Option>
+  {/each}
+</Select>
+
+<!-- <OutsideOfDropdown bind:showDropdown>
   <div class="inline-flex space-x-2 items-center">
-    <!-- svelte-ignore a11y-label-has-associated-control -->
     <label id="listbox-label" class="block text-sm font-medium text-gray-700">
       Namespace
     </label>
@@ -69,7 +62,6 @@
       </button>
 
       {#if showDropdown}
-        <!-- svelte-ignore a11y-autofocus-->
         <ul
           on:keyup={nextNamespace}
           autofocus
@@ -79,11 +71,7 @@
           aria-labelledby="listbox-label"
           aria-activedescendant="listbox-option-3"
         >
-          <!--
-          Select option, manage highlight styles based on mouseenter/mouseleave and keyboard navigation.
-  
-          Highlighted: "text-white bg-indigo-600", Not Highlighted: "text-gray-900"
-        -->
+
           {#each namespaces as namespace}
             <li
               on:mouseenter={() => (userSelectedNamespace = namespace)}
@@ -104,7 +92,7 @@
                 class:text-indigo-600={$currentNamespace === namespace}
                 class="text-white absolute inset-y-0 right-0 flex items-center pr-4"
               >
-                <!-- Heroicon name: solid/check -->
+    
                 <svg
                   class="h-5 w-5"
                   xmlns="http://www.w3.org/2000/svg"
@@ -125,8 +113,7 @@
       {/if}
     </div>
   </div>
-</OutsideOfDropdown>
-
+</OutsideOfDropdown> -->
 <style lang="postcss">
   .selectedItem {
     @apply text-white bg-indigo-600;
