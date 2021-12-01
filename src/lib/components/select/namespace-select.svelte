@@ -1,7 +1,7 @@
 <script lang="ts">
   import { namespace as currentNamespace } from '$lib/stores/namespace';
-  import Select from './select/select.svelte';
-  import Option from './select/option.svelte';
+  import Select from './select.svelte';
+  import Option from './option.svelte';
   import { getContext } from 'svelte';
   import { goto } from '$app/navigation';
 
