@@ -1,24 +1,45 @@
 <script lang="ts">
-  export let id: string;
-  export let name: string;
-  export let value: string | boolean;
-  export let condensed = false;
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+
+  export let label: string;
+  export let options: string[] | Record<string, string>;
+  export let value: string;
+  export let parameter: string = null;
+
+  let _value = (parameter && $page.query.get(parameter)) || value;
+
+  const id = `${parameter || label}-filter`;
+
+  $: {
+    updateQueryParameters({
+      parameter,
+      value: _value,
+      query: $page.query,
+      path: $page.path,
+      goto,
+    });
+  }
 </script>
 
 <div class="flex flex-col items-start justify-center">
-  <label
-    for={id}
-    class="text-gray-600 text-xs whitespace-nowrap"
-    class:hidden={condensed}
-  >
-    {name}
+  <label for={id} class="text-gray-600 text-xs whitespace-nowrap">
+    {label}
   </label>
   <select
     class="block border-2 text-base p-2 w-full h-10"
     {id}
-    bind:value
-    on:change
+    bind:value={_value}
   >
-    <slot />
+    {#if Array.isArray(options)}
+      {#each options as value}
+        <option {value}>{value}</option>
+      {/each}
+    {:else}
+      {#each Object.entries(options) as [label, value]}
+        <option {value}>{label}</option>
+      {/each}
+    {/if}
   </select>
 </div>

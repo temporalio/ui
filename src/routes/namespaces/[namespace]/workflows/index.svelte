@@ -1,46 +1,59 @@
+<script context="module" lang="ts">
+  import type { LoadInput } from '@sveltejs/kit';
+
+  export async function load({ page, fetch }: LoadInput) {
+    if (!page.query.has('time-range')) page.query.set('time-range', '24 hours');
+
+    const namespace = page.params.namespace;
+    const timeRange = page.query.get('time-range');
+
+    const initialData = await fetchAllWorkflows(
+      page.params.namespace,
+      { timeRange },
+      fetch,
+    );
+
+    return {
+      props: { initialData, namespace },
+    };
+  }
+</script>
+
 <script lang="ts">
-  import { namespace } from '$lib/stores/namespace';
-  import { createWorkflowStore } from '$lib/stores/workflows';
+  import { page } from '$app/stores';
+  import { fetchAllWorkflows } from '$lib/services/workflow-service';
 
   import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
   import WorkflowFilters from './_workflow-filters.svelte';
-  import WorkflowPagination from './_workflow-pagination.svelte';
   import WorkflowsEmptyState from './_workflows-empty.svelte';
-  import Loading from '$lib/components/loading.svelte';
+  import WorkflowsLoadingState from './_workflows-loading.svelte';
 
-  $: ({ workflows, loading, updating } = createWorkflowStore($namespace));
+  export let namespace: string;
+  export let initialData: ReturnType<typeof fetchAllWorkflows>;
+
+  $: timeRange = $page.query.get('time-range');
+  $: data = initialData || fetchAllWorkflows(namespace, { timeRange });
 
   let timeFormat = 'relative';
-  let currentPage = 0;
-  let executionsPerPage = 50;
-
-  $: maximumPage = Math.ceil($workflows.length / executionsPerPage);
-
-  $: visibleWorkflows = $workflows.slice(
-    currentPage * executionsPerPage,
-    currentPage * executionsPerPage + executionsPerPage,
-  );
-
-  $: {
-    if (currentPage > maximumPage) currentPage = maximumPage - 1;
-  }
 </script>
 
 <section class="flex items-start">
   <div class="w-full h-screen overflow-scroll">
     <header>
       <WorkflowFilters bind:timeFormat />
-      <WorkflowPagination bind:currentPage {maximumPage} />
     </header>
-    <Loading loading={$loading} updating={$updating} />
     <WorkflowsSummaryTable>
       <tbody slot="rows">
-        {#each visibleWorkflows as workflow}
-          <WorkflowsSummaryRow {workflow} {timeFormat} />
-        {:else}
-          <WorkflowsEmptyState />
-        {/each}
+        {#await data}
+          <WorkflowsLoadingState />
+        {:then { workflows }}
+          {#each workflows as workflow}
+            <WorkflowsSummaryRow {workflow} {timeFormat} />
+          {:else}
+            <WorkflowsEmptyState />
+          {/each}
+        {/await}
       </tbody>
     </WorkflowsSummaryTable>
   </div>

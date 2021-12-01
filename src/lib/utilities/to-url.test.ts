@@ -6,10 +6,7 @@ describe(toURL, () => {
   });
 
   it('should turn the query params into a query string', () => {
-    expect(toURL('/workflows', { a: 'hello' })).toBe('/workflows?a=hello');
-  });
-
-  it('should drop undefined query parameters', () => {
-    expect(toURL('/workflows', { a: undefined })).toBe('/workflows');
+    const params = new URLSearchParams({ a: 'hello' });
+    expect(toURL('/workflows', params)).toBe('/workflows?a=hello');
   });
 });

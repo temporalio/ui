@@ -3,7 +3,7 @@ import { derived, writable } from 'svelte/store';
 import type { HistoryEventWithId } from '$lib/models/event-history';
 import type { GetWorkflowExecutionHistoryResponse } from '$types';
 
-import { fetchEvents } from '$lib/services/workflow-execution-service';
+import { fetchEvents } from '$lib/services/events-service';
 import { createQueryStore } from '$lib/utilities/create-query-store';
 import { toEventHistory } from '$lib/models/event-history';
 import { set } from '$lib/utilities/set-object-key';
