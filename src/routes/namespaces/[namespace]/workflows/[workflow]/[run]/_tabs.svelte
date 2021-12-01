@@ -7,7 +7,6 @@
   const { namespace, workflow: id, run: runId } = $page.params;
 
   $: workflowUrl = getWorkflowExecutionUrl(namespace, { id, runId });
-  $: eventsUrl = `${workflowUrl}/events`;
   $: activitiesUrl = `${workflowUrl}/activities`;
 </script>
 
@@ -17,9 +16,6 @@
     href={workflowUrl}
   >
     Summary
-  </a>
-  <a class:active={pathMatches(eventsUrl, $page.path)} href={eventsUrl}>
-    Events
   </a>
   <a class:active={pathMatches(activitiesUrl, $page.path)} href={activitiesUrl}>
     Activities

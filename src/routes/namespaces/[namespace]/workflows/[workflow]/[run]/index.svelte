@@ -3,12 +3,16 @@
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
   export async function load({ stuff, page }: LoadInput) {
-    const { workflow } = stuff as { workflow: WorkflowExecution };
+    const { workflow, events } = stuff as {
+      workflow: WorkflowExecution;
+      events: HistoryEvent[];
+    };
     const { workflow: executionId, run: runId, namespace } = page.params;
 
     return {
       props: {
         workflow,
+        events,
         executionId,
         runId,
         namespace,
@@ -18,7 +22,6 @@
 </script>
 
 <script lang="ts">
-  import { createEventStore } from '$lib/stores/events';
   import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
   import { getTaskQueueUrl } from '$lib/utilities/get-task-queue-url';
 
@@ -27,15 +30,16 @@
   import PendingActivities from './_pending-activities.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
   import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
+  import Event from './events/_event.svelte';
 
   export let workflow: WorkflowExecution;
+  export let events: HistoryEvent[];
   export let executionId: string;
   export let runId: string;
   export let namespace: string;
 
-  let eventStore = createEventStore(namespace, executionId, runId);
+  let format: EventFormat = 'grid';
 
-  $: events = $eventStore.data;
   $: inputAndResults = getWorkflowStartedAndCompletedEvents(events);
   $: pendingActivities = workflow?.pendingActivities;
   $: taskQueue = workflow?.taskQueue;
@@ -56,4 +60,29 @@
   <div class="flex w-full mt-4">
     <PendingActivities activities={pendingActivities} />
   </div>
+  <section>
+    {#if format === 'grid'}
+      <table class="border-collapse w-full border-2 table-fixed">
+        <thead>
+          <tr>
+            <th class="w-1/12">ID</th>
+            <th class="w-2/12">Type</th>
+            <th class="w-2/12">Time</th>
+            <th class="w-7/12">Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          {#each events as event, index}
+            <Event {event} {index} />
+          {/each}
+        </tbody>
+      </table>
+    {/if}
+
+    {#if format === 'json'}
+      {#each events as event}
+        <CodeBlock heading={`Event ID: ${event.eventId}`} content={event} />
+      {/each}
+    {/if}
+  </section>
 </div>
