@@ -30,22 +30,12 @@
 <section class="p-4 flex flex-col">
   <h2 class="text-3xl mb-4">Workflows</h2>
   <div class="flex gap-4">
-    <FilterSelect
-      label="Time Range"
-      parameter="time-range"
-      options={durations}
-      value="24 hours"
-    >
+    <FilterSelect label="Time Range" parameter="time-range" value="24 hours">
       {#each durations as value}
         <Option {value}>{value}</Option>
       {/each}
     </FilterSelect>
-    <FilterSelect
-      label="Workflow Status"
-      parameter="status"
-      options={statuses}
-      value={null}
-    >
+    <FilterSelect label="Workflow Status" parameter="status" value={null}>
       {#each Object.entries(statuses) as [label, value]}
         <Option {value}>{label}</Option>
       {/each}
