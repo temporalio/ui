@@ -11,7 +11,7 @@
     });
 
     return {
-      props: { workflow },
+      props: { workflow, namespace },
       stuff: { workflow, events },
     };
   }
@@ -22,11 +22,12 @@
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
   export let workflow: WorkflowExecution;
+  export let namespace: string;
 </script>
 
 <section class="border-l-2 h-screen">
   <main class="w-full">
-    <Header {workflow} />
+    <Header {workflow} {namespace} />
     <slot />
   </main>
 </section>

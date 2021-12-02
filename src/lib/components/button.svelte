@@ -58,7 +58,7 @@
   }
 
   .destroy {
-    @apply text-white bg-danger border-2 rounded-md py-2 px-4 transition-colors;
+    @apply text-white bg-danger border-2 rounded-lg py-1 px-5 transition-colors;
   }
 
   .destroy:disabled {
