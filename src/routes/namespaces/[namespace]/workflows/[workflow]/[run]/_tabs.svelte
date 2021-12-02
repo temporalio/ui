@@ -1,29 +1,35 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
+  import { page } from '$app/stores';
   import { getWorkflowExecutionUrl } from '$lib/utilities/get-workflow-execution-url';
   import { pathMatches } from '$lib/utilities/path-matches';
 
   const { namespace, workflow: id, run: runId } = $page.params;
 
+  export let workflow: WorkflowExecution;
+
   $: workflowUrl = getWorkflowExecutionUrl(namespace, { id, runId });
+  const historyEvents = workflow?.historyEvents;
 </script>
 
-<nav class="mt-6 border-b-2 px-2 flex">
+<nav class="mt-6 px-6 flex">
   <a
     class:active={pathMatches(workflowUrl, $page.path, true)}
     href={workflowUrl}
   >
-    Summary
+    History <span class="inline bg-historyText text-historybg px-2"
+      >{historyEvents}</span
+    >
   </a>
 </nav>
 
 <style lang="postcss">
   a {
-    @apply block px-4 py-4 mx-2;
+    @apply block;
   }
 
   a.active {
-    @apply border-b-8 border-purple-400 font-bold;
+    @apply border-b-2 rounded-b-sm border-primary font-medium;
   }
 </style>

@@ -26,5 +26,5 @@
       {workflow.runId}
     </p>
   </main>
-  <Tabs />
+  <Tabs {workflow} />
 </header>
