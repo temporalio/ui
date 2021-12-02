@@ -1,3 +1,4 @@
+import { browser } from '$app/env';
 import { writable } from 'svelte/store';
 
 export const decryptPort = persistStore('port', null);
@@ -17,11 +18,13 @@ export function lastDecryptSuccess() {
 }
 
 export function persistStore(name, initialValue) {
-  if (window?.localStorage) {
-    const storedValue = window.localStorage.getItem(name);
+  if (browser) {
+    if (window?.localStorage) {
+      const storedValue = window.localStorage.getItem(name);
 
-    if (storedValue) {
-      initialValue = storedValue;
+      if (storedValue) {
+        initialValue = storedValue;
+      }
     }
   }
 
@@ -31,8 +34,10 @@ export function persistStore(name, initialValue) {
     subscribe,
 
     set: (x) => {
-      if (window?.localStorage) {
-        window.localStorage.setItem(name, x);
+      if (browser) {
+        if (window?.localStorage) {
+          window.localStorage.setItem(name, x);
+        }
       }
       set(x);
     },

@@ -35,14 +35,12 @@
           <Icon src={StatusOffline} class="mx-auto text-gray-400 w-8 h-8" />
         </Tooltip>
       {:else if $lastDecryptStatus === false}
-        <!-- Decrypt is on and last message was a failure -->
         <Tooltip
           text={'Decryption is on last message decryption was a failure'}
         >
           <Icon src={StatusOffline} class="mx-auto text-red-400 w-8 h-8" />
         </Tooltip>
       {:else if $lastDecryptStatus == true}
-        <!-- Decrypt is on and last message was a success -->
         <Tooltip text={'Decryption is on but last decryption was a success'}>
           <Icon src={StatusOnline} class="mx-auto text-green-500 w-8 h-8" />
         </Tooltip>
