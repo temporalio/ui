@@ -46,9 +46,10 @@ const emptyWorkflowRequest = (): Promise<ListWorkflowExecutionsResponse> => {
 
 export const fetchOpenWorkflows = (
   namespace: string,
-  { timeRange }: TimeRangeParameter,
+  { timeRange, status }: TimeRangeParameter & StatusParameters,
   request = fetch,
 ): Promise<ListWorkflowExecutionsResponse> => {
+  if (status && status !== 'Running') return emptyWorkflowRequest();
   return requestFromAPI<ListWorkflowExecutionsResponse>(
     `/namespaces/${namespace}/workflows/open`,
     {
@@ -67,10 +68,14 @@ export const fetchClosedWorkflows = (
   { timeRange, status }: TimeRangeParameter & StatusParameters,
   request = fetch,
 ): Promise<ListWorkflowExecutionsResponse> => {
+  if (status === 'Running') return emptyWorkflowRequest();
+
   const params: Record<string, string> = {
     'start_time_filter.earliest_time': createDate(timeRange || { hours: 24 }),
   };
+
   const statusFilter = getStatusFilterCode(status);
+
   if (statusFilter) params['status_filter.status'] = statusFilter;
 
   return requestFromAPI<ListWorkflowExecutionsResponse>(
@@ -87,21 +92,10 @@ export const fetchAllWorkflows = async (
   { timeRange, status }: TimeRangeParameter & StatusParameters,
   request = fetch,
 ): Promise<CombinedWorkflowExecutionsResponse> => {
-  const requests: Promise<ListWorkflowExecutionsResponse>[] = [];
-
-  if (!status || status === 'Running') {
-    requests.push(fetchOpenWorkflows(namespace, { timeRange }, request));
-  } else {
-    requests.push(emptyWorkflowRequest());
-  }
-
-  if (status || status !== 'Running') {
-    requests.push(fetchClosedWorkflows(namespace, { status }, request));
-  } else {
-    requests.push(emptyWorkflowRequest());
-  }
-
-  const [open, closed] = await Promise.all(requests);
+  const [open, closed] = await Promise.all([
+    fetchOpenWorkflows(namespace, { timeRange, status }, request),
+    fetchClosedWorkflows(namespace, { timeRange, status }, request),
+  ]);
   const executions = [...open?.executions, ...closed?.executions];
 
   return {
