@@ -15,6 +15,10 @@
 
 <script lang="ts">
   import { namespace } from '$lib/stores/namespace';
+  import { StatusOnline, StatusOffline } from 'svelte-hero-icons';
+  import { decryptPort, lastDecryptStatus } from '$lib/stores/decrypt';
+  import Icon from 'svelte-hero-icons/Icon.svelte';
+  import Tooltip from '$lib/components/tooltip.svelte';
 
   export let user: { name?: string; email?: string; picture?: string } = {};
 </script>
@@ -25,6 +29,25 @@
 >
   <NamespaceDropdown />
   <div class="flex flex-row justify-center items-center">
+    {#if $decryptPort}
+      {#if $lastDecryptStatus === null}
+        <Tooltip text={'Decryption is on but has not decrypted a payload'}>
+          <Icon src={StatusOffline} class="mx-auto text-gray-400 w-8 h-8" />
+        </Tooltip>
+      {:else if $lastDecryptStatus === false}
+        <!-- Decrypt is on and last message was a failure -->
+        <Tooltip
+          text={'Decryption is on last message decryption was a failure'}
+        >
+          <Icon src={StatusOffline} class="mx-auto text-red-400 w-8 h-8" />
+        </Tooltip>
+      {:else if $lastDecryptStatus == true}
+        <!-- Decrypt is on and last message was a success -->
+        <Tooltip text={'Decryption is on but last decryption was a success'}>
+          <Icon src={StatusOnline} class="mx-auto text-green-500 w-8 h-8" />
+        </Tooltip>
+      {/if}
+    {/if}
     <a href="https://github.com/temporalio/web/issues/new/choose">
       Report Bug/Give Feedback
     </a>
