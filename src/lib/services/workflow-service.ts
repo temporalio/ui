@@ -102,7 +102,6 @@ export const fetchAllWorkflows = async (
   }
 
   const [open, closed] = await Promise.all(requests);
-
   const executions = [...open?.executions, ...closed?.executions];
 
   return {
