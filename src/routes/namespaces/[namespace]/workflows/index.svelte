@@ -6,10 +6,11 @@
 
     const namespace = page.params.namespace;
     const timeRange = page.query.get('time-range');
+    const status = page.query.get('status') as WorkflowStatus;
 
     const initialData = await fetchAllWorkflows(
       page.params.namespace,
-      { timeRange },
+      { timeRange, status },
       fetch,
     );
 
