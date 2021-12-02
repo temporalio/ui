@@ -6,8 +6,12 @@ import {
 } from '$lib/models/workflow-execution';
 import { toDuration } from '$lib/utilities/to-duration';
 
+import { fetchEvents } from './events-service';
+import { toEventHistory } from '$lib/models/event-history';
+
 import type { ListWorkflowExecutionsResponse } from '$types';
 import type { WorkflowExecution } from '$lib/models/workflow-execution';
+import type { HistoryEventWithId } from '$lib/models/event-history';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   executionId: string;
@@ -79,4 +83,16 @@ export async function fetchWorkflow(
     `/namespaces/${namespace}/workflows/${executionId}/executions/${runId}`,
     { request },
   ).then(toWorkflowExecution);
+}
+
+export async function fetchWorkflowWithEventHistory(
+  parameters: GetWorkflowExecutionRequest,
+  request = fetch,
+): Promise<{ workflow: WorkflowExecution; events: HistoryEventWithId[] }> {
+  const [workflow, events] = await Promise.all([
+    fetchWorkflow(parameters, request),
+    fetchEvents(parameters, request).then(toEventHistory),
+  ]);
+
+  return { workflow, events };
 }

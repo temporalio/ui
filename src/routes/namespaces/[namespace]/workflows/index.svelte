@@ -43,18 +43,20 @@
     <header>
       <WorkflowFilters bind:timeFormat />
     </header>
-    <WorkflowsSummaryTable>
-      <tbody slot="rows">
-        {#await data}
-          <WorkflowsLoadingState />
-        {:then { workflows }}
-          {#each workflows as workflow}
-            <WorkflowsSummaryRow {workflow} {timeFormat} />
-          {:else}
-            <WorkflowsEmptyState />
-          {/each}
-        {/await}
-      </tbody>
-    </WorkflowsSummaryTable>
+    {#await data}
+      <WorkflowsLoadingState />
+    {:then { workflows }}
+      {#if workflows.length}
+        <WorkflowsSummaryTable>
+          <tbody slot="rows">
+            {#each workflows as workflow}
+              <WorkflowsSummaryRow {workflow} {timeFormat} />
+            {/each}
+          </tbody>
+        </WorkflowsSummaryTable>
+      {:else}
+        <WorkflowsEmptyState />
+      {/if}
+    {/await}
   </div>
 </section>
