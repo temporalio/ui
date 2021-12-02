@@ -4,12 +4,14 @@
   import Icon from 'svelte-hero-icons/Icon.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
+  import Tabs from './_tabs.svelte';
+
   export let workflow: WorkflowExecution;
   export let namespace: string;
 </script>
 
-<header class="flex flex-col justify-between mb-2">
-  <main class="px-6">
+<header class="flex flex-col justify-between">
+  <main class="px-6 mb-2">
     <div class="flex m-0 mt-6 justify-between items-center">
       <h1 class="text-lg">
         <a href={`/namespaces/${namespace}/workflows`}>
@@ -30,6 +32,7 @@
       {workflow.id}
     </p>
   </main>
+  <Tabs />
 </header>
 
 <style lang="postcss">

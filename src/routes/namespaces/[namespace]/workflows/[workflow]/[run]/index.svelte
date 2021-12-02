@@ -23,7 +23,6 @@
   import PendingActivities from './_pending-activities.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
   import Event from './_event.svelte';
-  import Tabs from './_tabs.svelte';
 
   export let workflow: WorkflowExecution;
   export let events: HistoryEvent[];
@@ -34,7 +33,6 @@
 </script>
 
 <div class="execution-information px-6 py-6">
-  <Tabs />
   <div class="flex w-full mt-4">
     <PendingActivities activities={pendingActivities} />
   </div>
