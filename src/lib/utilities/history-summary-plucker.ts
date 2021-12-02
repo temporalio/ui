@@ -49,7 +49,7 @@ const summaryExtractors = {
     Workflow: d,
   }),
   TimerStarted: (d) => ({
-    'Fire Timeout': d.startToFireTimeout?.duration,
+    'Fire Timeout': d.startToFireTimeout,
     'Timer ID': d.timerId,
   }),
   WorkflowExecutionStarted: (d) => {
@@ -79,15 +79,9 @@ const summaryExtractors = {
   ChildWorkflowExecutionFailed: (d) => ({ message: d.failure?.message }),
 };
 
-const isKnownEventType = (eventType) => {
-  return eventType in summaryExtractors;
-};
-
 const getHistorySummary = (event) => {
   const eventDetails = findValueIfItIncludesWord(event, 'EventAttributes');
-  return isKnownEventType(event.eventType)
-    ? summaryExtractors[event.eventType](eventDetails)
-    : eventDetails;
+  return summaryExtractors[event.eventType](eventDetails) ?? eventDetails;
 };
 
 export { getHistorySummary };
