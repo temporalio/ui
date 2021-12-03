@@ -18,7 +18,7 @@
     class:active={pathMatches(workflowUrl, $page.path, true)}
     href={workflowUrl}
   >
-    History <span class="inline bg-historyText text-historybg px-2"
+    History <span class="inline bg-historyText text-historyBg px-2"
       >{historyEvents}</span
     >
   </a>
