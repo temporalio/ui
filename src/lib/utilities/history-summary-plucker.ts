@@ -1,87 +1,80 @@
-import { findValueIfItIncludesWord } from './find-value-if-it-includes-word';
+import { getComponentForEventType } from './get-component-for-event-type';
 
 const summaryExtractors = {
-  ActivityTaskCancelRequested: (d) => ({ Id: d.activityId }),
-  ActivityTaskCompleted: (d) => ({ result: d.result }),
-  ActivityTaskFailed: (d) => ({
-    details: d.details,
-    reason: d.reason,
+  ActivityTaskCancelRequested: ({ activityId }) => ({ activityId }),
+  ActivityTaskCompleted: ({ result }) => ({ result }),
+  ActivityTaskFailed: ({ detail, reason }) => ({ detail, reason }),
+  ActivityTaskScheduled: ({
+    startToCloseTimeout,
+    activityId,
+    input,
+    activity,
+  }) => ({ startToCloseTimeout, activityId, input, activity }),
+  ActivityTaskStarted: ({ attempt, identity, requestId }) => ({
+    attempt,
+    identity,
+    requestId,
   }),
-  ActivityTaskScheduled: (d) => ({
-    'Close Timeout': d.startToCloseTimeout,
-    Id: d.activityId,
-    input: d.input,
-    Name: d.activityType.name,
+  ActivityTaskTimedOut: ({ failure }) => ({ failure }),
+  ChildWorkflowExecutionCompleted: ({ result }) => ({ result }),
+  ChildWorkflowExecutionStarted: (eventAttrs) => eventAttrs,
+  WorkflowTaskCompleted: ({ identity }) => ({ identity }),
+  WorkflowTaskScheduled: ({ taskQueue, startToCloseTimeout }) => ({
+    taskQueue,
+    startToCloseTimeout,
   }),
-  ActivityTaskStarted: (d) => ({
-    attempt: d.attempt,
-    identity: d.identity,
-    requestId: d.requestId,
+  WorkflowTaskStarted: ({ requestId }) => ({ requestId }),
+  WorkflowTaskTimedOut: ({ timeoutType }) => ({ timeoutType }),
+  ExternalWorkflowExecutionSignaled: (eventAttrs) => eventAttrs,
+  StartChildWorkflowExecutionInitiated: ({
+    input,
+    taskQueue,
+    workflowType,
+  }) => ({
+    input,
+    Taskqueue: taskQueue.name,
+    Workflow: workflowType.name,
   }),
-  ActivityTaskTimedOut: (d) => ({
-    'Timeout Type': d.failure?.timeoutFailureInfo?.timeoutType,
+  SignalExternalWorkflowExecutionInitiated: ({ input, signalName }) => ({
+    input,
+    signalName,
   }),
-  ChildWorkflowExecutionCompleted: (d) => ({
-    result: d.result,
-    Workflow: d,
+  TimerStarted: ({ startToFireTimeout, timerId }) => ({
+    startToFireTimeout,
+    timerId,
   }),
-  ChildWorkflowExecutionStarted: (d) => ({
-    Workflow: d,
+  WorkflowExecutionStarted: ({
+    workflowRunTimeout,
+    identity,
+    input,
+    workflowType,
+  }) => ({
+    workflowRunTimeout,
+    identity,
+    input,
+    workflowType: workflowType?.name ?? '',
   }),
-  WorkflowTaskCompleted: (d) => ({ identity: d.identity }),
-  WorkflowTaskScheduled: (d) => ({
-    Taskqueue: d.taskQueue.name,
-    Timeout: d.startToCloseTimeout,
+  WorkflowExecutionCompleted: ({ result, newExecutionRunId }) => ({
+    result,
+    newExecutionRunId,
   }),
-  WorkflowTaskStarted: (d) => ({ requestId: d.requestId }),
-  WorkflowTaskTimedOut: (d) => ({ 'Timeout Type': d.timeoutType }),
-  ExternalWorkflowExecutionSignaled: (d) => ({
-    Workflow: d,
+  WorkflowExecutionFailed: ({ failure, newExecutionRunId }) => ({
+    message: failure?.message ?? '',
+    newExecutionRunId,
   }),
-  StartChildWorkflowExecutionInitiated: (d) => ({
-    input: d.input,
-    Taskqueue: d.taskQueue.name,
-    Workflow: d.workflowType.name,
+  WorkflowExecutionTimedOut: ({ retryState, newExecutionRunId }) => ({
+    retryState,
+    newExecutionRunId,
   }),
-  SignalExternalWorkflowExecutionInitiated: (d) => ({
-    input: d.input,
-    signal: d.signalName,
-    Workflow: d,
+  WorkflowTaskFailed: ({ failure }) => ({ message: failure?.message ?? '' }),
+  ChildWorkflowExecutionFailed: ({ failure }) => ({
+    message: failure?.message ?? '',
   }),
-  TimerStarted: (d) => ({
-    'Fire Timeout': d.startToFireTimeout,
-    'Timer ID': d.timerId,
-  }),
-  WorkflowExecutionStarted: (d) => {
-    const summary = {
-      'Close Timeout': d.workflowRunTimeout,
-      identity: d.identity,
-      input: d.input,
-      Parent: undefined,
-      Workflow: d.workflowType ? d.workflowType.name : '',
-    };
-
-    return summary;
-  },
-  WorkflowExecutionCompleted: (d) => ({
-    result: d.result,
-    newExecutionRunId: d.newExecutionRunId || undefined,
-  }),
-  WorkflowExecutionFailed: (d) => ({
-    message: d.failure?.message,
-    newExecutionRunId: d.newExecutionRunId || undefined,
-  }),
-  WorkflowExecutionTimedOut: (d) => ({
-    retryState: d.retryState,
-    newExecutionRunId: d.newExecutionRunId || undefined,
-  }),
-  WorkflowTaskFailed: (d) => ({ message: d.failure?.message }),
-  ChildWorkflowExecutionFailed: (d) => ({ message: d.failure?.message }),
 };
 
-const getHistorySummary = (event) => {
-  const eventDetails = findValueIfItIncludesWord(event, 'EventAttributes');
-  return summaryExtractors[event.eventType](eventDetails) ?? eventDetails;
+export const getHistorySummary = (event) => {
+  return (
+    summaryExtractors[event.eventType](getComponentForEventType(event)) ??
+    getComponentForEventType(event)
+  );
 };
-
-export { getHistorySummary };
