@@ -30,17 +30,17 @@
   <NamespaceSelect />
   <div class="flex flex-row justify-center items-center">
     {#if $decryptPort}
-      {#if $lastDecryptStatus === null}
+      {#if $lastDecryptStatus === 'notRequested'}
         <Tooltip text={'Decryption is on but has not decrypted a payload'}>
           <Icon src={StatusOffline} class="mx-auto text-gray-400 w-8 h-8" />
         </Tooltip>
-      {:else if $lastDecryptStatus === false}
+      {:else if $lastDecryptStatus === 'error'}
         <Tooltip
           text={'Decryption is on last message decryption was a failure'}
         >
           <Icon src={StatusOffline} class="mx-auto text-red-400 w-8 h-8" />
         </Tooltip>
-      {:else if $lastDecryptStatus == true}
+      {:else if $lastDecryptStatus === 'success'}
         <Tooltip text={'Decryption is on but last decryption was a success'}>
           <Icon src={StatusOnline} class="mx-auto text-green-500 w-8 h-8" />
         </Tooltip>

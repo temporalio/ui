@@ -3,32 +3,27 @@ import { writable } from 'svelte/store';
 
 export const decryptPort = persistStore('port', null);
 
-// An enum or string union may be more appropriate here so we dont' get a
-// if thing and the falsiness evaluates to the null case, but start with this
-export const lastDecryptStatus = writable<null | boolean>(null);
+type DecryptStatus = 'notRequested' | 'success' | 'error';
+export const lastDecryptStatus = writable<DecryptStatus>('notRequested');
 
 export const portNumber = writable<null | number>(null);
 
-export function lastDecryptFailure() {
-  lastDecryptStatus.set(false);
+export function setLastDecryptFailure() {
+  lastDecryptStatus.set('error');
 }
 
-export function lastDecryptSuccess() {
-  lastDecryptStatus.set(true);
+export function setLastDecryptSuccess() {
+  lastDecryptStatus.set('success');
 }
 
 export function persistStore(name, initialValue) {
+  let initialStoreValue = initialValue;
   if (browser) {
-    if (window?.localStorage) {
-      const storedValue = window.localStorage.getItem(name);
-
-      if (storedValue) {
-        initialValue = storedValue;
-      }
-    }
+    initialStoreValue =
+      window?.localStorage?.getItem(name) ?? initialStoreValue;
   }
 
-  const { subscribe, set } = writable(initialValue);
+  const { subscribe, set } = writable(initialStoreValue);
 
   return {
     subscribe,
