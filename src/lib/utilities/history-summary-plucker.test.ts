@@ -3,25 +3,20 @@ import { getHistorySummary } from './history-summary-plucker';
 describe(getHistorySummary, () => {
   it('should return back unchanged ev', () => {
     const event = {
-      workflowExecutionStartedEventAttributes: {
-        attempt: 1,
-        workflowRunTimeout: '100s',
-        identity: 'some identity',
-        input: 'true',
-        Parent: undefined,
-        workflowType: {
-          name: 'Rainbow Workflow',
-        },
+      "eventId": "11",
+      "eventTime": "2021-12-02T21:51:06.992475543Z",
+      "eventType": "WorkflowExecutionCompleted",
+      "version": "0",
+      "taskId": "1048850",
+      "workflowExecutionCompletedEventAttributes": {
+          "result": null,
+          "workflowTaskCompletedEventId": "10"
       },
-      eventType: 'WorkflowExecutionStarted',
-    };
+      "id": "11"
+  }
 
     expect(getHistorySummary(event)).toStrictEqual({
-      'Close Timeout': '100s',
-      identity: 'some identity',
-      input: 'true',
-      Parent: undefined,
-      Workflow: 'Rainbow Workflow',
+      result: null
     });
   });
 });
