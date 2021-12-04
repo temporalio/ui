@@ -1,4 +1,54 @@
+type EventType = [
+  | 'WorkflowExecutionStarted'
+  | 'WorkflowExecutionCompleted'
+  | 'WorkflowExecutionFailed'
+  | 'WorkflowExecutionTimedOut'
+  | 'WorkflowTaskScheduled'
+  | 'WorkflowTaskStarted'
+  | 'WorkflowTaskCompleted'
+  | 'WorkflowTaskTimedOut'
+  | 'WorkflowTaskFailed'
+  | 'ActivityTaskScheduled'
+  | 'ActivityTaskStarted'
+  | 'ActivityTaskCompleted'
+  | 'ActivityTaskFailed'
+  | 'ActivityTaskTimedOut'
+  | 'TimerStarted'
+  | 'TimerFired'
+  | 'ActivityTaskCancelRequested'
+  | 'ActivityTaskCanceled'
+  | 'TimerCanceled'
+  | 'MarkerRecorded'
+  | 'WorkflowExecutionSignaled'
+  | 'WorkflowExecutionTerminated'
+  | 'WorkflowExecutionCancelRequested'
+  | 'WorkflowExecutionCanceled'
+  | 'RequestCancelExternalWorkflowExecutionInitiated'
+  | 'RequestCancelExternalWorkflowExecutionFailed'
+  | 'ExternalWorkflowExecutionCancelRequested'
+  | 'WorkflowExecutionContinuedAsNew'
+  | 'StartChildWorkflowExecutionInitiated'
+  | 'StartChildWorkflowExecutionFailed'
+  | 'ChildWorkflowExecutionStarted'
+  | 'ChildWorkflowExecutionCompleted'
+  | 'ChildWorkflowExecutionFailed'
+  | 'ChildWorkflowExecutionCanceled'
+  | 'ChildWorkflowExecutionTimedOut'
+  | 'ChildWorkflowExecutionTerminated'
+  | 'SignalExternalWorkflowExecutionInitiated'
+  | 'SignalExternalWorkflowExecutionFailed'
+  | 'ExternalWorkflowExecutionSignaled'
+  | 'UpsertWorkflowSearchEventAttributes',
+];
+
 type HistoryEvent = import('$types').HistoryEvent;
+
+type WorkflowEvent = Omit<HistoryEvent, 'eventType'> & {
+  id: string;
+  eventType: EventType;
+  attributes: EventAttributes;
+};
+
 type WorkflowExecutionStartedEventAttributes =
   import('$types').WorkflowExecutionStartedEventAttributes;
 type WorkflowExecutionCompletedEventAttributes =
@@ -169,3 +219,32 @@ type ExternalWorkflowExecutionSignaledEvent = BaseEvent &
   Pick<HistoryEvent, 'externalWorkflowExecutionSignaledEventAttributes'>;
 type UpsertWorkflowSearchAttributesEvent = BaseEvent &
   Pick<HistoryEvent, 'upsertWorkflowSearchAttributesEventAttributes'>;
+
+type EventAttributeKeys =
+  | 'activityTaskCancelRequestedEventAttributes'
+  | 'activityTaskCompletedEventAttributes'
+  | 'activityTaskFailedEventAttributes'
+  | 'activityTaskScheduledEventAttributes'
+  | 'activityTaskStartedEventAttributes'
+  | 'activityTaskTimedOutEventAttributes'
+  | 'childWorkflowExecutionCompletedEventAttributes'
+  | 'childWorkflowExecutionStartedEventAttributes'
+  | 'workflowTaskCompletedEventAttributes'
+  | 'workflowTaskScheduledEventAttributes'
+  | 'workflowTaskStartedEventAttributes'
+  | 'workflowTaskTimedOutEventAttributes'
+  | 'externalWorkflowExecutionSignaledEventAttributes'
+  | 'startChildWorkflowExecutionInitiatedEventAttributes'
+  | 'signalExternalWorkflowExecutionInitiatedEventAttributes'
+  | 'timerStartedEventAttributes'
+  | 'workflowExecutionStartedEventAttributes'
+  | 'workflowExecutionCompletedEventAttributes'
+  | 'workflowExecutionFailedEventAttributes'
+  | 'workflowExecutionTimedOutEventAttributes'
+  | 'workflowTaskFailedEventAttributes'
+  | 'childWorkflowExecutionFailedEventAttributes';
+
+type EventAttributes = Pick<HistoryEvent, EventAttributeKeys>[keyof Pick<
+  HistoryEvent,
+  EventAttributeKeys
+>];
