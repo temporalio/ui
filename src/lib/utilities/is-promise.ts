@@ -1,8 +1,8 @@
-export function isPromise(promiseTentially: any): Boolean {
+export function isPromise(obj: any): obj is Promise<unknown> {
   if (
-    typeof promiseTentially?.then === 'function' &&
-    typeof promiseTentially?.catch === 'function' &&
-    typeof promiseTentially?.finally === 'function'
+    typeof obj?.then === 'function' &&
+    typeof obj?.catch === 'function' &&
+    typeof obj?.finally === 'function'
   ) {
     return true;
   }

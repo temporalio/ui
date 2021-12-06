@@ -7,11 +7,11 @@
   import { page } from '$app/stores';
   import { notifications } from '$lib/stores/notifications';
   import { onMount } from 'svelte';
-  import { webDecoderPort } from '$lib/stores/web-decoder-config';
+  import { dataConverterPort } from '$lib/stores/data-converter-config';
   onMount(() => {
     let { port } = $page.params;
-    webDecoderPort.set(port);
-    goto('/');
+    dataConverterPort.set(port);
+    goto('/', { replaceState: true });
     notifications.add('success', 'Successfully set decoder');
   });
 </script>

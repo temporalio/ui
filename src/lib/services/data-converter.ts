@@ -1,13 +1,13 @@
 import type { HistoryEventWithId } from '$lib/models/event-history';
 import {
-  setLastWebDecoderFailure,
-  setLastWebDecoderSuccess,
-} from '$lib/stores/web-decoder-config';
+  setLastDataConverterFailure,
+  setLastDataConverterSuccess,
+} from '$lib/stores/data-converter-config';
 import type { Payload } from '$types';
 
 import WebSocketAsPromised from 'websocket-as-promised';
 
-export const webDecodeEventPayloads = async (
+export const convertEventPayloadFromDataConverter = async (
   events: any[],
   port: string | null,
 ) => {
@@ -22,13 +22,12 @@ export const webDecodeEventPayloads = async (
       extractRequestId: (data) => data && data.requestId,
     });
   } catch (err) {
-    setLastWebDecoderFailure();
+    setLastDataConverterFailure();
     return Promise.reject(err);
   }
 
   try {
     await sock.open();
-    console.log('opened', sock);
     const requests = [];
 
     events.forEach((event: HistoryEventWithId) => {
@@ -46,8 +45,6 @@ export const webDecodeEventPayloads = async (
           break;
       }
 
-      console.log({ payloads });
-
       payloads.forEach((payload, i) => {
         requests.push(
           sock
@@ -56,11 +53,11 @@ export const webDecodeEventPayloads = async (
               let currentPayload = null;
               try {
                 currentPayload = JSON.parse(response.content);
-                setLastWebDecoderSuccess();
+                setLastDataConverterSuccess();
               } catch {
                 // This doesn't seem to be a failure the worker _could_ send back a text response
                 currentPayload = response.content;
-                setLastWebDecoderFailure();
+                setLastDataConverterFailure();
               }
               switch (event.attributes.type) {
                 case 'activityTaskCompletedEventAttributes':
@@ -78,9 +75,8 @@ export const webDecodeEventPayloads = async (
     });
     await Promise.all(requests);
   } catch (err) {
-    console.log(err);
     const message = `Unable to convert event payload: ${err}`;
-    setLastWebDecoderFailure();
+    setLastDataConverterFailure();
     return Promise.reject({ message });
   } finally {
     if (sock.isOpened) {
