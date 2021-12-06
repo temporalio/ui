@@ -6,8 +6,6 @@ export const decryptPort = persistStore('port', null);
 type DecryptStatus = 'notRequested' | 'success' | 'error';
 export const lastDecryptStatus = writable<DecryptStatus>('notRequested');
 
-export const portNumber = writable<null | number>(null);
-
 export function setLastDecryptFailure() {
   lastDecryptStatus.set('error');
 }
@@ -16,11 +14,12 @@ export function setLastDecryptSuccess() {
   lastDecryptStatus.set('success');
 }
 
-export function persistStore(name, initialValue) {
+export function persistStore(name: string, initialValue: string | null = '') {
   let initialStoreValue = initialValue;
   if (browser) {
     initialStoreValue =
-      window?.localStorage?.getItem(name) ?? initialStoreValue;
+      JSON.parse(window?.localStorage?.getItem(name) ?? '{}') ??
+      initialStoreValue;
   }
 
   const { subscribe, set } = writable(initialStoreValue);
@@ -28,11 +27,9 @@ export function persistStore(name, initialValue) {
   return {
     subscribe,
 
-    set: (x) => {
+    set: (x: string | null) => {
       if (browser) {
-        if (window?.localStorage) {
-          window.localStorage.setItem(name, x);
-        }
+        window?.localStorage?.setItem(name, JSON.stringify(x));
       }
       set(x);
     },
