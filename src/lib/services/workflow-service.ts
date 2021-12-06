@@ -12,7 +12,6 @@ import { toEventHistory } from '$lib/models/event-history';
 import type { ListWorkflowExecutionsResponse } from '$types';
 import type { WorkflowExecution } from '$lib/models/workflow-execution';
 import type { HistoryEventWithId } from '$lib/models/event-history';
-import { getStatusFilterCode } from '$lib/utilities/get-workflow-status-filter-code';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   executionId: string;
@@ -24,11 +23,9 @@ type CombinedWorkflowExecutionsResponse = {
   nextPageTokens: NextPageTokens;
 };
 
-type TimeRangeParameter = {
+type WorkflowType = 'open' | 'closed';
+type VisibilityParameters = {
   timeRange?: Duration | string;
-};
-
-type StatusParameters = {
   status?: WorkflowStatus;
 };
 
@@ -38,20 +35,14 @@ const createDate = (timeRange: Duration | string) => {
   return formatISO(sub(new Date(), duration));
 };
 
-const emptyWorkflowRequest = (): Promise<ListWorkflowExecutionsResponse> => {
-  return Promise.resolve({
-    executions: [],
-  });
-};
-
-export const fetchOpenWorkflows = (
+export const fetchWorkflowsByType = (
   namespace: string,
-  { timeRange, status }: TimeRangeParameter & StatusParameters,
+  type: WorkflowType,
+  { timeRange }: VisibilityParameters,
   request = fetch,
 ): Promise<ListWorkflowExecutionsResponse> => {
-  if (status && status !== 'Running') return emptyWorkflowRequest();
   return requestFromAPI<ListWorkflowExecutionsResponse>(
-    `/namespaces/${namespace}/workflows/open`,
+    `/namespaces/${namespace}/workflows/${type}`,
     {
       params: {
         'start_time_filter.earliest_time': createDate(
@@ -63,39 +54,16 @@ export const fetchOpenWorkflows = (
   );
 };
 
-export const fetchClosedWorkflows = (
-  namespace: string,
-  { timeRange, status }: TimeRangeParameter & StatusParameters,
-  request = fetch,
-): Promise<ListWorkflowExecutionsResponse> => {
-  if (status === 'Running') return emptyWorkflowRequest();
-
-  const params: Record<string, string> = {
-    'start_time_filter.earliest_time': createDate(timeRange || { hours: 24 }),
-  };
-
-  const statusFilter = getStatusFilterCode(status);
-
-  if (statusFilter) params['status_filter.status'] = statusFilter;
-
-  return requestFromAPI<ListWorkflowExecutionsResponse>(
-    `/namespaces/${namespace}/workflows/closed`,
-    {
-      params,
-      request,
-    },
-  );
-};
-
 export const fetchAllWorkflows = async (
   namespace: string,
-  { timeRange, status }: TimeRangeParameter & StatusParameters,
+  parameters: VisibilityParameters,
   request = fetch,
 ): Promise<CombinedWorkflowExecutionsResponse> => {
   const [open, closed] = await Promise.all([
-    fetchOpenWorkflows(namespace, { timeRange, status }, request),
-    fetchClosedWorkflows(namespace, { timeRange, status }, request),
+    fetchWorkflowsByType(namespace, 'open', parameters, request),
+    fetchWorkflowsByType(namespace, 'closed', parameters, request),
   ]);
+
   const executions = [...open?.executions, ...closed?.executions];
 
   return {
