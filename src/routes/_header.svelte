@@ -15,6 +15,13 @@
 
 <script lang="ts">
   import { namespace } from '$lib/stores/namespace';
+  import { StatusOnline, StatusOffline } from 'svelte-hero-icons';
+  import {
+    webDecoderPort,
+    lastDecoderstatus,
+  } from '$lib/stores/web-decoder-config';
+  import Icon from 'svelte-hero-icons/Icon.svelte';
+  import Tooltip from '$lib/components/tooltip.svelte';
 
   export let user: { name?: string; email?: string; picture?: string } = {};
 </script>
@@ -25,6 +32,21 @@
 >
   <NamespaceSelect />
   <div class="flex flex-row justify-center items-center">
+    {#if $webDecoderPort}
+      {#if $lastDecoderstatus === 'notRequested'}
+        <Tooltip text={'Web decoder is ready'}>
+          <Icon src={StatusOffline} class="mx-auto text-gray-400 w-8 h-8" />
+        </Tooltip>
+      {:else if $lastDecoderstatus === 'error'}
+        <Tooltip text={`Web decoder couldn't connect to the remote decoder`}>
+          <Icon src={StatusOffline} class="mx-auto text-red-400 w-8 h-8" />
+        </Tooltip>
+      {:else if $lastDecoderstatus === 'success'}
+        <Tooltip text={'Web decoder succesfully decoded'}>
+          <Icon src={StatusOnline} class="mx-auto text-green-500 w-8 h-8" />
+        </Tooltip>
+      {/if}
+    {/if}
     <a href="https://github.com/temporalio/web/issues/new/choose">
       Report Bug/Give Feedback
     </a>

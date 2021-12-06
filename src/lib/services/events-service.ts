@@ -20,6 +20,10 @@ export const fetchEvents = async (
         {
           token,
           request,
+          // This rawPayloads parameter should be true/false depending on
+          // if we're decoding stuff in the payload
+          // TODO: finish this
+          params: { rawPayloads: JSON.stringify(true) },
         },
       );
     },

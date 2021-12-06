@@ -113,6 +113,9 @@ export type PendingActivityInfo = temporal.api.workflow.v1.IPendingActivityInfo;
 export type WorkflowExecutionInfo =
   temporal.api.workflow.v1.IWorkflowExecutionInfo;
 
+// api response
+export type Payload = temporal.api.common.v1.IPayload;
+
 // api.taskqueue
 
 export type PollerInfo = temporal.api.taskqueue.v1.IPollerInfo;
