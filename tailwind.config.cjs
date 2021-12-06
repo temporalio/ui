@@ -5,8 +5,6 @@ const TemporalColors = {
   secondary: '#64748b',
   // Custom Colors
   primaryText: '#141414',
-  historyBg: '#DCE4FB',
-  historyText: '#124AE5',
   spaceGray: { DEFAULT: '#141414' },
   offWhite: '#F2F2F2',
   white: '#ffffff',

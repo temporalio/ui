@@ -18,9 +18,7 @@
     class:active={pathMatches(workflowUrl, $page.path, true)}
     href={workflowUrl}
   >
-    History <span class="inline bg-historyText text-historyBg px-2"
-      >{historyEvents}</span
-    >
+    History <span class="inline px-2">{historyEvents}</span>
   </a>
 </nav>
 
@@ -31,5 +29,10 @@
 
   a.active {
     @apply border-b-2 rounded-b-sm border-primary font-medium;
+  }
+
+  span {
+    background-color: #dce4fb;
+    color: #124ae5;
   }
 </style>
