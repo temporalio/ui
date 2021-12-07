@@ -40,7 +40,7 @@
 </script>
 
 <section class="flex items-start">
-  <div class="w-full h-screen overflow-scroll">
+  <div class="workflow-container w-full h-screen overflow-hidden">
     <header>
       <WorkflowFilters bind:timeFormat />
     </header>
@@ -61,3 +61,16 @@
     {/await}
   </div>
 </section>
+
+<style lang="postcss">
+  .workflow-container {
+    margin: 0 2rem;
+  }
+
+  tbody {
+    display: block;
+    height: calc(100vh - 270px);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+</style>
