@@ -10,8 +10,12 @@
   <h2>{event.eventType}</h2>
   <div class="flex flex-row items-center event">
     {#each Object.entries(summaryEvent.attributes) as [event, value]}
-      {#if value !== null}
-        <p>{event} <span>{value}</span></p>
+      {#if value}
+        {#if typeof value === 'object'}
+          <p>{event} <span>{JSON.stringify(value)}</span></p>
+        {:else}
+          <p>{event} <span>{value}</span></p>
+        {/if}
       {/if}
     {/each}
   </div>
