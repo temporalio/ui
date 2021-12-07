@@ -1,94 +1,37 @@
 <script lang="ts">
-  import { getComponentForEventType } from '$lib/utilities/get-component-for-event-type';
-  import { formatDate } from '$lib/utilities/format-date';
   import type { HistoryEvent } from '$types';
-  import ExecutionInformation from './_execution-information.svelte';
-  import CodeBlock from '$lib/components/code-block.svelte';
+  import { getAttributesFromEvent } from '$lib/utilities/get-attributes-from-event';
 
   export let event: HistoryEvent;
-  export let index: number;
-
-  let even = !(index % 2);
-  $: isJSONView = false;
-  $: isIdJSONView = false;
-  $: isEventTypeJSONView = false;
-  $: isTimeJSONView = false;
-  $: isDetailsJSONView = false;
+  const summaryEvent = getAttributesFromEvent(event);
 </script>
 
-<tr class:even>
-  <td on:click={() => (isIdJSONView = !isIdJSONView)}>
-    {#if isIdJSONView}
-      <CodeBlock content={event.eventId} />
-    {:else}
-      {event.eventId}
-    {/if}
-  </td>
-  <td on:click={() => (isEventTypeJSONView = !isEventTypeJSONView)}>
-    {#if isEventTypeJSONView}
-      <CodeBlock content={event.eventType} />
-    {:else}
-      {event.eventType}
-    {/if}
-  </td>
-  <td on:click={() => (isTimeJSONView = !isTimeJSONView)}>
-    {#if isTimeJSONView}
-      <CodeBlock content={event.eventTime} />
-    {:else}
-      {formatDate(event.eventTime)}
-    {/if}</td
-  >
-  <td on:click={() => (isDetailsJSONView = !isDetailsJSONView)} class="w-1/2">
-    {#if isDetailsJSONView}
-      <CodeBlock
-        content={{
-          version: event.version,
-          TaskId: event.taskId,
-        }}
-      />
-    {:else}
-      <div class="flex">
-        <ExecutionInformation title="Version" value={event.version} />
-        <ExecutionInformation title="Task ID" value={event.taskId} />
-      </div>
-    {/if}
-
-    <button
-      on:click={(e) => {
-        e.stopPropagation();
-        isJSONView = !isJSONView;
-      }}>{!isJSONView ? 'GRID' : 'JSON'} VIEW</button
-    >
-
-    {#if isJSONView}
-      <CodeBlock content={event} />
-    {:else}
-      <svelte:component this={getComponentForEventType(event)} {event} />
-    {/if}
-  </td>
-</tr>
+<div class="flex flex-row event-box border-2 p-4 rounded-lg justify-between">
+  <h2>{event.eventType}</h2>
+  <div class="flex flex-row items-center event">
+    {#each Object.entries(summaryEvent.attributes) as [event, value]}
+      {#if value !== null}
+        <p>{event} <span>{value}</span></p>
+      {/if}
+    {/each}
+  </div>
+</div>
 
 <style lang="postcss">
-  td {
-    vertical-align: top;
-    cursor: pointer;
-    @apply p-4 overflow-x-scroll;
+  .event-box {
+    margin: 1rem 0;
   }
 
-  .even {
-    @apply bg-gray-100;
+  .event {
+    width: 70%;
   }
 
-  button {
-    font-weight: bold;
-    text-align: center;
-    background: #343436;
-    color: #fff;
-    height: 25px;
-    width: 15%;
+  span {
+    @apply bg-gray-300 p-1;
   }
 
-  button:hover {
-    @apply bg-purple-400;
+  p {
+    @apply text-sm;
+    margin: 0 1rem;
   }
 </style>
