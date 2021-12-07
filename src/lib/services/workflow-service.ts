@@ -125,22 +125,24 @@ export async function fetchWorkflowWithEventHistory(
   request = fetch,
 ): Promise<{ workflow: WorkflowExecution; events: HistoryEventWithId[] }> {
   let port = get(dataConverterPort);
-  // if port rawPayloads = true
 
   const [workflow, events] = await Promise.all([
     fetchWorkflow(parameters, request),
-    fetchEvents(parameters, request)
+    fetchEvents({ ...parameters, rawPayloads: Boolean(port) }, request)
       .then(toEventHistory)
       .then((events) => {
         if (port === null) {
-          return events;
+          return Promise.resolve(events);
         }
 
-        convertEventPayloadFromDataConverter(events, port).catch((error) => {
-          return events;
-        });
-
-        return events;
+        return convertEventPayloadFromDataConverter(events, port)
+          .then((events) => {
+            return Promise.resolve(events);
+          })
+          .catch((error) => {
+            // We were unable to convert the payload but we're happy to just show the old one.
+            return Promise.resolve(events);
+          });
       }),
   ]);
 

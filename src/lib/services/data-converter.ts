@@ -56,6 +56,7 @@ export const convertEventPayloadFromDataConverter = async (
                 setLastDataConverterSuccess();
               } catch {
                 // This doesn't seem to be a failure the worker _could_ send back a text response
+                // instead of JSON
                 currentPayload = response.content;
                 setLastDataConverterFailure();
               }
@@ -74,6 +75,7 @@ export const convertEventPayloadFromDataConverter = async (
       });
     });
     await Promise.all(requests);
+    return Promise.resolve(events);
   } catch (err) {
     const message = `Unable to convert event payload: ${err}`;
     setLastDataConverterFailure();

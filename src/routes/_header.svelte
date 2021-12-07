@@ -22,7 +22,6 @@
   } from '$lib/stores/data-converter-config';
   import Icon from 'svelte-hero-icons/Icon.svelte';
   import Tooltip from '$lib/components/tooltip.svelte';
-  console.log($dataConverterPort);
   export let user: { name?: string; email?: string; picture?: string } = {};
 </script>
 

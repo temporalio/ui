@@ -7,12 +7,27 @@ type FetchEvents = NamespaceScopedRequest &
   PaginationCallbacks<GetWorkflowExecutionHistoryResponse> & {
     executionId: string;
     runId: string;
+    rawPayloads?: boolean;
   };
 
 export const fetchEvents = async (
-  { namespace, executionId, runId, onStart, onUpdate, onComplete }: FetchEvents,
+  {
+    namespace,
+    executionId,
+    runId,
+    rawPayloads,
+    onStart,
+    onUpdate,
+    onComplete,
+  }: FetchEvents,
   request = fetch,
 ): Promise<GetWorkflowExecutionHistoryResponse> => {
+  let params = null;
+
+  if (rawPayloads) {
+    params = { params: { rawPayloads: JSON.stringify(true) } };
+  }
+
   const events: GetWorkflowExecutionHistoryResponse = await paginated(
     async (token: string) => {
       return requestFromAPI<GetWorkflowExecutionHistoryResponse>(
@@ -20,10 +35,7 @@ export const fetchEvents = async (
         {
           token,
           request,
-          // This rawPayloads parameter should be true/false depending on
-          // if we're decoding stuff in the payload
-          // TODO: finish this
-          params: { rawPayloads: JSON.stringify(true) },
+          ...params,
         },
       );
     },
