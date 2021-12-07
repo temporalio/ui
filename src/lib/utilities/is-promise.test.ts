@@ -8,35 +8,37 @@ describe(isPromise, () => {
   it('should return true if an object is a rejected promise', async () => {
     try {
       expect(isPromise(await Promise.reject().catch())).toBe(true);
-    } catch (er) {}
+    } catch (er) {
+      void 0;
+    }
   });
 
   it('should return true if an object is a promise', () => {
-    expect(isPromise(new Promise(() => {}))).toBe(true);
+    expect(isPromise(new Promise(() => void 0))).toBe(true);
   });
 
   it('should return false if an object is a function', () => {
-    expect(isPromise(() => {})).toBe(false);
+    expect(isPromise(() => void 0)).toBe(false);
   });
 
   it('should return false if an object is partially promise like with a .then', () => {
-    expect(isPromise({ then: () => {} })).toBe(false);
+    expect(isPromise({ then: () => void 0 })).toBe(false);
   });
 
   it('should return false if an object is partially promise like with a .catch', () => {
-    expect(isPromise({ catch: () => {} })).toBe(false);
+    expect(isPromise({ catch: () => void 0 })).toBe(false);
   });
 
   it('should return false if an object is partially promise like with a .finally', () => {
-    expect(isPromise({ finally: () => {} })).toBe(false);
+    expect(isPromise({ finally: () => void 0 })).toBe(false);
   });
 
   it('should return false if an object is promise like (contains .then, .catch. finally)', () => {
     expect(
       isPromise({
-        then: () => {},
-        catch: () => {},
-        finally: () => {},
+        then: () => void 0,
+        catch: () => void 0,
+        finally: () => void 0,
       }),
     ).toBe(false);
   });

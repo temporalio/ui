@@ -33,7 +33,7 @@
   <div class="flex flex-row justify-center items-center">
     {#if $dataConverterPort}
       {#if $lastDataConverterStatus === 'notRequested'}
-        <Tooltip text={'Data converter is ready'}>
+        <Tooltip text={'Data converter is configured'}>
           <Icon src={StatusOffline} class="mx-auto text-gray-400 w-8 h-8" />
         </Tooltip>
       {:else if $lastDataConverterStatus === 'error'}
@@ -43,7 +43,7 @@
           <Icon src={StatusOffline} class="mx-auto text-red-400 w-8 h-8" />
         </Tooltip>
       {:else if $lastDataConverterStatus === 'success'}
-        <Tooltip text={'Data converter succesfully decoded content'}>
+        <Tooltip text={'Data converter succesfully converted content'}>
           <Icon src={StatusOnline} class="mx-auto text-green-500 w-8 h-8" />
         </Tooltip>
       {/if}

@@ -8,9 +8,9 @@ import type { Payload } from '$types';
 import WebSocketAsPromised from 'websocket-as-promised';
 
 export const convertEventPayloadFromDataConverter = async (
-  events: any[],
+  events: HistoryEventWithId[],
   port: string | null,
-) => {
+): Promise<HistoryEventWithId[]> => {
   let sock = null;
 
   try {
@@ -45,7 +45,7 @@ export const convertEventPayloadFromDataConverter = async (
           break;
       }
 
-      payloads.forEach((payload, i) => {
+      payloads.forEach((payload) => {
         requests.push(
           sock
             .sendRequest({ payload: JSON.stringify(payload) })

@@ -1,5 +1,5 @@
 import { browser } from '$app/env';
-import { writable } from 'svelte/store';
+import { writable, Writable } from 'svelte/store';
 
 export const dataConverterPort = persistStore('port', null);
 
@@ -7,11 +7,11 @@ type DataConverterStatus = 'notRequested' | 'success' | 'error';
 export const lastDataConverterStatus =
   writable<DataConverterStatus>('notRequested');
 
-export function setLastDataConverterFailure() {
+export function setLastDataConverterFailure(): void {
   lastDataConverterStatus.set('error');
 }
 
-export function setLastDataConverterSuccess() {
+export function setLastDataConverterSuccess(): void {
   lastDataConverterStatus.set('success');
 }
 
