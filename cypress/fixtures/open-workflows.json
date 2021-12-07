@@ -1,0 +1,902 @@
+{
+  "executions": [
+    {
+      "execution": {
+        "workflowId": "7f25da_ContinuedAsNew",
+        "runId": "13404100-5df5-47c8-9386-ba51f98ab663"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:49.629Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:49.629Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "0dd61b_ContinuedAsNew",
+        "runId": "407e0f87-ba29-45ee-8fc0-fdaf8c61e472"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:48.558Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:48.558Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "99a3f2_ContinuedAsNew",
+        "runId": "0fa7801a-1773-4182-aff8-34bb521e2a23"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:48.043Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:48.043Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "51c5b3_ContinuedAsNew",
+        "runId": "aa56a48a-ab81-4bd3-bbf4-bfcd06c87819"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:47.862Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:47.862Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "9fe553_ContinuedAsNew",
+        "runId": "2d37ae23-9831-4e84-b85f-2a851a415b3f"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:47.617Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:47.617Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "032680_ContinuedAsNew",
+        "runId": "989ad923-a266-4647-9fc6-8f584db1cfc0"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:47.310Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:47.310Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "137bd9_ContinuedAsNew",
+        "runId": "57b56d6b-fff9-47bf-81f3-838c9cafc855"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:47.286Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:47.286Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "08b569_ContinuedAsNew",
+        "runId": "197de465-88a0-418c-9d62-c48a2e71cbb3"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:47.027Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:47.027Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "c64201_ContinuedAsNew",
+        "runId": "898a37e8-5b46-4933-8929-a20231cc4e29"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:46.740Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:46.740Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "b1b6d5_ContinuedAsNew",
+        "runId": "df86906e-fdd6-4ead-b59e-a4e95ed872de"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:46.654Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:46.654Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "7f25da_Failed",
+        "runId": "65ba1dc8-1de4-49bd-8bc0-9e4d4e367184"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:45.333Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:45.333Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "7f25da_Completed",
+        "runId": "caeedda8-3227-4a0d-ae3e-efcc6d5a30af"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:45.324Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:45.324Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "7f25da_Running",
+        "runId": "fbf53f4d-97f1-4662-9af9-ff82916215d2"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:45.318Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:45.318Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "137bd9_Completed",
+        "runId": "e73b57fc-fef4-4b4a-a620-b27e95fee65c"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:45.222Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:45.222Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "137bd9_Running",
+        "runId": "6b1ae3a9-1347-4490-94e0-1b0c78184bf4"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:45.213Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:45.213Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "0dd61b_Failed",
+        "runId": "126e59b8-5d7a-4b83-b86c-41fca02fc224"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:45.135Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:45.135Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "0dd61b_Completed",
+        "runId": "07d2d948-f7ff-43f8-ba1e-0f1916fb1f8a"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:45.123Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:45.123Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "0dd61b_Running",
+        "runId": "ad04bc90-244f-49bc-a0be-1249e9015121"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:45.106Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:45.106Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "9fe553_Failed",
+        "runId": "504b8ccb-7974-4fa7-971d-822b9fd18c81"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:44.981Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:44.981Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "9fe553_Completed",
+        "runId": "4f2d7235-c53b-415e-95f5-20b692e22343"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:44.970Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:44.970Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "9fe553_Running",
+        "runId": "66352445-c97a-4752-a9a3-30a85ad884da"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:44.955Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:44.955Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "99a3f2_Failed",
+        "runId": "b461f346-0a32-49ce-b6f0-6c7a9b5ba6f7"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:44.874Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:44.874Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "99a3f2_Completed",
+        "runId": "fa11f6d0-e518-40ec-90b6-cdf089f5929c"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:44.865Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:44.865Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "99a3f2_Running",
+        "runId": "df3deffa-fa8b-4d33-b483-582082f5d120"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:44.857Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:44.857Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "51c5b3_Failed",
+        "runId": "7e00cf41-728f-402a-8c2d-cf260d6c4ed7"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:44.744Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:44.744Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "51c5b3_Completed",
+        "runId": "b9b91e9e-55cf-4875-bf70-9dc35bfb63ae"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:44.715Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:44.715Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "51c5b3_Running",
+        "runId": "032834e3-77ea-499b-85f8-2d1b4f9b1f01"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:44.698Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:44.698Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "b1b6d5_Failed",
+        "runId": "c96f7941-8e5b-4344-b34c-9e7c3ed36276"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:44.576Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:44.576Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "b1b6d5_Completed",
+        "runId": "23a40a30-660a-45f3-88d2-54f3d6c85e73"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:44.553Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:44.553Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "b1b6d5_Running",
+        "runId": "8cd3ae02-c4c3-462d-a18e-9f0716e6060a"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:44.545Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:44.545Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "08b569_Failed",
+        "runId": "17c8483f-ab3c-4b5b-9e32-357c9238dc94"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:44.440Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:44.440Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "08b569_Completed",
+        "runId": "cf985fbe-0bcc-483f-81dc-7e6f2e423493"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:44.417Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:44.417Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "08b569_Running",
+        "runId": "745baefa-b134-45eb-b371-da5f66527485"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:44.409Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:44.409Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "c64201_Failed",
+        "runId": "b89c66e9-0d20-48f5-ae48-3acf4231b803"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:44.327Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:44.327Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "c64201_Completed",
+        "runId": "fd0939b1-e1ad-451f-a1bf-962d62b09b0f"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:44.318Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:44.318Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "c64201_Running",
+        "runId": "63d408f5-8da2-4180-bb5d-efecf900d4fc"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:44.304Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:44.304Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "032680_Failed",
+        "runId": "8fa857c1-04b8-491b-ab6b-fb023eaac9ac"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:44.201Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:44.201Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "032680_Completed",
+        "runId": "b40e3f39-683f-4b10-b1e3-036c937ea513"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:44.193Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:44.193Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "032680_Running",
+        "runId": "b3a1ccfe-06a8-4b0b-bd5a-066675f2ec52"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2021-12-06T21:23:44.184Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2021-12-06T21:23:44.184Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    }
+  ],
+  "nextPageToken": null
+}

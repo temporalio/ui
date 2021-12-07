@@ -2,7 +2,7 @@
   import { getComponentForEventType } from '$lib/utilities/get-component-for-event-type';
   import { formatDate } from '$lib/utilities/format-date';
   import type { HistoryEvent } from '$types';
-  import ExecutionInformation from '../_execution-information.svelte';
+  import ExecutionInformation from './_execution-information.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
 
   export let event: HistoryEvent;

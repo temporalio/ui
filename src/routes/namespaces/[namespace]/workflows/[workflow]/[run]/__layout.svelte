@@ -1,63 +1,33 @@
 <script context="module" lang="ts">
   import type { LoadInput } from '@sveltejs/kit';
+  import { fetchWorkflowWithEventHistory } from '$lib/services/workflow-service';
 
   export async function load({ page }: LoadInput) {
     const { workflow: executionId, run: runId, namespace } = page.params;
+    const { workflow, events } = await fetchWorkflowWithEventHistory({
+      namespace,
+      executionId,
+      runId,
+    });
 
     return {
-      props: {
-        executionId,
-        runId,
-        namespace,
-      },
+      props: { workflow, namespace },
+      stuff: { workflow, events },
     };
   }
 </script>
 
 <script lang="ts">
-  import { fly } from 'svelte/transition';
-  import { isFullScreen } from '$lib/stores/full-screen';
-
   import Header from './_header.svelte';
-  import { getWorkflow } from '$lib/stores/workflow';
-  import { setContext } from 'svelte';
+  import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
-  export let executionId: string;
-  export let runId: string;
+  export let workflow: WorkflowExecution;
   export let namespace: string;
-
-  $: store = getWorkflow({ executionId, runId, namespace });
-  $: workflow = $store.data;
-  $: loading = $store.loading;
-
-  setContext('workflow', store);
 </script>
 
-<section
-  class="border-l-2 h-screen"
-  class:full={$isFullScreen}
-  class:sidebar={!$isFullScreen}
-  in:fly={{ x: 500, duration: 350 }}
-  out:fly={{ x: 500 }}
->
+<section class="border-l-2 h-screen">
   <main class="w-full">
-    <Header {workflow} {loading} />
+    <Header {workflow} {namespace} />
     <slot />
   </main>
 </section>
-
-<style type="postcss">
-  .full {
-    @apply w-full;
-  }
-
-  .sidebar {
-    background-color: white;
-    width: 600px;
-    left: calc(100% - 600px);
-    position: absolute;
-    overflow-y: scroll;
-    box-shadow: -2px 14px 20px 0px rgb(0 0 0 / 20%);
-    z-index: 2;
-  }
-</style>

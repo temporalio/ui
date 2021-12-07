@@ -40,4 +40,8 @@ describe('pathMatches', () => {
       false,
     );
   });
+
+  it('should return false if exactMatch is true and paths are not exact matches', () => {
+    expect(pathMatches('/workflows', '/workflows/events', true)).toBe(false);
+  });
 });

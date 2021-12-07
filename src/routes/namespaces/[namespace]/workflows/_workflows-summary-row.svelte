@@ -10,7 +10,7 @@
   export let workflow: WorkflowExecution;
   export let timeFormat: string;
 
-  $: href = getWorkflowExecutionUrl($namespace, workflow, $page.query);
+  $: href = getWorkflowExecutionUrl($namespace, workflow);
   $: isActive = pathMatches(href, $page.path);
 </script>
 

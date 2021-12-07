@@ -1,13 +1,28 @@
 <script lang="ts">
   export let disabled: boolean = false;
   export let variant: string = 'primary';
+  export let as: string = 'button';
   export let active: boolean = false;
   export let size: string = 'small';
+  export let href: string | null = null;
 </script>
 
-<button on:click class:selected={active} {disabled} class={`${size} ${variant}`}
-  ><slot /></button
->
+{#if as === 'button'}
+  <button
+    on:click
+    class:selected={active}
+    {disabled}
+    class={`${size} ${variant}`}><slot /></button
+  >
+{:else}
+  <a
+    {href}
+    on:click
+    class:selected={active}
+    {disabled}
+    class={`${size} ${variant}`}><slot /></a
+  >
+{/if}
 
 <style lang="postcss">
   .small {
@@ -19,7 +34,7 @@
   }
 
   .primary {
-    @apply text-purple-700 bg-purple-300 border-2 rounded-md py-2 px-4 transition-colors;
+    @apply text-white bg-primary border-2 rounded-lg py-2 px-4 transition-colors;
   }
 
   .primary:disabled {
@@ -27,11 +42,11 @@
   }
 
   .primary:hover:enabled {
-    @apply bg-white;
+    @apply bg-secondary;
   }
 
   .secondary {
-    @apply text-purple-600 border-purple-600 border-2 rounded-md px-2 transition-colors;
+    @apply text-white bg-secondary border-2 rounded-lg px-2 transition-colors;
   }
 
   .secondary:disabled {
@@ -43,7 +58,7 @@
   }
 
   .destroy {
-    @apply text-white bg-red-600 border-2 rounded-md py-2 px-4 transition-colors;
+    @apply text-white bg-danger border-2 rounded-lg py-1 px-5 transition-colors;
   }
 
   .destroy:disabled {
