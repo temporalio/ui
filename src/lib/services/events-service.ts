@@ -22,7 +22,7 @@ export const fetchEvents = async (
   }: FetchEvents,
   request = fetch,
 ): Promise<GetWorkflowExecutionHistoryResponse> => {
-  let params = null;
+  let params = {};
 
   if (rawPayloads) {
     params = { params: { rawPayloads: JSON.stringify(true) } };
