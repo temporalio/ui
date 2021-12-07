@@ -1,6 +1,6 @@
 <table class="border-collapse w-full rounded-lg">
   <thead>
-    <tr>
+    <tr class="bg-gray-200">
       <th class="w-3/12 text-left ">Name</th>
       <th class="w-3/12 text-left">Workflow ID</th>
       <th class="w-2/12 text-left">Status</th>
@@ -14,14 +14,6 @@
 <style lang="postcss">
   table {
     @apply overflow-hidden;
-  }
-
-  thead {
-    @apply block bg-gray-200 h-12;
-  }
-
-  tr {
-    @apply w-full flex;
   }
 
   th {

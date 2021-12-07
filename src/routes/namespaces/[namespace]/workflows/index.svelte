@@ -66,11 +66,4 @@
   .workflow-container {
     margin: 0 2rem;
   }
-
-  tbody {
-    display: block;
-    height: calc(100vh - 270px);
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
 </style>

@@ -27,12 +27,13 @@
     <a sveltekit:noscroll {href}>
       <p>
         {workflow.id}
+        <!-- / <span class="run-id">{workflow.runId}</span> -->
       </p></a
     >
   </td>
   <td>
     <a sveltekit:noscroll {href}>
-      <div>
+      <div class={`flex justify-start`}>
         <WorkflowStatus status={workflow.status} />
       </div>
     </a>
@@ -43,7 +44,7 @@
     </a>
   </td>
   <td>
-    <a sveltekit:noscroll {href} class="text-left">
+    <a sveltekit:noscroll {href} class="text-let">
       <Time time={workflow.endTime} {timeFormat} />
     </a>
   </td>
@@ -55,7 +56,7 @@
   }
 
   tr {
-    @apply border-2 flex justify-between;
+    @apply border-2;
   }
 
   tr:hover {
@@ -76,5 +77,8 @@
 
   .active:hover {
     @apply bg-yellow-200;
+  }
+  .run-id {
+    font-size: 0.5rem;
   }
 </style>
