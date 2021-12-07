@@ -11,8 +11,10 @@ import { toEventHistory } from '$lib/models/event-history';
 
 import type { ListWorkflowExecutionsResponse } from '$types';
 import type { WorkflowExecution } from '$lib/models/workflow-execution';
-import type { HistoryEventWithId } from '$lib/models/event-history';
 import { getStatusFilterCode } from '$lib/utilities/get-workflow-status-filter-code';
+import { convertEventPayloadFromDataConverter } from './data-converter';
+import { get } from 'svelte/store';
+import { dataConverterPort } from '$lib/stores/data-converter-config';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   executionId: string;
@@ -121,9 +123,29 @@ export async function fetchWorkflowWithEventHistory(
   parameters: GetWorkflowExecutionRequest,
   request = fetch,
 ): Promise<{ workflow: WorkflowExecution; events: HistoryEventWithId[] }> {
+  const port = get(dataConverterPort);
+
   const [workflow, events] = await Promise.all([
     fetchWorkflow(parameters, request),
-    fetchEvents(parameters, request).then(toEventHistory),
+    fetchEvents({ ...parameters, rawPayloads: Boolean(port) }, request)
+      .then(toEventHistory)
+      .then(async (events) => {
+        if (port !== null) {
+          try {
+            // This is not my favorite code, but it mutates the events object inside the function call.
+            // we should definitely refactor this but this was essentially pulled from the original web project
+            // we can write this better using some Svelte primitives
+            await convertEventPayloadFromDataConverter(events, port);
+          } catch {
+            // This code is a bit side effecty, but the convert function handles it's error
+            // by just ignoring it and setting the error state for dataConverter then sending back the
+            // original payload.
+          }
+        }
+
+        // No matter what we want to return events. Even if they aren't data-converted
+        return Promise.resolve(events);
+      }),
   ]);
 
   return { workflow, events };
