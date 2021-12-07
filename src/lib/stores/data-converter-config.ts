@@ -1,5 +1,5 @@
 import { browser } from '$app/env';
-import { writable, Writable } from 'svelte/store';
+import { writable } from 'svelte/store';
 
 export const dataConverterPort = persistStore('port', null);
 

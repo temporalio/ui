@@ -1,4 +1,3 @@
-import type { HistoryEventWithId } from '$lib/models/event-history';
 import {
   setLastDataConverterFailure,
   setLastDataConverterSuccess,
@@ -7,6 +6,10 @@ import type { Payload } from '$types';
 
 import WebSocketAsPromised from 'websocket-as-promised';
 
+interface WebSocketResponse {
+  content: string;
+  requestId: string;
+}
 export const convertEventPayloadFromDataConverter = async (
   events: HistoryEventWithId[],
   port: string | null,
@@ -49,7 +52,7 @@ export const convertEventPayloadFromDataConverter = async (
         requests.push(
           sock
             .sendRequest({ payload: JSON.stringify(payload) })
-            .then((response) => {
+            .then((response: WebSocketResponse) => {
               let currentPayload = null;
               try {
                 currentPayload = JSON.parse(response.content);
@@ -85,6 +88,4 @@ export const convertEventPayloadFromDataConverter = async (
       await sock.close();
     }
   }
-
-  return events;
 };

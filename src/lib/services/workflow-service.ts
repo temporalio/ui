@@ -11,7 +11,6 @@ import { toEventHistory } from '$lib/models/event-history';
 
 import type { ListWorkflowExecutionsResponse } from '$types';
 import type { WorkflowExecution } from '$lib/models/workflow-execution';
-import type { HistoryEventWithId } from '$lib/models/event-history';
 import { getStatusFilterCode } from '$lib/utilities/get-workflow-status-filter-code';
 import { convertEventPayloadFromDataConverter } from './data-converter';
 import { get } from 'svelte/store';
