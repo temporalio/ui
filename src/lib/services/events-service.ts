@@ -15,7 +15,7 @@ export const fetchEvents = async (
     namespace,
     executionId,
     runId,
-    rawPayloads,
+    rawPayloads = false,
     onStart,
     onUpdate,
     onComplete,
