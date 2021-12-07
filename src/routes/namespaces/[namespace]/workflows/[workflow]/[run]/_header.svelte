@@ -32,7 +32,7 @@
       {workflow.id}
     </p>
   </main>
-  <Tabs />
+  <Tabs {workflow} />
 </header>
 
 <style lang="postcss">
