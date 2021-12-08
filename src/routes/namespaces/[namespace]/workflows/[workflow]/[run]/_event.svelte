@@ -8,7 +8,6 @@
   import EventDetails from '$lib/components/event-details.svelte';
 
   export let event: HistoryEventWithId;
-  export let expanded = false;
 
   const hash = `#event-${event.id}`;
   const summaryEvent = getAttributesFromEvent(event);
