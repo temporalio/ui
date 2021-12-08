@@ -5,7 +5,7 @@
   export async function load({ stuff, page }: LoadInput) {
     const { workflow, events } = stuff as {
       workflow: WorkflowExecution;
-      events: HistoryEvent[];
+      events: HistoryEventWithId[];
     };
     const { namespace } = page.params;
 
