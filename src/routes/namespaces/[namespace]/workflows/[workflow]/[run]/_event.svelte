@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { HistoryEvent } from '$types';
   import { getAttributesFromEvent } from '$lib/utilities/get-attributes-from-event';
   import { getEventClassification } from '$lib/utilities/get-event-classification';
   import { format } from '$lib/utilities/format-camel-case';
@@ -13,9 +12,9 @@
 
 <article class="flex flex-row items-start event-box border-2 p-4 rounded-lg">
   <h2 class="w-1/3 flex-1 {event.eventType}">
-    <span class="label {getEventClassification(event)}"
-      >{format(String(event.eventType))}</span
-    >
+    <span class="label {getEventClassification(event)}">
+      {format(String(event.eventType))}
+    </span>
   </h2>
   <div class="flex flex-row items-center event gap-4 w-full flex-3">
     {#each Object.entries(summaryEvent.attributes) as [attribute, value]}
