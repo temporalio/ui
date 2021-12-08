@@ -10,16 +10,16 @@
   const summaryEvent = getAttributesFromEvent(event);
 </script>
 
-<article class="flex flex-row items-start event-box border-2 p-4 rounded-lg">
+<article class="flex items-start event-box border-2 p-4 rounded-lg">
   <h2 class="w-1/3 flex-1 {event.eventType}">
     <span class="label {getEventClassification(event)}">
       {format(String(event.eventType))}
     </span>
   </h2>
-  <div class="flex flex-row items-center event gap-4 w-full flex-3">
+  <div class="flex items-center event gap-4 w-full">
     {#each Object.entries(summaryEvent.attributes) as [attribute, value]}
       {#if typeof value === 'object'}
-        <div class="flex flex-row gap-2 flex-nowrap">
+        <div class="flex gap-2 flex-nowrap">
           <h4>{format(attribute)}</h4>
           <CodeBlock content={value} inline={true} />
         </div>
