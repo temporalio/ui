@@ -26,39 +26,37 @@
   onMount(() => window.Prism.highlightAll());
 </script>
 
-{#if content}
+{#if inline}
+  <code class="language-json text-xs">
+    {formatJSON(JSON.stringify(content))}
+  </code>
+{:else if content || content === null}
   <div class="relative w-full">
-    {#if !inline}<div id="clipboard" />{/if}
+    <div id="clipboard" />
 
     {#if heading}
       <h3 class="text-lg mb-2 w-full">{heading}</h3>
     {/if}
-    {#if inline}
-      <code class="px-2 block language-json overflow-hidden">
-        {JSON.stringify(content)}
-      </code>
-    {:else}
-      <pre
-        class="p-4">
+
+    <pre
+      class="p-4">
         <code class="language-json">
           {formatJSON(JSON.stringify(content))}
         </code>
       </pre>
-    {/if}
-    {#if !inline}
-      <button on:click={copy}>
-        {#if copied}
-          <Icon
-            src={Check}
-            class="w-8 h-8 text-purple-900 bg-gray-300 border-2 border-gray-200 absolute right-0 top-0 hidden group-hover:block hover:bg-gray-400 hover:border-gray-400"
-          />
-        {:else}
-          <Icon
-            src={Clipboard}
-            class="w-8 h-8 text-purple-900 bg-gray-300 border-2 border-gray-200 absolute right-0 top-0 hidden group-hover:block hover:bg-gray-400 hover:border-gray-400"
-          />
-        {/if}
-      </button>
-    {/if}
+
+    <button on:click={copy}>
+      {#if copied}
+        <Icon
+          src={Check}
+          class="w-8 h-8 text-purple-900 bg-gray-300 border-2 border-gray-200 absolute right-0 top-0 hidden group-hover:block hover:bg-gray-400 hover:border-gray-400"
+        />
+      {:else}
+        <Icon
+          src={Clipboard}
+          class="w-8 h-8 text-purple-900 bg-gray-300 border-2 border-gray-200 absolute right-0 top-0 hidden group-hover:block hover:bg-gray-400 hover:border-gray-400"
+        />
+      {/if}
+    </button>
   </div>
 {/if}
