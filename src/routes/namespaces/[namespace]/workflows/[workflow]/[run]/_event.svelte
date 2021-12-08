@@ -20,14 +20,14 @@
   <div class="flex flex-row items-center event gap-4 w-full flex-3">
     {#each Object.entries(summaryEvent.attributes) as [attribute, value]}
       {#if typeof value === 'object'}
-        <div class="flex flex-row gap-2">
+        <div class="flex flex-row gap-2 flex-nowrap">
           <h4>{format(attribute)}</h4>
           <CodeBlock content={value} inline={true} />
         </div>
       {:else if value}
-        <div class="flex gap-2">
+        <div class="flex gap-2 flex-nowrap">
           <h4>{format(attribute)}</h4>
-          <p class="label">{value}</p>
+          <p class="w-full label">{value}</p>
         </div>
       {/if}
     {/each}
@@ -35,6 +35,10 @@
 </article>
 
 <style lang="postcss">
+  h4 {
+    @apply whitespace-nowrap;
+  }
+
   .event-box {
     margin: 1rem 0;
   }
