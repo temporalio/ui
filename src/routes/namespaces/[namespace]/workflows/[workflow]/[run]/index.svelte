@@ -21,11 +21,10 @@
 
 <script lang="ts">
   import PendingActivities from './_pending-activities.svelte';
-  import CodeBlock from '$lib/components/code-block.svelte';
   import Event from './_event.svelte';
 
   export let workflow: WorkflowExecution;
-  export let events: HistoryEvent[];
+  export let events: HistoryEventWithId[];
 
   let format: EventFormat = 'grid';
 
