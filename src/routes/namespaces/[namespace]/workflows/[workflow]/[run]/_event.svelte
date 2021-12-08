@@ -4,6 +4,7 @@
   import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
   import { goto } from '$app/navigation';
+  
   import { getAttributesFromEvent } from '$lib/utilities/get-attributes-from-event';
   import { getEventClassification } from '$lib/utilities/get-event-classification';
   import { format } from '$lib/utilities/format-camel-case';
