@@ -29,6 +29,7 @@
   import WorkflowFilters from './_workflow-filters.svelte';
   import WorkflowsEmptyState from './_workflows-empty.svelte';
   import WorkflowsLoadingState from './_workflows-loading.svelte';
+  import VirtualList from '@sveltejs/svelte-virtual-list';
 
   export let namespace: string;
   export let initialData: ReturnType<typeof fetchAllWorkflows>;
@@ -50,9 +51,9 @@
       {#if workflows.length}
         <WorkflowsSummaryTable>
           <tbody slot="rows">
-            {#each workflows as workflow}
-              <WorkflowsSummaryRow {workflow} {timeFormat} />
-            {/each}
+            <VirtualList items={workflows} let:item>
+              <WorkflowsSummaryRow workflow={item} {timeFormat} />
+            </VirtualList>
           </tbody>
         </WorkflowsSummaryTable>
       {:else}
@@ -65,5 +66,12 @@
 <style lang="postcss">
   .workflow-container {
     margin: 0 2rem;
+  }
+
+  tbody {
+    display: block;
+    height: calc(100vh - 270px);
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 </style>

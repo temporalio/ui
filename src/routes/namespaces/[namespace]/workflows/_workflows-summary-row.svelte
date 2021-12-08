@@ -33,7 +33,7 @@
   </td>
   <td>
     <a sveltekit:noscroll {href}>
-      <div class={`flex justify-start`}>
+      <div>
         <WorkflowStatus status={workflow.status} />
       </div>
     </a>
@@ -44,7 +44,7 @@
     </a>
   </td>
   <td>
-    <a sveltekit:noscroll {href} class="text-let">
+    <a sveltekit:noscroll {href} class="text-left">
       <Time time={workflow.endTime} {timeFormat} />
     </a>
   </td>
@@ -56,11 +56,11 @@
   }
 
   tr {
-    @apply border-2;
+    @apply border-2 flex justify-between;
   }
 
   tr:hover {
-    background-color: #e6fffa;
+    @apply bg-blue-100;
   }
 
   td {

@@ -15,7 +15,12 @@
   table {
     @apply overflow-hidden;
   }
-
+  thead {
+    @apply block bg-gray-200 h-12;
+  }
+  tr {
+    @apply w-full flex;
+  }
   th {
     @apply text-gray-500 text-sm h-6 m-0 p-3 table-fixed;
   }
