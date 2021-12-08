@@ -6,6 +6,7 @@
   export let heading = '';
   export let content: string | Parameters<typeof JSON.stringify>[0];
   export let copied = false;
+  export let inline = false;
 
   const copy = () =>
     navigator.clipboard
@@ -18,7 +19,7 @@
 
   const formatJSON = (jsonData: string) => {
     const parsedData = JSON.parse(jsonData);
-    const formated = JSON.stringify(parsedData, undefined, 4);
+    const formated = JSON.stringify(parsedData, undefined, 2);
     return formated;
   };
 
@@ -26,30 +27,38 @@
 </script>
 
 {#if content}
-  <div class="relative group w-full mb-2">
-    <div id="clipboard" />
+  <div class="relative w-full">
+    {#if !inline}<div id="clipboard" />{/if}
 
     {#if heading}
       <h3 class="text-lg mb-2 w-full">{heading}</h3>
     {/if}
-    <pre
-      class="p-4">
-      <code class="language-json">
-        {formatJSON(JSON.stringify(content))}
+    {#if inline}
+      <code class="px-2 block language-json overflow-hidden">
+        {JSON.stringify(content)}
       </code>
-    </pre>
-    <button on:click={copy}>
-      {#if copied}
-        <Icon
-          src={Check}
-          class="w-8 h-8 text-purple-900 bg-gray-300 border-2 border-gray-200 absolute right-0 top-0 hidden group-hover:block hover:bg-gray-400 hover:border-gray-400"
-        />
-      {:else}
-        <Icon
-          src={Clipboard}
-          class="w-8 h-8 text-purple-900 bg-gray-300 border-2 border-gray-200 absolute right-0 top-0 hidden group-hover:block hover:bg-gray-400 hover:border-gray-400"
-        />
-      {/if}
-    </button>
+    {:else}
+      <pre
+        class="p-4">
+        <code class="language-json">
+          {formatJSON(JSON.stringify(content))}
+        </code>
+      </pre>
+    {/if}
+    {#if !inline}
+      <button on:click={copy}>
+        {#if copied}
+          <Icon
+            src={Check}
+            class="w-8 h-8 text-purple-900 bg-gray-300 border-2 border-gray-200 absolute right-0 top-0 hidden group-hover:block hover:bg-gray-400 hover:border-gray-400"
+          />
+        {:else}
+          <Icon
+            src={Clipboard}
+            class="w-8 h-8 text-purple-900 bg-gray-300 border-2 border-gray-200 absolute right-0 top-0 hidden group-hover:block hover:bg-gray-400 hover:border-gray-400"
+          />
+        {/if}
+      </button>
+    {/if}
   </div>
 {/if}
