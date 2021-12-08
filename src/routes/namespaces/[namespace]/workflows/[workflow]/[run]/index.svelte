@@ -26,8 +26,6 @@
   export let workflow: WorkflowExecution;
   export let events: HistoryEventWithId[];
 
-  let format: EventFormat = 'grid';
-
   $: pendingActivities = workflow?.pendingActivities;
 </script>
 
