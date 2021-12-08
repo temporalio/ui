@@ -26,7 +26,7 @@
   onMount(() => window.Prism.highlightAll());
 </script>
 
-{#if content}
+{#if content || content === null}
   <div class="relative w-full">
     {#if !inline}<div id="clipboard" />{/if}
 
