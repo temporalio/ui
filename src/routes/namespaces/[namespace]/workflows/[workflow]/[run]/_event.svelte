@@ -48,7 +48,7 @@
   }
 
   .Scheduled {
-    @apply text-gray-700 bg-gray-100;
+    @apply text-gray-700 bg-gray-300;
   }
 
   .Open,

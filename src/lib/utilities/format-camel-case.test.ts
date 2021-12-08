@@ -6,15 +6,19 @@ describe(format, () => {
       'Workflow Execution Started',
     );
   });
+
   it('should format lastCompletionResult as "Last Completion Result"', () => {
     expect(format('lastCompletionResult')).toBe('Last Completion Result');
   });
+
   it('should format attempt as "Workflow Attempt"', () => {
     expect(format('attempt')).toBe('Attempt');
   });
+
   it('should format requestId as "Request ID"', () => {
     expect(format('requestId')).toBe('Request ID');
   });
+
   it('should format startedEventId as "Started Event ID"', () => {
     expect(format('startedEventId')).toBe('Started Event ID');
   });
