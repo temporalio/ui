@@ -1,41 +1,74 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+  import Fa from 'svelte-fa';
+  import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
+
+  import { goto } from '$app/navigation';
   import { getAttributesFromEvent } from '$lib/utilities/get-attributes-from-event';
   import { getEventClassification } from '$lib/utilities/get-event-classification';
   import { format } from '$lib/utilities/format-camel-case';
 
   import CodeBlock from '$lib/components/code-block.svelte';
+  import EventDetails from '$lib/components/event-details.svelte';
 
-  export let event: HistoryEvent;
+  export let event: HistoryEventWithId;
+  export let expanded = false;
 
+  const hash = `#event-${event.id}`;
   const summaryEvent = getAttributesFromEvent(event);
+
+  onMount(() => {
+    expanded = window.location.hash === hash;
+  });
+
+  const expand = () => {
+    expanded = !expanded;
+    if (expanded) {
+      goto(hash);
+    }
+  };
 </script>
 
-<article class="flex items-start event-box border-2 p-4 rounded-lg">
-  <h2 class="w-1/3 flex-1 {event.eventType}">
-    <span class="label {getEventClassification(event)}">
-      {format(String(event.eventType))}
-    </span>
-  </h2>
-  <div class="flex items-center event gap-4 w-full">
-    {#each Object.entries(summaryEvent.attributes) as [attribute, value]}
-      {#if typeof value === 'object'}
-        <div class="flex gap-2 flex-nowrap">
-          <h4>{format(attribute)}</h4>
-          <CodeBlock content={value} inline={true} />
-        </div>
-      {:else if value}
-        <div class="flex gap-2 flex-nowrap">
-          <h4>{format(attribute)}</h4>
-          <p class="w-full label">{value}</p>
-        </div>
-      {/if}
-    {/each}
+<article
+  id="event-{event.id}"
+  class="w-full py-2 event-box border-2 rounded-lg relative"
+  on:click={expand}
+>
+  <div class="absolute right-6 top-7">
+    <Fa icon={expanded ? faAngleUp : faAngleDown} scale={1.2} />
   </div>
+  <div class="flex items-start p-4 mx-4">
+    <h2 class="w-1/3 {event.eventType}">
+      <span class="label {getEventClassification(event)}">
+        {format(String(event.eventType))}
+      </span>
+    </h2>
+    <div class="flex items-center event gap-4 w-full">
+      {#each Object.entries(summaryEvent.attributes) as [attribute, value]}
+        {#if typeof value === 'object'}
+          <div class="flex gap-2 flex-nowrap">
+            <h4>{format(attribute)}</h4>
+            <CodeBlock content={value} inline={true} />
+          </div>
+        {:else if value}
+          <div class="flex gap-2 flex-nowrap">
+            <h4>{format(attribute)}</h4>
+            <p class="w-full label">{value}</p>
+          </div>
+        {/if}
+      {/each}
+    </div>
+  </div>
+  {#if expanded}<EventDetails {event} />{/if}
 </article>
 
 <style lang="postcss">
   h4 {
     @apply whitespace-nowrap;
+  }
+
+  article:hover {
+    @apply cursor-pointer;
   }
 
   .event-box {
