@@ -9,6 +9,7 @@
   import { getEventClassification } from '$lib/utilities/get-event-classification';
   import { format } from '$lib/utilities/format-camel-case';
 
+  import EventSummary from '$lib/components/event-summary.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
   import EventDetails from '$lib/components/event-details.svelte';
 
@@ -17,27 +18,9 @@
 
   const hash = `#event-${event.id}`;
   const summaryEvent = getAttributesFromEvent(event);
-
-  onMount(() => {
-    expanded = window.location.hash === hash;
-  });
-
-  const expand = () => {
-    expanded = !expanded;
-    if (expanded) {
-      goto(hash);
-    }
-  };
 </script>
 
-<article
-  id="event-{event.id}"
-  class="w-full py-2 event-box border-2 rounded-lg relative"
-  on:click={expand}
->
-  <div class="absolute right-6 top-7">
-    <Fa icon={expanded ? faAngleUp : faAngleDown} scale={1.2} />
-  </div>
+<EventSummary {hash}>
   <div class="flex items-start p-4 mx-4">
     <h2 class="w-1/3 {event.eventType}">
       <span class="label {getEventClassification(event)}">
@@ -60,16 +43,12 @@
       {/each}
     </div>
   </div>
-  {#if expanded}<EventDetails {event} />{/if}
-</article>
+  <EventDetails {event} slot="expanded" />
+</EventSummary>
 
 <style lang="postcss">
   h4 {
     @apply whitespace-nowrap;
-  }
-
-  article:hover {
-    @apply cursor-pointer;
   }
 
   .event-box {
