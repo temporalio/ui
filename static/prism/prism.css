@@ -28,6 +28,7 @@ pre[class*="language-"] {
 	-ms-hyphens: none;
 	hyphens: none;
 
+	font-size: 0.9em;
 }
 
 /* Code blocks */
@@ -122,4 +123,3 @@ pre[class*="language-"] {
 .token.inserted {
 	color: green;
 }
-

@@ -1,41 +1,80 @@
 <script lang="ts">
-  import type { HistoryEvent } from '$types';
   import { getAttributesFromEvent } from '$lib/utilities/get-attributes-from-event';
+  import { getEventClassification } from '$lib/utilities/get-event-classification';
+  import { format } from '$lib/utilities/format-camel-case';
+
+  import CodeBlock from '$lib/components/code-block.svelte';
 
   export let event: HistoryEvent;
+
   const summaryEvent = getAttributesFromEvent(event);
 </script>
 
-<div class="flex flex-row event-box border-2 p-4 rounded-lg justify-between">
-  <h2>{event.eventType}</h2>
-  <div class="flex flex-row items-center event">
-    {#each Object.entries(summaryEvent.attributes) as [event, value]}
-      {#if value}
-        {#if typeof value === 'object'}
-          <p>{event} <span>{JSON.stringify(value)}</span></p>
-        {:else}
-          <p>{event} <span>{value}</span></p>
-        {/if}
+<article class="flex items-start event-box border-2 p-4 rounded-lg">
+  <h2 class="w-1/3 flex-1 {event.eventType}">
+    <span class="label {getEventClassification(event)}">
+      {format(String(event.eventType))}
+    </span>
+  </h2>
+  <div class="flex items-center event gap-4 w-full">
+    {#each Object.entries(summaryEvent.attributes) as [attribute, value]}
+      {#if typeof value === 'object'}
+        <div class="flex gap-2 flex-nowrap">
+          <h4>{format(attribute)}</h4>
+          <CodeBlock content={value} inline={true} />
+        </div>
+      {:else if value}
+        <div class="flex gap-2 flex-nowrap">
+          <h4>{format(attribute)}</h4>
+          <p class="w-full label">{value}</p>
+        </div>
       {/if}
     {/each}
   </div>
-</div>
+</article>
 
 <style lang="postcss">
+  h4 {
+    @apply whitespace-nowrap;
+  }
+
   .event-box {
     margin: 1rem 0;
   }
 
-  .event {
-    width: 70%;
+  .label {
+    @apply bg-gray-300 px-2 rounded-sm;
   }
 
-  span {
-    @apply bg-gray-300 p-1;
+  .Scheduled {
+    @apply text-gray-700 bg-gray-300;
   }
 
-  p {
-    @apply text-sm;
-    margin: 0 1rem;
+  .Open,
+  .New {
+    @apply text-indigo-700 bg-indigo-100;
+  }
+
+  .Started,
+  .Initiated {
+    @apply text-blue-700 bg-blue-100;
+  }
+
+  .Running,
+  .Completed,
+  .Fired {
+    @apply text-green-700 bg-green-100;
+  }
+
+  .CancelRequested,
+  .TimedOut,
+  .Signaled,
+  .Cancelled {
+    @apply text-yellow-700 bg-yellow-100;
+  }
+
+  .Failed,
+  .Terminated {
+    @apply text-red-700 bg-red-100;
   }
 </style>

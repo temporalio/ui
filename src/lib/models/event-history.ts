@@ -1,6 +1,14 @@
-import type { GetWorkflowExecutionHistoryResponse } from '$types';
+import type { GetWorkflowExecutionHistoryResponse, HistoryEvent } from '$types';
 
-export type HistoryEventWithId = HistoryEvent & { id: string };
+export function getEventAttributes(historyEvent: HistoryEvent): EventAttribute {
+  const attributeKey = Object.keys(historyEvent).find((key) =>
+    key.includes('Attributes'),
+  );
+  return {
+    type: attributeKey as EventAttributeKeys,
+    ...historyEvent[attributeKey],
+  };
+}
 
 export const toEventHistory = (
   response: GetWorkflowExecutionHistoryResponse,
@@ -8,5 +16,6 @@ export const toEventHistory = (
   return response.history.events.map((event) => ({
     ...event,
     id: String(event.eventId),
+    attributes: getEventAttributes(event),
   }));
 };

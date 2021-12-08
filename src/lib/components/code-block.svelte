@@ -6,6 +6,7 @@
   export let heading = '';
   export let content: string | Parameters<typeof JSON.stringify>[0];
   export let copied = false;
+  export let inline = false;
 
   const copy = () =>
     navigator.clipboard
@@ -18,26 +19,32 @@
 
   const formatJSON = (jsonData: string) => {
     const parsedData = JSON.parse(jsonData);
-    const formated = JSON.stringify(parsedData, undefined, 4);
+    const formated = JSON.stringify(parsedData, undefined, 2);
     return formated;
   };
 
   onMount(() => window.Prism.highlightAll());
 </script>
 
-{#if content}
-  <div class="relative group w-full mb-2">
+{#if inline}
+  <code class="language-json text-xs">
+    {formatJSON(JSON.stringify(content))}
+  </code>
+{:else if content || content === null}
+  <div class="relative w-full">
     <div id="clipboard" />
 
     {#if heading}
       <h3 class="text-lg mb-2 w-full">{heading}</h3>
     {/if}
+
     <pre
       class="p-4">
-      <code class="language-json">
-        {formatJSON(JSON.stringify(content))}
-      </code>
-    </pre>
+        <code class="language-json">
+          {formatJSON(JSON.stringify(content))}
+        </code>
+      </pre>
+
     <button on:click={copy}>
       {#if copied}
         <Icon
