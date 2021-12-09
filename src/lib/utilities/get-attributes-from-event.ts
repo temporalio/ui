@@ -1,12 +1,5 @@
 import * as eventTypes from './is-event-type';
-
-function pick<T, K extends keyof T>(source: T, ...keys: K[]): Pick<T, K> {
-  const result: any = {};
-  for (const key of keys) {
-    result[key] = source[key];
-  }
-  return result;
-}
+import { pick } from './pick';
 
 export const getAttributesFromEvent = (event: unknown) => {
   if (eventTypes.isActivityTaskCancelRequestedEvent(event)) {

@@ -13,7 +13,7 @@
 </script>
 
 <a sveltekit:noscroll {href}>
-  <article class="row flex flex-row border-2">
+  <article class="row flex flex-row border-b-2">
     <div class="links w-3/12 text-left">
       {workflow.id}
     </div>

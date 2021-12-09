@@ -5,7 +5,7 @@
   export async function load({ stuff, page }: LoadInput) {
     const { workflow, events } = stuff as {
       workflow: WorkflowExecution;
-      events: HistoryEvent[];
+      events: HistoryEventWithId[];
     };
     const { namespace } = page.params;
 
@@ -21,15 +21,12 @@
 
 <script lang="ts">
   import PendingActivities from './_pending-activities.svelte';
-  import CodeBlock from '$lib/components/code-block.svelte';
   import Event from './_event.svelte';
 
   export let workflow: WorkflowExecution;
-  export let events: HistoryEvent[];
+  export let events: HistoryEventWithId[];
 
-  let format: EventFormat = 'grid';
-
-  $: pendingActivities = workflow?.pendingActivities;
+  let pendingActivities = workflow?.pendingActivities;
 </script>
 
 <div class="execution-information px-6 py-6">
@@ -37,6 +34,7 @@
     <PendingActivities activities={pendingActivities} />
   </div>
   <section>
+    <h3 class="text-lg mb-2 font-semibold">Event History</h3>
     {#each events as event}
       <Event {event} />
     {/each}
