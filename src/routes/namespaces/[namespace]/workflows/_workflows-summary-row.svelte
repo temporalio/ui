@@ -2,9 +2,7 @@
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
   import { namespace } from '$lib/stores/namespace';
-  import { page } from '$app/stores';
   import { getWorkflowExecutionUrl } from '$lib/utilities/get-workflow-execution-url';
-  import { pathMatches } from '$lib/utilities/path-matches';
   import Time from '$lib/components/workflow-time.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
 
@@ -12,73 +10,42 @@
   export let timeFormat: string;
 
   $: href = getWorkflowExecutionUrl($namespace, workflow);
-  $: isActive = pathMatches(href, $page.path);
 </script>
 
-<tr class:active={isActive}>
-  <td class="">
-    <a sveltekit:noscroll {href}>
+<a sveltekit:noscroll {href}>
+  <article class="row flex flex-row border-b-2">
+    <div class="links w-3/12 text-left">
+      {workflow.id}
+    </div>
+    <div class="links w-3/12 text-left">
       <h3>
         {workflow.name}
       </h3>
-    </a>
-  </td>
-  <td>
-    <a sveltekit:noscroll {href}>
-      <p>
-        {workflow.id}
-        <!-- / <span class="run-id">{workflow.runId}</span> -->
-      </p></a
-    >
-  </td>
-  <td>
-    <a sveltekit:noscroll {href}>
-      <div class={`flex justify-center  `}>
+    </div>
+    <div class="w-3/12 text-left">
+      <div>
         <WorkflowStatus status={workflow.status} />
       </div>
-    </a>
-  </td>
-  <td>
-    <a sveltekit:noscroll {href} class="font-mono text-right">
+    </div>
+    <div class="w-2/12 text-left">
       <Time time={workflow.startTime} {timeFormat} />
-    </a>
-  </td>
-  <td>
-    <a sveltekit:noscroll {href} class="font-mono text-right">
+    </div>
+    <div class="w-2/12 text-left">
       <Time time={workflow.endTime} {timeFormat} />
-    </a>
-  </td>
-</tr>
+    </div>
+  </article>
+</a>
 
 <style lang="postcss">
-  p {
-    @apply m-0 text-gray-500 text-sm;
+  .row {
+    @apply w-full h-full flex no-underline p-2;
   }
 
-  tr {
-    @apply bg-gray-50;
+  .row:hover {
+    @apply bg-green-100;
   }
 
-  tr:hover {
-    @apply bg-gray-100;
-  }
-
-  td {
-    @apply p-0;
-  }
-
-  a {
-    @apply w-full h-full block no-underline p-2;
-  }
-
-  .active {
-    @apply bg-yellow-200;
-  }
-
-  .active:hover {
-    @apply bg-yellow-200;
-  }
-  .run-id {
-    font-size: 0.5rem;
+  .row:hover .links {
+    @apply underline text-blue-500;
   }
 </style>
