@@ -58,9 +58,3 @@
     {/if}
   {/await}
 </section>
-
-<style lang="postcss">
-  .workflow-container {
-    margin: 0 2rem;
-  }
-</style>
