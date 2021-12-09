@@ -20,16 +20,14 @@
 </script>
 
 <EventSummary {hash}>
-  <div class="flex items-start p-4 mx-4">
-    <h2 class="w-1/3">
-      <EventLabel>
-        {activity?.activityType?.name}
-      </EventLabel>
-      <EventLabel color={activity.state}>
-        {activity.state}
-      </EventLabel>
-    </h2>
-    <EventSummaryAttributes attributes={summaryAttributes} />
-  </div>
+  <h2 class="w-1/3">
+    <EventLabel>
+      {activity?.activityType?.name}
+    </EventLabel>
+    <EventLabel color={activity.state}>
+      {activity.state}
+    </EventLabel>
+  </h2>
+  <EventSummaryAttributes attributes={summaryAttributes} />
   <EventDetails attributes={activity} slot="expanded" />
 </EventSummary>

@@ -25,10 +25,18 @@
   class="w-full py-2 my-4 border-2 rounded-lg relative"
   on:click={expand}
 >
-  <div class="absolute right-6 top-7">
-    <Icon icon={expanded ? faAngleUp : faAngleDown} scale={1.2} />
+  <div class="flex justify-between m-4">
+    <div class="flex items-center gap-4 w-full h-full overflow-x-hidden">
+      <slot />
+    </div>
+    <div class="flex justify-center items-center w-16">
+      <Icon
+        icon={expanded ? faAngleUp : faAngleDown}
+        scale={1.2}
+        class="block w-full h-full"
+      />
+    </div>
   </div>
-  <slot />
   {#if expanded}<slot name="expanded" />{/if}
 </article>
 

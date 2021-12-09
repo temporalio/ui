@@ -17,14 +17,12 @@
 </script>
 
 <EventSummary {hash}>
-  <div class="flex items-start p-4 mx-4">
-    <h2 class="w-1/3 {event.eventType}">
-      <EventLabel color={getEventClassification(event)}>
-        {format(String(event.eventType))}
-      </EventLabel>
-    </h2>
-    <EventSummaryAttributes attributes={summaryEvent.attributes} />
-  </div>
+  <h2 class="w-1/3 {event.eventType}">
+    <EventLabel color={getEventClassification(event)}>
+      {format(String(event.eventType))}
+    </EventLabel>
+  </h2>
+  <EventSummaryAttributes attributes={summaryEvent.attributes} />
   <EventDetails {attributes} slot="expanded" />
 </EventSummary>
 
