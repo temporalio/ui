@@ -6,6 +6,8 @@
     ListNamespacesResponse,
   } from '$types';
 
+  import '../app.postcss';
+
   export async function load({ fetch }: LoadInput) {
     const { namespaces }: ListNamespacesResponse = await requestFromAPI(
       '/namespaces',
@@ -20,10 +22,9 @@
 </script>
 
 <script lang="ts">
-  import '../app.postcss';
-  import Navigation from './_navigation.svelte';
-  import Header from './_header.svelte';
   import { setContext } from 'svelte';
+
+  import Header from './_header.svelte';
   import Notifications from '$lib/components/notifications.svelte';
 
   export let namespaces: DescribeNamespaceResponse[];
@@ -43,13 +44,10 @@
   <meta property="og:image" content="/banner.png" />
 </svelte:head>
 
-<main class="flex align-start h-screen">
+<main>
   <Notifications />
-  <Navigation />
-  <div class="w-full overflow-y-scroll">
-    <Header />
-    <div class="w-full relative">
-      <slot />
-    </div>
-  </div>
+  <Header />
+  <section id="content">
+    <slot />
+  </section>
 </main>

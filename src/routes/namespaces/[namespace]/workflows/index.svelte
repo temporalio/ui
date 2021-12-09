@@ -39,25 +39,23 @@
   let timeFormat = 'relative';
 </script>
 
-<section class="flex items-start">
-  <div class="w-full h-screen overflow-scroll">
-    <header>
-      <WorkflowFilters bind:timeFormat />
-    </header>
-    {#await data}
-      <WorkflowsLoadingState />
-    {:then { workflows }}
-      {#if workflows.length}
-        <WorkflowsSummaryTable>
-          <tbody slot="rows">
-            {#each workflows as workflow}
-              <WorkflowsSummaryRow {workflow} {timeFormat} />
-            {/each}
-          </tbody>
-        </WorkflowsSummaryTable>
-      {:else}
-        <WorkflowsEmptyState />
-      {/if}
-    {/await}
-  </div>
+<section>
+  <header>
+    <WorkflowFilters bind:timeFormat />
+  </header>
+  {#await data}
+    <WorkflowsLoadingState />
+  {:then { workflows }}
+    {#if workflows.length}
+      <WorkflowsSummaryTable>
+        <tbody slot="rows">
+          {#each workflows as workflow}
+            <WorkflowsSummaryRow {workflow} {timeFormat} />
+          {/each}
+        </tbody>
+      </WorkflowsSummaryTable>
+    {:else}
+      <WorkflowsEmptyState />
+    {/if}
+  {/await}
 </section>
