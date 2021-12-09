@@ -1,9 +1,9 @@
-const isUpperCase = (label: string, index: number) => {
+const isUpperCase = (label: string, index: number): boolean => {
   const charCode = label.charCodeAt(index);
   return charCode >= 65 && charCode <= 90;
 };
 
-export const format = (label: string) => {
+export const format = (label: string): string => {
   let result = '';
   let index = 0;
 

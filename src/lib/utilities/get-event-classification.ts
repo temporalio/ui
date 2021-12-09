@@ -1,4 +1,6 @@
-const eventClassifications = [
+export type EventClassification = typeof eventClassifications[number];
+
+export const eventClassifications = [
   'Scheduled',
   'Open',
   'New',
@@ -13,11 +15,11 @@ const eventClassifications = [
   'Canceled',
   'Failed',
   'Terminated',
-];
+] as const;
 
 export const getEventClassification = (
   event: HistoryEvent,
-): typeof eventClassifications[number] => {
+): EventClassification => {
   const eventType = event.eventType.toString();
 
   if (eventType.includes('RequestCancel')) return 'CancelRequested';

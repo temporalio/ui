@@ -1,81 +1,35 @@
 <script lang="ts">
-  import beautify from 'json-beautify';
-  import type { PendingActivityInfo } from '$types';
-  import { formatDate } from '$lib/utilities/format-date';
+  import { pick } from '$lib/utilities/pick';
 
-  export let activity: PendingActivityInfo;
+  import EventSummary from '$lib/components/event-summary.svelte';
+  import EventDetails from '$lib/components/event-details.svelte';
+  import EventSummaryAttributes from '$lib/components/event-summary-attributes.svelte';
+  import EventLabel from '$lib/components/event-label.svelte';
+
+  export let activity: PendingActivity;
+
+  const summaryAttributes = pick<PendingActivity, keyof PendingActivity>(
+    activity,
+    'attempts',
+    'maximumAttempts',
+    'lastHeart',
+    'expiration',
+  );
+
+  const hash = `#pending-${activity.activityId}`;
 </script>
 
-<article class="border-2 p-2">
-  <h4>
-    {activity.activityType.name}
-    <code>#{activity.activityId}</code>
-  </h4>
-  <section>
-    <div class="row">
-      <div class="key">State</div>
-      <div class="value">{activity.state}</div>
-    </div>
-    <div class="row">
-      <div class="key">Heartbeat Detaults</div>
-      <div class="value">{activity.heartbeatDetails}</div>
-    </div>
-    <div class="row">
-      <div class="key">Last Heartbeat Time</div>
-      <div class="value">{formatDate(activity.lastHeartbeatTime)}</div>
-    </div>
-    <div class="row">
-      <div class="key">Last Started Time</div>
-      <div class="value">{formatDate(activity.lastStartedTime)}</div>
-    </div>
-    <div class="row">
-      <div class="key">Attempt</div>
-      <div class="value">{activity.attempt}</div>
-    </div>
-    <div class="row">
-      <div class="key">Maximum Attempts</div>
-      <div class="value">{activity.maximumAttempts}</div>
-    </div>
-    <div class="row">
-      <div class="key">Scheduled Time</div>
-      <div class="value">{formatDate(activity.scheduledTime)}</div>
-    </div>
-    <div class="row">
-      <div class="key">Expiration Time</div>
-      <div class="value">{formatDate(activity.expirationTime)}</div>
-    </div>
-    <div class="row">
-      <div class="key">Last Failure</div>
-      <div class="value overflow-y-scroll whitespace-pre font-mono">
-        {beautify(activity.lastFailure, null, 2, 80)}
-      </div>
-    </div>
-    <div class="row">
-      <div class="key">Last Worker Identity</div>
-      <div class="value">{activity.lastWorkerIdentity}</div>
-    </div>
-  </section>
-</article>
-
-<style lang="postcss">
-  h4 {
-    @apply mb-4 font-semibold;
-  }
-
-  .row {
-    @apply flex p-4;
-  }
-
-  .key,
-  .value {
-    @apply w-full;
-  }
-
-  .key {
-    @apply font-semibold max-w-sm;
-  }
-
-  .row:nth-child(even) {
-    @apply bg-gray-100;
-  }
-</style>
+<EventSummary {hash}>
+  <div class="flex items-start p-4 mx-4">
+    <h2 class="w-1/3">
+      <EventLabel>
+        {activity?.activityType?.name}
+      </EventLabel>
+      <EventLabel color={activity.state}>
+        {activity.state}
+      </EventLabel>
+    </h2>
+    <EventSummaryAttributes attributes={summaryAttributes} />
+  </div>
+  <EventDetails attributes={activity} slot="expanded" />
+</EventSummary>

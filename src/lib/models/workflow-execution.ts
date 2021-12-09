@@ -1,6 +1,5 @@
 import type {
   WorkflowExecutionStatus,
-  PendingActivityInfo,
   DescribeWorkflowExecutionResponse,
   ListWorkflowExecutionsResponse,
 } from '$types';
@@ -17,7 +16,7 @@ export type WorkflowExecution = {
   status: WorkflowExecutionStatus;
   taskQueue?: string;
   historyEvents: Long;
-  pendingActivities: PendingActivityInfo[];
+  pendingActivities: PendingActivity[];
   url: string;
 };
 
@@ -38,7 +37,8 @@ export const toWorkflowExecution = (
   const historyEvents = response.workflowExecutionInfo.historyLength;
   const url = `/workflows/${id}/${runId}`;
   const taskQueue = response?.executionConfig?.taskQueue?.name;
-  const pendingActivities = response.pendingActivities || [];
+  const pendingActivities: PendingActivity[] =
+    (response.pendingActivities as unknown as PendingActivity[]) || [];
 
   return {
     name,

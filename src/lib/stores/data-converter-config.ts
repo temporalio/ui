@@ -1,6 +1,8 @@
 import { browser } from '$app/env';
 import { writable } from 'svelte/store';
 
+import type { Writable } from 'svelte/store';
+
 export const dataConverterPort = persistStore('port', null);
 
 type DataConverterStatus = 'notRequested' | 'success' | 'error';
@@ -15,7 +17,10 @@ export function setLastDataConverterSuccess(): void {
   lastDataConverterStatus.set('success');
 }
 
-export function persistStore(name: string, initialValue: string | null = '') {
+export function persistStore(
+  name: string,
+  initialValue: string | null = '',
+): Pick<Writable<string>, 'subscribe' | 'set'> {
   let initialStoreValue = initialValue;
   if (browser) {
     try {
