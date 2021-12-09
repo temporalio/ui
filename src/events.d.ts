@@ -1,4 +1,5 @@
 type HistoryEvent = import('$types').HistoryEvent;
+
 type WorkflowExecutionStartedEventAttributes =
   import('$types').WorkflowExecutionStartedEventAttributes;
 type WorkflowExecutionCompletedEventAttributes =
@@ -302,7 +303,11 @@ type EventAttribute =
   | WorkflowTaskFailedAttrs
   | ChildWorkflowExecutionFailedAttrs;
 
-interface HistoryEventWithId extends HistoryEvent {
+interface HistoryEventWithId extends HistoryEvent, Record<string, unknown> {
   id: string;
   attributes: EventAttribute;
 }
+
+type PendingActivity = Omit<import('$types').PendingActivityInfo, 'state'> & {
+  state: 'Unspecified' | 'Scheduled' | 'Started' | 'CancelRequested';
+} & Record<string, unknown>;

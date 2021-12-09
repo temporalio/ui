@@ -22,8 +22,10 @@
     "cypress:open": "TEMPORAL_API_HOST=http://localhost:3000 cypress open"
   },
   "dependencies": {
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "date-fns": "^2.23.0",
     "json-beautify": "^1.1.1",
+    "svelte-fa": "^2.4.0",
     "svelte-hero-icons": "^3.0.0",
     "url-pattern": "^1.0.3",
     "websocket-as-promised": "^2.0.1"
