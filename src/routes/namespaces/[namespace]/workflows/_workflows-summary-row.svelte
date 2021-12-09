@@ -13,7 +13,12 @@
 </script>
 
 <article class="flex flex-row border-2 p-1">
-  <div class="w-6/12 text-left">
+  <div class="w-3/12 text-left">
+    <a sveltekit:noscroll {href}>
+      {workflow.id}
+    </a>
+  </div>
+  <div class="w-3/12 text-left">
     <a sveltekit:noscroll {href}>
       <h3>
         {workflow.name}
@@ -21,11 +26,6 @@
     </a>
   </div>
   <div class="w-3/12 text-left">
-    <a sveltekit:noscroll {href}>
-      {workflow.id}
-    </a>
-  </div>
-  <div class="w-2/12 text-left">
     <a sveltekit:noscroll {href}>
       <div>
         <WorkflowStatus status={workflow.status} />
@@ -37,7 +37,7 @@
       <Time time={workflow.startTime} {timeFormat} />
     </a>
   </div>
-  <div class="w-3/12 text-left">
+  <div class="w-2/12 text-left">
     <a sveltekit:noscroll {href}>
       <Time time={workflow.endTime} {timeFormat} />
     </a>
