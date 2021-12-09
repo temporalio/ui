@@ -12,40 +12,40 @@
   $: href = getWorkflowExecutionUrl($namespace, workflow);
 </script>
 
-<article class="flex flex-row border-2 p-1">
-  <div class="w-3/12 text-left">
-    <a sveltekit:noscroll {href}>
+<a sveltekit:noscroll {href}>
+  <article class="row flex flex-row border-2">
+    <div class="links w-3/12 text-left">
       {workflow.id}
-    </a>
-  </div>
-  <div class="w-3/12 text-left">
-    <a sveltekit:noscroll {href}>
+    </div>
+    <div class="links w-3/12 text-left">
       <h3>
         {workflow.name}
       </h3>
-    </a>
-  </div>
-  <div class="w-3/12 text-left">
-    <a sveltekit:noscroll {href}>
+    </div>
+    <div class="w-3/12 text-left">
       <div>
         <WorkflowStatus status={workflow.status} />
       </div>
-    </a>
-  </div>
-  <div class="w-2/12 text-left">
-    <a sveltekit:noscroll {href}>
+    </div>
+    <div class="w-2/12 text-left">
       <Time time={workflow.startTime} {timeFormat} />
-    </a>
-  </div>
-  <div class="w-2/12 text-left">
-    <a sveltekit:noscroll {href}>
+    </div>
+    <div class="w-2/12 text-left">
       <Time time={workflow.endTime} {timeFormat} />
-    </a>
-  </div>
-</article>
+    </div>
+  </article>
+</a>
 
 <style lang="postcss">
-  a {
+  .row {
     @apply w-full h-full flex no-underline p-2;
+  }
+
+  .row:hover {
+    @apply bg-green-100;
+  }
+
+  .row:hover .links {
+    @apply underline text-blue-500;
   }
 </style>
