@@ -26,7 +26,7 @@
   export let workflow: WorkflowExecution;
   export let events: HistoryEventWithId[];
 
-  $: pendingActivities = workflow?.pendingActivities;
+  let pendingActivities = workflow?.pendingActivities;
 </script>
 
 <div class="execution-information px-6 py-6">
@@ -34,6 +34,7 @@
     <PendingActivities activities={pendingActivities} />
   </div>
   <section>
+    <h3 class="text-lg mb-2 font-semibold">Event History</h3>
     {#each events as event}
       <Event {event} />
     {/each}

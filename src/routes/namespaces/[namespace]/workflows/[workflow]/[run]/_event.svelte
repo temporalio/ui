@@ -4,10 +4,13 @@
   import { format } from '$lib/utilities/format-camel-case';
 
   import EventSummary from '$lib/components/event-summary.svelte';
-  import CodeBlock from '$lib/components/code-block.svelte';
   import EventDetails from '$lib/components/event-details.svelte';
+  import EventSummaryAttributes from '$lib/components/event-summary-attributes.svelte';
+  import EventLabel from '$lib/components/event-label.svelte';
 
   export let event: HistoryEventWithId;
+
+  const { attributes } = event;
 
   const hash = `#event-${event.id}`;
   const summaryEvent = getAttributesFromEvent(event);
@@ -16,38 +19,16 @@
 <EventSummary {hash}>
   <div class="flex items-start p-4 mx-4">
     <h2 class="w-1/3 {event.eventType}">
-      <span class="label {getEventClassification(event)}">
+      <EventLabel color={getEventClassification(event)}>
         {format(String(event.eventType))}
-      </span>
+      </EventLabel>
     </h2>
-    <div class="flex items-center event gap-4 w-full">
-      {#each Object.entries(summaryEvent.attributes) as [attribute, value]}
-        {#if typeof value === 'object'}
-          <div class="flex gap-2 flex-nowrap">
-            <h4>{format(attribute)}</h4>
-            <CodeBlock content={value} inline={true} />
-          </div>
-        {:else if value}
-          <div class="flex gap-2 flex-nowrap">
-            <h4>{format(attribute)}</h4>
-            <p class="w-full label">{value}</p>
-          </div>
-        {/if}
-      {/each}
-    </div>
+    <EventSummaryAttributes attributes={summaryEvent.attributes} />
   </div>
-  <EventDetails {event} slot="expanded" />
+  <EventDetails {attributes} slot="expanded" />
 </EventSummary>
 
 <style lang="postcss">
-  h4 {
-    @apply whitespace-nowrap;
-  }
-
-  .event-box {
-    margin: 1rem 0;
-  }
-
   .label {
     @apply bg-gray-300 px-2 rounded-sm;
   }
