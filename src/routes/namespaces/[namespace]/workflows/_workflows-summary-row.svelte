@@ -2,9 +2,7 @@
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
   import { namespace } from '$lib/stores/namespace';
-  import { page } from '$app/stores';
   import { getWorkflowExecutionUrl } from '$lib/utilities/get-workflow-execution-url';
-  import { pathMatches } from '$lib/utilities/path-matches';
   import Time from '$lib/components/workflow-time.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
 
@@ -14,32 +12,32 @@
   $: href = getWorkflowExecutionUrl($namespace, workflow);
 </script>
 
-<article class="flex flex-row">
-  <div>
+<article class="flex flex-row border-2 p-1">
+  <div class="w-6/12 text-left">
     <a sveltekit:noscroll {href}>
       <h3>
         {workflow.name}
       </h3>
     </a>
   </div>
-  <div>
-    <a sveltekit:noscroll {href} class="workflow-id hover">
+  <div class="w-3/12 text-left">
+    <a sveltekit:noscroll {href}>
       {workflow.id}
     </a>
   </div>
-  <div>
+  <div class="w-2/12 text-left">
     <a sveltekit:noscroll {href}>
       <div>
         <WorkflowStatus status={workflow.status} />
       </div>
     </a>
   </div>
-  <div>
+  <div class="w-2/12 text-left">
     <a sveltekit:noscroll {href}>
       <Time time={workflow.startTime} {timeFormat} />
     </a>
   </div>
-  <div>
+  <div class="w-3/12 text-left">
     <a sveltekit:noscroll {href}>
       <Time time={workflow.endTime} {timeFormat} />
     </a>
@@ -47,35 +45,7 @@
 </article>
 
 <style lang="postcss">
-  .workflow-id {
-    @apply m-0 text-gray-500 text-sm;
-  }
-
-  tr {
-    @apply border-2 flex justify-between;
-  }
-
-  tr:hover {
-    @apply bg-blue-100;
-  }
-
-  tr:hover .hover {
-    @apply text-blue-400 underline;
-  }
-
-  td {
-    @apply p-1 w-2/12;
-  }
-
   a {
-    @apply w-full h-full block no-underline p-2;
-  }
-
-  .active {
-    @apply bg-yellow-200;
-  }
-
-  .active:hover {
-    @apply bg-yellow-200;
+    @apply w-full h-full flex no-underline p-2;
   }
 </style>
