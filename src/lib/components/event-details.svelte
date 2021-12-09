@@ -3,21 +3,25 @@
   import CodeBlock from './code-block.svelte';
 
   export let attributes: EventAttribute | Record<string, unknown>;
-
-  console.log(attributes);
 </script>
 
 <section class="w-full px-8">
   {#each Object.entries(attributes) as [key, value]}
-    <article class="w-full flex items-start py-4 border-t-2 border-gray-300">
-      <h4 class="w-1/3">{format(key)}</h4>
-      <div class="flex gap-2 w-full">
+    <article
+      class="w-full flex items-center content-start py-4 border-t-2 border-gray-300"
+    >
+      <h4 class="w-96 flex-grow">{format(key)}</h4>
+      <div class="flex-grow w-full overflow-scroll">
         {#if value === null}
-          <CodeBlock content={value} inline={true} />
+          <p class="font-mono whitespace-nowrap flex-grow">
+            {value}
+          </p>
         {:else if typeof value === 'object'}
-          <CodeBlock content={value} inline={true} />
+          <div class="overflow-scroll flex-grow">
+            <CodeBlock content={value} inline={true} />
+          </div>
         {:else if value}
-          <p class="w-full label">{value}</p>
+          <p class="whitespace-nowrap">{value}</p>
         {/if}
       </div>
     </article>

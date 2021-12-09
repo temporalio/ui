@@ -6,19 +6,16 @@
   export let attributes: Record<string, unknown>;
 </script>
 
-<div class="flex items-center event gap-4 w-full">
-  {#each Object.entries(attributes) as [attribute, value]}
-    {#if typeof value === 'object'}
-      <div class="flex gap-2 flex-nowrap">
-        <h4>{format(attribute)}</h4>
+<div class="flex items-center event gap-4 w-full h-full overflow-x-hidden">
+  {#each Object.entries(attributes).filter(([, value]) => !!value) as [attribute, value]}
+    <div class="flex gap-2">
+      <h4 class="flex items-center">{format(attribute)}</h4>
+      {#if typeof value === 'object'}
         <CodeBlock content={value} inline={true} />
-      </div>
-    {:else if value}
-      <div class="flex gap-2 flex-nowrap">
-        <h4>{format(attribute)}</h4>
+      {:else}
         <p class="w-full label">{value}</p>
-      </div>
-    {/if}
+      {/if}
+    </div>
   {/each}
 </div>
 
@@ -28,6 +25,6 @@
   }
 
   .label {
-    @apply bg-gray-300 px-2 rounded-sm;
+    @apply bg-gray-300 px-2 rounded-sm whitespace-nowrap;
   }
 </style>

@@ -27,7 +27,7 @@
 </script>
 
 {#if inline}
-  <code class="language-json text-xs">
+  <code class="language-json" style="white-space: nowrap;">
     {formatJSON(JSON.stringify(content))}
   </code>
 {:else if content || content === null}
