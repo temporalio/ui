@@ -50,11 +50,9 @@
     {:then { workflows }}
       {#if workflows.length}
         <WorkflowsSummaryTable>
-          <tbody slot="rows">
-            <VirtualList items={workflows} let:item>
-              <WorkflowsSummaryRow workflow={item} {timeFormat} />
-            </VirtualList>
-          </tbody>
+          <VirtualList items={workflows} let:item>
+            <WorkflowsSummaryRow workflow={item} {timeFormat} />
+          </VirtualList>
         </WorkflowsSummaryTable>
       {:else}
         <WorkflowsEmptyState />
@@ -66,12 +64,5 @@
 <style lang="postcss">
   .workflow-container {
     margin: 0 2rem;
-  }
-
-  tbody {
-    display: block;
-    height: calc(100vh - 270px);
-    overflow-y: auto;
-    overflow-x: hidden;
   }
 </style>

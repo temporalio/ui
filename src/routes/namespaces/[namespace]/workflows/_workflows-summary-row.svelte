@@ -12,40 +12,39 @@
   export let timeFormat: string;
 
   $: href = getWorkflowExecutionUrl($namespace, workflow);
-  $: isActive = pathMatches(href, $page.path);
 </script>
 
-<tr class:active={isActive}>
-  <td>
-    <a sveltekit:noscroll {href} class="hover">
+<article class="flex flex-row">
+  <div>
+    <a sveltekit:noscroll {href}>
       <h3>
         {workflow.name}
       </h3>
     </a>
-  </td>
-  <td>
+  </div>
+  <div>
     <a sveltekit:noscroll {href} class="workflow-id hover">
       {workflow.id}
     </a>
-  </td>
-  <td>
+  </div>
+  <div>
     <a sveltekit:noscroll {href}>
       <div>
         <WorkflowStatus status={workflow.status} />
       </div>
     </a>
-  </td>
-  <td>
+  </div>
+  <div>
     <a sveltekit:noscroll {href}>
       <Time time={workflow.startTime} {timeFormat} />
     </a>
-  </td>
-  <td>
+  </div>
+  <div>
     <a sveltekit:noscroll {href}>
       <Time time={workflow.endTime} {timeFormat} />
     </a>
-  </td>
-</tr>
+  </div>
+</article>
 
 <style lang="postcss">
   .workflow-id {
