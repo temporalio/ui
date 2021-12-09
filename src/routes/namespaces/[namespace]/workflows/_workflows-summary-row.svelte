@@ -16,20 +16,17 @@
 </script>
 
 <tr class:active={isActive}>
-  <td class="">
-    <a sveltekit:noscroll {href}>
+  <td>
+    <a sveltekit:noscroll {href} class="hover">
       <h3>
         {workflow.name}
       </h3>
     </a>
   </td>
   <td>
-    <a sveltekit:noscroll {href}>
-      <p>
-        {workflow.id}
-        <!-- / <span class="run-id">{workflow.runId}</span> -->
-      </p></a
-    >
+    <a sveltekit:noscroll {href} class="workflow-id hover">
+      {workflow.id}
+    </a>
   </td>
   <td>
     <a sveltekit:noscroll {href}>
@@ -39,19 +36,19 @@
     </a>
   </td>
   <td>
-    <a sveltekit:noscroll {href} class="text-left">
+    <a sveltekit:noscroll {href}>
       <Time time={workflow.startTime} {timeFormat} />
     </a>
   </td>
   <td>
-    <a sveltekit:noscroll {href} class="text-left">
+    <a sveltekit:noscroll {href}>
       <Time time={workflow.endTime} {timeFormat} />
     </a>
   </td>
 </tr>
 
 <style lang="postcss">
-  p {
+  .workflow-id {
     @apply m-0 text-gray-500 text-sm;
   }
 
@@ -63,8 +60,12 @@
     @apply bg-blue-100;
   }
 
+  tr:hover .hover {
+    @apply text-blue-400 underline;
+  }
+
   td {
-    @apply p-1;
+    @apply p-1 w-2/12;
   }
 
   a {
@@ -77,8 +78,5 @@
 
   .active:hover {
     @apply bg-yellow-200;
-  }
-  .run-id {
-    font-size: 0.5rem;
   }
 </style>
