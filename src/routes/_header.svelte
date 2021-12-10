@@ -16,14 +16,25 @@
 <script lang="ts">
   import { namespace } from '$lib/stores/namespace';
   import DataConvertorStatus from '$lib/components/data-convertor-status.svelte';
+  import NavigationLink from './_navigation-link.svelte';
   export let user: { name?: string; email?: string; picture?: string } = {};
 </script>
 
 <div
   id="header"
-  class="h-16 w-full px-6 flex flex-row items-center justify-between border-b-2"
+  class="h-16 w-full px-6 flex flex-row items-center justify-between bg-black border-b-2"
 >
-  <NamespaceSelect />
+  <div class="flex flex-row justify-center items-center">
+    <img src="/logo.svg" alt="Temporal Logo" />
+    <NamespaceSelect />
+    <NavigationLink href={`/namespaces/${$namespace}/workflows`}>
+      Workflows
+    </NavigationLink>
+    <NavigationLink href={`/namespaces/${$namespace}/settings`}>
+      Settings
+    </NavigationLink>
+    <NavigationLink href="/archival">Archival</NavigationLink>
+  </div>
   <div class="flex flex-row justify-center items-center">
     <DataConvertorStatus />
     <a href="https://github.com/temporalio/web/issues/new/choose">
@@ -40,11 +51,18 @@
 </div>
 
 <style lang="postcss">
+  #header {
+    @apply bg-black;
+  }
+
+  img {
+    @apply w-10 mr-2;
+  }
   a {
-    @apply block px-4 py-2 text-sm;
+    @apply block px-4 py-2 text-sm text-white;
   }
 
   a:hover {
-    @apply bg-purple-100 rounded-md;
+    @apply bg-purple-100 rounded-md text-black;
   }
 </style>
