@@ -13,6 +13,13 @@ type RequestFromAPIOptions = {
 
 const base = import.meta.env.VITE_API;
 
+const encode = (component: string): string => {
+  return component
+    .split('/')
+    .map((segment) => encodeURIComponent(segment))
+    .join('/');
+};
+
 /**
  *  A utility method for making requests to the Temporal API.
  *
@@ -47,7 +54,7 @@ export const requestFromAPI = async <T>(
     ...nextPageToken,
   });
 
-  const url = toURL(base + '/api/v1' + endpoint, query);
+  const url = toURL(base + '/api/v1' + encode(endpoint), query);
 
   try {
     const response = await request(url, options);
