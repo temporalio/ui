@@ -18,7 +18,7 @@ export const eventClassifications = [
 ] as const;
 
 export const getEventClassification = (
-  event: HistoryEvent,
+  event: HistoryEventWithId,
 ): EventClassification => {
   const eventType = event.eventType.toString();
 

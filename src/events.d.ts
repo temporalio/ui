@@ -303,11 +303,64 @@ type EventAttribute =
   | WorkflowTaskFailedAttrs
   | ChildWorkflowExecutionFailedAttrs;
 
-interface HistoryEventWithId extends HistoryEvent, Record<string, unknown> {
+interface HistoryEventWithId
+  extends Omit<HistoryEvent, 'eventType'>,
+    Record<string, unknown> {
   id: string;
+  eventType: EventType;
   attributes: EventAttribute;
 }
 
 type PendingActivity = Omit<import('$types').PendingActivityInfo, 'state'> & {
   state: 'Unspecified' | 'Scheduled' | 'Started' | 'CancelRequested';
 } & Record<string, unknown>;
+
+type EventType =
+  | 'ActivityTaskCanceled'
+  | 'ActivityTaskCancelRequested'
+  | 'ActivityTaskCompleted'
+  | 'ActivityTaskFailed'
+  | 'ActivityTaskScheduled'
+  | 'ActivityTaskStarted'
+  | 'ActivityTaskTimedOut'
+  | 'ChildWorkflowExecutionCanceled'
+  | 'ChildWorkflowExecutionCompleted'
+  | 'ChildWorkflowExecutionFailed'
+  | 'ChildWorkflowExecutionStarted'
+  | 'ChildWorkflowExecutionTerminated'
+  | 'ChildWorkflowExecutionTimedOut'
+  | 'StartChildWorkflowExecutionFailed'
+  | 'StartChildWorkflowExecutionInitiated'
+  | 'SignalExternalWorkflowExecutionFailed'
+  | 'SignalExternalWorkflowExecutionInitiated'
+  | 'TimerCanceled'
+  | 'TimerFired'
+  | 'TimerStarted'
+  | 'WorkflowExecutionCanceled'
+  | 'WorkflowExecutionCancelRequested'
+  | 'WorkflowExecutionCompleted'
+  | 'WorkflowExecutionContinuedAsNew'
+  | 'WorkflowExecutionFailed'
+  | 'WorkflowExecutionSignaled'
+  | 'WorkflowExecutionStarted'
+  | 'WorkflowExecutionTerminated'
+  | 'WorkflowExecutionTimedOut'
+  | 'WorkflowTaskCompleted'
+  | 'WorkflowTaskFailed'
+  | 'WorkflowTaskScheduled'
+  | 'WorkflowTaskStarted'
+  | 'WorkflowTaskTimedOut'
+  | 'ExternalWorkflowExecutionCancelRequested'
+  | 'ExternalWorkflowExecutionSignaled'
+  | 'RequestCancelExternalWorkflowExecutionFailed'
+  | 'RequestCancelExternalWorkflowExecutionInitiated'
+  | 'MarkerRecorded'
+  | 'UpsertWorkflowSearchAttributes';
+
+type EventTypeCategory =
+  | 'activity'
+  | 'child-workflow'
+  | 'signal'
+  | 'timer'
+  | 'workflow'
+  | 'command';
