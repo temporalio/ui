@@ -303,7 +303,9 @@ type EventAttribute =
   | WorkflowTaskFailedAttrs
   | ChildWorkflowExecutionFailedAttrs;
 
-interface HistoryEventWithId extends HistoryEvent, Record<string, unknown> {
+interface HistoryEventWithId
+  extends Omit<HistoryEvent, 'eventType'>,
+    Record<string, unknown> {
   id: string;
   eventType: EventType;
   attributes: EventAttribute;
