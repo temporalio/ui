@@ -20,13 +20,20 @@
 </script>
 
 <script lang="ts">
+  import { eventTypeInCategory } from '$lib/utilities/get-event-categorization';
+
   import PendingActivities from './_pending-activities.svelte';
   import Event from './_event.svelte';
+  import Option from '$lib/components/select/option.svelte';
+  import Select from '$lib/components/select/select.svelte';
 
   export let workflow: WorkflowExecution;
   export let events: HistoryEventWithId[];
 
   let pendingActivities = workflow?.pendingActivities;
+  let category: EventTypeCategory = null;
+
+  $: visibleEvents = events.filter(eventTypeInCategory(category));
 </script>
 
 <div class="execution-information px-6 py-6">
@@ -35,7 +42,18 @@
   </div>
   <section>
     <h3 class="text-lg mb-2 font-semibold">Event History</h3>
-    {#each events as event}
+    <div>
+      <Select bind:value={category}>
+        <Option value={null}>All</Option>
+        <Option value="activity">Activity</Option>
+        <Option value="command">Command</Option>
+        <Option value="signal">Signal</Option>
+        <Option value="timer">Timer</Option>
+        <Option value="child-workflow">Child Workflow</Option>
+        <Option value="workflow">Workflow</Option>
+      </Select>
+    </div>
+    {#each visibleEvents as event}
       <Event {event} />
     {/each}
   </section>
