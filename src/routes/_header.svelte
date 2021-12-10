@@ -33,7 +33,6 @@
     <NavigationLink href={`/namespaces/${$namespace}/settings`}>
       Settings
     </NavigationLink>
-    <NavigationLink href="/archival">Archival</NavigationLink>
   </div>
   <div class="flex flex-row justify-center items-center">
     <DataConvertorStatus />
