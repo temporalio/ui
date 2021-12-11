@@ -10,6 +10,36 @@ interface WebSocketResponse {
   content: string;
   requestId: string;
 }
+
+export async function convertSinglePayloadDataConverter(
+  payload: Payload,
+  websocket: any,
+) {
+  if (!websocket.isOpened && !websocket.isOpening) {
+    console.log('Open your websocket', websocket.isOpen, websocket.isOpening);
+    await websocket.open();
+    console.log('after');
+  }
+
+  const socketResponse = websocket
+    .sendRequest({
+      payload: JSON.stringify(payload),
+    })
+    .then((response) => {
+      try {
+        const decodedResponse = JSON.parse(response.content);
+        setLastDataConverterSuccess();
+        return decodedResponse;
+      } catch {
+        // This doesn't seem to be a failure the worker _could_ send back a text response
+        // instead of JSON
+        return response.content;
+      }
+    });
+
+  return socketResponse;
+}
+
 export const convertEventPayloadFromDataConverter = async (
   events: HistoryEventWithId[],
   port: string | null,
@@ -61,7 +91,6 @@ export const convertEventPayloadFromDataConverter = async (
                 // This doesn't seem to be a failure the worker _could_ send back a text response
                 // instead of JSON
                 currentPayload = response.content;
-                setLastDataConverterFailure();
               }
               switch (event.attributes.type) {
                 case 'activityTaskCompletedEventAttributes':

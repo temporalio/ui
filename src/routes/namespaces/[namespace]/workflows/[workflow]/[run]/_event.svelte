@@ -22,7 +22,12 @@
       {format(String(event.eventType))}
     </EventLabel>
   </h2>
-  <EventSummaryAttributes attributes={summaryEvent.attributes} />
+  <!-- The getAttributesFromEvent doesn't seem to cover every case and the transform we do in
+  toEventHistory in the event-history model does get the attributes. I keep running into this when
+  I use the background check repo so it's firing different event types than the other workloads we're running 
+  the ?.attributes and ?? attributes is here for backup incase the lookup on getAttributesFromEvent fails
+  -->
+  <EventSummaryAttributes attributes={summaryEvent?.attributes ?? attributes} />
   <EventDetails {attributes} slot="expanded" />
 </EventSummary>
 
