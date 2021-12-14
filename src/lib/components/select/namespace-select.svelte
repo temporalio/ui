@@ -19,7 +19,7 @@
 </script>
 
 <Select
-  color="black"
+  dark={true}
   bind:value={selectedNamespace}
   on:change={() => switchNamespace()}
 >

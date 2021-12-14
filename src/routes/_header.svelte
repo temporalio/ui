@@ -22,7 +22,7 @@
 
 <div
   id="header"
-  class="h-16 w-full px-6 flex flex-row items-center justify-between bg-black border-b-2"
+  class="h-16 w-full px-6 flex flex-row items-center justify-between bg-gray-900 border-b-2"
 >
   <div class="flex flex-row justify-center items-center">
     <img src="/logo.svg" alt="Temporal Logo" />
