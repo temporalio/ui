@@ -51,7 +51,7 @@
 
 <style lang="postcss">
   #header {
-    @apply bg-black;
+    @apply bg-gray-900;
   }
 
   img {
@@ -62,6 +62,6 @@
   }
 
   a:hover {
-    @apply bg-purple-100 rounded-md text-black;
+    @apply bg-purple-100 rounded-md text-gray-900;
   }
 </style>
