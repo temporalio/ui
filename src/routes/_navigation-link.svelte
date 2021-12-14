@@ -13,12 +13,23 @@
 
 <style lang="postcss">
   a.active {
-    @apply border-b-2 border-blue-200 text-blue-200 opacity-100;
+    @apply text-blue-200 opacity-100;
+  }
+
+  a.active:after {
+    @apply bg-blue-200;
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-radius: 20px 20px 0 0;
   }
   a:hover {
     @apply opacity-100;
   }
   a {
-    @apply block px-2 py-4 text-base font-medium text-white;
+    @apply block px-2 py-5 text-base font-medium text-white;
   }
 </style>
