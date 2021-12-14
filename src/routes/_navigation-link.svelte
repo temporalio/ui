@@ -17,14 +17,9 @@
   }
 
   a.active:after {
-    @apply bg-blue-200;
+    @apply absolute bg-blue-200 inset-x-0 bottom-0 rounded-t;
     content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
     height: 3px;
-    border-radius: 20px 20px 0 0;
   }
   a:hover {
     @apply opacity-100;
