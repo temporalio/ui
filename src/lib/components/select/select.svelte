@@ -3,7 +3,7 @@
   export let value: string | boolean;
 </script>
 
-<div class="flex flex-col items-start justify-center border-gray-100">
+<div class="flex flex-col items-start justify-center border-gray-100 w-full">
   <select
     class="inline border-2 text-base p-2 w-full h-10 rounded-lg"
     {id}
