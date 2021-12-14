@@ -23,7 +23,9 @@
   id="header"
   class="h-16 w-full px-6 flex flex-row items-center justify-between border-b-2"
 >
-  <NamespaceSelect />
+  <div class="w-40">
+    <NamespaceSelect />
+  </div>
   <div class="flex flex-row justify-center items-center">
     <DataConvertorStatus />
     <a href="https://github.com/temporalio/web/issues/new/choose">
