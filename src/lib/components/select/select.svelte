@@ -27,7 +27,7 @@
   }
 
   .remove {
-    @apply appearance-none;
+    @apply appearance-none h-8 text-sm py-1 pl-3 rounded-xl;
   }
 
   .dark {
@@ -35,7 +35,7 @@
   }
 
   .arrow::after {
-    @apply absolute text-white text-sm font-normal top-3 right-3;
+    @apply absolute text-white text-sm font-normal top-2 right-3;
     font-family: 'Font Awesome 5 Free';
     content: '\f0dc';
   }
