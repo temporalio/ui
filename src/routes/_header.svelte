@@ -24,15 +24,17 @@
   id="header"
   class="h-16 w-full px-6 flex flex-row items-center justify-between bg-gray-900 border-b-2"
 >
-  <div class="flex flex-row justify-center items-center">
+  <div class="flex flex-row justify-center items-center gap-4">
     <img src="/logo.svg" alt="Temporal Logo" />
     <NamespaceSelect />
-    <NavigationLink href={`/namespaces/${$namespace}/workflows`}>
-      Workflows
-    </NavigationLink>
-    <NavigationLink href={`/namespaces/${$namespace}/settings`}>
-      Settings
-    </NavigationLink>
+    <div class="flex flex-row">
+      <NavigationLink href={`/namespaces/${$namespace}/workflows`}>
+        Workflows
+      </NavigationLink>
+      <NavigationLink href={`/namespaces/${$namespace}/settings`}>
+        Settings
+      </NavigationLink>
+    </div>
   </div>
   <div class="flex flex-row justify-center items-center">
     <DataConvertorStatus />
@@ -55,7 +57,7 @@
   }
 
   img {
-    @apply w-10 mr-2;
+    @apply w-10 mx-4;
   }
   a {
     @apply block px-4 py-2 text-sm text-white;

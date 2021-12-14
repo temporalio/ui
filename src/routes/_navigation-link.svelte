@@ -19,6 +19,6 @@
     @apply opacity-100;
   }
   a {
-    @apply block px-4 py-5 text-sm text-white;
+    @apply block px-2 py-4 text-base font-medium text-white;
   }
 </style>

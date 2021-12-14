@@ -12,6 +12,7 @@
   );
 
   let selectedNamespace = $currentNamespace;
+  let dark: boolean = true;
 
   function switchNamespace() {
     goto('/namespaces/' + selectedNamespace);
