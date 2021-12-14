@@ -40,7 +40,7 @@
   let timeFormat = 'relative';
 </script>
 
-<section class="h-full mb-8">
+<section class="h-full">
   <header>
     <WorkflowFilters bind:timeFormat />
   </header>

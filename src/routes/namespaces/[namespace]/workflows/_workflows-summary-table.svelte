@@ -8,7 +8,5 @@
     <div class="w-2/12 text-left">Started</div>
     <div class="w-2/12 text-left">End</div>
   </div>
-  <div class="h-full mb-8">
-    <slot />
-  </div>
+  <slot />
 </section>
