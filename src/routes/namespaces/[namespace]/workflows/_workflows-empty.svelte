@@ -1,5 +1,7 @@
 <div class="flex flex-col justify-start items-center gap-2">
-  <span class="flex rounded-full circle items-center justify-center">🔭</span>
+  <span class="flex rounded-full circle items-center justify-center"
+    ><i class="fas fa-meteor" /></span
+  >
   <h2>No Workflows Found</h2>
   <p class="text-center">If you have filter's applied, try adjusting them.</p>
 </div>
