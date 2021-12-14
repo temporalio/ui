@@ -22,7 +22,7 @@
 
 <div
   id="header"
-  class="h-16 w-full px-6 flex flex-row items-center justify-between bg-gray-900 border-b-2"
+  class="h-16 w-full px-6 flex flex-row items-center justify-between bg-gray-900"
 >
   <div class="flex flex-row justify-center items-center gap-4">
     <img src="/logo.svg" alt="Temporal Logo" />
@@ -53,7 +53,7 @@
 
 <style lang="postcss">
   #header {
-    @apply bg-gray-900;
+    @apply bg-gray-900 mb-0 shadow-lg;
   }
 
   img {
