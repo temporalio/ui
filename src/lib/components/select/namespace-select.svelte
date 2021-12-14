@@ -12,18 +12,13 @@
   );
 
   let selectedNamespace = $currentNamespace;
-  let dark: boolean = true;
 
   function switchNamespace() {
     goto('/namespaces/' + selectedNamespace);
   }
 </script>
 
-<Select
-  dark={true}
-  bind:value={selectedNamespace}
-  on:change={() => switchNamespace()}
->
+<Select dark bind:value={selectedNamespace} on:change={() => switchNamespace()}>
   {#each namespaces as namespace}
     <Option value={namespace}>{namespace}</Option>
   {/each}
