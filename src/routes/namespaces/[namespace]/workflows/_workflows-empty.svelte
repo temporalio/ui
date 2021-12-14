@@ -1,29 +1,19 @@
-<script lang="ts">
-  import Button from '$lib/components/button.svelte';
-</script>
-
-<div class="flex flex-col justify-start items-center gap-2 empty">
+<div class="flex flex-col justify-start items-center gap-2">
   <span class="flex rounded-full circle items-center justify-center">🔭</span>
-  <h2 class="font-medium">No Workflows Found</h2>
-  <p class="text">
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed dapibus
-    dignissim lectus, tempor lacinia turpis.
-  </p>
-  <Button as="a" href="https://docs.temporal.io/">📄 Go to Docs</Button>
+  <h2>No Workflows Found</h2>
+  <p class="text-center">If you have filter's applied, try adjusting them.</p>
 </div>
 
 <style lang="postcss">
-  .empty {
-    margin-top: 5rem;
+  div {
+    @apply mt-12;
   }
 
-  .text {
-    width: 44%;
+  h2 {
+    @apply text-xl font-medium;
   }
 
   .circle {
-    width: 3rem;
-    height: 3rem;
-    background-color: #e1e0e7;
+    @apply w-16 h-16 bg-gray-200;
   }
 </style>
