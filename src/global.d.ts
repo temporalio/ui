@@ -6,6 +6,12 @@ interface Window {
   };
 }
 
+interface ImportMeta {
+  env: {
+    VITE_API: string;
+  };
+}
+
 type Heroicon = { [key: string]: string }[][];
 
 type WorkflowStatus =
