@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Icon from 'svelte-hero-icons/Icon.svelte';
-  import { Download } from 'svelte-hero-icons';
+  import Icon from 'svelte-fa';
+  import { faFileExport } from '@fortawesome/free-solid-svg-icons';
   import type { Writable } from 'svelte/store';
 
   import { convertToJSON } from '$lib/utilities/convert-to-json';
@@ -42,7 +42,11 @@
       href={dataUri}
       download={`${execution}.json`}
     >
-      <Icon src={Download} class="text-black w-4 h-4" />export</a
+      <Icon
+        icon={faFileExport}
+        scale={1}
+        class="block w-full h-full"
+      />export</a
     >
   </div>
 </section>
