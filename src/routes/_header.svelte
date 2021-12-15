@@ -57,7 +57,7 @@
   }
 
   img {
-    @apply w-10 mx-4;
+    @apply w-8 mx-4;
   }
   a {
     @apply block px-4 py-2 text-sm text-white;
