@@ -16,15 +16,25 @@
 <script lang="ts">
   import { namespace } from '$lib/stores/namespace';
   import DataConvertorStatus from '$lib/components/data-convertor-status.svelte';
+  import NavigationLink from './_navigation-link.svelte';
   export let user: { name?: string; email?: string; picture?: string } = {};
 </script>
 
 <div
   id="header"
-  class="h-16 w-full px-6 flex flex-row items-center justify-between border-b-2"
+  class="h-16 w-full px-6 flex flex-row items-center justify-between bg-gray-900"
 >
-  <div class="w-40">
+  <div class="flex flex-row justify-center items-center gap-4">
+    <img src="/logo.svg" alt="Temporal Logo" />
     <NamespaceSelect />
+    <div class="flex flex-row">
+      <NavigationLink href={`/namespaces/${$namespace}/workflows`}>
+        Workflows
+      </NavigationLink>
+      <NavigationLink href={`/namespaces/${$namespace}/settings`}>
+        Settings
+      </NavigationLink>
+    </div>
   </div>
   <div class="flex flex-row justify-center items-center">
     <DataConvertorStatus />
@@ -42,11 +52,18 @@
 </div>
 
 <style lang="postcss">
+  #header {
+    @apply bg-gray-900 mb-0 shadow-lg;
+  }
+
+  img {
+    @apply w-8 mx-4;
+  }
   a {
-    @apply block px-4 py-2 text-sm;
+    @apply block px-4 py-2 text-sm text-white;
   }
 
   a:hover {
-    @apply bg-purple-100 rounded-md;
+    @apply bg-purple-100 rounded-md text-gray-900;
   }
 </style>
