@@ -81,3 +81,9 @@ type FilterParameters = {
   status?: WorkflowStatus;
   timeRange?: Duration | string;
 };
+
+type Settings = {
+  auth: {
+    enabled: boolean;
+  };
+};
