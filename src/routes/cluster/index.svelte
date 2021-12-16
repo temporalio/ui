@@ -1,25 +1,8 @@
-<script context="module" lang="ts">
-  import type { GetClusterInfoResponse } from '$types';
-
-  import type { LoadInput } from '@sveltejs/kit';
-  import { requestFromAPI } from '$lib/utilities/request-from-api';
-
-  export async function load({ fetch }: LoadInput) {
-    const cluster: GetClusterInfoResponse = await requestFromAPI('/cluster', {
-      request: fetch,
-    });
-
-    return {
-      props: { cluster },
-    };
-  }
-</script>
-
 <script lang="ts">
   import KeyValueTable from '$lib/components/key-value-table.svelte';
+  import { cluster } from '$lib/stores/cluster';
 
-  export let cluster: GetClusterInfoResponse;
-  const { supportedClients, ...clusterInformation } = cluster;
+  const { supportedClients, ...clusterInformation } = $cluster;
 </script>
 
 <main class="flex flex-wrap">
