@@ -1,6 +1,9 @@
 <script lang="ts">
   import Icon from 'svelte-fa';
-  import { faLock, faUnlock } from '@fortawesome/free-solid-svg-icons';
+  import {
+    faLongArrowAltDown,
+    faLongArrowAltUp,
+  } from '@fortawesome/free-solid-svg-icons';
   import {
     dataConverterPort,
     lastDataConverterStatus,
@@ -11,15 +14,48 @@
 {#if $dataConverterPort}
   {#if $lastDataConverterStatus === 'notRequested'}
     <Tooltip text={'Data converter is configured'}>
-      <Icon icon={faUnlock} scale={1} class="text-white block w-full h-full" />
+      <div class="flex">
+        <Icon
+          icon={faLongArrowAltDown}
+          scale={1}
+          class="text-blue-200 block w-full h-full"
+        />
+        <Icon
+          icon={faLongArrowAltUp}
+          scale={1}
+          class="text-blue-200 block w-full h-full"
+        />
+      </div>
     </Tooltip>
   {:else if $lastDataConverterStatus === 'error'}
     <Tooltip text={`Data converter couldn't connect to the remote converter`}>
-      <Icon icon={faUnlock} scale={1} class="text-danger block w-full h-full" />
+      <div class="flex">
+        <Icon
+          icon={faLongArrowAltDown}
+          scale={1}
+          class="text-red-400 block w-full h-full"
+        />
+        <Icon
+          icon={faLongArrowAltUp}
+          scale={1}
+          class="text-red-400 block w-full h-full"
+        />
+      </div>
     </Tooltip>
   {:else if $lastDataConverterStatus === 'success'}
     <Tooltip text={'Data converter succesfully converted content'}>
-      <Icon icon={faLock} scale={1} class="text-success block w-full h-full" />
+      <div class="flex">
+        <Icon
+          icon={faLongArrowAltDown}
+          scale={1}
+          class="text-blue-200 block w-full h-full"
+        />
+        <Icon
+          icon={faLongArrowAltUp}
+          scale={1}
+          class="text-blue-200 block w-full h-full"
+        />
+      </div>
     </Tooltip>
   {/if}
 {/if}
