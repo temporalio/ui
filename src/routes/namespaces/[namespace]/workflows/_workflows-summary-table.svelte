@@ -1,5 +1,5 @@
 <section
-  class="border-collapse border-2 border-gray-300 overflow-hidden w-full h-full rounded-lg"
+  class="border-collapse border-2 border-gray-300 overflow-hidden w-full rounded-lg"
 >
   <div class="bg-gray-200 flex flex-row p-2">
     <div class="w-3/12 text-left">Workflow ID</div>
@@ -10,3 +10,9 @@
   </div>
   <slot />
 </section>
+
+<style lang="postcss">
+  section {
+    height: calc(100vh - 20%);
+  }
+</style>
