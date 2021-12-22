@@ -3,15 +3,17 @@
   import { page } from '$app/stores';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  export let id: string;
+  export let parameter: string;
   export let name: string;
   export let value: string;
 
-  let _value = (id && $page.query.get(id)) || value;
+  let _value = (parameter && $page.query.get(parameter)) || value;
+
+  const id = `${parameter || name}-filter`;
 
   $: {
     updateQueryParameters({
-      parameter: id,
+      parameter,
       value: _value,
       query: $page.query,
       path: $page.path,

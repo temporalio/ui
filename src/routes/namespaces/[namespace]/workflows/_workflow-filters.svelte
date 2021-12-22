@@ -35,9 +35,13 @@
 <section class="flex flex-col my-8">
   <h2 class="text-3xl mb-4">Workflows</h2>
   <div class="grid grid-cols-5 gap-4">
-    <FilterInput id="workflow-id" name="Workflow ID" value={workflowIdFilter} />
     <FilterInput
-      id="workflow-type"
+      parameter="workflow-id"
+      name="Workflow ID"
+      value={workflowIdFilter}
+    />
+    <FilterInput
+      parameter="workflow-type"
       name="Workflow Type"
       value={workflowTypeFilter}
     />
