@@ -29,12 +29,6 @@ type CombinedWorkflowExecutionsResponse = {
   nextPageTokens: NextPageTokens;
 };
 
-const createDate = (timeRange: Duration | string) => {
-  const duration =
-    typeof timeRange === 'string' ? toDuration(timeRange) : timeRange;
-  return formatISO(sub(new Date(), duration));
-};
-
 const emptyWorkflowRequest = (): Promise<ListWorkflowExecutionsResponse> => {
   return Promise.resolve({
     executions: [],
