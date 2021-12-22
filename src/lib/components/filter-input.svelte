@@ -1,7 +1,27 @@
 <script lang="ts">
-  export let id: string;
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import debounce from 'just-debounce';
+
+  export let parameter: string;
   export let name: string;
   export let value: string;
+
+  let _value = (parameter && $page.query.get(parameter)) || value;
+
+  const id = `${parameter || name}-filter`;
+  const update = debounce(updateQueryParameters, 300);
+
+  $: {
+    update({
+      parameter,
+      value: _value,
+      query: $page.query,
+      path: $page.path,
+      goto,
+    });
+  }
 </script>
 
 <div class="flex flex-col items-start justify-center">
@@ -10,6 +30,6 @@
     class="block border-2 text-base p-2 w-full h-10 rounded-lg "
     placeholder={name}
     {id}
-    bind:value
+    bind:value={_value}
   />
 </div>

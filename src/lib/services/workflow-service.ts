@@ -1,20 +1,23 @@
 import { sub, formatISO } from 'date-fns';
+import { get } from 'svelte/store';
+
+import type { ListWorkflowExecutionsResponse } from '$types';
+import type { WorkflowExecution } from '$lib/models/workflow-execution';
+
 import { requestFromAPI } from '$lib/utilities/request-from-api';
+import { toDuration } from '$lib/utilities/to-duration';
+
 import {
   toWorkflowExecution,
   toWorkflowExecutions,
 } from '$lib/models/workflow-execution';
-import { toDuration } from '$lib/utilities/to-duration';
-
-import { fetchEvents } from './events-service';
 import { toEventHistory } from '$lib/models/event-history';
 
-import type { ListWorkflowExecutionsResponse } from '$types';
-import type { WorkflowExecution } from '$lib/models/workflow-execution';
-import { getStatusFilterCode } from '$lib/utilities/get-workflow-status-filter-code';
+import { fetchEvents } from './events-service';
 import { convertEventPayloadFromDataConverter } from './data-converter';
-import { get } from 'svelte/store';
+
 import { dataConverterPort } from '$lib/stores/data-converter-config';
+import { getWorkflowFilterParameters } from '$lib/utilities/get-workflow-filter-parameters';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   executionId: string;
@@ -26,20 +29,6 @@ type CombinedWorkflowExecutionsResponse = {
   nextPageTokens: NextPageTokens;
 };
 
-type TimeRangeParameter = {
-  timeRange?: Duration | string;
-};
-
-type StatusParameters = {
-  status?: WorkflowStatus;
-};
-
-const createDate = (timeRange: Duration | string) => {
-  const duration =
-    typeof timeRange === 'string' ? toDuration(timeRange) : timeRange;
-  return formatISO(sub(new Date(), duration));
-};
-
 const emptyWorkflowRequest = (): Promise<ListWorkflowExecutionsResponse> => {
   return Promise.resolve({
     executions: [],
@@ -48,18 +37,16 @@ const emptyWorkflowRequest = (): Promise<ListWorkflowExecutionsResponse> => {
 
 export const fetchOpenWorkflows = (
   namespace: string,
-  { timeRange, status }: TimeRangeParameter & StatusParameters,
+  parameters: FilterParameters,
   request = fetch,
 ): Promise<ListWorkflowExecutionsResponse> => {
   if (status && status !== 'Running') return emptyWorkflowRequest();
+  const params = getWorkflowFilterParameters(parameters);
+
   return requestFromAPI<ListWorkflowExecutionsResponse>(
     `/namespaces/${namespace}/workflows/open`,
     {
-      params: {
-        'start_time_filter.earliest_time': createDate(
-          timeRange || { hours: 24 },
-        ),
-      },
+      params,
       request,
     },
   );
@@ -67,18 +54,12 @@ export const fetchOpenWorkflows = (
 
 export const fetchClosedWorkflows = (
   namespace: string,
-  { timeRange, status }: TimeRangeParameter & StatusParameters,
+  parameters: FilterParameters,
   request = fetch,
 ): Promise<ListWorkflowExecutionsResponse> => {
   if (status === 'Running') return emptyWorkflowRequest();
 
-  const params: Record<string, string> = {
-    'start_time_filter.earliest_time': createDate(timeRange || { hours: 24 }),
-  };
-
-  const statusFilter = getStatusFilterCode(status);
-
-  if (statusFilter) params['status_filter.status'] = statusFilter;
+  const params = getWorkflowFilterParameters(parameters);
 
   return requestFromAPI<ListWorkflowExecutionsResponse>(
     `/namespaces/${namespace}/workflows/closed`,
@@ -91,13 +72,14 @@ export const fetchClosedWorkflows = (
 
 export const fetchAllWorkflows = async (
   namespace: string,
-  { timeRange, status }: TimeRangeParameter & StatusParameters,
+  parameters: FilterParameters,
   request = fetch,
 ): Promise<CombinedWorkflowExecutionsResponse> => {
   const [open, closed] = await Promise.all([
-    fetchOpenWorkflows(namespace, { timeRange, status }, request),
-    fetchClosedWorkflows(namespace, { timeRange, status }, request),
+    fetchOpenWorkflows(namespace, parameters, request),
+    fetchClosedWorkflows(namespace, parameters, request),
   ]);
+
   const executions = [...open?.executions, ...closed?.executions];
 
   return {
