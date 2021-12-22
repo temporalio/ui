@@ -5,5 +5,5 @@
     "**/build-local": true,
     "**/build-cloud": true
   },
-  "jest.nodeEnv": {"TZ":"UTC"}
+  "jest.nodeEnv": { "TZ": "UTC" }
 }
