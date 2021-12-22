@@ -74,3 +74,10 @@ type Activity = {
   activityTaskCancelRequestedEvent?: ActivityTaskCancelRequestedEvent;
   activityTaskCanceledEvent?: ActivityTaskCanceledEvent;
 };
+
+type FilterParameters = {
+  workflowId?: string;
+  workflowType?: string;
+  status?: WorkflowStatus;
+  timeRange?: Duration | string;
+};

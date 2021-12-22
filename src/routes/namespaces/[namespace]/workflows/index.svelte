@@ -5,12 +5,14 @@
     if (!page.query.has('time-range')) page.query.set('time-range', '24 hours');
 
     const namespace = page.params.namespace;
+    const workflowId = page.query.get('workflow-id');
+    const workflowType = page.query.get('workflow-type');
     const timeRange = page.query.get('time-range');
     const status = page.query.get('status') as WorkflowStatus;
 
     const initialData = await fetchAllWorkflows(
-      page.params.namespace,
-      { timeRange, status },
+      namespace,
+      { workflowId, workflowType, timeRange, status },
       fetch,
     );
 

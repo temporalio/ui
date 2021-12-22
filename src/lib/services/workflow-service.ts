@@ -6,7 +6,6 @@ import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { toDuration } from '$lib/utilities/to-duration';
-import { getStatusFilterCode } from '$lib/utilities/get-workflow-status-filter-code';
 
 import {
   toWorkflowExecution,
@@ -18,6 +17,7 @@ import { fetchEvents } from './events-service';
 import { convertEventPayloadFromDataConverter } from './data-converter';
 
 import { dataConverterPort } from '$lib/stores/data-converter-config';
+import { getWorkflowFilterParameters } from '$lib/utilities/get-workflow-filter-parameters';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   executionId: string;
@@ -27,13 +27,6 @@ export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
 type CombinedWorkflowExecutionsResponse = {
   workflows: WorkflowExecution[];
   nextPageTokens: NextPageTokens;
-};
-
-type FilterParameters = {
-  workflowId?: string;
-  workflowType?: string;
-  status?: WorkflowStatus;
-  timeRange?: Duration | string;
 };
 
 const createDate = (timeRange: Duration | string) => {
@@ -50,18 +43,16 @@ const emptyWorkflowRequest = (): Promise<ListWorkflowExecutionsResponse> => {
 
 export const fetchOpenWorkflows = (
   namespace: string,
-  { timeRange, status }: FilterParameters,
+  parameters: FilterParameters,
   request = fetch,
 ): Promise<ListWorkflowExecutionsResponse> => {
   if (status && status !== 'Running') return emptyWorkflowRequest();
+  const params = getWorkflowFilterParameters(parameters);
+
   return requestFromAPI<ListWorkflowExecutionsResponse>(
     `/namespaces/${namespace}/workflows/open`,
     {
-      params: {
-        'start_time_filter.earliest_time': createDate(
-          timeRange || { hours: 24 },
-        ),
-      },
+      params,
       request,
     },
   );
@@ -69,18 +60,12 @@ export const fetchOpenWorkflows = (
 
 export const fetchClosedWorkflows = (
   namespace: string,
-  { timeRange, status }: FilterParameters,
+  parameters: FilterParameters,
   request = fetch,
 ): Promise<ListWorkflowExecutionsResponse> => {
   if (status === 'Running') return emptyWorkflowRequest();
 
-  const params: Record<string, string> = {
-    'start_time_filter.earliest_time': createDate(timeRange || { hours: 24 }),
-  };
-
-  const statusFilter = getStatusFilterCode(status);
-
-  if (statusFilter) params['status_filter.status'] = statusFilter;
+  const params = getWorkflowFilterParameters(parameters);
 
   return requestFromAPI<ListWorkflowExecutionsResponse>(
     `/namespaces/${namespace}/workflows/closed`,
@@ -93,12 +78,12 @@ export const fetchClosedWorkflows = (
 
 export const fetchAllWorkflows = async (
   namespace: string,
-  { timeRange, status }: FilterParameters,
+  parameters: FilterParameters,
   request = fetch,
 ): Promise<CombinedWorkflowExecutionsResponse> => {
   const [open, closed] = await Promise.all([
-    fetchOpenWorkflows(namespace, { timeRange, status }, request),
-    fetchClosedWorkflows(namespace, { timeRange, status }, request),
+    fetchOpenWorkflows(namespace, parameters, request),
+    fetchClosedWorkflows(namespace, parameters, request),
   ]);
 
   const executions = [...open?.executions, ...closed?.executions];
