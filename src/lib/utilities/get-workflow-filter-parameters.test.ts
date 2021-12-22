@@ -12,7 +12,7 @@ describe(getWorkflowFilterParameters, () => {
 
   it('should always have a default earliest_time of 24 hours', () => {
     jest.useFakeTimers().setSystemTime(new Date('2020-01-01').getTime());
-    const OneDayEarlier = '2019-12-30T17:00:00-07:00';
+    const OneDayEarlier = '2019-12-31T00:00:00Z';
 
     const result = getWorkflowFilterParameters();
     expect(result['start_time_filter.earliest_time']).toBe(OneDayEarlier);
@@ -20,7 +20,7 @@ describe(getWorkflowFilterParameters, () => {
 
   it('should adjust the start time based on a duration', () => {
     jest.useFakeTimers().setSystemTime(new Date('2020-01-01').getTime());
-    const NinetyDaysEarlier = '2019-10-02T17:00:00-06:00';
+    const NinetyDaysEarlier = '2019-10-03T00:00:00Z';
 
     const result = getWorkflowFilterParameters({ timeRange: { days: 90 } });
     expect(result['start_time_filter.earliest_time']).toBe(NinetyDaysEarlier);
