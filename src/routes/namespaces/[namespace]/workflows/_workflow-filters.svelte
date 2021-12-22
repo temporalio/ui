@@ -6,6 +6,9 @@
 
   export let timeFormat: string = 'relative';
 
+  let workflowIdFilter = '';
+  let workflowTypeFilter = '';
+
   const durations = [
     '10 minutes',
     '60 minutes',
@@ -32,8 +35,12 @@
 <section class="flex flex-col my-8">
   <h2 class="text-3xl mb-4">Workflows</h2>
   <div class="grid grid-cols-5 gap-4">
-    <FilterInput id="workflow-id-filter" name="Workflow ID" value="" />
-    <FilterInput id="workflow-type-filter" name="Workflow Type" value="" />
+    <FilterInput id="workflow-id" name="Workflow ID" value={workflowIdFilter} />
+    <FilterInput
+      id="workflow-type"
+      name="Workflow Type"
+      value={workflowTypeFilter}
+    />
     <FilterSelect label="Time Range" parameter="time-range" value="24 hours">
       {#each durations as value}
         <Option {value}>{value}</Option>
