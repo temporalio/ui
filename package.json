@@ -8,7 +8,7 @@
     "dev:cloud": "TEMPORAL_UI_BUILD_TARGET=cloud svelte-kit dev",
     "build:local": "TEMPORAL_UI_BUILD_TARGET=local svelte-kit build",
     "build:cloud": "TEMPORAL_UI_BUILD_TARGET=cloud svelte-kit build",
-    "test": "jest",
+    "test": "TZ=UTC jest",
     "preview:local": "TEMPORAL_UI_BUILD_TARGET=local svelte-kit preview",
     "preview:cloud": "TEMPORAL_UI_BUILD_TARGET=cloud svelte-kit preview",
     "check": "TEMPORAL_UI_BUILD_TARGET=local svelte-check --tsconfig ./tsconfig.json",
