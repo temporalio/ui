@@ -2,6 +2,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import debounce from 'just-debounce';
 
   export let parameter: string;
   export let name: string;
@@ -10,9 +11,10 @@
   let _value = (parameter && $page.query.get(parameter)) || value;
 
   const id = `${parameter || name}-filter`;
+  const update = debounce(updateQueryParameters, 300);
 
   $: {
-    updateQueryParameters({
+    update({
       parameter,
       value: _value,
       query: $page.query,

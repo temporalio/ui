@@ -22,10 +22,11 @@
     "cypress:open": "TEMPORAL_API_HOST=http://localhost:3000 cypress open"
   },
   "dependencies": {
-    "@sveltejs/svelte-virtual-list": "^3.0.1",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@sveltejs/svelte-virtual-list": "^3.0.1",
     "date-fns": "^2.23.0",
     "json-beautify": "^1.1.1",
+    "just-debounce": "^1.1.0",
     "svelte-fa": "^2.4.0",
     "svelte-hero-icons": "^3.0.0",
     "url-pattern": "^1.0.3",

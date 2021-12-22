@@ -2,12 +2,14 @@ import type { goto, invalidate } from '$app/navigation';
 
 type UpdateQueryParams = {
   parameter: string;
-  value: string;
+  value?: string;
   query: URLSearchParams;
   path: string;
   goto: typeof goto;
   invalidate?: typeof invalidate;
 };
+
+const options = { replaceState: true, keepfocus: true };
 
 export const updateQueryParameters = ({
   parameter,
@@ -21,5 +23,10 @@ export const updateQueryParameters = ({
   } else {
     query.delete(parameter);
   }
-  goto(`${path}?${query}`, { replaceState: true, keepfocus: true });
+
+  if (query.toString()) {
+    goto(`${path}?${query}`, options);
+  } else {
+    goto(path, options);
+  }
 };
