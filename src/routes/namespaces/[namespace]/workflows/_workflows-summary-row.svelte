@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
-
   import { namespace } from '$lib/stores/namespace';
   import { getWorkflowExecutionUrl } from '$lib/utilities/get-workflow-execution-url';
+
   import Time from '$lib/components/workflow-time.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
 
