@@ -1,11 +1,9 @@
-import { sub, formatISO } from 'date-fns';
 import { get } from 'svelte/store';
 
 import type { ListWorkflowExecutionsResponse } from '$types';
 import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
 import { requestFromAPI } from '$lib/utilities/request-from-api';
-import { toDuration } from '$lib/utilities/to-duration';
 
 import {
   toWorkflowExecution,
@@ -40,7 +38,8 @@ export const fetchOpenWorkflows = (
   parameters: FilterParameters,
   request = fetch,
 ): Promise<ListWorkflowExecutionsResponse> => {
-  if (status && status !== 'Running') return emptyWorkflowRequest();
+  if (parameters.status !== 'Running') return emptyWorkflowRequest();
+
   const params = getWorkflowFilterParameters(parameters);
 
   return requestFromAPI<ListWorkflowExecutionsResponse>(
@@ -57,7 +56,7 @@ export const fetchClosedWorkflows = (
   parameters: FilterParameters,
   request = fetch,
 ): Promise<ListWorkflowExecutionsResponse> => {
-  if (status === 'Running') return emptyWorkflowRequest();
+  if (parameters.status !== 'Running') return emptyWorkflowRequest();
 
   const params = getWorkflowFilterParameters(parameters);
 
