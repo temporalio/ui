@@ -10,7 +10,7 @@
   class="relative flex flex-col items-start justify-center border-gray-100 w-full"
 >
   <select
-    class="inline border-2 text-base p-2 w-full h-10 rounded-lg"
+    class="inline border-2 text-base px-2 w-full h-10 rounded-lg"
     class:dark
     class:remove={arrow}
     {id}
@@ -35,7 +35,7 @@
   }
 
   .arrow::after {
-    @apply absolute text-white text-sm font-normal top-2 right-3;
+    @apply text-white text-sm font-normal mr-4;
     font-family: 'Font Awesome 5 Free';
     content: '\f0dc';
   }

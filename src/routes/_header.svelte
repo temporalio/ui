@@ -20,25 +20,31 @@
   export let user: { name?: string; email?: string; picture?: string } = {};
 </script>
 
-<div
-  id="header"
-  class="h-16 w-full px-6 flex flex-row items-center justify-between bg-gray-900"
+<header
+  class="grid grid-rows-1 grid-cols-12 gap-8 px-10 items-center bg-gray-900 shadow-lg"
 >
-  <div class="flex flex-row justify-center items-center gap-4">
-    <img src="/logo.svg" alt="Temporal Logo" />
+  <div class="flex gap-4 col-span-3">
+    <a href="/" class="block">
+      <img src="/logo.svg" alt="Temporal Logo" class="max-h-10" />
+    </a>
     <NamespaceSelect />
-    <div class="flex flex-row">
-      <NavigationLink href={`/namespaces/${$namespace}/workflows`}>
-        Workflows
-      </NavigationLink>
-      <NavigationLink href={`/namespaces/${$namespace}/settings`}>
-        Settings
-      </NavigationLink>
-    </div>
   </div>
-  <div class="flex flex-row justify-center items-center">
+  <div class="flex gap-4 col-span-4">
+    <NavigationLink href={`/namespaces/${$namespace}/workflows`}>
+      Workflows
+    </NavigationLink>
+    <NavigationLink href={`/namespaces/${$namespace}/settings`}>
+      Settings
+    </NavigationLink>
+  </div>
+  <div class="col-span-2">
     <DataConvertorStatus />
-    <a href="https://github.com/temporalio/web/issues/new/choose">
+  </div>
+  <div class="flex justify-end gap-4 col-span-3">
+    <a
+      class="header-button"
+      href="https://github.com/temporalio/web/issues/new/choose"
+    >
       Report Bug/Give Feedback
     </a>
     {#if user.email}
@@ -46,24 +52,19 @@
         {user.email}
       </span>
     {:else}
-      <a href={import.meta.env.VITE_API + '/auth/sso'}> Sign In </a>
+      <a class="header-button" href={import.meta.env.VITE_API + '/auth/sso'}>
+        Sign In
+      </a>
     {/if}
   </div>
-</div>
+</header>
 
 <style lang="postcss">
-  #header {
-    @apply bg-gray-900 mb-0 shadow-lg;
-  }
-
-  img {
-    @apply w-8 mx-4;
-  }
-  a {
+  .header-button {
     @apply block px-4 py-2 text-sm text-white;
   }
 
-  a:hover {
+  .header-button:hover {
     @apply bg-purple-100 rounded-md text-gray-900;
   }
 </style>

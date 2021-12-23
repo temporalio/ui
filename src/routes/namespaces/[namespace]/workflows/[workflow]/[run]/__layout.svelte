@@ -25,9 +25,7 @@
   export let namespace: string;
 </script>
 
-<section class="border-l-2 h-screen">
-  <main class="w-full">
-    <Header {workflow} {namespace} />
-    <slot />
-  </main>
-</section>
+<main class="w-full">
+  <Header {workflow} {namespace} />
+  <slot />
+</main>

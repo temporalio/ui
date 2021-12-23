@@ -1,13 +1,16 @@
 <script lang="ts">
   import Icon from 'svelte-fa';
+
   import {
     faLongArrowAltDown,
     faLongArrowAltUp,
   } from '@fortawesome/free-solid-svg-icons';
+
   import {
     dataConverterPort,
     lastDataConverterStatus,
   } from '$lib/stores/data-converter-config';
+
   import Tooltip from '$lib/components/tooltip.svelte';
 </script>
 

@@ -42,10 +42,9 @@
   let timeFormat = 'relative';
 </script>
 
-<section class="h-full">
-  <header>
-    <WorkflowFilters bind:timeFormat />
-  </header>
+<section class="flex flex-col gap-4 h-full">
+  <h2 class="text-2xl">Workflows</h2>
+  <WorkflowFilters bind:timeFormat />
   {#await data}
     <WorkflowsLoadingState />
   {:then { workflows }}
