@@ -26,7 +26,7 @@
   $: label = humanFriendlyNames[status];
 </script>
 
-<span class={`${color} rounded-xl text-center px-2 text-sm`}>
+<span class={`${color} rounded-md text-center px-2 text-sm`}>
   {label}
 </span>
 

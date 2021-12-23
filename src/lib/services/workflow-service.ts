@@ -33,12 +33,22 @@ const emptyWorkflowRequest = (): Promise<ListWorkflowExecutionsResponse> => {
   });
 };
 
+const checkForStatus =
+  (workflowStatus: WorkflowStatus, value: boolean) =>
+  ({ status }: FilterParameters): boolean => {
+    if (status && status[workflowStatus] === value) return true;
+    return false;
+  };
+
+const filterIsSetToRunning = checkForStatus('Running', true);
+const filterIsSetNotToRunning = checkForStatus('Running', false);
+
 export const fetchOpenWorkflows = (
   namespace: string,
   parameters: FilterParameters,
   request = fetch,
 ): Promise<ListWorkflowExecutionsResponse> => {
-  if (parameters.status !== 'Running') return emptyWorkflowRequest();
+  if (filterIsSetNotToRunning(parameters)) return emptyWorkflowRequest();
 
   const params = getWorkflowFilterParameters(parameters);
 
@@ -56,7 +66,7 @@ export const fetchClosedWorkflows = (
   parameters: FilterParameters,
   request = fetch,
 ): Promise<ListWorkflowExecutionsResponse> => {
-  if (parameters.status !== 'Running') return emptyWorkflowRequest();
+  if (filterIsSetToRunning(parameters)) return emptyWorkflowRequest();
 
   const params = getWorkflowFilterParameters(parameters);
 

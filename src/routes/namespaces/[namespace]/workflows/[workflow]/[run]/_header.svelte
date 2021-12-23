@@ -1,4 +1,7 @@
 <script lang="ts">
+  import Icon from 'svelte-fa';
+  import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
@@ -8,32 +11,30 @@
   export let namespace: string;
 </script>
 
-<header class="flex flex-col justify-between">
-  <main class="px-6 mb-2">
-    <div class="flex m-0 mt-6 justify-between items-center">
-      <h1 class="text-lg">
-        <a href={`/namespaces/${namespace}/workflows`}>
-          <i
-            class="fas fa-arrow-left inline w-5 h-5 text-gray-500 cursor-pointer"
-          />
-        </a>
-        {workflow.name}
-        <span class="inline">
+<header class="flex flex-col gap-8">
+  <main class="flex flex-col gap-1 relative">
+    <a href="/namespaces/{namespace}/workflows">
+      <Icon
+        icon={faChevronLeft}
+        class="absolute top-2 back-to-workflows"
+        style="left: -1.5rem"
+      />
+      <div class="flex justify-between items-center">
+        <h1 class="text-2xl">
+          {workflow.name}
           <WorkflowStatus status={workflow?.status} />
-        </span>
-      </h1>
-      <TerminateWorkflow {workflow} {namespace} />
-    </div>
-    <p class="text-gray-500 text-xs">
-      <span class="uppercase text-gray-400 mr-2">Workflow ID</span>
-      {workflow.id}
-    </p>
+        </h1>
+        <TerminateWorkflow {workflow} {namespace} />
+      </div>
+      <p class="text-md">
+        <span>Workflow ID</span>
+        <span class="font-medium">{workflow.id}</span>
+      </p>
+      <p class="text-md">
+        <span>Run ID</span>
+        <span class="font-medium">{workflow.runId}</span>
+      </p>
+    </a>
   </main>
   <Tabs {workflow} />
 </header>
-
-<style lang="postcss">
-  p {
-    @apply ml-6;
-  }
-</style>
