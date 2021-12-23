@@ -28,6 +28,7 @@
     "json-beautify": "^1.1.1",
     "just-debounce": "^1.1.0",
     "svelte-fa": "^2.4.0",
+    "svelte-virtual-scroll-list": "^1.0.8",
     "url-pattern": "^1.0.3",
     "websocket-as-promised": "^2.0.1"
   },

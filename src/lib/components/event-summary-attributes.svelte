@@ -6,7 +6,7 @@
   export let attributes: Record<string, unknown>;
 </script>
 
-<div class="flex items-center event gap-4 w-full h-full overflow-x-hidden">
+<div class="flex items-center event gap-4 w-full h-full">
   {#each Object.entries(attributes).filter(([, value]) => !!value) as [attribute, value]}
     <div class="flex gap-2">
       <h4 class="flex items-center">{format(attribute)}</h4>

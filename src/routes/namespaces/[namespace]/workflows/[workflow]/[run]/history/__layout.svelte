@@ -14,7 +14,7 @@
   let category: EventTypeCategory = null;
 </script>
 
-<section class="flex flex-col gap-4">
+<section class="flex flex-col gap-4 h-full">
   <h3 class="text-lg font-semibold">Event History</h3>
   <nav class="flex gap-4 justify-between">
     <div>

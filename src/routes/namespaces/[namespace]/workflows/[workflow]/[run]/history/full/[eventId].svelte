@@ -8,20 +8,16 @@
 
     return {
       props: {
-        events,
+        event: events.find((event) => event.id === page.params.eventId),
       },
     };
   }
 </script>
 
 <script lang="ts">
-  export let events: HistoryEventWithId[];
+  import EventDetails from '$lib/components/event-details.svelte';
+
+  export let event: HistoryEventWithId;
 </script>
 
-<section>
-  <pre>
-    <code>
-      {JSON.stringify(events, null, 2)}
-    </code>
-  </pre>
-</section>
+<EventDetails attributes={event.attributes} />
