@@ -1,3 +1,5 @@
+process.env.TZ = 'UTC';
+
 export default {
   preset: 'ts-jest',
   testEnvironment: 'node',

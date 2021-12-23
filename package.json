@@ -8,7 +8,7 @@
     "dev:cloud": "TEMPORAL_UI_BUILD_TARGET=cloud svelte-kit dev",
     "build:local": "TEMPORAL_UI_BUILD_TARGET=local svelte-kit build",
     "build:cloud": "TEMPORAL_UI_BUILD_TARGET=cloud svelte-kit build",
-    "test": "jest",
+    "test": "TZ=UTC jest",
     "preview:local": "TEMPORAL_UI_BUILD_TARGET=local svelte-kit preview",
     "preview:cloud": "TEMPORAL_UI_BUILD_TARGET=cloud svelte-kit preview",
     "check": "TEMPORAL_UI_BUILD_TARGET=local svelte-check --tsconfig ./tsconfig.json",
@@ -26,6 +26,7 @@
     "@sveltejs/svelte-virtual-list": "^3.0.1",
     "date-fns": "^2.23.0",
     "json-beautify": "^1.1.1",
+    "just-debounce": "^1.1.0",
     "svelte-fa": "^2.4.0",
     "url-pattern": "^1.0.3",
     "websocket-as-promised": "^2.0.1"
