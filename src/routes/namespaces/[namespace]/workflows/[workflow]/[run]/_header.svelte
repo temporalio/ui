@@ -19,22 +19,22 @@
         class="absolute top-2 back-to-workflows"
         style="left: -1.5rem"
       />
-      <div class="flex justify-between items-center">
-        <h1 class="text-2xl">
-          {workflow.name}
-          <WorkflowStatus status={workflow?.status} />
-        </h1>
-        <TerminateWorkflow {workflow} {namespace} />
-      </div>
-      <p class="text-md">
-        <span>Workflow ID</span>
-        <span class="font-medium">{workflow.id}</span>
-      </p>
-      <p class="text-md">
-        <span>Run ID</span>
-        <span class="font-medium">{workflow.runId}</span>
-      </p>
     </a>
+    <div class="flex justify-between items-center">
+      <h1 class="text-2xl">
+        {workflow.name}
+        <WorkflowStatus status={workflow?.status} />
+      </h1>
+      <TerminateWorkflow {workflow} {namespace} />
+    </div>
+    <p class="text-md">
+      <span>Workflow ID</span>
+      <span class="font-medium">{workflow.id}</span>
+    </p>
+    <p class="text-md">
+      <span>Run ID</span>
+      <span class="font-medium">{workflow.runId}</span>
+    </p>
   </main>
   <Tabs {workflow} />
 </header>
