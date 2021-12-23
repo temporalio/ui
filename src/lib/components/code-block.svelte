@@ -1,7 +1,5 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import Icon from 'svelte-hero-icons/Icon.svelte';
-  import { Clipboard, Check } from 'svelte-hero-icons';
 
   export let heading = '';
   export let content: string | Parameters<typeof JSON.stringify>[0];
@@ -47,15 +45,9 @@
 
     <button on:click={copy}>
       {#if copied}
-        <Icon
-          src={Check}
-          class="w-8 h-8 text-purple-900 bg-gray-300 border-2 border-gray-200 absolute right-0 top-0 hidden group-hover:block hover:bg-gray-400 hover:border-gray-400"
-        />
+        <i class="fas fa-check" />
       {:else}
-        <Icon
-          src={Clipboard}
-          class="w-8 h-8 text-purple-900 bg-gray-300 border-2 border-gray-200 absolute right-0 top-0 hidden group-hover:block hover:bg-gray-400 hover:border-gray-400"
-        />
+        <i class="fas fa-clipboard" />
       {/if}
     </button>
   </div>

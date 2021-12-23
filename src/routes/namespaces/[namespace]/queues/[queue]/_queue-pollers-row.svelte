@@ -1,7 +1,4 @@
 <script lang="ts">
-  import Icon from 'svelte-hero-icons/Icon.svelte';
-  import { Check } from 'svelte-hero-icons';
-
   import type { PollerWithTaskQueueTypes } from '$lib/services/pollers-service';
   import { formatDate } from '$lib/utilities/format-date';
 
@@ -19,14 +16,14 @@
   </td>
   {#if poller.taskQueueTypes.includes('WORKFLOW')}
     <td>
-      <Icon src={Check} class="w-8 h-8 pl-3" />
+      <i class="fas fa-check" />
     </td>
   {:else}
     <td />
   {/if}
   {#if poller.taskQueueTypes.includes('ACTIVITY')}
     <td>
-      <Icon src={Check} class="w-8 h-8 pl-3" />
+      <i class="fas fa-check" />
     </td>
   {:else}
     <td />
