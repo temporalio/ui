@@ -46,9 +46,6 @@ const config = {
       fallback: 'index.html',
     }),
     vite: {
-      optimizeDeps: {
-        include: ['svelte-hero-icons'],
-      },
       resolve: {
         alias: {
           $types: path.resolve('./src/types'),
