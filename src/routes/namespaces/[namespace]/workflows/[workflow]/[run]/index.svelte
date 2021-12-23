@@ -20,8 +20,12 @@
 </script>
 
 <script lang="ts">
-  import Icon from 'svelte-fa';
-  import { faAlignLeft } from '@fortawesome/free-solid-svg-icons';
+  import {
+    faCode,
+    faDownload,
+    faLayerGroup,
+    faStream,
+  } from '@fortawesome/free-solid-svg-icons';
 
   import { eventTypeInCategory } from '$lib/utilities/get-event-categorization';
 
@@ -61,14 +65,14 @@
       </div>
       <div class="flex gap-4">
         <ToggleButtons>
-          <ToggleButton icon={faAlignLeft} active />
-          <ToggleButton icon={faAlignLeft} />
-          <ToggleButton icon={faAlignLeft} />
+          <ToggleButton icon={faStream} active />
+          <ToggleButton icon={faLayerGroup} />
+          <ToggleButton icon={faCode} />
         </ToggleButtons>
-        <ToggleButton icon={faAlignLeft} />
+        <ToggleButton icon={faDownload} />
       </div>
     </nav>
-    {#each visibleEvents as event}
+    {#each visibleEvents as event (event.id)}
       <Event {event} />
     {/each}
   </section>

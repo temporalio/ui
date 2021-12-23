@@ -6,7 +6,7 @@
 
   export let icon: IconDefinition;
   export let group = getContext<boolean>('group');
-  export let scale = 1.2;
+  export let scale = 1;
   export let active = false;
 </script>
 
