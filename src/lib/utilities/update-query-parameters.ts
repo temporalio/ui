@@ -1,4 +1,5 @@
 import type { goto, invalidate } from '$app/navigation';
+import { appendQueryParameters } from './append-query-parameters';
 
 type UpdateQueryParams = {
   parameter: string;
@@ -24,9 +25,5 @@ export const updateQueryParameters = ({
     query.delete(parameter);
   }
 
-  if (query.toString()) {
-    goto(`${path}?${query}`, options);
-  } else {
-    goto(path, options);
-  }
+  goto(appendQueryParameters(path, query), options);
 };
