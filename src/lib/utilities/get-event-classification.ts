@@ -29,12 +29,14 @@ export const eventClassifications = [
   'Terminated',
 ] as const;
 
-const has = (event: unknown, property: string): boolean => {
-  return Object.prototype.hasOwnProperty.call(event, property);
+const has = (target: unknown, property: string): boolean => {
+  return Object.prototype.hasOwnProperty.call(target, property);
 };
 
 export const isEvent = (event: unknown): event is HistoryEventWithId => {
+  if (event === null) return false;
   if (typeof event !== 'object') return false;
+  if (Array.isArray(event)) return false;
   if (has(event, 'eventType')) return true;
   return false;
 };
@@ -42,7 +44,9 @@ export const isEvent = (event: unknown): event is HistoryEventWithId => {
 export const isActivity = (
   event: HistoryEventWithId | PendingActivity,
 ): event is PendingActivity => {
+  if (event === null) return false;
   if (typeof event !== 'object') return false;
+  if (Array.isArray(event)) return false;
   if (has(event, 'activityType')) return true;
   return false;
 };
@@ -62,7 +66,7 @@ export const getEventClassification = (
 
 const getName = (event: HistoryEventWithId | PendingActivity): string => {
   if (isEvent(event)) return String(event.eventType);
-  if (isActivity(event)) return `${event.activityType.name}: ${event.state}`;
+  if (isActivity(event)) return `${event.activityType.name}:${event.state}`;
 };
 
 const getTime = (event: HistoryEventWithId | PendingActivity): string => {
