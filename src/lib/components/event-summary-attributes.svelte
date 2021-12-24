@@ -11,7 +11,7 @@
     <div class="flex gap-2">
       <h4 class="flex items-center">{format(attribute)}</h4>
       {#if typeof value === 'object'}
-        <CodeBlock content={value} inline={true} />
+        <CodeBlock content={value} />
       {:else}
         <p class="w-full label">{value}</p>
       {/if}

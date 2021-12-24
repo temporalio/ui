@@ -19,7 +19,7 @@
       query: $page.query,
       path: $page.path,
       goto,
-    });
+    }).then((v) => (value = v));
   }
 </script>
 

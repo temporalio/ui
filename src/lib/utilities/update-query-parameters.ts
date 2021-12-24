@@ -12,13 +12,13 @@ type UpdateQueryParams = {
 
 const options = { replaceState: true, keepfocus: true };
 
-export const updateQueryParameters = ({
+export const updateQueryParameters = async ({
   parameter,
   value,
   query,
   path,
   goto,
-}: UpdateQueryParams): void => {
+}: UpdateQueryParams): Promise<typeof value> => {
   if (value) {
     query.set(parameter, value);
   } else {
@@ -26,4 +26,6 @@ export const updateQueryParameters = ({
   }
 
   goto(appendQueryParameters(path, query), options);
+
+  return value;
 };

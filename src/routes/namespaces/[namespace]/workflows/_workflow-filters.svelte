@@ -23,7 +23,7 @@
   const statuses = {
     All: null,
     Running: 'Running',
-    TimedOut: 'Timed Out',
+    'Timed Out': 'TimedOut',
     Completed: 'Completed',
     Failed: 'Failed',
     'Continued as New': 'ContinuedAsNew',
