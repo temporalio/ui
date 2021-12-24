@@ -1,4 +1,9 @@
-import { getEventClassification } from './get-event-classification';
+import {
+  getEventClassification,
+  isEvent,
+  isActivity,
+  formatEvent,
+} from './get-event-classification';
 
 describe(getEventClassification, () => {
   it('should return "Started" for WorkflowExecutionStartedEvent', () => {
