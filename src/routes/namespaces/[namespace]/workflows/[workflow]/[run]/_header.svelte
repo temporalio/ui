@@ -13,12 +13,12 @@
 
 <header class="flex flex-col gap-8">
   <main class="flex flex-col gap-1 relative">
-    <a
-      href="/namespaces/{namespace}/workflows"
-      class="absolute top-2 back-to-workflows"
-      style="left: -1.5rem"
-    >
-      <Icon icon={faChevronLeft} />
+    <a href="/namespaces/{namespace}/workflows">
+      <Icon
+        icon={faChevronLeft}
+        class="absolute top-2 back-to-workflows"
+        style="left: -1.5rem"
+      />
     </a>
     <div class="flex justify-between items-center">
       <h1 class="text-2xl">
