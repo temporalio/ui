@@ -1,36 +1,59 @@
 <script lang="ts">
+  import { getContext } from 'svelte';
   import { page } from '$app/stores';
 
-  import { getEventClassification } from '$lib/utilities/get-event-classification';
-  import { format } from '$lib/utilities/format-camel-case';
+  import { formatEvent } from '$lib/utilities/get-event-classification';
 
   import EventLabel from '$lib/components/event-label.svelte';
 
-  export let event: HistoryEventWithId;
-  export let href: string;
+  export let event: HistoryEventWithId | PendingActivity;
+
+  let { id, pending, timeStamp, name, tag, classification } =
+    formatEvent(event);
+
+  let path = getContext<string>('path');
+  let href = pending ? `${path}/pending-${id}` : `${path}/event-${id}`;
 </script>
 
 <a
   {href}
   sveltekit:noscroll
   sveltekit:prefetch
-  class="block border-b-2 border-gray-300"
+  class="flex border-b-2 border-gray-300 w-full items-center"
+  class:pending
+  class:active={$page.path.includes(href)}
 >
-  <article
-    class="p-4 border-l-4 border-white"
-    class:active={$page.path.includes(href)}
-  >
-    <h2 class="mb-2 {event.eventType}">
-      <EventLabel color={getEventClassification(event)}>
-        {format(String(event.eventType))}
+  <article class="p-4 w-full">
+    <h2 class="mb-2 {tag}">
+      <EventLabel color={classification}>
+        {name}
       </EventLabel>
     </h2>
-    <p>{event.eventTime}</p>
+    <p>{timeStamp}</p>
   </article>
+  {#if pending}
+    <div class="mx-8 text-orange-600 italic">Pending</div>
+  {/if}
 </a>
 
 <style lang="postcss">
   .active {
-    @apply border-blue-800 bg-blue-100;
+    background: theme('colors.blue[100]');
+    /* Creates a border without modifying the shape and size of the element. */
+    background-image: linear-gradient(
+      90deg,
+      theme('colors.blue[700]') 0%,
+      theme('colors.blue[700]') 1%,
+      theme('colors.blue[100]') 1%,
+      theme('colors.blue[100]') 1%
+    );
+  }
+
+  .pending {
+    @apply bg-orange-50;
+  }
+
+  .pending .active {
+    @apply bg-blue-100;
   }
 </style>

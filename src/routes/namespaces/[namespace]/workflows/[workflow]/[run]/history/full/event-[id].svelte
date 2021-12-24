@@ -8,7 +8,7 @@
 
     return {
       props: {
-        event: events.find((event) => event.id === page.params.eventId),
+        event: events.find((event) => event.id === page.params.id),
       },
     };
   }

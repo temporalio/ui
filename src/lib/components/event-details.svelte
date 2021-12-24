@@ -1,8 +1,12 @@
 <script lang="ts">
   import { format } from '$lib/utilities/format-camel-case';
+
   import CodeBlock from './code-block.svelte';
 
-  export let attributes: EventAttribute | Record<string, unknown>;
+  export let attributes:
+    | EventAttribute
+    | PendingActivity
+    | Record<string, unknown>;
 </script>
 
 {#each Object.entries(attributes) as [key, value]}
