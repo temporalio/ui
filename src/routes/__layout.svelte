@@ -44,6 +44,7 @@
   <meta property="og:image" content="/banner.png" />
 </svelte:head>
 
+
 <main class="flex flex-col h-screen gap-8">
   <Notifications />
   <Header />
