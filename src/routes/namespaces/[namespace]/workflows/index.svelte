@@ -42,20 +42,18 @@
   let timeFormat = 'relative';
 </script>
 
-<section class="flex flex-col gap-4 h-full">
-  <h2 class="text-2xl">Workflows</h2>
-  <WorkflowFilters bind:timeFormat />
-  {#await data}
-    <WorkflowsLoadingState />
-  {:then { workflows }}
-    {#if workflows.length}
-      <WorkflowsSummaryTable>
-        <VirtualList items={workflows} let:item>
-          <WorkflowsSummaryRow workflow={item} {timeFormat} />
-        </VirtualList>
-      </WorkflowsSummaryTable>
-    {:else}
-      <WorkflowsEmptyState />
-    {/if}
-  {/await}
-</section>
+<h2 class="text-2xl">Workflows</h2>
+<WorkflowFilters bind:timeFormat />
+{#await data}
+  <WorkflowsLoadingState />
+{:then { workflows }}
+  {#if workflows.length}
+    <WorkflowsSummaryTable>
+      <VirtualList items={workflows} let:item>
+        <WorkflowsSummaryRow workflow={item} {timeFormat} />
+      </VirtualList>
+    </WorkflowsSummaryTable>
+  {:else}
+    <WorkflowsEmptyState />
+  {/if}
+{/await}

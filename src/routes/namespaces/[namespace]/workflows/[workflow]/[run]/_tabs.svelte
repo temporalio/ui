@@ -4,6 +4,7 @@
   import { page } from '$app/stores';
 
   import { getWorkflowExecutionUrl } from '$lib/utilities/get-workflow-execution-url';
+
   import Tab from '$lib/components/tab.svelte';
 
   export let workflow: WorkflowExecution;
