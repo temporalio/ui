@@ -10,7 +10,7 @@
 
 <style lang="postcss">
   .label {
-    @apply text-gray-700 bg-gray-300;
+    @apply px-2 text-gray-700 bg-gray-300;
   }
 
   .Open,

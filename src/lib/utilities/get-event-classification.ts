@@ -12,6 +12,7 @@ type EventSummary = {
 };
 
 export const eventClassifications = [
+  'Unspecified',
   'Scheduled',
   'Open',
   'New',
@@ -49,10 +50,9 @@ export const isActivity = (
 export const getEventClassification = (
   event: HistoryEventWithId | PendingActivity,
 ): EventClassification => {
-  let eventType: string;
+  if (isActivity(event)) return event.state;
 
-  if (isEvent(event)) eventType = event.eventType;
-  if (isActivity(event)) eventType = event.activityType?.name;
+  const eventType = event.eventType;
 
   if (eventType.includes('RequestCancel')) return 'CancelRequested';
   for (const classification of eventClassifications) {
@@ -62,7 +62,7 @@ export const getEventClassification = (
 
 const getName = (event: HistoryEventWithId | PendingActivity): string => {
   if (isEvent(event)) return String(event.eventType);
-  if (isActivity(event)) return String(event.activityType.name);
+  if (isActivity(event)) return `${event.activityType.name}: ${event.state}`;
 };
 
 const getTime = (event: HistoryEventWithId | PendingActivity): string => {
@@ -78,18 +78,12 @@ const getId = (event: HistoryEventWithId | PendingActivity): string => {
 export const formatEvent = (
   event: HistoryEventWithId | PendingActivity,
 ): EventSummary => {
-  const name = format(getName(event));
-  const timeStamp = getTime(event);
-  const classification = getEventClassification(event);
-  const tag = getName(event);
-  const id = getId(event);
-
   return {
-    id,
-    name,
-    timeStamp,
-    classification,
-    tag,
+    id: getId(event),
+    name: format(getName(event)),
+    timeStamp: getTime(event),
+    classification: getEventClassification(event),
+    tag: getName(event),
     pending: isActivity(event),
   };
 };

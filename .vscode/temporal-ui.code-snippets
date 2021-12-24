@@ -1,0 +1,11 @@
+{
+	"Import Icons": {
+		"scope": "javascript,typescript",
+		"prefix": "fai",
+		"body": [
+			"import Icon from 'svelte-fa';",
+			"import { $0 } from '@fortawesome/free-solid-svg-icons';"
+		],
+		"description": "Imports Font Awesome icons"
+	}
+}

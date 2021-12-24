@@ -2,9 +2,13 @@
   import { getContext } from 'svelte';
   import { page } from '$app/stores';
 
+  import Icon from 'svelte-fa';
+  import { faCalendar } from '@fortawesome/free-solid-svg-icons';
+
   import { formatEvent } from '$lib/utilities/get-event-classification';
 
   import EventLabel from '$lib/components/event-label.svelte';
+  import { formatDate } from '$lib/utilities/format-date';
 
   export let event: HistoryEventWithId | PendingActivity;
 
@@ -29,7 +33,10 @@
         {name}
       </EventLabel>
     </h2>
-    <p>{timeStamp}</p>
+    <p class="text-sm">
+      <Icon icon={faCalendar} class="inline" />
+      {formatDate(timeStamp)}
+    </p>
   </article>
   {#if pending}
     <div class="mx-8 text-orange-600 italic">Pending</div>
