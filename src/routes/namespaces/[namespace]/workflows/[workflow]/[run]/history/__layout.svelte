@@ -31,19 +31,17 @@
 </script>
 
 <section class="flex flex-col gap-4">
-  <section class="flex flex-col gap-4">
-    <nav class="flex gap-4 justify-between items-end">
-      <h3 class="text-lg font-semibold">Event History</h3>
-      <div class="flex gap-4">
-        <ToggleButtons>
-          <ToggleButton icon={faStream} href="{path}/full" />
-          <ToggleButton icon={faLayerGroup} href="{path}/compact" />
-          <ToggleButton icon={faCode} href="{path}/json" />
-        </ToggleButtons>
-        <ToggleButton icon={faDownload} href="#no-implemented" />
-      </div>
-    </nav>
-  </section>
-
-  <slot />
+  <nav class="flex gap-4 justify-between items-end">
+    <h3 class="text-lg font-semibold">Event History</h3>
+    <div class="flex gap-4">
+      <ToggleButtons>
+        <ToggleButton icon={faStream} href="{path}/full" />
+        <ToggleButton icon={faLayerGroup} href="{path}/compact" />
+        <ToggleButton icon={faCode} href="{path}/json" />
+      </ToggleButtons>
+      <ToggleButton icon={faDownload} href="#no-implemented" />
+    </div>
+  </nav>
 </section>
+
+<slot />

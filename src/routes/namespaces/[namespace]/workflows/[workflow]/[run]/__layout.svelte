@@ -25,7 +25,7 @@
   export let namespace: string;
 </script>
 
-<main class="flex flex-col gap-8 h-full">
+<main class="flex flex-col gap-4 h-full">
   <Header {workflow} {namespace} />
   <slot />
 </main>

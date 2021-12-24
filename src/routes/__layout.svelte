@@ -48,7 +48,7 @@
   <Notifications />
   <Header />
   <section id="content" class="h-full mx-10 mb-10">
-    <div class="flex flex-col h-full gap-8">
+    <div class="flex flex-col h-full gap-4">
       <slot />
     </div>
   </section>

@@ -11,7 +11,7 @@
   export let namespace: string;
 </script>
 
-<header class="flex flex-col gap-8">
+<header class="flex flex-col gap-4">
   <main class="flex flex-col gap-1 relative">
     <a
       href="/namespaces/{namespace}/workflows"
