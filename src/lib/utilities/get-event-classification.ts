@@ -2,6 +2,15 @@ import { format } from './format-camel-case';
 
 export type EventClassification = typeof eventClassifications[number];
 
+type EventSummary = {
+  id: string;
+  name: string;
+  timeStamp: string;
+  classification: EventClassification;
+  tag: string;
+  pending: boolean;
+};
+
 export const eventClassifications = [
   'Scheduled',
   'Open',
@@ -19,9 +28,13 @@ export const eventClassifications = [
   'Terminated',
 ] as const;
 
+const has = (event: unknown, property: string): boolean => {
+  return Object.prototype.hasOwnProperty.call(event, property);
+};
+
 export const isEvent = (event: unknown): event is HistoryEventWithId => {
   if (typeof event !== 'object') return false;
-  if (event.hasOwnProperty('eventType')) return true;
+  if (has(event, 'eventType')) return true;
   return false;
 };
 
@@ -29,7 +42,7 @@ export const isActivity = (
   event: HistoryEventWithId | PendingActivity,
 ): event is PendingActivity => {
   if (typeof event !== 'object') return false;
-  if (event.hasOwnProperty('activityType')) return true;
+  if (has(event, 'activityType')) return true;
   return false;
 };
 
@@ -62,7 +75,9 @@ const getId = (event: HistoryEventWithId | PendingActivity): string => {
   if (isActivity(event)) return String(event.activityId);
 };
 
-export const formatEvent = (event: HistoryEventWithId | PendingActivity) => {
+export const formatEvent = (
+  event: HistoryEventWithId | PendingActivity,
+): EventSummary => {
   const name = format(getName(event));
   const timeStamp = getTime(event);
   const classification = getEventClassification(event);
