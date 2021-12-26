@@ -1,17 +1,14 @@
 <script context="module" lang="ts">
   import type { LoadInput } from '@sveltejs/kit';
-  import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
   export async function load({ stuff }: LoadInput) {
-    const { workflow, events } = stuff as {
-      workflow: WorkflowExecution;
+    const { events } = stuff as {
       events: HistoryEventWithId[];
     };
 
     return {
       props: {
         events,
-        pendingActivities: workflow.pendingActivities,
       },
     };
   }
@@ -25,15 +22,13 @@
   import EventTable from '$lib/components/event-table.svelte';
 
   export let events: HistoryEventWithId[];
-  export let pendingActivities: PendingActivity[];
 
   let category: EventTypeCategory = null;
 
   $: visibleEvents = events.filter(eventTypeInCategory(category));
-  $: eventsAndActivities = [...pendingActivities, ...visibleEvents];
 </script>
 
-<EventTable events={eventsAndActivities}>
+<EventTable events={visibleEvents}>
   <div slot="filters">
     <FilterSelect parameter="event-type" bind:value={category}>
       <Option value={null}>All</Option>

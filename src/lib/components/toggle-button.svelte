@@ -15,7 +15,7 @@
 <a
   class="border-2 py-2 px-4 hover:text-white hover:bg-gray-600 flex items-center justify-center"
   class:rounded-lg={!group}
-  class:active={$page.path.endsWith(href)}
+  class:active={$page.path.includes(href)}
   class:group
   href={appendQueryParameters(href, $page.query)}
 >

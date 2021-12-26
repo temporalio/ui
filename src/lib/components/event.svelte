@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
   import { page } from '$app/stores';
 
   import Icon from 'svelte-fa';
@@ -15,8 +14,7 @@
   let { id, pending, timeStamp, name, tag, classification } =
     formatEvent(event);
 
-  let path = getContext<string>('path');
-  let href = pending ? `${path}/pending-${id}` : `${path}/event-${id}`;
+  let href = pending ? `pending-${id}` : `event-${id}`;
 </script>
 
 <a
