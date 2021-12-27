@@ -15,15 +15,15 @@ type RoutePath =
 type EventView = 'event' | 'pending' | 'activity';
 type EventHistoryView = 'full' | 'compact' | 'json';
 
-type NamespaceParameter = { namespace: string };
-type WorkflowParameters = {
+export type NamespaceParameter = { namespace: string };
+export type WorkflowParameters = {
   workflowId: string;
   runId: string;
 } & NamespaceParameter;
-type EventParameter = {
+export type EventParameter = {
   eventId: string;
 } & WorkflowParameters;
-type TaskQueueParameter = {
+export type TaskQueueParameter = {
   queue: string;
 } & NamespaceParameter;
 
