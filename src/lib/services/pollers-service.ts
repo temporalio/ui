@@ -28,12 +28,12 @@ export async function getPollers(
   request = fetch,
 ): Promise<GetPollersResponse> {
   const workflowPollers = await requestFromAPI<GetPollersResponse>(
-    `/namespaces/${namespace}/task-queues/${queue}?task_queue_type=1`,
+    `/namespaces/${namespace}/task-queues/${queue}?taskQueueType=1`,
     { request },
   );
 
   const activityPollers = await requestFromAPI<GetPollersResponse>(
-    `/namespaces/${namespace}/task-queues/${queue}?task_queue_type=2`,
+    `/namespaces/${namespace}/task-queues/${queue}?taskQueueType=2`,
     { request },
   );
 
@@ -81,6 +81,7 @@ export async function getPollers(
     workflowPollers.pollers.reduce(r('WORKFLOW'), {}),
   );
 
+  
   return {
     pollers: activityPollers.pollers,
     taskQueueStatus: activityPollers.taskQueueStatus,
