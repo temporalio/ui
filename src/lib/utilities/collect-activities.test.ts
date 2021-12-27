@@ -68,8 +68,11 @@ const eventHistory = [
 ];
 
 describe(collectActivities, () => {
-  it('should exist', () => {
-    expect(collectActivities).toBeDefined();
+  it('have the activity name', () => {
+    const result = collectActivities(eventHistory);
+    const activity = result[5];
+
+    expect(activity.name).toBe('CompletedActivity');
   });
 
   it('should have a key with the ID of the ActivityTaskScheduledEvent', () => {
@@ -82,7 +85,7 @@ describe(collectActivities, () => {
     const result = collectActivities(eventHistory);
     const activity = result[5];
 
-    expect(activity.ActivityTaskScheduled).toBe(activityScheduled);
+    expect(activity.events.ActivityTaskScheduled).toBe(activityScheduled);
   });
 
   it('should have a scheduled activity of the first event', () => {
@@ -90,7 +93,7 @@ describe(collectActivities, () => {
     const result = collectActivities(eventHistory);
     const activity = result[5];
 
-    expect(activity.ActivityTaskStarted).toBe(activityStarted);
+    expect(activity.events.ActivityTaskStarted).toBe(activityStarted);
   });
 
   it('should have a scheduled activity of the first event', () => {
@@ -98,6 +101,6 @@ describe(collectActivities, () => {
     const result = collectActivities(eventHistory);
     const activity = result[5];
 
-    expect(activity.ActivityTaskCompleted).toBe(activityCompleted);
+    expect(activity.events.ActivityTaskCompleted).toBe(activityCompleted);
   });
 });

@@ -1,23 +1,49 @@
 type Activity = Record<ActivityType, HistoryEventWithId>;
 type Activities = Record<string, Activity>;
+type ActivityGroup = {
+  name?: string;
+  taskQueue?: string;
+  events: Activities;
+};
 
 const set = (
-  activities: Activities,
+  activities: ActivityGroup,
   activityId: string | Long,
   property: ActivityType,
   value: HistoryEventWithId,
 ): void => {
   const id = String(activityId);
-  if (!activities[id]) activities[id] = {} as Activity;
-  activities[id][property] = value;
+  if (!activities[id]) {
+    const events = {} as Activities;
+    activities[id] = {
+      events,
+    } as ActivityGroup;
+  }
+  activities[id].events[property] = value;
+};
+
+const setMetadata = (
+  activities: ActivityGroup,
+  eventId: string | Long,
+  scheduledEvent: HistoryEventWithId,
+): void => {
+  const id = String(eventId);
+  const { activityType, taskQueue } =
+    scheduledEvent.activityTaskScheduledEventAttributes;
+
+  activities[id].name = activityType.name;
+  activities[id].taskQueue = taskQueue.name;
 };
 
 export const collectActivities = (events: HistoryEventWithId[]) => {
-  const activities: Activities = {};
+  const activities: ActivityGroup = {
+    events: {} as Activities,
+  };
 
   for (const event of events) {
     if (event.eventType === 'ActivityTaskScheduled') {
       set(activities, event.id, event.eventType, event);
+      setMetadata(activities, event.id, event);
     }
 
     if (event.eventType === 'ActivityTaskStarted') {
