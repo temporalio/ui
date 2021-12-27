@@ -81,7 +81,6 @@ export async function getPollers(
     workflowPollers.pollers.reduce(r('WORKFLOW'), {}),
   );
 
-  
   return {
     pollers: activityPollers.pollers,
     taskQueueStatus: activityPollers.taskQueueStatus,
