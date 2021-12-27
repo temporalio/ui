@@ -20,13 +20,9 @@
   };
 </script>
 
-<article
-  id={hash.slice(1)}
-  class="w-full py-2 my-4 border-2 rounded-lg relative"
-  on:click={expand}
->
+<article id={hash.slice(1)} class="w-full relative" on:click={expand}>
   <div class="flex justify-between m-4">
-    <div class="flex items-center gap-4 w-full h-full overflow-x-hidden">
+    <div class="flex items-center gap-4 w-full h-full">
       <slot />
     </div>
     <div class="flex justify-center items-center w-16">

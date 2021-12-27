@@ -1,4 +1,5 @@
 import type { goto, invalidate } from '$app/navigation';
+import { appendQueryParameters } from './append-query-parameters';
 
 type UpdateQueryParams = {
   parameter: string;
@@ -11,22 +12,20 @@ type UpdateQueryParams = {
 
 const options = { replaceState: true, keepfocus: true };
 
-export const updateQueryParameters = ({
+export const updateQueryParameters = async ({
   parameter,
   value,
   query,
   path,
   goto,
-}: UpdateQueryParams): void => {
+}: UpdateQueryParams): Promise<typeof value> => {
   if (value) {
     query.set(parameter, value);
   } else {
     query.delete(parameter);
   }
 
-  if (query.toString()) {
-    goto(`${path}?${query}`, options);
-  } else {
-    goto(path, options);
-  }
+  goto(appendQueryParameters(path, query), options);
+
+  return value;
 };

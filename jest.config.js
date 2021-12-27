@@ -13,6 +13,6 @@ export default {
     'src/types',
   ],
   reporters: ['default'],
-  globals: { 'ts-jest': { diagnostics: false } },
+  globals: { 'ts-jest': { diagnostics: false, isolatedModules: true } },
   transform: {},
 };

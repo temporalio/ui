@@ -4,7 +4,7 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import Select from './select.svelte';
 
-  export let label: string;
+  export let label: string = null;
   export let value: string;
   export let parameter: string = null;
 
@@ -19,7 +19,7 @@
       query: $page.query,
       path: $page.path,
       goto,
-    });
+    }).then((v) => (value = v));
   }
 </script>
 

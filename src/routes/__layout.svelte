@@ -44,10 +44,12 @@
   <meta property="og:image" content="/banner.png" />
 </svelte:head>
 
-<main class="h-screen overflow-y-hidden">
+<main class="flex flex-col h-screen gap-8">
   <Notifications />
   <Header />
-  <section id="content" class="h-full mx-10">
-    <slot />
+  <section id="content" class="h-full mx-10 mb-10">
+    <div class="flex flex-col h-full gap-4">
+      <slot />
+    </div>
   </section>
 </main>

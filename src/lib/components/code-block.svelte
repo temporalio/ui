@@ -1,14 +1,15 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import Icon from 'svelte-fa';
+  import { faCheck, faCopy } from '@fortawesome/free-solid-svg-icons';
 
   export let heading = '';
   export let content: string | Parameters<typeof JSON.stringify>[0];
   export let copied = false;
-  export let inline = false;
 
   const copy = () =>
     navigator.clipboard
-      .writeText(content)
+      .writeText(formatJSON(JSON.stringify(content)))
       .then(() => {
         copied = !copied;
         setTimeout(() => (copied = false), 2000);
@@ -24,11 +25,7 @@
   onMount(() => window.Prism.highlightAll());
 </script>
 
-{#if inline}
-  <code class="language-json" style="white-space: nowrap;">
-    {formatJSON(JSON.stringify(content))}
-  </code>
-{:else if content || content === null}
+{#if content || content === null}
   <div class="relative w-full">
     <div id="clipboard" />
 
@@ -43,11 +40,11 @@
         </code>
       </pre>
 
-    <button on:click={copy}>
+    <button on:click={copy} class="absolute top-4 right-4 block">
       {#if copied}
-        <i class="fas fa-check" />
+        <Icon icon={faCheck} color="white" />
       {:else}
-        <i class="fas fa-clipboard" />
+        <Icon icon={faCopy} color="white" />
       {/if}
     </button>
   </div>

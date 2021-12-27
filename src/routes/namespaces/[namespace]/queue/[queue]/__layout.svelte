@@ -22,7 +22,7 @@
   <header class="p-3 mb-5">
     <h3 class="text-2xl">Pollers</h3>
   </header>
-  <div class="w-full h-full overflow-x-scroll">
+  <div class="w-full h-full">
     <QueuePollersTable>
       <tbody slot="rows">
         {#each pollers.pollers as poller}

@@ -23,7 +23,7 @@
   const statuses = {
     All: null,
     Running: 'Running',
-    TimedOut: 'Timed Out',
+    'Timed Out': 'TimedOut',
     Completed: 'Completed',
     Failed: 'Failed',
     'Continued as New': 'ContinuedAsNew',
@@ -32,33 +32,30 @@
   };
 </script>
 
-<section class="flex flex-col my-8">
-  <h2 class="text-3xl mb-4">Workflows</h2>
-  <div class="grid grid-cols-5 gap-4">
-    <FilterInput
-      parameter="workflow-id"
-      name="Workflow ID"
-      value={workflowIdFilter}
-    />
-    <FilterInput
-      parameter="workflow-type"
-      name="Workflow Type"
-      value={workflowTypeFilter}
-    />
-    <FilterSelect label="Time Range" parameter="time-range" value="24 hours">
-      {#each durations as value}
-        <Option {value}>{value}</Option>
-      {/each}
-    </FilterSelect>
-    <FilterSelect label="Workflow Status" parameter="status" value={null}>
-      {#each Object.entries(statuses) as [label, value]}
-        <Option {value}>{label}</Option>
-      {/each}
-    </FilterSelect>
-    <Select id="filter-by-relative-time" bind:value={timeFormat}>
-      <Option value={'relative'}>Relative</Option>
-      <Option value={'UTC'}>UTC</Option>
-      <Option value={'current'}>Current</Option>
-    </Select>
-  </div>
-</section>
+<div class="grid grid-cols-5 gap-4">
+  <FilterInput
+    parameter="workflow-id"
+    name="Workflow ID"
+    value={workflowIdFilter}
+  />
+  <FilterInput
+    parameter="workflow-type"
+    name="Workflow Type"
+    value={workflowTypeFilter}
+  />
+  <FilterSelect label="Time Range" parameter="time-range" value="24 hours">
+    {#each durations as value}
+      <Option {value}>{value}</Option>
+    {/each}
+  </FilterSelect>
+  <FilterSelect label="Workflow Status" parameter="status" value={null}>
+    {#each Object.entries(statuses) as [label, value]}
+      <Option {value}>{label}</Option>
+    {/each}
+  </FilterSelect>
+  <Select id="filter-by-relative-time" bind:value={timeFormat}>
+    <Option value={'relative'}>Relative</Option>
+    <Option value={'UTC'}>UTC</Option>
+    <Option value={'current'}>Current</Option>
+  </Select>
+</div>
