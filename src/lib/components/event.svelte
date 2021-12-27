@@ -5,16 +5,22 @@
   import { faCalendar } from '@fortawesome/free-solid-svg-icons';
 
   import { formatEvent } from '$lib/utilities/get-event-classification';
+  import { formatDate } from '$lib/utilities/format-date';
+  import { routeFor } from '$lib/utilities/route-for';
 
   import EventLabel from '$lib/components/event-label.svelte';
-  import { formatDate } from '$lib/utilities/format-date';
 
   export let event: HistoryEventWithId | PendingActivity;
 
   let { id, pending, timeStamp, name, tag, classification } =
     formatEvent(event);
 
-  let href = pending ? `pending-${id}` : `event-${id}`;
+  let { namespace, workflow: workflowId, run: runId } = $page.params;
+  let parameters = { namespace, workflowId, runId, eventId: id };
+
+  let href = pending
+    ? routeFor('workflow.events.full.pending', parameters)
+    : routeFor('workflow.events.full.event', parameters);
 </script>
 
 <a
