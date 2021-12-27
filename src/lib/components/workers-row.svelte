@@ -15,14 +15,14 @@
   </div>
   <div class="w-3/12 text-left">
     {#if poller.taskQueueTypes.includes('WORKFLOW')}
-      <Icon icon={faCheck} color="black" />
+      <Icon icon={faCheck} color="blue" />
     {:else}
       <Icon icon={faTimes} color="black" />
     {/if}
   </div>
   <div class="w-2/12 text-left">
     {#if poller.taskQueueTypes.includes('ACTIVITY')}
-      <Icon icon={faCheck} color="black" />
+      <Icon icon={faCheck} color="blue" />
     {:else}
       <Icon icon={faTimes} color="black" />
     {/if}
