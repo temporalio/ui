@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { setContext } from 'svelte';
-
   import Event from './event.svelte';
   import VirtualList from '@sveltejs/svelte-virtual-list';
 
