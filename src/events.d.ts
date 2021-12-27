@@ -358,6 +358,15 @@ type EventType =
   | 'MarkerRecorded'
   | 'UpsertWorkflowSearchAttributes';
 
+type ActivityType =
+  | 'ActivityTaskCanceled'
+  | 'ActivityTaskCancelRequested'
+  | 'ActivityTaskCompleted'
+  | 'ActivityTaskFailed'
+  | 'ActivityTaskScheduled'
+  | 'ActivityTaskStarted'
+  | 'ActivityTaskTimedOut';
+
 type EventTypeCategory =
   | 'activity'
   | 'child-workflow'
