@@ -73,6 +73,13 @@ const completedEvent = {
   },
 };
 
+const eventHistory = [
+  scheduledEvent,
+  startedEvent,
+  anotherScheduledEvent,
+  completedEvent,
+];
+
 describe(Activity, () => {
   it('should grab the name of the ActivityTaskScheduledEvent', () => {
     const activity = new Activity(scheduledEvent);
@@ -176,5 +183,36 @@ describe(Activity, () => {
     expect(activities.length).toBe(2);
     expect(first.length).toBe(3);
     expect(second.length).toBe(1);
+  });
+
+  describe('from event history', () => {
+    it('should create a collection with the correct number of activities', () => {
+      const activities = Activities.from(eventHistory);
+
+      const [first, second] = activities;
+
+      expect(activities.length).toBe(2);
+      expect(first.length).toBe(3);
+      expect(second.length).toBe(1);
+    });
+
+    it('should create a collection with the correct number of activities using the constructor', () => {
+      const activities = new Activities(eventHistory);
+
+      const [first, second] = activities;
+
+      expect(activities.length).toBe(2);
+      expect(first.length).toBe(3);
+      expect(second.length).toBe(1);
+    });
+
+    it('should instantiate correctly when given a single event', () => {
+      const activities = new Activities(scheduledEvent);
+
+      const [activity] = activities;
+
+      expect(activities.length).toBe(1);
+      expect(activity.length).toBe(1);
+    });
   });
 });

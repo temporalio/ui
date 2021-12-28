@@ -2,6 +2,27 @@ type ScheduledActivityEvent = HistoryEventWithId & {
   eventType: 'ActivityTaskScheduled';
 };
 
+const activityTypes = [
+  'ActivityTaskCanceled',
+  'ActivityTaskCancelRequested',
+  'ActivityTaskCompleted',
+  'ActivityTaskFailed',
+  'ActivityTaskScheduled',
+  'ActivityTaskStarted',
+  'ActivityTaskTimedOut',
+];
+
+const isActivity = (event: HistoryEventWithId): event is ActivityEvent => {
+  if (activityTypes.includes(event.eventType)) return true;
+  return false;
+};
+
+const isActivityScheduledEvent = (
+  event: HistoryEventWithId,
+): event is ScheduledActivityEvent => {
+  return event.eventType === 'ActivityTaskScheduled';
+};
+
 export class Activity {
   id: string;
   name: string;
@@ -38,12 +59,30 @@ export class Activity {
 export class Activities {
   private _activities: Map<string, Activity> = new Map();
 
+  static from = (
+    events: HistoryEventWithId[],
+    activities = new Activities(),
+  ): Activities => {
+    for (const event of events) {
+      if (isActivity(event)) {
+        activities.add(event);
+      }
+    }
+
+    return activities;
+  };
+
+  constructor(event?: ActivityEvent | HistoryEventWithId[]) {
+    if (Array.isArray(event)) return Activities.from(event, this);
+    if (event) this.add(event);
+  }
+
   get(id: string | number | Long) {
     return this._activities.get(String(id));
   }
 
-  add(event: ScheduledActivityEvent) {
-    if (event.eventType === 'ActivityTaskScheduled') {
+  add(event: ActivityEvent) {
+    if (isActivityScheduledEvent(event)) {
       const id = String(event.id);
       return this._activities.set(id, new Activity(event));
     }
