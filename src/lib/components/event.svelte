@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Activity } from '$lib/models/activity';
   import { page } from '$app/stores';
 
   import Icon from 'svelte-fa';
@@ -6,21 +7,17 @@
 
   import { formatEvent } from '$lib/utilities/get-event-classification';
   import { formatDate } from '$lib/utilities/format-date';
-  import { routeFor } from '$lib/utilities/route-for';
 
   import EventLabel from '$lib/components/event-label.svelte';
 
-  export let event: HistoryEventWithId | PendingActivity;
+  export let event: HistoryEventWithId | PendingActivity | Activity;
 
-  let { id, pending, timeStamp, name, tag, classification } =
+  let { id, routeFor, pending, timeStamp, name, tag, classification } =
     formatEvent(event);
 
   let { namespace, workflow: workflowId, run: runId } = $page.params;
   let parameters = { namespace, workflowId, runId, eventId: id };
-
-  let href = pending
-    ? routeFor('workflow.events.full.pending', parameters)
-    : routeFor('workflow.events.full.event', parameters);
+  let href = routeFor(parameters);
 </script>
 
 <a
