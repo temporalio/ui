@@ -16,6 +16,7 @@
 <script lang="ts">
   import { namespace } from '$lib/stores/namespace';
   import DataConvertorStatus from '$lib/components/data-convertor-status.svelte';
+  import { settings } from '$lib/stores/settings';
   import NavigationLink from './_navigation-link.svelte';
   export let user: { name?: string; email?: string; picture?: string } = {};
 </script>
@@ -47,14 +48,16 @@
     >
       Report Bug/Give Feedback
     </a>
-    {#if user.email}
-      <span href={`/namespaces/${$namespace}/settings`}>
-        {user.email}
-      </span>
-    {:else}
-      <a class="header-button" href={import.meta.env.VITE_API + '/auth/sso'}>
-        Sign In
-      </a>
+    {#if $settings.auth?.enabled}
+      {#if user.email}
+        <span href={`/namespaces/${$namespace}/settings`}>
+          {user.email}
+        </span>
+      {:else}
+        <a class="header-button" href={import.meta.env.VITE_API + '/auth/sso'}>
+          Sign In
+        </a>
+      {/if}
     {/if}
   </div>
 </header>
