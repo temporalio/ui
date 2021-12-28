@@ -4,7 +4,7 @@
   import type { Activities } from '$lib/models/activity';
   import Event from './event.svelte';
 
-  export let events: HistoryEventWithId[] | PendingActivity[] | Activities;
+  export let events: (HistoryEventWithId | PendingActivity)[] | Activities;
 </script>
 
 <section
