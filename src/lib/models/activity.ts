@@ -51,6 +51,16 @@ export class Activity {
     return this.events.size;
   }
 
+  get last(): HistoryEventWithId {
+    let last: HistoryEventWithId;
+
+    for (const event of this) {
+      last = event;
+    }
+
+    return last;
+  }
+
   [Symbol.iterator]() {
     return this._events.values();
   }

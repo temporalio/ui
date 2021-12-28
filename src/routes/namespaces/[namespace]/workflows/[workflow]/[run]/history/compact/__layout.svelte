@@ -15,6 +15,7 @@
 </script>
 
 <script lang="ts">
+  import { Activities } from '$lib/models/activity';
   import { eventTypeInCategory } from '$lib/utilities/get-event-categorization';
 
   import FilterSelect from '$lib/components/select/filter-select.svelte';
@@ -23,23 +24,12 @@
 
   export let events: HistoryEventWithId[];
 
-  let category: EventTypeCategory = null;
+  let activities = new Activities(events);
 
-  $: visibleEvents = events.filter(eventTypeInCategory(category));
+  let category: EventTypeCategory = null;
 </script>
 
-<EventTable events={visibleEvents}>
-  <div slot="filters">
-    <FilterSelect parameter="event-type" bind:value={category}>
-      <Option value={null}>All</Option>
-      <Option value="activity">Activity</Option>
-      <Option value="command">Command</Option>
-      <Option value="signal">Signal</Option>
-      <Option value="timer">Timer</Option>
-      <Option value="child-workflow">Child Workflow</Option>
-      <Option value="workflow">Workflow</Option>
-    </FilterSelect>
-  </div>
+<EventTable events={activities}>
   <div slot="details" class="w-full h-full">
     <slot />
   </div>

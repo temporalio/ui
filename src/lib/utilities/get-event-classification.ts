@@ -1,6 +1,8 @@
+import { Activity } from '../models/activity';
 import { format } from './format-camel-case';
 
 export type EventClassification = typeof eventClassifications[number];
+type EventOrActivity = HistoryEventWithId | PendingActivity | Activity;
 
 type EventSummary = {
   id: string;
@@ -41,8 +43,8 @@ export const isEvent = (event: unknown): event is HistoryEventWithId => {
   return false;
 };
 
-export const isActivity = (
-  event: HistoryEventWithId | PendingActivity,
+export const isPendingActivity = (
+  event: EventOrActivity,
 ): event is PendingActivity => {
   if (event === null) return false;
   if (typeof event !== 'object') return false;
@@ -51,10 +53,15 @@ export const isActivity = (
   return false;
 };
 
+export const isActivity = (event: EventOrActivity): event is Activity => {
+  return event instanceof Activity;
+};
+
 export const getEventClassification = (
-  event: HistoryEventWithId | PendingActivity,
+  event: EventOrActivity,
 ): EventClassification => {
-  if (isActivity(event)) return event.state;
+  if (isPendingActivity(event)) return event.state;
+  if (isActivity(event)) event = event.get('ActivityTaskScheduled');
 
   const eventType = event.eventType;
 
@@ -64,23 +71,27 @@ export const getEventClassification = (
   }
 };
 
-const getName = (event: HistoryEventWithId | PendingActivity): string => {
+const getName = (event: EventOrActivity): string => {
   if (isEvent(event)) return String(event.eventType);
-  if (isActivity(event)) return `${event.activityType.name}:${event.state}`;
+  if (isPendingActivity(event))
+    return `${event.activityType.name}:${event.state}`;
+  if (isActivity(event)) return event.name;
 };
 
-const getTime = (event: HistoryEventWithId | PendingActivity): string => {
+const getTime = (event: EventOrActivity): string => {
   if (isEvent(event)) return String(event.eventTime);
-  if (isActivity(event)) return String(event.lastStartedTime);
+  if (isPendingActivity(event)) return String(event.lastStartedTime);
+  if (isActivity(event)) return String(event.last.eventTime);
 };
 
-const getId = (event: HistoryEventWithId | PendingActivity): string => {
+const getId = (event: EventOrActivity): string => {
   if (isEvent(event)) return String(event.eventId);
-  if (isActivity(event)) return String(event.activityId);
+  if (isPendingActivity(event)) return String(event.activityId);
+  if (isActivity(event)) return String(event.id);
 };
 
 export const formatEvent = (
-  event: HistoryEventWithId | PendingActivity,
+  event: EventOrActivity | Activity,
 ): EventSummary => {
   return {
     id: getId(event),
@@ -88,6 +99,6 @@ export const formatEvent = (
     timeStamp: getTime(event),
     classification: getEventClassification(event),
     tag: getName(event),
-    pending: isActivity(event),
+    pending: isPendingActivity(event),
   };
 };

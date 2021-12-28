@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Activity } from '$lib/models/activity';
   import { page } from '$app/stores';
 
   import Icon from 'svelte-fa';
@@ -10,7 +11,7 @@
 
   import EventLabel from '$lib/components/event-label.svelte';
 
-  export let event: HistoryEventWithId | PendingActivity;
+  export let event: HistoryEventWithId | PendingActivity | Activity;
 
   let { id, pending, timeStamp, name, tag, classification } =
     formatEvent(event);
