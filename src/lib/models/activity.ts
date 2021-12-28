@@ -133,6 +133,10 @@ export class Activities {
     return this._activities.size;
   }
 
+  slice(...args: Parameters<typeof Array.prototype.slice>): Activity[] {
+    return [...this].slice(...args);
+  }
+
   [Symbol.iterator]() {
     return this._activities.values();
   }

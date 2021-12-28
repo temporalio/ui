@@ -27,7 +27,7 @@ export type TaskQueueParameter = {
   queue: string;
 } & NamespaceParameter;
 
-type CompositeParameters = NamespaceParameter &
+export type RouteParameters = NamespaceParameter &
   WorkflowParameters &
   EventParameter &
   TaskQueueParameter;
@@ -98,10 +98,7 @@ export function routeFor(
   path: 'workers',
   parameters: TaskQueueParameter,
 ): string;
-export function routeFor(
-  path: RoutePath,
-  parameters: CompositeParameters,
-): string {
+export function routeFor(path: RoutePath, parameters: RouteParameters): string {
   if (path === 'workflows') {
     return routeForWorkflows(parameters);
   }
