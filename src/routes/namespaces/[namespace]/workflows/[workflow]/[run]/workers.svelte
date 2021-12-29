@@ -20,7 +20,7 @@
 <script lang="ts">
   import WorkersTable from '$lib/components/workers-table.svelte';
   import WorkersRow from '$lib/components/workers-row.svelte';
-  import WorkersEmpty from '$lib/components/workers-empty.svelte';
+  import EmptyState from '$lib/components/empty-state.svelte';
 
   export let pollers;
 </script>
@@ -31,6 +31,6 @@
       <WorkersRow {poller} />
     </WorkersTable>
   {:else}
-    <WorkersEmpty />
+    <EmptyState title={'Workers'} />
   {/each}
 </section>

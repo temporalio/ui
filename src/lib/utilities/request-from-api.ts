@@ -47,9 +47,6 @@ export const requestFromAPI = async <T>(
     retryInterval = 5000,
   } = init;
 
-  const endpointParams = endpoint.split('?')[1];
-  endpoint = endpoint.split('?')[0];
-
   if (!endpoint.startsWith('/')) endpoint = '/' + endpoint;
   const nextPageToken = token ? { next_page_token: token } : {};
   const query = new URLSearchParams({
@@ -59,7 +56,7 @@ export const requestFromAPI = async <T>(
 
   const url = toURL(base + '/api/v1' + encode(endpoint), query);
   try {
-    const response = await request(url + endpointParams, options);
+    const response = await request(url, options);
 
     if (!response.ok) {
       throw new Error(`${response.status}: ${response.statusText}`);

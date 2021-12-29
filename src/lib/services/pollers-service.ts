@@ -28,13 +28,13 @@ export async function getPollers(
   request = fetch,
 ): Promise<GetPollersResponse> {
   const workflowPollers = await requestFromAPI<GetPollersResponse>(
-    `/namespaces/${namespace}/task-queues/${queue}?taskQueueType=1`,
-    { request },
+    `/namespaces/${namespace}/task-queues/${queue}`,
+    { request,  params: {taskQueueType : '1'} },
   );
 
   const activityPollers = await requestFromAPI<GetPollersResponse>(
-    `/namespaces/${namespace}/task-queues/${queue}?taskQueueType=2`,
-    { request },
+    `/namespaces/${namespace}/task-queues/${queue}`,
+    { request, params: {taskQueueType : '2'}  },
   );
 
   activityPollers.pollers.forEach((poller: PollerWithTaskQueueTypes) => {
