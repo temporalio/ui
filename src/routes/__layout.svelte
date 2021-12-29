@@ -26,6 +26,7 @@
 
   import Header from './_header.svelte';
   import Notifications from '$lib/components/notifications.svelte';
+  import Banner from '$lib/components/banner.svelte';
 
   export let namespaces: DescribeNamespaceResponse[];
 
@@ -44,10 +45,11 @@
   <meta property="og:image" content="/banner.png" />
 </svelte:head>
 
-<main class="flex flex-col h-screen gap-8">
+<main class="flex flex-col h-screen">
   <Notifications />
+  <Banner />
   <Header />
-  <section id="content" class="h-full mx-10 mb-10">
+  <section id="content" class="h-full mx-10 mb-10 mt-8">
     <div class="flex flex-col h-full gap-4">
       <slot />
     </div>
