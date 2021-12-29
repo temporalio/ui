@@ -1,6 +1,4 @@
-<section
-  class="flex flex-col border-2 border-gray-300 w-full rounded-lg workers-table"
->
+<section class="flex flex-col border-2 border-gray-300 w-full rounded-lg">
   <div class="bg-gray-200 flex flex-row p-2">
     <div class="w-3/12 text-left">ID</div>
     <div class="w-3/12 text-left">Last Accessed</div>
@@ -9,9 +7,3 @@
   </div>
   <slot />
 </section>
-
-<style lang="postcss">
-  .workers-table {
-    height: calc(100vh - 280px);
-  }
-</style>

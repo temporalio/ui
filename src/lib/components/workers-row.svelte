@@ -1,16 +1,18 @@
 <script lang="ts">
   import Icon from 'svelte-fa';
   import { faTimes, faCheck } from '@fortawesome/free-solid-svg-icons';
+  import Time from '$lib/components/workflow-time.svelte';
+
   export let poller;
 </script>
 
-<article class="row flex flex-row border-b-2">
+<article class="w-full h-full flex flex-row border-b-2 no-underline p-2">
   <div class="links w-3/12 text-left">
     {poller.identity}
   </div>
   <div class="links w-3/12 text-left">
     <h3>
-      {new Date(poller.lastAccessTime)}
+      <Time time={poller.lastAccessTime} timeFormat={'current'} />
     </h3>
   </div>
   <div class="w-3/12 text-left">
@@ -20,7 +22,7 @@
       <Icon icon={faTimes} color="black" />
     {/if}
   </div>
-  <div class="w-2/12 text-left">
+  <div class="w-3/12 text-left">
     {#if poller.taskQueueTypes.includes('ACTIVITY')}
       <Icon icon={faCheck} color="blue" />
     {:else}
@@ -28,9 +30,3 @@
     {/if}
   </div>
 </article>
-
-<style lang="postcss">
-  .row {
-    @apply w-full h-full flex no-underline p-2;
-  }
-</style>
