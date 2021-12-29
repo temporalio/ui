@@ -12,7 +12,8 @@
     on:click
     class:selected={active}
     {disabled}
-    class={`${size} ${variant}`}><slot /></button
+    class={`flex items-center justify-center ${size} ${variant}`}
+    ><slot /></button
   >
 {:else}
   <a
@@ -20,7 +21,7 @@
     on:click
     class:selected={active}
     {disabled}
-    class={`${size} ${variant}`}><slot /></a
+    class={`flex items-center justify-center ${size} ${variant}`}><slot /></a
   >
 {/if}
 
