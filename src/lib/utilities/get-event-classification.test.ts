@@ -1,7 +1,7 @@
 import {
   getEventClassification,
   isEvent,
-  isActivity,
+  isPendingActivity,
   formatEvent,
 } from './get-event-classification';
 
@@ -307,31 +307,31 @@ describe(isEvent, () => {
   });
 });
 
-describe(isActivity, () => {
+describe(isPendingActivity, () => {
   it('should return true if the event has an eventType', () => {
-    expect(isActivity({ activityType: { name: 'Workflow Started' } })).toBe(
-      true,
-    );
+    expect(
+      isPendingActivity({ activityType: { name: 'Workflow Started' } }),
+    ).toBe(true);
   });
 
   it('should return false if the event does not have an eventType', () => {
-    expect(isActivity({ eventType: 'Workflow Started' })).toBe(false);
+    expect(isPendingActivity({ eventType: 'Workflow Started' })).toBe(false);
   });
 
   it('should return false if passed null', () => {
-    expect(isActivity(null)).toBe(false);
+    expect(isPendingActivity(null)).toBe(false);
   });
 
   it('should return false if passed a string', () => {
-    expect(isActivity('string')).toBe(false);
+    expect(isPendingActivity('string')).toBe(false);
   });
 
   it('should return false if passed a number', () => {
-    expect(isActivity(4)).toBe(false);
+    expect(isPendingActivity(4)).toBe(false);
   });
 
   it('should return false if passed an array', () => {
-    expect(isActivity([])).toBe(false);
+    expect(isPendingActivity([])).toBe(false);
   });
 });
 

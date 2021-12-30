@@ -374,3 +374,7 @@ type EventTypeCategory =
   | 'timer'
   | 'workflow'
   | 'command';
+
+type ActivityEvent = HistoryEventWithId & {
+  eventType: ActivityType;
+};
