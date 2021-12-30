@@ -7,6 +7,7 @@ type RoutePath =
   | 'workflow.events.full.pending'
   | 'workflow.events.compact'
   | 'workflow.events.compact.activity'
+  | 'workflow.events.compact.activity.event'
   | 'workflow.events.json'
   | 'workflow.stack-trace'
   | 'workflow.query'
@@ -23,6 +24,9 @@ export type WorkflowParameters = {
 export type EventParameter = {
   eventId: string;
 } & WorkflowParameters;
+export type ActivityParameter = {
+  activityId: string;
+} & EventParameter;
 export type TaskQueueParameter = {
   queue: string;
 } & NamespaceParameter;
@@ -30,6 +34,7 @@ export type TaskQueueParameter = {
 export type RouteParameters = NamespaceParameter &
   WorkflowParameters &
   EventParameter &
+  ActivityParameter &
   TaskQueueParameter;
 
 const routeForNamespace = ({ namespace }: NamespaceParameter): string => {
@@ -68,6 +73,19 @@ const routeForEventHistoryItem = (
   return `${routeForEventHistory(parameters, view)}/${eventType}-${eventId}`;
 };
 
+const routeForActivity = (
+  parameters: WorkflowParameters,
+  view: EventHistoryView,
+  eventType: EventView,
+  activityId: string,
+  eventId: string,
+): string => {
+  return `${routeForEventHistory(
+    parameters,
+    view,
+  )}/${eventType}-${eventId}/events/${activityId}`;
+};
+
 const routeForWorkers = ({ queue, ...parameters }: TaskQueueParameter) => {
   return `${routeForNamespace(parameters)}/workers/${queue}`;
 };
@@ -93,6 +111,10 @@ export function routeFor(
     | 'workflow.events.full.pending'
     | 'workflow.events.compact.activity',
   parameters: EventParameter,
+): string;
+export function routeFor(
+  path: 'workflow.events.compact.activity.event',
+  parameters: ActivityParameter,
 ): string;
 export function routeFor(
   path: 'workers',
@@ -147,6 +169,16 @@ export function routeFor(path: RoutePath, parameters: RouteParameters): string {
       'compact',
       'activity',
       parameters.eventId,
+    );
+  }
+
+  if (path === 'workflow.events.compact.activity.event') {
+    return routeForActivity(
+      parameters,
+      'compact',
+      'activity',
+      parameters.eventId,
+      parameters.activityId,
     );
   }
 
