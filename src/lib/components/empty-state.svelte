@@ -12,7 +12,7 @@
   >
     <Icon icon={faMeteor} scale={1.2} class="block w-full h-full" /></span
   >
-  <h2 class="text-xl font-medium">No {title} Found</h2>
+  <h2 class="text-xl font-medium">{title}</h2>
   {#if content}
     <p class="text-center">{content}</p>
   {/if}

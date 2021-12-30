@@ -55,7 +55,7 @@
     </WorkflowsSummaryTable>
   {:else}
     <EmptyState
-      title={'Workflows'}
+      title={'No Workflows Found'}
       content={'If you have filters applied, try adjusting them.'}
     />
   {/if}

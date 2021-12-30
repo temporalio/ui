@@ -31,6 +31,6 @@
       <WorkersRow {poller} />
     </WorkersTable>
   {:else}
-    <EmptyState title={'Workers'} />
+    <EmptyState title={'No Workers Found'} />
   {/each}
 </section>
