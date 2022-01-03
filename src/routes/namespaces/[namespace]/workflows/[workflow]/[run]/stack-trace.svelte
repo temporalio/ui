@@ -43,7 +43,7 @@
         <Icon icon={faSyncAlt} scale={0.8} class="block w-full h-full" />
         Refresh</Button
       >
-      <p class="ml-9">Stack Trace at {datetime}</p>
+      <p class="ml-5">Stack Trace at {datetime}</p>
     </div>
     {#await data}
       <div>loading</div>
