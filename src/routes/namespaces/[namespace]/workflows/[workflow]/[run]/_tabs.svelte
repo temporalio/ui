@@ -18,7 +18,7 @@
     href={routeFor('workflow.events.full', { namespace, workflowId, runId })}
     amount={historyEvents}
   />
-  <Tab label="Workers" href="#not-implemented" />
+  <Tab label="Workers" href="workers" />
   <Tab
     label="Stack Trace"
     href={routeFor('workflow.stack-trace', { namespace, workflowId, runId })}
