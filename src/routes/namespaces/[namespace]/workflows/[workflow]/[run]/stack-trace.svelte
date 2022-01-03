@@ -49,9 +49,7 @@
       <div>loading</div>
     {:then { queryResult }}
       <div class="flex items-start h-full">
-        <CodeBlock
-          content={window.atob(String(queryResult.payloads[0].data))}
-        />
+        <CodeBlock content={window.atob(queryResult.payloads[0].data)} />
       </div>
     {/await}
   {:else}
