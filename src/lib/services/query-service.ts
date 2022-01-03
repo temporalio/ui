@@ -13,15 +13,18 @@ export async function getWorkflowStackTrace({
   return await requestFromAPI<null>(
     `/namespaces/${namespace}/workflows/${workflow.id}/executions/${workflow.runId}/query`,
     {
-      options: { method: 'POST', body: JSON.stringify({
-        "execution": {
-          "workflowId": workflow.id,
-          "runId": workflow.runId
-        },
-        "query": {
-          "queryType": "__stack_trace"
-        }
-      }) },
+      options: {
+        method: 'POST',
+        body: JSON.stringify({
+          execution: {
+            workflowId: workflow.id,
+            runId: workflow.runId,
+          },
+          query: {
+            queryType: '__stack_trace',
+          },
+        }),
+      },
       shouldRetry: false,
     },
   );
