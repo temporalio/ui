@@ -16,13 +16,14 @@
   $: message =
     severity == severities.Low
       ? `📥 v${recommended?.version} version is available`
-      : alert?.message;
+      : `📥 ${alert?.message}`;
 </script>
 
 {#if show}
   <section class={`block leading-10 text-center ${severity}`}>
     <a
-      href={`https://github.com/temporalio/temporal/releases/tag/v${$cluster.versionInfo.recommended.version}`}
+      href="https://github.com/temporalio/temporal/releases/tag/v{$cluster
+        .versionInfo.recommended.version}"
       target="_blank"
     >
       {message}
