@@ -87,3 +87,9 @@ type Settings = {
     enabled: boolean;
   };
 };
+
+type User = {
+  email: string;
+  name: string;
+  picture: string;
+};
