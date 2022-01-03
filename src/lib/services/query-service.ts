@@ -6,10 +6,26 @@ type StackTraceOptions = {
   namespace: string;
 };
 
+type QueryPayload = {
+  data: string;
+  metadata: {
+    encoding?: string;
+  };
+};
+
+type QueryType = {
+  payloads: QueryPayload[];
+};
+
+type StackTraceExecution = {
+  queryRejected?: null;
+  queryResult: QueryType;
+};
+
 export async function getWorkflowStackTrace({
   workflow,
   namespace,
-}: StackTraceOptions): Promise<null> {
+}: StackTraceOptions): Promise<StackTraceExecution> {
   return await requestFromAPI<null>(
     `/namespaces/${namespace}/workflows/${workflow.id}/executions/${workflow.runId}/query`,
     {
