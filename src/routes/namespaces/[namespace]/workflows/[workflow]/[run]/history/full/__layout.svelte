@@ -45,7 +45,7 @@
       <Option value="workflow">Workflow</Option>
     </FilterSelect>
   </div>
-  <div slot="details" class="w-full h-full">
+  <div slot="details" class="w-full h-full py-4">
     <slot />
   </div>
 </EventTable>
