@@ -22,23 +22,24 @@
   import { faSyncAlt } from '@fortawesome/free-solid-svg-icons';
   import Button from '$lib/components/button.svelte';
   import { getWorkflowStackTrace } from '$lib/services/query-service';
+  import EmptyState from '$lib/components/empty-state.svelte';
 
   export let workflow: WorkflowExecution;
 
   let currentdate = new Date();
   $: datetime = currentdate.toLocaleTimeString();
   $: data = getWorkflowStackTrace({ workflow, namespace: $namespace });
+
+  const refreshStackTrace = () => {
+    data = getWorkflowStackTrace({ workflow, namespace: $namespace });
+    currentdate = new Date();
+  };
 </script>
 
 <section>
   {#if String(workflow.status) === 'Running'}
     <div class="flex items-center">
-      <Button
-        on:click={() => {
-          data = getWorkflowStackTrace({ workflow, namespace: $namespace });
-          currentdate = new Date();
-        }}
-      >
+      <Button on:click={refreshStackTrace}>
         <Icon icon={faSyncAlt} scale={0.8} class="block w-full h-full" />
         Refresh</Button
       >
@@ -47,9 +48,13 @@
     {#await data}
       <div>loading</div>
     {:then { queryResult }}
-      <CodeBlock content={queryResult.payloads[0].data} />
+      <div class="flex items-start h-full">
+        <CodeBlock
+          content={window.atob(String(queryResult.payloads[0].data))}
+        />
+      </div>
     {/await}
   {:else}
-    <h2>Will add empty state</h2>
+    <EmptyState title="No Stack Traces Found" />
   {/if}
 </section>
