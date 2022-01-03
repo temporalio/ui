@@ -43,6 +43,10 @@ export class Activity {
     return this._events.get(type);
   }
 
+  toArray(): HistoryEventWithId[] {
+    return [...this];
+  }
+
   get events(): typeof this._events {
     return this._events;
   }

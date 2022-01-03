@@ -22,7 +22,7 @@
 </script>
 
 <header
-  class="grid grid-rows-1 grid-cols-12 gap-8 px-10 items-center bg-gray-900 shadow-lg"
+  class="grid grid-rows-1 grid-cols-12 px-10 items-center bg-gray-900 shadow-lg"
 >
   <div class="flex gap-4 col-span-3">
     <a href="/" class="block">

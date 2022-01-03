@@ -29,7 +29,7 @@
   import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
   import WorkflowFilters from './_workflow-filters.svelte';
-  import WorkflowsEmptyState from './_workflows-empty.svelte';
+  import EmptyState from '$lib/components/empty-state.svelte';
   import WorkflowsLoadingState from './_workflows-loading.svelte';
   import VirtualList from '@sveltejs/svelte-virtual-list';
 
@@ -54,6 +54,9 @@
       </VirtualList>
     </WorkflowsSummaryTable>
   {:else}
-    <WorkflowsEmptyState />
+    <EmptyState
+      title={'No Workflows Found'}
+      content={'If you have filters applied, try adjusting them.'}
+    />
   {/if}
 {/await}
