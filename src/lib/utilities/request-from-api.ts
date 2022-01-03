@@ -56,7 +56,7 @@ export const requestFromAPI = async <T>(
 
   const url = toURL(base + '/api/v1' + encode(endpoint), query);
   try {
-    const response = await request(url, options);
+    const response = await request(url, { ...options, credentials: 'include' });
 
     if (!response.ok) {
       throw new Error(`${response.status}: ${response.statusText}`);
