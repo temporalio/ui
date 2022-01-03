@@ -55,7 +55,6 @@ export const requestFromAPI = async <T>(
   });
 
   const url = toURL(base + '/api/v1' + encode(endpoint), query);
-
   try {
     const response = await request(url, options);
 
