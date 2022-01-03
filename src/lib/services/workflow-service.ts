@@ -36,6 +36,7 @@ const emptyWorkflowRequest = (): Promise<ListWorkflowExecutionsResponse> => {
 const checkForStatus =
   (workflowStatus: WorkflowStatus, value: boolean) =>
   ({ status }: FilterParameters): boolean => {
+    if (!status) return false;
     if (status === workflowStatus) return value;
     return !value;
   };
