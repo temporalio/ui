@@ -9,7 +9,7 @@ type StackTraceOptions = {
 type QueryPayload = {
   data: string;
   metadata: {
-    encoding?: string;
+    encoding: string;
   };
 };
 
@@ -18,7 +18,7 @@ type QueryType = {
 };
 
 type StackTraceExecution = {
-  queryRejected?: null;
+  queryRejected: string | null;
   queryResult: QueryType;
 };
 
