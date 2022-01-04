@@ -1,35 +1,37 @@
 <script lang="ts">
   export let disabled: boolean = false;
-  export let variant: string = 'primary';
+  export let secondary: boolean = false;
+  export let destroy: boolean = false;
   export let as: string = 'button';
   export let active: boolean = false;
-  export let size: string = 'small';
+  export let large: boolean = false;
   export let href: string | null = null;
 </script>
 
 {#if as === 'button'}
   <button
     on:click
+    class="flex items-center justify-center text-sm primary"
     class:selected={active}
-    {disabled}
-    class={`flex items-center justify-center ${size} ${variant}`}
-    ><slot /></button
+    class:large
+    class:secondary
+    class:destroy
+    {disabled}><slot /></button
   >
 {:else}
   <a
     {href}
     on:click
+    class="flex items-center justify-center text-sm primary"
     class:selected={active}
-    {disabled}
-    class={`flex items-center justify-center ${size} ${variant}`}><slot /></a
+    class:large
+    class:secondary
+    class:destroy
+    {disabled}><slot /></a
   >
 {/if}
 
 <style lang="postcss">
-  .small {
-    @apply text-sm;
-  }
-
   .large {
     @apply text-lg;
   }
