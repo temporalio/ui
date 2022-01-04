@@ -30,6 +30,8 @@ export type ActivityParameter = {
 } & EventParameter;
 export type TaskQueueParameter = {
   queue: string;
+  workflowId: string;
+  runId: string;
 } & NamespaceParameter;
 
 export type RouteParameters = NamespaceParameter &
@@ -87,8 +89,15 @@ const routeForActivity = (
   )}/${eventType}-${eventId}/events/${activityId}`;
 };
 
-const routeForWorkers = ({ queue, ...parameters }: TaskQueueParameter) => {
-  return `${routeForNamespace(parameters)}/workers/${queue}`;
+const routeForWorkers = ({
+  queue,
+  workflowId,
+  runId,
+  ...parameters
+}: TaskQueueParameter) => {
+  return `${routeForWorkflows(
+    parameters,
+  )}/${workflowId}/${runId}/workers?queue=${queue}`;
 };
 
 export function routeFor(

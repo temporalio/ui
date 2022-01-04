@@ -108,8 +108,10 @@ describe(routeFor, () => {
   it('should route to "workers"', () => {
     const path = routeFor('workflow.workers', {
       namespace: 'default',
+      workflowId: 'abc',
+      runId: 'def',
       queue: 'rainbow-statuses',
     });
-    expect(path).toBe('/namespaces/default/workers/rainbow-statuses');
+    expect(path).toBe('/namespaces/default/workers?queue=rainbow-statuses');
   });
 });

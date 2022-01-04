@@ -22,6 +22,8 @@
     label="Workers"
     href={routeFor('workflow.workers', {
       namespace,
+      workflowId,
+      runId,
       queue: workflow.taskQueue,
     })}
   />
