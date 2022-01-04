@@ -40,12 +40,12 @@ export const requestFromAPI = async <T>(
 ): Promise<T> => {
   const {
     params = {},
-    options,
     request = fetch,
     token,
     shouldRetry = true,
     retryInterval = 5000,
   } = init;
+  let { options } = init;
 
   if (!endpoint.startsWith('/')) endpoint = '/' + endpoint;
   const nextPageToken = token ? { next_page_token: token } : {};
@@ -56,7 +56,9 @@ export const requestFromAPI = async <T>(
 
   const url = toURL(base + '/api/v1' + encode(endpoint), query);
   try {
-    const response = await request(url, { ...options, credentials: 'include' });
+    options = withSecurityOptions(options);
+
+    const response = await request(url, options);
 
     if (!response.ok) {
       throw new Error(`${response.status}: ${response.statusText}`);
@@ -74,4 +76,30 @@ export const requestFromAPI = async <T>(
       });
     }
   }
+};
+
+const withSecurityOptions = (options: RequestInit): RequestInit => {
+  const opts: RequestInit = { credentials: 'include', ...options };
+  opts.headers = withCsrf(options?.headers);
+  return opts;
+};
+
+const withCsrf = (headers: HeadersInit): HeadersInit => {
+  if (!headers) headers = new Headers();
+
+  const csrfCookie = '_csrf=';
+  const csrfHeader = 'X-CSRF-TOKEN';
+  try {
+    const cookies = document.cookie.split(';');
+    let csrf = cookies.find((c) => c.includes(csrfCookie));
+    if (csrf && !headers[csrfHeader]) {
+      csrf = csrf.trim().slice(csrfCookie.length);
+      headers[csrfHeader] = csrf;
+    }
+  } catch (error) {
+    // in SSR mode document is not available
+    console.log(error);
+  }
+
+  return headers;
 };
