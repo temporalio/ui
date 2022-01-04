@@ -20,6 +20,7 @@
 </script>
 
 <section>
+  <h1 class="text-4xl mb-4">Workers</h1>
   {#each pollers.pollers as poller}
     <WorkersTable>
       <WorkersRow {poller} />
