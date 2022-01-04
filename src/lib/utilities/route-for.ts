@@ -2,6 +2,7 @@ type RoutePath =
   | 'workflows'
   | 'workflow'
   | 'workflow.events'
+  | 'workflow.workers'
   | 'workflow.events.full'
   | 'workflow.events.full.event'
   | 'workflow.events.full.pending'
@@ -100,6 +101,7 @@ export function routeFor(
     | 'workflow.events'
     | 'workflow.events.full'
     | 'workflow.events.compact'
+    | 'workflow.workers'
     | 'workflow.events.json'
     | 'workflow.stack-trace'
     | 'workflow.query',
@@ -190,7 +192,7 @@ export function routeFor(path: RoutePath, parameters: RouteParameters): string {
     return routeForWorkflow(parameters) + '/stack-trace';
   }
 
-  if (path === 'workers') {
-    return routeForWorkers(parameters);
+  if (path === 'workflow.workers') {
+    return routeForWorkflow(parameters) + '/workers';
   }
 }
