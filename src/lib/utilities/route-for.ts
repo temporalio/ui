@@ -2,7 +2,7 @@ type RoutePath =
   | 'workflows'
   | 'workflow'
   | 'workflow.events'
-  | 'workflow.workers'
+  | 'workers'
   | 'workflow.events.full'
   | 'workflow.events.full.event'
   | 'workflow.events.full.pending'
@@ -30,8 +30,6 @@ export type ActivityParameter = {
 } & EventParameter;
 export type TaskQueueParameter = {
   queue: string;
-  workflowId: string;
-  runId: string;
 } & NamespaceParameter;
 
 export type RouteParameters = NamespaceParameter &
@@ -89,15 +87,8 @@ const routeForActivity = (
   )}/${eventType}-${eventId}/events/${activityId}`;
 };
 
-const routeForWorkers = ({
-  queue,
-  workflowId,
-  runId,
-  ...parameters
-}: TaskQueueParameter) => {
-  return `${routeForWorkflows(
-    parameters,
-  )}/${workflowId}/${runId}/workers?queue=${queue}`;
+const routeForWorkers = ({ queue, ...parameters }: TaskQueueParameter) => {
+  return `${routeForNamespace(parameters)}/workers/${queue}`;
 };
 
 export function routeFor(
@@ -127,7 +118,7 @@ export function routeFor(
   parameters: ActivityParameter,
 ): string;
 export function routeFor(
-  path: 'workflow.workers',
+  path: 'workers',
   parameters: TaskQueueParameter,
 ): string;
 export function routeFor(path: RoutePath, parameters: RouteParameters): string {
@@ -200,7 +191,7 @@ export function routeFor(path: RoutePath, parameters: RouteParameters): string {
     return routeForWorkflow(parameters) + '/stack-trace';
   }
 
-  if (path === 'workflow.workers') {
+  if (path === 'workers') {
     return routeForWorkers(parameters);
   }
 }
