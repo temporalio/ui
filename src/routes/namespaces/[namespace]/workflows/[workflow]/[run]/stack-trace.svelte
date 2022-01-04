@@ -19,7 +19,7 @@
   import CodeBlock from '$lib/components/code-block.svelte';
   import Icon from 'svelte-fa';
   import { namespace } from '$lib/stores/namespace';
-  import { faSyncAlt } from '@fortawesome/free-solid-svg-icons';
+  import { faRedo } from '@fortawesome/free-solid-svg-icons';
   import Button from '$lib/components/button.svelte';
   import { getWorkflowStackTrace } from '$lib/services/query-service';
   import EmptyState from '$lib/components/empty-state.svelte';
@@ -40,10 +40,10 @@
   {#if String(workflow.status) === 'Running'}
     <div class="flex items-center">
       <Button on:click={refreshStackTrace}>
-        <Icon icon={faSyncAlt} scale={0.8} class="block w-full h-full" />
+        <span> <Icon icon={faRedo} scale={0.8} class="block w-full" /></span>
         Refresh</Button
       >
-      <p class="ml-5">Stack Trace at {datetime}</p>
+      <p>Stack Trace at {datetime}</p>
     </div>
     {#await data}
       <div>loading</div>
@@ -56,3 +56,13 @@
     <EmptyState title="No Stack Traces Found" />
   {/if}
 </section>
+
+<style lang="postcss">
+  p {
+    @apply ml-2;
+  }
+
+  span {
+    @apply mr-1;
+  }
+</style>
