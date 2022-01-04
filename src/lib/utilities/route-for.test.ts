@@ -112,6 +112,8 @@ describe(routeFor, () => {
       runId: 'def',
       queue: 'rainbow-statuses',
     });
-    expect(path).toBe('/namespaces/default/workers?queue=rainbow-statuses');
+    expect(path).toBe(
+      '/namespaces/default/workflows/abc/def/workers?queue=rainbow-statuses',
+    );
   });
 });
