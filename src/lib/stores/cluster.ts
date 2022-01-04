@@ -5,9 +5,7 @@ import type { GetClusterInfoResponse } from '$types';
 
 export const cluster = writable<GetClusterInfoResponse>({});
 
-const loadCluster = async (): Promise<void> => {
+export const loadCluster = async (): Promise<void> => {
   const clusterRes = await fetchCluster();
   cluster.set(clusterRes);
 };
-
-loadCluster();

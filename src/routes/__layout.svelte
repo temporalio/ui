@@ -1,6 +1,8 @@
 <script context="module" lang="ts">
   import type { LoadInput } from '@sveltejs/kit';
   import { requestFromAPI } from '$lib/utilities/request-from-api';
+  import { loadUser } from '$lib/stores/user';
+  import { loadCluster } from '$lib/stores/cluster';
   import type {
     DescribeNamespaceResponse,
     ListNamespacesResponse,
@@ -13,6 +15,9 @@
       '/namespaces',
       { request: fetch },
     );
+
+    await loadUser();
+    await loadCluster();
 
     return {
       props: { namespaces },
