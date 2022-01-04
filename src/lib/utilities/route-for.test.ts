@@ -106,7 +106,7 @@ describe(routeFor, () => {
   });
 
   it('should route to "workers"', () => {
-    const path = routeFor('workers', {
+    const path = routeFor('workflow.workers', {
       namespace: 'default',
       queue: 'rainbow-statuses',
     });

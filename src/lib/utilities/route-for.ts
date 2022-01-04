@@ -101,7 +101,6 @@ export function routeFor(
     | 'workflow.events'
     | 'workflow.events.full'
     | 'workflow.events.compact'
-    | 'workflow.workers'
     | 'workflow.events.json'
     | 'workflow.stack-trace'
     | 'workflow.query',
@@ -119,7 +118,7 @@ export function routeFor(
   parameters: ActivityParameter,
 ): string;
 export function routeFor(
-  path: 'workers',
+  path: 'workflow.workers',
   parameters: TaskQueueParameter,
 ): string;
 export function routeFor(path: RoutePath, parameters: RouteParameters): string {
@@ -193,6 +192,6 @@ export function routeFor(path: RoutePath, parameters: RouteParameters): string {
   }
 
   if (path === 'workflow.workers') {
-    return routeForWorkflow(parameters) + '/workers';
+    return routeForWorkers(parameters);
   }
 }
