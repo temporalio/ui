@@ -28,10 +28,16 @@
 
   let currentdate = new Date();
   $: datetime = currentdate.toLocaleTimeString();
-  $: data = getWorkflowStackTrace({ workflow, namespace: $namespace });
+  $: data =
+    String(workflow.status) === 'Running'
+      ? getWorkflowStackTrace({ workflow, namespace: $namespace })
+      : null;
 
   const refreshStackTrace = () => {
-    data = getWorkflowStackTrace({ workflow, namespace: $namespace });
+    data =
+      String(workflow.status) === 'Running'
+        ? getWorkflowStackTrace({ workflow, namespace: $namespace })
+        : null;
     currentdate = new Date();
   };
 </script>
