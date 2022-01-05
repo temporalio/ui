@@ -36,7 +36,7 @@
       class="flex items-center"
     /></span
   >
-  <input class="block " placeholder={name} {id} bind:value={_value} />
+  <input class="block w-full" placeholder={name} {id} bind:value={_value} />
 </div>
 
 <style lang="postcss">
