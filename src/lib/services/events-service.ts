@@ -2,6 +2,7 @@ import type { GetWorkflowExecutionHistoryResponse } from '$types';
 
 import { paginated } from '$lib/utilities/paginated';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
+import { routeForApi } from '$lib/utilities/route-for-api';
 
 type FetchEvents = NamespaceScopedRequest &
   PaginationCallbacks<GetWorkflowExecutionHistoryResponse> & {
@@ -22,6 +23,7 @@ export const fetchEvents = async (
   }: FetchEvents,
   request = fetch,
 ): Promise<GetWorkflowExecutionHistoryResponse> => {
+  console.log('fetchEvents');
   let params = {};
 
   if (rawPayloads) {
@@ -31,7 +33,7 @@ export const fetchEvents = async (
   const events: GetWorkflowExecutionHistoryResponse = await paginated(
     async (token: string) => {
       return requestFromAPI<GetWorkflowExecutionHistoryResponse>(
-        `/namespaces/${namespace}/workflows/${executionId}/executions/${runId}/events`,
+        routeForApi('events', { namespace, executionId, runId }),
         {
           token,
           request,
