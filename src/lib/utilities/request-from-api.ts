@@ -12,15 +12,6 @@ type RequestFromAPIOptions = {
   retryInterval?: number;
 };
 
-const base = import.meta.env.VITE_API;
-
-const encode = (component: string): string => {
-  return component
-    .split('/')
-    .map((segment) => encodeURIComponent(segment))
-    .join('/');
-};
-
 /**
  *  A utility method for making requests to the Temporal API.
  *
@@ -48,14 +39,13 @@ export const requestFromAPI = async <T>(
   } = init;
   let { options } = init;
 
-  if (!endpoint.startsWith('/')) endpoint = '/' + endpoint;
   const nextPageToken = token ? { next_page_token: token } : {};
   const query = new URLSearchParams({
     ...params,
     ...nextPageToken,
   });
+  const url = toURL(endpoint, query);
 
-  const url = toURL(base + '/api/v1' + encode(endpoint), query);
   try {
     options = withSecurityOptions(options);
 
