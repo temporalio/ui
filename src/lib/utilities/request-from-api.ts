@@ -1,3 +1,4 @@
+import { browser } from '$app/env';
 import { handleError } from './handle-error';
 import { toURL } from './to-url';
 
@@ -85,6 +86,7 @@ const withSecurityOptions = (options: RequestInit): RequestInit => {
 };
 
 const withCsrf = (headers: HeadersInit): HeadersInit => {
+  if (!browser) return;
   if (!headers) headers = new Headers();
 
   const csrfCookie = '_csrf=';
@@ -97,8 +99,7 @@ const withCsrf = (headers: HeadersInit): HeadersInit => {
       headers[csrfHeader] = csrf;
     }
   } catch (error) {
-    // in SSR mode document is not available
-    console.log(error);
+    console.error(error);
   }
 
   return headers;
