@@ -18,12 +18,8 @@
 </script>
 
 <script lang="ts">
-  import { invalidate } from '$app/navigation';
-  import { onDestroy, onMount } from 'svelte';
-
   import Header from './_header.svelte';
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
-  import { routeForApi } from '$lib/utilities/route-for-api';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
