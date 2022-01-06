@@ -12,7 +12,7 @@
   $: current = $cluster?.versionInfo?.current;
   $: alert = $cluster?.versionInfo?.alerts?.[0];
   $: severity = alert ? severities[alert.severity] : severities.Low;
-  $: show = recommended?.version && recommended.version != $closedBannerId;
+  $: show = current?.version && current.version != $closedBannerId;
   $: message =
     severity == severities.Low
       ? `📥 v${recommended?.version} version is available`
@@ -23,7 +23,7 @@
   <section class={`block leading-10 text-center ${severity}`}>
     <a
       href="https://github.com/temporalio/temporal/releases/tag/v{$cluster
-        .versionInfo.recommended.version}"
+        .versionInfo.current.version}"
       target="_blank"
     >
       {message}

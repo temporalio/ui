@@ -1,28 +1,17 @@
 <script context="module" lang="ts">
-  import type { LoadInput } from '@sveltejs/kit';
-
-  import { requestFromAPI } from '$lib/utilities/request-from-api';
   import NamespaceSelect from '$lib/components/select/namespace-select.svelte';
-
-  export async function load({ fetch }: LoadInput) {
-    const { user }: any = await requestFromAPI('/me', { request: fetch });
-
-    return {
-      props: { user },
-    };
-  }
 </script>
 
 <script lang="ts">
   import { namespace } from '$lib/stores/namespace';
   import DataConvertorStatus from '$lib/components/data-convertor-status.svelte';
   import { settings } from '$lib/stores/settings';
+  import { user } from '$lib/stores/user';
   import NavigationLink from './_navigation-link.svelte';
-  export let user: { name?: string; email?: string; picture?: string } = {};
 </script>
 
 <header
-  class="grid grid-rows-1 grid-cols-12 px-10 items-center bg-gray-900 shadow-lg"
+  class="grid grid-rows-1 grid-cols-12 px-10 items-center bg-gray-900 shadow-lg gap-6"
 >
   <div class="flex gap-4 col-span-3">
     <a href="/" class="block">
@@ -41,7 +30,7 @@
   <div class="col-span-2">
     <DataConvertorStatus />
   </div>
-  <div class="flex justify-end gap-4 col-span-3">
+  <div class="flex justify-end gap-4 col-span-3 items-center">
     <a
       class="header-button"
       href="https://github.com/temporalio/web/issues/new/choose"
@@ -49,14 +38,20 @@
       Report Bug/Give Feedback
     </a>
     {#if $settings.auth?.enabled}
-      {#if user.email}
-        <span href={`/namespaces/${$namespace}/settings`}>
-          {user.email}
-        </span>
+      {#if $user?.email}
+        <img
+          src={$user.picture}
+          alt="User Avatar"
+          class="rounded-full h-6 w-6"
+        />
       {:else}
-        <a class="header-button" href={import.meta.env.VITE_API + '/auth/sso'}>
+        <button
+          class="header-button"
+          on:click={() =>
+            window.location.assign(import.meta.env.VITE_API + '/auth/sso')}
+        >
           Sign In
-        </a>
+        </button>
       {/if}
     {/if}
   </div>

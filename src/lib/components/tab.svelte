@@ -6,10 +6,10 @@
   export let label: string;
   export let amount: number | Long.Long = null;
 
-  $: isActive = pathMatches(href, $page.path);
+  $: active = pathMatches(href, $page.path);
 </script>
 
-<a class="block" class:active={isActive} {href}>
+<a class="block" class:active {href}>
   {#if amount}
     {label}
     <span class="px-2 text-blue-700 bg-blue-100 rounded-sm">{amount}</span>
