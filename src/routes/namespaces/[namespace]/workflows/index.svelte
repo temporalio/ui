@@ -32,19 +32,23 @@
   import EmptyState from '$lib/components/empty-state.svelte';
   import WorkflowsLoadingState from './_workflows-loading.svelte';
   import VirtualList from '@sveltejs/svelte-virtual-list';
+  import { refreshable } from '$lib/stores/refreshable';
 
   export let namespace: string;
   export let initialData: ReturnType<typeof fetchAllWorkflows>;
 
   $: timeRange = $page.query.get('time-range');
-  $: data = initialData || fetchAllWorkflows(namespace, { timeRange });
 
   let timeFormat = 'relative';
+  let data = refreshable(
+    () => fetchAllWorkflows(namespace, { timeRange }),
+    initialData,
+  );
 </script>
 
 <h2 class="text-2xl">Workflows</h2>
 <WorkflowFilters bind:timeFormat />
-{#await data}
+{#await $data}
   <WorkflowsLoadingState />
 {:then { workflows }}
   {#if workflows.length}
