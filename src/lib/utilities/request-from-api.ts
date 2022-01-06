@@ -34,7 +34,7 @@ export const requestFromAPI = async <T>(
     params = {},
     request = fetch,
     token,
-    shouldRetry = true,
+    shouldRetry = false,
     retryInterval = 5000,
   } = init;
   let { options } = init;
