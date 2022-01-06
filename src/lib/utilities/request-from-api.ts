@@ -86,7 +86,7 @@ const withSecurityOptions = (options: RequestInit): RequestInit => {
 };
 
 const withCsrf = (headers: HeadersInit): HeadersInit => {
-  if (!browser) return;
+  if (!browser) return headers;
   if (!headers) headers = new Headers();
 
   const csrfCookie = '_csrf=';
