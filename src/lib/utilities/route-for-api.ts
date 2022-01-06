@@ -25,8 +25,6 @@ type TaskQueueRouteParameters = Pick<APIRouteParameters, 'namespace' | 'queue'>;
 
 const base = import.meta.env?.VITE_API || process.env.VITE_API;
 
-console.log({ base });
-
 const encode = (component: string): string => {
   return component
     .split('/')

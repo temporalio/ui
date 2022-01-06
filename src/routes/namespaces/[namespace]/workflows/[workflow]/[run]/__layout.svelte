@@ -29,15 +29,6 @@
   export let namespace: string;
   export let executionId: string;
   export let runId: string;
-
-  let interval: NodeJS.Timer;
-  onMount(() => {
-    interval = setInterval(() => {
-      console.log('invalidate');
-      invalidate(routeForApi('events', { namespace, executionId, runId }));
-    }, 5000);
-  });
-  onDestroy(() => clearInterval(interval));
 </script>
 
 <main class="flex flex-col gap-4 h-full">

@@ -23,7 +23,6 @@ export const fetchEvents = async (
   }: FetchEvents,
   request = fetch,
 ): Promise<GetWorkflowExecutionHistoryResponse> => {
-  console.log('fetchEvents');
   let params = {};
 
   if (rawPayloads) {
