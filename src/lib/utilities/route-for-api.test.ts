@@ -51,4 +51,23 @@ describe(routeForApi, () => {
   it('should return a route for user', () => {
     expect(routeForApi('user')).toBe('http://localhost:8080/api/v1/me');
   });
+
+  it('should return a route for workflow.terminate', () => {
+    expect(routeForApi('workflow.terminate', parameters)).toBe(
+      'http://localhost:8080/api/v1/namespaces/namespace/workflows/execution/executions/run/terminate',
+    );
+  });
+});
+
+describe('API Request Encoding', () => {
+  it('should return a route for workflow', () => {
+    expect(
+      routeForApi('workflow', {
+        ...parameters,
+        executionId: 'worflow#with#hashes',
+      }),
+    ).toBe(
+      'http://localhost:8080/api/v1/namespaces/namespace/workflows/worflow%23with%23hashes/executions/run',
+    );
+  });
 });
