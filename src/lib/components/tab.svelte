@@ -4,9 +4,10 @@
   export let href: string;
   export let label: string;
   export let amount: number | Long.Long = null;
+  export let active: boolean = $page.path.includes(href);
 </script>
 
-<a class="block" class:active={$page.path.includes(href)} {href}>
+<a class="block" class:active {href}>
   {#if amount}
     {label}
     <span class="px-2 text-blue-700 bg-blue-100 rounded-sm">{amount}</span>
