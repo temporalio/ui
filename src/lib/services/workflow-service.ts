@@ -4,6 +4,8 @@ import type { ListWorkflowExecutionsResponse } from '$types';
 import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
 import { requestFromAPI } from '$lib/utilities/request-from-api';
+import { getWorkflowFilterParameters } from '$lib/utilities/get-workflow-filter-parameters';
+import { dataConverterPort } from '$lib/stores/data-converter-config';
 
 import {
   toWorkflowExecution,
@@ -13,9 +15,7 @@ import { toEventHistory } from '$lib/models/event-history';
 
 import { fetchEvents } from './events-service';
 import { convertEventPayloadFromDataConverter } from './data-converter';
-
-import { dataConverterPort } from '$lib/stores/data-converter-config';
-import { getWorkflowFilterParameters } from '$lib/utilities/get-workflow-filter-parameters';
+import { routeForApi } from '$lib/utilities/route-for-api';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   executionId: string;
@@ -54,7 +54,7 @@ export const fetchOpenWorkflows = (
   const params = getWorkflowFilterParameters(parameters);
 
   return requestFromAPI<ListWorkflowExecutionsResponse>(
-    `/namespaces/${namespace}/workflows/open`,
+    routeForApi('workflows.open', { namespace }),
     {
       params,
       request,
@@ -72,7 +72,7 @@ export const fetchClosedWorkflows = (
   const params = getWorkflowFilterParameters(parameters);
 
   return requestFromAPI<ListWorkflowExecutionsResponse>(
-    `/namespaces/${namespace}/workflows/closed`,
+    routeForApi('workflows.closed', { namespace }),
     {
       params,
       request,
@@ -102,13 +102,12 @@ export const fetchAllWorkflows = async (
 };
 
 export async function fetchWorkflow(
-  { executionId, runId, namespace }: GetWorkflowExecutionRequest,
+  parameters: GetWorkflowExecutionRequest,
   request = fetch,
 ): Promise<WorkflowExecution> {
-  return requestFromAPI(
-    `/namespaces/${namespace}/workflows/${executionId}/executions/${runId}`,
-    { request },
-  ).then(toWorkflowExecution);
+  return requestFromAPI(routeForApi('workflow', parameters), { request }).then(
+    toWorkflowExecution,
+  );
 }
 
 export async function fetchWorkflowWithEventHistory(
