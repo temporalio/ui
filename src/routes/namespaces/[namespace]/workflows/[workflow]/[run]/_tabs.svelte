@@ -15,7 +15,7 @@
 <nav class="flex gap-6">
   <Tab
     label="History"
-    href={routeFor('workflow.events.full', { namespace, workflowId, runId })}
+    href={routeFor('workflow.events', { namespace, workflowId, runId })}
     amount={historyEvents}
   />
   <Tab label="Workers" href="#not-implemented" />
