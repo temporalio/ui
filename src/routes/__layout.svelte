@@ -1,8 +1,12 @@
 <script context="module" lang="ts">
   import type { LoadInput } from '@sveltejs/kit';
+
   import { requestFromAPI } from '$lib/utilities/request-from-api';
+  import { routeForApi } from '$lib/utilities/route-for-api';
+
   import { loadUser } from '$lib/stores/user';
   import { loadCluster } from '$lib/stores/cluster';
+
   import type {
     DescribeNamespaceResponse,
     ListNamespacesResponse,
@@ -12,7 +16,7 @@
 
   export async function load({ fetch }: LoadInput) {
     const { namespaces }: ListNamespacesResponse = await requestFromAPI(
-      '/namespaces',
+      routeForApi('namespaces'),
       { request: fetch },
     );
 

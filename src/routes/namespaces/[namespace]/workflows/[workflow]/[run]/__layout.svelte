@@ -11,7 +11,7 @@
     });
 
     return {
-      props: { workflow, namespace },
+      props: { workflow, namespace, executionId, runId },
       stuff: { workflow, events },
     };
   }
@@ -23,6 +23,8 @@
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
+  export let executionId: string;
+  export let runId: string;
 </script>
 
 <main class="flex flex-col gap-4 h-full">
