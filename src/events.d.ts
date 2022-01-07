@@ -378,3 +378,5 @@ type EventTypeCategory =
 type ActivityEvent = HistoryEventWithId & {
   eventType: ActivityType;
 };
+
+type EventualHistoryEvents = PromiseLike<HistoryEventWithId[]>;

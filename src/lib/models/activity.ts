@@ -35,7 +35,7 @@ export class Activity {
     this.set(event.eventType, event);
   }
 
-  set(type: ActivityType, event: HistoryEventWithId) {
+  set(type: ActivityType, event: HistoryEventWithId): void {
     this._events.set(type, event);
   }
 
@@ -47,12 +47,12 @@ export class Activity {
     return [...this];
   }
 
-  get events(): typeof this._events {
-    return this._events;
+  get events(): HistoryEventWithId[] {
+    return [...this];
   }
 
   get length(): number {
-    return this.events.size;
+    return this._events.size;
   }
 
   get last(): HistoryEventWithId {
@@ -65,13 +65,19 @@ export class Activity {
     return last;
   }
 
-  [Symbol.iterator]() {
+  [Symbol.iterator](): IterableIterator<HistoryEventWithId> {
     return this._events.values();
   }
 }
 
 export class Activities {
   private _activities: Map<string, Activity> = new Map();
+
+  static async fromPromise(
+    events: PromiseLike<HistoryEventWithId[]>,
+  ): Promise<Activities> {
+    return Activities.from(await events);
+  }
 
   static from = (
     events: HistoryEventWithId[],
@@ -91,45 +97,45 @@ export class Activities {
     if (event) this.add(event);
   }
 
-  get(id: string | number | Long) {
+  get(id: string | number | Long): Activity {
     return this._activities.get(String(id));
   }
 
-  add(event: ActivityEvent) {
+  add(event: ActivityEvent): void {
     if (isActivityScheduledEvent(event)) {
       const id = String(event.id);
-      return this._activities.set(id, new Activity(event));
+      this._activities.set(id, new Activity(event));
     }
 
     if (event.eventType === 'ActivityTaskStarted') {
       const { scheduledEventId } = event.activityTaskStartedEventAttributes;
-      return this.get(scheduledEventId).set(event.eventType, event);
+      this.get(scheduledEventId).set(event.eventType, event);
     }
 
     if (event.eventType === 'ActivityTaskCanceled') {
       const { scheduledEventId } = event.activityTaskCanceledEventAttributes;
-      return this.get(scheduledEventId).set(event.eventType, event);
+      this.get(scheduledEventId).set(event.eventType, event);
     }
 
     if (event.eventType === 'ActivityTaskCancelRequested') {
       const { scheduledEventId } =
         event.activityTaskCancelRequestedEventAttributes;
-      return this.get(scheduledEventId).set(event.eventType, event);
+      this.get(scheduledEventId).set(event.eventType, event);
     }
 
     if (event.eventType === 'ActivityTaskFailed') {
       const { scheduledEventId } = event.activityTaskFailedEventAttributes;
-      return this.get(scheduledEventId).set(event.eventType, event);
+      this.get(scheduledEventId).set(event.eventType, event);
     }
 
     if (event.eventType === 'ActivityTaskTimedOut') {
       const { scheduledEventId } = event.activityTaskTimedOutEventAttributes;
-      return this.get(scheduledEventId).set(event.eventType, event);
+      this.get(scheduledEventId).set(event.eventType, event);
     }
 
     if (event.eventType === 'ActivityTaskCompleted') {
       const { scheduledEventId } = event.activityTaskCompletedEventAttributes;
-      return this.get(scheduledEventId).set(event.eventType, event);
+      this.get(scheduledEventId).set(event.eventType, event);
     }
   }
 
@@ -141,7 +147,7 @@ export class Activities {
     return [...this].slice(...args);
   }
 
-  [Symbol.iterator]() {
+  [Symbol.iterator](): IterableIterator<Activity> {
     return this._activities.values();
   }
 }
