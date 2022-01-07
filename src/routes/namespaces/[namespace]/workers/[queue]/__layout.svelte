@@ -3,8 +3,7 @@
 
   import { getPollers } from '$lib/services/pollers-service';
   export async function load({ fetch, page }: LoadInput) {
-    const { namespace } = page.params;
-    const queue = page.query.get('queue');
+    const { namespace, queue } = page.params;
 
     return await getPollers({ queue, namespace }, fetch).then((pollers) => ({
       props: { pollers },
@@ -21,6 +20,7 @@
 </script>
 
 <section>
+  <h1 class="text-4xl mb-4">Workers</h1>
   {#each pollers.pollers as poller}
     <WorkersTable>
       <WorkersRow {poller} />

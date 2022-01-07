@@ -2,6 +2,7 @@ type RoutePath =
   | 'workflows'
   | 'workflow'
   | 'workflow.events'
+  | 'workers'
   | 'workflow.events.full'
   | 'workflow.events.full.event'
   | 'workflow.events.full.pending'

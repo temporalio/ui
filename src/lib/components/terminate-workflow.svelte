@@ -31,5 +31,5 @@
 </script>
 
 {#if isEligibleForTermination(workflow)}
-  <Button variant="destroy" size="small" on:click={terminate}>Terminate</Button>
+  <Button destroy on:click={terminate}>Terminate</Button>
 {/if}

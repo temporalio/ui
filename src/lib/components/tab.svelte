@@ -1,10 +1,12 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  import { pathMatches } from '$lib/utilities/path-matches';
 
   export let href: string;
   export let label: string;
   export let amount: number | Long.Long = null;
-  export let active: boolean = $page.path.includes(href);
+
+  $: active = pathMatches(href, $page.path);
 </script>
 
 <a class="block" class:active {href}>
