@@ -35,7 +35,7 @@ export class Activity {
     this.set(event.eventType, event);
   }
 
-  set(type: ActivityType, event: HistoryEventWithId) {
+  set(type: ActivityType, event: HistoryEventWithId): void {
     this._events.set(type, event);
   }
 
@@ -65,7 +65,7 @@ export class Activity {
     return last;
   }
 
-  [Symbol.iterator]() {
+  [Symbol.iterator](): IterableIterator<HistoryEventWithId> {
     return this._events.values();
   }
 }
@@ -97,11 +97,11 @@ export class Activities {
     if (event) this.add(event);
   }
 
-  get(id: string | number | Long) {
+  get(id: string | number | Long): Activity {
     return this._activities.get(String(id));
   }
 
-  add(event: ActivityEvent) {
+  add(event: ActivityEvent): void {
     if (isActivityScheduledEvent(event)) {
       const id = String(event.id);
       return this._activities.set(id, new Activity(event));
@@ -147,7 +147,7 @@ export class Activities {
     return [...this].slice(...args);
   }
 
-  [Symbol.iterator]() {
+  [Symbol.iterator](): IterableIterator<Activity> {
     return this._activities.values();
   }
 }

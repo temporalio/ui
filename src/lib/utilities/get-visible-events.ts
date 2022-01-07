@@ -5,7 +5,7 @@ export const getVisibleEvents = async (
   eventsRequest: EventualHistoryEvents,
   workflowRequest: PromiseLike<WorkflowExecution>,
   category: EventTypeCategory,
-) => {
+): Promise<(HistoryEventWithId | PendingActivity)[]> => {
   const events = await eventsRequest;
   const workflow = await workflowRequest;
   const pendingActivities = workflow.pendingActivities;

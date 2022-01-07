@@ -55,7 +55,9 @@ export const fetchEvents = async (
       if (port !== null) {
         try {
           await convertEventPayloadFromDataConverter(events, port);
-        } catch {}
+        } catch (error) {
+          console.error(error);
+        }
       }
       return Promise.resolve(events);
     });
