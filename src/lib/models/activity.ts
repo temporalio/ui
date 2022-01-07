@@ -104,38 +104,38 @@ export class Activities {
   add(event: ActivityEvent): void {
     if (isActivityScheduledEvent(event)) {
       const id = String(event.id);
-      return this._activities.set(id, new Activity(event));
+      this._activities.set(id, new Activity(event));
     }
 
     if (event.eventType === 'ActivityTaskStarted') {
       const { scheduledEventId } = event.activityTaskStartedEventAttributes;
-      return this.get(scheduledEventId).set(event.eventType, event);
+      this.get(scheduledEventId).set(event.eventType, event);
     }
 
     if (event.eventType === 'ActivityTaskCanceled') {
       const { scheduledEventId } = event.activityTaskCanceledEventAttributes;
-      return this.get(scheduledEventId).set(event.eventType, event);
+      this.get(scheduledEventId).set(event.eventType, event);
     }
 
     if (event.eventType === 'ActivityTaskCancelRequested') {
       const { scheduledEventId } =
         event.activityTaskCancelRequestedEventAttributes;
-      return this.get(scheduledEventId).set(event.eventType, event);
+      this.get(scheduledEventId).set(event.eventType, event);
     }
 
     if (event.eventType === 'ActivityTaskFailed') {
       const { scheduledEventId } = event.activityTaskFailedEventAttributes;
-      return this.get(scheduledEventId).set(event.eventType, event);
+      this.get(scheduledEventId).set(event.eventType, event);
     }
 
     if (event.eventType === 'ActivityTaskTimedOut') {
       const { scheduledEventId } = event.activityTaskTimedOutEventAttributes;
-      return this.get(scheduledEventId).set(event.eventType, event);
+      this.get(scheduledEventId).set(event.eventType, event);
     }
 
     if (event.eventType === 'ActivityTaskCompleted') {
       const { scheduledEventId } = event.activityTaskCompletedEventAttributes;
-      return this.get(scheduledEventId).set(event.eventType, event);
+      this.get(scheduledEventId).set(event.eventType, event);
     }
   }
 
