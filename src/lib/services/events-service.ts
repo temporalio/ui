@@ -1,8 +1,14 @@
+import { get } from 'svelte/store';
+
 import type { GetWorkflowExecutionHistoryResponse } from '$types';
+
+import { convertEventPayloadFromDataConverter } from './data-converter';
+import { dataConverterPort } from '$lib/stores/data-converter-config';
 
 import { paginated } from '$lib/utilities/paginated';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
+import { toEventHistory } from '$lib/models/event-history';
 
 type FetchEvents = NamespaceScopedRequest &
   PaginationCallbacks<GetWorkflowExecutionHistoryResponse> & {
@@ -22,14 +28,16 @@ export const fetchEvents = async (
     onComplete,
   }: FetchEvents,
   request = fetch,
-): Promise<GetWorkflowExecutionHistoryResponse> => {
+): Promise<HistoryEventWithId[]> => {
   let params = {};
 
+  const port = get(dataConverterPort);
+
   if (rawPayloads) {
-    params = { params: { rawPayloads: JSON.stringify(true) } };
+    params = { params: { rawPayloads: JSON.stringify(!!port) } };
   }
 
-  const events: GetWorkflowExecutionHistoryResponse = await paginated(
+  const events = await paginated(
     async (token: string) => {
       return requestFromAPI<GetWorkflowExecutionHistoryResponse>(
         routeForApi('events', { namespace, executionId, runId }),
@@ -41,7 +49,16 @@ export const fetchEvents = async (
       );
     },
     { onStart, onUpdate, onComplete },
-  );
+  )
+    .then(toEventHistory)
+    .then(async (events) => {
+      if (port !== null) {
+        try {
+          await convertEventPayloadFromDataConverter(events, port);
+        } catch {}
+      }
+      return Promise.resolve(events);
+    });
 
   return events;
 };

@@ -9,10 +9,10 @@ type Timeout = Parameters<SetIntervalType>[1];
 
 export const refreshable = <T>(
   callback: () => PromiseLike<T>,
-  initialData: PromiseLike<T> = callback(),
+  initialData: PromiseLike<T> | T = callback(),
   timeout: Timeout = 10000,
 ): Writable<PromiseLike<T>> => {
-  const store = writable<PromiseLike<T>>(initialData);
+  const store = writable<PromiseLike<T>>(Promise.resolve(initialData));
   let interval: Timer;
 
   onMount(() => {

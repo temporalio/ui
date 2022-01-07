@@ -69,9 +69,9 @@ const routeForEventHistoryItem = (
   parameters: WorkflowParameters,
   view: EventHistoryView,
   eventType: EventView,
-  eventId: string,
+  id: string,
 ): string => {
-  return `${routeForEventHistory(parameters, view)}/${eventType}-${eventId}`;
+  return `${routeForEventHistory(parameters, view)}/${eventType}-${id}`;
 };
 
 const routeForActivity = (
@@ -87,8 +87,8 @@ const routeForActivity = (
   )}/${eventType}-${eventId}/events/${activityId}`;
 };
 
-const routeForWorkers = ({ queue, ...parameters }: TaskQueueParameter) => {
-  return `${routeForNamespace(parameters)}/workers/${queue}`;
+const routeForWorkers = (parameters: WorkflowParameters) => {
+  return `${routeForWorkflow(parameters)}/workers`;
 };
 
 export function routeFor(
@@ -103,7 +103,8 @@ export function routeFor(
     | 'workflow.events.compact'
     | 'workflow.events.json'
     | 'workflow.stack-trace'
-    | 'workflow.query',
+    | 'workflow.query'
+    | 'workers',
   parameters: WorkflowParameters,
 ): string;
 export function routeFor(

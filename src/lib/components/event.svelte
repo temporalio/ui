@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { Activity } from '$lib/models/activity';
-  import { page } from '$app/stores';
-
   import Icon from 'svelte-fa';
   import { faCalendar } from '@fortawesome/free-solid-svg-icons';
+  import { page } from '$app/stores';
+
+  import type { Activity } from '$lib/models/activity';
 
   import { formatEvent } from '$lib/utilities/get-event-classification';
   import { formatDate } from '$lib/utilities/format-date';
@@ -12,12 +12,11 @@
 
   export let event: HistoryEventWithId | PendingActivity | Activity;
 
-  let { id, routeFor, pending, timeStamp, name, tag, classification } =
+  let { routeFor, pending, timeStamp, name, tag, classification } =
     formatEvent(event);
 
   let { namespace, workflow: workflowId, run: runId } = $page.params;
-  let parameters = { namespace, workflowId, runId, eventId: id };
-  let href = routeFor(parameters);
+  let href = routeFor({ namespace, workflowId, runId });
 </script>
 
 <a

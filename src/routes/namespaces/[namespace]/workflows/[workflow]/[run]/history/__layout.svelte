@@ -4,16 +4,21 @@
 
   export async function load({ page }: LoadInput) {
     const { workflow: workflowId, run: runId, namespace } = page.params;
+    const parameters = { namespace, executionId: workflowId, runId };
+
+    const events = await fetchEvents(parameters);
 
     return {
       props: {
         workflow: { workflowId, runId, namespace },
+        parameters,
       },
     };
   }
 </script>
 
 <script lang="ts">
+  import { setContext } from 'svelte';
   import {
     faCode,
     faDownload,
@@ -21,11 +26,18 @@
     faStream,
   } from '@fortawesome/free-solid-svg-icons';
 
+  import { refreshable } from '$lib/stores/refreshable';
+
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
   import { routeFor } from '$lib/utilities/route-for';
+  import { fetchEvents } from '$lib/services/events-service';
 
   export let workflow: WorkflowParameters;
+  export let parameters: Parameters<typeof fetchEvents>[0];
+
+  let events = refreshable(() => fetchEvents(parameters));
+  $: setContext('events', $events);
 </script>
 
 <section class="flex flex-col gap-4">

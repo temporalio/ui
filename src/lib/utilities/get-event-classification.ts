@@ -1,7 +1,8 @@
 import { Activity } from '../models/activity';
 import { format } from './format-camel-case';
 import { routeFor } from './route-for';
-import type { EventParameter } from './route-for';
+
+import type { WorkflowParameters } from './route-for';
 
 export type EventClassification = typeof eventClassifications[number];
 type EventOrActivity = HistoryEventWithId | PendingActivity | Activity;
@@ -15,7 +16,7 @@ type EventSummary = {
   pending: boolean;
   activity: boolean;
   type: 'event' | 'pending-activity' | 'activity';
-  routeFor: (parameters: EventParameter) => string;
+  routeFor: (parameters: WorkflowParameters) => string;
 };
 
 export const eventClassifications = [
@@ -104,14 +105,29 @@ const getType = (
 };
 
 export const getHref = (
-  event: EventOrActivity,
-  parameters: EventParameter,
+  event: EventOrActivity | PendingActivity,
+  parameters: WorkflowParameters,
 ): string => {
-  if (isEvent(event)) return routeFor('workflow.events.full.event', parameters);
-  if (isPendingActivity(event))
-    routeFor('workflow.events.full.pending', parameters);
-  if (isActivity(event))
-    return routeFor('workflow.events.compact.activity', parameters);
+  if (isEvent(event)) {
+    return routeFor('workflow.events.full.event', {
+      ...parameters,
+      eventId: String(event.eventId),
+    });
+  }
+
+  if (isPendingActivity(event)) {
+    return routeFor('workflow.events.full.pending', {
+      ...parameters,
+      eventId: String(event.activityId),
+    });
+  }
+
+  if (isActivity(event)) {
+    return routeFor('workflow.events.compact.activity', {
+      ...parameters,
+      eventId: String(event.id),
+    });
+  }
 };
 
 export const formatEvent = (
@@ -126,6 +142,6 @@ export const formatEvent = (
     type: getType(event),
     pending: isPendingActivity(event),
     activity: isActivity(event),
-    routeFor: (parameters: EventParameter) => getHref(event, parameters),
+    routeFor: (parameters: WorkflowParameters) => getHref(event, parameters),
   };
 };

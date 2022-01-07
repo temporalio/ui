@@ -2,7 +2,7 @@
   import type { EventParameter } from '$lib/utilities/route-for';
   import type { LoadInput } from '@sveltejs/kit';
 
-  export async function load({ page, stuff }: LoadInput) {
+  export async function load({ page }: LoadInput) {
     const {
       workflow: workflowId,
       run: runId,
@@ -10,13 +10,8 @@
       eventId,
     } = page.params;
 
-    const { events } = stuff as {
-      events: HistoryEventWithId[];
-    };
-
     return {
       props: {
-        events,
         params: {
           workflowId,
           runId,
@@ -29,17 +24,29 @@
 </script>
 
 <script lang="ts">
+  import { getContext } from 'svelte';
+
   import { Activities } from '$lib/models/activity';
   import { routeFor } from '$lib/utilities/route-for';
   import { page } from '$app/stores';
 
-  export let events: HistoryEventWithId[];
+  let events = getContext<EventualHistoryEvents>('events');
   export let params: EventParameter;
 
-  let activities = new Activities(events);
-  let activity = activities.get(params.eventId);
+  const getActivity = async (
+    events: EventualHistoryEvents,
+    id: string,
+  ): Promise<{ activity: Activity; events: HistoryEventWithId[] }> => {
+    const activities = await Activities.fromPromise(events);
+    const activity = activities.get(id);
 
-  const getHref = (event: HistoryEventWithId) =>
+    return {
+      activity,
+      events: activity.events,
+    };
+  };
+
+  const getHref = (activity, event: HistoryEventWithId) =>
     routeFor('workflow.events.compact.activity.event', {
       ...params,
       activityId: activity.id,
@@ -50,13 +57,18 @@
 <div class="flex flex-col w-full h-full">
   <nav class="mb-4">
     <ul class="flex gap-4 w-full items-start">
-      {#each activity.toArray() as event}
-        <li>
-          <a href={getHref(event)} class:active={$page.path === getHref(event)}>
-            {event.eventType}
-          </a>
-        </li>
-      {/each}
+      {#await getActivity(events, params.eventId) then { activity, events }}
+        {#each events as event}
+          <li>
+            <a
+              href={getHref(activity, event)}
+              class:active={$page.path === getHref(activity, event)}
+            >
+              {event.eventType}
+            </a>
+          </li>
+        {/each}
+      {/await}
     </ul>
   </nav>
   <slot />

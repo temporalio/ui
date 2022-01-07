@@ -20,10 +20,7 @@
   />
   <Tab
     label="Workers"
-    href={routeFor('workers', {
-      namespace,
-      queue: workflow.taskQueue,
-    })}
+    href={routeFor('workers', { namespace, workflowId, runId })}
   />
   <Tab
     label="Stack Trace"

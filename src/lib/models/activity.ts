@@ -47,12 +47,12 @@ export class Activity {
     return [...this];
   }
 
-  get events(): typeof this._events {
-    return this._events;
+  get events(): HistoryEventWithId[] {
+    return [...this];
   }
 
   get length(): number {
-    return this.events.size;
+    return this._events.size;
   }
 
   get last(): HistoryEventWithId {
@@ -72,6 +72,12 @@ export class Activity {
 
 export class Activities {
   private _activities: Map<string, Activity> = new Map();
+
+  static async fromPromise(
+    events: PromiseLike<HistoryEventWithId[]>,
+  ): Promise<Activities> {
+    return Activities.from(await events);
+  }
 
   static from = (
     events: HistoryEventWithId[],
