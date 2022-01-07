@@ -23,37 +23,33 @@
   import Button from '$lib/components/button.svelte';
   import { getWorkflowStackTrace } from '$lib/services/query-service';
   import EmptyState from '$lib/components/empty-state.svelte';
+  import { onMount } from 'svelte';
 
   export let workflow: WorkflowExecution;
 
   let currentdate = new Date();
+
+  $: isLoading = true;
   $: datetime = currentdate.toLocaleTimeString();
-  $: data =
-    String(workflow.status) === 'Running'
-      ? getWorkflowStackTrace({ workflow, namespace: $namespace })
-      : null;
+  $: data = getWorkflowStackTrace({ workflow, namespace: $namespace });
 
   const refreshStackTrace = () => {
-    data =
-      String(workflow.status) === 'Running'
-        ? getWorkflowStackTrace({ workflow, namespace: $namespace })
-        : null;
+    data = getWorkflowStackTrace({ workflow, namespace: $namespace });
     currentdate = new Date();
+    isLoading = false;
   };
 </script>
 
 <section>
   {#if String(workflow.status) === 'Running'}
     <div class="flex items-center">
-      <Button on:click={refreshStackTrace}>
-        <span> <Icon icon={faRedo} scale={0.8} class="block w-full" /></span>
-        Refresh</Button
-      >
+      <Button on:click={refreshStackTrace} loading={isLoading}>
+        <span> <Icon icon={faRedo} scale={0.8} /></span>
+        Refresh
+      </Button>
       <p>Stack Trace at {datetime}</p>
     </div>
-    {#await data}
-      <div>loading</div>
-    {:then { queryResult }}
+    {#await data then { queryResult }}
       <div class="flex items-start h-full">
         <CodeBlock content={window.atob(queryResult.payloads[0].data)} />
       </div>

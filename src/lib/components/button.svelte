@@ -1,7 +1,11 @@
 <script lang="ts">
+  import Icon from 'svelte-fa';
+  import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+
   export let disabled: boolean = false;
   export let secondary: boolean = false;
   export let destroy: boolean = false;
+  export let loading: boolean = false;
   export let as: string = 'button';
   export let active: boolean = false;
   export let large: boolean = false;
@@ -16,8 +20,13 @@
     class:large
     class:secondary
     class:destroy
-    {disabled}><slot /></button
-  >
+    {disabled}
+    >{#if loading}
+      <span class="animate-spin"> <Icon icon={faSpinner} scale={1} /></span>
+    {:else}
+      <slot />
+    {/if}
+  </button>
 {:else}
   <a
     {href}
@@ -27,7 +36,12 @@
     class:large
     class:secondary
     class:destroy
-    {disabled}><slot /></a
+    {disabled}
+    >{#if loading}
+      <span class="animate-spin"> <Icon icon={faSpinner} scale={1} /></span>
+    {:else}
+      <slot />
+    {/if}</a
   >
 {/if}
 
