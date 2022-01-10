@@ -1,63 +1,60 @@
-<script context="module" lang="ts">
-  import type { LoadInput } from '@sveltejs/kit';
+<script lang="ts">
+  import { getContext } from 'svelte';
+  import Icon from 'svelte-fa';
+  import { faRedo } from '@fortawesome/free-solid-svg-icons';
+
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
-  export async function load({ stuff }: LoadInput) {
-    const { workflow } = stuff as {
-      workflow: WorkflowExecution;
-    };
-
-    return {
-      props: {
-        workflow,
-      },
-    };
-  }
-</script>
-
-<script lang="ts">
-  import CodeBlock from '$lib/components/code-block.svelte';
-  import Icon from 'svelte-fa';
   import { namespace } from '$lib/stores/namespace';
-  import { faRedo } from '@fortawesome/free-solid-svg-icons';
-  import Button from '$lib/components/button.svelte';
   import { getWorkflowStackTrace } from '$lib/services/query-service';
-  import EmptyState from '$lib/components/empty-state.svelte';
-  import { onMount } from 'svelte';
 
-  export let workflow: WorkflowExecution;
+  import CodeBlock from '$lib/components/code-block.svelte';
+  import Button from '$lib/components/button.svelte';
+  import EmptyState from '$lib/components/empty-state.svelte';
+
+  let workflow = getContext<PromiseLike<WorkflowExecution>>('workflow');
 
   let currentdate = new Date();
+  let isLoading = true;
 
-  $: isLoading = true;
   $: datetime = currentdate.toLocaleTimeString();
   $: data = getWorkflowStackTrace({ workflow, namespace: $namespace });
 
+  $: {
+    isLoading = true;
+    currentdate = new Date();
+    data.then(() => {
+      isLoading = false;
+      new Date();
+    });
+  }
+
   const refreshStackTrace = () => {
     data = getWorkflowStackTrace({ workflow, namespace: $namespace });
-    currentdate = new Date();
-    isLoading = false;
+    isLoading = true;
   };
 </script>
 
-<section>
-  {#if String(workflow.status) === 'Running'}
-    <div class="flex items-center">
-      <Button on:click={refreshStackTrace} loading={isLoading}>
-        <span> <Icon icon={faRedo} scale={0.8} /></span>
-        Refresh
-      </Button>
-      <p>Stack Trace at {datetime}</p>
-    </div>
-    {#await data then { queryResult }}
-      <div class="flex items-start h-full">
-        <CodeBlock content={window.atob(queryResult.payloads[0].data)} />
+{#await workflow then workflow}
+  <section>
+    {#if String(workflow.status) === 'Running'}
+      <div class="flex items-center">
+        <Button on:click={refreshStackTrace} loading={isLoading}>
+          <span> <Icon icon={faRedo} scale={0.8} /></span>
+          Refresh
+        </Button>
+        <p>Stack Trace at {datetime}</p>
       </div>
-    {/await}
-  {:else}
-    <EmptyState title="No Stack Traces Found" />
-  {/if}
-</section>
+      {#await data then result}
+        <div class="flex items-start h-full">
+          <CodeBlock content={result} language="text" />
+        </div>
+      {/await}
+    {:else}
+      <EmptyState title="No Stack Traces Found" />
+    {/if}
+  </section>
+{/await}
 
 <style lang="postcss">
   p {

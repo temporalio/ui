@@ -27,6 +27,7 @@
     "date-fns": "^2.23.0",
     "json-beautify": "^1.1.1",
     "just-debounce": "^1.1.0",
+    "sanitize-html": "^2.6.1",
     "svelte-fa": "^2.4.0",
     "url-pattern": "^1.0.3",
     "websocket-as-promised": "^2.0.1"
@@ -38,6 +39,7 @@
     "@temporalio/proto": "^0.3.1",
     "@types/base-64": "^1.0.0",
     "@types/jest": "^27.0.1",
+    "@types/sanitize-html": "^2.6.1",
     "@typescript-eslint/eslint-plugin": "^4.30.0",
     "@typescript-eslint/parser": "^4.30.0",
     "autoprefixer": "^10.3.3",

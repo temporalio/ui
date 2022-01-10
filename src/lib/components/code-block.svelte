@@ -6,6 +6,9 @@
   export let heading = '';
   export let content: string | Parameters<typeof JSON.stringify>[0];
   export let copied = false;
+  export let language = 'json';
+
+  const isJSON = language === 'json';
 
   const copy = () =>
     navigator.clipboard
@@ -22,7 +25,9 @@
     return formated;
   };
 
-  onMount(() => window.Prism.highlightAll());
+  onMount(() => {
+    window.Prism.highlightAll();
+  });
 </script>
 
 {#if content || content === null}
@@ -35,10 +40,14 @@
 
     <pre
       class="p-4">
-        <code class="language-json">
-          {formatJSON(JSON.stringify(content))}
+        <code class="language-{language}">
+          {#if isJSON}
+            {formatJSON(JSON.stringify(content))}
+          {:else}
+            {@html content}
+          {/if}
         </code>
-      </pre>
+    </pre>
 
     <button on:click={copy} class="absolute top-4 right-4 block">
       {#if copied}
