@@ -1,6 +1,5 @@
 <script lang="ts">
   import { getContext } from 'svelte';
-  import Icon from 'svelte-fa';
   import { faRedo } from '@fortawesome/free-solid-svg-icons';
 
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
@@ -13,37 +12,33 @@
   import EmptyState from '$lib/components/empty-state.svelte';
 
   let workflow = getContext<PromiseLike<WorkflowExecution>>('workflow');
-
   let currentdate = new Date();
   let isLoading = true;
 
-  $: datetime = currentdate.toLocaleTimeString();
-  $: data = getWorkflowStackTrace({ workflow, namespace: $namespace });
-
-  $: {
+  const refreshStackTrace = async (): Promise<string> => {
     isLoading = true;
-    currentdate = new Date();
-    data.then(() => {
-      isLoading = false;
-      new Date();
+
+    const response = await getWorkflowStackTrace({
+      workflow,
+      namespace: $namespace,
     });
-  }
 
-  const refreshStackTrace = () => {
-    data = getWorkflowStackTrace({ workflow, namespace: $namespace });
-    isLoading = true;
+    isLoading = false;
+    currentdate = new Date();
+    return response;
   };
+
+  let data = refreshStackTrace();
 </script>
 
 {#await workflow then workflow}
   <section>
     {#if String(workflow.status) === 'Running'}
-      <div class="flex items-center">
-        <Button on:click={refreshStackTrace} loading={isLoading}>
-          <span> <Icon icon={faRedo} scale={0.8} /></span>
+      <div class="flex items-center gap-4">
+        <Button on:click={refreshStackTrace} icon={faRedo} loading={isLoading}>
           Refresh
         </Button>
-        <p>Stack Trace at {datetime}</p>
+        <p>Stack Trace at {currentdate.toLocaleTimeString()}</p>
       </div>
       {#await data then result}
         <div class="flex items-start h-full">
@@ -55,13 +50,3 @@
     {/if}
   </section>
 {/await}
-
-<style lang="postcss">
-  p {
-    @apply ml-2;
-  }
-
-  span {
-    @apply mr-1;
-  }
-</style>

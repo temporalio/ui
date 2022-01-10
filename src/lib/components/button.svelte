@@ -1,6 +1,7 @@
 <script lang="ts">
   import Icon from 'svelte-fa';
   import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+  import type { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 
   export let disabled: boolean = false;
   export let secondary: boolean = false;
@@ -9,7 +10,8 @@
   export let as: string = 'button';
   export let active: boolean = false;
   export let large: boolean = false;
-  export let href: string | null = null;
+  export let href: string = null;
+  export let icon: IconDefinition = null;
 </script>
 
 {#if as === 'button'}
@@ -21,11 +23,13 @@
     class:secondary
     class:destroy
     {disabled}
-    >{#if loading}
-      <span class="animate-spin"> <Icon icon={faSpinner} scale={1} /></span>
-    {:else}
-      <slot />
+  >
+    {#if icon}
+      <span class:animate-spin={loading} class="pr-2">
+        <Icon icon={loading ? faSpinner : icon} scale={1} />
+      </span>
     {/if}
+    <slot />
   </button>
 {:else}
   <a
@@ -38,7 +42,7 @@
     class:destroy
     {disabled}
     >{#if loading}
-      <span class="animate-spin"> <Icon icon={faSpinner} scale={1} /></span>
+      <span class="animate-spin"> <Icon {icon} scale={1} /></span>
     {:else}
       <slot />
     {/if}</a
