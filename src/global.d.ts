@@ -12,7 +12,7 @@ interface ImportMeta {
   };
 }
 
-type Heroicon = { [key: string]: string }[][];
+type Eventual<T> = T | PromiseLike<T>;
 
 type WorkflowStatus =
   | 'Running'

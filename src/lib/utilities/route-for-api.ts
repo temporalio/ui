@@ -1,5 +1,9 @@
 type WorkflowsAPIRoutePath = 'workflows.open' | 'workflows.closed';
-type WorkflowAPIRoutePath = 'workflow' | 'workflow.terminate' | 'events';
+type WorkflowAPIRoutePath =
+  | 'workflow'
+  | 'workflow.terminate'
+  | 'events'
+  | 'query';
 type TaskQueueAPIRoutePath = 'task-queue';
 type ParameterlessAPIRoutePath = 'cluster' | 'settings' | 'user' | 'namespaces';
 
@@ -16,12 +20,15 @@ type APIRouteParameters = {
   queue: string;
 };
 
-type WorkflowListRouteParameters = Pick<APIRouteParameters, 'namespace'>;
-type WorkflowRouteParameters = Pick<
+export type WorkflowListRouteParameters = Pick<APIRouteParameters, 'namespace'>;
+export type WorkflowRouteParameters = Pick<
   APIRouteParameters,
   'namespace' | 'executionId' | 'runId'
 >;
-type TaskQueueRouteParameters = Pick<APIRouteParameters, 'namespace' | 'queue'>;
+export type TaskQueueRouteParameters = Pick<
+  APIRouteParameters,
+  'namespace' | 'queue'
+>;
 
 const base = import.meta.env?.VITE_API || process.env.VITE_API;
 
@@ -65,6 +72,7 @@ export function routeForApi(
     workflow: `/namespaces/${parameters?.namespace}/workflows/${parameters?.executionId}/executions/${parameters?.runId}`,
     'workflow.terminate': `/namespaces/${parameters?.namespace}/workflows/${parameters?.executionId}/executions/${parameters?.runId}/terminate`,
     events: `/namespaces/${parameters?.namespace}/workflows/${parameters?.executionId}/executions/${parameters?.runId}/events`,
+    query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.executionId}/executions/${parameters?.runId}/query`,
   };
 
   return withBase(routes[route]);
