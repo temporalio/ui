@@ -6,10 +6,13 @@ import { routeForApi } from '$lib/utilities/route-for-api';
 import type { WorkflowExecution } from '$lib/models/workflow-execution';
 import type { WorkflowRouteParameters } from '$lib/utilities/route-for-api';
 
-type StackTraceOptions = {
+type QueryRequestParameters = {
   workflow: Eventual<WorkflowExecution>;
   namespace: string;
+  queryType: string;
 };
+
+type StackTraceOptions = Omit<QueryRequestParameters, 'queryType'>;
 
 type QueryPayload = {
   data: string;
@@ -22,7 +25,7 @@ type QueryType = {
   payloads: QueryPayload[];
 };
 
-type StackTraceExecution = {
+type QueryResponse = {
   queryRejected: string | null;
   queryResult: QueryType;
 };
@@ -43,32 +46,43 @@ const formatStackTrace = (data: string): string => {
   return sanitize(data).slice(1, data.length - 1);
 };
 
-export async function getWorkflowStackTrace({
+async function fetchQuery({
   workflow,
   namespace,
-}: StackTraceOptions): Promise<string> {
+  queryType,
+}: QueryRequestParameters): Promise<QueryResponse> {
   workflow = await workflow;
   const parameters = await formatParameters(namespace, workflow);
 
-  return await requestFromAPI<StackTraceExecution>(
-    routeForApi('query', parameters),
-    {
-      options: {
-        method: 'POST',
-        body: JSON.stringify({
-          execution: {
-            workflowId: workflow.id,
-            runId: workflow.runId,
-          },
-          query: {
-            queryType: '__stack_trace',
-          },
-        }),
-      },
-      shouldRetry: false,
+  return await requestFromAPI<QueryResponse>(routeForApi('query', parameters), {
+    options: {
+      method: 'POST',
+      body: JSON.stringify({
+        execution: {
+          workflowId: workflow.id,
+          runId: workflow.runId,
+        },
+        query: {
+          queryType,
+        },
+      }),
     },
-  ).then((execution) => {
-    const { queryResult } = execution;
-    return formatStackTrace(window.atob(queryResult.payloads[0].data));
   });
+}
+
+export async function getQuery(
+  options: QueryRequestParameters,
+): Promise<string> {
+  return fetchQuery(options).then((execution) => {
+    const { queryResult } = execution;
+    return window.atob(queryResult.payloads[0].data);
+  });
+}
+
+export async function getWorkflowStackTrace(
+  options: StackTraceOptions,
+): Promise<string> {
+  return getQuery({ ...options, queryType: '__stack_trace' }).then(
+    formatStackTrace,
+  );
 }
