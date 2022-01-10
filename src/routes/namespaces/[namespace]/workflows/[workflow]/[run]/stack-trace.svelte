@@ -1,15 +1,30 @@
+<script context="module" lang="ts">
+  import type { LoadInput } from '@sveltejs/kit';
+
+  export async function load({ page }: LoadInput) {
+    const { namespace } = page.params;
+
+    return {
+      props: {
+        namespace,
+      },
+    };
+  }
+</script>
+
 <script lang="ts">
   import { getContext } from 'svelte';
   import { faRedo } from '@fortawesome/free-solid-svg-icons';
 
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
-  import { namespace } from '$lib/stores/namespace';
   import { getWorkflowStackTrace } from '$lib/services/query-service';
 
   import CodeBlock from '$lib/components/code-block.svelte';
   import Button from '$lib/components/button.svelte';
   import EmptyState from '$lib/components/empty-state.svelte';
+
+  export let namespace: string;
 
   let workflow = getContext<PromiseLike<WorkflowExecution>>('workflow');
   let currentdate = new Date();
@@ -20,7 +35,7 @@
 
     const response = await getWorkflowStackTrace({
       workflow,
-      namespace: $namespace,
+      namespace,
     });
 
     isLoading = false;
