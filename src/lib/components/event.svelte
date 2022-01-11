@@ -12,7 +12,7 @@
 
   export let event: HistoryEventWithId | PendingActivity | Activity;
 
-  let { routeFor, pending, timeStamp, name, tag, classification } =
+  let { routeFor, pending, timeStamp, name, tag, classification, id } =
     formatEvent(event);
 
   let { namespace, workflow: workflowId, run: runId } = $page.params;
@@ -27,20 +27,23 @@
   class:pending
   class:active={$page.path.includes(href)}
 >
-  <article class="p-4 w-full">
-    <h2 class="mb-2 {tag}">
-      <EventLabel color={classification}>
-        {name}
-      </EventLabel>
-    </h2>
-    <p class="text-sm">
-      <Icon icon={faCalendar} class="inline" />
-      {formatDate(timeStamp)}
-    </p>
+  <article class="flex gap-4 items-center p-4">
+    <p class="w-5 text-center text-gray-500">{id}</p>
+    <div class="w-full">
+      <h2 class="mb-2 {tag}">
+        <EventLabel color={classification}>
+          {name}
+        </EventLabel>
+      </h2>
+      <p class="text-sm">
+        <Icon icon={faCalendar} class="inline" />
+        {formatDate(timeStamp)}
+      </p>
+    </div>
+    {#if pending}
+      <div class="mx-8 text-orange-600 italic">Pending</div>
+    {/if}
   </article>
-  {#if pending}
-    <div class="mx-8 text-orange-600 italic">Pending</div>
-  {/if}
 </a>
 
 <style lang="postcss">
