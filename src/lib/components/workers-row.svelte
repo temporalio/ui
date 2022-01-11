@@ -6,7 +6,9 @@
   export let poller;
 </script>
 
-<article class="w-full h-full flex flex-row border-b-2 no-underline p-2">
+<article
+  class="w-full h-full flex flex-row border-b-2 last:border-b-0 no-underline p-2"
+>
   <div class="links w-3/12 text-left">
     {poller.identity}
   </div>
