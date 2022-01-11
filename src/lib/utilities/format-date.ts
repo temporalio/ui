@@ -17,7 +17,7 @@ export function formatDate(
     date = timestampToDate(date);
   }
 
-  let parsed = parseJSON(date);
+  const parsed = parseJSON(date);
 
   if (timeFormat === 'local') return format(parsed, pattern);
   if (timeFormat === 'relative') return formatDistanceToNow(parsed) + ' ago';
