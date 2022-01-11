@@ -12,6 +12,7 @@ export function formatDate(
   timeFormat: TimeFormat = 'UTC',
 ): string {
   if (!date) return '';
+
   if (isTimestamp(date)) {
     date = timestampToDate(date);
   }
@@ -21,8 +22,6 @@ export function formatDate(
   try {
     if (timeFormat === 'local') return format(parsed, pattern);
     if (timeFormat === 'relative') return formatDistanceToNow(parsed) + ' ago';
-
-    if (String(parsed) === 'Invalid Date') return String(parsed);
 
     return formatInTimeZone(parsed, 'UTC', pattern);
   } catch {
