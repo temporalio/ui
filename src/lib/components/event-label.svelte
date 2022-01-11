@@ -4,13 +4,13 @@
   export let color: EventClassification | PendingActivity['state'] = null;
 </script>
 
-<span class="label {color}">
+<span class="label {color} font-semibold">
   <slot />
 </span>
 
 <style lang="postcss">
   .label {
-    @apply inline-block px-2 text-center text-gray-700 bg-gray-300;
+    @apply px-2 text-gray-700 bg-gray-300;
   }
 
   .Open,

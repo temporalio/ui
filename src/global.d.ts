@@ -6,7 +6,13 @@ interface Window {
   };
 }
 
-type Heroicon = { [key: string]: string }[][];
+interface ImportMeta {
+  env: {
+    VITE_API: string;
+  };
+}
+
+type Eventual<T> = T | PromiseLike<T>;
 
 type WorkflowStatus =
   | 'Running'
@@ -67,4 +73,23 @@ type Activity = {
   activityTaskTimedOutEvent?: ActivityTaskTimedOutEvent;
   activityTaskCancelRequestedEvent?: ActivityTaskCancelRequestedEvent;
   activityTaskCanceledEvent?: ActivityTaskCanceledEvent;
+};
+
+type FilterParameters = {
+  workflowId?: string;
+  workflowType?: string;
+  status?: WorkflowStatus;
+  timeRange?: Duration | string;
+};
+
+type Settings = {
+  auth: {
+    enabled: boolean;
+  };
+};
+
+type User = {
+  email: string;
+  name: string;
+  picture: string;
 };

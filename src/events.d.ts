@@ -303,11 +303,80 @@ type EventAttribute =
   | WorkflowTaskFailedAttrs
   | ChildWorkflowExecutionFailedAttrs;
 
-interface HistoryEventWithId extends HistoryEvent, Record<string, unknown> {
+interface HistoryEventWithId extends HistoryEvent {
   id: string;
+  eventType: EventType;
   attributes: EventAttribute;
 }
 
-type PendingActivity = Omit<import('$types').PendingActivityInfo, 'state'> & {
+type PendingActivityInfo = import('$types').PendingActivityInfo;
+
+interface PendingActivity extends PendingActivityInfo {
   state: 'Unspecified' | 'Scheduled' | 'Started' | 'CancelRequested';
-} & Record<string, unknown>;
+  activityType: { name: string };
+}
+
+type EventType =
+  | 'ActivityTaskCanceled'
+  | 'ActivityTaskCancelRequested'
+  | 'ActivityTaskCompleted'
+  | 'ActivityTaskFailed'
+  | 'ActivityTaskScheduled'
+  | 'ActivityTaskStarted'
+  | 'ActivityTaskTimedOut'
+  | 'ChildWorkflowExecutionCanceled'
+  | 'ChildWorkflowExecutionCompleted'
+  | 'ChildWorkflowExecutionFailed'
+  | 'ChildWorkflowExecutionStarted'
+  | 'ChildWorkflowExecutionTerminated'
+  | 'ChildWorkflowExecutionTimedOut'
+  | 'StartChildWorkflowExecutionFailed'
+  | 'StartChildWorkflowExecutionInitiated'
+  | 'SignalExternalWorkflowExecutionFailed'
+  | 'SignalExternalWorkflowExecutionInitiated'
+  | 'TimerCanceled'
+  | 'TimerFired'
+  | 'TimerStarted'
+  | 'WorkflowExecutionCanceled'
+  | 'WorkflowExecutionCancelRequested'
+  | 'WorkflowExecutionCompleted'
+  | 'WorkflowExecutionContinuedAsNew'
+  | 'WorkflowExecutionFailed'
+  | 'WorkflowExecutionSignaled'
+  | 'WorkflowExecutionStarted'
+  | 'WorkflowExecutionTerminated'
+  | 'WorkflowExecutionTimedOut'
+  | 'WorkflowTaskCompleted'
+  | 'WorkflowTaskFailed'
+  | 'WorkflowTaskScheduled'
+  | 'WorkflowTaskStarted'
+  | 'WorkflowTaskTimedOut'
+  | 'ExternalWorkflowExecutionCancelRequested'
+  | 'ExternalWorkflowExecutionSignaled'
+  | 'RequestCancelExternalWorkflowExecutionFailed'
+  | 'RequestCancelExternalWorkflowExecutionInitiated'
+  | 'MarkerRecorded'
+  | 'UpsertWorkflowSearchAttributes';
+
+type ActivityType =
+  | 'ActivityTaskCanceled'
+  | 'ActivityTaskCancelRequested'
+  | 'ActivityTaskCompleted'
+  | 'ActivityTaskFailed'
+  | 'ActivityTaskScheduled'
+  | 'ActivityTaskStarted'
+  | 'ActivityTaskTimedOut';
+
+type EventTypeCategory =
+  | 'activity'
+  | 'child-workflow'
+  | 'signal'
+  | 'timer'
+  | 'workflow'
+  | 'command';
+
+type ActivityEvent = HistoryEventWithId & {
+  eventType: ActivityType;
+};
+
+type EventualHistoryEvents = PromiseLike<HistoryEventWithId[]>;

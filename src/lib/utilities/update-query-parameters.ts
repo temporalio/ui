@@ -1,25 +1,31 @@
 import type { goto, invalidate } from '$app/navigation';
+import { appendQueryParameters } from './append-query-parameters';
 
 type UpdateQueryParams = {
   parameter: string;
-  value: string;
+  value?: string;
   query: URLSearchParams;
   path: string;
   goto: typeof goto;
   invalidate?: typeof invalidate;
 };
 
-export const updateQueryParameters = ({
+const options = { replaceState: true, keepfocus: true };
+
+export const updateQueryParameters = async ({
   parameter,
   value,
   query,
   path,
   goto,
-}: UpdateQueryParams): void => {
+}: UpdateQueryParams): Promise<typeof value> => {
   if (value) {
     query.set(parameter, value);
   } else {
     query.delete(parameter);
   }
-  goto(`${path}?${query}`, { replaceState: true, keepfocus: true });
+
+  goto(appendQueryParameters(path, query), options);
+
+  return value;
 };

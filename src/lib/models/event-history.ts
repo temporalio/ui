@@ -45,9 +45,12 @@ export function getEventAttributes(historyEvent: HistoryEvent): EventAttribute {
 export const toEventHistory = (
   response: GetWorkflowExecutionHistoryResponse,
 ): HistoryEventWithId[] => {
-  return response.history.events.map((event) => ({
-    ...event,
-    id: String(event.eventId),
-    attributes: getEventAttributes(event),
-  }));
+  return response.history.events.map(
+    (event): HistoryEventWithId => ({
+      ...event,
+      id: String(event.eventId),
+      eventType: event.eventType as unknown as EventType,
+      attributes: getEventAttributes(event),
+    }),
+  );
 };

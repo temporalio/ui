@@ -1,34 +1,55 @@
 <script lang="ts">
+  import Icon from 'svelte-fa';
+  import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+  import type { IconDefinition } from '@fortawesome/free-solid-svg-icons';
+
   export let disabled: boolean = false;
-  export let variant: string = 'primary';
+  export let secondary: boolean = false;
+  export let destroy: boolean = false;
+  export let loading: boolean = false;
   export let as: string = 'button';
   export let active: boolean = false;
-  export let size: string = 'small';
-  export let href: string | null = null;
+  export let large: boolean = false;
+  export let href: string = null;
+  export let icon: IconDefinition = null;
 </script>
 
 {#if as === 'button'}
   <button
     on:click
+    class="flex items-center justify-center text-sm primary"
     class:selected={active}
+    class:large
+    class:secondary
+    class:destroy
     {disabled}
-    class={`${size} ${variant}`}><slot /></button
   >
+    {#if icon}
+      <span class:animate-spin={loading} class="pr-2">
+        <Icon icon={loading ? faSpinner : icon} scale={1} />
+      </span>
+    {/if}
+    <slot />
+  </button>
 {:else}
   <a
     {href}
     on:click
+    class="flex items-center justify-center text-sm primary"
     class:selected={active}
+    class:large
+    class:secondary
+    class:destroy
     {disabled}
-    class={`${size} ${variant}`}><slot /></a
+    >{#if loading}
+      <span class="animate-spin"> <Icon {icon} scale={1} /></span>
+    {:else}
+      <slot />
+    {/if}</a
   >
 {/if}
 
 <style lang="postcss">
-  .small {
-    @apply text-sm;
-  }
-
   .large {
     @apply text-lg;
   }

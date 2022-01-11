@@ -1,18 +1,12 @@
-const TemporalColors = {
-  // This is blue700
-  primary: { DEFAULT: '#1d4ed8' },
-  // blueGray 500
-  secondary: '#64748b',
-  // Custom Colors
+const temporalColors = {
+  primary: { DEFAULT: '#1d4ed8' }, // blue-700
+  secondary: '#64748b', // blue-gray-500
   primaryText: '#141414',
   spaceGray: { DEFAULT: '#141414' },
   offWhite: '#F2F2F2',
   white: '#ffffff',
-  // Red 700
-  danger: '#b91c1c',
-  // Green 200
-  success: '#bbf7d0',
-  // Stuff we stole from Tailwind
+  danger: '#b91c1c', // red-700
+  success: '#bbf7d0', // green-200
   black: '#000000',
   blue: {
     50: '#eff6ff',
@@ -26,8 +20,6 @@ const TemporalColors = {
     800: '#1e40af',
     900: '#1e3a8a',
   },
-  // This is here for compatability with some of our @applys
-  // we can remove this later
   indigo: {
     50: '#eef2ff',
     100: '#e0e7ff',
@@ -40,8 +32,6 @@ const TemporalColors = {
     800: '#3730a3',
     900: '#312e81',
   },
-  // This is here for compatability with some of our @applys
-  // we can remove this later
   gray: {
     50: '#fafafa',
     100: '#f4f4f5',
@@ -144,9 +134,9 @@ const config = {
   mode: 'jit',
   purge: ['./src/**/*.{html,js,svelte,ts}'],
   theme: {
-    colors: TemporalColors,
-    textColor: TemporalColors,
-    backgroundColor: TemporalColors,
+    colors: temporalColors,
+    textColor: temporalColors,
+    backgroundColor: temporalColors,
   },
   plugins: [],
 };

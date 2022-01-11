@@ -1,3 +1,6 @@
+process.env.TZ = 'UTC';
+process.env.VITE_API = 'http://localhost:8080';
+
 export default {
   preset: 'ts-jest',
   testEnvironment: 'node',
@@ -11,6 +14,16 @@ export default {
     'src/types',
   ],
   reporters: ['default'],
-  globals: { 'ts-jest': { diagnostics: false } },
-  transform: {},
+  globals: { 'ts-jest': { diagnostics: false, isolatedModules: true } },
+  transform: {
+    '^.+\\.tsx?$': [
+      'esbuild-jest',
+      {
+        sourcemap: true,
+        loaders: {
+          '.spec.ts': 'tsx',
+        },
+      },
+    ],
+  },
 };

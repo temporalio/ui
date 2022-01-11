@@ -5,3 +5,4 @@ node_modules
 /cypress/videos
 /build-local
 /build-cloud
+/coverage

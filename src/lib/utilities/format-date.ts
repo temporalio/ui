@@ -9,7 +9,7 @@ export function formatDate(date: Date | Timestamp | string | null): string {
     date = timestampToDate(date);
   }
 
-  return format(parseJSON(date), 'MMMM dd, yyyy — h:mm a');
+  return format(parseJSON(date), 'h:mm:ss a O, E, MMM dd, yyyy');
 }
 
 function timestampToDate(ts: Timestamp): Date {

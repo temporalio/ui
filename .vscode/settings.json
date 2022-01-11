@@ -4,5 +4,6 @@
     "**/.svelte-kit": true,
     "**/build-local": true,
     "**/build-cloud": true
-  }
+  },
+  "jest.nodeEnv": { "TZ": "UTC" }
 }

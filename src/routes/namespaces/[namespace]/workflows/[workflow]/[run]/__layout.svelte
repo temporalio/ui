@@ -1,33 +1,36 @@
 <script context="module" lang="ts">
   import type { LoadInput } from '@sveltejs/kit';
-  import { fetchWorkflowWithEventHistory } from '$lib/services/workflow-service';
+  import { fetchWorkflow } from '$lib/services/workflow-service';
 
   export async function load({ page }: LoadInput) {
     const { workflow: executionId, run: runId, namespace } = page.params;
-    const { workflow, events } = await fetchWorkflowWithEventHistory({
+
+    const parameters = {
       namespace,
       executionId,
       runId,
-    });
+    };
 
     return {
-      props: { workflow, namespace },
-      stuff: { workflow, events },
+      props: { parameters, namespace },
     };
   }
 </script>
 
 <script lang="ts">
-  import Header from './_header.svelte';
-  import type { WorkflowExecution } from '$lib/models/workflow-execution';
+  import { setContext } from 'svelte';
+  import { refreshable } from '$lib/stores/refreshable';
 
-  export let workflow: WorkflowExecution;
+  import Header from './_header.svelte';
+
+  export let parameters: Parameters<typeof fetchWorkflow>[0];
   export let namespace: string;
+
+  let workflow = refreshable(() => fetchWorkflow(parameters));
+  $: setContext('workflow', $workflow);
 </script>
 
-<section class="border-l-2 h-screen">
-  <main class="w-full">
-    <Header {workflow} {namespace} />
-    <slot />
-  </main>
-</section>
+<main class="flex flex-col gap-4 h-full">
+  <Header {namespace} />
+  <slot />
+</main>

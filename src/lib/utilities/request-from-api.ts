@@ -1,5 +1,19 @@
+import { browser } from '$app/env';
 import { handleError } from './handle-error';
+import { isFunction } from './is-function';
 import { toURL } from './to-url';
+
+type TemporalAPIError = {
+  code: number;
+  message: string;
+  details: unknown[];
+};
+
+type ErrorCallback = (error: {
+  status: number;
+  statusText: string;
+  body: TemporalAPIError;
+}) => void;
 
 type toURLParams = Parameters<typeof toURL>;
 type RequestFromAPIOptions = {
@@ -7,11 +21,14 @@ type RequestFromAPIOptions = {
   request?: typeof fetch;
   options?: Parameters<typeof fetch>[1];
   token?: string;
+  onError?: ErrorCallback;
   shouldRetry?: boolean;
   retryInterval?: number;
 };
 
-const base = import.meta.env.VITE_API;
+export const isTemporalAPIError = (obj: unknown): obj is TemporalAPIError =>
+  (obj as TemporalAPIError).message !== undefined &&
+  typeof (obj as TemporalAPIError).message === 'string';
 
 /**
  *  A utility method for making requests to the Temporal API.
@@ -33,30 +50,38 @@ export const requestFromAPI = async <T>(
 ): Promise<T> => {
   const {
     params = {},
-    options,
     request = fetch,
     token,
-    shouldRetry = true,
+    shouldRetry = false,
+    onError,
     retryInterval = 5000,
   } = init;
+  let { options } = init;
 
-  if (!endpoint.startsWith('/')) endpoint = '/' + endpoint;
   const nextPageToken = token ? { next_page_token: token } : {};
   const query = new URLSearchParams({
     ...params,
     ...nextPageToken,
   });
-
-  const url = toURL(base + '/api/v1' + endpoint, query);
+  const url = toURL(endpoint, query);
 
   try {
+    options = withSecurityOptions(options);
+
     const response = await request(url, options);
+    const body = await response.json();
+
+    const { status, statusText } = response;
 
     if (!response.ok) {
-      throw new Error(`${response.status}: ${response.statusText}`);
+      if (onError && isFunction(onError)) {
+        onError({ status, statusText, body });
+      } else {
+        throw new Error(`${status}: ${statusText}`);
+      }
     }
 
-    return await response.json();
+    return body;
   } catch (error: unknown) {
     handleError(error);
 
@@ -68,4 +93,30 @@ export const requestFromAPI = async <T>(
       });
     }
   }
+};
+
+const withSecurityOptions = (options: RequestInit): RequestInit => {
+  const opts: RequestInit = { credentials: 'include', ...options };
+  opts.headers = withCsrf(options?.headers);
+  return opts;
+};
+
+const withCsrf = (headers: HeadersInit): HeadersInit => {
+  if (!browser) return headers;
+  if (!headers) headers = {};
+
+  const csrfCookie = '_csrf=';
+  const csrfHeader = 'X-CSRF-TOKEN';
+  try {
+    const cookies = document.cookie.split(';');
+    let csrf = cookies.find((c) => c.includes(csrfCookie));
+    if (csrf && !headers[csrfHeader]) {
+      csrf = csrf.trim().slice(csrfCookie.length);
+      headers[csrfHeader] = csrf;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+
+  return headers;
 };

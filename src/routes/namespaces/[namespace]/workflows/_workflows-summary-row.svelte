@@ -1,15 +1,19 @@
 <script lang="ts">
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
-
   import { namespace } from '$lib/stores/namespace';
-  import { getWorkflowExecutionUrl } from '$lib/utilities/get-workflow-execution-url';
+
   import Time from '$lib/components/workflow-time.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import { routeFor } from '$lib/utilities/route-for';
 
   export let workflow: WorkflowExecution;
   export let timeFormat: string;
 
-  $: href = getWorkflowExecutionUrl($namespace, workflow);
+  $: href = routeFor('workflow', {
+    namespace: $namespace,
+    workflowId: workflow.id,
+    runId: workflow.runId,
+  });
 </script>
 
 <a sveltekit:noscroll {href}>

@@ -1,4 +1,9 @@
-import { getEventClassification } from './get-event-classification';
+import {
+  getEventClassification,
+  isEvent,
+  isPendingActivity,
+  formatEvent,
+} from './get-event-classification';
 
 describe(getEventClassification, () => {
   it('should return "Started" for WorkflowExecutionStartedEvent', () => {
@@ -273,5 +278,84 @@ describe(getEventClassification, () => {
         eventType: 'UpsertWorkflowSearchAttributesEvent',
       }),
     ).toBeUndefined();
+  });
+});
+
+describe(isEvent, () => {
+  it('should return true if the event has an eventType', () => {
+    expect(isEvent({ eventType: 'Workflow Started' })).toBe(true);
+  });
+
+  it('should return false if the event does not have an eventType', () => {
+    expect(isEvent({ activityType: 'Workflow Started' })).toBe(false);
+  });
+
+  it('should return false if passed null', () => {
+    expect(isEvent(null)).toBe(false);
+  });
+
+  it('should return false if passed a string', () => {
+    expect(isEvent('string')).toBe(false);
+  });
+
+  it('should return false if passed a number', () => {
+    expect(isEvent(4)).toBe(false);
+  });
+
+  it('should return false if passed an array', () => {
+    expect(isEvent([])).toBe(false);
+  });
+});
+
+describe(isPendingActivity, () => {
+  it('should return true if the event has an eventType', () => {
+    expect(
+      isPendingActivity({ activityType: { name: 'Workflow Started' } }),
+    ).toBe(true);
+  });
+
+  it('should return false if the event does not have an eventType', () => {
+    expect(isPendingActivity({ eventType: 'Workflow Started' })).toBe(false);
+  });
+
+  it('should return false if passed null', () => {
+    expect(isPendingActivity(null)).toBe(false);
+  });
+
+  it('should return false if passed a string', () => {
+    expect(isPendingActivity('string')).toBe(false);
+  });
+
+  it('should return false if passed a number', () => {
+    expect(isPendingActivity(4)).toBe(false);
+  });
+
+  it('should return false if passed an array', () => {
+    expect(isPendingActivity([])).toBe(false);
+  });
+});
+
+describe(formatEvent, () => {
+  it('should correctly get the name from an event', () => {
+    const result = formatEvent({ eventType: 'WorkflowStarted' });
+    expect(result.name).toBe('Workflow Started');
+  });
+
+  it('should correctly get the tag from an event', () => {
+    const result = formatEvent({ eventType: 'WorkflowStarted' });
+    expect(result.tag).toBe('WorkflowStarted');
+  });
+
+  it('should correctly get the name from an activity', () => {
+    const result = formatEvent({
+      activityType: { name: 'LongActivity' },
+      state: 'Started',
+    });
+    expect(result.name).toBe('Long Activity: Started');
+  });
+
+  it('should correctly get the tag from an activity', () => {
+    const result = formatEvent({ eventType: 'WorkflowStarted' });
+    expect(result.tag).toBe('WorkflowStarted');
   });
 });

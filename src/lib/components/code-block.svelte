@@ -1,16 +1,18 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import Icon from 'svelte-hero-icons/Icon.svelte';
-  import { Clipboard, Check } from 'svelte-hero-icons';
+  import Icon from 'svelte-fa';
+  import { faCheck, faCopy } from '@fortawesome/free-solid-svg-icons';
 
   export let heading = '';
   export let content: string | Parameters<typeof JSON.stringify>[0];
   export let copied = false;
-  export let inline = false;
+  export let language = 'json';
+
+  const isJSON = language === 'json';
 
   const copy = () =>
     navigator.clipboard
-      .writeText(content)
+      .writeText(formatJSON(JSON.stringify(content)))
       .then(() => {
         copied = !copied;
         setTimeout(() => (copied = false), 2000);
@@ -23,14 +25,12 @@
     return formated;
   };
 
-  onMount(() => window.Prism.highlightAll());
+  onMount(() => {
+    window.Prism.highlightAll();
+  });
 </script>
 
-{#if inline}
-  <code class="language-json" style="white-space: nowrap;">
-    {formatJSON(JSON.stringify(content))}
-  </code>
-{:else if content || content === null}
+{#if content || content === null}
   <div class="relative w-full">
     <div id="clipboard" />
 
@@ -40,22 +40,20 @@
 
     <pre
       class="p-4">
-        <code class="language-json">
-          {formatJSON(JSON.stringify(content))}
+        <code class="language-{language}">
+          {#if isJSON}
+            {formatJSON(JSON.stringify(content))}
+          {:else}
+            {@html content}
+          {/if}
         </code>
-      </pre>
+    </pre>
 
-    <button on:click={copy}>
+    <button on:click={copy} class="absolute top-4 right-4 block">
       {#if copied}
-        <Icon
-          src={Check}
-          class="w-8 h-8 text-purple-900 bg-gray-300 border-2 border-gray-200 absolute right-0 top-0 hidden group-hover:block hover:bg-gray-400 hover:border-gray-400"
-        />
+        <Icon icon={faCheck} color="white" />
       {:else}
-        <Icon
-          src={Clipboard}
-          class="w-8 h-8 text-purple-900 bg-gray-300 border-2 border-gray-200 absolute right-0 top-0 hidden group-hover:block hover:bg-gray-400 hover:border-gray-400"
-        />
+        <Icon icon={faCopy} color="white" />
       {/if}
     </button>
   </div>

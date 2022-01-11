@@ -1,42 +1,44 @@
 <script lang="ts">
+  import { getContext } from 'svelte';
+  import Icon from 'svelte-fa';
+  import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
-  import { ArrowLeft } from 'svelte-hero-icons';
-  import Icon from 'svelte-hero-icons/Icon.svelte';
+
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
   import Tabs from './_tabs.svelte';
 
-  export let workflow: WorkflowExecution;
+  export let workflow = getContext<PromiseLike<WorkflowExecution>>('workflow');
   export let namespace: string;
 </script>
 
-<header class="flex flex-col justify-between">
-  <main class="px-6 mb-2">
-    <div class="flex m-0 mt-6 justify-between items-center">
-      <h1 class="text-lg">
-        <a href={`/namespaces/${namespace}/workflows`}>
-          <Icon
-            src={ArrowLeft}
-            class={`inline w-5 h-5 text-gray-500 cursor-pointer`}
-          />
-        </a>
-        {workflow.name}
-        <span class="inline">
+{#await workflow then workflow}
+  <header class="flex flex-col gap-4">
+    <main class="flex flex-col gap-1 relative">
+      <a
+        href="/namespaces/{namespace}/workflows"
+        class="absolute top-2 back-to-workflows"
+        style="left: -1.5rem"
+      >
+        <Icon icon={faChevronLeft} />
+      </a>
+      <div class="flex justify-between items-center">
+        <h1 class="text-2xl">
+          {workflow.name}
           <WorkflowStatus status={workflow?.status} />
-        </span>
-      </h1>
-      <TerminateWorkflow {workflow} {namespace} />
-    </div>
-    <p class="text-gray-500 text-xs">
-      <span class="uppercase text-gray-400 mr-2">Workflow ID</span>
-      {workflow.id}
-    </p>
-  </main>
-  <Tabs {workflow} />
-</header>
-
-<style lang="postcss">
-  p {
-    @apply ml-6;
-  }
-</style>
+        </h1>
+        <TerminateWorkflow {workflow} {namespace} />
+      </div>
+      <p class="text-md">
+        <span>Workflow ID</span>
+        <span class="font-medium">{workflow.id}</span>
+      </p>
+      <p class="text-md">
+        <span>Run ID</span>
+        <span class="font-medium">{workflow.runId}</span>
+      </p>
+    </main>
+    <Tabs {workflow} />
+  </header>
+{/await}
