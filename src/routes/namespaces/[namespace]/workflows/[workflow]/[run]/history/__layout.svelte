@@ -26,12 +26,13 @@
     faStream,
   } from '@fortawesome/free-solid-svg-icons';
 
+  import { routeFor } from '$lib/utilities/route-for';
+  import { createDataUrl } from '$lib/utilities/create-data-url';
+  import { fetchEvents } from '$lib/services/events-service';
   import { refreshable } from '$lib/stores/refreshable';
 
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
-  import { routeFor } from '$lib/utilities/route-for';
-  import { fetchEvents } from '$lib/services/events-service';
 
   export let workflow: WorkflowParameters;
   export let parameters: Parameters<typeof fetchEvents>[0];
@@ -58,7 +59,7 @@
           href={routeFor('workflow.events.json', workflow)}
         />
       </ToggleButtons>
-      <ToggleButton icon={faDownload} href="#no-implemented" />
+      <ToggleButton icon={faDownload} href={createDataUrl(events)} />
     </div>
   </nav>
 </section>
