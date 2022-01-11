@@ -1,7 +1,7 @@
 <script lang="ts">
+  import { formatDate } from '$lib/utilities/format-date';
   import Icon from 'svelte-fa';
   import { faTimes, faCheck } from '@fortawesome/free-solid-svg-icons';
-  import Time from '$lib/components/workflow-time.svelte';
 
   export let poller;
 </script>
@@ -12,7 +12,7 @@
   </div>
   <div class="links w-3/12 text-left">
     <h3>
-      <Time time={poller.lastAccessTime} timeFormat={'current'} />
+      <p>{formatDate(poller.lastAccessTime)}</p>
     </h3>
   </div>
   <div class="w-3/12 text-left">
