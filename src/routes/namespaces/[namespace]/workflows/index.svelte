@@ -42,7 +42,7 @@
 
   let timeFormat: TimeFormat = 'UTC';
 
-  let data = refreshable(
+  $: data = refreshable(
     () => fetchAllWorkflows(namespace, { timeRange }),
     initialData,
   );
