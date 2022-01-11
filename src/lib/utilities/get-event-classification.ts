@@ -3,6 +3,7 @@ import { format } from './format-camel-case';
 import { routeFor } from './route-for';
 
 import type { WorkflowParameters } from './route-for';
+import type { Timestamp } from '$types';
 
 export type EventClassification = typeof eventClassifications[number];
 type EventOrActivity = HistoryEventWithId | PendingActivity | Activity;
@@ -85,9 +86,13 @@ const getName = (event: EventOrActivity): string => {
 };
 
 const getTime = (event: EventOrActivity): string => {
-  if (isEvent(event)) return String(event.eventTime);
-  if (isPendingActivity(event)) return String(event.lastStartedTime);
-  if (isActivity(event)) return String(event.last.eventTime);
+  let ts: Timestamp;
+
+  if (isEvent(event)) ts = event.eventTime;
+  if (isPendingActivity(event)) ts = event.lastStartedTime;
+  if (isActivity(event)) ts = event.last.eventTime;
+
+  return ts ? String(ts) : null;
 };
 
 const getId = (event: EventOrActivity): string => {
