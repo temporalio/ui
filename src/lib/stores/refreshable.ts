@@ -1,5 +1,3 @@
-import { onDestroy, onMount } from 'svelte';
-
 import { writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 
@@ -12,16 +10,17 @@ export const refreshable = <T>(
   initialData: PromiseLike<T> | T = callback(),
   timeout: Timeout = 10000,
 ): Writable<PromiseLike<T>> => {
-  const store = writable<PromiseLike<T>>(Promise.resolve(initialData));
   let interval: Timer;
 
-  onMount(() => {
+  const cleanUp = () => clearInterval(interval);
+  const setUp = () => {
     interval = setInterval(() => {
       callback().then((data: T) => store.set(Promise.resolve(data)));
     }, timeout);
-  });
+    return cleanUp;
+  };
 
-  onDestroy(() => clearInterval(interval));
+  const store = writable<PromiseLike<T>>(Promise.resolve(initialData), setUp);
 
   return store;
 };
