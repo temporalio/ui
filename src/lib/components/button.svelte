@@ -63,7 +63,7 @@
   }
 
   .primary:hover:enabled {
-    @apply bg-secondary;
+    @apply bg-blue-800;
   }
 
   .secondary {

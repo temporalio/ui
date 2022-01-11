@@ -46,7 +46,7 @@
   }
 
   .row:hover {
-    @apply bg-green-100;
+    @apply bg-gray-50;
   }
 
   .row:hover .links {

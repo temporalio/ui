@@ -1,7 +1,12 @@
 import * as eventTypes from './is-event-type';
 import { pick } from './pick';
 
-export const getAttributesFromEvent = (event: unknown) => {
+interface EventSummary {
+  type: string;
+  attributes: Partial<EventAttribute>;
+}
+
+export const getAttributesFromEvent = (event: unknown): EventSummary => {
   if (eventTypes.isActivityTaskCancelRequestedEvent(event)) {
     return {
       type: 'activityTaskCancelRequestedEventAttributes',

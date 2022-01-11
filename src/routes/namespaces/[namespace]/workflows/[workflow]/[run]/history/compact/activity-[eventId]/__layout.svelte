@@ -46,7 +46,7 @@
     };
   };
 
-  const getHref = (activity, event: HistoryEventWithId) =>
+  const getHref = (activity: Activity, event: HistoryEventWithId): string =>
     routeFor('workflow.events.compact.activity.event', {
       ...params,
       activityId: activity.id,
