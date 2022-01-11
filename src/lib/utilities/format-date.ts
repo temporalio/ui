@@ -18,12 +18,16 @@ export function formatDate(
 
   const parsed = parseJSON(date);
 
-  if (timeFormat === 'local') return format(parsed, pattern);
-  if (timeFormat === 'relative') return formatDistanceToNow(parsed) + ' ago';
+  try {
+    if (timeFormat === 'local') return format(parsed, pattern);
+    if (timeFormat === 'relative') return formatDistanceToNow(parsed) + ' ago';
 
-  if (String(parsed) === 'Invalid Date') return String(parsed);
+    if (String(parsed) === 'Invalid Date') return String(parsed);
 
-  return formatInTimeZone(parsed, 'UTC', pattern);
+    return formatInTimeZone(parsed, 'UTC', pattern);
+  } catch {
+    return '';
+  }
 }
 
 function timestampToDate(ts: Timestamp): Date {
