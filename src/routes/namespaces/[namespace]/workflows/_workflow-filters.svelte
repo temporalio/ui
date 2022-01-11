@@ -4,7 +4,7 @@
   import Option from '$lib/components/select/option.svelte';
   import FilterInput from '$lib/components/filter-input.svelte';
 
-  export let timeFormat: string = 'relative';
+  export let timeFormat: TimeFormat = 'UTC';
 
   let workflowIdFilter = '';
   let workflowTypeFilter = '';
@@ -56,6 +56,6 @@
   <Select id="filter-by-relative-time" bind:value={timeFormat}>
     <Option value={'relative'}>Relative</Option>
     <Option value={'UTC'}>UTC</Option>
-    <Option value={'current'}>Current</Option>
+    <Option value={'local'}>Local</Option>
   </Select>
 </div>

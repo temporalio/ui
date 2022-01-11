@@ -52,7 +52,7 @@ type WorkflowExecutionFilters = {
   status: WorkflowStatus;
 };
 
-type EventFormat = 'grid' | 'json';
+type TimeFormat = 'UTC' | 'relative' | 'local';
 
 type ActivityStatus =
   | 'Started'

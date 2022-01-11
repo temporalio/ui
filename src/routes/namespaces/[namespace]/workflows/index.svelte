@@ -40,7 +40,8 @@
 
   $: timeRange = $page.query.get('time-range');
 
-  let timeFormat = 'relative';
+  let timeFormat: TimeFormat = 'UTC';
+
   let data = refreshable(
     () => fetchAllWorkflows(namespace, { timeRange }),
     initialData,

@@ -1,13 +1,14 @@
 <script lang="ts">
-  import type { WorkflowExecution } from '$lib/models/workflow-execution';
+  import { formatDate } from '$lib/utilities/format-date';
   import { namespace } from '$lib/stores/namespace';
 
-  import Time from '$lib/components/workflow-time.svelte';
+  import type { WorkflowExecution } from '$lib/models/workflow-execution';
+
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import { routeFor } from '$lib/utilities/route-for';
 
   export let workflow: WorkflowExecution;
-  export let timeFormat: string;
+  export let timeFormat: TimeFormat;
 
   $: href = routeFor('workflow', {
     namespace: $namespace,
@@ -17,7 +18,7 @@
 </script>
 
 <a sveltekit:noscroll {href}>
-  <article class="row flex flex-row border-b-2">
+  <article class="row flex flex-row border-b-2 items-center">
     <div class="links w-3/12 text-left">
       {workflow.id}
     </div>
@@ -32,10 +33,14 @@
       </div>
     </div>
     <div class="w-2/12 text-left">
-      <Time time={workflow.startTime} {timeFormat} />
+      <p class="text-xs">
+        {formatDate(workflow.startTime, timeFormat)}
+      </p>
     </div>
     <div class="w-2/12 text-left">
-      <Time time={workflow.endTime} {timeFormat} />
+      <p class="text-xs">
+        {formatDate(workflow.endTime, timeFormat)}
+      </p>
     </div>
   </article>
 </a>
