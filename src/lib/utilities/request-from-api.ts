@@ -1,6 +1,19 @@
 import { browser } from '$app/env';
 import { handleError } from './handle-error';
+import { isFunction } from './is-function';
 import { toURL } from './to-url';
+
+type TemporalAPIError = {
+  code: number;
+  message: string;
+  details: unknown[];
+};
+
+type ErrorCallback = (error: {
+  status: number;
+  statusText: string;
+  body: TemporalAPIError;
+}) => void;
 
 type toURLParams = Parameters<typeof toURL>;
 type RequestFromAPIOptions = {
@@ -8,9 +21,14 @@ type RequestFromAPIOptions = {
   request?: typeof fetch;
   options?: Parameters<typeof fetch>[1];
   token?: string;
+  onError?: ErrorCallback;
   shouldRetry?: boolean;
   retryInterval?: number;
 };
+
+export const isTemporalAPIError = (obj: unknown): obj is TemporalAPIError =>
+  (obj as TemporalAPIError).message !== undefined &&
+  typeof (obj as TemporalAPIError).message === 'string';
 
 /**
  *  A utility method for making requests to the Temporal API.
@@ -35,6 +53,7 @@ export const requestFromAPI = async <T>(
     request = fetch,
     token,
     shouldRetry = false,
+    onError,
     retryInterval = 5000,
   } = init;
   let { options } = init;
@@ -50,12 +69,19 @@ export const requestFromAPI = async <T>(
     options = withSecurityOptions(options);
 
     const response = await request(url, options);
+    const body = await response.json();
+
+    const { status, statusText } = response;
 
     if (!response.ok) {
-      throw new Error(`${response.status}: ${response.statusText}`);
+      if (onError && isFunction(onError)) {
+        onError({ status, statusText, body });
+      } else {
+        throw new Error(`${status}: ${statusText}`);
+      }
     }
 
-    return await response.json();
+    return body;
   } catch (error: unknown) {
     handleError(error);
 

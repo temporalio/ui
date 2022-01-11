@@ -24,7 +24,9 @@
 
 <script lang="ts">
   import { page } from '$app/stores';
+
   import { fetchAllWorkflows } from '$lib/services/workflow-service';
+  import { refreshable } from '$lib/stores/refreshable';
 
   import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
@@ -32,7 +34,6 @@
   import EmptyState from '$lib/components/empty-state.svelte';
   import WorkflowsLoadingState from './_workflows-loading.svelte';
   import VirtualList from '@sveltejs/svelte-virtual-list';
-  import { refreshable } from '$lib/stores/refreshable';
 
   export let namespace: string;
   export let initialData: ReturnType<typeof fetchAllWorkflows>;
