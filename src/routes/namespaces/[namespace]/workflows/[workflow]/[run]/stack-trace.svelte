@@ -2,11 +2,18 @@
   import type { LoadInput } from '@sveltejs/kit';
 
   export async function load({ page }: LoadInput) {
-    const { namespace } = page.params;
+    const { namespace, workflow: id, run: runId } = page.params;
+    const workflow = { id, runId };
+
+    const stackTrace = getWorkflowStackTrace({
+      workflow,
+      namespace,
+    });
 
     return {
       props: {
         namespace,
+        stackTrace,
       },
     };
   }
@@ -25,25 +32,23 @@
   import EmptyState from '$lib/components/empty-state.svelte';
 
   export let namespace: string;
+  export let stackTrace: string;
 
   let workflow = getContext<PromiseLike<WorkflowExecution>>('workflow');
   let currentdate = new Date();
-  let isLoading = true;
+  let isLoading = false;
 
-  const refreshStackTrace = async (): Promise<string> => {
+  const refreshStackTrace = async () => {
     isLoading = true;
 
-    const response = await getWorkflowStackTrace({
+    stackTrace = await getWorkflowStackTrace({
       workflow,
       namespace,
     });
 
     isLoading = false;
     currentdate = new Date();
-    return response;
   };
-
-  let data = refreshStackTrace();
 </script>
 
 {#await workflow then workflow}
@@ -55,7 +60,7 @@
         </Button>
         <p>Stack Trace at {currentdate.toLocaleTimeString()}</p>
       </div>
-      {#await data then result}
+      {#await stackTrace then result}
         <div class="flex items-start h-full">
           <CodeBlock content={result} language="text" />
         </div>

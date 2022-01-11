@@ -1,18 +1,19 @@
-import sanitize from 'sanitize-html';
-
-import { requestFromAPI } from '$lib/utilities/request-from-api';
+import {
+  isTemporalAPIError,
+  requestFromAPI,
+} from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
-import type { WorkflowExecution } from '$lib/models/workflow-execution';
 import type { WorkflowRouteParameters } from '$lib/utilities/route-for-api';
+import { getQueryTypesFromError } from '$lib/utilities/get-query-types-from-error';
 
 type QueryRequestParameters = {
-  workflow: Eventual<WorkflowExecution>;
+  workflow: Eventual<{ id: string; runId: string }>;
   namespace: string;
   queryType: string;
 };
 
-type StackTraceOptions = Omit<QueryRequestParameters, 'queryType'>;
+type WorkflowParameters = Omit<QueryRequestParameters, 'queryType'>;
 
 type QueryPayload = {
   data: string;
@@ -30,9 +31,11 @@ type QueryResponse = {
   queryResult: QueryType;
 };
 
+type ParsedQuery = ReturnType<typeof JSON.parse>[0];
+
 const formatParameters = async (
   namespace: string,
-  workflow: Eventual<WorkflowExecution>,
+  workflow: Eventual<{ id: string; runId: string }>,
 ): Promise<WorkflowRouteParameters> => {
   workflow = await workflow;
   return {
@@ -42,15 +45,15 @@ const formatParameters = async (
   };
 };
 
-const formatStackTrace = (data: string): string => {
-  return sanitize(data).slice(1, data.length - 1);
-};
-
-async function fetchQuery({
-  workflow,
-  namespace,
-  queryType,
-}: QueryRequestParameters): Promise<QueryResponse> {
+async function fetchQuery(
+  { workflow, namespace, queryType }: QueryRequestParameters,
+  request = fetch,
+  onError?: (error: {
+    status: number;
+    statusText: string;
+    body: unknown;
+  }) => void,
+): Promise<QueryResponse> {
   workflow = await workflow;
   const parameters = await formatParameters(namespace, workflow);
 
@@ -67,22 +70,43 @@ async function fetchQuery({
         },
       }),
     },
+    request,
+    onError,
+  });
+}
+
+export async function getQueryTypes(
+  options: WorkflowParameters,
+  request = fetch,
+): Promise<string[]> {
+  return new Promise<string[]>((resolve, reject) => {
+    fetchQuery(
+      { ...options, queryType: '@@temporal-internal__list' },
+      request,
+      ({ body }) => {
+        if (isTemporalAPIError(body)) {
+          resolve(getQueryTypesFromError(body.message));
+        }
+      },
+    );
   });
 }
 
 export async function getQuery(
   options: QueryRequestParameters,
-): Promise<string> {
-  return fetchQuery(options).then((execution) => {
+  request = fetch,
+): Promise<ParsedQuery> {
+  return fetchQuery(options, request).then((execution) => {
     const { queryResult } = execution;
-    return window.atob(queryResult.payloads[0].data);
+    const data = window.atob(queryResult.payloads[0].data);
+
+    return JSON.parse(data);
   });
 }
 
 export async function getWorkflowStackTrace(
-  options: StackTraceOptions,
-): Promise<string> {
-  return getQuery({ ...options, queryType: '__stack_trace' }).then(
-    formatStackTrace,
-  );
+  options: WorkflowParameters,
+  request = fetch,
+): Promise<ParsedQuery> {
+  return getQuery({ ...options, queryType: '__stack_trace' }, request);
 }
