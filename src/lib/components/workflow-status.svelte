@@ -4,21 +4,21 @@
 
   const humanFriendlyNames = {
     Running: 'Running',
-    TimedOut: 'Timed',
+    TimedOut: 'Timed Out',
     Completed: 'Completed',
     Failed: 'Failed',
-    ContinuedAsNew: 'Continued',
+    ContinuedAsNew: 'Continued as New',
     Canceled: 'Canceled',
     Terminated: 'Terminated',
   };
 
   const colors = {
-    Running: 'green',
-    TimedOut: 'yellow',
-    Completed: 'blue',
+    Running: 'blue',
+    TimedOut: 'red',
+    Completed: 'green',
     Failed: 'red',
     ContinuedAsNew: 'indigo',
-    Canceled: 'purple',
+    Canceled: 'yellow',
     Terminated: 'pink',
   };
 
@@ -32,24 +32,24 @@
 
 <style lang="postcss">
   .green {
-    @apply bg-green-200 text-green-600;
+    @apply bg-green-100 text-green-700;
   }
   .yellow {
-    @apply bg-yellow-200 text-yellow-600;
+    @apply bg-yellow-100 text-yellow-900;
   }
   .blue {
-    @apply bg-blue-200 text-blue-600;
+    @apply bg-blue-100 text-blue-700;
   }
   .red {
-    @apply bg-red-200 text-red-600;
+    @apply bg-red-100 text-red-700;
   }
   .indigo {
-    @apply bg-indigo-200 text-indigo-600;
+    @apply bg-indigo-100 text-indigo-700;
   }
   .purple {
-    @apply bg-purple-200 text-purple-600;
+    @apply bg-purple-100 text-purple-700;
   }
   .pink {
-    @apply bg-pink-200 text-pink-600;
+    @apply bg-pink-100 text-pink-700;
   }
 </style>

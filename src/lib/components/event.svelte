@@ -23,7 +23,7 @@
   {href}
   sveltekit:noscroll
   sveltekit:prefetch
-  class="flex border-b-2 border-gray-300 w-full items-center"
+  class="flex border-b-2 border-gray-300 w-full items-center hover:bg-gray-50"
   class:pending
   class:active={$page.path.includes(href)}
 >
@@ -45,14 +45,14 @@
 
 <style lang="postcss">
   .active {
-    background: theme('colors.blue[100]');
+    background: theme('colors.blue[50]');
     /* Creates a border without modifying the shape and size of the element. */
     background-image: linear-gradient(
       90deg,
       theme('colors.blue[700]') 0%,
       theme('colors.blue[700]') 1%,
-      theme('colors.blue[100]') 1%,
-      theme('colors.blue[100]') 1%
+      theme('colors.blue[50]') 1%,
+      theme('colors.blue[50]') 1%
     );
   }
 
@@ -61,6 +61,6 @@
   }
 
   .pending .active {
-    @apply bg-blue-100;
+    @apply bg-blue-50;
   }
 </style>

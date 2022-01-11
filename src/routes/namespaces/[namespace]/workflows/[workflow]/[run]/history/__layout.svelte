@@ -42,7 +42,7 @@
 
 <section class="flex flex-col gap-4">
   <nav class="flex gap-4 justify-between items-end">
-    <h3 class="text-lg font-semibold">Event History</h3>
+    <h3 class="text-lg font-medium">Event History</h3>
     <div class="flex gap-4">
       <ToggleButtons>
         <ToggleButton
