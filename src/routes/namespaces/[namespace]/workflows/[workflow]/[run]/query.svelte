@@ -22,8 +22,6 @@
 
     return {
       props: {
-        namespace,
-        workflow,
         queryType,
         queryTypes,
         queryResult,
@@ -37,8 +35,6 @@
   import FilterSelect from '$lib/components/select/filter-select.svelte';
   import Option from '$lib/components/select/option.svelte';
 
-  export let namespace: string;
-  export let workflow: { id: string; runId: string };
   export let queryTypes: string[];
   export let queryType: string;
   export let queryResult: string;
