@@ -13,11 +13,11 @@ export function formatDate(
 ): string {
   if (!date) return '';
 
-  if (isTimestamp(date)) {
-    date = timestampToDate(date);
-  }
-
   try {
+    if (isTimestamp(date)) {
+      date = timestampToDate(date);
+    }
+
     const parsed = parseJSON(date);
 
     if (timeFormat === 'local') return format(parsed, pattern);
