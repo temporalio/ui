@@ -13,16 +13,20 @@ export function formatDate(
 ): string {
   if (!date) return '';
 
-  if (isTimestamp(date)) {
-    date = timestampToDate(date);
+  try {
+    if (isTimestamp(date)) {
+      date = timestampToDate(date);
+    }
+
+    const parsed = parseJSON(date);
+
+    if (timeFormat === 'local') return format(parsed, pattern);
+    if (timeFormat === 'relative') return formatDistanceToNow(parsed) + ' ago';
+
+    return formatInTimeZone(parsed, 'UTC', pattern);
+  } catch {
+    return '';
   }
-
-  const parsed = parseJSON(date);
-
-  if (timeFormat === 'local') return format(parsed, pattern);
-  if (timeFormat === 'relative') return formatDistanceToNow(parsed) + ' ago';
-
-  return formatInTimeZone(parsed, 'UTC', pattern);
 }
 
 function timestampToDate(ts: Timestamp): Date {
