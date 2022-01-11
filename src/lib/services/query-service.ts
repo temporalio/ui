@@ -79,7 +79,7 @@ export async function getQueryTypes(
   options: WorkflowParameters,
   request = fetch,
 ): Promise<string[]> {
-  return new Promise<string[]>((resolve, reject) => {
+  return new Promise<string[]>((resolve) => {
     fetchQuery(
       { ...options, queryType: '@@temporal-internal__list' },
       request,
