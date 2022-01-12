@@ -54,27 +54,6 @@ type WorkflowExecutionFilters = {
 
 type TimeFormat = 'UTC' | 'relative' | 'local';
 
-type ActivityStatus =
-  | 'Started'
-  | 'Scheduled'
-  | 'Completed'
-  | 'Failed'
-  | 'TimedOut'
-  | 'CancelRequested'
-  | 'Canceled';
-
-type Activity = {
-  id?: string;
-  status?: ActivityStatus;
-  activityTaskStartedEvent?: ActivityTaskStartedEvent;
-  activityTaskScheduledEvent?: ActivityTaskScheduledEvent;
-  activityTaskCompletedEvent?: ActivityTaskCompletedEvent;
-  activityTaskFailedEvent?: ActivityTaskFailedEvent;
-  activityTaskTimedOutEvent?: ActivityTaskTimedOutEvent;
-  activityTaskCancelRequestedEvent?: ActivityTaskCancelRequestedEvent;
-  activityTaskCanceledEvent?: ActivityTaskCanceledEvent;
-};
-
 type FilterParameters = {
   workflowId?: string;
   workflowType?: string;

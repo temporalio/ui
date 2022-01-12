@@ -1,4 +1,4 @@
-import { Activity } from '../models/activity';
+import { EventsGroup } from '../models/events-group';
 import { format } from './format-camel-case';
 import { routeFor } from './route-for';
 
@@ -6,7 +6,7 @@ import type { WorkflowParameters } from './route-for';
 import type { Timestamp } from '$types';
 
 export type EventClassification = typeof eventClassifications[number];
-type EventOrActivity = HistoryEventWithId | PendingActivity | Activity;
+type EventOrGroup = HistoryEventWithId | PendingActivity | EventsGroup;
 
 type EventSummary = {
   id: string;
@@ -51,7 +51,7 @@ export const isEvent = (event: unknown): event is HistoryEventWithId => {
 };
 
 export const isPendingActivity = (
-  event: EventOrActivity,
+  event: EventOrGroup,
 ): event is PendingActivity => {
   if (event === null) return false;
   if (typeof event !== 'object') return false;
@@ -60,15 +60,17 @@ export const isPendingActivity = (
   return false;
 };
 
-export const isActivity = (event: EventOrActivity): event is Activity => {
-  return event instanceof Activity;
+export const isEventsGroup = (event: EventOrGroup): event is EventsGroup => {
+  return event instanceof EventsGroup;
 };
 
 export const getEventClassification = (
-  event: EventOrActivity,
+  event: EventOrGroup,
 ): EventClassification => {
   if (isPendingActivity(event)) return event.state;
-  if (isActivity(event)) event = event.get('ActivityTaskScheduled');
+  if (isEventsGroup(event)) {
+    event = event.get('ActivityTaskScheduled') ?? event.get('TimerStarted');
+  }
 
   const eventType = event.eventType;
 
@@ -78,39 +80,39 @@ export const getEventClassification = (
   }
 };
 
-const getName = (event: EventOrActivity): string => {
+const getName = (event: EventOrGroup): string => {
   if (isEvent(event)) return String(event.eventType);
   if (isPendingActivity(event))
     return `${event.activityType.name}:${event.state}`;
-  if (isActivity(event)) return event.name;
+  if (isEventsGroup(event)) return event.name;
 };
 
-const getTime = (event: EventOrActivity): string => {
+const getTime = (event: EventOrGroup): string => {
   let ts: Timestamp;
 
   if (isEvent(event)) ts = event.eventTime;
   if (isPendingActivity(event)) ts = event.lastStartedTime;
-  if (isActivity(event)) ts = event.last.eventTime;
+  if (isEventsGroup(event)) ts = event.last.eventTime;
 
   return ts ? String(ts) : null;
 };
 
-const getId = (event: EventOrActivity): string => {
+const getId = (event: EventOrGroup): string => {
   if (isEvent(event)) return String(event.eventId);
   if (isPendingActivity(event)) return String(event.activityId);
-  if (isActivity(event)) return String(event.id);
+  if (isEventsGroup(event)) return String(event.id);
 };
 
 const getType = (
-  event: EventOrActivity,
+  event: EventOrGroup,
 ): 'event' | 'pending-activity' | 'activity' => {
   if (isEvent(event)) return 'event';
   if (isPendingActivity(event)) return 'pending-activity';
-  if (isActivity(event)) return 'activity';
+  if (isEventsGroup(event)) return 'activity';
 };
 
 export const getHref = (
-  event: EventOrActivity | PendingActivity,
+  event: EventOrGroup | PendingActivity,
   parameters: WorkflowParameters,
 ): string => {
   if (isEvent(event)) {
@@ -127,7 +129,7 @@ export const getHref = (
     });
   }
 
-  if (isActivity(event)) {
+  if (isEventsGroup(event)) {
     return routeFor('workflow.events.compact.activity', {
       ...parameters,
       eventId: String(event.id),
@@ -136,7 +138,7 @@ export const getHref = (
 };
 
 export const formatEvent = (
-  event: EventOrActivity | Activity,
+  event: EventOrGroup | EventsGroup,
 ): EventSummary => {
   return {
     id: getId(event),
@@ -146,7 +148,7 @@ export const formatEvent = (
     tag: getName(event),
     type: getType(event),
     pending: isPendingActivity(event),
-    activity: isActivity(event),
+    activity: isEventsGroup(event),
     routeFor: (parameters: WorkflowParameters) => getHref(event, parameters),
   };
 };

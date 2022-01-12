@@ -26,30 +26,30 @@
 <script lang="ts">
   import { getContext } from 'svelte';
 
-  import { Activities } from '$lib/models/activity';
+  import { EventGroups, EventsGroup } from '$lib/models/events-group';
   import { routeFor } from '$lib/utilities/route-for';
   import { page } from '$app/stores';
 
   let events = getContext<EventualHistoryEvents>('events');
   export let params: EventParameter;
 
-  const getActivity = async (
+  const getEventsGroup = async (
     events: EventualHistoryEvents,
     id: string,
-  ): Promise<{ activity: Activity; events: HistoryEventWithId[] }> => {
-    const activities = await Activities.fromPromise(events);
-    const activity = activities.get(id);
+  ): Promise<{ group: EventsGroup; events: HistoryEventWithId[] }> => {
+    const groups = await EventGroups.fromPromise(events);
+    const group = groups.get(id);
 
     return {
-      activity,
-      events: activity.events,
+      group,
+      events: group.events,
     };
   };
 
-  const getHref = (activity: Activity, event: HistoryEventWithId): string =>
+  const getHref = (group: EventsGroup, event: HistoryEventWithId): string =>
     routeFor('workflow.events.compact.activity.event', {
       ...params,
-      activityId: activity.id,
+      activityId: group.id,
       eventId: event.id,
     });
 </script>
@@ -57,12 +57,12 @@
 <div class="flex flex-col w-full h-full">
   <nav class="mb-4">
     <ul class="flex gap-4 w-full items-start">
-      {#await getActivity(events, params.eventId) then { activity, events }}
+      {#await getEventsGroup(events, params.eventId) then { group, events }}
         {#each events as event}
           <li>
             <a
-              href={getHref(activity, event)}
-              class:active={$page.path === getHref(activity, event)}
+              href={getHref(group, event)}
+              class:active={$page.path === getHref(group, event)}
             >
               {event.eventType}
             </a>
