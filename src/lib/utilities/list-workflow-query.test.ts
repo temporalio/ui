@@ -1,7 +1,4 @@
-import {
-  toListWorkflowQuery,
-  fromListWorkflowQuery,
-} from './list-workflow-query';
+import { toListWorkflowQuery } from './list-workflow-query';
 
 describe(toListWorkflowQuery, () => {
   afterEach(() => {
@@ -19,7 +16,7 @@ describe(toListWorkflowQuery, () => {
 
     const query = toListWorkflowQuery({ timeRange: { hours: 24 } });
 
-    expect(query).toBe(`StartTime="${twentyFourHoursEarlier}"`);
+    expect(query).toBe(`StartTime > "${twentyFourHoursEarlier}"`);
   });
 
   it('should convert an two values using an "and"', () => {
@@ -41,5 +38,25 @@ describe(toListWorkflowQuery, () => {
     expect(query).toBe(
       'ExecutionStatus="Running" and WorkflowId="abcdef123" and WorkflowType="ImportantBusinessTransaction"',
     );
+  });
+
+  it('should drop null values', () => {
+    const query = toListWorkflowQuery({
+      executionStatus: 'Running',
+      workflowId: 'abcdef123',
+      workflowType: null,
+    });
+
+    expect(query).toBe('ExecutionStatus="Running" and WorkflowId="abcdef123"');
+  });
+
+  it('should drop "undefined" which can be returned from inputs', () => {
+    const query = toListWorkflowQuery({
+      executionStatus: 'Running',
+      workflowId: 'abcdef123',
+      workflowType: 'undefined',
+    });
+
+    expect(query).toBe('ExecutionStatus="Running" and WorkflowId="abcdef123"');
   });
 });

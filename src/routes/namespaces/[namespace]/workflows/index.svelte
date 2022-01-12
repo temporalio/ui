@@ -8,11 +8,11 @@
     const workflowId = page.query.get('workflow-id');
     const workflowType = page.query.get('workflow-type');
     const timeRange = page.query.get('time-range');
-    const status = page.query.get('status') as WorkflowStatus;
+    const executionStatus = page.query.get('status') as WorkflowStatus;
 
     const initialData = await fetchAllWorkflows(
       namespace,
-      { workflowId, workflowType, timeRange, status },
+      { workflowId, workflowType, timeRange, executionStatus },
       fetch,
     );
 

@@ -43,6 +43,7 @@ const isDurationKey = (key: unknown): key is DurationKey => {
 };
 
 export const isDuration = (value: unknown): value is Duration => {
+  if (value === null) return false;
   if (typeof value !== 'object') return false;
 
   for (const key of Object.keys(value)) {
@@ -53,8 +54,14 @@ export const isDuration = (value: unknown): value is Duration => {
 };
 
 export const isDurationString = (value: unknown): value is string => {
+  if (value === null) return false;
   if (typeof value !== 'string') return false;
-  const [, amount, units] = value.match(durationPattern);
+
+  const match = value.match(durationPattern);
+
+  if (!match) return false;
+
+  const [, amount, units] = match;
   return !!amount && !!units;
 };
 
@@ -72,6 +79,7 @@ export const toString = (duration: Duration): string => {
 export const toDate = (timeRange: Duration | string): string => {
   const duration =
     typeof timeRange === 'string' ? toDuration(timeRange) : timeRange;
+
   return formatISO(sub(new Date(), duration));
 };
 

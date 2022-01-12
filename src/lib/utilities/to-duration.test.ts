@@ -1,4 +1,4 @@
-import { toDuration, toDate, fromDate } from './to-duration';
+import { toDuration, toDate, fromDate, isDurationString } from './to-duration';
 
 describe(toDuration, () => {
   it('should correctly parse "Last 10 minutes"', () => {
@@ -73,10 +73,18 @@ describe(toDate, () => {
 
   it('should produce a date based on a duration', () => {
     jest.useFakeTimers().setSystemTime(new Date('2020-01-01').getTime());
-    const NinetyDaysEarlier = '2019-10-03T00:00:00Z';
+    const ninetyDaysEarlier = '2019-10-03T00:00:00Z';
 
     const result = toDate({ days: 90 });
-    expect(result).toBe(NinetyDaysEarlier);
+    expect(result).toBe(ninetyDaysEarlier);
+  });
+
+  it('should produce a date based on a duration string', () => {
+    jest.useFakeTimers().setSystemTime(new Date('2020-01-01').getTime());
+    const ninetyDaysEarlier = '2019-10-03T00:00:00Z';
+
+    const result = toDate('90 days');
+    expect(result).toBe(ninetyDaysEarlier);
   });
 });
 
@@ -87,9 +95,9 @@ describe(fromDate, () => {
 
   it('should produce a duration based on a 90 days in the past', () => {
     jest.useFakeTimers().setSystemTime(new Date('2020-01-01').getTime());
-    const NinetyDaysEarlier = '2019-10-03T00:00:00Z';
+    const ninetyDaysEarlier = '2019-10-03T00:00:00Z';
 
-    const result = fromDate(NinetyDaysEarlier);
+    const result = fromDate(ninetyDaysEarlier);
     expect(result).toEqual({ days: 90 });
   });
 
@@ -99,5 +107,23 @@ describe(fromDate, () => {
 
     const result = fromDate(sixtyDaysEarlier);
     expect(result).toEqual({ days: 60 });
+  });
+});
+
+describe(isDurationString, () => {
+  it('should return true for "24 hours"', () => {
+    expect(isDurationString('24 hours')).toBe(true);
+  });
+
+  it('should return false for null', () => {
+    expect(isDurationString(null)).toBe(false);
+  });
+
+  it('should return false for undefined', () => {
+    expect(isDurationString(undefined)).toBe(false);
+  });
+
+  it('should return false for "undefined"', () => {
+    expect(isDurationString('undefined')).toBe(false);
   });
 });

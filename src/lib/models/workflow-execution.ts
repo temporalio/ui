@@ -1,4 +1,3 @@
-import { fetchWorkflow } from '$lib/services/workflow-service';
 import type {
   WorkflowExecutionStatus,
   DescribeWorkflowExecutionResponse,

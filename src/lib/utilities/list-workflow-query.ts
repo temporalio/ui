@@ -1,4 +1,4 @@
-import { isDuration, toDate } from './to-duration';
+import { isDuration, isDurationString, toDate } from './to-duration';
 
 type QueryKey =
   | 'WorkflowId'
@@ -30,6 +30,14 @@ const filterKeys: Readonly<FilterKey[]> = [
   'executionStatus',
 ] as const;
 
+const isValid = (value: unknown): boolean => {
+  if (value === null) return false;
+  if (value === undefined) return false;
+  if (typeof value === 'string' && value === 'undefined') return false;
+
+  return true;
+};
+
 const isFilterKey = (key: unknown): key is FilterKey => {
   if (typeof key !== 'string') return false;
 
@@ -41,21 +49,24 @@ const isFilterKey = (key: unknown): key is FilterKey => {
 };
 
 const toQueryStatement = (key: FilterKey, value: FilterValue): string => {
-  if (isDuration(value)) value = toDate(value);
   const queryKey = queryKeys[key];
+
+  if (isDuration(value) || isDurationString(value)) {
+    return `${queryKey} > "${toDate(value)}"`;
+  }
+
   return `${queryKey}="${value}"`;
 };
 
 const toQueryStatements = (parameters: FilterParameters): string[] => {
-  return Object.entries(parameters).map(([key, value]) => {
-    if (isFilterKey(key)) return toQueryStatement(key, value);
-  });
+  return Object.entries(parameters)
+    .map(([key, value]) => {
+      if (isFilterKey(key) && isValid(value))
+        return toQueryStatement(key, value);
+    })
+    .filter(Boolean);
 };
 
 export const toListWorkflowQuery = (parameters: FilterParameters): string => {
   return toQueryStatements(parameters).join(' and ');
-};
-
-export const fromListWorkflowQuery = (query: string): FilterParameters => {
-  return {};
 };
