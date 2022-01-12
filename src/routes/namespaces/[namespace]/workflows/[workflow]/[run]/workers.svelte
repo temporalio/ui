@@ -14,7 +14,7 @@
 
 <script lang="ts">
   import { getContext } from 'svelte';
-  import { refreshable } from '$lib/stores/refreshable';
+  import { Refreshable, refreshable } from '$lib/stores/refreshable';
 
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
@@ -23,15 +23,16 @@
   import EmptyState from '$lib/components/empty-state.svelte';
 
   export let namespace: string;
-  let workflow = getContext<PromiseLike<WorkflowExecution>>('workflow');
+
+  let workflow = getContext<Refreshable<WorkflowExecution>>('workflow');
 
   $: pollers = refreshable(async () => {
-    let { taskQueue } = await workflow;
+    let { taskQueue } = await $workflow;
     return getPollers({ queue: taskQueue, namespace });
   });
 </script>
 
-{#await workflow then { taskQueue }}
+{#await $workflow then { taskQueue }}
   <section class="flex flex-col gap-4">
     <h3 class="text-lg font-medium">Task Queue: {taskQueue}</h3>
     {#await $pollers then workers}

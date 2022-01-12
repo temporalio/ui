@@ -24,6 +24,7 @@
   import { faRedo } from '@fortawesome/free-solid-svg-icons';
 
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
+  import type { Refreshable } from '$lib/stores/refreshable';
 
   import { getWorkflowStackTrace } from '$lib/services/query-service';
 
@@ -34,7 +35,7 @@
   export let namespace: string;
   export let stackTrace: string;
 
-  let workflow = getContext<PromiseLike<WorkflowExecution>>('workflow');
+  let workflow = getContext<Refreshable<WorkflowExecution>>('workflow');
   let currentdate = new Date();
   let isLoading = false;
 
@@ -42,7 +43,7 @@
     isLoading = true;
 
     stackTrace = await getWorkflowStackTrace({
-      workflow,
+      workflow: $workflow,
       namespace,
     });
 
@@ -51,7 +52,7 @@
   };
 </script>
 
-{#await workflow then workflow}
+{#await $workflow then workflow}
   <section>
     {#if String(workflow.status) === 'Running'}
       <div class="flex items-center gap-4">

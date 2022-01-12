@@ -3,6 +3,7 @@
   import { page } from '$app/stores';
   import EventDetails from '$lib/components/event-details.svelte';
 
+  import type { Refreshable } from '$lib/stores/refreshable';
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
   const findActivity = async (
@@ -14,8 +15,8 @@
     });
   };
 
-  let workflow = getContext<PromiseLike<WorkflowExecution>>('workflow');
-  $: pendingActivity = findActivity(workflow, $page.params.id);
+  let workflow = getContext<Refreshable<WorkflowExecution>>('workflow');
+  $: pendingActivity = findActivity($workflow, $page.params.id);
 </script>
 
 {#await pendingActivity then activity}

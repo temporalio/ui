@@ -4,16 +4,18 @@
   import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
+  import type { Refreshable } from '$lib/stores/refreshable';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
   import Tabs from './_tabs.svelte';
 
-  export let workflow = getContext<PromiseLike<WorkflowExecution>>('workflow');
   export let namespace: string;
+
+  let workflow = getContext<Refreshable<WorkflowExecution>>('workflow');
 </script>
 
-{#await workflow then workflow}
+{#await $workflow then workflow}
   <header class="flex flex-col gap-4">
     <main class="flex flex-col gap-1 relative">
       <a
