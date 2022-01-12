@@ -9,7 +9,7 @@ import {
 } from '$lib/models/workflow-execution';
 
 import { routeForApi } from '$lib/utilities/route-for-api';
-import { getWorkflowFilterParameters } from '$lib/utilities/get-workflow-filter-parameters';
+import { toListWorkflowQuery } from '$lib/utilities/list-workflow-query';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   executionId: string;
@@ -18,60 +18,7 @@ export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
 
 type CombinedWorkflowExecutionsResponse = {
   workflows: WorkflowExecution[];
-  nextPageTokens: NextPageTokens;
-};
-
-const emptyWorkflowRequest = (): Promise<ListWorkflowExecutionsResponse> => {
-  return Promise.resolve({
-    executions: [],
-  });
-};
-
-const checkForStatus =
-  (workflowStatus: WorkflowStatus, value: boolean) =>
-  ({ status }: FilterParameters): boolean => {
-    if (!status) return false;
-    if (status === workflowStatus) return value;
-    return !value;
-  };
-
-const filterIsSetToRunning = checkForStatus('Running', true);
-const filterIsNotSetToRunning = checkForStatus('Running', false);
-
-export const fetchOpenWorkflows = (
-  namespace: string,
-  parameters: FilterParameters,
-  request = fetch,
-): Promise<ListWorkflowExecutionsResponse> => {
-  if (filterIsNotSetToRunning(parameters)) return emptyWorkflowRequest();
-
-  const params = getWorkflowFilterParameters(parameters);
-
-  return requestFromAPI<ListWorkflowExecutionsResponse>(
-    routeForApi('workflows.open', { namespace }),
-    {
-      params,
-      request,
-    },
-  );
-};
-
-export const fetchClosedWorkflows = (
-  namespace: string,
-  parameters: FilterParameters,
-  request = fetch,
-): Promise<ListWorkflowExecutionsResponse> => {
-  if (filterIsSetToRunning(parameters)) return emptyWorkflowRequest();
-
-  const params = getWorkflowFilterParameters(parameters);
-
-  return requestFromAPI<ListWorkflowExecutionsResponse>(
-    routeForApi('workflows.closed', { namespace }),
-    {
-      params,
-      request,
-    },
-  );
+  nextPageToken: string;
 };
 
 export const fetchAllWorkflows = async (
@@ -79,19 +26,20 @@ export const fetchAllWorkflows = async (
   parameters: FilterParameters,
   request = fetch,
 ): Promise<CombinedWorkflowExecutionsResponse> => {
-  const [open, closed] = await Promise.all([
-    fetchOpenWorkflows(namespace, parameters, request),
-    fetchClosedWorkflows(namespace, parameters, request),
-  ]);
+  const query = toListWorkflowQuery(parameters);
 
-  const executions = [...open?.executions, ...closed?.executions];
+  const { executions, nextPageToken } =
+    await requestFromAPI<ListWorkflowExecutionsResponse>(
+      routeForApi('workflows', { namespace }),
+      {
+        params: { query },
+        request,
+      },
+    );
 
   return {
     workflows: toWorkflowExecutions({ executions }),
-    nextPageTokens: {
-      open: open.nextPageToken,
-      closed: closed.nextPageToken,
-    },
+    nextPageToken: String(nextPageToken),
   };
 };
 

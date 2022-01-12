@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { durations } from '$lib/utilities/to-duration';
+
   import Select from '$lib/components/select/select.svelte';
   import FilterSelect from '$lib/components/select/filter-select.svelte';
   import Option from '$lib/components/select/option.svelte';
@@ -8,17 +10,6 @@
 
   let workflowIdFilter = '';
   let workflowTypeFilter = '';
-
-  const durations = [
-    '10 minutes',
-    '60 minutes',
-    '3 hours',
-    '24 hours',
-    '3 days',
-    '7 days',
-    '30 days',
-    '90 days',
-  ];
 
   const statuses = {
     All: null,
