@@ -23,9 +23,6 @@
     <NavigationLink href={`/namespaces/${$namespace}/workflows`}>
       Workflows
     </NavigationLink>
-    <NavigationLink href={`/namespaces/${$namespace}/settings`}>
-      Settings
-    </NavigationLink>
   </div>
   <div class="col-span-2">
     <DataConvertorStatus />
