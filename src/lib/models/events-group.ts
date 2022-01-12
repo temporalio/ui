@@ -12,8 +12,18 @@ const activityTypes = [
   'ActivityTaskTimedOut',
 ];
 
-const isActivity = (event: HistoryEventWithId): event is ActivityEvent => {
-  if (activityTypes.includes(event.eventType)) return true;
+const timerTypes = ['TimerStarted', 'TimerCanceled', 'TimerFired'];
+
+type CompactEvent = HistoryEventWithId & {
+  eventType: ActivityType | TimerType;
+};
+
+const isCompactEvent = (event: HistoryEventWithId): event is CompactEvent => {
+  if (
+    activityTypes.includes(event.eventType) ||
+    timerTypes.includes(event.eventType)
+  )
+    return true;
   return false;
 };
 
@@ -23,23 +33,39 @@ const isActivityScheduledEvent = (
   return event.eventType === 'ActivityTaskScheduled';
 };
 
-export class Activity {
+const isTimerStartedEvent = (
+  event: HistoryEventWithId,
+): event is ScheduledActivityEvent => {
+  return event.eventType === 'TimerStarted';
+};
+
+type CompactEventType = ActivityType | TimerType;
+
+export class EventsGroup {
   id: string;
   name: string;
-  private _events: Map<ActivityType, HistoryEventWithId> = new Map();
+  private _events: Map<CompactEventType, HistoryEventWithId> = new Map();
 
-  constructor(event: ScheduledActivityEvent) {
-    this.id = event?.activityTaskScheduledEventAttributes?.activityId;
-    this.name = event?.activityTaskScheduledEventAttributes?.activityType?.name;
+  constructor(event: CompactEvent) {
+    if (isActivityScheduledEvent) {
+      this.id = event?.activityTaskScheduledEventAttributes?.activityId;
+      this.name =
+        event?.activityTaskScheduledEventAttributes?.activityType?.name;
+    }
+
+    if (isTimerStartedEvent(event)) {
+      this.id = event?.timerStartedEventAttributes?.timerId;
+      this.name = `Timer ${event?.timerStartedEventAttributes?.timerId}`;
+    }
 
     this.set(event.eventType, event);
   }
 
-  set(type: ActivityType, event: HistoryEventWithId): void {
+  set(type: CompactEventType, event: HistoryEventWithId): void {
     this._events.set(type, event);
   }
 
-  get(type: ActivityType): HistoryEventWithId {
+  get(type: CompactEventType): HistoryEventWithId {
     return this._events.get(type);
   }
 
@@ -70,41 +96,41 @@ export class Activity {
   }
 }
 
-export class Activities {
-  private _activities: Map<string, Activity> = new Map();
+export class EventGroups {
+  private _groups: Map<string, EventsGroup> = new Map();
 
   static async fromPromise(
     events: PromiseLike<HistoryEventWithId[]>,
-  ): Promise<Activities> {
-    return Activities.from(await events);
+  ): Promise<EventGroups> {
+    return EventGroups.from(await events);
   }
 
   static from = (
     events: HistoryEventWithId[],
-    activities = new Activities(),
-  ): Activities => {
+    groups = new EventGroups(),
+  ): EventGroups => {
     for (const event of events) {
-      if (isActivity(event)) {
-        activities.add(event);
+      if (isCompactEvent(event)) {
+        groups.add(event);
       }
     }
 
-    return activities;
+    return groups;
   };
 
-  constructor(event?: ActivityEvent | HistoryEventWithId[]) {
-    if (Array.isArray(event)) return Activities.from(event, this);
+  constructor(event?: CompactEvent | HistoryEventWithId[]) {
+    if (Array.isArray(event)) return EventGroups.from(event, this);
     if (event) this.add(event);
   }
 
-  get(id: string | number | Long): Activity {
-    return this._activities.get(String(id));
+  get(id: string | number | Long): EventsGroup {
+    return this._groups.get(String(id));
   }
 
-  add(event: ActivityEvent): void {
+  add(event: CompactEvent): void {
     if (isActivityScheduledEvent(event)) {
       const id = String(event.id);
-      this._activities.set(id, new Activity(event));
+      this._groups.set(id, new EventsGroup(event));
     }
 
     if (event.eventType === 'ActivityTaskStarted') {
@@ -137,17 +163,22 @@ export class Activities {
       const { scheduledEventId } = event.activityTaskCompletedEventAttributes;
       this.get(scheduledEventId).set(event.eventType, event);
     }
+
+    if (isTimerStartedEvent(event)) {
+      const id = String(event.id);
+      this._groups.set(id, new EventsGroup(event));
+    }
   }
 
   get length(): number {
-    return this._activities.size;
+    return this._groups.size;
   }
 
-  slice(...args: Parameters<typeof Array.prototype.slice>): Activity[] {
+  slice(...args: Parameters<typeof Array.prototype.slice>): EventsGroup[] {
     return [...this].slice(...args);
   }
 
-  [Symbol.iterator](): IterableIterator<Activity> {
-    return this._activities.values();
+  [Symbol.iterator](): IterableIterator<EventsGroup> {
+    return this._groups.values();
   }
 }

@@ -1,10 +1,10 @@
 <script lang="ts">
   import VirtualList from '@sveltejs/svelte-virtual-list';
 
-  import type { Activities } from '$lib/models/activity';
+  import type { EventGroups } from '$lib/models/events-group';
   import Event from './event.svelte';
 
-  export let events: (HistoryEventWithId | PendingActivity)[] | Activities;
+  export let events: (HistoryEventWithId | PendingActivity)[] | EventGroups;
 </script>
 
 <section

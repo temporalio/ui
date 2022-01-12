@@ -3,14 +3,14 @@
   import { faCalendar } from '@fortawesome/free-solid-svg-icons';
   import { page } from '$app/stores';
 
-  import type { Activity } from '$lib/models/activity';
+  import type { EventsGroup } from '$lib/models/events-group';
 
   import { formatEvent } from '$lib/utilities/get-event-classification';
   import { formatDate } from '$lib/utilities/format-date';
 
   import EventLabel from '$lib/components/event-label.svelte';
 
-  export let event: HistoryEventWithId | PendingActivity | Activity;
+  export let event: HistoryEventWithId | PendingActivity | EventsGroup;
 
   let { routeFor, pending, timeStamp, name, tag, classification } =
     formatEvent(event);

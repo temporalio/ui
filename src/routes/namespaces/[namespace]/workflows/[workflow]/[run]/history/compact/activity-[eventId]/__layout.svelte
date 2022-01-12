@@ -26,7 +26,7 @@
 <script lang="ts">
   import { getContext } from 'svelte';
 
-  import { Activities } from '$lib/models/activity';
+  import { EventGroups } from '$lib/models/events-group';
   import { routeFor } from '$lib/utilities/route-for';
   import { page } from '$app/stores';
 
@@ -37,7 +37,7 @@
     events: EventualHistoryEvents,
     id: string,
   ): Promise<{ activity: Activity; events: HistoryEventWithId[] }> => {
-    const activities = await Activities.fromPromise(events);
+    const activities = await EventGroups.fromPromise(events);
     const activity = activities.get(id);
 
     return {

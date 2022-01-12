@@ -317,13 +317,8 @@ interface PendingActivity extends PendingActivityInfo {
 }
 
 type EventType =
-  | 'ActivityTaskCanceled'
-  | 'ActivityTaskCancelRequested'
-  | 'ActivityTaskCompleted'
-  | 'ActivityTaskFailed'
-  | 'ActivityTaskScheduled'
-  | 'ActivityTaskStarted'
-  | 'ActivityTaskTimedOut'
+  | ActivityType
+  | TimerType
   | 'ChildWorkflowExecutionCanceled'
   | 'ChildWorkflowExecutionCompleted'
   | 'ChildWorkflowExecutionFailed'
@@ -334,9 +329,6 @@ type EventType =
   | 'StartChildWorkflowExecutionInitiated'
   | 'SignalExternalWorkflowExecutionFailed'
   | 'SignalExternalWorkflowExecutionInitiated'
-  | 'TimerCanceled'
-  | 'TimerFired'
-  | 'TimerStarted'
   | 'WorkflowExecutionCanceled'
   | 'WorkflowExecutionCancelRequested'
   | 'WorkflowExecutionCompleted'
@@ -367,6 +359,8 @@ type ActivityType =
   | 'ActivityTaskStarted'
   | 'ActivityTaskTimedOut';
 
+type TimerType = 'TimerCanceled' | 'TimerFired' | 'TimerStarted';
+
 type EventTypeCategory =
   | 'activity'
   | 'child-workflow'
@@ -374,9 +368,5 @@ type EventTypeCategory =
   | 'timer'
   | 'workflow'
   | 'command';
-
-type ActivityEvent = HistoryEventWithId & {
-  eventType: ActivityType;
-};
 
 type EventualHistoryEvents = PromiseLike<HistoryEventWithId[]>;
