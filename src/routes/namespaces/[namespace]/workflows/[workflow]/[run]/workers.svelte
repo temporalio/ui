@@ -14,8 +14,9 @@
 
 <script lang="ts">
   import { getContext } from 'svelte';
-  import { Refreshable, refreshable } from '$lib/stores/refreshable';
+  import { refreshable } from '$lib/stores/refreshable';
 
+  import type { Refreshable } from '$lib/stores/refreshable';
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
   import WorkersTable from '$lib/components/workers-table.svelte';

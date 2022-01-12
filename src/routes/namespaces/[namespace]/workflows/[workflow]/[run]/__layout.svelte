@@ -28,9 +28,6 @@
 
   let workflow = refreshable(() => fetchWorkflow(parameters));
 
-  $: console.log($workflow);
-
-  $: setContext('workflow', $workflow);
   $: setContext('workflow', workflow);
 </script>
 
