@@ -62,6 +62,5 @@
       <ToggleButton icon={faDownload} href={createDataUrl(events)} />
     </div>
   </nav>
+  <slot />
 </section>
-
-<slot />
