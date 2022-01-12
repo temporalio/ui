@@ -319,6 +319,8 @@ interface PendingActivity extends PendingActivityInfo {
 type EventType =
   | ActivityType
   | TimerType
+  | SignalType
+  | MarkerType
   | 'ChildWorkflowExecutionCanceled'
   | 'ChildWorkflowExecutionCompleted'
   | 'ChildWorkflowExecutionFailed'
@@ -334,7 +336,6 @@ type EventType =
   | 'WorkflowExecutionCompleted'
   | 'WorkflowExecutionContinuedAsNew'
   | 'WorkflowExecutionFailed'
-  | 'WorkflowExecutionSignaled'
   | 'WorkflowExecutionStarted'
   | 'WorkflowExecutionTerminated'
   | 'WorkflowExecutionTimedOut'
@@ -344,10 +345,8 @@ type EventType =
   | 'WorkflowTaskStarted'
   | 'WorkflowTaskTimedOut'
   | 'ExternalWorkflowExecutionCancelRequested'
-  | 'ExternalWorkflowExecutionSignaled'
   | 'RequestCancelExternalWorkflowExecutionFailed'
   | 'RequestCancelExternalWorkflowExecutionInitiated'
-  | 'MarkerRecorded'
   | 'UpsertWorkflowSearchAttributes';
 
 type ActivityType =
@@ -360,6 +359,12 @@ type ActivityType =
   | 'ActivityTaskTimedOut';
 
 type TimerType = 'TimerCanceled' | 'TimerFired' | 'TimerStarted';
+
+type SignalType =
+  | 'WorkflowExecutionSignaled'
+  | 'ExternalWorkflowExecutionSignaled';
+
+type MarkerType = 'MarkerRecorded';
 
 type EventTypeCategory =
   | 'activity'
