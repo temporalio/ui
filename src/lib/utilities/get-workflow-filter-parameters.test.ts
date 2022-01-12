@@ -69,7 +69,7 @@ describe(getWorkflowFilterParameters, () => {
   });
 
   it('should return a status filter if one is provided', () => {
-    const result = getWorkflowFilterParameters({ status: 'Running' });
+    const result = getWorkflowFilterParameters({ executionStatus: 'Running' });
     expect(result['status_filter.status']).toBe('1');
   });
 });

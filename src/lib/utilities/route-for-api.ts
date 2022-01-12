@@ -1,4 +1,7 @@
-type WorkflowsAPIRoutePath = 'workflows.open' | 'workflows.closed';
+type WorkflowsAPIRoutePath =
+  | 'workflows'
+  | 'workflows.open'
+  | 'workflows.closed';
 type WorkflowAPIRoutePath =
   | 'workflow'
   | 'workflow.terminate'
@@ -67,6 +70,7 @@ export function routeForApi(
     user: '/me',
     namespaces: '/namespaces',
     'task-queue': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}`,
+    workflows: `/namespaces/${parameters?.namespace}/workflows`,
     'workflows.open': `/namespaces/${parameters?.namespace}/workflows/open`,
     'workflows.closed': `/namespaces/${parameters?.namespace}/workflows/closed`,
     workflow: `/namespaces/${parameters?.namespace}/workflows/${parameters?.executionId}/executions/${parameters?.runId}`,

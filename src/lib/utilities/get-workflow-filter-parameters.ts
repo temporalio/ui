@@ -1,24 +1,16 @@
-import { formatISO, sub } from 'date-fns';
-
-import { toDuration } from './to-duration';
+import { toDate } from './to-duration';
 import { getStatusFilterCode } from './get-workflow-status-filter-code';
-
-const createDate = (timeRange: Duration | string) => {
-  const duration =
-    typeof timeRange === 'string' ? toDuration(timeRange) : timeRange;
-  return formatISO(sub(new Date(), duration));
-};
 
 export const getWorkflowFilterParameters = ({
   workflowId,
   workflowType,
   timeRange,
-  status,
+  executionStatus,
 }: FilterParameters = {}): Record<string, string> => {
   const params: Record<string, string> = {};
-  const statusFilter = getStatusFilterCode(status);
+  const statusFilter = getStatusFilterCode(executionStatus);
 
-  params['start_time_filter.earliest_time'] = createDate(
+  params['start_time_filter.earliest_time'] = toDate(
     timeRange || { hours: 24 },
   );
 
