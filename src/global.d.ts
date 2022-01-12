@@ -54,7 +54,6 @@ type WorkflowExecutionFilters = {
 
 type EventFormat = 'grid' | 'json';
 
-
 type FilterParameters = {
   workflowId?: string;
   workflowType?: string;
