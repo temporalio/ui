@@ -12,7 +12,7 @@ interface WebSocketResponse {
 export async function convertPayload(
   payload: Payload,
   websocket: any,
-): Promise<string> {
+): Promise<string | Payload> {
   if (!websocket.isOpened && !websocket.isOpening) {
     try {
       await websocket.open();
@@ -21,6 +21,9 @@ export async function convertPayload(
     }
   }
 
+  if (!websocket.isOpened) {
+    return Promise.resolve(payload);
+  }
   const socketResponse: Promise<string> = websocket
     .sendRequest({
       payload: JSON.stringify(payload),
