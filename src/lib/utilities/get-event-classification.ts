@@ -73,7 +73,8 @@ export const getEventClassification = (
       event.get('ActivityTaskScheduled') ??
       event.get('TimerStarted') ??
       event.get('WorkflowExecutionSignaled') ??
-      event.get('MarkerRecorded');
+      event.get('MarkerRecorded') ??
+      event.get('StartChildWorkflowExecutionInitiated');
   }
 
   const eventType = event.eventType;
