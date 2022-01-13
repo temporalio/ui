@@ -3,7 +3,7 @@ import WebSocketAsPromised from 'websocket-as-promised';
 import {
   dataConverterPort,
   setLastDataConverterFailure,
-} from './data-converter-config';
+} from '../stores/data-converter-config';
 
 let sock = null;
 const port = get(dataConverterPort) ?? null;

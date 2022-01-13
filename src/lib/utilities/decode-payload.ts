@@ -1,6 +1,6 @@
 import type { Payload } from '$types';
 import { dataConverterPort } from '$lib/stores/data-converter-config';
-import { dataConverterWebsocket } from '$lib/stores/data-converter-websocket';
+import { dataConverterWebsocket } from '$lib/utilities/data-converter-websocket';
 import { get } from 'svelte/store';
 import { convertPayload } from '$lib/services/data-converter';
 
@@ -30,9 +30,9 @@ export const convertPayloadToJson = async (
   // over this and get each entry decoded from base64
   // This was set to any because we just want whatever comes out of here to be base64 decoded and reset to the other value
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let [JSONPayload]: any[] = potentialPayload.map((payload) => payload.data);
-
-  JSONPayload = window.atob(JSONPayload);
+  // let [JSONPayload]: any[] = potentialPayload.map((payload) => payload.data);
+  let JSONPayload: any = potentialPayload;
+  // JSONPayload = window.atob(JSONPayload);
 
   if (port) {
     const webSocket = dataConverterWebsocket.websocket;

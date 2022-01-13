@@ -1,4 +1,4 @@
-import { persistStore } from '$lib/utilities/persist-store';
+import { persistStore } from '$lib/stores/persist-store';
 
 export const closedBannerId = persistStore('closedBannerId', null);
 
