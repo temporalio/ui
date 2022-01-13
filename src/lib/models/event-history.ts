@@ -18,7 +18,7 @@ export async function getEventAttributes(
 export const toEventHistory = async (
   response: GetWorkflowExecutionHistoryResponse,
 ): Promise<HistoryEventWithId[]> => {
-  return await Promise.all(
+  return Promise.all(
     response.history.events.map(
       async (event): Promise<HistoryEventWithId> => ({
         ...event,
