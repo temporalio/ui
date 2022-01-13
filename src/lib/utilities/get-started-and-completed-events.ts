@@ -1,5 +1,3 @@
-import { convertPayloadToJson as toJson } from './decode-payload';
-
 type WorkflowEvents = {
   input: string;
   result: string;
@@ -20,11 +18,17 @@ export const getWorkflowStartedAndCompletedEvents = (
     },
   );
 
-  const input = toJson(workflowStartedEvent);
-  const result = toJson(workflowCompletedEvent);
-
+  // I changed this to be a string to appease the compiler. But I _think_ these should already
+  // be decoded through the toEventHistory. This function is currently not being used and the values below
+  // needs to be verified.
   return {
-    input,
-    result,
+    input: JSON.stringify(
+      workflowStartedEvent.workflowExecutionStartedEventAttributes?.input
+        ?.payloads ?? '',
+    ),
+    result: JSON.stringify(
+      workflowCompletedEvent.workflowExecutionCompletedEventAttributes?.result
+        ?.payloads ?? '',
+    ),
   };
 };
