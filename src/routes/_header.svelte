@@ -27,10 +27,11 @@
       Settings
     </NavigationLink>
   </div>
-  <div class="col-span-2">
-    <DataConvertorStatus />
-  </div>
+
   <div class="flex justify-end gap-4 col-span-3 items-center">
+    <div class="text-right">
+      <DataConvertorStatus />
+    </div>
     <a
       class="header-button"
       href="https://github.com/temporalio/web/issues/new/choose"
