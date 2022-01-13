@@ -77,12 +77,12 @@ export class EventsGroup {
     }
 
     if (isSignalEvent(event)) {
-      this.id = event?.id;
+      this.id = event.id;
       this.name = `Signal ${event?.workflowExecutionSignaledEventAttributes?.signalName}`;
     }
 
     if (isMarkerEvent(event)) {
-      this.id = event?.id;
+      this.id = event.id;
       this.name = `Marker ${event?.markerRecordedEventAttributes?.markerName}`;
     }
 
