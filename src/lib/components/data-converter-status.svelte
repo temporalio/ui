@@ -19,12 +19,14 @@
     <Tooltip text={'Data converter is configured'}>
       <div class="flex">
         <Icon
-          icon={faLongArrowAltUp}
-          class="text-gray-200 block w-full h-full"
+          icon={faLongArrowAltDown}
+          scale={1}
+          class="text-blue-200 block w-full h-full"
         />
         <Icon
-          icon={faLongArrowAltDown}
-          class="text-gray-200 block w-full h-full"
+          icon={faLongArrowAltUp}
+          scale={1}
+          class="text-blue-200 block w-full h-full"
         />
       </div>
     </Tooltip>
@@ -32,11 +34,14 @@
     <Tooltip text={`Data converter couldn't connect to the remote converter`}>
       <div class="flex">
         <Icon
-          icon={faLongArrowAltUp}
-          class="text-red-400 block w-full h-full"
-        /><Icon
           icon={faLongArrowAltDown}
-          class="text-gray-200 block w-full h-full"
+          scale={1}
+          class="text-red-400 block w-full h-full"
+        />
+        <Icon
+          icon={faLongArrowAltUp}
+          scale={1}
+          class="text-red-400 block w-full h-full"
         />
       </div>
     </Tooltip>
@@ -44,11 +49,14 @@
     <Tooltip text={'Data converter succesfully converted content'}>
       <div class="flex">
         <Icon
-          icon={faLongArrowAltUp}
-          class="text-blue-400 block w-full h-full"
-        /><Icon
           icon={faLongArrowAltDown}
-          class="text-blue-400 block w-full h-full"
+          scale={1}
+          class="text-blue-200 block w-full h-full"
+        />
+        <Icon
+          icon={faLongArrowAltUp}
+          scale={1}
+          class="text-blue-200 block w-full h-full"
         />
       </div>
     </Tooltip>

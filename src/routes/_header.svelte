@@ -4,7 +4,7 @@
 
 <script lang="ts">
   import { namespace } from '$lib/stores/namespace';
-  import DataConvertorStatus from '$lib/components/data-convertor-status.svelte';
+  import DataConverterStatus from '$lib/components/data-converter-status.svelte';
   import { settings } from '$lib/stores/settings';
   import { user } from '$lib/stores/user';
   import NavigationLink from './_navigation-link.svelte';
@@ -24,10 +24,10 @@
       Workflows
     </NavigationLink>
   </div>
-  <div class="col-span-2">
-    <DataConvertorStatus />
-  </div>
   <div class="flex justify-end gap-4 col-span-3 items-center">
+    <div class="text-right">
+      <DataConverterStatus />
+    </div>
     <a
       class="header-button"
       href="https://github.com/temporalio/web/issues/new/choose"
