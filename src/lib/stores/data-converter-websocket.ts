@@ -5,39 +5,38 @@ import {
   setLastDataConverterFailure,
 } from './data-converter-config';
 
-export const dataConverterWebsocket = (function () {
-  let sock = null;
-  const port = get(dataConverterPort) ?? null;
+let sock = null;
+const port = get(dataConverterPort) ?? null;
 
-  if (port == null) {
-    return {
-      websocket: function () {
-        return null;
-      },
-      closeSocket: function () {
-        return null;
-      },
-    };
-  }
+try {
+  sock = new WebSocketAsPromised(`ws://localhost:${port}/`, {
+    packMessage: (data) => JSON.stringify(data),
+    unpackMessage: (data) => JSON.parse(data as string),
+    attachRequestId: (data, requestId) =>
+      Object.assign({ requestId: requestId }, data),
+    extractRequestId: (data) => data && data.requestId,
+  });
+} catch (err) {
+  setLastDataConverterFailure();
+}
 
-  try {
-    sock = new WebSocketAsPromised(`ws://localhost:${port}/`, {
-      packMessage: (data) => JSON.stringify(data),
-      unpackMessage: (data) => JSON.parse(data as string),
-      attachRequestId: (data, requestId) =>
-        Object.assign({ requestId: requestId }, data),
-      extractRequestId: (data) => data && data.requestId,
-    });
-  } catch (err) {
-    setLastDataConverterFailure();
-  }
+sock.open();
 
-  sock.open();
+const configuredWebsocket = {
+  websocket: sock,
+  closeSocket: function (): void {
+    sock.close();
+  },
+};
 
-  return {
-    websocket: sock,
-    closeSocket: function () {
-      sock.close();
-    },
-  };
-})();
+const unConfiguredWebsocket = {
+  websocket: function () {
+    return null;
+  },
+  closeSocket: function () {
+    return null;
+  },
+};
+
+export const dataConverterWebsocket =
+  port !== null ? configuredWebsocket : unConfiguredWebsocket;
