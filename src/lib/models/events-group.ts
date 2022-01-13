@@ -14,14 +14,22 @@ const activityTypes = [
 
 const timerTypes = ['TimerStarted', 'TimerCanceled', 'TimerFired'];
 
+const signalType = ['WorkflowExecutionSignaled'];
+
+const markerType = ['MarkerRecorded'];
+
+type CompactEventType = ActivityType | TimerType | SignalType | MarkerType;
+
 type CompactEvent = HistoryEventWithId & {
-  eventType: ActivityType | TimerType;
+  eventType: CompactEventType;
 };
 
 const isCompactEvent = (event: HistoryEventWithId): event is CompactEvent => {
   if (
     activityTypes.includes(event.eventType) ||
-    timerTypes.includes(event.eventType)
+    isTimerEvent(event) ||
+    isSignalEvent(event) ||
+    isMarkerEvent(event)
   )
     return true;
   return false;
@@ -33,13 +41,23 @@ const isActivityScheduledEvent = (
   return event.eventType === 'ActivityTaskScheduled';
 };
 
-const isTimerStartedEvent = (
+const isTimerEvent = (
   event: HistoryEventWithId,
 ): event is ScheduledActivityEvent => {
-  return event.eventType === 'TimerStarted';
+  return timerTypes.includes(event.eventType);
 };
 
-type CompactEventType = ActivityType | TimerType;
+const isSignalEvent = (
+  event: HistoryEventWithId,
+): event is ScheduledActivityEvent => {
+  return signalType.includes(event.eventType);
+};
+
+const isMarkerEvent = (
+  event: HistoryEventWithId,
+): event is ScheduledActivityEvent => {
+  return markerType.includes(event.eventType);
+};
 
 export class EventsGroup {
   id: string;
@@ -53,9 +71,19 @@ export class EventsGroup {
         event?.activityTaskScheduledEventAttributes?.activityType?.name;
     }
 
-    if (isTimerStartedEvent(event)) {
+    if (isTimerEvent(event)) {
       this.id = event?.timerStartedEventAttributes?.timerId;
       this.name = `Timer ${event?.timerStartedEventAttributes?.timerId}`;
+    }
+
+    if (isSignalEvent(event)) {
+      this.id = event.id;
+      this.name = `Signal ${event?.workflowExecutionSignaledEventAttributes?.signalName}`;
+    }
+
+    if (isMarkerEvent(event)) {
+      this.id = event.id;
+      this.name = `Marker ${event?.markerRecordedEventAttributes?.markerName}`;
     }
 
     this.set(event.eventType, event);
@@ -128,7 +156,12 @@ export class EventGroups {
   }
 
   add(event: CompactEvent): void {
-    if (isActivityScheduledEvent(event)) {
+    if (
+      isActivityScheduledEvent(event) ||
+      isTimerEvent(event) ||
+      isSignalEvent(event) ||
+      isMarkerEvent(event)
+    ) {
       const id = String(event.id);
       this._groups.set(id, new EventsGroup(event));
     }
@@ -162,11 +195,6 @@ export class EventGroups {
     if (event.eventType === 'ActivityTaskCompleted') {
       const { scheduledEventId } = event.activityTaskCompletedEventAttributes;
       this.get(scheduledEventId).set(event.eventType, event);
-    }
-
-    if (isTimerStartedEvent(event)) {
-      const id = String(event.id);
-      this._groups.set(id, new EventsGroup(event));
     }
   }
 

@@ -69,7 +69,11 @@ export const getEventClassification = (
 ): EventClassification => {
   if (isPendingActivity(event)) return event.state;
   if (isEventsGroup(event)) {
-    event = event.get('ActivityTaskScheduled') ?? event.get('TimerStarted');
+    event =
+      event.get('ActivityTaskScheduled') ??
+      event.get('TimerStarted') ??
+      event.get('WorkflowExecutionSignaled') ??
+      event.get('MarkerRecorded');
   }
 
   const eventType = event.eventType;
