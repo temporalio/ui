@@ -4,26 +4,28 @@ import {
 } from '$lib/stores/data-converter-config';
 import type { Payload } from '$types';
 
-import WebSocketAsPromised from 'websocket-as-promised';
-
 interface WebSocketResponse {
   content: string;
   requestId: string;
 }
 
-export async function convertSinglePayloadDataConverter(
+export async function convertPayload(
   payload: Payload,
   websocket: any,
 ): Promise<string> {
   if (!websocket.isOpened && !websocket.isOpening) {
-    await websocket.open();
+    try {
+      await websocket.open();
+    } catch (_e) {
+      setLastDataConverterFailure();
+    }
   }
 
   const socketResponse: Promise<string> = websocket
     .sendRequest({
       payload: JSON.stringify(payload),
     })
-    .then((response) => {
+    .then((response: WebSocketResponse) => {
       try {
         const decodedResponse = JSON.parse(response.content);
         setLastDataConverterSuccess();

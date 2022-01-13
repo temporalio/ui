@@ -2,7 +2,7 @@ import type { Payload } from '$types';
 import { dataConverterPort } from '$lib/stores/data-converter-config';
 import { dataConverterWebsocket } from '$lib/stores/data-converter-websocket';
 import { get } from 'svelte/store';
-import { convertSinglePayloadDataConverter } from '$lib/services/data-converter';
+import { convertPayload } from '$lib/services/data-converter';
 
 export const convertPayloadToJson = async (
   eventAttribute: EventAttribute,
@@ -39,8 +39,7 @@ export const convertPayloadToJson = async (
 
     const awaitData = await Promise.all(
       potentialPayload.map(
-        async (payload) =>
-          await convertSinglePayloadDataConverter(payload, webSocket),
+        async (payload) => await convertPayload(payload, webSocket),
       ),
     );
     JSONPayload = awaitData;
