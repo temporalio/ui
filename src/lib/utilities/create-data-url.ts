@@ -1,4 +1,4 @@
-export const convertToJSON = (
+export const createDataUrl = (
   events: Parameters<typeof JSON.stringify>[0],
 ): string => {
   const data = JSON.stringify(events);

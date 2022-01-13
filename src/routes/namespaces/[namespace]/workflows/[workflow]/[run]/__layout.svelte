@@ -27,10 +27,11 @@
   export let namespace: string;
 
   let workflow = refreshable(() => fetchWorkflow(parameters));
-  $: setContext('workflow', $workflow);
+
+  $: setContext('workflow', workflow);
 </script>
 
-<main class="flex flex-col gap-4 h-full">
+<main class="flex flex-col gap-6 h-full">
   <Header {namespace} />
   <slot />
 </main>

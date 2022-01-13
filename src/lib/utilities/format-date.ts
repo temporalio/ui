@@ -1,15 +1,32 @@
-import { format, parseJSON } from 'date-fns';
+import { formatDistanceToNow, parseJSON } from 'date-fns';
+import { format, formatInTimeZone } from 'date-fns-tz';
 
 import type { Timestamp } from '$types';
 
-export function formatDate(date: Date | Timestamp | string | null): string {
+type ValidTime = Parameters<typeof parseJSON>[0] | Timestamp;
+
+const pattern = 'H:mm:ss:SS a O ccc, LLL do';
+
+export function formatDate(
+  date: ValidTime,
+  timeFormat: TimeFormat = 'UTC',
+): string {
   if (!date) return '';
 
-  if (isTimestamp(date)) {
-    date = timestampToDate(date);
-  }
+  try {
+    if (isTimestamp(date)) {
+      date = timestampToDate(date);
+    }
 
-  return format(parseJSON(date), 'h:mm:ss a O, E, MMM dd, yyyy');
+    const parsed = parseJSON(date);
+
+    if (timeFormat === 'local') return format(parsed, pattern);
+    if (timeFormat === 'relative') return formatDistanceToNow(parsed) + ' ago';
+
+    return formatInTimeZone(parsed, 'UTC', pattern);
+  } catch {
+    return '';
+  }
 }
 
 function timestampToDate(ts: Timestamp): Date {
@@ -18,6 +35,7 @@ function timestampToDate(ts: Timestamp): Date {
   }
 
   const d = new Date(null);
+
   d.setTime(Number(ts.seconds) * 1000 + ts.nanos / 1000);
 
   return d;

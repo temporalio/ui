@@ -8,22 +8,24 @@
     const workflowId = page.query.get('workflow-id');
     const workflowType = page.query.get('workflow-type');
     const timeRange = page.query.get('time-range');
-    const status = page.query.get('status') as WorkflowStatus;
+    const executionStatus = page.query.get('status') as WorkflowStatus;
 
-    const initialData = await fetchAllWorkflows(
-      namespace,
-      { workflowId, workflowType, timeRange, status },
-      fetch,
-    );
+    const parameters: FilterParameters = {
+      workflowId,
+      workflowType,
+      timeRange,
+      executionStatus,
+    };
+    const initialData = await fetchAllWorkflows(namespace, parameters, fetch);
 
     return {
-      props: { initialData, namespace },
+      props: { initialData, namespace, parameters },
     };
   }
 </script>
 
 <script lang="ts">
-  import { page } from '$app/stores';
+  import VirtualList from '@sveltejs/svelte-virtual-list';
 
   import { fetchAllWorkflows } from '$lib/services/workflow-service';
   import { refreshable } from '$lib/stores/refreshable';
@@ -33,16 +35,15 @@
   import WorkflowFilters from './_workflow-filters.svelte';
   import EmptyState from '$lib/components/empty-state.svelte';
   import WorkflowsLoadingState from './_workflows-loading.svelte';
-  import VirtualList from '@sveltejs/svelte-virtual-list';
 
   export let namespace: string;
   export let initialData: ReturnType<typeof fetchAllWorkflows>;
+  export let parameters: FilterParameters;
 
-  $: timeRange = $page.query.get('time-range');
+  let timeFormat: TimeFormat = 'UTC';
 
-  let timeFormat = 'relative';
-  let data = refreshable(
-    () => fetchAllWorkflows(namespace, { timeRange }),
+  $: data = refreshable(
+    () => fetchAllWorkflows(namespace, parameters),
     initialData,
   );
 </script>

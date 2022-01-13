@@ -3,16 +3,16 @@
   import { faCalendar } from '@fortawesome/free-solid-svg-icons';
   import { page } from '$app/stores';
 
-  import type { Activity } from '$lib/models/activity';
+  import type { EventsGroup } from '$lib/models/events-group';
 
   import { formatEvent } from '$lib/utilities/get-event-classification';
   import { formatDate } from '$lib/utilities/format-date';
 
   import EventLabel from '$lib/components/event-label.svelte';
 
-  export let event: HistoryEventWithId | PendingActivity | Activity;
+  export let event: HistoryEventWithId | PendingActivity | EventsGroup;
 
-  let { routeFor, pending, timeStamp, name, tag, classification } =
+  let { routeFor, pending, timeStamp, name, tag, classification, id } =
     formatEvent(event);
 
   let { namespace, workflow: workflowId, run: runId } = $page.params;
@@ -23,36 +23,39 @@
   {href}
   sveltekit:noscroll
   sveltekit:prefetch
-  class="flex border-b-2 border-gray-300 w-full items-center"
+  class="flex border-b-2 border-gray-300 w-full items-center hover:bg-gray-50"
   class:pending
   class:active={$page.path.includes(href)}
 >
-  <article class="p-4 w-full">
-    <h2 class="mb-2 {tag}">
-      <EventLabel color={classification}>
-        {name}
-      </EventLabel>
-    </h2>
-    <p class="text-sm">
-      <Icon icon={faCalendar} class="inline" />
-      {formatDate(timeStamp)}
-    </p>
+  <article class="flex gap-4 items-center p-4">
+    <p class="w-5 text-center text-gray-500">{id}</p>
+    <div class="w-full">
+      <h2 class="mb-2 {tag}">
+        <EventLabel color={classification}>
+          {name}
+        </EventLabel>
+      </h2>
+      <p class="text-sm">
+        <Icon icon={faCalendar} class="inline" />
+        {formatDate(timeStamp)}
+      </p>
+    </div>
+    {#if pending}
+      <div class="mx-8 text-orange-600 italic">Pending</div>
+    {/if}
   </article>
-  {#if pending}
-    <div class="mx-8 text-orange-600 italic">Pending</div>
-  {/if}
 </a>
 
 <style lang="postcss">
   .active {
-    background: theme('colors.blue[100]');
+    background: theme('colors.blue[50]');
     /* Creates a border without modifying the shape and size of the element. */
     background-image: linear-gradient(
       90deg,
       theme('colors.blue[700]') 0%,
       theme('colors.blue[700]') 1%,
-      theme('colors.blue[100]') 1%,
-      theme('colors.blue[100]') 1%
+      theme('colors.blue[50]') 1%,
+      theme('colors.blue[50]') 1%
     );
   }
 
@@ -61,6 +64,6 @@
   }
 
   .pending .active {
-    @apply bg-blue-100;
+    @apply bg-blue-50;
   }
 </style>

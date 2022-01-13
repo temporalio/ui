@@ -317,32 +317,23 @@ interface PendingActivity extends PendingActivityInfo {
 }
 
 type EventType =
-  | 'ActivityTaskCanceled'
-  | 'ActivityTaskCancelRequested'
-  | 'ActivityTaskCompleted'
-  | 'ActivityTaskFailed'
-  | 'ActivityTaskScheduled'
-  | 'ActivityTaskStarted'
-  | 'ActivityTaskTimedOut'
+  | ActivityType
+  | TimerType
+  | SignalType
+  | MarkerType
+  | ChildType
   | 'ChildWorkflowExecutionCanceled'
-  | 'ChildWorkflowExecutionCompleted'
   | 'ChildWorkflowExecutionFailed'
-  | 'ChildWorkflowExecutionStarted'
   | 'ChildWorkflowExecutionTerminated'
   | 'ChildWorkflowExecutionTimedOut'
   | 'StartChildWorkflowExecutionFailed'
-  | 'StartChildWorkflowExecutionInitiated'
   | 'SignalExternalWorkflowExecutionFailed'
   | 'SignalExternalWorkflowExecutionInitiated'
-  | 'TimerCanceled'
-  | 'TimerFired'
-  | 'TimerStarted'
   | 'WorkflowExecutionCanceled'
   | 'WorkflowExecutionCancelRequested'
   | 'WorkflowExecutionCompleted'
   | 'WorkflowExecutionContinuedAsNew'
   | 'WorkflowExecutionFailed'
-  | 'WorkflowExecutionSignaled'
   | 'WorkflowExecutionStarted'
   | 'WorkflowExecutionTerminated'
   | 'WorkflowExecutionTimedOut'
@@ -352,10 +343,8 @@ type EventType =
   | 'WorkflowTaskStarted'
   | 'WorkflowTaskTimedOut'
   | 'ExternalWorkflowExecutionCancelRequested'
-  | 'ExternalWorkflowExecutionSignaled'
   | 'RequestCancelExternalWorkflowExecutionFailed'
   | 'RequestCancelExternalWorkflowExecutionInitiated'
-  | 'MarkerRecorded'
   | 'UpsertWorkflowSearchAttributes';
 
 type ActivityType =
@@ -367,6 +356,19 @@ type ActivityType =
   | 'ActivityTaskStarted'
   | 'ActivityTaskTimedOut';
 
+type TimerType = 'TimerCanceled' | 'TimerFired' | 'TimerStarted';
+
+type SignalType =
+  | 'WorkflowExecutionSignaled'
+  | 'ExternalWorkflowExecutionSignaled';
+
+type MarkerType = 'MarkerRecorded';
+
+type ChildType =
+  | 'StartChildWorkflowExecutionInitiated'
+  | 'ChildWorkflowExecutionStarted'
+  | 'ChildWorkflowExecutionCompleted';
+
 type EventTypeCategory =
   | 'activity'
   | 'child-workflow'
@@ -374,9 +376,5 @@ type EventTypeCategory =
   | 'timer'
   | 'workflow'
   | 'command';
-
-type ActivityEvent = HistoryEventWithId & {
-  eventType: ActivityType;
-};
 
 type EventualHistoryEvents = PromiseLike<HistoryEventWithId[]>;

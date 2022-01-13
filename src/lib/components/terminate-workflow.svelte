@@ -1,19 +1,29 @@
 <script lang="ts">
+  import { getContext } from 'svelte';
+
   import { terminateWorkflow } from '$lib/services/terminate-service';
-  import type { WorkflowExecution } from '$lib/models/workflow-execution';
   import { notifications } from '$lib/stores/notifications';
-  import Button from '$lib/components/button.svelte';
   import { handleError } from '$lib/utilities/handle-error';
-  import { isFunction } from '$lib/utilities/is-function';
+
+  import type { WorkflowExecution } from '$lib/models/workflow-execution';
+
+  import Button from '$lib/components/button.svelte';
+  import type { Refreshable } from '$lib/stores/refreshable';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
-  export let refresh: () => void = null;
 
-  let reason: string = '';
+  let reason = '';
+  const { refresh } = getContext<Refreshable<WorkflowExecution>>('workflow');
 
   const isEligibleForTermination = (workflow: WorkflowExecution) =>
     String(workflow.status) === 'Running';
+
+  const handleSuccessfulTermination = () => {
+    reason = '';
+    notifications.add('success', 'Workflow Terminated');
+    refresh();
+  };
 
   const terminate = () => {
     terminateWorkflow({
@@ -21,11 +31,7 @@
       namespace,
       reason,
     })
-      .then(() => {
-        reason = '';
-        notifications.add('success', 'Workflow Terminated');
-        if (isFunction(refresh)) refresh();
-      })
+      .then(handleSuccessfulTermination)
       .catch(handleError);
   };
 </script>
