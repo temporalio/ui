@@ -5,7 +5,6 @@
 // Use jsdom jest environment for access to window.atob
 
 import { decodePayload } from './decode-payload-lazy';
-import { convertPayloadToJson } from './decode-payload';
 const WebDecodePayload = {
   metadata: {
     encoding: 'YmluYXJ5L2VuY3J5cHRlZA==',
@@ -37,7 +36,6 @@ const BinaryNullEncodedNoData = {
   data: null,
 };
 
-convertPayloadToJson();
 const Base64Decoded = 'test@test.com';
 
 describe(decodePayload, () => {
