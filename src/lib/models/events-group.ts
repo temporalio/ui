@@ -14,11 +14,22 @@ const activityTypes = [
 
 const timerTypes = ['TimerStarted', 'TimerCanceled', 'TimerFired'];
 
-const signalType = ['WorkflowExecutionSignaled'];
+const signalTypes = ['WorkflowExecutionSignaled'];
 
-const markerType = ['MarkerRecorded'];
+const markerTypes = ['MarkerRecorded'];
 
-type CompactEventType = ActivityType | TimerType | SignalType | MarkerType;
+const childTypes = [
+  'StartChildWorkflowExecutionInitiated',
+  'ChildWorkflowExecutionStarted',
+  'ChildWorkflowExecutionCompleted',
+];
+
+type CompactEventType =
+  | ActivityType
+  | TimerType
+  | SignalType
+  | MarkerType
+  | ChildType;
 
 type CompactEvent = HistoryEventWithId & {
   eventType: CompactEventType;
@@ -29,7 +40,8 @@ const isCompactEvent = (event: HistoryEventWithId): event is CompactEvent => {
     activityTypes.includes(event.eventType) ||
     isTimerEvent(event) ||
     isSignalEvent(event) ||
-    isMarkerEvent(event)
+    isMarkerEvent(event) ||
+    childTypes.includes(event.eventType)
   )
     return true;
   return false;
@@ -41,6 +53,12 @@ const isActivityScheduledEvent = (
   return event.eventType === 'ActivityTaskScheduled';
 };
 
+const isChildWorkflowInitializedEvent = (
+  event: HistoryEventWithId,
+): event is ScheduledActivityEvent => {
+  return event.eventType === 'StartChildWorkflowExecutionInitiated';
+};
+
 const isTimerEvent = (
   event: HistoryEventWithId,
 ): event is ScheduledActivityEvent => {
@@ -50,13 +68,13 @@ const isTimerEvent = (
 const isSignalEvent = (
   event: HistoryEventWithId,
 ): event is ScheduledActivityEvent => {
-  return signalType.includes(event.eventType);
+  return signalTypes.includes(event.eventType);
 };
 
 const isMarkerEvent = (
   event: HistoryEventWithId,
 ): event is ScheduledActivityEvent => {
-  return markerType.includes(event.eventType);
+  return markerTypes.includes(event.eventType);
 };
 
 export class EventsGroup {
@@ -65,7 +83,7 @@ export class EventsGroup {
   private _events: Map<CompactEventType, HistoryEventWithId> = new Map();
 
   constructor(event: CompactEvent) {
-    if (isActivityScheduledEvent) {
+    if (isActivityScheduledEvent(event)) {
       this.id = event?.activityTaskScheduledEventAttributes?.activityId;
       this.name =
         event?.activityTaskScheduledEventAttributes?.activityType?.name;
@@ -78,12 +96,17 @@ export class EventsGroup {
 
     if (isSignalEvent(event)) {
       this.id = event.id;
-      this.name = `Signal ${event?.workflowExecutionSignaledEventAttributes?.signalName}`;
+      this.name = `Signal: ${event?.workflowExecutionSignaledEventAttributes?.signalName}`;
     }
 
     if (isMarkerEvent(event)) {
       this.id = event.id;
-      this.name = `Marker ${event?.markerRecordedEventAttributes?.markerName}`;
+      this.name = `Marker: ${event?.markerRecordedEventAttributes?.markerName}`;
+    }
+
+    if (isChildWorkflowInitializedEvent(event)) {
+      this.id = event.id;
+      this.name = `Child Workflow: ${event?.startChildWorkflowExecutionInitiatedEventAttributes?.workflowType?.name}`;
     }
 
     this.set(event.eventType, event);
@@ -160,7 +183,8 @@ export class EventGroups {
       isActivityScheduledEvent(event) ||
       isTimerEvent(event) ||
       isSignalEvent(event) ||
-      isMarkerEvent(event)
+      isMarkerEvent(event) ||
+      isChildWorkflowInitializedEvent(event)
     ) {
       const id = String(event.id);
       this._groups.set(id, new EventsGroup(event));
@@ -195,6 +219,18 @@ export class EventGroups {
     if (event.eventType === 'ActivityTaskCompleted') {
       const { scheduledEventId } = event.activityTaskCompletedEventAttributes;
       this.get(scheduledEventId).set(event.eventType, event);
+    }
+
+    if (event.eventType === 'ChildWorkflowExecutionStarted') {
+      const { initiatedEventId } =
+        event.childWorkflowExecutionStartedEventAttributes;
+      this.get(initiatedEventId).set(event.eventType, event);
+    }
+
+    if (event.eventType === 'ChildWorkflowExecutionCompleted') {
+      const { initiatedEventId } =
+        event.childWorkflowExecutionCompletedEventAttributes;
+      this.get(initiatedEventId).set(event.eventType, event);
     }
   }
 

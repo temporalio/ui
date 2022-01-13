@@ -321,14 +321,12 @@ type EventType =
   | TimerType
   | SignalType
   | MarkerType
+  | ChildType
   | 'ChildWorkflowExecutionCanceled'
-  | 'ChildWorkflowExecutionCompleted'
   | 'ChildWorkflowExecutionFailed'
-  | 'ChildWorkflowExecutionStarted'
   | 'ChildWorkflowExecutionTerminated'
   | 'ChildWorkflowExecutionTimedOut'
   | 'StartChildWorkflowExecutionFailed'
-  | 'StartChildWorkflowExecutionInitiated'
   | 'SignalExternalWorkflowExecutionFailed'
   | 'SignalExternalWorkflowExecutionInitiated'
   | 'WorkflowExecutionCanceled'
@@ -365,6 +363,11 @@ type SignalType =
   | 'ExternalWorkflowExecutionSignaled';
 
 type MarkerType = 'MarkerRecorded';
+
+type ChildType =
+  | 'StartChildWorkflowExecutionInitiated'
+  | 'ChildWorkflowExecutionStarted'
+  | 'ChildWorkflowExecutionCompleted';
 
 type EventTypeCategory =
   | 'activity'
