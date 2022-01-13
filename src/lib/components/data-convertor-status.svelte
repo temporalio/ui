@@ -20,12 +20,10 @@
       <div class="flex">
         <Icon
           icon={faLongArrowAltUp}
-          scale={1}
           class="text-gray-200 block w-full h-full"
         />
         <Icon
           icon={faLongArrowAltDown}
-          scale={1}
           class="text-gray-200 block w-full h-full"
         />
       </div>
@@ -35,11 +33,9 @@
       <div class="flex">
         <Icon
           icon={faLongArrowAltUp}
-          scale={1}
           class="text-red-400 block w-full h-full"
         /><Icon
           icon={faLongArrowAltDown}
-          scale={1}
           class="text-gray-200 block w-full h-full"
         />
       </div>
@@ -49,11 +45,9 @@
       <div class="flex">
         <Icon
           icon={faLongArrowAltUp}
-          scale={1}
           class="text-blue-400 block w-full h-full"
         /><Icon
           icon={faLongArrowAltDown}
-          scale={1}
           class="text-blue-400 block w-full h-full"
         />
       </div>
