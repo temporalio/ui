@@ -1,40 +1,13 @@
-import { convertSinglePayloadDataConverter } from '$lib/services/data-converter';
-import { dataConverterPort } from '$lib/stores/data-converter-config';
-import { dataConverterWebsocket } from '$lib/stores/data-converter-websocket';
-import type {
-  GetWorkflowExecutionHistoryResponse,
-  HistoryEvent,
-  Payload,
-} from '$types';
-import { get } from 'svelte/store';
+import { convertPayloadToJson } from '$lib/utilities/decode-payload';
+import type { GetWorkflowExecutionHistoryResponse, HistoryEvent } from '$types';
 
-export function getEventAttributes(historyEvent: HistoryEvent): EventAttribute {
+export async function getEventAttributes(
+  historyEvent: HistoryEvent,
+): Promise<EventAttribute> {
   const attributeKey = Object.keys(historyEvent).find((key) =>
     key.includes('Attributes'),
   );
-  const attributes = historyEvent[attributeKey];
-
-  const port = get(dataConverterPort);
-  const webSocket = dataConverterWebsocket.websocket;
-
-  if (port) {
-    const potentialPayload = (attributes?.input?.payloads ??
-      attributes?.result?.payloads ??
-      null) as Payload[] | null;
-
-    if (potentialPayload) {
-      attributes.payloadPromise = potentialPayload.map((payload) => {
-        return convertSinglePayloadDataConverter(payload, webSocket);
-      });
-
-      // Verify the promise responds
-      attributes.payloadPromise.map((promise) => {
-        promise.then((stuff) => {
-          console.log(stuff);
-        });
-      });
-    }
-  }
+  const attributes = await convertPayloadToJson(historyEvent[attributeKey]);
 
   return {
     type: attributeKey as EventAttributeKeys,
@@ -42,15 +15,19 @@ export function getEventAttributes(historyEvent: HistoryEvent): EventAttribute {
   };
 }
 
-export const toEventHistory = (
+export const toEventHistory = async (
   response: GetWorkflowExecutionHistoryResponse,
-): HistoryEventWithId[] => {
-  return response.history.events.map(
-    (event): HistoryEventWithId => ({
-      ...event,
-      id: String(event.eventId),
-      eventType: event.eventType as unknown as EventType,
-      attributes: getEventAttributes(event),
-    }),
+): Promise<HistoryEventWithId[]> => {
+  const returnstuff = await Promise.all(
+    response.history.events.map(
+      async (event): Promise<HistoryEventWithId> => ({
+        ...event,
+        id: String(event.eventId),
+        eventType: event.eventType as unknown as EventType,
+        attributes: await getEventAttributes(event),
+      }),
+    ),
   );
+
+  return returnstuff;
 };

@@ -1,8 +1,6 @@
 import { get } from 'svelte/store';
 
 import type { GetWorkflowExecutionHistoryResponse } from '$types';
-
-import { convertEventPayloadFromDataConverter } from './data-converter';
 import { dataConverterPort } from '$lib/stores/data-converter-config';
 
 import { paginated } from '$lib/utilities/paginated';
@@ -49,18 +47,7 @@ export const fetchEvents = async (
       );
     },
     { onStart, onUpdate, onComplete },
-  )
-    .then(toEventHistory)
-    .then(async (events) => {
-      if (port !== null) {
-        try {
-          await convertEventPayloadFromDataConverter(events, port);
-        } catch (error) {
-          console.error(error);
-        }
-      }
-      return Promise.resolve(events);
-    });
+  ).then(toEventHistory);
 
   return events;
 };

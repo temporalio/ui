@@ -28,7 +28,6 @@ export const dataConverterWebsocket = (function () {
         Object.assign({ requestId: requestId }, data),
       extractRequestId: (data) => data && data.requestId,
     });
-    console.log('Websocket Created');
   } catch (err) {
     setLastDataConverterFailure();
   }

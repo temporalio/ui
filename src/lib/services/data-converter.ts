@@ -14,14 +14,12 @@ interface WebSocketResponse {
 export async function convertSinglePayloadDataConverter(
   payload: Payload,
   websocket: any,
-) {
+): Promise<string> {
   if (!websocket.isOpened && !websocket.isOpening) {
-    console.log('Open your websocket', websocket.isOpen, websocket.isOpening);
     await websocket.open();
-    console.log('after');
   }
 
-  const socketResponse = websocket
+  const socketResponse: Promise<string> = websocket
     .sendRequest({
       payload: JSON.stringify(payload),
     })
@@ -40,6 +38,7 @@ export async function convertSinglePayloadDataConverter(
   return socketResponse;
 }
 
+// This can be baleeted!
 export const convertEventPayloadFromDataConverter = async (
   events: HistoryEventWithId[],
   port: string | null,

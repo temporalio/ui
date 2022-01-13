@@ -1,31 +1,57 @@
-import type {
-  WorkflowExecutionStartedEventAttributes,
-  WorkflowExecutionCompletedEventAttributes,
-} from '$types';
+import type { Payload } from '$types';
+import { dataConverterPort } from '$lib/stores/data-converter-config';
+import { dataConverterWebsocket } from '$lib/stores/data-converter-websocket';
+import { get } from 'svelte/store';
+import { convertSinglePayloadDataConverter } from '$lib/services/data-converter';
 
-type DecodeEvent = BaseEvent & {
-  workflowExecutionStartedEventAttributes?: WorkflowExecutionStartedEventAttributes;
-  workflowExecutionCompletedEventAttributes?: WorkflowExecutionCompletedEventAttributes;
-};
+export const convertPayloadToJson = async (
+  eventAttribute: EventAttribute,
+): Promise<EventAttribute> => {
+  if (!eventAttribute) return eventAttribute;
 
-export const convertPayloadToJson = (event: DecodeEvent): string => {
-  if (!event) return;
+  // This anyAttribues allows us to use ?. notation to introspect the object which is a safe access pattern.
+  // Because of the way we wrote our discrimited union we have to use this any. If we have two objects that
+  // don't have the same property TS won't let us access that object without verifying the type string like
+  // attributes.type === "ATypeWithInput/Result"
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const anyAttributes = eventAttribute as any;
 
-  if (event.workflowExecutionStartedEventAttributes) {
-    const input = event.workflowExecutionStartedEventAttributes.input;
-    if (input === null) return 'null';
-    if (input) {
-      const [data] = input.payloads.map((payload) => payload.data);
-      return window.atob(String(data));
-    }
+  const port = get(dataConverterPort);
+
+  const potentialPayload = (anyAttributes?.input?.payloads ??
+    anyAttributes?.result?.payloads ??
+    null) as Payload[] | null;
+
+  if (potentialPayload === null) {
+    return Promise.resolve(eventAttribute);
   }
 
-  if (event.workflowExecutionCompletedEventAttributes) {
-    const result = event.workflowExecutionCompletedEventAttributes.result;
-    if (result === null) return 'null';
-    if (result) {
-      const [data] = result.payloads.map((payload) => payload.data);
-      return window.atob(String(data));
-    }
+  // This is a very sneaky array[0].data It's a holdover from a previous version of this code we could probably actually iterate
+  // over this and get each entry decoded from base64
+  // This was set to any because we just want whatever comes out of here to be base64 decoded and reset to the other value
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let [JSONPayload]: any[] = potentialPayload.map((payload) => payload.data);
+
+  JSONPayload = window.atob(JSONPayload);
+
+  if (port) {
+    const webSocket = dataConverterWebsocket.websocket;
+
+    const awaitData = await Promise.all(
+      potentialPayload.map(
+        async (payload) =>
+          await convertSinglePayloadDataConverter(payload, webSocket),
+      ),
+    );
+    JSONPayload = awaitData;
   }
+
+  if (anyAttributes?.input?.payloads) {
+    anyAttributes.input.payloads = JSONPayload;
+  }
+  if (anyAttributes?.result?.payloads) {
+    anyAttributes.result.payloads = JSONPayload;
+  }
+
+  return anyAttributes;
 };
