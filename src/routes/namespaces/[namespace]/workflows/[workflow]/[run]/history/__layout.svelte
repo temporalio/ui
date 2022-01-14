@@ -21,16 +21,15 @@
   import { setContext } from 'svelte';
   import {
     faCode,
-    faDownload,
     faLayerGroup,
     faStream,
   } from '@fortawesome/free-solid-svg-icons';
 
   import { routeFor } from '$lib/utilities/route-for';
-  import { createDataUrl } from '$lib/utilities/create-data-url';
   import { fetchEvents } from '$lib/services/events-service';
   import { refreshable } from '$lib/stores/refreshable';
 
+  import ExportHistory from '$lib/components/export-history.svelte';
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
 
@@ -59,7 +58,11 @@
           href={routeFor('workflow.events.json', workflow)}
         />
       </ToggleButtons>
-      <ToggleButton icon={faDownload} href={createDataUrl(events)} />
+      <ExportHistory
+        namespace={parameters.namespace}
+        workflowId={parameters.executionId}
+        runId={parameters.runId}
+      />
     </div>
   </nav>
   <slot />

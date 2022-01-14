@@ -51,3 +51,23 @@ export const fetchEvents = async (
 
   return events;
 };
+
+export const fetchRawEvents = async (
+  { namespace, executionId, runId, onStart, onUpdate, onComplete }: FetchEvents,
+  request = fetch,
+): Promise<HistoryEvent[]> => {
+  const resp = await paginated(
+    async (token: string) => {
+      return requestFromAPI<GetWorkflowExecutionHistoryResponse>(
+        routeForApi('events', { namespace, executionId, runId }),
+        {
+          token,
+          request,
+        },
+      );
+    },
+    { onStart, onUpdate, onComplete },
+  );
+
+  return resp.history.events;
+};
