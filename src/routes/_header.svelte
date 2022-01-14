@@ -36,18 +36,25 @@
     </a>
     {#if $settings.auth?.enabled}
       {#if $user?.email}
-        <img
-          src={$user.picture}
-          alt="User Avatar"
-          class="rounded-full h-6 w-6"
-        />
+        <button
+          class="header-button min-w-min"
+          on:click={() =>
+            window.location.assign(import.meta.env.VITE_API + '/auth/logout')}
+        >
+          Logout
+          <img
+            src={$user.picture}
+            alt="User Avatar"
+            class="rounded-full h-6 w-6 ml-2.5"
+          />
+        </button>
       {:else}
         <button
           class="header-button"
           on:click={() =>
             window.location.assign(import.meta.env.VITE_API + '/auth/sso')}
         >
-          Sign In
+          Login
         </button>
       {/if}
     {/if}
@@ -56,7 +63,7 @@
 
 <style lang="postcss">
   .header-button {
-    @apply block px-4 py-2 text-sm text-white;
+    @apply block px-4 py-2 text-sm text-white flex items-center justify-center;
   }
 
   .header-button:hover {
