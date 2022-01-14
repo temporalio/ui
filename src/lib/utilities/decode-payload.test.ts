@@ -4,7 +4,8 @@
 
 // Use jsdom jest environment for access to window.atob
 
-import { decodePayload } from './decode-payload-lazy';
+import { decodePayload } from './decode-payload';
+
 const WebDecodePayload = {
   metadata: {
     encoding: 'YmluYXJ5L2VuY3J5cHRlZA==',

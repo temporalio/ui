@@ -6,7 +6,7 @@ import type { Writable } from 'svelte/store';
 export function persistStore(
   name: string,
   initialValue: string | null = '',
-): Pick<Writable<string>, 'subscribe' | 'set'> {
+): Pick<Writable<string | null>, 'subscribe' | 'set'> {
   let initialStoreValue = initialValue;
   if (browser) {
     try {
