@@ -7,7 +7,7 @@ export function decodePayload(
 ): Payload | Record<any, any> | string {
   const encoding = window.atob(String(payload.metadata.encoding));
   // Help users out with an english encoding
-  (payload.metadata.encodingDecrypted as unknown as string) = encoding;
+  (payload.metadata.encodingDecoded as unknown as string) = encoding;
 
   switch (encoding) {
     case 'json/plain':
