@@ -1,8 +1,9 @@
 import type { Payload } from '$types';
 import { dataConverterPort } from '$lib/stores/data-converter-config';
-import { dataConverterWebsocket } from '$lib/stores/data-converter-websocket';
+import { dataConverterWebsocket } from '$lib/utilities/data-converter-websocket';
 import { get } from 'svelte/store';
 import { convertPayload } from '$lib/services/data-converter';
+import { decodePayload } from './decode-payload-lazy';
 
 export const convertPayloadToJson = async (
   eventAttribute: EventAttribute,
@@ -26,13 +27,7 @@ export const convertPayloadToJson = async (
     return Promise.resolve(eventAttribute);
   }
 
-  // This is a very sneaky array[0].data It's a holdover from a previous version of this code we could probably actually iterate
-  // over this and get each entry decoded from base64
-  // This was set to any because we just want whatever comes out of here to be base64 decoded and reset to the other value
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let [JSONPayload]: any[] = potentialPayload.map((payload) => payload.data);
-
-  JSONPayload = window.atob(JSONPayload);
+  let JSONPayload = potentialPayload.map(decodePayload);
 
   if (port) {
     const webSocket = dataConverterWebsocket.websocket;
@@ -50,6 +45,43 @@ export const convertPayloadToJson = async (
   }
   if (anyAttributes?.result?.payloads) {
     anyAttributes.result.payloads = JSONPayload;
+  }
+
+  // Decode Search Attributes
+  if (anyAttributes?.searchAttributes?.indexedFields) {
+    const searchAttributes = anyAttributes?.searchAttributes?.indexedFields;
+
+    Object.entries(searchAttributes).forEach(([key, value]) => {
+      searchAttributes[key] = decodePayload(value);
+    });
+  }
+
+  // Decode Memo
+  if (anyAttributes?.memo?.fields) {
+    const memo = anyAttributes?.memo?.fields;
+
+    Object.entries(memo).forEach(([key, value]) => {
+      memo[key] = decodePayload(value);
+    });
+  }
+
+  // Decode Header
+  if (anyAttributes?.header?.fields) {
+    const header = anyAttributes?.header?.fields;
+
+    Object.entries(header).forEach(([key, value]) => {
+      header[key] = decodePayload(value);
+    });
+  }
+
+  // Decode Query Result
+  // This one is a best guess from the previous codebase and needs verified
+  if (anyAttributes?.queryResult) {
+    const queryResult = anyAttributes?.queryResult;
+
+    Object.entries(queryResult).forEach(([key, value]) => {
+      queryResult[key] = decodePayload(value);
+    });
   }
 
   return anyAttributes;
