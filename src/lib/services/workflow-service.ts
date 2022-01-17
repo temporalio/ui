@@ -29,13 +29,13 @@ export const fetchAllWorkflows = async (
   const query = toListWorkflowQuery(parameters);
 
   const { executions, nextPageToken } =
-    await requestFromAPI<ListWorkflowExecutionsResponse>(
+    (await requestFromAPI<ListWorkflowExecutionsResponse>(
       routeForApi('workflows', { namespace }),
       {
         params: { query },
         request,
       },
-    );
+    )) || { executions: [], nextPageToken: '' };
 
   return {
     workflows: toWorkflowExecutions({ executions }),
