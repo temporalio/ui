@@ -1,8 +1,7 @@
 import type { Payload } from '$types';
-import {
-  DataConverterWebsocket,
-  dataConverterWebsocket,
-} from '$lib/utilities/data-converter-websocket';
+import { dataConverterWebsocket } from '$lib/utilities/data-converter-websocket';
+import type { DataConverterWebsocketInterface } from '$lib/utilities/data-converter-websocket';
+
 import { convertPayload } from '$lib/services/data-converter';
 
 export function decodePayload(
@@ -29,7 +28,7 @@ export function decodePayload(
 
 export const convertPayloadToJson = async (
   eventAttribute: EventAttribute,
-  websocket?: DataConverterWebsocket,
+  websocket?: DataConverterWebsocketInterface,
 ): Promise<EventAttribute> => {
   // This anyAttribues allows us to use ?. notation to introspect the object which is a safe access pattern.
   // Because of the way we wrote our discrimited union we have to use this any. If we have two objects that

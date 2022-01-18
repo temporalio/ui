@@ -6,7 +6,7 @@ import {
   setLastDataConverterFailure,
 } from '../stores/data-converter-config';
 
-export interface DataConverterWebsocket {
+export interface DataConverterWebsocketInterface {
   hasWebsocket: boolean;
   websocket: WebSocketAsPromised;
   closeSocket: () => Promise<CloseEvent>;
@@ -15,7 +15,7 @@ export interface DataConverterWebsocket {
 export const createWebsocket = (
   port: string | null,
   extraParams?: Options,
-): DataConverterWebsocket => {
+): DataConverterWebsocketInterface => {
   if (!port) {
     return {
       hasWebsocket: false,
