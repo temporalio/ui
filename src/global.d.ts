@@ -1,5 +1,7 @@
 /// <reference types="@sveltejs/kit" />
 
+type OptionalProperty<T> = T | null;
+
 interface Window {
   Prism: {
     highlightAll: () => void;

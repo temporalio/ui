@@ -3,7 +3,7 @@
 
   export let href: string;
   export let label: string;
-  export let amount: number | Long.Long = null;
+  export let amount: OptionalProperty<number | Long.Long> = null;
 
   $: active = $page.path.includes(href);
 </script>
