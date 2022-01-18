@@ -18,7 +18,7 @@
     const { namespaces }: ListNamespacesResponse = (await requestFromAPI(
       routeForApi('namespaces'),
       { request: fetch },
-    )) || { namespaces: [] };
+    )) ?? { namespaces: [] };
 
     await loadUser();
     await loadCluster();

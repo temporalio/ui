@@ -35,7 +35,7 @@ export const fetchAllWorkflows = async (
         params: { query },
         request,
       },
-    )) || { executions: [], nextPageToken: '' };
+    )) ?? { executions: [], nextPageToken: '' };
 
   return {
     workflows: toWorkflowExecutions({ executions }),
