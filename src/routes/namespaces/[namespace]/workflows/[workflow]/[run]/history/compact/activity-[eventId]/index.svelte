@@ -1,7 +1,8 @@
 <script context="module" lang="ts">
   import { routeFor } from '$lib/utilities/route-for';
+  import type { LoadInput } from '@sveltejs/kit';
 
-  export async function load({ page }) {
+  export async function load({ page }: LoadInput) {
     const {
       workflow: workflowId,
       run: runId,

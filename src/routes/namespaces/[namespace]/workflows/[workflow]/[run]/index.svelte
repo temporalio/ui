@@ -1,5 +1,7 @@
 <script context="module" lang="ts">
-  export async function load({ page }) {
+  import type { LoadInput } from '@sveltejs/kit';
+
+  export async function load({ page }: LoadInput) {
     return { status: 302, redirect: `${page.path}/history` };
   }
 </script>
