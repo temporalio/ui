@@ -1,7 +1,4 @@
-import { get } from 'svelte/store';
-
 import type { GetWorkflowExecutionHistoryResponse } from '$types';
-import { dataConverterPort } from '$lib/stores/data-converter-config';
 
 import { paginated } from '$lib/utilities/paginated';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
@@ -16,25 +13,9 @@ type FetchEvents = NamespaceScopedRequest &
   };
 
 export const fetchEvents = async (
-  {
-    namespace,
-    executionId,
-    runId,
-    rawPayloads = false,
-    onStart,
-    onUpdate,
-    onComplete,
-  }: FetchEvents,
+  { namespace, executionId, runId, onStart, onUpdate, onComplete }: FetchEvents,
   request = fetch,
 ): Promise<HistoryEventWithId[]> => {
-  let params = {};
-
-  const port = get(dataConverterPort);
-
-  if (rawPayloads) {
-    params = { params: { rawPayloads: JSON.stringify(!!port) } };
-  }
-
   const events = await paginated(
     async (token: string) => {
       return requestFromAPI<GetWorkflowExecutionHistoryResponse>(
@@ -42,7 +23,6 @@ export const fetchEvents = async (
         {
           token,
           request,
-          ...params,
         },
       );
     },

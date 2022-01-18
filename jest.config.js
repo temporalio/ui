@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 process.env.TZ = 'UTC';
 process.env.VITE_API = 'http://localhost:8080';
 
@@ -6,6 +7,13 @@ export default {
   testEnvironment: 'node',
   testMatch: ['<rootDir>/**/*.test.ts', '<rootDir>/**/*.test.js'],
   testPathIgnorePatterns: ['/node_modules/'],
+  moduleNameMapper: {
+    '^\\$lib/(.*)$': '<rootDir>/src/lib/$1',
+    '^\\$types/(.*)$': '<rootDir>/src/types/$1',
+    '^\\$components/(.*)$': '<rootDir>/src/components/$1',
+    '^\\$app(.*)$': '<rootDir>/.svelte-kit/dev/runtime/app$1',
+  },
+
   coverageDirectory: './coverage',
   coveragePathIgnorePatterns: [
     'node_modules',

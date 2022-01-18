@@ -58,6 +58,8 @@
     "google-protobuf": "^3.17.3",
     "husky": "^7.0.2",
     "jest": "^27.1.0",
+    "jest-websocket-mock": "^2.2.1",
+    "mock-socket": "^9.1.0",
     "postcss": "^8.3.6",
     "postcss-load-config": "^3.1.0",
     "prettier": "~2.3.2",

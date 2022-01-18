@@ -4,7 +4,21 @@
 
 // Use jsdom jest environment for access to window.atob
 
-import { decodePayload } from './decode-payload-lazy';
+import { decodePayload, convertPayloadToJson } from './decode-payload';
+import { createWebsocket } from './data-converter-websocket';
+import {
+  noRemoteDataConverterWorkflowStartedEvent,
+  dataConvertedFailureWorkflowStartedEvent,
+  dataConvertedWorkflowStartedEvent,
+  workflowStartedEvent,
+} from './decode-payload-test-fixtures';
+import WS from 'jest-websocket-mock';
+import {
+  lastDataConverterStatus,
+  resetLastDataConverterSuccess,
+} from '../stores/data-converter-config';
+import { get } from 'svelte/store';
+
 const WebDecodePayload = {
   metadata: {
     encoding: 'YmluYXJ5L2VuY3J5cHRlZA==',
@@ -55,5 +69,76 @@ describe(decodePayload, () => {
 
   it('Should decode a payload with encoding json/protobuf', () => {
     expect(decodePayload(ProtobufEncoded)).toEqual(Base64Decoded);
+  });
+});
+
+describe(convertPayloadToJson, () => {
+  afterEach(() => {
+    resetLastDataConverterSuccess();
+  });
+  it('Should convert a payload through data-converter and set the success status when the websocket is set and the websocket connects', async () => {
+    const ws = new WS('ws://localhost:1337');
+
+    // We need to respond to the websocket messages with the requestID so the
+    // websocket as promised library can resolve the promises correctly without
+    // the requestId it won't properly resolve
+    ws.nextMessage.then((data) => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const dataz = JSON.parse(data as any);
+
+        ws.send(
+          JSON.stringify({
+            requestId: dataz.requestId,
+            content: { Transformer: 'OptimusPrime' },
+          }),
+        );
+      } catch (e) {
+        // ignore errors, test should fail if we don't respond
+      }
+    });
+
+    const websocket = createWebsocket('1337');
+    await ws.connected;
+
+    const convertedPayload = await convertPayloadToJson(
+      JSON.parse(JSON.stringify(workflowStartedEvent)),
+      websocket,
+    );
+    convertPayloadToJson(JSON.parse(JSON.stringify(workflowStartedEvent)), {});
+    expect(convertedPayload).toEqual(dataConvertedWorkflowStartedEvent);
+
+    const dataConverterStatus = get(lastDataConverterStatus);
+    expect(dataConverterStatus).toEqual('success');
+
+    ws.close();
+    WS.clean();
+  });
+
+  it('Should fail converting a payload through data-converter and set the status to error when the websocket is set and the websocket fails connection', async () => {
+    const websocket = createWebsocket('break', {
+      timeout: 1,
+    });
+
+    const convertedPayload = await convertPayloadToJson(
+      JSON.parse(JSON.stringify(workflowStartedEvent)),
+      websocket,
+    );
+
+    expect(convertedPayload).toEqual(dataConvertedFailureWorkflowStartedEvent);
+
+    const dataConverterStatus = get(lastDataConverterStatus);
+    expect(dataConverterStatus).toEqual('error');
+  });
+
+  it('Should skip converting a payload and set the status to notRequested when the websocket and port is not set', async () => {
+    const convertedPayload = await convertPayloadToJson(
+      JSON.parse(JSON.stringify(workflowStartedEvent)),
+    );
+
+    expect(convertedPayload).toEqual(noRemoteDataConverterWorkflowStartedEvent);
+
+    const dataConverterStatus = get(lastDataConverterStatus);
+    expect(dataConverterStatus).toEqual('notRequested');
   });
 });

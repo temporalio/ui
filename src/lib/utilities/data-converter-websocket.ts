@@ -1,42 +1,60 @@
 import { get } from 'svelte/store';
 import WebSocketAsPromised from 'websocket-as-promised';
+import type Options from 'websocket-as-promised/types/options';
 import {
   dataConverterPort,
   setLastDataConverterFailure,
 } from '../stores/data-converter-config';
 
+export interface DataConverterWebsocketInterface {
+  hasWebsocket: boolean;
+  websocket: WebSocketAsPromised;
+  closeSocket: () => Promise<CloseEvent>;
+}
+
+export const createWebsocket = (
+  port: string | null,
+  extraParams?: Options,
+): DataConverterWebsocketInterface => {
+  if (!port) {
+    return {
+      hasWebsocket: false,
+      websocket: null,
+      closeSocket: function () {
+        return null;
+      },
+    };
+  }
+
+  try {
+    sock = new WebSocketAsPromised(`ws://localhost:${port}/`, {
+      packMessage: (data) => JSON.stringify(data),
+      unpackMessage: (data) => JSON.parse(data as string),
+      attachRequestId: (data, requestId) =>
+        Object.assign({ requestId: requestId }, data),
+      extractRequestId: (data) => data && data.requestId,
+
+      ...extraParams,
+    });
+    sock.onError(() => {
+      console.log('oh snap');
+    });
+  } catch (err) {
+    setLastDataConverterFailure();
+  }
+
+  sock.open();
+
+  return {
+    hasWebsocket: true,
+    websocket: sock,
+    closeSocket: function (): Promise<CloseEvent> {
+      return sock.close();
+    },
+  };
+};
+
 let sock = null;
 const port = get(dataConverterPort) ?? null;
 
-try {
-  sock = new WebSocketAsPromised(`ws://localhost:${port}/`, {
-    packMessage: (data) => JSON.stringify(data),
-    unpackMessage: (data) => JSON.parse(data as string),
-    attachRequestId: (data, requestId) =>
-      Object.assign({ requestId: requestId }, data),
-    extractRequestId: (data) => data && data.requestId,
-  });
-} catch (err) {
-  setLastDataConverterFailure();
-}
-
-sock.open();
-
-const configuredWebsocket = {
-  websocket: sock,
-  closeSocket: function (): void {
-    sock.close();
-  },
-};
-
-const unConfiguredWebsocket = {
-  websocket: function () {
-    return null;
-  },
-  closeSocket: function () {
-    return null;
-  },
-};
-
-export const dataConverterWebsocket =
-  port !== null ? configuredWebsocket : unConfiguredWebsocket;
+export const dataConverterWebsocket = createWebsocket(port);
