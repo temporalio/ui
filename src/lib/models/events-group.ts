@@ -38,7 +38,7 @@ type CompactEvent = HistoryEventWithId & {
 const isCompactEvent = (event: HistoryEventWithId): event is CompactEvent => {
   if (
     activityTypes.includes(event.eventType) ||
-    isTimerEvent(event) ||
+    timerTypes.includes(event.eventType) ||
     isSignalEvent(event) ||
     isMarkerEvent(event) ||
     childTypes.includes(event.eventType)
@@ -59,10 +59,10 @@ const isChildWorkflowInitializedEvent = (
   return event.eventType === 'StartChildWorkflowExecutionInitiated';
 };
 
-const isTimerEvent = (
+const isTimerStartedEvent = (
   event: HistoryEventWithId,
 ): event is ScheduledActivityEvent => {
-  return timerTypes.includes(event.eventType);
+  return event.eventType === 'TimerStarted';
 };
 
 const isSignalEvent = (
@@ -89,8 +89,8 @@ export class EventsGroup {
         event?.activityTaskScheduledEventAttributes?.activityType?.name;
     }
 
-    if (isTimerEvent(event)) {
-      this.id = event?.timerStartedEventAttributes?.timerId;
+    if (isTimerStartedEvent(event)) {
+      this.id = event.id;
       this.name = `Timer ${event?.timerStartedEventAttributes?.timerId}`;
     }
 
@@ -181,7 +181,7 @@ export class EventGroups {
   add(event: CompactEvent): void {
     if (
       isActivityScheduledEvent(event) ||
-      isTimerEvent(event) ||
+      isTimerStartedEvent(event) ||
       isSignalEvent(event) ||
       isMarkerEvent(event) ||
       isChildWorkflowInitializedEvent(event)
@@ -231,6 +231,16 @@ export class EventGroups {
       const { initiatedEventId } =
         event.childWorkflowExecutionCompletedEventAttributes;
       this.get(initiatedEventId).set(event.eventType, event);
+    }
+
+    if (event.eventType === 'TimerFired') {
+      const { startedEventId } = event.timerFiredEventAttributes;
+      this.get(startedEventId).set(event.eventType, event);
+    }
+
+    if (event.eventType === 'TimerCanceled') {
+      const { startedEventId } = event.timerCanceledEventAttributes;
+      this.get(startedEventId).set(event.eventType, event);
     }
   }
 

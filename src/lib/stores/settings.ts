@@ -8,9 +8,7 @@ export const settings = writable<Settings>({
   },
 });
 
-const loadSettings = async (): Promise<void> => {
+export const loadSettings = async (): Promise<void> => {
   const settingsRes = await fetchSettings();
   settings.set(settingsRes);
 };
-
-loadSettings();

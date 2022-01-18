@@ -2,14 +2,19 @@
 
 **Nota bene**: This is pre-release software.
 
-## Prequisites
+## Prerequisites
 
-While we're in pre-production, you need to do the following before you spin up the development server:
-
-1. Have Temporal running in development. ([See our documentation](https://docs.temporal.io/docs/server/quick-install) for details.)
-2. Clone, build, and start [the UI API Server](https://github.com/temporalio/ui-server).
+Temporal must be running in development. ([See our documentation](https://docs.temporal.io/docs/server/quick-install) for details.)
 
 ## Trying it out
+
+After pulling down the lastest version of Temporal's `docker-compose`, you can start it up in _experimental mode_.
+
+```sh
+docker-compose -f docker-compose-ui-experimental.yml up -d
+```
+
+## Trying it out: Bleeding edge
 
 Starting the UI API server will give you a somewhat recent version on `localhost:8080`. If you want to use the most recent commit to `main`, you can spin up a bleeding-edge build as described below.
 
