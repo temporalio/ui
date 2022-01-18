@@ -2,7 +2,7 @@
 
 **Nota bene**: This is pre-release software.
 
-## Prequisites
+## Prerequisites
 
 While we're in pre-production, you need to do the following before you spin up the development server:
 
