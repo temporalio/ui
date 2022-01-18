@@ -9,7 +9,7 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
 
   return {
     auth: {
-      enabled: settings.Auth.Enabled,
+      enabled: !!settings?.Auth?.Enabled,
     },
   };
 };

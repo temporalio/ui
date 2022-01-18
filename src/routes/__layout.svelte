@@ -15,10 +15,10 @@
   import '../app.postcss';
 
   export async function load({ fetch }: LoadInput) {
-    const { namespaces }: ListNamespacesResponse = await requestFromAPI(
+    const { namespaces }: ListNamespacesResponse = (await requestFromAPI(
       routeForApi('namespaces'),
       { request: fetch },
-    );
+    )) ?? { namespaces: [] };
 
     await loadUser();
     await loadCluster();
