@@ -6,6 +6,7 @@
 
   import { loadUser } from '$lib/stores/user';
   import { loadCluster } from '$lib/stores/cluster';
+  import { loadSettings } from '$lib/stores/settings';
 
   import type {
     DescribeNamespaceResponse,
@@ -20,8 +21,9 @@
       { request: fetch },
     )) ?? { namespaces: [] };
 
-    await loadUser();
-    await loadCluster();
+    loadUser();
+    loadCluster();
+    loadSettings();
 
     return {
       props: { namespaces },
