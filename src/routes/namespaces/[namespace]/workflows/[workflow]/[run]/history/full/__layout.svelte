@@ -10,7 +10,7 @@
   import Option from '$lib/components/select/option.svelte';
   import EventTable from '$lib/components/event-table.svelte';
 
-  let category: EventTypeCategory = null;
+  let category: EventTypeCategory | '' = '';
 
   let workflow = getContext<Refreshable<WorkflowExecution>>('workflow');
   let events = getContext<EventualHistoryEvents>('events');
@@ -22,7 +22,7 @@
   <EventTable {events}>
     <div slot="filters">
       <FilterSelect parameter="event-type" bind:value={category}>
-        <Option value={null}>All</Option>
+        <Option value="">All</Option>
         <Option value="activity">Activity</Option>
         <Option value="command">Command</Option>
         <Option value="signal">Signal</Option>

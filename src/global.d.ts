@@ -1,6 +1,6 @@
 /// <reference types="@sveltejs/kit" />
 
-type OptionalProperty<T> = T | null;
+type OptionalProperty<T> = T | null | undefined;
 
 interface Window {
   Prism: {
