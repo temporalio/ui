@@ -97,7 +97,7 @@ export async function getQuery(
   request = fetch,
 ): Promise<ParsedQuery> {
   return fetchQuery(options, request).then((execution) => {
-    const { queryResult } = execution;
+    const { queryResult } = execution ?? { queryResult: { payloads: [] } };
     const data = window.atob(queryResult.payloads[0].data);
 
     return JSON.parse(data);
