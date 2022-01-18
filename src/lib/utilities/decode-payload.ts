@@ -1,8 +1,9 @@
 import type { Payload } from '$types';
-import { dataConverterWebsocket } from '$lib/utilities/data-converter-websocket';
+import {
+  DataConverterWebsocket,
+  dataConverterWebsocket,
+} from '$lib/utilities/data-converter-websocket';
 import { convertPayload } from '$lib/services/data-converter';
-import { dataConverterPort } from '$lib/stores/data-converter-config';
-import { get } from 'svelte/store';
 
 export function decodePayload(
   payload: Payload,
@@ -28,45 +29,43 @@ export function decodePayload(
 
 export const convertPayloadToJson = async (
   eventAttribute: EventAttribute,
+  websocket?: DataConverterWebsocket,
 ): Promise<EventAttribute> => {
-  if (!eventAttribute) return eventAttribute;
-
   // This anyAttribues allows us to use ?. notation to introspect the object which is a safe access pattern.
   // Because of the way we wrote our discrimited union we have to use this any. If we have two objects that
   // don't have the same property TS won't let us access that object without verifying the type string like
   // attributes.type === "ATypeWithInput/Result"
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const anyAttributes = eventAttribute as any;
-
   const potentialPayload = (anyAttributes?.input?.payloads ??
     anyAttributes?.result?.payloads ??
     null) as Payload[] | null;
 
-  // Decode payload data
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let JSONPayload: string | Payload | Record<any, any>;
+  if (potentialPayload) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let JSONPayload: string | Payload | Record<any, any>;
 
-  const port = get(dataConverterPort);
+    const webSocket = websocket ?? dataConverterWebsocket;
 
-  if (port) {
-    // Convert Payload data
-    const webSocket = dataConverterWebsocket.websocket;
+    if (websocket?.hasWebsocket) {
+      // Convert Payload data
+      const awaitData = await Promise.all(
+        (potentialPayload ?? []).map(
+          async (payload) => await convertPayload(payload, webSocket.websocket),
+        ),
+      );
 
-    const awaitData = await Promise.all(
-      (potentialPayload ?? []).map(
-        async (payload) => await convertPayload(payload, webSocket),
-      ),
-    );
-    JSONPayload = awaitData;
-  } else {
-    JSONPayload = potentialPayload.map(decodePayload);
-  }
+      JSONPayload = awaitData;
+    } else {
+      JSONPayload = potentialPayload.map(decodePayload);
+    }
 
-  if (anyAttributes?.input?.payloads) {
-    anyAttributes.input.payloads = JSONPayload;
-  }
-  if (anyAttributes?.result?.payloads) {
-    anyAttributes.result.payloads = JSONPayload;
+    if (anyAttributes?.input?.payloads) {
+      anyAttributes.input.payloads = JSONPayload;
+    }
+    if (anyAttributes?.result?.payloads) {
+      anyAttributes.result.payloads = JSONPayload;
+    }
   }
 
   // Decode Search Attributes

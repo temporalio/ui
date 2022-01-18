@@ -14,3 +14,7 @@ export function setLastDataConverterFailure(): void {
 export function setLastDataConverterSuccess(): void {
   lastDataConverterStatus.set('success');
 }
+
+export function resetLastDataConverterSuccess(): void {
+  lastDataConverterStatus.set('notRequested');
+}
