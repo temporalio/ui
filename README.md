@@ -11,6 +11,14 @@ While we're in pre-production, you need to do the following before you spin up t
 
 ## Trying it out
 
+After pulling down the lastest version of Temporal's `docker-compose`, you can start it up in _experimental mode_.
+
+```sh
+docker-compose -f docker-compose-ui-experimental.yml up -d
+```
+
+## Trying it out: Bleeding edge
+
 Starting the UI API server will give you a somewhat recent version on `localhost:8080`. If you want to use the most recent commit to `main`, you can spin up a bleeding-edge build as described below.
 
 Once you have the prerequisites going, run the following:
