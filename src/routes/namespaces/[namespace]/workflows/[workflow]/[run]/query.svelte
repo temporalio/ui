@@ -8,7 +8,7 @@
 
     const queryTypes = await getQueryTypes({ namespace, workflow });
 
-    const queryTypeParameter = page.query.get('query-type');
+    const queryTypeParameter = page.query.get('query-type') || '';
     const queryType = queryTypes.includes(queryTypeParameter)
       ? queryTypeParameter
       : queryTypes[0];
