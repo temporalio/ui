@@ -33,7 +33,8 @@ export type TaskQueueRouteParameters = Pick<
   'namespace' | 'queue'
 >;
 
-const base = import.meta.env?.VITE_API || process.env.VITE_API;
+let base = (import.meta.env?.VITE_API as string) ?? process.env.VITE_API;
+if (base.endsWith('/')) base = base.slice(0, -1);
 
 const encode = (component: string): string => {
   return component
