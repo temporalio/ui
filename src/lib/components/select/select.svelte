@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let id: string = null;
+  export let id: OptionalProperty<string> = undefined;
   export let value: string | boolean;
   export let dark: boolean = false;
   export let arrow: boolean = false;

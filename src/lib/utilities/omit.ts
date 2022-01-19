@@ -1,23 +1,12 @@
-type Omit = {
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  <Source extends object, KeysToOmit extends string[]>(
-    obj: Source,
-    ...keys: KeysToOmit
-  ): {
-    [RemainingKey in Exclude<
-      keyof Source,
-      KeysToOmit[number]
-    >]: Source[RemainingKey];
-  };
+const getKeys = <T>(object: T): Iterable<keyof T> => {
+  return Object.keys(object) as unknown as Iterable<keyof T>;
 };
 
-export const omit: Omit = (object, ...keys) => {
-  const result = {} as {
-    [K in keyof typeof object]: typeof object[K];
-  };
+export const omit = <T>(object: T, ...keys: (keyof T)[]) => {
+  const result = {} as Record<keyof T, T[keyof T]>;
 
-  for (const key of Object.keys(object)) {
-    if (!keys.includes(key)) {
+  for (const key of getKeys(object)) {
+    if (!keys.includes(key) && typeof key === 'string') {
       result[key] = object[key];
     }
   }

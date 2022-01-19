@@ -7,14 +7,17 @@
   const findEvent = async (
     data: EventualHistoryEvents,
     id: string,
-  ): Promise<HistoryEventWithId> => {
+  ): Promise<HistoryEventWithId | undefined> => {
     return data.then((events) => events.find((event) => event.id === id));
   };
 
   let events = getContext<EventualHistoryEvents>('events');
+
   $: event = findEvent(events, $page.params.id);
 </script>
 
-{#await event then { attributes }}
-  <EventDetails {attributes} />
+{#await event then event}
+  {#if event}
+    <EventDetails attributes={event?.attributes} />
+  {/if}
 {/await}

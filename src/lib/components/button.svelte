@@ -10,8 +10,8 @@
   export let as: string = 'button';
   export let active: boolean = false;
   export let large: boolean = false;
-  export let href: string = null;
-  export let icon: IconDefinition = null;
+  export let href: string = '';
+  export let icon: OptionalProperty<IconDefinition> = null;
 </script>
 
 {#if as === 'button'}
@@ -42,7 +42,13 @@
     class:destroy
     {disabled}
     >{#if loading}
-      <span class="animate-spin"> <Icon {icon} scale={1} /></span>
+      <span class="animate-spin">
+        {#if icon}
+          <span class:animate-spin={loading} class="pr-2">
+            <Icon icon={loading ? faSpinner : icon} scale={1} />
+          </span>
+        {/if}
+      </span>
     {:else}
       <slot />
     {/if}</a

@@ -1,4 +1,8 @@
-import type { ListWorkflowExecutionsResponse } from '$types';
+import type {
+  DescribeWorkflowExecutionResponse,
+  ListWorkflowExecutionsResponse,
+} from '$types';
+
 import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
 import { requestFromAPI } from '$lib/utilities/request-from-api';
@@ -47,7 +51,8 @@ export async function fetchWorkflow(
   parameters: GetWorkflowExecutionRequest,
   request = fetch,
 ): Promise<WorkflowExecution> {
-  return requestFromAPI(routeForApi('workflow', parameters), { request }).then(
-    toWorkflowExecution,
-  );
+  return requestFromAPI<DescribeWorkflowExecutionResponse>(
+    routeForApi('workflow', parameters),
+    { request },
+  ).then(toWorkflowExecution);
 }

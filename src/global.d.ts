@@ -57,10 +57,10 @@ type WorkflowExecutionFilters = {
 type TimeFormat = 'UTC' | 'relative' | 'local';
 
 type FilterParameters = {
-  workflowId?: string;
-  workflowType?: string;
-  executionStatus?: WorkflowStatus;
-  timeRange?: Duration | string;
+  workflowId?: string | null;
+  workflowType?: string | null;
+  executionStatus?: WorkflowStatus | null;
+  timeRange?: Duration | string | null;
 };
 
 type Settings = {

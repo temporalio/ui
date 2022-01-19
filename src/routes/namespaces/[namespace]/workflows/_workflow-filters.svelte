@@ -12,7 +12,7 @@
   let workflowTypeFilter = '';
 
   const statuses = {
-    All: null,
+    All: '',
     Running: 'Running',
     'Timed Out': 'TimedOut',
     Completed: 'Completed',
@@ -39,7 +39,7 @@
       <Option {value}>{value}</Option>
     {/each}
   </FilterSelect>
-  <FilterSelect label="Workflow Status" parameter="status" value={null}>
+  <FilterSelect label="Workflow Status" parameter="status" value={''}>
     {#each Object.entries(statuses) as [label, value]}
       <Option {value}>{label}</Option>
     {/each}

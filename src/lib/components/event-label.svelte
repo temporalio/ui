@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { EventClassification } from '$lib/utilities/get-event-classification';
 
-  export let color: EventClassification | PendingActivity['state'] = null;
+  export let color: EventClassification | PendingActivity['state'] | '' = '';
 </script>
 
 <span class="label {color} font-semibold">

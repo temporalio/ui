@@ -10,7 +10,7 @@
   export let group = getContext<boolean>('group');
   export let scale = 1;
   export let href: string;
-  export let onclick: () => void = undefined;
+  export let onclick: () => void = () => {};
 </script>
 
 <a

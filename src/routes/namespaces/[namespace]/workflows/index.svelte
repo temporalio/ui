@@ -16,6 +16,7 @@
       timeRange,
       executionStatus,
     };
+
     const initialData = await fetchAllWorkflows(namespace, parameters, fetch);
 
     return {
