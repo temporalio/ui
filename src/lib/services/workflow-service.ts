@@ -51,3 +51,13 @@ export async function fetchWorkflow(
     toWorkflowExecution,
   );
 }
+
+// Finish archive fetch.
+export async function fetchArchive(
+  parameters: GetWorkflowExecutionRequest,
+  request = fetch,
+): Promise<WorkflowExecution> {
+  return requestFromAPI(routeForApi('archive', parameters), { request }).then(
+    toWorkflowExecution,
+  );
+}
