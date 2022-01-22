@@ -4,6 +4,21 @@
   export async function load({ page, fetch }: LoadInput) {
     if (!page.query.has('time-range')) page.query.set('time-range', '24 hours');
 
+    const validPages = ['workflows', 'archival'];
+
+    let workflowFetch = fetchAllWorkflows;
+
+    if (page.params.workflows === 'archival') {
+      workflowFetch = fetchAllArchivedWorkflows;
+    }
+
+    if (!validPages.includes(page.params.workflows)) {
+      return {
+        status: 404,
+        error: new Error(`${page.params.workflows} Not a valid page`),
+      };
+    }
+
     const namespace = page.params.namespace;
     const workflowId = page.query.get('workflow-id');
     const workflowType = page.query.get('workflow-type');
@@ -16,7 +31,8 @@
       timeRange,
       executionStatus,
     };
-    const initialData = await fetchAllWorkflows(namespace, parameters, fetch);
+
+    const initialData = await workflowFetch(namespace, parameters, fetch);
 
     return {
       props: { initialData, namespace, parameters },
@@ -27,9 +43,18 @@
 <script lang="ts">
   import VirtualList from '@sveltejs/svelte-virtual-list';
 
-  import { fetchAllWorkflows } from '$lib/services/workflow-service';
+  import {
+    fetchAllWorkflows,
+    fetchAllArchivedWorkflows,
+  } from '$lib/services/workflow-service';
   import { refreshable } from '$lib/stores/refreshable';
+  import { page } from '$app/stores';
 
+  let workflowFetch = fetchAllWorkflows;
+
+  if ($page.params.workflows === 'archival') {
+    workflowFetch = fetchAllArchivedWorkflows;
+  }
   import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
   import WorkflowFilters from './_workflow-filters.svelte';
@@ -43,7 +68,7 @@
   let timeFormat: TimeFormat = 'UTC';
 
   $: data = refreshable(
-    () => fetchAllWorkflows(namespace, parameters),
+    () => workflowFetch(namespace, parameters),
     initialData,
   );
 </script>

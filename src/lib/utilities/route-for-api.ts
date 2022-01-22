@@ -83,7 +83,7 @@ export function routeForApi(
     'workflows.closed': `/namespaces/${parameters?.namespace}/workflows/closed`,
     workflow: `/namespaces/${parameters?.namespace}/workflows/${parameters?.executionId}/executions/${parameters?.runId}`,
     'workflow.terminate': `/namespaces/${parameters?.namespace}/workflows/${parameters?.executionId}/executions/${parameters?.runId}/terminate`,
-    archive: `namespaces/${parameters?.namespace}/archival/basic`,
+    archive: `/namespaces/${parameters?.namespace}/workflows/archived`,
     events: `/namespaces/${parameters?.namespace}/workflows/${parameters?.executionId}/executions/${parameters?.runId}/events`,
     query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.executionId}/executions/${parameters?.runId}/query`,
   };
