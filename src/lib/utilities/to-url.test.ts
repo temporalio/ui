@@ -9,4 +9,9 @@ describe(toURL, () => {
     const params = new URLSearchParams({ a: 'hello' });
     expect(toURL('/workflows', params)).toBe('/workflows?a=hello');
   });
+
+  it('should turn an object into a query string', () => {
+    const params = { a: 'hello' };
+    expect(toURL('/workflows', params)).toBe('/workflows?a=hello');
+  });
 });

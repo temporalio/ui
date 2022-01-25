@@ -32,7 +32,7 @@ export const durations = [
 
 const durationPattern = new RegExp(`(\\d+)\\s(${durationKeys.join('|')})`);
 
-const isDurationKey = (key: unknown): key is DurationKey => {
+export const isDurationKey = (key: unknown): key is DurationKey => {
   if (typeof key !== 'string') return false;
 
   for (const durationKey of durationKeys) {
@@ -71,8 +71,11 @@ export const toDuration = (value: string): Duration => {
 };
 
 export const toString = (duration: Duration): string => {
-  const units = Object.keys(duration)[0];
+  let units = Object.keys(duration)[0];
   const amount: number = duration[units];
+
+  if (amount === 1) units = units.slice(0, units.length - 1);
+
   return `${amount} ${units}`;
 };
 

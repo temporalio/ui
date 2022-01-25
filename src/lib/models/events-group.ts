@@ -2,6 +2,17 @@ type ScheduledActivityEvent = HistoryEventWithId & {
   eventType: 'ActivityTaskScheduled';
 };
 
+type CompactEventType =
+  | ActivityType
+  | TimerType
+  | SignalType
+  | MarkerType
+  | ChildType;
+
+type CompactEvent = HistoryEventWithId & {
+  eventType: CompactEventType;
+};
+
 const activityTypes = [
   'ActivityTaskCanceled',
   'ActivityTaskCancelRequested',
@@ -13,9 +24,7 @@ const activityTypes = [
 ];
 
 const timerTypes = ['TimerStarted', 'TimerCanceled', 'TimerFired'];
-
 const signalTypes = ['WorkflowExecutionSignaled'];
-
 const markerTypes = ['MarkerRecorded'];
 
 const childTypes = [
@@ -23,17 +32,6 @@ const childTypes = [
   'ChildWorkflowExecutionStarted',
   'ChildWorkflowExecutionCompleted',
 ];
-
-type CompactEventType =
-  | ActivityType
-  | TimerType
-  | SignalType
-  | MarkerType
-  | ChildType;
-
-type CompactEvent = HistoryEventWithId & {
-  eventType: CompactEventType;
-};
 
 const isCompactEvent = (event: HistoryEventWithId): event is CompactEvent => {
   if (
