@@ -27,4 +27,4 @@
   export let runId: string;
 </script>
 
-<ToggleButton icon={faDownload} onclick={exportHistory} href="#" />
+<ToggleButton icon={faDownload} on:click={exportHistory} />

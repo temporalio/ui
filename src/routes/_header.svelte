@@ -25,7 +25,7 @@
       Workflows
     </NavigationLink>
   </div>
-  <div class="flex justify-end gap-4 col-span-5 col-end-8 items-center">
+  <div class="flex justify-end gap-4 col-span-5 col-end-13 items-center">
     <div class="text-right">
       <DataConverterStatus />
     </div>
