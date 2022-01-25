@@ -1,0 +1,249 @@
+{
+  "executions": [
+    {
+      "execution": {
+        "workflowId": "5cc877_ContinuedAsNew",
+        "runId": "e7c7a4ed-0702-41a3-b02c-036092d66d68"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2022-01-25T19:05:42.087272900Z",
+      "closeTime": "2022-01-25T19:05:42.175438300Z",
+      "status": "Completed",
+      "historyLength": "11",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-01-25T19:05:42.087272900Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "7"
+    },
+    {
+      "execution": {
+        "workflowId": "5cc877_TimedOut",
+        "runId": "df43c7bd-2e0b-4b8f-b7ec-6e1b1df93830"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2022-01-25T19:05:42.075873200Z",
+      "closeTime": "2022-01-25T19:05:43.071320400Z",
+      "status": "TimedOut",
+      "historyLength": "6",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-01-25T19:05:42.075873200Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {
+          "BinaryChecksums": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "WyI4NzQ3ZjJkMzgxMWIyNDBiM2VjZWM0NTM4ZmRjZGNmNCJd"
+          }
+        }
+      },
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "5"
+    },
+    {
+      "execution": {
+        "workflowId": "5cc877_ContinuedAsNew",
+        "runId": "8a0c3c1c-b8f2-4a79-b9e3-13395d9aca69"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2022-01-25T19:05:42.059526200Z",
+      "closeTime": "2022-01-25T19:05:42.087272900Z",
+      "status": "ContinuedAsNew",
+      "historyLength": "5",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-01-25T19:05:42.059526200Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {
+          "BinaryChecksums": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "WyI4NzQ3ZjJkMzgxMWIyNDBiM2VjZWM0NTM4ZmRjZGNmNCJd"
+          }
+        }
+      },
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "3"
+    },
+    {
+      "execution": {
+        "workflowId": "5cc877_Terminated",
+        "runId": "39aa40c1-691d-4104-ab34-c678db203fe2"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2022-01-25T19:05:42.034827400Z",
+      "closeTime": "2022-01-25T19:05:42.047770900Z",
+      "status": "Terminated",
+      "historyLength": "3",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-01-25T19:05:42.034827400Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": null,
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "2"
+    },
+    {
+      "execution": {
+        "workflowId": "5cc877_Canceled",
+        "runId": "4bef35ed-ec89-4d6b-9712-2c7ed28c1033"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2022-01-25T19:05:42.012001Z",
+      "closeTime": "2022-01-25T19:05:42.076370300Z",
+      "status": "Canceled",
+      "historyLength": "8",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-01-25T19:05:42.012001Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {
+          "BinaryChecksums": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "WyI4NzQ3ZjJkMzgxMWIyNDBiM2VjZWM0NTM4ZmRjZGNmNCJd"
+          }
+        }
+      },
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "4"
+    },
+    {
+      "execution": {
+        "workflowId": "5cc877_Failed",
+        "runId": "644b6296-d5e9-4ac1-8a44-1714ee2f7519"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2022-01-25T19:05:42.002066300Z",
+      "closeTime": "2022-01-25T19:05:42.164449Z",
+      "status": "Failed",
+      "historyLength": "11",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-01-25T19:05:42.002066300Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {
+          "BinaryChecksums": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "WyI4NzQ3ZjJkMzgxMWIyNDBiM2VjZWM0NTM4ZmRjZGNmNCJd"
+          }
+        }
+      },
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "7"
+    },
+    {
+      "execution": {
+        "workflowId": "5cc877_Completed",
+        "runId": "8280aa73-9f40-4fce-bcf7-0d4944cf973d"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2022-01-25T19:05:41.992307100Z",
+      "closeTime": "2022-01-25T19:05:42.121018600Z",
+      "status": "Completed",
+      "historyLength": "11",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-01-25T19:05:41.992307100Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {
+          "BinaryChecksums": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "WyI4NzQ3ZjJkMzgxMWIyNDBiM2VjZWM0NTM4ZmRjZGNmNCJd"
+          }
+        }
+      },
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "7"
+    },
+    {
+      "execution": {
+        "workflowId": "5cc877_Running",
+        "runId": "9e63f93b-a488-4394-ba76-74f47e97d5e3"
+      },
+      "type": {
+        "name": "RainbowStatusesWorkflow"
+      },
+      "startTime": "2022-01-25T19:05:41.982105700Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-01-25T19:05:41.982105700Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {
+          "BinaryChecksums": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "WyI4NzQ3ZjJkMzgxMWIyNDBiM2VjZWM0NTM4ZmRjZGNmNCJd"
+          }
+        }
+      },
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "0"
+    }
+  ],
+  "nextPageToken": null
+}

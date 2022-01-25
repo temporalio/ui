@@ -1,8 +1,7 @@
 /// <reference types="cypress" />
 
 const waitOnAPIs = () => {
-  cy.wait('@open-api');
-  cy.wait('@closed-api');
+  cy.wait('@list-workflows');
 };
 
 describe('Workflow Executions List', () => {
@@ -15,15 +14,9 @@ describe('Workflow Executions List', () => {
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        '/api/v1/namespaces/default/workflows/open?*',
-      { fixture: 'open-workflows.json' },
-    ).as('open-api');
-
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
-        '/api/v1/namespaces/default/workflows/closed?*',
-      { fixture: 'closed-workflows.json' },
-    ).as('closed-api');
+        '/api/v1/namespaces/default/workflows?query=*',
+      { fixture: 'workflows.json' },
+    ).as('list-workflows');
   });
 
   it('should call the namespaces when starting up', () => {
