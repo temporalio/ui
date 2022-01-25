@@ -9,8 +9,7 @@
   export let icon: IconDefinition;
   export let group = getContext<boolean>('group');
   export let scale = 1;
-  export let href: string;
-  export let onclick: () => void = undefined;
+  export let href = '#';
 </script>
 
 <a
@@ -19,7 +18,7 @@
   class:active={$page.path.includes(href)}
   class:group
   href={appendQueryParameters(href, $page.query)}
-  on:click={onclick}
+  on:click
 >
   <Icon {icon} {scale} />
 </a>
