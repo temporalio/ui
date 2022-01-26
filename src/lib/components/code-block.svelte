@@ -12,7 +12,7 @@
 
   const copy = () =>
     navigator.clipboard
-      .writeText(formatJSON(JSON.stringify(content)))
+      .writeText(isJSON ? formatJSON(JSON.stringify(content)) : content)
       .then(() => {
         copied = !copied;
         setTimeout(() => (copied = false), 2000);

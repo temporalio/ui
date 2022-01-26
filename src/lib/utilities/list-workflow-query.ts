@@ -12,7 +12,8 @@ type FilterKey =
   | 'workflowId'
   | 'workflowType'
   | 'timeRange'
-  | 'executionStatus';
+  | 'executionStatus'
+  | 'closeTime';
 
 type FilterValue = string | Duration;
 
@@ -21,6 +22,7 @@ const queryKeys: Readonly<Record<string, QueryKey>> = {
   workflowType: 'WorkflowType',
   timeRange: 'StartTime',
   executionStatus: 'ExecutionStatus',
+  closeTime: 'CloseTime',
 } as const;
 
 const filterKeys: Readonly<FilterKey[]> = [
@@ -28,6 +30,7 @@ const filterKeys: Readonly<FilterKey[]> = [
   'workflowType',
   'timeRange',
   'executionStatus',
+  'closeTime',
 ] as const;
 
 const isValid = (value: unknown): boolean => {
@@ -58,7 +61,9 @@ const toQueryStatement = (key: FilterKey, value: FilterValue): string => {
   return `${queryKey}="${value}"`;
 };
 
-const toQueryStatements = (parameters: FilterParameters): string[] => {
+const toQueryStatements = (
+  parameters: FilterParameters | ArchiveFilterParameters,
+): string[] => {
   return Object.entries(parameters)
     .map(([key, value]) => {
       if (isFilterKey(key) && isValid(value))
@@ -67,6 +72,8 @@ const toQueryStatements = (parameters: FilterParameters): string[] => {
     .filter(Boolean);
 };
 
-export const toListWorkflowQuery = (parameters: FilterParameters): string => {
+export const toListWorkflowQuery = (
+  parameters: FilterParameters | ArchiveFilterParameters,
+): string => {
   return toQueryStatements(parameters).join(' and ');
 };

@@ -23,6 +23,9 @@
     <NavigationLink href={`/namespaces/${$namespace}/workflows`}>
       Workflows
     </NavigationLink>
+    <NavigationLink href={`/namespaces/${$namespace}/archival`}>
+      Archival
+    </NavigationLink>
   </div>
   <div class="flex justify-end gap-4 col-span-5 col-end-13 items-center">
     <div class="text-right">
