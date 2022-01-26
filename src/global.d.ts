@@ -63,7 +63,6 @@ type FilterParameters = {
 
 type ArchiveFilterParameters = {
   workflowId?: string;
-  // runId?: string;
   workflowType?: string;
   closeTime?: Duration | string;
   executionStatus?: WorkflowStatus;
