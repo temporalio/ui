@@ -16,7 +16,7 @@ export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   runId: string;
 };
 
-type CombinedWorkflowExecutionsResponse = {
+export type CombinedWorkflowExecutionsResponse = {
   workflows: WorkflowExecution[];
   nextPageToken: string;
 };
@@ -31,6 +31,28 @@ export const fetchAllWorkflows = async (
   const { executions, nextPageToken } =
     (await requestFromAPI<ListWorkflowExecutionsResponse>(
       routeForApi('workflows', { namespace }),
+      {
+        params: { query },
+        request,
+      },
+    )) ?? { executions: [], nextPageToken: '' };
+
+  return {
+    workflows: toWorkflowExecutions({ executions }),
+    nextPageToken: String(nextPageToken),
+  };
+};
+
+export const fetchAllArchivedWorkflows = async (
+  namespace: string,
+  parameters: ArchiveFilterParameters,
+  request = fetch,
+): Promise<CombinedWorkflowExecutionsResponse> => {
+  const query = toListWorkflowQuery(parameters);
+
+  const { executions, nextPageToken } =
+    (await requestFromAPI<ListWorkflowExecutionsResponse>(
+      routeForApi('archive', { namespace }),
       {
         params: { query },
         request,

@@ -61,6 +61,13 @@ type FilterParameters = {
   timeRange?: Duration | string;
 };
 
+type ArchiveFilterParameters = {
+  workflowId?: string;
+  workflowType?: string;
+  closeTime?: Duration | string;
+  executionStatus?: WorkflowStatus;
+};
+
 type Settings = {
   auth: {
     enabled: boolean;

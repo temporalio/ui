@@ -2,19 +2,25 @@ type WorkflowsAPIRoutePath =
   | 'workflows'
   | 'workflows.open'
   | 'workflows.closed';
+
+type WorkflowsAPIArchivalRoutePath = 'archive';
+
 type WorkflowAPIRoutePath =
   | 'workflow'
   | 'workflow.terminate'
   | 'events'
   | 'query';
+
 type TaskQueueAPIRoutePath = 'task-queue';
 type ParameterlessAPIRoutePath = 'cluster' | 'settings' | 'user' | 'namespaces';
+type APIArchivalParameters = Pick<APIRouteParameters, 'namespace'>;
 
 type APIRoutePath =
   | WorkflowsAPIRoutePath
   | WorkflowAPIRoutePath
   | ParameterlessAPIRoutePath
-  | TaskQueueAPIRoutePath;
+  | TaskQueueAPIRoutePath
+  | WorkflowsAPIArchivalRoutePath;
 
 type APIRouteParameters = {
   namespace: string;
@@ -60,6 +66,11 @@ export function routeForApi(
   route: TaskQueueAPIRoutePath,
   parameters: TaskQueueRouteParameters,
 ): string;
+export function routeForApi(
+  route: WorkflowsAPIArchivalRoutePath,
+  parameters: APIArchivalParameters,
+);
+
 export function routeForApi(route: ParameterlessAPIRoutePath): string;
 export function routeForApi(
   route: APIRoutePath,
@@ -76,6 +87,7 @@ export function routeForApi(
     'workflows.closed': `/namespaces/${parameters?.namespace}/workflows/closed`,
     workflow: `/namespaces/${parameters?.namespace}/workflows/${parameters?.executionId}/executions/${parameters?.runId}`,
     'workflow.terminate': `/namespaces/${parameters?.namespace}/workflows/${parameters?.executionId}/executions/${parameters?.runId}/terminate`,
+    archive: `/namespaces/${parameters?.namespace}/workflows/archived`,
     events: `/namespaces/${parameters?.namespace}/workflows/${parameters?.executionId}/executions/${parameters?.runId}/events`,
     query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.executionId}/executions/${parameters?.runId}/query`,
   };
