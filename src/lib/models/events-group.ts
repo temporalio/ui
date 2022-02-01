@@ -89,7 +89,7 @@ export class EventsGroup {
 
     if (isTimerStartedEvent(event)) {
       this.id = event.id;
-      this.name = `Timer ${event?.timerStartedEventAttributes?.timerId}`;
+      this.name = `Timer ${event?.timerStartedEventAttributes?.startToFireTimeout}`;
     }
 
     if (isSignalEvent(event)) {
