@@ -20,22 +20,19 @@
 </script>
 
 <script lang="ts">
-  import { getContext } from 'svelte';
   import { faRedo } from '@fortawesome/free-solid-svg-icons';
-
-  import type { WorkflowExecution } from '$lib/models/workflow-execution';
-  import type { Refreshable } from '$lib/stores/refreshable';
 
   import { getWorkflowStackTrace } from '$lib/services/query-service';
 
   import CodeBlock from '$lib/components/code-block.svelte';
   import Button from '$lib/components/button.svelte';
   import EmptyState from '$lib/components/empty-state.svelte';
+  import { getAppContext } from '$lib/utilities/get-context';
 
   export let namespace: string;
   export let stackTrace: string;
 
-  let workflow = getContext<Refreshable<WorkflowExecution>>('workflow');
+  let workflow = getAppContext('workflow');
   let currentdate = new Date();
   let isLoading = false;
 

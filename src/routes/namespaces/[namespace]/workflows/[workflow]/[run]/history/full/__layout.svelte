@@ -1,19 +1,15 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
-
-  import type { Refreshable } from '$lib/stores/refreshable';
-  import type { WorkflowExecution } from '$lib/models/workflow-execution';
-
   import { getVisibleEvents } from '$lib/utilities/get-visible-events';
 
   import FilterSelect from '$lib/components/select/filter-select.svelte';
   import Option from '$lib/components/select/option.svelte';
   import EventTable from '$lib/components/event-table.svelte';
+  import { getAppContext } from '$lib/utilities/get-context';
 
   let category: EventTypeCategory = null;
 
-  let workflow = getContext<Refreshable<WorkflowExecution>>('workflow');
-  let events = getContext<EventualHistoryEvents>('events');
+  let workflow = getAppContext('workflow');
+  let events = getAppContext('events');
 
   $: eventsAndActivities = getVisibleEvents(events, $workflow, category);
 </script>
