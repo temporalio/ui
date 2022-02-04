@@ -13,19 +13,16 @@
 </script>
 
 <script lang="ts">
-  import { getContext } from 'svelte';
   import { refreshable } from '$lib/stores/refreshable';
-
-  import type { Refreshable } from '$lib/stores/refreshable';
-  import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
   import WorkersTable from '$lib/components/workers-table.svelte';
   import WorkersRow from '$lib/components/workers-row.svelte';
   import EmptyState from '$lib/components/empty-state.svelte';
+  import { getAppContext } from '$lib/utilities/get-context';
 
   export let namespace: string;
 
-  let workflow = getContext<Refreshable<WorkflowExecution>>('workflow');
+  let workflow = getAppContext('workflow');
 
   $: pollers = refreshable(async () => {
     let { taskQueue } = await $workflow;

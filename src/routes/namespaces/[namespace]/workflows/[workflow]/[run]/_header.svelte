@@ -1,18 +1,15 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
   import Icon from 'svelte-fa';
   import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
-
-  import type { WorkflowExecution } from '$lib/models/workflow-execution';
-  import type { Refreshable } from '$lib/stores/refreshable';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
   import Tabs from './_tabs.svelte';
+  import { getAppContext } from '$lib/utilities/get-context';
 
   export let namespace: string;
 
-  let workflow = getContext<Refreshable<WorkflowExecution>>('workflow');
+  let workflow = getAppContext('workflow');
 </script>
 
 {#await $workflow then workflow}

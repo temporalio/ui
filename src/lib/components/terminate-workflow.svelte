@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
-
   import { terminateWorkflow } from '$lib/services/terminate-service';
   import { notifications } from '$lib/stores/notifications';
   import { handleError } from '$lib/utilities/handle-error';
@@ -8,13 +6,13 @@
   import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
   import Button from '$lib/components/button.svelte';
-  import type { Refreshable } from '$lib/stores/refreshable';
+  import { getAppContext } from '$lib/utilities/get-context';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
 
   let reason = '';
-  const { refresh } = getContext<Refreshable<WorkflowExecution>>('workflow');
+  const { refresh } = getAppContext('workflow');
 
   const isEligibleForTermination = (workflow: WorkflowExecution) =>
     String(workflow.status) === 'Running';

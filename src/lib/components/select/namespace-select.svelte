@@ -2,12 +2,11 @@
   import { namespace as currentNamespace } from '$lib/stores/namespace';
   import Select from './select.svelte';
   import Option from './option.svelte';
-  import { getContext } from 'svelte';
   import { goto } from '$app/navigation';
 
-  import type { DescribeNamespaceResponse } from '$types';
+  import { getAppContext } from '$lib/utilities/get-context';
 
-  $: namespaces = getContext<DescribeNamespaceResponse[]>('namespaces').map(
+  $: namespaces = getAppContext('namespaces').map(
     (namespace) => namespace.namespaceInfo.name,
   );
 

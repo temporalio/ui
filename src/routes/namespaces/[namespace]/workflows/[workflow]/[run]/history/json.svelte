@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
+  import { getAppContext } from '$lib/utilities/get-context';
 
-  let events = getContext<EventualHistoryEvents>('events');
+  let events = getAppContext('events');
 </script>
 
 {#await events then content}

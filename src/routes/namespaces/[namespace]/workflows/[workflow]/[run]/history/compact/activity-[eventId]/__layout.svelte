@@ -24,13 +24,12 @@
 </script>
 
 <script lang="ts">
-  import { getContext } from 'svelte';
-
   import { EventGroups, EventsGroup } from '$lib/models/events-group';
   import { routeFor } from '$lib/utilities/route-for';
   import { page } from '$app/stores';
+  import { getAppContext } from '$lib/utilities/get-context';
 
-  let events = getContext<EventualHistoryEvents>('events');
+  let events = getAppContext('events');
   export let params: EventParameter;
 
   const getEventsGroup = async (

@@ -1,13 +1,13 @@
 <script lang="ts">
   import Icon from 'svelte-fa';
-  import { getContext } from 'svelte';
   import { page } from '$app/stores';
 
   import type { IconDefinition } from '@fortawesome/free-solid-svg-icons';
   import { appendQueryParameters } from '$lib/utilities/append-query-parameters';
+  import { getAppContext } from '$lib/utilities/get-context';
 
   export let icon: IconDefinition;
-  export let group = getContext<boolean>('group');
+  export let group = getAppContext('group');
   export let scale = 1;
   export let href = '#';
 </script>

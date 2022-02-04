@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
   import { page } from '$app/stores';
 
   import EventDetails from '$lib/components/event-details.svelte';
+  import { getAppContext } from '$lib/utilities/get-context';
 
   const findEvent = async (
     data: EventualHistoryEvents,
@@ -11,7 +11,7 @@
     return data.then((events) => events.find((event) => event.id === id));
   };
 
-  let events = getContext<EventualHistoryEvents>('events');
+  let events = getAppContext('events');
   $: event = findEvent(events, $page.params.id);
 </script>
 

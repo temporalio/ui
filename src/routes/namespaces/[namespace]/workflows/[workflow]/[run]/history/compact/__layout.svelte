@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
   import { EventGroups } from '$lib/models/events-group';
   import EventTable from '$lib/components/event-table.svelte';
+  import { getAppContext } from '$lib/utilities/get-context';
 
-  export let events = getContext<EventualHistoryEvents>('events');
+  export let events = getAppContext('events');
 </script>
 
 {#await EventGroups.fromPromise(events) then activities}
