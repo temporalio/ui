@@ -60,8 +60,6 @@ export const convertPayloadToJson = async (
       JSONPayload = potentialPayload.map(decodePayload);
     }
 
-    console.log('payload', JSONPayload)
-
     if (anyAttributes?.input?.payloads) {
       anyAttributes.input.payloads = JSONPayload;
     }
