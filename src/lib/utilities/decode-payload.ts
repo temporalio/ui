@@ -1,8 +1,9 @@
 import type { Payload } from '$types';
 import { dataConverterWebsocket } from '$lib/utilities/data-converter-websocket';
-import type { DataConverterWebsocketInterface } from '$lib/utilities/data-converter-websocket';
+import { dataConverterIframe } from '$lib/utilities/data-converter-iframe';
 
 import { convertPayload } from '$lib/services/data-converter';
+import type { RemoteDataConverterInterface } from './remote-data-converter';
 
 export function decodePayload(
   payload: Payload,
@@ -28,7 +29,7 @@ export function decodePayload(
 
 export const convertPayloadToJson = async (
   eventAttribute: EventAttribute,
-  websocket?: DataConverterWebsocketInterface,
+  converter?: RemoteDataConverterInterface,
 ): Promise<EventAttribute> => {
   // This anyAttribues allows us to use ?. notation to introspect the object which is a safe access pattern.
   // Because of the way we wrote our discrimited union we have to use this any. If we have two objects that
@@ -44,20 +45,22 @@ export const convertPayloadToJson = async (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let JSONPayload: string | Payload | Record<any, any>;
 
-    const webSocket = websocket ?? dataConverterWebsocket;
+    const remoteConverter = converter ?? dataConverterIframe;
 
-    if (websocket?.hasWebsocket) {
+    if (remoteConverter?.configured) {
       // Convert Payload data
       const awaitData = await Promise.all(
         (potentialPayload ?? []).map(
-          async (payload) => await convertPayload(payload, webSocket.websocket),
+          async (payload) => await convertPayload(payload, remoteConverter),
         ),
       );
 
-      JSONPayload = awaitData;
+      JSONPayload = awaitData.map(decodePayload);
     } else {
       JSONPayload = potentialPayload.map(decodePayload);
     }
+
+    console.log('payload', JSONPayload)
 
     if (anyAttributes?.input?.payloads) {
       anyAttributes.input.payloads = JSONPayload;

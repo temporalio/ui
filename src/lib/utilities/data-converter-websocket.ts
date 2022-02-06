@@ -5,24 +5,23 @@ import {
   dataConverterPort,
   setLastDataConverterFailure,
 } from '../stores/data-converter-config';
+import type { RemoteDataConverterInterface } from './remote-data-converter';
 
-export interface DataConverterWebsocketInterface {
-  hasWebsocket: boolean;
-  websocket: WebSocketAsPromised;
-  closeSocket: () => Promise<CloseEvent>;
+interface WebSocketResponse {
+  content: string;
+  requestId: string;
 }
 
 export const createWebsocket = (
   port: string | null,
   extraParams?: Options,
-): DataConverterWebsocketInterface => {
+): RemoteDataConverterInterface => {
   if (!port) {
     return {
-      hasWebsocket: false,
-      websocket: null,
-      closeSocket: function () {
-        return null;
-      },
+      configured: false,
+      isOpened: () => false,
+      open: () => { return null },
+      sendRequest: () => { return null },
     };
   }
 
@@ -39,6 +38,7 @@ export const createWebsocket = (
     sock.onError(() => {
       console.log('oh snap');
     });
+
   } catch (err) {
     setLastDataConverterFailure();
   }
@@ -46,11 +46,12 @@ export const createWebsocket = (
   sock.open();
 
   return {
-    hasWebsocket: true,
-    websocket: sock,
-    closeSocket: function (): Promise<CloseEvent> {
-      return sock.close();
-    },
+    configured: true,
+    isOpened: () => sock.isOpened,
+    open: sock.open,
+    sendRequest: (data: any) => {
+      return sock.sendRequest(JSON.stringify(data)).then((r: WebSocketResponse) => r.content)
+    }
   };
 };
 

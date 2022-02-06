@@ -3,48 +3,36 @@ import {
   setLastDataConverterSuccess,
 } from '$lib/stores/data-converter-config';
 import type { Payload } from '$types';
-import type WebSocketAsPromised from 'websocket-as-promised';
-
-interface WebSocketResponse {
-  content: string;
-  requestId: string;
-}
+import type { RemoteDataConverterInterface } from '../utilities/remote-data-converter';
 
 export async function convertPayload(
   payload: Payload,
-  websocket: WebSocketAsPromised,
+  dataConverter: RemoteDataConverterInterface,
 ): Promise<string | Payload> {
-  if (!websocket.isOpened) {
+  if (!dataConverter.isOpened()) {
     try {
-      await websocket.open();
+      await dataConverter.open();
     } catch (_e) {
       setLastDataConverterFailure();
     }
   }
 
-  if (!websocket.isOpened) {
+  if (!dataConverter.isOpened()) {
     return Promise.resolve(payload);
   }
 
-  const socketResponse: Promise<string> = websocket
+  const converterResponse: Promise<string> = dataConverter
     .sendRequest({
-      payload: JSON.stringify(payload),
+      payload: payload,
     })
-    .then((response: WebSocketResponse) => {
+    .then((response) => {
       setLastDataConverterSuccess();
 
-      try {
-        const decodedResponse = JSON.parse(response.content);
-        return decodedResponse;
-      } catch {
-        // This doesn't seem to be a failure the worker _could_ send back a text response
-        // instead of JSON
-        return response.content;
-      }
+      return response;
     })
     .catch(() => {
       setLastDataConverterFailure();
     });
 
-  return socketResponse;
+  return converterResponse;
 }
