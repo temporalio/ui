@@ -20,8 +20,12 @@ export const createWebsocket = (
     return {
       configured: false,
       isOpened: () => false,
-      open: () => { return null },
-      sendRequest: () => { return null },
+      open: () => {
+        return null;
+      },
+      sendRequest: () => {
+        return null;
+      },
     };
   }
 
@@ -38,7 +42,6 @@ export const createWebsocket = (
     sock.onError(() => {
       console.log('oh snap');
     });
-
   } catch (err) {
     setLastDataConverterFailure();
   }
@@ -50,8 +53,10 @@ export const createWebsocket = (
     isOpened: () => sock.isOpened,
     open: sock.open,
     sendRequest: (data: any) => {
-      return sock.sendRequest(JSON.stringify(data)).then((r: WebSocketResponse) => r.content)
-    }
+      return sock
+        .sendRequest(JSON.stringify(data))
+        .then((r: WebSocketResponse) => r.content);
+    },
   };
 };
 
