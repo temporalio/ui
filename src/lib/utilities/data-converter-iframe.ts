@@ -33,15 +33,14 @@ export const createIframe = (
         return
     }
 
-    switch(event.data["type"]) {
+    switch(event.data.type) {
       case "data_encoder_ready":
         target = event.source
         break;
       case "encoded":
       case "decoded":
-        let id = event.data["requestId"]
-        requests[id](event.data["payload"])
-        delete(requests[id])
+        requests[event.data.requestId](event.data.payload)
+        delete(requests[event.data.requestId])
         break;
     }
   })
@@ -49,16 +48,20 @@ export const createIframe = (
   let requestId = 0
   let requests = {}
 
+  const nextRequestId = (): number => {
+    return requestId += 1
+  }
+
   return {
     configured: true,
     isOpened: () => !!target,
     open: () => open,
     sendRequest: async (data: any) => {
-      let id = requestId++
+      let id = nextRequestId()
       return new Promise((resolve) => {
         requests[id] = resolve
         target.postMessage(
-          { requestId: id, type: "decode", payload: data["payload"] },
+          { requestId: id, type: "decode", payload: data.payload },
           { targetOrigin: endpoint }
         )
       })
