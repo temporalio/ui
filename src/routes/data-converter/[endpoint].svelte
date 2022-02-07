@@ -10,7 +10,7 @@
   import { dataConverterEndpoint } from '$lib/stores/data-converter-config';
   onMount(() => {
     let { endpoint } = $page.params;
-    dataConverterEndpoint.set(window.atob(endpoint).trim());
+    dataConverterEndpoint.set(decodeURIComponent(endpoint));
     goto('/', { replaceState: true });
     notifications.add('success', 'Successfully set decoder');
   });

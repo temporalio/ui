@@ -25,6 +25,8 @@ export const createIframe = (
 
   const open: Promise<boolean> = new Promise((resolve) => {
     iframe.src = endpoint + '/js';
+    // Note: the load event will always fire, it does not indicate success.
+    // There is no way to detect cross-origin iframe load errors :(
     iframe.addEventListener('load', () => resolve(true));
   });
 
