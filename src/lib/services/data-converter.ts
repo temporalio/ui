@@ -8,7 +8,7 @@ import type { RemoteDataConverterInterface } from '../utilities/remote-data-conv
 export async function convertPayload(
   payload: Payload,
   dataConverter: RemoteDataConverterInterface,
-): Promise<string | Payload> {
+): Promise<Payload> {
   if (!dataConverter.isOpened()) {
     try {
       await dataConverter.open();
@@ -21,8 +21,8 @@ export async function convertPayload(
     return Promise.resolve(payload);
   }
 
-  const converterResponse: Promise<string> = dataConverter
-    .sendRequest(payload)
+  const converterResponse: Promise<Payload> = dataConverter
+    .decode(payload)
     .then((response) => {
       setLastDataConverterSuccess();
 
@@ -30,6 +30,8 @@ export async function convertPayload(
     })
     .catch(() => {
       setLastDataConverterFailure();
+
+      return payload;
     });
 
   return converterResponse;

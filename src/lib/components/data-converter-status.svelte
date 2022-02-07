@@ -7,14 +7,14 @@
   } from '@fortawesome/free-solid-svg-icons';
 
   import {
-    dataConverterPort,
+    dataConverterEndpoint,
     lastDataConverterStatus,
   } from '$lib/stores/data-converter-config';
 
   import Tooltip from '$lib/components/tooltip.svelte';
 </script>
 
-{#if $dataConverterPort}
+{#if $dataConverterEndpoint}
   {#if $lastDataConverterStatus === 'notRequested'}
     <Tooltip text={'Data converter is configured'}>
       <div class="flex">

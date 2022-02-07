@@ -1,5 +1,4 @@
 import type { Payload } from '$types';
-import { dataConverterWebsocket } from '$lib/utilities/data-converter-websocket';
 import { dataConverterIframe } from '$lib/utilities/data-converter-iframe';
 
 import { convertPayload } from '$lib/services/data-converter';
@@ -29,7 +28,6 @@ export function decodePayload(
 
 export const convertPayloadToJson = async (
   eventAttribute: EventAttribute,
-  converter?: RemoteDataConverterInterface,
 ): Promise<EventAttribute> => {
   // This anyAttribues allows us to use ?. notation to introspect the object which is a safe access pattern.
   // Because of the way we wrote our discrimited union we have to use this any. If we have two objects that
@@ -45,8 +43,11 @@ export const convertPayloadToJson = async (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let JSONPayload: string | Payload | Record<any, any>;
 
-    const remoteConverter =
-      converter ?? dataConverterIframe ?? dataConverterWebsocket;
+    let remoteConverter: RemoteDataConverterInterface = undefined;
+
+    if (dataConverterIframe.configured) {
+      remoteConverter = dataConverterIframe;
+    }
 
     if (remoteConverter?.configured) {
       // Convert Payload data

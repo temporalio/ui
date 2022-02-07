@@ -13,8 +13,8 @@ export const createIframe = (
       open: () => {
         return null;
       },
-      sendRequest: () => {
-        return null;
+      decode: (payload: Payload): Promise<Payload> => {
+        return Promise.resolve(payload);
       },
     };
   }
@@ -58,7 +58,7 @@ export const createIframe = (
     configured: true,
     isOpened: () => !!target,
     open: () => open,
-    sendRequest: async (payload: Payload) => {
+    decode: async (payload: Payload): Promise<Payload> => {
       const id = nextRequestId();
       return new Promise((resolve) => {
         requests[id] = resolve;
