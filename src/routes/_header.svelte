@@ -33,7 +33,7 @@
     </div>
     <a
       class="header-button"
-      href="https://github.com/temporalio/web/issues/new/choose"
+      href="https://github.com/temporalio/ui/issues/new/choose"
     >
       Report Bug/Give Feedback
     </a>
