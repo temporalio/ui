@@ -22,9 +22,7 @@ export async function convertPayload(
   }
 
   const converterResponse: Promise<string> = dataConverter
-    .sendRequest({
-      payload: payload,
-    })
+    .sendRequest(payload)
     .then((response) => {
       setLastDataConverterSuccess();
 

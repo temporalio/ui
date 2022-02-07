@@ -6,6 +6,7 @@ import {
   setLastDataConverterFailure,
 } from '../stores/data-converter-config';
 import type { RemoteDataConverterInterface } from './remote-data-converter';
+import type { Payload } from '$types';
 
 interface WebSocketResponse {
   content: string;
@@ -52,9 +53,9 @@ export const createWebsocket = (
     configured: true,
     isOpened: () => sock.isOpened,
     open: sock.open,
-    sendRequest: (data: any) => {
+    sendRequest: (payload: Payload) => {
       return sock
-        .sendRequest(JSON.stringify(data))
+        .sendRequest(JSON.stringify({ payload: payload }))
         .then((r: WebSocketResponse) => r.content);
     },
   };

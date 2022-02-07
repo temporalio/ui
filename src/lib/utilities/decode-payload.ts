@@ -45,7 +45,8 @@ export const convertPayloadToJson = async (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let JSONPayload: string | Payload | Record<any, any>;
 
-    const remoteConverter = converter ?? dataConverterIframe;
+    const remoteConverter =
+      converter ?? dataConverterIframe ?? dataConverterWebsocket;
 
     if (remoteConverter?.configured) {
       // Convert Payload data
