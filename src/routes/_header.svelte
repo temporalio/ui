@@ -4,7 +4,7 @@
 
 <script lang="ts">
   import { namespace } from '$lib/stores/namespace';
-  import DataConverterStatus from '$lib/components/data-converter-status.svelte';
+  import DataConverterStatus from '$lib/components/data-encoder-status.svelte';
   import { settings } from '$lib/stores/settings';
   import { user } from '$lib/stores/user';
   import NavigationLink from './_navigation-link.svelte';

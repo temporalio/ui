@@ -1,8 +1,7 @@
 import type { Payload } from '$types';
-import { dataConverterIframe } from '$lib/utilities/data-converter-iframe';
-
-import { convertPayload } from '$lib/services/data-converter';
-import type { RemoteDataConverterInterface } from './remote-data-converter';
+import { convertPayload } from '$lib/services/data-encoder';
+import { get } from 'svelte/store';
+import { dataEncoderEndpoint } from '$lib/stores/data-encoder-config';
 
 export function decodePayload(
   payload: Payload,
@@ -43,17 +42,12 @@ export const convertPayloadToJson = async (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let JSONPayload: string | Payload | Record<any, any>;
 
-    let remoteConverter: RemoteDataConverterInterface = undefined;
-
-    if (dataConverterIframe.configured) {
-      remoteConverter = dataConverterIframe;
-    }
-
-    if (remoteConverter?.configured) {
+    let remoteEncoderEndpoint = get(dataEncoderEndpoint);
+    if (remoteEncoderEndpoint) {
       // Convert Payload data
       const awaitData = await Promise.all(
         (potentialPayload ?? []).map(
-          async (payload) => await convertPayload(payload, remoteConverter),
+          async (payload) => await convertPayload(payload, remoteEncoderEndpoint),
         ),
       );
 

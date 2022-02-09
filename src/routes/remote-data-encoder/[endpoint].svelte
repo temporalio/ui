@@ -7,10 +7,10 @@
   import { page } from '$app/stores';
   import { notifications } from '$lib/stores/notifications';
   import { onMount } from 'svelte';
-  import { dataConverterEndpoint } from '$lib/stores/data-converter-config';
+  import { dataEncoderEndpoint } from '$lib/stores/data-encoder-config';
   onMount(() => {
     let { endpoint } = $page.params;
-    dataConverterEndpoint.set(decodeURIComponent(endpoint));
+    dataEncoderEndpoint.set(decodeURIComponent(endpoint));
     goto('/', { replaceState: true });
     notifications.add('success', 'Successfully set decoder');
   });
