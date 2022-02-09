@@ -42,7 +42,7 @@ export const convertPayloadToJson = async (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let JSONPayload: string | Payload | Record<any, any>;
 
-    let remoteEncoderEndpoint = get(dataEncoderEndpoint);
+    const remoteEncoderEndpoint = get(dataEncoderEndpoint);
     if (remoteEncoderEndpoint) {
       // Convert Payload data
       const awaitData = await Promise.all(
