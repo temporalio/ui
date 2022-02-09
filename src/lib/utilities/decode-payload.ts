@@ -47,7 +47,8 @@ export const convertPayloadToJson = async (
       // Convert Payload data
       const awaitData = await Promise.all(
         (potentialPayload ?? []).map(
-          async (payload) => await convertPayload(payload, remoteEncoderEndpoint),
+          async (payload) =>
+            await convertPayload(payload, remoteEncoderEndpoint),
         ),
       );
 

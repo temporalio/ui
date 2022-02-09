@@ -8,7 +8,10 @@ export async function convertPayload(
   payload: Payload,
   endpoint: string,
 ): Promise<Payload> {
-  const encoderResponse: Promise<Payload> = fetch(endpoint + '/decode', { method: 'POST', body: JSON.stringify(payload) })
+  const encoderResponse: Promise<Payload> = fetch(endpoint + '/decode', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
     .then((r) => r.json())
     .then((response) => {
       setLastDataEncoderSuccess();
