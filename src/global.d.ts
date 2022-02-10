@@ -79,3 +79,5 @@ type User = {
   name: string;
   picture: string;
 };
+
+declare module '@crownframework/svelte-error-boundary';

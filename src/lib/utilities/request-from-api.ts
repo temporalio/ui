@@ -30,6 +30,12 @@ export const isTemporalAPIError = (obj: unknown): obj is TemporalAPIError =>
   (obj as TemporalAPIError).message !== undefined &&
   typeof (obj as TemporalAPIError).message === 'string';
 
+export interface NetworkError {
+  statusCode: number;
+  statusText: string;
+  response: Response;
+}
+
 /**
  *  A utility method for making requests to the Temporal API.
  *
@@ -77,7 +83,11 @@ export const requestFromAPI = async <T>(
       if (onError && isFunction(onError)) {
         onError({ status, statusText, body });
       } else {
-        throw new Error(`${status}: ${statusText}`);
+        throw {
+          statusCode: response.status,
+          statusText: response.statusText,
+          response,
+        } as NetworkError;
       }
     }
 
