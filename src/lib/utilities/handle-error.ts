@@ -1,17 +1,6 @@
-import { networkError } from '$lib/stores/error-store';
+import { networkError } from '$lib/stores/error';
 import { notifications } from '../stores/notifications';
-import type { NetworkError } from './request-from-api';
-
-export function isNetworkError(
-  error: unknown | NetworkError,
-): error is NetworkError {
-  const networkErr = error as NetworkError;
-  return (
-    networkErr?.statusCode !== undefined &&
-    networkErr?.statusText !== undefined &&
-    networkErr?.response !== undefined
-  );
-}
+import { isNetworkError } from './is-network-error';
 
 // This will eventually be expanded on.
 export const handleError = (error: unknown): void => {

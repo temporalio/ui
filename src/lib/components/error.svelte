@@ -1,6 +1,4 @@
 <script lang="ts">
-  import type { NetworkError } from '$lib/utilities/request-from-api';
-
   export let error: NetworkError & { stack?: string; status: number } = null;
 
   let ENV =
@@ -17,15 +15,16 @@
     status = error.statusCode;
   }
   $: currentLocation = window.location.toString();
-  console.log({ ThisIsTheWay: error });
 </script>
 
 <section aria-roledescription="error" class="text-center align-middle mt-32">
   <h1 class="text-[12rem] font-semibold ">{status}</h1>
   <p class="-mt-6 mb-5 text-lg">Uh oh. There's an error.</p>
   <p class="text-lg">
-    <a href={currentLocation} class="underline-offset-2 underline"
-      >Try a refresh</a
+    <a
+      href={currentLocation}
+      target="_self"
+      class="underline-offset-2 underline">Try a refresh</a
     >
     or
     <a href="https://temporal.io/slack" class="underline-offset-2 underline"

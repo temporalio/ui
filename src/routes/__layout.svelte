@@ -63,11 +63,7 @@
   <Header />
   <section id="content" class="h-full mx-10 mb-10 mt-8">
     <div class="flex flex-col h-full gap-4">
-      <ErrorBoundary
-        onError={() => {
-          // console.log('OnError!', args);
-        }}
-      >
+      <ErrorBoundary onError={() => {}}>
         <slot />
       </ErrorBoundary>
     </div>

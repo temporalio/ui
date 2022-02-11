@@ -45,6 +45,12 @@ type PaginationCallbacks<T> = {
   onError?: (error: unknown) => void;
 };
 
+interface NetworkError {
+  statusCode: number;
+  statusText: string;
+  response: Response;
+}
+
 type WorkflowType = string | null;
 
 type WorkflowExecutionFilters = {

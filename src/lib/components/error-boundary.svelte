@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { isNetworkError } from '$lib/utilities/handle-error';
-  import { networkError } from '$lib/stores/error-store';
+  import { networkError } from '$lib/stores/error';
+  import { isNetworkError } from '$lib/utilities/is-network-error';
   import Error from './error.svelte';
 
   export let error = null;
@@ -8,8 +8,6 @@
 
   let theError;
 
-  // We know something broke and was un-recoverable so lets default to 500 and let the throwing code
-  // tell us what kind of stuff was broken
   let status = 500;
 
   $: {
