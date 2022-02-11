@@ -8,6 +8,7 @@
   import { settings } from '$lib/stores/settings';
   import { user } from '$lib/stores/user';
   import NavigationLink from './_navigation-link.svelte';
+  import Badge from '$lib/components/badge.svelte';
 </script>
 
 <header
@@ -22,6 +23,7 @@
   <div class="flex gap-4 col-span-4">
     <NavigationLink href={`/namespaces/${$namespace}/workflows`}>
       Workflows
+      <Badge type="beta">β</Badge>
     </NavigationLink>
     <NavigationLink href={`/namespaces/${$namespace}/archival`}>
       Archival
