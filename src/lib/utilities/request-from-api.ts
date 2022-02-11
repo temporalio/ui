@@ -77,7 +77,11 @@ export const requestFromAPI = async <T>(
       if (onError && isFunction(onError)) {
         onError({ status, statusText, body });
       } else {
-        throw new Error(`${status}: ${statusText}`);
+        throw {
+          statusCode: response.status,
+          statusText: response.statusText,
+          response,
+        } as NetworkError;
       }
     }
 

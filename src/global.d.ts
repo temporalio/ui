@@ -45,6 +45,12 @@ type PaginationCallbacks<T> = {
   onError?: (error: unknown) => void;
 };
 
+interface NetworkError {
+  statusCode: number;
+  statusText: string;
+  response: Response;
+}
+
 type WorkflowType = string | null;
 
 type WorkflowExecutionFilters = {
@@ -79,3 +85,5 @@ type User = {
   name: string;
   picture: string;
 };
+
+declare module '@crownframework/svelte-error-boundary';
