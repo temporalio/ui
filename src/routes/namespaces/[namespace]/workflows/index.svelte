@@ -62,7 +62,7 @@
 <WorkflowFilters bind:timeFormat />
 {#await $data}
   <WorkflowsLoadingState />
-{:then { workflows, error }}
+{:then { workflows }}
   {#if workflows.length}
     <WorkflowsSummaryTable>
       <VirtualList items={workflows} let:item>
