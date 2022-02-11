@@ -8,8 +8,6 @@
 
   let theError;
 
-  let status = 500;
-
   $: {
     if (error && $error) {
       theError = error;
@@ -20,10 +18,6 @@
 
     if (onError && theError) {
       onError(theError);
-    }
-
-    if (isNetworkError($theError)) {
-      status = $theError.statusCode;
     }
   }
 </script>

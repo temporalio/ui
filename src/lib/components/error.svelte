@@ -5,9 +5,8 @@
     typeof process !== 'undefined' && process.env && process.env.NODE_ENV;
   let DEV = ENV !== 'production';
 
-  // We know something broke and was un-recoverable so lets default to 500 and let the throwing code
-  // tell us what kind of stuff was broken
   let status = 500;
+
   if (error?.status) {
     status = error.status;
   }
