@@ -2,24 +2,29 @@
   import type { LoadInput } from '@sveltejs/kit';
 
   export async function load({ page, fetch }: LoadInput) {
-    if (!page.query.has('time-range')) page.query.set('time-range', '24 hours');
+    const isAdvancedSearch = page.query.has('query');
+
+    if (!page.query.has('time-range') && !isAdvancedSearch)
+      page.query.set('time-range', '24 hours');
 
     const namespace = page.params.namespace;
     const workflowId = page.query.get('workflow-id');
     const workflowType = page.query.get('workflow-type');
     const timeRange = page.query.get('time-range');
     const executionStatus = page.query.get('status') as WorkflowStatus;
+    const query = page.query.get('query');
 
     const parameters: FilterParameters = {
       workflowId,
       workflowType,
       timeRange,
       executionStatus,
+      query,
     };
     const initialData = await fetchAllWorkflows(namespace, parameters, fetch);
 
     return {
-      props: { initialData, namespace, parameters },
+      props: { initialData, namespace, parameters, isAdvancedSearch },
     };
   }
 </script>
@@ -39,8 +44,13 @@
   export let namespace: string;
   export let initialData: ReturnType<typeof fetchAllWorkflows>;
   export let parameters: FilterParameters;
+  export let isAdvancedSearch: boolean;
 
   let timeFormat: TimeFormat = 'UTC';
+
+  const errorMessage = isAdvancedSearch
+    ? 'Please check your syntax and try again.'
+    : 'If you have filters applied, try adjusting them.';
 
   $: data = refreshable(
     () => fetchAllWorkflows(namespace, parameters),
@@ -52,7 +62,7 @@
 <WorkflowFilters bind:timeFormat />
 {#await $data}
   <WorkflowsLoadingState />
-{:then { workflows }}
+{:then { workflows, error }}
   {#if workflows.length}
     <WorkflowsSummaryTable>
       <VirtualList items={workflows} let:item>
@@ -60,9 +70,6 @@
       </VirtualList>
     </WorkflowsSummaryTable>
   {:else}
-    <EmptyState
-      title={'No Workflows Found'}
-      content={'If you have filters applied, try adjusting them.'}
-    />
+    <EmptyState title={'No Workflows Found'} content={errorMessage} />
   {/if}
 {/await}

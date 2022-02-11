@@ -59,13 +59,11 @@ type FilterParameters = {
   workflowType?: string;
   executionStatus?: WorkflowStatus;
   timeRange?: Duration | string;
+  query?: string;
 };
 
-type ArchiveFilterParameters = {
-  workflowId?: string;
-  workflowType?: string;
-  closeTime?: Duration | string;
-  executionStatus?: WorkflowStatus;
+type ArchiveFilterParameters = Omit<FilterParameters, 'timeRange'> & {
+  closeTime: Duration | string;
 };
 
 type Settings = {

@@ -1,5 +1,6 @@
 import type { ListWorkflowExecutionsResponse } from '$types';
 import type { WorkflowExecution } from '$lib/models/workflow-execution';
+import type { ErrorCallback } from '$lib/utilities/request-from-api';
 
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 
@@ -19,6 +20,7 @@ export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
 export type CombinedWorkflowExecutionsResponse = {
   workflows: WorkflowExecution[];
   nextPageToken: string;
+  error?: string;
 };
 
 export const fetchAllWorkflows = async (
@@ -26,13 +28,23 @@ export const fetchAllWorkflows = async (
   parameters: FilterParameters,
   request = fetch,
 ): Promise<CombinedWorkflowExecutionsResponse> => {
-  const query = toListWorkflowQuery(parameters);
+  const query = parameters.query || toListWorkflowQuery(parameters);
+
+  let onError: ErrorCallback;
+  let error: string;
+
+  if (parameters.query) {
+    onError = (response) => {
+      error = response.body.message;
+    };
+  }
 
   const { executions, nextPageToken } =
     (await requestFromAPI<ListWorkflowExecutionsResponse>(
       routeForApi('workflows', { namespace }),
       {
         params: { query },
+        onError,
         request,
       },
     )) ?? { executions: [], nextPageToken: '' };
@@ -40,6 +52,7 @@ export const fetchAllWorkflows = async (
   return {
     workflows: toWorkflowExecutions({ executions }),
     nextPageToken: String(nextPageToken),
+    error,
   };
 };
 
@@ -48,13 +61,23 @@ export const fetchAllArchivedWorkflows = async (
   parameters: ArchiveFilterParameters,
   request = fetch,
 ): Promise<CombinedWorkflowExecutionsResponse> => {
-  const query = toListWorkflowQuery(parameters);
+  const query = parameters.query || toListWorkflowQuery(parameters);
+
+  let onError: ErrorCallback;
+  let error: string;
+
+  if (parameters.query) {
+    onError = (response) => {
+      error = response.body.message;
+    };
+  }
 
   const { executions, nextPageToken } =
     (await requestFromAPI<ListWorkflowExecutionsResponse>(
       routeForApi('archive', { namespace }),
       {
         params: { query },
+        onError,
         request,
       },
     )) ?? { executions: [], nextPageToken: '' };
@@ -62,6 +85,7 @@ export const fetchAllArchivedWorkflows = async (
   return {
     workflows: toWorkflowExecutions({ executions }),
     nextPageToken: String(nextPageToken),
+    error,
   };
 };
 
