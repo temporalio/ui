@@ -18,15 +18,14 @@
 </script>
 
 <div
-onclick={(e: MouseEvent)=>{}}
-  class={`${Badges[type]}
-        border-solid 
-        border-2 
-        rounded-md text-center 
+  class={`${Badges[type]}        
+        rounded-sm
+        text-center 
         inline-block
         px-1
         ml-1
-        text-md
+        text-sm
+        align-middle	
         `}
 >
   <slot />
