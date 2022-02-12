@@ -125,3 +125,9 @@ export type TaskQueueStatus = temporal.api.taskqueue.v1.ITaskQueueStatus;
 // google
 
 export type Timestamp = google.protobuf.ITimestamp;
+
+// extra APIs
+export type SettingsResponse = {
+  Auth: { Enabled: boolean };
+  DefaultNamespace: string;
+};

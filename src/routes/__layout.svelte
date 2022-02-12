@@ -23,7 +23,7 @@
 
     loadUser();
     loadCluster();
-    loadSettings();
+    await loadSettings();
 
     return {
       props: { namespaces },

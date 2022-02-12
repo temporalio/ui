@@ -1,8 +1,9 @@
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
+import type { SettingsResponse } from '$types';
 
 export const fetchSettings = async (request = fetch): Promise<Settings> => {
-  const settings: { Auth: { Enabled: boolean } } = await requestFromAPI(
+  const settings: SettingsResponse = await requestFromAPI(
     routeForApi('settings'),
     { request },
   );
@@ -11,5 +12,6 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     auth: {
       enabled: !!settings?.Auth?.Enabled,
     },
+    defaultNamespace: settings?.DefaultNamespace || 'default',
   };
 };

@@ -6,6 +6,7 @@ export const settings = writable<Settings>({
   auth: {
     enabled: false,
   },
+  defaultNamespace: '',
 });
 
 export const loadSettings = async (): Promise<void> => {
