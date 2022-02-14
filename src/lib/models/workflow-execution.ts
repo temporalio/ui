@@ -26,7 +26,7 @@ type WorkflowExecutionAPIResponse = Optional<
 >;
 
 export const toWorkflowExecution = (
-  response: WorkflowExecutionAPIResponse,
+  response?: WorkflowExecutionAPIResponse,
 ): WorkflowExecution => {
   const name = response.workflowExecutionInfo.type.name;
   const id = response.workflowExecutionInfo.execution.workflowId;
