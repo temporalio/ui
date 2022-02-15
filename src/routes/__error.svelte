@@ -13,9 +13,9 @@
   import Error from '$lib/components/error.svelte';
   import { isNetworkError } from '$lib/utilities/is-network-error';
 
-  export let error;
-  export let status;
-  let requestFromAPIError;
+  export let error: any;
+  export let status: number | null;
+  let requestFromAPIError: any;
 
   try {
     requestFromAPIError = JSON.parse(error.message);

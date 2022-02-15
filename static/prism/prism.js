@@ -15,6 +15,6 @@ Prism.languages.temporalql = {
 		alias: "class-name",
 	},
 	keyword: /\b(?:and|between|in|or|order by)\b/,
-	operator: /[<>]=?|[!=]=?=?|--?|\+\+?|&&?|\|\|?|[?*/~^%]/,
+	operator: /([\!=]|<|>|<=|>=|=)(?=[\s|\w|\"|\'])/,
 
 };

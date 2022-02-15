@@ -3,31 +3,22 @@
 
   let Prism = window.Prism;
   export let placeholder: string | undefined = '';
-  export let value = `WorkflowId = '<workflow-id>'
-WorkflowId = '<workflow-id>' or WorkflowId = '<another-workflow-id>'
-WorkflowId = '<workflow-id>' order by StartTime desc
-WorkflowId = '<workflow-id>' and ExecutionStatus = 'Running'
-WorkflowId = '<workflow-id>' or ExecutionStatus = 'Running'
-WorkflowId = '<workflow-id>' and StartTime > '2021-08-22T15:04:05+00:00'
-ExecutionTime between '2021-08-22T15:04:05+00:00' and '2021-08-28T15:04:05+00:00'
-ExecutionTime < '2021-08-28T15:04:05+00:00' or ExecutionTime > '2021-08-22T15:04:05+00:00'
-order by ExecutionTime
-order by StartTime desc, CloseTime asc
-order by CustomIntField asc
-`;
+  export let value: string = ``;
   export let onChange: (value: string) => void | null = null;
 
-  let highlightContainer;
-  let highlighter;
-  let textInput;
+  let highlightContainer: HTMLPreElement;
+  let highlighter: HTMLElement;
+  let textInput: HTMLTextAreaElement;
+  let container: HTMLDivElement;
 
-  function keepElementsTheSameSize(element) {
+  function keepElementsTheSameSize(element: HTMLElement) {
     let resizeObs = new ResizeObserver(function (entries) {
       let { offsetWidth, offsetHeight } = entries[0]
         .target as HTMLTextAreaElement;
 
       highlightContainer.style.height = `${offsetHeight}px`;
       highlightContainer.style.width = `${offsetWidth}px`;
+      container.style.height = `${offsetHeight}px`;
     });
 
     resizeObs.observe(element);
@@ -43,7 +34,7 @@ order by CustomIntField asc
     update(value);
   });
 
-  function update(text) {
+  function update(text: string) {
     // Handle final newlines (see article)
     if (text[text.length - 1] == '\n') {
       text += ' ';
@@ -65,7 +56,7 @@ order by CustomIntField asc
     highlightContainer.scrollLeft = textInput.scrollLeft;
   }
 
-  function check_tab(event) {
+  function check_tab(event: KeyboardEvent) {
     let code = textInput.value;
 
     if (event.key == 'Tab') {
@@ -85,7 +76,7 @@ order by CustomIntField asc
   }
 </script>
 
-<div>
+<div style="position: relative;" bind:this={container}>
   <textarea
     class="editable-code-block"
     spellcheck="false"
@@ -119,8 +110,8 @@ order by CustomIntField asc
     margin: 10px;
     padding: 10px;
     border: 0;
-    width: 98%;
-    height: 150px;
+    width: var(--width, 98%);
+    height: var(--height, 50px);
   }
   .editable-code-block,
   .highlighting-container,

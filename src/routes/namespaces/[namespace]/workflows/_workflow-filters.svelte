@@ -7,6 +7,7 @@
   import FilterSelect from '$lib/components/select/filter-select.svelte';
   import Option from '$lib/components/select/option.svelte';
   import FilterInput from '$lib/components/filter-input.svelte';
+  import WorkflowFilterAdvanced from './_workflow-filter-advanced.svelte';
 
   export let timeFormat: TimeFormat = 'UTC';
 
@@ -59,7 +60,9 @@
   </p>
 
   {#if isAdvancedQuery}
-    <FilterInput parameter="query" name="Query" value={''} />
+    <div>
+      <WorkflowFilterAdvanced />
+    </div>
   {:else}
     <div class="grid grid-cols-5 gap-4">
       <FilterInput
