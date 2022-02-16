@@ -3,13 +3,13 @@ import { handleError } from './handle-error';
 import { isFunction } from './is-function';
 import { toURL } from './to-url';
 
-type TemporalAPIError = {
+export type TemporalAPIError = {
   code: number;
   message: string;
   details: unknown[];
 };
 
-type ErrorCallback = (error: {
+export type ErrorCallback = (error: {
   status: number;
   statusText: string;
   body: TemporalAPIError;

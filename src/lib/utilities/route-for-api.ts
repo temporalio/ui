@@ -69,7 +69,7 @@ export function routeForApi(
 export function routeForApi(
   route: WorkflowsAPIArchivalRoutePath,
   parameters: APIArchivalParameters,
-);
+): string;
 
 export function routeForApi(route: ParameterlessAPIRoutePath): string;
 export function routeForApi(

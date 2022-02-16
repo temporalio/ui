@@ -3,6 +3,7 @@
 interface Window {
   Prism: {
     highlightAll: () => void;
+    highlightElement: (element: Element) => void;
   };
 }
 
@@ -65,13 +66,11 @@ type FilterParameters = {
   workflowType?: string;
   executionStatus?: WorkflowStatus;
   timeRange?: Duration | string;
+  query?: string;
 };
 
-type ArchiveFilterParameters = {
-  workflowId?: string;
-  workflowType?: string;
-  closeTime?: Duration | string;
-  executionStatus?: WorkflowStatus;
+type ArchiveFilterParameters = Omit<FilterParameters, 'timeRange'> & {
+  closeTime: Duration | string;
 };
 
 type Settings = {
@@ -87,3 +86,4 @@ type User = {
 };
 
 declare module '@crownframework/svelte-error-boundary';
+declare module '@sveltejs/svelte-virtual-list';
