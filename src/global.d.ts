@@ -85,4 +85,5 @@ type User = {
   picture: string;
 };
 
+declare module '@crownframework/svelte-error-boundary';
 declare module '@sveltejs/svelte-virtual-list';
