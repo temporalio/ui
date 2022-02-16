@@ -3,6 +3,7 @@
 interface Window {
   Prism: {
     highlightAll: () => void;
+    highlightElement: (element: Element) => void;
   };
 }
 
@@ -84,4 +85,4 @@ type User = {
   picture: string;
 };
 
-declare module '@crownframework/svelte-error-boundary';
+declare module '@sveltejs/svelte-virtual-list';
