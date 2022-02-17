@@ -31,8 +31,6 @@ type WorkflowRouteParameters = Pick<
 >;
 type TaskQueueRouteParameters = Pick<APIRouteParameters, 'namespace' | 'queue'>;
 
-type ValidWorkflowEndpoints =
-  | WorkflowsAPIRoutePath
-  | WorkflowsAPIArchivalRoutePath;
+type ValidWorkflowEndpoints = WorkflowsAPIRoutePath;
 
 type ValidWorkflowParameters = ArchiveFilterParameters | FilterParameters;
