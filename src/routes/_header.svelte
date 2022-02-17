@@ -37,7 +37,7 @@
     >
       Report Bug/Give Feedback
     </a>
-    {#if $settings.auth?.enabled}
+    {#if $settings?.auth?.enabled}
       {#if $user?.email}
         <button
           class="header-button min-w-min"
