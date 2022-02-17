@@ -35,6 +35,4 @@ type ValidWorkflowEndpoints =
   | WorkflowsAPIRoutePath
   | WorkflowsAPIArchivalRoutePath;
 
-type ValidWorkflowParameters<T> = T extends true
-  ? ArchiveFilterParameters
-  : FilterParameters;
+type ValidWorkflowParameters = ArchiveFilterParameters | FilterParameters;

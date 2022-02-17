@@ -25,7 +25,7 @@ export type CombinedWorkflowExecutionsResponse = {
 
 export const fetchAllWorkflows = async (
   namespace: string,
-  parameters: ValidWorkflowParameters<typeof archived>,
+  parameters: ValidWorkflowParameters,
   request = fetch,
   archived = false,
 ): Promise<CombinedWorkflowExecutionsResponse> => {
