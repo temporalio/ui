@@ -29,4 +29,4 @@
   } catch (e) {}
 </script>
 
-<Error {error} />
+<Error {error} {status} />
