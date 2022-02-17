@@ -23,12 +23,19 @@ export type CombinedWorkflowExecutionsResponse = {
   error?: string;
 };
 
+const allWorkflowsEndpoint: ValidWorkflowEndpoints =
+  'workflows' as ValidWorkflowEndpoints;
+const archivedWorkflowsEndpoint: ValidWorkflowEndpoints =
+  'workflows.archived' as ValidWorkflowEndpoints;
+
 export const fetchAllWorkflows = async (
   namespace: string,
-  parameters: FilterParameters,
+  parameters: ValidWorkflowParameters<typeof archived>,
   request = fetch,
+  archived = false,
 ): Promise<CombinedWorkflowExecutionsResponse> => {
   const query = parameters.query || toListWorkflowQuery(parameters);
+  const endpoint = archived ? archivedWorkflowsEndpoint : allWorkflowsEndpoint;
 
   let onError: ErrorCallback;
   let error: string;
@@ -41,7 +48,7 @@ export const fetchAllWorkflows = async (
 
   const { executions, nextPageToken } =
     (await requestFromAPI<ListWorkflowExecutionsResponse>(
-      routeForApi('workflows', { namespace }),
+      routeForApi(endpoint, { namespace }),
       {
         params: { query },
         onError,
@@ -61,32 +68,7 @@ export const fetchAllArchivedWorkflows = async (
   parameters: ArchiveFilterParameters,
   request = fetch,
 ): Promise<CombinedWorkflowExecutionsResponse> => {
-  const query = parameters.query || toListWorkflowQuery(parameters);
-
-  let onError: ErrorCallback;
-  let error: string;
-
-  if (parameters.query) {
-    onError = (response) => {
-      error = response.body.message;
-    };
-  }
-
-  const { executions, nextPageToken } =
-    (await requestFromAPI<ListWorkflowExecutionsResponse>(
-      routeForApi('archive', { namespace }),
-      {
-        params: { query },
-        onError,
-        request,
-      },
-    )) ?? { executions: [], nextPageToken: '' };
-
-  return {
-    workflows: toWorkflowExecutions({ executions }),
-    nextPageToken: String(nextPageToken),
-    error,
-  };
+  return fetchAllWorkflows(namespace, parameters, request, true);
 };
 
 export async function fetchWorkflow(

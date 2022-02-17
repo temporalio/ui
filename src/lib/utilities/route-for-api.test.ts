@@ -8,18 +8,6 @@ const parameters = {
 };
 
 describe(routeForApi, () => {
-  it('should return a route for workflows.open', () => {
-    expect(routeForApi('workflows.open', parameters)).toBe(
-      'http://localhost:8080/api/v1/namespaces/namespace/workflows/open',
-    );
-  });
-
-  it('should return a route for workflows.closed', () => {
-    expect(routeForApi('workflows.closed', parameters)).toBe(
-      'http://localhost:8080/api/v1/namespaces/namespace/workflows/closed',
-    );
-  });
-
   it('should return a route for workflow', () => {
     expect(routeForApi('workflow', parameters)).toBe(
       'http://localhost:8080/api/v1/namespaces/namespace/workflows/execution/executions/run',
