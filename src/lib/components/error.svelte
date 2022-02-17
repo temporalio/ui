@@ -1,19 +1,15 @@
 <script lang="ts">
-  export let error: NetworkError & { stack?: string; status: number } = null;
+  import { dev } from '$app/env';
+  import { isNetworkError } from '$lib/utilities/is-network-error';
 
-  let ENV =
-    typeof process !== 'undefined' && process.env && process.env.NODE_ENV;
-  let DEV = ENV !== 'production';
+  export let error: globalThis.Error = null;
+  export let status = 500;
 
-  let status = 500;
-
-  if (error?.status) {
-    status = error.status;
-  }
-  if (error?.statusCode) {
+  if (isNetworkError(error)) {
     status = error.statusCode;
   }
-  $: currentLocation = window.location.toString();
+
+  $: currentLocation = window.location.href;
 </script>
 
 <section aria-roledescription="error" class="text-center align-middle mt-32">
@@ -28,11 +24,12 @@
     or
     <a href="https://temporal.io/slack" class="underline-offset-2 underline"
       >jump on our Slack Channel</a
-    >
+    >.
   </p>
 </section>
-{#if DEV}
+
+{#if dev}
   <pre class="trace">
-        {error?.stack ?? ''}
-    </pre>
+    {error?.stack ?? ''}
+  </pre>
 {/if}
