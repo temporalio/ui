@@ -23,11 +23,6 @@ export type CombinedWorkflowExecutionsResponse = {
   error?: string;
 };
 
-const allWorkflowsEndpoint: ValidWorkflowEndpoints =
-  'workflows' as ValidWorkflowEndpoints;
-const archivedWorkflowsEndpoint: ValidWorkflowEndpoints =
-  'workflows.archived' as ValidWorkflowEndpoints;
-
 export const fetchAllWorkflows = async (
   namespace: string,
   parameters: ValidWorkflowParameters<typeof archived>,
@@ -35,7 +30,9 @@ export const fetchAllWorkflows = async (
   archived = false,
 ): Promise<CombinedWorkflowExecutionsResponse> => {
   const query = parameters.query || toListWorkflowQuery(parameters);
-  const endpoint = archived ? archivedWorkflowsEndpoint : allWorkflowsEndpoint;
+  const endpoint: ValidWorkflowEndpoints = archived
+    ? 'workflows.archived'
+    : 'workflows';
 
   let onError: ErrorCallback;
   let error: string;
