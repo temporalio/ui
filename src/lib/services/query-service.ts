@@ -4,7 +4,6 @@ import {
 } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
-import type { WorkflowRouteParameters } from '$lib/utilities/route-for-api';
 import { getQueryTypesFromError } from '$lib/utilities/get-query-types-from-error';
 
 type QueryRequestParameters = {
