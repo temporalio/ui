@@ -6,7 +6,17 @@
   export let heading = '';
   export let content: string | Parameters<typeof JSON.stringify>[0];
   export let copied = false;
+  export let framed = false;
+  export let parsed = false;
   export let language = 'json';
+
+  if (framed)
+    console.log(
+      { content },
+      typeof content,
+      JSON.parse(content),
+      JSON.stringify(content),
+    );
 
   const isJSON = language === 'json';
 
@@ -31,7 +41,7 @@
 </script>
 
 {#if content || content === null}
-  <div class="relative w-full">
+  <div class="relative w-full" class:framed>
     <div id="clipboard" />
 
     {#if heading}
@@ -39,10 +49,12 @@
     {/if}
 
     <pre
-      class="p-4">
+      class="p-4"
+      class:rounded-2xl={framed}
+      class:h-full={framed}>
         <code class="language-{language}">
           {#if isJSON}
-            {formatJSON(JSON.stringify(content))}
+            {formatJSON(content)}
           {:else}
             {@html content}
           {/if}
@@ -58,3 +70,9 @@
     </button>
   </div>
 {/if}
+
+<style lang="postcss">
+  .framed {
+    @apply border-2 border-gray-300 rounded-2xl p-4 flex flex-col;
+  }
+</style>

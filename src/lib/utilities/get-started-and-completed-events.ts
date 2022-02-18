@@ -3,24 +3,19 @@ type WorkflowEvents = {
   result: string;
 };
 
-export const getWorkflowStartedAndCompletedEvents = (
-  events: HistoryEvent[],
-): WorkflowEvents => {
-  const workflowStartedEvent: WorkflowExecutionStartedEvent = events?.find(
-    (event) => {
-      return !!event.workflowExecutionStartedEventAttributes;
-    },
-  );
+export const getWorkflowStartedAndCompletedEvents = async (
+  events: HistoryEventWithId[] | PromiseLike<HistoryEventWithId[]>,
+): Promise<WorkflowEvents> => {
+  events = await events;
 
-  const workflowCompletedEvent: WorkflowExecutionCompletedEvent = events?.find(
-    (event) => {
-      return !!event.workflowExecutionCompletedEventAttributes;
-    },
-  );
+  const workflowStartedEvent: HistoryEventWithId = events?.find((event) => {
+    return !!event.workflowExecutionStartedEventAttributes;
+  });
 
-  // I changed this to be a string to appease the compiler. But I _think_ these should already
-  // be decoded through the toEventHistory. This function is currently not being used and the values below
-  // needs to be verified.
+  const workflowCompletedEvent: HistoryEventWithId = events?.find((event) => {
+    return !!event.workflowExecutionCompletedEventAttributes;
+  });
+
   return {
     input: JSON.stringify(
       workflowStartedEvent.workflowExecutionStartedEventAttributes?.input
