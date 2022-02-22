@@ -13,10 +13,6 @@ type CompactEvent = HistoryEventWithId & {
   eventType: CompactEventType;
 };
 
-const isKey = (key): key is string | number => {
-  return typeof key === 'string' && Number.isInteger(Number(key));
-};
-
 const activityTypes = [
   'ActivityTaskCanceled',
   'ActivityTaskCancelRequested',
