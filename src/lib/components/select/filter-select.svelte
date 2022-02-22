@@ -2,15 +2,19 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+
   import Select from './select.svelte';
+  import Option from './option.svelte';
 
   export let label: string = null;
-  export let value: string;
+  export let value: SelectOptionValue;
+  export let options: SelectOptionValue[] = [];
   export let parameter: string = null;
 
-  let _value = (parameter && $page.query.get(parameter)) || value;
-
   const id = `${parameter || label}-filter`;
+  const parameterValue = parameter && $page.query.get(parameter);
+
+  let _value = parameterValue || (value && value.toString());
 
   $: {
     updateQueryParameters({
@@ -23,8 +27,10 @@
   }
 </script>
 
-<div class="flex flex-col items-start justify-center">
-  <Select {id} bind:value={_value}>
-    <slot />
-  </Select>
-</div>
+<Select {id} bind:value={_value} {...$$props}>
+  <slot>
+    {#each options as option}
+      <Option value={option} />
+    {/each}
+  </slot>
+</Select>

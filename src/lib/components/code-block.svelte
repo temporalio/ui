@@ -7,7 +7,6 @@
   export let content: string | Parameters<typeof JSON.stringify>[0];
   export let copied = false;
   export let framed = false;
-  export let parsed = false;
   export let language = 'json';
 
   const isJSON = language === 'json';

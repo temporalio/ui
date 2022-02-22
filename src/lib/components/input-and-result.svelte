@@ -11,8 +11,8 @@
   {#await inputAndResult then { input, result }}
     <h3 class="text-lg font-medium">Input & Results</h3>
     <div class="flex gap-4">
-      <CodeBlock heading="Input" content={input} framed parsed />
-      <CodeBlock heading="Result" content={result} framed parsed />
+      <CodeBlock heading="Input" content={input} framed />
+      <CodeBlock heading="Result" content={result} framed />
     </div>
   {/await}
 </section>

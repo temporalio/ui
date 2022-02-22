@@ -87,3 +87,5 @@ type User = {
 
 declare module '@crownframework/svelte-error-boundary';
 declare module '@sveltejs/svelte-virtual-list';
+
+type SelectOptionValue = number | string | boolean;
