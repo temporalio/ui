@@ -8,7 +8,6 @@
   const toArray = (
     items: (HistoryEventWithId | PendingActivity)[] | EventGroups,
   ) => {
-    console.log({ items });
     return [...items];
   };
 </script>

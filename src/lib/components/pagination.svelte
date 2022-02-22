@@ -46,7 +46,6 @@
         label="Per Page"
         parameter={queryKey}
         value={perPage}
-        on:change={console.log}
         {options}
       />
     </div>
