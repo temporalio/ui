@@ -10,9 +10,9 @@
 <section class="flex flex-col gap-4">
   {#await inputAndResult then { input, result }}
     <h3 class="text-lg font-medium">Input & Results</h3>
-    <section class="flex gap-4">
+    <div class="flex gap-4">
       <CodeBlock heading="Input" content={input} framed parsed />
       <CodeBlock heading="Result" content={result} framed parsed />
-    </section>
+    </div>
   {/await}
 </section>

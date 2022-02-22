@@ -10,14 +10,6 @@
   export let parsed = false;
   export let language = 'json';
 
-  if (framed)
-    console.log(
-      { content },
-      typeof content,
-      JSON.parse(content),
-      JSON.stringify(content),
-    );
-
   const isJSON = language === 'json';
 
   const copy = () =>

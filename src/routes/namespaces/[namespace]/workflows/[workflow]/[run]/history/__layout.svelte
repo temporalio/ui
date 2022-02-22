@@ -11,6 +11,7 @@
     return {
       props: {
         workflow: { workflowId, runId, namespace },
+        events,
         parameters,
       },
     };
@@ -27,7 +28,6 @@
 
   import { routeFor } from '$lib/utilities/route-for';
   import { fetchEvents } from '$lib/services/events-service';
-  import { refreshable } from '$lib/stores/refreshable';
 
   import ExportHistory from '$lib/components/export-history.svelte';
   import ToggleButton from '$lib/components/toggle-button.svelte';
@@ -36,13 +36,13 @@
 
   export let workflow: WorkflowParameters;
   export let parameters: Parameters<typeof fetchEvents>[0];
+  export let events: HistoryEventWithId[];
 
-  let events = refreshable(() => fetchEvents(parameters));
-  $: setContext('events', $events);
+  $: setContext('events', events);
 </script>
 
 <section class="flex flex-col gap-4">
-  <InputAndResults events={$events} />
+  <InputAndResults {events} />
   <nav class="flex gap-4 justify-between items-end">
     <h3 class="text-lg font-medium">Event History</h3>
     <div class="flex gap-4">

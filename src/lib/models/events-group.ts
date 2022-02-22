@@ -13,6 +13,10 @@ type CompactEvent = HistoryEventWithId & {
   eventType: CompactEventType;
 };
 
+const isKey = (key): key is string | number => {
+  return typeof key === 'string' && Number.isInteger(Number(key));
+};
+
 const activityTypes = [
   'ActivityTaskCanceled',
   'ActivityTaskCancelRequested',
@@ -168,8 +172,11 @@ export class EventGroups {
   };
 
   constructor(event?: CompactEvent | HistoryEventWithId[]) {
-    if (Array.isArray(event)) return EventGroups.from(event, this);
-    if (event) this.add(event);
+    if (Array.isArray(event)) {
+      EventGroups.from(event, this);
+    } else if (event) {
+      this.add(event);
+    }
   }
 
   get(id: string | number | Long): EventsGroup {
