@@ -8,6 +8,9 @@ export const getWorkflowStartedAndCompletedEvents = async (
 ): Promise<WorkflowEvents> => {
   events = await events;
 
+  let input: string;
+  let result;
+
   const workflowStartedEvent: HistoryEventWithId = events?.find((event) => {
     return !!event.workflowExecutionStartedEventAttributes;
   });
@@ -16,14 +19,22 @@ export const getWorkflowStartedAndCompletedEvents = async (
     return !!event.workflowExecutionCompletedEventAttributes;
   });
 
+  if (workflowStartedEvent) {
+    input = JSON.stringify(
+      workflowStartedEvent?.workflowExecutionStartedEventAttributes?.input
+        ?.payloads ?? '',
+    );
+  }
+
+  if (workflowCompletedEvent) {
+    result = JSON.stringify(
+      workflowCompletedEvent?.workflowExecutionCompletedEventAttributes?.result
+        ?.payloads ?? '',
+    );
+  }
+
   return {
-    input: JSON.stringify(
-      workflowStartedEvent.workflowExecutionStartedEventAttributes?.input
-        ?.payloads ?? '',
-    ),
-    result: JSON.stringify(
-      workflowCompletedEvent.workflowExecutionCompletedEventAttributes?.result
-        ?.payloads ?? '',
-    ),
+    input,
+    result,
   };
 };

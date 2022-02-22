@@ -26,7 +26,7 @@ type WorkflowExecutionAPIResponse = Optional<
 >;
 
 const toPendingActivities = (
-  pendingActivity: PendingActivityInfo[],
+  pendingActivity: PendingActivityInfo[] = [],
 ): PendingActivity[] => {
   return pendingActivity.map((activity) => {
     const id = activity.activityId;
