@@ -1,4 +1,4 @@
-import { isDuration, isDurationString, toDate } from './to-duration';
+import { isDuration, isDurationString, toDate, tomorrow } from './to-duration';
 
 type QueryKey =
   | 'WorkflowId'
@@ -55,7 +55,7 @@ const toQueryStatement = (key: FilterKey, value: FilterValue): string => {
   const queryKey = queryKeys[key];
 
   if (isDuration(value) || isDurationString(value)) {
-    return `${queryKey} > "${toDate(value)}"`;
+    return `${queryKey} BETWEEN "${toDate(value)}" AND "${tomorrow()}"`;
   }
 
   return `${queryKey}="${value}"`;
