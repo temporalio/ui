@@ -4,9 +4,16 @@
   import Event from './event.svelte';
 
   export let events: (HistoryEventWithId | PendingActivity)[] | EventGroups;
+
+  const toArray = (
+    items: (HistoryEventWithId | PendingActivity)[] | EventGroups,
+  ) => {
+    console.log({ items });
+    return [...items];
+  };
 </script>
 
-<Pagination items={events} let:visibleItems>
+<Pagination items={toArray(events)} let:visibleItems>
   <section
     class="flex flex-col border-2 border-gray-300 rounded-lg w-full event-history mb-6"
   >

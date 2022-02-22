@@ -314,6 +314,7 @@ type PendingActivityInfo = import('$types').PendingActivityInfo;
 interface PendingActivity extends PendingActivityInfo {
   state: 'Unspecified' | 'Scheduled' | 'Started' | 'CancelRequested';
   activityType: { name: string };
+  id: typeof PendingActivityInfo.activityId;
 }
 
 type EventType =
