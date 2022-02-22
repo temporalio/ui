@@ -29,7 +29,7 @@ const toPendingActivities = (
   pendingActivity: PendingActivityInfo[] = [],
 ): PendingActivity[] => {
   return pendingActivity.map((activity) => {
-    const id = activity.activityId;
+    const id = `pending-${activity.activityId}`;
     return { ...activity, id } as unknown as PendingActivity;
   });
 };
