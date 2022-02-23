@@ -66,4 +66,8 @@
   .pending .active {
     @apply bg-blue-50;
   }
+
+  a:last-child {
+    @apply border-b-0;
+  }
 </style>

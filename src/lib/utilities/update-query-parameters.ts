@@ -3,7 +3,7 @@ import { appendQueryParameters } from './append-query-parameters';
 
 type UpdateQueryParams = {
   parameter: string;
-  value?: string;
+  value?: string | number;
   query: URLSearchParams;
   path: string;
   goto: typeof goto;
@@ -20,7 +20,7 @@ export const updateQueryParameters = async ({
   goto,
 }: UpdateQueryParams): Promise<typeof value> => {
   if (value) {
-    query.set(parameter, value);
+    query.set(parameter, value.toString());
   } else {
     query.delete(parameter);
   }

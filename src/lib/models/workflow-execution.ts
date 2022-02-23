@@ -25,6 +25,15 @@ type WorkflowExecutionAPIResponse = Optional<
   'executionConfig' | 'pendingActivities' | 'pendingChildren'
 >;
 
+const toPendingActivities = (
+  pendingActivity: PendingActivityInfo[] = [],
+): PendingActivity[] => {
+  return pendingActivity.map((activity) => {
+    const id = `pending-${activity.activityId}`;
+    return { ...activity, id } as unknown as PendingActivity;
+  });
+};
+
 export const toWorkflowExecution = (
   response?: WorkflowExecutionAPIResponse,
 ): WorkflowExecution => {
@@ -37,8 +46,9 @@ export const toWorkflowExecution = (
   const historyEvents = response.workflowExecutionInfo.historyLength;
   const url = `/workflows/${id}/${runId}`;
   const taskQueue = response?.executionConfig?.taskQueue?.name;
-  const pendingActivities: PendingActivity[] =
-    (response.pendingActivities as unknown as PendingActivity[]) || [];
+  const pendingActivities: PendingActivity[] = toPendingActivities(
+    response.pendingActivities,
+  );
 
   return {
     name,

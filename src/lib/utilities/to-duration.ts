@@ -105,6 +105,6 @@ export const fromDate = (targetDate: string | Date): Duration => {
   return { seconds: difference / 1000 };
 };
 
-export const tomorrow = () => {
+export const tomorrow = (): string => {
   return formatISO(add(new Date(), { hours: 24 }));
 };

@@ -40,6 +40,7 @@
     class:large
     class:secondary
     class:destroy
+    class:disabled
     {disabled}
     >{#if loading}
       <span class="animate-spin"> <Icon {icon} scale={1} /></span>
@@ -59,7 +60,7 @@
   }
 
   .primary:disabled {
-    @apply text-purple-400 border-purple-400 cursor-not-allowed;
+    @apply text-purple-400 border-purple-400 cursor-not-allowed bg-gray-400;
   }
 
   .primary:hover:enabled {
@@ -71,7 +72,7 @@
   }
 
   .secondary:disabled {
-    @apply text-purple-400 border-purple-400 cursor-not-allowed;
+    @apply text-purple-400 border-purple-400 cursor-not-allowed bg-gray-400;
   }
 
   .secondary:hover:enabled {
@@ -83,7 +84,7 @@
   }
 
   .destroy:disabled {
-    @apply text-red-400 border-red-400 cursor-not-allowed;
+    @apply text-red-400 border-red-400 cursor-not-allowed bg-gray-400;
   }
 
   .destroy:hover:enabled {

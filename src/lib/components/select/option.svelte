@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let value: string | boolean = null;
+  export let value: SelectOptionValue = null;
 </script>
 
-<option {value} class="border-0"><slot /></option>
+<option {value} class="border-0"><slot>{value}</slot></option>
