@@ -2,7 +2,7 @@
   import type { EventParameter } from '$lib/utilities/route-for';
   import type { LoadInput } from '@sveltejs/kit';
 
-  export async function load({ page }: LoadInput) {
+  export async function load({ page, stuff }: LoadInput) {
     const {
       workflow: workflowId,
       run: runId,
@@ -10,8 +10,11 @@
       eventId,
     } = page.params;
 
+    const { events } = stuff;
+
     return {
       props: {
+        events,
         params: {
           workflowId,
           runId,
@@ -27,16 +30,15 @@
   import { EventGroups, EventsGroup } from '$lib/models/events-group';
   import { routeFor } from '$lib/utilities/route-for';
   import { page } from '$app/stores';
-  import { getAppContext } from '$lib/utilities/get-context';
 
-  let events = getAppContext('events');
+  export let events: HistoryEventWithId[];
   export let params: EventParameter;
 
-  const getEventsGroup = async (
-    events: EventualHistoryEvents,
+  const getEventsGroup = (
+    events: HistoryEventWithId[],
     id: string,
-  ): Promise<{ group: EventsGroup; events: HistoryEventWithId[] }> => {
-    const groups = await EventGroups.fromPromise(events);
+  ): { group: EventsGroup; events: HistoryEventWithId[] } => {
+    const groups = EventGroups.from(events);
     const group = groups.get(id);
 
     return {

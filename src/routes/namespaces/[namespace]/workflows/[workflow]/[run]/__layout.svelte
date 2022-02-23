@@ -1,5 +1,7 @@
 <script context="module" lang="ts">
   import type { LoadInput } from '@sveltejs/kit';
+  import type { WorkflowExecution } from '$lib/models/workflow-execution';
+
   import { fetchWorkflow } from '$lib/services/workflow-service';
 
   export async function load({ page }: LoadInput) {
@@ -11,27 +13,23 @@
       runId,
     };
 
+    const workflow = await fetchWorkflow(parameters, fetch);
+
     return {
-      props: { parameters, namespace },
+      props: { workflow, namespace },
+      stuff: { workflow },
     };
   }
 </script>
 
 <script lang="ts">
-  import { setContext } from 'svelte';
-  import { refreshable } from '$lib/stores/refreshable';
-
   import Header from './_header.svelte';
 
-  export let parameters: Parameters<typeof fetchWorkflow>[0];
+  export let workflow: WorkflowExecution;
   export let namespace: string;
-
-  let workflow = refreshable(() => fetchWorkflow(parameters));
-
-  $: setContext('workflow', workflow);
 </script>
 
 <main class="flex flex-col gap-6 h-full">
-  <Header {namespace} />
+  <Header {namespace} {workflow} />
   <slot />
 </main>

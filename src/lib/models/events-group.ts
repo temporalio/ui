@@ -155,7 +155,7 @@ export class EventGroups {
   }
 
   static from = (
-    events: HistoryEventWithId[],
+    events: HistoryEventWithId[] = [],
     groups = new EventGroups(),
   ): EventGroups => {
     for (const event of events) {
