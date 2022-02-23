@@ -9,10 +9,12 @@
       (event: HistoryEventWithId) => event.id === id,
     );
 
-    const { attributes } = event;
+    if (!event) {
+      return { status: 404 };
+    }
 
     return {
-      props: { attributes },
+      props: { attributes: event.attributes },
     };
   };
 </script>

@@ -4,12 +4,16 @@
   export const load = async ({ stuff, page }: LoadInput) => {
     const { events } = stuff;
 
-    const { attributes }: HistoryEventWithId = events.find(
+    const event: HistoryEventWithId = events.find(
       (event: HistoryEventWithId) => event.id === page.params.id,
     );
 
+    if (!event) {
+      return { status: 404 };
+    }
+
     return {
-      props: { attributes },
+      props: { attributes: event.attributes },
     };
   };
 </script>
