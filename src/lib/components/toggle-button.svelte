@@ -3,6 +3,7 @@
   import { page } from '$app/stores';
 
   import type { IconDefinition } from '@fortawesome/free-solid-svg-icons';
+
   import { appendQueryParameters } from '$lib/utilities/append-query-parameters';
   import { getAppContext } from '$lib/utilities/get-context';
 

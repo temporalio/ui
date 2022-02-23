@@ -2,6 +2,8 @@
   import type { LoadInput } from '@sveltejs/kit';
   import type { WorkflowParameters } from '$lib/utilities/route-for';
 
+  import { fetchEvents } from '$lib/services/events-service';
+
   export async function load({ page }: LoadInput) {
     const { workflow: workflowId, run: runId, namespace } = page.params;
     const parameters = { namespace, executionId: workflowId, runId };
@@ -14,12 +16,14 @@
         events,
         parameters,
       },
+      stuff: {
+        events,
+      },
     };
   }
 </script>
 
 <script lang="ts">
-  import { setContext } from 'svelte';
   import {
     faCode,
     faLayerGroup,
@@ -27,7 +31,6 @@
   } from '@fortawesome/free-solid-svg-icons';
 
   import { routeFor } from '$lib/utilities/route-for';
-  import { fetchEvents } from '$lib/services/events-service';
 
   import ExportHistory from '$lib/components/export-history.svelte';
   import ToggleButton from '$lib/components/toggle-button.svelte';
@@ -37,8 +40,6 @@
   export let workflow: WorkflowParameters;
   export let parameters: Parameters<typeof fetchEvents>[0];
   export let events: HistoryEventWithId[];
-
-  $: setContext('events', events);
 </script>
 
 <section class="flex flex-col gap-4">

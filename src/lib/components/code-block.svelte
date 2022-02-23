@@ -1,10 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+
   import Icon from 'svelte-fa';
   import { faCheck, faCopy } from '@fortawesome/free-solid-svg-icons';
 
   export let heading = '';
-  export let content: string | Parameters<typeof JSON.stringify>[0];
+  export let content: Parameters<typeof JSON.stringify>[0];
   export let copied = false;
   export let framed = false;
   export let language = 'json';
@@ -20,9 +21,13 @@
       })
       .catch((error) => console.error(error));
 
-  const formatJSON = (jsonData: string) => {
-    const parsedData = JSON.parse(jsonData);
+  const formatJSON = (jsonData: string): string => {
+    if (!jsonData) return;
+
+    const parsedData =
+      typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
     const formated = JSON.stringify(parsedData, undefined, 2);
+
     return formated;
   };
 

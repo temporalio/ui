@@ -1,20 +1,23 @@
-<script lang="ts">
-  import { page } from '$app/stores';
+<script lang="ts" context="module">
+  import type { LoadInput } from '@sveltejs/kit';
 
-  import EventDetails from '$lib/components/event-details.svelte';
-  import { getAppContext } from '$lib/utilities/get-context';
+  export const load = async ({ stuff, page }: LoadInput) => {
+    const { events } = stuff;
 
-  const findEvent = async (
-    data: EventualHistoryEvents,
-    id: string,
-  ): Promise<HistoryEventWithId> => {
-    return data.then((events) => events.find((event) => event.id === id));
+    const { attributes }: HistoryEventWithId = events.find(
+      (event: HistoryEventWithId) => event.id === page.params.id,
+    );
+
+    return {
+      props: { attributes },
+    };
   };
-
-  let events = getAppContext('events');
-  $: event = findEvent(events, $page.params.id);
 </script>
 
-{#await event then { attributes }}
-  <EventDetails {attributes} />
-{/await}
+<script lang="ts">
+  import EventDetails from '$lib/components/event-details.svelte';
+
+  export let attributes: EventAttribute;
+</script>
+
+<EventDetails {attributes} />

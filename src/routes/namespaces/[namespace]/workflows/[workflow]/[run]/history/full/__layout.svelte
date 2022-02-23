@@ -1,17 +1,29 @@
+<script lang="ts" context="module">
+  import type { LoadInput } from '@sveltejs/kit';
+  import type { WorkflowExecution } from '$lib/models/workflow-execution';
+
+  export const load = async ({ stuff }: LoadInput) => {
+    const { workflow, events } = stuff;
+
+    return {
+      props: { workflow, events },
+    };
+  };
+</script>
+
 <script lang="ts">
   import { getVisibleEvents } from '$lib/utilities/get-visible-events';
 
   import FilterSelect from '$lib/components/select/filter-select.svelte';
   import Option from '$lib/components/select/option.svelte';
   import EventTable from '$lib/components/event-table.svelte';
-  import { getAppContext } from '$lib/utilities/get-context';
 
   let category: EventTypeCategory = null;
 
-  let workflow = getAppContext('workflow');
-  let events = getAppContext('events');
+  export let workflow: WorkflowExecution;
+  export let events: HistoryEventWithId[];
 
-  $: eventsAndActivities = getVisibleEvents(events, $workflow, category);
+  const eventsAndActivities = getVisibleEvents(events, workflow, category);
 </script>
 
 {#await eventsAndActivities then events}
