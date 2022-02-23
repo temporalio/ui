@@ -1,5 +1,10 @@
-<script context="module" lang="ts">
-  export async function load() {
-    return { status: 302, redirect: '/namespaces/default/workflows' };
+<script lang="ts">
+  import { settings } from '$lib/stores/settings';
+  import { goto } from '$app/navigation';
+
+  $: {
+    if ($settings?.defaultNamespace) {
+      goto(`/namespaces/${$settings.defaultNamespace}`, { replaceState: true });
+    }
   }
 </script>

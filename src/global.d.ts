@@ -77,6 +77,7 @@ type Settings = {
   auth: {
     enabled: boolean;
   };
+  defaultNamespace: string;
 };
 
 type User = {
