@@ -1,32 +1,28 @@
 <script lang="ts">
-  export let type: BadgeTypes;
-  type BadgeTypes = keyof typeof Badges;
+  type BadgeTypes = 'alpha' | 'beta';
 
-  // We need to keep the entire classname intact so tailiwnd
-  // doesn't auto purge it
-  const Badges = {
-    beta: `
-        bg-blue-100 
-        text-blue-700 
-        border-blue-700`,
-    alpha: `
-        bg-purple-100
-        text-purple-700
-        border-purple-700
-    `,
-  };
+  export let type: BadgeTypes;
 </script>
 
 <div
-  class={`${Badges[type]}        
+  class={`${type}     
         rounded-sm
         text-center 
         inline-block
         px-1
         ml-1
         text-sm
-        align-middle	
-        `}
+        align-middle`}
 >
   <slot />
 </div>
+
+<style lang="postcss">
+  .beta {
+    @apply bg-blue-100  text-blue-700  border-blue-700;
+  }
+
+  .alpha {
+    @apply bg-purple-100 text-purple-700 border-purple-700;
+  }
+</style>
