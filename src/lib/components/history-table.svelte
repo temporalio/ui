@@ -1,5 +1,5 @@
 <section
-  class="flex flex-col border-2 border-gray-300 rounded-lg w-full event-history mb-6 h-96"
+  class="flex flex-col border-2 border-gray-300 rounded-lg w-full event-history mb-6 h-auto max-h-screen"
 >
   <div class="flex w-full">
     <header class="table-header border-r-2 rounded-tl-lg w-1/3">

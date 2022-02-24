@@ -14,7 +14,7 @@
     formatEvent(event);
 
   let { namespace, workflow: workflowId, run: runId } = $page.params;
-  let href = routeFor({ namespace, workflowId, runId });
+  let href = routeFor({ namespace, workflowId, runId, query: $page.query });
 </script>
 
 <a

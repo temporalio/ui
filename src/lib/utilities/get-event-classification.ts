@@ -132,10 +132,12 @@ export const getHref = (
   parameters: WorkflowParameters,
 ): string => {
   if (isEvent(event)) {
-    return routeFor('workflow.events.full.event', {
+    const route = routeFor('workflow.events.full.event', {
       ...parameters,
       eventId: String(event.eventId),
     });
+
+    return route;
   }
 
   if (isPendingActivity(event)) {
