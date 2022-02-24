@@ -1,17 +1,17 @@
 import { convertPayloadToJson } from '$lib/utilities/decode-payload';
-import type { GetWorkflowExecutionHistoryResponse, HistoryEvent } from '$types';
+import { findAttributesAndKey } from '$lib/utilities/is-event-type';
+
+import type { GetWorkflowExecutionHistoryResponse } from '$types';
 
 export async function getEventAttributes(
   historyEvent: HistoryEvent,
-): Promise<EventAttribute> {
-  const attributeKey = Object.keys(historyEvent).find((key) =>
-    key.includes('Attributes'),
-  );
-  const attributes = await convertPayloadToJson(historyEvent[attributeKey]);
+): Promise<EventAttributesWithType> {
+  const { key, attributes } = findAttributesAndKey(historyEvent);
+  const decodedAttributes = await convertPayloadToJson(attributes);
 
   return {
-    type: attributeKey as EventAttributeKeys,
-    ...attributes,
+    type: key,
+    ...decodedAttributes,
   };
 }
 

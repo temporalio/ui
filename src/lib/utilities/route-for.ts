@@ -17,7 +17,8 @@ type RoutePath =
 type EventView = 'event' | 'pending' | 'activity';
 type EventHistoryView = 'full' | 'compact' | 'json';
 
-export type NamespaceParameter = { namespace: string };
+export type QueryParameters = { query?: URLSearchParams };
+export type NamespaceParameter = { namespace: string } & QueryParameters;
 export type WorkflowParameters = {
   workflowId: string;
   runId: string;
@@ -123,32 +124,34 @@ export function routeFor(
   parameters: TaskQueueParameter,
 ): string;
 export function routeFor(path: RoutePath, parameters: RouteParameters): string {
+  let route: string;
+
   if (path === 'workflows') {
-    return routeForWorkflows(parameters);
+    route = routeForWorkflows(parameters);
   }
 
   if (path === 'workflow') {
-    return routeForWorkflow(parameters);
+    route = routeForWorkflow(parameters);
   }
 
   if (path === 'workflow.events') {
-    return routeForEventHistory(parameters);
+    route = routeForEventHistory(parameters);
   }
 
   if (path === 'workflow.events.full') {
-    return routeForEventHistory(parameters, 'full');
+    route = routeForEventHistory(parameters, 'full');
   }
 
   if (path === 'workflow.events.compact') {
-    return routeForEventHistory(parameters, 'compact');
+    route = routeForEventHistory(parameters, 'compact');
   }
 
   if (path === 'workflow.events.json') {
-    return routeForEventHistory(parameters, 'json');
+    route = routeForEventHistory(parameters, 'json');
   }
 
   if (path === 'workflow.events.full.event') {
-    return routeForEventHistoryItem(
+    route = routeForEventHistoryItem(
       parameters,
       'full',
       'event',
@@ -157,7 +160,7 @@ export function routeFor(path: RoutePath, parameters: RouteParameters): string {
   }
 
   if (path === 'workflow.events.full.pending') {
-    return routeForEventHistoryItem(
+    route = routeForEventHistoryItem(
       parameters,
       'full',
       'pending',
@@ -166,7 +169,7 @@ export function routeFor(path: RoutePath, parameters: RouteParameters): string {
   }
 
   if (path === 'workflow.events.compact.activity') {
-    return routeForEventHistoryItem(
+    route = routeForEventHistoryItem(
       parameters,
       'compact',
       'activity',
@@ -175,7 +178,7 @@ export function routeFor(path: RoutePath, parameters: RouteParameters): string {
   }
 
   if (path === 'workflow.events.compact.activity.event') {
-    return routeForActivity(
+    route = routeForActivity(
       parameters,
       'compact',
       'activity',
@@ -185,14 +188,20 @@ export function routeFor(path: RoutePath, parameters: RouteParameters): string {
   }
 
   if (path === 'workflow.query') {
-    return routeForWorkflow(parameters) + '/query';
+    route = routeForWorkflow(parameters) + '/query';
   }
 
   if (path === 'workflow.stack-trace') {
-    return routeForWorkflow(parameters) + '/stack-trace';
+    route = routeForWorkflow(parameters) + '/stack-trace';
   }
 
   if (path === 'workers') {
-    return routeForWorkers(parameters);
+    route = routeForWorkers(parameters);
+  }
+
+  if (parameters.query) {
+    return `${route}?${parameters.query}`;
+  } else {
+    return route;
   }
 }

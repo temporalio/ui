@@ -1,12 +1,11 @@
 <script lang="ts">
   import { networkError } from '$lib/stores/error';
-  import { isNetworkError } from '$lib/utilities/is-network-error';
   import Error from './error.svelte';
 
   export let error = null;
   export let onError = null;
 
-  let theError;
+  let theError: NetworkError | any;
 
   $: {
     if (error && $error) {
@@ -29,9 +28,6 @@
 {/if}
 
 <style>
-  .error {
-    border: 1px solid red;
-  }
   .trace {
     font-family: monospace;
   }

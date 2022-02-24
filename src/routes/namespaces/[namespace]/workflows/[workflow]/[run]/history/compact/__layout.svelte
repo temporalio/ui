@@ -2,26 +2,24 @@
   import type { LoadInput } from '@sveltejs/kit';
 
   export const load = async ({ stuff }: LoadInput) => {
-    const { events } = stuff;
-
-    console.log({ events });
+    const { events } = stuff as { events: HistoryEventWithId[] };
+    const eventGroups = groupEvents(events);
 
     return {
-      props: { events },
+      props: { eventGroups },
+      stuff: { eventGroups },
     };
   };
 </script>
 
 <script lang="ts">
-  import { EventGroups } from '$lib/models/events-group';
+  import { groupEvents } from '$lib/models/group-events';
   import EventTable from '$lib/components/event-table.svelte';
 
-  export let events: HistoryEventWithId[];
-
-  const activities = EventGroups.from(events);
+  export let eventGroups: CompactEventGroups;
 </script>
 
-<EventTable events={activities}>
+<EventTable events={eventGroups}>
   <div slot="details" class="w-full h-full py-4">
     <slot />
   </div>

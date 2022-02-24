@@ -28,22 +28,20 @@
     const workflows = await fetchAllWorkflows(namespace, parameters, fetch);
 
     return {
-      props: { workflows, namespace, parameters, isAdvancedSearch },
+      props: { workflows, isAdvancedSearch },
     };
   }
 </script>
 
 <script lang="ts">
-  import VirtualList from '@sveltejs/svelte-virtual-list';
-
   import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
   import WorkflowFilters from './_workflow-filters.svelte';
   import EmptyState from '$lib/components/empty-state.svelte';
   import WorkflowsLoadingState from './_workflows-loading.svelte';
   import Pagination from '$lib/components/pagination.svelte';
+  import Badge from '$lib/components/badge.svelte';
 
-  export let namespace: string;
   export let workflows: CombinedWorkflowExecutionsResponse;
   export let isAdvancedSearch: boolean;
 
@@ -54,7 +52,7 @@
     : 'If you have filters applied, try adjusting them.';
 </script>
 
-<h2 class="text-2xl">Workflows</h2>
+<h2 class="text-2xl">Workflows <Badge type="beta">Beta</Badge></h2>
 <WorkflowFilters bind:timeFormat />
 {#await workflows}
   <WorkflowsLoadingState />

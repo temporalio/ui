@@ -13,7 +13,7 @@
     const workers = await getPollers({ queue: taskQueue, namespace });
 
     return {
-      props: { workflow, workers, taskQueue, namespace },
+      props: { workers, taskQueue },
     };
   }
 </script>
@@ -23,8 +23,6 @@
   import WorkersRow from '$lib/components/workers-row.svelte';
   import EmptyState from '$lib/components/empty-state.svelte';
 
-  export let namespace: string;
-  export let workflow: WorkflowExecution;
   export let workers: GetPollersResponse;
   export let taskQueue: string;
 </script>

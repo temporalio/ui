@@ -1,4 +1,6 @@
-export const eventTypeCategorizations: Record<EventType, EventTypeCategory> = {
+export const eventTypeCategorizations: Readonly<
+  Record<EventType, EventTypeCategory>
+> = {
   ActivityTaskCanceled: 'activity',
   ActivityTaskCancelRequested: 'activity',
   ActivityTaskCompleted: 'activity',
@@ -46,14 +48,15 @@ export const eventTypeCategorizations: Record<EventType, EventTypeCategory> = {
   UpsertWorkflowSearchAttributes: 'command',
 };
 
-const categories: EventTypeCategory[] = [
+export type EventTypeCategory = typeof categories[number];
+const categories = [
   'activity',
   'child-workflow',
   'signal',
   'timer',
   'workflow',
   'command',
-];
+] as const;
 
 export const eventTypeInCategory =
   (category?: EventTypeCategory) =>
