@@ -24,8 +24,4 @@
   .table-header {
     @apply table-cell text-left p-2;
   }
-
-  .table-header-group:first {
-    @apply rounded-tl-lg;
-  }
 </style>
