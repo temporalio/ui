@@ -61,7 +61,7 @@
   {#if isAdvancedQuery}
     <FilterInput parameter="query" name="Query" value={''} />
   {:else}
-    <div class="grid grid-cols-5 gap-4">
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
       <FilterInput
         parameter="workflow-id"
         name="Workflow ID"

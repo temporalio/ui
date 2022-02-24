@@ -17,37 +17,44 @@
   });
 </script>
 
-<a sveltekit:noscroll {href}>
-  <article class="row flex flex-row border-b-2 items-center">
-    <div class="w-2/12 text-left">
-      <div>
-        <WorkflowStatus status={workflow.status} />
-      </div>
+<a
+  sveltekit:noscroll
+  {href}
+  class="row text-sm md:text-base block md:table-row border-b-2 items-center"
+>
+  <div class="cell">
+    <div>
+      <WorkflowStatus status={workflow.status} />
     </div>
-    <div class="links w-3/12 text-left">
-      {workflow.id}
-    </div>
-    <div class="links w-3/12 text-left">
-      <h3>
-        {workflow.name}
-      </h3>
-    </div>
-    <div class="w-2/12 text-left">
-      <p class="text-xs">
-        {formatDate(workflow.startTime, timeFormat)}
-      </p>
-    </div>
-    <div class="w-2/12 text-left">
-      <p class="text-xs">
-        {formatDate(workflow.endTime, timeFormat)}
-      </p>
-    </div>
-  </article>
+  </div>
+  <div class="cell links font-medium md:font-normal">
+    {workflow.id}
+  </div>
+  <div class="cell links">
+    <h3>
+      {workflow.name}
+    </h3>
+  </div>
+  <div class="inline-block  cell">
+    <p>
+      {formatDate(workflow.startTime, timeFormat)}
+    </p>
+  </div>
+  <span class=" md:hidden"> - </span>
+  <div class="inline-block cell">
+    <p>
+      {formatDate(workflow.endTime, timeFormat)}
+    </p>
+  </div>
 </a>
 
 <style lang="postcss">
   .row {
-    @apply w-full flex no-underline p-2;
+    @apply no-underline p-2;
+  }
+
+  .cell {
+    @apply md:table-cell md:border-b-2 text-left p-2;
   }
 
   .row:hover {
