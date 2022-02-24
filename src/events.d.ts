@@ -171,4 +171,5 @@ type EventTypeCategory =
   | 'workflow'
   | 'command';
 
-type EventualHistoryEvents = PromiseLike<HistoryEventWithId[]>;
+type EventsOrActivities = (HistoryEventWithId | PendingActivity)[];
+type IterableEvents = EventsOrActivities | CompactEventGroups;

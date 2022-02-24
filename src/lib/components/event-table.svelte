@@ -2,9 +2,7 @@
   import Pagination from './pagination.svelte';
   import Event from './event.svelte';
 
-  export let events:
-    | (HistoryEventWithId | PendingActivity)[]
-    | CompactEventGroups;
+  export let events: IterableEvents;
 </script>
 
 <Pagination items={events} let:visibleItems>
