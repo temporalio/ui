@@ -1,11 +1,11 @@
-<section class="workflow-table ">
-  <div class="bg-gray-100 hidden md:table-header-group ">
-    <div class=" md:table-row ">
-      <div class="table-header">Status</div>
+<section class="workflow-table">
+  <div class="md:table-header-group bg-gray-100 rounded-t-lg">
+    <div class="md:table-row hidden">
+      <div class="table-header rounded-tl-lg">Status</div>
       <div class="table-header">Workflow ID</div>
       <div class="table-header">Type</div>
       <div class="table-header">Started</div>
-      <div class="table-header">End</div>
+      <div class="table-header rounded-tr-lg">End</div>
     </div>
   </div>
   <div class="md:hidden">
@@ -18,8 +18,7 @@
 
 <style lang="postcss">
   .workflow-table {
-    height: calc(100vh - 280px);
-    @apply md:table  border-gray-300 border-2 rounded-lg w-full;
+    @apply md:table border-gray-300 border-2 rounded-lg w-full mb-6;
   }
 
   .table-header {
