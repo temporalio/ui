@@ -4,9 +4,10 @@ import { routeFor } from './route-for';
 
 import type { WorkflowParameters } from './route-for';
 import type { Timestamp } from '$types';
+import { getLastEvent } from '$lib/models/group-events';
 
 export type EventClassification = typeof eventClassifications[number];
-type EventOrGroup = HistoryEventWithId | PendingActivity | EventsGroup;
+type EventOrGroup = HistoryEventWithId | PendingActivity | CompactEventGroup;
 
 type EventSummary = {
   id: string;
@@ -60,8 +61,10 @@ export const isPendingActivity = (
   return false;
 };
 
-export const isEventsGroup = (event: EventOrGroup): event is EventsGroup => {
-  return event instanceof EventsGroup;
+export const isEventsGroup = (
+  eventOrGroup: EventOrGroup,
+): eventOrGroup is CompactEventGroup => {
+  return has(eventOrGroup, 'events');
 };
 
 export const getEventClassification = (
@@ -70,11 +73,11 @@ export const getEventClassification = (
   if (isPendingActivity(event)) return event.state;
   if (isEventsGroup(event)) {
     event =
-      event.get('ActivityTaskScheduled') ??
-      event.get('TimerStarted') ??
-      event.get('WorkflowExecutionSignaled') ??
-      event.get('MarkerRecorded') ??
-      event.get('StartChildWorkflowExecutionInitiated');
+      event.events.get('ActivityTaskScheduled') ??
+      event.events.get('TimerStarted') ??
+      event.events.get('WorkflowExecutionSignaled') ??
+      event.events.get('MarkerRecorded') ??
+      event.events.get('StartChildWorkflowExecutionInitiated');
   }
 
   const eventType = event.eventType;
@@ -97,7 +100,10 @@ const getTime = (event: EventOrGroup): string => {
 
   if (isEvent(event)) ts = event.eventTime;
   if (isPendingActivity(event)) ts = event.lastStartedTime;
-  if (isEventsGroup(event)) ts = event.last.eventTime;
+  if (isEventsGroup(event)) {
+    console.log(event, getLastEvent(event));
+    ts = getLastEvent(event).eventTime;
+  }
 
   return ts ? String(ts) : null;
 };
@@ -142,9 +148,7 @@ export const getHref = (
   }
 };
 
-export const formatEvent = (
-  event: EventOrGroup | EventsGroup,
-): EventSummary => {
+export const formatEvent = (event: EventOrGroup): EventSummary => {
   return {
     id: getId(event),
     name: format(getName(event)),

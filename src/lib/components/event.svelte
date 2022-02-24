@@ -10,7 +10,7 @@
 
   import EventLabel from '$lib/components/event-label.svelte';
 
-  export let event: HistoryEventWithId | PendingActivity | EventsGroup;
+  export let event: HistoryEventWithId | PendingActivity | CompactEventGroup;
 
   let { routeFor, pending, timeStamp, name, tag, classification, id } =
     formatEvent(event);

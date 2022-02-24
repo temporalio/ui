@@ -1,12 +1,14 @@
 <script lang="ts">
-  import type { EventGroups } from '$lib/models/events-group';
   import Pagination from './pagination.svelte';
   import Event from './event.svelte';
 
-  export let events: (HistoryEventWithId | PendingActivity)[] | EventGroups;
+  export let events:
+    | HistoryEventWithId[]
+    | PendingActivity[]
+    | CompactEventGroups;
 </script>
 
-<Pagination items={[...events]} let:visibleItems>
+<Pagination items={events} let:visibleItems>
   <section
     class="flex flex-col border-2 border-gray-300 rounded-lg w-full event-history mb-6"
   >

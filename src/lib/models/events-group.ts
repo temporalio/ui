@@ -1,3 +1,5 @@
+import { getName } from '$lib/utilities/get-event-name';
+
 type ScheduledActivityEvent = HistoryEventWithId & {
   eventType: 'ActivityTaskScheduled';
 };
@@ -81,31 +83,8 @@ export class EventsGroup {
   private _events: Map<CompactEventType, HistoryEventWithId> = new Map();
 
   constructor(event: CompactEvent) {
-    if (isActivityScheduledEvent(event)) {
-      this.id = event?.activityTaskScheduledEventAttributes?.activityId;
-      this.name =
-        event?.activityTaskScheduledEventAttributes?.activityType?.name;
-    }
-
-    if (isTimerStartedEvent(event)) {
-      this.id = event.id;
-      this.name = `Timer ${event?.timerStartedEventAttributes?.timerId} (${event?.timerStartedEventAttributes?.startToFireTimeout})`;
-    }
-
-    if (isSignalEvent(event)) {
-      this.id = event.id;
-      this.name = `Signal: ${event?.workflowExecutionSignaledEventAttributes?.signalName}`;
-    }
-
-    if (isMarkerEvent(event)) {
-      this.id = event.id;
-      this.name = `Marker: ${event?.markerRecordedEventAttributes?.markerName}`;
-    }
-
-    if (isChildWorkflowInitializedEvent(event)) {
-      this.id = event.id;
-      this.name = `Child Workflow: ${event?.startChildWorkflowExecutionInitiatedEventAttributes?.workflowType?.name}`;
-    }
+    this.id = event?.id;
+    this.name = getName(event);
 
     this.set(event.eventType, event);
   }

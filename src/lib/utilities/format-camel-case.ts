@@ -4,6 +4,7 @@ const isUpperCase = (label: string, index: number): boolean => {
 };
 
 export const format = (label: string): string => {
+  console.log(label);
   let result = '';
   let index = 0;
 
