@@ -8,6 +8,7 @@ type TimerType = import('$lib/utilities/is-event-type').TimerType;
 type SignalType = import('$lib/utilities/is-event-type').SignalType;
 type MarkerType = import('$lib/utilities/is-event-type').MarkerType;
 type ChildType = import('$lib/utilities/is-event-type').ChildType;
+type EventTypeCategory = import('$lib/utilities/get-event-categorization');
 
 interface HistoryEventWithId extends HistoryEvent {
   id: string;
@@ -142,14 +143,6 @@ type ChildEvent = StartChildWorkflowExecutionInitiatedEvent &
   ChildWorkflowExecutionCanceledEvent &
   ChildWorkflowExecutionTimedOutEvent &
   ChildWorkflowExecutionTerminatedEvent;
-
-type EventTypeCategory =
-  | 'activity'
-  | 'child-workflow'
-  | 'signal'
-  | 'timer'
-  | 'workflow'
-  | 'command';
 
 type EventsOrActivities = (HistoryEventWithId | PendingActivity)[];
 type IterableEvents = EventsOrActivities | CompactEventGroups;

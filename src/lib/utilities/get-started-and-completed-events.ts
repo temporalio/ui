@@ -9,7 +9,7 @@ export const getWorkflowStartedAndCompletedEvents = async (
   events = await events;
 
   let input: string;
-  let result;
+  let result: string;
 
   const workflowStartedEvent: HistoryEventWithId = events?.find((event) => {
     return !!event.workflowExecutionStartedEventAttributes;

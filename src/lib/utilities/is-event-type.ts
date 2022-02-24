@@ -58,6 +58,7 @@ export const eventTypes = [
   'WorkflowTaskStarted',
   'WorkflowTaskTimedOut',
   'ExternalWorkflowExecutionCancelRequested',
+  'ExternalWorkflowExecutionSignaled',
   'RequestCancelExternalWorkflowExecutionFailed',
   'RequestCancelExternalWorkflowExecutionInitiated',
   'UpsertWorkflowSearchAttributes',

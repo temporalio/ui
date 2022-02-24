@@ -9,14 +9,6 @@ import {
   isTimerStartedEvent,
 } from '$lib/utilities/is-event-type';
 
-type EventGroups = {
-  Activity: ActivityEvent;
-  ChildWorkflow: ChildEvent;
-  Timer: TimerEvent;
-  Signal: SignalEvent;
-  Marker: MarkerEvent;
-};
-
 type StartingEvents = {
   Activity: ActivityTaskScheduledEvent;
   ChildWorkflow: StartChildWorkflowExecutionInitiatedEvent;
@@ -25,43 +17,30 @@ type StartingEvents = {
   Marker: MarkerRecordedEvent;
 };
 
-const _create =
-  <K extends keyof StartingEvents>(kind: K) =>
-  (event: StartingEvents[K]): CompactEventGroup => {
-    const id = getGroupId(event);
-    const name = getName(event);
+const createGroupFor = <K extends keyof StartingEvents>(
+  event: StartingEvents[K],
+): CompactEventGroup => {
+  const id = getGroupId(event);
+  const name = getName(event);
 
-    const events = new Map<EventType, HistoryEventWithId>();
+  const events = new Map<EventType, HistoryEventWithId>();
 
-    events.set(event.eventType, event);
+  events.set(event.eventType, event);
 
-    return { id, name, events };
-  };
-
-const a = (e: ActivityTaskScheduledEvent) => {
-  const l = createGroupFor.activity(e);
-  l.events;
-};
-
-const createGroupFor = {
-  activity: _create('Activity'),
-  childWorkflow: _create('ChildWorkflow'),
-  timer: _create('Timer'),
-  signal: _create('Signal'),
-  marker: _create('Marker'),
+  return { id, name, events };
 };
 
 export const createEventGroup = (event: CommonHistoryEvent) => {
   if (isActivityTaskScheduledEvent(event))
-    return createGroupFor.activity(event);
+    return createGroupFor<'Activity'>(event);
 
   if (isStartChildWorkflowExecutionInitiatedEvent(event))
-    return createGroupFor.childWorkflow(event);
+    return createGroupFor<'ChildWorkflow'>(event);
 
-  if (isTimerStartedEvent(event)) return createGroupFor.timer(event);
+  if (isTimerStartedEvent(event)) return createGroupFor<'Timer'>(event);
 
   if (isSignalExternalWorkflowExecutionInitiatedEvent(event))
-    return createGroupFor.signal(event);
+    return createGroupFor<'Signal'>(event);
 
-  if (isMarkerRecordedEvent(event)) return createGroupFor.marker(event);
+  if (isMarkerRecordedEvent(event)) return createGroupFor<'Marker'>(event);
 };
