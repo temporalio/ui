@@ -10,10 +10,16 @@
       eventId,
     } = page.params;
 
-    const { events } = stuff;
+    const { eventGroups } = stuff;
+    const group = eventGroups.find(({ id }) => id === eventId);
+
+    if (!group) return { status: 404 };
+
+    const events = [...group.events.values()];
 
     return {
       props: {
+        group,
         events,
         params: {
           workflowId,
@@ -27,27 +33,17 @@
 </script>
 
 <script lang="ts">
-  import { EventGroups, EventsGroup } from '$lib/models/events-group';
   import { routeFor } from '$lib/utilities/route-for';
   import { page } from '$app/stores';
 
+  export let group: CompactEventGroup;
   export let events: HistoryEventWithId[];
   export let params: EventParameter;
 
-  const getEventsGroup = (
-    events: HistoryEventWithId[],
-    id: string,
-  ): { group: EventsGroup; events: HistoryEventWithId[] } => {
-    const groups = EventGroups.from(events);
-    const group = groups.get(id);
-
-    return {
-      group,
-      events: group.events,
-    };
-  };
-
-  const getHref = (group: EventsGroup, event: HistoryEventWithId): string =>
+  const getHref = (
+    group: CompactEventGroup,
+    event: HistoryEventWithId,
+  ): string =>
     routeFor('workflow.events.compact.activity.event', {
       ...params,
       activityId: group.id,
@@ -58,18 +54,16 @@
 <div class="flex flex-col w-full h-full">
   <nav class="mb-4">
     <ul class="flex gap-4 w-full items-start">
-      {#await getEventsGroup(events, params.eventId) then { group, events }}
-        {#each events as event}
-          <li>
-            <a
-              href={getHref(group, event)}
-              class:active={$page.path === getHref(group, event)}
-            >
-              {event.eventType}
-            </a>
-          </li>
-        {/each}
-      {/await}
+      {#each events as event}
+        <li>
+          <a
+            href={getHref(group, event)}
+            class:active={$page.path === getHref(group, event)}
+          >
+            {event.eventType}
+          </a>
+        </li>
+      {/each}
     </ul>
   </nav>
   <slot />

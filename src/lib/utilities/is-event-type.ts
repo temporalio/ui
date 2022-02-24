@@ -69,6 +69,7 @@ export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
   'workflowTaskFailedEventAttributes',
   'activityTaskScheduledEventAttributes',
   'activityTaskCompletedEventAttributes',
+  'activityTaskStartedEventAttributes',
   'activityTaskFailedEventAttributes',
   'activityTaskTimedOutEventAttributes',
   'timerStartedEventAttributes',

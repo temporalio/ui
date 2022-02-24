@@ -7,6 +7,7 @@
 
     return {
       props: { eventGroups },
+      stuff: { eventGroups },
     };
   };
 </script>
@@ -14,7 +15,6 @@
 <script lang="ts">
   import { groupEvents } from '$lib/models/group-events';
   import EventTable from '$lib/components/event-table.svelte';
-  import { dataConverterWebsocket } from '$lib/utilities/data-converter-websocket';
 
   export let eventGroups: CompactEventGroups;
 </script>

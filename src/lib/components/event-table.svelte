@@ -10,7 +10,7 @@
 
 <Pagination items={events} let:visibleItems>
   <section
-    class="flex flex-col border-2 border-gray-300 rounded-lg w-full event-history mb-6"
+    class="flex flex-col border-2 border-gray-300 rounded-lg w-full event-history mb-6 h-96"
   >
     <div class="flex w-full">
       <header class="table-header border-r-2 rounded-tl-lg w-1/3">

@@ -1,4 +1,3 @@
-import { EventsGroup } from '../models/events-group';
 import { format } from './format-camel-case';
 import { routeFor } from './route-for';
 

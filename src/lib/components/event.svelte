@@ -3,8 +3,6 @@
   import { faCalendar } from '@fortawesome/free-solid-svg-icons';
   import { page } from '$app/stores';
 
-  import type { EventsGroup } from '$lib/models/events-group';
-
   import { formatEvent } from '$lib/utilities/get-event-classification';
   import { formatDate } from '$lib/utilities/format-date';
 
