@@ -41,6 +41,7 @@
   import WorkflowFilters from './_workflow-filters.svelte';
   import EmptyState from '$lib/components/empty-state.svelte';
   import WorkflowsLoadingState from './_workflows-loading.svelte';
+  import Badge from '$lib/components/badge.svelte';
 
   export let namespace: string;
   export let workflows: CombinedWorkflowExecutionsResponse;
@@ -53,7 +54,7 @@
     : 'If you have filters applied, try adjusting them.';
 </script>
 
-<h2 class="text-2xl">Workflows</h2>
+<h2 class="text-2xl">Workflows <Badge type="beta">Beta</Badge></h2>
 <WorkflowFilters bind:timeFormat />
 {#await workflows}
   <WorkflowsLoadingState />
