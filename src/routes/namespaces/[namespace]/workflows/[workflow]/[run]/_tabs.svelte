@@ -1,6 +1,4 @@
 <script lang="ts">
-  import type { WorkflowExecution } from '$lib/models/workflow-execution';
-
   import { page } from '$app/stores';
   import { routeFor } from '$lib/utilities/route-for';
 

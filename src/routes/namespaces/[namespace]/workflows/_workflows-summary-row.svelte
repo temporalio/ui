@@ -2,8 +2,6 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { namespace } from '$lib/stores/namespace';
 
-  import type { WorkflowExecution } from '$lib/models/workflow-execution';
-
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import { routeFor } from '$lib/utilities/route-for';
 

@@ -1,5 +1,3 @@
-import type { ListWorkflowExecutionsResponse } from '$types';
-import type { WorkflowExecution } from '$lib/models/workflow-execution';
 import type { ErrorCallback } from '$lib/utilities/request-from-api';
 
 import { requestFromAPI } from '$lib/utilities/request-from-api';

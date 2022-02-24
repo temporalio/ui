@@ -1,6 +1,5 @@
 <script lang="ts" context="module">
   import type { LoadInput } from '@sveltejs/kit';
-  import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
   export const load = async ({ stuff }: LoadInput) => {
     const { workflow, events } = stuff;

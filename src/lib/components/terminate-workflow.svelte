@@ -1,8 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
 
-  import type { WorkflowExecution } from '$lib/models/workflow-execution';
-
   import { routeFor } from '$lib/utilities/route-for';
   import { handleError } from '$lib/utilities/handle-error';
   import { terminateWorkflow } from '$lib/services/terminate-service';

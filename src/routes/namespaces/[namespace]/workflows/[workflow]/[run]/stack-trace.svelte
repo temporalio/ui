@@ -1,5 +1,4 @@
 <script context="module" lang="ts">
-  import type { WorkflowExecution } from '$lib/models/workflow-execution';
   import type { LoadInput } from '@sveltejs/kit';
 
   export async function load({ page, stuff }: LoadInput) {
