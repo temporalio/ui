@@ -23,24 +23,22 @@
   export let workflow: WorkflowExecution;
   export let events: HistoryEventWithId[];
 
-  const eventsAndActivities = getVisibleEvents(events, workflow, category);
+  const visibleEvents = getVisibleEvents(events, workflow, category);
 </script>
 
-{#await eventsAndActivities then events}
-  <EventTable {events}>
-    <div slot="filters">
-      <FilterSelect parameter="event-type" bind:value={category}>
-        <Option value={null}>All</Option>
-        <Option value="activity">Activity</Option>
-        <Option value="command">Command</Option>
-        <Option value="signal">Signal</Option>
-        <Option value="timer">Timer</Option>
-        <Option value="child-workflow">Child Workflow</Option>
-        <Option value="workflow">Workflow</Option>
-      </FilterSelect>
-    </div>
-    <div slot="details" class="w-full h-full py-4">
-      <slot />
-    </div>
-  </EventTable>
-{/await}
+<EventTable events={visibleEvents}>
+  <div slot="filters">
+    <FilterSelect parameter="event-type" bind:value={category}>
+      <Option value={null}>All</Option>
+      <Option value="activity">Activity</Option>
+      <Option value="command">Command</Option>
+      <Option value="signal">Signal</Option>
+      <Option value="timer">Timer</Option>
+      <Option value="child-workflow">Child Workflow</Option>
+      <Option value="workflow">Workflow</Option>
+    </FilterSelect>
+  </div>
+  <div slot="details" class="w-full h-full py-4">
+    <slot />
+  </div>
+</EventTable>

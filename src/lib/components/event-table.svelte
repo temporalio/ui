@@ -1,7 +1,6 @@
 <script lang="ts">
   import Pagination from './pagination.svelte';
   import Event from './event.svelte';
-  import HistoryTable from './history-table.svelte';
 
   export let events: IterableEvents;
 </script>

@@ -19,4 +19,8 @@
   export let eventGroups: CompactEventGroups;
 </script>
 
-<EventTable events={eventGroups} />
+<EventTable events={eventGroups}>
+  <div slot="details" class="w-full h-full py-4">
+    <slot />
+  </div>
+</EventTable>
