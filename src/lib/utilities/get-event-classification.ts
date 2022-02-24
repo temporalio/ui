@@ -1,12 +1,12 @@
-import { EventsGroup } from '../models/events-group';
 import { format } from './format-camel-case';
 import { routeFor } from './route-for';
+import { getLastEvent } from '$lib/models/group-events/get-last-event';
 
 import type { WorkflowParameters } from './route-for';
 import type { Timestamp } from '$types';
 
 export type EventClassification = typeof eventClassifications[number];
-type EventOrGroup = HistoryEventWithId | PendingActivity | EventsGroup;
+type EventOrGroup = HistoryEventWithId | PendingActivity | CompactEventGroup;
 
 type EventSummary = {
   id: string;
@@ -60,21 +60,29 @@ export const isPendingActivity = (
   return false;
 };
 
-export const isEventsGroup = (event: EventOrGroup): event is EventsGroup => {
-  return event instanceof EventsGroup;
+export const isEventGroup = (
+  eventOrGroup: EventOrGroup,
+): eventOrGroup is CompactEventGroup => {
+  return has(eventOrGroup, 'events');
+};
+
+export const isEventGroups = (
+  eventsOrGroups: unknown[],
+): eventsOrGroups is CompactEventGroups => {
+  return eventsOrGroups.every(isEventGroup);
 };
 
 export const getEventClassification = (
   event: EventOrGroup,
 ): EventClassification => {
   if (isPendingActivity(event)) return event.state;
-  if (isEventsGroup(event)) {
+  if (isEventGroup(event)) {
     event =
-      event.get('ActivityTaskScheduled') ??
-      event.get('TimerStarted') ??
-      event.get('WorkflowExecutionSignaled') ??
-      event.get('MarkerRecorded') ??
-      event.get('StartChildWorkflowExecutionInitiated');
+      event.events.get('ActivityTaskScheduled') ??
+      event.events.get('TimerStarted') ??
+      event.events.get('WorkflowExecutionSignaled') ??
+      event.events.get('MarkerRecorded') ??
+      event.events.get('StartChildWorkflowExecutionInitiated');
   }
 
   const eventType = event.eventType;
@@ -89,7 +97,7 @@ const getName = (event: EventOrGroup): string => {
   if (isEvent(event)) return String(event.eventType);
   if (isPendingActivity(event))
     return `${event.activityType.name}:${event.state}`;
-  if (isEventsGroup(event)) return event.name;
+  if (isEventGroup(event)) return event.name;
 };
 
 const getTime = (event: EventOrGroup): string => {
@@ -97,7 +105,7 @@ const getTime = (event: EventOrGroup): string => {
 
   if (isEvent(event)) ts = event.eventTime;
   if (isPendingActivity(event)) ts = event.lastStartedTime;
-  if (isEventsGroup(event)) ts = event.last.eventTime;
+  if (isEventGroup(event)) ts = getLastEvent(event).eventTime;
 
   return ts ? String(ts) : null;
 };
@@ -105,7 +113,7 @@ const getTime = (event: EventOrGroup): string => {
 const getId = (event: EventOrGroup): string => {
   if (isEvent(event)) return String(event.eventId);
   if (isPendingActivity(event)) return String(event.activityId);
-  if (isEventsGroup(event)) return String(event.id);
+  if (isEventGroup(event)) return String(event.id);
 };
 
 const getType = (
@@ -113,7 +121,7 @@ const getType = (
 ): 'event' | 'pending-activity' | 'activity' => {
   if (isEvent(event)) return 'event';
   if (isPendingActivity(event)) return 'pending-activity';
-  if (isEventsGroup(event)) return 'activity';
+  if (isEventGroup(event)) return 'activity';
 };
 
 export const getHref = (
@@ -121,10 +129,12 @@ export const getHref = (
   parameters: WorkflowParameters,
 ): string => {
   if (isEvent(event)) {
-    return routeFor('workflow.events.full.event', {
+    const route = routeFor('workflow.events.full.event', {
       ...parameters,
       eventId: String(event.eventId),
     });
+
+    return route;
   }
 
   if (isPendingActivity(event)) {
@@ -134,7 +144,7 @@ export const getHref = (
     });
   }
 
-  if (isEventsGroup(event)) {
+  if (isEventGroup(event)) {
     return routeFor('workflow.events.compact.activity', {
       ...parameters,
       eventId: String(event.id),
@@ -142,9 +152,7 @@ export const getHref = (
   }
 };
 
-export const formatEvent = (
-  event: EventOrGroup | EventsGroup,
-): EventSummary => {
+export const formatEvent = (event: EventOrGroup): EventSummary => {
   return {
     id: getId(event),
     name: format(getName(event)),
@@ -153,7 +161,7 @@ export const formatEvent = (
     tag: getName(event),
     type: getType(event),
     pending: isPendingActivity(event),
-    activity: isEventsGroup(event),
+    activity: isEventGroup(event),
     routeFor: (parameters: WorkflowParameters) => getHref(event, parameters),
   };
 };

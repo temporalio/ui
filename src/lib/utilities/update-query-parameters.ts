@@ -10,7 +10,7 @@ type UpdateQueryParams = {
   invalidate?: typeof invalidate;
 };
 
-const options = { replaceState: true, keepfocus: true };
+const options = { replaceState: true, keepfocus: true, noscroll: true };
 
 export const updateQueryParameters = async ({
   parameter,

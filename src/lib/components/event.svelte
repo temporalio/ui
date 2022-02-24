@@ -3,20 +3,18 @@
   import { faCalendar } from '@fortawesome/free-solid-svg-icons';
   import { page } from '$app/stores';
 
-  import type { EventsGroup } from '$lib/models/events-group';
-
   import { formatEvent } from '$lib/utilities/get-event-classification';
   import { formatDate } from '$lib/utilities/format-date';
 
   import EventLabel from '$lib/components/event-label.svelte';
 
-  export let event: HistoryEventWithId | PendingActivity | EventsGroup;
+  export let event: HistoryEventWithId | PendingActivity | CompactEventGroup;
 
   let { routeFor, pending, timeStamp, name, tag, classification, id } =
     formatEvent(event);
 
   let { namespace, workflow: workflowId, run: runId } = $page.params;
-  let href = routeFor({ namespace, workflowId, runId });
+  let href = routeFor({ namespace, workflowId, runId, query: $page.query });
 </script>
 
 <a
