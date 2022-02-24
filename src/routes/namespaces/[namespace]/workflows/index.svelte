@@ -34,13 +34,12 @@
 </script>
 
 <script lang="ts">
-  import VirtualList from '@sveltejs/svelte-virtual-list';
-
   import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
   import WorkflowFilters from './_workflow-filters.svelte';
   import EmptyState from '$lib/components/empty-state.svelte';
   import WorkflowsLoadingState from './_workflows-loading.svelte';
+  import Pagination from '$lib/components/pagination.svelte';
   import Badge from '$lib/components/badge.svelte';
 
   export let workflows: CombinedWorkflowExecutionsResponse;
@@ -59,11 +58,13 @@
   <WorkflowsLoadingState />
 {:then { workflows }}
   {#if workflows.length}
-    <WorkflowsSummaryTable>
-      <VirtualList items={workflows} let:item>
-        <WorkflowsSummaryRow workflow={item} {timeFormat} />
-      </VirtualList>
-    </WorkflowsSummaryTable>
+    <Pagination items={workflows} let:visibleItems>
+      <WorkflowsSummaryTable>
+        {#each visibleItems as event}
+          <WorkflowsSummaryRow workflow={event} {timeFormat} />
+        {/each}
+      </WorkflowsSummaryTable>
+    </Pagination>
   {:else}
     <EmptyState title={'No Workflows Found'} content={errorMessage} />
   {/if}
