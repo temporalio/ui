@@ -105,10 +105,7 @@ const getTime = (event: EventOrGroup): string => {
 
   if (isEvent(event)) ts = event.eventTime;
   if (isPendingActivity(event)) ts = event.lastStartedTime;
-  if (isEventGroup(event)) {
-    console.log(event, getLastEvent(event));
-    ts = getLastEvent(event).eventTime;
-  }
+  if (isEventGroup(event)) ts = getLastEvent(event).eventTime;
 
   return ts ? String(ts) : null;
 };
