@@ -1,13 +1,17 @@
 <script lang="ts">
+  import { page } from '$app/stores';
+
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import { fetchRawEvents } from '$lib/services/events-service';
   import { faDownload } from '@fortawesome/free-solid-svg-icons';
 
+  const { workflow: executionId, run: runId, namespace } = $page.params;
+
   const exportHistory = async () => {
     const events = await fetchRawEvents({
       namespace,
-      executionId: workflowId,
-      runId: runId,
+      executionId,
+      runId,
     });
 
     const content = JSON.stringify(events, null, 2);
@@ -21,10 +25,6 @@
       a.click();
     }
   };
-
-  export let namespace: string;
-  export let workflowId: string;
-  export let runId: string;
 </script>
 
 <ToggleButton icon={faDownload} on:click={exportHistory} />

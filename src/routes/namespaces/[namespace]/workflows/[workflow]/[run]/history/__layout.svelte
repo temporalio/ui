@@ -14,7 +14,6 @@
       props: {
         workflow: { workflowId, runId, namespace },
         events,
-        parameters,
       },
       stuff: {
         events,
@@ -38,7 +37,6 @@
   import InputAndResults from '$lib/components/input-and-result.svelte';
 
   export let workflow: WorkflowParameters;
-  export let parameters: Parameters<typeof fetchEvents>[0];
   export let events: HistoryEventWithId[];
 </script>
 
@@ -61,11 +59,7 @@
           href={routeFor('workflow.events.json', workflow)}
         />
       </ToggleButtons>
-      <ExportHistory
-        namespace={parameters.namespace}
-        workflowId={parameters.executionId}
-        runId={parameters.runId}
-      />
+      <ExportHistory />
     </div>
   </nav>
   <slot />
