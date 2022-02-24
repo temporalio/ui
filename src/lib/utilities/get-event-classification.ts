@@ -60,17 +60,23 @@ export const isPendingActivity = (
   return false;
 };
 
-export const isEventsGroup = (
+export const isEventGroup = (
   eventOrGroup: EventOrGroup,
 ): eventOrGroup is CompactEventGroup => {
   return has(eventOrGroup, 'events');
+};
+
+export const isEventGroups = (
+  eventsOrGroups: unknown[],
+): eventsOrGroups is CompactEventGroups => {
+  return eventsOrGroups.every(isEventGroup);
 };
 
 export const getEventClassification = (
   event: EventOrGroup,
 ): EventClassification => {
   if (isPendingActivity(event)) return event.state;
-  if (isEventsGroup(event)) {
+  if (isEventGroup(event)) {
     event =
       event.events.get('ActivityTaskScheduled') ??
       event.events.get('TimerStarted') ??
@@ -91,7 +97,7 @@ const getName = (event: EventOrGroup): string => {
   if (isEvent(event)) return String(event.eventType);
   if (isPendingActivity(event))
     return `${event.activityType.name}:${event.state}`;
-  if (isEventsGroup(event)) return event.name;
+  if (isEventGroup(event)) return event.name;
 };
 
 const getTime = (event: EventOrGroup): string => {
@@ -99,7 +105,7 @@ const getTime = (event: EventOrGroup): string => {
 
   if (isEvent(event)) ts = event.eventTime;
   if (isPendingActivity(event)) ts = event.lastStartedTime;
-  if (isEventsGroup(event)) {
+  if (isEventGroup(event)) {
     console.log(event, getLastEvent(event));
     ts = getLastEvent(event).eventTime;
   }
@@ -110,7 +116,7 @@ const getTime = (event: EventOrGroup): string => {
 const getId = (event: EventOrGroup): string => {
   if (isEvent(event)) return String(event.eventId);
   if (isPendingActivity(event)) return String(event.activityId);
-  if (isEventsGroup(event)) return String(event.id);
+  if (isEventGroup(event)) return String(event.id);
 };
 
 const getType = (
@@ -118,7 +124,7 @@ const getType = (
 ): 'event' | 'pending-activity' | 'activity' => {
   if (isEvent(event)) return 'event';
   if (isPendingActivity(event)) return 'pending-activity';
-  if (isEventsGroup(event)) return 'activity';
+  if (isEventGroup(event)) return 'activity';
 };
 
 export const getHref = (
@@ -139,7 +145,7 @@ export const getHref = (
     });
   }
 
-  if (isEventsGroup(event)) {
+  if (isEventGroup(event)) {
     return routeFor('workflow.events.compact.activity', {
       ...parameters,
       eventId: String(event.id),
@@ -156,7 +162,7 @@ export const formatEvent = (event: EventOrGroup): EventSummary => {
     tag: getName(event),
     type: getType(event),
     pending: isPendingActivity(event),
-    activity: isEventsGroup(event),
+    activity: isEventGroup(event),
     routeFor: (parameters: WorkflowParameters) => getHref(event, parameters),
   };
 };

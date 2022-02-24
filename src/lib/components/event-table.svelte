@@ -3,8 +3,7 @@
   import Event from './event.svelte';
 
   export let events:
-    | HistoryEventWithId[]
-    | PendingActivity[]
+    | (HistoryEventWithId | PendingActivity)[]
     | CompactEventGroups;
 </script>
 

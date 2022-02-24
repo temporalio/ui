@@ -28,7 +28,7 @@
     const workflows = await fetchAllWorkflows(namespace, parameters, fetch);
 
     return {
-      props: { workflows, namespace, parameters, isAdvancedSearch },
+      props: { workflows, isAdvancedSearch },
     };
   }
 </script>
@@ -42,7 +42,6 @@
   import EmptyState from '$lib/components/empty-state.svelte';
   import WorkflowsLoadingState from './_workflows-loading.svelte';
 
-  export let namespace: string;
   export let workflows: CombinedWorkflowExecutionsResponse;
   export let isAdvancedSearch: boolean;
 
