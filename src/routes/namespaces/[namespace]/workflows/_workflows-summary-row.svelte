@@ -19,6 +19,11 @@
 
 <a sveltekit:noscroll {href}>
   <article class="row flex flex-row border-b-2 items-center">
+    <div class="w-2/12 text-left">
+      <div>
+        <WorkflowStatus status={workflow.status} />
+      </div>
+    </div>
     <div class="links w-3/12 text-left">
       {workflow.id}
     </div>
@@ -26,11 +31,6 @@
       <h3>
         {workflow.name}
       </h3>
-    </div>
-    <div class="w-3/12 text-left">
-      <div>
-        <WorkflowStatus status={workflow.status} />
-      </div>
     </div>
     <div class="w-2/12 text-left">
       <p class="text-xs">
@@ -47,7 +47,7 @@
 
 <style lang="postcss">
   .row {
-    @apply w-full h-full flex no-underline p-2;
+    @apply w-full flex no-underline p-2;
   }
 
   .row:hover {

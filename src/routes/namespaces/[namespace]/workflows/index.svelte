@@ -41,6 +41,7 @@
   import WorkflowFilters from './_workflow-filters.svelte';
   import EmptyState from '$lib/components/empty-state.svelte';
   import WorkflowsLoadingState from './_workflows-loading.svelte';
+  import Pagination from '$lib/components/pagination.svelte';
 
   export let namespace: string;
   export let workflows: CombinedWorkflowExecutionsResponse;
@@ -59,11 +60,13 @@
   <WorkflowsLoadingState />
 {:then { workflows }}
   {#if workflows.length}
-    <WorkflowsSummaryTable>
-      <VirtualList items={workflows} let:item>
-        <WorkflowsSummaryRow workflow={item} {timeFormat} />
-      </VirtualList>
-    </WorkflowsSummaryTable>
+    <Pagination items={workflows} let:visibleItems>
+      <WorkflowsSummaryTable>
+        {#each visibleItems as event}
+          <WorkflowsSummaryRow workflow={event} {timeFormat} />
+        {/each}
+      </WorkflowsSummaryTable>
+    </Pagination>
   {:else}
     <EmptyState title={'No Workflows Found'} content={errorMessage} />
   {/if}
