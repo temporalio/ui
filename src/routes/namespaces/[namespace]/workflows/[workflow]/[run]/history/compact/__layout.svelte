@@ -14,13 +14,9 @@
 
 <script lang="ts">
   import { groupEvents } from '$lib/models/group-events';
-  import EventGroupTable from '$lib/components/event-group-table.svelte';
+  import EventTable from '$lib/components/event-table.svelte';
 
   export let eventGroups: CompactEventGroups;
 </script>
 
-<EventGroupTable events={eventGroups}>
-  <div slot="details" class="w-full h-full py-4">
-    <slot />
-  </div>
-</EventGroupTable>
+<EventTable events={eventGroups} />

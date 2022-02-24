@@ -17,7 +17,7 @@ type RoutePath =
 type EventView = 'event' | 'pending' | 'activity';
 type EventHistoryView = 'full' | 'compact' | 'json';
 
-export type QueryParameters = { query: URLSearchParams };
+export type QueryParameters = { query?: URLSearchParams };
 export type NamespaceParameter = { namespace: string } & QueryParameters;
 export type WorkflowParameters = {
   workflowId: string;
