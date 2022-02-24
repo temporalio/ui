@@ -3,7 +3,7 @@
   import Event from './event.svelte';
   import HistoryTable from './history-table.svelte';
 
-  export let events: EventsOrActivities;
+  export let events: CompactEventGroups;
 </script>
 
 <Pagination items={events} let:visibleItems>
