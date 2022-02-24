@@ -1,9 +1,9 @@
 import { format } from './format-camel-case';
 import { routeFor } from './route-for';
+import { getLastEvent } from '$lib/models/group-events/get-last-event';
 
 import type { WorkflowParameters } from './route-for';
 import type { Timestamp } from '$types';
-import { getLastEvent } from '$lib/models/group-events';
 
 export type EventClassification = typeof eventClassifications[number];
 type EventOrGroup = HistoryEventWithId | PendingActivity | CompactEventGroup;

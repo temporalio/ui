@@ -1,7 +1,10 @@
-type CompactEventGroup = {
+type CompactEventGroup<T = EventType, E = HistoryEventWithId> = {
   id: string;
   name: string;
-  events: Map<EventType, HistoryEventWithId>;
+  events: Map<T, E>;
 };
 
-type CompactEventGroups = CompactEventGroup[];
+type CompactEventGroups<
+  T = EventType,
+  E = HistoryEventWithId,
+> = CompactEventGroup[];

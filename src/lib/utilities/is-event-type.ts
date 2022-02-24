@@ -1,4 +1,5 @@
-export const activityTypes = [
+export type ActivityType = typeof activityEvents[number];
+export const activityEvents = [
   'ActivityTaskCanceled',
   'ActivityTaskCancelRequested',
   'ActivityTaskCompleted',
@@ -8,21 +9,24 @@ export const activityTypes = [
   'ActivityTaskTimedOut',
 ] as const;
 
-export const timerTypes = [
+export type TimerType = typeof timerEvents[number];
+export const timerEvents = [
   'TimerStarted',
   'TimerCanceled',
   'TimerFired',
 ] as const;
 
-export const signalTypes = [
+export type SignalType = typeof signalEvents[number];
+export const signalEvents = [
   'WorkflowExecutionSignaled',
   'SignalExternalWorkflowExecutionFailed',
   'SignalExternalWorkflowExecutionInitiated',
 ] as const;
 
-export const markerTypes = ['MarkerRecorded'] as const;
+export type MarkerType = typeof markerEvents[number];
+export const markerEvents = ['MarkerRecorded'] as const;
 
-const childTypes = [
+const childEvents = [
   'StartChildWorkflowExecutionInitiated',
   'ChildWorkflowExecutionStarted',
   'ChildWorkflowExecutionCompleted',
@@ -33,12 +37,13 @@ const childTypes = [
   'StartChildWorkflowExecutionFailed',
 ] as const;
 
-export const eventTypes: Readonly<EventType[]> = [
-  ...activityTypes,
-  ...timerTypes,
-  ...signalTypes,
-  ...markerTypes,
-  ...childTypes,
+export type EventType = typeof eventTypes[number];
+export const eventTypes = [
+  ...activityEvents,
+  ...timerEvents,
+  ...signalEvents,
+  ...markerEvents,
+  ...childEvents,
   'WorkflowExecutionCanceled',
   'WorkflowExecutionCancelRequested',
   'WorkflowExecutionCompleted',
@@ -98,7 +103,7 @@ export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
   'signalExternalWorkflowExecutionFailedEventAttributes',
   'externalWorkflowExecutionSignaledEventAttributes',
   'upsertWorkflowSearchAttributesEventAttributes',
-];
+] as const;
 
 export const findAttributeKey = (event: HistoryEvent): EventAttributeKey => {
   for (const key of eventAttributeKeys) {

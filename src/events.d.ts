@@ -1,6 +1,14 @@
 type HistoryEvent = import('$types').HistoryEvent;
 type PendingActivityInfo = import('$types').PendingActivityInfo;
 
+type EventType = import('$lib/utilities/is-event-type').EventType;
+
+type ActivityType = import('$lib/utilities/is-event-type').ActivityType;
+type TimerType = import('$lib/utilities/is-event-type').TimerType;
+type SignalType = import('$lib/utilities/is-event-type').SignalType;
+type MarkerType = import('$lib/utilities/is-event-type').MarkerType;
+type ChildType = import('$lib/utilities/is-event-type').ChildType;
+
 interface HistoryEventWithId extends HistoryEvent {
   id: string;
   eventType: EventType;
@@ -110,58 +118,30 @@ type ExternalWorkflowExecutionSignaledEvent =
 type UpsertWorkflowSearchAttributesEvent =
   EventWithAttributes<'upsertWorkflowSearchAttributesEventAttributes'>;
 
-type EventType =
-  | ActivityType
-  | TimerType
-  | SignalType
-  | MarkerType
-  | ChildType
-  | 'ChildWorkflowExecutionCanceled'
-  | 'ChildWorkflowExecutionFailed'
-  | 'ChildWorkflowExecutionTerminated'
-  | 'ChildWorkflowExecutionTimedOut'
-  | 'StartChildWorkflowExecutionFailed'
-  | 'SignalExternalWorkflowExecutionFailed'
-  | 'SignalExternalWorkflowExecutionInitiated'
-  | 'WorkflowExecutionCanceled'
-  | 'WorkflowExecutionCancelRequested'
-  | 'WorkflowExecutionCompleted'
-  | 'WorkflowExecutionContinuedAsNew'
-  | 'WorkflowExecutionFailed'
-  | 'WorkflowExecutionStarted'
-  | 'WorkflowExecutionTerminated'
-  | 'WorkflowExecutionTimedOut'
-  | 'WorkflowTaskCompleted'
-  | 'WorkflowTaskFailed'
-  | 'WorkflowTaskScheduled'
-  | 'WorkflowTaskStarted'
-  | 'WorkflowTaskTimedOut'
-  | 'ExternalWorkflowExecutionCancelRequested'
-  | 'RequestCancelExternalWorkflowExecutionFailed'
-  | 'RequestCancelExternalWorkflowExecutionInitiated'
-  | 'UpsertWorkflowSearchAttributes';
+type ActivityEvent = ActivityTaskScheduledEvent &
+  ActivityTaskStartedEvent &
+  ActivityTaskCompletedEvent &
+  ActivityTaskFailedEvent &
+  ActivityTaskTimedOutEvent &
+  ActivityTaskCancelRequestedEvent &
+  ActivityTaskCanceledEvent;
 
-type ActivityType =
-  | 'ActivityTaskCanceled'
-  | 'ActivityTaskCancelRequested'
-  | 'ActivityTaskCompleted'
-  | 'ActivityTaskFailed'
-  | 'ActivityTaskScheduled'
-  | 'ActivityTaskStarted'
-  | 'ActivityTaskTimedOut';
+type TimerEvent = TimerCanceledEvent & TimerStartedEvent & TimerFiredEvent;
 
-type TimerType = 'TimerCanceled' | 'TimerFired' | 'TimerStarted';
+type SignalEvent = SignalExternalWorkflowExecutionInitiatedEvent &
+  SignalExternalWorkflowExecutionFailedEvent &
+  WorkflowExecutionSignaledEvent;
 
-type SignalType =
-  | 'WorkflowExecutionSignaled'
-  | 'ExternalWorkflowExecutionSignaled';
+type MarkerEvent = MarkerRecordedEvent;
 
-type MarkerType = 'MarkerRecorded';
-
-type ChildType =
-  | 'StartChildWorkflowExecutionInitiated'
-  | 'ChildWorkflowExecutionStarted'
-  | 'ChildWorkflowExecutionCompleted';
+type ChildEvent = StartChildWorkflowExecutionInitiatedEvent &
+  StartChildWorkflowExecutionFailedEvent &
+  ChildWorkflowExecutionStartedEvent &
+  ChildWorkflowExecutionCompletedEvent &
+  ChildWorkflowExecutionFailedEvent &
+  ChildWorkflowExecutionCanceledEvent &
+  ChildWorkflowExecutionTimedOutEvent &
+  ChildWorkflowExecutionTerminatedEvent;
 
 type EventTypeCategory =
   | 'activity'

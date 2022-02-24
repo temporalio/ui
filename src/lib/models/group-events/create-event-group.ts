@@ -1,4 +1,5 @@
 import { getName } from '$lib/utilities/get-event-name';
+import { getGroupId } from './get-group-id';
 
 import {
   isActivityTaskScheduledEvent,
@@ -8,18 +9,26 @@ import {
   isTimerStartedEvent,
 } from '$lib/utilities/is-event-type';
 
-type Groupings = {
-  ActivityTaskScheduled: ActivityTaskScheduledEvent;
-  StartChildWorkflowExecutionInitiated: StartChildWorkflowExecutionInitiatedEvent;
-  TimerStarted: TimerStartedEvent;
-  SignalExternalWorkflowExecutionInitiated: SignalExternalWorkflowExecutionInitiatedEvent;
-  MarkerRecorded: MarkerRecordedEvent;
+type EventGroups = {
+  Activity: ActivityEvent;
+  ChildWorkflow: ChildEvent;
+  Timer: TimerEvent;
+  Signal: SignalEvent;
+  Marker: MarkerEvent;
+};
+
+type StartingEvents = {
+  Activity: ActivityTaskScheduledEvent;
+  ChildWorkflow: StartChildWorkflowExecutionInitiatedEvent;
+  Timer: TimerStartedEvent;
+  Signal: SignalExternalWorkflowExecutionInitiatedEvent;
+  Marker: MarkerRecordedEvent;
 };
 
 const _create =
-  <E extends keyof Groupings, T extends Groupings[E]>(eventType: E) =>
-  (event: T): CompactEventGroup => {
-    const id = event.id;
+  <K extends keyof StartingEvents>(kind: K) =>
+  (event: StartingEvents[K]): CompactEventGroup => {
+    const id = getGroupId(event);
     const name = getName(event);
 
     const events = new Map<EventType, HistoryEventWithId>();
@@ -29,12 +38,17 @@ const _create =
     return { id, name, events };
   };
 
+const a = (e: ActivityTaskScheduledEvent) => {
+  const l = createGroupFor.activity(e);
+  l.events;
+};
+
 const createGroupFor = {
-  activity: _create('ActivityTaskScheduled'),
-  childWorkflow: _create('StartChildWorkflowExecutionInitiated'),
-  timer: _create('TimerStarted'),
-  signal: _create('SignalExternalWorkflowExecutionInitiated'),
-  marker: _create('MarkerRecorded'),
+  activity: _create('Activity'),
+  childWorkflow: _create('ChildWorkflow'),
+  timer: _create('Timer'),
+  signal: _create('Signal'),
+  marker: _create('Marker'),
 };
 
 export const createEventGroup = (event: CommonHistoryEvent) => {
