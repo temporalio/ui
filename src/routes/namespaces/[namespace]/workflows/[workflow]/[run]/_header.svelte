@@ -2,8 +2,6 @@
   import Icon from 'svelte-fa';
   import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 
-  import type { WorkflowExecution } from '$lib/models/workflow-execution';
-
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
   import Tabs from './_tabs.svelte';

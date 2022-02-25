@@ -1,6 +1,5 @@
 <script context="module" lang="ts">
   import type { LoadInput } from '@sveltejs/kit';
-  import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
   import { fetchWorkflow } from '$lib/services/workflow-service';
 

@@ -1,6 +1,5 @@
 <script context="module" lang="ts">
   import type { LoadInput } from '@sveltejs/kit';
-  import type { WorkflowExecution } from '$lib/models/workflow-execution';
 
   import { getPollers } from '$lib/services/pollers-service';
   import type { GetPollersResponse } from '$lib/services/pollers-service';

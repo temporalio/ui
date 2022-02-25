@@ -1,5 +1,3 @@
-import type { WorkflowExecution } from '$lib/models/workflow-execution';
-
 import { eventTypeInCategory } from './get-event-categorization';
 import { isEventGroups } from './get-event-classification';
 

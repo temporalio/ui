@@ -1,30 +1,3 @@
-import type {
-  WorkflowExecutionStatus,
-  DescribeWorkflowExecutionResponse,
-  ListWorkflowExecutionsResponse,
-} from '$types';
-
-type Optional<T extends unknown, K extends keyof T = keyof T> = Omit<T, K> &
-  Partial<Pick<T, K>>;
-
-export type WorkflowExecution = {
-  name: string;
-  id: string;
-  runId: string;
-  startTime: string;
-  endTime: string;
-  status: WorkflowExecutionStatus;
-  taskQueue?: string;
-  historyEvents: Long;
-  pendingActivities: PendingActivity[];
-  url: string;
-};
-
-type WorkflowExecutionAPIResponse = Optional<
-  DescribeWorkflowExecutionResponse,
-  'executionConfig' | 'pendingActivities' | 'pendingChildren'
->;
-
 const toPendingActivities = (
   pendingActivity: PendingActivityInfo[] = [],
 ): PendingActivity[] => {
