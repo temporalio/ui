@@ -26,9 +26,3 @@
 {:else}
   <slot />
 {/if}
-
-<style>
-  .trace {
-    font-family: monospace;
-  }
-</style>

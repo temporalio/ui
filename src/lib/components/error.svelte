@@ -33,3 +33,9 @@
     {error?.stack ?? ''}
   </pre>
 {/if}
+
+<style>
+  .trace {
+    font-family: monospace;
+  }
+</style>
