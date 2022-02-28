@@ -1,4 +1,4 @@
-import { formatISO, sub } from 'date-fns';
+import { formatISO, sub, add } from 'date-fns';
 
 type DurationKey = typeof durationKeys;
 
@@ -103,4 +103,8 @@ export const fromDate = (targetDate: string | Date): Duration => {
   if (minutes >= 1) return { minutes };
 
   return { seconds: difference / 1000 };
+};
+
+export const tomorrow = (): string => {
+  return formatISO(add(new Date(), { hours: 24 }));
 };

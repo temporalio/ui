@@ -1,23 +1,30 @@
 <script lang="ts">
+  import Option from './option.svelte';
+
   export let id: string = null;
-  export let value: string | boolean;
+  export let value: SelectOptionValue;
+  export let label: string = null;
   export let dark: boolean = false;
   export let arrow: boolean = false;
+
+  export let options: SelectOptionValue[] = [];
 </script>
 
-<div
-  class:arrow
-  class="relative flex flex-col items-start justify-center border-gray-100 w-full"
->
+<div>
+  <label class="hidden" for={id}>{label}</label>
   <select
-    class="inline border-2 text-base px-2 w-full h-10 rounded-lg"
+    class={`inline border-2 text-base px-2 h-10 rounded-lg w-full ${$$props.class}`}
     class:dark
     class:remove={arrow}
     {id}
     bind:value
     on:change
   >
-    <slot />
+    <slot>
+      {#each options as option}
+        <Option value={option} />
+      {/each}
+    </slot>
   </select>
 </div>
 

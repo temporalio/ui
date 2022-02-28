@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { WorkflowExecutionStatus } from '$types';
   export let status: WorkflowExecutionStatus;
 
   const humanFriendlyNames = {

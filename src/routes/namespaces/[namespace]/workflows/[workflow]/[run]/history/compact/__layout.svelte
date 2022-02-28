@@ -1,15 +1,26 @@
-<script lang="ts">
-  import { EventGroups } from '$lib/models/events-group';
-  import EventTable from '$lib/components/event-table.svelte';
-  import { getAppContext } from '$lib/utilities/get-context';
+<script lang="ts" context="module">
+  import type { LoadInput } from '@sveltejs/kit';
 
-  export let events = getAppContext('events');
+  export const load = async ({ stuff }: LoadInput) => {
+    const { events } = stuff as { events: HistoryEventWithId[] };
+    const eventGroups = groupEvents(events);
+
+    return {
+      props: { eventGroups },
+      stuff: { eventGroups },
+    };
+  };
 </script>
 
-{#await EventGroups.fromPromise(events) then activities}
-  <EventTable events={activities}>
-    <div slot="details" class="w-full h-full py-4">
-      <slot />
-    </div>
-  </EventTable>
-{/await}
+<script lang="ts">
+  import { groupEvents } from '$lib/models/group-events';
+  import EventTable from '$lib/components/event-table.svelte';
+
+  export let eventGroups: CompactEventGroups;
+</script>
+
+<EventTable events={eventGroups}>
+  <div slot="details" class="w-full h-full py-4">
+    <slot />
+  </div>
+</EventTable>

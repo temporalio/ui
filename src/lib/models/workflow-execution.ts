@@ -1,32 +1,14 @@
-import type {
-  WorkflowExecutionStatus,
-  DescribeWorkflowExecutionResponse,
-  ListWorkflowExecutionsResponse,
-} from '$types';
-
-type Optional<T extends unknown, K extends keyof T = keyof T> = Omit<T, K> &
-  Partial<Pick<T, K>>;
-
-export type WorkflowExecution = {
-  name: string;
-  id: string;
-  runId: string;
-  startTime: string;
-  endTime: string;
-  status: WorkflowExecutionStatus;
-  taskQueue?: string;
-  historyEvents: Long;
-  pendingActivities: PendingActivity[];
-  url: string;
+const toPendingActivities = (
+  pendingActivity: PendingActivityInfo[] = [],
+): PendingActivity[] => {
+  return pendingActivity.map((activity) => {
+    const id = `pending-${activity.activityId}`;
+    return { ...activity, id } as unknown as PendingActivity;
+  });
 };
 
-type WorkflowExecutionAPIResponse = Optional<
-  DescribeWorkflowExecutionResponse,
-  'executionConfig' | 'pendingActivities' | 'pendingChildren'
->;
-
 export const toWorkflowExecution = (
-  response: WorkflowExecutionAPIResponse,
+  response?: WorkflowExecutionAPIResponse,
 ): WorkflowExecution => {
   const name = response.workflowExecutionInfo.type.name;
   const id = response.workflowExecutionInfo.execution.workflowId;
@@ -37,8 +19,9 @@ export const toWorkflowExecution = (
   const historyEvents = response.workflowExecutionInfo.historyLength;
   const url = `/workflows/${id}/${runId}`;
   const taskQueue = response?.executionConfig?.taskQueue?.name;
-  const pendingActivities: PendingActivity[] =
-    (response.pendingActivities as unknown as PendingActivity[]) || [];
+  const pendingActivities: PendingActivity[] = toPendingActivities(
+    response.pendingActivities,
+  );
 
   return {
     name,

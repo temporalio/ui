@@ -1,6 +1,6 @@
 import { updateQueryParameters } from './update-query-parameters';
 
-const gotoOptions = { replaceState: true, keepfocus: true };
+const gotoOptions = { replaceState: true, keepfocus: true, noscroll: true };
 
 describe(updateQueryParameters, () => {
   it('should call the set method on the query when a value is provided', () => {

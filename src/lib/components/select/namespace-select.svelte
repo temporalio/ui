@@ -17,8 +17,10 @@
   }
 </script>
 
-<Select dark bind:value={selectedNamespace} on:change={switchNamespace}>
-  {#each namespaces as namespace}
-    <Option value={namespace}>{namespace}</Option>
-  {/each}
-</Select>
+<div class="w-full">
+  <Select dark bind:value={selectedNamespace} on:change={switchNamespace}>
+    {#each namespaces as namespace}
+      <Option value={namespace}>{namespace}</Option>
+    {/each}
+  </Select>
+</div>

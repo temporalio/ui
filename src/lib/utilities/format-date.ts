@@ -5,7 +5,7 @@ import type { Timestamp } from '$types';
 
 type ValidTime = Parameters<typeof parseJSON>[0] | Timestamp;
 
-const pattern = 'H:mm:ss:SS a O ccc, LLL do';
+const pattern = 'yyyy-MM-dd z H:mm:ss:SS';
 
 export function formatDate(
   date: ValidTime,

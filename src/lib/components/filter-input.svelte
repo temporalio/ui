@@ -26,7 +26,7 @@
   }
 </script>
 
-<div class="input-container ">
+<div class="input-container">
   <label for={id} class="hidden">{name}</label>
   <span
     ><Icon

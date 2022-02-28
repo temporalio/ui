@@ -1,8 +1,15 @@
 /// <reference types="@sveltejs/kit" />
 
+declare module '@crownframework/svelte-error-boundary';
+declare module '@sveltejs/svelte-virtual-list';
+
+type Optional<T extends unknown, K extends keyof T = keyof T> = Omit<T, K> &
+  Partial<Pick<T, K>>;
+
 interface Window {
   Prism: {
     highlightAll: () => void;
+    highlightElement: (element: Element) => void;
   };
 }
 
@@ -13,17 +20,6 @@ interface ImportMeta {
 }
 
 type Eventual<T> = T | PromiseLike<T>;
-
-type WorkflowStatus =
-  | 'Running'
-  | 'TimedOut'
-  | 'Completed'
-  | 'Failed'
-  | 'Completed'
-  | 'ContinuedAsNew'
-  | 'Canceled'
-  | 'Terminated'
-  | null;
 
 type NamespaceScopedRequest = { namespace: string };
 
@@ -45,33 +41,17 @@ type PaginationCallbacks<T> = {
   onError?: (error: unknown) => void;
 };
 
-type WorkflowType = string | null;
-
-type WorkflowExecutionFilters = {
-  type: WorkflowType;
-  status: WorkflowStatus;
-};
-
-type TimeFormat = 'UTC' | 'relative' | 'local';
-
-type FilterParameters = {
-  workflowId?: string;
-  workflowType?: string;
-  executionStatus?: WorkflowStatus;
-  timeRange?: Duration | string;
-};
-
-type ArchiveFilterParameters = {
-  workflowId?: string;
-  workflowType?: string;
-  closeTime?: Duration | string;
-  executionStatus?: WorkflowStatus;
-};
+interface NetworkError {
+  statusCode: number;
+  statusText: string;
+  response: Response;
+}
 
 type Settings = {
   auth: {
     enabled: boolean;
   };
+  defaultNamespace: string;
 };
 
 type User = {
@@ -79,3 +59,7 @@ type User = {
   name: string;
   picture: string;
 };
+
+type TimeFormat = 'UTC' | 'relative' | 'local';
+
+type SelectOptionValue = number | string | boolean;

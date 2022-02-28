@@ -66,7 +66,7 @@
 
   export let namespace: string;
   export let initialData: ReturnType<typeof fetchAllArchivedWorkflows>;
-  export let parameters: FilterParameters;
+  export let parameters: ArchiveFilterParameters;
   export let archivalEnabled: boolean = false;
   export let visibilityArchivalEnabled: boolean = false;
 

@@ -38,6 +38,7 @@
   import Header from './_header.svelte';
   import Notifications from '$lib/components/notifications.svelte';
   import Banner from '$lib/components/banner.svelte';
+  import { ErrorBoundary } from '$lib/components/error-boundary';
 
   export let namespaces: DescribeNamespaceResponse[];
 
@@ -62,7 +63,9 @@
   <Header />
   <section id="content" class="h-full mx-10 mb-10 mt-8">
     <div class="flex flex-col h-full gap-4">
-      <slot />
+      <ErrorBoundary onError={() => {}}>
+        <slot />
+      </ErrorBoundary>
     </div>
   </section>
 </main>

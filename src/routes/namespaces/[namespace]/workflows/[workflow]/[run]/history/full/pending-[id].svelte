@@ -1,21 +1,28 @@
+<script lang="ts" context="module">
+  import type { LoadInput } from '@sveltejs/kit';
+
+  export const load = async ({ stuff }: LoadInput) => {
+    const { workflow, events } = stuff;
+
+    return {
+      props: { workflow, events },
+    };
+  };
+</script>
+
 <script lang="ts">
   import { page } from '$app/stores';
   import EventDetails from '$lib/components/event-details.svelte';
 
-  import type { WorkflowExecution } from '$lib/models/workflow-execution';
-  import { getAppContext } from '$lib/utilities/get-context';
-
-  const findActivity = async (
-    workflow: PromiseLike<WorkflowExecution>,
+  const findActivity = (
+    workflow: WorkflowExecution,
     id: string,
-  ): Promise<PendingActivity> => {
-    return workflow.then(({ pendingActivities }) => {
-      return pendingActivities.find((activity) => activity.activityId === id);
-    });
+  ): PendingActivity => {
+    return workflow.pendingActivities.find((activity) => activity.id === id);
   };
 
-  let workflow = getAppContext('workflow');
-  $: pendingActivity = findActivity($workflow, $page.params.id);
+  export let workflow: WorkflowExecution;
+  const pendingActivity = findActivity(workflow, $page.params.id);
 </script>
 
 {#await pendingActivity then activity}

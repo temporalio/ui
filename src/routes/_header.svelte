@@ -7,6 +7,7 @@
   import DataConverterStatus from '$lib/components/data-encoder-status.svelte';
   import { settings } from '$lib/stores/settings';
   import { user } from '$lib/stores/user';
+
   import NavigationLink from './_navigation-link.svelte';
 </script>
 
@@ -33,11 +34,11 @@
     </div>
     <a
       class="header-button"
-      href="https://github.com/temporalio/web/issues/new/choose"
+      href="https://github.com/temporalio/ui/issues/new/choose"
     >
       Report Bug/Give Feedback
     </a>
-    {#if $settings.auth?.enabled}
+    {#if $settings?.auth?.enabled}
       {#if $user?.email}
         <button
           class="header-button min-w-min"
