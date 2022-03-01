@@ -1,9 +1,9 @@
 <script lang="ts" context="module">
-  import type { LoadInput } from '@sveltejs/kit';
+  import type { Load } from '@sveltejs/kit';
 
-  export const load = async ({ stuff, page }: LoadInput) => {
+  export const load: Load = async function ({ params, stuff }) {
     const { events } = stuff;
-    const { id } = page.params;
+    const { id } = params;
 
     const event: HistoryEventWithId = events.find(
       (event: HistoryEventWithId) => event.id === id,

@@ -1,11 +1,11 @@
 <script context="module" lang="ts">
-  import type { LoadInput } from '@sveltejs/kit';
+  import type { Load } from '@sveltejs/kit';
   import type { WorkflowParameters } from '$lib/utilities/route-for';
 
   import { fetchEvents } from '$lib/services/events-service';
 
-  export async function load({ page }: LoadInput) {
-    const { workflow: workflowId, run: runId, namespace } = page.params;
+  export const load: Load = async function ({ params }) {
+    const { workflow: workflowId, run: runId, namespace } = params;
     const parameters = { namespace, executionId: workflowId, runId };
 
     const events = await fetchEvents(parameters);
@@ -19,7 +19,7 @@
         events,
       },
     };
-  }
+  };
 </script>
 
 <script lang="ts">

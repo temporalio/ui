@@ -1,13 +1,9 @@
 <script context="module" lang="ts">
   import { routeFor } from '$lib/utilities/route-for';
+  import type { Load } from '@sveltejs/kit';
 
-  export async function load({ page }) {
-    const {
-      workflow: workflowId,
-      run: runId,
-      namespace,
-      eventId,
-    } = page.params;
+  export const load: Load = async function ({ params }) {
+    const { workflow: workflowId, run: runId, namespace, eventId } = params;
 
     return {
       status: 302,
@@ -19,5 +15,5 @@
         activityId: eventId,
       }),
     };
-  }
+  };
 </script>

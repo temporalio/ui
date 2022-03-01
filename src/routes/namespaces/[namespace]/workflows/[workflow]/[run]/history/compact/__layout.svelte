@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
-  import type { LoadInput } from '@sveltejs/kit';
+  import type { Load } from '@sveltejs/kit';
 
-  export const load = async ({ stuff }: LoadInput) => {
+  export const load: Load = async function ({ stuff }) {
     const { events } = stuff as { events: HistoryEventWithId[] };
     const eventGroups = groupEvents(events);
 

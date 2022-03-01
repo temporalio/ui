@@ -21,7 +21,7 @@
     Terminated: 'Terminated',
   };
 
-  let isAdvancedQuery = $page.query.has('query');
+  let isAdvancedQuery = $page.url.searchParams.has('query');
   let workflowIdFilter = '';
   let workflowTypeFilter = '';
 
@@ -31,7 +31,7 @@
       const element = event.target as HTMLAnchorElement;
       isAdvancedQuery = searchType === 'advanced';
 
-      if (!isAdvancedQuery) $page.query.delete('query');
+      if (!isAdvancedQuery) $page.url.searchParams.delete('query');
 
       goto(element.href);
     };
@@ -41,7 +41,7 @@
   <p class="text-right text-xs">
     {#if isAdvancedQuery}
       <a
-        href={$page.path}
+        href={$page.url.pathname}
         class="text-blue-700"
         on:click|preventDefault={handleToggle('basic')}
       >
@@ -49,7 +49,7 @@
       </a>
     {:else}
       <a
-        href="{$page.path}?query=''"
+        href="{$page.url.pathname}?query=''"
         class="text-blue-700"
         on:click|preventDefault={handleToggle('advanced')}
       >

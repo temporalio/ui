@@ -1,5 +1,6 @@
 <script lang="ts">
   import { dev } from '$app/env';
+  import { page } from '$app/stores';
   import { isNetworkError } from '$lib/utilities/is-network-error';
 
   export let error: globalThis.Error = null;
@@ -9,7 +10,7 @@
     status = error.statusCode;
   }
 
-  $: currentLocation = window.location.href;
+  $: currentLocation = $page.url.toString();
 </script>
 
 <section aria-roledescription="error" class="text-center align-middle mt-32">

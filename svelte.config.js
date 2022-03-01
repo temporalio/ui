@@ -52,7 +52,7 @@ const config = {
         },
       },
     },
-    ssr: false,
+    // ssr: false,
   },
 };
 

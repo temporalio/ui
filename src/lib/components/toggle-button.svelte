@@ -16,9 +16,9 @@
 <a
   class="border-2 py-2 px-4 hover:text-white hover:bg-gray-600 flex items-center justify-center"
   class:rounded-lg={!group}
-  class:active={$page.path.includes(href)}
+  class:active={$page.url.pathname.includes(href)}
   class:group
-  href={appendQueryParameters(href, $page.query)}
+  href={appendQueryParameters(href, $page.url.searchParams)}
   on:click
 >
   <Icon {icon} {scale} />

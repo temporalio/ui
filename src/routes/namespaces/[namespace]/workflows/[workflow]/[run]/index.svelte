@@ -1,5 +1,7 @@
 <script context="module" lang="ts">
-  export async function load({ page }) {
-    return { status: 302, redirect: `${page.path}/history` };
-  }
+  import type { Load } from '@sveltejs/kit';
+
+  export const load: Load = async function ({ url }) {
+    return { status: 302, redirect: `${url.pathname}/history` };
+  };
 </script>

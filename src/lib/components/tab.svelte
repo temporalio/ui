@@ -5,7 +5,7 @@
   export let label: string;
   export let amount: number | Long.Long = null;
 
-  $: active = $page.path.includes(href);
+  $: active = $page.url.pathname.includes(href);
 </script>
 
 <a class="block" class:active {href}>
