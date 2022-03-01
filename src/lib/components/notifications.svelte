@@ -20,7 +20,9 @@
   });
 </script>
 
-<section class="flex flex-col justify-right absolute w-1/3 top-4 right-4 z-40">
+<section
+  class="flex flex-col justify-center absolute w-1/3 top-20 right-4 z-40"
+>
   {#each $notifications as notification (notification.id)}
     <article
       in:receive={{ key: notification.id }}
