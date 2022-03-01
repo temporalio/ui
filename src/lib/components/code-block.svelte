@@ -44,18 +44,13 @@
       <h3 class="text-lg mb-2 w-full">{heading}</h3>
     {/if}
 
+    <!-- The spacing for this if statement is like this because PRE's honor all whitespace and 
+      line breaks so we have this peculiar formatting to preserve this components output -->
     <pre
       class="p-4"
       class:rounded-2xl={framed}
-      class:h-full={framed}>
-        <code class="language-{language}">
-          {#if isJSON}
-            {formatJSON(content)}
-          {:else}
-            {@html content}
-          {/if}
-        </code>
-    </pre>
+      class:h-full={framed}><code class="language-{language}"
+      >{#if isJSON}{formatJSON(content)}{:else}{@html content}{/if}</code></pre>
 
     <button on:click={copy} class="absolute top-4 right-4 block">
       {#if copied}
