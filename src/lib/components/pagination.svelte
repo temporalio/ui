@@ -17,7 +17,7 @@
   let pageNumber = 1;
   let visibleItems: T = items.slice(0, 0);
 
-  $: queryKeyValue = $page.query.get(queryKey);
+  $: queryKeyValue = $page.url.searchParams.get(queryKey);
   $: perPage = queryKeyValue || '25';
   $: pageRange = Number(perPage);
 

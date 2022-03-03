@@ -1,9 +1,9 @@
 <script lang="ts" context="module">
-  import type { LoadInput } from '@sveltejs/kit';
+  import type { Load } from '@sveltejs/kit';
 
-  export const load = async ({ stuff, page }: LoadInput) => {
+  export const load: Load = async function ({ params, stuff }) {
     const { workflow, events } = stuff;
-    const category = page.query.get('category');
+    const category = params.category;
 
     return {
       props: { workflow, events, category },

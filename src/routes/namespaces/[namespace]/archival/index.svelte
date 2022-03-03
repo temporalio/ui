@@ -1,14 +1,16 @@
 <script context="module" lang="ts">
-  import type { LoadInput } from '@sveltejs/kit';
+  import type { Load } from '@sveltejs/kit';
 
-  export async function load({ page, fetch, stuff }: LoadInput) {
-    if (!page.query.has('time-range')) page.query.set('time-range', '24 hours');
+  export const load: Load = async function ({ params, url, stuff }) {
+    const query = url.searchParams;
 
-    const namespace = page.params.namespace;
-    const workflowId = page.query.get('workflow-id');
-    const workflowType = page.query.get('workflow-type');
-    const timeRange = page.query.get('time-range');
-    const executionStatus = page.query.get('status') as WorkflowStatus;
+    if (!query.has('time-range')) query.set('time-range', '24 hours');
+
+    const namespace = params.namespace;
+    const workflowId = query.get('workflow-id');
+    const workflowType = query.get('workflow-type');
+    const timeRange = query.get('time-range');
+    const executionStatus = query.get('status') as WorkflowStatus;
 
     const parameters: ArchiveFilterParameters = {
       workflowId,
@@ -45,7 +47,7 @@
         visibilityArchivalEnabled,
       },
     };
-  }
+  };
 </script>
 
 <script lang="ts">

@@ -1,11 +1,11 @@
 <script context="module" lang="ts">
-  import type { LoadInput } from '@sveltejs/kit';
+  import type { Load } from '@sveltejs/kit';
 
   import { getPollers } from '$lib/services/pollers-service';
   import type { GetPollersResponse } from '$lib/services/pollers-service';
 
-  export async function load({ page, stuff }: LoadInput) {
-    const { namespace } = page.params;
+  export const load: Load = async function ({ params, stuff }) {
+    const { namespace } = params;
     const { workflow } = stuff;
     const { taskQueue } = workflow as WorkflowExecution;
 
@@ -14,7 +14,7 @@
     return {
       props: { workers, taskQueue },
     };
-  }
+  };
 </script>
 
 <script lang="ts">

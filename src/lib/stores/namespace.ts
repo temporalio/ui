@@ -9,7 +9,7 @@ const onlyInBrowser = <T>(fn: () => T): T => {
 };
 
 export const namespace = derived(page, ($page) => {
-  const match = pattern.match($page.path);
+  const match = pattern.match($page.url.pathname);
   const namespace =
     onlyInBrowser(
       () => localStorage.getItem('currentNamespace') || 'default',

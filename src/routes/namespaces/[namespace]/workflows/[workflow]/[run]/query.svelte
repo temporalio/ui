@@ -1,19 +1,19 @@
 <script context="module" lang="ts">
-  import type { LoadInput } from '@sveltejs/kit';
+  import type { Load } from '@sveltejs/kit';
   import { getQuery, getQueryTypes } from '$lib/services/query-service';
 
-  export async function load({ page, fetch: request }: LoadInput) {
-    const { namespace, workflow: id, run: runId } = page.params;
+  export const load: Load = async function ({ params, fetch: request }) {
+    const { namespace, workflow: id, run: runId } = params;
     const workflow = { id, runId };
 
     const queryTypes = await getQueryTypes({ namespace, workflow });
 
-    const queryTypeParameter = page.query.get('query-type');
+    const queryTypeParameter = params['query-type'];
     const queryType = queryTypes.includes(queryTypeParameter)
       ? queryTypeParameter
       : queryTypes[0];
 
-    page.query.set('query-type', queryType);
+    params['query-type'] = queryType;
 
     const queryResult = await getQuery(
       { namespace, workflow, queryType },
@@ -27,7 +27,7 @@
         queryResult,
       },
     };
-  }
+  };
 </script>
 
 <script lang="ts">

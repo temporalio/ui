@@ -14,7 +14,12 @@
     formatEvent(event);
 
   let { namespace, workflow: workflowId, run: runId } = $page.params;
-  let href = routeFor({ namespace, workflowId, runId, query: $page.query });
+  let href = routeFor({
+    namespace,
+    workflowId,
+    runId,
+    query: $page.url.searchParams,
+  });
 </script>
 
 <a
@@ -23,7 +28,7 @@
   sveltekit:prefetch
   class="flex border-b-2 border-gray-300 w-full items-center hover:bg-gray-50"
   class:pending
-  class:active={$page.path.includes(href)}
+  class:active={$page.url.pathname.includes(href)}
 >
   <article class="flex gap-4 items-center p-4">
     <p class="w-5 text-center text-gray-500">{id}</p>

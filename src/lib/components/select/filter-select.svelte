@@ -12,7 +12,7 @@
   export let parameter: string = null;
 
   const id = `${parameter || label}-filter`;
-  const parameterValue = parameter && $page.query.get(parameter);
+  const parameterValue = parameter && $page.url.searchParams.get(parameter);
 
   let _value = parameterValue || (value && value.toString());
 
@@ -20,8 +20,8 @@
     updateQueryParameters({
       parameter,
       value: _value,
-      query: $page.query,
-      path: $page.path,
+      query: $page.url.searchParams,
+      path: $page.url.pathname,
       goto,
     }).then((v) => (value = v));
   }

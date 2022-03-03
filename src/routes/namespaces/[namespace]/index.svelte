@@ -1,6 +1,8 @@
 <script context="module" lang="ts">
-  export async function load({ page }) {
-    const { namespace } = page.params;
+  import type { Load } from '@sveltejs/kit';
+
+  export const load: Load = async function ({ params }) {
+    const { namespace } = params;
     return { status: 302, redirect: `/namespaces/${namespace}/workflows` };
-  }
+  };
 </script>

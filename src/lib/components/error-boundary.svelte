@@ -19,10 +19,16 @@
       onError(theError);
     }
   }
+  function clearError() {
+    $error = null;
+    onError = null;
+    theError = null;
+    $networkError = null;
+  }
 </script>
 
-{#if $theError}
-  <Error error={$theError} />
+{#if theError && $theError}
+  <Error on:clearError={clearError} error={$theError} />
 {:else}
   <slot />
 {/if}

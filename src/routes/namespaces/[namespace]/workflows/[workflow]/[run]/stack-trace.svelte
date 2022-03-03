@@ -1,8 +1,8 @@
 <script context="module" lang="ts">
-  import type { LoadInput } from '@sveltejs/kit';
+  import type { Load } from '@sveltejs/kit';
 
-  export async function load({ page, stuff }: LoadInput) {
-    const { namespace } = page.params;
+  export const load: Load = async function ({ params, stuff }) {
+    const { namespace } = params;
     const { workflow } = stuff;
 
     const stackTrace = await getWorkflowStackTrace({
@@ -17,7 +17,7 @@
         stackTrace,
       },
     };
-  }
+  };
 </script>
 
 <script lang="ts">

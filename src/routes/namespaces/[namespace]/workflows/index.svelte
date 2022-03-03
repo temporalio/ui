@@ -1,21 +1,21 @@
 <script context="module" lang="ts">
-  import type { LoadInput } from '@sveltejs/kit';
+  import type { Load } from '@sveltejs/kit';
   import type { CombinedWorkflowExecutionsResponse } from '$lib/services/workflow-service';
 
   import { fetchAllWorkflows } from '$lib/services/workflow-service';
 
-  export async function load({ page, fetch }: LoadInput) {
-    const isAdvancedSearch = page.query.has('query');
+  export const load: Load = async function ({ params, url }) {
+    const isAdvancedSearch = url.searchParams.has('query');
 
-    if (!page.query.has('time-range') && !isAdvancedSearch)
-      page.query.set('time-range', '24 hours');
+    if (!url.searchParams.has('time-range') && !isAdvancedSearch)
+      url.searchParams.set('time-range', '24 hours');
 
-    const namespace = page.params.namespace;
-    const workflowId = page.query.get('workflow-id');
-    const workflowType = page.query.get('workflow-type');
-    const timeRange = page.query.get('time-range');
-    const executionStatus = page.query.get('status') as WorkflowStatus;
-    const query = page.query.get('query');
+    const namespace = params.namespace;
+    const workflowId = url.searchParams.get('workflow-id');
+    const workflowType = url.searchParams.get('workflow-type');
+    const timeRange = url.searchParams.get('time-range');
+    const executionStatus = url.searchParams.get('status') as WorkflowStatus;
+    const query = url.searchParams.get('query');
 
     const parameters: ValidWorkflowParameters = {
       workflowId,
@@ -30,7 +30,7 @@
     return {
       props: { workflows, isAdvancedSearch },
     };
-  }
+  };
 </script>
 
 <script lang="ts">
