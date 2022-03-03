@@ -4,7 +4,7 @@
 
   export let href: string;
 
-  $: isActive = pathMatches(href, $page.path);
+  $: isActive = pathMatches(href, $page.url.pathname);
 </script>
 
 <a {href} class:active={isActive} class="relative">

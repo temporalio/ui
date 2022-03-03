@@ -1,14 +1,14 @@
 <script context="module" lang="ts">
-  import type { LoadInput } from '@sveltejs/kit';
+  import type { Load } from '@sveltejs/kit';
 
   import { getPollers } from '$lib/services/pollers-service';
-  export async function load({ fetch, page }: LoadInput) {
-    const { namespace, queue } = page.params;
+  export const load: Load = async function ({ fetch, params }) {
+    const { namespace, queue } = params;
 
     return await getPollers({ queue, namespace }, fetch).then((pollers) => ({
       props: { pollers },
     }));
-  }
+  };
 </script>
 
 <script lang="ts">
@@ -16,7 +16,9 @@
   import WorkersRow from '$lib/components/workers-row.svelte';
   import EmptyState from '$lib/components/empty-state.svelte';
 
-  export let pollers;
+  import type { GetPollersResponse } from '$lib/services/pollers-service';
+
+  export let pollers: GetPollersResponse;
 </script>
 
 <section>

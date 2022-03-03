@@ -10,7 +10,7 @@
   export let name: string;
   export let value: string;
 
-  let _value = (parameter && $page.query.get(parameter)) || value;
+  let _value = (parameter && $page.url.searchParams.get(parameter)) || value;
 
   const id = `${parameter || name}-filter`;
   const update = debounce(updateQueryParameters, 300);
@@ -19,8 +19,8 @@
     update({
       parameter,
       value: _value,
-      query: $page.query,
-      path: $page.path,
+      query: $page.url.searchParams,
+      path: $page.url.pathname,
       goto,
     });
   }

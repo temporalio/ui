@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
-  import type { LoadInput } from '@sveltejs/kit';
+  import type { Load } from '@sveltejs/kit';
 
   import { requestFromAPI } from '$lib/utilities/request-from-api';
   import { routeForApi } from '$lib/utilities/route-for-api';
@@ -15,7 +15,7 @@
 
   import '../app.postcss';
 
-  export async function load({ fetch }: LoadInput) {
+  export const load: Load = async function ({}) {
     const { namespaces }: ListNamespacesResponse = (await requestFromAPI(
       routeForApi('namespaces'),
       { request: fetch },
@@ -29,7 +29,7 @@
       props: { namespaces },
       stuff: { namespaces },
     };
-  }
+  };
 </script>
 
 <script lang="ts">

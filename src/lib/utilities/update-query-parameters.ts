@@ -1,3 +1,4 @@
+import { browser } from '$app/env';
 import type { goto, invalidate } from '$app/navigation';
 import { appendQueryParameters } from './append-query-parameters';
 
@@ -24,8 +25,8 @@ export const updateQueryParameters = async ({
   } else {
     query.delete(parameter);
   }
-
-  goto(appendQueryParameters(path, query), options);
-
+  if (browser) {
+    goto(appendQueryParameters(path, query), options);
+  }
   return value;
 };

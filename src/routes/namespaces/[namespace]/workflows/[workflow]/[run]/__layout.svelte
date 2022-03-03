@@ -1,10 +1,10 @@
 <script context="module" lang="ts">
-  import type { LoadInput } from '@sveltejs/kit';
+  import type { Load } from '@sveltejs/kit';
 
   import { fetchWorkflow } from '$lib/services/workflow-service';
 
-  export async function load({ page }: LoadInput) {
-    const { workflow: executionId, run: runId, namespace } = page.params;
+  export const load: Load = async function ({ params }) {
+    const { workflow: executionId, run: runId, namespace } = params;
 
     const parameters = {
       namespace,
@@ -18,7 +18,7 @@
       props: { workflow, namespace },
       stuff: { workflow },
     };
-  }
+  };
 </script>
 
 <script lang="ts">

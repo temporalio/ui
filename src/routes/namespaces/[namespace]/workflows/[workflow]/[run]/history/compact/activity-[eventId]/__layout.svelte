@@ -1,14 +1,9 @@
 <script context="module" lang="ts">
   import type { EventParameter } from '$lib/utilities/route-for';
-  import type { LoadInput } from '@sveltejs/kit';
+  import type { Load } from '@sveltejs/kit';
 
-  export async function load({ page, stuff }: LoadInput) {
-    const {
-      workflow: workflowId,
-      run: runId,
-      namespace,
-      eventId,
-    } = page.params;
+  export const load: Load = async function ({ params, stuff }) {
+    const { workflow: workflowId, run: runId, namespace, eventId } = params;
 
     const { eventGroups } = stuff;
     const group = eventGroups.find(({ id }) => id === eventId);
@@ -29,7 +24,7 @@
         },
       },
     };
-  }
+  };
 </script>
 
 <script lang="ts">
@@ -58,7 +53,7 @@
         <li>
           <a
             href={getHref(group, event)}
-            class:active={$page.path === getHref(group, event)}
+            class:active={$page.url.pathname === getHref(group, event)}
           >
             {event.eventType}
           </a>

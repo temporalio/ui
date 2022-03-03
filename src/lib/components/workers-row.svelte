@@ -2,8 +2,9 @@
   import { formatDate } from '$lib/utilities/format-date';
   import Icon from 'svelte-fa';
   import { faTimes, faCheck } from '@fortawesome/free-solid-svg-icons';
+  import type { PollerWithTaskQueueTypes } from '$lib/services/pollers-service';
 
-  export let poller;
+  export let poller: PollerWithTaskQueueTypes;
 </script>
 
 <article
