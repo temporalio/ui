@@ -50,6 +50,7 @@ interface NetworkError {
 type Settings = {
   auth: {
     enabled: boolean;
+    options: string[];
   };
   defaultNamespace: string;
 };

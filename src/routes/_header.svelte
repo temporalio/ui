@@ -9,6 +9,18 @@
   import { user } from '$lib/stores/user';
 
   import NavigationLink from './_navigation-link.svelte';
+  import { page } from '$app/stores';
+
+  let loginUrl = '';
+  $: {
+    const query = $settings?.auth?.options
+      .filter((o) => !!$page.url.searchParams.get(o))
+      .map((o) => `&${o}=${$page.url.searchParams.get(o)}`)
+      .join();
+
+    loginUrl =
+      import.meta.env.VITE_API + '/auth/sso?' + encodeURIComponent(query);
+  }
 </script>
 
 <header
@@ -55,8 +67,7 @@
       {:else}
         <button
           class="header-button"
-          on:click={() =>
-            window.location.assign(import.meta.env.VITE_API + '/auth/sso')}
+          on:click={() => window.location.assign(loginUrl)}
         >
           Login
         </button>
