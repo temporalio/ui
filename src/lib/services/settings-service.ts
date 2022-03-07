@@ -11,6 +11,7 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
   return {
     auth: {
       enabled: !!settings?.Auth?.Enabled,
+      options: settings?.Auth?.Options,
     },
     defaultNamespace: settings?.DefaultNamespace || 'default', // API returns an empty string if default namespace is not configured
   };

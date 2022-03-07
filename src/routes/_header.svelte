@@ -7,8 +7,20 @@
   import DataConverterStatus from '$lib/components/data-converter-status.svelte';
   import { settings } from '$lib/stores/settings';
   import { user } from '$lib/stores/user';
+  import { goto } from '$app/navigation';
 
   import NavigationLink from './_navigation-link.svelte';
+  import { page } from '$app/stores';
+
+  let loginUrl = '';
+  $: {
+    const query = ($settings?.auth?.options ?? [])
+      .filter((option) => !!$page.url.searchParams.get(option))
+      .map((option) => `&${option}=${$page.url.searchParams.get(option)}`)
+      .join('');
+
+    loginUrl = import.meta.env.VITE_API + '/auth/sso?' + encodeURI(query);
+  }
 </script>
 
 <header
@@ -42,8 +54,7 @@
       {#if $user?.email}
         <button
           class="header-button min-w-min"
-          on:click={() =>
-            window.location.assign(import.meta.env.VITE_API + '/auth/logout')}
+          on:click={() => goto(import.meta.env.VITE_API + '/auth/logout')}
         >
           Logout
           <img
@@ -53,11 +64,7 @@
           />
         </button>
       {:else}
-        <button
-          class="header-button"
-          on:click={() =>
-            window.location.assign(import.meta.env.VITE_API + '/auth/sso')}
-        >
+        <button class="header-button" on:click={() => goto(loginUrl)}>
           Login
         </button>
       {/if}

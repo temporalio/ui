@@ -128,6 +128,6 @@ export type Timestamp = google.protobuf.ITimestamp;
 
 // extra APIs
 export type SettingsResponse = {
-  Auth: { Enabled: boolean };
+  Auth: { Enabled: boolean; Options: string[] };
   DefaultNamespace: string;
 };
