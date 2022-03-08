@@ -3,6 +3,7 @@
 
   import { requestFromAPI } from '$lib/utilities/request-from-api';
   import { routeForApi } from '$lib/utilities/route-for-api';
+  import { notifications } from '$lib/stores/notifications';
 
   import { loadUser } from '$lib/stores/user';
   import { loadCluster } from '$lib/stores/cluster';
@@ -18,11 +19,16 @@
   export const load: Load = async function ({}) {
     const { namespaces }: ListNamespacesResponse = (await requestFromAPI(
       routeForApi('namespaces'),
-      { request: fetch },
+      {
+        request: fetch,
+        onError: () => notifications.add('error', 'Unable to fetch namespaces'),
+      },
     )) ?? { namespaces: [] };
 
     loadUser();
-    loadCluster();
+    loadCluster().catch(() =>
+      notifications.add('error', 'Unable to fetch cluster info'),
+    );
     loadSettings();
 
     return {
