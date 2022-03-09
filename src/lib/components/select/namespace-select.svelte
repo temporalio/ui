@@ -5,6 +5,7 @@
   import { goto } from '$app/navigation';
 
   import { getAppContext } from '$lib/utilities/get-context';
+  import { isCloud } from '$lib/utilities/env';
 
   $: namespaces = (getAppContext('namespaces') ?? []).map(
     (namespace) => namespace.namespaceInfo.name,
@@ -19,8 +20,12 @@
 
 <div class="w-full">
   <Select dark bind:value={selectedNamespace} on:change={switchNamespace}>
-    {#each namespaces as namespace}
-      <Option value={namespace}>{namespace}</Option>
-    {/each}
+    {#if isCloud}
+      <Option value={selectedNamespace}>{selectedNamespace}</Option>
+    {:else}
+      {#each namespaces as namespace}
+        <Option value={namespace}>{namespace}</Option>
+      {/each}
+    {/if}
   </Select>
 </div>
