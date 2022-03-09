@@ -6,7 +6,7 @@
 
   import { getAppContext } from '$lib/utilities/get-context';
 
-  $: namespaces = getAppContext('namespaces').map(
+  $: namespaces = (getAppContext('namespaces') ?? []).map(
     (namespace) => namespace.namespaceInfo.name,
   );
 
