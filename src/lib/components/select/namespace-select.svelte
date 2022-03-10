@@ -7,9 +7,9 @@
   import { getAppContext } from '$lib/utilities/get-context';
   import { isCloud } from '$lib/utilities/env';
 
-  $: namespaces = (getAppContext('namespaces') ?? []).map(
-    (namespace) => namespace.namespaceInfo.name,
-  );
+  $: namespaces = (getAppContext('namespaces') ?? [])
+    .map((namespace) => namespace?.namespaceInfo?.name ?? undefined)
+    .filter((namespace) => namespace);
 
   $: selectedNamespace = $currentNamespace;
 
