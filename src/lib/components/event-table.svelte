@@ -22,7 +22,7 @@
       <div
         class="flex flex-col h-full w-1/3 border-r-2 border-gray-300 rounded-bl-lg"
       >
-        <div class="h-full rounded-bl-lg overflow-y-scroll">
+        <div class="rounded-bl-lg overflow-y-scroll h-screen">
           {#each visibleItems as event (event.id)}
             <Event {event} />
           {/each}
