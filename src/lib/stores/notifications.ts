@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store';
 import type { Readable } from 'svelte/store';
+import { faNetworkWired } from '@fortawesome/free-solid-svg-icons';
 
 type NotificationType = 'error' | 'warning' | 'success' | 'information';
 type Notification = {
@@ -10,9 +11,11 @@ type Notification = {
 };
 type Notifications = Notification[];
 
+const whenIdle = globalThis.requestIdleCallback || ((fn: Parameters<typeof setTimeout>[0]) => { setTimeout(fn, 0) });
+
 const store = writable<Notifications>([], () => {
   const interval = setInterval(() => {
-    requestIdleCallback(() => {
+    whenIdle(() => {
       const now = Date.now();
       store.update((ns) => {
         return ns.filter((n) => n.expiration < now);
