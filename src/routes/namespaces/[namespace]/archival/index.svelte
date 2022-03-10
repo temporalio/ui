@@ -2,15 +2,16 @@
   import type { Load } from '@sveltejs/kit';
 
   export const load: Load = async function ({ params, url, stuff }) {
-    const query = url.searchParams;
+    const { searchParams } = url;
 
-    if (!query.has('time-range')) query.set('time-range', '24 hours');
+    if (!searchParams.has('time-range'))
+      searchParams.set('time-range', '24 hours');
 
     const namespace = params.namespace;
-    const workflowId = query.get('workflow-id');
-    const workflowType = query.get('workflow-type');
-    const timeRange = query.get('time-range');
-    const executionStatus = query.get('status') as WorkflowStatus;
+    const workflowId = searchParams.get('workflow-id');
+    const workflowType = searchParams.get('workflow-type');
+    const timeRange = searchParams.get('time-range');
+    const executionStatus = searchParams.get('status') as WorkflowStatus;
 
     const parameters: ArchiveFilterParameters = {
       workflowId,
