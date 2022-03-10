@@ -1,18 +1,21 @@
 import { browser } from '$app/env';
 import { page } from '$app/stores';
-import { derived } from 'svelte/store';
-import UrlPattern from 'url-pattern';
+import { namespaceUrlPattern } from '$lib/utilities/namespace-url-pattern';
+import { derived, get } from 'svelte/store';
+import { settings } from '$lib/stores/settings';
 
-const pattern = new UrlPattern('/namespaces/:namespace/*');
 const onlyInBrowser = <T>(fn: () => T): T => {
   if (browser) return fn();
 };
 
 export const namespace = derived(page, ($page) => {
-  const match = pattern.match($page.url.pathname);
+  const match = namespaceUrlPattern.match($page.url.pathname);
+
+  const defaultNamespace = get(settings).defaultNamespace;
+
   const namespace =
     onlyInBrowser(
-      () => localStorage.getItem('currentNamespace') || 'default',
+      () => localStorage.getItem('currentNamespace') || defaultNamespace,
     ) || 'default';
 
   if (match) {

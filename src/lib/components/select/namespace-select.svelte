@@ -11,7 +11,7 @@
     (namespace) => namespace.namespaceInfo.name,
   );
 
-  let selectedNamespace = $currentNamespace;
+  $: selectedNamespace = $currentNamespace;
 
   function switchNamespace() {
     goto('/namespaces/' + selectedNamespace);
