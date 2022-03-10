@@ -1,9 +1,9 @@
 <script lang="ts" context="module">
   import type { Load } from '@sveltejs/kit';
 
-  export const load: Load = async function ({ params, stuff }) {
+  export const load: Load = async function ({ params, url, stuff }) {
     const { workflow, events } = stuff;
-    const category = params.category;
+    const category = url.searchParams.get('category');
 
     return {
       props: { workflow, events, category },
