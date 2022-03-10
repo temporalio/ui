@@ -40,7 +40,7 @@
     loadCluster().catch(() =>
       notifications.add('error', 'Unable to fetch cluster info'),
     );
-    loadSettings();
+    await loadSettings();
 
     return {
       props: { namespaces },
