@@ -16,14 +16,25 @@
 
   import '../app.postcss';
 
+  async function loadNamespaces(): Promise<ListNamespacesResponse> {
+    const emptyNamespace = {
+      namespaces: [],
+    };
+
+    if (isCloud) {
+      return Promise.resolve(emptyNamespace);
+    }
+
+    const results = await requestFromAPI(routeForApi('namespaces'), {
+      request: fetch,
+      onError: () => notifications.add('error', 'Unable to fetch namespaces'),
+    });
+
+    return results ?? Promise.resolve(emptyNamespace);
+  }
+
   export const load: Load = async function ({}) {
-    const { namespaces }: ListNamespacesResponse = (await requestFromAPI(
-      routeForApi('namespaces'),
-      {
-        request: fetch,
-        onError: () => notifications.add('error', 'Unable to fetch namespaces'),
-      },
-    )) ?? { namespaces: [] };
+    const { namespaces }: ListNamespacesResponse = await loadNamespaces();
 
     loadUser();
     loadCluster().catch(() =>
@@ -45,6 +56,7 @@
   import Notifications from '$lib/components/notifications.svelte';
   import Banner from '$lib/components/banner.svelte';
   import { ErrorBoundary } from '$lib/components/error-boundary';
+  import { isCloud } from '$lib/utilities/env';
 
   export let namespaces: DescribeNamespaceResponse[];
 
