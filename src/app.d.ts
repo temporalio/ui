@@ -13,5 +13,6 @@ declare namespace App {
     namespaces: ListNamespacesResponse;
     events: HistoryEventWithId[];
     eventGroups: CompactEventGroups;
+    settings: Settings;
   }
 }

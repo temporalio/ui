@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
   import type { Load } from '@sveltejs/kit';
 
-  export const load: Load = async function ({ params, url, stuff }) {
+  export const load: Load = async function ({ url, stuff }) {
     const { workflow, events } = stuff;
     const category = url.searchParams.get('category');
 
@@ -28,7 +28,7 @@
 <EventTable events={visibleEvents}>
   <div slot="filters">
     <FilterSelect parameter="category" bind:value={category}>
-      <Option value={null}>All</Option>
+      <Option value={undefined}>All</Option>
       <Option value="activity">Activity</Option>
       <Option value="command">Command</Option>
       <Option value="signal">Signal</Option>
