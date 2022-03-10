@@ -9,10 +9,10 @@ declare namespace App {
   interface Session {}
 
   interface Stuff {
-    workflow: WorkflowExecution;
+    workflow?: WorkflowExecution;
     namespaces: ListNamespacesResponse;
-    events: HistoryEventWithId[];
-    eventGroups: CompactEventGroups;
+    events?: HistoryEventWithId[];
+    eventGroups?: CompactEventGroups;
     settings: Settings;
   }
 }
