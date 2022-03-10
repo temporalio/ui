@@ -30,7 +30,7 @@
   class:pending
   class:active={$page.params.id === event.id}
 >
-  <article class="flex gap-4 items-center p-4">
+  <article class="flex gap-4 items-center p-4 w-full">
     <p class="w-5 text-center text-gray-500">{id}</p>
     <div class="w-full">
       <h2 class="mb-2 {tag}">
