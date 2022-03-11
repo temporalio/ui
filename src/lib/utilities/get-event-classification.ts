@@ -111,7 +111,7 @@ const getTime = (event: EventOrGroup): string => {
 };
 
 const getId = (event: EventOrGroup): string => {
-  if (isEvent(event)) return String(event.eventId);
+  if (isEvent(event)) return String(event.id);
   if (isPendingActivity(event)) return String(event.activityId);
   if (isEventGroup(event)) return String(event.id);
 };

@@ -5,6 +5,16 @@
   import { fetchEvents } from '$lib/services/events-service';
   import { groupEvents } from '$lib/models/group-events';
 
+  const useSearchParams = (
+    { searchParams }: URL,
+    name: string,
+    defaultValue: string = undefined,
+  ): string => {
+    if (!searchParams.has(name) && defaultValue)
+      searchParams.set(name, defaultValue);
+    return searchParams.get(name);
+  };
+
   export const load: Load = async function ({ params, url, stuff }) {
     const { workflow } = stuff;
     const { workflow: workflowId, run: runId, namespace } = params;
@@ -13,17 +23,12 @@
     const events = await fetchEvents(parameters);
     const eventGroups = groupEvents(events);
 
-    const category = url.searchParams.get('category');
-    const view = (url.searchParams.get('view') as EventHistoryView) || 'full';
-
     return {
       props: {
         workflowParameters: { workflowId, runId, namespace },
         events,
         workflow,
-        category,
         eventGroups,
-        view,
       },
       stuff: {
         events,
@@ -42,10 +47,6 @@
 
   import { routeFor } from '$lib/utilities/route-for';
 
-  import { getVisibleEvents } from '$lib/utilities/get-visible-events';
-
-  import FilterSelect from '$lib/components/select/filter-select.svelte';
-  import Option from '$lib/components/select/option.svelte';
   import EventTable from '$lib/components/event-table.svelte';
 
   import ExportHistory from '$lib/components/export-history.svelte';
@@ -54,12 +55,12 @@
   import InputAndResults from '$lib/components/input-and-result.svelte';
 
   export let workflowParameters: WorkflowParameters;
-  export let workflow: WorkflowExecution;
   export let events: HistoryEventWithId[];
-  export let category: EventTypeCategory = null;
-  export let view: EventHistoryView;
+  export let eventGroups: CompactEventGroups;
 
-  $: visibleEvents = getVisibleEvents(events, workflow, category);
+  let isCompact = false;
+
+  $: visibleEvents = isCompact ? eventGroups : events;
 </script>
 
 <section class="flex flex-col gap-4">
@@ -86,15 +87,14 @@
   </nav>
   <EventTable events={visibleEvents}>
     <div slot="filters">
-      <FilterSelect parameter="category" bind:value={category}>
-        <Option value={null}>All</Option>
-        <Option value="activity">Activity</Option>
-        <Option value="command">Command</Option>
-        <Option value="signal">Signal</Option>
-        <Option value="timer">Timer</Option>
-        <Option value="child-workflow">Child Workflow</Option>
-        <Option value="workflow">Workflow</Option>
-      </FilterSelect>
+      <div>
+        <input
+          type="checkbox"
+          id="event-history-view"
+          bind:checked={isCompact}
+        />
+        <label for="event-history-view">Show compact view</label>
+      </div>
     </div>
     <div slot="details" class="w-full h-full py-4">
       <slot />

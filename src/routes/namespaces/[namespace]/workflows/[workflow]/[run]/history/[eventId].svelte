@@ -30,21 +30,24 @@
   export let eventId: string;
 </script>
 
-<section>
+<section class="overflow-y-scroll max-h-full">
   {#if eventGroup}
-    <div class="flex flex-col w-full h-full">
-      <nav class="mb-4">
-        <ul class="flex gap-4 w-full items-start">
-          {#each [...eventGroup.events.values()] as event}
-            <li>
-              <a href={event.id} class:active={event.id === eventId}>
-                {event.eventType}
-              </a>
-            </li>
-          {/each}
-        </ul>
-      </nav>
-    </div>
+    <nav class="flex flex-col mb-4">
+      <ul class="flex gap-4 w-full items-start">
+        {#each [...eventGroup.events.values()] as event}
+          <li>
+            <a
+              sveltekit:noscroll
+              href={event.id}
+              class:active={event.id === eventId}
+              class="border-b-2 border-blue-600"
+            >
+              {event.eventType}
+            </a>
+          </li>
+        {/each}
+      </ul>
+    </nav>
   {/if}
   <EventDetails {attributes} />
 </section>

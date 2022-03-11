@@ -16,6 +16,7 @@ export const groupEvents = (
       groups[group.id] = group;
     } else {
       groups[id]?.events.set(event.eventType, event);
+      groups[id]?.eventIds.add(event.id);
     }
   }
 

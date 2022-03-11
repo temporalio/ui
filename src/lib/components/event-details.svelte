@@ -11,7 +11,7 @@
 
 {#each Object.entries(attributes) as [key, value]}
   <article
-    class="flex items-center content-start w-full border-b-2 last:border-b-0 border-gray-200 py-1"
+    class="flex items-center content-start w-full border-b-2 last:border-b-0 border-gray-200 py-1 max-h-full overflow-y-scroll"
   >
     <h4 class="w-96 flex-grow">{format(key)}</h4>
     <div class="flex-grow w-full">

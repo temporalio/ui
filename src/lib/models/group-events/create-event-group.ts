@@ -24,10 +24,12 @@ const createGroupFor = <K extends keyof StartingEvents>(
   const name = getName(event);
 
   const events = new Map<EventType, HistoryEventWithId>();
+  const eventIds = new Set<string>();
 
   events.set(event.eventType, event);
+  eventIds.add(event.id);
 
-  return { id, name, events };
+  return { id, name, events, eventIds };
 };
 
 export const createEventGroup = (event: CommonHistoryEvent) => {

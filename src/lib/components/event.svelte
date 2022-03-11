@@ -1,34 +1,41 @@
 <script lang="ts">
   import Icon from 'svelte-fa';
   import { faCalendar } from '@fortawesome/free-solid-svg-icons';
-  import { page } from '$app/stores';
 
-  import { formatEvent } from '$lib/utilities/get-event-classification';
+  import { page } from '$app/stores';
   import { formatDate } from '$lib/utilities/format-date';
+  import {
+    formatEvent,
+    isEvent,
+    isEventGroup,
+    isPendingActivity,
+  } from '$lib/utilities/get-event-classification';
 
   import EventLabel from '$lib/components/event-label.svelte';
 
-  export let event: HistoryEventWithId | PendingActivity | CompactEventGroup;
+  export let event: IterableEvent;
 
-  let { routeFor, pending, timeStamp, name, tag, classification, id } =
+  let { pending, timeStamp, name, tag, classification, id } =
     formatEvent(event);
 
-  let { namespace, workflow: workflowId, run: runId } = $page.params;
-  let href = routeFor({
-    namespace,
-    workflowId,
-    runId,
-    query: $page.url.searchParams,
-  });
+  const isActive = (something: IterableEvent, currentId: string): boolean => {
+    if (isPendingActivity(something) || isEvent(something)) {
+      return id === currentId;
+    }
+
+    if (isEventGroup(something)) {
+      return something.eventIds.has(currentId);
+    }
+  };
 </script>
 
 <a
-  {href}
+  href={event.id}
   sveltekit:noscroll
   sveltekit:prefetch
   class="flex border-b-2 border-gray-300 w-full items-center hover:bg-gray-50"
   class:pending
-  class:active={$page.params.eventId === event.id}
+  class:active={isActive(event, $page.params.eventId)}
 >
   <article class="flex gap-4 items-center p-4 w-full">
     <p class="w-5 text-center text-gray-500">{id}</p>

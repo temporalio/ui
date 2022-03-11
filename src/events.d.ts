@@ -148,3 +148,4 @@ type EventHistoryView = 'full' | 'compact' | 'json';
 
 type EventsOrActivities = (HistoryEventWithId | PendingActivity)[];
 type IterableEvents = EventsOrActivities | CompactEventGroups;
+type IterableEvent = IterableEvents[number];

@@ -47,8 +47,7 @@
     <!-- The spacing for this if statement is like this because PRE's honor all whitespace and 
       line breaks so we have this peculiar formatting to preserve this components output -->
     <pre
-      class="p-4"
-      class:rounded-2xl={framed}
+      class="p-4 rounded-lg"
       class:h-full={framed}><code class="language-{language}"
       >{#if isJSON}{formatJSON(content)}{:else}{@html content}{/if}</code></pre>
 
@@ -64,6 +63,6 @@
 
 <style lang="postcss">
   .framed {
-    @apply border-2 border-gray-300 rounded-2xl p-4 flex flex-col;
+    @apply border-2 border-gray-300 rounded-lg p-4 flex flex-col;
   }
 </style>
