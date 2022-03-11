@@ -15,7 +15,6 @@ type RoutePath =
   | 'workers';
 
 type EventView = 'event' | 'pending' | 'activity';
-type EventHistoryView = 'full' | 'compact' | 'json';
 
 export type QueryParameters = { query?: URLSearchParams };
 export type NamespaceParameter = { namespace: string } & QueryParameters;
@@ -59,11 +58,10 @@ const routeForEventHistory = (
   parameters: WorkflowParameters,
   view?: EventHistoryView,
 ): string => {
-  if (!view) {
-    return `${routeForWorkflow(parameters)}/history`;
-  } else {
-    return `${routeForWorkflow(parameters)}/history/${view}`;
-  }
+  if (!view) view = 'full';
+
+  if (view === 'full') return `${routeForWorkflow(parameters)}/history`;
+  if (view === 'json') return `${routeForWorkflow(parameters)}/history/json`;
 };
 
 const routeForEventHistoryItem = (
@@ -72,7 +70,7 @@ const routeForEventHistoryItem = (
   eventType: EventView,
   id: string,
 ): string => {
-  return `${routeForEventHistory(parameters, view)}/${eventType}-${id}`;
+  return `${routeForEventHistory(parameters, view)}/${id}`;
 };
 
 const routeForActivity = (

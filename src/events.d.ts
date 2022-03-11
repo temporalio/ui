@@ -144,5 +144,7 @@ type ChildEvent = StartChildWorkflowExecutionInitiatedEvent &
   ChildWorkflowExecutionTimedOutEvent &
   ChildWorkflowExecutionTerminatedEvent;
 
+type EventHistoryView = 'full' | 'compact' | 'json';
+
 type EventsOrActivities = (HistoryEventWithId | PendingActivity)[];
 type IterableEvents = EventsOrActivities | CompactEventGroups;

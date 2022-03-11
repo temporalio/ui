@@ -1,6 +1,8 @@
 import { createEventGroup } from './create-event-group';
 import { getGroupId } from './get-group-id';
 
+export { getGroupForEvent } from './get-group-for-event';
+
 export const groupEvents = (
   events: CommonHistoryEvent[],
 ): CompactEventGroups => {
