@@ -20,7 +20,7 @@
 
 <div class="w-full">
   <Select dark bind:value={selectedNamespace} on:change={switchNamespace}>
-    {#if isCloud}
+    {#if isCloud()}
       <Option value={selectedNamespace}>{selectedNamespace}</Option>
     {:else}
       {#each namespaces as namespace}
