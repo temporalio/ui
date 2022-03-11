@@ -86,7 +86,6 @@
   </nav>
   <EventTable events={visibleEvents}>
     <div slot="filters">
-      {view}
       <FilterSelect parameter="category" bind:value={category}>
         <Option value={null}>All</Option>
         <Option value="activity">Activity</Option>

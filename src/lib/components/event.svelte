@@ -28,7 +28,7 @@
   sveltekit:prefetch
   class="flex border-b-2 border-gray-300 w-full items-center hover:bg-gray-50"
   class:pending
-  class:active={$page.params.id === event.id}
+  class:active={$page.params.eventId === event.id}
 >
   <article class="flex gap-4 items-center p-4 w-full">
     <p class="w-5 text-center text-gray-500">{id}</p>
