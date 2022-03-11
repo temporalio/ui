@@ -11,7 +11,11 @@ type Notification = {
 };
 type Notifications = Notification[];
 
-const whenIdle = globalThis?.requestIdleCallback || ((fn: Parameters<typeof setTimeout>[0]) => { setTimeout(fn, 0) });
+const whenIdle =
+  globalThis?.requestIdleCallback ||
+  ((fn: Parameters<typeof setTimeout>[0]) => {
+    setTimeout(fn, 0);
+  });
 
 const store = writable<Notifications>([], () => {
   const interval = setInterval(() => {
