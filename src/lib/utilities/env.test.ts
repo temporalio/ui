@@ -1,60 +1,44 @@
-import { isLocal, isCloud, getEnvironment } from './env';
+// Need to mock out the getEnvironment out to the jest mock function
+/* eslint-disable @typescript-eslint/no-explicit-any */
+jest.mock('./get-environment');
 
-const initialValue = process.env.VITE_TEMPORAL_UI_BUILD_TARGET;
+import { isLocal, isCloud } from './env';
+import { getEnvironment } from './get-environment';
+
+const setEnvLocal = () => 'local';
+const setEnvCloud = () => 'cloud';
 
 describe('Build Environment', () => {
-  afterEach(() => {
-    process.env.VITE_TEMPORAL_UI_BUILD_TARGET = initialValue;
-  });
-
-  describe('getEnvironment', () => {
-    console.log(initialValue);
-    it('should return "local" is VITE_TEMPORAL_UI_BUILD_TARGET is set to "local"', () => {
-      process.env.VITE_TEMPORAL_UI_BUILD_TARGET = 'local';
-      expect(getEnvironment()).toBe('local');
-    });
-
-    it('should return "cloud" is VITE_TEMPORAL_UI_BUILD_TARGET is set to "cloud"', () => {
-      process.env.VITE_TEMPORAL_UI_BUILD_TARGET = 'cloud';
-      expect(getEnvironment()).toBe('cloud');
-    });
-
-    it('should return "local" is VITE_TEMPORAL_UI_BUILD_TARGET is undefined', () => {
-      delete process.env.VITE_TEMPORAL_UI_BUILD_TARGET;
-      expect(getEnvironment()).toBe('local');
-    });
-  });
-
   describe('isLocal', () => {
     it('should return true if VITE_TEMPORAL_UI_BUILD_TARGET is set to "local"', () => {
-      process.env.VITE_TEMPORAL_UI_BUILD_TARGET = 'local';
+      (getEnvironment as any).mockImplementation(setEnvLocal);
       expect(isLocal()).toBe(true);
     });
 
     it('should return false if VITE_TEMPORAL_UI_BUILD_TARGET is set to "local"', () => {
-      process.env.VITE_TEMPORAL_UI_BUILD_TARGET = 'cloud';
+      (getEnvironment as any).mockImplementation(setEnvCloud);
       expect(isLocal()).toBe(false);
     });
 
     it('should throw an error if VITE_TEMPORAL_UI_BUILD_TARGET is set to something other than "cloud" or "local"', () => {
-      process.env.VITE_TEMPORAL_UI_BUILD_TARGET = 'not_valid';
+      (getEnvironment as any).mockImplementation(() => 'not_valid');
       expect(() => isLocal()).toThrow();
     });
   });
 
   describe('isCloud', () => {
     it('should return true if VITE_TEMPORAL_UI_BUILD_TARGET is set to "cloud"', () => {
-      process.env.VITE_TEMPORAL_UI_BUILD_TARGET = 'cloud';
+      (getEnvironment as any).mockImplementation(setEnvCloud);
       expect(isCloud()).toBe(true);
     });
 
-    it('should return false if VITE_TEMPORAL_UI_BUILD_TARGET is set to "cloud"', () => {
-      process.env.VITE_TEMPORAL_UI_BUILD_TARGET = 'local';
+    it('should return false if VITE_TEMPORAL_UI_BUILD_TARGET is set to "local"', () => {
+      (getEnvironment as any).mockImplementation(setEnvLocal);
       expect(isCloud()).toBe(false);
     });
 
     it('should throw an error if VITE_TEMPORAL_UI_BUILD_TARGET is set to something other than "cloud" or "local"', () => {
-      process.env.VITE_TEMPORAL_UI_BUILD_TARGET = 'not_valid';
+      (getEnvironment as any).mockImplementation(() => 'not_valid');
       expect(() => isCloud()).toThrow();
     });
   });

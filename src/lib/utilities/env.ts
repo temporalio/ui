@@ -1,3 +1,5 @@
+import { getEnvironment } from './get-environment';
+
 const validTargets = ['local', 'cloud'];
 
 const throwErrorIfInvalid = (callback: () => boolean) => () => {
@@ -22,9 +24,6 @@ const throwErrorIfInvalid = (callback: () => boolean) => () => {
 
   return callback();
 };
-export function getEnvironment(): string {
-  return import.meta.env.VITE_TEMPORAL_UI_BUILD_TARGET ?? 'local';
-}
 
 export const isLocal = throwErrorIfInvalid(() => getEnvironment() === 'local');
 export const isCloud = throwErrorIfInvalid(() => getEnvironment() === 'cloud');
