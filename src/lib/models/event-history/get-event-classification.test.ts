@@ -1,141 +1,120 @@
-import {
-  getEventClassification,
-  isEvent,
-  isPendingActivity,
-  formatEvent,
-} from './get-event-classification';
+import { getEventClassification } from './get-event-classification';
 
 describe(getEventClassification, () => {
   it('should return "Started" for WorkflowExecutionStartedEvent', () => {
-    expect(
-      getEventClassification({ eventType: 'WorkflowExecutionStartedEvent' }),
-    ).toBe('Started');
-  });
-
-  it('should return "Completed" for WorkflowExecutionCompletedEvent', () => {
-    expect(
-      getEventClassification({ eventType: 'WorkflowExecutionCompletedEvent' }),
-    ).toBe('Completed');
-  });
-
-  it('should return "Failed" for WorkflowExecutionFailedEvent', () => {
-    expect(
-      getEventClassification({ eventType: 'WorkflowExecutionFailedEvent' }),
-    ).toBe('Failed');
-  });
-
-  it('should return "TimedOut" for WorkflowExecutionTimedOutEvent', () => {
-    expect(
-      getEventClassification({ eventType: 'WorkflowExecutionTimedOutEvent' }),
-    ).toBe('TimedOut');
-  });
-
-  it('should return "Scheduled" for WorkflowTaskScheduledEvent', () => {
-    expect(
-      getEventClassification({ eventType: 'WorkflowTaskScheduledEvent' }),
-    ).toBe('Scheduled');
-  });
-
-  it('should return "Started" for WorkflowTaskStartedEvent', () => {
-    expect(
-      getEventClassification({ eventType: 'WorkflowTaskStartedEvent' }),
-    ).toBe('Started');
-  });
-
-  it('should return "Completed" for WorkflowTaskCompletedEvent', () => {
-    expect(
-      getEventClassification({ eventType: 'WorkflowTaskCompletedEvent' }),
-    ).toBe('Completed');
-  });
-
-  it('should return "TimedOut" for WorkflowTaskTimedOutEvent', () => {
-    expect(
-      getEventClassification({ eventType: 'WorkflowTaskTimedOutEvent' }),
-    ).toBe('TimedOut');
-  });
-
-  it('should return "Failed" for WorkflowTaskFailedEvent', () => {
-    expect(
-      getEventClassification({ eventType: 'WorkflowTaskFailedEvent' }),
-    ).toBe('Failed');
-  });
-
-  it('should return "Scheduled" for ActivityTaskScheduledEvent', () => {
-    expect(
-      getEventClassification({ eventType: 'ActivityTaskScheduledEvent' }),
-    ).toBe('Scheduled');
-  });
-
-  it('should return "Started" for ActivityTaskStartedEvent', () => {
-    expect(
-      getEventClassification({ eventType: 'ActivityTaskStartedEvent' }),
-    ).toBe('Started');
-  });
-
-  it('should return "Completed" for ActivityTaskCompletedEvent', () => {
-    expect(
-      getEventClassification({ eventType: 'ActivityTaskCompletedEvent' }),
-    ).toBe('Completed');
-  });
-
-  it('should return "Failed" for ActivityTaskFailedEvent', () => {
-    expect(
-      getEventClassification({ eventType: 'ActivityTaskFailedEvent' }),
-    ).toBe('Failed');
-  });
-
-  it('should return "TimedOut" for ActivityTaskTimedOutEvent', () => {
-    expect(
-      getEventClassification({ eventType: 'ActivityTaskTimedOutEvent' }),
-    ).toBe('TimedOut');
-  });
-
-  it('should return "Started" for TimerStartedEven', () => {
-    expect(getEventClassification({ eventType: 'TimerStartedEven' })).toBe(
+    expect(getEventClassification('WorkflowExecutionStartedEvent')).toBe(
       'Started',
     );
   });
 
-  it('should return "Fired" for TimerFiredEven', () => {
-    expect(getEventClassification({ eventType: 'TimerFiredEven' })).toBe(
-      'Fired',
+  it('should return "Completed" for WorkflowExecutionCompletedEvent', () => {
+    expect(getEventClassification('WorkflowExecutionCompletedEvent')).toBe(
+      'Completed',
     );
   });
 
+  it('should return "Failed" for WorkflowExecutionFailedEvent', () => {
+    expect(getEventClassification('WorkflowExecutionFailedEvent')).toBe(
+      'Failed',
+    );
+  });
+
+  it('should return "TimedOut" for WorkflowExecutionTimedOutEvent', () => {
+    expect(getEventClassification('WorkflowExecutionTimedOutEvent')).toBe(
+      'TimedOut',
+    );
+  });
+
+  it('should return "Scheduled" for WorkflowTaskScheduledEvent', () => {
+    expect(getEventClassification('WorkflowTaskScheduledEvent')).toBe(
+      'Scheduled',
+    );
+  });
+
+  it('should return "Started" for WorkflowTaskStartedEvent', () => {
+    expect(getEventClassification('WorkflowTaskStartedEvent')).toBe('Started');
+  });
+
+  it('should return "Completed" for WorkflowTaskCompletedEvent', () => {
+    expect(getEventClassification('WorkflowTaskCompletedEvent')).toBe(
+      'Completed',
+    );
+  });
+
+  it('should return "TimedOut" for WorkflowTaskTimedOutEvent', () => {
+    expect(getEventClassification('WorkflowTaskTimedOutEvent')).toBe(
+      'TimedOut',
+    );
+  });
+
+  it('should return "Failed" for WorkflowTaskFailedEvent', () => {
+    expect(getEventClassification('WorkflowTaskFailedEvent')).toBe('Failed');
+  });
+
+  it('should return "Scheduled" for ActivityTaskScheduledEvent', () => {
+    expect(getEventClassification('ActivityTaskScheduledEvent')).toBe(
+      'Scheduled',
+    );
+  });
+
+  it('should return "Started" for ActivityTaskStartedEvent', () => {
+    expect(getEventClassification('ActivityTaskStartedEvent')).toBe('Started');
+  });
+
+  it('should return "Completed" for ActivityTaskCompletedEvent', () => {
+    expect(getEventClassification('ActivityTaskCompletedEvent')).toBe(
+      'Completed',
+    );
+  });
+
+  it('should return "Failed" for ActivityTaskFailedEvent', () => {
+    expect(getEventClassification('ActivityTaskFailedEvent')).toBe('Failed');
+  });
+
+  it('should return "TimedOut" for ActivityTaskTimedOutEvent', () => {
+    expect(getEventClassification('ActivityTaskTimedOutEvent')).toBe(
+      'TimedOut',
+    );
+  });
+
+  it('should return "Started" for TimerStartedEven', () => {
+    expect(getEventClassification('TimerStartedEvent')).toBe('Started');
+  });
+
+  it('should return "Fired" for TimerFiredEven', () => {
+    expect(getEventClassification('TimerFiredEvent')).toBe('Fired');
+  });
+
   it('should return "CancelRequested" for ActivityTaskCancelRequestedEvent', () => {
-    expect(
-      getEventClassification({ eventType: 'ActivityTaskCancelRequestedEvent' }),
-    ).toBe('CancelRequested');
+    expect(getEventClassification('ActivityTaskCancelRequestedEvent')).toBe(
+      'CancelRequested',
+    );
   });
 
   it('should return "Canceled" for ActivityTaskCanceledEvent', () => {
-    expect(
-      getEventClassification({ eventType: 'ActivityTaskCanceledEvent' }),
-    ).toBe('Canceled');
-  });
-
-  it('should return "Canceled" for TimerCanceledEvent', () => {
-    expect(getEventClassification({ eventType: 'TimerCanceledEvent' })).toBe(
+    expect(getEventClassification('ActivityTaskCanceledEvent')).toBe(
       'Canceled',
     );
   });
 
+  it('should return "Canceled" for TimerCanceledEvent', () => {
+    expect(getEventClassification('TimerCanceledEventt')).toBe('Canceled');
+  });
+
   it('should return undefined for MarkerRecordedEvent', () => {
-    expect(
-      getEventClassification({ eventType: 'MarkerRecordedEvent' }),
-    ).toBeUndefined();
+    expect(getEventClassification('MarkerRecordedEvent')).toBeUndefined();
   });
 
   it('should return "Signaled" for WorkflowExecutionSignaledEvent', () => {
-    expect(
-      getEventClassification({ eventType: 'WorkflowExecutionSignaledEvent' }),
-    ).toBe('Signaled');
+    expect(getEventClassification('WorkflowExecutionSignaledEvent')).toBe(
+      'Signaled',
+    );
   });
 
   it('should return "Terminated" for WorkflowExecutionTerminatedEvent', () => {
-    expect(
-      getEventClassification({ eventType: 'WorkflowExecutionTerminatedEvent' }),
-    ).toBe('Terminated');
+    expect(getEventClassification('WorkflowExecutionTerminatedEvent')).toBe(
+      'Terminated',
+    );
   });
 
   it('should return "CancelRequested" for WorkflowExecutionCancelRequestedEvent', () => {
@@ -147,9 +126,9 @@ describe(getEventClassification, () => {
   });
 
   it('should return "Canceled" for WorkflowExecutionCanceledEvent', () => {
-    expect(
-      getEventClassification({ eventType: 'WorkflowExecutionCanceledEvent' }),
-    ).toBe('Canceled');
+    expect(getEventClassification('WorkflowExecutionCanceledEvent')).toBe(
+      'Canceled',
+    );
   });
 
   it('should return "$x" for RequestCancelExternalWorkflowExecutionInitiatedEvent', () => {
@@ -278,84 +257,5 @@ describe(getEventClassification, () => {
         eventType: 'UpsertWorkflowSearchAttributesEvent',
       }),
     ).toBeUndefined();
-  });
-});
-
-describe(isEvent, () => {
-  it('should return true if the event has an eventType', () => {
-    expect(isEvent({ eventType: 'Workflow Started' })).toBe(true);
-  });
-
-  it('should return false if the event does not have an eventType', () => {
-    expect(isEvent({ activityType: 'Workflow Started' })).toBe(false);
-  });
-
-  it('should return false if passed null', () => {
-    expect(isEvent(null)).toBe(false);
-  });
-
-  it('should return false if passed a string', () => {
-    expect(isEvent('string')).toBe(false);
-  });
-
-  it('should return false if passed a number', () => {
-    expect(isEvent(4)).toBe(false);
-  });
-
-  it('should return false if passed an array', () => {
-    expect(isEvent([])).toBe(false);
-  });
-});
-
-describe(isPendingActivity, () => {
-  it('should return true if the event has an eventType', () => {
-    expect(
-      isPendingActivity({ activityType: { name: 'Workflow Started' } }),
-    ).toBe(true);
-  });
-
-  it('should return false if the event does not have an eventType', () => {
-    expect(isPendingActivity({ eventType: 'Workflow Started' })).toBe(false);
-  });
-
-  it('should return false if passed null', () => {
-    expect(isPendingActivity(null)).toBe(false);
-  });
-
-  it('should return false if passed a string', () => {
-    expect(isPendingActivity('string')).toBe(false);
-  });
-
-  it('should return false if passed a number', () => {
-    expect(isPendingActivity(4)).toBe(false);
-  });
-
-  it('should return false if passed an array', () => {
-    expect(isPendingActivity([])).toBe(false);
-  });
-});
-
-describe(formatEvent, () => {
-  it('should correctly get the name from an event', () => {
-    const result = formatEvent({ eventType: 'WorkflowStarted' });
-    expect(result.name).toBe('Workflow Started');
-  });
-
-  it('should correctly get the tag from an event', () => {
-    const result = formatEvent({ eventType: 'WorkflowStarted' });
-    expect(result.tag).toBe('WorkflowStarted');
-  });
-
-  it('should correctly get the name from an activity', () => {
-    const result = formatEvent({
-      activityType: { name: 'LongActivity' },
-      state: 'Started',
-    });
-    expect(result.name).toBe('Long Activity: Started');
-  });
-
-  it('should correctly get the tag from an activity', () => {
-    const result = formatEvent({ eventType: 'WorkflowStarted' });
-    expect(result.tag).toBe('WorkflowStarted');
   });
 });

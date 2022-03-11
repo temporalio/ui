@@ -8,13 +8,23 @@ type TimerType = import('$lib/utilities/is-event-type').TimerType;
 type SignalType = import('$lib/utilities/is-event-type').SignalType;
 type MarkerType = import('$lib/utilities/is-event-type').MarkerType;
 type ChildType = import('$lib/utilities/is-event-type').ChildType;
-type EventTypeCategory = import('$lib/utilities/get-event-categorization');
+
+type EventTypeCategory =
+  import('$lib/models/event-history/get-event-categorization').EventTypeCategory;
+
+type EventClassification =
+  import('$lib/utilities/get-event-classiciation').EventClassification;
 
 interface HistoryEventWithId extends HistoryEvent {
   id: string;
   eventType: EventType;
   attributes: EventAttribute;
+  timestamp: string;
+  classification: EventClassification;
+  name: EventType;
 }
+
+type HistoryEvents = HistoryEventWithId[];
 
 interface PendingActivity extends PendingActivityInfo {
   id: typeof PendingActivityInfo.activityId;
@@ -29,7 +39,10 @@ type CommonEventKey =
   | 'eventId'
   | 'eventTime'
   | 'version'
-  | 'taskId';
+  | 'taskId'
+  | 'timestamp'
+  | 'classification'
+  | 'name';
 
 type CommonHistoryEvent = Pick<HistoryEventWithId, CommonEventKey>;
 
@@ -146,6 +159,7 @@ type ChildEvent = StartChildWorkflowExecutionInitiatedEvent &
 
 type EventHistoryView = 'full' | 'compact' | 'json';
 
-type EventsOrActivities = (HistoryEventWithId | PendingActivity)[];
-type IterableEvents = EventsOrActivities | CompactEventGroups;
-type IterableEvent = IterableEvents[number];
+type FetchEventsResponse = {
+  events: HistoryEventWithId[];
+  eventGroups: CompactEventGroups;
+};

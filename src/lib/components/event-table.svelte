@@ -1,13 +1,10 @@
 <script lang="ts">
-  import Pagination from './pagination.svelte';
   import Event from './event.svelte';
 
-  export let events: IterableEvents;
+  export let events: HistoryEvents | CompactEventGroups;
 </script>
 
-<section
-  class="flex flex-col border-2 border-gray-300 rounded-lg w-full event-history mb-6"
->
+<section class="flex flex-col border-2 border-gray-300 rounded-lg w-full mb-6">
   <div class="flex w-full">
     <header class="table-header border-r-2 rounded-tl-lg w-1/3">
       <h3>Summary</h3>
@@ -28,11 +25,9 @@
       </div>
     </div>
     <div class="flex flex-col h-full w-2/3">
-      <div
-        class="h-full  overflow-y-scroll overflow-x-hidden rounded-br-lg px-4"
-      >
+      <div class="overflow-y-scroll overflow-x-hidden rounded-br-lg px-4">
         <slot name="details">
-          <div class="flex items-center justify-center w-full h-full">
+          <div class="flex items-center justify-center w-full">
             <p class="text-gray-600 italic">(Nothing selected.)</p>
           </div>
         </slot>

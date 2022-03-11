@@ -12,31 +12,11 @@ type FetchEvents = NamespaceScopedRequest &
     rawPayloads?: boolean;
   };
 
-export const fetchEvents = async (
-  { namespace, executionId, runId, onStart, onUpdate, onComplete }: FetchEvents,
-  request = fetch,
-): Promise<HistoryEventWithId[]> => {
-  const events = await paginated(
-    async (token: string) => {
-      return requestFromAPI<GetWorkflowExecutionHistoryResponse>(
-        routeForApi('events', { namespace, executionId, runId }),
-        {
-          token,
-          request,
-        },
-      );
-    },
-    { onStart, onUpdate, onComplete },
-  ).then(toEventHistory);
-
-  return events;
-};
-
 export const fetchRawEvents = async (
   { namespace, executionId, runId, onStart, onUpdate, onComplete }: FetchEvents,
   request = fetch,
 ): Promise<HistoryEvent[]> => {
-  const resp = await paginated(
+  const response = await paginated(
     async (token: string) => {
       return requestFromAPI<GetWorkflowExecutionHistoryResponse>(
         routeForApi('events', { namespace, executionId, runId }),
@@ -49,5 +29,12 @@ export const fetchRawEvents = async (
     { onStart, onUpdate, onComplete },
   );
 
-  return resp.history.events;
+  return response.history.events;
+};
+
+export const fetchEvents = (
+  parameters: FetchEvents,
+  request = fetch,
+): Promise<FetchEventsResponse> => {
+  return fetchRawEvents(parameters, request).then(toEventHistory);
 };

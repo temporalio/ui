@@ -1,7 +1,19 @@
+import { has } from '$lib/utilities/has';
 import { createEventGroup } from './create-event-group';
 import { getGroupId } from './get-group-id';
 
 export { getGroupForEvent } from './get-group-for-event';
+
+const addToExistingGroup = (
+  group: CompactEventGroup,
+  event: HistoryEventWithId,
+): void => {
+  if (!group) return;
+
+  group.events.set(event.eventType, event);
+  group.eventIds.add(event.id);
+  group.timestamp = event.timestamp;
+};
 
 export const groupEvents = (
   events: CommonHistoryEvent[],
@@ -15,10 +27,21 @@ export const groupEvents = (
     if (group) {
       groups[group.id] = group;
     } else {
-      groups[id]?.events.set(event.eventType, event);
-      groups[id]?.eventIds.add(event.id);
+      addToExistingGroup(groups[id], event);
     }
   }
 
   return Object.values(groups);
+};
+
+export const isEventGroup = (
+  eventOrGroup: unknown,
+): eventOrGroup is CompactEventGroup => {
+  return has(eventOrGroup, 'events');
+};
+
+export const isEventGroups = (
+  eventsOrGroups: unknown[],
+): eventsOrGroups is CompactEventGroups => {
+  return eventsOrGroups.every(isEventGroup);
 };

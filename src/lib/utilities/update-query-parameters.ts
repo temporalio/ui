@@ -29,19 +29,19 @@ export const updateQueryParameters = async ({
   path,
   goto,
 }: UpdateQueryParams): Promise<typeof value> => {
-  // const updateSearchParams = new URLSearchParams(query);
+  const updateSearchParams = new URLSearchParams(query);
 
-  // if (value) {
-  //   updateSearchParams.set(parameter, value.toString());
-  // } else {
-  //   updateSearchParams.delete(parameter);
-  // }
+  if (value) {
+    updateSearchParams.set(parameter, value.toString());
+  } else {
+    updateSearchParams.delete(parameter);
+  }
 
-  // if (hasChanged(query, updateSearchParams)) return value;
+  if (hasChanged(query, updateSearchParams)) return value;
 
-  // if (browser) {
-  //   goto(appendQueryParameters(path, query), options);
-  // }
+  if (browser) {
+    goto(appendQueryParameters(path, query), options);
+  }
 
   return value;
 };

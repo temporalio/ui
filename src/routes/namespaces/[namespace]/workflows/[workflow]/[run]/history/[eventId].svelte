@@ -2,8 +2,8 @@
   import type { Load } from '@sveltejs/kit';
 
   export const load: Load = async function ({ params, stuff }) {
-    const { events, eventGroups } = stuff;
     const { eventId } = params;
+    const { events, eventGroups } = stuff;
 
     const event: HistoryEventWithId = events.find(
       (event: HistoryEventWithId) => event.id === eventId,

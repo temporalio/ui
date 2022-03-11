@@ -1,4 +1,3 @@
-import { getName } from '$lib/utilities/get-event-name';
 import { getGroupId } from './get-group-id';
 
 import {
@@ -8,6 +7,30 @@ import {
   isStartChildWorkflowExecutionInitiatedEvent,
   isTimerStartedEvent,
 } from '$lib/utilities/is-event-type';
+
+export const getName = (event: CommonHistoryEvent): string => {
+  if (!event) return;
+
+  if (isActivityTaskScheduledEvent(event)) {
+    return event.activityTaskScheduledEventAttributes?.activityType?.name;
+  }
+
+  if (isTimerStartedEvent(event)) {
+    return `Timer ${event.timerStartedEventAttributes?.timerId} (${event.timerStartedEventAttributes?.startToFireTimeout})`;
+  }
+
+  if (isSignalExternalWorkflowExecutionInitiatedEvent(event)) {
+    return `Signal: ${event.signalExternalWorkflowExecutionInitiatedEventAttributes?.signalName}`;
+  }
+
+  if (isMarkerRecordedEvent(event)) {
+    return `Marker: ${event.markerRecordedEventAttributes?.markerName}`;
+  }
+
+  if (isStartChildWorkflowExecutionInitiatedEvent(event)) {
+    return `Child Workflow: ${event.startChildWorkflowExecutionInitiatedEventAttributes?.workflowType?.name}`;
+  }
+};
 
 type StartingEvents = {
   Activity: ActivityTaskScheduledEvent;
@@ -22,6 +45,10 @@ const createGroupFor = <K extends keyof StartingEvents>(
 ): CompactEventGroup => {
   const id = getGroupId(event);
   const name = getName(event);
+  const timestamp = event.timestamp;
+  const classification = event.classification;
+
+  const initialEvent = event;
 
   const events = new Map<EventType, HistoryEventWithId>();
   const eventIds = new Set<string>();
@@ -29,7 +56,15 @@ const createGroupFor = <K extends keyof StartingEvents>(
   events.set(event.eventType, event);
   eventIds.add(event.id);
 
-  return { id, name, events, eventIds };
+  return {
+    id,
+    name,
+    events,
+    eventIds,
+    initialEvent,
+    timestamp,
+    classification,
+  };
 };
 
 export const createEventGroup = (event: CommonHistoryEvent) => {

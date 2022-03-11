@@ -3,56 +3,47 @@
   import { faCalendar } from '@fortawesome/free-solid-svg-icons';
 
   import { page } from '$app/stores';
-  import { formatDate } from '$lib/utilities/format-date';
-  import {
-    formatEvent,
-    isEvent,
-    isEventGroup,
-    isPendingActivity,
-  } from '$lib/utilities/get-event-classification';
+  import { isEvent } from '$lib/models/event-history';
+  import { isEventGroup } from '$lib/models/group-events';
 
   import EventLabel from '$lib/components/event-label.svelte';
 
-  export let event: IterableEvent;
+  export let event: HistoryEventWithId | CompactEventGroup;
 
-  let { pending, timeStamp, name, tag, classification, id } =
-    formatEvent(event);
-
-  const isActive = (something: IterableEvent, currentId: string): boolean => {
-    if (isPendingActivity(something) || isEvent(something)) {
-      return id === currentId;
+  const isActive = (currentId: string): boolean => {
+    if (isEvent(event)) {
+      return event.id === currentId;
     }
 
-    if (isEventGroup(something)) {
-      return something.eventIds.has(currentId);
+    if (isEventGroup(event)) {
+      return event.eventIds.has(currentId);
     }
   };
+
+  $: href = $page.params.eventId
+    ? event.id
+    : `${$page.url.pathname}/${event.id}`;
 </script>
 
 <a
-  href={event.id}
+  {href}
   sveltekit:noscroll
-  sveltekit:prefetch
   class="flex border-b-2 border-gray-300 w-full items-center hover:bg-gray-50"
-  class:pending
-  class:active={isActive(event, $page.params.eventId)}
+  class:active={isActive($page.params.eventId)}
 >
   <article class="flex gap-4 items-center p-4 w-full">
-    <p class="w-5 text-center text-gray-500">{id}</p>
+    <p class="w-5 text-center text-gray-500">{event.id}</p>
     <div class="w-full">
-      <h2 class="mb-2 {tag}">
-        <EventLabel color={classification}>
-          {name}
+      <h2 class="mb-2">
+        <EventLabel color={event.classification}>
+          {event.name}
         </EventLabel>
       </h2>
       <p class="text-sm">
         <Icon icon={faCalendar} class="inline" />
-        {formatDate(timeStamp)}
+        {event.timestamp}
       </p>
     </div>
-    {#if pending}
-      <div class="mx-8 text-orange-600 italic">Pending</div>
-    {/if}
   </article>
 </a>
 
@@ -67,14 +58,6 @@
       theme('colors.blue[50]') 1%,
       theme('colors.blue[50]') 1%
     );
-  }
-
-  .pending {
-    @apply bg-orange-50;
-  }
-
-  .pending .active {
-    @apply bg-blue-50;
   }
 
   a:last-child {
