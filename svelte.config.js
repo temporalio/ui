@@ -1,31 +1,8 @@
 import path from 'path';
 import preprocess from 'svelte-preprocess';
 import adapter from '@sveltejs/adapter-static';
-import chalk from 'chalk';
 
-const buildTarget = process.env.VITE_TEMPORAL_UI_BUILD_TARGET;
-const validBuildTargets = ['local', 'cloud'];
-const isProduction = process.env.NODE_ENV === 'production';
-
-if (!isProduction && !buildTarget) {
-  process.env.VITE_TEMPORAL_UI_BUILD_TARGET = 'local';
-}
-
-// Don't build anything unless a valid build target has been set.
-if (!buildTarget || !validBuildTargets.includes(buildTarget)) {
-  const valid = validBuildTargets.map((t) => chalk.blue(t)).join(', ');
-
-  console.error(
-    chalk.red('ERROR:'),
-    `You must provide a VITE_TEMPORAL_UI_BUILD_TARGET environment variable. Valid targets: ${valid}.`,
-  );
-
-  if (buildTarget) {
-    console.error(`You provided: ${chalk.bgYellowBright(buildTarget)}.`);
-  }
-
-  if (isProduction) process.exit(1);
-}
+const buildTarget = process.env.VITE_TEMPORAL_UI_BUILD_TARGET || 'local';
 
 let outputDirectory = `build-${buildTarget}`;
 

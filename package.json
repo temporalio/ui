@@ -4,9 +4,9 @@
   "type": "module",
   "scripts": {
     "start": "npm run dev:local -- --open",
-    "dev:local": ". ./.env && VITE_TEMPORAL_UI_BUILD_TARGET=local svelte-kit dev",
+    "dev:local": ". ./.env && VITE_TEMPORAL_UI_BUILD_TARGET=cloud svelte-kit dev",
     "dev:cloud": "VITE_TEMPORAL_UI_BUILD_TARGET=cloud svelte-kit dev",
-    "build:local": "VITE_TEMPORAL_UI_BUILD_TARGET=local svelte-kit build",
+    "build:local": "svelte-kit build",
     "build:cloud": "VITE_TEMPORAL_UI_BUILD_TARGET=cloud svelte-kit build",
     "test": "TZ=UTC jest",
     "preview:local": "VITE_TEMPORAL_UI_BUILD_TARGET=local svelte-kit preview",
