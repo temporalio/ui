@@ -53,6 +53,11 @@ type Settings = {
     options: string[];
   };
   defaultNamespace: string;
+  runtimeEnvironment: {
+    isCloud: boolean;
+    isLocal: boolean;
+    envOverride: boolean;
+  };
 };
 
 type User = {

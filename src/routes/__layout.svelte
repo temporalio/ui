@@ -8,7 +8,6 @@
 
   import { loadUser } from '$lib/stores/user';
   import { loadCluster } from '$lib/stores/cluster';
-  import { isCloud } from '$lib/utilities/env';
 
   import type {
     DescribeNamespaceResponse,
@@ -21,8 +20,10 @@
     namespaces: [],
   };
 
-  async function loadNamespaces(): Promise<ListNamespacesResponse> {
-    if (isCloud()) {
+  async function loadNamespaces(
+    settings: Settings,
+  ): Promise<ListNamespacesResponse> {
+    if (settings.runtimeEnvironment.isCloud) {
       return Promise.resolve(emptyNamespace);
     }
 
@@ -37,12 +38,14 @@
     return results ?? Promise.resolve(emptyNamespace);
   }
 
-  export const load: Load = async function ({}) {
-    const settings: Settings = await fetchSettings();
-    const { namespaces }: ListNamespacesResponse = await loadNamespaces();
+  export const load: Load = async function ({ url }) {
+    const settings: Settings = await fetchSettings({ url });
+    const { namespaces }: ListNamespacesResponse = await loadNamespaces(
+      settings,
+    );
 
     loadUser();
-    loadCluster().catch(() =>
+    loadCluster(settings).catch(() =>
       notifications.add('error', 'Unable to fetch cluster info'),
     );
 
