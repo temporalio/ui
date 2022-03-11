@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "moduleResolution": "node",
+    // "strict": true,
     "module": "es2020",
     "lib": ["es2020", "dom", "DOM.Iterable"],
     "target": "es2019",

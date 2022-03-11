@@ -8,6 +8,7 @@
 
   import { loadUser } from '$lib/stores/user';
   import { loadCluster } from '$lib/stores/cluster';
+  import { isCloud } from '$lib/utilities/env';
 
   import type {
     DescribeNamespaceResponse,
@@ -21,7 +22,7 @@
   };
 
   async function loadNamespaces(): Promise<ListNamespacesResponse> {
-    if (isCloud) {
+    if (isCloud()) {
       return Promise.resolve(emptyNamespace);
     }
 
@@ -59,7 +60,6 @@
   import Notifications from '$lib/components/notifications.svelte';
   import Banner from '$lib/components/banner.svelte';
   import { ErrorBoundary } from '$lib/components/error-boundary';
-  import { isCloud } from '$lib/utilities/env';
 
   export let namespaces: DescribeNamespaceResponse[];
 

@@ -7,7 +7,7 @@ import { isCloud } from '$lib/utilities/env';
 export const cluster = writable<GetClusterInfoResponse>({});
 
 export const loadCluster = async (): Promise<void> => {
-  if (isCloud) {
+  if (isCloud()) {
     return Promise.resolve();
   }
   const clusterRes = await fetchCluster();
