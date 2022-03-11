@@ -5,14 +5,14 @@ import type { DataConverterWebsocketInterface } from '$lib/utilities/data-conver
 import { convertPayload } from '$lib/services/data-converter';
 import { browser } from '$app/env';
 
-const atob = browser ? window.atob : (str) => str;
+const atob = browser ? window.atob : (str: string) => str;
 
 export function decodePayload(
   payload: Payload,
   // This could decode to any object. So we either use the payload object passed in or decode it
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Payload | Record<any, any> | string {
-  const encoding = atob(String(payload.metadata.encoding));
+  const encoding = atob(String(payload?.metadata?.encoding ?? ''));
   // Help users out with an english encoding
   (payload.metadata.encodingDecoded as unknown as string) = encoding;
 
