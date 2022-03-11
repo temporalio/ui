@@ -5,16 +5,17 @@
 <script lang="ts">
   import { namespace } from '$lib/stores/namespace';
   import DataConverterStatus from '$lib/components/data-converter-status.svelte';
-  import { settings } from '$lib/stores/settings';
+
   import { user } from '$lib/stores/user';
   import { goto } from '$app/navigation';
 
   import NavigationLink from './_navigation-link.svelte';
   import { page } from '$app/stores';
+  $: settings = $page.stuff.settings;
 
   let loginUrl = '';
   $: {
-    const query = ($settings?.auth?.options ?? [])
+    const query = (settings.auth.options ?? [])
       .filter((option) => !!$page.url.searchParams.get(option))
       .map((option) => `&${option}=${$page.url.searchParams.get(option)}`)
       .join('');
@@ -50,7 +51,7 @@
     >
       Report Bug/Give Feedback
     </a>
-    {#if $settings?.auth?.enabled}
+    {#if settings.auth.enabled}
       {#if $user?.email}
         <button
           class="header-button min-w-min"

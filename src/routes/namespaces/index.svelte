@@ -1,12 +1,17 @@
 <script lang="ts">
-  import { loadSettings, settings } from '$lib/stores/settings';
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
+  import { page } from '$app/stores';
+  import { routeFor } from '$lib/utilities/route-for';
 
   onMount(async () => {
-    await loadSettings();
-    if ($settings?.defaultNamespace) {
-      goto(`/namespaces/${$settings.defaultNamespace}`, { replaceState: true });
-    }
+    goto(
+      routeFor('workflows', {
+        namespace: $page.stuff.settings.defaultNamespace,
+      }),
+      {
+        replaceState: true,
+      },
+    );
   });
 </script>

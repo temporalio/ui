@@ -4,10 +4,10 @@
   import { requestFromAPI } from '$lib/utilities/request-from-api';
   import { routeForApi } from '$lib/utilities/route-for-api';
   import { notifications } from '$lib/stores/notifications';
+  import { fetchSettings } from '$lib/services/settings-service';
 
   import { loadUser } from '$lib/stores/user';
   import { loadCluster } from '$lib/stores/cluster';
-  import { loadSettings } from '$lib/stores/settings';
 
   import type {
     DescribeNamespaceResponse,
@@ -16,35 +16,38 @@
 
   import '../app.postcss';
 
-  async function loadNamespaces(): Promise<ListNamespacesResponse> {
-    const emptyNamespace = {
-      namespaces: [],
-    };
+  const emptyNamespace = {
+    namespaces: [],
+  };
 
+  async function loadNamespaces(): Promise<ListNamespacesResponse> {
     if (isCloud) {
       return Promise.resolve(emptyNamespace);
     }
 
-    const results = await requestFromAPI(routeForApi('namespaces'), {
-      request: fetch,
-      onError: () => notifications.add('error', 'Unable to fetch namespaces'),
-    });
+    const results = await requestFromAPI<ListNamespacesResponse>(
+      routeForApi('namespaces'),
+      {
+        request: fetch,
+        onError: () => notifications.add('error', 'Unable to fetch namespaces'),
+      },
+    );
 
     return results ?? Promise.resolve(emptyNamespace);
   }
 
   export const load: Load = async function ({}) {
+    const settings: Settings = await fetchSettings();
     const { namespaces }: ListNamespacesResponse = await loadNamespaces();
 
     loadUser();
     loadCluster().catch(() =>
       notifications.add('error', 'Unable to fetch cluster info'),
     );
-    await loadSettings();
 
     return {
       props: { namespaces },
-      stuff: { namespaces },
+      stuff: { namespaces, settings },
     };
   };
 </script>
