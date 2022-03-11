@@ -21,7 +21,7 @@
       namespaces: [],
     };
 
-    if (isCloud) {
+    if (isCloud()) {
       return Promise.resolve(emptyNamespace);
     }
 
