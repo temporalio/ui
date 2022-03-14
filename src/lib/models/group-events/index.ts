@@ -10,8 +10,9 @@ const addToExistingGroup = (
 ): void => {
   if (!group) return;
 
-  group.events.set(event.eventType, event);
+  group.events.set(event.id, event);
   group.eventIds.add(event.id);
+
   group.timestamp = event.timestamp;
 };
 

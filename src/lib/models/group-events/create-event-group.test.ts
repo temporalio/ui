@@ -96,7 +96,7 @@ describe(createEventGroup, () => {
   it('should store the groupTaskScheduled', () => {
     const group = createEventGroup(scheduledEvent);
 
-    expect(group.events.get('ActivityTaskScheduled')).toBe(scheduledEvent);
+    expect(group.events.get(scheduledEvent.id)).toBe(scheduledEvent);
   });
 
   it('should be able to add a started event', () => {

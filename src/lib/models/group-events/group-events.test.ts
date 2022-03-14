@@ -100,7 +100,7 @@ describe(groupEvents, () => {
     const group = groups.find(({ id }) => id === scheduledEvent.id);
 
     expect(group.events.size).toBe(2);
-    expect(group.events.get('ActivityTaskCompleted')).toBe(completedEvent);
+    expect(group.events.get(completedEvent.id).toBe(completedEvent);
   });
 
   it('should be able to add multiple event groups and their associated events', () => {

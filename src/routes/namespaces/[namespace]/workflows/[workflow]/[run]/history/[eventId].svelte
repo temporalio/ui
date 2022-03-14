@@ -34,12 +34,12 @@
   {#if eventGroup}
     <nav class="flex flex-col mb-4">
       <ul class="flex gap-4 w-full items-start">
-        {#each [...eventGroup.events.values()] as event}
+        {#each [...eventGroup.events] as [id, event]}
           <li>
             <a
               sveltekit:noscroll
-              href={event.id}
-              class:active={event.id === eventId}
+              href={id}
+              class:active={id === eventId}
               class="border-b-2 border-blue-600"
             >
               {event.eventType}

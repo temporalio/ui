@@ -45,15 +45,14 @@ const createGroupFor = <K extends keyof StartingEvents>(
 ): CompactEventGroup => {
   const id = getGroupId(event);
   const name = getName(event);
-  const timestamp = event.timestamp;
-  const classification = event.classification;
+  const { timestamp, classification } = event;
 
   const initialEvent = event;
 
-  const events = new Map<EventType, HistoryEventWithId>();
-  const eventIds = new Set<string>();
+  const events: CompactEventGroup['events'] = new Map();
+  const eventIds: CompactEventGroup['eventIds'] = new Set();
 
-  events.set(event.eventType, event);
+  events.set(event.id, event);
   eventIds.add(event.id);
 
   return {

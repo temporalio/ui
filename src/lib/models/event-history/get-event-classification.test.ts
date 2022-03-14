@@ -119,9 +119,7 @@ describe(getEventClassification, () => {
 
   it('should return "CancelRequested" for WorkflowExecutionCancelRequestedEvent', () => {
     expect(
-      getEventClassification({
-        eventType: 'WorkflowExecutionCancelRequestedEvent',
-      }),
+      getEventClassification('WorkflowExecutionCancelRequestedEvent'),
     ).toBe('CancelRequested');
   });
 
@@ -133,129 +131,101 @@ describe(getEventClassification, () => {
 
   it('should return "$x" for RequestCancelExternalWorkflowExecutionInitiatedEvent', () => {
     expect(
-      getEventClassification({
-        eventType: 'RequestCancelExternalWorkflowExecutionInitiatedEvent',
-      }),
+      getEventClassification(
+        'RequestCancelExternalWorkflowExecutionInitiatedEvent',
+      ),
     ).toBe('CancelRequested');
   });
 
   it('should return "$x" for RequestCancelExternalWorkflowExecutionFailedEvent', () => {
     expect(
-      getEventClassification({
-        eventType: 'RequestCancelExternalWorkflowExecutionFailedEvent',
-      }),
+      getEventClassification(
+        'RequestCancelExternalWorkflowExecutionFailedEvent',
+      ),
     ).toBe('CancelRequested');
   });
 
   it('should return "CancelRequested" for ExternalWorkflowExecutionCancelRequestedEvent', () => {
     expect(
-      getEventClassification({
-        eventType: 'ExternalWorkflowExecutionCancelRequestedEvent',
-      }),
+      getEventClassification('ExternalWorkflowExecutionCancelRequestedEvent'),
     ).toBe('CancelRequested');
   });
 
   it('should return "New" for WorkflowExecutionContinuedAsNewEvent', () => {
-    expect(
-      getEventClassification({
-        eventType: 'WorkflowExecutionContinuedAsNewEvent',
-      }),
-    ).toBe('New');
+    expect(getEventClassification('WorkflowExecutionContinuedAsNewEvent')).toBe(
+      'New',
+    );
   });
 
   it('should return "$x" for StartChildWorkflowExecutionInitiatedEvent', () => {
     expect(
-      getEventClassification({
-        eventType: 'StartChildWorkflowExecutionInitiatedEvent',
-      }),
+      getEventClassification('StartChildWorkflowExecutionInitiatedEvent'),
     ).toBe('Initiated');
   });
 
   it('should return "Failed" for StartChildWorkflowExecutionFailedEvent', () => {
     expect(
-      getEventClassification({
-        eventType: 'StartChildWorkflowExecutionFailedEvent',
-      }),
+      getEventClassification('StartChildWorkflowExecutionFailedEvent'),
     ).toBe('Failed');
   });
 
   it('should return "Started" for ChildWorkflowExecutionStartedEvent', () => {
-    expect(
-      getEventClassification({
-        eventType: 'ChildWorkflowExecutionStartedEvent',
-      }),
-    ).toBe('Started');
+    expect(getEventClassification('ChildWorkflowExecutionStartedEvent')).toBe(
+      'Started',
+    );
   });
 
   it('should return "Completed" for ChildWorkflowExecutionCompletedEvent', () => {
-    expect(
-      getEventClassification({
-        eventType: 'ChildWorkflowExecutionCompletedEvent',
-      }),
-    ).toBe('Completed');
+    expect(getEventClassification('ChildWorkflowExecutionCompletedEvent')).toBe(
+      'Completed',
+    );
   });
 
   it('should return "Failed" for ChildWorkflowExecutionFailedEvent', () => {
-    expect(
-      getEventClassification({
-        eventType: 'ChildWorkflowExecutionFailedEvent',
-      }),
-    ).toBe('Failed');
+    expect(getEventClassification('ChildWorkflowExecutionFailedEvent')).toBe(
+      'Failed',
+    );
   });
 
   it('should return "Canceled" for ChildWorkflowExecutionCanceledEvent', () => {
-    expect(
-      getEventClassification({
-        eventType: 'ChildWorkflowExecutionCanceledEvent',
-      }),
-    ).toBe('Canceled');
+    expect(getEventClassification('ChildWorkflowExecutionCanceledEvent')).toBe(
+      'Canceled',
+    );
   });
 
   it('should return "TimedOut" for ChildWorkflowExecutionTimedOutEvent', () => {
-    expect(
-      getEventClassification({
-        eventType: 'ChildWorkflowExecutionTimedOutEvent',
-      }),
-    ).toBe('TimedOut');
+    expect(getEventClassification('ChildWorkflowExecutionTimedOutEvent')).toBe(
+      'TimedOut',
+    );
   });
 
   it('should return "Terminated" for ChildWorkflowExecutionTerminatedEvent', () => {
     expect(
-      getEventClassification({
-        eventType: 'ChildWorkflowExecutionTerminatedEvent',
-      }),
+      getEventClassification('ChildWorkflowExecutionTerminatedEvent'),
     ).toBe('Terminated');
   });
 
   it('should return "Initiated" for SignalExternalWorkflowExecutionInitiatedEvent', () => {
     expect(
-      getEventClassification({
-        eventType: 'SignalExternalWorkflowExecutionInitiatedEvent',
-      }),
+      getEventClassification('SignalExternalWorkflowExecutionInitiatedEvent'),
     ).toBe('Initiated');
   });
 
   it('should return "Failed" for SignalExternalWorkflowExecutionFailedEvent', () => {
     expect(
-      getEventClassification({
-        eventType: 'SignalExternalWorkflowExecutionFailedEvent',
-      }),
+      getEventClassification('SignalExternalWorkflowExecutionFailedEvent'),
     ).toBe('Failed');
   });
 
   it('should return "Signaled" for ExternalWorkflowExecutionSignaledEvent', () => {
     expect(
-      getEventClassification({
-        eventType: 'ExternalWorkflowExecutionSignaledEvent',
-      }),
+      getEventClassification('ExternalWorkflowExecutionSignaledEvent'),
     ).toBe('Signaled');
   });
 
   it('should return undefined for UpsertWorkflowSearchAttributesEvent', () => {
     expect(
-      getEventClassification({
-        eventType: 'UpsertWorkflowSearchAttributesEvent',
-      }),
+      getEventClassification('UpsertWorkflowSearchAttributesEvent'),
     ).toBeUndefined();
   });
 });
