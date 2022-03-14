@@ -10,7 +10,7 @@
 </script>
 
 <section id="event-details" class=" overflow-y-scroll">
-  {#each Object.entries(attributes) as [key, value]}
+  {#each Object.entries(attributes) as [key, value] (key)}
     <article
       class="flex items-center content-start w-full border-b-2 last:border-b-0 border-gray-200 py-1"
     >

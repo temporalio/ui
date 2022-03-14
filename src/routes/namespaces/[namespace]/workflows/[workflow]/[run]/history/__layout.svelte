@@ -47,7 +47,7 @@
 <section class="flex flex-col gap-4">
   <InputAndResults {events} />
   <section id="event-history">
-    <nav class="flex gap-4 justify-between items-end">
+    <nav class="flex gap-4 justify-between items-end pb-4">
       <h3 class="text-lg font-medium">Event History</h3>
       <div class="flex gap-4">
         <ToggleButtons>
