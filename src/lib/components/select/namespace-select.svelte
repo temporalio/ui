@@ -5,7 +5,9 @@
   import { goto } from '$app/navigation';
 
   import { getAppContext } from '$lib/utilities/get-context';
-  import { isCloud } from '$lib/utilities/env';
+  import { page } from '$app/stores';
+
+  const isCloud = $page.stuff.settings.runtimeEnvironment;
 
   $: namespaces = (getAppContext('namespaces') ?? [])
     .map((namespace) => namespace?.namespaceInfo?.name ?? undefined)
@@ -20,7 +22,7 @@
 
 <div class="w-full">
   <Select dark bind:value={selectedNamespace} on:change={switchNamespace}>
-    {#if isCloud()}
+    {#if isCloud}
       <Option value={selectedNamespace}>{selectedNamespace}</Option>
     {:else}
       {#each namespaces as namespace}
