@@ -21,6 +21,7 @@ interface HistoryEventWithId extends HistoryEvent {
   attributes: EventAttribute;
   timestamp: string;
   classification: EventClassification;
+  category: EventTypeCategory;
   name: EventType;
 }
 
@@ -42,6 +43,7 @@ type CommonEventKey =
   | 'taskId'
   | 'timestamp'
   | 'classification'
+  | 'category'
   | 'name';
 
 type CommonHistoryEvent = Pick<HistoryEventWithId, CommonEventKey>;

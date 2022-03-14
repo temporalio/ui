@@ -50,11 +50,10 @@ const routeForWorkflow = ({
 
 const routeForEventHistory = (
   parameters: WorkflowParameters,
-  view?: EventHistoryView,
+  view?: 'full' | 'json',
 ): string => {
-  if (!view) view = 'full';
-
-  if (view === 'full') return `${routeForWorkflow(parameters)}/history`;
+  if (!view) return `${routeForWorkflow(parameters)}/history`;
+  if (view === 'full') return `${routeForWorkflow(parameters)}/history/summary`;
   if (view === 'json') return `${routeForWorkflow(parameters)}/history/json`;
 };
 

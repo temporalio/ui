@@ -30,7 +30,7 @@ describe(routeFor, () => {
       workflowId: 'abc',
       runId: 'def',
     });
-    expect(path).toBe('/namespaces/default/workflows/abc/def/history');
+    expect(path).toBe('/namespaces/default/workflows/abc/def/history/summary');
   });
 
   it('should route to "workflow".events.json', () => {

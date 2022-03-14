@@ -5,8 +5,7 @@ type CompactEventGroup<T = EventType, E = HistoryEventWithId, Id = E['id']> = {
   eventIds: Set<Id>;
   initialEvent: HistoryEventWithId;
   timestamp: HistoryEventWithId['timestamp'];
-  classification: EventClassification;
-};
+} & Pick<HistoryEventWithId, 'timestamp' | 'classification' | 'category'>;
 
 type CompactEventGroups<
   T = EventType,

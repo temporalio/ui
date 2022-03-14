@@ -45,7 +45,7 @@ const createGroupFor = <K extends keyof StartingEvents>(
 ): CompactEventGroup => {
   const id = getGroupId(event);
   const name = getName(event);
-  const { timestamp, classification } = event;
+  const { timestamp, category, classification } = event;
 
   const initialEvent = event;
 
@@ -62,6 +62,7 @@ const createGroupFor = <K extends keyof StartingEvents>(
     eventIds,
     initialEvent,
     timestamp,
+    category,
     classification,
   };
 };

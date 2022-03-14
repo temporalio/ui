@@ -4,7 +4,7 @@
 
   export let events: HistoryEventWithId[] | PromiseLike<HistoryEventWithId[]>;
 
-  $: inputAndResult = getWorkflowStartedAndCompletedEvents(events);
+  let inputAndResult = getWorkflowStartedAndCompletedEvents(events);
 </script>
 
 <section class="flex flex-col gap-4">

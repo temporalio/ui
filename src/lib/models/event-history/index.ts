@@ -4,6 +4,7 @@ import { has } from '$lib/utilities/has';
 import { findAttributesAndKey } from '$lib/utilities/is-event-type';
 
 import { groupEvents } from '../group-events';
+import { getEventCategory } from './get-event-categorization';
 import { getEventClassification } from './get-event-classification';
 
 export async function getEventAttributes(
@@ -25,14 +26,16 @@ const toEvent = async (
   const eventType = historyEvent.eventType as unknown as EventType;
   const timestamp = formatDate(String(historyEvent.eventTime));
   const classification = getEventClassification(eventType);
+  const category = getEventCategory(eventType);
   const attributes = await getEventAttributes(historyEvent);
 
   return {
     ...historyEvent,
-    id,
+    attributes,
     eventType,
     classification,
-    attributes,
+    category,
+    id,
     name: eventType,
     timestamp,
   };
