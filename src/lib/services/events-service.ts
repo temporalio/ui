@@ -32,7 +32,7 @@ export const fetchRawEvents = async (
   return response.history.events;
 };
 
-export const fetchEvents = (
+export const fetchEvents = async (
   parameters: FetchEvents,
   request = fetch,
 ): Promise<FetchEventsResponse> => {

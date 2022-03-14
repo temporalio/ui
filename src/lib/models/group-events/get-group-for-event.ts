@@ -1,5 +1,3 @@
-import { groupEvents } from '.';
-
 export const getGroupForEvent = (
   event: HistoryEventWithId,
   groups: CompactEventGroups,

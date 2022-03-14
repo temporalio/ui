@@ -33,49 +33,6 @@ describe(routeFor, () => {
     expect(path).toBe('/namespaces/default/workflows/abc/def/history');
   });
 
-  it('should route to "workflow".events.full.event', () => {
-    const path = routeFor('workflow.events.full.event', {
-      namespace: 'default',
-      workflowId: 'abc',
-      runId: 'def',
-      eventId: '1',
-    });
-    expect(path).toBe('/namespaces/default/workflows/abc/def/history/1');
-  });
-
-  it.skip('should route to "workflow".events.full.pending', () => {
-    const path = routeFor('workflow.events.full.pending', {
-      namespace: 'default',
-      workflowId: 'abc',
-      runId: 'def',
-      eventId: '1',
-    });
-    expect(path).toBe(
-      '/namespaces/default/workflows/abc/def/history/pending-1',
-    );
-  });
-
-  it.skip('should route to "workflow".events.compact', () => {
-    const path = routeFor('workflow.events.compact', {
-      namespace: 'default',
-      workflowId: 'abc',
-      runId: 'def',
-    });
-    expect(path).toBe('/namespaces/default/workflows/abc/def/history/compact');
-  });
-
-  it.skip('should route to "workflow".events.compact.activity', () => {
-    const path = routeFor('workflow.events.compact.activity', {
-      namespace: 'default',
-      workflowId: 'abc',
-      runId: 'def',
-      eventId: '1',
-    });
-    expect(path).toBe(
-      '/namespaces/default/workflows/abc/def/history/compact/activity-1',
-    );
-  });
-
   it('should route to "workflow".events.json', () => {
     const path = routeFor('workflow.events.json', {
       namespace: 'default',
