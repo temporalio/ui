@@ -7,21 +7,24 @@
   export let secondary: boolean = false;
   export let destroy: boolean = false;
   export let loading: boolean = false;
-  export let as: string = 'button';
+  export let login: boolean = false;
+  export let as: 'button' | 'anchor' = 'button';
   export let active: boolean = false;
   export let large: boolean = false;
   export let href: string = null;
   export let icon: IconDefinition = null;
+  export let classes: string = '';
 </script>
 
 {#if as === 'button'}
   <button
     on:click
-    class="flex items-center justify-center text-sm primary"
+    class={`flex items-center justify-center text-sm primary ${classes}`}
     class:selected={active}
     class:large
     class:secondary
     class:destroy
+    class:login
     {disabled}
   >
     {#if icon}
@@ -35,19 +38,22 @@
   <a
     {href}
     on:click
-    class="flex items-center justify-center text-sm primary"
+    class={`flex items-center justify-center text-sm primary w-fit ${classes}`}
     class:selected={active}
     class:large
     class:secondary
     class:destroy
     class:disabled
+    class:login
     {disabled}
-    >{#if loading}
-      <span class="animate-spin"> <Icon {icon} scale={1} /></span>
-    {:else}
-      <slot />
-    {/if}</a
   >
+    {#if icon}
+      <span class:animate-spin={loading} class="pr-2">
+        <Icon icon={loading ? faSpinner : icon} scale={1} />
+      </span>
+    {/if}
+    <slot />
+  </a>
 {/if}
 
 <style lang="postcss">
@@ -93,5 +99,9 @@
 
   .selected {
     @apply text-white bg-purple-600 border-purple-200;
+  }
+
+  .login {
+    @apply bg-gray-900 mx-auto py-4;
   }
 </style>

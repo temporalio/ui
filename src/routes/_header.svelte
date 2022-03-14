@@ -28,7 +28,7 @@
   class="grid grid-rows-1 grid-cols-12 px-10 items-center bg-gray-900 shadow-lg gap-6"
 >
   <div class="flex gap-4 col-span-3">
-    <a href="/" class="block">
+    <a href="/" class="flex max-h-10">
       <img src="/logo.svg" alt="Temporal Logo" class="max-h-10" />
     </a>
     <NamespaceSelect />
