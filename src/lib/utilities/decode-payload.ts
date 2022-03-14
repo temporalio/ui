@@ -5,7 +5,7 @@ import type { DataConverterWebsocketInterface } from '$lib/utilities/data-conver
 import { convertPayload } from '$lib/services/data-converter';
 import { browser } from '$app/env';
 
-const atob = browser ? window.atob : (str: string) => str;
+const atob = browser ? globalThis.atob : (str: string) => str;
 
 export function decodePayload(
   payload: Payload,
