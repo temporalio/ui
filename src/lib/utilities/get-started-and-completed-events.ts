@@ -3,11 +3,9 @@ type WorkflowEvents = {
   result: string;
 };
 
-export const getWorkflowStartedAndCompletedEvents = async (
-  events: HistoryEventWithId[] | PromiseLike<HistoryEventWithId[]>,
-): Promise<WorkflowEvents> => {
-  events = await events;
-
+export const getWorkflowStartedAndCompletedEvents = (
+  events: HistoryEventWithId[],
+): WorkflowEvents => {
   let input: string;
   let result: string;
 
@@ -22,14 +20,14 @@ export const getWorkflowStartedAndCompletedEvents = async (
   if (workflowStartedEvent) {
     input = JSON.stringify(
       workflowStartedEvent?.workflowExecutionStartedEventAttributes?.input
-        ?.payloads ?? '',
+        ?.payloads,
     );
   }
 
   if (workflowCompletedEvent) {
     result = JSON.stringify(
       workflowCompletedEvent?.workflowExecutionCompletedEventAttributes?.result
-        ?.payloads ?? '',
+        ?.payloads,
     );
   }
 

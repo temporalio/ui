@@ -2,7 +2,7 @@
   import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
   import CodeBlock from './code-block.svelte';
 
-  export let events: HistoryEventWithId[] | PromiseLike<HistoryEventWithId[]>;
+  export let events: HistoryEventWithId[];
 
   let inputAndResult = getWorkflowStartedAndCompletedEvents(events);
 </script>

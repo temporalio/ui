@@ -5,6 +5,7 @@ import {
 import { routeForApi } from '$lib/utilities/route-for-api';
 
 import { getQueryTypesFromError } from '$lib/utilities/get-query-types-from-error';
+import { atob } from '$lib/utilities/atob';
 
 type QueryRequestParameters = {
   workflow: Eventual<{ id: string; runId: string }>;
@@ -28,7 +29,7 @@ type QueryType = {
 type QueryResponse = {
   queryRejected: string | null;
   queryResult: QueryType;
-};
+} & Response;
 
 type ParsedQuery = ReturnType<typeof JSON.parse>[0];
 
@@ -71,6 +72,7 @@ async function fetchQuery(
     },
     request,
     onError,
+    notifyOnError: false,
   });
 }
 
@@ -78,13 +80,18 @@ export async function getQueryTypes(
   options: WorkflowParameters,
   request = fetch,
 ): Promise<string[]> {
-  return new Promise<string[]>((resolve) => {
+  return new Promise<string[]>((resolve, reject) => {
     fetchQuery(
       { ...options, queryType: '@@temporal-internal__list' },
       request,
-      ({ body }) => {
-        if (isTemporalAPIError(body)) {
-          resolve(getQueryTypesFromError(body.message));
+      (response) => {
+        if (
+          isTemporalAPIError(response.body) &&
+          response.body.message.startsWith('unknown queryType')
+        ) {
+          resolve(getQueryTypesFromError(response.body.message));
+        } else {
+          reject(response);
         }
       },
     );
@@ -97,9 +104,18 @@ export async function getQuery(
 ): Promise<ParsedQuery> {
   return fetchQuery(options, request).then((execution) => {
     const { queryResult } = execution ?? { queryResult: { payloads: [] } };
-    const data = window.atob(queryResult.payloads[0].data);
 
-    return JSON.parse(data);
+    let data: any = queryResult.payloads;
+
+    try {
+      if (data[0]) {
+        data = atob(queryResult.payloads[0].data);
+      }
+
+      return JSON.parse(data);
+    } catch {
+      return data;
+    }
   });
 }
 

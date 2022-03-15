@@ -22,6 +22,7 @@ type RequestFromAPIOptions = {
   options?: Parameters<typeof fetch>[1];
   token?: string;
   onError?: ErrorCallback;
+  notifyOnError?: boolean;
   shouldRetry?: boolean;
   retryInterval?: number;
 };
@@ -53,6 +54,7 @@ export const requestFromAPI = async <T>(
     request = fetch,
     token,
     shouldRetry = false,
+    notifyOnError = true,
     onError,
     retryInterval = 5000,
   } = init;
@@ -87,14 +89,18 @@ export const requestFromAPI = async <T>(
 
     return body;
   } catch (error: unknown) {
-    handleError(error);
+    if (notifyOnError) {
+      handleError(error);
 
-    if (shouldRetry && retryCount > 0) {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(requestFromAPI(endpoint, init, retryCount - 1));
-        }, retryInterval);
-      });
+      if (shouldRetry && retryCount > 0) {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve(requestFromAPI(endpoint, init, retryCount - 1));
+          }, retryInterval);
+        });
+      }
+    } else {
+      throw error;
     }
   }
 };

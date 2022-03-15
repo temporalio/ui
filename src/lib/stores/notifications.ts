@@ -1,6 +1,5 @@
 import { writable } from 'svelte/store';
 import type { Readable } from 'svelte/store';
-import { faNetworkWired } from '@fortawesome/free-solid-svg-icons';
 
 type NotificationType = 'error' | 'warning' | 'success' | 'information';
 type Notification = {
