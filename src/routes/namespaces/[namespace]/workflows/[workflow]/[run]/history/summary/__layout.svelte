@@ -69,10 +69,12 @@
         {#each visibleEvents as event (event.id)}
           {#if !category || event.category === category}<Event {event} />{/if}
         {:else}
-          <EmptyState
-            title="No Events Match"
-            content="There are know events that match your filters. Adjust your filters to see your events."
-          />
+          <div class="p-2">
+            <EmptyState
+              title="No Events Match"
+              content="There are know events that match your filters. Adjust your filters to see your events."
+            />
+          </div>
         {/each}
       </div>
     </div>
