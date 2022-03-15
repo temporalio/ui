@@ -75,7 +75,7 @@
 
 <style lang="postcss">
   .header-button {
-    @apply block px-4 py-2 text-sm text-white flex items-center justify-center;
+    @apply px-4 py-2 text-sm text-white flex items-center justify-center;
   }
 
   .header-button:hover {
