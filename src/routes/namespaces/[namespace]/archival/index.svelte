@@ -122,7 +122,8 @@
   <p>
     For more details please check out <a
       class="text-blue-700 underline"
-      href="https://docs.temporal.io/docs/server/archive-data/">Archival Docs</a
-    >
+      href="https://docs.temporal.io/docs/server/archive-data/"
+      target="_blank">Archival Docs</a
+    >.
   </p>
 {/if}
