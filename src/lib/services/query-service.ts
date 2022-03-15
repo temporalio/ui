@@ -28,7 +28,7 @@ type QueryType = {
 type QueryResponse = {
   queryRejected: string | null;
   queryResult: QueryType;
-};
+} & Response;
 
 type ParsedQuery = ReturnType<typeof JSON.parse>[0];
 
@@ -71,6 +71,7 @@ async function fetchQuery(
     },
     request,
     onError,
+    notifyOnError: false,
   });
 }
 
@@ -78,13 +79,18 @@ export async function getQueryTypes(
   options: WorkflowParameters,
   request = fetch,
 ): Promise<string[]> {
-  return new Promise<string[]>((resolve) => {
+  return new Promise<string[]>((resolve, reject) => {
     fetchQuery(
       { ...options, queryType: '@@temporal-internal__list' },
       request,
-      ({ body }) => {
-        if (isTemporalAPIError(body)) {
-          resolve(getQueryTypesFromError(body.message));
+      (response) => {
+        if (
+          isTemporalAPIError(response.body) &&
+          response.body.message.startsWith('unknown queryType')
+        ) {
+          resolve(getQueryTypesFromError(response.body.message));
+        } else {
+          reject(response);
         }
       },
     );
