@@ -6,8 +6,8 @@ export const getGroupForEvent = (
 
   for (const group of groups) {
     if (eventId === group.id) return group;
-    for (const ev of group.events.values()) {
-      if (ev.id === event.id) {
+    for (const id of group.eventIds) {
+      if (eventId === id) {
         return group;
       }
     }
