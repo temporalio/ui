@@ -48,6 +48,7 @@
     <a
       class="header-button"
       href="https://github.com/temporalio/ui/issues/new/choose"
+      target="_blank"
     >
       Report Bug/Give Feedback
     </a>
