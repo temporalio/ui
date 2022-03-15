@@ -9,7 +9,6 @@
     | Record<string, unknown>;
 </script>
 
-
 {#each Object.entries(attributes) as [key, value] (key)}
   {#if value !== null && value !== undefined}
     <article
