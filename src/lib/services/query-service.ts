@@ -54,33 +54,26 @@ async function fetchQuery(
     body: unknown;
   }) => void,
 ): Promise<QueryResponse> {
-  try {
-    workflow = await workflow;
-    const parameters = await formatParameters(namespace, workflow);
+  workflow = await workflow;
+  const parameters = await formatParameters(namespace, workflow);
 
-    return await requestFromAPI<QueryResponse>(
-      routeForApi('query', parameters),
-      {
-        options: {
-          method: 'POST',
-          body: JSON.stringify({
-            execution: {
-              workflowId: workflow.id,
-              runId: workflow.runId,
-            },
-            query: {
-              queryType,
-            },
-          }),
+  return await requestFromAPI<QueryResponse>(routeForApi('query', parameters), {
+    options: {
+      method: 'POST',
+      body: JSON.stringify({
+        execution: {
+          workflowId: workflow.id,
+          runId: workflow.runId,
         },
-        request,
-        onError,
-        notifyOnError: false,
-      },
-    );
-  } catch (e) {
-    console.log(e);
-  }
+        query: {
+          queryType,
+        },
+      }),
+    },
+    request,
+    onError,
+    notifyOnError: false,
+  });
 }
 
 export async function getQueryTypes(
