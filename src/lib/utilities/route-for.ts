@@ -5,17 +5,10 @@ type RoutePath =
   | 'workers'
   | 'workflow.events.full'
   | 'workflow.events.full.event'
-  | 'workflow.events.full.pending'
-  | 'workflow.events.compact'
-  | 'workflow.events.compact.activity'
-  | 'workflow.events.compact.activity.event'
   | 'workflow.events.json'
   | 'workflow.stack-trace'
   | 'workflow.query'
   | 'workers';
-
-type EventView = 'event' | 'pending' | 'activity';
-type EventHistoryView = 'full' | 'compact' | 'json';
 
 export type QueryParameters = { query?: URLSearchParams };
 export type NamespaceParameter = { namespace: string } & QueryParameters;
@@ -57,35 +50,11 @@ const routeForWorkflow = ({
 
 const routeForEventHistory = (
   parameters: WorkflowParameters,
-  view?: EventHistoryView,
+  view?: 'full' | 'json',
 ): string => {
-  if (!view) {
-    return `${routeForWorkflow(parameters)}/history`;
-  } else {
-    return `${routeForWorkflow(parameters)}/history/${view}`;
-  }
-};
-
-const routeForEventHistoryItem = (
-  parameters: WorkflowParameters,
-  view: EventHistoryView,
-  eventType: EventView,
-  id: string,
-): string => {
-  return `${routeForEventHistory(parameters, view)}/${eventType}-${id}`;
-};
-
-const routeForActivity = (
-  parameters: WorkflowParameters,
-  view: EventHistoryView,
-  eventType: EventView,
-  activityId: string,
-  eventId: string,
-): string => {
-  return `${routeForEventHistory(
-    parameters,
-    view,
-  )}/${eventType}-${eventId}/events/${activityId}`;
+  if (!view) return `${routeForWorkflow(parameters)}/history`;
+  if (view === 'full') return `${routeForWorkflow(parameters)}/history/summary`;
+  if (view === 'json') return `${routeForWorkflow(parameters)}/history/json`;
 };
 
 const routeForWorkers = (parameters: WorkflowParameters) => {
@@ -101,7 +70,6 @@ export function routeFor(
     | 'workflow'
     | 'workflow.events'
     | 'workflow.events.full'
-    | 'workflow.events.compact'
     | 'workflow.events.json'
     | 'workflow.stack-trace'
     | 'workflow.query'
@@ -109,15 +77,8 @@ export function routeFor(
   parameters: WorkflowParameters,
 ): string;
 export function routeFor(
-  path:
-    | 'workflow.events.full.event'
-    | 'workflow.events.full.pending'
-    | 'workflow.events.compact.activity',
+  path: 'workflow.events.full.event',
   parameters: EventParameter,
-): string;
-export function routeFor(
-  path: 'workflow.events.compact.activity.event',
-  parameters: ActivityParameter,
 ): string;
 export function routeFor(
   path: 'workers',
@@ -142,49 +103,8 @@ export function routeFor(path: RoutePath, parameters: RouteParameters): string {
     route = routeForEventHistory(parameters, 'full');
   }
 
-  if (path === 'workflow.events.compact') {
-    route = routeForEventHistory(parameters, 'compact');
-  }
-
   if (path === 'workflow.events.json') {
     route = routeForEventHistory(parameters, 'json');
-  }
-
-  if (path === 'workflow.events.full.event') {
-    route = routeForEventHistoryItem(
-      parameters,
-      'full',
-      'event',
-      parameters.eventId,
-    );
-  }
-
-  if (path === 'workflow.events.full.pending') {
-    route = routeForEventHistoryItem(
-      parameters,
-      'full',
-      'pending',
-      parameters.eventId,
-    );
-  }
-
-  if (path === 'workflow.events.compact.activity') {
-    route = routeForEventHistoryItem(
-      parameters,
-      'compact',
-      'activity',
-      parameters.eventId,
-    );
-  }
-
-  if (path === 'workflow.events.compact.activity.event') {
-    route = routeForActivity(
-      parameters,
-      'compact',
-      'activity',
-      parameters.eventId,
-      parameters.activityId,
-    );
   }
 
   if (path === 'workflow.query') {

@@ -58,6 +58,10 @@ const categories = [
   'command',
 ] as const;
 
+export const getEventCategory = (eventType: EventType): EventTypeCategory => {
+  return eventTypeCategorizations[eventType];
+};
+
 export const eventTypeInCategory =
   (category?: EventTypeCategory) =>
   (event: HistoryEventWithId): boolean => {

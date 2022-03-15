@@ -1,6 +1,4 @@
 <script lang="ts">
-  import type { EventClassification } from '$lib/utilities/get-event-classification';
-
   export let color: EventClassification | PendingActivity['state'] = null;
 </script>
 

@@ -8,26 +8,23 @@
     const { workflow: workflowId, run: runId, namespace } = params;
     const parameters = { namespace, executionId: workflowId, runId };
 
-    const events = await fetchEvents(parameters);
+    const { events, eventGroups } = await fetchEvents(parameters);
 
     return {
       props: {
-        workflow: { workflowId, runId, namespace },
+        workflowParameters: { workflowId, runId, namespace },
         events,
       },
       stuff: {
         events,
+        eventGroups,
       },
     };
   };
 </script>
 
 <script lang="ts">
-  import {
-    faCode,
-    faLayerGroup,
-    faStream,
-  } from '@fortawesome/free-solid-svg-icons';
+  import { faCode, faStream } from '@fortawesome/free-solid-svg-icons';
 
   import { routeFor } from '$lib/utilities/route-for';
 
@@ -36,31 +33,29 @@
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
   import InputAndResults from '$lib/components/input-and-result.svelte';
 
-  export let workflow: WorkflowParameters;
+  export let workflowParameters: WorkflowParameters;
   export let events: HistoryEventWithId[];
 </script>
 
 <section class="flex flex-col gap-4">
   <InputAndResults {events} />
-  <nav class="flex gap-4 justify-between items-end">
-    <h3 class="text-lg font-medium">Event History</h3>
-    <div class="flex gap-4">
-      <ToggleButtons>
-        <ToggleButton
-          icon={faStream}
-          href={routeFor('workflow.events.full', workflow)}
-        />
-        <ToggleButton
-          icon={faLayerGroup}
-          href={routeFor('workflow.events.compact', workflow)}
-        />
-        <ToggleButton
-          icon={faCode}
-          href={routeFor('workflow.events.json', workflow)}
-        />
-      </ToggleButtons>
-      <ExportHistory />
-    </div>
-  </nav>
-  <slot />
+  <section id="event-history">
+    <nav class="flex gap-4 justify-between items-end pb-4">
+      <h3 class="text-lg font-medium">Event History</h3>
+      <div class="flex gap-4">
+        <ToggleButtons>
+          <ToggleButton
+            icon={faStream}
+            href={routeFor('workflow.events.full', workflowParameters)}
+          />
+          <ToggleButton
+            icon={faCode}
+            href={routeFor('workflow.events.json', workflowParameters)}
+          />
+        </ToggleButtons>
+        <ExportHistory />
+      </div>
+    </nav>
+    <slot />
+  </section>
 </section>

@@ -3,6 +3,7 @@ import { dataConverterWebsocket } from '$lib/utilities/data-converter-websocket'
 import type { DataConverterWebsocketInterface } from '$lib/utilities/data-converter-websocket';
 
 import { convertPayload } from '$lib/services/data-converter';
+
 import { atob } from './atob';
 
 export function decodePayload(
