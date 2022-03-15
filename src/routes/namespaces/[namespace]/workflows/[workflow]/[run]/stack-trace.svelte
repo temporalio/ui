@@ -66,7 +66,7 @@
       <div class="flex items-start h-full">
         <CodeBlock content={result} language="text" />
       </div>
-    {:catch error}
+    {:catch _error}
       <EmptyState
         title="An Error Occured"
         content="Please make sure you have at least one worker running."

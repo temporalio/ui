@@ -5,6 +5,7 @@ import {
 import { routeForApi } from '$lib/utilities/route-for-api';
 
 import { getQueryTypesFromError } from '$lib/utilities/get-query-types-from-error';
+import { atob } from '$lib/utilities/atob';
 
 type QueryRequestParameters = {
   workflow: Eventual<{ id: string; runId: string }>;
@@ -53,26 +54,33 @@ async function fetchQuery(
     body: unknown;
   }) => void,
 ): Promise<QueryResponse> {
-  workflow = await workflow;
-  const parameters = await formatParameters(namespace, workflow);
+  try {
+    workflow = await workflow;
+    const parameters = await formatParameters(namespace, workflow);
 
-  return await requestFromAPI<QueryResponse>(routeForApi('query', parameters), {
-    options: {
-      method: 'POST',
-      body: JSON.stringify({
-        execution: {
-          workflowId: workflow.id,
-          runId: workflow.runId,
+    return await requestFromAPI<QueryResponse>(
+      routeForApi('query', parameters),
+      {
+        options: {
+          method: 'POST',
+          body: JSON.stringify({
+            execution: {
+              workflowId: workflow.id,
+              runId: workflow.runId,
+            },
+            query: {
+              queryType,
+            },
+          }),
         },
-        query: {
-          queryType,
-        },
-      }),
-    },
-    request,
-    onError,
-    notifyOnError: false,
-  });
+        request,
+        onError,
+        notifyOnError: false,
+      },
+    );
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 export async function getQueryTypes(
@@ -103,9 +111,18 @@ export async function getQuery(
 ): Promise<ParsedQuery> {
   return fetchQuery(options, request).then((execution) => {
     const { queryResult } = execution ?? { queryResult: { payloads: [] } };
-    const data = window.atob(queryResult.payloads[0].data);
 
-    return JSON.parse(data);
+    let data: any = queryResult.payloads;
+
+    try {
+      if (data[0]) {
+        data = atob(queryResult.payloads[0].data);
+      }
+
+      return JSON.parse(data);
+    } catch {
+      return data;
+    }
   });
 }
 
