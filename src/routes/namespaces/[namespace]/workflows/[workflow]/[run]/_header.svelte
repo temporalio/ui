@@ -2,7 +2,6 @@
   import Icon from 'svelte-fa';
   import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 
-  import { page } from '$app/stores';
   import { routeFor } from '$lib/utilities/route-for';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
@@ -12,8 +11,10 @@
   export let namespace: string;
   export let workflow: WorkflowExecution;
 
-  const { workflow: workflowId, run: runId } = $page.params;
+  const { id: workflowId, runId } = workflow;
+
   const historyEvents = workflow?.historyEvents;
+  const routeParamters = { namespace, workflowId, runId };
 </script>
 
 <header class="flex flex-col gap-4">
@@ -44,20 +45,14 @@
   <nav class="flex gap-6">
     <Tab
       label="History"
-      href={routeFor('workflow.events', { namespace, workflowId, runId })}
+      href={routeFor('workflow.events', routeParamters)}
       amount={historyEvents}
     />
-    <Tab
-      label="Workers"
-      href={routeFor('workers', { namespace, workflowId, runId })}
-    />
+    <Tab label="Workers" href={routeFor('workers', routeParamters)} />
     <Tab
       label="Stack Trace"
-      href={routeFor('workflow.stack-trace', { namespace, workflowId, runId })}
+      href={routeFor('workflow.stack-trace', routeParamters)}
     />
-    <Tab
-      label="Query"
-      href={routeFor('workflow.query', { namespace, workflowId, runId })}
-    />
+    <Tab label="Query" href={routeFor('workflow.query', routeParamters)} />
   </nav>
 </header>
