@@ -33,7 +33,7 @@
 
   $: {
     if (!options.includes(perPage.toString())) {
-      options = [perPage.toString(), ...options];
+      options = [pageRange.toString(), ...options];
     }
   }
 </script>
@@ -45,7 +45,7 @@
       <FilterSelect
         label="Per Page"
         parameter={queryKey}
-        value={perPage}
+        value={String(pageRange)}
         {options}
       />
     </div>
