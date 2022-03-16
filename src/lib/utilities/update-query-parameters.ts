@@ -4,7 +4,7 @@ import { appendQueryParameters } from './append-query-parameters';
 
 type UpdateQueryParams = {
   parameter: string;
-  value?: string | number;
+  value?: string | number | boolean;
   query: URLSearchParams;
   path: string;
   goto: typeof goto;
@@ -25,8 +25,10 @@ export const updateQueryParameters = async ({
   } else {
     query.delete(parameter);
   }
+
   if (browser) {
     goto(appendQueryParameters(path, query), options);
   }
+
   return value;
 };

@@ -10,8 +10,8 @@
   const isCloud = $page.stuff.settings.runtimeEnvironment;
 
   $: namespaces = (getAppContext('namespaces') ?? [])
-    .map((namespace) => namespace?.namespaceInfo?.name ?? undefined)
-    .filter((namespace) => namespace);
+    .map((namespace) => namespace?.namespaceInfo?.name)
+    .filter((namespace) => namespace && namespace !== 'temporal-system');
 
   $: selectedNamespace = $currentNamespace;
 

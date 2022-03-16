@@ -13,6 +13,12 @@
   export const load: Load = async function ({ url }) {
     const settings: Settings = await fetchSettings({ url });
 
+    if (!settings.auth.enabled) {
+      return {
+        status: 404,
+      };
+    }
+
     return {
       props: { settings },
       stuff: { settings },

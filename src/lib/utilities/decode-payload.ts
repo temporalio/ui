@@ -3,9 +3,8 @@ import { dataConverterWebsocket } from '$lib/utilities/data-converter-websocket'
 import type { DataConverterWebsocketInterface } from '$lib/utilities/data-converter-websocket';
 
 import { convertPayload } from '$lib/services/data-converter';
-import { browser } from '$app/env';
 
-const atob = browser ? window.atob : (str: string) => str;
+import { atob } from './atob';
 
 export function decodePayload(
   payload: Payload,

@@ -15,22 +15,18 @@
   });
 </script>
 
-<a
-  sveltekit:noscroll
-  {href}
-  class="row text-sm md:text-base block md:table-row border-b-2 items-center"
->
+<article class="row">
   <div class="cell">
     <div>
       <WorkflowStatus status={workflow.status} />
     </div>
   </div>
   <div class="cell links font-medium md:font-normal">
-    {workflow.id}
+    <a {href} class="underline">{workflow.id}</a>
   </div>
   <div class="cell links">
     <h3>
-      {workflow.name}
+      <a {href} class="underline">{workflow.name}</a>
     </h3>
   </div>
   <div class="inline-block  cell">
@@ -44,11 +40,11 @@
       {formatDate(workflow.endTime, timeFormat)}
     </p>
   </div>
-</a>
+</article>
 
 <style lang="postcss">
   .row {
-    @apply no-underline p-2;
+    @apply no-underline p-2 text-sm border-b-2 items-center md:text-base md:table-row;
   }
 
   .cell {
