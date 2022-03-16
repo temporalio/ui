@@ -46,4 +46,25 @@ describe('Get login url ', () => {
 
     expect(login).toEqual('https://localhost/auth/sso');
   });
+  it('test of the signin flow', () => {
+    const settings = {
+      auth: {
+        options: ['organization_name', 'invitation'],
+      },
+      baseUrl: 'https://localhost/',
+    };
+
+    const params = new URLSearchParams(
+      'invitation=Wwv6g2cKkfjyqoLxnCPUCfiKcjHKpK%5B%E2%80%A6%5Dn9ipxcao0jKYH0I3&organization_name=temporal-cloud',
+    );
+
+    const login = getLoginUrl(settings, params);
+
+    const loginUrl = new URL(login);
+
+    expect(loginUrl.searchParams.get('one')).toBeNull();
+    expect(login).toEqual(
+      'https://localhost/auth/sso?organization_name=temporal-cloud&invitation=Wwv6g2cKkfjyqoLxnCPUCfiKcjHKpK%5B%E2%80%A6%5Dn9ipxcao0jKYH0I3',
+    );
+  });
 });
