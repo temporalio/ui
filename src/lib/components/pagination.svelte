@@ -32,7 +32,7 @@
   }
 
   $: {
-    if (!options.includes(perPage.toString())) {
+    if (!options.includes(pageRange.toString())) {
       options = [pageRange.toString(), ...options];
     }
   }
