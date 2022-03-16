@@ -14,6 +14,7 @@
       props: {
         workflowParameters: { workflowId, runId, namespace },
         events,
+        eventGroups,
       },
       stuff: {
         events,
@@ -24,7 +25,11 @@
 </script>
 
 <script lang="ts">
-  import { faCode, faStream } from '@fortawesome/free-solid-svg-icons';
+  import {
+    faCode,
+    faLayerGroup,
+    faStream,
+  } from '@fortawesome/free-solid-svg-icons';
 
   import { routeFor } from '$lib/utilities/route-for';
   import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
@@ -37,7 +42,7 @@
   export let workflowParameters: WorkflowParameters;
   export let events: HistoryEventWithId[];
 
-  let { input, result } = getWorkflowStartedAndCompletedEvents(events);
+  const { input, result } = getWorkflowStartedAndCompletedEvents(events);
 </script>
 
 <section class="flex flex-col gap-4">
@@ -53,6 +58,10 @@
           <ToggleButton
             icon={faStream}
             href={routeFor('workflow.events.summary', workflowParameters)}
+          />
+          <ToggleButton
+            icon={faLayerGroup}
+            href={routeFor('workflow.events.compact', workflowParameters)}
           />
           <ToggleButton
             icon={faCode}
