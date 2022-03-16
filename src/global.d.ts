@@ -52,6 +52,7 @@ type Settings = {
     enabled: boolean;
     options: string[];
   };
+  baseUrl: string;
   defaultNamespace: string;
   runtimeEnvironment: {
     isCloud: boolean;
