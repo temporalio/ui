@@ -9,18 +9,18 @@
 
 <section class="border-2 border-gray-300 rounded-lg w-full mb-6">
   <header class="table-header rounded-t-lg">
-    <h3>Details</h3>
+    <h3>Pending Activities</h3>
   </header>
   <div>
     {#each pendingActivities as { id, activityId, ...details }}
       <article class="flex gap-4">
         <div {id} class="p-4">
-          <a href={id}>{activityId}</a>
+          <a href={id} class="block py-1">{activityId}</a>
         </div>
         <div class="p-4 w-full">
           {#each Object.entries(details) as [key, value] (key)}
             <article
-              class="flex items-center content-start w-full border-b-2 last:border-b-0 border-gray-200 py-1"
+              class="flex items-start content-start w-full border-b-2 last:border-b-0 border-gray-200 py-1"
             >
               <h4 class="w-full flex-grow">{format(key)}</h4>
               <div class="flex-grow w-full">
