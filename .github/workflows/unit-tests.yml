@@ -13,5 +13,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install modules
         run: npm ci
+      - name: check working dir
+        run: ls -lah
       - name: Run tests
         run: npm test
