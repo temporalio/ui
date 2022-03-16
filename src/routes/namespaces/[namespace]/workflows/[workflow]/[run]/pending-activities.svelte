@@ -15,7 +15,7 @@
     {#each pendingActivities as { id, activityId, ...details }}
       <article class="flex gap-4">
         <div {id} class="p-4">
-          <a href={id} class="block py-1">{activityId}</a>
+          <a href="#{id}" class="block py-1">{activityId}</a>
         </div>
         <div class="p-4 w-full">
           {#each Object.entries(details) as [key, value] (key)}
