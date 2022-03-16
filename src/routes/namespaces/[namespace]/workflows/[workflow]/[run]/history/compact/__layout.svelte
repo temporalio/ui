@@ -21,7 +21,7 @@
   export let eventGroups: CompactEventGroups;
   export let category: EventTypeCategory = null;
 
-  $: visibleEvents = [...eventGroups].filter(
+  $: visibleEvents = eventGroups.filter(
     (event) => !category || event.category === category,
   );
 </script>

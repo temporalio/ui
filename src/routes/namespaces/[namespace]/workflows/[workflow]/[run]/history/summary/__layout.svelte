@@ -21,7 +21,7 @@
   export let events: HistoryEventWithId[];
   export let category: EventTypeCategory = null;
 
-  $: visibleEvents = [...events].filter(
+  $: visibleEvents = events.filter(
     (event) => !category || event.category === category,
   );
 </script>
