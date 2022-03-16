@@ -19,7 +19,7 @@
 
   $: queryKeyValue = $page.url.searchParams.get(queryKey);
   $: perPage = queryKeyValue || '25';
-  $: pageRange = Number(perPage);
+  $: pageRange = !isNaN(Number(perPage)) ? Math.abs(Number(perPage)) : 25;
 
   $: previousEnabled = pageNumber > 1;
   $: nextEnabled = pageNumber * pageRange < items.length;
@@ -32,8 +32,8 @@
   }
 
   $: {
-    if (!options.includes(perPage.toString())) {
-      options = [perPage.toString(), ...options];
+    if (!options.includes(pageRange.toString())) {
+      options = [pageRange.toString(), ...options];
     }
   }
 </script>
@@ -45,7 +45,7 @@
       <FilterSelect
         label="Per Page"
         parameter={queryKey}
-        value={perPage}
+        value={String(pageRange)}
         {options}
       />
     </div>
