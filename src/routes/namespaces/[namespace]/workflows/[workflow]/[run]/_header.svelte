@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { page } from '$app/stores';
   import Icon from 'svelte-fa';
   import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 
+  import { page } from '$app/stores';
   import { routeFor } from '$lib/utilities/route-for';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
