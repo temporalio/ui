@@ -5,7 +5,7 @@
   export const load: Load = async function ({ url, stuff }) {
     return {
       status: 302,
-      redirect: `${url.pathname}/${getFirstId(stuff.events)}`,
+      redirect: `${url.pathname}/${getFirstId(stuff.eventGroups)}`,
     };
   };
 </script>

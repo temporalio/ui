@@ -2,13 +2,13 @@
   import type { Load } from '@sveltejs/kit';
 
   export const load: Load = async function ({ stuff, url }) {
-    const { events } = stuff;
+    const { eventGroups } = stuff;
 
     const category = url.searchParams.get('category');
 
     return {
       props: {
-        events,
+        eventGroups,
         category,
       },
     };
@@ -18,10 +18,10 @@
 <script lang="ts">
   import EventTable from '../_event-table.svelte';
 
-  export let events: HistoryEventWithId[];
+  export let eventGroups: CompactEventGroups;
   export let category: EventTypeCategory = null;
 
-  $: visibleEvents = events.filter(
+  $: visibleEvents = eventGroups.filter(
     (event) => !category || event.category === category,
   );
 </script>

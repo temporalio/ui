@@ -25,7 +25,7 @@ describe(routeFor, () => {
   });
 
   it('should route to "workflow".events.full', () => {
-    const path = routeFor('workflow.events.full', {
+    const path = routeFor('workflow.events.summary', {
       namespace: 'default',
       workflowId: 'abc',
       runId: 'def',

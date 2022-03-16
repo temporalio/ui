@@ -2,12 +2,19 @@
   import Icon from 'svelte-fa';
   import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 
+  import { routeFor } from '$lib/utilities/route-for';
+
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
-  import Tabs from './_tabs.svelte';
+  import Tab from '$lib/components/tab.svelte';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
+
+  const { id: workflowId, runId } = workflow;
+
+  const historyEvents = workflow?.historyEvents;
+  const routeParamters = { namespace, workflowId, runId };
 </script>
 
 <header class="flex flex-col gap-4">
@@ -35,5 +42,17 @@
       <span class="font-medium">{workflow.runId}</span>
     </p>
   </main>
-  <Tabs {workflow} />
+  <nav class="flex gap-6">
+    <Tab
+      label="History"
+      href={routeFor('workflow.events', routeParamters)}
+      amount={historyEvents}
+    />
+    <Tab label="Workers" href={routeFor('workers', routeParamters)} />
+    <Tab
+      label="Stack Trace"
+      href={routeFor('workflow.stack-trace', routeParamters)}
+    />
+    <Tab label="Query" href={routeFor('workflow.query', routeParamters)} />
+  </nav>
 </header>
