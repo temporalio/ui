@@ -52,7 +52,7 @@
         <ToggleButtons>
           <ToggleButton
             icon={faStream}
-            href={routeFor('workflow.events.full', workflowParameters)}
+            href={routeFor('workflow.events.summary', workflowParameters)}
           />
           <ToggleButton
             icon={faCode}

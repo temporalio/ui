@@ -3,8 +3,8 @@ type RoutePath =
   | 'workflow'
   | 'workflow.events'
   | 'workers'
-  | 'workflow.events.full'
-  | 'workflow.events.full.event'
+  | 'workflow.events.summary'
+  | 'workflow.events.summary.event'
   | 'workflow.events.json'
   | 'workflow.stack-trace'
   | 'workflow.query'
@@ -69,7 +69,7 @@ export function routeFor(
   path:
     | 'workflow'
     | 'workflow.events'
-    | 'workflow.events.full'
+    | 'workflow.events.summary'
     | 'workflow.events.json'
     | 'workflow.stack-trace'
     | 'workflow.query'
@@ -77,7 +77,7 @@ export function routeFor(
   parameters: WorkflowParameters,
 ): string;
 export function routeFor(
-  path: 'workflow.events.full.event',
+  path: 'workflow.events.summary.event',
   parameters: EventParameter,
 ): string;
 export function routeFor(
@@ -99,7 +99,7 @@ export function routeFor(path: RoutePath, parameters: RouteParameters): string {
     route = routeForEventHistory(parameters);
   }
 
-  if (path === 'workflow.events.full') {
+  if (path === 'workflow.events.summary') {
     route = routeForEventHistory(parameters, 'full');
   }
 
