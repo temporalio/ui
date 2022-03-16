@@ -14,6 +14,8 @@ jobs:
       - name: Install modules
         run: npm ci
       - name: check working dir
-        run: ls -lah
+        run: |
+          pwd
+          run ls -lah
       - name: Run tests
         run: npm test
