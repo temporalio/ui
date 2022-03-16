@@ -27,18 +27,24 @@
   import { faCode, faStream } from '@fortawesome/free-solid-svg-icons';
 
   import { routeFor } from '$lib/utilities/route-for';
+  import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
 
   import ExportHistory from '$lib/components/export-history.svelte';
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
-  import InputAndResults from '$lib/components/input-and-result.svelte';
+  import CodeBlock from '$lib/components/code-block.svelte';
 
   export let workflowParameters: WorkflowParameters;
   export let events: HistoryEventWithId[];
+
+  let { input, result } = getWorkflowStartedAndCompletedEvents(events);
 </script>
 
 <section class="flex flex-col gap-4">
-  <InputAndResults {events} />
+  <div class="flex gap-4">
+    <CodeBlock heading="Input" content={input} framed />
+    <CodeBlock heading="Result" content={result} framed />
+  </div>
   <section id="event-history">
     <nav class="flex gap-4 justify-between items-end pb-4">
       <h3 class="text-lg font-medium">Event History</h3>
