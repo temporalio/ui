@@ -11,7 +11,10 @@ export default {
     '^\\$lib/(.*)$': '<rootDir>/src/lib/$1',
     '^\\$types/(.*)$': '<rootDir>/src/types/$1',
     '^\\$components/(.*)$': '<rootDir>/src/components/$1',
-    '^\\$app(.*)$': '<rootDir>/.svelte-kit/dev/runtime/app$1',
+    '^\\$app(.*)$': [
+      '<rootDir>/.svelte-kit/dev/runtime/app$1',
+      '<rootDir>/.svelte-kit/build/runtime/app$1',
+    ],
   },
 
   coverageDirectory: './coverage',
