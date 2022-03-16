@@ -37,7 +37,7 @@
           <div class="p-2">
             <EmptyState
               title="No Events Match"
-              content="There are know events that match your filters. Adjust your filters to see your events."
+              content="There are no events that match your filters. Adjust your filters to see your events."
             />
           </div>
         {/each}
