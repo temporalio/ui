@@ -38,6 +38,7 @@
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
+  import PendingActivties from './_pending-activties.svelte';
 
   export let workflowParameters: WorkflowParameters;
   export let events: HistoryEventWithId[];
@@ -50,6 +51,7 @@
     <CodeBlock heading="Input" content={input} framed />
     <CodeBlock heading="Result" content={result} framed />
   </div>
+  <PendingActivties />
   <section id="event-history">
     <nav class="flex gap-4 justify-between items-end pb-4">
       <h3 class="text-lg font-medium">Event History</h3>
