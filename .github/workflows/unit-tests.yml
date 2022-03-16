@@ -15,5 +15,7 @@ jobs:
         run: npm ci
       - name: Populate .svelte-dir with files for jest
         run: npm run build:local
+      - name: check dir for sveltedir
+        run: ls -lah
       - name: Run tests
         run: npm test
