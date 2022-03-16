@@ -3,7 +3,6 @@
   import CodeBlock from '$lib/components/code-block.svelte';
 
   import { format } from '$lib/utilities/format-camel-case';
-  import { formatDate } from '$lib/utilities/format-date';
 
   const { pendingActivities } = $page.stuff.workflow;
 </script>

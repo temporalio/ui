@@ -22,7 +22,7 @@
   import Select from '$lib/components/select/select.svelte';
 
   export let namespace: string;
-  export let workflow;
+  export let workflow: { id: string; runId: string };
 
   let queryType: string;
 
