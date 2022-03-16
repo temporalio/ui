@@ -11,19 +11,9 @@
 
   import NavigationLink from './_navigation-link.svelte';
   import { page } from '$app/stores';
+  import { getLoginUrl } from '$lib/utilities/get-login-url';
 
   $: settings = $page.stuff.settings;
-
-  let loginUrl = '';
-
-  $: {
-    const query = (settings.auth.options ?? [])
-      .filter((option) => !!$page.url.searchParams.get(option))
-      .map((option) => `&${option}=${$page.url.searchParams.get(option)}`)
-      .join('');
-
-    loginUrl = import.meta.env.VITE_API + '/auth/sso?' + encodeURI(query);
-  }
 </script>
 
 <header
@@ -68,7 +58,11 @@
           />
         </button>
       {:else}
-        <button class="header-button" on:click={() => goto(loginUrl)}>
+        <button
+          class="header-button"
+          on:click={() =>
+            goto(getLoginUrl($page.stuff.settings, $page.url.searchParams))}
+        >
           Login
         </button>
       {/if}
