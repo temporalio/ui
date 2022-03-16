@@ -47,7 +47,7 @@
       login
       icon={faLock}
       on:click={() => {
-        goto(getLoginUrl(settings, new URLSearchParams($page.params)));
+        goto(getLoginUrl(settings, $page.url.searchParams));
       }}>Continue to SSO</Button
     >
   </div>
