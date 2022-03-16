@@ -44,28 +44,19 @@
     >
       Report Bug/Give Feedback
     </a>
-    {#if settings.auth.enabled}
-      {#if $user?.email}
-        <button
-          class="header-button min-w-min"
-          on:click={() => goto(import.meta.env.VITE_API + '/auth/logout')}
-        >
-          Logout
-          <img
-            src={$user.picture}
-            alt="User Avatar"
-            class="rounded-full h-6 w-6 ml-2.5"
-          />
-        </button>
-      {:else}
-        <button
-          class="header-button"
-          on:click={() =>
-            goto(getLoginUrl($page.stuff.settings, $page.url.searchParams))}
-        >
-          Login
-        </button>
-      {/if}
+
+    {#if $user?.email}
+      <button
+        class="header-button min-w-min"
+        on:click={() => goto(import.meta.env.VITE_API + '/auth/logout')}
+      >
+        Logout
+        <img
+          src={$user.picture}
+          alt="User Avatar"
+          class="rounded-full h-6 w-6 ml-2.5"
+        />
+      </button>
     {/if}
   </div>
 </header>
