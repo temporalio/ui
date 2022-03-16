@@ -10,10 +10,6 @@
   import { goto } from '$app/navigation';
 
   import NavigationLink from './_navigation-link.svelte';
-  import { page } from '$app/stores';
-  import { getLoginUrl } from '$lib/utilities/get-login-url';
-
-  $: settings = $page.stuff.settings;
 </script>
 
 <header

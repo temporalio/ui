@@ -1,4 +1,4 @@
-// jest.mock('$app/navigation', () => jest.fn({ goto: () => false } as any));
+jest.mock('$app/navigation', () => jest.fn({ goto: () => false } as any));
 import { paginated } from './paginated';
 
 const fetchMock = async (token: string | Uint8Array = null) => {
