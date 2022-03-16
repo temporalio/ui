@@ -1,7 +1,5 @@
 <script lang="ts" context="module">
-  import { loadEventDetails } from '../_load-event-details';
-
-  export const load = loadEventDetails;
+  export { loadEventDetails as load } from '../_load-event-details';
 </script>
 
 <script lang="ts">
