@@ -19,7 +19,7 @@
 
   $: queryKeyValue = $page.url.searchParams.get(queryKey);
   $: perPage = queryKeyValue || '25';
-  $: pageRange = Number(perPage);
+  $: pageRange = !isNaN(Number(perPage)) ? Math.abs(Number(perPage)) : 25;
 
   $: previousEnabled = pageNumber > 1;
   $: nextEnabled = pageNumber * pageRange < items.length;
