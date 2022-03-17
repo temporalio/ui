@@ -18,7 +18,7 @@
 
   export const load: Load = async function ({ params, stuff, url }) {
     const { eventId } = params;
-    const { events, eventGroups, matchingEvents } = stuff;
+    const { events, eventGroups } = stuff;
 
     const event: HistoryEventWithId = events.find(
       (event: HistoryEventWithId) => event.id === eventId,
