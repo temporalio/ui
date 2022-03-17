@@ -16,15 +16,12 @@
   export let namespace: string;
   export let workflow: WorkflowExecution;
 
-  console.log(workflow);
-
   const historyEvents = workflow?.historyEvents;
   const routeParameters = {
     namespace,
     workflow: workflow.id,
     run: workflow.runId,
-    view: 'summary',
-  } as const;
+  };
 </script>
 
 <header class="flex flex-col gap-4">

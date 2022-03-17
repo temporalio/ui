@@ -5,6 +5,7 @@
   import { page } from '$app/stores';
   import { isEvent } from '$lib/models/event-history';
   import { isEventGroup } from '$lib/models/group-events';
+  import { appendQueryParameters } from '$lib/utilities/append-query-parameters';
 
   export let event: HistoryEventWithId | CompactEventGroup;
 
@@ -24,7 +25,7 @@
 </script>
 
 <a
-  {href}
+  href={appendQueryParameters(href, $page.url.searchParams)}
   sveltekit:noscroll
   class="flex border-b-2 border-gray-300 w-full items-center hover:bg-gray-50"
   class:active={isActive($page.params.eventId)}

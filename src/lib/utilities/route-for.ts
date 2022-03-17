@@ -4,7 +4,7 @@ type RouteParameters = {
   namespace: string;
   workflow: string;
   run: string;
-  view: EventView;
+  view?: EventView;
   eventId: string;
   queue: string;
 };
@@ -25,9 +25,8 @@ export type EventHistoryParameters = Pick<
   RouteParameters,
   'namespace' | 'workflow' | 'run' | 'view'
 >;
-export type EventParameters = Pick<
-  RouteParameters,
-  'namespace' | 'workflow' | 'run' | 'view' | 'eventId'
+export type EventParameters = Required<
+  Pick<RouteParameters, 'namespace' | 'workflow' | 'run' | 'view' | 'eventId'>
 >;
 
 export const routeForNamespace = ({
@@ -52,11 +51,11 @@ export const routeForEventHistory = ({
   view,
   ...parameters
 }: EventHistoryParameters): string => {
-  if (view === 'summary')
-    return `${routeForWorkflow(parameters)}/history/summary`;
-  if (view === 'compact')
-    return `${routeForWorkflow(parameters)}/history/compact`;
-  if (view === 'json') return `${routeForWorkflow(parameters)}/history/json`;
+  const eventHistoryPath = `${routeForWorkflow(parameters)}/history`;
+  if (!view) return eventHistoryPath;
+  if (view === 'summary') return `${eventHistoryPath}/summary`;
+  if (view === 'compact') return `${eventHistoryPath}/compact`;
+  if (view === 'json') return `${eventHistoryPath}/json`;
 };
 
 export const routeForEventHistoryItem = (

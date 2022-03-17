@@ -1,6 +1,9 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
-  import type { EventView, WorkflowParameters } from '$lib/utilities/route-for';
+  import {
+    EventView,
+    routeForEventHistoryItem,
+  } from '$lib/utilities/route-for';
 
   import { fetchEvents } from '$lib/services/events-service';
 
@@ -45,17 +48,19 @@
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
   import PendingActivties from './_pending-activties.svelte';
+  import { page } from '$app/stores';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
   export let events: HistoryEventWithId[];
 
   const { input, result } = getWorkflowStartedAndCompletedEvents(events);
-  const routeParameters = (view: EventView) => ({
+  const routeParameters = (view: EventView, eventId?: string) => ({
     namespace,
     workflow: workflow.id,
     run: workflow.runId,
     view,
+    eventId,
   });
 </script>
 
@@ -72,16 +77,21 @@
         <ToggleButtons>
           <ToggleButton
             icon={faStream}
-            href={routeForEventHistory(routeParameters('summary'))}
-          />
+            base={routeForEventHistory(routeParameters('summary'))}
+            href={routeForEventHistoryItem(
+              routeParameters('summary', $page.params.eventId || '1'),
+            )}>Summary</ToggleButton
+          >
           <ToggleButton
             icon={faLayerGroup}
             href={routeForEventHistory(routeParameters('compact'))}
-          />
+            >Compact</ToggleButton
+          >
           <ToggleButton
             icon={faCode}
             href={routeForEventHistory(routeParameters('json'))}
-          />
+            >JSON</ToggleButton
+          >
         </ToggleButtons>
         <ExportHistory />
       </div>

@@ -1,22 +1,18 @@
 <script context="module" lang="ts">
-  import {
-    getEventsInCategory,
-    isCategoryType,
-  } from '$lib/models/event-history/get-event-categorization';
-  import { getEventsOrGroupsBasedOnParams } from './_get-events-or-groups-based-on-params';
+  import { getEventsInCategory } from '$lib/models/event-history/get-event-categorization';
 
   import type { Load } from '@sveltejs/kit';
 
   export const load: Load = async function ({ stuff, url, params }) {
     const category = url.searchParams.get('category');
 
-    let items = getEventsOrGroupsBasedOnParams({ params, stuff });
+    const events = getEventsInCategory(stuff.events, category);
+    const eventGroups = getEventsInCategory(stuff.eventGroups, category);
 
-    if (!items) return { status: 404 };
+    let items: HistoryEventWithId[] | CompactEventGroups;
 
-    if (isCategoryType(category)) {
-      items = getEventsInCategory(items, category);
-    }
+    if (params.view === 'summary') items = events;
+    if (params.view === 'compact') items = eventGroups;
 
     return {
       props: {
@@ -24,7 +20,8 @@
         category,
       },
       stuff: {
-        matchingEvents: items,
+        matchingEvents: events,
+        matchingEventGroups: eventGroups,
       },
     };
   };

@@ -25,7 +25,7 @@ export const updateQueryParameters = async ({
   }
 
   if (browser) {
-    goto(url.toString(), options);
+    goto(String(url), options);
   }
 
   return value;
