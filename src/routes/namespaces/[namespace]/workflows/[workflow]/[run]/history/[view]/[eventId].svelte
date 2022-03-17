@@ -5,7 +5,7 @@
   import { routeForEventHistory } from '$lib/utilities/route-for';
   import type { EventHistoryParameters } from '$lib/utilities/route-for';
 
-  const isIneligible = (
+  const shouldRedirect = (
     event: HistoryEventWithId,
     eventGroup: CompactEventGroup,
     { matchingEvents }: Partial<App.Stuff>,
@@ -28,7 +28,7 @@
 
     if (!event) return { status: 404 };
 
-    if (isIneligible(event, eventGroup, stuff, params)) {
+    if (shouldRedirect(event, eventGroup, stuff, params)) {
       url.pathname = routeForEventHistory(params as EventHistoryParameters);
 
       return {
