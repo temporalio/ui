@@ -3,6 +3,8 @@
 
   import type { Load } from '@sveltejs/kit';
 
+  const validViews = ['summary', 'compact', 'json'];
+
   export const load: Load = async function ({ stuff, url, params }) {
     const category = url.searchParams.get('category');
 
@@ -13,6 +15,8 @@
 
     if (params.view === 'summary') items = events;
     if (params.view === 'compact') items = eventGroups;
+
+    if (!validViews.includes(params.view)) return { status: 404 };
 
     return {
       props: {
