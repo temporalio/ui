@@ -5,6 +5,17 @@
   import { routeForEventHistory } from '$lib/utilities/route-for';
   import type { EventHistoryParameters } from '$lib/utilities/route-for';
 
+  const isIneligible = (
+    event: HistoryEventWithId,
+    eventGroup: CompactEventGroup,
+    { matchingEvents }: Partial<App.Stuff>,
+    { view }: Record<string, string>,
+  ): boolean => {
+    if (!matchingEvents.includes(event)) return true;
+    if (view === 'compact' && !eventGroup) return true;
+    return false;
+  };
+
   export const load: Load = async function ({ params, stuff, url }) {
     const { eventId } = params;
     const { events, eventGroups, matchingEvents } = stuff;
@@ -17,7 +28,7 @@
 
     if (!event) return { status: 404 };
 
-    if (!matchingEvents.includes(event)) {
+    if (isIneligible(event, eventGroup, stuff, params)) {
       url.pathname = routeForEventHistory(params as EventHistoryParameters);
 
       return {
