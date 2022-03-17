@@ -12,8 +12,6 @@
   export let scale = 1;
   export let href = '#';
   export let base = href;
-
-  console.log({ href, base });
 </script>
 
 <a
