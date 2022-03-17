@@ -5,6 +5,15 @@
   import { routeForEventHistory } from '$lib/utilities/route-for';
   import type { EventHistoryParameters } from '$lib/utilities/route-for';
 
+  /**
+   * Returns `true` if we're trying to view an event that has been filtered
+   * out from the sidebar.
+   *
+   * @param event The event as determined by the route
+   * @param eventGroup The event group that its a member of
+   * @param stuff SvelteKit's stuff object
+   * @param params Route parameters
+   */
   const shouldRedirect = (
     event: HistoryEventWithId,
     eventGroup: CompactEventGroup,
