@@ -76,6 +76,10 @@ export const routeForWorkflowQuery = (parameters: WorkflowParameters) => {
   return `${routeForWorkflow(parameters)}/query`;
 };
 
+export const routeForPendingActivities = (parameters: WorkflowParameters) => {
+  return `${routeForWorkflow(parameters)}/pending-activities`;
+};
+
 const hasParameters =
   <T extends Record<string, string>>(...required: string[]) =>
   (parameters: Record<string, string>): parameters is T => {

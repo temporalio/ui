@@ -3,9 +3,12 @@
   import { page } from '$app/stores';
 
   import { formatDate } from '$lib/utilities/format-date';
+  import { routeForPendingActivities } from '$lib/utilities/route-for';
 
   const { pendingActivities } = $page.stuff.workflow;
-  const pendingActivitiesHref = '../../pending-activities';
+  const { namespace, workflow, run } = $page.params;
+
+  const href = routeForPendingActivities({ namespace, workflow, run });
 
   onMount(() => {
     window.Prism.highlightAll();
@@ -19,7 +22,7 @@
       {#each pendingActivities as { id, ...pendingActivity }}
         <tr class="border-b-2 border-gray-300 pb-4 last-of-type:border-b-0">
           <th class="text-left font-normal text-gray-500">
-            <a href="{pendingActivitiesHref}#{id}">
+            <a href="{href}#{id}">
               {pendingActivity.activityId}
             </a>
           </th>
@@ -51,9 +54,7 @@
       {/each}
     </table>
     <div class="text-right">
-      <a href={pendingActivitiesHref} class="border-b-2 border-blue-600">
-        Show all
-      </a>
+      <a {href} class="border-b-2 border-blue-600"> Show all </a>
     </div>
   </section>
 {/if}

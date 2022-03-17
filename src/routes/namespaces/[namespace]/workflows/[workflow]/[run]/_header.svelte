@@ -4,6 +4,7 @@
 
   import {
     routeForEventHistory,
+    routeForPendingActivities,
     routeForStackTrace,
     routeForWorkers,
     routeForWorkflowQuery,
@@ -16,7 +17,6 @@
   export let namespace: string;
   export let workflow: WorkflowExecution;
 
-  const historyEvents = workflow?.historyEvents;
   const routeParameters = {
     namespace,
     workflow: workflow.id,
@@ -53,7 +53,12 @@
     <Tab
       label="History"
       href={routeForEventHistory(routeParameters)}
-      amount={historyEvents}
+      amount={workflow?.historyEvents}
+    />
+    <Tab
+      label="Pending Activities"
+      href={routeForPendingActivities(routeParameters)}
+      amount={workflow.pendingActivities?.length}
     />
     <Tab label="Workers" href={routeForWorkers(routeParameters)} />
     <Tab label="Stack Trace" href={routeForStackTrace(routeParameters)} />
