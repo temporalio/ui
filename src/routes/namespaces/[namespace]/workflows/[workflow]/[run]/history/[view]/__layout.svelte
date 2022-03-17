@@ -1,10 +1,43 @@
+<script context="module" lang="ts">
+  import { getEventsInCategory } from '$lib/models/event-history/get-event-categorization';
+
+  import type { Load } from '@sveltejs/kit';
+
+  const validViews = ['summary', 'compact', 'json'];
+
+  export const load: Load = async function ({ stuff, url, params }) {
+    const category = url.searchParams.get('category');
+
+    const events = getEventsInCategory(stuff.events, category);
+    const eventGroups = getEventsInCategory(stuff.eventGroups, category);
+
+    let items: HistoryEventWithId[] | CompactEventGroups;
+
+    if (params.view === 'summary') items = events;
+    if (params.view === 'compact') items = eventGroups;
+
+    if (!validViews.includes(params.view)) return { status: 404 };
+
+    return {
+      props: {
+        items,
+        category,
+      },
+      stuff: {
+        matchingEvents: events,
+        matchingEventGroups: eventGroups,
+      },
+    };
+  };
+</script>
+
 <script lang="ts">
   import EmptyState from '$lib/components/empty-state.svelte';
   import FilterSelect from '$lib/components/select/filter-select.svelte';
   import Option from '$lib/components/select/option.svelte';
-  import Event from './_event-list-item.svelte';
+  import EventListItem from './_event-list-item.svelte';
 
-  export let events: HistoryEventWithId[] | CompactEventGroups;
+  export let items: HistoryEventWithId[] | CompactEventGroups;
   export let category: EventTypeCategory;
 </script>
 
@@ -31,8 +64,8 @@
   <div class="flex">
     <div class="flex flex-col w-1/3 border-r-2 border-gray-300 rounded-bl-lg">
       <div class="rounded-bl-lg overflow-y-scroll h-full">
-        {#each events as event (event.id)}
-          {#if !category || event.category === category}<Event {event} />{/if}
+        {#each items as event (event.id)}
+          <EventListItem {event} />
         {:else}
           <div class="p-2">
             <EmptyState

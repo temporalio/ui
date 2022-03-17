@@ -1,18 +1,27 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
-  import type { WorkflowParameters } from '$lib/utilities/route-for';
+  import {
+    EventView,
+    routeForEventHistoryItem,
+  } from '$lib/utilities/route-for';
 
   import { fetchEvents } from '$lib/services/events-service';
 
-  export const load: Load = async function ({ params }) {
-    const { workflow: workflowId, run: runId, namespace } = params;
-    const parameters = { namespace, executionId: workflowId, runId };
+  export const load: Load = async function ({ params, stuff }) {
+    const { workflow } = stuff;
+    const { namespace } = params;
+    const parameters = {
+      namespace,
+      executionId: workflow.id,
+      runId: workflow.runId,
+    };
 
     const { events, eventGroups } = await fetchEvents(parameters);
 
     return {
       props: {
-        workflowParameters: { workflowId, runId, namespace },
+        namespace,
+        workflow,
         events,
         eventGroups,
       },
@@ -31,7 +40,7 @@
     faStream,
   } from '@fortawesome/free-solid-svg-icons';
 
-  import { routeFor } from '$lib/utilities/route-for';
+  import { routeForEventHistory } from '$lib/utilities/route-for';
   import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
 
   import ExportHistory from '$lib/components/export-history.svelte';
@@ -39,11 +48,20 @@
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
   import PendingActivties from './_pending-activties.svelte';
+  import { page } from '$app/stores';
 
-  export let workflowParameters: WorkflowParameters;
+  export let namespace: string;
+  export let workflow: WorkflowExecution;
   export let events: HistoryEventWithId[];
 
   const { input, result } = getWorkflowStartedAndCompletedEvents(events);
+  const routeParameters = (view: EventView, eventId?: string) => ({
+    namespace,
+    workflow: workflow.id,
+    run: workflow.runId,
+    view,
+    eventId,
+  });
 </script>
 
 <section class="flex flex-col gap-4">
@@ -59,16 +77,21 @@
         <ToggleButtons>
           <ToggleButton
             icon={faStream}
-            href={routeFor('workflow.events.summary', workflowParameters)}
-          />
+            base={routeForEventHistory(routeParameters('summary'))}
+            href={routeForEventHistoryItem(
+              routeParameters('summary', $page.params.eventId || '1'),
+            )}>Summary</ToggleButton
+          >
           <ToggleButton
             icon={faLayerGroup}
-            href={routeFor('workflow.events.compact', workflowParameters)}
-          />
+            href={routeForEventHistory(routeParameters('compact'))}
+            >Compact</ToggleButton
+          >
           <ToggleButton
             icon={faCode}
-            href={routeFor('workflow.events.json', workflowParameters)}
-          />
+            href={routeForEventHistory(routeParameters('json'))}
+            >JSON</ToggleButton
+          >
         </ToggleButtons>
         <ExportHistory />
       </div>

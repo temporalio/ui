@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
 
-  import { routeFor } from '$lib/utilities/route-for';
+  import { routeForWorkflow } from '$lib/utilities/route-for';
   import { handleError } from '$lib/utilities/handle-error';
   import { terminateWorkflow } from '$lib/services/terminate-service';
   import { notifications } from '$lib/stores/notifications';
@@ -20,10 +20,10 @@
     reason = '';
     notifications.add('success', 'Workflow Terminated');
     goto(
-      routeFor('workflow', {
+      routeForWorkflow({
         namespace,
-        workflowId: workflow.id,
-        runId: workflow.runId,
+        workflow: workflow.id,
+        run: workflow.runId,
       }),
     );
   };

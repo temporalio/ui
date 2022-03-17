@@ -10,4 +10,4 @@ type CompactEventGroup<T = EventType, E = HistoryEventWithId, Id = E['id']> = {
 type CompactEventGroups<
   T = EventType,
   E = HistoryEventWithId,
-> = CompactEventGroup[];
+> = CompactEventGroup<T, E>[] & ArrayLike;

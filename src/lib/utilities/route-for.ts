@@ -1,137 +1,110 @@
-type RoutePath =
-  | 'workflows'
-  | 'workflow'
-  | 'workflow.events'
-  | 'workers'
-  | 'workflow.events.summary'
-  | 'workflow.events.summary.event'
-  | 'workflow.events.compact'
-  | 'workflow.events.compact.event'
-  | 'workflow.events.json'
-  | 'workflow.stack-trace'
-  | 'workflow.query'
-  | 'workers';
+export type EventView = 'compact' | 'summary' | 'json';
 
-export type QueryParameters = { query?: URLSearchParams };
-export type NamespaceParameter = { namespace: string } & QueryParameters;
-export type WorkflowParameters = {
-  workflowId: string;
-  runId: string;
-} & NamespaceParameter;
-export type EventParameter = {
+type RouteParameters = {
+  namespace: string;
+  workflow: string;
+  run: string;
+  view?: EventView;
   eventId: string;
-} & WorkflowParameters;
-export type ActivityParameter = {
-  activityId: string;
-} & EventParameter;
-export type TaskQueueParameter = {
   queue: string;
-} & NamespaceParameter;
+};
 
-export type RouteParameters = NamespaceParameter &
-  WorkflowParameters &
-  EventParameter &
-  ActivityParameter &
-  TaskQueueParameter;
+export const isEventView = (view: string): view is EventView => {
+  if (view === 'summary') return true;
+  if (view === 'compact') return true;
+  if (view === 'json') return true;
+  return false;
+};
 
-const routeForNamespace = ({ namespace }: NamespaceParameter): string => {
+export type NamespaceParameter = Pick<RouteParameters, 'namespace'>;
+export type WorkflowParameters = Pick<
+  RouteParameters,
+  'namespace' | 'workflow' | 'run'
+>;
+export type EventHistoryParameters = Pick<
+  RouteParameters,
+  'namespace' | 'workflow' | 'run' | 'view'
+>;
+export type EventParameters = Required<
+  Pick<RouteParameters, 'namespace' | 'workflow' | 'run' | 'view' | 'eventId'>
+>;
+
+export const routeForNamespace = ({
+  namespace,
+}: NamespaceParameter): string => {
   return `/namespaces/${namespace}`;
 };
 
-const routeForWorkflows = (parameters: NamespaceParameter): string => {
+export const routeForWorkflows = (parameters: NamespaceParameter): string => {
   return `${routeForNamespace(parameters)}/workflows`;
 };
 
-const routeForWorkflow = ({
-  workflowId,
-  runId,
+export const routeForWorkflow = ({
+  workflow,
+  run,
   ...parameters
 }: WorkflowParameters): string => {
-  return `${routeForWorkflows(parameters)}/${workflowId}/${runId}`;
+  return `${routeForWorkflows(parameters)}/${workflow}/${run}`;
 };
 
-const routeForEventHistory = (
-  parameters: WorkflowParameters,
-  view?: 'summary' | 'compact' | 'json',
+export const routeForEventHistory = ({
+  view,
+  ...parameters
+}: EventHistoryParameters): string => {
+  const eventHistoryPath = `${routeForWorkflow(parameters)}/history`;
+  if (!view) return eventHistoryPath;
+  if (view === 'summary') return `${eventHistoryPath}/summary`;
+  if (view === 'compact') return `${eventHistoryPath}/compact`;
+  if (view === 'json') return `${eventHistoryPath}/json`;
+};
+
+export const routeForEventHistoryItem = (
+  parameters: EventParameters,
 ): string => {
-  if (!view) return `${routeForWorkflow(parameters)}/history`;
-  if (view === 'summary')
-    return `${routeForWorkflow(parameters)}/history/summary`;
-  if (view === 'compact')
-    return `${routeForWorkflow(parameters)}/history/compact`;
-  if (view === 'json') return `${routeForWorkflow(parameters)}/history/json`;
+  return `${routeForEventHistory(parameters)}/${parameters.eventId}`;
 };
 
-const routeForWorkers = (parameters: WorkflowParameters) => {
+export const routeForWorkers = (parameters: WorkflowParameters) => {
   return `${routeForWorkflow(parameters)}/workers`;
 };
 
-export function routeFor(
-  path: 'workflows',
-  parameters: NamespaceParameter,
-): string;
-export function routeFor(
-  path:
-    | 'workflow'
-    | 'workflow.events'
-    | 'workflow.events.summary'
-    | 'workflow.events.compact'
-    | 'workflow.events.json'
-    | 'workflow.stack-trace'
-    | 'workflow.query'
-    | 'workers',
-  parameters: WorkflowParameters,
-): string;
-export function routeFor(
-  path: 'workflow.events.summary.event',
-  parameters: EventParameter,
-): string;
-export function routeFor(
-  path: 'workers',
-  parameters: TaskQueueParameter,
-): string;
-export function routeFor(path: RoutePath, parameters: RouteParameters): string {
-  let route: string;
+export const routeForStackTrace = (parameters: WorkflowParameters) => {
+  return `${routeForWorkflow(parameters)}/stack-trace`;
+};
 
-  if (path === 'workflows') {
-    route = routeForWorkflows(parameters);
-  }
+export const routeForWorkflowQuery = (parameters: WorkflowParameters) => {
+  return `${routeForWorkflow(parameters)}/query`;
+};
 
-  if (path === 'workflow') {
-    route = routeForWorkflow(parameters);
-  }
+const hasParameters =
+  <T extends Record<string, string>>(...required: string[]) =>
+  (parameters: Record<string, string>): parameters is T => {
+    for (const parameter of required) {
+      if (!parameters[parameter]) return false;
+    }
+    return true;
+  };
 
-  if (path === 'workflow.events') {
-    route = routeForEventHistory(parameters);
-  }
+export const isNamespaceParameter =
+  hasParameters<NamespaceParameter>('namespace');
 
-  if (path === 'workflow.events.summary') {
-    route = routeForEventHistory(parameters, 'summary');
-  }
+export const isWorkflowParameters = hasParameters<WorkflowParameters>(
+  'namespace',
+  'workflow',
+  'run',
+);
 
-  if (path === 'workflow.events.compact') {
-    route = routeForEventHistory(parameters, 'compact');
-  }
+export const isEventHistoryParameters = hasParameters<EventHistoryParameters>(
+  'namespace',
+  'workflow',
+  'run',
+  'view',
+);
 
-  if (path === 'workflow.events.json') {
-    route = routeForEventHistory(parameters, 'json');
-  }
-
-  if (path === 'workflow.query') {
-    route = routeForWorkflow(parameters) + '/query';
-  }
-
-  if (path === 'workflow.stack-trace') {
-    route = routeForWorkflow(parameters) + '/stack-trace';
-  }
-
-  if (path === 'workers') {
-    route = routeForWorkers(parameters);
-  }
-
-  if (parameters.query) {
-    return `${route}?${parameters.query}`;
-  } else {
-    return route;
-  }
-}
+export const isEventParameters = hasParameters<EventParameters>(
+  'namespace',
+  'workflow',
+  'run',
+  'view',
+  'eventId',
+);

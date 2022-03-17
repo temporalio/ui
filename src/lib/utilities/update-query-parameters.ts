@@ -5,8 +5,7 @@ import { appendQueryParameters } from './append-query-parameters';
 type UpdateQueryParams = {
   parameter: string;
   value?: string | number | boolean;
-  query: URLSearchParams;
-  path: string;
+  url: URL;
   goto: typeof goto;
   invalidate?: typeof invalidate;
 };
@@ -16,18 +15,17 @@ const options = { replaceState: true, keepfocus: true, noscroll: true };
 export const updateQueryParameters = async ({
   parameter,
   value,
-  query,
-  path,
+  url,
   goto,
 }: UpdateQueryParams): Promise<typeof value> => {
   if (value) {
-    query.set(parameter, value.toString());
+    url.searchParams.set(parameter, value.toString());
   } else {
-    query.delete(parameter);
+    url.searchParams.delete(parameter);
   }
 
   if (browser) {
-    goto(appendQueryParameters(path, query), options);
+    goto(String(url), options);
   }
 
   return value;

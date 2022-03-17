@@ -2,11 +2,11 @@
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
-  import { routeFor } from '$lib/utilities/route-for';
+  import { routeForWorkflows } from '$lib/utilities/route-for';
 
   onMount(async () => {
     goto(
-      routeFor('workflows', {
+      routeForWorkflows({
         namespace: $page.stuff.settings.defaultNamespace,
       }),
       {

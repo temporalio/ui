@@ -11,17 +11,25 @@
   export let group = getAppContext('group');
   export let scale = 1;
   export let href = '#';
+  export let base = href;
 </script>
 
 <a
   class="border-2 py-2 px-4 hover:text-white hover:bg-gray-600 flex items-center justify-center"
   class:rounded-lg={!group}
-  class:active={$page.url.pathname.includes(href)}
+  class:active={$page.url.pathname.includes(base)}
   class:group
   href={appendQueryParameters(href, $page.url.searchParams)}
   on:click
 >
-  <Icon {icon} {scale} />
+  {#if icon}
+    <div class="flex gap-2 items-center">
+      <Icon {icon} {scale} />
+      <slot />
+    </div>
+  {:else}
+    <slot />
+  {/if}
 </a>
 
 <style lang="postcss">

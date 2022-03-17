@@ -62,16 +62,20 @@ export const getEventCategory = (eventType: EventType): EventTypeCategory => {
   return eventTypeCategorizations[eventType];
 };
 
-export const eventTypeInCategory =
-  (category?: EventTypeCategory) =>
-  (event: HistoryEventWithId): boolean => {
-    if (!category) return true;
-    return eventTypeCategorizations[event.eventType] === category;
-  };
-
 export const isCategoryType = (value: string): value is EventTypeCategory => {
   for (const category of categories) {
     if (value === category) return true;
   }
   return false;
+};
+
+export const getEventsInCategory = (
+  events: HistoryEventWithId[] | CompactEventGroups,
+  category: string,
+) => {
+  if (!isCategoryType(category)) return events;
+  return events.filter(
+    (event: HistoryEventWithId | CompactEventGroup) =>
+      event.category === category,
+  );
 };
