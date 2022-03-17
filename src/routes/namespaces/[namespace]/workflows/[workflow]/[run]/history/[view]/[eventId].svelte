@@ -11,7 +11,7 @@
    *
    * @param event The event as determined by the route
    * @param eventGroup The event group that its a member of
-   * @param stuff SvelteKit's stuff object
+   * @param stuff SvelteKit's `stuff` object
    * @param params Route parameters
    */
   const shouldRedirect = (
