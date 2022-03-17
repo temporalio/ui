@@ -20,8 +20,7 @@
     updateQueryParameters({
       parameter,
       value: _value,
-      query: $page.url.searchParams,
-      path: $page.url.pathname,
+      url: $page.url,
       goto,
     }).then((v) => (value = v));
   }

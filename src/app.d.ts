@@ -14,5 +14,6 @@ declare namespace App {
     events?: HistoryEventWithId[];
     eventGroups?: CompactEventGroups;
     settings: Settings;
+    matchingEvents?: HistoryEventWithId[] | CompactEventGroups;
   }
 }

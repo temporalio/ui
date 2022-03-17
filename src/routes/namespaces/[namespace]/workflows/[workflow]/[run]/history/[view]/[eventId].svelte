@@ -1,3 +1,57 @@
+<script lang="ts" context="module">
+  import type { Load } from '@sveltejs/kit';
+
+  import { getGroupForEvent } from '$lib/models/group-events';
+  import {
+    routeForEventHistoryItem,
+    isEventView,
+    isEventParameters,
+    routeForEventHistory,
+  } from '$lib/utilities/route-for';
+  import { getFirstId } from './_get-first-id';
+
+  export const load: Load = async function ({ params, stuff, url }) {
+    const { view, eventId } = params;
+    const { events, eventGroups, matchingEvents } = stuff;
+
+    const event: HistoryEventWithId = events.find(
+      (event: HistoryEventWithId) => event.id === eventId,
+    );
+
+    const eventGroup: CompactEventGroup = getGroupForEvent(event, eventGroups);
+
+    if (!event || !isEventView(view)) {
+      return { status: 404 };
+    }
+
+    if (!matchingEvents.length && isEventParameters(params)) {
+      url.pathname = routeForEventHistory(params);
+
+      return {
+        status: 302,
+        redirect: url.toString(),
+      };
+    }
+
+    if (!matchingEvents.includes(event) && isEventParameters(params)) {
+      const firstMatchingEventId = getFirstId(matchingEvents);
+      url.pathname = routeForEventHistoryItem({
+        ...params,
+        eventId: firstMatchingEventId,
+      });
+
+      return {
+        status: 302,
+        redirect: url.toString(),
+      };
+    }
+
+    return {
+      props: { event, eventGroup },
+    };
+  };
+</script>
+
 <script lang="ts">
   import { format } from '$lib/utilities/format-camel-case';
 

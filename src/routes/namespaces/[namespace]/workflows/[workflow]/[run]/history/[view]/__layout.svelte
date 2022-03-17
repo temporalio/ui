@@ -1,10 +1,42 @@
+<script context="module" lang="ts">
+  import {
+    getEventsInCategory,
+    isCategoryType,
+  } from '$lib/models/event-history/get-event-categorization';
+  import { getEventsOrGroupsBasedOnParams } from './_get-events-or-groups-based-on-params';
+
+  import type { Load } from '@sveltejs/kit';
+
+  export const load: Load = async function ({ stuff, url, params }) {
+    const category = url.searchParams.get('category');
+
+    let items = getEventsOrGroupsBasedOnParams({ params, stuff });
+
+    if (!items) return { status: 404 };
+
+    if (isCategoryType(category)) {
+      items = getEventsInCategory(items, category);
+    }
+
+    return {
+      props: {
+        items,
+        category,
+      },
+      stuff: {
+        matchingEvents: items,
+      },
+    };
+  };
+</script>
+
 <script lang="ts">
   import EmptyState from '$lib/components/empty-state.svelte';
   import FilterSelect from '$lib/components/select/filter-select.svelte';
   import Option from '$lib/components/select/option.svelte';
-  import Event from './_event-list-item.svelte';
+  import EventListItem from './_event-list-item.svelte';
 
-  export let events: HistoryEventWithId[] | CompactEventGroups;
+  export let items: HistoryEventWithId[] | CompactEventGroups;
   export let category: EventTypeCategory;
 </script>
 
@@ -31,8 +63,8 @@
   <div class="flex">
     <div class="flex flex-col w-1/3 border-r-2 border-gray-300 rounded-bl-lg">
       <div class="rounded-bl-lg overflow-y-scroll h-full">
-        {#each events as event (event.id)}
-          {#if !category || event.category === category}<Event {event} />{/if}
+        {#each items as event (event.id)}
+          <EventListItem {event} />
         {:else}
           <div class="p-2">
             <EmptyState

@@ -1,70 +1,80 @@
-import { routeFor } from './route-for';
+import {
+  routeForEventHistory,
+  routeForStackTrace,
+  routeForWorkers,
+  routeForWorkflow,
+  routeForWorkflowQuery,
+  routeForWorkflows,
+} from './route-for';
 
-describe(routeFor, () => {
+describe('routeFor', () => {
   it('should route to "workflows"', () => {
-    const path = routeFor('workflows', { namespace: 'default' });
+    const path = routeForWorkflows({ namespace: 'default' });
     expect(path).toBe('/namespaces/default/workflows');
   });
 
   it('should route to "workflow"', () => {
-    const path = routeFor('workflow', {
+    const path = routeForWorkflow({
       namespace: 'default',
-      workflowId: 'abc',
-      runId: 'def',
+      workflow: 'abc',
+      run: 'def',
     });
     expect(path).toBe('/namespaces/default/workflows/abc/def');
   });
 
   it('should route to "workflow.events"', () => {
-    const path = routeFor('workflow.events', {
+    const path = routeForEventHistory({
       namespace: 'default',
-      workflowId: 'abc',
-      runId: 'def',
-    });
-    expect(path).toBe('/namespaces/default/workflows/abc/def/history');
-  });
-
-  it('should route to "workflow".events.full', () => {
-    const path = routeFor('workflow.events.summary', {
-      namespace: 'default',
-      workflowId: 'abc',
-      runId: 'def',
+      workflow: 'abc',
+      run: 'def',
+      view: 'summary',
     });
     expect(path).toBe('/namespaces/default/workflows/abc/def/history/summary');
   });
 
-  it('should route to "workflow".events.json', () => {
-    const path = routeFor('workflow.events.json', {
+  it('should route to "workflow.events"', () => {
+    const path = routeForEventHistory({
       namespace: 'default',
-      workflowId: 'abc',
-      runId: 'def',
+      workflow: 'abc',
+      run: 'def',
+      view: 'compact',
+    });
+    expect(path).toBe('/namespaces/default/workflows/abc/def/history/compact');
+  });
+
+  it('should route to "workflow.events"', () => {
+    const path = routeForEventHistory({
+      namespace: 'default',
+      workflow: 'abc',
+      run: 'def',
+      view: 'json',
     });
     expect(path).toBe('/namespaces/default/workflows/abc/def/history/json');
   });
 
   it('should route to "workflow".stack-trace', () => {
-    const path = routeFor('workflow.stack-trace', {
+    const path = routeForStackTrace({
       namespace: 'default',
-      workflowId: 'abc',
-      runId: 'def',
+      workflow: 'abc',
+      run: 'def',
     });
     expect(path).toBe('/namespaces/default/workflows/abc/def/stack-trace');
   });
 
   it('should route to "workflow".query', () => {
-    const path = routeFor('workflow.query', {
+    const path = routeForWorkflowQuery({
       namespace: 'default',
-      workflowId: 'abc',
-      runId: 'def',
+      workflow: 'abc',
+      run: 'def',
     });
     expect(path).toBe('/namespaces/default/workflows/abc/def/query');
   });
 
   it('should route to "workers"', () => {
-    const path = routeFor('workers', {
+    const path = routeForWorkers({
       namespace: 'default',
-      workflowId: 'abc',
-      runId: 'def',
+      workflow: 'abc',
+      run: 'def',
     });
     expect(path).toBe('/namespaces/default/workflows/abc/def/workers');
   });

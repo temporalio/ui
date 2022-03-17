@@ -3,15 +3,15 @@
   import { namespace } from '$lib/stores/namespace';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import { routeFor } from '$lib/utilities/route-for';
+  import { routeForWorkflow } from '$lib/utilities/route-for';
 
   export let workflow: WorkflowExecution;
   export let timeFormat: TimeFormat;
 
-  $: href = routeFor('workflow', {
+  $: href = routeForWorkflow({
     namespace: $namespace,
-    workflowId: workflow.id,
-    runId: workflow.runId,
+    workflow: workflow.id,
+    run: workflow.runId,
   });
 </script>
 
