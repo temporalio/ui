@@ -40,6 +40,7 @@
     faStream,
   } from '@fortawesome/free-solid-svg-icons';
 
+  import { page } from '$app/stores';
   import { routeForEventHistory } from '$lib/utilities/route-for';
   import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
 
@@ -48,7 +49,6 @@
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
   import PendingActivties from './_pending-activties.svelte';
-  import { page } from '$app/stores';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;

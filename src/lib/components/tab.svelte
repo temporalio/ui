@@ -9,7 +9,7 @@
 </script>
 
 <a class="block" class:active {href}>
-  {#if amount}
+  {#if amount || amount === 0}
     {label}
     <span class="px-2 text-blue-700 bg-blue-100 rounded-sm">{amount}</span>
   {:else}
