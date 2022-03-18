@@ -5,6 +5,7 @@ import {
   isMarkerRecordedEvent,
   isSignalExternalWorkflowExecutionInitiatedEvent,
   isStartChildWorkflowExecutionInitiatedEvent,
+  isWorkflowExecutionSignaledEvent,
   isTimerStartedEvent,
 } from '$lib/utilities/is-event-type';
 
@@ -23,6 +24,10 @@ export const getName = (event: CommonHistoryEvent): string => {
     return `Signal: ${event.signalExternalWorkflowExecutionInitiatedEventAttributes?.signalName}`;
   }
 
+  if (isWorkflowExecutionSignaledEvent(event)) {
+    return `Signal received: ${event.workflowExecutionSignaledEventAttributes?.signalName}`;
+  }
+
   if (isMarkerRecordedEvent(event)) {
     return `Marker: ${event.markerRecordedEventAttributes?.markerName}`;
   }
@@ -37,6 +42,7 @@ type StartingEvents = {
   ChildWorkflow: StartChildWorkflowExecutionInitiatedEvent;
   Timer: TimerStartedEvent;
   Signal: SignalExternalWorkflowExecutionInitiatedEvent;
+  SignalReceived: WorkflowExecutionSignaledEvent;
   Marker: MarkerRecordedEvent;
 };
 
@@ -78,6 +84,9 @@ export const createEventGroup = (event: CommonHistoryEvent) => {
 
   if (isSignalExternalWorkflowExecutionInitiatedEvent(event))
     return createGroupFor<'Signal'>(event);
+
+  if (isWorkflowExecutionSignaledEvent(event))
+    return createGroupFor<'SignalReceived'>(event);
 
   if (isMarkerRecordedEvent(event)) return createGroupFor<'Marker'>(event);
 };
