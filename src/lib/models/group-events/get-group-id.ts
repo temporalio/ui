@@ -11,6 +11,7 @@ import {
   isMarkerRecordedEvent,
   isSignalExternalWorkflowExecutionInitiatedEvent,
   isStartChildWorkflowExecutionInitiatedEvent,
+  isWorkflowExecutionSignaledEvent,
   isTimerCanceledEvent,
   isTimerFiredEvent,
   isTimerStartedEvent,
@@ -24,6 +25,8 @@ export const getGroupId = (event: CommonHistoryEvent): string => {
   if (isTimerStartedEvent(event)) return event.id;
 
   if (isSignalExternalWorkflowExecutionInitiatedEvent(event)) return event.id;
+
+  if (isWorkflowExecutionSignaledEvent(event)) return event.id;
 
   if (isMarkerRecordedEvent(event)) return event.id;
 
