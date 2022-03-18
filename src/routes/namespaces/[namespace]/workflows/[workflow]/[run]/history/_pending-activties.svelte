@@ -20,13 +20,14 @@
     <h3 class="text-lg font-medium mb-4">Pending Activities</h3>
     <table class="w-full table-auto space-x-4">
       {#each pendingActivities as { id, ...pendingActivity }}
-        <tr class="border-b-2 border-gray-300 pb-4 last-of-type:border-b-0">
-          <th class="text-left font-normal text-gray-500">
-            <a href="{href}#{id}">
-              {pendingActivity.activityId}
-            </a>
-          </th>
-          <td>
+        <a
+          class="flex content-between w-full border-b-2 border-gray-300 p-2 last-of-type:border-b-0 hover:bg-gray-50"
+          {href}
+        >
+          <div class="text-left font-normal text-gray-500 w-40">
+            {pendingActivity.activityId}
+          </div>
+          <div class="w-full">
             <div class="flex gap-2">
               <h4>Activity Name</h4>
               <p>
@@ -35,22 +36,22 @@
                 </span>
               </p>
             </div>
-          </td>
-          <td>
+          </div>
+          <div class="w-full">
             <div class="flex gap-2">
               <h3>Last Failure</h3>
               <pre
                 style="padding: 0 1em; margin: 0"
                 class="rounded-lg"><code class="language-json">{pendingActivity.lastFailure}</code></pre>
             </div>
-          </td>
-          <td>
+          </div>
+          <div class="w-full">
             <div class="flex gap-2">
               <h4>Last Heartbeat Time</h4>
               <p>{formatDate(pendingActivity.lastHeartbeatTime)}</p>
             </div>
-          </td>
-        </tr>
+          </div>
+        </a>
       {/each}
     </table>
     <div class="text-right">
