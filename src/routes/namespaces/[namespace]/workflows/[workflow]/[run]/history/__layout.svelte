@@ -39,6 +39,7 @@
     faCode,
     faLayerGroup,
     faStream,
+    faTable,
   } from '@fortawesome/free-solid-svg-icons';
 
   import { page } from '$app/stores';
@@ -77,22 +78,23 @@
       <div class="flex gap-4">
         <ToggleButtons>
           <ToggleButton
-            icon={faStream}
+            icon={faTable}
             base={routeForEventHistory(routeParameters('summary'))}
             href={routeForEventHistoryItem(
               routeParameters('summary', $page.params.eventId || '1'),
             )}>Summary</ToggleButton
           >
           <ToggleButton
-            icon={faLayerGroup}
-            href={routeForEventHistory(routeParameters('compact'))}
-            >Compact</ToggleButton
-          >
-          <ToggleButton
             icon={faBars}
             href={routeForEventHistory(routeParameters('full'))}
             >Full</ToggleButton
           >
+          <ToggleButton
+            icon={faLayerGroup}
+            href={routeForEventHistory(routeParameters('compact'))}
+            >Compact</ToggleButton
+          >
+
           <ToggleButton
             icon={faCode}
             href={routeForEventHistory(routeParameters('json'))}
