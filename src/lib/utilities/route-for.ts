@@ -1,4 +1,4 @@
-export type EventView = 'compact' | 'summary' | 'json';
+export type EventView = 'full' | 'compact' | 'summary' | 'json';
 
 type RouteParameters = {
   namespace: string;
@@ -54,6 +54,7 @@ export const routeForEventHistory = ({
   const eventHistoryPath = `${routeForWorkflow(parameters)}/history`;
   if (!view) return eventHistoryPath;
   if (view === 'summary') return `${eventHistoryPath}/summary`;
+  if (view === 'full') return `${eventHistoryPath}/full`;
   if (view === 'compact') return `${eventHistoryPath}/compact`;
   if (view === 'json') return `${eventHistoryPath}/json`;
 };

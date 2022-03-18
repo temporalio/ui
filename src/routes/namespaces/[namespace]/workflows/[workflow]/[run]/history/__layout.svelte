@@ -35,6 +35,7 @@
 
 <script lang="ts">
   import {
+    faBars,
     faCode,
     faLayerGroup,
     faStream,
@@ -86,6 +87,11 @@
             icon={faLayerGroup}
             href={routeForEventHistory(routeParameters('compact'))}
             >Compact</ToggleButton
+          >
+          <ToggleButton
+            icon={faBars}
+            href={routeForEventHistory(routeParameters('full'))}
+            >Full</ToggleButton
           >
           <ToggleButton
             icon={faCode}
