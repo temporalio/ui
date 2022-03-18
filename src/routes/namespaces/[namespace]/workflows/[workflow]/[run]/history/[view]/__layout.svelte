@@ -1,12 +1,11 @@
 <script context="module" lang="ts">
-  import { getEventsInCategory } from '$lib/models/event-history/get-event-categorization';
-
   import type { Load } from '@sveltejs/kit';
 
-  const validViews = ['summary', 'compact', 'json'];
+  import { getEventsInCategory } from '$lib/models/event-history/get-event-categorization';
 
   export const load: Load = async function ({ stuff, url, params }) {
     const category = url.searchParams.get('category');
+    const validViews = ['summary', 'compact', 'json'];
 
     const events = getEventsInCategory(stuff.events, category);
     const eventGroups = getEventsInCategory(stuff.eventGroups, category);
@@ -41,7 +40,7 @@
   export let category: EventTypeCategory;
 </script>
 
-<section class="flex flex-col border-2 border-gray-300 rounded-lg w-full  mb-6">
+<section class="flex flex-col border-2 border-gray-300 rounded-lg w-full mb-6">
   <div class="flex w-full">
     <header class="table-header border-r-2 rounded-tl-lg w-1/3">
       <h3>Summary</h3>

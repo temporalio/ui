@@ -13,7 +13,7 @@
 <div>
   <label class="hidden" for={id}>{label}</label>
   <select
-    class={`inline border-2 text-base px-2 h-10 rounded-lg w-full ${$$props.class}`}
+    class="inline border-2 text-base px-2 h-10 rounded-lg w-full {$$props.class}"
     class:dark
     class:remove={arrow}
     {id}
