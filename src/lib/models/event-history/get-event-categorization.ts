@@ -20,6 +20,7 @@ export const eventTypeCategorizations: Readonly<
 
   SignalExternalWorkflowExecutionFailed: 'signal',
   SignalExternalWorkflowExecutionInitiated: 'signal',
+  WorkflowExecutionSignaled: 'signal',
 
   TimerCanceled: 'timer',
   TimerFired: 'timer',
@@ -30,7 +31,6 @@ export const eventTypeCategorizations: Readonly<
   WorkflowExecutionCompleted: 'workflow',
   WorkflowExecutionContinuedAsNew: 'workflow',
   WorkflowExecutionFailed: 'workflow',
-  WorkflowExecutionSignaled: 'workflow',
   WorkflowExecutionStarted: 'workflow',
   WorkflowExecutionTerminated: 'workflow',
   WorkflowExecutionTimedOut: 'workflow',
