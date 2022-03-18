@@ -5,9 +5,29 @@
   import { routeForEventHistory } from '$lib/utilities/route-for';
   import type { EventHistoryParameters } from '$lib/utilities/route-for';
 
+  /**
+   * Returns `true` if we're trying to view an event that has been filtered
+   * out from the sidebar.
+   *
+   * @param event The event as determined by the route
+   * @param eventGroup The event group that its a member of
+   * @param stuff SvelteKit's `stuff` object
+   * @param params Route parameters
+   */
+  const shouldRedirect = (
+    event: HistoryEventWithId,
+    eventGroup: CompactEventGroup,
+    { matchingEvents }: Partial<App.Stuff>,
+    { view }: Record<string, string>,
+  ): boolean => {
+    if (!matchingEvents.includes(event)) return true;
+    if (view === 'compact' && !eventGroup) return true;
+    return false;
+  };
+
   export const load: Load = async function ({ params, stuff, url }) {
     const { eventId } = params;
-    const { events, eventGroups, matchingEvents } = stuff;
+    const { events, eventGroups } = stuff;
 
     const event: HistoryEventWithId = events.find(
       (event: HistoryEventWithId) => event.id === eventId,
@@ -17,7 +37,7 @@
 
     if (!event) return { status: 404 };
 
-    if (!matchingEvents.includes(event)) {
+    if (shouldRedirect(event, eventGroup, stuff, params)) {
       url.pathname = routeForEventHistory(params as EventHistoryParameters);
 
       return {
