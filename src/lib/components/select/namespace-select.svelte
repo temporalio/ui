@@ -7,7 +7,7 @@
   import { getAppContext } from '$lib/utilities/get-context';
   import { page } from '$app/stores';
 
-  const isCloud = $page.stuff.settings.runtimeEnvironment;
+  const { isCloud } = $page.stuff.settings.runtimeEnvironment;
 
   $: namespaces = (getAppContext('namespaces') ?? [])
     .map((namespace) => namespace?.namespaceInfo?.name)
