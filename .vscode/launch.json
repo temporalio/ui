@@ -8,9 +8,30 @@
       "type": "pwa-node",
       "request": "launch",
       "name": "Launch Program",
-      "skipFiles": ["<node_internals>/**"],
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run-script", "start"]
+      "runtimeArgs": [
+        "run-script",
+        "start"
+      ]
+    },
+    {
+      "type": "node",
+      "name": "vscode-jest-tests",
+      "request": "launch",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true,
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "npm",
+      "args": [
+        "test",
+        "--",
+        "--runInBand",
+        "--watchAll=false"
+      ]
     }
   ]
 }
