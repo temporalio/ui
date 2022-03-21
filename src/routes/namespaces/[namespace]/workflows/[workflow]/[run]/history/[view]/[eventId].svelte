@@ -33,9 +33,9 @@
       (event: HistoryEventWithId) => event.id === eventId,
     );
 
-    const eventGroup: CompactEventGroup = getGroupForEvent(event, eventGroups);
-
     if (!event) return { status: 404 };
+
+    const eventGroup: CompactEventGroup = getGroupForEvent(event, eventGroups);
 
     if (shouldRedirect(event, eventGroup, stuff, params)) {
       url.pathname = routeForEventHistory(params as EventHistoryParameters);
