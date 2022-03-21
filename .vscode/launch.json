@@ -8,14 +8,9 @@
       "type": "pwa-node",
       "request": "launch",
       "name": "Launch Program",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "skipFiles": ["<node_internals>/**"],
       "runtimeExecutable": "npm",
-      "runtimeArgs": [
-        "run-script",
-        "start"
-      ]
+      "runtimeArgs": ["run-script", "start"]
     },
     {
       "type": "node",
@@ -26,12 +21,7 @@
       "disableOptimisticBPs": true,
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "npm",
-      "args": [
-        "test",
-        "--",
-        "--runInBand",
-        "--watchAll=false"
-      ]
+      "args": ["test", "--", "--runInBand", "--watchAll=false"]
     }
   ]
 }
