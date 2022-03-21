@@ -11,7 +11,7 @@
 
     const [first] = items;
 
-    if (stuff.matchingEvents.length && first) {
+    if (matchingEvents.length && first?.id) {
       url.pathname = `${url.pathname}/${first.id}`;
 
       return {
