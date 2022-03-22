@@ -1,18 +1,25 @@
 import { get } from 'svelte/store';
-import { getPageForIndex, getTotalPages, pagination } from './pagination';
+import {
+  getIndex,
+  getPageForIndex,
+  getStartingIndexForPage,
+  getTotalPages,
+  getValidPage,
+  pagination,
+} from './pagination';
 
-const items = new Array(100).fill(null).map((_, i) => i);
+const oneHundredResolutions = new Array(100).fill(null).map((_, i) => i);
 
 describe(pagination, () => {
   it('should have a pageSize', () => {
-    const store = pagination(items, 50);
+    const store = pagination(oneHundredResolutions, 50);
     const { pageSize } = get(store);
 
     expect(pageSize).toBe(50);
   });
 
   it('should be able to adjust the pageSize', () => {
-    const store = pagination(items, 50);
+    const store = pagination(oneHundredResolutions, 50);
     store.adjustPageSize(75);
     const { pageSize } = get(store);
 
@@ -20,14 +27,14 @@ describe(pagination, () => {
   });
 
   it('should set hasPrevious to false by default', () => {
-    const store = pagination(items, 50);
+    const store = pagination(oneHundredResolutions, 50);
     const { hasPrevious } = get(store);
 
     expect(hasPrevious).toBe(false);
   });
 
   it('should set hasPrevious if it is not at the beginning', () => {
-    const store = pagination(items, 25);
+    const store = pagination(oneHundredResolutions, 25);
     store.next();
     const { hasPrevious } = get(store);
 
@@ -35,14 +42,14 @@ describe(pagination, () => {
   });
 
   it('should set hasNext to true if the pageSize is less than the items in the array', () => {
-    const store = pagination(items, 50);
+    const store = pagination(oneHundredResolutions, 50);
     const { hasNext } = get(store);
 
     expect(hasNext).toBe(true);
   });
 
   it('should set hasNext to false if there are no more items', () => {
-    const store = pagination(items, 75);
+    const store = pagination(oneHundredResolutions, 75);
     store.next();
     const { hasNext } = get(store);
 
@@ -50,21 +57,21 @@ describe(pagination, () => {
   });
 
   it('should set the startingIndex to zero by default', () => {
-    const store = pagination(items, 75);
+    const store = pagination(oneHundredResolutions, 75);
     const { startingIndex } = get(store);
 
     expect(startingIndex).toBe(0);
   });
 
   it('should set the endingIndex to pageSize by default', () => {
-    const store = pagination(items, 5);
+    const store = pagination(oneHundredResolutions, 5);
     const { endingIndex } = get(store);
 
     expect(endingIndex).toBe(5);
   });
 
   it('should increment the startingIndex by the pageSize', () => {
-    const store = pagination(items, 5);
+    const store = pagination(oneHundredResolutions, 5);
     store.next();
     const { startingIndex } = get(store);
 
@@ -72,7 +79,7 @@ describe(pagination, () => {
   });
 
   it('should increment the endingIndex by the pageSize', () => {
-    const store = pagination(items, 5);
+    const store = pagination(oneHundredResolutions, 5);
     store.next();
     const { endingIndex } = get(store);
 
@@ -80,7 +87,7 @@ describe(pagination, () => {
   });
 
   it('should decrement the startingIndex by the page size', () => {
-    const store = pagination(items, 5);
+    const store = pagination(oneHundredResolutions, 5);
 
     store.next();
     store.next();
@@ -92,7 +99,7 @@ describe(pagination, () => {
   });
 
   it('should decrement the endingIndex by the page size', () => {
-    const store = pagination(items, 5);
+    const store = pagination(oneHundredResolutions, 5);
 
     store.next();
     store.next();
@@ -104,7 +111,7 @@ describe(pagination, () => {
   });
 
   it('should not decrement the starting position if at the beginning', () => {
-    const store = pagination(items, 5);
+    const store = pagination(oneHundredResolutions, 5);
 
     store.previous();
 
@@ -114,7 +121,7 @@ describe(pagination, () => {
   });
 
   it('should not increment the starting position if at end', () => {
-    const store = pagination(items, 200);
+    const store = pagination(oneHundredResolutions, 200);
 
     store.next();
 
@@ -124,7 +131,7 @@ describe(pagination, () => {
   });
 
   it('should show the first page worth of items by default', () => {
-    const store = pagination(items, 5);
+    const store = pagination(oneHundredResolutions, 5);
 
     const { items: result } = get(store);
 
@@ -132,7 +139,7 @@ describe(pagination, () => {
   });
 
   it('should show the second page of items once incremented', () => {
-    const store = pagination(items, 5);
+    const store = pagination(oneHundredResolutions, 5);
 
     store.next();
 
@@ -142,7 +149,7 @@ describe(pagination, () => {
   });
 
   it('should default to a startingPage of 1', () => {
-    const store = pagination(items, 5);
+    const store = pagination(oneHundredResolutions, 5);
 
     const { currentPage } = get(store);
 
@@ -150,7 +157,7 @@ describe(pagination, () => {
   });
 
   it('should increment the starting page when incremented', () => {
-    const store = pagination(items, 5);
+    const store = pagination(oneHundredResolutions, 5);
 
     store.next();
 
@@ -160,15 +167,15 @@ describe(pagination, () => {
   });
 
   it('should have the correct number of total pages', () => {
-    const store = pagination(items, 5);
+    const store = pagination(oneHundredResolutions, 5);
 
     const { totalPages } = get(store);
 
     expect(totalPages).toBe(20);
   });
 
-  it.only('should have the correct page when jumping to a page', () => {
-    const store = pagination(items, 5);
+  it('should have the correct page when jumping to a page', () => {
+    const store = pagination(oneHundredResolutions, 5);
 
     store.jumpToPage(10);
 
@@ -178,17 +185,17 @@ describe(pagination, () => {
   });
 
   it('should have the correct starting index when jumping to a page', () => {
-    const store = pagination(items, 5);
+    const store = pagination(oneHundredResolutions, 5);
 
     store.jumpToPage(2);
 
     const { startingIndex } = get(store);
 
-    expect(startingIndex).toBe(10);
+    expect(startingIndex).toBe(5);
   });
 
   it('should default to zero when jumping to a negative number', () => {
-    const store = pagination(items, 5);
+    const store = pagination(oneHundredResolutions, 5);
 
     store.jumpToPage(-20);
 
@@ -198,7 +205,7 @@ describe(pagination, () => {
   });
 
   it('should default to the last page when jumping to a page out of bounds', () => {
-    const store = pagination(items, 5);
+    const store = pagination(oneHundredResolutions, 5);
 
     store.jumpToPage(200);
 
@@ -208,7 +215,7 @@ describe(pagination, () => {
   });
 
   it('should allow you to set a custom key on initialization', () => {
-    const store = pagination(items, 5, 'numbers');
+    const store = pagination(oneHundredResolutions, 5, 'numbers');
 
     store.next();
 
@@ -218,7 +225,7 @@ describe(pagination, () => {
   });
 
   it('should allow you to find the index of an item', () => {
-    const store = pagination(items, 5, 'numbers');
+    const store = pagination(oneHundredResolutions, 5, 'numbers');
 
     const index = store.findIndex((i) => i === 5);
 
@@ -226,7 +233,7 @@ describe(pagination, () => {
   });
 
   it('should allow you to find the page of an item', () => {
-    const store = pagination(items, 5, 'numbers');
+    const store = pagination(oneHundredResolutions, 5, 'numbers');
 
     const page = store.findPage((i) => i === 6);
 
@@ -234,15 +241,21 @@ describe(pagination, () => {
   });
 
   it('should be able to jump to a page for a given index', () => {
-    const store = pagination(items, 5);
-
-    store.subscribe(console.log);
+    const store = pagination(oneHundredResolutions, 5);
 
     store.jumpToIndex(6);
 
     const { currentPage } = get(store);
 
     expect(currentPage).toBe(2);
+  });
+
+  it('should allow you set a custom key', () => {
+    const store = pagination(oneHundredResolutions, 5, 'numbers');
+
+    const result = get(store);
+
+    expect(result.numbers).toBeDefined();
   });
 });
 
@@ -254,6 +267,68 @@ describe(getPageForIndex, () => {
 
 describe(getTotalPages, () => {
   it('should correctly calculate the total number of pages', () => {
-    expect(getTotalPages(100, 20)).toBe(5);
+    expect(getTotalPages(20, oneHundredResolutions)).toBe(5);
+  });
+});
+
+describe(getIndex, () => {
+  it('should get the index if it is in the array', () => {
+    const things = ['first', 'second', 'third'];
+    expect(getIndex(2, things)).toBe(2);
+  });
+
+  it('should get the index of the last item of the last item in the array', () => {
+    const things = ['first', 'second', 'third'];
+    expect(getIndex(3, things)).toBe(2);
+  });
+
+  it('should return 0 if you give it an index less than 0', () => {
+    const things = ['first', 'second', 'third'];
+    expect(getIndex(-10, things)).toBe(0);
+  });
+
+  it('should return 0 if given NaN', () => {
+    const things = ['first', 'second', 'third'];
+    expect(getIndex(NaN, things)).toBe(0);
+  });
+});
+
+describe(getValidPage, () => {
+  it('should return 1 if given the first index of an array', () => {
+    expect(getValidPage(0, 20, oneHundredResolutions)).toBe(1);
+  });
+
+  it('should return 2 if given an index from the second page', () => {
+    expect(getValidPage(2, 20, oneHundredResolutions)).toBe(2);
+  });
+
+  it('should return the last page if given a page out of bounds', () => {
+    expect(getValidPage(10000, 20, oneHundredResolutions)).toBe(5);
+  });
+
+  it('should return 0 if given NaN', () => {
+    expect(getValidPage(NaN, 20, oneHundredResolutions)).toBe(0);
+  });
+});
+
+describe(getStartingIndexForPage, () => {
+  it('should return 0 for the first page', () => {
+    expect(getStartingIndexForPage(1, 20, oneHundredResolutions)).toBe(0);
+  });
+
+  it('should return the first index of the second page for the something on the second page', () => {
+    expect(getStartingIndexForPage(2, 20, oneHundredResolutions)).toBe(20);
+  });
+
+  it('should return the first index of the last page for the something out of bounds', () => {
+    expect(getStartingIndexForPage(100, 20, oneHundredResolutions)).toBe(80);
+  });
+
+  it('should return 0 if given a negative number for the page', () => {
+    expect(getStartingIndexForPage(-10, 20, oneHundredResolutions)).toBe(0);
+  });
+
+  it('should return 0 if given NaN', () => {
+    expect(getStartingIndexForPage(NaN, 20, oneHundredResolutions)).toBe(0);
   });
 });

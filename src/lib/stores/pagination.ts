@@ -4,16 +4,50 @@ export const getPageForIndex = (i: number, pageSize: number): number => {
   return Math.floor(i / pageSize) + 1;
 };
 
-export const getTotalPages = (
-  numberOfItems: number,
-  pageSize: number,
-): number => {
-  return Math.ceil(numberOfItems / pageSize);
+export const getStartingIndexForPage = (
+  page: number,
+  itemsPerPage: number,
+  items: ArrayLike<unknown>,
+) => {
+  if (isNaN(page)) return 0;
+
+  if (page <= 1) return 0;
+  if (page > getTotalPages(itemsPerPage, items))
+    return items.length - itemsPerPage;
+
+  return Math.floor(itemsPerPage * (page - 1));
 };
 
-export const getEndingIndex = (index: number, length: number): number => {
-  if (index < length) return index;
-  return length;
+export const getValidPage = (
+  page: number,
+  itemsPerPage: number,
+  items: ArrayLike<unknown>,
+) => {
+  if (isNaN(page)) return 0;
+  const lastPage = getTotalPages(itemsPerPage, items);
+
+  if (page <= 0) return 1;
+  if (page > lastPage) return lastPage;
+
+  return page;
+};
+
+export const getTotalPages = (
+  pageSize: number,
+  items: ArrayLike<unknown>,
+): number => {
+  return Math.ceil(items.length / pageSize);
+};
+
+export const getIndex = (index: number, things: ArrayLike<unknown>): number => {
+  if (isNaN(index)) return 0;
+  if (index < 0) return 0;
+  if (index < things.length) return index;
+  return things.length - 1;
+};
+
+export const outOfBounds = (index: number, things: ArrayLike<unknown>) => {
+  return index > things.length;
 };
 
 export const pagination = <T>(
@@ -30,34 +64,22 @@ export const pagination = <T>(
 
   const next = () => {
     index.update((index) => {
-      const nextStart = index + get(pageSize);
-      if (nextStart < items.length) {
-        return nextStart;
-      } else {
-        return index;
-      }
+      const nextIndex = index + get(pageSize);
+      if (outOfBounds(nextIndex, items)) return index;
+      return getIndex(nextIndex, items);
     });
   };
 
   const previous = () => {
     index.update((index) => {
       const nextStart = index - get(pageSize);
-      if (nextStart > 0) {
-        return nextStart;
-      } else {
-        return 0;
-      }
+      return getIndex(nextStart, items);
     });
   };
 
   const jumpToPage = (page: number) => {
     const itemsPerPage = get(pageSize);
-    const lastPage = getTotalPages(items.length, itemsPerPage);
-
-    if (page > lastPage) return index.set(lastPage * itemsPerPage - 1);
-    if (page < 0) return index.set(0);
-
-    return index.set(page * itemsPerPage - 1);
+    return index.set(getStartingIndexForPage(page, itemsPerPage, items));
   };
 
   const jumpToIndex = (i: number) => {
@@ -82,11 +104,11 @@ export const pagination = <T>(
       hasPrevious: $index - $pageSize >= 0,
       hasNext: $index + $pageSize < items.length,
       startingIndex: $index,
-      endingIndex: getEndingIndex($index + $pageSize, items.length),
+      endingIndex: getIndex($index + $pageSize, items),
       length: items.length,
       pageSize: $pageSize,
-      currentPage: Math.floor($index / $pageSize) + 1,
-      totalPages: Math.ceil(items.length / $pageSize),
+      currentPage: getPageForIndex($index, $pageSize),
+      totalPages: getTotalPages($pageSize, items),
     };
   });
 
