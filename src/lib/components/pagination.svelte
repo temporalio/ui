@@ -3,37 +3,29 @@
   import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 
   import { page } from '$app/stores';
+  import { pagination } from '$lib/stores/pagination';
 
   import FilterSelect from './select/filter-select.svelte';
 
-  type T = $$Generic<Array>;
+  type T = $$Generic<unknown>;
 
   export let key: string = null;
   export let options = ['25', '50', '100'];
-  export let items: T;
+  export let items: T[];
 
   const queryKey = key || 'per-page';
 
-  let pageNumber = 1;
-  let visibleItems: T = items.slice(0, 0);
+  $: perPage = $page.url.searchParams.get(queryKey);
 
-  $: queryKeyValue = $page.url.searchParams.get(queryKey);
-  $: perPage = queryKeyValue || '25';
-  $: pageRange = !isNaN(Number(perPage)) ? Math.abs(Number(perPage)) : 25;
-
-  $: previousEnabled = pageNumber > 1;
-  $: nextEnabled = pageNumber * pageRange < items.length;
-
-  $: startingIndex = pageRange * (pageNumber - 1);
-  $: endingIndex = Math.min(startingIndex + pageRange, items.length);
+  let store = pagination(items, perPage);
 
   $: {
-    visibleItems = items.slice(startingIndex, endingIndex);
+    store.adjustPageSize(perPage);
   }
 
   $: {
-    if (!options.includes(pageRange.toString())) {
-      options = [pageRange.toString(), ...options];
+    if (!options.includes(perPage.toString())) {
+      options = [perPage.toString(), ...options];
     }
   }
 </script>
@@ -45,29 +37,31 @@
       <FilterSelect
         label="Per Page"
         parameter={queryKey}
-        value={String(pageRange)}
+        value={perPage}
         {options}
       />
     </div>
     <div class="flex gap-6 items-center justify-center">
       <button
         class="caret"
-        disabled={!previousEnabled}
-        on:click={() => pageNumber--}
+        disabled={!$store.hasPrevious}
+        on:click={() => store.previous()}
       >
         <Icon icon={faAngleLeft} />
       </button>
-      <p>{startingIndex + 1}–{endingIndex} of {items.length}</p>
+      <p>
+        {$store.startingIndex + 1}–{$store.endingIndex} of {$store.length}
+      </p>
       <button
         class="caret"
-        disabled={!nextEnabled}
-        on:click={() => pageNumber++}
+        disabled={!$store.hasNext}
+        on:click={() => store.next()}
       >
         <Icon icon={faAngleRight} />
       </button>
     </div>
   </nav>
-  <slot {visibleItems} />
+  <slot visibleItems={$store.items} />
 </div>
 
 <style lang="postcss">

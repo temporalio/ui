@@ -11,12 +11,21 @@ export const getTotalPages = (
   return Math.ceil(numberOfItems / pageSize);
 };
 
-export const pagination = <T>(items: T[], perPage = 25, key = 'items') => {
-  const pageSize = writable(perPage);
+export const getEndingIndex = (index: number, length: number): number => {
+  if (index < length) return index;
+  return length;
+};
+
+export const pagination = <T>(
+  items: Readonly<T[]>,
+  perPage: number | string = 25,
+  key = 'items',
+) => {
+  const pageSize = writable(Number(perPage));
   const index = writable(0);
 
-  const adjustPageSize = (n: number) => {
-    pageSize.set(n);
+  const adjustPageSize = (n: number | string) => {
+    pageSize.set(Number(n));
   };
 
   const next = () => {
@@ -36,7 +45,7 @@ export const pagination = <T>(items: T[], perPage = 25, key = 'items') => {
       if (nextStart > 0) {
         return nextStart;
       } else {
-        return index;
+        return 0;
       }
     });
   };
@@ -73,7 +82,8 @@ export const pagination = <T>(items: T[], perPage = 25, key = 'items') => {
       hasPrevious: $index - $pageSize >= 0,
       hasNext: $index + $pageSize < items.length,
       startingIndex: $index,
-      endingIndex: $index + $pageSize,
+      endingIndex: getEndingIndex($index + $pageSize, items.length),
+      length: items.length,
       pageSize: $pageSize,
       currentPage: Math.floor($index / $pageSize) + 1,
       totalPages: Math.ceil(items.length / $pageSize),
