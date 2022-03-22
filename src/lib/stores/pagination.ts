@@ -1,11 +1,11 @@
 import { derived, writable, get } from 'svelte/store';
 
-type DefaultPaginationKey<T extends string = 'items'> = T;
+const options: string[] = ['100', '250', '500'];
 
-type PaginationOptions<K = DefaultPaginationKey> = Readonly<{
-  key?: K;
-  startingIndex?: number | string;
-}>;
+export const perPageOptions = (perPage: number | string) => {
+  const itemsPerPage = String(perPage);
+  return options.includes(itemsPerPage) ? options : [perPage, ...options];
+};
 
 export const getPageForIndex = (i: number, pageSize: number): number => {
   return Math.floor(i / pageSize) + 1;
@@ -23,6 +23,15 @@ export const getStartingIndexForPage = (
     return items.length - itemsPerPage;
 
   return Math.floor(itemsPerPage * (page - 1));
+};
+
+export const getNearestStartingIndex = (
+  index: number,
+  itemsPerPage: number,
+  items: ArrayLike<unknown>,
+) => {
+  const page = getPageForIndex(index, itemsPerPage);
+  return getStartingIndexForPage(page, itemsPerPage, items);
 };
 
 export const getValidPage = (
@@ -63,14 +72,18 @@ export const outOfBounds = (index: number, things: ArrayLike<unknown>) => {
  * Creates a Svelte store for viewing pages of a larger data set.
  */
 export const pagination = <T>(
-  items: Readonly<T[]>,
-  perPage: number | string = 25,
-  { startingIndex }: PaginationOptions = {
-    startingIndex: 0,
-  },
+  items: Readonly<T[]> = [],
+  perPage: number | string = 100,
+  startingIndex: string | number = 0,
 ) => {
+  const start = getNearestStartingIndex(
+    Number(startingIndex),
+    Number(perPage),
+    items,
+  );
+
   const pageSize = writable(Number(perPage));
-  const index = writable(getIndex(Number(startingIndex), items));
+  const index = writable(start);
 
   const adjustPageSize = (n: number | string) => {
     pageSize.set(Number(n));
@@ -91,13 +104,16 @@ export const pagination = <T>(
     });
   };
 
-  const jumpToPage = (page: number) => {
+  const jumpToPage = (page: number | string) => {
     const itemsPerPage = get(pageSize);
-    return index.set(getStartingIndexForPage(page, itemsPerPage, items));
+    return index.set(
+      getStartingIndexForPage(Number(page), itemsPerPage, items),
+    );
   };
 
-  const jumpToIndex = (i: number) => {
-    const page = getPageForIndex(i, get(pageSize));
+  const jumpToIndex = (i: number | string) => {
+    console.log({ i });
+    const page = getPageForIndex(Number(i), get(pageSize));
     jumpToPage(page);
   };
 

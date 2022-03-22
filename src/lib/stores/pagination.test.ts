@@ -241,7 +241,15 @@ describe(pagination, () => {
   });
 
   it('should allow you set a custom starting index', () => {
-    const store = pagination(oneHundredResolutions, 5, { startingIndex: 5 });
+    const store = pagination(oneHundredResolutions, 5, 5);
+
+    const { startingIndex } = get(store);
+
+    expect(startingIndex).toBe(5);
+  });
+
+  it('should fall back to the nearest page', () => {
+    const store = pagination(oneHundredResolutions, 5, 6);
 
     const { startingIndex } = get(store);
 

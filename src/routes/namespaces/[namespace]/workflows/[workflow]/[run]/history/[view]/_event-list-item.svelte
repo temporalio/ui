@@ -7,7 +7,7 @@
   import { isEventGroup } from '$lib/models/group-events';
   import { appendQueryParameters } from '$lib/utilities/append-query-parameters';
 
-  export let event: HistoryEventWithId | CompactEventGroup;
+  export let event: IterableEvent;
 
   const isActive = (currentId: string): boolean => {
     if (isEvent(event)) {

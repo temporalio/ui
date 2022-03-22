@@ -3,37 +3,20 @@
   import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 
   import { page } from '$app/stores';
-  import { pagination } from '$lib/stores/pagination';
+  import { pagination, perPageOptions } from '$lib/stores/pagination';
 
   import FilterSelect from './select/filter-select.svelte';
 
   type T = $$Generic;
 
-  interface $$Slots {
-    default: {
-      visibleItems: T[];
-    };
-  }
-
-  export let key: string = null;
-  export let options = ['25', '50', '100'];
+  export let key = 'per-page';
   export let items: T[];
+  export let startingIndex: string | number = null;
 
-  const queryKey = key || 'per-page';
-
-  $: perPage = $page.url.searchParams.get(queryKey);
-
-  let store = pagination<T>(items, perPage);
-
-  $: {
-    store.adjustPageSize(perPage);
-  }
-
-  $: {
-    if (!options.includes(perPage.toString())) {
-      options = [perPage.toString(), ...options];
-    }
-  }
+  $: perPage = $page.url.searchParams.get(key) || '100';
+  $: store = pagination(items, perPage);
+  $: store.adjustPageSize(perPage);
+  $: store.jumpToIndex(startingIndex);
 </script>
 
 <div class="flex flex-col gap-4">
@@ -42,9 +25,9 @@
       <p class="w-fit text-right">Per Page</p>
       <FilterSelect
         label="Per Page"
-        parameter={queryKey}
+        parameter={key}
         value={perPage}
-        {options}
+        options={perPageOptions(perPage)}
       />
     </div>
     <div class="flex gap-6 items-center justify-center">
@@ -56,7 +39,7 @@
         <Icon icon={faAngleLeft} />
       </button>
       <p>
-        {$store.startingIndex + 1}–{$store.endingIndex} of {$store.length}
+        {$store.startingIndex + 1}–{$store.endingIndex + 1} of {$store.length}
       </p>
       <button
         class="caret"
