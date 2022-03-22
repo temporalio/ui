@@ -1,15 +1,12 @@
-<script context="module" lang="ts">
-  import NamespaceSelect from '$lib/components/select/namespace-select.svelte';
-</script>
-
 <script lang="ts">
-  import { namespace } from '$lib/stores/namespace';
-  import DataConverterStatus from '$lib/components/data-converter-status.svelte';
-
-  import { user } from '$lib/stores/user';
   import { goto } from '$app/navigation';
+  import { namespace } from '$lib/stores/namespace';
 
+  import NamespaceSelect from '$lib/components/select/namespace-select.svelte';
+  import DataConverterStatus from '$lib/components/data-converter-status.svelte';
   import NavigationLink from './_navigation-link.svelte';
+
+  export let user: User;
 </script>
 
 <header
@@ -38,17 +35,17 @@
       href="https://github.com/temporalio/ui/issues/new/choose"
       target="_blank"
     >
-      Report Bug/Give Feedback
+      Give Feedback
     </a>
 
-    {#if $user?.email}
+    {#if user?.email}
       <button
         class="header-button min-w-min"
         on:click={() => goto(import.meta.env.VITE_API + '/auth/logout')}
       >
         Logout
         <img
-          src={$user.picture}
+          src={user.picture}
           alt="User Avatar"
           class="rounded-full h-6 w-6 ml-2.5"
         />

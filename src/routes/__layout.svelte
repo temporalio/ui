@@ -6,8 +6,8 @@
   import { notifications } from '$lib/stores/notifications';
   import { fetchSettings } from '$lib/services/settings-service';
 
-  import { loadUser } from '$lib/stores/user';
-  import { loadCluster } from '$lib/stores/cluster';
+  import { fetchUser } from '$lib/services/user-service';
+  import { fetchCluster } from '$lib/services/cluster-service';
 
   import type {
     DescribeNamespaceResponse,
@@ -40,17 +40,16 @@
 
   export const load: Load = async function ({ url }) {
     const settings: Settings = await fetchSettings({ url });
+
     const { namespaces }: ListNamespacesResponse = await loadNamespaces(
       settings,
     );
 
-    loadUser();
-    loadCluster(settings).catch(() =>
-      notifications.add('error', 'Unable to fetch cluster info'),
-    );
+    const user = await fetchUser();
+    const cluster = await fetchCluster(settings);
 
     return {
-      props: { namespaces },
+      props: { namespaces, user, cluster },
       stuff: { namespaces, settings },
     };
   };
@@ -63,6 +62,9 @@
   import Notifications from '$lib/components/notifications.svelte';
   import Banner from '$lib/components/banner.svelte';
   import { ErrorBoundary } from '$lib/components/error-boundary';
+
+  export let user: User;
+  export let cluster: ClusterInformation;
 
   export let namespaces: DescribeNamespaceResponse[];
 
@@ -83,8 +85,8 @@
 
 <main class="flex flex-col h-screen">
   <Notifications />
-  <Banner />
-  <Header />
+  <Banner {cluster} />
+  <Header {user} />
   <section id="content" class="h-full mx-10 mb-10 mt-8">
     <div class="flex flex-col h-full gap-4">
       <ErrorBoundary onError={() => {}}>
