@@ -1,9 +1,11 @@
 import { derived, writable, get } from 'svelte/store';
 
-type PaginationOptions = {
-  key?: string;
+type DefaultPaginationKey<T extends string = 'items'> = T;
+
+type PaginationOptions<K = DefaultPaginationKey> = Readonly<{
+  key?: K;
   startingIndex?: number | string;
-};
+}>;
 
 export const getPageForIndex = (i: number, pageSize: number): number => {
   return Math.floor(i / pageSize) + 1;
@@ -63,8 +65,7 @@ export const outOfBounds = (index: number, things: ArrayLike<unknown>) => {
 export const pagination = <T>(
   items: Readonly<T[]>,
   perPage: number | string = 25,
-  { key, startingIndex }: PaginationOptions = {
-    key: 'items',
+  { startingIndex }: PaginationOptions = {
     startingIndex: 0,
   },
 ) => {
@@ -113,7 +114,7 @@ export const pagination = <T>(
 
   const { subscribe } = derived([index, pageSize], ([$index, $pageSize]) => {
     return {
-      [key]: items.slice($index, $index + $pageSize),
+      items: items.slice($index, $index + $pageSize),
       hasPrevious: !outOfBounds($index - $pageSize, items),
       hasNext: !outOfBounds($index + $pageSize, items),
       startingIndex: $index,

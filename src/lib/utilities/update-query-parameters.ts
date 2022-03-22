@@ -1,6 +1,5 @@
 import { browser } from '$app/env';
 import type { goto, invalidate } from '$app/navigation';
-import { appendQueryParameters } from './append-query-parameters';
 
 type UpdateQueryParams = {
   parameter: string;

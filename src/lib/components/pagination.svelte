@@ -7,7 +7,13 @@
 
   import FilterSelect from './select/filter-select.svelte';
 
-  type T = $$Generic<unknown>;
+  type T = $$Generic;
+
+  interface $$Slots {
+    default: {
+      visibleItems: T[];
+    };
+  }
 
   export let key: string = null;
   export let options = ['25', '50', '100'];
@@ -17,7 +23,7 @@
 
   $: perPage = $page.url.searchParams.get(queryKey);
 
-  let store = pagination(items, perPage);
+  let store = pagination<T>(items, perPage);
 
   $: {
     store.adjustPageSize(perPage);

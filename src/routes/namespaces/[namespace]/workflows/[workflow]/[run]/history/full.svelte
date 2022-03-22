@@ -1,7 +1,7 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
 
-  export const load: Load = async function ({ stuff, url, params }) {
+  export const load: Load = async function ({ stuff }) {
     const { events } = stuff;
 
     return {
