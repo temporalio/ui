@@ -1,7 +1,8 @@
 import { browser } from '$app/env';
 import { page } from '$app/stores';
-import { namespaceUrlPattern } from '$lib/utilities/namespace-url-pattern';
 import { derived } from 'svelte/store';
+
+import { namespaceUrlPattern } from '$lib/utilities/namespace-url-pattern';
 
 const onlyInBrowser = <T>(fn: () => T): T => {
   if (browser) return fn();

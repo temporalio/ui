@@ -6,8 +6,8 @@
   import { notifications } from '$lib/stores/notifications';
   import { fetchSettings } from '$lib/services/settings-service';
 
-  import { loadUser } from '$lib/stores/user';
-  import { loadCluster } from '$lib/stores/cluster';
+  import { fetchUser } from '$lib/services/user-service';
+  import { fetchCluster } from '$lib/services/cluster-service';
 
   import type {
     DescribeNamespaceResponse,
@@ -20,8 +20,9 @@
     namespaces: [],
   };
 
-  async function loadNamespaces(
+  async function fetchNamespaces(
     settings: Settings,
+    request = fetch,
   ): Promise<ListNamespacesResponse> {
     if (settings.runtimeEnvironment.isCloud) {
       return Promise.resolve(emptyNamespace);
@@ -30,7 +31,7 @@
     const results = await requestFromAPI<ListNamespacesResponse>(
       routeForApi('namespaces'),
       {
-        request: fetch,
+        request,
         onError: () => notifications.add('error', 'Unable to fetch namespaces'),
       },
     );
@@ -38,19 +39,19 @@
     return results ?? Promise.resolve(emptyNamespace);
   }
 
-  export const load: Load = async function ({ url }) {
-    const settings: Settings = await fetchSettings({ url });
-    const { namespaces }: ListNamespacesResponse = await loadNamespaces(
+  export const load: Load = async function ({ url, fetch }) {
+    const settings: Settings = await fetchSettings({ url }, fetch);
+
+    const { namespaces }: ListNamespacesResponse = await fetchNamespaces(
       settings,
+      fetch,
     );
 
-    loadUser();
-    loadCluster(settings).catch(() =>
-      notifications.add('error', 'Unable to fetch cluster info'),
-    );
+    const user = await fetchUser(fetch);
+    const cluster = await fetchCluster(settings, fetch);
 
     return {
-      props: { namespaces },
+      props: { namespaces, user, cluster },
       stuff: { namespaces, settings },
     };
   };
@@ -63,6 +64,9 @@
   import Notifications from '$lib/components/notifications.svelte';
   import Banner from '$lib/components/banner.svelte';
   import { ErrorBoundary } from '$lib/components/error-boundary';
+
+  export let user: User;
+  export let cluster: ClusterInformation;
 
   export let namespaces: DescribeNamespaceResponse[];
 
@@ -83,8 +87,8 @@
 
 <main class="flex flex-col h-screen">
   <Notifications />
-  <Banner />
-  <Header />
+  <Banner {cluster} />
+  <Header {user} />
   <section id="content" class="h-full mx-10 mb-10 mt-8">
     <div class="flex flex-col h-full gap-4">
       <ErrorBoundary onError={() => {}}>

@@ -1,16 +1,17 @@
 <script lang="ts">
   import { closedBannerId, close } from '$lib/stores/banner';
-  import { cluster } from '$lib/stores/cluster';
+
+  export let cluster: ClusterInformation;
 
   const severities = {
     High: 'high',
     Medium: 'medium',
     Low: 'low',
-  };
+  } as const;
 
-  $: recommended = $cluster?.versionInfo?.recommended;
-  $: current = $cluster?.versionInfo?.current;
-  $: alert = $cluster?.versionInfo?.alerts?.[0];
+  $: recommended = cluster?.versionInfo?.recommended;
+  $: current = cluster?.versionInfo?.current;
+  $: alert = cluster?.versionInfo?.alerts?.[0];
   $: severity = alert ? severities[alert.severity] : severities.Low;
   $: show = current?.version && current.version != $closedBannerId;
   $: message =
@@ -22,8 +23,8 @@
 {#if show}
   <section class={`block leading-10 text-center ${severity}`}>
     <a
-      href="https://github.com/temporalio/temporal/releases/tag/v{$cluster
-        .versionInfo.current.version}"
+      href="https://github.com/temporalio/temporal/releases/tag/v{cluster
+        ?.versionInfo?.current?.version}"
       target="_blank"
     >
       {message}
