@@ -52,7 +52,9 @@ export const getIndex = (index: number, things: ArrayLike<unknown>): number => {
 };
 
 export const outOfBounds = (index: number, things: ArrayLike<unknown>) => {
-  return index > things.length;
+  if (index > things.length) return true;
+  if (index < 0) return true;
+  return false;
 };
 
 export const pagination = <T>(
@@ -109,8 +111,8 @@ export const pagination = <T>(
   const { subscribe } = derived([index, pageSize], ([$index, $pageSize]) => {
     return {
       [key]: items.slice($index, $index + $pageSize),
-      hasPrevious: $index - $pageSize >= 0,
-      hasNext: $index + $pageSize < items.length,
+      hasPrevious: !outOfBounds($index - $pageSize, items),
+      hasNext: !outOfBounds($index + $pageSize, items),
       startingIndex: $index,
       endingIndex: getIndex($index + $pageSize, items),
       length: items.length,
