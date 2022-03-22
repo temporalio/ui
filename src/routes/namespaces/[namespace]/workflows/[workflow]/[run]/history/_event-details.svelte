@@ -18,7 +18,7 @@
   {#each Object.entries(event.attributes) as [key, value] (key)}
     {#if shouldDisplay(key, value)}
       <article
-        class="flex w-full border-b-2 py-2 last:border-b-0 border-gray-200 {$$props.class}"
+        class="flex w-full border-b-2 py-2 last:border-b-0 border-gray-200 first:pt-0 {$$props.class}"
       >
         <h4 class="w-96 flex-grow">{format(key)}</h4>
         <div class="flex-grow w-full">
