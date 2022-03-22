@@ -7,7 +7,7 @@
     High: 'high',
     Medium: 'medium',
     Low: 'low',
-  };
+  } as const;
 
   $: recommended = cluster?.versionInfo?.recommended;
   $: current = cluster?.versionInfo?.current;
