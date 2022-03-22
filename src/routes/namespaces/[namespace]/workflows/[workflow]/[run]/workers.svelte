@@ -30,7 +30,7 @@
 
 <section class="flex flex-col gap-4">
   <h3 class="text-lg font-medium">Task Queue: {taskQueue}</h3>
-  {#each workers.pollers as poller}
+  {#each workers.pollers as poller (poller.identity)}
     <section class="flex flex-col border-2 border-gray-300 w-full rounded-lg">
       <div class="bg-gray-200 flex flex-row p-2">
         <div class="w-3/12 text-left">ID</div>

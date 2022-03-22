@@ -4,7 +4,6 @@
 
   import type { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 
-  import { appendQueryParameters } from '$lib/utilities/append-query-parameters';
   import { getAppContext } from '$lib/utilities/get-context';
 
   export let icon: IconDefinition;
@@ -19,7 +18,7 @@
   class:rounded-lg={!group}
   class:active={$page.url.pathname.includes(base)}
   class:group
-  href={appendQueryParameters(href, $page.url.searchParams)}
+  href={href + $page.url.search}
   on:click
 >
   {#if icon}

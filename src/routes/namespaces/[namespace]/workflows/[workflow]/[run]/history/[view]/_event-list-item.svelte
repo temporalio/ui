@@ -5,7 +5,6 @@
   import { page } from '$app/stores';
   import { isEvent } from '$lib/models/event-history';
   import { isEventGroup } from '$lib/models/group-events';
-  import { appendQueryParameters } from '$lib/utilities/append-query-parameters';
 
   export let event: IterableEvent;
 
@@ -18,14 +17,10 @@
       return event.eventIds.has(currentId);
     }
   };
-
-  $: href = $page.params.eventId
-    ? event.id
-    : `${$page.url.pathname}/${event.id}`;
 </script>
 
 <a
-  href={appendQueryParameters(href, $page.url.searchParams)}
+  href={event.id + $page.url.search}
   sveltekit:noscroll
   class="flex border-b-2 border-gray-300 w-full items-center hover:bg-gray-50"
   class:active={isActive($page.params.eventId)}

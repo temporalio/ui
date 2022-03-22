@@ -78,7 +78,7 @@
         {/each}
       </FilterSelect>
       <FilterSelect label="Workflow Status" parameter="status" value={null}>
-        {#each Object.entries(statuses) as [label, value]}
+        {#each Object.entries(statuses) as [label, value] (label)}
           <Option {value}>{label}</Option>
         {/each}
       </FilterSelect>
