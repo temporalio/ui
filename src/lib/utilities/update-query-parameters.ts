@@ -20,8 +20,6 @@ export const updateQueryParameters = async ({
   const current = url.searchParams.get(parameter);
   const next = String(value);
 
-  if (current === next) return;
-
   if (value) {
     url.searchParams.set(parameter, next);
   } else {
