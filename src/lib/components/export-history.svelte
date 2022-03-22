@@ -14,7 +14,7 @@
       runId,
     });
 
-    const content = JSON.stringify(events, null, 2);
+    const content = JSON.stringify({ events }, null, 2);
     download(content, `${runId}/events.json`, 'text/plain');
 
     function download(content: string, fileName: string, contentType: string) {
