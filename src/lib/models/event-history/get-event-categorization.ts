@@ -70,7 +70,7 @@ export const isCategoryType = (value: string): value is EventTypeCategory => {
 };
 
 export const getEventsInCategory = (
-  events: IterableEvents,
+  events: HistoryEventWithId[],
   category: string,
 ) => {
   if (!isCategoryType(category)) return events;

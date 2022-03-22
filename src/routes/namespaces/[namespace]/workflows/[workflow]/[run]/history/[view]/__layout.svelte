@@ -10,7 +10,7 @@
     const events = getEventsInCategory(stuff.events, category);
     const eventGroups = getEventsInCategory(stuff.eventGroups, category);
 
-    let items: IterableEvents;
+    let items: HistoryEventWithId[] | CompactEventGroups;
 
     if (params.view === 'summary') items = events;
     if (params.view === 'compact') items = eventGroups;
