@@ -8,6 +8,7 @@
   export let destroy: boolean = false;
   export let loading: boolean = false;
   export let login: boolean = false;
+  export let thin: boolean = false;
   export let as: 'button' | 'anchor' = 'button';
   export let active: boolean = false;
   export let large: boolean = false;
@@ -25,6 +26,7 @@
     class:secondary
     class:destroy
     class:login
+    class:thin
     {disabled}
   >
     {#if icon}
@@ -45,6 +47,7 @@
     class:destroy
     class:disabled
     class:login
+    class:thin
     {disabled}
   >
     {#if icon}
@@ -74,7 +77,7 @@
   }
 
   .secondary {
-    @apply text-white bg-secondary border-2 rounded-lg px-2 transition-colors;
+    @apply text-gray-800 bg-white border-2 rounded-lg py-2 px-4 transition-colors;
   }
 
   .secondary:disabled {
@@ -86,7 +89,7 @@
   }
 
   .destroy {
-    @apply text-white bg-danger border-2 rounded-lg py-1 px-5 transition-colors;
+    @apply text-white bg-danger border-2 rounded-lg px-5 transition-colors;
   }
 
   .destroy:disabled {
@@ -103,5 +106,9 @@
 
   .login {
     @apply bg-gray-900 mx-auto py-4;
+  }
+
+  .thin {
+    @apply py-1;
   }
 </style>
