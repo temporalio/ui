@@ -38,7 +38,6 @@
     faBars,
     faCode,
     faLayerGroup,
-    faStream,
     faTable,
   } from '@fortawesome/free-solid-svg-icons';
 

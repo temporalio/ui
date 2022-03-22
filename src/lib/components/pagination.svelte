@@ -3,39 +3,20 @@
   import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 
   import { page } from '$app/stores';
+  import { pagination, perPageOptions } from '$lib/stores/pagination';
 
   import FilterSelect from './select/filter-select.svelte';
 
-  type T = $$Generic<Array>;
+  type T = $$Generic;
 
-  export let key: string = null;
-  export let options = ['25', '50', '100'];
-  export let items: T;
+  export let key = 'per-page';
+  export let items: T[];
+  export let startingIndex: string | number = null;
 
-  const queryKey = key || 'per-page';
-
-  let pageNumber = 1;
-  let visibleItems: T = items.slice(0, 0);
-
-  $: queryKeyValue = $page.url.searchParams.get(queryKey);
-  $: perPage = queryKeyValue || '25';
-  $: pageRange = !isNaN(Number(perPage)) ? Math.abs(Number(perPage)) : 25;
-
-  $: previousEnabled = pageNumber > 1;
-  $: nextEnabled = pageNumber * pageRange < items.length;
-
-  $: startingIndex = pageRange * (pageNumber - 1);
-  $: endingIndex = Math.min(startingIndex + pageRange, items.length);
-
-  $: {
-    visibleItems = items.slice(startingIndex, endingIndex);
-  }
-
-  $: {
-    if (!options.includes(pageRange.toString())) {
-      options = [pageRange.toString(), ...options];
-    }
-  }
+  $: perPage = $page.url.searchParams.get(key) || '100';
+  $: store = pagination(items, perPage);
+  $: store.adjustPageSize(perPage);
+  $: store.jumpToIndex(startingIndex);
 </script>
 
 <div class="flex flex-col gap-4">
@@ -44,30 +25,32 @@
       <p class="w-fit text-right">Per Page</p>
       <FilterSelect
         label="Per Page"
-        parameter={queryKey}
-        value={String(pageRange)}
-        {options}
+        parameter={key}
+        value={perPage}
+        options={perPageOptions(perPage)}
       />
     </div>
     <div class="flex gap-6 items-center justify-center">
       <button
         class="caret"
-        disabled={!previousEnabled}
-        on:click={() => pageNumber--}
+        disabled={!$store.hasPrevious}
+        on:click={() => store.previous()}
       >
         <Icon icon={faAngleLeft} />
       </button>
-      <p>{startingIndex + 1}–{endingIndex} of {items.length}</p>
+      <p>
+        {$store.startingIndex + 1}–{$store.endingIndex + 1} of {$store.length}
+      </p>
       <button
         class="caret"
-        disabled={!nextEnabled}
-        on:click={() => pageNumber++}
+        disabled={!$store.hasNext}
+        on:click={() => store.next()}
       >
         <Icon icon={faAngleRight} />
       </button>
     </div>
   </nav>
-  <slot {visibleItems} />
+  <slot visibleItems={$store.items} />
 </div>
 
 <style lang="postcss">

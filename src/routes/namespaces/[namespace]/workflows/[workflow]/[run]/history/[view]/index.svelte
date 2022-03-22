@@ -4,7 +4,7 @@
   export const load: Load = async function ({ url, params, stuff }) {
     const { matchingEvents, matchingEventGroups } = stuff;
 
-    let items: HistoryEventWithId[] | CompactEventGroups;
+    let items: IterableEvents;
 
     if (params.view === 'summary') items = matchingEvents;
     if (params.view === 'compact') items = matchingEventGroups;
