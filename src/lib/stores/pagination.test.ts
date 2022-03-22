@@ -67,7 +67,7 @@ describe(pagination, () => {
     const store = pagination(oneHundredResolutions, 5);
     const { endingIndex } = get(store);
 
-    expect(endingIndex).toBe(5);
+    expect(endingIndex).toBe(4);
   });
 
   it('should increment the startingIndex by the pageSize', () => {
@@ -83,7 +83,7 @@ describe(pagination, () => {
     store.next();
     const { endingIndex } = get(store);
 
-    expect(endingIndex).toBe(10);
+    expect(endingIndex).toBe(9);
   });
 
   it('should decrement the startingIndex by the page size', () => {
@@ -107,7 +107,7 @@ describe(pagination, () => {
 
     const { endingIndex } = get(store);
 
-    expect(endingIndex).toBe(10);
+    expect(endingIndex).toBe(9);
   });
 
   it('should not decrement the starting position if at the beginning', () => {

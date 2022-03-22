@@ -63,7 +63,7 @@ export const getIndex = (index: number, things: ArrayLike<unknown>): number => {
 };
 
 export const outOfBounds = (index: number, things: ArrayLike<unknown>) => {
-  if (index > things.length) return true;
+  if (index >= things.length) return true;
   if (index < 0) return true;
   return false;
 };
@@ -112,7 +112,6 @@ export const pagination = <T>(
   };
 
   const jumpToIndex = (i: number | string) => {
-    console.log({ i });
     const page = getPageForIndex(Number(i), get(pageSize));
     jumpToPage(page);
   };
@@ -134,7 +133,7 @@ export const pagination = <T>(
       hasPrevious: !outOfBounds($index - $pageSize, items),
       hasNext: !outOfBounds($index + $pageSize, items),
       startingIndex: $index,
-      endingIndex: getIndex($index + $pageSize, items),
+      endingIndex: getIndex($index + $pageSize - 1, items),
       length: items.length,
       pageSize: $pageSize,
       currentPage: getPageForIndex($index, $pageSize),
