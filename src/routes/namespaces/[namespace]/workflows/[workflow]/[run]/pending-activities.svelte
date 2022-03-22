@@ -14,7 +14,7 @@
       <h3>Pending Activities</h3>
     </header>
     <div>
-      {#each pendingActivities as { id, activityId, ...details }}
+      {#each pendingActivities as { id, activityId, ...details } (id)}
         <article class="flex gap-4">
           <div {id} class="p-4">
             <a href="#{id}" class="block py-1">{activityId}</a>

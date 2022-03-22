@@ -54,7 +54,6 @@
 
 <script lang="ts">
   import { page } from '$app/stores';
-  import { appendQueryParameters } from '$lib/utilities/append-query-parameters';
 
   import EventDetails from '../_event-details.svelte';
 
@@ -66,11 +65,11 @@
   {#if eventGroup}
     <nav class="flex flex-col mb-4">
       <ul class="flex gap-4 w-full items-start">
-        {#each [...eventGroup.events] as [id, eventInGroup]}
+        {#each [...eventGroup.events] as [id, eventInGroup] (id)}
           <li>
             <a
               sveltekit:noscroll
-              href={appendQueryParameters(id, $page.url.searchParams)}
+              href={id + $page.url.search}
               class:active={id === event.id}
               class="border-b-2 border-blue-600"
             >
