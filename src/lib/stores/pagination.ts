@@ -57,6 +57,9 @@ export const outOfBounds = (index: number, things: ArrayLike<unknown>) => {
   return false;
 };
 
+/**
+ * Creates a Svelte store for viewing pages of a larger data set.
+ */
 export const pagination = <T>(
   items: Readonly<T[]>,
   perPage: number | string = 25,
@@ -66,7 +69,7 @@ export const pagination = <T>(
   },
 ) => {
   const pageSize = writable(Number(perPage));
-  const index = writable(Number(startingIndex || 0));
+  const index = writable(getIndex(Number(startingIndex), items));
 
   const adjustPageSize = (n: number | string) => {
     pageSize.set(Number(n));
