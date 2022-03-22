@@ -6,7 +6,7 @@
   import { isEvent } from '$lib/models/event-history';
   import { isEventGroup } from '$lib/models/group-events';
 
-  export let event: HistoryEventWithId | CompactEventGroup;
+  export let event: IterableEvent;
 
   const isActive = (currentId: string): boolean => {
     if (isEvent(event)) {

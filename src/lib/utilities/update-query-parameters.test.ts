@@ -7,7 +7,7 @@ describe(updateQueryParameters, () => {
   it('should call the set method on the query when a value is provided', () => {
     const parameter = 'parameter';
     const value = 'value';
-    const goto = () => Promise.resolve(true);
+    const goto = () => Promise.resolve();
 
     const spy = jest.spyOn(url.searchParams, 'set');
 
@@ -19,7 +19,7 @@ describe(updateQueryParameters, () => {
 
   it('should call the delete method on the query when no value is provided', () => {
     const parameter = 'parameter';
-    const goto = () => Promise.resolve(true);
+    const goto = () => Promise.resolve();
 
     const spy = jest.spyOn(url.searchParams, 'delete');
 
@@ -32,7 +32,7 @@ describe(updateQueryParameters, () => {
   it('should call the delete method on the query when an empty string is provided', () => {
     const parameter = 'parameter';
     const value = '';
-    const goto = () => Promise.resolve(true);
+    const goto = () => Promise.resolve();
 
     const spy = jest.spyOn(url.searchParams, 'delete');
 
@@ -45,7 +45,7 @@ describe(updateQueryParameters, () => {
   it('should call the delete method on the query when null is provided', () => {
     const parameter = 'parameter';
     const value = null;
-    const goto = () => Promise.resolve(true);
+    const goto = () => Promise.resolve();
 
     const spy = jest.spyOn(url.searchParams, 'delete');
 
@@ -67,13 +67,13 @@ describe(updateQueryParameters, () => {
 
   it('should call `goto` with the correct path when query paramters already exist', () => {
     const parameter = 'parameter';
-    const value = 'value';
+    const value = 'newvalue';
     const goto = jest.fn().mockReturnValue(Promise.resolve(null));
 
     updateQueryParameters({ parameter, value, url, goto });
 
     expect(goto).toHaveBeenCalledWith(
-      'https://temporal.io/?parameter=value',
+      'https://temporal.io/?parameter=newvalue',
       gotoOptions,
     );
   });

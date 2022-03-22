@@ -165,3 +165,6 @@ type FetchEventsResponse = {
   events: HistoryEventWithId[];
   eventGroups: CompactEventGroups;
 };
+
+type IterableEvent = HistoryEventWithId | CompactEventGroup;
+type IterableEvents = IterableEvent[];
