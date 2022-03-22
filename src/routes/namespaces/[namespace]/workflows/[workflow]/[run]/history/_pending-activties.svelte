@@ -19,7 +19,7 @@
   <section class="border-2 border-gray-300 rounded-lg p-4">
     <h3 class="text-lg font-medium mb-4">Pending Activities</h3>
     <section class="w-full table-auto space-x-4">
-      {#each pendingActivities as { id, ...pendingActivity }}
+      {#each pendingActivities as { id, ...pendingActivity } (id)}
         <a
           class="flex content-between w-full border-b-2 border-gray-300 p-2 last-of-type:border-b-0 hover:bg-gray-50"
           {href}

@@ -26,7 +26,7 @@
     <h3 class="w-2/12">Date & Time</h3>
     <h3 class="w-3/4">Event Details</h3>
   </header>
-  {#each events as event}
+  {#each events as event (event.id)}
     <article class="table-row" id={event.id}>
       <p class="w-1/12"><a href="#{event.id}">{event.id}</a></p>
       <p class="w-2/12">{formatDate(event.eventTime)}</p>
