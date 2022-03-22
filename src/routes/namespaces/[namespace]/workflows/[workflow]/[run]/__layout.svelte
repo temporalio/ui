@@ -3,7 +3,7 @@
 
   import { fetchWorkflow } from '$lib/services/workflow-service';
 
-  export const load: Load = async function ({ params }) {
+  export const load: Load = async function ({ params, fetch }) {
     const { workflow: executionId, run: runId, namespace } = params;
 
     const parameters = {

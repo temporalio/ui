@@ -20,8 +20,9 @@
     namespaces: [],
   };
 
-  async function loadNamespaces(
+  async function fetchNamespaces(
     settings: Settings,
+    request = fetch,
   ): Promise<ListNamespacesResponse> {
     if (settings.runtimeEnvironment.isCloud) {
       return Promise.resolve(emptyNamespace);
@@ -30,7 +31,7 @@
     const results = await requestFromAPI<ListNamespacesResponse>(
       routeForApi('namespaces'),
       {
-        request: fetch,
+        request,
         onError: () => notifications.add('error', 'Unable to fetch namespaces'),
       },
     );
@@ -38,15 +39,16 @@
     return results ?? Promise.resolve(emptyNamespace);
   }
 
-  export const load: Load = async function ({ url }) {
-    const settings: Settings = await fetchSettings({ url });
+  export const load: Load = async function ({ url, fetch }) {
+    const settings: Settings = await fetchSettings({ url }, fetch);
 
-    const { namespaces }: ListNamespacesResponse = await loadNamespaces(
+    const { namespaces }: ListNamespacesResponse = await fetchNamespaces(
       settings,
+      fetch,
     );
 
-    const user = await fetchUser();
-    const cluster = await fetchCluster(settings);
+    const user = await fetchUser(fetch);
+    const cluster = await fetchCluster(settings, fetch);
 
     return {
       props: { namespaces, user, cluster },

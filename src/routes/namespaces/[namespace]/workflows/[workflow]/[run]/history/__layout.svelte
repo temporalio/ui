@@ -7,7 +7,7 @@
 
   import { fetchEvents } from '$lib/services/events-service';
 
-  export const load: Load = async function ({ params, stuff }) {
+  export const load: Load = async function ({ params, stuff, fetch }) {
     const { workflow } = stuff;
     const { namespace } = params;
     const parameters = {
@@ -16,7 +16,7 @@
       runId: workflow.runId,
     };
 
-    const { events, eventGroups } = await fetchEvents(parameters);
+    const { events, eventGroups } = await fetchEvents(parameters, fetch);
 
     return {
       props: {

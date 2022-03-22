@@ -8,13 +8,12 @@ const isCloudMatch = /tmprl\.cloud$/;
 
 interface FetchSettingsInterface {
   url: URL;
-  request?: typeof fetch;
 }
 
-export const fetchSettings = async ({
-  url,
+export const fetchSettings = async (
+  { url }: FetchSettingsInterface,
   request = fetch,
-}: FetchSettingsInterface): Promise<Settings> => {
+): Promise<Settings> => {
   const settings: SettingsResponse = await requestFromAPI(
     routeForApi('settings'),
     { request },

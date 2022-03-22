@@ -17,10 +17,7 @@ export const updateQueryParameters = async ({
   url,
   goto,
 }: UpdateQueryParams): Promise<typeof value> => {
-  const current = url.searchParams.get(parameter);
   const next = String(value);
-
-  if (current === next) return;
 
   if (value) {
     url.searchParams.set(parameter, next);
