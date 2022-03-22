@@ -42,10 +42,12 @@
   } from '@fortawesome/free-solid-svg-icons';
 
   import { page } from '$app/stores';
+  import { dev } from '$app/env';
   import { routeForEventHistory } from '$lib/utilities/route-for';
   import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
 
   import ExportHistory from '$lib/components/export-history.svelte';
+  import ImportHistory from '$lib/components/import-history.svelte'
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
@@ -100,6 +102,9 @@
           >
         </ToggleButtons>
         <ExportHistory />
+        {#if dev}
+          <ImportHistory />
+        {/if}
       </div>
     </nav>
     <slot />
