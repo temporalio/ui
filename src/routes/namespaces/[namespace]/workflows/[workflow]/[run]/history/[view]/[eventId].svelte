@@ -57,6 +57,7 @@
   import { appendQueryParameters } from '$lib/utilities/append-query-parameters';
 
   import EventDetails from '../_event-details.svelte';
+  import Link from '$lib/components/link.svelte';
 
   export let event: HistoryEventWithId;
   export let eventGroup: CompactEventGroup;
@@ -68,14 +69,13 @@
       <ul class="flex gap-4 w-full items-start">
         {#each [...eventGroup.events] as [id, eventInGroup]}
           <li>
-            <a
+            <Link
               sveltekit:noscroll
               href={appendQueryParameters(id, $page.url.searchParams)}
-              class:active={id === event.id}
-              class="border-b-2 border-blue-600"
+              active={id === event.id}
             >
               {eventInGroup.eventType}
-            </a>
+            </Link>
           </li>
         {/each}
       </ul>
@@ -84,9 +84,3 @@
 
   <EventDetails {event} />
 </section>
-
-<style lang="postcss">
-  .active {
-    @apply text-blue-700 border-b-2 border-blue-600;
-  }
-</style>

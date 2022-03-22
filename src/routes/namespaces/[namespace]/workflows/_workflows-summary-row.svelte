@@ -5,6 +5,8 @@
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import { routeForWorkflow } from '$lib/utilities/route-for';
 
+  import Link from '$lib/components/link.svelte';
+
   export let workflow: WorkflowExecution;
   export let timeFormat: TimeFormat;
 
@@ -22,11 +24,11 @@
     </div>
   </div>
   <div class="cell links font-medium md:font-normal">
-    <a {href} class="underline">{workflow.id}</a>
+    <Link {href}>{workflow.id}</Link>
   </div>
   <div class="cell links">
     <h3>
-      <a {href} class="underline">{workflow.name}</a>
+      <Link {href}>{workflow.name}</Link>
     </h3>
   </div>
   <div class="inline-block  cell">
@@ -53,9 +55,5 @@
 
   .row:hover {
     @apply bg-gray-50;
-  }
-
-  .row:hover .links {
-    @apply underline text-blue-500;
   }
 </style>

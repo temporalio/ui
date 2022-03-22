@@ -4,6 +4,7 @@
 
   import { formatDate } from '$lib/utilities/format-date';
   import { routeForPendingActivities } from '$lib/utilities/route-for';
+  import Link from '$lib/components/link.svelte';
 
   const { pendingActivities } = $page.stuff.workflow;
   const { namespace, workflow, run } = $page.params;
@@ -55,7 +56,7 @@
       {/each}
     </section>
     <div class="text-right">
-      <a {href} class="border-b-2 border-blue-600"> Show all </a>
+      <Link {href}>Show all</Link>
     </div>
   </section>
 {/if}
