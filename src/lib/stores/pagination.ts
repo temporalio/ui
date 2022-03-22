@@ -1,5 +1,10 @@
 import { derived, writable, get } from 'svelte/store';
 
+type PaginationOptions = {
+  key?: string;
+  startingIndex?: number | string;
+};
+
 export const getPageForIndex = (i: number, pageSize: number): number => {
   return Math.floor(i / pageSize) + 1;
 };
@@ -53,10 +58,13 @@ export const outOfBounds = (index: number, things: ArrayLike<unknown>) => {
 export const pagination = <T>(
   items: Readonly<T[]>,
   perPage: number | string = 25,
-  key = 'items',
+  { key, startingIndex }: PaginationOptions = {
+    key: 'items',
+    startingIndex: 0,
+  },
 ) => {
   const pageSize = writable(Number(perPage));
-  const index = writable(0);
+  const index = writable(Number(startingIndex || 0));
 
   const adjustPageSize = (n: number | string) => {
     pageSize.set(Number(n));

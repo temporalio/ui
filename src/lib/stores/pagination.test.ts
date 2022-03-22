@@ -215,7 +215,7 @@ describe(pagination, () => {
   });
 
   it('should allow you to set a custom key on initialization', () => {
-    const store = pagination(oneHundredResolutions, 5, 'numbers');
+    const store = pagination(oneHundredResolutions, 5, { key: 'numbers' });
 
     store.next();
 
@@ -225,7 +225,7 @@ describe(pagination, () => {
   });
 
   it('should allow you to find the index of an item', () => {
-    const store = pagination(oneHundredResolutions, 5, 'numbers');
+    const store = pagination(oneHundredResolutions, 5, { key: 'numbers' });
 
     const index = store.findIndex((i) => i === 5);
 
@@ -233,7 +233,7 @@ describe(pagination, () => {
   });
 
   it('should allow you to find the page of an item', () => {
-    const store = pagination(oneHundredResolutions, 5, 'numbers');
+    const store = pagination(oneHundredResolutions, 5, { key: 'numbers' });
 
     const page = store.findPage((i) => i === 6);
 
@@ -251,11 +251,19 @@ describe(pagination, () => {
   });
 
   it('should allow you set a custom key', () => {
-    const store = pagination(oneHundredResolutions, 5, 'numbers');
+    const store = pagination(oneHundredResolutions, 5, { key: 'numbers' });
 
     const result = get(store);
 
     expect(result.numbers).toBeDefined();
+  });
+
+  it('should allow you set a custom starting index', () => {
+    const store = pagination(oneHundredResolutions, 5, { startingIndex: 5 });
+
+    const { startingIndex } = get(store);
+
+    expect(startingIndex).toBe(5);
   });
 });
 
