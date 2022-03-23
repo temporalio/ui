@@ -26,7 +26,12 @@
 </script>
 
 <div class="w-full">
-  <Select dark bind:value={selectedNamespace} on:change={switchNamespaces}>
+  <Select
+    dark
+    bind:value={selectedNamespace}
+    on:change={switchNamespaces}
+    id="namespace-select"
+  >
     {#if isCloud}
       <Option value={selectedNamespace}>{selectedNamespace}</Option>
     {:else}
