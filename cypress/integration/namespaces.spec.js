@@ -12,6 +12,11 @@ describe('Redirect to Workflow Exections', () => {
       for (const url of urls) {
         it(`should redirect from "${url}" to "/namespaces/${namespace}/workflows"`, () => {
           cy.visit(url);
+
+          cy.wait('@namespaces-api');
+          cy.wait('@settings-api');
+          cy.wait('@workflows-api');
+
           cy.url().should('include', `/namespaces/${namespace}/workflows`);
         });
       }
@@ -33,7 +38,7 @@ describe('Namespace Select', () => {
       })
       .as('namespaces');
 
-    cy.wait('@list-workflows-api');
+    cy.wait('@workflows-api');
     cy.wait('@namespaces-api');
 
     cy.get('#namespace-select').as('select');

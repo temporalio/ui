@@ -34,7 +34,7 @@ Cypress.Commands.add(
     cy.intercept(
       Cypress.env('VITE_API_HOST') + `/api/v1/namespaces/*/workflows?query=*`,
       { fixture: 'workflows.json' },
-    ).as('list-workflows-api');
+    ).as('workflows-api');
 
     cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/cluster*', {
       fixture: 'cluster.json',

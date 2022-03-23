@@ -16,7 +16,7 @@ describe('Workflow Executions List', () => {
 
     cy.visit('/namespaces/default/workflows');
 
-    cy.wait('@list-workflows-api');
+    cy.wait('@workflows-api');
     cy.wait('@namespaces-api');
   });
 
@@ -46,7 +46,7 @@ describe('Workflow Executions List', () => {
 
       cy.url().should('contain', 'workflow-type=ImportantWorkflowType');
 
-      cy.wait('@list-workflows-api').then((interception) => {
+      cy.wait('@workflows-api').then((interception) => {
         expect(interception.request.url).to.contain(result);
       });
     });
@@ -58,7 +58,7 @@ describe('Workflow Executions List', () => {
 
       cy.url().should('contain', 'workflow-id=002c98_Running');
 
-      cy.wait('@list-workflows-api').then((interception) => {
+      cy.wait('@workflows-api').then((interception) => {
         expect(interception.request.url).to.contain(result);
       });
     });
@@ -75,7 +75,7 @@ describe('Workflow Executions List', () => {
 
         cy.get('#status-filter').should('have.value', status);
 
-        cy.wait('@list-workflows-api').then((interception) => {
+        cy.wait('@workflows-api').then((interception) => {
           expect(interception.request.url).to.contain(
             encodeURIComponent(`ExecutionStatus="${status}"`),
           );
