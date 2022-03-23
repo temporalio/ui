@@ -32,8 +32,6 @@
 </script>
 
 <script lang="ts">
-  import { setContext } from 'svelte';
-
   import Header from './_header.svelte';
   import Notifications from '$lib/components/notifications.svelte';
   import Banner from '$lib/components/banner.svelte';

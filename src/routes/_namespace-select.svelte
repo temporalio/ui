@@ -14,7 +14,7 @@
   let selectedNamespace =
     $page.params.namespace || $page.stuff?.settings?.defaultNamespace;
 
-  let namespaces = $page.stuff.namespaces
+  let namespaces = ($page.stuff.namespaces || [])
     .map((namespace: Namespace) => namespace?.namespaceInfo?.name)
     .filter((namespace: string) => namespace !== 'temporal-system');
 
