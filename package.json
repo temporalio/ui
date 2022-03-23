@@ -21,7 +21,7 @@
     "lint": "prettier --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
     "format": "prettier --write --plugin-search-dir=. .",
     "cypress": "concurrently \"npm run dev:test\" \"cypress open\"",
-    "cypress:run": "cypress run"
+    "cypress:run": "cypress run --record --key a8f28ac3-1d2f-4a6c-8867-5efd1a7e4dd2"
   },
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
