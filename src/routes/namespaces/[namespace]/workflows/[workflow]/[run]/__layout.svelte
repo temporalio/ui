@@ -4,7 +4,7 @@
 
   export const load: Load = async function ({ params, fetch }) {
     const url = routeForWorkflow({ ...params, endpoint: 'workflow.json' });
-    const { workflow, namespace } = await fetch(url).then((r) => r.json())
+    const { workflow, namespace } = await fetch(url).then((r) => r.json());
 
     return {
       props: { workflow, namespace },

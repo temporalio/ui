@@ -17,7 +17,10 @@ export const isEventView = (view: string): view is EventView => {
   return false;
 };
 
-export type NamespaceParameter = Pick<RouteParameters, 'namespace' | 'endpoint'>;
+export type NamespaceParameter = Pick<
+  RouteParameters,
+  'namespace' | 'endpoint'
+>;
 export type WorkflowParameters = Pick<
   RouteParameters,
   'namespace' | 'workflow' | 'run' | 'endpoint'
@@ -33,7 +36,7 @@ export type EventParameters = Required<
 const routeIfEndpoint = (route: string, endpoint?: string): string => {
   if (endpoint) return route + `/${endpoint}`;
   return route;
-}
+};
 
 export const routeForNamespace = ({
   namespace,
@@ -41,7 +44,10 @@ export const routeForNamespace = ({
   return `/namespaces/${namespace}`;
 };
 
-export const routeForWorkflows = ({ namespace, endpoint }: NamespaceParameter): string => {
+export const routeForWorkflows = ({
+  namespace,
+  endpoint,
+}: NamespaceParameter): string => {
   const route = `${routeForNamespace({ namespace })}/workflows`;
   return routeIfEndpoint(route, endpoint);
 };
@@ -56,9 +62,9 @@ export const routeForWorkflow = ({
   workflow,
   run,
   namespace,
-  endpoint
+  endpoint,
 }: WorkflowParameters): string => {
-  const route = `${routeForWorkflows({ namespace })}/${workflow}/${run}`
+  const route = `${routeForWorkflows({ namespace })}/${workflow}/${run}`;
   return routeIfEndpoint(route, endpoint);
 };
 
@@ -67,9 +73,9 @@ export const routeForEventHistory = ({
   run,
   namespace,
   view,
-  endpoint
+  endpoint,
 }: EventHistoryParameters): string => {
-  const workflowPath = `${routeForWorkflow({ workflow, run, namespace })}`
+  const workflowPath = `${routeForWorkflow({ workflow, run, namespace })}`;
   const eventHistoryPath = `${workflowPath}/history`;
   if (!view) return routeIfEndpoint(eventHistoryPath, endpoint);
   if (view === 'summary') return `${eventHistoryPath}/summary`;
@@ -116,7 +122,7 @@ export const isWorkflowParameters = hasParameters<WorkflowParameters>(
   'namespace',
   'workflow',
   'run',
-  'endpoint'
+  'endpoint',
 );
 
 export const isEventHistoryParameters = hasParameters<EventHistoryParameters>(

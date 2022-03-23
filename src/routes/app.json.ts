@@ -3,10 +3,7 @@ import { fetchUser } from '$lib/services/user-service';
 import { fetchCluster } from '$lib/services/cluster-service';
 import { fetchNamespaces } from '$lib/services/namespaces-service';
 
-
-import type {
-  ListNamespacesResponse,
-} from '$types';
+import type { ListNamespacesResponse } from '$types';
 
 export async function get({ params, url }) {
   const settings: Settings = await fetchSettings({ url }, fetch);
@@ -19,5 +16,4 @@ export async function get({ params, url }) {
   return {
     body: { settings, namespaces, user, cluster },
   };
-};
-
+}
