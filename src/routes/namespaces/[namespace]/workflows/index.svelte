@@ -1,33 +1,11 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
-  import type { CombinedWorkflowExecutionsResponse } from '$lib/services/workflow-service';
+  import { routeForWorkflows } from '$lib/utilities/route-for';
 
-  import { fetchAllWorkflows } from '$lib/services/workflow-service';
-
-  export const load: Load = async function ({ params, url }) {
-    const isAdvancedSearch = url.searchParams.has('query');
-
-    if (!url.searchParams.has('time-range') && !isAdvancedSearch)
-      url.searchParams.set('time-range', '24 hours');
-
-    const { namespace } = params;
-
-    const workflowId = url.searchParams.get('workflow-id');
-    const workflowType = url.searchParams.get('workflow-type');
-    const timeRange = url.searchParams.get('time-range');
-    const executionStatus = url.searchParams.get('status') as WorkflowStatus;
-    const query = url.searchParams.get('query');
-
-    const parameters: ValidWorkflowParameters = {
-      workflowId,
-      workflowType,
-      timeRange,
-      executionStatus,
-      query,
-    };
-
-    const workflows = await fetchAllWorkflows(namespace, parameters, fetch);
-
+  export const load: Load = async function ({ params, fetch }) {
+    const url = routeForWorkflows({ namespace: params.namespace, endpoint: 'workflows.json' });
+    const { namespace, workflows, isAdvancedSearch } = await fetch(url).then((r) => r.json())
+  
     return {
       props: { namespace, workflows, isAdvancedSearch },
     };

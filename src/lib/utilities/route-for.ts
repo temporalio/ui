@@ -7,6 +7,7 @@ type RouteParameters = {
   view?: EventView;
   eventId: string;
   queue: string;
+  endpoint?: string;
 };
 
 export const isEventView = (view: string): view is EventView => {
@@ -16,18 +17,23 @@ export const isEventView = (view: string): view is EventView => {
   return false;
 };
 
-export type NamespaceParameter = Pick<RouteParameters, 'namespace'>;
+export type NamespaceParameter = Pick<RouteParameters, 'namespace' | 'endpoint'>;
 export type WorkflowParameters = Pick<
   RouteParameters,
-  'namespace' | 'workflow' | 'run'
+  'namespace' | 'workflow' | 'run' | 'endpoint'
 >;
 export type EventHistoryParameters = Pick<
   RouteParameters,
-  'namespace' | 'workflow' | 'run' | 'view'
+  'namespace' | 'workflow' | 'run' | 'view' | 'endpoint'
 >;
 export type EventParameters = Required<
   Pick<RouteParameters, 'namespace' | 'workflow' | 'run' | 'view' | 'eventId'>
 >;
+
+const routeIfEndpoint = (route: string, endpoint?: string): string => {
+  if (endpoint) return route + `/${endpoint}`;
+  return route;
+}
 
 export const routeForNamespace = ({
   namespace,
@@ -35,8 +41,9 @@ export const routeForNamespace = ({
   return `/namespaces/${namespace}`;
 };
 
-export const routeForWorkflows = (parameters: NamespaceParameter): string => {
-  return `${routeForNamespace(parameters)}/workflows`;
+export const routeForWorkflows = ({ namespace, endpoint }: NamespaceParameter): string => {
+  const route = `${routeForNamespace({ namespace })}/workflows`;
+  return routeIfEndpoint(route, endpoint);
 };
 
 export const routeForArchivalWorkfows = (
@@ -48,17 +55,23 @@ export const routeForArchivalWorkfows = (
 export const routeForWorkflow = ({
   workflow,
   run,
-  ...parameters
+  namespace,
+  endpoint
 }: WorkflowParameters): string => {
-  return `${routeForWorkflows(parameters)}/${workflow}/${run}`;
+  const route = `${routeForWorkflows({ namespace })}/${workflow}/${run}`
+  return routeIfEndpoint(route, endpoint);
 };
 
 export const routeForEventHistory = ({
+  workflow,
+  run,
+  namespace,
   view,
-  ...parameters
+  endpoint
 }: EventHistoryParameters): string => {
-  const eventHistoryPath = `${routeForWorkflow(parameters)}/history`;
-  if (!view) return eventHistoryPath;
+  const workflowPath = `${routeForWorkflow({ workflow, run, namespace })}`
+  const eventHistoryPath = `${workflowPath}/history`;
+  if (!view) return routeIfEndpoint(eventHistoryPath, endpoint);
   if (view === 'summary') return `${eventHistoryPath}/summary`;
   if (view === 'full') return `${eventHistoryPath}/full`;
   if (view === 'compact') return `${eventHistoryPath}/compact`;
@@ -103,6 +116,7 @@ export const isWorkflowParameters = hasParameters<WorkflowParameters>(
   'namespace',
   'workflow',
   'run',
+  'endpoint'
 );
 
 export const isEventHistoryParameters = hasParameters<EventHistoryParameters>(
