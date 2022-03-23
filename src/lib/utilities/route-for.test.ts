@@ -40,7 +40,28 @@ describe('routeFor', () => {
     expect(path).toBe('/namespaces/default/workflows/abc/def/workflow.json');
   });
 
-  it('should route to "workflow.events"', () => {
+  it('should default route to "workflow.events" history', () => {
+    const path = routeForEventHistory({
+      namespace: 'default',
+      workflow: 'abc',
+      run: 'def',
+    });
+    expect(path).toBe('/namespaces/default/workflows/abc/def/history');
+  });
+
+  it('should route to "workflow.events" history endpoint', () => {
+    const path = routeForEventHistory({
+      namespace: 'default',
+      workflow: 'abc',
+      run: 'def',
+      endpoint: 'events.json',
+    });
+    expect(path).toBe(
+      '/namespaces/default/workflows/abc/def/history/events.json',
+    );
+  });
+
+  it('should route to "workflow.events" summary', () => {
     const path = routeForEventHistory({
       namespace: 'default',
       workflow: 'abc',
@@ -50,7 +71,7 @@ describe('routeFor', () => {
     expect(path).toBe('/namespaces/default/workflows/abc/def/history/summary');
   });
 
-  it('should route to "workflow.events"', () => {
+  it('should route to "workflow.events" compact view', () => {
     const path = routeForEventHistory({
       namespace: 'default',
       workflow: 'abc',
@@ -60,7 +81,7 @@ describe('routeFor', () => {
     expect(path).toBe('/namespaces/default/workflows/abc/def/history/compact');
   });
 
-  it('should route to "workflow.events"', () => {
+  it('should route to "workflow.events" json view', () => {
     const path = routeForEventHistory({
       namespace: 'default',
       workflow: 'abc',

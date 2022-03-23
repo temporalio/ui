@@ -47,6 +47,12 @@ interface NetworkError {
   response: Response;
 }
 
+interface RequestOutput {
+  status?: number;
+  body?: ResponseBody;
+  headers?: Headers | Partial<ResponseHeaders>;
+}
+
 type Settings = {
   auth: {
     enabled: boolean;

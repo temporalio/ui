@@ -1,6 +1,6 @@
 import { fetchEvents } from '$lib/services/events-service';
 
-export async function post({ request, params }) {
+export async function post({ request, params }): Promise<RequestOutput> {
   const { workflow } = await request.json();
   const { namespace } = params;
 

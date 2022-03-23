@@ -28,10 +28,10 @@
         namespace,
         workflow: workflow.id,
         run: workflow.runId,
+        endpoint: 'workflow.json',
       }),
     );
     notifications.add('success', 'Workflow Terminated');
-    // window.location.reload();
   };
 
   const terminate = () => {
