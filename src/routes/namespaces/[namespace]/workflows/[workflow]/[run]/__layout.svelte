@@ -3,7 +3,12 @@
   import { routeForWorkflow } from '$lib/utilities/route-for';
 
   export const load: Load = async function ({ params, fetch }) {
-    const url = routeForWorkflow({ ...params, endpoint: 'workflow.json' });
+    const url = routeForWorkflow({
+      namespace: params.namespace,
+      workflow: params.workflow,
+      run: params.run,
+      endpoint: 'workflow.json',
+    });
     const { workflow, namespace } = await fetch(url).then((r) => r.json());
 
     return {
@@ -15,7 +20,6 @@
 
 <script lang="ts">
   import Header from './_header.svelte';
-
   export let workflow: WorkflowExecution;
   export let namespace: string;
 </script>

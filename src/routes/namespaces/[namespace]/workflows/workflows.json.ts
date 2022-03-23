@@ -1,6 +1,6 @@
 import { fetchAllWorkflows } from '$lib/services/workflow-service';
 
-export async function get({ params, url }) {
+export async function get({ params, url }): Promise<RequestOutput> {
   const isAdvancedSearch = url.searchParams.has('query');
 
   if (!url.searchParams.has('time-range') && !isAdvancedSearch)
