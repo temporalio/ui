@@ -93,7 +93,7 @@
     {#if workflows.length}
       <WorkflowsSummaryTable>
         <VirtualList items={workflows} let:item>
-          <WorkflowsSummaryRow workflow={item} {timeFormat} />
+          <WorkflowsSummaryRow workflow={item} {namespace} {timeFormat} />
         </VirtualList>
       </WorkflowsSummaryTable>
     {:else}
