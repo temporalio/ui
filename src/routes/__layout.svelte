@@ -2,28 +2,13 @@
   import type { Load } from '@sveltejs/kit';
   import type {
     DescribeNamespaceResponse,
-    ListNamespacesResponse,
   } from '$types';
 
   import '../app.postcss';
 
-  import { fetchSettings } from '$lib/services/settings-service';
-
-  import { fetchUser } from '$lib/services/user-service';
-  import { fetchCluster } from '$lib/services/cluster-service';
-  import { fetchNamespaces } from '$lib/services/namespaces-service';
-
-  export const load: Load = async function ({ url, fetch }) {
-    const settings: Settings = await fetchSettings({ url }, fetch);
-
-    const { namespaces }: ListNamespacesResponse = await fetchNamespaces(
-      settings,
-      fetch,
-    );
-
-    const user = await fetchUser(fetch);
-    const cluster = await fetchCluster(settings, fetch);
-
+  export const load: Load = async function ({ fetch }) {
+    const { cluster, namespaces, settings, user } = await fetch('/app.json').then((r) => r.json())
+  
     return {
       props: { namespaces, user, cluster },
       stuff: { namespaces, settings },
