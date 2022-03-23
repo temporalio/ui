@@ -12,8 +12,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Build assets
+        run: npm run build:local
       - name: Run Cypress tests
         uses: cypress-io/github-action@v2
         with:
-          start: npm run dev:local
+          install: false
+          start: npm run preview:local
           wait-on: 'http://localhost:3000'
+          wait-on-timeout: 120
+          browser: chrome
+          record: true
