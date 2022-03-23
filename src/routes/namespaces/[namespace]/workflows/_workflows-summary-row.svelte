@@ -1,17 +1,17 @@
 <script lang="ts">
   import { formatDate } from '$lib/utilities/format-date';
-  import { namespace } from '$lib/stores/namespace';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import { routeForWorkflow } from '$lib/utilities/route-for';
 
   import Link from '$lib/components/link.svelte';
 
+  export let namespace: string;
   export let workflow: WorkflowExecution;
   export let timeFormat: TimeFormat;
 
   $: href = routeForWorkflow({
-    namespace: $namespace,
+    namespace,
     workflow: workflow.id,
     run: workflow.runId,
   });

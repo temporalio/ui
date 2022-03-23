@@ -39,6 +39,12 @@ export const routeForWorkflows = (parameters: NamespaceParameter): string => {
   return `${routeForNamespace(parameters)}/workflows`;
 };
 
+export const routeForArchivalWorkfows = (
+  parameters: NamespaceParameter,
+): string => {
+  return `${routeForNamespace(parameters)}/archival`;
+};
+
 export const routeForWorkflow = ({
   workflow,
   run,

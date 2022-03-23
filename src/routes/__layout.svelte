@@ -1,14 +1,5 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
-
-  import { requestFromAPI } from '$lib/utilities/request-from-api';
-  import { routeForApi } from '$lib/utilities/route-for-api';
-  import { notifications } from '$lib/stores/notifications';
-  import { fetchSettings } from '$lib/services/settings-service';
-
-  import { fetchUser } from '$lib/services/user-service';
-  import { fetchCluster } from '$lib/services/cluster-service';
-
   import type {
     DescribeNamespaceResponse,
     ListNamespacesResponse,
@@ -16,28 +7,11 @@
 
   import '../app.postcss';
 
-  const emptyNamespace = {
-    namespaces: [],
-  };
+  import { fetchSettings } from '$lib/services/settings-service';
 
-  async function fetchNamespaces(
-    settings: Settings,
-    request = fetch,
-  ): Promise<ListNamespacesResponse> {
-    if (settings.runtimeEnvironment.isCloud) {
-      return Promise.resolve(emptyNamespace);
-    }
-
-    const results = await requestFromAPI<ListNamespacesResponse>(
-      routeForApi('namespaces'),
-      {
-        request,
-        onError: () => notifications.add('error', 'Unable to fetch namespaces'),
-      },
-    );
-
-    return results ?? Promise.resolve(emptyNamespace);
-  }
+  import { fetchUser } from '$lib/services/user-service';
+  import { fetchCluster } from '$lib/services/cluster-service';
+  import { fetchNamespaces } from '$lib/services/namespaces-service';
 
   export const load: Load = async function ({ url, fetch }) {
     const settings: Settings = await fetchSettings({ url }, fetch);
@@ -67,10 +41,6 @@
 
   export let user: User;
   export let cluster: ClusterInformation;
-
-  export let namespaces: DescribeNamespaceResponse[];
-
-  setContext('namespaces', namespaces);
 </script>
 
 <svelte:head>

@@ -10,7 +10,8 @@
     if (!url.searchParams.has('time-range') && !isAdvancedSearch)
       url.searchParams.set('time-range', '24 hours');
 
-    const namespace = params.namespace;
+    const { namespace } = params;
+
     const workflowId = url.searchParams.get('workflow-id');
     const workflowType = url.searchParams.get('workflow-type');
     const timeRange = url.searchParams.get('time-range');
@@ -28,7 +29,7 @@
     const workflows = await fetchAllWorkflows(namespace, parameters, fetch);
 
     return {
-      props: { workflows, isAdvancedSearch },
+      props: { namespace, workflows, isAdvancedSearch },
     };
   };
 </script>
@@ -42,6 +43,7 @@
   import Pagination from '$lib/components/pagination.svelte';
   import Badge from '$lib/components/badge.svelte';
 
+  export let namespace: string;
   export let workflows: CombinedWorkflowExecutionsResponse;
   export let isAdvancedSearch: boolean;
 
@@ -61,7 +63,7 @@
     <Pagination items={workflows} let:visibleItems>
       <WorkflowsSummaryTable>
         {#each visibleItems as event}
-          <WorkflowsSummaryRow workflow={event} {timeFormat} />
+          <WorkflowsSummaryRow workflow={event} {namespace} {timeFormat} />
         {/each}
       </WorkflowsSummaryTable>
     </Pagination>
