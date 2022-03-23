@@ -1,14 +1,10 @@
 /// <reference types="cypress" />
 
-const waitOnAPIs = () => {
-  cy.wait('@list-workflows');
-};
-
 describe('Workflow Executions List', () => {
   beforeEach(() => {
     cy.visit('/namespaces/default/workflows');
 
-    cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/namespaces?*', {
+    cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/namespaces*', {
       fixture: 'namespaces.json',
     }).as('namespaces-api');
 
@@ -16,17 +12,26 @@ describe('Workflow Executions List', () => {
       Cypress.env('VITE_API_HOST') +
         '/api/v1/namespaces/default/workflows?query=*',
       { fixture: 'workflows.json' },
-    ).as('list-workflows');
-  });
+    ).as('list-workflows-api');
 
-  it('should call the namespaces when starting up', () => {
-    waitOnAPIs();
+    cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/settings*', {
+      fixture: 'settings.json',
+    }).as('settings-api');
+
+    cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/cluster*', {
+      fixture: 'cluster.json',
+    }).as('settings-api');
+
+    cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/me*', {
+      fixture: 'me.json',
+    }).as('user-api');
+
+    cy.wait('@list-workflows-api');
+    cy.wait('@namespaces-api');
   });
 
   it('should default to 24 hours for the time range', () => {
-    waitOnAPIs();
-
-    cy.url().should('contain', '?time-range=24+hours');
+    cy.url().should('contain', 'time-range=24+hours');
 
     cy.get('#time-range-filter')
       .find('option:selected')
@@ -34,10 +39,12 @@ describe('Workflow Executions List', () => {
   });
 
   it('should default to showing all workflows', () => {
-    waitOnAPIs();
-
     cy.get('#status-filter')
       .find('option:selected')
       .should('have.value', 'null');
+
+    cy.get('#workflow-id-filter').should('have.value', '');
+
+    cy.get('#workflow-type-filter').should('have.value', '');
   });
 });
