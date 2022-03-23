@@ -10,7 +10,7 @@ describe('Redirect to Workflow Exections', () => {
       });
 
       for (const url of urls) {
-        it(`should redirect from "${url}" to "/namespaces/some-other-namespace/workflows"`, () => {
+        it(`should redirect from "${url}" to "/namespaces/${namespace}/workflows"`, () => {
           cy.visit(url);
           cy.url().should('include', `/namespaces/${namespace}/workflows`);
         });
