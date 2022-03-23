@@ -12,9 +12,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Install modules
-        run: npm ci
-      - name: Start server
-        run: npm run dev:test
-      - name: Cypress run
+      - name: Run Cypress tests
         uses: cypress-io/github-action@v2
+        with:
+          start: npm run dev
+          wait-on: 'http://localhost:3000'
