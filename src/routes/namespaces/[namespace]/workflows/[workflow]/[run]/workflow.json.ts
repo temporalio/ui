@@ -1,6 +1,6 @@
 import { fetchWorkflow } from '$lib/services/workflow-service';
 
- export async function get({ params }) {
+export async function get({ params }) {
   const { workflow: executionId, run: runId, namespace } = params;
 
   const parameters = {
@@ -14,6 +14,4 @@ import { fetchWorkflow } from '$lib/services/workflow-service';
   return {
     body: { workflow, namespace },
   };
-};
-
- 
+}

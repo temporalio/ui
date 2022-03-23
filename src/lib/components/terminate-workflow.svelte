@@ -28,8 +28,8 @@
         namespace,
         workflow: workflow.id,
         run: workflow.runId,
-      })
-    )
+      }),
+    );
     notifications.add('success', 'Workflow Terminated');
     // window.location.reload();
   };

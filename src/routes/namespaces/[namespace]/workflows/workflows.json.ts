@@ -1,11 +1,11 @@
 import { fetchAllWorkflows } from '$lib/services/workflow-service';
 
- export async function get({ params, url }) {
+export async function get({ params, url }) {
   const isAdvancedSearch = url.searchParams.has('query');
 
   if (!url.searchParams.has('time-range') && !isAdvancedSearch)
     url.searchParams.set('time-range', '24 hours');
-  
+
   const { namespace } = params;
   const workflowId = url.searchParams.get('workflow-id');
   const workflowType = url.searchParams.get('workflow-type');
@@ -26,4 +26,4 @@ import { fetchAllWorkflows } from '$lib/services/workflow-service';
   return {
     body: { namespace, workflows, isAdvancedSearch },
   };
-};
+}

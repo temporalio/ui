@@ -3,9 +3,14 @@
   import { routeForWorkflows } from '$lib/utilities/route-for';
 
   export const load: Load = async function ({ params, fetch }) {
-    const url = routeForWorkflows({ namespace: params.namespace, endpoint: 'workflows.json' });
-    const { namespace, workflows, isAdvancedSearch } = await fetch(url).then((r) => r.json())
-  
+    const url = routeForWorkflows({
+      namespace: params.namespace,
+      endpoint: 'workflows.json',
+    });
+    const { namespace, workflows, isAdvancedSearch } = await fetch(url).then(
+      (r) => r.json(),
+    );
+
     return {
       props: { namespace, workflows, isAdvancedSearch },
     };
@@ -20,9 +25,7 @@
   import WorkflowsLoadingState from './_workflows-loading.svelte';
   import Pagination from '$lib/components/pagination.svelte';
   import Badge from '$lib/components/badge.svelte';
-  import type {
-    CombinedWorkflowExecutionsResponse,
-  } from '$lib/services/workflow-service';
+  import type { CombinedWorkflowExecutionsResponse } from '$lib/services/workflow-service';
 
   export let namespace: string;
   export let workflows: CombinedWorkflowExecutionsResponse;

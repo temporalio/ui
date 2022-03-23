@@ -20,4 +20,4 @@ export async function post({ request, params }) {
       eventGroups,
     },
   };
-};
+}

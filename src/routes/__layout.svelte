@@ -1,14 +1,14 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
-  import type {
-    DescribeNamespaceResponse,
-  } from '$types';
+  import type { DescribeNamespaceResponse } from '$types';
 
   import '../app.postcss';
 
   export const load: Load = async function ({ fetch }) {
-    const { cluster, namespaces, settings, user } = await fetch('/app.json').then((r) => r.json())
-  
+    const { cluster, namespaces, settings, user } = await fetch(
+      '/app.json',
+    ).then((r) => r.json());
+
     return {
       props: { namespaces, user, cluster },
       stuff: { namespaces, settings },
