@@ -1,7 +1,9 @@
 <script lang="ts">
+  import { invalidate } from '$app/navigation';
   import { handleError } from '$lib/utilities/handle-error';
   import { terminateWorkflow } from '$lib/services/terminate-service';
   import { notifications } from '$lib/stores/notifications';
+  import { routeForWorkflow } from '$lib/utilities/route-for';
 
   import Button from '$lib/components/button.svelte';
   import Modal from '$lib/components/modal.svelte';
@@ -21,8 +23,15 @@
   const handleSuccessfulTermination = () => {
     showConfirmation = false;
     reason = '';
+    invalidate(
+      routeForWorkflow({
+        namespace,
+        workflow: workflow.id,
+        run: workflow.runId,
+      })
+    )
     notifications.add('success', 'Workflow Terminated');
-    window.location.reload();
+    // window.location.reload();
   };
 
   const terminate = () => {

@@ -105,7 +105,7 @@ export const requestFromAPI = async <T>(
   }
 };
 
-const withSecurityOptions = (options: RequestInit): RequestInit => {
+export const withSecurityOptions = (options: RequestInit): RequestInit => {
   const opts: RequestInit = { credentials: 'include', ...options };
   opts.headers = withCsrf(options?.headers);
   return opts;

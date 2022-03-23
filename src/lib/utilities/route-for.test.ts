@@ -13,6 +13,11 @@ describe('routeFor', () => {
     expect(path).toBe('/namespaces/default/workflows');
   });
 
+  it('should route to "workflows" endpoint', () => {
+    const path = routeForWorkflows({ namespace: 'default', endpoint: 'workflows.json' });
+    expect(path).toBe('/namespaces/default/workflows/workflows.json');
+  });
+
   it('should route to "workflow"', () => {
     const path = routeForWorkflow({
       namespace: 'default',
@@ -20,6 +25,16 @@ describe('routeFor', () => {
       run: 'def',
     });
     expect(path).toBe('/namespaces/default/workflows/abc/def');
+  });
+
+  it('should route to "workflow" endpoint', () => {
+    const path = routeForWorkflow({
+      namespace: 'default',
+      workflow: 'abc',
+      run: 'def',
+      endpoint: 'workflow.json'
+    });
+    expect(path).toBe('/namespaces/default/workflows/abc/def/workflow.json');
   });
 
   it('should route to "workflow.events"', () => {

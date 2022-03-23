@@ -1,12 +1,43 @@
+<!-- <script context="module" lang="ts">
+  import type { Load } from '@sveltejs/kit';
+  import {
+    EventView,
+    routeForEventHistory,
+    routeForEventHistoryItem,
+  } from '$lib/utilities/route-for';
+
+  export const load: Load = async function ({ params, stuff, fetch }) {
+    const { namespace, run, workflow } = params;
+    const url = routeForEventHistory({ namespace, run, workflow, endpoint: 'events.json' });
+    const body = JSON.stringify({ workflow: stuff.workflow });
+    const { events, eventGroups } = await fetch(url, {
+      method: 'POST',
+      body,
+    }).then((r) => r.json());
+
+    return {
+      props: {
+        namespace,
+        workflow,
+        events,
+        eventGroups,
+      },
+      stuff: {
+        events,
+        eventGroups,
+      },
+    };
+  };
+</script> -->
+
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
   import {
     EventView,
+    routeForEventHistory,
     routeForEventHistoryItem,
   } from '$lib/utilities/route-for';
-
   import { fetchEvents } from '$lib/services/events-service';
-
   export const load: Load = async function ({ params, stuff, fetch }) {
     const { workflow } = stuff;
     const { namespace } = params;
@@ -15,7 +46,6 @@
       executionId: workflow.id,
       runId: workflow.runId,
     };
-
     const { events, eventGroups } = await fetchEvents(parameters, fetch);
 
     return {
@@ -33,6 +63,7 @@
   };
 </script>
 
+
 <script lang="ts">
   import {
     faBars,
@@ -42,7 +73,6 @@
   } from '@fortawesome/free-solid-svg-icons';
 
   import { page } from '$app/stores';
-  import { routeForEventHistory } from '$lib/utilities/route-for';
   import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
 
   import ExportHistory from '$lib/components/export-history.svelte';

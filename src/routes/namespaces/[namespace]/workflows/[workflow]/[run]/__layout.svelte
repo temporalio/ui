@@ -1,18 +1,10 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
-
-  import { fetchWorkflow } from '$lib/services/workflow-service';
+  import { routeForWorkflow } from '$lib/utilities/route-for';
 
   export const load: Load = async function ({ params, fetch }) {
-    const { workflow: executionId, run: runId, namespace } = params;
-
-    const parameters = {
-      namespace,
-      executionId,
-      runId,
-    };
-
-    const workflow = await fetchWorkflow(parameters, fetch);
+    const url = routeForWorkflow({ ...params, endpoint: 'workflow.json' });
+    const { workflow, namespace } = await fetch(url).then((r) => r.json())
 
     return {
       props: { workflow, namespace },
