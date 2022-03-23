@@ -19,7 +19,8 @@
     "check:cloud:watch": "VITE_TEMPORAL_UI_BUILD_TARGET=local svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
     "format": "prettier --write --plugin-search-dir=. .",
-    "cypress:open": "TEMPORAL_API_HOST=http://localhost:3000 cypress open"
+    "cypress": ". ./.env && VITE_TEMPORAL_UI_BUILD_TARGET=local cypress open",
+    "cypress:run": ". ./.env && VITE_TEMPORAL_UI_BUILD_TARGET=local cypress run"
   },
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
@@ -48,7 +49,7 @@
     "babel-preset-vite": "^1.0.4",
     "chalk": "^4.1.2",
     "cssnano": "^5.0.8",
-    "cypress": "^8.3.1",
+    "cypress": "^9.5.2",
     "esbuild": "^0.13.15",
     "esbuild-jest": "^0.5.0",
     "eslint": "^7.32.0",
