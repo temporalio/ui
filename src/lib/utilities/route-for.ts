@@ -8,6 +8,7 @@ type RouteParameters = {
   eventId: string;
   queue: string;
   endpoint?: string;
+  searchParams?: URLSearchParams;
 };
 
 export const isEventView = (view: string): view is EventView => {
@@ -19,11 +20,11 @@ export const isEventView = (view: string): view is EventView => {
 
 export type NamespaceParameter = Pick<
   RouteParameters,
-  'namespace' | 'endpoint'
+  'namespace' | 'endpoint' | 'searchParams'
 >;
 export type WorkflowParameters = Pick<
   RouteParameters,
-  'namespace' | 'workflow' | 'run' | 'endpoint'
+  'namespace' | 'workflow' | 'run' | 'endpoint' | 'searchParams'
 >;
 export type EventHistoryParameters = Pick<
   RouteParameters,
@@ -33,8 +34,12 @@ export type EventParameters = Required<
   Pick<RouteParameters, 'namespace' | 'workflow' | 'run' | 'view' | 'eventId'>
 >;
 
-const routeIfEndpoint = (route: string, endpoint?: string): string => {
-  if (endpoint) return route + `/${endpoint}`;
+const routeIfEndpoint = (
+  route: string,
+  endpoint?: string,
+  searchParams?: string,
+): string => {
+  if (endpoint) return route + `/${endpoint}?${searchParams}`;
   return route;
 };
 
@@ -47,9 +52,10 @@ export const routeForNamespace = ({
 export const routeForWorkflows = ({
   namespace,
   endpoint,
+  searchParams,
 }: NamespaceParameter): string => {
   const route = `${routeForNamespace({ namespace })}/workflows`;
-  return routeIfEndpoint(route, endpoint);
+  return routeIfEndpoint(route, endpoint, searchParams);
 };
 
 export const routeForArchivalWorkfows = (
