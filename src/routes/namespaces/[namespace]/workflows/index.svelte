@@ -42,6 +42,9 @@
   import WorkflowsLoadingState from './_workflows-loading.svelte';
   import Pagination from '$lib/components/pagination.svelte';
   import Badge from '$lib/components/badge.svelte';
+  import type {
+    CombinedWorkflowExecutionsResponse,
+  } from '$lib/services/workflow-service';
 
   export let namespace: string;
   export let workflows: CombinedWorkflowExecutionsResponse;
