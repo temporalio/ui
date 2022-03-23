@@ -15,7 +15,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build assets
-        run: npm run build:local
+        run: VITE_MODE=test npm run build:local
       - name: Run Cypress tests
         uses: cypress-io/github-action@v2
         with:
@@ -27,3 +27,4 @@ jobs:
           record: true
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          VITE_MODE: test
