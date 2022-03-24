@@ -3,7 +3,6 @@
   import { faCalendar } from '@fortawesome/free-solid-svg-icons';
 
   import { page } from '$app/stores';
-  import { afterNavigate } from '$app/navigation';
   import { isEvent } from '$lib/models/event-history';
   import { isEventGroup } from '$lib/models/group-events';
 
@@ -18,14 +17,6 @@
       return event.eventIds.has(currentId);
     }
   };
-
-  afterNavigate(() => {
-    if (isActive($page.params.eventId) && parseInt($page.params.eventId) > 1) {
-      document
-        .getElementById($page.params.eventId)
-        ?.scrollIntoView({ block: 'start' });
-    }
-  });
 </script>
 
 <a

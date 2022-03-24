@@ -32,6 +32,7 @@
 
 <script lang="ts">
   import { page } from '$app/stores';
+  import { afterNavigate } from '$app/navigation';
 
   import EmptyState from '$lib/components/empty-state.svelte';
   import Pagination from '$lib/components/pagination.svelte';
@@ -45,6 +46,16 @@
   const startingIndex = items.findIndex(
     ({ id }) => $page.params.eventId === id,
   );
+
+  $: currentIndex = items.findIndex(({ id }) => $page.params.eventId === id);
+
+  afterNavigate(() => {
+    if (currentIndex > 0) {
+      document
+        .getElementById($page.params.eventId)
+        ?.scrollIntoView({ block: 'start' });
+    }
+  });
 </script>
 
 <Pagination {items} {startingIndex} let:visibleItems>
