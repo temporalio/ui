@@ -11,6 +11,7 @@
       endpoint: 'workflow.json',
       searchParams,
     });
+
     const { workflow, namespace } = await fetch(path).then((r) => r.json());
 
     return {

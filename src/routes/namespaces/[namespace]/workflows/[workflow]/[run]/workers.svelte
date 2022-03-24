@@ -17,6 +17,33 @@
   };
 </script>
 
+<!-- <script context="module" lang="ts">
+  import type { Load } from '@sveltejs/kit';
+
+  import type { GetPollersResponse } from '$lib/services/pollers-service';
+  import { routeForWorkflow } from '$lib/utilities/route-for';
+
+  export const load: Load = async function ({ params, stuff }) {
+    const { workflow } = stuff;
+    const { taskQueue } = workflow as WorkflowExecution;
+    const path = routeForWorkflow({
+      namespace: params.namespace,
+      workflow: params.workflow,
+      run: params.run,
+      endpoint: 'workers.json',
+    });
+    const body = JSON.stringify({ queue: taskQueue });
+    const workers = await fetch(path, {
+      method: 'POST',
+      body,
+    }).then((r) => r.json());
+
+    return {
+      props: { workers, taskQueue },
+    };
+  };
+</script> -->
+
 <script lang="ts">
   import Icon from 'svelte-fa';
   import { faTimes, faCheck } from '@fortawesome/free-solid-svg-icons';
