@@ -10,14 +10,13 @@ export async function post({ request, params }): Promise<RequestOutput> {
     runId: workflow.runId,
   };
 
-  const { events, eventGroups } = await fetchEvents(parameters, fetch);
+  const events = await fetchEvents(parameters, fetch);
 
   return {
     body: {
       namespace,
       workflow,
       events,
-      eventGroups,
     },
   };
 }

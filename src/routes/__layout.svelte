@@ -9,7 +9,7 @@
     ).then((r) => r.json());
 
     return {
-      props: { namespaces, user, cluster },
+      props: { user, cluster },
       stuff: { namespaces, settings },
     };
   };

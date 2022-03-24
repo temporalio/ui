@@ -35,6 +35,6 @@ export const fetchRawEvents = async (
 export const fetchEvents = async (
   parameters: FetchEvents,
   request = fetch,
-): Promise<FetchEventsResponse> => {
-  return fetchRawEvents(parameters, request).then(toEventHistory);
+): Promise<HistoryEvent[]> => {
+  return fetchRawEvents(parameters, request);
 };

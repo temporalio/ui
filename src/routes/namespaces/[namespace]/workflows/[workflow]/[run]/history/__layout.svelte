@@ -1,41 +1,3 @@
-<!-- <script context="module" lang="ts">
-  import type { Load } from '@sveltejs/kit';
-  import {
-    EventView,
-    routeForEventHistory,
-    routeForEventHistoryItem,
-  } from '$lib/utilities/route-for';
-
-  export const load: Load = async function ({ url, params, stuff, fetch }) {
-    const { searchParams } = url;
-    const { namespace, run, workflow } = params;
-    const path = routeForEventHistory({ 
-      namespace, 
-      run, 
-      workflow, 
-      endpoint: 'events.json',
-      searchParams 
-    });
-    const body = JSON.stringify({ workflow: stuff.workflow });
-    const { events, eventGroups } = await fetch(path, {
-      method: 'POST',
-      body,
-    }).then((r) => r.json());
-
-    return {
-      props: {
-        namespace,
-        workflow,
-        events,
-        eventGroups,
-      },
-      stuff: {
-        events,
-        eventGroups,
-      },
-    };
-  };
-</script> -->
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
   import {
@@ -43,23 +5,32 @@
     routeForEventHistory,
     routeForEventHistoryItem,
   } from '$lib/utilities/route-for';
-  import { fetchEvents } from '$lib/services/events-service';
-  export const load: Load = async function ({ params, stuff, fetch }) {
-    const { workflow } = stuff;
-    const { namespace } = params;
-    const parameters = {
-      namespace,
-      executionId: workflow.id,
-      runId: workflow.runId,
-    };
-    const { events, eventGroups } = await fetchEvents(parameters, fetch);
+  import { toEventHistory } from '$lib/models/event-history';
 
+  export const load: Load = async function ({ url, params, stuff, fetch }) {
+    const { searchParams } = url;
+    const path = routeForEventHistory({
+      namespace: params.namespace,
+      run: params.run,
+      workflow: params.workflow,
+      endpoint: 'events.json',
+      searchParams,
+    });
+    const body = JSON.stringify({ workflow: stuff.workflow });
+    const {
+      events: rawEvents,
+      workflow,
+      namespace,
+    } = await fetch(path, {
+      method: 'POST',
+      body,
+    }).then((r) => r.json());
+    const { events, eventGroups } = await toEventHistory(rawEvents);
     return {
       props: {
         namespace,
         workflow,
         events,
-        eventGroups,
       },
       stuff: {
         events,

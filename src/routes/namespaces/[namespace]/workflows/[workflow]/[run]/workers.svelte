@@ -43,7 +43,6 @@
     };
   };
 </script> -->
-
 <script lang="ts">
   import Icon from 'svelte-fa';
   import { faTimes, faCheck } from '@fortawesome/free-solid-svg-icons';

@@ -84,7 +84,7 @@
     <div class="flex">
       <div class="flex flex-col w-1/3 border-r-2 border-gray-300 rounded-bl-lg">
         <div class="rounded-bl-lg overflow-y-scroll h-full">
-          {#each visibleItems as event (event.id)}
+          {#each items as event (event.id)}
             <EventListItem {event} />
           {:else}
             <div class="p-2">

@@ -3,7 +3,6 @@
 
   import { getGroupForEvent } from '$lib/models/group-events';
   import { routeForEventHistory } from '$lib/utilities/route-for';
-  import type { EventHistoryParameters } from '$lib/utilities/route-for';
 
   /**
    * Returns `true` if we're trying to view an event that has been filtered
