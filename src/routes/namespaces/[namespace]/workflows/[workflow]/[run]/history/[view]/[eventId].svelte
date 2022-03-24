@@ -26,7 +26,7 @@
   };
 
   export const load: Load = async function ({ params, stuff, url }) {
-    const { eventId } = params;
+    const { eventId, namespace, workflow, run } = params;
     const { events, eventGroups } = stuff;
 
     const event: HistoryEventWithId = events.find(
@@ -38,7 +38,11 @@
     const eventGroup: CompactEventGroup = getGroupForEvent(event, eventGroups);
 
     if (shouldRedirect(event, eventGroup, stuff, params)) {
-      url.pathname = routeForEventHistory(params as EventHistoryParameters);
+      url.pathname = routeForEventHistory({
+        namespace,
+        workflow,
+        run,
+      });
 
       return {
         status: 302,
