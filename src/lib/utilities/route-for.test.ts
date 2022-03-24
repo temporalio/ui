@@ -21,6 +21,18 @@ describe('routeFor', () => {
     expect(path).toBe('/namespaces/default/workflows/workflows.json');
   });
 
+  it('should route to "workflows" endpoint with searchParams', () => {
+    const searchParams = { status: 'Running', 'per-page': '100' };
+    const path = routeForWorkflows({
+      namespace: 'default',
+      endpoint: 'workflows.json',
+      searchParams,
+    });
+    expect(path).toBe(
+      '/namespaces/default/workflows/workflows.json?status=Running&per-page=100',
+    );
+  });
+
   it('should route to "workflow"', () => {
     const path = routeForWorkflow({
       namespace: 'default',
@@ -38,6 +50,20 @@ describe('routeFor', () => {
       endpoint: 'workflow.json',
     });
     expect(path).toBe('/namespaces/default/workflows/abc/def/workflow.json');
+  });
+
+  it('should route to "workflow" endpoint with searchParams', () => {
+    const searchParams = { 'per-page': '500' };
+    const path = routeForWorkflow({
+      namespace: 'default',
+      workflow: 'abc',
+      run: 'def',
+      endpoint: 'workflow.json',
+      searchParams,
+    });
+    expect(path).toBe(
+      '/namespaces/default/workflows/abc/def/workflow.json?per-page=500',
+    );
   });
 
   it('should default route to "workflow.events" history', () => {
@@ -58,6 +84,20 @@ describe('routeFor', () => {
     });
     expect(path).toBe(
       '/namespaces/default/workflows/abc/def/history/events.json',
+    );
+  });
+
+  it('should route to "workflow.events" history endpoint with searchParams', () => {
+    const searchParams = { 'per-page': '500' };
+    const path = routeForEventHistory({
+      namespace: 'default',
+      workflow: 'abc',
+      run: 'def',
+      endpoint: 'events.json',
+      searchParams,
+    });
+    expect(path).toBe(
+      '/namespaces/default/workflows/abc/def/history/events.json?per-page=500',
     );
   });
 

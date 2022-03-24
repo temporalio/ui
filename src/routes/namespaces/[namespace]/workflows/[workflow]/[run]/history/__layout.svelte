@@ -6,11 +6,18 @@
     routeForEventHistoryItem,
   } from '$lib/utilities/route-for';
 
-  export const load: Load = async function ({ params, stuff, fetch }) {
+  export const load: Load = async function ({ url, params, stuff, fetch }) {
+    const { searchParams } = url;
     const { namespace, run, workflow } = params;
-    const url = routeForEventHistory({ namespace, run, workflow, endpoint: 'events.json' });
+    const path = routeForEventHistory({ 
+      namespace, 
+      run, 
+      workflow, 
+      endpoint: 'events.json',
+      searchParams 
+    });
     const body = JSON.stringify({ workflow: stuff.workflow });
-    const { events, eventGroups } = await fetch(url, {
+    const { events, eventGroups } = await fetch(path, {
       method: 'POST',
       body,
     }).then((r) => r.json());

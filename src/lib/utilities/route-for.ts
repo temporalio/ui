@@ -1,3 +1,5 @@
+import { toURL } from './to-url';
+
 export type EventView = 'full' | 'compact' | 'summary' | 'json';
 
 type RouteParameters = {
@@ -8,7 +10,7 @@ type RouteParameters = {
   eventId: string;
   queue: string;
   endpoint?: string;
-  searchParams?: URLSearchParams;
+  searchParams?: URLSearchParams | Record<string, string>;
 };
 
 export const isEventView = (view: string): view is EventView => {
@@ -28,7 +30,7 @@ export type WorkflowParameters = Pick<
 >;
 export type EventHistoryParameters = Pick<
   RouteParameters,
-  'namespace' | 'workflow' | 'run' | 'view' | 'endpoint'
+  'namespace' | 'workflow' | 'run' | 'view' | 'endpoint' | 'searchParams'
 >;
 export type EventParameters = Required<
   Pick<RouteParameters, 'namespace' | 'workflow' | 'run' | 'view' | 'eventId'>
@@ -37,9 +39,9 @@ export type EventParameters = Required<
 const routeIfEndpoint = (
   route: string,
   endpoint?: string,
-  searchParams?: string,
+  searchParams?: URLSearchParams | Record<string, string>,
 ): string => {
-  if (endpoint) return route + `/${endpoint}?${searchParams}`;
+  if (endpoint) return toURL(`${route}/${endpoint}`, searchParams);
   return route;
 };
 
@@ -69,9 +71,10 @@ export const routeForWorkflow = ({
   run,
   namespace,
   endpoint,
+  searchParams,
 }: WorkflowParameters): string => {
   const route = `${routeForWorkflows({ namespace })}/${workflow}/${run}`;
-  return routeIfEndpoint(route, endpoint);
+  return routeIfEndpoint(route, endpoint, searchParams);
 };
 
 export const routeForEventHistory = ({
@@ -80,10 +83,11 @@ export const routeForEventHistory = ({
   namespace,
   view,
   endpoint,
+  searchParams,
 }: EventHistoryParameters): string => {
   const workflowPath = `${routeForWorkflow({ workflow, run, namespace })}`;
   const eventHistoryPath = `${workflowPath}/history`;
-  if (!view) return routeIfEndpoint(eventHistoryPath, endpoint);
+  if (!view) return routeIfEndpoint(eventHistoryPath, endpoint, searchParams);
   if (view === 'summary') return `${eventHistoryPath}/summary`;
   if (view === 'full') return `${eventHistoryPath}/full`;
   if (view === 'compact') return `${eventHistoryPath}/compact`;

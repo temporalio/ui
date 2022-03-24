@@ -2,14 +2,16 @@
   import type { Load } from '@sveltejs/kit';
   import { routeForWorkflow } from '$lib/utilities/route-for';
 
-  export const load: Load = async function ({ params, fetch }) {
-    const url = routeForWorkflow({
+  export const load: Load = async function ({ url, params, fetch }) {
+    const { searchParams } = url;
+    const path = routeForWorkflow({
       namespace: params.namespace,
       workflow: params.workflow,
       run: params.run,
       endpoint: 'workflow.json',
+      searchParams,
     });
-    const { workflow, namespace } = await fetch(url).then((r) => r.json());
+    const { workflow, namespace } = await fetch(path).then((r) => r.json());
 
     return {
       props: { workflow, namespace },
