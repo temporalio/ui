@@ -20,7 +20,8 @@ export const isEventView = (view: string): view is EventView => {
   return false;
 };
 
-export type NamespaceParameter = Pick<
+export type NamespaceParameter = Pick<RouteParameters, 'namespace'>;
+export type WorkflowsParameters = Pick<
   RouteParameters,
   'namespace' | 'endpoint' | 'searchParams'
 >;
@@ -55,7 +56,7 @@ export const routeForWorkflows = ({
   namespace,
   endpoint,
   searchParams,
-}: NamespaceParameter): string => {
+}: WorkflowsParameters): string => {
   const route = `${routeForNamespace({ namespace })}/workflows`;
   return routeIfEndpoint(route, endpoint, searchParams);
 };
@@ -116,9 +117,11 @@ export const routeForPendingActivities = (parameters: WorkflowParameters) => {
   return `${routeForWorkflow(parameters)}/pending-activities`;
 };
 
+type RouteParameter = string | URLSearchParams | Record<string, string>;
+
 const hasParameters =
-  <T extends Record<string, string>>(...required: string[]) =>
-  (parameters: Record<string, string>): parameters is T => {
+  <T extends Record<string, RouteParameter>>(...required: string[]) =>
+  (parameters: Record<string, RouteParameter>): parameters is T => {
     for (const parameter of required) {
       if (!parameters[parameter]) return false;
     }
@@ -128,11 +131,18 @@ const hasParameters =
 export const isNamespaceParameter =
   hasParameters<NamespaceParameter>('namespace');
 
+export const isWorkflowsParameters = hasParameters<WorkflowsParameters>(
+  'namespace',
+  'endpoint',
+  'searchParams',
+);
+
 export const isWorkflowParameters = hasParameters<WorkflowParameters>(
   'namespace',
   'workflow',
   'run',
   'endpoint',
+  'searchParams',
 );
 
 export const isEventHistoryParameters = hasParameters<EventHistoryParameters>(
@@ -140,6 +150,8 @@ export const isEventHistoryParameters = hasParameters<EventHistoryParameters>(
   'workflow',
   'run',
   'view',
+  'endpoint',
+  'searchParams',
 );
 
 export const isEventParameters = hasParameters<EventParameters>(

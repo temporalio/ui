@@ -76,7 +76,6 @@
     faLayerGroup,
     faTable,
   } from '@fortawesome/free-solid-svg-icons';
-
   import { page } from '$app/stores';
   import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
 
