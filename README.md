@@ -8,11 +8,7 @@ Temporal must be running in development. ([See our documentation](https://docs.t
 
 ## Trying it out
 
-After pulling down the lastest version of Temporal's `docker-compose`, you can start it up in _experimental mode_.
-
-```sh
-docker-compose -f docker-compose-ui-experimental.yml up -d
-```
+After pulling down the lastest version of Temporal's [`docker-compose`](https://github.com/temporalio/docker-compose), you can access the new new UI by visiting `http://localhost:8080`.
 
 ## Trying it out: Bleeding edge
 
