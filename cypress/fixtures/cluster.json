@@ -1,0 +1,15 @@
+{
+  "supportedClients": {
+    "temporal-cli": "\u003c2.0.0",
+    "temporal-go": "\u003c2.0.0",
+    "temporal-java": "\u003c2.0.0",
+    "temporal-php": "\u003c2.0.0",
+    "temporal-server": "\u003c2.0.0",
+    "temporal-typescript": "\u003c2.0.0"
+  },
+  "serverVersion": "1.15.2",
+  "clusterId": "fe325f09-1d00-45c0-8924-ce6f0e465258",
+  "versionInfo": null,
+  "clusterName": "active",
+  "historyShardCount": 4
+}

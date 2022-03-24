@@ -29,7 +29,6 @@ const config = {
         },
       },
     },
-    // ssr: false,
   },
 };
 

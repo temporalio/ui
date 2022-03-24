@@ -2,42 +2,19 @@
   "executions": [
     {
       "execution": {
-        "workflowId": "5cc877_ContinuedAsNew",
-        "runId": "e7c7a4ed-0702-41a3-b02c-036092d66d68"
+        "workflowId": "002c98_Running",
+        "runId": "54a1a2c3-9322-4f75-88ea-bf5660c251d0"
       },
       "type": {
-        "name": "RainbowStatusesWorkflow"
+        "name": "ImportantWorkflowType"
       },
-      "startTime": "2022-01-25T19:05:42.087272900Z",
-      "closeTime": "2022-01-25T19:05:42.175438300Z",
-      "status": "Completed",
-      "historyLength": "11",
+      "startTime": "2022-03-23T18:06:01.726484047Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "0",
       "parentNamespaceId": "",
       "parentExecution": null,
-      "executionTime": "2022-01-25T19:05:42.087272900Z",
-      "memo": {
-        "fields": {}
-      },
-      "searchAttributes": null,
-      "autoResetPoints": null,
-      "taskQueue": "rainbow-statuses",
-      "stateTransitionCount": "7"
-    },
-    {
-      "execution": {
-        "workflowId": "5cc877_TimedOut",
-        "runId": "df43c7bd-2e0b-4b8f-b7ec-6e1b1df93830"
-      },
-      "type": {
-        "name": "RainbowStatusesWorkflow"
-      },
-      "startTime": "2022-01-25T19:05:42.075873200Z",
-      "closeTime": "2022-01-25T19:05:43.071320400Z",
-      "status": "TimedOut",
-      "historyLength": "6",
-      "parentNamespaceId": "",
-      "parentExecution": null,
-      "executionTime": "2022-01-25T19:05:42.075873200Z",
+      "executionTime": "2022-03-23T18:06:01.726484047Z",
       "memo": {
         "fields": {}
       },
@@ -48,29 +25,207 @@
               "encoding": "anNvbi9wbGFpbg==",
               "type": "S2V5d29yZA=="
             },
-            "data": "WyI4NzQ3ZjJkMzgxMWIyNDBiM2VjZWM0NTM4ZmRjZGNmNCJd"
+            "data": "WyIzMmUwNDI1OWUzYTFlMTM3ZmE2Njg5M2JiNjE3OTc5YSJd"
+          },
+          "CustomBoolField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "Qm9vbA=="
+            },
+            "data": "dHJ1ZQ=="
+          },
+          "CustomDatetimeField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RGF0ZXRpbWU="
+            },
+            "data": "IjIwMjItMDMtMjNUMTg6MDY6MDEuNzIwMTM3WiI="
+          },
+          "CustomDoubleField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RG91Ymxl"
+            },
+            "data": "MA=="
+          },
+          "CustomIntField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "SW50"
+            },
+            "data": "MA=="
+          },
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "InJhaW5ib3ctc3RhdHVzZXMtMDAyYzk4Ig=="
+          },
+          "CustomStringField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "VGV4dA=="
+            },
+            "data": "InJhaW5ib3cgc3RhdHVzZXMgMDAyYzk4IFJ1bm5pbmci"
           }
         }
       },
       "autoResetPoints": null,
       "taskQueue": "rainbow-statuses",
-      "stateTransitionCount": "5"
+      "stateTransitionCount": "0"
     },
     {
       "execution": {
-        "workflowId": "5cc877_ContinuedAsNew",
-        "runId": "8a0c3c1c-b8f2-4a79-b9e3-13395d9aca69"
+        "workflowId": "002c98_ContinuedAsNew",
+        "runId": "a0dcbea8-c501-4cdc-90cc-44766b19d512"
       },
       "type": {
-        "name": "RainbowStatusesWorkflow"
+        "name": "ImportantWorkflowType"
       },
-      "startTime": "2022-01-25T19:05:42.059526200Z",
-      "closeTime": "2022-01-25T19:05:42.087272900Z",
+      "startTime": "2022-03-23T18:06:01.874404131Z",
+      "closeTime": "2022-03-23T18:06:26.011906253Z",
+      "status": "Terminated",
+      "historyLength": "3",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-03-23T18:06:01.874404131Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {
+          "CustomBoolField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "Qm9vbA=="
+            },
+            "data": "ZmFsc2U="
+          },
+          "CustomDatetimeField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RGF0ZXRpbWU="
+            },
+            "data": "IjIwMjItMDMtMjNUMTg6MDY6MDEuODIzNzk0WiI="
+          },
+          "CustomDoubleField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RG91Ymxl"
+            },
+            "data": "NQ=="
+          },
+          "CustomIntField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "SW50"
+            },
+            "data": "NQ=="
+          },
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "InJhaW5ib3ctc3RhdHVzZXMtMDAyYzk4Ig=="
+          },
+          "CustomStringField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "VGV4dA=="
+            },
+            "data": "InJhaW5ib3cgc3RhdHVzZXMgMDAyYzk4IENvbnRpbnVlZEFzTmV3Ig=="
+          }
+        }
+      },
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "2"
+    },
+    {
+      "execution": {
+        "workflowId": "002c98_TimedOut",
+        "runId": "75bde3d3-e085-42d2-a41b-066fc1f52097"
+      },
+      "type": {
+        "name": "ImportantWorkflowType"
+      },
+      "startTime": "2022-03-23T18:06:01.834286089Z",
+      "closeTime": "2022-03-23T18:06:02.861970423Z",
+      "status": "TimedOut",
+      "historyLength": "3",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-03-23T18:06:01.834286089Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {
+          "CustomBoolField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "Qm9vbA=="
+            },
+            "data": "dHJ1ZQ=="
+          },
+          "CustomDatetimeField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RGF0ZXRpbWU="
+            },
+            "data": "IjIwMjItMDMtMjNUMTg6MDY6MDEuODMxOTE4WiI="
+          },
+          "CustomDoubleField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RG91Ymxl"
+            },
+            "data": "Ng=="
+          },
+          "CustomIntField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "SW50"
+            },
+            "data": "Ng=="
+          },
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "InJhaW5ib3ctc3RhdHVzZXMtMDAyYzk4Ig=="
+          },
+          "CustomStringField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "VGV4dA=="
+            },
+            "data": "InJhaW5ib3cgc3RhdHVzZXMgMDAyYzk4IFRpbWVkT3V0Ig=="
+          }
+        }
+      },
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "2"
+    },
+    {
+      "execution": {
+        "workflowId": "002c98_ContinuedAsNew",
+        "runId": "0ef1dc98-9718-4d8f-80f6-a81f58ecd164"
+      },
+      "type": {
+        "name": "ImportantWorkflowType"
+      },
+      "startTime": "2022-03-23T18:06:01.825801964Z",
+      "closeTime": "2022-03-23T18:06:01.874404131Z",
       "status": "ContinuedAsNew",
       "historyLength": "5",
       "parentNamespaceId": "",
       "parentExecution": null,
-      "executionTime": "2022-01-25T19:05:42.059526200Z",
+      "executionTime": "2022-03-23T18:06:01.825801964Z",
       "memo": {
         "fields": {}
       },
@@ -81,7 +236,49 @@
               "encoding": "anNvbi9wbGFpbg==",
               "type": "S2V5d29yZA=="
             },
-            "data": "WyI4NzQ3ZjJkMzgxMWIyNDBiM2VjZWM0NTM4ZmRjZGNmNCJd"
+            "data": "WyIzMmUwNDI1OWUzYTFlMTM3ZmE2Njg5M2JiNjE3OTc5YSJd"
+          },
+          "CustomBoolField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "Qm9vbA=="
+            },
+            "data": "ZmFsc2U="
+          },
+          "CustomDatetimeField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RGF0ZXRpbWU="
+            },
+            "data": "IjIwMjItMDMtMjNUMTg6MDY6MDEuODIzNzk0WiI="
+          },
+          "CustomDoubleField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RG91Ymxl"
+            },
+            "data": "NQ=="
+          },
+          "CustomIntField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "SW50"
+            },
+            "data": "NQ=="
+          },
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "InJhaW5ib3ctc3RhdHVzZXMtMDAyYzk4Ig=="
+          },
+          "CustomStringField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "VGV4dA=="
+            },
+            "data": "InJhaW5ib3cgc3RhdHVzZXMgMDAyYzk4IENvbnRpbnVlZEFzTmV3Ig=="
           }
         }
       },
@@ -91,42 +288,19 @@
     },
     {
       "execution": {
-        "workflowId": "5cc877_Terminated",
-        "runId": "39aa40c1-691d-4104-ab34-c678db203fe2"
+        "workflowId": "002c98_Failed",
+        "runId": "36fa6f53-d2ab-4dc0-a8e0-7037d8a8d369"
       },
       "type": {
-        "name": "RainbowStatusesWorkflow"
+        "name": "ImportantWorkflowType"
       },
-      "startTime": "2022-01-25T19:05:42.034827400Z",
-      "closeTime": "2022-01-25T19:05:42.047770900Z",
-      "status": "Terminated",
-      "historyLength": "3",
+      "startTime": "2022-03-23T18:06:01.767867797Z",
+      "closeTime": "2022-03-23T18:06:01.823839297Z",
+      "status": "Failed",
+      "historyLength": "11",
       "parentNamespaceId": "",
       "parentExecution": null,
-      "executionTime": "2022-01-25T19:05:42.034827400Z",
-      "memo": {
-        "fields": {}
-      },
-      "searchAttributes": null,
-      "autoResetPoints": null,
-      "taskQueue": "rainbow-statuses",
-      "stateTransitionCount": "2"
-    },
-    {
-      "execution": {
-        "workflowId": "5cc877_Canceled",
-        "runId": "4bef35ed-ec89-4d6b-9712-2c7ed28c1033"
-      },
-      "type": {
-        "name": "RainbowStatusesWorkflow"
-      },
-      "startTime": "2022-01-25T19:05:42.012001Z",
-      "closeTime": "2022-01-25T19:05:42.076370300Z",
-      "status": "Canceled",
-      "historyLength": "8",
-      "parentNamespaceId": "",
-      "parentExecution": null,
-      "executionTime": "2022-01-25T19:05:42.012001Z",
+      "executionTime": "2022-03-23T18:06:01.767867797Z",
       "memo": {
         "fields": {}
       },
@@ -137,7 +311,267 @@
               "encoding": "anNvbi9wbGFpbg==",
               "type": "S2V5d29yZA=="
             },
-            "data": "WyI4NzQ3ZjJkMzgxMWIyNDBiM2VjZWM0NTM4ZmRjZGNmNCJd"
+            "data": "WyIzMmUwNDI1OWUzYTFlMTM3ZmE2Njg5M2JiNjE3OTc5YSJd"
+          },
+          "CustomBoolField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "Qm9vbA=="
+            },
+            "data": "dHJ1ZQ=="
+          },
+          "CustomDatetimeField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RGF0ZXRpbWU="
+            },
+            "data": "IjIwMjItMDMtMjNUMTg6MDY6MDEuNzYyMDAyWiI="
+          },
+          "CustomDoubleField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RG91Ymxl"
+            },
+            "data": "Mg=="
+          },
+          "CustomIntField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "SW50"
+            },
+            "data": "Mg=="
+          },
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "InJhaW5ib3ctc3RhdHVzZXMtMDAyYzk4Ig=="
+          },
+          "CustomStringField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "VGV4dA=="
+            },
+            "data": "InJhaW5ib3cgc3RhdHVzZXMgMDAyYzk4IEZhaWxlZCI="
+          }
+        }
+      },
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "7"
+    },
+    {
+      "execution": {
+        "workflowId": "002c98_Terminated",
+        "runId": "7a5d2860-91b9-4f18-b406-dc9b7f03e0fa"
+      },
+      "type": {
+        "name": "ImportantWorkflowType"
+      },
+      "startTime": "2022-03-23T18:06:01.797946631Z",
+      "closeTime": "2022-03-23T18:06:01.816783797Z",
+      "status": "Terminated",
+      "historyLength": "3",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-03-23T18:06:01.797946631Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {
+          "CustomBoolField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "Qm9vbA=="
+            },
+            "data": "dHJ1ZQ=="
+          },
+          "CustomDatetimeField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RGF0ZXRpbWU="
+            },
+            "data": "IjIwMjItMDMtMjNUMTg6MDY6MDEuNzkxMDc3WiI="
+          },
+          "CustomDoubleField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RG91Ymxl"
+            },
+            "data": "NA=="
+          },
+          "CustomIntField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "SW50"
+            },
+            "data": "NA=="
+          },
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "InJhaW5ib3ctc3RhdHVzZXMtMDAyYzk4Ig=="
+          },
+          "CustomStringField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "VGV4dA=="
+            },
+            "data": "InJhaW5ib3cgc3RhdHVzZXMgMDAyYzk4IFRlcm1pbmF0ZWQi"
+          }
+        }
+      },
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "2"
+    },
+    {
+      "execution": {
+        "workflowId": "002c98_Completed",
+        "runId": "de64f5d9-a6fe-476b-8825-92d4c8fea39d"
+      },
+      "type": {
+        "name": "ImportantWorkflowType"
+      },
+      "startTime": "2022-03-23T18:06:01.757428214Z",
+      "closeTime": "2022-03-23T18:06:01.815125881Z",
+      "status": "Completed",
+      "historyLength": "11",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-03-23T18:06:01.757428214Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {
+          "BinaryChecksums": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "WyIzMmUwNDI1OWUzYTFlMTM3ZmE2Njg5M2JiNjE3OTc5YSJd"
+          },
+          "CustomBoolField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "Qm9vbA=="
+            },
+            "data": "ZmFsc2U="
+          },
+          "CustomDatetimeField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RGF0ZXRpbWU="
+            },
+            "data": "IjIwMjItMDMtMjNUMTg6MDY6MDEuNzU0NTkzWiI="
+          },
+          "CustomDoubleField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RG91Ymxl"
+            },
+            "data": "MQ=="
+          },
+          "CustomIntField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "SW50"
+            },
+            "data": "MQ=="
+          },
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "InJhaW5ib3ctc3RhdHVzZXMtMDAyYzk4Ig=="
+          },
+          "CustomStringField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "VGV4dA=="
+            },
+            "data": "InJhaW5ib3cgc3RhdHVzZXMgMDAyYzk4IENvbXBsZXRlZCI="
+          }
+        }
+      },
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "7"
+    },
+    {
+      "execution": {
+        "workflowId": "002c98_Canceled",
+        "runId": "43a1484f-90fa-4265-95f4-8165a1d57b14"
+      },
+      "type": {
+        "name": "ImportantWorkflowType"
+      },
+      "startTime": "2022-03-23T18:06:01.777287172Z",
+      "closeTime": "2022-03-23T18:06:01.799289006Z",
+      "status": "Canceled",
+      "historyLength": "8",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-03-23T18:06:01.777287172Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {
+          "BinaryChecksums": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "WyIzMmUwNDI1OWUzYTFlMTM3ZmE2Njg5M2JiNjE3OTc5YSJd"
+          },
+          "CustomBoolField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "Qm9vbA=="
+            },
+            "data": "ZmFsc2U="
+          },
+          "CustomDatetimeField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RGF0ZXRpbWU="
+            },
+            "data": "IjIwMjItMDMtMjNUMTg6MDY6MDEuNzczNDcyWiI="
+          },
+          "CustomDoubleField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RG91Ymxl"
+            },
+            "data": "Mw=="
+          },
+          "CustomIntField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "SW50"
+            },
+            "data": "Mw=="
+          },
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "InJhaW5ib3ctc3RhdHVzZXMtMDAyYzk4Ig=="
+          },
+          "CustomStringField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "VGV4dA=="
+            },
+            "data": "InJhaW5ib3cgc3RhdHVzZXMgMDAyYzk4IENhbmNlbGVkIg=="
           }
         }
       },
@@ -147,85 +581,19 @@
     },
     {
       "execution": {
-        "workflowId": "5cc877_Failed",
-        "runId": "644b6296-d5e9-4ac1-8a44-1714ee2f7519"
+        "workflowId": "1337c9_Running",
+        "runId": "54a1a2c3-9322-4f75-88ea-bf5660c251d0"
       },
       "type": {
-        "name": "RainbowStatusesWorkflow"
+        "name": "AnotherWorkflowType"
       },
-      "startTime": "2022-01-25T19:05:42.002066300Z",
-      "closeTime": "2022-01-25T19:05:42.164449Z",
-      "status": "Failed",
-      "historyLength": "11",
-      "parentNamespaceId": "",
-      "parentExecution": null,
-      "executionTime": "2022-01-25T19:05:42.002066300Z",
-      "memo": {
-        "fields": {}
-      },
-      "searchAttributes": {
-        "indexedFields": {
-          "BinaryChecksums": {
-            "metadata": {
-              "encoding": "anNvbi9wbGFpbg==",
-              "type": "S2V5d29yZA=="
-            },
-            "data": "WyI4NzQ3ZjJkMzgxMWIyNDBiM2VjZWM0NTM4ZmRjZGNmNCJd"
-          }
-        }
-      },
-      "autoResetPoints": null,
-      "taskQueue": "rainbow-statuses",
-      "stateTransitionCount": "7"
-    },
-    {
-      "execution": {
-        "workflowId": "5cc877_Completed",
-        "runId": "8280aa73-9f40-4fce-bcf7-0d4944cf973d"
-      },
-      "type": {
-        "name": "RainbowStatusesWorkflow"
-      },
-      "startTime": "2022-01-25T19:05:41.992307100Z",
-      "closeTime": "2022-01-25T19:05:42.121018600Z",
-      "status": "Completed",
-      "historyLength": "11",
-      "parentNamespaceId": "",
-      "parentExecution": null,
-      "executionTime": "2022-01-25T19:05:41.992307100Z",
-      "memo": {
-        "fields": {}
-      },
-      "searchAttributes": {
-        "indexedFields": {
-          "BinaryChecksums": {
-            "metadata": {
-              "encoding": "anNvbi9wbGFpbg==",
-              "type": "S2V5d29yZA=="
-            },
-            "data": "WyI4NzQ3ZjJkMzgxMWIyNDBiM2VjZWM0NTM4ZmRjZGNmNCJd"
-          }
-        }
-      },
-      "autoResetPoints": null,
-      "taskQueue": "rainbow-statuses",
-      "stateTransitionCount": "7"
-    },
-    {
-      "execution": {
-        "workflowId": "5cc877_Running",
-        "runId": "9e63f93b-a488-4394-ba76-74f47e97d5e3"
-      },
-      "type": {
-        "name": "RainbowStatusesWorkflow"
-      },
-      "startTime": "2022-01-25T19:05:41.982105700Z",
+      "startTime": "2022-03-23T18:06:01.726484047Z",
       "closeTime": null,
       "status": "Running",
       "historyLength": "0",
       "parentNamespaceId": "",
       "parentExecution": null,
-      "executionTime": "2022-01-25T19:05:41.982105700Z",
+      "executionTime": "2022-03-23T18:06:01.726484047Z",
       "memo": {
         "fields": {}
       },
@@ -236,13 +604,559 @@
               "encoding": "anNvbi9wbGFpbg==",
               "type": "S2V5d29yZA=="
             },
-            "data": "WyI4NzQ3ZjJkMzgxMWIyNDBiM2VjZWM0NTM4ZmRjZGNmNCJd"
+            "data": "WyIzMmUwNDI1OWUzYTFlMTM3ZmE2Njg5M2JiNjE3OTc5YSJd"
+          },
+          "CustomBoolField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "Qm9vbA=="
+            },
+            "data": "dHJ1ZQ=="
+          },
+          "CustomDatetimeField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RGF0ZXRpbWU="
+            },
+            "data": "IjIwMjItMDMtMjNUMTg6MDY6MDEuNzIwMTM3WiI="
+          },
+          "CustomDoubleField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RG91Ymxl"
+            },
+            "data": "MA=="
+          },
+          "CustomIntField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "SW50"
+            },
+            "data": "MA=="
+          },
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "InJhaW5ib3ctc3RhdHVzZXMtMDAyYzk4Ig=="
+          },
+          "CustomStringField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "VGV4dA=="
+            },
+            "data": "InJhaW5ib3cgc3RhdHVzZXMgMDAyYzk4IFJ1bm5pbmci"
           }
         }
       },
       "autoResetPoints": null,
       "taskQueue": "rainbow-statuses",
       "stateTransitionCount": "0"
+    },
+    {
+      "execution": {
+        "workflowId": "1337c9_ContinuedAsNew",
+        "runId": "a0dcbea8-c501-4cdc-90cc-44766b19d512"
+      },
+      "type": {
+        "name": "AnotherWorkflowType"
+      },
+      "startTime": "2022-03-23T18:06:01.874404131Z",
+      "closeTime": "2022-03-23T18:06:26.011906253Z",
+      "status": "Terminated",
+      "historyLength": "3",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-03-23T18:06:01.874404131Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {
+          "CustomBoolField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "Qm9vbA=="
+            },
+            "data": "ZmFsc2U="
+          },
+          "CustomDatetimeField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RGF0ZXRpbWU="
+            },
+            "data": "IjIwMjItMDMtMjNUMTg6MDY6MDEuODIzNzk0WiI="
+          },
+          "CustomDoubleField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RG91Ymxl"
+            },
+            "data": "NQ=="
+          },
+          "CustomIntField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "SW50"
+            },
+            "data": "NQ=="
+          },
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "InJhaW5ib3ctc3RhdHVzZXMtMDAyYzk4Ig=="
+          },
+          "CustomStringField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "VGV4dA=="
+            },
+            "data": "InJhaW5ib3cgc3RhdHVzZXMgMDAyYzk4IENvbnRpbnVlZEFzTmV3Ig=="
+          }
+        }
+      },
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "2"
+    },
+    {
+      "execution": {
+        "workflowId": "1337c9_TimedOut",
+        "runId": "75bde3d3-e085-42d2-a41b-066fc1f52097"
+      },
+      "type": {
+        "name": "AnotherWorkflowType"
+      },
+      "startTime": "2022-03-23T18:06:01.834286089Z",
+      "closeTime": "2022-03-23T18:06:02.861970423Z",
+      "status": "TimedOut",
+      "historyLength": "3",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-03-23T18:06:01.834286089Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {
+          "CustomBoolField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "Qm9vbA=="
+            },
+            "data": "dHJ1ZQ=="
+          },
+          "CustomDatetimeField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RGF0ZXRpbWU="
+            },
+            "data": "IjIwMjItMDMtMjNUMTg6MDY6MDEuODMxOTE4WiI="
+          },
+          "CustomDoubleField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RG91Ymxl"
+            },
+            "data": "Ng=="
+          },
+          "CustomIntField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "SW50"
+            },
+            "data": "Ng=="
+          },
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "InJhaW5ib3ctc3RhdHVzZXMtMDAyYzk4Ig=="
+          },
+          "CustomStringField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "VGV4dA=="
+            },
+            "data": "InJhaW5ib3cgc3RhdHVzZXMgMDAyYzk4IFRpbWVkT3V0Ig=="
+          }
+        }
+      },
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "2"
+    },
+    {
+      "execution": {
+        "workflowId": "1337c9_ContinuedAsNew",
+        "runId": "0ef1dc98-9718-4d8f-80f6-a81f58ecd164"
+      },
+      "type": {
+        "name": "AnotherWorkflowType"
+      },
+      "startTime": "2022-03-23T18:06:01.825801964Z",
+      "closeTime": "2022-03-23T18:06:01.874404131Z",
+      "status": "ContinuedAsNew",
+      "historyLength": "5",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-03-23T18:06:01.825801964Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {
+          "BinaryChecksums": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "WyIzMmUwNDI1OWUzYTFlMTM3ZmE2Njg5M2JiNjE3OTc5YSJd"
+          },
+          "CustomBoolField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "Qm9vbA=="
+            },
+            "data": "ZmFsc2U="
+          },
+          "CustomDatetimeField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RGF0ZXRpbWU="
+            },
+            "data": "IjIwMjItMDMtMjNUMTg6MDY6MDEuODIzNzk0WiI="
+          },
+          "CustomDoubleField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RG91Ymxl"
+            },
+            "data": "NQ=="
+          },
+          "CustomIntField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "SW50"
+            },
+            "data": "NQ=="
+          },
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "InJhaW5ib3ctc3RhdHVzZXMtMDAyYzk4Ig=="
+          },
+          "CustomStringField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "VGV4dA=="
+            },
+            "data": "InJhaW5ib3cgc3RhdHVzZXMgMDAyYzk4IENvbnRpbnVlZEFzTmV3Ig=="
+          }
+        }
+      },
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "3"
+    },
+    {
+      "execution": {
+        "workflowId": "1337c9_Failed",
+        "runId": "36fa6f53-d2ab-4dc0-a8e0-7037d8a8d369"
+      },
+      "type": {
+        "name": "AnotherWorkflowType"
+      },
+      "startTime": "2022-03-23T18:06:01.767867797Z",
+      "closeTime": "2022-03-23T18:06:01.823839297Z",
+      "status": "Failed",
+      "historyLength": "11",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-03-23T18:06:01.767867797Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {
+          "BinaryChecksums": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "WyIzMmUwNDI1OWUzYTFlMTM3ZmE2Njg5M2JiNjE3OTc5YSJd"
+          },
+          "CustomBoolField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "Qm9vbA=="
+            },
+            "data": "dHJ1ZQ=="
+          },
+          "CustomDatetimeField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RGF0ZXRpbWU="
+            },
+            "data": "IjIwMjItMDMtMjNUMTg6MDY6MDEuNzYyMDAyWiI="
+          },
+          "CustomDoubleField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RG91Ymxl"
+            },
+            "data": "Mg=="
+          },
+          "CustomIntField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "SW50"
+            },
+            "data": "Mg=="
+          },
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "InJhaW5ib3ctc3RhdHVzZXMtMDAyYzk4Ig=="
+          },
+          "CustomStringField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "VGV4dA=="
+            },
+            "data": "InJhaW5ib3cgc3RhdHVzZXMgMDAyYzk4IEZhaWxlZCI="
+          }
+        }
+      },
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "7"
+    },
+    {
+      "execution": {
+        "workflowId": "1337c9_Terminated",
+        "runId": "7a5d2860-91b9-4f18-b406-dc9b7f03e0fa"
+      },
+      "type": {
+        "name": "AnotherWorkflowType"
+      },
+      "startTime": "2022-03-23T18:06:01.797946631Z",
+      "closeTime": "2022-03-23T18:06:01.816783797Z",
+      "status": "Terminated",
+      "historyLength": "3",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-03-23T18:06:01.797946631Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {
+          "CustomBoolField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "Qm9vbA=="
+            },
+            "data": "dHJ1ZQ=="
+          },
+          "CustomDatetimeField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RGF0ZXRpbWU="
+            },
+            "data": "IjIwMjItMDMtMjNUMTg6MDY6MDEuNzkxMDc3WiI="
+          },
+          "CustomDoubleField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RG91Ymxl"
+            },
+            "data": "NA=="
+          },
+          "CustomIntField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "SW50"
+            },
+            "data": "NA=="
+          },
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "InJhaW5ib3ctc3RhdHVzZXMtMDAyYzk4Ig=="
+          },
+          "CustomStringField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "VGV4dA=="
+            },
+            "data": "InJhaW5ib3cgc3RhdHVzZXMgMDAyYzk4IFRlcm1pbmF0ZWQi"
+          }
+        }
+      },
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "2"
+    },
+    {
+      "execution": {
+        "workflowId": "1337c9_Completed",
+        "runId": "de64f5d9-a6fe-476b-8825-92d4c8fea39d"
+      },
+      "type": {
+        "name": "AnotherWorkflowType"
+      },
+      "startTime": "2022-03-23T18:06:01.757428214Z",
+      "closeTime": "2022-03-23T18:06:01.815125881Z",
+      "status": "Completed",
+      "historyLength": "11",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-03-23T18:06:01.757428214Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {
+          "BinaryChecksums": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "WyIzMmUwNDI1OWUzYTFlMTM3ZmE2Njg5M2JiNjE3OTc5YSJd"
+          },
+          "CustomBoolField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "Qm9vbA=="
+            },
+            "data": "ZmFsc2U="
+          },
+          "CustomDatetimeField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RGF0ZXRpbWU="
+            },
+            "data": "IjIwMjItMDMtMjNUMTg6MDY6MDEuNzU0NTkzWiI="
+          },
+          "CustomDoubleField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RG91Ymxl"
+            },
+            "data": "MQ=="
+          },
+          "CustomIntField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "SW50"
+            },
+            "data": "MQ=="
+          },
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "InJhaW5ib3ctc3RhdHVzZXMtMDAyYzk4Ig=="
+          },
+          "CustomStringField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "VGV4dA=="
+            },
+            "data": "InJhaW5ib3cgc3RhdHVzZXMgMDAyYzk4IENvbXBsZXRlZCI="
+          }
+        }
+      },
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "7"
+    },
+    {
+      "execution": {
+        "workflowId": "1337c9_Canceled",
+        "runId": "43a1484f-90fa-4265-95f4-8165a1d57b14"
+      },
+      "type": {
+        "name": "AnotherWorkflowType"
+      },
+      "startTime": "2022-03-23T18:06:01.777287172Z",
+      "closeTime": "2022-03-23T18:06:01.799289006Z",
+      "status": "Canceled",
+      "historyLength": "8",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-03-23T18:06:01.777287172Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {
+          "BinaryChecksums": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "WyIzMmUwNDI1OWUzYTFlMTM3ZmE2Njg5M2JiNjE3OTc5YSJd"
+          },
+          "CustomBoolField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "Qm9vbA=="
+            },
+            "data": "ZmFsc2U="
+          },
+          "CustomDatetimeField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RGF0ZXRpbWU="
+            },
+            "data": "IjIwMjItMDMtMjNUMTg6MDY6MDEuNzczNDcyWiI="
+          },
+          "CustomDoubleField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "RG91Ymxl"
+            },
+            "data": "Mw=="
+          },
+          "CustomIntField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "SW50"
+            },
+            "data": "Mw=="
+          },
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "InJhaW5ib3ctc3RhdHVzZXMtMDAyYzk4Ig=="
+          },
+          "CustomStringField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "VGV4dA=="
+            },
+            "data": "InJhaW5ib3cgc3RhdHVzZXMgMDAyYzk4IENhbmNlbGVkIg=="
+          }
+        }
+      },
+      "autoResetPoints": null,
+      "taskQueue": "rainbow-statuses",
+      "stateTransitionCount": "4"
     }
   ],
   "nextPageToken": null

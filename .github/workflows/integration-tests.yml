@@ -1,0 +1,30 @@
+name: Cypress Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install dependencies
+        run: npm ci
+      - name: Build assets
+        run: VITE_MODE=test npm run build:local
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v2
+        with:
+          install: false
+          start: npm run preview:local
+          wait-on: 'http://localhost:3000'
+          wait-on-timeout: 120
+          browser: chrome
+          record: true
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          VITE_MODE: test
