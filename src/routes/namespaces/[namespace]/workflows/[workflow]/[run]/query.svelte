@@ -70,7 +70,7 @@
       </Button>
     </div>
     <div class="flex items-start h-full">
-      <CodeBlock content={queryResult} />
+      <CodeBlock content={queryResult}/>
     </div>
   {:catch}
     <EmptyState
