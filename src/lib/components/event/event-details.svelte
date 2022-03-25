@@ -14,7 +14,7 @@
   };
 </script>
 
-<section class="sticky">
+<section>
   {#each Object.entries(event.attributes) as [key, value] (key)}
     {#if shouldDisplay(key, value)}
       <article

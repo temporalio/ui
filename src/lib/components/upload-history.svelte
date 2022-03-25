@@ -32,7 +32,6 @@
       uploadEvents.set(events);
       cancel();
     } catch (e) {
-      debugger;
       notifications.add('error', 'Could not create event history from JSON');
     }
   };
