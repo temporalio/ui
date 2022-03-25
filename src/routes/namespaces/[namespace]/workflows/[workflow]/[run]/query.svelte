@@ -61,12 +61,16 @@
           <Option {value}>{value}</Option>
         {/each}
       </Select>
-      <Button on:click={() => query(queryType)} icon={faRedo} loading={isLoading}>
+      <Button
+        on:click={() => query(queryType)}
+        icon={faRedo}
+        loading={isLoading}
+      >
         Refresh
       </Button>
     </div>
     <div class="flex items-start h-full">
-      <CodeBlock content={queryResult}/>
+      <CodeBlock content={queryResult} />
     </div>
   {:catch}
     <EmptyState
