@@ -37,10 +37,10 @@
     return queryTypes;
   });
 
-  let queryResult: string;
+  let queryResult: Promise<string>;
 
-  const query = async (queryType: string) => {
-    queryResult = await getQuery({ namespace, workflow, queryType });
+  const query = (queryType: string) => {
+    queryResult = getQuery({ namespace, workflow, queryType });
   };
 
   $: {
@@ -70,7 +70,9 @@
       </Button>
     </div>
     <div class="flex items-start h-full">
-      <CodeBlock content={queryResult} />
+      {#await queryResult then result}
+        <CodeBlock content={result} />
+      {/await}
     </div>
   {:catch}
     <EmptyState
