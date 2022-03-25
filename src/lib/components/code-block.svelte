@@ -24,8 +24,13 @@
   const formatJSON = (jsonData: string): string => {
     if (!jsonData) return;
 
-    const parsedData =
-      typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+    let parsedData: string;
+    try {
+      parsedData = JSON.parse(jsonData);
+    } catch (error) {
+      parsedData = jsonData;
+    }
+
     const formated = JSON.stringify(parsedData, undefined, 2);
 
     return formated;
