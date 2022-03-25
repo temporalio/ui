@@ -15,7 +15,6 @@
 
   $: perPage = $page.url.searchParams.get(key) || '100';
   $: store = pagination(items, perPage);
-
   $: store.adjustPageSize(perPage);
   $: store.jumpToIndex(startingIndex);
 </script>
