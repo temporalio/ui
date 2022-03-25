@@ -3,7 +3,7 @@
   import { page } from '$app/stores';
 
   import Button from '$lib/components/button.svelte';
-  import { getLoginUrl } from '$lib/utilities/get-login-url';
+  import { routeForAuthentication } from '$lib/utilities/route-for';
   import { faLock } from '@fortawesome/free-solid-svg-icons';
 
   import { fetchSettings } from '$lib/services/settings-service';
@@ -47,7 +47,13 @@
       login
       icon={faLock}
       on:click={() => {
-        goto(getLoginUrl(settings, $page.url.searchParams));
+        goto(
+          routeForAuthentication({
+            settings,
+            searchParams: $page.url.searchParams,
+            originUrl: $page.url.origin,
+          }),
+        );
       }}>Continue to SSO</Button
     >
   </div>

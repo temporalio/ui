@@ -1,5 +1,6 @@
 import {
   routeForEventHistory,
+  routeForAuthentication,
   routeForStackTrace,
   routeForWorkers,
   routeForWorkflow,
@@ -77,5 +78,98 @@ describe('routeFor', () => {
       run: 'def',
     });
     expect(path).toBe('/namespaces/default/workflows/abc/def/workers');
+  });
+});
+
+describe('routeFor sso authentication ', () => {
+  it('Options added through settings should be passed in the url', () => {
+    const settings = {
+      auth: {
+        options: ['one'],
+      },
+      baseUrl: 'https://localhost/',
+    };
+
+    const searchParams = new URLSearchParams();
+    searchParams.set('one', '1');
+    searchParams.set('two', '2');
+
+    const sso = routeForAuthentication({ settings, searchParams });
+
+    const ssoUrl = new URL(sso);
+
+    expect(ssoUrl.searchParams.get('one')).toBe('1');
+    expect(ssoUrl.searchParams.get('two')).toBeNull();
+  });
+  it("We should not add the options from the search param if they don't exist in the current url params", () => {
+    const settings = {
+      auth: {
+        options: ['one'],
+      },
+      baseUrl: 'https://localhost/',
+    };
+
+    const searchParams = new URLSearchParams();
+
+    const sso = routeForAuthentication({ settings, searchParams });
+
+    const ssoUrl = new URL(sso);
+
+    expect(ssoUrl.searchParams.get('one')).toBeNull();
+    expect(sso).toEqual('https://localhost/auth/sso');
+  });
+  it('Should render a login url', () => {
+    const settings = { auth: {}, baseUrl: 'https://localhost' };
+    const searchParams = new URLSearchParams();
+
+    const sso = routeForAuthentication({ settings, searchParams });
+
+    expect(sso).toEqual('https://localhost/auth/sso');
+  });
+  it('Should add redirect URL search param', () => {
+    const settings = { auth: {}, baseUrl: 'https://localhost' };
+
+    const searchParams = new URLSearchParams();
+    searchParams.set('redirectUrl', 'https://localhost/some/path');
+
+    const sso = routeForAuthentication({
+      settings,
+      searchParams,
+    });
+
+    const ssoUrl = new URL(sso);
+    expect(ssoUrl.searchParams.get('redirectUrl')).toBe(
+      `https://localhost/some/path`,
+    );
+  });
+  it('Should not add redirect URL search param if undefined', () => {
+    const settings = { auth: {}, baseUrl: 'https://localhost' };
+
+    const searchParams = new URLSearchParams();
+    const sso = routeForAuthentication({ settings, searchParams });
+
+    const ssoUrl = new URL(sso);
+    expect(ssoUrl.searchParams.get('redirectUrl')).toBe(null);
+  });
+  it('test of the signin flow', () => {
+    const settings = {
+      auth: {
+        options: ['organization_name', 'invitation'],
+      },
+      baseUrl: 'https://localhost/',
+    };
+
+    const searchParams = new URLSearchParams(
+      'invitation=Wwv6g2cKkfjyqoLxnCPUCfiKcjHKpK%5B%E2%80%A6%5Dn9ipxcao0jKYH0I3&organization_name=temporal-cloud',
+    );
+
+    const sso = routeForAuthentication({ settings, searchParams });
+
+    const ssoUrl = new URL(sso);
+
+    expect(ssoUrl.searchParams.get('one')).toBeNull();
+    expect(sso).toEqual(
+      'https://localhost/auth/sso?organization_name=temporal-cloud&invitation=Wwv6g2cKkfjyqoLxnCPUCfiKcjHKpK%5B%E2%80%A6%5Dn9ipxcao0jKYH0I3',
+    );
   });
 });

@@ -3,11 +3,12 @@ import { goto } from '$app/navigation';
 import { networkError } from '$lib/stores/error';
 import { notifications } from '../stores/notifications';
 import { isNetworkError } from './is-network-error';
+import { routeForLoginPage } from './route-for';
 
 // This will eventually be expanded on.
 export const handleError = (error: unknown): void => {
   if (isUnauthorized(error) && browser) {
-    goto('/login');
+    goto(routeForLoginPage());
     return;
   }
   if (isForbidden(error)) {

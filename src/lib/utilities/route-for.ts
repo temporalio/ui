@@ -1,3 +1,5 @@
+import { browser } from '$app/env';
+
 export type EventView = 'full' | 'compact' | 'summary' | 'json';
 
 type RouteParameters = {
@@ -28,6 +30,12 @@ export type EventHistoryParameters = Pick<
 export type EventParameters = Required<
   Pick<RouteParameters, 'namespace' | 'workflow' | 'run' | 'view' | 'eventId'>
 >;
+
+export type AuthenticationParameters = {
+  settings: Settings;
+  searchParams?: URLSearchParams;
+  originUrl?: string;
+};
 
 export const routeForNamespace = ({
   namespace,
@@ -85,6 +93,40 @@ export const routeForWorkflowQuery = (parameters: WorkflowParameters) => {
 
 export const routeForPendingActivities = (parameters: WorkflowParameters) => {
   return `${routeForWorkflow(parameters)}/pending-activities`;
+};
+
+export const routeForAuthentication = (
+  parameters: AuthenticationParameters,
+) => {
+  const { settings, searchParams: currentSearchParams, originUrl } = parameters;
+
+  const login = new URL('/auth/sso', settings.baseUrl);
+  let opts = settings.auth.options ?? [];
+
+  opts = [...opts, 'redirectUrl'];
+
+  opts.forEach((option) => {
+    const searchParam = currentSearchParams.get(option);
+    if (searchParam) {
+      login.searchParams.set(option, searchParam);
+    }
+  });
+
+  if (!login.searchParams.get('redirectUrl') && originUrl) {
+    login.searchParams.set('redirectUrl', originUrl);
+  }
+
+  return login.toString();
+};
+
+export const routeForLoginPage = () => {
+  if (browser) {
+    const login = new URL('login', window.location.origin);
+    login.searchParams.set('redirectUrl', window.location.href);
+    return login.toString();
+  }
+
+  return '/login';
 };
 
 const hasParameters =
