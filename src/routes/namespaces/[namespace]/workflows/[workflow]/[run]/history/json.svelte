@@ -11,9 +11,9 @@
 </script>
 
 <script lang="ts">
-  import CodeBlock from '$lib/components/code-block.svelte';
+  import EventJson from '$lib/components/event/event-json.svelte';
 
   export let events: HistoryEventWithId[];
 </script>
 
-<CodeBlock content={events} />
+<EventJson {events} />

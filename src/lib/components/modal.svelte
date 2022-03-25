@@ -4,8 +4,9 @@
   import { createEventDispatcher } from 'svelte';
   import Button from './button.svelte';
 
-  export let open = false;
-  export let confirmText = 'Confirm';
+  export let open: boolean = false;
+  export let confirmText: string = 'Confirm';
+  export let confirmDisabled: boolean = false;
 
   const dispatch = createEventDispatcher();
 </script>
@@ -34,8 +35,10 @@
         <Button secondary on:click={() => dispatch('cancelModal', {})}
           >Cancel</Button
         >
-        <Button destroy on:click={() => dispatch('confirmModal', {})}
-          >{confirmText}</Button
+        <Button
+          destroy
+          disabled={confirmDisabled}
+          on:click={() => dispatch('confirmModal', {})}>{confirmText}</Button
         >
       </div>
     </div>
