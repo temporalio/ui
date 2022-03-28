@@ -26,7 +26,11 @@
 
   import type { EventView } from '$lib/utilities/route-for';
 
+<<<<<<< HEAD
   import { importEvents, importEventGroups } from '$lib/stores/import-events';
+=======
+  import { importEvents } from '$lib/stores/import-events';
+>>>>>>> d0fd4b5 (Use import/events routes for event import)
   import ImportHistory from '$lib/components/event/event-history-import.svelte';
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
