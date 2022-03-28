@@ -43,6 +43,17 @@ export const routeForNamespace = ({
   return `/namespaces/${namespace}`;
 };
 
+export const routeForNamespaceImport = ({
+  namespace,
+  eventId,
+}: {
+  namespace: string;
+  eventId?: string;
+}): string => {
+  if (eventId) return `/namespaces/${namespace}/import/${eventId}`;
+  return `/namespaces/${namespace}/import`;
+};
+
 export const routeForWorkflows = (parameters: NamespaceParameter): string => {
   return `${routeForNamespace(parameters)}/workflows`;
 };

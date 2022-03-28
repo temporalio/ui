@@ -3,9 +3,11 @@
   import { page } from '$app/stores';
   import {
     routeForArchivalWorkfows,
+    routeForNamespaceImport,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
 
+  import { importVisited } from '$lib/stores/import-events';
   import DataConverterStatus from '$lib/components/data-converter-status.svelte';
   import NamespaceSelect from './_namespace-select.svelte';
   import NavigationLink from './_navigation-link.svelte';
