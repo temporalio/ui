@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { routeForNamespaceImport } from '$lib/utilities/route-for';
+  import { routeForImport } from '$lib/utilities/route-for';
   import { goto } from '$app/navigation';
 
   import Button from '$lib/components/button.svelte';
@@ -7,8 +7,6 @@
   import { notifications } from '$lib/stores/notifications';
   import { importEvents } from '$lib/stores/import-events';
   import { faFileImport } from '@fortawesome/free-solid-svg-icons';
-
-  export let namespace: string;
 
   let rawEvents;
 
@@ -31,7 +29,7 @@
       const events = await toEventHistory(rawEvents?.events ?? rawEvents);
       importEvents.set(events);
       const eventId = events[0]?.id ?? 1;
-      const path = routeForNamespaceImport({ namespace, eventId });
+      const path = routeForImport({ importType: 'events', eventId });
       goto(path);
     } catch (e) {
       notifications.add('error', 'Could not create event history from JSON');

@@ -1,16 +1,9 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
-  import {
-    routeForArchivalWorkfows,
-    routeForWorkflows,
-  } from '$lib/utilities/route-for';
 
   import DataConverterStatus from '$lib/components/data-converter-status.svelte';
-  import NamespaceSelect from './_namespace-select.svelte';
-  import NavigationLink from './_navigation-link.svelte';
-
-  $: namespace = $page.params.namespace;
+  import { routeForImport } from '$lib/utilities/route-for';
+  import NavigationLink from '../_navigation-link.svelte';
 
   export let user: User;
 </script>
@@ -18,18 +11,14 @@
 <header
   class="grid grid-rows-1 grid-cols-12 px-10 items-center bg-gray-900 shadow-lg gap-6"
 >
-  <div class="flex gap-4 col-span-3">
-    <a href={routeForWorkflows({ namespace })} class="block">
+  <div class="flex gap-4 col-span-1/2">
+    <a href={'/'} class="block">
       <img src="/logo.svg" alt="Temporal Logo" class="max-h-10" />
     </a>
-    <NamespaceSelect />
   </div>
   <div class="flex gap-4 col-span-4">
-    <NavigationLink href={routeForWorkflows({ namespace })}>
-      Workflows
-    </NavigationLink>
-    <NavigationLink href={routeForArchivalWorkfows({ namespace })}>
-      Archival
+    <NavigationLink href={routeForImport({ importType: 'events' })}>
+      Import
     </NavigationLink>
   </div>
   <div class="flex justify-end gap-4 col-span-5 col-end-13 items-center">

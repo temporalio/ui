@@ -35,17 +35,6 @@ export const routeForNamespace = ({
   return `/namespaces/${namespace}`;
 };
 
-export const routeForNamespaceImport = ({
-  namespace,
-  eventId,
-}: {
-  namespace: string;
-  eventId?: string;
-}): string => {
-  if (eventId) return `/namespaces/${namespace}/import/${eventId}`;
-  return `/namespaces/${namespace}/import`;
-};
-
 export const routeForWorkflows = (parameters: NamespaceParameter): string => {
   return `${routeForNamespace(parameters)}/workflows`;
 };
@@ -96,6 +85,19 @@ export const routeForWorkflowQuery = (parameters: WorkflowParameters) => {
 
 export const routeForPendingActivities = (parameters: WorkflowParameters) => {
   return `${routeForWorkflow(parameters)}/pending-activities`;
+};
+
+type ImportParameters = {
+  importType: string;
+  eventId?: string;
+};
+
+export const routeForImport = ({
+  importType,
+  eventId,
+}: ImportParameters): string => {
+  if (eventId) return `/import/${importType}/${eventId}`;
+  return `/import/${importType}`;
 };
 
 const hasParameters =
