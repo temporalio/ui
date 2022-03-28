@@ -14,8 +14,6 @@
 
 <script lang="ts">
   import { page } from '$app/stores';
-  import { goto } from '$app/navigation';
-  import { routeForImport } from '$lib/utilities/route-for';
   import { getGroupForEvent } from '$lib/models/group-events';
   import {
     faBars,
@@ -25,12 +23,7 @@
   } from '@fortawesome/free-solid-svg-icons';
 
   import type { EventView } from '$lib/utilities/route-for';
-
-<<<<<<< HEAD
   import { importEvents, importEventGroups } from '$lib/stores/import-events';
-=======
-  import { importEvents } from '$lib/stores/import-events';
->>>>>>> d0fd4b5 (Use import/events routes for event import)
   import ImportHistory from '$lib/components/event/event-history-import.svelte';
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
