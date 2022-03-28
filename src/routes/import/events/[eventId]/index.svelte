@@ -2,11 +2,10 @@
   import type { Load } from '@sveltejs/kit';
 
   export const load: Load = async function ({ params, url }) {
-    const { eventId, namespace } = params;
+    const { eventId } = params;
 
     return {
       props: {
-        namespace,
         eventId,
       },
     };
@@ -16,7 +15,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
-  import { routeForNamespace } from '$lib/utilities/route-for';
+  import { routeForImport } from '$lib/utilities/route-for';
   import { getGroupForEvent } from '$lib/models/group-events';
   import {
     faBars,
@@ -36,7 +35,6 @@
   import EventGroupDetails from '$lib/components/event/event-group-details.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
 
-  export let namespace: string;
   export let eventId: string;
 
   let tab: EventView = 'summary';
@@ -61,7 +59,7 @@
 
   $: {
     if (!events.length || !eventId) {
-      const path = routeForNamespace({ namespace }) + `/upload`;
+      const path = routeForImport({ importType: 'events' });
       goto(path);
     }
   }
@@ -102,7 +100,7 @@
             >
           </ToggleButtons>
         {/if}
-        <ImportHistory {namespace} />
+        <ImportHistory />
       </div>
     </nav>
     {#if activeView('summary')}
