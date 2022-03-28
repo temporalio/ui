@@ -3,9 +3,11 @@
   import { page } from '$app/stores';
   import {
     routeForArchivalWorkfows,
+    routeForNamespaceImport,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
 
+  import { importVisited } from '$lib/stores/import-events';
   import DataConverterStatus from '$lib/components/data-converter-status.svelte';
   import NamespaceSelect from './_namespace-select.svelte';
   import NavigationLink from './_navigation-link.svelte';
@@ -31,6 +33,11 @@
     <NavigationLink href={routeForArchivalWorkfows({ namespace })}>
       Archival
     </NavigationLink>
+    {#if $importVisited}
+      <NavigationLink href={routeForNamespaceImport({ namespace })}>
+        Import
+      </NavigationLink>
+    {/if}
   </div>
   <div class="flex justify-end gap-4 col-span-5 col-end-13 items-center">
     <div class="text-right">
