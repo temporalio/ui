@@ -26,7 +26,7 @@
 
   import type { EventView } from '$lib/utilities/route-for';
 
-  import { importEvents } from '$lib/stores/import-events';
+  import { importEvents, importEventGroups } from '$lib/stores/import-events';
   import ImportHistory from '$lib/components/event/event-history-import.svelte';
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
@@ -40,35 +40,22 @@
   let tab: EventView = 'summary';
 
   $: category = $page.url.searchParams.get('category') as EventTypeCategory;
-  $: events = $importEvents.events;
-  $: eventGroups = $importEvents.eventGroups;
-  $: filteredEvents = events;
-  $: filteredEventGroups = eventGroups;
+  $: filteredEvents = $importEvents.filter((event) => {
+    if (category) return event.category === category;
+    return event;
+  });
+  $: filteredEventGroups = $importEventGroups.filter((event) => {
+    if (category) return event.category === category;
+    return event;
+  });
 
-  $: {
-    if (category) {
-      filteredEvents = events.filter((e) => e.category === category);
-      filteredEventGroups = filteredEventGroups.filter(
-        (e) => e.category === category,
-      );
-    } else {
-      filteredEvents = events;
-      filteredEventGroups = filteredEventGroups;
-    }
-  }
+  $: event = filteredEvents.find(
+    (event: HistoryEventWithId) => event.id === eventId,
+  );
 
-  $: {
-    if (!events.length || !eventId) {
-      const path = routeForImport({ importType: 'events' });
-      goto(path);
-    }
-  }
+  $: eventGroup = event ? getGroupForEvent(event, $importEventGroups) : null;
 
-  $: event = events.find((event: HistoryEventWithId) => event.id === eventId);
-
-  $: eventGroup = getGroupForEvent(event, eventGroups);
-
-  $: activeView = (view: EventView) => events.length && tab === view;
+  $: activeView = (view: EventView) => tab === view;
 </script>
 
 <section class="flex flex-col gap-4">
@@ -76,30 +63,28 @@
     <nav class="relative flex gap-4 justify-between items-end pb-4 max-w-1/2">
       <h3 class="text-lg font-medium">Event History</h3>
       <div class="flex gap-4">
-        {#if events.length}
-          <ToggleButtons>
-            <ToggleButton
-              icon={faTable}
-              active={tab === 'summary'}
-              on:click={() => (tab = 'summary')}>Summary</ToggleButton
-            >
-            <ToggleButton
-              icon={faBars}
-              active={tab === 'full'}
-              on:click={() => (tab = 'full')}>Full</ToggleButton
-            >
-            <ToggleButton
-              icon={faLayerGroup}
-              active={tab === 'compact'}
-              on:click={() => (tab = 'compact')}>Compact</ToggleButton
-            >
-            <ToggleButton
-              icon={faCode}
-              active={tab === 'json'}
-              on:click={() => (tab = 'json')}>JSON</ToggleButton
-            >
-          </ToggleButtons>
-        {/if}
+        <ToggleButtons>
+          <ToggleButton
+            icon={faTable}
+            active={tab === 'summary'}
+            on:click={() => (tab = 'summary')}>Summary</ToggleButton
+          >
+          <ToggleButton
+            icon={faBars}
+            active={tab === 'full'}
+            on:click={() => (tab = 'full')}>Full</ToggleButton
+          >
+          <ToggleButton
+            icon={faLayerGroup}
+            active={tab === 'compact'}
+            on:click={() => (tab = 'compact')}>Compact</ToggleButton
+          >
+          <ToggleButton
+            icon={faCode}
+            active={tab === 'json'}
+            on:click={() => (tab = 'json')}>JSON</ToggleButton
+          >
+        </ToggleButtons>
         <ImportHistory />
       </div>
     </nav>
@@ -108,13 +93,13 @@
         {#if event}<EventGroupDetails {event} {eventGroup} />{/if}
       </EventSummary>
     {:else if activeView('full')}
-      <EventFull {events} />
+      <EventFull events={$importEvents} />
     {:else if activeView('compact')}
       <EventSummary items={filteredEventGroups} {category}>
         {#if event}<EventGroupDetails {event} {eventGroup} />{/if}
       </EventSummary>
     {:else if activeView('json')}
-      <CodeBlock content={events} />
+      <CodeBlock content={$importEvents} />
     {/if}
   </section>
 </section>
