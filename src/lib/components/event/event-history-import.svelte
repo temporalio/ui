@@ -5,7 +5,7 @@
   import Button from '$lib/components/button.svelte';
   import { toEventHistory } from '$lib/models/event-history';
   import { notifications } from '$lib/stores/notifications';
-  import { importEvents } from '$lib/stores/import-events';
+  import { importEvents, importEventGroups } from '$lib/stores/import-events';
   import { faFileImport } from '@fortawesome/free-solid-svg-icons';
 
   let rawEvents;
@@ -26,9 +26,12 @@
 
   const onConfirm = async () => {
     try {
-      const events = await toEventHistory(rawEvents?.events ?? rawEvents);
+      const { events, eventGroups } = await toEventHistory(
+        rawEvents?.events ?? rawEvents,
+      );
       importEvents.set(events);
-      const eventId = events[0]?.id ?? 1;
+      importEventGroups.set(eventGroups);
+      const eventId = events[0]?.id ?? '1';
       const path = routeForImport({ importType: 'events', eventId });
       goto(path);
     } catch (e) {
@@ -38,9 +41,11 @@
 </script>
 
 <input
-  class="block w-full border border-gray-200 rounded-md p-2"
+  class="import-input block w-full border border-gray-200 rounded-md p-2"
   type="file"
   accept=".json"
   on:change={onFileSelect}
 />
-<Button icon={faFileImport} on:click={onConfirm}>Import</Button>
+<Button classes="import-btn" icon={faFileImport} on:click={onConfirm}
+  >Import</Button
+>
