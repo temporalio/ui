@@ -28,7 +28,7 @@
   import type { EventView } from '$lib/utilities/route-for';
 
   import { uploadEvents } from '$lib/stores/uploads-events';
-  import UploadHistory from '$lib/components/upload-history.svelte';
+  import UploadHistory from '$lib/components/event/event-history-upload.svelte';
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
   import EventSummary from '$lib/components/event/event-summary.svelte';
@@ -75,7 +75,7 @@
 
 <section class="flex flex-col gap-4">
   <section id="event-history">
-    <nav class="flex gap-4 justify-between items-end pb-4">
+    <nav class="flex gap-4 justify-between items-end pb-4 max-w-1/2">
       <h3 class="text-lg font-medium">Event History</h3>
       <div class="flex gap-4">
         {#if events.length}
