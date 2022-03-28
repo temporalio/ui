@@ -5,7 +5,7 @@
   import { uploadEvents } from '$lib/stores/uploads-events';
   import { faFileImport, faIcons } from '@fortawesome/free-solid-svg-icons';
 
-  let rawEvents: HistoryEvent[];
+  let rawEvents: HistoryEvent[] | { events: HistoryEvent[] };
 
   const onFileSelect = async (e) => {
     const file = e.target.files[0];
@@ -23,7 +23,7 @@
 
   const onConfirm = async () => {
     try {
-      const events = await toEventHistory(rawEvents);
+      const events = await toEventHistory(rawEvents?.events ?? rawEvents);
       uploadEvents.set(events);
     } catch (e) {
       notifications.add('error', 'Could not create event history from JSON');
