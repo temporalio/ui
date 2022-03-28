@@ -27,14 +27,14 @@
 
   import type { EventView } from '$lib/utilities/route-for';
 
-  import { uploadEvents } from '$lib/stores/uploads-events';
-  import UploadHistory from '$lib/components/event/event-history-upload.svelte';
+  import { importEvents } from '$lib/stores/import-events';
+  import ImportHistory from '$lib/components/event/event-history-import.svelte';
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
   import EventSummary from '$lib/components/event/event-summary.svelte';
   import EventFull from '$lib/components/event/event-full.svelte';
-  import EventJson from '$lib/components/event/event-json.svelte';
   import EventGroupDetails from '$lib/components/event/event-group-details.svelte';
+  import CodeBlock from '$lib/components/code-block.svelte';
 
   export let namespace: string;
   export let eventId: string;
@@ -42,8 +42,8 @@
   let tab: EventView = 'summary';
 
   $: category = $page.url.searchParams.get('category') as EventTypeCategory;
-  $: events = $uploadEvents.events;
-  $: eventGroups = $uploadEvents.eventGroups;
+  $: events = $importEvents.events;
+  $: eventGroups = $importEvents.eventGroups;
   $: filteredEvents = events;
   $: filteredEventGroups = eventGroups;
 
@@ -102,7 +102,7 @@
             >
           </ToggleButtons>
         {/if}
-        <UploadHistory />
+        <ImportHistory {namespace} />
       </div>
     </nav>
     {#if activeView('summary')}
@@ -116,7 +116,7 @@
         {#if event}<EventGroupDetails {event} {eventGroup} />{/if}
       </EventSummary>
     {:else if activeView('json')}
-      <EventJson {events} />
+      <CodeBlock content={events} />
     {/if}
   </section>
 </section>
