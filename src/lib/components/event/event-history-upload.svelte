@@ -3,9 +3,9 @@
   import { toEventHistory } from '$lib/models/event-history';
   import { notifications } from '$lib/stores/notifications';
   import { uploadEvents } from '$lib/stores/uploads-events';
-  import { faFileImport, faIcons } from '@fortawesome/free-solid-svg-icons';
+  import { faFileImport } from '@fortawesome/free-solid-svg-icons';
 
-  let rawEvents: HistoryEvent[] | { events: HistoryEvent[] };
+  let rawEvents;
 
   const onFileSelect = async (e) => {
     const file = e.target.files[0];
