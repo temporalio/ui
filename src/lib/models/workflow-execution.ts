@@ -22,7 +22,7 @@ export const toWorkflowExecution = (
   const parentNamespaceId = response?.workflowExecutionInfo?.parentNamespaceId;
   const parent = response?.workflowExecutionInfo?.parentExecution;
   const stateTransitionCount =
-    response?.workflowExecutionInfo?.stateTransitionCount;
+    response.workflowExecutionInfo.stateTransitionCount;
 
   const pendingActivities: PendingActivity[] = toPendingActivities(
     response.pendingActivities,
