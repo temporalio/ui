@@ -9,6 +9,7 @@
   import DataConverterStatus from '$lib/components/data-converter-status.svelte';
   import NamespaceSelect from './_namespace-select.svelte';
   import NavigationLink from './_navigation-link.svelte';
+  import IsCloudGuard from '$lib/components/is-cloud-guard.svelte';
 
   $: namespace = $page.params.namespace;
 
@@ -28,9 +29,11 @@
     <NavigationLink href={routeForWorkflows({ namespace })}>
       Workflows
     </NavigationLink>
-    <NavigationLink href={routeForArchivalWorkfows({ namespace })}>
-      Archival
-    </NavigationLink>
+    <IsCloudGuard>
+      <NavigationLink href={routeForArchivalWorkfows({ namespace })}>
+        Archival
+      </NavigationLink>
+    </IsCloudGuard>
   </div>
   <div class="flex justify-end gap-4 col-span-5 col-end-13 items-center">
     <div class="text-right">
