@@ -19,6 +19,6 @@
 
 <style lang="postcss">
   a.active {
-    @apply border-b-2 rounded-b-sm border-blue-700 font-medium;
+    @apply border-b-2 rounded-b-sm text-blue-700 border-blue-700 font-medium;
   }
 </style>
