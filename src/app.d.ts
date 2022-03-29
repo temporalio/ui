@@ -16,5 +16,6 @@ declare namespace App {
     settings: Settings;
     matchingEvents?: HistoryEventWithId[];
     matchingEventGroups?: CompactEventGroups;
+    workers?: GetPollersResponse;
   }
 }

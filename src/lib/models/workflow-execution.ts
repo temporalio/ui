@@ -19,6 +19,11 @@ export const toWorkflowExecution = (
   const historyEvents = response.workflowExecutionInfo.historyLength;
   const url = `/workflows/${id}/${runId}`;
   const taskQueue = response?.executionConfig?.taskQueue?.name;
+  const parentNamespaceId = response?.workflowExecutionInfo?.parentNamespaceId;
+  const parent = response?.workflowExecutionInfo?.parentExecution;
+  const stateTransitionCount =
+    response.workflowExecutionInfo.stateTransitionCount;
+
   const pendingActivities: PendingActivity[] = toPendingActivities(
     response.pendingActivities,
   );
@@ -34,6 +39,9 @@ export const toWorkflowExecution = (
     url,
     taskQueue,
     pendingActivities,
+    parentNamespaceId,
+    parent,
+    stateTransitionCount,
   };
 };
 

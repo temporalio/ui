@@ -1,15 +1,11 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
 
-  import { getPollers } from '$lib/services/pollers-service';
   import type { GetPollersResponse } from '$lib/services/pollers-service';
 
   export const load: Load = async function ({ params, stuff }) {
-    const { namespace } = params;
-    const { workflow } = stuff;
+    const { workflow, workers } = stuff;
     const { taskQueue } = workflow as WorkflowExecution;
-
-    const workers = await getPollers({ queue: taskQueue, namespace });
 
     return {
       props: { workers, taskQueue },
