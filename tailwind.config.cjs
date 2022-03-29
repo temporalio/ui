@@ -1,5 +1,5 @@
 const temporalColors = {
-  primary: { DEFAULT: '#1d4ed8' }, // blue-700
+  primary: { DEFAULT: '#18181b' }, // gray-900
   secondary: '#64748b', // blue-gray-500
   primaryText: '#141414',
   spaceGray: { DEFAULT: '#141414' },

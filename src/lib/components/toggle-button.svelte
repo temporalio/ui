@@ -11,12 +11,13 @@
   export let scale = 1;
   export let href = '#';
   export let base = href;
+  export let active: boolean = false;
 </script>
 
 <a
   class="border-2 py-2 px-4 hover:text-white hover:bg-gray-600 flex items-center justify-center"
   class:rounded-lg={!group}
-  class:active={$page.url.pathname.includes(base)}
+  class:active={$page.url.pathname.includes(base) || active}
   class:group
   href={href + $page.url.search}
   on:click

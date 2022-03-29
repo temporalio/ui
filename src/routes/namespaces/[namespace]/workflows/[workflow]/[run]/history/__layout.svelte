@@ -93,7 +93,6 @@
             href={routeForEventHistory(routeParameters('compact'))}
             >Compact</ToggleButton
           >
-
           <ToggleButton
             icon={faCode}
             href={routeForEventHistory(routeParameters('json'))}

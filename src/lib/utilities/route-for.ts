@@ -129,6 +129,19 @@ export const routeForLoginPage = () => {
   return '/login';
 };
 
+type ImportParameters = {
+  importType: string;
+  eventId?: string;
+};
+
+export const routeForImport = ({
+  importType,
+  eventId,
+}: ImportParameters): string => {
+  if (eventId) return `/import/${importType}/${eventId}`;
+  return `/import/${importType}`;
+};
+
 const hasParameters =
   <T extends Record<string, string>>(...required: string[]) =>
   (parameters: Record<string, string>): parameters is T => {
