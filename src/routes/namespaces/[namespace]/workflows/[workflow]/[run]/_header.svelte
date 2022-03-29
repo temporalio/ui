@@ -2,26 +2,36 @@
   import Icon from 'svelte-fa';
   import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 
+  import { page } from '$app/stores';
   import {
     routeForEventHistory,
     routeForPendingActivities,
     routeForStackTrace,
     routeForWorkers,
     routeForWorkflowQuery,
+    routeForWorkflow,
   } from '$lib/utilities/route-for';
+  import { formatDate } from '$lib/utilities/format-date';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
   import Tab from '$lib/components/tab.svelte';
+  import type { GetPollersResponse } from '$lib/services/pollers-service';
+  import Link from '$lib/components/link.svelte';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
+  export let workers: GetPollersResponse;
 
   const routeParameters = {
     namespace,
     workflow: workflow.id,
     run: workflow.runId,
   };
+
+  $: historyActive = $page.url.pathname.includes(
+    routeForEventHistory(routeParameters),
+  );
 </script>
 
 <header class="flex flex-col gap-4">
@@ -33,35 +43,77 @@
     >
       <Icon icon={faChevronLeft} />
     </a>
-    <div class="flex justify-between items-center">
-      <h1 class="text-2xl">
-        {workflow.name}
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-2xl relative">
+        <span class="font-medium">{workflow.id}</span>
         <WorkflowStatus status={workflow?.status} />
       </h1>
       <TerminateWorkflow {workflow} {namespace} />
     </div>
-    <p class="text-md">
-      <span>Workflow ID</span>
-      <span class="font-medium">{workflow.id}</span>
-    </p>
-    <p class="text-md">
-      <span>Run ID</span>
-      <span class="font-medium">{workflow.runId}</span>
-    </p>
+    <nav class="flex gap-6 mb-6">
+      <Tab
+        label="History"
+        href={routeForEventHistory(routeParameters)}
+        amount={workflow?.historyEvents}
+      />
+      <Tab
+        label="Workers"
+        href={routeForWorkers(routeParameters)}
+        amount={workers?.pollers?.length}
+      />
+      <Tab
+        label="Pending Activities"
+        href={routeForPendingActivities(routeParameters)}
+        amount={workflow.pendingActivities?.length}
+      />
+      <Tab label="Stack Trace" href={routeForStackTrace(routeParameters)} />
+      <Tab label="Queries" href={routeForWorkflowQuery(routeParameters)} />
+    </nav>
+    {#if historyActive}
+      <p class="text-md">
+        <span class="font-medium">Workflow Type:</span>
+        <span class="ml-1">{workflow.name}</span>
+      </p>
+      <p class="text-md">
+        <span class="font-medium">Run ID:</span>
+        <span class="ml-1">{workflow.runId}</span>
+      </p>
+      <div class="text-md flex gap-6">
+        <p>
+          <span class="font-medium">Start Time:</span>
+          <span class="ml-1">{formatDate(workflow.startTime, 'UTC')}</span>
+        </p>
+        <p>
+          <span class="font-medium">Closed Time:</span>
+          <span class="ml-1">{formatDate(workflow.endTime, 'UTC')}</span>
+        </p>
+      </div>
+      <p class="text-md">
+        <span class="font-medium">Task Queue:</span>
+        <span class="ml-1"
+          ><Link href={routeForWorkers(routeParameters)}
+            >{workflow.taskQueue}</Link
+          ></span
+        >
+      </p>
+      {#if workflow?.parentNamespaceId && workflow?.parent}
+        <p class="text-md">
+          <span class="font-medium">Parent:</span>
+          <span class="ml-1"
+            ><Link
+              href={routeForWorkflow({
+                namespace: workflow.parentNamespaceId,
+                workflow: workflow.parent?.workflowId,
+                run: workflow.parent?.runId,
+              })}>{workflow.parent?.workflowId}</Link
+            ></span
+          >
+        </p>
+      {/if}
+      <p class="text-md">
+        <span class="font-medium">State Transitions:</span>
+        <span class="ml-1">{workflow.stateTransitionCount}</span>
+      </p>
+    {/if}
   </main>
-  <nav class="flex gap-6">
-    <Tab
-      label="History"
-      href={routeForEventHistory(routeParameters)}
-      amount={workflow?.historyEvents}
-    />
-    <Tab
-      label="Pending Activities"
-      href={routeForPendingActivities(routeParameters)}
-      amount={workflow.pendingActivities?.length}
-    />
-    <Tab label="Workers" href={routeForWorkers(routeParameters)} />
-    <Tab label="Stack Trace" href={routeForStackTrace(routeParameters)} />
-    <Tab label="Query" href={routeForWorkflowQuery(routeParameters)} />
-  </nav>
 </header>

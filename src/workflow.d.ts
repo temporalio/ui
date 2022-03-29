@@ -47,5 +47,8 @@ type WorkflowExecution = {
   taskQueue?: string;
   historyEvents: Long;
   pendingActivities: PendingActivity[];
+  stateTransitionCount: string;
+  parentNamespaceId?: string;
+  parent?: IWorkflowExecution;
   url: string;
 };
