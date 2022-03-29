@@ -127,7 +127,7 @@ export const routeForLoginPage = () => {
   }
 
   return '/login';
-}
+};
 
 type ImportParameters = {
   importType: string;
