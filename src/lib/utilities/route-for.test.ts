@@ -126,11 +126,11 @@ describe('routeFor sso authentication ', () => {
 
     expect(sso).toEqual('https://localhost/auth/sso');
   });
-  it('Should add redirect URL search param', () => {
+  it('Should add return URL search param', () => {
     const settings = { auth: {}, baseUrl: 'https://localhost' };
 
     const searchParams = new URLSearchParams();
-    searchParams.set('redirectUrl', 'https://localhost/some/path');
+    searchParams.set('returnUrl', 'https://localhost/some/path');
 
     const sso = routeForAuthentication({
       settings,
@@ -138,18 +138,18 @@ describe('routeFor sso authentication ', () => {
     });
 
     const ssoUrl = new URL(sso);
-    expect(ssoUrl.searchParams.get('redirectUrl')).toBe(
+    expect(ssoUrl.searchParams.get('returnUrl')).toBe(
       `https://localhost/some/path`,
     );
   });
-  it('Should not add redirect URL search param if undefined', () => {
+  it('Should not add return URL search param if undefined', () => {
     const settings = { auth: {}, baseUrl: 'https://localhost' };
 
     const searchParams = new URLSearchParams();
     const sso = routeForAuthentication({ settings, searchParams });
 
     const ssoUrl = new URL(sso);
-    expect(ssoUrl.searchParams.get('redirectUrl')).toBe(null);
+    expect(ssoUrl.searchParams.get('returnUrl')).toBe(null);
   });
   it('test of the signin flow', () => {
     const settings = {

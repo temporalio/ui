@@ -103,7 +103,7 @@ export const routeForAuthentication = (
   const login = new URL('/auth/sso', settings.baseUrl);
   let opts = settings.auth.options ?? [];
 
-  opts = [...opts, 'redirectUrl'];
+  opts = [...opts, 'returnUrl'];
 
   opts.forEach((option) => {
     const searchParam = currentSearchParams.get(option);
@@ -112,8 +112,8 @@ export const routeForAuthentication = (
     }
   });
 
-  if (!login.searchParams.get('redirectUrl') && originUrl) {
-    login.searchParams.set('redirectUrl', originUrl);
+  if (!login.searchParams.get('returnUrl') && originUrl) {
+    login.searchParams.set('returnUrl', originUrl);
   }
 
   return login.toString();
@@ -122,7 +122,7 @@ export const routeForAuthentication = (
 export const routeForLoginPage = () => {
   if (browser) {
     const login = new URL('login', window.location.origin);
-    login.searchParams.set('redirectUrl', window.location.href);
+    login.searchParams.set('returnUrl', window.location.href);
     return login.toString();
   }
 
