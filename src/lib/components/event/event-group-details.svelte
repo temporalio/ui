@@ -5,7 +5,7 @@
   import Link from '$lib/components/link.svelte';
 
   export let event: HistoryEventWithId;
-  export let eventGroup;
+  export let eventGroup: CompactEventGroup | null;
 </script>
 
 <section class="overflow-y-scroll max-h-full">

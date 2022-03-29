@@ -8,7 +8,8 @@
   import { importEvents, importEventGroups } from '$lib/stores/import-events';
   import { faFileImport } from '@fortawesome/free-solid-svg-icons';
 
-  let rawEvents;
+  // rawEvents is expected to be HistoryEvent[] | { events: HistoryEvent[] } but could be anything
+  let rawEvents: any;
 
   const onFileSelect = async (e) => {
     const file = e.target.files[0];
