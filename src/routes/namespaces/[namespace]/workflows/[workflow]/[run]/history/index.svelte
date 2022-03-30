@@ -2,9 +2,6 @@
   import type { Load } from '@sveltejs/kit';
 
   export const load: Load = async function ({ url }) {
-    return {
-      status: 302,
-      redirect: `${url.pathname}/compact`,
-    };
+    return { status: 302, redirect: `${url.pathname}/full` };
   };
 </script>

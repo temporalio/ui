@@ -85,7 +85,7 @@
   }
 
   .secondary:hover:enabled {
-    @apply text-white bg-purple-300;
+    @apply text-white bg-gray-300;
   }
 
   .destroy {

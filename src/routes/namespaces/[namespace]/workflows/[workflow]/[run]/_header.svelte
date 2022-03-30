@@ -50,8 +50,10 @@
         <span class="font-medium">{workflow.id}</span>
         <WorkflowStatus status={workflow?.status} />
       </h1>
-      <ExportHistory />
-      <TerminateWorkflow {workflow} {namespace} />
+      <div class="flex justify-end items-center gap-4">
+        <ExportHistory />
+        <TerminateWorkflow {workflow} {namespace} />
+      </div>
     </div>
     <nav class="flex gap-6 mb-6">
       <Tab

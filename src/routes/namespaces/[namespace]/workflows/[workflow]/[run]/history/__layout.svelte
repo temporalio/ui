@@ -78,9 +78,8 @@
           <ToggleButton
             icon={faTable}
             base={routeForEventHistory(routeParameters('summary'))}
-            href={routeForEventHistoryItem(
-              routeParameters('summary', $page.params.eventId || '1'),
-            )}>Summary</ToggleButton
+            href={routeForEventHistory(routeParameters('summary'))}
+            >Summary</ToggleButton
           >
           <ToggleButton
             icon={faBars}
