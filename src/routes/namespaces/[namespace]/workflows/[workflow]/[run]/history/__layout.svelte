@@ -49,6 +49,7 @@
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
   import PendingActivties from './_pending-activties.svelte';
+import PaginationNav from '$lib/components/pagination-nav.svelte';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
@@ -74,29 +75,32 @@
     <nav class="flex gap-4 justify-between items-end pb-4">
       <h3 class="text-lg font-medium">Recent Events</h3>
       <div class="flex gap-4">
-        <ToggleButtons>
-          <ToggleButton
-            icon={faTable}
-            base={routeForEventHistory(routeParameters('summary'))}
-            href={routeForEventHistory(routeParameters('summary'))}
-            >Summary</ToggleButton
-          >
-          <ToggleButton
-            icon={faBars}
-            href={routeForEventHistory(routeParameters('full'))}
-            >Full</ToggleButton
-          >
-          <ToggleButton
-            icon={faLayerGroup}
-            href={routeForEventHistory(routeParameters('compact'))}
-            >Compact</ToggleButton
-          >
-          <ToggleButton
-            icon={faCode}
-            href={routeForEventHistory(routeParameters('json'))}
-            >JSON</ToggleButton
-          >
-        </ToggleButtons>
+        <PaginationNav />
+        <div class="flex gap-4">
+          <ToggleButtons>
+            <ToggleButton
+              icon={faTable}
+              base={routeForEventHistory(routeParameters('summary'))}
+              href={routeForEventHistory(routeParameters('summary'))}
+              >Summary</ToggleButton
+            >
+            <ToggleButton
+              icon={faBars}
+              href={routeForEventHistory(routeParameters('full'))}
+              >Full</ToggleButton
+            >
+            <ToggleButton
+              icon={faLayerGroup}
+              href={routeForEventHistory(routeParameters('compact'))}
+              >Compact</ToggleButton
+            >
+            <ToggleButton
+              icon={faCode}
+              href={routeForEventHistory(routeParameters('json'))}
+              >JSON</ToggleButton
+            >
+          </ToggleButtons>
+        </div>  
       </div>
     </nav>
     <slot />

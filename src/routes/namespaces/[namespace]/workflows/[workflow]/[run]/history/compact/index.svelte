@@ -13,7 +13,6 @@
     return {
       props: {
         items,
-        category,
       },
       stuff: {
         matchingEventGroups: eventGroups,
@@ -29,35 +28,17 @@
   import Pagination from '$lib/components/pagination.svelte';
   import LoadingRow from '$lib/components/loading-row.svelte';
 
-  import FilterSelect from '$lib/components/select/filter-select.svelte';
-  import Option from '$lib/components/select/option.svelte';
   import EventCompactTable from '$lib/components/event/event-compact-table.svelte';
   import EventCompactRow from '$lib/components/event/event-compact-row.svelte';
 
   export let items: IterableEvents;
-  export let category: EventTypeCategory;
-
-  const startingIndex = items.findIndex(
-    ({ id }) => $page.params.eventId === id,
-  );
 </script>
 
 {#await items}
   <LoadingRow />
 {:then items}
   {#if items.length}
-    <div class="flex items-center gap-4">
-      <FilterSelect parameter="category" bind:value={category}>
-        <Option value={undefined}>All</Option>
-        <Option value="activity">Activity</Option>
-        <Option value="command">Command</Option>
-        <Option value="signal">Signal</Option>
-        <Option value="timer">Timer</Option>
-        <Option value="child-workflow">Child Workflow</Option>
-        <Option value="workflow">Workflow</Option>
-      </FilterSelect>
-    </div>
-    <Pagination {items} {startingIndex} let:visibleItems>
+    <Pagination {items} let:visibleItems>
       <EventCompactTable>
         {#each visibleItems as eventGroup (eventGroup.id)}
           <EventCompactRow {eventGroup} />
@@ -65,6 +46,10 @@
       </EventCompactTable>
     </Pagination>
   {:else}
-    <EmptyState title={'No Events Found'} />
+    <Pagination {items} let:visibleItems>
+      <EventCompactTable>
+        <EmptyState title={'No Events Found'} />
+      </EventCompactTable>
+    </Pagination>
   {/if}
 {/await}

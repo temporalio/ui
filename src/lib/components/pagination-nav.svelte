@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { page } from '$app/stores';
+
   import Icon from 'svelte-fa';
   import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 
@@ -11,9 +13,15 @@
   export let key = 'per-page';
   export let perPage: string;
   export let items: T[];
-  export let startingIndex: string | number = null;
+
+  const startingIndex = items.findIndex(
+    ({ id }) => $page.params.eventId === id,
+  );
 
   $: store = pagination(items, perPage);
+  $: store.adjustPageSize(perPage);
+  $: store.jumpToIndex(startingIndex);
+
 </script>
 
 <nav class="flex justify-end gap-8">
