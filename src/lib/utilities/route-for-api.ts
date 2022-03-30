@@ -38,10 +38,10 @@ export function routeForApi(
     'task-queue': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}`,
     workflows: `/namespaces/${parameters?.namespace}/workflows`,
     'workflows.archived': `/namespaces/${parameters?.namespace}/workflows/archived`,
-    workflow: `/namespaces/${parameters?.namespace}/workflows/${parameters?.executionId}/executions/${parameters?.runId}`,
-    'workflow.terminate': `/namespaces/${parameters?.namespace}/workflows/${parameters?.executionId}/executions/${parameters?.runId}/terminate`,
-    events: `/namespaces/${parameters?.namespace}/workflows/${parameters?.executionId}/executions/${parameters?.runId}/events`,
-    query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.executionId}/executions/${parameters?.runId}/query`,
+    workflow: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}`,
+    'workflow.terminate': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/terminate`,
+    events: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/events`,
+    query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/query`,
   };
 
   return withBase(routes[route]);

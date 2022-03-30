@@ -40,7 +40,7 @@ const formatParameters = async (
   workflow = await workflow;
   return {
     namespace,
-    executionId: workflow.id,
+    workflowId: workflow.id,
     runId: workflow.runId,
   };
 };

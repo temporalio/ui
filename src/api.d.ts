@@ -18,7 +18,7 @@ type APIRoutePath =
 
 type APIRouteParameters = {
   namespace: string;
-  executionId: string;
+  workflowId: string;
   runId: string;
   queue: string;
 };
@@ -27,7 +27,7 @@ type WorkflowListRouteParameters = Pick<APIRouteParameters, 'namespace'>;
 
 type WorkflowRouteParameters = Pick<
   APIRouteParameters,
-  'namespace' | 'executionId' | 'runId'
+  'namespace' | 'workflowId' | 'runId'
 >;
 type TaskQueueRouteParameters = Pick<APIRouteParameters, 'namespace' | 'queue'>;
 

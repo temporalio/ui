@@ -7,19 +7,19 @@ import { toEventHistory } from '$lib/models/event-history';
 
 type FetchEvents = NamespaceScopedRequest &
   PaginationCallbacks<GetWorkflowExecutionHistoryResponse> & {
-    executionId: string;
+    workflowId: string;
     runId: string;
     rawPayloads?: boolean;
   };
 
 export const fetchRawEvents = async (
-  { namespace, executionId, runId, onStart, onUpdate, onComplete }: FetchEvents,
+  { namespace, workflowId, runId, onStart, onUpdate, onComplete }: FetchEvents,
   request = fetch,
 ): Promise<HistoryEvent[]> => {
   const response = await paginated(
     async (token: string) => {
       return requestFromAPI<GetWorkflowExecutionHistoryResponse>(
-        routeForApi('events', { namespace, executionId, runId }),
+        routeForApi('events', { namespace, workflowId, runId }),
         {
           token,
           request,

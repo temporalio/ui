@@ -5,12 +5,12 @@
   import { fetchRawEvents } from '$lib/services/events-service';
   import { faDownload } from '@fortawesome/free-solid-svg-icons';
 
-  const { workflow: executionId, run: runId, namespace } = $page.params;
+  const { workflow: workflowId, run: runId, namespace } = $page.params;
 
   const exportHistory = async () => {
     const events = await fetchRawEvents({
       namespace,
-      executionId,
+      workflowId,
       runId,
     });
 

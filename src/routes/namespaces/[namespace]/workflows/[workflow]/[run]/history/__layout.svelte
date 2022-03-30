@@ -12,7 +12,7 @@
     const { namespace } = params;
     const parameters = {
       namespace,
-      executionId: workflow.id,
+      workflowId: workflow.id,
       runId: workflow.runId,
     };
 

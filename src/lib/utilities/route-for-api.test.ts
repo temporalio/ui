@@ -2,7 +2,7 @@ import { routeForApi } from './route-for-api';
 
 const parameters = {
   namespace: 'namespace',
-  executionId: 'execution',
+  workflowId: 'workflow',
   runId: 'run',
   queue: 'queue',
 };
@@ -10,13 +10,13 @@ const parameters = {
 describe(routeForApi, () => {
   it('should return a route for workflow', () => {
     expect(routeForApi('workflow', parameters)).toBe(
-      'http://localhost:8080/api/v1/namespaces/namespace/workflows/execution/executions/run',
+      'http://localhost:8080/api/v1/namespaces/namespace/workflows/workflow/runs/run',
     );
   });
 
   it('should return a route for events', () => {
     expect(routeForApi('events', parameters)).toBe(
-      'http://localhost:8080/api/v1/namespaces/namespace/workflows/execution/executions/run/events',
+      'http://localhost:8080/api/v1/namespaces/namespace/workflows/workflow/runs/run/events',
     );
   });
 
@@ -42,7 +42,7 @@ describe(routeForApi, () => {
 
   it('should return a route for workflow.terminate', () => {
     expect(routeForApi('workflow.terminate', parameters)).toBe(
-      'http://localhost:8080/api/v1/namespaces/namespace/workflows/execution/executions/run/terminate',
+      'http://localhost:8080/api/v1/namespaces/namespace/workflows/workflow/runs/run/terminate',
     );
   });
 });
@@ -52,10 +52,10 @@ describe('API Request Encoding', () => {
     expect(
       routeForApi('workflow', {
         ...parameters,
-        executionId: 'worflow#with#hashes',
+        workflowId: 'worflow#with#hashes',
       }),
     ).toBe(
-      'http://localhost:8080/api/v1/namespaces/namespace/workflows/worflow%23with%23hashes/executions/run',
+      'http://localhost:8080/api/v1/namespaces/namespace/workflows/worflow%23with%23hashes/runs/run',
     );
   });
 });

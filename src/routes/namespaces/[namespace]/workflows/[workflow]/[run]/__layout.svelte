@@ -6,11 +6,11 @@
   import type { GetPollersResponse } from '$lib/services/pollers-service';
 
   export const load: Load = async function ({ params, fetch }) {
-    const { workflow: executionId, run: runId, namespace } = params;
+    const { workflow: workflowId, run: runId, namespace } = params;
 
     const parameters = {
       namespace,
-      executionId,
+      workflowId,
       runId,
     };
 

@@ -15,7 +15,7 @@ export async function terminateWorkflow({
   return await requestFromAPI<null>(
     routeForApi('workflow.terminate', {
       namespace,
-      executionId: workflow.id,
+      workflowId: workflow.id,
       runId: workflow.runId,
     }),
     {
