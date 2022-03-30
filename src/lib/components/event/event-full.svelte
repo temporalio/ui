@@ -3,6 +3,7 @@
 
   import Pagination from '$lib/components/pagination.svelte';
   import EventDetails from '$lib/components/event/event-details.svelte';
+  import EventClassification from './event-classification.svelte';
 
   export let events: HistoryEventWithId[];
 </script>
@@ -10,15 +11,19 @@
 <Pagination items={events} let:visibleItems>
   <section class="border-2 border-gray-300 rounded-lg w-full mb-6">
     <header class="flex table-header rounded-t-lg">
-      <h3 class="w-1/12">Workflow Events</h3>
+      <h3 class="w-3/12">Workflow Events</h3>
       <h3 class="w-2/12">Date & Time</h3>
-      <h3 class="w-3/4">Event Details</h3>
+      <h3 class="w-7/12">Event Details</h3>
     </header>
     {#each visibleItems as event (event.id)}
       <article class="table-row" id={event.id}>
-        <p class="w-1/12"><a href="#{event.id}">{event.id}</a></p>
+        <p class="w-3/12">
+          <a href="#{event.id}" class="mr-3">{event.id}</a><EventClassification
+            {event}
+          />
+        </p>
         <p class="w-2/12">{formatDate(event.eventTime)}</p>
-        <div class="w-3/4 relative">
+        <div class="w-7/12 relative">
           <EventDetails {event} />
         </div>
       </article>
