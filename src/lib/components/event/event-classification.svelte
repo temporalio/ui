@@ -2,16 +2,16 @@
   export let event: IterableEvent;
 </script>
 
-<span class="label {event.classification} font-semibold">
+<span class="label font-semibold">
   {event.name}
 </span>
 
 <style lang="postcss">
   .label {
-    @apply px-2 text-gray-700 bg-gray-300;
+    @apply px-4 text-gray-900 font-medium;
   }
 
-  .Open,
+  /* .Open,
   .New {
     @apply text-indigo-700 bg-indigo-100;
   }
@@ -37,5 +37,5 @@
   .Failed,
   .Terminated {
     @apply text-red-700 bg-red-100;
-  }
+  } */
 </style>

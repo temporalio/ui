@@ -8,7 +8,7 @@ type ValidTime = Parameters<typeof parseJSON>[0] | Timestamp;
 const pattern = 'yyyy-MM-dd z HH:mm:ss.SS';
 
 export function formatDate(
-  date: ValidTime,
+  date: ValidTime | undefined | null,
   timeFormat: TimeFormat = 'UTC',
 ): string {
   if (!date) return '';

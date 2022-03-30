@@ -51,12 +51,3 @@
     };
   };
 </script>
-
-<script lang="ts">
-  import EventGroupDetails from '$lib/components/event/event-group-details.svelte';
-
-  export let event: HistoryEventWithId;
-  export let eventGroup: CompactEventGroup;
-</script>
-
-<EventGroupDetails {event} {eventGroup} />

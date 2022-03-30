@@ -15,7 +15,7 @@
 </script>
 
 <a
-  class="border-2 py-2 px-4 hover:text-white hover:bg-gray-600 flex items-center justify-center"
+  class="border-2 py-2 px-4 hover:text-white text-sm hover:bg-gray-600 flex items-center justify-center"
   class:rounded-lg={!group}
   class:active={$page.url.pathname.includes(base) || active}
   class:group

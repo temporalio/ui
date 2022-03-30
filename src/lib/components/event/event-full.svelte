@@ -9,21 +9,28 @@
 </script>
 
 <Pagination items={events} let:visibleItems>
-  <section class="border-2 border-gray-300 rounded-lg w-full mb-6">
-    <header class="flex table-header rounded-t-lg">
-      <h3 class="w-3/12">Workflow Events</h3>
-      <h3 class="w-2/12">Date & Time</h3>
-      <h3 class="w-7/12">Event Details</h3>
-    </header>
+  <section class="full-table">
+    <div class="table-header md:table-header-group">
+      <div class="md:table-row hidden">
+        <div class="table-header-cell w-3/12 rounded-tl-lg">
+          Workflow Events
+        </div>
+        <div class="table-header-cell w-3/12">Date & Time</div>
+        <div class="table-header-cell w-1/2 rounded-tr-lg">Event Details</div>
+      </div>
+    </div>
+    <div class="table-header md:hidden rounded-t-lg">
+      <div class="table-header-cell">Full</div>
+    </div>
     {#each visibleItems as event (event.id)}
-      <article class="table-row" id={event.id}>
-        <p class="w-3/12">
+      <article class="row">
+        <div class="cell w-full md:w-3/12">
           <a href="#{event.id}" class="mr-3">{event.id}</a><EventClassification
             {event}
           />
-        </p>
-        <p class="w-2/12">{formatDate(event.eventTime)}</p>
-        <div class="w-7/12 relative">
+        </div>
+        <div class="cell w-full md:w-2/12">{formatDate(event.eventTime)}</div>
+        <div class="cell w-full md:w-7/12">
           <EventDetails {event} />
         </div>
       </article>
@@ -32,11 +39,21 @@
 </Pagination>
 
 <style lang="postcss">
+  .full-table {
+    @apply md:table border-gray-300 border-2 rounded-t-xl w-full mb-6;
+  }
   .table-header {
-    @apply bg-gray-100 text-gray-800 font-semibold p-4 flex justify-between items-center border-b-2;
+    @apply bg-gray-900 text-gray-100;
+  }
+  .table-header-cell {
+    @apply table-cell text-left p-3;
   }
 
-  .table-row {
-    @apply flex border-b-2 border-gray-300 last-of-type:border-b-0 p-4;
+  .row {
+    @apply no-underline p-2 text-sm border-b-2 items-center md:text-base md:table-row;
+  }
+
+  .cell {
+    @apply md:table-cell md:border-b-2 text-left p-2;
   }
 </style>

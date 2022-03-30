@@ -45,7 +45,6 @@
   import { routeForEventHistory } from '$lib/utilities/route-for';
   import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
 
-  import ExportHistory from '$lib/components/export-history.svelte';
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
@@ -73,7 +72,7 @@
   <PendingActivties />
   <section id="event-history">
     <nav class="flex gap-4 justify-between items-end pb-4">
-      <h3 class="text-lg font-medium">Event History</h3>
+      <h3 class="text-lg font-medium">Recent Events</h3>
       <div class="flex gap-4">
         <ToggleButtons>
           <ToggleButton
@@ -99,7 +98,6 @@
             >JSON</ToggleButton
           >
         </ToggleButtons>
-        <ExportHistory />
       </div>
     </nav>
     <slot />

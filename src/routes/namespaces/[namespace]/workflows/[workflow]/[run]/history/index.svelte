@@ -4,7 +4,7 @@
   export const load: Load = async function ({ url }) {
     return {
       status: 302,
-      redirect: `${url.pathname}/summary`,
+      redirect: `${url.pathname}/compact`,
     };
   };
 </script>
