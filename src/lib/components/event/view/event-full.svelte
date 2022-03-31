@@ -1,10 +1,11 @@
 <script lang="ts">
   import { formatDate } from '$lib/utilities/format-date';
 
-  import EmptyState from '$lib/components/empty-state.svelte';
   import Pagination from '$lib/components/pagination.svelte';
   import EventDetails from '$lib/components/event/event-details.svelte';
   import EventCategoryMenu from '$lib/components/event/event-category-menu.svelte';
+  import EventEmptyRow from '$lib/components/event/event-empty-row.svelte';
+  import EventClassification from '$lib/components/event/event-classification.svelte';
 
   export let events: HistoryEventWithId[];
 </script>
@@ -26,7 +27,8 @@
     {#each visibleItems as event (event.id)}
       <article class="row">
         <div class="cell w-full md:w-3/12 mr-3">
-          {event.id}
+          <span class="text-gray-500 text-normal">{event.id}</span
+          ><EventClassification {event} />
         </div>
         <div class="cell w-full md:w-2/12">{formatDate(event.eventTime)}</div>
         <div class="cell w-full md:w-7/12">
@@ -35,10 +37,7 @@
       </article>
     {/each}
     {#if !events.length}
-      <EmptyState
-        title="No Events Match"
-        content="There are no events that match your filters. Adjust your filters to see your events."
-      />
+      <EventEmptyRow />
     {/if}
   </section>
 </Pagination>

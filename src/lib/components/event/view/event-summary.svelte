@@ -6,7 +6,7 @@
 
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
-  import EmptyState from '$lib/components/empty-state.svelte';
+  import EventEmptyRow from '../event-empty-row.svelte';
 
   export let items: HistoryEventWithId[];
 
@@ -29,10 +29,7 @@
         <EventSummaryRow {event} />
       {/each}
       {#if !items.length}
-        <EmptyState
-          title="No Events Match"
-          content="There are no events that match your filters. Adjust your filters to see your events."
-        />
+        <EventEmptyRow />
       {/if}
     </EventSummaryTable>
   </Pagination>
