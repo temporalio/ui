@@ -72,7 +72,7 @@
   <section id="event-history">
     <nav class="flex gap-4 justify-between items-end pb-4">
       <h3 class="text-lg font-medium">Recent Events</h3>
-      <div class="flex gap-4">
+      <div id="event-view-toggle" class="flex gap-4">
         <div class="flex gap-4">
           <ToggleButtons>
             <ToggleButton

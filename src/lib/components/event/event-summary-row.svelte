@@ -31,12 +31,12 @@
 </article>
 
 <style lang="postcss">
-  .row {
-    @apply no-underline p-2 text-sm border-b-2 items-center md:text-base md:table-row;
-  }
-
   .cell {
     @apply md:table-cell md:border-b-2 text-left p-2;
+  }
+
+  .row {
+    @apply no-underline p-2 text-sm border-b-2 items-center md:text-base md:table-row last-of-type:border-b-0;
   }
 
   .row:hover {
@@ -49,9 +49,5 @@
 
   .row:hover :global(.link) {
     @apply text-blue-700 border-b-2 border-blue-700;
-  }
-
-  .row {
-    @apply last-of-type:border-b-0;
   }
 </style>

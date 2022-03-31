@@ -134,11 +134,7 @@ type ImportParameters = {
   eventId?: string;
 };
 
-export const routeForImport = ({
-  importType,
-  eventId,
-}: ImportParameters): string => {
-  if (eventId) return `/import/${importType}/${eventId}`;
+export const routeForImport = ({ importType }: ImportParameters): string => {
   return `/import/${importType}`;
 };
 

@@ -34,8 +34,6 @@ export const getSingleAttributeForEvent = ({
       };
     }
 
-    console.log('EVENT ATTRITUBES: ', event.attributes);
-
     return { key: 'lorum', value: 'ipsum' };
   }
 

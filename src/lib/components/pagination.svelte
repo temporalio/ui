@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import { pagination, perPageOptions } from '$lib/stores/pagination';
 
@@ -7,7 +8,7 @@
 
   export let key = 'per-page';
   export let items: T[];
-  export let float: boolean = false;
+  export let floatElementId: string;
 
   import FilterSelect from './select/filter-select.svelte';
 
@@ -17,10 +18,29 @@
   $: store = pagination(items, perPage);
   $: store.adjustPageSize(perPage);
   $: store.jumpToIndex(startingIndex);
+
+  let screenWidth: number;
+  let floatWidth: number | undefined;
+  let navHeight: number | undefined;
+
+  onMount(() => {
+    floatWidth = document.getElementById(floatElementId)?.clientWidth;
+    navHeight = document.getElementById('pagination-nav')?.clientHeight;
+  });
+
+  // If float width and nav height exist and screen is above lg breakpoint, float the nav
+  $: floatStyle =
+    floatWidth && navHeight && screenWidth > 1024
+      ? `position: absolute; right: ${floatWidth + 40}px; top: -${
+          navHeight + 14
+        }px`
+      : '';
 </script>
 
+<svelte:window bind:innerWidth={screenWidth} />
+
 <div class="pagination flex flex-col gap-4 relative">
-  <nav class="pagination-nav flex justify-end gap-8" class:float>
+  <nav style={floatStyle} id="pagination-nav" class="flex justify-end gap-8">
     <div class="flex gap-2 items-center justify-center">
       <p class="w-fit text-right">Per Page</p>
       <FilterSelect
@@ -54,11 +74,6 @@
 </div>
 
 <style lang="postcss">
-  .float {
-    @apply absolute;
-    top: -54px;
-    right: 440px;
-  }
   .caret {
     @apply text-gray-500;
   }

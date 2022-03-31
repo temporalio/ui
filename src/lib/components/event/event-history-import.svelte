@@ -32,8 +32,7 @@
       );
       importEvents.set(events);
       importEventGroups.set(eventGroups);
-      const eventId = events[0]?.id ?? '1';
-      const path = routeForImport({ importType: 'events', eventId });
+      const path = routeForImport({ importType: 'events/view' });
       goto(path);
     } catch (e) {
       notifications.add('error', 'Could not create event history from JSON');

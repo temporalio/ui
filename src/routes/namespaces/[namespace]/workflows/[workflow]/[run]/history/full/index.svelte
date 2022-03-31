@@ -13,7 +13,7 @@
 </script>
 
 <script lang="ts">
-  import FullEvent from '$lib/components/event/event-full.svelte';
+  import FullEvent from '$lib/components/event/view/event-full.svelte';
 
   export let events: HistoryEventWithId[];
 </script>

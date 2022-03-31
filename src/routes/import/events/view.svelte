@@ -27,8 +27,9 @@
   import ImportHistory from '$lib/components/event/event-history-import.svelte';
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
-  import EventSummary from '$lib/components/event/event-summary.svelte';
-  import EventFull from '$lib/components/event/event-full.svelte';
+  import EventSummary from '$lib/components/event/view/event-summary.svelte';
+  import EventFull from '$lib/components/event/view/event-full.svelte';
+  import CompactEvent from '$lib/components/event/view/event-compact.svelte';
   import EventGroupDetails from '$lib/components/event/event-group-details.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
 
@@ -56,47 +57,41 @@
 </script>
 
 <section class="flex flex-col gap-4">
-  <section id="event-history">
-    <nav class="relative flex gap-4 justify-between items-end pb-4 max-w-1/2">
-      <h3 class="text-lg font-medium">Event History</h3>
-      <div class="flex gap-4">
-        <ToggleButtons>
-          <ToggleButton
-            icon={faTable}
-            active={tab === 'summary'}
-            on:click={() => (tab = 'summary')}>Summary</ToggleButton
-          >
-          <ToggleButton
-            icon={faBars}
-            active={tab === 'full'}
-            on:click={() => (tab = 'full')}>Full</ToggleButton
-          >
-          <ToggleButton
-            icon={faLayerGroup}
-            active={tab === 'compact'}
-            on:click={() => (tab = 'compact')}>Compact</ToggleButton
-          >
-          <ToggleButton
-            icon={faCode}
-            active={tab === 'json'}
-            on:click={() => (tab = 'json')}>JSON</ToggleButton
-          >
-        </ToggleButtons>
-        <ImportHistory />
-      </div>
-    </nav>
-    {#if activeView('summary')}
-      <EventSummary items={filteredEvents} {category}>
-        {#if event}<EventGroupDetails {event} {eventGroup} />{/if}
-      </EventSummary>
-    {:else if activeView('full')}
-      <EventFull events={$importEvents} />
-    {:else if activeView('compact')}
-      <EventSummary items={filteredEventGroups} {category}>
-        {#if event}<EventGroupDetails {event} {eventGroup} />{/if}
-      </EventSummary>
-    {:else if activeView('json')}
-      <CodeBlock content={$importEvents} />
-    {/if}
-  </section>
+  <nav class="relative flex gap-4 justify-between items-end pb-4 max-w-1/2">
+    <h3 class="text-lg font-medium">Event History</h3>
+    <div class="flex gap-4">
+      <ToggleButtons>
+        <ToggleButton
+          icon={faTable}
+          active={tab === 'summary'}
+          on:click={() => (tab = 'summary')}>Summary</ToggleButton
+        >
+        <ToggleButton
+          icon={faBars}
+          active={tab === 'full'}
+          on:click={() => (tab = 'full')}>Full</ToggleButton
+        >
+        <ToggleButton
+          icon={faLayerGroup}
+          active={tab === 'compact'}
+          on:click={() => (tab = 'compact')}>Compact</ToggleButton
+        >
+        <ToggleButton
+          icon={faCode}
+          active={tab === 'json'}
+          on:click={() => (tab = 'json')}>JSON</ToggleButton
+        >
+      </ToggleButtons>
+      <ImportHistory />
+    </div>
+  </nav>
+  {#if activeView('summary')}
+    <EventSummary items={filteredEvents} />
+  {:else if activeView('full')}
+    <EventFull events={$importEvents} />
+  {:else if activeView('compact')}
+    <CompactEvent items={filteredEventGroups} />
+  {:else if activeView('json')}
+    <CodeBlock content={$importEvents} />
+  {/if}
 </section>
