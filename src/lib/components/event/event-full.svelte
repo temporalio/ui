@@ -8,7 +8,7 @@
   export let events: HistoryEventWithId[];
 </script>
 
-<Pagination items={events} let:visibleItems>
+<Pagination items={events} float let:visibleItems>
   <section class="full-table">
     <div class="table-header md:table-header-group">
       <div class="md:table-row hidden">

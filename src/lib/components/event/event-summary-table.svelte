@@ -4,15 +4,18 @@
   import FilterSelect from '$lib/components/select/filter-select.svelte';
 
   import Option from '$lib/components/select/option.svelte';
+  import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
+  import IconButton from '../icon-button.svelte';
 
   let category = $page.params.category;
 </script>
 
-
 <section class="summary-table">
   <div class="table-header md:table-header-group">
     <div class="md:table-row hidden">
-      <div class="table-header-cell w-3/12 rounded-tl-lg">Workflow Events
+      <div class="table-header-cell w-3/12 rounded-tl-lg">
+        Workflow Events
+        <!-- <IconButton icon={faCaretDown} />
         <div class="flex items-center gap-4">
           <FilterSelect parameter="category" bind:value={category}>
             <Option value={undefined}>All</Option>
@@ -23,7 +26,7 @@
             <Option value="child-workflow">Child Workflow</Option>
             <Option value="workflow">Workflow</Option>
           </FilterSelect>
-        </div>    
+        </div>     -->
       </div>
       <div class="table-header-cell w-3/12">Date & Time</div>
       <div class="table-header-cell w-1/2 rounded-tr-lg">Event Details</div>

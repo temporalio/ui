@@ -42,7 +42,7 @@
   <LoadingRow />
 {:then items}
   {#if items.length}
-    <Pagination {items} {startingIndex} let:visibleItems>
+    <Pagination {items} {startingIndex} float let:visibleItems>
       <EventSummaryTable>
         {#each visibleItems as event (event.id)}
           <EventSummaryRow {event} />
@@ -50,10 +50,15 @@
       </EventSummaryTable>
     </Pagination>
   {:else}
-    <Pagination {items} {startingIndex} let:visibleItems>
+    <Pagination {items} {startingIndex} float let:visibleItems>
       <EventSummaryTable>
-        <EmptyState title={'No Events Found'} />
+        <div class="p-2">
+          <EmptyState
+            title="No Events Match"
+            content="There are no events that match your filters. Adjust your filters to see your events."
+          />
+        </div>
       </EventSummaryTable>
-  </Pagination>
+    </Pagination>
   {/if}
 {/await}

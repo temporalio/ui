@@ -26,6 +26,4 @@
       </ul>
     </nav>
   {/if}
-
-  <EventDetails {event} />
 </section>

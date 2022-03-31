@@ -2,13 +2,13 @@
   export let event: IterableEvent;
 </script>
 
-<span class="label font-semibold">
+<span class="label">
   {event.name}
 </span>
 
 <style lang="postcss">
   .label {
-    @apply px-4 text-gray-900 font-medium;
+    @apply font-medium font-normal;
   }
 
   /* .Open,

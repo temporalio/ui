@@ -1,9 +1,6 @@
 <script lang="ts">
   import { formatDate } from '$lib/utilities/format-date';
 
-  import { routeForWorkflow } from '$lib/utilities/route-for';
-
-  import Link from '$lib/components/link.svelte';
   import EventClassification from './event-classification.svelte';
   import EventDetails from './event-details.svelte';
   import EventSingleDetail from './event-single-detail.svelte';
@@ -15,11 +12,11 @@
   const onRowClick = () => (collapsed = !collapsed);
 </script>
 
-<article class="row" on:click={onRowClick}>
+<article class="row" on:click={onRowClick} id={event.id}>
   <div class="cell">
-    <div>
-      {event.id}<EventClassification {event} />
-    </div>
+    <span class="text-gray-500 text-normal">{event.id}</span><span class="link"
+      ><EventClassification {event} /></span
+    >
   </div>
   <div class="cell links font-medium md:font-normal">
     {formatDate(event?.eventTime)}
@@ -43,7 +40,15 @@
   }
 
   .row:hover {
-    @apply bg-gray-50;
+    @apply bg-gray-50 cursor-pointer;
+  }
+
+  .link {
+    @apply text-gray-900 mx-4;
+  }
+
+  .row:hover :global(.link) {
+    @apply text-blue-700 border-b-2 border-blue-700;
   }
 
   .row {

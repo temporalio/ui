@@ -38,7 +38,7 @@
   <LoadingRow />
 {:then items}
   {#if items.length}
-    <Pagination {items} let:visibleItems>
+    <Pagination {items} float let:visibleItems>
       <EventCompactTable>
         {#each visibleItems as eventGroup (eventGroup.id)}
           <EventCompactRow {eventGroup} />
@@ -46,7 +46,7 @@
       </EventCompactTable>
     </Pagination>
   {:else}
-    <Pagination {items} let:visibleItems>
+    <Pagination {items} float let:visibleItems>
       <EventCompactTable>
         <EmptyState title={'No Events Found'} />
       </EventCompactTable>

@@ -41,7 +41,6 @@
     faTable,
   } from '@fortawesome/free-solid-svg-icons';
 
-  import { page } from '$app/stores';
   import { routeForEventHistory } from '$lib/utilities/route-for';
   import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
 
@@ -49,7 +48,6 @@
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
   import PendingActivties from './_pending-activties.svelte';
-import PaginationNav from '$lib/components/pagination-nav.svelte';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
@@ -75,7 +73,6 @@ import PaginationNav from '$lib/components/pagination-nav.svelte';
     <nav class="flex gap-4 justify-between items-end pb-4">
       <h3 class="text-lg font-medium">Recent Events</h3>
       <div class="flex gap-4">
-        <PaginationNav />
         <div class="flex gap-4">
           <ToggleButtons>
             <ToggleButton
@@ -100,7 +97,7 @@ import PaginationNav from '$lib/components/pagination-nav.svelte';
               >JSON</ToggleButton
             >
           </ToggleButtons>
-        </div>  
+        </div>
       </div>
     </nav>
     <slot />

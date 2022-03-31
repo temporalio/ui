@@ -2,6 +2,7 @@
   import EventClassification from './event-classification.svelte';
   import EventSingleDetail from './event-single-detail.svelte';
   import EventGroupDetails from './event-group-details.svelte';
+  import EventDetails from './event-details.svelte';
 
   export let eventGroup: CompactEventGroups;
 
@@ -13,14 +14,19 @@
 <article class="row" on:click={onRowClick}>
   <div class="cell">
     <div>
-      {eventGroup.id}<EventClassification event={eventGroup} />
+      <span class="link"><EventClassification event={eventGroup} /></span>
+      {#if !collapsed}
+        <div class="p-8">
+          <EventGroupDetails event={eventGroup.initialEvent} {eventGroup} />
+        </div>
+      {/if}
     </div>
   </div>
   <div class="cell">
     {#if collapsed}
       <EventSingleDetail {eventGroup} />
     {:else}
-      <EventGroupDetails event={eventGroup.initialEvent} {eventGroup} />
+      <EventDetails event={eventGroup.initialEvent} />
     {/if}
   </div>
 </article>
@@ -35,10 +41,18 @@
   }
 
   .row:hover {
-    @apply bg-gray-50;
+    @apply bg-gray-50 cursor-pointer;
   }
 
   .row {
     @apply last-of-type:border-b-0;
+  }
+
+  .link {
+    @apply text-gray-900 mx-4;
+  }
+
+  .row:hover :global(.link) {
+    @apply text-blue-700 border-b-2 border-blue-700;
   }
 </style>
