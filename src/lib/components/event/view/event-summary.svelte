@@ -21,7 +21,7 @@
   <Pagination
     {items}
     {startingIndex}
-    floatElementId="event-view-toggle"
+    floatId="event-view-toggle"
     let:visibleItems
   >
     <EventSummaryTable>

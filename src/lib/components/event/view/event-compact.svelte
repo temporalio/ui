@@ -12,19 +12,14 @@
 {#await items}
   <LoadingRow />
 {:then items}
-  {#if items.length}
-    <Pagination {items} floatElementId="event-view-toggle" let:visibleItems>
-      <EventCompactTable>
-        {#each visibleItems as eventGroup (eventGroup.id)}
-          <EventCompactRow {eventGroup} />
-        {/each}
-      </EventCompactTable>
-    </Pagination>
-  {:else}
-    <Pagination {items} floatElementId="event-view-toggle" let:visibleItems>
-      <EventCompactTable>
+  <Pagination {items} floatId="event-view-toggle" let:visibleItems>
+    <EventCompactTable>
+      {#each visibleItems as eventGroup (eventGroup.id)}
+        <EventCompactRow {eventGroup} />
+      {/each}
+      {#if !items.length}
         <EmptyState title="No Events Found" />
-      </EventCompactTable>
-    </Pagination>
-  {/if}
+      {/if}
+    </EventCompactTable>
+  </Pagination>
 {/await}

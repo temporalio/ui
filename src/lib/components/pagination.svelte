@@ -8,11 +8,11 @@
 
   export let key = 'per-page';
   export let items: T[];
-  export let floatElementId: string;
+  export let floatId: string;
 
   import FilterSelect from './select/filter-select.svelte';
 
-  export let startingIndex: string | number | null = null;
+  export let startingIndex: string | number = -1;
 
   $: perPage = $page.url.searchParams.get(key) || '100';
   $: store = pagination(items, perPage);
@@ -24,7 +24,7 @@
   let navHeight: number | undefined;
 
   onMount(() => {
-    floatWidth = document.getElementById(floatElementId)?.clientWidth;
+    floatWidth = document.getElementById(floatId)?.clientWidth;
     navHeight = document.getElementById('pagination-nav')?.clientHeight;
   });
 
