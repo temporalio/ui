@@ -27,8 +27,9 @@
     {#each visibleItems as event (event.id)}
       <article class="row">
         <div class="cell w-full md:w-3/12 mr-3">
-          <span class="text-gray-500 text-normal">{event.id}</span
-          ><EventClassification {event} />
+          <span class="text-gray-500 text-normal">{event.id}</span><span
+            class="mx-4"><EventClassification {event} /></span
+          >
         </div>
         <div class="cell w-full md:w-2/12">{formatDate(event.eventTime)}</div>
         <div class="cell w-full md:w-7/12">

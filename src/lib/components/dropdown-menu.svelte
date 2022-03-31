@@ -14,7 +14,7 @@
 
   export let value: string | undefined;
   export let parameter: string;
-  export let options: DropdownMenuOption[];
+  export let options: OptionLabel[];
 
   let show: boolean = false; // menu state
   let menu: any = null; // menu wrapper DOM reference

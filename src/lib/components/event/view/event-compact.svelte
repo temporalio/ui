@@ -18,7 +18,7 @@
         <EventCompactRow {eventGroup} />
       {/each}
       {#if !items.length}
-        <EventEmptyRow width="1/6" />
+        <EventEmptyRow />
       {/if}
     </EventCompactTable>
   </Pagination>

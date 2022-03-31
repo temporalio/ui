@@ -1,20 +1,5 @@
-<script context="module" lang="ts">
-  import type { Load } from '@sveltejs/kit';
-
-  export const load: Load = async function ({ params, url }) {
-    const { eventId } = params;
-
-    return {
-      props: {
-        eventId,
-      },
-    };
-  };
-</script>
-
 <script lang="ts">
   import { page } from '$app/stores';
-  import { getGroupForEvent } from '$lib/models/group-events';
   import {
     faBars,
     faCode,
@@ -30,10 +15,7 @@
   import EventSummary from '$lib/components/event/view/event-summary.svelte';
   import EventFull from '$lib/components/event/view/event-full.svelte';
   import CompactEvent from '$lib/components/event/view/event-compact.svelte';
-  import EventGroupDetails from '$lib/components/event/event-group-details.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
-
-  export let eventId: string;
 
   let tab: EventView = 'summary';
 
@@ -46,12 +28,6 @@
     if (category) return event.category === category;
     return event;
   });
-
-  $: event = filteredEvents.find(
-    (event: HistoryEventWithId) => event.id === eventId,
-  );
-
-  $: eventGroup = event ? getGroupForEvent(event, $importEventGroups) : null;
 
   $: activeView = (view: EventView) => tab === view;
 </script>
@@ -88,7 +64,7 @@
   {#if activeView('summary')}
     <EventSummary items={filteredEvents} />
   {:else if activeView('full')}
-    <EventFull events={$importEvents} />
+    <EventFull events={filteredEvents} />
   {:else if activeView('compact')}
     <CompactEvent items={filteredEventGroups} />
   {:else if activeView('json')}

@@ -39,7 +39,7 @@
 
 <svelte:window bind:innerWidth={screenWidth} />
 
-<div class="pagination flex flex-col gap-4 relative">
+<div class="pagination flex flex-col gap-4 relative mb-8">
   <nav style={floatStyle} id="pagination-nav" class="flex justify-end gap-8">
     <div class="flex gap-2 items-center justify-center">
       <p class="w-fit text-right">Per Page</p>

@@ -73,7 +73,7 @@ type TimeFormat = 'UTC' | 'relative' | 'local';
 
 type SelectOptionValue = number | string | boolean;
 
-type DropdownMenuOption = {
+type OptionLabel = {
   label: string;
   option: string;
 };

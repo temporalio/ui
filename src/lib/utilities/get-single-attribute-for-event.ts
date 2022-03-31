@@ -4,7 +4,7 @@ export const getSingleAttributeForEvent = ({
 }: {
   event: HistoryEventWithId | null;
   eventGroup: CompactEventGroup | null;
-}) => {
+}): { key: string; value: string } => {
   if (event) {
     if (event?.attributes?.workflowType?.name) {
       return {
