@@ -22,8 +22,6 @@
 </script>
 
 <script lang="ts">
-  import { page } from '$app/stores';
-
   import EmptyState from '$lib/components/empty-state.svelte';
   import Pagination from '$lib/components/pagination.svelte';
   import LoadingRow from '$lib/components/loading-row.svelte';
