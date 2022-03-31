@@ -72,3 +72,8 @@ type ClusterInformation = import('$types').GetClusterInfoResponse;
 type TimeFormat = 'UTC' | 'relative' | 'local';
 
 type SelectOptionValue = number | string | boolean;
+
+type DropdownMenuOption = {
+  label: string;
+  option: string;
+};

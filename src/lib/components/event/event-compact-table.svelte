@@ -1,12 +1,18 @@
+<script lang="ts">
+  import EventCategoryMenu from '$lib/components/event/event-category-menu.svelte';
+</script>
+
 <section class="summary-table">
   <div class="table-header md:table-header-group">
     <div class="md:table-row hidden">
-      <div class="table-header-cell w-3/12 rounded-tl-lg">Event Type</div>
+      <div class="table-header-cell w-3/12 rounded-tl-lg">
+        Event Type<EventCategoryMenu compact />
+      </div>
       <div class="table-header-cell w-1/2 rounded-tr-lg">Event Details</div>
     </div>
   </div>
   <div class="table-header md:hidden rounded-t-lg">
-    <div class="table-header-cell">Compact</div>
+    <div class="table-header-cell">Compact<EventCategoryMenu compact /></div>
   </div>
   <div class="overflow-y-auto md:table-row-group">
     <slot />

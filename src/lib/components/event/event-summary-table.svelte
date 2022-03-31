@@ -1,39 +1,19 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
-  import FilterSelect from '$lib/components/select/filter-select.svelte';
-
-  import Option from '$lib/components/select/option.svelte';
-  import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
-  import IconButton from '../icon-button.svelte';
-
-  let category = $page.params.category;
+  import EventCategoryMenu from '$lib/components/event/event-category-menu.svelte';
 </script>
 
 <section class="summary-table">
   <div class="table-header md:table-header-group">
     <div class="md:table-row hidden">
       <div class="table-header-cell w-3/12 rounded-tl-lg">
-        Workflow Events
-        <!-- <IconButton icon={faCaretDown} />
-        <div class="flex items-center gap-4">
-          <FilterSelect parameter="category" bind:value={category}>
-            <Option value={undefined}>All</Option>
-            <Option value="activity">Activity</Option>
-            <Option value="command">Command</Option>
-            <Option value="signal">Signal</Option>
-            <Option value="timer">Timer</Option>
-            <Option value="child-workflow">Child Workflow</Option>
-            <Option value="workflow">Workflow</Option>
-          </FilterSelect>
-        </div>     -->
+        Workflow Events<EventCategoryMenu />
       </div>
       <div class="table-header-cell w-3/12">Date & Time</div>
       <div class="table-header-cell w-1/2 rounded-tr-lg">Event Details</div>
     </div>
   </div>
   <div class="table-header md:hidden rounded-t-lg">
-    <div class="table-header-cell">Summary</div>
+    <div class="table-header-cell">Summary<EventCategoryMenu /></div>
   </div>
   <div class="overflow-y-auto md:table-row-group">
     <slot />

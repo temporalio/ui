@@ -5,11 +5,12 @@
 
   export let icon: IconDefinition;
   export let scale = 1;
+  export let classes: string = '';
 </script>
 
 <button class="icon-button" on:click>
   {#if icon}
-    <div class="flex gap-2 items-center">
+    <div class="flex gap-2 items-center {classes}">
       <Icon {icon} {scale} />
       <slot />
     </div>
@@ -20,6 +21,6 @@
 
 <style lang="postcss">
   .icon-button {
-    @apply inline-block inline p-1 text-sm flex items-center justify-center w-8 h-8;
+    @apply inline-block p-1 text-sm w-8 h-8;
   }
 </style>

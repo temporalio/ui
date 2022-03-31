@@ -1,8 +1,12 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
 
-  export const load: Load = async function ({ stuff }) {
-    const { events } = stuff;
+  import { getEventsInCategory } from '$lib/models/event-history/get-event-categorization';
+
+  export const load: Load = async function ({ stuff, url }) {
+    const category = url.searchParams.get('category');
+
+    const events = getEventsInCategory(stuff.events, category);
 
     return {
       props: {

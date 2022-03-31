@@ -28,7 +28,7 @@
   <div class="cell">
     <div>
       <span
-        class={collapsed ? 'link collapsed' : 'link expanded'}
+        class={collapsed ? 'link collapsed text-medium' : 'link expanded'}
         on:click|stopPropagation={onClassificationClick}
         ><EventClassification event={eventGroup} /></span
       >

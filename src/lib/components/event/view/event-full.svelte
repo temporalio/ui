@@ -4,32 +4,29 @@
   import EmptyState from '$lib/components/empty-state.svelte';
   import Pagination from '$lib/components/pagination.svelte';
   import EventDetails from '$lib/components/event/event-details.svelte';
-  import EventClassification from '$lib/components/event/event-classification.svelte';
-  import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
+  import EventCategoryMenu from '$lib/components/event/event-category-menu.svelte';
 
   export let events: HistoryEventWithId[];
 </script>
 
-<Pagination items={events} floatElementId="event-view-toggle" let:visibleItems>
+<Pagination items={events} floatId="event-view-toggle" let:visibleItems>
   <section class="full-table">
     <div class="table-header md:table-header-group">
       <div class="md:table-row hidden">
         <div class="table-header-cell w-3/12 rounded-tl-lg">
-          Workflow Events
+          Workflow Events<EventCategoryMenu />
         </div>
         <div class="table-header-cell w-3/12">Date & Time</div>
         <div class="table-header-cell w-1/2 rounded-tr-lg">Event Details</div>
       </div>
     </div>
     <div class="table-header md:hidden rounded-t-lg">
-      <div class="table-header-cell">Full</div>
+      <div class="table-header-cell">Full<EventCategoryMenu /></div>
     </div>
     {#each visibleItems as event (event.id)}
       <article class="row">
-        <div class="cell w-full md:w-3/12">
-          <a href="#{event.id}" class="mr-3">{event.id}</a><EventClassification
-            {event}
-          />
+        <div class="cell w-full md:w-3/12 mr-3">
+          {event.id}
         </div>
         <div class="cell w-full md:w-2/12">{formatDate(event.eventTime)}</div>
         <div class="cell w-full md:w-7/12">

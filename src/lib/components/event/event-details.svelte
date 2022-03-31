@@ -20,7 +20,7 @@
       <article
         class="flex py-2 last:border-b-0 border-gray-200 first:pt-0 {$$props.class}"
       >
-        <h4 class="w-96 flex-grow">{format(key)}</h4>
+        <p class="w-96 flex-grow">{format(key)}</p>
         <div class="flex-grow w-full">
           {#if typeof value === 'object'}
             <CodeBlock content={value} />
