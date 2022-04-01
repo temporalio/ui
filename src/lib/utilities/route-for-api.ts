@@ -1,48 +1,67 @@
+import urlcat from 'urlcat';
+
 let base = (import.meta.env?.VITE_API as string) ?? process.env.VITE_API;
-if (base.endsWith('/')) base = base.slice(0, -1);
+base = `${base}/api/v1/`;
 
-const encode = (component: string): string => {
-  return component
-    .split('/')
-    .map((segment) => encodeURIComponent(segment))
-    .join('/');
+// We're using this type to force EXACT type matches so we don't get extraneous query params in our urls
+type ValidateShape<T, Struct> = T extends Struct
+  ? Exclude<keyof T, keyof Struct> extends never
+    ? T
+    : never
+  : never;
+
+export const ApiRoutes = {
+  cluster(): string {
+    return urlcat(base, '/cluster', {});
+  },
+  settings(): string {
+    return urlcat(base, '/settings', {});
+  },
+  user(): string {
+    return urlcat(base, '/me', {});
+  },
+  namespaces(): string {
+    return urlcat(base, '/namespaces', {});
+  },
+  'task-queue'<T>(params: ValidateShape<T, TaskQueueRouteParameters>): string {
+    return urlcat(base, `/namespaces/:namespace/task-queues/:queue`, params);
+  },
+  workflows<T>(params: ValidateShape<T, WorkflowListRouteParameters>): string {
+    return urlcat(base, `/namespaces/:namespace/workflows`, params);
+  },
+  'workflows.archived'<T>(
+    params: ValidateShape<T, WorkflowListRouteParameters>,
+  ): string {
+    return urlcat(base, `/namespaces/:namespace/workflows/archived`, params);
+  },
+  workflow<T>(params: ValidateShape<T, WorkflowRouteParameters>): string {
+    return urlcat(
+      base,
+      `/namespaces/:namespace/workflows/:workflowId/runs/:runId`,
+      params,
+    );
+  },
+  'workflow.terminate'<T>(
+    params: ValidateShape<T, WorkflowRouteParameters>,
+  ): string {
+    return urlcat(
+      base,
+      `/namespaces/:namespace/workflows/:workflowId/runs/:runId/terminate`,
+      params,
+    );
+  },
+  events<T>(params: ValidateShape<T, WorkflowRouteParameters>): string {
+    return urlcat(
+      base,
+      `/namespaces/:namespace/workflows/:workflowId/runs/:runId/events`,
+      params,
+    );
+  },
+  query<T>(params: ValidateShape<T, WorkflowRouteParameters>): string {
+    return urlcat(
+      base,
+      `/namespaces/:namespace/workflows/:workflowId/runs/:runId/query`,
+      params,
+    );
+  },
 };
-
-const withBase = (endpoint: string): string => {
-  if (endpoint.startsWith('/')) endpoint = endpoint.slice(1);
-  return `${base}/api/v1/${encode(endpoint)}`;
-};
-
-export function routeForApi(
-  route: WorkflowsAPIRoutePath,
-  parameters: WorkflowListRouteParameters,
-): string;
-export function routeForApi(
-  route: WorkflowAPIRoutePath,
-  parameters: WorkflowRouteParameters,
-): string;
-export function routeForApi(
-  route: TaskQueueAPIRoutePath,
-  parameters: TaskQueueRouteParameters,
-): string;
-export function routeForApi(route: ParameterlessAPIRoutePath): string;
-export function routeForApi(
-  route: APIRoutePath,
-  parameters?: APIRouteParameters,
-): string {
-  const routes: { [K in APIRoutePath]: string } = {
-    cluster: '/cluster',
-    settings: '/settings',
-    user: '/me',
-    namespaces: '/namespaces',
-    'task-queue': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}`,
-    workflows: `/namespaces/${parameters?.namespace}/workflows`,
-    'workflows.archived': `/namespaces/${parameters?.namespace}/workflows/archived`,
-    workflow: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}`,
-    'workflow.terminate': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/terminate`,
-    events: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/events`,
-    query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/query`,
-  };
-
-  return withBase(routes[route]);
-}

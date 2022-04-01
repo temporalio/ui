@@ -33,6 +33,7 @@
     "sanitize-html": "^2.6.1",
     "svelte-fa": "^2.4.0",
     "url-pattern": "^1.0.3",
+    "urlcat": "^2.0.4",
     "websocket-as-promised": "^2.0.1"
   },
   "devDependencies": {
