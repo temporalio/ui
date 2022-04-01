@@ -98,15 +98,6 @@ describe('routeFor import ', () => {
   });
 });
 
-describe('routeFor imort ', () => {
-  it('should default route to "import/events" for import', () => {
-    const path = routeForImport({
-      importType: 'events',
-    });
-    expect(path).toBe('/import/events');
-  });
-});
-
 describe('routeFor sso authentication ', () => {
   it('Options added through settings should be passed in the url', () => {
     const settings = {
