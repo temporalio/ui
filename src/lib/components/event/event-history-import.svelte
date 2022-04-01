@@ -11,8 +11,8 @@
   // rawEvents is expected to be HistoryEvent[] | { events: HistoryEvent[] } but could be anything
   let rawEvents: any;
 
-  const onFileSelect = async (e) => {
-    const file = e.target.files[0];
+  const onFileSelect = async (e: Event) => {
+    const file = (e.target as HTMLInputElement).files[0];
     const reader = new FileReader();
     reader.readAsText(file);
     reader.onload = () => {

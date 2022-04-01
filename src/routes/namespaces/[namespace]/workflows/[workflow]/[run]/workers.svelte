@@ -3,7 +3,7 @@
 
   import type { GetPollersResponse } from '$lib/services/pollers-service';
 
-  export const load: Load = async function ({ params, stuff }) {
+  export const load: Load = async function ({ stuff }) {
     const { workflow, workers } = stuff;
     const { taskQueue } = workflow as WorkflowExecution;
 
