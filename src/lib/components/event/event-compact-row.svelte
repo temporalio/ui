@@ -1,5 +1,4 @@
 <script lang="ts">
-  import EventClassification from './event-classification.svelte';
   import EventSingleDetail from './event-single-detail.svelte';
   import EventGroupDetails from './event-group-details.svelte';
   import EventDetails from './event-details.svelte';

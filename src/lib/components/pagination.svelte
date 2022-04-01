@@ -6,6 +6,8 @@
   import Icon from 'svelte-fa';
   import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 
+  type T = $$Generic;
+
   export let key = 'per-page';
   export let items: T[];
   export let floatId: string | undefined = undefined;

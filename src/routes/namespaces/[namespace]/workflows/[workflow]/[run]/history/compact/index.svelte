@@ -3,7 +3,7 @@
 
   import { getEventsInCategory } from '$lib/models/event-history/get-event-categorization';
 
-  export const load: Load = async function ({ stuff, url, params }) {
+  export const load: Load = async function ({ stuff, url }) {
     const category = url.searchParams.get('category');
 
     const eventGroups = getEventsInCategory(stuff.eventGroups, category);

@@ -58,6 +58,28 @@ const categories = [
   'command',
 ] as const;
 
+type EventTypeOption = {
+  label: string;
+  option: EventTypeCategory | undefined;
+};
+
+export const allEventTypeOptions: EventTypeOption[] = [
+  { label: 'All', option: undefined },
+  { label: 'Activity', option: 'activity' },
+  { label: 'Child Workflow', option: 'child-workflow' },
+  { label: 'Command', option: 'command' },
+  { label: 'Signal', option: 'signal' },
+  { label: 'Timer', option: 'timer' },
+  { label: 'Workflow', option: 'workflow' },
+];
+
+export const compactEventTypeOptions: EventTypeOption[] = [
+  { label: 'All', option: undefined },
+  { label: 'Activity', option: 'activity' },
+  { label: 'Signal', option: 'signal' },
+  { label: 'Timer', option: 'timer' },
+];
+
 export const getEventCategory = (eventType: EventType): EventTypeCategory => {
   return eventTypeCategorizations[eventType];
 };

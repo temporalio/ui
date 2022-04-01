@@ -6,6 +6,7 @@ import {
   routeForWorkflow,
   routeForWorkflowQuery,
   routeForWorkflows,
+  routeForImport,
 } from './route-for';
 
 describe('routeFor', () => {
@@ -78,6 +79,31 @@ describe('routeFor', () => {
       run: 'def',
     });
     expect(path).toBe('/namespaces/default/workflows/abc/def/workers');
+  });
+});
+
+describe('routeFor import ', () => {
+  it('should default route to "import/events" for import', () => {
+    const path = routeForImport({
+      importType: 'events',
+    });
+    expect(path).toBe('/import/events');
+  });
+  it('should route to "import/events/history/compact" for import', () => {
+    const path = routeForImport({
+      importType: 'events',
+      view: 'compact',
+    });
+    expect(path).toBe('/import/events/history/compact');
+  });
+});
+
+describe('routeFor imort ', () => {
+  it('should default route to "import/events" for import', () => {
+    const path = routeForImport({
+      importType: 'events',
+    });
+    expect(path).toBe('/import/events');
   });
 });
 

@@ -11,18 +11,21 @@
   // rawEvents is expected to be HistoryEvent[] | { events: HistoryEvent[] } but could be anything
   let rawEvents: any;
 
-  const onFileSelect = async (e) => {
-    const file = e.target.files[0];
+  const onFileSelect = async (e: Event) => {
+    const target = e.target as HTMLInputElement;
+    const file = target?.files?.[0];
     const reader = new FileReader();
-    reader.readAsText(file);
-    reader.onload = () => {
-      try {
-        const result = reader.result.toString();
-        rawEvents = JSON.parse(result);
-      } catch (e) {
-        notifications.add('error', 'Could not parse JSON');
-      }
-    };
+    if (file) {
+      reader.readAsText(file);
+      reader.onload = () => {
+        try {
+          const result = reader?.result?.toString() ?? '';
+          rawEvents = JSON.parse(result);
+        } catch (e) {
+          notifications.add('error', 'Could not parse JSON');
+        }
+      };
+    }
   };
 
   const onConfirm = async () => {

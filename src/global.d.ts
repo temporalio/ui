@@ -75,5 +75,5 @@ type SelectOptionValue = number | string | boolean;
 
 type OptionLabel = {
   label: string;
-  option: string;
+  option?: string;
 };

@@ -5,10 +5,12 @@
   import CompactEvent from '$lib/components/event/view/event-compact.svelte';
 
   $: category = $page.url.searchParams.get('category') as EventTypeCategory;
-  $: filteredEventGroups = $importEventGroups.filter((event) => {
-    if (category) return event.category === category;
-    return event;
-  });
+  $: filteredEventGroups = $importEventGroups.filter(
+    (event: CompactEventGroups) => {
+      if (category) return event.category === category;
+      return event;
+    },
+  );
 </script>
 
 <CompactEvent items={filteredEventGroups} />

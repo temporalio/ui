@@ -16,8 +16,8 @@
   export let parameter: string;
   export let options: OptionLabel[];
 
-  let show: boolean = false; // menu state
-  let menu: any = null; // menu wrapper DOM reference
+  let show: boolean = false;
+  let menu: any = null;
   $: _value = $page.url?.searchParams?.get(parameter) ?? undefined;
 
   $: {
@@ -26,7 +26,7 @@
       value: _value,
       url: $page.url,
       goto,
-    }).then((v) => (value = v));
+    }).then((v) => (value = v?.toString()));
   }
 
   const onOptionClick = (option: string) => {
