@@ -1,5 +1,5 @@
 import { requestFromAPI } from '$lib/utilities/request-from-api';
-import { routeForApi } from '$lib/utilities/route-for-api';
+import { ApiRoutes } from '$lib/utilities/route-for-api';
 
 type TerminateWorkflowOptions = {
   workflow: WorkflowExecution;
@@ -13,7 +13,7 @@ export async function terminateWorkflow({
   reason,
 }: TerminateWorkflowOptions): Promise<null> {
   return await requestFromAPI<null>(
-    routeForApi('workflow.terminate', {
+    ApiRoutes['workflow.terminate']({
       namespace,
       workflowId: workflow.id,
       runId: workflow.runId,

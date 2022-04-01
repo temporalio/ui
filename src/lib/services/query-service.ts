@@ -2,7 +2,7 @@ import {
   isTemporalAPIError,
   requestFromAPI,
 } from '$lib/utilities/request-from-api';
-import { routeForApi } from '$lib/utilities/route-for-api';
+import { ApiRoutes } from '$lib/utilities/route-for-api';
 
 import { getQueryTypesFromError } from '$lib/utilities/get-query-types-from-error';
 import { atob } from '$lib/utilities/atob';
@@ -57,7 +57,7 @@ async function fetchQuery(
   workflow = await workflow;
   const parameters = await formatParameters(namespace, workflow);
 
-  return await requestFromAPI<QueryResponse>(routeForApi('query', parameters), {
+  return await requestFromAPI<QueryResponse>(ApiRoutes.query(parameters), {
     options: {
       method: 'POST',
       body: JSON.stringify({

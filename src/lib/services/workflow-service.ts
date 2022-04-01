@@ -7,8 +7,8 @@ import {
   toWorkflowExecutions,
 } from '$lib/models/workflow-execution';
 
-import { routeForApi } from '$lib/utilities/route-for-api';
 import { toListWorkflowQuery } from '$lib/utilities/list-workflow-query';
+import { ApiRoutes } from '$lib/utilities/route-for-api';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;
@@ -43,7 +43,7 @@ export const fetchAllWorkflows = async (
 
   const { executions, nextPageToken } =
     (await requestFromAPI<ListWorkflowExecutionsResponse>(
-      routeForApi(endpoint, { namespace }),
+      ApiRoutes[endpoint]({ namespace }),
       {
         params: { query },
         onError,
@@ -70,7 +70,7 @@ export async function fetchWorkflow(
   parameters: GetWorkflowExecutionRequest,
   request = fetch,
 ): Promise<WorkflowExecution> {
-  return requestFromAPI(routeForApi('workflow', parameters), { request }).then(
+  return requestFromAPI(ApiRoutes.workflow(parameters), { request }).then(
     toWorkflowExecution,
   );
 }

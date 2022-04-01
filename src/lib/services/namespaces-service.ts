@@ -1,6 +1,6 @@
 import { notifications } from '$lib/stores/notifications';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
-import { routeForApi } from '$lib/utilities/route-for-api';
+import { ApiRoutes } from '$lib/utilities/route-for-api';
 
 import type { ListNamespacesResponse } from '$types';
 
@@ -17,7 +17,7 @@ export async function fetchNamespaces(
   }
 
   const results = await requestFromAPI<ListNamespacesResponse>(
-    routeForApi('namespaces'),
+    ApiRoutes.namespaces(),
     {
       request,
       onError: () => notifications.add('error', 'Unable to fetch namespaces'),

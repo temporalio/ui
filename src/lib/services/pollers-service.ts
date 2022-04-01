@@ -1,5 +1,5 @@
 import { requestFromAPI } from '$lib/utilities/request-from-api';
-import { routeForApi } from '$lib/utilities/route-for-api';
+import { ApiRoutes } from '$lib/utilities/route-for-api';
 import type { PollerInfo, TaskQueueStatus } from '$types';
 
 export type GetAllPollersRequest = NamespaceScopedRequest & { queue: string };
@@ -29,12 +29,12 @@ export async function getPollers(
   request = fetch,
 ): Promise<GetPollersResponse> {
   const workflowPollers = await requestFromAPI<GetPollersResponse>(
-    routeForApi('task-queue', parameters),
+    ApiRoutes['task-queue'](parameters),
     { request, params: { taskQueueType: '1' } },
   );
 
   const activityPollers = await requestFromAPI<GetPollersResponse>(
-    routeForApi('task-queue', parameters),
+    ApiRoutes['task-queue'](parameters),
     { request, params: { taskQueueType: '2' } },
   );
 

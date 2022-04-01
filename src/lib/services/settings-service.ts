@@ -1,7 +1,7 @@
 import { browser } from '$app/env';
 import { getEnvironment } from '$lib/utilities/get-environment';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
-import { routeForApi } from '$lib/utilities/route-for-api';
+import { ApiRoutes } from '$lib/utilities/route-for-api';
 import type { SettingsResponse } from '$types';
 
 const isCloudMatch = /tmprl\.cloud$/;
@@ -15,8 +15,10 @@ export const fetchSettings = async (
   request = fetch,
 ): Promise<Settings> => {
   const settings: SettingsResponse = await requestFromAPI(
-    routeForApi('settings'),
-    { request },
+    ApiRoutes.settings(),
+    {
+      request,
+    },
   );
 
   const EnvironmentOverride = getEnvironment();
