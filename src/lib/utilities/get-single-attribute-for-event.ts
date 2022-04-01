@@ -1,3 +1,20 @@
+export const shouldDisplayAttribute = (
+  key: string,
+  value: unknown,
+): boolean => {
+  if (value === null) return false;
+  if (value === undefined) return false;
+  if (value === '') return false;
+  if (value === '0s') return false;
+  if (key === 'type') return false;
+  return true;
+};
+
+const mapObjectToPropertValue = (key: string, value: any) => {
+  const firstKey = Object.keys(value)[0];
+  return { key: `${key}.${firstKey}`, value: value[firstKey] };
+};
+
 export const getSingleAttributeForEvent = ({
   event,
   eventGroup,
@@ -5,44 +22,27 @@ export const getSingleAttributeForEvent = ({
   event: HistoryEventWithId | null;
   eventGroup: CompactEventGroup | null;
 }): { key: string; value: string } => {
+  let attribute = { key: '', value: '' };
+
   if (event) {
-    if (event?.attributes?.workflowType?.name) {
-      return {
-        key: 'workflowType.name',
-        value: event.attributes.workflowType.name ?? '',
-      };
+    const attributes = event?.attributes as any;
+    for (const [key, value] of Object.entries(attributes)) {
+      if (shouldDisplayAttribute(key, value)) {
+        if (typeof value === 'object') {
+          attribute = mapObjectToPropertValue(key, value);
+        } else {
+          attribute = { key, value: value.toString() };
+        }
+        break;
+      }
     }
-
-    if (event?.attributes?.taskQueue?.name) {
-      return {
-        key: 'taskQueue.name',
-        value: event.attributes.taskQueue.name,
-      };
-    }
-
-    if (event?.attributes?.signalName) {
-      return {
-        key: 'signalName',
-        value: event.attributes.signalName,
-      };
-    }
-
-    if (event?.attributes?.requestId) {
-      return {
-        key: 'requestId',
-        value: event.attributes.requestId,
-      };
-    }
-
-    return { key: 'lorum', value: 'ipsum' };
   }
 
   if (eventGroup) {
-    return {
-      key: 'input',
-      value: eventGroup?.initialEvent?.attributes?.input ?? '',
-    };
+    const attributes = eventGroup?.initialEvent?.attributes as any;
+    const input = attributes?.input;
+    attribute = { key: 'input', value: input ?? '' };
   }
 
-  return { key: '', value: '' };
+  return attribute;
 };

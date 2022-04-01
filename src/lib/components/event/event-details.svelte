@@ -1,22 +1,13 @@
 <script lang="ts">
   import { format } from '$lib/utilities/format-camel-case';
   import CodeBlock from '$lib/components/code-block.svelte';
-
+  import { shouldDisplayAttribute } from '$lib/utilities/get-single-attribute-for-event';
   export let event: HistoryEventWithId;
-
-  const shouldDisplay = (key: string, value: unknown): boolean => {
-    if (value === null) return false;
-    if (value === undefined) return false;
-    if (value === '') return false;
-    if (value === '0s') return false;
-    if (key === 'type') return false;
-    return true;
-  };
 </script>
 
 <section>
   {#each Object.entries(event.attributes) as [key, value] (key)}
-    {#if shouldDisplay(key, value)}
+    {#if shouldDisplayAttribute(key, value)}
       <article
         class="flex py-2 last:border-b-0 border-gray-200 first:pt-0 {$$props.class}"
       >
