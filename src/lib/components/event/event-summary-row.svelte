@@ -5,7 +5,7 @@
   import EventSingleDetail from './event-single-detail.svelte';
 
   export let event: HistoryEventWithId;
-  export let expanded: boolean;
+  export let expanded: boolean = false;
 
   $: collapsed = expanded ? false : true;
 

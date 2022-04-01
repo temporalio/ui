@@ -1,9 +1,6 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
-  import {
-    EventView,
-    routeForEventHistoryItem,
-  } from '$lib/utilities/route-for';
+  import type { EventView } from '$lib/utilities/route-for';
 
   import { fetchEvents } from '$lib/services/events-service';
 

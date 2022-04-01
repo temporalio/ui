@@ -4,7 +4,7 @@
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import { routeForWorkflow } from '$lib/utilities/route-for';
 
-  import Link from '$lib/components/link.svelte';
+  import TableLink from '$lib/components/table-link.svelte';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
@@ -24,12 +24,14 @@
     </div>
   </div>
   <div class="cell links font-medium md:font-normal">
-    <Link {href}>{workflow.id}</Link>
+    <p>
+      <TableLink {href}>{workflow.id}</TableLink>
+    </p>
   </div>
   <div class="cell links">
-    <h3>
-      <Link {href}>{workflow.name}</Link>
-    </h3>
+    <p>
+      <TableLink {href}>{workflow.name}</TableLink>
+    </p>
   </div>
   <div class="inline-block  cell">
     <p>
@@ -55,5 +57,9 @@
 
   .row:hover {
     @apply bg-gray-50;
+  }
+
+  .row:hover :global(.table-link) {
+    @apply text-blue-700 border-b-2 border-blue-700;
   }
 </style>

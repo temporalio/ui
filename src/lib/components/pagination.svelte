@@ -8,7 +8,7 @@
 
   export let key = 'per-page';
   export let items: T[];
-  export let floatId: string;
+  export let floatId: string | undefined = undefined;
 
   import FilterSelect from './select/filter-select.svelte';
 
@@ -24,8 +24,10 @@
   let navHeight: number | undefined;
 
   onMount(() => {
-    floatWidth = document.getElementById(floatId)?.clientWidth;
-    navHeight = document.getElementById('pagination-nav')?.clientHeight;
+    if (floatId) {
+      floatWidth = document.getElementById(floatId)?.clientWidth;
+      navHeight = document.getElementById('pagination-nav')?.clientHeight;
+    }
   });
 
   // If float width and nav height exist and screen is above lg breakpoint, float the nav

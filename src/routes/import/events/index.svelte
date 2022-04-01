@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ImportHistory from '$lib/components/event/event-history-import.svelte';
+  import HistoryImport from '$lib/components/event/event-history-import.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
   import Link from '$lib/components/link.svelte';
 
@@ -13,7 +13,7 @@
     <nav class="flex gap-4 justify-between items-end pb-4">
       <h3 class="text-lg font-medium">Event History Import</h3>
       <div class="flex gap-4">
-        <ImportHistory />
+        <HistoryImport />
       </div>
     </nav>
   </section>

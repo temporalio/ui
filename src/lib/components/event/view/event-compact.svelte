@@ -17,7 +17,7 @@
       {#each visibleItems as eventGroup (eventGroup.id)}
         <EventCompactRow {eventGroup} />
       {/each}
-      {#if !items.length}
+      {#if !items?.length}
         <EventEmptyRow />
       {/if}
     </EventCompactTable>

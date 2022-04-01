@@ -28,7 +28,7 @@
       {#each visibleItems as event (event.id)}
         <EventSummaryRow {event} />
       {/each}
-      {#if !items.length}
+      {#if !items?.length}
         <EventEmptyRow />
       {/if}
     </EventSummaryTable>
