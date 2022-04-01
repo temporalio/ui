@@ -21,22 +21,22 @@
         <ToggleButton
           icon={faTable}
           href={routeForImport({ importType: 'events', view: 'summary' })}
-          >Summary</ToggleButton
+          ><span class="hidden md:block">Summary</span></ToggleButton
         >
         <ToggleButton
           icon={faBars}
           href={routeForImport({ importType: 'events', view: 'full' })}
-          >Full</ToggleButton
+          ><span class="hidden md:block">Full</span></ToggleButton
         >
         <ToggleButton
           icon={faLayerGroup}
           href={routeForImport({ importType: 'events', view: 'compact' })}
-          >Compact</ToggleButton
+          ><span class="hidden md:block">Compact</span></ToggleButton
         >
         <ToggleButton
           icon={faCode}
           href={routeForImport({ importType: 'events', view: 'json' })}
-          >JSON</ToggleButton
+          ><span class="hidden md:block">JSON</span></ToggleButton
         >
       </ToggleButtons>
       <HistoryImport />

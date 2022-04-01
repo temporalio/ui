@@ -76,22 +76,22 @@
               icon={faTable}
               base={routeForEventHistory(routeParameters('summary'))}
               href={routeForEventHistory(routeParameters('summary'))}
-              >Summary</ToggleButton
+              ><span class="hidden md:block">Summary</span></ToggleButton
             >
             <ToggleButton
               icon={faBars}
               href={routeForEventHistory(routeParameters('full'))}
-              >Full</ToggleButton
+              ><span class="hidden md:block">Full</span></ToggleButton
             >
             <ToggleButton
               icon={faLayerGroup}
               href={routeForEventHistory(routeParameters('compact'))}
-              >Compact</ToggleButton
+              ><span class="hidden md:block">Compact</span></ToggleButton
             >
             <ToggleButton
               icon={faCode}
               href={routeForEventHistory(routeParameters('json'))}
-              >JSON</ToggleButton
+              ><span class="hidden md:block">JSON</span></ToggleButton
             >
           </ToggleButtons>
         </div>
