@@ -1,64 +1,36 @@
 <script lang="ts">
-  import { formatDate } from '$lib/utilities/format-date';
+  import { page } from '$app/stores';
 
+  import LoadingRow from '$lib/components/loading-row.svelte';
   import Pagination from '$lib/components/pagination.svelte';
-  import EventDetails from '$lib/components/event/event-details.svelte';
-  import EventCategoryMenu from '$lib/components/event/event-category-menu.svelte';
-  import EventEmptyRow from '$lib/components/event/event-empty-row.svelte';
-  import EventClassification from '$lib/components/event/event-classification.svelte';
 
-  export let events: HistoryEventWithId[];
+  import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
+  import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
+  import EventEmptyRow from '../event-empty-row.svelte';
+
+  export let items: HistoryEventWithId[];
+
+  const startingIndex = items.findIndex(
+    ({ id }) => $page.params.eventId === id,
+  );
 </script>
 
-<Pagination items={events} floatId="event-view-toggle" let:visibleItems>
-  <section class="full-table">
-    <div class="table-header md:table-header-group">
-      <div class="md:table-row hidden">
-        <div class="table-header-cell w-3/12 rounded-tl-lg">
-          Workflow Events<EventCategoryMenu />
-        </div>
-        <div class="table-header-cell w-3/12">Date & Time</div>
-        <div class="table-header-cell w-1/2 rounded-tr-lg">Event Details</div>
-      </div>
-    </div>
-    <div class="table-header md:hidden rounded-t-lg">
-      <div class="table-header-cell">Full<EventCategoryMenu /></div>
-    </div>
-    {#each visibleItems as event (event.id)}
-      <article class="row">
-        <div class="cell w-full md:w-3/12 mr-3">
-          <span class="text-gray-500 text-normal">{event.id}</span><span
-            class="mx-4"><EventClassification {event} /></span
-          >
-        </div>
-        <div class="cell w-full md:w-2/12">{formatDate(event.eventTime)}</div>
-        <div class="cell w-full md:w-7/12">
-          <EventDetails {event} />
-        </div>
-      </article>
-    {/each}
-    {#if !events.length}
-      <EventEmptyRow />
-    {/if}
-  </section>
-</Pagination>
-
-<style lang="postcss">
-  .full-table {
-    @apply md:table border-gray-300 border-2 rounded-t-xl w-full mb-6;
-  }
-  .table-header {
-    @apply bg-gray-900 text-gray-100;
-  }
-  .table-header-cell {
-    @apply table-cell text-left p-3;
-  }
-
-  .row {
-    @apply no-underline p-2 text-sm border-b-2 items-center md:text-base md:table-row;
-  }
-
-  .cell {
-    @apply md:table-cell md:border-b-2 text-left p-2;
-  }
-</style>
+{#await items}
+  <LoadingRow />
+{:then items}
+  <Pagination
+    {items}
+    {startingIndex}
+    floatId="event-view-toggle"
+    let:visibleItems
+  >
+    <EventSummaryTable>
+      {#each visibleItems as event (event.id)}
+        <EventSummaryRow {event} expanded />
+      {/each}
+      {#if !items.length}
+        <EventEmptyRow />
+      {/if}
+    </EventSummaryTable>
+  </Pagination>
+{/await}

@@ -6,11 +6,11 @@
   export const load: Load = async function ({ stuff, url }) {
     const category = url.searchParams.get('category');
 
-    const events = getEventsInCategory(stuff.events, category);
+    const items = getEventsInCategory(stuff.events, category);
 
     return {
       props: {
-        events,
+        items,
       },
     };
   };
@@ -19,7 +19,7 @@
 <script lang="ts">
   import FullEvent from '$lib/components/event/view/event-full.svelte';
 
-  export let events: HistoryEventWithId[];
+  export let items: HistoryEventWithId[];
 </script>
 
-<FullEvent {events} />
+<FullEvent {items} />

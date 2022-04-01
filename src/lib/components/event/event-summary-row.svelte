@@ -1,21 +1,28 @@
 <script lang="ts">
   import { formatDate } from '$lib/utilities/format-date';
 
-  import EventClassification from './event-classification.svelte';
   import EventDetails from './event-details.svelte';
   import EventSingleDetail from './event-single-detail.svelte';
 
   export let event: HistoryEventWithId;
+  export let expanded: boolean;
 
-  $: collapsed = true;
+  $: collapsed = expanded ? false : true;
 
-  const onRowClick = () => (collapsed = !collapsed);
+  const onLinkClick = () => {
+    if (!expanded) {
+      collapsed = !collapsed;
+    }
+  };
 </script>
 
-<article class="row" on:click={onRowClick} id={event.id}>
+<article class="row" id={event.id}>
   <div class="cell">
-    <span class="text-gray-500 text-normal">{event.id}</span><span class="link"
-      ><EventClassification {event} /></span
+    <span class="text-gray-500 text-normal">{event.id}</span>
+    <span
+      class="mx-4"
+      class:link={!expanded}
+      on:click|stopPropagation={onLinkClick}>{event.name}</span
     >
   </div>
   <div class="cell links font-medium md:font-normal">
@@ -32,22 +39,22 @@
 
 <style lang="postcss">
   .cell {
-    @apply md:table-cell md:border-b-2 text-left p-2;
+    @apply md:table-cell md:border-b-2 text-left p-1 pt-2;
   }
 
   .row {
-    @apply no-underline p-2 text-sm border-b-2 items-center md:text-base md:table-row last-of-type:border-b-0;
+    @apply no-underline p-1 text-sm border-b-2 items-center md:text-base md:table-row last-of-type:border-b-0;
   }
 
   .row:hover {
-    @apply bg-gray-50 cursor-pointer;
+    @apply bg-gray-50;
   }
 
   .link {
-    @apply text-gray-900 mx-4;
+    @apply text-gray-900 cursor-pointer;
   }
 
-  .row:hover :global(.link) {
+  .row:hover .link {
     @apply text-blue-700 border-b-2 border-blue-700;
   }
 </style>
