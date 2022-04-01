@@ -41,7 +41,7 @@
       }
     };
 
-    const handleEscape = (event: Event) => {
+    const handleEscape = (event: KeyboardEvent) => {
       if (show && event?.key === 'Escape') {
         show = false;
       }
