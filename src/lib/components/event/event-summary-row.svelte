@@ -2,6 +2,7 @@
   import { getGroupForEvent, isEventGroup } from '$lib/models/group-events';
 
   import { formatDate } from '$lib/utilities/format-date';
+  import { eventTimeFormat } from '$lib/stores/event-filters';
 
   import EventDetails from './event-details.svelte';
   import EventGroupDetails from './event-group-details.svelte';
@@ -42,7 +43,7 @@
     {/if}
   </div>
   <div class="cell links font-medium md:font-normal">
-    {formatDate(event?.eventTime)}
+    {formatDate(event?.eventTime, $eventTimeFormat)}
   </div>
 
   <div class="cell links">
