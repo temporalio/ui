@@ -1,15 +1,15 @@
 <section class="workflow-table">
   <div class="table-header-row md:table-header-group">
     <div class="md:table-row hidden">
-      <div class="table-header rounded-tl-lg">Status</div>
+      <div class="table-header rounded-tl-md">Status</div>
       <div class="table-header">Workflow ID</div>
       <div class="table-header">Type</div>
       <div class="table-header">Start</div>
-      <div class="table-header rounded-tr-lg">End</div>
+      <div class="table-header rounded-tr-md">End</div>
     </div>
   </div>
   <div class="table-header-row md:hidden">
-    <div class="p-2 border-b rounded-t-lg">Summary</div>
+    <div class="p-2 border-b rounded-t-md">Summary</div>
   </div>
   <div class="overflow-y-auto md:table-row-group">
     <slot />

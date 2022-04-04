@@ -5,13 +5,13 @@
 <section class="compact-table">
   <div class="table-header md:table-header-group">
     <div class="md:table-row hidden">
-      <div class="table-header-cell w-3/12 rounded-tl-lg">
+      <div class="table-header-cell w-3/12 rounded-tl-md">
         Event Type<EventCategoryMenu compact />
       </div>
-      <div class="table-header-cell w-1/2 rounded-tr-lg">Event Details</div>
+      <div class="table-header-cell w-1/2 rounded-tr-md">Event Details</div>
     </div>
   </div>
-  <div class="table-header md:hidden rounded-t-lg">
+  <div class="table-header md:hidden rounded-t-md">
     <div class="table-header-cell">Compact<EventCategoryMenu compact /></div>
   </div>
   <div class="overflow-y-auto md:table-row-group">
@@ -21,7 +21,7 @@
 
 <style lang="postcss">
   .compact-table {
-    @apply md:table border-gray-300 border-2 rounded-t-xl w-full;
+    @apply md:table border-gray-300 border-2 rounded-lg w-full;
   }
 
   .table-header {

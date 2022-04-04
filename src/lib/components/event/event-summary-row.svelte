@@ -18,9 +18,9 @@
 
 <article class="row" id={event.id}>
   <div class="cell">
-    <span class="text-gray-500 text-normal">{event.id}</span>
+    <span class="text-gray-500 text-normal mx-1">{event.id}</span>
     <span
-      class="mx-4"
+      class="mx-2"
       class:link={!expanded}
       on:click|stopPropagation={onLinkClick}>{event.name}</span
     >
@@ -56,5 +56,9 @@
 
   .row:hover .link {
     @apply text-blue-700 border-b-2 border-blue-700;
+  }
+
+  .row:last-of-type .cell {
+    @apply border-b-0 first-of-type:rounded-bl-lg  last-of-type:rounded-br-lg;
   }
 </style>

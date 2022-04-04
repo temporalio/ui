@@ -48,19 +48,28 @@
   .cell {
     @apply md:table-cell md:border-b-2 text-left p-2;
   }
+
   .row {
     @apply no-underline p-2 text-sm border-b-2 items-center md:text-base md:table-row last-of-type:border-b-0;
   }
+
   .row:hover {
     @apply bg-gray-50;
   }
+
   .link {
     @apply text-gray-900 font-medium cursor-pointer;
   }
+
   .row:hover .collapsed {
     @apply text-blue-700 border-b-2 border-blue-700;
   }
+
   .row:hover .expanded:hover {
     @apply text-blue-700 border-b-2 border-blue-700;
+  }
+
+  .row:last-of-type .cell {
+    @apply border-b-0 first-of-type:rounded-bl-lg  last-of-type:rounded-br-lg;
   }
 </style>
