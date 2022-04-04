@@ -28,18 +28,18 @@
       <TableLink {href}>{workflow.id}</TableLink>
     </p>
   </div>
-  <div class="cell links">
+  <div class="cell links font-medium md:font-normal">
     <p>
       <TableLink {href}>{workflow.name}</TableLink>
     </p>
   </div>
-  <div class="inline-block  cell">
+  <div class="inline-block cell font-normal">
     <p>
       {formatDate(workflow.startTime, timeFormat)}
     </p>
   </div>
   <span class=" md:hidden"> - </span>
-  <div class="inline-block cell">
+  <div class="inline-block cell font-normal">
     <p>
       {formatDate(workflow.endTime, timeFormat)}
     </p>
