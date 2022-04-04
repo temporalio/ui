@@ -9,21 +9,12 @@
   import EventEmptyRow from '../event-empty-row.svelte';
 
   export let items: HistoryEventWithId[];
-
-  const startingIndex = items.findIndex(
-    ({ id }) => $page.params.eventId === id,
-  );
 </script>
 
 {#await items}
   <LoadingRow />
 {:then items}
-  <Pagination
-    {items}
-    {startingIndex}
-    floatId="event-view-toggle"
-    let:visibleItems
-  >
+  <Pagination {items} floatId="event-view-toggle" let:visibleItems>
     <EventSummaryTable>
       {#each visibleItems as event (event.id)}
         <EventSummaryRow {event} />

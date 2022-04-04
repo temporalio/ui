@@ -13,33 +13,37 @@
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
 </script>
 
-<section class="flex flex-col gap-4">
-  <nav class="relative flex gap-4 justify-between items-end pb-4 max-w-1/2">
+<section id="event-history">
+  <nav class="flex gap-4 justify-between items-end pb-4">
     <h3 class="text-lg font-medium">Event History</h3>
     <div class="flex gap-4">
+      <HistoryImport />
+    </div>
+  </nav>
+  <nav class="flex gap-4 justify-end items-end pb-4">
+    <div id="event-view-toggle" class="flex gap-4">
       <ToggleButtons>
         <ToggleButton
           icon={faTable}
           href={routeForImport({ importType: 'events', view: 'summary' })}
-          ><span class="hidden md:block">Summary</span></ToggleButton
+          >Summary</ToggleButton
         >
         <ToggleButton
           icon={faBars}
           href={routeForImport({ importType: 'events', view: 'full' })}
-          ><span class="hidden md:block">Full</span></ToggleButton
+          >Full</ToggleButton
         >
         <ToggleButton
           icon={faLayerGroup}
           href={routeForImport({ importType: 'events', view: 'compact' })}
-          ><span class="hidden md:block">Compact</span></ToggleButton
+          >Compact</ToggleButton
         >
         <ToggleButton
           icon={faCode}
           href={routeForImport({ importType: 'events', view: 'json' })}
-          ><span class="hidden md:block">JSON</span></ToggleButton
+          >JSON</ToggleButton
         >
       </ToggleButtons>
-      <HistoryImport />
     </div>
   </nav>
   <slot />

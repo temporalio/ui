@@ -70,31 +70,29 @@
     <nav class="flex gap-4 justify-between items-end pb-4">
       <h3 class="text-lg font-medium">Recent Events</h3>
       <div id="event-view-toggle" class="flex gap-4">
-        <div class="flex gap-4">
-          <ToggleButtons>
-            <ToggleButton
-              icon={faTable}
-              base={routeForEventHistory(routeParameters('summary'))}
-              href={routeForEventHistory(routeParameters('summary'))}
-              ><span class="hidden md:block">Summary</span></ToggleButton
-            >
-            <ToggleButton
-              icon={faBars}
-              href={routeForEventHistory(routeParameters('full'))}
-              ><span class="hidden md:block">Full</span></ToggleButton
-            >
-            <ToggleButton
-              icon={faLayerGroup}
-              href={routeForEventHistory(routeParameters('compact'))}
-              ><span class="hidden md:block">Compact</span></ToggleButton
-            >
-            <ToggleButton
-              icon={faCode}
-              href={routeForEventHistory(routeParameters('json'))}
-              ><span class="hidden md:block">JSON</span></ToggleButton
-            >
-          </ToggleButtons>
-        </div>
+        <ToggleButtons>
+          <ToggleButton
+            icon={faTable}
+            base={routeForEventHistory(routeParameters('summary'))}
+            href={routeForEventHistory(routeParameters('summary'))}
+            >Summary</ToggleButton
+          >
+          <ToggleButton
+            icon={faBars}
+            href={routeForEventHistory(routeParameters('full'))}
+            >Full</ToggleButton
+          >
+          <ToggleButton
+            icon={faLayerGroup}
+            href={routeForEventHistory(routeParameters('compact'))}
+            >Compact</ToggleButton
+          >
+          <ToggleButton
+            icon={faCode}
+            href={routeForEventHistory(routeParameters('json'))}
+            >JSON</ToggleButton
+          >
+        </ToggleButtons>
       </div>
     </nav>
     <slot />

@@ -35,7 +35,7 @@
       );
       importEvents.set(events);
       importEventGroups.set(eventGroups);
-      const path = routeForImport({ importType: 'events', view: 'compact' });
+      const path = routeForImport({ importType: 'events', view: 'summary' });
       goto(path);
     } catch (e) {
       notifications.add('error', 'Could not create event history from JSON');
@@ -44,11 +44,9 @@
 </script>
 
 <input
-  class="import-input block w-full border border-gray-200 rounded-md p-2"
+  class="import-input block border border-gray-200 rounded-md p-2"
   type="file"
   accept=".json"
   on:change={onFileSelect}
 />
-<Button classes="import-btn" icon={faFileImport} on:click={onConfirm}
-  >Import</Button
->
+<Button icon={faFileImport} on:click={onConfirm}>Import</Button>

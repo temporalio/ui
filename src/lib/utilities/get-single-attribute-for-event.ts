@@ -16,6 +16,7 @@ const mapObjectToPropertValue = (key: string, value: any) => {
 };
 
 const getFirstDisplayAttribute = (attributes: any) => {
+  if (!attributes) return;
   for (const [key, value] of Object.entries(attributes)) {
     if (shouldDisplayAttribute(key, value)) {
       if (typeof value === 'object') {
@@ -34,17 +35,11 @@ export const getSingleAttributeForEvent = ({
   event: HistoryEventWithId | null;
   eventGroup: CompactEventGroup | null;
 }): { key: string; value: string } => {
-  let attribute = { key: '', value: '' };
-
-  if (event) {
-    attribute = getFirstDisplayAttribute(event?.attributes);
-  }
-
   if (eventGroup) {
     const attributes = eventGroup?.initialEvent?.attributes as any;
-    const input = attributes?.input;
-    attribute = { key: 'input', value: input ?? '' };
+    const input = attributes?.input ?? '';
+    return { key: 'input', value: input };
   }
 
-  return attribute;
+  return getFirstDisplayAttribute(event?.attributes) ?? { key: '', value: '' };
 };

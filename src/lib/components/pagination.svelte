@@ -14,7 +14,7 @@
 
   import FilterSelect from './select/filter-select.svelte';
 
-  export let startingIndex: string | number = -1;
+  export let startingIndex: string | number = 0;
 
   $: perPage = $page.url.searchParams.get(key) || '100';
   $: store = pagination(items, perPage);
@@ -22,29 +22,30 @@
   $: store.jumpToIndex(startingIndex);
 
   let screenWidth: number;
-  let floatWidth: number | undefined;
-  let navHeight: number | undefined;
+  let width: number | undefined;
+  let height: number | undefined;
 
   onMount(() => {
     if (floatId) {
-      floatWidth = document.getElementById(floatId)?.clientWidth;
-      navHeight = document.getElementById('pagination-nav')?.clientHeight;
+      width = document.getElementById(floatId)?.clientWidth;
     }
   });
 
   // If float width and nav height exist and screen is above lg breakpoint, float the nav
   $: floatStyle =
-    floatWidth && navHeight && screenWidth > 1024
-      ? `position: absolute; right: ${floatWidth + 40}px; top: -${
-          navHeight + 14
-        }px`
+    width && height && screenWidth > 1024
+      ? `position: absolute; right: ${width + 20}px; top: -${height + 14}px`
       : '';
 </script>
 
 <svelte:window bind:innerWidth={screenWidth} />
 
 <div class="pagination flex flex-col gap-4 relative mb-8">
-  <nav style={floatStyle} id="pagination-nav" class="flex justify-end gap-8">
+  <nav
+    style={floatStyle}
+    bind:clientHeight={height}
+    class="flex justify-end gap-8"
+  >
     <div class="flex gap-2 items-center justify-center">
       <p class="w-fit text-right">Per Page</p>
       <FilterSelect
