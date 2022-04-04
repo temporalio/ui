@@ -10,8 +10,10 @@
   import {
     eventFilterSort,
     eventTimeFormat,
+    eventShowElapsed,
     setFilterSort,
     setTimeFormat,
+    setShowElapsed,
   } from '$lib/stores/event-filters';
 
   let sortOptions = [
@@ -25,38 +27,39 @@
     { label: 'Local Time', option: 'local' },
   ];
 
-  let value = undefined;
-  $: sortDirection = $eventFilterSort;
-  $: timeFormat = $eventTimeFormat;
-
-  $: {
-    setFilterSort(sortDirection);
-    value = sortDirection;
-  }
-
-  $: {
-    setTimeFormat(timeFormat);
-    value = timeFormat;
-  }
-
   const onSortOptionClick = (option: string) => {
-    sortDirection = option;
+    setFilterSort(option);
   };
 
   const onDateOptionClick = (option: string) => {
-    timeFormat = option;
+    setTimeFormat(option);
   };
+
+  const onShowElapsedClick = () => {
+    if ($eventShowElapsed === 'true') {
+      setShowElapsed('false');
+    } else {
+      setShowElapsed('true');
+    }
+  };
+
+  $: value =
+    $eventFilterSort === 'asc' &&
+    $eventTimeFormat === 'UTC' &&
+    $eventShowElapsed === 'false'
+      ? undefined
+      : `${$eventFilterSort}:${$eventTimeFormat}:${$eventShowElapsed}`;
 </script>
 
 <DropdownMenu {value}>
   {#each sortOptions as { option, label } (option)}
     <div
       class="option"
-      class:active={sortDirection === option}
+      class:active={$eventFilterSort === option}
       on:click={() => onSortOptionClick(option)}
     >
       <div class="check">
-        {#if sortDirection === option}
+        {#if $eventFilterSort === option}
           <Icon icon={faCheck} />
         {/if}
       </div>
@@ -72,11 +75,11 @@
   {#each dateOptions as { label, option } (option)}
     <div
       class="option"
-      class:active={timeFormat === option}
+      class:active={$eventTimeFormat === option}
       on:click={() => onDateOptionClick(option)}
     >
       <div class="check">
-        {#if timeFormat === option}
+        {#if $eventTimeFormat === option}
           <Icon icon={faCheck} />
         {/if}
       </div>
@@ -89,8 +92,16 @@
     <div class="check" />
     <div class="my-2 pr-2 w-full border-b-2 border-gray-300" />
   </div>
-  <div class="option pr-4">
-    <div class="check" />
+  <div
+    class="option"
+    class:active={$eventShowElapsed === 'true'}
+    on:click={onShowElapsedClick}
+  >
+    <div class="check">
+      {#if $eventShowElapsed === 'true'}
+        <Icon icon={faCheck} />
+      {/if}
+    </div>
     <div class="label">Show Elapsed Time</div>
   </div>
 </DropdownMenu>
