@@ -13,11 +13,13 @@
   } from '$lib/utilities/route-for';
   import { formatDate } from '$lib/utilities/format-date';
 
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
-  import Tab from '$lib/components/tab.svelte';
   import type { GetPollersResponse } from '$lib/services/pollers-service';
   import Link from '$lib/components/link.svelte';
+
+  import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
+  import ExportHistory from '$lib/components/export-history.svelte';
+  import Tab from '$lib/components/tab.svelte';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
@@ -48,7 +50,10 @@
         <span class="font-medium">{workflow.id}</span>
         <WorkflowStatus status={workflow?.status} />
       </h1>
-      <TerminateWorkflow {workflow} {namespace} />
+      <div class="flex justify-end items-center gap-4">
+        <ExportHistory />
+        <TerminateWorkflow {workflow} {namespace} />
+      </div>
     </div>
     <nav class="flex gap-6 mb-6">
       <Tab

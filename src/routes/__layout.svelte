@@ -1,9 +1,6 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
-  import type {
-    DescribeNamespaceResponse,
-    ListNamespacesResponse,
-  } from '$types';
+  import type { ListNamespacesResponse } from '$types';
 
   import '../app.postcss';
 

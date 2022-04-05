@@ -39,9 +39,9 @@
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
   import WorkflowFilters from './_workflow-filters.svelte';
   import EmptyState from '$lib/components/empty-state.svelte';
-  import WorkflowsLoadingState from './_workflows-loading.svelte';
   import Pagination from '$lib/components/pagination.svelte';
   import Badge from '$lib/components/badge.svelte';
+  import LoadingRow from '$lib/components/loading-row.svelte';
 
   export let namespace: string;
   export let workflows: CombinedWorkflowExecutionsResponse;
@@ -57,7 +57,7 @@
 <h2 class="text-2xl">Workflows <Badge type="beta">Beta</Badge></h2>
 <WorkflowFilters bind:timeFormat />
 {#await workflows}
-  <WorkflowsLoadingState />
+  <LoadingRow />
 {:then { workflows }}
   {#if workflows.length}
     <Pagination items={workflows} let:visibleItems>

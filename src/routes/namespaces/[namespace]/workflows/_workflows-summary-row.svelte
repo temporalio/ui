@@ -4,7 +4,7 @@
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import { routeForWorkflow } from '$lib/utilities/route-for';
 
-  import Link from '$lib/components/link.svelte';
+  import TableLink from '$lib/components/table-link.svelte';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
@@ -24,20 +24,22 @@
     </div>
   </div>
   <div class="cell links font-medium md:font-normal">
-    <Link {href}>{workflow.id}</Link>
+    <p>
+      <TableLink {href}>{workflow.id}</TableLink>
+    </p>
   </div>
-  <div class="cell links">
-    <h3>
-      <Link {href}>{workflow.name}</Link>
-    </h3>
+  <div class="cell links font-medium md:font-normal">
+    <p>
+      <TableLink {href}>{workflow.name}</TableLink>
+    </p>
   </div>
-  <div class="inline-block  cell">
+  <div class="inline-block cell font-normal">
     <p>
       {formatDate(workflow.startTime, timeFormat)}
     </p>
   </div>
   <span class=" md:hidden"> - </span>
-  <div class="inline-block cell">
+  <div class="inline-block cell font-normal">
     <p>
       {formatDate(workflow.endTime, timeFormat)}
     </p>
@@ -46,7 +48,7 @@
 
 <style lang="postcss">
   .row {
-    @apply no-underline p-2 text-sm border-b-2 items-center md:text-base md:table-row;
+    @apply no-underline p-2 text-sm border-b-2 items-center md:text-base md:table-row last-of-type:border-b-0;
   }
 
   .cell {
@@ -55,5 +57,13 @@
 
   .row:hover {
     @apply bg-gray-50;
+  }
+
+  .row:hover :global(.table-link) {
+    @apply text-blue-700 border-b-2 border-blue-700;
+  }
+
+  .row:last-of-type .cell {
+    @apply border-b-0 first-of-type:rounded-bl-lg  last-of-type:rounded-br-lg;
   }
 </style>

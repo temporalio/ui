@@ -73,7 +73,7 @@
   }
 
   .primary:hover:enabled {
-    @apply bg-blue-800;
+    @apply bg-blue-700;
   }
 
   .secondary {
@@ -85,7 +85,7 @@
   }
 
   .secondary:hover:enabled {
-    @apply text-white bg-purple-300;
+    @apply text-white bg-gray-900;
   }
 
   .destroy {

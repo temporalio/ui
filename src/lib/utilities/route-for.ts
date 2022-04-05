@@ -130,15 +130,18 @@ export const routeForLoginPage = () => {
 };
 
 type ImportParameters = {
-  importType: string;
-  eventId?: string;
+  importType: 'events';
+  view?: EventView;
 };
 
 export const routeForImport = ({
   importType,
-  eventId,
+  view,
 }: ImportParameters): string => {
-  if (eventId) return `/import/${importType}/${eventId}`;
+  if (view) {
+    if (importType === 'events') return `/import/${importType}/history/${view}`;
+    return `/import/${importType}/${view}`;
+  }
   return `/import/${importType}`;
 };
 

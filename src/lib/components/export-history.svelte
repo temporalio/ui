@@ -1,9 +1,9 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import ToggleButton from '$lib/components/toggle-button.svelte';
   import { fetchRawEvents } from '$lib/services/events-service';
   import { faDownload } from '@fortawesome/free-solid-svg-icons';
+  import Button from './button.svelte';
 
   const { workflow: workflowId, run: runId, namespace } = $page.params;
 
@@ -27,4 +27,6 @@
   };
 </script>
 
-<ToggleButton icon={faDownload} on:click={exportHistory} />
+<Button thin secondary icon={faDownload} on:click={exportHistory}
+  >Download</Button
+>

@@ -1,26 +1,51 @@
 <script lang="ts">
-  import Icon from 'svelte-fa';
-  import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
-
+  import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import { pagination, perPageOptions } from '$lib/stores/pagination';
 
-  import FilterSelect from './select/filter-select.svelte';
+  import Icon from 'svelte-fa';
+  import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 
   type T = $$Generic;
 
   export let key = 'per-page';
   export let items: T[];
-  export let startingIndex: string | number = null;
+  export let floatId: string | undefined = undefined;
+
+  import FilterSelect from './select/filter-select.svelte';
+
+  export let startingIndex: string | number = 0;
 
   $: perPage = $page.url.searchParams.get(key) || '100';
   $: store = pagination(items, perPage);
   $: store.adjustPageSize(perPage);
   $: store.jumpToIndex(startingIndex);
+
+  let screenWidth: number;
+  let width: number | undefined;
+  let height: number | undefined;
+
+  onMount(() => {
+    if (floatId) {
+      width = document.getElementById(floatId)?.clientWidth;
+    }
+  });
+
+  // If float width and nav height exist and screen is above lg breakpoint, float the nav
+  $: floatStyle =
+    width && height && screenWidth > 1024
+      ? `position: absolute; right: ${width + 20}px; top: -${height + 14}px`
+      : '';
 </script>
 
-<div class="flex flex-col gap-4">
-  <nav class="flex justify-end gap-8">
+<svelte:window bind:innerWidth={screenWidth} />
+
+<div class="pagination flex flex-col gap-4 relative mb-8">
+  <nav
+    style={floatStyle}
+    bind:clientHeight={height}
+    class="flex justify-end gap-8"
+  >
     <div class="flex gap-2 items-center justify-center">
       <p class="w-fit text-right">Per Page</p>
       <FilterSelect

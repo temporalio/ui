@@ -11,18 +11,21 @@
   // rawEvents is expected to be HistoryEvent[] | { events: HistoryEvent[] } but could be anything
   let rawEvents: any;
 
-  const onFileSelect = async (e) => {
-    const file = e.target.files[0];
+  const onFileSelect = async (e: Event) => {
+    const target = e.target as HTMLInputElement;
+    const file = target?.files?.[0];
     const reader = new FileReader();
-    reader.readAsText(file);
-    reader.onload = () => {
-      try {
-        const result = reader.result.toString();
-        rawEvents = JSON.parse(result);
-      } catch (e) {
-        notifications.add('error', 'Could not parse JSON');
-      }
-    };
+    if (file) {
+      reader.readAsText(file);
+      reader.onload = () => {
+        try {
+          const result = reader?.result?.toString() ?? '';
+          rawEvents = JSON.parse(result);
+        } catch (e) {
+          notifications.add('error', 'Could not parse JSON');
+        }
+      };
+    }
   };
 
   const onConfirm = async () => {
@@ -32,8 +35,7 @@
       );
       importEvents.set(events);
       importEventGroups.set(eventGroups);
-      const eventId = events[0]?.id ?? '1';
-      const path = routeForImport({ importType: 'events', eventId });
+      const path = routeForImport({ importType: 'events', view: 'summary' });
       goto(path);
     } catch (e) {
       notifications.add('error', 'Could not create event history from JSON');
@@ -42,11 +44,9 @@
 </script>
 
 <input
-  class="import-input block w-full border border-gray-200 rounded-md p-2"
+  class="import-input block border border-gray-200 rounded-md p-2"
   type="file"
   accept=".json"
   on:change={onFileSelect}
 />
-<Button classes="import-btn" icon={faFileImport} on:click={onConfirm}
-  >Import</Button
->
+<Button icon={faFileImport} on:click={onConfirm}>Import</Button>

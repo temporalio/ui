@@ -1,31 +1,33 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
-  import EventDetails from '$lib/components/event/event-details.svelte';
-  import Link from '$lib/components/link.svelte';
-
-  export let event: HistoryEventWithId;
   export let eventGroup: CompactEventGroup | null;
+  export let eventId: string;
+  export let onClick: (id: string) => void;
 </script>
 
 <section class="overflow-y-scroll max-h-full">
   {#if eventGroup}
     <nav class="flex flex-col mb-4">
-      <ul class="flex gap-4 w-full items-start">
+      <ul class="gap-4 w-full items-start">
         {#each [...eventGroup.events] as [id, eventInGroup] (id)}
-          <li>
-            <Link
-              sveltekit:noscroll
-              href={id + $page.url.search}
-              active={id === event.id}
+          <li on:click|preventDefault|stopPropagation={() => onClick(id)}>
+            <span class="event-type" class:active={id === eventId}
+              >{eventInGroup.eventType}</span
             >
-              {eventInGroup.eventType}
-            </Link>
           </li>
         {/each}
       </ul>
     </nav>
   {/if}
-
-  <EventDetails {event} />
 </section>
+
+<style lang="postcss">
+  li {
+    @apply my-2 cursor-pointer;
+  }
+  .event-type:hover {
+    @apply text-blue-700 border-b-2 border-blue-700;
+  }
+  .active {
+    @apply text-blue-700 border-b-2 border-blue-700;
+  }
+</style>
