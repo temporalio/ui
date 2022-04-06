@@ -1,4 +1,7 @@
-import { getSingleAttributeForEvent } from './get-single-attribute-for-event';
+import {
+  getSingleAttributeForEvent,
+  shouldDisplayAsWorkflowLink,
+} from './get-single-attribute-for-event';
 
 describe(getSingleAttributeForEvent, () => {
   const workflowEvent = {
@@ -155,5 +158,25 @@ describe(getSingleAttributeForEvent, () => {
     expect(
       getSingleAttributeForEvent({ event, eventGroup: workflowEventGroup }),
     ).toStrictEqual({ key: 'input', value });
+  });
+});
+
+describe(shouldDisplayAsWorkflowLink, () => {
+  it('should return true for event keys that end with RunId', () => {
+    expect(shouldDisplayAsWorkflowLink('originalExecutionRunId')).toBe(true);
+    expect(shouldDisplayAsWorkflowLink('firstExecutionRunId')).toBe(true);
+    expect(shouldDisplayAsWorkflowLink('continuedExecutionRunId')).toBe(true);
+  });
+
+  it('should be case insensitive', () => {
+    expect(shouldDisplayAsWorkflowLink('originalExecutionRunId')).toBe(true);
+    expect(shouldDisplayAsWorkflowLink('OriginalExecutionrunid')).toBe(true);
+  });
+
+  it('should return false for event keys that do not end with RunId', () => {
+    expect(shouldDisplayAsWorkflowLink('')).toBe(false);
+    expect(shouldDisplayAsWorkflowLink('workflowType.name')).toBe(false);
+    expect(shouldDisplayAsWorkflowLink('parentInitiatedEventId')).toBe(false);
+    expect(shouldDisplayAsWorkflowLink('inlineRunIdSample')).toBe(false);
   });
 });
