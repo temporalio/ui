@@ -13,7 +13,7 @@
   export let floatId: string | undefined = undefined;
 
   import FilterSelect from './select/filter-select.svelte';
-import { getFloatStyle } from '$lib/utilities/get-float-style';
+  import { getFloatStyle } from '$lib/utilities/get-float-style';
 
   export let startingIndex: string | number = 0;
 
@@ -32,7 +32,7 @@ import { getFloatStyle } from '$lib/utilities/get-float-style';
     }
   });
 
-  $: floatStyle = getFloatStyle({ width, height, screenWidth })
+  $: floatStyle = getFloatStyle({ width, height, screenWidth });
 </script>
 
 <svelte:window bind:innerWidth={screenWidth} />

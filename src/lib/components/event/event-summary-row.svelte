@@ -18,7 +18,7 @@
 
 <article class="row" id={event.id}>
   <div class="cell">
-    <span class="text-gray-500 text-normal mx-1">{event.id}</span>
+    <a class="text-gray-500 text-normal mx-1" href="#{event.id}">{event.id}</a>
     <span
       class="mx-2"
       class:link={!expandAll}
