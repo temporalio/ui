@@ -130,4 +130,5 @@ export type Timestamp = google.protobuf.ITimestamp;
 export type SettingsResponse = {
   Auth: { Enabled: boolean; Options: string[] };
   DefaultNamespace: string;
+  ShowTemporalSystemNamespace: boolean;
 };

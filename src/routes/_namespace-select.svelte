@@ -6,6 +6,7 @@
 
   import { routeForWorkflows } from '$lib/utilities/route-for';
 
+  const { showTemporalSystemNamespace } = $page.stuff.settings;
   const { isCloud } = $page.stuff.settings.runtimeEnvironment;
 
   import Select from '$lib/components/select/select.svelte';
@@ -16,7 +17,10 @@
 
   let namespaces = ($page.stuff.namespaces || [])
     .map((namespace: Namespace) => namespace?.namespaceInfo?.name)
-    .filter((namespace: string) => namespace !== 'temporal-system');
+    .filter(
+      (namespace: string) =>
+        showTemporalSystemNamespace || namespace !== 'temporal-system',
+    );
 
   const switchNamespaces = (event: Event) => {
     const target = event.target as HTMLSelectElement;

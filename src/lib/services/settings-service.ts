@@ -29,6 +29,7 @@ export const fetchSettings = async (
     baseUrl:
       import.meta?.env?.VITE_API ?? browser ? window.location.origin : '',
     defaultNamespace: settings?.DefaultNamespace || 'default', // API returns an empty string if default namespace is not configured
+    showTemporalSystemNamespace: settings?.ShowTemporalSystemNamespace,
     runtimeEnvironment: {
       get isCloud() {
         if (EnvironmentOverride) {
