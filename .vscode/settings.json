@@ -8,5 +8,6 @@
   "jest.nodeEnv": {
     "TZ": "UTC"
   },
-  "jest.jestCommandLine": "npm test --"
+  "jest.jestCommandLine": "npm test --",
+  "editor.formatOnSave": true
 }
