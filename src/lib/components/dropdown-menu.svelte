@@ -18,7 +18,7 @@
 
   let show: boolean = false;
   let menu: any = null;
-  $: _value = $page.url?.searchParams?.get(parameter) ?? undefined;
+  $: _value = $page.url?.searchParams?.get(parameter);
 
   $: {
     updateQueryParameters({

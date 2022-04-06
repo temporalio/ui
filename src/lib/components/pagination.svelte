@@ -13,6 +13,7 @@
   export let floatId: string | undefined = undefined;
 
   import FilterSelect from './select/filter-select.svelte';
+import { getFloatStyle } from '$lib/utilities/get-float-style';
 
   export let startingIndex: string | number = 0;
 
@@ -31,11 +32,7 @@
     }
   });
 
-  // If float width and nav height exist and screen is above lg breakpoint, float the nav
-  $: floatStyle =
-    width && height && screenWidth > 1024
-      ? `position: absolute; right: ${width + 20}px; top: -${height + 14}px`
-      : '';
+  $: floatStyle = getFloatStyle({ width, height, screenWidth })
 </script>
 
 <svelte:window bind:innerWidth={screenWidth} />
