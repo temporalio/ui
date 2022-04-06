@@ -15,7 +15,7 @@
   <Pagination {items} floatId="event-view-toggle" let:visibleItems>
     <EventSummaryTable>
       {#each visibleItems as event (event.id)}
-        <EventSummaryRow {event} expanded />
+        <EventSummaryRow {event} expandAll />
       {/each}
       {#if !items?.length}
         <EventEmptyRow />

@@ -5,23 +5,23 @@
   import EventSingleDetail from './event-single-detail.svelte';
 
   export let event: HistoryEventWithId;
-  export let expanded: boolean = false;
+  export let expandAll: boolean = false;
 
-  $: collapsed = expanded ? false : true;
+  $: expanded = expandAll;
 
   const onLinkClick = () => {
-    if (!expanded) {
-      collapsed = !collapsed;
+    if (!expandAll) {
+      expanded = !expanded;
     }
   };
 </script>
 
 <article class="row" id={event.id}>
   <div class="cell">
-    <span class="text-gray-500 text-normal mx-1">{event.id}</span>
+    <a class="text-gray-500 text-normal mx-1" href="#{event.id}">{event.id}</a>
     <span
       class="mx-2"
-      class:link={!expanded}
+      class:link={!expandAll}
       on:click|stopPropagation={onLinkClick}>{event.name}</span
     >
   </div>
@@ -29,10 +29,10 @@
     {formatDate(event?.eventTime)}
   </div>
   <div class="cell links">
-    {#if collapsed}
-      <EventSingleDetail {event} />
-    {:else}
+    {#if expanded}
       <EventDetails {event} />
+    {:else}
+      <EventSingleDetail {event} />
     {/if}
   </div>
 </article>
