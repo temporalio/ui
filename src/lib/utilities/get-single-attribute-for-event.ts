@@ -10,6 +10,16 @@ export const shouldDisplayAttribute = (
   return true;
 };
 
+export const shouldDisplayAsWorkflowLink = (key: string) => {
+  if (!key) return false;
+
+  if (key.toLowerCase().endsWith('runid')) {
+    return true;
+  }
+
+  return false;
+};
+
 const mapObjectToPropertValue = (key: string, value: any) => {
   const firstKey = Object.keys(value)[0];
   return { key: `${key}.${firstKey}`, value: value[firstKey] };

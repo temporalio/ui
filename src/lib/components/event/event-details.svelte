@@ -1,8 +1,16 @@
 <script lang="ts">
+  import { page } from '$app/stores';
   import { format } from '$lib/utilities/format-camel-case';
+  import { routeForWorkflow } from '$lib/utilities/route-for';
   import CodeBlock from '$lib/components/code-block.svelte';
-  import { shouldDisplayAttribute } from '$lib/utilities/get-single-attribute-for-event';
+  import TableLink from '$lib/components/table-link.svelte';
+  import {
+    shouldDisplayAttribute,
+    shouldDisplayAsWorkflowLink,
+  } from '$lib/utilities/get-single-attribute-for-event';
   export let event: HistoryEventWithId;
+
+  const { workflow, namespace } = $page.params;
 </script>
 
 <section>
@@ -15,6 +23,11 @@
         <div class="flex-grow w-full">
           {#if typeof value === 'object'}
             <CodeBlock content={value} />
+          {:else if shouldDisplayAsWorkflowLink(key)}
+            <TableLink
+              href={routeForWorkflow({ namespace, workflow, run: value })}
+              >{value}</TableLink
+            >
           {:else}
             <p><span class="bg-gray-300 text-gray-700 px-2">{value}</span></p>
           {/if}
