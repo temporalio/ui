@@ -2,7 +2,7 @@
   import { page } from '$app/stores';
 
   import { importEvents } from '$lib/stores/import-events';
-  import FullEvent from '$lib/components/event/view/event-full.svelte';
+  import EventFullView from '$lib/components/event/view/event-summary.svelte';
 
   $: category = $page.url.searchParams.get('category') as EventTypeCategory;
   $: filteredEvents = $importEvents.filter((event) => {
@@ -11,4 +11,4 @@
   });
 </script>
 
-<FullEvent items={filteredEvents} />
+<EventFullView items={filteredEvents} expandAll />

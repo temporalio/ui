@@ -17,9 +17,9 @@
 </script>
 
 <script lang="ts">
-  import FullEvent from '$lib/components/event/view/event-full.svelte';
+  import EventSummary from '$lib/components/event/view/event-summary.svelte';
 
   export let items: HistoryEventWithId[];
 </script>
 
-<FullEvent {items} />
+<EventSummary {items} expandAll />
