@@ -57,3 +57,53 @@ Set these environment variables if you want to change their defaults
 | --------- | ---------------------------------------------------------------- | --------------------- | ----- |
 | VITE_API  | Temporal HTTP API address. Set to empty `` to use relative paths | http://localhost:8080 | Build |
 | VITE_MODE | Build target                                                     | development           | Build |
+
+## Developing with Canary
+
+To get a better representation of production data, you can run our UI with the go-canary repo. You will need go installed on your machine.
+
+### go-canary
+
+```bash
+make bins
+./temporal-canary start
+```
+
+### temporal
+
+```bash
+make bins
+TEMPORAL_ENVIRONMENT=development_sqlite make start
+```
+
+### tctl
+
+```bash
+make build
+./tctl --ns canary namespace register
+./tctl --ns default namespace register (if you also want a default namespace)
+./tctl --auto_confirm admin cluster add-search-attributes \
+	 --name CustomKeywordField --type Keyword \
+	--name CustomStringField --type Text \
+	--name CustomTextField --type Text \
+	--name CustomIntField --type Int \
+	 --name CustomDatetimeField --type Datetime \
+	--name CustomDoubleField --type Double \
+	--name CustomBoolField --type Bool
+```
+
+To view the search attributes code:
+https://github.com/temporalio/docker-builds/blob/main/docker/auto-setup.sh#L297
+
+### ui-server
+
+```bash
+make build-server
+./ui-server start
+```
+
+### ui
+
+```bash
+npm start
+```
