@@ -3,6 +3,41 @@ type WorkflowEvents = {
   result: string;
 };
 
+type CompletionEvent =
+  | WorkflowExecutionFailedEvent
+  | WorkflowExecutionCompletedEvent
+  | WorkflowExecutionContinuedAsNewEvent
+  | WorkflowExecutionTimedOutEvent
+  | WorkflowExecutionCanceledEvent
+  | WorkflowExecutionTerminatedEvent;
+
+const completedEventTypes = [
+  'WorkflowExecutionFailed',
+  'WorkflowExecutionCompleted',
+  'WorkflowExecutionContinuedAsNew',
+  'WorkflowExecutionTimedOut',
+  'WorkflowExecutionCanceled',
+  'WorkflowExecutionTerminated',
+] as const;
+
+const getWorkflowCompletedEvent = (
+  events: HistoryEventWithId[],
+): CompletionEvent => {
+  for (const event of events) {
+    for (const completionType of completedEventTypes) {
+      if (event.eventType === completionType) return event;
+    }
+  }
+};
+
+const getEventResult = (event: CompletionEvent) => {
+  const payloads = event.attributes?.result?.payloads;
+
+  if (payloads) return payloads;
+
+  return event.attributes;
+};
+
 export const getWorkflowStartedAndCompletedEvents = (
   events: HistoryEventWithId[],
 ): WorkflowEvents => {
@@ -13,9 +48,7 @@ export const getWorkflowStartedAndCompletedEvents = (
     return !!event.workflowExecutionStartedEventAttributes;
   });
 
-  const workflowCompletedEvent: HistoryEventWithId = events?.find((event) => {
-    return !!event.workflowExecutionCompletedEventAttributes;
-  });
+  const workflowCompletedEvent = getWorkflowCompletedEvent(events);
 
   if (workflowStartedEvent) {
     input = JSON.stringify(
@@ -25,10 +58,7 @@ export const getWorkflowStartedAndCompletedEvents = (
   }
 
   if (workflowCompletedEvent) {
-    result = JSON.stringify(
-      workflowCompletedEvent?.workflowExecutionCompletedEventAttributes?.result
-        ?.payloads,
-    );
+    result = JSON.stringify(getEventResult(workflowCompletedEvent));
   }
 
   return {

@@ -54,6 +54,7 @@ function isTimestamp(arg: unknown): arg is Timestamp {
 }
 
 export function formatDuration(duration: Duration | string): string {
+  if (duration === null) return '';
   if (typeof duration === 'string') duration = fromSeconds(duration);
   return durationToString(duration, { delimiter: ', ' });
 }
