@@ -5,7 +5,7 @@
   let title = compact ? 'Event Type' : 'Workflow Events';
 </script>
 
-<section class="summary-table">
+<section class="event-table">
   <div class="table-header-row md:table-header-group">
     <div class="md:table-row hidden">
       <div class="table-header w-3/12 rounded-tl-md">
@@ -24,8 +24,8 @@
 </section>
 
 <style lang="postcss">
-  .summary-table {
-    @apply md:table border-gray-300 border-2 rounded-lg w-full;
+  .event-table {
+    @apply md:table border-gray-900 border-2 rounded-lg w-full;
   }
 
   .table-header-row {
