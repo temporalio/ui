@@ -92,8 +92,7 @@
           },
           "prevAutoResetPoints": null,
           "header": {
-            "fields": {
-            }
+            "fields": {}
           }
         }
       },
@@ -191,8 +190,7 @@
       }
     ]
   },
-  "rawHistory": [
-  ],
+  "rawHistory": [],
   "nextPageToken": null,
   "archived": false
 }
