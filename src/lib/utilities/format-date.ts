@@ -1,7 +1,12 @@
-import { formatDistanceToNow, parseJSON } from 'date-fns';
+import {
+  formatDistanceToNow,
+  parseJSON,
+  formatDuration as durationToString,
+} from 'date-fns';
 import * as dateTz from 'date-fns-tz'; // `build` script fails on importing some of named CommonJS modules
 
 import type { Timestamp } from '$types';
+import { fromSeconds } from './to-duration';
 
 type ValidTime = Parameters<typeof parseJSON>[0] | Timestamp;
 
@@ -46,4 +51,9 @@ function isTimestamp(arg: unknown): arg is Timestamp {
     return arg['seconds'] !== undefined && arg['nanos'] !== undefined;
   }
   return false;
+}
+
+export function formatDuration(duration: Duration | string): string {
+  if (typeof duration === 'string') duration = fromSeconds(duration);
+  return durationToString(duration, { delimiter: ', ' });
 }

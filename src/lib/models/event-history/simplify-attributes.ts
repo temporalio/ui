@@ -1,4 +1,4 @@
-import { formatDate } from '$lib/utilities/format-date';
+import { formatDate, formatDuration } from '$lib/utilities/format-date';
 import type { PendingActivityInfo } from '$types';
 
 const keysToBeFormattedAsTime = [
@@ -22,8 +22,35 @@ const keysToBeFormattedAsTime = [
   'workflowExecutionExpirationTime',
 ] as const;
 
+const keysToBeFormattedAsDuration = [
+  'backoffStartInterval',
+  'defaultWorkflowTaskTimeout',
+  'firstWorkflowTaskBackoff',
+  'heartbeatTimeout',
+  'initialInterval',
+  'maximumInterval',
+  'scheduleToCloseTimeout',
+  'scheduleToStartTimeout',
+  'startToCloseTimeout',
+  'startToFireTimeout',
+  'workflowExecutionRetentionPeriod',
+  'workflowExecutionRetentionTtl',
+  'workflowExecutionTimeout',
+  'workflowRunTimeout',
+  'workflowTaskTimeout',
+] as const;
+
 const isTime = (key: string): key is typeof keysToBeFormattedAsTime[number] => {
   for (const timeKey of keysToBeFormattedAsTime) {
+    if (timeKey === key) return true;
+  }
+  return false;
+};
+
+const isDuration = (
+  key: string,
+): key is typeof keysToBeFormattedAsDuration[number] => {
+  for (const timeKey of keysToBeFormattedAsDuration) {
     if (timeKey === key) return true;
   }
   return false;
@@ -65,6 +92,10 @@ export function simplifyAttributes<
 
     if (isTime(key)) {
       attributes[key] = formatDate(value);
+    }
+
+    if (isDuration(key)) {
+      attributes[key] = formatDuration(value);
     }
   }
 
