@@ -33,7 +33,7 @@
               <h4>Activity Name</h4>
               <p>
                 <span class="bg-gray-300 text-gray-700 px-2">
-                  {pendingActivity.activityType?.name}
+                  {pendingActivity.activityType}
                 </span>
               </p>
             </div>

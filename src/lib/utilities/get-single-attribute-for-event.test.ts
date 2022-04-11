@@ -168,11 +168,6 @@ describe(shouldDisplayAsWorkflowLink, () => {
     expect(shouldDisplayAsWorkflowLink('continuedExecutionRunId')).toBe(true);
   });
 
-  it('should be case insensitive', () => {
-    expect(shouldDisplayAsWorkflowLink('originalExecutionRunId')).toBe(true);
-    expect(shouldDisplayAsWorkflowLink('OriginalExecutionrunid')).toBe(true);
-  });
-
   it('should return false for event keys that do not end with RunId', () => {
     expect(shouldDisplayAsWorkflowLink('')).toBe(false);
     expect(shouldDisplayAsWorkflowLink('workflowType.name')).toBe(false);

@@ -1,3 +1,7 @@
+type SummaryAttribute = { key: string; value: string };
+
+const emptyAttribute: SummaryAttribute = { key: '', value: '' };
+
 export const shouldDisplayAttribute = (
   key: string,
   value: unknown,
@@ -10,32 +14,82 @@ export const shouldDisplayAttribute = (
   return true;
 };
 
-export const shouldDisplayAsWorkflowLink = (key: string) => {
-  if (!key) return false;
+const keysWithWorkflowLinks = [
+  'baseRunId',
+  'continuedExecutionRunId',
+  'firstExecutionRunId',
+  'newExecutionRunId',
+  'newRunId',
+  'originalExecutionRunId',
+] as const;
 
-  if (key.toLowerCase().endsWith('runid')) {
-    return true;
+export const shouldDisplayAsWorkflowLink = (
+  key: string,
+): key is typeof keysWithWorkflowLinks[number] => {
+  for (const workflowKey of keysWithWorkflowLinks) {
+    if (key === workflowKey) return true;
   }
 
   return false;
 };
 
-const mapObjectToPropertValue = (key: string, value: any) => {
-  const firstKey = Object.keys(value)[0];
-  return { key: `${key}.${firstKey}`, value: value[firstKey] };
+const formatSummaryValue = (key: string, value: unknown): SummaryAttribute => {
+  if (typeof value === 'object') {
+    const [firstKey] = Object.keys(value);
+    return { key: `${key}.${firstKey}`, value: value[firstKey] };
+  } else {
+    return { key, value: value.toString() };
+  }
 };
 
-const getFirstDisplayAttribute = (attributes: any) => {
-  if (!attributes) return;
+/**
+ * A list of the keys that should be shown in the summary view.
+ */
+const preferredSummaryKeys = ['activityType'] as const;
+
+/**
+ * Returns that first event attribute that is eligible to be displayed.
+ */
+const getFirstDisplayAttribute = ({
+  attributes,
+}: HistoryEventWithId): { key: string; value: string } => {
   for (const [key, value] of Object.entries(attributes)) {
     if (shouldDisplayAttribute(key, value)) {
-      if (typeof value === 'object') {
-        return mapObjectToPropertValue(key, value);
-      } else {
-        return { key, value: value.toString() };
-      }
+      return formatSummaryValue(key, value);
     }
   }
+};
+
+/**
+ * Iterates through the keys of an event and compares it with the list of
+ * preferred keys. If a preferred key is found, it will be returned.
+ * Otherwise, it will return the first eligible event attribute.
+ */
+const getPreferredSummaryAttribute = (
+  event: HistoryEventWithId,
+): SummaryAttribute => {
+  const first = getFirstDisplayAttribute(event);
+
+  for (const [key, value] of Object.entries(event.attributes)) {
+    for (const preferredKey of preferredSummaryKeys) {
+      if (key === preferredKey) return formatSummaryValue(key, value);
+    }
+  }
+
+  return first;
+};
+
+const getSummaryForEventGroup = (
+  eventGroup: CompactEventGroup,
+): SummaryAttribute => {
+  let input = '';
+  const attributes = eventGroup.initialEvent.attributes;
+
+  for (const [key, value] of Object.entries(attributes)) {
+    if (key === 'input') input = value;
+  }
+
+  return { key: 'input', value: input };
 };
 
 export const getSingleAttributeForEvent = ({
@@ -44,12 +98,13 @@ export const getSingleAttributeForEvent = ({
 }: {
   event: HistoryEventWithId | null;
   eventGroup: CompactEventGroup | null;
-}): { key: string; value: string } => {
+}): SummaryAttribute => {
+  let summaryAttribute = emptyAttribute;
+  if (!event && !eventGroup) return summaryAttribute;
+
   if (eventGroup) {
-    const attributes = eventGroup?.initialEvent?.attributes as any;
-    const input = attributes?.input ?? '';
-    return { key: 'input', value: input };
+    return getSummaryForEventGroup(eventGroup);
   }
 
-  return getFirstDisplayAttribute(event?.attributes) ?? { key: '', value: '' };
+  return getPreferredSummaryAttribute(event);
 };
