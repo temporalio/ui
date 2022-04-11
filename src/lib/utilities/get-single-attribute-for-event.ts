@@ -1,4 +1,6 @@
-type SummaryAttribute = { key: string; value: string };
+import { getLastEvent } from '$lib/models/group-events/get-last-event';
+
+type SummaryAttribute = { key: string; value: string | Record<string, any> };
 
 const emptyAttribute: SummaryAttribute = { key: '', value: '' };
 
@@ -33,10 +35,14 @@ export const shouldDisplayAsWorkflowLink = (
   return false;
 };
 
+const capitalize = (word: string): string => {
+  return word[0].toUpperCase() + word.slice(1);
+};
+
 const formatSummaryValue = (key: string, value: unknown): SummaryAttribute => {
   if (typeof value === 'object') {
     const [firstKey] = Object.keys(value);
-    return { key: `${key}.${firstKey}`, value: value[firstKey] };
+    return { key: key + capitalize(firstKey), value: value[firstKey] };
   } else {
     return { key, value: value.toString() };
   }
@@ -45,14 +51,14 @@ const formatSummaryValue = (key: string, value: unknown): SummaryAttribute => {
 /**
  * A list of the keys that should be shown in the summary view.
  */
-const preferredSummaryKeys = ['activityType'] as const;
+const preferredSummaryKeys = ['failure', 'input', 'activityType'] as const;
 
 /**
  * Returns that first event attribute that is eligible to be displayed.
  */
 const getFirstDisplayAttribute = ({
   attributes,
-}: HistoryEventWithId): { key: string; value: string } => {
+}: HistoryEventWithId): SummaryAttribute => {
   for (const [key, value] of Object.entries(attributes)) {
     if (shouldDisplayAttribute(key, value)) {
       return formatSummaryValue(key, value);
@@ -65,9 +71,7 @@ const getFirstDisplayAttribute = ({
  * preferred keys. If a preferred key is found, it will be returned.
  * Otherwise, it will return the first eligible event attribute.
  */
-const getPreferredSummaryAttribute = (
-  event: HistoryEventWithId,
-): SummaryAttribute => {
+const getSummaryAttribute = (event: HistoryEventWithId): SummaryAttribute => {
   const first = getFirstDisplayAttribute(event);
 
   for (const [key, value] of Object.entries(event.attributes)) {
@@ -79,17 +83,13 @@ const getPreferredSummaryAttribute = (
   return first;
 };
 
-const getSummaryForEventGroup = (
+export const getSummaryForEventGroup = (
   eventGroup: CompactEventGroup,
+  getSummary: (event: HistoryEventWithId) => SummaryAttribute,
 ): SummaryAttribute => {
-  let input = '';
-  const attributes = eventGroup.initialEvent.attributes;
+  const event = getLastEvent(eventGroup);
 
-  for (const [key, value] of Object.entries(attributes)) {
-    if (key === 'input') input = value;
-  }
-
-  return { key: 'input', value: input };
+  return getSummary(event);
 };
 
 export const getSingleAttributeForEvent = ({
@@ -102,8 +102,8 @@ export const getSingleAttributeForEvent = ({
   if (!event && !eventGroup) return emptyAttribute;
 
   if (eventGroup) {
-    return getSummaryForEventGroup(eventGroup);
+    return getSummaryForEventGroup(eventGroup, getSummaryAttribute);
   }
 
-  return getPreferredSummaryAttribute(event);
+  return getSummaryAttribute(event);
 };

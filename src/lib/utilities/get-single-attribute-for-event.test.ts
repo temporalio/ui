@@ -117,7 +117,7 @@ describe(getSingleAttributeForEvent, () => {
     expect(
       getSingleAttributeForEvent({ event: workflowEvent, eventGroup: null }),
     ).toStrictEqual({
-      key: 'workflowType.name',
+      key: 'workflowTypeName',
       value: 'RainbowStatusesWorkflow',
     });
   });
@@ -127,7 +127,7 @@ describe(getSingleAttributeForEvent, () => {
     event.attributes.workflowType = null;
     expect(
       getSingleAttributeForEvent({ event, eventGroup: null }),
-    ).toStrictEqual({ key: 'taskQueue.name', value: 'rainbow-statuses' });
+    ).toStrictEqual({ key: 'taskQueueName', value: 'rainbow-statuses' });
   });
 
   it('should return "parentInitiatedEventId" if the workflow type and task queue does not exists', () => {
@@ -145,21 +145,6 @@ describe(getSingleAttributeForEvent, () => {
     ).toStrictEqual({ key: '', value: '' });
   });
 
-  it('should return "input" if passed an event group', () => {
-    const event = { ...workflowEvent };
-    const value = {
-      payloads: [
-        {
-          Hey: 'from Mars',
-          At: '2022-04-04T11:50:28.151785-05:00',
-        },
-      ],
-    };
-    expect(
-      getSingleAttributeForEvent({ event, eventGroup: workflowEventGroup }),
-    ).toStrictEqual({ key: 'input', value });
-  });
-});
 
 describe(shouldDisplayAsWorkflowLink, () => {
   it('should return true for event keys that end with RunId', () => {
