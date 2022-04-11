@@ -3,7 +3,7 @@
   import { page } from '$app/stores';
   import { isNetworkError } from '$lib/utilities/is-network-error';
   import { createEventDispatcher } from 'svelte';
-  import { beforeNavigate, goto } from '$app/navigation';
+  import { beforeNavigate } from '$app/navigation';
 
   export let error: globalThis.Error = null;
   export let status = 500;
