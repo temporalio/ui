@@ -1,3 +1,4 @@
+import { isEventGroup } from '$lib/models/group-events';
 import { getLastEvent } from '$lib/models/group-events/get-last-event';
 
 type SummaryAttribute = { key: string; value: string | Record<string, any> };
@@ -51,7 +52,14 @@ const formatSummaryValue = (key: string, value: unknown): SummaryAttribute => {
 /**
  * A list of the keys that should be shown in the summary view.
  */
-const preferredSummaryKeys = ['failure', 'input', 'activityType'] as const;
+const preferredSummaryKeys = [
+  'failure',
+  'input',
+  'activityType',
+  'parentInitiatedEventId',
+  'workflowType',
+  'taskQueue',
+] as const;
 
 /**
  * Returns that first event attribute that is eligible to be displayed.
@@ -76,7 +84,8 @@ const getSummaryAttribute = (event: HistoryEventWithId): SummaryAttribute => {
 
   for (const [key, value] of Object.entries(event.attributes)) {
     for (const preferredKey of preferredSummaryKeys) {
-      if (key === preferredKey) return formatSummaryValue(key, value);
+      if (key === preferredKey && shouldDisplayAttribute(key, value))
+        return formatSummaryValue(key, value);
     }
   }
 
@@ -85,24 +94,19 @@ const getSummaryAttribute = (event: HistoryEventWithId): SummaryAttribute => {
 
 export const getSummaryForEventGroup = (
   eventGroup: CompactEventGroup,
-  getSummary: (event: HistoryEventWithId) => SummaryAttribute,
 ): SummaryAttribute => {
   const event = getLastEvent(eventGroup);
 
-  return getSummary(event);
+  return getSummaryAttribute(event);
 };
 
-export const getSingleAttributeForEvent = ({
-  event,
-  eventGroup,
-}: {
-  event: HistoryEventWithId | null;
-  eventGroup: CompactEventGroup | null;
-}): SummaryAttribute => {
-  if (!event && !eventGroup) return emptyAttribute;
+export const getSingleAttributeForEvent = (
+  event: HistoryEventWithId | CompactEventGroup,
+): SummaryAttribute => {
+  if (!event) return emptyAttribute;
 
-  if (eventGroup) {
-    return getSummaryForEventGroup(eventGroup, getSummaryAttribute);
+  if (isEventGroup(event)) {
+    return getSummaryForEventGroup(event);
   }
 
   return getSummaryAttribute(event);
