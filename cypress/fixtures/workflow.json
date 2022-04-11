@@ -1,0 +1,103 @@
+{
+  "executionConfig": {
+    "taskQueue": {
+      "name": "rainbow-statuses",
+      "kind": "Normal"
+    },
+    "workflowExecutionTimeout": "0s",
+    "workflowRunTimeout": "0s",
+    "defaultWorkflowTaskTimeout": "10s"
+  },
+  "workflowExecutionInfo": {
+    "execution": {
+      "workflowId": "b12453_Completed",
+      "runId": "db7b0929-24bc-424c-a935-a1f8da69755e"
+    },
+    "type": {
+      "name": "RainbowStatusesWorkflow"
+    },
+    "startTime": "2022-04-11T12:59:24.522874755Z",
+    "closeTime": "2022-04-11T12:59:24.614591797Z",
+    "status": "Completed",
+    "historyLength": "11",
+    "parentNamespaceId": "",
+    "parentExecution": null,
+    "executionTime": "2022-04-11T12:59:24.522874755Z",
+    "memo": {
+      "fields": {
+      }
+    },
+    "searchAttributes": {
+      "indexedFields": {
+        "BinaryChecksums": {
+          "metadata": {
+            "encoding": "anNvbi9wbGFpbg==",
+            "type": "S2V5d29yZA=="
+          },
+          "data": "WyIzMmUwNDI1OWUzYTFlMTM3ZmE2Njg5M2JiNjE3OTc5YSJd"
+        },
+        "CustomBoolField": {
+          "metadata": {
+            "encoding": "anNvbi9wbGFpbg==",
+            "type": "Qm9vbA=="
+          },
+          "data": "ZmFsc2U="
+        },
+        "CustomDatetimeField": {
+          "metadata": {
+            "encoding": "anNvbi9wbGFpbg==",
+            "type": "RGF0ZXRpbWU="
+          },
+          "data": "IjIwMjItMDQtMTFUMTI6NTk6MjQuNTIzMzA5WiI="
+        },
+        "CustomDoubleField": {
+          "metadata": {
+            "encoding": "anNvbi9wbGFpbg==",
+            "type": "RG91Ymxl"
+          },
+          "data": "MQ=="
+        },
+        "CustomIntField": {
+          "metadata": {
+            "encoding": "anNvbi9wbGFpbg==",
+            "type": "SW50"
+          },
+          "data": "MQ=="
+        },
+        "CustomKeywordField": {
+          "metadata": {
+            "encoding": "anNvbi9wbGFpbg==",
+            "type": "S2V5d29yZA=="
+          },
+          "data": "InJhaW5ib3ctc3RhdHVzZXMtYjEyNDUzIg=="
+        },
+        "CustomStringField": {
+          "metadata": {
+            "encoding": "anNvbi9wbGFpbg==",
+            "type": "VGV4dA=="
+          },
+          "data": "InJhaW5ib3cgc3RhdHVzZXMgYjEyNDUzIENvbXBsZXRlZCI="
+        }
+      }
+    },
+    "autoResetPoints": {
+      "points": [
+        {
+          "binaryChecksum": "32e04259e3a1e137fa66893bb617979a",
+          "runId": "db7b0929-24bc-424c-a935-a1f8da69755e",
+          "firstWorkflowTaskCompletedId": "4",
+          "createTime": "2022-04-11T12:59:24.554244672Z",
+          "expireTime": null,
+          "resettable": true
+        }
+      ]
+    },
+    "taskQueue": "rainbow-statuses",
+    "stateTransitionCount": "7"
+  },
+  "pendingActivities": [
+  ],
+  "pendingChildren": [
+  ],
+  "pendingWorkflowTask": null
+}
