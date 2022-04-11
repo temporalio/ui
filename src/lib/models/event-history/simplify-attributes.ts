@@ -1,4 +1,60 @@
+import { formatDate, formatDuration } from '$lib/utilities/format-date';
 import type { PendingActivityInfo } from '$types';
+
+const keysToBeFormattedAsTime = [
+  'closeTime',
+  'createTime',
+  'currentAttemptScheduledTime',
+  'earliestTime',
+  'eventTime',
+  'executionTime',
+  'expirationTime',
+  'expireTime',
+  'lastAccessTime',
+  'lastHeartbeatTime',
+  'lastStartedTime',
+  'lastUpdateTime',
+  'latestTime',
+  'releaseTime',
+  'scheduledTime',
+  'startedTime',
+  'startTime',
+  'workflowExecutionExpirationTime',
+] as const;
+
+const keysToBeFormattedAsDuration = [
+  'backoffStartInterval',
+  'defaultWorkflowTaskTimeout',
+  'firstWorkflowTaskBackoff',
+  'heartbeatTimeout',
+  'initialInterval',
+  'maximumInterval',
+  'scheduleToCloseTimeout',
+  'scheduleToStartTimeout',
+  'startToCloseTimeout',
+  'startToFireTimeout',
+  'workflowExecutionRetentionPeriod',
+  'workflowExecutionRetentionTtl',
+  'workflowExecutionTimeout',
+  'workflowRunTimeout',
+  'workflowTaskTimeout',
+] as const;
+
+const isTime = (key: string): key is typeof keysToBeFormattedAsTime[number] => {
+  for (const timeKey of keysToBeFormattedAsTime) {
+    if (timeKey === key) return true;
+  }
+  return false;
+};
+
+const isDuration = (
+  key: string,
+): key is typeof keysToBeFormattedAsDuration[number] => {
+  for (const timeKey of keysToBeFormattedAsDuration) {
+    if (timeKey === key) return true;
+  }
+  return false;
+};
 
 const canBeSimplified = (value: unknown): value is Record<string, string> => {
   if (value === null) return false;
@@ -26,12 +82,20 @@ export function simplifyAttributes(
 export function simplifyAttributes(
   attributes: PendingActivityInfo,
 ): PendingActivityInfo;
-export function simplifyAttributes(
-  attributes: EventAttributesWithType | PendingActivityInfo,
-): EventAttributesWithType | PendingActivityInfo {
+export function simplifyAttributes<
+  T = EventAttributesWithType | PendingActivityInfo,
+>(attributes: T): T {
   for (const [key, value] of Object.entries(attributes)) {
     if (canBeSimplified(value)) {
       attributes[key] = getValueForFirstKey(value);
+    }
+
+    if (isTime(key)) {
+      attributes[key] = formatDate(value);
+    }
+
+    if (isDuration(key)) {
+      attributes[key] = formatDuration(value);
     }
   }
 

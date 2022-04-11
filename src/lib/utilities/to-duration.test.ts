@@ -6,6 +6,7 @@ import {
   isDurationKey,
   toString,
   isDuration,
+  fromSeconds,
 } from './to-duration';
 
 describe(toDuration, () => {
@@ -106,7 +107,7 @@ describe(fromDate, () => {
     const twoYearsEarlier = '2018-01-01T00:00:00Z';
 
     const result = fromDate(twoYearsEarlier);
-    expect(result).toEqual({ years: 2 });
+    expect(result).toEqual(expect.objectContaining({ years: 2 }));
   });
 
   it('should produce a duration based on a 90 days in the past', () => {
@@ -114,7 +115,7 @@ describe(fromDate, () => {
     const ninetyDaysEarlier = '2019-10-03T00:00:00Z';
 
     const result = fromDate(ninetyDaysEarlier);
-    expect(result).toEqual({ days: 90 });
+    expect(result).toEqual(expect.objectContaining({ months: 2, days: 29 }));
   });
 
   it('should produce a duration based on a 60 days in the past', () => {
@@ -122,7 +123,7 @@ describe(fromDate, () => {
     const sixtyDaysEarlier = '2019-11-02T00:00:00Z';
 
     const result = fromDate(sixtyDaysEarlier);
-    expect(result).toEqual({ days: 60 });
+    expect(result).toEqual(expect.objectContaining({ months: 1, days: 29 }));
   });
 
   it('should produce a duration based on 23 hours in the past', () => {
@@ -130,7 +131,7 @@ describe(fromDate, () => {
     const twentyThreeHoursEarlier = '2019-12-31T01:00:00Z';
 
     const result = fromDate(twentyThreeHoursEarlier);
-    expect(result).toEqual({ hours: 23 });
+    expect(result).toEqual(expect.objectContaining({ hours: 23 }));
   });
 
   it('should produce a duration based on 30 minutes in the past', () => {
@@ -138,7 +139,7 @@ describe(fromDate, () => {
     const thirtyMinutesEarlier = '2019-12-31T23:30:00Z';
 
     const result = fromDate(thirtyMinutesEarlier);
-    expect(result).toEqual({ minutes: 30 });
+    expect(result).toEqual(expect.objectContaining({ minutes: 30 }));
   });
 
   it('should produce a duration based on 10 seconds in the past', () => {
@@ -146,7 +147,7 @@ describe(fromDate, () => {
     const tenSecondsEarlier = '2019-12-31T23:59:50Z';
 
     const result = fromDate(tenSecondsEarlier);
-    expect(result).toEqual({ seconds: 10 });
+    expect(result).toEqual(expect.objectContaining({ seconds: 10 }));
   });
 });
 
@@ -287,5 +288,29 @@ describe(toString, () => {
 
   it('should correctly format 1 second', () => {
     expect(toString({ seconds: 1 })).toBe('1 second');
+  });
+});
+
+describe(fromSeconds, () => {
+  it('should return undefined if given invalid input', () => {
+    expect(fromSeconds('lolol')).toBeUndefined();
+  });
+
+  it('should return undefined given a string that does not end in seconds', () => {
+    expect(fromSeconds('3600m')).toBeUndefined();
+  });
+
+  it('should correctly parse minutes', () => {
+    expect(fromSeconds('60s')).toEqual(expect.objectContaining({ minutes: 1 }));
+  });
+
+  it('should correctly parse hours', () => {
+    expect(fromSeconds('3600s')).toEqual(expect.objectContaining({ hours: 1 }));
+  });
+
+  it('should correctly parse minutes', () => {
+    expect(fromSeconds('3660s')).toEqual(
+      expect.objectContaining({ hours: 1, minutes: 1 }),
+    );
   });
 });

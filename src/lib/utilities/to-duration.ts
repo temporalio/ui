@@ -1,4 +1,4 @@
-import { formatISO, sub, add } from 'date-fns';
+import { formatISO, sub, add, intervalToDuration } from 'date-fns';
 
 type DurationKey = typeof durationKeys;
 
@@ -65,6 +65,10 @@ export const isDurationString = (value: unknown): value is string => {
   return !!amount && !!units;
 };
 
+export const tomorrow = (): string => {
+  return formatISO(add(new Date(), { hours: 24 }));
+};
+
 export const toDuration = (value: string): Duration => {
   const [, amount, units] = value.match(durationPattern);
   return { [units]: parseInt(amount, 10) };
@@ -88,23 +92,14 @@ export const toDate = (timeRange: Duration | string): string => {
 
 export const fromDate = (targetDate: string | Date): Duration => {
   if (typeof targetDate === 'string') targetDate = new Date(targetDate);
-
-  const currentDate = new Date();
-  const difference = Number(currentDate) - Number(targetDate);
-
-  const years = Math.floor(difference / year);
-  const days = Math.floor(difference / day);
-  const hours = Math.floor(difference / hour);
-  const minutes = Math.floor(difference / minute);
-
-  if (years >= 1) return { years };
-  if (days >= 1) return { days };
-  if (hours >= 1) return { hours };
-  if (minutes >= 1) return { minutes };
-
-  return { seconds: difference / 1000 };
+  return intervalToDuration({ start: new Date(), end: targetDate });
 };
 
-export const tomorrow = (): string => {
-  return formatISO(add(new Date(), { hours: 24 }));
+export const fromSeconds = (seconds: string): Duration => {
+  const milliseconds = parseInt(seconds) * 1000;
+
+  if (!seconds.endsWith('s')) return undefined;
+  if (isNaN(milliseconds)) return undefined;
+
+  return intervalToDuration({ start: 0, end: milliseconds });
 };
