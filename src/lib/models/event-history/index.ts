@@ -28,8 +28,8 @@ const toEvent = async (
   const timestamp = formatDate(String(historyEvent.eventTime));
   const classification = getEventClassification(eventType);
   const category = getEventCategory(eventType);
-  const attributes = await getEventAttributes(historyEvent).then(
-    simplifyAttributes,
+  const attributes = await getEventAttributes(historyEvent).then((attributes) =>
+    simplifyAttributes(attributes),
   );
 
   return {

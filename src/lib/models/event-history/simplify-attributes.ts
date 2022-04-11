@@ -1,3 +1,5 @@
+import type { PendingActivityInfo } from '$types';
+
 const canBeSimplified = (value: unknown): value is Record<string, string> => {
   if (value === null) return false;
   if (value === undefined) return false;
@@ -18,9 +20,15 @@ const getValueForFirstKey = (value: Record<string, string>): string => {
   }
 };
 
-export const simplifyAttributes = (
+export function simplifyAttributes(
   attributes: EventAttributesWithType,
-): EventAttributesWithType => {
+): EventAttributesWithType;
+export function simplifyAttributes(
+  attributes: PendingActivityInfo,
+): PendingActivityInfo;
+export function simplifyAttributes(
+  attributes: EventAttributesWithType | PendingActivityInfo,
+): EventAttributesWithType | PendingActivityInfo {
   for (const [key, value] of Object.entries(attributes)) {
     if (canBeSimplified(value)) {
       attributes[key] = getValueForFirstKey(value);
@@ -28,4 +36,4 @@ export const simplifyAttributes = (
   }
 
   return attributes;
-};
+}

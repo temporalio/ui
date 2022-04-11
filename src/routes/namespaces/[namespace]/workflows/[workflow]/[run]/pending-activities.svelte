@@ -4,6 +4,7 @@
   import EmptyState from '$lib/components/empty-state.svelte';
 
   import { format } from '$lib/utilities/format-camel-case';
+  import { shouldDisplayAttribute } from '$lib/utilities/get-single-attribute-for-event';
 
   const { pendingActivities } = $page.stuff.workflow;
 </script>
@@ -21,21 +22,24 @@
           </div>
           <div class="p-4 w-full">
             {#each Object.entries(details) as [key, value] (key)}
-              <article
-                class="flex items-start content-start w-full border-b-2 last:border-b-0 border-gray-200 py-1"
-              >
-                <h4 class="w-full flex-grow">{format(key)}</h4>
-                <div class="flex-grow w-full">
-                  {#if typeof value === 'object'}
-                    <CodeBlock content={value} />
-                  {:else}
-                    <p>
-                      <span class="bg-gray-300 text-gray-700 px-2">{value}</span
-                      >
-                    </p>
-                  {/if}
-                </div>
-              </article>
+              {#if shouldDisplayAttribute(key, value)}
+                <article
+                  class="flex items-start content-start w-full border-b-2 last:border-b-0 border-gray-200 py-1"
+                >
+                  <h4 class="w-full flex-grow">{format(key)}</h4>
+                  <div class="flex-grow w-full">
+                    {#if typeof value === 'object'}
+                      <CodeBlock content={value} />
+                    {:else}
+                      <p>
+                        <span class="bg-gray-300 text-gray-700 px-2"
+                          >{value}</span
+                        >
+                      </p>
+                    {/if}
+                  </div>
+                </article>
+              {/if}
             {/each}
           </div>
         </article>
