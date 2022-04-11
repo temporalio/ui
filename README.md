@@ -58,11 +58,9 @@ Set these environment variables if you want to change their defaults
 | VITE_API  | Temporal HTTP API address. Set to empty `` to use relative paths | http://localhost:8080 | Build |
 | VITE_MODE | Build target                                                     | development           | Build |
 
-
 ## Developing with Canary
 
-To get a better representation of production data, you can run our UI with the go-canary repo.
-
+To get a better representation of production data, you can run our UI with the go-canary repo. You will need go installed on your machine.
 
 ### go-canary
 
@@ -96,7 +94,6 @@ make build
 
 To view the search attributes code:
 https://github.com/temporalio/docker-builds/blob/main/docker/auto-setup.sh#L297
-
 
 ### ui-server
 
