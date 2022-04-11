@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
   import LoadingRow from '$lib/components/loading-row.svelte';
   import Pagination from '$lib/components/pagination.svelte';
 
