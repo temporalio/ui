@@ -22,7 +22,7 @@
       <article
         class="flex gap-4 py-2 last:border-b-0 border-gray-200 first:pt-0 {$$props.class}"
       >
-        <p class="w-full">{format(key)}</p>
+        <p class="w-96">{format(key)}</p>
         <div class="w-full">
           {#if typeof value === 'object'}
             <CodeBlock content={value} />
