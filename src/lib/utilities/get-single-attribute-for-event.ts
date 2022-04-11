@@ -99,8 +99,7 @@ export const getSingleAttributeForEvent = ({
   event: HistoryEventWithId | null;
   eventGroup: CompactEventGroup | null;
 }): SummaryAttribute => {
-  let summaryAttribute = emptyAttribute;
-  if (!event && !eventGroup) return summaryAttribute;
+  if (!event && !eventGroup) return emptyAttribute;
 
   if (eventGroup) {
     return getSummaryForEventGroup(eventGroup);
