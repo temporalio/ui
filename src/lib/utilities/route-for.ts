@@ -2,6 +2,9 @@ import { browser } from '$app/env';
 
 export type EventView = 'full' | 'compact' | 'summary' | 'json';
 
+let base = (import.meta.env?.VITE_API as string) ?? process.env.VITE_API;
+base = `${base}/api/v1/`;
+
 type RouteParameters = {
   namespace: string;
   workflow: string;
@@ -33,7 +36,7 @@ export type EventParameters = Required<
 
 export type AuthenticationParameters = {
   settings: Settings;
-  searchParams?: URLSearchParams;
+  searchParams: URLSearchParams;
   originUrl?: string;
 };
 
@@ -66,11 +69,19 @@ export const routeForEventHistory = ({
   ...parameters
 }: EventHistoryParameters): string => {
   const eventHistoryPath = `${routeForWorkflow(parameters)}/history`;
-  if (!view) return eventHistoryPath;
-  if (view === 'summary') return `${eventHistoryPath}/summary`;
-  if (view === 'full') return `${eventHistoryPath}/full`;
-  if (view === 'compact') return `${eventHistoryPath}/compact`;
-  if (view === 'json') return `${eventHistoryPath}/json`;
+
+  switch (view) {
+    case 'summary':
+      return `${eventHistoryPath}/summary`;
+    case 'full':
+      return `${eventHistoryPath}/full`;
+    case 'compact':
+      return `${eventHistoryPath}/compact`;
+    case 'json':
+      return `${eventHistoryPath}/json`;
+    default:
+      return eventHistoryPath;
+  }
 };
 
 export const routeForEventHistoryItem = (
@@ -79,25 +90,29 @@ export const routeForEventHistoryItem = (
   return `${routeForEventHistory(parameters)}/${parameters.eventId}`;
 };
 
-export const routeForWorkers = (parameters: WorkflowParameters) => {
+export const routeForWorkers = (parameters: WorkflowParameters): string => {
   return `${routeForWorkflow(parameters)}/workers`;
 };
 
-export const routeForStackTrace = (parameters: WorkflowParameters) => {
+export const routeForStackTrace = (parameters: WorkflowParameters): string => {
   return `${routeForWorkflow(parameters)}/stack-trace`;
 };
 
-export const routeForWorkflowQuery = (parameters: WorkflowParameters) => {
+export const routeForWorkflowQuery = (
+  parameters: WorkflowParameters,
+): string => {
   return `${routeForWorkflow(parameters)}/query`;
 };
 
-export const routeForPendingActivities = (parameters: WorkflowParameters) => {
+export const routeForPendingActivities = (
+  parameters: WorkflowParameters,
+): string => {
   return `${routeForWorkflow(parameters)}/pending-activities`;
 };
 
 export const routeForAuthentication = (
   parameters: AuthenticationParameters,
-) => {
+): string => {
   const { settings, searchParams: currentSearchParams, originUrl } = parameters;
 
   const login = new URL('/auth/sso', settings.baseUrl);
@@ -129,7 +144,7 @@ export const routeForLoginPage = () => {
   return '/login';
 };
 
-type ImportParameters = {
+export type ImportParameters = {
   importType: string;
   eventId?: string;
 };

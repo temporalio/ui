@@ -72,3 +72,10 @@ type ClusterInformation = import('$types').GetClusterInfoResponse;
 type TimeFormat = 'UTC' | 'relative' | 'local';
 
 type SelectOptionValue = number | string | boolean;
+
+// We're using this type to force EXACT type matches so we don't get extraneous query params in our urls
+type ValidateShape<T, Struct> = T extends Struct
+  ? Exclude<keyof T, keyof Struct> extends never
+    ? T
+    : never
+  : never;

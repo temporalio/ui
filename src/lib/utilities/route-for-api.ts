@@ -1,4 +1,4 @@
-import urlcat from 'urlcat';
+import urlcat, { ParamMap } from 'urlcat';
 
 let base = (import.meta.env?.VITE_API as string) ?? process.env.VITE_API;
 base = `${base}/api/v1/`;
@@ -10,7 +10,7 @@ type ValidateShape<T, Struct> = T extends Struct
     : never
   : never;
 
-export const ApiRoutes = {
+export const ApiRoutes: Record<string, (params: ParamMap & never) => string> = {
   cluster(): string {
     return urlcat(base, '/cluster', {});
   },
