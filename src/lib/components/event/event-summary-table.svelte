@@ -22,7 +22,7 @@
 
 <style lang="postcss">
   .summary-table {
-    @apply md:table border-gray-300 border-2 rounded-lg w-full;
+    @apply md:table border-gray-300 border-2 rounded-lg w-full max-w-full;
   }
 
   .table-header-row {
