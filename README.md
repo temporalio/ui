@@ -60,7 +60,7 @@ Set these environment variables if you want to change their defaults
 
 ## Developing with Canary
 
-To get a better representation of production data, you can run our UI with the [canary-go](github.com/temporalio/canary-go) repo. You will need go installed on your machine.
+To get a better representation of production data, you can run our UI with the [canary-go](https://github.com/temporalio/canary-go) repo. You will need go installed on your machine.
 
 ### canary-go
 
