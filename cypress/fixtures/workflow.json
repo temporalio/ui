@@ -24,8 +24,7 @@
     "parentExecution": null,
     "executionTime": "2022-04-11T12:59:24.522874755Z",
     "memo": {
-      "fields": {
-      }
+      "fields": {}
     },
     "searchAttributes": {
       "indexedFields": {
@@ -95,9 +94,7 @@
     "taskQueue": "rainbow-statuses",
     "stateTransitionCount": "7"
   },
-  "pendingActivities": [
-  ],
-  "pendingChildren": [
-  ],
+  "pendingActivities": [],
+  "pendingChildren": [],
   "pendingWorkflowTask": null
 }
