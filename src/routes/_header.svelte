@@ -11,7 +11,8 @@
   import NavigationLink from './_navigation-link.svelte';
   import IsCloudGuard from '$lib/components/is-cloud-guard.svelte';
 
-  $: namespace = $page.params.namespace;
+  $: namespace =
+    $page.params.namespace || $page.stuff?.settings?.defaultNamespace;
 
   export let user: User;
 </script>

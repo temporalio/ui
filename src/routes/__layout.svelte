@@ -9,6 +9,7 @@
   import { fetchUser } from '$lib/services/user-service';
   import { fetchCluster } from '$lib/services/cluster-service';
   import { fetchNamespaces } from '$lib/services/namespaces-service';
+  import { getDefaultNamespace } from '$lib/utilities/get-namespace';
 
   export const load: Load = async function ({ url, fetch }) {
     const settings: Settings = await fetchSettings({ url }, fetch);
@@ -18,12 +19,13 @@
       fetch,
     );
 
+    const defaultNamespace = getDefaultNamespace({ namespaces, settings });
     const user = await fetchUser(fetch);
     const cluster = await fetchCluster(settings, fetch);
 
     return {
-      props: { namespaces, user, cluster },
-      stuff: { namespaces, settings },
+      props: { user, cluster },
+      stuff: { namespaces, settings: { ...settings, defaultNamespace } },
     };
   };
 </script>
