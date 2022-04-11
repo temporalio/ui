@@ -1,14 +1,22 @@
 <script lang="ts">
-  import { shouldDisplayAttribute } from '$lib/utilities/get-single-attribute-for-event';
+  import {
+    getSingleAttributeForEvent,
+    shouldDisplayAttribute,
+  } from '$lib/utilities/get-single-attribute-for-event';
   import EventDetailsRow from './event-details-row.svelte';
 
-  export let event: HistoryEventWithId;
+  export let event: IterableEvent;
+  export let expanded = false;
 </script>
 
 <section>
-  {#each Object.entries(event.attributes) as [key, value] (key)}
-    {#if shouldDisplayAttribute(key, value)}
-      <EventDetailsRow {key} {value} />
-    {/if}
-  {/each}
+  {#if expanded}
+    {#each Object.entries(event.attributes) as [key, value] (key)}
+      {#if shouldDisplayAttribute(key, value)}
+        <EventDetailsRow {key} {value} />
+      {/if}
+    {/each}
+  {:else}
+    <EventDetailsRow {...getSingleAttributeForEvent(event)} />
+  {/if}
 </section>

@@ -114,9 +114,7 @@ describe(getSingleAttributeForEvent, () => {
   };
 
   it('should return "workflowType.name" if the workflow type exists', () => {
-    expect(
-      getSingleAttributeForEvent({ event: workflowEvent, eventGroup: null }),
-    ).toStrictEqual({
+    expect(getSingleAttributeForEvent(workflowEvent)).toStrictEqual({
       key: 'workflowTypeName',
       value: 'RainbowStatusesWorkflow',
     });
@@ -125,26 +123,29 @@ describe(getSingleAttributeForEvent, () => {
   it('should return "taskqueue.name" if the workflow type does not exists', () => {
     const event = { ...workflowEvent };
     event.attributes.workflowType = null;
-    expect(
-      getSingleAttributeForEvent({ event, eventGroup: null }),
-    ).toStrictEqual({ key: 'taskQueueName', value: 'rainbow-statuses' });
+    expect(getSingleAttributeForEvent(event)).toStrictEqual({
+      key: 'taskQueueName',
+      value: 'rainbow-statuses',
+    });
   });
 
-  it('should return "parentInitiatedEventId" if the workflow type and task queue does not exists', () => {
+  it('should return "parentInitiatedEventId" if the workflow type and task queue does not exist', () => {
     const event = { ...workflowEvent };
     event.attributes.workflowType = null;
     event.attributes.taskQueue = null;
-    expect(
-      getSingleAttributeForEvent({ event, eventGroup: null }),
-    ).toStrictEqual({ key: 'parentInitiatedEventId', value: '0' });
+    expect(getSingleAttributeForEvent(event)).toStrictEqual({
+      key: 'parentInitiatedEventId',
+      value: '0',
+    });
   });
 
   it('should return empty key value object if none of the attributes display', () => {
-    expect(
-      getSingleAttributeForEvent({ event: null, eventGroup: null }),
-    ).toStrictEqual({ key: '', value: '' });
+    expect(getSingleAttributeForEvent(null)).toStrictEqual({
+      key: '',
+      value: '',
+    });
   });
-
+});
 
 describe(shouldDisplayAsWorkflowLink, () => {
   it('should return true for event keys that end with RunId', () => {

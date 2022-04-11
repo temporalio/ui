@@ -3,16 +3,17 @@
 
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
-  import EventEmptyRow from '../event-empty-row.svelte';
+  import EventEmptyRow from './event-empty-row.svelte';
 
-  export let items: HistoryEventWithId[];
+  export let items: IterableEvents;
   export let expandAll = false;
+  export let compact = false;
 </script>
 
 <Pagination {items} floatId="event-view-toggle" let:visibleItems>
-  <EventSummaryTable>
+  <EventSummaryTable {compact}>
     {#each visibleItems as event (event.id)}
-      <EventSummaryRow {event} {expandAll} />
+      <EventSummaryRow {event} {expandAll} {compact} />
     {:else}
       <EventEmptyRow />
     {/each}

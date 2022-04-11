@@ -1,13 +1,25 @@
 <script lang="ts">
+  import { page } from '$app/stores';
+
+  import { getGroupForEvent, isEventGroup } from '$lib/models/group-events';
+
   import { formatDate } from '$lib/utilities/format-date';
 
   import EventDetails from './event-details.svelte';
-  import EventSingleDetail from './event-single-detail.svelte';
+  import EventGroupDetails from './event-group-details.svelte';
 
-  export let event: HistoryEventWithId;
-  export let expandAll: boolean = false;
+  export let event: IterableEvent;
+  export let expandAll = false;
+  export let compact = false;
+
+  let selectedId = event.id;
+
+  let eventGroup = isEventGroup(event)
+    ? event
+    : getGroupForEvent(event, $page.stuff.eventGroups);
 
   $: expanded = expandAll;
+  $: currentEvent = compact ? eventGroup.events.get(selectedId) : event;
 
   const onLinkClick = () => {
     if (!expandAll) {
@@ -24,16 +36,15 @@
       class:link={!expandAll}
       on:click|stopPropagation={onLinkClick}>{event.name}</span
     >
+    {#if expanded && compact}
+      <EventGroupDetails {eventGroup} bind:selectedId />
+    {/if}
   </div>
   <div class="cell links font-medium md:font-normal">
     {formatDate(event?.eventTime)}
   </div>
   <div class="cell links">
-    {#if expanded}
-      <EventDetails {event} />
-    {:else}
-      <EventSingleDetail {event} />
-    {/if}
+    <EventDetails event={currentEvent} {expanded} />
   </div>
 </article>
 

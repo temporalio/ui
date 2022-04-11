@@ -8,6 +8,7 @@ import {
   isWorkflowExecutionSignaledEvent,
   isTimerStartedEvent,
 } from '$lib/utilities/is-event-type';
+import { getLastEvent } from './get-last-event';
 
 export const getName = (event: CommonHistoryEvent): string => {
   if (!event) return;
@@ -70,6 +71,12 @@ const createGroupFor = <K extends keyof StartingEvents>(
     timestamp,
     category,
     classification,
+    get eventTime() {
+      return getLastEvent(this)?.eventTime;
+    },
+    get attributes() {
+      return getLastEvent(this)?.attributes;
+    },
   };
 };
 
