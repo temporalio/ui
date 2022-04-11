@@ -1,3 +1,5 @@
+import { isWorkflowExecutionCompletedEvent } from './is-event-type';
+
 type WorkflowEvents = {
   input: string;
   result: string;
@@ -20,20 +22,28 @@ const completedEventTypes = [
   'WorkflowExecutionTerminated',
 ] as const;
 
+const isCompletionEvent = (
+  event: HistoryEventWithId,
+): event is CompletionEvent => {
+  for (const completionType of completedEventTypes) {
+    if (event.eventType === completionType) return true;
+  }
+  return false;
+};
+
 const getWorkflowCompletedEvent = (
   events: HistoryEventWithId[],
 ): CompletionEvent => {
   for (const event of events) {
-    for (const completionType of completedEventTypes) {
-      if (event.eventType === completionType) return event;
-    }
+    if (isCompletionEvent(event)) return event;
   }
 };
 
 const getEventResult = (event: CompletionEvent) => {
-  const payloads = event.attributes?.result?.payloads;
-
-  if (payloads) return payloads;
+  if (isWorkflowExecutionCompletedEvent(event)) {
+    if (event.attributes.result === null) return null;
+    return event.attributes.result.payloads;
+  }
 
   return event.attributes;
 };
