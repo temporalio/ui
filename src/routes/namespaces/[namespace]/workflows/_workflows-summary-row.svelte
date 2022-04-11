@@ -25,12 +25,12 @@
   </div>
   <div class="cell links font-medium md:font-normal">
     <p>
-      <TableLink {href}>{workflow.id}</TableLink>
+      <TableLink {href} data-test="workflow-link">{workflow.id}</TableLink>
     </p>
   </div>
   <div class="cell links font-medium md:font-normal">
     <p>
-      <TableLink {href}>{workflow.name}</TableLink>
+      <TableLink {href} data-test="workflow-link">{workflow.name}</TableLink>
     </p>
   </div>
   <div class="inline-block cell font-normal">

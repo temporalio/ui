@@ -2,6 +2,6 @@
   export let href: string;
 </script>
 
-<a {href} {...$$props} class="{$$props.class} table-link">
+<a {href} {...$$props} class="table-link {$$props.class ?? ''}">
   <slot />
 </a>
