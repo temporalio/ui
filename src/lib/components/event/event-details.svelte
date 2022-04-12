@@ -1,20 +1,18 @@
 <script lang="ts">
-  import { formatDate } from '$lib/utilities/format-date';
-
   import {
     getSingleAttributeForEvent,
     shouldDisplayAttribute,
   } from '$lib/utilities/get-single-attribute-for-event';
   import EventDetailsRow from './event-details-row.svelte';
 
+  import { formatAttributes } from './_format-attributes';
+
   export let event: IterableEvent;
   export let summaryEvent = event;
   export let expanded = false;
   export let compact = false;
 
-  $: attributes = compact
-    ? { eventTime: formatDate(event.eventTime), ...event.attributes }
-    : event.attributes;
+  $: attributes = formatAttributes(event, { compact });
 </script>
 
 <section>
