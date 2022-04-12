@@ -9,10 +9,12 @@
     const events = getEventsInCategory(stuff.events, category);
 
     let items: HistoryEventWithId[] = events;
+    const groups = stuff.eventGroups;
 
     return {
       props: {
         items,
+        groups,
       },
       stuff: {
         matchingEvents: events,
@@ -25,6 +27,7 @@
   import EventSummary from '$lib/components/event/event-summary.svelte';
 
   export let items: HistoryEventWithId[];
+  export let groups: CompactEventGroups;
 </script>
 
-<EventSummary {items} />
+<EventSummary {items} {groups} />

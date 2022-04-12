@@ -13,4 +13,8 @@
   );
 </script>
 
-<EventSummary items={filteredEventGroups} compact={true} />
+<EventSummary
+  items={filteredEventGroups}
+  groups={$importEventGroups}
+  compact={true}
+/>

@@ -6,6 +6,7 @@
   import EventEmptyRow from './event-empty-row.svelte';
 
   export let items: IterableEvents;
+  export let groups: CompactEventGroups;
   export let expandAll = false;
   export let compact = false;
 </script>
@@ -13,7 +14,7 @@
 <Pagination {items} floatId="event-view-toggle" let:visibleItems>
   <EventSummaryTable {compact}>
     {#each visibleItems as event (event.id)}
-      <EventSummaryRow {event} {expandAll} {compact} />
+      <EventSummaryRow {event} {groups} {expandAll} {compact} />
     {:else}
       <EventEmptyRow />
     {/each}

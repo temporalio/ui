@@ -9,6 +9,7 @@
   import EventGroupDetails from './event-group-details.svelte';
 
   export let event: IterableEvent;
+  export let groups: CompactEventGroups;
   export let expandAll = false;
   export let compact = false;
 
@@ -16,7 +17,7 @@
 
   let eventGroup = isEventGroup(event)
     ? event
-    : getGroupForEvent(event, $page.stuff.eventGroups);
+    : getGroupForEvent(event, groups);
 
   $: expanded = expandAll;
   $: currentEvent = compact ? eventGroup.events.get(selectedId) : event;

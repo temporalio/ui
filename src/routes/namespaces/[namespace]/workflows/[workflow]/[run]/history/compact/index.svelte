@@ -27,4 +27,4 @@
   export let items: IterableEvents;
 </script>
 
-<EventSummary {items} compact={true} />
+<EventSummary {items} groups={items} compact={true} />

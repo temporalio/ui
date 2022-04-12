@@ -16,7 +16,7 @@
             <span class="event-type" class:active={id === selectedId}
               >{eventInGroup.eventType}</span
             >
-            ({id})
+            (#{id})
           </li>
         {/each}
       </ul>
