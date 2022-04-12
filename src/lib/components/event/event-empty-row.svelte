@@ -6,7 +6,7 @@
   <div class="cell">
     <EmptyState
       title="No Events Match"
-      content="There are no events that match your filters. Adjust your filters to see your events."
+      content="There are no events that match your filters or selected view. Adjust your filters or view to see your events."
     />
   </div>
 </article>
