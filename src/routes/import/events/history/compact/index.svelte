@@ -2,7 +2,7 @@
   import { page } from '$app/stores';
 
   import { importEventGroups } from '$lib/stores/import-events';
-  import CompactEvent from '$lib/components/event/view/event-compact.svelte';
+  import EventSummary from '$lib/components/event/event-summary.svelte';
 
   $: category = $page.url.searchParams.get('category') as EventTypeCategory;
   $: filteredEventGroups = $importEventGroups.filter(
@@ -13,4 +13,8 @@
   );
 </script>
 
-<CompactEvent items={filteredEventGroups} />
+<EventSummary
+  items={filteredEventGroups}
+  groups={$importEventGroups}
+  compact={true}
+/>

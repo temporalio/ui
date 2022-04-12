@@ -38,11 +38,13 @@ export const groupEvents = (
 export const isEventGroup = (
   eventOrGroup: unknown,
 ): eventOrGroup is CompactEventGroup => {
+  if (eventOrGroup === undefined || eventOrGroup === null) return false;
   return has(eventOrGroup, 'events');
 };
 
 export const isEventGroups = (
   eventsOrGroups: unknown[],
 ): eventsOrGroups is CompactEventGroups => {
+  if (eventsOrGroups === undefined || eventsOrGroups === null) return false;
   return eventsOrGroups.every(isEventGroup);
 };

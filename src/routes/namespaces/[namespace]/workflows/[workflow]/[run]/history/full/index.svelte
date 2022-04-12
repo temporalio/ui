@@ -7,19 +7,22 @@
     const category = url.searchParams.get('category');
 
     const items = getEventsInCategory(stuff.events, category);
+    const groups = stuff.eventGroups;
 
     return {
       props: {
         items,
+        groups,
       },
     };
   };
 </script>
 
 <script lang="ts">
-  import EventSummary from '$lib/components/event/view/event-summary.svelte';
+  import EventSummary from '$lib/components/event/event-summary.svelte';
 
   export let items: HistoryEventWithId[];
+  export let groups: CompactEventGroups;
 </script>
 
-<EventSummary {items} expandAll />
+<EventSummary {items} {groups} expandAll />

@@ -22,9 +22,9 @@
 </script>
 
 <script lang="ts">
-  import CompactEvent from '$lib/components/event/view/event-compact.svelte';
+  import EventSummary from '$lib/components/event/event-summary.svelte';
 
   export let items: IterableEvents;
 </script>
 
-<CompactEvent {items} />
+<EventSummary {items} groups={items} compact={true} />
