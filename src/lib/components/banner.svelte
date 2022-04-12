@@ -9,11 +9,32 @@
     Low: 'low',
   } as const;
 
+  const isNewer = (version1: string, version2: string) => {
+    if (!version1 || !version2) {
+      return false;
+    }
+
+    const [major1, minor1, patch1] = version1.split('.').map(Number);
+    const [major2, minor2, patch2] = version2.split('.').map(Number);
+
+    if (major1 !== major2) {
+      return major1 > major2;
+    } else if (minor1 !== minor2) {
+      return minor1 > minor2;
+    } else {
+      return patch1 > patch2;
+    }
+  };
+
   $: recommended = cluster?.versionInfo?.recommended;
   $: current = cluster?.versionInfo?.current;
   $: alert = cluster?.versionInfo?.alerts?.[0];
   $: severity = alert ? severities[alert.severity] : severities.Low;
-  $: show = current?.version && current.version != $closedBannerId;
+  $: show =
+    current?.version &&
+    current.version != $closedBannerId &&
+    isNewer(recommended?.version, current.version);
+
   $: message =
     severity == severities.Low
       ? `📥 v${recommended?.version} version is available`
