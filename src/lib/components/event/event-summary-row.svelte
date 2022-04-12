@@ -46,7 +46,12 @@
   </div>
 
   <div class="cell links">
-    <EventDetails event={currentEvent} {expanded} summaryEvent={event} />
+    <EventDetails
+      event={currentEvent}
+      summaryEvent={event}
+      {expanded}
+      {compact}
+    />
   </div>
 </article>
 
