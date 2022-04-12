@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
   import { getGroupForEvent, isEventGroup } from '$lib/models/group-events';
 
   import { formatDate } from '$lib/utilities/format-date';
@@ -31,9 +29,8 @@
 
 <article class="row" id={event.id}>
   <div class="cell">
-    <a
-      class="text-gray-500 text-normal mx-1 text-lg md:text-base"
-      href="#{event.id}">{event.id}</a
+    <a class="text-gray-500 mx-1 text-lg md:text-base" href="#{event.id}"
+      >{event.id}</a
     >
     <span
       class="md:mx-2 text-lg md:text-base font-semibold"
@@ -55,7 +52,7 @@
 
 <style lang="postcss">
   .cell {
-    @apply md:table-cell md:border-b-2 text-left py-1 px-3 pt-2;
+    @apply md:table-cell md:border-b-2 text-left py-1 px-3 leading-4;
   }
 
   .row {

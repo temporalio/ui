@@ -7,7 +7,7 @@ export const format = (label: string): string => {
   let result = '';
   let index = 0;
 
-  while (index < label.length) {
+  while (index < label?.length) {
     const current = label[index];
     const next = label[index + 1];
 
