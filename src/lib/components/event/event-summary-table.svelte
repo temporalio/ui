@@ -29,10 +29,10 @@
   }
 
   .table-header-row {
-    @apply bg-gray-900 text-gray-100;
+    @apply bg-gray-900 text-gray-100 px-3;
   }
 
   .table-header {
-    @apply table-cell text-left p-3;
+    @apply md:table-cell table-cell text-left px-3 py-3;
   }
 </style>

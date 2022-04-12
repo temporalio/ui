@@ -6,6 +6,7 @@
   import EventDetailsRow from './event-details-row.svelte';
 
   export let event: IterableEvent;
+  export let summaryEvent = event;
   export let expanded = false;
 </script>
 
@@ -17,6 +18,6 @@
       {/if}
     {/each}
   {:else}
-    <EventDetailsRow {...getSingleAttributeForEvent(event)} />
+    <EventDetailsRow {...getSingleAttributeForEvent(summaryEvent)} />
   {/if}
 </section>

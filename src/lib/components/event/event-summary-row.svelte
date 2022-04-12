@@ -30,9 +30,12 @@
 
 <article class="row" id={event.id}>
   <div class="cell">
-    <a class="text-gray-500 text-normal mx-1" href="#{event.id}">{event.id}</a>
+    <a
+      class="text-gray-500 text-normal mx-1 text-lg md:text-base"
+      href="#{event.id}">{event.id}</a
+    >
     <span
-      class="mx-2"
+      class="md:mx-2 text-lg md:text-base font-semibold"
       class:link={!expandAll}
       on:click|stopPropagation={onLinkClick}>{event.name}</span
     >
@@ -43,22 +46,27 @@
   <div class="cell links font-medium md:font-normal">
     {formatDate(event?.eventTime)}
   </div>
+
   <div class="cell links">
-    <EventDetails event={currentEvent} {expanded} />
+    <EventDetails event={currentEvent} {expanded} summaryEvent={event} />
   </div>
 </article>
 
 <style lang="postcss">
   .cell {
-    @apply md:table-cell md:border-b-2 text-left p-1 pt-2;
+    @apply md:table-cell md:border-b-2 text-left py-1 px-3 pt-2;
   }
 
   .row {
-    @apply no-underline p-1 text-sm border-b-2 items-center md:text-base md:table-row last-of-type:border-b-0;
+    @apply no-underline py-3 text-sm border-b-2 items-center md:text-base md:table-row last-of-type:border-b-0;
   }
 
   .row:hover {
     @apply bg-gray-50;
+  }
+
+  .meta-summary {
+    @apply md:block;
   }
 
   .link {
