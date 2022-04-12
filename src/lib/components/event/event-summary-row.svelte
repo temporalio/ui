@@ -65,10 +65,6 @@
     @apply bg-gray-50;
   }
 
-  .meta-summary {
-    @apply md:block;
-  }
-
   .link {
     @apply text-gray-900 cursor-pointer;
   }
