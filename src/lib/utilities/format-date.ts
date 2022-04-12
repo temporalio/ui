@@ -2,6 +2,8 @@ import {
   formatDistanceToNow,
   parseJSON,
   formatDuration as durationToString,
+  intervalToDuration,
+  format,
 } from 'date-fns';
 import * as dateTz from 'date-fns-tz'; // `build` script fails on importing some of named CommonJS modules
 
@@ -53,8 +55,81 @@ function isTimestamp(arg: unknown): arg is Timestamp {
   return false;
 }
 
-export function formatDuration(duration: Duration | string): string {
+export function formatDuration(
+  duration: Duration | string,
+  delimiter: string = ', ',
+): string {
   if (duration === null) return '';
   if (typeof duration === 'string') duration = fromSeconds(duration);
-  return durationToString(duration, { delimiter: ', ' });
+  return durationToString(duration, { delimiter });
+}
+
+function formatDistanceToSingleLetters(distance: string) {
+  if (!distance) return '';
+  distance = distance.replace(/seconds/g, 'second');
+  distance = distance.replace(/second/g, 's');
+  distance = distance.replace(/ s/g, 's');
+  distance = distance.replace(/minutes/g, 'minute');
+  distance = distance.replace(/minute/g, 'm');
+  distance = distance.replace(/ m/g, 'm');
+  distance = distance.replace(/hours/g, 'hour');
+  distance = distance.replace(/hour/g, 'h');
+  distance = distance.replace(/ h/g, 'h');
+  distance = distance.replace(/days/g, 'day');
+  distance = distance.replace(/day/g, 'd');
+  distance = distance.replace(/ d/g, 'd');
+  distance = distance.replace(/weeks/g, 'week');
+  distance = distance.replace(/week/g, 'w');
+  distance = distance.replace(/ w/g, 'w');
+  return distance;
+}
+
+export function getDuration({
+  start,
+  end,
+}: {
+  start: ValidTime | undefined | null;
+  end: ValidTime | undefined | null;
+}): Duration | null {
+  if (!start || !end) return null;
+
+  try {
+    if (isTimestamp(start)) {
+      start = timestampToDate(start);
+    }
+
+    if (isTimestamp(end)) {
+      end = timestampToDate(end);
+    }
+
+    const parsedStart = parseJSON(start);
+    const parsedEnd = parseJSON(end);
+
+    const distance = intervalToDuration({ start: parsedStart, end: parsedEnd });
+    return distance;
+  } catch {
+    return null;
+  }
+}
+
+export function formatDistance({
+  start,
+  end,
+}: {
+  start: ValidTime | undefined | null;
+  end: ValidTime | undefined | null;
+}): string {
+  const duration = getDuration({ start, end });
+  return formatDuration(duration, '');
+}
+
+export function formatDistanceAbbreviated({
+  start,
+  end,
+}: {
+  start: ValidTime | undefined | null;
+  end: ValidTime | undefined | null;
+}): string {
+  const distance = formatDistance({ start, end });
+  return formatDistanceToSingleLetters(distance);
 }

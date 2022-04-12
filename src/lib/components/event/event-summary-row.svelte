@@ -1,14 +1,24 @@
 <script lang="ts">
   import { getGroupForEvent, isEventGroup } from '$lib/models/group-events';
 
-  import { formatDate } from '$lib/utilities/format-date';
-  import { eventTimeFormat } from '$lib/stores/event-filters';
+  import {
+    formatDate,
+    formatDistanceAbbreviated,
+    formatDistanceDifferenceAbbreviated,
+  } from '$lib/utilities/format-date';
+  import {
+    eventFilterSort,
+    eventTimeFormat,
+    eventShowElapsed,
+  } from '$lib/stores/event-filters';
 
   import EventDetails from './event-details.svelte';
   import EventGroupDetails from './event-group-details.svelte';
 
   export let event: IterableEvent;
   export let groups: CompactEventGroups;
+  export let visibleItems: IterableEvent[];
+  export let initialItem: IterableEvent;
   export let expandAll = false;
   export let compact = false;
 
@@ -20,6 +30,21 @@
 
   $: expanded = expandAll;
   $: currentEvent = compact ? eventGroup.events.get(selectedId) : event;
+  $: reversed = $eventFilterSort === 'reverse';
+  $: showElapsed = $eventShowElapsed === 'true';
+
+  $: timeDiffChange = '';
+  $: {
+    const currentIndex = visibleItems.indexOf(event);
+    const previousItem = visibleItems[currentIndex - 1];
+    if (previousItem) {
+      const timeDiff = formatDistanceAbbreviated({
+        start: previousItem.eventTime,
+        end: event.eventTime,
+      });
+      timeDiffChange = timeDiff ? `(${reversed ? '-' : '+'}${timeDiff})` : '';
+    }
+  }
 
   const onLinkClick = () => {
     if (!expandAll) {
@@ -43,7 +68,15 @@
     {/if}
   </div>
   <div class="cell links font-medium md:font-normal">
-    {formatDate(event?.eventTime, $eventTimeFormat)}
+    {#if showElapsed && event.id !== initialItem.id}
+      {formatDistanceAbbreviated({
+        start: initialItem.eventTime,
+        end: event.eventTime,
+      })}
+      {timeDiffChange}
+    {:else}
+      {formatDate(event?.eventTime, $eventTimeFormat)}
+    {/if}
   </div>
 
   <div class="cell links">

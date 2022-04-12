@@ -255,6 +255,27 @@ describe(pagination, () => {
 
     expect(startingIndex).toBe(5);
   });
+
+  it('should return first item for initialItem', () => {
+    const store = pagination(oneHundredResolutions, 50);
+    const { initialItem } = get(store);
+
+    expect(initialItem).toBe(0);
+  });
+
+  it('should return first item for initialItem', () => {
+    const store = pagination(oneHundredResolutions, 50);
+    const { initialItem } = get(store);
+
+    expect(initialItem).toBe(0);
+  });
+
+  it('should return first item for initialItem', () => {
+    const store = pagination(oneHundredResolutions, 5, 11);
+    const { initialItem } = get(store);
+
+    expect(initialItem).toBe(0);
+  });
 });
 
 describe(getPageForIndex, () => {

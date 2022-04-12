@@ -14,10 +14,18 @@ type FetchEvents = NamespaceScopedRequest &
   };
 
 export const fetchRawEvents = async (
-  { namespace, workflowId, runId, reverse, onStart, onUpdate, onComplete }: FetchEvents,
+  {
+    namespace,
+    workflowId,
+    runId,
+    reverse,
+    onStart,
+    onUpdate,
+    onComplete,
+  }: FetchEvents,
   request = fetch,
 ): Promise<HistoryEvent[]> => {
-  const endpoint: WorkflowAPIRoutePath = reverse ? 'events.reverse' : 'events'
+  const endpoint: WorkflowAPIRoutePath = reverse ? 'events.reverse' : 'events';
   const response = await paginated(
     async (token: string) => {
       return requestFromAPI<GetWorkflowExecutionHistoryResponse>(

@@ -18,7 +18,6 @@
   import type {
     EventFilterType,
     EventFilterTypeOptions,
-    EventTimeFormat,
     EventTimeFormatOptions,
   } from '$lib/stores/event-filters';
 
@@ -32,7 +31,7 @@
   ];
 
   let dateOptions: EventTimeFormatOptions = [
-    { label: 'UTC Time', option: 'utc' },
+    { label: 'UTC Time', option: 'UTC' },
     { label: 'Relative Time', option: 'relative' },
     { label: 'Local Time', option: 'local' },
   ];
@@ -47,7 +46,7 @@
     });
   };
 
-  const onDateOptionClick = (option: EventTimeFormat) => {
+  const onDateOptionClick = (option: TimeFormat) => {
     setTimeFormat(option);
   };
 
@@ -61,7 +60,7 @@
 
   $: value =
     $eventFilterSort === '' &&
-    $eventTimeFormat === 'utc' &&
+    $eventTimeFormat === 'UTC' &&
     $eventShowElapsed === 'false'
       ? undefined
       : `${$eventFilterSort}:${$eventTimeFormat}:${$eventShowElapsed}`;
