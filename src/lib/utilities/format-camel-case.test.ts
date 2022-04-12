@@ -34,4 +34,8 @@ describe(format, () => {
   it('should format requestIdSomething as "Request ID Something"', () => {
     expect(format('requestIdSomething')).toBe('Request ID Something');
   });
+
+  it('should format undefined as ""', () => {
+    expect(format()).toBe('');
+  });
 });

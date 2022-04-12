@@ -17,7 +17,7 @@
 <article
   class="flex flex-col lg:flex-row gap-2 lg:gap-4 py-2 last:border-b-0 border-gray-200 first:pt-0 {$$props.class}"
 >
-  <h4 class="w-1/3 text-normal">{format(key)}</h4>
+  <p class="w-1/3 text-normal">{format(key)}</p>
   <div class="flex-grow w-full">
     {#if typeof value === 'object'}
       <CodeBlock content={value} />
