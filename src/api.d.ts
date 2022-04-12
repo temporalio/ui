@@ -4,6 +4,7 @@ type WorkflowAPIRoutePath =
   | 'workflow'
   | 'workflow.terminate'
   | 'events'
+  | 'events.reverse'
   | 'query';
 
 type TaskQueueAPIRoutePath = 'task-queue';

@@ -15,23 +15,39 @@
     setTimeFormat,
     setShowElapsed,
   } from '$lib/stores/event-filters';
+  import type {
+    EventFilterType,
+    EventFilterTypeOptions,
+    EventTimeFormat,
+    EventTimeFormatOptions,
+  } from '$lib/stores/event-filters';
 
-  let sortOptions = [
-    { label: 'Sort 1-9', option: 'asc' },
-    { label: 'Sort 9-1', option: 'desc' },
+  import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+
+  let sortOptions: EventFilterTypeOptions = [
+    { label: 'Sort 1-9', option: '' },
+    { label: 'Sort 9-1', option: 'reverse' },
   ];
 
-  let dateOptions = [
-    { label: 'UTC Time', option: 'UTC' },
+  let dateOptions: EventTimeFormatOptions = [
+    { label: 'UTC Time', option: 'utc' },
     { label: 'Relative Time', option: 'relative' },
     { label: 'Local Time', option: 'local' },
   ];
 
-  const onSortOptionClick = (option: string) => {
+  const onSortOptionClick = (option: EventFilterType) => {
     setFilterSort(option);
+    updateQueryParameters({
+      parameter: 'sort',
+      value: option,
+      url: $page.url,
+      goto,
+    });
   };
 
-  const onDateOptionClick = (option: string) => {
+  const onDateOptionClick = (option: EventTimeFormat) => {
     setTimeFormat(option);
   };
 
@@ -44,8 +60,8 @@
   };
 
   $: value =
-    $eventFilterSort === 'asc' &&
-    $eventTimeFormat === 'UTC' &&
+    $eventFilterSort === '' &&
+    $eventTimeFormat === 'utc' &&
     $eventShowElapsed === 'false'
       ? undefined
       : `${$eventFilterSort}:${$eventTimeFormat}:${$eventShowElapsed}`;

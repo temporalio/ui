@@ -54,6 +54,7 @@ export function routeForApi(
     workflow: `/namespaces/${encoded?.namespace}/workflows/${encoded?.workflowId}/runs/${encoded?.runId}`,
     'workflow.terminate': `/namespaces/${encoded?.namespace}/workflows/${encoded?.workflowId}/runs/${encoded?.runId}/terminate`,
     events: `/namespaces/${encoded?.namespace}/workflows/${encoded?.workflowId}/runs/${encoded?.runId}/events`,
+    'events.reverse': `/namespaces/${encoded?.namespace}/workflows/${encoded?.workflowId}/runs/${encoded?.runId}/events/reverse`,
     query: `/namespaces/${encoded?.namespace}/workflows/${encoded?.workflowId}/runs/${encoded?.runId}/query`,
   };
 
