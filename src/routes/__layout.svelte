@@ -33,7 +33,7 @@
     return {
       props: { user, cluster },
       stuff: {
-        namespaces: namespaces.namespaces,
+        namespaces: namespaces?.namespaces,
         settings: { ...settings, defaultNamespace },
       },
     };
