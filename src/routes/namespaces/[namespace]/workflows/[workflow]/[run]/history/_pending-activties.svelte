@@ -6,7 +6,7 @@
   import { routeForPendingActivities } from '$lib/utilities/route-for';
   import Link from '$lib/components/link.svelte';
 
-  const { pendingActivities, endTime } = $page.stuff.workflow;
+  const { pendingActivities } = $page.stuff.workflow;
   const { namespace, workflow, run } = $page.params;
 
   const href = routeForPendingActivities({ namespace, workflow, run });
@@ -46,7 +46,7 @@
             </div>
             <div>
               <pre
-                class="rounded-lg break-words"><code class="language-json">{pendingActivity.lastFailure?.message ?? ''}</code></pre>
+                class="rounded-lg"><code class="language-json">{pendingActivity.lastFailure?.message ?? ''}</code></pre>
             </div>
           </div>
           <div class="w-full md:w-1/4">
