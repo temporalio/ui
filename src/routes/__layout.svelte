@@ -18,13 +18,13 @@
 
     let defaultNamespace: string;
     let cluster: GetClusterInfoResponse;
-    let namespaces: ListNamespacesResponse;
+    let namespacesResp: ListNamespacesResponse;
 
     if (!settings.auth.enabled || user.email) {
-      namespaces = await fetchNamespaces(settings, fetch);
+      namespacesResp = await fetchNamespaces(settings, fetch);
 
       defaultNamespace = getDefaultNamespace({
-        namespaces: [],
+        namespaces: namespacesResp?.namespaces,
         settings,
       });
       cluster = await fetchCluster(settings, fetch);
@@ -33,7 +33,7 @@
     return {
       props: { user, cluster },
       stuff: {
-        namespaces: namespaces?.namespaces,
+        namespaces: namespacesResp?.namespaces,
         settings: { ...settings, defaultNamespace },
       },
     };
