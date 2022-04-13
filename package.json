@@ -21,7 +21,9 @@
     "lint": "prettier --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
     "format": "prettier --write --plugin-search-dir=. .",
     "cypress": "concurrently \"npm run dev:test\" \"cypress open\"",
-    "cypress:run": "cypress run"
+    "cypress:run": "cypress run",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
@@ -36,8 +38,14 @@
     "websocket-as-promised": "^2.0.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.17.9",
     "@crownframework/svelte-error-boundary": "^1.0.3",
     "@grpc/grpc-js": "^1.3.7",
+    "@storybook/addon-actions": "^6.5.0-alpha.62",
+    "@storybook/addon-essentials": "^6.5.0-alpha.62",
+    "@storybook/addon-links": "^6.5.0-alpha.62",
+    "@storybook/addon-svelte-csf": "^2.0.1",
+    "@storybook/svelte": "^6.5.0-alpha.62",
     "@sveltejs/adapter-static": "^1.0.0-next.29",
     "@sveltejs/kit": "^1.0.0-next.311",
     "@temporalio/proto": "^0.3.1",
@@ -47,6 +55,7 @@
     "@typescript-eslint/eslint-plugin": "^4.30.0",
     "@typescript-eslint/parser": "^4.30.0",
     "autoprefixer": "^10.4.2",
+    "babel-loader": "^8.2.4",
     "babel-preset-vite": "^1.0.4",
     "chalk": "^4.1.2",
     "concurrently": "^7.0.0",
@@ -58,6 +67,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-cypress": "^2.11.3",
     "eslint-plugin-jest": "^24.4.0",
+    "eslint-plugin-storybook": "^0.5.9--canary.acfda00.0",
     "eslint-plugin-svelte3": "^3.2.0",
     "google-protobuf": "^3.17.3",
     "husky": "^7.0.2",
@@ -68,9 +78,10 @@
     "postcss-load-config": "^3.1.0",
     "prettier": "~2.3.2",
     "prettier-plugin-svelte": "^2.4.0",
-    "svelte": "^3.46.4",
+    "svelte": "^3.47.0",
     "svelte-check": "^2.4.5",
     "svelte-highlight": "^3.4.0",
+    "svelte-loader": "^3.1.2",
     "svelte-preprocess": "^4.10.4",
     "tailwindcss": "^3.0.18",
     "ts-jest": "^27.0.5",
