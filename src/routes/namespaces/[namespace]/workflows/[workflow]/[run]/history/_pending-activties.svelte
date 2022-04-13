@@ -6,7 +6,7 @@
   import { routeForPendingActivities } from '$lib/utilities/route-for';
   import Link from '$lib/components/link.svelte';
 
-  const { pendingActivities } = $page.stuff.workflow;
+  const { pendingActivities, endTime } = $page.stuff.workflow;
   const { namespace, workflow, run } = $page.params;
 
   const href = routeForPendingActivities({ namespace, workflow, run });
