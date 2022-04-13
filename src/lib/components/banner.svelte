@@ -1,5 +1,6 @@
 <script lang="ts">
   import { closedBannerId, close } from '$lib/stores/banner';
+  import { isRecommendedVersionNewer } from '$lib/utilities/version-check';
 
   export let cluster: ClusterInformation;
 
@@ -13,7 +14,11 @@
   $: current = cluster?.versionInfo?.current;
   $: alert = cluster?.versionInfo?.alerts?.[0];
   $: severity = alert ? severities[alert.severity] : severities.Low;
-  $: show = current?.version && current.version != $closedBannerId;
+  $: show =
+    current?.version &&
+    current.version != $closedBannerId &&
+    isRecommendedVersionNewer(recommended?.version, current.version);
+
   $: message =
     severity == severities.Low
       ? `📥 v${recommended?.version} version is available`
