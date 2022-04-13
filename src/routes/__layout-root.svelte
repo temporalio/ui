@@ -20,7 +20,7 @@
     let cluster: GetClusterInfoResponse;
     let namespacesResp: ListNamespacesResponse;
 
-    if (!settings.auth.enabled || user.email) {
+    if (!settings.auth.enabled || user?.email) {
       namespacesResp = await fetchNamespaces(settings, fetch);
 
       defaultNamespace = getDefaultNamespace({
