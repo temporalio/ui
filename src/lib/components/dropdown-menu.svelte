@@ -49,8 +49,8 @@
     <div
       in:scale={{ duration: 200, start: 0.65 }}
       out:scale={{ duration: 100, start: 0.65 }}
-      class="origin-top-left absolute left-0 w-48 py-2 mt-1 bg-white
-        rounded shadow-md text-gray-900 z-50"
+      class="origin-top-left absolute left-0 py-2 mt-1 bg-white
+        rounded shadow-md text-gray-900 w-56 z-50"
     >
       <div class="gap-4 block">
         <slot />

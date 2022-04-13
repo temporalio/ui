@@ -75,7 +75,7 @@
     >
       <div class="check">
         {#if $eventFilterSort === option}
-          <Icon icon={faCheck} />
+          <Icon icon={faCheck} scale={0.8} />
         {/if}
       </div>
       <div class="label">
@@ -95,7 +95,7 @@
     >
       <div class="check">
         {#if $eventTimeFormat === option}
-          <Icon icon={faCheck} />
+          <Icon icon={faCheck} scale={0.8} />
         {/if}
       </div>
       <div class="label">
@@ -114,7 +114,7 @@
   >
     <div class="check">
       {#if $eventShowElapsed === 'true'}
-        <Icon icon={faCheck} />
+        <Icon icon={faCheck} scale={0.8} />
       {/if}
     </div>
     <div class="label">Show Elapsed Time</div>
@@ -129,7 +129,7 @@
     @apply cursor-pointer;
   }
   .check {
-    @apply mx-4 w-4;
+    @apply mx-4 w-4 mt-1;
   }
   .active {
     @apply text-blue-700;

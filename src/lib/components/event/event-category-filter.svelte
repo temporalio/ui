@@ -42,7 +42,7 @@
     >
       <div class="check">
         {#if _value === option}
-          <Icon icon={faCheck} />
+          <Icon icon={faCheck} scale={0.8} />
         {/if}
       </div>
       <div class="label">
@@ -60,7 +60,7 @@
     @apply cursor-pointer;
   }
   .check {
-    @apply mx-4 w-4;
+    @apply mx-4 w-4 mt-1;
   }
   .active {
     @apply text-blue-700;
