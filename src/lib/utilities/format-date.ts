@@ -3,7 +3,6 @@ import {
   parseJSON,
   formatDuration as durationToString,
   intervalToDuration,
-  format,
 } from 'date-fns';
 import * as dateTz from 'date-fns-tz'; // `build` script fails on importing some of named CommonJS modules
 
@@ -57,7 +56,7 @@ function isTimestamp(arg: unknown): arg is Timestamp {
 
 export function formatDuration(
   duration: Duration | string,
-  delimiter: string = ', ',
+  delimiter = ', ',
 ): string {
   if (duration === null) return '';
   if (typeof duration === 'string') duration = fromSeconds(duration);
@@ -66,21 +65,26 @@ export function formatDuration(
 
 function formatDistanceToSingleLetters(distance: string) {
   if (!distance) return '';
-  distance = distance.replace(/seconds/g, 'second');
-  distance = distance.replace(/second/g, 's');
-  distance = distance.replace(/ s/g, 's');
-  distance = distance.replace(/minutes/g, 'minute');
-  distance = distance.replace(/minute/g, 'm');
-  distance = distance.replace(/ m/g, 'm');
-  distance = distance.replace(/hours/g, 'hour');
-  distance = distance.replace(/hour/g, 'h');
-  distance = distance.replace(/ h/g, 'h');
-  distance = distance.replace(/days/g, 'day');
-  distance = distance.replace(/day/g, 'd');
-  distance = distance.replace(/ d/g, 'd');
-  distance = distance.replace(/weeks/g, 'week');
-  distance = distance.replace(/week/g, 'w');
-  distance = distance.replace(/ w/g, 'w');
+  distance = distance
+    .replace(/seconds/g, 'second')
+    .replace(/second/g, 's')
+    .replace(/ s/g, 's')
+    .replace(/minutes/g, 'minute')
+    .replace(/minute/g, 'm')
+    .replace(/ m/g, 'm')
+    .replace(/hours/g, 'hour')
+    .replace(/hour/g, 'h')
+    .replace(/ h/g, 'h')
+    .replace(/days/g, 'day')
+    .replace(/day/g, 'd')
+    .replace(/ d/g, 'd')
+    .replace(/weeks/g, 'week')
+    .replace(/week/g, 'w')
+    .replace(/ w/g, 'w')
+    .replace(/ month/g, 'month')
+    .replace(/ months/g, 'months')
+    .replace(/ year/g, 'year')
+    .replace(/ years/g, 'years');
   return distance;
 }
 
@@ -120,7 +124,7 @@ export function formatDistance({
   end: ValidTime | undefined | null;
 }): string {
   const duration = getDuration({ start, end });
-  return formatDuration(duration, '');
+  return formatDuration(duration);
 }
 
 export function formatDistanceAbbreviated({
@@ -130,6 +134,7 @@ export function formatDistanceAbbreviated({
   start: ValidTime | undefined | null;
   end: ValidTime | undefined | null;
 }): string {
-  const distance = formatDistance({ start, end });
+  const duration = getDuration({ start, end });
+  const distance = formatDuration(duration, ' ');
   return formatDistanceToSingleLetters(distance);
 }

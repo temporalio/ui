@@ -4,7 +4,6 @@
   import {
     formatDate,
     formatDistanceAbbreviated,
-    formatDistanceDifferenceAbbreviated,
   } from '$lib/utilities/format-date';
   import {
     eventFilterSort,
@@ -78,7 +77,6 @@
       {formatDate(event?.eventTime, $eventTimeFormat)}
     {/if}
   </div>
-
   <div class="cell links">
     <EventDetails
       event={currentEvent}
