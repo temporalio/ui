@@ -39,7 +39,7 @@
     if (previousItem) {
       const timeDiff = formatDistanceAbbreviated({
         start: compact
-          ? previousItem?.initialEvent?.eventTime
+          ? (previousItem as CompactEventGroup)?.initialEvent?.eventTime
           : previousItem?.eventTime,
         end: compact ? currentEvent?.eventTime : event?.eventTime,
       });

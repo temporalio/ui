@@ -15,7 +15,7 @@ const pattern = 'yyyy-MM-dd z HH:mm:ss.SS';
 
 export function formatDate(
   date: ValidTime | undefined | null,
-  timeFormat: TimeFormat = 'UTC',
+  timeFormat: TimeFormat | string = 'UTC',
 ): string {
   if (!date) return '';
 
