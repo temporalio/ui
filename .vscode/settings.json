@@ -9,5 +9,6 @@
     "TZ": "UTC"
   },
   "jest.jestCommandLine": "npm test --",
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "css.customData": [".vscode/css-custom-data.json"]
 }
