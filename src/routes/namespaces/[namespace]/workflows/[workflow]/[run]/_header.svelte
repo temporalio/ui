@@ -101,13 +101,13 @@
           ></span
         >
       </p>
-      {#if workflow?.parentNamespaceId && workflow?.parent}
+      {#if workflow?.parent}
         <p class="text-md">
           <span class="font-medium">Parent:</span>
           <span class="ml-1"
             ><Link
               href={routeForWorkflow({
-                namespace: workflow.parentNamespaceId,
+                namespace,
                 workflow: workflow.parent?.workflowId,
                 run: workflow.parent?.runId,
               })}>{workflow.parent?.workflowId}</Link
