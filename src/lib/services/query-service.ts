@@ -105,7 +105,7 @@ export async function getQuery(
   return fetchQuery(options, request).then((execution) => {
     const { queryResult } = execution ?? { queryResult: { payloads: [] } };
 
-    let data: any = queryResult.payloads;
+    let data: ParsedQuery = queryResult.payloads;
 
     try {
       if (data[0]) {

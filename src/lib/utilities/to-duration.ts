@@ -1,13 +1,7 @@
 import { formatISO, sub, add, intervalToDuration } from 'date-fns';
+import { isString, isObject } from './is';
 
 type DurationKey = typeof durationKeys;
-
-const millisecond = 1;
-const second = millisecond * 1000;
-const minute = second * 60;
-const hour = minute * 60;
-const day = hour * 24;
-const year = day * 365;
 
 const durationKeys = [
   'years',
@@ -33,7 +27,7 @@ export const durations = [
 const durationPattern = new RegExp(`(\\d+)\\s(${durationKeys.join('|')})`);
 
 export const isDurationKey = (key: unknown): key is DurationKey => {
-  if (typeof key !== 'string') return false;
+  if (!isString(key)) return false;
 
   for (const durationKey of durationKeys) {
     if (durationKey === key) return true;
@@ -43,8 +37,7 @@ export const isDurationKey = (key: unknown): key is DurationKey => {
 };
 
 export const isDuration = (value: unknown): value is Duration => {
-  if (value === null) return false;
-  if (typeof value !== 'object') return false;
+  if (!isObject(value)) return false;
 
   for (const key of Object.keys(value)) {
     if (!isDurationKey(key)) return false;
@@ -54,8 +47,7 @@ export const isDuration = (value: unknown): value is Duration => {
 };
 
 export const isDurationString = (value: unknown): value is string => {
-  if (value === null) return false;
-  if (typeof value !== 'string') return false;
+  if (!isString(value)) return false;
 
   const match = value.match(durationPattern);
 
@@ -91,7 +83,7 @@ export const toDate = (timeRange: Duration | string): string => {
 };
 
 export const fromDate = (targetDate: string | Date): Duration => {
-  if (typeof targetDate === 'string') targetDate = new Date(targetDate);
+  if (isString(targetDate)) targetDate = new Date(targetDate);
   return intervalToDuration({ start: new Date(), end: targetDate });
 };
 

@@ -94,7 +94,7 @@ export const isCategoryType = (value: string): value is EventTypeCategory => {
 export const getEventsInCategory = (
   events: HistoryEventWithId[],
   category: string,
-) => {
+): HistoryEventWithId[] => {
   if (!isCategoryType(category)) return events;
   return events.filter((event: IterableEvent) => event.category === category);
 };

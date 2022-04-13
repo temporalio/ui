@@ -109,10 +109,6 @@ describe(getSingleAttributeForEvent, () => {
     },
   };
 
-  const workflowEventGroup = {
-    initialEvent: workflowEvent,
-  };
-
   it('should return "workflowType.name" if the workflow type exists', () => {
     expect(getSingleAttributeForEvent(workflowEvent)).toStrictEqual({
       key: 'workflowTypeName',
