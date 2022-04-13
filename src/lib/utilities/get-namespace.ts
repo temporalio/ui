@@ -33,7 +33,7 @@ export const getDefaultNamespace = ({
 }: GetDefaultNamespaceParameters): string => {
   const { showTemporalSystemNamespace, defaultNamespace } = settings;
 
-  const namespaceNames = namespaces
+  const namespaceNames = (namespaces || [])
     .map(
       (namespace: DescribeNamespaceResponse) => namespace?.namespaceInfo?.name,
     )
