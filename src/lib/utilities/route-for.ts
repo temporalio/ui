@@ -58,7 +58,9 @@ export const routeForWorkflow = ({
   run,
   ...parameters
 }: WorkflowParameters): string => {
-  return `${routeForWorkflows(parameters)}/${workflow}/${run}`;
+  const wid = encodeURIComponent(workflow);
+
+  return `${routeForWorkflows(parameters)}/${wid}/${run}`;
 };
 
 export const routeForEventHistory = ({
