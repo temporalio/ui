@@ -1,8 +1,5 @@
 <script lang="ts">
-  import {
-    getSingleAttributeForEvent,
-    shouldDisplayAttribute,
-  } from '$lib/utilities/get-single-attribute-for-event';
+  import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
   import EventDetailsRow from './event-details-row.svelte';
 
   import { formatAttributes } from './_format-attributes';
@@ -18,9 +15,7 @@
 <section>
   {#if expanded}
     {#each Object.entries(attributes) as [key, value] (key)}
-      {#if shouldDisplayAttribute(key, value)}
-        <EventDetailsRow {key} {value} />
-      {/if}
+      <EventDetailsRow {key} {value} />
     {/each}
   {:else}
     <EventDetailsRow {...getSingleAttributeForEvent(summaryEvent)} />

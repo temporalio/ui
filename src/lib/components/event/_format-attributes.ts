@@ -1,4 +1,5 @@
 import { formatDate } from '$lib/utilities/format-date';
+import { shouldDisplayAttribute } from '$lib/utilities/get-single-attribute-for-event';
 
 type CombinedAttributes = EventAttribute & {
   eventTime?: string;
@@ -15,7 +16,8 @@ export const formatAttributes = (
   if (compact) attributes.eventTime = formatDate(event.eventTime);
 
   for (const [key, value] of Object.entries(event.attributes)) {
-    if (!keysToOmit.has(key)) attributes[key] = value;
+    const shouldDisplay = shouldDisplayAttribute(key, value);
+    if (!keysToOmit.has(key) && shouldDisplay) attributes[key] = value;
   }
 
   return attributes;
