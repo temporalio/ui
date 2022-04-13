@@ -38,8 +38,10 @@
     const previousItem = visibleItems[currentIndex - 1];
     if (previousItem) {
       const timeDiff = formatDistanceAbbreviated({
-        start: previousItem.eventTime,
-        end: event.eventTime,
+        start: compact
+          ? previousItem?.initialEvent?.eventTime
+          : previousItem?.eventTime,
+        end: compact ? currentEvent?.eventTime : event?.eventTime,
       });
       timeDiffChange = timeDiff ? `(${reversed ? '-' : '+'}${timeDiff})` : '';
     }
@@ -70,7 +72,7 @@
     {#if showElapsed && event.id !== initialItem.id}
       {formatDistanceAbbreviated({
         start: initialItem.eventTime,
-        end: event.eventTime,
+        end: currentEvent.eventTime,
       })}
       {timeDiffChange}
     {:else}
