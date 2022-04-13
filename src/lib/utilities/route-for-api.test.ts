@@ -55,7 +55,7 @@ describe('API Request Encoding', () => {
         workflowId: 'worflow#with#hashes',
       }),
     ).toBe(
-      'http://localhost:8080/api/v1/namespaces/namespace/workflows/worflow%23with%23hashes/runs/run',
+      'http://localhost:8080/api/v1/namespaces/namespace/workflows/worflow%2523with%2523hashes/runs/run',
     );
   });
 });

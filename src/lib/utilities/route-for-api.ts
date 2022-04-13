@@ -30,18 +30,31 @@ export function routeForApi(
   route: APIRoutePath,
   parameters?: APIRouteParameters,
 ): string {
+  const encoded: APIRouteParameters = Object.keys(parameters ?? {}).reduce(
+    (acc, key) => {
+      acc[key] = encodeURIComponent(parameters[key]);
+      return acc;
+    },
+    {
+      namespace: '',
+      workflowId: '',
+      runId: '',
+      queue: '',
+    },
+  );
+
   const routes: { [K in APIRoutePath]: string } = {
     cluster: '/cluster',
     settings: '/settings',
     user: '/me',
     namespaces: '/namespaces',
-    'task-queue': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}`,
-    workflows: `/namespaces/${parameters?.namespace}/workflows`,
-    'workflows.archived': `/namespaces/${parameters?.namespace}/workflows/archived`,
-    workflow: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}`,
-    'workflow.terminate': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/terminate`,
-    events: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/events`,
-    query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/query`,
+    'task-queue': `/namespaces/${encoded?.namespace}/task-queues/${encoded?.queue}`,
+    workflows: `/namespaces/${encoded?.namespace}/workflows`,
+    'workflows.archived': `/namespaces/${encoded?.namespace}/workflows/archived`,
+    workflow: `/namespaces/${encoded?.namespace}/workflows/${encoded?.workflowId}/runs/${encoded?.runId}`,
+    'workflow.terminate': `/namespaces/${encoded?.namespace}/workflows/${encoded?.workflowId}/runs/${encoded?.runId}/terminate`,
+    events: `/namespaces/${encoded?.namespace}/workflows/${encoded?.workflowId}/runs/${encoded?.runId}/events`,
+    query: `/namespaces/${encoded?.namespace}/workflows/${encoded?.workflowId}/runs/${encoded?.runId}/query`,
   };
 
   return withBase(routes[route]);

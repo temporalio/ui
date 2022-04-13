@@ -10,7 +10,7 @@
 
     const parameters = {
       namespace,
-      workflowId,
+      workflowId: decodeURIComponent(workflowId),
       runId,
     };
 
