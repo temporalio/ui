@@ -2,7 +2,7 @@
   import type { Load } from '@sveltejs/kit';
   import type { ListNamespacesResponse } from '$types';
 
-  import '../app.postcss';
+  import '../app.css';
 
   import { fetchSettings } from '$lib/services/settings-service';
 

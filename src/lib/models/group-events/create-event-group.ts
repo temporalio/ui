@@ -80,7 +80,9 @@ const createGroupFor = <K extends keyof StartingEvents>(
   };
 };
 
-export const createEventGroup = (event: CommonHistoryEvent) => {
+export const createEventGroup = (
+  event: CommonHistoryEvent,
+): CompactEventGroup => {
   if (isActivityTaskScheduledEvent(event))
     return createGroupFor<'Activity'>(event);
 

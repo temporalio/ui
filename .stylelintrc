@@ -1,0 +1,37 @@
+{
+  "extends": [
+    "stylelint-config-recommended"
+  ],
+  "processors": [],
+  "rules": {
+    "at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": [
+          "tailwind",
+          "apply",
+          "variants",
+          "responsive",
+          "screen",
+          "function",
+          "each",
+          "if",
+          "else",
+          "return",
+          "layer"
+        ]
+      }
+    ],
+    "declaration-block-trailing-semicolon": null,
+    "no-descending-specificity": [
+      true,
+      {
+        "ignore": [
+          "selectors-within-list"
+        ]
+      }
+    ],
+    "no-invalid-double-slash-comments": true,
+    "block-no-empty": null
+  }
+}

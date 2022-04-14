@@ -81,25 +81,29 @@ export const routeForEventHistoryItem = (
   return `${routeForEventHistory(parameters)}/${parameters.eventId}`;
 };
 
-export const routeForWorkers = (parameters: WorkflowParameters) => {
+export const routeForWorkers = (parameters: WorkflowParameters): string => {
   return `${routeForWorkflow(parameters)}/workers`;
 };
 
-export const routeForStackTrace = (parameters: WorkflowParameters) => {
+export const routeForStackTrace = (parameters: WorkflowParameters): string => {
   return `${routeForWorkflow(parameters)}/stack-trace`;
 };
 
-export const routeForWorkflowQuery = (parameters: WorkflowParameters) => {
+export const routeForWorkflowQuery = (
+  parameters: WorkflowParameters,
+): string => {
   return `${routeForWorkflow(parameters)}/query`;
 };
 
-export const routeForPendingActivities = (parameters: WorkflowParameters) => {
+export const routeForPendingActivities = (
+  parameters: WorkflowParameters,
+): string => {
   return `${routeForWorkflow(parameters)}/pending-activities`;
 };
 
 export const routeForAuthentication = (
   parameters: AuthenticationParameters,
-) => {
+): string => {
   const { settings, searchParams: currentSearchParams, originUrl } = parameters;
 
   const login = new URL('/auth/sso', settings.baseUrl);
@@ -121,7 +125,7 @@ export const routeForAuthentication = (
   return login.toString();
 };
 
-export const routeForLoginPage = () => {
+export const routeForLoginPage = (): string => {
   if (browser) {
     const login = new URL('login', window.location.origin);
     login.searchParams.set('returnUrl', window.location.href);

@@ -1,7 +1,7 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
 
-  import '../../app.postcss';
+  import '../../app.css';
 
   import { fetchSettings } from '$lib/services/settings-service';
 

@@ -9,7 +9,7 @@
   import TableLink from '$lib/components/table-link.svelte';
 
   export let key: string;
-  export let value: string | Record<string, string>;
+  export let value: string | Record<string, unknown>;
 
   const { workflow, namespace } = $page.params;
 </script>

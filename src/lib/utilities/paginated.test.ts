@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 jest.mock('$app/navigation', () => jest.fn({ goto: () => false } as any));
 import { paginated } from './paginated';
 

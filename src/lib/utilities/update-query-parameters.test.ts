@@ -81,8 +81,6 @@ describe(updateQueryParameters, () => {
   it('should call `goto` with without the "?" if the query params are empty', () => {
     const parameter = 'parameter';
     const value = null;
-    const query = new URLSearchParams();
-    const path = '/some/path';
     const goto = jest.fn().mockReturnValue(Promise.resolve(null));
 
     updateQueryParameters({ parameter, value, url, goto });

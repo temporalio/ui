@@ -25,7 +25,7 @@
   }
 </script>
 
-<div class="input-container">
+<div class="input-container focus-within:border-blue-700">
   <label for={id} class="hidden">{name}</label>
   <span
     ><Icon
@@ -35,7 +35,12 @@
       class="flex items-center"
     /></span
   >
-  <input class="block w-full" placeholder={name} {id} bind:value={_value} />
+  <input
+    class="block w-full focus:outline-none"
+    placeholder={name}
+    {id}
+    bind:value={_value}
+  />
 </div>
 
 <style lang="postcss">

@@ -1,7 +1,10 @@
 import { isEventGroup } from '$lib/models/group-events';
 import { getLastEvent } from '$lib/models/group-events/get-last-event';
 
-type SummaryAttribute = { key: string; value: string | Record<string, any> };
+type SummaryAttribute = {
+  key: string;
+  value: string | Record<string, unknown>;
+};
 
 const emptyAttribute: SummaryAttribute = { key: '', value: '' };
 

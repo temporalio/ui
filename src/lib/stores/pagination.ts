@@ -1,10 +1,35 @@
 import { derived, writable, get } from 'svelte/store';
+import type { Readable } from 'svelte/store';
 
 const options: string[] = ['100', '250', '500'];
 
-export const perPageOptions = (perPage: number | string) => {
+type PaginationMethods<T> = {
+  adjustPageSize: (n: number | string) => void;
+  next: () => void;
+  previous: () => void;
+  jumpToPage: (x: number | string) => void;
+  jumpToIndex: (x: number | string) => void;
+  findIndex: (fn: (item: T) => boolean) => number;
+  findPage: (fn: (item: T) => boolean) => number;
+};
+
+type PaginationStore<T> = PaginationMethods<T> &
+  Readable<{
+    items: T[];
+    initialItem: T;
+    hasPrevious: boolean;
+    hasNext: boolean;
+    startingIndex: number;
+    endingIndex: number;
+    length: number;
+    pageSize: number;
+    currentPage: number;
+    totalPages: number;
+  }>;
+
+export const perPageOptions = (perPage: number | string): string[] => {
   const itemsPerPage = String(perPage);
-  return options.includes(itemsPerPage) ? options : [perPage, ...options];
+  return options.includes(itemsPerPage) ? options : [itemsPerPage, ...options];
 };
 
 export const getPageForIndex = (i: number, pageSize: number): number => {
@@ -15,7 +40,7 @@ export const getStartingIndexForPage = (
   page: number,
   itemsPerPage: number,
   items: ArrayLike<unknown>,
-) => {
+): number => {
   if (isNaN(page)) return 0;
 
   if (page <= 1) return 0;
@@ -29,7 +54,7 @@ export const getNearestStartingIndex = (
   index: number,
   itemsPerPage: number,
   items: ArrayLike<unknown>,
-) => {
+): number => {
   const page = getPageForIndex(index, itemsPerPage);
   return getStartingIndexForPage(page, itemsPerPage, items);
 };
@@ -38,7 +63,7 @@ export const getValidPage = (
   page: number,
   itemsPerPage: number,
   items: ArrayLike<unknown>,
-) => {
+): number => {
   if (isNaN(page)) return 0;
   const lastPage = getTotalPages(itemsPerPage, items);
 
@@ -62,7 +87,10 @@ export const getIndex = (index: number, things: ArrayLike<unknown>): number => {
   return things.length - 1;
 };
 
-export const outOfBounds = (index: number, things: ArrayLike<unknown>) => {
+export const outOfBounds = (
+  index: number,
+  things: ArrayLike<unknown>,
+): boolean => {
   if (index >= things.length) return true;
   if (index < 0) return true;
   return false;
@@ -75,7 +103,7 @@ export const pagination = <T>(
   items: Readonly<T[]> = [],
   perPage: number | string = 100,
   startingIndex: string | number = 0,
-) => {
+): PaginationStore<T> => {
   const start = getNearestStartingIndex(
     Number(startingIndex),
     Number(perPage),

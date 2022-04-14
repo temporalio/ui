@@ -1,4 +1,4 @@
-type CompactEventGroup<T = EventType, E = HistoryEventWithId, Id = E['id']> = {
+type CompactEventGroup<E = HistoryEventWithId, Id = E['id']> = {
   id: Id;
   name: string;
   events: Map<Id, E>;

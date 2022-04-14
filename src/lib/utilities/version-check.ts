@@ -1,7 +1,7 @@
 export const isRecommendedVersionNewer = (
   recommendedVersion: string,
   currentVersion: string,
-) => {
+): boolean => {
   if (!recommendedVersion || !currentVersion) {
     return false;
   }

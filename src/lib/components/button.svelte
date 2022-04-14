@@ -14,7 +14,7 @@
   export let large: boolean = false;
   export let href: string = null;
   export let icon: IconDefinition = null;
-  export let classes: string = '';
+  export let classes: string = $$props.class;
 </script>
 
 {#if as === 'button'}
