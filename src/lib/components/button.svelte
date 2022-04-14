@@ -9,10 +9,10 @@
   export let loading: boolean = false;
   export let login: boolean = false;
   export let thin: boolean = false;
-  export let as: 'button' | 'anchor' = 'button';
+  export let href: string = null;
   export let active: boolean = false;
   export let large: boolean = false;
-  export let href: string = null;
+  export let as: 'button' | 'anchor' = href ? 'anchor' : 'button';
   export let icon: IconDefinition = null;
   export let classes: string = $$props.class;
 </script>
