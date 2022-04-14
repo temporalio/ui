@@ -76,7 +76,7 @@
         "badBinaries": {
           "binaries": {}
         },
-        "historyArchivalState": "Disabled",
+        "historyArchivalState": "Enabled",
         "historyArchivalUri": "",
         "visibilityArchivalState": "Disabled",
         "visibilityArchivalUri": ""
