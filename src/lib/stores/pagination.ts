@@ -16,6 +16,7 @@ type PaginationMethods<T> = {
 type PaginationStore<T> = PaginationMethods<T> &
   Readable<{
     items: T[];
+    initialItem: T;
     hasPrevious: boolean;
     hasNext: boolean;
     startingIndex: number;
