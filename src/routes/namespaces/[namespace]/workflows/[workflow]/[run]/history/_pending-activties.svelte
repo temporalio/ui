@@ -22,12 +22,10 @@
     <section class="w-full table-auto space-x-4">
       {#each pendingActivities as { id, ...pendingActivity } (id)}
         <a
-          class="block md:flex content-between w-full border-b-2 border-gray-300 p-2 last-of-type:border-b-0 hover:bg-gray-50"
+          class="block md:flex content-between w-full border-b-2 border-gray-300 p-2 last-of-type:border-b-0 hover:bg-gray-50 gap-4 items-center"
           {href}
         >
-          <div
-            class="w-full md:w-1/12 text-left font-normal text-gray-500 w-40"
-          >
+          <div class="md:w-1/12 text-left font-normal text-gray-500 w-40">
             {pendingActivity.activityId}
           </div>
           <div class="w-full md:w-1/4">
@@ -41,12 +39,10 @@
             </div>
           </div>
           <div class="w-full md:w-5/12">
-            <div class="flex gap-2">
-              <h3>Last Failure</h3>
-            </div>
-            <div>
+            <div class="flex gap-2 items-center">
+              <h3 class="whitespace-nowrap">Last Failure</h3>
               <pre
-                class="rounded-lg"><code class="language-json">{pendingActivity.lastFailure?.message ?? ''}</code></pre>
+                class="w-full rounded-lg"><code class="language-json">{pendingActivity.lastFailure?.message ?? ''}</code></pre>
             </div>
           </div>
           <div class="w-full md:w-1/4">
