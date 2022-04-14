@@ -37,7 +37,7 @@
 </script>
 
 {#if isEligibleForTermination(workflow)}
-  <Button destroy thin on:click={show}>Terminate</Button>
+  <Button destroy on:click={show}>Terminate</Button>
   <Modal
     open={showConfirmation}
     confirmText="Terminate"

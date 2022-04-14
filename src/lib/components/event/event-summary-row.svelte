@@ -55,12 +55,12 @@
 </script>
 
 <article class="row" id={event.id}>
-  <div class="cell">
-    <a class="text-gray-500 mx-1 text-lg md:text-base" href="#{event.id}"
+  <div class="cell text-left">
+    <a class="text-gray-500 mx-1 text-sm md:text-base" href="#{event.id}"
       >{event.id}</a
     >
     <span
-      class="md:mx-2 text-lg md:text-base font-semibold"
+      class="md:mx-2 text-sm md:text-base font-semibold"
       class:link={!expandAll}
       on:click|stopPropagation={onLinkClick}>{event.name}</span
     >
@@ -68,7 +68,7 @@
       <EventGroupDetails {eventGroup} bind:selectedId />
     {/if}
   </div>
-  <div class="cell links font-medium md:font-normal">
+  <div class="cell links text-sm font-normal text-right xl:text-left">
     {#if showElapsed && event.id !== initialItem.id}
       {formatDistanceAbbreviated({
         start: initialItem.eventTime,
@@ -91,11 +91,12 @@
 
 <style lang="postcss">
   .cell {
-    @apply md:table-cell md:border-b-2 text-left py-1 px-3 leading-4;
+    @apply xl:table-cell xl:border-b-2 py-1 px-3 leading-4;
+    flex: 40%;
   }
 
   .row {
-    @apply no-underline py-3 text-sm border-b-2 items-center md:text-base md:table-row last-of-type:border-b-0;
+    @apply no-underline py-3 text-sm border-b-2 items-center xl:text-base flex flex-wrap xl:table-row last-of-type:border-b-0;
   }
 
   .row:hover {
