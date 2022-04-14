@@ -1,9 +1,10 @@
 <script lang="ts">
   export let compact = false;
 
-  let title = compact ? 'Event Type' : 'Workflow Events';
   import EventCategoryFilter from '$lib/components/event/event-category-filter.svelte';
   import EventDateFilter from '$lib/components/event/event-date-filter.svelte';
+
+  let title = compact ? 'Event Type' : 'Workflow Events';
 </script>
 
 <section class="event-table">
@@ -12,7 +13,10 @@
       <div class="table-header w-3/12 rounded-tl-md">
         {title}<EventCategoryFilter />
       </div>
-      <div class="table-header w-3/12">Date & Time<EventDateFilter /></div>
+      <div class="table-header w-3/12">
+        Date & Time
+        {#if !compact}<EventDateFilter />{/if}
+      </div>
       <div class="table-header w-1/2 rounded-tr-md">Event Details</div>
     </div>
   </div>
