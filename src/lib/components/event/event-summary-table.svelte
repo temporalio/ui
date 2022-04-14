@@ -1,22 +1,23 @@
 <script lang="ts">
-  import EventCategoryMenu from '$lib/components/event/event-category-menu.svelte';
   export let compact = false;
 
   let title = compact ? 'Event Type' : 'Workflow Events';
+  import EventCategoryFilter from '$lib/components/event/event-category-filter.svelte';
+  import EventDateFilter from '$lib/components/event/event-date-filter.svelte';
 </script>
 
 <section class="event-table">
   <div class="table-header-row md:table-header-group">
     <div class="md:table-row hidden">
       <div class="table-header w-3/12 rounded-tl-md">
-        {title}<EventCategoryMenu {compact} />
+        {title}<EventCategoryFilter />
       </div>
-      <div class="table-header w-3/12">Date & Time</div>
+      <div class="table-header w-3/12">Date & Time<EventDateFilter /></div>
       <div class="table-header w-1/2 rounded-tr-md">Event Details</div>
     </div>
   </div>
   <div class="table-header-row md:hidden rounded-t-md">
-    <div class="table-header">{title}<EventCategoryMenu {compact} /></div>
+    <div class="table-header">{title}<EventCategoryFilter /></div>
   </div>
   <div class="overflow-y-auto md:table-row-group">
     <slot />

@@ -4,13 +4,14 @@
 
   import { fetchEvents } from '$lib/services/events-service';
 
-  export const load: Load = async function ({ params, stuff, fetch }) {
+  export const load: Load = async function ({ params, url, stuff, fetch }) {
     const { workflow } = stuff;
     const { namespace } = params;
     const parameters = {
       namespace,
       workflowId: workflow.id,
       runId: workflow.runId,
+      reverse: Boolean(url?.searchParams?.get('sort')),
     };
 
     const { events, eventGroups } = await fetchEvents(parameters, fetch);

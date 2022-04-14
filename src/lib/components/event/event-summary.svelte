@@ -11,10 +11,22 @@
   export let compact = false;
 </script>
 
-<Pagination {items} floatId="event-view-toggle" let:visibleItems>
+<Pagination
+  {items}
+  floatId="event-view-toggle"
+  let:visibleItems
+  let:initialItem
+>
   <EventSummaryTable {compact}>
     {#each visibleItems as event (event.id)}
-      <EventSummaryRow {event} {groups} {expandAll} {compact} />
+      <EventSummaryRow
+        {event}
+        {groups}
+        {expandAll}
+        {compact}
+        {initialItem}
+        {visibleItems}
+      />
     {:else}
       <EventEmptyRow />
     {/each}

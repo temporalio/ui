@@ -130,6 +130,7 @@ export const pagination = <T>(
   const { subscribe } = derived([index, pageSize], ([$index, $pageSize]) => {
     return {
       items: items.slice($index, $index + $pageSize),
+      initialItem: items[0],
       hasPrevious: !outOfBounds($index - $pageSize, items),
       hasNext: !outOfBounds($index + $pageSize, items),
       startingIndex: $index,
