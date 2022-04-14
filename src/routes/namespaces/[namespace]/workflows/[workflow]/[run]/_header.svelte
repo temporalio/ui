@@ -46,25 +46,23 @@
       <Icon icon={faChevronLeft} />
     </a>
     <div class="flex justify-between items-start mb-8">
-<<<<<<< HEAD
       <h1 class="text-base w-auto md:text-2xl md:flex relative items-center">
         <span class="mr-2">
           <WorkflowStatus status={workflow?.status} delay={0} />
         </span>
         <span class="font-medium">{workflow.id}</span>
-=======
-      <h1 class="text-base md:text-2xl relative w-auto">
-        <span class="font-medium break-all">{workflow.id}</span>
-        <span class="block md:inline mr-2">
-          <WorkflowStatus status={workflow?.status} delay={0} />
-          <span class="font-medium">{workflow.id}</span>
-        </span>
->>>>>>> fa47f99 (Add stack trace to header of layout, WIP of responsive. Have most of table responsive)
+        <h1 class="text-base md:text-2xl relative w-auto">
+          <span class="font-medium break-all">{workflow.id}</span>
+          <span class="block md:inline mr-2">
+            <WorkflowStatus status={workflow?.status} delay={0} />
+            <span class="font-medium">{workflow.id}</span>
+          </span>
+        </h1>
+        <div class="ml-8 flex justify-end items-center gap-4">
+          <ExportHistory />
+          <TerminateWorkflow {workflow} {namespace} />
+        </div>
       </h1>
-      <div class="ml-8 flex justify-end items-center gap-4">
-        <ExportHistory />
-        <TerminateWorkflow {workflow} {namespace} />
-      </div>
     </div>
     <nav class="flex gap-6 mb-6">
       <Tab
