@@ -6,7 +6,7 @@
     routeForWorkflows,
   } from '$lib/utilities/route-for';
 
-  import DataConverterStatus from '$lib/components/data-converter-status.svelte';
+  import DataConverterStatus from '$lib/components/data-encoder-status.svelte';
   import NamespaceSelect from './_namespace-select.svelte';
   import NavigationLink from './_navigation-link.svelte';
   import IsCloudGuard from '$lib/components/is-cloud-guard.svelte';

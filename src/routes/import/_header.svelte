@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
 
-  import DataConverterStatus from '$lib/components/data-converter-status.svelte';
+  import DataConverterStatus from '$lib/components/data-encoder-status.svelte';
   import { routeForImport } from '$lib/utilities/route-for';
   import NavigationLink from '../_navigation-link.svelte';
 

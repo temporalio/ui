@@ -1,8 +1,7 @@
 import type { Payload } from '$types';
-import { dataConverterWebsocket } from '$lib/utilities/data-converter-websocket';
-import type { DataConverterWebsocketInterface } from '$lib/utilities/data-converter-websocket';
-
-import { convertPayload } from '$lib/services/data-converter';
+import { convertPayload } from '$lib/services/data-encoder';
+import { get } from 'svelte/store';
+import { dataEncoderEndpoint } from '$lib/stores/data-encoder-config';
 
 import { atob } from './atob';
 
@@ -30,7 +29,6 @@ export function decodePayload(
 
 export const convertPayloadToJson = async (
   eventAttribute: EventAttribute,
-  websocket?: DataConverterWebsocketInterface,
 ): Promise<EventAttribute> => {
   // This anyAttribues allows us to use ?. notation to introspect the object which is a safe access pattern.
   // Because of the way we wrote our discrimited union we have to use this any. If we have two objects that
@@ -46,17 +44,17 @@ export const convertPayloadToJson = async (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let JSONPayload: string | Payload | Record<any, any>;
 
-    const webSocket = websocket ?? dataConverterWebsocket;
-
-    if (websocket?.hasWebsocket) {
+    const remoteEncoderEndpoint = get(dataEncoderEndpoint);
+    if (remoteEncoderEndpoint) {
       // Convert Payload data
       const awaitData = await Promise.all(
         (potentialPayload ?? []).map(
-          async (payload) => await convertPayload(payload, webSocket.websocket),
+          async (payload) =>
+            await convertPayload(payload, remoteEncoderEndpoint),
         ),
       );
 
-      JSONPayload = awaitData;
+      JSONPayload = awaitData.map(decodePayload);
     } else {
       JSONPayload = potentialPayload.map(decodePayload);
     }
