@@ -1,6 +1,6 @@
 <script lang="ts">
   import Icon from 'svelte-fa';
-  import { fas, faSearch } from '@fortawesome/free-solid-svg-icons';
+  import { faSearch } from '@fortawesome/free-solid-svg-icons';
   import Button from './button.svelte';
 
   export let placeholder = '';

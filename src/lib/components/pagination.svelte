@@ -72,7 +72,7 @@
       </button>
     </div>
   </nav>
-  <slot visibleItems={$store.items} initialItem={$store.initialItem} />
+  <slot visibleItems={$store.items} />
 </div>
 
 <style lang="postcss">

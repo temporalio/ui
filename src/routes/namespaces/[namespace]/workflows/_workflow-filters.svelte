@@ -26,8 +26,8 @@
   let workflowIdFilter = '';
   let workflowTypeFilter = '';
 
-  const submitAdvancedQuery = (event) => {
-    const data = new FormData(event.target);
+  const submitAdvancedQuery = (event: SubmitEvent): void => {
+    const data = new FormData(event.target as HTMLFormElement);
     const query = data.get('query');
     $page.url.searchParams.set('query', String(query));
     goto($page.url.toString());
