@@ -7,6 +7,7 @@
   import FilterSelect from '$lib/components/select/filter-select.svelte';
   import Option from '$lib/components/select/option.svelte';
   import FilterInput from '$lib/components/filter-input.svelte';
+  import Search from '$lib/components/search.svelte';
 
   export let timeFormat: TimeFormat = 'UTC';
 
@@ -25,13 +26,22 @@
   let workflowIdFilter = '';
   let workflowTypeFilter = '';
 
+  const submitAdvancedQuery = (event) => {
+    const data = new FormData(event.target);
+    const query = data.get('query');
+    $page.url.searchParams.set('query', String(query));
+    goto($page.url.toString());
+  };
+
   const handleToggle =
     (searchType: 'basic' | 'advanced') =>
     (event: Event): void => {
       const element = event.target as HTMLAnchorElement;
       isAdvancedQuery = searchType === 'advanced';
 
-      if (!isAdvancedQuery) $page.url.searchParams.delete('query');
+      if (!isAdvancedQuery) {
+        $page.url.searchParams.delete('query');
+      }
 
       goto(element.href);
     };
@@ -49,7 +59,7 @@
       </a>
     {:else}
       <a
-        href="{$page.url.pathname}?query=''"
+        href="{$page.url.pathname}?query"
         class="text-blue-700"
         on:click|preventDefault={handleToggle('advanced')}
       >
@@ -59,7 +69,12 @@
   </p>
 
   {#if isAdvancedQuery}
-    <FilterInput parameter="query" name="Query" value={''} />
+    <Search
+      icon
+      placeholder="Query…"
+      value={$page.url.searchParams.get('query')}
+      on:submit={submitAdvancedQuery}
+    />
   {:else}
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
       <FilterInput

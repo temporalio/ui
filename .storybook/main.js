@@ -1,3 +1,5 @@
+const preprocess = require('svelte-preprocess');
+
 module.exports = {
   core: {
     builder: '@storybook/builder-vite',
@@ -10,11 +12,21 @@ module.exports = {
     '@storybook/addon-links',
     '@storybook/addon-essentials',
     '@storybook/addon-svelte-csf',
+    {
+      name: '@storybook/addon-postcss',
+      options: {
+        postcssLoaderOptions: {
+          implementation: require('postcss'),
+        },
+      },
+    },
   ],
   framework: '@storybook/svelte',
   svelteOptions: {
-    preprocess: import('../svelte.config.js').then((module) => {
-      return module.preprocess;
+    preprocess: preprocess({
+      typescript: true,
+      postcss: true,
+      sourceMap: true,
     }),
   },
 };
