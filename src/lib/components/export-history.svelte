@@ -27,6 +27,6 @@
   };
 </script>
 
-<Button thin secondary icon={faDownload} on:click={exportHistory}
-  >Download</Button
+<Button secondary icon={faDownload} on:click={exportHistory}
+  ><span class="hidden md:inline">Download</span></Button
 >
