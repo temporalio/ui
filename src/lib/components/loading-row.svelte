@@ -1,7 +1,3 @@
-<script lang="ts">
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
-</script>
-
 <article class="row">
   <div class="cell">
     <p />
