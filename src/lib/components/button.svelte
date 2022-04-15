@@ -20,7 +20,7 @@
 {#if as === 'button'}
   <button
     on:click
-    class={`flex items-center justify-center text-sm primary ${classes}`}
+    class={`flex items-center gap-2 justify-center text-sm primary ${classes}`}
     class:selected={active}
     class:large
     class:secondary
@@ -30,7 +30,7 @@
     {disabled}
   >
     {#if icon}
-      <span class:animate-spin={loading} class="pr-2">
+      <span class:animate-spin={loading}>
         <Icon icon={loading ? faSpinner : icon} scale={1} />
       </span>
     {/if}
@@ -40,7 +40,7 @@
   <a
     {href}
     on:click
-    class={`flex items-center justify-center text-sm primary w-fit ${classes}`}
+    class={`flex items-center gap-2 justify-center text-sm primary w-fit ${classes}`}
     class:selected={active}
     class:large
     class:secondary
@@ -51,7 +51,7 @@
     {disabled}
   >
     {#if icon}
-      <span class:animate-spin={loading} class="pr-2">
+      <span class:animate-spin={loading}>
         <Icon icon={loading ? faSpinner : icon} scale={1} />
       </span>
     {/if}
