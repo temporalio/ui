@@ -48,13 +48,7 @@
     query,
   };
 
-  let workflows: Promise<CombinedWorkflowExecutionsResponse> = new Promise(
-    () => [],
-  );
-
-  $: {
-    workflows = fetchAllWorkflows(namespace, parameters, fetch);
-  }
+  $: workflows = fetchAllWorkflows(namespace, parameters, fetch);
 
   const errorMessage = isAdvancedSearch
     ? 'Please check your syntax and try again.'
