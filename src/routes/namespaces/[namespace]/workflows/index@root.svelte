@@ -12,24 +12,8 @@
 
     const { namespace } = params;
 
-    const workflowId = url.searchParams.get('workflow-id');
-    const workflowType = url.searchParams.get('workflow-type');
-    const timeRange = url.searchParams.get('time-range');
-    const executionStatus = url.searchParams.get('status') as WorkflowStatus;
-    const query = url.searchParams.get('query');
-
-    const parameters: ValidWorkflowParameters = {
-      workflowId,
-      workflowType,
-      timeRange,
-      executionStatus,
-      query,
-    };
-
-    const workflows = await fetchAllWorkflows(namespace, parameters, fetch);
-
     return {
-      props: { namespace, workflows, isAdvancedSearch },
+      props: { namespace, isAdvancedSearch },
     };
   };
 </script>
@@ -42,12 +26,35 @@
   import Pagination from '$lib/components/pagination.svelte';
   import Badge from '$lib/components/badge.svelte';
   import LoadingRow from '$lib/components/loading-row.svelte';
+  import { onMount } from 'svelte';
+  import { page } from '$app/stores';
 
   export let namespace: string;
-  export let workflows: CombinedWorkflowExecutionsResponse;
   export let isAdvancedSearch: boolean;
 
   let timeFormat: TimeFormat = 'UTC';
+
+  $: workflowId = $page.url.searchParams.get('workflow-id');
+  $: workflowType = $page.url.searchParams.get('workflow-type');
+  $: timeRange = $page.url.searchParams.get('time-range');
+  $: executionStatus = $page.url.searchParams.get('status') as WorkflowStatus;
+  $: query = $page.url.searchParams.get('query');
+
+  $: parameters = {
+    workflowId,
+    workflowType,
+    timeRange,
+    executionStatus,
+    query,
+  };
+
+  let workflows: Promise<CombinedWorkflowExecutionsResponse> = new Promise(
+    () => [],
+  );
+
+  $: {
+    workflows = fetchAllWorkflows(namespace, parameters, fetch);
+  }
 
   const errorMessage = isAdvancedSearch
     ? 'Please check your syntax and try again.'
@@ -57,7 +64,11 @@
 <h2 class="text-2xl">Workflows <Badge type="beta">Beta</Badge></h2>
 <WorkflowFilters bind:timeFormat />
 {#await workflows}
-  <LoadingRow />
+  <Pagination items={[]} let:visibleItems>
+    <WorkflowsSummaryTable>
+      <LoadingRow />
+    </WorkflowsSummaryTable>
+  </Pagination>
 {:then { workflows }}
   {#if workflows.length}
     <Pagination items={workflows} let:visibleItems>
