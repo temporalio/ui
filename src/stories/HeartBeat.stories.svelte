@@ -6,29 +6,7 @@
 
 <!-- More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export -->
 <!-- More on argTypes: https://storybook.js.org/docs/svelte/api/argtypes -->
-<Meta
-  title="Loading Indicator"
-  component={HeartBeat}
-  argTypes={{
-    placeholder: {
-      name: 'Placeholder',
-      defaultValue: 'Query…',
-      control: 'text',
-    },
-    label: {
-      name: 'Button Label',
-      defaultValue: 'Search',
-      control: 'text',
-    },
-    icon: {
-      name: 'Icon',
-      defaultValue: false,
-      control: 'boolean',
-    },
-    onSubmit: { action: 'onSubmit' },
-    onChange: { action: 'onChange' },
-  }}
-/>
+<Meta title="Heart Beat Indicator" component={HeartBeat} />
 
 <!-- More on component templates: https://storybook.js.org/docs/svelte/writing-stories/introduction#using-args -->
 <Template let:args>
