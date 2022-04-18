@@ -5,6 +5,8 @@
   import IconButton from './icon-button.svelte';
 
   export let value: string | undefined;
+  export let left = false;
+  export let right = false;
 
   let show: boolean = false;
   let menu: any = null;
@@ -49,8 +51,9 @@
     <div
       in:scale={{ duration: 200, start: 0.65 }}
       out:scale={{ duration: 100, start: 0.65 }}
-      class="origin-top-left absolute left-0 py-2 mt-1 bg-white
-        rounded shadow-md text-gray-900 w-56 z-50"
+      class:left
+      class:right
+      class="dropdown-menu"
     >
       <div class="gap-4 block">
         <slot />
@@ -65,3 +68,16 @@
     />
   {/if}
 </div>
+
+<style lang="postcss">
+  .dropdown-menu {
+    @apply absolute py-2 mt-1 bg-white
+        rounded shadow-md text-gray-900 w-56 z-50;
+  }
+  .dropdown-menu.left {
+    @apply origin-top-left absolute left-0;
+  }
+  .dropdown-menu.right {
+    @apply origin-top-right absolute right-0;
+  }
+</style>

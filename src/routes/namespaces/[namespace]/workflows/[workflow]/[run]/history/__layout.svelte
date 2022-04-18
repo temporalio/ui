@@ -46,6 +46,7 @@
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
   import PendingActivties from './_pending-activties.svelte';
+  import WorkflowStackTrace from '$lib/components/workflow/workflow-stack-trace.svelte';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
@@ -62,7 +63,7 @@
 </script>
 
 <section class="flex flex-col gap-4">
-  <section class="flex gap-4 w-full">
+  <section class="flex flex-col md:flex-row gap-4 w-full">
     <article class="border-2 border-gray-300 p-4 rounded-lg w-full">
       <h3 class="text-lg">Input</h3>
       <CodeBlock content={input} />
@@ -72,6 +73,7 @@
       <CodeBlock content={result} />
     </article>
   </section>
+  <WorkflowStackTrace {namespace} {workflow} />
   <PendingActivties />
   <section id="event-history">
     <nav class="flex gap-4 justify-between items-end pb-4">

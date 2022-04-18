@@ -34,7 +34,7 @@
     dark
     bind:value={selectedNamespace}
     on:change={switchNamespaces}
-    id="namespace-select"
+    class="namespace-select"
   >
     {#if isCloud}
       <Option value={selectedNamespace}>{selectedNamespace}</Option>
