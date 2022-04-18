@@ -4,10 +4,8 @@
   import Icon from 'svelte-fa';
   import { faCheck, faCopy } from '@fortawesome/free-solid-svg-icons';
 
-  export let heading = '';
   export let content: Parameters<typeof JSON.stringify>[0];
   export let copied = false;
-  export let framed = false;
   export let language = 'json';
 
   const isJSON = language === 'json';
@@ -42,32 +40,15 @@
 </script>
 
 {#if content || content === null}
-  <div class="relative w-full" class:framed>
-    <div id="clipboard" />
-
-    {#if heading}
-      <h3 class="text-lg mb-2 w-full">{heading}</h3>
-    {/if}
-
+  <div class="relative w-full h-full">
     <!-- The spacing for this if statement is like this because PRE's honor all whitespace and 
       line breaks so we have this peculiar formatting to preserve this components output -->
     <pre
-      class="p-4 rounded-lg"
-      class:h-full={framed}><code class="language-{language}"
+      class="p-4 rounded-lg overflow-y-scroll h-full max-h-96"><code class="language-{language}"
       >{#if isJSON}{formatJSON(content)}{:else}{@html content}{/if}</code></pre>
 
-    <button on:click={copy} class="absolute top-4 right-4 block">
-      {#if copied}
-        <Icon icon={faCheck} color="white" />
-      {:else}
-        <Icon icon={faCopy} color="white" />
-      {/if}
+    <button on:click={copy} class="absolute top-4 right-4">
+      <Icon icon={copied ? faCheck : faCopy} color="white" />
     </button>
   </div>
 {/if}
-
-<style lang="postcss">
-  .framed {
-    @apply border-2 border-gray-300 rounded-lg p-4 flex flex-col;
-  }
-</style>

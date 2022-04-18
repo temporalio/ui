@@ -62,10 +62,16 @@
 </script>
 
 <section class="flex flex-col gap-4">
-  <div class="flex gap-4">
-    <CodeBlock heading="Input" content={input} framed />
-    <CodeBlock heading="Result" content={result} framed />
-  </div>
+  <section class="flex gap-4 w-full">
+    <article class="border-2 border-gray-300 p-4 rounded-lg w-full">
+      <h3 class="text-lg">Input</h3>
+      <CodeBlock content={input} />
+    </article>
+    <article class="border-2 border-gray-300 p-4 rounded-lg w-full">
+      <h3 class="text-lg">Results</h3>
+      <CodeBlock content={result} />
+    </article>
+  </section>
   <PendingActivties />
   <section id="event-history">
     <nav class="flex gap-4 justify-between items-end pb-4">
