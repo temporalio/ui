@@ -16,7 +16,7 @@
 
 <header class="hamburger-header">
   <div class="flex gap-4 col-span-4 justify-start">
-    <div on:click={() => (open = !open)}>
+    <div on:click={() => (open = !open)} data-test="hamburger-icon">
       <Icon
         class="cursor-pointer"
         icon={open ? faTimes : faBars}
@@ -42,10 +42,10 @@
     class="hamburger-menu"
   >
     <div class="relative h-full">
-      <div class="w-5/6 md:w-2/3 lg:w-1/2">
+      <div class="w-5/6 md:w-2/3 lg:w-1/2 action">
         <slot name="action" />
       </div>
-      <div class="mt-4 inline-block">
+      <div class="mt-4 inline-block links">
         <slot name="links" />
       </div>
       <div class="absolute left-0 bottom-24">

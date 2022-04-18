@@ -50,7 +50,7 @@
 
   .fade-in {
     @apply absolute top-0 right-0 bg-blue-100 w-full h-full;
-    animation: heartRateIn 2.5s linear infinite;
+    animation: heartRateIn 2s linear infinite;
     animation-delay: var(--animation-delay, 0);
   }
 
@@ -59,7 +59,7 @@
     height: 100%;
     top: 0;
     left: 0;
-    animation: heartRateOut 2.5s linear infinite;
+    animation: heartRateOut 2s linear infinite;
     animation-delay: var(--animation-delay, 0);
     background: rgb(219, 234, 254);
     background: -moz-linear-gradient(
