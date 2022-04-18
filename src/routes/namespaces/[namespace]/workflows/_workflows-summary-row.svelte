@@ -1,10 +1,9 @@
 <script lang="ts">
   import { formatDate, getMilliseconds } from '$lib/utilities/format-date';
-
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import { routeForWorkflow } from '$lib/utilities/route-for';
 
-  import TableLink from '$lib/components/table-link.svelte';
+  import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import Copyable from '$lib/components/copyable.svelte';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
@@ -17,7 +16,7 @@
   });
 </script>
 
-<article class="row">
+<a {href} class="row group">
   <div class="cell">
     <div>
       <WorkflowStatus
@@ -27,14 +26,14 @@
     </div>
   </div>
   <div class="cell links font-medium md:font-normal">
-    <p>
-      <TableLink {href} data-test="workflow-link">{workflow.id}</TableLink>
-    </p>
+    <Copyable content={workflow.id}>
+      <span class="table-link">{workflow.id}</span>
+    </Copyable>
   </div>
   <div class="cell links font-medium md:font-normal">
-    <p>
-      <TableLink {href} data-test="workflow-link">{workflow.name}</TableLink>
-    </p>
+    <Copyable content={workflow.name}>
+      <span class="table-link">{workflow.name}</span>
+    </Copyable>
   </div>
   <div class="inline-block cell font-normal">
     <p>
@@ -47,11 +46,11 @@
       {formatDate(workflow.endTime, timeFormat)}
     </p>
   </div>
-</article>
+</a>
 
 <style lang="postcss">
   .row {
-    @apply no-underline p-2 text-sm border-b-2 items-center md:text-base md:table-row last-of-type:border-b-0;
+    @apply block no-underline p-2 text-sm border-b-2 items-center md:text-base md:table-row last-of-type:border-b-0;
   }
 
   .cell {
@@ -62,8 +61,8 @@
     @apply bg-gray-50;
   }
 
-  .row:hover :global(.table-link) {
-    @apply text-blue-700 border-b-2 border-blue-700;
+  .table-link {
+    @apply border-b-2 group-hover:text-blue-700 group-hover:border-blue-700;
   }
 
   .row:last-of-type .cell {
