@@ -78,7 +78,7 @@
   <section class="flex flex-col gap-1">
     <WorkflowDetail title="Workflow Type" content={workflow.name} />
     <WorkflowDetail title="Run ID" content={workflow.runId} />
-    <div class="flex gap-6">
+    <div class="flex gap-1 flex-col md:flex-row md:gap-6">
       <WorkflowDetail
         title="Start Time"
         content={formatDate(workflow.startTime, 'UTC')}
@@ -109,7 +109,7 @@
       content={workflow.stateTransitionCount}
     />
   </section>
-  <section class="flex gap-4 w-full h-fit">
+  <section class="flex gap-4 w-full h-fit flex-col lg:flex-row">
     <InputAndResults title="Input" content={input} />
     <InputAndResults title="Results" content={result} />
   </section>

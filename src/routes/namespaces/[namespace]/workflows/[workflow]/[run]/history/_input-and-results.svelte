@@ -6,7 +6,7 @@
 </script>
 
 {#if content}
-  <article class="border-2 border-gray-300 p-4 rounded-lg w-full">
+  <article class="border-2 border-gray-300 p-4 rounded-lg w-full lg:w-1/2">
     <h3 class="text-lg">{title}</h3>
     <CodeBlock {content} />
   </article>

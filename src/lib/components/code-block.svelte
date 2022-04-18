@@ -40,7 +40,7 @@
 </script>
 
 {#if content || content === null}
-  <div class="relative w-full h-full max-h-96 rounded-lg">
+  <div class="relative w-full lg:h-full max-h-96 rounded-lg h-auto">
     <!-- The spacing for this if statement is like this because PRE's honor all whitespace and 
       line breaks so we have this peculiar formatting to preserve this components output -->
     <pre
