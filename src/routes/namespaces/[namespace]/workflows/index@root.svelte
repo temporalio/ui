@@ -42,6 +42,7 @@
   import Pagination from '$lib/components/pagination.svelte';
   import Badge from '$lib/components/badge.svelte';
   import LoadingRow from '$lib/components/loading-row.svelte';
+  import LoadingIndicator from '$lib/components/Loading/loading-indicator.svelte';
 
   export let namespace: string;
   export let workflows: CombinedWorkflowExecutionsResponse;

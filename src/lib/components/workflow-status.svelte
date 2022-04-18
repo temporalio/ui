@@ -1,5 +1,12 @@
 <script lang="ts">
+  import FailedIndicator from './Loading/failed-indicator.svelte';
+
+  import LoadingIndicator from './Loading/loading-indicator.svelte';
+
   export let status: WorkflowExecutionStatus;
+
+  let isRunning: Boolean = status === 'Running';
+  let hasFailed: Boolean = status === 'Failed';
 
   const humanFriendlyNames = {
     Running: 'Running',
@@ -12,7 +19,7 @@
   };
 
   const colors = {
-    Running: 'blue',
+    Running: 'white',
     TimedOut: 'red',
     Completed: 'green',
     Failed: 'red',
@@ -25,8 +32,14 @@
   $: label = humanFriendlyNames[status];
 </script>
 
-<span class={`${color} rounded-md text-center px-2 text-sm`}>
-  {label}
+<span class={`flex rounded-md text-center text-sm`}>
+  <span class={`${color} text-sm z-10 px-2 `}>{label}</span>
+  {#if isRunning}
+    <LoadingIndicator />
+  {/if}
+  {#if hasFailed}
+    <FailedIndicator />
+  {/if}
 </span>
 
 <style lang="postcss">
