@@ -9,18 +9,14 @@
     routeForStackTrace,
     routeForWorkers,
     routeForWorkflowQuery,
-    routeForWorkflow,
   } from '$lib/utilities/route-for';
-  import { formatDate } from '$lib/utilities/format-date';
 
   import type { GetPollersResponse } from '$lib/services/pollers-service';
-  import Link from '$lib/components/link.svelte';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
   import ExportHistory from '$lib/components/export-history.svelte';
   import Tab from '$lib/components/tab.svelte';
-  import WorkflowDetail from './_workflow-detail.svelte';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
@@ -56,7 +52,7 @@
         <TerminateWorkflow {workflow} {namespace} />
       </div>
     </div>
-    <nav class="flex gap-6 mb-6">
+    <nav class="flex gap-6">
       <Tab
         label="History"
         href={routeForEventHistory(routeParameters)}
@@ -75,41 +71,5 @@
       <Tab label="Stack Trace" href={routeForStackTrace(routeParameters)} />
       <Tab label="Queries" href={routeForWorkflowQuery(routeParameters)} />
     </nav>
-    <section class="flex flex-col gap-1">
-      {#if historyActive}
-        <WorkflowDetail title="Workflow Type" content={workflow.name} />
-        <WorkflowDetail title="Run ID" content={workflow.runId} />
-        <div class="flex gap-6">
-          <WorkflowDetail
-            title="Start Time"
-            content={formatDate(workflow.startTime, 'UTC')}
-          />
-          <WorkflowDetail
-            title="Close Time"
-            content={formatDate(workflow.endTime, 'UTC')}
-          />
-        </div>
-        <WorkflowDetail
-          title="Task Queue"
-          content={workflow.taskQueue}
-          href={routeForWorkers(routeParameters)}
-        />
-        {#if workflow?.parent}
-          <WorkflowDetail
-            title="Parent"
-            content={workflow.parent?.workflowId}
-            href={routeForWorkflow({
-              namespace,
-              workflow: workflow.parent?.workflowId,
-              run: workflow.parent?.runId,
-            })}
-          />
-        {/if}
-        <WorkflowDetail
-          title="State Transitions"
-          content={workflow.stateTransitionCount}
-        />
-      {/if}
-    </section>
   </main>
 </header>
