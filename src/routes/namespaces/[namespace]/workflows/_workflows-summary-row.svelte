@@ -56,7 +56,7 @@
   }
 
   .cell {
-    @apply md:table-cell md:border-b-2 text-left p-2;
+    @apply md:table-cell md:border-b-2 text-left p-2 overflow-hidden whitespace-nowrap text-ellipsis;
   }
 
   .row:hover {
