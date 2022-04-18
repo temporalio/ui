@@ -27,17 +27,12 @@
 </script>
 
 <script lang="ts">
+  import NavigationHeader from '$lib/components/navigation-header.svelte';
+
   export let settings: Settings;
 </script>
 
-<header
-  class="grid grid-rows-1 grid-cols-12 px-10 items-center bg-gray-900 shadow-lg gap-6"
->
-  <a href="/" class="flex my-4 max-h-8">
-    <img src="/logo.svg" alt="Temporal Logo" class="max-h-8" />
-  </a>
-</header>
-
+<NavigationHeader href="/" user={undefined} />
 <section class="text-center my-[20vh]">
   <h1 class="text-8xl font-semibold">Welcome back.</h1>
   <p class="my-7">Lets get you signed in.</p>

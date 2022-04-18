@@ -6,7 +6,7 @@
   } from '$lib/utilities/route-for';
 
   import NamespaceSelect from './_namespace-select.svelte';
-  import NavigationLink from './_navigation-link.svelte';
+  import NavigationLink from '$lib/components/navigation-link.svelte';
   import IsCloudGuard from '$lib/components/is-cloud-guard.svelte';
   import HamburgerHeader from '$lib/components/hamburger-header.svelte';
 

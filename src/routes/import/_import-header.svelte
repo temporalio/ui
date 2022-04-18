@@ -1,7 +1,7 @@
 <script lang="ts">
   import NavigationHeader from '$lib/components/navigation-header.svelte';
   import { routeForImport } from '$lib/utilities/route-for';
-  import NavigationLink from '../_navigation-link.svelte';
+  import NavigationLink from '$lib/components/navigation-link.svelte';
 
   export let user: User;
 </script>
