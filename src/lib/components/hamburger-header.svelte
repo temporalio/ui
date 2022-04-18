@@ -11,7 +11,7 @@
   export let user: User;
   export let href: string;
 
-  $: open = true;
+  $: open = false;
 </script>
 
 <header class="hamburger-header">
@@ -58,13 +58,13 @@
 
 <style lang="postcss">
   .hamburger-header {
-    @apply grid xl:hidden grid-rows-1 grid-cols-12 px-10 items-center bg-gray-900 shadow-lg gap-6 py-2;
+    @apply fixed top-0 left-0 right-0 z-50 grid xl:hidden grid-rows-1 grid-cols-12 h-16 px-10 items-center bg-gray-900 shadow-lg gap-6 py-2;
   }
   .hamburger-header img {
     user-select: none;
   }
 
   .hamburger-menu {
-    @apply fixed xl:hidden z-50 bg-gray-900 top-12 left-0 w-2/3 bottom-0 p-4;
+    @apply fixed top-16 left-0 xl:hidden z-50 bg-gray-900 w-2/3 bottom-0 p-4;
   }
 </style>

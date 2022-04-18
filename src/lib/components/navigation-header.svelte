@@ -3,7 +3,7 @@
   import FeedbackButton from '$lib/components/feedback-button.svelte';
   import LogoutButton from '$lib/components/logout-button.svelte';
 
-  export let user: User;
+  export let user: User | undefined;
   export let href: string;
 </script>
 
@@ -18,16 +18,18 @@
     <slot name="links" />
   </div>
   <div class="flex justify-end gap-4 col-span-5 col-end-13 items-center">
-    <div class="text-right">
-      <DataConverterStatus />
-    </div>
-    <FeedbackButton />
-    <LogoutButton {user} />
+    {#if user}
+      <div class="text-right">
+        <DataConverterStatus />
+      </div>
+      <FeedbackButton />
+      <LogoutButton {user} />
+    {/if}
   </div>
 </header>
 
 <style lang="postcss">
   .navigation-header {
-    @apply hidden xl:grid grid-rows-1 grid-cols-12 px-10 items-center bg-gray-900 shadow-lg gap-6;
+    @apply hidden xl:grid grid-rows-1 grid-cols-12 h-16 px-10 items-center bg-gray-900 shadow-lg gap-6;
   }
 </style>

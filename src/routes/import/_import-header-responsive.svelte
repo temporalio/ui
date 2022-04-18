@@ -1,7 +1,7 @@
 <script lang="ts">
   import { routeForImport } from '$lib/utilities/route-for';
 
-  import NavigationLink from '../_navigation-link.svelte';
+  import NavigationLink from '$lib/components/navigation-link.svelte';
   import HamburgerHeader from '$lib/components/hamburger-header.svelte';
 
   export let user: User;
