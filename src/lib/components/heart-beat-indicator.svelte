@@ -43,7 +43,7 @@
 
   .heart-rate {
     @apply relative;
-    width: 24px;
+    width: 20px;
     height: 18px;
     margin: 0;
   }

@@ -33,7 +33,7 @@
   };
 </script>
 
-<DropdownMenu value={_value}>
+<DropdownMenu value={_value} left>
   {#each options as { label, option } (option)}
     <div
       class="option"
