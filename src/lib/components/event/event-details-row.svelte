@@ -14,7 +14,7 @@
 </script>
 
 <article
-  class="flex flex-column justify-between xl:flex-row gap-2 xl:gap-4 py-2 last:border-b-0 border-gray-200 first:pt-0 {$$props.class}"
+  class="flex flex-column justify-between xl:flex-row xl:gap-4 gap-2 py-2 last:border-b-0 border-gray-200 first:pt-0 {$$props.class}"
 >
   <p class="w-1/2 text-normal">{format(key)}</p>
   <div class="flex-grow w-full text-right xl:text-left">
