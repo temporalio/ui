@@ -1,14 +1,14 @@
 <script lang="ts">
   import '../app.css';
   import { Meta, Template, Story } from '@storybook/addon-svelte-csf';
-  import LoadingIndicator from '../lib/components/Loading/loading-indicator.svelte';
+  import HeartBeat from '../lib/components/heart-beat-indicator.svelte';
 </script>
 
 <!-- More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export -->
 <!-- More on argTypes: https://storybook.js.org/docs/svelte/api/argtypes -->
 <Meta
   title="Loading Indicator"
-  component={LoadingIndicator}
+  component={HeartBeat}
   argTypes={{
     placeholder: {
       name: 'Placeholder',
@@ -32,7 +32,7 @@
 
 <!-- More on component templates: https://storybook.js.org/docs/svelte/writing-stories/introduction#using-args -->
 <Template let:args>
-  <LoadingIndicator />
+  <HeartBeat />
 </Template>
 
 <!-- More on args: https://storybook.js.org/docs/svelte/writing-stories/args -->

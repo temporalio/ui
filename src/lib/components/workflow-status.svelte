@@ -1,12 +1,8 @@
 <script lang="ts">
-  import FailedIndicator from './Loading/failed-indicator.svelte';
-
-  import LoadingIndicator from './Loading/loading-indicator.svelte';
+  import HeartBeat from './heart-beat-indicator.svelte';
 
   export let status: WorkflowExecutionStatus;
-
-  let isRunning: Boolean = status === 'Running';
-  let hasFailed: Boolean = status === 'Failed';
+  export let delay: number;
 
   const humanFriendlyNames = {
     Running: 'Running',
@@ -19,7 +15,7 @@
   };
 
   const colors = {
-    Running: 'white',
+    Running: 'blue',
     TimedOut: 'red',
     Completed: 'green',
     Failed: 'red',
@@ -30,19 +26,24 @@
 
   $: color = colors[status];
   $: label = humanFriendlyNames[status];
+  $: isRunning = label === humanFriendlyNames.Running;
 </script>
 
-<span class={`flex rounded-md text-center text-sm`}>
-  <span class={`${color} text-sm z-10 px-2 `}>{label}</span>
-  {#if isRunning}
-    <LoadingIndicator />
-  {/if}
-  {#if hasFailed}
-    <FailedIndicator />
-  {/if}
+<span class={`status flex text-center font-medium leading-4`}>
+  <h6 class={`${color} flex rounded-sm z-10 px-1`}>
+    {label}
+    {#if isRunning}
+      <HeartBeat {delay} />
+    {/if}
+  </h6>
 </span>
 
 <style lang="postcss">
+  .status {
+    font-size: 12px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+  }
   .green {
     @apply bg-green-100 text-green-700;
   }

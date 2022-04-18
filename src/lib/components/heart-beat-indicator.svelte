@@ -1,10 +1,14 @@
-<script>
-  let text = '';
+<script lang="ts">
   // Heart rate animation
   // https://codepen.io/jupa8712/pen/XmbyXE?js-preprocessor=none
+
+  let text = '';
+  export let delay: number = 0;
+
+  $: cssVarStyles = `--animation-delay:${delay}ms;`;
 </script>
 
-<div class="LoadingIndicator">
+<div class="heart-beat" style={cssVarStyles}>
   <div class="heart-rate">
     <svg
       version="1.0"
@@ -12,7 +16,7 @@
       xmlns:xlink="http://www.w3.org/1999/xlink"
       x="0px"
       y="0px"
-      width="37.5px"
+      width="30px"
       height="18px"
       viewBox="0 0 150 73"
       enable-background="new 0 0 150 73"
@@ -20,10 +24,10 @@
     >
       <polyline
         fill="none"
-        stroke="#2b2b2b"
+        stroke="#1D4ED8"
         stroke-width="3"
         stroke-miterlimit="10"
-        points="0,45.486 38.514,45.486 44.595,33.324 52.676,45.486 57.771,45.486 62.838,55.622 71.959,9 80.067,63.729 83.122,45.486 97.297,45.486 103.379,41.419 110.473,45.486 150,45.486 200,45"
+        points="0,45.486 18.514,45.486 24.595,33.324 32.676,45.486 37.771,45.486 42.838,55.622 51.959,18 56.067,45 60.067,60.729 63.122,45.486 77.297,45.486 83.379,41.419 90.473,45.486 100,45.486"
       />
     </svg>
     <div class="fade-in" />
@@ -32,76 +36,60 @@
   {text}
 </div>
 
-<style>
-  .LoadingIndicator {
-    display: flex;
-    background: #ffffff;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    position: relative;
-    /* top: 0;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    height: 100vh; */
-    z-index: 1;
-    font-size: 60px;
+<style lang="postcss">
+  .heart-beat {
+    @apply flex bg-blue-100 justify-center items-center text-center relative;
   }
 
   .heart-rate {
-    width: 37.5px;
+    @apply relative;
+    width: 24px;
     height: 18px;
-    position: relative;
-    margin: 0 20px;
+    margin: 0;
   }
 
   .fade-in {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-color: #ffffff;
-    top: 0;
-    right: 0;
+    @apply absolute top-0 right-0 bg-blue-100 w-full h-full;
     animation: heartRateIn 2.5s linear infinite;
+    animation-delay: var(--animation-delay, 0);
   }
 
   .fade-out {
     position: absolute;
-    width: 120%;
     height: 100%;
     top: 0;
-    left: -120%;
+    left: 0;
     animation: heartRateOut 2.5s linear infinite;
-    background: rgba(255, 255, 255, 1);
+    animation-delay: var(--animation-delay, 0);
+    background: rgb(219, 234, 254);
     background: -moz-linear-gradient(
       left,
-      rgba(255, 255, 255, 1) 0%,
-      rgba(255, 255, 255, 1) 50%,
+      rgb(219, 234, 254) 0%,
+      rgb(219, 234, 254) 50%,
       rgba(255, 255, 255, 0) 100%
     );
     background: -webkit-linear-gradient(
       left,
-      rgba(255, 255, 255, 1) 0%,
-      rgba(255, 255, 255, 1) 50%,
+      rgb(219, 234, 254) 0%,
+      rgb(219, 234, 254) 50%,
       rgba(255, 255, 255, 0) 100%
     );
     background: -o-linear-gradient(
       left,
-      rgba(255, 255, 255, 1) 0%,
-      rgba(255, 255, 255, 1) 50%,
+      rgb(219, 234, 254) 0%,
+      rgb(219, 234, 254) 50%,
       rgba(255, 255, 255, 0) 100%
     );
     background: -ms-linear-gradient(
       left,
-      rgba(255, 255, 255, 1) 0%,
-      rgba(255, 255, 255, 1) 50%,
+      rgb(219, 234, 254) 0%,
+      rgb(219, 234, 254) 50%,
       rgba(255, 255, 255, 0) 100%
     );
     background: linear-gradient(
       to right,
-      rgba(255, 255, 255, 1) 0%,
-      rgba(255, 255, 255, 1) 80%,
+      rgb(219, 234, 254) 0%,
+      rgb(219, 234, 254) 80%,
       rgba(255, 255, 255, 0) 100%
     );
   }
@@ -120,13 +108,10 @@
 
   @keyframes heartRateOut {
     0% {
-      left: -120%;
-    }
-    30% {
-      left: -120%;
+      width: 0%;
     }
     100% {
-      left: 0;
+      width: 100%;
     }
   }
 </style>
