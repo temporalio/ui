@@ -18,7 +18,7 @@
   };
 </script>
 
-<div class="flex gap-2 items-center">
+<div class="flex gap-2 items-center group">
   <slot>{content}</slot>
   <button on:click|preventDefault|stopPropagation={copy}>
     <Icon
