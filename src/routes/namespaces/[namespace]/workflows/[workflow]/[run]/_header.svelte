@@ -20,6 +20,7 @@
   import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
   import ExportHistory from '$lib/components/export-history.svelte';
   import Tab from '$lib/components/tab.svelte';
+  import WorkflowDetail from './_workflow-detail.svelte';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
@@ -45,12 +46,10 @@
     >
       <Icon icon={faChevronLeft} />
     </a>
-    <div class="flex justify-between items-start mb-8">
-      <h1 class="text-base w-auto md:text-2xl md:flex relative items-center">
-        <span class="mr-2">
-          <WorkflowStatus status={workflow?.status} delay={0} />
-        </span>
-        <span class="font-medium break-all">{workflow.id}</span>
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-2xl flex relative items-center gap-4">
+        <WorkflowStatus status={workflow?.status} />
+        <span class="font-medium select-all">{workflow.id}</span>
       </h1>
       <div class="ml-8 flex justify-end items-center gap-4">
         <ExportHistory />
@@ -76,51 +75,41 @@
       <Tab label="Stack Trace" href={routeForStackTrace(routeParameters)} />
       <Tab label="Queries" href={routeForWorkflowQuery(routeParameters)} />
     </nav>
-    {#if historyActive}
-      <p class="text-md">
-        <span class="font-medium">Workflow Type:</span>
-        <span class="ml-1">{workflow.name}</span>
-      </p>
-      <p class="text-md">
-        <span class="font-medium">Run ID:</span>
-        <span class="ml-1">{workflow.runId}</span>
-      </p>
-      <div class="text-md md:flex gap-6">
-        <p>
-          <span class="font-medium">Start Time:</span>
-          <span class="ml-1">{formatDate(workflow.startTime, 'UTC')}</span>
-        </p>
-        <p>
-          <span class="font-medium">Closed Time:</span>
-          <span class="ml-1">{formatDate(workflow.endTime, 'UTC')}</span>
-        </p>
-      </div>
-      <p class="text-md">
-        <span class="font-medium">Task Queue:</span>
-        <span class="ml-1"
-          ><Link href={routeForWorkers(routeParameters)}
-            >{workflow.taskQueue}</Link
-          ></span
-        >
-      </p>
-      {#if workflow?.parent}
-        <p class="text-md">
-          <span class="font-medium">Parent:</span>
-          <span class="ml-1"
-            ><Link
-              href={routeForWorkflow({
-                namespace,
-                workflow: workflow.parent?.workflowId,
-                run: workflow.parent?.runId,
-              })}>{workflow.parent?.workflowId}</Link
-            ></span
-          >
-        </p>
+    <section class="flex flex-col gap-1">
+      {#if historyActive}
+        <WorkflowDetail title="Workflow Type" content={workflow.name} />
+        <WorkflowDetail title="Run ID" content={workflow.runId} />
+        <div class="flex gap-6">
+          <WorkflowDetail
+            title="Start Time"
+            content={formatDate(workflow.startTime, 'UTC')}
+          />
+          <WorkflowDetail
+            title="Close Time"
+            content={formatDate(workflow.endTime, 'UTC')}
+          />
+        </div>
+        <WorkflowDetail
+          title="Task Queue"
+          content={workflow.taskQueue}
+          href={routeForWorkers(routeParameters)}
+        />
+        {#if workflow?.parent}
+          <WorkflowDetail
+            title="Parent"
+            content={workflow.parent?.workflowId}
+            href={routeForWorkflow({
+              namespace,
+              workflow: workflow.parent?.workflowId,
+              run: workflow.parent?.runId,
+            })}
+          />
+        {/if}
+        <WorkflowDetail
+          title="State Transitions"
+          content={workflow.stateTransitionCount}
+        />
       {/if}
-      <p class="text-md">
-        <span class="font-medium">State Transitions:</span>
-        <span class="ml-1">{workflow.stateTransitionCount}</span>
-      </p>
-    {/if}
+    </section>
   </main>
 </header>

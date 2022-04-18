@@ -6,6 +6,8 @@
   import { shouldDisplayAsWorkflowLink } from '$lib/utilities/get-single-attribute-for-event';
 
   import CodeBlock from '../code-block.svelte';
+  import Link from '../link.svelte';
+  import Copyable from '../copyable.svelte';
 
   export let key: string;
   export let value: string | Record<string, unknown>;
@@ -21,15 +23,14 @@
     {#if typeof value === 'object'}
       <CodeBlock content={value} />
     {:else if shouldDisplayAsWorkflowLink(key)}
-      <a
-        href={routeForWorkflow({ namespace, workflow, run: value })}
-        class="border-b-2 hover:text-blue-700 hover:border-blue-700"
-      >
-        {value}
-      </a>
+      <Copyable content={value}>
+        <Link href={routeForWorkflow({ namespace, workflow, run: value })}>
+          {value}
+        </Link>
+      </Copyable>
     {:else}
       <p>
-        <span class="bg-gray-300 text-gray-700 px-2">{value}</span>
+        <span class="bg-gray-300 text-gray-700 px-2 select-all">{value}</span>
       </p>
     {/if}
   </div>

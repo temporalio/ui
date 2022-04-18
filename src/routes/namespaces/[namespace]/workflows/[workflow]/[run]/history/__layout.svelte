@@ -47,6 +47,7 @@
   import CodeBlock from '$lib/components/code-block.svelte';
   import PendingActivties from './_pending-activties.svelte';
   import WorkflowStackTrace from '$lib/components/workflow/workflow-stack-trace.svelte';
+  import InputAndResults from './_input-and-results.svelte';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
@@ -63,15 +64,9 @@
 </script>
 
 <section class="flex flex-col gap-4">
-  <section class="flex flex-col md:flex-row gap-4 w-full">
-    <article class="border-2 border-gray-300 p-4 rounded-lg w-full">
-      <h3 class="text-lg">Input</h3>
-      <CodeBlock content={input} />
-    </article>
-    <article class="border-2 border-gray-300 p-4 rounded-lg w-full">
-      <h3 class="text-lg">Results</h3>
-      <CodeBlock content={result} />
-    </article>
+  <section class="flex gap-4 w-full h-fit">
+    <InputAndResults title="Input" content={input} />
+    <InputAndResults title="Results" content={result} />
   </section>
   <WorkflowStackTrace {namespace} {workflow} />
   <PendingActivties />
