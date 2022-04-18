@@ -111,13 +111,13 @@
   </h2>
   <p>Run this command to enable Archival for Event Histories:</p>
   <CodeBlock
-    content={`tctl --namespace default namespace update --has enabled`}
+    content={`tctl --namespace ${namespace} namespace update --has enabled`}
     language="text"
   />
   {#if !visibilityArchivalEnabled}
     <p>To enable Visibility Archival:</p>
     <CodeBlock
-      content="tctl --namespace default namespace update -vas enabled"
+      content={`tctl --namespace ${namespace} namespace update -vas enabled`}
       language="text"
     />
   {/if}
