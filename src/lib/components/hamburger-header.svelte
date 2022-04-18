@@ -1,0 +1,70 @@
+<script lang="ts">
+  import Icon from 'svelte-fa';
+  import { faBars, faTimes } from '@fortawesome/free-solid-svg-icons';
+
+  import { fly } from 'svelte/transition';
+
+  import DataConverterStatus from '$lib/components/data-converter-status.svelte';
+  import FeedbackButton from '$lib/components/feedback-button.svelte';
+  import LogoutButton from '$lib/components/logout-button.svelte';
+
+  export let user: User;
+  export let href: string;
+
+  $: open = true;
+</script>
+
+<header class="hamburger-header">
+  <div class="flex gap-4 col-span-4 justify-start">
+    <div on:click={() => (open = !open)}>
+      <Icon
+        class="cursor-pointer"
+        icon={open ? faTimes : faBars}
+        color="white"
+      />
+    </div>
+  </div>
+  <div class="flex gap-4 col-span-4 justify-center">
+    <a {href} class="block">
+      <img src="/logo.svg" alt="Temporal Logo" class="max-h-10" />
+    </a>
+  </div>
+  <div class="flex gap-4 col-span-4 justify-end items-center">
+    <div class="text-right">
+      <DataConverterStatus />
+    </div>
+  </div>
+</header>
+{#if open}
+  <section
+    in:fly={{ x: -50, duration: 250 }}
+    out:fly={{ x: -50, duration: 250, delay: 100 }}
+    class="hamburger-menu"
+  >
+    <div class="relative h-full">
+      <div class="w-5/6 md:w-2/3 lg:w-1/2">
+        <slot name="action" />
+      </div>
+      <div class="mt-4 inline-block">
+        <slot name="links" />
+      </div>
+      <div class="absolute left-0 bottom-24">
+        <FeedbackButton />
+        <LogoutButton {user} />
+      </div>
+    </div>
+  </section>
+{/if}
+
+<style lang="postcss">
+  .hamburger-header {
+    @apply grid xl:hidden grid-rows-1 grid-cols-12 px-10 items-center bg-gray-900 shadow-lg gap-6 py-2;
+  }
+  .hamburger-header img {
+    user-select: none;
+  }
+
+  .hamburger-menu {
+    @apply fixed xl:hidden z-50 bg-gray-900 top-12 left-0 w-2/3 bottom-0 p-4;
+  }
+</style>

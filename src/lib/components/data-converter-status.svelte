@@ -16,7 +16,7 @@
 
 {#if $dataConverterPort}
   {#if $lastDataConverterStatus === 'notRequested'}
-    <Tooltip text={'Data converter is configured'}>
+    <Tooltip left text={'Data converter is configured'}>
       <div class="flex">
         <Icon
           icon={faLongArrowAltDown}
@@ -31,7 +31,10 @@
       </div>
     </Tooltip>
   {:else if $lastDataConverterStatus === 'error'}
-    <Tooltip text={`Data converter couldn't connect to the remote converter`}>
+    <Tooltip
+      left
+      text={`Data converter couldn't connect to the remote converter`}
+    >
       <div class="flex">
         <Icon
           icon={faLongArrowAltDown}
@@ -46,7 +49,7 @@
       </div>
     </Tooltip>
   {:else if $lastDataConverterStatus === 'success'}
-    <Tooltip text={'Data converter succesfully converted content'}>
+    <Tooltip left text={'Data converter succesfully converted content'}>
       <div class="flex">
         <Icon
           icon={faLongArrowAltDown}

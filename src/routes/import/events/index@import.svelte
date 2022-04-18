@@ -10,7 +10,7 @@
 
 <section class="flex flex-col gap-4">
   <section id="event-history">
-    <nav class="flex gap-4 justify-between items-end pb-4">
+    <nav class="block lg:flex gap-4 justify-between items-center pb-4">
       <h3 class="text-lg font-medium">Event History Import</h3>
       <div class="flex gap-4">
         <HistoryImport />

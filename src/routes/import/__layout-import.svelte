@@ -21,7 +21,8 @@
 </script>
 
 <script lang="ts">
-  import Header from './_header.svelte';
+  import Header from './_import-header.svelte';
+  import HeaderResponsive from './_import-header-responsive.svelte';
   import Notifications from '$lib/components/notifications.svelte';
   import Banner from '$lib/components/banner.svelte';
   import { ErrorBoundary } from '$lib/components/error-boundary';
@@ -46,6 +47,7 @@
   <Notifications />
   <Banner {cluster} />
   <Header {user} />
+  <HeaderResponsive {user} />
   <section id="content" class="h-full mx-10 mb-10 mt-8">
     <div class="flex flex-col h-full gap-4">
       <ErrorBoundary onError={() => {}}>
