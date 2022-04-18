@@ -63,7 +63,7 @@
 </script>
 
 <section class="flex flex-col gap-4">
-  <section class="flex gap-4 w-full">
+  <section class="flex flex-col md:flex-row gap-4 w-full">
     <article class="border-2 border-gray-300 p-4 rounded-lg w-full">
       <h3 class="text-lg">Input</h3>
       <CodeBlock content={input} />

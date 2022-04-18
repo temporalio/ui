@@ -50,19 +50,12 @@
         <span class="mr-2">
           <WorkflowStatus status={workflow?.status} delay={0} />
         </span>
-        <span class="font-medium">{workflow.id}</span>
-        <h1 class="text-base md:text-2xl relative w-auto">
-          <span class="font-medium break-all">{workflow.id}</span>
-          <span class="block md:inline mr-2">
-            <WorkflowStatus status={workflow?.status} delay={0} />
-            <span class="font-medium">{workflow.id}</span>
-          </span>
-        </h1>
-        <div class="ml-8 flex justify-end items-center gap-4">
-          <ExportHistory />
-          <TerminateWorkflow {workflow} {namespace} />
-        </div>
+        <span class="font-medium break-all">{workflow.id}</span>
       </h1>
+      <div class="ml-8 flex justify-end items-center gap-4">
+        <ExportHistory />
+        <TerminateWorkflow {workflow} {namespace} />
+      </div>
     </div>
     <nav class="flex gap-6 mb-6">
       <Tab

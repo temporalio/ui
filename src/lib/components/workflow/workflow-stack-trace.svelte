@@ -1,6 +1,7 @@
 <script lang="ts">
   import { getWorkflowStackTrace } from '$lib/services/query-service';
   import EmptyState from '$lib/components/empty-state.svelte';
+  import CodeBlock from '$lib/components/code-block.svelte';
   import { onMount } from 'svelte';
 
   export let namespace: string;
