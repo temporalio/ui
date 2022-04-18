@@ -1,6 +1,5 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
-  import type { CombinedWorkflowExecutionsResponse } from '$lib/services/workflow-service';
 
   import { fetchAllWorkflows } from '$lib/services/workflow-service';
 
@@ -26,7 +25,6 @@
   import Pagination from '$lib/components/pagination.svelte';
   import Badge from '$lib/components/badge.svelte';
   import LoadingRow from '$lib/components/loading-row.svelte';
-  import { onMount } from 'svelte';
   import { page } from '$app/stores';
 
   export let namespace: string;
