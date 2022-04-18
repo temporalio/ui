@@ -1,5 +1,8 @@
 <script lang="ts">
+  import HeartBeat from './heart-beat-indicator.svelte';
+
   export let status: WorkflowExecutionStatus;
+  export let delay: number;
 
   const humanFriendlyNames = {
     Running: 'Running',
@@ -23,13 +26,24 @@
 
   $: color = colors[status];
   $: label = humanFriendlyNames[status];
+  $: isRunning = label === humanFriendlyNames.Running;
 </script>
 
-<span class={`${color} rounded-md text-center px-2 text-sm`}>
-  {label}
+<span class={`status flex text-center font-medium leading-4`}>
+  <h6 class={`${color} flex rounded-sm z-10 px-1`}>
+    {label}
+    {#if isRunning}
+      <HeartBeat {delay} />
+    {/if}
+  </h6>
 </span>
 
 <style lang="postcss">
+  .status {
+    font-size: 12px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+  }
   .green {
     @apply bg-green-100 text-green-700;
   }

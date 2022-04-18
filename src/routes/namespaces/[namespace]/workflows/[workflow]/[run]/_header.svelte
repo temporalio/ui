@@ -46,9 +46,11 @@
       <Icon icon={faChevronLeft} />
     </a>
     <div class="flex justify-between items-center mb-8">
-      <h1 class="text-2xl relative">
+      <h1 class="text-2xl flex relative items-center">
+        <span class="mr-2"
+          ><WorkflowStatus status={workflow?.status} delay={0} /></span
+        >
         <span class="font-medium">{workflow.id}</span>
-        <WorkflowStatus status={workflow?.status} />
       </h1>
       <div class="flex justify-end items-center gap-4">
         <ExportHistory />

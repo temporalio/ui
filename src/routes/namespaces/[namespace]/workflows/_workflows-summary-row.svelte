@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { formatDate } from '$lib/utilities/format-date';
+  import { formatDate, getMilliseconds } from '$lib/utilities/format-date';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import { routeForWorkflow } from '$lib/utilities/route-for';
@@ -20,7 +20,10 @@
 <article class="row">
   <div class="cell">
     <div>
-      <WorkflowStatus status={workflow.status} />
+      <WorkflowStatus
+        status={workflow.status}
+        delay={getMilliseconds(workflow.startTime)}
+      />
     </div>
   </div>
   <div class="cell links font-medium md:font-normal">

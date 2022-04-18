@@ -3,6 +3,7 @@ import {
   parseJSON,
   formatDuration as durationToString,
   intervalToDuration,
+  getMilliseconds as getSecondAsMilliseconds,
 } from 'date-fns';
 import * as dateTz from 'date-fns-tz'; // `build` script fails on importing some of named CommonJS modules
 
@@ -137,4 +138,14 @@ export function formatDistanceAbbreviated({
   const duration = getDuration({ start, end });
   const distance = formatDuration(duration, ' ');
   return formatDistanceToSingleLetters(distance);
+}
+
+export function getMilliseconds(date: ValidTime | undefined | null): number {
+  if (!date) return 0;
+  if (isTimestamp(date)) {
+    date = timestampToDate(date);
+  }
+  const parsedDate = parseJSON(date);
+
+  return getSecondAsMilliseconds(parsedDate);
 }
