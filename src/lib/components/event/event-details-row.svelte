@@ -6,7 +6,6 @@
   import { shouldDisplayAsWorkflowLink } from '$lib/utilities/get-single-attribute-for-event';
 
   import CodeBlock from '../code-block.svelte';
-  import TableLink from '$lib/components/table-link.svelte';
 
   export let key: string;
   export let value: string | Record<string, unknown>;
@@ -22,9 +21,12 @@
     {#if typeof value === 'object'}
       <CodeBlock content={value} />
     {:else if shouldDisplayAsWorkflowLink(key)}
-      <TableLink href={routeForWorkflow({ namespace, workflow, run: value })}
-        >{value}</TableLink
+      <a
+        href={routeForWorkflow({ namespace, workflow, run: value })}
+        class="border-b-2 hover:text-blue-700 hover:border-blue-700"
       >
+        {value}
+      </a>
     {:else}
       <p>
         <span class="bg-gray-300 text-gray-700 px-2">{value}</span>
