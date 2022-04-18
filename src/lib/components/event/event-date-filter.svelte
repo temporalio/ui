@@ -66,7 +66,7 @@
       : `${$eventFilterSort}:${$eventTimeFormat}:${$eventShowElapsed}`;
 </script>
 
-<DropdownMenu {value}>
+<DropdownMenu {value} right>
   {#each sortOptions as { option, label } (option)}
     <div
       class="option"
