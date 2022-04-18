@@ -8,16 +8,16 @@
   import NamespaceSelect from './_namespace-select.svelte';
   import NavigationLink from './_navigation-link.svelte';
   import IsCloudGuard from '$lib/components/is-cloud-guard.svelte';
-  import NavigationHeader from '$lib/components/navigation-header.svelte';
+  import HamburgerHeader from '$lib/components/hamburger-header.svelte';
+
+  export let user: User;
 
   $: namespace =
     $page.params.namespace || $page.stuff?.settings?.defaultNamespace;
-
-  export let user: User;
 </script>
 
-<NavigationHeader {user} href={routeForWorkflows({ namespace })}>
-  <svelte:fragment slot="logo">
+<HamburgerHeader {user} href={routeForWorkflows({ namespace })}>
+  <svelte:fragment slot="action">
     <NamespaceSelect />
   </svelte:fragment>
   <svelte:fragment slot="links">
@@ -30,4 +30,4 @@
       </NavigationLink>
     </IsCloudGuard>
   </svelte:fragment>
-</NavigationHeader>
+</HamburgerHeader>
