@@ -18,8 +18,8 @@
 <article
   class="flex flex-column justify-between xl:flex-row xl:gap-4 gap-2 py-2 last:border-b-0 border-gray-200 first:pt-0 {$$props.class}"
 >
-  <p class="w-1/2 text-normal">{format(key)}</p>
-  <div class="flex-grow w-full text-right xl:text-left">
+  <p class="w-1/4 text-sm font-semibold">{format(key)}</p>
+  <div class="w-3/4 text-right xl:text-left">
     {#if typeof value === 'object'}
       <CodeBlock content={value} />
     {:else if shouldDisplayAsWorkflowLink(key)}
