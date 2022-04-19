@@ -43,9 +43,12 @@
             <div class="flex gap-2 items-center">
               <h3 class="whitespace-nowrap">Last Failure</h3>
               {#if pendingActivity.lastFailure}
-                <Copyable content={pendingActivity.lastFailure?.message}>
+                <Copyable
+                  content={pendingActivity.lastFailure?.message}
+                  container-class="overflow-y-scroll"
+                >
                   <pre
-                    class="w-full rounded-lg"><code class="language-json">{pendingActivity.lastFailure?.message}</code></pre>
+                    class="rounded-lg max-w-fit"><code class="language-json">{pendingActivity.lastFailure?.message}</code></pre>
                 </Copyable>
               {:else}
                 <span class="bg-gray-300 text-gray-700 px-2 text-sm"
