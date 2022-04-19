@@ -4,6 +4,7 @@
 
   export let content: string;
   export let visible = false;
+
   export let size:
     | 'xs'
     | 'sm'
@@ -32,7 +33,7 @@
   };
 </script>
 
-<div class="flex gap-2 items-center group">
+<div class="flex gap-2 items-center group {$$props['container-class']}">
   <slot>
     <span class={$$props.class} class:select-all={!$$slots.default}
       >{content}</span

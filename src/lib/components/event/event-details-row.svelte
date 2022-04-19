@@ -16,22 +16,28 @@
 </script>
 
 <article
-  class="flex flex-column justify-between xl:flex-row xl:gap-4 gap-2 py-2 last:border-b-0 border-gray-200 first:pt-0 {$$props.class}"
+  class="flex flex-col justify-between xl:flex-row xl:gap-4 gap-2 py-2 last:border-b-0 border-gray-200 first:pt-0 {$$props.class}"
 >
-  <p class="w-1/4 text-sm font-semibold">{format(key)}</p>
-  <div class="w-3/4 text-right xl:text-left">
-    {#if typeof value === 'object'}
-      <CodeBlock content={value} />
-    {:else if shouldDisplayAsWorkflowLink(key)}
-      <Copyable content={value}>
-        <Link href={routeForWorkflow({ namespace, workflow, run: value })}>
-          {value}
-        </Link>
-      </Copyable>
-    {:else}
-      <p>
+  {#if typeof value === 'object'}
+    <h2 class="w-full xl:w-1/4 text-sm">{format(key)}</h2>
+    <CodeBlock content={value} class="w-full xl:w-3/4" />
+  {:else if shouldDisplayAsWorkflowLink(key)}
+    <div class="flex w-full xl:3/4">
+      <h2 class="w-full xl:w-1/4 text-sm">{format(key)}</h2>
+      <div class="w-full xl:w-3/4 text-sm">
+        <Copyable content={value} container-class="flex-row-reverse">
+          <Link href={routeForWorkflow({ namespace, workflow, run: value })}>
+            {value}
+          </Link>
+        </Copyable>
+      </div>
+    </div>
+  {:else}
+    <div class="flex w-full xl:3/4">
+      <h2 class="w-full xl:w-1/4 text-sm">{format(key)}</h2>
+      <p class="w-full xl:w-3/4 text-sm text-right">
         <span class="bg-gray-300 text-gray-700 px-2 select-all">{value}</span>
       </p>
-    {/if}
-  </div>
+    </div>
+  {/if}
 </article>

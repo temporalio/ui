@@ -52,7 +52,7 @@
         <TerminateWorkflow {workflow} {namespace} />
       </div>
     </div>
-    <nav class="flex gap-6">
+    <nav class="flex gap-6 flex-wrap">
       <Tab
         label="History"
         href={routeForEventHistory(routeParameters)}
