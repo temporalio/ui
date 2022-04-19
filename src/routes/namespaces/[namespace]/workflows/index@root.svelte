@@ -53,7 +53,7 @@
 </script>
 
 <h2 class="text-2xl">Workflows <Badge type="beta">Beta</Badge></h2>
-<WorkflowFilters />
+<WorkflowFilters {parameters} />
 {#await workflows}
   <Pagination items={[]} let:visibleItems>
     <WorkflowsSummaryTable>
