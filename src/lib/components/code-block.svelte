@@ -40,8 +40,9 @@
 
 {#if content || content === null}
   <div
-    class="relative w-full max-h-96 rounded-lg h-auto {$$props.class}"
-    class:h-full={!inline}
+    class="relative w-full max-h-96 rounded-lg h-auto {$$props.class} {inline
+      ? ''
+      : 'lg:h-full'}"
   >
     <!-- The spacing for this if statement is like this because PRE's honor all whitespace and 
       line breaks so we have this peculiar formatting to preserve this components output -->
