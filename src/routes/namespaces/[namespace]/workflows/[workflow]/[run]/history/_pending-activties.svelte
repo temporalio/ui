@@ -5,6 +5,7 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { routeForPendingActivities } from '$lib/utilities/route-for';
   import Link from '$lib/components/link.svelte';
+  import Copyable from '$lib/components/copyable.svelte';
 
   const { pendingActivities } = $page.stuff.workflow;
   const { namespace, workflow, run } = $page.params;
@@ -29,10 +30,10 @@
             {pendingActivity.activityId}
           </div>
           <div class="w-full md:w-1/4">
-            <div class="flex gap-2">
+            <div class="flex gap-2 items-center">
               <h4>Activity Name</h4>
               <p>
-                <span class="bg-gray-300 text-gray-700 px-2">
+                <span class="bg-gray-300 text-gray-700 px-2 text-sm">
                   {pendingActivity.activityType}
                 </span>
               </p>
@@ -41,8 +42,16 @@
           <div class="w-full md:w-5/12">
             <div class="flex gap-2 items-center">
               <h3 class="whitespace-nowrap">Last Failure</h3>
-              <pre
-                class="w-full rounded-lg"><code class="language-json">{pendingActivity.lastFailure?.message ?? ''}</code></pre>
+              {#if pendingActivity.lastFailure}
+                <Copyable content={pendingActivity.lastFailure?.message}>
+                  <pre
+                    class="w-full rounded-lg"><code class="language-json">{pendingActivity.lastFailure?.message}</code></pre>
+                </Copyable>
+              {:else}
+                <span class="bg-gray-300 text-gray-700 px-2 text-sm"
+                  >(Empty)</span
+                >
+              {/if}
             </div>
           </div>
           <div class="w-full md:w-1/4">

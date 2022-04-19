@@ -54,7 +54,7 @@
   };
 </script>
 
-<article class="row mb-4" id={event.id}>
+<article class="row" id={event.id}>
   <div class="cell text-left">
     <a class="text-gray-500 mx-1 text-sm md:text-base" href="#{event.id}"
       >{event.id}</a
