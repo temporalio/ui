@@ -18,6 +18,6 @@
       <EventDetailsRow {key} {value} />
     {/each}
   {:else}
-    <EventDetailsRow {...getSingleAttributeForEvent(summaryEvent)} />
+    <EventDetailsRow {...getSingleAttributeForEvent(summaryEvent)} inline />
   {/if}
 </section>

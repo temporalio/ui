@@ -11,6 +11,7 @@
 
   export let key: string;
   export let value: string | Record<string, unknown>;
+  export let inline = false;
 
   const { workflow, namespace } = $page.params;
 </script>
@@ -22,7 +23,7 @@
     <h2 class="w-full items-center xl:items-start xl:w-1/4 text-sm">
       {format(key)}
     </h2>
-    <CodeBlock content={value} class="w-full xl:w-3/4" />
+    <CodeBlock content={value} class="w-full xl:w-3/4" {inline} />
   {:else if shouldDisplayAsWorkflowLink(key)}
     <div class="flex items-center xl:items-start w-full xl:3/4">
       <h2 class="w-full xl:w-1/4 text-sm">{format(key)}</h2>

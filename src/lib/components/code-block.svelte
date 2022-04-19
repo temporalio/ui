@@ -30,7 +30,7 @@
       parsedData = jsonData;
     }
 
-    return JSON.stringify(parsedData, undefined, 2);
+    return JSON.stringify(parsedData, undefined, inline ? 0 : 2);
   };
 
   onMount(() => {
