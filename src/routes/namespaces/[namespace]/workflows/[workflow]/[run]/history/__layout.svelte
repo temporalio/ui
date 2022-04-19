@@ -109,7 +109,7 @@
       content={workflow.stateTransitionCount}
     />
   </section>
-  <section class="flex gap-4 w-full h-fit flex-col lg:flex-row">
+  <section class="flex gap-4 w-full flex-col lg:flex-row">
     <InputAndResults title="Input" content={input} />
     <InputAndResults title="Results" content={result} />
   </section>
