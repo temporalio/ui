@@ -1,15 +1,17 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
-  import { durations } from '$lib/utilities/to-duration';
+  import { timeFormat } from '$lib/stores/time-format';
 
+  import { durations } from '$lib/utilities/to-duration';
   import Select from '$lib/components/select/select.svelte';
   import FilterSelect from '$lib/components/select/filter-select.svelte';
   import Option from '$lib/components/select/option.svelte';
   import FilterInput from '$lib/components/filter-input.svelte';
   import Search from '$lib/components/search.svelte';
+  import { toListWorkflowQuery } from '$lib/utilities/list-workflow-query';
 
-  import { timeFormat } from '$lib/stores/time-format';
+  export let parameters: ValidWorkflowParameters;
 
   const statuses = {
     All: null,
@@ -59,7 +61,7 @@
       </a>
     {:else}
       <a
-        href="{$page.url.pathname}?query"
+        href="{$page.url.pathname}?query={toListWorkflowQuery(parameters)}"
         class="text-blue-700"
         on:click|preventDefault={handleToggle('advanced')}
       >
