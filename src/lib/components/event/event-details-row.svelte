@@ -6,31 +6,44 @@
   import { shouldDisplayAsWorkflowLink } from '$lib/utilities/get-single-attribute-for-event';
 
   import CodeBlock from '../code-block.svelte';
+  import Link from '../link.svelte';
+  import Copyable from '../copyable.svelte';
 
   export let key: string;
   export let value: string | Record<string, unknown>;
+  export let inline = false;
 
   const { workflow, namespace } = $page.params;
 </script>
 
 <article
-  class="flex flex-column justify-between xl:flex-row xl:gap-4 gap-2 py-2 last:border-b-0 border-gray-200 first:pt-0 {$$props.class}"
+  class="flex flex-col justify-between xl:flex-row xl:gap-4 gap-2 py-2 last:border-b-0 border-gray-200 first:pt-0 {$$props.class}"
 >
-  <p class="w-1/2 text-normal">{format(key)}</p>
-  <div class="flex-grow w-full text-right xl:text-left">
-    {#if typeof value === 'object'}
-      <CodeBlock content={value} />
-    {:else if shouldDisplayAsWorkflowLink(key)}
-      <a
-        href={routeForWorkflow({ namespace, workflow, run: value })}
-        class="border-b-2 hover:text-blue-700 hover:border-blue-700"
-      >
-        {value}
-      </a>
-    {:else}
-      <p>
-        <span class="bg-gray-300 text-gray-700 px-2">{value}</span>
+  {#if typeof value === 'object'}
+    <h2 class="w-full items-center xl:items-start xl:w-1/4 text-sm">
+      {format(key)}
+    </h2>
+    <CodeBlock content={value} class="w-full xl:w-3/4" {inline} />
+  {:else if shouldDisplayAsWorkflowLink(key)}
+    <div class="flex items-center xl:items-start w-full xl:3/4">
+      <h2 class="w-full xl:w-1/4 text-sm">{format(key)}</h2>
+      <div class="w-full xl:w-3/4 text-sm">
+        <Copyable content={value} container-class="flex-row-reverse" size="xs">
+          <Link
+            href={routeForWorkflow({ namespace, workflow, run: value })}
+            class="whitespace-nowrap"
+          >
+            {value}
+          </Link>
+        </Copyable>
+      </div>
+    </div>
+  {:else}
+    <div class="flex items-center xl:items-start w-full xl:3/4">
+      <h2 class="w-full xl:w-1/4 text-sm">{format(key)}</h2>
+      <p class="w-full xl:w-3/4 text-sm text-right">
+        <span class="bg-gray-300 text-gray-700 px-2 select-all">{value}</span>
       </p>
-    {/if}
-  </div>
+    </div>
+  {/if}
 </article>

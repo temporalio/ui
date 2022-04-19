@@ -13,11 +13,11 @@
       <div class="table-header w-3/12 rounded-tl-md">
         {title}<EventCategoryFilter />
       </div>
-      <div class="table-header w-3/12">
+      <div class="table-header w-2/12">
         Date & Time
         {#if !compact}<EventDateFilter />{/if}
       </div>
-      <div class="table-header w-1/2 rounded-tr-md">Event Details</div>
+      <div class="table-header w-7/12 rounded-tr-md">Event Details</div>
     </div>
   </div>
   <div class="table-header-row-responsive rounded-t-md">

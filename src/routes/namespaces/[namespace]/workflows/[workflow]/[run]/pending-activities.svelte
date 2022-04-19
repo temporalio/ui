@@ -32,7 +32,7 @@
                       <CodeBlock content={value} />
                     {:else}
                       <p>
-                        <span class="bg-gray-300 text-gray-700 px-2"
+                        <span class="bg-gray-300 text-gray-700 px-2 select-all"
                           >{value}</span
                         >
                       </p>

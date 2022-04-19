@@ -1,6 +1,10 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
-  import type { EventView } from '$lib/utilities/route-for';
+  import {
+    EventView,
+    routeForWorkers,
+    routeForWorkflow,
+  } from '$lib/utilities/route-for';
 
   import { fetchEvents } from '$lib/services/events-service';
 
@@ -41,12 +45,14 @@
 
   import { routeForEventHistory } from '$lib/utilities/route-for';
   import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
+  import { formatDate } from '$lib/utilities/format-date';
 
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
-  import CodeBlock from '$lib/components/code-block.svelte';
   import PendingActivties from './_pending-activties.svelte';
   import WorkflowStackTrace from '$lib/components/workflow/workflow-stack-trace.svelte';
+  import InputAndResults from './_input-and-results.svelte';
+  import WorkflowDetail from '../_workflow-detail.svelte';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
@@ -60,18 +66,52 @@
     view,
     eventId,
   });
+
+  const workflowRoute = {
+    namespace,
+    workflow: workflow.id,
+    run: workflow.runId,
+  };
 </script>
 
 <section class="flex flex-col gap-4">
-  <section class="flex flex-col md:flex-row gap-4 w-full">
-    <article class="border-2 border-gray-300 p-4 rounded-lg w-full">
-      <h3 class="text-lg">Input</h3>
-      <CodeBlock content={input} />
-    </article>
-    <article class="border-2 border-gray-300 p-4 rounded-lg w-full">
-      <h3 class="text-lg">Results</h3>
-      <CodeBlock content={result} />
-    </article>
+  <section class="flex flex-col gap-1">
+    <WorkflowDetail title="Workflow Type" content={workflow.name} />
+    <WorkflowDetail title="Run ID" content={workflow.runId} />
+    <div class="flex gap-1 flex-col md:flex-row md:gap-6">
+      <WorkflowDetail
+        title="Start Time"
+        content={formatDate(workflow.startTime, 'UTC')}
+      />
+      <WorkflowDetail
+        title="Close Time"
+        content={formatDate(workflow.endTime, 'UTC')}
+      />
+    </div>
+    <WorkflowDetail
+      title="Task Queue"
+      content={workflow.taskQueue}
+      href={routeForWorkers(workflowRoute)}
+    />
+    {#if workflow?.parent}
+      <WorkflowDetail
+        title="Parent"
+        content={workflow.parent?.workflowId}
+        href={routeForWorkflow({
+          namespace,
+          workflow: workflow.parent?.workflowId,
+          run: workflow.parent?.runId,
+        })}
+      />
+    {/if}
+    <WorkflowDetail
+      title="State Transitions"
+      content={workflow.stateTransitionCount}
+    />
+  </section>
+  <section class="flex gap-4 w-full flex-col lg:flex-row">
+    <InputAndResults title="Input" content={input} />
+    <InputAndResults title="Results" content={result} />
   </section>
   <WorkflowStackTrace {namespace} {workflow} />
   <PendingActivties />

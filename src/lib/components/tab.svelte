@@ -8,7 +8,11 @@
   $: active = $page.url.pathname.includes(href);
 </script>
 
-<a class="block text-sm md:text-base" class:active {href}>
+<a
+  class="block text-sm md:text-base border-b-2 whitespace-nowrap"
+  class:active
+  {href}
+>
   {#if amount || amount === 0}
     {label}
     <span class="px-2 text-blue-700 bg-blue-100 rounded-sm">{amount}</span>

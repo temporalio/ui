@@ -6,6 +6,7 @@
 
   export let content: Parameters<typeof JSON.stringify>[0];
   export let copied = false;
+  export let inline = false;
   export let language = 'json';
 
   const isJSON = language === 'json';
@@ -29,9 +30,7 @@
       parsedData = jsonData;
     }
 
-    const formated = JSON.stringify(parsedData, undefined, 2);
-
-    return formated;
+    return JSON.stringify(parsedData, undefined, inline ? 0 : 2);
   };
 
   onMount(() => {
@@ -40,11 +39,16 @@
 </script>
 
 {#if content || content === null}
-  <div class="relative w-full h-auto">
+  <div
+    class="relative w-full max-h-96 rounded-lg h-auto {$$props.class} {inline
+      ? ''
+      : 'lg:h-full'}"
+  >
     <!-- The spacing for this if statement is like this because PRE's honor all whitespace and 
       line breaks so we have this peculiar formatting to preserve this components output -->
     <pre
-      class="p-4 rounded-lg overflow-scroll h-full max-h-96"><code class="language-{language}"
+      class="p-4 rounded-lg w-full overflow-x-scroll"
+      class:h-full={!inline}><code class="language-{language}"
       >{#if isJSON}{formatJSON(content)}{:else}{@html content}{/if}</code></pre>
 
     <button on:click={copy} class="absolute top-4 right-4">

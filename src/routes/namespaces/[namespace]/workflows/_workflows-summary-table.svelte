@@ -18,7 +18,7 @@
 
 <style lang="postcss">
   .workflow-table {
-    @apply md:table border-gray-300 border-2 rounded-lg w-full mb-6;
+    @apply md:table border-gray-900 border-2 rounded-lg w-full mb-6;
   }
 
   .table-header-row {
