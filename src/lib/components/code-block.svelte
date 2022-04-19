@@ -30,9 +30,7 @@
       parsedData = jsonData;
     }
 
-    const formated = JSON.stringify(parsedData, undefined, 2);
-
-    return formated;
+    return JSON.stringify(parsedData, undefined, 2);
   };
 
   onMount(() => {
