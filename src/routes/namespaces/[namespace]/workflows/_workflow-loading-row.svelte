@@ -1,18 +1,17 @@
 <article class="row">
-  <div class="cell">
+  <div class="cell md:table-cell">
     <p />
   </div>
-  <div class="cell w-1/2">
+  <div class="cell md:table-cell w-1/2">
     <p>Loading</p>
   </div>
-  <div class="cell">
+  <div class="cell md:table-cell">
     <p />
   </div>
-  <div class="cell">
+  <div class="cell inline-block md:hidden xl:table-cell">
     <p />
   </div>
-  <span class=" md:hidden"> - </span>
-  <div class="cell">
+  <div class="cell inline-block md:hidden xl:table-cell">
     <p />
   </div>
 </article>
@@ -23,7 +22,7 @@
   }
 
   .cell {
-    @apply md:table-cell md:border-b-2 text-left p-2;
+    @apply md:border-b-2 text-left p-2;
   }
 
   .row:last-of-type .cell {

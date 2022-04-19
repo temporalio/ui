@@ -1,13 +1,46 @@
+<script lang="ts">
+  import {
+    workflowIdColumnWidth,
+    workflowTypeColumnWidth,
+  } from '$lib/stores/column-width-store';
+
+  // Need to measure column width since we can't use a tooltip and use overflow-hidden for text overflow
+  let workflowIdWidth: number = 0;
+  let workflowTypeWidth: number = 0;
+
+  $: {
+    workflowIdColumnWidth.set(workflowIdWidth);
+  }
+
+  $: {
+    workflowTypeColumnWidth.set(workflowTypeWidth);
+  }
+</script>
+
 <section class="workflow-table">
   <div class="table-header-row md:table-header-group">
     <div class="md:table-row hidden">
-      <div class="table-header rounded-tl-md w-24">Status</div>
-      <div class="table-header">Workflow ID</div>
-      <div class="table-header w-44 lg:w-60 xl:w-80">Type</div>
-      <div class="table-header w-32 lg:w-40 xl:w-64 text-sm lg:text-base">
+      <div class="table-header table-cell rounded-tl-md w-24">Status</div>
+      <div
+        bind:offsetWidth={workflowIdWidth}
+        class="table-header table-cell md:w-60 xl:w-auto"
+      >
+        Workflow ID
+      </div>
+      <div
+        bind:offsetWidth={workflowTypeWidth}
+        class="table-header table-cell md:w-60 xl:w-80"
+      >
+        Type
+      </div>
+      <div
+        class="table-header hidden xl:table-cell xl:w-64 text-sm xl:text-base"
+      >
         Start
       </div>
-      <div class="table-header rounded-tr-md w-32 lg:w-40 xl:w-64">End</div>
+      <div class="table-header rounded-tr-md hidden xl:table-cell xl:w-64">
+        End
+      </div>
     </div>
   </div>
   <div class="table-header-row md:hidden">
@@ -24,10 +57,10 @@
   }
 
   .table-header-row {
-    @apply bg-gray-900 text-white rounded-t-lg;
+    @apply bg-gray-900 text-white rounded-t-sm md:rounded-t-lg;
   }
 
   .table-header {
-    @apply table-cell text-left p-2;
+    @apply text-left p-2;
   }
 </style>

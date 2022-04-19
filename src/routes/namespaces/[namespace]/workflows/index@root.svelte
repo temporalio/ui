@@ -24,7 +24,7 @@
   import EmptyState from '$lib/components/empty-state.svelte';
   import Pagination from '$lib/components/pagination.svelte';
   import Badge from '$lib/components/badge.svelte';
-  import LoadingRow from '$lib/components/loading-row.svelte';
+  import WorkflowLoadingRow from './_workflow-loading-row.svelte';
   import { page } from '$app/stores';
 
   export let namespace: string;
@@ -58,7 +58,7 @@
 {#await workflows}
   <Pagination items={[]} let:visibleItems>
     <WorkflowsSummaryTable>
-      <LoadingRow />
+      <WorkflowLoadingRow />
     </WorkflowsSummaryTable>
   </Pagination>
 {:then { workflows }}
