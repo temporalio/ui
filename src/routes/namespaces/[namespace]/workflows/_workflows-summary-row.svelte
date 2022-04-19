@@ -4,6 +4,7 @@
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Copyable from '$lib/components/copyable.svelte';
+  import Tooltip from '$lib/components/tooltip.svelte';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
@@ -25,11 +26,10 @@
       />
     </div>
   </div>
-  <div class="cell links font-medium md:font-normal flex gap-2">
-    <h3 class="md:hidden">Workflow ID:</h3>
-    <Copyable content={workflow.id} size="xs">
+  <div class="cell overflow-cell links font-medium md:font-normal">
+    <Tooltip bottom copyable text={workflow.id}>
       <span class="table-link">{workflow.id}</span>
-    </Copyable>
+    </Tooltip>
   </div>
   <div class="cell links font-medium md:font-normal flex gap-2">
     <h3 class="md:hidden">Workflow Name:</h3>
@@ -56,7 +56,11 @@
   }
 
   .cell {
-    @apply md:table-cell md:border-b-2 text-left p-2 overflow-hidden whitespace-nowrap text-ellipsis;
+    @apply md:table-cell md:border-b-2 text-left p-2;
+  }
+
+  .overflow-cell {
+    @apply whitespace-nowrap text-ellipsis;
   }
 
   .row:hover {

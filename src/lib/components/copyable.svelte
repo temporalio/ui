@@ -4,6 +4,7 @@
 
   export let content: string;
   export let visible = false;
+  export let color = 'black';
 
   export let size:
     | 'xs'
@@ -42,6 +43,7 @@
   <button on:click|preventDefault|stopPropagation={copy}>
     <Icon
       icon={copied ? faCheck : faCopy}
+      {color}
       class={visible ? 'visible' : 'invisible group-hover:visible'}
       {size}
     />

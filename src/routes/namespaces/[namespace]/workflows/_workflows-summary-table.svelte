@@ -3,9 +3,11 @@
     <div class="md:table-row hidden">
       <div class="table-header rounded-tl-md w-24">Status</div>
       <div class="table-header">Workflow ID</div>
-      <div class="table-header w-72">Type</div>
-      <div class="table-header w-60">Start</div>
-      <div class="table-header rounded-tr-md w-60">End</div>
+      <div class="table-header w-44 lg:w-60 xl:w-80">Type</div>
+      <div class="table-header w-32 lg:w-40 xl:w-64 text-sm lg:text-base">
+        Start
+      </div>
+      <div class="table-header rounded-tr-md w-32 lg:w-40 xl:w-64">End</div>
     </div>
   </div>
   <div class="table-header-row md:hidden">
