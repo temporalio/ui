@@ -113,12 +113,14 @@
   <CodeBlock
     content={`tctl --namespace default namespace update --has enabled`}
     language="text"
+    inline
   />
   {#if !visibilityArchivalEnabled}
     <p>To enable Visibility Archival:</p>
     <CodeBlock
       content="tctl --namespace default namespace update -vas enabled"
       language="text"
+      inline
     />
   {/if}
   <p>
