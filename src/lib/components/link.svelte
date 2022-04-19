@@ -7,7 +7,7 @@
   {href}
   class:active
   {...$$props}
-  class="border-b-0 md:border-b-2  border-blue-600 {$$props.class} hover:text-blue-900 hover:no-underline"
+  class="border-b-2 border-blue-600 {$$props.class} hover:text-blue-900 hover:no-underline"
 >
   <slot />
 </a>

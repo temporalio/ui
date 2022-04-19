@@ -3,11 +3,11 @@
 
   import Icon from 'svelte-fa';
   import { faCheck, faCopy } from '@fortawesome/free-solid-svg-icons';
-  import { compute_rest_props } from 'svelte/internal';
 
   export let content: Parameters<typeof JSON.stringify>[0];
   export let copied = false;
   export let language = 'json';
+  export let inline = false;
 
   const isJSON = language === 'json';
 
@@ -42,12 +42,14 @@
 
 {#if content || content === null}
   <div
-    class="relative w-full lg:h-full max-h-96 rounded-lg h-auto {$$props.class}"
+    class="relative w-full max-h-96 rounded-lg h-auto {$$props.class}"
+    class:h-full={!inline}
   >
     <!-- The spacing for this if statement is like this because PRE's honor all whitespace and 
       line breaks so we have this peculiar formatting to preserve this components output -->
     <pre
-      class="p-4 rounded-lg h-full w-full overflow-x-scroll"><code class="language-{language}"
+      class="p-4 rounded-lg w-full overflow-x-scroll"
+      class:h-full={!inline}><code class="language-{language}"
       >{#if isJSON}{formatJSON(content)}{:else}{@html content}{/if}</code></pre>
 
     <button on:click={copy} class="absolute top-4 right-4">

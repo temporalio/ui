@@ -63,8 +63,10 @@
       href="#{event.id}"
       class="md:mx-2 text-sm md:text-base font-semibold"
       class:link={!expandAll}
-      on:click|stopPropagation={onLinkClick}>{event.name}</a
+      on:click|stopPropagation={onLinkClick}
     >
+      {event.name}
+    </a>
     {#if expanded && compact}
       <EventGroupDetails {eventGroup} bind:selectedId />
     {/if}

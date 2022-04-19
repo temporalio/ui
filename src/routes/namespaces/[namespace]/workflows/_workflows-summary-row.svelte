@@ -27,13 +27,13 @@
   </div>
   <div class="cell links font-medium md:font-normal flex gap-2">
     <h3 class="md:hidden">Workflow ID:</h3>
-    <Copyable content={workflow.id}>
+    <Copyable content={workflow.id} size="xs">
       <span class="table-link">{workflow.id}</span>
     </Copyable>
   </div>
   <div class="cell links font-medium md:font-normal flex gap-2">
     <h3 class="md:hidden">Workflow Name:</h3>
-    <Copyable content={workflow.name}>
+    <Copyable content={workflow.name} size="xs">
       <span class="table-link">{workflow.name}</span>
     </Copyable>
   </div>
