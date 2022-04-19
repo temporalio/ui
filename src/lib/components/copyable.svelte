@@ -1,9 +1,12 @@
 <script lang="ts">
   import Icon from 'svelte-fa';
   import { faCheck, faCopy } from '@fortawesome/free-solid-svg-icons';
+  import { noop } from 'svelte/internal';
 
   export let content: string;
   export let visible = false;
+  export let color = 'black';
+  export let clickAllToCopy = false;
 
   export let size:
     | 'xs'
@@ -33,7 +36,10 @@
   };
 </script>
 
-<div class="flex gap-2 items-center group {$$props['container-class']}">
+<div
+  class="flex gap-2 items-center group {$$props['container-class']}"
+  on:click|preventDefault|stopPropagation={clickAllToCopy ? copy : noop}
+>
   <slot>
     <span class={$$props.class} class:select-all={!$$slots.default}
       >{content}</span
@@ -42,6 +48,7 @@
   <button on:click|preventDefault|stopPropagation={copy}>
     <Icon
       icon={copied ? faCheck : faCopy}
+      {color}
       class={visible ? 'visible' : 'invisible group-hover:visible'}
       {size}
     />

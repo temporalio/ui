@@ -1,10 +1,14 @@
 <script lang="ts">
   import { formatDate, getMilliseconds } from '$lib/utilities/format-date';
   import { routeForWorkflow } from '$lib/utilities/route-for';
+  import { getTruncatedWord } from '$lib/utilities/get-truncated-word';
+  import {
+    workflowIdColumnWidth,
+    workflowTypeColumnWidth,
+  } from '$lib/stores/column-width-store';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import Copyable from '$lib/components/copyable.svelte';
-
+  import Tooltip from '$lib/components/tooltip.svelte';
   export let namespace: string;
   export let workflow: WorkflowExecution;
   export let timeFormat: TimeFormat;
@@ -25,25 +29,34 @@
       />
     </div>
   </div>
-  <div class="cell links font-medium md:font-normal flex gap-2">
-    <h3 class="md:hidden">Workflow ID:</h3>
-    <Copyable content={workflow.id} size="xs">
-      <span class="table-link">{workflow.id}</span>
-    </Copyable>
+  <div class="cell overflow-cell links font-medium md:font-normal">
+    <Tooltip bottom copyable text={workflow.id}>
+      <span class="table-link"
+        >{getTruncatedWord(workflow.id, $workflowIdColumnWidth)}</span
+      >
+    </Tooltip>
+    <p class="time-cell-inline">
+      {formatDate(workflow.startTime, timeFormat)}
+    </p>
   </div>
   <div class="cell links font-medium md:font-normal flex gap-2">
     <h3 class="md:hidden">Workflow Name:</h3>
-    <Copyable content={workflow.name} size="xs">
-      <span class="table-link">{workflow.name}</span>
-    </Copyable>
+    <Tooltip bottom copyable text={workflow.name}>
+      <span class="table-link"
+        >{getTruncatedWord(workflow.name, $workflowTypeColumnWidth)}</span
+      >
+    </Tooltip>
+    <p class="time-cell-inline">
+      {formatDate(workflow.endTime, timeFormat)}
+    </p>
   </div>
-  <div class="inline-block cell font-normal">
+  <div class="time-cell font-normal">
     <p>
       {formatDate(workflow.startTime, timeFormat)}
     </p>
   </div>
   <span class="md:hidden"> - </span>
-  <div class="inline-block cell font-normal">
+  <div class="time-cell font-medium md:font-normal">
     <p>
       {formatDate(workflow.endTime, timeFormat)}
     </p>
@@ -55,8 +68,20 @@
     @apply block no-underline p-2 text-sm border-b-2 items-center md:text-base md:table-row last-of-type:border-b-0;
   }
 
+  .time-cell {
+    @apply inline-block md:hidden xl:table-cell md:border-b-2 text-left p-2;
+  }
+
+  .time-cell-inline {
+    @apply hidden md:block xl:hidden mt-2;
+  }
+
   .cell {
     @apply md:table-cell md:border-b-2 text-left p-2;
+  }
+
+  .overflow-cell {
+    @apply whitespace-nowrap text-ellipsis;
   }
 
   .row:hover {
@@ -64,7 +89,7 @@
   }
 
   .table-link {
-    @apply border-b-2 group-hover:text-blue-700 group-hover:border-blue-700;
+    @apply group-hover:text-blue-700 group-hover:underline group-hover:decoration-blue-700;
   }
 
   .row:last-of-type .cell {
