@@ -17,7 +17,6 @@
 
     return {
       props: {
-        namespaces,
         currentNamespace,
       },
     };
@@ -25,46 +24,55 @@
 </script>
 
 <script lang="ts">
-  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import Search from '$lib/components/search.svelte';
+  import { fromSecondsToDaysOrHours } from '$lib/utilities/format-date';
 
   let selectedNamespace =
     $page.params.namespace || $page.stuff?.settings?.defaultNamespace;
 
-  export let namespaces: DescribeNamespaceResponse[];
   export let currentNamespace: DescribeNamespaceResponse;
-
-  console.log('Current Namespace: ', currentNamespace);
-  let input = '';
 </script>
 
-<h2 class="text-2xl" data-test="archived-enabled-title">
+<h2 class="text-2xl" data-cy="settings-title">
   Settings: {selectedNamespace}
 </h2>
-<div class="w-1/2">
-  <Search placeholder="Search" value={input} icon />
-</div>
 <div class="flex">
-  <div class="recent-namespaces w-1/4 h-full p-4">
-    <h1 class="text-lg font-medium my-2">Recent Namespaces</h1>
-    {#each namespaces as namespace}
-      <div>{namespace.namespaceInfo.name}</div>
-    {/each}
-  </div>
-  <div class="namespace-info w-3/4 p-4 border-l-2">
-    <h1 class="text-lg font-medium my-2">Details</h1>
-    <p>Description: {currentNamespace.namespaceInfo.description}</p>
-    <p>Owner: {currentNamespace.namespaceInfo.ownerEmail}</p>
-    <p>Global? {currentNamespace.isGlobalNamespace ? 'Yes' : 'No'}</p>
-    <p>
-      Retention Period: {currentNamespace?.config
-        ?.workflowExecutionRetentionTtl}
+  <div class="namespace-info w-full p-4">
+    <h1 class="text-lg font-medium my-4">Details</h1>
+    <p data-cy="namespace-description">
+      <span class="font-medium mr-2">Description:</span>
+      {currentNamespace?.namespaceInfo?.description}
     </p>
-    <p>History Archival: {currentNamespace?.config?.historyArchivalState}</p>
-    <p>
-      Visibility Archival: {currentNamespace?.config?.visibilityArchivalState}
+    <p data-cy="namespace-owner">
+      <span class="font-medium mr-2">Owner:</span>
+      {currentNamespace?.namespaceInfo?.ownerEmail || 'Unknown'}
     </p>
-    <p>Clusters: {currentNamespace.replicationConfig.activeClusterName}</p>
+    <p data-cy="namespace-global">
+      <span class="font-medium mr-2">Global?</span>
+      {currentNamespace?.isGlobalNamespace ? 'Yes' : 'No'}
+    </p>
+    <p data-cy="namespace-retention">
+      <span class="font-medium mr-2">Retention Period:</span>
+      {fromSecondsToDaysOrHours(
+        currentNamespace?.config?.workflowExecutionRetentionTtl.toString(),
+      )}
+    </p>
+    <p data-cy="namespace-history">
+      <span class="font-medium mr-2">History Archival:</span>
+      {currentNamespace?.config?.historyArchivalState}
+    </p>
+    <p data-cy="namespace-visibility">
+      <span class="font-medium mr-2">Visibility Archival:</span>
+      {currentNamespace?.config?.visibilityArchivalState}
+    </p>
+    <p data-cy="namespace-failover">
+      <span class="font-medium mr-2">Failover Version:</span>
+      {currentNamespace?.failoverVersion}
+    </p>
+    <p data-cy="namespace-clusters">
+      <span class="font-medium mr-2">Clusters:</span>
+      {currentNamespace?.replicationConfig?.state} ({currentNamespace
+        ?.replicationConfig?.activeClusterName})
+    </p>
   </div>
 </div>

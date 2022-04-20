@@ -30,8 +30,10 @@
         Archival
       </NavigationLink>
     </IsCloudGuard>
-    <NavigationLink href={routeForSettings({ namespace })}>
-      Settings
-    </NavigationLink>
+    <IsCloudGuard>
+      <NavigationLink href={routeForSettings({ namespace })}>
+        Settings
+      </NavigationLink>
+    </IsCloudGuard>
   </svelte:fragment>
 </HamburgerHeader>

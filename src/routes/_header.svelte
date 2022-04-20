@@ -25,9 +25,11 @@
     <NavigationLink href={routeForWorkflows({ namespace })}>
       Workflows
     </NavigationLink>
-    <NavigationLink href={routeForSettings({ namespace })}>
-      Settings
-    </NavigationLink>
+    <IsCloudGuard>
+      <NavigationLink href={routeForSettings({ namespace })}>
+        Settings
+      </NavigationLink>
+    </IsCloudGuard>
     <IsCloudGuard>
       <NavigationLink href={routeForArchivalWorkfows({ namespace })}>
         Archival

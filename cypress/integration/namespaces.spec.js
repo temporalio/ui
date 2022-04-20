@@ -56,7 +56,7 @@ describe('Namespace Select', () => {
   });
   it('have the correct namespaces in the dropdown when using hamburger header', () => {
     cy.viewport(900, 600);
-    cy.get('[data-test="hamburger-icon"]').click();
+    cy.get('[data-cy="hamburger-icon"]').click();
     cy.get('.action')
       .find('.namespace-select')
       .find('option')
