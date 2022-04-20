@@ -11,7 +11,7 @@
   import Tooltip from '$lib/components/tooltip.svelte';
   export let namespace: string;
   export let workflow: WorkflowExecution;
-  export let timeFormat: TimeFormat;
+  export let timeFormat: TimeFormat | string;
 
   $: href = routeForWorkflow({
     namespace,
