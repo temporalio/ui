@@ -20,7 +20,7 @@
 
     return {
       props: { workflow, namespace, workers },
-      stuff: { workflow, namespace, workers },
+      stuff: { workflow, workers },
     };
   };
 </script>
