@@ -26,13 +26,11 @@
       Workflows
     </NavigationLink>
     <IsCloudGuard>
-      <NavigationLink href={routeForArchivalWorkfows({ namespace })}>
-        Archival
-      </NavigationLink>
-    </IsCloudGuard>
-    <IsCloudGuard>
       <NavigationLink href={routeForSettings({ namespace })}>
         Settings
+      </NavigationLink>
+      <NavigationLink href={routeForArchivalWorkfows({ namespace })}>
+        Archival
       </NavigationLink>
     </IsCloudGuard>
   </svelte:fragment>

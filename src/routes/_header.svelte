@@ -29,8 +29,6 @@
       <NavigationLink href={routeForSettings({ namespace })}>
         Settings
       </NavigationLink>
-    </IsCloudGuard>
-    <IsCloudGuard>
       <NavigationLink href={routeForArchivalWorkfows({ namespace })}>
         Archival
       </NavigationLink>

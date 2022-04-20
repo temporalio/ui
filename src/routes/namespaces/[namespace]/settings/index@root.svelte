@@ -31,9 +31,6 @@
     $page.params.namespace || $page.stuff?.settings?.defaultNamespace;
 
   export let currentNamespace: DescribeNamespaceResponse;
-
-  // State is incorrectly missing from INamespaceReplicationConfig type
-  let clusterState = (currentNamespace?.replicationConfig as any)?.state;
 </script>
 
 <h2 class="text-2xl" data-cy="settings-title">
@@ -74,7 +71,8 @@
     </p>
     <p data-cy="namespace-clusters">
       <span class="font-medium mr-2">Clusters:</span>
-      {clusterState} ({currentNamespace?.replicationConfig?.activeClusterName})
+      {currentNamespace?.replicationConfig?.state} ({currentNamespace
+        ?.replicationConfig?.activeClusterName})
     </p>
   </div>
 </div>
