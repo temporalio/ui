@@ -10,14 +10,14 @@
 <section class="event-table">
   <div class="table-header-row xl:table-header-group">
     <div class="xl:table-row hidden">
-      <div class="table-header w-3/12 rounded-tl-md">
+      <div class="table-header w-96 rounded-tl-md">
         {title}<EventCategoryFilter />
       </div>
-      <div class="table-header w-2/12">
+      <div class="table-header w-60">
         Date & Time
         {#if !compact}<EventDateFilter />{/if}
       </div>
-      <div class="table-header w-7/12 rounded-tr-md">Event Details</div>
+      <div class="table-header rounded-tr-md">Event Details</div>
     </div>
   </div>
   <div class="table-header-row-responsive rounded-t-md">
@@ -34,7 +34,7 @@
 
 <style lang="postcss">
   .event-table {
-    @apply xl:table border-gray-900 border-2 rounded-lg w-full;
+    @apply xl:table table-fixed border-gray-900 border-2 rounded-lg w-full;
   }
 
   .table-header-row {
@@ -46,6 +46,6 @@
   }
 
   .table-header {
-    @apply xl:table-cell table-cell text-left px-3 py-3;
+    @apply xl:table-cell text-left px-3 py-3;
   }
 </style>

@@ -40,14 +40,14 @@
 
 {#if content || content === null}
   <div
-    class="relative w-full max-h-96 rounded-lg h-auto {$$props.class} {inline
+    class="relative w-full rounded-lg h-auto {$$props.class} {inline
       ? ''
       : 'lg:h-full'}"
   >
     <!-- The spacing for this if statement is like this because PRE's honor all whitespace and 
       line breaks so we have this peculiar formatting to preserve this components output -->
     <pre
-      class="p-4 rounded-lg w-full overflow-x-scroll"
+      class="p-4 rounded-lg w-full overflow-x-scroll whitespace-pre"
       class:h-full={!inline}><code class="language-{language}"
       >{#if isJSON}{formatJSON(content)}{:else}{@html content}{/if}</code></pre>
 
@@ -56,3 +56,6 @@
     </button>
   </div>
 {/if}
+
+<style lang="postcss">
+</style>

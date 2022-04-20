@@ -91,12 +91,12 @@
 
 <style lang="postcss">
   .cell {
-    @apply xl:table-cell xl:border-b-2 py-1 px-3 leading-4;
+    @apply xl:table-cell xl:border-b-2 border-gray-700 py-1 px-3 leading-4;
     flex: 40%;
   }
 
   .row {
-    @apply no-underline py-3 text-sm border-b-2 items-center xl:text-base flex flex-wrap xl:table-row last-of-type:border-b-0;
+    @apply no-underline py-3 text-sm border-b-2 border-gray-700 items-center xl:text-base flex flex-wrap xl:table-row last-of-type:border-b-0;
   }
 
   .row:hover {
