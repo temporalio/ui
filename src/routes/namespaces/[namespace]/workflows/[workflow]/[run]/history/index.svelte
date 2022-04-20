@@ -8,10 +8,9 @@
   const { namespace, workflow, run } = $page.params;
 
   onMount(async () => {
-    const view = $eventViewType;
     goto(
       routeForEventHistory({
-        view,
+        view: $eventViewType,
         namespace,
         workflow,
         run,
