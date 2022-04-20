@@ -10,7 +10,7 @@
   onMount(async () => {
     goto(
       routeForEventHistory({
-        view: $eventViewType ?? 'summary',
+        view: $eventViewType,
         namespace,
         workflow,
         run,
