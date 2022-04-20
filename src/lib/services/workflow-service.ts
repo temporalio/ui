@@ -8,7 +8,7 @@ import {
 } from '$lib/models/workflow-execution';
 
 import { routeForApi } from '$lib/utilities/route-for-api';
-import { toListWorkflowQuery } from '$lib/utilities/list-workflow-query';
+import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;

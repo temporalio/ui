@@ -1,4 +1,4 @@
-import { formatISO, sub, add, intervalToDuration } from 'date-fns';
+import { formatISO, sub, add, intervalToDuration, parseISO } from 'date-fns';
 import { isString, isObject } from './is';
 
 type DurationKey = typeof durationKeys;
@@ -24,7 +24,7 @@ export const durations = [
   '90 days',
 ];
 
-const durationPattern = new RegExp(`(\\d+)\\s(${durationKeys.join('|')})`);
+const durationPattern = new RegExp(`(\\d+)\\s(${durationKeys.join('|')})`, 'g');
 
 export const isDurationKey = (key: unknown): key is DurationKey => {
   if (!isString(key)) return false;
@@ -49,21 +49,25 @@ export const isDuration = (value: unknown): value is Duration => {
 export const isDurationString = (value: unknown): value is string => {
   if (!isString(value)) return false;
 
-  const match = value.match(durationPattern);
-
-  if (!match) return false;
-
-  const [, amount, units] = match;
-  return !!amount && !!units;
+  return !!value.match(durationPattern);
 };
 
 export const tomorrow = (): string => {
   return formatISO(add(new Date(), { hours: 24 }));
 };
 
-export const toDuration = (value: string): Duration => {
-  const [, amount, units] = value.match(durationPattern);
-  return { [units]: parseInt(amount, 10) };
+export const toDuration = (value: string, delimiter = ','): Duration => {
+  const duration: Duration = {};
+  const segments = value.match(durationPattern);
+
+  for (const segment of segments) {
+    const [amount, unit] = segment.split(' ');
+    if (isDurationKey(unit)) {
+      duration[unit] = parseInt(amount, 10);
+    }
+  }
+
+  return duration;
 };
 
 export const toString = (duration: Duration): string => {
@@ -82,9 +86,14 @@ export const toDate = (timeRange: Duration | string): string => {
   return formatISO(sub(new Date(), duration));
 };
 
-export const fromDate = (targetDate: string | Date): Duration => {
-  if (isString(targetDate)) targetDate = new Date(targetDate);
-  return intervalToDuration({ start: new Date(), end: targetDate });
+export const fromDate = (
+  start: string | Date,
+  end: string | Date = new Date(),
+): Duration => {
+  if (isString(start)) start = parseISO(start);
+  if (isString(end)) end = parseISO(end);
+
+  return intervalToDuration({ start, end });
 };
 
 export const fromSeconds = (seconds: string): Duration => {

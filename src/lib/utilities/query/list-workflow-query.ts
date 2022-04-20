@@ -1,4 +1,4 @@
-import { isDuration, isDurationString, toDate, tomorrow } from './to-duration';
+import { isDuration, isDurationString, toDate, tomorrow } from '../to-duration';
 
 type QueryKey =
   | 'WorkflowId'
@@ -77,3 +77,5 @@ export const toListWorkflowQuery = (
 ): string => {
   return toQueryStatements(parameters).join(' and ');
 };
+
+export const fromListWorkflowQuery = (query: string) => {};
