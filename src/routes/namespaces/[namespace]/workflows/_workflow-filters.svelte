@@ -9,7 +9,7 @@
   import FilterInput from '$lib/components/filter-input.svelte';
   import Search from '$lib/components/search.svelte';
 
-  export let timeFormat: TimeFormat = 'UTC';
+  import { timeFormat } from '$lib/stores/time-format';
 
   const statuses = {
     All: null,
@@ -97,7 +97,7 @@
           <Option {value}>{label}</Option>
         {/each}
       </FilterSelect>
-      <Select id="filter-by-relative-time" bind:value={timeFormat}>
+      <Select id="filter-by-relative-time" bind:value={$timeFormat}>
         <Option value={'relative'}>Relative</Option>
         <Option value={'UTC'}>UTC</Option>
         <Option value={'local'}>Local</Option>

@@ -5,11 +5,8 @@
     formatDate,
     formatDistanceAbbreviated,
   } from '$lib/utilities/format-date';
-  import {
-    eventFilterSort,
-    eventTimeFormat,
-    eventShowElapsed,
-  } from '$lib/stores/event-filters';
+  import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-filters';
+  import { timeFormat } from '$lib/stores/time-format';
 
   import EventDetails from './event-details.svelte';
   import EventGroupDetails from './event-group-details.svelte';
@@ -79,7 +76,7 @@
       })}
       {timeDiffChange}
     {:else}
-      {formatDate(event?.eventTime, $eventTimeFormat)}
+      {formatDate(event?.eventTime, $timeFormat)}
     {/if}
   </div>
   <div class="cell links">

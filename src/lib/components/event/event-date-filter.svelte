@@ -62,10 +62,10 @@
 
   $: value =
     $eventFilterSort === '' &&
-    $eventTimeFormat === 'UTC' &&
+    $timeFormat === 'UTC' &&
     $eventShowElapsed === 'false'
       ? undefined
-      : `${$eventFilterSort}:${$eventTimeFormat}:${$eventShowElapsed}`;
+      : `${$eventFilterSort}:${$timeFormat}:${$eventShowElapsed}`;
 </script>
 
 <DropdownMenu {value} right>
@@ -92,11 +92,11 @@
   {#each dateOptions as { label, option } (option)}
     <div
       class="option"
-      class:active={$eventTimeFormat === option}
+      class:active={$timeFormat === option}
       on:click={() => onDateOptionClick(option)}
     >
       <div class="check">
-        {#if $eventTimeFormat === option}
+        {#if $timeFormat === option}
           <Icon icon={faCheck} scale={0.8} />
         {/if}
       </div>

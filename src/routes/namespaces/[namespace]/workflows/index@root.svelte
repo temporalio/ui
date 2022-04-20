@@ -26,11 +26,10 @@
   import Badge from '$lib/components/badge.svelte';
   import WorkflowLoadingRow from './_workflow-loading-row.svelte';
   import { page } from '$app/stores';
+  import { timeFormat } from '$lib/stores/time-format';
 
   export let namespace: string;
   export let isAdvancedSearch: boolean;
-
-  let timeFormat: TimeFormat = 'UTC';
 
   $: workflowId = $page.url.searchParams.get('workflow-id');
   $: workflowType = $page.url.searchParams.get('workflow-type');
@@ -54,7 +53,7 @@
 </script>
 
 <h2 class="text-2xl">Workflows <Badge type="beta">Beta</Badge></h2>
-<WorkflowFilters bind:timeFormat />
+<WorkflowFilters />
 {#await workflows}
   <Pagination items={[]} let:visibleItems>
     <WorkflowsSummaryTable>
@@ -66,7 +65,11 @@
     <Pagination items={workflows} let:visibleItems>
       <WorkflowsSummaryTable>
         {#each visibleItems as event}
-          <WorkflowsSummaryRow workflow={event} {namespace} {timeFormat} />
+          <WorkflowsSummaryRow
+            workflow={event}
+            {namespace}
+            timeFormat={$timeFormat}
+          />
         {/each}
       </WorkflowsSummaryTable>
     </Pagination>
