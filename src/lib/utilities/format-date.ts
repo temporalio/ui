@@ -149,3 +149,16 @@ export function getMilliseconds(date: ValidTime | undefined | null): number {
 
   return getSecondAsMilliseconds(parsedDate);
 }
+
+export function fromSecondsToDaysOrHours(seconds: string): string {
+  if (!seconds) return '';
+  if (seconds.includes('s')) {
+    seconds = seconds.replace('s', '');
+  }
+
+  const duration = intervalToDuration({
+    start: 0,
+    end: parseInt(seconds) * 1000,
+  });
+  return durationToString(duration, { format: ['days', 'hours'] });
+}

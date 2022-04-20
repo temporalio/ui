@@ -2,6 +2,7 @@ import {
   getDuration,
   formatDistance,
   formatDistanceAbbreviated,
+  fromSecondsToDaysOrHours,
 } from './format-date';
 
 describe(getDuration, () => {
@@ -125,5 +126,28 @@ describe(getDuration, () => {
       '2 years, 9 months, 11 days, 4 hours, 44 minutes, 18 seconds',
     );
     expect(abbvDistancer).toBe('2years 9months 11d 4h 44m 18s');
+  });
+});
+
+describe(fromSecondsToDaysOrHours, () => {
+  it('should return "1 day" for 86400 seconds', () => {
+    const seconds = '86400s';
+    expect(fromSecondsToDaysOrHours(seconds)).toBe('1 day');
+  });
+  it('should return "1 day" for 86400 seconds without s', () => {
+    const seconds = '86400';
+    expect(fromSecondsToDaysOrHours(seconds)).toBe('1 day');
+  });
+  it('should return "5 days" for 432000 seconds', () => {
+    const seconds = '432000s';
+    expect(fromSecondsToDaysOrHours(seconds)).toBe('5 days');
+  });
+  it('should return hours for less than 1 day of seconds', () => {
+    const seconds = '10800s';
+    expect(fromSecondsToDaysOrHours(seconds)).toBe('3 hours');
+  });
+  it('should return hour for one hour of seconds', () => {
+    const seconds = '3600s';
+    expect(fromSecondsToDaysOrHours(seconds)).toBe('1 hour');
   });
 });

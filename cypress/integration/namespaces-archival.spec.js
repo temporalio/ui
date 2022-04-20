@@ -16,7 +16,7 @@ describe('Archival disabled page', () => {
   });
 
   it('have the correct namespaces in the dropdown', () => {
-    cy.get('[data-test="archived-disabled-title"]').should(
+    cy.get('[data-cy="archived-disabled-title"]').should(
       'contain',
       'This namespace is currently not enabled for archival.',
     );
@@ -42,7 +42,7 @@ describe('Archival enabled page', () => {
   });
 
   it('have the correct namespaces in the dropdown', () => {
-    cy.get('[data-test="archived-enabled-title"]').should(
+    cy.get('[data-cy="archived-enabled-title"]').should(
       'contain',
       'Archived Workflows',
     );

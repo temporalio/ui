@@ -85,9 +85,7 @@
 </script>
 
 {#if archivalEnabled}
-  <h2 class="text-2xl" data-test="archived-enabled-title">
-    Archived Workflows
-  </h2>
+  <h2 class="text-2xl" data-cy="archived-enabled-title">Archived Workflows</h2>
   <WorkflowFilters bind:timeFormat />
   {#await data}
     <WorkflowsLoadingState />
@@ -106,7 +104,7 @@
     {/if}
   {/await}
 {:else}
-  <h2 class="text-2xl" data-test="archived-disabled-title">
+  <h2 class="text-2xl" data-cy="archived-disabled-title">
     This namespace is currently not enabled for archival.
   </h2>
   <p>Run this command to enable Archival for Event Histories:</p>

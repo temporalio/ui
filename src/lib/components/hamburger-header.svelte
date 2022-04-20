@@ -16,7 +16,7 @@
 
 <header class="hamburger-header">
   <div class="flex gap-4 col-span-4 justify-start">
-    <div on:click={() => (open = !open)} data-test="hamburger-icon">
+    <div on:click={() => (open = !open)} data-cy="hamburger-icon">
       <Icon
         class="cursor-pointer"
         icon={open ? faTimes : faBars}

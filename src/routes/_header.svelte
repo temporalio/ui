@@ -3,6 +3,7 @@
   import {
     routeForArchivalWorkfows,
     routeForWorkflows,
+    routeForSettings,
   } from '$lib/utilities/route-for';
 
   import NamespaceSelect from './_namespace-select.svelte';
@@ -25,6 +26,9 @@
       Workflows
     </NavigationLink>
     <IsCloudGuard>
+      <NavigationLink href={routeForSettings({ namespace })}>
+        Settings
+      </NavigationLink>
       <NavigationLink href={routeForArchivalWorkfows({ namespace })}>
         Archival
       </NavigationLink>

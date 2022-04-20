@@ -53,6 +53,10 @@ export const routeForArchivalWorkfows = (
   return `${routeForNamespace(parameters)}/archival`;
 };
 
+export const routeForSettings = (parameters: NamespaceParameter): string => {
+  return `${routeForNamespace(parameters)}/settings`;
+};
+
 export const routeForWorkflow = ({
   workflow,
   run,
