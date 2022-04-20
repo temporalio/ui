@@ -25,7 +25,7 @@
   import Header from './_import-header.svelte';
   import HeaderResponsive from './_import-header-responsive.svelte';
   import Notifications from '$lib/components/notifications.svelte';
-  import Banner from '$lib/components/banner.svelte';
+  import Banner from '$lib/components/banner/banner-temporal-version.svelte';
   import { ErrorBoundary } from '$lib/components/error-boundary';
 
   export let user: User;

@@ -1,7 +1,12 @@
+import { get } from 'svelte/store';
 import { persistStore } from '$lib/stores/persist-store';
 
-export const closedBannerId = persistStore('closedBannerId', null);
+export const closedBanners = persistStore('closedBanners', JSON.stringify([]));
 
 export const close = (bannerId: string): void => {
-  closedBannerId.set(bannerId);
+  let banners = JSON.parse(get(closedBanners)) ?? [];
+  banners = [...banners, bannerId];
+  banners = banners.slice(banners.length - 10, banners.length);
+
+  closedBanners.set(JSON.stringify(banners));
 };
