@@ -4,12 +4,13 @@
   import { timeFormat } from '$lib/stores/time-format';
 
   import { durations } from '$lib/utilities/to-duration';
+  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
+
   import Select from '$lib/components/select/select.svelte';
   import FilterSelect from '$lib/components/select/filter-select.svelte';
   import Option from '$lib/components/select/option.svelte';
   import FilterInput from '$lib/components/filter-input.svelte';
   import Search from '$lib/components/search.svelte';
-  import { toListWorkflowQuery } from '$lib/utilities/list-workflow-query';
 
   export let parameters: ValidWorkflowParameters;
 

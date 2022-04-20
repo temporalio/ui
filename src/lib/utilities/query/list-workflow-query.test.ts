@@ -1,4 +1,7 @@
-import { toListWorkflowQuery } from './list-workflow-query';
+import {
+  fromListWorkflowQuery,
+  toListWorkflowQuery,
+} from './list-workflow-query';
 
 describe(toListWorkflowQuery, () => {
   afterEach(() => {
@@ -61,5 +64,28 @@ describe(toListWorkflowQuery, () => {
     });
 
     expect(query).toBe('ExecutionStatus="Running" and WorkflowId="abcdef123"');
+  });
+});
+
+describe.skip(fromListWorkflowQuery, () => {
+  it('should parse the Workflow ID', () => {
+    const query = 'WorkflowId="db8949_Running"';
+    const expected = { workflowId: 'db8949_Running' };
+
+    expect(fromListWorkflowQuery(query)).toEqual(expected);
+  });
+
+  it('should parse the Workflow Type', () => {
+    const query = 'WorkflowType="VeryImportantWorkflow"';
+    const expected = { workflowId: 'VeryImportantWorkflow' };
+
+    expect(fromListWorkflowQuery(query)).toEqual(expected);
+  });
+
+  it('should parse the Execution Status', () => {
+    const query = 'ExecutionStatus="Running"';
+    const expected = { executionStatus: 'Running' };
+
+    expect(fromListWorkflowQuery(query)).toEqual(expected);
   });
 });
