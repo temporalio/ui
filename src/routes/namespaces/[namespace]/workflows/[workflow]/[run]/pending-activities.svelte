@@ -10,8 +10,8 @@
 </script>
 
 {#if pendingActivities.length}
-  <section class="border-2 border-gray-300 rounded-lg w-full mb-6">
-    <header class="table-header rounded-t-lg">
+  <section class="border-2 border-gray-900 rounded-lg w-full mb-6">
+    <header class="table-header">
       <h3>Pending Activities</h3>
     </header>
     <div>
@@ -52,6 +52,6 @@
 
 <style lang="postcss">
   .table-header {
-    @apply bg-gray-100 text-gray-800 font-semibold p-4 flex justify-between items-center border-b-2;
+    @apply bg-gray-900 text-white p-4 flex justify-between items-center border-b-2 border-gray-900;
   }
 </style>
