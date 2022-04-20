@@ -10,14 +10,14 @@
 <section class="event-table">
   <div class="table-header-row xl:table-header-group">
     <div class="xl:table-row hidden">
-      <div class="table-header w-96 rounded-tl-md">
+      <div class="table-header w-1/4 rounded-tl-md">
         {title}<EventCategoryFilter />
       </div>
-      <div class="table-header w-60">
+      <div class="table-header w-1/4">
         Date & Time
         {#if !compact}<EventDateFilter />{/if}
       </div>
-      <div class="table-header rounded-tr-md">Event Details</div>
+      <div class="table-header rounded-tr-md w-1/2">Event Details</div>
     </div>
   </div>
   <div class="table-header-row-responsive rounded-t-md">

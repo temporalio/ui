@@ -41,7 +41,7 @@
   {:else}
     <div class="flex items-center xl:items-start w-full xl:3/4">
       <h2 class="w-full xl:w-1/4 text-sm">{format(key)}</h2>
-      <p class="w-full xl:w-3/4 text-sm text-right">
+      <p class="w-full xl:w-3/4 text-sm text-right xl:text-left">
         <span class="bg-gray-300 text-gray-700 px-2 select-all">{value}</span>
       </p>
     </div>
