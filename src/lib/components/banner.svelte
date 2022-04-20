@@ -29,7 +29,7 @@
   <section class={`block leading-10 text-center ${severity}`}>
     <a
       href="https://github.com/temporalio/temporal/releases/tag/v{cluster
-        ?.versionInfo?.current?.version}"
+        ?.versionInfo?.recommended?.version}"
       target="_blank"
     >
       {message}
