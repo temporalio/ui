@@ -9,16 +9,18 @@
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
   import {
     eventFilterSort,
-    eventTimeFormat,
     eventShowElapsed,
     setFilterSort,
-    setTimeFormat,
     setShowElapsed,
   } from '$lib/stores/event-filters';
+  import {
+    timeFormat,
+    setTimeFormat,
+    TimeFormatOptions,
+  } from '$lib/stores/time-format';
   import type {
     EventFilterType,
     EventFilterTypeOptions,
-    EventTimeFormatOptions,
   } from '$lib/stores/event-filters';
 
   import { page } from '$app/stores';
@@ -30,7 +32,7 @@
     { label: 'Sort 9-1', option: 'reverse' },
   ];
 
-  let dateOptions: EventTimeFormatOptions = [
+  let dateOptions: TimeFormatOptions = [
     { label: 'UTC Time', option: 'UTC' },
     { label: 'Relative Time', option: 'relative' },
     { label: 'Local Time', option: 'local' },

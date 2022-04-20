@@ -5,7 +5,7 @@
   import {
     workflowIdColumnWidth,
     workflowTypeColumnWidth,
-  } from '$lib/stores/column-width-store';
+  } from '$lib/stores/column-width';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Tooltip from '$lib/components/tooltip.svelte';

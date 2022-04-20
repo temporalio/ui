@@ -2,7 +2,7 @@
   import {
     workflowIdColumnWidth,
     workflowTypeColumnWidth,
-  } from '$lib/stores/column-width-store';
+  } from '$lib/stores/column-width';
 
   // Need to measure column width since we can't use a tooltip and use overflow-hidden for text overflow
 </script>
