@@ -17,6 +17,12 @@ describe('Workflow Executions List', () => {
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/*/runs/*/query*`,
+      { fixture: 'query.json' },
+    ).as('query-api');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
         `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}?`,
       { fixture: 'workflow.json' },
     ).as('workflow-api');
@@ -47,7 +53,28 @@ describe('Workflow Executions List', () => {
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-api');
+    cy.wait('@query-api');
 
     cy.url().should('contain', '/summary');
+  });
+
+  it('default to last viewed event view when visiting a workflow', () => {
+    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
+
+    cy.wait('@workflow-api');
+    cy.wait('@event-history-api');
+    cy.wait('@query-api');
+
+    cy.url().should('contain', '/summary');
+
+    cy.get(
+      '[href="/namespaces/default/workflows/b12453_Completed/db7b0929-24bc-424c-a935-a1f8da69755e/history/full?per-page=100"]',
+    ).click();
+    cy.url().should('contain', '/full');
+
+    cy.visit('/namespaces/default/workflows');
+
+    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
+    cy.url().should('contain', '/full');
   });
 });
