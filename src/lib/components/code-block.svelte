@@ -40,7 +40,7 @@
 
 {#if content || content === null}
   <div
-    class="relative w-full max-h-96 rounded-lg h-auto {$$props.class} {inline
+    class="relative w-full rounded-lg h-auto {$$props.class} {inline
       ? ''
       : 'lg:h-full'}"
   >
