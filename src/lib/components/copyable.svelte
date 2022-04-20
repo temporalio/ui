@@ -26,6 +26,8 @@
   let copied = false;
 
   const copy = (event: Event) => {
+    event.preventDefault();
+    event.stopPropagation();
     navigator.clipboard
       .writeText(content)
       .then(() => {
@@ -38,14 +40,14 @@
 
 <div
   class="flex gap-2 items-center group {$$props['container-class']}"
-  on:click|preventDefault|stopPropagation={clickAllToCopy ? copy : noop}
+  on:click={clickAllToCopy ? copy : noop}
 >
   <slot>
     <span class={$$props.class} class:select-all={!$$slots.default}
       >{content}</span
     >
   </slot>
-  <button on:click|preventDefault|stopPropagation={copy}>
+  <button on:click={copy}>
     <Icon
       icon={copied ? faCheck : faCopy}
       {color}
