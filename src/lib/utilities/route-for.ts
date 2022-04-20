@@ -1,18 +1,17 @@
 import { browser } from '$app/env';
 
-export type EventView = 'full' | 'compact' | 'summary' | 'json';
-
 type RouteParameters = {
   namespace: string;
   workflow: string;
   run: string;
-  view?: EventView;
+  view?: EventView | string;
   eventId: string;
   queue: string;
 };
 
 export const isEventView = (view: string): view is EventView => {
   if (view === 'summary') return true;
+  if (view === 'full') return true;
   if (view === 'compact') return true;
   if (view === 'json') return true;
   return false;
@@ -72,11 +71,8 @@ export const routeForEventHistory = ({
   ...parameters
 }: EventHistoryParameters): string => {
   const eventHistoryPath = `${routeForWorkflow(parameters)}/history`;
-  if (!view) return eventHistoryPath;
-  if (view === 'summary') return `${eventHistoryPath}/summary`;
-  if (view === 'full') return `${eventHistoryPath}/full`;
-  if (view === 'compact') return `${eventHistoryPath}/compact`;
-  if (view === 'json') return `${eventHistoryPath}/json`;
+  if (!view || !isEventView(view)) return eventHistoryPath;
+  return `${eventHistoryPath}/${view}`;
 };
 
 export const routeForEventHistoryItem = (

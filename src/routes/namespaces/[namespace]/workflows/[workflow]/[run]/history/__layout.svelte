@@ -1,10 +1,6 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
-  import {
-    EventView,
-    routeForWorkers,
-    routeForWorkflow,
-  } from '$lib/utilities/route-for';
+  import { routeForWorkers, routeForWorkflow } from '$lib/utilities/route-for';
 
   import { fetchEvents } from '$lib/services/events-service';
 
@@ -46,6 +42,7 @@
   import { routeForEventHistory } from '$lib/utilities/route-for';
   import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
   import { formatDate } from '$lib/utilities/format-date';
+  import { eventViewType, setEventViewType } from '$lib/stores/event-view-type';
 
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
@@ -124,22 +121,26 @@
             icon={faTable}
             base={routeForEventHistory(routeParameters('summary'))}
             href={routeForEventHistory(routeParameters('summary'))}
-            >Summary</ToggleButton
+            active={$eventViewType === 'summary'}
+            on:click={() => setEventViewType('summary')}>Summary</ToggleButton
           >
           <ToggleButton
             icon={faBars}
             href={routeForEventHistory(routeParameters('full'))}
-            >Full</ToggleButton
+            active={$eventViewType === 'full'}
+            on:click={() => setEventViewType('full')}>Full</ToggleButton
           >
           <ToggleButton
             icon={faLayerGroup}
             href={routeForEventHistory(routeParameters('compact'))}
-            >Compact</ToggleButton
+            active={$eventViewType === 'compact'}
+            on:click={() => setEventViewType('compact')}>Compact</ToggleButton
           >
           <ToggleButton
             icon={faCode}
             href={routeForEventHistory(routeParameters('json'))}
-            >JSON</ToggleButton
+            active={$eventViewType === 'json'}
+            on:click={() => setEventViewType('json')}>JSON</ToggleButton
           >
         </ToggleButtons>
       </div>
