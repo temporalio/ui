@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { compute_rest_props } from 'svelte/internal';
-
   import HeartBeat from './heart-beat-indicator.svelte';
 
   export let status: WorkflowExecutionStatus;

@@ -66,14 +66,13 @@
   import EmptyState from '$lib/components/empty-state.svelte';
   import WorkflowsLoadingState from '../workflows/_workflows-loading.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
+  import { timeFormat } from '$lib/stores/time-format';
 
   export let namespace: string;
   export let initialData: ReturnType<typeof fetchAllArchivedWorkflows>;
   export let parameters: ArchiveFilterParameters;
   export let archivalEnabled: boolean = false;
   export let visibilityArchivalEnabled: boolean = false;
-
-  let timeFormat: TimeFormat = 'UTC';
 
   let data: Promise<CombinedWorkflowExecutionsResponse | null> = initialData;
 
@@ -86,14 +85,18 @@
 
 {#if archivalEnabled}
   <h2 class="text-2xl" data-cy="archived-enabled-title">Archived Workflows</h2>
-  <WorkflowFilters bind:timeFormat />
+  <WorkflowFilters />
   {#await data}
     <WorkflowsLoadingState />
   {:then { workflows }}
     {#if workflows.length}
       <WorkflowsSummaryTable>
         <VirtualList items={workflows} let:item>
-          <WorkflowsSummaryRow workflow={item} {namespace} {timeFormat} />
+          <WorkflowsSummaryRow
+            workflow={item}
+            {namespace}
+            timeFormat={$timeFormat}
+          />
         </VirtualList>
       </WorkflowsSummaryTable>
     {:else}

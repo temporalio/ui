@@ -10,7 +10,9 @@ export function persistStore(
   let initialStoreValue = initialValue;
   if (browser) {
     try {
-      initialStoreValue = JSON.parse(window?.localStorage?.getItem(name));
+      if (window?.localStorage?.getItem(name)) {
+        initialStoreValue = JSON.parse(window?.localStorage?.getItem(name));
+      }
     } catch (_err) {
       initialStoreValue = null;
     }

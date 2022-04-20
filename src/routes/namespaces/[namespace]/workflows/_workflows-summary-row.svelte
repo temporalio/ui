@@ -5,13 +5,13 @@
   import {
     workflowIdColumnWidth,
     workflowTypeColumnWidth,
-  } from '$lib/stores/column-width-store';
+  } from '$lib/stores/column-width';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Tooltip from '$lib/components/tooltip.svelte';
   export let namespace: string;
   export let workflow: WorkflowExecution;
-  export let timeFormat: TimeFormat;
+  export let timeFormat: TimeFormat | string;
 
   $: href = routeForWorkflow({
     namespace,
