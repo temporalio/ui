@@ -10,7 +10,7 @@
 <section class="workflow-table">
   <div class="table-header-row md:table-header-group">
     <div class="md:table-row hidden">
-      <div class="table-header table-cell rounded-tl-md w-24">Status</div>
+      <div class="table-header table-cell rounded-tl-md w-28">Status</div>
       <div
         bind:offsetWidth={$workflowIdColumnWidth}
         class="table-header table-cell md:w-60 xl:w-auto"
