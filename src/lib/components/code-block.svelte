@@ -47,7 +47,7 @@
     <!-- The spacing for this if statement is like this because PRE's honor all whitespace and 
       line breaks so we have this peculiar formatting to preserve this components output -->
     <pre
-      class="p-4 rounded-lg w-full overflow-x-scroll whitespace-pre"
+      class="p-4 rounded-lg w-full overflow-x-scroll"
       class:h-full={!inline}><code class="language-{language}"
       >{#if isJSON}{formatJSON(content)}{:else}{@html content}{/if}</code></pre>
 
@@ -56,6 +56,3 @@
     </button>
   </div>
 {/if}
-
-<style lang="postcss">
-</style>
