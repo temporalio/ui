@@ -12,6 +12,7 @@
   import Input from '$lib/components/input.svelte';
   import Search from '$lib/components/search.svelte';
   import { goto } from '$app/navigation';
+  import debounce from 'just-debounce';
 
   export let searchType: 'basic' | 'advanced';
   export let query: string;
@@ -48,10 +49,10 @@
     update(query);
   };
 
-  const handleParameterChange = () => {
+  const handleParameterChange = debounce(() => {
     query = toListWorkflowQuery(parameters);
     update(query);
-  };
+  }, 300);
 </script>
 
 <section class="flex flex-col gap-2">
@@ -93,7 +94,7 @@
       />
       <Input
         id="workflow-type-filter"
-        label="Workflow ID"
+        label="Workflow Type"
         bind:value={parameters.workflowType}
         on:input={handleParameterChange}
       />
