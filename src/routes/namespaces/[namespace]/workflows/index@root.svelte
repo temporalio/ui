@@ -39,6 +39,7 @@
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
   import WorkflowFilters from './_workflow-filters.svelte';
   import WorkflowsLoading from './_workflows-loading.svelte';
+  import debounce from 'just-debounce';
 
   export let namespace: string;
   export let searchType: 'basic' | 'advanced';
@@ -49,17 +50,21 @@
       query,
     });
 
-  const update = async (query: string) => {
+  let update = debounce(async (updatedQuery: string = query) => {
     updateQueryParameters({
       url: $page.url,
       parameter: 'query',
-      value: query,
+      value: updatedQuery,
       goto,
     });
-    fetchAllWorkflows(namespace, { query }).then((updatedWorkflows) => {
-      workflows = updatedWorkflows;
-    });
-  };
+    fetchAllWorkflows(namespace, { query: updatedQuery }).then(
+      (updatedWorkflows) => {
+        workflows = updatedWorkflows;
+      },
+    );
+  }, 50);
+
+  $: namespace && update();
 
   const errorMessage =
     searchType === 'advanced'
