@@ -1,5 +1,6 @@
 <script lang="ts">
   import { getGroupForEvent, isEventGroup } from '$lib/models/group-events';
+  import Icon from 'svelte-fa';
 
   import {
     formatDate,
@@ -12,6 +13,7 @@
   import EventGroupDetails from './event-group-details.svelte';
   import { isSubrowActivity } from '$lib/utilities/is-subrow-activity';
   import { eventViewType } from '$lib/stores/event-view-type';
+  import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
   export let event: IterableEvent;
   export let groups: CompactEventGroups;
@@ -76,6 +78,7 @@
       on:click|stopPropagation={onLinkClick}
     >
       {event.name}
+      <Icon class="inline" icon={expanded ? faAngleUp : faAngleDown} />
     </p>
     {#if expanded && compact}
       <EventGroupDetails {eventGroup} bind:selectedId />
@@ -104,16 +107,16 @@
 
 <style lang="postcss">
   .cell {
-    @apply xl:table-cell xl:border-b-2 border-gray-200 py-1 px-3 leading-4;
+    @apply xl:table-cell xl:border-b-2 border-gray-700 py-1 px-3 leading-4;
     flex: 40%;
   }
 
   .id-cell {
-    @apply hidden xl:table-cell xl:border-b-2 border-gray-200 py-1 px-3 leading-4;
+    @apply hidden xl:table-cell xl:border-b-2 border-gray-700 py-1 px-3 leading-4;
   }
 
   .row {
-    @apply no-underline py-3 text-sm border-b-2 border-gray-200 items-center xl:text-base flex flex-wrap xl:table-row last-of-type:border-b-0;
+    @apply no-underline xl:py-3 text-sm border-b-2 border-gray-700 items-center xl:text-base flex flex-wrap xl:table-row last-of-type:border-b-0;
   }
 
   .row:hover {
@@ -137,7 +140,7 @@
   }
 
   .subRow {
-    @apply ml-2 xl:ml-6 text-sm;
+    @apply ml-2 md:ml-4 xl:ml-6 text-sm;
   }
 
   .expanded {
