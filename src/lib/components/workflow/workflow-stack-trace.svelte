@@ -1,13 +1,16 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+
   import { getWorkflowStackTrace } from '$lib/services/query-service';
   import EmptyState from '$lib/components/empty-state.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
-  import { onMount } from 'svelte';
+
+  import type { ParsedQuery } from '$lib/services/query-service';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
 
-  let stackTrace;
+  let stackTrace: Eventual<ParsedQuery>;
 
   onMount(() => {
     const getStackTrace = () =>

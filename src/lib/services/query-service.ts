@@ -31,7 +31,7 @@ type QueryResponse = {
   queryResult: QueryType;
 } & Response;
 
-type ParsedQuery = ReturnType<typeof JSON.parse>[0];
+export type ParsedQuery = ReturnType<typeof JSON.parse>[0];
 
 const formatParameters = async (
   namespace: string,

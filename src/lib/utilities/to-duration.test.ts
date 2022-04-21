@@ -73,6 +73,18 @@ describe(toDuration, () => {
   it('should correctly parse "3 months"', () => {
     expect(toDuration('3 months')).toEqual({ months: 3 });
   });
+
+  it('should correctly parse "1 day"', () => {
+    expect(toDuration('1 day')).toEqual({ days: 1 });
+  });
+
+  it('should correctly parse "1 month"', () => {
+    expect(toDuration('1 month')).toEqual({ months: 1 });
+  });
+
+  it('should correctly parse "3 months"', () => {
+    expect(toDuration('3 months, 4 days')).toEqual({ months: 3, days: 4 });
+  });
 });
 
 describe(toDate, () => {
@@ -123,7 +135,7 @@ describe(fromDate, () => {
     const sixtyDaysEarlier = '2019-11-02T00:00:00Z';
 
     const result = fromDate(sixtyDaysEarlier);
-    expect(result).toEqual(expect.objectContaining({ months: 1, days: 29 }));
+    expect(result).toEqual(expect.objectContaining({ months: 1, days: 30 }));
   });
 
   it('should produce a duration based on 23 hours in the past', () => {
@@ -218,6 +230,10 @@ describe(isDurationKey, () => {
 describe(isDurationString, () => {
   it('should return true for "24 hours"', () => {
     expect(isDurationString('24 hours')).toBe(true);
+  });
+
+  it('should return true for "3 days, 24 hours"', () => {
+    expect(isDurationString('24 hours, 3 days')).toBe(true);
   });
 
   it('should return false for null', () => {

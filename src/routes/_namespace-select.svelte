@@ -32,6 +32,7 @@
 <div class="w-full">
   <Select
     dark
+    id="namespace-select"
     bind:value={selectedNamespace}
     on:change={switchNamespaces}
     class="namespace-select"

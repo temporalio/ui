@@ -1,4 +1,4 @@
-import { isDuration, isDurationString, toDate, tomorrow } from './to-duration';
+import { isDuration, isDurationString, toDate, tomorrow } from '../to-duration';
 
 type QueryKey =
   | 'WorkflowId'
@@ -36,6 +36,7 @@ const filterKeys: Readonly<FilterKey[]> = [
 const isValid = (value: unknown): boolean => {
   if (value === null) return false;
   if (value === undefined) return false;
+  if (value === '') return false;
   if (typeof value === 'string' && value === 'undefined') return false;
 
   return true;
@@ -53,6 +54,8 @@ const isFilterKey = (key: unknown): key is FilterKey => {
 
 const toQueryStatement = (key: FilterKey, value: FilterValue): string => {
   const queryKey = queryKeys[key];
+
+  if (value === 'All') return '';
 
   if (isDuration(value) || isDurationString(value)) {
     return `${queryKey} BETWEEN "${toDate(value)}" AND "${tomorrow()}"`;

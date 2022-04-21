@@ -9,7 +9,7 @@
 <Meta title="Heart Beat Indicator" component={HeartBeat} />
 
 <!-- More on component templates: https://storybook.js.org/docs/svelte/writing-stories/introduction#using-args -->
-<Template let:args>
+<Template>
   <HeartBeat />
 </Template>
 
