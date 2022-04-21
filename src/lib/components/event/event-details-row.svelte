@@ -28,7 +28,11 @@
     <div class="flex items-center xl:items-start w-full xl:3/4">
       <h2 class="w-full xl:w-1/4 text-sm">{format(key)}</h2>
       <div class="w-full xl:w-3/4 text-sm">
-        <Copyable content={value} container-class="flex-row-reverse" size="xs">
+        <Copyable
+          content={value}
+          container-class="flex-row-reverse xl:flex-row"
+          size="xs"
+        >
           <Link
             href={routeForWorkflow({ namespace, workflow, run: value })}
             class="whitespace-nowrap"

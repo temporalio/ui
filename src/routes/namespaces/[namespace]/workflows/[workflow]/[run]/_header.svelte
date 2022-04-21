@@ -2,7 +2,6 @@
   import Icon from 'svelte-fa';
   import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 
-  import { page } from '$app/stores';
   import {
     routeForEventHistory,
     routeForPendingActivities,
@@ -17,6 +16,7 @@
   import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
   import ExportHistory from '$lib/components/export-history.svelte';
   import Tab from '$lib/components/tab.svelte';
+  import { eventViewType } from '$lib/stores/event-view-type';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
@@ -27,10 +27,6 @@
     workflow: workflow.id,
     run: workflow.runId,
   };
-
-  $: historyActive = $page.url.pathname.includes(
-    routeForEventHistory(routeParameters),
-  );
 </script>
 
 <header class="flex flex-col gap-4">
@@ -55,7 +51,10 @@
     <nav class="flex gap-6 flex-wrap">
       <Tab
         label="History"
-        href={routeForEventHistory(routeParameters)}
+        href={routeForEventHistory({
+          view: $eventViewType,
+          ...routeParameters,
+        })}
         amount={workflow?.historyEvents}
       />
       <Tab

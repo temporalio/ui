@@ -43,7 +43,10 @@
     <h3 class="md:hidden">Workflow Name:</h3>
     <Tooltip bottom copyable text={workflow.name}>
       <span class="table-link"
-        >{getTruncatedWord(workflow.name, $workflowTypeColumnWidth)}</span
+        >{getTruncatedWord(
+          workflow.name,
+          $workflowTypeColumnWidth || $workflowIdColumnWidth,
+        )}</span
       >
     </Tooltip>
     <p class="time-cell-inline">

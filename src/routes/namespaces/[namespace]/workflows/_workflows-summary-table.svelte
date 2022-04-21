@@ -33,7 +33,11 @@
       </div>
     </div>
   </div>
-  <div class="table-header-row md:hidden">
+  <div
+    class="table-header-row md:hidden"
+    multiple
+    bind:offsetWidth={$workflowIdColumnWidth}
+  >
     <div class="p-2 border-b rounded-t-md">Summary</div>
   </div>
   <div class="overflow-y-auto md:table-row-group">
