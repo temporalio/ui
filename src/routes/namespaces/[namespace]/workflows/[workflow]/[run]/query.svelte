@@ -56,7 +56,7 @@
     </div>
   {:then types}
     <div class="flex items-center gap-4">
-      <Select id="namespace-select" label="Query Type" bind:value={queryType}>
+      <Select id="query-select" label="Query Type" bind:value={queryType}>
         {#each types as value}
           <Option {value}>{value}</Option>
         {/each}
