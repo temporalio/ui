@@ -1,5 +1,4 @@
 import { browser } from '$app/env';
-import { goto } from '$app/navigation';
 import { networkError } from '$lib/stores/error';
 import { notifications } from '../stores/notifications';
 import { isNetworkError } from './is-network-error';
@@ -8,9 +7,10 @@ import { routeForLoginPage } from './route-for';
 // This will eventually be expanded on.
 export const handleError = (error: unknown): void => {
   if (isUnauthorized(error) && browser) {
-    goto(routeForLoginPage());
+    window.location.href = routeForLoginPage();
     return;
   }
+
   if (isForbidden(error)) {
     notifications.add('error', `${error.statusCode} ${error.statusText}`);
     return;
