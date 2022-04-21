@@ -18,6 +18,12 @@ describe('Workflow Executions List', () => {
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/*/runs/*/query*`,
+      { fixture: 'query.json' },
+    ).as('query-api');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
         `/api/v1/namespaces/default/workflows/*/runs/*?`,
       { fixture: 'workflow.json' },
     ).as('workflow-api');
@@ -44,6 +50,7 @@ describe('Workflow Executions List', () => {
 
       cy.wait('@workflow-api');
       cy.wait('@event-history-api');
+      cy.wait('@query-api');
 
       cy.contains('No Events Match');
     });

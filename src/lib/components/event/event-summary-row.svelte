@@ -1,5 +1,6 @@
 <script lang="ts">
   import { getGroupForEvent, isEventGroup } from '$lib/models/group-events';
+  import Icon from 'svelte-fa';
 
   import {
     formatDate,
@@ -10,6 +11,9 @@
 
   import EventDetails from './event-details.svelte';
   import EventGroupDetails from './event-group-details.svelte';
+  import { isSubrowActivity } from '$lib/utilities/is-subrow-activity';
+  import { eventViewType } from '$lib/stores/event-view-type';
+  import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
   export let event: IterableEvent;
   export let groups: CompactEventGroups;
@@ -49,21 +53,33 @@
       expanded = !expanded;
     }
   };
+
+  $: subRow = isSubrowActivity(event) && $eventViewType === 'summary';
 </script>
 
-<article class="row" id={event.id}>
-  <div class="cell text-left">
-    <a class="text-gray-500 mx-1 text-sm md:text-base" href="#{event.id}"
-      >{event.id}</a
-    >
+<article class="row" id={event.id} class:expanded={expanded && !expandAll}>
+  <div class="id-cell text-left">
     <a
-      href="#{event.id}"
+      class="text-gray-500 mx-1 text-sm md:text-base"
+      class:subRow
+      href="#{event.id}">{event.id}</a
+    >
+  </div>
+  <div class="cell flex text-left">
+    <a
+      class="text-gray-500 mx-1 text-sm md:text-base xl:hidden"
+      class:subRow
+      href="#{event.id}">{event.id}</a
+    >
+    <p
       class="md:mx-2 text-sm md:text-base font-semibold"
+      class:subRow
       class:link={!expandAll}
       on:click|stopPropagation={onLinkClick}
     >
       {event.name}
-    </a>
+      <Icon class="inline" icon={expanded ? faAngleUp : faAngleDown} />
+    </p>
     {#if expanded && compact}
       <EventGroupDetails {eventGroup} bind:selectedId />
     {/if}
@@ -95,8 +111,12 @@
     flex: 40%;
   }
 
+  .id-cell {
+    @apply hidden xl:table-cell xl:border-b-2 border-gray-700 py-1 px-3 leading-4;
+  }
+
   .row {
-    @apply no-underline py-3 text-sm border-b-2 border-gray-700 items-center xl:text-base flex flex-wrap xl:table-row last-of-type:border-b-0;
+    @apply no-underline xl:py-3 text-sm border-b-2 border-gray-700 items-center xl:text-base flex flex-wrap xl:table-row last-of-type:border-b-0;
   }
 
   .row:hover {
@@ -108,10 +128,20 @@
   }
 
   .row:hover .link {
-    @apply text-blue-700 border-b-2 border-blue-700;
+    @apply text-blue-700 underline decoration-blue-700;
   }
 
-  .row:last-of-type .cell {
+  .row:last-of-type .cell,
+  .row:last-of-type .id-cell {
     @apply border-b-0 first-of-type:rounded-bl-lg  last-of-type:rounded-br-lg;
+  }
+
+  .subRow {
+    @apply ml-2 md:ml-4 xl:ml-6 text-sm;
+  }
+
+  .expanded,
+  .expanded:hover {
+    @apply bg-blue-50;
   }
 </style>
