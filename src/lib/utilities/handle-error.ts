@@ -7,7 +7,7 @@ import { routeForLoginPage } from './route-for';
 // This will eventually be expanded on.
 export const handleError = (error: unknown): void => {
   if (isUnauthorized(error) && browser) {
-    window.location.href = routeForLoginPage();
+    window.location.assign(routeForLoginPage());
     return;
   }
 
