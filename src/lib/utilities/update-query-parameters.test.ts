@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { updateQueryParameters } from './update-query-parameters';
 
 const gotoOptions = { replaceState: true, keepfocus: true, noscroll: true };

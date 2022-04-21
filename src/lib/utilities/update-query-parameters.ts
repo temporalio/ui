@@ -9,7 +9,11 @@ type UpdateQueryParams = {
   invalidate?: typeof invalidate;
 };
 
-const options = { replaceState: true, keepfocus: true, noscroll: true };
+export const gotoOptions = {
+  replaceState: true,
+  keepfocus: true,
+  noscroll: true,
+};
 
 export const updateQueryParameters = async ({
   parameter,
@@ -26,7 +30,7 @@ export const updateQueryParameters = async ({
   }
 
   if (browser) {
-    goto(String(url), options);
+    goto(String(url), gotoOptions);
   }
 
   return value;

@@ -1,9 +1,9 @@
 import { formatISO, sub, add, intervalToDuration, parseISO } from 'date-fns';
 import { isString, isObject } from './is';
 
-type DurationKey = typeof durationKeys;
+type DurationKey = keyof Duration;
 
-const durationKeys = [
+export const durationKeys: Readonly<DurationKey[]> = [
   'years',
   'months',
   'weeks',
@@ -15,16 +15,19 @@ const durationKeys = [
 
 export const durations = [
   '10 minutes',
-  '60 minutes',
+  '1 hour',
   '3 hours',
-  '24 hours',
+  '1 day',
   '3 days',
   '7 days',
   '30 days',
   '90 days',
 ];
 
-const durationPattern = new RegExp(`(\\d+)\\s(${durationKeys.join('|')})`, 'g');
+const durationPattern = new RegExp(
+  `(\\d+)\\s(${durationKeys.map((k) => k + '?').join('|')})`,
+  'g',
+);
 
 export const isDurationKey = (key: unknown): key is DurationKey => {
   if (!isString(key)) return false;
@@ -52,8 +55,8 @@ export const isDurationString = (value: unknown): value is string => {
   return !!value.match(durationPattern);
 };
 
-export const tomorrow = (): string => {
-  return formatISO(add(new Date(), { hours: 24 }));
+export const tomorrow = (date = new Date()): string => {
+  return formatISO(add(date, { hours: 24 }));
 };
 
 export const toDuration = (value: string, delimiter = ','): Duration => {
@@ -61,9 +64,13 @@ export const toDuration = (value: string, delimiter = ','): Duration => {
   const segments = value.match(durationPattern);
 
   for (const segment of segments) {
-    const [amount, unit] = segment.split(' ');
+    let [amount, unit] = segment.split(' ');
+    const n = parseInt(amount, 10);
+
+    if (!unit.endsWith('s')) unit = unit + 's';
+
     if (isDurationKey(unit)) {
-      duration[unit] = parseInt(amount, 10);
+      duration[unit] = n;
     }
   }
 

@@ -1,65 +1,75 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
 
-  import { fetchAllWorkflows } from '$lib/services/workflow-service';
+  import {
+    CombinedWorkflowExecutionsResponse,
+    fetchAllWorkflows,
+  } from '$lib/services/workflow-service';
+
+  const defaultQuery = toListWorkflowQuery({ timeRange: '1 day' });
 
   export const load: Load = async function ({ params, url }) {
-    const isAdvancedSearch = url.searchParams.has('query');
+    const searchType = getSearchType(url);
 
-    if (!url.searchParams.has('time-range') && !isAdvancedSearch)
-      url.searchParams.set('time-range', '24 hours');
+    if (!url.searchParams.has('query')) {
+      url.searchParams.set('query', defaultQuery);
+    }
 
+    const query = url.searchParams.get('query');
     const { namespace } = params;
 
     return {
-      props: { namespace, isAdvancedSearch },
+      props: { namespace, searchType, query },
     };
   };
 </script>
 
 <script lang="ts">
+  import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
+  import { timeFormat } from '$lib/stores/time-format';
+
   import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
   import WorkflowFilters from './_workflow-filters.svelte';
   import EmptyState from '$lib/components/empty-state.svelte';
   import Pagination from '$lib/components/pagination.svelte';
   import Badge from '$lib/components/badge.svelte';
-  import WorkflowLoadingRow from './_workflow-loading-row.svelte';
-  import { page } from '$app/stores';
-  import { timeFormat } from '$lib/stores/time-format';
+  import { getSearchType } from '$lib/utilities/search-type-parameter';
+  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   export let namespace: string;
-  export let isAdvancedSearch: boolean;
+  export let searchType: 'basic' | 'advanced';
+  export let query: string;
 
-  $: workflowId = $page.url.searchParams.get('workflow-id');
-  $: workflowType = $page.url.searchParams.get('workflow-type');
-  $: timeRange = $page.url.searchParams.get('time-range');
-  $: executionStatus = $page.url.searchParams.get('status') as WorkflowStatus;
-  $: query = $page.url.searchParams.get('query');
+  let workflows: Eventual<CombinedWorkflowExecutionsResponse> =
+    fetchAllWorkflows(namespace, {
+      query,
+    });
 
-  $: parameters = {
-    workflowId,
-    workflowType,
-    timeRange,
-    executionStatus,
-    query,
+  const update = async (query: string) => {
+    updateQueryParameters({
+      url: $page.url,
+      parameter: 'query',
+      value: query,
+      goto,
+    });
+    fetchAllWorkflows(namespace, { query }).then((updatedWorkflows) => {
+      workflows = updatedWorkflows;
+    });
   };
 
-  $: workflows = fetchAllWorkflows(namespace, parameters, fetch);
-
-  const errorMessage = isAdvancedSearch
-    ? 'Please check your syntax and try again.'
-    : 'If you have filters applied, try adjusting them.';
+  const errorMessage =
+    searchType === 'advanced'
+      ? 'Please check your syntax and try again.'
+      : 'If you have filters applied, try adjusting them.';
 </script>
 
 <h2 class="text-2xl">Workflows <Badge type="beta">Beta</Badge></h2>
-<WorkflowFilters {parameters} />
+<WorkflowFilters bind:searchType bind:query {update} />
 {#await workflows}
-  <Pagination items={[]} let:visibleItems>
-    <WorkflowsSummaryTable>
-      <WorkflowLoadingRow />
-    </WorkflowsSummaryTable>
-  </Pagination>
+  <p>Loading…</p>
 {:then { workflows }}
   {#if workflows.length}
     <Pagination items={workflows} let:visibleItems>
