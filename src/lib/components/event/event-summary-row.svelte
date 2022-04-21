@@ -10,6 +10,7 @@
 
   import EventDetails from './event-details.svelte';
   import EventGroupDetails from './event-group-details.svelte';
+  import { isSubrowActivity } from '$lib/utilities/is-subrow-activity';
 
   export let event: IterableEvent;
   export let groups: CompactEventGroups;
@@ -49,16 +50,22 @@
       expanded = !expanded;
     }
   };
+
+  $: subRow = isSubrowActivity(event);
 </script>
 
 <article class="row" id={event.id}>
   <div class="cell text-left">
-    <a class="text-gray-500 mx-1 text-sm md:text-base" href="#{event.id}"
-      >{event.id}</a
+    <a
+      class="text-gray-500 mx-1 text-sm md:text-base"
+      class:subRow
+      href="#{event.id}">{event.id}</a
     >
     <a
       href="#{event.id}"
-      class="md:mx-2 text-sm md:text-base font-semibold"
+      class="md:mx-2 text-sm md:text-base font-semibold {subRow
+        ? 'md:text-sm md:mx-0'
+        : ''}"
       class:link={!expandAll}
       on:click|stopPropagation={onLinkClick}
     >
@@ -108,10 +115,14 @@
   }
 
   .row:hover .link {
-    @apply text-blue-700 border-b-2 border-blue-700;
+    @apply text-blue-700 underline decoration-blue-700;
   }
 
   .row:last-of-type .cell {
     @apply border-b-0 first-of-type:rounded-bl-lg  last-of-type:rounded-br-lg;
+  }
+
+  .subRow {
+    @apply ml-8 text-sm;
   }
 </style>
