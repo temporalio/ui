@@ -131,10 +131,7 @@
     @apply text-blue-700 underline decoration-blue-700;
   }
 
-  .row:last-of-type .cell {
-    @apply border-b-0 first-of-type:rounded-bl-lg  last-of-type:rounded-br-lg;
-  }
-
+  .row:last-of-type .cell,
   .row:last-of-type .id-cell {
     @apply border-b-0 first-of-type:rounded-bl-lg  last-of-type:rounded-br-lg;
   }
@@ -143,10 +140,7 @@
     @apply ml-2 md:ml-4 xl:ml-6 text-sm;
   }
 
-  .expanded {
-    @apply bg-blue-50;
-  }
-
+  .expanded,
   .expanded:hover {
     @apply bg-blue-50;
   }
