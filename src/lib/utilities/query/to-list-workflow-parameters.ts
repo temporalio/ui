@@ -1,6 +1,6 @@
 import { formatDuration } from 'date-fns';
 import { isExecutionStatus } from '../is';
-import { durationKeys, fromDate, isDurationKey } from '../to-duration';
+import { durationKeys, fromDate } from '../to-duration';
 import { tokenize } from './tokenize';
 
 type Tokens = string[];
