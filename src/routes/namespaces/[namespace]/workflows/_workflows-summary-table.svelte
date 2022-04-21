@@ -2,6 +2,7 @@
   import {
     workflowIdColumnWidth,
     workflowTypeColumnWidth,
+    workflowSummaryColumnWidth,
   } from '$lib/stores/column-width';
 
   // Need to measure column width since we can't use a tooltip and use overflow-hidden for text overflow
@@ -33,7 +34,10 @@
       </div>
     </div>
   </div>
-  <div class="table-header-row md:hidden">
+  <div
+    class="table-header-row md:hidden"
+    bind:offsetWidth={$workflowSummaryColumnWidth}
+  >
     <div class="p-2 border-b rounded-t-md">Summary</div>
   </div>
   <div class="overflow-y-auto md:table-row-group">
