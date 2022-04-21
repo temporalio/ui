@@ -26,7 +26,7 @@
 
 <style lang="postcss">
   li {
-    @apply my-2 cursor-pointer;
+    @apply my-6 cursor-pointer;
   }
   .event-type:hover {
     @apply text-blue-700 border-b-2 border-blue-700;

@@ -11,6 +11,7 @@
   import EventDetails from './event-details.svelte';
   import EventGroupDetails from './event-group-details.svelte';
   import { isSubrowActivity } from '$lib/utilities/is-subrow-activity';
+  import { eventViewType } from '$lib/stores/event-view-type';
 
   export let event: IterableEvent;
   export let groups: CompactEventGroups;
@@ -51,7 +52,7 @@
     }
   };
 
-  $: subRow = isSubrowActivity(event);
+  $: subRow = isSubrowActivity(event) && $eventViewType === 'summary';
 </script>
 
 <article class="row" id={event.id}>
@@ -61,11 +62,12 @@
       class:subRow
       href="#{event.id}">{event.id}</a
     >
+  </div>
+  <div class="cell text-left">
     <a
       href="#{event.id}"
-      class="md:mx-2 text-sm md:text-base font-semibold {subRow
-        ? 'md:text-sm md:mx-0'
-        : ''}"
+      class="md:mx-2 text-sm md:text-base font-semibold"
+      class:subRow
       class:link={!expandAll}
       on:click|stopPropagation={onLinkClick}
     >
@@ -98,12 +100,12 @@
 
 <style lang="postcss">
   .cell {
-    @apply xl:table-cell xl:border-b-2 border-gray-700 py-1 px-3 leading-4;
+    @apply xl:table-cell xl:border-b-2 border-gray-300 py-1 px-3 leading-4;
     flex: 40%;
   }
 
   .row {
-    @apply no-underline py-3 text-sm border-b-2 border-gray-700 items-center xl:text-base flex flex-wrap xl:table-row last-of-type:border-b-0;
+    @apply no-underline py-3 text-sm border-b-2 border-gray-300 items-center xl:text-base flex flex-wrap xl:table-row last-of-type:border-b-0;
   }
 
   .row:hover {
@@ -123,6 +125,6 @@
   }
 
   .subRow {
-    @apply ml-8 text-sm;
+    @apply md:ml-6 text-sm;
   }
 </style>
