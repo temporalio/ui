@@ -1,7 +1,3 @@
-export const isSubrowActivity = (event: IterableEvent): boolean => {
-  return (
-    (event.category === 'command' &&
-      event?.attributes?.workflowTaskCompletedEventId) ||
-    (event.category === 'workflow' && event?.attributes?.startedEventId)
-  );
+export const isSubrowActivity = (event: CommonHistoryEvent): boolean => {
+  return Boolean((event?.attributes as any)?.workflowTaskCompletedEventId);
 };
