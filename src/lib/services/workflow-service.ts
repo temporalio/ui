@@ -30,6 +30,7 @@ export const fetchAllWorkflows = async (
   const query = decodeURIComponent(
     parameters.query || toListWorkflowQuery(parameters),
   );
+
   const endpoint: ValidWorkflowEndpoints = archived
     ? 'workflows.archived'
     : 'workflows';

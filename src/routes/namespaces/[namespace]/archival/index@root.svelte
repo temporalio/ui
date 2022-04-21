@@ -20,9 +20,9 @@
       executionStatus,
     };
 
-    const NameSpaceStore: DescribeNamespaceResponse[] = stuff.namespaces;
+    const namespaces: DescribeNamespaceResponse[] = stuff.namespaces;
 
-    const currentNamespaceConfig = NameSpaceStore.find(
+    const currentNamespaceConfig = namespaces.find(
       (namespaceConfig) => namespaceConfig.namespaceInfo.name === namespace,
     );
 
@@ -62,7 +62,7 @@
 
   import WorkflowsSummaryTable from '../workflows/_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from '../workflows/_workflows-summary-row.svelte';
-  import WorkflowFilters from '../workflows/_workflow-filters.svelte';
+  import WorkflowFilters from './_workflow-filters.svelte';
   import EmptyState from '$lib/components/empty-state.svelte';
   import WorkflowsLoadingState from '../workflows/_workflows-loading.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
