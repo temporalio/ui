@@ -59,18 +59,20 @@ export const tomorrow = (date = new Date()): string => {
   return formatISO(add(date, { hours: 24 }));
 };
 
-export const toDuration = (value: string, delimiter = ','): Duration => {
+export const toDuration = (value: string): Duration => {
   const duration: Duration = {};
   const segments = value.match(durationPattern);
 
   for (const segment of segments) {
-    let [amount, unit] = segment.split(' ');
+    const [amount, unit] = segment.split(' ');
     const n = parseInt(amount, 10);
 
-    if (!unit.endsWith('s')) unit = unit + 's';
+    let key = unit;
 
-    if (isDurationKey(unit)) {
-      duration[unit] = n;
+    if (!unit.endsWith('s')) key = unit + 's';
+
+    if (isDurationKey(key)) {
+      duration[key] = n;
     }
   }
 
