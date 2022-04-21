@@ -39,7 +39,6 @@
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
   import WorkflowFilters from './_workflow-filters.svelte';
   import WorkflowsLoading from './_workflows-loading.svelte';
-  import debounce from 'just-debounce';
 
   export let namespace: string;
   export let searchType: 'basic' | 'advanced';
@@ -50,7 +49,7 @@
       query,
     });
 
-  let update = debounce(async (updatedQuery: string = query) => {
+  let update = async (updatedQuery: string = query) => {
     updateQueryParameters({
       url: $page.url,
       parameter: 'query',
@@ -62,7 +61,7 @@
         workflows = updatedWorkflows;
       },
     );
-  }, 50);
+  };
 
   $: namespace && update();
 
