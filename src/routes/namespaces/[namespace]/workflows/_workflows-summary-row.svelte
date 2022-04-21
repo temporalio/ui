@@ -5,6 +5,7 @@
   import {
     workflowIdColumnWidth,
     workflowTypeColumnWidth,
+    workflowSummaryColumnWidth,
   } from '$lib/stores/column-width';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
@@ -32,7 +33,10 @@
   <div class="cell overflow-cell links font-medium md:font-normal">
     <Tooltip bottom copyable text={workflow.id}>
       <span class="table-link"
-        >{getTruncatedWord(workflow.id, $workflowIdColumnWidth)}</span
+        >{getTruncatedWord(
+          workflow.id,
+          $workflowIdColumnWidth || $workflowSummaryColumnWidth,
+        )}</span
       >
     </Tooltip>
     <p class="time-cell-inline">
@@ -45,7 +49,7 @@
       <span class="table-link"
         >{getTruncatedWord(
           workflow.name,
-          $workflowTypeColumnWidth || $workflowIdColumnWidth,
+          $workflowTypeColumnWidth || $workflowSummaryColumnWidth,
         )}</span
       >
     </Tooltip>
