@@ -10,7 +10,7 @@
 <section class="event-table">
   <div class="table-header-row xl:table-header-group">
     <div class="xl:table-row hidden">
-      <div class="table-header w-8 rounded-tl-md" />
+      <div class="table-header w-4 rounded-tl-md" />
       <div class="table-header w-1/4">
         {title}<EventCategoryFilter />
       </div>

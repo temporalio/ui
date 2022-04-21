@@ -55,24 +55,28 @@
   $: subRow = isSubrowActivity(event) && $eventViewType === 'summary';
 </script>
 
-<article class="row" id={event.id}>
-  <div class="cell text-left">
+<article class="row" id={event.id} class:expanded={expanded && !expandAll}>
+  <div class="id-cell text-left">
     <a
       class="text-gray-500 mx-1 text-sm md:text-base"
       class:subRow
       href="#{event.id}">{event.id}</a
     >
   </div>
-  <div class="cell text-left">
+  <div class="cell flex text-left">
     <a
-      href="#{event.id}"
+      class="text-gray-500 mx-1 text-sm md:text-base xl:hidden"
+      class:subRow
+      href="#{event.id}">{event.id}</a
+    >
+    <p
       class="md:mx-2 text-sm md:text-base font-semibold"
       class:subRow
       class:link={!expandAll}
       on:click|stopPropagation={onLinkClick}
     >
       {event.name}
-    </a>
+    </p>
     {#if expanded && compact}
       <EventGroupDetails {eventGroup} bind:selectedId />
     {/if}
@@ -100,12 +104,16 @@
 
 <style lang="postcss">
   .cell {
-    @apply xl:table-cell xl:border-b-2 border-gray-300 py-1 px-3 leading-4;
+    @apply xl:table-cell xl:border-b-2 border-gray-200 py-1 px-3 leading-4;
     flex: 40%;
   }
 
+  .id-cell {
+    @apply hidden xl:table-cell xl:border-b-2 border-gray-200 py-1 px-3 leading-4;
+  }
+
   .row {
-    @apply no-underline py-3 text-sm border-b-2 border-gray-300 items-center xl:text-base flex flex-wrap xl:table-row last-of-type:border-b-0;
+    @apply no-underline py-3 text-sm border-b-2 border-gray-200 items-center xl:text-base flex flex-wrap xl:table-row last-of-type:border-b-0;
   }
 
   .row:hover {
@@ -124,7 +132,19 @@
     @apply border-b-0 first-of-type:rounded-bl-lg  last-of-type:rounded-br-lg;
   }
 
+  .row:last-of-type .id-cell {
+    @apply border-b-0 first-of-type:rounded-bl-lg  last-of-type:rounded-br-lg;
+  }
+
   .subRow {
-    @apply md:ml-6 text-sm;
+    @apply ml-2 xl:ml-6 text-sm;
+  }
+
+  .expanded {
+    @apply bg-blue-50;
+  }
+
+  .expanded:hover {
+    @apply bg-blue-50;
   }
 </style>
