@@ -74,6 +74,14 @@ describe(toDuration, () => {
     expect(toDuration('3 months')).toEqual({ months: 3 });
   });
 
+  it('should correctly parse "1 day"', () => {
+    expect(toDuration('1 day')).toEqual({ days: 1 });
+  });
+
+  it('should correctly parse "1 month"', () => {
+    expect(toDuration('1 month')).toEqual({ months: 1 });
+  });
+
   it('should correctly parse "3 months"', () => {
     expect(toDuration('3 months, 4 days')).toEqual({ months: 3, days: 4 });
   });

@@ -1,11 +1,12 @@
 <script lang="ts">
   import Option from './option.svelte';
 
-  export let id: string = null;
+  export let id: string;
   export let value: SelectOptionValue;
   export let label: string = null;
   export let dark: boolean = false;
   export let arrow: boolean = false;
+  export let name = id;
 
   export let options: SelectOptionValue[] = [];
 </script>
@@ -16,6 +17,7 @@
     class="inline border-2 text-base px-2 h-10 rounded-lg w-full {$$props.class}"
     class:dark
     class:remove={arrow}
+    {name}
     {id}
     bind:value
     on:change
