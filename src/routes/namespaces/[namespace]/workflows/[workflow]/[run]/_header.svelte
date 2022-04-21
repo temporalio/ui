@@ -27,10 +27,6 @@
     workflow: workflow.id,
     run: workflow.runId,
   };
-
-  $: historyActive = $page.url.pathname.includes(
-    routeForEventHistory(routeParameters),
-  );
 </script>
 
 <header class="flex flex-col gap-4">
