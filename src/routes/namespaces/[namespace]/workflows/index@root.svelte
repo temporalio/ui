@@ -1,10 +1,11 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
 
-  import {
-    CombinedWorkflowExecutionsResponse,
-    fetchAllWorkflows,
-  } from '$lib/services/workflow-service';
+  import { fetchAllWorkflows } from '$lib/services/workflow-service';
+  import type { CombinedWorkflowExecutionsResponse } from '$lib/services/workflow-service';
+
+  import { getSearchType } from '$lib/utilities/search-type-parameter';
+  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
   const defaultQuery = toListWorkflowQuery({ timeRange: '1 day' });
 
@@ -29,15 +30,15 @@
   import { goto } from '$app/navigation';
   import { timeFormat } from '$lib/stores/time-format';
 
-  import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
-  import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
-  import WorkflowFilters from './_workflow-filters.svelte';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+
   import EmptyState from '$lib/components/empty-state.svelte';
   import Pagination from '$lib/components/pagination.svelte';
   import Badge from '$lib/components/badge.svelte';
-  import { getSearchType } from '$lib/utilities/search-type-parameter';
-  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
+  import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
+  import WorkflowFilters from './_workflow-filters.svelte';
+  import WorkflowsLoading from './_workflows-loading.svelte';
 
   export let namespace: string;
   export let searchType: 'basic' | 'advanced';
@@ -69,7 +70,7 @@
 <h2 class="text-2xl">Workflows <Badge type="beta">Beta</Badge></h2>
 <WorkflowFilters bind:searchType bind:query {update} />
 {#await workflows}
-  <p>Loading…</p>
+  <WorkflowsLoading />
 {:then { workflows }}
   {#if workflows.length}
     <Pagination items={workflows} let:visibleItems>
