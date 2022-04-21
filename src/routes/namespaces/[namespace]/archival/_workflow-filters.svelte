@@ -6,7 +6,7 @@
   import Select from '$lib/components/select/select.svelte';
   import FilterSelect from '$lib/components/select/filter-select.svelte';
   import Option from '$lib/components/select/option.svelte';
-  import FilterInput from './filter-input.svelte';
+  import FilterInput from './_filter-input.svelte';
   import Search from '$lib/components/search.svelte';
 
   import { timeFormat } from '$lib/stores/time-format';
