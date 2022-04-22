@@ -10,14 +10,16 @@
     Low: 'low',
   } as const;
 
-  $: recommended = cluster?.versionInfo?.recommended;
-  $: current = cluster?.versionInfo?.current;
-  $: alert = cluster?.versionInfo?.alerts?.[0];
-  $: severity = alert ? severities[alert.severity] : severities.Low;
-  $: show = isRecommendedVersionNewer(recommended?.version, current?.version);
-  $: key = `server-v${current?.version}`;
-  $: link = `https://github.com/temporalio/temporal/releases/tag/v${cluster?.versionInfo?.recommended?.version}`;
-  $: message =
+  const { recommended, current } = cluster?.versionInfo ?? {};
+  const alert = cluster?.versionInfo?.alerts?.[0];
+  const severity = alert ? severities[alert.severity] : severities.Low;
+  const key = `server-v${current?.version}`;
+  const link = `https://github.com/temporalio/temporal/releases/tag/v${cluster?.versionInfo?.recommended?.version}`;
+  const show = isRecommendedVersionNewer(
+    recommended?.version,
+    current?.version,
+  );
+  const message =
     severity == severities.Low
       ? `📥 Temporal v${recommended?.version} is available`
       : `📥 ${alert?.message}`;
