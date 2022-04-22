@@ -5,7 +5,11 @@
   import { faDownload } from '@fortawesome/free-solid-svg-icons';
   import Button from './button.svelte';
 
-  const { workflow: workflowId, run: runId, namespace } = $page.params;
+  export let namespace: string;
+  export let workflowId: string;
+  export let runId: string;
+
+  // const { workflow: workflowId, run: runId, namespace } = $page.params;
 
   const exportHistory = async () => {
     const events = await fetchRawEvents({

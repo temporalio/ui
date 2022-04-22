@@ -44,7 +44,11 @@
         <span class="font-medium select-all">{workflow.id}</span>
       </h1>
       <div class="ml-8 flex justify-end items-center gap-4">
-        <ExportHistory />
+        <ExportHistory
+          {namespace}
+          workflowId={workflow.id}
+          runId={workflow.runId}
+        />
         <TerminateWorkflow {workflow} {namespace} />
       </div>
     </div>
