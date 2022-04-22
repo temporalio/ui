@@ -1,9 +1,7 @@
 <script lang="ts">
   import DataConverterStatus from '$lib/components/data-converter-status.svelte';
   import FeedbackButton from '$lib/components/feedback-button.svelte';
-  import LogoutButton from '$lib/components/logout-button.svelte';
 
-  export let user: User | undefined;
   export let href: string;
 </script>
 
@@ -18,13 +16,11 @@
     <slot name="links" />
   </div>
   <div class="flex justify-end gap-4 col-span-5 col-end-13 items-center">
-    {#if user}
-      <div class="text-right">
-        <DataConverterStatus />
-      </div>
-      <FeedbackButton />
-      <LogoutButton {user} />
-    {/if}
+    <div class="text-right">
+      <DataConverterStatus />
+    </div>
+    <FeedbackButton />
+    <slot name="user" />
   </div>
 </header>
 

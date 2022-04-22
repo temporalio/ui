@@ -10,6 +10,7 @@
   import NavigationLink from '$lib/components/navigation-link.svelte';
   import IsCloudGuard from '$lib/components/is-cloud-guard.svelte';
   import NavigationHeader from '$lib/components/navigation-header.svelte';
+  import AuthButton from '$lib/components/auth-button.svelte';
 
   $: namespace =
     $page.params.namespace || $page.stuff?.settings?.defaultNamespace;
@@ -17,7 +18,7 @@
   export let user: User;
 </script>
 
-<NavigationHeader {user} href={routeForWorkflows({ namespace })}>
+<NavigationHeader href={routeForWorkflows({ namespace })}>
   <svelte:fragment slot="logo">
     <NamespaceSelect />
   </svelte:fragment>
@@ -33,5 +34,8 @@
         Archival
       </NavigationLink>
     </IsCloudGuard>
+  </svelte:fragment>
+  <svelte:fragment slot="user">
+    <AuthButton {user} />
   </svelte:fragment>
 </NavigationHeader>

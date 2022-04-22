@@ -32,7 +32,7 @@
   export let settings: Settings;
 </script>
 
-<NavigationHeader href="/" user={undefined} />
+<NavigationHeader href="/" />
 <section class="text-center my-[20vh]">
   <h1 class="text-8xl font-semibold">Welcome back.</h1>
   <p class="my-7">Lets get you signed in.</p>

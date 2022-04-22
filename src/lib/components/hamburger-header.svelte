@@ -6,9 +6,7 @@
 
   import DataConverterStatus from '$lib/components/data-converter-status.svelte';
   import FeedbackButton from '$lib/components/feedback-button.svelte';
-  import LogoutButton from '$lib/components/logout-button.svelte';
 
-  export let user: User;
   export let href: string;
 
   $: open = false;
@@ -50,7 +48,7 @@
       </div>
       <div class="absolute left-0 bottom-24">
         <FeedbackButton />
-        <LogoutButton {user} />
+        <slot name="user" />
       </div>
     </div>
   </section>
