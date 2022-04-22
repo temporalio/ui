@@ -71,7 +71,7 @@ export const routeForEventHistory = ({
   ...parameters
 }: EventHistoryParameters): string => {
   const eventHistoryPath = `${routeForWorkflow(parameters)}/history`;
-  if (!view || !isEventView(view)) return eventHistoryPath;
+  if (!view || !isEventView(view)) return `${eventHistoryPath}/summary`;
   return `${eventHistoryPath}/${view}`;
 };
 
