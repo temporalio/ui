@@ -5,7 +5,7 @@
   export let message: string;
   export let link: string;
 
-  $: show = !(JSON.parse($closedBanners) ?? []).includes(key);
+  $: show = !($closedBanners ?? []).includes(key);
 </script>
 
 {#if show}
