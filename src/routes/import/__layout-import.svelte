@@ -16,6 +16,7 @@
 
     return {
       props: { user, cluster },
+      stuff: { settings },
     };
   };
 </script>
