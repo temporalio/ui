@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
   import CodeBlock from '$lib/components/code-block.svelte';
   import EmptyState from '$lib/components/empty-state.svelte';
+  import Link from '$lib/components/link.svelte';
 
   import { format } from '$lib/utilities/format-camel-case';
   import { shouldDisplayAttribute } from '$lib/utilities/get-single-attribute-for-event';
@@ -18,7 +19,7 @@
       {#each pendingActivities as { id, activityId, ...details } (id)}
         <article class="flex gap-4">
           <div {id} class="p-4">
-            <a href="#{id}" class="block py-1">{activityId}</a>
+            <Link href="#{id}" class="block py-1">{activityId}</Link>
           </div>
           <div class="p-4 w-full">
             {#each Object.entries(details) as [key, value] (key)}
