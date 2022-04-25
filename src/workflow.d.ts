@@ -34,7 +34,7 @@ type FilterParameters = {
 };
 
 type ArchiveFilterParameters = Omit<FilterParameters, 'timeRange'> & {
-  closeTime: Duration | string;
+  closeTime?: Duration | string;
 };
 
 type WorkflowExecution = {

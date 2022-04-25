@@ -21,6 +21,10 @@ export type CombinedWorkflowExecutionsResponse = {
   error?: string;
 };
 
+export type FetchWorkflow =
+  | typeof fetchAllWorkflows
+  | typeof fetchAllArchivedWorkflows;
+
 export const fetchAllWorkflows = async (
   namespace: string,
   parameters: ValidWorkflowParameters,
