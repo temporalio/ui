@@ -1,0 +1,37 @@
+<script lang="ts">
+  import { closedBanners, close } from '$lib/stores/banner';
+  export let key: string;
+  export let severity: 'high' | 'medium' | 'low';
+  export let message: string;
+  export let link: string;
+
+  $: show = !($closedBanners ?? []).includes(key);
+</script>
+
+{#if show}
+  <section class={`block leading-10 text-center ${severity}`}>
+    <a href={link} target="_blank">
+      {message}
+    </a>
+    <button
+      on:click={() => close(key)}
+      class="absolute top-0 right-0 mr-5 text-black-600"
+    >
+      ✕
+    </button>
+  </section>
+{/if}
+
+<style lang="postcss">
+  .high {
+    @apply bg-red-200 text-red-900;
+  }
+
+  .medium {
+    @apply bg-orange-200 text-orange-900;
+  }
+
+  .low {
+    @apply bg-blue-100 text-blue-900;
+  }
+</style>

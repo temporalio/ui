@@ -3,10 +3,10 @@ import { writable } from 'svelte/store';
 
 import type { Writable } from 'svelte/store';
 
-export function persistStore(
+export function persistStore<T>(
   name: string,
-  initialValue: string | null = '',
-): Pick<Writable<string | null>, 'subscribe' | 'set'> {
+  initialValue: T | null = null,
+): Pick<Writable<T | null>, 'subscribe' | 'set'> {
   let initialStoreValue = initialValue;
   if (browser) {
     try {
@@ -18,12 +18,12 @@ export function persistStore(
     }
   }
 
-  const { subscribe, set } = writable(initialStoreValue);
+  const { subscribe, set } = writable<T>(initialStoreValue);
 
   return {
     subscribe,
 
-    set: (x: string | null) => {
+    set: (x: T | null) => {
       if (browser) {
         window?.localStorage?.setItem(name, JSON.stringify(x));
       }
