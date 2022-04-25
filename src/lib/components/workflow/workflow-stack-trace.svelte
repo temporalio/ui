@@ -23,7 +23,7 @@
   });
 </script>
 
-{#if String(workflow.status) === 'Running'}
+{#if workflow.isRunning}
   <section class="stack-trace">
     <h3 class="text-lg mb-2 w-full">Stack Trace</h3>
     {#await stackTrace}
