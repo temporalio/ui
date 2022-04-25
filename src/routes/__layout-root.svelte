@@ -10,25 +10,29 @@
   import { fetchCluster } from '$lib/services/cluster-service';
   import { fetchNamespaces } from '$lib/services/namespaces-service';
   import { getDefaultNamespace } from '$lib/utilities/get-namespace';
+  import { isAuthorized } from '$lib/utilities/is-authorized';
   import type { GetClusterInfoResponse } from '$types';
 
   export const load: Load = async function ({ url, fetch }) {
     const settings: Settings = await fetchSettings({ url }, fetch);
     const user = await fetchUser(fetch);
 
-    let defaultNamespace: string;
-    let cluster: GetClusterInfoResponse;
-    let namespacesResp: ListNamespacesResponse;
-
-    if (!settings.auth.enabled || user?.email) {
-      namespacesResp = await fetchNamespaces(settings, fetch);
-
-      defaultNamespace = getDefaultNamespace({
-        namespaces: namespacesResp?.namespaces,
-        settings,
-      });
-      cluster = await fetchCluster(settings, fetch);
+    if (!isAuthorized(settings, user)) {
+      return {
+        status: 302,
+        redirect: '/login',
+      };
     }
+
+    const namespacesResp: ListNamespacesResponse = await fetchNamespaces(
+      settings,
+      fetch,
+    );
+    const defaultNamespace: string = getDefaultNamespace({
+      namespaces: namespacesResp?.namespaces,
+      settings,
+    });
+    const cluster: GetClusterInfoResponse = await fetchCluster(settings, fetch);
 
     return {
       props: { user, cluster },
