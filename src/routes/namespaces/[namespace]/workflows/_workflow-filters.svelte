@@ -56,7 +56,7 @@
     });
   };
 
-  const handleParameterChange = () => {
+  const handleParameterChange = debounce(() => {
     query = toListWorkflowQuery(parameters);
 
     updateQueryParameters({
@@ -65,7 +65,7 @@
       value: query,
       goto,
     });
-  };
+  }, 300);
 </script>
 
 <section class="flex flex-col gap-2">
