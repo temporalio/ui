@@ -3,14 +3,14 @@
   import { faHeart } from '@fortawesome/free-solid-svg-icons';
 </script>
 
-<div class="feedback-button">
-  <div class="feedback-icon">
-    <Icon class="" icon={faHeart} color="#e9d5ff" scale={0.5} />
-  </div>
-  <a href="https://github.com/temporalio/ui/issues/new/choose" target="_blank">
+<a href="https://github.com/temporalio/ui/issues/new/choose" target="_blank">
+  <div class="feedback-button">
+    <div class="feedback-icon">
+      <Icon class="" icon={faHeart} color="#e9d5ff" scale={0.5} />
+    </div>
     Give Feedback
-  </a>
-</div>
+  </div>
+</a>
 
 <style lang="postcss">
   .feedback-button {
