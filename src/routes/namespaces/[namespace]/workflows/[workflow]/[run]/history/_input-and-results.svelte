@@ -5,7 +5,7 @@
 
   export let title: string;
   export let content: string;
-  export let isRunning: false;
+  export let isRunning = false;
 </script>
 
 <article
