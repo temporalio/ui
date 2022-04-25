@@ -26,11 +26,8 @@
 </script>
 
 <script lang="ts">
-  import { page } from '$app/stores';
-  import { goto } from '$app/navigation';
   import { timeFormat } from '$lib/stores/time-format';
-
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import { getWorkflows } from '$lib/stores/workflows';
 
   import EmptyState from '$lib/components/empty-state.svelte';
   import Pagination from '$lib/components/pagination.svelte';
@@ -44,26 +41,7 @@
   export let searchType: 'basic' | 'advanced';
   export let query: string;
 
-  let workflows: Eventual<CombinedWorkflowExecutionsResponse> =
-    fetchAllWorkflows(namespace, {
-      query,
-    });
-
-  let update = async (updatedQuery: string = query) => {
-    updateQueryParameters({
-      url: $page.url,
-      parameter: 'query',
-      value: updatedQuery,
-      goto,
-    });
-    fetchAllWorkflows(namespace, { query: updatedQuery }).then(
-      (updatedWorkflows) => {
-        workflows = updatedWorkflows;
-      },
-    );
-  };
-
-  $: namespace && update();
+  let workflows = getWorkflows({ namespace, query });
 
   const errorMessage =
     searchType === 'advanced'
@@ -72,8 +50,8 @@
 </script>
 
 <h2 class="text-2xl">Workflows <Badge type="beta">Beta</Badge></h2>
-<WorkflowFilters bind:searchType bind:query {update} />
-{#await workflows}
+<WorkflowFilters bind:searchType bind:query />
+{#await $workflows}
   <WorkflowsLoading />
 {:then { workflows }}
   {#if workflows.length}

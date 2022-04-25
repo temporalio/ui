@@ -1,8 +1,11 @@
 <script lang="ts">
+  import debounce from 'just-debounce';
   import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
 
   import { timeFormat } from '$lib/stores/time-format';
 
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { durations } from '$lib/utilities/to-duration';
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
   import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
@@ -11,12 +14,9 @@
   import Option from '$lib/components/select/option.svelte';
   import Input from '$lib/components/input.svelte';
   import Search from '$lib/components/search.svelte';
-  import { goto } from '$app/navigation';
-  import debounce from 'just-debounce';
 
   export let searchType: 'basic' | 'advanced';
   export let query: string;
-  export let update: (query: string) => void;
 
   let parameters = toListWorkflowParameters(query);
 
@@ -34,11 +34,12 @@
   const updateSearchType =
     (newSearchType: 'basic' | 'advanced') => (): void => {
       searchType = newSearchType;
-      $page.url.searchParams.set('search', searchType);
-      goto($page.url.search, {
-        replaceState: true,
-        keepfocus: true,
-        noscroll: true,
+
+      updateQueryParameters({
+        parameter: 'search',
+        value: searchType,
+        url: $page.url,
+        goto,
       });
     };
 
@@ -46,13 +47,25 @@
     const data = new FormData(event.target as HTMLFormElement);
     query = String(data.get('query'));
     parameters = toListWorkflowParameters(query);
-    update(query);
+
+    updateQueryParameters({
+      url: $page.url,
+      parameter: 'query',
+      value: query,
+      goto,
+    });
   };
 
-  const handleParameterChange = debounce(() => {
+  const handleParameterChange = () => {
     query = toListWorkflowQuery(parameters);
-    update(query);
-  }, 300);
+
+    updateQueryParameters({
+      url: $page.url,
+      parameter: 'query',
+      value: query,
+      goto,
+    });
+  };
 </script>
 
 <section class="flex flex-col gap-2">

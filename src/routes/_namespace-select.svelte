@@ -25,7 +25,12 @@
   const switchNamespaces = (event: Event) => {
     const target = event.target as HTMLSelectElement;
     const namespace = target.value;
-    if (namespace) goto(routeForWorkflows({ namespace }));
+    if (namespace)
+      goto(routeForWorkflows({ namespace }), {
+        replaceState: true,
+        keepfocus: true,
+        noscroll: true,
+      });
   };
 </script>
 
