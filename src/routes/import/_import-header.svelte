@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
   import NavigationHeader from '$lib/components/navigation-header.svelte';
   import { routeForImport } from '$lib/utilities/route-for';
   import NavigationLink from '$lib/components/navigation-link.svelte';
