@@ -1,10 +1,24 @@
 <script lang="ts">
-  export let compact = false;
+  import { createEventDispatcher } from 'svelte';
 
   import EventCategoryFilter from '$lib/components/event/event-category-filter.svelte';
   import EventDateFilter from '$lib/components/event/event-date-filter.svelte';
+  import { expandAllEvents } from '$lib/stores/event-view-type';
+
+  export let compact = false;
 
   let title = compact ? 'Event Type' : 'Workflow Events';
+  let expandAll = $expandAllEvents === 'true';
+
+  const dispatch = createEventDispatcher();
+
+  function handleChange(e) {
+    const { checked } = e.target;
+    expandAll = checked;
+    dispatch('expandAll', {
+      expanded: checked ? 'true' : 'false',
+    });
+  }
 </script>
 
 <section class="event-table">
@@ -18,14 +32,36 @@
         Date & Time
         {#if !compact}<EventDateFilter />{/if}
       </div>
-      <div class="table-header rounded-tr-md w-1/2">Event Details</div>
+      <div class="table-header rounded-tr-md w-1/2 relative">
+        Event Details
+        <div class="absolute right-4 top-3">
+          <label for="expandAll">Expand all</label>
+          <input
+            type="checkbox"
+            name="expandAll"
+            on:change={handleChange}
+            checked={expandAll}
+          />
+        </div>
+      </div>
     </div>
   </div>
   <div class="table-header-row-responsive rounded-t-md">
-    <div class="table-header text-right">{title}<EventCategoryFilter /></div>
-    <div class="table-header text-right">
+    <div class="table-header-responsive">{title}<EventCategoryFilter /></div>
+    <div class="table-header-responsive">
       Date & Time
       {#if !compact}<EventDateFilter />{/if}
+    </div>
+    <div class="table-header-responsive">
+      <div>
+        <label for="expandAll">Expand all</label>
+        <input
+          type="checkbox"
+          name="expandAll"
+          on:change={handleChange}
+          checked={expandAll}
+        />
+      </div>
     </div>
   </div>
   <div class="overflow-y-auto xl:table-row-group">
@@ -47,6 +83,10 @@
   }
 
   .table-header {
-    @apply xl:table-cell text-left px-3 py-3;
+    @apply xl:table-cell text-left p-2 flex;
+  }
+
+  .table-header-responsive {
+    @apply p-2 flex items-center;
   }
 </style>

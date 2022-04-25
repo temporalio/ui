@@ -4,11 +4,15 @@
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventEmptyRow from './event-empty-row.svelte';
+  import { expandAllEvents } from '$lib/stores/event-view-type';
 
   export let items: IterableEvents;
   export let groups: CompactEventGroups;
-  export let expandAll = false;
   export let compact = false;
+
+  function handleExpandChange(event: CustomEvent) {
+    $expandAllEvents = event.detail.expanded;
+  }
 </script>
 
 <Pagination
@@ -17,13 +21,13 @@
   let:visibleItems
   let:initialItem
 >
-  <EventSummaryTable {compact}>
+  <EventSummaryTable {compact} on:expandAll={handleExpandChange}>
     {#each visibleItems as event (event.id)}
       <EventSummaryRow
         {event}
         {groups}
-        {expandAll}
         {compact}
+        expandAll={$expandAllEvents === 'true'}
         {initialItem}
         {visibleItems}
       />

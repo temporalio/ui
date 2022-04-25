@@ -55,7 +55,7 @@ describe('Workflow Executions List', () => {
     cy.wait('@event-history-api');
     cy.wait('@query-api');
 
-    cy.url().should('contain', '/summary');
+    cy.url().should('contain', '/feed');
   });
 
   it('default to last viewed event view when visiting a workflow', () => {
@@ -65,16 +65,16 @@ describe('Workflow Executions List', () => {
     cy.wait('@event-history-api');
     cy.wait('@query-api');
 
-    cy.url().should('contain', '/summary');
+    cy.url().should('contain', '/feed');
 
     cy.get(
-      '[href="/namespaces/default/workflows/b12453_Completed/db7b0929-24bc-424c-a935-a1f8da69755e/history/full?per-page=100"]',
+      '[href="/namespaces/default/workflows/b12453_Completed/db7b0929-24bc-424c-a935-a1f8da69755e/history/feed?per-page=100"]',
     ).click();
-    cy.url().should('contain', '/full');
+    cy.url().should('contain', '/feed');
 
     cy.visit('/namespaces/default/workflows');
 
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
-    cy.url().should('contain', '/full');
+    cy.url().should('contain', '/feed');
   });
 });

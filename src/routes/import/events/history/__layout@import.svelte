@@ -25,13 +25,8 @@
       <ToggleButtons>
         <ToggleButton
           icon={faTable}
-          href={routeForImport({ importType: 'events', view: 'summary' })}
-          >Summary</ToggleButton
-        >
-        <ToggleButton
-          icon={faBars}
-          href={routeForImport({ importType: 'events', view: 'full' })}
-          >Full</ToggleButton
+          href={routeForImport({ importType: 'events', view: 'feed' })}
+          >Feed</ToggleButton
         >
         <ToggleButton
           icon={faLayerGroup}

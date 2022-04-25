@@ -10,8 +10,7 @@ type RouteParameters = {
 };
 
 export const isEventView = (view: string): view is EventView => {
-  if (view === 'summary') return true;
-  if (view === 'full') return true;
+  if (view === 'feed') return true;
   if (view === 'compact') return true;
   if (view === 'json') return true;
   return false;
@@ -71,7 +70,7 @@ export const routeForEventHistory = ({
   ...parameters
 }: EventHistoryParameters): string => {
   const eventHistoryPath = `${routeForWorkflow(parameters)}/history`;
-  if (!view || !isEventView(view)) return eventHistoryPath;
+  if (!view || !isEventView(view)) return `${eventHistoryPath}/feed`;
   return `${eventHistoryPath}/${view}`;
 };
 

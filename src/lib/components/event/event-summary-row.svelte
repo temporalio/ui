@@ -19,8 +19,8 @@
   export let groups: CompactEventGroups;
   export let visibleItems: IterableEvent[];
   export let initialItem: IterableEvent;
-  export let expandAll = false;
   export let compact = false;
+  export let expandAll = false;
 
   let selectedId = event.id;
 
@@ -29,6 +29,7 @@
     : getGroupForEvent(event, groups);
 
   $: expanded = expandAll;
+
   $: currentEvent = compact ? eventGroup.events.get(selectedId) : event;
   $: reversed = $eventFilterSort === 'reverse';
   $: showElapsed = $eventShowElapsed === 'true';
@@ -49,12 +50,10 @@
   }
 
   const onLinkClick = () => {
-    if (!expandAll) {
-      expanded = !expanded;
-    }
+    expanded = !expanded;
   };
 
-  $: subRow = isSubrowActivity(event) && $eventViewType === 'summary';
+  $: subRow = isSubrowActivity(event) && $eventViewType === 'feed';
 </script>
 
 <article class="row" id={event.id} class:expanded={expanded && !expandAll}>
@@ -72,9 +71,8 @@
       href="#{event.id}">{event.id}</a
     >
     <p
-      class="md:mx-2 text-sm md:text-base font-semibold"
+      class="md:mx-2 text-sm md:text-base font-semibold link"
       class:subRow
-      class:link={!expandAll}
       on:click|stopPropagation={onLinkClick}
     >
       {event.name}
