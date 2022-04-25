@@ -44,7 +44,7 @@ describe('Workflow Executions List', () => {
     ).as('queue-api');
   });
 
-  for (const view of ['summary', 'full', 'compact', 'feed']) {
+  for (const view of ['feed', 'compact']) {
     it(`should show an empty state in the ${view} view`, () => {
       cy.visit(workflowUrl + `/history/${view}`);
 
