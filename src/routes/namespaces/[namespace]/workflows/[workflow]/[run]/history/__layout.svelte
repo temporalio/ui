@@ -119,16 +119,10 @@
         <ToggleButtons>
           <ToggleButton
             icon={faTable}
-            base={routeForEventHistory(routeParameters('summary'))}
-            href={routeForEventHistory(routeParameters('summary'))}
-            active={$eventViewType === 'summary'}
-            on:click={() => setEventViewType('summary')}>Summary</ToggleButton
-          >
-          <ToggleButton
-            icon={faBars}
-            href={routeForEventHistory(routeParameters('full'))}
-            active={$eventViewType === 'full'}
-            on:click={() => setEventViewType('full')}>Full</ToggleButton
+            base={routeForEventHistory(routeParameters('feed'))}
+            href={routeForEventHistory(routeParameters('feed'))}
+            active={$eventViewType === 'feed'}
+            on:click={() => setEventViewType('feed')}>Feed</ToggleButton
           >
           <ToggleButton
             icon={faLayerGroup}

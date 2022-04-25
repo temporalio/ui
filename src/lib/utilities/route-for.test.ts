@@ -24,17 +24,17 @@ describe('routeFor', () => {
     expect(path).toBe('/namespaces/default/workflows/abc/def');
   });
 
-  it('should route to "workflow.events"', () => {
+  it('should route to "workflow.events" feed page', () => {
     const path = routeForEventHistory({
       namespace: 'default',
       workflow: 'abc',
       run: 'def',
-      view: 'summary',
+      view: 'feed',
     });
-    expect(path).toBe('/namespaces/default/workflows/abc/def/history/summary');
+    expect(path).toBe('/namespaces/default/workflows/abc/def/history/feed');
   });
 
-  it('should route to "workflow.events"', () => {
+  it('should route to "workflow.events" compact page', () => {
     const path = routeForEventHistory({
       namespace: 'default',
       workflow: 'abc',
@@ -44,7 +44,7 @@ describe('routeFor', () => {
     expect(path).toBe('/namespaces/default/workflows/abc/def/history/compact');
   });
 
-  it('should route to "workflow.events"', () => {
+  it('should route to "workflow.events" json page', () => {
     const path = routeForEventHistory({
       namespace: 'default',
       workflow: 'abc',
@@ -52,6 +52,15 @@ describe('routeFor', () => {
       view: 'json',
     });
     expect(path).toBe('/namespaces/default/workflows/abc/def/history/json');
+  });
+
+  it('should route to default "workflow.events" feed page if no view provided', () => {
+    const path = routeForEventHistory({
+      namespace: 'default',
+      workflow: 'abc',
+      run: 'def',
+    });
+    expect(path).toBe('/namespaces/default/workflows/abc/def/history/feed');
   });
 
   it('should route to "workflow".stack-trace', () => {

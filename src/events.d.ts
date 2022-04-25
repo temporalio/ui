@@ -159,7 +159,7 @@ type ChildEvent = StartChildWorkflowExecutionInitiatedEvent &
   ChildWorkflowExecutionTimedOutEvent &
   ChildWorkflowExecutionTerminatedEvent;
 
-type EventView = 'full' | 'compact' | 'summary' | 'json';
+type EventView = 'feed' | 'compact' | 'json';
 
 type FetchEventsResponse = {
   events: HistoryEventWithId[];
