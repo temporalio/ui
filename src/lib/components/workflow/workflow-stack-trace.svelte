@@ -33,7 +33,7 @@
       </div>
     {:then result}
       <div class="flex items-start h-full">
-        <CodeBlock content={result} language="text" />
+        <CodeBlock content={result} language="text" class={$$props.class} />
       </div>
     {:catch _error}
       <EmptyState

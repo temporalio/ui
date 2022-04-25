@@ -113,7 +113,7 @@
       isRunning={workflow.isRunning}
     />
   </section>
-  <WorkflowStackTrace {namespace} {workflow} />
+  <WorkflowStackTrace {namespace} {workflow} class="mb-2 max-h-96" />
   <PendingActivties />
   <section id="event-history">
     <nav class="flex gap-4 justify-between items-end pb-4">
