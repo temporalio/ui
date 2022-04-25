@@ -33,7 +33,6 @@
 
 <script lang="ts">
   import {
-    faBars,
     faCode,
     faLayerGroup,
     faTable,
@@ -108,7 +107,11 @@
   </section>
   <section class="flex gap-4 w-full flex-col lg:flex-row">
     <InputAndResults title="Input" content={input} />
-    <InputAndResults title="Results" content={result} />
+    <InputAndResults
+      title="Results"
+      content={result}
+      isRunning={workflow.isRunning}
+    />
   </section>
   <WorkflowStackTrace {namespace} {workflow} />
   <PendingActivties />

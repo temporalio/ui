@@ -20,6 +20,7 @@ export const toWorkflowExecution = (
   const startTime = String(response.workflowExecutionInfo.startTime);
   const endTime = String(response.workflowExecutionInfo.closeTime);
   const status = response.workflowExecutionInfo.status;
+  const isRunning = response.workflowExecutionInfo.status === 'Running';
   const historyEvents = response.workflowExecutionInfo.historyLength;
   const url = `/workflows/${id}/${runId}`;
   const taskQueue = response?.executionConfig?.taskQueue?.name;
@@ -46,6 +47,7 @@ export const toWorkflowExecution = (
     parentNamespaceId,
     parent,
     stateTransitionCount,
+    isRunning,
   };
 };
 
