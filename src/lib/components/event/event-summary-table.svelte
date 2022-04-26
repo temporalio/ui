@@ -12,8 +12,8 @@
 
   const dispatch = createEventDispatcher();
 
-  function handleChange(e) {
-    const { checked } = e.target;
+  function handleChange(e: Event) {
+    const { checked } = e.target as HTMLInputElement;
     expandAll = checked;
     dispatch('expandAll', {
       expanded: checked ? 'true' : 'false',

@@ -50,9 +50,11 @@ export const getWorkflowStartedAndCompletedEvents = (
   let input: string;
   let result: string;
 
-  const workflowStartedEvent: WorkflowEvent = events?.find((event) => {
-    return !!event.workflowExecutionStartedEventAttributes;
-  });
+  const workflowStartedEvent: WorkflowEvent = events?.find(
+    (event: WorkflowEvent) => {
+      return !!event.workflowExecutionStartedEventAttributes;
+    },
+  );
 
   const workflowCompletedEvent = getWorkflowCompletedEvent(events);
 
