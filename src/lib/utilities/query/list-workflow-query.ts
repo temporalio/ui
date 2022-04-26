@@ -52,12 +52,19 @@ const isFilterKey = (key: unknown): key is FilterKey => {
   return false;
 };
 
-const toQueryStatement = (key: FilterKey, value: FilterValue): string => {
+const toQueryStatement = (
+  key: FilterKey,
+  value: FilterValue,
+  archived: boolean,
+): string => {
   const queryKey = queryKeys[key];
 
   if (value === 'All') return '';
 
   if (isDuration(value) || isDurationString(value)) {
+    if (archived) {
+      return `${queryKey} > "${toDate(value)}"`;
+    }
     return `${queryKey} BETWEEN "${toDate(value)}" AND "${tomorrow()}"`;
   }
 
@@ -66,17 +73,19 @@ const toQueryStatement = (key: FilterKey, value: FilterValue): string => {
 
 const toQueryStatements = (
   parameters: FilterParameters | ArchiveFilterParameters,
+  archived: boolean,
 ): string[] => {
   return Object.entries(parameters)
     .map(([key, value]) => {
       if (isFilterKey(key) && isValid(value))
-        return toQueryStatement(key, value);
+        return toQueryStatement(key, value, archived);
     })
     .filter(Boolean);
 };
 
 export const toListWorkflowQuery = (
   parameters: FilterParameters | ArchiveFilterParameters,
+  archived = false,
 ): string => {
-  return toQueryStatements(parameters).join(' and ');
+  return toQueryStatements(parameters, archived).join(' and ');
 };
