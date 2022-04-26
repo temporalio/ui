@@ -4,7 +4,6 @@
   import '../../app.css';
 
   import { fetchSettings } from '$lib/services/settings-service';
-
   import { fetchUser } from '$lib/services/user-service';
   import { fetchCluster } from '$lib/services/cluster-service';
 
@@ -25,11 +24,9 @@
   import Header from './_import-header.svelte';
   import HeaderResponsive from './_import-header-responsive.svelte';
   import Notifications from '$lib/components/notifications.svelte';
-  import Banner from '$lib/components/banner/banner-temporal-version.svelte';
   import { ErrorBoundary } from '$lib/components/error-boundary';
 
   export let user: User;
-  export let cluster: ClusterInformation;
 </script>
 
 <svelte:head>
@@ -46,7 +43,6 @@
 
 <main class="flex flex-col h-screen">
   <Notifications />
-  <Banner {cluster} />
   <Header {user} />
   <HeaderResponsive {user} />
   <section id="content" class="h-full mx-10 mb-10 mt-8">
