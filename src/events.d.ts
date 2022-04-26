@@ -25,7 +25,7 @@ interface WorkflowEvent extends HistoryEvent {
   name: EventType;
 }
 
-type WorkflowEvents = WorkflowEvent[];
+type WorkflowEvents = WorkflowEvents;
 
 interface PendingActivity extends PendingActivityInfo {
   id: typeof PendingActivityInfo.activityId;
@@ -85,7 +85,7 @@ type ChildEvent = StartChildWorkflowExecutionInitiatedEvent &
 type EventView = 'feed' | 'compact' | 'json';
 
 type FetchEventsResponse = {
-  events: WorkflowEvent[];
+  events: WorkflowEvents;
   eventGroups: EventGroups;
 };
 

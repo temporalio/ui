@@ -45,7 +45,7 @@ const toEvent = async (historyEvent: HistoryEvent): Promise<WorkflowEvent> => {
 export const toEventHistory = async (
   response: HistoryEvent[],
 ): Promise<{
-  events: WorkflowEvent[];
+  events: WorkflowEvents;
   eventGroups: EventGroups;
 }> => {
   const events = await Promise.all(response.map(toEvent));

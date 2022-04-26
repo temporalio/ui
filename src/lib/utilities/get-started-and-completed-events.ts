@@ -29,9 +29,7 @@ const isCompletionEvent = (event: WorkflowEvent): event is CompletionEvent => {
   return false;
 };
 
-const getWorkflowCompletedEvent = (
-  events: WorkflowEvent[],
-): CompletionEvent => {
+const getWorkflowCompletedEvent = (events: WorkflowEvents): CompletionEvent => {
   for (const event of events) {
     if (isCompletionEvent(event)) return event;
   }
@@ -47,7 +45,7 @@ const getEventResult = (event: CompletionEvent) => {
 };
 
 export const getWorkflowStartedAndCompletedEvents = (
-  events: WorkflowEvent[],
+  events: WorkflowEvents,
 ): WorkflowEvents => {
   let input: string;
   let result: string;
