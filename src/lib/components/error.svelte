@@ -1,9 +1,11 @@
 <script lang="ts">
-  import { browser, dev } from '$app/env';
-  import { page } from '$app/stores';
-  import { isNetworkError } from '$lib/utilities/is-network-error';
   import { createEventDispatcher } from 'svelte';
   import { beforeNavigate } from '$app/navigation';
+  import { browser, dev } from '$app/env';
+  import { page } from '$app/stores';
+
+  import { isNetworkError } from '$lib/utilities/is-network-error';
+
   import Link from './link.svelte';
 
   export let error: globalThis.Error = null;
@@ -37,9 +39,7 @@
       class="underline-offset-2 underline">Try a refresh</Link
     >
     or
-    <Link href="https://temporal.io/slack" class="underline-offset-2 underline"
-      >jump on our Slack Channel</Link
-    >.
+    <Link href="https://temporal.io/slack">jump on our Slack Channel</Link>.
   </p>
 </section>
 
