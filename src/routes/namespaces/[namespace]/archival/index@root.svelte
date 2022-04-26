@@ -1,11 +1,12 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
+  import type { CombinedWorkflowExecutionsResponse } from '$lib/services/workflow-service';
 
   export const load: Load = async function ({ params, url, stuff }) {
     const { searchParams } = url;
 
     if (!searchParams.has('time-range'))
-      searchParams.set('time-range', '24 hours');
+      searchParams.set('time-range', '1 day');
 
     const namespace = params.namespace;
     const workflowId = searchParams.get('workflow-id');
@@ -35,15 +36,15 @@
       (currentNamespaceConfig?.config
         ?.visibilityArchivalState as unknown as string) === 'Enabled';
 
-    const initialData = archivalEnabled
-      ? await fetchAllArchivedWorkflows(namespace, parameters, fetch)
-      : Promise.resolve(null);
+    const initialData: CombinedWorkflowExecutionsResponse | null =
+      archivalEnabled && visibilityArchivalEnabled
+        ? await fetchAllArchivedWorkflows(namespace, parameters, fetch)
+        : null;
 
     return {
       props: {
-        initialData,
+        workflows: initialData ? initialData.workflows : [],
         namespace,
-        parameters,
         archivalEnabled,
         visibilityArchivalEnabled,
       },
@@ -52,60 +53,58 @@
 </script>
 
 <script lang="ts">
-  import VirtualList from '@sveltejs/svelte-virtual-list';
-
   import type { DescribeNamespaceResponse } from '$types';
-  import {
-    CombinedWorkflowExecutionsResponse,
-    fetchAllArchivedWorkflows,
-  } from '$lib/services/workflow-service';
+  import { fetchAllArchivedWorkflows } from '$lib/services/workflow-service';
 
   import WorkflowsSummaryTable from '../workflows/_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from '../workflows/_workflows-summary-row.svelte';
   import WorkflowFilters from './_workflow-filters.svelte';
+  import Pagination from '$lib/components/pagination.svelte';
   import EmptyState from '$lib/components/empty-state.svelte';
-  import WorkflowsLoadingState from '../workflows/_workflows-loading.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
   import { timeFormat } from '$lib/stores/time-format';
 
   export let namespace: string;
-  export let initialData: ReturnType<typeof fetchAllArchivedWorkflows>;
-  export let parameters: ArchiveFilterParameters;
+  export let workflows: WorkflowExecution[];
   export let archivalEnabled: boolean = false;
   export let visibilityArchivalEnabled: boolean = false;
-
-  let data: Promise<CombinedWorkflowExecutionsResponse | null> = initialData;
-
-  $: {
-    if (archivalEnabled) {
-      data = fetchAllArchivedWorkflows(namespace, parameters);
-    }
-  }
 </script>
 
-{#if archivalEnabled}
+{#if archivalEnabled && visibilityArchivalEnabled}
   <h2 class="text-2xl" data-cy="archived-enabled-title">Archived Workflows</h2>
   <WorkflowFilters />
-  {#await data}
-    <WorkflowsLoadingState />
-  {:then { workflows }}
-    {#if workflows.length}
+  {#if workflows?.length}
+    <Pagination items={workflows} let:visibleItems>
       <WorkflowsSummaryTable>
-        <VirtualList items={workflows} let:item>
+        {#each visibleItems as event}
           <WorkflowsSummaryRow
-            workflow={item}
+            workflow={event}
             {namespace}
             timeFormat={$timeFormat}
           />
-        </VirtualList>
+        {/each}
       </WorkflowsSummaryTable>
-    {:else}
-      <EmptyState
-        title={'No Workflows Found'}
-        content={'If you have filters applied, try adjusting them.'}
-      />
-    {/if}
-  {/await}
+    </Pagination>
+  {:else}
+    <EmptyState
+      title={'No Workflows Found'}
+      content={'If you have filters applied, try adjusting them.'}
+    />
+  {/if}
+{:else if archivalEnabled}
+  <p>To enable Visibility Archival:</p>
+  <CodeBlock
+    content={`tctl --namespace ${namespace} namespace update -vas enabled`}
+    language="text"
+    inline
+  />
+  <p>
+    For more details please check out <a
+      class="text-blue-700 underline"
+      href="https://docs.temporal.io/docs/server/archive-data/"
+      target="_blank">Archival Docs</a
+    >.
+  </p>
 {:else}
   <h2 class="text-2xl" data-cy="archived-disabled-title">
     This namespace is currently not enabled for archival.
