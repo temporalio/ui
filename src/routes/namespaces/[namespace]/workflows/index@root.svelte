@@ -1,9 +1,6 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
 
-  import { fetchAllWorkflows } from '$lib/services/workflow-service';
-  import type { CombinedWorkflowExecutionsResponse } from '$lib/services/workflow-service';
-
   import { getSearchType } from '$lib/utilities/search-type-parameter';
   import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
