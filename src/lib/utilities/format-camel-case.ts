@@ -3,9 +3,26 @@ const isUpperCase = (label: string, index: number): boolean => {
   return charCode >= 65 && charCode <= 90;
 };
 
+const labelsToAddName = [
+  'workflowType',
+  'taskQueue',
+]
+
+const addNameIfNeeded = (label?: string) => {
+  if (labelsToAddName.includes(label)) {
+    return `${label}Name`
+  }
+  return label;
+}
+
 export const format = (label?: string): string => {
   let result = '';
   let index = 0;
+
+  label = addNameIfNeeded(label);
+
+  if (label === 'workflowType') label = 'workflowTypeName';
+  if (label === 'taskQueue') label = 'taskQueueName';
 
   while (index < label?.length) {
     const current = label[index];

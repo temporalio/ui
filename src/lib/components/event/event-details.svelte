@@ -9,6 +9,7 @@
   export let expanded = false;
   export let compact = false;
 
+  console.log(`${event.id} EVENT ATTRIBUTES: `, event.attributes);
   $: attributes = formatAttributes(event, { compact });
 </script>
 
