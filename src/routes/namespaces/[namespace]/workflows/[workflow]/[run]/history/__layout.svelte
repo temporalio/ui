@@ -7,6 +7,7 @@
   export const load: Load = async function ({ params, url, stuff, fetch }) {
     const { workflow } = stuff;
     const { namespace } = params;
+
     const parameters = {
       namespace,
       workflowId: workflow.id,

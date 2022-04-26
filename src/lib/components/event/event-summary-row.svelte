@@ -4,10 +4,8 @@
 
   import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-filters';
   import { timeFormat } from '$lib/stores/time-format';
-  import { eventViewType } from '$lib/stores/event-view-type';
 
   import { getGroupForEvent, isEventGroup } from '$lib/models/event-groups';
-  import { isSubrowActivity } from '$lib/utilities/is-subrow-activity';
   import {
     formatDate,
     formatDistanceAbbreviated,
@@ -53,27 +51,21 @@
   const onLinkClick = () => {
     expanded = !expanded;
   };
-
-  $: subRow = isSubrowActivity(event) && $eventViewType === 'feed';
 </script>
 
 <article class="row" id={event.id} class:expanded={expanded && !expandAll}>
   <div class="id-cell text-left">
-    <a
-      class="text-gray-500 mx-1 text-sm md:text-base"
-      class:subRow
-      href="#{event.id}">{event.id}</a
+    <a class="text-gray-500 mx-1 text-sm md:text-base" href="#{event.id}"
+      >{event.id}</a
     >
   </div>
   <div class="cell flex text-left">
     <a
       class="text-gray-500 mx-1 text-sm md:text-base xl:hidden"
-      class:subRow
       href="#{event.id}">{event.id}</a
     >
     <p
       class="md:mx-2 text-sm md:text-base font-semibold link"
-      class:subRow
       on:click|stopPropagation={onLinkClick}
     >
       {event.name}
@@ -133,10 +125,6 @@
   .row:last-of-type .cell,
   .row:last-of-type .id-cell {
     @apply border-b-0 first-of-type:rounded-bl-lg  last-of-type:rounded-br-lg;
-  }
-
-  .subRow {
-    @apply ml-2 md:ml-4 xl:ml-6 text-sm;
   }
 
   .expanded,

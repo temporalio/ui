@@ -4,13 +4,17 @@
   import { onMount } from 'svelte';
   import { routeForEventHistory } from '$lib/utilities/route-for';
   import { page } from '$app/stores';
+  import { eventFilterSort } from '$lib/stores/event-filters';
 
   const { namespace, workflow, run } = $page.params;
 
   onMount(async () => {
+    const queryParams =
+      $eventFilterSort === 'reverse' ? { sort: 'reverse' } : undefined;
     goto(
       routeForEventHistory({
         view: $eventViewType,
+        queryParams,
         namespace,
         workflow,
         run,
