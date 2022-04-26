@@ -35,13 +35,14 @@
       <div class="table-header rounded-tr-md w-1/2 relative">
         Event Details
         <div class="absolute right-4 top-3">
-          <label for="expandAll">Expand all</label>
           <input
+            class="mr-1"
             type="checkbox"
             name="expandAll"
             on:change={handleChange}
             checked={expandAll}
           />
+          <label for="expandAll">Expand all</label>
         </div>
       </div>
     </div>
@@ -54,13 +55,13 @@
     </div>
     <div class="table-header-responsive">
       <div>
-        <label for="expandAll">Expand all</label>
         <input
           type="checkbox"
           name="expandAll"
           on:change={handleChange}
           checked={expandAll}
         />
+        <label for="expandAll">Expand all</label>
       </div>
     </div>
   </div>
