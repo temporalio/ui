@@ -54,5 +54,9 @@ Cypress.Commands.add(
       Auth: { Enabled: false, Options: null },
       DefaultNamespace: namespace,
     }).as('settings-api');
+
+    cy.intercept('https://api.github.com/repos/temporalio/ui-server/releases', {
+      fixture: 'github-releases.json',
+    }).as('github-releases-api');
   },
 );
