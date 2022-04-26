@@ -78,7 +78,7 @@
         },
         "historyArchivalState": "Enabled",
         "historyArchivalUri": "",
-        "visibilityArchivalState": "Disabled",
+        "visibilityArchivalState": "Enabled",
         "visibilityArchivalUri": ""
       },
       "replicationConfig": {

@@ -15,7 +15,7 @@ describe('Archival disabled page', () => {
     cy.wait('@namespaces-api');
   });
 
-  it('have the correct namespaces in the dropdown', () => {
+  it('have the correct title on page', () => {
     cy.get('[data-cy="archived-disabled-title"]').should(
       'contain',
       'This namespace is currently not enabled for archival.',

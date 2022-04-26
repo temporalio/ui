@@ -92,7 +92,7 @@
     />
   {/if}
 {:else if archivalEnabled}
-  <h2 class="text-2xl" data-cy="archived-disabled-title">
+  <h2 class="text-2xl" data-cy="visibility-disabled-title">
     This namespace is currently enabled for archival but visibility is not
     enabled.
   </h2>
