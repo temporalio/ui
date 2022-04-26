@@ -4,13 +4,14 @@
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { getPollers } from '$lib/services/pollers-service';
   import type { GetPollersResponse } from '$lib/services/pollers-service';
+  import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 
   export const load: Load = async function ({ params, fetch }) {
     const { workflow: workflowId, run: runId, namespace } = params;
 
     const parameters = {
       namespace,
-      workflowId: decodeURIComponent(workflowId),
+      workflowId: decodeURIForSvelte(workflowId),
       runId,
     };
 

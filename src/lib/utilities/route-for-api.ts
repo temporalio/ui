@@ -1,16 +1,9 @@
 let base = (import.meta.env?.VITE_API as string) ?? process.env.VITE_API;
 if (base.endsWith('/')) base = base.slice(0, -1);
 
-const encode = (component: string): string => {
-  return component
-    .split('/')
-    .map((segment) => encodeURIComponent(segment))
-    .join('/');
-};
-
 const withBase = (endpoint: string): string => {
   if (endpoint.startsWith('/')) endpoint = endpoint.slice(1);
-  return `${base}/api/v1/${encode(endpoint)}`;
+  return `${base}/api/v1/${endpoint}`;
 };
 
 export function routeForApi(
@@ -32,7 +25,7 @@ export function routeForApi(
 ): string {
   const encoded: APIRouteParameters = Object.keys(parameters ?? {}).reduce(
     (acc, key) => {
-      acc[key] = encodeURIComponent(parameters[key]);
+      acc[key] = encodeURIComponent(encodeURIComponent(parameters[key]));
       return acc;
     },
     {

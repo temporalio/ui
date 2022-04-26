@@ -1,5 +1,6 @@
 import { browser } from '$app/env';
 import { toURL } from '$lib/utilities/to-url';
+import { encodeURIForSvelte } from '$lib/utilities/encode-uri';
 
 type RouteParameters = {
   namespace: string;
@@ -62,7 +63,7 @@ export const routeForWorkflow = ({
   run,
   ...parameters
 }: WorkflowParameters): string => {
-  const wid = encodeURIComponent(workflow);
+  const wid = encodeURIForSvelte(workflow);
 
   return `${routeForWorkflows(parameters)}/${wid}/${run}`;
 };
