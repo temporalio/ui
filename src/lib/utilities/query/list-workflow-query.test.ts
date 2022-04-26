@@ -22,6 +22,15 @@ describe(toListWorkflowQuery, () => {
     );
   });
 
+  it('should convert an timeRange with a Duration as a value when archived', () => {
+    jest.useFakeTimers().setSystemTime(new Date('2020-01-01').getTime());
+    const twentyFourHoursEarlier = '2019-12-31T00:00:00Z';
+
+    const query = toListWorkflowQuery({ timeRange: { days: 1 } }, true);
+
+    expect(query).toBe(`StartTime > "${twentyFourHoursEarlier}"`);
+  });
+
   it('should convert an two values using an "and"', () => {
     const query = toListWorkflowQuery({
       executionStatus: 'Running',
