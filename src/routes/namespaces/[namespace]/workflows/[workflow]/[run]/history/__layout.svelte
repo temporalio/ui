@@ -33,7 +33,6 @@
 
 <script lang="ts">
   import {
-    faBars,
     faCode,
     faLayerGroup,
     faTable,
@@ -108,9 +107,13 @@
   </section>
   <section class="flex gap-4 w-full flex-col lg:flex-row">
     <InputAndResults title="Input" content={input} />
-    <InputAndResults title="Results" content={result} />
+    <InputAndResults
+      title="Results"
+      content={result}
+      isRunning={workflow.isRunning}
+    />
   </section>
-  <WorkflowStackTrace {namespace} {workflow} />
+  <WorkflowStackTrace {namespace} {workflow} class="mb-2 max-h-96" />
   <PendingActivties />
   <section id="event-history">
     <nav class="flex gap-4 justify-between items-end pb-4">

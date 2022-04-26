@@ -23,7 +23,7 @@
   });
 </script>
 
-{#if String(workflow.status) === 'Running'}
+{#if workflow.isRunning}
   <section class="stack-trace">
     <h3 class="text-lg mb-2 w-full">Stack Trace</h3>
     {#await stackTrace}
@@ -33,7 +33,7 @@
       </div>
     {:then result}
       <div class="flex items-start h-full">
-        <CodeBlock content={result} language="text" />
+        <CodeBlock content={result} language="text" class={$$props.class} />
       </div>
     {:catch _error}
       <EmptyState

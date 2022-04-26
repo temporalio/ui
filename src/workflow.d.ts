@@ -51,4 +51,5 @@ type WorkflowExecution = {
   parentNamespaceId?: string;
   parent?: IWorkflowExecution;
   url: string;
+  isRunning: boolean;
 };
