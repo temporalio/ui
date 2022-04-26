@@ -15,7 +15,7 @@ type EventTypeCategory =
 type EventClassification =
   import('$lib/utilities/get-event-classiciation').EventClassification;
 
-interface HistoryEventWithId extends HistoryEvent {
+interface WorkflowEvent extends HistoryEvent {
   id: string;
   eventType: EventType;
   attributes: EventAttribute;
@@ -25,7 +25,7 @@ interface HistoryEventWithId extends HistoryEvent {
   name: EventType;
 }
 
-type HistoryEvents = HistoryEventWithId[];
+type WorkflowEvents = WorkflowEvents;
 
 interface PendingActivity extends PendingActivityInfo {
   id: typeof PendingActivityInfo.activityId;
@@ -46,7 +46,7 @@ type CommonEventKey =
   | 'category'
   | 'name';
 
-type CommonHistoryEvent = Pick<HistoryEventWithId, CommonEventKey>;
+type CommonHistoryEvent = Pick<WorkflowEvent, CommonEventKey>;
 
 type EventAttributeKey = keyof Omit<HistoryEvent, CommonEventKey>;
 type EventAttribute = HistoryEvent[EventAttributeKey];
@@ -55,7 +55,42 @@ type EventAttributesWithType<K = EventAttributeKey> = HistoryEvent[K] & {
 };
 
 type EventWithAttributes<A extends EventAttributeKey> = CommonHistoryEvent &
-  Pick<HistoryEventWithId, A> & { attributes: EventAttributesWithType<A> };
+  Pick<WorkflowEvent, A> & { attributes: EventAttributesWithType<A> };
+
+type ActivityEvent = ActivityTaskScheduledEvent &
+  ActivityTaskStartedEvent &
+  ActivityTaskCompletedEvent &
+  ActivityTaskFailedEvent &
+  ActivityTaskTimedOutEvent &
+  ActivityTaskCancelRequestedEvent &
+  ActivityTaskCanceledEvent;
+
+type TimerEvent = TimerCanceledEvent & TimerStartedEvent & TimerFiredEvent;
+
+type SignalEvent = SignalExternalWorkflowExecutionInitiatedEvent &
+  SignalExternalWorkflowExecutionFailedEvent &
+  WorkflowExecutionSignaledEvent;
+
+type MarkerEvent = MarkerRecordedEvent;
+
+type ChildEvent = StartChildWorkflowExecutionInitiatedEvent &
+  StartChildWorkflowExecutionFailedEvent &
+  ChildWorkflowExecutionStartedEvent &
+  ChildWorkflowExecutionCompletedEvent &
+  ChildWorkflowExecutionFailedEvent &
+  ChildWorkflowExecutionCanceledEvent &
+  ChildWorkflowExecutionTimedOutEvent &
+  ChildWorkflowExecutionTerminatedEvent;
+
+type EventView = 'feed' | 'compact' | 'json';
+
+type FetchEventsResponse = {
+  events: WorkflowEvents;
+  eventGroups: EventGroups;
+};
+
+type IterableEvent = WorkflowEvent | EventGroup;
+type IterableEvents = IterableEvent[];
 
 type WorkflowExecutionStartedEvent =
   EventWithAttributes<'workflowExecutionStartedEventAttributes'>;
@@ -133,38 +168,3 @@ type ExternalWorkflowExecutionSignaledEvent =
   EventWithAttributes<'externalWorkflowExecutionSignaledEventAttributes'>;
 type UpsertWorkflowSearchAttributesEvent =
   EventWithAttributes<'upsertWorkflowSearchAttributesEventAttributes'>;
-
-type ActivityEvent = ActivityTaskScheduledEvent &
-  ActivityTaskStartedEvent &
-  ActivityTaskCompletedEvent &
-  ActivityTaskFailedEvent &
-  ActivityTaskTimedOutEvent &
-  ActivityTaskCancelRequestedEvent &
-  ActivityTaskCanceledEvent;
-
-type TimerEvent = TimerCanceledEvent & TimerStartedEvent & TimerFiredEvent;
-
-type SignalEvent = SignalExternalWorkflowExecutionInitiatedEvent &
-  SignalExternalWorkflowExecutionFailedEvent &
-  WorkflowExecutionSignaledEvent;
-
-type MarkerEvent = MarkerRecordedEvent;
-
-type ChildEvent = StartChildWorkflowExecutionInitiatedEvent &
-  StartChildWorkflowExecutionFailedEvent &
-  ChildWorkflowExecutionStartedEvent &
-  ChildWorkflowExecutionCompletedEvent &
-  ChildWorkflowExecutionFailedEvent &
-  ChildWorkflowExecutionCanceledEvent &
-  ChildWorkflowExecutionTimedOutEvent &
-  ChildWorkflowExecutionTerminatedEvent;
-
-type EventView = 'feed' | 'compact' | 'json';
-
-type FetchEventsResponse = {
-  events: HistoryEventWithId[];
-  eventGroups: CompactEventGroups;
-};
-
-type IterableEvent = HistoryEventWithId | CompactEventGroup;
-type IterableEvents = IterableEvent[];

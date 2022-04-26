@@ -1,6 +1,5 @@
 <script lang="ts">
   import {
-    faBars,
     faCode,
     faLayerGroup,
     faTable,

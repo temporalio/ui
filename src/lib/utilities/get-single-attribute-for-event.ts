@@ -1,5 +1,5 @@
-import { isEventGroup } from '$lib/models/group-events';
-import { getLastEvent } from '$lib/models/group-events/get-last-event';
+import { isEventGroup } from '$lib/models/event-groups';
+import { getLastEvent } from '$lib/models/event-groups/get-last-event';
 
 type SummaryAttribute = {
   key: string;
@@ -69,7 +69,7 @@ const preferredSummaryKeys = [
  */
 const getFirstDisplayAttribute = ({
   attributes,
-}: HistoryEventWithId): SummaryAttribute => {
+}: WorkflowEvent): SummaryAttribute => {
   for (const [key, value] of Object.entries(attributes)) {
     if (shouldDisplayAttribute(key, value)) {
       return formatSummaryValue(key, value);
@@ -82,7 +82,7 @@ const getFirstDisplayAttribute = ({
  * preferred keys. If a preferred key is found, it will be returned.
  * Otherwise, it will return the first eligible event attribute.
  */
-const getSummaryAttribute = (event: HistoryEventWithId): SummaryAttribute => {
+const getSummaryAttribute = (event: WorkflowEvent): SummaryAttribute => {
   const first = getFirstDisplayAttribute(event);
 
   for (const [key, value] of Object.entries(event.attributes)) {
@@ -96,7 +96,7 @@ const getSummaryAttribute = (event: HistoryEventWithId): SummaryAttribute => {
 };
 
 export const getSummaryForEventGroup = (
-  eventGroup: CompactEventGroup,
+  eventGroup: EventGroup,
 ): SummaryAttribute => {
   const event = getLastEvent(eventGroup);
 
@@ -104,7 +104,7 @@ export const getSummaryForEventGroup = (
 };
 
 export const getSingleAttributeForEvent = (
-  event: HistoryEventWithId | CompactEventGroup,
+  event: WorkflowEvent | EventGroup,
 ): SummaryAttribute => {
   if (!event) return emptyAttribute;
 

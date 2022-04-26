@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let eventGroup: CompactEventGroup | null;
+  export let eventGroup: EventGroup | null;
   export let selectedId: string;
 </script>
 

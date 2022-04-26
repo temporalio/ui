@@ -13,7 +13,7 @@
 <script lang="ts">
   import CodeBlock from '$lib/components/code-block.svelte';
 
-  export let events: HistoryEventWithId[];
+  export let events: WorkflowEvents;
 </script>
 
 <CodeBlock content={events} />

@@ -1,22 +1,23 @@
 <script lang="ts">
-  import { getGroupForEvent, isEventGroup } from '$lib/models/group-events';
   import Icon from 'svelte-fa';
+  import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
+  import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-filters';
+  import { timeFormat } from '$lib/stores/time-format';
+  import { eventViewType } from '$lib/stores/event-view-type';
+
+  import { getGroupForEvent, isEventGroup } from '$lib/models/event-groups';
+  import { isSubrowActivity } from '$lib/utilities/is-subrow-activity';
   import {
     formatDate,
     formatDistanceAbbreviated,
   } from '$lib/utilities/format-date';
-  import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-filters';
-  import { timeFormat } from '$lib/stores/time-format';
 
   import EventDetails from './event-details.svelte';
   import EventGroupDetails from './event-group-details.svelte';
-  import { isSubrowActivity } from '$lib/utilities/is-subrow-activity';
-  import { eventViewType } from '$lib/stores/event-view-type';
-  import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
   export let event: IterableEvent;
-  export let groups: CompactEventGroups;
+  export let groups: EventGroups;
   export let visibleItems: IterableEvent[];
   export let initialItem: IterableEvent;
   export let compact = false;
@@ -41,7 +42,7 @@
     if (previousItem) {
       const timeDiff = formatDistanceAbbreviated({
         start: compact
-          ? (previousItem as CompactEventGroup)?.initialEvent?.eventTime
+          ? (previousItem as EventGroup)?.initialEvent?.eventTime
           : previousItem?.eventTime,
         end: compact ? currentEvent?.eventTime : event?.eventTime,
       });

@@ -1,4 +1,4 @@
 import { writable } from 'svelte/store';
 
-export const importEvents = writable<HistoryEventWithId[]>([]);
-export const importEventGroups = writable<CompactEventGroups>([]);
+export const importEvents = writable<WorkflowEvents>([]);
+export const importEventGroups = writable<EventGroups>([]);

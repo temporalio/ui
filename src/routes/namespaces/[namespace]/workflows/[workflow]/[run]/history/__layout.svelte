@@ -52,7 +52,7 @@
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
-  export let events: HistoryEventWithId[];
+  export let events: WorkflowEvents;
 
   const { input, result } = getWorkflowStartedAndCompletedEvents(events);
   const routeParameters = (view: EventView, eventId?: string) => ({

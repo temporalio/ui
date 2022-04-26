@@ -1,7 +1,7 @@
 export const getGroupForEvent = (
-  event: HistoryEventWithId,
-  groups: CompactEventGroups,
-): CompactEventGroup => {
+  event: WorkflowEvent,
+  groups: EventGroups,
+): EventGroup => {
   const eventId = event.id;
 
   for (const group of groups) {

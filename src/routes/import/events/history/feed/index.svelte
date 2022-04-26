@@ -5,7 +5,7 @@
   import EventSummary from '$lib/components/event/event-summary.svelte';
 
   $: category = $page.url.searchParams.get('category') as EventTypeCategory;
-  $: filteredEvents = $importEvents.filter((event) => {
+  $: filteredEvents = $importEvents.filter((event: WorkflowEvent) => {
     if (category) return event.category === category;
     return event;
   });
