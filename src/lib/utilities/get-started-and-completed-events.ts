@@ -1,6 +1,6 @@
 import { isWorkflowExecutionCompletedEvent } from './is-event-type';
 
-type WorkflowEvents = {
+type WorkflowInputAndResults = {
   input: string;
   result: string;
 };
@@ -46,7 +46,7 @@ const getEventResult = (event: CompletionEvent) => {
 
 export const getWorkflowStartedAndCompletedEvents = (
   events: WorkflowEvents,
-): WorkflowEvents => {
+): WorkflowInputAndResults => {
   let input: string;
   let result: string;
 
