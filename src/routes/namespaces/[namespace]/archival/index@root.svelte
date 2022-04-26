@@ -92,6 +92,10 @@
     />
   {/if}
 {:else if archivalEnabled}
+  <h2 class="text-2xl" data-cy="archived-disabled-title">
+    This namespace is currently enabled for archival but visibility is not
+    enabled.
+  </h2>
   <p>To enable Visibility Archival:</p>
   <CodeBlock
     content={`tctl --namespace ${namespace} namespace update -vas enabled`}
