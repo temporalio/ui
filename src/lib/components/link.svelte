@@ -5,15 +5,10 @@
 
 <a
   {href}
-  class:active
+  class:text-blue-900={active}
   {...$$props}
-  class="border-b-2 border-gray-900 {$$props.class} hover:text-blue-700 hover:border-blue-700"
+  class="{$$props.class} hover:text-blue-700 underline underline-offset-2"
+  on:click
 >
   <slot />
 </a>
-
-<style lang="postcss">
-  .active {
-    @apply text-blue-900 border-b-2 border-blue-900;
-  }
-</style>
