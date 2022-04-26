@@ -20,6 +20,18 @@ export const shouldDisplayAttribute = (
   return true;
 };
 
+export const shouldDisplayNestedAttribute = (
+  key: string,
+  value: unknown,
+): boolean => {
+  if (value === null) return false;
+  if (value === undefined) return false;
+  if (value === '') return false;
+  if (Array.isArray(value) && !value.length) return false;
+
+  return true;
+};
+
 const keysWithWorkflowLinks = [
   'baseRunId',
   'continuedExecutionRunId',
@@ -29,11 +41,23 @@ const keysWithWorkflowLinks = [
   'originalExecutionRunId',
 ] as const;
 
+const keysWithWorkerLinks = ['taskQueueName'] as const;
+
 export const shouldDisplayAsWorkflowLink = (
   key: string,
 ): key is typeof keysWithWorkflowLinks[number] => {
   for (const workflowKey of keysWithWorkflowLinks) {
     if (key === workflowKey) return true;
+  }
+
+  return false;
+};
+
+export const shouldDisplayAsWorkersLink = (
+  key: string,
+): key is typeof keysWithWorkerLinks[number] => {
+  for (const workerKey of keysWithWorkerLinks) {
+    if (key === workerKey) return true;
   }
 
   return false;
