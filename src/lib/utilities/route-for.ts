@@ -1,10 +1,12 @@
 import { browser } from '$app/env';
+import { toURL } from '$lib/utilities/to-url';
 
 type RouteParameters = {
   namespace: string;
   workflow: string;
   run: string;
   view?: EventView | string;
+  queryParams?: Record<string, string>;
   eventId: string;
   queue: string;
 };
@@ -23,7 +25,7 @@ export type WorkflowParameters = Pick<
 >;
 export type EventHistoryParameters = Pick<
   RouteParameters,
-  'namespace' | 'workflow' | 'run' | 'view'
+  'namespace' | 'workflow' | 'run' | 'view' | 'queryParams'
 >;
 export type EventParameters = Required<
   Pick<RouteParameters, 'namespace' | 'workflow' | 'run' | 'view' | 'eventId'>
@@ -67,11 +69,12 @@ export const routeForWorkflow = ({
 
 export const routeForEventHistory = ({
   view,
+  queryParams,
   ...parameters
 }: EventHistoryParameters): string => {
   const eventHistoryPath = `${routeForWorkflow(parameters)}/history`;
   if (!view || !isEventView(view)) return `${eventHistoryPath}/feed`;
-  return `${eventHistoryPath}/${view}`;
+  return toURL(`${eventHistoryPath}/${view}`, queryParams);
 };
 
 export const routeForEventHistoryItem = (
@@ -151,8 +154,12 @@ export const routeForImport = ({
 };
 
 const hasParameters =
-  <T extends Record<string, string>>(...required: string[]) =>
-  (parameters: Record<string, string>): parameters is T => {
+  <T extends Record<string, string | Record<string, string>>>(
+    ...required: string[]
+  ) =>
+  (
+    parameters: Record<string, string | Record<string, string>>,
+  ): parameters is T => {
     for (const parameter of required) {
       if (!parameters[parameter]) return false;
     }
@@ -173,6 +180,7 @@ export const isEventHistoryParameters = hasParameters<EventHistoryParameters>(
   'workflow',
   'run',
   'view',
+  'queryParams',
 );
 
 export const isEventParameters = hasParameters<EventParameters>(
