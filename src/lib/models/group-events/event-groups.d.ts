@@ -1,15 +1,13 @@
-type CompactEventGroup<E = HistoryEventWithId, Id = E['id']> = {
+type EventGroup<E = WorkflowEvent, Id = E['id']> = {
   id: Id;
   name: string;
   events: Map<Id, E>;
   eventIds: Set<Id>;
-  initialEvent: HistoryEventWithId;
-  timestamp: HistoryEventWithId['timestamp'];
-  eventTime: HistoryEventWithId['eventTime'];
-  attributes: HistoryEventWithId['attributes'];
-} & Pick<HistoryEventWithId, 'timestamp' | 'classification' | 'category'>;
+  initialEvent: WorkflowEvent;
+  timestamp: WorkflowEvent['timestamp'];
+  eventTime: WorkflowEvent['eventTime'];
+  attributes: WorkflowEvent['attributes'];
+} & Pick<WorkflowEvent, 'timestamp' | 'classification' | 'category'>;
 
-type CompactEventGroups<
-  T = EventType,
-  E = HistoryEventWithId,
-> = CompactEventGroup<T, E>[] & ArrayLike;
+type EventGroups<T = EventType, E = WorkflowEvent> = EventGroup<T, E>[] &
+  ArrayLike;

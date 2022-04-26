@@ -20,9 +20,7 @@ export async function getEventAttributes(
   };
 }
 
-const toEvent = async (
-  historyEvent: HistoryEvent,
-): Promise<HistoryEventWithId> => {
+const toEvent = async (historyEvent: HistoryEvent): Promise<WorkflowEvent> => {
   const id = String(historyEvent.eventId);
   const eventType = historyEvent.eventType as unknown as EventType;
   const timestamp = formatDate(String(historyEvent.eventTime));
@@ -47,8 +45,8 @@ const toEvent = async (
 export const toEventHistory = async (
   response: HistoryEvent[],
 ): Promise<{
-  events: HistoryEventWithId[];
-  eventGroups: CompactEventGroups;
+  events: WorkflowEvent[];
+  eventGroups: EventGroups;
 }> => {
   const events = await Promise.all(response.map(toEvent));
   const eventGroups = groupEvents(events);
@@ -56,7 +54,7 @@ export const toEventHistory = async (
   return { events, eventGroups };
 };
 
-export const isEvent = (event: unknown): event is HistoryEventWithId => {
+export const isEvent = (event: unknown): event is WorkflowEvent => {
   if (event === null) return false;
   if (typeof event !== 'object') return false;
   if (Array.isArray(event)) return false;

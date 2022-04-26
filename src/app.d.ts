@@ -11,11 +11,11 @@ declare namespace App {
   interface Stuff {
     workflow?: WorkflowExecution;
     namespaces: ListNamespacesResponse;
-    events?: HistoryEventWithId[];
-    eventGroups?: CompactEventGroups;
+    events?: WorkflowEvent[];
+    eventGroups?: EventGroups;
     settings: Settings;
-    matchingEvents?: HistoryEventWithId[];
-    matchingEventGroups?: CompactEventGroups;
+    matchingEvents?: WorkflowEvent[];
+    matchingEventGroups?: EventGroups;
     workers?: GetPollersResponse;
   }
 }

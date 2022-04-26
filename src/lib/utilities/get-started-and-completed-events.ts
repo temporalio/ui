@@ -22,9 +22,7 @@ const completedEventTypes = [
   'WorkflowExecutionTerminated',
 ] as const;
 
-const isCompletionEvent = (
-  event: HistoryEventWithId,
-): event is CompletionEvent => {
+const isCompletionEvent = (event: WorkflowEvent): event is CompletionEvent => {
   for (const completionType of completedEventTypes) {
     if (event.eventType === completionType) return true;
   }
@@ -32,7 +30,7 @@ const isCompletionEvent = (
 };
 
 const getWorkflowCompletedEvent = (
-  events: HistoryEventWithId[],
+  events: WorkflowEvent[],
 ): CompletionEvent => {
   for (const event of events) {
     if (isCompletionEvent(event)) return event;
@@ -49,12 +47,12 @@ const getEventResult = (event: CompletionEvent) => {
 };
 
 export const getWorkflowStartedAndCompletedEvents = (
-  events: HistoryEventWithId[],
+  events: WorkflowEvent[],
 ): WorkflowEvents => {
   let input: string;
   let result: string;
 
-  const workflowStartedEvent: HistoryEventWithId = events?.find((event) => {
+  const workflowStartedEvent: WorkflowEvent = events?.find((event) => {
     return !!event.workflowExecutionStartedEventAttributes;
   });
 

@@ -92,9 +92,9 @@ export const isCategoryType = (value: string): value is EventTypeCategory => {
 };
 
 export const getEventsInCategory = (
-  events: HistoryEventWithId[],
+  events: WorkflowEvent[],
   category: string,
-): HistoryEventWithId[] => {
+): WorkflowEvent[] => {
   if (!isCategoryType(category)) return events;
   return events.filter((event: IterableEvent) => event.category === category);
 };

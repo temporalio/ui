@@ -1,8 +1,6 @@
-export const getLastEvent = ({
-  events,
-}: CompactEventGroup): HistoryEventWithId => {
+export const getLastEvent = ({ events }: EventGroup): WorkflowEvent => {
   let latestEventKey = 0;
-  let result: HistoryEventWithId;
+  let result: WorkflowEvent;
 
   for (const event of events.values()) {
     const k = Number(event.id);

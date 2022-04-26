@@ -8,7 +8,7 @@
 
     const eventGroups = getEventsInCategory(stuff.eventGroups, category);
 
-    let items: CompactEventGroups = eventGroups;
+    let items: EventGroups = eventGroups;
 
     return {
       props: {

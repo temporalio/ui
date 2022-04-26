@@ -8,7 +8,7 @@
 
     const events = getEventsInCategory(stuff.events, category);
 
-    let items: HistoryEventWithId[] = events;
+    let items: WorkflowEvent[] = events;
     const groups = stuff.eventGroups;
 
     return {
@@ -26,8 +26,8 @@
 <script lang="ts">
   import EventSummary from '$lib/components/event/event-summary.svelte';
 
-  export let items: HistoryEventWithId[];
-  export let groups: CompactEventGroups;
+  export let items: WorkflowEvent[];
+  export let groups: EventGroups;
 </script>
 
 <EventSummary {items} {groups} />

@@ -4,10 +4,7 @@ import { getGroupId } from './get-group-id';
 
 export { getGroupForEvent } from './get-group-for-event';
 
-const addToExistingGroup = (
-  group: CompactEventGroup,
-  event: HistoryEventWithId,
-): void => {
+const addToExistingGroup = (group: EventGroup, event: WorkflowEvent): void => {
   if (!group) return;
 
   group.events.set(event.id, event);
@@ -16,10 +13,8 @@ const addToExistingGroup = (
   group.timestamp = event.timestamp;
 };
 
-export const groupEvents = (
-  events: CommonHistoryEvent[],
-): CompactEventGroups => {
-  const groups: Record<string, CompactEventGroup> = {};
+export const groupEvents = (events: CommonHistoryEvent[]): EventGroups => {
+  const groups: Record<string, EventGroup> = {};
 
   for (const event of events) {
     const id = getGroupId(event);
@@ -37,14 +32,14 @@ export const groupEvents = (
 
 export const isEventGroup = (
   eventOrGroup: unknown,
-): eventOrGroup is CompactEventGroup => {
+): eventOrGroup is EventGroup => {
   if (eventOrGroup === undefined || eventOrGroup === null) return false;
   return has(eventOrGroup, 'events');
 };
 
 export const isEventGroups = (
   eventsOrGroups: unknown[],
-): eventsOrGroups is CompactEventGroups => {
+): eventsOrGroups is EventGroups => {
   if (eventsOrGroups === undefined || eventsOrGroups === null) return false;
   return eventsOrGroups.every(isEventGroup);
 };

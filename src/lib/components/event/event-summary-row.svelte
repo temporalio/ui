@@ -16,7 +16,7 @@
   import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
   export let event: IterableEvent;
-  export let groups: CompactEventGroups;
+  export let groups: EventGroups;
   export let visibleItems: IterableEvent[];
   export let initialItem: IterableEvent;
   export let compact = false;
@@ -41,7 +41,7 @@
     if (previousItem) {
       const timeDiff = formatDistanceAbbreviated({
         start: compact
-          ? (previousItem as CompactEventGroup)?.initialEvent?.eventTime
+          ? (previousItem as EventGroup)?.initialEvent?.eventTime
           : previousItem?.eventTime,
         end: compact ? currentEvent?.eventTime : event?.eventTime,
       });

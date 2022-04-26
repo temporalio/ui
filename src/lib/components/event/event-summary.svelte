@@ -7,7 +7,7 @@
   import { expandAllEvents } from '$lib/stores/event-view-type';
 
   export let items: IterableEvents;
-  export let groups: CompactEventGroups;
+  export let groups: EventGroups;
   export let compact = false;
 
   function handleExpandChange(event: CustomEvent) {

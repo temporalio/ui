@@ -1,5 +1,3 @@
-import { getGroupId } from './get-group-id';
-
 import {
   isActivityTaskScheduledEvent,
   isMarkerRecordedEvent,
@@ -8,35 +6,10 @@ import {
   isWorkflowExecutionSignaledEvent,
   isTimerStartedEvent,
 } from '$lib/utilities/is-event-type';
+
+import { getGroupId } from './get-group-id';
+import { getEventGroupName } from './get-group-name';
 import { getLastEvent } from './get-last-event';
-
-export const getName = (event: CommonHistoryEvent): string => {
-  if (!event) return;
-
-  if (isActivityTaskScheduledEvent(event)) {
-    return event.activityTaskScheduledEventAttributes?.activityType?.name;
-  }
-
-  if (isTimerStartedEvent(event)) {
-    return `Timer ${event.timerStartedEventAttributes?.timerId} (${event.timerStartedEventAttributes?.startToFireTimeout})`;
-  }
-
-  if (isSignalExternalWorkflowExecutionInitiatedEvent(event)) {
-    return `Signal: ${event.signalExternalWorkflowExecutionInitiatedEventAttributes?.signalName}`;
-  }
-
-  if (isWorkflowExecutionSignaledEvent(event)) {
-    return `Signal received: ${event.workflowExecutionSignaledEventAttributes?.signalName}`;
-  }
-
-  if (isMarkerRecordedEvent(event)) {
-    return `Marker: ${event.markerRecordedEventAttributes?.markerName}`;
-  }
-
-  if (isStartChildWorkflowExecutionInitiatedEvent(event)) {
-    return `Child Workflow: ${event.startChildWorkflowExecutionInitiatedEventAttributes?.workflowType?.name}`;
-  }
-};
 
 type StartingEvents = {
   Activity: ActivityTaskScheduledEvent;
@@ -49,15 +22,15 @@ type StartingEvents = {
 
 const createGroupFor = <K extends keyof StartingEvents>(
   event: StartingEvents[K],
-): CompactEventGroup => {
+): EventGroup => {
   const id = getGroupId(event);
-  const name = getName(event);
+  const name = getEventGroupName(event);
   const { timestamp, category, classification } = event;
 
   const initialEvent = event;
 
-  const events: CompactEventGroup['events'] = new Map();
-  const eventIds: CompactEventGroup['eventIds'] = new Set();
+  const events: EventGroup['events'] = new Map();
+  const eventIds: EventGroup['eventIds'] = new Set();
 
   events.set(event.id, event);
   eventIds.add(event.id);
@@ -80,9 +53,7 @@ const createGroupFor = <K extends keyof StartingEvents>(
   };
 };
 
-export const createEventGroup = (
-  event: CommonHistoryEvent,
-): CompactEventGroup => {
+export const createEventGroup = (event: CommonHistoryEvent): EventGroup => {
   if (isActivityTaskScheduledEvent(event))
     return createGroupFor<'Activity'>(event);
 
