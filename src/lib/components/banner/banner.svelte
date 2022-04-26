@@ -1,11 +1,19 @@
 <script lang="ts">
   import { closedBanners, close } from '$lib/stores/banner';
+  import type { BannersState } from '$lib/models/banner-state';
   export let key: string;
   export let severity: 'high' | 'medium' | 'low';
   export let message: string;
   export let link: string;
+  export let shownBanner: BannersState;
 
   $: show = !($closedBanners ?? []).includes(key);
+
+  $: {
+    if (!show) {
+      shownBanner++;
+    }
+  }
 </script>
 
 {#if show}

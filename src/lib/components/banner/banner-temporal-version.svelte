@@ -1,8 +1,12 @@
 <script lang="ts">
+  import { page } from '$app/stores';
   import { isRecommendedVersionNewer } from '$lib/utilities/version-check';
+  import type { BannersState } from '$lib/models/banner-state';
   import Banner from './banner.svelte';
 
-  export let cluster: ClusterInformation;
+  export let shownBanner: BannersState;
+
+  const { cluster } = $page.stuff;
 
   const severities = {
     High: 'high',
@@ -20,11 +24,11 @@
     current?.version,
   );
   const message =
-    severity == severities.Low
+    severity === severities.Low
       ? `📥 Temporal v${recommended?.version} is available`
       : `📥 ${alert?.message}`;
 </script>
 
 {#if show}
-  <Banner {key} {severity} {message} {link} />
+  <Banner {key} {severity} {message} {link} bind:shownBanner />
 {/if}

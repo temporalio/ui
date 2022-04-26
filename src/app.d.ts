@@ -17,5 +17,6 @@ declare namespace App {
     matchingEvents?: WorkflowEvents;
     matchingEventGroups?: EventGroups;
     workers?: GetPollersResponse;
+    cluster?: ClusterInformation;
   }
 }

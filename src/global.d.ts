@@ -60,6 +60,7 @@ type Settings = {
     isLocal: boolean;
     envOverride: boolean;
   };
+  version: string;
 };
 
 type User = {
@@ -77,4 +78,9 @@ type SelectOptionValue = number | string | boolean;
 type OptionLabel = {
   label: string;
   option?: string;
+};
+
+type UiVersionInfo = {
+  current: string;
+  recommended: string;
 };

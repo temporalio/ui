@@ -47,5 +47,6 @@ export const fetchSettings = async (
       },
       envOverride: Boolean(EnvironmentOverride),
     },
+    version: settings?.Version,
   };
 };
