@@ -6,7 +6,7 @@ type RouteParameters = {
   workflow: string;
   run: string;
   view?: EventView | string;
-  queryParams?: URLSearchParams | Record<string, string>;
+  queryParams?: Record<string, string>;
   eventId: string;
   queue: string;
 };
@@ -154,8 +154,12 @@ export const routeForImport = ({
 };
 
 const hasParameters =
-  <T extends Record<string, string>>(...required: string[]) =>
-  (parameters: Record<string, string>): parameters is T => {
+  <T extends Record<string, string | Record<string, string>>>(
+    ...required: string[]
+  ) =>
+  (
+    parameters: Record<string, string | Record<string, string>>,
+  ): parameters is T => {
     for (const parameter of required) {
       if (!parameters[parameter]) return false;
     }
@@ -176,6 +180,7 @@ export const isEventHistoryParameters = hasParameters<EventHistoryParameters>(
   'workflow',
   'run',
   'view',
+  'queryParams',
 );
 
 export const isEventParameters = hasParameters<EventParameters>(
