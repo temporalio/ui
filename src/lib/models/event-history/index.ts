@@ -3,7 +3,7 @@ import { formatDate } from '$lib/utilities/format-date';
 import { has } from '$lib/utilities/has';
 import { findAttributesAndKey } from '$lib/utilities/is-event-type';
 
-import { groupEvents } from '../group-events';
+import { groupEvents } from '../event-groups';
 import { getEventCategory } from './get-event-categorization';
 import { getEventClassification } from './get-event-classification';
 import { simplifyAttributes } from './simplify-attributes';

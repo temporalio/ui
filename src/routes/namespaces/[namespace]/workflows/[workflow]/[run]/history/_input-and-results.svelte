@@ -1,6 +1,7 @@
 <script lang="ts">
   import Icon from 'svelte-fa';
   import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+
   import CodeBlock from '$lib/components/code-block.svelte';
 
   export let title: string;

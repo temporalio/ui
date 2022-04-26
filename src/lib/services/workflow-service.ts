@@ -1,12 +1,11 @@
 import type { ErrorCallback } from '$lib/utilities/request-from-api';
 
-import { requestFromAPI } from '$lib/utilities/request-from-api';
-
 import {
   toWorkflowExecution,
   toWorkflowExecutions,
 } from '$lib/models/workflow-execution';
 
+import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 

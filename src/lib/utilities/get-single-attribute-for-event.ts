@@ -1,5 +1,5 @@
-import { isEventGroup } from '$lib/models/group-events';
-import { getLastEvent } from '$lib/models/group-events/get-last-event';
+import { isEventGroup } from '$lib/models/event-groups';
+import { getLastEvent } from '$lib/models/event-groups/get-last-event';
 
 type SummaryAttribute = {
   key: string;
