@@ -13,12 +13,14 @@ const keysToOmit: Readonly<Set<string>> = new Set(['header']);
 const keysToExpand: Readonly<Set<string>> = new Set([
   'taskQueue',
   'retryPolicy',
+  'parentWorkflowExecution',
+  'workflowExecution',
 ]);
 
 const keysToDeeplyExpand: Record<string, string> = {
-  'searchAttributes': 'indexedFields',
-  // 'prevAutoResetPoints': 'points',
-}
+  searchAttributes: 'indexedFields',
+  prevAutoResetPoints: 'points',
+};
 
 const keysToOmitIfEmpty: Readonly<Set<string>> = new Set([
   'nonRetryableErrorTypes',
@@ -50,12 +52,12 @@ const formatDeeplyNestedAttributes = (
   value: any,
 ) => {
   if (keysToDeeplyExpand[key] && typeof attributes[key] === 'object') {
-    const deeplyNestedKey = attributes[key][keysToDeeplyExpand[key]];
-    debugger
+    let deeplyNestedKey = attributes[key][keysToDeeplyExpand[key]];
+    if (Array.isArray(deeplyNestedKey)) deeplyNestedKey = deeplyNestedKey[0];
     for (const [nestedKey, nestedValue] of Object.entries(deeplyNestedKey)) {
       const shouldDisplayNested = shouldDisplayNestedAttribute(key, value);
       if (!keysToOmitIfEmpty.has(nestedKey) && shouldDisplayNested) {
-        attributes[`${nestedKey}`] = nestedValue;
+        attributes[`${key} - ${capitalize(nestedKey)}`] = nestedValue;
       }
     }
     delete attributes[key];

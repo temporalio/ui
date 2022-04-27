@@ -8,6 +8,20 @@ type SummaryAttribute = {
 
 const emptyAttribute: SummaryAttribute = { key: '', value: '' };
 
+const keysForPlainText: Readonly<Set<string>> = new Set([
+  'activityId',
+  'activityTypeKind',
+  'binaryChecksum',
+  'identity',
+  'requestId',
+  'scheduledEventId',
+  'startedEventId',
+]);
+
+export const shouldDisplayAsPlainText = (key: string): boolean => {
+  return keysForPlainText.has(key);
+};
+
 export const shouldDisplayAttribute = (
   key: string,
   value: unknown,
