@@ -36,8 +36,8 @@ export const createWebsocket = (
 
       ...extraParams,
     });
-    sock.onError(() => {
-      console.error('A WebSocket error occurred.');
+    sock.onError.addListener((event) => {
+      console.error(event);
     });
   } catch (err) {
     setLastDataConverterFailure();

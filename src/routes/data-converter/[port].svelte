@@ -1,7 +1,3 @@
-<script context="module">
-  export const ssr = false;
-</script>
-
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
