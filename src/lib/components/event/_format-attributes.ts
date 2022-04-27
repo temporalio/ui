@@ -15,10 +15,10 @@ const keysToExpand: Readonly<Set<string>> = new Set([
   'retryPolicy',
 ]);
 
-const keysToDeeplyExpand: Readonly<Set<string>> = new Set([
-  'searchAttributes',
-  'retryPolicy',
-]);
+const keysToDeeplyExpand: Record<string, string> = {
+  'searchAttributes': 'indexedFields',
+  // 'prevAutoResetPoints': 'points',
+}
 
 const keysToOmitIfEmpty: Readonly<Set<string>> = new Set([
   'nonRetryableErrorTypes',
@@ -41,8 +41,6 @@ const formatNestedAttributes = (
       }
     }
     delete attributes[key];
-  } else {
-    formatDeeplyNestedAttributes(attributes, key, value);
   }
 };
 
@@ -51,11 +49,13 @@ const formatDeeplyNestedAttributes = (
   key: string,
   value: any,
 ) => {
-  if (keysToDeeplyExpand.has(key) && typeof attributes[key] === 'object') {
-    for (const [nestedKey, nestedValue] of Object.entries(attributes[key])) {
+  if (keysToDeeplyExpand[key] && typeof attributes[key] === 'object') {
+    const deeplyNestedKey = attributes[key][keysToDeeplyExpand[key]];
+    debugger
+    for (const [nestedKey, nestedValue] of Object.entries(deeplyNestedKey)) {
       const shouldDisplayNested = shouldDisplayNestedAttribute(key, value);
       if (!keysToOmitIfEmpty.has(nestedKey) && shouldDisplayNested) {
-        attributes[`${key}${capitalize(nestedKey)}`] = nestedValue;
+        attributes[`${nestedKey}`] = nestedValue;
       }
     }
     delete attributes[key];
@@ -74,6 +74,7 @@ export const formatAttributes = (
     const shouldDisplay = shouldDisplayAttribute(key, value);
     if (!keysToOmit.has(key) && shouldDisplay) attributes[key] = value;
     formatNestedAttributes(attributes, key, value);
+    formatDeeplyNestedAttributes(attributes, key, value);
   }
 
   return attributes;
