@@ -18,6 +18,10 @@
   export let inline = false;
 
   const { workflow, namespace, run } = $page.params;
+
+  const getCodeBlockValue = (value: Record<string, unknown>) => {
+    return value?.payloads ?? value?.indexedFields ?? value?.points ?? value;
+  };
 </script>
 
 <article class="row flex my-2 px-4 first:pt-0 {$$props.class}">
@@ -27,7 +31,7 @@
         {format(key)}
       </h2>
       <CodeBlock
-        content={value?.payloads ?? value}
+        content={getCodeBlockValue(value)}
         class="w-1/2 text-right pb-2"
         {inline}
       />
@@ -73,7 +77,7 @@
       <h2 class="text-sm">{format(key)}</h2>
       <p class="text-sm text-right xl:text-left">
         <span
-          class="text-gray-700 px-2 select-all"
+          class="px-2 select-all"
           class:badge={!shouldDisplayAsPlainText(key)}>{value}</span
         >
       </p>
@@ -85,7 +89,10 @@
   .detail-row {
     @apply block xl:flex items-start gap-4 w-full border-b-2 border-gray-200 pb-2;
   }
+  .row:last-of-type .detail-row {
+    @apply border-b-0;
+  }
   .badge {
-    @apply bg-gray-300;
+    @apply text-gray-700 bg-gray-300;
   }
 </style>

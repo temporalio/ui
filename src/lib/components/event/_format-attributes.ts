@@ -3,6 +3,7 @@ import {
   shouldDisplayAttribute,
   shouldDisplayNestedAttribute,
 } from '$lib/utilities/get-single-attribute-for-event';
+import { capitalize } from '$lib/utilities/format-camel-case';
 
 type CombinedAttributes = EventAttribute & {
   eventTime?: string;
@@ -17,47 +18,16 @@ const keysToExpand: Readonly<Set<string>> = new Set([
   'workflowExecution',
 ]);
 
-const keysToDeeplyExpand: Record<string, string> = {
-  searchAttributes: 'indexedFields',
-  prevAutoResetPoints: 'points',
-};
-
-const keysToOmitIfEmpty: Readonly<Set<string>> = new Set([
-  'nonRetryableErrorTypes',
-]);
-
-const capitalize = (word: string): string => {
-  return word.charAt(0).toUpperCase() + word.slice(1);
-};
-
 const formatNestedAttributes = (
   attributes: CombinedAttributes,
   key: string,
-  value: any,
+  value: unknown,
 ) => {
   if (keysToExpand.has(key) && typeof attributes[key] === 'object') {
     for (const [nestedKey, nestedValue] of Object.entries(attributes[key])) {
       const shouldDisplayNested = shouldDisplayNestedAttribute(key, value);
-      if (!keysToOmitIfEmpty.has(nestedKey) && shouldDisplayNested) {
+      if (shouldDisplayNested) {
         attributes[`${key}${capitalize(nestedKey)}`] = nestedValue;
-      }
-    }
-    delete attributes[key];
-  }
-};
-
-const formatDeeplyNestedAttributes = (
-  attributes: CombinedAttributes,
-  key: string,
-  value: any,
-) => {
-  if (keysToDeeplyExpand[key] && typeof attributes[key] === 'object') {
-    let deeplyNestedKey = attributes[key][keysToDeeplyExpand[key]];
-    if (Array.isArray(deeplyNestedKey)) deeplyNestedKey = deeplyNestedKey[0];
-    for (const [nestedKey, nestedValue] of Object.entries(deeplyNestedKey)) {
-      const shouldDisplayNested = shouldDisplayNestedAttribute(key, value);
-      if (!keysToOmitIfEmpty.has(nestedKey) && shouldDisplayNested) {
-        attributes[`${key} - ${capitalize(nestedKey)}`] = nestedValue;
       }
     }
     delete attributes[key];
@@ -76,7 +46,6 @@ export const formatAttributes = (
     const shouldDisplay = shouldDisplayAttribute(key, value);
     if (!keysToOmit.has(key) && shouldDisplay) attributes[key] = value;
     formatNestedAttributes(attributes, key, value);
-    formatDeeplyNestedAttributes(attributes, key, value);
   }
 
   return attributes;

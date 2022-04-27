@@ -1,5 +1,6 @@
 import { isEventGroup } from '$lib/models/event-groups';
 import { getLastEvent } from '$lib/models/event-groups/get-last-event';
+import { capitalize } from '$lib/utilities/format-camel-case';
 
 type SummaryAttribute = {
   key: string;
@@ -10,9 +11,10 @@ const emptyAttribute: SummaryAttribute = { key: '', value: '' };
 
 const keysForPlainText: Readonly<Set<string>> = new Set([
   'activityId',
-  'activityTypeKind',
+  'attempt',
   'binaryChecksum',
   'identity',
+  'parentInitiatedEventId',
   'requestId',
   'scheduledEventId',
   'startedEventId',
@@ -75,10 +77,6 @@ export const shouldDisplayAsWorkersLink = (
   }
 
   return false;
-};
-
-const capitalize = (word: string): string => {
-  return word[0].toUpperCase() + word.slice(1);
 };
 
 const formatSummaryValue = (key: string, value: unknown): SummaryAttribute => {

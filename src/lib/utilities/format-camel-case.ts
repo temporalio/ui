@@ -3,10 +3,11 @@ const isUpperCase = (label: string, index: number): boolean => {
   return charCode >= 65 && charCode <= 90;
 };
 
-const labelsToAddName = [
-  'workflowType',
-  // 'taskQueue',
-];
+export const capitalize = (word: string): string => {
+  return word[0].toUpperCase() + word.slice(1);
+};
+
+const labelsToAddName = ['workflowType'];
 
 const addNameIfNeeded = (label?: string) => {
   if (labelsToAddName.includes(label)) {
