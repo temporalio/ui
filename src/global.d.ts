@@ -86,4 +86,3 @@ type UiVersionInfo = {
 };
 
 type DataEncoderStatus = 'notRequested' | 'success' | 'error';
-

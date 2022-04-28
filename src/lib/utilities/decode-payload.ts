@@ -69,7 +69,7 @@ const decodePayloadAttributes = (anyAttributes) => {
       queryResult[key] = decodePayload(value);
     });
   }
-}
+};
 
 export const convertPayloadToJsonWithCodec = async (
   eventAttribute: EventAttribute,
@@ -93,7 +93,8 @@ export const convertPayloadToJsonWithCodec = async (
       // Convert Payload data
       const awaitData = await Promise.all(
         (potentialPayload ?? []).map(
-          async (payload) => await convertPayloadWithCodec(payload, remoteEncoderEndpoint),
+          async (payload) =>
+            await convertPayloadWithCodec(payload, remoteEncoderEndpoint),
         ),
       );
 
@@ -139,7 +140,8 @@ export const convertPayloadToJsonWithWebsocket = async (
       // Convert Payload data
       const awaitData = await Promise.all(
         (potentialPayload ?? []).map(
-          async (payload) => await convertPayloadWithWebsocket(payload, ws.websocket),
+          async (payload) =>
+            await convertPayloadWithWebsocket(payload, ws.websocket),
         ),
       );
 
