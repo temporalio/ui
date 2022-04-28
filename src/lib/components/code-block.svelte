@@ -43,6 +43,7 @@
     class="relative w-full rounded-lg h-auto {$$props.class} {inline
       ? ''
       : 'lg:h-full'}"
+    data-cy={$$props.dataCy}
   >
     <!-- The spacing for this if statement is like this because PRE's honor all whitespace and 
       line breaks so we have this peculiar formatting to preserve this components output -->
