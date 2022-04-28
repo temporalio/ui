@@ -65,7 +65,7 @@ describe('Workflow Input and Results', () => {
       firstEvent.workflowExecutionStartedEventAttributes.input.payloads[0].data,
       'base64',
     ).toString();
-    cy.get('[data-cy="workflow-input-and-results"]').eq(0).contains(input);
+    cy.get('[data-cy="workflow-input"]').contains(input);
 
     const lastEvent =
       eventsCompletedFixture.history.events[
@@ -76,7 +76,7 @@ describe('Workflow Input and Results', () => {
         .data,
       'base64',
     ).toString();
-    cy.get('[data-cy="workflow-input-and-results"]').eq(1).contains(results);
+    cy.get('[data-cy="workflow-results"]').contains(results);
   });
 
   it('should show the input and result for completed workflow and null result', () => {
@@ -95,7 +95,7 @@ describe('Workflow Input and Results', () => {
       firstEvent.workflowExecutionStartedEventAttributes.input.payloads[0].data,
       'base64',
     ).toString();
-    cy.get('[data-cy="workflow-input-and-results"]').eq(0).contains(input);
+    cy.get('[data-cy="workflow-input"]').contains(input);
 
     const lastEvent =
       eventsCompletedNullFixture.history.events[
@@ -104,7 +104,7 @@ describe('Workflow Input and Results', () => {
     const results = String(
       lastEvent.workflowExecutionCompletedEventAttributes.result,
     );
-    cy.get('[data-cy="workflow-input-and-results"]').eq(1).contains(results);
+    cy.get('[data-cy="workflow-results"]').contains(results);
   });
 
   it('should show the input and result for running workflow', () => {
@@ -128,10 +128,8 @@ describe('Workflow Input and Results', () => {
       firstEvent.workflowExecutionStartedEventAttributes.input.payloads[0].data,
       'base64',
     ).toString();
-    cy.get('[data-cy="workflow-input-and-results"]').eq(0).contains(input);
-    cy.get('[data-cy="workflow-input-and-results"]')
-      .eq(1)
-      .contains('In progress');
+    cy.get('[data-cy="workflow-input"]').contains(input);
+    cy.get('[data-cy="workflow-results"]').contains('In progress');
   });
 
   it('should show the input and results for failed workflow', () => {
@@ -150,7 +148,7 @@ describe('Workflow Input and Results', () => {
       firstEvent.workflowExecutionStartedEventAttributes.input.payloads[0].data,
       'base64',
     ).toString();
-    cy.get('[data-cy="workflow-input-and-results"]').eq(0).contains(input);
+    cy.get('[data-cy="workflow-input"]').contains(input);
 
     const lastEvent =
       eventsFailedFixture.history.events[
@@ -159,7 +157,7 @@ describe('Workflow Input and Results', () => {
     const results = String(
       lastEvent.workflowExecutionFailedEventAttributes.failure.cause.message,
     );
-    cy.get('[data-cy="workflow-input-and-results"]').eq(1).contains(results);
+    cy.get('[data-cy="workflow-results"]').contains(results);
   });
 
   it('should show the input and results for cancelled workflow', () => {
@@ -178,8 +176,8 @@ describe('Workflow Input and Results', () => {
       firstEvent.workflowExecutionStartedEventAttributes.input.payloads[0].data,
       'base64',
     ).toString();
-    cy.get('[data-cy="workflow-input-and-results"]').eq(0).contains(input);
-    cy.get('[data-cy="workflow-input-and-results"]').eq(1).contains('Canceled');
+    cy.get('[data-cy="workflow-input"]').contains(input);
+    cy.get('[data-cy="workflow-results"]').contains('Canceled');
   });
 
   it('should show the input and results for timed out workflow', () => {
@@ -198,8 +196,8 @@ describe('Workflow Input and Results', () => {
       firstEvent.workflowExecutionStartedEventAttributes.input.payloads[0].data,
       'base64',
     ).toString();
-    cy.get('[data-cy="workflow-input-and-results"]').eq(0).contains(input);
-    cy.get('[data-cy="workflow-input-and-results"]').eq(1).contains('Timeout');
+    cy.get('[data-cy="workflow-input"]').contains(input);
+    cy.get('[data-cy="workflow-results"]').contains('Timeout');
   });
 
   it('should show the input and results for continued as new workflow', () => {
@@ -218,9 +216,7 @@ describe('Workflow Input and Results', () => {
       firstEvent.workflowExecutionStartedEventAttributes.input.payloads[0].data,
       'base64',
     ).toString();
-    cy.get('[data-cy="workflow-input-and-results"]').eq(0).contains(input);
-    cy.get('[data-cy="workflow-input-and-results"]')
-      .eq(1)
-      .contains('ContinuedAsNew');
+    cy.get('[data-cy="workflow-input"]').contains(input);
+    cy.get('[data-cy="workflow-results"]').contains('ContinuedAsNew');
   });
 });
