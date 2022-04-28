@@ -8,8 +8,8 @@ export const lastDataConverterStatus =
   writable<DataConverterStatus>('notRequested');
 
 export function setLastDataConverterFailure(error?: string): void {
-  if (error) console.error(error);
   lastDataConverterStatus.set('error');
+  if (error) console.error(error);
 }
 
 export function setLastDataConverterSuccess(): void {
