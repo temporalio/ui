@@ -17,10 +17,19 @@
   } from '$lib/stores/data-converter-config';
 
   import Tooltip from '$lib/components/tooltip.svelte';
+  $: notRequested = $dataConverterPort
+    ? $lastDataConverterStatus === 'notRequested'
+    : $lastDataEncoderStatus === 'notRequested';
+  $: error = $dataConverterPort
+    ? $lastDataConverterStatus === 'error'
+    : $lastDataEncoderStatus === 'error';
+  $: success = $dataConverterPort
+    ? $lastDataConverterStatus === 'success'
+    : $lastDataEncoderStatus === 'success';
 </script>
 
 {#if $dataEncoderEndpoint || $dataConverterPort}
-  {#if $lastDataEncoderStatus === 'notRequested' || $lastDataConverterStatus === 'notRequested'}
+  {#if notRequested}
     <Tooltip left text={'Data converter is configured'}>
       <div class="flex">
         <Icon
@@ -35,7 +44,7 @@
         />
       </div>
     </Tooltip>
-  {:else if $lastDataEncoderStatus === 'error' || $lastDataConverterStatus === 'error'}
+  {:else if error}
     <Tooltip
       left
       text={`Data converter couldn't connect to the remote converter`}
@@ -53,7 +62,7 @@
         />
       </div>
     </Tooltip>
-  {:else if $lastDataEncoderStatus === 'success' || $lastDataConverterStatus === 'success'}
+  {:else if success}
     <Tooltip left text={'Data converter succesfully converted content'}>
       <div class="flex">
         <Icon
