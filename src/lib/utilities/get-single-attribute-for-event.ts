@@ -45,6 +45,10 @@ export const shouldDisplayNestedAttribute = (value: unknown): boolean => {
   return true;
 };
 
+export const getCodeBlockValue: unknown = (value: Record<string, unknown>) => {
+  return value?.payloads ?? value?.indexedFields ?? value?.points ?? value;
+};
+
 const keysWithWorkflowLinks = [
   'baseRunId',
   'continuedExecutionRunId',

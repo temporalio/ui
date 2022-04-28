@@ -7,6 +7,7 @@
     shouldDisplayAsWorkflowLink,
     shouldDisplayAsWorkersLink,
     shouldDisplayAsPlainText,
+    getCodeBlockValue,
   } from '$lib/utilities/get-single-attribute-for-event';
 
   import CodeBlock from '../code-block.svelte';
@@ -28,7 +29,7 @@
       {format(key)}
     </h2>
     <CodeBlock
-      content={value?.payloads ?? value}
+      content={getCodeBlockValue(value)}
       class="w-full w-96 md:w-auto xl:w-2/3"
       {inline}
     />

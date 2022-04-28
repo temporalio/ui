@@ -4,6 +4,7 @@
   import { format } from '$lib/utilities/format-camel-case';
   import { routeForWorkflow, routeForWorkers } from '$lib/utilities/route-for';
   import {
+    getCodeBlockValue,
     shouldDisplayAsWorkflowLink,
     shouldDisplayAsWorkersLink,
     shouldDisplayAsPlainText,
@@ -18,10 +19,6 @@
   export let inline = false;
 
   const { workflow, namespace, run } = $page.params;
-
-  const getCodeBlockValue = (value: Record<string, unknown>) => {
-    return value?.payloads ?? value?.indexedFields ?? value?.points ?? value;
-  };
 </script>
 
 <article class="row flex my-2 px-4 first:pt-0 {$$props.class}">
