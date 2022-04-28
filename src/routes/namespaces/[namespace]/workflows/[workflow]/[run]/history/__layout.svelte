@@ -125,7 +125,7 @@
             base={routeForEventHistory(routeParameters('feed'))}
             href={routeForEventHistory(routeParameters('feed'))}
             active={$eventViewType === 'feed'}
-            on:click={() => setEventViewType('feed')}>Feed</ToggleButton
+            on:click={() => setEventViewType('feed')}>Timeline</ToggleButton
           >
           <ToggleButton
             icon={faLayerGroup}

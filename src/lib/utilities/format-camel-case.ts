@@ -3,9 +3,24 @@ const isUpperCase = (label: string, index: number): boolean => {
   return charCode >= 65 && charCode <= 90;
 };
 
+export const capitalize = (word: string): string => {
+  return word[0].toUpperCase() + word.slice(1);
+};
+
+const labelsToAddName = new Set(['workflowType']);
+
+const addNameIfNeeded = (label?: string) => {
+  if (labelsToAddName.has(label)) {
+    return `${label}Name`;
+  }
+  return label;
+};
+
 export const format = (label?: string): string => {
   let result = '';
   let index = 0;
+
+  label = addNameIfNeeded(label);
 
   while (index < label?.length) {
     const current = label[index];

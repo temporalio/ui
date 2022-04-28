@@ -1,5 +1,6 @@
 import { isEventGroup } from '$lib/models/event-groups';
 import { getLastEvent } from '$lib/models/event-groups/get-last-event';
+import { capitalize } from '$lib/utilities/format-camel-case';
 
 type SummaryAttribute = {
   key: string;
@@ -7,6 +8,21 @@ type SummaryAttribute = {
 };
 
 const emptyAttribute: SummaryAttribute = { key: '', value: '' };
+
+const keysForPlainText: Readonly<Set<string>> = new Set([
+  'activityId',
+  'attempt',
+  'binaryChecksum',
+  'identity',
+  'parentInitiatedEventId',
+  'requestId',
+  'scheduledEventId',
+  'startedEventId',
+]);
+
+export const shouldDisplayAsPlainText = (key: string): boolean => {
+  return keysForPlainText.has(key);
+};
 
 export const shouldDisplayAttribute = (
   key: string,
@@ -20,6 +36,22 @@ export const shouldDisplayAttribute = (
   return true;
 };
 
+export const shouldDisplayNestedAttribute = (value: unknown): boolean => {
+  if (value === null) return false;
+  if (value === undefined) return false;
+  if (value === '') return false;
+  if (Array.isArray(value) && !value.length) return false;
+
+  return true;
+};
+
+export const getCodeBlockValue: Parameters<typeof JSON.stringify>[0] = (
+  value: string | Record<string, unknown>,
+) => {
+  if (typeof value === 'string') return value;
+  return value?.payloads ?? value?.indexedFields ?? value?.points ?? value;
+};
+
 const keysWithWorkflowLinks = [
   'baseRunId',
   'continuedExecutionRunId',
@@ -28,6 +60,8 @@ const keysWithWorkflowLinks = [
   'newRunId',
   'originalExecutionRunId',
 ] as const;
+
+const keysWithWorkerLinks = ['taskQueueName'] as const;
 
 export const shouldDisplayAsWorkflowLink = (
   key: string,
@@ -39,8 +73,14 @@ export const shouldDisplayAsWorkflowLink = (
   return false;
 };
 
-const capitalize = (word: string): string => {
-  return word[0].toUpperCase() + word.slice(1);
+export const shouldDisplayAsWorkersLink = (
+  key: string,
+): key is typeof keysWithWorkerLinks[number] => {
+  for (const workerKey of keysWithWorkerLinks) {
+    if (key === workerKey) return true;
+  }
+
+  return false;
 };
 
 const formatSummaryValue = (key: string, value: unknown): SummaryAttribute => {

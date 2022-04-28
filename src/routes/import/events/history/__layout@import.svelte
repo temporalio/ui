@@ -25,7 +25,7 @@
         <ToggleButton
           icon={faTable}
           href={routeForImport({ importType: 'events', view: 'feed' })}
-          >Feed</ToggleButton
+          >Timeline</ToggleButton
         >
         <ToggleButton
           icon={faLayerGroup}

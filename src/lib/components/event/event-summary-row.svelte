@@ -4,6 +4,7 @@
 
   import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-filters';
   import { timeFormat } from '$lib/stores/time-format';
+  import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
 
   import { getGroupForEvent, isEventGroup } from '$lib/models/event-groups';
   import {
@@ -11,8 +12,9 @@
     formatDistanceAbbreviated,
   } from '$lib/utilities/format-date';
 
-  import EventDetails from './event-details.svelte';
+  import EventDetailsRow from './event-details-row.svelte';
   import EventGroupDetails from './event-group-details.svelte';
+  import EventDetailsFull from './event-details-full.svelte';
 
   export let event: IterableEvent;
   export let groups: EventGroups;
@@ -53,13 +55,13 @@
   };
 </script>
 
-<article class="row" id={event.id} class:expanded={expanded && !expandAll}>
-  <div class="id-cell text-left">
+<tr class="row" id={event.id} class:expanded={expanded && !expandAll}>
+  <td class="id-cell text-left">
     <a class="text-gray-500 mx-1 text-sm md:text-base" href="#{event.id}"
       >{event.id}</a
     >
-  </div>
-  <div class="cell flex text-left">
+  </td>
+  <td class="cell flex text-left">
     <a
       class="text-gray-500 mx-1 text-sm md:text-base xl:hidden"
       href="#{event.id}">{event.id}</a
@@ -74,8 +76,8 @@
     {#if expanded && compact}
       <EventGroupDetails {eventGroup} bind:selectedId />
     {/if}
-  </div>
-  <div class="cell links text-sm font-normal text-right xl:text-left">
+  </td>
+  <td class="cell links text-sm font-normal text-right xl:text-left">
     {#if showElapsed && event.id !== initialItem.id}
       {formatDistanceAbbreviated({
         start: initialItem.eventTime,
@@ -85,16 +87,18 @@
     {:else}
       {formatDate(event?.eventTime, $timeFormat)}
     {/if}
-  </div>
-  <div class="cell links">
-    <EventDetails
-      event={currentEvent}
-      summaryEvent={event}
-      {expanded}
-      {compact}
-    />
-  </div>
-</article>
+  </td>
+  <td class="cell links">
+    <EventDetailsRow {...getSingleAttributeForEvent(currentEvent)} inline />
+  </td>
+</tr>
+{#if expanded}
+  <tr class="expanded-row flex-wrap xl:table-row">
+    <td class="expanded-cell" colspan="4">
+      <EventDetailsFull event={currentEvent} {compact} />
+    </td>
+  </tr>
+{/if}
 
 <style lang="postcss">
   .cell {
@@ -127,8 +131,11 @@
     @apply border-b-0 first-of-type:rounded-bl-lg  last-of-type:rounded-br-lg;
   }
 
-  .expanded,
-  .expanded:hover {
-    @apply bg-blue-50;
+  .expanded-row {
+    @apply border-b-2 border-gray-700;
+  }
+
+  .expanded-cell {
+    @apply border-b-2 border-gray-700 no-underline text-sm xl:text-base flex flex-wrap xl:table-cell;
   }
 </style>

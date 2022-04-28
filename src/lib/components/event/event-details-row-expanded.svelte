@@ -4,10 +4,10 @@
   import { format } from '$lib/utilities/format-camel-case';
   import { routeForWorkflow, routeForWorkers } from '$lib/utilities/route-for';
   import {
+    getCodeBlockValue,
     shouldDisplayAsWorkflowLink,
     shouldDisplayAsWorkersLink,
     shouldDisplayAsPlainText,
-    getCodeBlockValue,
   } from '$lib/utilities/get-single-attribute-for-event';
 
   import CodeBlock from '../code-block.svelte';
@@ -21,22 +21,22 @@
   const { workflow, namespace, run } = $page.params;
 </script>
 
-<article
-  class="flex flex-row xl:gap-4 gap-2 py-2 last:border-b-0 border-b-2 border-gray-200 first:pt-0 {$$props.class}"
->
+<article class="row flex my-2 px-4 first:pt-0 {$$props.class}">
   {#if typeof value === 'object'}
-    <h2 class="w-full items-center xl:items-start xl:w-1/3 text-sm">
-      {format(key)}
-    </h2>
-    <CodeBlock
-      content={getCodeBlockValue(value)}
-      class="w-full w-96 md:w-auto xl:w-2/3"
-      {inline}
-    />
+    <div class="detail-row">
+      <h2 class="w-1/2 text-sm">
+        {format(key)}
+      </h2>
+      <CodeBlock
+        content={getCodeBlockValue(value)}
+        class="w-1/2 text-right pb-2"
+        {inline}
+      />
+    </div>
   {:else if shouldDisplayAsWorkflowLink(key)}
-    <div class="flex items-center xl:items-start w-full xl:3/4">
-      <h2 class="w-full xl:w-1/3 text-sm">{format(key)}</h2>
-      <div class="w-full xl:w-2/3 text-sm">
+    <div class="detail-row">
+      <h2 class=" text-sm">{format(key)}</h2>
+      <div class=" text-sm">
         <Copyable
           content={value}
           container-class="flex-row-reverse xl:flex-row"
@@ -52,9 +52,9 @@
       </div>
     </div>
   {:else if shouldDisplayAsWorkersLink(key)}
-    <div class="flex items-center xl:items-start w-full xl:3/4">
-      <h2 class="w-full xl:w-1/3 text-sm">{format(key)}</h2>
-      <div class="w-full xl:w-2/3 text-sm">
+    <div class="detail-row">
+      <h2 class=" text-sm">{format(key)}</h2>
+      <div class=" text-sm">
         <Copyable
           content={value}
           container-class="flex-row-reverse xl:flex-row"
@@ -70,11 +70,11 @@
       </div>
     </div>
   {:else}
-    <div class="flex items-center xl:items-start w-full xl:3/4">
-      <h2 class="w-full xl:w-1/3 text-sm">{format(key)}</h2>
-      <p class="w-full xl:w-2/3 text-sm text-right xl:text-left">
+    <div class="detail-row">
+      <h2 class="text-sm">{format(key)}</h2>
+      <p class="text-sm text-right xl:text-left">
         <span
-          class="text-gray-700 px-2 select-all"
+          class="px-2 select-all"
           class:badge={!shouldDisplayAsPlainText(key)}>{value}</span
         >
       </p>
@@ -83,7 +83,13 @@
 </article>
 
 <style lang="postcss">
+  .detail-row {
+    @apply block xl:flex items-start gap-4 w-full border-b-2 border-gray-200 pb-2;
+  }
+  .row:last-of-type .detail-row {
+    @apply border-b-0;
+  }
   .badge {
-    @apply bg-gray-300;
+    @apply text-gray-700 bg-gray-300;
   }
 </style>
