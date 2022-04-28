@@ -40,7 +40,7 @@ export const createWebsocket = (
       console.error(event);
     });
   } catch (err) {
-    setLastDataConverterFailure();
+    setLastDataConverterFailure(`Error creating websocket: ${err.message}`);
   }
 
   sock.open();

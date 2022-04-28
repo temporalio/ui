@@ -7,7 +7,8 @@ type DataConverterStatus = 'notRequested' | 'success' | 'error';
 export const lastDataConverterStatus =
   writable<DataConverterStatus>('notRequested');
 
-export function setLastDataConverterFailure(): void {
+export function setLastDataConverterFailure(error?: string): void {
+  if (error) console.error(error);
   lastDataConverterStatus.set('error');
 }
 
