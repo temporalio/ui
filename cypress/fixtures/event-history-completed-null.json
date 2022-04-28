@@ -1,0 +1,257 @@
+{
+  "history": {
+    "events": [
+      {
+        "eventId": "1",
+        "eventTime": "2022-04-11T12:59:24.522874755Z",
+        "eventType": "WorkflowExecutionStarted",
+        "version": "0",
+        "taskId": "1048675",
+        "workflowExecutionStartedEventAttributes": {
+          "workflowType": {
+            "name": "RainbowStatusesWorkflow"
+          },
+          "parentWorkflowNamespace": "",
+          "parentWorkflowExecution": null,
+          "parentInitiatedEventId": "0",
+          "taskQueue": {
+            "name": "rainbow-statuses",
+            "kind": "Normal"
+          },
+          "input": {
+            "payloads": [
+              {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg=="
+                },
+                "data": "Mg=="
+              }
+            ]
+          },
+          "workflowExecutionTimeout": "0s",
+          "workflowRunTimeout": "0s",
+          "workflowTaskTimeout": "10s",
+          "continuedExecutionRunId": "",
+          "initiator": "Unspecified",
+          "continuedFailure": null,
+          "lastCompletionResult": null,
+          "originalExecutionRunId": "db7b0929-24bc-424c-a935-a1f8da69755e",
+          "identity": "57997@MacBook-Pro@",
+          "firstExecutionRunId": "db7b0929-24bc-424c-a935-a1f8da69755e",
+          "retryPolicy": null,
+          "attempt": 1,
+          "workflowExecutionExpirationTime": null,
+          "cronSchedule": "",
+          "firstWorkflowTaskBackoff": "0s",
+          "memo": null,
+          "searchAttributes": {
+            "indexedFields": {
+              "CustomBoolField": {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg==",
+                  "type": "Qm9vbA=="
+                },
+                "data": "ZmFsc2U="
+              },
+              "CustomDatetimeField": {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg==",
+                  "type": "RGF0ZXRpbWU="
+                },
+                "data": "IjIwMjItMDQtMTFUMTI6NTk6MjQuNTIzMzA5WiI="
+              },
+              "CustomDoubleField": {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg==",
+                  "type": "RG91Ymxl"
+                },
+                "data": "MQ=="
+              },
+              "CustomIntField": {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg==",
+                  "type": "SW50"
+                },
+                "data": "MQ=="
+              },
+              "CustomKeywordField": {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg==",
+                  "type": "S2V5d29yZA=="
+                },
+                "data": "InJhaW5ib3ctc3RhdHVzZXMtYjEyNDUzIg=="
+              },
+              "CustomStringField": {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg==",
+                  "type": "VGV4dA=="
+                },
+                "data": "InJhaW5ib3cgc3RhdHVzZXMgYjEyNDUzIENvbXBsZXRlZCI="
+              }
+            }
+          },
+          "prevAutoResetPoints": null,
+          "header": {
+            "fields": {}
+          }
+        }
+      },
+      {
+        "eventId": "2",
+        "eventTime": "2022-04-11T12:59:24.522889797Z",
+        "eventType": "WorkflowTaskScheduled",
+        "version": "0",
+        "taskId": "1048676",
+        "workflowTaskScheduledEventAttributes": {
+          "taskQueue": {
+            "name": "rainbow-statuses",
+            "kind": "Normal"
+          },
+          "startToCloseTimeout": "10s",
+          "attempt": 1
+        }
+      },
+      {
+        "eventId": "3",
+        "eventTime": "2022-04-11T12:59:24.544864255Z",
+        "eventType": "WorkflowTaskStarted",
+        "version": "0",
+        "taskId": "1048690",
+        "workflowTaskStartedEventAttributes": {
+          "scheduledEventId": "2",
+          "identity": "57979@MacBook-Pro@",
+          "requestId": "1e90c204-0535-462c-b335-4052d3658e02"
+        }
+      },
+      {
+        "eventId": "4",
+        "eventTime": "2022-04-11T12:59:24.554243505Z",
+        "eventType": "WorkflowTaskCompleted",
+        "version": "0",
+        "taskId": "1048702",
+        "workflowTaskCompletedEventAttributes": {
+          "scheduledEventId": "2",
+          "startedEventId": "3",
+          "identity": "57979@MacBook-Pro@",
+          "binaryChecksum": "32e04259e3a1e137fa66893bb617979a"
+        }
+      },
+      {
+        "eventId": "5",
+        "eventTime": "2022-04-11T12:59:24.554351380Z",
+        "eventType": "ActivityTaskScheduled",
+        "version": "0",
+        "taskId": "1048703",
+        "activityTaskScheduledEventAttributes": {
+          "activityId": "5",
+          "activityType": {
+            "name": "CompletedActivity"
+          },
+          "namespace": "",
+          "taskQueue": {
+            "name": "rainbow-statuses",
+            "kind": "Normal"
+          },
+          "header": {
+            "fields": {}
+          },
+          "input": null,
+          "scheduleToCloseTimeout": "0s",
+          "scheduleToStartTimeout": "0s",
+          "startToCloseTimeout": "3600s",
+          "heartbeatTimeout": "0s",
+          "workflowTaskCompletedEventId": "4",
+          "retryPolicy": {
+            "initialInterval": "1s",
+            "backoffCoefficient": 2,
+            "maximumInterval": "100s",
+            "maximumAttempts": 1,
+            "nonRetryableErrorTypes": []
+          }
+        }
+      },
+      {
+        "eventId": "6",
+        "eventTime": "2022-04-11T12:59:24.581489380Z",
+        "eventType": "ActivityTaskStarted",
+        "version": "0",
+        "taskId": "1048729",
+        "activityTaskStartedEventAttributes": {
+          "scheduledEventId": "5",
+          "identity": "57979@MacBook-Pro@",
+          "requestId": "ad1409a9-0f7c-4524-9612-dc96d8d3cb92",
+          "attempt": 1,
+          "lastFailure": null
+        }
+      },
+      {
+        "eventId": "7",
+        "eventTime": "2022-04-11T12:59:24.596869172Z",
+        "eventType": "ActivityTaskCompleted",
+        "version": "0",
+        "taskId": "1048730",
+        "activityTaskCompletedEventAttributes": {
+          "result": null,
+          "scheduledEventId": "5",
+          "startedEventId": "6",
+          "identity": "57979@MacBook-Pro@"
+        }
+      },
+      {
+        "eventId": "8",
+        "eventTime": "2022-04-11T12:59:24.596873172Z",
+        "eventType": "WorkflowTaskScheduled",
+        "version": "0",
+        "taskId": "1048731",
+        "workflowTaskScheduledEventAttributes": {
+          "taskQueue": {
+            "name": "MacBook-Pro:2ed93de6-ee9e-4d83-bde1-9d08303b992c",
+            "kind": "Sticky"
+          },
+          "startToCloseTimeout": "10s",
+          "attempt": 1
+        }
+      },
+      {
+        "eventId": "9",
+        "eventTime": "2022-04-11T12:59:24.607690588Z",
+        "eventType": "WorkflowTaskStarted",
+        "version": "0",
+        "taskId": "1048741",
+        "workflowTaskStartedEventAttributes": {
+          "scheduledEventId": "8",
+          "identity": "57979@MacBook-Pro@",
+          "requestId": "9c6532d7-a87c-4f3b-ac87-b91748b97906"
+        }
+      },
+      {
+        "eventId": "10",
+        "eventTime": "2022-04-11T12:59:24.614579172Z",
+        "eventType": "WorkflowTaskCompleted",
+        "version": "0",
+        "taskId": "1048744",
+        "workflowTaskCompletedEventAttributes": {
+          "scheduledEventId": "8",
+          "startedEventId": "9",
+          "identity": "57979@MacBook-Pro@",
+          "binaryChecksum": "32e04259e3a1e137fa66893bb617979a"
+        }
+      },
+      {
+        "eventId": "11",
+        "eventTime": "2022-04-11T12:59:24.614591797Z",
+        "eventType": "WorkflowExecutionCompleted",
+        "version": "0",
+        "taskId": "1048745",
+        "workflowExecutionCompletedEventAttributes": {
+          "result": null,
+          "workflowTaskCompletedEventId": "10",
+          "newExecutionRunId": ""
+        }
+      }
+    ]
+  },
+  "rawHistory": [],
+  "nextPageToken": null,
+  "archived": false
+}
