@@ -18,7 +18,7 @@ export async function convertPayload(
     try {
       await websocket.open();
     } catch (_e) {
-      setLastDataConverterFailure(`Error opening websocket: ${_e.message}`);
+      setLastDataConverterFailure(`Error opening websocket: ${_e}`);
     }
   }
 
@@ -44,7 +44,7 @@ export async function convertPayload(
     })
     .catch((error) => {
       setLastDataConverterFailure(
-        `Error decoding websocket response: ${error.message}`,
+        `Error decoding websocket response: ${error}`,
       );
     });
 
