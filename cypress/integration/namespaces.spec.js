@@ -1,6 +1,6 @@
 const namespaces = ['default', 'some-other-namespace'];
 
-describe('Redirect to Workflow Exections', () => {
+describe('Redirect to Workflow Executions', () => {
   for (const namespace of namespaces) {
     describe(`Default namespace: ${namespace}`, () => {
       const urls = ['/', '/namespaces', `/namespaces/${namespace}`];

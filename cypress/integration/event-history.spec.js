@@ -5,14 +5,14 @@ import workflowsFixture from '../fixtures/workflows.json';
 const workflow = workflowsFixture.executions[0];
 const { workflowId, runId } = workflow?.execution;
 
-describe('Workflow Executions List', () => {
+describe('Workflow Events', () => {
   beforeEach(() => {
     cy.interceptApi();
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
         `/api/v1/namespaces/default/workflows/*/runs/*/events*`,
-      { fixture: 'completed-event-history.json' },
+      { fixture: 'event-history-completed.json' },
     ).as('event-history-api');
 
     cy.intercept(
