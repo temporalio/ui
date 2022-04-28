@@ -7,10 +7,10 @@ export const capitalize = (word: string): string => {
   return word[0].toUpperCase() + word.slice(1);
 };
 
-const labelsToAddName = ['workflowType'];
+const labelsToAddName = new Set(['workflowType']);
 
 const addNameIfNeeded = (label?: string) => {
-  if (labelsToAddName.includes(label)) {
+  if (labelsToAddName.has(label)) {
     return `${label}Name`;
   }
   return label;
