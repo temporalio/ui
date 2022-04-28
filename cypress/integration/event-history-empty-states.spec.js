@@ -13,7 +13,7 @@ describe('Workflow Executions List', () => {
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
         `/api/v1/namespaces/default/workflows/*/runs/*/events*`,
-      { fixture: 'empty-event-history.json' },
+      { fixture: 'event-history-empty.json' },
     ).as('event-history-api');
 
     cy.intercept(

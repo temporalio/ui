@@ -5,5 +5,7 @@
     "VITE_API_HOST": "http://localhost:8080",
     "VITE_MODE": "test",
     "VITE_TEMPORAL_UI_BUILD_TARGET": "local"
-  }
+  },
+  "viewportWidth": 1400,
+  "viewportHeight": 660
 }
