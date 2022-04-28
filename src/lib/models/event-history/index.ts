@@ -1,7 +1,9 @@
-import { convertPayloadToJson } from '$lib/utilities/decode-payload';
+import { dataConverterPort } from '$lib/stores/data-converter-config';
+import { convertPayloadToJsonWithCodec, convertPayloadToJsonWithWebsocket } from '$lib/utilities/decode-payload';
 import { formatDate } from '$lib/utilities/format-date';
 import { has } from '$lib/utilities/has';
 import { findAttributesAndKey } from '$lib/utilities/is-event-type';
+import { get } from 'svelte/store';
 
 import { groupEvents } from '../event-groups';
 import { getEventCategory } from './get-event-categorization';
@@ -12,7 +14,11 @@ export async function getEventAttributes(
   historyEvent: HistoryEvent,
 ): Promise<EventAttributesWithType> {
   const { key, attributes } = findAttributesAndKey(historyEvent);
-  const decodedAttributes = await convertPayloadToJson(attributes);
+  const port = get(dataConverterPort);
+
+  const decodedAttributes = port ?
+    await convertPayloadToJsonWithWebsocket(attributes) :
+    await convertPayloadToJsonWithCodec(attributes);
 
   return {
     type: key,

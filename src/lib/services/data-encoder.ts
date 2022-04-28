@@ -4,7 +4,7 @@ import {
 } from '$lib/stores/data-encoder-config';
 import type { Payload } from '$types';
 
-export async function convertPayload(
+export async function convertPayloadWithCodec(
   payload: Payload,
   endpoint: string,
 ): Promise<Payload> {

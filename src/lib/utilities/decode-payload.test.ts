@@ -4,7 +4,7 @@
 
 // Use jsdom jest environment for access to window.atob
 
-import { decodePayload, convertPayloadToJson } from './decode-payload';
+import { decodePayload, convertPayloadToJsonWithWebsocket, convertPayloadToJsonWithCodec } from './decode-payload';
 import { createWebsocket } from './data-converter-websocket';
 import {
   noRemoteDataConverterWorkflowStartedEvent,
@@ -17,6 +17,13 @@ import {
   lastDataConverterStatus,
   resetLastDataConverterSuccess,
 } from '../stores/data-converter-config';
+
+import {
+  dataEncoderEndpoint,
+  lastDataEncoderStatus,
+  resetLastDataEncoderSuccess,
+} from '../stores/data-encoder-config';
+
 import { get } from 'svelte/store';
 
 const WebDecodePayload = {
@@ -72,7 +79,7 @@ describe(decodePayload, () => {
   });
 });
 
-describe(convertPayloadToJson, () => {
+describe(convertPayloadToJsonWithWebsocket, () => {
   afterEach(() => {
     resetLastDataConverterSuccess();
   });
@@ -101,11 +108,11 @@ describe(convertPayloadToJson, () => {
     const websocket = createWebsocket('1337');
     await ws.connected;
 
-    const convertedPayload = await convertPayloadToJson(
+    const convertedPayload = await convertPayloadToJsonWithWebsocket(
       JSON.parse(JSON.stringify(workflowStartedEvent)),
       websocket,
     );
-    convertPayloadToJson(JSON.parse(JSON.stringify(workflowStartedEvent)), {});
+    convertPayloadToJsonWithWebsocket(JSON.parse(JSON.stringify(workflowStartedEvent)), {});
     expect(convertedPayload).toEqual(dataConvertedWorkflowStartedEvent);
 
     const dataConverterStatus = get(lastDataConverterStatus);
@@ -120,7 +127,7 @@ describe(convertPayloadToJson, () => {
       timeout: 1,
     });
 
-    const convertedPayload = await convertPayloadToJson(
+    const convertedPayload = await convertPayloadToJsonWithWebsocket(
       JSON.parse(JSON.stringify(workflowStartedEvent)),
       websocket,
     );
@@ -132,7 +139,7 @@ describe(convertPayloadToJson, () => {
   });
 
   it('Should skip converting a payload and set the status to notRequested when the websocket and port is not set', async () => {
-    const convertedPayload = await convertPayloadToJson(
+    const convertedPayload = await convertPayloadToJsonWithWebsocket(
       JSON.parse(JSON.stringify(workflowStartedEvent)),
     );
 
@@ -141,4 +148,47 @@ describe(convertPayloadToJson, () => {
     const dataConverterStatus = get(lastDataConverterStatus);
     expect(dataConverterStatus).toEqual('notRequested');
   });
+});
+
+describe(convertPayloadToJsonWithCodec, () => {
+  // afterEach(() => {
+  //   resetLastDataEncoderSuccess();
+  // });
+  // it('Should convert a payload through data-converter and set the success status when the websocket is set and the websocket connects', async () => {
+  //   const endpoint = 'http://localhost:1337'
+  //   dataEncoderEndpoint.set(decodeURIComponent(endpoint));
+
+  //   const convertedPayload = await convertPayloadToJsonWithCodec(
+  //     JSON.parse(JSON.stringify(workflowStartedEvent)),
+  //   );
+  //   expect(convertedPayload).toEqual(dataConvertedWorkflowStartedEvent);
+
+  //   const dataConverterStatus = get(lastDataEncoderStatus);
+  //   expect(dataConverterStatus).toEqual('success');
+  // });
+
+  // it('Should fail converting a payload through data-encoder and set the status to error when the websocket is set and the websocket fails connection', async () => {
+  //   const endpoint = 'http://localhost:1337'
+  //   dataEncoderEndpoint.set(decodeURIComponent(endpoint));
+
+  //   const convertedPayload = await convertPayloadToJsonWithCodec(
+  //     JSON.parse(JSON.stringify(workflowStartedEvent)),
+  //   );
+
+  //   expect(convertedPayload).toEqual(dataConvertedFailureWorkflowStartedEvent);
+
+  //   const dataConverterStatus = get(lastDataEncoderStatus);
+  //   expect(dataConverterStatus).toEqual('error');
+  // });
+
+  // it('Should skip converting a payload and set the status to notRequested when the encoder endpoint is not set', async () => {
+  //   const convertedPayload = await convertPayloadToJsonWithCodec(
+  //     JSON.parse(JSON.stringify(workflowStartedEvent)),
+  //   );
+
+  //   expect(convertedPayload).toEqual(noRemoteDataConverterWorkflowStartedEvent);
+
+  //   const dataConverterStatus = get(lastDataEncoderStatus);
+  //   expect(dataConverterStatus).toEqual('notRequested');
+  // });
 });

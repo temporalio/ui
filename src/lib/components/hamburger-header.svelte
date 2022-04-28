@@ -4,7 +4,7 @@
 
   import { fly } from 'svelte/transition';
 
-  import DataConverterStatus from '$lib/components/data-converter-status.svelte';
+  import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
   import FeedbackButton from '$lib/components/feedback-button.svelte';
 
   export let href: string;
@@ -29,7 +29,7 @@
   </div>
   <div class="flex gap-4 col-span-4 justify-end items-center">
     <div class="text-right">
-      <DataConverterStatus />
+      <DataEncoderStatus />
     </div>
   </div>
 </header>

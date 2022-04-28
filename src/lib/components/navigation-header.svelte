@@ -1,5 +1,5 @@
 <script lang="ts">
-  import DataConverterStatus from '$lib/components/data-converter-status.svelte';
+  import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
   import FeedbackButton from '$lib/components/feedback-button.svelte';
 
   export let href: string;
@@ -17,7 +17,7 @@
   </div>
   <div class="flex justify-end gap-4 col-span-5 col-end-13 items-center">
     <div class="text-right">
-      <DataConverterStatus />
+      <DataEncoderStatus />
     </div>
     <FeedbackButton />
     <slot name="user" />

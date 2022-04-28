@@ -3,7 +3,6 @@ import { persistStore } from '$lib/stores/persist-store';
 
 export const dataEncoderEndpoint = persistStore('endpoint', null);
 
-type DataEncoderStatus = 'notRequested' | 'success' | 'error';
 export const lastDataEncoderStatus =
   writable<DataEncoderStatus>('notRequested');
 
