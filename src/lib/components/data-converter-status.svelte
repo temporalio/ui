@@ -54,12 +54,12 @@
         <Icon
           icon={faLongArrowAltDown}
           scale={1}
-          class="text-blue-200 block w-full h-full"
+          class="text-green-400 block w-full h-full"
         />
         <Icon
           icon={faLongArrowAltUp}
           scale={1}
-          class="text-blue-200 block w-full h-full"
+          class="text-green-400 block w-full h-full"
         />
       </div>
     </Tooltip>

@@ -46,13 +46,13 @@ export const convertPayloadToJson = async (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let JSONPayload: string | Payload | Record<any, any>;
 
-    const webSocket = websocket ?? dataConverterWebsocket;
+    const ws = websocket ?? dataConverterWebsocket;
 
-    if (websocket?.hasWebsocket) {
+    if (ws?.hasWebsocket) {
       // Convert Payload data
       const awaitData = await Promise.all(
         (potentialPayload ?? []).map(
-          async (payload) => await convertPayload(payload, webSocket.websocket),
+          async (payload) => await convertPayload(payload, ws.websocket),
         ),
       );
 

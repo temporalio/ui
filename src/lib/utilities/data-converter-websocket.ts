@@ -36,11 +36,11 @@ export const createWebsocket = (
 
       ...extraParams,
     });
-    sock.onError(() => {
-      console.error('A WebSocket error occurred.');
+    sock.onError.addListener((event) => {
+      console.error(`Websocket connection error: ${event}`);
     });
   } catch (err) {
-    setLastDataConverterFailure();
+    setLastDataConverterFailure(`Error creating websocket: ${err}`);
   }
 
   sock.open();
