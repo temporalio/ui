@@ -45,7 +45,10 @@ export const shouldDisplayNestedAttribute = (value: unknown): boolean => {
   return true;
 };
 
-export const getCodeBlockValue: unknown = (value: Record<string, unknown>) => {
+export const getCodeBlockValue: Parameters<typeof JSON.stringify>[0] = (
+  value: string | Record<string, unknown>,
+) => {
+  if (typeof value === 'string') return value;
   return value?.payloads ?? value?.indexedFields ?? value?.points ?? value;
 };
 
