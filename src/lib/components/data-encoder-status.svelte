@@ -7,11 +7,6 @@
   } from '@fortawesome/free-solid-svg-icons';
 
   import {
-    dataConverterPort,
-    lastDataConverterStatus,
-  } from '$lib/stores/data-converter-config';
-
-  import {
     dataEncoderEndpoint,
     lastDataEncoderStatus,
   } from '$lib/stores/data-encoder-config';
@@ -19,8 +14,8 @@
   import Tooltip from '$lib/components/tooltip.svelte';
 </script>
 
-{#if $dataConverterPort}
-  {#if $lastDataConverterStatus === 'notRequested'}
+{#if $dataEncoderEndpoint}
+  {#if $lastDataEncoderStatus === 'notRequested'}
     <Tooltip left text={'Data converter is configured'}>
       <div class="flex">
         <Icon
@@ -35,7 +30,7 @@
         />
       </div>
     </Tooltip>
-  {:else if $lastDataConverterStatus === 'error'}
+  {:else if $lastDataEncoderStatus === 'error'}
     <Tooltip
       left
       text={`Data converter couldn't connect to the remote converter`}
@@ -53,7 +48,7 @@
         />
       </div>
     </Tooltip>
-  {:else if $lastDataConverterStatus === 'success'}
+  {:else if $lastDataEncoderStatus === 'success'}
     <Tooltip left text={'Data converter succesfully converted content'}>
       <div class="flex">
         <Icon
