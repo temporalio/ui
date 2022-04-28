@@ -93,7 +93,7 @@
   </td>
 </tr>
 {#if expanded}
-  <tr class="flex-wrap xl:table-row">
+  <tr class="expanded-row flex-wrap xl:table-row">
     <td class="expanded-cell" colspan="4">
       <EventDetailsFull event={currentEvent} {compact} />
     </td>
@@ -111,7 +111,7 @@
   }
 
   .row {
-    @apply no-underline xl:py-3 text-sm border-b-0 border-gray-700 items-center xl:text-base flex flex-wrap xl:table-row last-of-type:border-b-0;
+    @apply no-underline xl:py-3 text-sm border-b-2 border-gray-700 items-center xl:text-base flex flex-wrap xl:table-row last-of-type:border-b-0;
   }
 
   .row:hover {
@@ -129,6 +129,10 @@
   .row:last-of-type .cell,
   .row:last-of-type .id-cell {
     @apply border-b-0 first-of-type:rounded-bl-lg  last-of-type:rounded-br-lg;
+  }
+
+  .expanded-row {
+    @apply border-b-2 border-gray-700;
   }
 
   .expanded-cell {

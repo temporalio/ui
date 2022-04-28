@@ -21,11 +21,10 @@ const keysToExpand: Readonly<Set<string>> = new Set([
 const formatNestedAttributes = (
   attributes: CombinedAttributes,
   key: string,
-  value: unknown,
 ) => {
   if (keysToExpand.has(key) && typeof attributes[key] === 'object') {
     for (const [nestedKey, nestedValue] of Object.entries(attributes[key])) {
-      const shouldDisplayNested = shouldDisplayNestedAttribute(key, value);
+      const shouldDisplayNested = shouldDisplayNestedAttribute(nestedValue);
       if (shouldDisplayNested) {
         attributes[`${key}${capitalize(nestedKey)}`] = nestedValue;
       }
@@ -45,7 +44,7 @@ export const formatAttributes = (
   for (const [key, value] of Object.entries(event.attributes)) {
     const shouldDisplay = shouldDisplayAttribute(key, value);
     if (!keysToOmit.has(key) && shouldDisplay) attributes[key] = value;
-    formatNestedAttributes(attributes, key, value);
+    formatNestedAttributes(attributes, key);
   }
 
   return attributes;
