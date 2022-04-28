@@ -1,0 +1,294 @@
+{
+  "history": {
+    "events": [
+      {
+        "eventId": "1",
+        "eventTime": "2022-04-28T05:30:19.445614773Z",
+        "eventType": "WorkflowExecutionStarted",
+        "version": "0",
+        "taskId": "1367526",
+        "workflowExecutionStartedEventAttributes": {
+          "workflowType": {
+            "name": "RainbowStatusesWorkflow"
+          },
+          "parentWorkflowNamespace": "",
+          "parentWorkflowExecution": null,
+          "parentInitiatedEventId": "0",
+          "taskQueue": {
+            "name": "rainbow-statuses",
+            "kind": "Normal"
+          },
+          "input": {
+            "payloads": [
+              {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg=="
+                },
+                "data": "Mw=="
+              }
+            ]
+          },
+          "workflowExecutionTimeout": "0s",
+          "workflowRunTimeout": "0s",
+          "workflowTaskTimeout": "10s",
+          "continuedExecutionRunId": "",
+          "initiator": "Unspecified",
+          "continuedFailure": null,
+          "lastCompletionResult": null,
+          "originalExecutionRunId": "cd6eac83-95e0-4c3f-8532-4a062b66d65b",
+          "identity": "168773@user0@",
+          "firstExecutionRunId": "cd6eac83-95e0-4c3f-8532-4a062b66d65b",
+          "retryPolicy": null,
+          "attempt": 1,
+          "workflowExecutionExpirationTime": null,
+          "cronSchedule": "",
+          "firstWorkflowTaskBackoff": "0s",
+          "memo": null,
+          "searchAttributes": {
+            "indexedFields": {
+              "CustomBoolField": {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg==",
+                  "type": "Qm9vbA=="
+                },
+                "data": "dHJ1ZQ=="
+              },
+              "CustomDatetimeField": {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg==",
+                  "type": "RGF0ZXRpbWU="
+                },
+                "data": "IjIwMjItMDQtMjhUMDU6MzA6MTkuNDQ0ODc1NjU4WiI="
+              },
+              "CustomDoubleField": {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg==",
+                  "type": "RG91Ymxl"
+                },
+                "data": "Mg=="
+              },
+              "CustomIntField": {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg==",
+                  "type": "SW50"
+                },
+                "data": "Mg=="
+              },
+              "CustomKeywordField": {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg==",
+                  "type": "S2V5d29yZA=="
+                },
+                "data": "InJhaW5ib3ctc3RhdHVzZXMtZDQ5NGM0Ig=="
+              },
+              "CustomStringField": {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg==",
+                  "type": "VGV4dA=="
+                },
+                "data": "InJhaW5ib3cgc3RhdHVzZXMgZDQ5NGM0IEZhaWxlZCI="
+              }
+            }
+          },
+          "prevAutoResetPoints": null,
+          "header": {
+            "fields": {}
+          }
+        }
+      },
+      {
+        "eventId": "2",
+        "eventTime": "2022-04-28T05:30:19.445630017Z",
+        "eventType": "WorkflowTaskScheduled",
+        "version": "0",
+        "taskId": "1367527",
+        "workflowTaskScheduledEventAttributes": {
+          "taskQueue": {
+            "name": "rainbow-statuses",
+            "kind": "Normal"
+          },
+          "startToCloseTimeout": "10s",
+          "attempt": 1
+        }
+      },
+      {
+        "eventId": "3",
+        "eventTime": "2022-04-28T05:30:19.455830647Z",
+        "eventType": "WorkflowTaskStarted",
+        "version": "0",
+        "taskId": "1367537",
+        "workflowTaskStartedEventAttributes": {
+          "scheduledEventId": "2",
+          "identity": "168631@user0@",
+          "requestId": "9c328226-6823-4ce9-9ff8-e4be34b11336"
+        }
+      },
+      {
+        "eventId": "4",
+        "eventTime": "2022-04-28T05:30:19.459978643Z",
+        "eventType": "WorkflowTaskCompleted",
+        "version": "0",
+        "taskId": "1367540",
+        "workflowTaskCompletedEventAttributes": {
+          "scheduledEventId": "2",
+          "startedEventId": "3",
+          "identity": "168631@user0@",
+          "binaryChecksum": "04f0fb34cfd90d692fa1d506c626a598"
+        }
+      },
+      {
+        "eventId": "5",
+        "eventTime": "2022-04-28T05:30:19.460006335Z",
+        "eventType": "ActivityTaskScheduled",
+        "version": "0",
+        "taskId": "1367541",
+        "activityTaskScheduledEventAttributes": {
+          "activityId": "5",
+          "activityType": {
+            "name": "FailedActivity"
+          },
+          "namespace": "",
+          "taskQueue": {
+            "name": "rainbow-statuses",
+            "kind": "Normal"
+          },
+          "header": {
+            "fields": {}
+          },
+          "input": null,
+          "scheduleToCloseTimeout": "0s",
+          "scheduleToStartTimeout": "0s",
+          "startToCloseTimeout": "3600s",
+          "heartbeatTimeout": "0s",
+          "workflowTaskCompletedEventId": "4",
+          "retryPolicy": {
+            "initialInterval": "1s",
+            "backoffCoefficient": 2,
+            "maximumInterval": "100s",
+            "maximumAttempts": 1,
+            "nonRetryableErrorTypes": []
+          }
+        }
+      },
+      {
+        "eventId": "6",
+        "eventTime": "2022-04-28T05:30:19.464253422Z",
+        "eventType": "ActivityTaskStarted",
+        "version": "0",
+        "taskId": "1367546",
+        "activityTaskStartedEventAttributes": {
+          "scheduledEventId": "5",
+          "identity": "168631@user0@",
+          "requestId": "5259a8ac-da1d-46ed-8d10-22fb4df32e41",
+          "attempt": 1,
+          "lastFailure": null
+        }
+      },
+      {
+        "eventId": "7",
+        "eventTime": "2022-04-28T05:30:19.467461618Z",
+        "eventType": "ActivityTaskFailed",
+        "version": "0",
+        "taskId": "1367547",
+        "activityTaskFailedEventAttributes": {
+          "failure": {
+            "message": "manual failure",
+            "source": "GoSDK",
+            "stackTrace": "",
+            "cause": null,
+            "applicationFailureInfo": {
+              "type": "",
+              "nonRetryable": false,
+              "details": null
+            }
+          },
+          "scheduledEventId": "5",
+          "startedEventId": "6",
+          "identity": "168631@user0@",
+          "retryState": "MaximumAttemptsReached"
+        }
+      },
+      {
+        "eventId": "8",
+        "eventTime": "2022-04-28T05:30:19.467466352Z",
+        "eventType": "WorkflowTaskScheduled",
+        "version": "0",
+        "taskId": "1367548",
+        "workflowTaskScheduledEventAttributes": {
+          "taskQueue": {
+            "name": "user0:d433b889-ba64-4226-ba2c-8e6a07e19d63",
+            "kind": "Sticky"
+          },
+          "startToCloseTimeout": "10s",
+          "attempt": 1
+        }
+      },
+      {
+        "eventId": "9",
+        "eventTime": "2022-04-28T05:30:19.471343817Z",
+        "eventType": "WorkflowTaskStarted",
+        "version": "0",
+        "taskId": "1367552",
+        "workflowTaskStartedEventAttributes": {
+          "scheduledEventId": "8",
+          "identity": "168631@user0@",
+          "requestId": "6b7e2000-e452-43c0-9048-056255d32034"
+        }
+      },
+      {
+        "eventId": "10",
+        "eventTime": "2022-04-28T05:30:19.475521623Z",
+        "eventType": "WorkflowTaskCompleted",
+        "version": "0",
+        "taskId": "1367555",
+        "workflowTaskCompletedEventAttributes": {
+          "scheduledEventId": "8",
+          "startedEventId": "9",
+          "identity": "168631@user0@",
+          "binaryChecksum": "04f0fb34cfd90d692fa1d506c626a598"
+        }
+      },
+      {
+        "eventId": "11",
+        "eventTime": "2022-04-28T05:30:19.475534318Z",
+        "eventType": "WorkflowExecutionFailed",
+        "version": "0",
+        "taskId": "1367556",
+        "workflowExecutionFailedEventAttributes": {
+          "failure": {
+            "message": "activity error",
+            "source": "GoSDK",
+            "stackTrace": "",
+            "cause": {
+              "message": "manual failure",
+              "source": "GoSDK",
+              "stackTrace": "",
+              "cause": null,
+              "applicationFailureInfo": {
+                "type": "",
+                "nonRetryable": false,
+                "details": null
+              }
+            },
+            "activityFailureInfo": {
+              "scheduledEventId": "5",
+              "startedEventId": "6",
+              "identity": "168631@user0@",
+              "activityType": {
+                "name": "FailedActivity"
+              },
+              "activityId": "5",
+              "retryState": "MaximumAttemptsReached"
+            }
+          },
+          "retryState": "RetryPolicyNotSet",
+          "workflowTaskCompletedEventId": "10",
+          "newExecutionRunId": ""
+        }
+      }
+    ]
+  },
+  "rawHistory": [],
+  "nextPageToken": null,
+  "archived": false
+}

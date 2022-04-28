@@ -11,6 +11,7 @@
 
 <article
   class="flex flex-col border-2 border-gray-300 p-4 rounded-lg w-full lg:w-1/2"
+  data-cy="workflow-input-and-results"
 >
   <h3 class="text-lg">{title}</h3>
   {#if isRunning}
