@@ -25,7 +25,7 @@ interface WorkflowEvent extends HistoryEvent {
   name: EventType;
 }
 
-type WorkflowEvents = WorkflowEvents;
+type WorkflowEvents = WorkflowEvent[];
 
 interface PendingActivity extends PendingActivityInfo {
   id: typeof PendingActivityInfo.activityId;
