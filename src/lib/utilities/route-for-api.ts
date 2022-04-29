@@ -46,8 +46,8 @@ export function routeForApi(
     'workflows.archived': `/namespaces/${encoded?.namespace}/workflows/archived`,
     workflow: `/namespaces/${encoded?.namespace}/workflows/${encoded?.workflowId}/runs/${encoded?.runId}`,
     'workflow.terminate': `/namespaces/${encoded?.namespace}/workflows/${encoded?.workflowId}/runs/${encoded?.runId}/terminate`,
-    events: `/namespaces/${encoded?.namespace}/workflows/${encoded?.workflowId}/runs/${encoded?.runId}/events`,
-    'events.reverse': `/namespaces/${encoded?.namespace}/workflows/${encoded?.workflowId}/runs/${encoded?.runId}/events/reverse`,
+    'events.ascending': `/namespaces/${encoded?.namespace}/workflows/${encoded?.workflowId}/runs/${encoded?.runId}/events`,
+    'events.descending': `/namespaces/${encoded?.namespace}/workflows/${encoded?.workflowId}/runs/${encoded?.runId}/events/reverse`,
     query: `/namespaces/${encoded?.namespace}/workflows/${encoded?.workflowId}/runs/${encoded?.runId}/query`,
   };
 

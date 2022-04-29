@@ -15,8 +15,14 @@ describe(routeForApi, () => {
   });
 
   it('should return a route for events', () => {
-    expect(routeForApi('events', parameters)).toBe(
+    expect(routeForApi('events.ascending', parameters)).toBe(
       'http://localhost:8080/api/v1/namespaces/namespace/workflows/workflow/runs/run/events',
+    );
+  });
+
+  it('should return a route for events', () => {
+    expect(routeForApi('events.descending', parameters)).toBe(
+      'http://localhost:8080/api/v1/namespaces/namespace/workflows/workflow/runs/run/events/reverse',
     );
   });
 

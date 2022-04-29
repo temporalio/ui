@@ -6,7 +6,7 @@
     faClock,
   } from '@fortawesome/free-solid-svg-icons';
 
-  import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-filters';
+  import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-views';
   import { timeFormat } from '$lib/stores/time-format';
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
 
@@ -39,7 +39,7 @@
   $: expanded = expandAll;
 
   $: currentEvent = compact ? eventGroup.events.get(selectedId) : event;
-  $: reversed = $eventFilterSort === 'reverse';
+  $: descending = $eventFilterSort === 'descending';
   $: showElapsed = $eventShowElapsed === 'true';
 
   $: timeDiffChange = '';
@@ -53,7 +53,7 @@
           : previousItem?.eventTime,
         end: compact ? currentEvent?.eventTime : event?.eventTime,
       });
-      timeDiffChange = timeDiff ? `(${reversed ? '-' : '+'}${timeDiff})` : '';
+      timeDiffChange = timeDiff ? `(${descending ? '-' : '+'}${timeDiff})` : '';
     }
   }
 

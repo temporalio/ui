@@ -4,28 +4,43 @@ import { paginated } from '$lib/utilities/paginated';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { toEventHistory } from '$lib/models/event-history';
+import type { EventFilterType } from '$lib/stores/event-views';
 
 type FetchEvents = NamespaceScopedRequest &
   PaginationCallbacks<GetWorkflowExecutionHistoryResponse> & {
     workflowId: string;
     runId: string;
     rawPayloads?: boolean;
-    reverse?: boolean;
+    sort?: string;
   };
+
+const isSortOrder = (sortOrder: string): sortOrder is EventFilterType => {
+  if (sortOrder === 'ascending') return true;
+  if (sortOrder === 'descending') return true;
+  return false;
+};
+
+const getEndpointForSortOrder = (sortOrder: string): WorkflowAPIRoutePath => {
+  if (!isSortOrder(sortOrder)) return 'events.descending';
+  if (sortOrder === 'descending') return 'events.descending';
+  if (sortOrder === 'ascending') return 'events.ascending';
+  return 'events.descending';
+};
 
 export const fetchRawEvents = async (
   {
     namespace,
     workflowId,
     runId,
-    reverse,
+    sort,
     onStart,
     onUpdate,
     onComplete,
   }: FetchEvents,
   request = fetch,
 ): Promise<HistoryEvent[]> => {
-  const endpoint: WorkflowAPIRoutePath = reverse ? 'events.reverse' : 'events';
+  const endpoint = getEndpointForSortOrder(sort);
+
   const response = await paginated(
     async (token: string) => {
       return requestFromAPI<GetWorkflowExecutionHistoryResponse>(
