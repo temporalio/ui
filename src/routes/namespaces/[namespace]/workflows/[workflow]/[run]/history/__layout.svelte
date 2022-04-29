@@ -2,8 +2,8 @@
   import type { Load } from '@sveltejs/kit';
   import { routeForWorkers, routeForWorkflow } from '$lib/utilities/route-for';
 
-  export const load: Load = async function ({ params, url, stuff, fetch }) {
-    const { workflow, settings } = stuff;
+  export const load: Load = async function ({ params, stuff }) {
+    const { workflow } = stuff;
     const { namespace } = params;
 
     return {
