@@ -7,12 +7,7 @@
   import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
-  import {
-    eventFilterSort,
-    eventShowElapsed,
-    setFilterSort,
-    setShowElapsed,
-  } from '$lib/stores/event-filters';
+  import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-views';
   import {
     timeFormat,
     setTimeFormat,
@@ -21,15 +16,15 @@
   import type {
     EventFilterType,
     EventFilterTypeOptions,
-  } from '$lib/stores/event-filters';
+  } from '$lib/stores/event-views';
 
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   let sortOptions: EventFilterTypeOptions = [
-    { label: 'Sort 1-9', option: '' },
-    { label: 'Sort 9-1', option: 'reverse' },
+    { label: 'Sort 1-9', option: 'ascending' },
+    { label: 'Sort 9-1', option: 'descending' },
   ];
 
   let dateOptions: TimeFormatOptions = [
@@ -39,7 +34,7 @@
   ];
 
   const onSortOptionClick = (option: EventFilterType) => {
-    setFilterSort(option);
+    $eventFilterSort = option;
     updateQueryParameters({
       parameter: 'sort',
       value: option,
@@ -54,14 +49,14 @@
 
   const onShowElapsedClick = () => {
     if ($eventShowElapsed === 'true') {
-      setShowElapsed('false');
+      $eventShowElapsed = 'false';
     } else {
-      setShowElapsed('true');
+      $eventShowElapsed = 'true';
     }
   };
 
   $: value =
-    $eventFilterSort === '' &&
+    $eventFilterSort === 'descending' &&
     $timeFormat === 'UTC' &&
     $eventShowElapsed === 'false'
       ? undefined

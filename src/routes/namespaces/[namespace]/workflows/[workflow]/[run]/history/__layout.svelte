@@ -11,7 +11,7 @@
       namespace,
       workflowId: workflow.id,
       runId: workflow.runId,
-      reverse: Boolean(url?.searchParams?.get('sort')),
+      sort: url?.searchParams?.get('sort'),
     };
 
     const { events, eventGroups } = await fetchEvents(parameters, fetch);
