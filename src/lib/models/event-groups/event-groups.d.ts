@@ -1,13 +1,14 @@
-type EventGroup<E = WorkflowEvent, Id = E['id']> = {
-  id: Id;
-  name: string;
-  events: Map<Id, E>;
-  eventIds: Set<Id>;
-  initialEvent: WorkflowEvent;
-  timestamp: WorkflowEvent['timestamp'];
-  eventTime: WorkflowEvent['eventTime'];
-  attributes: WorkflowEvent['attributes'];
-} & Pick<WorkflowEvent, 'timestamp' | 'classification' | 'category'>;
+type EventId = EventType['id'];
 
-type EventGroups<T = EventType, E = WorkflowEvent> = EventGroup<T, E>[] &
-  ArrayLike;
+type EventGroup = {
+  id: EventId;
+  name: string;
+  events: Map<EventId, EventType>;
+  eventIds: Set<EventId>;
+  initialEvent: WorkflowEvent;
+} & Pick<
+  WorkflowEvent,
+  'timestamp' | 'classification' | 'category' | 'eventTime' | 'attributes'
+>;
+
+type EventGroups = EventGroup[];
