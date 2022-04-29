@@ -1,16 +1,15 @@
 type EventId = EventType['id'];
 
-type EventGroup = {
+interface EventGroup
+  extends Pick<
+    WorkflowEvent,
+    'timestamp' | 'classification' | 'category' | 'eventTime' | 'attributes'
+  > {
   id: EventId;
   name: string;
-  events: Map<EventId, EventType>;
+  events: Map<EventId, WorkflowEvent>;
   eventIds: Set<EventId>;
   initialEvent: WorkflowEvent;
-  eventTime: WorkflowEvent['eventTime'];
-  attributes: WorkflowEvent['attributes'];
-} & Pick<
-  WorkflowEvent,
-  'timestamp' | 'classification' | 'category' | 'eventTime'
->;
+}
 
 type EventGroups = EventGroup[];
