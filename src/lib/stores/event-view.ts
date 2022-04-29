@@ -9,6 +9,7 @@ export type EventSortOrderOptions = {
 }[];
 
 export const eventViewType = persistStore<EventView>('eventView', 'feed');
+
 export const expandAllEvents = persistStore('expandAllEvents', 'false');
 
 export const eventSortOrder = persistStore<EventSortOrder>(

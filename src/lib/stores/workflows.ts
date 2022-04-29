@@ -1,10 +1,10 @@
-import { Writable, writable } from 'svelte/store';
+import { writable } from 'svelte/store';
 import { page } from '$app/stores';
 
 import { fetchAllWorkflows } from '$lib/services/workflow-service';
 
 import type { CombinedWorkflowExecutionsResponse } from '$lib/services/workflow-service';
-import type { StartStopNotifier } from 'svelte/store';
+import type { StartStopNotifier, Writable } from 'svelte/store';
 
 type WorkflowStoreParameters = {
   namespace: string;
