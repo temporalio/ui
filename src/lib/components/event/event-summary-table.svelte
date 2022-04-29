@@ -3,7 +3,7 @@
 
   import EventCategoryFilter from '$lib/components/event/event-category-filter.svelte';
   import EventDateFilter from '$lib/components/event/event-date-filter.svelte';
-  import { expandAllEvents } from '$lib/stores/event-view-type';
+  import { expandAllEvents } from '$lib/stores/event-views';
 
   export let compact = false;
 
