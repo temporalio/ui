@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
-  import { eventViewType } from '$lib/stores/event-view-type';
   import { onMount } from 'svelte';
-  import { routeForEventHistory } from '$lib/utilities/route-for';
   import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
+
+  import { eventViewType } from '$lib/stores/event-views';
+  import { routeForEventHistory } from '$lib/utilities/route-for';
   import { eventFilterSort } from '$lib/stores/event-filters';
 
   const { namespace, workflow, run } = $page.params;

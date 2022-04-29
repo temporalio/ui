@@ -1,10 +1,10 @@
 <script lang="ts">
-  import Pagination from '$lib/components/pagination.svelte';
+  import { expandAllEvents } from '$lib/stores/event-views';
 
+  import Pagination from '$lib/components/pagination.svelte';
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventEmptyRow from './event-empty-row.svelte';
-  import { expandAllEvents } from '$lib/stores/event-view-type';
 
   export let items: IterableEvents;
   export let groups: EventGroups;
