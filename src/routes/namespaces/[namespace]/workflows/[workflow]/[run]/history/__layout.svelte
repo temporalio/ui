@@ -45,7 +45,7 @@
   import { routeForEventHistory } from '$lib/utilities/route-for';
   import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
   import { formatDate } from '$lib/utilities/format-date';
-  import { eventViewType, setEventViewType } from '$lib/stores/event-view-type';
+  import { eventViewType } from '$lib/stores/event-view-type';
 
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
@@ -130,19 +130,19 @@
             base={routeForEventHistory(routeParameters('feed'))}
             href={routeForEventHistory(routeParameters('feed'))}
             active={$eventViewType === 'feed'}
-            on:click={() => setEventViewType('feed')}>Timeline</ToggleButton
+            on:click={() => ($eventViewType = 'feed')}>Timeline</ToggleButton
           >
           <ToggleButton
             icon={faLayerGroup}
             href={routeForEventHistory(routeParameters('compact'))}
             active={$eventViewType === 'compact'}
-            on:click={() => setEventViewType('compact')}>Compact</ToggleButton
+            on:click={() => ($eventViewType = 'compact')}>Compact</ToggleButton
           >
           <ToggleButton
             icon={faCode}
             href={routeForEventHistory(routeParameters('json'))}
             active={$eventViewType === 'json'}
-            on:click={() => setEventViewType('json')}>JSON</ToggleButton
+            on:click={() => ($eventViewType = 'json')}>JSON</ToggleButton
           >
         </ToggleButtons>
       </div>
