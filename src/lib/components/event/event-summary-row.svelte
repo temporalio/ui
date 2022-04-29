@@ -4,13 +4,13 @@
 
   import { eventSortOrder, eventShowElapsed } from '$lib/stores/event-view';
   import { timeFormat } from '$lib/stores/time-format';
-  import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
 
   import { getGroupForEvent, isEventGroup } from '$lib/models/event-groups';
   import {
     formatDate,
     formatDistanceAbbreviated,
   } from '$lib/utilities/format-date';
+  import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
 
   import EventDetailsRow from './event-details-row.svelte';
   import EventGroupDetails from './event-group-details.svelte';
