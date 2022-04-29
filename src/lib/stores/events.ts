@@ -42,6 +42,7 @@ export const events = derived(
   [eventHistory, eventCategory],
   ([$eventHistory, $category]) => {
     const { events } = $eventHistory;
+    if (!$category) return events;
     return events.filter((event) => event.category === $category);
   },
 );
@@ -50,6 +51,7 @@ export const eventGroups = derived(
   [eventHistory, eventCategory],
   ([$eventHistory, $category]) => {
     const { eventGroups } = $eventHistory;
+    if (!$category) return eventGroups;
     return eventGroups.filter((event) => event.category === $category);
   },
 );

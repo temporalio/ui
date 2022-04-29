@@ -2,30 +2,14 @@
   import type { Load } from '@sveltejs/kit';
   import { routeForWorkers, routeForWorkflow } from '$lib/utilities/route-for';
 
-  import { fetchEvents } from '$lib/services/events-service';
-
   export const load: Load = async function ({ params, url, stuff, fetch }) {
     const { workflow } = stuff;
     const { namespace } = params;
-    const parameters = {
-      namespace,
-      workflowId: workflow.id,
-      runId: workflow.runId,
-      sort: url?.searchParams?.get('sort'),
-    };
-
-    const { events, eventGroups } = await fetchEvents(parameters, fetch);
 
     return {
       props: {
         namespace,
         workflow,
-        events,
-        eventGroups,
-      },
-      stuff: {
-        events,
-        eventGroups,
       },
     };
   };
@@ -39,7 +23,6 @@
   } from '@fortawesome/free-solid-svg-icons';
 
   import { routeForEventHistory } from '$lib/utilities/route-for';
-  import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
   import { formatDate } from '$lib/utilities/format-date';
   import { eventViewType } from '$lib/stores/event-view';
 
@@ -52,9 +35,7 @@
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
-  export let events: WorkflowEvents;
 
-  const { input, result } = getWorkflowStartedAndCompletedEvents(events);
   const routeParameters = (view: EventView, eventId?: string) => ({
     namespace,
     workflow: workflow.id,
@@ -106,13 +87,8 @@
     />
   </section>
   <section class="flex gap-4 w-full flex-col lg:flex-row">
-    <InputAndResults title="Input" content={input} dataCy="workflow-input" />
-    <InputAndResults
-      title="Results"
-      content={result}
-      isRunning={workflow.isRunning}
-      dataCy="workflow-results"
-    />
+    <InputAndResults type="input" />
+    <InputAndResults type="results" />
   </section>
   <WorkflowStackTrace {namespace} {workflow} class="mb-2 max-h-96" />
   <PendingActivties />

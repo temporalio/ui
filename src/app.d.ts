@@ -11,11 +11,7 @@ declare namespace App {
   interface Stuff {
     workflow?: WorkflowExecution;
     namespaces: ListNamespacesResponse;
-    events?: WorkflowEvents;
-    eventGroups?: EventGroups;
     settings: Settings;
-    matchingEvents?: WorkflowEvents;
-    matchingEventGroups?: EventGroups;
     workers?: GetPollersResponse;
     cluster?: ClusterInformation;
   }

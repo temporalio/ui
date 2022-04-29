@@ -5,7 +5,7 @@
   import EventSummary from '$lib/components/event/event-summary.svelte';
 
   $: category = $page.url.searchParams.get('category') as EventTypeCategory;
-  $: filteredEventGroups = $importEventGroups.filter((event: EventGroups) => {
+  $: filteredEventGroups = $importEventGroups.filter((event: EventGroup) => {
     if (category) return event.category === category;
     return event;
   });
