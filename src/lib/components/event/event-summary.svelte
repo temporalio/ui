@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { expandAllEvents } from '$lib/stores/event-views';
+  import { expandAllEvents } from '$lib/stores/event-view';
 
   import Pagination from '$lib/components/pagination.svelte';
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';

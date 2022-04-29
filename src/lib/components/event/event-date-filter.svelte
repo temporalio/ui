@@ -7,16 +7,16 @@
   import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
-  import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-views';
+  import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-view';
   import {
     timeFormat,
     setTimeFormat,
     TimeFormatOptions,
   } from '$lib/stores/time-format';
   import type {
-    EventFilterType,
+    EventSortOrder,
     EventFilterTypeOptions,
-  } from '$lib/stores/event-views';
+  } from '$lib/stores/event-view';
 
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
@@ -33,7 +33,7 @@
     { label: 'Local Time', option: 'local' },
   ];
 
-  const onSortOptionClick = (option: EventFilterType) => {
+  const onSortOptionClick = (option: EventSortOrder) => {
     $eventFilterSort = option;
     updateQueryParameters({
       parameter: 'sort',

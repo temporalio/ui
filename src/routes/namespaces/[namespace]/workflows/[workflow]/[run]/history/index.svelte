@@ -3,9 +3,9 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
 
-  import { eventViewType } from '$lib/stores/event-views';
+  import { eventViewType } from '$lib/stores/event-view';
   import { routeForEventHistory } from '$lib/utilities/route-for';
-  import { eventFilterSort } from '$lib/stores/event-views';
+  import { eventFilterSort } from '$lib/stores/event-view';
 
   const { namespace, workflow, run } = $page.params;
 
