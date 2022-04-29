@@ -1,4 +1,10 @@
-import { derived, readable, writable, Readable } from 'svelte/store';
+import {
+  derived,
+  readable,
+  writable,
+  Readable,
+  Unsubscriber,
+} from 'svelte/store';
 import { page } from '$app/stores';
 import {
   fetchEvents,
@@ -17,6 +23,13 @@ const runId = derived([page], ([$page]) => $page.params.run);
 
 const loading = writable(true);
 
+const shouldFetchNewEvents = (parameters: FetchEventsParameters): boolean => {
+  for (const required of ['namespace', 'workflowId', 'runId']) {
+    if (!parameters[required]) return false;
+  }
+  return true;
+};
+
 export const parameters: Readable<FetchEventsParameters> = derived(
   [namespace, workflowId, runId, eventSortOrder],
   ([$namespace, $workflowId, $runId, $sort]) => {
@@ -29,12 +42,16 @@ export const parameters: Readable<FetchEventsParameters> = derived(
   },
 );
 
-export const eventHistory = readable(emptyEvents, (set) => {
+export const eventHistory = readable(emptyEvents, (set): Unsubscriber => {
   return parameters.subscribe(async (params) => {
     loading.set(true);
-    const eventsAndGroups = await fetchEvents(params);
-    set(eventsAndGroups);
-    loading.set(false);
+    if (shouldFetchNewEvents(params)) {
+      const response = await fetchEvents(params);
+      set(response);
+      loading.set(false);
+    } else {
+      set(emptyEvents);
+    }
   });
 });
 
