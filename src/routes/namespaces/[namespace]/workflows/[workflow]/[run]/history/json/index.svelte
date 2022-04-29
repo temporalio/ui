@@ -16,4 +16,4 @@
   export let events: WorkflowEvents;
 </script>
 
-<CodeBlock content={events} />
+<CodeBlock content={events} dataCy="event-history-json" />

@@ -1,9 +1,9 @@
 /// <reference types="cypress" />
 
-import workflowsFixture from '../fixtures/workflows.json';
+import workflowFixture from '../fixtures/workflow.json';
+import eventsFixture from '../fixtures/event-history-completed.json';
 
-const workflow = workflowsFixture.executions[0];
-const { workflowId, runId } = workflow?.execution;
+const { workflowId, runId } = workflowFixture.workflowExecutionInfo.execution;
 
 describe('Workflow Events', () => {
   beforeEach(() => {
@@ -68,7 +68,7 @@ describe('Workflow Events', () => {
     cy.url().should('contain', '/feed');
 
     cy.get(
-      '[href="/namespaces/default/workflows/b12453_Completed/db7b0929-24bc-424c-a935-a1f8da69755e/history/feed?per-page=100"]',
+      `[href="/namespaces/default/workflows/${workflowId}/${runId}/history/feed?per-page=100"]`,
     ).click();
     cy.url().should('contain', '/feed');
 
@@ -76,5 +76,20 @@ describe('Workflow Events', () => {
 
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
     cy.url().should('contain', '/feed');
+  });
+
+  it('should be viewable as JSON', () => {
+    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
+
+    cy.wait('@workflow-api');
+    cy.wait('@event-history-api');
+    cy.wait('@query-api');
+
+    cy.get(
+      `[href="/namespaces/default/workflows/${workflowId}/${runId}/history/json?per-page=100"]`,
+    ).click();
+
+    const match = eventsFixture.history.events[0].eventTime;
+    cy.get('[data-cy="event-history-json"]').contains(match);
   });
 });
