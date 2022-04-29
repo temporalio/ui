@@ -2,7 +2,7 @@
   import Icon from 'svelte-fa';
   import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 
-  import { eventViewType } from '$lib/stores/event-views';
+  import { eventViewType } from '$lib/stores/event-view';
 
   import {
     routeForEventHistory,

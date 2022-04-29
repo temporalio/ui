@@ -4,7 +4,7 @@ import { paginated } from '$lib/utilities/paginated';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { toEventHistory } from '$lib/models/event-history';
-import type { EventFilterType } from '$lib/stores/event-views';
+import type { EventSortOrder } from '$lib/stores/event-view';
 
 type FetchEvents = NamespaceScopedRequest &
   PaginationCallbacks<GetWorkflowExecutionHistoryResponse> & {
@@ -14,7 +14,7 @@ type FetchEvents = NamespaceScopedRequest &
     sort?: string;
   };
 
-const isSortOrder = (sortOrder: string): sortOrder is EventFilterType => {
+const isSortOrder = (sortOrder: string): sortOrder is EventSortOrder => {
   if (sortOrder === 'ascending') return true;
   if (sortOrder === 'descending') return true;
   return false;

@@ -6,7 +6,7 @@
     faClock,
   } from '@fortawesome/free-solid-svg-icons';
 
-  import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-views';
+  import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-view';
   import { timeFormat } from '$lib/stores/time-format';
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
 
