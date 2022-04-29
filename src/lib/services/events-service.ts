@@ -6,7 +6,7 @@ import { routeForApi } from '$lib/utilities/route-for-api';
 import { toEventHistory } from '$lib/models/event-history';
 import type { EventSortOrder } from '$lib/stores/event-view';
 
-type FetchEvents = NamespaceScopedRequest &
+export type FetchEventsParameters = NamespaceScopedRequest &
   PaginationCallbacks<GetWorkflowExecutionHistoryResponse> & {
     workflowId: string;
     runId: string;
@@ -36,7 +36,7 @@ export const fetchRawEvents = async (
     onStart,
     onUpdate,
     onComplete,
-  }: FetchEvents,
+  }: FetchEventsParameters,
   request = fetch,
 ): Promise<HistoryEvent[]> => {
   const endpoint = getEndpointForSortOrder(sort);
@@ -58,7 +58,7 @@ export const fetchRawEvents = async (
 };
 
 export const fetchEvents = async (
-  parameters: FetchEvents,
+  parameters: FetchEventsParameters,
   request = fetch,
 ): Promise<FetchEventsResponse> => {
   return fetchRawEvents(parameters, request).then(toEventHistory);
