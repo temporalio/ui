@@ -36,7 +36,7 @@ export const createWebsocket = (
 
       ...extraParams,
     });
-    sock.onError.addListener((event) => {
+    sock.onError.addListener((event: unknown) => {
       console.error(`Websocket connection error: ${event}`);
     });
   } catch (err) {
