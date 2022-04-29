@@ -5,12 +5,12 @@
 
   import { eventViewType } from '$lib/stores/event-view';
   import { routeForEventHistory } from '$lib/utilities/route-for';
-  import { eventFilterSort } from '$lib/stores/event-view';
+  import { eventSortOrder } from '$lib/stores/event-view';
 
   const { namespace, workflow, run } = $page.params;
 
   onMount(async () => {
-    const queryParams = { sort: $eventFilterSort };
+    const queryParams = { sort: $eventSortOrder };
     goto(
       routeForEventHistory({
         view: $eventViewType,

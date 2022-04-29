@@ -2,7 +2,7 @@
   import Icon from 'svelte-fa';
   import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
-  import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-view';
+  import { eventSortOrder, eventShowElapsed } from '$lib/stores/event-view';
   import { timeFormat } from '$lib/stores/time-format';
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
 
@@ -32,7 +32,7 @@
   $: expanded = expandAll;
 
   $: currentEvent = compact ? eventGroup.events.get(selectedId) : event;
-  $: descending = $eventFilterSort === 'descending';
+  $: descending = $eventSortOrder === 'descending';
   $: showElapsed = $eventShowElapsed === 'true';
 
   $: timeDiffChange = '';

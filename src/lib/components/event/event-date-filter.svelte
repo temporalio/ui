@@ -7,7 +7,7 @@
   import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
-  import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-view';
+  import { eventSortOrder, eventShowElapsed } from '$lib/stores/event-view';
   import {
     timeFormat,
     setTimeFormat,
@@ -15,14 +15,14 @@
   } from '$lib/stores/time-format';
   import type {
     EventSortOrder,
-    EventFilterTypeOptions,
+    EventSortOrderOptions,
   } from '$lib/stores/event-view';
 
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  let sortOptions: EventFilterTypeOptions = [
+  let sortOptions: EventSortOrderOptions = [
     { label: 'Sort 1-9', option: 'ascending' },
     { label: 'Sort 9-1', option: 'descending' },
   ];
@@ -34,7 +34,7 @@
   ];
 
   const onSortOptionClick = (option: EventSortOrder) => {
-    $eventFilterSort = option;
+    $eventSortOrder = option;
     updateQueryParameters({
       parameter: 'sort',
       value: option,
@@ -56,22 +56,22 @@
   };
 
   $: value =
-    $eventFilterSort === 'descending' &&
+    $eventSortOrder === 'descending' &&
     $timeFormat === 'UTC' &&
     $eventShowElapsed === 'false'
       ? undefined
-      : `${$eventFilterSort}:${$timeFormat}:${$eventShowElapsed}`;
+      : `${$eventSortOrder}:${$timeFormat}:${$eventShowElapsed}`;
 </script>
 
 <DropdownMenu {value} right>
   {#each sortOptions as { option, label } (option)}
     <div
       class="option"
-      class:active={$eventFilterSort === option}
+      class:active={$eventSortOrder === option}
       on:click={() => onSortOptionClick(option)}
     >
       <div class="check">
-        {#if $eventFilterSort === option}
+        {#if $eventSortOrder === option}
           <Icon icon={faCheck} scale={0.8} />
         {/if}
       </div>
