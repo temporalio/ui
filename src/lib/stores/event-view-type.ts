@@ -1,7 +1,7 @@
 import { persistStore } from '$lib/stores/persist-store';
 import { isEventView } from '$lib/utilities/route-for';
 
-export const eventViewType = persistStore('eventView', 'feed');
+export const eventViewType = persistStore<EventView>('eventView', 'feed');
 
 export const setEventViewType = (view: string): void => {
   if (isEventView(view)) {
