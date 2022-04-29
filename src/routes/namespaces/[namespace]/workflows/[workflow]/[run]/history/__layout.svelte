@@ -106,11 +106,12 @@
     />
   </section>
   <section class="flex gap-4 w-full flex-col lg:flex-row">
-    <InputAndResults title="Input" content={input} />
+    <InputAndResults title="Input" content={input} dataCy="workflow-input" />
     <InputAndResults
       title="Results"
       content={result}
       isRunning={workflow.isRunning}
+      dataCy="workflow-results"
     />
   </section>
   <WorkflowStackTrace {namespace} {workflow} class="mb-2 max-h-96" />
