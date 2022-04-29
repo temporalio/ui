@@ -1,5 +1,3 @@
-import { notifications } from '$lib/stores/notifications';
-
 export const fetchLatestUiVersion = async (
   request = fetch,
 ): Promise<string> => {
@@ -9,7 +7,6 @@ export const fetchLatestUiVersion = async (
   const body = await response.json();
 
   if (!response.ok) {
-    notifications.add('error', 'Unable to fetch latest UI release version');
     return;
   }
 
