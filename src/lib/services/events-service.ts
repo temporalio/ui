@@ -27,18 +27,15 @@ const getEndpointForSortOrder = (sortOrder: string): WorkflowAPIRoutePath => {
   return 'events.descending';
 };
 
-export const fetchRawEvents = async (
-  {
-    namespace,
-    workflowId,
-    runId,
-    sort,
-    onStart,
-    onUpdate,
-    onComplete,
-  }: FetchEventsParameters,
-  request = fetch,
-): Promise<HistoryEvent[]> => {
+export const fetchRawEvents = async ({
+  namespace,
+  workflowId,
+  runId,
+  sort,
+  onStart,
+  onUpdate,
+  onComplete,
+}: FetchEventsParameters): Promise<HistoryEvent[]> => {
   const endpoint = getEndpointForSortOrder(sort);
 
   const response = await paginated(
@@ -47,7 +44,7 @@ export const fetchRawEvents = async (
         routeForApi(endpoint, { namespace, workflowId, runId }),
         {
           token,
-          request,
+          request: fetch,
         },
       );
     },
@@ -60,9 +57,8 @@ export const fetchRawEvents = async (
 export const fetchEvents = async (
   parameters: FetchEventsParameters,
   settings: Settings,
-  request = fetch,
 ): Promise<FetchEventsResponse> => {
-  return fetchRawEvents(parameters, request).then((response) =>
+  return fetchRawEvents(parameters).then((response) =>
     toEventHistory({ response, namespace: parameters.namespace, settings }),
   );
 };
