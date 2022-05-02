@@ -20,6 +20,8 @@
   class:active={$page.url.pathname.includes(base) || active}
   class:group
   href={href + $page.url.search}
+  id={$$props.id}
+  {...$$props}
   on:click
 >
   {#if icon}
