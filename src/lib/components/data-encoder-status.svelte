@@ -7,38 +7,19 @@
     faLongArrowAltUp,
   } from '@fortawesome/free-solid-svg-icons';
 
-  import {
-    dataEncoder,
-    lastDataEncoderStatus,
-  } from '$lib/stores/data-encoder-config';
+  import { dataEncoder } from '$lib/stores/data-encoder-config';
 
-  import {
-    dataConverterPort,
-    lastDataConverterStatus,
-  } from '$lib/stores/data-converter-config';
+  import { dataConverterPort } from '$lib/stores/data-converter-config';
 
   import Tooltip from '$lib/components/tooltip.svelte';
-  $: notRequested = $dataConverterPort
-    ? $lastDataConverterStatus === 'notRequested'
-    : $lastDataEncoderStatus === 'notRequested';
-  $: error = $dataConverterPort
-    ? $lastDataConverterStatus === 'error'
-    : $lastDataEncoderStatus === 'error';
-  $: success = $dataConverterPort
-    ? $lastDataConverterStatus === 'success'
-    : $lastDataEncoderStatus === 'success';
-
-  const clearPort = () => {
-    $dataConverterPort = null;
-  };
 </script>
 
-{#if $dataEncoder?.endpoint && $dataConverterPort}
+{#if $dataEncoder?.hasEndpointAndPortConfigured}
   <Tooltip
     left
     text={'Both data encoder endpoint and port are configured. Click to clear port.'}
   >
-    <div class="flex mr-1" on:click={clearPort}>
+    <div class="flex mr-1" on:click={() => ($dataConverterPort = null)}>
       <Icon
         icon={faExclamationTriangle}
         scale={1}
@@ -47,8 +28,8 @@
     </div>
   </Tooltip>
 {/if}
-{#if $dataEncoder?.endpoint || $dataConverterPort}
-  {#if notRequested}
+{#if $dataEncoder?.hasEndpointOrPortConfigured}
+  {#if $dataEncoder?.hasNotRequested}
     <Tooltip left text={'Data encoder is configured'}>
       <div class="flex">
         <Icon
@@ -63,7 +44,7 @@
         />
       </div>
     </Tooltip>
-  {:else if error}
+  {:else if $dataEncoder.hasError}
     <Tooltip left text={`Data encoder couldn't connect to the remote encoder`}>
       <div class="flex">
         <Icon
@@ -78,7 +59,7 @@
         />
       </div>
     </Tooltip>
-  {:else if success}
+  {:else if $dataEncoder.hasSuccess}
     <Tooltip left text={'Data encoder succesfully converted content'}>
       <div class="flex">
         <Icon

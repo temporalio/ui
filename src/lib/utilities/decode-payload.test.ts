@@ -22,12 +22,10 @@ import {
   lastDataConverterStatus,
   resetLastDataConverterSuccess,
 } from '../stores/data-converter-config';
-
-// import {
-//   dataEncoderEndpoint,
-//   lastDataEncoderStatus,
-//   resetLastDataEncoderSuccess,
-// } from '../stores/data-encoder-config';
+import {
+  lastDataEncoderStatus,
+  resetLastDataEncoderSuccess,
+} from '../stores/data-encoder-config';
 
 import { get } from 'svelte/store';
 
@@ -162,35 +160,51 @@ describe(convertPayloadToJsonWithWebsocket, () => {
 });
 
 describe(convertPayloadToJsonWithCodec, () => {
-  // afterEach(() => {
-  //   resetLastDataEncoderSuccess();
-  // });
-  // it('Should convert a payload through data-converter and set the success status when the websocket is set and the websocket connects', async () => {
-  //   const endpoint = 'http://localhost:1337'
-  //   dataEncoderEndpoint.set(decodeURIComponent(endpoint));
-  //   const convertedPayload = await convertPayloadToJsonWithCodec(
-  //     JSON.parse(JSON.stringify(workflowStartedEvent)),
-  //   );
-  //   expect(convertedPayload).toEqual(dataConvertedWorkflowStartedEvent);
-  //   const dataConverterStatus = get(lastDataEncoderStatus);
-  //   expect(dataConverterStatus).toEqual('success');
-  // });
-  // it('Should fail converting a payload through data-encoder and set the status to error when the websocket is set and the websocket fails connection', async () => {
-  //   const endpoint = 'http://localhost:1337'
-  //   dataEncoderEndpoint.set(decodeURIComponent(endpoint));
-  //   const convertedPayload = await convertPayloadToJsonWithCodec(
-  //     JSON.parse(JSON.stringify(workflowStartedEvent)),
-  //   );
-  //   expect(convertedPayload).toEqual(dataConvertedFailureWorkflowStartedEvent);
-  //   const dataConverterStatus = get(lastDataEncoderStatus);
-  //   expect(dataConverterStatus).toEqual('error');
-  // });
-  // it('Should skip converting a payload and set the status to notRequested when the encoder endpoint is not set', async () => {
-  //   const convertedPayload = await convertPayloadToJsonWithCodec(
-  //     JSON.parse(JSON.stringify(workflowStartedEvent)),
-  //   );
-  //   expect(convertedPayload).toEqual(noRemoteDataConverterWorkflowStartedEvent);
-  //   const dataConverterStatus = get(lastDataEncoderStatus);
-  //   expect(dataConverterStatus).toEqual('notRequested');
-  // });
+  afterEach(() => {
+    resetLastDataEncoderSuccess();
+  });
+  it('Should convert a payload through data-converter and set the success status when the websocket is set and the websocket connects', async () => {
+    const endpoint = 'http://localhost:1337';
+    const convertedPayload = await convertPayloadToJsonWithCodec({
+      attributes: JSON.parse(JSON.stringify(workflowStartedEvent)),
+      namespace: 'default',
+      settings: {
+        codec: {
+          endpoint,
+        },
+      },
+    });
+    expect(convertedPayload).toEqual(dataConvertedWorkflowStartedEvent);
+    const dataConverterStatus = get(lastDataEncoderStatus);
+    expect(dataConverterStatus).toEqual('success');
+  });
+  it('Should fail converting a payload through data-encoder and set the status to error when the websocket is set and the websocket fails connection', async () => {
+    const endpoint = 'http://localhost:1337';
+    const convertedPayload = await convertPayloadToJsonWithCodec({
+      attributes: JSON.parse(JSON.stringify(workflowStartedEvent)),
+      namespace: 'default',
+      settings: {
+        codec: {
+          endpoint,
+        },
+      },
+    });
+    expect(convertedPayload).toEqual(dataConvertedFailureWorkflowStartedEvent);
+    const dataConverterStatus = get(lastDataEncoderStatus);
+    expect(dataConverterStatus).toEqual('error');
+  });
+  it('Should skip converting a payload and set the status to notRequested when the encoder endpoint is not set', async () => {
+    const convertedPayload = await convertPayloadToJsonWithCodec({
+      attributes: JSON.parse(JSON.stringify(workflowStartedEvent)),
+      namespace: 'default',
+      settings: {
+        codec: {
+          endpoint: '',
+        },
+      },
+    });
+    expect(convertedPayload).toEqual(noRemoteDataConverterWorkflowStartedEvent);
+    const dataConverterStatus = get(lastDataEncoderStatus);
+    expect(dataConverterStatus).toEqual('notRequested');
+  });
 });

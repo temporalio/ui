@@ -22,7 +22,7 @@ export async function getEventAttributes({
   settings: Settings;
 }): Promise<EventAttributesWithType> {
   const { key, attributes } = findAttributesAndKey(historyEvent);
-  const endpoint = settings?.codec?.endpoint;
+  const endpoint = settings.codec?.endpoint;
 
   const convertedAttributes = endpoint
     ? await convertPayloadToJsonWithCodec({
