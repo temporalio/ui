@@ -11,7 +11,7 @@ describe('Workflow Events', () => {
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/*/runs/*/events*`,
+        `/api/v1/namespaces/default/workflows/*/runs/*/events/reverse*`,
       { fixture: 'event-history-completed.json' },
     ).as('event-history-api');
 
@@ -49,6 +49,8 @@ describe('Workflow Events', () => {
   });
 
   it('default to the summary page when visiting a workflow', () => {
+    cy.clearLocalStorage();
+
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
     cy.wait('@workflow-api');
@@ -67,9 +69,7 @@ describe('Workflow Events', () => {
 
     cy.url().should('contain', '/feed');
 
-    cy.get(
-      `[href="/namespaces/default/workflows/${workflowId}/${runId}/history/feed?per-page=100"]`,
-    ).click();
+    cy.get('[data-cy="feed"]').click();
     cy.url().should('contain', '/feed');
 
     cy.visit('/namespaces/default/workflows');
@@ -85,9 +85,7 @@ describe('Workflow Events', () => {
     cy.wait('@event-history-api');
     cy.wait('@query-api');
 
-    cy.get(
-      `[href="/namespaces/default/workflows/${workflowId}/${runId}/history/json?per-page=100"]`,
-    ).click();
+    cy.get('[data-cy="json"]').click();
 
     const match = eventsFixture.history.events[0].eventTime;
     cy.get('[data-cy="event-history-json"]').contains(match);

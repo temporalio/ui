@@ -102,18 +102,21 @@
             base={routeForEventHistory(routeParameters('feed'))}
             href={routeForEventHistory(routeParameters('feed'))}
             active={$eventViewType === 'feed'}
+            data-cy="feed"
             on:click={() => ($eventViewType = 'feed')}>Timeline</ToggleButton
           >
           <ToggleButton
             icon={faLayerGroup}
             href={routeForEventHistory(routeParameters('compact'))}
             active={$eventViewType === 'compact'}
+            data-cy="compact"
             on:click={() => ($eventViewType = 'compact')}>Compact</ToggleButton
           >
           <ToggleButton
             icon={faCode}
             href={routeForEventHistory(routeParameters('json'))}
             active={$eventViewType === 'json'}
+            data-cy="json"
             on:click={() => ($eventViewType = 'json')}>JSON</ToggleButton
           >
         </ToggleButtons>
