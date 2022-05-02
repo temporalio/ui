@@ -2,13 +2,13 @@ import {
   setLastDataEncoderFailure,
   setLastDataEncoderSuccess,
 } from '$lib/stores/data-encoder-config';
-import type { Payload } from '$types';
+import type { Payloads } from '$types';
 
-export async function convertPayloadWithCodec(
-  payload: Payload,
+export async function convertPayloadsWithCodec(
+  payload: Payloads,
   endpoint: string,
-): Promise<Payload> {
-  const encoderResponse: Promise<Payload> = fetch(endpoint + '/decode', {
+): Promise<Payloads> {
+  const encoderResponse: Promise<Payloads> = fetch(endpoint + '/decode', {
     method: 'POST',
     body: JSON.stringify(payload),
   })

@@ -2,6 +2,7 @@ import { dataConverterPort } from '$lib/stores/data-converter-config';
 import {
   convertPayloadToJsonWithCodec,
   convertPayloadToJsonWithWebsocket,
+  decodePayloadAttributes,
 } from '$lib/utilities/decode-payload';
 import { formatDate } from '$lib/utilities/format-date';
 import { has } from '$lib/utilities/has';
@@ -19,13 +20,15 @@ export async function getEventAttributes(
   const { key, attributes } = findAttributesAndKey(historyEvent);
   const port = get(dataConverterPort);
 
-  const decodedAttributes = port
+  const convertedAttributes = port
     ? await convertPayloadToJsonWithWebsocket(attributes)
     : await convertPayloadToJsonWithCodec(attributes);
 
+  decodePayloadAttributes(convertedAttributes);
+
   return {
     type: key,
-    ...decodedAttributes,
+    ...convertedAttributes,
   };
 }
 

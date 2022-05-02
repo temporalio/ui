@@ -4,7 +4,7 @@ import { dataConverterWebsocket } from '$lib/utilities/data-converter-websocket'
 import type { DataConverterWebsocketInterface } from '$lib/utilities/data-converter-websocket';
 
 import { convertPayloadWithWebsocket } from '$lib/services/data-converter';
-import { convertPayloadWithCodec } from '$lib/services/data-encoder';
+import { convertPayloadsWithCodec } from '$lib/services/data-encoder';
 import { get } from 'svelte/store';
 import { dataEncoderEndpoint } from '$lib/stores/data-encoder-config';
 
@@ -32,7 +32,7 @@ export function decodePayload(
   return payload;
 }
 
-const decodePayloadAttributes = (anyAttributes) => {
+export const decodePayloadAttributes = (anyAttributes) => {
   // Decode Search Attributes
   if (anyAttributes?.searchAttributes?.indexedFields) {
     const searchAttributes = anyAttributes?.searchAttributes?.indexedFields;
@@ -91,14 +91,12 @@ export const convertPayloadToJsonWithCodec = async (
     const remoteEncoderEndpoint = get(dataEncoderEndpoint);
     if (remoteEncoderEndpoint) {
       // Convert Payload data
-      const awaitData = await Promise.all(
-        (potentialPayload ?? []).map(
-          async (payload) =>
-            await convertPayloadWithCodec(payload, remoteEncoderEndpoint),
-        ),
-      );
 
-      JSONPayload = awaitData.map(decodePayload);
+      const awaitData = await convertPayloadsWithCodec(
+        { payloads: potentialPayload },
+        remoteEncoderEndpoint,
+      );
+      JSONPayload = (awaitData?.payloads ?? []).map(decodePayload);
     } else {
       JSONPayload = potentialPayload.map(decodePayload);
     }
@@ -110,8 +108,6 @@ export const convertPayloadToJsonWithCodec = async (
       anyAttributes.result.payloads = JSONPayload;
     }
   }
-
-  decodePayloadAttributes(anyAttributes);
 
   return anyAttributes;
 };
@@ -157,8 +153,6 @@ export const convertPayloadToJsonWithWebsocket = async (
       anyAttributes.result.payloads = JSONPayload;
     }
   }
-
-  decodePayloadAttributes(anyAttributes);
 
   return anyAttributes;
 };
