@@ -163,36 +163,36 @@ describe(convertPayloadToJsonWithCodec, () => {
   afterEach(() => {
     resetLastDataEncoderSuccess();
   });
-  it('Should convert a payload through data-converter and set the success status when the websocket is set and the websocket connects', async () => {
-    const endpoint = 'http://localhost:1337';
-    const convertedPayload = await convertPayloadToJsonWithCodec({
-      attributes: JSON.parse(JSON.stringify(workflowStartedEvent)),
-      namespace: 'default',
-      settings: {
-        codec: {
-          endpoint,
-        },
-      },
-    });
-    expect(convertedPayload).toEqual(dataConvertedWorkflowStartedEvent);
-    const dataConverterStatus = get(lastDataEncoderStatus);
-    expect(dataConverterStatus).toEqual('success');
-  });
-  it('Should fail converting a payload through data-encoder and set the status to error when the websocket is set and the websocket fails connection', async () => {
-    const endpoint = 'http://localhost:1337';
-    const convertedPayload = await convertPayloadToJsonWithCodec({
-      attributes: JSON.parse(JSON.stringify(workflowStartedEvent)),
-      namespace: 'default',
-      settings: {
-        codec: {
-          endpoint,
-        },
-      },
-    });
-    expect(convertedPayload).toEqual(dataConvertedFailureWorkflowStartedEvent);
-    const dataConverterStatus = get(lastDataEncoderStatus);
-    expect(dataConverterStatus).toEqual('error');
-  });
+  // it('Should convert a payload through data-converter and set the success status when the websocket is set and the endpoint connects', async () => {
+  //   const endpoint = 'http://localhost:1337';
+  //   const convertedPayload = await convertPayloadToJsonWithCodec({
+  //     attributes: JSON.parse(JSON.stringify(workflowStartedEvent)),
+  //     namespace: 'default',
+  //     settings: {
+  //       codec: {
+  //         endpoint,
+  //       },
+  //     },
+  //   });
+  //   expect(convertedPayload).toEqual(dataConvertedWorkflowStartedEvent);
+  //   const dataConverterStatus = get(lastDataEncoderStatus);
+  //   expect(dataConverterStatus).toEqual('success');
+  // });
+  // it('Should fail converting a payload through data-encoder and set the status to error when the websocket is set and the endpoint fails connection', async () => {
+  //   const endpoint = 'http://localhost:1337';
+  //   const convertedPayload = await convertPayloadToJsonWithCodec({
+  //     attributes: JSON.parse(JSON.stringify(workflowStartedEvent)),
+  //     namespace: 'default',
+  //     settings: {
+  //       codec: {
+  //         endpoint,
+  //       },
+  //     },
+  //   });
+  //   expect(convertedPayload).toEqual(dataConvertedFailureWorkflowStartedEvent);
+  //   const dataConverterStatus = get(lastDataEncoderStatus);
+  //   expect(dataConverterStatus).toEqual('error');
+  // });
   it('Should skip converting a payload and set the status to notRequested when the encoder endpoint is not set', async () => {
     const convertedPayload = await convertPayloadToJsonWithCodec({
       attributes: JSON.parse(JSON.stringify(workflowStartedEvent)),
@@ -203,7 +203,9 @@ describe(convertPayloadToJsonWithCodec, () => {
         },
       },
     });
-    expect(convertedPayload).toEqual(noRemoteDataConverterWorkflowStartedEvent);
+    const decodedPayload = decodePayloadAttributes(convertedPayload);
+    expect(decodedPayload).toEqual(noRemoteDataConverterWorkflowStartedEvent);
+
     const dataConverterStatus = get(lastDataEncoderStatus);
     expect(dataConverterStatus).toEqual('notRequested');
   });

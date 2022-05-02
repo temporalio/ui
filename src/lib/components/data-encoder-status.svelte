@@ -7,7 +7,7 @@
     faLongArrowAltUp,
   } from '@fortawesome/free-solid-svg-icons';
 
-  import { dataEncoder } from '$lib/stores/data-encoder-config';
+  import { dataEncoder } from '$lib/stores/data-encoder';
 
   import { dataConverterPort } from '$lib/stores/data-converter-config';
 
