@@ -25,35 +25,37 @@ const saveToSearchParameters = (parameter: string, value: SearchParameterValue) 
 		const url = new URL(window?.location?.href);
 		url.searchParams.set(parameter, String(value));
 
-		goto(url.href, {
-			replaceState: true,
-			keepfocus: true,
-			noscroll: true
-		});
+		window?.history.replaceState(null, '', url);
+
+		// goto(url.href, {
+		// 	replaceState: true,
+		// 	keepfocus: true,
+		// 	noscroll: true
+		// });
 	}
 };
 
-const getFromLocalStorage = (parameter: string): string | undefined => {
-	if (browser) {
+const getFromLocalStorage = (parameter: string, persist: boolean): string | undefined => {
+	if (browser && persist) {
 		const value = window?.localStorage?.getItem(parameter);
 		if (value) return value;
 	}
 };
 
-const saveToLocalStorage = (parameter: string, value: SearchParameterValue) => {
-	if (browser) {
+const saveToLocalStorage = (parameter: string, value: SearchParameterValue, persist: boolean) => {
+	if (browser && persist) {
 		window?.localStorage?.setItem(parameter, String(value));
 	}
 };
 
-const getValue = (parameter: string, defaultValue: SearchParameterValue): SearchParameterValue => {
+const getValue = (parameter: string, defaultValue: SearchParameterValue, persist: boolean): SearchParameterValue => {
 	let value: string | undefined = undefined;
 
 	let searchParameterValue = getFromSearchParameters(parameter);
-	let localStorageValue = getFromLocalStorage(parameter);
+	let localStorageValue = getFromLocalStorage(parameter, persist);
 
 	if (searchParameterValue !== undefined) {
-		saveToLocalStorage(parameter, searchParameterValue);
+		saveToLocalStorage(parameter, searchParameterValue, persist);
 		value = searchParameterValue;
 	} else if (localStorageValue !== undefined) {
 		saveToSearchParameters(parameter, localStorageValue);
@@ -63,31 +65,33 @@ const getValue = (parameter: string, defaultValue: SearchParameterValue): Search
 	if (value !== undefined) {
 		if (isBoolean(defaultValue)) return toBoolean(value, defaultValue);
 		if (isNumber(defaultValue)) return toNumber(value);
+		return value;
 	}
 
 	return defaultValue;
 };
 
-const setValue = (parameter: string, value: SearchParameterValue) => {
-	saveToLocalStorage(parameter, value);
+const setValue = (parameter: string, value: SearchParameterValue, persist: boolean) => {
+	saveToLocalStorage(parameter, value, persist);
 	saveToSearchParameters(parameter, value);
 };
 
 export const searchParameter = (
 	parameter: string,
-	defaultValue: SearchParameterValue
+	defaultValue: SearchParameterValue,
+  persist = true
 ): Writable<SearchParameterValue> => {
-	const value = getValue(parameter, defaultValue);
+	const value = getValue(parameter, defaultValue, persist);
 	const store = writable(value);
 
 	const set: typeof store.set = (value: SearchParameterValue) => {
 		store.set(value);
-		setValue(parameter, value);
+		setValue(parameter, value, persist);
 	};
 
 	const update: typeof store.update = (updater) => {
 		store.update(updater);
-		setValue(parameter, value);
+		setValue(parameter, value, persist);
 	};
 
 	return {
