@@ -1,7 +1,5 @@
-import { writable } from 'svelte/store';
-import { persistStore } from '$lib/stores/persist-store';
-
-export const dataEncoderEndpoint = persistStore('endpoint', null);
+import { writable, derived } from 'svelte/store';
+import { page } from '$app/stores';
 
 export const lastDataEncoderStatus =
   writable<DataEncoderStatus>('notRequested');
@@ -17,3 +15,11 @@ export function setLastDataEncoderSuccess(): void {
 export function resetLastDataEncoderSuccess(): void {
   lastDataEncoderStatus.set('notRequested');
 }
+
+export const dataEncoder = derived([page], ([$page]) => {
+  return {
+    namespace: $page.params.namespace,
+    endpoint: $page.stuff.settings.codec?.endpoint,
+    accessToken: $page.stuff.settings.codec?.accessToken,
+  };
+});

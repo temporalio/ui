@@ -4,13 +4,30 @@ import {
 } from '$lib/stores/data-encoder-config';
 import type { Payloads } from '$types';
 
-export async function convertPayloadsWithCodec(
-  payload: Payloads,
-  endpoint: string,
-): Promise<Payloads> {
+export async function convertPayloadsWithCodec({
+  payloads,
+  namespace,
+  settings,
+}: {
+  payloads: Payloads;
+  namespace: string;
+  settings: Settings;
+}): Promise<Payloads> {
+  const { endpoint, accessToken } = settings.codec;
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'X-Namespace': namespace,
+  };
+
+  if (accessToken) {
+    headers['Authorization'] = `Bearer ${accessToken}`;
+  }
+
   const encoderResponse: Promise<Payloads> = fetch(endpoint + '/decode', {
+    headers,
     method: 'POST',
-    body: JSON.stringify(payload),
+    body: JSON.stringify(payloads),
   })
     .then((r) => r.json())
     .then((response) => {
@@ -21,7 +38,7 @@ export async function convertPayloadsWithCodec(
     .catch(() => {
       setLastDataEncoderFailure();
 
-      return payload;
+      return payloads;
     });
 
   return encoderResponse;

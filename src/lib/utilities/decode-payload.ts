@@ -5,8 +5,6 @@ import type { DataConverterWebsocketInterface } from '$lib/utilities/data-conver
 
 import { convertPayloadWithWebsocket } from '$lib/services/data-converter';
 import { convertPayloadsWithCodec } from '$lib/services/data-encoder';
-import { get } from 'svelte/store';
-import { dataEncoderEndpoint } from '$lib/stores/data-encoder-config';
 
 import { atob } from './atob';
 
@@ -78,34 +76,40 @@ export const decodePayloadAttributes = (
   return anyAttributes;
 };
 
-export const convertPayloadToJsonWithCodec = async (
-  eventAttribute: EventAttribute,
-): Promise<EventAttribute> => {
+export const convertPayloadToJsonWithCodec = async ({
+  attributes,
+  namespace,
+  settings,
+}: {
+  attributes: EventAttribute;
+  namespace: string;
+  settings: Settings;
+}): Promise<EventAttribute> => {
   // This anyAttribues allows us to use ?. notation to introspect the object which is a safe access pattern.
   // Because of the way we wrote our discrimited union we have to use this any. If we have two objects that
   // don't have the same property TS won't let us access that object without verifying the type string like
   // attributes.type === "ATypeWithInput/Result"
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const anyAttributes = eventAttribute as any;
-  const potentialPayload = (anyAttributes?.input?.payloads ??
+  const anyAttributes = attributes as any;
+  const potentialPayloads = (anyAttributes?.input?.payloads ??
     anyAttributes?.result?.payloads ??
     null) as Payload[] | null;
 
-  if (potentialPayload) {
+  if (potentialPayloads) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let JSONPayload: string | Payload | Record<any, any>;
 
-    const remoteEncoderEndpoint = get(dataEncoderEndpoint);
-    if (remoteEncoderEndpoint) {
+    const endpoint = settings?.codec?.endpoint;
+    if (endpoint) {
       // Convert Payload data
-
-      const awaitData = await convertPayloadsWithCodec(
-        { payloads: potentialPayload },
-        remoteEncoderEndpoint,
-      );
+      const awaitData = await convertPayloadsWithCodec({
+        payloads: { payloads: potentialPayloads },
+        namespace,
+        settings,
+      });
       JSONPayload = (awaitData?.payloads ?? []).map(decodePayload);
     } else {
-      JSONPayload = potentialPayload.map(decodePayload);
+      JSONPayload = potentialPayloads.map(decodePayload);
     }
 
     if (anyAttributes?.input?.payloads) {

@@ -53,6 +53,10 @@ type Settings = {
     options: string[];
   };
   baseUrl: string;
+  codec: {
+    endpoint?: string;
+    accessToken?: string;
+  };
   defaultNamespace: string;
   showTemporalSystemNamespace: boolean;
   runtimeEnvironment: {

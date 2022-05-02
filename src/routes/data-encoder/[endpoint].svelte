@@ -3,10 +3,10 @@
   import { page } from '$app/stores';
   import { notifications } from '$lib/stores/notifications';
   import { onMount } from 'svelte';
-  import { dataEncoderEndpoint } from '$lib/stores/data-encoder-config';
+  import { dataEncoder } from '$lib/stores/data-encoder-config';
   onMount(() => {
     let { endpoint } = $page.params;
-    dataEncoderEndpoint.set(decodeURIComponent(endpoint));
+    dataEncoder.set('endpoint', decodeURIComponent(endpoint));
     goto('/', { replaceState: true });
     notifications.add('success', 'Successfully set encoder');
   });
