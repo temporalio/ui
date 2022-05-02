@@ -5,11 +5,14 @@ import {
   Readable,
   Unsubscriber,
 } from 'svelte/store';
+
 import { page } from '$app/stores';
+
 import {
   fetchEvents,
   FetchEventsParameters,
 } from '$lib/services/events-service';
+
 import { eventCategory, eventSortOrder } from './event-view';
 
 const emptyEvents: FetchEventsResponse = {
