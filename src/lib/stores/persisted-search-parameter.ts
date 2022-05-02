@@ -26,12 +26,6 @@ const saveToSearchParameters = (parameter: string, value: SearchParameterValue) 
 		url.searchParams.set(parameter, String(value));
 
 		window?.history.replaceState(null, '', url);
-
-		// goto(url.href, {
-		// 	replaceState: true,
-		// 	keepfocus: true,
-		// 	noscroll: true
-		// });
 	}
 };
 
@@ -68,6 +62,7 @@ const getValue = (parameter: string, defaultValue: SearchParameterValue, persist
 		return value;
 	}
 
+  setValue(parameter, value, persist);
 	return defaultValue;
 };
 
