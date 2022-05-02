@@ -14,15 +14,22 @@ import {
 } from '$lib/services/events-service';
 
 import { eventCategory, eventSortOrder } from './event-view';
+import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 
 const emptyEvents: FetchEventsResponse = {
   events: [],
   eventGroups: [],
 };
 
-const namespace = derived([page], ([$page]) => $page.params.namespace);
-const workflowId = derived([page], ([$page]) => $page.params.workflow);
-const runId = derived([page], ([$page]) => $page.params.run);
+const namespace = derived([page], ([$page]) =>
+  decodeURIForSvelte($page.params.namespace),
+);
+const workflowId = derived([page], ([$page]) =>
+  decodeURIForSvelte($page.params.workflow),
+);
+const runId = derived([page], ([$page]) =>
+  decodeURIForSvelte($page.params.run),
+);
 
 const loading = writable(true);
 
@@ -47,6 +54,7 @@ export const parameters: Readable<FetchEventsParameters> = derived(
 
 export const eventHistory = readable(emptyEvents, (set): Unsubscriber => {
   return parameters.subscribe(async (params) => {
+    console.log(params);
     loading.set(true);
     if (shouldFetchNewEvents(params)) {
       const response = await fetchEvents(params);
