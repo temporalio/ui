@@ -6,6 +6,7 @@
 
 import {
   decodePayload,
+  decodePayloadAttributes,
   convertPayloadToJsonWithWebsocket,
   convertPayloadToJsonWithCodec,
 } from './decode-payload';
@@ -116,11 +117,12 @@ describe(convertPayloadToJsonWithWebsocket, () => {
       JSON.parse(JSON.stringify(workflowStartedEvent)),
       websocket,
     );
+    const decodedPayload = decodePayloadAttributes(convertedPayload);
     convertPayloadToJsonWithWebsocket(
       JSON.parse(JSON.stringify(workflowStartedEvent)),
       {},
     );
-    expect(convertedPayload).toEqual(dataConvertedWorkflowStartedEvent);
+    expect(decodedPayload).toEqual(dataConvertedWorkflowStartedEvent);
 
     const dataConverterStatus = get(lastDataConverterStatus);
     expect(dataConverterStatus).toEqual('success');
@@ -138,8 +140,9 @@ describe(convertPayloadToJsonWithWebsocket, () => {
       JSON.parse(JSON.stringify(workflowStartedEvent)),
       websocket,
     );
+    const decodedPayload = decodePayloadAttributes(convertedPayload);
 
-    expect(convertedPayload).toEqual(dataConvertedFailureWorkflowStartedEvent);
+    expect(decodedPayload).toEqual(dataConvertedFailureWorkflowStartedEvent);
 
     const dataConverterStatus = get(lastDataConverterStatus);
     expect(dataConverterStatus).toEqual('error');
@@ -149,8 +152,9 @@ describe(convertPayloadToJsonWithWebsocket, () => {
     const convertedPayload = await convertPayloadToJsonWithWebsocket(
       JSON.parse(JSON.stringify(workflowStartedEvent)),
     );
+    const decodedPayload = decodePayloadAttributes(convertedPayload);
 
-    expect(convertedPayload).toEqual(noRemoteDataConverterWorkflowStartedEvent);
+    expect(decodedPayload).toEqual(noRemoteDataConverterWorkflowStartedEvent);
 
     const dataConverterStatus = get(lastDataConverterStatus);
     expect(dataConverterStatus).toEqual('notRequested');

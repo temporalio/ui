@@ -32,7 +32,12 @@ export function decodePayload(
   return payload;
 }
 
-export const decodePayloadAttributes = (anyAttributes) => {
+export const decodePayloadAttributes = (
+  eventAttribute: EventAttribute,
+): EventAttribute => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const anyAttributes = eventAttribute as any;
+
   // Decode Search Attributes
   if (anyAttributes?.searchAttributes?.indexedFields) {
     const searchAttributes = anyAttributes?.searchAttributes?.indexedFields;
@@ -69,6 +74,8 @@ export const decodePayloadAttributes = (anyAttributes) => {
       queryResult[key] = decodePayload(value);
     });
   }
+
+  return anyAttributes;
 };
 
 export const convertPayloadToJsonWithCodec = async (

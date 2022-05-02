@@ -24,11 +24,11 @@ export async function getEventAttributes(
     ? await convertPayloadToJsonWithWebsocket(attributes)
     : await convertPayloadToJsonWithCodec(attributes);
 
-  decodePayloadAttributes(convertedAttributes);
+  const decodedAttributes = decodePayloadAttributes(convertedAttributes);
 
   return {
     type: key,
-    ...convertedAttributes,
+    ...decodedAttributes,
   };
 }
 
