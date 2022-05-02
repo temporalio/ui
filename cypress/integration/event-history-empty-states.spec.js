@@ -25,7 +25,7 @@ describe('Workflow Executions List', () => {
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
         `/api/v1/namespaces/default/workflows/*/runs/*?`,
-      { fixture: 'workflow.json' },
+      { fixture: 'workflow-completed.json' },
     ).as('workflow-api');
 
     cy.intercept(

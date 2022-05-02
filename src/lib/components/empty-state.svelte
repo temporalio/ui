@@ -6,7 +6,10 @@
   export let content: string = '';
 </script>
 
-<div class="my-12 flex flex-col justify-start items-center gap-2">
+<div
+  class="my-12 flex flex-col justify-start items-center gap-2"
+  data-cy={$$props.dataCy}
+>
   <span
     class="flex rounded-full items-center justify-center w-16 h-16 bg-gray-200"
   >
