@@ -1,5 +1,4 @@
 import { browser } from '$app/env';
-import { goto } from '$app/navigation';
 import { page } from '$app/stores';
 import { writable, get, type Writable } from 'svelte/store';
 
