@@ -1,11 +1,8 @@
 /// <reference types="cypress" />
 
-<<<<<<< HEAD
 import { formatDistanceToNow } from 'date-fns';
 import * as dateTz from 'date-fns-tz';
 
-=======
->>>>>>> 333d56e (Add UI for setting and clearing codec endpoint and data converter port)
 import workflowCompletedFixture from '../fixtures/workflow-completed.json';
 import eventsFixture from '../fixtures/event-history-completed.json';
 
