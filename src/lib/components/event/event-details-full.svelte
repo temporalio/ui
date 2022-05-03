@@ -9,6 +9,6 @@
   $: attributes = formatAttributes(event, { compact });
 </script>
 
-{#each Object.entries(attributes) as [key, value] (key)}
-  <EventDetailsRowExpanded {key} {value} class="w-full" />
+{#each Object.entries(attributes) as [key, value], index (key)}
+  <EventDetailsRowExpanded {key} {value} {index} class="w-full" />
 {/each}

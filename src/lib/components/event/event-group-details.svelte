@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { isActivityTaskTimedOutEvent } from '$lib/utilities/is-event-type';
+  import WorkflowStatus from '../workflow-status.svelte';
+
   export let eventGroup: EventGroup | null;
   export let selectedId: string;
 </script>
@@ -13,9 +16,14 @@
               selectedId = id;
             }}
           >
-            <span class="event-type" class:active={id === selectedId}
-              >{eventInGroup.eventType} (#{id})</span
-            >
+            <div class="flex gap-4">
+              <span class="event-type" class:active={id === selectedId}
+                >{eventInGroup.eventType} (#{id})</span
+              >
+              {#if isActivityTaskTimedOutEvent(eventInGroup)}
+                <WorkflowStatus status="TimedOut" />
+              {/if}
+            </div>
           </li>
         {/each}
       </ul>
@@ -28,9 +36,9 @@
     @apply my-6 cursor-pointer;
   }
   .event-type:hover {
-    @apply text-blue-700 border-b-2 border-blue-700;
+    @apply text-blue-700 underline decoration-blue-700;
   }
   .active {
-    @apply text-blue-700 border-b-2 border-blue-700;
+    @apply text-blue-700 underline decoration-blue-700;
   }
 </style>

@@ -1,12 +1,18 @@
 <script lang="ts">
   import Icon from 'svelte-fa';
-  import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
+  import {
+    faAngleDown,
+    faAngleUp,
+    faClock,
+  } from '@fortawesome/free-solid-svg-icons';
 
   import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-filters';
   import { timeFormat } from '$lib/stores/time-format';
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
+  import { isActivityTaskTimedOutEvent } from '$lib/utilities/is-event-type';
 
   import { getGroupForEvent, isEventGroup } from '$lib/models/event-groups';
+  import { groupHasActivityTimedOut } from '$lib/models/event-groups/get-event-in-group';
   import {
     formatDate,
     formatDistanceAbbreviated,
@@ -50,6 +56,7 @@
     }
   }
 
+  isActivityTaskTimedOutEvent;
   const onLinkClick = () => {
     expanded = !expanded;
   };
@@ -75,12 +82,12 @@
       class="md:mx-2 text-sm md:text-base font-semibold link"
       on:click|stopPropagation={onLinkClick}
     >
+      {#if compact && groupHasActivityTimedOut(eventGroup)}
+        <Icon class="inline text-red-700" icon={faClock} />
+      {/if}
       {event.name}
       <Icon class="inline" icon={expanded ? faAngleUp : faAngleDown} />
     </p>
-    {#if expanded && compact}
-      <EventGroupDetails {eventGroup} bind:selectedId />
-    {/if}
   </td>
   <td class="cell links text-sm font-normal text-right xl:text-left">
     {#if showElapsed && event.id !== initialItem.id}
@@ -97,8 +104,15 @@
     <EventDetailsRow {...getSingleAttributeForEvent(currentEvent)} inline />
   </td>
 </tr>
+{#if expanded && compact}
+  <tr class="expanded-row">
+    <td class="expanded-cell" colspan="4">
+      <EventGroupDetails {eventGroup} bind:selectedId />
+    </td>
+  </tr>
+{/if}
 {#if expanded}
-  <tr class="expanded-row flex-wrap xl:table-row">
+  <tr class="expanded-row">
     <td class="expanded-cell" colspan="4">
       <EventDetailsFull event={currentEvent} {compact} />
     </td>
@@ -137,7 +151,7 @@
   }
 
   .expanded-row {
-    @apply border-b-2 border-gray-700;
+    @apply flex-wrap xl:table-row border-b-2 border-gray-700;
   }
 
   .expanded-cell {
