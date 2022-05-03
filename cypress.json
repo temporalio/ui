@@ -6,6 +6,5 @@
     "VITE_MODE": "test",
     "VITE_TEMPORAL_UI_BUILD_TARGET": "local"
   },
-  "viewportWidth": 1400,
-  "viewportHeight": 660
+  "viewportWidth": 1280
 }

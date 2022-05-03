@@ -41,11 +41,12 @@
   });
 </script>
 
-<div class="relative inline mx-2" bind:this={menu}>
+<div class="relative inline mx-2" bind:this={menu} data-cy={$$props.dataCy}>
   <IconButton
     icon={faCaretDown}
     on:click={() => (show = !show)}
     classes="menu focus:outline-none focus:shadow-solid"
+    dataCy="{$$props.dataCy}-button"
   />
   {#if show}
     <div
