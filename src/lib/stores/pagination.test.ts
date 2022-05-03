@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { get } from 'svelte/store';
 import {
   getIndex,
@@ -407,9 +409,13 @@ describe(perPageOptions, () => {
     expect(perPageOptions('bogus input')).toEqual(['100', '250', '500']);
   });
 
-  for (const input of [null, undefined, {}, [], () => {}]) {
+  for (const input of [null, undefined, {}, []]) {
     it(`should ignore ${JSON.stringify(input)}`, () => {
-      expect(perPageOptions(input as any)).toEqual(['100', '250', '500']);
+      expect(perPageOptions(input as unknown as any)).toEqual([
+        '100',
+        '250',
+        '500',
+      ]);
     });
   }
 });
