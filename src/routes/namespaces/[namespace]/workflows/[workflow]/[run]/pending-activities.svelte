@@ -65,30 +65,4 @@
   .event-table {
     @apply xl:table table-fixed border-gray-900 border-2 rounded-lg w-full;
   }
-
-  .table-header-row {
-    @apply bg-gray-900 text-gray-100 px-3;
-  }
-
-  .table-header-row-responsive {
-    @apply flex xl:hidden bg-gray-900 text-gray-100 px-3 justify-end;
-  }
-
-  .table-header {
-    @apply xl:table-cell text-left p-2 flex;
-  }
-
-  .table-header-responsive {
-    @apply p-2 flex items-center;
-  }
-
-  .detail-row {
-    @apply block xl:flex items-start gap-4 w-full border-b-2 border-gray-200 pb-2;
-  }
-  .row:last-of-type .detail-row {
-    @apply border-b-0;
-  }
-  .badge {
-    @apply text-gray-700 bg-gray-300;
-  }
 </style>
