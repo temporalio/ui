@@ -64,7 +64,11 @@
         <p>Stack Trace at {currentdate.toLocaleTimeString()}</p>
       </div>
       <div class="flex items-start h-full">
-        <CodeBlock content={result} language="text" />
+        <CodeBlock
+          content={result}
+          language="text"
+          dataCy="query-stack-trace"
+        />
       </div>
     {:catch _error}
       <EmptyState
@@ -73,6 +77,9 @@
       />
     {/await}
   {:else}
-    <EmptyState title="No Stack Traces Found" />
+    <EmptyState
+      title="No Stack Traces Found"
+      dataCy="query-stack-trace-empty"
+    />
   {/if}
 </section>
