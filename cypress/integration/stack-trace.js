@@ -2,12 +2,11 @@
 
 import workflowRunningFixture from '../fixtures/workflow-running.json';
 import workflowCompletedFixture from '../fixtures/workflow-completed.json';
-import eventsFixture from '../fixtures/event-history-completed.json';
 
 const { workflowId, runId } =
   workflowCompletedFixture.workflowExecutionInfo.execution;
 
-describe('Workflow Events', () => {
+describe('Stack Trace', () => {
   beforeEach(() => {
     cy.interceptApi();
 
@@ -50,37 +49,7 @@ describe('Workflow Events', () => {
     cy.wait('@namespaces-api');
   });
 
-  it('default to the summary page when visiting a workflow', () => {
-    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
-
-    cy.wait('@workflow-api');
-    cy.wait('@event-history-api');
-    cy.wait('@query-api');
-
-    cy.url().should('contain', '/feed');
-  });
-
-  it('default to last viewed event view when visiting a workflow', () => {
-    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
-
-    cy.wait('@workflow-api');
-    cy.wait('@event-history-api');
-    cy.wait('@query-api');
-
-    cy.url().should('contain', '/feed');
-
-    cy.get(
-      `[href="/namespaces/default/workflows/${workflowId}/${runId}/history/feed?per-page=100"]`,
-    ).click();
-    cy.url().should('contain', '/feed');
-
-    cy.visit('/namespaces/default/workflows');
-
-    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
-    cy.url().should('contain', '/feed');
-  });
-
-  it('should be viewable as JSON', () => {
+  it('should show No Stack Trace for completed workflow', () => {
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
     cy.wait('@workflow-api');
@@ -91,7 +60,45 @@ describe('Workflow Events', () => {
       `[href="/namespaces/default/workflows/${workflowId}/${runId}/history/json?per-page=100"]`,
     ).click();
 
-    const match = eventsFixture.history.events[0].eventTime;
-    cy.get('[data-cy="event-history-json"]').contains(match);
+    cy.get(
+      `[href="/namespaces/default/workflows/${workflowId}/${runId}/stack-trace"]`,
+    ).click();
+
+    cy.get('[data-cy="query-stack-trace-empty"]').contains(
+      'No Stack Traces Found',
+    );
+  });
+
+  it('should show stack trace for running workflow', () => {
+    const { workflowId, runId } =
+      workflowRunningFixture.workflowExecutionInfo.execution;
+
+    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}?`,
+      { fixture: 'workflow-running.json' },
+    ).as('workflow-api');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/*/runs/*/query*`,
+      { fixture: 'query-stack-trace.json' },
+    ).as('query-api');
+
+    cy.wait('@workflow-api');
+    cy.wait('@event-history-api');
+    cy.wait('@query-api');
+
+    cy.get(
+      `[href="/namespaces/default/workflows/${workflowId}/${runId}/history/json?per-page=100"]`,
+    ).click();
+
+    cy.get(
+      `[href="/namespaces/default/workflows/${workflowId}/${runId}/stack-trace"]`,
+    ).click();
+
+    cy.get('[data-cy="query-stack-trace"]').contains('go.temporal.io/sdk');
   });
 });
