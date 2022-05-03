@@ -55,7 +55,12 @@
   };
 </script>
 
-<tr class="row" id={event.id} class:expanded={expanded && !expandAll}>
+<tr
+  class="row"
+  id={event.id}
+  class:expanded={expanded && !expandAll}
+  data-cy="event-summary-row"
+>
   <td class="id-cell text-left">
     <a class="text-gray-500 mx-1 text-sm md:text-base" href="#{event.id}"
       >{event.id}</a

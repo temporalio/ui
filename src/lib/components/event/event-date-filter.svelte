@@ -68,7 +68,7 @@
       : `${$eventFilterSort}:${$timeFormat}:${$eventShowElapsed}`;
 </script>
 
-<DropdownMenu {value} right>
+<DropdownMenu {value} right dataCy="event-date-filter">
   {#each sortOptions as { option, label } (option)}
     <div
       class="option"
@@ -94,6 +94,7 @@
       class="option"
       class:active={$timeFormat === option}
       on:click={() => onDateOptionClick(option)}
+      data-cy="event-date-filter-{option}"
     >
       <div class="check">
         {#if $timeFormat === option}
