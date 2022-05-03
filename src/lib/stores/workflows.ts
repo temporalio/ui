@@ -34,9 +34,12 @@ const withLoading = async (
   loading: Writable<boolean>,
   fn: () => Promise<void>,
 ) => {
-  loading.set(true);
+  updating.set(true);
   await fn();
   loading.set(false);
+  setTimeout(() => {
+    updating.set(false);
+  }, 300);
 };
 
 const namespace = derived([page], ([$page]) => $page.params.namespace);
@@ -53,11 +56,18 @@ const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
     if (isNewRequest(namespace, query, previous)) {
       withLoading(loading, async () => {
         const { workflows } = await fetchAllWorkflows(namespace, { query });
-        set(workflows);
+        if (workflows) {
+          set(workflows);
+        } else {
+          setTimeout(() => {
+            set(workflows);
+          }, 300);
+        }
       });
     }
   });
 };
 
+export const updating = writable(true);
 export const loading = writable(true);
 export const workflows = readable<WorkflowExecution[]>([], updateWorkflows);

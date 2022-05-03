@@ -24,7 +24,7 @@
 
 <script lang="ts">
   import { timeFormat } from '$lib/stores/time-format';
-  import { workflows, loading } from '$lib/stores/workflows';
+  import { workflows, loading, updating } from '$lib/stores/workflows';
 
   import EmptyState from '$lib/components/empty-state.svelte';
   import Pagination from '$lib/components/pagination.svelte';
@@ -49,7 +49,7 @@
 {#if $loading}
   <WorkflowsLoading />
 {:else if $workflows.length}
-  <Pagination items={$workflows} let:visibleItems>
+  <Pagination items={$workflows} updating={$updating} let:visibleItems>
     <WorkflowsSummaryTable>
       {#each visibleItems as event}
         <WorkflowsSummaryRow
