@@ -8,7 +8,7 @@
   export let classes: string = '';
 </script>
 
-<button class="icon-button" on:click>
+<button class="icon-button" on:click data-cy={$$props.dataCy}>
   {#if icon}
     <div class="flex gap-2 items-center {classes}">
       <Icon {icon} {scale} />

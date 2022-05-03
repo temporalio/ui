@@ -21,8 +21,11 @@
   }
 </script>
 
-<section class="event-table">
-  <div class="table-header-row xl:table-header-group">
+<section class="event-table" data-cy="event-summary-table">
+  <div
+    class="table-header-row xl:table-header-group"
+    data-cy="event-summary-table-header-desktop"
+  >
     <div class="xl:table-row hidden">
       <div class="table-header w-8 rounded-tl-md" />
       <div class="table-header w-1/4">
