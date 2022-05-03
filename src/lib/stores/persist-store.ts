@@ -25,7 +25,11 @@ export function persistStore<T>(
 
     set: (x: T | null) => {
       if (browser) {
-        window?.localStorage?.setItem(name, JSON.stringify(x));
+        if (x === null) {
+          window?.localStorage?.removeItem(name);
+        } else {
+          window?.localStorage?.setItem(name, JSON.stringify(x));
+        }
       }
       set(x);
     },

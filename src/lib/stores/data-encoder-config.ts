@@ -1,4 +1,7 @@
 import { writable } from 'svelte/store';
+import { persistStore } from '$lib/stores/persist-store';
+
+export const dataEncoderEndpoint = persistStore('endpoint', null);
 
 export const lastDataEncoderStatus =
   writable<DataEncoderStatus>('notRequested');

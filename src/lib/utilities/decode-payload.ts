@@ -91,6 +91,7 @@ export const convertPayloadToJsonWithCodec = async ({
   // attributes.type === "ATypeWithInput/Result"
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const anyAttributes = attributes as any;
+
   const potentialPayloads = (anyAttributes?.input?.payloads ??
     anyAttributes?.result?.payloads ??
     null) as Payload[] | null;

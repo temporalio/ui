@@ -28,9 +28,7 @@
     </a>
   </div>
   <div class="flex gap-4 col-span-4 justify-end items-center">
-    <div class="text-right">
-      <DataEncoderStatus />
-    </div>
+    <DataEncoderStatus />
   </div>
 </header>
 {#if open}

@@ -1,6 +1,5 @@
 /// <reference types="cypress" />
 
-import workflowRunningFixture from '../fixtures/workflow-running.json';
 import workflowCompletedFixture from '../fixtures/workflow-completed.json';
 import eventsFixture from '../fixtures/event-history-completed.json';
 
@@ -13,25 +12,25 @@ describe('Workflow Events', () => {
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/*/runs/*/events*`,
+      `/api/v1/namespaces/default/workflows/*/runs/*/events*`,
       { fixture: 'event-history-completed.json' },
     ).as('event-history-api');
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/*/runs/*/query*`,
+      `/api/v1/namespaces/default/workflows/*/runs/*/query*`,
       { fixture: 'query.json' },
     ).as('query-api');
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}?`,
+      `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}?`,
       { fixture: 'workflow-completed.json' },
     ).as('workflow-api');
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/task-queues/rainbow-statuses?taskQueueType=*`,
+      `/api/v1/namespaces/default/task-queues/rainbow-statuses?taskQueueType=*`,
       {
         pollers: [
           {

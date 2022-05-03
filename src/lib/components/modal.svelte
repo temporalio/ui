@@ -5,6 +5,7 @@
   import Button from './button.svelte';
 
   export let open: boolean = false;
+  export let hideConfirm: boolean = false;
   export let confirmText: string = 'Confirm';
   export let confirmDisabled: boolean = false;
 
@@ -35,11 +36,13 @@
         <Button secondary on:click={() => dispatch('cancelModal', {})}
           >Cancel</Button
         >
-        <Button
-          destroy
-          disabled={confirmDisabled}
-          on:click={() => dispatch('confirmModal', {})}>{confirmText}</Button
-        >
+        {#if !hideConfirm}
+          <Button
+            destroy
+            disabled={confirmDisabled}
+            on:click={() => dispatch('confirmModal', {})}>{confirmText}</Button
+          >
+        {/if}
       </div>
     </div>
   </div>

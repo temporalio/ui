@@ -10,19 +10,23 @@ import {
   convertPayloadToJsonWithWebsocket,
   convertPayloadToJsonWithCodec,
 } from './decode-payload';
+import { getEventAttributes } from '../../lib/models/event-history';
 import { createWebsocket } from './data-converter-websocket';
 import {
   noRemoteDataConverterWorkflowStartedEvent,
   dataConvertedFailureWorkflowStartedEvent,
   dataConvertedWorkflowStartedEvent,
   workflowStartedEvent,
+  workflowStartedHistoryEvent,
 } from './decode-payload-test-fixtures';
 import WS from 'jest-websocket-mock';
 import {
+  dataConverterPort,
   lastDataConverterStatus,
   resetLastDataConverterSuccess,
 } from '../stores/data-converter-config';
 import {
+  dataEncoderEndpoint,
   lastDataEncoderStatus,
   resetLastDataEncoderSuccess,
 } from '../stores/data-encoder-config';
@@ -234,5 +238,64 @@ describe(convertPayloadToJsonWithCodec, () => {
 
     const dataConverterStatus = get(lastDataEncoderStatus);
     expect(dataConverterStatus).toEqual('notRequested');
+  });
+});
+
+// Integration test
+describe(getEventAttributes, () => {
+  afterEach(() => {
+    resetLastDataEncoderSuccess();
+    resetLastDataConverterSuccess();
+  });
+  it('Should convert a payload through data-converter and set the success status when the endpoint is set locally and the endpoint connects', async () => {
+    // tslint:disable-next-line
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        json: () => Promise.resolve({ payloads: [JsonObjectEncoded] }),
+      }),
+    );
+
+    const endpoint = 'http://localhost:1337';
+    dataEncoderEndpoint.set(endpoint);
+
+    const decodedPayload = await getEventAttributes({
+      historyEvent: JSON.parse(JSON.stringify(workflowStartedHistoryEvent)),
+      namespace: 'default',
+      settings: {
+        codec: {
+          endpoint: '',
+        },
+      },
+    });
+
+    expect(decodedPayload).toEqual(dataConvertedWorkflowStartedEvent);
+    const dataConverterStatus = get(lastDataEncoderStatus);
+    expect(dataConverterStatus).toEqual('success');
+  });
+  it('Should convert a payload through data-converter and set the success status when both the endpoint and websocket is set and the endpoint connects', async () => {
+    // tslint:disable-next-line
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        json: () => Promise.resolve({ payloads: [JsonObjectEncoded] }),
+      }),
+    );
+
+    const endpoint = 'http://localhost:1337';
+    dataEncoderEndpoint.set(endpoint);
+    dataConverterPort.set('3889');
+
+    const decodedPayload = await getEventAttributes({
+      historyEvent: JSON.parse(JSON.stringify(workflowStartedHistoryEvent)),
+      namespace: 'default',
+      settings: {
+        codec: {
+          endpoint: '',
+        },
+      },
+    });
+
+    expect(decodedPayload).toEqual(dataConvertedWorkflowStartedEvent);
+    const dataConverterStatus = get(lastDataEncoderStatus);
+    expect(dataConverterStatus).toEqual('success');
   });
 });
