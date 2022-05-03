@@ -1,6 +1,7 @@
 import { derived, writable, get } from 'svelte/store';
 import type { Readable } from 'svelte/store';
 
+const defaultItemsPerPage = 100;
 const options: string[] = ['100', '250', '500'];
 
 type PaginationMethods<T> = {
@@ -28,7 +29,7 @@ type PaginationStore<T> = PaginationMethods<T> &
   }>;
 
 export const perPageOptions = (perPage: number | string): string[] => {
-  const itemsPerPage = String(perPage);
+  const itemsPerPage = String(perPageFromSearchParameter(perPage));
   return options.includes(itemsPerPage) ? options : [itemsPerPage, ...options];
 };
 
@@ -101,20 +102,22 @@ export const outOfBounds = (
  */
 export const pagination = <T>(
   items: Readonly<T[]> = [],
-  perPage: number | string = 100,
+  perPage: number | string = defaultItemsPerPage,
   startingIndex: string | number = 0,
 ): PaginationStore<T> => {
+  perPage = perPageFromSearchParameter(perPage);
+
   const start = getNearestStartingIndex(
-    Number(startingIndex),
-    Number(perPage),
+    toNumber(startingIndex),
+    perPage,
     items,
   );
 
-  const pageSize = writable(Number(perPage));
+  const pageSize = writable(perPage);
   const index = writable(start);
 
   const adjustPageSize = (n: number | string) => {
-    pageSize.set(Number(n));
+    pageSize.set(toNumber(n));
   };
 
   const next = () => {
@@ -180,4 +183,24 @@ export const pagination = <T>(
     findIndex,
     findPage,
   };
+};
+
+export const perPageFromSearchParameter = (
+  perPage: number | string = defaultItemsPerPage,
+): number => {
+  const asNumber = toNumber(perPage);
+
+  if (isNaN(asNumber)) return defaultItemsPerPage;
+  if (!asNumber) return defaultItemsPerPage;
+
+  return asNumber;
+};
+
+const toNumber = (perPage: number | string = 0): number => {
+  const asNumber = Number(perPage);
+
+  if (isNaN(asNumber)) return 0;
+  if (!asNumber) return 0;
+
+  return Math.abs(asNumber);
 };
