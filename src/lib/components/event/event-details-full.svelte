@@ -26,9 +26,7 @@
 
 {#if compact && eventGroup}
   <div class="flex flex-row w-full">
-    <div
-      class="w-1/3 flex flex-col max-h-full p-4 pl-8 border-r-2 border-gray-200"
-    >
+    <div class="w-1/3 flex flex-col max-h-full p-4 pl-8">
       <ul class="gap-2 items-start">
         {#each [...eventGroup.events] as [id, eventInGroup] (id)}
           <li

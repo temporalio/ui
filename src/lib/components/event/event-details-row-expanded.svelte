@@ -21,9 +21,7 @@
   const { workflow, namespace, run } = $page.params;
 </script>
 
-<article
-  class="row border-b-2 border-gray-200 flex px-4 first:pt-0 {$$props.class}"
->
+<article class="row flex px-4 first:pt-0 {$$props.class}">
   {#if typeof value === 'object'}
     <div class="code-block-row">
       <h2 class="text-sm">
@@ -82,10 +80,10 @@
 
 <style lang="postcss">
   .code-block-row {
-    @apply block w-full py-2 text-left;
+    @apply block w-full py-2 text-left border-b-2 border-gray-200;
   }
   .detail-row {
-    @apply block xl:flex items-start gap-4 w-full py-2 text-left;
+    @apply block xl:flex items-start gap-4 w-full py-2 text-left border-b-2 border-gray-200;
   }
   .row:last-of-type .detail-row {
     @apply border-b-0;

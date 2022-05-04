@@ -21,7 +21,6 @@
   } from '$lib/utilities/format-date';
 
   import EventDetailsRow from './event-details-row.svelte';
-  import EventGroupDetails from './event-group-details.svelte';
   import EventDetailsFull from './event-details-full.svelte';
 
   export let event: IterableEvent;

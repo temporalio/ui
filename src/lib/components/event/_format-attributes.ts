@@ -79,14 +79,14 @@ type GroupingOption = {
 export const attributeGroupingProperties: Readonly<
   Record<AttributeGroup, GroupingOption>
 > = {
-  activity: { label: 'Activity', color: 'green' },
-  parent: { label: 'Parent', color: 'blue' },
-  retryPolicy: { label: 'Retry Policy', color: 'red' },
-  schedule: { label: 'Schedule', color: 'pink' },
-  searchAttributes: { label: 'Search Attributes', color: 'indigo' },
-  summary: { label: 'Summary', color: 'blueGray' },
-  taskQueue: { label: 'Task Queue', color: 'yellow' },
-  workflow: { label: 'Workflow', color: 'purple' },
+  activity: { label: 'Activity', color: 'gray' },
+  parent: { label: 'Parent', color: 'gray' },
+  retryPolicy: { label: 'Retry Policy', color: 'gray' },
+  schedule: { label: 'Schedule', color: 'gray' },
+  searchAttributes: { label: 'Search Attributes', color: 'gray' },
+  summary: { label: 'Summary', color: 'gray' },
+  taskQueue: { label: 'Task Queue', color: 'gray' },
+  workflow: { label: 'Workflow', color: 'gray' },
 };
 
 export type AttributeGrouping = Partial<

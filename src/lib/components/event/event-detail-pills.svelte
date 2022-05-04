@@ -12,7 +12,7 @@
   const dispatch = createEventDispatcher();
 </script>
 
-<div class="p-2">
+<div class="p-2 text-center">
   <div class="pill-container">
     {#each Object.keys(attributeGrouping) as key (key)}
       <Pill
@@ -27,6 +27,6 @@
 
 <style lang="postcss">
   .pill-container {
-    @apply inline-flex gap-2 items-center justify-start flex-col md:flex-row px-2 py-2 rounded-full bg-gray-100;
+    @apply inline-flex gap-2 items-center justify-start flex-col md:flex-row px-2 py-2 rounded-md md:rounded-full bg-gray-100;
   }
 </style>
