@@ -59,7 +59,7 @@
   class="row"
   id={event.id}
   class:expanded={expanded && !expandAll}
-  data-cy="event-summary-row"
+  data-cy="event-summary-row-{$eventFilterSort}"
 >
   <td class="id-cell text-left">
     <a class="text-gray-500 mx-1 text-sm md:text-base" href="#{event.id}"
@@ -82,7 +82,10 @@
       <EventGroupDetails {eventGroup} bind:selectedId />
     {/if}
   </td>
-  <td class="cell links text-sm font-normal text-right xl:text-left">
+  <td
+    class="cell links text-sm font-normal text-right xl:text-left"
+    data-cy="event-summary-time"
+  >
     {#if showElapsed && event.id !== initialItem.id}
       {formatDistanceAbbreviated({
         start: initialItem.eventTime,

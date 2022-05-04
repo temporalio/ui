@@ -1,0 +1,200 @@
+{
+  "history": {
+    "events": [
+      {
+        "eventId": "6",
+        "eventTime": "2022-05-03T22:43:04.152090361Z",
+        "eventType": "ActivityTaskScheduled",
+        "version": "0",
+        "taskId": "2097217",
+        "activityTaskScheduledEventAttributes": {
+          "activityId": "6",
+          "activityType": {
+            "name": "LongActivity"
+          },
+          "namespace": "",
+          "taskQueue": {
+            "name": "rainbow-statuses",
+            "kind": "Normal"
+          },
+          "header": {
+            "fields": {}
+          },
+          "input": null,
+          "scheduleToCloseTimeout": "0s",
+          "scheduleToStartTimeout": "0s",
+          "startToCloseTimeout": "3600s",
+          "heartbeatTimeout": "0s",
+          "workflowTaskCompletedEventId": "5",
+          "retryPolicy": {
+            "initialInterval": "1s",
+            "backoffCoefficient": 2,
+            "maximumInterval": "100s",
+            "maximumAttempts": 1,
+            "nonRetryableErrorTypes": []
+          }
+        }
+      },
+      {
+        "eventId": "5",
+        "eventTime": "2022-05-03T22:43:04.151295792Z",
+        "eventType": "WorkflowTaskCompleted",
+        "version": "0",
+        "taskId": "2097216",
+        "workflowTaskCompletedEventAttributes": {
+          "scheduledEventId": "2",
+          "startedEventId": "4",
+          "identity": "60411@user0@",
+          "binaryChecksum": "abfe7e3fc78675a42c9e544a83eb7edb"
+        }
+      },
+      {
+        "eventId": "4",
+        "eventTime": "2022-05-03T22:43:04.140971867Z",
+        "eventType": "WorkflowTaskStarted",
+        "version": "0",
+        "taskId": "2097208",
+        "workflowTaskStartedEventAttributes": {
+          "scheduledEventId": "2",
+          "identity": "60411@user0@",
+          "requestId": "dac2f95f-4188-493c-9361-c8db54830440"
+        }
+      },
+      {
+        "eventId": "3",
+        "eventTime": "2022-05-03T22:43:04.136321341Z",
+        "eventType": "WorkflowExecutionSignaled",
+        "version": "0",
+        "taskId": "2097206",
+        "workflowExecutionSignaledEventAttributes": {
+          "signalName": "customSignal",
+          "input": {
+            "payloads": [
+              {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg=="
+                },
+                "data": "eyJIZXkiOiJmcm9tIE1hcnMiLCJBdCI6IjIwMjItMDUtMDNUMTg6NDM6MDQuMTMzNDQyNzg1LTA0OjAwIn0="
+              }
+            ]
+          },
+          "identity": "161111@user0@",
+          "header": {
+            "fields": {}
+          }
+        }
+      },
+      {
+        "eventId": "2",
+        "eventTime": "2022-05-03T22:43:04.126395250Z",
+        "eventType": "WorkflowTaskScheduled",
+        "version": "0",
+        "taskId": "2097202",
+        "workflowTaskScheduledEventAttributes": {
+          "taskQueue": {
+            "name": "rainbow-statuses",
+            "kind": "Normal"
+          },
+          "startToCloseTimeout": "10s",
+          "attempt": 1
+        }
+      },
+      {
+        "eventId": "1",
+        "eventTime": "2022-05-03T22:43:04.125949324Z",
+        "eventType": "WorkflowExecutionStarted",
+        "version": "0",
+        "taskId": "2097201",
+        "workflowExecutionStartedEventAttributes": {
+          "workflowType": {
+            "name": "RainbowStatusesWorkflow"
+          },
+          "parentWorkflowNamespace": "",
+          "parentWorkflowExecution": null,
+          "parentInitiatedEventId": "0",
+          "taskQueue": {
+            "name": "rainbow-statuses",
+            "kind": "Normal"
+          },
+          "input": {
+            "payloads": [
+              {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg=="
+                },
+                "data": "MQ=="
+              }
+            ]
+          },
+          "workflowExecutionTimeout": "0s",
+          "workflowRunTimeout": "0s",
+          "workflowTaskTimeout": "10s",
+          "continuedExecutionRunId": "",
+          "initiator": "Unspecified",
+          "continuedFailure": null,
+          "lastCompletionResult": null,
+          "originalExecutionRunId": "124fd9fd-577a-4f87-a4c6-48672349afd0",
+          "identity": "161111@user0@",
+          "firstExecutionRunId": "124fd9fd-577a-4f87-a4c6-48672349afd0",
+          "retryPolicy": null,
+          "attempt": 1,
+          "workflowExecutionExpirationTime": null,
+          "cronSchedule": "",
+          "firstWorkflowTaskBackoff": "0s",
+          "memo": null,
+          "searchAttributes": {
+            "indexedFields": {
+              "CustomBoolField": {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg==",
+                  "type": "Qm9vbA=="
+                },
+                "data": "dHJ1ZQ=="
+              },
+              "CustomDatetimeField": {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg==",
+                  "type": "RGF0ZXRpbWU="
+                },
+                "data": "IjIwMjItMDUtMDNUMjI6NDM6MDQuMTIzNjA3MTQ2WiI="
+              },
+              "CustomDoubleField": {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg==",
+                  "type": "RG91Ymxl"
+                },
+                "data": "MA=="
+              },
+              "CustomIntField": {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg==",
+                  "type": "SW50"
+                },
+                "data": "MA=="
+              },
+              "CustomKeywordField": {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg==",
+                  "type": "S2V5d29yZA=="
+                },
+                "data": "InJhaW5ib3ctc3RhdHVzZXMtYzFlOWI0Ig=="
+              },
+              "CustomStringField": {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg==",
+                  "type": "VGV4dA=="
+                },
+                "data": "InJhaW5ib3cgc3RhdHVzZXMgYzFlOWI0IFJ1bm5pbmci"
+              }
+            }
+          },
+          "prevAutoResetPoints": null,
+          "header": {
+            "fields": {}
+          }
+        }
+      }
+    ]
+  },
+  "nextPageToken": null
+}

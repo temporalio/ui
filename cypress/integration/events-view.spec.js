@@ -1,15 +1,12 @@
 /// <reference types="cypress" />
 
-import { formatDistanceToNow } from 'date-fns';
-import * as dateTz from 'date-fns-tz';
-
 import workflowCompletedFixture from '../fixtures/workflow-completed.json';
 import eventsFixture from '../fixtures/event-history-completed.json';
 
 const { workflowId, runId } =
   workflowCompletedFixture.workflowExecutionInfo.execution;
 
-describe('Workflow Events', () => {
+describe('Events Views', () => {
   beforeEach(() => {
     cy.interceptApi();
 
@@ -70,52 +67,13 @@ describe('Workflow Events', () => {
     cy.wait('@event-history-api');
     cy.wait('@query-api');
 
-    cy.get('[data-cy="event-summary-row"]').should(
+    cy.get('[data-cy=event-summary-row-]').should(
       'have.length',
       eventsFixture.history.events.length,
     );
 
     const eventType = eventsFixture.history.events[0].eventType;
-    cy.get('[data-cy="event-summary-table"]').contains(eventType);
-  });
-
-  it('should render event time in various formats', () => {
-    cy.visit(
-      `/namespaces/default/workflows/${workflowId}/${runId}/history/feed`,
-    );
-
-    cy.wait('@workflow-api');
-    cy.wait('@event-history-api');
-    cy.wait('@query-api');
-
-    const dt = new Date(eventsFixture.history.events[0].eventTime);
-
-    cy.get(
-      '[data-cy="event-summary-table-header-desktop"] [data-cy=event-date-filter-button]',
-    ).click();
-    cy.get(
-      '[data-cy="event-summary-table-header-desktop"] [data-cy=event-date-filter-relative]',
-    ).click();
-    const relative = formatDistanceToNow(dt);
-    cy.get('[data-cy="event-summary-table"]').contains(relative);
-
-    cy.get(
-      '[data-cy="event-summary-table-header-desktop"] [data-cy=event-date-filter-button]',
-    ).click();
-    cy.get(
-      '[data-cy="event-summary-table-header-desktop"] [data-cy=event-date-filter-UTC]',
-    ).click();
-    const utc = dateTz.formatInTimeZone(dt, 'UTC', 'yyyy-MM-dd z HH:mm:ss.SS');
-    cy.get('[data-cy="event-summary-table"]').contains(utc);
-
-    cy.get(
-      '[data-cy="event-summary-table-header-desktop"] [data-cy=event-date-filter-button]',
-    ).click();
-    cy.get(
-      '[data-cy="event-summary-table-header-desktop"] [data-cy=event-date-filter-local]',
-    ).click();
-    const local = dateTz.format(dt, 'yyyy-MM-dd z HH:mm:ss.SS');
-    cy.get('[data-cy="event-summary-table"]').contains(local);
+    cy.get('[data-cy=event-summary-table]').contains(eventType);
   });
 
   it('should render events in compact view', () => {
@@ -127,10 +85,10 @@ describe('Workflow Events', () => {
     cy.wait('@event-history-api');
     cy.wait('@query-api');
 
-    cy.get('[data-cy="event-summary-row"]')
+    cy.get('[data-cy=event-summary-row-]')
       .should('not.have.length', 0)
       .should('not.have.length', eventsFixture.history.events.length);
-    cy.get('[data-cy="event-summary-table"]').contains('CompletedActivity');
+    cy.get('[data-cy=event-summary-table]').contains('CompletedActivity');
   });
 
   it('should be viewable as JSON', () => {
@@ -145,6 +103,6 @@ describe('Workflow Events', () => {
     ).click();
 
     const match = eventsFixture.history.events[0].eventTime;
-    cy.get('[data-cy="event-history-json"]').contains(match);
+    cy.get('[data-cy=event-history-json]').contains(match);
   });
 });

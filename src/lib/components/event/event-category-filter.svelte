@@ -33,12 +33,13 @@
   };
 </script>
 
-<DropdownMenu value={_value} left>
+<DropdownMenu value={_value} left dataCy="event-category-filter">
   {#each options as { label, option } (option)}
     <div
       class="option"
       class:active={_value === option}
       on:click={() => onOptionClick(option)}
+      data-cy="event-category-filter-{option}"
     >
       <div class="check">
         {#if _value === option}

@@ -74,6 +74,7 @@
       class="option"
       class:active={$eventFilterSort === option}
       on:click={() => onSortOptionClick(option)}
+      data-cy="event-date-sort-{option}"
     >
       <div class="check">
         {#if $eventFilterSort === option}
@@ -114,6 +115,7 @@
     class="option"
     class:active={$eventShowElapsed === 'true'}
     on:click={onShowElapsedClick}
+    data-cy="event-show-elapsed-time"
   >
     <div class="check">
       {#if $eventShowElapsed === 'true'}
