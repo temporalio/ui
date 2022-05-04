@@ -16,7 +16,11 @@
   const onCancel = () => (showSettings = false);
 </script>
 
-<DataEncoderSettings {showSettings} {onCancel} />
+<DataEncoderSettings
+  {showSettings}
+  {onCancel}
+  accessToken={$dataEncoder.accessToken}
+/>
 {#if $dataEncoder?.hasEndpointOrPortConfigured}
   {#if $dataEncoder?.hasNotRequested}
     <Tooltip left text={'Data encoder is configured'}>

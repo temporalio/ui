@@ -2,6 +2,8 @@ import {
   setLastDataEncoderFailure,
   setLastDataEncoderSuccess,
 } from '$lib/stores/data-encoder-config';
+import { validateHttps } from '$lib/utilities/is-http';
+
 import type { Payloads } from '$types';
 
 export async function convertPayloadsWithCodec({
@@ -20,8 +22,15 @@ export async function convertPayloadsWithCodec({
     'X-Namespace': namespace,
   };
 
+
   if (accessToken) {
-    headers['Authorization'] = `Bearer ${accessToken}`;
+    if (validateHttps(endpoint)) {
+      headers['Authorization'] = `Bearer ${accessToken}`;
+    } else {
+      setLastDataEncoderFailure();
+
+      return payloads;
+    }
   }
 
   const encoderResponse: Promise<Payloads> = fetch(endpoint + '/decode', {
