@@ -93,6 +93,6 @@
     @apply text-gray-700 bg-gray-300;
   }
   .odd {
-    @apply bg-gray-100;
+    @apply bg-gray-50;
   }
 </style>
