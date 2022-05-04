@@ -119,5 +119,9 @@ export const attributeGroups = (
     }
   }
 
+  if (!groupedAttributes.summary.length) {
+    delete groupedAttributes.summary;
+  }
+
   return groupedAttributes;
 };

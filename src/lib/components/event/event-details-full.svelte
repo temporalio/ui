@@ -17,14 +17,7 @@
 
   $: attributes = formatAttributes(event, { compact });
   $: attributeGrouping = attributeGroups(attributes);
-
-  let activePill: AttributeGroup = 'summary';
-
-  $: {
-    if (!attributeGrouping[activePill]) {
-      activePill = 'summary';
-    }
-  }
+  $: activePill = Object.keys(attributeGrouping)[0];
 
   const handlePillChange = (event: CustomEvent) => {
     activePill = event.detail.key;
@@ -34,7 +27,7 @@
 {#if compact && eventGroup}
   <div class="flex flex-row w-full">
     <div
-      class="w-1/3 flex flex-col max-h-full p-4 pl-8 border-r-2 border-gray-200 bg-blueGray-50"
+      class="w-1/3 flex flex-col max-h-full p-4 pl-8 border-r-2 border-gray-200"
     >
       <ul class="gap-2 items-start">
         {#each [...eventGroup.events] as [id, eventInGroup] (id)}

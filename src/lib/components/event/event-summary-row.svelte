@@ -126,6 +126,11 @@
     @apply no-underline xl:py-3 text-sm border-b-2 border-gray-700 items-center xl:text-base flex flex-wrap xl:table-row last-of-type:border-b-0;
   }
 
+  .expanded .cell,
+  .expanded .id-cell {
+    @apply border-b-0;
+  }
+
   .row:hover {
     @apply bg-gray-50;
   }

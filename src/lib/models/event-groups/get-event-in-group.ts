@@ -7,7 +7,9 @@ export const groupHasActivityTimedOut = (eventGroup: EventGroup): boolean => {
   return Boolean(groupEvents.find(isActivityTaskTimedOutEvent));
 };
 
-export const eventOrGroupHasActivityTimedOut = (event: IterableEvent): boolean => {
+export const eventOrGroupHasActivityTimedOut = (
+  event: IterableEvent,
+): boolean => {
   if (isEventGroup(event)) return groupHasActivityTimedOut(event);
   return isActivityTaskTimedOutEvent(event as WorkflowEvent);
 };
