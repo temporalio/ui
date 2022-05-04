@@ -16,7 +16,6 @@
 
   export let key: string;
   export let value: string | Record<string, unknown>;
-  export let index: number;
   export let inline = false;
 
   const { workflow, namespace, run } = $page.params;
@@ -24,16 +23,15 @@
 
 <article
   class="row border-b-2 border-gray-200 flex px-4 first:pt-0 {$$props.class}"
-  class:odd={index % 2 === 1}
 >
   {#if typeof value === 'object'}
-    <div class="detail-row">
-      <h2 class="w-1/2 text-sm">
+    <div class="code-block-row">
+      <h2 class="text-sm">
         {format(key)}
       </h2>
       <CodeBlock
         content={getCodeBlockValue(value)}
-        class="w-1/2 text-right pb-2"
+        class="w-full text-right"
         {inline}
       />
     </div>
@@ -83,6 +81,9 @@
 </article>
 
 <style lang="postcss">
+  .code-block-row {
+    @apply block w-full py-2 text-left;
+  }
   .detail-row {
     @apply block xl:flex items-start gap-4 w-full py-2 text-left;
   }
@@ -91,8 +92,5 @@
   }
   .badge {
     @apply text-gray-700 bg-gray-300;
-  }
-  .odd {
-    @apply bg-gray-50;
   }
 </style>

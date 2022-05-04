@@ -108,13 +108,6 @@
     <EventDetailsRow {...getSingleAttributeForEvent(currentEvent)} inline />
   </td>
 </tr>
-<!-- {#if expanded && compact}
-  <tr class="expanded-row">
-    <td class="expanded-cell" colspan="4">
-      <EventGroupDetails {eventGroup} bind:selectedId />
-    </td>
-  </tr>
-{/if} -->
 {#if expanded}
   <tr class="expanded-row">
     <td class="expanded-cell" colspan="4">
@@ -169,10 +162,10 @@
   }
 
   .expanded-row {
-    @apply flex-wrap xl:table-row border-b-2 border-gray-700;
+    @apply block xl:table-row xl:border-b-2 xl:border-gray-700;
   }
 
   .expanded-cell {
-    @apply border-b-2 border-gray-700 no-underline text-sm xl:text-base flex flex-wrap xl:table-cell;
+    @apply w-full xl:border-b-2 xl:border-gray-700 no-underline text-sm xl:text-base flex flex-wrap xl:table-cell;
   }
 </style>

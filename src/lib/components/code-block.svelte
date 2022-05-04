@@ -40,9 +40,7 @@
 
 {#if content || content === null}
   <div
-    class="relative w-full rounded-lg h-auto {$$props.class} {inline
-      ? ''
-      : 'lg:h-full'}"
+    class="relative w-full rounded-lg h-auto {$$props.class}"
     data-cy={$$props.dataCy}
   >
     <!-- The spacing for this if statement is like this because PRE's honor all whitespace and 

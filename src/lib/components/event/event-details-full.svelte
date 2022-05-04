@@ -3,8 +3,12 @@
   import { isActivityTaskTimedOutEvent } from '$lib/utilities/is-event-type';
   import WorkflowStatus from '../workflow-status.svelte';
 
-  import { formatAttributes } from './_format-attributes';
-  import Pill from '../pill.svelte';
+  import {
+    formatAttributes,
+    AttributeGroup,
+    attributeGroups,
+  } from './_format-attributes';
+  import EventDetailPills from './event-detail-pills.svelte';
 
   export let event: IterableEvent;
   export let compact = false;
@@ -12,15 +16,27 @@
   export let selectedId: string;
 
   $: attributes = formatAttributes(event, { compact });
-  let activePill = 'parent';
+  $: attributeGrouping = attributeGroups(attributes);
+
+  let activePill: AttributeGroup = 'summary';
+
+  $: {
+    if (!attributeGrouping[activePill]) {
+      activePill = 'summary';
+    }
+  }
+
+  const handlePillChange = (event: CustomEvent) => {
+    activePill = event.detail.key;
+  };
 </script>
 
-<div class="flex flex-row">
-  {#if compact && eventGroup}
+{#if compact && eventGroup}
+  <div class="flex flex-row w-full">
     <div
-      class="w-1/4 flex flex-col max-h-full p-4 pl-12 border-r-2 border-gray-200"
+      class="w-1/3 flex flex-col max-h-full p-4 pl-8 border-r-2 border-gray-200 bg-blueGray-50"
     >
-      <ul class="gap-2 w-full items-start">
+      <ul class="gap-2 items-start">
         {#each [...eventGroup.events] as [id, eventInGroup] (id)}
           <li
             on:click|preventDefault|stopPropagation={() => {
@@ -40,49 +56,33 @@
         {/each}
       </ul>
     </div>
-  {/if}
-  <div class="w-3/4">
-    <div class="flex flex-row gap-4 px-8 py-4">
-      <Pill
-        active={activePill === 'summary'}
-        on:click={() => (activePill = 'summary')}
-        color="indigo">Summary</Pill
-      >
-      <Pill
-        active={activePill === 'parent'}
-        on:click={() => (activePill = 'parent')}
-        color="blue">Parent</Pill
-      >
-      <Pill
-        active={activePill === 'activity'}
-        on:click={() => (activePill = 'activity')}
-        color="green">Activity</Pill
-      >
-      <Pill
-        active={activePill === 'taskQueue'}
-        on:click={() => (activePill = 'taskQueue')}
-        color="yellow">Task Queue</Pill
-      >
-      <Pill
-        active={activePill === 'schedule'}
-        on:click={() => (activePill = 'schedule')}
-        color="pink">Schedule</Pill
-      >
-      <Pill
-        active={activePill === 'retryPolicy'}
-        on:click={() => (activePill = 'retryPolicy')}
-        color="purple">Retry Policy</Pill
-      >
+    <div class="w-2/3">
+      <EventDetailPills
+        {attributeGrouping}
+        {activePill}
+        on:pillChange={handlePillChange}
+      />
+      {#each Object.entries(attributes) as [key, value] (key)}
+        {#if attributeGrouping[activePill]?.includes(key)}
+          <EventDetailsRowExpanded {key} {value} class="w-full" />
+        {/if}
+      {/each}
     </div>
-    {#each Object.entries(attributes) as [key, value], index (key)}
-      {#if activePill !== 'summary' && key.includes(activePill)}
-        <EventDetailsRowExpanded {key} {value} {index} class="w-full" />
-      {:else if activePill === 'summary'}
-        <EventDetailsRowExpanded {key} {value} {index} class="w-full" />
+  </div>
+{:else}
+  <div class="w-full">
+    <EventDetailPills
+      {attributeGrouping}
+      {activePill}
+      on:pillChange={handlePillChange}
+    />
+    {#each Object.entries(attributes) as [key, value] (key)}
+      {#if attributeGrouping[activePill]?.includes(key)}
+        <EventDetailsRowExpanded {key} {value} class="w-full" />
       {/if}
     {/each}
   </div>
-</div>
+{/if}
 
 <style lang="postcss">
   li {

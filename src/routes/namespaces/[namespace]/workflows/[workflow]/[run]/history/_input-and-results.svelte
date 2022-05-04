@@ -28,6 +28,6 @@
       <h2 class="text-xl font-medium">In progress…</h2>
     </div>
   {:else}
-    <CodeBlock {content} class="mb-2 max-h-96" />
+    <CodeBlock {content} class="mb-2 lg:h-full max-h-96" />
   {/if}
 </article>

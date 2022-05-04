@@ -25,6 +25,27 @@
     @apply flex items-center gap-2 border-2 border-white justify-center text-sm rounded-full px-3 py-1 text-sm font-semibold;
   }
 
+  .gray {
+    @apply bg-gray-100 text-gray-700;
+  }
+  .gray.active {
+    @apply border-2 border-gray-700;
+  }
+
+  .blueGray {
+    @apply bg-blueGray-200 text-blueGray-900;
+  }
+  .blueGray.active {
+    @apply border-2 border-blueGray-900;
+  }
+
+  .blue {
+    @apply bg-blue-100 text-blue-700;
+  }
+  .blue.active {
+    @apply border-2 border-blue-700;
+  }
+
   .green {
     @apply bg-green-100 text-green-700;
   }
@@ -39,11 +60,11 @@
     @apply border-2 border-yellow-900;
   }
 
-  .blue {
-    @apply bg-blue-100 text-blue-700;
+  .orange {
+    @apply bg-orange-100 text-orange-900;
   }
-  .blue.active {
-    @apply border-2 border-blue-700;
+  .orange.active {
+    @apply border-2 border-orange-900;
   }
 
   .red {
