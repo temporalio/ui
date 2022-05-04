@@ -90,3 +90,13 @@ type UiVersionInfo = {
 };
 
 type DataEncoderStatus = 'notRequested' | 'success' | 'error';
+
+type Color =
+  'blue'
+  | 'red'
+  | 'green'
+  | 'red'
+  | 'indigo'
+  | 'yellow'
+  | 'purple'
+  | 'pink'

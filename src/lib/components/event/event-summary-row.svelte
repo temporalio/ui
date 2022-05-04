@@ -9,10 +9,12 @@
   import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-filters';
   import { timeFormat } from '$lib/stores/time-format';
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
-  import { isActivityTaskTimedOutEvent } from '$lib/utilities/is-event-type';
 
   import { getGroupForEvent, isEventGroup } from '$lib/models/event-groups';
-  import { groupHasActivityTimedOut } from '$lib/models/event-groups/get-event-in-group';
+  import {
+    eventOrGroupHasActivityTimedOut,
+    groupHasActivityTimedOut,
+  } from '$lib/models/event-groups/get-event-in-group';
   import {
     formatDate,
     formatDistanceAbbreviated,
@@ -59,13 +61,15 @@
   const onLinkClick = () => {
     expanded = !expanded;
   };
+
+  const error = eventOrGroupHasActivityTimedOut(compact ? eventGroup : event);
 </script>
 
 <tr
   class="row"
   id={event.id}
   class:expanded={expanded && !expandAll}
-  class:error={groupHasActivityTimedOut(eventGroup)}
+  class:error
   data-cy="event-summary-row"
 >
   <td class="id-cell text-left">
@@ -79,7 +83,7 @@
       href="#{event.id}">{event.id}</a
     >
     <p
-      class="md:mx-2 text-sm md:text-base font-semibold link"
+      class="md:mx-2 text-sm md:text-base font-semibold link event-name"
       on:click|stopPropagation={onLinkClick}
     >
       {#if compact && groupHasActivityTimedOut(eventGroup)}
@@ -104,17 +108,22 @@
     <EventDetailsRow {...getSingleAttributeForEvent(currentEvent)} inline />
   </td>
 </tr>
-{#if expanded && compact}
+<!-- {#if expanded && compact}
   <tr class="expanded-row">
     <td class="expanded-cell" colspan="4">
       <EventGroupDetails {eventGroup} bind:selectedId />
     </td>
   </tr>
-{/if}
+{/if} -->
 {#if expanded}
   <tr class="expanded-row">
     <td class="expanded-cell" colspan="4">
-      <EventDetailsFull event={currentEvent} {compact} />
+      <EventDetailsFull
+        event={currentEvent}
+        {compact}
+        {eventGroup}
+        bind:selectedId
+      />
     </td>
   </tr>
 {/if}
@@ -128,12 +137,17 @@
     @apply bg-gray-50;
   }
 
-  .error {
+  .error,
+  .error:hover {
     @apply bg-red-50;
   }
 
+  .error .event-name {
+    @apply text-red-700;
+  }
+
   .cell {
-    @apply xl:table-cell xl:border-b-2 border-gray-700 py-1 px-3 leading-4;
+    @apply xl:table-cell xl:border-b-2 border-gray-700 pt-1 pb-0 px-3 leading-4;
     flex: 40%;
   }
 
