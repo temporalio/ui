@@ -9,6 +9,7 @@
     attributeGroups,
   } from './_format-attributes';
   import EventDetailPills from './event-detail-pills.svelte';
+  import Pill from '../pill.svelte';
 
   export let event: IterableEvent;
   export let compact = false;
@@ -22,11 +23,15 @@
   const handlePillChange = (event: CustomEvent) => {
     activePill = event.detail.key;
   };
+
+  console.log('EVENT: ', event);
 </script>
 
 {#if compact && eventGroup}
-  <div class="flex flex-row w-full">
-    <div class="w-1/3 flex flex-col max-h-full p-4 pl-8">
+  <div class="flex flex-col md:flex-row w-full">
+    <div
+      class="w-full block md:w-1/3 md:flex flex-col max-h-full bg-gray-100 p-4 pl-8"
+    >
       <ul class="gap-2 items-start">
         {#each [...eventGroup.events] as [id, eventInGroup] (id)}
           <li
@@ -35,19 +40,22 @@
             }}
           >
             <div class="flex gap-2">
-              <span class="text-gray-500 mx-1">{id}</span>
-              <span class="event-type" class:active={id === selectedId}
+              <!-- <span class="text-gray-500 mx-1">{id}</span> -->
+              <!-- <span class="event-type" class:active={id === selectedId}
                 >{eventInGroup.eventType}</span
-              >
-              {#if isActivityTaskTimedOutEvent(eventInGroup)}
-                <WorkflowStatus status="TimedOut" />
-              {/if}
+              > -->
+              <Pill active={id === selectedId}
+                >{eventInGroup.eventType}
+                {#if isActivityTaskTimedOutEvent(eventInGroup)}
+                  <WorkflowStatus status="TimedOut" />
+                {/if}
+              </Pill>
             </div>
           </li>
         {/each}
       </ul>
     </div>
-    <div class="w-2/3">
+    <div class="w-full block md:w-2/3">
       <EventDetailPills
         {attributeGrouping}
         {activePill}

@@ -104,7 +104,9 @@
     {/if}
   </td>
   <td class="cell links">
-    <EventDetailsRow {...getSingleAttributeForEvent(currentEvent)} inline />
+    {#if !expanded}
+      <EventDetailsRow {...getSingleAttributeForEvent(currentEvent)} inline />
+    {/if}
   </td>
 </tr>
 {#if expanded}
@@ -125,15 +127,13 @@
     @apply no-underline xl:py-3 text-sm border-b-2 border-gray-700 items-center xl:text-base flex flex-wrap xl:table-row last-of-type:border-b-0;
   }
 
-  .expanded .cell,
-  .expanded .id-cell {
-    @apply border-b-0;
-  }
-
   .row:hover {
     @apply bg-gray-50;
   }
 
+  .expanded.row {
+    @apply border-b-0;
+  }
   .error,
   .error:hover {
     @apply bg-red-50;
@@ -150,6 +150,11 @@
 
   .id-cell {
     @apply hidden xl:table-cell xl:border-b-2 border-gray-700 py-1 px-3 leading-4;
+  }
+
+  .expanded .cell,
+  .expanded .id-cell {
+    @apply border-b-0;
   }
 
   .link {
@@ -170,6 +175,6 @@
   }
 
   .expanded-cell {
-    @apply w-full xl:border-b-2 xl:border-gray-700 no-underline text-sm xl:text-base flex flex-wrap xl:table-cell;
+    @apply w-full border-gray-700 border-b-2 no-underline text-sm xl:text-base flex flex-wrap xl:table-cell;
   }
 </style>

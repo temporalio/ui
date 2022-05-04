@@ -88,6 +88,9 @@
   .row:last-of-type .detail-row {
     @apply border-b-0;
   }
+  .row:last-of-type .code-block-row {
+    @apply border-b-0;
+  }
   .badge {
     @apply text-gray-700 bg-gray-300;
   }
