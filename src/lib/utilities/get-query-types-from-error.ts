@@ -1,5 +1,4 @@
 export const getQueryTypesFromError = (message: string): string[] => {
-  console.log(message);
   const indexOfOpeningBracket = message.indexOf('[');
   const indexOfClosingBracket = message.indexOf(']');
 
