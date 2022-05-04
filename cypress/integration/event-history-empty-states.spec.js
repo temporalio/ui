@@ -18,30 +18,9 @@ describe('Workflow Executions List', () => {
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/*/runs/*/query*`,
-      { fixture: 'query.json' },
-    ).as('query-api');
-
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
         `/api/v1/namespaces/default/workflows/*/runs/*?`,
       { fixture: 'workflow-completed.json' },
     ).as('workflow-api');
-
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/task-queues/rainbow-statuses?taskQueueType=*`,
-      {
-        pollers: [
-          {
-            lastAccessTime: '2022-04-11T13:21:10.910333429Z',
-            identity: '57979@MacBook-Pro@',
-            ratePerSecond: 100000,
-          },
-        ],
-        taskQueueStatus: null,
-      },
-    ).as('queue-api');
   });
 
   for (const view of ['feed', 'compact']) {
