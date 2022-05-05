@@ -25,7 +25,7 @@
   {#if $dataEncoder?.hasNotRequested}
     <Tooltip left text={'Data encoder is configured'}>
       <button
-        class="flex cursor-pointer p-2"
+        class="flex cursor-pointer"
         data-cy="data-encoder-status-configured"
         on:click={() => (showSettings = true)}
       >

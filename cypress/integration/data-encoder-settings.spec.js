@@ -128,7 +128,7 @@ describe('Set Data Encoder Settings', () => {
       cy.get('[data-cy="data-encoder-endpoint"]').contains('http://test.com');
       cy.get('[data-cy="data-encoder-clear-endpoint"]').contains('Clear');
       cy.get('[data-cy="data-encoder-endpoint-info"]').contains(
-        'Set endpoint overrides site setting.',
+        'Set endpoint overrides site setting endpoint.',
       );
 
       // Clear endpoint
@@ -223,7 +223,7 @@ describe('Set Data Encoder Settings', () => {
       cy.get('[data-cy="data-encoder-endpoint"]').contains('https://test.com');
       cy.get('[data-cy="data-encoder-clear-endpoint"]').contains('Clear');
       cy.get('[data-cy="data-encoder-endpoint-info"]').contains(
-        'Set endpoint overrides site setting.',
+        'Set endpoint overrides site setting endpoint.',
       );
 
       // Clear endpoint
