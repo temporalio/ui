@@ -1,6 +1,5 @@
 <script lang="ts">
   import { isActivityTaskTimedOutEvent } from '$lib/utilities/is-event-type';
-  import WorkflowStatus from '../workflow-status.svelte';
 
   export let eventGroup: EventGroup | null;
   export let selectedId: string;
@@ -15,12 +14,12 @@
       <li on:click|preventDefault|stopPropagation={() => onGroupClick(id)}>
         <div class="flex gap-2">
           <span class="text-gray-500 mx-1">{id}</span>
-          <span class="event-type" class:active={id === selectedId}
+          <span
+            class="event-type"
+            class:active={id === selectedId}
+            class:error={isActivityTaskTimedOutEvent(eventInGroup)}
             >{eventInGroup.eventType}</span
           >
-          {#if isActivityTaskTimedOutEvent(eventInGroup)}
-            <WorkflowStatus status="TimedOut" />
-          {/if}
         </div>
       </li>
     {/each}
@@ -36,5 +35,8 @@
   }
   .active {
     @apply text-blue-700 underline decoration-blue-700;
+  }
+  .error {
+    @apply text-red-700 decoration-red-700;
   }
 </style>
