@@ -28,42 +28,45 @@
 
   import EmptyState from '$lib/components/empty-state.svelte';
   import Pagination from '$lib/components/pagination.svelte';
+  import Button from '$lib/components/button.svelte';
   import Badge from '$lib/components/badge.svelte';
   import Loading from '$lib/components/loading.svelte';
-  import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
-  import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
-  import WorkflowFilters from './_workflow-filters.svelte';
+  import Table from '$lib/components/table/index.svelte';
+  import TableRow from '$lib/components/table/row.svelte';
+  import Search from '$lib/components/search.svelte';
+
+  import { columns } from './_schedule-table-columns';
+  import { noop } from 'svelte/internal';
 
   export let namespace: string;
-  export let searchType: 'basic' | 'advanced';
   export let query: string;
 
   let workflows = getWorkflows({ namespace, query });
 
+  let search = '';
   const errorMessage =
-    searchType === 'advanced'
-      ? 'Please check your syntax and try again.'
-      : 'If you have filters applied, try adjusting them.';
+    'Create scheduled actions using our Public API or TCTL (CLI).';
 </script>
 
-<h2 class="text-2xl">Workflows <Badge type="beta">Beta</Badge></h2>
-<WorkflowFilters bind:searchType bind:query />
+<h2 class="text-2xl">Schedules <Badge type="beta">Beta</Badge></h2>
+<div class="w-1/2">
+  <Search icon placeholder="Search" value={search} on:submit={noop} />
+</div>
 {#await $workflows}
   <Loading />
 {:then { workflows }}
   {#if workflows.length}
     <Pagination items={workflows} let:visibleItems>
-      <WorkflowsSummaryTable>
+      <Table {columns}>
         {#each visibleItems as event}
-          <WorkflowsSummaryRow
-            workflow={event}
-            {namespace}
-            timeFormat={$timeFormat}
-          />
+          <TableRow item={event} {columns} timeFormat={$timeFormat} />
         {/each}
-      </WorkflowsSummaryTable>
+      </Table>
     </Pagination>
   {:else}
-    <EmptyState title={'No Workflows Found'} content={errorMessage} />
+    <div class="my-12 flex flex-col justify-start items-center gap-2">
+      <EmptyState title={'No Schedules Found'} content={errorMessage} />
+      <Button primary as="anchor">Get Started With Docs</Button>
+    </div>
   {/if}
 {/await}

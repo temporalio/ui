@@ -3,6 +3,7 @@
   import {
     routeForArchivalWorkfows,
     routeForWorkflows,
+    routeForSchedules,
     routeForSettings,
   } from '$lib/utilities/route-for';
 
@@ -25,6 +26,9 @@
   <svelte:fragment slot="links">
     <NavigationLink href={routeForWorkflows({ namespace })}>
       Workflows
+    </NavigationLink>
+    <NavigationLink href={routeForSchedules({ namespace })}>
+      Schedules
     </NavigationLink>
     <IsCloudGuard>
       <NavigationLink href={routeForSettings({ namespace })}>

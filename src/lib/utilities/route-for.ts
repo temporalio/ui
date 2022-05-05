@@ -58,6 +58,10 @@ export const routeForSettings = (parameters: NamespaceParameter): string => {
   return `${routeForNamespace(parameters)}/settings`;
 };
 
+export const routeForSchedules = (parameters: NamespaceParameter): string => {
+  return `${routeForNamespace(parameters)}/schedules`;
+};
+
 export const routeForWorkflow = ({
   workflow,
   run,
@@ -66,6 +70,16 @@ export const routeForWorkflow = ({
   const wid = encodeURIForSvelte(workflow);
 
   return `${routeForWorkflows(parameters)}/${wid}/${run}`;
+};
+
+export const routeForSchedule = ({
+  workflow,
+  run,
+  ...parameters
+}: WorkflowParameters): string => {
+  const wid = encodeURIForSvelte(workflow);
+
+  return `${routeForSchedules(parameters)}/${wid}/${run}`;
 };
 
 export const routeForEventHistory = ({
