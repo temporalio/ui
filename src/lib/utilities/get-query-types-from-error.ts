@@ -2,8 +2,6 @@ export const getQueryTypesFromError = (message: string): string[] => {
   const indexOfOpeningBracket = message.indexOf('[');
   const indexOfClosingBracket = message.indexOf(']');
 
-  console.log(message);
-
   return message
     .slice(indexOfOpeningBracket + 1, indexOfClosingBracket)
     .split(' ')
