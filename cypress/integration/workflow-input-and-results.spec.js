@@ -68,6 +68,7 @@ describe('Workflow Input and Results', () => {
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
     cy.wait('@workflow-api');
+    cy.wait('@event-history-api');
 
     const firstEvent = eventsCompletedNullFixture.history.events[0];
     const input = Buffer.from(
@@ -101,6 +102,7 @@ describe('Workflow Input and Results', () => {
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
     cy.wait('@workflow-api');
+    cy.wait('@event-history-api');
 
     const firstEvent = eventsRunningFixture.history.events[0];
     const input = Buffer.from(
@@ -121,6 +123,7 @@ describe('Workflow Input and Results', () => {
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
     cy.wait('@workflow-api');
+    cy.wait('@event-history-api');
 
     const firstEvent = eventsFailedFixture.history.events[0];
     const input = Buffer.from(
@@ -149,6 +152,7 @@ describe('Workflow Input and Results', () => {
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
     cy.wait('@workflow-api');
+    cy.wait('@event-history-api');
 
     const firstEvent = eventsCanceledFixture.history.events[0];
     const input = Buffer.from(
@@ -169,6 +173,7 @@ describe('Workflow Input and Results', () => {
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
     cy.wait('@workflow-api');
+    cy.wait('@event-history-api');
 
     const firstEvent = eventsTimedOutFixture.history.events[0];
     const input = Buffer.from(
@@ -189,6 +194,7 @@ describe('Workflow Input and Results', () => {
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
     cy.wait('@workflow-api');
+    cy.wait('@event-history-api');
 
     const firstEvent = eventsContinuedAsNewFixture.history.events[0];
     const input = Buffer.from(
