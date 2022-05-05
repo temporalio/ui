@@ -1,6 +1,10 @@
 <script lang="ts">
   import Icon from 'svelte-fa';
-  import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
+  import {
+    faAngleDown,
+    faAngleUp,
+    faClock,
+  } from '@fortawesome/free-solid-svg-icons';
 
   import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-filters';
   import { timeFormat } from '$lib/stores/time-format';
@@ -8,12 +12,15 @@
 
   import { getGroupForEvent, isEventGroup } from '$lib/models/event-groups';
   import {
+    eventOrGroupHasActivityTimedOut,
+    groupHasActivityTimedOut,
+  } from '$lib/models/event-groups/get-event-in-group';
+  import {
     formatDate,
     formatDistanceAbbreviated,
   } from '$lib/utilities/format-date';
 
   import EventDetailsRow from './event-details-row.svelte';
-  import EventGroupDetails from './event-group-details.svelte';
   import EventDetailsFull from './event-details-full.svelte';
 
   export let event: IterableEvent;
@@ -53,12 +60,15 @@
   const onLinkClick = () => {
     expanded = !expanded;
   };
+
+  const error = eventOrGroupHasActivityTimedOut(compact ? eventGroup : event);
 </script>
 
 <tr
   class="row"
   id={event.id}
   class:expanded={expanded && !expandAll}
+  class:error
   data-cy="event-summary-row"
 >
   <td class="id-cell text-left">
@@ -72,15 +82,15 @@
       href="#{event.id}">{event.id}</a
     >
     <p
-      class="md:mx-2 text-sm md:text-base font-semibold link"
+      class="md:mx-2 text-sm md:text-base font-semibold link event-name"
       on:click|stopPropagation={onLinkClick}
     >
+      {#if compact && groupHasActivityTimedOut(eventGroup)}
+        <Icon class="inline text-red-700" icon={faClock} />
+      {/if}
       {event.name}
       <Icon class="inline" icon={expanded ? faAngleUp : faAngleDown} />
     </p>
-    {#if expanded && compact}
-      <EventGroupDetails {eventGroup} bind:selectedId />
-    {/if}
   </td>
   <td class="cell links text-sm font-normal text-right xl:text-left">
     {#if showElapsed && event.id !== initialItem.id}
@@ -94,20 +104,47 @@
     {/if}
   </td>
   <td class="cell links">
-    <EventDetailsRow {...getSingleAttributeForEvent(currentEvent)} inline />
+    {#if !expanded}
+      <EventDetailsRow {...getSingleAttributeForEvent(currentEvent)} inline />
+    {/if}
   </td>
 </tr>
 {#if expanded}
-  <tr class="expanded-row flex-wrap xl:table-row">
+  <tr class="expanded-row">
     <td class="expanded-cell" colspan="4">
-      <EventDetailsFull event={currentEvent} {compact} />
+      <EventDetailsFull
+        event={currentEvent}
+        {compact}
+        {eventGroup}
+        bind:selectedId
+      />
     </td>
   </tr>
 {/if}
 
 <style lang="postcss">
+  .row {
+    @apply no-underline xl:py-3 text-sm border-b-2 border-gray-700 items-center xl:text-base flex flex-wrap xl:table-row last-of-type:border-b-0;
+  }
+
+  .row:hover {
+    @apply bg-gray-50;
+  }
+
+  .expanded.row {
+    @apply border-b-0;
+  }
+  .error,
+  .error:hover {
+    @apply bg-red-50;
+  }
+
+  .error .event-name {
+    @apply text-red-700;
+  }
+
   .cell {
-    @apply xl:table-cell xl:border-b-2 border-gray-700 py-1 px-3 leading-4;
+    @apply xl:table-cell xl:border-b-2 border-gray-700 pt-1 pb-0 px-3 leading-4;
     flex: 40%;
   }
 
@@ -115,12 +152,9 @@
     @apply hidden xl:table-cell xl:border-b-2 border-gray-700 py-1 px-3 leading-4;
   }
 
-  .row {
-    @apply no-underline xl:py-3 text-sm border-b-2 border-gray-700 items-center xl:text-base flex flex-wrap xl:table-row last-of-type:border-b-0;
-  }
-
-  .row:hover {
-    @apply bg-gray-50;
+  .expanded .cell,
+  .expanded .id-cell {
+    @apply border-b-0;
   }
 
   .link {
@@ -137,10 +171,10 @@
   }
 
   .expanded-row {
-    @apply border-b-2 border-gray-700;
+    @apply block xl:table-row xl:border-b-2 xl:border-gray-700;
   }
 
   .expanded-cell {
-    @apply border-b-2 border-gray-700 no-underline text-sm xl:text-base flex flex-wrap xl:table-cell;
+    @apply w-full border-gray-700 border-b-2 no-underline text-sm xl:text-base flex flex-wrap xl:table-cell;
   }
 </style>
