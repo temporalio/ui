@@ -36,8 +36,6 @@
   onMount(() => {
     window.Prism.highlightAll();
   });
-
-  console.log($$props);
 </script>
 
 {#if content || content === null}

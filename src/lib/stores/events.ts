@@ -11,6 +11,7 @@ import { page } from '$app/stores';
 import {
   fetchEvents,
   FetchEventsParameters,
+  FetchEventsParametersWithSettings,
 } from '$lib/services/events-service';
 
 import { eventCategory, eventSortOrder } from './event-view';
@@ -30,6 +31,8 @@ const workflowId = derived([page], ([$page]) =>
 const runId = derived([page], ([$page]) =>
   decodeURIForSvelte($page.params.run),
 );
+
+const settings = derived([page], ([$page]) => $page.stuff.settings);
 
 const loading = writable(true);
 
@@ -52,9 +55,16 @@ export const parameters: Readable<FetchEventsParameters> = derived(
   },
 );
 
+export const parametersWithSettings: Readable<FetchEventsParametersWithSettings> =
+  derived([parameters, settings], ([$parameters, $settings]) => {
+    return {
+      ...$parameters,
+      settings: $settings,
+    };
+  });
+
 export const eventHistory = readable(emptyEvents, (set): Unsubscriber => {
-  return parameters.subscribe(async (params) => {
-    console.log(params);
+  return parametersWithSettings.subscribe(async (params) => {
     loading.set(true);
     if (shouldFetchNewEvents(params)) {
       const response = await fetchEvents(params);

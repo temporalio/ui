@@ -14,6 +14,16 @@ export type FetchEventsParameters = NamespaceScopedRequest &
     sort?: string;
   };
 
+export type FetchEventsParametersWithSettings = NamespaceScopedRequest &
+  PaginationCallbacks<GetWorkflowExecutionHistoryResponse> & {
+    workflowId: string;
+    runId: string;
+    rawPayloads?: boolean;
+    sort?: string;
+  } & {
+    settings: Settings;
+  };
+
 const isSortOrder = (sortOrder: string): sortOrder is EventSortOrder => {
   if (sortOrder === 'ascending') return true;
   if (sortOrder === 'descending') return true;
@@ -55,10 +65,10 @@ export const fetchRawEvents = async ({
 };
 
 export const fetchEvents = async (
-  parameters: FetchEventsParameters,
-  settings: Settings,
+  parameters: FetchEventsParametersWithSettings,
 ): Promise<FetchEventsResponse> => {
+  const { settings, namespace } = parameters;
   return fetchRawEvents(parameters).then((response) =>
-    toEventHistory({ response, namespace: parameters.namespace, settings }),
+    toEventHistory({ response, namespace, settings }),
   );
 };
