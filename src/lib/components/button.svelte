@@ -15,6 +15,7 @@
   export let as: 'button' | 'anchor' = href ? 'anchor' : 'button';
   export let icon: IconDefinition = null;
   export let classes: string = $$props.class;
+  export let dataCy: string = $$props.dataCy;
 </script>
 
 {#if as === 'button'}
@@ -27,6 +28,7 @@
     class:destroy
     class:login
     class:thin
+    data-cy={dataCy}
     {disabled}
   >
     {#if icon}
@@ -48,6 +50,7 @@
     class:disabled
     class:login
     class:thin
+    data-cy={dataCy}
     {disabled}
   >
     {#if icon}

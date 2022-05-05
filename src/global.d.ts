@@ -53,6 +53,10 @@ type Settings = {
     options: string[];
   };
   baseUrl: string;
+  codec: {
+    endpoint?: string;
+    accessToken?: string;
+  };
   defaultNamespace: string;
   showTemporalSystemNamespace: boolean;
   runtimeEnvironment: {
@@ -84,3 +88,5 @@ type UiVersionInfo = {
   current: string;
   recommended: string;
 };
+
+type DataEncoderStatus = 'notRequested' | 'success' | 'error';

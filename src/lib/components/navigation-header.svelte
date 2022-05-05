@@ -1,11 +1,11 @@
 <script lang="ts">
-  import DataConverterStatus from '$lib/components/data-converter-status.svelte';
+  import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
   import FeedbackButton from '$lib/components/feedback-button.svelte';
 
   export let href: string;
 </script>
 
-<header class="navigation-header">
+<header class="navigation-header" data-cy="navigation-header">
   <div class="flex items-center gap-4 col-span-3">
     <a {href} class="block">
       <img src="/logo.svg" alt="Temporal Logo" class="max-h-10" />
@@ -16,9 +16,7 @@
     <slot name="links" />
   </div>
   <div class="flex justify-end gap-4 col-span-5 col-end-13 items-center">
-    <div class="text-right">
-      <DataConverterStatus />
-    </div>
+    <DataEncoderStatus />
     <FeedbackButton />
     <slot name="user" />
   </div>

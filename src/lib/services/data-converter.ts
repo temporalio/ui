@@ -10,7 +10,7 @@ interface WebSocketResponse {
   requestId: string;
 }
 
-export async function convertPayload(
+export async function convertPayloadWithWebsocket(
   payload: Payload,
   websocket: WebSocketAsPromised,
 ): Promise<string | Payload> {

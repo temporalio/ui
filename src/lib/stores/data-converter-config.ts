@@ -3,9 +3,8 @@ import { persistStore } from '$lib/stores/persist-store';
 
 export const dataConverterPort = persistStore('port', null);
 
-type DataConverterStatus = 'notRequested' | 'success' | 'error';
 export const lastDataConverterStatus =
-  writable<DataConverterStatus>('notRequested');
+  writable<DataEncoderStatus>('notRequested');
 
 export function setLastDataConverterFailure(error?: string): void {
   lastDataConverterStatus.set('error');

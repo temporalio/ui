@@ -8,6 +8,6 @@
     let { port } = $page.params;
     dataConverterPort.set(port);
     goto('/', { replaceState: true });
-    notifications.add('success', 'Successfully set decoder');
+    notifications.add('success', 'Successfully set encoder');
   });
 </script>
