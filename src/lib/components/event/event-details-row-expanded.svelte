@@ -29,7 +29,7 @@
       </h2>
       <CodeBlock
         content={getCodeBlockValue(value)}
-        class="w-full text-right"
+        class="w-full text-right lg:h-auto"
         {inline}
       />
     </div>
