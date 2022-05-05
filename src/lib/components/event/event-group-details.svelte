@@ -4,37 +4,32 @@
 
   export let eventGroup: EventGroup | null;
   export let selectedId: string;
+  export let onGroupClick: (id: string) => void;
 </script>
 
-<section class="overflow-y-scroll max-h-full p-4 pl-12">
-  {#if eventGroup}
-    <nav class="flex flex-col mb-4">
-      <ul class="gap-2 w-full items-start">
-        {#each [...eventGroup.events] as [id, eventInGroup] (id)}
-          <li
-            on:click|preventDefault|stopPropagation={() => {
-              selectedId = id;
-            }}
+<div
+  class="w-full block lg:w-1/3 lg:flex flex-col max-h-full lg:border-r-2 border-gray-200 p-4"
+>
+  <ul class="gap-2">
+    {#each [...eventGroup.events] as [id, eventInGroup] (id)}
+      <li on:click|preventDefault|stopPropagation={() => onGroupClick(id)}>
+        <div class="flex gap-2">
+          <span class="text-gray-500 mx-1">{id}</span>
+          <span class="event-type" class:active={id === selectedId}
+            >{eventInGroup.eventType}</span
           >
-            <div class="flex gap-2">
-              <span class="text-gray-500 mx-1">{id}</span>
-              <span class="event-type" class:active={id === selectedId}
-                >{eventInGroup.eventType}</span
-              >
-              {#if isActivityTaskTimedOutEvent(eventInGroup)}
-                <WorkflowStatus status="TimedOut" />
-              {/if}
-            </div>
-          </li>
-        {/each}
-      </ul>
-    </nav>
-  {/if}
-</section>
+          {#if isActivityTaskTimedOutEvent(eventInGroup)}
+            <WorkflowStatus status="TimedOut" />
+          {/if}
+        </div>
+      </li>
+    {/each}
+  </ul>
+</div>
 
 <style lang="postcss">
   li {
-    @apply my-2 cursor-pointer;
+    @apply my-2 pl-8 cursor-pointer;
   }
   .event-type:hover {
     @apply text-blue-700 underline decoration-blue-700;

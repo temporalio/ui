@@ -1,7 +1,7 @@
 <script lang="ts">
   import HeartBeat from './heart-beat-indicator.svelte';
 
-  export let status: WorkflowExecutionStatus | WorkflowStatus;
+  export let status: WorkflowExecutionStatus | string;
   export let delay: number = 0;
 
   const humanFriendlyNames = {

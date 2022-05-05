@@ -12,15 +12,17 @@
   const dispatch = createEventDispatcher();
 </script>
 
-<div class="p-2 text-center">
+<div class="p-2 text-center xl:text-left">
   <div class="pill-container">
-    {#each Object.keys(attributeGrouping) as key (key)}
-      <Pill
-        active={activePill === key}
-        on:click={() => dispatch('pillChange', { key })}
-        color={attributeGroupingProperties[key].color}
-        >{attributeGroupingProperties[key].label}</Pill
-      >
+    {#each Object.entries(attributeGrouping) as [key, value] (key)}
+      {#if value.length}
+        <Pill
+          active={activePill === key}
+          on:click={() => dispatch('pillChange', { key })}
+          color={attributeGroupingProperties[key].color}
+          >{attributeGroupingProperties[key].label}</Pill
+        >
+      {/if}
     {/each}
   </div>
 </div>

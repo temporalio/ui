@@ -94,33 +94,39 @@ export type AttributeGrouping = Partial<
 >;
 
 export const attributeGroups = (
+  event: IterableEvent,
   attributes: CombinedAttributes,
 ): AttributeGrouping => {
-  const groupedAttributes = {
-    summary: Object.keys(attributes),
-  };
+  const groupedAttributes: AttributeGrouping = {};
+  attributeGroupings.forEach((group) => {
+    if (group === 'summary') {
+      groupedAttributes[group] = Object.keys(attributes) as EventAttributeKey[];
+    } else {
+      groupedAttributes[group] = [];
+    }
+  });
 
   for (const key of Object.keys(attributes)) {
     const attributeGroup = attributeGroupings.find((group) =>
       key.includes(group),
     );
     if (attributeGroup) {
-      if (!groupedAttributes[attributeGroup]) {
-        groupedAttributes[attributeGroup] = [key];
-      } else {
-        groupedAttributes[attributeGroup] = [
-          key,
-          ...groupedAttributes[attributeGroup],
-        ];
-      }
+      groupedAttributes[attributeGroup] = [
+        key,
+        ...groupedAttributes[attributeGroup],
+      ];
       groupedAttributes.summary = groupedAttributes.summary.filter(
         (g) => g !== key,
       );
     }
   }
 
-  if (!groupedAttributes.summary.length) {
-    delete groupedAttributes.summary;
+  if (event.category === 'activity' && groupedAttributes?.workflow?.length) {
+    groupedAttributes.summary = [
+      ...groupedAttributes.summary,
+      ...groupedAttributes?.workflow,
+    ];
+    groupedAttributes.workflow = [];
   }
 
   return groupedAttributes;
