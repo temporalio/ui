@@ -5,7 +5,7 @@
   export let href: string;
 </script>
 
-<header class="navigation-header">
+<header class="navigation-header" data-cy="navigation-header">
   <div class="flex items-center gap-4 col-span-3">
     <a {href} class="block">
       <img src="/logo.svg" alt="Temporal Logo" class="max-h-10" />

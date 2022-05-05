@@ -24,7 +24,11 @@
 {#if $dataEncoder?.hasEndpointOrPortConfigured}
   {#if $dataEncoder?.hasNotRequested}
     <Tooltip left text={'Data encoder is configured'}>
-      <div class="flex cursor-pointer" on:click={() => (showSettings = true)}>
+      <button
+        class="flex cursor-pointer p-2"
+        data-cy="data-encoder-status-configured"
+        on:click={() => (showSettings = true)}
+      >
         <Icon
           icon={faLongArrowAltDown}
           scale={1}
@@ -35,11 +39,15 @@
           scale={1}
           class="text-blue-200 block w-full h-full"
         />
-      </div>
+      </button>
     </Tooltip>
   {:else if $dataEncoder.hasError}
     <Tooltip left text={`Data encoder couldn't connect to the remote encoder`}>
-      <div class="flex cursor-pointer" on:click={() => (showSettings = true)}>
+      <button
+        class="flex cursor-pointer"
+        data-cy="data-encoder-status-error"
+        on:click={() => (showSettings = true)}
+      >
         <Icon
           icon={faLongArrowAltDown}
           scale={1}
@@ -50,11 +58,15 @@
           scale={1}
           class="text-red-400 block w-full h-full"
         />
-      </div>
+      </button>
     </Tooltip>
   {:else if $dataEncoder.hasSuccess}
     <Tooltip left text={'Data encoder succesfully converted content'}>
-      <div class="flex cursor-pointer" on:click={() => (showSettings = true)}>
+      <button
+        class="flex cursor-pointer"
+        data-cy="data-encoder-status-success"
+        on:click={() => (showSettings = true)}
+      >
         <Icon
           icon={faLongArrowAltDown}
           scale={1}
@@ -65,12 +77,16 @@
           scale={1}
           class="text-green-400 block w-full h-full"
         />
-      </div>
+      </button>
     </Tooltip>
   {/if}
 {:else}
   <Tooltip left text={'Configure data encoder'}>
-    <div class="flex cursor-pointer" on:click={() => (showSettings = true)}>
+    <button
+      class="flex cursor-pointer"
+      data-cy="data-encoder-status"
+      on:click={() => (showSettings = true)}
+    >
       <Icon
         icon={faLongArrowAltDown}
         scale={1}
@@ -81,6 +97,6 @@
         scale={1}
         class="text-gray-200 block w-full h-full"
       />
-    </div>
+    </button>
   </Tooltip>
 {/if}

@@ -22,7 +22,6 @@ export async function convertPayloadsWithCodec({
     'X-Namespace': namespace,
   };
 
-
   if (accessToken) {
     if (validateHttps(endpoint)) {
       headers['Authorization'] = `Bearer ${accessToken}`;

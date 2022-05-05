@@ -12,7 +12,7 @@
   $: open = false;
 </script>
 
-<header class="hamburger-header">
+<header class="hamburger-header" data-cy="hamburger-header">
   <div class="flex gap-4 col-span-4 justify-start">
     <div on:click={() => (open = !open)} data-cy="hamburger-icon">
       <Icon
