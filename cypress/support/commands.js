@@ -24,6 +24,8 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
+import settings from '../fixtures/settings.json';
+
 Cypress.Commands.add(
   'interceptApi',
   ({ namespace } = { namespace: 'default' }) => {
@@ -51,7 +53,7 @@ Cypress.Commands.add(
     }).as('user-api');
 
     cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/settings*', {
-      Auth: { Enabled: false, Options: null },
+      ...settings,
       DefaultNamespace: namespace,
     }).as('settings-api');
 

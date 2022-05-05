@@ -1,9 +1,14 @@
 <script lang="ts">
   import Icon from 'svelte-fa';
   import { faHeart } from '@fortawesome/free-solid-svg-icons';
+  import { page } from '$app/stores';
+
+  const href =
+    $page.stuff.settings.feedbackURL ||
+    'https://github.com/temporalio/ui/issues/new/choose';
 </script>
 
-<a href="https://github.com/temporalio/ui/issues/new/choose" target="_blank">
+<a {href} target="_blank" data-cy="give-feedback">
   <div class="feedback-button">
     <div class="feedback-icon">
       <Icon class="" icon={faHeart} color="#e9d5ff" scale={0.5} />

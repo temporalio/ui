@@ -133,5 +133,6 @@ export type SettingsResponse = {
   Codec: { Endpoint: string; PassAccessToken?: boolean; AccessToken?: string };
   DefaultNamespace: string;
   ShowTemporalSystemNamespace: boolean;
+  FeedbackURL: string;
   Version: string;
 };

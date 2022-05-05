@@ -59,6 +59,7 @@ type Settings = {
   };
   defaultNamespace: string;
   showTemporalSystemNamespace: boolean;
+  feedbackURL: string;
   runtimeEnvironment: {
     isCloud: boolean;
     isLocal: boolean;
