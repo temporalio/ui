@@ -112,7 +112,7 @@ export const attributeGroups = (
     );
     if (attributeGroup) {
       groupedAttributes[attributeGroup] = [
-        key,
+        key as EventAttributeKey,
         ...groupedAttributes[attributeGroup],
       ];
       groupedAttributes.summary = groupedAttributes.summary.filter(

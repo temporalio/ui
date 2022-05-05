@@ -3,7 +3,7 @@
   import {
     attributeGroupingProperties,
     AttributeGrouping,
-  } from './_format-attributes';
+  } from '$lib/utilities/format-event-attributes';
   import Pill from '$lib/components/pill.svelte';
 
   export let attributeGrouping: AttributeGrouping;

@@ -1,7 +1,10 @@
 <script lang="ts">
   import EventDetailsRowExpanded from './event-details-row-expanded.svelte';
 
-  import { formatAttributes, attributeGroups } from './_format-attributes';
+  import {
+    formatAttributes,
+    attributeGroups,
+  } from '$lib/utilities/format-event-attributes';
   import EventDetailPills from './event-detail-pills.svelte';
   import EventGroupDetails from './event-group-details.svelte';
 
