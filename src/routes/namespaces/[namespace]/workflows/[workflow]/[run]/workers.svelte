@@ -40,11 +40,12 @@
     {#each workers.pollers as poller (poller.identity)}
       <article
         class="w-full h-full flex flex-row border-b-2 last:border-b-0 no-underline p-2"
+        data-cy="worker-row"
       >
-        <div class="links w-3/12 text-left">
+        <div class="links w-3/12 text-left" data-cy="worker-identity">
           <p class="select-all">{poller.identity}</p>
         </div>
-        <div class="links w-3/12 text-left">
+        <div class="links w-3/12 text-left" data-cy="worker-last-access-time">
           <h3>
             <p class="select-all">
               {formatDate(poller.lastAccessTime, $timeFormat)}

@@ -66,6 +66,7 @@
         label="Workers"
         href={routeForWorkers(routeParameters)}
         amount={workers?.pollers?.length}
+        dataCy="workers-tab"
       />
       <Tab
         label="Pending Activities"

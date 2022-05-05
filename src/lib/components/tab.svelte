@@ -12,6 +12,7 @@
   class="block text-sm md:text-base border-b-2 whitespace-nowrap"
   class:active
   {href}
+  data-cy={$$props.dataCy}
 >
   {#if amount || amount === 0}
     {label}

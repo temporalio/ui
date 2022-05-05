@@ -71,15 +71,8 @@ Cypress.Commands.add(
       Cypress.env('VITE_API_HOST') +
         `/api/v1/namespaces/default/task-queues/rainbow-statuses?taskQueueType=*`,
       {
-        pollers: [
-          {
-            lastAccessTime: '2022-04-11T13:21:10.910333429Z',
-            identity: '57979@MacBook-Pro@',
-            ratePerSecond: 100000,
-          },
-        ],
-        taskQueueStatus: null,
+        fixture: 'task-queues.json',
       },
-    ).as('queue-api');
+    ).as('task-queues-api');
   },
 );
