@@ -17,13 +17,17 @@
 </script>
 
 {#if show}
-  <section class={`block leading-10 text-center ${severity}`}>
+  <section
+    class={`block leading-10 text-center ${severity}`}
+    data-cy={$$props.dataCy}
+  >
     <a href={link} target="_blank">
       {message}
     </a>
     <button
       on:click={() => close(key)}
       class="absolute top-0 right-0 mr-5 text-black-600"
+      data-cy="close-banner"
     >
       ✕
     </button>
