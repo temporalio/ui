@@ -56,7 +56,7 @@ const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
     if (isNewRequest(namespace, query, previous)) {
       withLoading(loading, async () => {
         const { workflows } = await fetchAllWorkflows(namespace, { query });
-        if (workflows) {
+        if (workflows.length) {
           set(workflows);
         } else {
           setTimeout(() => {
