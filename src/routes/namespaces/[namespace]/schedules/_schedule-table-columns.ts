@@ -20,10 +20,9 @@ export const columns: TableColumn[] = [
     filter: DateTimeFormatFilter,
   },
   {
-    key: 'upcomingRuns',
+    key: 'closeTime',
     label: 'Upcoming Runs',
     classes: 'hidden xl:table-cell',
     type: 'dateTime',
-    filter: DateTimeFormatFilter,
   },
 ];

@@ -4,14 +4,15 @@
   import { getSearchType } from '$lib/utilities/search-type-parameter';
   import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
-  const defaultQuery = toListWorkflowQuery({ timeRange: '1 day' });
+  const defaultQuery = toListWorkflowQuery({
+    timeRange: '1 day',
+    workflowType: 'cronWorkflow',
+  });
 
   export const load: Load = async function ({ params, url }) {
     const searchType = getSearchType(url);
 
-    if (!url.searchParams.has('query')) {
-      url.searchParams.set('query', defaultQuery);
-    }
+    url.searchParams.set('query', defaultQuery);
 
     const query = url.searchParams.get('query');
     const { namespace } = params;
@@ -25,6 +26,7 @@
 <script lang="ts">
   import { timeFormat } from '$lib/stores/time-format';
   import { getWorkflows } from '$lib/stores/workflows';
+  import { routeForSchedule } from '$lib/utilities/route-for';
 
   import EmptyState from '$lib/components/empty-state.svelte';
   import Pagination from '$lib/components/pagination.svelte';
@@ -46,6 +48,13 @@
   let search = '';
   const errorMessage =
     'Create scheduled actions using our Public API or TCTL (CLI).';
+
+  const getRoute = (item: WorkflowExecution) =>
+    routeForSchedule({
+      namespace,
+      schedule: item.id,
+      run: item.runId,
+    });
 </script>
 
 <h2 class="text-2xl">Schedules <Badge type="beta">Beta</Badge></h2>
@@ -59,7 +68,12 @@
     <Pagination items={workflows} let:visibleItems>
       <Table {columns}>
         {#each visibleItems as event}
-          <TableRow item={event} {columns} timeFormat={$timeFormat} />
+          <TableRow
+            item={event}
+            {columns}
+            href={getRoute(event)}
+            timeFormat={$timeFormat}
+          />
         {/each}
       </Table>
     </Pagination>

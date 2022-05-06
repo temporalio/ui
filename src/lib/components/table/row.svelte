@@ -4,6 +4,7 @@
   import type { TableColumn } from './types';
 
   export let columns: TableColumn[];
+  export let href: string;
   export let item: unknown;
   export let timeFormat: TimeFormat | string;
 
@@ -17,7 +18,7 @@
     return props;
   };
 
-  const formatLabel = (value: string, type) => {
+  $: formatLabel = (value: string, type) => {
     if (type === 'dateTime') {
       return formatDate(value, timeFormat);
     }
@@ -25,7 +26,7 @@
   };
 </script>
 
-<div class="row">
+<a {href} class="row">
   {#each columns as column (column.key)}
     <div class="cell {column.cellClasses}">
       {#if column.component}
@@ -38,7 +39,7 @@
       {/if}
     </div>
   {/each}
-</div>
+</a>
 
 <style lang="postcss">
   .row {
