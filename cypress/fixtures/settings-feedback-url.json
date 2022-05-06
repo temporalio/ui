@@ -1,8 +1,0 @@
-{
-  "Auth": { "Enabled": false, "Options": null },
-  "DefaultNamespace": "default",
-  "ShowTemporalSystemNamespace": false,
-  "FeedbackURL": "https://support.com/",
-  "NotifyOnNewVersion": true,
-  "Codec": { "Endpoint": "", "AccessToken": "" }
-}
