@@ -3,8 +3,8 @@ import {
   readable,
   writable,
   Readable,
-  Unsubscriber,
 } from 'svelte/store';
+import type { Writable, StartStopNotifier } from 'svelte/store';
 
 import { page } from '$app/stores';
 
@@ -22,25 +22,60 @@ const emptyEvents: FetchEventsResponse = {
   eventGroups: [],
 };
 
+const previous: FetchEventsParameters = {
+  namespace: null,
+  workflowId: null,
+  runId: null,
+  rawPayloads: false,
+  sort: 'descending',
+};
+
 const namespace = derived([page], ([$page]) =>
   decodeURIForSvelte($page.params.namespace),
 );
-const workflowId = derived([page], ([$page]) =>
-  decodeURIForSvelte($page.params.workflow),
-);
-const runId = derived([page], ([$page]) =>
-  decodeURIForSvelte($page.params.run),
-);
+
+const workflowId = derived([page], ([$page]) => {
+  if ($page.params.workflow) {
+    return decodeURIForSvelte($page.params.workflow);
+  }
+  return '';
+});
+
+const runId = derived([page], ([$page]) => {
+  if ($page.params.run) {
+    return decodeURIForSvelte($page.params.run);
+  }
+  return '';
+});
 
 const settings = derived([page], ([$page]) => $page.stuff.settings);
 
-const loading = writable(true);
-
-const shouldFetchNewEvents = (parameters: FetchEventsParameters): boolean => {
+const isNewRequest = (parameters: FetchEventsParameters, previous: FetchEventsParameters): boolean => {
   for (const required of ['namespace', 'workflowId', 'runId']) {
     if (!parameters[required]) return false;
   }
+
+  if (query === previous.query && namespace === previous.namespace) {
+    return false;
+  }
+
+  previous.namespace = namespace;
+  previous.query = query;
+
+
   return true;
+};
+
+const withLoading = async (
+  loading: Writable<boolean>,
+  fn: () => Promise<void>,
+) => {
+  updating.set(true);
+  await fn();
+  loading.set(false);
+  setTimeout(() => {
+    updating.set(false);
+  }, 300);
 };
 
 export const parameters: Readable<FetchEventsParameters> = derived(
@@ -63,18 +98,24 @@ export const parametersWithSettings: Readable<FetchEventsParametersWithSettings>
     };
   });
 
-export const eventHistory = readable(emptyEvents, (set): Unsubscriber => {
+export const updateEventHistory: StartStopNotifier<FetchEventsResponse> = (set) => {
   return parametersWithSettings.subscribe(async (params) => {
-    loading.set(true);
-    if (shouldFetchNewEvents(params)) {
-      const response = await fetchEvents(params);
-      set(response);
-      loading.set(false);
-    } else {
-      set(emptyEvents);
+    if (isNewRequest(params)) {
+      withLoading(loading, async () => {
+        const events = await fetchEvents(params);
+        if (events?.events?.length) {
+          set(events);
+        } else {
+          setTimeout(() => {
+            set(events);
+          }, 300);
+        }
+      });
     }
   });
-});
+};
+
+export const eventHistory = readable(emptyEvents, updateEventHistory)
 
 export const events = derived(
   [eventHistory, eventCategory],
@@ -93,3 +134,6 @@ export const eventGroups = derived(
     return eventGroups.filter((event) => event.category === $category);
   },
 );
+
+export const updating = writable(true);
+export const loading = writable(true);
