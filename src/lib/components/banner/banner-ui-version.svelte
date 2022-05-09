@@ -17,5 +17,12 @@
 </script>
 
 {#if show}
-  <Banner {key} {severity} {message} {link} bind:shownBanner />
+  <Banner
+    {key}
+    {severity}
+    {message}
+    {link}
+    bind:shownBanner
+    dataCy="ui-version-banner"
+  />
 {/if}

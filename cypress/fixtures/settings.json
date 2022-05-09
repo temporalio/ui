@@ -1,4 +1,5 @@
 {
+  "Version": "2.0.0",
   "Auth": { "Enabled": false, "Options": null },
   "DefaultNamespace": "default",
   "ShowTemporalSystemNamespace": false,
