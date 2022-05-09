@@ -24,7 +24,7 @@
 
 <script lang="ts">
   import { timeFormat } from '$lib/stores/time-format';
-  import { getWorkflows } from '$lib/stores/workflows';
+  import { workflows, loading, updating } from '$lib/stores/workflows';
 
   import EmptyState from '$lib/components/empty-state.svelte';
   import Pagination from '$lib/components/pagination.svelte';
@@ -38,32 +38,28 @@
   export let searchType: 'basic' | 'advanced';
   export let query: string;
 
-  let workflows = getWorkflows({ namespace, query });
-
   const errorMessage =
     searchType === 'advanced'
       ? 'Please check your syntax and try again.'
       : 'If you have filters applied, try adjusting them.';
 </script>
 
-<h2 class="text-2xl">Workflows <Badge type="beta">Beta</Badge></h2>
+<h2 class="text-2xl">Recent Workflows <Badge type="beta">Beta</Badge></h2>
 <WorkflowFilters bind:searchType bind:query />
-{#await $workflows}
+{#if $loading}
   <WorkflowsLoading />
-{:then { workflows }}
-  {#if workflows.length}
-    <Pagination items={workflows} let:visibleItems>
-      <WorkflowsSummaryTable>
-        {#each visibleItems as event}
-          <WorkflowsSummaryRow
-            workflow={event}
-            {namespace}
-            timeFormat={$timeFormat}
-          />
-        {/each}
-      </WorkflowsSummaryTable>
-    </Pagination>
-  {:else}
-    <EmptyState title={'No Workflows Found'} content={errorMessage} />
-  {/if}
-{/await}
+{:else if $workflows.length}
+  <Pagination items={$workflows} updating={$updating} let:visibleItems>
+    <WorkflowsSummaryTable>
+      {#each visibleItems as event}
+        <WorkflowsSummaryRow
+          workflow={event}
+          {namespace}
+          timeFormat={$timeFormat}
+        />
+      {/each}
+    </WorkflowsSummaryTable>
+  </Pagination>
+{:else}
+  <EmptyState title={'No Workflows Found'} content={errorMessage} />
+{/if}
