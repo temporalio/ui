@@ -8,6 +8,7 @@
   import FeedbackButton from '$lib/components/feedback-button.svelte';
 
   export let href: string;
+  export let user: User;
 
   $: open = false;
 </script>
@@ -28,7 +29,9 @@
     </a>
   </div>
   <div class="flex gap-4 col-span-4 justify-end items-center">
-    <DataEncoderStatus />
+    {#if user}
+      <DataEncoderStatus />
+    {/if}
   </div>
 </header>
 {#if open}

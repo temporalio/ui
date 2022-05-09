@@ -18,7 +18,7 @@
   export let user: User;
 </script>
 
-<NavigationHeader href={routeForWorkflows({ namespace })}>
+<NavigationHeader href={routeForWorkflows({ namespace })} {user}>
   <svelte:fragment slot="logo">
     <NamespaceSelect />
   </svelte:fragment>

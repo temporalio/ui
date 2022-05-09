@@ -28,17 +28,19 @@
 
 <script lang="ts">
   import NavigationHeader from '$lib/components/navigation-header.svelte';
+  import HamburgerHeader from '$lib/components/hamburger-header.svelte';
 
   export let settings: Settings;
 </script>
 
-<NavigationHeader href="/" />
+<NavigationHeader href="/" user={undefined} />
+<HamburgerHeader href="/" user={undefined} />
 <section class="text-center my-[20vh]">
-  <h1 class="text-8xl font-semibold">Welcome back.</h1>
-  <p class="my-7">Let's get you signed in.</p>
+  <h1 class="text-8xl font-semibold" data-cy="login-title">Welcome back.</h1>
+  <p class="my-7" data-cy="login-info">Let's get you signed in.</p>
   <div class="mx-auto">
     <Button
-      classes=""
+      dataCy="login-button"
       login
       icon={faLock}
       on:click={() => {

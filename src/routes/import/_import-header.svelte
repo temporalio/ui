@@ -7,7 +7,7 @@
   export let user: User;
 </script>
 
-<NavigationHeader href="/">
+<NavigationHeader href="/" {user}>
   <svelte:fragment slot="links">
     <NavigationLink href={routeForImport({ importType: 'events' })}>
       Import
