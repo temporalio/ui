@@ -5,7 +5,7 @@
   import { fetchEvents } from '$lib/services/events-service';
 
   export const load: Load = async function ({ params, url, stuff, fetch }) {
-    const { workflow } = stuff;
+    const { workflow, settings } = stuff;
     const { namespace } = params;
     const parameters = {
       namespace,
@@ -14,7 +14,11 @@
       reverse: Boolean(url?.searchParams?.get('sort')),
     };
 
-    const { events, eventGroups } = await fetchEvents(parameters, fetch);
+    const { events, eventGroups } = await fetchEvents(
+      parameters,
+      settings,
+      fetch,
+    );
 
     return {
       props: {

@@ -35,7 +35,7 @@
 <NavigationHeader href="/" />
 <section class="text-center my-[20vh]">
   <h1 class="text-8xl font-semibold">Welcome back.</h1>
-  <p class="my-7">Lets get you signed in.</p>
+  <p class="my-7">Let's get you signed in.</p>
   <div class="mx-auto">
     <Button
       classes=""

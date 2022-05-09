@@ -16,11 +16,6 @@
   export const load: Load = async function ({ url, fetch }) {
     const settings: Settings = await fetchSettings({ url }, fetch);
     const user = await fetchUser(fetch);
-    const recommended = await fetchLatestUiVersion(fetch);
-    const uiVersionInfo: UiVersionInfo = {
-      current: settings.version,
-      recommended,
-    };
 
     if (!isAuthorized(settings, user)) {
       return {
@@ -38,6 +33,13 @@
       settings,
     });
     const cluster: GetClusterInfoResponse = await fetchCluster(settings, fetch);
+
+    const uiVersionInfo: UiVersionInfo = {
+      current: settings.version,
+      recommended: settings.notifyOnNewVersion
+        ? await fetchLatestUiVersion(fetch)
+        : undefined,
+    };
 
     return {
       props: { user, uiVersionInfo },

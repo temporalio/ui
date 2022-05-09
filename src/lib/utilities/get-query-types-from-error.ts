@@ -5,5 +5,12 @@ export const getQueryTypesFromError = (message: string): string[] => {
   return message
     .slice(indexOfOpeningBracket + 1, indexOfClosingBracket)
     .split(' ')
-    .filter((query) => query !== '__stack_trace');
+    .filter((query: string) => query !== '__stack_trace')
+    .map((query: string) => {
+      if (query.endsWith(',')) {
+        return query.slice(0, query.length - 1);
+      } else {
+        return query;
+      }
+    });
 };

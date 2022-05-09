@@ -53,8 +53,14 @@ type Settings = {
     options: string[];
   };
   baseUrl: string;
+  codec: {
+    endpoint?: string;
+    accessToken?: string;
+  };
   defaultNamespace: string;
   showTemporalSystemNamespace: boolean;
+  notifyOnNewVersion: boolean;
+  feedbackURL: string;
   runtimeEnvironment: {
     isCloud: boolean;
     isLocal: boolean;
@@ -84,3 +90,18 @@ type UiVersionInfo = {
   current: string;
   recommended: string;
 };
+
+type DataEncoderStatus = 'notRequested' | 'success' | 'error';
+
+type Color =
+  | 'blue'
+  | 'blueGray'
+  | 'gray'
+  | 'orange'
+  | 'red'
+  | 'green'
+  | 'red'
+  | 'indigo'
+  | 'yellow'
+  | 'purple'
+  | 'pink';

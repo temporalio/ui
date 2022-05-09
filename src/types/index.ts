@@ -116,6 +116,7 @@ export type WorkflowExecutionInfo =
 
 // api response
 export type Payload = temporal.api.common.v1.IPayload;
+export type Payloads = temporal.api.common.v1.IPayloads;
 
 // api.taskqueue
 
@@ -129,7 +130,10 @@ export type Timestamp = google.protobuf.ITimestamp;
 // extra APIs
 export type SettingsResponse = {
   Auth: { Enabled: boolean; Options: string[] };
+  Codec: { Endpoint: string; PassAccessToken?: boolean; AccessToken?: string };
   DefaultNamespace: string;
   ShowTemporalSystemNamespace: boolean;
+  NotifyOnNewVersion: boolean;
+  FeedbackURL: string;
   Version: string;
 };

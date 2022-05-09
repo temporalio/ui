@@ -21,22 +21,22 @@
   const { workflow, namespace, run } = $page.params;
 </script>
 
-<article class="row flex my-2 px-4 first:pt-0 {$$props.class}">
+<article class="row flex px-4 first:pt-0 {$$props.class}">
   {#if typeof value === 'object'}
-    <div class="detail-row">
-      <h2 class="w-1/2 text-sm">
+    <div class="code-block-row">
+      <h2 class="text-sm">
         {format(key)}
       </h2>
       <CodeBlock
         content={getCodeBlockValue(value)}
-        class="w-1/2 text-right pb-2"
+        class="w-full text-right lg:h-auto"
         {inline}
       />
     </div>
   {:else if shouldDisplayAsWorkflowLink(key)}
     <div class="detail-row">
-      <h2 class=" text-sm">{format(key)}</h2>
-      <div class=" text-sm">
+      <h2 class="text-sm">{format(key)}</h2>
+      <div class="text-sm">
         <Copyable
           content={value}
           container-class="flex-row-reverse xl:flex-row"
@@ -53,13 +53,9 @@
     </div>
   {:else if shouldDisplayAsWorkersLink(key)}
     <div class="detail-row">
-      <h2 class=" text-sm">{format(key)}</h2>
-      <div class=" text-sm">
-        <Copyable
-          content={value}
-          container-class="flex-row-reverse xl:flex-row"
-          size="xs"
-        >
+      <h2 class="text-sm">{format(key)}</h2>
+      <div class="text-sm">
+        <Copyable content={value} container-class="xl:flex-row" size="xs">
           <Link
             href={routeForWorkers({ namespace, workflow, run })}
             class="whitespace-nowrap"
@@ -72,7 +68,7 @@
   {:else}
     <div class="detail-row">
       <h2 class="text-sm">{format(key)}</h2>
-      <p class="text-sm text-right xl:text-left">
+      <p class="text-sm">
         <span
           class="px-2 select-all"
           class:badge={!shouldDisplayAsPlainText(key)}>{value}</span
@@ -83,10 +79,16 @@
 </article>
 
 <style lang="postcss">
+  .code-block-row {
+    @apply block w-full py-2 text-left border-b-2 border-gray-200;
+  }
   .detail-row {
-    @apply block xl:flex items-start gap-4 w-full border-b-2 border-gray-200 pb-2;
+    @apply block xl:flex items-start gap-4 w-full py-2 text-left border-b-2 border-gray-200;
   }
   .row:last-of-type .detail-row {
+    @apply border-b-0;
+  }
+  .row:last-of-type .code-block-row {
     @apply border-b-0;
   }
   .badge {

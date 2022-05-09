@@ -4,7 +4,7 @@
 
   import { fly } from 'svelte/transition';
 
-  import DataConverterStatus from '$lib/components/data-converter-status.svelte';
+  import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
   import FeedbackButton from '$lib/components/feedback-button.svelte';
 
   export let href: string;
@@ -12,7 +12,7 @@
   $: open = false;
 </script>
 
-<header class="hamburger-header">
+<header class="hamburger-header" data-cy="hamburger-header">
   <div class="flex gap-4 col-span-4 justify-start">
     <div on:click={() => (open = !open)} data-cy="hamburger-icon">
       <Icon
@@ -28,9 +28,7 @@
     </a>
   </div>
   <div class="flex gap-4 col-span-4 justify-end items-center">
-    <div class="text-right">
-      <DataConverterStatus />
-    </div>
+    <DataEncoderStatus />
   </div>
 </header>
 {#if open}

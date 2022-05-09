@@ -1,8 +1,10 @@
 import type { Payload } from '$types';
+
 import { dataConverterWebsocket } from '$lib/utilities/data-converter-websocket';
 import type { DataConverterWebsocketInterface } from '$lib/utilities/data-converter-websocket';
 
-import { convertPayload } from '$lib/services/data-converter';
+import { convertPayloadWithWebsocket } from '$lib/services/data-converter';
+import { convertPayloadsWithCodec } from '$lib/services/data-encoder';
 
 import { atob } from './atob';
 
@@ -28,46 +30,11 @@ export function decodePayload(
   return payload;
 }
 
-export const convertPayloadToJson = async (
+export const decodePayloadAttributes = (
   eventAttribute: EventAttribute,
-  websocket?: DataConverterWebsocketInterface,
-): Promise<EventAttribute> => {
-  // This anyAttribues allows us to use ?. notation to introspect the object which is a safe access pattern.
-  // Because of the way we wrote our discrimited union we have to use this any. If we have two objects that
-  // don't have the same property TS won't let us access that object without verifying the type string like
-  // attributes.type === "ATypeWithInput/Result"
+): EventAttribute => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const anyAttributes = eventAttribute as any;
-  const potentialPayload = (anyAttributes?.input?.payloads ??
-    anyAttributes?.result?.payloads ??
-    null) as Payload[] | null;
-
-  if (potentialPayload) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let JSONPayload: string | Payload | Record<any, any>;
-
-    const ws = websocket ?? dataConverterWebsocket;
-
-    if (ws?.hasWebsocket) {
-      // Convert Payload data
-      const awaitData = await Promise.all(
-        (potentialPayload ?? []).map(
-          async (payload) => await convertPayload(payload, ws.websocket),
-        ),
-      );
-
-      JSONPayload = awaitData;
-    } else {
-      JSONPayload = potentialPayload.map(decodePayload);
-    }
-
-    if (anyAttributes?.input?.payloads) {
-      anyAttributes.input.payloads = JSONPayload;
-    }
-    if (anyAttributes?.result?.payloads) {
-      anyAttributes.result.payloads = JSONPayload;
-    }
-  }
 
   // Decode Search Attributes
   if (anyAttributes?.searchAttributes?.indexedFields) {
@@ -104,6 +71,99 @@ export const convertPayloadToJson = async (
     Object.entries(queryResult).forEach(([key, value]) => {
       queryResult[key] = decodePayload(value);
     });
+  }
+
+  return anyAttributes;
+};
+
+export const convertPayloadToJsonWithCodec = async ({
+  attributes,
+  namespace,
+  settings,
+}: {
+  attributes: EventAttribute;
+  namespace: string;
+  settings: Settings;
+}): Promise<EventAttribute> => {
+  // This anyAttribues allows us to use ?. notation to introspect the object which is a safe access pattern.
+  // Because of the way we wrote our discrimited union we have to use this any. If we have two objects that
+  // don't have the same property TS won't let us access that object without verifying the type string like
+  // attributes.type === "ATypeWithInput/Result"
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const anyAttributes = attributes as any;
+
+  const potentialPayloads = (anyAttributes?.input?.payloads ??
+    anyAttributes?.result?.payloads ??
+    null) as Payload[] | null;
+
+  if (potentialPayloads) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let JSONPayload: string | Payload | Record<any, any>;
+
+    const endpoint = settings?.codec?.endpoint;
+    if (endpoint) {
+      // Convert Payload data
+      const awaitData = await convertPayloadsWithCodec({
+        payloads: { payloads: potentialPayloads },
+        namespace,
+        settings,
+      });
+      JSONPayload = (awaitData?.payloads ?? []).map(decodePayload);
+    } else {
+      JSONPayload = potentialPayloads.map(decodePayload);
+    }
+
+    if (anyAttributes?.input?.payloads) {
+      anyAttributes.input.payloads = JSONPayload;
+    }
+    if (anyAttributes?.result?.payloads) {
+      anyAttributes.result.payloads = JSONPayload;
+    }
+  }
+
+  return anyAttributes;
+};
+
+export const convertPayloadToJsonWithWebsocket = async (
+  eventAttribute: EventAttribute,
+  websocket?: DataConverterWebsocketInterface,
+): Promise<EventAttribute> => {
+  // This anyAttribues allows us to use ?. notation to introspect the object which is a safe access pattern.
+  // Because of the way we wrote our discrimited union we have to use this any. If we have two objects that
+  // don't have the same property TS won't let us access that object without verifying the type string like
+  // attributes.type === "ATypeWithInput/Result"
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const anyAttributes = eventAttribute as any;
+  const potentialPayload = (anyAttributes?.input?.payloads ??
+    anyAttributes?.result?.payloads ??
+    null) as Payload[] | null;
+
+  if (potentialPayload) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let JSONPayload: string | Payload | Record<any, any>;
+
+    const ws = websocket ?? dataConverterWebsocket;
+
+    if (ws?.hasWebsocket) {
+      // Convert Payload data
+      const awaitData = await Promise.all(
+        (potentialPayload ?? []).map(
+          async (payload) =>
+            await convertPayloadWithWebsocket(payload, ws.websocket),
+        ),
+      );
+
+      JSONPayload = awaitData;
+    } else {
+      JSONPayload = potentialPayload.map(decodePayload);
+    }
+
+    if (anyAttributes?.input?.payloads) {
+      anyAttributes.input.payloads = JSONPayload;
+    }
+    if (anyAttributes?.result?.payloads) {
+      anyAttributes.result.payloads = JSONPayload;
+    }
   }
 
   return anyAttributes;

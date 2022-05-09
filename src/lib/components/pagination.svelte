@@ -1,7 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
-  import { pagination, perPageOptions } from '$lib/stores/pagination';
+  import {
+    pagination,
+    perPageFromSearchParameter,
+    perPageOptions,
+  } from '$lib/stores/pagination';
 
   import Icon from 'svelte-fa';
   import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
@@ -18,9 +22,10 @@
 
   export let startingIndex: string | number = 0;
 
-  $: perPage = $page.url.searchParams.get(key) || '100';
+  $: perPage = String(
+    perPageFromSearchParameter($page.url.searchParams.get(key)),
+  ).toString();
   $: store = pagination(items, perPage);
-  $: store.adjustPageSize(perPage);
   $: store.jumpToIndex(startingIndex);
 
   let screenWidth: number;
@@ -81,6 +86,36 @@
     </nav>
   </div>
   <slot visibleItems={$store.items} initialItem={$store.initialItem} />
+  <nav class="flex justify-end gap-8">
+    <div class="flex gap-2 items-center justify-center">
+      <p class="w-fit text-right">Per Page</p>
+      <FilterSelect
+        label="Per Page"
+        parameter={key}
+        value={String(perPage)}
+        options={perPageOptions(perPage)}
+      />
+    </div>
+    <div class="flex gap-6 items-center justify-center">
+      <button
+        class="caret"
+        disabled={!$store.hasPrevious}
+        on:click={() => store.previous()}
+      >
+        <Icon icon={faAngleLeft} />
+      </button>
+      <p>
+        {$store.startingIndex + 1}–{$store.endingIndex + 1} of {$store.length}
+      </p>
+      <button
+        class="caret"
+        disabled={!$store.hasNext}
+        on:click={() => store.next()}
+      >
+        <Icon icon={faAngleRight} />
+      </button>
+    </div>
+  </nav>
 </div>
 
 <style lang="postcss">

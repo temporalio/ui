@@ -11,48 +11,58 @@
 </script>
 
 {#if pendingActivities.length}
-  <section class="border-2 border-gray-900 rounded-lg w-full mb-6">
-    <header class="table-header">
-      <h3>Pending Activities</h3>
+  <section class="mb-6 event-table">
+    <header class="p-2 border-gray-900 bg-gray-900 text-white  w-full">
+      <h2>Pending Activities</h2>
     </header>
-    <div>
-      {#each pendingActivities as { id, activityId, ...details } (id)}
-        <article class="flex gap-4">
-          <div {id} class="p-4">
-            <Link href="#{id}" class="block py-1">{activityId}</Link>
-          </div>
-          <div class="p-4 w-full">
-            {#each Object.entries(details) as [key, value] (key)}
-              {#if shouldDisplayAttribute(key, value)}
-                <article
-                  class="flex items-start content-start w-full border-b-2 last:border-b-0 border-gray-200 py-1"
-                >
-                  <h4 class="w-full flex-grow">{format(key)}</h4>
-                  <div class="flex-grow w-full">
+    {#each pendingActivities as { id, activityId, ...details } (id)}
+      <article
+        class="flex gap-4 p-4 items-start last-of-type:border-b-0 border-b-2 border-gray-600"
+      >
+        <div {id} class="py-1 w-12">
+          <Link href="#{id}" class="block py-1">{activityId}</Link>
+        </div>
+        <table class="w-full">
+          {#each Object.entries(details) as [key, value] (key)}
+            <tr class="xl:table-row">
+              <td>
+                {#if shouldDisplayAttribute(key, value)}
+                  <div class="border-b-2 border-gray-200 py-2">
                     {#if typeof value === 'object'}
-                      <CodeBlock content={value} />
+                      <h2>
+                        {format(key)}
+                      </h2>
+                      <CodeBlock
+                        content={value}
+                        class="w-full text-right pb-2"
+                      />
                     {:else}
-                      <p>
-                        <span class="bg-gray-300 text-gray-700 px-2 select-all"
-                          >{value}</span
-                        >
-                      </p>
+                      <div
+                        class="flex justify-between md:justify-start items-center gap-4"
+                      >
+                        <h2>{format(key)}</h2>
+                        <p class="text-sm text-right xl:text-left ">
+                          <span class="px-2 bg-gray-300 select-all"
+                            >{value}</span
+                          >
+                        </p>
+                      </div>
                     {/if}
                   </div>
-                </article>
-              {/if}
-            {/each}
-          </div>
-        </article>
-      {/each}
-    </div>
+                {/if}
+              </td>
+            </tr>
+          {/each}
+        </table>
+      </article>
+    {/each}
   </section>
 {:else}
   <EmptyState title="No Pending Activities" />
 {/if}
 
 <style lang="postcss">
-  .table-header {
-    @apply bg-gray-900 text-white p-4 flex justify-between items-center border-b-2 border-gray-900;
+  .event-table {
+    @apply xl:table table-fixed border-gray-900 border-2 rounded-lg w-full;
   }
 </style>
