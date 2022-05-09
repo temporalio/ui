@@ -2,8 +2,6 @@ describe('Login page', () => {
   beforeEach(() => {
     cy.interceptApi();
 
-    cy.visit('/namespaces/default/workflows');
-
     cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/settings*', {
       Auth: { Enabled: true, Options: null },
       DefaultNamespace: 'default',
@@ -12,14 +10,19 @@ describe('Login page', () => {
       NotifyOnNewVersion: true,
       Codec: { Endpoint: '', AccessToken: '' },
     }).as('settings-api');
-
-    cy.wait('@settings-api');
-    cy.wait('@user-api');
-
-    cy.get('[data-cy="navigation-header"]').as('header');
   });
 
   it('have the correct login title', () => {
+    cy.visit('/namespaces/default/workflows');
+
+    cy.wait('@settings-api');
+    cy.wait('@user-api');
+    cy.wait('@settings-api');
+
+    cy.url().should('include', `/login`);
+
+    cy.get('[data-cy="navigation-header"]').as('header');
+
     cy.get('[data-cy="login-title"]').contains('Welcome back.');
     cy.get('[data-cy="login-info"]').contains(`Let's get you signed in.`);
     cy.get('[data-cy="login-button"]').contains('Continue to SSO');
