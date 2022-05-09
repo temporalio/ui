@@ -1,41 +1,73 @@
-import { writable } from 'svelte/store';
+import { derived, readable, Writable, writable } from 'svelte/store';
 import { page } from '$app/stores';
 
 import { fetchAllWorkflows } from '$lib/services/workflow-service';
 
-import type { CombinedWorkflowExecutionsResponse } from '$lib/services/workflow-service';
-import type { StartStopNotifier, Writable } from 'svelte/store';
+import type { StartStopNotifier } from 'svelte/store';
 
 type WorkflowStoreParameters = {
   namespace: string;
   query: string;
 };
 
-type EventualWorkflows = Eventual<CombinedWorkflowExecutionsResponse>;
+const previous: WorkflowStoreParameters = {
+  namespace: null,
+  query: null,
+};
 
-const updateWorkflows: StartStopNotifier<EventualWorkflows> = (set) => {
-  const previous: WorkflowStoreParameters = {
-    namespace: null,
-    query: null,
+const isNewRequest = (
+  namespace: string,
+  query: string,
+  previous: WorkflowStoreParameters,
+): boolean => {
+  if (query === previous.query && namespace === previous.namespace) {
+    return false;
+  }
+
+  previous.namespace = namespace;
+  previous.query = query;
+
+  return true;
+};
+
+const withLoading = async (
+  loading: Writable<boolean>,
+  fn: () => Promise<void>,
+) => {
+  updating.set(true);
+  await fn();
+  loading.set(false);
+  setTimeout(() => {
+    updating.set(false);
+  }, 300);
+};
+
+const namespace = derived([page], ([$page]) => $page.params.namespace);
+const query = derived([page], ([$page]) => $page.url.searchParams.get('query'));
+const parameters = derived([namespace, query], ([$namespace, $query]) => {
+  return {
+    namespace: $namespace,
+    query: $query,
   };
+});
 
-  return page.subscribe(($page) => {
-    const namespace = $page.params.namespace;
-    const query = $page.url.searchParams.get('query');
-
-    if (namespace !== previous.namespace || query !== previous.query) {
-      fetchAllWorkflows(namespace, { query }).then(set);
-      previous.namespace = namespace;
-      previous.query = query;
+const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
+  return parameters.subscribe(({ namespace, query }) => {
+    if (isNewRequest(namespace, query, previous)) {
+      withLoading(loading, async () => {
+        const { workflows } = await fetchAllWorkflows(namespace, { query });
+        if (workflows.length) {
+          set(workflows);
+        } else {
+          setTimeout(() => {
+            set(workflows);
+          }, 300);
+        }
+      });
     }
   });
 };
 
-export const getWorkflows = ({
-  namespace,
-  query,
-}: WorkflowStoreParameters): Writable<EventualWorkflows> =>
-  writable<EventualWorkflows>(
-    fetchAllWorkflows(namespace, { query }),
-    updateWorkflows,
-  );
+export const updating = writable(true);
+export const loading = writable(true);
+export const workflows = readable<WorkflowExecution[]>([], updateWorkflows);
