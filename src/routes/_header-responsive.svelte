@@ -18,7 +18,7 @@
     $page.params.namespace || $page.stuff?.settings?.defaultNamespace;
 </script>
 
-<HamburgerHeader href={routeForWorkflows({ namespace })}>
+<HamburgerHeader href={routeForWorkflows({ namespace })} {user}>
   <svelte:fragment slot="action">
     <NamespaceSelect />
   </svelte:fragment>

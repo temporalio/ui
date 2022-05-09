@@ -3,6 +3,7 @@
   import FeedbackButton from '$lib/components/feedback-button.svelte';
 
   export let href: string;
+  export let user: User;
 </script>
 
 <header class="navigation-header" data-cy="navigation-header">
@@ -16,7 +17,9 @@
     <slot name="links" />
   </div>
   <div class="flex justify-end gap-4 col-span-5 col-end-13 items-center">
-    <DataEncoderStatus />
+    {#if user}
+      <DataEncoderStatus />
+    {/if}
     <FeedbackButton />
     <slot name="user" />
   </div>
