@@ -9,7 +9,26 @@
   },
   "serverVersion": "1.15.2",
   "clusterId": "fe325f09-1d00-45c0-8924-ce6f0e465258",
-  "versionInfo": null,
+  "versionInfo": {
+    "current": {
+      "version": "1.15.2",
+      "releaseTime": "2022-03-04T23:00:00Z",
+      "notes": ""
+    },
+    "recommended": {
+      "version": "1.16.1",
+      "releaseTime": "2022-04-19T19:50:00Z",
+      "notes": "Temporal 1.16.1"
+    },
+    "instructions": "",
+    "alerts": [
+      {
+        "message": "🪐 A new release is available!",
+        "severity": "Low"
+      }
+    ],
+    "lastUpdateTime": "2022-05-06T15:58:56.815957932Z"
+  },
   "clusterName": "active",
   "historyShardCount": 4
 }
