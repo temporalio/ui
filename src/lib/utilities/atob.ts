@@ -1,7 +1,6 @@
 import { browser } from '$app/env';
 
-// decode base64 to unicode
-function atou(str: string) {
+export function base64DecodeUnicode(str: string) {
   return decodeURIComponent(
     window
       .atob(str)
@@ -13,4 +12,4 @@ function atou(str: string) {
   );
 }
 
-export const atob = browser ? atou : (str: string) => str;
+export const atob = browser ? base64DecodeUnicode : (str: string) => str;
