@@ -1,7 +1,8 @@
-import { derived, readable, Writable, writable } from 'svelte/store';
+import { derived, readable, writable } from 'svelte/store';
 import { page } from '$app/stores';
 
 import { fetchAllWorkflows } from '$lib/services/workflow-service';
+import { withLoading, delay } from '$lib/utilities/stores/with-loading';
 
 import type { StartStopNotifier } from 'svelte/store';
 
@@ -30,18 +31,6 @@ const isNewRequest = (
   return true;
 };
 
-const withLoading = async (
-  loading: Writable<boolean>,
-  fn: () => Promise<void>,
-) => {
-  updating.set(true);
-  await fn();
-  loading.set(false);
-  setTimeout(() => {
-    updating.set(false);
-  }, 300);
-};
-
 const namespace = derived([page], ([$page]) => $page.params.namespace);
 const query = derived([page], ([$page]) => $page.url.searchParams.get('query'));
 const parameters = derived([namespace, query], ([$namespace, $query]) => {
@@ -54,14 +43,14 @@ const parameters = derived([namespace, query], ([$namespace, $query]) => {
 const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
   return parameters.subscribe(({ namespace, query }) => {
     if (isNewRequest(namespace, query, previous)) {
-      withLoading(loading, async () => {
+      withLoading(loading, updating, async () => {
         const { workflows } = await fetchAllWorkflows(namespace, { query });
         if (workflows.length) {
           set(workflows);
         } else {
           setTimeout(() => {
             set(workflows);
-          }, 300);
+          }, delay);
         }
       });
     }

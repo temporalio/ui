@@ -14,15 +14,9 @@ export type FetchEventsParameters = NamespaceScopedRequest &
     sort?: string;
   };
 
-export type FetchEventsParametersWithSettings = NamespaceScopedRequest &
-  PaginationCallbacks<GetWorkflowExecutionHistoryResponse> & {
-    workflowId: string;
-    runId: string;
-    rawPayloads?: boolean;
-    sort?: string;
-  } & {
-    settings: Settings;
-  };
+export type FetchEventsParametersWithSettings = FetchEventsParameters & {
+  settings: Settings;
+};
 
 const isSortOrder = (sortOrder: string): sortOrder is EventSortOrder => {
   if (sortOrder === 'ascending') return true;

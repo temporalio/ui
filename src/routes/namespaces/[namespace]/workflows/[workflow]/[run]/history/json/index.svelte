@@ -1,8 +1,6 @@
 <script lang="ts">
   import CodeBlock from '$lib/components/code-block.svelte';
-  import { getContext } from 'svelte';
-
-  const { events } = getContext('eventHistory');
+  import { events } from '$lib/stores/events';
 </script>
 
-<CodeBlock content={events} data-cy="event-history-json" />
+<CodeBlock content={$events} data-cy="event-history-json" />

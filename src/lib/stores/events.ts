@@ -1,10 +1,5 @@
-import {
-  derived,
-  readable,
-  writable,
-  Readable,
-} from 'svelte/store';
-import type { Writable, StartStopNotifier } from 'svelte/store';
+import { derived, readable, writable, Readable } from 'svelte/store';
+import type { StartStopNotifier } from 'svelte/store';
 
 import { page } from '$app/stores';
 
@@ -16,6 +11,7 @@ import {
 
 import { eventCategory, eventSortOrder } from './event-view';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
+import { withLoading, delay } from '$lib/utilities/stores/with-loading';
 
 const emptyEvents: FetchEventsResponse = {
   events: [],
@@ -42,26 +38,37 @@ const runId = derived([page], ([$page]) => {
 
 const settings = derived([page], ([$page]) => $page.stuff.settings);
 
-const shouldFetchNewEvents = (params: FetchEventsParametersWithSettings): boolean => {
+const previous: FetchEventsParameters = {
+  namespace: null,
+  workflowId: null,
+  runId: null,
+  rawPayloads: null,
+  sort: null,
+};
+
+const isNewRequest = (
+  params: FetchEventsParameters,
+  previous: FetchEventsParameters,
+): boolean => {
   for (const required of ['namespace', 'workflowId', 'runId']) {
     if (!params[required]) return false;
   }
 
-  debugger
+  let matchedPrevious = true;
+  for (const key of Object.keys(previous)) {
+    if (previous[key] !== params[key]) {
+      matchedPrevious = false;
+      break;
+    }
+  }
+
+  if (matchedPrevious) return false;
+
+  for (const key of Object.keys(previous)) {
+    previous[key] = params[key];
+  }
 
   return true;
-};
-
-const withLoading = async (
-  loading: Writable<boolean>,
-  fn: () => Promise<void>,
-) => {
-  updating.set(true);
-  await fn();
-  loading.set(false);
-  setTimeout(() => {
-    updating.set(false);
-  }, 300);
 };
 
 export const parameters: Readable<FetchEventsParameters> = derived(
@@ -84,55 +91,45 @@ export const parametersWithSettings: Readable<FetchEventsParametersWithSettings>
     };
   });
 
-export const updateEventHistory: StartStopNotifier<FetchEventsResponse> = (set) => {
+export const updateEventHistory: StartStopNotifier<FetchEventsResponse> = (
+  set,
+) => {
   return parametersWithSettings.subscribe(async (params) => {
-    if (shouldFetchNewEvents(params)) {
-      withLoading(loading, async () => {
+    const { settings, ...rest } = params;
+    if (isNewRequest(rest, previous)) {
+      withLoading(loading, updating, async () => {
         const events = await fetchEvents(params);
         if (events?.events?.length) {
           set(events);
         } else {
           setTimeout(() => {
             set(events);
-          }, 300);
+          }, delay);
         }
       });
     }
   });
 };
 
-export const rawEventHistory = readable(emptyEvents, updateEventHistory)
+export const eventHistory = readable(emptyEvents, updateEventHistory);
 
-// export const events: Readable<WorkflowEvents> = derived(
-//   [rawEventHistory, eventCategory],
-//   ([$rawEventHistory, $category]) => {
-//     const { events } = $rawEventHistory;
-//     if (!$category) return events;
-//     return events.filter((event) => event.category === $category);
-//   },
-// );
-
-// export const eventGroups: Readable<EventGroups> = derived(
-//   [rawEventHistory, eventCategory],
-//   ([$rawEventHistory, $category]) => {
-//     const { eventGroups } = $rawEventHistory;
-//     if (!$category) return eventGroups;
-//     return eventGroups.filter((event) => event.category === $category);
-//   },
-// );
-
-export const eventHistory: Readable<FetchEventsResponse> = derived(
-  [rawEventHistory, eventCategory],
-  ([$rawEventHistory, $category]) => {
-    const { events, eventGroups } = $rawEventHistory;
-    if (!$category) return { events, eventGroups };
-    return {
-      events: events.filter((event) => event.category === $category),
-      eventGroups: eventGroups.filter((event) => event.category === $category),
-    }
+export const events: Readable<WorkflowEvents> = derived(
+  [eventHistory, eventCategory],
+  ([$eventHistory, $category]) => {
+    const { events } = $eventHistory;
+    if (!$category) return events;
+    return events.filter((event) => event.category === $category);
   },
 );
 
+export const eventGroups: Readable<EventGroups> = derived(
+  [eventHistory, eventCategory],
+  ([$eventHistory, $category]) => {
+    const { eventGroups } = $eventHistory;
+    if (!$category) return eventGroups;
+    return eventGroups.filter((event) => event.category === $category);
+  },
+);
 
 export const updating = writable(true);
 export const loading = writable(true);

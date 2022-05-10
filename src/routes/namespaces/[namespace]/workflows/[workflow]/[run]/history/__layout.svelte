@@ -25,8 +25,6 @@
   import { routeForEventHistory } from '$lib/utilities/route-for';
   import { formatDate } from '$lib/utilities/format-date';
   import { eventViewType } from '$lib/stores/event-view';
-  import { setContext } from 'svelte';
-  import { eventHistory } from '$lib/stores/events';
 
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
@@ -37,8 +35,6 @@
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
-
-  setContext('eventHistory', $eventHistory);
 
   const routeParameters = (view: EventView, eventId?: string) => ({
     namespace,

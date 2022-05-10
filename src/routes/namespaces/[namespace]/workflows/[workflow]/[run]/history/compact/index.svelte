@@ -1,8 +1,6 @@
 <script lang="ts">
   import EventSummary from '$lib/components/event/event-summary.svelte';
-  import { getContext } from 'svelte';
-
-  const { eventGroups } = getContext('eventHistory');
+  import { eventGroups } from '$lib/stores/events';
 </script>
 
-<EventSummary items={eventGroups} groups={eventGroups} compact={true} />
+<EventSummary items={$eventGroups} groups={$eventGroups} compact={true} />

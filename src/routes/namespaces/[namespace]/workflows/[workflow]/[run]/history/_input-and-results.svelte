@@ -2,7 +2,8 @@
   import Icon from 'svelte-fa';
   import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 
-  import { getContext } from 'svelte';
+  import { events } from '$lib/stores/events';
+
   import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
   import { capitalize } from '$lib/utilities/format-camel-case';
 
@@ -10,9 +11,8 @@
 
   export let type: 'input' | 'results';
 
-  const { events } = getContext('eventHistory');
   $: title = capitalize(type);
-  $: content = getWorkflowStartedAndCompletedEvents(events)[type];
+  $: content = getWorkflowStartedAndCompletedEvents($events)[type];
 </script>
 
 <article
