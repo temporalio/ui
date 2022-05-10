@@ -1,4 +1,11 @@
-import { derived, readable, writable, Readable } from 'svelte/store';
+import {
+  derived,
+  readable,
+  writable,
+  Readable,
+  Writable,
+  get,
+} from 'svelte/store';
 import type { StartStopNotifier } from 'svelte/store';
 
 import { page } from '$app/stores';
@@ -38,7 +45,7 @@ const runId = derived([page], ([$page]) => {
 
 const settings = derived([page], ([$page]) => $page.stuff.settings);
 
-const previous: FetchEventsParameters = {
+const emptyPrevious: FetchEventsParameters = {
   namespace: null,
   workflowId: null,
   runId: null,
@@ -46,17 +53,24 @@ const previous: FetchEventsParameters = {
   sort: null,
 };
 
+const previous: Writable<FetchEventsParameters> = writable(emptyPrevious);
+
+export const clearPreviousEventParameters = (): void => {
+  previous.set(emptyPrevious);
+};
+
 const isNewRequest = (
   params: FetchEventsParameters,
-  previous: FetchEventsParameters,
+  previous: Writable<FetchEventsParameters>,
 ): boolean => {
   for (const required of ['namespace', 'workflowId', 'runId']) {
     if (!params[required]) return false;
   }
 
   let matchedPrevious = true;
-  for (const key of Object.keys(previous)) {
-    if (previous[key] !== params[key]) {
+  const previousParameters = get(previous);
+  for (const key of Object.keys(previousParameters)) {
+    if (previousParameters[key] !== params[key]) {
       matchedPrevious = false;
       break;
     }
@@ -64,9 +78,7 @@ const isNewRequest = (
 
   if (matchedPrevious) return false;
 
-  for (const key of Object.keys(previous)) {
-    previous[key] = params[key];
-  }
+  previous.set(params);
 
   return true;
 };

@@ -1,4 +1,4 @@
-import { derived, readable, writable } from 'svelte/store';
+import { derived, get, readable, writable, Writable } from 'svelte/store';
 import { page } from '$app/stores';
 
 import { fetchAllWorkflows } from '$lib/services/workflow-service';
@@ -11,22 +11,31 @@ type WorkflowStoreParameters = {
   query: string;
 };
 
-const previous: WorkflowStoreParameters = {
+const emptyPrevious: WorkflowStoreParameters = {
   namespace: null,
   query: null,
+};
+
+const previous: Writable<WorkflowStoreParameters> = writable(emptyPrevious);
+
+export const clearPreviousWorkflowsParameters = (): void => {
+  previous.set(emptyPrevious);
 };
 
 const isNewRequest = (
   namespace: string,
   query: string,
-  previous: WorkflowStoreParameters,
+  previous: Writable<WorkflowStoreParameters>,
 ): boolean => {
-  if (query === previous.query && namespace === previous.namespace) {
+  const previousParameters = get(previous);
+  if (
+    query === previousParameters.query &&
+    namespace === previousParameters.namespace
+  ) {
     return false;
   }
 
-  previous.namespace = namespace;
-  previous.query = query;
+  previous.set({ namespace, query });
 
   return true;
 };
