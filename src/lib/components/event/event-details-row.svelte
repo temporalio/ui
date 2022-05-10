@@ -42,10 +42,7 @@
           container-class="flex-row-reverse xl:flex-row"
           size="xs"
         >
-          <Link
-            href={routeForWorkflow({ namespace, workflow, run: value })}
-            class="whitespace-nowrap"
-          >
+          <Link href={routeForWorkflow({ namespace, workflow, run: value })}>
             {value}
           </Link>
         </Copyable>
@@ -60,10 +57,7 @@
           container-class="flex-row-reverse xl:flex-row"
           size="xs"
         >
-          <Link
-            href={routeForWorkers({ namespace, workflow, run })}
-            class="whitespace-nowrap"
-          >
+          <Link href={routeForWorkers({ namespace, workflow, run })}>
             {value}
           </Link>
         </Copyable>
