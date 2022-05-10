@@ -4,35 +4,51 @@ import { paginated } from '$lib/utilities/paginated';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { toEventHistory } from '$lib/models/event-history';
+import type { EventSortOrder } from '$lib/stores/event-view';
 
-type FetchEvents = NamespaceScopedRequest &
+export type FetchEventsParameters = NamespaceScopedRequest &
   PaginationCallbacks<GetWorkflowExecutionHistoryResponse> & {
     workflowId: string;
     runId: string;
     rawPayloads?: boolean;
-    reverse?: boolean;
+    sort?: string;
   };
 
-export const fetchRawEvents = async (
-  {
-    namespace,
-    workflowId,
-    runId,
-    reverse,
-    onStart,
-    onUpdate,
-    onComplete,
-  }: FetchEvents,
-  request = fetch,
-): Promise<HistoryEvent[]> => {
-  const endpoint: WorkflowAPIRoutePath = reverse ? 'events.reverse' : 'events';
+export type FetchEventsParametersWithSettings = FetchEventsParameters & {
+  settings: Settings;
+};
+
+const isSortOrder = (sortOrder: string): sortOrder is EventSortOrder => {
+  if (sortOrder === 'ascending') return true;
+  if (sortOrder === 'descending') return true;
+  return false;
+};
+
+const getEndpointForSortOrder = (sortOrder: string): WorkflowAPIRoutePath => {
+  if (!isSortOrder(sortOrder)) return 'events.descending';
+  if (sortOrder === 'descending') return 'events.descending';
+  if (sortOrder === 'ascending') return 'events.ascending';
+  return 'events.descending';
+};
+
+export const fetchRawEvents = async ({
+  namespace,
+  workflowId,
+  runId,
+  sort,
+  onStart,
+  onUpdate,
+  onComplete,
+}: FetchEventsParameters): Promise<HistoryEvent[]> => {
+  const endpoint = getEndpointForSortOrder(sort);
+
   const response = await paginated(
     async (token: string) => {
       return requestFromAPI<GetWorkflowExecutionHistoryResponse>(
         routeForApi(endpoint, { namespace, workflowId, runId }),
         {
           token,
-          request,
+          request: fetch,
         },
       );
     },
@@ -43,11 +59,10 @@ export const fetchRawEvents = async (
 };
 
 export const fetchEvents = async (
-  parameters: FetchEvents,
-  settings: Settings,
-  request = fetch,
+  parameters: FetchEventsParametersWithSettings,
 ): Promise<FetchEventsResponse> => {
-  return fetchRawEvents(parameters, request).then((response) =>
-    toEventHistory({ response, namespace: parameters.namespace, settings }),
+  const { settings, namespace } = parameters;
+  return fetchRawEvents(parameters).then((response) =>
+    toEventHistory({ response, namespace, settings }),
   );
 };

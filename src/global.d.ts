@@ -81,6 +81,8 @@ type TimeFormat = 'UTC' | 'relative' | 'local';
 
 type SelectOptionValue = number | string | boolean;
 
+type BooleanString = 'true' | 'false';
+
 type OptionLabel = {
   label: string;
   option?: string;

@@ -4,4 +4,4 @@
   import { importEvents } from '$lib/stores/import-events';
 </script>
 
-<CodeBlock content={$importEvents} />
+<CodeBlock content={$importEvents} data-cy="event-history-json" />
