@@ -1,6 +1,6 @@
 import { browser } from '$app/env';
 
-export function base64DecodeUnicode(str: string) {
+export function base64DecodeUnicode(str: string): string {
   return decodeURIComponent(
     window
       .atob(str)

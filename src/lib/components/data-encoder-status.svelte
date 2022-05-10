@@ -29,16 +29,8 @@
         data-cy="data-encoder-status-configured"
         on:click={() => (showSettings = true)}
       >
-        <Icon
-          icon={faLongArrowAltDown}
-          scale={1}
-          class="text-blue-200 block w-full h-full"
-        />
-        <Icon
-          icon={faLongArrowAltUp}
-          scale={1}
-          class="text-blue-200 block w-full h-full"
-        />
+        <Icon icon={faLongArrowAltDown} scale={1} class="text-blue-200 block" />
+        <Icon icon={faLongArrowAltUp} scale={1} class="text-blue-200 block" />
       </button>
     </Tooltip>
   {:else if $dataEncoder.hasError}
@@ -48,16 +40,8 @@
         data-cy="data-encoder-status-error"
         on:click={() => (showSettings = true)}
       >
-        <Icon
-          icon={faLongArrowAltDown}
-          scale={1}
-          class="text-red-400 block w-full h-full"
-        />
-        <Icon
-          icon={faLongArrowAltUp}
-          scale={1}
-          class="text-red-400 block w-full h-full"
-        />
+        <Icon icon={faLongArrowAltDown} scale={1} class="text-red-400 block" />
+        <Icon icon={faLongArrowAltUp} scale={1} class="text-red-400 block" />
       </button>
     </Tooltip>
   {:else if $dataEncoder.hasSuccess}
@@ -70,13 +54,9 @@
         <Icon
           icon={faLongArrowAltDown}
           scale={1}
-          class="text-green-400 block w-full h-full"
+          class="text-green-400 block"
         />
-        <Icon
-          icon={faLongArrowAltUp}
-          scale={1}
-          class="text-green-400 block w-full h-full"
-        />
+        <Icon icon={faLongArrowAltUp} scale={1} class="text-green-400 block" />
       </button>
     </Tooltip>
   {/if}
@@ -87,16 +67,8 @@
       data-cy="data-encoder-status"
       on:click={() => (showSettings = true)}
     >
-      <Icon
-        icon={faLongArrowAltDown}
-        scale={1}
-        class="text-gray-200 block w-full h-full"
-      />
-      <Icon
-        icon={faLongArrowAltUp}
-        scale={1}
-        class="text-gray-200 block w-full h-full"
-      />
+      <Icon icon={faLongArrowAltDown} scale={1} class="text-gray-200 block" />
+      <Icon icon={faLongArrowAltUp} scale={1} class="text-gray-200 block" />
     </button>
   </Tooltip>
 {/if}
