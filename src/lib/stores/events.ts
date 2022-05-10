@@ -22,14 +22,6 @@ const emptyEvents: FetchEventsResponse = {
   eventGroups: [],
 };
 
-const previous: FetchEventsParameters = {
-  namespace: null,
-  workflowId: null,
-  runId: null,
-  rawPayloads: false,
-  sort: 'descending',
-};
-
 const namespace = derived([page], ([$page]) =>
   decodeURIForSvelte($page.params.namespace),
 );
@@ -50,18 +42,12 @@ const runId = derived([page], ([$page]) => {
 
 const settings = derived([page], ([$page]) => $page.stuff.settings);
 
-const isNewRequest = (parameters: FetchEventsParameters, previous: FetchEventsParameters): boolean => {
+const shouldFetchNewEvents = (params: FetchEventsParametersWithSettings): boolean => {
   for (const required of ['namespace', 'workflowId', 'runId']) {
-    if (!parameters[required]) return false;
+    if (!params[required]) return false;
   }
 
-  if (query === previous.query && namespace === previous.namespace) {
-    return false;
-  }
-
-  previous.namespace = namespace;
-  previous.query = query;
-
+  debugger
 
   return true;
 };
@@ -100,7 +86,7 @@ export const parametersWithSettings: Readable<FetchEventsParametersWithSettings>
 
 export const updateEventHistory: StartStopNotifier<FetchEventsResponse> = (set) => {
   return parametersWithSettings.subscribe(async (params) => {
-    if (isNewRequest(params)) {
+    if (shouldFetchNewEvents(params)) {
       withLoading(loading, async () => {
         const events = await fetchEvents(params);
         if (events?.events?.length) {
@@ -115,25 +101,38 @@ export const updateEventHistory: StartStopNotifier<FetchEventsResponse> = (set) 
   });
 };
 
-export const eventHistory = readable(emptyEvents, updateEventHistory)
+export const rawEventHistory = readable(emptyEvents, updateEventHistory)
 
-export const events = derived(
-  [eventHistory, eventCategory],
-  ([$eventHistory, $category]) => {
-    const { events } = $eventHistory;
-    if (!$category) return events;
-    return events.filter((event) => event.category === $category);
+// export const events: Readable<WorkflowEvents> = derived(
+//   [rawEventHistory, eventCategory],
+//   ([$rawEventHistory, $category]) => {
+//     const { events } = $rawEventHistory;
+//     if (!$category) return events;
+//     return events.filter((event) => event.category === $category);
+//   },
+// );
+
+// export const eventGroups: Readable<EventGroups> = derived(
+//   [rawEventHistory, eventCategory],
+//   ([$rawEventHistory, $category]) => {
+//     const { eventGroups } = $rawEventHistory;
+//     if (!$category) return eventGroups;
+//     return eventGroups.filter((event) => event.category === $category);
+//   },
+// );
+
+export const eventHistory: Readable<FetchEventsResponse> = derived(
+  [rawEventHistory, eventCategory],
+  ([$rawEventHistory, $category]) => {
+    const { events, eventGroups } = $rawEventHistory;
+    if (!$category) return { events, eventGroups };
+    return {
+      events: events.filter((event) => event.category === $category),
+      eventGroups: eventGroups.filter((event) => event.category === $category),
+    }
   },
 );
 
-export const eventGroups = derived(
-  [eventHistory, eventCategory],
-  ([$eventHistory, $category]) => {
-    const { eventGroups } = $eventHistory;
-    if (!$category) return eventGroups;
-    return eventGroups.filter((event) => event.category === $category);
-  },
-);
 
 export const updating = writable(true);
 export const loading = writable(true);
