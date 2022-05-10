@@ -34,6 +34,7 @@ export const fetchSettings = async (
     },
     defaultNamespace: settings?.DefaultNamespace || 'default', // API returns an empty string if default namespace is not configured
     showTemporalSystemNamespace: settings?.ShowTemporalSystemNamespace,
+    notifyOnNewVersion: settings?.NotifyOnNewVersion,
     feedbackURL: settings?.FeedbackURL,
     runtimeEnvironment: {
       get isCloud() {

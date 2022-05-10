@@ -87,7 +87,7 @@ export async function getQueryTypes(
       (response) => {
         if (
           isTemporalAPIError(response.body) &&
-          response.body.message.startsWith('unknown queryType')
+          response.body.message.includes('@@temporal-internal__list')
         ) {
           resolve(getQueryTypesFromError(response.body.message));
         } else {

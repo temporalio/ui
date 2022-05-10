@@ -28,11 +28,13 @@
 
 <script lang="ts">
   import NavigationHeader from '$lib/components/navigation-header.svelte';
+  import HamburgerHeader from '$lib/components/hamburger-header.svelte';
 
   export let settings: Settings;
 </script>
 
-<NavigationHeader href="/" />
+<NavigationHeader href="/" user={undefined} />
+<HamburgerHeader href="/" user={undefined} />
 <section class="text-center my-[20vh]">
   <h1 class="text-8xl font-semibold">Welcome back.</h1>
   <p class="my-7">Let's get you signed in.</p>

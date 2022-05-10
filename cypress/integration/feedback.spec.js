@@ -1,4 +1,4 @@
-import settingsWithFeedbackUrl from '../fixtures/settings-feedback-url.json';
+import settingsFixture from '../fixtures/settings.json';
 
 describe('Give Feedback link', () => {
   beforeEach(() => {
@@ -17,14 +17,20 @@ describe('Give Feedback link', () => {
   });
 
   it('should link to custom link if set in settings', () => {
+    const feedbackUrl = 'internal-support-forum';
+
     cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/settings*', {
-      fixture: 'settings-feedback-url.json',
+      ...settingsFixture,
+      FeedbackURL: feedbackUrl,
     }).as('settings-api');
 
     cy.visit('/');
     cy.wait('@settings-api');
 
-    const url = settingsWithFeedbackUrl.FeedbackURL;
-    cy.get('[data-cy="give-feedback"]').should('have.attr', 'href', url);
+    cy.get('[data-cy="give-feedback"]').should(
+      'have.attr',
+      'href',
+      feedbackUrl,
+    );
   });
 });
