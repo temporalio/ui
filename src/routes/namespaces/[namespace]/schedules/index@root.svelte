@@ -25,7 +25,7 @@
 
 <script lang="ts">
   import { timeFormat } from '$lib/stores/time-format';
-  import { getWorkflows } from '$lib/stores/workflows';
+  import { getSchedules } from '$lib/stores/schedules';
   import { routeForSchedule } from '$lib/utilities/route-for';
 
   import EmptyState from '$lib/components/empty-state.svelte';
@@ -43,7 +43,7 @@
   export let namespace: string;
   export let query: string;
 
-  let workflows = getWorkflows({ namespace, query });
+  let workflows = getSchedules({ namespace, query });
 
   let search = '';
   const errorMessage =

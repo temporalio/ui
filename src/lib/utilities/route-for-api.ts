@@ -11,6 +11,10 @@ export function routeForApi(
   parameters: WorkflowListRouteParameters,
 ): string;
 export function routeForApi(
+  route: SchedulesAPIRoutePath,
+  parameters: WorkflowListRouteParameters,
+): string;
+export function routeForApi(
   route: WorkflowAPIRoutePath,
   parameters: WorkflowRouteParameters,
 ): string;
@@ -49,6 +53,7 @@ export function routeForApi(
     events: `/namespaces/${encoded?.namespace}/workflows/${encoded?.workflowId}/runs/${encoded?.runId}/events`,
     'events.reverse': `/namespaces/${encoded?.namespace}/workflows/${encoded?.workflowId}/runs/${encoded?.runId}/events/reverse`,
     query: `/namespaces/${encoded?.namespace}/workflows/${encoded?.workflowId}/runs/${encoded?.runId}/query`,
+    schedules: `/namespaces/${encoded?.namespace}/schedules`,
   };
 
   return withBase(routes[route]);

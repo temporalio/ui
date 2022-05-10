@@ -9,13 +9,15 @@ type WorkflowAPIRoutePath =
 
 type TaskQueueAPIRoutePath = 'task-queue';
 type ParameterlessAPIRoutePath = 'cluster' | 'settings' | 'user' | 'namespaces';
+type SchedulesAPIRoutePath = 'schedules';
 
 type APIRoutePath =
   | WorkflowsAPIRoutePath
   | WorkflowAPIRoutePath
   | ParameterlessAPIRoutePath
   | TaskQueueAPIRoutePath
-  | WorkflowsAPIArchivalRoutePath;
+  | WorkflowsAPIArchivalRoutePath
+  | SchedulesAPIRoutePath;
 
 type APIRouteParameters = {
   namespace: string;
