@@ -99,7 +99,8 @@
     @apply group-hover:text-blue-700 group-hover:underline group-hover:decoration-blue-700;
   }
 
-  .row:last-of-type .cell {
+  .row:last-of-type .cell,
+  .row:last-of-type .time-cell {
     @apply border-b-0 first-of-type:rounded-bl-lg  last-of-type:rounded-br-lg;
   }
 </style>
