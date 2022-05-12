@@ -7,17 +7,14 @@
   const defaultQuery = toListWorkflowQuery({ timeRange: '1 day' });
 
   export const load: Load = async function ({ params, url }) {
-    const searchType = getSearchType(url);
-
     if (!url.searchParams.has('query')) {
       url.searchParams.set('query', defaultQuery);
     }
 
-    const query = url.searchParams.get('query');
     const { namespace } = params;
 
     return {
-      props: { namespace, searchType, query },
+      props: { namespace },
     };
   };
 </script>
@@ -39,10 +36,12 @@
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
   import WorkflowFilters from './_workflow-filters.svelte';
   import WorkflowsLoading from './_workflows-loading.svelte';
+  import { page } from '$app/stores';
 
   export let namespace: string;
-  export let searchType: 'basic' | 'advanced';
-  export let query: string;
+
+  let searchType: 'basic' | 'advanced' = getSearchType($page.url);
+  let query = $page.url.searchParams.get('query');
 
   const errorMessage =
     searchType === 'advanced'
