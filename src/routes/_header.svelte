@@ -6,6 +6,8 @@
     routeForSettings,
   } from '$lib/utilities/route-for';
 
+  import Navigation from 'holocene/components/navigation/index.svelte';
+
   import NamespaceSelect from './_namespace-select.svelte';
   import NavigationLink from '$lib/components/navigation-link.svelte';
   import IsCloudGuard from '$lib/components/is-cloud-guard.svelte';
@@ -18,7 +20,8 @@
   export let user: User;
 </script>
 
-<NavigationHeader href={routeForWorkflows({ namespace })} {user}>
+<Navigation />
+<!-- <NavigationHeader href={routeForWorkflows({ namespace })} {user}>
   <svelte:fragment slot="logo">
     <NamespaceSelect />
   </svelte:fragment>
@@ -38,4 +41,4 @@
   <svelte:fragment slot="user">
     <AuthButton {user} />
   </svelte:fragment>
-</NavigationHeader>
+</NavigationHeader> -->

@@ -75,7 +75,25 @@
   <meta property="og:image" content="/banner.png" />
 </svelte:head>
 
-<main class="flex flex-col h-screen">
+<div class="flex flex-row w-screen h-screen">
+  <Notifications />
+  <Banners {uiVersionInfo} />
+  <div class="sticky top-0 h-screen w-auto">
+    <Header {user} />
+  </div>
+  <section
+    id="content"
+    class="flex-auto h-screen w-max overflow-auto mx-10 mb-10 mt-8"
+  >
+    <div class="flex flex-col h-full gap-4 mt-12 xl:mt-0">
+      <ErrorBoundary onError={() => {}}>
+        <slot />
+      </ErrorBoundary>
+    </div>
+  </section>
+</div>
+
+<!-- <main class="flex flex-col h-screen">
   <Notifications />
   <Banners {uiVersionInfo} />
   <Header {user} />
@@ -87,4 +105,4 @@
       </ErrorBoundary>
     </div>
   </section>
-</main>
+</main> -->
