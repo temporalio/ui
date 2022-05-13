@@ -17,6 +17,7 @@
   import IsCloudGuard from '$lib/components/is-cloud-guard.svelte';
   import NavigationHeader from '$lib/components/navigation-header.svelte';
   import AuthButton from '$lib/components/auth-button.svelte';
+  import { goto } from '$app/navigation';
 
   $: namespace =
     $page.params.namespace || $page.stuff?.settings?.defaultNamespace;
@@ -29,9 +30,13 @@
     );
 
   export let user: User;
+  const namespaceList = namespaces.map((namespace) => {
+    const href = routeForWorkflows({ namespace });
+    return { namespace, href, onClick: () => goto(href) };
+  });
 </script>
 
-<Navigation {namespaces} />
+<Navigation {namespaceList} {namespace} />
 <!-- <NavigationHeader href={routeForWorkflows({ namespace })} {user}>
   <svelte:fragment slot="logo">
     <NamespaceSelect />

@@ -82,7 +82,6 @@
   </div>
   <section id="content" class="flex-auto h-screen w-max overflow-auto">
     <Banners {uiVersionInfo} />
-
     <div class="flex flex-col h-full gap-4 px-10 pb-10 pt-8 z-10">
       <ErrorBoundary onError={() => {}}>
         <slot />
@@ -90,18 +89,3 @@
     </div>
   </section>
 </div>
-
-<!-- flex-auto h-screen w-max overflow-auto mx-10 mb-10 mt-8 -->
-<!-- <main class="flex flex-col h-screen">
-  <Notifications />
-  <Banners {uiVersionInfo} />
-  <Header {user} />
-  <HeaderResponsive {user} />
-  <section id="content" class="h-full mx-10 mb-10 mt-8">
-    <div class="flex flex-col h-full gap-4 mt-12 xl:mt-0">
-      <ErrorBoundary onError={() => {}}>
-        <slot />
-      </ErrorBoundary>
-    </div>
-  </section>
-</main> -->
