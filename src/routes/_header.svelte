@@ -18,6 +18,7 @@
   import NavigationHeader from '$lib/components/navigation-header.svelte';
   import AuthButton from '$lib/components/auth-button.svelte';
   import { goto } from '$app/navigation';
+  import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
 
   $: namespace =
     $page.params.namespace || $page.stuff?.settings?.defaultNamespace;
@@ -36,7 +37,11 @@
   });
 </script>
 
-<Navigation {namespaceList} {namespace} />
+<Navigation
+  {namespaceList}
+  {namespace}
+  extras={[{ icon: DataEncoderStatus, name: 'Data Encoder' }]}
+/>
 <!-- <NavigationHeader href={routeForWorkflows({ namespace })} {user}>
   <svelte:fragment slot="logo">
     <NamespaceSelect />
