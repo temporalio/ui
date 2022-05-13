@@ -76,13 +76,14 @@
 </svelte:head>
 
 <div class="flex flex-row w-screen h-screen">
-  <div class="sticky top-0 h-screen w-auto">
+  <Notifications />
+  <div class="sticky top-0 h-screen w-auto z-20">
     <Header {user} />
-    <Notifications />
-    <Banners {uiVersionInfo} />
   </div>
   <section id="content" class="flex-auto h-screen w-max overflow-auto">
-    <div class="flex flex-col h-full gap-4 px-10 pb-10 pt-8">
+    <Banners {uiVersionInfo} />
+
+    <div class="flex flex-col h-full gap-4 px-10 pb-10 pt-8 z-10">
       <ErrorBoundary onError={() => {}}>
         <slot />
       </ErrorBoundary>

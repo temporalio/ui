@@ -60,11 +60,11 @@ Set these environment variables if you want to change their defaults
 
 ## Developing with Holocene
 
-To work on the Temporal Shared UI library (holocene) and see updates within the ui, follow these steps:
+To see updates from holocene, follow the instructions in [holocene](https://github.com/temporalio/holocene) README and link the project after cloning:
 
-
-npm link 
-
+```bash
+npm link holocene
+```
 
 ## Developing with Canary
 

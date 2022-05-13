@@ -16,9 +16,9 @@
   }
 </script>
 
-{#if show}
+{#if true}
   <section
-    class={`block leading-10 text-center ${severity}`}
+    class={`block relative leading-10 text-center ${severity}`}
     data-cy={$$props.dataCy}
   >
     <a href={link} target="_blank">
