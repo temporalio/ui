@@ -22,12 +22,7 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
   import { timeFormat } from '$lib/stores/time-format';
-  import {
-    workflows,
-    loading,
-    updating,
-    clearPreviousWorkflowsParameters,
-  } from '$lib/stores/workflows';
+  import { workflows, loading, updating } from '$lib/stores/workflows';
 
   import EmptyState from '$lib/components/empty-state.svelte';
   import Pagination from '$lib/components/pagination.svelte';
@@ -47,10 +42,6 @@
     searchType === 'advanced'
       ? 'Please check your syntax and try again.'
       : 'If you have filters applied, try adjusting them.';
-
-  onDestroy(() => {
-    clearPreviousWorkflowsParameters();
-  });
 </script>
 
 <h2 class="text-2xl">Recent Workflows <Badge type="beta">Beta</Badge></h2>
