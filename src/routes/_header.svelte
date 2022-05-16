@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import type { DescribeNamespaceResponse as Namespace } from '$types';
+  import { goto } from '$app/navigation';
 
   import {
     routeForArchivalWorkfows,
@@ -12,12 +13,6 @@
 
   import Navigation from 'holocene/components/navigation/index.svelte';
 
-  import NamespaceSelect from './_namespace-select.svelte';
-  import NavigationLink from '$lib/components/navigation-link.svelte';
-  import IsCloudGuard from '$lib/components/is-cloud-guard.svelte';
-  import NavigationHeader from '$lib/components/navigation-header.svelte';
-  import AuthButton from '$lib/components/auth-button.svelte';
-  import { goto } from '$app/navigation';
   import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
 
   $: namespace =
@@ -35,31 +30,22 @@
     const href = routeForWorkflows({ namespace });
     return { namespace, href, onClick: () => goto(href) };
   });
+  $: linkList = {
+    home: routeForWorkflows({ namespace }),
+    archive: routeForArchivalWorkfows({ namespace }),
+    settings: routeForSettings({ namespace }),
+    workflows: routeForWorkflows({ namespace }),
+  };
+
+  const logout = () => goto(import.meta.env.VITE_API + '/auth/logout');
 </script>
 
 <Navigation
   {namespaceList}
-  {namespace}
+  activeNamespace={namespace}
+  {linkList}
+  {isCloud}
+  {user}
+  {logout}
   extras={[{ icon: DataEncoderStatus, name: 'Data Encoder' }]}
 />
-<!-- <NavigationHeader href={routeForWorkflows({ namespace })} {user}>
-  <svelte:fragment slot="logo">
-    <NamespaceSelect />
-  </svelte:fragment>
-  <svelte:fragment slot="links">
-    <NavigationLink href={routeForWorkflows({ namespace })}>
-      Workflows
-    </NavigationLink>
-    <IsCloudGuard>
-      <NavigationLink href={routeForSettings({ namespace })}>
-        Settings
-      </NavigationLink>
-      <NavigationLink href={routeForArchivalWorkfows({ namespace })}>
-        Archival
-      </NavigationLink>
-    </IsCloudGuard>
-  </svelte:fragment>
-  <svelte:fragment slot="user">
-    <AuthButton {user} />
-  </svelte:fragment>
-</NavigationHeader> -->

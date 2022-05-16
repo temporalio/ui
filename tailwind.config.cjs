@@ -133,7 +133,7 @@ const temporalColors = {
 const config = {
   content: [
     './src/**/*.{html,js,svelte,ts}',
-    './node_modules/holocene/**/*.{html,js,svelte,ts}'
+    './node_modules/holocene/**/*.{html,js,svelte,ts}',
   ],
   theme: {
     colors: temporalColors,
