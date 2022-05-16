@@ -11,8 +11,8 @@ export const handleError = (error: unknown): void => {
     return;
   }
 
-  if (isForbidden(error)) {
-    notifications.add('error', `${error.statusCode} ${error.statusText}`);
+  if (isForbidden(error) && browser) {
+    window.location.assign(routeForLoginPage());
     return;
   }
 
