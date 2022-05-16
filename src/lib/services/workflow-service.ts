@@ -41,12 +41,6 @@ export const fetchAllWorkflows = async (
   let onError: ErrorCallback;
   let error: string;
 
-  if (parameters.query) {
-    onError = (response) => {
-      error = response.body.message;
-    };
-  }
-
   const { executions, nextPageToken } =
     (await requestFromAPI<ListWorkflowExecutionsResponse>(
       routeForApi(endpoint, { namespace }),
