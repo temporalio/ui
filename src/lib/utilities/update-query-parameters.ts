@@ -6,6 +6,7 @@ type UpdateQueryParams = {
   value?: string | number | boolean;
   url: URL;
   goto: typeof goto;
+  allowEmpty?: boolean;
   invalidate?: typeof invalidate;
 };
 
@@ -20,11 +21,14 @@ export const updateQueryParameters = async ({
   value,
   url,
   goto,
+  allowEmpty = false,
 }: UpdateQueryParams): Promise<typeof value> => {
   const next = String(value);
 
   if (value) {
     url.searchParams.set(parameter, next);
+  } else if (allowEmpty) {
+    url.searchParams.set(parameter, '');
   } else {
     url.searchParams.delete(parameter);
   }
