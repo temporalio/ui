@@ -1,55 +1,10 @@
-import { derived, get, readable, writable, Writable } from 'svelte/store';
+import { derived, readable, writable } from 'svelte/store';
 import { page } from '$app/stores';
 
 import { fetchAllWorkflows } from '$lib/services/workflow-service';
-import { withLoading, delay } from '$lib/utilities/stores/with-loading';
+import { withLoading } from '$lib/utilities/stores/with-loading';
 
 import type { StartStopNotifier } from 'svelte/store';
-
-type WorkflowStoreParameters = {
-  namespace: string;
-  query: string;
-};
-
-const emptyPrevious: WorkflowStoreParameters = {
-  namespace: null,
-  query: null,
-};
-
-const previous: Writable<WorkflowStoreParameters> = writable(emptyPrevious);
-
-export const clearPreviousWorkflowsParameters = (): void => {
-  previous.set(emptyPrevious);
-};
-
-const isUnchanged = (
-  next: WorkflowStoreParameters,
-  previous: WorkflowStoreParameters,
-) => {
-  for (const [key, value] of Object.entries(next)) {
-    const previousValue = previous[key];
-    if (!previousValue) return false;
-    if (value !== previousValue) return false;
-  }
-  return true;
-};
-
-const isNewRequest = (
-  namespace: string,
-  query: string,
-  previous: Writable<WorkflowStoreParameters>,
-): boolean => {
-  const previousParameters = get(previous);
-  const unchanged = isUnchanged({ namespace, query }, previousParameters);
-
-  if (unchanged) {
-    return false;
-  }
-
-  previous.set({ namespace, query });
-
-  return true;
-};
 
 const namespace = derived([page], ([$page]) => $page.params.namespace);
 const query = derived([page], ([$page]) => $page.url.searchParams.get('query'));
@@ -62,18 +17,10 @@ const parameters = derived([namespace, query], ([$namespace, $query]) => {
 
 const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
   return parameters.subscribe(({ namespace, query }) => {
-    if (isNewRequest(namespace, query, previous)) {
-      withLoading(loading, updating, async () => {
-        const { workflows } = await fetchAllWorkflows(namespace, { query });
-        if (workflows.length) {
-          set(workflows);
-        } else {
-          setTimeout(() => {
-            set(workflows);
-          }, delay);
-        }
-      });
-    }
+    withLoading(loading, updating, async () => {
+      const { workflows } = await fetchAllWorkflows(namespace, { query });
+      set(workflows);
+    });
   });
 };
 
