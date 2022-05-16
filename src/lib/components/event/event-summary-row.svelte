@@ -11,8 +11,8 @@
 
   import { getGroupForEvent, isEventGroup } from '$lib/models/event-groups';
   import {
-    eventOrGroupHasActivityTimedOut,
-    groupHasActivityTimedOut,
+    eventOrGroupIsFailureOrTimedOut,
+    eventOrGroupIsCanceledOrTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
   import {
     formatDate,
@@ -61,7 +61,10 @@
     expanded = !expanded;
   };
 
-  const error = eventOrGroupHasActivityTimedOut(compact ? eventGroup : event);
+  const error = eventOrGroupIsFailureOrTimedOut(compact ? eventGroup : event);
+  const warning = eventOrGroupIsCanceledOrTerminated(
+    compact ? eventGroup : event,
+  );
 </script>
 
 <tr
@@ -69,6 +72,7 @@
   id={event.id}
   class:expanded={expanded && !expandAll}
   class:error
+  class:warning
   data-cy="event-summary-row"
 >
   <td class="id-cell text-left">
@@ -85,8 +89,11 @@
       class="md:mx-2 text-sm md:text-base font-semibold link event-name"
       on:click|stopPropagation={onLinkClick}
     >
-      {#if compact && groupHasActivityTimedOut(eventGroup)}
+      {#if compact && error}
         <Icon class="inline text-red-700" icon={faClock} />
+      {/if}
+      {#if compact && warning}
+        <Icon class="inline text-yellow-700" icon={faClock} />
       {/if}
       {event.name}
       <Icon class="inline" icon={expanded ? faAngleUp : faAngleDown} />
@@ -141,6 +148,15 @@
 
   .error .event-name {
     @apply text-red-700;
+  }
+
+  .warning,
+  .warning:hover {
+    @apply bg-yellow-50;
+  }
+
+  .warning .event-name {
+    @apply text-yellow-700;
   }
 
   .cell {
