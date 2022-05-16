@@ -22,16 +22,27 @@ export const clearPreviousWorkflowsParameters = (): void => {
   previous.set(emptyPrevious);
 };
 
+const isUnchanged = (
+  next: WorkflowStoreParameters,
+  previous: WorkflowStoreParameters,
+) => {
+  for (const [key, value] of Object.entries(next)) {
+    const previousValue = previous[key];
+    if (!previousValue) return false;
+    if (value !== previousValue) return false;
+  }
+  return true;
+};
+
 const isNewRequest = (
   namespace: string,
   query: string,
   previous: Writable<WorkflowStoreParameters>,
 ): boolean => {
   const previousParameters = get(previous);
-  if (
-    query === previousParameters.query &&
-    namespace === previousParameters.namespace
-  ) {
+  const unchanged = isUnchanged({ namespace, query }, previousParameters);
+
+  if (unchanged) {
     return false;
   }
 
