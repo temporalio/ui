@@ -8,7 +8,11 @@ export const withLoading = async (
   fn: () => Promise<void>,
 ): Promise<void> => {
   updating.set(true);
-  await fn();
+  try {
+    await fn();
+  } catch (error) {
+    console.error(error);
+  }
   loading.set(false);
   setTimeout(() => {
     updating.set(false);

@@ -83,6 +83,7 @@ export const requestFromAPI = async <T>(
           statusCode: response.status,
           statusText: response.statusText,
           response,
+          message: body?.message ?? response.statusText,
         } as NetworkError;
       }
     }
