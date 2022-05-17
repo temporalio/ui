@@ -44,26 +44,40 @@ export const eventOrGroupIsFailureOrTimedOut = (
   return eventIsFailureOrTimedOut(event as WorkflowEvent);
 };
 
-const eventIsCanceledOrTerminated = (event) => {
+const eventIsCanceled = (event) => {
   return (
     isActivityTaskCanceledEvent(event) ||
     isTimerCanceledEvent(event) ||
-    isWorkflowExecutionTerminatedEvent(event) ||
     isWorkflowExecutionCanceledEvent(event) ||
-    isChildWorkflowExecutionCanceledEvent(event) ||
+    isChildWorkflowExecutionCanceledEvent(event)
+  );
+};
+
+const groupIsCanceled = (eventGroup: EventGroup): boolean => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const groupEvents = Array.from(eventGroup.events, ([key, value]) => value);
+  return Boolean(groupEvents.find(eventIsCanceled));
+};
+
+export const eventOrGroupIsCanceled = (event: IterableEvent): boolean => {
+  if (isEventGroup(event)) return groupIsCanceled(event);
+  return eventIsCanceled(event as WorkflowEvent);
+};
+
+const eventIsTerminated = (event) => {
+  return (
+    isWorkflowExecutionTerminatedEvent(event) ||
     isChildWorkflowExecutionTerminatedEvent(event)
   );
 };
 
-const groupIsCanceledOrTerminated = (eventGroup: EventGroup): boolean => {
+const groupIsTerminated = (eventGroup: EventGroup): boolean => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const groupEvents = Array.from(eventGroup.events, ([key, value]) => value);
-  return Boolean(groupEvents.find(eventIsCanceledOrTerminated));
+  return Boolean(groupEvents.find(eventIsTerminated));
 };
 
-export const eventOrGroupIsCanceledOrTerminated = (
-  event: IterableEvent,
-): boolean => {
-  if (isEventGroup(event)) return groupIsCanceledOrTerminated(event);
-  return eventIsCanceledOrTerminated(event as WorkflowEvent);
+export const eventOrGroupIsTerminated = (event: IterableEvent): boolean => {
+  if (isEventGroup(event)) return groupIsTerminated(event);
+  return eventIsTerminated(event as WorkflowEvent);
 };

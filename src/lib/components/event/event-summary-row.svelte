@@ -12,7 +12,8 @@
   import { getGroupForEvent, isEventGroup } from '$lib/models/event-groups';
   import {
     eventOrGroupIsFailureOrTimedOut,
-    eventOrGroupIsCanceledOrTerminated,
+    eventOrGroupIsCanceled,
+    eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
   import {
     formatDate,
@@ -61,18 +62,18 @@
     expanded = !expanded;
   };
 
-  const error = eventOrGroupIsFailureOrTimedOut(compact ? eventGroup : event);
-  const warning = eventOrGroupIsCanceledOrTerminated(
-    compact ? eventGroup : event,
-  );
+  const failure = eventOrGroupIsFailureOrTimedOut(compact ? eventGroup : event);
+  const canceled = eventOrGroupIsCanceled(compact ? eventGroup : event);
+  const terminated = eventOrGroupIsTerminated(compact ? eventGroup : event);
 </script>
 
 <tr
   class="row"
   id={event.id}
   class:expanded={expanded && !expandAll}
-  class:error
-  class:warning
+  class:failure
+  class:canceled
+  class:terminated
   data-cy="event-summary-row"
 >
   <td class="id-cell text-left">
@@ -89,11 +90,14 @@
       class="md:mx-2 text-sm md:text-base font-semibold link event-name"
       on:click|stopPropagation={onLinkClick}
     >
-      {#if compact && error}
+      {#if compact && failure}
         <Icon class="inline text-red-700" icon={faClock} />
       {/if}
-      {#if compact && warning}
+      {#if compact && canceled}
         <Icon class="inline text-yellow-700" icon={faClock} />
+      {/if}
+      {#if compact && terminated}
+        <Icon class="inline text-pink-700" icon={faClock} />
       {/if}
       {event.name}
       <Icon class="inline" icon={expanded ? faAngleUp : faAngleDown} />
@@ -141,22 +145,31 @@
   .expanded.row {
     @apply border-b-0;
   }
-  .error,
-  .error:hover {
+  .failure,
+  .failure:hover {
     @apply bg-red-50;
   }
 
-  .error .event-name {
+  .failure .event-name {
     @apply text-red-700;
   }
 
-  .warning,
-  .warning:hover {
+  .canceled,
+  .canceled:hover {
     @apply bg-yellow-50;
   }
 
-  .warning .event-name {
+  .canceled .event-name {
     @apply text-yellow-700;
+  }
+
+  .terminated,
+  .terminated:hover {
+    @apply bg-pink-50;
+  }
+
+  .terminated .event-name {
+    @apply text-pink-700;
   }
 
   .cell {

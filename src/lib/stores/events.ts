@@ -149,7 +149,7 @@ export const ascendingEventGroups: Readable<EventGroups> = derived(
   ([$eventHistory, $sortOrder, $category]) => {
     const { events } = $eventHistory;
     const _events =
-      $sortOrder === 'descending' ? [...events].reverse() : events;
+      $sortOrder === 'descending' ? events.slice().reverse() : events;
     const eventGroups = groupEvents(_events);
     if (!$category) return eventGroups;
     return eventGroups.filter((event) => event.category === $category);
