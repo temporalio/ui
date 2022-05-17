@@ -19,6 +19,7 @@ import {
 import { eventCategory, eventSortOrder } from './event-view';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { withLoading, delay } from '$lib/utilities/stores/with-loading';
+import { groupEvents } from '$lib/models/event-groups';
 
 const emptyEvents: FetchEventsResponse = {
   events: [],
@@ -138,6 +139,18 @@ export const eventGroups: Readable<EventGroups> = derived(
   [eventHistory, eventCategory],
   ([$eventHistory, $category]) => {
     const { eventGroups } = $eventHistory;
+    if (!$category) return eventGroups;
+    return eventGroups.filter((event) => event.category === $category);
+  },
+);
+
+export const ascendingEventGroups: Readable<EventGroups> = derived(
+  [eventHistory, eventSortOrder, eventCategory],
+  ([$eventHistory, $sortOrder, $category]) => {
+    const { events } = $eventHistory;
+    const _events =
+      $sortOrder === 'descending' ? events.slice().reverse() : events;
+    const eventGroups = groupEvents(_events);
     if (!$category) return eventGroups;
     return eventGroups.filter((event) => event.category === $category);
   },

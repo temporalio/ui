@@ -6,6 +6,11 @@ import {
   isWorkflowExecutionSignaledEvent,
   isTimerStartedEvent,
 } from '$lib/utilities/is-event-type';
+import {
+  eventIsFailureOrTimedOut,
+  eventIsCanceled,
+  eventIsTerminated,
+} from './get-event-in-group';
 
 import { getGroupId } from './get-group-id';
 import { getEventGroupName } from './get-group-name';
@@ -49,6 +54,19 @@ const createGroupFor = <K extends keyof StartingEvents>(
     },
     get attributes() {
       return getLastEvent(this)?.attributes;
+    },
+    get eventList() {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      return Array.from(this.events, ([key, value]) => value);
+    },
+    get isFailureOrTimedOut() {
+      return Boolean(this.eventList.find(eventIsFailureOrTimedOut));
+    },
+    get isCanceled() {
+      return Boolean(this.eventList.find(eventIsCanceled));
+    },
+    get isTerminated() {
+      return Boolean(this.eventList.find(eventIsTerminated));
     },
   };
 };
