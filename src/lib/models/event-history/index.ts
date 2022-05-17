@@ -31,10 +31,10 @@ export async function getEventAttributes({
 
   const convertedAttributes = endpoint
     ? await convertPayloadToJsonWithCodec({
-      attributes,
-      namespace,
-      settings: _settings,
-    })
+        attributes,
+        namespace,
+        settings: _settings,
+      })
     : await convertPayloadToJsonWithWebsocket(attributes);
 
   const decodedAttributes = decodePayloadAttributes(convertedAttributes);
@@ -81,12 +81,10 @@ export const toEventHistory = async ({
   response,
   namespace,
   settings,
-  sort,
 }: {
   response: HistoryEvent[];
   namespace: string;
   settings: Settings;
-  sort: string;
 }): Promise<{
   events: WorkflowEvents;
   eventGroups: EventGroups;
@@ -97,9 +95,6 @@ export const toEventHistory = async ({
     ),
   );
 
-  // if (sort === 'descending') {
-  //   events = events.reverse();
-  // }
   const eventGroups = groupEvents(events);
 
   return { events, eventGroups };

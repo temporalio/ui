@@ -48,7 +48,6 @@ export const getGroupId = (event: CommonHistoryEvent): string => {
   }
 
   if (isActivityTaskTimedOutEvent(event)) {
-    debugger
     return String(event.activityTaskTimedOutEventAttributes.scheduledEventId);
   }
 
