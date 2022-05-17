@@ -16,14 +16,14 @@ export const getNamespace = ({
   defaultNamespace,
   namespaces,
 }: GetNamespaceParameters): string | undefined => {
-  if (namespace && namespaces) {
-    if (namespaces.find((ns) => ns.namespaceInfo.name === namespace)) {
-      return namespace;
-    }
-    return;
+  if (!namespace) return defaultNamespace;
+  if (!namespaces.length) return defaultNamespace;
+
+  if (namespaces.find((ns) => ns.namespaceInfo.name === namespace)) {
+    return namespace;
   }
 
-  return defaultNamespace;
+  return;
 };
 
 export const getDefaultNamespace = ({
