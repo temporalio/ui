@@ -63,6 +63,7 @@
       url: $page.url,
       parameter: 'query',
       value: query,
+      allowEmpty: true,
       goto,
     });
   }, 300);
