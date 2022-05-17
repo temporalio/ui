@@ -17,7 +17,7 @@ import {
 } from '$lib/utilities/is-event-type';
 import { isEventGroup } from '$lib/models/event-groups';
 
-const eventIsFailureOrTimedOut = (event) => {
+export const eventIsFailureOrTimedOut = (event: WorkflowEvent): boolean => {
   return (
     isActivityTaskTimedOutEvent(event) ||
     isActivityTaskFailedEvent(event) ||
@@ -31,20 +31,14 @@ const eventIsFailureOrTimedOut = (event) => {
   );
 };
 
-const groupIsFailureOrTimedOut = (eventGroup: EventGroup): boolean => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const groupEvents = Array.from(eventGroup.events, ([key, value]) => value);
-  return Boolean(groupEvents.find(eventIsFailureOrTimedOut));
-};
-
 export const eventOrGroupIsFailureOrTimedOut = (
   event: IterableEvent,
 ): boolean => {
-  if (isEventGroup(event)) return groupIsFailureOrTimedOut(event);
+  if (isEventGroup(event)) return event.isFailureOrTimedOut;
   return eventIsFailureOrTimedOut(event as WorkflowEvent);
 };
 
-const eventIsCanceled = (event) => {
+export const eventIsCanceled = (event: WorkflowEvent): boolean => {
   return (
     isActivityTaskCanceledEvent(event) ||
     isTimerCanceledEvent(event) ||
@@ -53,31 +47,19 @@ const eventIsCanceled = (event) => {
   );
 };
 
-const groupIsCanceled = (eventGroup: EventGroup): boolean => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const groupEvents = Array.from(eventGroup.events, ([key, value]) => value);
-  return Boolean(groupEvents.find(eventIsCanceled));
-};
-
 export const eventOrGroupIsCanceled = (event: IterableEvent): boolean => {
-  if (isEventGroup(event)) return groupIsCanceled(event);
+  if (isEventGroup(event)) return event.isCanceled;
   return eventIsCanceled(event as WorkflowEvent);
 };
 
-const eventIsTerminated = (event) => {
+export const eventIsTerminated = (event: WorkflowEvent): boolean => {
   return (
     isWorkflowExecutionTerminatedEvent(event) ||
     isChildWorkflowExecutionTerminatedEvent(event)
   );
 };
 
-const groupIsTerminated = (eventGroup: EventGroup): boolean => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const groupEvents = Array.from(eventGroup.events, ([key, value]) => value);
-  return Boolean(groupEvents.find(eventIsTerminated));
-};
-
 export const eventOrGroupIsTerminated = (event: IterableEvent): boolean => {
-  if (isEventGroup(event)) return groupIsTerminated(event);
+  if (isEventGroup(event)) return event.isTerminated;
   return eventIsTerminated(event as WorkflowEvent);
 };
