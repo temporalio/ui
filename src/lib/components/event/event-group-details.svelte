@@ -1,5 +1,8 @@
 <script lang="ts">
-  import { isActivityTaskTimedOutEvent } from '$lib/utilities/is-event-type';
+  import {
+    eventOrGroupIsFailureOrTimedOut,
+    eventOrGroupIsCanceledOrTerminated,
+  } from '$lib/models/event-groups/get-event-in-group';
 
   export let eventGroup: EventGroup | null;
   export let selectedId: string;
@@ -17,7 +20,8 @@
           <span
             class="event-type"
             class:active={id === selectedId}
-            class:error={isActivityTaskTimedOutEvent(eventInGroup)}
+            class:error={eventOrGroupIsFailureOrTimedOut(eventInGroup)}
+            class:warning={eventOrGroupIsCanceledOrTerminated(eventInGroup)}
             >{eventInGroup.eventType}</span
           >
         </div>
@@ -38,5 +42,8 @@
   }
   .error {
     @apply text-red-700 decoration-red-700;
+  }
+  .warning {
+    @apply text-yellow-700 decoration-yellow-700;
   }
 </style>

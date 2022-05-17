@@ -63,6 +63,6 @@ export const fetchEvents = async (
 ): Promise<FetchEventsResponse> => {
   const { settings, namespace } = parameters;
   return fetchRawEvents(parameters).then((response) =>
-    toEventHistory({ response, namespace, settings }),
+    toEventHistory({ response, namespace, settings, sort: parameters.sort }),
   );
 };
