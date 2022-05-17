@@ -10,6 +10,10 @@ interface EventGroup
   events: Map<EventId, WorkflowEvent>;
   eventIds: Set<EventId>;
   initialEvent: WorkflowEvent;
+  eventList: WorkflowEvent[];
+  isFailureOrTimedOut: boolean;
+  isCanceled: boolean;
+  isTerminated: boolean;
 }
 
 type EventGroups = EventGroup[];

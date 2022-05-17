@@ -92,7 +92,7 @@
   }
 
   .destroy {
-    @apply text-white bg-danger border-2 rounded-lg px-5 transition-colors;
+    @apply text-white bg-danger border-danger border-2 rounded-lg px-5 transition-colors;
   }
 
   .destroy:disabled {
@@ -100,7 +100,7 @@
   }
 
   .destroy:hover:enabled {
-    @apply bg-white text-red-400 border-red-400;
+    @apply bg-red-900 text-white border-red-900;
   }
 
   .selected {
