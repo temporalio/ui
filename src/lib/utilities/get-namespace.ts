@@ -19,11 +19,11 @@ export const getNamespace = ({
   if (!namespace) return defaultNamespace;
   if (!namespaces.length) return defaultNamespace;
 
-  if (namespaces.find((ns) => ns.namespaceInfo.name === namespace)) {
+  if (namespaces.find((ns) => ns?.namespaceInfo?.name === namespace)) {
     return namespace;
   }
 
-  return;
+  return undefined;
 };
 
 export const getDefaultNamespace = ({
