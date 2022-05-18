@@ -10,6 +10,7 @@
 
   export let error: globalThis.Error = null;
   export let status = 500;
+  let message = error?.message || '';
 
   if (isNetworkError(error)) {
     status = error.statusCode;
@@ -27,6 +28,10 @@
 <section aria-roledescription="error" class="text-center align-middle mt-32">
   <h1 class="text-[12rem] font-semibold ">{status}</h1>
   <p class="-mt-6 mb-5 text-lg">Uh oh. There's an error.</p>
+  <p class="my-4 text-2xl text-red-700 w-auto font-extrabold">
+    {message}
+  </p>
+
   <p class="text-lg">
     <Link
       href={currentLocation}

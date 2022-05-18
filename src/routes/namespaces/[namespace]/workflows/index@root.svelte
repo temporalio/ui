@@ -20,7 +20,6 @@
 </script>
 
 <script lang="ts">
-  import { onDestroy } from 'svelte';
   import { timeFormat } from '$lib/stores/time-format';
   import { workflows, loading, updating } from '$lib/stores/workflows';
 
