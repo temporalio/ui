@@ -46,7 +46,7 @@
   activeNamespace={namespace}
   {linkList}
   {isCloud}
-  {user}
+  user={Promise.resolve(user)}
   {logout}
   extras={[{ icon: DataEncoderStatus, name: 'Data Encoder' }]}
 />

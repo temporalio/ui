@@ -54,7 +54,6 @@
 
 <script lang="ts">
   import Header from './_header.svelte';
-  import HeaderResponsive from './_header-responsive.svelte';
   import Notifications from '$lib/components/notifications.svelte';
   import Banners from '$lib/components/banner/banners.svelte';
   import { ErrorBoundary } from '$lib/components/error-boundary';

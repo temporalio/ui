@@ -49,8 +49,11 @@
       line breaks so we have this peculiar formatting to preserve this components output -->
     <pre
       class="p-4 rounded-lg w-full overflow-x-scroll"
-      class:h-full={!inline}><code class="language-{language}" data-cy={$$props['data-cy']}
-      >{#if isJSON}{formatJSON(content)}{:else}{@html content}{/if}</code></pre>
+      class:h-full={!inline}><code
+        class="language-{language}"
+        data-cy={$$props['data-cy']}
+        >{#if isJSON}{formatJSON(content)}{:else}{@html content}{/if}</code
+      ></pre>
 
     <button on:click={copy} class="absolute top-4 right-4">
       <Icon icon={copied ? faCheck : faCopy} color="white" />
