@@ -1,9 +1,10 @@
 let base = (import.meta.env?.VITE_API as string) ?? process.env.VITE_API;
 if (base.endsWith('/')) base = base.slice(0, -1);
 
-const withBase = (endpoint: string): string => {
+const withBase = (endpoint: string, namespace?: string): string => {
   if (endpoint.startsWith('/')) endpoint = endpoint.slice(1);
-  return `${base}/api/v1/${endpoint}`;
+
+  return `https://web.${namespace}.tmprl.cloud/api/v1/${endpoint}`;
 };
 
 const encode = (parameters: APIRouteParameters): APIRouteParameters => {
@@ -59,5 +60,5 @@ export function routeForApi(
     query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/query`,
   };
 
-  return withBase(routes[route]);
+  return withBase(routes[route], parameters?.namespace);
 }
