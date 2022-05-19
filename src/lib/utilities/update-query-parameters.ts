@@ -1,6 +1,5 @@
 import { browser } from '$app/env';
 import type { goto, invalidate } from '$app/navigation';
-import { page } from '$app/stores';
 
 type UpdateQueryParams = {
   parameter: string;
