@@ -10,10 +10,9 @@ if (base.endsWith('/')) base = base.slice(0, -1);
 const withBase = (endpoint: string): string => {
   if (endpoint.startsWith('/')) endpoint = endpoint.slice(1);
   if (window.location.host.match(/thundergun\.io$/)) {
-    return RealBaseUrl;
+    return `${RealBaseUrl}${endpoint}`;
   }
   return `${base}/api/v1/${endpoint}`;
-  // return `${RealBaseUrl}${endpoint}`;
 };
 
 const encode = (parameters: APIRouteParameters): APIRouteParameters => {
