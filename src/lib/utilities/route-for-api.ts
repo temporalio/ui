@@ -1,10 +1,16 @@
-let base = (import.meta.env?.VITE_API as string) ?? process.env.VITE_API;
+import { namespaceUrlPattern } from './namespace-url-pattern';
+
+const RealBaseUrl = `https://web.${
+  namespaceUrlPattern.match(window.location.pathname).namespace
+}.tmprl.cloud/api/v1/`;
+
+let base = RealBaseUrl;
 if (base.endsWith('/')) base = base.slice(0, -1);
 
-const withBase = (endpoint: string, namespace?: string): string => {
+const withBase = (endpoint: string): string => {
   if (endpoint.startsWith('/')) endpoint = endpoint.slice(1);
 
-  return `https://web.${namespace}.tmprl.cloud/api/v1/${endpoint}`;
+  return `${RealBaseUrl}${endpoint}`;
 };
 
 const encode = (parameters: APIRouteParameters): APIRouteParameters => {
@@ -60,5 +66,5 @@ export function routeForApi(
     query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/query`,
   };
 
-  return withBase(routes[route], parameters?.namespace);
+  return withBase(routes[route]);
 }
