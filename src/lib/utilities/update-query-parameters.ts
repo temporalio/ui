@@ -1,5 +1,6 @@
 import { browser } from '$app/env';
 import type { goto, invalidate } from '$app/navigation';
+import { page } from '$app/stores';
 
 type UpdateQueryParams = {
   parameter: string;
@@ -33,7 +34,7 @@ export const updateQueryParameters = async ({
     url.searchParams.delete(parameter);
   }
 
-  if (browser) {
+  if (browser && url.href !== window.location.href) {
     goto(String(url), gotoOptions);
   }
 
