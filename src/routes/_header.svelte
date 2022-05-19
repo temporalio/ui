@@ -42,6 +42,7 @@
 </script>
 
 <Navigation
+  theme="developer"
   {namespaceList}
   activeNamespace={namespace}
   {linkList}
