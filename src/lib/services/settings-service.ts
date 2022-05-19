@@ -38,7 +38,10 @@ export const fetchSettings = async (
     feedbackURL: settings?.FeedbackURL,
     runtimeEnvironment: {
       get isCloud() {
+        console.log(EnvironmentOverride);
+
         if (EnvironmentOverride) {
+          console.log('cloud override');
           return EnvironmentOverride === 'cloud';
         }
 

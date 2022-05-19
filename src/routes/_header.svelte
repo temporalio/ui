@@ -38,6 +38,7 @@
   };
 
   const logout = () => goto(import.meta.env.VITE_API + '/auth/logout');
+  console.log(isCloud);
 </script>
 
 <Navigation
