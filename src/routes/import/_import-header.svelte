@@ -1,19 +1,15 @@
 <script lang="ts">
-  import NavigationHeader from '$lib/components/navigation-header.svelte';
-  import { routeForImport } from '$lib/utilities/route-for';
-  import NavigationLink from '$lib/components/navigation-link.svelte';
-  import AuthButton from '$lib/components/auth-button.svelte';
+  import { page } from '$app/stores';
+  import Navigation from 'holocene/components/navigation/import.svelte';
 
-  export let user: User;
+  import { routeForImport, routeForWorkflows } from '$lib/utilities/route-for';
+
+  $: namespace = $page.stuff?.settings?.defaultNamespace;
+
+  $: linkList = {
+    home: routeForWorkflows({ namespace }),
+    import: routeForImport({ importType: 'events' }),
+  };
 </script>
 
-<NavigationHeader href="/" {user}>
-  <svelte:fragment slot="links">
-    <NavigationLink href={routeForImport({ importType: 'events' })}>
-      Import
-    </NavigationLink>
-  </svelte:fragment>
-  <svelte:fragment slot="user">
-    <AuthButton {user} />
-  </svelte:fragment>
-</NavigationHeader>
+<Navigation theme="developer" {linkList} />
