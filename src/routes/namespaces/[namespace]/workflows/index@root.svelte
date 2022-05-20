@@ -30,7 +30,6 @@
   import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
   import WorkflowFilters from './_workflow-filters.svelte';
-  import WorkflowsLoading from './_workflows-loading.svelte';
   import { page } from '$app/stores';
 
   export let namespace: string;
