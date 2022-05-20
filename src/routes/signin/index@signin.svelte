@@ -10,8 +10,8 @@
 
   import type { Load } from '@sveltejs/kit';
 
-  export const load: Load = async function ({ url }) {
-    const settings: Settings = await fetchSettings({ url });
+  export const load: Load = async function ({ fetch }) {
+    const settings: Settings = await fetchSettings(fetch);
 
     if (!settings.auth.enabled) {
       return {
