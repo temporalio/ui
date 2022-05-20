@@ -6,28 +6,8 @@ const withBase = (endpoint: string): string => {
   return `${base}/api/v1/${endpoint}`;
 };
 
-export function routeForApi(
-  route: WorkflowsAPIRoutePath,
-  parameters: WorkflowListRouteParameters,
-): string;
-export function routeForApi(
-  route: SchedulesAPIRoutePath,
-  parameters: WorkflowListRouteParameters,
-): string;
-export function routeForApi(
-  route: WorkflowAPIRoutePath,
-  parameters: WorkflowRouteParameters,
-): string;
-export function routeForApi(
-  route: TaskQueueAPIRoutePath,
-  parameters: TaskQueueRouteParameters,
-): string;
-export function routeForApi(route: ParameterlessAPIRoutePath): string;
-export function routeForApi(
-  route: APIRoutePath,
-  parameters?: APIRouteParameters,
-): string {
-  const encoded: APIRouteParameters = Object.keys(parameters ?? {}).reduce(
+const encode = (parameters: APIRouteParameters): APIRouteParameters => {
+  return Object.keys(parameters ?? {}).reduce(
     (acc, key) => {
       acc[key] = encodeURIComponent(encodeURIComponent(parameters[key]));
       return acc;
@@ -39,21 +19,49 @@ export function routeForApi(
       queue: '',
     },
   );
+};
+
+export function routeForApi(
+  route: WorkflowsAPIRoutePath,
+  parameters: WorkflowListRouteParameters,
+  shouldEncode?: boolean,
+): string;
+export function routeForApi(
+  route: SchedulesAPIRoutePath,
+  parameters: WorkflowListRouteParameters,
+): string;
+export function routeForApi(
+  route: WorkflowAPIRoutePath,
+  parameters: WorkflowRouteParameters,
+  shouldEncode?: boolean,
+): string;
+export function routeForApi(
+  route: TaskQueueAPIRoutePath,
+  parameters: TaskQueueRouteParameters,
+  shouldEncode?: boolean,
+): string;
+export function routeForApi(route: ParameterlessAPIRoutePath): string;
+export function routeForApi(
+  route: APIRoutePath,
+  parameters?: APIRouteParameters,
+  shouldEncode = true,
+): string {
+  if (shouldEncode) parameters = encode(parameters);
 
   const routes: { [K in APIRoutePath]: string } = {
     cluster: '/cluster',
     settings: '/settings',
     user: '/me',
     namespaces: '/namespaces',
-    'task-queue': `/namespaces/${encoded?.namespace}/task-queues/${encoded?.queue}`,
-    workflows: `/namespaces/${encoded?.namespace}/workflows`,
-    'workflows.archived': `/namespaces/${encoded?.namespace}/workflows/archived`,
-    workflow: `/namespaces/${encoded?.namespace}/workflows/${encoded?.workflowId}/runs/${encoded?.runId}`,
-    'workflow.terminate': `/namespaces/${encoded?.namespace}/workflows/${encoded?.workflowId}/runs/${encoded?.runId}/terminate`,
-    events: `/namespaces/${encoded?.namespace}/workflows/${encoded?.workflowId}/runs/${encoded?.runId}/events`,
-    'events.reverse': `/namespaces/${encoded?.namespace}/workflows/${encoded?.workflowId}/runs/${encoded?.runId}/events/reverse`,
-    query: `/namespaces/${encoded?.namespace}/workflows/${encoded?.workflowId}/runs/${encoded?.runId}/query`,
-    schedules: `/namespaces/${encoded?.namespace}/schedules`,
+    'task-queue': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}`,
+    workflows: `/namespaces/${parameters?.namespace}/workflows`,
+    'workflows.archived': `/namespaces/${parameters?.namespace}/workflows/archived`,
+    workflow: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}`,
+    'workflow.terminate': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/terminate`,
+    'events.ascending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/events`,
+    'events.descending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/events/reverse`,
+    query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/query`,
+    schedules: `/namespaces/${parameters?.namespace}/schedules`,
   };
 
   return withBase(routes[route]);

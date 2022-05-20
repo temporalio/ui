@@ -31,13 +31,13 @@ describe('Workflow Input and Results', () => {
   it('should show the input and result for completed workflow', () => {
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/*/runs/*/events*`,
+        `/api/v1/namespaces/default/workflows/*/runs/*/events/reverse?`,
       { fixture: 'event-history-completed.json' },
     ).as('event-history-api');
 
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
-    cy.wait('@workflow-api');
+    cy.wait('@event-history-api');
 
     const firstEvent = eventsCompletedFixture.history.events[0];
     const input = Buffer.from(
@@ -61,13 +61,14 @@ describe('Workflow Input and Results', () => {
   it('should show the input and result for completed workflow and null result', () => {
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/*/runs/*/events*`,
+        `/api/v1/namespaces/default/workflows/*/runs/*/events/reverse?`,
       { fixture: 'event-history-completed-null.json' },
     ).as('event-history-api');
 
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
     cy.wait('@workflow-api');
+    cy.wait('@event-history-api');
 
     const firstEvent = eventsCompletedNullFixture.history.events[0];
     const input = Buffer.from(
@@ -89,7 +90,7 @@ describe('Workflow Input and Results', () => {
   it('should show the input and result for running workflow', () => {
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/*/runs/*/events*`,
+        `/api/v1/namespaces/default/workflows/*/runs/*/events/reverse?`,
       { fixture: 'event-history-running.json' },
     ).as('event-history-api');
     cy.intercept(
@@ -101,6 +102,7 @@ describe('Workflow Input and Results', () => {
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
     cy.wait('@workflow-api');
+    cy.wait('@event-history-api');
 
     const firstEvent = eventsRunningFixture.history.events[0];
     const input = Buffer.from(
@@ -114,13 +116,14 @@ describe('Workflow Input and Results', () => {
   it('should show the input and results for failed workflow', () => {
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/*/runs/*/events*`,
+        `/api/v1/namespaces/default/workflows/*/runs/*/events/reverse?`,
       { fixture: 'event-history-failed.json' },
     ).as('event-history-api');
 
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
     cy.wait('@workflow-api');
+    cy.wait('@event-history-api');
 
     const firstEvent = eventsFailedFixture.history.events[0];
     const input = Buffer.from(
@@ -142,13 +145,14 @@ describe('Workflow Input and Results', () => {
   it('should show the input and results for cancelled workflow', () => {
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/*/runs/*/events*`,
+        `/api/v1/namespaces/default/workflows/*/runs/*/events/reverse?`,
       { fixture: 'event-history-canceled.json' },
     ).as('event-history-api');
 
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
     cy.wait('@workflow-api');
+    cy.wait('@event-history-api');
 
     const firstEvent = eventsCanceledFixture.history.events[0];
     const input = Buffer.from(
@@ -162,13 +166,14 @@ describe('Workflow Input and Results', () => {
   it('should show the input and results for timed out workflow', () => {
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/*/runs/*/events*`,
+        `/api/v1/namespaces/default/workflows/*/runs/*/events/reverse?`,
       { fixture: 'event-history-timed-out.json' },
     ).as('event-history-api');
 
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
     cy.wait('@workflow-api');
+    cy.wait('@event-history-api');
 
     const firstEvent = eventsTimedOutFixture.history.events[0];
     const input = Buffer.from(
@@ -182,13 +187,14 @@ describe('Workflow Input and Results', () => {
   it('should show the input and results for continued as new workflow', () => {
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/*/runs/*/events*`,
+        `/api/v1/namespaces/default/workflows/*/runs/*/events/reverse?`,
       { fixture: 'event-history-continued-as-new.json' },
     ).as('event-history-api');
 
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
     cy.wait('@workflow-api');
+    cy.wait('@event-history-api');
 
     const firstEvent = eventsContinuedAsNewFixture.history.events[0];
     const input = Buffer.from(

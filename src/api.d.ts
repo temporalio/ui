@@ -4,7 +4,8 @@ type WorkflowAPIRoutePath =
   | 'workflow'
   | 'workflow.terminate'
   | 'events'
-  | 'events.reverse'
+  | 'events.ascending'
+  | 'events.descending'
   | 'query';
 
 type TaskQueueAPIRoutePath = 'task-queue';
@@ -32,6 +33,7 @@ type WorkflowRouteParameters = Pick<
   APIRouteParameters,
   'namespace' | 'workflowId' | 'runId'
 >;
+
 type TaskQueueRouteParameters = Pick<APIRouteParameters, 'namespace' | 'queue'>;
 
 type ValidWorkflowEndpoints = WorkflowsAPIRoutePath;

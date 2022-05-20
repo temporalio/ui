@@ -6,19 +6,20 @@
     faClock,
   } from '@fortawesome/free-solid-svg-icons';
 
-  import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-filters';
+  import { eventSortOrder, eventShowElapsed } from '$lib/stores/event-view';
   import { timeFormat } from '$lib/stores/time-format';
-  import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
 
   import { getGroupForEvent, isEventGroup } from '$lib/models/event-groups';
   import {
-    eventOrGroupHasActivityTimedOut,
-    groupHasActivityTimedOut,
+    eventOrGroupIsFailureOrTimedOut,
+    eventOrGroupIsCanceled,
+    eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
   import {
     formatDate,
     formatDistanceAbbreviated,
   } from '$lib/utilities/format-date';
+  import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
 
   import EventDetailsRow from './event-details-row.svelte';
   import EventDetailsFull from './event-details-full.svelte';
@@ -39,7 +40,7 @@
   $: expanded = expandAll;
 
   $: currentEvent = compact ? eventGroup.events.get(selectedId) : event;
-  $: reversed = $eventFilterSort === 'reverse';
+  $: descending = $eventSortOrder === 'descending';
   $: showElapsed = $eventShowElapsed === 'true';
 
   $: timeDiffChange = '';
@@ -53,7 +54,7 @@
           : previousItem?.eventTime,
         end: compact ? currentEvent?.eventTime : event?.eventTime,
       });
-      timeDiffChange = timeDiff ? `(${reversed ? '-' : '+'}${timeDiff})` : '';
+      timeDiffChange = timeDiff ? `(${descending ? '-' : '+'}${timeDiff})` : '';
     }
   }
 
@@ -61,14 +62,18 @@
     expanded = !expanded;
   };
 
-  const error = eventOrGroupHasActivityTimedOut(compact ? eventGroup : event);
+  const failure = eventOrGroupIsFailureOrTimedOut(compact ? eventGroup : event);
+  const canceled = eventOrGroupIsCanceled(compact ? eventGroup : event);
+  const terminated = eventOrGroupIsTerminated(compact ? eventGroup : event);
 </script>
 
 <tr
   class="row"
   id={event.id}
   class:expanded={expanded && !expandAll}
-  class:error
+  class:failure
+  class:canceled
+  class:terminated
   data-cy="event-summary-row"
 >
   <td class="id-cell text-left">
@@ -85,8 +90,14 @@
       class="md:mx-2 text-sm md:text-base font-semibold link event-name"
       on:click|stopPropagation={onLinkClick}
     >
-      {#if compact && groupHasActivityTimedOut(eventGroup)}
+      {#if compact && failure}
         <Icon class="inline text-red-700" icon={faClock} />
+      {/if}
+      {#if compact && canceled}
+        <Icon class="inline text-yellow-700" icon={faClock} />
+      {/if}
+      {#if compact && terminated}
+        <Icon class="inline text-pink-700" icon={faClock} />
       {/if}
       {event.name}
       <Icon class="inline" icon={expanded ? faAngleUp : faAngleDown} />
@@ -134,13 +145,31 @@
   .expanded.row {
     @apply border-b-0;
   }
-  .error,
-  .error:hover {
+  .failure,
+  .failure:hover {
     @apply bg-red-50;
   }
 
-  .error .event-name {
+  .failure .event-name {
     @apply text-red-700;
+  }
+
+  .canceled,
+  .canceled:hover {
+    @apply bg-yellow-50;
+  }
+
+  .canceled .event-name {
+    @apply text-yellow-700;
+  }
+
+  .terminated,
+  .terminated:hover {
+    @apply bg-pink-50;
+  }
+
+  .terminated .event-name {
+    @apply text-pink-700;
   }
 
   .cell {

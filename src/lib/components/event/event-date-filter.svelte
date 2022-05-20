@@ -7,29 +7,24 @@
   import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
-  import {
-    eventFilterSort,
-    eventShowElapsed,
-    setFilterSort,
-    setShowElapsed,
-  } from '$lib/stores/event-filters';
+  import { eventSortOrder, eventShowElapsed } from '$lib/stores/event-view';
   import {
     timeFormat,
     setTimeFormat,
     TimeFormatOptions,
   } from '$lib/stores/time-format';
   import type {
-    EventFilterType,
-    EventFilterTypeOptions,
-  } from '$lib/stores/event-filters';
+    EventSortOrder,
+    EventSortOrderOptions,
+  } from '$lib/stores/event-view';
 
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  let sortOptions: EventFilterTypeOptions = [
-    { label: 'Sort 1-9', option: '' },
-    { label: 'Sort 9-1', option: 'reverse' },
+  let sortOptions: EventSortOrderOptions = [
+    { label: 'Sort 1-9', option: 'ascending' },
+    { label: 'Sort 9-1', option: 'descending' },
   ];
 
   let dateOptions: TimeFormatOptions = [
@@ -38,8 +33,8 @@
     { label: 'Local Time', option: 'local' },
   ];
 
-  const onSortOptionClick = (option: EventFilterType) => {
-    setFilterSort(option);
+  const onSortOptionClick = (option: EventSortOrder) => {
+    $eventSortOrder = option;
     updateQueryParameters({
       parameter: 'sort',
       value: option,
@@ -54,29 +49,29 @@
 
   const onShowElapsedClick = () => {
     if ($eventShowElapsed === 'true') {
-      setShowElapsed('false');
+      $eventShowElapsed = 'false';
     } else {
-      setShowElapsed('true');
+      $eventShowElapsed = 'true';
     }
   };
 
   $: value =
-    $eventFilterSort === '' &&
+    $eventSortOrder === 'descending' &&
     $timeFormat === 'UTC' &&
     $eventShowElapsed === 'false'
       ? undefined
-      : `${$eventFilterSort}:${$timeFormat}:${$eventShowElapsed}`;
+      : `${$eventSortOrder}:${$timeFormat}:${$eventShowElapsed}`;
 </script>
 
 <DropdownMenu {value} right dataCy="event-date-filter">
   {#each sortOptions as { option, label } (option)}
     <div
       class="option"
-      class:active={$eventFilterSort === option}
+      class:active={$eventSortOrder === option}
       on:click={() => onSortOptionClick(option)}
     >
       <div class="check">
-        {#if $eventFilterSort === option}
+        {#if $eventSortOrder === option}
           <Icon icon={faCheck} scale={0.8} />
         {/if}
       </div>

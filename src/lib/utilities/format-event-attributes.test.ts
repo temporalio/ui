@@ -133,8 +133,9 @@ describe(attributeGroups, () => {
       'identity',
       'firstExecutionRunId',
       'attempt',
+      'parentInitiatedEventId',
     ]);
-    expect(groups.parent).toEqual(['parentInitiatedEventId']);
+    expect(groups.parent).toEqual([]);
     expect(groups.activity).toEqual([]);
     expect(groups.taskQueue).toEqual(['taskQueueKind', 'taskQueueName']);
     expect(groups.schedule).toEqual([]);

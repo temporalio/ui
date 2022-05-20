@@ -11,7 +11,7 @@ describe('Query', () => {
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/*/runs/*/events*`,
+        `/api/v1/namespaces/default/workflows/*/runs/*/events/reverse*`,
       { fixture: 'event-history-completed.json' },
     ).as('event-history-api');
 

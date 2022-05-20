@@ -2,6 +2,8 @@
   import Icon from 'svelte-fa';
   import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 
+  import { eventViewType } from '$lib/stores/event-view';
+
   import {
     routeForEventHistory,
     routeForPendingActivities,
@@ -16,7 +18,6 @@
   import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
   import ExportHistory from '$lib/components/export-history.svelte';
   import Tab from '$lib/components/tab.svelte';
-  import { eventViewType } from '$lib/stores/event-view-type';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;

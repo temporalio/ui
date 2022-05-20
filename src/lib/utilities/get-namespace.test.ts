@@ -1,4 +1,4 @@
-import { getDefaultNamespace } from './get-namespace';
+import { getDefaultNamespace, getNamespace } from './get-namespace';
 
 const temporalSystemNamespace = {
   namespaceInfo: {
@@ -109,6 +109,41 @@ const getSettings = (
     showTemporalSystemNamespace,
   };
 };
+
+describe(getNamespace, () => {
+  it('should return default namespace if no namespace given', () => {
+    const namespaces = [defaultNamespace, canaryNamespace];
+    expect(getNamespace({ namespaces, defaultNamespace: 'default' })).toEqual(
+      'default',
+    );
+  });
+  it('should return default namespace if no namespaces given', () => {
+    const namespaces = [];
+    expect(getNamespace({ namespaces, defaultNamespace: 'default' })).toEqual(
+      'default',
+    );
+  });
+  it('should return namespace if namespace exists in namespaces given', () => {
+    const namespaces = [defaultNamespace, canaryNamespace];
+    expect(
+      getNamespace({
+        namespaces,
+        defaultNamespace: 'default',
+        namespace: 'canary',
+      }),
+    ).toEqual('canary');
+  });
+  it('should return undefined if namespace does not exist in namespaces given', () => {
+    const namespaces = [defaultNamespace, canaryNamespace];
+    expect(
+      getNamespace({
+        namespaces,
+        defaultNamespace: 'default',
+        namespace: 'cats',
+      }),
+    ).toEqual(undefined);
+  });
+});
 
 describe(getDefaultNamespace, () => {
   it('should return default namespace if it exists in namespaces and matches defaultNamespace setting', () => {

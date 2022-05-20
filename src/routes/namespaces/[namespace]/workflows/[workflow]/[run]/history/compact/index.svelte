@@ -1,30 +1,10 @@
-<script context="module" lang="ts">
-  import type { Load } from '@sveltejs/kit';
-
-  import { getEventsInCategory } from '$lib/models/event-history/get-event-categorization';
-
-  export const load: Load = async function ({ stuff, url }) {
-    const category = url.searchParams.get('category');
-
-    const eventGroups = getEventsInCategory(stuff.eventGroups, category);
-
-    let items: EventGroups = eventGroups;
-
-    return {
-      props: {
-        items,
-      },
-      stuff: {
-        matchingEventGroups: eventGroups,
-      },
-    };
-  };
-</script>
-
 <script lang="ts">
   import EventSummary from '$lib/components/event/event-summary.svelte';
-
-  export let items: IterableEvents;
+  import { ascendingEventGroups } from '$lib/stores/events';
 </script>
 
-<EventSummary {items} groups={items} compact={true} />
+<EventSummary
+  items={$ascendingEventGroups}
+  groups={$ascendingEventGroups}
+  compact={true}
+/>

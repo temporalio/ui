@@ -15,8 +15,14 @@ describe(routeForApi, () => {
   });
 
   it('should return a route for events', () => {
-    expect(routeForApi('events', parameters)).toBe(
+    expect(routeForApi('events.ascending', parameters)).toBe(
       'http://localhost:8080/api/v1/namespaces/namespace/workflows/workflow/runs/run/events',
+    );
+  });
+
+  it('should return a route for events', () => {
+    expect(routeForApi('events.descending', parameters)).toBe(
+      'http://localhost:8080/api/v1/namespaces/namespace/workflows/workflow/runs/run/events/reverse',
     );
   });
 
@@ -52,10 +58,24 @@ describe('API Request Encoding', () => {
     expect(
       routeForApi('workflow', {
         ...parameters,
-        workflowId: 'worflow#with#hashes',
+        workflowId: 'workflow#with#hashes',
       }),
     ).toBe(
-      'http://localhost:8080/api/v1/namespaces/namespace/workflows/worflow%2523with%2523hashes/runs/run',
+      'http://localhost:8080/api/v1/namespaces/namespace/workflows/workflow%2523with%2523hashes/runs/run',
+    );
+  });
+
+  it('should handle slashes', () => {
+    expect(
+      routeForApi('workflow', {
+        ...parameters,
+        namespace: 'canary',
+        runId: '47e33895-aff5-475a-9b53-73abdee8bebe',
+        workflowId:
+          'temporal.canary.cron-workflow.sanity-2022-05-02T16:03:11-06:00/workflow.advanced-visibility.scan',
+      }),
+    ).toBe(
+      'http://localhost:8080/api/v1/namespaces/canary/workflows/temporal.canary.cron-workflow.sanity-2022-05-02T16%253A03%253A11-06%253A00%252Fworkflow.advanced-visibility.scan/runs/47e33895-aff5-475a-9b53-73abdee8bebe',
     );
   });
 });

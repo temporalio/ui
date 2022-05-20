@@ -45,6 +45,7 @@ interface NetworkError {
   statusCode: number;
   statusText: string;
   response: Response;
+  message?: string;
 }
 
 type Settings = {
@@ -80,6 +81,8 @@ type ClusterInformation = import('$types').GetClusterInfoResponse;
 type TimeFormat = 'UTC' | 'relative' | 'local';
 
 type SelectOptionValue = number | string | boolean;
+
+type BooleanString = 'true' | 'false';
 
 type OptionLabel = {
   label: string;

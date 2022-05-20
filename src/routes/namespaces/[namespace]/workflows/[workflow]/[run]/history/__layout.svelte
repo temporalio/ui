@@ -2,34 +2,14 @@
   import type { Load } from '@sveltejs/kit';
   import { routeForWorkers, routeForWorkflow } from '$lib/utilities/route-for';
 
-  import { fetchEvents } from '$lib/services/events-service';
-
-  export const load: Load = async function ({ params, url, stuff, fetch }) {
-    const { workflow, settings } = stuff;
+  export const load: Load = async function ({ params, stuff }) {
+    const { workflow } = stuff;
     const { namespace } = params;
-    const parameters = {
-      namespace,
-      workflowId: workflow.id,
-      runId: workflow.runId,
-      reverse: Boolean(url?.searchParams?.get('sort')),
-    };
-
-    const { events, eventGroups } = await fetchEvents(
-      parameters,
-      settings,
-      fetch,
-    );
 
     return {
       props: {
         namespace,
         workflow,
-        events,
-        eventGroups,
-      },
-      stuff: {
-        events,
-        eventGroups,
       },
     };
   };
@@ -43,9 +23,11 @@
   } from '@fortawesome/free-solid-svg-icons';
 
   import { routeForEventHistory } from '$lib/utilities/route-for';
-  import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
   import { formatDate } from '$lib/utilities/format-date';
-  import { eventViewType, setEventViewType } from '$lib/stores/event-view-type';
+  import { eventViewType } from '$lib/stores/event-view';
+
+  import { onDestroy } from 'svelte';
+  import { clearPreviousEventParameters } from '$lib/stores/events';
 
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
@@ -56,9 +38,7 @@
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
-  export let events: WorkflowEvents;
 
-  const { input, result } = getWorkflowStartedAndCompletedEvents(events);
   const routeParameters = (view: EventView, eventId?: string) => ({
     namespace,
     workflow: workflow.id,
@@ -72,6 +52,10 @@
     workflow: workflow.id,
     run: workflow.runId,
   };
+
+  onDestroy(() => {
+    clearPreviousEventParameters();
+  });
 </script>
 
 <section class="flex flex-col gap-4">
@@ -110,13 +94,8 @@
     />
   </section>
   <section class="flex gap-4 w-full flex-col lg:flex-row">
-    <InputAndResults title="Input" content={input} dataCy="workflow-input" />
-    <InputAndResults
-      title="Results"
-      content={result}
-      isRunning={workflow.isRunning}
-      dataCy="workflow-results"
-    />
+    <InputAndResults type="input" />
+    <InputAndResults type="results" />
   </section>
   <WorkflowStackTrace {namespace} {workflow} class="mb-2 max-h-96" />
   <PendingActivties />
@@ -130,19 +109,22 @@
             base={routeForEventHistory(routeParameters('feed'))}
             href={routeForEventHistory(routeParameters('feed'))}
             active={$eventViewType === 'feed'}
-            on:click={() => setEventViewType('feed')}>Timeline</ToggleButton
+            data-cy="feed"
+            on:click={() => ($eventViewType = 'feed')}>Timeline</ToggleButton
           >
           <ToggleButton
             icon={faLayerGroup}
             href={routeForEventHistory(routeParameters('compact'))}
             active={$eventViewType === 'compact'}
-            on:click={() => setEventViewType('compact')}>Compact</ToggleButton
+            data-cy="compact"
+            on:click={() => ($eventViewType = 'compact')}>Compact</ToggleButton
           >
           <ToggleButton
             icon={faCode}
             href={routeForEventHistory(routeParameters('json'))}
             active={$eventViewType === 'json'}
-            on:click={() => setEventViewType('json')}>JSON</ToggleButton
+            data-cy="json"
+            on:click={() => ($eventViewType = 'json')}>JSON</ToggleButton
           >
         </ToggleButtons>
       </div>

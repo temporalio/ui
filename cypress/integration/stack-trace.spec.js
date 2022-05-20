@@ -12,15 +12,9 @@ describe('Stack Trace', () => {
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/*/runs/*/events*`,
+        `/api/v1/namespaces/default/workflows/*/runs/*/events/reverse*`,
       { fixture: 'event-history-completed.json' },
     ).as('event-history-api');
-
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}?`,
-      { fixture: 'workflow-completed.json' },
-    ).as('workflow-api');
 
     cy.visit('/namespaces/default/workflows');
 
@@ -31,13 +25,17 @@ describe('Stack Trace', () => {
   it('should show No Stack Trace for completed workflow', () => {
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}?`,
+      { fixture: 'workflow-completed.json' },
+    ).as('workflow-api');
+
     cy.wait('@workflow-api');
     cy.wait('@event-history-api');
     cy.wait('@query-api');
 
-    cy.get(
-      `[href="/namespaces/default/workflows/${workflowId}/${runId}/history/json?per-page=100"]`,
-    ).click();
+    cy.get('[data-cy="json"]').click();
 
     cy.get(
       `[href="/namespaces/default/workflows/${workflowId}/${runId}/stack-trace"]`,
@@ -64,9 +62,7 @@ describe('Stack Trace', () => {
     cy.wait('@event-history-api');
     cy.wait('@query-api');
 
-    cy.get(
-      `[href="/namespaces/default/workflows/${workflowId}/${runId}/history/json?per-page=100"]`,
-    ).click();
+    cy.get('[data-cy="json"]').click();
 
     cy.get(
       `[href="/namespaces/default/workflows/${workflowId}/${runId}/stack-trace"]`,
