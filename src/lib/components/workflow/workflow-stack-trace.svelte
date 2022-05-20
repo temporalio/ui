@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
   import { getWorkflowStackTrace } from '$lib/services/query-service';
   import EmptyState from '$lib/components/empty-state.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
@@ -12,20 +10,18 @@
   export let workflow: WorkflowExecution;
   export let workers: GetPollersResponse;
 
+  const getStackTrace = () =>
+    getWorkflowStackTrace({
+      workflow,
+      namespace,
+    });
+
   let stackTrace: Eventual<ParsedQuery>;
   $: runningWithNoWorkers = workflow.isRunning && !workers?.pollers?.length;
 
-  onMount(() => {
-    const getStackTrace = () =>
-      getWorkflowStackTrace({
-        workflow,
-        namespace,
-      });
-
-    if (runningWithNoWorkers) {
-      stackTrace = getStackTrace();
-    }
-  });
+  $: {
+    if (runningWithNoWorkers) stackTrace = getStackTrace();
+  }
 </script>
 
 {#if runningWithNoWorkers}
