@@ -3,13 +3,14 @@
   import { routeForWorkers, routeForWorkflow } from '$lib/utilities/route-for';
 
   export const load: Load = async function ({ params, stuff }) {
-    const { workflow } = stuff;
+    const { workflow, workers } = stuff;
     const { namespace } = params;
 
     return {
       props: {
         namespace,
         workflow,
+        workers,
       },
     };
   };
@@ -21,6 +22,8 @@
     faLayerGroup,
     faTable,
   } from '@fortawesome/free-solid-svg-icons';
+
+  import type { GetPollersResponse } from '$lib/services/pollers-service';
 
   import { routeForEventHistory } from '$lib/utilities/route-for';
   import { formatDate } from '$lib/utilities/format-date';
@@ -38,6 +41,7 @@
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
+  export let workers: GetPollersResponse;
 
   const routeParameters = (view: EventView, eventId?: string) => ({
     namespace,
@@ -97,7 +101,7 @@
     <InputAndResults type="input" />
     <InputAndResults type="results" />
   </section>
-  <WorkflowStackTrace {namespace} {workflow} class="mb-2 max-h-96" />
+  <WorkflowStackTrace {namespace} {workflow} {workers} class="mb-2 max-h-96" />
   <PendingActivties />
   <section id="event-history">
     <nav class="flex gap-4 justify-between items-end pb-4">

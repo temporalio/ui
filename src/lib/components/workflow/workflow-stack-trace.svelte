@@ -6,9 +6,11 @@
   import CodeBlock from '$lib/components/code-block.svelte';
 
   import type { ParsedQuery } from '$lib/services/query-service';
+  import type { GetPollersResponse } from '$lib/services/pollers-service';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
+  export let workers: GetPollersResponse;
 
   let stackTrace: Eventual<ParsedQuery>;
 
@@ -19,11 +21,13 @@
         namespace,
       });
 
-    stackTrace = getStackTrace();
+    if (workflow.isRunning && !workers?.pollers?.length) {
+      stackTrace = getStackTrace();
+    }
   });
 </script>
 
-{#if workflow.isRunning}
+{#if workflow.isRunning && !workers?.pollers?.length}
   <section class="stack-trace">
     <h3 class="text-lg mb-2 w-full">Stack Trace</h3>
     {#await stackTrace}

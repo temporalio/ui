@@ -113,7 +113,7 @@ export async function getQuery(
       }
 
       return JSON.parse(data);
-    } catch {
+    } catch (e) {
       return data;
     }
   });
