@@ -13,6 +13,7 @@
   export let workers: GetPollersResponse;
 
   let stackTrace: Eventual<ParsedQuery>;
+  $: runningWithNoWorkers = workflow.isRunning && !workers?.pollers?.length;
 
   onMount(() => {
     const getStackTrace = () =>
@@ -21,13 +22,13 @@
         namespace,
       });
 
-    if (workflow.isRunning && !workers?.pollers?.length) {
+    if (runningWithNoWorkers) {
       stackTrace = getStackTrace();
     }
   });
 </script>
 
-{#if workflow.isRunning && !workers?.pollers?.length}
+{#if runningWithNoWorkers}
   <section class="stack-trace">
     <h3 class="text-lg mb-2 w-full">Stack Trace</h3>
     {#await stackTrace}
