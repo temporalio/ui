@@ -36,6 +36,11 @@ export function routeForApi(
   shouldEncode?: boolean,
 ): string;
 export function routeForApi(
+  route: ScheduleAPIRoutePath,
+  parameters: WorkflowRouteParameters,
+  shouldEncode?: boolean,
+): string;
+export function routeForApi(
   route: TaskQueueAPIRoutePath,
   parameters: TaskQueueRouteParameters,
   shouldEncode?: boolean,
@@ -62,6 +67,7 @@ export function routeForApi(
     'events.descending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/events/reverse`,
     query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/query`,
     schedules: `/namespaces/${parameters?.namespace}/schedules`,
+    schedule: `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}`,
   };
 
   return withBase(routes[route]);

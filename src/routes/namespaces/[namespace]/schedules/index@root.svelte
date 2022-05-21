@@ -5,20 +5,18 @@
   import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
   const defaultQuery = toListWorkflowQuery({
-    timeRange: '1 day',
-    workflowType: 'cronWorkflow',
+    timeRange: '1 year',
   });
 
   export const load: Load = async function ({ params, url }) {
     const searchType = getSearchType(url);
 
-    url.searchParams.set('query', defaultQuery);
-
-    const query = url.searchParams.get('query');
+    // url.searchParams.set('query', defaultQuery);
+    // const query = url.searchParams.get('query');
     const { namespace } = params;
 
     return {
-      props: { namespace, searchType, query },
+      props: { namespace, searchType },
     };
   };
 </script>
@@ -41,9 +39,8 @@
   import { noop } from 'svelte/internal';
 
   export let namespace: string;
-  export let query: string;
 
-  let workflows = getSchedules({ namespace, query });
+  let schedules = getSchedules({ namespace });
 
   let search = '';
   const errorMessage =
@@ -52,8 +49,7 @@
   const getRoute = (item: WorkflowExecution) =>
     routeForSchedule({
       namespace,
-      schedule: item.id,
-      run: item.runId,
+      scheduleId: item.scheduleId,
     });
 </script>
 
@@ -61,11 +57,11 @@
 <div class="w-1/2">
   <Search icon placeholder="Search" value={search} on:submit={noop} />
 </div>
-{#await $workflows}
+{#await $schedules}
   <Loading />
-{:then { workflows }}
-  {#if workflows.length}
-    <Pagination items={workflows} let:visibleItems>
+{:then { schedules }}
+  {#if schedules.length}
+    <Pagination items={schedules} let:visibleItems>
       <Table {columns}>
         {#each visibleItems as event}
           <TableRow

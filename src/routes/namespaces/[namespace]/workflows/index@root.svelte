@@ -4,7 +4,7 @@
   import { getSearchType } from '$lib/utilities/search-type-parameter';
   import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
-  const defaultQuery = toListWorkflowQuery({ timeRange: '1 day' });
+  const defaultQuery = toListWorkflowQuery({ timeRange: '1 month' });
 
   export const load: Load = async function ({ params, url }) {
     if (!url.searchParams.has('query')) {

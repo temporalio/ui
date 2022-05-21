@@ -10,7 +10,7 @@ export const columns: TableColumn[] = [
     component: WorkflowStatus,
     props: ['status'],
   },
-  { key: 'runId', label: 'Schedule ID', classes: 'w-96 truncate' },
+  { key: 'scheduleId', label: 'Schedule ID', classes: 'w-96 truncate' },
   { key: 'name', label: 'Workflow Type' },
   {
     key: 'startTime',

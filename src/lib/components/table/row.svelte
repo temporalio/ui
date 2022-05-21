@@ -35,7 +35,8 @@
           {...getProps(column.props, item)}
         />
       {:else}
-        {formatLabel(item?.[column.key], column.type) ?? '[ ... ]'}
+        {formatLabel(item?.[column.key], column.type) ??
+          'temporal-sys-scheduler-workflow'}
       {/if}
     </div>
   {/each}

@@ -7,7 +7,6 @@ import {
 
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
-import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;
@@ -28,42 +27,32 @@ export const fetchAllSchedules = async (
   parameters: ValidWorkflowParameters,
   request = fetch,
 ): Promise<CombinedWorkflowExecutionsResponse> => {
-  const query = decodeURIComponent(
-    parameters.query,
-  );
 
   let onError: ErrorCallback;
   let error: string;
 
-  if (parameters.query) {
-    onError = (response) => {
-      error = response.body.message;
-    };
-  }
-
-  const { executions, nextPageToken } =
+  const { schedules, nextPageToken } =
     (await requestFromAPI<ListWorkflowExecutionsResponse>(
       routeForApi('schedules', { namespace }),
       {
-        // params: { query },
         params: {},
         onError,
         request,
       },
-    )) ?? { executions: [], nextPageToken: '' };
+    )) ?? { schedules: [], nextPageToken: '' };
 
   return {
-    workflows: toWorkflowExecutions({ executions }),
+    schedules,
     nextPageToken: String(nextPageToken),
     error,
   };
 };
 
-export async function fetchWorkflow(
+export async function fetchSchedule(
   parameters: GetWorkflowExecutionRequest,
   request = fetch,
 ): Promise<WorkflowExecution> {
-  return requestFromAPI(routeForApi('workflow', parameters), { request }).then(
+  return requestFromAPI(routeForApi('schedule', parameters), { request }).then(
     toWorkflowExecution,
   );
 }
