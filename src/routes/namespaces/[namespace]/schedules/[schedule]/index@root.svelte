@@ -5,14 +5,12 @@
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
-  const defaultQuery = toListWorkflowQuery({ timeRange: '1 day' });
-
-  export const load: Load = async function ({ params }) {
+  export const load: Load = async function ({ params, url }) {
     const { schedule: scheduleId, namespace } = params;
 
-    // if (!url.searchParams.has('query')) {
-    //   url.searchParams.set('query', defaultQuery);
-    // }
+    if (!url.searchParams.has('query')) {
+      url.searchParams.delete('query');
+    }
 
     const parameters = {
       namespace,
@@ -22,7 +20,7 @@
     const schedule = await fetchSchedule(parameters, fetch);
 
     return {
-      props: { schedule, namespace },
+      props: { schedule, namespace, scheduleId },
       stuff: { schedule },
     };
   };
@@ -45,10 +43,11 @@
   import ScheduleError from '$lib/components/schedule/schedule-error.svelte';
 
   export let namespace: string;
-  export let schedule;
+  export let scheduleId: string;
+  export let schedule: DescribeScheduleResponse;
 
   console.log('SCHEDULE: ', schedule);
-  $: error = 'Error message with helpful resolution';
+  $: error = schedule.info.invalidScheduleError;
 </script>
 
 <header class="flex flex-col gap-4 mb-8">
@@ -62,42 +61,57 @@
     </a>
     <div class="flex justify-between items-center">
       <h1 class="text-2xl flex relative items-center gap-4">
-        <span class="font-medium select-all">{schedule}</span>
+        <span class="font-medium select-all">{scheduleId}</span>
         <WorkflowStatus status="Running" />
       </h1>
     </div>
     <div class="flex items-center text-sm">
-      <p>{namespace} WorkflowTypeName-1</p>
+      <p>
+        {namespace}
+        {schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
+      </p>
     </div>
     <div class="flex items-center gap-2 text-sm">
-      <p>Created: {formatDate('2022-05-03T15:35:36.730883Z', $timeFormat)}</p>
-      <p>-</p>
-      <p>
-        Last updated: {formatDate('2022-05-06T15:35:36.730883Z', $timeFormat)}
-      </p>
+      <p>Created: {formatDate(schedule?.info?.createTime, $timeFormat)}</p>
+      {#if schedule.info.updateTime}
+        <p>-</p>
+        <p>
+          Last updated: {formatDate(schedule?.info?.updateTime, $timeFormat)}
+        </p>
+      {/if}
     </div>
   </main>
 </header>
-
-{#if error}
+<div class="flex flex-col gap-4 pb-24">
+  {#if error}
+    <div class="w-full xl:w-1/2">
+      <ScheduleError {error} />
+    </div>
+  {/if}
   <div class="w-full xl:w-1/2">
-    <ScheduleError {error} />
+    <ScheduleFrequency
+      calendar={schedule?.schedule?.spec?.calendar?.[0]}
+      interval={schedule?.schedule?.spec?.interval?.[0]}
+    />
   </div>
-{/if}
-<div class="w-full xl:w-1/2">
-  <ScheduleFrequency />
-</div>
-<div class="flex flex-col xl:flex-row gap-4">
-  <div class="w-full xl:w-auto">
-    <ScheduleRecentRuns />
+  <div class="flex flex-col xl:flex-row gap-4">
+    <div class="w-full xl:w-2/3">
+      <ScheduleRecentRuns
+        recentRuns={schedule?.info?.recentActions?.reverse()}
+      />
+    </div>
+    <div class="w-full xl:w-1/3">
+      <ScheduleUpcomingRuns futureRuns={schedule?.info?.futureActionTimes} />
+    </div>
   </div>
-  <div class="w-full xl:w-auto">
-    <ScheduleUpcomingRuns />
+  <div class="w-full xl:w-1/2">
+    <ScheduleAdvancedSettings
+      spec={schedule?.schedule?.spec}
+      state={schedule?.schedule?.state}
+      policies={schedule?.schedule?.policies}
+    />
   </div>
-</div>
-<div class="w-full xl:w-1/2">
-  <ScheduleAdvancedSettings />
-</div>
-<div class="w-full xl:w-1/2">
-  <ScheduleMemo />
+  <div class="w-full xl:w-1/2">
+    <ScheduleMemo notes={schedule?.schedule?.state?.notes} />
+  </div>
 </div>

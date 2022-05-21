@@ -1,18 +1,10 @@
 <script lang="ts">
   import Icon from 'svelte-fa';
   import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
-  import { onMount } from 'svelte';
-  import { scale } from 'svelte/transition';
-  import IconButton from '$lib/components/icon-button.svelte';
 
-  const settings = {
-    startTime: '',
-    endTime: '',
-    jitter: '1 second',
-    exclusionCalendar: '',
-    remainingActions: '34',
-    overlapPolicy: 'Option 1',
-  };
+  export let spec;
+  export let state;
+  export let policies;
 
   let show = false;
 </script>
@@ -24,12 +16,12 @@
   />
 </p>
 {#if show}
-  <p>Schedule Start Time: {settings.startTime}</p>
-  <p>Schedule End Time: {settings.endTime}</p>
-  <p>Jitter: {settings.jitter}</p>
-  <p>Exclusion Calendar: {settings.exclusionCalendar}</p>
-  <p>Remaining Actions: {settings.remainingActions}</p>
-  <p>Overlap Policy: {settings.overlapPolicy}</p>
+  <p>Schedule Start Time: {spec?.startTime ?? ''}</p>
+  <p>Schedule End Time: {spec?.endTime ?? ''}</p>
+  <p>Jitter: {spec?.jitter ?? ''}</p>
+  <p>Exclusion Calendar: {spec?.exclusionCalendar ?? ''}</p>
+  <p>Remaining Actions: {state?.remainingActions ?? ''}</p>
+  <p>Overlap Policy: {policies?.overlapPolicy ?? ''}</p>
 {/if}
 
 <style lang="postcss">

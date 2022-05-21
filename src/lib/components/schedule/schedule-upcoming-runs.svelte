@@ -3,30 +3,14 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { timeFormat } from '$lib/stores/time-format';
 
-  const runs = [
-    {
-      startTime: '2022-05-06T15:35:36.730883Z',
-    },
-    {
-      startTime: '2022-05-06T15:35:36.730883Z',
-    },
-    {
-      startTime: '2022-05-06T15:35:36.730883Z',
-    },
-    {
-      startTime: '2022-05-06T15:35:36.730883Z',
-    },
-    {
-      startTime: '2022-05-06T15:35:36.730883Z',
-    },
-  ];
+  export let futureRuns = [];
 </script>
 
 <Panel>
   <h2 class="text-2xl mb-4">Upcoming Runs</h2>
-  {#each runs as run}
+  {#each futureRuns as run}
     <div class="row">
-      <p>{formatDate(run.startTime, $timeFormat)}</p>
+      <p>{formatDate(run, $timeFormat, 'from now')}</p>
     </div>
   {/each}
 </Panel>
