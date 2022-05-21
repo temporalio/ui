@@ -1,30 +1,23 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
 
-  import { getSearchType } from '$lib/utilities/search-type-parameter';
-  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
-
-  const defaultQuery = toListWorkflowQuery({
-    timeRange: '1 year',
-  });
-
-  export const load: Load = async function ({ params, url }) {
-    const searchType = getSearchType(url);
-
-    // url.searchParams.set('query', defaultQuery);
-    // const query = url.searchParams.get('query');
+  export const load: Load = async function ({ params }) {
     const { namespace } = params;
 
     return {
-      props: { namespace, searchType },
+      props: { namespace },
     };
   };
 </script>
 
 <script lang="ts">
   import { timeFormat } from '$lib/stores/time-format';
+  import { formatDate } from '$lib/utilities/format-date';
   import { getSchedules } from '$lib/stores/schedules';
   import { routeForSchedule } from '$lib/utilities/route-for';
+  import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import { fetchSchedule } from '$lib/services/schedule-service';
+  import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 
   import EmptyState from '$lib/components/empty-state.svelte';
   import Pagination from '$lib/components/pagination.svelte';
@@ -37,6 +30,7 @@
 
   import { columns } from './_schedule-table-columns';
   import { noop } from 'svelte/internal';
+  import { stringify } from 'postcss';
 
   export let namespace: string;
 
@@ -64,12 +58,45 @@
     <Pagination items={schedules} let:visibleItems>
       <Table {columns}>
         {#each visibleItems as event}
-          <TableRow
-            item={event}
-            {columns}
-            href={getRoute(event)}
-            timeFormat={$timeFormat}
-          />
+          <a sveltekit:prefetch href={getRoute(event)} class="row">
+            {#await fetchSchedule({ namespace, scheduleId: decodeURIForSvelte(event.scheduleId) }, fetch)}
+              <div class="cell" />
+              <div class="cell" />
+              <div class="cell" />
+              <div class="cell hidden xl:table-cell" />
+              <div class="cell hidden xl:table-cell" />
+            {:then schedule}
+              <div class="cell">
+                <WorkflowStatus />
+              </div>
+              <div class="cell truncate">
+                {event.scheduleId}
+                <p>
+                  <small class="text-gray-700"
+                    >{JSON.stringify(
+                      schedule?.schedule?.spec?.calendar?.[0] ??
+                        schedule?.schedule?.spec?.interval?.[0],
+                    )}</small
+                  >
+                </p>
+              </div>
+              <div class="cell">
+                {schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
+              </div>
+              <div class="cell hidden xl:table-cell">
+                {#each schedule?.info?.recentActions
+                  ?.reverse()
+                  .slice(0, 5) ?? [] as run}
+                  <div>{formatDate(run.actualTime, $timeFormat)}</div>
+                {/each}
+              </div>
+              <div class="cell hidden xl:table-cell">
+                {#each schedule?.info?.futureActionTimes?.slice(0, 5) ?? [] as run}
+                  <div>{formatDate(run, $timeFormat, 'from now')}</div>
+                {/each}
+              </div>
+            {/await}
+          </a>
         {/each}
       </Table>
     </Pagination>
@@ -80,3 +107,25 @@
     </div>
   {/if}
 {/await}
+
+<style lang="postcss">
+  .row {
+    @apply block no-underline p-2 text-sm border-b-2 items-center xl:text-base xl:table-row last-of-type:border-b-0;
+  }
+
+  .row:hover {
+    @apply bg-gray-50;
+  }
+
+  .cell {
+    @apply xl:table-cell xl:border-b-2 border-gray-700 text-left p-2;
+  }
+
+  .table-link {
+    @apply group-hover:text-blue-700 group-hover:underline group-hover:decoration-blue-700;
+  }
+
+  .row:last-of-type .cell {
+    @apply border-b-0 first-of-type:rounded-bl-lg  last-of-type:rounded-br-lg;
+  }
+</style>

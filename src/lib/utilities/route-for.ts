@@ -176,14 +176,14 @@ const hasParameters =
   <T extends Record<string, string | Record<string, string>>>(
     ...required: string[]
   ) =>
-    (
-      parameters: Record<string, string | Record<string, string>>,
-    ): parameters is T => {
-      for (const parameter of required) {
-        if (!parameters[parameter]) return false;
-      }
-      return true;
-    };
+  (
+    parameters: Record<string, string | Record<string, string>>,
+  ): parameters is T => {
+    for (const parameter of required) {
+      if (!parameters[parameter]) return false;
+    }
+    return true;
+  };
 
 export const isNamespaceParameter =
   hasParameters<NamespaceParameter>('namespace');

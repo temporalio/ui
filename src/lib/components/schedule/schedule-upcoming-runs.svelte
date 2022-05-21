@@ -17,6 +17,6 @@
 
 <style lang="postcss">
   .row {
-    @apply inline-flex justify-start border-b-2 border-gray-300 my-1 py-1 w-full;
+    @apply inline-flex justify-start border-b-2 border-gray-300 my-1 py-1 w-full h-10;
   }
 </style>

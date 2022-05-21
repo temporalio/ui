@@ -5,12 +5,8 @@
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
-  export const load: Load = async function ({ params, url }) {
+  export const load: Load = async function ({ params }) {
     const { schedule: scheduleId, namespace } = params;
-
-    if (!url.searchParams.has('query')) {
-      url.searchParams.delete('query');
-    }
 
     const parameters = {
       namespace,
@@ -95,12 +91,13 @@
     />
   </div>
   <div class="flex flex-col xl:flex-row gap-4">
-    <div class="w-full xl:w-2/3">
+    <div class="w-full xl:w-3/4">
       <ScheduleRecentRuns
+        {namespace}
         recentRuns={schedule?.info?.recentActions?.reverse()}
       />
     </div>
-    <div class="w-full xl:w-1/3">
+    <div class="w-full xl:w-1/4">
       <ScheduleUpcomingRuns futureRuns={schedule?.info?.futureActionTimes} />
     </div>
   </div>

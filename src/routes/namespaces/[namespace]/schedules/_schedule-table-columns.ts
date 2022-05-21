@@ -10,19 +10,19 @@ export const columns: TableColumn[] = [
     component: WorkflowStatus,
     props: ['status'],
   },
-  { key: 'scheduleId', label: 'Schedule ID', classes: 'w-96 truncate' },
-  { key: 'name', label: 'Workflow Type' },
+  { key: 'scheduleId', label: 'Schedule ID', classes: 'truncate' },
+  { key: 'name', label: 'Workflow Type', classes: 'w-80' },
   {
     key: 'startTime',
     label: 'Recent Runs',
-    classes: 'hidden xl:table-cell',
+    classes: 'hidden xl:table-cell w-64',
     type: 'dateTime',
     filter: DateTimeFormatFilter,
   },
   {
     key: 'closeTime',
     label: 'Upcoming Runs',
-    classes: 'hidden xl:table-cell',
+    classes: 'hidden xl:table-cell w-64',
     type: 'dateTime',
   },
 ];
