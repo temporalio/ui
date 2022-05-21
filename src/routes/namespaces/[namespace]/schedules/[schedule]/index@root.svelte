@@ -19,11 +19,11 @@
       scheduleId: decodeURIForSvelte(scheduleId),
     };
 
-    const workflow = await fetchSchedule(parameters, fetch);
+    const schedule = await fetchSchedule(parameters, fetch);
 
     return {
-      props: { workflow, namespace },
-      stuff: { workflow },
+      props: { schedule, namespace },
+      stuff: { schedule },
     };
   };
 </script>
@@ -45,8 +45,9 @@
   import ScheduleError from '$lib/components/schedule/schedule-error.svelte';
 
   export let namespace: string;
-  export let workflow: WorkflowExecution;
+  export let schedule;
 
+  console.log('SCHEDULE: ', schedule);
   $: error = 'Error message with helpful resolution';
 </script>
 
@@ -61,7 +62,7 @@
     </a>
     <div class="flex justify-between items-center">
       <h1 class="text-2xl flex relative items-center gap-4">
-        <span class="font-medium select-all">SchedulemeID4</span>
+        <span class="font-medium select-all">{schedule}</span>
         <WorkflowStatus status="Running" />
       </h1>
     </div>

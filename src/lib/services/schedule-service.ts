@@ -52,7 +52,5 @@ export async function fetchSchedule(
   parameters: GetWorkflowExecutionRequest,
   request = fetch,
 ): Promise<WorkflowExecution> {
-  return requestFromAPI(routeForApi('schedule', parameters), { request }).then(
-    toWorkflowExecution,
-  );
+  return requestFromAPI(routeForApi('schedule', parameters), { request });
 }
