@@ -42,7 +42,6 @@
   export let scheduleId: string;
   export let schedule: DescribeScheduleResponse;
 
-  console.log('SCHEDULE: ', schedule);
   $: error = schedule.info.invalidScheduleError;
 </script>
 
@@ -94,7 +93,7 @@
     <div class="w-full xl:w-3/4">
       <ScheduleRecentRuns
         {namespace}
-        recentRuns={schedule?.info?.recentActions?.reverse()}
+        recentRuns={schedule?.info?.recentActions}
       />
     </div>
     <div class="w-full xl:w-1/4">

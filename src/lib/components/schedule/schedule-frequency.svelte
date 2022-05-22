@@ -27,10 +27,17 @@
     {#if !calendar}
       <p>Every {getInterval(interval.interval)} minutes</p>
     {:else}
-      <p>
-        Year: {year}, Month: {month}, Day Of Month: {dayOfMonth}, Day Of Week: {dayOfWeek},
-        Hour: {hour}, Minute: {minute}, Second: {second}
-      </p>
+      <div class="flex flex-row gap-4">
+        <p>Year: {year}</p>
+        <p>Month: {month}</p>
+        {#if calendar?.dayOfMonth}
+          <p>Day Of Month: {dayOfMonth}</p>
+        {/if}
+        <p>Hour: {hour}</p>
+        <p>Day of Week: {dayOfWeek}</p>
+        <p>Minute: {minute}</p>
+        <p>Second: {second}</p>
+      </div>
     {/if}
   </div>
 </Panel>

@@ -8,7 +8,6 @@ import type { StartStopNotifier } from 'svelte/store';
 
 type ScheduleStoreParameters = {
   namespace: string;
-  query: string;
 };
 
 type EventualWorkflows = Eventual<CombinedWorkflowExecutionsResponse>;
@@ -16,26 +15,19 @@ type EventualWorkflows = Eventual<CombinedWorkflowExecutionsResponse>;
 const updateWorkflows: StartStopNotifier<EventualWorkflows> = (set) => {
   const previous: ScheduleStoreParameters = {
     namespace: null,
-    query: null,
   };
 
   return page.subscribe(($page) => {
     const namespace = $page.params.namespace;
-    const query = $page.url.searchParams.get('query');
 
-    if (namespace !== previous.namespace || query !== previous.query) {
-      fetchAllSchedules(namespace, { query }).then(set);
+    if (namespace !== previous.namespace) {
+      fetchAllSchedules(namespace).then(set);
       previous.namespace = namespace;
-      previous.query = query;
     }
   });
 };
 
 export const getSchedules = ({
   namespace,
-  query,
 }: ScheduleStoreParameters): Writable<EventualWorkflows> =>
-  writable<EventualWorkflows>(
-    fetchAllSchedules(namespace, { query }),
-    updateWorkflows,
-  );
+  writable<EventualWorkflows>(fetchAllSchedules(namespace), updateWorkflows);

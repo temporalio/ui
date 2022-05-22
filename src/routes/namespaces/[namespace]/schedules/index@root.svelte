@@ -13,7 +13,7 @@
 <script lang="ts">
   import { timeFormat } from '$lib/stores/time-format';
   import { formatDate } from '$lib/utilities/format-date';
-  import { getSchedules } from '$lib/stores/schedules';
+  import { fetchAllSchedules } from '$lib/services/schedule-service';
   import { routeForSchedule } from '$lib/utilities/route-for';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import { fetchSchedule } from '$lib/services/schedule-service';
@@ -25,16 +25,18 @@
   import Badge from '$lib/components/badge.svelte';
   import Loading from '$lib/components/loading.svelte';
   import Table from '$lib/components/table/index.svelte';
-  import TableRow from '$lib/components/table/row.svelte';
+  import ScheduleRow from '$lib/components/schedule/schedule-row.svelte';
   import Search from '$lib/components/search.svelte';
 
   import { columns } from './_schedule-table-columns';
-  import { noop } from 'svelte/internal';
-  import { stringify } from 'postcss';
+  import { noop, onMount } from 'svelte/internal';
 
   export let namespace: string;
 
-  let schedules = getSchedules({ namespace });
+  let schedules = new Promise(() => []);
+  onMount(() => {
+    schedules = fetchAllSchedules(namespace);
+  });
 
   let search = '';
   const errorMessage =
@@ -51,52 +53,14 @@
 <div class="w-1/2">
   <Search icon placeholder="Search" value={search} on:submit={noop} />
 </div>
-{#await $schedules}
+{#await schedules}
   <Loading />
 {:then { schedules }}
   {#if schedules.length}
     <Pagination items={schedules} let:visibleItems>
       <Table {columns}>
-        {#each visibleItems as event}
-          <a sveltekit:prefetch href={getRoute(event)} class="row">
-            {#await fetchSchedule({ namespace, scheduleId: decodeURIForSvelte(event.scheduleId) }, fetch)}
-              <div class="cell" />
-              <div class="cell" />
-              <div class="cell" />
-              <div class="cell hidden xl:table-cell" />
-              <div class="cell hidden xl:table-cell" />
-            {:then schedule}
-              <div class="cell">
-                <WorkflowStatus />
-              </div>
-              <div class="cell truncate">
-                {event.scheduleId}
-                <p>
-                  <small class="text-gray-700"
-                    >{JSON.stringify(
-                      schedule?.schedule?.spec?.calendar?.[0] ??
-                        schedule?.schedule?.spec?.interval?.[0],
-                    )}</small
-                  >
-                </p>
-              </div>
-              <div class="cell">
-                {schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
-              </div>
-              <div class="cell hidden xl:table-cell">
-                {#each schedule?.info?.recentActions
-                  ?.reverse()
-                  .slice(0, 5) ?? [] as run}
-                  <div>{formatDate(run.actualTime, $timeFormat)}</div>
-                {/each}
-              </div>
-              <div class="cell hidden xl:table-cell">
-                {#each schedule?.info?.futureActionTimes?.slice(0, 5) ?? [] as run}
-                  <div>{formatDate(run, $timeFormat, 'from now')}</div>
-                {/each}
-              </div>
-            {/await}
-          </a>
+        {#each visibleItems as item}
+          <ScheduleRow {item} {namespace} />
         {/each}
       </Table>
     </Pagination>

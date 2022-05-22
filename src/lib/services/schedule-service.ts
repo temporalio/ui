@@ -18,7 +18,6 @@ export type FetchWorkflow = typeof fetchAllSchedules;
 
 export const fetchAllSchedules = async (
   namespace: string,
-  parameters: ValidWorkflowParameters,
   request = fetch,
 ): Promise<CombinedWorkflowExecutionsResponse> => {
   let onError: ErrorCallback;
