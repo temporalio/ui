@@ -1,0 +1,7 @@
+schema: 'http://localhost:4000'
+documents:
+  - 'src/**/*.svelte'
+  - '!src/gql/**/*'
+generates:
+  ./src/gql/:
+    preset: gql-tag-operations-preset

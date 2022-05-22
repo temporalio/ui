@@ -28,6 +28,12 @@ const config = {
           $types: path.resolve('./src/types'),
         },
       },
+      optimizeDeps: {
+        exclude: ['@apollo/client', 'svelte-apollo'],
+      },
+      ssr: {
+        noExternal: ['@apollo/client', 'svelte-apollo'],
+      },
     },
   },
 };
