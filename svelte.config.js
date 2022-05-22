@@ -28,6 +28,7 @@ const config = {
           $types: path.resolve('./src/types'),
         },
       },
+      // https://github.com/timhall/svelte-apollo/issues/97#issuecomment-1133959484
       optimizeDeps: {
         exclude: ['@apollo/client', 'svelte-apollo'],
       },
