@@ -12,6 +12,7 @@
     ContinuedAsNew: 'Continued as New',
     Canceled: 'Canceled',
     Terminated: 'Terminated',
+    Paused: 'Paused',
   };
 
   const colors = {
@@ -22,6 +23,7 @@
     ContinuedAsNew: 'indigo',
     Canceled: 'yellow',
     Terminated: 'pink',
+    Paused: 'yellow',
   };
 
   $: color = colors[status];

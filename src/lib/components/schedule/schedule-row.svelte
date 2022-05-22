@@ -48,7 +48,9 @@
 {:then schedule}
   <a sveltekit:prefetch href={getRoute(item)} class="row">
     <div class="cell">
-      <WorkflowStatus />
+      <WorkflowStatus
+        status={schedule?.schedule?.state?.paused ? 'Paused' : 'Running'}
+      />
     </div>
     <div class="cell truncate">
       {item.scheduleId}

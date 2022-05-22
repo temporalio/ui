@@ -5,6 +5,7 @@
   import { timeFormat } from '$lib/stores/time-format';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
+  import EmptyState from '../empty-state.svelte';
 
   export let recentRuns = [];
   export let namespace: string;
@@ -25,6 +26,9 @@
       </div>
     {/await}
   {/each}
+  {#if !recentRuns.length}
+    <EmptyState title={'No Recent Runs'} />
+  {/if}
 </Panel>
 
 <style lang="postcss">

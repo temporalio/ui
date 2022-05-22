@@ -46,3 +46,50 @@ export async function fetchSchedule(
 ): Promise<WorkflowExecution> {
   return requestFromAPI(routeForApi('schedule', parameters), { request });
 }
+
+type PauseScheduleOptions = {
+  namespace: string;
+  scheduleId: string;
+  pause: string;
+};
+
+export async function pauseSchedule({
+  namespace,
+  scheduleId,
+  pause,
+}: PauseScheduleOptions): Promise<null> {
+  return await requestFromAPI<null>(
+    routeForApi('schedule', {
+      namespace,
+      scheduleId: scheduleId,
+    }),
+    {
+      options: { method: 'POST', body: JSON.stringify({ pause }) },
+      shouldRetry: false,
+    },
+  );
+}
+
+type UnpauseScheduleOptions = {
+  namespace: string;
+  scheduleId: string;
+  unpause: string;
+};
+
+export async function unpauseSchedule({
+  namespace,
+  scheduleId,
+  unpause,
+}: UnpauseScheduleOptions): Promise<null> {
+  return await requestFromAPI<null>(
+    routeForApi('schedule', {
+      namespace,
+      scheduleId: scheduleId,
+    }),
+    {
+      options: { method: 'POST', body: JSON.stringify({ unpause }) },
+      shouldRetry: false,
+    },
+  );
+}
+

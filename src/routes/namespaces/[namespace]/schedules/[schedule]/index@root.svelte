@@ -1,7 +1,7 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
 
-  import { fetchSchedule } from '$lib/services/schedule-service';
+  import { fetchSchedule, pauseSchedule } from '$lib/services/schedule-service';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
@@ -37,6 +37,7 @@
   import ScheduleAdvancedSettings from '$lib/components/schedule/schedule-advanced-settings.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import ScheduleError from '$lib/components/schedule/schedule-error.svelte';
+  import Button from '$lib/components/button.svelte';
 
   export let namespace: string;
   export let scheduleId: string;
@@ -45,7 +46,7 @@
   $: error = schedule.info.invalidScheduleError;
 </script>
 
-<header class="flex flex-col gap-4 mb-8">
+<header class="flex flex-row justify-between gap-4 mb-8">
   <main class="flex flex-col gap-1 relative">
     <a
       href={routeForSchedules({ namespace })}
@@ -57,7 +58,9 @@
     <div class="flex justify-between items-center">
       <h1 class="text-2xl flex relative items-center gap-4">
         <span class="font-medium select-all">{scheduleId}</span>
-        <WorkflowStatus status="Running" />
+        <WorkflowStatus
+          status={schedule.schedule.state.paused ? 'Paused' : 'Running'}
+        />
       </h1>
     </div>
     <div class="flex items-center text-sm">
@@ -76,6 +79,14 @@
       {/if}
     </div>
   </main>
+  <Button
+    class="h-12"
+    on:click={pauseSchedule({
+      namespace,
+      scheduleId,
+      pause: 'Pausing this schedule',
+    })}>Pause</Button
+  >
 </header>
 <div class="flex flex-col gap-4 pb-24">
   {#if error}
