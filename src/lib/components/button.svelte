@@ -68,15 +68,15 @@
   }
 
   .primary {
-    @apply text-white bg-primary border-2 rounded-lg py-2 px-4 transition-colors;
+    @apply text-white bg-primary border-2 border-gray-900 rounded-lg py-2 px-4 transition-colors;
   }
 
   .primary:disabled {
-    @apply text-purple-400 border-purple-400 cursor-not-allowed bg-gray-400;
+    @apply text-gray-300 border-gray-300 cursor-not-allowed bg-gray-400;
   }
 
   .primary:hover:enabled {
-    @apply bg-blue-700;
+    @apply bg-blue-700 border-blue-700;
   }
 
   .secondary {
@@ -88,7 +88,7 @@
   }
 
   .secondary:hover:enabled {
-    @apply text-white bg-gray-900;
+    @apply text-white bg-gray-400 border-gray-400;
   }
 
   .destroy {

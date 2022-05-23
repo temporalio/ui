@@ -11,13 +11,13 @@
 </script>
 
 <script lang="ts">
-  import { timeFormat } from '$lib/stores/time-format';
-  import { formatDate } from '$lib/utilities/format-date';
-  import { fetchAllSchedules } from '$lib/services/schedule-service';
-  import { routeForSchedule } from '$lib/utilities/route-for';
-  import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import { fetchSchedule } from '$lib/services/schedule-service';
-  import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
+  import { v4 as uuidv4 } from 'uuid';
+
+  import { scheduleForm } from '$lib/stores/schedules';
+  import {
+    createSchedule,
+    fetchAllSchedules,
+  } from '$lib/services/schedule-service';
 
   import EmptyState from '$lib/components/empty-state.svelte';
   import Pagination from '$lib/components/pagination.svelte';
@@ -30,6 +30,8 @@
 
   import { columns } from './_schedule-table-columns';
   import { noop, onMount } from 'svelte/internal';
+  import Modal from '$lib/components/modal.svelte';
+  import ScheduleForm from '$lib/components/schedule/schedule-form.svelte';
 
   export let namespace: string;
 
@@ -39,6 +41,7 @@
   });
 
   let search = '';
+  let showCreateConfirmation = false;
 
   $: filteredSchedules = (schedules) =>
     search
@@ -47,16 +50,43 @@
 
   const errorMessage =
     'Create scheduled actions using our Public API or TCTL (CLI).';
+
+  const handleClick = async () => {
+    const body = $scheduleForm;
+    if (
+      body.schedule.spec.interval.interval &&
+      body.schedule.spec.interval.phase
+    ) {
+      body.schedule.spec.interval = [$scheduleForm.schedule.spec.interval];
+      body.schedule.spec.calendar = [];
+    } else {
+      body.schedule.spec.interval = [];
+      body.schedule.spec.calendar = [$scheduleForm.schedule.spec.calendar];
+    }
+    await createSchedule({
+      namespace,
+      request_id: uuidv4(),
+      body,
+    });
+    showCreateConfirmation = false;
+    schedules = fetchAllSchedules(namespace);
+  };
 </script>
 
-<h2 class="text-2xl">Schedules <Badge type="beta">Beta</Badge></h2>
-<Search
-  icon
-  placeholder="Search"
-  value={search}
-  on:input={(e) => (search = e.target.value)}
-  on:submit={noop}
-/>
+<div class="flex flex-row justify-between">
+  <h2 class="text-2xl">Schedules <Badge type="beta">Beta</Badge></h2>
+  <Button on:click={() => (showCreateConfirmation = true)}>Create</Button>
+</div>
+<div class="w-full xl:w-1/2 xl:absolute xl:left-12 xl:top-36 z-20">
+  <Search
+    icon
+    placeholder="Search"
+    value={search}
+    noButton
+    on:input={(e) => (search = e.target.value)}
+    on:submit={noop}
+  />
+</div>
 {#await schedules}
   <Loading />
 {:then { schedules }}
@@ -74,6 +104,19 @@
       <Button primary as="anchor">Get Started With Docs</Button>
     </div>
   {/if}
+  <Modal
+    open={showCreateConfirmation}
+    confirmText="Create"
+    confirmType="primary"
+    large
+    on:cancelModal={() => (showCreateConfirmation = false)}
+    on:confirmModal={() => handleClick()}
+  >
+    <h3 slot="title">Create Schedule</h3>
+    <div slot="content">
+      <ScheduleForm {namespace} />
+    </div>
+  </Modal>
 {/await}
 
 <style lang="postcss">

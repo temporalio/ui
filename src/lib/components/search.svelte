@@ -8,12 +8,15 @@
   export let label = 'Search';
   export let name = 'query';
   export let icon = false;
+  export let noButton = false;
   export let id = `${label.toLocaleUpperCase()}-input`;
 </script>
 
 <form
   on:submit|preventDefault
-  class="flex items-center relative rounded-lg border-2 focus-within:border-blue-700 transition-colors"
+  class="flex items-center relative rounded-full border-2 focus-within:border-blue-700 transition-colors {noButton
+    ? 'h-12'
+    : ''}"
 >
   {#if icon}
     <Icon
@@ -27,13 +30,15 @@
   <input
     {id}
     type="text"
-    class="w-full px-4 focus:outline-none rounded-l-lg"
+    class="w-full px-4 focus:outline-none rounded-l-full rounded-r-full"
     {name}
     {value}
     {placeholder}
     on:input
   />
-  <div>
-    <Button class="m-2">{label}</Button>
-  </div>
+  {#if !noButton}
+    <div>
+      <Button class="m-2">{label}</Button>
+    </div>
+  {/if}
 </form>

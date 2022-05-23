@@ -41,6 +41,7 @@
   <Modal
     open={showConfirmation}
     confirmText="Terminate"
+    confirmType="destroy"
     on:cancelModal={cancel}
     on:confirmModal={terminate}
   >

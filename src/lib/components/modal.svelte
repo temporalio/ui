@@ -7,7 +7,9 @@
   export let open: boolean = false;
   export let hideConfirm: boolean = false;
   export let confirmText: string = 'Confirm';
+  export let confirmType: 'destroy' | 'primary';
   export let confirmDisabled: boolean = false;
+  export let large: boolean = false;
 
   const dispatch = createEventDispatcher();
 </script>
@@ -15,7 +17,7 @@
 {#if open}
   <div class="modal">
     <div class="overlay" />
-    <div class="body">
+    <div class="body" class:large>
       <div
         class="float-right cursor-pointer p-6"
         on:click={() => dispatch('cancelModal', {})}
@@ -38,7 +40,8 @@
         >
         {#if !hideConfirm}
           <Button
-            destroy
+            destroy={confirmType === 'destroy'}
+            primary={confirmType === 'primary'}
             disabled={confirmDisabled}
             on:click={() => dispatch('confirmModal', {})}>{confirmText}</Button
           >
@@ -59,6 +62,10 @@
 
   .body {
     @apply bg-white w-full md:h-max lg:w-1/3  mx-auto rounded-lg shadow-xl z-50 overflow-y-auto;
+  }
+
+  .large {
+    @apply lg:w-1/2;
   }
 
   .title {

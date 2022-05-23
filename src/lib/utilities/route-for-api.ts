@@ -68,6 +68,7 @@ export function routeForApi(
     query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/query`,
     schedules: `/namespaces/${parameters?.namespace}/schedules`,
     schedule: `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}`,
+    'schedule.delete': `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}`,
   };
 
   return withBase(routes[route]);

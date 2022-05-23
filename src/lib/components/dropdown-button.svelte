@@ -50,7 +50,7 @@
     <span class="pl-2 pr-8">{value}</span>
     <span class="absolute right-8 top-0 h-12 w-0 border-l-2 border-white" />
     <div
-      class="absolute right-0 top-0 h-12 w-8 py-4 px-2"
+      class="absolute right-0 top-0 h-10 w-8 py-3 px-2"
       on:click|stopPropagation={() => (show = !show)}
     >
       <Icon icon={faCaretDown} scale={1} />
@@ -64,7 +64,7 @@
     >
       <div class="flex flex-col gap-2 block">
         {#each options as option}
-          <div class="option">{option.label}</div>
+          <div class="option" on:click={option.onClick}>{option.label}</div>
         {/each}
         <slot />
       </div>
@@ -74,11 +74,11 @@
 
 <style lang="postcss">
   .primary {
-    @apply h-12 text-white text-lg bg-primary border-2 border-gray-900 rounded-lg py-2 px-4 transition-colors;
+    @apply h-10 text-white text-base bg-primary border-2 border-gray-900 rounded-lg py-2 px-4 transition-colors;
   }
 
   .dropdown-menu {
-    @apply absolute  w-44 py-4 pl-8 pr-4 mt-1 bg-white origin-top-right absolute right-0
+    @apply absolute w-44 py-4 pl-8 pr-4 mt-1 bg-white origin-top-right absolute right-0
         rounded-lg shadow-xl z-50 border-2 border-gray-100;
   }
   .option {

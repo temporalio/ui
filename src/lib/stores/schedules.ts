@@ -31,3 +31,31 @@ export const getSchedules = ({
   namespace,
 }: ScheduleStoreParameters): Writable<EventualWorkflows> =>
   writable<EventualWorkflows>(fetchAllSchedules(namespace), updateWorkflows);
+
+export const scheduleForm = writable({
+  schedule_id: 'TestSchedule',
+  schedule: {
+    spec: {
+      calendar: {
+        year: '',
+        month: '',
+        dayOfMonth: '',
+        dayOfWeek: '',
+        hour: '',
+        minute: '',
+        second: '',
+      },
+      interval: {
+        interval: '',
+        phase: '',
+      },
+    },
+    action: {
+      startWorkflow: {
+        workflowId: 'TestWf',
+        workflowType: { name: 'test' },
+        taskQueue: { name: 'test-queue' },
+      },
+    },
+  },
+});
