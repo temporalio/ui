@@ -40,7 +40,6 @@
 
   let search = '';
 
-  console.log('SEARCH: ', search);
   $: filteredSchedules = (schedules) =>
     search
       ? schedules.filter((schedule) => schedule.scheduleId.includes(search))

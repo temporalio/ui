@@ -50,19 +50,18 @@ export async function fetchSchedule(
 type PauseScheduleOptions = {
   namespace: string;
   scheduleId: string;
-  pause: string;
+  reason: string;
 };
 
 export async function pauseSchedule({
   namespace,
   scheduleId,
-  pause,
+  reason,
 }: PauseScheduleOptions): Promise<null> {
   const options = {
-    pause,
-    overlayPolicy: 'allowall',
-    startTime: '2022-05-09T11:00:00Z',
-    endTime: '2022-05-09T11:15:00Z',
+    patch: {
+      pause: reason,
+    }
   };
 
   return await requestFromAPI<null>(
@@ -75,11 +74,11 @@ export async function pauseSchedule({
       options: {
         method: 'POST',
         body: JSON.stringify({
-          pause,
+          ...options,
         }),
       },
       shouldRetry: false,
-      onError: (error) => {},
+      onError: (error) => { },
     },
   );
 }
@@ -87,21 +86,27 @@ export async function pauseSchedule({
 type UnpauseScheduleOptions = {
   namespace: string;
   scheduleId: string;
-  unpause: string;
+  reason: string;
 };
 
 export async function unpauseSchedule({
   namespace,
   scheduleId,
-  unpause,
+  reason,
 }: UnpauseScheduleOptions): Promise<null> {
+  const options = {
+    patch: {
+      unpause: reason,
+    }
+  };
+
   return await requestFromAPI<null>(
     routeForApi('schedule', {
       namespace,
       scheduleId: scheduleId,
     }),
     {
-      options: { method: 'POST', body: JSON.stringify({ unpause }) },
+      options: { method: 'POST', body: JSON.stringify({ ...options }) },
       shouldRetry: false,
     },
   );
