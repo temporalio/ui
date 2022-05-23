@@ -20,6 +20,8 @@
       }),
       {
         replaceState: true,
+        noscroll: true,
+        keepfocus: true,
       },
     );
   });

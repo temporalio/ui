@@ -13,10 +13,12 @@
 <script lang="ts">
   import { timeFormat } from '$lib/stores/time-format';
   import { formatDate } from '$lib/utilities/format-date';
-  import { routeForSchedule } from '$lib/utilities/route-for';
+  import { routeForSchedule, routeForWorkflow } from '$lib/utilities/route-for';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import { fetchSchedule } from '$lib/services/schedule-service';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
+  import Link from '$lib/components/link.svelte';
+
   import { onMount } from 'svelte';
   import ScheduleFrequency from './schedule-frequency.svelte';
 
@@ -67,9 +69,17 @@
     <div class="cell">
       {schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
     </div>
-    <div class="cell hidden xl:table-cell">
+    <div class="cell hidden xl:table-cell links">
       {#each schedule?.info?.recentActions?.reverse().slice(0, 5) ?? [] as run}
-        <div>{formatDate(run.actualTime, $timeFormat)}</div>
+        <p>
+          <Link
+            href={routeForWorkflow({
+              namespace,
+              workflow: run.startWorkflowResult.workflowId,
+              run: run.startWorkflowResult.runId,
+            })}>{formatDate(run.actualTime, $timeFormat)}</Link
+          >
+        </p>
       {/each}
     </div>
     <div class="cell hidden xl:table-cell">
