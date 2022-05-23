@@ -88,6 +88,7 @@
         });
     scheduleFetch = fetchSchedule(parameters, fetch);
     showPauseConfirmation = false;
+    reason = '';
   };
 
   const handleEdit = async () => {

@@ -74,6 +74,17 @@
       label = `Every ${getSuffix(parseInt(dayOfMonth))} of the month`;
     } else if (!calendar?.year && calendar?.month) {
       label = `Every ${getProperMonthName[month]}`;
+      if (calendar?.dayOfWeek) {
+        label += ` on every ${getProperDayNames(dayOfWeek)}`;
+      }
+    } else if (calendar?.year) {
+      label = `For ${calendar?.year},`;
+      if (calendar?.month) {
+        label += ` on ${getProperMonthName[month]}`;
+      }
+      if (calendar?.dayOfWeek) {
+        label += ` on every ${getProperDayNames(dayOfWeek)}`;
+      }
     }
 
     if (calendar?.hour) {
