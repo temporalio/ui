@@ -58,14 +58,28 @@ export async function pauseSchedule({
   scheduleId,
   pause,
 }: PauseScheduleOptions): Promise<null> {
+  const options = {
+    pause,
+    overlayPolicy: 'allowall',
+    startTime: '2022-05-09T11:00:00Z',
+    endTime: '2022-05-09T11:15:00Z',
+  };
+
   return await requestFromAPI<null>(
     routeForApi('schedule', {
       namespace,
       scheduleId: scheduleId,
     }),
     {
-      options: { method: 'POST', body: JSON.stringify({ pause }) },
+      // options: { method: 'POST', body: JSON.stringify({ ...options }) },
+      options: {
+        method: 'POST',
+        body: JSON.stringify({
+          pause,
+        }),
+      },
       shouldRetry: false,
+      onError: (error) => {},
     },
   );
 }
@@ -92,4 +106,3 @@ export async function unpauseSchedule({
     },
   );
 }
-

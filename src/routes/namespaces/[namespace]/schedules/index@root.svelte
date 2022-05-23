@@ -39,25 +39,30 @@
   });
 
   let search = '';
+
+  console.log('SEARCH: ', search);
+  $: filteredSchedules = (schedules) =>
+    search
+      ? schedules.filter((schedule) => schedule.scheduleId.includes(search))
+      : schedules;
+
   const errorMessage =
     'Create scheduled actions using our Public API or TCTL (CLI).';
-
-  const getRoute = (item: WorkflowExecution) =>
-    routeForSchedule({
-      namespace,
-      scheduleId: item.scheduleId,
-    });
 </script>
 
 <h2 class="text-2xl">Schedules <Badge type="beta">Beta</Badge></h2>
-<div class="w-1/2">
-  <Search icon placeholder="Search" value={search} on:submit={noop} />
-</div>
+<Search
+  icon
+  placeholder="Search"
+  value={search}
+  on:input={(e) => (search = e.target.value)}
+  on:submit={noop}
+/>
 {#await schedules}
   <Loading />
 {:then { schedules }}
   {#if schedules.length}
-    <Pagination items={schedules} let:visibleItems>
+    <Pagination items={filteredSchedules(schedules)} let:visibleItems>
       <Table {columns}>
         {#each visibleItems as item}
           <ScheduleRow {item} {namespace} />

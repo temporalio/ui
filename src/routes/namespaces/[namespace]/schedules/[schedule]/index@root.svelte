@@ -30,7 +30,6 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { timeFormat } from '$lib/stores/time-format';
 
-  import ScheduleFrequency from '$lib/components/schedule/schedule-frequency.svelte';
   import ScheduleMemo from '$lib/components/schedule/schedule-memo.svelte';
   import ScheduleRecentRuns from '$lib/components/schedule/schedule-recent-runs.svelte';
   import ScheduleUpcomingRuns from '$lib/components/schedule/schedule-upcoming-runs.svelte';
@@ -38,6 +37,7 @@
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import ScheduleError from '$lib/components/schedule/schedule-error.svelte';
   import Button from '$lib/components/button.svelte';
+  import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
 
   export let namespace: string;
   export let scheduleId: string;
@@ -95,7 +95,7 @@
     </div>
   {/if}
   <div class="w-full xl:w-1/2">
-    <ScheduleFrequency
+    <ScheduleFrequencyPanel
       calendar={schedule?.schedule?.spec?.calendar?.[0]}
       interval={schedule?.schedule?.spec?.interval?.[0]}
     />

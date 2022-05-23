@@ -8,7 +8,7 @@
 
 <Panel>
   <h2 class="text-2xl mb-4">Upcoming Runs</h2>
-  {#each futureRuns as run}
+  {#each futureRuns.slice(0, 5) as run}
     <div class="row">
       <p>{formatDate(run, $timeFormat, 'from now')}</p>
     </div>

@@ -18,6 +18,7 @@
   import { fetchSchedule } from '$lib/services/schedule-service';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { onMount } from 'svelte';
+  import ScheduleFrequency from './schedule-frequency.svelte';
 
   export let namespace: string;
   export let item;
@@ -56,10 +57,10 @@
       {item.scheduleId}
       <p>
         <small class="text-gray-900"
-          >{JSON.stringify(
-            schedule?.schedule?.spec?.calendar?.[0] ??
-              schedule?.schedule?.spec?.interval?.[0],
-          )}</small
+          ><ScheduleFrequency
+            calendar={schedule?.schedule?.spec?.calendar?.[0]}
+            interval={schedule?.schedule?.spec?.interval?.[0]}
+          /></small
         >
       </p>
     </div>

@@ -1,6 +1,4 @@
 <script lang="ts">
-  import Panel from '$lib/components/panel.svelte';
-
   export let calendar;
   export let interval;
 
@@ -19,25 +17,70 @@
     }
     return interval;
   };
+
+  const getSuffix = (day: number): string => {
+    const j = day % 10;
+    const k = day % 100;
+    if (j == 1 && k != 11) return `${day}st`;
+    if (j == 2 && k != 12) return `${day}nd`;
+    if (j == 3 && k != 13) return `${day}rd`;
+    return `${day}th`;
+  };
+
+  const getProperDayNames = (days: string): string => {
+    const daysList = days.split(',');
+    return daysList
+      .map((day) => day.charAt(0).toUpperCase() + day.slice(1))
+      .join(', ');
+  };
+
+  const humanReadableCalendar = (calendar) => {
+    let label = '';
+    if (
+      !calendar?.year &&
+      !calendar?.month &&
+      !calendar?.dayOfMonth &&
+      !calendar?.dayOfWeek
+    ) {
+      label = `Every day`;
+    } else if (
+      !calendar?.year &&
+      !calendar?.month &&
+      !calendar?.dayOfMonth &&
+      calendar?.dayOfWeek
+    ) {
+      label = `Every ${getProperDayNames(dayOfWeek)}`;
+    } else if (
+      !calendar?.year &&
+      !calendar?.month &&
+      calendar?.dayOfMonth &&
+      !calendar?.dayOfWeek
+    ) {
+      label = `Every ${getSuffix(parseInt(dayOfMonth))} of the month`;
+    } else if (!calendar?.year && calendar?.month) {
+      label = `Every ${month}`;
+    }
+
+    if (calendar?.hour) {
+      label += ` on the ${getSuffix(parseInt(calendar.hour))} hour`;
+    }
+
+    if (calendar?.minute) {
+      label += ` at the ${getSuffix(parseInt(calendar.minute))} minute`;
+    }
+
+    if (calendar?.second) {
+      label += ` on the ${getSuffix(parseInt(calendar.second))} second`;
+    }
+
+    return label;
+  };
 </script>
 
-<Panel>
-  <h2 class="text-2xl mb-4">Frequency</h2>
-  <div class="pr-2">
-    {#if !calendar}
-      <p>Every {getInterval(interval.interval)} minutes</p>
-    {:else}
-      <div class="flex flex-row gap-4">
-        <p>Year: {year}</p>
-        <p>Month: {month}</p>
-        {#if calendar?.dayOfMonth}
-          <p>Day Of Month: {dayOfMonth}</p>
-        {/if}
-        <p>Hour: {hour}</p>
-        <p>Day of Week: {dayOfWeek}</p>
-        <p>Minute: {minute}</p>
-        <p>Second: {second}</p>
-      </div>
-    {/if}
+{#if !calendar}
+  <p>Every {getInterval(interval.interval)} minutes</p>
+{:else}
+  <div class="flex flex-row gap-4">
+    {humanReadableCalendar(calendar)}
   </div>
-</Panel>
+{/if}
