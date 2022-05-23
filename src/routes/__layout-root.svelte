@@ -58,6 +58,10 @@
   import Notifications from '$lib/components/notifications.svelte';
   import Banners from '$lib/components/banner/banners.svelte';
   import { ErrorBoundary } from '$lib/components/error-boundary';
+  import { setClient } from 'svelte-apollo';
+  import { client } from '$lib/services/graphql-client';
+
+  setClient(client);
 
   export let user: User;
   export let uiVersionInfo: UiVersionInfo;

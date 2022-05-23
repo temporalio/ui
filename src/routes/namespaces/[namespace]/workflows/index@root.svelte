@@ -21,7 +21,7 @@
 
 <script lang="ts">
   import { timeFormat } from '$lib/stores/time-format';
-  import { workflows, loading, updating } from '$lib/stores/workflows';
+  // import { workflows, loading, updating } from '$lib/stores/workflows';
 
   import EmptyState from '$lib/components/empty-state.svelte';
   import Pagination from '$lib/components/pagination.svelte';
@@ -31,11 +31,55 @@
   import WorkflowFilters from './_workflow-filters.svelte';
   import WorkflowsLoading from './_workflows-loading.svelte';
   import { page } from '$app/stores';
+  import { query } from 'svelte-apollo';
+  import { gql } from '../../../../gql';
+  import type {
+    WorkflowsQuery,
+    WorkflowsQueryVariables,
+  } from '../../../../gql/graphql';
+
+  const WORKFLOWS_QUERY = gql(/* GraphQL */ `
+    query Workflows($input: WorkflowsInput) {
+      workflows(input: $input) {
+        nodes {
+          id
+          runId
+          type
+          status
+          isRunning
+          taskQueue
+          historyLength
+          startTime
+          executionTime
+          closeTime
+          parent {
+            id
+            runId
+          }
+          parentNamespace
+          memo
+          searchAttributes
+          stateTransitionCount
+        }
+        nextPageToken
+      }
+    }
+  `);
+
+  const workflows = query<WorkflowsQuery, WorkflowsQueryVariables>(
+    WORKFLOWS_QUERY,
+    {
+      // show data that's in cache and also send query to server to get fresh results
+      fetchPolicy: 'cache-and-network',
+      // after the initial query, poll every 2 seconds to get fresh results
+      pollInterval: 2000,
+    },
+  );
 
   export let namespace: string;
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
-  let query = $page.url.searchParams.get('query');
+  // let filter = $page.url.searchParams.get('query');
 
   const errorMessage =
     searchType === 'advanced'
@@ -44,8 +88,28 @@
 </script>
 
 <h2 class="text-2xl">Recent Workflows <Badge type="beta">Beta</Badge></h2>
-<WorkflowFilters bind:searchType bind:query />
-{#if $loading}
+<!-- <WorkflowFilters bind:searchType bind:query /> -->
+
+{#if $workflows.loading}
+  <WorkflowsLoading />
+{:else if $workflows.error}
+  Error: {$workflows.error.message}
+{:else if !$workflows.data.workflows.nodes.length}
+  <EmptyState title={'No Workflows Found'} content={errorMessage} />
+{:else}
+  <div>
+    Results:
+    <ul>
+      {#each $workflows.data.workflows.nodes as workflow}
+        <li>
+          {workflow.id} - {workflow.type} - {workflow.status} - {workflow.startTime}
+        </li>
+      {/each}
+    </ul>
+  </div>
+{/if}
+
+<!-- {#if $loading}
   <WorkflowsLoading />
 {:else if $workflows.length}
   <Pagination items={$workflows} updating={$updating} let:visibleItems>
@@ -61,4 +125,4 @@
   </Pagination>
 {:else}
   <EmptyState title={'No Workflows Found'} content={errorMessage} />
-{/if}
+{/if} -->
