@@ -61,6 +61,7 @@
           ...routeParameters,
         })}
         amount={workflow?.historyEvents}
+        dataCy="history-tab"
       />
       <Tab
         label="Workers"
@@ -72,9 +73,18 @@
         label="Pending Activities"
         href={routeForPendingActivities(routeParameters)}
         amount={workflow.pendingActivities?.length}
+        dataCy="pending-activities-tab"
       />
-      <Tab label="Stack Trace" href={routeForStackTrace(routeParameters)} />
-      <Tab label="Queries" href={routeForWorkflowQuery(routeParameters)} />
+      <Tab
+        label="Stack Trace"
+        href={routeForStackTrace(routeParameters)}
+        dataCy="stack-trace-tab"
+      />
+      <Tab
+        label="Queries"
+        href={routeForWorkflowQuery(routeParameters)}
+        dataCy="queries-tab"
+      />
     </nav>
   </main>
 </header>

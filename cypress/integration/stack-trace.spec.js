@@ -33,13 +33,8 @@ describe('Stack Trace', () => {
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-api');
-    cy.wait('@query-api');
 
-    cy.get('[data-cy="json"]').click();
-
-    cy.get(
-      `[href="/namespaces/default/workflows/${workflowId}/${runId}/stack-trace"]`,
-    ).click();
+    cy.get('[data-cy=stack-trace-tab]').click();
 
     cy.get('[data-cy="query-stack-trace-empty"]').contains(
       'No Stack Traces Found',
@@ -60,13 +55,10 @@ describe('Stack Trace', () => {
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-api');
+
+    cy.get('[data-cy=stack-trace-tab]').click();
+
     cy.wait('@query-api');
-
-    cy.get('[data-cy="json"]').click();
-
-    cy.get(
-      `[href="/namespaces/default/workflows/${workflowId}/${runId}/stack-trace"]`,
-    ).click();
 
     cy.get('[data-cy="query-stack-trace"]').contains('go.temporal.io/sdk');
   });
