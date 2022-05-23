@@ -56,8 +56,7 @@ const createGroupFor = <K extends keyof StartingEvents>(
       return getLastEvent(this)?.attributes;
     },
     get eventList() {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      return Array.from(this.events, ([key, value]) => value);
+      return Array.from(this.events, ([_key, value]) => value);
     },
     get isFailureOrTimedOut() {
       return Boolean(this.eventList.find(eventIsFailureOrTimedOut));
