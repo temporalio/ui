@@ -62,11 +62,11 @@
     }
 
     if (calendar?.hour) {
-      label += ` on the ${getSuffix(parseInt(calendar.hour))} hour`;
+      label += ` at the ${getSuffix(parseInt(calendar.hour))} hour`;
     }
 
     if (calendar?.minute) {
-      label += ` at the ${getSuffix(parseInt(calendar.minute))} minute`;
+      label += ` on the ${getSuffix(parseInt(calendar.minute))} minute`;
     }
 
     if (calendar?.second) {
