@@ -103,10 +103,10 @@
     inline
   />
   <p>
-    For more details please check out <a
+    For more details, please check out <a
       class="text-blue-700 underline"
-      href="https://docs.temporal.io/docs/server/archive-data/"
-      target="_blank">Archival Docs</a
+      href="https://docs.temporal.io/server/archive-data/"
+      target="_blank">Archival documentation</a
     >.
   </p>
 {:else}
@@ -128,10 +128,10 @@
     />
   {/if}
   <p>
-    For more details please check out <a
+    For more details, please check out <a
       class="text-blue-700 underline"
-      href="https://docs.temporal.io/docs/server/archive-data/"
-      target="_blank">Archival Docs</a
+      href="https://docs.temporal.io/server/archive-data/"
+      target="_blank">Archival documentation</a
     >.
   </p>
 {/if}
