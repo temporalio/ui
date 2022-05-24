@@ -43,7 +43,7 @@
       : 'If you have filters applied, try adjusting them.';
 </script>
 
-<h2 class="text-2xl">Recent Workflows <Badge type="beta">Beta</Badge></h2>
+<h2 class="text-2xl">Recent Workflows</h2>
 <WorkflowFilters bind:searchType bind:query />
 {#if $loading}
   <WorkflowsLoading />
