@@ -20,7 +20,7 @@
   $: namespace =
     $page.params.namespace || $page.stuff?.settings?.defaultNamespace;
 
-  let namespaces = ($page.stuff.namespaces || [])
+  const namespaces = ($page.stuff.namespaces || [])
     .map((namespace: Namespace) => namespace?.namespaceInfo?.name)
     .filter(
       (namespace: string) =>
@@ -37,6 +37,9 @@
     archive: routeForArchivalWorkfows({ namespace }),
     settings: routeForSettings({ namespace }),
     workflows: routeForWorkflows({ namespace }),
+    feedback:
+      $page.stuff?.settings?.feedbackURL ||
+      'https://github.com/temporalio/ui/issues/new/choose',
   };
 
   const logout = () => goto(import.meta.env.VITE_API + '/auth/logout');
