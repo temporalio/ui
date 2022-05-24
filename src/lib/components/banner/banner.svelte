@@ -16,7 +16,7 @@
   }
 </script>
 
-{#if true}
+{#if show}
   <section
     class={`block relative leading-10 text-center ${severity}`}
     data-cy={$$props.dataCy}
