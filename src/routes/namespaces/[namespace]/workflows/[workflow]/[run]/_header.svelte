@@ -1,6 +1,5 @@
 <script lang="ts">
-  import Icon from 'svelte-fa';
-  import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
 
   import { eventViewType } from '$lib/stores/event-view';
 
@@ -32,13 +31,11 @@
 
 <header class="flex flex-col gap-4">
   <main class="flex flex-col gap-1 relative">
-    <a
-      href="/namespaces/{namespace}/workflows"
-      class="absolute top-2 back-to-workflows"
-      style="left: -1.5rem"
-    >
-      <Icon icon={faChevronLeft} />
-    </a>
+    <div class="block -mt-3 -ml-2">
+      <a href="/namespaces/{namespace}/workflows" class="back-to-workflows">
+        <Icon name="caretLeft" class="inline" color="black" />Back to Workflows
+      </a>
+    </div>
     <div class="flex justify-between items-center mb-8">
       <h1 class="text-2xl flex relative items-center gap-4">
         <WorkflowStatus status={workflow?.status} />
@@ -88,3 +85,17 @@
     </nav>
   </main>
 </header>
+
+<style lang="postcss">
+  .back-to-workflows {
+    @apply text-sm;
+  }
+
+  .back-to-workflows:hover {
+    @apply text-blue-700 underline;
+  }
+
+  .back-to-workflows:hover :global(svg path) {
+    stroke: #1d4ed8;
+  }
+</style>

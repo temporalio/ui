@@ -4,6 +4,7 @@
 
   import { routeForImport, routeForWorkflows } from '$lib/utilities/route-for';
 
+  const { isCloud } = $page.stuff.settings.runtimeEnvironment;
   $: namespace = $page.stuff?.settings?.defaultNamespace;
 
   $: linkList = {
@@ -12,4 +13,4 @@
   };
 </script>
 
-<Navigation theme="developer" {linkList} />
+<Navigation {linkList} {isCloud} />
