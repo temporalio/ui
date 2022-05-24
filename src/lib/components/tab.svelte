@@ -9,7 +9,7 @@
 </script>
 
 <a
-  class="block text-sm md:text-base border-b-2 whitespace-nowrap"
+  class="block text-sm md:text-base whitespace-nowrap"
   class:active
   {href}
   data-cy={$$props.dataCy}
