@@ -1,3 +1,4 @@
+import { browser } from '$app/env';
 import { namespaceUrlPattern } from './namespace-url-pattern';
 
 const RealBaseUrl = `https://web.${
@@ -9,7 +10,7 @@ if (base.endsWith('/')) base = base.slice(0, -1);
 
 const withBase = (endpoint: string): string => {
   if (endpoint.startsWith('/')) endpoint = endpoint.slice(1);
-  if (window.location.host.match(/thundergun\.io$/)) {
+  if (browser && window.location.host.match(/thundergun\.io$/)) {
     return `${RealBaseUrl}${endpoint}`;
   }
   return `${base}/api/v1/${endpoint}`;
