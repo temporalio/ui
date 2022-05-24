@@ -7,7 +7,7 @@
 </script>
 
 <div
-  class="my-12 flex flex-col justify-start items-center gap-2"
+  class="my-12 flex flex-col justify-start items-center gap-2 {$$props.class}"
   data-cy={$$props.dataCy}
 >
   <span

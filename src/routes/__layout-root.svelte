@@ -13,8 +13,8 @@
   import { isAuthorized } from '$lib/utilities/is-authorized';
   import type { GetClusterInfoResponse } from '$types';
 
-  export const load: Load = async function ({ url, fetch }) {
-    const settings: Settings = await fetchSettings({ url }, fetch);
+  export const load: Load = async function ({ fetch }) {
+    const settings: Settings = await fetchSettings(fetch);
     const user = await fetchUser(fetch);
 
     if (!isAuthorized(settings, user)) {

@@ -7,8 +7,8 @@
   import { fetchUser } from '$lib/services/user-service';
   import { fetchCluster } from '$lib/services/cluster-service';
 
-  export const load: Load = async function ({ url, fetch }) {
-    const settings: Settings = await fetchSettings({ url }, fetch);
+  export const load: Load = async function ({ fetch }) {
+    const settings: Settings = await fetchSettings(fetch);
 
     const user = await fetchUser(fetch);
     const cluster = await fetchCluster(settings, fetch);

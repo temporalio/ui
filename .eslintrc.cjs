@@ -36,4 +36,13 @@ module.exports = {
       extends: ['plugin:cypress/recommended'],
     },
   ],
+  rules: {
+    '@typescript-eslint/no-unused-vars': [
+      1,
+      {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+      },
+    ],
+  },
 };

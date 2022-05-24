@@ -23,7 +23,7 @@
     activePill = event.detail.key;
   };
 
-  const handleGroupClick = (id) => (selectedId = id);
+  const handleGroupClick = (id: string) => (selectedId = id);
 </script>
 
 {#if compact && eventGroup}

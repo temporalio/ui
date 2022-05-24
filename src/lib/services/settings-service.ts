@@ -6,14 +6,7 @@ import type { SettingsResponse } from '$types';
 
 const isCloudMatch = /tmprl\.cloud$/;
 
-interface FetchSettingsInterface {
-  url: URL;
-}
-
-export const fetchSettings = async (
-  { url }: FetchSettingsInterface,
-  request = fetch,
-): Promise<Settings> => {
+export const fetchSettings = async (request = fetch): Promise<Settings> => {
   const settings: SettingsResponse = await requestFromAPI(
     routeForApi('settings'),
     { request },
@@ -45,14 +38,14 @@ export const fetchSettings = async (
           return EnvironmentOverride === 'cloud';
         }
 
-        return isCloudMatch.test(url.hostname);
+        return isCloudMatch.test(browser ? window.location.hostname : '');
       },
       get isLocal() {
         if (EnvironmentOverride) {
           return EnvironmentOverride === 'local';
         }
 
-        return isCloudMatch.test(url.hostname);
+        return isCloudMatch.test(browser ? window.location.hostname : '');
       },
       envOverride: Boolean(EnvironmentOverride),
     },

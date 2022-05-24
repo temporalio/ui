@@ -18,6 +18,7 @@
   import { faRedo } from '@fortawesome/free-solid-svg-icons';
 
   import { getWorkflowStackTrace } from '$lib/services/query-service';
+  import type { ParsedQuery } from '$lib/services/query-service';
 
   import CodeBlock from '$lib/components/code-block.svelte';
   import Button from '$lib/components/button.svelte';
@@ -35,7 +36,10 @@
       namespace,
     });
 
-  let stackTrace = getStackTrace();
+  let stackTrace: Eventual<ParsedQuery>;
+  $: {
+    if (workflow.isRunning) stackTrace = getStackTrace();
+  }
 
   const refreshStackTrace = () => {
     stackTrace = getWorkflowStackTrace({
@@ -50,7 +54,7 @@
 </script>
 
 <section>
-  {#if String(workflow.status) === 'Running'}
+  {#if workflow.isRunning}
     {#await stackTrace}
       <div class="text-center">
         <h2 class="font-bold text-2xl mb-4">Loading…</h2>
