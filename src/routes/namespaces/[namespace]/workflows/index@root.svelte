@@ -20,17 +20,16 @@
 </script>
 
 <script lang="ts">
+  import { page } from '$app/stores';
   import { timeFormat } from '$lib/stores/time-format';
   import { workflows, loading, updating } from '$lib/stores/workflows';
 
   import EmptyState from '$lib/components/empty-state.svelte';
   import Pagination from '$lib/components/pagination.svelte';
-  import Badge from '$lib/components/badge.svelte';
   import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
   import WorkflowFilters from './_workflow-filters.svelte';
   import WorkflowsLoading from './_workflows-loading.svelte';
-  import { page } from '$app/stores';
 
   export let namespace: string;
 
