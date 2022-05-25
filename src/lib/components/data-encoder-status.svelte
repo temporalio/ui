@@ -24,8 +24,8 @@
         data-cy="data-encoder-status-configured"
         on:click={() => (showSettings = true)}
       >
-        <Icon name="arrowDown" color="#bfdbfe" />
-        <Icon name="arrowUp" class="absolute left-2" color="#bfdbfe" />
+        <Icon name="arrowDown" class="-ml-1" color="#bfdbfe" />
+        <Icon name="arrowUp" class="absolute left-1" color="#bfdbfe" />
       </button>
     </Tooltip>
   {:else if $dataEncoder.hasError}
@@ -35,8 +35,8 @@
         data-cy="data-encoder-status-error"
         on:click={() => (showSettings = true)}
       >
-        <Icon name="arrowDown" color="#f87171" />
-        <Icon name="arrowUp" class="absolute left-2" color="#f87171" />
+        <Icon name="arrowDown" class="-ml-1" color="#f87171" />
+        <Icon name="arrowUp" class="absolute left-1" color="#f87171" />
       </button>
     </Tooltip>
   {:else if $dataEncoder.hasSuccess}
@@ -46,8 +46,8 @@
         data-cy="data-encoder-status-success"
         on:click={() => (showSettings = true)}
       >
-        <Icon name="arrowDown" color="#4ade80" />
-        <Icon name="arrowUp" class="absolute left-2" color="#4ade80" />
+        <Icon name="arrowDown" class="-ml-1" color="#4ade80" />
+        <Icon name="arrowUp" class="absolute left-1" color="#4ade80" />
       </button>
     </Tooltip>
   {/if}
@@ -58,8 +58,8 @@
       data-cy="data-encoder-status"
       on:click={() => (showSettings = true)}
     >
-      <Icon name="arrowDown" color="#e4e4e7" />
-      <Icon name="arrowUp" class="absolute left-2" color="#e4e4e7" />
+      <Icon name="arrowDown" class="-ml-1" color="#e4e4e7" />
+      <Icon name="arrowUp" class="absolute left-1" color="#e4e4e7" />
     </button>
   </Tooltip>
 {/if}
