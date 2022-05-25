@@ -24,7 +24,7 @@
         data-cy="data-encoder-status-configured"
         on:click={() => (showSettings = true)}
       >
-        <Icon name="arrowDown" class="-m4-4" color="#bfdbfe" />
+        <Icon name="arrowDown" color="#bfdbfe" />
         <Icon name="arrowUp" class="-ml-4" color="#bfdbfe" />
       </button>
     </Tooltip>
@@ -35,7 +35,7 @@
         data-cy="data-encoder-status-error"
         on:click={() => (showSettings = true)}
       >
-        <Icon name="arrowDown" class="-m4-4" color="#f87171" />
+        <Icon name="arrowDown" color="#f87171" />
         <Icon name="arrowUp" class="-ml-4" color="#f87171" />
       </button>
     </Tooltip>
@@ -46,7 +46,7 @@
         data-cy="data-encoder-status-success"
         on:click={() => (showSettings = true)}
       >
-        <Icon name="arrowDown" class="-m4-4" color="#4ade80" />
+        <Icon name="arrowDown" color="#4ade80" />
         <Icon name="arrowUp" class="-ml-4" color="#4ade80" />
       </button>
     </Tooltip>
@@ -58,7 +58,7 @@
       data-cy="data-encoder-status"
       on:click={() => (showSettings = true)}
     >
-      <Icon name="arrowDown" class="-m4-4" color="#e4e4e7" />
+      <Icon name="arrowDown" color="#e4e4e7" />
       <Icon name="arrowUp" class="-ml-4" color="#e4e4e7" />
     </button>
   </Tooltip>
