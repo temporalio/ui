@@ -5,7 +5,6 @@ module.exports = {
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'prettier',
-    'plugin:storybook/recommended',
   ],
   plugins: ['svelte3', '@typescript-eslint'],
   ignorePatterns: ['*.cjs', 'prism.js'],

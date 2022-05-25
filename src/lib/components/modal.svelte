@@ -58,7 +58,7 @@
   }
 
   .body {
-    @apply bg-white w-full md:h-max lg:w-1/3  mx-auto rounded-lg shadow-xl z-50 overflow-y-auto;
+    @apply bg-white text-gray-900 w-full md:h-max lg:w-1/3  mx-auto rounded-lg shadow-xl z-50 overflow-y-auto;
   }
 
   .title {

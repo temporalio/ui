@@ -1,9 +1,9 @@
 <script context="module" lang="ts">
-  import type { ErrorLoad } from '@sveltejs/kit';
+  import type { Load } from '@sveltejs/kit';
 
   import '../app.css';
 
-  export const load: ErrorLoad = async function ({ error, status }) {
+  export const load: Load = async function ({ error, status }) {
     return {
       props: {
         error,

@@ -54,7 +54,6 @@
 
 <script lang="ts">
   import Header from './_header.svelte';
-  import HeaderResponsive from './_header-responsive.svelte';
   import Notifications from '$lib/components/notifications.svelte';
   import Banners from '$lib/components/banner/banners.svelte';
   import { ErrorBoundary } from '$lib/components/error-boundary';
@@ -75,16 +74,17 @@
   <meta property="og:image" content="/banner.png" />
 </svelte:head>
 
-<main class="flex flex-col h-screen">
+<div class="flex flex-row w-screen h-screen">
   <Notifications />
-  <Banners {uiVersionInfo} />
-  <Header {user} />
-  <HeaderResponsive {user} />
-  <section id="content" class="h-full mx-10 mb-10 mt-8">
-    <div class="flex flex-col h-full gap-4 mt-12 xl:mt-0">
+  <div class="sticky top-0 h-screen w-auto z-20">
+    <Header {user} />
+  </div>
+  <section id="content" class="flex-auto h-screen w-max overflow-auto">
+    <Banners {uiVersionInfo} />
+    <div class="flex flex-col h-full gap-4 px-10 pb-10 pt-8 z-10">
       <ErrorBoundary onError={() => {}}>
         <slot />
       </ErrorBoundary>
     </div>
   </section>
-</main>
+</div>

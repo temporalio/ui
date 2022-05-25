@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { routeForApi } from './route-for-api';
 
 const parameters = {

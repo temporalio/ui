@@ -58,6 +58,14 @@ Set these environment variables if you want to change their defaults
 | VITE_API  | Temporal HTTP API address. Set to empty `` to use relative paths | http://localhost:8080 | Build |
 | VITE_MODE | Build target                                                     | development           | Build |
 
+## Developing with Holocene
+
+To see updates from holocene, follow the instructions in [holocene](https://github.com/temporalio/holocene) README and link the project after cloning:
+
+```bash
+npm link holocene
+```
+
 ## Developing with Canary
 
 To get a better representation of production data, you can run our UI with the [canary-go](https://github.com/temporalio/canary-go) repo. You will need go installed on your machine.
