@@ -1,8 +1,9 @@
-import { browser } from '$app/env';
-import { namespaceUrlPattern } from './namespace-url-pattern';
+// import { browser } from '$app/env';
+// import { namespaceUrlPattern } from './namespace-url-pattern';
 
-const RealBaseUrl = `https://web.${namespaceUrlPattern.match(window.location.pathname)?.namespace
-  }.tmprl.cloud/api/v1/`;
+// const RealBaseUrl = `https://web.${
+//   namespaceUrlPattern.match(window.location.pathname)?.namespace
+// }.tmprl.cloud/api/v1/`;
 
 let base = (import.meta.env?.VITE_API as string) ?? process.env.VITE_API;
 if (base.endsWith('/')) base = base.slice(0, -1);
@@ -10,9 +11,6 @@ if (base.endsWith('/')) base = base.slice(0, -1);
 const withBase = (endpoint: string): string => {
   if (endpoint.startsWith('/')) endpoint = endpoint.slice(1);
   //   return `${RealBaseUrl}${endpoint}`;
-  if (browser && window.location.host.match(/thundergun\.io$/)) {
-    return `${RealBaseUrl}${endpoint}`;
-  }
   return `${base}/api/v1/${endpoint}`;
 };
 
