@@ -41,25 +41,12 @@ describe('Namespace Select', () => {
     cy.wait('@workflows-api');
     cy.wait('@namespaces-api');
 
-    cy.get('.namespace-select').as('select');
+    cy.get('[data-cy="namespace-select-button"]').as('namespace-select-button');
   });
 
   it('have the correct namespaces in the dropdown when using navigation header', () => {
     cy.viewport(1500, 600);
-    cy.get('@select').find('option').should('have.length', 2);
-    cy.get('@namespaces').then((namespaces) => {
-      for (const namespace of namespaces) {
-        cy.get('@select').select(namespace);
-        cy.get('@select').should('have.value', namespace);
-      }
-    });
-  });
-  it('have the correct namespaces in the dropdown when using hamburger header', () => {
-    cy.viewport(900, 600);
-    cy.get('[data-cy="hamburger-icon"]').click();
-    cy.get('.action')
-      .find('.namespace-select')
-      .find('option')
-      .should('have.length', 2);
+    cy.get('@namespace-select-button').click();
+    cy.get('[data-cy="namespace-list"]').children().should('have.length', 2);
   });
 });
