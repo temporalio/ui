@@ -33,7 +33,7 @@
   <main class="flex flex-col gap-1 relative">
     <div class="block -mt-3 -ml-2">
       <a href="/namespaces/{namespace}/workflows" class="back-to-workflows">
-        <Icon name="caretLeft" class="inline" color="black" />Back to Workflows
+        <Icon name="caretLeft" class="inline" />Back to Workflows
       </a>
     </div>
     <div class="flex justify-between items-center mb-8">

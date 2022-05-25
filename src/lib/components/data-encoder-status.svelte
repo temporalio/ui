@@ -1,10 +1,5 @@
 <script lang="ts">
-  import Icon from 'svelte-fa';
-
-  import {
-    faLongArrowAltDown,
-    faLongArrowAltUp,
-  } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
 
   import { dataEncoder } from '$lib/stores/data-encoder';
 
@@ -25,50 +20,46 @@
   {#if $dataEncoder?.hasNotRequested}
     <Tooltip right text={'Data encoder is configured'}>
       <button
-        class="flex cursor-pointer mt-1 ml-1"
+        class="flex cursor-pointer"
         data-cy="data-encoder-status-configured"
         on:click={() => (showSettings = true)}
       >
-        <Icon icon={faLongArrowAltDown} scale={1} class="text-blue-200 block" />
-        <Icon icon={faLongArrowAltUp} scale={1} class="text-blue-200 block" />
+        <Icon name="arrowDown" class="-m4-4" color="#bfdbfe" />
+        <Icon name="arrowUp" class="-ml-4" color="#bfdbfe" />
       </button>
     </Tooltip>
   {:else if $dataEncoder.hasError}
     <Tooltip right text={`Data encoder couldn't connect to the remote encoder`}>
       <button
-        class="flex cursor-pointer mt-1 ml-1"
+        class="flex cursor-pointer"
         data-cy="data-encoder-status-error"
         on:click={() => (showSettings = true)}
       >
-        <Icon icon={faLongArrowAltDown} scale={1} class="text-red-400 block" />
-        <Icon icon={faLongArrowAltUp} scale={1} class="text-red-400 block" />
+        <Icon name="arrowDown" class="-m4-4" color="#f87171" />
+        <Icon name="arrowUp" class="-ml-4" color="#f87171" />
       </button>
     </Tooltip>
   {:else if $dataEncoder.hasSuccess}
     <Tooltip right text={'Data encoder succesfully converted content'}>
       <button
-        class="flex cursor-pointer mt-1 ml-1"
+        class="flex cursor-pointer"
         data-cy="data-encoder-status-success"
         on:click={() => (showSettings = true)}
       >
-        <Icon
-          icon={faLongArrowAltDown}
-          scale={1}
-          class="text-green-400 block"
-        />
-        <Icon icon={faLongArrowAltUp} scale={1} class="text-green-400 block" />
+        <Icon name="arrowDown" class="-m4-4" color="#4ade80" />
+        <Icon name="arrowUp" class="-ml-4" color="#4ade80" />
       </button>
     </Tooltip>
   {/if}
 {:else}
   <Tooltip right text={'Configure data encoder'}>
     <button
-      class="flex cursor-pointer mt-1 ml-1"
+      class="flex cursor-pointer"
       data-cy="data-encoder-status"
       on:click={() => (showSettings = true)}
     >
-      <Icon icon={faLongArrowAltDown} scale={1} class="text-gray-200 block" />
-      <Icon icon={faLongArrowAltUp} scale={1} class="text-gray-200 block" />
+      <Icon name="arrowDown" class="-m4-4" color="#e4e4e7" />
+      <Icon name="arrowUp" class="-ml-4" color="#e4e4e7" />
     </button>
   </Tooltip>
 {/if}

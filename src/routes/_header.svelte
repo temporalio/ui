@@ -52,5 +52,5 @@
   {isCloud}
   user={Promise.resolve(user)}
   {logout}
-  extras={[{ icon: DataEncoderStatus, name: 'Data Encoder' }]}
+  extras={[{ component: DataEncoderStatus, name: 'Data Encoder' }]}
 />
