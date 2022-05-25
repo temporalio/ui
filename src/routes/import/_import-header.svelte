@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import Navigation from 'holocene/components/navigation/import.svelte';
+  import ImportNavigation from 'holocene/components/navigation/import-nav.svelte';
 
   import { routeForImport, routeForWorkflows } from '$lib/utilities/route-for';
 
@@ -13,4 +13,4 @@
   };
 </script>
 
-<Navigation {linkList} {isCloud} />
+<ImportNavigation {linkList} {isCloud} />
