@@ -46,6 +46,6 @@ describe('Namespace Select', () => {
 
   it('have the correct namespaces in the dropdown when using navigation header', () => {
     cy.get('@namespace-select-button').click({ wait: 1000 });
-    cy.get('[data-cy="namespace-list"]').children().should('have.length', 2);
+    cy.get('.prose > .text-2xl').contains('Select a namespace');
   });
 });
