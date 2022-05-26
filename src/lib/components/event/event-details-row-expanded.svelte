@@ -7,7 +7,6 @@
     getCodeBlockValue,
     shouldDisplayAsWorkflowLink,
     shouldDisplayAsWorkersLink,
-    shouldDisplayAsPlainText,
   } from '$lib/utilities/get-single-attribute-for-event';
 
   import CodeBlock from '../code-block.svelte';
@@ -63,10 +62,7 @@
     <div class="detail-row">
       <h2 class="text-sm">{format(key)}</h2>
       <p class="text-sm">
-        <span
-          class="px-2 select-all"
-          class:badge={!shouldDisplayAsPlainText(key)}>{value}</span
-        >
+        <span class="px-2 select-all">{value}</span>
       </p>
     </div>
   {/if}
@@ -84,8 +80,5 @@
   }
   .row:last-of-type .code-block-row {
     @apply border-b-0;
-  }
-  .badge {
-    @apply text-gray-700 bg-gray-300;
   }
 </style>

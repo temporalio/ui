@@ -67,17 +67,8 @@
     <div class="flex items-center xl:items-start w-full xl:3/4">
       <h2 class="w-full xl:w-1/3 text-sm">{format(key)}</h2>
       <p class="w-full xl:w-2/3 text-sm text-right xl:text-left">
-        <span
-          class="text-gray-700 px-2 select-all"
-          class:badge={!shouldDisplayAsPlainText(key)}>{value}</span
-        >
+        <span class="text-gray-700 px-2 select-all">{value}</span>
       </p>
     </div>
   {/if}
 </article>
-
-<style lang="postcss">
-  .badge {
-    @apply bg-gray-300;
-  }
-</style>
