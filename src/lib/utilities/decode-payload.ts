@@ -94,6 +94,8 @@ export const convertPayloadToJsonWithCodec = async ({
 
   const potentialPayloads = (anyAttributes?.input?.payloads ??
     anyAttributes?.result?.payloads ??
+    // How to find all payloads?
+    // anyAttributes?.lastFailure?.payloads ??
     null) as Payload[] | null;
 
   if (potentialPayloads) {
