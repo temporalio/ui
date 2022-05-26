@@ -55,7 +55,7 @@
         >{#if isJSON}{formatJSON(content)}{:else}{@html content}{/if}</code
       ></pre>
 
-    <button on:click={copy} class="absolute top-4 right-4">
+    <button on:click|stopPropagation={copy} class="absolute top-4 right-4">
       <Icon icon={copied ? faCheck : faCopy} color="white" />
     </button>
   </div>

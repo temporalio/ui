@@ -18,9 +18,10 @@
 </script>
 
 <article
-  class="flex flex-row justify-between border-2 border-gray-300 p-4 rounded-lg w-full"
+  class="input-and-results"
   class:expanded={showContent}
-  data-cy="input-and-results"
+  data-cy="workflow-input-results-toggle"
+  on:click={() => (showContent = !showContent)}
 >
   <div class="w-full">
     <h3 class="text-lg">
@@ -54,28 +55,30 @@
       </div>
     {/if}
   </div>
-  <div class="h-8 w-8">
-    <div
-      class="expand-icon"
-      on:click={() => (showContent = !showContent)}
-      data-cy="workflow-input-results-toggle"
-    >
+  <div class="h-8 w-8 text-center">
+    <div class="expand-icon">
       {showContent ? '-' : '+'}
     </div>
   </div>
 </article>
 
 <style lang="postcss">
-  .expanded {
-    @apply pb-8;
+  .input-and-results {
+    @apply flex flex-row justify-between border-2 border-gray-300 p-4 rounded-lg w-full cursor-pointer;
+  }
+  .expand-icon {
+    @apply text-2xl rounded-full select-none;
   }
 
   .expand-icon {
-    @apply text-center text-3xl px-1 pt-2 pb-2 leading-4 text-gray-900 rounded-full cursor-pointer select-none;
+    transition: all 0.5s ease-in-out;
   }
-  .expand-icon:hover {
-    @apply bg-gray-100;
-    transition: background-color 0.3s linear;
-    -webkit-transition: background-color 0.3s linear;
+
+  .input-and-results:hover .expand-icon {
+    @apply bg-gray-200;
+    transform: scale(1.2);
+  }
+  .expanded {
+    @apply pb-8;
   }
 </style>
