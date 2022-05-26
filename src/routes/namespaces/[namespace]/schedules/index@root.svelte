@@ -77,7 +77,7 @@
   <h2 class="text-2xl">Schedules <Badge type="beta">Beta</Badge></h2>
   <Button on:click={() => (showCreateConfirmation = true)}>Create</Button>
 </div>
-<div class="w-full xl:w-1/2 xl:absolute xl:left-12 xl:top-36 z-20">
+<div class="w-full xl:w-1/2 z-20">
   <Search
     icon
     placeholder="Search"
