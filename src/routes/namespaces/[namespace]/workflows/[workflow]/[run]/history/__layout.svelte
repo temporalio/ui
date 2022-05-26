@@ -99,8 +99,7 @@
   </section>
   <WorkflowStackTraceError {workflow} {workers} />
   <section class="flex gap-4 w-full flex-col lg:flex-row">
-    <InputAndResults type="input" />
-    <InputAndResults type="results" />
+    <InputAndResults running={workflow.isRunning} />
   </section>
   <PendingActivties />
   <section id="event-history">
