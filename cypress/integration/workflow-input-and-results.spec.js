@@ -38,6 +38,7 @@ describe('Workflow Input and Results', () => {
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
     cy.wait('@event-history-api');
+    cy.get('[data-cy="workflow-input-results-toggle"]').click();
 
     const firstEvent = eventsCompletedFixture.history.events[0];
     const input = Buffer.from(
@@ -55,6 +56,7 @@ describe('Workflow Input and Results', () => {
         .data,
       'base64',
     ).toString();
+
     cy.get('[data-cy="workflow-results"]').contains(results);
   });
 
@@ -69,6 +71,7 @@ describe('Workflow Input and Results', () => {
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-api');
+    cy.get('[data-cy="workflow-input-results-toggle"]').click();
 
     const firstEvent = eventsCompletedNullFixture.history.events[0];
     const input = Buffer.from(
@@ -103,6 +106,7 @@ describe('Workflow Input and Results', () => {
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-api');
+    cy.get('[data-cy="workflow-input-results-toggle"]').click();
 
     const firstEvent = eventsRunningFixture.history.events[0];
     const input = Buffer.from(
@@ -110,7 +114,7 @@ describe('Workflow Input and Results', () => {
       'base64',
     ).toString();
     cy.get('[data-cy="workflow-input"]').contains(input);
-    cy.get('[data-cy="workflow-results"]').contains('In progress');
+    cy.get('[data-cy="result-code-block"]').should('not.exist');
   });
 
   it('should show the input and results for failed workflow', () => {
@@ -124,6 +128,7 @@ describe('Workflow Input and Results', () => {
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-api');
+    cy.get('[data-cy="workflow-input-results-toggle"]').click();
 
     const firstEvent = eventsFailedFixture.history.events[0];
     const input = Buffer.from(
@@ -153,6 +158,7 @@ describe('Workflow Input and Results', () => {
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-api');
+    cy.get('[data-cy="workflow-input-results-toggle"]').click();
 
     const firstEvent = eventsCanceledFixture.history.events[0];
     const input = Buffer.from(
@@ -174,6 +180,7 @@ describe('Workflow Input and Results', () => {
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-api');
+    cy.get('[data-cy="workflow-input-results-toggle"]').click();
 
     const firstEvent = eventsTimedOutFixture.history.events[0];
     const input = Buffer.from(
@@ -195,6 +202,7 @@ describe('Workflow Input and Results', () => {
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-api');
+    cy.get('[data-cy="workflow-input-results-toggle"]').click();
 
     const firstEvent = eventsContinuedAsNewFixture.history.events[0];
     const input = Buffer.from(

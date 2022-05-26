@@ -43,7 +43,11 @@
           <div class="w-full">
             {#if resultsContent}
               <h3 class="text-base text-gray-900">Result</h3>
-              <CodeBlock content={resultsContent} class="mb-2 max-h-96" />
+              <CodeBlock
+                content={resultsContent}
+                data-cy="result-code-block"
+                class="mb-2 max-h-96"
+              />
             {/if}
           </div>
         </article>
@@ -51,7 +55,11 @@
     {/if}
   </div>
   <div class="h-8 w-8">
-    <div class="expand-icon" on:click={() => (showContent = !showContent)}>
+    <div
+      class="expand-icon"
+      on:click={() => (showContent = !showContent)}
+      data-cy="workflow-input-results-toggle"
+    >
       {showContent ? '-' : '+'}
     </div>
   </div>
