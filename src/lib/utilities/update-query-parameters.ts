@@ -33,7 +33,7 @@ export const updateQueryParameters = async ({
     url.searchParams.delete(parameter);
   }
 
-  if (browser) {
+  if (browser && url.href !== window.location.href) {
     goto(String(url), gotoOptions);
   }
 

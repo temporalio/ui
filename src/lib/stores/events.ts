@@ -108,7 +108,7 @@ export const updateEventHistory: StartStopNotifier<FetchEventsResponse> = (
   set,
 ) => {
   return parametersWithSettings.subscribe(async (params) => {
-    const { settings, ...rest } = params;
+    const { settings: _, ...rest } = params;
     if (isNewRequest(rest, previous)) {
       withLoading(loading, updating, async () => {
         const events = await fetchEvents(params);

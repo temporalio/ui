@@ -61,7 +61,7 @@ export const getWorkflowStartedAndCompletedEvents = (
   if (workflowStartedEvent) {
     input = JSON.stringify(
       workflowStartedEvent?.workflowExecutionStartedEventAttributes?.input
-        ?.payloads,
+        ?.payloads ?? null,
     );
   }
 

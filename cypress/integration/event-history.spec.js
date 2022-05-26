@@ -38,7 +38,6 @@ describe('Workflow Events', () => {
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-api');
-    cy.wait('@query-api');
 
     cy.url().should('contain', '/feed');
   });
@@ -48,7 +47,6 @@ describe('Workflow Events', () => {
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-api');
-    cy.wait('@query-api');
 
     cy.url().should('contain', '/feed');
 
@@ -68,7 +66,6 @@ describe('Workflow Events', () => {
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-api');
-    cy.wait('@query-api');
 
     cy.get('[data-cy="event-summary-row"]').should(
       'have.length',
@@ -86,7 +83,6 @@ describe('Workflow Events', () => {
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-api');
-    cy.wait('@query-api');
 
     const dt = new Date(eventsFixture.history.events[0].eventTime);
 
@@ -125,7 +121,6 @@ describe('Workflow Events', () => {
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-api');
-    cy.wait('@query-api');
 
     cy.get('[data-cy="event-summary-row"]')
       .should('not.have.length', 0)
@@ -138,7 +133,6 @@ describe('Workflow Events', () => {
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-api');
-    cy.wait('@query-api');
 
     cy.get('[data-cy="json"]').click();
 

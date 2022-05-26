@@ -1,10 +1,5 @@
 <script lang="ts">
-  import Icon from 'svelte-fa';
-
-  import {
-    faLongArrowAltDown,
-    faLongArrowAltUp,
-  } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
 
   import { dataEncoder } from '$lib/stores/data-encoder';
 
@@ -23,52 +18,48 @@
 />
 {#if $dataEncoder?.hasEndpointOrPortConfigured}
   {#if $dataEncoder?.hasNotRequested}
-    <Tooltip left text={'Data encoder is configured'}>
+    <Tooltip right text={'Data encoder is configured'}>
       <button
-        class="flex cursor-pointer"
+        class="flex cursor-pointer relative"
         data-cy="data-encoder-status-configured"
         on:click={() => (showSettings = true)}
       >
-        <Icon icon={faLongArrowAltDown} scale={1} class="text-blue-200 block" />
-        <Icon icon={faLongArrowAltUp} scale={1} class="text-blue-200 block" />
+        <Icon name="arrowDown" class="-ml-1" color="#bfdbfe" />
+        <Icon name="arrowUp" class="absolute left-1" color="#bfdbfe" />
       </button>
     </Tooltip>
   {:else if $dataEncoder.hasError}
-    <Tooltip left text={`Data encoder couldn't connect to the remote encoder`}>
+    <Tooltip right text={`Data encoder couldn't connect to the remote encoder`}>
       <button
-        class="flex cursor-pointer"
+        class="flex cursor-pointer relative"
         data-cy="data-encoder-status-error"
         on:click={() => (showSettings = true)}
       >
-        <Icon icon={faLongArrowAltDown} scale={1} class="text-red-400 block" />
-        <Icon icon={faLongArrowAltUp} scale={1} class="text-red-400 block" />
+        <Icon name="arrowDown" class="-ml-1" color="#f87171" />
+        <Icon name="arrowUp" class="absolute left-1" color="#f87171" />
       </button>
     </Tooltip>
   {:else if $dataEncoder.hasSuccess}
-    <Tooltip left text={'Data encoder succesfully converted content'}>
+    <Tooltip right text={'Data encoder succesfully converted content'}>
       <button
-        class="flex cursor-pointer"
+        class="flex cursor-pointer relative"
         data-cy="data-encoder-status-success"
         on:click={() => (showSettings = true)}
       >
-        <Icon
-          icon={faLongArrowAltDown}
-          scale={1}
-          class="text-green-400 block"
-        />
-        <Icon icon={faLongArrowAltUp} scale={1} class="text-green-400 block" />
+        <Icon name="arrowDown" class="-ml-1" color="#4ade80" />
+        <Icon name="arrowUp" class="absolute left-1" color="#4ade80" />
       </button>
     </Tooltip>
   {/if}
 {:else}
-  <Tooltip left text={'Configure data encoder'}>
+  <Tooltip right text={'Configure data encoder'}>
     <button
-      class="flex cursor-pointer"
+      class="flex cursor-pointer relative"
       data-cy="data-encoder-status"
       on:click={() => (showSettings = true)}
     >
-      <Icon icon={faLongArrowAltDown} scale={1} class="text-gray-200 block" />
-      <Icon icon={faLongArrowAltUp} scale={1} class="text-gray-200 block" />
+      <Icon name="arrowDown" class="-ml-1" color="#e4e4e7" />
+      <Icon name="arrowUp" class="absolute left-1" color="#e4e4e7" />
     </button>
   </Tooltip>
 {/if}

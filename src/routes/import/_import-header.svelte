@@ -1,19 +1,16 @@
 <script lang="ts">
-  import NavigationHeader from '$lib/components/navigation-header.svelte';
-  import { routeForImport } from '$lib/utilities/route-for';
-  import NavigationLink from '$lib/components/navigation-link.svelte';
-  import AuthButton from '$lib/components/auth-button.svelte';
+  import { page } from '$app/stores';
+  import ImportNavigation from 'holocene/components/navigation/import-nav.svelte';
 
-  export let user: User;
+  import { routeForImport, routeForWorkflows } from '$lib/utilities/route-for';
+
+  const { isCloud } = $page.stuff.settings.runtimeEnvironment;
+  $: namespace = $page.stuff?.settings?.defaultNamespace;
+
+  $: linkList = {
+    home: routeForWorkflows({ namespace }),
+    import: routeForImport({ importType: 'events' }),
+  };
 </script>
 
-<NavigationHeader href="/" {user}>
-  <svelte:fragment slot="links">
-    <NavigationLink href={routeForImport({ importType: 'events' })}>
-      Import
-    </NavigationLink>
-  </svelte:fragment>
-  <svelte:fragment slot="user">
-    <AuthButton {user} />
-  </svelte:fragment>
-</NavigationHeader>
+<ImportNavigation {linkList} {isCloud} />

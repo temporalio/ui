@@ -20,17 +20,16 @@
 </script>
 
 <script lang="ts">
+  import { page } from '$app/stores';
   import { timeFormat } from '$lib/stores/time-format';
   import { workflows, loading, updating } from '$lib/stores/workflows';
 
   import EmptyState from '$lib/components/empty-state.svelte';
   import Pagination from '$lib/components/pagination.svelte';
-  import Badge from '$lib/components/badge.svelte';
   import Loading from '$lib/components/loading.svelte';
   import WorkflowsSummaryTable from './_workflows-summary-table.svelte';
   import WorkflowsSummaryRow from './_workflows-summary-row.svelte';
   import WorkflowFilters from './_workflow-filters.svelte';
-  import { page } from '$app/stores';
 
   export let namespace: string;
 
@@ -43,7 +42,7 @@
       : 'If you have filters applied, try adjusting them.';
 </script>
 
-<h2 class="text-2xl">Recent Workflows <Badge type="beta">Beta</Badge></h2>
+<h2 class="text-2xl">Recent Workflows</h2>
 <WorkflowFilters bind:searchType bind:query />
 {#if $loading}
   <Loading />

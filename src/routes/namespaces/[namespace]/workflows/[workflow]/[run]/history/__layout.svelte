@@ -3,13 +3,14 @@
   import { routeForWorkers, routeForWorkflow } from '$lib/utilities/route-for';
 
   export const load: Load = async function ({ params, stuff }) {
-    const { workflow } = stuff;
+    const { workflow, workers } = stuff;
     const { namespace } = params;
 
     return {
       props: {
         namespace,
         workflow,
+        workers,
       },
     };
   };
@@ -22,6 +23,8 @@
     faTable,
   } from '@fortawesome/free-solid-svg-icons';
 
+  import type { GetPollersResponse } from '$lib/services/pollers-service';
+
   import { routeForEventHistory } from '$lib/utilities/route-for';
   import { formatDate } from '$lib/utilities/format-date';
   import { eventViewType } from '$lib/stores/event-view';
@@ -32,12 +35,13 @@
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
   import PendingActivties from './_pending-activties.svelte';
-  import WorkflowStackTrace from '$lib/components/workflow/workflow-stack-trace.svelte';
+  import WorkflowStackTraceError from '$lib/components/workflow/workflow-stack-trace-error.svelte';
   import InputAndResults from './_input-and-results.svelte';
   import WorkflowDetail from '../_workflow-detail.svelte';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
+  export let workers: GetPollersResponse;
 
   const routeParameters = (view: EventView, eventId?: string) => ({
     namespace,
@@ -93,11 +97,11 @@
       content={workflow.stateTransitionCount}
     />
   </section>
+  <WorkflowStackTraceError {workflow} {workers} />
   <section class="flex gap-4 w-full flex-col lg:flex-row">
     <InputAndResults type="input" />
     <InputAndResults type="results" />
   </section>
-  <WorkflowStackTrace {namespace} {workflow} class="mb-2 max-h-96" />
   <PendingActivties />
   <section id="event-history">
     <nav class="flex gap-4 justify-between items-end pb-4">

@@ -4,7 +4,7 @@
 
 ## Prerequisites
 
-Temporal must be running in development. ([See our documentation](https://docs.temporal.io/docs/server/quick-install) for details.)
+Temporal must be running in development. (For details, see [Run a dev Cluster](https://docs.temporal.io/application-development-guide#run-a-dev-cluster) in the documentation.)
 
 ## Trying it out
 
@@ -57,6 +57,14 @@ Set these environment variables if you want to change their defaults
 | --------- | ---------------------------------------------------------------- | --------------------- | ----- |
 | VITE_API  | Temporal HTTP API address. Set to empty `` to use relative paths | http://localhost:8080 | Build |
 | VITE_MODE | Build target                                                     | development           | Build |
+
+## Developing with Holocene
+
+To see updates from holocene, follow the instructions in [holocene](https://github.com/temporalio/holocene) README and link the project after cloning:
+
+```bash
+npm link holocene
+```
 
 ## Developing with Canary
 
