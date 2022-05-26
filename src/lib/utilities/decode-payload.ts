@@ -76,6 +76,31 @@ export const decodePayloadAttributes = (
   return anyAttributes;
 };
 
+// List of fields with payloads
+const payloadFields: string[] = [
+  'input',
+  'result',
+  'details',
+  'heartbeatDetails',
+  'lastHeartbeatDetails',
+  'lastFailure',
+  'lastCompletionResult',
+  'queryArgs',
+  'answer',
+  'signalInput',
+];
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const getPotentialPayloads = (anyAttributes: any): Payload[] | null => {
+  let payloads = null;
+  for (const field of payloadFields) {
+    if (anyAttributes?.[field]?.payloads) {
+      payloads = anyAttributes?.[field]?.payloads;
+      break;
+    }
+  }
+  return payloads;
+};
+
 export const convertPayloadToJsonWithCodec = async ({
   attributes,
   namespace,
@@ -92,11 +117,7 @@ export const convertPayloadToJsonWithCodec = async ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const anyAttributes = attributes as any;
 
-  const potentialPayloads = (anyAttributes?.input?.payloads ??
-    anyAttributes?.result?.payloads ??
-    // How to find all payloads?
-    // anyAttributes?.lastFailure?.payloads ??
-    null) as Payload[] | null;
+  const potentialPayloads = getPotentialPayloads(anyAttributes);
 
   if (potentialPayloads) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -115,11 +136,10 @@ export const convertPayloadToJsonWithCodec = async ({
       JSONPayload = potentialPayloads.map(decodePayload);
     }
 
-    if (anyAttributes?.input?.payloads) {
-      anyAttributes.input.payloads = JSONPayload;
-    }
-    if (anyAttributes?.result?.payloads) {
-      anyAttributes.result.payloads = JSONPayload;
+    for (const field of payloadFields) {
+      if (anyAttributes?.[field]?.payloads) {
+        anyAttributes[field].payloads = JSONPayload;
+      }
     }
   }
 
@@ -136,11 +156,9 @@ export const convertPayloadToJsonWithWebsocket = async (
   // attributes.type === "ATypeWithInput/Result"
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const anyAttributes = eventAttribute as any;
-  const potentialPayload = (anyAttributes?.input?.payloads ??
-    anyAttributes?.result?.payloads ??
-    null) as Payload[] | null;
+  const potentialPayloads = getPotentialPayloads(anyAttributes);
 
-  if (potentialPayload) {
+  if (potentialPayloads) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let JSONPayload: string | Payload | Record<any, any>;
 
@@ -149,7 +167,7 @@ export const convertPayloadToJsonWithWebsocket = async (
     if (ws?.hasWebsocket) {
       // Convert Payload data
       const awaitData = await Promise.all(
-        (potentialPayload ?? []).map(
+        (potentialPayloads ?? []).map(
           async (payload) =>
             await convertPayloadWithWebsocket(payload, ws.websocket),
         ),
@@ -157,14 +175,13 @@ export const convertPayloadToJsonWithWebsocket = async (
 
       JSONPayload = awaitData;
     } else {
-      JSONPayload = potentialPayload.map(decodePayload);
+      JSONPayload = potentialPayloads.map(decodePayload);
     }
 
-    if (anyAttributes?.input?.payloads) {
-      anyAttributes.input.payloads = JSONPayload;
-    }
-    if (anyAttributes?.result?.payloads) {
-      anyAttributes.result.payloads = JSONPayload;
+    for (const field of payloadFields) {
+      if (anyAttributes?.[field]?.payloads) {
+        anyAttributes[field].payloads = JSONPayload;
+      }
     }
   }
 
