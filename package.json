@@ -28,7 +28,7 @@
     "@sveltejs/svelte-virtual-list": "^3.0.1",
     "date-fns": "^2.23.0",
     "date-fns-tz": "^1.2.2",
-    "holocene": "^0.0.13",
+    "holocene": "^0.0.14",
     "json-beautify": "^1.1.1",
     "just-debounce": "^1.1.0",
     "sanitize-html": "^2.6.1",
