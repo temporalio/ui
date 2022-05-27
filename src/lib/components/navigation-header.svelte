@@ -7,16 +7,16 @@
 </script>
 
 <header class="navigation-header" data-cy="navigation-header">
-  <div class="flex items-center gap-4 col-span-3">
+  <div class="col-span-3 flex items-center gap-4">
     <a {href} class="block">
       <img src="/logo.svg" alt="Temporal Logo" class="max-h-10" />
     </a>
     <slot name="logo" />
   </div>
-  <div class="flex gap-4 col-span-4">
+  <div class="col-span-4 flex gap-4">
     <slot name="links" />
   </div>
-  <div class="flex justify-end gap-4 col-span-5 col-end-13 items-center">
+  <div class="col-span-5 col-end-13 flex items-center justify-end gap-4">
     {#if user}
       <DataEncoderStatus />
     {/if}
@@ -27,6 +27,6 @@
 
 <style lang="postcss">
   .navigation-header {
-    @apply hidden xl:grid grid-rows-1 grid-cols-12 h-16 px-10 items-center bg-gray-900 shadow-lg gap-6;
+    @apply hidden h-16 grid-cols-12 grid-rows-1 items-center gap-6 bg-gray-900 px-10 shadow-lg xl:grid;
   }
 </style>

@@ -16,21 +16,21 @@
 </script>
 
 <article
-  class="flex flex-col border-2 border-gray-300 p-4 rounded-lg w-full lg:w-1/2"
+  class="flex w-full flex-col rounded-lg border-2 border-gray-300 p-4 lg:w-1/2"
   data-cy="workflow-{type}"
 >
   <h3 class="text-lg">{title}</h3>
   {#if content}
     <CodeBlock {content} class="mb-2 max-h-96" />
   {:else}
-    <div class="my-12 flex flex-col justify-start items-center gap-2">
+    <div class="my-12 flex flex-col items-center justify-start gap-2">
       <div
-        class="flex rounded-full items-center justify-center w-16 h-16 bg-gray-200"
+        class="flex h-16 w-16 items-center justify-center rounded-full bg-gray-200"
       >
         <Icon
           icon={faSpinner}
           scale={1.2}
-          class="block w-full h-full animate-spin"
+          class="block h-full w-full animate-spin"
         />
       </div>
       <h2 class="text-xl font-medium">In progress…</h2>

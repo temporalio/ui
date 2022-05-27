@@ -99,7 +99,7 @@
       on:submit={updateQuery}
     />
   {:else}
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-5">
       <Input
         id="workflow-id-filter"
         label="Workflow ID"

@@ -18,7 +18,7 @@
 
 {#if show}
   <section
-    class={`block relative leading-10 text-center ${severity}`}
+    class={`relative block text-center leading-10 ${severity}`}
     data-cy={$$props.dataCy}
   >
     <a href={link} target="_blank">
@@ -26,7 +26,7 @@
     </a>
     <button
       on:click={() => close(key)}
-      class="absolute top-0 right-0 mr-5 text-black-600"
+      class="text-black-600 absolute top-0 right-0 mr-5"
       data-cy="close-banner"
     >
       ✕

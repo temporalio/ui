@@ -30,8 +30,8 @@
   <h3 class="text-lg font-medium">
     Task Queue: <span class="select-all font-normal">{taskQueue}</span>
   </h3>
-  <section class="flex flex-col border-2 border-gray-900 w-full rounded-lg">
-    <div class="bg-gray-900 text-white flex flex-row p-2">
+  <section class="flex w-full flex-col rounded-lg border-2 border-gray-900">
+    <div class="flex flex-row bg-gray-900 p-2 text-white">
       <div class="w-3/12 text-left">ID</div>
       <div class="w-3/12 text-left">Last Accessed</div>
       <div class="w-3/12 text-left">Workflow Task Handler</div>
@@ -39,7 +39,7 @@
     </div>
     {#each workers.pollers as poller (poller.identity)}
       <article
-        class="w-full h-full flex flex-row border-b-2 last:border-b-0 no-underline p-2"
+        class="flex h-full w-full flex-row border-b-2 p-2 no-underline last:border-b-0"
         data-cy="worker-row"
       >
         <div class="links w-3/12 text-left" data-cy="worker-identity">

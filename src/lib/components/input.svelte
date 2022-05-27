@@ -33,7 +33,7 @@
 
 <style lang="postcss">
   .input-container {
-    @apply border-2 text-base p-2 w-full h-10 rounded-lg inline-flex relative items-center box-border;
+    @apply relative box-border inline-flex h-10 w-full items-center rounded-lg border-2 p-2 text-base;
   }
 
   span {

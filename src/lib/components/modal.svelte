@@ -32,7 +32,7 @@
           <span>Content</span>
         </slot>
       </div>
-      <div class="flex justify-end items-center p-6 space-x-2">
+      <div class="flex items-center justify-end space-x-2 p-6">
         <Button secondary on:click={() => dispatch('cancelModal', {})}
           >Cancel</Button
         >
@@ -50,19 +50,19 @@
 
 <style lang="postcss">
   .modal {
-    @apply z-50 fixed w-full h-full top-0 left-0 flex items-center justify-center p-8 lg:p-0;
+    @apply fixed top-0 left-0 z-50 flex h-full w-full items-center justify-center p-8 lg:p-0;
   }
 
   .overlay {
-    @apply fixed w-full h-full bg-gray-900 opacity-50;
+    @apply fixed h-full w-full bg-gray-900 opacity-50;
   }
 
   .body {
-    @apply bg-white text-gray-900 w-full md:h-max lg:w-1/3  mx-auto rounded-lg shadow-xl z-50 overflow-y-auto;
+    @apply z-50 mx-auto w-full overflow-y-auto rounded-lg  bg-white text-gray-900 shadow-xl md:h-max lg:w-1/3;
   }
 
   .title {
-    @apply bg-white pt-8 pb-0 px-8 text-2xl;
+    @apply bg-white px-8 pt-8 pb-0 text-2xl;
   }
 
   .content {

@@ -35,7 +35,7 @@
 
 <NavigationHeader href="/" user={undefined} />
 <HamburgerHeader href="/" user={undefined} />
-<section class="text-center my-[20vh]">
+<section class="my-[20vh] text-center">
   <h1 class="text-8xl font-semibold" data-cy="login-title">Welcome back.</h1>
   <p class="my-7" data-cy="login-info">Let's get you signed in.</p>
   <div class="mx-auto">

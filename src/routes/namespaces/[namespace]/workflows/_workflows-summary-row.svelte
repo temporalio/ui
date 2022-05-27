@@ -43,7 +43,7 @@
       {formatDate(workflow.startTime, timeFormat)}
     </p>
   </div>
-  <div class="cell links font-medium md:font-normal flex gap-2">
+  <div class="cell links flex gap-2 font-medium md:font-normal">
     <h3 class="md:hidden">Workflow Name:</h3>
     <Tooltip bottom copyable text={workflow.name}>
       <span class="table-link"
@@ -72,23 +72,23 @@
 
 <style lang="postcss">
   .row {
-    @apply block no-underline p-2 text-sm border-b-2 items-center md:text-base md:table-row last-of-type:border-b-0;
+    @apply block items-center border-b-2 p-2 text-sm no-underline last-of-type:border-b-0 md:table-row md:text-base;
   }
 
   .time-cell {
-    @apply inline-block md:hidden xl:table-cell md:border-b-2 text-left p-2;
+    @apply inline-block p-2 text-left md:hidden md:border-b-2 xl:table-cell;
   }
 
   .time-cell-inline {
-    @apply hidden md:block xl:hidden mt-2;
+    @apply mt-2 hidden md:block xl:hidden;
   }
 
   .cell {
-    @apply md:table-cell md:border-b-2 text-left p-2;
+    @apply p-2 text-left md:table-cell md:border-b-2;
   }
 
   .overflow-cell {
-    @apply whitespace-nowrap text-ellipsis;
+    @apply text-ellipsis whitespace-nowrap;
   }
 
   .row:hover {

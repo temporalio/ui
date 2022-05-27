@@ -66,7 +66,7 @@
   <section class="flex flex-col gap-1">
     <WorkflowDetail title="Workflow Type" content={workflow.name} />
     <WorkflowDetail title="Run ID" content={workflow.runId} />
-    <div class="flex gap-1 flex-col md:flex-row md:gap-6">
+    <div class="flex flex-col gap-1 md:flex-row md:gap-6">
       <WorkflowDetail
         title="Start Time"
         content={formatDate(workflow.startTime, 'UTC')}
@@ -98,13 +98,13 @@
     />
   </section>
   <WorkflowStackTraceError {workflow} {workers} />
-  <section class="flex gap-4 w-full flex-col lg:flex-row">
+  <section class="flex w-full flex-col gap-4 lg:flex-row">
     <InputAndResults type="input" />
     <InputAndResults type="results" />
   </section>
   <PendingActivties />
   <section id="event-history">
-    <nav class="flex gap-4 justify-between items-end pb-4">
+    <nav class="flex items-end justify-between gap-4 pb-4">
       <h3 class="text-lg font-medium">Recent Events</h3>
       <div id="event-view-toggle" class="flex gap-4">
         <ToggleButtons>

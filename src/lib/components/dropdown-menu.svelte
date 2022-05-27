@@ -41,7 +41,7 @@
   });
 </script>
 
-<div class="relative inline mx-2" bind:this={menu} data-cy={$$props.dataCy}>
+<div class="relative mx-2 inline" bind:this={menu} data-cy={$$props.dataCy}>
   <IconButton
     icon={faCaretDown}
     on:click={() => (show = !show)}
@@ -56,7 +56,7 @@
       class:right
       class="dropdown-menu"
     >
-      <div class="gap-4 block">
+      <div class="block gap-4">
         <slot />
       </div>
     </div>
@@ -65,20 +65,20 @@
     <span
       in:scale={{ duration: 200, start: 0.65 }}
       out:scale={{ duration: 100, start: 0.65 }}
-      class="absolute top-0 right-3 w-2 h-2 bg-blue-200 rounded-full"
+      class="absolute top-0 right-3 h-2 w-2 rounded-full bg-blue-200"
     />
   {/if}
 </div>
 
 <style lang="postcss">
   .dropdown-menu {
-    @apply absolute py-2 mt-1 bg-white
-        rounded shadow-md text-gray-900 w-56 z-50;
+    @apply absolute z-50 mt-1 w-56
+        rounded bg-white py-2 text-gray-900 shadow-md;
   }
   .dropdown-menu.left {
-    @apply origin-top-left absolute left-0;
+    @apply absolute left-0 origin-top-left;
   }
   .dropdown-menu.right {
-    @apply origin-top-right absolute right-0;
+    @apply absolute right-0 origin-top-right;
   }
 </style>

@@ -17,7 +17,7 @@
   }
 
   a.active:after {
-    @apply absolute bg-blue-200 inset-x-0 bottom-0 rounded-t;
+    @apply absolute inset-x-0 bottom-0 rounded-t bg-blue-200;
     content: '';
     height: 3px;
   }

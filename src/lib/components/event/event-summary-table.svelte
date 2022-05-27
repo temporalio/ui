@@ -26,7 +26,7 @@
     class="table-header-row xl:table-header-group"
     data-cy="event-summary-table-header-desktop"
   >
-    <div class="xl:table-row hidden">
+    <div class="hidden xl:table-row">
       <div class="table-header w-8 rounded-tl-md" />
       <div class="table-header w-1/4">
         {title}<EventCategoryFilter />
@@ -35,7 +35,7 @@
         Date & Time
         {#if !compact}<EventDateFilter />{/if}
       </div>
-      <div class="table-header rounded-tr-md w-1/2 relative">
+      <div class="table-header relative w-1/2 rounded-tr-md">
         Event Details
         <div class="absolute right-4 top-3">
           <input
@@ -75,22 +75,22 @@
 
 <style lang="postcss">
   .event-table {
-    @apply xl:table table-fixed border-gray-900 border-2 rounded-lg w-full;
+    @apply w-full table-fixed rounded-lg border-2 border-gray-900 xl:table;
   }
 
   .table-header-row {
-    @apply bg-gray-900 text-gray-100 px-3;
+    @apply bg-gray-900 px-3 text-gray-100;
   }
 
   .table-header-row-responsive {
-    @apply flex xl:hidden bg-gray-900 text-gray-100 px-3 justify-end;
+    @apply flex justify-end bg-gray-900 px-3 text-gray-100 xl:hidden;
   }
 
   .table-header {
-    @apply xl:table-cell text-left p-2 flex;
+    @apply flex p-2 text-left xl:table-cell;
   }
 
   .table-header-responsive {
-    @apply p-2 flex items-center;
+    @apply flex items-center p-2;
   }
 </style>
