@@ -10,7 +10,7 @@
 
 <button class="icon-button" on:click data-cy={$$props.dataCy}>
   {#if icon}
-    <div class="flex gap-2 items-center {classes}">
+    <div class="flex items-center gap-2 {classes}">
       <Icon {icon} {scale} />
       <slot />
     </div>
@@ -21,6 +21,6 @@
 
 <style lang="postcss">
   .icon-button {
-    @apply inline-block p-1 text-sm w-8 h-8;
+    @apply inline-block h-8 w-8 p-1 text-sm;
   }
 </style>

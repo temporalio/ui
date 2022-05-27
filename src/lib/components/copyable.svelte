@@ -39,7 +39,7 @@
 </script>
 
 <div
-  class="flex gap-2 items-center group {$$props['container-class']}"
+  class="group flex items-center gap-2 {$$props['container-class']}"
   on:click={clickAllToCopy ? copy : noop}
 >
   <slot>

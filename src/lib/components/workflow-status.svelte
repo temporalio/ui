@@ -29,8 +29,8 @@
   $: isRunning = label === humanFriendlyNames.Running;
 </script>
 
-<span class="flex text-center font-medium leading-4 text-sm">
-  <h6 class="{color} flex rounded-sm z-10 px-1 py-1">
+<span class="flex text-center text-sm font-medium leading-4">
+  <h6 class="{color} z-10 flex rounded-sm px-1 py-1">
     {label}
     {#if isRunning}
       <HeartBeat {delay} />

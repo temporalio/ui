@@ -82,7 +82,7 @@
   {/each}
   <div class="option pr-4">
     <div class="check" />
-    <div class="my-2 pr-2 w-full border-b-2 border-gray-300" />
+    <div class="my-2 w-full border-b-2 border-gray-300 pr-2" />
   </div>
   {#each dateOptions as { label, option } (option)}
     <div
@@ -103,7 +103,7 @@
   {/each}
   <div class="option pr-4">
     <div class="check" />
-    <div class="my-2 pr-2 w-full border-b-2 border-gray-300" />
+    <div class="my-2 w-full border-b-2 border-gray-300 pr-2" />
   </div>
   <div
     class="option"
@@ -121,13 +121,13 @@
 
 <style lang="postcss">
   .option {
-    @apply font-normal flex my-2;
+    @apply my-2 flex font-normal;
   }
   .label {
     @apply cursor-pointer;
   }
   .check {
-    @apply mx-4 w-4 mt-1;
+    @apply mx-4 mt-1 w-4;
   }
   .active {
     @apply text-blue-700;

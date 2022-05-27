@@ -74,7 +74,7 @@
     "postcss-import": "^14.1.0",
     "postcss-load-config": "^3.1.0",
     "prettier": "~2.3.2",
-    "prettier-plugin-svelte": "^2.4.0",
+    "prettier-plugin-tailwindcss": "^0.1.11",
     "stylelint": "^14.6.1",
     "stylelint-config-recommended": "^7.0.0",
     "svelte": "^3.47.0",

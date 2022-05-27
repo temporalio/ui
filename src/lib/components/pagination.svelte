@@ -43,9 +43,9 @@
 
 <svelte:window bind:innerWidth={screenWidth} />
 
-<div class="pagination flex flex-col gap-4 relative mb-8">
+<div class="pagination relative mb-8 flex flex-col gap-4">
   <div class="flex justify-between">
-    <p class="text-gray-600 mr-6 items-center flex">
+    <p class="mr-6 flex items-center text-gray-600">
       {#if updating}
         Updating…
       {/if}
@@ -55,7 +55,7 @@
       bind:clientHeight={height}
       class="flex justify-end gap-8"
     >
-      <div class="flex gap-2 items-center justify-center">
+      <div class="flex items-center justify-center gap-2">
         <p class="w-fit text-right">Per Page</p>
         <FilterSelect
           label="Per Page"
@@ -64,7 +64,7 @@
           options={perPageOptions(perPage)}
         />
       </div>
-      <div class="flex gap-6 items-center justify-center">
+      <div class="flex items-center justify-center gap-6">
         <button
           class="caret"
           disabled={!$store.hasPrevious}
@@ -87,7 +87,7 @@
   </div>
   <slot visibleItems={$store.items} initialItem={$store.initialItem} />
   <nav class="flex justify-end gap-8">
-    <div class="flex gap-2 items-center justify-center">
+    <div class="flex items-center justify-center gap-2">
       <p class="w-fit text-right">Per Page</p>
       <FilterSelect
         label="Per Page"
@@ -96,7 +96,7 @@
         options={perPageOptions(perPage)}
       />
     </div>
-    <div class="flex gap-6 items-center justify-center">
+    <div class="flex items-center justify-center gap-6">
       <button
         class="caret"
         disabled={!$store.hasPrevious}
@@ -124,6 +124,6 @@
   }
 
   .caret:disabled {
-    @apply text-gray-300 cursor-not-allowed;
+    @apply cursor-not-allowed text-gray-300;
   }
 </style>

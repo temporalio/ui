@@ -77,17 +77,17 @@
   data-cy="event-summary-row"
 >
   <td class="id-cell text-left">
-    <a class="text-gray-500 mx-1 text-sm md:text-base" href="#{event.id}"
+    <a class="mx-1 text-sm text-gray-500 md:text-base" href="#{event.id}"
       >{event.id}</a
     >
   </td>
   <td class="cell flex text-left">
     <a
-      class="text-gray-500 mx-1 text-sm md:text-base xl:hidden"
+      class="mx-1 text-sm text-gray-500 md:text-base xl:hidden"
       href="#{event.id}">{event.id}</a
     >
     <p
-      class="md:mx-2 text-sm md:text-base font-semibold link event-name"
+      class="link event-name text-sm font-semibold md:mx-2 md:text-base"
       on:click|stopPropagation={onLinkClick}
     >
       {#if compact && failure}
@@ -103,7 +103,7 @@
       <Icon class="inline" icon={expanded ? faAngleUp : faAngleDown} />
     </p>
   </td>
-  <td class="cell links text-sm font-normal text-right xl:text-left">
+  <td class="cell links text-right text-sm font-normal xl:text-left">
     {#if showElapsed && event.id !== initialItem.id}
       {formatDistanceAbbreviated({
         start: initialItem.eventTime,
@@ -135,7 +135,7 @@
 
 <style lang="postcss">
   .row {
-    @apply no-underline xl:py-3 text-sm border-b-2 border-gray-700 items-center xl:text-base flex flex-wrap xl:table-row last-of-type:border-b-0;
+    @apply flex flex-wrap items-center border-b-2 border-gray-700 text-sm no-underline last-of-type:border-b-0 xl:table-row xl:py-3 xl:text-base;
   }
 
   .row:hover {
@@ -173,12 +173,12 @@
   }
 
   .cell {
-    @apply xl:table-cell xl:border-b-2 border-gray-700 pt-1 pb-0 px-3 leading-4;
+    @apply border-gray-700 px-3 pt-1 pb-0 leading-4 xl:table-cell xl:border-b-2;
     flex: 40%;
   }
 
   .id-cell {
-    @apply hidden xl:table-cell xl:border-b-2 border-gray-700 py-1 px-3 leading-4;
+    @apply hidden border-gray-700 py-1 px-3 leading-4 xl:table-cell xl:border-b-2;
   }
 
   .expanded .cell,
@@ -187,7 +187,7 @@
   }
 
   .link {
-    @apply text-gray-900 cursor-pointer;
+    @apply cursor-pointer text-gray-900;
   }
 
   .row:hover .link {
@@ -204,6 +204,6 @@
   }
 
   .expanded-cell {
-    @apply w-full border-gray-700 border-b-2 no-underline text-sm xl:text-base flex flex-wrap xl:table-cell;
+    @apply flex w-full flex-wrap border-b-2 border-gray-700 text-sm no-underline xl:table-cell xl:text-base;
   }
 </style>

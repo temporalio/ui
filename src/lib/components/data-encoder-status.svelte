@@ -20,7 +20,7 @@
   {#if $dataEncoder?.hasNotRequested}
     <Tooltip right text={'Data encoder is configured'}>
       <button
-        class="flex cursor-pointer relative"
+        class="relative flex cursor-pointer"
         data-cy="data-encoder-status-configured"
         on:click={() => (showSettings = true)}
       >
@@ -31,7 +31,7 @@
   {:else if $dataEncoder.hasError}
     <Tooltip right text={`Data encoder couldn't connect to the remote encoder`}>
       <button
-        class="flex cursor-pointer relative"
+        class="relative flex cursor-pointer"
         data-cy="data-encoder-status-error"
         on:click={() => (showSettings = true)}
       >
@@ -42,7 +42,7 @@
   {:else if $dataEncoder.hasSuccess}
     <Tooltip right text={'Data encoder succesfully converted content'}>
       <button
-        class="flex cursor-pointer relative"
+        class="relative flex cursor-pointer"
         data-cy="data-encoder-status-success"
         on:click={() => (showSettings = true)}
       >
@@ -54,7 +54,7 @@
 {:else}
   <Tooltip right text={'Configure data encoder'}>
     <button
-      class="flex cursor-pointer relative"
+      class="relative flex cursor-pointer"
       data-cy="data-encoder-status"
       on:click={() => (showSettings = true)}
     >

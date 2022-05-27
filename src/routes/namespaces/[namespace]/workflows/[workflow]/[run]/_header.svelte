@@ -30,18 +30,18 @@
 </script>
 
 <header class="flex flex-col gap-4">
-  <main class="flex flex-col gap-1 relative">
-    <div class="block -mt-3 -ml-2">
+  <main class="relative flex flex-col gap-1">
+    <div class="-mt-3 -ml-2 block">
       <a href="/namespaces/{namespace}/workflows" class="back-to-workflows">
         <Icon name="caretLeft" class="inline" />Back to Workflows
       </a>
     </div>
-    <div class="flex justify-between items-center mb-8">
-      <h1 class="text-2xl flex relative items-center gap-4">
+    <div class="mb-8 flex items-center justify-between">
+      <h1 class="relative flex items-center gap-4 text-2xl">
         <WorkflowStatus status={workflow?.status} />
-        <span class="font-medium select-all">{workflow.id}</span>
+        <span class="select-all font-medium">{workflow.id}</span>
       </h1>
-      <div class="ml-8 flex justify-end items-center gap-4">
+      <div class="ml-8 flex items-center justify-end gap-4">
         <ExportHistory
           {namespace}
           workflowId={workflow.id}
@@ -50,7 +50,7 @@
         <TerminateWorkflow {workflow} {namespace} />
       </div>
     </div>
-    <nav class="flex gap-6 flex-wrap">
+    <nav class="flex flex-wrap gap-6">
       <Tab
         label="History"
         href={routeForEventHistory({

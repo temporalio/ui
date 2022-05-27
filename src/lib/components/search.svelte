@@ -13,21 +13,21 @@
 
 <form
   on:submit|preventDefault
-  class="flex items-center relative rounded-lg border-2 focus-within:border-blue-700 transition-colors"
+  class="relative flex items-center rounded-lg border-2 transition-colors focus-within:border-blue-700"
 >
   {#if icon}
     <Icon
       icon={faSearch}
       scale={0.9}
       color="gray"
-      class="flex items-center ml-4"
+      class="ml-4 flex items-center"
     />
   {/if}
   <label for={id} class="hidden">{label}</label>
   <input
     {id}
     type="text"
-    class="w-full px-4 focus:outline-none rounded-l-lg"
+    class="w-full rounded-l-lg px-4 focus:outline-none"
     {name}
     {value}
     {placeholder}

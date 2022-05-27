@@ -21,14 +21,14 @@
 </script>
 
 <section
-  class="flex flex-col justify-center absolute w-1/3 top-20 right-4 z-40"
+  class="absolute top-20 right-4 z-40 flex w-1/3 flex-col justify-center"
 >
   {#each $notifications as notification (notification.id)}
     <article
       in:receive={{ key: notification.id }}
       out:send={{ key: notification.id }}
       animate:flip
-      class="px-8 py-6 mb-4 opacity-90 shadow-lg {notification.type}"
+      class="mb-4 px-8 py-6 opacity-90 shadow-lg {notification.type}"
       on:click={() => notifications.dismiss(notification.id)}
     >
       <p>
@@ -40,18 +40,18 @@
 
 <style lang="postcss">
   .error {
-    @apply bg-red-300 border-l-4 border-red-500;
+    @apply border-l-4 border-red-500 bg-red-300;
   }
 
   .success {
-    @apply bg-green-300 border-l-4 border-green-500;
+    @apply border-l-4 border-green-500 bg-green-300;
   }
 
   .warning {
-    @apply bg-yellow-300 border-l-4 border-yellow-500;
+    @apply border-l-4 border-yellow-500 bg-yellow-300;
   }
 
   .information {
-    @apply bg-blue-300 border-l-4 border-blue-500;
+    @apply border-l-4 border-blue-500 bg-blue-300;
   }
 </style>
