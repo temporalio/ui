@@ -8,6 +8,7 @@
 
   import { eventSortOrder, eventShowElapsed } from '$lib/stores/event-view';
   import { timeFormat } from '$lib/stores/time-format';
+  import { workflowEventsColumnWidth } from '$lib/stores/column-width';
 
   import { getGroupForEvent, isEventGroup } from '$lib/models/event-groups';
   import {
@@ -20,6 +21,7 @@
     formatDistanceAbbreviated,
   } from '$lib/utilities/format-date';
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
+  import { getTruncatedWord } from '$lib/utilities/get-truncated-word';
 
   import EventDetailsRow from './event-details-row.svelte';
   import EventDetailsFull from './event-details-full.svelte';
@@ -110,7 +112,7 @@
       {#if compact && terminated}
         <Icon class="inline text-pink-700" icon={faClock} />
       {/if}
-      {event.name}
+      {getTruncatedWord(event.name, $workflowEventsColumnWidth)}
     </p>
   </td>
   <td class="cell links">
