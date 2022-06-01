@@ -31,7 +31,7 @@
     <CodeBlock content={getCodeBlockValue(value)} class="w-full" {inline} />
   {:else if shouldDisplayAsWorkflowLink(key)}
     <div class="xl:3/4 flex w-full items-center xl:items-start">
-      <h2 class="text-sm mr-3">{format(key)}</h2>
+      <h2 class="mr-3 text-sm">{format(key)}</h2>
       <div class="text-sm">
         <Copyable
           content={value}
@@ -46,7 +46,7 @@
     </div>
   {:else if shouldDisplayAsWorkersLink(key)}
     <div class="xl:3/4 flex w-full items-center xl:items-start">
-      <h2 class="text-sm mr-3">{format(key)}</h2>
+      <h2 class="mr-3 text-sm">{format(key)}</h2>
       <div class="text-sm">
         <Copyable
           content={value}
@@ -61,7 +61,7 @@
     </div>
   {:else}
     <div class="xl:3/4 flex w-full items-center xl:items-start">
-      <h2 class="text-sm mr-3">{format(key)}</h2>
+      <h2 class="mr-3 text-sm">{format(key)}</h2>
       <p class="text-right text-sm xl:text-left">
         <span
           class="select-all px-2 text-gray-700"

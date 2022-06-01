@@ -82,7 +82,7 @@
       >{event.id}</a
     >
   </td>
-  <td class="cell flex text-left w-1/4">
+  <td class="cell flex w-1/4 text-left">
     <a
       class="mx-1 text-sm text-gray-500 md:text-base xl:hidden"
       href="#{event.id}">{event.id}</a
@@ -99,8 +99,8 @@
       {/if}
     </p>
   </td>
-  <td class="cell text-sm font-normal text-right xl:text-left w-10">
-    <p tabindex="0" class="event-name font-semibold text-sm md:text-base">
+  <td class="cell w-10 text-right text-sm font-normal xl:text-left">
+    <p tabindex="0" class="event-name text-sm font-semibold md:text-base">
       {#if compact && failure}
         <Icon class="inline text-red-700" icon={faClock} />
       {/if}
@@ -141,7 +141,7 @@
   }
 
   .row:hover {
-    @apply bg-gray-50 cursor-pointer;
+    @apply cursor-pointer bg-gray-50;
   }
 
   .expanded.row {
