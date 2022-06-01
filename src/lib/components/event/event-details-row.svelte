@@ -25,18 +25,14 @@
   class="flex flex-row gap-2 border-b-2 border-gray-200 py-2 first:pt-0 last:border-b-0 xl:gap-4 {$$props.class}"
 >
   {#if typeof value === 'object'}
-    <h2 class="w-full items-center text-sm xl:w-1/3 xl:items-start">
+    <h2 class="min-w-fit items-center text-sm xl:items-start">
       {format(key)}
     </h2>
-    <CodeBlock
-      content={getCodeBlockValue(value)}
-      class="w-full w-96 md:w-auto xl:w-2/3"
-      {inline}
-    />
+    <CodeBlock content={getCodeBlockValue(value)} class="w-full" {inline} />
   {:else if shouldDisplayAsWorkflowLink(key)}
     <div class="xl:3/4 flex w-full items-center xl:items-start">
-      <h2 class="w-full text-sm xl:w-1/3">{format(key)}</h2>
-      <div class="w-full text-sm xl:w-2/3">
+      <h2 class="text-sm mr-3">{format(key)}</h2>
+      <div class="text-sm">
         <Copyable
           content={value}
           container-class="flex-row-reverse xl:flex-row"
@@ -50,8 +46,8 @@
     </div>
   {:else if shouldDisplayAsWorkersLink(key)}
     <div class="xl:3/4 flex w-full items-center xl:items-start">
-      <h2 class="w-full text-sm xl:w-1/3">{format(key)}</h2>
-      <div class="w-full text-sm xl:w-2/3">
+      <h2 class="text-sm mr-3">{format(key)}</h2>
+      <div class="text-sm">
         <Copyable
           content={value}
           container-class="flex-row-reverse xl:flex-row"
@@ -65,8 +61,8 @@
     </div>
   {:else}
     <div class="xl:3/4 flex w-full items-center xl:items-start">
-      <h2 class="w-full text-sm xl:w-1/3">{format(key)}</h2>
-      <p class="w-full text-right text-sm xl:w-2/3 xl:text-left">
+      <h2 class="text-sm mr-3">{format(key)}</h2>
+      <p class="text-right text-sm xl:text-left">
         <span
           class="select-all px-2 text-gray-700"
           class:badge={!shouldDisplayAsPlainText(key)}>{value}</span
