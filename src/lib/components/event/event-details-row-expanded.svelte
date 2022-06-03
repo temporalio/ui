@@ -62,7 +62,7 @@
     <div class="detail-row">
       <h2 class="text-sm">{format(key)}</h2>
       <p class="text-sm">
-        <span class="px-2 select-all">{value}</span>
+        <span class="select-all px-2">{value}</span>
       </p>
     </div>
   {/if}
@@ -70,10 +70,10 @@
 
 <style lang="postcss">
   .code-block-row {
-    @apply block w-full py-2 text-left border-b-2 border-gray-200;
+    @apply block w-full border-b-2 border-gray-200 py-2 text-left;
   }
   .detail-row {
-    @apply block xl:flex items-start gap-4 w-full py-2 text-left border-b-2 border-gray-200;
+    @apply block w-full items-start gap-4 border-b-2 border-gray-200 py-2 text-left xl:flex;
   }
   .row:last-of-type .detail-row {
     @apply border-b-0;

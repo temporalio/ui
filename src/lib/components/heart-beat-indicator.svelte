@@ -38,7 +38,7 @@
 
 <style lang="postcss">
   .heart-beat {
-    @apply flex bg-blue-100 justify-center items-center text-center relative;
+    @apply relative flex items-center justify-center bg-blue-100 text-center;
   }
 
   .heart-rate {
@@ -49,7 +49,7 @@
   }
 
   .fade-in {
-    @apply absolute top-0 right-0 bg-blue-100 w-full h-full;
+    @apply absolute top-0 right-0 h-full w-full bg-blue-100;
     animation: heartRateIn 2s linear infinite;
     animation-delay: var(--animation-delay, 0);
   }

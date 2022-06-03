@@ -70,7 +70,7 @@
             >
           {:else}
             <input
-              class="block w-80 border border-gray-200 rounded-md p-2"
+              class="block w-80 rounded-md border border-gray-200 p-2"
               placeholder="Endpoint"
               data-cy="data-encoder-endpoint-input"
               bind:value={endpoint}
@@ -88,7 +88,7 @@
           >
         {/if}
         {#if $dataEncoder.settingsEndpoint}
-          <div class="flex items-center justify-between mt-4">
+          <div class="mt-4 flex items-center justify-between">
             <p data-cy="data-encoder-site-endpoint">
               {$dataEncoder.settingsEndpoint}
             </p>
@@ -108,7 +108,7 @@
         </h3>
         <div class="flex items-center justify-between">
           <input
-            class="block w-80 border border-gray-200 rounded-md p-2"
+            class="block w-80 rounded-md border border-gray-200 p-2"
             placeholder="Endpoint"
             data-cy="data-encoder-endpoint-input"
             bind:value={endpoint}
@@ -147,7 +147,7 @@
         </h3>
         <div class="flex items-center justify-between">
           <input
-            class="block w-80 border border-gray-200 rounded-md p-2"
+            class="block w-80 rounded-md border border-gray-200 p-2"
             placeholder="Port"
             data-cy="data-encoder-port-input"
             bind:value={port}

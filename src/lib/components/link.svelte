@@ -7,7 +7,7 @@
   {href}
   class:text-blue-900={active}
   {...$$props}
-  class="{$$props.class} hover:text-blue-700 underline underline-offset-2"
+  class="{$$props.class} underline underline-offset-2 hover:text-blue-700"
   on:click
 >
   <slot />

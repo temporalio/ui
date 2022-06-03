@@ -44,7 +44,7 @@
 </script>
 
 <input
-  class="import-input block border border-gray-200 rounded-md p-2"
+  class="import-input block rounded-md border border-gray-200 p-2"
   type="file"
   accept=".json"
   on:change={onFileSelect}

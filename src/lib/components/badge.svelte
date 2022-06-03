@@ -6,23 +6,23 @@
 
 <div
   class={`${type}     
-        rounded-sm
-        text-center 
-        inline-block
-        px-1
         ml-1
-        text-sm
-        align-middle`}
+        inline-block 
+        rounded-sm
+        px-1
+        text-center
+        align-middle
+        text-sm`}
 >
   <slot />
 </div>
 
 <style lang="postcss">
   .beta {
-    @apply bg-blue-100  text-blue-700  border-blue-700;
+    @apply border-blue-700  bg-blue-100  text-blue-700;
   }
 
   .alpha {
-    @apply bg-purple-100 text-purple-700 border-purple-700;
+    @apply border-purple-700 bg-purple-100 text-purple-700;
   }
 </style>

@@ -27,13 +27,13 @@
 </script>
 
 {#if compact && eventGroup}
-  <div class="flex flex-col lg:flex-row w-full">
+  <div class="flex w-full flex-col lg:flex-row">
     <EventGroupDetails
       {eventGroup}
       {selectedId}
       onGroupClick={handleGroupClick}
     />
-    <div class="w-full block lg:w-2/3">
+    <div class="block w-full lg:w-2/3">
       <EventDetailPills
         {attributeGrouping}
         {activePill}

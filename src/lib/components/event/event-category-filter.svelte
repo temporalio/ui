@@ -54,13 +54,13 @@
 
 <style lang="postcss">
   .option {
-    @apply font-normal flex my-2;
+    @apply my-2 flex font-normal;
   }
   .label {
     @apply cursor-pointer;
   }
   .check {
-    @apply mx-4 w-4 mt-1;
+    @apply mx-4 mt-1 w-4;
   }
   .active {
     @apply text-blue-700;

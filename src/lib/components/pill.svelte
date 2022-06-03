@@ -22,14 +22,14 @@
 
 <style lang="postcss">
   .pill {
-    @apply flex items-center gap-1 justify-center rounded-full px-3 py-1 text-sm border-2 border-gray-100;
+    @apply flex items-center justify-center gap-1 rounded-full border-2 border-gray-100 px-3 py-1 text-sm;
   }
 
   .gray {
     @apply bg-gray-100 text-gray-600;
   }
   .gray.active {
-    @apply bg-white text-gray-900 border-2 border-gray-900;
+    @apply border-2 border-gray-900 bg-white text-gray-900;
   }
 
   .blueGray {

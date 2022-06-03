@@ -75,7 +75,7 @@
       on:submit={submitAdvancedQuery}
     />
   {:else}
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-5">
       <FilterInput
         parameter="workflow-id"
         name="Workflow ID"

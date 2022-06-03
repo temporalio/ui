@@ -12,7 +12,7 @@
     <img
       src={user.picture}
       alt="User Avatar"
-      class="rounded-full h-6 w-6 mr-2.5"
+      class="mr-2.5 h-6 w-6 rounded-full"
     />
     Logout
   </button>
@@ -20,10 +20,10 @@
 
 <style lang="postcss">
   .logout-button {
-    @apply rounded-full px-4 py-2 text-sm text-white flex items-center justify-center;
+    @apply flex items-center justify-center rounded-full px-4 py-2 text-sm text-white;
   }
 
   .logout-button:hover {
-    @apply bg-purple-100 rounded-md text-gray-900;
+    @apply rounded-md bg-purple-100 text-gray-900;
   }
 </style>

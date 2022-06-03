@@ -18,41 +18,41 @@
 </script>
 
 {#if pendingActivities.length}
-  <section class="border-2 border-gray-300 rounded-lg p-4">
-    <h3 class="text-lg font-medium mb-4">Pending Activities</h3>
+  <section class="rounded-lg border-2 border-gray-300 p-4">
+    <h3 class="mb-4 text-lg font-medium">Pending Activities</h3>
     <section class="w-full table-auto space-x-4">
       {#each pendingActivities as { id, ...pendingActivity } (id)}
         <a
-          class="block md:flex content-between w-full border-b-2 border-gray-300 p-2 last-of-type:border-b-0 hover:bg-gray-50 gap-4 items-center"
+          class="block w-full content-between items-center gap-4 border-b-2 border-gray-300 p-2 last-of-type:border-b-0 hover:bg-gray-50 md:flex"
           {href}
         >
-          <div class="md:w-1/12 text-left font-normal text-gray-500 w-40">
+          <div class="w-40 text-left font-normal text-gray-500 md:w-1/12">
             {pendingActivity.activityId}
           </div>
           <div class="w-full md:w-1/4">
-            <div class="flex gap-2 items-center">
+            <div class="flex items-center gap-2">
               <h4>Activity Name</h4>
               <p>
-                <span class="bg-gray-300 text-gray-700 px-2 text-sm">
+                <span class="bg-gray-300 px-2 text-sm text-gray-700">
                   {pendingActivity.activityType}
                 </span>
               </p>
             </div>
           </div>
           <div class="w-full md:w-5/12">
-            <div class="flex gap-2 items-center">
+            <div class="flex items-center gap-2">
               <h3 class="whitespace-nowrap">Last Failure</h3>
               {#if pendingActivity.lastFailure}
                 <Copyable
                   content={pendingActivity.lastFailure?.message}
                   container-class="overflow-y-scroll"
                 >
-                  <pre class="rounded-lg max-w-fit"><code class="language-json"
+                  <pre class="max-w-fit rounded-lg"><code class="language-json"
                       >{pendingActivity.lastFailure?.message}</code
                     ></pre>
                 </Copyable>
               {:else}
-                <span class="bg-gray-300 text-gray-700 px-2 text-sm"
+                <span class="bg-gray-300 px-2 text-sm text-gray-700"
                   >(Empty)</span
                 >
               {/if}

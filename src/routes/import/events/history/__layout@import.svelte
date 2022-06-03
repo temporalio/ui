@@ -13,13 +13,13 @@
 </script>
 
 <section id="event-history">
-  <nav class="flex gap-4 justify-between items-end pb-4">
+  <nav class="flex items-end justify-between gap-4 pb-4">
     <h3 class="text-lg font-medium">Event History</h3>
     <div class="flex gap-4">
       <HistoryImport />
     </div>
   </nav>
-  <nav class="flex gap-4 justify-end items-end pb-4">
+  <nav class="flex items-end justify-end gap-4 pb-4">
     <div id="event-view-toggle" class="flex gap-4">
       <ToggleButtons>
         <ToggleButton

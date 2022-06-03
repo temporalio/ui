@@ -34,7 +34,7 @@
   export let workers: GetPollersResponse;
 </script>
 
-<main class="flex flex-col gap-6 h-full">
+<main class="flex h-full flex-col gap-6">
   <Header {namespace} {workflow} {workers} />
   <slot />
 </main>

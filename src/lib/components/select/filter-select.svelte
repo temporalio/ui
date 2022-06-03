@@ -16,17 +16,17 @@
 
   let _value = parameterValue || (value && value.toString());
 
-  $: {
+  const onChange = () => {
     updateQueryParameters({
       parameter,
       value: _value,
       url: $page.url,
       goto,
     }).then((v) => (value = v));
-  }
+  };
 </script>
 
-<Select {id} bind:value={_value} {...$$props}>
+<Select on:change={onChange} {id} bind:value={_value} {...$$props}>
   <slot>
     {#each options as option}
       <Option value={option} />

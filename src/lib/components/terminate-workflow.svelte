@@ -51,7 +51,7 @@
         undone.
       </p>
       <input
-        class="block w-full border border-gray-200 rounded-md p-2 mt-4"
+        class="mt-4 block w-full rounded-md border border-gray-200 p-2"
         placeholder="Enter a reason"
         bind:value={reason}
       />

@@ -12,7 +12,7 @@
 <div class="wrapper relative inline-block">
   <slot />
   <div class="tooltip" class:left class:right class:bottom class:top>
-    <div class="bg-gray-800 inline-block px-2 py-2 rounded-lg">
+    <div class="inline-block rounded-lg bg-gray-800 px-2 py-2">
       {#if copyable}
         <Copyable clickAllToCopy content={text} color="white">
           <span class="text-gray-100">{text}</span>
@@ -26,7 +26,7 @@
 
 <style lang="postcss">
   .tooltip {
-    @apply inline-block left-0 top-0 opacity-0 whitespace-nowrap absolute z-50 translate-x-12 text-xs shadow-md transition-all invisible;
+    @apply invisible absolute left-0 top-0 z-50 inline-block translate-x-12 whitespace-nowrap text-xs opacity-0 shadow-md transition-all;
   }
 
   .tooltip.top {
@@ -43,6 +43,6 @@
   }
 
   .wrapper:hover .tooltip {
-    @apply opacity-90 visible;
+    @apply visible opacity-90;
   }
 </style>

@@ -17,6 +17,7 @@ Starting the UI API server will give you a somewhat recent version on `localhost
 Once you have the prerequisites going, run the following:
 
 ```bash
+npm install
 npm run build:local
 npm run preview:local
 ```

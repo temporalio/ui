@@ -11,15 +11,15 @@
 </script>
 
 {#if pendingActivities.length}
-  <section class="mb-6 event-table">
-    <header class="p-2 border-gray-900 bg-gray-900 text-white  w-full">
+  <section class="event-table mb-6">
+    <header class="w-full border-gray-900 bg-gray-900 p-2  text-white">
       <h2>Pending Activities</h2>
     </header>
     {#each pendingActivities as { id, activityId, ...details } (id)}
       <article
-        class="flex gap-4 p-4 items-start last-of-type:border-b-0 border-b-2 border-gray-600"
+        class="flex items-start gap-4 border-b-2 border-gray-600 p-4 last-of-type:border-b-0"
       >
-        <div {id} class="py-1 w-12">
+        <div {id} class="w-12 py-1">
           <Link href="#{id}" class="block py-1">{activityId}</Link>
         </div>
         <table class="w-full">
@@ -34,15 +34,15 @@
                       </h2>
                       <CodeBlock
                         content={value}
-                        class="w-full text-right pb-2"
+                        class="w-full pb-2 text-right"
                       />
                     {:else}
                       <div
-                        class="flex justify-between md:justify-start items-center gap-4"
+                        class="flex items-center justify-between gap-4 md:justify-start"
                       >
                         <h2>{format(key)}</h2>
-                        <p class="text-sm text-right xl:text-left ">
-                          <span class="px-2 bg-gray-300 select-all"
+                        <p class="text-right text-sm xl:text-left ">
+                          <span class="select-all bg-gray-300 px-2"
                             >{value}</span
                           >
                         </p>
@@ -63,6 +63,6 @@
 
 <style lang="postcss">
   .event-table {
-    @apply xl:table table-fixed border-gray-900 border-2 rounded-lg w-full;
+    @apply w-full table-fixed rounded-lg border-2 border-gray-900 xl:table;
   }
 </style>

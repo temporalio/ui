@@ -2,7 +2,7 @@
   <div class="cell md:table-cell">
     <p />
   </div>
-  <div class="cell md:table-cell w-1/2">
+  <div class="cell w-1/2 md:table-cell">
     <p>Loading</p>
   </div>
   <div class="cell md:table-cell">
@@ -18,11 +18,11 @@
 
 <style lang="postcss">
   .row {
-    @apply no-underline p-2 text-sm border-b-2 items-center md:text-base md:table-row last-of-type:border-b-0;
+    @apply items-center border-b-2 p-2 text-sm no-underline last-of-type:border-b-0 md:table-row md:text-base;
   }
 
   .cell {
-    @apply md:border-b-2 text-left p-2;
+    @apply p-2 text-left md:border-b-2;
   }
 
   .row:last-of-type .cell {

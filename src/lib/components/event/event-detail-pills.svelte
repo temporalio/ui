@@ -29,6 +29,6 @@
 
 <style lang="postcss">
   .pill-container {
-    @apply inline-flex gap-2 items-center justify-start flex-col md:flex-row px-2 py-2 rounded-md md:rounded-full bg-gray-100;
+    @apply inline-flex flex-col items-center justify-start gap-2 rounded-md bg-gray-100 px-2 py-2 md:flex-row md:rounded-full;
   }
 </style>
