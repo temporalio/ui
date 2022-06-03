@@ -2,7 +2,7 @@
   import Icon from 'svelte-fa';
   import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 
-  import { events } from '$lib/stores/events';
+  import { events, updating } from '$lib/stores/events';
 
   import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
   import { capitalize } from '$lib/utilities/format-camel-case';
@@ -21,7 +21,21 @@
 >
   <h3 class="text-lg">{title}</h3>
   {#if content}
-    <CodeBlock {content} class="mb-2 max-h-96" />
+    {#if $updating}
+      <div class="my-12 flex flex-col items-center justify-start gap-2">
+        <div
+          class="flex h-16 w-16 items-center justify-center rounded-full bg-gray-200"
+        >
+          <Icon
+            icon={faSpinner}
+            scale={1.2}
+            class="block h-full w-full animate-spin"
+          />
+        </div>
+      </div>
+    {:else}
+      <CodeBlock {content} class="mb-2 max-h-96" />
+    {/if}
   {:else}
     <div class="my-12 flex flex-col items-center justify-start gap-2">
       <div
