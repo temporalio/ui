@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
 
+  import { workflowEventsColumnWidth } from '$lib/stores/column-width';
   import EventCategoryFilter from '$lib/components/event/event-category-filter.svelte';
   import EventDateFilter from '$lib/components/event/event-date-filter.svelte';
   import { expandAllEvents } from '$lib/stores/event-view';
@@ -27,17 +28,20 @@
     data-cy="event-summary-table-header-desktop"
   >
     <div class="hidden xl:table-row">
-      <div class="table-header w-8 rounded-tl-md" />
-      <div class="table-header w-1/4">
-        {title}<EventCategoryFilter />
-      </div>
-      <div class="table-header">
+      <div class="table-header w-12 rounded-tl-md" />
+      <div class="table-header w-1/5">
         Date & Time
         {#if !compact}<EventDateFilter />{/if}
       </div>
-      <div class="table-header relative w-1/2 rounded-tr-md">
-        Event Details
-        <div class="absolute right-4 top-3">
+      <div
+        bind:offsetWidth={$workflowEventsColumnWidth}
+        class="table-header relative w-1/5"
+      >
+        {title}<EventCategoryFilter />
+      </div>
+      <div class="table-header w-auto" />
+      <div class="table-header relative w-32 rounded-tr-md">
+        <div class="absolute right-5 top-3">
           <input
             class="mr-1"
             type="checkbox"
@@ -51,21 +55,26 @@
     </div>
   </div>
   <div class="table-header-row-responsive rounded-t-md">
-    <div class="table-header-responsive">{title}<EventCategoryFilter /></div>
-    <div class="table-header-responsive">
+    <div class="table-header-responsive w-2/3">
       Date & Time
       {#if !compact}<EventDateFilter />{/if}
     </div>
-    <div class="table-header-responsive">
-      <div>
-        <input
-          type="checkbox"
-          name="expandAll"
-          on:change={handleChange}
-          checked={expandAll}
-        />
-        <label for="expandAll">Expand all</label>
-      </div>
+    <div
+      bind:offsetWidth={$workflowEventsColumnWidth}
+      class="table-header-responsive w-1/3 justify-end"
+    >
+      {title}<EventCategoryFilter />
+    </div>
+    <div class="table-header-responsive" />
+    <div class="table-header-responsive min-w-fit">
+      <input
+        class="mr-1"
+        type="checkbox"
+        name="expandAll"
+        on:change={handleChange}
+        checked={expandAll}
+      />
+      <label for="expandAll">Expand all</label>
     </div>
   </div>
   <div class="overflow-y-auto xl:table-row-group">
@@ -83,11 +92,11 @@
   }
 
   .table-header-row-responsive {
-    @apply flex justify-end bg-gray-900 px-3 text-gray-100 xl:hidden;
+    @apply flex justify-between bg-gray-900 px-3 text-gray-100 xl:hidden;
   }
 
   .table-header {
-    @apply flex p-2 text-left xl:table-cell;
+    @apply flex px-3 py-2 text-left xl:table-cell;
   }
 
   .table-header-responsive {

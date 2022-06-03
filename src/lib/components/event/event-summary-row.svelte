@@ -8,6 +8,7 @@
 
   import { eventSortOrder, eventShowElapsed } from '$lib/stores/event-view';
   import { timeFormat } from '$lib/stores/time-format';
+  import { workflowEventsColumnWidth } from '$lib/stores/column-width';
 
   import { getGroupForEvent, isEventGroup } from '$lib/models/event-groups';
   import {
@@ -20,6 +21,7 @@
     formatDistanceAbbreviated,
   } from '$lib/utilities/format-date';
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
+  import { getTruncatedWord } from '$lib/utilities/get-truncated-word';
 
   import EventDetailsRow from './event-details-row.svelte';
   import EventDetailsFull from './event-details-full.svelte';
@@ -75,21 +77,32 @@
   class:canceled
   class:terminated
   data-cy="event-summary-row"
+  on:click|stopPropagation={onLinkClick}
 >
   <td class="id-cell text-left">
     <a class="mx-1 text-sm text-gray-500 md:text-base" href="#{event.id}"
       >{event.id}</a
     >
   </td>
-  <td class="cell flex text-left">
+  <td class="cell flex w-1/4 text-left">
     <a
       class="mx-1 text-sm text-gray-500 md:text-base xl:hidden"
       href="#{event.id}">{event.id}</a
     >
-    <p
-      class="link event-name text-sm font-semibold md:mx-2 md:text-base"
-      on:click|stopPropagation={onLinkClick}
-    >
+    <p class="m-0 text-sm md:text-base">
+      {#if showElapsed && event.id !== initialItem.id}
+        {formatDistanceAbbreviated({
+          start: initialItem.eventTime,
+          end: currentEvent.eventTime,
+        })}
+        {timeDiffChange}
+      {:else}
+        {formatDate(event?.eventTime, $timeFormat)}
+      {/if}
+    </p>
+  </td>
+  <td class="cell w-10 text-right text-sm font-normal xl:text-left">
+    <p tabindex="0" class="event-name text-sm font-semibold md:text-base">
       {#if compact && failure}
         <Icon class="inline text-red-700" icon={faClock} />
       {/if}
@@ -99,30 +112,21 @@
       {#if compact && terminated}
         <Icon class="inline text-pink-700" icon={faClock} />
       {/if}
-      {event.name}
-      <Icon class="inline" icon={expanded ? faAngleUp : faAngleDown} />
+      {getTruncatedWord(event.name, $workflowEventsColumnWidth)}
     </p>
-  </td>
-  <td class="cell links text-right text-sm font-normal xl:text-left">
-    {#if showElapsed && event.id !== initialItem.id}
-      {formatDistanceAbbreviated({
-        start: initialItem.eventTime,
-        end: currentEvent.eventTime,
-      })}
-      {timeDiffChange}
-    {:else}
-      {formatDate(event?.eventTime, $timeFormat)}
-    {/if}
   </td>
   <td class="cell links">
     {#if !expanded}
       <EventDetailsRow {...getSingleAttributeForEvent(currentEvent)} inline />
     {/if}
   </td>
+  <td class="cell text-right">
+    <Icon class="inline" icon={expanded ? faAngleUp : faAngleDown} />
+  </td>
 </tr>
 {#if expanded}
   <tr class="expanded-row">
-    <td class="expanded-cell" colspan="4">
+    <td class="expanded-cell" colspan="5">
       <EventDetailsFull
         event={currentEvent}
         {compact}
@@ -139,12 +143,13 @@
   }
 
   .row:hover {
-    @apply bg-gray-50;
+    @apply cursor-pointer bg-gray-50;
   }
 
   .expanded.row {
     @apply border-b-0;
   }
+
   .failure,
   .failure:hover {
     @apply bg-red-50;
@@ -184,14 +189,6 @@
   .expanded .cell,
   .expanded .id-cell {
     @apply border-b-0;
-  }
-
-  .link {
-    @apply cursor-pointer text-gray-900;
-  }
-
-  .row:hover .link {
-    @apply text-blue-700 underline decoration-blue-700;
   }
 
   .row:last-of-type .cell,

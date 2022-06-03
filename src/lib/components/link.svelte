@@ -8,7 +8,7 @@
   class:text-blue-900={active}
   {...$$props}
   class="{$$props.class} underline underline-offset-2 hover:text-blue-700"
-  on:click
+  on:click|stopPropagation
 >
   <slot />
 </a>
