@@ -8,7 +8,10 @@
 
   import { eventSortOrder, eventShowElapsed } from '$lib/stores/event-view';
   import { timeFormat } from '$lib/stores/time-format';
-  import { workflowEventsColumnWidth } from '$lib/stores/column-width';
+  import {
+    workflowEventsColumnWidth,
+    workflowEventsResponsiveColumnWidth,
+  } from '$lib/stores/column-width';
 
   import { getGroupForEvent, isEventGroup } from '$lib/models/event-groups';
   import {
@@ -67,6 +70,14 @@
   const failure = eventOrGroupIsFailureOrTimedOut(compact ? eventGroup : event);
   const canceled = eventOrGroupIsCanceled(compact ? eventGroup : event);
   const terminated = eventOrGroupIsTerminated(compact ? eventGroup : event);
+
+  let truncateWidth;
+  workflowEventsColumnWidth.subscribe((value) => {
+    if (value !== 0) truncateWidth = value;
+  });
+  workflowEventsResponsiveColumnWidth.subscribe((value) => {
+    if (value !== 0) truncateWidth = value;
+  });
 </script>
 
 <tr
@@ -112,7 +123,7 @@
       {#if compact && terminated}
         <Icon class="inline text-pink-700" icon={faClock} />
       {/if}
-      {getTruncatedWord(event.name, $workflowEventsColumnWidth)}
+      {getTruncatedWord(event.name, truncateWidth)}
     </p>
   </td>
   <td class="cell links">
