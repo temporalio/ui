@@ -8,11 +8,20 @@
   import { capitalize } from '$lib/utilities/format-camel-case';
 
   import CodeBlock from '$lib/components/code-block.svelte';
+  import { onMount } from 'svelte';
 
   export let type: 'input' | 'results';
 
   $: title = capitalize(type);
   $: content = getWorkflowStartedAndCompletedEvents($events)[type];
+
+  let open = false;
+
+  onMount(() => {
+    setTimeout(() => {
+      open = true;
+    }, 250);
+  });
 </script>
 
 <article
@@ -21,7 +30,21 @@
 >
   <h3 class="text-lg">{title}</h3>
   {#if content}
-    <CodeBlock {content} class="mb-2 max-h-96" />
+    {#if open}
+      <CodeBlock {content} class="mb-2 max-h-96" />
+    {:else}
+      <div class="my-12 flex flex-col items-center justify-start gap-2">
+        <div
+          class="flex h-16 w-16 items-center justify-center rounded-full bg-gray-200"
+        >
+          <Icon
+            icon={faSpinner}
+            scale={1.2}
+            class="block h-full w-full animate-spin"
+          />
+        </div>
+      </div>
+    {/if}
   {:else}
     <div class="my-12 flex flex-col items-center justify-start gap-2">
       <div
