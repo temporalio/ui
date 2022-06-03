@@ -2,26 +2,17 @@
   import Icon from 'svelte-fa';
   import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 
-  import { events } from '$lib/stores/events';
+  import { events, updating } from '$lib/stores/events';
 
   import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
   import { capitalize } from '$lib/utilities/format-camel-case';
 
   import CodeBlock from '$lib/components/code-block.svelte';
-  import { onMount } from 'svelte';
 
   export let type: 'input' | 'results';
 
   $: title = capitalize(type);
   $: content = getWorkflowStartedAndCompletedEvents($events)[type];
-
-  let open = false;
-
-  onMount(() => {
-    setTimeout(() => {
-      open = true;
-    }, 250);
-  });
 </script>
 
 <article
@@ -30,7 +21,7 @@
 >
   <h3 class="text-lg">{title}</h3>
   {#if content}
-    {#if open}
+    {#if !$updating}
       <CodeBlock {content} class="mb-2 max-h-96" />
     {:else}
       <div class="my-12 flex flex-col items-center justify-start gap-2">
