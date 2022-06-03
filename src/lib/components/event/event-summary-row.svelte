@@ -123,7 +123,7 @@
       {#if compact && terminated}
         <Icon class="inline text-pink-700" icon={faClock} />
       {/if}
-      {getTruncatedWord(event.name, truncateWidth)}
+      {getTruncatedWord(event.name, truncateWidth - 30)}
     </p>
   </td>
   <td class="cell links">

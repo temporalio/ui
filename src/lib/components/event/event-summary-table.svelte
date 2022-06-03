@@ -38,7 +38,7 @@
       </div>
       <div
         bind:offsetWidth={$workflowEventsColumnWidth}
-        class="table-header relative"
+        class="table-header relative w-1/5"
       >
         {title}<EventCategoryFilter />
       </div>
