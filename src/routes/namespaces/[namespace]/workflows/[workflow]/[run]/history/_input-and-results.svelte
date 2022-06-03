@@ -21,9 +21,7 @@
 >
   <h3 class="text-lg">{title}</h3>
   {#if content}
-    {#if !$updating}
-      <CodeBlock {content} class="mb-2 max-h-96" />
-    {:else}
+    {#if $updating}
       <div class="my-12 flex flex-col items-center justify-start gap-2">
         <div
           class="flex h-16 w-16 items-center justify-center rounded-full bg-gray-200"
@@ -35,6 +33,8 @@
           />
         </div>
       </div>
+    {:else}
+      <CodeBlock {content} class="mb-2 max-h-96" />
     {/if}
   {:else}
     <div class="my-12 flex flex-col items-center justify-start gap-2">
