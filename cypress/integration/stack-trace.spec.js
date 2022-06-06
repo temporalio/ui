@@ -62,4 +62,32 @@ describe('Stack Trace', () => {
 
     cy.get('[data-cy="query-stack-trace"]').contains('go.temporal.io/sdk');
   });
+
+  it('should handle errors when the stack trace is not formatted as we expect', () => {
+    const { workflowId, runId } =
+      workflowRunningFixture.workflowExecutionInfo.execution;
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/*/runs/*/query*`,
+      { fixture: 'query-stack-trace-error.json' },
+    ).as('query-api-error');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}?`,
+      { fixture: 'workflow-running.json' },
+    ).as('workflow-api');
+
+    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
+
+    cy.wait('@workflow-api');
+    cy.wait('@event-history-api');
+
+    cy.get('[data-cy=stack-trace-tab]').click();
+
+    cy.wait('@query-api-error')
+    
+    cy.get('[data-cy="query-stack-trace"]').contains('[{"an":"error"}]')
+  })
 });
