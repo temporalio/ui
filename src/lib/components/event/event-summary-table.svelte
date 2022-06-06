@@ -1,7 +1,10 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
 
-  import { workflowEventsColumnWidth } from '$lib/stores/column-width';
+  import {
+    workflowEventsColumnWidth,
+    workflowEventsResponsiveColumnWidth,
+  } from '$lib/stores/column-width';
   import EventCategoryFilter from '$lib/components/event/event-category-filter.svelte';
   import EventDateFilter from '$lib/components/event/event-date-filter.svelte';
   import { expandAllEvents } from '$lib/stores/event-view';
@@ -29,7 +32,7 @@
   >
     <div class="hidden xl:table-row">
       <div class="table-header w-12 rounded-tl-md" />
-      <div class="table-header w-1/5">
+      <div class="table-header w-80">
         Date & Time
         {#if !compact}<EventDateFilter />{/if}
       </div>
@@ -60,7 +63,7 @@
       {#if !compact}<EventDateFilter />{/if}
     </div>
     <div
-      bind:offsetWidth={$workflowEventsColumnWidth}
+      bind:offsetWidth={$workflowEventsResponsiveColumnWidth}
       class="table-header-responsive w-1/3 justify-end"
     >
       {title}<EventCategoryFilter />
