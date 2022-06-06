@@ -72,8 +72,9 @@ describe('Workflow Events', () => {
       eventsFixture.history.events.length,
     );
 
-    const eventType = eventsFixture.history.events[0].eventType;
-    cy.get('[data-cy="event-summary-table"]').contains(eventType);
+    cy.get('[data-cy="event-summary-table"]').contains(
+      'RainbowStatusesWorkflow',
+    );
   });
 
   it('should render event time in various formats', () => {
