@@ -86,8 +86,8 @@ describe('Stack Trace', () => {
 
     cy.get('[data-cy=stack-trace-tab]').click();
 
-    cy.wait('@query-api-error')
-    
-    cy.get('[data-cy="query-stack-trace"]').contains('[{"an":"error"}]')
-  })
+    cy.wait('@query-api-error');
+
+    cy.get('[data-cy="query-stack-trace"]').contains('[{"an":"error"}]');
+  });
 });
