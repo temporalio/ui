@@ -114,6 +114,10 @@ export async function getQuery(
 
       return JSON.parse(data);
     } catch {
+      if (typeof data !== 'string') {
+        return JSON.stringify(data);
+      }
+
       return data;
     }
   });
