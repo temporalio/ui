@@ -1,14 +1,12 @@
 # Temporal UI
 
-**Nota bene**: This is pre-release software.
-
 ## Prerequisites
 
 Temporal must be running in development. (For details, see [Run a dev Cluster](https://docs.temporal.io/application-development-guide#run-a-dev-cluster) in the documentation.)
 
 ## Trying it out
 
-After pulling down the lastest version of Temporal's [`docker-compose`](https://github.com/temporalio/docker-compose), you can access the new new UI by visiting `http://localhost:8080`.
+After pulling down the lastest version of Temporal's [`docker-compose`](https://github.com/temporalio/docker-compose), you can access the UI by visiting `http://localhost:8080`.
 
 ## Trying it out: Bleeding edge
 
@@ -92,13 +90,13 @@ make build
 ./tctl --ns canary namespace register
 ./tctl --ns default namespace register (if you also want a default namespace)
 ./tctl --auto_confirm admin cluster add-search-attributes \
-	 --name CustomKeywordField --type Keyword \
-	--name CustomStringField --type Text \
-	--name CustomTextField --type Text \
-	--name CustomIntField --type Int \
-	 --name CustomDatetimeField --type Datetime \
-	--name CustomDoubleField --type Double \
-	--name CustomBoolField --type Bool
+ 	--name CustomKeywordField --type Keyword \
+ 	--name CustomStringField --type Text \
+ 	--name CustomTextField --type Text \
+ 	--name CustomIntField --type Int \
+ 	--name CustomDatetimeField --type Datetime \
+ 	--name CustomDoubleField --type Double \
+ 	--name CustomBoolField --type Bool
 ```
 
 To view the search attributes code:
