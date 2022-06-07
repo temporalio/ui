@@ -23,7 +23,6 @@
 </script>
 
 <h2 class="text-2xl">Recent Workflows</h2>
-<slot name="metrics" />
 <WorkflowFilters bind:searchType bind:query />
 {#if $loading}
   <WorkflowsLoading />
