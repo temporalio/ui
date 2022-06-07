@@ -18,7 +18,8 @@
   export let searchType: 'basic' | 'advanced';
   export let query: string;
 
-  let parameters = toListWorkflowParameters(query);
+  const defaultQuery = toListWorkflowQuery({ timeRange: '1 day' });
+  let parameters = toListWorkflowParameters(query ?? defaultQuery);
 
   const statuses = {
     All: null,
