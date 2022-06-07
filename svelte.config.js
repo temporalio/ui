@@ -15,13 +15,21 @@ const config = {
       postcss: true,
     }),
   ],
-
   kit: {
     adapter: adapter({
       pages: outputDirectory,
       assets: outputDirectory,
       fallback: 'index.html',
     }),
+    package: {
+      dir: 'package',
+      emitTypes: true,
+      // include only page and layouts for now... Will add to it.
+      exports: (filepath) => {
+        return /^(page|layouts)/.test(filepath);
+      },
+      files: () => true,
+    },
     vite: {
       resolve: {
         alias: {

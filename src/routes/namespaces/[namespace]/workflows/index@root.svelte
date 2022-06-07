@@ -1,5 +1,5 @@
 <script lang="ts">
-  import WorkflowsPage from '$lib/components/page/workflows.svelte';
+  import WorkflowsPage from '$lib/page/workflows.svelte';
 </script>
 
 <WorkflowsPage />
