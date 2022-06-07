@@ -26,7 +26,7 @@
           class="flex h-16 w-16 items-center justify-center rounded-full bg-gray-200"
         >
           <Icon
-            icon={faSpinner}
+            name="spinner"
             scale={1.2}
             class="block h-full w-full animate-spin"
           />
