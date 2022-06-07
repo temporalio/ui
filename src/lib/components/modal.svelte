@@ -1,6 +1,5 @@
 <script lang="ts">
-  import Icon from 'svelte-fa';
-  import { faTimes } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
   import { createEventDispatcher } from 'svelte';
   import Button from './button.svelte';
 
@@ -20,7 +19,7 @@
         class="float-right cursor-pointer p-6"
         on:click={() => dispatch('cancelModal', {})}
       >
-        <Icon icon={faTimes} />
+        <Icon name="close" />
       </div>
       <div class="title">
         <slot name="title">

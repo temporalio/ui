@@ -1,7 +1,5 @@
 <script lang="ts">
-  import Icon from 'svelte-fa';
-
-  import { faSearch } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
 
   export let id: string;
   export let label: string;
@@ -14,9 +12,9 @@
   <label for={id} class="hidden">{label}</label>
   <span
     ><Icon
-      icon={faSearch}
+      name="search"
       scale={0.9}
-      color="gray"
+      stroke="gray"
       class="flex items-center"
     /></span
   >

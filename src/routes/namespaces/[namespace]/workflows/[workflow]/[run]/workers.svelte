@@ -14,8 +14,7 @@
 </script>
 
 <script lang="ts">
-  import Icon from 'svelte-fa';
-  import { faTimes, faCheck } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
 
   import { timeFormat } from '$lib/stores/time-format';
   import { formatDate } from '$lib/utilities/format-date';
@@ -54,16 +53,16 @@
         </div>
         <div class="w-3/12 text-left">
           {#if poller.taskQueueTypes.includes('WORKFLOW')}
-            <Icon icon={faCheck} color="blue" />
+            <Icon name="checkMark" color="blue" />
           {:else}
-            <Icon icon={faTimes} color="black" />
+            <Icon name="close" color="black" />
           {/if}
         </div>
         <div class="w-3/12 text-left">
           {#if poller.taskQueueTypes.includes('ACTIVITY')}
-            <Icon icon={faCheck} color="blue" />
+            <Icon name="checkMark" color="blue" />
           {:else}
-            <Icon icon={faTimes} color="black" />
+            <Icon name="close" color="black" />
           {/if}
         </div>
       </article>

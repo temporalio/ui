@@ -3,8 +3,7 @@
 </script>
 
 <script lang="ts">
-  import Icon from 'svelte-fa';
-  import { faCheck } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
 
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
   import { eventSortOrder, eventShowElapsed } from '$lib/stores/event-view';
@@ -72,7 +71,7 @@
     >
       <div class="check">
         {#if $eventSortOrder === option}
-          <Icon icon={faCheck} scale={0.8} />
+          <Icon name="checkMark" scale={0.8} />
         {/if}
       </div>
       <div class="label">
@@ -93,7 +92,7 @@
     >
       <div class="check">
         {#if $timeFormat === option}
-          <Icon icon={faCheck} scale={0.8} />
+          <Icon name="checkMark" scale={0.8} />
         {/if}
       </div>
       <div class="label">
@@ -112,7 +111,7 @@
   >
     <div class="check">
       {#if $eventShowElapsed === 'true'}
-        <Icon icon={faCheck} scale={0.8} />
+        <Icon name="checkMark" scale={0.8} />
       {/if}
     </div>
     <div class="label">Show Elapsed Time</div>

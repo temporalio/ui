@@ -4,7 +4,6 @@
 
   import Button from '$lib/components/button.svelte';
   import { routeForAuthentication } from '$lib/utilities/route-for';
-  import { faLock } from '@fortawesome/free-solid-svg-icons';
 
   import { fetchSettings } from '$lib/services/settings-service';
 
@@ -42,7 +41,7 @@
     <Button
       dataCy="login-button"
       login
-      icon={faLock}
+      icon="lock"
       on:click={() => {
         goto(
           routeForAuthentication({

@@ -1,12 +1,12 @@
 <script lang="ts">
-  import Icon from 'svelte-fa';
-  import { faSpinner } from '@fortawesome/free-solid-svg-icons';
-  import type { IconDefinition } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
+
+  import type { IconName } from 'holocene/components/icon/paths';
 
   export let disabled: boolean = false;
   export let loading: boolean = false;
   export let active: boolean = false;
-  export let icon: IconDefinition = null;
+  export let icon: IconName = null;
   export let classes: string = $$props.class;
   export let color: Color = 'gray';
 </script>
@@ -14,7 +14,7 @@
 <button on:click class={`pill ${color} ${classes}`} class:active {disabled}>
   {#if icon}
     <span class:animate-spin={loading}>
-      <Icon icon={loading ? faSpinner : icon} scale={1} />
+      <Icon name={loading ? 'spinner' : icon} scale={1} />
     </span>
   {/if}
   <slot />

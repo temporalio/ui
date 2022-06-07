@@ -2,8 +2,7 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
 
-  import Icon from 'svelte-fa';
-  import { faCheck } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
 
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
   import {
@@ -42,7 +41,7 @@
     >
       <div class="check">
         {#if _value === option}
-          <Icon icon={faCheck} scale={0.8} />
+          <Icon name="checkMark" scale={0.8} />
         {/if}
       </div>
       <div class="label">

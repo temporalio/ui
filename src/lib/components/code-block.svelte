@@ -1,8 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import Icon from 'svelte-fa';
-  import { faCheck, faCopy } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
 
   export let content: Parameters<typeof JSON.stringify>[0];
   export let copied = false;
@@ -56,7 +55,10 @@
       ></pre>
 
     <button on:click={copy} class="absolute top-4 right-4">
-      <Icon icon={copied ? faCheck : faCopy} color="white" />
+      <Icon
+        name={copied ? 'checkMark' : 'copy'}
+        stroke={copied ? '#1D4ED8' : 'white'}
+      />
     </button>
   </div>
 {/if}

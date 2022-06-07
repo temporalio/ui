@@ -1,6 +1,5 @@
 <script lang="ts">
-  import Icon from 'svelte-fa';
-  import { faBars, faTimes } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
 
   import { fly } from 'svelte/transition';
 
@@ -18,7 +17,7 @@
     <div on:click={() => (open = !open)} data-cy="hamburger-icon">
       <Icon
         class="cursor-pointer"
-        icon={open ? faTimes : faBars}
+        name={open ? 'navCollapse' : 'navExpand'}
         color="white"
       />
     </div>

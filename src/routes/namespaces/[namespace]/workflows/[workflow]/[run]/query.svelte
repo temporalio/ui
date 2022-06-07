@@ -16,7 +16,6 @@
 </script>
 
 <script lang="ts">
-  import { faRedo } from '@fortawesome/free-solid-svg-icons';
   import CodeBlock from '$lib/components/code-block.svelte';
   import Option from '$lib/components/select/option.svelte';
   import EmptyState from '$lib/components/empty-state.svelte';
@@ -68,7 +67,8 @@
       </Select>
       <Button
         on:click={() => query(queryType)}
-        icon={faRedo}
+        icon="refresh"
+        iconScale={0.8}
         loading={isLoading}
       >
         Refresh
