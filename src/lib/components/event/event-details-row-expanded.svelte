@@ -42,7 +42,11 @@
           container-class="flex-row-reverse xl:flex-row"
           size="xs"
         >
-          <Link href={routeForWorkflow({ namespace, workflow, run: value })}>
+          <Link
+            href={namespace
+              ? routeForWorkflow({ namespace, workflow, run: value })
+              : ''}
+          >
             {value}
           </Link>
         </Copyable>
@@ -53,7 +57,11 @@
       <h2 class="text-sm">{format(key)}</h2>
       <div class="text-sm">
         <Copyable content={value} container-class="xl:flex-row" size="xs">
-          <Link href={routeForWorkers({ namespace, workflow, run })}>
+          <Link
+            href={namespace
+              ? routeForWorkers({ namespace, workflow, run })
+              : ''}
+          >
             {value}
           </Link>
         </Copyable>

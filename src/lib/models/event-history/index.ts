@@ -94,7 +94,6 @@ export const toEventHistory = async ({
       toEvent({ historyEvent, namespace, settings }),
     ),
   );
-
   const eventGroups = groupEvents(events);
 
   return { events, eventGroups };

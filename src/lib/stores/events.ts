@@ -27,7 +27,7 @@ const emptyEvents: FetchEventsResponse = {
 };
 
 const namespace = derived([page], ([$page]) =>
-  decodeURIForSvelte($page.params.namespace),
+  decodeURIForSvelte($page.params?.namespace ?? ''),
 );
 
 const workflowId = derived([page], ([$page]) => {

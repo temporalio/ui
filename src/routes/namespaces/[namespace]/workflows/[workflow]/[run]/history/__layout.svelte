@@ -36,7 +36,7 @@
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
   import PendingActivties from './_pending-activties.svelte';
   import WorkflowStackTraceError from '$lib/components/workflow/workflow-stack-trace-error.svelte';
-  import InputAndResults from './_input-and-results.svelte';
+  import InputAndResults from '$lib/components/workflow/workflow-input-and-results.svelte';
   import WorkflowDetail from '../_workflow-detail.svelte';
 
   export let namespace: string;

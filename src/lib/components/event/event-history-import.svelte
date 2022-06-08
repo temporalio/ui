@@ -8,8 +8,25 @@
   import { importEvents, importEventGroups } from '$lib/stores/import-events';
   import { faFileImport } from '@fortawesome/free-solid-svg-icons';
 
-  // rawEvents is expected to be HistoryEvent[] | { events: HistoryEvent[] } but could be anything
-  let rawEvents: any;
+  let rawEvents: HistoryEvent[] | { events: HistoryEvent[] };
+  const importSettings = {
+    auth: {
+      enabled: false,
+      options: [],
+    },
+    baseUrl: 'base',
+    codec: {},
+    defaultNamespace: 'default',
+    showTemporalSystemNamespace: false,
+    notifyOnNewVersion: false,
+    feedbackURL: '',
+    runtimeEnvironment: {
+      isCloud: false,
+      isLocal: true,
+      envOverride: false,
+    },
+    version: '2.0.0',
+  };
 
   const onFileSelect = async (e: Event) => {
     const target = e.target as HTMLInputElement;
@@ -30,14 +47,17 @@
 
   const onConfirm = async () => {
     try {
-      const { events, eventGroups } = await toEventHistory(
-        rawEvents?.events ?? rawEvents,
-      );
+      const { events, eventGroups } = await toEventHistory({
+        response: rawEvents?.events ?? rawEvents,
+        namespace: 'default',
+        settings: importSettings,
+      });
       importEvents.set(events);
       importEventGroups.set(eventGroups);
       const path = routeForImport({ importType: 'events', view: 'feed' });
       goto(path);
     } catch (e) {
+      console.error(e);
       notifications.add('error', 'Could not create event history from JSON');
     }
   };
