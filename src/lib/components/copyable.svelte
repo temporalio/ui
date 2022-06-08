@@ -1,14 +1,11 @@
 <script lang="ts">
   import Icon from 'holocene/components/icon/index.svelte';
-  import type { IconSize } from 'holocene/components/icon/utils';
   import { noop } from 'svelte/internal';
 
   export let content: string;
   export let visible = false;
   export let color = 'black';
   export let clickAllToCopy = false;
-
-  export let size: IconSize = '1x';
 
   let copied = false;
 
@@ -38,8 +35,7 @@
     <Icon
       name={copied ? 'checkMark' : 'copy'}
       stroke={color}
-      class={visible ? 'visible' : 'invisible group-hover:visible'}
-      {size}
+      class={`${visible ? 'visible' : 'invisible group-hover:visible'} h-4`}
     />
   </button>
 </div>

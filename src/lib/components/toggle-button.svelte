@@ -26,7 +26,7 @@
 >
   {#if icon}
     <div class="flex items-center gap-2">
-      <Icon stroke="currentcolor" name={icon} {scale} />
+      <Icon color="currentcolor" name={icon} {scale} />
       <span class="hidden md:block"><slot /></span>
     </div>
   {:else}

@@ -33,7 +33,7 @@
   <main class="relative flex flex-col gap-1">
     <div class="-mt-3 -ml-2 block">
       <a href="/namespaces/{namespace}/workflows" class="back-to-workflows">
-        <Icon name="caretLeft" class="inline" />Back to Workflows
+        <Icon scale={0.8} name="caretLeft" class="inline" />Back to Workflows
       </a>
     </div>
     <div class="mb-8 flex items-center justify-between">
