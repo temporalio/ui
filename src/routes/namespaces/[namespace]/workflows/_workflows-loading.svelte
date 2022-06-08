@@ -8,7 +8,7 @@
   <div
     class="flex h-16 w-16 items-center justify-center rounded-full bg-gray-200"
   >
-    <Icon name="spinner" class="block h-full w-full animate-spin" />
+    <Icon name="spinner" scale={0.5} class="block h-full w-full animate-spin" />
   </div>
   <h2 class="text-xl font-medium">{title}</h2>
 </div>
