@@ -11,7 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7
       - name: Install modules
-        run: npm ci
+        run: pnpm install
       - name: Lint
-        run: npm run lint --if-present
+        run: pnpm run lint --if-present

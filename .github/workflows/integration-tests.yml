@@ -12,15 +12,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Setup
+        uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install
       - name: Build assets
-        run: VITE_MODE=test npm run build:local
+        run: VITE_MODE=test pnpm run build:local
       - name: Run Cypress tests
         uses: cypress-io/github-action@v2
         with:
           install: false
-          start: npm run preview:local
+          start: pnpm run preview:local
           wait-on: 'http://localhost:3000'
           wait-on-timeout: 120
           browser: chrome
