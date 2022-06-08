@@ -32,7 +32,7 @@
     try {
       const { events, eventGroups } = await toEventHistory({
         response: rawEvents?.events ?? rawEvents,
-        namespace: 'default',
+        namespace: importSettings.defaultNamespace,
         settings: importSettings,
       });
       importEvents.set(events);
