@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "start": "pnpm run dev:local -- --open --port",
+    "start": "pnpm run dev:local -- --open",
     "dev:local": ". ./.env && VITE_TEMPORAL_UI_BUILD_TARGET=local svelte-kit dev",
     "dev:cloud": "VITE_TEMPORAL_UI_BUILD_TARGET=cloud svelte-kit dev",
     "dev:test": ". ./.env && VITE_TEMPORAL_UI_BUILD_TARGET=local VITE_MODE=test svelte-kit dev",
