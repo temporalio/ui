@@ -10,7 +10,6 @@
   import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
   import WorkflowFilters from '$lib/components/workflow/workflow-filters.svelte';
   import WorkflowsLoading from '$lib/components/workflow/workflows-loading.svelte';
-  import { onMount } from 'svelte';
 
   export let workflows: WorkflowExecution[];
   export let loading: boolean;
