@@ -20,10 +20,10 @@ describe('Workflow Executions List', () => {
     cy.wait('@namespaces-api');
   });
 
-  it('should default to 24 hours for the time range', () => {
+  it('should default to All for the time range', () => {
     cy.get('#time-range-filter')
       .find('option:selected')
-      .should('have.value', '1 day');
+      .should('have.value', 'All');
   });
 
   it('should default to showing all workflows', () => {
