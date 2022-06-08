@@ -69,7 +69,7 @@
           disabled={!$store.hasPrevious}
           on:click={() => store.previous()}
         >
-          <Icon name="caretLeft" />
+          <Icon scale={0.8} stroke="currentcolor" name="caretLeft" />
         </button>
         <p>
           {$store.startingIndex + 1}–{$store.endingIndex + 1} of {$store.length}
@@ -79,7 +79,7 @@
           disabled={!$store.hasNext}
           on:click={() => store.next()}
         >
-          <Icon name="caretRight" />
+          <Icon scale={0.8} stroke="currentcolor" name="caretRight" />
         </button>
       </div>
     </nav>
@@ -101,7 +101,7 @@
         disabled={!$store.hasPrevious}
         on:click={() => store.previous()}
       >
-        <Icon name="caretLeft" />
+        <Icon scale={0.8} stroke="currentcolor" name="caretLeft" />
       </button>
       <p>
         {$store.startingIndex + 1}–{$store.endingIndex + 1} of {$store.length}
@@ -111,7 +111,7 @@
         disabled={!$store.hasNext}
         on:click={() => store.next()}
       >
-        <Icon name="caretRight" />
+        <Icon scale={0.8} stroke="currentcolor" name="caretRight" />
       </button>
     </div>
   </nav>
