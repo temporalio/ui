@@ -41,7 +41,7 @@
     >
       <div class="check">
         {#if _value === option}
-          <Icon name="checkMark" scale={0.8} />
+          <Icon name="checkMark" />
         {/if}
       </div>
       <div class="label">

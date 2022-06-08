@@ -12,8 +12,7 @@
   <span
     class="flex h-16 w-16 items-center justify-center rounded-full bg-gray-200"
   >
-    <!-- TODO: Fix me -->
-    <Icon name="meteor" scale={1.2} class="block h-full w-full" /></span
+    <Icon name="comet" class="block h-full w-full" /></span
   >
   <h2 class="text-xl font-medium">{title}</h2>
   {#if content}

@@ -55,11 +55,7 @@
       ></pre>
 
     <button on:click={copy} class="absolute top-4 right-4">
-      {#if copied}
-        <Icon name="checkMark" color="white" />
-      {:else}
-        <Icon name="copy" stroke="white" />
-      {/if}
+      <Icon name={copied ? 'checkMark' : 'copy'} stroke="white" />
     </button>
   </div>
 {/if}

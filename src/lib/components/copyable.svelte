@@ -1,5 +1,6 @@
 <script lang="ts">
   import Icon from 'holocene/components/icon/index.svelte';
+  import type { IconSize } from 'holocene/components/icon/utils';
   import { noop } from 'svelte/internal';
 
   export let content: string;
@@ -7,20 +8,7 @@
   export let color = 'black';
   export let clickAllToCopy = false;
 
-  export let size:
-    | 'xs'
-    | 'sm'
-    | 'lg'
-    | '1x'
-    | '2x'
-    | '3x'
-    | '4x'
-    | '5x'
-    | '6x'
-    | '7x'
-    | '8x'
-    | '9x'
-    | '10x' = '1x';
+  export let size: IconSize = '1x';
 
   let copied = false;
 
@@ -49,7 +37,7 @@
   <button on:click={copy}>
     <Icon
       name={copied ? 'checkMark' : 'copy'}
-      stroke={copied ? '#1D4ED8' : color}
+      stroke={color}
       class={visible ? 'visible' : 'invisible group-hover:visible'}
       {size}
     />

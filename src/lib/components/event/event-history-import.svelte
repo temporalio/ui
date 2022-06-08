@@ -48,5 +48,4 @@
   accept=".json"
   on:change={onFileSelect}
 />
-<!-- TODO: Fix me -->
-<Button icon="fileImport" on:click={onConfirm}>Import</Button>
+<Button icon="fileUpload" on:click={onConfirm}>Import</Button>
