@@ -56,8 +56,8 @@
   import type { DescribeNamespaceResponse } from '$types';
   import { fetchAllArchivedWorkflows } from '$lib/services/workflow-service';
 
-  import WorkflowsSummaryTable from '../workflows/_workflows-summary-table.svelte';
-  import WorkflowsSummaryRow from '../workflows/_workflows-summary-row.svelte';
+  import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
+  import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
   import WorkflowFilters from './_workflow-filters.svelte';
   import Pagination from '$lib/components/pagination.svelte';
   import EmptyState from '$lib/components/empty-state.svelte';

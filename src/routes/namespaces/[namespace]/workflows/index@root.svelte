@@ -1,5 +1,6 @@
 <script lang="ts">
-  import WorkflowsPage from '$lib/page/workflows.svelte';
+  import Workflows from '$lib/pages/workflows.svelte';
+  import { workflows, loading, updating } from '$lib/stores/workflows';
 </script>
 
-<WorkflowsPage />
+<Workflows workflows={$workflows} loading={$loading} updating={$updating} />

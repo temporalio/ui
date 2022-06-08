@@ -24,9 +24,11 @@ const config = {
     package: {
       dir: 'package',
       emitTypes: true,
-      // include only page and layouts for now... Will add to it.
+      // Don't include components for now.
       exports: (filepath) => {
-        return /^(page|layouts)/.test(filepath);
+        return /^(layouts|models|pages|services|stores|utilities)/.test(
+          filepath,
+        );
       },
       files: () => true,
     },
