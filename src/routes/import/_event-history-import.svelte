@@ -31,7 +31,7 @@
   const onConfirm = async () => {
     try {
       const { events, eventGroups } = await toEventHistory({
-        response: rawEvents?.events ?? rawEvents,
+        response: Array.isArray(rawEvents) ? rawEvents : rawEvents?.events,
         namespace: importSettings.defaultNamespace,
         settings: importSettings,
       });
