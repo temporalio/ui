@@ -4,13 +4,11 @@
     faLayerGroup,
     faTable,
   } from '@fortawesome/free-solid-svg-icons';
-
   import { routeForImport } from '$lib/utilities/route-for';
-  import InputAndResults from '$lib/components/workflow/workflow-input-and-results.svelte';
 
-  import HistoryImport from '$lib/components/event/event-history-import.svelte';
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
+  import HistoryImport from '../../../../../_event-history-import.svelte';
 </script>
 
 <section id="event-history">

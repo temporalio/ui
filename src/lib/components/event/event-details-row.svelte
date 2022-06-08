@@ -53,11 +53,7 @@
           container-class="flex-row-reverse xl:flex-row"
           size="xs"
         >
-          <Link
-            href={namespace
-              ? routeForWorkers({ namespace, workflow, run })
-              : ''}
-          >
+          <Link href={routeForWorkers({ namespace, workflow, run })}>
             {value}
           </Link>
         </Copyable>

@@ -7,26 +7,9 @@
   import { notifications } from '$lib/stores/notifications';
   import { importEvents, importEventGroups } from '$lib/stores/import-events';
   import { faFileImport } from '@fortawesome/free-solid-svg-icons';
+  import { importSettings } from './_import-settings';
 
   let rawEvents: HistoryEvent[] | { events: HistoryEvent[] };
-  const importSettings = {
-    auth: {
-      enabled: false,
-      options: [],
-    },
-    baseUrl: 'base',
-    codec: {},
-    defaultNamespace: 'default',
-    showTemporalSystemNamespace: false,
-    notifyOnNewVersion: false,
-    feedbackURL: '',
-    runtimeEnvironment: {
-      isCloud: false,
-      isLocal: true,
-      envOverride: false,
-    },
-    version: '2.0.0',
-  };
 
   const onFileSelect = async (e: Event) => {
     const target = e.target as HTMLInputElement;
