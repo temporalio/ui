@@ -21,9 +21,7 @@ describe('Workflow Executions List', () => {
   });
 
   it('should default to All for the time range', () => {
-    cy.get('#time-range-filter')
-      .find('option:selected')
-      .should('have.value', 'All');
+    cy.get('#time-range-filter').find('option').should('have.value', 'null');
   });
 
   it('should default to showing all workflows', () => {

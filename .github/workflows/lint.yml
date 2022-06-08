@@ -17,4 +17,4 @@ jobs:
       - name: Install modules
         run: pnpm install
       - name: Lint
-        run: pnpm run lint --if-present
+        run: pnpm run --if-present lint
