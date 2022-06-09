@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "start": "npm run dev:local -- --open",
+    "start": "pnpm run dev:local -- --open",
     "dev:local": ". ./.env && VITE_TEMPORAL_UI_BUILD_TARGET=local svelte-kit dev",
     "dev:cloud": "VITE_TEMPORAL_UI_BUILD_TARGET=cloud svelte-kit dev",
     "dev:test": ". ./.env && VITE_TEMPORAL_UI_BUILD_TARGET=local VITE_MODE=test svelte-kit dev",
@@ -20,8 +20,9 @@
     "check:cloud:watch": "VITE_TEMPORAL_UI_BUILD_TARGET=local svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
     "format": "prettier --write --plugin-search-dir=. .",
-    "cypress": "concurrently \"npm run dev:test\" \"cypress open\"",
-    "cypress:run": "cypress run"
+    "cypress": "concurrently \"pnpm run dev:test\" \"cypress open\"",
+    "cypress:run": "cypress run",
+    "package": "svelte-kit package"
   },
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^5.15.4",

@@ -15,13 +15,23 @@ const config = {
       postcss: true,
     }),
   ],
-
   kit: {
     adapter: adapter({
       pages: outputDirectory,
       assets: outputDirectory,
       fallback: 'index.html',
     }),
+    package: {
+      dir: 'package',
+      emitTypes: true,
+      // Don't include components for now.
+      exports: (filepath) => {
+        return /^(layouts|models|pages|services|stores|utilities)/.test(
+          filepath,
+        );
+      },
+      files: (filepath) => /^(?!.*(?:test)).*\.ts$/.test(filepath),
+    },
     vite: {
       resolve: {
         alias: {
