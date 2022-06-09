@@ -12,14 +12,13 @@
   import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
   import WorkflowFilters from '$lib/components/workflow/workflow-filters.svelte';
   import WorkflowsLoading from '$lib/components/workflow/workflows-loading.svelte';
-  import { onDestroy, onMount } from 'svelte';
+  import { onDestroy } from 'svelte';
 
   export let workflows: WorkflowExecution[];
   export let loading: boolean;
   export let updating: boolean;
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
-  let query = $page.url.searchParams.get('query');
 
   const errorMessage =
     searchType === 'advanced'
@@ -27,13 +26,14 @@
       : 'If you have filters applied, try adjusting them.';
 
   onDestroy(() => {
+    const query = $page.url.searchParams.get('query');
     const parameters = query ? toListWorkflowParameters(query) : {};
     $workflowsSearch = { parameters, searchType };
   });
 </script>
 
 <h2 class="text-2xl">Recent Workflows</h2>
-<WorkflowFilters bind:searchType bind:query />
+<WorkflowFilters bind:searchType />
 {#if loading}
   <WorkflowsLoading />
 {:else if workflows.length}

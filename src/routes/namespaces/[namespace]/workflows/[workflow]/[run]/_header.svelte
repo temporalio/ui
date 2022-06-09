@@ -42,6 +42,7 @@
         href={`/namespaces/${namespace}/workflows?query=${encodeURIForSvelte(
           query,
         )}&search=${searchType}`}
+        data-cy="back-to-workflows"
         class="back-to-workflows"
       >
         <Icon name="caretLeft" class="inline" />Back to Workflows
