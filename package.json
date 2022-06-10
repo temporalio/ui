@@ -45,7 +45,7 @@
     "@temporalio/proto": "0.21.0",
     "@types/base-64": "^1.0.0",
     "@types/jest": "^27.0.1",
-    "@types/node": "^17.0.41",
+    "@types/node": "16",
     "@types/sanitize-html": "^2.6.1",
     "@typescript-eslint/eslint-plugin": "^4.30.0",
     "@typescript-eslint/parser": "^4.30.0",
