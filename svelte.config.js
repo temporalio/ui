@@ -32,6 +32,7 @@ const config = {
       },
       files: (filepath) => /^(?!.*(?:test)).*\.ts$/.test(filepath),
     },
+    routes: (filepath) =>/^(?!.*(?:fiction)).*$/.test(filepath),
     vite: {
       resolve: {
         alias: {
