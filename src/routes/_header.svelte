@@ -33,7 +33,7 @@
   });
 
   // To show single namespace on cloud
-  if (isCloud && $page.params.namespace && !namespace.length) {
+  if (isCloud && $page.params.namespace && !namespaces.length) {
     const href = routeForWorkflows({ namespace: $page.params.namespace });
     namespaceList.push({
       namespace: $page.params.namespace,
