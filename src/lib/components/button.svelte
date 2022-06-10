@@ -1,7 +1,6 @@
 <script lang="ts">
-  import Icon from 'svelte-fa';
-  import { faSpinner } from '@fortawesome/free-solid-svg-icons';
-  import type { IconDefinition } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
+  import type { IconName } from 'holocene/components/icon/paths';
 
   export let disabled: boolean = false;
   export let secondary: boolean = false;
@@ -13,7 +12,8 @@
   export let active: boolean = false;
   export let large: boolean = false;
   export let as: 'button' | 'anchor' = href ? 'anchor' : 'button';
-  export let icon: IconDefinition = null;
+  export let icon: IconName = null;
+  export let iconScale: number = 1;
   export let classes: string = $$props.class;
   export let dataCy: string = $$props.dataCy;
 </script>
@@ -33,7 +33,11 @@
   >
     {#if icon}
       <span class:animate-spin={loading}>
-        <Icon icon={loading ? faSpinner : icon} scale={1} />
+        <Icon
+          scale={iconScale}
+          stroke="currentcolor"
+          name={loading ? 'spinner' : icon}
+        />
       </span>
     {/if}
     <slot />
@@ -55,7 +59,11 @@
   >
     {#if icon}
       <span class:animate-spin={loading}>
-        <Icon icon={loading ? faSpinner : icon} scale={1} />
+        <Icon
+          scale={iconScale}
+          stroke="currentcolor"
+          name={loading ? 'spinner' : icon}
+        />
       </span>
     {/if}
     <slot />

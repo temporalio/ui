@@ -1,5 +1,10 @@
 /// <reference types="cypress" />
 
+import workflowsFixture from '../fixtures/workflows.json';
+
+const workflowRunningFixture = workflowsFixture.executions[0];
+const { workflowId, runId } = workflowRunningFixture.execution;
+
 const statuses = [
   'Running',
   'TimedOut',
@@ -20,10 +25,8 @@ describe('Workflow Executions List', () => {
     cy.wait('@namespaces-api');
   });
 
-  it('should default to 24 hours for the time range', () => {
-    cy.get('#time-range-filter')
-      .find('option:selected')
-      .should('have.value', '1 day');
+  it('should default to All for the time range', () => {
+    cy.get('#time-range-filter').find('option').should('have.value', 'null');
   });
 
   it('should default to showing all workflows', () => {
@@ -73,5 +76,53 @@ describe('Workflow Executions List', () => {
         cy.get('#execution-status-filter').should('have.value', status);
       });
     }
+
+    describe('Workflow Filters with Navigation ', () => {
+      beforeEach(() => {
+        cy.interceptApi();
+
+        cy.intercept(
+          Cypress.env('VITE_API_HOST') +
+            `/api/v1/namespaces/default/workflows/*/runs/*/events/reverse*`,
+          { fixture: 'event-history-completed.json' },
+        ).as('event-history-api');
+
+        cy.intercept(
+          Cypress.env('VITE_API_HOST') +
+            `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}?`,
+          { fixture: 'workflow-completed.json' },
+        ).as('workflow-api');
+      });
+
+      it('should keep single workflow filter after navigating away and back to workflow list', () => {
+        cy.get('#execution-status-filter')
+          .find('option:selected')
+          .should('have.value', 'null');
+
+        cy.get('#execution-status-filter').select('Running').trigger('input');
+        cy.url().should(
+          'contain',
+          encodeURIComponent(`ExecutionStatus="Running"`),
+        );
+
+        cy.get(
+          `[href="/namespaces/default/workflows/${workflowId}/${runId}"] > .overflow-cell > .wrapper > .table-link`,
+        ).click();
+
+        cy.wait('@workflow-api');
+        cy.wait('@event-history-api');
+
+        cy.url().should('contain', '/feed');
+        cy.get('[data-cy="back-to-workflows"]').click();
+
+        cy.url().should(
+          'contain',
+          encodeURIComponent(`ExecutionStatus="Running"`),
+        );
+        cy.get('#execution-status-filter')
+          .find('option:selected')
+          .should('have.value', 'Running');
+      });
+    });
   });
 });

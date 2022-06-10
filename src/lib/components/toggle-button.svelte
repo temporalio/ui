@@ -1,12 +1,12 @@
 <script lang="ts">
-  import Icon from 'svelte-fa';
+  import Icon from 'holocene/components/icon/index.svelte';
   import { page } from '$app/stores';
 
-  import type { IconDefinition } from '@fortawesome/free-solid-svg-icons';
+  import type { IconName } from 'holocene/components/icon/paths';
 
   import { getAppContext } from '$lib/utilities/get-context';
 
-  export let icon: IconDefinition;
+  export let icon: IconName;
   export let group = getAppContext('group');
   export let scale = 1;
   export let href = '#';
@@ -26,7 +26,7 @@
 >
   {#if icon}
     <div class="flex items-center gap-2">
-      <Icon {icon} {scale} />
+      <Icon color="currentcolor" name={icon} {scale} />
       <span class="hidden md:block"><slot /></span>
     </div>
   {:else}

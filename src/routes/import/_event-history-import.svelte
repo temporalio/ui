@@ -6,7 +6,6 @@
   import { toEventHistory } from '$lib/models/event-history';
   import { notifications } from '$lib/stores/notifications';
   import { importEvents, importEventGroups } from '$lib/stores/import-events';
-  import { faFileImport } from '@fortawesome/free-solid-svg-icons';
   import { importSettings } from './_import-settings';
 
   let rawEvents: HistoryEvent[] | { events: HistoryEvent[] };
@@ -52,4 +51,4 @@
   accept=".json"
   on:change={onFileSelect}
 />
-<Button icon={faFileImport} on:click={onConfirm}>Import</Button>
+<Button icon="fileUpload" on:click={onConfirm}>Import</Button>

@@ -15,38 +15,38 @@ Starting the UI API server will give you a somewhat recent version on `localhost
 Once you have the prerequisites going, run the following:
 
 ```bash
-npm install
-npm run build:local
-npm run preview:local
+pnpm install
+pnpm run build:local
+pnpm run preview:local
 ```
 
 ## Developing
 
-Developing the UI has the same prequisites as trying it out. Once you've created a project and installed dependencies with `npm install`, start the development server:
+Developing the UI has the same prequisites as trying it out. Once you've created a project and installed dependencies with `pnpm install`, start the development server:
 
 ```bash
-npm start
+pnpm start
 ```
 
 By default, the application will start up with a version of the UI for the local version of Temporal. You can start the UI for Temporal Cloud by setting the `VITE_TEMPORAL_UI_BUILD_TARGET` target to `cloud`. Alternatively, you can use either of the following scripts:
 
 ```bash
-npm run dev:local
-npm run dev:cloud
+pnpm run dev:local
+pnpm run dev:cloud
 ```
 
 ## Building
 
-The Temporal UI _must_ be built for either the local version or Temporal Cloud. You must set the `VITE_TEMPORAL_UI_BUILD_TARGET` environment variable in order to build the assets. This will be set for you if you use either of the following `npm` scripts.
+The Temporal UI _must_ be built for either the local version or Temporal Cloud. You must set the `VITE_TEMPORAL_UI_BUILD_TARGET` environment variable in order to build the assets. This will be set for you if you use either of the following `pnpm` scripts.
 
 ```bash
-npm run build:local
-npm run build:cloud
+pnpm run build:local
+pnpm run build:cloud
 ```
 
 The resulting assets will be placed in either `build-local` or `build-cloud` respectively.
 
-> You can preview the built app with `npm run preview`, regardless of whether you installed an adapter. This should _not_ be used to serve your app in production.
+> You can preview the built app with `pnpm run preview`, regardless of whether you installed an adapter. This should _not_ be used to serve your app in production.
 
 ## Configuration
 
@@ -62,7 +62,7 @@ Set these environment variables if you want to change their defaults
 To see updates from holocene, follow the instructions in [holocene](https://github.com/temporalio/holocene) README and link the project after cloning:
 
 ```bash
-npm link holocene
+pnpm link ../holocene
 ```
 
 ## Developing with Canary
@@ -112,5 +112,5 @@ make build-server
 ### ui
 
 ```bash
-npm start
+pnpm start
 ```

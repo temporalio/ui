@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
   import { onMount } from 'svelte';
   import { scale } from 'svelte/transition';
   import IconButton from './icon-button.svelte';
@@ -43,7 +42,7 @@
 
 <div class="relative mx-2 inline" bind:this={menu} data-cy={$$props.dataCy}>
   <IconButton
-    icon={faCaretDown}
+    icon="caretDown"
     on:click={() => (show = !show)}
     classes="menu focus:outline-none focus:shadow-solid"
     dataCy="{$$props.dataCy}-button"
@@ -65,7 +64,7 @@
     <span
       in:scale={{ duration: 200, start: 0.65 }}
       out:scale={{ duration: 100, start: 0.65 }}
-      class="absolute top-0 right-3 h-2 w-2 rounded-full bg-blue-200"
+      class="absolute top-0 right-1 h-2 w-2 rounded-full bg-blue-200"
     />
   {/if}
 </div>

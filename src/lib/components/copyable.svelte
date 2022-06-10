@@ -1,27 +1,11 @@
 <script lang="ts">
-  import Icon from 'svelte-fa';
-  import { faCheck, faCopy } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
   import { noop } from 'svelte/internal';
 
   export let content: string;
   export let visible = false;
   export let color = 'black';
   export let clickAllToCopy = false;
-
-  export let size:
-    | 'xs'
-    | 'sm'
-    | 'lg'
-    | '1x'
-    | '2x'
-    | '3x'
-    | '4x'
-    | '5x'
-    | '6x'
-    | '7x'
-    | '8x'
-    | '9x'
-    | '10x' = '1x';
 
   let copied = false;
 
@@ -49,10 +33,9 @@
   </slot>
   <button on:click={copy}>
     <Icon
-      icon={copied ? faCheck : faCopy}
-      {color}
-      class={visible ? 'visible' : 'invisible group-hover:visible'}
-      {size}
+      name={copied ? 'checkMark' : 'copy'}
+      stroke={color}
+      class={`${visible ? 'visible' : 'invisible group-hover:visible'} h-4`}
     />
   </button>
 </div>
