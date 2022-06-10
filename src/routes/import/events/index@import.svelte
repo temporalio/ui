@@ -1,5 +1,5 @@
 <script lang="ts">
-  import HistoryImport from '$lib/components/event/event-history-import.svelte';
+  import HistoryImport from '../_event-history-import.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
   import Link from '$lib/components/link.svelte';
 

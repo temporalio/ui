@@ -98,12 +98,12 @@ describe('routeFor import ', () => {
     });
     expect(path).toBe('/import/events');
   });
-  it('should route to "import/events/history/compact" for import', () => {
+  it('should route to specific view for import', () => {
     const path = routeForImport({
       importType: 'events',
       view: 'compact',
     });
-    expect(path).toBe('/import/events/history/compact');
+    expect(path).toBe('/import/events/namespace/workflow/run/history/compact');
   });
 });
 
