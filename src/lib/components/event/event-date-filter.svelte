@@ -3,8 +3,7 @@
 </script>
 
 <script lang="ts">
-  import Icon from 'svelte-fa';
-  import { faCheck } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
 
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
   import { eventSortOrder, eventShowElapsed } from '$lib/stores/event-view';
@@ -70,9 +69,9 @@
       class:active={$eventSortOrder === option}
       on:click={() => onSortOptionClick(option)}
     >
-      <div class="check">
+      <div class="check active">
         {#if $eventSortOrder === option}
-          <Icon icon={faCheck} scale={0.8} />
+          <Icon stroke="currentcolor" name="checkMark" scale={0.8} />
         {/if}
       </div>
       <div class="label">
@@ -91,9 +90,9 @@
       on:click={() => onDateOptionClick(option)}
       data-cy="event-date-filter-{option}"
     >
-      <div class="check">
+      <div class="check active">
         {#if $timeFormat === option}
-          <Icon icon={faCheck} scale={0.8} />
+          <Icon stroke="currentcolor" name="checkMark" scale={0.8} />
         {/if}
       </div>
       <div class="label">
@@ -110,9 +109,9 @@
     class:active={$eventShowElapsed === 'true'}
     on:click={onShowElapsedClick}
   >
-    <div class="check">
+    <div class="check active">
       {#if $eventShowElapsed === 'true'}
-        <Icon icon={faCheck} scale={0.8} />
+        <Icon stroke="currentcolor" name="checkMark" scale={0.8} />
       {/if}
     </div>
     <div class="label">Show Elapsed Time</div>
@@ -127,7 +126,7 @@
     @apply cursor-pointer;
   }
   .check {
-    @apply mx-4 mt-1 w-4;
+    @apply mx-4 w-4;
   }
   .active {
     @apply text-blue-700;

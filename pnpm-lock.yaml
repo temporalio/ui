@@ -4,7 +4,6 @@ specifiers:
   '@babel/core': ^7.17.9
   '@babel/preset-typescript': ^7.16.7
   '@crownframework/svelte-error-boundary': ^1.0.3
-  '@fortawesome/free-solid-svg-icons': ^5.15.4
   '@grpc/grpc-js': ^1.3.7
   '@sveltejs/adapter-static': ^1.0.0-next.29
   '@sveltejs/kit': ^1.0.0-next.311
@@ -33,7 +32,7 @@ specifiers:
   eslint-plugin-jest: ^24.4.0
   eslint-plugin-svelte3: ^3.2.0
   google-protobuf: ^3.17.3
-  holocene: ^0.0.15
+  holocene: ^0.0.16
   husky: ^7.0.2
   jest: ^27.1.0
   jest-websocket-mock: ^2.2.1
@@ -51,7 +50,6 @@ specifiers:
   stylelint-config-recommended: ^7.0.0
   svelte: ^3.47.0
   svelte-check: ^2.4.5
-  svelte-fa: ^2.4.0
   svelte-highlight: ^3.4.0
   svelte-loader: ^3.1.2
   svelte-preprocess: ^4.10.4
@@ -65,15 +63,13 @@ specifiers:
   websocket-as-promised: ^2.0.1
 
 dependencies:
-  '@fortawesome/free-solid-svg-icons': 5.15.4
   '@sveltejs/svelte-virtual-list': 3.0.1
   date-fns: 2.28.0
   date-fns-tz: 1.3.4_date-fns@2.28.0
-  holocene: 0.0.15_wwvk7nlptlrqo2czohjtk6eiqm
+  holocene: 0.0.16_wwvk7nlptlrqo2czohjtk6eiqm
   json-beautify: 1.1.1
   just-debounce: 1.1.0
   sanitize-html: 2.7.0
-  svelte-fa: 2.4.0
   url-pattern: 1.0.3
   websocket-as-promised: 2.0.1
 
@@ -807,26 +803,6 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
-
-  /@fortawesome/fontawesome-common-types/0.2.36:
-    resolution:
-      {
-        integrity: sha512-a/7BiSgobHAgBWeN7N0w+lAhInrGxksn13uK7231n2m8EDPE3BMCl9NZLTGrj9ZXfCmC6LM0QLqXidIizVQ6yg==,
-      }
-    engines: { node: '>=6' }
-    requiresBuild: true
-    dev: false
-
-  /@fortawesome/free-solid-svg-icons/5.15.4:
-    resolution:
-      {
-        integrity: sha512-JLmQfz6tdtwxoihXLg6lT78BorrFyCf59SAwBM6qV/0zXyVeDygJVb3fk+j5Qat+Yvcxp1buLTY5iDh1ZSAQ8w==,
-      }
-    engines: { node: '>=6' }
-    requiresBuild: true
-    dependencies:
-      '@fortawesome/fontawesome-common-types': 0.2.36
-    dev: false
 
   /@grpc/grpc-js/1.6.7:
     resolution:
@@ -5460,10 +5436,10 @@ packages:
     engines: { node: '>=12.0.0' }
     dev: true
 
-  /holocene/0.0.15_wwvk7nlptlrqo2czohjtk6eiqm:
+  /holocene/0.0.16_wwvk7nlptlrqo2czohjtk6eiqm:
     resolution:
       {
-        integrity: sha512-0Y0nDWoBg6cwUyi9ER3lI5gcBDZwT+DqtL3KI4vo8bj2ixznRjDHKZFEtQqXyiT4iXonTzkZ+f8Maf3paadcLQ==,
+        integrity: sha512-hwaDTqo0geqmbiC/95SF2StHh+NNeBAd4T/lC+jaUetDvVKuuMEZdcnPB7MTmh8y19loTm5UBKvQDSyL7oJ4dQ==,
       }
     dependencies:
       svelte2tsx: 0.5.10_wwvk7nlptlrqo2czohjtk6eiqm
@@ -9802,13 +9778,6 @@ packages:
   /svelte-dev-helper/1.1.9:
     resolution: { integrity: sha1-fRh9tcbNu9ZNdaMvkbiZi94yc8M= }
     dev: true
-
-  /svelte-fa/2.4.0:
-    resolution:
-      {
-        integrity: sha512-0bnbMGbsE1LUnlioDcf27tl2O8kjuXlTXMXzIxC7LoIOWmqn0D+zd539HfLiQbdLuOHGTaynwN9V+4ehhEu1Jw==,
-      }
-    dev: false
 
   /svelte-highlight/3.4.0:
     resolution:

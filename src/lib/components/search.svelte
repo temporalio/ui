@@ -1,6 +1,5 @@
 <script lang="ts">
-  import Icon from 'svelte-fa';
-  import { faSearch } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
   import Button from './button.svelte';
 
   export let placeholder = '';
@@ -17,9 +16,9 @@
 >
   {#if icon}
     <Icon
-      icon={faSearch}
+      name="search"
       scale={0.9}
-      color="gray"
+      stroke="gray"
       class="ml-4 flex items-center"
     />
   {/if}

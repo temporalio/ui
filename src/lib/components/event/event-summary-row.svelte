@@ -1,10 +1,5 @@
 <script lang="ts">
-  import Icon from 'svelte-fa';
-  import {
-    faAngleDown,
-    faAngleUp,
-    faClock,
-  } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
 
   import { eventSortOrder, eventShowElapsed } from '$lib/stores/event-view';
   import { timeFormat } from '$lib/stores/time-format';
@@ -115,13 +110,13 @@
   <td class="cell w-10 text-right text-sm font-normal xl:text-left">
     <p tabindex="0" class="event-name text-sm font-semibold md:text-base">
       {#if compact && failure}
-        <Icon class="inline text-red-700" icon={faClock} />
+        <Icon class="inline text-red-700" name="clock" />
       {/if}
       {#if compact && canceled}
-        <Icon class="inline text-yellow-700" icon={faClock} />
+        <Icon class="inline text-yellow-700" name="clock" />
       {/if}
       {#if compact && terminated}
-        <Icon class="inline text-pink-700" icon={faClock} />
+        <Icon class="inline text-pink-700" name="clock" />
       {/if}
       {getTruncatedWord(event.name, truncateWidth - 30)}
     </p>
@@ -132,7 +127,7 @@
     {/if}
   </td>
   <td class="cell text-right">
-    <Icon class="inline" icon={expanded ? faAngleUp : faAngleDown} />
+    <Icon class="inline" name={expanded ? 'caretUp' : 'caretDown'} />
   </td>
 </tr>
 {#if expanded}

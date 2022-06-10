@@ -7,8 +7,7 @@
     perPageOptions,
   } from '$lib/stores/pagination';
 
-  import Icon from 'svelte-fa';
-  import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
 
   type T = $$Generic;
 
@@ -70,7 +69,7 @@
           disabled={!$store.hasPrevious}
           on:click={() => store.previous()}
         >
-          <Icon icon={faAngleLeft} />
+          <Icon scale={0.8} stroke="currentcolor" name="caretLeft" />
         </button>
         <p>
           {$store.startingIndex + 1}–{$store.endingIndex + 1} of {$store.length}
@@ -80,7 +79,7 @@
           disabled={!$store.hasNext}
           on:click={() => store.next()}
         >
-          <Icon icon={faAngleRight} />
+          <Icon scale={0.8} stroke="currentcolor" name="caretRight" />
         </button>
       </div>
     </nav>
@@ -102,7 +101,7 @@
         disabled={!$store.hasPrevious}
         on:click={() => store.previous()}
       >
-        <Icon icon={faAngleLeft} />
+        <Icon scale={0.8} stroke="currentcolor" name="caretLeft" />
       </button>
       <p>
         {$store.startingIndex + 1}–{$store.endingIndex + 1} of {$store.length}
@@ -112,7 +111,7 @@
         disabled={!$store.hasNext}
         on:click={() => store.next()}
       >
-        <Icon icon={faAngleRight} />
+        <Icon scale={0.8} stroke="currentcolor" name="caretRight" />
       </button>
     </div>
   </nav>

@@ -2,8 +2,7 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
 
-  import Icon from 'svelte-fa';
-  import { faCheck } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
 
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
   import {
@@ -40,9 +39,9 @@
       class:active={_value === option}
       on:click={() => onOptionClick(option)}
     >
-      <div class="check">
+      <div class="check active">
         {#if _value === option}
-          <Icon icon={faCheck} scale={0.8} />
+          <Icon stroke="currentcolor" name="checkMark" scale={0.8} />
         {/if}
       </div>
       <div class="label">
@@ -60,7 +59,7 @@
     @apply cursor-pointer;
   }
   .check {
-    @apply mx-4 mt-1 w-4;
+    @apply mx-4 w-4;
   }
   .active {
     @apply text-blue-700;

@@ -3,8 +3,7 @@
   import { page } from '$app/stores';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import debounce from 'just-debounce';
-  import Icon from 'svelte-fa';
-  import { faSearch } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
 
   export let parameter: string;
   export let name: string;
@@ -29,9 +28,9 @@
   <label for={id} class="hidden">{name}</label>
   <span
     ><Icon
-      icon={faSearch}
+      name="search"
       scale={0.9}
-      color="gray"
+      stroke="gray"
       class="flex items-center"
     /></span
   >

@@ -17,12 +17,6 @@
 </script>
 
 <script lang="ts">
-  import {
-    faCode,
-    faLayerGroup,
-    faTable,
-  } from '@fortawesome/free-solid-svg-icons';
-
   import type { GetPollersResponse } from '$lib/services/pollers-service';
 
   import { routeForEventHistory } from '$lib/utilities/route-for';
@@ -109,7 +103,7 @@
       <div id="event-view-toggle" class="flex gap-4">
         <ToggleButtons>
           <ToggleButton
-            icon={faTable}
+            icon="feed"
             base={routeForEventHistory(routeParameters('feed'))}
             href={routeForEventHistory(routeParameters('feed'))}
             active={$eventViewType === 'feed'}
@@ -117,14 +111,14 @@
             on:click={() => ($eventViewType = 'feed')}>Timeline</ToggleButton
           >
           <ToggleButton
-            icon={faLayerGroup}
+            icon="compact"
             href={routeForEventHistory(routeParameters('compact'))}
             active={$eventViewType === 'compact'}
             data-cy="compact"
             on:click={() => ($eventViewType = 'compact')}>Compact</ToggleButton
           >
           <ToggleButton
-            icon={faCode}
+            icon="json"
             href={routeForEventHistory(routeParameters('json'))}
             active={$eventViewType === 'json'}
             data-cy="json"

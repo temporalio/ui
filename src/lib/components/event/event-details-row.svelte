@@ -36,7 +36,6 @@
         <Copyable
           content={value}
           container-class="flex-row-reverse xl:flex-row"
-          size="xs"
         >
           <Link href={routeForWorkflow({ namespace, workflow, run: value })}>
             {value}
@@ -51,7 +50,6 @@
         <Copyable
           content={value}
           container-class="flex-row-reverse xl:flex-row"
-          size="xs"
         >
           <Link href={routeForWorkers({ namespace, workflow, run })}>
             {value}
