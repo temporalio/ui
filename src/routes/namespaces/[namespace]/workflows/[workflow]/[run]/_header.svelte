@@ -2,6 +2,8 @@
   import Icon from 'holocene/components/icon/index.svelte';
 
   import { eventViewType } from '$lib/stores/event-view';
+  import { workflowsSearch } from '$lib/stores/workflows';
+  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
   import {
     routeForEventHistory,
@@ -17,6 +19,7 @@
   import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
   import ExportHistory from '$lib/components/export-history.svelte';
   import Tab from '$lib/components/tab.svelte';
+  import { encodeURIForSvelte } from '$lib/utilities/encode-uri';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
@@ -27,12 +30,21 @@
     workflow: workflow.id,
     run: workflow.runId,
   };
+
+  const { parameters, searchType } = $workflowsSearch;
+  const query = toListWorkflowQuery(parameters);
 </script>
 
 <header class="flex flex-col gap-4">
   <main class="relative flex flex-col gap-1">
     <div class="-mt-3 -ml-2 block">
-      <a href="/namespaces/{namespace}/workflows" class="back-to-workflows">
+      <a
+        href={`/namespaces/${namespace}/workflows?query=${encodeURIForSvelte(
+          query,
+        )}&search=${searchType}`}
+        data-cy="back-to-workflows"
+        class="back-to-workflows"
+      >
         <Icon scale={0.8} name="caretLeft" class="inline" />Back to Workflows
       </a>
     </div>

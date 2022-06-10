@@ -2,6 +2,7 @@
   import debounce from 'just-debounce';
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
+  import { workflowsSearch } from '$lib/stores/workflows';
 
   import { timeFormat } from '$lib/stores/time-format';
 
@@ -16,10 +17,10 @@
   import Search from '$lib/components/search.svelte';
 
   export let searchType: 'basic' | 'advanced';
-  export let query: string;
 
   const defaultQuery = toListWorkflowQuery({ timeRange: 'All' });
-  let parameters = toListWorkflowParameters(query ?? defaultQuery);
+  $: query = $page.url.searchParams.get('query');
+  $: parameters = toListWorkflowParameters(query ?? defaultQuery);
 
   const statuses = {
     All: null,

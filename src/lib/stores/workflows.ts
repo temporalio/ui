@@ -3,7 +3,7 @@ import { page } from '$app/stores';
 
 import { fetchAllWorkflows } from '$lib/services/workflow-service';
 import { withLoading } from '$lib/utilities/stores/with-loading';
-
+import type { ParsedParameters } from '$lib/utilities/query/to-list-workflow-parameters';
 import type { StartStopNotifier } from 'svelte/store';
 
 const namespace = derived([page], ([$page]) => $page.params.namespace);
@@ -24,6 +24,14 @@ const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
   });
 };
 
+type WorkflowsSearch = {
+  parameters: ParsedParameters;
+  searchType: 'basic' | 'advanced';
+};
+export const workflowsSearch = writable<WorkflowsSearch>({
+  parameters: {},
+  searchType: 'basic',
+});
 export const updating = writable(true);
 export const loading = writable(true);
 export const workflows = readable<WorkflowExecution[]>([], updateWorkflows);

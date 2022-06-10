@@ -4,7 +4,7 @@ import { durationKeys, fromDate } from '../to-duration';
 import { tokenize } from './tokenize';
 
 type Tokens = string[];
-type ParsedParameters = FilterParameters & { timeRange?: string };
+export type ParsedParameters = FilterParameters & { timeRange?: string };
 
 const is =
   (identifier: string) =>
