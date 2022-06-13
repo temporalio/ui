@@ -9,7 +9,7 @@
     routeForSettings,
   } from '$lib/utilities/route-for';
 
-  import Navigation from 'holocene/components/navigation/full-nav.svelte';
+  import Navigation from '$lib/components/full-nav.svelte';
   import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
 
   export let user: User;
