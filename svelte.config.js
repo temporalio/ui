@@ -30,7 +30,8 @@ const config = {
           filepath,
         );
       },
-      files: (filepath) => /^(?!.*(?:test)).*\.ts$/.test(filepath),
+      // files: (filepath) => true,
+      files: (filepath) => /^(?!.*\.(spec|test)\.ts$).*\.(svelte|ts)$/.test(filepath),
     },
     vite: {
       resolve: {
