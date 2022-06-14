@@ -19,8 +19,6 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 16
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@temporalio'
       - name: pnpm setup
         uses: pnpm/action-setup@v2.2.2
         with:
@@ -42,10 +40,14 @@ jobs:
       - name: The bump is patch
         if: ${{ inputs.bump == 'patch' }}
         run: pnpm run package:patch
+      - name: Authenticate with GitHub package registry
+      - run: |
+          echo @temporalio:https://npm.pkg.github.com/ > package/.npmrc
+          echo '//npm.pkg.github.com/:_authToken=${NPM_TOKEN}' >> package/.npmrc
       - name: Publish package to NPM
         run: npm publish --access public
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GH_TOKEN }}
         working-directory: ./package
       - name: Commit version bump
         run: |
