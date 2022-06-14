@@ -29,13 +29,22 @@ jobs:
         run: pnpm run build:local
       - name: The bump is major
         if: ${{ inputs.bump == 'major' }}
-        run: pnpm run package:major
+        run: |
+          git config --local user.name 'Temporal Data (cicd)'
+          git config --local user.email 'commander-data@temporal.io'
+          pnpm run package:major
       - name: The bump is minor
         if: ${{ inputs.bump == 'minor' }}
-        run: pnpm run package:minor
+        run: |
+          git config --local user.name 'Temporal Data (cicd)'
+          git config --local user.email 'commander-data@temporal.io'
+          pnpm run package:minor
       - name: The bump is patch
         if: ${{ inputs.bump == 'patch' }}
-        run: pnpm run package:patch
+        run: |
+          git config --local user.name 'Temporal Data (cicd)'
+          git config --local user.email 'commander-data@temporal.io'
+          pnpm run package:patch
       - name: Publish package to NPM
         run: npm publish
         env:
