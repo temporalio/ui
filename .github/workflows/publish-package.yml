@@ -46,4 +46,4 @@ jobs:
           git config --local user.email 'commander-data@temporal.io'
           git remote set-url origin https://x-access-token:${{ secrets.COMMANDER_DATA_TOKEN }}@github.com/${{ github.repository }}
           git add .
-          git commit -m "Update UI submodule" && git push || echo "No changes to commit"
+          git commit -m "Update package version" && git push || echo "No changes to commit"
