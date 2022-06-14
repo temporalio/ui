@@ -39,3 +39,50 @@ jobs:
         working-directory: ./package
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'bump type, major or minor or patch or empty string'
+        default: ''
+      dry_run:
+        description: 'dry run, true or false'
+        default: 'false'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+      - uses: actions/checkout@v2
+      - name: Node setup
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: pnpm setup
+      - uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7
+      - name: Install
+      - run: pnpm install
+      - name: Build
+      - run: pnpm run build
+      - name: Automated Version Bump
+        run: pnpm version patch -m "[RELEASE] %s"
+      - name: Update package
+        run: pnpm run package
+      - name: Publish package to NPM
+        run: npm publish
+        working-directory: ./package
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - uses: MeilCli/bump-release-action@master
+        with:
+          bump: ${{ github.event.inputs.bump }}
+          dry_run: ${{ github.event.inputs.dry_run }}
+          draft: ${{ github.event.inputs.draft }}
+          pre_release: ${{ github.event.inputs.pre_release }}
