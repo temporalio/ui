@@ -30,7 +30,6 @@ const config = {
           filepath,
         );
       },
-      // files: (filepath) => true,
       files: (filepath) =>
         /^(?!.*\.(spec|test)\.ts$).*\.(svelte|ts)$/.test(filepath),
     },
