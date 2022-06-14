@@ -41,7 +41,7 @@ jobs:
         if: ${{ inputs.bump == 'patch' }}
         run: pnpm run package:patch
       - name: Authenticate with GitHub package registry
-      - run: |
+        run: |
           echo @temporalio:https://npm.pkg.github.com/ > package/.npmrc
           echo '//npm.pkg.github.com/:_authToken=${NPM_TOKEN}' >> package/.npmrc
       - name: Publish package to NPM
