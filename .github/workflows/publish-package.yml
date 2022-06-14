@@ -26,7 +26,7 @@ jobs:
       - name: Install
         run: pnpm install
       - name: Build
-        run: pnpm run build
+        run: pnpm run build:local
       - name: The bump is major
         if: ${{ inputs.bump == 'major' }}
         run: pnpm run package:major
