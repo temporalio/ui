@@ -19,41 +19,36 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 16
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@temporalio'
       - name: pnpm setup
         uses: pnpm/action-setup@v2.2.2
         with:
           version: 7
+      - name: Configure Git
+        run: |
+          git config --local user.name 'Temporal Data (cicd)'
+          git config --local user.email 'commander-data@temporal.io'
       - name: Install
         run: pnpm install
       - name: Build
         run: pnpm run build:local
       - name: The bump is major
         if: ${{ inputs.bump == 'major' }}
-        run: |
-          git config --local user.name 'Temporal Data (cicd)'
-          git config --local user.email 'commander-data@temporal.io'
-          pnpm run package:major
+        run: pnpm run package:major
       - name: The bump is minor
         if: ${{ inputs.bump == 'minor' }}
-        run: |
-          git config --local user.name 'Temporal Data (cicd)'
-          git config --local user.email 'commander-data@temporal.io'
-          pnpm run package:minor
+        run: pnpm run package:minor
       - name: The bump is patch
         if: ${{ inputs.bump == 'patch' }}
-        run: |
-          git config --local user.name 'Temporal Data (cicd)'
-          git config --local user.email 'commander-data@temporal.io'
-          pnpm run package:patch
+        run: pnpm run package:patch
       - name: Publish package to NPM
-        run: npm publish
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         working-directory: ./package
       - name: Commit version bump
         run: |
-          git config --local user.name 'Temporal Data (cicd)'
-          git config --local user.email 'commander-data@temporal.io'
           git remote set-url origin https://x-access-token:${{ secrets.COMMANDER_DATA_TOKEN }}@github.com/${{ github.repository }}
           git add .
           git commit -m "Update package version" && git push || echo "No changes to commit"
