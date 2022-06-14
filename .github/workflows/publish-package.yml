@@ -1,0 +1,41 @@
+name: Publish patch version of package to npm
+
+on: [workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install modules
+        run: pnpm install
+      - name: Lint
+        run: pnpm run --if-present lint
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup pnpm
+      - uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7
+      - name: Install dependencies and build
+        run: pnpm install && pnpm run build
+      - name: Automated Version Bump
+        run: pnpm version patch -m "[RELEASE] %s"
+      - name: Update package to patch version of package
+        run: pnpm run package:patch
+      - name: Publish package to NPM
+        run: npm publish
+        working-directory: ./package
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
