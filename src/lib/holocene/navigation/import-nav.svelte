@@ -1,8 +1,8 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/index.svelte';
 
-  import NavContainer from '../holocene/nav-container.svelte';
-  import NavRow from '../holocene/nav-row.svelte';
+  import NavContainer from '$lib/holocene/navigation/_nav-container.svelte';
+  import NavRow from '$lib/holocene/navigation/_nav-row.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
 
   export let isCloud: boolean;
