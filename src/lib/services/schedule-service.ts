@@ -20,7 +20,7 @@ export const fetchAllSchedules = async (
   namespace: string,
   request = fetch,
 ): Promise<ScheduleResponse> => {
-  let onError: ErrorCallback;
+  const onError: ErrorCallback = (e) => console.error(e);
   let error: string;
 
   const { schedules, nextPageToken } = (await requestFromAPI<ScheduleResponse>(
@@ -79,7 +79,7 @@ export async function createSchedule({
         }),
       },
       shouldRetry: false,
-      onError: (error) => {},
+      onError: (error) => console.error(error),
     },
   );
 }
@@ -111,7 +111,7 @@ export async function editSchedule({
         }),
       },
       shouldRetry: false,
-      onError: (error) => {},
+      onError: (error) => console.error(error),
     },
   );
 }
@@ -147,7 +147,7 @@ export async function pauseSchedule({
         }),
       },
       shouldRetry: false,
-      onError: (error) => {},
+      onError: (error) => console.error(error),
     },
   );
 }

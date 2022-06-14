@@ -8,7 +8,7 @@
 
 <style lang="postcss">
   .panel {
-    @apply p-8 border-2 border-gray-300 rounded-lg;
+    @apply rounded-lg border-2 border-gray-300 p-8;
   }
   .error {
     @apply border-red-700 bg-red-50;

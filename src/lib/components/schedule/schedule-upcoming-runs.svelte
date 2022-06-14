@@ -7,7 +7,7 @@
 </script>
 
 <Panel>
-  <h2 class="text-2xl mb-4">Upcoming Runs</h2>
+  <h2 class="mb-4 text-2xl">Upcoming Runs</h2>
   {#each futureRuns.slice(0, 5) as run}
     <div class="row">
       <p>{formatDate(run, $timeFormat, 'from now')}</p>
@@ -17,6 +17,6 @@
 
 <style lang="postcss">
   .row {
-    @apply inline-flex justify-start border-b-2 border-gray-300 my-1 py-1 w-full h-10;
+    @apply my-1 inline-flex h-10 w-full justify-start border-b-2 border-gray-300 py-1;
   }
 </style>

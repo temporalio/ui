@@ -12,7 +12,7 @@
 </script>
 
 <Panel>
-  <h2 class="text-2xl mb-4">Recent Runs</h2>
+  <h2 class="mb-4 text-2xl">Recent Runs</h2>
   {#each recentRuns
     .sort((a, b) => new Date(b.actualTime) - new Date(a.actualTime))
     .slice(0, 5) as run (run.startWorkflowResult.workflowId)}
@@ -35,7 +35,7 @@
 
 <style lang="postcss">
   .row {
-    @apply inline-flex border-b-2 border-gray-300 my-1 py-1 w-full h-10;
+    @apply my-1 inline-flex h-10 w-full border-b-2 border-gray-300 py-1;
   }
   .cell {
     @apply text-left;

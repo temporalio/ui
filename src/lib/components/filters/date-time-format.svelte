@@ -1,6 +1,5 @@
 <script lang="ts">
-  import Icon from 'svelte-fa';
-  import { faCheck } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
 
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
   import {
@@ -32,7 +31,7 @@
     >
       <div class="check">
         {#if $timeFormat === option}
-          <Icon icon={faCheck} scale={0.8} />
+          <Icon name="check" scale={0.8} />
         {/if}
       </div>
       <div class="label">
@@ -44,13 +43,13 @@
 
 <style lang="postcss">
   .option {
-    @apply font-normal flex my-2;
+    @apply my-2 flex font-normal;
   }
   .label {
     @apply cursor-pointer;
   }
   .check {
-    @apply mx-4 w-4 mt-1;
+    @apply mx-4 mt-1 w-4;
   }
   .active {
     @apply text-blue-700;

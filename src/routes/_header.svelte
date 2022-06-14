@@ -48,6 +48,7 @@
     archive: routeForArchivalWorkfows({ namespace }),
     settings: routeForSettings({ namespace }),
     workflows: routeForWorkflows({ namespace }),
+    schedules: routeForSchedules({ namespace }),
     feedback:
       $page.stuff?.settings?.feedbackURL ||
       'https://github.com/temporalio/ui/issues/new/choose',

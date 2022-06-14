@@ -1,6 +1,5 @@
 <script lang="ts">
-  import Icon from 'svelte-fa';
-  import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
 
   export let spec;
   export let state;
@@ -12,7 +11,7 @@
 <p on:click={() => (show = !show)} class="settings">
   Advanced Settings <Icon
     class="inline"
-    icon={show ? faCaretUp : faCaretDown}
+    name={show ? 'caretUp' : 'caretDown'}
   />
 </p>
 {#if show}
@@ -26,6 +25,6 @@
 
 <style lang="postcss">
   .settings {
-    @apply underline decoration-gray-900 mb-4 cursor-pointer;
+    @apply mb-4 cursor-pointer underline decoration-gray-900;
   }
 </style>

@@ -2,5 +2,5 @@
   export let notes = '';
 </script>
 
-<h2 class="text-2xl mb-4">Memo</h2>
+<h2 class="mb-4 text-2xl">Memo</h2>
 <p>{notes}</p>

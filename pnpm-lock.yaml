@@ -61,6 +61,7 @@ specifiers:
   tslib: ^2.3.1
   typescript: ^4.4.2
   url-pattern: ^1.0.3
+  uuid: ^8.3.2
   webpack: ^5.73.0
   websocket-as-promised: ^2.0.1
 
@@ -73,6 +74,7 @@ dependencies:
   just-debounce: 1.1.0
   sanitize-html: 2.7.0
   url-pattern: 1.0.3
+  uuid: 8.3.2
   websocket-as-promised: 2.0.1
 
 devDependencies:
@@ -10827,7 +10829,6 @@ packages:
         integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==,
       }
     hasBin: true
-    dev: true
 
   /v8-compile-cache-lib/3.0.1:
     resolution:

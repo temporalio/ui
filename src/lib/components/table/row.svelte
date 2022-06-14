@@ -43,7 +43,7 @@
 
 <style lang="postcss">
   .row {
-    @apply block no-underline p-2 text-sm border-b-2 items-center xl:text-base xl:table-row last-of-type:border-b-0;
+    @apply block items-center border-b-2 p-2 text-sm no-underline last-of-type:border-b-0 xl:table-row xl:text-base;
   }
 
   .row:hover {
@@ -51,7 +51,7 @@
   }
 
   .cell {
-    @apply xl:table-cell xl:border-b-2 border-gray-700 text-left p-2;
+    @apply border-gray-700 p-2 text-left xl:table-cell xl:border-b-2;
   }
 
   .table-link {

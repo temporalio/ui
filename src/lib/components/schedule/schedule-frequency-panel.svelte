@@ -7,7 +7,7 @@
 </script>
 
 <Panel>
-  <h2 class="text-2xl mb-4">Frequency</h2>
+  <h2 class="mb-4 text-2xl">Frequency</h2>
   <div class="pr-2">
     <ScheduleFrequency {calendar} {interval} />
   </div>
