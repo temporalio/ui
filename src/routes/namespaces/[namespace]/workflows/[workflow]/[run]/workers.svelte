@@ -14,8 +14,7 @@
 </script>
 
 <script lang="ts">
-  import Icon from 'svelte-fa';
-  import { faTimes, faCheck } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
 
   import { timeFormat } from '$lib/stores/time-format';
   import { formatDate } from '$lib/utilities/format-date';
@@ -30,8 +29,8 @@
   <h3 class="text-lg font-medium">
     Task Queue: <span class="select-all font-normal">{taskQueue}</span>
   </h3>
-  <section class="flex flex-col border-2 border-gray-900 w-full rounded-lg">
-    <div class="bg-gray-900 text-white flex flex-row p-2">
+  <section class="flex w-full flex-col rounded-lg border-2 border-gray-900">
+    <div class="flex flex-row bg-gray-900 p-2 text-white">
       <div class="w-3/12 text-left">ID</div>
       <div class="w-3/12 text-left">Last Accessed</div>
       <div class="w-3/12 text-left">Workflow Task Handler</div>
@@ -39,7 +38,7 @@
     </div>
     {#each workers.pollers as poller (poller.identity)}
       <article
-        class="w-full h-full flex flex-row border-b-2 last:border-b-0 no-underline p-2"
+        class="flex h-full w-full flex-row border-b-2 p-2 no-underline last:border-b-0"
         data-cy="worker-row"
       >
         <div class="links w-3/12 text-left" data-cy="worker-identity">
@@ -54,16 +53,16 @@
         </div>
         <div class="w-3/12 text-left">
           {#if poller.taskQueueTypes.includes('WORKFLOW')}
-            <Icon icon={faCheck} color="blue" />
+            <Icon name="checkMark" color="blue" />
           {:else}
-            <Icon icon={faTimes} color="black" />
+            <Icon name="close" color="black" />
           {/if}
         </div>
         <div class="w-3/12 text-left">
           {#if poller.taskQueueTypes.includes('ACTIVITY')}
-            <Icon icon={faCheck} color="blue" />
+            <Icon name="checkMark" color="blue" />
           {:else}
-            <Icon icon={faTimes} color="black" />
+            <Icon name="close" color="black" />
           {/if}
         </div>
       </article>

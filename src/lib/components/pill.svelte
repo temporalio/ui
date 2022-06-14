@@ -1,12 +1,12 @@
 <script lang="ts">
-  import Icon from 'svelte-fa';
-  import { faSpinner } from '@fortawesome/free-solid-svg-icons';
-  import type { IconDefinition } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
+
+  import type { IconName } from 'holocene/components/icon/paths';
 
   export let disabled: boolean = false;
   export let loading: boolean = false;
   export let active: boolean = false;
-  export let icon: IconDefinition = null;
+  export let icon: IconName = null;
   export let classes: string = $$props.class;
   export let color: Color = 'gray';
 </script>
@@ -14,7 +14,7 @@
 <button on:click class={`pill ${color} ${classes}`} class:active {disabled}>
   {#if icon}
     <span class:animate-spin={loading}>
-      <Icon icon={loading ? faSpinner : icon} scale={1} />
+      <Icon name={loading ? 'spinner' : icon} scale={1} />
     </span>
   {/if}
   <slot />
@@ -22,14 +22,14 @@
 
 <style lang="postcss">
   .pill {
-    @apply flex items-center gap-1 justify-center rounded-full px-3 py-1 text-sm border-2 border-gray-100;
+    @apply flex items-center justify-center gap-1 rounded-full border-2 border-gray-100 px-3 py-1 text-sm;
   }
 
   .gray {
     @apply bg-gray-100 text-gray-600;
   }
   .gray.active {
-    @apply bg-white text-gray-900 border-2 border-gray-900;
+    @apply border-2 border-gray-900 bg-white text-gray-900;
   }
 
   .blueGray {

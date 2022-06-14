@@ -9,14 +9,14 @@
 </script>
 
 <a
-  class="block text-sm md:text-base whitespace-nowrap"
+  class="block whitespace-nowrap text-sm md:text-base"
   class:active
   {href}
   data-cy={$$props.dataCy}
 >
   {#if amount || amount === 0}
     {label}
-    <span class="px-2 text-blue-700 bg-blue-100 rounded-sm">{amount}</span>
+    <span class="rounded-sm bg-blue-100 px-2 text-blue-700">{amount}</span>
   {:else}
     {label}
   {/if}
@@ -24,6 +24,6 @@
 
 <style lang="postcss">
   a.active {
-    @apply border-b-2 rounded-b-sm text-blue-700 border-blue-700 font-medium;
+    @apply rounded-b-sm border-b-2 border-blue-700 font-medium text-blue-700;
   }
 </style>

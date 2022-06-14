@@ -13,6 +13,6 @@
 
 <style lang="postcss">
   .row {
-    @apply absolute left-0 right-0 p-2 text-sm text-center border-2;
+    @apply absolute left-0 right-0 border-2 p-2 text-center text-sm;
   }
 </style>

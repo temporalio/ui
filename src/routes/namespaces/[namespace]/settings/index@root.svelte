@@ -38,39 +38,39 @@
 </h2>
 <div class="flex">
   <div class="namespace-info w-full p-4">
-    <h1 class="text-lg font-medium my-4">Details</h1>
+    <h1 class="my-4 text-lg font-medium">Details</h1>
     <p data-cy="namespace-description">
-      <span class="font-medium mr-2">Description:</span>
+      <span class="mr-2 font-medium">Description:</span>
       {currentNamespace?.namespaceInfo?.description}
     </p>
     <p data-cy="namespace-owner">
-      <span class="font-medium mr-2">Owner:</span>
+      <span class="mr-2 font-medium">Owner:</span>
       {currentNamespace?.namespaceInfo?.ownerEmail || 'Unknown'}
     </p>
     <p data-cy="namespace-global">
-      <span class="font-medium mr-2">Global?</span>
+      <span class="mr-2 font-medium">Global?</span>
       {currentNamespace?.isGlobalNamespace ? 'Yes' : 'No'}
     </p>
     <p data-cy="namespace-retention">
-      <span class="font-medium mr-2">Retention Period:</span>
+      <span class="mr-2 font-medium">Retention Period:</span>
       {fromSecondsToDaysOrHours(
         currentNamespace?.config?.workflowExecutionRetentionTtl.toString(),
       )}
     </p>
     <p data-cy="namespace-history">
-      <span class="font-medium mr-2">History Archival:</span>
+      <span class="mr-2 font-medium">History Archival:</span>
       {currentNamespace?.config?.historyArchivalState}
     </p>
     <p data-cy="namespace-visibility">
-      <span class="font-medium mr-2">Visibility Archival:</span>
+      <span class="mr-2 font-medium">Visibility Archival:</span>
       {currentNamespace?.config?.visibilityArchivalState}
     </p>
     <p data-cy="namespace-failover">
-      <span class="font-medium mr-2">Failover Version:</span>
+      <span class="mr-2 font-medium">Failover Version:</span>
       {currentNamespace?.failoverVersion}
     </p>
     <p data-cy="namespace-clusters">
-      <span class="font-medium mr-2">Clusters:</span>
+      <span class="mr-2 font-medium">Clusters:</span>
       {currentNamespace?.replicationConfig?.state} ({currentNamespace
         ?.replicationConfig?.activeClusterName})
     </p>

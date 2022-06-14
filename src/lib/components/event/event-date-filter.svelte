@@ -3,8 +3,7 @@
 </script>
 
 <script lang="ts">
-  import Icon from 'svelte-fa';
-  import { faCheck } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
 
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
   import { eventSortOrder, eventShowElapsed } from '$lib/stores/event-view';
@@ -70,9 +69,9 @@
       class:active={$eventSortOrder === option}
       on:click={() => onSortOptionClick(option)}
     >
-      <div class="check">
+      <div class="check active">
         {#if $eventSortOrder === option}
-          <Icon icon={faCheck} scale={0.8} />
+          <Icon stroke="currentcolor" name="checkMark" scale={0.8} />
         {/if}
       </div>
       <div class="label">
@@ -82,7 +81,7 @@
   {/each}
   <div class="option pr-4">
     <div class="check" />
-    <div class="my-2 pr-2 w-full border-b-2 border-gray-300" />
+    <div class="my-2 w-full border-b-2 border-gray-300 pr-2" />
   </div>
   {#each dateOptions as { label, option } (option)}
     <div
@@ -91,9 +90,9 @@
       on:click={() => onDateOptionClick(option)}
       data-cy="event-date-filter-{option}"
     >
-      <div class="check">
+      <div class="check active">
         {#if $timeFormat === option}
-          <Icon icon={faCheck} scale={0.8} />
+          <Icon stroke="currentcolor" name="checkMark" scale={0.8} />
         {/if}
       </div>
       <div class="label">
@@ -103,16 +102,16 @@
   {/each}
   <div class="option pr-4">
     <div class="check" />
-    <div class="my-2 pr-2 w-full border-b-2 border-gray-300" />
+    <div class="my-2 w-full border-b-2 border-gray-300 pr-2" />
   </div>
   <div
     class="option"
     class:active={$eventShowElapsed === 'true'}
     on:click={onShowElapsedClick}
   >
-    <div class="check">
+    <div class="check active">
       {#if $eventShowElapsed === 'true'}
-        <Icon icon={faCheck} scale={0.8} />
+        <Icon stroke="currentcolor" name="checkMark" scale={0.8} />
       {/if}
     </div>
     <div class="label">Show Elapsed Time</div>
@@ -121,13 +120,13 @@
 
 <style lang="postcss">
   .option {
-    @apply font-normal flex my-2;
+    @apply my-2 flex font-normal;
   }
   .label {
     @apply cursor-pointer;
   }
   .check {
-    @apply mx-4 w-4 mt-1;
+    @apply mx-4 w-4;
   }
   .active {
     @apply text-blue-700;

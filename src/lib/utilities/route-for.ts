@@ -165,9 +165,8 @@ export const routeForImport = ({
   importType,
   view,
 }: ImportParameters): string => {
-  if (view) {
-    if (importType === 'events') return `/import/${importType}/history/${view}`;
-    return `/import/${importType}/${view}`;
+  if (importType === 'events' && view) {
+    return `/import/${importType}/namespace/workflow/run/history/${view}`;
   }
   return `/import/${importType}`;
 };

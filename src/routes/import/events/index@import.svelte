@@ -1,5 +1,5 @@
 <script lang="ts">
-  import HistoryImport from '$lib/components/event/event-history-import.svelte';
+  import HistoryImport from '../_event-history-import.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
   import Link from '$lib/components/link.svelte';
 
@@ -10,7 +10,7 @@
 
 <section class="flex flex-col gap-4">
   <section id="event-history">
-    <nav class="block lg:flex gap-4 justify-between items-center pb-4">
+    <nav class="block items-center justify-between gap-4 pb-4 lg:flex">
       <h3 class="text-lg font-medium">Event History Import</h3>
       <div class="flex gap-4">
         <HistoryImport />
@@ -18,7 +18,7 @@
     </nav>
   </section>
   <section class="w-full md:w-1/2">
-    <code class="text-md font-medium bg-gray-200 p-2"
+    <code class="text-md bg-gray-200 p-2 font-medium"
       >type HistoryEvent = temporal.api.history.v1.IHistoryEvent</code
     >
     <div class="mt-4">
@@ -28,7 +28,7 @@
         class="mb-8">View in Github</Link
       >
     </div>
-    <h3 class="text-lg font-medium mt-8">Expected JSON format</h3>
+    <h3 class="mt-8 text-lg font-medium">Expected JSON format</h3>
     <CodeBlock content={format1} />
     <h4 class="text-md font-medium">or</h4>
     <CodeBlock content={format2} />

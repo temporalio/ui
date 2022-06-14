@@ -1,19 +1,18 @@
 <script lang="ts">
-  import Icon from 'svelte-fa';
-  import { faMeteor } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
 
   export let title: string;
   export let content: string = '';
 </script>
 
 <div
-  class="my-12 flex flex-col justify-start items-center gap-2 {$$props.class}"
+  class="my-12 flex flex-col items-center justify-start gap-2 {$$props.class}"
   data-cy={$$props.dataCy}
 >
   <span
-    class="flex rounded-full items-center justify-center w-16 h-16 bg-gray-200"
+    class="flex h-16 w-16 items-center justify-center rounded-full bg-gray-200"
   >
-    <Icon icon={faMeteor} scale={1.2} class="block w-full h-full" /></span
+    <Icon name="comet" class="block h-full w-full" /></span
   >
   <h2 class="text-xl font-medium">{title}</h2>
   {#if content}

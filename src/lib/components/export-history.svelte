@@ -1,6 +1,5 @@
 <script lang="ts">
   import { fetchRawEvents } from '$lib/services/events-service';
-  import { faDownload } from '@fortawesome/free-solid-svg-icons';
   import Button from './button.svelte';
 
   export let namespace: string;
@@ -27,6 +26,6 @@
   };
 </script>
 
-<Button secondary icon={faDownload} on:click={exportHistory}
+<Button secondary icon="download" on:click={exportHistory}
   ><span class="hidden md:inline">Download</span></Button
 >

@@ -1,6 +1,5 @@
 <script lang="ts">
-  import Icon from 'svelte-fa';
-  import { faSearch } from '@fortawesome/free-solid-svg-icons';
+  import Icon from 'holocene/components/icon/index.svelte';
   import Button from './button.svelte';
 
   export let placeholder = '';
@@ -14,23 +13,21 @@
 
 <form
   on:submit|preventDefault
-  class="flex items-center relative rounded-full border-2 focus-within:border-blue-700 transition-colors {noButton
-    ? 'h-12'
-    : ''}"
+  class="relative flex items-center rounded-lg border-2 transition-colors focus-within:border-blue-700"
 >
   {#if icon}
     <Icon
-      icon={faSearch}
+      name="search"
       scale={0.9}
-      color="gray"
-      class="flex items-center ml-4"
+      stroke="gray"
+      class="ml-4 flex items-center"
     />
   {/if}
   <label for={id} class="hidden">{label}</label>
   <input
     {id}
     type="text"
-    class="w-full px-4 focus:outline-none rounded-l-full rounded-r-full"
+    class="w-full rounded-l-lg px-4 focus:outline-none"
     {name}
     {value}
     {placeholder}

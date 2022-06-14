@@ -40,7 +40,6 @@
         <Copyable
           content={value}
           container-class="flex-row-reverse xl:flex-row"
-          size="xs"
         >
           <Link href={routeForWorkflow({ namespace, workflow, run: value })}>
             {value}
@@ -52,7 +51,7 @@
     <div class="detail-row">
       <h2 class="text-sm">{format(key)}</h2>
       <div class="text-sm">
-        <Copyable content={value} container-class="xl:flex-row" size="xs">
+        <Copyable content={value} container-class="xl:flex-row">
           <Link href={routeForWorkers({ namespace, workflow, run })}>
             {value}
           </Link>
@@ -64,7 +63,7 @@
       <h2 class="text-sm">{format(key)}</h2>
       <p class="text-sm">
         <span
-          class="px-2 select-all"
+          class="select-all px-2"
           class:badge={!shouldDisplayAsPlainText(key)}>{value}</span
         >
       </p>
@@ -74,10 +73,10 @@
 
 <style lang="postcss">
   .code-block-row {
-    @apply block w-full py-2 text-left border-b-2 border-gray-200;
+    @apply block w-full border-b-2 border-gray-200 py-2 text-left;
   }
   .detail-row {
-    @apply block xl:flex items-start gap-4 w-full py-2 text-left border-b-2 border-gray-200;
+    @apply block w-full items-start gap-4 border-b-2 border-gray-200 py-2 text-left xl:flex;
   }
   .row:last-of-type .detail-row {
     @apply border-b-0;
@@ -86,6 +85,6 @@
     @apply border-b-0;
   }
   .badge {
-    @apply text-gray-700 bg-gray-300;
+    @apply bg-gray-300 text-gray-700;
   }
 </style>

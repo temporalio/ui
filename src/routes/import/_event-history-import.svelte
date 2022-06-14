@@ -6,10 +6,9 @@
   import { toEventHistory } from '$lib/models/event-history';
   import { notifications } from '$lib/stores/notifications';
   import { importEvents, importEventGroups } from '$lib/stores/import-events';
-  import { faFileImport } from '@fortawesome/free-solid-svg-icons';
+  import { importSettings } from './_import-settings';
 
-  // rawEvents is expected to be HistoryEvent[] | { events: HistoryEvent[] } but could be anything
-  let rawEvents: any;
+  let rawEvents: HistoryEvent[] | { events: HistoryEvent[] };
 
   const onFileSelect = async (e: Event) => {
     const target = e.target as HTMLInputElement;
@@ -30,23 +29,26 @@
 
   const onConfirm = async () => {
     try {
-      const { events, eventGroups } = await toEventHistory(
-        rawEvents?.events ?? rawEvents,
-      );
+      const { events, eventGroups } = await toEventHistory({
+        response: Array.isArray(rawEvents) ? rawEvents : rawEvents?.events,
+        namespace: importSettings.defaultNamespace,
+        settings: importSettings,
+      });
       importEvents.set(events);
       importEventGroups.set(eventGroups);
       const path = routeForImport({ importType: 'events', view: 'feed' });
       goto(path);
     } catch (e) {
+      console.error(e);
       notifications.add('error', 'Could not create event history from JSON');
     }
   };
 </script>
 
 <input
-  class="import-input block border border-gray-200 rounded-md p-2"
+  class="import-input block rounded-md border border-gray-200 p-2"
   type="file"
   accept=".json"
   on:change={onFileSelect}
 />
-<Button icon={faFileImport} on:click={onConfirm}>Import</Button>
+<Button icon="fileUpload" on:click={onConfirm}>Import</Button>

@@ -14,7 +14,7 @@
 <div>
   <label class="hidden" for={id}>{label}</label>
   <select
-    class="inline border-2 text-base px-2 h-10 rounded-lg w-full {$$props.class}"
+    class="inline h-10 w-full rounded-lg border-2 px-2 text-base {$$props.class}"
     class:dark
     class:remove={arrow}
     {name}
@@ -37,7 +37,7 @@
   }
 
   .remove {
-    @apply appearance-none h-8 text-sm py-1 pl-3 rounded-xl;
+    @apply h-8 appearance-none rounded-xl py-1 pl-3 text-sm;
   }
 
   .dark {
@@ -45,7 +45,7 @@
   }
 
   .arrow::after {
-    @apply text-white text-sm font-normal mr-4;
+    @apply mr-4 text-sm font-normal text-white;
     font-family: 'Font Awesome 5 Free';
     content: '\f0dc';
   }

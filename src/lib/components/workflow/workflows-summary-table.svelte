@@ -10,8 +10,8 @@
 
 <section class="workflow-table">
   <div class="table-header-row md:table-header-group">
-    <div class="md:table-row hidden">
-      <div class="table-header table-cell rounded-tl-md w-28">Status</div>
+    <div class="hidden md:table-row">
+      <div class="table-header table-cell w-28 rounded-tl-md">Status</div>
       <div
         bind:offsetWidth={$workflowIdColumnWidth}
         class="table-header table-cell md:w-60 xl:w-auto"
@@ -25,11 +25,11 @@
         Type
       </div>
       <div
-        class="table-header hidden xl:table-cell xl:w-64 text-sm xl:text-base"
+        class="table-header hidden text-sm xl:table-cell xl:w-64 xl:text-base"
       >
         Start
       </div>
-      <div class="table-header rounded-tr-md hidden xl:table-cell xl:w-64">
+      <div class="table-header hidden rounded-tr-md xl:table-cell xl:w-64">
         End
       </div>
     </div>
@@ -38,7 +38,7 @@
     class="table-header-row md:hidden"
     bind:offsetWidth={$workflowSummaryColumnWidth}
   >
-    <div class="p-2 border-b rounded-t-md">Summary</div>
+    <div class="rounded-t-md border-b p-2">Summary</div>
   </div>
   <div class="overflow-y-auto md:table-row-group">
     <slot />
@@ -47,14 +47,14 @@
 
 <style lang="postcss">
   .workflow-table {
-    @apply md:table md:table-fixed border-gray-900 border-2 rounded-lg w-full;
+    @apply w-full rounded-lg border-2 border-gray-900 md:table md:table-fixed;
   }
 
   .table-header-row {
-    @apply bg-gray-900 text-white rounded-t-sm md:rounded-t-lg;
+    @apply rounded-t-sm bg-gray-900 text-white md:rounded-t-lg;
   }
 
   .table-header {
-    @apply text-left p-2;
+    @apply p-2 text-left;
   }
 </style>

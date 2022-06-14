@@ -33,6 +33,16 @@
     return { namespace, href, onClick: () => goto(href) };
   });
 
+  // To show single namespace on cloud
+  if (isCloud && $page.params.namespace && !namespaces.length) {
+    const href = routeForWorkflows({ namespace: $page.params.namespace });
+    namespaceList.push({
+      namespace: $page.params.namespace,
+      href,
+      onClick: () => goto(href),
+    });
+  }
+
   $: linkList = {
     home: routeForWorkflows({ namespace }),
     archive: routeForArchivalWorkfows({ namespace }),

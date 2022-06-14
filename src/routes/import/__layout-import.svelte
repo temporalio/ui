@@ -36,13 +36,13 @@
   <meta property="og:image" content="/banner.png" />
 </svelte:head>
 
-<div class="flex flex-row w-screen h-screen">
+<div class="flex h-screen w-screen flex-row">
   <Notifications />
-  <div class="sticky top-0 h-screen w-auto z-20">
+  <div class="sticky top-0 z-20 h-screen w-auto">
     <Header />
   </div>
-  <section id="content" class="flex-auto h-screen w-max overflow-auto">
-    <div class="flex flex-col h-full gap-4 px-10 pb-10 pt-8 z-10">
+  <section id="content" class="h-screen w-max flex-auto overflow-auto">
+    <div class="z-10 flex h-full flex-col gap-4 px-10 pb-10 pt-8">
       <ErrorBoundary onError={() => {}}>
         <slot />
       </ErrorBoundary>

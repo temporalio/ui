@@ -1,0 +1,10 @@
+{
+  "queryResult": {
+    "payloads": [
+      {
+        "an": "error"
+      }
+    ]
+  },
+  "queryRejected": null
+}

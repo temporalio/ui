@@ -25,10 +25,10 @@
   });
 </script>
 
-<section aria-roledescription="error" class="text-center align-middle mt-32">
+<section aria-roledescription="error" class="mt-32 text-center align-middle">
   <h1 class="text-[12rem] font-semibold ">{status}</h1>
   <p class="-mt-6 mb-5 text-lg">Uh oh. There's an error.</p>
-  <p class="my-4 text-2xl text-red-700 w-auto font-extrabold">
+  <p class="my-4 w-auto text-2xl font-extrabold text-red-700">
     {message}
   </p>
 
@@ -41,7 +41,7 @@
         }
       }}
       target="_self"
-      class="underline-offset-2 underline">Try a refresh</Link
+      class="underline underline-offset-2">Try a refresh</Link
     >
     or
     <Link href="https://temporal.io/slack">jump on our Slack Channel</Link>.

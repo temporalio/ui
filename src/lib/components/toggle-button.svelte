@@ -1,12 +1,12 @@
 <script lang="ts">
-  import Icon from 'svelte-fa';
+  import Icon from 'holocene/components/icon/index.svelte';
   import { page } from '$app/stores';
 
-  import type { IconDefinition } from '@fortawesome/free-solid-svg-icons';
+  import type { IconName } from 'holocene/components/icon/paths';
 
   import { getAppContext } from '$lib/utilities/get-context';
 
-  export let icon: IconDefinition;
+  export let icon: IconName;
   export let group = getAppContext('group');
   export let scale = 1;
   export let href = '#';
@@ -15,7 +15,7 @@
 </script>
 
 <a
-  class="border-2 py-2 px-4 hover:text-white text-sm hover:bg-gray-600 flex items-center justify-center"
+  class="flex items-center justify-center border-2 py-2 px-4 text-sm hover:bg-gray-600 hover:text-white"
   class:rounded-lg={!group}
   class:active={$page.url.pathname.includes(base) || active}
   class:group
@@ -25,8 +25,8 @@
   on:click
 >
   {#if icon}
-    <div class="flex gap-2 items-center">
-      <Icon {icon} {scale} />
+    <div class="flex items-center gap-2">
+      <Icon color="currentcolor" name={icon} {scale} />
       <span class="hidden md:block"><slot /></span>
     </div>
   {:else}
