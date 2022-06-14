@@ -1,20 +1,22 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/index.svelte';
-
   import Logo from '$lib/holocene/logo.svelte';
+  import { navOpen } from '$lib/stores/nav-open';
 
   export let isCloud = false;
   export let linkList: Partial<Record<string, string>>;
-  export let navOpen: boolean;
-  export let toggleNav: () => void;
+
+  function toggleNav() {
+    $navOpen = !$navOpen;
+  }
 </script>
 
 <nav class="nav-header transition-width " data-cy="navigation-header">
   <div
     class="nav-wrapper transition-width"
     class:cloud={isCloud}
-    class:open={navOpen}
-    class:close={!navOpen}
+    class:open={$navOpen}
+    class:close={!$navOpen}
   >
     <div>
       <a
@@ -31,7 +33,7 @@
       on:click={toggleNav}
     >
       <div class={isCloud ? 'cloudNavIcon' : 'localNavIcon'}>
-        <Icon name={navOpen ? 'navCollapse' : 'navExpand'} scale={1} />
+        <Icon name={$navOpen ? 'navCollapse' : 'navExpand'} scale={1} />
       </div>
     </button>
     <div class="mt-24 grow items-center">
