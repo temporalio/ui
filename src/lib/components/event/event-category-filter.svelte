@@ -2,7 +2,7 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
 
-  import Icon from 'holocene/components/icon/index.svelte';
+  import Icon from '$lib/holocene/icon/index.svelte';
 
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
   import {

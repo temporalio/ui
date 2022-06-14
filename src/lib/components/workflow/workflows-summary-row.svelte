@@ -9,7 +9,7 @@
   } from '$lib/stores/column-width';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import Tooltip from '$lib/components/tooltip.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   export let namespace: string;
   export let workflow: WorkflowExecution;
   export let timeFormat: TimeFormat | string;

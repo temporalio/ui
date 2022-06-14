@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from 'holocene/components/icon/index.svelte';
+  import Icon from '$lib/holocene/icon/index.svelte';
 
   import { eventViewType } from '$lib/stores/event-view';
   import { workflowsSearch } from '$lib/stores/workflows';

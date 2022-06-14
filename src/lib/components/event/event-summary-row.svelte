@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from 'holocene/components/icon/index.svelte';
+  import Icon from '$lib/holocene/icon/index.svelte';
 
   import { eventSortOrder, eventShowElapsed } from '$lib/stores/event-view';
   import { timeFormat } from '$lib/stores/time-format';
