@@ -45,7 +45,7 @@ jobs:
           echo @temporalio:https://npm.pkg.github.com/ > package/.npmrc
           echo '//npm.pkg.github.com/:_authToken=${NPM_TOKEN}' >> package/.npmrc
       - name: Publish package to NPM
-        run: npm publish --access public
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_TOKEN }}
         working-directory: ./package
