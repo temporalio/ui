@@ -1,56 +1,11 @@
-name: Publish patch version of package to npm
-
-on: [workflow_dispatch]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: pnpm/action-setup@v2.2.2
-        with:
-          version: 7
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '16.x'
-          registry-url: 'https://registry.npmjs.org'
-      - name: Install modules
-        run: pnpm install
-      - name: Lint
-        run: pnpm run --if-present lint
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup pnpm
-      - uses: pnpm/action-setup@v2.2.2
-        with:
-          version: 7
-      - name: Install dependencies and build
-        run: pnpm install && pnpm run build
-      - name: Automated Version Bump
-        run: pnpm version patch -m "[RELEASE] %s"
-      - name: Update package to patch version of package
-        run: pnpm run package:patch
-      - name: Publish package to NPM
-        run: npm publish
-        working-directory: ./package
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-name: Release
+name: Publish version of package to npm
 
 on:
   workflow_dispatch:
     inputs:
       bump:
-        description: 'bump type, major or minor or patch or empty string'
-        default: ''
-      dry_run:
-        description: 'dry run, true or false'
-        default: 'false'
+        description: 'bump type, major or minor or patch'
+        default: 'patch'
 
 jobs:
   release:
@@ -62,6 +17,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+          registry-url: 'https://npm.pkg.github.com'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: pnpm setup
       - uses: pnpm/action-setup@v2.2.2
         with:
@@ -70,19 +28,22 @@ jobs:
       - run: pnpm install
       - name: Build
       - run: pnpm run build
-      - name: Automated Version Bump
-        run: pnpm version patch -m "[RELEASE] %s"
-      - name: Update package
-        run: pnpm run package
+      - name: The bump is major
+        if: ${{ inputs.bump == 'major' }}
+        run: pnpm run package:major
+      - name: The bump is minor
+        if: ${{ inputs.bump == 'minor' }}
+        run: pnpm run package:minor
+      - name: The bump is patch
+        if: ${{ inputs.bump == 'patch' }}
+        run: pnpm run package:patch
       - name: Publish package to NPM
         run: npm publish
         working-directory: ./package
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - uses: MeilCli/bump-release-action@master
-        with:
-          bump: ${{ github.event.inputs.bump }}
-          dry_run: ${{ github.event.inputs.dry_run }}
-          draft: ${{ github.event.inputs.draft }}
-          pre_release: ${{ github.event.inputs.pre_release }}
+      - name: Commit version bump
+        run: |
+          git config --local user.name 'Temporal Data (cicd)'
+          git config --local user.email 'commander-data@temporal.io'
+          git remote set-url origin https://x-access-token:${{ secrets.COMMANDER_DATA_TOKEN }}@github.com/${{ github.repository }}
+          git add .
+          git commit -m "Update UI submodule" && git push || echo "No changes to commit"
