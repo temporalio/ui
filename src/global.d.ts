@@ -3,6 +3,8 @@
 declare module '@crownframework/svelte-error-boundary';
 declare module '@sveltejs/svelte-virtual-list';
 
+type NamespaceItem = { namespace: string; href: string; onClick: () => void };
+
 type Optional<T extends unknown, K extends keyof T = keyof T> = Omit<T, K> &
   Partial<Pick<T, K>>;
 
@@ -71,11 +73,28 @@ type Settings = {
 };
 
 type User = {
-  email: string;
-  name: string;
-  picture: string;
+  name?: string;
+  given_name?: string;
+  family_name?: string;
+  middle_name?: string;
+  nickname?: string;
+  preferred_username?: string;
+  profile?: string;
+  picture?: string;
+  website?: string;
+  email?: string;
+  email_verified?: boolean;
+  gender?: string;
+  birthdate?: string;
+  zoneinfo?: string;
+  locale?: string;
+  phone_number?: string;
+  phone_number_verified?: boolean;
+  address?: string;
+  updated_at?: string;
+  sub?: string;
+  [key: string]: any;
 };
-
 type ClusterInformation = import('$types').GetClusterInfoResponse;
 
 type TimeFormat = 'UTC' | 'relative' | 'local';

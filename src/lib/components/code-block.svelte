@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import Icon from 'holocene/components/icon/index.svelte';
+  import Icon from '$lib/holocene/icon/index.svelte';
 
   export let content: Parameters<typeof JSON.stringify>[0];
   export let copied = false;

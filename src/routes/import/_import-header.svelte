@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import ImportNavigation from 'holocene/components/navigation/import-nav.svelte';
+  import ImportNavigation from '$lib/holocene/navigation/import-nav.svelte';
 
   import { routeForImport, routeForWorkflows } from '$lib/utilities/route-for';
 

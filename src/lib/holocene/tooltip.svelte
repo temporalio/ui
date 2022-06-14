@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Copyable from './copyable.svelte';
+  import Copyable from '$lib/components/copyable.svelte';
 
   export let text: string = '';
   export let top = false;
@@ -7,22 +7,27 @@
   export let bottom = false;
   export let left = false;
   export let copyable = false;
+  export let hide: boolean | null = false;
 </script>
 
-<div class="wrapper relative inline-block">
+{#if hide}
   <slot />
-  <div class="tooltip" class:left class:right class:bottom class:top>
-    <div class="inline-block rounded-lg bg-gray-800 px-2 py-2">
-      {#if copyable}
-        <Copyable clickAllToCopy content={text} color="white">
+{:else}
+  <div class="wrapper relative inline-block">
+    <slot />
+    <div class="tooltip" class:left class:right class:bottom class:top>
+      <div class="inline-block rounded-lg bg-gray-800 px-2 py-2">
+        {#if copyable}
+          <Copyable clickAllToCopy content={text} color="white">
+            <span class="text-gray-100">{text}</span>
+          </Copyable>
+        {:else}
           <span class="text-gray-100">{text}</span>
-        </Copyable>
-      {:else}
-        <span class="text-gray-100">{text}</span>
-      {/if}
+        {/if}
+      </div>
     </div>
   </div>
-</div>
+{/if}
 
 <style lang="postcss">
   .tooltip {
