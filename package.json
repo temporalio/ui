@@ -41,6 +41,7 @@
     "json-beautify": "^1.1.1",
     "just-debounce": "^1.1.0",
     "sanitize-html": "^2.6.1",
+    "svelte2tsx": "^0.5.10",
     "url-pattern": "^1.0.3",
     "websocket-as-promised": "^2.0.1"
   },
