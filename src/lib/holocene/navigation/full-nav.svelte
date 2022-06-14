@@ -10,14 +10,13 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/index.svelte';
 
-  import { navOpen } from '$lib/stores/nav-open';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
 
-  import NavContainer from '$lib/holocene/nav-container.svelte';
-  import NavRow from '$lib/holocene/nav-row.svelte';
+  import NavContainer from '$lib/holocene/navigation/_nav-container.svelte';
+  import NavRow from '$lib/holocene/navigation/_nav-row.svelte';
   import Logout from '$lib/components/logout-button.svelte';
   import NamespaceList from '$lib/components/namespace-list.svelte';
-  import Drawer from '$lib/holocene/drawer.svelte';
+  import Drawer from '$lib/holocene/navigation/_drawer.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import IsCloudGuard from '$lib/components/is-cloud-guard.svelte';
 
@@ -30,6 +29,8 @@
   export let user: null | Promise<User> = null;
   export let logout: () => void;
   export let extras: ExtraIcon[] | null = null;
+  export let navOpen: boolean;
+  export let toggleNav: () => void;
 
   let showProfilePic = true;
   let namespaceSelectorOpen: boolean | null = null;
@@ -49,14 +50,14 @@
   });
 </script>
 
-<NavContainer {isCloud} {linkList}>
+<NavContainer {navOpen} {toggleNav} {isCloud} {linkList}>
   <svelte:fragment slot="top">
     <NavRow {isCloud} wrap data-cy="namespace-select-button">
       <div
         class="relative flex cursor-pointer items-center"
         on:click={toggleNamespaceSelector}
       >
-        <Tooltip right hide={$navOpen} text={activeNamespace ?? 'Namespaces'}>
+        <Tooltip right hide={navOpen} text={activeNamespace ?? 'Namespaces'}>
           <div class="nav-icon">
             <Icon name="namespaceSelect" scale={1.6} />
           </div>
@@ -67,7 +68,7 @@
       </div>
     </NavRow>
     <NavRow link={linkList.workflows} {isCloud} data-cy="worfklows-button">
-      <Tooltip right hide={$navOpen} text="Workflows">
+      <Tooltip right hide={navOpen} text="Workflows">
         <div class="nav-icon">
           <Icon name="workflow" scale={1.5} />
         </div>
@@ -76,7 +77,7 @@
     </NavRow>
     <IsCloudGuard>
       <NavRow link={linkList.archive} {isCloud} data-cy="archive-button">
-        <Tooltip right hide={$navOpen} text="Archive">
+        <Tooltip right hide={navOpen} text="Archive">
           <div class="nav-icon">
             <Icon name="archive" scale={1.2} />
           </div>
@@ -100,7 +101,7 @@
     {/if}
     <IsCloudGuard>
       <NavRow link={linkList.settings} {isCloud} data-cy="settings-button">
-        <Tooltip right hide={$navOpen} text="Settings">
+        <Tooltip right hide={navOpen} text="Settings">
           <div class="nav-icon">
             <Icon name="settings" scale={1.4} />
           </div>
@@ -109,7 +110,7 @@
       </NavRow>
     </IsCloudGuard>
     <NavRow link={linkList.feedback} {isCloud} externalLink>
-      <Tooltip right hide={$navOpen} text="Feedback">
+      <Tooltip right hide={navOpen} text="Feedback">
         <div class="nav-icon">
           <Icon name="feedback" scale={1.4} />
         </div>
@@ -128,7 +129,7 @@
     {:then user}
       {#if user?.email}
         <NavRow {isCloud}>
-          <Tooltip right hide={$navOpen} text="Logout">
+          <Tooltip right hide={navOpen} text="Logout">
             <div class="nav-icon" on:click={logout}>
               <Icon name="logout" scale={1.4} />
             </div>

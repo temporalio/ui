@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import ImportNavigation from '$lib/components/import-nav.svelte';
+  import ImportNavigation from '$lib/holocene/navigation/import-nav.svelte';
+  import { navOpen } from '$lib/stores/nav-open';
 
   import { routeForImport, routeForWorkflows } from '$lib/utilities/route-for';
 
@@ -11,6 +12,10 @@
     home: routeForWorkflows({ namespace }),
     import: routeForImport({ importType: 'events' }),
   };
+
+  const toggleNav = () => {
+    navOpen.set(!$navOpen);
+  };
 </script>
 
-<ImportNavigation {linkList} {isCloud} />
+<ImportNavigation navOpen={$navOpen} {toggleNav} {linkList} {isCloud} />

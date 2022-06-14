@@ -1,20 +1,20 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/index.svelte';
 
-  import { navOpen } from '$lib/stores/nav-open';
-
   import NavContainer from '../holocene/nav-container.svelte';
   import NavRow from '../holocene/nav-row.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
 
   export let isCloud: boolean;
   export let linkList: Partial<Record<string, string>>;
+  export let navOpen: boolean;
+  export let toggleNav: () => void;
 </script>
 
-<NavContainer {isCloud} {linkList}>
+<NavContainer {navOpen} {toggleNav} {isCloud} {linkList}>
   <svelte:fragment slot="top">
     <NavRow link={linkList.import} {isCloud}>
-      <Tooltip right hide={$navOpen} text="Import">
+      <Tooltip right hide={navOpen} text="Import">
         <div class="nav-icon">
           <Icon {isCloud} name="download" scale={1} />
         </div>

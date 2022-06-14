@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
   import type { DescribeNamespaceResponse as Namespace } from '$types';
   import { goto } from '$app/navigation';
+  import { navOpen } from '$lib/stores/nav-open';
 
   import {
     routeForArchivalWorkfows,
@@ -9,7 +10,7 @@
     routeForSettings,
   } from '$lib/utilities/route-for';
 
-  import Navigation from '$lib/components/full-nav.svelte';
+  import Navigation from '$lib/holocene/navigation/full-nav.svelte';
   import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
 
   export let user: User;
@@ -53,14 +54,20 @@
   };
 
   const logout = () => goto(import.meta.env.VITE_API + '/auth/logout');
+
+  const toggleNav = () => {
+    navOpen.set(!$navOpen);
+  };
 </script>
 
 <Navigation
   namespaceList={Promise.resolve(namespaceList)}
   activeNamespace={namespace}
+  navOpen={$navOpen}
   {linkList}
   {isCloud}
   user={Promise.resolve(user)}
   {logout}
+  {toggleNav}
   extras={[{ component: DataEncoderStatus, name: 'Data Encoder' }]}
 />
