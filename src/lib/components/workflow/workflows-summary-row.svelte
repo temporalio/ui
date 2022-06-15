@@ -7,6 +7,9 @@
     workflowTypeColumnWidth,
     workflowSummaryColumnWidth,
   } from '$lib/stores/column-width';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
@@ -46,7 +49,16 @@
   <div class="cell links flex gap-2 font-medium md:font-normal">
     <h3 class="md:hidden">Workflow Name:</h3>
     <Tooltip bottom copyable text={workflow.name}>
-      <span class="table-link"
+      <span
+        class="table-link"
+        on:click|preventDefault|stopPropagation={() =>
+          updateQueryParameters({
+            url: $page.url,
+            parameter: 'query',
+            value: `WorkflowType="${workflow.name}"`,
+            allowEmpty: true,
+            goto,
+          })}
         >{getTruncatedWord(
           workflow.name,
           $workflowTypeColumnWidth || $workflowSummaryColumnWidth,
