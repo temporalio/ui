@@ -15,7 +15,6 @@
     workflowSummaryColumnWidth,
   } from '$lib/stores/column-width';
 
-  import Icon from '$lib/holocene/icon/index.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import FilterOrCopyTooltip from '$lib/holocene/filter-or-copy-tooltip.svelte';
@@ -29,13 +28,14 @@
     run: workflow.runId,
   });
 
-  const onTypeClick = (workflowType: string) => {
+  const onTypeClick = (type: string) => {
     const defaultQuery = toListWorkflowQuery({ timeRange: 'All' });
     const query = $page.url.searchParams.get('query');
     const parameters = toListWorkflowParameters(query ?? defaultQuery);
+    const workflowType = parameters?.workflowType === type ? '' : type;
     const value = toListWorkflowQuery({
       ...parameters,
-      workflowType: parameters?.workflowType ? '' : workflowType,
+      workflowType,
     });
     updateQueryParameters({
       url: $page.url,
@@ -75,7 +75,7 @@
       bottom
       content={workflow.name}
       onFilter={() => onTypeClick(workflow.name)}
-      filtered={$page.url.searchParams.get('query').includes(workflow.name)}
+      filtered={$page.url?.searchParams?.get('query')?.includes(workflow.name)}
     >
       <span
         class="table-link"
