@@ -1,7 +1,10 @@
 <script lang="ts">
   import Copyable from '$lib/components/copyable.svelte';
+  import Icon from '$lib/holocene/icon/index.svelte';
+  import type { IconName } from '$lib/holocene/icon/paths';
 
   export let text: string = '';
+  export let icon: IconName | undefined = undefined;
   export let top = false;
   export let right = false;
   export let bottom = false;
@@ -19,10 +22,22 @@
       <div class="inline-block rounded-lg bg-gray-800 px-2 py-2">
         {#if copyable}
           <Copyable clickAllToCopy content={text} color="white">
-            <span class="text-gray-100">{text}</span>
+            <span class="text-gray-100"
+              >{#if icon}<Icon
+                  name={icon}
+                  class="inline h-4"
+                  stroke="#fff"
+                />{/if}{text}</span
+            >
           </Copyable>
         {:else}
-          <span class="text-gray-100">{text}</span>
+          <span class="flex gap-2 text-gray-100"
+            >{#if icon}<Icon
+                name={icon}
+                class="inline h-4"
+                stroke="#fff"
+              />{/if}{text}</span
+          >
         {/if}
       </div>
     </div>

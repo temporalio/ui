@@ -1,7 +1,14 @@
 <script lang="ts">
+  import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
+
   import { formatDate, getMilliseconds } from '$lib/utilities/format-date';
   import { routeForWorkflow } from '$lib/utilities/route-for';
   import { getTruncatedWord } from '$lib/utilities/get-truncated-word';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
+  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
+
   import {
     workflowIdColumnWidth,
     workflowTypeColumnWidth,
@@ -10,6 +17,7 @@
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import FilterOrCopyTooltip from '$lib/holocene/filter-or-copy-tooltip.svelte';
   export let namespace: string;
   export let workflow: WorkflowExecution;
   export let timeFormat: TimeFormat | string;
@@ -19,6 +27,24 @@
     workflow: workflow.id,
     run: workflow.runId,
   });
+
+  const onTypeClick = (type: string) => {
+    const defaultQuery = toListWorkflowQuery({ timeRange: 'All' });
+    const query = $page.url.searchParams.get('query');
+    const parameters = toListWorkflowParameters(query ?? defaultQuery);
+    const workflowType = parameters?.workflowType === type ? '' : type;
+    const value = toListWorkflowQuery({
+      ...parameters,
+      workflowType,
+    });
+    updateQueryParameters({
+      url: $page.url,
+      parameter: 'query',
+      value,
+      allowEmpty: true,
+      goto,
+    });
+  };
 </script>
 
 <a {href} class="row group">
@@ -45,14 +71,22 @@
   </div>
   <div class="cell links flex gap-2 font-medium md:font-normal">
     <h3 class="md:hidden">Workflow Name:</h3>
-    <Tooltip bottom copyable text={workflow.name}>
-      <span class="table-link"
+    <FilterOrCopyTooltip
+      bottom
+      content={workflow.name}
+      onFilter={() => onTypeClick(workflow.name)}
+      filtered={$page.url?.searchParams?.get('query')?.includes(workflow.name)}
+    >
+      <span
+        class="table-link"
+        on:click|preventDefault|stopPropagation={() =>
+          onTypeClick(workflow.name)}
         >{getTruncatedWord(
           workflow.name,
           $workflowTypeColumnWidth || $workflowSummaryColumnWidth,
         )}</span
       >
-    </Tooltip>
+    </FilterOrCopyTooltip>
     <p class="time-cell-inline">
       {formatDate(workflow.endTime, timeFormat)}
     </p>
