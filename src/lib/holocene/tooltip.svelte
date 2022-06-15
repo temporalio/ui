@@ -22,7 +22,13 @@
       <div class="inline-block rounded-lg bg-gray-800 px-2 py-2">
         {#if copyable}
           <Copyable clickAllToCopy content={text} color="white">
-            <span class="text-gray-100">{text}</span>
+            <span class="text-gray-100"
+              >{#if icon}<Icon
+                  name={icon}
+                  class="inline h-4"
+                  stroke="#fff"
+                />{/if}{text}</span
+            >
           </Copyable>
         {:else}
           <span class="flex gap-2 text-gray-100"

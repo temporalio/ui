@@ -28,7 +28,7 @@
     run: workflow.runId,
   });
 
-  const onTypeClick = (workflowType) => {
+  const onTypeClick = (workflowType: string) => {
     const defaultQuery = toListWorkflowQuery({ timeRange: 'All' });
     const query = $page.url.searchParams.get('query');
     const parameters = toListWorkflowParameters(query ?? defaultQuery);
@@ -67,7 +67,7 @@
   </div>
   <div class="cell links flex gap-2 font-medium md:font-normal">
     <h3 class="md:hidden">Workflow Name:</h3>
-    <Tooltip bottom text={workflow.name} icon="filter">
+    <Tooltip bottom text={workflow.name} copyable icon="filter">
       <span
         class="table-link"
         on:click|preventDefault|stopPropagation={() =>
