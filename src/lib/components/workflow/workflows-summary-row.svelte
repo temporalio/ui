@@ -18,6 +18,7 @@
   import Icon from '$lib/holocene/icon/index.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import FilterOrCopyTooltip from '$lib/holocene/filter-or-copy-tooltip.svelte';
   export let namespace: string;
   export let workflow: WorkflowExecution;
   export let timeFormat: TimeFormat | string;
@@ -32,7 +33,10 @@
     const defaultQuery = toListWorkflowQuery({ timeRange: 'All' });
     const query = $page.url.searchParams.get('query');
     const parameters = toListWorkflowParameters(query ?? defaultQuery);
-    const value = toListWorkflowQuery({ ...parameters, workflowType });
+    const value = toListWorkflowQuery({
+      ...parameters,
+      workflowType: parameters?.workflowType ? '' : workflowType,
+    });
     updateQueryParameters({
       url: $page.url,
       parameter: 'query',
@@ -67,7 +71,12 @@
   </div>
   <div class="cell links flex gap-2 font-medium md:font-normal">
     <h3 class="md:hidden">Workflow Name:</h3>
-    <Tooltip bottom text={workflow.name} copyable icon="filter">
+    <FilterOrCopyTooltip
+      bottom
+      content={workflow.name}
+      onFilter={() => onTypeClick(workflow.name)}
+      filtered={$page.url.searchParams.get('query').includes(workflow.name)}
+    >
       <span
         class="table-link"
         on:click|preventDefault|stopPropagation={() =>
@@ -77,7 +86,7 @@
           $workflowTypeColumnWidth || $workflowSummaryColumnWidth,
         )}</span
       >
-    </Tooltip>
+    </FilterOrCopyTooltip>
     <p class="time-cell-inline">
       {formatDate(workflow.endTime, timeFormat)}
     </p>
