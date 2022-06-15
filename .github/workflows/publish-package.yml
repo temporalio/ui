@@ -31,19 +31,12 @@ jobs:
         run: pnpm install
       - name: Build
         run: pnpm run build:local
-      - name: The bump is major
-        if: ${{ inputs.bump == 'major' }}
-        run: pnpm run package:major
-      - name: The bump is minor
-        if: ${{ inputs.bump == 'minor' }}
-        run: pnpm run package:minor
-      - name: The bump is patch
-        if: ${{ inputs.bump == 'patch' }}
-        run: pnpm run package:patch
+      - name: Bump version
+        run: pnpm run package:${{ inputs.bump }}
       - name: Authenticate with GitHub package registry
         run: |
           echo @temporalio:https://npm.pkg.github.com/ > package/.npmrc
-          echo '//npm.pkg.github.com/:_authToken=${NPM_TOKEN}' >> package/.npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> package/.npmrc
       - name: Publish package to NPM
         run: npm publish
         env:
