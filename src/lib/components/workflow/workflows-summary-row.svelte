@@ -1,16 +1,21 @@
 <script lang="ts">
+  import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
+
   import { formatDate, getMilliseconds } from '$lib/utilities/format-date';
   import { routeForWorkflow } from '$lib/utilities/route-for';
   import { getTruncatedWord } from '$lib/utilities/get-truncated-word';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
+  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
+
   import {
     workflowIdColumnWidth,
     workflowTypeColumnWidth,
     workflowSummaryColumnWidth,
   } from '$lib/stores/column-width';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  import { page } from '$app/stores';
-  import { goto } from '$app/navigation';
 
+  import Icon from '$lib/holocene/icon/index.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   export let namespace: string;
@@ -22,6 +27,20 @@
     workflow: workflow.id,
     run: workflow.runId,
   });
+
+  const onTypeClick = (workflowType) => {
+    const defaultQuery = toListWorkflowQuery({ timeRange: 'All' });
+    const query = $page.url.searchParams.get('query');
+    const parameters = toListWorkflowParameters(query ?? defaultQuery);
+    const value = toListWorkflowQuery({ ...parameters, workflowType });
+    updateQueryParameters({
+      url: $page.url,
+      parameter: 'query',
+      value,
+      allowEmpty: true,
+      goto,
+    });
+  };
 </script>
 
 <a {href} class="row group">
@@ -48,17 +67,11 @@
   </div>
   <div class="cell links flex gap-2 font-medium md:font-normal">
     <h3 class="md:hidden">Workflow Name:</h3>
-    <Tooltip bottom copyable text={workflow.name}>
+    <Tooltip bottom text={workflow.name} icon="filter">
       <span
         class="table-link"
         on:click|preventDefault|stopPropagation={() =>
-          updateQueryParameters({
-            url: $page.url,
-            parameter: 'query',
-            value: `WorkflowType="${workflow.name}"`,
-            allowEmpty: true,
-            goto,
-          })}
+          onTypeClick(workflow.name)}
         >{getTruncatedWord(
           workflow.name,
           $workflowTypeColumnWidth || $workflowSummaryColumnWidth,
