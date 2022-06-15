@@ -2,7 +2,6 @@
   import Copyable from '$lib/components/copyable.svelte';
   import Icon from '$lib/holocene/icon/index.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
-  import { fade } from 'svelte/transition';
 
   export let text: string = '';
   export let icon: IconName | undefined = undefined;
