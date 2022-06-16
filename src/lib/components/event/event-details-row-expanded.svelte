@@ -23,15 +23,14 @@
 
 <article class="row flex px-4 first:pt-0 {$$props.class}">
   {#if typeof value === 'object'}
+    {@const content = getCodeBlockValue(value)}
     <div class="code-block-row">
       <h2 class="text-sm">
         {format(key)}
       </h2>
-      <CodeBlock
-        content={getCodeBlockValue(value)}
-        class="w-full text-right lg:h-auto"
-        {inline}
-      />
+      {#key getCodeBlockValue(value)}
+        <CodeBlock {content} class="w-full text-right lg:h-auto" {inline} />
+      {/key}
     </div>
   {:else if shouldDisplayAsWorkflowLink(key)}
     <div class="detail-row">
