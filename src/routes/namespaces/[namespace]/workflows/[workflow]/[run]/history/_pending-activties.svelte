@@ -1,70 +1,109 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { page } from '$app/stores';
 
-  import { formatDate } from '$lib/utilities/format-date';
+  import {
+    formatDate,
+    getDuration,
+    formatDuration,
+  } from '$lib/utilities/format-date';
   import { routeForPendingActivities } from '$lib/utilities/route-for';
   import Link from '$lib/components/link.svelte';
-  import Copyable from '$lib/components/copyable.svelte';
+  import Icon from '$lib/holocene/icon/index.svelte';
+  import Badge from '$lib/components/badge.svelte';
+  import CodeBlock from '$lib/components/code-block.svelte';
 
-  const { pendingActivities } = $page.stuff.workflow;
+  const { pendingActivities, defaultWorkflowTaskTimeout } =
+    $page.stuff.workflow;
   const { namespace, workflow, run } = $page.params;
 
   const href = routeForPendingActivities({ namespace, workflow, run });
-
-  onMount(() => {
-    window.Prism.highlightAll();
-  });
 </script>
 
 {#if pendingActivities.length}
   <section class="rounded-lg border-2 border-gray-300 p-4">
-    <h3 class="mb-4 text-lg font-medium">Pending Activities</h3>
-    <section class="w-full table-auto space-x-4">
+    <h3 class="mb-2 text-lg font-medium">Pending Activities</h3>
+    <section>
       {#each pendingActivities as { id, ...pendingActivity } (id)}
-        <a
-          class="block w-full content-between items-center gap-4 border-b-2 border-gray-300 p-2 last-of-type:border-b-0 hover:bg-gray-50 md:flex"
-          {href}
-        >
-          <div class="w-40 text-left font-normal text-gray-500 md:w-1/12">
+        {@const failed = pendingActivity.attempt > 1}
+        <div class="pending-activity-row">
+          <h3 class="font-normal text-gray-500 w-6 self-start p-1">
             {pendingActivity.activityId}
+          </h3>
+          <div class="pending-activity-summary">
+            <a class="w-full flex items-center hover:bg-gray-50" {href}>
+              <div class="grid grid-cols-6 w-full gap-4">
+                <div class="pending-activity-detail">
+                  <h4>Activity Type</h4>
+                  <Badge type={failed ? 'warning' : 'default'}>
+                    {pendingActivity.activityType}
+                  </Badge>
+                </div>
+                <h4 class="pending-activity-detail">
+                  Last Heartbeat {formatDate(
+                    pendingActivity.lastHeartbeatTime,
+                    'relative',
+                  )}
+                </h4>
+                <div class="pending-activity-detail">
+                  <h4>Attempt</h4>
+                  <Badge type={failed ? 'warning' : 'default'}>
+                    {#if failed}
+                      <Icon
+                        name="refresh"
+                        stroke="currentcolor"
+                        scale={0.5}
+                        strokeWidth={2}
+                      />
+                    {/if}
+                    {pendingActivity.attempt}
+                  </Badge>
+                </div>
+                <div class="pending-activity-detail">
+                  <h4>Attempts Left</h4>
+                  <Badge type={failed ? 'warning' : 'default'}>
+                    {pendingActivity.maximumAttempts - pendingActivity.attempt}
+                  </Badge>
+                </div>
+                <div class="pending-activity-detail">
+                  <h4>Next Retry</h4>
+                  <Badge type={failed ? 'warning' : 'default'}>
+                    {defaultWorkflowTaskTimeout}
+                  </Badge>
+                </div>
+                <h4 class="pending-activity-detail">
+                  Expiration {formatDuration(
+                    getDuration({
+                      start: Date.now(),
+                      end: pendingActivity.expirationTime,
+                    }),
+                  )}
+                </h4>
+              </div>
+            </a>
+            {#if failed}
+              <div class="grid grid-cols-2 w-full gap-4 mb-2">
+                <div>
+                  {#if pendingActivity.heartbeatDetails}
+                    <h4>Heartbeat Details</h4>
+                    <CodeBlock
+                      class="max-h-32"
+                      content={pendingActivity.heartbeatDetails}
+                    />
+                  {/if}
+                </div>
+                <div>
+                  {#if pendingActivity.lastFailure}
+                    <h4>Last Failure</h4>
+                    <CodeBlock
+                      class="max-h-32"
+                      content={pendingActivity.lastFailure}
+                    />
+                  {/if}
+                </div>
+              </div>
+            {/if}
           </div>
-          <div class="w-full md:w-1/4">
-            <div class="flex items-center gap-2">
-              <h4>Activity Name</h4>
-              <p>
-                <span class="bg-gray-300 px-2 text-sm text-gray-700">
-                  {pendingActivity.activityType}
-                </span>
-              </p>
-            </div>
-          </div>
-          <div class="w-full md:w-5/12">
-            <div class="flex items-center gap-2">
-              <h3 class="whitespace-nowrap">Last Failure</h3>
-              {#if pendingActivity.lastFailure}
-                <Copyable
-                  content={pendingActivity.lastFailure?.message}
-                  container-class="overflow-y-scroll"
-                >
-                  <pre class="max-w-fit rounded-lg"><code class="language-json"
-                      >{pendingActivity.lastFailure?.message}</code
-                    ></pre>
-                </Copyable>
-              {:else}
-                <span class="bg-gray-300 px-2 text-sm text-gray-700"
-                  >(Empty)</span
-                >
-              {/if}
-            </div>
-          </div>
-          <div class="w-full md:w-1/4">
-            <div class="flex gap-2">
-              <h4>Last Heartbeat Time</h4>
-              <p>{formatDate(pendingActivity.lastHeartbeatTime)}</p>
-            </div>
-          </div>
-        </a>
+        </div>
       {/each}
     </section>
     <div class="text-right">
@@ -72,3 +111,21 @@
     </div>
   </section>
 {/if}
+
+<style lang="postcss">
+  .pending-activity-row {
+    @apply w-full flex flex-row items-center;
+  }
+
+  .pending-activity-summary {
+    @apply text-sm w-full border-b-2 border-gray-300;
+  }
+
+  .pending-activity-row:last-child .pending-activity-summary {
+    @apply border-b-0;
+  }
+
+  .pending-activity-detail {
+    @apply xl:flex xl:flex-row xl:items-center xl:gap-2;
+  }
+</style>

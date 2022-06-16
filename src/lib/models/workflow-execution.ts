@@ -4,7 +4,7 @@ const toPendingActivities = (
   pendingActivity: PendingActivityInfo[] = [],
 ): PendingActivity[] => {
   return pendingActivity.map((activity) => {
-    const attributes = simplifyAttributes(activity);
+    const attributes = simplifyAttributes(activity, true);
     const id = activity.activityId;
 
     return { ...attributes, id } as unknown as PendingActivity;
@@ -28,6 +28,7 @@ export const toWorkflowExecution = (
   const parent = response?.workflowExecutionInfo?.parentExecution;
   const stateTransitionCount =
     response.workflowExecutionInfo.stateTransitionCount;
+  const defaultWorkflowTaskTimeout = response.executionConfig?.defaultWorkflowTaskTimeout;
 
   const pendingActivities: PendingActivity[] = toPendingActivities(
     response.pendingActivities,
@@ -48,6 +49,7 @@ export const toWorkflowExecution = (
     parent,
     stateTransitionCount,
     isRunning,
+    defaultWorkflowTaskTimeout,
   };
 };
 

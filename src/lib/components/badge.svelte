@@ -1,18 +1,13 @@
-<script lang="ts">
-  type BadgeTypes = 'alpha' | 'beta';
+<script lang="ts" context="module">
+  export type BadgeType = 'alpha' | 'beta' | 'warning' | 'default';
+</script>
 
-  export let type: BadgeTypes;
+<script lang="ts">
+  export let type: BadgeType = 'default';
 </script>
 
 <div
-  class={`${type}     
-        ml-1
-        inline-block 
-        rounded-sm
-        px-1
-        text-center
-        align-middle
-        text-sm`}
+  class="{type} rounded-sm p-1 flex flex-row font-medium text-sm items-center w-fit"
 >
   <slot />
 </div>
@@ -24,5 +19,13 @@
 
   .alpha {
     @apply border-purple-700 bg-purple-100 text-purple-700;
+  }
+
+  .warning {
+    @apply border-red-700 bg-red-50 text-red-700;
+  }
+
+  .default {
+    @apply border-gray-700 bg-gray-300 text-gray-700;
   }
 </style>

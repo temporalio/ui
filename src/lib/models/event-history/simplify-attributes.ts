@@ -78,19 +78,21 @@ const getValueForFirstKey = (value: Record<string, string>): string => {
 
 export function simplifyAttributes(
   attributes: EventAttributesWithType,
+  preserveTimestamps?: boolean,
 ): EventAttributesWithType;
 export function simplifyAttributes(
   attributes: PendingActivityInfo,
+  preserveTimestamps?: boolean
 ): PendingActivityInfo;
 export function simplifyAttributes<
   T = EventAttributesWithType | PendingActivityInfo,
->(attributes: T): T {
+>(attributes: T, preserveTimestamps: boolean = false): T {
   for (const [key, value] of Object.entries(attributes)) {
     if (canBeSimplified(value)) {
       attributes[key] = getValueForFirstKey(value);
     }
 
-    if (isTime(key)) {
+    if (isTime(key) && !preserveTimestamps) {
       attributes[key] = formatDate(value);
     }
 
