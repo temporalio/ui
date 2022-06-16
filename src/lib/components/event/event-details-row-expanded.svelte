@@ -28,7 +28,7 @@
       <h2 class="text-sm">
         {format(key)}
       </h2>
-      {#key getCodeBlockValue(value)}
+      {#key content}
         <CodeBlock {content} class="w-full text-right lg:h-auto" {inline} />
       {/key}
     </div>
