@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
   import Icon from '$lib/holocene/icon/index.svelte';
 
   export let content: Parameters<typeof JSON.stringify>[0];
@@ -8,7 +6,7 @@
   export let inline = false;
   export let language = 'json';
 
-  const isJSON = language === 'json';
+  $: isJSON = language === 'json';
 
   const copy = () =>
     navigator.clipboard
@@ -32,9 +30,23 @@
     return JSON.stringify(parsedData, undefined, inline ? 0 : 2);
   };
 
-  onMount(() => {
-    window.Prism.highlightAll();
-  });
+  let root: HTMLElement;
+
+  function highlight(root: HTMLElement, language: string, source: string) {
+    root.textContent = isJSON ? formatJSON(source) : source;
+    root.classList.forEach((item) => root.classList.remove(item));
+    if (language) {
+      root.classList.add(`language-${language}`);
+    }
+
+    window.Prism.highlightElement(root);
+  }
+
+  $: {
+    if (root && window.Prism) {
+      highlight(root, language, content);
+    }
+  }
 </script>
 
 {#if content || content === null}
@@ -49,10 +61,10 @@
     <pre
       class="w-full overflow-x-scroll rounded-lg p-4"
       class:h-full={!inline}><code
-        class="language-{language}"
+        bind:this={root}
+        class={`language-${language}`}
         data-cy={$$props['data-cy']}
-        >{#if isJSON}{formatJSON(content)}{:else}{@html content}{/if}</code
-      ></pre>
+      /></pre>
 
     <button on:click={copy} class="absolute top-4 right-4">
       <Icon name={copied ? 'checkMark' : 'copy'} stroke="white" />
