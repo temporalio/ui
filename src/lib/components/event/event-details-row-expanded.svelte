@@ -28,9 +28,7 @@
       <h2 class="text-sm">
         {format(key)}
       </h2>
-      {#key content}
-        <CodeBlock {content} class="w-full text-right lg:h-auto" {inline} />
-      {/key}
+      <CodeBlock {content} class="w-full text-right lg:h-auto" {inline} />
     </div>
   {:else if shouldDisplayAsWorkflowLink(key)}
     <div class="detail-row">

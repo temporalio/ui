@@ -29,9 +29,7 @@
     <h2 class="min-w-fit items-center text-sm xl:items-start">
       {format(key)}
     </h2>
-    {#key content}
-      <CodeBlock {content} class="w-full" {inline} />
-    {/key}
+    <CodeBlock {content} class="w-full" {inline} />
   {:else if shouldDisplayAsWorkflowLink(key)}
     <div class="xl:3/4 flex w-full items-center xl:items-start">
       <h2 class="mr-3 text-sm">{format(key)}</h2>
