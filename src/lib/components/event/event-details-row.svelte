@@ -25,11 +25,10 @@
   class="flex flex-row gap-2 border-b-2 border-gray-200 py-2 first:pt-0 last:border-b-0 xl:gap-4 {$$props.class}"
 >
   {#if typeof value === 'object'}
-    {@const content = getCodeBlockValue(value)}
     <h2 class="min-w-fit items-center text-sm xl:items-start">
       {format(key)}
     </h2>
-    <CodeBlock {content} class="w-full" {inline} />
+    <CodeBlock content={getCodeBlockValue(value)} class="w-full" {inline} />
   {:else if shouldDisplayAsWorkflowLink(key)}
     <div class="xl:3/4 flex w-full items-center xl:items-start">
       <h2 class="mr-3 text-sm">{format(key)}</h2>
