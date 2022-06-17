@@ -1,6 +1,6 @@
 {
   "name": "@temporalio/ui",
-  "version": "2.0.3",
+  "version": "2.0.5",
   "type": "module",
   "description": "Temporal.io UI",
   "keywords": [
@@ -99,8 +99,5 @@
     "tslib": "^2.3.1",
     "typescript": "^4.4.2",
     "webpack": "^5.73.0"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
   }
 }

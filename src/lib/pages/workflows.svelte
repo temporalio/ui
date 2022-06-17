@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
   import { timeFormat } from '$lib/stores/time-format';
   import { workflowsSearch } from '$lib/stores/workflows';
+  import { workflows, loading, updating } from '$lib/stores/workflows';
 
   import { getSearchType } from '$lib/utilities/search-type-parameter';
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
@@ -13,10 +14,6 @@
   import WorkflowFilters from '$lib/components/workflow/workflow-filters.svelte';
   import WorkflowsLoading from '$lib/components/workflow/workflows-loading.svelte';
   import { onDestroy } from 'svelte';
-
-  export let workflows: WorkflowExecution[];
-  export let loading: boolean;
-  export let updating: boolean;
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
 
@@ -34,10 +31,10 @@
 
 <h2 class="text-2xl">Recent Workflows</h2>
 <WorkflowFilters bind:searchType />
-{#if loading}
+{#if $loading}
   <WorkflowsLoading />
-{:else if workflows.length}
-  <Pagination items={workflows} {updating} let:visibleItems>
+{:else if $workflows.length}
+  <Pagination items={$workflows} updating={$updating} let:visibleItems>
     <WorkflowsSummaryTable>
       {#each visibleItems as event}
         <WorkflowsSummaryRow
