@@ -12,16 +12,6 @@ const parameters = {
 };
 
 describe(routeForApi, () => {
-  const OLD_ENV = process.env;
-  beforeEach(() => {
-    jest.resetModules();
-    process.env = { ...OLD_ENV };
-  });
-
-  afterAll(() => {
-    process.env = OLD_ENV;
-  });
-
   it('should return a route for workflow', () => {
     expect(routeForApi('workflow', parameters)).toBe(
       'http://localhost:8080/api/v1/namespaces/namespace/workflows/workflow/runs/run',
