@@ -1,7 +1,8 @@
 let base =
-  import.meta.env?.VITE_API ??
-  process.env.VITE_API ??
-  globalThis?.AppConfig?.baseUrl;
+  globalThis?.AppConfig?.baseUrl ??
+  (import.meta.env?.VITE_API as string) ??
+  process.env.VITE_API;
+
 if (base.endsWith('/')) base = base.slice(0, -1);
 
 const withBase = (endpoint: string): string => {
