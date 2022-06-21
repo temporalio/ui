@@ -7,7 +7,7 @@
 </script>
 
 <div
-  class="{type} rounded-sm p-1 flex flex-row font-medium text-sm items-center w-fit"
+  class="{type} flex w-fit flex-row items-center rounded-sm p-1 text-sm font-medium"
 >
   <slot />
 </div>

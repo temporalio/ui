@@ -24,7 +24,7 @@
     {#each pendingActivities as { id, activityId, ...details } (id)}
       {@const failed = details.attempt > 1}
       <div class="event-table-body">
-        <div class="w-8 p-5 flex items-start">
+        <div class="flex w-8 items-start p-5">
           <Link href="#{id}">{activityId}</Link>
         </div>
         <div class="w-full py-4 px-5">
@@ -126,15 +126,15 @@
 
 <style lang="postcss">
   .event-table {
-    @apply w-full table-fixed xl:table mb-6;
+    @apply mb-6 w-full table-fixed xl:table;
   }
 
   .event-table-header {
-    @apply border-2 border-gray-300 bg-gray-900 text-white rounded-t-lg p-3 grid grid-cols-2;
+    @apply grid grid-cols-2 rounded-t-lg border-2 border-gray-300 bg-gray-900 p-3 text-white;
   }
 
   .event-table-body {
-    @apply border-2 border-t-0 border-gray-300 flex flex-row w-full;
+    @apply flex w-full flex-row border-2 border-t-0 border-gray-300;
   }
 
   .event-table-row {

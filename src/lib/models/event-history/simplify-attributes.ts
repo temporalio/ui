@@ -82,7 +82,7 @@ export function simplifyAttributes(
 ): EventAttributesWithType;
 export function simplifyAttributes(
   attributes: PendingActivityInfo,
-  preserveTimestamps?: boolean
+  preserveTimestamps?: boolean,
 ): PendingActivityInfo;
 export function simplifyAttributes<
   T = EventAttributesWithType | PendingActivityInfo,

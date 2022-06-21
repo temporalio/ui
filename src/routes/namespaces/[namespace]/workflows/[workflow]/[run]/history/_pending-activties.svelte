@@ -26,12 +26,12 @@
       {#each pendingActivities as { id, ...pendingActivity } (id)}
         {@const failed = pendingActivity.attempt > 1}
         <div class="pending-activity-row">
-          <h3 class="font-normal text-gray-500 w-6 self-start p-1">
+          <h3 class="w-6 self-start p-1 font-normal text-gray-500">
             {pendingActivity.activityId}
           </h3>
           <div class="pending-activity-summary">
-            <a class="w-full flex items-center hover:bg-gray-50" {href}>
-              <div class="grid grid-cols-6 w-full gap-4">
+            <a class="flex w-full items-center hover:bg-gray-50" {href}>
+              <div class="grid w-full grid-cols-6 gap-4">
                 <div class="pending-activity-detail">
                   <h4>Activity Type</h4>
                   <Badge type={failed ? 'warning' : 'default'}>
@@ -81,7 +81,7 @@
               </div>
             </a>
             {#if failed}
-              <div class="grid grid-cols-2 w-full gap-4 mb-2">
+              <div class="mb-2 grid w-full grid-cols-2 gap-4">
                 <div>
                   {#if pendingActivity.heartbeatDetails}
                     <h4>Heartbeat Details</h4>
@@ -114,11 +114,11 @@
 
 <style lang="postcss">
   .pending-activity-row {
-    @apply w-full flex flex-row items-center;
+    @apply flex w-full flex-row items-center;
   }
 
   .pending-activity-summary {
-    @apply text-sm w-full border-b-2 border-gray-300;
+    @apply w-full border-b-2 border-gray-300 text-sm;
   }
 
   .pending-activity-row:last-child .pending-activity-summary {

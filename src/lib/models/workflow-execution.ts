@@ -28,7 +28,8 @@ export const toWorkflowExecution = (
   const parent = response?.workflowExecutionInfo?.parentExecution;
   const stateTransitionCount =
     response.workflowExecutionInfo.stateTransitionCount;
-  const defaultWorkflowTaskTimeout = response.executionConfig?.defaultWorkflowTaskTimeout;
+  const defaultWorkflowTaskTimeout =
+    response.executionConfig?.defaultWorkflowTaskTimeout;
 
   const pendingActivities: PendingActivity[] = toPendingActivities(
     response.pendingActivities,
