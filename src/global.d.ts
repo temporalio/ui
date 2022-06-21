@@ -17,7 +17,7 @@ interface Window {
 
 interface ImportMeta {
   env: {
-    VITE_API: string;
+    VITE_API?: string;
   };
 }
 

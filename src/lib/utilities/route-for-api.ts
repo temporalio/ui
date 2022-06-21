@@ -1,5 +1,5 @@
 let base =
-  import.meta.env.VITE_API ??
+  import.meta.env?.VITE_API ??
   process.env.VITE_API ??
   globalThis?.AppConfig?.baseUrl;
 if (base.endsWith('/')) base = base.slice(0, -1);
