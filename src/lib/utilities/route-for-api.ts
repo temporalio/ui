@@ -1,16 +1,12 @@
-// import { browser } from '$app/env';
-// import { namespaceUrlPattern } from './namespace-url-pattern';
+let base =
+  globalThis?.AppConfig?.baseUrl ??
+  (import.meta.env?.VITE_API as string) ??
+  process.env.VITE_API;
 
-// const RealBaseUrl = `https://web.${
-//   namespaceUrlPattern.match(window.location.pathname)?.namespace
-// }.tmprl.cloud/api/v1/`;
-
-let base = (import.meta.env?.VITE_API as string) ?? process.env.VITE_API;
 if (base.endsWith('/')) base = base.slice(0, -1);
 
 const withBase = (endpoint: string): string => {
   if (endpoint.startsWith('/')) endpoint = endpoint.slice(1);
-  //   return `${RealBaseUrl}${endpoint}`;
   return `${base}/api/v1/${endpoint}`;
 };
 
