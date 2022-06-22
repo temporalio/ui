@@ -74,7 +74,7 @@
       </Tooltip>
       <div class="nav-title">Workflows</div>
     </NavRow>
-    <IsCloudGuard>
+    <IsCloudGuard {isCloud}>
       <NavRow link={linkList.archive} {isCloud} data-cy="archive-button">
         <Tooltip right hide={$navOpen} text="Archive">
           <div class="nav-icon">
@@ -98,7 +98,7 @@
         </NavRow>
       {/each}
     {/if}
-    <IsCloudGuard>
+    <IsCloudGuard {isCloud}>
       <NavRow link={linkList.settings} {isCloud} data-cy="settings-button">
         <Tooltip right hide={$navOpen} text="Settings">
           <div class="nav-icon">
