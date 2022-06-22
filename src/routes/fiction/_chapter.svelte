@@ -28,7 +28,7 @@
 
 <div
   on:click={handleClick}
-  class="mt-4 cursor-pointer border-2 p-4 hover:bg-gray-50"
+  class="mt-4 cursor-pointer border rounded-sm p-4 hover:bg-gray-50"
 >
   <h2 class="mb-4">{description}</h2>
   <svelte:component this={Component} {...props}>
