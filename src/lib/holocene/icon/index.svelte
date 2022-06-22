@@ -10,6 +10,7 @@
   export let color = '';
   export let fill = '';
   export let stroke = '';
+  export let strokeWidth: string | number = 1.5;
 
   $: icon = icons[name];
 
@@ -45,6 +46,9 @@
         {#each icon.paths as path (path.d)}
           <path
             {...path}
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width={strokeWidth}
             stroke={getStroke(path)}
             fill={getFill(path)}
             transform="translate({width / -2} {height / -2})"

@@ -18,6 +18,9 @@ const keysForPlainText: Readonly<Set<string>> = new Set([
   'requestId',
   'scheduledEventId',
   'startedEventId',
+  'lastHeartbeatTime',
+  'scheduledTime',
+  'expirationTime',
 ]);
 
 export const shouldDisplayAsPlainText = (key: string): boolean => {
