@@ -117,7 +117,7 @@
 
 <style lang="postcss">
   .pending-activity-row {
-    @apply flex w-full flex-row items-center mb-2;
+    @apply mb-2 flex w-full flex-row items-center;
   }
 
   .pending-activity-summary {
