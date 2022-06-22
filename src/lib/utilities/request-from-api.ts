@@ -126,9 +126,13 @@ const withBearerToken = async (
   if (!browser) return headers;
   if (!headers) headers = {};
 
-  const token = await accessToken();
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+  try {
+    const token = await accessToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+  } catch (e) {
+    console.error(e);
   }
 
   return headers;

@@ -12,6 +12,7 @@
   class:noFilter
   class:wrap
   data-cy={$$props['data-cy']}
+  on:click
 >
   {#if link && externalLink}
     <a href={link} target="_blank" class={classes}>
