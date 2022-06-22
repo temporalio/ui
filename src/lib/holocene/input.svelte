@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import Icon from '$lib/holocene/icon/index.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
 
@@ -11,15 +12,7 @@
   export let copyable: boolean = false;
   export let theme: 'dark' | 'light' = 'light';
 
-  let copied = false;
-  const handleCopy = () =>
-    navigator.clipboard
-      .writeText(value)
-      .then(() => {
-        copied = !copied;
-        setTimeout(() => (copied = false), 1000);
-      })
-      .catch((error) => console.error(error));
+  const { copy, copied } = copyToClipboard(value);
 </script>
 
 <div class="input-container {theme}" class:copyable>
@@ -41,8 +34,8 @@
     on:change
   />
   {#if copyable}
-    <div class="copy-icon-container" on:click={handleCopy}>
-      <Icon name={copied ? 'checkMark' : 'copy'} stroke="currentcolor" />
+    <div class="copy-icon-container" on:click={copy}>
+      <Icon name={$copied ? 'checkMark' : 'copy'} stroke="currentcolor" />
     </div>
   {/if}
 </div>

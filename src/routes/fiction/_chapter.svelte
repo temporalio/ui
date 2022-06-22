@@ -31,7 +31,11 @@
   class="mt-4 cursor-pointer rounded-sm border p-4 hover:bg-gray-50"
 >
   <h2 class="mb-4">{description}</h2>
-  <svelte:component this={Component} {...props}>
-    <slot />
-  </svelte:component>
+  {#if $$slots.default}
+    <svelte:component this={Component} {...props}>
+      <slot />
+    </svelte:component>
+  {:else}
+    <svelte:component this={Component} {...props} />
+  {/if}
 </div>
