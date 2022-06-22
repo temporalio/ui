@@ -30,7 +30,7 @@
     </span>
   {/if}
   <input
-    class="block w-full focus:outline-none bg-white m-2"
+    class="m-2 block w-full bg-white focus:outline-none"
     class:copyable
     disabled={copyable}
     {placeholder}
@@ -58,11 +58,11 @@
   }
 
   .icon-container {
-    @apply flex items-center justify-center ml-2;
+    @apply ml-2 flex items-center justify-center;
   }
 
   .copy-icon-container {
-    @apply flex items-center justify-center h-full w-9 cursor-pointer border-l rounded-r-lg;
+    @apply flex h-full w-9 cursor-pointer items-center justify-center rounded-r-lg border-l;
   }
 
   /* Light theme styles */
@@ -77,7 +77,7 @@
   }
 
   .input-container.light.copyable {
-    @apply bg-gray-50 border-gray-900;
+    @apply border-gray-900 bg-gray-50;
   }
 
   .input-container.light.copyable input {
@@ -103,6 +103,6 @@
   .input-container.dark.copyable,
   .input-container.dark.copyable .copy-icon-container,
   .input-container.dark.copyable input {
-    @apply bg-gray-900 border-gray-900;
+    @apply border-gray-900 bg-gray-900;
   }
 </style>
