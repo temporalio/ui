@@ -29,5 +29,6 @@
       "$components/*": ["src/components/*"]
     }
   },
-  "include": ["src/**/*.d.ts", "src/**/*.js", "src/**/*.ts", "src/**/*.svelte"]
+  "include": ["src/**/*.d.ts", "src/**/*.js", "src/**/*.ts", "src/**/*.svelte"],
+  "exclude": ["src/**/*.test.ts"]
 }
