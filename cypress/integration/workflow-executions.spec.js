@@ -106,7 +106,7 @@ describe('Workflow Executions List', () => {
         );
 
         cy.get(
-          `[href="/namespaces/default/workflows/${workflowId}/${runId}"] > .overflow-cell > .wrapper > .table-link`,
+          `[href="/namespaces/default/workflows/${workflowId}/${runId}"] > :nth-child(2) > .table-link`,
         ).click();
 
         cy.wait('@workflow-api');
