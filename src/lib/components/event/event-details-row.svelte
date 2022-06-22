@@ -4,7 +4,7 @@
   import { format } from '$lib/utilities/format-camel-case';
   import { routeForWorkflow, routeForWorkers } from '$lib/utilities/route-for';
   import {
-    shouldDisplayAsWorkflowLink,
+    shouldDisplayAsExecutionLink,
     shouldDisplayAsWorkersLink,
     shouldDisplayAsPlainText,
     getCodeBlockValue,
@@ -29,7 +29,7 @@
       {format(key)}
     </h2>
     <CodeBlock content={getCodeBlockValue(value)} class="w-full" {inline} />
-  {:else if shouldDisplayAsWorkflowLink(key)}
+  {:else if shouldDisplayAsExecutionLink(key)}
     <div class="xl:3/4 flex w-full items-center xl:items-start">
       <h2 class="mr-3 text-sm">{format(key)}</h2>
       <div class="text-sm">

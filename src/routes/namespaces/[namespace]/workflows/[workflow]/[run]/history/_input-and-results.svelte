@@ -1,7 +1,7 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/index.svelte';
 
-  import { events, updating } from '$lib/stores/events';
+  import { eventHistory, updating } from '$lib/stores/events';
 
   import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
   import { capitalize } from '$lib/utilities/format-camel-case';
@@ -11,7 +11,9 @@
   export let type: 'input' | 'results';
 
   $: title = capitalize(type);
-  $: content = getWorkflowStartedAndCompletedEvents($events)[type];
+  $: content = getWorkflowStartedAndCompletedEvents(
+    $eventHistory?.events ?? [],
+  )[type];
 </script>
 
 <article

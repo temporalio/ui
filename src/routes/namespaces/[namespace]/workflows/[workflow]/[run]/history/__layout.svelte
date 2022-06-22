@@ -76,15 +76,26 @@
       href={routeForWorkers(workflowRoute)}
     />
     {#if workflow?.parent}
-      <WorkflowDetail
-        title="Parent"
-        content={workflow.parent?.workflowId}
-        href={routeForWorkflow({
-          namespace,
-          workflow: workflow.parent?.workflowId,
-          run: workflow.parent?.runId,
-        })}
-      />
+      <div class="gap-2 xl:flex">
+        <WorkflowDetail
+          title="Parent"
+          content={workflow.parent?.workflowId}
+          href={routeForWorkflow({
+            namespace,
+            workflow: workflow.parent?.workflowId,
+            run: workflow.parent?.runId,
+          })}
+        />
+        <WorkflowDetail
+          title="Parent ID"
+          content={workflow.parent?.runId}
+          href={routeForWorkflow({
+            namespace,
+            workflow: workflow.parent?.workflowId,
+            run: workflow.parent?.runId,
+          })}
+        />
+      </div>
     {/if}
     <WorkflowDetail
       title="State Transitions"

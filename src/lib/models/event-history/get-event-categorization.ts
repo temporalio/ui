@@ -18,6 +18,8 @@ export const eventTypeCategorizations: Readonly<
   StartChildWorkflowExecutionFailed: 'child-workflow',
   StartChildWorkflowExecutionInitiated: 'child-workflow',
 
+  MarkerRecorded: 'marker',
+
   SignalExternalWorkflowExecutionFailed: 'signal',
   SignalExternalWorkflowExecutionInitiated: 'signal',
   WorkflowExecutionSignaled: 'signal',
@@ -44,7 +46,6 @@ export const eventTypeCategorizations: Readonly<
   RequestCancelExternalWorkflowExecutionFailed: 'workflow',
   RequestCancelExternalWorkflowExecutionInitiated: 'workflow',
 
-  MarkerRecorded: 'command',
   UpsertWorkflowSearchAttributes: 'command',
 };
 
@@ -52,10 +53,11 @@ export type EventTypeCategory = typeof categories[number];
 const categories = [
   'activity',
   'child-workflow',
+  'command',
+  'marker',
   'signal',
   'timer',
   'workflow',
-  'command',
 ] as const;
 
 type EventTypeOption = {
@@ -68,6 +70,7 @@ export const allEventTypeOptions: EventTypeOption[] = [
   { label: 'Activity', option: 'activity' },
   { label: 'Child Workflow', option: 'child-workflow' },
   { label: 'Command', option: 'command' },
+  { label: 'Marker', option: 'marker' },
   { label: 'Signal', option: 'signal' },
   { label: 'Timer', option: 'timer' },
   { label: 'Workflow', option: 'workflow' },
