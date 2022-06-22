@@ -86,7 +86,7 @@ export function simplifyAttributes(
 ): PendingActivityInfo;
 export function simplifyAttributes<
   T = EventAttributesWithType | PendingActivityInfo,
->(attributes: T, preserveTimestamps: boolean = false): T {
+>(attributes: T, preserveTimestamps = false): T {
   for (const [key, value] of Object.entries(attributes)) {
     if (canBeSimplified(value)) {
       attributes[key] = getValueForFirstKey(value);
