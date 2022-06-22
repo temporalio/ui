@@ -5,7 +5,7 @@
   import { routeForWorkflow, routeForWorkers } from '$lib/utilities/route-for';
   import {
     getCodeBlockValue,
-    shouldDisplayAsWorkflowLink,
+    shouldDisplayAsExecutionLink,
     shouldDisplayAsWorkersLink,
     shouldDisplayAsPlainText,
   } from '$lib/utilities/get-single-attribute-for-event';
@@ -16,6 +16,7 @@
 
   export let key: string;
   export let value: string | Record<string, unknown>;
+
   export let inline = false;
 
   const { workflow, namespace, run } = $page.params;
@@ -33,7 +34,7 @@
         {inline}
       />
     </div>
-  {:else if shouldDisplayAsWorkflowLink(key)}
+  {:else if shouldDisplayAsExecutionLink(key)}
     <div class="detail-row">
       <h2 class="text-sm">{format(key)}</h2>
       <div class="text-sm">

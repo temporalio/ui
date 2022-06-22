@@ -55,7 +55,7 @@ export const getCodeBlockValue: Parameters<typeof JSON.stringify>[0] = (
   return value?.payloads ?? value?.indexedFields ?? value?.points ?? value;
 };
 
-const keysWithWorkflowLinks = [
+const keysWithExecutionLinks = [
   'baseRunId',
   'continuedExecutionRunId',
   'firstExecutionRunId',
@@ -64,17 +64,18 @@ const keysWithWorkflowLinks = [
   'originalExecutionRunId',
 ] as const;
 
-const keysWithWorkerLinks = ['taskQueueName'] as const;
-
-export const shouldDisplayAsWorkflowLink = (
+// For linking to same workflow but different execution
+export const shouldDisplayAsExecutionLink = (
   key: string,
-): key is typeof keysWithWorkflowLinks[number] => {
-  for (const workflowKey of keysWithWorkflowLinks) {
+): key is typeof keysWithExecutionLinks[number] => {
+  for (const workflowKey of keysWithExecutionLinks) {
     if (key === workflowKey) return true;
   }
 
   return false;
 };
+
+const keysWithWorkerLinks = ['taskQueueName'] as const;
 
 export const shouldDisplayAsWorkersLink = (
   key: string,
