@@ -31,7 +31,7 @@
           </h3>
           <div class="pending-activity-summary">
             <a class="flex w-full items-center hover:bg-gray-50" {href}>
-              <div class="grid w-full grid-cols-6 gap-4">
+              <div class="pending-activity-inner-row">
                 <div class="pending-activity-detail">
                   <h4>Activity Type</h4>
                   <Badge type={failed ? 'warning' : 'default'}>
@@ -81,8 +81,8 @@
               </div>
             </a>
             {#if failed}
-              <div class="mb-2 grid w-full grid-cols-2 gap-4">
-                <div>
+              <div class="pending-activity-failure-details">
+                <div class="hidden lg:inline-block">
                   {#if pendingActivity.heartbeatDetails}
                     <h4>Heartbeat Details</h4>
                     <CodeBlock
@@ -91,7 +91,7 @@
                     />
                   {/if}
                 </div>
-                <div>
+                <div class="hidden lg:inline-block">
                   {#if pendingActivity.lastFailure}
                     <h4>Last Failure</h4>
                     <CodeBlock
@@ -114,7 +114,7 @@
 
 <style lang="postcss">
   .pending-activity-row {
-    @apply flex w-full flex-row items-center;
+    @apply flex w-full flex-row items-center mb-2;
   }
 
   .pending-activity-summary {
@@ -125,7 +125,22 @@
     @apply border-b-0;
   }
 
+  .pending-activity-inner-row {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 20% 20% repeat(3, 1fr) 20%;
+    column-gap: 1rem;
+  }
+
   .pending-activity-detail {
     @apply xl:flex xl:flex-row xl:items-center xl:gap-2;
+  }
+
+  .pending-activity-failure-details {
+    width: 100%;
+    margin-bottom: 0.5rem;
+    display: grid;
+    grid-template-columns: 40% 1fr;
+    column-gap: 2rem;
   }
 </style>
