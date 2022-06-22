@@ -12,9 +12,12 @@
   import Badge from '$lib/components/badge.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
 
-  const { pendingActivities, defaultWorkflowTaskTimeout } =
-    $page.stuff.workflow;
-  const { namespace, workflow, run } = $page.params;
+  const {
+    pendingActivities,
+    defaultWorkflowTaskTimeout,
+    id: workflow,
+  } = $page.stuff.workflow;
+  const { namespace, run } = $page.params;
 
   const href = routeForPendingActivities({ namespace, workflow, run });
 </script>
