@@ -1,6 +1,6 @@
 <script lang="ts">
   import Chapter from '../_chapter.svelte';
-  import Button from '$lib/components/button.svelte';
+  import Button from '$lib/holocene/button.svelte';
 </script>
 
 <Chapter description="A primary button" component={Button}>Click Me</Chapter>

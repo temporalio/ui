@@ -2,7 +2,7 @@
   import { routeForImport } from '$lib/utilities/route-for';
   import { goto } from '$app/navigation';
 
-  import Button from '$lib/components/button.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import { toEventHistory } from '$lib/models/event-history';
   import { notifications } from '$lib/stores/notifications';
   import { importEvents, importEventGroups } from '$lib/stores/import-events';

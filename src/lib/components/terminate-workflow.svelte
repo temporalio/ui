@@ -3,7 +3,7 @@
   import { terminateWorkflow } from '$lib/services/terminate-service';
   import { notifications } from '$lib/stores/notifications';
 
-  import Button from '$lib/components/button.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Modal from '$lib/components/modal.svelte';
 
   export let workflow: WorkflowExecution;

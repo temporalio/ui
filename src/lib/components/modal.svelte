@@ -1,7 +1,7 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/index.svelte';
   import { createEventDispatcher } from 'svelte';
-  import Button from './button.svelte';
+  import Button from '../holocene/button.svelte';
 
   export let open: boolean = false;
   export let hideConfirm: boolean = false;
