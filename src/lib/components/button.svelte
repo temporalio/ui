@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Icon from 'holocene/components/icon/index.svelte';
-  import type { IconName } from 'holocene/components/icon/paths';
+  import Icon from '$lib/holocene/icon/index.svelte';
+  import type { IconName } from '$lib/holocene/icon/paths';
 
   export let disabled: boolean = false;
   export let secondary: boolean = false;

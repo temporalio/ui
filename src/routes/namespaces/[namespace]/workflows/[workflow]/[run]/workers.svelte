@@ -14,7 +14,7 @@
 </script>
 
 <script lang="ts">
-  import Icon from 'holocene/components/icon/index.svelte';
+  import Icon from '$lib/holocene/icon/index.svelte';
 
   import { timeFormat } from '$lib/stores/time-format';
   import { formatDate } from '$lib/utilities/format-date';
@@ -53,16 +53,16 @@
         </div>
         <div class="w-3/12 text-left">
           {#if poller.taskQueueTypes.includes('WORKFLOW')}
-            <Icon name="checkMark" color="blue" />
+            <Icon name="checkMark" stroke="blue" />
           {:else}
-            <Icon name="close" color="black" />
+            <Icon name="close" stroke="black" />
           {/if}
         </div>
         <div class="w-3/12 text-left">
           {#if poller.taskQueueTypes.includes('ACTIVITY')}
-            <Icon name="checkMark" color="blue" />
+            <Icon name="checkMark" stroke="blue" />
           {:else}
-            <Icon name="close" color="black" />
+            <Icon name="close" stroke="black" />
           {/if}
         </div>
       </article>

@@ -1,9 +1,9 @@
 <script lang="ts">
-  import Icon from 'holocene/components/icon/index.svelte';
+  import Icon from '$lib/holocene/icon/index.svelte';
 
   import { dataEncoder } from '$lib/stores/data-encoder';
 
-  import Tooltip from '$lib/components/tooltip.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import DataEncoderSettings from './data-encoder-settings.svelte';
 
   let showSettings = false;

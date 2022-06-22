@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Icon from 'holocene/components/icon/index.svelte';
+  import Icon from '$lib/holocene/icon/index.svelte';
   import { page } from '$app/stores';
 
-  import type { IconName } from 'holocene/components/icon/paths';
+  import type { IconName } from '$lib/holocene/icon/paths';
 
   import { getAppContext } from '$lib/utilities/get-context';
 

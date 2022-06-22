@@ -52,4 +52,5 @@ type WorkflowExecution = {
   parent?: IWorkflowExecution;
   url: string;
   isRunning: boolean;
+  defaultWorkflowTaskTimeout: Duration;
 };

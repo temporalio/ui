@@ -1,15 +1,16 @@
 <script lang="ts">
+  import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
+
   import { formatDate, getMilliseconds } from '$lib/utilities/format-date';
   import { routeForWorkflow } from '$lib/utilities/route-for';
-  import { getTruncatedWord } from '$lib/utilities/get-truncated-word';
-  import {
-    workflowIdColumnWidth,
-    workflowTypeColumnWidth,
-    workflowSummaryColumnWidth,
-  } from '$lib/stores/column-width';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
+  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import Tooltip from '$lib/components/tooltip.svelte';
+  import FilterOrCopyButtons from '$lib/holocene/filter-or-copy-buttons.svelte';
+  import { noop } from 'svelte/internal';
   export let namespace: string;
   export let workflow: WorkflowExecution;
   export let timeFormat: TimeFormat | string;
@@ -19,6 +20,26 @@
     workflow: workflow.id,
     run: workflow.runId,
   });
+
+  let showFilterCopy = false;
+
+  const onTypeClick = (type: string) => {
+    const defaultQuery = toListWorkflowQuery({ timeRange: 'All' });
+    const query = $page.url.searchParams.get('query');
+    const parameters = toListWorkflowParameters(query ?? defaultQuery);
+    const workflowType = parameters?.workflowType === type ? '' : type;
+    const value = toListWorkflowQuery({
+      ...parameters,
+      workflowType,
+    });
+    updateQueryParameters({
+      url: $page.url,
+      parameter: 'query',
+      value,
+      allowEmpty: true,
+      goto,
+    });
+  };
 </script>
 
 <a {href} class="row group">
@@ -30,29 +51,43 @@
       />
     </div>
   </div>
-  <div class="cell overflow-cell links font-medium md:font-normal">
-    <Tooltip bottom copyable text={workflow.id}>
-      <span class="table-link"
-        >{getTruncatedWord(
-          workflow.id,
-          $workflowIdColumnWidth || $workflowSummaryColumnWidth,
-        )}</span
-      >
-    </Tooltip>
+  <div
+    class="cell links relative truncate font-medium md:font-normal"
+    on:mouseover={() => (showFilterCopy = true)}
+    on:focus={() => (showFilterCopy = true)}
+    on:mouseleave={() => (showFilterCopy = false)}
+    on:blur={() => (showFilterCopy = false)}
+  >
+    <span class="table-link">{workflow.id}</span>
+    <FilterOrCopyButtons
+      show={showFilterCopy}
+      content={workflow.id}
+      filterable={false}
+    />
     <p class="time-cell-inline">
       {formatDate(workflow.startTime, timeFormat)}
     </p>
   </div>
-  <div class="cell links flex gap-2 font-medium md:font-normal">
+  <div
+    class="cell links relative flex items-center justify-between gap-2 truncate font-medium md:font-normal"
+    on:mouseover={() => (showFilterCopy = true)}
+    on:focus={() => (showFilterCopy = true)}
+    on:mouseleave={() => (showFilterCopy = false)}
+    on:blur={() => (showFilterCopy = false)}
+    on:click|preventDefault|stopPropagation={noop}
+  >
     <h3 class="md:hidden">Workflow Name:</h3>
-    <Tooltip bottom copyable text={workflow.name}>
-      <span class="table-link"
-        >{getTruncatedWord(
-          workflow.name,
-          $workflowTypeColumnWidth || $workflowSummaryColumnWidth,
-        )}</span
-      >
-    </Tooltip>
+    <span
+      class="table-link"
+      on:click|preventDefault|stopPropagation={() => onTypeClick(workflow.name)}
+      >{workflow.name}</span
+    >
+    <FilterOrCopyButtons
+      show={showFilterCopy}
+      content={workflow.name}
+      onFilter={() => onTypeClick(workflow.name)}
+      filtered={$page.url?.searchParams?.get('query')?.includes(workflow.name)}
+    />
     <p class="time-cell-inline">
       {formatDate(workflow.endTime, timeFormat)}
     </p>
@@ -85,10 +120,6 @@
 
   .cell {
     @apply p-2 text-left md:table-cell md:border-b-2;
-  }
-
-  .overflow-cell {
-    @apply text-ellipsis whitespace-nowrap;
   }
 
   .row:hover {

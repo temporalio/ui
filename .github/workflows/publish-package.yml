@@ -1,0 +1,45 @@
+name: Publish package to npm
+
+on:
+  workflow_dispatch:
+    branches:
+      - main
+    inputs:
+      bump:
+        description: 'bump type, major or minor or patch'
+        default: 'patch'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Node setup
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16
+      - name: pnpm setup
+        uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7
+      - name: Configure Git
+        run: |
+          git config --local user.name 'Temporal Data (cicd)'
+          git config --local user.email 'commander-data@temporal.io'
+      - name: Install
+        run: pnpm install
+      - name: Build
+        run: pnpm run build:local
+      - name: Bump version
+        run: pnpm run package:${{ inputs.bump }}
+      - name: Publish package to NPM
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        working-directory: ./package
+      - name: Commit version bump
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.COMMANDER_DATA_TOKEN }}@github.com/${{ github.repository }}
+          git add .
+          git commit -m "Update package version" && git push || echo "No changes to commit"

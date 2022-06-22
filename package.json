@@ -1,6 +1,6 @@
 {
-  "name": "temporal-ui",
-  "version": "2.0.1",
+  "name": "@temporalio/ui",
+  "version": "2.0.6",
   "type": "module",
   "description": "Temporal.io UI",
   "keywords": [
@@ -29,13 +29,15 @@
     "format": "prettier --write --plugin-search-dir=. .",
     "cypress": "concurrently \"pnpm run dev:test\" \"cypress open\"",
     "cypress:run": "cypress run",
-    "package": "svelte-kit package"
+    "package": "svelte-kit package",
+    "package:patch": "pnpm version patch && svelte-kit package",
+    "package:minor": "pnpm version minor && svelte-kit package",
+    "package:major": "pnpm version major && svelte-kit package"
   },
   "dependencies": {
     "@sveltejs/svelte-virtual-list": "^3.0.1",
     "date-fns": "^2.23.0",
     "date-fns-tz": "^1.2.2",
-    "holocene": "^0.0.17",
     "json-beautify": "^1.1.1",
     "just-debounce": "^1.1.0",
     "sanitize-html": "^2.6.1",
@@ -90,6 +92,7 @@
     "svelte-highlight": "^3.4.0",
     "svelte-loader": "^3.1.2",
     "svelte-preprocess": "^4.10.4",
+    "svelte2tsx": "^0.5.10",
     "tailwindcss": "^3.0.18",
     "ts-jest": "^27.0.5",
     "ts-node": "^10.2.1",
