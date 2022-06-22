@@ -17,7 +17,7 @@
       .writeText(value)
       .then(() => {
         copied = !copied;
-        setTimeout(() => (copied = false), 100);
+        setTimeout(() => (copied = false), 1000);
       })
       .catch((error) => console.error(error));
 </script>
@@ -76,10 +76,16 @@
     @apply text-gray-400;
   }
 
-  .input-container.light.copyable,
-  .input-container.light.copyable input,
+  .input-container.light.copyable {
+    @apply bg-gray-50 border-gray-900;
+  }
+
+  .input-container.light.copyable input {
+    @apply bg-gray-50 text-gray-900;
+  }
+
   .input-container.light.copyable .copy-icon-container {
-    @apply bg-gray-50 border-gray-900 text-gray-900;
+    @apply border-gray-900 bg-gray-200;
   }
 
   /* Dark theme styles */
