@@ -26,7 +26,7 @@
   const { copy, copied } = copyToClipboard(parsedContent);
 
   function highlight(root: HTMLElement, language: string, source: string) {
-    root.textContent = isJSON ? formatJSON(source) : source;
+    root.textContent = source;
     root.classList.forEach((item) => root.classList.remove(item));
     if (language) {
       root.classList.add(`language-${language}`);
