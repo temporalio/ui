@@ -1,25 +1,12 @@
-<script context="module" lang="ts">
-  import type { Load } from '@sveltejs/kit';
-  import { routeForWorkers, routeForWorkflow } from '$lib/utilities/route-for';
-
-  export const load: Load = async function ({ params, stuff }) {
-    const { workflow, workers } = stuff;
-    const { namespace } = params;
-
-    return {
-      props: {
-        namespace,
-        workflow,
-        workers,
-      },
-    };
-  };
-</script>
-
 <script lang="ts">
-  import type { GetPollersResponse } from '$lib/services/pollers-service';
+  import { page } from '$app/stores';
+  import { workflowRun } from '$lib/stores/workflow-run';
 
-  import { routeForEventHistory } from '$lib/utilities/route-for';
+  import {
+    routeForWorkflow,
+    routeForWorkers,
+    routeForEventHistory,
+  } from '$lib/utilities/route-for';
   import { formatDate } from '$lib/utilities/format-date';
   import { eventViewType } from '$lib/stores/event-view';
 
@@ -33,9 +20,8 @@
   import InputAndResults from './_input-and-results.svelte';
   import WorkflowDetail from '../_workflow-detail.svelte';
 
-  export let namespace: string;
-  export let workflow: WorkflowExecution;
-  export let workers: GetPollersResponse;
+  const { namespace } = $page.params;
+  const { workflow, workers } = $workflowRun;
 
   const routeParameters = (view: EventView, eventId?: string) => ({
     namespace,

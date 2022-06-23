@@ -1,5 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  import { workflowRun } from '$lib/stores/workflow-run';
 
   import {
     formatDate,
@@ -12,14 +13,11 @@
   import Badge from '$lib/components/badge.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
 
-  const {
-    pendingActivities,
-    defaultWorkflowTaskTimeout,
-    id: workflow,
-  } = $page.stuff.workflow;
   const { namespace, run } = $page.params;
+  const { workflow } = $workflowRun;
+  const { pendingActivities, defaultWorkflowTaskTimeout, id } = workflow;
 
-  const href = routeForPendingActivities({ namespace, workflow, run });
+  const href = routeForPendingActivities({ namespace, workflow: id, run });
 </script>
 
 {#if pendingActivities.length}

@@ -1,40 +1,25 @@
-<script context="module" lang="ts">
-  import type { Load } from '@sveltejs/kit';
-
-  import { fetchWorkflow } from '$lib/services/workflow-service';
-  import { getPollers } from '$lib/services/pollers-service';
-  import type { GetPollersResponse } from '$lib/services/pollers-service';
-  import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-
-  export const load: Load = async function ({ params, fetch }) {
-    const { workflow: workflowId, run: runId, namespace } = params;
-
-    const parameters = {
-      namespace,
-      workflowId: decodeURIForSvelte(workflowId),
-      runId,
-    };
-
-    const workflow = await fetchWorkflow(parameters, fetch);
-    const { taskQueue } = workflow;
-    const workers = await getPollers({ queue: taskQueue, namespace });
-
-    return {
-      props: { workflow, namespace, workers },
-      stuff: { workflow, workers },
-    };
-  };
-</script>
-
 <script lang="ts">
-  import Header from './_header.svelte';
+  import { page } from '$app/stores';
+  import { workflowRun, loading } from '$lib/stores/workflow-run';
 
-  export let workflow: WorkflowExecution;
-  export let namespace: string;
-  export let workers: GetPollersResponse;
+  import PageTransition from '$lib/holocene/page-transition.svelte';
+  import Header from './_header.svelte';
+  import Loading from '$lib/components/loading.svelte';
+
+  const { namespace } = $page.params;
 </script>
 
-<main class="flex h-full flex-col gap-6">
-  <Header {namespace} {workflow} {workers} />
-  <slot />
-</main>
+<PageTransition>
+  <main class="flex h-full flex-col gap-6">
+    {#if !$loading}
+      <Header
+        {namespace}
+        workflow={$workflowRun.workflow}
+        workers={$workflowRun.workers}
+      />
+      <slot />
+    {:else}
+      <Loading />
+    {/if}
+  </main>
+</PageTransition>
