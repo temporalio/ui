@@ -1,6 +1,5 @@
 <script lang="ts">
-  import CodeBlock from '$lib/components/code-block.svelte';
-  import { events } from '$lib/stores/events';
+  import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
 </script>
 
-<CodeBlock content={$events} data-cy="event-history-json" />
+<WorkflowHistoryJson />
