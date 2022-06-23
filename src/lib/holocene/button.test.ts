@@ -1,4 +1,4 @@
-import Button from './button.svelte';
+import Button from '$holocene/button.svelte';
 
 let host: HTMLElement;
 

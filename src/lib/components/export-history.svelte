@@ -1,6 +1,6 @@
 <script lang="ts">
   import { fetchRawEvents } from '$lib/services/events-service';
-  import Button from '../holocene/button.svelte';
+  import Button from '$holocene/button.svelte';
 
   export let namespace: string;
   export let workflowId: string;

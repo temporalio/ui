@@ -5,7 +5,7 @@
   import { validateHttpOrHttps, validateHttps } from '$lib/utilities/is-http';
 
   import Modal from './modal.svelte';
-  import Button from '../holocene/button.svelte';
+  import Button from '$holocene/button.svelte';
 
   export let showSettings: boolean;
   export let accessToken: string;

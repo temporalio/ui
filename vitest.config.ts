@@ -10,6 +10,7 @@ export default defineConfig({
       $lib: path.resolve(__dirname, './src/lib'),
       $types: path.resolve(__dirname, './src/types'),
       $components: path.resolve(__dirname, './src/lib/components/'),
+      $holocene: path.resolve(__dirname, './src/lib/holocene/'),
     },
   },
   test: {

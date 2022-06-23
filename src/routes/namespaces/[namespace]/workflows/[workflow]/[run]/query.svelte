@@ -20,7 +20,7 @@
   import Option from '$lib/components/select/option.svelte';
   import EmptyState from '$lib/components/empty-state.svelte';
   import Select from '$lib/components/select/select.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$holocene/button.svelte';
 
   export let namespace: string;
   export let workflow: { id: string; runId: string };

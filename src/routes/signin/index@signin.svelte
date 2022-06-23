@@ -2,7 +2,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$holocene/button.svelte';
   import { routeForAuthentication } from '$lib/utilities/route-for';
 
   import { fetchSettings } from '$lib/services/settings-service';
