@@ -15,9 +15,24 @@
       (namespaceConfig) => namespaceConfig.namespaceInfo.name === namespace,
     );
 
+    const clusters = currentNamespace?.replicationConfig?.clusters.length
+      ? currentNamespace.replicationConfig.clusters
+          .map(({ clusterName }) => {
+            if (
+              clusterName ===
+              currentNamespace?.replicationConfig?.activeClusterName
+            ) {
+              return `${clusterName} (active)`;
+            }
+            return clusterName;
+          })
+          .join(', ')
+      : 'Unknown';
+
     return {
       props: {
         currentNamespace,
+        clusters,
       },
     };
   };
@@ -31,6 +46,7 @@
     $page.params.namespace || $page.stuff?.settings?.defaultNamespace;
 
   export let currentNamespace: DescribeNamespaceResponse;
+  export let clusters: string;
 </script>
 
 <h2 class="text-2xl" data-cy="settings-title">
@@ -71,8 +87,7 @@
     </p>
     <p data-cy="namespace-clusters">
       <span class="mr-2 font-medium">Clusters:</span>
-      {currentNamespace?.replicationConfig?.state} ({currentNamespace
-        ?.replicationConfig?.activeClusterName})
+      {clusters}
     </p>
   </div>
 </div>
