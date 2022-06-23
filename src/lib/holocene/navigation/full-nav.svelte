@@ -15,7 +15,6 @@
 
   import NavContainer from '$lib/holocene/navigation/_nav-container.svelte';
   import NavRow from '$lib/holocene/navigation/_nav-row.svelte';
-  import Logout from '$lib/components/logout-button.svelte';
   import NamespaceList from '$lib/components/namespace-list.svelte';
   import Drawer from '$lib/holocene/navigation/_drawer.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
@@ -74,7 +73,7 @@
       </Tooltip>
       <div class="nav-title">Workflows</div>
     </NavRow>
-    <IsCloudGuard>
+    <IsCloudGuard {isCloud}>
       <NavRow link={linkList.archive} {isCloud} data-cy="archive-button">
         <Tooltip right hide={$navOpen} text="Archive">
           <div class="nav-icon">
@@ -98,7 +97,7 @@
         </NavRow>
       {/each}
     {/if}
-    <IsCloudGuard>
+    <IsCloudGuard {isCloud}>
       <NavRow link={linkList.settings} {isCloud} data-cy="settings-button">
         <Tooltip right hide={$navOpen} text="Settings">
           <div class="nav-icon">
@@ -127,13 +126,13 @@
       </NavRow>
     {:then user}
       {#if user?.email}
-        <NavRow {isCloud}>
+        <NavRow {isCloud} on:click={logout}>
           <Tooltip right hide={$navOpen} text="Logout">
-            <div class="nav-icon" on:click={logout}>
+            <div class="nav-icon">
               <Icon name="logout" scale={1.4} />
             </div>
           </Tooltip>
-          <div class="nav-title"><Logout {user} /></div>
+          <div class="nav-title cursor-pointer">Logout</div>
         </NavRow>
         <div class="profile-row">
           <div>

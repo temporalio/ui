@@ -12,7 +12,7 @@
 
   import Select from '$lib/components/select/select.svelte';
   import Option from '$lib/components/select/option.svelte';
-  import Input from '$lib/components/input.svelte';
+  import Input from '$lib/holocene/input.svelte';
   import Search from '$lib/components/search.svelte';
 
   export let searchType: 'basic' | 'advanced';
@@ -102,12 +102,14 @@
   {:else}
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-5">
       <Input
+        icon="search"
         id="workflow-id-filter"
         label="Workflow ID"
         bind:value={parameters.workflowId}
         on:input={handleParameterChange}
       />
       <Input
+        icon="search"
         id="workflow-type-filter"
         label="Workflow Type"
         bind:value={parameters.workflowType}
