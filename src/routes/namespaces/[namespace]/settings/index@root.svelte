@@ -15,19 +15,7 @@
       (namespaceConfig) => namespaceConfig.namespaceInfo.name === namespace,
     );
 
-    const clusters = currentNamespace?.replicationConfig?.clusters.length
-      ? currentNamespace.replicationConfig.clusters
-          .map(({ clusterName }) => {
-            if (
-              clusterName ===
-              currentNamespace?.replicationConfig?.activeClusterName
-            ) {
-              return `${clusterName} (active)`;
-            }
-            return clusterName;
-          })
-          .join(', ')
-      : 'Unknown';
+    const clusters = getClusters(currentNamespace);
 
     return {
       props: {
@@ -41,6 +29,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { fromSecondsToDaysOrHours } from '$lib/utilities/format-date';
+  import { getClusters } from '$lib/utilities/get-clusters';
 
   let selectedNamespace =
     $page.params.namespace || $page.stuff?.settings?.defaultNamespace;
