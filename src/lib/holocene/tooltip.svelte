@@ -6,6 +6,7 @@
   export let text: string = '';
   export let icon: IconName | undefined = undefined;
   export let top = false;
+  export let topRight = false;
   export let right = false;
   export let bottom = false;
   export let left = false;
@@ -18,7 +19,14 @@
 {:else}
   <div class="wrapper relative inline-block">
     <slot />
-    <div class="tooltip" class:left class:right class:bottom class:top>
+    <div
+      class="tooltip"
+      class:left
+      class:right
+      class:bottom
+      class:top
+      class:topRight
+    >
       <div class="inline-block rounded-lg bg-gray-800 px-2 py-2">
         {#if copyable}
           <Copyable clickAllToCopy content={text} color="white">
@@ -60,6 +68,10 @@
   }
   .tooltip.right {
     @apply right-0 -mr-4 translate-x-full;
+  }
+
+  .tooltip.topRight {
+    @apply right-1/2 -mt-4 mr-4 -translate-x-1/2 -translate-y-full;
   }
 
   .wrapper:hover .tooltip {

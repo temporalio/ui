@@ -55,12 +55,16 @@
         class="relative flex cursor-pointer items-center"
         on:click={toggleNamespaceSelector}
       >
-        <Tooltip right hide={$navOpen} text={activeNamespace ?? 'Namespaces'}>
+        <Tooltip
+          right={!$navOpen}
+          topRight={$navOpen}
+          text={activeNamespace ?? 'Namespaces'}
+        >
           <div class="nav-icon">
             <Icon name="namespaceSelect" scale={1.6} />
           </div>
         </Tooltip>
-        <div class="nav-title namespace">
+        <div class="nav-title namespace truncate" style="font-size: 12px;">
           {activeNamespace ?? 'Namespaces'}
         </div>
       </div>
