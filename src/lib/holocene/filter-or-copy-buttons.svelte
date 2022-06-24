@@ -1,5 +1,6 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/index.svelte';
+  import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { noop } from 'svelte/internal';
 
   export let show = false;
@@ -9,17 +10,7 @@
   export let onFilter: () => void = noop;
   export let filtered = false;
 
-  let copied = false;
-
-  const copy = () => {
-    navigator.clipboard
-      .writeText(content)
-      .then(() => {
-        copied = !copied;
-        setTimeout(() => (copied = false), 700);
-      })
-      .catch((error) => console.error(error));
-  };
+  const { copy, copied } = copyToClipboard(content, 700);
 </script>
 
 {#if show}
@@ -39,7 +30,7 @@
     {#if copyable}
       <button on:click|preventDefault|stopPropagation={copy}>
         <Icon
-          name={copied ? 'checkMark' : 'copy'}
+          name={$copied ? 'checkMark' : 'copy'}
           stroke="#000"
           class="h-4 w-4"
         />

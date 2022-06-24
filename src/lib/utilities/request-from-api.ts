@@ -70,6 +70,13 @@ export const requestFromAPI = async <T>(
   try {
     options = withSecurityOptions(options);
 
+    if (globalThis?.AccessToken) {
+      options.headers = await withBearerToken(
+        options?.headers,
+        globalThis.AccessToken,
+      );
+    }
+
     const response = await request(url, options);
     const body = await response.json();
 
@@ -110,6 +117,25 @@ const withSecurityOptions = (options: RequestInit): RequestInit => {
   const opts: RequestInit = { credentials: 'include', ...options };
   opts.headers = withCsrf(options?.headers);
   return opts;
+};
+
+const withBearerToken = async (
+  headers: HeadersInit,
+  accessToken: () => Promise<string>,
+): Promise<HeadersInit> => {
+  if (!browser) return headers;
+  if (!headers) headers = {};
+
+  try {
+    const token = await accessToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+  } catch (e) {
+    console.error(e);
+  }
+
+  return headers;
 };
 
 const withCsrf = (headers: HeadersInit): HeadersInit => {

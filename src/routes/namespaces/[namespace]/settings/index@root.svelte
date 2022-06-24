@@ -15,9 +15,12 @@
       (namespaceConfig) => namespaceConfig.namespaceInfo.name === namespace,
     );
 
+    const clusters = getClusters(currentNamespace);
+
     return {
       props: {
         currentNamespace,
+        clusters,
       },
     };
   };
@@ -26,11 +29,13 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { fromSecondsToDaysOrHours } from '$lib/utilities/format-date';
+  import { getClusters } from '$lib/utilities/get-clusters';
 
   let selectedNamespace =
     $page.params.namespace || $page.stuff?.settings?.defaultNamespace;
 
   export let currentNamespace: DescribeNamespaceResponse;
+  export let clusters: string;
 </script>
 
 <h2 class="text-2xl" data-cy="settings-title">
@@ -71,8 +76,7 @@
     </p>
     <p data-cy="namespace-clusters">
       <span class="mr-2 font-medium">Clusters:</span>
-      {currentNamespace?.replicationConfig?.state} ({currentNamespace
-        ?.replicationConfig?.activeClusterName})
+      {clusters}
     </p>
   </div>
 </div>

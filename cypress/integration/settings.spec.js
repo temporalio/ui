@@ -47,7 +47,7 @@ describe('Settings page', () => {
     );
     cy.get('[data-cy="namespace-clusters"]').should(
       'to.contain',
-      'Clusters: Unspecified (active)',
+      'Clusters: us-east1 (active), us-east2',
     );
   });
 });
