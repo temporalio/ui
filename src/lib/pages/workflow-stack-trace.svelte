@@ -6,7 +6,7 @@
   import type { ParsedQuery } from '$lib/services/query-service';
 
   import CodeBlock from '$lib/components/code-block.svelte';
-  import Button from '$lib/components/button.svelte';
+  import Button from '$holocene/button.svelte';
   import EmptyState from '$lib/components/empty-state.svelte';
 
   const { namespace } = $page.params;
