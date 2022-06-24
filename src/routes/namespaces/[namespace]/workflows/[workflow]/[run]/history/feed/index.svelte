@@ -1,6 +1,5 @@
 <script lang="ts">
-  import EventSummary from '$lib/components/event/event-summary.svelte';
-  import { events, eventGroups } from '$lib/stores/events';
+  import WorkflowHistoryFeed from '$lib/pages/workflow-history-feed.svelte';
 </script>
 
-<EventSummary items={$events} groups={$eventGroups} />
+<WorkflowHistoryFeed />
