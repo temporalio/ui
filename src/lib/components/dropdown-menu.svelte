@@ -40,7 +40,7 @@
   });
 </script>
 
-<div class="relative mx-2 inline" bind:this={menu} data-cy={$$props.dataCy}>
+<div class="relative inline" bind:this={menu} data-cy={$$props.dataCy}>
   <IconButton
     icon="caretDown"
     on:click={() => (show = !show)}
@@ -64,7 +64,7 @@
     <span
       in:scale={{ duration: 200, start: 0.65 }}
       out:scale={{ duration: 100, start: 0.65 }}
-      class="absolute top-0 right-1 h-2 w-2 rounded-full bg-blue-200"
+      class="absolute top-0 right-0.5 h-2 w-2 rounded-full bg-blue-200"
     />
   {/if}
 </div>
