@@ -3,7 +3,7 @@ import {
   shouldDisplayAsExecutionLink,
 } from './get-single-attribute-for-event';
 
-describe(getSingleAttributeForEvent, () => {
+describe('getSingleAttributeForEvent', () => {
   const workflowEvent = {
     eventId: '1',
     eventTime: '2022-03-14T17:44:14.996241458Z',
@@ -143,7 +143,7 @@ describe(getSingleAttributeForEvent, () => {
   });
 });
 
-describe(shouldDisplayAsExecutionLink, () => {
+describe('shouldDisplayAsExecutionLink', () => {
   it('should return true for event keys that end with RunId', () => {
     expect(shouldDisplayAsExecutionLink('originalExecutionRunId')).toBe(true);
     expect(shouldDisplayAsExecutionLink('firstExecutionRunId')).toBe(true);

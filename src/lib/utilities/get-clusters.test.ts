@@ -28,7 +28,7 @@ const getNamespace = (clusters: string[], activeClusterName: string) => ({
   isGlobalNamespace: false,
 });
 
-describe(getClusters, () => {
+describe('getClusters', () => {
   it('should return single active cluster', () => {
     const namespace = getNamespace(['us-east'], 'us-east');
     const clusters = getClusters(namespace);

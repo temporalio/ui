@@ -1,6 +1,6 @@
 import { isFunction } from './is-function';
 
-describe(isFunction, () => {
+describe('isFunction', () => {
   it('should return true if given an arrow function', () => {
     const fn = () => 2;
     expect(isFunction(fn)).toBe(true);

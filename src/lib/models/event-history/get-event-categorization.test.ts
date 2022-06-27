@@ -1,6 +1,6 @@
 import { isCategoryType } from './get-event-categorization';
 
-describe(isCategoryType, () => {
+describe('isCategoryType', () => {
   it('should return true for "activity"', () => {
     expect(isCategoryType('activity')).toBeTruthy();
   });

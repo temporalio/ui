@@ -74,7 +74,7 @@ const [activityTaskScheduled, activityTaskStarted, activityTaskCompleted] =
 const eventGroups = groupEvents(eventHistory);
 const [eventGroup] = eventGroups;
 
-describe(getGroupForEvent, () => {
+describe('getGroupForEvent', () => {
   it('should get ActivityScheduledEvent', () => {
     const result = getGroupForEvent(activityTaskScheduled, eventGroups);
     expect(result).toBe(eventGroup);

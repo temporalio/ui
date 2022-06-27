@@ -1,19 +1,20 @@
-/**
- * @jest-environment jsdom
- */
-
+import { vi } from 'vitest';
 import { updateQueryParameters } from './update-query-parameters';
 
 const gotoOptions = { replaceState: true, keepfocus: true, noscroll: true };
 const url = new URL('https://temporal.io');
 
-describe(updateQueryParameters, () => {
+describe('updateQueryParameters', () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('should call the set method on the query when a value is provided', () => {
     const parameter = 'parameter';
     const value = 'value';
     const goto = () => Promise.resolve();
 
-    const spy = jest.spyOn(url.searchParams, 'set');
+    const spy = vi.spyOn(url.searchParams, 'set');
 
     updateQueryParameters({ parameter, value, url, goto });
 
@@ -25,7 +26,7 @@ describe(updateQueryParameters, () => {
     const parameter = 'parameter';
     const goto = () => Promise.resolve();
 
-    const spy = jest.spyOn(url.searchParams, 'delete');
+    const spy = vi.spyOn(url.searchParams, 'delete');
 
     updateQueryParameters({ parameter, url, goto });
 
@@ -38,7 +39,7 @@ describe(updateQueryParameters, () => {
     const value = '';
     const goto = () => Promise.resolve();
 
-    const spy = jest.spyOn(url.searchParams, 'delete');
+    const spy = vi.spyOn(url.searchParams, 'delete');
 
     updateQueryParameters({ parameter, value, url, goto });
 
@@ -51,7 +52,7 @@ describe(updateQueryParameters, () => {
     const value = null;
     const goto = () => Promise.resolve();
 
-    const spy = jest.spyOn(url.searchParams, 'delete');
+    const spy = vi.spyOn(url.searchParams, 'delete');
 
     updateQueryParameters({ parameter, value, url, goto });
 
@@ -62,7 +63,7 @@ describe(updateQueryParameters, () => {
   it('should call `goto` with the correct path', () => {
     const parameter = 'parameter';
     const value = 'value';
-    const goto = jest.fn().mockReturnValue(Promise.resolve(null));
+    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateQueryParameters({ parameter, value, url, goto });
 
@@ -72,7 +73,7 @@ describe(updateQueryParameters, () => {
   it('should call `goto` with the correct path when query paramters already exist', () => {
     const parameter = 'parameter';
     const value = 'newvalue';
-    const goto = jest.fn().mockReturnValue(Promise.resolve(null));
+    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateQueryParameters({ parameter, value, url, goto });
 
@@ -85,7 +86,7 @@ describe(updateQueryParameters, () => {
   it('should call `goto` with without the "?" if the query params are empty', () => {
     const parameter = 'parameter';
     const value = null;
-    const goto = jest.fn().mockReturnValue(Promise.resolve(null));
+    const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
 
     updateQueryParameters({ parameter, value, url, goto });
 

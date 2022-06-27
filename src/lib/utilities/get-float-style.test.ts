@@ -1,6 +1,6 @@
 import { getFloatStyle } from './get-float-style';
 
-describe(getFloatStyle, () => {
+describe('getFloatStyle', () => {
   it('should return a style string for a width/height and screenWidth over default breakpoint', () => {
     const dimensions = {
       width: 390,

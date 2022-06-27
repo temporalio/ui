@@ -1,6 +1,6 @@
 import { isString, isNull, isObject, isNumber } from './is';
 
-describe(isString, () => {
+describe('isString', () => {
   it('should return true if given a string', () => {
     expect(isString('string')).toBe(true);
   });
@@ -26,7 +26,7 @@ describe(isString, () => {
   });
 });
 
-describe(isNull, () => {
+describe('isNull', () => {
   it('should return true if given null', () => {
     expect(isNull(null)).toBe(true);
   });
@@ -52,7 +52,7 @@ describe(isNull, () => {
   });
 });
 
-describe(isObject, () => {
+describe('isObject', () => {
   it('should return true if given an object', () => {
     expect(isObject({})).toBe(true);
   });
@@ -78,7 +78,7 @@ describe(isObject, () => {
   });
 });
 
-describe(isNumber, () => {
+describe('isNumber', () => {
   it('should return true if given a number', () => {
     expect(isNumber(1)).toBe(true);
   });

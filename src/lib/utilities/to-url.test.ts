@@ -1,6 +1,6 @@
 import { toURL } from './to-url';
 
-describe(toURL, () => {
+describe('toURL', () => {
   it('should take a string for the URL and return it', () => {
     expect(toURL('/workflows')).toBe('/workflows');
   });

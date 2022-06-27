@@ -105,7 +105,7 @@ const workflowEvent = {
   },
 };
 
-describe(formatAttributes, () => {
+describe('formatAttributes', () => {
   it('should remove values thath should not display', () => {
     const formattedAttributes = formatAttributes(workflowEvent);
     expect(formattedAttributes.firstWorkflowTaskBackoff).toBe(undefined);
@@ -122,7 +122,7 @@ describe(formatAttributes, () => {
   });
 });
 
-describe(attributeGroups, () => {
+describe('attributeGroups', () => {
   it('should group attributes', () => {
     const formattedAttributes = formatAttributes(workflowEvent);
     const groups = attributeGroups(workflowEvent, formattedAttributes);

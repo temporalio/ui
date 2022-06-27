@@ -1,6 +1,6 @@
 import { validateHttps, validateHttp, validateHttpOrHttps } from './is-http';
 
-describe(validateHttps, () => {
+describe('validateHttps', () => {
   it('Should return true with valid https endpoint', () => {
     const endpoint = 'https://test.com';
     expect(validateHttps(endpoint)).toBe(true);
@@ -19,7 +19,7 @@ describe(validateHttps, () => {
   });
 });
 
-describe(validateHttp, () => {
+describe('validateHttp', () => {
   it('Should return true with valid http endpoint', () => {
     const endpoint = 'http://test.com';
     expect(validateHttp(endpoint)).toBe(true);
@@ -38,7 +38,7 @@ describe(validateHttp, () => {
   });
 });
 
-describe(validateHttpOrHttps, () => {
+describe('validateHttpOrHttps', () => {
   it('Should return true with valid http endpoint', () => {
     const endpoint = 'http://test.com';
     expect(validateHttp(endpoint)).toBe(true);

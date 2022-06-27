@@ -11,10 +11,14 @@ export default defineConfig({
       $types: path.resolve(__dirname, './src/types'),
       $components: path.resolve(__dirname, './src/lib/components/'),
       $holocene: path.resolve(__dirname, './src/lib/holocene/'),
+      $app: path.resolve(__dirname, './src/lib/svelte-mocks/app/'),
     },
   },
   test: {
     globals: true,
     environment: 'jsdom',
+    deps: {
+      inline: ['date-fns'],
+    },
   },
 });

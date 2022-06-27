@@ -36,7 +36,7 @@ const completedEvent = {
   },
 };
 
-describe(createEventGroup, () => {
+describe('createEventGroup', () => {
   it('should grab the name of the groupTaskScheduledEvent', () => {
     const group = createEventGroup(scheduledEvent);
 

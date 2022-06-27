@@ -1,9 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-
-// Use jsdom jest environment for access to window.atob
-
 import {
   decodePayload,
   decodePayloadAttributes,
@@ -32,6 +26,7 @@ import {
 } from '../stores/data-encoder-config';
 
 import { get } from 'svelte/store';
+import { vi } from 'vitest';
 
 const WebDecodePayload = {
   metadata: {
@@ -74,7 +69,7 @@ const JsonObjectEncoded = {
   data: 'eyAiVHJhbnNmb3JtZXIiOiAiT3B0aW11c1ByaW1lIiB9',
 };
 
-describe(decodePayload, () => {
+describe('decodePayload', () => {
   it('Should not decode a payload with encoding binary/encrypted', () => {
     expect(decodePayload(WebDecodePayload)).toEqual(WebDecodePayload);
   });
@@ -94,7 +89,7 @@ describe(decodePayload, () => {
   });
 });
 
-describe(convertPayloadToJsonWithWebsocket, () => {
+describe('convertPayloadToJsonWithWebsocket', () => {
   afterEach(() => {
     resetLastDataConverterSuccess();
   });
@@ -171,17 +166,17 @@ describe(convertPayloadToJsonWithWebsocket, () => {
   });
 });
 
-describe(convertPayloadToJsonWithCodec, () => {
+describe('convertPayloadToJsonWithCodec', () => {
   afterEach(() => {
     resetLastDataEncoderSuccess();
+    vi.clearAllMocks();
   });
   it('Should convert a payload through data-converter and set the success status when the endpoint is set and the endpoint connects', async () => {
-    // tslint:disable-next-line
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
+    vi.stubGlobal('fetch', async () => {
+      return {
         json: () => Promise.resolve({ payloads: [JsonObjectEncoded] }),
-      }),
-    );
+      };
+    });
 
     const endpoint = 'http://localhost:1337';
     const convertedPayload = await convertPayloadToJsonWithCodec({
@@ -201,11 +196,11 @@ describe(convertPayloadToJsonWithCodec, () => {
   });
   it('Should fail converting a payload through data-converter and set the error status when the endpoint is set and the endpoint fails', async () => {
     // tslint:disable-next-line
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
+    vi.stubGlobal('fetch', async () => {
+      return {
         json: () => Promise.reject(),
-      }),
-    );
+      };
+    });
 
     const endpoint = 'http://localhost:1337';
     const convertedPayload = await convertPayloadToJsonWithCodec({
@@ -242,18 +237,17 @@ describe(convertPayloadToJsonWithCodec, () => {
 });
 
 // Integration test
-describe(getEventAttributes, () => {
+describe('getEventAttributes', () => {
   afterEach(() => {
     resetLastDataEncoderSuccess();
     resetLastDataConverterSuccess();
   });
   it('Should convert a payload through data-converter and set the success status when the endpoint is set locally and the endpoint connects', async () => {
-    // tslint:disable-next-line
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
+    vi.stubGlobal('fetch', async () => {
+      return {
         json: () => Promise.resolve({ payloads: [JsonObjectEncoded] }),
-      }),
-    );
+      };
+    });
 
     const endpoint = 'http://localhost:1337';
     dataEncoderEndpoint.set(endpoint);
@@ -274,11 +268,11 @@ describe(getEventAttributes, () => {
   });
   it('Should convert a payload through data-converter and set the success status when both the endpoint and websocket is set and the endpoint connects', async () => {
     // tslint:disable-next-line
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
+    vi.stubGlobal('fetch', async () => {
+      return {
         json: () => Promise.resolve({ payloads: [JsonObjectEncoded] }),
-      }),
-    );
+      };
+    });
 
     const endpoint = 'http://localhost:1337';
     dataEncoderEndpoint.set(endpoint);

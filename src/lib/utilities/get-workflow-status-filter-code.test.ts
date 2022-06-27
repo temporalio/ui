@@ -1,6 +1,6 @@
 import { getStatusFilterCode } from './get-workflow-status-filter-code';
 
-describe(getStatusFilterCode, () => {
+describe('getStatusFilterCode', () => {
   it('should return "1" if the status is "Running"', () => {
     expect(getStatusFilterCode('Running')).toBe('1');
   });

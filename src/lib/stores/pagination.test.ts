@@ -14,7 +14,7 @@ import {
 
 const oneHundredResolutions = new Array(100).fill(null).map((_, i) => i);
 
-describe(pagination, () => {
+describe('pagination', () => {
   it('should have a pageSize', () => {
     const store = pagination(oneHundredResolutions, 50);
     const { pageSize } = get(store);
@@ -275,19 +275,19 @@ describe(pagination, () => {
   });
 });
 
-describe(getPageForIndex, () => {
+describe('getPageForIndex', () => {
   it('should correctly get the page for a given index', () => {
     expect(getPageForIndex(6, 5)).toBe(2);
   });
 });
 
-describe(getTotalPages, () => {
+describe('getTotalPages', () => {
   it('should correctly calculate the total number of pages', () => {
     expect(getTotalPages(20, oneHundredResolutions)).toBe(5);
   });
 });
 
-describe(getIndex, () => {
+describe('getIndex', () => {
   it('should get the index if it is in the array', () => {
     const things = ['first', 'second', 'third'];
     expect(getIndex(2, things)).toBe(2);
@@ -309,7 +309,7 @@ describe(getIndex, () => {
   });
 });
 
-describe(getValidPage, () => {
+describe('getValidPage', () => {
   it('should return 1 if given the first index of an array', () => {
     expect(getValidPage(0, 20, oneHundredResolutions)).toBe(1);
   });
@@ -327,7 +327,7 @@ describe(getValidPage, () => {
   });
 });
 
-describe(getStartingIndexForPage, () => {
+describe('getStartingIndexForPage', () => {
   it('should return 0 for the first page', () => {
     expect(getStartingIndexForPage(1, 20, oneHundredResolutions)).toBe(0);
   });
@@ -349,7 +349,7 @@ describe(getStartingIndexForPage, () => {
   });
 });
 
-describe(perPageFromSearchParameter, () => {
+describe('perPageFromSearchParameter', () => {
   it('should turn a number into a number', () => {
     expect(perPageFromSearchParameter(123)).toBe(123);
   });
@@ -384,7 +384,7 @@ describe(perPageFromSearchParameter, () => {
   });
 });
 
-describe(perPageOptions, () => {
+describe('perPageOptions', () => {
   it('should return the default options', () => {
     expect(perPageOptions(undefined)).toEqual(['100', '250', '500']);
   });

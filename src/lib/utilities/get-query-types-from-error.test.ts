@@ -26,7 +26,7 @@ const javaSDKError = {
   ],
 };
 
-describe(getQueryTypesFromError, () => {
+describe('getQueryTypesFromError', () => {
   it('should return an array of query types', () => {
     const queryTypes = ['__open_sessions'];
     expect(getQueryTypesFromError(error.message)).toEqual(queryTypes);

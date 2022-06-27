@@ -6,7 +6,7 @@ const networkErr = {
   response: {},
 };
 
-describe(isNetworkError, () => {
+describe('isNetworkError', () => {
   it('Should infer a networkError error with the correct shape', () => {
     try {
       throw networkErr;

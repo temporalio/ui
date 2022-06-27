@@ -1,8 +1,14 @@
+import { vi } from 'vitest';
 import { toListWorkflowQuery } from './list-workflow-query';
 
-describe(toListWorkflowQuery, () => {
+describe('toListWorkflowQuery', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2020-01-01').getTime());
+  });
+
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should convert an executionStatus', () => {
@@ -11,7 +17,6 @@ describe(toListWorkflowQuery, () => {
   });
 
   it('should convert an timeRange with a Duration as a value', () => {
-    jest.useFakeTimers().setSystemTime(new Date('2020-01-01').getTime());
     const tomorrow = '2020-01-02T00:00:00Z';
     const twentyFourHoursEarlier = '2019-12-31T00:00:00Z';
 
@@ -23,7 +28,6 @@ describe(toListWorkflowQuery, () => {
   });
 
   it('should convert an timeRange with a Duration as a value when archived', () => {
-    jest.useFakeTimers().setSystemTime(new Date('2020-01-01').getTime());
     const twentyFourHoursEarlier = '2019-12-31T00:00:00Z';
 
     const query = toListWorkflowQuery({ timeRange: { days: 1 } }, true);

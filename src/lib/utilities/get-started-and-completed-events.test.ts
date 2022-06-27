@@ -1,6 +1,6 @@
 import { getWorkflowStartedAndCompletedEvents } from './get-started-and-completed-events';
 
-describe(getWorkflowStartedAndCompletedEvents, () => {
+describe('getWorkflowStartedAndCompletedEvents', () => {
   it('should return null if the input is null', () => {
     const workflowStartedEvent = {
       eventId: '1',

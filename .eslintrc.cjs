@@ -28,10 +28,6 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['src/**/*.test.js'],
-      extends: ['plugin:jest/recommended'],
-    },
-    {
       files: ['cypress/**/*.js'],
       extends: ['plugin:cypress/recommended'],
     },

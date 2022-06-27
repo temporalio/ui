@@ -110,7 +110,7 @@ const getSettings = (
   };
 };
 
-describe(getNamespace, () => {
+describe('getNamespace', () => {
   it('should return default namespace if no namespace given', () => {
     const namespaces = [defaultNamespace, canaryNamespace];
     expect(getNamespace({ namespaces, defaultNamespace: 'default' })).toEqual(
@@ -145,7 +145,7 @@ describe(getNamespace, () => {
   });
 });
 
-describe(getDefaultNamespace, () => {
+describe('getDefaultNamespace', () => {
   it('should return default namespace if it exists in namespaces and matches defaultNamespace setting', () => {
     const namespaces = [defaultNamespace];
     const settings = getSettings('default', false);
