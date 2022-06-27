@@ -76,6 +76,7 @@
     "google-protobuf": "^3.17.3",
     "husky": "^7.0.2",
     "jest-websocket-mock": "^2.2.1",
+    "jsdom": "^20.0.0",
     "mock-socket": "^9.1.0",
     "postcss": "^8.4.5",
     "postcss-cli": "^9.1.0",

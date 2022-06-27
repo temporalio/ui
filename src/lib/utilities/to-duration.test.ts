@@ -98,14 +98,14 @@ describe('toDate', () => {
     vi.useRealTimers();
   });
 
-  it.todo('should produce a date based on a duration', () => {
+  it('should produce a date based on a duration', () => {
     const ninetyDaysEarlier = '2019-10-03T00:00:00Z';
 
     const result = toDate({ days: 90 });
     expect(result).toBe(ninetyDaysEarlier);
   });
 
-  it.todo('should produce a date based on a duration string', () => {
+  it('should produce a date based on a duration string', () => {
     const ninetyDaysEarlier = '2019-10-03T00:00:00Z';
 
     const result = toDate('90 days');
@@ -130,11 +130,11 @@ describe('fromDate', () => {
     expect(result).toMatchObject({ years: 2 });
   });
 
-  it.todo('should produce a duration based on a 90 days in the past', () => {
+  it('should produce a duration based on a 90 days in the past', () => {
     const ninetyDaysEarlier = '2019-10-03T00:00:00Z';
 
     const result = fromDate(ninetyDaysEarlier);
-    expect(result).toMatchObject({ months: 2, days: 30 });
+    expect(result).toMatchObject({ months: 2, days: 29 });
   });
 
   it('should produce a duration based on a 60 days in the past', () => {
