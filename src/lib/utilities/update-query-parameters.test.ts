@@ -1,4 +1,5 @@
-import { vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
 import { updateQueryParameters } from './update-query-parameters';
 
 const gotoOptions = { replaceState: true, keepfocus: true, noscroll: true };

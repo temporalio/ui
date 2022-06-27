@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { encodeURIForSvelte, decodeURIForSvelte } from './encode-uri';
 
 describe('encodeURIForSvelte', () => {

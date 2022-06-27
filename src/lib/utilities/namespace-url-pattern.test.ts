@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { namespaceUrlPattern } from './namespace-url-pattern';
 
 describe('Namespace Url Pattern', () => {

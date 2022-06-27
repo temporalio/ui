@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { paginated } from './paginated';
 
 const getPage = async (token: string | Uint8Array = null) => {

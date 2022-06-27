@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { createEventGroup } from './create-event-group';
 
 const scheduledEvent = {

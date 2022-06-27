@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getFloatStyle } from './get-float-style';
 
 describe('getFloatStyle', () => {

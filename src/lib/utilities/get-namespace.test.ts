@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getDefaultNamespace, getNamespace } from './get-namespace';
 
 const temporalSystemNamespace = {

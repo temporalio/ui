@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getQueryTypesFromError } from './get-query-types-from-error';
 
 const error = {

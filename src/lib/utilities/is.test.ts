@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { isString, isNull, isObject, isNumber } from './is';
 
 describe('isString', () => {

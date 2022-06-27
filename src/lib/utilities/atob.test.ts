@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { base64DecodeUnicode } from './atob';
 
 describe('base64DecodeUnicode', () => {

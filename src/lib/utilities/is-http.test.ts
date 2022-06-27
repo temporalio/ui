@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { validateHttps, validateHttp, validateHttpOrHttps } from './is-http';
 
 describe('validateHttps', () => {
