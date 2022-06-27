@@ -1,6 +1,7 @@
+import { describe, expect, it } from 'vitest';
 import { format } from './format-camel-case';
 
-describe(format, () => {
+describe('format', () => {
   it('should format WorkflowExecutionStarted as "Workflow Execution Started"', () => {
     expect(format('WorkflowExecutionStarted')).toBe(
       'Workflow Execution Started',

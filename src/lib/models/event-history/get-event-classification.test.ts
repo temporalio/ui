@@ -1,6 +1,6 @@
 import { getEventClassification } from './get-event-classification';
 
-describe(getEventClassification, () => {
+describe('getEventClassification', () => {
   it('should return "Started" for WorkflowExecutionStartedEvent', () => {
     expect(getEventClassification('WorkflowExecutionStartedEvent')).toBe(
       'Started',

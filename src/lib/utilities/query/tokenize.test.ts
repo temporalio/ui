@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { tokenize } from './tokenize';
 
 const executionStatusQuery = 'ExecutionStatus="Completed"';
@@ -7,7 +8,7 @@ const workflowQuery = 'WorkflowId="Hello" and WorkflowType="World"';
 const combinedQuery =
   'WorkflowId="Hello" and WorkflowType="World" and StartTime BETWEEN "2022-04-18T18:09:49-06:00" AND "2022-04-20T18:09:49-06:00"';
 
-describe(tokenize, () => {
+describe('tokenize', () => {
   it('should eliminate spaces', () => {
     const query = 'one and two';
 

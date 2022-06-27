@@ -1,6 +1,7 @@
+import { describe, expect, it } from 'vitest';
 import { merge } from './merge';
 
-describe(merge, () => {
+describe('merge', () => {
   it('should overwrite keys if they are primitive values', () => {
     const first = { a: 1 };
     const second = { a: 2 };

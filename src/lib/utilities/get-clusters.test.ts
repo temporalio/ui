@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getClusters } from './get-clusters';
 
 const getNamespace = (clusters: string[], activeClusterName: string) => ({
@@ -28,7 +29,7 @@ const getNamespace = (clusters: string[], activeClusterName: string) => ({
   isGlobalNamespace: false,
 });
 
-describe(getClusters, () => {
+describe('getClusters', () => {
   it('should return single active cluster', () => {
     const namespace = getNamespace(['us-east'], 'us-east');
     const clusters = getClusters(namespace);

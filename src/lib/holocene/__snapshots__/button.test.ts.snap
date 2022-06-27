@@ -1,0 +1,13 @@
+// Vitest Snapshot v1
+
+exports[`Button > default 1`] = `"<button class=\\"primary flex items-center justify-center gap-2 text-sm undefined svelte-11nd9lu\\"> </button>"`;
+
+exports[`Button > disabled 1`] = `"<button class=\\"primary flex items-center justify-center gap-2 text-sm undefined svelte-11nd9lu\\" disabled=\\"\\"> </button>"`;
+
+exports[`Button > icon 1`] = `"<button class=\\"primary flex items-center justify-center gap-2 text-sm undefined svelte-11nd9lu\\"><span><svg width=\\"24\\" height=\\"24\\" fill=\\"none\\" viewBox=\\"0 0 24 24\\" xmlns=\\"http://www.w3.org/2000/svg\\"><g transform=\\"translate(12 12)\\" transform-origin=\\"6 0\\"><g transform=\\"scale(1) rotate(0)\\"><path d=\\"M6 20H18\\" stroke=\\"currentcolor\\" stroke-linecap=\\"round\\" stroke-linejoin=\\"round\\" stroke-width=\\"1.5\\" fill=\\"\\" transform=\\"translate(-12 -12)\\"></path><path d=\\"M12 16L8.5 12.5M12 4V16V4ZM12 16L15.5 12.5L12 16Z\\" stroke=\\"currentcolor\\" stroke-linecap=\\"round\\" stroke-linejoin=\\"round\\" stroke-width=\\"1.5\\" fill=\\"\\" transform=\\"translate(-12 -12)\\"></path></g></g></svg></span> </button>"`;
+
+exports[`Button > loading 1`] = `"<button class=\\"primary flex items-center justify-center gap-2 text-sm undefined svelte-11nd9lu\\"> </button>"`;
+
+exports[`Button > secondary 1`] = `"<button class=\\"primary flex items-center justify-center gap-2 text-sm undefined svelte-11nd9lu secondary\\"> </button>"`;
+
+exports[`Button > secondary disabled 1`] = `"<button class=\\"primary flex items-center justify-center gap-2 text-sm undefined svelte-11nd9lu secondary\\"> </button>"`;

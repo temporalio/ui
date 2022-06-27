@@ -1,6 +1,7 @@
+import { describe, expect, it } from 'vitest';
 import { getTruncatedWord } from './get-truncated-word';
 
-describe(getTruncatedWord, () => {
+describe('getTruncatedWord', () => {
   it('should return same word if the width is wider than word', () => {
     expect(getTruncatedWord('Running', 100)).toBe('Running');
   });

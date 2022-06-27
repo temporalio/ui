@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { pathMatches } from './path-matches';
 
 describe('pathMatches', () => {

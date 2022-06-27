@@ -1,8 +1,7 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-jest.mock('$app/navigation', () => jest.fn({ goto: () => false } as any));
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { paginated } from './paginated';
 
-const fetchMock = async (token: string | Uint8Array = null) => {
+const getPage = async (token: string | Uint8Array = null) => {
   if (!token)
     return {
       items: [1, 2, 3],
@@ -28,12 +27,17 @@ const fetchMock = async (token: string | Uint8Array = null) => {
     };
 };
 
-describe(paginated, () => {
+describe('paginated', () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('should be a function', () => {
     expect(typeof paginated).toBe('function');
   });
 
   it('should return a promise with the first page of data', () => {
+    const fetchMock = vi.fn().mockImplementation(getPage);
     return paginated((token) => fetchMock(token)).then((result) =>
       expect(result).toEqual({
         items: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
@@ -42,7 +46,8 @@ describe(paginated, () => {
   });
 
   it('should collect incremental updates with an onUpdate callback', () => {
-    const mockCallback = jest.fn((x) => x);
+    const fetchMock = vi.fn().mockImplementation(getPage);
+    const mockCallback = vi.fn().mockImplementation((x) => x);
     return paginated((token) => fetchMock(token), {
       onUpdate: mockCallback,
     }).then(() => {
