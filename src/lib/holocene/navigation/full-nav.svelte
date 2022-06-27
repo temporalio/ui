@@ -77,6 +77,14 @@
       </Tooltip>
       <div class="nav-title">Workflows</div>
     </NavRow>
+    <NavRow link={linkList.namespaces} {isCloud} data-cy="namespaces-button">
+      <Tooltip right hide={$navOpen} text="Namespaces">
+        <div class="nav-icon">
+          <Icon name="namespace" scale={1.5} />
+        </div>
+      </Tooltip>
+      <div class="nav-title">Namespaces</div>
+    </NavRow>
     <IsCloudGuard {isCloud}>
       <NavRow link={linkList.archive} {isCloud} data-cy="archive-button">
         <Tooltip right hide={$navOpen} text="Archive">
