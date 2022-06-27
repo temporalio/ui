@@ -1,13 +1,25 @@
-let base =
-  globalThis?.AppConfig?.baseUrl ??
-  (import.meta.env?.VITE_API as string) ??
-  process.env.VITE_API;
+const replaceNamespaceInApiUrl = (
+  apiUrl: string,
+  namespace: string,
+): string => {
+  return apiUrl.replace('%namespace%', namespace);
+};
 
-if (base.endsWith('/')) base = base.slice(0, -1);
+const base = (namespace?: string): string => {
+  let baseUrl = '';
+  if (globalThis?.AppConfig?.apiUrl && namespace) {
+    baseUrl = replaceNamespaceInApiUrl(globalThis.AppConfig.apiUrl, namespace);
+  } else {
+    baseUrl = (import.meta.env?.VITE_API as string) ?? process.env.VITE_API;
+  }
 
-const withBase = (endpoint: string): string => {
+  if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+  return baseUrl;
+};
+
+const withBase = (endpoint: string, namespace?: string): string => {
   if (endpoint.startsWith('/')) endpoint = endpoint.slice(1);
-  return `${base}/api/v1/${endpoint}`;
+  return `${base(namespace)}/api/v1/${endpoint}`;
 };
 
 const encode = (parameters: APIRouteParameters): APIRouteParameters => {
@@ -63,5 +75,5 @@ export function routeForApi(
     query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/query`,
   };
 
-  return withBase(routes[route]);
+  return withBase(routes[route], parameters?.namespace);
 }
