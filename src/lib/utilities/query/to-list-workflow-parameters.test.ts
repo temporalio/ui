@@ -1,4 +1,5 @@
 import { parseISO } from 'date-fns';
+import { describe, expect, it, vi } from 'vitest';
 import { toListWorkflowParameters } from './to-list-workflow-parameters';
 
 const executionStatusQuery = 'ExecutionStatus="Completed"';
@@ -15,9 +16,9 @@ const defaultParameters = {
   timeRange: null,
 };
 
-describe(toListWorkflowParameters, () => {
+describe('toListWorkflowParameters', () => {
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should parse a query with an executionStatus', () => {
@@ -52,9 +53,9 @@ describe(toListWorkflowParameters, () => {
   });
 
   it('should parse a query with an startTime', () => {
-    jest
-      .useFakeTimers()
-      .setSystemTime(parseISO('2022-04-20T17:45:18-06:00').getTime());
+    vi.useFakeTimers().setSystemTime(
+      parseISO('2022-04-20T17:45:18-06:00').getTime(),
+    );
     const result = toListWorkflowParameters(startTimeQuery);
 
     expect(result).toEqual({ ...defaultParameters, timeRange: '2 days' });

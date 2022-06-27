@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import {
   getDuration,
   formatDistance,
@@ -5,7 +6,7 @@ import {
   fromSecondsToDaysOrHours,
 } from './format-date';
 
-describe(getDuration, () => {
+describe('getDuration', () => {
   it('should get no duration of a start and end date within same second', () => {
     const start = '2022-04-13T16:29:35.630571Z';
     const end = '2022-04-13T16:29:35.630609Z';
@@ -108,6 +109,7 @@ describe(getDuration, () => {
     expect(distance).toBe('7 months, 11 days, 5 hours, 5 minutes, 45 seconds');
     expect(abbvDistancer).toBe('7months 11d 5h 5m 45s');
   });
+
   it('should get months/days/hours/minutes/seconds duration of a start and end date', () => {
     const start = '2020-02-02T16:51:02.630571Z';
     const end = '2022-11-13T21:35:21.300609Z';
@@ -129,7 +131,7 @@ describe(getDuration, () => {
   });
 });
 
-describe(fromSecondsToDaysOrHours, () => {
+describe('fromSecondsToDaysOrHours', () => {
   it('should return "1 day" for 86400 seconds', () => {
     const seconds = '86400s';
     expect(fromSecondsToDaysOrHours(seconds)).toBe('1 day');

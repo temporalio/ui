@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { groupEvents } from './';
 
 const scheduledEvent = {
@@ -80,7 +81,7 @@ const eventHistory = [
   completedEvent,
 ];
 
-describe(groupEvents, () => {
+describe('groupEvents', () => {
   it('should create a new entry when given a scheduled event', () => {
     const groups = groupEvents([scheduledEvent]);
     const group = groups.find(({ id }) => id === scheduledEvent.id);

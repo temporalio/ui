@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { isCloudMatch } from './settings-service';
 
 describe('isCloudMatch', () => {
