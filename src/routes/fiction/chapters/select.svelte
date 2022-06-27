@@ -53,15 +53,14 @@
     },
   ];
 
-  const favoriteDrink = writable<OptionType<string> | undefined>(undefined);
-  const favoriteFood = writable<OptionType<string>>(foodOptions[0]);
-  const favoriteAnimal = writable<OptionType<string>>(animalOptions[2]);
-  const favoriteNumber = writable<OptionType<number>>();
+  const favoriteDrink = writable<OptionType>();
+  const favoriteFood = writable<OptionType>(foodOptions[0]);
+  const favoriteAnimal = writable<OptionType>(animalOptions[2]);
+  const favoriteNumber = writable<OptionType>();
+  const favoriteLetter = writable<string>();
 
-  function handleAnimalClick(
-    event: CustomEvent<{ option: OptionType<string> }>,
-  ) {
-    favoriteAnimal.set(event.detail.option);
+  function handleAnimalClick(event: CustomEvent<{ value: OptionType }>) {
+    favoriteAnimal.set(event.detail.value);
   }
 </script>
 
@@ -71,18 +70,20 @@
     id="favorite-drink"
     options={drinkOptions}
     value={$favoriteDrink}
-    on:change={(event) => favoriteDrink.set(event.detail.option)}
+    on:change={(event) => favoriteDrink.set(event.detail.value)}
   />
 </Chapter>
 
-<Chapter description="A dark select dropdown with option descriptions">
+<Chapter
+  description="A dark select dropdown with option descriptions and a default value"
+>
   <Select
     label="Favorite Food"
     id="favorite-food"
     dark
     options={foodOptions}
     value={$favoriteFood}
-    on:change={(event) => favoriteFood.set(event.detail.option)}
+    on:change={(event) => favoriteFood.set(event.detail.value)}
   />
 </Chapter>
 
@@ -90,8 +91,8 @@
   <Select label="Favorite Animal" id="favorite-animal" value={$favoriteAnimal}>
     {#each animalOptions as option}
       <Option
-        {...option}
-        on:click={handleAnimalClick}
+        value={option}
+        on:select={handleAnimalClick}
         selected={option.value == $favoriteAnimal.value}
       />
     {/each}
@@ -103,9 +104,21 @@
     label="Favorite Number"
     id="favorite-number"
     value={$favoriteNumber}
-    on:change={(event) => favoriteNumber.set(event.detail.option)}
+    on:change={(event) => favoriteNumber.set(event.detail.value)}
     options={new Array(20)
       .fill(undefined)
       .map((_, i) => ({ label: `Number ${i}`, value: i }))}
   />
+</Chapter>
+
+<Chapter description="A select dropdown with string values only">
+  <Select label="Favorite Letter" id="favorite letter" value={$favoriteLetter}>
+    {#each 'abcdefghijklmnop'.split('') as option}
+      <Option
+        on:select={(event) => favoriteLetter.set(event.detail.value)}
+        value={option}
+        selected={option === $favoriteLetter}
+      />
+    {/each}
+  </Select>
 </Chapter>

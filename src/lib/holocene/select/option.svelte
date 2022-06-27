@@ -1,16 +1,16 @@
 <script lang="ts" context="module">
-  export interface Option<T> {
+  export interface Option {
     label: string;
-    value: T;
+    value: string | boolean | number;
     description?: string;
   }
 
-  export const EMPTY_OPTION: Option<any> = {
+  export const EMPTY_OPTION: Option = {
     label: '',
     value: '',
   };
 
-  export const isOption = (x: unknown): x is Option<unknown> => {
+  export const isOption = (x: unknown): x is Option => {
     return x.hasOwnProperty('label') && x.hasOwnProperty('value');
   };
 </script>
@@ -20,26 +20,34 @@
   import Icon from '$lib/holocene/icon/index.svelte';
 
   type T = $$Generic;
-  export let label: Option<T>['label'];
-  export let value: Option<T>['value'];
-  export let description: Option<T>['description'] = '';
+
+  export let value: T;
   export let selected: boolean;
   export let dark: boolean = false;
 
-  const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher<{ select: { value: T } }>();
 
   function handleOptionClick() {
-    dispatch('click', { option: { label, value, description } });
+    dispatch('select', { value });
+  }
+
+  let label: string | T;
+  let description: string | undefined;
+
+  if (isOption(value)) {
+    ({ label, description } = value);
+  } else {
+    label = value;
   }
 </script>
 
-<div on:click={handleOptionClick} class="option" class:dark {value}>
-  <div class="w-6 mr-2">
+<div on:click={handleOptionClick} class="option" class:dark>
+  <div class="mr-2 w-6">
     {#if selected}
       <Icon stroke="currentcolor" name="checkMark" scale={0.9} />
     {/if}
   </div>
-  <div class="flex flex-col w-full">
+  <div class="flex w-full flex-col">
     <span class="option-label">{label}</span>
     {#if description}
       <span class="option-description">
@@ -51,15 +59,15 @@
 
 <style lang="postcss">
   .option {
-    @apply rounded-sm w-full flex flex-row p-4 cursor-pointer bg-white text-gray-900 hover:bg-gray-50;
+    @apply flex w-full cursor-pointer flex-row rounded-sm bg-white p-4 text-gray-900 hover:bg-gray-50;
   }
 
   .option-label {
-    @apply flex font-medium font-poppins;
+    @apply flex font-poppins font-medium;
   }
 
   .option-description {
-    @apply flex font-normal font-inter;
+    @apply flex font-inter font-normal;
   }
 
   .option.dark {

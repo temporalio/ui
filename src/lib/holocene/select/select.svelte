@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import Icon from '$lib/holocene/icon/index.svelte';
-  import Option, { EMPTY_OPTION } from '$lib/holocene/select/option.svelte';
+  import Option, { isOption } from '$lib/holocene/select/option.svelte';
   import type { Option as OptionType } from '$lib/holocene/select/option.svelte';
 
   let container: HTMLDivElement;
@@ -10,25 +10,36 @@
 
   type T = $$Generic;
 
-  export let label: string;
+  export let label: string = '';
   export let id: string;
-  export let value: OptionType<T> = EMPTY_OPTION;
-  export let options: Array<typeof value> | undefined = undefined;
+  export let value: T;
+  export let options: T[] | undefined = undefined;
   export let dark: boolean = false;
 
-  $: selectedOption = options?.find((option) => option.value === value.value);
+  let _value: OptionType['value'] | T;
+  let _selected: string | T;
+  $: {
+    if (value) {
+      if (isOption(value)) {
+        _value = value.value;
+        _selected = value.label;
+      } else {
+        _value = value;
+        _selected = value;
+      }
+    } else {
+      _selected = '';
+    }
+  }
 
-  const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher<{ change: { value: T } }>();
 
   function handleContainerClick() {
     open = !open;
   }
 
-  function handleOptionClick(event: CustomEvent<{ option: OptionType<T> }>) {
-    const { option } = event.detail;
-    if (option.value !== value.value) {
-      dispatch('change', { option });
-    }
+  function handleOptionClick(event: CustomEvent<{ value: T }>) {
+    dispatch('change', { value: event.detail.value });
     open = false;
   }
 
@@ -56,7 +67,7 @@
 
 <svelte:window on:click={handleOutsideClick} on:resize={handleWindowResize} />
 
-<div class={$$props.class}>
+<div data-cy={$$props.dataCy} class={$$props.class}>
   <label class="mb-2" for={id}>{label}</label>
   <div
     class="container"
@@ -68,7 +79,7 @@
     <input
       class="input"
       placeholder={label}
-      value={selectedOption ? selectedOption.label : value.label}
+      value={_selected}
       name={id}
       disabled
       {id}
@@ -78,14 +89,13 @@
   {#if open}
     <div class="options" class:dark style="width: {dropdownWidth}px">
       {#if options}
-        {#each options as { label, value: optionValue, description }}
+        {#each options as option}
+          {@const value = isOption(option) ? option.value : _value}
           <Option
-            on:click={handleOptionClick}
-            value={optionValue}
-            selected={optionValue === value.value}
+            on:select={handleOptionClick}
+            selected={value === _value}
             {dark}
-            {label}
-            {description}
+            value={option}
           />
         {/each}
       {:else}
@@ -97,7 +107,7 @@
 
 <style lang="postcss">
   .container {
-    @apply flex flex-row justify-between items-center h-10 w-full rounded-sm border border-gray-900 text-base bg-white px-2;
+    @apply flex h-10 w-full flex-row items-center justify-between rounded-sm border border-gray-900 bg-white px-2 text-base;
   }
 
   .container.open {
@@ -114,11 +124,11 @@
   }
 
   .input {
-    @apply w-full h-full bg-white cursor-pointer;
+    @apply h-full w-full cursor-pointer bg-white;
   }
 
   .options {
-    @apply rounded-sm bg-white fixed border border-gray-900 mt-1 max-h-60 overflow-y-scroll;
+    @apply fixed mt-1 max-h-60 overflow-y-scroll rounded-sm border border-gray-900 bg-white;
     box-shadow: 0 2px 2px 0 rgb(0, 0, 0, 0.15);
   }
 
