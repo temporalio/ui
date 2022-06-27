@@ -1,6 +1,7 @@
+import { describe, expect, it } from 'vitest';
 import { isRecommendedVersionNewer } from './version-check';
 
-describe(isRecommendedVersionNewer, () => {
+describe('isRecommendedVersionNewer', () => {
   it('should return true when recommended version is higher than current', () => {
     expect(isRecommendedVersionNewer('2.01.1', '1.01.1')).toBe(true);
     expect(isRecommendedVersionNewer('1.02.1', '1.01.1')).toBe(true);

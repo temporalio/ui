@@ -12,7 +12,7 @@ const createAttributes = () => {
   };
 };
 
-describe(simplifyAttributes, () => {
+describe('simplifyAttributes', () => {
   it('should take single key attributes and reduce them down to their values', () => {
     const attributes = createAttributes();
     const { shouldBeSimple } = simplifyAttributes(attributes);

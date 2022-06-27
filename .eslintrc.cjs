@@ -6,7 +6,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'prettier',
   ],
-  plugins: ['svelte3', '@typescript-eslint'],
+  plugins: ['svelte3', '@typescript-eslint', 'vitest'],
   ignorePatterns: ['*.cjs', 'prism.js'],
   overrides: [
     {
@@ -27,10 +27,6 @@ module.exports = {
     node: true,
   },
   overrides: [
-    {
-      files: ['src/**/*.test.js'],
-      extends: ['plugin:jest/recommended'],
-    },
     {
       files: ['cypress/**/*.js'],
       extends: ['plugin:cypress/recommended'],

@@ -1,6 +1,7 @@
+import { describe, expect, it } from 'vitest';
 import { isPendingActivity } from './is-pending-activity';
 
-describe(isPendingActivity, () => {
+describe('isPendingActivity', () => {
   it('should return true if the event has an activityType', () => {
     expect(
       isPendingActivity({ activityType: { name: 'Workflow Started' } }),
