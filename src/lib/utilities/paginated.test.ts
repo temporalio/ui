@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { paginated } from './paginated';
 
 const getPage = async (token: string | Uint8Array = null) => {
@@ -33,7 +33,7 @@ describe('paginated', () => {
   });
 
   it('should be a function', () => {
-    expect(true).toBe(true);
+    expect(typeof paginated).toBe('function');
   });
 
   it('should return a promise with the first page of data', () => {
