@@ -6,3 +6,5 @@ node_modules
 /build-local
 /build-cloud
 /coverage
+*.log
+*.swp

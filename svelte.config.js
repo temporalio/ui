@@ -44,6 +44,7 @@ const config = {
       resolve: {
         alias: {
           $types: path.resolve('./src/types'),
+          $holocene: path.resolve('./src/lib/holocene'),
         },
       },
     },
