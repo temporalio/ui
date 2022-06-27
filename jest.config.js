@@ -6,7 +6,7 @@ export default {
   preset: 'ts-jest',
   testEnvironment: 'node',
   testMatch: ['<rootDir>/**/*.test.ts', '<rootDir>/**/*.test.js'],
-  testPathIgnorePatterns: ['/node_modules/'],
+  testPathIgnorePatterns: ['/node_modules/', 'src/lib/holocene/'],
   moduleNameMapper: {
     '^\\$lib/(.*)$': '<rootDir>/src/lib/$1',
     '^\\$types/(.*)$': '<rootDir>/src/types/$1',

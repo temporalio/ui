@@ -2,7 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "isolatedModules": false,
-    "types": ["jest"]
+    "types": ["jest", "vitest/globals"]
   },
   "include": ["src/**/*.test.ts"]
 }

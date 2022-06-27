@@ -26,7 +26,8 @@
     "paths": {
       "$lib/*": ["src/lib/*"],
       "$types": ["src/types"],
-      "$components/*": ["src/components/*"]
+      "$components/*": ["src/components/*"],
+      "$holocene/*": ["src/lib/holocene/*"]
     }
   },
   "include": ["src/**/*.d.ts", "src/**/*.js", "src/**/*.ts", "src/**/*.svelte"],
