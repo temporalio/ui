@@ -1,10 +1,6 @@
-/**
- * @jest-environment jsdom
- */
-
 import { isEvent } from '.';
 
-describe(isEvent, () => {
+describe('isEvent', () => {
   it('should return true if the event has an eventType', () => {
     expect(isEvent({ eventType: 'Workflow Started' })).toBe(true);
   });
