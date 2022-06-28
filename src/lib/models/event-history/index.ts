@@ -26,8 +26,8 @@ export async function getEventAttributes({
   const { key, attributes } = findAttributesAndKey(historyEvent);
   // Use locally set endpoint over settings endpoint for testing purposes
   const endpoint: string =
-    get(dataEncoderEndpoint) || settings.codec?.endpoint || '';
-  const _settings = { ...settings, codec: { ...settings.codec, endpoint } };
+    get(dataEncoderEndpoint) || settings?.codec?.endpoint || '';
+  const _settings = { ...settings, codec: { ...settings?.codec, endpoint } };
 
   const convertedAttributes = endpoint
     ? await convertPayloadToJsonWithCodec({

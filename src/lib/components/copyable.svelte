@@ -1,5 +1,6 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/index.svelte';
+  import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { noop } from 'svelte/internal';
 
   export let content: string;
@@ -7,19 +8,7 @@
   export let color = 'black';
   export let clickAllToCopy = false;
 
-  let copied = false;
-
-  const copy = (event: Event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    navigator.clipboard
-      .writeText(content)
-      .then(() => {
-        copied = !copied;
-        setTimeout(() => (copied = false), 500);
-      })
-      .catch((error) => console.error(error));
-  };
+  const { copy, copied } = copyToClipboard(content, 500);
 </script>
 
 <div
@@ -33,7 +22,7 @@
   </slot>
   <button on:click={copy}>
     <Icon
-      name={copied ? 'checkMark' : 'copy'}
+      name={$copied ? 'checkMark' : 'copy'}
       stroke={color}
       class={`${visible ? 'visible' : 'invisible group-hover:visible'} h-4`}
     />

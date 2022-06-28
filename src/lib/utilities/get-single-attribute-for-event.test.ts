@@ -1,9 +1,10 @@
+import { describe, expect, it } from 'vitest';
 import {
   getSingleAttributeForEvent,
-  shouldDisplayAsWorkflowLink,
+  shouldDisplayAsExecutionLink,
 } from './get-single-attribute-for-event';
 
-describe(getSingleAttributeForEvent, () => {
+describe('getSingleAttributeForEvent', () => {
   const workflowEvent = {
     eventId: '1',
     eventTime: '2022-03-14T17:44:14.996241458Z',
@@ -143,17 +144,17 @@ describe(getSingleAttributeForEvent, () => {
   });
 });
 
-describe(shouldDisplayAsWorkflowLink, () => {
+describe('shouldDisplayAsExecutionLink', () => {
   it('should return true for event keys that end with RunId', () => {
-    expect(shouldDisplayAsWorkflowLink('originalExecutionRunId')).toBe(true);
-    expect(shouldDisplayAsWorkflowLink('firstExecutionRunId')).toBe(true);
-    expect(shouldDisplayAsWorkflowLink('continuedExecutionRunId')).toBe(true);
+    expect(shouldDisplayAsExecutionLink('originalExecutionRunId')).toBe(true);
+    expect(shouldDisplayAsExecutionLink('firstExecutionRunId')).toBe(true);
+    expect(shouldDisplayAsExecutionLink('continuedExecutionRunId')).toBe(true);
   });
 
   it('should return false for event keys that do not end with RunId', () => {
-    expect(shouldDisplayAsWorkflowLink('')).toBe(false);
-    expect(shouldDisplayAsWorkflowLink('workflowType.name')).toBe(false);
-    expect(shouldDisplayAsWorkflowLink('parentInitiatedEventId')).toBe(false);
-    expect(shouldDisplayAsWorkflowLink('inlineRunIdSample')).toBe(false);
+    expect(shouldDisplayAsExecutionLink('')).toBe(false);
+    expect(shouldDisplayAsExecutionLink('workflowType.name')).toBe(false);
+    expect(shouldDisplayAsExecutionLink('parentInitiatedEventId')).toBe(false);
+    expect(shouldDisplayAsExecutionLink('inlineRunIdSample')).toBe(false);
   });
 });

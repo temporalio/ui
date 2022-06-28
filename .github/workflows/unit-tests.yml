@@ -16,7 +16,7 @@ jobs:
           version: 7
       - name: Install modules
         run: pnpm install
-      - name: Populate .svelte-dir with files for jest
+      - name: Populate .svelte-dir with files for vitest
         run: pnpm run build:local
       - name: Run tests
         run: pnpm test

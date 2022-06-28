@@ -51,10 +51,13 @@
         "visibilityArchivalUri": ""
       },
       "replicationConfig": {
-        "activeClusterName": "active",
+        "activeClusterName": "us-east1",
         "clusters": [
           {
-            "clusterName": "active"
+            "clusterName": "us-east1"
+          },
+          {
+            "clusterName": "us-east2"
           }
         ],
         "state": "Unspecified"

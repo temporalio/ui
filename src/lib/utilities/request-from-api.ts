@@ -36,7 +36,6 @@ export const isTemporalAPIError = (obj: unknown): obj is TemporalAPIError =>
  *
  * @param endpoint The path of the API endpoint you want to request data from.
  *
- * @param options Additional options to be used when making the API request.
  * @param options.params Query (or search) parameters to be suffixed to the
  * path.
  * @param options.token Shorthand for a `nextPageToken` query parameter.
@@ -69,6 +68,13 @@ export const requestFromAPI = async <T>(
 
   try {
     options = withSecurityOptions(options);
+
+    if (globalThis?.AccessToken) {
+      options.headers = await withBearerToken(
+        options?.headers,
+        globalThis.AccessToken,
+      );
+    }
 
     const response = await request(url, options);
     const body = await response.json();
@@ -110,6 +116,25 @@ const withSecurityOptions = (options: RequestInit): RequestInit => {
   const opts: RequestInit = { credentials: 'include', ...options };
   opts.headers = withCsrf(options?.headers);
   return opts;
+};
+
+const withBearerToken = async (
+  headers: HeadersInit,
+  accessToken: () => Promise<string>,
+): Promise<HeadersInit> => {
+  if (!browser) return headers;
+  if (!headers) headers = {};
+
+  try {
+    const token = await accessToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+  } catch (e) {
+    console.error(e);
+  }
+
+  return headers;
 };
 
 const withCsrf = (headers: HeadersInit): HeadersInit => {

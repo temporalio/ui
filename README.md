@@ -4,6 +4,8 @@
 
 Temporal must be running in development. (For details, see [Run a dev Cluster](https://docs.temporal.io/application-development-guide#run-a-dev-cluster) in the documentation.)
 
+Temporal UI requires [Temporal v1.16.0](https://github.com/temporalio/temporal/releases/tag/v1.16.0) or later.
+
 ## Trying it out
 
 After pulling down the lastest version of Temporal's [`docker-compose`](https://github.com/temporalio/docker-compose), you can access the UI by visiting `http://localhost:8080`.

@@ -12,13 +12,13 @@
 
   interface $$Props {
     description: string;
-    component: T;
+    component?: T;
     props?: ComponentProps<T>;
   }
 
-  export let description;
+  export let description: string;
   export let props = {};
-  let Component;
+  let Component = undefined;
   export { Component as component };
 
   function handleClick() {
@@ -28,10 +28,16 @@
 
 <div
   on:click={handleClick}
-  class="mt-4 cursor-pointer border-2 p-4 hover:bg-gray-50"
+  class="mt-4 cursor-pointer rounded-sm border p-4 hover:bg-gray-50"
 >
   <h2 class="mb-4">{description}</h2>
-  <svelte:component this={Component} {...props}>
+  {#if !Component && $$slots.default}
     <slot />
-  </svelte:component>
+  {:else if Component && $$slots.default}
+    <svelte:component this={Component} {...props}>
+      <slot />
+    </svelte:component>
+  {:else}
+    <svelte:component this={Component} {...props} />
+  {/if}
 </div>

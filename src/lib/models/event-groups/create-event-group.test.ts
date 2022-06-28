@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { createEventGroup } from './create-event-group';
 
 const scheduledEvent = {
@@ -36,7 +37,7 @@ const completedEvent = {
   },
 };
 
-describe(createEventGroup, () => {
+describe('createEventGroup', () => {
   it('should grab the name of the groupTaskScheduledEvent', () => {
     const group = createEventGroup(scheduledEvent);
 

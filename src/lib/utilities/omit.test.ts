@@ -1,6 +1,7 @@
+import { describe, expect, it } from 'vitest';
 import { omit } from './omit';
 
-describe(omit, () => {
+describe('omit', () => {
   it('should remove a key from an object', () => {
     const obj = { a: 1, b: 2 };
     const result = omit(obj, 'b');

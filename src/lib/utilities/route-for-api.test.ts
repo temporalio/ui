@@ -1,7 +1,4 @@
-/**
- * @jest-environment jsdom
- */
-
+import { describe, expect, it } from 'vitest';
 import { routeForApi } from './route-for-api';
 
 const parameters = {
@@ -11,7 +8,7 @@ const parameters = {
   queue: 'queue',
 };
 
-describe(routeForApi, () => {
+describe('routeForApi', () => {
   it('should return a route for workflow', () => {
     expect(routeForApi('workflow', parameters)).toBe(
       'http://localhost:8080/api/v1/namespaces/namespace/workflows/workflow/runs/run',

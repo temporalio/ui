@@ -5,10 +5,6 @@
     "**/build-local": true,
     "**/build-cloud": true
   },
-  "jest.nodeEnv": {
-    "TZ": "UTC"
-  },
-  "jest.jestCommandLine": "npm test --",
   "editor.formatOnSave": true,
   "css.customData": [".vscode/css-custom-data.json"]
 }

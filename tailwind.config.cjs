@@ -136,6 +136,10 @@ const config = {
     colors: temporalColors,
     textColor: temporalColors,
     backgroundColor: temporalColors,
+    fontFamily: {
+      poppins: ['Poppins', 'sans-serif'],
+      inter: ['Inter', 'sans-serif'],
+    },
   },
   plugins: [],
 };

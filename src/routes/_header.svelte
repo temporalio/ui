@@ -28,7 +28,7 @@
         showTemporalSystemNamespace || namespace !== 'temporal-system',
     );
 
-  const namespaceList = namespaces.map((namespace) => {
+  const namespaceList = namespaces.map((namespace: string) => {
     const href = routeForWorkflows({ namespace });
     return { namespace, href, onClick: () => goto(href) };
   });

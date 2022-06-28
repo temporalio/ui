@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { isAuthorized } from './is-authorized';
 
 const user = {
@@ -21,7 +22,7 @@ const getSettings = (enabled: boolean) => ({
   },
 });
 
-describe(isAuthorized, () => {
+describe('isAuthorized', () => {
   it('should return true if auth no enabled and no user', () => {
     expect(isAuthorized(getSettings(false), noUser)).toBe(true);
   });

@@ -1,5 +1,5 @@
 /** Dispatch event on click outside of node */
-export function clickOutside(node: Element) {
+export function clickOutside(node: Element): { destroy: () => void } {
   const handleClick = (event: Event) => {
     if (
       node &&
