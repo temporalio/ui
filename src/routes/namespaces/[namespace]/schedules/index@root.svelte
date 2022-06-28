@@ -21,7 +21,7 @@
 
   import EmptyState from '$lib/components/empty-state.svelte';
   import Pagination from '$lib/components/pagination.svelte';
-  import Button from '$lib/components/button.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Badge from '$lib/components/badge.svelte';
   import Loading from '$lib/components/loading.svelte';
   import Table from '$lib/components/table/index.svelte';
