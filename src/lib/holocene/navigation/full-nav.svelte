@@ -44,7 +44,7 @@
 
 <NavContainer {isCloud} {linkList}>
   <svelte:fragment slot="top">
-    <NavRow link={linkList.workflows} {isCloud} data-cy="worfklows-button">
+    <NavRow link={linkList.workflows} {isCloud} data-cy="workflows-button">
       <Tooltip right hide={$navOpen} text="Workflows">
         <div class="nav-icon">
           <Icon name="workflow" scale={1.5} />

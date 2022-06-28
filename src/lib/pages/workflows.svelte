@@ -5,6 +5,7 @@
   import { workflows, loading, updating } from '$lib/stores/workflows';
   import { namespaceSelectorOpen } from '$lib/stores/nav-open';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
+  import { viewFeature } from '$lib/stores/new-feature-tags';
 
   import { getSearchType } from '$lib/utilities/search-type-parameter';
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
@@ -17,7 +18,7 @@
   import WorkflowFilters from '$lib/components/workflow/workflow-filters.svelte';
   import WorkflowsLoading from '$lib/components/workflow/workflows-loading.svelte';
   import { onDestroy, onMount } from 'svelte';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
+  import FeatureTag from '$lib/holocene/feature-tag.svelte';
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
 
@@ -38,21 +39,28 @@
 
   function toggleNamespaceSelector() {
     $namespaceSelectorOpen = !$namespaceSelectorOpen;
+    viewFeature('namespaceSelector');
   }
 </script>
 
-<h2 class="text-2xl">
-  Recent Workflows
-  <Tooltip right text={$page.params.namespace}>
-    <button on:click={toggleNamespaceSelector}>
+<div>
+  <h1 class="text-2xl">
+    Recent Workflows
+    <button
+      class="relative"
+      on:click={toggleNamespaceSelector}
+      data-cy="namespace-select-button"
+    >
       <Icon
         name="namespaceSelect"
         scale={1.6}
         class="mx-2 inline cursor-pointer"
       />
+      <FeatureTag feature="namespaceSelector" />
     </button>
-  </Tooltip>
-</h2>
+  </h1>
+  <p class="text-sm text-gray-600">{$page.params.namespace}</p>
+</div>
 <WorkflowFilters bind:searchType />
 {#if $loading}
   <WorkflowsLoading />

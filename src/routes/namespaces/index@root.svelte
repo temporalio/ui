@@ -9,11 +9,9 @@
       showTemporalSystemNamespace ||
       namespace.namespaceInfo.name !== 'temporal-system',
   );
-
-  console.log(namespaces);
 </script>
 
-<h2 class="mb-8 text-2xl">Namespaces</h2>
+<h1 class="mb-8 text-2xl">Namespaces</h1>
 {#if namespaces?.length > 0}
   <table class="fancy w-full ">
     <thead class="">
