@@ -5,7 +5,8 @@ export const viewedFeatureTags = persistStore('viewedFeatureTags', null);
 
 export const viewFeature = (feature: string): void => {
   let featureTags: string[] = get(viewedFeatureTags) ?? [];
-  featureTags = [...featureTags, feature];
-
-  viewedFeatureTags.set(featureTags);
+  if (!featureTags.includes(feature)) {
+    featureTags = [...featureTags, feature];
+    viewedFeatureTags.set(featureTags);
+  }
 };
