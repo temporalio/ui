@@ -33,7 +33,9 @@
     "package:patch": "pnpm version patch && svelte-kit package",
     "package:minor": "pnpm version minor && svelte-kit package",
     "package:major": "pnpm version major && svelte-kit package",
-    "snapshot": "vitest run --dir src/lib/holocene"
+    "snapshot": "vitest run --dir src/lib/holocene",
+    "coverage": "TZ=UTC vitest run --coverage",
+    "test-ui": "TZ=UTC vitest --ui"
   },
   "dependencies": {
     "@sveltejs/svelte-virtual-list": "^3.0.1",
@@ -59,9 +61,11 @@
     "@types/sanitize-html": "^2.6.1",
     "@typescript-eslint/eslint-plugin": "^4.30.0",
     "@typescript-eslint/parser": "^4.30.0",
+    "@vitest/ui": "^0.16.0",
     "autoprefixer": "^10.4.2",
     "babel-loader": "^8.2.4",
     "babel-preset-vite": "^1.0.4",
+    "c8": "^7.11.3",
     "chalk": "^4.1.2",
     "concurrently": "^7.1.0",
     "cross-env": "^7.0.3",
