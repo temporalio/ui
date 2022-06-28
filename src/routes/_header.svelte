@@ -45,6 +45,7 @@
       href,
       onClick: () => {
         $lastUsedNamespace = $page.params.namespace;
+        goto(href);
       },
     });
   }
