@@ -1,6 +1,14 @@
-import { writable } from 'svelte/store';
+import { Writable, writable } from 'svelte/store';
 
-export const copyToClipboard = (content: string, timeout = 2000) => {
+type CopiedToClipboardReturnValue = {
+  copy: (event: Event) => Promise<void>;
+  copied: Writable<boolean>;
+};
+
+export const copyToClipboard = (
+  content: string,
+  timeout = 2000,
+): CopiedToClipboardReturnValue => {
   const copied = writable(false);
 
   const copy = async (event: Event) => {

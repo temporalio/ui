@@ -36,7 +36,6 @@ export const isTemporalAPIError = (obj: unknown): obj is TemporalAPIError =>
  *
  * @param endpoint The path of the API endpoint you want to request data from.
  *
- * @param options Additional options to be used when making the API request.
  * @param options.params Query (or search) parameters to be suffixed to the
  * path.
  * @param options.token Shorthand for a `nextPageToken` query parameter.

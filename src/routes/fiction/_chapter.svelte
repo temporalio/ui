@@ -16,7 +16,7 @@
     props?: ComponentProps<T>;
   }
 
-  export let description;
+  export let description: string;
   export let props = {};
   let Component = undefined;
   export { Component as component };

@@ -9,6 +9,10 @@
   let open = false;
 
   type T = $$Generic;
+  type ExtendedPointerEvent<T> = PointerEvent & {
+    currentTarget: EventTarget & T;
+    path?: NodeList;
+  };
 
   export let label: string = '';
   export let id: string;
@@ -43,15 +47,15 @@
     open = false;
   }
 
-  function handleOutsideClick(event) {
-    const eventTarget =
-      event.path && event.path.length > 0 ? event.path[0] : event.target;
-    if (
-      container.contains(eventTarget) ||
-      container.contains(event.relatedTarget)
-    ) {
-      return;
-    }
+  function handleOutsideClick<T extends EventTarget = HTMLElement>(
+    event: ExtendedPointerEvent<T>,
+  ) {
+    let eventTarget: EventTarget = event.path?.length
+      ? event.path[0]
+      : event.target;
+    if (!eventTarget && event.relatedTarget) eventTarget = event.relatedTarget;
+
+    if (container.contains(eventTarget as Node)) return;
 
     open = false;
   }
