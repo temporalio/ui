@@ -90,7 +90,7 @@
   }
 
   .input-container.dark input {
-    @apply placeholder:text-gray-400;
+    @apply placeholder:text-gray-200;
   }
 
   .input-container.dark.copyable,
