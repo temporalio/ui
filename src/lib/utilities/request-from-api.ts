@@ -1,4 +1,4 @@
-import { browser, dev } from '$app/env';
+import { browser } from '$app/env';
 import { handleError } from './handle-error';
 import { isFunction } from './is-function';
 import { toURL } from './to-url';

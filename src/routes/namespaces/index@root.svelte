@@ -1,63 +1,49 @@
-<script lang="ts" context="module">
-  import type { Load } from '@sveltejs/kit';
-
-  export const load: Load = async ({ stuff }) => {
-    const { namespaces } = stuff.namespaces;
-
-    return {
-      props: {
-        namespaces,
-      },
-    };
-  };
-</script>
-
 <script lang="ts">
-  import type { ListNamespacesResponse } from '$types';
+  import type { DescribeNamespaceResponse as Namespace } from '$types';
+  import { routeForNamespace } from '$lib/utilities/route-for';
+  import { page } from '$app/stores';
 
-  export let namespaces: [];
-  debugger;
+  const { showTemporalSystemNamespace } = $page.stuff.settings;
+  const namespaces = ($page.stuff.namespaces || []).filter(
+    (namespace: Namespace) =>
+      showTemporalSystemNamespace ||
+      namespace.namespaceInfo.name !== 'temporal-system',
+  );
+
+  console.log(namespaces);
 </script>
 
-<div class="p-2">
-  <div class="prose mb-10 max-w-none">
-    <h1>Namespaces</h1>
-  </div>
-
-  {#if namespaces?.length > 0}
-    <table class="fancy w-full ">
-      <thead class="">
-        <tr>
-          <!-- <th>Status</th> -->
-          <th>Name</th>
-          <!-- <th>Region</th>
-						<th>Retention</th> -->
+<h2 class="mb-8 text-2xl">Namespaces</h2>
+{#if namespaces?.length > 0}
+  <table class="fancy w-full ">
+    <thead class="">
+      <tr>
+        <th>Name</th>
+      </tr>
+    </thead>
+    <tbody class="">
+      {#each namespaces as namespace}
+        <tr class="">
+          <td>
+            <a
+              href={routeForNamespace({
+                namespace: namespace.namespaceInfo.name,
+              })}
+              class="hover:text-blue-700 hover:underline hover:decoration-blue-700 md:text-base"
+              >{namespace.namespaceInfo.name}</a
+            >
+          </td>
         </tr>
-      </thead>
-      <tbody class="">
-        {#each namespaces as namespace}
-          <tr class="">
-            <!-- <td><span class="status available">Available</span></td> -->
-            <td>
-              <a
-                href={AppRoutes.namespace({ namespace })}
-                class="hover:underline">{namespace}</a
-              >
-            </td>
-            <!-- <td>temp-1</td>
-							<td>3 Days</td> -->
-          </tr>
-        {/each}
-      </tbody>
-    </table>
-  {:else}
-    <div class="prose max-w-none text-center mt-[15vh]">
-      <h3>No Namespaces Found</h3>
-      <p>
-        You do not have access to a Namespace.
-        <br />
-        Contact your Administrator for assistance.
-      </p>
-    </div>
-  {/if}
-</div>
+      {/each}
+    </tbody>
+  </table>
+{:else}
+  <div class="prose mt-[15vh] max-w-none text-center">
+    <h3>No Namespaces Found</h3>
+    <p>
+      You do not have access to a Namespace.
+      <br />
+      Contact your Administrator for assistance.
+    </p>
+  </div>
+{/if}
