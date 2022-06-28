@@ -18,7 +18,6 @@
   } from '$lib/stores/event-view';
 
   import { page } from '$app/stores';
-  import { goto } from '$app/navigation';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   let sortOptions: EventSortOrderOptions = [
@@ -38,7 +37,6 @@
       parameter: 'sort',
       value: option,
       url: $page.url,
-      goto,
     });
   };
 

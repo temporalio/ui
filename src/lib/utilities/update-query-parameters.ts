@@ -1,11 +1,12 @@
 import { browser } from '$app/env';
-import type { goto, invalidate } from '$app/navigation';
+import { goto as navigateTo } from '$app/navigation';
+import type { invalidate } from '$app/navigation';
 
 type UpdateQueryParams = {
   parameter: string;
   value?: string | number | boolean;
   url: URL;
-  goto: typeof goto;
+  goto?: typeof navigateTo;
   allowEmpty?: boolean;
   invalidate?: typeof invalidate;
 };
@@ -20,7 +21,7 @@ export const updateQueryParameters = async ({
   parameter,
   value,
   url,
-  goto,
+  goto = navigateTo,
   allowEmpty = false,
 }: UpdateQueryParams): Promise<typeof value> => {
   const next = String(value);
