@@ -5,13 +5,14 @@
 
   export let icon: IconName;
   export let scale = 1;
+  export let stroke = 'white';
   export let classes: string = '';
 </script>
 
 <button class="icon-button" on:click data-cy={$$props.dataCy}>
   {#if icon}
-    <div class="flex items-center gap-2 {classes}">
-      <Icon class="h-4" stroke="white" name={icon} {scale} />
+    <div class="flex items-center justify-center gap-2 {classes}">
+      <Icon class="h-4" {stroke} name={icon} {scale} />
       <slot />
     </div>
   {:else}
