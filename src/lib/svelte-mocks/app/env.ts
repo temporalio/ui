@@ -1,3 +1,3 @@
-export function browser() {
+export function browser(): boolean {
   return true;
 }

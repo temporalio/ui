@@ -93,6 +93,7 @@ type User = {
   address?: string;
   updated_at?: string;
   sub?: string;
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 };
 type ClusterInformation = import('$types').GetClusterInfoResponse;

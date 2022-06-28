@@ -1,27 +1,42 @@
-export function disableScrollHandling() {
-  //
+export function disableScrollHandling(): void {
+  null;
 }
 
-export function goto() {
-  return false;
+export async function goto(
+  url: string | URL,
+  opts?: {
+    replaceState?: boolean;
+    noscroll?: boolean;
+    keepfocus?: boolean;
+    state?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  },
+): Promise<void> {
+  url;
+  opts;
 }
 
-export function invalidate() {
-  //
+export async function invalidate(
+  dependency: string | ((href: string) => boolean),
+): Promise<void> {
+  dependency;
 }
 
-export function prefetch() {
-  //
+export async function prefetch(href: string): Promise<void> {
+  href;
 }
 
-export function prefetchRoutes() {
-  //
+export async function prefetchRoutes(routes?: string[]): Promise<void> {
+  routes;
 }
 
-export function beforeNavigate() {
-  //
+export function beforeNavigate(
+  fn: (navigation: { from: URL; to: URL | null; cancel: () => void }) => void,
+): void {
+  fn;
 }
 
-export function afterNavigate() {
-  //
+export function afterNavigate(
+  fn: (navigation: { from: URL | null; to: URL }) => void,
+): void {
+  fn;
 }
