@@ -1,7 +1,8 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  import debounce from 'just-debounce';
+  import type { UpdateQueryParams } from '$lib/utilities/update-query-parameters';
+  import { debounce } from '$lib/utilities/debounce';
   import Icon from '$lib/holocene/icon/index.svelte';
 
   export let parameter: string;
@@ -11,7 +12,8 @@
   let _value = (parameter && $page.url.searchParams.get(parameter)) || value;
 
   const id = `${parameter || name}-filter`;
-  const update = debounce(updateQueryParameters, 300);
+  const update = (params: UpdateQueryParams) =>
+    debounce(() => updateQueryParameters(params), 300);
 
   $: {
     update({

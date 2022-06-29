@@ -2,7 +2,7 @@ import { browser } from '$app/env';
 import { goto as navigateTo } from '$app/navigation';
 import type { invalidate } from '$app/navigation';
 
-type UpdateQueryParams = {
+export type UpdateQueryParams = {
   parameter: string;
   value?: string | number | boolean;
   url: URL;

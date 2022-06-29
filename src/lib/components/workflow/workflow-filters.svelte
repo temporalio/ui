@@ -1,5 +1,4 @@
 <script lang="ts">
-  import debounce from 'just-debounce';
   import { page } from '$app/stores';
 
   import { timeFormat } from '$lib/stores/time-format';
@@ -8,6 +7,7 @@
   import { durations } from '$lib/utilities/to-duration';
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
   import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
+  import { debounce } from '$lib/utilities/debounce';
 
   import Select from '$lib/components/select/select.svelte';
   import Option from '$lib/components/select/option.svelte';
