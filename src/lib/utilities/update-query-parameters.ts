@@ -35,6 +35,7 @@ export const updateQueryParameters = async ({
   }
 
   if (browser && url.href !== window.location.href) {
+    // Needed to trigger store updates when used as npm package
     if (!url.href.endsWith('#')) {
       url.href = url.href + '#';
     }

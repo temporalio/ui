@@ -10,7 +10,9 @@
 </script>
 
 <main class="flex h-full flex-col gap-6">
-  {#if !$loading}
+  {#if $loading}
+    <Loading />
+  {:else}
     <PageTransition>
       <Header
         {namespace}
@@ -19,7 +21,5 @@
       />
       <slot />
     </PageTransition>
-  {:else}
-    <Loading />
   {/if}
 </main>
