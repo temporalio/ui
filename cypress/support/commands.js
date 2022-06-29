@@ -26,53 +26,91 @@
 
 import settings from '../fixtures/settings.json';
 
+Cypress.Commands.add('interceptNamespacesApi', () => {
+  cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/namespaces*', {
+    fixture: 'namespaces.json',
+  }).as('namespaces-api');
+});
+
+Cypress.Commands.add('interceptWorkflowsApi', () => {
+  cy.intercept(
+    Cypress.env('VITE_API_HOST') + `/api/v1/namespaces/*/workflows?query=*`,
+    { fixture: 'workflows.json' },
+  ).as('workflows-api');
+});
+
+Cypress.Commands.add(
+  'interceptWorkflowApi',
+  (fixture = 'workflow-completed.json') => {
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') + '/api/v1/namespaces/*/workflows/*/runs/*?',
+      { fixture },
+    ).as('workflow-api');
+  },
+);
+
+Cypress.Commands.add('interceptUserApi', () => {
+  cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/me*', {
+    fixture: 'me.json',
+  }).as('user-api');
+});
+
+Cypress.Commands.add('interceptClusterApi', (fixture = 'cluster.json') => {
+  cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/cluster*', {
+    fixture,
+  }).as('cluster-api');
+});
+
+Cypress.Commands.add('interceptArchivedWorkflowsApi', () => {
+  cy.intercept(
+    Cypress.env('VITE_API_HOST') +
+      `/api/v1/namespaces/*/workflows/archived?query=*`,
+    { fixture: 'workflows.json' },
+  ).as('workflows-archived-api');
+});
+
+Cypress.Commands.add('interceptSettingsApi', (namespace = 'default') => {
+  cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/settings*', {
+    ...settings,
+    DefaultNamespace: namespace,
+  }).as('settings-api');
+});
+
+Cypress.Commands.add('interceptGithubReleasesApi', () => {
+  cy.intercept('https://api.github.com/repos/temporalio/ui-server/releases', {
+    fixture: 'github-releases.json',
+  }).as('github-releases-api');
+});
+
+Cypress.Commands.add('interceptQueryApi', () => {
+  cy.intercept(
+    Cypress.env('VITE_API_HOST') +
+      `/api/v1/namespaces/*/workflows/*/runs/*/query*`,
+    { fixture: 'query-stack-trace.json' },
+  ).as('query-api');
+});
+
+Cypress.Commands.add('interceptTaskQueuesApi', () => {
+  cy.intercept(
+    Cypress.env('VITE_API_HOST') +
+      `/api/v1/namespaces/*/task-queues/*?taskQueueType=*`,
+    {
+      fixture: 'task-queues.json',
+    },
+  ).as('task-queues-api');
+});
+
 Cypress.Commands.add(
   'interceptApi',
   ({ namespace } = { namespace: 'default' }) => {
-    cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/namespaces*', {
-      fixture: 'namespaces.json',
-    }).as('namespaces-api');
-
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') + `/api/v1/namespaces/*/workflows?query=*`,
-      { fixture: 'workflows.json' },
-    ).as('workflows-api');
-
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/*/workflows/archived?query=*`,
-      { fixture: 'workflows.json' },
-    ).as('workflows-archived-api');
-
-    cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/cluster*', {
-      fixture: 'cluster.json',
-    }).as('cluster-api');
-
-    cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/me*', {
-      fixture: 'me.json',
-    }).as('user-api');
-
-    cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/settings*', {
-      ...settings,
-      DefaultNamespace: namespace,
-    }).as('settings-api');
-
-    cy.intercept('https://api.github.com/repos/temporalio/ui-server/releases', {
-      fixture: 'github-releases.json',
-    }).as('github-releases-api');
-
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/*/runs/*/query*`,
-      { fixture: 'query-stack-trace.json' },
-    ).as('query-api');
-
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/task-queues/rainbow-statuses?taskQueueType=*`,
-      {
-        fixture: 'task-queues.json',
-      },
-    ).as('task-queues-api');
+    cy.interceptNamespacesApi();
+    cy.interceptWorkflowsApi();
+    cy.interceptUserApi();
+    cy.interceptClusterApi();
+    cy.interceptArchivedWorkflowsApi();
+    cy.interceptGithubReleasesApi();
+    cy.interceptQueryApi();
+    cy.interceptTaskQueuesApi();
+    cy.interceptSettingsApi();
   },
 );

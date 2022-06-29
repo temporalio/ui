@@ -1,6 +1,8 @@
 import { derived } from 'svelte/store';
 import { page } from '$app/stores';
 import { persistStore } from '$lib/stores/persist-store';
+import { temporalVersion } from './versions';
+import { isVersionNewer } from '$lib/utilities/version-check';
 
 export type EventSortOrder = 'ascending' | 'descending';
 export type EventSortOrderOptions = {
@@ -24,4 +26,12 @@ export const eventShowElapsed = persistStore<BooleanString>(
 
 export const eventCategory = derived([page], ([$page]) =>
   $page.url.searchParams.get('category'),
+);
+
+export const supportsReverseOrder = derived(
+  [temporalVersion],
+  ([$temporalVersion]) => {
+    console.log('supports reverse', isVersionNewer($temporalVersion, '1.16.0'));
+    return isVersionNewer($temporalVersion, '1.16.0');
+  },
 );
