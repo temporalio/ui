@@ -35,7 +35,7 @@
   const query = toListWorkflowQuery(parameters);
 </script>
 
-<header class="flex flex-col gap-4">
+<header class="mb-4 flex flex-col gap-4">
   <main class="relative flex flex-col gap-1">
     <div class="-mt-3 -ml-2 block">
       <a
