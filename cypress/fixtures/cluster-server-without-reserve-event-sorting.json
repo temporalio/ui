@@ -7,11 +7,11 @@
     "temporal-server": "\u003c2.0.0",
     "temporal-typescript": "\u003c2.0.0"
   },
-  "serverVersion": "1.16.2",
+  "serverVersion": "1.14.0",
   "clusterId": "fe325f09-1d00-45c0-8924-ce6f0e465258",
   "versionInfo": {
     "current": {
-      "version": "1.16.2",
+      "version": "1.14.0",
       "releaseTime": "2022-03-04T23:00:00Z",
       "notes": ""
     },

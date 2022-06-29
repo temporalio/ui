@@ -1,4 +1,5 @@
 import { browser } from '$app/env';
+import { settings } from '$lib/stores/settings';
 import { getEnvironment } from '$lib/utilities/get-environment';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
@@ -7,28 +8,28 @@ import type { SettingsResponse } from '$types';
 export const isCloudMatch = /(tmprl\.cloud|tmprl-test\.cloud)$/;
 
 export const fetchSettings = async (request = fetch): Promise<Settings> => {
-  const settings: SettingsResponse = await requestFromAPI(
+  const settingsResponse: SettingsResponse = await requestFromAPI(
     routeForApi('settings'),
     { request },
   );
 
   const EnvironmentOverride = getEnvironment();
 
-  return {
+  const settingsInformation = {
     auth: {
-      enabled: !!settings?.Auth?.Enabled,
-      options: settings?.Auth?.Options,
+      enabled: !!settingsResponse?.Auth?.Enabled,
+      options: settingsResponse?.Auth?.Options,
     },
     baseUrl:
       import.meta?.env?.VITE_API ?? browser ? window.location.origin : '',
     codec: {
-      endpoint: settings?.Codec?.Endpoint,
-      accessToken: settings?.Codec?.AccessToken,
+      endpoint: settingsResponse?.Codec?.Endpoint,
+      accessToken: settingsResponse?.Codec?.AccessToken,
     },
-    defaultNamespace: settings?.DefaultNamespace || 'default', // API returns an empty string if default namespace is not configured
-    showTemporalSystemNamespace: settings?.ShowTemporalSystemNamespace,
-    notifyOnNewVersion: settings?.NotifyOnNewVersion,
-    feedbackURL: settings?.FeedbackURL,
+    defaultNamespace: settingsResponse?.DefaultNamespace || 'default', // API returns an empty string if default namespace is not configured
+    showTemporalSystemNamespace: settingsResponse?.ShowTemporalSystemNamespace,
+    notifyOnNewVersion: settingsResponse?.NotifyOnNewVersion,
+    feedbackURL: settingsResponse?.FeedbackURL,
     runtimeEnvironment: {
       get isCloud() {
         if (EnvironmentOverride) {
@@ -46,6 +47,10 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
       },
       envOverride: Boolean(EnvironmentOverride),
     },
-    version: settings?.Version,
+    version: settingsResponse?.Version,
   };
+
+  settings.set(settingsInformation);
+
+  return settingsInformation;
 };

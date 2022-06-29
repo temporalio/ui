@@ -6,7 +6,12 @@
   import Icon from '$lib/holocene/icon/index.svelte';
 
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
-  import { eventSortOrder, eventShowElapsed } from '$lib/stores/event-view';
+  import {
+    eventFilterSort,
+    eventSortOrder,
+    eventShowElapsed,
+    supportsReverseOrder,
+  } from '$lib/stores/event-view';
   import {
     timeFormat,
     setTimeFormat,
@@ -32,7 +37,7 @@
   ];
 
   const onSortOptionClick = (option: EventSortOrder) => {
-    $eventSortOrder = option;
+    $eventFilterSort = option;
     updateQueryParameters({
       parameter: 'sort',
       value: option,
@@ -61,26 +66,29 @@
 </script>
 
 <DropdownMenu {value} right dataCy="event-date-filter">
-  {#each sortOptions as { option, label } (option)}
-    <div
-      class="option"
-      class:active={$eventSortOrder === option}
-      on:click={() => onSortOptionClick(option)}
-    >
-      <div class="check active">
-        {#if $eventSortOrder === option}
-          <Icon stroke="currentcolor" name="checkMark" scale={0.8} />
-        {/if}
+  {#if $supportsReverseOrder}
+    {#each sortOptions as { option, label } (option)}
+      <div
+        class="option"
+        class:active={$eventSortOrder === option}
+        on:click={() => onSortOptionClick(option)}
+      >
+        <div class="check active">
+          {#if $eventSortOrder === option}
+            <Icon stroke="currentcolor" name="checkMark" scale={0.8} />
+          {/if}
+        </div>
+        <div class="label">
+          {label}
+        </div>
       </div>
-      <div class="label">
-        {label}
-      </div>
+    {/each}
+
+    <div class="option pr-4">
+      <div class="check" />
+      <div class="my-2 w-full border-b-2 border-gray-300 pr-2" />
     </div>
-  {/each}
-  <div class="option pr-4">
-    <div class="check" />
-    <div class="my-2 w-full border-b-2 border-gray-300 pr-2" />
-  </div>
+  {/if}
   {#each dateOptions as { label, option } (option)}
     <div
       class="option"

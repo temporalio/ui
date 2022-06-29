@@ -1,4 +1,4 @@
-export const isRecommendedVersionNewer = (
+export const isVersionNewer = (
   recommendedVersion: string,
   currentVersion: string,
 ): boolean => {

@@ -34,6 +34,10 @@
 </script>
 
 <script lang="ts">
+  import { dev } from '$app/env';
+  import { temporalVersion, uiVersion } from '$lib/stores/versions';
+  import { supportsReverseOrder } from '$lib/stores/event-view';
+
   import { fromSecondsToDaysOrHours } from '$lib/utilities/format-date';
   import { getClusters } from '$lib/utilities/get-clusters';
 
@@ -45,7 +49,7 @@
   Namespace: {currentNamespace?.namespaceInfo?.name}
 </h2>
 <div class="flex">
-  <div class="namespace-info w-full p-4">
+  <article class="namespace-info w-full p-4">
     <h1 class="my-4 text-lg font-medium">Details</h1>
     <p data-cy="namespace-description">
       <span class="mr-2 font-medium">Description:</span>
@@ -81,5 +85,22 @@
       <span class="mr-2 font-medium">Clusters:</span>
       {clusters}
     </p>
-  </div>
+  </article>
+  <article class="namespace-info w-full p-4">
+    <h1 class="my-4 text-lg font-medium">Versions</h1>
+    <p data-cy="server-version">
+      <span class="mr-2 font-medium">Temporal Server Version:</span>
+      {$temporalVersion}
+    </p>
+    <p data-cy="ui-version">
+      <span class="mr-2 font-medium">Temporal UI Version:</span>
+      {$uiVersion}
+    </p>
+    {#if dev}
+      <p data-cy="supports-reverse-order">
+        <span class="mr-2 font-medium">Supports Descending Event History:</span>
+        {$supportsReverseOrder}
+      </p>
+    {/if}
+  </article>
 </div>
