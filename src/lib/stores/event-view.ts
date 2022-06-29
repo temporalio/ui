@@ -1,6 +1,7 @@
 import { derived } from 'svelte/store';
 import { page } from '$app/stores';
 import { persistStore } from '$lib/stores/persist-store';
+import { settings } from '$lib/stores/settings';
 import { temporalVersion } from './versions';
 import { isVersionNewer } from '$lib/utilities/version-check';
 
@@ -33,8 +34,10 @@ export const eventSortParam = derived([page], ([$page]) =>
 );
 
 export const supportsReverseOrder = derived(
-  [temporalVersion],
-  ([$temporalVersion]) => {
+  [temporalVersion, settings],
+  ([$temporalVersion, $settings]) => {
+    if ($settings.runtimeEnvironment.isCloud) return true;
+
     console.log('supports reverse', isVersionNewer($temporalVersion, '1.16.0'));
     return isVersionNewer($temporalVersion, '1.16.0');
   },
