@@ -38,5 +38,6 @@ describe('Fallback to Ascending Ordering of Event History on Older Versions of T
   it('should sort events in descending if a query param is set', () => {
     cy.interceptClusterApi('cluster-server-without-reserve-event-sorting.json');
     visitWorkflow('?sort=ascending');
+    cy.wait('@events-ascending-api');
   });
 });
