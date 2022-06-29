@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import debounce from 'just-debounce';
@@ -19,7 +18,6 @@
       parameter,
       value: _value,
       url: $page.url,
-      goto,
     });
   }
 </script>

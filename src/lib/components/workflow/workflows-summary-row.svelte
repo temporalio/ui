@@ -1,6 +1,5 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { goto } from '$app/navigation';
 
   import { formatDate, getMilliseconds } from '$lib/utilities/format-date';
   import { routeForWorkflow } from '$lib/utilities/route-for';
@@ -37,7 +36,6 @@
       parameter: 'query',
       value,
       allowEmpty: true,
-      goto,
     });
   };
 </script>

@@ -1,6 +1,5 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { goto } from '$app/navigation';
 
   import Icon from '$lib/holocene/icon/index.svelte';
 
@@ -23,7 +22,6 @@
       parameter: parameter,
       value: _value,
       url: $page.url,
-      goto,
     }).then((v) => (_value = v?.toString()));
   }
 
