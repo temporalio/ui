@@ -38,6 +38,10 @@ export type AuthenticationParameters = {
   originUrl?: string;
 };
 
+export const routeForNamespaces = (): string => {
+  return `/namespaces`;
+};
+
 export const routeForNamespace = ({
   namespace,
 }: NamespaceParameter): string => {
@@ -52,10 +56,6 @@ export const routeForArchivalWorkfows = (
   parameters: NamespaceParameter,
 ): string => {
   return `${routeForNamespace(parameters)}/archival`;
-};
-
-export const routeForSettings = (parameters: NamespaceParameter): string => {
-  return `${routeForNamespace(parameters)}/settings`;
 };
 
 export const routeForWorkflow = ({

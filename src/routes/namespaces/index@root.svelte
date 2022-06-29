@@ -1,17 +1,47 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
-  import { onMount } from 'svelte';
+  import type { DescribeNamespaceResponse as Namespace } from '$types';
+  import { routeForNamespace } from '$lib/utilities/route-for';
   import { page } from '$app/stores';
-  import { routeForWorkflows } from '$lib/utilities/route-for';
 
-  onMount(async () => {
-    goto(
-      routeForWorkflows({
-        namespace: $page.stuff.settings.defaultNamespace,
-      }),
-      {
-        replaceState: true,
-      },
-    );
-  });
+  const { showTemporalSystemNamespace } = $page.stuff.settings;
+  const namespaces = ($page.stuff.namespaces || []).filter(
+    (namespace: Namespace) =>
+      showTemporalSystemNamespace ||
+      namespace.namespaceInfo.name !== 'temporal-system',
+  );
 </script>
+
+<h1 class="mb-8 text-2xl">Namespaces</h1>
+{#if namespaces?.length > 0}
+  <table class="fancy w-full ">
+    <thead class="">
+      <tr>
+        <th>Name</th>
+      </tr>
+    </thead>
+    <tbody class="">
+      {#each namespaces as namespace}
+        <tr class="">
+          <td>
+            <a
+              href={routeForNamespace({
+                namespace: namespace.namespaceInfo.name,
+              })}
+              class="hover:text-blue-700 hover:underline hover:decoration-blue-700 md:text-base"
+              >{namespace.namespaceInfo.name}</a
+            >
+          </td>
+        </tr>
+      {/each}
+    </tbody>
+  </table>
+{:else}
+  <div class="prose mt-[15vh] max-w-none text-center">
+    <h3>No Namespaces Found</h3>
+    <p>
+      You do not have access to a Namespace.
+      <br />
+      Contact your Administrator for assistance.
+    </p>
+  </div>
+{/if}

@@ -5,7 +5,6 @@
     { namespace: string; href: string; onClick: () => void }[]
   >;
   export let activeNamespace: string | undefined | null;
-  export let lastUsedNamespace: string | null;
 
   $: searchValue = '';
 </script>
@@ -32,10 +31,7 @@
       {#each namespacesResult.filter( ({ namespace }) => namespace.includes(searchValue), ) as namespace}
         <li
           class="first:rounded-t-md first:border-t last:rounded-b-md border-b border-l border-r p-3 flex border-collapse gap-2 hover:bg-gray-50 cursor-pointer"
-          on:click={() => {
-            namespace.onClick();
-            lastUsedNamespace = namespace.namespace;
-          }}
+          on:click={() => namespace?.onClick()}
         >
           <div class="w-6 h-6 pl-3 active">
             {#if namespace.namespace === activeNamespace}

@@ -58,7 +58,7 @@ describe('Workflow Executions List', () => {
 
     for (const status of statuses) {
       it(`should redirect to the correct query params for ${status} workflows`, () => {
-        cy.visit(`/namespaces/default`);
+        cy.visit(`/namespaces/default/workflows`);
         cy.get('#execution-status-filter').select(status).trigger('input');
         cy.url().should(
           'contain',

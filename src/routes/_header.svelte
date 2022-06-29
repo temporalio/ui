@@ -6,19 +6,17 @@
   import {
     routeForArchivalWorkfows,
     routeForWorkflows,
-    routeForSettings,
+    routeForNamespaces,
   } from '$lib/utilities/route-for';
 
   import Navigation from '$lib/holocene/navigation/full-nav.svelte';
   import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
+  import { lastUsedNamespace } from '$lib/stores/namespaces';
 
   export let user: User;
 
   const { showTemporalSystemNamespace } = $page.stuff.settings;
   const { isCloud } = $page.stuff.settings.runtimeEnvironment;
-
-  $: namespace =
-    $page.params.namespace || $page.stuff?.settings?.defaultNamespace;
 
   const namespaces = ($page.stuff.namespaces || [])
     .map((namespace: Namespace) => namespace?.namespaceInfo?.name)
@@ -29,7 +27,14 @@
 
   const namespaceList = namespaces.map((namespace: string) => {
     const href = routeForWorkflows({ namespace });
-    return { namespace, href, onClick: () => goto(href) };
+    return {
+      namespace,
+      href,
+      onClick: () => {
+        $lastUsedNamespace = namespace;
+        goto(routeForWorkflows({ namespace }));
+      },
+    };
   });
 
   // To show single namespace on cloud
@@ -38,15 +43,18 @@
     namespaceList.push({
       namespace: $page.params.namespace,
       href,
-      onClick: () => goto(href),
+      onClick: () => {
+        $lastUsedNamespace = $page.params.namespace;
+        goto(href);
+      },
     });
   }
 
   $: linkList = {
-    home: routeForWorkflows({ namespace }),
-    archive: routeForArchivalWorkfows({ namespace }),
-    settings: routeForSettings({ namespace }),
-    workflows: routeForWorkflows({ namespace }),
+    home: routeForWorkflows({ namespace: $lastUsedNamespace }),
+    archive: routeForArchivalWorkfows({ namespace: $lastUsedNamespace }),
+    namespaces: routeForNamespaces(),
+    workflows: routeForWorkflows({ namespace: $lastUsedNamespace }),
     feedback:
       $page.stuff?.settings?.feedbackURL ||
       'https://github.com/temporalio/ui/issues/new/choose',
@@ -57,7 +65,7 @@
 
 <Navigation
   namespaceList={Promise.resolve(namespaceList)}
-  activeNamespace={namespace}
+  activeNamespace={$lastUsedNamespace}
   {linkList}
   {isCloud}
   user={Promise.resolve(user)}
