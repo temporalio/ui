@@ -7,7 +7,10 @@ export const fetchCluster = async (
   settings: Settings,
   request = fetch,
 ): Promise<GetClusterInfoResponse> => {
-  if (settings.runtimeEnvironment.isCloud) return;
+  if (settings.runtimeEnvironment.isCloud) {
+    cluster.set({ serverVersion: '1.17.0' });
+    return;
+  }
 
   return await requestFromAPI(routeForApi('cluster'), {
     request,
