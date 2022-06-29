@@ -52,7 +52,7 @@
       </Tooltip>
       <div class="nav-title">Workflows</div>
     </NavRow>
-    <IsCloudGuard {isCloud}>
+    <IsCloudGuard>
       <NavRow link={linkList.namespaces} {isCloud} data-cy="namespaces-button">
         <Tooltip right hide={$navOpen} text="Namespaces">
           <div class="nav-icon">
