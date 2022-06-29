@@ -105,8 +105,7 @@
             "kind": "Normal"
           },
           "header": {
-            "fields": {
-            }
+            "fields": {}
           },
           "input": {
             "payloads": [
@@ -128,8 +127,7 @@
             "backoffCoefficient": 2,
             "maximumInterval": "100s",
             "maximumAttempts": 0,
-            "nonRetryableErrorTypes": [
-            ]
+            "nonRetryableErrorTypes": []
           }
         }
       },
@@ -294,8 +292,7 @@
           },
           "prevAutoResetPoints": null,
           "header": {
-            "fields": {
-            }
+            "fields": {}
           },
           "parentInitiatedEventVersion": "0"
         }
