@@ -18,13 +18,13 @@ describe('Fallback to Ascending Ordering of Event History on Older Versions of T
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-      '/api/v1/namespaces/default/workflows/workflowId/runs/runId/events',
+        '/api/v1/namespaces/default/workflows/workflowId/runs/runId/events',
       { fixture: 'event-history-completed.json' },
     ).as('events-ascending-api');
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-      '/api/v1/namespaces/default/workflows/workflowId/runs/runId/events/reverse?',
+        '/api/v1/namespaces/default/workflows/workflowId/runs/runId/events/reverse?',
       { fixture: 'event-history-completed-reverse.json' },
     ).as('events-descending-api');
   });
