@@ -35,6 +35,9 @@ export const updateQueryParameters = async ({
   }
 
   if (browser && url.href !== window.location.href) {
+    if (!url.href.endsWith('#')) {
+      url.href = url.href + '#';
+    }
     goto(String(url), gotoOptions);
   }
 
