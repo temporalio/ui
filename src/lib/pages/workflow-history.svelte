@@ -4,17 +4,13 @@
   import { goto } from '$app/navigation';
 
   import { routeForEventHistory } from '$lib/utilities/route-for';
-  import {
-    eventViewType,
-    eventSortOrder,
-    supportsReverseOrder,
-  } from '$lib/stores/event-view';
+  import { eventViewType, eventSortOrder } from '$lib/stores/event-view';
 
   const { namespace, workflow, run } = $page.params;
 
   onMount(async () => {
     const queryParams = {
-      sort: $supportsReverseOrder ? $eventSortOrder : 'ascending',
+      sort: $eventSortOrder,
     };
 
     goto(

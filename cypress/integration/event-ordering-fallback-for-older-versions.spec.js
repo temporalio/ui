@@ -2,7 +2,7 @@
 
 const visitWorkflow = (suffix = '') => {
   cy.visit(
-    '/namespaces/cypress/workflows/workflowId/runId/history/feed' + suffix,
+    '/namespaces/default/workflows/workflowId/runId/history/feed' + suffix,
   );
 };
 
@@ -18,13 +18,13 @@ describe('Fallback to Ascending Ordering of Event History on Older Versions of T
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        '/api/v1/namespaces/cypress/workflows/workflowId/runs/runId/events',
+      '/api/v1/namespaces/default/workflows/workflowId/runs/runId/events',
       { fixture: 'event-history-completed.json' },
     ).as('events-ascending-api');
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        '/api/v1/namespaces/cypress/workflows/workflowId/runs/runId/events/reverse?',
+      '/api/v1/namespaces/default/workflows/workflowId/runs/runId/events/reverse?',
       { fixture: 'event-history-completed-reverse.json' },
     ).as('events-descending-api');
   });
@@ -36,7 +36,7 @@ describe('Fallback to Ascending Ordering of Event History on Older Versions of T
   });
 
   it('should sort events in descending if a query param is set', () => {
-    cy.interceptClusterApi('cluster-server-without-reserve-event-sorting.json');
+    cy.interceptClusterApi();
     visitWorkflow('?sort=ascending');
     cy.wait('@events-ascending-api');
   });

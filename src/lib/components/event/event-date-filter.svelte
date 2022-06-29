@@ -7,6 +7,7 @@
 
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
   import {
+    eventFilterSort,
     eventSortOrder,
     eventShowElapsed,
     supportsReverseOrder,
@@ -36,7 +37,7 @@
   ];
 
   const onSortOptionClick = (option: EventSortOrder) => {
-    $eventSortOrder = option;
+    $eventFilterSort = option;
     updateQueryParameters({
       parameter: 'sort',
       value: option,
