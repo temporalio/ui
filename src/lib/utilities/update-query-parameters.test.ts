@@ -71,7 +71,7 @@ describe('updateQueryParameters', () => {
     expect(goto).toHaveBeenCalledWith(url.toString(), gotoOptions);
   });
 
-  it('should call `goto` with the correct path when query paramters already exist', () => {
+  it('should call `goto` with the correct path when query parameters already exist', () => {
     const parameter = 'parameter';
     const value = 'newvalue';
     const goto = vi.fn().mockImplementation(() => Promise.resolve(null));
@@ -79,7 +79,7 @@ describe('updateQueryParameters', () => {
     updateQueryParameters({ parameter, value, url, goto });
 
     expect(goto).toHaveBeenCalledWith(
-      'https://temporal.io/?parameter=newvalue',
+      'https://temporal.io/?parameter=newvalue#',
       gotoOptions,
     );
   });
@@ -91,6 +91,6 @@ describe('updateQueryParameters', () => {
 
     updateQueryParameters({ parameter, value, url, goto });
 
-    expect(goto).toHaveBeenCalledWith('https://temporal.io/', gotoOptions);
+    expect(goto).toHaveBeenCalledWith('https://temporal.io/#', gotoOptions);
   });
 });
