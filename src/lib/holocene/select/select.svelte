@@ -132,8 +132,7 @@
   }
 
   .options {
-    @apply fixed mt-1 max-h-60 overflow-y-scroll rounded-sm border border-gray-900 bg-white;
-    box-shadow: 0 2px 2px 0 rgb(0, 0, 0, 0.15);
+    @apply fixed mt-1 max-h-60 overflow-y-scroll rounded-sm border border-gray-900 bg-white shadow;
   }
 
   .options.dark {
