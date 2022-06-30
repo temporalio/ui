@@ -1,6 +1,19 @@
 <script lang="ts">
+  import { page } from '$app/stores';
+
   import CodeBlock from '$lib/components/code-block.svelte';
-  import { events } from '$lib/stores/events';
+  import { fetchRawEvents } from '$lib/services/events-service';
+  import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
+
+  const { namespace, workflow: workflowId, run: runId } = $page.params;
+  const events = fetchRawEvents({
+    namespace: decodeURIForSvelte(namespace),
+    workflowId: decodeURIForSvelte(workflowId),
+    runId: decodeURIForSvelte(runId),
+    sort: 'ascending',
+  });
 </script>
 
-<CodeBlock content={$events} data-cy="event-history-json" />
+{#await events then events}
+  <CodeBlock content={events} data-cy="event-history-json" />
+{/await}

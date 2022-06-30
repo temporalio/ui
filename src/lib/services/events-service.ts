@@ -24,7 +24,9 @@ const isSortOrder = (sortOrder: string): sortOrder is EventSortOrder => {
   return false;
 };
 
-const getEndpointForSortOrder = (sortOrder: string): WorkflowAPIRoutePath => {
+const getEndpointForSortOrder = (
+  sortOrder: 'ascending' | 'descending',
+): WorkflowAPIRoutePath => {
   if (!isSortOrder(sortOrder)) return 'events.descending';
   if (sortOrder === 'descending') return 'events.descending';
   if (sortOrder === 'ascending') return 'events.ascending';
@@ -35,14 +37,17 @@ export const fetchRawEvents = async ({
   namespace,
   workflowId,
   runId,
+  sort,
   onStart,
   onUpdate,
   onComplete,
 }: FetchEventsParameters): Promise<HistoryEvent[]> => {
+  const endpoint = getEndpointForSortOrder(sort);
+
   const response = await paginated(
     async (token: string) => {
       return requestFromAPI<GetWorkflowExecutionHistoryResponse>(
-        routeForApi('events.ascending', { namespace, workflowId, runId }),
+        routeForApi(endpoint, { namespace, workflowId, runId }),
         {
           token,
           request: fetch,
