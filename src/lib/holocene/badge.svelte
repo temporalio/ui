@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  export type BadgeType = 'alpha' | 'beta' | 'warning' | 'default';
+  export type BadgeType = 'alpha' | 'beta' | 'warning' | 'default' | 'count';
 </script>
 
 <script lang="ts">
@@ -7,14 +7,14 @@
 </script>
 
 <div
-  class="{type} flex w-fit flex-row items-center rounded-sm p-1 text-sm font-medium"
+  class="{type} flex w-fit flex-row items-center justify-center rounded-sm p-1 text-sm font-medium transition-colors {$$props.class}"
 >
   <slot />
 </div>
 
 <style lang="postcss">
   .beta {
-    @apply border-blue-700  bg-blue-100  text-blue-700;
+    @apply border-blue-700 bg-blue-100 text-blue-700;
   }
 
   .alpha {
@@ -27,5 +27,9 @@
 
   .default {
     @apply border-gray-700 bg-gray-300 text-gray-700;
+  }
+
+  .count {
+    @apply h-6 w-6 min-w-max rounded-full bg-blue-700 text-white;
   }
 </style>
