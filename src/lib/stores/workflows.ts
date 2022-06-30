@@ -18,8 +18,15 @@ const parameters = derived([namespace, query], ([$namespace, $query]) => {
 const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
   return parameters.subscribe(({ namespace, query }) => {
     withLoading(loading, updating, async () => {
-      const { workflows } = await fetchAllWorkflows(namespace, { query });
+      const { workflows, error } = await fetchAllWorkflows(namespace, {
+        query,
+      });
       set(workflows);
+      if (error) {
+        workflowError.set(error);
+      } else {
+        workflowError.set('');
+      }
     });
   });
 };
@@ -34,4 +41,5 @@ export const workflowsSearch = writable<WorkflowsSearch>({
 });
 export const updating = writable(true);
 export const loading = writable(true);
+export const workflowError = writable('');
 export const workflows = readable<WorkflowExecution[]>([], updateWorkflows);
