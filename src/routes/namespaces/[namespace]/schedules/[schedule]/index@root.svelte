@@ -1,5 +1,10 @@
-<script context="module" lang="ts">
-  import type { Load } from '@sveltejs/kit';
+<script lang="ts">
+  import { page } from '$app/stores';
+  import Icon from '$lib/holocene/icon/index.svelte';
+  import { v4 as uuidv4 } from 'uuid';
+  import { routeForSchedules } from '$lib/utilities/route-for';
+  import { goto } from '$app/navigation';
+  import { onMount } from 'svelte';
 
   import {
     fetchSchedule,
@@ -9,22 +14,6 @@
     unpauseSchedule,
   } from '$lib/services/schedule-service';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-
-  export const load: Load = async function ({ params }) {
-    const { schedule: scheduleId, namespace } = params;
-
-    return {
-      props: { namespace, scheduleId },
-    };
-  };
-</script>
-
-<script lang="ts">
-  import Icon from '$lib/holocene/icon/index.svelte';
-  import { v4 as uuidv4 } from 'uuid';
-  import { routeForSchedules } from '$lib/utilities/route-for';
-  import { goto } from '$app/navigation';
-  import { onMount } from 'svelte';
 
   import { scheduleForm } from '$lib/stores/schedules';
 
@@ -42,9 +31,8 @@
   import Modal from '$lib/components/modal.svelte';
   import ScheduleForm from '$lib/components/schedule/schedule-form.svelte';
 
-  export let namespace: string;
-  export let scheduleId: string;
-
+  let namespace = $page.params.namespace;
+  let scheduleId = $page.params.schedule;
   const parameters = {
     namespace,
     scheduleId: decodeURIForSvelte(scheduleId),
@@ -56,17 +44,17 @@
   let showEditConfirmation = false;
   let reason = '';
 
-  onMount(async () => {
-    const sched = await scheduleFetch;
-    $scheduleForm.schedule_id = scheduleId;
-    if (sched.schedule.spec.calendar[0]) {
-      $scheduleForm.schedule.spec.calendar = sched.schedule.spec.calendar[0];
-    }
-    if (sched.schedule.spec.interval[0]) {
-      $scheduleForm.schedule.spec.interval = sched.schedule.spec.interval[0];
-    }
-    $scheduleForm.schedule.action = sched.schedule.action;
-  });
+  // onMount(async () => {
+  //   const sched = await scheduleFetch;
+  //   $scheduleForm.schedule_id = scheduleId;
+  //   if (sched.schedule.spec.calendar[0]) {
+  //     $scheduleForm.schedule.spec.calendar = sched.schedule.spec.calendar[0];
+  //   }
+  //   if (sched.schedule.spec.interval[0]) {
+  //     $scheduleForm.schedule.spec.interval = sched.schedule.spec.interval[0];
+  //   }
+  //   $scheduleForm.schedule.action = sched.schedule.action;
+  // });
 
   const handleDelete = async () => {
     await deleteSchedule({ namespace, scheduleId });
@@ -85,34 +73,32 @@
           scheduleId,
           reason,
         });
-    scheduleFetch = fetchSchedule(parameters, fetch);
+    // scheduleFetch = fetchSchedule(parameters, fetch);
     showPauseConfirmation = false;
     reason = '';
   };
 
   const handleEdit = async () => {
-    const body = $scheduleForm;
-    if (
-      body.schedule.spec.interval.interval &&
-      body.schedule.spec.interval.phase
-    ) {
-      body.schedule.spec.interval = [$scheduleForm.schedule.spec.interval];
-      body.schedule.spec.calendar = [];
-    } else {
-      body.schedule.spec.interval = [];
-      body.schedule.spec.calendar = [$scheduleForm.schedule.spec.calendar];
-    }
-
-    delete body.schedule_id;
-
-    await editSchedule({
-      namespace,
-      scheduleId,
-      request_id: uuidv4(),
-      body,
-    });
-    showEditConfirmation = false;
-    scheduleFetch = fetchSchedule(parameters, fetch);
+    // const body = $scheduleForm;
+    // if (
+    //   body.schedule.spec.interval.interval &&
+    //   body.schedule.spec.interval.phase
+    // ) {
+    //   body.schedule.spec.interval = [$scheduleForm.schedule.spec.interval];
+    //   body.schedule.spec.calendar = [];
+    // } else {
+    //   body.schedule.spec.interval = [];
+    //   body.schedule.spec.calendar = [$scheduleForm.schedule.spec.calendar];
+    // }
+    // delete body.schedule_id;
+    // await editSchedule({
+    //   namespace,
+    //   scheduleId,
+    //   request_id: uuidv4(),
+    //   body,
+    // });
+    // showEditConfirmation = false;
+    // scheduleFetch = fetchSchedule(parameters, fetch);
   };
 
   let options = [
@@ -135,12 +121,12 @@
     <main class="flex flex-col gap-1 relative">
       <a
         href={routeForSchedules({ namespace })}
-        class="absolute top-2 back-to-workflows"
+        class="absolute top-0 back-to-workflows"
         style="left: -1.5rem"
       >
         <Icon scale={0.8} name="caretLeft" class="inline" />Back to Schedules
       </a>
-      <div class="flex justify-between items-center">
+      <div class="flex justify-between items-center mt-8">
         <h1 class="text-2xl flex relative items-center gap-4">
           <span class="font-medium select-all">{scheduleId}</span>
           <WorkflowStatus

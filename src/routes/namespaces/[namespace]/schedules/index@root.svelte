@@ -35,15 +35,7 @@
 
   export let namespace: string;
 
-  let schedules = new Promise(() => []);
-  onMount(() => {
-    try {
-      schedules = fetchAllSchedules(namespace);
-    } catch (e) {
-      debugger;
-    }
-  });
-
+  let schedules = fetchAllSchedules(namespace);
   let search = '';
   let showCreateConfirmation = false;
 
@@ -97,8 +89,8 @@
   {#if schedules.length}
     <Pagination items={filteredSchedules(schedules)} let:visibleItems>
       <Table {columns}>
-        {#each visibleItems as item}
-          <ScheduleRow {item} {namespace} />
+        {#each visibleItems as schedule}
+          <ScheduleRow {schedule} {namespace} />
         {/each}
       </Table>
     </Pagination>

@@ -15,23 +15,12 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { routeForSchedule, routeForWorkflow } from '$lib/utilities/route-for';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import { fetchSchedule } from '$lib/services/schedule-service';
-  import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import Link from '$lib/components/link.svelte';
 
-  import { onMount } from 'svelte';
   import ScheduleFrequency from './schedule-frequency.svelte';
 
   export let namespace: string;
-  export let item;
-
-  let schedule = new Promise(() => []);
-  onMount(() => {
-    schedule = fetchSchedule(
-      { namespace, scheduleId: decodeURIForSvelte(item.scheduleId) },
-      fetch,
-    );
-  });
+  export let schedule;
 
   const getRoute = (item: WorkflowExecution) =>
     routeForSchedule({
@@ -40,56 +29,55 @@
     });
 </script>
 
-{#await schedule}
-  <div class="row">
-    <div class="cell" />
-    <div class="cell">{item.scheduleId}</div>
-    <div class="cell" />
-    <div class="cell hidden xl:table-cell" />
-    <div class="cell hidden xl:table-cell" />
+<a sveltekit:prefetch href={getRoute(schedule)} class="row">
+  <div class="cell">Status</div>
+  <div class="cell truncate">
+    {schedule.scheduleId}
   </div>
-{:then schedule}
-  <a sveltekit:prefetch href={getRoute(item)} class="row">
-    <div class="cell">
-      <WorkflowStatus
-        status={schedule?.schedule?.state?.paused ? 'Paused' : 'Running'}
-      />
-    </div>
-    <div class="cell truncate">
-      {item.scheduleId}
+  <div class="cell">Workflow Name</div>
+  <div class="cell hidden xl:table-cell links">Recent actions</div>
+  <div class="cell hidden xl:table-cell">Future action times</div>
+</a>
+
+<!-- <a sveltekit:prefetch href={getRoute(schedule)} class="row">
+  <div class="cell">
+    <WorkflowStatus
+      status={schedule?.schedule?.state?.paused ? 'Paused' : 'Running'}
+    />
+  </div>
+  <div class="cell truncate">
+    {schedule.scheduleId}
+    <p>
+      <small class="text-gray-900"
+        ><ScheduleFrequency
+          calendar={schedule?.schedule?.spec?.calendar?.[0]}
+          interval={schedule?.schedule?.spec?.interval?.[0]}
+        /></small
+      >
+    </p>
+  </div>
+  <div class="cell">
+    {schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
+  </div>
+  <div class="cell hidden xl:table-cell links">
+    {#each schedule?.info?.recentActions?.reverse().slice(0, 5) ?? [] as run}
       <p>
-        <small class="text-gray-900"
-          ><ScheduleFrequency
-            calendar={schedule?.schedule?.spec?.calendar?.[0]}
-            interval={schedule?.schedule?.spec?.interval?.[0]}
-          /></small
+        <Link
+          href={routeForWorkflow({
+            namespace,
+            workflow: run.startWorkflowResult.workflowId,
+            run: run.startWorkflowResult.runId,
+          })}>{formatDate(run.actualTime, $timeFormat)}</Link
         >
       </p>
-    </div>
-    <div class="cell">
-      {schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
-    </div>
-    <div class="cell hidden xl:table-cell links">
-      {#each schedule?.info?.recentActions?.reverse().slice(0, 5) ?? [] as run}
-        <p>
-          <Link
-            href={routeForWorkflow({
-              namespace,
-              workflow: run.startWorkflowResult.workflowId,
-              run: run.startWorkflowResult.runId,
-            })}>{formatDate(run.actualTime, $timeFormat)}</Link
-          >
-        </p>
-      {/each}
-    </div>
-    <div class="cell hidden xl:table-cell">
-      {#each schedule?.info?.futureActionTimes?.slice(0, 5) ?? [] as run}
-        <div>{formatDate(run, $timeFormat, 'from now')}</div>
-      {/each}
-    </div>
-  </a>
-{/await}
-
+    {/each}
+  </div>
+  <div class="cell hidden xl:table-cell">
+    {#each schedule?.info?.futureActionTimes?.slice(0, 5) ?? [] as run}
+      <div>{formatDate(run, $timeFormat, 'from now')}</div>
+    {/each}
+  </div>
+</a> -->
 <style lang="postcss">
   .row {
     @apply block h-36 items-center border-b-2 p-2 text-sm no-underline last-of-type:border-b-0 xl:table-row xl:text-base;
