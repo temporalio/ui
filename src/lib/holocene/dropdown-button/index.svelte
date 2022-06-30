@@ -35,7 +35,7 @@
 
 <style lang="postcss">
   .dropdown-button {
-    @apply flex flex-row items-center justify-between gap-4 rounded-lg border border-gray-300 py-4;
+    @apply flex flex-row items-center justify-between rounded-lg border border-gray-300 py-4;
   }
 
   .dropdown {
