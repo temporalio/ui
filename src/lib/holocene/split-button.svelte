@@ -22,10 +22,10 @@
   on:click-outside={() => (showDropdown = false)}
 >
   <div class="split-button" class:disabled>
-    <button {disabled} class="segment px-4 rounded-l">
+    <button {disabled} class="segment rounded-l px-4">
       {label}
     </button>
-    <div class="segment px-2 rounded-r">
+    <div class="segment rounded-r px-2">
       <Icon stroke="currentcolor" name="caretDown" />
     </div>
   </div>
@@ -44,15 +44,15 @@
 
 <style lang="postcss">
   .split-button {
-    @apply font-poppins cursor-pointer flex grow flex-row gap-[1px];
+    @apply flex grow cursor-pointer flex-row gap-[1px] font-poppins;
   }
 
   .right {
-    @apply origin-top-right right-0;
+    @apply right-0 origin-top-right;
   }
 
   .left {
-    @apply origin-top-left left-0;
+    @apply left-0 origin-top-left;
   }
 
   .split-button.disabled {
@@ -64,10 +64,10 @@
   }
 
   .segment {
-    @apply text-sm text-white bg-gray-900 py-2 shadow inline-block;
+    @apply inline-block bg-gray-900 py-2 text-sm text-white shadow;
   }
 
   .dropdown {
-    @apply min-w-max font-poppins text-sm absolute z-50 flex flex-col gap-y-4  bg-white rounded-lg shadow border border-gray-300 p-6 mt-1;
+    @apply absolute z-50 mt-1 flex min-w-max flex-col gap-y-4 rounded-lg  border border-gray-300 bg-white p-6 font-poppins text-sm shadow;
   }
 </style>
