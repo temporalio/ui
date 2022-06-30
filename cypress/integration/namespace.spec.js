@@ -1,8 +1,8 @@
-describe('Settings page', () => {
+describe('Namespace page', () => {
   beforeEach(() => {
     cy.interceptApi();
 
-    cy.visit('/namespaces/default/settings');
+    cy.visit('/namespaces/default');
 
     cy.fixture('namespaces.json')
       .then(({ namespaces }) => {
@@ -16,9 +16,9 @@ describe('Settings page', () => {
   });
 
   it('have the correct namespace information with labels', () => {
-    cy.get('[data-cy="settings-title"]').should(
+    cy.get('[data-cy="namespace-title"]').should(
       'to.contain',
-      'Settings: default',
+      'Namespace: default',
     );
     cy.get('[data-cy="namespace-description"]').should(
       'to.contain',

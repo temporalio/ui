@@ -1,7 +1,6 @@
 <script lang="ts">
   import debounce from 'just-debounce';
   import { page } from '$app/stores';
-  import { goto } from '$app/navigation';
 
   import { timeFormat } from '$lib/stores/time-format';
 
@@ -40,7 +39,6 @@
         parameter: 'search',
         value: searchType,
         url: $page.url,
-        goto,
       });
     };
 
@@ -53,7 +51,6 @@
       url: $page.url,
       parameter: 'query',
       value: query,
-      goto,
     });
   };
 
@@ -65,7 +62,6 @@
       parameter: 'query',
       value: query,
       allowEmpty: true,
-      goto,
     });
   }, 300);
 </script>

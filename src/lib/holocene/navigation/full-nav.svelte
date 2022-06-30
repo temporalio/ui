@@ -10,8 +10,7 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/index.svelte';
 
-  import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import { navOpen } from '$lib/stores/nav-open';
+  import { navOpen, namespaceSelectorOpen } from '$lib/stores/nav-open';
 
   import NavContainer from '$lib/holocene/navigation/_nav-container.svelte';
   import NavRow from '$lib/holocene/navigation/_nav-row.svelte';
@@ -31,45 +30,21 @@
   export let extras: ExtraIcon[] | null = null;
 
   let showProfilePic = true;
-  let namespaceSelectorOpen: boolean | null = null;
 
   function fixImage() {
     showProfilePic = false;
   }
 
-  function toggleNamespaceSelector() {
-    namespaceSelectorOpen = !namespaceSelectorOpen;
-  }
-
   afterNavigate(() => {
-    if (namespaceSelectorOpen) {
-      namespaceSelectorOpen = false;
+    if ($namespaceSelectorOpen) {
+      $namespaceSelectorOpen = false;
     }
   });
 </script>
 
 <NavContainer {isCloud} {linkList}>
   <svelte:fragment slot="top">
-    <NavRow {isCloud} wrap data-cy="namespace-select-button">
-      <div
-        class="relative flex cursor-pointer items-center"
-        on:click={toggleNamespaceSelector}
-      >
-        <Tooltip
-          right={!$navOpen}
-          topRight={$navOpen}
-          text={activeNamespace ?? 'Namespaces'}
-        >
-          <div class="nav-icon">
-            <Icon name="namespaceSelect" scale={1.6} />
-          </div>
-        </Tooltip>
-        <div class="nav-title namespace truncate" style="font-size: 12px;">
-          {activeNamespace ?? 'Namespaces'}
-        </div>
-      </div>
-    </NavRow>
-    <NavRow link={linkList.workflows} {isCloud} data-cy="worfklows-button">
+    <NavRow link={linkList.workflows} {isCloud} data-cy="workflows-button">
       <Tooltip right hide={$navOpen} text="Workflows">
         <div class="nav-icon">
           <Icon name="workflow" scale={1.5} />
@@ -77,6 +52,16 @@
       </Tooltip>
       <div class="nav-title">Workflows</div>
     </NavRow>
+    <IsCloudGuard>
+      <NavRow link={linkList.namespaces} {isCloud} data-cy="namespaces-button">
+        <Tooltip right hide={$navOpen} text="Namespaces">
+          <div class="nav-icon">
+            <Icon name="namespace" scale={1.5} />
+          </div>
+        </Tooltip>
+        <div class="nav-title">Namespaces</div>
+      </NavRow>
+    </IsCloudGuard>
     <IsCloudGuard {isCloud}>
       <NavRow link={linkList.archive} {isCloud} data-cy="archive-button">
         <Tooltip right hide={$navOpen} text="Archive">
@@ -101,16 +86,6 @@
         </NavRow>
       {/each}
     {/if}
-    <IsCloudGuard {isCloud}>
-      <NavRow link={linkList.settings} {isCloud} data-cy="settings-button">
-        <Tooltip right hide={$navOpen} text="Settings">
-          <div class="nav-icon">
-            <Icon name="settings" scale={1.4} />
-          </div>
-        </Tooltip>
-        <div class="nav-title">Settings</div>
-      </NavRow>
-    </IsCloudGuard>
     <NavRow link={linkList.feedback} {isCloud} externalLink>
       <Tooltip right hide={$navOpen} text="Feedback">
         <div class="nav-icon">
@@ -171,18 +146,14 @@
   </svelte:fragment>
   <svelte:fragment slot="drawer">
     <Drawer
-      flyin={namespaceSelectorOpen === true}
-      flyout={namespaceSelectorOpen === false}
+      flyin={$namespaceSelectorOpen === true}
+      flyout={$namespaceSelectorOpen === false}
       onClose={() => {
-        if (namespaceSelectorOpen === true) namespaceSelectorOpen = false;
+        if ($namespaceSelectorOpen === true) $namespaceSelectorOpen = false;
       }}
     >
-      {#if namespaceSelectorOpen}
-        <NamespaceList
-          {namespaceList}
-          {activeNamespace}
-          lastUsedNamespace={$lastUsedNamespace}
-        />
+      {#if $namespaceSelectorOpen}
+        <NamespaceList {namespaceList} {activeNamespace} />
       {/if}
     </Drawer>
   </svelte:fragment>

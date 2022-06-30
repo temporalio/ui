@@ -4,19 +4,22 @@
 
   import PageTransition from '$lib/holocene/page-transition.svelte';
   import Header from '$lib/layouts/workflow-header.svelte';
+  import Loading from '$lib/components/loading.svelte';
 
   const { namespace } = $page.params;
 </script>
 
-<PageTransition>
-  <main class="flex h-full flex-col gap-6">
-    {#if !$loading}
+<main class="flex h-full flex-col gap-6">
+  {#if $loading}
+    <Loading />
+  {:else}
+    <PageTransition>
       <Header
         {namespace}
         workflow={$workflowRun.workflow}
         workers={$workflowRun.workers}
       />
       <slot />
-    {/if}
-  </main>
-</PageTransition>
+    </PageTransition>
+  {/if}
+</main>

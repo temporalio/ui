@@ -9,6 +9,7 @@ type RouteParameters = {
   view?: EventView | string;
   queryParams?: Record<string, string>;
   eventId: string;
+  scheduleId: string;
   queue: string;
   schedule: string;
 };
@@ -27,7 +28,7 @@ export type WorkflowParameters = Pick<
 >;
 export type ScheduleParameters = Pick<
   RouteParameters,
-  'namespace' | 'schedule' | 'run'
+  'namespace' | 'schedule' | 'run' | 'scheduleId'
 >;
 export type EventHistoryParameters = Pick<
   RouteParameters,
@@ -41,6 +42,10 @@ export type AuthenticationParameters = {
   settings: Settings;
   searchParams?: URLSearchParams;
   originUrl?: string;
+};
+
+export const routeForNamespaces = (): string => {
+  return `/namespaces`;
 };
 
 export const routeForNamespace = ({
@@ -57,10 +62,6 @@ export const routeForArchivalWorkfows = (
   parameters: NamespaceParameter,
 ): string => {
   return `${routeForNamespace(parameters)}/archival`;
-};
-
-export const routeForSettings = (parameters: NamespaceParameter): string => {
-  return `${routeForNamespace(parameters)}/settings`;
 };
 
 export const routeForSchedules = (parameters: NamespaceParameter): string => {
@@ -175,14 +176,14 @@ const hasParameters =
   <T extends Record<string, string | Record<string, string>>>(
     ...required: string[]
   ) =>
-  (
-    parameters: Record<string, string | Record<string, string>>,
-  ): parameters is T => {
-    for (const parameter of required) {
-      if (!parameters[parameter]) return false;
-    }
-    return true;
-  };
+    (
+      parameters: Record<string, string | Record<string, string>>,
+    ): parameters is T => {
+      for (const parameter of required) {
+        if (!parameters[parameter]) return false;
+      }
+      return true;
+    };
 
 export const isNamespaceParameter =
   hasParameters<NamespaceParameter>('namespace');

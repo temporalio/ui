@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { isRecommendedVersionNewer } from '$lib/utilities/version-check';
+  import { isVersionNewer } from '$lib/utilities/version-check';
   import type { BannersState } from '$lib/models/banner-state';
   import Banner from './banner.svelte';
 
@@ -9,7 +9,7 @@
   const severity = 'low';
   const key = `ui-v${uiVersionInfo?.current}`;
   const message = `📥 Temporal UI v${uiVersionInfo?.recommended} is available`;
-  const show = isRecommendedVersionNewer(
+  const show = isVersionNewer(
     uiVersionInfo?.recommended,
     uiVersionInfo?.current,
   );

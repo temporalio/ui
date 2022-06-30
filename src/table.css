@@ -1,0 +1,56 @@
+@layer components {
+  table.fancy {
+    @apply border-separate border-gray-900;
+
+    border-spacing: 0;
+
+    thead {
+      @apply bg-gray-900 text-gray-100;
+    }
+
+    th {
+      @apply border border-b-0 border-r-0 border-l-0 p-3 text-left text-sm font-medium;
+    }
+
+    thead tr th:first-child {
+      @apply rounded-tl-lg border-l border-gray-900;
+    }
+
+    thead tr th:last-child {
+      @apply rounded-tr-lg border-r border-gray-900;
+    }
+
+    tbody tr td {
+      @apply border-t border-l-0 border-gray-900 p-2 text-sm;
+    }
+
+    tbody tr td:first-child {
+      @apply border-l border-gray-900;
+    }
+
+    tbody tr:last-child td {
+      @apply border-b border-gray-900;
+    }
+
+    tbody tr td {
+      @apply border-r border-gray-900 p-2 text-sm;
+    }
+  }
+
+  table.simple {
+    @apply border-separate rounded-lg border border-gray-900 p-2;
+    border-spacing: 0;
+
+    tr {
+      td {
+        @apply border-b border-gray-900 p-2;
+      }
+    }
+
+    tr:last-child {
+      td {
+        @apply border-b-0 border-gray-900;
+      }
+    }
+  }
+}

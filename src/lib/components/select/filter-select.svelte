@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
@@ -21,7 +20,6 @@
       parameter,
       value: _value,
       url: $page.url,
-      goto,
     }).then((v) => (value = v));
   };
 </script>

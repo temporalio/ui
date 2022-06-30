@@ -16,7 +16,7 @@ import {
   FetchEventsParametersWithSettings,
 } from '$lib/services/events-service';
 
-import { eventCategory, eventSortOrder } from './event-view';
+import { eventCategoryParam, eventSortOrder } from './event-view';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { withLoading, delay } from '$lib/utilities/stores/with-loading';
 import { groupEvents } from '$lib/models/event-groups';
@@ -26,9 +26,12 @@ const emptyEvents: FetchEventsResponse = {
   eventGroups: [],
 };
 
-const namespace = derived([page], ([$page]) =>
-  decodeURIForSvelte($page.params.namespace),
-);
+const namespace = derived([page], ([$page]) => {
+  if ($page.params.namespace) {
+    return decodeURIForSvelte($page.params.namespace);
+  }
+  return '';
+});
 
 const workflowId = derived([page], ([$page]) => {
   if ($page.params.workflow) {
@@ -127,7 +130,7 @@ export const updateEventHistory: StartStopNotifier<FetchEventsResponse> = (
 export const eventHistory = readable(emptyEvents, updateEventHistory);
 
 export const events: Readable<WorkflowEvents> = derived(
-  [eventHistory, eventCategory],
+  [eventHistory, eventCategoryParam],
   ([$eventHistory, $category]) => {
     const { events } = $eventHistory;
     if (!$category) return events;
@@ -136,7 +139,7 @@ export const events: Readable<WorkflowEvents> = derived(
 );
 
 export const eventGroups: Readable<EventGroups> = derived(
-  [eventHistory, eventCategory],
+  [eventHistory, eventCategoryParam],
   ([$eventHistory, $category]) => {
     const { eventGroups } = $eventHistory;
     if (!$category) return eventGroups;
@@ -145,7 +148,7 @@ export const eventGroups: Readable<EventGroups> = derived(
 );
 
 export const ascendingEventGroups: Readable<EventGroups> = derived(
-  [eventHistory, eventSortOrder, eventCategory],
+  [eventHistory, eventSortOrder, eventCategoryParam],
   ([$eventHistory, $sortOrder, $category]) => {
     const { events } = $eventHistory;
     const _events =
