@@ -1,6 +1,7 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/index.svelte';
-  import type { IconName } from '$lib/holocene/icon/paths';
+  import Icon from '$holocene/icon/index.svelte';
+  import type { IconName } from '$holocene/icon/paths';
+  import Badge from '$holocene/badge.svelte';
 
   export let disabled: boolean = false;
   export let secondary: boolean = false;
@@ -16,12 +17,13 @@
   export let iconScale: number = 1;
   export let classes: string = $$props.class;
   export let dataCy: string = $$props.dataCy;
+  export let count: number = 0;
 </script>
 
 {#if as === 'button'}
   <button
     on:click
-    class={`primary flex items-center justify-center gap-2 text-sm ${classes}`}
+    class={`button primary ${classes}`}
     class:selected={active}
     class:large
     class:secondary
@@ -31,22 +33,30 @@
     data-cy={dataCy}
     {disabled}
   >
-    {#if icon}
+    {#if icon || loading}
       <span class:animate-spin={loading}>
         <Icon
           scale={iconScale}
+          width={18}
+          height={18}
           stroke="currentcolor"
           name={loading ? 'spinner' : icon}
         />
       </span>
     {/if}
     <slot />
+    {#if count > 0}
+      <Badge
+        class="badge absolute top-0 right-0 origin-bottom-left origin-bottom-left translate-y-[-10px] translate-x-[10px]"
+        type="count">{count}</Badge
+      >
+    {/if}
   </button>
 {:else}
   <a
     {href}
     on:click
-    class={`primary flex w-fit items-center justify-center gap-2 text-sm ${classes}`}
+    class={`button primary ${classes}`}
     class:selected={active}
     class:large
     class:secondary
@@ -57,10 +67,12 @@
     data-cy={dataCy}
     {disabled}
   >
-    {#if icon}
+    {#if icon || loading}
       <span class:animate-spin={loading}>
         <Icon
           scale={iconScale}
+          width={18}
+          height={18}
           stroke="currentcolor"
           name={loading ? 'spinner' : icon}
         />
@@ -71,40 +83,52 @@
 {/if}
 
 <style lang="postcss">
+  .button {
+    @apply relative flex w-fit items-center justify-center gap-2 border py-2 px-4 font-poppins text-sm transition-colors;
+  }
+
+  .button:disabled {
+    @apply cursor-not-allowed;
+  }
+
   .large {
     @apply text-lg;
   }
 
   .primary {
-    @apply rounded-lg border-2 bg-primary py-2 px-4 text-white transition-colors;
+    @apply rounded border-primary bg-primary text-white;
   }
 
   .primary:disabled {
-    @apply cursor-not-allowed border-purple-400 bg-gray-400 text-purple-400;
+    @apply opacity-50;
   }
 
   .primary:hover:enabled {
-    @apply bg-blue-700;
+    @apply border-blue-700 bg-blue-700;
+  }
+
+  .primary:hover:enabled :global(.badge) {
+    @apply bg-blue-500 text-gray-100;
   }
 
   .secondary {
-    @apply rounded-lg border-2 bg-white py-2 px-4 text-gray-800 transition-colors;
+    @apply border-gray-800 bg-white text-gray-800;
   }
 
   .secondary:disabled {
-    @apply cursor-not-allowed border-purple-400 bg-gray-400 text-purple-400;
+    @apply bg-gray-300 text-gray-900;
   }
 
   .secondary:hover:enabled {
-    @apply bg-gray-900 text-white;
+    @apply border-gray-900 bg-gray-900 text-white;
   }
 
   .destroy {
-    @apply rounded-lg border-2 border-danger bg-danger px-5 text-white transition-colors;
+    @apply border-danger bg-danger px-5 text-white;
   }
 
   .destroy:disabled {
-    @apply cursor-not-allowed border-red-400 bg-gray-400 text-red-400;
+    @apply border-red-900 bg-red-300 text-red-900;
   }
 
   .destroy:hover:enabled {
@@ -112,7 +136,7 @@
   }
 
   .selected {
-    @apply border-purple-200 bg-purple-600 text-white;
+    @apply bg-purple-600 text-white;
   }
 
   .login {
