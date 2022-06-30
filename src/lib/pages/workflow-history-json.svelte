@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
 
   import CodeBlock from '$lib/components/code-block.svelte';
+  import Loading from '$lib/components/loading.svelte';
   import { fetchRawEvents } from '$lib/services/events-service';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 
@@ -14,6 +15,8 @@
   });
 </script>
 
-{#await events then events}
+{#await events}
+  <Loading />
+{:then events}
   <CodeBlock content={events} data-cy="event-history-json" />
 {/await}
