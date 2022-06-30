@@ -38,8 +38,11 @@ export const fetchAllWorkflows = async (
     ? 'workflows.archived'
     : 'workflows';
 
-  let onError: ErrorCallback;
-  let error: string;
+  let error = '';
+  const onError: ErrorCallback = (err) =>
+    (error =
+      err?.body?.message ??
+      `Error fetching workflows: ${err.status}: ${err.statusText}`);
 
   const { executions, nextPageToken } =
     (await requestFromAPI<ListWorkflowExecutionsResponse>(

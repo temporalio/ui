@@ -2,7 +2,12 @@
   import { page } from '$app/stores';
   import { timeFormat } from '$lib/stores/time-format';
   import { workflowsSearch } from '$lib/stores/workflows';
-  import { workflows, loading, updating } from '$lib/stores/workflows';
+  import {
+    workflows,
+    loading,
+    updating,
+    workflowError,
+  } from '$lib/stores/workflows';
   import { namespaceSelectorOpen } from '$lib/stores/nav-open';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { viewFeature } from '$lib/stores/new-feature-tags';
@@ -77,5 +82,9 @@
     </WorkflowsSummaryTable>
   </Pagination>
 {:else}
-  <EmptyState title={'No Workflows Found'} content={errorMessage} />
+  <EmptyState
+    title={'No Workflows Found'}
+    content={errorMessage}
+    error={$workflowError}
+  />
 {/if}
