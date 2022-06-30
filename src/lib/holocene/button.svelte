@@ -47,7 +47,7 @@
     <slot />
     {#if count > 0}
       <Badge
-        class="badge absolute top-0 right-0 translate-y-[-10px] translate-x-[10px] origin-bottom-left origin-bottom-left"
+        class="badge absolute top-0 right-0 origin-bottom-left origin-bottom-left translate-y-[-10px] translate-x-[10px]"
         type="count">{count}</Badge
       >
     {/if}
@@ -84,7 +84,7 @@
 
 <style lang="postcss">
   .button {
-    @apply border transition-colors py-2 px-4 relative flex w-fit items-center justify-center gap-2 font-poppins text-sm;
+    @apply relative flex w-fit items-center justify-center gap-2 border py-2 px-4 font-poppins text-sm transition-colors;
   }
 
   .button:disabled {
@@ -96,7 +96,7 @@
   }
 
   .primary {
-    @apply rounded bg-primary border-primary text-white;
+    @apply rounded border-primary bg-primary text-white;
   }
 
   .primary:disabled {
@@ -104,7 +104,7 @@
   }
 
   .primary:hover:enabled {
-    @apply bg-blue-700 border-blue-700;
+    @apply border-blue-700 bg-blue-700;
   }
 
   .primary:hover:enabled :global(.badge) {
@@ -120,19 +120,19 @@
   }
 
   .secondary:hover:enabled {
-    @apply bg-gray-900 border-gray-900 text-white;
+    @apply border-gray-900 bg-gray-900 text-white;
   }
 
   .destroy {
-    @apply bg-danger border-danger px-5 text-white;
+    @apply border-danger bg-danger px-5 text-white;
   }
 
   .destroy:disabled {
-    @apply bg-red-300 text-red-900 border-red-900;
+    @apply border-red-900 bg-red-300 text-red-900;
   }
 
   .destroy:hover:enabled {
-    @apply bg-red-900 border-red-900 text-white;
+    @apply border-red-900 bg-red-900 text-white;
   }
 
   .selected {
