@@ -1,5 +1,6 @@
 <script lang="ts">
   import Icon from '$holocene/icon/index.svelte';
+  import { clickOutside } from '$holocene/outside-click';
   import type { IconName } from '$holocene/icon/paths';
 
   export let label: string;
@@ -13,6 +14,8 @@
   class="inline-block {$$props.class}"
   bind:clientWidth={width}
   on:click={() => (showDropdown = !showDropdown)}
+  use:clickOutside
+  on:click-outside={() => (showDropdown = false)}
 >
   <div class="dropdown-button">
     {#if icon}
@@ -39,6 +42,6 @@
   }
 
   .dropdown {
-    @apply absolute z-50 mt-1 rounded-lg border border-gray-300 bg-white p-4 shadow-md;
+    @apply absolute z-50 mt-1 min-w-max rounded-lg border border-gray-300 bg-white p-4 shadow-md;
   }
 </style>
