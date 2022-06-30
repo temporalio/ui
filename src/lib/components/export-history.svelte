@@ -11,6 +11,7 @@
       namespace,
       workflowId,
       runId,
+      sort: 'ascending',
     });
 
     const content = JSON.stringify({ events }, null, 2);
