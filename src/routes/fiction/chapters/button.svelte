@@ -63,7 +63,7 @@
     <Button>Primary</Button>
     <Button secondary>Secondary</Button>
     <Button destroy>Danger</Button>
-    <Button icon="download" secondary>Download</Button>
+    <Button icon="refresh" secondary>Refresh</Button>
     <Button loading secondary>Loading</Button>
   </div>
 </Chapter>

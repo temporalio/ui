@@ -185,6 +185,31 @@ const filterIcon = {
   ],
 };
 
+const globeIcon = {
+  paths: [
+    {
+      d: 'M6 11C8.7614 11 11 8.7614 11 6C11 3.23857 8.7614 1 6 1C3.23857 1 1 3.23857 1 6C1 8.7614 3.23857 11 6 11Z',
+      stroke: '',
+    },
+    {
+      d: 'M1.25 6.25L4 7.25L3.5 9L4 10.5',
+      stroke: '',
+    },
+    {
+      d: 'M8.5 10.25L8.25 9L7 8.5V6.75L8.5 6.25L10.75 6.5',
+      stroke: '',
+    },
+    {
+      d: 'M9.5 2.75L9.25 3.5L7.5 3.75V5.25L8.75 4.75H9.75L10.75 5.25',
+      stroke: '',
+    },
+    {
+      d: 'M1.25 5.25L2.5 4.25L3.75 4L4.75 2.5L4.25 1.5',
+      stroke: '',
+    },
+  ],
+};
+
 const jsonIcon = {
   paths: [
     {
@@ -307,6 +332,23 @@ const spinnerIcon: Icon = {
   ],
 };
 
+const stopwatchIcon: Icon = {
+  paths: [
+    {
+      d: 'M4.5 1H7.5',
+      stroke: '#111827',
+    },
+    {
+      d: 'M6 5V7',
+      stroke: '#111827',
+    },
+    {
+      d: 'M6 11C8.20915 11 10 9.20915 10 7C10 4.79086 8.20915 3 6 3C3.79086 3 2 4.79086 2 7C2 9.20915 3.79086 11 6 11Z',
+      stroke: '#111827',
+    },
+  ],
+};
+
 const workflowIcon: Icon = {
   paths: [
     {
@@ -339,6 +381,7 @@ export const icons: { [index: string]: Icon } = {
   feedback: feedbackIcon,
   fileUpload: fileUploadIcon,
   filter: filterIcon,
+  globe: globeIcon,
   json: jsonIcon,
   lock: lockIcon,
   logout: logoutIcon,
@@ -350,5 +393,6 @@ export const icons: { [index: string]: Icon } = {
   search: searchIcon,
   settings: settingsIcon,
   spinner: spinnerIcon,
+  stopwatch: stopwatchIcon,
   workflow: workflowIcon,
 };

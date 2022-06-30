@@ -12,7 +12,7 @@
   }
 </script>
 
-<div class:checked class="flex items-center py-2" on:click={handleItemClick}>
+<div class:checked class="flex items-center" on:click={handleItemClick}>
   <input {checked} class="mr-4" type="radio" {name} {value} id={value} />
   <label class="w-full cursor-pointer p-2" for={value}><slot /></label>
 </div>

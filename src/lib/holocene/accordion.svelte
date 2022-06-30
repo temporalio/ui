@@ -1,7 +1,7 @@
 <script lang="ts">
   import IconButton from '$lib/components/icon-button.svelte';
   export let title: string;
-  export let subtitle: string;
+  export let subtitle: string = '';
 
   let open: boolean = false;
 </script>

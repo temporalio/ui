@@ -56,11 +56,11 @@
   }
 
   .split-button.disabled {
-    @apply cursor-default;
+    @apply cursor-not-allowed opacity-50;
   }
 
-  .split-button.disabled .segment {
-    @apply bg-gray-500;
+  .segment:disabled {
+    @apply cursor-not-allowed;
   }
 
   .segment {
