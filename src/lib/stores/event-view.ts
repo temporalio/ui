@@ -1,9 +1,11 @@
-import { derived } from 'svelte/store';
+import { derived, Readable } from 'svelte/store';
 import { page } from '$app/stores';
 import { persistStore } from '$lib/stores/persist-store';
 import { temporalVersion } from './versions';
 import { isVersionNewer } from '$lib/utilities/version-check';
+import { isSortOrder } from '$lib/utilities/is';
 
+type PageStore = typeof page;
 export type EventSortOrder = 'ascending' | 'descending';
 export type EventSortOrderOptions = {
   label: string;
@@ -28,9 +30,14 @@ export const eventCategoryParam = derived([page], ([$page]) =>
   $page.url.searchParams.get('category'),
 );
 
-export const eventSortParam = derived([page], ([$page]) =>
-  $page.url.searchParams.get('sort'),
-);
+export const eventSortParam: Readable<EventSortOrder> = derived<
+  [PageStore],
+  EventSortOrder
+>([page], ([$page]): EventSortOrder => {
+  const sortParameter = $page.url.searchParams.get('sort');
+  if (isSortOrder(sortParameter)) return sortParameter;
+  return 'descending';
+});
 
 export const supportsReverseOrder = derived(
   [temporalVersion],
@@ -40,13 +47,16 @@ export const supportsReverseOrder = derived(
   },
 );
 
-export const eventSortOrder = derived(
+export const eventSortOrder: Readable<EventSortOrder> = derived(
   [eventFilterSort, supportsReverseOrder, eventSortParam],
   ([$eventFilterSort, $supportsReverseOrder, $eventSortParam]) => {
+    let sortOrder: EventSortOrder;
     if ($supportsReverseOrder) {
       if ($eventSortParam) return $eventSortParam;
-      return $eventFilterSort;
+      sortOrder = $eventFilterSort;
+    } else {
+      sortOrder = 'ascending';
     }
-    return 'ascending';
+    return sortOrder;
   },
 );
