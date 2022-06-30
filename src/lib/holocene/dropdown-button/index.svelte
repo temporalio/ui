@@ -5,31 +5,46 @@
 
   export let label: string;
   export let icon: IconName = undefined;
-  export let showDropdown: boolean = false;
+  export let readonly: boolean = false;
+
+  let showDropdown: boolean = false;
 
   let width: number;
+  const handleClick = () => {
+    if (!readonly) {
+      showDropdown = !showDropdown;
+    }
+  };
 </script>
 
 <div
   class="inline-block {$$props.class}"
   bind:clientWidth={width}
-  on:click={() => (showDropdown = !showDropdown)}
+  on:click={handleClick}
   use:clickOutside
   on:click-outside={() => (showDropdown = false)}
 >
-  <div class="dropdown-button">
+  <div class="dropdown-button" class:readonly>
     {#if icon}
-      <div class="ml-4">
-        <Icon name={icon} scale={0.6} stroke="currentcolor" />
+      <div class="ml-4 flex items-center">
+        <Icon
+          name={icon}
+          strokeWidth={1}
+          width={12}
+          height={12}
+          stroke="currentcolor"
+        />
       </div>
     {/if}
     <span class="ml-2 mr-8">{label}</span>
-    <div class="mr-2">
-      <Icon scale={0.8} name={showDropdown ? 'caretUp' : 'caretDown'} />
-    </div>
+    {#if !readonly}
+      <div class="mr-2">
+        <Icon scale={0.8} name={showDropdown ? 'caretUp' : 'caretDown'} />
+      </div>
+    {/if}
   </div>
 
-  {#if showDropdown}
+  {#if showDropdown && $$slots.default}
     <div class="dropdown" style="width: {width}px;">
       <slot />
     </div>
@@ -38,7 +53,11 @@
 
 <style lang="postcss">
   .dropdown-button {
-    @apply flex flex-row items-center justify-between rounded-lg border border-gray-300 py-4;
+    @apply flex cursor-pointer flex-row items-center justify-between rounded-lg border border-gray-300 py-4;
+  }
+
+  .dropdown-button.readonly {
+    @apply cursor-default;
   }
 
   .dropdown {

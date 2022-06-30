@@ -18,6 +18,7 @@
   export let classes: string = $$props.class;
   export let dataCy: string = $$props.dataCy;
   export let count: number = 0;
+  export let type: string = 'button';
 </script>
 
 {#if as === 'button'}
@@ -31,14 +32,13 @@
     class:login
     class:thin
     data-cy={dataCy}
+    {type}
     {disabled}
   >
     {#if icon || loading}
       <span class:animate-spin={loading}>
         <Icon
           scale={iconScale}
-          width={18}
-          height={18}
           stroke="currentcolor"
           name={loading ? 'spinner' : icon}
         />

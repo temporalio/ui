@@ -3,31 +3,29 @@
   import Item from '$lib/holocene/dropdown-button/radio-menu-item.svelte';
   import Chapter from '../_chapter.svelte';
 
-  let options = {
-    pepperoni: 'Pepperoni',
-    green_peppers: 'Green Peppers',
-    black_olives: 'Black Olives',
-  };
-
-  let favoritePizzaTopping: string;
+  let value: string;
 
   const updateValue = (event: CustomEvent<{ value: string }>) => {
-    favoritePizzaTopping = event.detail.value;
+    value = event.detail.value;
   };
 </script>
 
 <Chapter description="A simple dropdown menu">
   <DropdownButton
-    label={options[favoritePizzaTopping] ?? 'Favorite Pizza Topping'}
-    icon="clock"
+    label={value ? `${value} day retention` : 'Retention Policy'}
+    icon="stopwatch"
   >
-    {#each Object.entries(options) as [value, label]}
+    {#each ['3', '7', '15', '30', '60', '90'] as v}
       <Item
         on:click={updateValue}
         name="pizza-toppings"
-        {value}
-        checked={value === favoritePizzaTopping}>{label}</Item
+        value={v}
+        checked={value === v}>{v} Days</Item
       >
     {/each}
   </DropdownButton>
+</Chapter>
+
+<Chapter description="A readonly dropdown menu">
+  <DropdownButton readonly label="region-1" icon="globe" />
 </Chapter>
