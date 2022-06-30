@@ -39,6 +39,6 @@
   }
 
   .dropdown {
-    @apply absolute z-50 mt-1 p-4 border border-gray-300 rounded-lg shadow-md bg-white;
+    @apply absolute z-50 mt-1 rounded-lg border border-gray-300 bg-white p-4 shadow-md;
   }
 </style>
