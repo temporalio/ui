@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Link from '$lib/components/link.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
   import Chapter from '../_chapter.svelte';
 </script>

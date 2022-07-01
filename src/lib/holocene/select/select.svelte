@@ -1,18 +1,15 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import Icon from '$lib/holocene/icon/index.svelte';
+  import Menu, { triggerMenu } from '$lib/holocene/primatives/menu.svelte';
   import Option, { isOption } from '$lib/holocene/select/option.svelte';
   import type { Option as OptionType } from '$lib/holocene/select/option.svelte';
 
-  let container: HTMLDivElement;
-  let dropdownWidth: number;
-  let open = false;
-
   type T = $$Generic;
-  type ExtendedPointerEvent<T> = PointerEvent & {
-    currentTarget: EventTarget & T;
-    path?: NodeList;
-  };
+  let show = false;
+
+  const hide = () => (show = false);
+  const toggle = () => (show = !show);
 
   export let label: string = '';
   export let id: string;
@@ -36,49 +33,21 @@
     }
   }
 
-  const dispatch = createEventDispatcher<{ change: { value: T } }>();
-
-  function handleContainerClick() {
-    open = !open;
-  }
+  const dispatch = createEventDispatcher<{ select: { value: T } }>();
 
   function handleOptionClick(event: CustomEvent<{ value: T }>) {
-    dispatch('change', { value: event.detail.value });
-    open = false;
-  }
-
-  function handleOutsideClick<T extends EventTarget = HTMLElement>(
-    event: ExtendedPointerEvent<T>,
-  ) {
-    let eventTarget: EventTarget = event.path?.length
-      ? event.path[0]
-      : event.target;
-    if (!eventTarget && event.relatedTarget) eventTarget = event.relatedTarget;
-
-    if (container.contains(eventTarget as Node)) return;
-
-    open = false;
-  }
-
-  function handleWindowResize() {
-    dropdownWidth = container?.offsetWidth;
-  }
-
-  $: {
-    dropdownWidth = container?.offsetWidth;
+    dispatch('select', { value: event.detail.value });
   }
 </script>
 
-<svelte:window on:click={handleOutsideClick} on:resize={handleWindowResize} />
-
-<div data-cy={$$props.dataCy} class={$$props.class}>
+<div data-cy={$$props.dataCy} class="relative inline w-full {$$props.class}">
   <label class="mb-2" for={id}>{label}</label>
   <div
     class="container"
-    class:open
+    use:triggerMenu
+    on:close-menu={hide}
+    on:trigger-menu={toggle}
     class:dark
-    on:click={handleContainerClick}
-    bind:this={container}
   >
     <input
       class="input"
@@ -88,25 +57,23 @@
       disabled
       {id}
     />
-    <Icon stroke="currentcolor" name={open ? 'caretUp' : 'caretDown'} />
+    <Icon stroke="currentcolor" name={show ? 'caretUp' : 'caretDown'} />
   </div>
-  {#if open}
-    <div class="options" class:dark style="width: {dropdownWidth}px">
-      {#if options}
-        {#each options as option}
-          {@const value = isOption(option) ? option.value : _value}
-          <Option
-            on:select={handleOptionClick}
-            selected={value === _value}
-            {dark}
-            value={option}
-          />
-        {/each}
-      {:else}
-        <slot />
-      {/if}
-    </div>
-  {/if}
+  <Menu class="max-h-60" bind:show {dark}>
+    {#if options}
+      {#each options as option}
+        {@const value = isOption(option) ? option.value : _value}
+        <Option
+          on:select={handleOptionClick}
+          selected={value === _value}
+          value={option}
+          {dark}
+        />
+      {/each}
+    {:else}
+      <slot />
+    {/if}
+  </Menu>
 </div>
 
 <style lang="postcss">
@@ -129,13 +96,5 @@
 
   .input {
     @apply h-full w-full cursor-pointer bg-white;
-  }
-
-  .options {
-    @apply fixed mt-1 max-h-60 overflow-y-scroll rounded-sm border border-gray-900 bg-white shadow;
-  }
-
-  .options.dark {
-    @apply bg-gray-900 text-white;
   }
 </style>

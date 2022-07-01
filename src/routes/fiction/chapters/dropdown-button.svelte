@@ -1,5 +1,5 @@
 <script lang="ts">
-  import DropdownButton from '$lib/holocene/dropdown-button/index.svelte';
+  import DropdownButton from '$lib/holocene/dropdown-button/dropdown-button.svelte';
   import Item from '$lib/holocene/dropdown-button/radio-menu-item.svelte';
   import Chapter from '../_chapter.svelte';
 
