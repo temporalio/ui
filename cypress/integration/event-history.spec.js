@@ -4,7 +4,10 @@ import { formatDistanceToNow } from 'date-fns';
 import * as dateTz from 'date-fns-tz';
 
 import workflowCompletedFixture from '../fixtures/workflow-completed.json';
-import eventsFixture from '../fixtures/event-history-completed.json';
+import eventsFixtureDescending from '../fixtures/event-history-completed-reverse.json';
+import eventsFixtureAscending from '../fixtures/event-history-completed.json';
+
+const [firstEventInDescendingOrder] = eventsFixtureDescending.history.events;
 
 const { workflowId, runId } =
   workflowCompletedFixture.workflowExecutionInfo.execution;
@@ -16,8 +19,14 @@ describe('Workflow Events', () => {
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
         `/api/v1/namespaces/default/workflows/*/runs/*/events/reverse*`,
+      { fixture: 'event-history-completed-reverse.json' },
+    ).as('event-history-descending');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/*/runs/*/events?`,
       { fixture: 'event-history-completed.json' },
-    ).as('event-history-api');
+    ).as('event-history-ascending');
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
@@ -37,7 +46,7 @@ describe('Workflow Events', () => {
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
     cy.wait('@workflow-api');
-    cy.wait('@event-history-api');
+    cy.wait('@event-history-descending');
 
     cy.url().should('contain', '/feed');
   });
@@ -46,7 +55,7 @@ describe('Workflow Events', () => {
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
     cy.wait('@workflow-api');
-    cy.wait('@event-history-api');
+    cy.wait('@event-history-descending');
 
     cy.url().should('contain', '/feed');
 
@@ -65,15 +74,15 @@ describe('Workflow Events', () => {
     );
 
     cy.wait('@workflow-api');
-    cy.wait('@event-history-api');
+    cy.wait('@event-history-descending');
 
     cy.get('[data-cy="event-summary-row"]').should(
       'have.length',
-      eventsFixture.history.events.length,
+      eventsFixtureDescending.history.events.length,
     );
 
     cy.get('[data-cy="event-summary-table"]').contains(
-      'RainbowStatusesWorkflow',
+      firstEventInDescendingOrder.eventId,
     );
   });
 
@@ -83,9 +92,9 @@ describe('Workflow Events', () => {
     );
 
     cy.wait('@workflow-api');
-    cy.wait('@event-history-api');
+    cy.wait('@event-history-descending');
 
-    const dt = new Date(eventsFixture.history.events[0].eventTime);
+    const dt = new Date(eventsFixtureDescending.history.events[0].eventTime);
 
     cy.get(
       '[data-cy="event-summary-table-header-desktop"] [data-cy=event-date-filter-button]',
@@ -121,23 +130,24 @@ describe('Workflow Events', () => {
     );
 
     cy.wait('@workflow-api');
-    cy.wait('@event-history-api');
+    cy.wait('@event-history-descending');
 
     cy.get('[data-cy="event-summary-row"]')
       .should('not.have.length', 0)
-      .should('not.have.length', eventsFixture.history.events.length);
-    cy.get('[data-cy="event-summary-table"]').contains('CompletedActivity');
+      .should('not.have.length', eventsFixtureDescending.history.events.length);
+    cy.get('[data-cy="event-summary-table"]').contains('activity.timeout');
   });
 
   it('should be viewable as JSON', () => {
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
     cy.wait('@workflow-api');
-    cy.wait('@event-history-api');
 
     cy.get('[data-cy="json"]').click();
 
-    const match = eventsFixture.history.events[0].eventTime;
+    cy.wait('@event-history-ascending');
+
+    const match = eventsFixtureAscending.history.events[0].eventTime;
     cy.get('[data-cy="event-history-json"]').contains(match);
   });
 });

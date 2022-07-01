@@ -33,9 +33,7 @@
     {placeholder}
     on:input
   />
-  {#if !noButton}
-    <div>
-      <Button class="m-2">{label}</Button>
-    </div>
-  {/if}
+  <div>
+    <Button class="m-2" type="submit">{label}</Button>
+  </div>
 </form>

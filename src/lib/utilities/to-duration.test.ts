@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   toDuration,
   toDate,
@@ -8,6 +8,7 @@ import {
   toString,
   isDuration,
   fromSeconds,
+  tomorrow,
 } from './to-duration';
 
 describe('toDuration', () => {
@@ -113,6 +114,25 @@ describe('toDate', () => {
   });
 });
 
+describe('tomorrow', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2020-01-01').getTime());
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('should create a date 24 hours in the future', () => {
+    expect(tomorrow()).toBe('2020-01-02T00:00:00Z');
+  });
+
+  it('should create a date 24 hours in the future from an argument', () => {
+    expect(tomorrow(new Date('2022-07-01'))).toBe('2022-07-02T00:00:00Z');
+  });
+});
+
 describe('fromDate', () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -163,6 +183,14 @@ describe('fromDate', () => {
 
     const result = fromDate(tenSecondsEarlier);
     expect(result).toMatchObject({ seconds: 10 });
+  });
+
+  it('should determine a duration from a provided end date', () => {
+    const endDate = '2022-07-01T11:11:11Z';
+    const elevenMinutesAndElevenSecondsEarlier = '2022-07-01T11:00:00Z';
+
+    const result = fromDate(elevenMinutesAndElevenSecondsEarlier, endDate);
+    expect(result).toMatchObject({ minutes: 11, seconds: 11 });
   });
 });
 
@@ -329,5 +357,9 @@ describe('fromSeconds', () => {
 
   it('should correctly parse minutes', () => {
     expect(fromSeconds('3660s')).toMatchObject({ hours: 1, minutes: 1 });
+  });
+
+  it('should return undefined if given bogus input', () => {
+    expect(fromSeconds('bogus')).toBeUndefined();
   });
 });
