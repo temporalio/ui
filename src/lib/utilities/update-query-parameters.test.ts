@@ -129,7 +129,7 @@ describe('addHashToURL', () => {
 });
 
 describe('a sanity test for how URLs work in JavaScript', () => {
-  // This is primarily meant to serve as documentation for some of the of the
+  // This is primarily meant to serve as documentation for some of the
   // decisions made above.
 
   it('should not be able to parse the hash if it comes before the search parameters', () => {
