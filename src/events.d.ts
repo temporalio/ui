@@ -1,7 +1,9 @@
 type HistoryEvent = import('$types').HistoryEvent;
 type PendingActivityInfo = import('$types').PendingActivityInfo;
 
-type EventType = import('$lib/utilities/is-event-type').EventType;
+type EventType =
+  | import('$lib/utilities/is-event-type').EventType
+  | 'TimerCanceledEvent';
 
 type ActivityType = import('$lib/utilities/is-event-type').ActivityType;
 type TimerType = import('$lib/utilities/is-event-type').TimerType;
