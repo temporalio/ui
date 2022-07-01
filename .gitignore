@@ -2,6 +2,7 @@
 node_modules
 /.svelte-kit
 /package
+/cypress/screenshots
 /cypress/videos
 /build-local
 /build-cloud
