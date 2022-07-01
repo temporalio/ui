@@ -22,7 +22,7 @@ export const durations = [
   '7 days',
   '30 days',
   '90 days',
-];
+] as const;
 
 const durationPattern = new RegExp(
   `(\\d+)\\s(${durationKeys.map((k) => k + '?').join('|')})`,
