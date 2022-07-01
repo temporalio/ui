@@ -2,7 +2,9 @@ import { isString } from './is';
 
 type SearchType = 'basic' | 'advanced';
 
-const isValidSearchType = (parameter: unknown): parameter is SearchType => {
+export const isValidSearchType = (
+  parameter: unknown,
+): parameter is SearchType => {
   if (!isString(parameter)) return false;
   if (parameter === 'basic') return true;
   if (parameter === 'advanced') return true;
