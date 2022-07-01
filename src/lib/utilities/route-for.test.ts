@@ -13,15 +13,37 @@ import {
   isEventHistoryParameters,
   isWorkflowParameters,
   isEventParameters,
+  routeForNamespace,
+  routeForNamespaces,
+  isEventView,
+  routeForArchivalWorkfows,
+  routeForPendingActivities,
 } from './route-for';
 
 describe('routeFor', () => {
+  it('should route to "namespaces"', () => {
+    const path = routeForNamespaces();
+    expect(path).toBe('/namespaces');
+  });
+
+  it('should route to a "namespace"', () => {
+    const path = routeForNamespace({
+      namespace: 'default',
+    });
+    expect(path).toBe('/namespaces/default');
+  });
+
   it('should route to "workflows"', () => {
     const path = routeForWorkflows({ namespace: 'default' });
     expect(path).toBe('/namespaces/default/workflows');
   });
 
-  it('should route to "workflow"', () => {
+  it('should route to archival workflows', () => {
+    const path = routeForArchivalWorkfows({ namespace: 'default' });
+    expect(path).toBe('/namespaces/default/archival');
+  });
+
+  it('should route to a "workflow"', () => {
     const path = routeForWorkflow({
       namespace: 'default',
       workflow: 'abc',
@@ -67,6 +89,17 @@ describe('routeFor', () => {
       run: 'def',
     });
     expect(path).toBe('/namespaces/default/workflows/abc/def/history/feed');
+  });
+
+  it('should route to pending activities', () => {
+    const path = routeForPendingActivities({
+      namespace: 'default',
+      workflow: 'abc',
+      run: 'def',
+    });
+    expect(path).toBe(
+      '/namespaces/default/workflows/abc/def/pending-activities',
+    );
   });
 
   it('should route to "workflow".stack-trace', () => {
@@ -251,6 +284,7 @@ describe('routeFor SSO authentication ', () => {
   describe('routeForLoginPage', () => {
     afterEach(() => {
       vi.clearAllMocks();
+      vi.resetModules();
     });
 
     it('should return a URL with the correct returnUrl', () => {
@@ -264,6 +298,10 @@ describe('routeFor SSO authentication ', () => {
       expect(routeForLoginPage()).toBe(
         'https://temporal.io/login?returnUrl=https%3A%2F%2Ftemporal.io%2Fcurrent-page',
       );
+    });
+
+    it('should return a URL with the correct returnUrl', () => {
+      expect(routeForLoginPage(false)).toBe('/login');
     });
   });
 
@@ -348,4 +386,16 @@ describe('routeFor SSO authentication ', () => {
       });
     });
   });
+});
+
+describe('isEventView', () => {
+  for (const validEventView of ['feed', 'compact', 'json']) {
+    it(`should return true if provided "${validEventView}"`, () => {
+      expect(isEventView(validEventView)).toBe(true);
+    });
+
+    it('should return false if given a bogus event view', () => {
+      expect(isEventView('bogus')).toBe(false);
+    });
+  }
 });

@@ -122,8 +122,8 @@ export const routeForAuthentication = (
   return login.toString();
 };
 
-export const routeForLoginPage = (): string => {
-  if (browser) {
+export const routeForLoginPage = (isBrowser = browser): string => {
+  if (isBrowser) {
     const login = new URL('login', window.location.origin);
     login.searchParams.set('returnUrl', window.location.href);
     return login.toString();
