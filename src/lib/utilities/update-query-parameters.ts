@@ -35,12 +35,22 @@ export const updateQueryParameters = async ({
   }
 
   if (browser && url.href !== window.location.href) {
-    // Needed to trigger store updates when used as npm package
-    if (!url.href.endsWith('#')) {
-      url.href = url.href + '#';
-    }
-    goto(String(url), gotoOptions);
+    // This is to trigger store updates when used as npm package.
+    goto(addHashToURL(url), gotoOptions);
   }
 
   return value;
+};
+
+export const addHashToURL = (url: URL): string => {
+  const { href } = url;
+
+  if (href.includes('#')) return href;
+
+  if (href.includes('?')) {
+    const [before, after] = href.split('?');
+    return `${before}#?${after}`;
+  }
+
+  return href + '#';
 };
