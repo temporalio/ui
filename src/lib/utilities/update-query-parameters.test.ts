@@ -134,7 +134,7 @@ describe('a sanity test for how URLs work in JavaScript', () => {
 
   it('should not be able to parse the hash if it comes before the search parameters', () => {
     const url = new URL('https://temporal.io/#hash?parameter=value');
-    expect(url.hash).not.toBe('hash');
+    expect(url.hash).not.toBe('#hash');
   });
 
   it('should not be able to parse the search parameters if they come after the hash', () => {
