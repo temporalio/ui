@@ -35,14 +35,21 @@
 
 <script lang="ts">
   import { dev } from '$app/env';
+  import { onMount } from 'svelte';
+
   import { temporalVersion, uiVersion } from '$lib/stores/versions';
   import { supportsReverseOrder } from '$lib/stores/event-view';
+  import { lastUsedNamespace } from '$lib/stores/namespaces';
 
   import { fromSecondsToDaysOrHours } from '$lib/utilities/format-date';
   import { getClusters } from '$lib/utilities/get-clusters';
 
   export let currentNamespace: DescribeNamespaceResponse;
   export let clusters: string;
+
+  onMount(() => {
+    $lastUsedNamespace = currentNamespace?.namespaceInfo?.name;
+  });
 </script>
 
 <h2 class="text-2xl" data-cy="namespace-title">

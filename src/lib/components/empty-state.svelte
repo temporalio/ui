@@ -3,6 +3,7 @@
 
   export let title: string;
   export let content: string = '';
+  export let error: string = '';
 </script>
 
 <div
@@ -17,5 +18,12 @@
   <h2 class="text-xl font-medium">{title}</h2>
   {#if content}
     <p class="text-center">{content}</p>
+  {/if}
+  {#if error}
+    <p
+      class="rounded-md border-2 border-orange-500 bg-orange-100 p-5 text-center"
+    >
+      {error}
+    </p>
   {/if}
 </div>
