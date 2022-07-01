@@ -1,3 +1,4 @@
+import { get } from 'svelte/store';
 import { dataEncoderEndpoint } from '$lib/stores/data-encoder-config';
 import {
   convertPayloadToJsonWithCodec,
@@ -7,7 +8,6 @@ import {
 import { formatDate } from '$lib/utilities/format-date';
 import { has } from '$lib/utilities/has';
 import { findAttributesAndKey } from '$lib/utilities/is-event-type';
-import { get } from 'svelte/store';
 
 import { groupEvents } from '../event-groups';
 import { getEventCategory } from './get-event-categorization';
@@ -94,6 +94,7 @@ export const toEventHistory = async ({
       toEvent({ historyEvent, namespace, settings }),
     ),
   );
+
   const eventGroups = groupEvents(events);
 
   return { events, eventGroups };
