@@ -20,29 +20,20 @@
   import ScheduleFrequency from './schedule-frequency.svelte';
 
   export let namespace: string;
-  export let schedule;
+  export let schedule: unknown;
 
-  const getRoute = (item: WorkflowExecution) =>
+  console.log('SCHEDULE: ', schedule);
+  const getRoute = (item: unknown) =>
     routeForSchedule({
       namespace,
-      scheduleId: item.scheduleId,
+      scheduleId: schedule.scheduleId as string,
     });
 </script>
 
 <a sveltekit:prefetch href={getRoute(schedule)} class="row">
-  <div class="cell">Status</div>
-  <div class="cell truncate">
-    {schedule.scheduleId}
-  </div>
-  <div class="cell">Workflow Name</div>
-  <div class="cell hidden xl:table-cell links">Recent actions</div>
-  <div class="cell hidden xl:table-cell">Future action times</div>
-</a>
-
-<!-- <a sveltekit:prefetch href={getRoute(schedule)} class="row">
   <div class="cell">
     <WorkflowStatus
-      status={schedule?.schedule?.state?.paused ? 'Paused' : 'Running'}
+      status={schedule?.info?.state?.paused ? 'Paused' : 'Running'}
     />
   </div>
   <div class="cell truncate">
@@ -50,14 +41,14 @@
     <p>
       <small class="text-gray-900"
         ><ScheduleFrequency
-          calendar={schedule?.schedule?.spec?.calendar?.[0]}
-          interval={schedule?.schedule?.spec?.interval?.[0]}
+          calendar={schedule?.info?.spec?.calendar?.[0]}
+          interval={schedule?.info?.spec?.interval?.[0]}
         /></small
       >
     </p>
   </div>
   <div class="cell">
-    {schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
+    {schedule?.info?.workflowType?.name}
   </div>
   <div class="cell hidden xl:table-cell links">
     {#each schedule?.info?.recentActions?.reverse().slice(0, 5) ?? [] as run}
@@ -77,7 +68,8 @@
       <div>{formatDate(run, $timeFormat, 'from now')}</div>
     {/each}
   </div>
-</a> -->
+</a>
+
 <style lang="postcss">
   .row {
     @apply block h-36 items-center border-b-2 p-2 text-sm no-underline last-of-type:border-b-0 xl:table-row xl:text-base;

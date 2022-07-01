@@ -104,7 +104,7 @@
 </script>
 
 {#if !calendar}
-  <p>Every {getInterval(interval.interval)} minutes</p>
+  <p>Every {getInterval(interval?.interval ?? 0)} minutes</p>
 {:else}
   <div class="flex flex-row gap-4">
     {humanReadableCalendar(calendar)}

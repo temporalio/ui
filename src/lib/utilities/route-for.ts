@@ -80,11 +80,11 @@ export const routeForWorkflow = ({
 
 export const routeForSchedule = ({
   scheduleId,
-  ...parameters
+  namespace
 }: ScheduleParameters): string => {
   const sid = encodeURIForSvelte(scheduleId);
 
-  return `${routeForSchedules(parameters)}/${sid}`;
+  return `${routeForSchedules({ namespace })}/${sid}`;
 };
 
 export const routeForEventHistory = ({

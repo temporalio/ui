@@ -1,5 +1,6 @@
 <script lang="ts" context="module">
   import type { SvelteComponent } from 'svelte';
+  import FeatureTag from '$lib/holocene/feature-tag.svelte';
 
   export interface ExtraIcon {
     component: typeof SvelteComponent;
@@ -20,6 +21,7 @@
   import IsCloudGuard from '$lib/components/is-cloud-guard.svelte';
 
   import { afterNavigate } from '$app/navigation';
+  import { viewFeature } from '$lib/stores/new-feature-tags';
 
   export let isCloud = false;
   export let activeNamespace: string | null | undefined;
@@ -60,6 +62,22 @@
           </div>
         </Tooltip>
         <div class="nav-title">Namespaces</div>
+      </NavRow>
+    </IsCloudGuard>
+    <IsCloudGuard {isCloud}>
+      <NavRow
+        link={linkList.schedules}
+        {isCloud}
+        data-cy="schedules-button"
+        on:click={() => viewFeature('schedules')}
+      >
+        <Tooltip right hide={$navOpen} text="Schedules">
+          <div class="nav-icon">
+            <Icon name="calendarPlus" scale={1} />
+            <FeatureTag feature="schedules" alpha />
+          </div>
+        </Tooltip>
+        <div class="nav-title">Schedules</div>
       </NavRow>
     </IsCloudGuard>
     <IsCloudGuard {isCloud}>

@@ -21,17 +21,17 @@
 
   import EmptyState from '$lib/components/empty-state.svelte';
   import Pagination from '$lib/components/pagination.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import Button from '$holocene/button.svelte';
   import Badge from '$lib/components/badge.svelte';
   import Loading from '$lib/components/loading.svelte';
   import Table from '$lib/components/table/index.svelte';
   import ScheduleRow from '$lib/components/schedule/schedule-row.svelte';
-  import Search from '$lib/components/search.svelte';
 
   import { columns } from './_schedule-table-columns';
   import { noop, onMount } from 'svelte/internal';
   import Modal from '$lib/components/modal.svelte';
   import ScheduleForm from '$lib/components/schedule/schedule-form.svelte';
+  import Input from '$lib/holocene/input.svelte';
 
   export let namespace: string;
 
@@ -70,15 +70,17 @@
 </script>
 
 <div class="flex flex-row justify-between">
-  <h2 class="text-2xl">Schedules <Badge type="beta">Beta</Badge></h2>
-  <Button on:click={() => (showCreateConfirmation = true)}>Create</Button>
+  <h2 class="text-2xl">Schedules <Badge type="alpha">Alpha</Badge></h2>
+  <Button primary on:click={() => (showCreateConfirmation = true)}
+    >Create</Button
+  >
 </div>
 <div class="z-20 w-full xl:w-1/2">
-  <Search
-    icon
-    placeholder="Search"
-    value={search}
-    noButton
+  <Input
+    icon="search"
+    id="schedule-name-filter"
+    label="Schedule Name"
+    bind:value={search}
     on:input={(e) => (search = e.target.value)}
     on:submit={noop}
   />
