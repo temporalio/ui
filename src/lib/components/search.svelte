@@ -33,6 +33,6 @@
     on:input
   />
   <div>
-    <Button class="m-2">{label}</Button>
+    <Button class="m-2" type="submit">{label}</Button>
   </div>
 </form>
