@@ -11,7 +11,7 @@ type UpdateQueryParams = {
   invalidate?: typeof invalidate;
 };
 
-export const gotoOptions = {
+const gotoOptions = {
   replaceState: true,
   keepfocus: true,
   noscroll: true,
