@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { isEvent } from '.';
 
 describe('isEvent', () => {
