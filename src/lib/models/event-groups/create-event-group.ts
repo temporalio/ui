@@ -50,13 +50,16 @@ const createGroupFor = <K extends keyof StartingEvents>(
     category,
     classification,
     get eventTime() {
-      return getLastEvent(this)?.eventTime;
+      return this.lastEvent?.eventTime;
     },
     get attributes() {
       return getLastEvent(this)?.attributes;
     },
     get eventList() {
       return Array.from(this.events, ([_key, value]) => value);
+    },
+    get lastEvent() {
+      return getLastEvent(this);
     },
     get isFailureOrTimedOut() {
       return Boolean(this.eventList.find(eventIsFailureOrTimedOut));

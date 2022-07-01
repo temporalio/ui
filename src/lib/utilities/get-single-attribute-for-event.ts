@@ -139,12 +139,10 @@ const getSummaryAttribute = (event: WorkflowEvent): SummaryAttribute => {
   return first;
 };
 
-export const getSummaryForEventGroup = (
-  eventGroup: EventGroup,
-): SummaryAttribute => {
-  const event = getLastEvent(eventGroup);
-
-  return getSummaryAttribute(event);
+export const getSummaryForEventGroup = ({
+  lastEvent,
+}: EventGroup): SummaryAttribute => {
+  return getSummaryAttribute(lastEvent);
 };
 
 export const getSingleAttributeForEvent = (
