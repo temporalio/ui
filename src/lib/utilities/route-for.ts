@@ -153,7 +153,7 @@ export const routeForImport = ({
   return `/import/${importType}`;
 };
 
-const hasParameters =
+export const hasParameters =
   <T extends Record<string, string | Record<string, string>>>(
     ...required: string[]
   ) =>
