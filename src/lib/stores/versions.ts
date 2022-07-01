@@ -3,9 +3,9 @@ import { cluster } from './cluster';
 import { settings } from './settings';
 
 export const temporalVersion = derived([cluster], ([$cluster]) => {
-  return $cluster.serverVersion;
+  return $cluster?.serverVersion;
 });
 
 export const uiVersion = derived([settings], ([$settings]) => {
-  return $settings.version;
+  return $settings?.version;
 });

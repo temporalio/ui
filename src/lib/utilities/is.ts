@@ -1,3 +1,5 @@
+import type { EventSortOrder } from '$lib/stores/event-view';
+
 type Space = ' ';
 type Quote = "'" | '"';
 type Operator = typeof operators[number];
@@ -69,5 +71,11 @@ export const isOperator = (x: unknown): x is Operator => {
     if (x === operator) return true;
   }
 
+  return false;
+};
+
+export const isSortOrder = (sortOrder: string): sortOrder is EventSortOrder => {
+  if (sortOrder === 'ascending') return true;
+  if (sortOrder === 'descending') return true;
   return false;
 };
