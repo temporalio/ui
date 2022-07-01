@@ -78,12 +78,6 @@ export const routeForEventHistory = ({
   return toURL(`${eventHistoryPath}/${view}`, queryParams);
 };
 
-export const routeForEventHistoryItem = (
-  parameters: EventParameters,
-): string => {
-  return `${routeForEventHistory(parameters)}/${parameters.eventId}`;
-};
-
 export const routeForWorkers = (parameters: WorkflowParameters): string => {
   return `${routeForWorkflow(parameters)}/workers`;
 };

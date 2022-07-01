@@ -104,6 +104,7 @@ describe('routeFor import ', () => {
     });
     expect(path).toBe('/import/events');
   });
+
   it('should route to specific view for import', () => {
     const path = routeForImport({
       importType: 'events',
@@ -132,6 +133,43 @@ describe('routeFor SSO authentication ', () => {
 
     expect(ssoUrl.searchParams.get('one')).toBe('1');
     expect(ssoUrl.searchParams.get('two')).toBeNull();
+  });
+
+  it('should fallback to the originUrl if returnUrl is not provided', () => {
+    const settings = {
+      auth: {
+        options: ['one'],
+      },
+      baseUrl: 'https://localhost/',
+    };
+
+    const originUrl = 'https://temporal.io';
+    const searchParams = new URLSearchParams();
+
+    const sso = routeForAuthentication({ settings, searchParams, originUrl });
+
+    expect(sso).toBe(
+      `${settings.baseUrl}auth/sso?returnUrl=${encodeURIComponent(originUrl)}`,
+    );
+  });
+
+  it('should use the returnUrl if provided', () => {
+    const settings = {
+      auth: {
+        options: ['one'],
+      },
+      baseUrl: 'https://localhost/',
+    };
+
+    const originUrl = 'https://temporal.io';
+    const returnUrl = 'https://return-url.com';
+    const searchParams = new URLSearchParams({ returnUrl: returnUrl });
+
+    const sso = routeForAuthentication({ settings, searchParams, originUrl });
+
+    expect(sso).toBe(
+      `${settings.baseUrl}auth/sso?returnUrl=${encodeURIComponent(returnUrl)}`,
+    );
   });
 
   it("should not add the options from the search param if they don't exist in the current url params", () => {
