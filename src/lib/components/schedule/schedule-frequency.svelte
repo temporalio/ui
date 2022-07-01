@@ -2,16 +2,12 @@
   export let calendar;
   export let interval;
 
-  const year = calendar?.year || '*';
   const month = calendar?.month || '*';
   const dayOfMonth = calendar?.dayOfMonth || '*';
   const dayOfWeek = calendar?.dayOfWeek || '*';
-  const hour = calendar?.hour || '*';
-  const minute = calendar?.minute || '*';
-  const second = calendar?.second || '*';
 
   const getInterval = (interval: string) => {
-    if (interval.endsWith('s')) {
+    if (interval?.toString().endsWith('s')) {
       const seconds = parseInt(interval.slice(0, interval.length - 1));
       return seconds / 60;
     }

@@ -1,21 +1,13 @@
-<script context="module" lang="ts">
-  import type { Load } from '@sveltejs/kit';
-
-  export const load: Load = async function ({ params }) {
-    const { namespace } = params;
-
-    return {
-      props: { namespace },
-    };
-  };
-</script>
-
 <script lang="ts">
-  import { scheduleForm } from '$lib/stores/schedules';
   import {
-    createSchedule,
-    fetchAllSchedules,
-  } from '$lib/services/schedule-service';
+    loading,
+    updating,
+    schedules,
+    initialForm,
+    scheduleForm,
+    scheduleError,
+  } from '$lib/stores/schedules';
+  import { createSchedule } from '$lib/services/schedule-service';
 
   import EmptyState from '$lib/components/empty-state.svelte';
   import Pagination from '$lib/components/pagination.svelte';
@@ -26,14 +18,14 @@
   import ScheduleRow from '$lib/components/schedule/schedule-row.svelte';
 
   import { columns } from './_schedule-table-columns';
-  import { noop, onMount, tick } from 'svelte/internal';
+  import { noop } from 'svelte/internal';
   import Modal from '$lib/components/modal.svelte';
   import ScheduleForm from '$lib/components/schedule/schedule-form.svelte';
   import Input from '$lib/holocene/input.svelte';
+  import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
 
-  export let namespace: string;
-
-  $: schedules = fetchAllSchedules(namespace);
+  let { namespace } = $page.params;
 
   let search = '';
   let showCreateConfirmation = false;
@@ -58,19 +50,23 @@
       body.schedule.spec.interval = [];
       body.schedule.spec.calendar = [$scheduleForm.schedule.spec.calendar];
     }
-    await createSchedule({
-      namespace,
-      body,
-    });
-    showCreateConfirmation = false;
-    schedules = fetchAllSchedules(namespace);
+
+    // Need to wait x amount for create to get it on fetchAllSchedules
+    try {
+      await createSchedule({
+        namespace,
+        body,
+      });
+      showCreateConfirmation = false;
+      $scheduleForm = initialForm;
+    } catch (e) {}
   };
 </script>
 
 <div class="flex flex-row justify-between">
   <h2 class="text-2xl">Schedules <Badge type="alpha">Alpha</Badge></h2>
-  <Button class="h-12" primary on:click={() => (showCreateConfirmation = true)}
-    >Create</Button
+  <Button class="h-10" primary on:click={() => (showCreateConfirmation = true)}
+    >Create Schedule</Button
   >
 </div>
 <div class="z-20 w-full xl:w-1/2">
@@ -84,11 +80,15 @@
   />
 </div>
 
-{#await schedules}
+{#if $loading}
   <Loading />
-{:then { schedules }}
-  {#if schedules.length}
-    <Pagination items={filteredSchedules(schedules)} let:visibleItems>
+{:else}
+  {#if $schedules.length}
+    <Pagination
+      items={filteredSchedules($schedules)}
+      updating={$updating}
+      let:visibleItems
+    >
       <Table {columns}>
         {#each visibleItems as schedule}
           <ScheduleRow {schedule} {namespace} />
@@ -96,8 +96,12 @@
       </Table>
     </Pagination>
   {:else}
-    <div class="my-12 flex flex-col justify-start items-center gap-2">
-      <EmptyState title={'No Schedules Found'} content={errorMessage} />
+    <div class="my-12 flex flex-col items-center justify-start gap-2">
+      <EmptyState
+        title={'No Schedules Found'}
+        content={errorMessage}
+        error={$scheduleError}
+      />
       <Button primary as="anchor">Get Started With Docs</Button>
     </div>
   {/if}
@@ -114,7 +118,7 @@
       <ScheduleForm />
     </div>
   </Modal>
-{/await}
+{/if}
 
 <style lang="postcss">
   .row {

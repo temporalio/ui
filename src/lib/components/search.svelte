@@ -7,7 +7,6 @@
   export let label = 'Search';
   export let name = 'query';
   export let icon = false;
-  export let noButton = false;
   export let id = `${label.toLocaleUpperCase()}-input`;
 </script>
 

@@ -58,7 +58,6 @@ export async function deleteSchedule(
 
 type CreateScheduleOptions = {
   namespace: string;
-  request_id: string;
   body: unknown;
 };
 
@@ -139,7 +138,7 @@ export async function pauseSchedule({
     }),
     {
       options: {
-        method: 'POST',
+        method: 'PATCH',
         body: JSON.stringify({
           ...options,
           request_id: uuidv4(),
@@ -175,7 +174,7 @@ export async function unpauseSchedule({
     }),
     {
       options: {
-        method: 'POST',
+        method: 'PATCH',
         body: JSON.stringify({
           ...options,
           request_id: uuidv4(),
