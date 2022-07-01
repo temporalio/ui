@@ -69,7 +69,7 @@ describe('updateQueryParameters', () => {
     updateQueryParameters({ parameter, value, url, goto });
 
     expect(goto).toHaveBeenCalledWith(
-      'https://temporal.io/#?parameter=value',
+      'https://temporal.io/?parameter=value',
       gotoOptions,
     );
   });
@@ -82,7 +82,7 @@ describe('updateQueryParameters', () => {
     updateQueryParameters({ parameter, value, url, goto });
 
     expect(goto).toHaveBeenCalledWith(
-      'https://temporal.io/#?parameter=newvalue',
+      'https://temporal.io/?parameter=newvalue',
       gotoOptions,
     );
   });
@@ -94,7 +94,7 @@ describe('updateQueryParameters', () => {
 
     updateQueryParameters({ parameter, value, url, goto });
 
-    expect(goto).toHaveBeenCalledWith('https://temporal.io/#', gotoOptions);
+    expect(goto).toHaveBeenCalledWith('https://temporal.io/', gotoOptions);
   });
 
   it('should set the parameter to an empty string if allowEmpty is set', () => {
@@ -105,7 +105,7 @@ describe('updateQueryParameters', () => {
     updateQueryParameters({ parameter, value, url, goto, allowEmpty: true });
 
     expect(goto).toHaveBeenCalledWith(
-      'https://temporal.io/#?parameter=',
+      'https://temporal.io/?parameter=',
       gotoOptions,
     );
   });

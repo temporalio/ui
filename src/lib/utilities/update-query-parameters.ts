@@ -35,8 +35,7 @@ export const updateQueryParameters = async ({
   }
 
   if (browser && url.href !== window.location.href) {
-    // This is to trigger store updates when used as npm package.
-    goto(addHashToURL(url), gotoOptions);
+    goto(url.href, gotoOptions);
   }
 
   return value;
