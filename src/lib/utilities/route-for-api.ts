@@ -31,6 +31,7 @@ const encode = (parameters: APIRouteParameters): APIRouteParameters => {
     {
       namespace: '',
       workflowId: '',
+      scheduleId: '',
       runId: '',
       queue: '',
     },

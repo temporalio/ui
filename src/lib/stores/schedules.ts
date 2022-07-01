@@ -33,7 +33,7 @@ export const getSchedules = ({
   writable<EventualWorkflows>(fetchAllSchedules(namespace), updateWorkflows);
 
 export const scheduleForm = writable({
-  schedule_id: 'TestSchedule',
+  schedule_id: '',
   schedule: {
     spec: {
       calendar: {
@@ -52,9 +52,9 @@ export const scheduleForm = writable({
     },
     action: {
       startWorkflow: {
-        workflowId: 'TestWf',
-        workflowType: { name: 'test' },
-        taskQueue: { name: 'test-queue' },
+        workflowId: '',
+        workflowType: { name: '' },
+        taskQueue: { name: '' },
       },
     },
   },

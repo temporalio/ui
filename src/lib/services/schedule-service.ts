@@ -1,4 +1,5 @@
 import type { ErrorCallback } from '$lib/utilities/request-from-api';
+import { v4 as uuidv4 } from 'uuid';
 
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
@@ -63,7 +64,6 @@ type CreateScheduleOptions = {
 
 export async function createSchedule({
   namespace,
-  request_id,
   body,
 }: CreateScheduleOptions): Promise<null> {
   return await requestFromAPI<null>(
@@ -74,7 +74,7 @@ export async function createSchedule({
       options: {
         method: 'POST',
         body: JSON.stringify({
-          request_id,
+          request_id: uuidv4(),
           ...body,
         }),
       },
@@ -94,7 +94,6 @@ type EditScheduleOptions = {
 export async function editSchedule({
   namespace,
   scheduleId,
-  request_id,
   body,
 }: EditScheduleOptions): Promise<null> {
   return await requestFromAPI<null>(
@@ -106,7 +105,7 @@ export async function editSchedule({
       options: {
         method: 'POST',
         body: JSON.stringify({
-          request_id,
+          request_id: uuidv4(),
           ...body,
         }),
       },
@@ -139,11 +138,11 @@ export async function pauseSchedule({
       scheduleId: scheduleId,
     }),
     {
-      // options: { method: 'POST', body: JSON.stringify({ ...options }) },
       options: {
         method: 'POST',
         body: JSON.stringify({
           ...options,
+          request_id: uuidv4(),
         }),
       },
       shouldRetry: false,
@@ -175,7 +174,13 @@ export async function unpauseSchedule({
       scheduleId: scheduleId,
     }),
     {
-      options: { method: 'POST', body: JSON.stringify({ ...options }) },
+      options: {
+        method: 'POST',
+        body: JSON.stringify({
+          ...options,
+          request_id: uuidv4(),
+        }),
+      },
       shouldRetry: false,
     },
   );

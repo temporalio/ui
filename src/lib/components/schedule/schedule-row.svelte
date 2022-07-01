@@ -50,7 +50,7 @@
   <div class="cell">
     {schedule?.info?.workflowType?.name}
   </div>
-  <div class="cell hidden xl:table-cell links">
+  <div class="cell links hidden xl:table-cell">
     {#each schedule?.info?.recentActions?.reverse().slice(0, 5) ?? [] as run}
       <p>
         <Link

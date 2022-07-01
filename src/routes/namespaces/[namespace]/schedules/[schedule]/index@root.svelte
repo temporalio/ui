@@ -1,21 +1,16 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import Icon from '$lib/holocene/icon/index.svelte';
-  import { v4 as uuidv4 } from 'uuid';
   import { routeForSchedules } from '$lib/utilities/route-for';
   import { goto } from '$app/navigation';
-  import { onMount } from 'svelte';
 
   import {
     fetchSchedule,
-    editSchedule,
     deleteSchedule,
     pauseSchedule,
     unpauseSchedule,
   } from '$lib/services/schedule-service';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-
-  import { scheduleForm } from '$lib/stores/schedules';
 
   import { formatDate } from '$lib/utilities/format-date';
   import { timeFormat } from '$lib/stores/time-format';
@@ -27,9 +22,8 @@
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import ScheduleError from '$lib/components/schedule/schedule-error.svelte';
   import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
-  import DropdownButton from '$lib/components/dropdown-button.svelte';
   import Modal from '$lib/components/modal.svelte';
-  import ScheduleForm from '$lib/components/schedule/schedule-form.svelte';
+  import SplitButton from '$lib/holocene/split-button.svelte';
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
@@ -41,20 +35,7 @@
   let scheduleFetch = fetchSchedule(parameters, fetch);
 
   let showPauseConfirmation = false;
-  let showEditConfirmation = false;
   let reason = '';
-
-  // onMount(async () => {
-  //   const sched = await scheduleFetch;
-  //   $scheduleForm.schedule_id = scheduleId;
-  //   if (sched.schedule.spec.calendar[0]) {
-  //     $scheduleForm.schedule.spec.calendar = sched.schedule.spec.calendar[0];
-  //   }
-  //   if (sched.schedule.spec.interval[0]) {
-  //     $scheduleForm.schedule.spec.interval = sched.schedule.spec.interval[0];
-  //   }
-  //   $scheduleForm.schedule.action = sched.schedule.action;
-  // });
 
   const handleDelete = async () => {
     await deleteSchedule({ namespace, scheduleId });
@@ -73,45 +54,16 @@
           scheduleId,
           reason,
         });
-    // scheduleFetch = fetchSchedule(parameters, fetch);
+    scheduleFetch = fetchSchedule(parameters, fetch);
     showPauseConfirmation = false;
     reason = '';
   };
 
-  const handleEdit = async () => {
-    // const body = $scheduleForm;
-    // if (
-    //   body.schedule.spec.interval.interval &&
-    //   body.schedule.spec.interval.phase
-    // ) {
-    //   body.schedule.spec.interval = [$scheduleForm.schedule.spec.interval];
-    //   body.schedule.spec.calendar = [];
-    // } else {
-    //   body.schedule.spec.interval = [];
-    //   body.schedule.spec.calendar = [$scheduleForm.schedule.spec.calendar];
-    // }
-    // delete body.schedule_id;
-    // await editSchedule({
-    //   namespace,
-    //   scheduleId,
-    //   request_id: uuidv4(),
-    //   body,
-    // });
-    // showEditConfirmation = false;
-    // scheduleFetch = fetchSchedule(parameters, fetch);
-  };
-
   let options = [
     {
-      label: 'Edit',
-      value: 'edit',
-      onClick: () => (showEditConfirmation = true),
-    },
-    { label: 'Backfill', value: 'backfill' },
-    {
       label: 'Delete',
-      value: 'delete',
       onClick: handleDelete,
+      icon: 'close',
     },
   ];
 </script>
@@ -150,14 +102,24 @@
         {/if}
       </div>
     </main>
-    <DropdownButton
-      value={schedule.schedule.state.paused ? 'Unpause' : 'Pause'}
-      {options}
+    <SplitButton
+      right
+      label={schedule.schedule.state.paused ? 'Unpause' : 'Pause'}
       on:click={() => (showPauseConfirmation = !showPauseConfirmation)}
-    />
+    >
+      {#each options as option}
+        <div
+          class="cursor-pointer flex gap-2 items-center"
+          on:click={option.onClick}
+        >
+          <Icon name={option.icon} color="#dc2626" />{option.label}
+        </div>
+      {/each}
+    </SplitButton>
   </header>
   <Modal
     open={showPauseConfirmation}
+    confirmType="primary"
     confirmText={schedule.schedule.state.paused ? 'Unpause' : 'Pause'}
     confirmDisabled={!reason}
     on:cancelModal={() => (showPauseConfirmation = false)}
@@ -219,17 +181,4 @@
       <ScheduleMemo notes={schedule?.schedule?.state?.notes} />
     </div>
   </div>
-  <Modal
-    open={showEditConfirmation}
-    confirmText="Update"
-    confirmType="primary"
-    large
-    on:cancelModal={() => (showEditConfirmation = false)}
-    on:confirmModal={handleEdit}
-  >
-    <h3 slot="title">Edit Schedule</h3>
-    <div slot="content">
-      <ScheduleForm {namespace} />
-    </div>
-  </Modal>
 {/await}

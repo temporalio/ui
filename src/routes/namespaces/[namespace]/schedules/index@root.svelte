@@ -11,8 +11,6 @@
 </script>
 
 <script lang="ts">
-  import { v4 as uuidv4 } from 'uuid';
-
   import { scheduleForm } from '$lib/stores/schedules';
   import {
     createSchedule,
@@ -22,20 +20,21 @@
   import EmptyState from '$lib/components/empty-state.svelte';
   import Pagination from '$lib/components/pagination.svelte';
   import Button from '$holocene/button.svelte';
-  import Badge from '$lib/components/badge.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
   import Loading from '$lib/components/loading.svelte';
   import Table from '$lib/components/table/index.svelte';
   import ScheduleRow from '$lib/components/schedule/schedule-row.svelte';
 
   import { columns } from './_schedule-table-columns';
-  import { noop, onMount } from 'svelte/internal';
+  import { noop, onMount, tick } from 'svelte/internal';
   import Modal from '$lib/components/modal.svelte';
   import ScheduleForm from '$lib/components/schedule/schedule-form.svelte';
   import Input from '$lib/holocene/input.svelte';
 
   export let namespace: string;
 
-  let schedules = fetchAllSchedules(namespace);
+  $: schedules = fetchAllSchedules(namespace);
+
   let search = '';
   let showCreateConfirmation = false;
 
@@ -61,7 +60,6 @@
     }
     await createSchedule({
       namespace,
-      request_id: uuidv4(),
       body,
     });
     showCreateConfirmation = false;
@@ -71,7 +69,7 @@
 
 <div class="flex flex-row justify-between">
   <h2 class="text-2xl">Schedules <Badge type="alpha">Alpha</Badge></h2>
-  <Button primary on:click={() => (showCreateConfirmation = true)}
+  <Button class="h-12" primary on:click={() => (showCreateConfirmation = true)}
     >Create</Button
   >
 </div>
@@ -85,6 +83,7 @@
     on:submit={noop}
   />
 </div>
+
 {#await schedules}
   <Loading />
 {:then { schedules }}
@@ -112,7 +111,7 @@
   >
     <h3 slot="title">Create Schedule</h3>
     <div slot="content">
-      <ScheduleForm {namespace} />
+      <ScheduleForm />
     </div>
   </Modal>
 {/await}

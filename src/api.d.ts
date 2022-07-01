@@ -25,6 +25,7 @@ type APIRoutePath =
 type APIRouteParameters = {
   namespace: string;
   workflowId: string;
+  scheduleId: string;
   runId: string;
   queue: string;
 };

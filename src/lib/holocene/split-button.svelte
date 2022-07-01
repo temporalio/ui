@@ -22,7 +22,7 @@
   on:click-outside={() => (showDropdown = false)}
 >
   <div class="split-button" class:disabled>
-    <button {disabled} class="segment rounded-l px-4">
+    <button {disabled} class="segment rounded-l px-4" on:click>
       {label}
     </button>
     <div class="segment rounded-r px-2">
@@ -68,6 +68,6 @@
   }
 
   .dropdown {
-    @apply absolute z-50 mt-1 flex min-w-max flex-col gap-y-4 rounded-lg border border-gray-300 bg-white p-6 font-poppins text-sm shadow;
+    @apply absolute z-50 mt-1 flex min-w-max flex-col gap-y-4 rounded-lg border border-gray-300 bg-white p-3 px-6 font-poppins text-sm shadow;
   }
 </style>
