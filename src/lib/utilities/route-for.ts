@@ -64,10 +64,6 @@ export const routeForArchivalWorkfows = (
   return `${routeForNamespace(parameters)}/archival`;
 };
 
-export const routeForSchedules = (parameters: NamespaceParameter): string => {
-  return `${routeForNamespace(parameters)}/schedules`;
-};
-
 export const routeForWorkflow = ({
   workflow,
   run,
@@ -76,6 +72,23 @@ export const routeForWorkflow = ({
   const wid = encodeURIForSvelte(workflow);
 
   return `${routeForWorkflows(parameters)}/${wid}/${run}`;
+};
+
+export const routeForSchedules = (parameters: NamespaceParameter): string => {
+  return `${routeForNamespace(parameters)}/schedules`;
+};
+
+export const isRouteForSchedules = (
+  pathname,
+  parameters: NamespaceParameter,
+) => {
+  return pathname === routeForSchedules(parameters);
+};
+
+export const routeForScheduleCreate = ({
+  namespace,
+}: ScheduleParameters): string => {
+  return `${routeForSchedules({ namespace })}/new`;
 };
 
 export const routeForSchedule = ({

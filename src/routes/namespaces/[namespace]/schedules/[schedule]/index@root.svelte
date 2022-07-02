@@ -24,6 +24,7 @@
   import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
   import Modal from '$lib/components/modal.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
+  import Loading from '$lib/components/loading.svelte';
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
@@ -35,11 +36,22 @@
   let scheduleFetch = fetchSchedule(parameters, fetch);
 
   let showPauseConfirmation = false;
+  let showDeleteConfirmation = false;
+
   let reason = '';
+  let loading = false;
 
   const handleDelete = async () => {
-    await deleteSchedule({ namespace, scheduleId });
-    goto(routeForSchedules({ namespace }));
+    try {
+      loading = true;
+      await deleteSchedule({ namespace, scheduleId });
+      setTimeout(() => {
+        goto(routeForSchedules({ namespace }));
+        loading = false;
+      }, 1000);
+    } catch (e) {
+      loading = false;
+    }
   };
 
   const handlePause = async (schedule) => {
@@ -62,13 +74,15 @@
   let options = [
     {
       label: 'Delete',
-      onClick: handleDelete,
+      onClick: () => (showDeleteConfirmation = true),
       icon: 'close',
     },
   ];
 </script>
 
-{#await scheduleFetch then schedule}
+{#await scheduleFetch}
+  <Loading />
+{:then schedule}
   <header class="flex flex-row justify-between gap-4 mb-8">
     <main class="flex flex-col gap-1 relative">
       <a
@@ -82,7 +96,7 @@
         <h1 class="text-2xl flex relative items-center gap-4">
           <span class="font-medium select-all">{scheduleId}</span>
           <WorkflowStatus
-            status={schedule.schedule.state.paused ? 'Paused' : 'Running'}
+            status={schedule?.schedule.state.paused ? 'Paused' : 'Running'}
           />
         </h1>
       </div>
@@ -94,7 +108,7 @@
       </div>
       <div class="flex items-center gap-2 text-sm">
         <p>Created: {formatDate(schedule?.info?.createTime, $timeFormat)}</p>
-        {#if schedule.info.updateTime}
+        {#if schedule?.info?.updateTime}
           <p>-</p>
           <p>
             Last updated: {formatDate(schedule?.info?.updateTime, $timeFormat)}
@@ -104,7 +118,7 @@
     </main>
     <SplitButton
       right
-      label={schedule.schedule.state.paused ? 'Unpause' : 'Pause'}
+      label={schedule?.schedule?.state?.paused ? 'Unpause' : 'Pause'}
       on:click={() => (showPauseConfirmation = !showPauseConfirmation)}
     >
       {#each options as option}
@@ -117,36 +131,6 @@
       {/each}
     </SplitButton>
   </header>
-  <Modal
-    open={showPauseConfirmation}
-    confirmType="primary"
-    confirmText={schedule.schedule.state.paused ? 'Unpause' : 'Pause'}
-    confirmDisabled={!reason}
-    on:cancelModal={() => (showPauseConfirmation = false)}
-    on:confirmModal={() => handlePause(schedule)}
-  >
-    <h3 slot="title">
-      {schedule.schedule.state.paused ? 'Unpause' : 'Pause'} Schedule?
-    </h3>
-    <div slot="content">
-      <p>
-        Are you sure you want to {schedule.schedule.state.paused
-          ? 'unpause'
-          : 'pause'}
-        <strong>{scheduleId}</strong>?
-      </p>
-      <p class="my-4">
-        Enter a reason for {schedule.schedule.state.paused
-          ? 'unpausing'
-          : 'pausing'} the schedule.
-      </p>
-      <input
-        class="block w-full border border-gray-200 rounded-md p-2 mt-4"
-        placeholder="Enter a reason"
-        bind:value={reason}
-      />
-    </div>
-  </Modal>
   <div class="flex flex-col gap-4 pb-24">
     {#if schedule?.info?.invalidScheduleError}
       <div class="w-full xl:w-1/2">
@@ -181,4 +165,49 @@
       <ScheduleMemo notes={schedule?.schedule?.state?.notes} />
     </div>
   </div>
+  <Modal
+    open={showPauseConfirmation}
+    confirmType="primary"
+    confirmText={schedule.schedule.state.paused ? 'Unpause' : 'Pause'}
+    confirmDisabled={!reason}
+    on:cancelModal={() => (showPauseConfirmation = false)}
+    on:confirmModal={() => handlePause(schedule)}
+  >
+    <h3 slot="title">
+      {schedule.schedule.state.paused ? 'Unpause' : 'Pause'} Schedule?
+    </h3>
+    <div slot="content">
+      <p>
+        Are you sure you want to {schedule.schedule.state.paused
+          ? 'unpause'
+          : 'pause'}
+        <strong>{scheduleId}</strong>?
+      </p>
+      <p class="my-4">
+        Enter a reason for {schedule.schedule.state.paused
+          ? 'unpausing'
+          : 'pausing'} the schedule.
+      </p>
+      <input
+        class="block w-full border border-gray-200 rounded-md p-2 mt-4"
+        placeholder="Enter a reason"
+        bind:value={reason}
+      />
+    </div>
+  </Modal>
+  <Modal
+    open={showDeleteConfirmation}
+    confirmType="destroy"
+    confirmText={'Delete'}
+    on:cancelModal={() => (showDeleteConfirmation = false)}
+    on:confirmModal={() => handleDelete()}
+  >
+    <h3 slot="title">Delete Schedule?</h3>
+    <div slot="content">
+      <p>
+        Are you sure you want to delete
+        <strong>{scheduleId}</strong>?
+      </p>
+    </div>
+  </Modal>
 {/await}

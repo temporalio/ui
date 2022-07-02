@@ -22,19 +22,16 @@
   export let namespace: string;
   export let schedule: unknown;
 
-  console.log('SCHEDULE: ', schedule);
   const getRoute = (item: unknown) =>
     routeForSchedule({
       namespace,
-      scheduleId: schedule.scheduleId as string,
+      scheduleId: schedule?.scheduleId as string,
     });
 </script>
 
 <a sveltekit:prefetch href={getRoute(schedule)} class="row">
   <div class="cell">
-    <WorkflowStatus
-      status={schedule?.info?.state?.paused ? 'Paused' : 'Running'}
-    />
+    <WorkflowStatus status={schedule?.info?.paused ? 'Paused' : 'Running'} />
   </div>
   <div class="cell truncate">
     {schedule.scheduleId}
