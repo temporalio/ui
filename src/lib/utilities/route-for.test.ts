@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   routeForEventHistory,
   routeForAuthentication,
@@ -8,15 +8,42 @@ import {
   routeForWorkflowQuery,
   routeForWorkflows,
   routeForImport,
+  routeForLoginPage,
+  hasParameters,
+  isEventHistoryParameters,
+  isWorkflowParameters,
+  isEventParameters,
+  routeForNamespace,
+  routeForNamespaces,
+  isEventView,
+  routeForArchivalWorkfows,
+  routeForPendingActivities,
 } from './route-for';
 
 describe('routeFor', () => {
+  it('should route to "namespaces"', () => {
+    const path = routeForNamespaces();
+    expect(path).toBe('/namespaces');
+  });
+
+  it('should route to a "namespace"', () => {
+    const path = routeForNamespace({
+      namespace: 'default',
+    });
+    expect(path).toBe('/namespaces/default');
+  });
+
   it('should route to "workflows"', () => {
     const path = routeForWorkflows({ namespace: 'default' });
     expect(path).toBe('/namespaces/default/workflows');
   });
 
-  it('should route to "workflow"', () => {
+  it('should route to archival workflows', () => {
+    const path = routeForArchivalWorkfows({ namespace: 'default' });
+    expect(path).toBe('/namespaces/default/archival');
+  });
+
+  it('should route to a "workflow"', () => {
     const path = routeForWorkflow({
       namespace: 'default',
       workflow: 'abc',
@@ -64,6 +91,17 @@ describe('routeFor', () => {
     expect(path).toBe('/namespaces/default/workflows/abc/def/history/feed');
   });
 
+  it('should route to pending activities', () => {
+    const path = routeForPendingActivities({
+      namespace: 'default',
+      workflow: 'abc',
+      run: 'def',
+    });
+    expect(path).toBe(
+      '/namespaces/default/workflows/abc/def/pending-activities',
+    );
+  });
+
   it('should route to "workflow".stack-trace', () => {
     const path = routeForStackTrace({
       namespace: 'default',
@@ -99,6 +137,7 @@ describe('routeFor import ', () => {
     });
     expect(path).toBe('/import/events');
   });
+
   it('should route to specific view for import', () => {
     const path = routeForImport({
       importType: 'events',
@@ -108,7 +147,7 @@ describe('routeFor import ', () => {
   });
 });
 
-describe('routeFor sso authentication ', () => {
+describe('routeFor SSO authentication ', () => {
   it('Options added through settings should be passed in the url', () => {
     const settings = {
       auth: {
@@ -128,7 +167,45 @@ describe('routeFor sso authentication ', () => {
     expect(ssoUrl.searchParams.get('one')).toBe('1');
     expect(ssoUrl.searchParams.get('two')).toBeNull();
   });
-  it("We should not add the options from the search param if they don't exist in the current url params", () => {
+
+  it('should fallback to the originUrl if returnUrl is not provided', () => {
+    const settings = {
+      auth: {
+        options: ['one'],
+      },
+      baseUrl: 'https://localhost/',
+    };
+
+    const originUrl = 'https://temporal.io';
+    const searchParams = new URLSearchParams();
+
+    const sso = routeForAuthentication({ settings, searchParams, originUrl });
+
+    expect(sso).toBe(
+      `${settings.baseUrl}auth/sso?returnUrl=${encodeURIComponent(originUrl)}`,
+    );
+  });
+
+  it('should use the returnUrl if provided', () => {
+    const settings = {
+      auth: {
+        options: ['one'],
+      },
+      baseUrl: 'https://localhost/',
+    };
+
+    const originUrl = 'https://temporal.io';
+    const returnUrl = 'https://return-url.com';
+    const searchParams = new URLSearchParams({ returnUrl: returnUrl });
+
+    const sso = routeForAuthentication({ settings, searchParams, originUrl });
+
+    expect(sso).toBe(
+      `${settings.baseUrl}auth/sso?returnUrl=${encodeURIComponent(returnUrl)}`,
+    );
+  });
+
+  it("should not add the options from the search param if they don't exist in the current url params", () => {
     const settings = {
       auth: {
         options: ['one'],
@@ -145,6 +222,7 @@ describe('routeFor sso authentication ', () => {
     expect(ssoUrl.searchParams.get('one')).toBeNull();
     expect(sso).toEqual('https://localhost/auth/sso');
   });
+
   it('Should render a login url', () => {
     const settings = { auth: {}, baseUrl: 'https://localhost' };
     const searchParams = new URLSearchParams();
@@ -153,6 +231,7 @@ describe('routeFor sso authentication ', () => {
 
     expect(sso).toEqual('https://localhost/auth/sso');
   });
+
   it('Should add return URL search param', () => {
     const settings = { auth: {}, baseUrl: 'https://localhost' };
 
@@ -169,6 +248,7 @@ describe('routeFor sso authentication ', () => {
       `https://localhost/some/path`,
     );
   });
+
   it('Should not add return URL search param if undefined', () => {
     const settings = { auth: {}, baseUrl: 'https://localhost' };
 
@@ -178,6 +258,7 @@ describe('routeFor sso authentication ', () => {
     const ssoUrl = new URL(sso);
     expect(ssoUrl.searchParams.get('returnUrl')).toBe(null);
   });
+
   it('test of the signin flow', () => {
     const settings = {
       auth: {
@@ -199,4 +280,122 @@ describe('routeFor sso authentication ', () => {
       'https://localhost/auth/sso?organization_name=temporal-cloud&invitation=Wwv6g2cKkfjyqoLxnCPUCfiKcjHKpK%5B%E2%80%A6%5Dn9ipxcao0jKYH0I3',
     );
   });
+
+  describe('routeForLoginPage', () => {
+    afterEach(() => {
+      vi.clearAllMocks();
+      vi.resetModules();
+    });
+
+    it('should return a URL with the correct returnUrl', () => {
+      vi.stubGlobal('window', {
+        location: {
+          origin: 'https://temporal.io',
+          href: 'https://temporal.io/current-page',
+        },
+      });
+
+      expect(routeForLoginPage()).toBe(
+        'https://temporal.io/login?returnUrl=https%3A%2F%2Ftemporal.io%2Fcurrent-page',
+      );
+    });
+
+    it('should return a URL with the correct returnUrl', () => {
+      expect(routeForLoginPage(false)).toBe('/login');
+    });
+  });
+
+  describe('hasParameters', () => {
+    it('should return true if it has all of the parameters', () => {
+      expect(
+        hasParameters(
+          'namespace',
+          'workflow',
+        )({ namespace: 'default', workflow: 'workflow-id' }),
+      ).toBe(true);
+    });
+
+    it('should return false a parameter is missing', () => {
+      expect(
+        hasParameters('namespace', 'workflow')({ namespace: 'default' }),
+      ).toBe(false);
+    });
+
+    it('should return true if all of the required parametersisWorkflowParameters$x are provided', () => {
+      expect(
+        isWorkflowParameters({
+          namespace: 'default',
+          workflow: 'workflow',
+          run: 'run',
+        }),
+      ).toBe(true);
+    });
+
+    it('should return true if all of the required parameters for isEventHistoryParameters are provided', () => {
+      expect(
+        isEventHistoryParameters({
+          namespace: 'default',
+          workflow: 'workflow',
+          run: 'run',
+          view: 'feed',
+          queryParams: '?parameter=value',
+        }),
+      ).toBe(true);
+    });
+
+    it('should return true if all of the required parameters for isEventParameters are provided', () => {
+      expect(
+        isEventParameters({
+          namespace: 'default',
+          workflow: 'workflow',
+          run: 'run',
+          view: 'feed',
+          eventId: '1234',
+        }),
+      ).toBe(true);
+
+      it('should return false if all of the required parametersisWorkflowParameters$x are provided', () => {
+        expect(
+          isWorkflowParameters({
+            namespace: 'default',
+            workflow: 'workflow',
+          }),
+        ).toBe(false);
+      });
+
+      it('should return false if all of the required parameters for isEventHistoryParameters are provided', () => {
+        expect(
+          isEventHistoryParameters({
+            namespace: 'default',
+            workflow: 'workflow',
+            run: 'run',
+            view: 'feed',
+          }),
+        ).toBe(false);
+      });
+
+      it('should return false if all of the required parameters for isEventParameters are provided', () => {
+        expect(
+          isEventParameters({
+            namespace: 'default',
+            workflow: 'workflow',
+            run: 'run',
+            view: 'feed',
+          }),
+        ).toBe(false);
+      });
+    });
+  });
+});
+
+describe('isEventView', () => {
+  for (const validEventView of ['feed', 'compact', 'json']) {
+    it(`should return true if provided "${validEventView}"`, () => {
+      expect(isEventView(validEventView)).toBe(true);
+    });
+
+    it('should return false if given a bogus event view', () => {
+      expect(isEventView('bogus')).toBe(false);
+    });
+  }
 });

@@ -110,12 +110,6 @@ export const routeForEventHistory = ({
   return toURL(`${eventHistoryPath}/${view}`, queryParams);
 };
 
-export const routeForEventHistoryItem = (
-  parameters: EventParameters,
-): string => {
-  return `${routeForEventHistory(parameters)}/${parameters.eventId}`;
-};
-
 export const routeForWorkers = (parameters: WorkflowParameters): string => {
   return `${routeForWorkflow(parameters)}/workers`;
 };
@@ -160,8 +154,8 @@ export const routeForAuthentication = (
   return login.toString();
 };
 
-export const routeForLoginPage = (): string => {
-  if (browser) {
+export const routeForLoginPage = (isBrowser = browser): string => {
+  if (isBrowser) {
     const login = new URL('login', window.location.origin);
     login.searchParams.set('returnUrl', window.location.href);
     return login.toString();
@@ -185,7 +179,7 @@ export const routeForImport = ({
   return `/import/${importType}`;
 };
 
-const hasParameters =
+export const hasParameters =
   <T extends Record<string, string | Record<string, string>>>(
     ...required: string[]
   ) =>
