@@ -20,6 +20,7 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
+  import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
 
   let { namespace } = $page.params;
 
@@ -35,7 +36,9 @@
 </script>
 
 <div class="flex flex-row justify-between">
-  <h2 class="text-2xl">Schedules <Badge type="alpha">Alpha</Badge></h2>
+  <h2 class="text-2xl">
+    Schedules <NamespaceSelector /><Badge type="alpha">Alpha</Badge>
+  </h2>
   <Button
     class="h-10"
     primary
@@ -43,7 +46,7 @@
     >Create Schedule</Button
   >
 </div>
-<div class="z-20 w-full xl:w-1/2">
+<div class="w-full xl:w-1/2">
   <Input
     icon="search"
     id="schedule-name-filter"

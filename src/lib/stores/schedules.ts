@@ -60,8 +60,7 @@ export const formValues: Record<string, FormField> = {
   interval: {
     key: 'schedule.spec.interval.interval',
     label: 'Interval',
-    placeholder: '5m',
-    hint: 'Blank for 1 day',
+    hint: '5m',
     required: false,
   },
   phase: {

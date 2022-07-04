@@ -20,8 +20,13 @@
 {#if required}
   <HintGroup for={key}>
     <Hint on="required"
-      ><small class="text-gray-700">{hint ?? 'Required'}</small></Hint
+      ><small class="text-orange-500">{hint ?? 'Required'}</small></Hint
     >
+  </HintGroup>
+{/if}
+{#if !required && hint}
+  <HintGroup for={key}>
+    <Hint><small class="text-blue-500">{hint}</small></Hint>
   </HintGroup>
 {/if}
 
