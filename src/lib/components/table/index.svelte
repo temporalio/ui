@@ -32,11 +32,11 @@
   }
 
   .table-header-row {
-    @apply rounded-t-sm bg-gray-900 text-lg text-white xl:rounded-t-lg;
+    @apply rounded-t-sm bg-gray-900 text-base text-white xl:rounded-t-lg;
   }
 
   .table-header {
-    @apply p-2 text-left;
+    @apply p-2 pt-1 text-left;
   }
 
   .table-header:first-of-type {

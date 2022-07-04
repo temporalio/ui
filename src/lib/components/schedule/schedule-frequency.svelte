@@ -72,6 +72,8 @@
       label = `Every ${getProperMonthName[month]}`;
       if (calendar?.dayOfWeek) {
         label += ` on every ${getProperDayNames(dayOfWeek)}`;
+      } else if (calendar?.dayOfMonth) {
+        label += `${calendar?.dayOfMonth}`;
       }
     } else if (calendar?.year) {
       label = `For ${calendar?.year},`;
@@ -80,6 +82,8 @@
       }
       if (calendar?.dayOfWeek) {
         label += ` on every ${getProperDayNames(dayOfWeek)}`;
+      } else if (calendar?.dayOfMonth) {
+        label += ` ${calendar?.dayOfMonth}`;
       }
     }
 

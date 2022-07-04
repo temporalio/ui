@@ -54,16 +54,6 @@
       </Tooltip>
       <div class="nav-title">Workflows</div>
     </NavRow>
-    <IsCloudGuard>
-      <NavRow link={linkList.namespaces} {isCloud} data-cy="namespaces-button">
-        <Tooltip right hide={$navOpen} text="Namespaces">
-          <div class="nav-icon">
-            <Icon name="namespace" scale={1.5} />
-          </div>
-        </Tooltip>
-        <div class="nav-title">Namespaces</div>
-      </NavRow>
-    </IsCloudGuard>
     <IsCloudGuard {isCloud}>
       <NavRow
         link={linkList.schedules}
@@ -78,6 +68,16 @@
           </div>
         </Tooltip>
         <div class="nav-title">Schedules</div>
+      </NavRow>
+    </IsCloudGuard>
+    <IsCloudGuard>
+      <NavRow link={linkList.namespaces} {isCloud} data-cy="namespaces-button">
+        <Tooltip right hide={$navOpen} text="Namespaces">
+          <div class="nav-icon">
+            <Icon name="namespace" scale={1.5} />
+          </div>
+        </Tooltip>
+        <div class="nav-title">Namespaces</div>
       </NavRow>
     </IsCloudGuard>
     <IsCloudGuard {isCloud}>

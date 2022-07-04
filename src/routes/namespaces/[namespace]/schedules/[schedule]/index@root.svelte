@@ -88,16 +88,16 @@
       <a
         href={routeForSchedules({ namespace })}
         class="absolute top-0 back-to-workflows"
-        style="left: -1.5rem"
+        style="left: -.5rem"
       >
         <Icon scale={0.8} name="caretLeft" class="inline" />Back to Schedules
       </a>
       <div class="flex justify-between items-center mt-8">
         <h1 class="text-2xl flex relative items-center gap-4">
-          <span class="font-medium select-all">{scheduleId}</span>
           <WorkflowStatus
             status={schedule?.schedule.state.paused ? 'Paused' : 'Running'}
           />
+          <span class="font-medium select-all">{scheduleId}</span>
         </h1>
       </div>
       <div class="flex items-center text-sm">
