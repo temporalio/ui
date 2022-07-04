@@ -1,20 +1,17 @@
 <script lang="ts">
   import { useForm } from 'svelte-use-form';
 
-  import { formValues, scheduleBody } from '$lib/stores/schedules';
-  import { createSchedule } from '$lib/services/schedule-service';
+  import { fields, submitScheduleForm } from '$lib/stores/schedules';
 
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
   import Icon from '$holocene/icon/index.svelte';
 
   import { page } from '$app/stores';
-  import { goto } from '$app/navigation';
   import { routeForSchedules } from '$lib/utilities/route-for';
   import Button from '$lib/holocene/button.svelte';
   import Loading from '$lib/components/loading.svelte';
   import FormInput from '$lib/holocene/forms/form-input.svelte';
-  import debounce from 'just-debounce';
 
   let tab = 'interval';
   let loading = false;
@@ -23,57 +20,8 @@
 
   const form = useForm();
 
-  function setBodyProperty(path: string, body: unknown, value: unknown) {
-    const properties = path.split('.');
-    return properties.reduce(
-      (o, p, index) =>
-        (o[p] = properties.length === ++index ? value : o[p] || {}),
-      body,
-    );
-  }
-
-  const handleClick = async () => {
-    const body = scheduleBody;
-    const values = $form.values;
-
-    Object.keys(values).forEach((key) => {
-      setBodyProperty(key, body, values[key]);
-    });
-
-    const interval = values['schedule.spec.interval.interval'];
-    const phase = values['schedule.spec.interval.phase'];
-    const year = values['schedule.spec.calendar.year'];
-    const month = values['schedule.spec.calendar.month'];
-    const dayOfMonth = values['schedule.spec.calendar.dayOfMonth'];
-    const dayOfWeek = values['schedule.spec.calendar.dayOfWeek'];
-    const hour = values['schedule.spec.calendar.hour'];
-    const minute = values['schedule.spec.calendar.minute'];
-    const second = values['schedule.spec.calendar.second'];
-
-    if (interval) {
-      body.schedule.spec.interval = [{ interval, phase }];
-      body.schedule.spec.calendar = [];
-    } else {
-      body.schedule.spec.interval = [];
-      body.schedule.spec.calendar = [
-        { year, month, dayOfMonth, dayOfWeek, hour, minute, second },
-      ];
-    }
-
-    // // Wait 1 second for create to get it on fetchAllSchedules
-    try {
-      loading = true;
-      await createSchedule({
-        namespace,
-        body,
-      });
-      setTimeout(() => {
-        goto(routeForSchedules({ namespace }));
-        loading = false;
-      }, 1000);
-    } catch (e) {
-      loading = false;
-    }
+  const handleClick = () => {
+    submitScheduleForm($form, namespace, loading);
   };
 </script>
 
@@ -95,16 +43,16 @@
     </main>
     <form use:form class="mb-4 flex w-full flex-col gap-4 md:w-2/3 xl:w-1/2">
       <div class="w-full">
-        <FormInput field={formValues.name} />
+        <FormInput field={fields.name} />
       </div>
       <div class="w-full">
-        <FormInput field={formValues.workflowType} />
+        <FormInput field={fields.workflowType} />
       </div>
       <div class="w-full">
-        <FormInput field={formValues.workflowId} />
+        <FormInput field={fields.workflowId} />
       </div>
       <div class="w-full">
-        <FormInput field={formValues.workflowTaskQueue} />
+        <FormInput field={fields.workflowTaskQueue} />
       </div>
       <div class="my-2 flex justify-center">
         <ToggleButtons>
@@ -125,36 +73,36 @@
       {#if tab === 'interval'}
         <div class="mb-4 flex gap-4">
           <div class="w-full">
-            <FormInput field={formValues.interval} />
+            <FormInput field={fields.interval} />
           </div>
           <div class="w-full">
-            <FormInput field={formValues.phase} />
+            <FormInput field={fields.phase} />
           </div>
         </div>
       {:else}
         <div class="mb-4 flex flex gap-4">
           <div class="w-1/4">
-            <FormInput field={formValues.year} />
+            <FormInput field={fields.year} />
           </div>
           <div class="w-1/4">
-            <FormInput field={formValues.month} />
+            <FormInput field={fields.month} />
           </div>
           <div class="w-1/4">
-            <FormInput field={formValues.dayOfMonth} />
+            <FormInput field={fields.dayOfMonth} />
           </div>
           <div class="w-1/4">
-            <FormInput field={formValues.dayOfWeek} />
+            <FormInput field={fields.dayOfWeek} />
           </div>
         </div>
         <div class="mb-4 flex flex w-full gap-4 md:w-2/3 xl:w-1/2">
           <div class="w-1/3">
-            <FormInput field={formValues.hour} />
+            <FormInput field={fields.hour} />
           </div>
           <div class="w-1/3">
-            <FormInput field={formValues.minute} />
+            <FormInput field={fields.minute} />
           </div>
           <div class="w-1/3">
-            <FormInput field={formValues.second} />
+            <FormInput field={fields.second} />
           </div>
         </div>
       {/if}

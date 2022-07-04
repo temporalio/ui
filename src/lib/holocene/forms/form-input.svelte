@@ -5,7 +5,7 @@
     validators,
     required as formRequired,
   } from 'svelte-use-form';
-  import type { FormField } from '$app/stores/schedules';
+  import type { FormField } from '$holocene/forms';
 
   export let field: FormField;
   const { key, label, validations, hint, required, placeholder } = field;
@@ -25,9 +25,7 @@
   </HintGroup>
 {/if}
 {#if !required && hint}
-  <HintGroup for={key}>
-    <Hint><small class="text-blue-500">{hint}</small></Hint>
-  </HintGroup>
+  <small class="text-blue-500">{hint}</small>
 {/if}
 
 <style lang="postcss">
