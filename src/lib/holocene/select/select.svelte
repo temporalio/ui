@@ -9,7 +9,6 @@
 
   type T = $$Generic;
   let show = false;
-  let menu: HTMLElement;
 
   export let label: string = '';
   export let id: string;
