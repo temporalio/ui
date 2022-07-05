@@ -3,7 +3,7 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { timeFormat } from '$lib/stores/time-format';
 
-  export let futureRuns = [];
+  export let futureRuns: string[] = [];
 </script>
 
 <Panel>

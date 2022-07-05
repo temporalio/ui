@@ -133,6 +133,18 @@ export type Payloads = temporal.api.common.v1.IPayloads;
 export type PollerInfo = temporal.api.taskqueue.v1.IPollerInfo;
 export type TaskQueueStatus = temporal.api.taskqueue.v1.ITaskQueueStatus;
 
+// api.schedule
+
+export type ScheduleListEntry = temporal.api.schedule.v1.IScheduleListEntry;
+export type ScheduleSpec = temporal.api.schedule.v1.IScheduleSpec;
+export type ScheduleState = temporal.api.schedule.v1.IScheduleState;
+export type SchedulePolicies = temporal.api.schedule.v1.ISchedulePolicies;
+
+export type CalendarSpec = temporal.api.schedule.v1.ICalendarSpec;
+export type IntervalSpec = temporal.api.schedule.v1.IIntervalSpec;
+export type ScheduleActionResult =
+  temporal.api.schedule.v1.ScheduleActionResult;
+
 // google
 
 export type Timestamp = google.protobuf.ITimestamp;

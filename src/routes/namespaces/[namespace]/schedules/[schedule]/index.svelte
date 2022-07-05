@@ -26,6 +26,7 @@
   import Modal from '$lib/components/modal.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
   import Loading from '$holocene/loading.svelte';
+  import type { DescribeScheduleResponse } from '$types';
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
@@ -54,8 +55,8 @@
     }
   };
 
-  const handlePause = async (schedule) => {
-    schedule.schedule.state.paused
+  const handlePause = async (schedule: DescribeScheduleResponse) => {
+    schedule?.schedule?.state?.paused
       ? await unpauseSchedule({
           namespace,
           scheduleId,
@@ -129,7 +130,7 @@
       >
         {#each options as option}
           <div
-            class="cursor-pointer flex gap-2 items-center {option.class}"
+            class="cursor-pointer flex gap-2 items-center {option?.class}"
             on:click={option.onClick}
           >
             {option.label}

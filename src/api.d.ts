@@ -11,7 +11,7 @@ type WorkflowAPIRoutePath =
 type TaskQueueAPIRoutePath = 'task-queue';
 type ParameterlessAPIRoutePath = 'cluster' | 'settings' | 'user' | 'namespaces';
 type SchedulesAPIRoutePath = 'schedules';
-type ScheduleAPIRoutePath = 'schedule';
+type ScheduleAPIRoutePath = 'schedule' | 'schedule.delete';
 
 type APIRoutePath =
   | WorkflowsAPIRoutePath

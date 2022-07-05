@@ -1,13 +1,15 @@
 <script lang="ts">
-  export let calendar;
-  export let interval;
+  import type { CalendarSpec, IntervalSpec } from '$types';
+
+  export let calendar: CalendarSpec;
+  export let interval: IntervalSpec;
 
   const month = calendar?.month || '*';
   const dayOfMonth = calendar?.dayOfMonth || '*';
   const dayOfWeek = calendar?.dayOfWeek || '*';
 
   const getInterval = (interval: string) => {
-    if (interval?.toString().endsWith('s')) {
+    if (interval.endsWith('s')) {
       const seconds = parseInt(interval.slice(0, interval.length - 1));
       return seconds / 60;
     }
@@ -45,7 +47,7 @@
     '12': 'December',
   };
 
-  const humanReadableCalendar = (calendar) => {
+  const humanReadableCalendar = (calendar: CalendarSpec) => {
     let label = '';
     if (
       !calendar?.year &&
@@ -104,7 +106,7 @@
 </script>
 
 {#if !calendar}
-  <p>Every {getInterval(interval?.interval ?? 0)} minutes</p>
+  <p>Every {getInterval(interval?.interval?.toString())} minutes</p>
 {:else}
   <div class="flex flex-row gap-4">
     {humanReadableCalendar(calendar)}

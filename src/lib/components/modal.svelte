@@ -6,7 +6,7 @@
   export let open: boolean = false;
   export let hideConfirm: boolean = false;
   export let confirmText: string = 'Confirm';
-  export let confirmType: 'destroy' | 'primary';
+  export let confirmType: 'destroy' | 'primary' = 'primary';
   export let confirmDisabled: boolean = false;
   export let large: boolean = false;
 

@@ -1,9 +1,10 @@
 <script lang="ts">
+  import type { ScheduleSpec, ScheduleState, SchedulePolicies } from '$types';
   import Icon from '$lib/holocene/icon/index.svelte';
 
-  export let spec;
-  export let state;
-  export let policies;
+  export let spec: ScheduleSpec;
+  export let state: ScheduleState;
+  export let policies: SchedulePolicies;
 
   let show = false;
 </script>
@@ -18,7 +19,7 @@
   <p>Schedule Start Time: {spec?.startTime ?? ''}</p>
   <p>Schedule End Time: {spec?.endTime ?? ''}</p>
   <p>Jitter: {spec?.jitter ?? ''}</p>
-  <p>Exclusion Calendar: {spec?.exclusionCalendar ?? ''}</p>
+  <p>Exclusion Calendar: {spec?.excludeCalendar?.[0] ?? ''}</p>
   <p>Remaining Actions: {state?.remainingActions ?? ''}</p>
   <p>Overlap Policy: {policies?.overlapPolicy ?? ''}</p>
 {/if}

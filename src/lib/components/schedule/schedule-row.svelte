@@ -1,16 +1,6 @@
-<script context="module" lang="ts">
-  import type { Load } from '@sveltejs/kit';
-
-  export const load: Load = async function ({ params }) {
-    const { namespace } = params;
-
-    return {
-      props: { namespace },
-    };
-  };
-</script>
-
 <script lang="ts">
+  import type { ScheduleListEntry } from '$types';
+  import { page } from '$app/stores';
   import { timeFormat } from '$lib/stores/time-format';
   import { formatDate } from '$lib/utilities/format-date';
   import { routeForSchedule, routeForWorkflow } from '$lib/utilities/route-for';
@@ -19,17 +9,17 @@
 
   import ScheduleFrequency from './schedule-frequency.svelte';
 
-  export let namespace: string;
-  export let schedule: unknown;
+  let { namespace } = $page.params;
+  export let schedule: ScheduleListEntry;
 
-  const getRoute = (item: unknown) =>
+  const getRoute = () =>
     routeForSchedule({
       namespace,
       scheduleId: schedule?.scheduleId as string,
     });
 </script>
 
-<a sveltekit:prefetch href={getRoute(schedule)} class="row">
+<a sveltekit:prefetch href={getRoute()} class="row">
   <div class="cell">
     <WorkflowStatus status={schedule?.info?.paused ? 'Paused' : 'Running'} />
   </div>
@@ -79,12 +69,7 @@
   .cell {
     @apply border-gray-700 p-2 text-left xl:table-cell xl:border-b-2;
   }
-
-  .table-link {
-    @apply group-hover:text-blue-700 group-hover:underline group-hover:decoration-blue-700;
-  }
-
-  .row:last-of-type .cell {
+  s .row:last-of-type .cell {
     @apply border-b-0 first-of-type:rounded-bl-lg  last-of-type:rounded-br-lg;
   }
 </style>

@@ -5,7 +5,6 @@
     validators,
     required as formRequired,
   } from 'svelte-use-form';
-  import type { Form } from 'svelte-use-form';
   import type { FormField } from '$holocene/forms';
 
   export let field: FormField;

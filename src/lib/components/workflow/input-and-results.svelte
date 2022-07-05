@@ -1,6 +1,4 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/index.svelte';
-
   import { eventHistory, updating } from '$lib/stores/events';
 
   import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';

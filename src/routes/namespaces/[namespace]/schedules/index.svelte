@@ -15,6 +15,7 @@
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
   import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
   import { fetchAllSchedules } from '$lib/services/schedule-service';
+  import type { ScheduleListEntry } from '$types';
 
   let { namespace } = $page.params;
 
@@ -22,7 +23,7 @@
 
   $: fetchSchedules = fetchAllSchedules(namespace);
 
-  $: filteredSchedules = (schedules) =>
+  $: filteredSchedules = (schedules: ScheduleListEntry[]) =>
     search
       ? schedules.filter((schedule) => schedule.scheduleId.includes(search))
       : schedules;
@@ -48,7 +49,6 @@
     id="schedule-name-filter"
     label="Schedule Name"
     bind:value={search}
-    on:input={(e) => (search = e.target.value)}
     on:submit={noop}
   />
 </div>
@@ -60,7 +60,7 @@
     <Pagination items={filteredSchedules(schedules)} let:visibleItems>
       <Table {columns}>
         {#each visibleItems as schedule}
-          <ScheduleRow {schedule} {namespace} />
+          <ScheduleRow {schedule} />
         {/each}
       </Table>
     </Pagination>

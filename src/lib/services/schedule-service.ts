@@ -1,6 +1,13 @@
 import type { ErrorCallback } from '$lib/utilities/request-from-api';
 import { v4 as uuidv4 } from 'uuid';
 
+import type {
+  ListScheduleResponse,
+  DescribeScheduleResponse,
+  CreateScheduleRequest,
+  UpdateScheduleRequest,
+  ScheduleListEntry,
+} from '$types';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
@@ -10,7 +17,7 @@ type ScheduleParameters = {
 };
 
 export type ScheduleResponse = {
-  schedules: WorkflowExecution[];
+  schedules: ScheduleListEntry[];
   nextPageToken: string;
   error?: string;
 };

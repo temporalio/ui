@@ -124,13 +124,6 @@
 </article>
 
 <style lang="postcss">
-  input {
-    @apply block w-full rounded-md border border-gray-400 p-2;
-  }
-  label {
-    @apply text-sm text-gray-700;
-  }
-
   .back-to-schedules {
     @apply text-sm;
   }
