@@ -20,7 +20,7 @@ const scheduledEvent = {
     },
     input: null,
   },
-};
+} as unknown as ActivityTaskScheduledEvent;
 
 const completedEvent = {
   id: '7',
@@ -35,7 +35,7 @@ const completedEvent = {
     startedEventId: '6',
     identity: '21665@temporal@',
   },
-};
+} as unknown as ActivityTaskCompletedEvent;
 
 describe('createEventGroup', () => {
   it('should grab the name of the groupTaskScheduledEvent', () => {

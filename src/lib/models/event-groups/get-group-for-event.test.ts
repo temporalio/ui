@@ -39,7 +39,7 @@ const eventHistory = [
         nonRetryableErrorTypes: [],
       },
     },
-  },
+  } as unknown as ActivityTaskScheduledEvent,
   {
     eventId: '6',
     eventTime: '2022-03-10T16:47:09.226184379Z',
@@ -53,7 +53,7 @@ const eventHistory = [
       attempt: 1,
       lastFailure: null,
     },
-  },
+  } as unknown as ActivityTaskStartedEvent,
   {
     id: '7',
     eventId: '7',
@@ -67,7 +67,7 @@ const eventHistory = [
       startedEventId: '6',
       identity: '14327@MacBook-Pro.local@',
     },
-  },
+  } as unknown as ActivityTaskCompletedEvent,
 ];
 
 const [activityTaskScheduled, activityTaskStarted, activityTaskCompleted] =
@@ -105,7 +105,7 @@ describe('getGroupForEvent', () => {
         startedEventId: '2',
         identity: '14327@MacBook-Pro.local@',
       },
-    };
+    } as unknown as ActivityTaskCompletedEvent;
 
     const result = getGroupForEvent(anotherEvent, eventGroups);
 
