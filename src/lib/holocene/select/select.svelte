@@ -1,15 +1,15 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import Icon from '$lib/holocene/icon/index.svelte';
-  import Menu, { triggerMenu } from '$lib/holocene/primatives/menu.svelte';
+  import Menu from '$lib/holocene/primatives/menu/menu.svelte';
   import Option, { isOption } from '$lib/holocene/select/option.svelte';
   import type { Option as OptionType } from '$lib/holocene/select/option.svelte';
+  import MenuTrigger from '../primatives/menu/menu-button.svelte';
+  import MenuContainer from '../primatives/menu/menu-container.svelte';
 
   type T = $$Generic;
   let show = false;
-
-  const hide = () => (show = false);
-  const toggle = () => (show = !show);
+  let menu: HTMLElement;
 
   export let label: string = '';
   export let id: string;
@@ -40,17 +40,18 @@
   }
 </script>
 
-<div data-cy={$$props.dataCy} class="relative inline w-full {$$props.class}">
-  <label class="mb-2" for={id}>{label}</label>
-  <div
-    class="container"
-    use:triggerMenu
-    on:close-menu={hide}
-    on:trigger-menu={toggle}
-    class:dark
+<label class="mb-2" for={id}>{label}</label>
+<MenuContainer class="w-full {$$props.class}">
+  <MenuTrigger
+    class="select-input-container"
+    bind:show
+    controls="{id}-menu"
+    data-cy={$$props.dataCy}
+    {dark}
   >
     <input
-      class="input"
+      class="select-input"
+      class:dark
       placeholder={label}
       value={_selected}
       name={id}
@@ -58,8 +59,8 @@
       {id}
     />
     <Icon stroke="currentcolor" name={show ? 'caretUp' : 'caretDown'} />
-  </div>
-  <Menu class="max-h-60" bind:show {dark}>
+  </MenuTrigger>
+  <Menu id="{id}-menu" class="max-h-60" {show} {dark}>
     {#if options}
       {#each options as option}
         {@const value = isOption(option) ? option.value : _value}
@@ -74,27 +75,18 @@
       <slot />
     {/if}
   </Menu>
-</div>
+</MenuContainer>
 
 <style lang="postcss">
-  .container {
+  :global(.select-input-container) {
     @apply flex h-10 w-full flex-row items-center justify-between rounded-sm border border-gray-900 bg-white px-2 text-base;
   }
 
-  .container.open {
-    @apply border-2 border-blue-700;
-  }
-
-  .container.dark,
-  .container.dark input {
-    @apply bg-gray-900 text-white;
-  }
-
-  .container.dark input {
-    @apply placeholder:text-gray-200;
-  }
-
-  .input {
+  .select-input {
     @apply h-full w-full cursor-pointer bg-white;
+  }
+
+  .select-input.dark {
+    @apply placeholder:text-gray-200 bg-primary text-white;
   }
 </style>

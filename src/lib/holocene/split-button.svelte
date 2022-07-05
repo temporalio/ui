@@ -1,40 +1,32 @@
 <script lang="ts">
   import Icon from '$holocene/icon/index.svelte';
-  import { noop } from 'svelte/internal';
-  import Menu, { triggerMenu } from './primatives/menu.svelte';
+  import MenuContainer from './primatives/menu/menu-container.svelte';
+  import MenuTrigger from './primatives/menu/menu-button.svelte';
+  import Menu from './primatives/menu/menu.svelte';
   export let label: string;
+  export let id: string;
   export let disabled: boolean = false;
   export let left: boolean = false;
   export let right: boolean = false;
 
   let show: boolean = false;
-  const hide = () => (show = false);
-  const toggle = () => (show = !show);
 </script>
 
-<div
-  class="relative inline-block"
-  use:triggerMenu
-  on:trigger-menu={disabled ? noop : toggle}
-  on:close-menu={disabled ? noop : hide}
->
-  <div class="split-button" class:disabled>
-    <button {disabled} class="segment rounded-l px-4">
-      {label}
-    </button>
-    <div class="segment rounded-r px-2">
-      <Icon stroke="currentcolor" name="caretDown" />
+<MenuContainer class={$$props.class}>
+  <MenuTrigger bind:show controls={id} class={$$props.class}>
+    <div class="split-button" class:disabled>
+      <button tabindex="-1" {disabled} class="segment rounded-l px-4">
+        {label}
+      </button>
+      <div class="segment rounded-r px-2">
+        <Icon stroke="currentcolor" name="caretDown" />
+      </div>
     </div>
-  </div>
-  <Menu
-    class="flex min-w-max flex-col gap-y-4 border-gray-300 p-6 font-poppins text-sm"
-    {show}
-    {left}
-    {right}
-  >
+  </MenuTrigger>
+  <Menu class="split-button-menu" {id} {show} {left} {right}>
     <slot />
   </Menu>
-</div>
+</MenuContainer>
 
 <style lang="postcss">
   .split-button {
@@ -43,6 +35,10 @@
 
   .split-button.disabled {
     @apply cursor-not-allowed opacity-50;
+  }
+
+  :global(.split-button-menu) {
+    @apply flex min-w-max flex-col items-start gap-y-4 border-gray-300 p-6 font-poppins text-sm;
   }
 
   .segment:disabled {

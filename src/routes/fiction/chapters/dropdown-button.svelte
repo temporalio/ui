@@ -12,12 +12,13 @@
 
 <Chapter description="A simple dropdown menu">
   <DropdownButton
+    id="retention-days"
     label={value ? `${value} day retention` : 'Retention Policy'}
     icon="stopwatch"
   >
     {#each ['3', '7', '15', '30', '60', '90'] as v}
       <Item
-        on:click={updateValue}
+        on:select={updateValue}
         name="pizza-toppings"
         value={v}
         checked={value === v}>{v} Days</Item
@@ -27,5 +28,5 @@
 </Chapter>
 
 <Chapter description="A readonly dropdown menu">
-  <DropdownButton readonly label="region-1" icon="globe" />
+  <DropdownButton readonly id="region" label="region-1" icon="globe" />
 </Chapter>
