@@ -18,9 +18,9 @@
   import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
   import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
   import WorkflowFilters from '$lib/components/workflow/workflow-filters.svelte';
-  import WorkflowsLoading from '$lib/components/workflow/workflows-loading.svelte';
   import { onDestroy, onMount } from 'svelte';
   import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
+  import Loading from '$holocene/loading.svelte';
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
 
@@ -49,7 +49,7 @@
 </div>
 <WorkflowFilters bind:searchType />
 {#if $loading}
-  <WorkflowsLoading />
+  <Loading />
 {:else if $workflows.length}
   <Pagination items={$workflows} updating={$updating} let:visibleItems>
     <WorkflowsSummaryTable>

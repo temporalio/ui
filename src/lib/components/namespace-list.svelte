@@ -4,15 +4,15 @@
   export let namespaceList: null | Promise<
     { namespace: string; href: string; onClick: () => void }[]
   >;
-  export let activeNamespace: string | undefined | null;
+  import { lastUsedNamespace } from '$lib/stores/namespaces';
 
   $: searchValue = '';
 </script>
 
 <div class="prose mt-16 mb-8">
   <h2 class="text-2xl">Select a namespace</h2>
-  {#if activeNamespace}
-    <p>You are currently viewing {activeNamespace}</p>
+  {#if $lastUsedNamespace}
+    <p>You are currently viewing {$lastUsedNamespace}</p>
   {/if}
 </div>
 
@@ -34,14 +34,14 @@
           on:click={() => namespace?.onClick()}
         >
           <div class="w-6 h-6 pl-3 active">
-            {#if namespace.namespace === activeNamespace}
+            {#if namespace.namespace === $lastUsedNamespace}
               <Icon stroke="currentcolor" name="checkMark" />
             {/if}
           </div>
           <a
             href={namespace.href}
             class="link"
-            class:active={activeNamespace === namespace.namespace}
+            class:active={$lastUsedNamespace === namespace.namespace}
             >{namespace.namespace}</a
           >
         </li>

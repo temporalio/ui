@@ -28,7 +28,7 @@ export type WorkflowParameters = Pick<
 >;
 export type ScheduleParameters = Pick<
   RouteParameters,
-  'namespace' | 'schedule' | 'run' | 'scheduleId'
+  'namespace' | 'scheduleId'
 >;
 export type EventHistoryParameters = Pick<
   RouteParameters,
@@ -78,16 +78,9 @@ export const routeForSchedules = (parameters: NamespaceParameter): string => {
   return `${routeForNamespace(parameters)}/schedules`;
 };
 
-export const isRouteForSchedules = (
-  pathname,
-  parameters: NamespaceParameter,
-) => {
-  return pathname === routeForSchedules(parameters);
-};
-
 export const routeForScheduleCreate = ({
   namespace,
-}: ScheduleParameters): string => {
+}: NamespaceParameter): string => {
   return `${routeForSchedules({ namespace })}/new`;
 };
 

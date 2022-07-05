@@ -1,4 +1,5 @@
 import { goto } from '$app/navigation';
+import { writable } from 'svelte/store';
 
 import type { Form } from 'svelte-use-form';
 
@@ -40,13 +41,11 @@ export const fields: Record<string, FormField> = {
   year: {
     key: 'schedule.spec.calendar.year',
     label: 'Year',
-    placeholder: '*',
     required: false,
   },
   month: {
     key: 'schedule.spec.calendar.month',
     label: 'Month',
-    placeholder: '*',
     required: false,
   },
   dayOfMonth: {
@@ -76,6 +75,7 @@ export const fields: Record<string, FormField> = {
     required: false,
   },
 
+  // TODO: Post Alpha, add support of additional fields.
   // "startTime": "2022-07-04T03:18:59.668Z",
   // "endTime": "2022-07-04T03:18:59.668Z",
   // "jitter": "string",
@@ -86,8 +86,7 @@ export const fields: Record<string, FormField> = {
 export const submitScheduleForm = async (
   form: Form,
   namespace: string,
-  loading: boolean,
-) => {
+): Promise<void> => {
   const values = form.values;
   const body = {
     schedule_id: '',
@@ -130,18 +129,23 @@ export const submitScheduleForm = async (
     ];
   }
 
-  // // Wait 1 second for create to get it on fetchAllSchedules
-  try {
-    loading = true;
-    await createSchedule({
-      namespace,
-      body,
-    });
+  // // Wait 2 seconds for create to get it on fetchAllSchedules
+  loading.set(true);
+  const { error: err } = await createSchedule({
+    namespace,
+    body,
+  });
+  if (err) {
+    error.set(err);
+    loading.set(false);
+  } else {
+    error.set('');
     setTimeout(() => {
       goto(routeForSchedules({ namespace }));
-      loading = false;
-    }, 1000);
-  } catch (e) {
-    loading = false;
+      loading.set(false);
+    }, 2000);
   }
 };
+
+export const loading = writable(false);
+export const error = writable('');

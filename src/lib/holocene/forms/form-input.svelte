@@ -5,16 +5,20 @@
     validators,
     required as formRequired,
   } from 'svelte-use-form';
+  import type { Form } from 'svelte-use-form';
   import type { FormField } from '$holocene/forms';
 
   export let field: FormField;
+
   const { key, label, validations, hint, required, placeholder } = field;
 </script>
 
-<label for={key}>{label}</label>
+<label for={key}
+  >{label}<span class="required">{required ? '*' : ''}</span></label
+>
 <input
   name={key}
-  placeholder={required ? 'Required' : placeholder ?? ''}
+  placeholder={placeholder ?? ''}
   use:validators={validations ?? required ? [formRequired] : []}
 />
 {#if required}
@@ -34,5 +38,8 @@
   }
   label {
     @apply text-sm text-gray-700;
+  }
+  .required {
+    @apply border-red-400;
   }
 </style>

@@ -26,6 +26,11 @@
         showTemporalSystemNamespace || namespace !== 'temporal-system',
     );
 
+  $: activeNamespace = ($page.stuff.namespaces || []).find(
+    (namespace: Namespace) =>
+      namespace?.namespaceInfo?.name === $page.params.namespace,
+  );
+
   const namespaceList = namespaces.map((namespace: string) => {
     const href = routeForWorkflows({ namespace });
     return {
@@ -67,7 +72,7 @@
 
 <Navigation
   namespaceList={Promise.resolve(namespaceList)}
-  activeNamespace={$lastUsedNamespace}
+  {activeNamespace}
   {linkList}
   {isCloud}
   user={Promise.resolve(user)}

@@ -9,7 +9,11 @@ export type FormField = {
   placeholder?: string;
 };
 
-export function setBodyProperty(path: string, body: unknown, value: unknown) {
+export function setBodyProperty(
+  path: string,
+  body: unknown,
+  value: unknown,
+): unknown {
   const properties = path.split('.');
   return properties.reduce(
     (o, p, index) =>

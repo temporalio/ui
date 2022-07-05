@@ -21,17 +21,21 @@ export const fetchAllSchedules = async (
   namespace: string,
   request = fetch,
 ): Promise<ScheduleResponse> => {
-  const onError: ErrorCallback = (e) => console.error(e);
-  let error: string;
+  let error = '';
+  const onError: ErrorCallback = (err) =>
+    (error =
+      err?.body?.message ??
+      `Error fetching schedules: ${err.status}: ${err.statusText}`);
 
-  const { schedules, nextPageToken } = (await requestFromAPI<ScheduleResponse>(
-    routeForApi('schedules', { namespace }),
-    {
-      params: {},
-      onError,
-      request,
-    },
-  )) ?? { schedules: [], nextPageToken: '' };
+  const { schedules, nextPageToken } =
+    (await requestFromAPI<ListScheduleResponse>(
+      routeForApi('schedules', { namespace }),
+      {
+        params: {},
+        onError,
+        request,
+      },
+    )) ?? { schedules: [], nextPageToken: '' };
 
   return {
     schedules,
@@ -43,29 +47,36 @@ export const fetchAllSchedules = async (
 export async function fetchSchedule(
   parameters: ScheduleParameters,
   request = fetch,
-): Promise<WorkflowExecution> {
+): Promise<DescribeScheduleResponse> {
   return requestFromAPI(routeForApi('schedule', parameters), { request });
 }
 
 export async function deleteSchedule(
   parameters: ScheduleParameters,
   request = fetch,
-): Promise<WorkflowExecution> {
+): Promise<void> {
   return requestFromAPI(routeForApi('schedule.delete', parameters), {
+    request,
     options: { method: 'DELETE' },
   });
 }
 
 type CreateScheduleOptions = {
   namespace: string;
-  body: unknown;
+  body: CreateScheduleRequest;
 };
 
 export async function createSchedule({
   namespace,
   body,
-}: CreateScheduleOptions): Promise<null> {
-  return await requestFromAPI<null>(
+}: CreateScheduleOptions): Promise<{ error: string; conflictToken: string }> {
+  let error = '';
+  const onError: ErrorCallback = (err) =>
+    (error =
+      err?.body?.message ??
+      `Error creating schedule: ${err.status}: ${err.statusText}`);
+
+  const { conflictToken } = await requestFromAPI<{ conflictToken: string }>(
     routeForApi('schedules', {
       namespace,
     }),
@@ -78,16 +89,18 @@ export async function createSchedule({
         }),
       },
       shouldRetry: false,
-      onError: (error) => console.error(error),
+      onError,
     },
   );
+
+  return { conflictToken, error };
 }
 
 type EditScheduleOptions = {
   namespace: string;
   scheduleId: string;
   request_id: string;
-  body: unknown;
+  body: UpdateScheduleRequest;
 };
 
 export async function editSchedule({

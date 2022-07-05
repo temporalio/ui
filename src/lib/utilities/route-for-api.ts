@@ -45,7 +45,7 @@ export function routeForApi(
 ): string;
 export function routeForApi(
   route: SchedulesAPIRoutePath,
-  parameters: WorkflowListRouteParameters,
+  parameters: ScheduleListRouteParameters,
 ): string;
 export function routeForApi(
   route: WorkflowAPIRoutePath,
@@ -54,7 +54,7 @@ export function routeForApi(
 ): string;
 export function routeForApi(
   route: ScheduleAPIRoutePath,
-  parameters: WorkflowRouteParameters,
+  parameters: ScheduleRouteParameters,
   shouldEncode?: boolean,
 ): string;
 export function routeForApi(

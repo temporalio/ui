@@ -1,7 +1,12 @@
 <script lang="ts">
   import { useForm } from 'svelte-use-form';
 
-  import { fields, submitScheduleForm } from '$lib/stores/schedules';
+  import {
+    fields,
+    submitScheduleForm,
+    loading,
+    error,
+  } from '$lib/stores/schedules';
 
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
@@ -10,23 +15,21 @@
   import { page } from '$app/stores';
   import { routeForSchedules } from '$lib/utilities/route-for';
   import Button from '$lib/holocene/button.svelte';
-  import Loading from '$lib/components/loading.svelte';
+  import Loading from '$holocene/loading.svelte';
   import FormInput from '$lib/holocene/forms/form-input.svelte';
-
-  let tab = 'interval';
-  $: loading = false;
 
   let { namespace } = $page.params;
 
+  let tab = 'interval';
   const form = useForm();
 
   const handleClick = () => {
-    submitScheduleForm($form, namespace, loading);
+    submitScheduleForm($form, namespace);
   };
 </script>
 
 <article class="pb-20">
-  {#if loading}
+  {#if $loading}
     <Loading title="Creating Schedule..." />
   {:else}
     <main class="relative mb-12 flex gap-1">
@@ -110,6 +113,13 @@
         <Button disabled={!$form.valid} on:click={handleClick}>Create</Button>
       </div>
     </form>
+  {/if}
+  {#if $error}
+    <p
+      class="rounded-md border-2 border-orange-500 bg-orange-100 p-5 text-center"
+    >
+      {$error}
+    </p>
   {/if}
 </article>
 

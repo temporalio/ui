@@ -16,6 +16,16 @@ export type GetSearchAttributesResponse =
   temporal.api.workflowservice.v1.IGetSearchAttributesResponse;
 export type ListWorkflowExecutionsResponse =
   temporal.api.workflowservice.v1.IListWorkflowExecutionsResponse;
+export type ListScheduleResponse =
+  temporal.api.workflowservice.v1.IListSchedulesResponse;
+export type DescribeScheduleResponse =
+  temporal.api.workflowservice.v1.IDescribeScheduleResponse;
+export type CreateScheduleRequest =
+  temporal.api.workflowservice.v1.ICreateScheduleRequest;
+export type PatchScheduleRequest =
+  temporal.api.workflowservice.v1.IPatchScheduleRequest;
+export type UpdateScheduleRequest =
+  temporal.api.workflowservice.v1.IUpdateScheduleRequest;
 
 // api.history
 

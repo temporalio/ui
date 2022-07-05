@@ -2,8 +2,8 @@
   import EmptyState from '$lib/components/empty-state.svelte';
   import Pagination from '$lib/components/pagination.svelte';
   import Button from '$holocene/button.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
-  import Loading from '$lib/components/loading.svelte';
+  import Badge from '$holocene/badge.svelte';
+  import Loading from '$holocene/loading.svelte';
   import Table from '$lib/components/table/index.svelte';
   import ScheduleRow from '$lib/components/schedule/schedule-row.svelte';
 
@@ -32,8 +32,8 @@
 </script>
 
 <div class="flex flex-row justify-between">
-  <h2 class="text-2xl">
-    Schedules <NamespaceSelector /><Badge type="alpha">Alpha</Badge>
+  <h2 class="flex items-center gap-2 text-2xl">
+    Schedules<Badge type="alpha">Alpha</Badge><NamespaceSelector />
   </h2>
   <Button
     class="h-10"
@@ -55,7 +55,7 @@
 
 {#await fetchSchedules}
   <Loading />
-{:then { schedules }}
+{:then { schedules, error }}
   {#if schedules?.length}
     <Pagination items={filteredSchedules(schedules)} let:visibleItems>
       <Table {columns}>
@@ -66,17 +66,14 @@
     </Pagination>
   {:else}
     <div class="my-12 flex flex-col items-center justify-start gap-2">
-      <EmptyState title={'No Schedules Found'} content={errorMessage} />
-      <Button primary as="anchor">Get Started With Docs</Button>
+      <EmptyState title={'No Schedules Found'} content={errorMessage} {error} />
+      <Button
+        primary
+        as="anchor"
+        target="_external"
+        href="https://docs.temporal.io/workflows/#how-to-enable-schedules"
+        >Get Started With Docs</Button
+      >
     </div>
   {/if}
-{:catch error}
-  <div class="my-12 flex flex-col items-center justify-start gap-2">
-    <EmptyState
-      title={'No Schedules Found'}
-      content={errorMessage}
-      error={error.toString()}
-    />
-    <Button primary as="anchor">Get Started With Docs</Button>
-  </div>
 {/await}

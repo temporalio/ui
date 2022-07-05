@@ -11,7 +11,6 @@ type WorkflowAPIRoutePath =
 type TaskQueueAPIRoutePath = 'task-queue';
 type ParameterlessAPIRoutePath = 'cluster' | 'settings' | 'user' | 'namespaces';
 type SchedulesAPIRoutePath = 'schedules';
-
 type ScheduleAPIRoutePath = 'schedule';
 
 type APIRoutePath =
@@ -20,7 +19,8 @@ type APIRoutePath =
   | ParameterlessAPIRoutePath
   | TaskQueueAPIRoutePath
   | WorkflowsAPIArchivalRoutePath
-  | SchedulesAPIRoutePath;
+  | SchedulesAPIRoutePath
+  | ScheduleAPIRoutePath;
 
 type APIRouteParameters = {
   namespace: string;
@@ -28,9 +28,11 @@ type APIRouteParameters = {
   scheduleId: string;
   runId: string;
   queue: string;
+  scheduleId: string;
 };
 
 type WorkflowListRouteParameters = Pick<APIRouteParameters, 'namespace'>;
+type ScheduleListRouteParameters = Pick<APIRouteParameters, 'namespace'>;
 
 type WorkflowRouteParameters = Pick<
   APIRouteParameters,
@@ -42,3 +44,8 @@ type TaskQueueRouteParameters = Pick<APIRouteParameters, 'namespace' | 'queue'>;
 type ValidWorkflowEndpoints = WorkflowsAPIRoutePath;
 
 type ValidWorkflowParameters = ArchiveFilterParameters | FilterParameters;
+
+type ScheduleRouteParameters = Pick<
+  APIRouteParameters,
+  'namespace' | 'scheduleId'
+>;

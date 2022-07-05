@@ -2,7 +2,7 @@
   import { page } from '$app/stores';
 
   import CodeBlock from '$lib/components/code-block.svelte';
-  import Loading from '$lib/components/loading.svelte';
+  import Loading from '$holocene/loading.svelte';
   import { fetchRawEvents } from '$lib/services/events-service';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 

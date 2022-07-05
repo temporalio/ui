@@ -56,7 +56,7 @@
     "@sveltejs/adapter-static": "^1.0.0-next.29",
     "@sveltejs/kit": "^1.0.0-next.311",
     "@sveltejs/vite-plugin-svelte": "1.0.0-next.49",
-    "@temporalio/proto": "0.21.0",
+    "@temporalio/proto": "1.0.0-rc.0",
     "@types/base-64": "^1.0.0",
     "@types/node": "^16.3.2",
     "@types/sanitize-html": "^2.6.1",
