@@ -1,5 +1,4 @@
 import { isEventGroup } from '$lib/models/event-groups';
-import { getLastEvent } from '$lib/models/event-groups/get-last-event';
 import { capitalize } from '$lib/utilities/format-camel-case';
 
 type SummaryAttribute = {

@@ -20,7 +20,7 @@ const attributes = {
     kind: 'Normal',
   },
   input: {
-    payloads: [1656707029044596700, 'canary'],
+    payloads: ['1656707029044596700', 'canary'],
   },
   workflowExecutionTimeout: '0s',
   workflowRunTimeout: '1200s',

@@ -1,5 +1,30 @@
 import { describe, expect, it } from 'vitest';
-import { getEventClassification } from './get-event-classification';
+import {
+  eventClassifications,
+  getEventClassification,
+} from './get-event-classification';
+
+describe('eventClassifications', () => {
+  it('should match the last snapshot of the classifications', () => {
+    expect(eventClassifications).toEqual([
+      'Unspecified',
+      'Scheduled',
+      'Open',
+      'New',
+      'Started',
+      'Initiated',
+      'Running',
+      'Completed',
+      'Fired',
+      'CancelRequested',
+      'TimedOut',
+      'Signaled',
+      'Canceled',
+      'Failed',
+      'Terminated',
+    ]);
+  });
+});
 
 describe('getEventClassification', () => {
   it('should return "Started" for WorkflowExecutionStarted', () => {
@@ -93,7 +118,7 @@ describe('getEventClassification', () => {
   });
 
   it('should return "Canceled" for TimerCanceled', () => {
-    const eventType: EventType = 'TimerCanceledEvent';
+    const eventType: EventType = 'TimerCanceled';
     expect(getEventClassification(eventType)).toBe('Canceled');
   });
 
