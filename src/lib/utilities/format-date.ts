@@ -59,7 +59,7 @@ export function formatDuration(
   duration: Duration | string,
   delimiter = ', ',
 ): string {
-  if (duration === null) return '';
+  if (duration === null || !duration) return '';
   if (typeof duration === 'string') duration = fromSeconds(duration);
   return durationToString(duration, { delimiter });
 }
