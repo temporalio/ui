@@ -28,7 +28,7 @@
 
   $: activeNamespace = ($page.stuff.namespaces || []).find(
     (namespace: Namespace) =>
-      namespace?.namespaceInfo?.name === $page.params.namespace,
+      namespace?.namespaceInfo?.name === $lastUsedNamespace,
   );
 
   const namespaceList = namespaces.map((namespace: string) => {
