@@ -6,7 +6,7 @@
   on:click
   role="menuitem"
   class:dark
-  class="list-none bg-white text-gray-900 flex w-full cursor-pointer flex-row items-center {$$props.class}"
+  class="flex w-full cursor-pointer list-none flex-row items-center bg-white text-gray-900 {$$props.class}"
 >
   <slot />
 </li>

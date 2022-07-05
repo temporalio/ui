@@ -42,7 +42,7 @@
   }
 </script>
 
-<MenuItem on:click={handleOptionClick} class="hover:bg-gray-50 p-4" {dark}>
+<MenuItem on:click={handleOptionClick} class="p-4 hover:bg-gray-50" {dark}>
   <div class="mr-2 w-6">
     {#if selected}
       <Icon stroke="currentcolor" name="checkMark" scale={0.9} />

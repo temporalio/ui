@@ -87,6 +87,6 @@
   }
 
   .select-input.dark {
-    @apply placeholder:text-gray-200 bg-primary text-white;
+    @apply bg-primary text-white placeholder:text-gray-200;
   }
 </style>
