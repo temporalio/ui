@@ -1,7 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { getEventAttributes } from '.';
-import settingsFixture from '$fixtures/settings.json';
 import { writable } from 'svelte/store';
+import { getEventAttributes, toEventHistory } from '.';
+
+import settingsFixture from '$fixtures/settings.json';
+import eventsFixture from '$fixtures/raw-events.descending.completed.json';
 
 const historyEvent = {
   eventId: '1',
@@ -77,21 +79,23 @@ const historyEvent = {
 const namespace = 'unit-tests';
 const settings = settingsFixture as unknown as Settings;
 
-vi.mock('$lib/utilities/decode-payload', () => {
-  const fn = async <T>(x: T): Promise<T> => x;
-
-  const convertPayloadToJsonWithCodec = vi.fn(fn);
-  const convertPayloadToJsonWithWebsocket = vi.fn(fn);
-  const decodePayloadAttributes = vi.fn(fn);
-
-  return {
-    convertPayloadToJsonWithCodec,
-    convertPayloadToJsonWithWebsocket,
-    decodePayloadAttributes,
-  };
-});
-
 describe('getEventAttributes', () => {
+  beforeEach(() => {
+    vi.mock('$lib/utilities/decode-payload', () => {
+      const fn = async <T>(x: T): Promise<T> => x;
+
+      const convertPayloadToJsonWithCodec = vi.fn(fn);
+      const convertPayloadToJsonWithWebsocket = vi.fn(fn);
+      const decodePayloadAttributes = vi.fn(fn);
+
+      return {
+        convertPayloadToJsonWithCodec,
+        convertPayloadToJsonWithWebsocket,
+        decodePayloadAttributes,
+      };
+    });
+  });
+
   afterEach(() => {
     vi.clearAllMocks();
   });
@@ -166,4 +170,30 @@ describe('getEventAttributes', () => {
     expect(convertWithCodec).toBeCalled();
     expect(convertWithWebsocket).not.toBeCalled();
   });
+});
+
+describe('toEventHistory', () => {
+  const additionalProperties = [
+    'attributes',
+    'eventType',
+    'classification',
+    'category',
+    'id',
+    'name',
+    'timestamp',
+  ];
+
+  for (const property of additionalProperties) {
+    it(`should add a[n] ${property} property`, async () => {
+      const { events } = await toEventHistory({
+        response: eventsFixture.history.events as unknown as HistoryEvent[],
+        namespace,
+        settings,
+      });
+
+      const [event] = events;
+
+      expect(event[property]).toBeDefined();
+    });
+  }
 });
