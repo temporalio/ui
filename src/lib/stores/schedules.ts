@@ -61,7 +61,6 @@ export const fields: Record<string, FormField> = {
   hour: {
     key: 'schedule.spec.calendar.hour',
     label: 'Hour',
-    placeholder: '*',
     required: false,
   },
   minute: {
