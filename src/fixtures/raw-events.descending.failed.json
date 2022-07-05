@@ -172,8 +172,7 @@
             "backoffCoefficient": 1.1,
             "maximumInterval": "100s",
             "maximumAttempts": 0,
-            "nonRetryableErrorTypes": [
-            ]
+            "nonRetryableErrorTypes": []
           },
           "attempt": 2,
           "workflowExecutionExpirationTime": null,
@@ -194,8 +193,7 @@
             ]
           },
           "header": {
-            "fields": {
-            }
+            "fields": {}
           },
           "parentInitiatedEventVersion": "0"
         }

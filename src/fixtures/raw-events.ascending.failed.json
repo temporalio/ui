@@ -53,8 +53,7 @@
             "backoffCoefficient": 1.1,
             "maximumInterval": "100s",
             "maximumAttempts": 0,
-            "nonRetryableErrorTypes": [
-            ]
+            "nonRetryableErrorTypes": []
           },
           "attempt": 3,
           "workflowExecutionExpirationTime": null,
@@ -75,8 +74,7 @@
             ]
           },
           "header": {
-            "fields": {
-            }
+            "fields": {}
           },
           "parentInitiatedEventVersion": "0"
         }
@@ -200,8 +198,7 @@
       }
     ]
   },
-  "rawHistory": [
-  ],
+  "rawHistory": [],
   "nextPageToken": null,
   "archived": false
 }

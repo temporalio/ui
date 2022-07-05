@@ -1,5 +1,4 @@
 import { getLastEvent } from './get-last-event';
-import eventsFixture from '$fixtures/events.completed.json';
 import { describe, expect, it } from 'vitest';
 import { groupEvents } from '.';
 
