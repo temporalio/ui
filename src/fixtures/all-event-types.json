@@ -1,0 +1,760 @@
+{
+  "WorkflowExecutionCanceled": {
+    "eventId": "13",
+    "eventTime": "2022-07-01T20:20:50.181506253Z",
+    "eventType": "WorkflowExecutionCanceled",
+    "version": "0",
+    "taskId": "29875732",
+    "workflowExecutionCanceledEventAttributes": {
+      "workflowTaskCompletedEventId": "11",
+      "details": null
+    },
+    "attributes": {
+      "type": "workflowExecutionCanceledEventAttributes",
+      "workflowTaskCompletedEventId": "11",
+      "details": null
+    },
+    "classification": "Canceled",
+    "category": "workflow",
+    "id": "13",
+    "name": "WorkflowExecutionCanceled",
+    "timestamp": "2022-07-01 UTC 20:20:50.18"
+  },
+  "TimerCanceled": {
+    "eventId": "12",
+    "eventTime": "2022-07-01T20:20:50.181504836Z",
+    "eventType": "TimerCanceled",
+    "version": "0",
+    "taskId": "29875731",
+    "timerCanceledEventAttributes": {
+      "timerId": "7",
+      "startedEventId": "7",
+      "workflowTaskCompletedEventId": "11",
+      "identity": "83579@MacBook-Pro-2.local@"
+    },
+    "attributes": {
+      "type": "timerCanceledEventAttributes",
+      "timerId": "7",
+      "startedEventId": "7",
+      "workflowTaskCompletedEventId": "11",
+      "identity": "83579@MacBook-Pro-2.local@"
+    },
+    "classification": "Canceled",
+    "category": "timer",
+    "id": "12",
+    "name": "TimerCanceled",
+    "timestamp": "2022-07-01 UTC 20:20:50.18"
+  },
+  "WorkflowTaskCompleted": {
+    "eventId": "4",
+    "eventTime": "2022-07-01T13:56:18.869983378Z",
+    "eventType": "WorkflowTaskCompleted",
+    "version": "0",
+    "taskId": "29866339",
+    "workflowTaskCompletedEventAttributes": {
+      "scheduledEventId": "2",
+      "startedEventId": "3",
+      "identity": "63703@MacBook-Pro-2.local@",
+      "binaryChecksum": "e56c0141e58df0bd405138565d0526f9"
+    },
+    "attributes": {
+      "type": "workflowTaskCompletedEventAttributes",
+      "scheduledEventId": "2",
+      "startedEventId": "3",
+      "identity": "63703@MacBook-Pro-2.local@",
+      "binaryChecksum": "e56c0141e58df0bd405138565d0526f9"
+    },
+    "classification": "Completed",
+    "category": "workflow",
+    "id": "4",
+    "name": "WorkflowTaskCompleted",
+    "timestamp": "2022-07-01 UTC 13:56:18.86"
+  },
+  "WorkflowTaskStarted": {
+    "eventId": "3",
+    "eventTime": "2022-07-01T13:56:18.855975045Z",
+    "eventType": "WorkflowTaskStarted",
+    "version": "0",
+    "taskId": "29866324",
+    "workflowTaskStartedEventAttributes": {
+      "scheduledEventId": "2",
+      "identity": "63703@MacBook-Pro-2.local@",
+      "requestId": "32951c02-1e6e-4cbf-9b54-ae6551ede63c"
+    },
+    "attributes": {
+      "type": "workflowTaskStartedEventAttributes",
+      "scheduledEventId": "2",
+      "identity": "63703@MacBook-Pro-2.local@",
+      "requestId": "32951c02-1e6e-4cbf-9b54-ae6551ede63c"
+    },
+    "classification": "Started",
+    "category": "workflow",
+    "id": "3",
+    "name": "WorkflowTaskStarted",
+    "timestamp": "2022-07-01 UTC 13:56:18.85"
+  },
+  "WorkflowTaskScheduled": {
+    "eventId": "2",
+    "eventTime": "2022-07-01T13:56:18.813330420Z",
+    "eventType": "WorkflowTaskScheduled",
+    "version": "0",
+    "taskId": "29866296",
+    "workflowTaskScheduledEventAttributes": {
+      "taskQueue": { "name": "canary-task-queue", "kind": "Normal" },
+      "startToCloseTimeout": "20s",
+      "attempt": 1
+    },
+    "attributes": {
+      "type": "workflowTaskScheduledEventAttributes",
+      "taskQueue": { "name": "canary-task-queue", "kind": "Normal" },
+      "startToCloseTimeout": "20 seconds",
+      "attempt": 1
+    },
+    "classification": "Scheduled",
+    "category": "workflow",
+    "id": "2",
+    "name": "WorkflowTaskScheduled",
+    "timestamp": "2022-07-01 UTC 13:56:18.81"
+  },
+  "WorkflowExecutionCancelRequested": {
+    "eventId": "8",
+    "eventTime": "2022-07-01T20:20:50.172252128Z",
+    "eventType": "WorkflowExecutionCancelRequested",
+    "version": "0",
+    "taskId": "29875722",
+    "workflowExecutionCancelRequestedEventAttributes": {
+      "cause": "",
+      "externalInitiatedEventId": "81",
+      "externalWorkflowExecution": {
+        "workflowId": "temporal.fixture.cancelled.workflow.id",
+        "runId": "b142fc85-8e13-42e5-a824-0f2fafdeabaf"
+      },
+      "identity": "history-service"
+    },
+    "attributes": {
+      "type": "workflowExecutionCancelRequestedEventAttributes",
+      "cause": "",
+      "externalInitiatedEventId": "81",
+      "externalWorkflowExecution": {
+        "workflowId": "temporal.fixture.cancelled.workflow.id",
+        "runId": "b142fc85-8e13-42e5-a824-0f2fafdeabaf"
+      },
+      "identity": "history-service"
+    },
+    "classification": "CancelRequested",
+    "category": "workflow",
+    "id": "8",
+    "name": "WorkflowExecutionCancelRequested",
+    "timestamp": "2022-07-01 UTC 20:20:50.17"
+  },
+  "TimerStarted": {
+    "eventId": "8",
+    "eventTime": "2022-07-01T13:56:18.871057920Z",
+    "eventType": "TimerStarted",
+    "version": "0",
+    "taskId": "29866343",
+    "timerStartedEventAttributes": {
+      "timerId": "8",
+      "startToFireTimeout": "4s",
+      "workflowTaskCompletedEventId": "4"
+    },
+    "attributes": {
+      "type": "timerStartedEventAttributes",
+      "timerId": "8",
+      "startToFireTimeout": "4 seconds",
+      "workflowTaskCompletedEventId": "4"
+    },
+    "classification": "Started",
+    "category": "timer",
+    "id": "8",
+    "name": "TimerStarted",
+    "timestamp": "2022-07-01 UTC 13:56:18.87"
+  },
+  "UpsertWorkflowSearchAttributes": {
+    "eventId": "6",
+    "eventTime": "2022-07-01T13:56:18.870735212Z",
+    "eventType": "UpsertWorkflowSearchAttributes",
+    "version": "0",
+    "taskId": "29866341",
+    "upsertWorkflowSearchAttributesEventAttributes": {
+      "workflowTaskCompletedEventId": "4",
+      "searchAttributes": {
+        "indexedFields": { "TemporalChangeVersion": ["initial version-3"] }
+      }
+    },
+    "attributes": {
+      "type": "upsertWorkflowSearchAttributesEventAttributes",
+      "workflowTaskCompletedEventId": "4",
+      "searchAttributes": {
+        "indexedFields": { "TemporalChangeVersion": ["initial version-3"] }
+      }
+    },
+    "category": "command",
+    "id": "6",
+    "name": "UpsertWorkflowSearchAttributes",
+    "timestamp": "2022-07-01 UTC 13:56:18.87"
+  },
+  "MarkerRecorded": {
+    "eventId": "5",
+    "eventTime": "2022-07-01T13:56:18.869998878Z",
+    "eventType": "MarkerRecorded",
+    "version": "0",
+    "taskId": "29866340",
+    "markerRecordedEventAttributes": {
+      "markerName": "Version",
+      "details": {
+        "change-id": {
+          "payloads": [
+            {
+              "metadata": { "encoding": "anNvbi9wbGFpbg==" },
+              "data": "ImluaXRpYWwgdmVyc2lvbiI="
+            }
+          ]
+        },
+        "version": {
+          "payloads": [
+            { "metadata": { "encoding": "anNvbi9wbGFpbg==" }, "data": "Mw==" }
+          ]
+        }
+      },
+      "workflowTaskCompletedEventId": "4",
+      "header": null,
+      "failure": null
+    },
+    "attributes": {
+      "type": "markerRecordedEventAttributes",
+      "markerName": "Version",
+      "details": {
+        "change-id": {
+          "payloads": [
+            {
+              "metadata": { "encoding": "anNvbi9wbGFpbg==" },
+              "data": "ImluaXRpYWwgdmVyc2lvbiI="
+            }
+          ]
+        },
+        "version": {
+          "payloads": [
+            { "metadata": { "encoding": "anNvbi9wbGFpbg==" }, "data": "Mw==" }
+          ]
+        }
+      },
+      "workflowTaskCompletedEventId": "4",
+      "header": null,
+      "failure": null
+    },
+    "category": "marker",
+    "id": "5",
+    "name": "MarkerRecorded",
+    "timestamp": "2022-07-01 UTC 13:56:18.86"
+  },
+  "WorkflowExecutionStarted": {
+    "eventId": "1",
+    "eventTime": "2022-07-01T13:56:18.803016378Z",
+    "eventType": "WorkflowExecutionStarted",
+    "version": "0",
+    "taskId": "29866290",
+    "workflowExecutionStartedEventAttributes": {
+      "workflowType": { "name": "workflow.advanced-visibility" },
+      "parentWorkflowNamespace": "canary",
+      "parentWorkflowExecution": {
+        "workflowId": "temporal.fixture.timed-out.workflow.id",
+        "runId": "78cba607-189e-41fe-a31b-a2b6061babaa"
+      },
+      "parentInitiatedEventId": "11",
+      "taskQueue": { "name": "canary-task-queue", "kind": "Normal" },
+      "input": { "payloads": [1656683778738403300, "canary"] },
+      "workflowExecutionTimeout": "0s",
+      "workflowRunTimeout": "1200s",
+      "workflowTaskTimeout": "20s",
+      "continuedExecutionRunId": "",
+      "initiator": "Unspecified",
+      "continuedFailure": null,
+      "lastCompletionResult": null,
+      "originalExecutionRunId": "445a17cb-6cb4-4508-bc59-187d08c6c6e2",
+      "identity": "",
+      "firstExecutionRunId": "445a17cb-6cb4-4508-bc59-187d08c6c6e2",
+      "retryPolicy": null,
+      "attempt": 1,
+      "workflowExecutionExpirationTime": null,
+      "cronSchedule": "",
+      "firstWorkflowTaskBackoff": "0s",
+      "memo": null,
+      "searchAttributes": {
+        "indexedFields": { "CustomKeywordField": "childWorkflowValue" }
+      },
+      "prevAutoResetPoints": null,
+      "header": { "fields": {} },
+      "parentInitiatedEventVersion": "0"
+    },
+    "attributes": {
+      "type": "workflowExecutionStartedEventAttributes",
+      "workflowType": "workflow.advanced-visibility",
+      "parentWorkflowNamespace": "canary",
+      "parentWorkflowExecution": {
+        "workflowId": "temporal.fixture.timed-out.workflow.id",
+        "runId": "78cba607-189e-41fe-a31b-a2b6061babaa"
+      },
+      "parentInitiatedEventId": "11",
+      "taskQueue": { "name": "canary-task-queue", "kind": "Normal" },
+      "input": { "payloads": [1656683778738403300, "canary"] },
+      "workflowExecutionTimeout": "",
+      "workflowRunTimeout": "20 minutes",
+      "workflowTaskTimeout": "20 seconds",
+      "continuedExecutionRunId": "",
+      "initiator": "Unspecified",
+      "continuedFailure": null,
+      "lastCompletionResult": null,
+      "originalExecutionRunId": "445a17cb-6cb4-4508-bc59-187d08c6c6e2",
+      "identity": "",
+      "firstExecutionRunId": "445a17cb-6cb4-4508-bc59-187d08c6c6e2",
+      "retryPolicy": null,
+      "attempt": 1,
+      "workflowExecutionExpirationTime": "",
+      "cronSchedule": "",
+      "firstWorkflowTaskBackoff": "",
+      "memo": null,
+      "searchAttributes": {
+        "indexedFields": { "CustomKeywordField": "childWorkflowValue" }
+      },
+      "prevAutoResetPoints": null,
+      "header": { "fields": {} },
+      "parentInitiatedEventVersion": "0"
+    },
+    "classification": "Started",
+    "category": "workflow",
+    "id": "1",
+    "name": "WorkflowExecutionStarted",
+    "timestamp": "2022-07-01 UTC 13:56:18.80"
+  },
+  "WorkflowExecutionCompleted": {
+    "eventId": "18",
+    "eventTime": "2022-07-01T20:28:52.916373379Z",
+    "eventType": "WorkflowExecutionCompleted",
+    "version": "0",
+    "taskId": "29887670",
+    "workflowExecutionCompletedEventAttributes": {
+      "result": null,
+      "workflowTaskCompletedEventId": "17",
+      "newExecutionRunId": ""
+    },
+    "attributes": {
+      "type": "workflowExecutionCompletedEventAttributes",
+      "result": null,
+      "workflowTaskCompletedEventId": "17",
+      "newExecutionRunId": ""
+    },
+    "classification": "Completed",
+    "category": "workflow",
+    "id": "18",
+    "name": "WorkflowExecutionCompleted",
+    "timestamp": "2022-07-01 UTC 20:28:52.91"
+  },
+  "ActivityTaskCompleted": {
+    "eventId": "17",
+    "eventTime": "2022-07-01T20:14:50.005757628Z",
+    "eventType": "ActivityTaskCompleted",
+    "version": "0",
+    "taskId": "32096821",
+    "activityTaskCompletedEventAttributes": {
+      "result": null,
+      "scheduledEventId": "7",
+      "startedEventId": "16",
+      "identity": "83579@MacBook-Pro-2.local@"
+    },
+    "attributes": {
+      "type": "activityTaskCompletedEventAttributes",
+      "result": null,
+      "scheduledEventId": "7",
+      "startedEventId": "16",
+      "identity": "83579@MacBook-Pro-2.local@"
+    },
+    "classification": "Completed",
+    "category": "activity",
+    "id": "17",
+    "name": "ActivityTaskCompleted",
+    "timestamp": "2022-07-01 UTC 20:14:50.00"
+  },
+  "ActivityTaskStarted": {
+    "eventId": "16",
+    "eventTime": "2022-07-01T20:14:48.999413586Z",
+    "eventType": "ActivityTaskStarted",
+    "version": "0",
+    "taskId": "32096820",
+    "activityTaskStartedEventAttributes": {
+      "scheduledEventId": "7",
+      "identity": "83579@MacBook-Pro-2.local@",
+      "requestId": "3e0c5791-4187-4ae6-9591-1d0698cc47ca",
+      "attempt": 1,
+      "lastFailure": null
+    },
+    "attributes": {
+      "type": "activityTaskStartedEventAttributes",
+      "scheduledEventId": "7",
+      "identity": "83579@MacBook-Pro-2.local@",
+      "requestId": "3e0c5791-4187-4ae6-9591-1d0698cc47ca",
+      "attempt": 1,
+      "lastFailure": null
+    },
+    "classification": "Started",
+    "category": "activity",
+    "id": "16",
+    "name": "ActivityTaskStarted",
+    "timestamp": "2022-07-01 UTC 20:14:48.99"
+  },
+  "ActivityTaskScheduled": {
+    "eventId": "13",
+    "eventTime": "2022-07-01T13:56:22.894914505Z",
+    "eventType": "ActivityTaskScheduled",
+    "version": "0",
+    "taskId": "29867308",
+    "activityTaskScheduledEventAttributes": {
+      "activityId": "13",
+      "activityType": { "name": "activity.advanced-visibility" },
+      "taskQueue": { "name": "canary-task-queue", "kind": "Normal" },
+      "header": { "fields": {} },
+      "input": {
+        "payloads": [
+          1656683782883152600,
+          {
+            "ID": "temporal.fixture.timed-out.workflow.id/workflow.advanced-visibility",
+            "RunID": "445a17cb-6cb4-4508-bc59-187d08c6c6e2"
+          }
+        ]
+      },
+      "scheduleToCloseTimeout": "260s",
+      "scheduleToStartTimeout": "240s",
+      "startToCloseTimeout": "20s",
+      "heartbeatTimeout": "0s",
+      "workflowTaskCompletedEventId": "12",
+      "retryPolicy": {
+        "initialInterval": "1s",
+        "backoffCoefficient": 2,
+        "maximumInterval": "100s",
+        "maximumAttempts": 0,
+        "nonRetryableErrorTypes": []
+      }
+    },
+    "attributes": {
+      "type": "activityTaskScheduledEventAttributes",
+      "activityId": "13",
+      "activityType": "activity.advanced-visibility",
+      "taskQueue": { "name": "canary-task-queue", "kind": "Normal" },
+      "header": { "fields": {} },
+      "input": {
+        "payloads": [
+          1656683782883152600,
+          {
+            "ID": "temporal.fixture.timed-out.workflow.id/workflow.advanced-visibility",
+            "RunID": "445a17cb-6cb4-4508-bc59-187d08c6c6e2"
+          }
+        ]
+      },
+      "scheduleToCloseTimeout": "4 minutes, 20 seconds",
+      "scheduleToStartTimeout": "4 minutes",
+      "startToCloseTimeout": "20 seconds",
+      "heartbeatTimeout": "",
+      "workflowTaskCompletedEventId": "12",
+      "retryPolicy": {
+        "initialInterval": "1s",
+        "backoffCoefficient": 2,
+        "maximumInterval": "100s",
+        "maximumAttempts": 0,
+        "nonRetryableErrorTypes": []
+      }
+    },
+    "classification": "Scheduled",
+    "category": "activity",
+    "id": "13",
+    "name": "ActivityTaskScheduled",
+    "timestamp": "2022-07-01 UTC 13:56:22.89"
+  },
+  "TimerFired": {
+    "eventId": "9",
+    "eventTime": "2022-07-01T13:56:22.872334672Z",
+    "eventType": "TimerFired",
+    "version": "0",
+    "taskId": "29867299",
+    "timerFiredEventAttributes": { "timerId": "8", "startedEventId": "8" },
+    "attributes": {
+      "type": "timerFiredEventAttributes",
+      "timerId": "8",
+      "startedEventId": "8"
+    },
+    "classification": "Fired",
+    "category": "timer",
+    "id": "9",
+    "name": "TimerFired",
+    "timestamp": "2022-07-01 UTC 13:56:22.87"
+  },
+  "WorkflowExecutionFailed": {
+    "eventId": "7",
+    "eventTime": "2022-07-01T20:22:50.027441003Z",
+    "eventType": "WorkflowExecutionFailed",
+    "version": "0",
+    "taskId": "32106942",
+    "workflowExecutionFailedEventAttributes": {
+      "failure": {
+        "message": "failing on attempt 2",
+        "source": "GoSDK",
+        "stackTrace": "",
+        "cause": null,
+        "applicationFailureInfo": {
+          "type": "",
+          "nonRetryable": false,
+          "details": null
+        }
+      },
+      "retryState": "InProgress",
+      "workflowTaskCompletedEventId": "4",
+      "newExecutionRunId": "15e13ed4-880a-4557-96c6-0116e3d07b8d"
+    },
+    "attributes": {
+      "type": "workflowExecutionFailedEventAttributes",
+      "failure": {
+        "message": "failing on attempt 2",
+        "source": "GoSDK",
+        "stackTrace": "",
+        "cause": null,
+        "applicationFailureInfo": {
+          "type": "",
+          "nonRetryable": false,
+          "details": null
+        }
+      },
+      "retryState": "InProgress",
+      "workflowTaskCompletedEventId": "4",
+      "newExecutionRunId": "15e13ed4-880a-4557-96c6-0116e3d07b8d"
+    },
+    "classification": "Failed",
+    "category": "workflow",
+    "id": "7",
+    "name": "WorkflowExecutionFailed",
+    "timestamp": "2022-07-01 UTC 20:22:50.02"
+  },
+  "WorkflowExecutionTerminated": {
+    "eventId": "30",
+    "eventTime": "2022-07-01T20:14:51.002030504Z",
+    "eventType": "WorkflowExecutionTerminated",
+    "version": "0",
+    "taskId": "32096888",
+    "workflowExecutionTerminatedEventAttributes": {
+      "reason": "reset canary",
+      "details": null,
+      "identity": "history-service"
+    },
+    "attributes": {
+      "type": "workflowExecutionTerminatedEventAttributes",
+      "reason": "reset canary",
+      "details": null,
+      "identity": "history-service"
+    },
+    "classification": "Terminated",
+    "category": "workflow",
+    "id": "30",
+    "name": "WorkflowExecutionTerminated",
+    "timestamp": "2022-07-01 UTC 20:14:51.00"
+  },
+  "ExternalWorkflowExecutionSignaled": {
+    "eventId": "26",
+    "eventTime": "2022-07-01T20:14:50.979729045Z",
+    "eventType": "ExternalWorkflowExecutionSignaled",
+    "version": "0",
+    "taskId": "32096878",
+    "externalWorkflowExecutionSignaledEventAttributes": {
+      "initiatedEventId": "25",
+      "namespace": "canary",
+      "workflowExecution": {
+        "workflowId": "temporal.fixture.terminated.workflow.id",
+        "runId": "3cbbf515-36da-43b9-a1f3-18a7ec031ddd"
+      },
+      "control": "25"
+    },
+    "attributes": {
+      "type": "externalWorkflowExecutionSignaledEventAttributes",
+      "initiatedEventId": "25",
+      "namespace": "canary",
+      "workflowExecution": {
+        "workflowId": "temporal.fixture.terminated.workflow.id",
+        "runId": "3cbbf515-36da-43b9-a1f3-18a7ec031ddd"
+      },
+      "control": "25"
+    },
+    "classification": "Signaled",
+    "category": "workflow",
+    "id": "26",
+    "name": "ExternalWorkflowExecutionSignaled",
+    "timestamp": "2022-07-01 UTC 20:14:50.97"
+  },
+  "SignalExternalWorkflowExecutionInitiated": {
+    "eventId": "25",
+    "eventTime": "2022-07-01T20:14:50.970075337Z",
+    "eventType": "SignalExternalWorkflowExecutionInitiated",
+    "version": "0",
+    "taskId": "32096875",
+    "signalExternalWorkflowExecutionInitiatedEventAttributes": {
+      "workflowTaskCompletedEventId": "24",
+      "namespace": "canary",
+      "workflowExecution": {
+        "workflowId": "temporal.fixture.terminated.workflow.id",
+        "runId": "3cbbf515-36da-43b9-a1f3-18a7ec031ddd"
+      },
+      "signalName": "signalToTrigger",
+      "input": { "payloads": ["signalValue"] },
+      "control": "25",
+      "childWorkflowOnly": false,
+      "header": { "fields": {} }
+    },
+    "attributes": {
+      "type": "signalExternalWorkflowExecutionInitiatedEventAttributes",
+      "workflowTaskCompletedEventId": "24",
+      "namespace": "canary",
+      "workflowExecution": {
+        "workflowId": "temporal.fixture.terminated.workflow.id",
+        "runId": "3cbbf515-36da-43b9-a1f3-18a7ec031ddd"
+      },
+      "signalName": "signalToTrigger",
+      "input": { "payloads": ["signalValue"] },
+      "control": "25",
+      "childWorkflowOnly": false,
+      "header": { "fields": {} }
+    },
+    "classification": "Initiated",
+    "category": "signal",
+    "id": "25",
+    "name": "SignalExternalWorkflowExecutionInitiated",
+    "timestamp": "2022-07-01 UTC 20:14:50.97"
+  },
+  "WorkflowExecutionSignaled": {
+    "eventId": "12",
+    "eventTime": "2022-07-01T20:14:48.972339419Z",
+    "eventType": "WorkflowExecutionSignaled",
+    "version": "0",
+    "taskId": "32096693",
+    "workflowExecutionSignaledEventAttributes": {
+      "signalName": "signalBeforeReset",
+      "input": { "payloads": ["signalValue"] },
+      "identity": "history-service",
+      "header": { "fields": {} }
+    },
+    "attributes": {
+      "type": "workflowExecutionSignaledEventAttributes",
+      "signalName": "signalBeforeReset",
+      "input": { "payloads": ["signalValue"] },
+      "identity": "history-service",
+      "header": { "fields": {} }
+    },
+    "classification": "Signaled",
+    "category": "signal",
+    "id": "12",
+    "name": "WorkflowExecutionSignaled",
+    "timestamp": "2022-07-01 UTC 20:14:48.97"
+  },
+  "WorkflowExecutionTimedOut": {
+    "eventId": "18",
+    "eventTime": "2022-07-01T14:16:18.804308503Z",
+    "eventType": "WorkflowExecutionTimedOut",
+    "version": "0",
+    "taskId": "29867406",
+    "workflowExecutionTimedOutEventAttributes": {
+      "retryState": "RetryPolicyNotSet",
+      "newExecutionRunId": ""
+    },
+    "attributes": {
+      "type": "workflowExecutionTimedOutEventAttributes",
+      "retryState": "RetryPolicyNotSet",
+      "newExecutionRunId": ""
+    },
+    "classification": "TimedOut",
+    "category": "workflow",
+    "id": "18",
+    "name": "WorkflowExecutionTimedOut",
+    "timestamp": "2022-07-01 UTC 14:16:18.80"
+  },
+  "WorkflowTaskTimedOut": {
+    "eventId": "16",
+    "eventTime": "2022-07-01T14:00:34.963137844Z",
+    "eventType": "WorkflowTaskTimedOut",
+    "version": "0",
+    "taskId": "29867342",
+    "workflowTaskTimedOutEventAttributes": {
+      "scheduledEventId": "15",
+      "startedEventId": "0",
+      "timeoutType": "ScheduleToStart"
+    },
+    "attributes": {
+      "type": "workflowTaskTimedOutEventAttributes",
+      "scheduledEventId": "15",
+      "startedEventId": "0",
+      "timeoutType": "ScheduleToStart"
+    },
+    "classification": "TimedOut",
+    "category": "workflow",
+    "id": "16",
+    "name": "WorkflowTaskTimedOut",
+    "timestamp": "2022-07-01 UTC 14:00:34.96"
+  },
+  "ActivityTaskTimedOut": {
+    "eventId": "14",
+    "eventTime": "2022-07-01T14:00:29.948388342Z",
+    "eventType": "ActivityTaskTimedOut",
+    "version": "0",
+    "taskId": "29867337",
+    "activityTaskTimedOutEventAttributes": {
+      "failure": {
+        "message": "activity ScheduleToStart timeout",
+        "source": "Server",
+        "stackTrace": "",
+        "cause": {
+          "message": "listWorkflow returned 0 executions, expected=1, query=WorkflowId = 'temporal.fixture.timed-out.workflow.id/workflow.advanced-visibility' and CustomKeywordField = 'canaryTest' and StartTime between '2022-07-01T13:51:25.934794Z' and '2022-07-01T14:01:25.934794Z'",
+          "source": "GoSDK",
+          "stackTrace": "",
+          "cause": null,
+          "applicationFailureInfo": {
+            "type": "",
+            "nonRetryable": false,
+            "details": null
+          }
+        },
+        "timeoutFailureInfo": {
+          "timeoutType": "ScheduleToStart",
+          "lastHeartbeatDetails": null
+        }
+      },
+      "scheduledEventId": "13",
+      "startedEventId": "0",
+      "retryState": "NonRetryableFailure"
+    },
+    "attributes": {
+      "type": "activityTaskTimedOutEventAttributes",
+      "failure": {
+        "message": "activity ScheduleToStart timeout",
+        "source": "Server",
+        "stackTrace": "",
+        "cause": {
+          "message": "listWorkflow returned 0 executions, expected=1, query=WorkflowId = 'temporal.fixture.timed-out.workflow.id/workflow.advanced-visibility' and CustomKeywordField = 'canaryTest' and StartTime between '2022-07-01T13:51:25.934794Z' and '2022-07-01T14:01:25.934794Z'",
+          "source": "GoSDK",
+          "stackTrace": "",
+          "cause": null,
+          "applicationFailureInfo": {
+            "type": "",
+            "nonRetryable": false,
+            "details": null
+          }
+        },
+        "timeoutFailureInfo": {
+          "timeoutType": "ScheduleToStart",
+          "lastHeartbeatDetails": null
+        }
+      },
+      "scheduledEventId": "13",
+      "startedEventId": "0",
+      "retryState": "NonRetryableFailure"
+    },
+    "classification": "TimedOut",
+    "category": "activity",
+    "id": "14",
+    "name": "ActivityTaskTimedOut",
+    "timestamp": "2022-07-01 UTC 14:00:29.94"
+  }
+}

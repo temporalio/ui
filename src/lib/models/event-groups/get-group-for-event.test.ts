@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { groupEvents } from '.';
-import { getGroupForEvent } from './get-group-for-event';
+import { groupEvents, getGroupForEvent } from '.';
 
 const eventHistory = [
   {
