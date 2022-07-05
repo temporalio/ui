@@ -6,7 +6,6 @@ export const triggerMenu = (node: HTMLElement): { destroy: () => void } => {
 
   const handleTriggerClick = (event: PointerEvent) => {
     node.dispatchEvent(new CustomEvent('toggle-menu'));
-    event.preventDefault();
     event.stopPropagation();
   };
 
