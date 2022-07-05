@@ -1,6 +1,4 @@
-import type {
-  validators,
-} from 'svelte-use-form';
+import type { validators } from 'svelte-use-form';
 
 export type FormField = {
   key: string;

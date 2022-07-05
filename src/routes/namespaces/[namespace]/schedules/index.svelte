@@ -1,11 +1,4 @@
 <script lang="ts">
-  import {
-    loading,
-    updating,
-    schedules,
-    scheduleError,
-  } from '$lib/stores/schedules';
-
   import EmptyState from '$lib/components/empty-state.svelte';
   import Pagination from '$lib/components/pagination.svelte';
   import Button from '$holocene/button.svelte';
@@ -21,10 +14,13 @@
   import { goto } from '$app/navigation';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
   import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
+  import { fetchAllSchedules } from '$lib/services/schedule-service';
 
   let { namespace } = $page.params;
 
   let search = '';
+
+  $: fetchSchedules = fetchAllSchedules(namespace);
 
   $: filteredSchedules = (schedules) =>
     search
@@ -57,27 +53,30 @@
   />
 </div>
 
-{#if $loading}
+{#await fetchSchedules}
   <Loading />
-{:else if $schedules?.length}
-  <Pagination
-    items={filteredSchedules($schedules)}
-    updating={$updating}
-    let:visibleItems
-  >
-    <Table {columns}>
-      {#each visibleItems as schedule}
-        <ScheduleRow {schedule} {namespace} />
-      {/each}
-    </Table>
-  </Pagination>
-{:else}
+{:then { schedules }}
+  {#if schedules?.length}
+    <Pagination items={filteredSchedules(schedules)} let:visibleItems>
+      <Table {columns}>
+        {#each visibleItems as schedule}
+          <ScheduleRow {schedule} {namespace} />
+        {/each}
+      </Table>
+    </Pagination>
+  {:else}
+    <div class="my-12 flex flex-col items-center justify-start gap-2">
+      <EmptyState title={'No Schedules Found'} content={errorMessage} />
+      <Button primary as="anchor">Get Started With Docs</Button>
+    </div>
+  {/if}
+{:catch error}
   <div class="my-12 flex flex-col items-center justify-start gap-2">
     <EmptyState
       title={'No Schedules Found'}
       content={errorMessage}
-      error={$scheduleError}
+      error={error.toString()}
     />
     <Button primary as="anchor">Get Started With Docs</Button>
   </div>
-{/if}
+{/await}

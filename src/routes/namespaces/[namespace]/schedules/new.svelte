@@ -14,7 +14,7 @@
   import FormInput from '$lib/holocene/forms/form-input.svelte';
 
   let tab = 'interval';
-  let loading = false;
+  $: loading = false;
 
   let { namespace } = $page.params;
 

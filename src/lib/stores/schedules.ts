@@ -1,40 +1,12 @@
-import { readable, writable } from 'svelte/store';
-import { page } from '$app/stores';
 import { goto } from '$app/navigation';
 
-import type {
-  Form
-} from 'svelte-use-form';
+import type { Form } from 'svelte-use-form';
 
-import { isRouteForSchedules, routeForSchedules } from '$lib/utilities/route-for';
+import { routeForSchedules } from '$lib/utilities/route-for';
 
-import { fetchAllSchedules, createSchedule } from '$lib/services/schedule-service';
-import { withLoading } from '$lib/utilities/stores/with-loading';
+import { createSchedule } from '$lib/services/schedule-service';
 import type { FormField } from '$holocene/forms';
 import { setBodyProperty } from '$holocene/forms';
-
-import type { StartStopNotifier } from 'svelte/store';
-
-const updateSchedules: StartStopNotifier<WorkflowExecution[]> = (set) => {
-  return page.subscribe(({ params, url }) => {
-    if (isRouteForSchedules(url.pathname, { namespace: params.namespace })) {
-      withLoading(loading, updating, async () => {
-        const { schedules, error } = await fetchAllSchedules(params.namespace);
-        set(schedules);
-        if (error) {
-          scheduleError.set(error);
-        } else {
-          scheduleError.set('');
-        }
-      });
-    }
-  });
-};
-
-export const updating = writable(true);
-export const loading = writable(true);
-export const schedules = readable<unknown[]>([], updateSchedules);
-export const scheduleError = writable('');
 
 export const fields: Record<string, FormField> = {
   // Action
@@ -58,7 +30,6 @@ export const fields: Record<string, FormField> = {
   interval: {
     key: 'schedule.spec.interval.interval',
     label: 'Interval',
-    hint: 'IntervalSpec matches times that can be expressed as: epoch + n * interval + phase where n is an integer. Phase defaults to zero if missing. interval is required. Both interval and phase must be non-negative and are truncated to the nearest second before any calculations. For example, an interval of 1 hour with phase of zero would match every hour, on the hour. The same interval but a phase of 19 minutes would match every xx:19:00. An interval of 28 days with phase zero would match 2022-02-17T00:00:00Z (among other times). The same interval with a phase of 3 days, 5 hours, and 23 minutes would match 2022-02-20T05:23:00Z instead.',
     required: false,
   },
   phase: {
@@ -112,8 +83,11 @@ export const fields: Record<string, FormField> = {
   // "timezoneData": "string"
 };
 
-
-export const submitScheduleForm = async (form: Form, namespace: string, loading: boolean) => {
+export const submitScheduleForm = async (
+  form: Form,
+  namespace: string,
+  loading: boolean,
+) => {
   const values = form.values;
   const body = {
     schedule_id: '',
@@ -130,7 +104,7 @@ export const submitScheduleForm = async (form: Form, namespace: string, loading:
         },
       },
     },
-  };;
+  };
 
   Object.keys(values).forEach((key) => {
     setBodyProperty(key, body, values[key]);
