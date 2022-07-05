@@ -7,6 +7,8 @@
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import EmptyState from '../empty-state.svelte';
+  import { routeForWorkflow } from '$lib/utilities/route-for';
+  import Link from '../link.svelte';
 
   export let recentRuns: ScheduleActionResult[] = [];
   export let namespace: string;
@@ -22,7 +24,18 @@
         <div class="w-28">
           <WorkflowStatus status={workflow.status} />
         </div>
-        <div class="w-96">{run.startWorkflowResult.workflowId}</div>
+        <div class="w-96">
+          <Link
+            sveltekit:prefetch
+            href={routeForWorkflow({
+              workflow: run.startWorkflowResult.workflowId,
+              run: run.startWorkflowResult.runId,
+              namespace,
+            })}
+          >
+            {run.startWorkflowResult.workflowId}
+          </Link>
+        </div>
         <div class="ml-auto">
           <p>{formatDate(run.actualTime, $timeFormat)}</p>
         </div>

@@ -28,7 +28,7 @@
   </HintGroup>
 {/if}
 {#if !required && hint}
-  <small class="text-blue-500">{hint}</small>
+  <small class="text-gray-500">{hint}</small>
 {/if}
 
 <style lang="postcss">

@@ -31,11 +31,14 @@ export const fields: Record<string, FormField> = {
   interval: {
     key: 'schedule.spec.interval.interval',
     label: 'Interval',
+    placeholder: '86400s',
+    hint: 'Example: 60s or 10.000001s',
     required: false,
   },
   phase: {
     key: 'schedule.spec.interval.phase',
     label: 'Phase',
+    placeholder: '0s',
     required: false,
   },
   year: {
@@ -119,7 +122,7 @@ export const submitScheduleForm = async (
   const second = values['schedule.spec.calendar.second'];
 
   if (interval) {
-    body.schedule.spec.interval = [{ interval, phase }];
+    body.schedule.spec.interval = [{ interval, phase: phase || '0s' }];
     body.schedule.spec.calendar = [];
   } else {
     body.schedule.spec.interval = [];
