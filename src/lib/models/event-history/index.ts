@@ -1,6 +1,7 @@
 import { get } from 'svelte/store';
 import { dataEncoderEndpoint } from '$lib/stores/data-encoder-config';
 import {
+  Decode,
   convertPayloadToJsonWithCodec,
   convertPayloadToJsonWithWebsocket,
   decodePayloadAttributes,
@@ -14,30 +15,43 @@ import { getEventCategory } from './get-event-categorization';
 import { getEventClassification } from './get-event-classification';
 import { simplifyAttributes } from './simplify-attributes';
 
-export async function getEventAttributes({
-  historyEvent,
-  namespace,
-  settings,
-}: {
-  historyEvent: HistoryEvent;
-  namespace: string;
-  settings: Settings;
-}): Promise<EventAttributesWithType> {
+type DecodeFunctions = {
+  convertWithCodec?: Decode['convertPayloadToJsonWithCodec'];
+  convertWithWebsocket?: Decode['convertPayloadToJsonWithWebsocket'];
+  decodeAttributes?: Decode['decodePayloadAttributes'];
+  encoderEndpoint?: typeof dataEncoderEndpoint;
+};
+
+const getEndpoint = (
+  settings: Settings,
+  encoderEndpoint = dataEncoderEndpoint,
+): string => {
+  return get(encoderEndpoint) || settings?.codec?.endpoint || '';
+};
+
+export async function getEventAttributes(
+  { historyEvent, namespace, settings }: EventWithMetadata,
+  {
+    convertWithCodec = convertPayloadToJsonWithCodec,
+    convertWithWebsocket = convertPayloadToJsonWithWebsocket,
+    decodeAttributes = decodePayloadAttributes,
+    encoderEndpoint = dataEncoderEndpoint,
+  }: DecodeFunctions = {},
+): Promise<EventAttributesWithType> {
   const { key, attributes } = findAttributesAndKey(historyEvent);
   // Use locally set endpoint over settings endpoint for testing purposes
-  const endpoint: string =
-    get(dataEncoderEndpoint) || settings?.codec?.endpoint || '';
+  const endpoint = getEndpoint(settings, encoderEndpoint);
   const _settings = { ...settings, codec: { ...settings?.codec, endpoint } };
 
   const convertedAttributes = endpoint
-    ? await convertPayloadToJsonWithCodec({
+    ? await convertWithCodec({
         attributes,
         namespace,
         settings: _settings,
       })
-    : await convertPayloadToJsonWithWebsocket(attributes);
+    : await convertWithWebsocket(attributes);
 
-  const decodedAttributes = decodePayloadAttributes(convertedAttributes);
+  const decodedAttributes = decodeAttributes(convertedAttributes);
 
   return {
     type: key,
@@ -49,11 +63,7 @@ const toEvent = async ({
   historyEvent,
   namespace,
   settings,
-}: {
-  historyEvent: HistoryEvent;
-  namespace: string;
-  settings: Settings;
-}): Promise<WorkflowEvent> => {
+}: EventWithMetadata): Promise<WorkflowEvent> => {
   const id = String(historyEvent.eventId);
   const eventType = historyEvent.eventType as unknown as EventType;
   const timestamp = formatDate(String(historyEvent.eventTime));
@@ -81,11 +91,7 @@ export const toEventHistory = async ({
   response,
   namespace,
   settings,
-}: {
-  response: HistoryEvent[];
-  namespace: string;
-  settings: Settings;
-}): Promise<{
+}: EventsWithMetadata): Promise<{
   events: WorkflowEvents;
   eventGroups: EventGroups;
 }> => {

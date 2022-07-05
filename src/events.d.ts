@@ -1,6 +1,19 @@
 type HistoryEvent = import('$types').HistoryEvent;
 type PendingActivityInfo = import('$types').PendingActivityInfo;
 
+type EventRequestMetadata = {
+  namespace: string;
+  settings: Settings;
+};
+
+type EventWithMetadata = {
+  historyEvent: HistoryEvent;
+} & EventRequestMetadata;
+
+type EventsWithMetadata = {
+  response: HistoryEvent[];
+} & EventRequestMetadata;
+
 type EventType = import('$lib/utilities/is-event-type').EventType;
 
 type ActivityType = import('$lib/utilities/is-event-type').ActivityType;

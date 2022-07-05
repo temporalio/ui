@@ -79,24 +79,30 @@ const eventHistory = [
   startedEvent,
   anotherScheduledEvent,
   completedEvent,
-];
+] as unknown as WorkflowEvents;
 
 describe('groupEvents', () => {
   it('should create a new entry when given a scheduled event', () => {
-    const groups = groupEvents([scheduledEvent]);
+    const groups = groupEvents([scheduledEvent] as unknown as WorkflowEvents);
     const group = groups.find(({ id }) => id === scheduledEvent.id);
 
     expect(group.events.get(scheduledEvent.id)).toBe(scheduledEvent);
   });
 
   it('should be able to store multiple event groups', () => {
-    const groups = groupEvents([scheduledEvent, anotherScheduledEvent]);
+    const groups = groupEvents([
+      scheduledEvent,
+      anotherScheduledEvent,
+    ] as unknown as WorkflowEvents);
 
     expect(Object.keys(groups).length).toBe(2);
   });
 
   it('should add a completed event to the correct group', () => {
-    const groups = groupEvents([scheduledEvent, completedEvent]);
+    const groups = groupEvents([
+      scheduledEvent,
+      completedEvent,
+    ] as unknown as WorkflowEvents);
 
     const group = groups.find(({ id }) => id === scheduledEvent.id);
 
