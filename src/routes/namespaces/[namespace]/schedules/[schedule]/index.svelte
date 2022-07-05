@@ -73,9 +73,9 @@
 
   let options = [
     {
-      label: 'Delete',
+      label: 'Delete Schedule',
       onClick: () => (showDeleteConfirmation = true),
-      icon: 'close',
+      class: 'text-red-500',
     },
   ];
 </script>
@@ -129,10 +129,10 @@
       >
         {#each options as option}
           <div
-            class="cursor-pointer flex gap-2 items-center"
+            class="cursor-pointer flex gap-2 items-center {option.class}"
             on:click={option.onClick}
           >
-            <Icon name={option.icon} color="#dc2626" />{option.label}
+            {option.label}
           </div>
         {/each}
       </SplitButton>
