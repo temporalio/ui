@@ -56,7 +56,9 @@ const isDuration = (
   return false;
 };
 
-const canBeSimplified = (value: unknown): value is Record<string, string> => {
+export const canBeSimplified = (
+  value: unknown,
+): value is Record<string, string> => {
   if (value === null) return false;
   if (value === undefined) return false;
   if (typeof value !== 'object') return false;
@@ -70,7 +72,7 @@ const canBeSimplified = (value: unknown): value is Record<string, string> => {
   return true;
 };
 
-const getValueForFirstKey = (value: Record<string, string>): string => {
+export const getValueForFirstKey = (value: Record<string, string>): string => {
   for (const v of Object.values(value)) {
     return v;
   }
