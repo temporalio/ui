@@ -1,0 +1,36 @@
+{
+  "supportedClients": {
+    "temporal-cli": "\u003c2.0.0",
+    "temporal-go": "\u003c2.0.0",
+    "temporal-java": "\u003c2.0.0",
+    "temporal-php": "\u003c2.0.0",
+    "temporal-server": "\u003c2.0.0",
+    "temporal-typescript": "\u003c2.0.0"
+  },
+  "serverVersion": "1.16.2",
+  "clusterId": "75d9c0b6-577f-42d4-a049-9f6e47e97c46",
+  "versionInfo": {
+    "current": {
+      "version": "1.16.2",
+      "releaseTime": "2022-05-09T22:33:00Z",
+      "notes": "Temporal 1.16.2"
+    },
+    "recommended": {
+      "version": "1.16.2",
+      "releaseTime": "2022-05-09T22:33:00Z",
+      "notes": "Temporal 1.16.2"
+    },
+    "instructions": "",
+    "alerts": [
+      {
+        "message": "🪐 A new release is available!",
+        "severity": "Low"
+      }
+    ],
+    "lastUpdateTime": "2022-07-01T09:27:22.470019753Z"
+  },
+  "clusterName": "active",
+  "historyShardCount": 4,
+  "persistenceStore": "postgres",
+  "visibilityStore": "VisibilityManagerDual"
+}

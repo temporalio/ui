@@ -1,0 +1,102 @@
+{
+  "executionConfig": {
+    "taskQueue": {
+      "name": "canary-task-queue",
+      "kind": "Normal"
+    },
+    "workflowExecutionTimeout": "0s",
+    "workflowRunTimeout": "1200s",
+    "defaultWorkflowTaskTimeout": "20s"
+  },
+  "workflowExecutionInfo": {
+    "execution": {
+      "workflowId": "temporal.fixture.running.workflow.id",
+      "runId": "2a7ba421-f74b-4b8b-b9d8-e6e30e4caac7"
+    },
+    "type": {
+      "name": "workflow.advanced-visibility"
+    },
+    "startTime": "2022-07-01T20:23:49.104303753Z",
+    "closeTime": null,
+    "status": "Running",
+    "historyLength": "13",
+    "parentNamespaceId": "c3e6ec56-8059-4bdf-99ac-d50d3fa1616c",
+    "parentExecution": {
+      "workflowId": "temporal.fixture.running.workflow.id",
+      "runId": "8f00d989-6bc2-4826-b9f9-7c18ed90c9cc"
+    },
+    "executionTime": "2022-07-01T20:23:49.104303753Z",
+    "memo": {
+      "fields": {}
+    },
+    "searchAttributes": {
+      "indexedFields": {
+        "BinaryChecksums": {
+          "metadata": {
+            "encoding": "anNvbi9wbGFpbg==",
+            "type": "S2V5d29yZA=="
+          },
+          "data": "WyJlNTZjMDE0MWU1OGRmMGJkNDA1MTM4NTY1ZDA1MjZmOSJd"
+        },
+        "CustomKeywordField": {
+          "metadata": {
+            "encoding": "anNvbi9wbGFpbg==",
+            "type": "S2V5d29yZA=="
+          },
+          "data": "ImNhbmFyeVRlc3Qi"
+        },
+        "TemporalChangeVersion": {
+          "metadata": {
+            "encoding": "anNvbi9wbGFpbg==",
+            "type": "S2V5d29yZA=="
+          },
+          "data": "WyJpbml0aWFsIHZlcnNpb24tMyJd"
+        }
+      }
+    },
+    "autoResetPoints": {
+      "points": [
+        {
+          "binaryChecksum": "e56c0141e58df0bd405138565d0526f9",
+          "runId": "2a7ba421-f74b-4b8b-b9d8-e6e30e4caac7",
+          "firstWorkflowTaskCompletedId": "4",
+          "createTime": "2022-07-01T20:23:49.135775669Z",
+          "expireTime": null,
+          "resettable": true
+        }
+      ]
+    },
+    "taskQueue": "canary-task-queue",
+    "stateTransitionCount": "21"
+  },
+  "pendingActivities": [
+    {
+      "activityId": "13",
+      "activityType": {
+        "name": "activity.advanced-visibility"
+      },
+      "state": "Scheduled",
+      "heartbeatDetails": null,
+      "lastHeartbeatTime": "2022-07-01T20:24:56.384173631Z",
+      "lastStartedTime": null,
+      "attempt": 8,
+      "maximumAttempts": 0,
+      "scheduledTime": "2022-07-01T20:26:00.421129506Z",
+      "expirationTime": "2022-07-01T20:28:13.174691421Z",
+      "lastFailure": {
+        "message": "listWorkflow returned 0 executions, expected=1, query=WorkflowId = 'temporal.fixture.running.workflow.id' and CustomKeywordField = 'canaryTest' and StartTime between '2022-07-01T20:19:56.40849Z' and '2022-07-01T20:29:56.40849Z'",
+        "source": "GoSDK",
+        "stackTrace": "",
+        "cause": null,
+        "applicationFailureInfo": {
+          "type": "",
+          "nonRetryable": false,
+          "details": null
+        }
+      },
+      "lastWorkerIdentity": "83579@MacBook-Pro-2.local@"
+    }
+  ],
+  "pendingChildren": [],
+  "pendingWorkflowTask": null
+}

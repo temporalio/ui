@@ -1,0 +1,75 @@
+{
+  "executionConfig": {
+    "taskQueue": {
+      "name": "canary-task-queue",
+      "kind": "Normal"
+    },
+    "workflowExecutionTimeout": "0s",
+    "workflowRunTimeout": "1200s",
+    "defaultWorkflowTaskTimeout": "20s"
+  },
+  "workflowExecutionInfo": {
+    "execution": {
+      "workflowId": "temporal.fixture.completed.workflow.id",
+      "runId": "202dcff6-7f35-4c65-995c-bcadce524fb1"
+    },
+    "type": {
+      "name": "workflow.completion"
+    },
+    "startTime": "2022-07-01T20:28:48.796369169Z",
+    "closeTime": "2022-07-01T20:28:52.916373379Z",
+    "status": "Completed",
+    "historyLength": "18",
+    "parentNamespaceId": "c3e6ec56-8059-4bdf-99ac-d50d3fa1616c",
+    "parentExecution": {
+      "workflowId": "temporal.fixture.completed.workflow.id",
+      "runId": "971e2165-c4f8-4f78-87ca-b652a06eb234"
+    },
+    "executionTime": "2022-07-01T20:28:48.796369169Z",
+    "memo": {
+      "fields": {}
+    },
+    "searchAttributes": {
+      "indexedFields": {
+        "BinaryChecksums": {
+          "metadata": {
+            "encoding": "anNvbi9wbGFpbg==",
+            "type": "S2V5d29yZA=="
+          },
+          "data": "WyJlNTZjMDE0MWU1OGRmMGJkNDA1MTM4NTY1ZDA1MjZmOSJd"
+        },
+        "CustomKeywordField": {
+          "metadata": {
+            "encoding": "anNvbi9wbGFpbg==",
+            "type": "S2V5d29yZA=="
+          },
+          "data": "ImNoaWxkV29ya2Zsb3dWYWx1ZSI="
+        },
+        "TemporalChangeVersion": {
+          "metadata": {
+            "encoding": "anNvbi9wbGFpbg==",
+            "type": "S2V5d29yZA=="
+          },
+          "data": "WyJpbml0aWFsIHZlcnNpb24tMyJd"
+        }
+      }
+    },
+    "autoResetPoints": {
+      "points": [
+        {
+          "binaryChecksum": "e56c0141e58df0bd405138565d0526f9",
+          "runId": "202dcff6-7f35-4c65-995c-bcadce524fb1",
+          "firstWorkflowTaskCompletedId": "4",
+          "createTime": "2022-07-01T20:28:48.820934544Z",
+          "expireTime": null,
+          "resettable": true
+        }
+      ]
+    },
+    "taskQueue": "canary-task-queue",
+    "stateTransitionCount": "11"
+  },
+  "pendingActivities": [],
+  "pendingChildren": [],
+  "pendingWorkflowTask": null
+}

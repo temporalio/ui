@@ -1,0 +1,81 @@
+{
+  "executionConfig": {
+    "taskQueue": {
+      "name": "canary-task-queue",
+      "kind": "Normal"
+    },
+    "workflowExecutionTimeout": "0s",
+    "workflowRunTimeout": "1200s",
+    "defaultWorkflowTaskTimeout": "20s"
+  },
+  "workflowExecutionInfo": {
+    "execution": {
+      "workflowId": "temporal.fixture.timed-out.workflow.id/workflow.advanced-visibility",
+      "runId": "445a17cb-6cb4-4508-bc59-187d08c6c6e2"
+    },
+    "type": {
+      "name": "workflow.advanced-visibility"
+    },
+    "startTime": "2022-07-01T13:56:18.803016378Z",
+    "closeTime": "2022-07-01T14:16:18.804308503Z",
+    "status": "TimedOut",
+    "historyLength": "18",
+    "parentNamespaceId": "c3e6ec56-8059-4bdf-99ac-d50d3fa1616c",
+    "parentExecution": {
+      "workflowId": "temporal.fixture.timed-out.workflow.id",
+      "runId": "78cba607-189e-41fe-a31b-a2b6061babaa"
+    },
+    "executionTime": "2022-07-01T13:56:18.803016378Z",
+    "memo": {
+      "fields": {}
+    },
+    "searchAttributes": {
+      "indexedFields": {
+        "BinaryChecksums": {
+          "metadata": {
+            "encoding": "anNvbi9wbGFpbg==",
+            "type": "S2V5d29yZA=="
+          },
+          "data": "WyJlNTZjMDE0MWU1OGRmMGJkNDA1MTM4NTY1ZDA1MjZmOSJd"
+        },
+        "CustomKeywordField": {
+          "metadata": {
+            "encoding": "anNvbi9wbGFpbg==",
+            "type": "S2V5d29yZA=="
+          },
+          "data": "ImNhbmFyeVRlc3Qi"
+        },
+        "TemporalChangeVersion": {
+          "metadata": {
+            "encoding": "anNvbi9wbGFpbg==",
+            "type": "S2V5d29yZA=="
+          },
+          "data": "WyJpbml0aWFsIHZlcnNpb24tMyJd"
+        }
+      }
+    },
+    "autoResetPoints": {
+      "points": [
+        {
+          "binaryChecksum": "e56c0141e58df0bd405138565d0526f9",
+          "runId": "445a17cb-6cb4-4508-bc59-187d08c6c6e2",
+          "firstWorkflowTaskCompletedId": "4",
+          "createTime": "2022-07-01T13:56:18.869984628Z",
+          "expireTime": null,
+          "resettable": true
+        }
+      ]
+    },
+    "taskQueue": "canary-task-queue",
+    "stateTransitionCount": "16"
+  },
+  "pendingActivities": [],
+  "pendingChildren": [],
+  "pendingWorkflowTask": {
+    "state": "Scheduled",
+    "scheduledTime": "2022-07-01T14:00:34.963148844Z",
+    "originalScheduledTime": "2022-07-01T14:00:34.963148219Z",
+    "startedTime": null,
+    "attempt": 1
+  }
+}
