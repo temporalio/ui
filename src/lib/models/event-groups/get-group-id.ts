@@ -3,18 +3,12 @@ import {
   isActivityTaskCancelRequestedEvent,
   isActivityTaskCompletedEvent,
   isActivityTaskFailedEvent,
-  isActivityTaskScheduledEvent,
   isActivityTaskStartedEvent,
   isActivityTaskTimedOutEvent,
   isChildWorkflowExecutionCompletedEvent,
   isChildWorkflowExecutionStartedEvent,
-  isMarkerRecordedEvent,
-  isSignalExternalWorkflowExecutionInitiatedEvent,
-  isStartChildWorkflowExecutionInitiatedEvent,
-  isWorkflowExecutionSignaledEvent,
   isTimerCanceledEvent,
   isTimerFiredEvent,
-  isTimerStartedEvent,
 } from '$lib/utilities/is-event-type';
 
 export const getGroupId = (event: CommonHistoryEvent): string => {
