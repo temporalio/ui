@@ -2,7 +2,7 @@
   import Icon from '$holocene/icon/index.svelte';
   import type { IconName } from '$holocene/icon/paths';
   import MenuContainer from '$holocene/primatives/menu/menu-container.svelte';
-  import MenuTrigger from '$holocene/primatives/menu/menu-button.svelte';
+  import MenuButton from '$holocene/primatives/menu/menu-button.svelte';
   import Menu from '$holocene/primatives/menu/menu.svelte';
 
   export let label: string;
@@ -14,7 +14,7 @@
 </script>
 
 <MenuContainer class={$$props.class}>
-  <MenuTrigger
+  <MenuButton
     bind:show
     class="flex flex-row items-center rounded border border-gray-300 bg-white py-4"
     controls={id}
@@ -37,7 +37,7 @@
         <Icon scale={0.8} name={show ? 'caretUp' : 'caretDown'} />
       </div>
     {/if}
-  </MenuTrigger>
+  </MenuButton>
   <Menu {id} class="flex flex-col items-start gap-4 border-gray-300 p-4" {show}>
     <slot />
   </Menu>

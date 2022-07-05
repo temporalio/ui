@@ -1,7 +1,7 @@
 <script lang="ts">
   import Icon from '$holocene/icon/index.svelte';
   import MenuContainer from './primatives/menu/menu-container.svelte';
-  import MenuTrigger from './primatives/menu/menu-button.svelte';
+  import MenuButton from './primatives/menu/menu-button.svelte';
   import Menu from './primatives/menu/menu.svelte';
   export let label: string;
   export let id: string;
@@ -13,7 +13,7 @@
 </script>
 
 <MenuContainer class={$$props.class}>
-  <MenuTrigger bind:show controls={id} class={$$props.class}>
+  <MenuButton bind:show controls={id} class={$$props.class}>
     <div class="split-button" class:disabled>
       <button tabindex="-1" {disabled} class="segment rounded-l px-4">
         {label}
@@ -22,7 +22,7 @@
         <Icon stroke="currentcolor" name="caretDown" />
       </div>
     </div>
-  </MenuTrigger>
+  </MenuButton>
   <Menu class="split-button-menu" {id} {show} {left} {right}>
     <slot />
   </Menu>

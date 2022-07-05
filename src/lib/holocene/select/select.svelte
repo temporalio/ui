@@ -4,7 +4,7 @@
   import Menu from '$lib/holocene/primatives/menu/menu.svelte';
   import Option, { isOption } from '$lib/holocene/select/option.svelte';
   import type { Option as OptionType } from '$lib/holocene/select/option.svelte';
-  import MenuTrigger from '../primatives/menu/menu-button.svelte';
+  import MenuButton from '../primatives/menu/menu-button.svelte';
   import MenuContainer from '../primatives/menu/menu-container.svelte';
 
   type T = $$Generic;
@@ -42,7 +42,7 @@
 
 <label class="mb-2" for={id}>{label}</label>
 <MenuContainer class="w-full {$$props.class}">
-  <MenuTrigger
+  <MenuButton
     class="select-input-container"
     bind:show
     controls="{id}-menu"
@@ -59,7 +59,7 @@
       {id}
     />
     <Icon stroke="currentcolor" name={show ? 'caretUp' : 'caretDown'} />
-  </MenuTrigger>
+  </MenuButton>
   <Menu id="{id}-menu" class="max-h-60" {show} {dark}>
     {#if options}
       {#each options as option}
