@@ -66,7 +66,7 @@ exports[`getEventsInCategory > should return the correct events for the activity
       "heartbeatTimeout": "0s",
       "input": {
         "payloads": [
-          1656707332859456300,
+          "1656707332859456300",
           {
             "ID": "temporal.fixture.completed.workflow.id",
             "RunID": "202dcff6-7f35-4c65-995c-bcadce524fb1",
@@ -98,7 +98,7 @@ exports[`getEventsInCategory > should return the correct events for the activity
       "heartbeatTimeout": "",
       "input": {
         "payloads": [
-          1656707332859456300,
+          "1656707332859456300",
           {
             "ID": "temporal.fixture.completed.workflow.id",
             "RunID": "202dcff6-7f35-4c65-995c-bcadce524fb1",
@@ -570,7 +570,7 @@ exports[`getEventsInCategory > should return the correct events for the workflow
       "initiator": "Unspecified",
       "input": {
         "payloads": [
-          1656707328774263000,
+          "1656707328774263000",
           "canary",
         ],
       },
@@ -626,7 +626,7 @@ exports[`getEventsInCategory > should return the correct events for the workflow
       "initiator": "Unspecified",
       "input": {
         "payloads": [
-          1656707328774263000,
+          "1656707328774263000",
           "canary",
         ],
       },
