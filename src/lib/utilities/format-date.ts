@@ -38,7 +38,7 @@ export function formatDate(
   }
 }
 
-function timestampToDate(ts: Timestamp): Date {
+export function timestampToDate(ts: Timestamp): Date {
   if (!isTimestamp(ts)) {
     throw new TypeError('provided value is not a timestamp');
   }

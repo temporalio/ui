@@ -143,7 +143,7 @@ export type SchedulePolicies = temporal.api.schedule.v1.ISchedulePolicies;
 export type CalendarSpec = temporal.api.schedule.v1.ICalendarSpec;
 export type IntervalSpec = temporal.api.schedule.v1.IIntervalSpec;
 export type ScheduleActionResult =
-  temporal.api.schedule.v1.ScheduleActionResult;
+  temporal.api.schedule.v1.IScheduleActionResult;
 
 // google
 
