@@ -10,11 +10,14 @@
   class="flex cursor-default flex-row rounded-lg border border-gray-300 bg-white p-8"
 >
   <div class="w-full">
-    <div class="flex flex-col" class:open>
+    <div
+      class="flex cursor-pointer flex-col"
+      class:open
+      on:click={() => (open = !open)}
+    >
       <div class="space-between flex flex-row">
         <h2 class="w-full text-lg font-medium">{title}</h2>
         <IconButton
-          on:click={() => (open = !open)}
           icon={open ? 'caretUp' : 'caretDown'}
           stroke="currentcolor"
           scale={1.4}
