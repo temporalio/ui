@@ -25,7 +25,9 @@
 
   $: filteredSchedules = (schedules: ScheduleListEntry[]) =>
     search
-      ? schedules.filter((schedule) => schedule.scheduleId.includes(search))
+      ? schedules.filter((schedule) =>
+          schedule.scheduleId.toLowerCase().includes(search.toLowerCase()),
+        )
       : schedules;
 
   const errorMessage =
@@ -34,7 +36,7 @@
 
 <div class="flex flex-row justify-between">
   <h2 class="flex items-center gap-2 text-2xl">
-    Schedules<Badge type="alpha">Alpha</Badge><NamespaceSelector />
+    Schedules<Badge type="alpha">Alpha</Badge>
   </h2>
   <Button
     class="h-10"

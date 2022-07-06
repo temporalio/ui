@@ -43,9 +43,9 @@
         <Link
           href={routeForWorkflow({
             namespace,
-            workflow: run.startWorkflowResult.workflowId,
-            run: run.startWorkflowResult.runId,
-          })}>{formatDate(run.actualTime, $timeFormat)}</Link
+            workflow: run?.startWorkflowResult?.workflowId,
+            run: run?.startWorkflowResult?.runId,
+          })}>{formatDate(run?.actualTime, $timeFormat)}</Link
         >
       </p>
     {/each}

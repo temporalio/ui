@@ -26,9 +26,10 @@
         showTemporalSystemNamespace || namespace !== 'temporal-system',
     );
 
+  $: activeNamespaceName = $page.params?.namespace ?? $lastUsedNamespace;
   $: activeNamespace = ($page.stuff.namespaces || []).find(
     (namespace: Namespace) =>
-      namespace?.namespaceInfo?.name === $lastUsedNamespace,
+      namespace?.namespaceInfo?.name === activeNamespaceName,
   );
 
   const namespaceList = namespaces.map((namespace: string) => {
@@ -57,11 +58,11 @@
   }
 
   $: linkList = {
-    home: routeForWorkflows({ namespace: $lastUsedNamespace }),
-    archive: routeForArchivalWorkfows({ namespace: $lastUsedNamespace }),
+    home: routeForWorkflows({ namespace: activeNamespaceName }),
+    archive: routeForArchivalWorkfows({ namespace: activeNamespaceName }),
     namespaces: routeForNamespaces(),
-    schedules: routeForSchedules({ namespace: $lastUsedNamespace }),
-    workflows: routeForWorkflows({ namespace: $lastUsedNamespace }),
+    schedules: routeForSchedules({ namespace: activeNamespaceName }),
+    workflows: routeForWorkflows({ namespace: activeNamespaceName }),
     feedback:
       $page.stuff?.settings?.feedbackURL ||
       'https://github.com/temporalio/ui/issues/new/choose',
