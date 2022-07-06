@@ -48,6 +48,7 @@ const config = {
         alias: {
           $types: path.resolve('./src/types'),
           $holocene: path.resolve('./src/lib/holocene'),
+          $fixtures: path.resolve('./src/fixtures'),
         },
       },
     },

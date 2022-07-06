@@ -1,0 +1,502 @@
+[
+  {
+    "eventId": "13",
+    "eventTime": "2022-07-01T20:23:53.174691421Z",
+    "eventType": "ActivityTaskScheduled",
+    "version": "0",
+    "taskId": "32107901",
+    "activityTaskScheduledEventAttributes": {
+      "activityId": "13",
+      "activityType": {
+        "name": "activity.advanced-visibility"
+      },
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "header": {
+        "fields": {}
+      },
+      "input": {
+        "payloads": [
+          1656707033156390700,
+          {
+            "ID": "temporal.fixture.running.workflow.id",
+            "RunID": "2a7ba421-f74b-4b8b-b9d8-e6e30e4caac7"
+          }
+        ]
+      },
+      "scheduleToCloseTimeout": "260s",
+      "scheduleToStartTimeout": "240s",
+      "startToCloseTimeout": "20s",
+      "heartbeatTimeout": "0s",
+      "workflowTaskCompletedEventId": "12",
+      "retryPolicy": {
+        "initialInterval": "1s",
+        "backoffCoefficient": 2,
+        "maximumInterval": "100s",
+        "maximumAttempts": 0,
+        "nonRetryableErrorTypes": []
+      }
+    },
+    "attributes": {
+      "type": "activityTaskScheduledEventAttributes",
+      "activityId": "13",
+      "activityType": "activity.advanced-visibility",
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "header": {
+        "fields": {}
+      },
+      "input": {
+        "payloads": [
+          1656707033156390700,
+          {
+            "ID": "temporal.fixture.running.workflow.id",
+            "RunID": "2a7ba421-f74b-4b8b-b9d8-e6e30e4caac7"
+          }
+        ]
+      },
+      "scheduleToCloseTimeout": "4 minutes, 20 seconds",
+      "scheduleToStartTimeout": "4 minutes",
+      "startToCloseTimeout": "20 seconds",
+      "heartbeatTimeout": "",
+      "workflowTaskCompletedEventId": "12",
+      "retryPolicy": {
+        "initialInterval": "1s",
+        "backoffCoefficient": 2,
+        "maximumInterval": "100s",
+        "maximumAttempts": 0,
+        "nonRetryableErrorTypes": []
+      }
+    },
+    "classification": "Scheduled",
+    "category": "activity",
+    "id": "13",
+    "name": "ActivityTaskScheduled",
+    "timestamp": "2022-07-01 UTC 20:23:53.17"
+  },
+  {
+    "eventId": "12",
+    "eventTime": "2022-07-01T20:23:53.174680254Z",
+    "eventType": "WorkflowTaskCompleted",
+    "version": "0",
+    "taskId": "32107900",
+    "workflowTaskCompletedEventAttributes": {
+      "scheduledEventId": "10",
+      "startedEventId": "11",
+      "identity": "83579@MacBook-Pro-2.local@",
+      "binaryChecksum": "e56c0141e58df0bd405138565d0526f9"
+    },
+    "attributes": {
+      "type": "workflowTaskCompletedEventAttributes",
+      "scheduledEventId": "10",
+      "startedEventId": "11",
+      "identity": "83579@MacBook-Pro-2.local@",
+      "binaryChecksum": "e56c0141e58df0bd405138565d0526f9"
+    },
+    "classification": "Completed",
+    "category": "workflow",
+    "id": "12",
+    "name": "WorkflowTaskCompleted",
+    "timestamp": "2022-07-01 UTC 20:23:53.17"
+  },
+  {
+    "eventId": "11",
+    "eventTime": "2022-07-01T20:23:53.156390713Z",
+    "eventType": "WorkflowTaskStarted",
+    "version": "0",
+    "taskId": "32107897",
+    "workflowTaskStartedEventAttributes": {
+      "scheduledEventId": "10",
+      "identity": "83579@MacBook-Pro-2.local@",
+      "requestId": "5b9898f6-3215-4efb-81c4-c1e5583b05c1"
+    },
+    "attributes": {
+      "type": "workflowTaskStartedEventAttributes",
+      "scheduledEventId": "10",
+      "identity": "83579@MacBook-Pro-2.local@",
+      "requestId": "5b9898f6-3215-4efb-81c4-c1e5583b05c1"
+    },
+    "classification": "Started",
+    "category": "workflow",
+    "id": "11",
+    "name": "WorkflowTaskStarted",
+    "timestamp": "2022-07-01 UTC 20:23:53.15"
+  },
+  {
+    "eventId": "10",
+    "eventTime": "2022-07-01T20:23:53.139395296Z",
+    "eventType": "WorkflowTaskScheduled",
+    "version": "0",
+    "taskId": "32107893",
+    "workflowTaskScheduledEventAttributes": {
+      "taskQueue": {
+        "name": "MacBook-Pro-2.local:0539ec5f-2f46-4d51-8dcf-a3b9b1de6611",
+        "kind": "Sticky"
+      },
+      "startToCloseTimeout": "20s",
+      "attempt": 1
+    },
+    "attributes": {
+      "type": "workflowTaskScheduledEventAttributes",
+      "taskQueue": {
+        "name": "MacBook-Pro-2.local:0539ec5f-2f46-4d51-8dcf-a3b9b1de6611",
+        "kind": "Sticky"
+      },
+      "startToCloseTimeout": "20 seconds",
+      "attempt": 1
+    },
+    "classification": "Scheduled",
+    "category": "workflow",
+    "id": "10",
+    "name": "WorkflowTaskScheduled",
+    "timestamp": "2022-07-01 UTC 20:23:53.13"
+  },
+  {
+    "eventId": "9",
+    "eventTime": "2022-07-01T20:23:53.139387421Z",
+    "eventType": "TimerFired",
+    "version": "0",
+    "taskId": "32107892",
+    "timerFiredEventAttributes": {
+      "timerId": "8",
+      "startedEventId": "8"
+    },
+    "attributes": {
+      "type": "timerFiredEventAttributes",
+      "timerId": "8",
+      "startedEventId": "8"
+    },
+    "classification": "Fired",
+    "category": "timer",
+    "id": "9",
+    "name": "TimerFired",
+    "timestamp": "2022-07-01 UTC 20:23:53.13"
+  },
+  {
+    "eventId": "8",
+    "eventTime": "2022-07-01T20:23:49.136317294Z",
+    "eventType": "TimerStarted",
+    "version": "0",
+    "taskId": "32107435",
+    "timerStartedEventAttributes": {
+      "timerId": "8",
+      "startToFireTimeout": "4s",
+      "workflowTaskCompletedEventId": "4"
+    },
+    "attributes": {
+      "type": "timerStartedEventAttributes",
+      "timerId": "8",
+      "startToFireTimeout": "4 seconds",
+      "workflowTaskCompletedEventId": "4"
+    },
+    "classification": "Started",
+    "category": "timer",
+    "id": "8",
+    "name": "TimerStarted",
+    "timestamp": "2022-07-01 UTC 20:23:49.13"
+  },
+  {
+    "eventId": "7",
+    "eventTime": "2022-07-01T20:23:49.136314086Z",
+    "eventType": "UpsertWorkflowSearchAttributes",
+    "version": "0",
+    "taskId": "32107434",
+    "upsertWorkflowSearchAttributesEventAttributes": {
+      "workflowTaskCompletedEventId": "4",
+      "searchAttributes": {
+        "indexedFields": {
+          "CustomKeywordField": "canaryTest"
+        }
+      }
+    },
+    "attributes": {
+      "type": "upsertWorkflowSearchAttributesEventAttributes",
+      "workflowTaskCompletedEventId": "4",
+      "searchAttributes": {
+        "indexedFields": {
+          "CustomKeywordField": "canaryTest"
+        }
+      }
+    },
+    "category": "command",
+    "id": "7",
+    "name": "UpsertWorkflowSearchAttributes",
+    "timestamp": "2022-07-01 UTC 20:23:49.13"
+  },
+  {
+    "eventId": "6",
+    "eventTime": "2022-07-01T20:23:49.136068836Z",
+    "eventType": "UpsertWorkflowSearchAttributes",
+    "version": "0",
+    "taskId": "32107433",
+    "upsertWorkflowSearchAttributesEventAttributes": {
+      "workflowTaskCompletedEventId": "4",
+      "searchAttributes": {
+        "indexedFields": {
+          "TemporalChangeVersion": ["initial version-3"]
+        }
+      }
+    },
+    "attributes": {
+      "type": "upsertWorkflowSearchAttributesEventAttributes",
+      "workflowTaskCompletedEventId": "4",
+      "searchAttributes": {
+        "indexedFields": {
+          "TemporalChangeVersion": ["initial version-3"]
+        }
+      }
+    },
+    "category": "command",
+    "id": "6",
+    "name": "UpsertWorkflowSearchAttributes",
+    "timestamp": "2022-07-01 UTC 20:23:49.13"
+  },
+  {
+    "eventId": "5",
+    "eventTime": "2022-07-01T20:23:49.135788128Z",
+    "eventType": "MarkerRecorded",
+    "version": "0",
+    "taskId": "32107432",
+    "markerRecordedEventAttributes": {
+      "markerName": "Version",
+      "details": {
+        "change-id": {
+          "payloads": [
+            {
+              "metadata": {
+                "encoding": "anNvbi9wbGFpbg=="
+              },
+              "data": "ImluaXRpYWwgdmVyc2lvbiI="
+            }
+          ]
+        },
+        "version": {
+          "payloads": [
+            {
+              "metadata": {
+                "encoding": "anNvbi9wbGFpbg=="
+              },
+              "data": "Mw=="
+            }
+          ]
+        }
+      },
+      "workflowTaskCompletedEventId": "4",
+      "header": null,
+      "failure": null
+    },
+    "attributes": {
+      "type": "markerRecordedEventAttributes",
+      "markerName": "Version",
+      "details": {
+        "change-id": {
+          "payloads": [
+            {
+              "metadata": {
+                "encoding": "anNvbi9wbGFpbg=="
+              },
+              "data": "ImluaXRpYWwgdmVyc2lvbiI="
+            }
+          ]
+        },
+        "version": {
+          "payloads": [
+            {
+              "metadata": {
+                "encoding": "anNvbi9wbGFpbg=="
+              },
+              "data": "Mw=="
+            }
+          ]
+        }
+      },
+      "workflowTaskCompletedEventId": "4",
+      "header": null,
+      "failure": null
+    },
+    "category": "marker",
+    "id": "5",
+    "name": "MarkerRecorded",
+    "timestamp": "2022-07-01 UTC 20:23:49.13"
+  },
+  {
+    "eventId": "4",
+    "eventTime": "2022-07-01T20:23:49.135774336Z",
+    "eventType": "WorkflowTaskCompleted",
+    "version": "0",
+    "taskId": "32107431",
+    "workflowTaskCompletedEventAttributes": {
+      "scheduledEventId": "2",
+      "startedEventId": "3",
+      "identity": "83579@MacBook-Pro-2.local@",
+      "binaryChecksum": "e56c0141e58df0bd405138565d0526f9"
+    },
+    "attributes": {
+      "type": "workflowTaskCompletedEventAttributes",
+      "scheduledEventId": "2",
+      "startedEventId": "3",
+      "identity": "83579@MacBook-Pro-2.local@",
+      "binaryChecksum": "e56c0141e58df0bd405138565d0526f9"
+    },
+    "classification": "Completed",
+    "category": "workflow",
+    "id": "4",
+    "name": "WorkflowTaskCompleted",
+    "timestamp": "2022-07-01 UTC 20:23:49.13"
+  },
+  {
+    "eventId": "3",
+    "eventTime": "2022-07-01T20:23:49.127284961Z",
+    "eventType": "WorkflowTaskStarted",
+    "version": "0",
+    "taskId": "32107425",
+    "workflowTaskStartedEventAttributes": {
+      "scheduledEventId": "2",
+      "identity": "83579@MacBook-Pro-2.local@",
+      "requestId": "5502b3df-fbd5-4ab0-89d6-cd7bebde664c"
+    },
+    "attributes": {
+      "type": "workflowTaskStartedEventAttributes",
+      "scheduledEventId": "2",
+      "identity": "83579@MacBook-Pro-2.local@",
+      "requestId": "5502b3df-fbd5-4ab0-89d6-cd7bebde664c"
+    },
+    "classification": "Started",
+    "category": "workflow",
+    "id": "3",
+    "name": "WorkflowTaskStarted",
+    "timestamp": "2022-07-01 UTC 20:23:49.12"
+  },
+  {
+    "eventId": "2",
+    "eventTime": "2022-07-01T20:23:49.117811086Z",
+    "eventType": "WorkflowTaskScheduled",
+    "version": "0",
+    "taskId": "32107422",
+    "workflowTaskScheduledEventAttributes": {
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "startToCloseTimeout": "20s",
+      "attempt": 1
+    },
+    "attributes": {
+      "type": "workflowTaskScheduledEventAttributes",
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "startToCloseTimeout": "20 seconds",
+      "attempt": 1
+    },
+    "classification": "Scheduled",
+    "category": "workflow",
+    "id": "2",
+    "name": "WorkflowTaskScheduled",
+    "timestamp": "2022-07-01 UTC 20:23:49.11"
+  },
+  {
+    "eventId": "1",
+    "eventTime": "2022-07-01T20:23:49.104303753Z",
+    "eventType": "WorkflowExecutionStarted",
+    "version": "0",
+    "taskId": "32107411",
+    "workflowExecutionStartedEventAttributes": {
+      "workflowType": {
+        "name": "workflow.advanced-visibility"
+      },
+      "parentWorkflowNamespace": "canary",
+      "parentWorkflowExecution": {
+        "workflowId": "temporal.fixture.running.workflow.id",
+        "runId": "8f00d989-6bc2-4826-b9f9-7c18ed90c9cc"
+      },
+      "parentInitiatedEventId": "11",
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "input": {
+        "payloads": [1656707029044596700, "canary"]
+      },
+      "workflowExecutionTimeout": "0s",
+      "workflowRunTimeout": "1200s",
+      "workflowTaskTimeout": "20s",
+      "continuedExecutionRunId": "",
+      "initiator": "Unspecified",
+      "continuedFailure": null,
+      "lastCompletionResult": null,
+      "originalExecutionRunId": "2a7ba421-f74b-4b8b-b9d8-e6e30e4caac7",
+      "identity": "",
+      "firstExecutionRunId": "2a7ba421-f74b-4b8b-b9d8-e6e30e4caac7",
+      "retryPolicy": null,
+      "attempt": 1,
+      "workflowExecutionExpirationTime": null,
+      "cronSchedule": "",
+      "firstWorkflowTaskBackoff": "0s",
+      "memo": null,
+      "searchAttributes": {
+        "indexedFields": {
+          "CustomKeywordField": "childWorkflowValue"
+        }
+      },
+      "prevAutoResetPoints": null,
+      "header": {
+        "fields": {}
+      },
+      "parentInitiatedEventVersion": "0"
+    },
+    "attributes": {
+      "type": "workflowExecutionStartedEventAttributes",
+      "workflowType": "workflow.advanced-visibility",
+      "parentWorkflowNamespace": "canary",
+      "parentWorkflowExecution": {
+        "workflowId": "temporal.fixture.running.workflow.id",
+        "runId": "8f00d989-6bc2-4826-b9f9-7c18ed90c9cc"
+      },
+      "parentInitiatedEventId": "11",
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "input": {
+        "payloads": [1656707029044596700, "canary"]
+      },
+      "workflowExecutionTimeout": "",
+      "workflowRunTimeout": "20 minutes",
+      "workflowTaskTimeout": "20 seconds",
+      "continuedExecutionRunId": "",
+      "initiator": "Unspecified",
+      "continuedFailure": null,
+      "lastCompletionResult": null,
+      "originalExecutionRunId": "2a7ba421-f74b-4b8b-b9d8-e6e30e4caac7",
+      "identity": "",
+      "firstExecutionRunId": "2a7ba421-f74b-4b8b-b9d8-e6e30e4caac7",
+      "retryPolicy": null,
+      "attempt": 1,
+      "workflowExecutionExpirationTime": "",
+      "cronSchedule": "",
+      "firstWorkflowTaskBackoff": "",
+      "memo": null,
+      "searchAttributes": {
+        "indexedFields": {
+          "CustomKeywordField": "childWorkflowValue"
+        }
+      },
+      "prevAutoResetPoints": null,
+      "header": {
+        "fields": {}
+      },
+      "parentInitiatedEventVersion": "0"
+    },
+    "classification": "Started",
+    "category": "workflow",
+    "id": "1",
+    "name": "WorkflowExecutionStarted",
+    "timestamp": "2022-07-01 UTC 20:23:49.10"
+  }
+]

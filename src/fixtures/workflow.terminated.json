@@ -1,0 +1,108 @@
+{
+  "executionConfig": {
+    "taskQueue": {
+      "name": "canary-task-queue",
+      "kind": "Normal"
+    },
+    "workflowExecutionTimeout": "0s",
+    "workflowRunTimeout": "1200s",
+    "defaultWorkflowTaskTimeout": "20s"
+  },
+  "workflowExecutionInfo": {
+    "execution": {
+      "workflowId": "temporal.fixture.completed.workflow.id",
+      "runId": "16c5fbe5-f82d-43c1-acbc-18c65c449ace"
+    },
+    "type": {
+      "name": "workflow.reset.base"
+    },
+    "startTime": "2022-07-01T20:14:48.911627544Z",
+    "closeTime": "2022-07-01T20:14:51.002030504Z",
+    "status": "Terminated",
+    "historyLength": "30",
+    "parentNamespaceId": "c3e6ec56-8059-4bdf-99ac-d50d3fa1616c",
+    "parentExecution": {
+      "workflowId": "temporal.fixture.terminated.workflow.id",
+      "runId": "3cbbf515-36da-43b9-a1f3-18a7ec031ddd"
+    },
+    "executionTime": "2022-07-01T20:14:48.911627544Z",
+    "memo": {
+      "fields": {}
+    },
+    "searchAttributes": {
+      "indexedFields": {
+        "BinaryChecksums": {
+          "metadata": {
+            "encoding": "anNvbi9wbGFpbg==",
+            "type": "S2V5d29yZA=="
+          },
+          "data": "WyJlNTZjMDE0MWU1OGRmMGJkNDA1MTM4NTY1ZDA1MjZmOSJd"
+        },
+        "CustomKeywordField": {
+          "metadata": {
+            "encoding": "anNvbi9wbGFpbg==",
+            "type": "S2V5d29yZA=="
+          },
+          "data": "ImNoaWxkV29ya2Zsb3dWYWx1ZSI="
+        },
+        "TemporalChangeVersion": {
+          "metadata": {
+            "encoding": "anNvbi9wbGFpbg==",
+            "type": "S2V5d29yZA=="
+          },
+          "data": "WyJpbml0aWFsIHZlcnNpb24tMyJd"
+        }
+      }
+    },
+    "autoResetPoints": {
+      "points": [
+        {
+          "binaryChecksum": "e56c0141e58df0bd405138565d0526f9",
+          "runId": "16c5fbe5-f82d-43c1-acbc-18c65c449ace",
+          "firstWorkflowTaskCompletedId": "4",
+          "createTime": "2022-07-01T20:14:48.953547419Z",
+          "expireTime": null,
+          "resettable": true
+        }
+      ]
+    },
+    "taskQueue": "canary-task-queue",
+    "stateTransitionCount": "21"
+  },
+  "pendingActivities": [
+    {
+      "activityId": "8",
+      "activityType": {
+        "name": "activity.reset.base"
+      },
+      "state": "Started",
+      "heartbeatDetails": null,
+      "lastHeartbeatTime": "2022-07-01T20:14:49.003625461Z",
+      "lastStartedTime": "2022-07-01T20:14:49.003625461Z",
+      "attempt": 1,
+      "maximumAttempts": 0,
+      "scheduledTime": null,
+      "expirationTime": "2022-07-01T20:34:48.954045336Z",
+      "lastFailure": null,
+      "lastWorkerIdentity": "83579@MacBook-Pro-2.local@"
+    },
+    {
+      "activityId": "9",
+      "activityType": {
+        "name": "activity.reset.base"
+      },
+      "state": "Started",
+      "heartbeatDetails": null,
+      "lastHeartbeatTime": "2022-07-01T20:14:49.009769794Z",
+      "lastStartedTime": "2022-07-01T20:14:49.009769794Z",
+      "attempt": 1,
+      "maximumAttempts": 5,
+      "scheduledTime": null,
+      "expirationTime": "2022-07-01T20:34:48.954048586Z",
+      "lastFailure": null,
+      "lastWorkerIdentity": "83579@MacBook-Pro-2.local@"
+    }
+  ],
+  "pendingChildren": [],
+  "pendingWorkflowTask": null
+}

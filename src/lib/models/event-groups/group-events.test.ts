@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { groupEvents } from './';
+import { getEventGroupName } from './get-group-name';
 
 const scheduledEvent = {
   id: '5',
@@ -79,24 +80,30 @@ const eventHistory = [
   startedEvent,
   anotherScheduledEvent,
   completedEvent,
-];
+] as unknown as WorkflowEvents;
 
 describe('groupEvents', () => {
   it('should create a new entry when given a scheduled event', () => {
-    const groups = groupEvents([scheduledEvent]);
+    const groups = groupEvents([scheduledEvent] as unknown as WorkflowEvents);
     const group = groups.find(({ id }) => id === scheduledEvent.id);
 
     expect(group.events.get(scheduledEvent.id)).toBe(scheduledEvent);
   });
 
   it('should be able to store multiple event groups', () => {
-    const groups = groupEvents([scheduledEvent, anotherScheduledEvent]);
+    const groups = groupEvents([
+      scheduledEvent,
+      anotherScheduledEvent,
+    ] as unknown as WorkflowEvents);
 
     expect(Object.keys(groups).length).toBe(2);
   });
 
   it('should add a completed event to the correct group', () => {
-    const groups = groupEvents([scheduledEvent, completedEvent]);
+    const groups = groupEvents([
+      scheduledEvent,
+      completedEvent,
+    ] as unknown as WorkflowEvents);
 
     const group = groups.find(({ id }) => id === scheduledEvent.id);
 
@@ -112,5 +119,86 @@ describe('groupEvents', () => {
     expect(Object.values(groups).length).toBe(2);
     expect(first.events.size).toBe(3);
     expect(second.events.size).toBe(1);
+  });
+});
+
+describe('getEventGroupName', () => {
+  it('should get the name of the eventGroup', () => {
+    const [group] = groupEvents(eventHistory);
+    expect(group.name).toBe('CompletedActivity');
+  });
+
+  it('should guard against empty arguments', () => {
+    expect(getEventGroupName(undefined as CommonHistoryEvent)).toBeUndefined();
+  });
+
+  it('should get the name of a TimerStartedEvent', () => {
+    const timerStartedEvent = {
+      eventId: '8',
+      timerStartedEventAttributes: {
+        timerId: '8',
+        startToFireTimeout: '4s',
+        workflowTaskCompletedEventId: '4',
+      },
+      id: '8',
+      name: 'TimerStarted',
+    } as unknown as CommonHistoryEvent;
+
+    expect(getEventGroupName(timerStartedEvent)).toBe('Timer 8 (4s)');
+  });
+
+  it('should get the name of a SignalExternalWorkflowExecutionInitiatedEvent', () => {
+    const signalEvent = {
+      eventId: '12',
+      signalExternalWorkflowExecutionInitiatedEventAttributes: {
+        signalName: 'WorkflowSignal',
+      },
+      name: 'WorkflowExecutionSignaled',
+    } as unknown as CommonHistoryEvent;
+    expect(getEventGroupName(signalEvent)).toBe('Signal: WorkflowSignal');
+  });
+
+  it('should get the name of a WorkflowExecutionSignaledEvent', () => {
+    const workflowExectutionSignaledEvent = {
+      eventId: '12',
+      workflowExecutionSignaledEventAttributes: {
+        signalName: 'signalBeforeReset',
+      },
+      name: 'WorkflowExecutionSignaled',
+    } as unknown as CommonHistoryEvent;
+
+    expect(getEventGroupName(workflowExectutionSignaledEvent)).toBe(
+      'Signal received: signalBeforeReset',
+    );
+  });
+
+  it('should get the name of a MarkerRecordedEvent', () => {
+    const markerRecordedEvent = {
+      eventId: '5',
+      eventTime: '2022-07-01T20:23:49.135788128Z',
+      eventType: 'MarkerRecorded',
+      markerRecordedEventAttributes: {
+        markerName: 'Version',
+        workflowTaskCompletedEventId: '4',
+      },
+      category: 'marker',
+      timestamp: '2022-07-01 UTC 20:23:49.13',
+    } as unknown as CommonHistoryEvent;
+
+    expect(getEventGroupName(markerRecordedEvent)).toBe('Marker: Version');
+  });
+
+  it('should get the name of a StartChildWorkflowExecutionInitiatedEvent', () => {
+    const startChildWorkflowEvent = {
+      startChildWorkflowExecutionInitiatedEventAttributes: {
+        workflowType: {
+          name: 'Workflow Name',
+        },
+      },
+    } as unknown as CommonHistoryEvent;
+
+    expect(getEventGroupName(startChildWorkflowEvent)).toBe(
+      'Child Workflow: Workflow Name',
+    );
   });
 });

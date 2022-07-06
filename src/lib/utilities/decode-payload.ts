@@ -8,6 +8,12 @@ import { convertPayloadsWithCodec } from '$lib/services/data-encoder';
 
 import { atob } from './atob';
 
+export type Decode = {
+  convertPayloadToJsonWithCodec: typeof convertPayloadToJsonWithCodec;
+  convertPayloadToJsonWithWebsocket: typeof convertPayloadToJsonWithWebsocket;
+  decodePayloadAttributes: typeof decodePayloadAttributes;
+};
+
 export function decodePayload(
   payload: Payload,
   // This could decode to any object. So we either use the payload object passed in or decode it
@@ -107,9 +113,7 @@ export const convertPayloadToJsonWithCodec = async ({
   settings,
 }: {
   attributes: EventAttribute;
-  namespace: string;
-  settings: Settings;
-}): Promise<EventAttribute> => {
+} & EventRequestMetadata): Promise<EventAttribute> => {
   // This anyAttribues allows us to use ?. notation to introspect the object which is a safe access pattern.
   // Because of the way we wrote our discrimited union we have to use this any. If we have two objects that
   // don't have the same property TS won't let us access that object without verifying the type string like

@@ -1,0 +1,339 @@
+[
+  {
+    "id": "5",
+    "name": "Marker: Version",
+    "events": {},
+    "eventIds": {},
+    "initialEvent": {
+      "eventId": "5",
+      "eventTime": "2022-07-01T20:20:50.175413503Z",
+      "eventType": "MarkerRecorded",
+      "version": "0",
+      "taskId": "29875719",
+      "markerRecordedEventAttributes": {
+        "markerName": "Version",
+        "details": {
+          "change-id": {
+            "payloads": [
+              {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg=="
+                },
+                "data": "ImluaXRpYWwgdmVyc2lvbiI="
+              }
+            ]
+          },
+          "version": {
+            "payloads": [
+              {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg=="
+                },
+                "data": "Mw=="
+              }
+            ]
+          }
+        },
+        "workflowTaskCompletedEventId": "4",
+        "header": null,
+        "failure": null
+      },
+      "attributes": {
+        "type": "markerRecordedEventAttributes",
+        "markerName": "Version",
+        "details": {
+          "change-id": {
+            "payloads": [
+              {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg=="
+                },
+                "data": "ImluaXRpYWwgdmVyc2lvbiI="
+              }
+            ]
+          },
+          "version": {
+            "payloads": [
+              {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg=="
+                },
+                "data": "Mw=="
+              }
+            ]
+          }
+        },
+        "workflowTaskCompletedEventId": "4",
+        "header": null,
+        "failure": null
+      },
+      "category": "marker",
+      "id": "5",
+      "name": "MarkerRecorded",
+      "timestamp": "2022-07-01 UTC 20:20:50.17"
+    },
+    "timestamp": "2022-07-01 UTC 20:20:50.17",
+    "category": "marker",
+    "eventTime": "2022-07-01T20:20:50.175413503Z",
+    "attributes": {
+      "type": "markerRecordedEventAttributes",
+      "markerName": "Version",
+      "details": {
+        "change-id": {
+          "payloads": [
+            {
+              "metadata": {
+                "encoding": "anNvbi9wbGFpbg=="
+              },
+              "data": "ImluaXRpYWwgdmVyc2lvbiI="
+            }
+          ]
+        },
+        "version": {
+          "payloads": [
+            {
+              "metadata": {
+                "encoding": "anNvbi9wbGFpbg=="
+              },
+              "data": "Mw=="
+            }
+          ]
+        }
+      },
+      "workflowTaskCompletedEventId": "4",
+      "header": null,
+      "failure": null
+    },
+    "eventList": [
+      {
+        "eventId": "5",
+        "eventTime": "2022-07-01T20:20:50.175413503Z",
+        "eventType": "MarkerRecorded",
+        "version": "0",
+        "taskId": "29875719",
+        "markerRecordedEventAttributes": {
+          "markerName": "Version",
+          "details": {
+            "change-id": {
+              "payloads": [
+                {
+                  "metadata": {
+                    "encoding": "anNvbi9wbGFpbg=="
+                  },
+                  "data": "ImluaXRpYWwgdmVyc2lvbiI="
+                }
+              ]
+            },
+            "version": {
+              "payloads": [
+                {
+                  "metadata": {
+                    "encoding": "anNvbi9wbGFpbg=="
+                  },
+                  "data": "Mw=="
+                }
+              ]
+            }
+          },
+          "workflowTaskCompletedEventId": "4",
+          "header": null,
+          "failure": null
+        },
+        "attributes": {
+          "type": "markerRecordedEventAttributes",
+          "markerName": "Version",
+          "details": {
+            "change-id": {
+              "payloads": [
+                {
+                  "metadata": {
+                    "encoding": "anNvbi9wbGFpbg=="
+                  },
+                  "data": "ImluaXRpYWwgdmVyc2lvbiI="
+                }
+              ]
+            },
+            "version": {
+              "payloads": [
+                {
+                  "metadata": {
+                    "encoding": "anNvbi9wbGFpbg=="
+                  },
+                  "data": "Mw=="
+                }
+              ]
+            }
+          },
+          "workflowTaskCompletedEventId": "4",
+          "header": null,
+          "failure": null
+        },
+        "category": "marker",
+        "id": "5",
+        "name": "MarkerRecorded",
+        "timestamp": "2022-07-01 UTC 20:20:50.17"
+      }
+    ],
+    "lastEvent": {
+      "eventId": "5",
+      "eventTime": "2022-07-01T20:20:50.175413503Z",
+      "eventType": "MarkerRecorded",
+      "version": "0",
+      "taskId": "29875719",
+      "markerRecordedEventAttributes": {
+        "markerName": "Version",
+        "details": {
+          "change-id": {
+            "payloads": [
+              {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg=="
+                },
+                "data": "ImluaXRpYWwgdmVyc2lvbiI="
+              }
+            ]
+          },
+          "version": {
+            "payloads": [
+              {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg=="
+                },
+                "data": "Mw=="
+              }
+            ]
+          }
+        },
+        "workflowTaskCompletedEventId": "4",
+        "header": null,
+        "failure": null
+      },
+      "attributes": {
+        "type": "markerRecordedEventAttributes",
+        "markerName": "Version",
+        "details": {
+          "change-id": {
+            "payloads": [
+              {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg=="
+                },
+                "data": "ImluaXRpYWwgdmVyc2lvbiI="
+              }
+            ]
+          },
+          "version": {
+            "payloads": [
+              {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg=="
+                },
+                "data": "Mw=="
+              }
+            ]
+          }
+        },
+        "workflowTaskCompletedEventId": "4",
+        "header": null,
+        "failure": null
+      },
+      "category": "marker",
+      "id": "5",
+      "name": "MarkerRecorded",
+      "timestamp": "2022-07-01 UTC 20:20:50.17"
+    },
+    "isFailureOrTimedOut": false,
+    "isCanceled": false,
+    "isTerminated": false
+  },
+  {
+    "id": "7",
+    "name": "Timer 7 (480s)",
+    "events": {},
+    "eventIds": {},
+    "initialEvent": {
+      "eventId": "7",
+      "eventTime": "2022-07-01T20:20:50.175677753Z",
+      "eventType": "TimerStarted",
+      "version": "0",
+      "taskId": "29875721",
+      "timerStartedEventAttributes": {
+        "timerId": "7",
+        "startToFireTimeout": "480s",
+        "workflowTaskCompletedEventId": "4"
+      },
+      "attributes": {
+        "type": "timerStartedEventAttributes",
+        "timerId": "7",
+        "startToFireTimeout": "8 minutes",
+        "workflowTaskCompletedEventId": "4"
+      },
+      "classification": "Started",
+      "category": "timer",
+      "id": "7",
+      "name": "TimerStarted",
+      "timestamp": "2022-07-01 UTC 20:20:50.17"
+    },
+    "timestamp": "2022-07-01 UTC 20:20:50.17",
+    "category": "timer",
+    "classification": "Started",
+    "eventTime": "2022-07-01T20:20:50.175677753Z",
+    "attributes": {
+      "type": "timerStartedEventAttributes",
+      "timerId": "7",
+      "startToFireTimeout": "8 minutes",
+      "workflowTaskCompletedEventId": "4"
+    },
+    "eventList": [
+      {
+        "eventId": "7",
+        "eventTime": "2022-07-01T20:20:50.175677753Z",
+        "eventType": "TimerStarted",
+        "version": "0",
+        "taskId": "29875721",
+        "timerStartedEventAttributes": {
+          "timerId": "7",
+          "startToFireTimeout": "480s",
+          "workflowTaskCompletedEventId": "4"
+        },
+        "attributes": {
+          "type": "timerStartedEventAttributes",
+          "timerId": "7",
+          "startToFireTimeout": "8 minutes",
+          "workflowTaskCompletedEventId": "4"
+        },
+        "classification": "Started",
+        "category": "timer",
+        "id": "7",
+        "name": "TimerStarted",
+        "timestamp": "2022-07-01 UTC 20:20:50.17"
+      }
+    ],
+    "lastEvent": {
+      "eventId": "7",
+      "eventTime": "2022-07-01T20:20:50.175677753Z",
+      "eventType": "TimerStarted",
+      "version": "0",
+      "taskId": "29875721",
+      "timerStartedEventAttributes": {
+        "timerId": "7",
+        "startToFireTimeout": "480s",
+        "workflowTaskCompletedEventId": "4"
+      },
+      "attributes": {
+        "type": "timerStartedEventAttributes",
+        "timerId": "7",
+        "startToFireTimeout": "8 minutes",
+        "workflowTaskCompletedEventId": "4"
+      },
+      "classification": "Started",
+      "category": "timer",
+      "id": "7",
+      "name": "TimerStarted",
+      "timestamp": "2022-07-01 UTC 20:20:50.17"
+    },
+    "isFailureOrTimedOut": false,
+    "isCanceled": false,
+    "isTerminated": false
+  }
+]

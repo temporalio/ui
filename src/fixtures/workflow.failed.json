@@ -1,0 +1,58 @@
+{
+  "executionConfig": {
+    "taskQueue": {
+      "name": "canary-task-queue",
+      "kind": "Normal"
+    },
+    "workflowExecutionTimeout": "0s",
+    "workflowRunTimeout": "300s",
+    "defaultWorkflowTaskTimeout": "20s"
+  },
+  "workflowExecutionInfo": {
+    "execution": {
+      "workflowId": "temporal.fixture.failed.workflow.id",
+      "runId": "7e00b341-c579-4bb5-9e28-810d34ef4329"
+    },
+    "type": {
+      "name": "workflow.retry-workflow.ext"
+    },
+    "startTime": "2022-07-01T20:22:49.015107253Z",
+    "closeTime": "2022-07-01T20:22:50.027441003Z",
+    "status": "Failed",
+    "historyLength": "7",
+    "parentNamespaceId": "",
+    "parentExecution": null,
+    "executionTime": "2022-07-01T20:22:50.015107253Z",
+    "memo": {
+      "fields": {}
+    },
+    "searchAttributes": {
+      "indexedFields": {
+        "TemporalChangeVersion": {
+          "metadata": {
+            "encoding": "anNvbi9wbGFpbg==",
+            "type": "S2V5d29yZA=="
+          },
+          "data": "WyJpbml0aWFsIHZlcnNpb24tMyJd"
+        }
+      }
+    },
+    "autoResetPoints": {
+      "points": [
+        {
+          "binaryChecksum": "e56c0141e58df0bd405138565d0526f9",
+          "runId": "babf5e35-3a61-48c2-8738-a19293205282",
+          "firstWorkflowTaskCompletedId": "4",
+          "createTime": "2022-07-01T20:22:49.014356253Z",
+          "expireTime": "2022-07-11T20:22:49.015107253Z",
+          "resettable": true
+        }
+      ]
+    },
+    "taskQueue": "canary-task-queue",
+    "stateTransitionCount": "4"
+  },
+  "pendingActivities": [],
+  "pendingChildren": [],
+  "pendingWorkflowTask": null
+}

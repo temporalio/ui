@@ -1,0 +1,320 @@
+{
+  "executions": [
+    {
+      "execution": {
+        "workflowId": "temporal.fixture.cancelled.workflow.id",
+        "runId": "346e7a24-c660-4f91-a777-ffe3274d8144"
+      },
+      "type": {
+        "name": "workflow.cancellation"
+      },
+      "startTime": "2022-07-01T20:20:50.157120545Z",
+      "closeTime": "2022-07-01T20:20:50.181506253Z",
+      "status": "Canceled",
+      "historyLength": "13",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-07-01T20:20:50.157120545Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {
+          "BinaryChecksums": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "WyJlNTZjMDE0MWU1OGRmMGJkNDA1MTM4NTY1ZDA1MjZmOSJd"
+          },
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "ImNoaWxkV29ya2Zsb3dWYWx1ZSI="
+          },
+          "TemporalChangeVersion": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "WyJpbml0aWFsIHZlcnNpb24tMyJd"
+          }
+        }
+      },
+      "autoResetPoints": null,
+      "taskQueue": "canary-task-queue",
+      "stateTransitionCount": "6"
+    },
+    {
+      "execution": {
+        "workflowId": "temporal.fixture.completed.workflow.id",
+        "runId": "202dcff6-7f35-4c65-995c-bcadce524fb1"
+      },
+      "type": {
+        "name": "workflow.completion"
+      },
+      "startTime": "2022-07-01T20:28:48.796369169Z",
+      "closeTime": "2022-07-01T20:28:52.916373379Z",
+      "status": "Completed",
+      "historyLength": "18",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-07-01T20:28:48.796369169Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {
+          "BinaryChecksums": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "WyJlNTZjMDE0MWU1OGRmMGJkNDA1MTM4NTY1ZDA1MjZmOSJd"
+          },
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "ImNoaWxkV29ya2Zsb3dWYWx1ZSI="
+          },
+          "TemporalChangeVersion": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "WyJpbml0aWFsIHZlcnNpb24tMyJd"
+          }
+        }
+      },
+      "autoResetPoints": null,
+      "taskQueue": "canary-task-queue",
+      "stateTransitionCount": "11"
+    },
+    {
+      "execution": {
+        "workflowId": "temporal.fixture.failed.workflow.id",
+        "runId": "7e00b341-c579-4bb5-9e28-810d34ef4329"
+      },
+      "type": {
+        "name": "workflow.retry-workflow.ext"
+      },
+      "startTime": "2022-07-01T20:22:49.015107253Z",
+      "closeTime": "2022-07-01T20:22:50.027441003Z",
+      "status": "Failed",
+      "historyLength": "7",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-07-01T20:22:50.015107253Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {
+          "TemporalChangeVersion": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "WyJpbml0aWFsIHZlcnNpb24tMyJd"
+          }
+        }
+      },
+      "autoResetPoints": null,
+      "taskQueue": "canary-task-queue",
+      "stateTransitionCount": "4"
+    },
+    {
+      "execution": {
+        "workflowId": "temporal.fixture.running.workflow.id",
+        "runId": "2a7ba421-f74b-4b8b-b9d8-e6e30e4caac7"
+      },
+      "type": {
+        "name": "workflow.advanced-visibility"
+      },
+      "startTime": "2022-07-01T20:23:49.104303753Z",
+      "closeTime": null,
+      "status": "Running",
+      "historyLength": "19",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-07-01T20:23:49.104303753Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {
+          "BinaryChecksums": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "WyJlNTZjMDE0MWU1OGRmMGJkNDA1MTM4NTY1ZDA1MjZmOSJd"
+          },
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "ImNhbmFyeVRlc3Qi"
+          },
+          "TemporalChangeVersion": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "WyJpbml0aWFsIHZlcnNpb24tMyJd"
+          }
+        }
+      },
+      "autoResetPoints": null,
+      "taskQueue": "canary-task-queue",
+      "stateTransitionCount": "27"
+    },
+    {
+      "execution": {
+        "workflowId": "temporal.fixture.completed.workflow.id",
+        "runId": "dfd4039d-4bc0-4864-9a24-85d136814977"
+      },
+      "type": {
+        "name": "workflow.reset.base"
+      },
+      "startTime": "2022-07-01T20:14:51.002662504Z",
+      "closeTime": "2022-07-01T20:14:51.073853795Z",
+      "status": "Completed",
+      "historyLength": "42",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-07-01T20:14:51.002662504Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {
+          "BinaryChecksums": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "WyJlNTZjMDE0MWU1OGRmMGJkNDA1MTM4NTY1ZDA1MjZmOSJd"
+          },
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "ImNoaWxkV29ya2Zsb3dWYWx1ZSI="
+          },
+          "TemporalChangeVersion": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "WyJpbml0aWFsIHZlcnNpb24tMyJd"
+          }
+        }
+      },
+      "autoResetPoints": null,
+      "taskQueue": "canary-task-queue",
+      "stateTransitionCount": "13"
+    },
+    {
+      "execution": {
+        "workflowId": "temporal.fixture.terminated.workflow.id",
+        "runId": "16c5fbe5-f82d-43c1-acbc-18c65c449ace"
+      },
+      "type": {
+        "name": "workflow.reset.base"
+      },
+      "startTime": "2022-07-01T20:14:48.911627544Z",
+      "closeTime": "2022-07-01T20:14:51.002030504Z",
+      "status": "Terminated",
+      "historyLength": "30",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-07-01T20:14:48.911627544Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {
+          "BinaryChecksums": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "WyJlNTZjMDE0MWU1OGRmMGJkNDA1MTM4NTY1ZDA1MjZmOSJd"
+          },
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "ImNoaWxkV29ya2Zsb3dWYWx1ZSI="
+          },
+          "TemporalChangeVersion": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "WyJpbml0aWFsIHZlcnNpb24tMyJd"
+          }
+        }
+      },
+      "autoResetPoints": null,
+      "taskQueue": "canary-task-queue",
+      "stateTransitionCount": "21"
+    },
+    {
+      "execution": {
+        "workflowId": "temporal.fixture.timed-out.workflow.id",
+        "runId": "445a17cb-6cb4-4508-bc59-187d08c6c6e2"
+      },
+      "type": {
+        "name": "workflow.advanced-visibility"
+      },
+      "startTime": "2022-07-01T13:56:18.803016378Z",
+      "closeTime": "2022-07-01T14:16:18.804308503Z",
+      "status": "TimedOut",
+      "historyLength": "18",
+      "parentNamespaceId": "",
+      "parentExecution": null,
+      "executionTime": "2022-07-01T13:56:18.803016378Z",
+      "memo": {
+        "fields": {}
+      },
+      "searchAttributes": {
+        "indexedFields": {
+          "BinaryChecksums": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "WyJlNTZjMDE0MWU1OGRmMGJkNDA1MTM4NTY1ZDA1MjZmOSJd"
+          },
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "ImNhbmFyeVRlc3Qi"
+          },
+          "TemporalChangeVersion": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "WyJpbml0aWFsIHZlcnNpb24tMyJd"
+          }
+        }
+      },
+      "autoResetPoints": null,
+      "taskQueue": "canary-task-queue",
+      "stateTransitionCount": "16"
+    }
+  ],
+  "nextPageToken": null
+}

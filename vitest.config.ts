@@ -11,6 +11,7 @@ export default defineConfig({
       $components: path.resolve(__dirname, './src/lib/components/'),
       $holocene: path.resolve(__dirname, './src/lib/holocene/'),
       $app: path.resolve(__dirname, './src/lib/svelte-mocks/app/'),
+      $fixtures: path.resolve(__dirname, './src/fixtures/'),
     },
   },
   test: {

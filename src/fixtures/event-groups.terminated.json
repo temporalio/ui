@@ -1,0 +1,1457 @@
+[
+  {
+    "id": "5",
+    "name": "Marker: Version",
+    "events": {},
+    "eventIds": {},
+    "initialEvent": {
+      "eventId": "5",
+      "eventTime": "2022-07-01T20:14:48.953563836Z",
+      "eventType": "MarkerRecorded",
+      "version": "0",
+      "taskId": "32096674",
+      "markerRecordedEventAttributes": {
+        "markerName": "Version",
+        "details": {
+          "change-id": {
+            "payloads": [
+              {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg=="
+                },
+                "data": "ImluaXRpYWwgdmVyc2lvbiI="
+              }
+            ]
+          },
+          "version": {
+            "payloads": [
+              {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg=="
+                },
+                "data": "Mw=="
+              }
+            ]
+          }
+        },
+        "workflowTaskCompletedEventId": "4",
+        "header": null,
+        "failure": null
+      },
+      "attributes": {
+        "type": "markerRecordedEventAttributes",
+        "markerName": "Version",
+        "details": {
+          "change-id": {
+            "payloads": [
+              {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg=="
+                },
+                "data": "ImluaXRpYWwgdmVyc2lvbiI="
+              }
+            ]
+          },
+          "version": {
+            "payloads": [
+              {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg=="
+                },
+                "data": "Mw=="
+              }
+            ]
+          }
+        },
+        "workflowTaskCompletedEventId": "4",
+        "header": null,
+        "failure": null
+      },
+      "category": "marker",
+      "id": "5",
+      "name": "MarkerRecorded",
+      "timestamp": "2022-07-01 UTC 20:14:48.95"
+    },
+    "timestamp": "2022-07-01 UTC 20:14:48.95",
+    "category": "marker",
+    "eventTime": "2022-07-01T20:14:48.953563836Z",
+    "attributes": {
+      "type": "markerRecordedEventAttributes",
+      "markerName": "Version",
+      "details": {
+        "change-id": {
+          "payloads": [
+            {
+              "metadata": {
+                "encoding": "anNvbi9wbGFpbg=="
+              },
+              "data": "ImluaXRpYWwgdmVyc2lvbiI="
+            }
+          ]
+        },
+        "version": {
+          "payloads": [
+            {
+              "metadata": {
+                "encoding": "anNvbi9wbGFpbg=="
+              },
+              "data": "Mw=="
+            }
+          ]
+        }
+      },
+      "workflowTaskCompletedEventId": "4",
+      "header": null,
+      "failure": null
+    },
+    "eventList": [
+      {
+        "eventId": "5",
+        "eventTime": "2022-07-01T20:14:48.953563836Z",
+        "eventType": "MarkerRecorded",
+        "version": "0",
+        "taskId": "32096674",
+        "markerRecordedEventAttributes": {
+          "markerName": "Version",
+          "details": {
+            "change-id": {
+              "payloads": [
+                {
+                  "metadata": {
+                    "encoding": "anNvbi9wbGFpbg=="
+                  },
+                  "data": "ImluaXRpYWwgdmVyc2lvbiI="
+                }
+              ]
+            },
+            "version": {
+              "payloads": [
+                {
+                  "metadata": {
+                    "encoding": "anNvbi9wbGFpbg=="
+                  },
+                  "data": "Mw=="
+                }
+              ]
+            }
+          },
+          "workflowTaskCompletedEventId": "4",
+          "header": null,
+          "failure": null
+        },
+        "attributes": {
+          "type": "markerRecordedEventAttributes",
+          "markerName": "Version",
+          "details": {
+            "change-id": {
+              "payloads": [
+                {
+                  "metadata": {
+                    "encoding": "anNvbi9wbGFpbg=="
+                  },
+                  "data": "ImluaXRpYWwgdmVyc2lvbiI="
+                }
+              ]
+            },
+            "version": {
+              "payloads": [
+                {
+                  "metadata": {
+                    "encoding": "anNvbi9wbGFpbg=="
+                  },
+                  "data": "Mw=="
+                }
+              ]
+            }
+          },
+          "workflowTaskCompletedEventId": "4",
+          "header": null,
+          "failure": null
+        },
+        "category": "marker",
+        "id": "5",
+        "name": "MarkerRecorded",
+        "timestamp": "2022-07-01 UTC 20:14:48.95"
+      }
+    ],
+    "lastEvent": {
+      "eventId": "5",
+      "eventTime": "2022-07-01T20:14:48.953563836Z",
+      "eventType": "MarkerRecorded",
+      "version": "0",
+      "taskId": "32096674",
+      "markerRecordedEventAttributes": {
+        "markerName": "Version",
+        "details": {
+          "change-id": {
+            "payloads": [
+              {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg=="
+                },
+                "data": "ImluaXRpYWwgdmVyc2lvbiI="
+              }
+            ]
+          },
+          "version": {
+            "payloads": [
+              {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg=="
+                },
+                "data": "Mw=="
+              }
+            ]
+          }
+        },
+        "workflowTaskCompletedEventId": "4",
+        "header": null,
+        "failure": null
+      },
+      "attributes": {
+        "type": "markerRecordedEventAttributes",
+        "markerName": "Version",
+        "details": {
+          "change-id": {
+            "payloads": [
+              {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg=="
+                },
+                "data": "ImluaXRpYWwgdmVyc2lvbiI="
+              }
+            ]
+          },
+          "version": {
+            "payloads": [
+              {
+                "metadata": {
+                  "encoding": "anNvbi9wbGFpbg=="
+                },
+                "data": "Mw=="
+              }
+            ]
+          }
+        },
+        "workflowTaskCompletedEventId": "4",
+        "header": null,
+        "failure": null
+      },
+      "category": "marker",
+      "id": "5",
+      "name": "MarkerRecorded",
+      "timestamp": "2022-07-01 UTC 20:14:48.95"
+    },
+    "isFailureOrTimedOut": false,
+    "isCanceled": false,
+    "isTerminated": false
+  },
+  {
+    "id": "7",
+    "name": "activity.reset.base",
+    "events": {},
+    "eventIds": {},
+    "initialEvent": {
+      "eventId": "7",
+      "eventTime": "2022-07-01T20:14:48.954038419Z",
+      "eventType": "ActivityTaskScheduled",
+      "version": "0",
+      "taskId": "32096676",
+      "activityTaskScheduledEventAttributes": {
+        "activityId": "7",
+        "activityType": {
+          "name": "activity.reset.base"
+        },
+        "taskQueue": {
+          "name": "canary-task-queue",
+          "kind": "Normal"
+        },
+        "header": {
+          "fields": {}
+        },
+        "input": {
+          "payloads": [1]
+        },
+        "scheduleToCloseTimeout": "1200s",
+        "scheduleToStartTimeout": "1200s",
+        "startToCloseTimeout": "20s",
+        "heartbeatTimeout": "0s",
+        "workflowTaskCompletedEventId": "4",
+        "retryPolicy": {
+          "initialInterval": "5s",
+          "backoffCoefficient": 1,
+          "maximumInterval": "5s",
+          "maximumAttempts": 5,
+          "nonRetryableErrorTypes": []
+        }
+      },
+      "attributes": {
+        "type": "activityTaskScheduledEventAttributes",
+        "activityId": "7",
+        "activityType": "activity.reset.base",
+        "taskQueue": {
+          "name": "canary-task-queue",
+          "kind": "Normal"
+        },
+        "header": {
+          "fields": {}
+        },
+        "input": {
+          "payloads": [1]
+        },
+        "scheduleToCloseTimeout": "20 minutes",
+        "scheduleToStartTimeout": "20 minutes",
+        "startToCloseTimeout": "20 seconds",
+        "heartbeatTimeout": "",
+        "workflowTaskCompletedEventId": "4",
+        "retryPolicy": {
+          "initialInterval": "5s",
+          "backoffCoefficient": 1,
+          "maximumInterval": "5s",
+          "maximumAttempts": 5,
+          "nonRetryableErrorTypes": []
+        }
+      },
+      "classification": "Scheduled",
+      "category": "activity",
+      "id": "7",
+      "name": "ActivityTaskScheduled",
+      "timestamp": "2022-07-01 UTC 20:14:48.95"
+    },
+    "timestamp": "2022-07-01 UTC 20:14:48.95",
+    "category": "activity",
+    "classification": "Scheduled",
+    "eventTime": "2022-07-01T20:14:48.954038419Z",
+    "attributes": {
+      "type": "activityTaskScheduledEventAttributes",
+      "activityId": "7",
+      "activityType": "activity.reset.base",
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "header": {
+        "fields": {}
+      },
+      "input": {
+        "payloads": [1]
+      },
+      "scheduleToCloseTimeout": "20 minutes",
+      "scheduleToStartTimeout": "20 minutes",
+      "startToCloseTimeout": "20 seconds",
+      "heartbeatTimeout": "",
+      "workflowTaskCompletedEventId": "4",
+      "retryPolicy": {
+        "initialInterval": "5s",
+        "backoffCoefficient": 1,
+        "maximumInterval": "5s",
+        "maximumAttempts": 5,
+        "nonRetryableErrorTypes": []
+      }
+    },
+    "eventList": [
+      {
+        "eventId": "7",
+        "eventTime": "2022-07-01T20:14:48.954038419Z",
+        "eventType": "ActivityTaskScheduled",
+        "version": "0",
+        "taskId": "32096676",
+        "activityTaskScheduledEventAttributes": {
+          "activityId": "7",
+          "activityType": {
+            "name": "activity.reset.base"
+          },
+          "taskQueue": {
+            "name": "canary-task-queue",
+            "kind": "Normal"
+          },
+          "header": {
+            "fields": {}
+          },
+          "input": {
+            "payloads": [1]
+          },
+          "scheduleToCloseTimeout": "1200s",
+          "scheduleToStartTimeout": "1200s",
+          "startToCloseTimeout": "20s",
+          "heartbeatTimeout": "0s",
+          "workflowTaskCompletedEventId": "4",
+          "retryPolicy": {
+            "initialInterval": "5s",
+            "backoffCoefficient": 1,
+            "maximumInterval": "5s",
+            "maximumAttempts": 5,
+            "nonRetryableErrorTypes": []
+          }
+        },
+        "attributes": {
+          "type": "activityTaskScheduledEventAttributes",
+          "activityId": "7",
+          "activityType": "activity.reset.base",
+          "taskQueue": {
+            "name": "canary-task-queue",
+            "kind": "Normal"
+          },
+          "header": {
+            "fields": {}
+          },
+          "input": {
+            "payloads": [1]
+          },
+          "scheduleToCloseTimeout": "20 minutes",
+          "scheduleToStartTimeout": "20 minutes",
+          "startToCloseTimeout": "20 seconds",
+          "heartbeatTimeout": "",
+          "workflowTaskCompletedEventId": "4",
+          "retryPolicy": {
+            "initialInterval": "5s",
+            "backoffCoefficient": 1,
+            "maximumInterval": "5s",
+            "maximumAttempts": 5,
+            "nonRetryableErrorTypes": []
+          }
+        },
+        "classification": "Scheduled",
+        "category": "activity",
+        "id": "7",
+        "name": "ActivityTaskScheduled",
+        "timestamp": "2022-07-01 UTC 20:14:48.95"
+      }
+    ],
+    "lastEvent": {
+      "eventId": "7",
+      "eventTime": "2022-07-01T20:14:48.954038419Z",
+      "eventType": "ActivityTaskScheduled",
+      "version": "0",
+      "taskId": "32096676",
+      "activityTaskScheduledEventAttributes": {
+        "activityId": "7",
+        "activityType": {
+          "name": "activity.reset.base"
+        },
+        "taskQueue": {
+          "name": "canary-task-queue",
+          "kind": "Normal"
+        },
+        "header": {
+          "fields": {}
+        },
+        "input": {
+          "payloads": [1]
+        },
+        "scheduleToCloseTimeout": "1200s",
+        "scheduleToStartTimeout": "1200s",
+        "startToCloseTimeout": "20s",
+        "heartbeatTimeout": "0s",
+        "workflowTaskCompletedEventId": "4",
+        "retryPolicy": {
+          "initialInterval": "5s",
+          "backoffCoefficient": 1,
+          "maximumInterval": "5s",
+          "maximumAttempts": 5,
+          "nonRetryableErrorTypes": []
+        }
+      },
+      "attributes": {
+        "type": "activityTaskScheduledEventAttributes",
+        "activityId": "7",
+        "activityType": "activity.reset.base",
+        "taskQueue": {
+          "name": "canary-task-queue",
+          "kind": "Normal"
+        },
+        "header": {
+          "fields": {}
+        },
+        "input": {
+          "payloads": [1]
+        },
+        "scheduleToCloseTimeout": "20 minutes",
+        "scheduleToStartTimeout": "20 minutes",
+        "startToCloseTimeout": "20 seconds",
+        "heartbeatTimeout": "",
+        "workflowTaskCompletedEventId": "4",
+        "retryPolicy": {
+          "initialInterval": "5s",
+          "backoffCoefficient": 1,
+          "maximumInterval": "5s",
+          "maximumAttempts": 5,
+          "nonRetryableErrorTypes": []
+        }
+      },
+      "classification": "Scheduled",
+      "category": "activity",
+      "id": "7",
+      "name": "ActivityTaskScheduled",
+      "timestamp": "2022-07-01 UTC 20:14:48.95"
+    },
+    "isFailureOrTimedOut": false,
+    "isCanceled": false,
+    "isTerminated": false
+  },
+  {
+    "id": "8",
+    "name": "activity.reset.base",
+    "events": {},
+    "eventIds": {},
+    "initialEvent": {
+      "eventId": "8",
+      "eventTime": "2022-07-01T20:14:48.954045336Z",
+      "eventType": "ActivityTaskScheduled",
+      "version": "0",
+      "taskId": "32096677",
+      "activityTaskScheduledEventAttributes": {
+        "activityId": "8",
+        "activityType": {
+          "name": "activity.reset.base"
+        },
+        "taskQueue": {
+          "name": "canary-task-queue",
+          "kind": "Normal"
+        },
+        "header": {
+          "fields": {}
+        },
+        "input": {
+          "payloads": [30]
+        },
+        "scheduleToCloseTimeout": "1200s",
+        "scheduleToStartTimeout": "1200s",
+        "startToCloseTimeout": "20s",
+        "heartbeatTimeout": "0s",
+        "workflowTaskCompletedEventId": "4",
+        "retryPolicy": {
+          "initialInterval": "1s",
+          "backoffCoefficient": 2,
+          "maximumInterval": "100s",
+          "maximumAttempts": 0,
+          "nonRetryableErrorTypes": []
+        }
+      },
+      "attributes": {
+        "type": "activityTaskScheduledEventAttributes",
+        "activityId": "8",
+        "activityType": "activity.reset.base",
+        "taskQueue": {
+          "name": "canary-task-queue",
+          "kind": "Normal"
+        },
+        "header": {
+          "fields": {}
+        },
+        "input": {
+          "payloads": [30]
+        },
+        "scheduleToCloseTimeout": "20 minutes",
+        "scheduleToStartTimeout": "20 minutes",
+        "startToCloseTimeout": "20 seconds",
+        "heartbeatTimeout": "",
+        "workflowTaskCompletedEventId": "4",
+        "retryPolicy": {
+          "initialInterval": "1s",
+          "backoffCoefficient": 2,
+          "maximumInterval": "100s",
+          "maximumAttempts": 0,
+          "nonRetryableErrorTypes": []
+        }
+      },
+      "classification": "Scheduled",
+      "category": "activity",
+      "id": "8",
+      "name": "ActivityTaskScheduled",
+      "timestamp": "2022-07-01 UTC 20:14:48.95"
+    },
+    "timestamp": "2022-07-01 UTC 20:14:48.95",
+    "category": "activity",
+    "classification": "Scheduled",
+    "eventTime": "2022-07-01T20:14:48.954045336Z",
+    "attributes": {
+      "type": "activityTaskScheduledEventAttributes",
+      "activityId": "8",
+      "activityType": "activity.reset.base",
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "header": {
+        "fields": {}
+      },
+      "input": {
+        "payloads": [30]
+      },
+      "scheduleToCloseTimeout": "20 minutes",
+      "scheduleToStartTimeout": "20 minutes",
+      "startToCloseTimeout": "20 seconds",
+      "heartbeatTimeout": "",
+      "workflowTaskCompletedEventId": "4",
+      "retryPolicy": {
+        "initialInterval": "1s",
+        "backoffCoefficient": 2,
+        "maximumInterval": "100s",
+        "maximumAttempts": 0,
+        "nonRetryableErrorTypes": []
+      }
+    },
+    "eventList": [
+      {
+        "eventId": "8",
+        "eventTime": "2022-07-01T20:14:48.954045336Z",
+        "eventType": "ActivityTaskScheduled",
+        "version": "0",
+        "taskId": "32096677",
+        "activityTaskScheduledEventAttributes": {
+          "activityId": "8",
+          "activityType": {
+            "name": "activity.reset.base"
+          },
+          "taskQueue": {
+            "name": "canary-task-queue",
+            "kind": "Normal"
+          },
+          "header": {
+            "fields": {}
+          },
+          "input": {
+            "payloads": [30]
+          },
+          "scheduleToCloseTimeout": "1200s",
+          "scheduleToStartTimeout": "1200s",
+          "startToCloseTimeout": "20s",
+          "heartbeatTimeout": "0s",
+          "workflowTaskCompletedEventId": "4",
+          "retryPolicy": {
+            "initialInterval": "1s",
+            "backoffCoefficient": 2,
+            "maximumInterval": "100s",
+            "maximumAttempts": 0,
+            "nonRetryableErrorTypes": []
+          }
+        },
+        "attributes": {
+          "type": "activityTaskScheduledEventAttributes",
+          "activityId": "8",
+          "activityType": "activity.reset.base",
+          "taskQueue": {
+            "name": "canary-task-queue",
+            "kind": "Normal"
+          },
+          "header": {
+            "fields": {}
+          },
+          "input": {
+            "payloads": [30]
+          },
+          "scheduleToCloseTimeout": "20 minutes",
+          "scheduleToStartTimeout": "20 minutes",
+          "startToCloseTimeout": "20 seconds",
+          "heartbeatTimeout": "",
+          "workflowTaskCompletedEventId": "4",
+          "retryPolicy": {
+            "initialInterval": "1s",
+            "backoffCoefficient": 2,
+            "maximumInterval": "100s",
+            "maximumAttempts": 0,
+            "nonRetryableErrorTypes": []
+          }
+        },
+        "classification": "Scheduled",
+        "category": "activity",
+        "id": "8",
+        "name": "ActivityTaskScheduled",
+        "timestamp": "2022-07-01 UTC 20:14:48.95"
+      }
+    ],
+    "lastEvent": {
+      "eventId": "8",
+      "eventTime": "2022-07-01T20:14:48.954045336Z",
+      "eventType": "ActivityTaskScheduled",
+      "version": "0",
+      "taskId": "32096677",
+      "activityTaskScheduledEventAttributes": {
+        "activityId": "8",
+        "activityType": {
+          "name": "activity.reset.base"
+        },
+        "taskQueue": {
+          "name": "canary-task-queue",
+          "kind": "Normal"
+        },
+        "header": {
+          "fields": {}
+        },
+        "input": {
+          "payloads": [30]
+        },
+        "scheduleToCloseTimeout": "1200s",
+        "scheduleToStartTimeout": "1200s",
+        "startToCloseTimeout": "20s",
+        "heartbeatTimeout": "0s",
+        "workflowTaskCompletedEventId": "4",
+        "retryPolicy": {
+          "initialInterval": "1s",
+          "backoffCoefficient": 2,
+          "maximumInterval": "100s",
+          "maximumAttempts": 0,
+          "nonRetryableErrorTypes": []
+        }
+      },
+      "attributes": {
+        "type": "activityTaskScheduledEventAttributes",
+        "activityId": "8",
+        "activityType": "activity.reset.base",
+        "taskQueue": {
+          "name": "canary-task-queue",
+          "kind": "Normal"
+        },
+        "header": {
+          "fields": {}
+        },
+        "input": {
+          "payloads": [30]
+        },
+        "scheduleToCloseTimeout": "20 minutes",
+        "scheduleToStartTimeout": "20 minutes",
+        "startToCloseTimeout": "20 seconds",
+        "heartbeatTimeout": "",
+        "workflowTaskCompletedEventId": "4",
+        "retryPolicy": {
+          "initialInterval": "1s",
+          "backoffCoefficient": 2,
+          "maximumInterval": "100s",
+          "maximumAttempts": 0,
+          "nonRetryableErrorTypes": []
+        }
+      },
+      "classification": "Scheduled",
+      "category": "activity",
+      "id": "8",
+      "name": "ActivityTaskScheduled",
+      "timestamp": "2022-07-01 UTC 20:14:48.95"
+    },
+    "isFailureOrTimedOut": false,
+    "isCanceled": false,
+    "isTerminated": false
+  },
+  {
+    "id": "9",
+    "name": "activity.reset.base",
+    "events": {},
+    "eventIds": {},
+    "initialEvent": {
+      "eventId": "9",
+      "eventTime": "2022-07-01T20:14:48.954048586Z",
+      "eventType": "ActivityTaskScheduled",
+      "version": "0",
+      "taskId": "32096678",
+      "activityTaskScheduledEventAttributes": {
+        "activityId": "9",
+        "activityType": {
+          "name": "activity.reset.base"
+        },
+        "taskQueue": {
+          "name": "canary-task-queue",
+          "kind": "Normal"
+        },
+        "header": {
+          "fields": {}
+        },
+        "input": {
+          "payloads": [30]
+        },
+        "scheduleToCloseTimeout": "1200s",
+        "scheduleToStartTimeout": "1200s",
+        "startToCloseTimeout": "20s",
+        "heartbeatTimeout": "0s",
+        "workflowTaskCompletedEventId": "4",
+        "retryPolicy": {
+          "initialInterval": "5s",
+          "backoffCoefficient": 1,
+          "maximumInterval": "5s",
+          "maximumAttempts": 5,
+          "nonRetryableErrorTypes": []
+        }
+      },
+      "attributes": {
+        "type": "activityTaskScheduledEventAttributes",
+        "activityId": "9",
+        "activityType": "activity.reset.base",
+        "taskQueue": {
+          "name": "canary-task-queue",
+          "kind": "Normal"
+        },
+        "header": {
+          "fields": {}
+        },
+        "input": {
+          "payloads": [30]
+        },
+        "scheduleToCloseTimeout": "20 minutes",
+        "scheduleToStartTimeout": "20 minutes",
+        "startToCloseTimeout": "20 seconds",
+        "heartbeatTimeout": "",
+        "workflowTaskCompletedEventId": "4",
+        "retryPolicy": {
+          "initialInterval": "5s",
+          "backoffCoefficient": 1,
+          "maximumInterval": "5s",
+          "maximumAttempts": 5,
+          "nonRetryableErrorTypes": []
+        }
+      },
+      "classification": "Scheduled",
+      "category": "activity",
+      "id": "9",
+      "name": "ActivityTaskScheduled",
+      "timestamp": "2022-07-01 UTC 20:14:48.95"
+    },
+    "timestamp": "2022-07-01 UTC 20:14:48.95",
+    "category": "activity",
+    "classification": "Scheduled",
+    "eventTime": "2022-07-01T20:14:48.954048586Z",
+    "attributes": {
+      "type": "activityTaskScheduledEventAttributes",
+      "activityId": "9",
+      "activityType": "activity.reset.base",
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "header": {
+        "fields": {}
+      },
+      "input": {
+        "payloads": [30]
+      },
+      "scheduleToCloseTimeout": "20 minutes",
+      "scheduleToStartTimeout": "20 minutes",
+      "startToCloseTimeout": "20 seconds",
+      "heartbeatTimeout": "",
+      "workflowTaskCompletedEventId": "4",
+      "retryPolicy": {
+        "initialInterval": "5s",
+        "backoffCoefficient": 1,
+        "maximumInterval": "5s",
+        "maximumAttempts": 5,
+        "nonRetryableErrorTypes": []
+      }
+    },
+    "eventList": [
+      {
+        "eventId": "9",
+        "eventTime": "2022-07-01T20:14:48.954048586Z",
+        "eventType": "ActivityTaskScheduled",
+        "version": "0",
+        "taskId": "32096678",
+        "activityTaskScheduledEventAttributes": {
+          "activityId": "9",
+          "activityType": {
+            "name": "activity.reset.base"
+          },
+          "taskQueue": {
+            "name": "canary-task-queue",
+            "kind": "Normal"
+          },
+          "header": {
+            "fields": {}
+          },
+          "input": {
+            "payloads": [30]
+          },
+          "scheduleToCloseTimeout": "1200s",
+          "scheduleToStartTimeout": "1200s",
+          "startToCloseTimeout": "20s",
+          "heartbeatTimeout": "0s",
+          "workflowTaskCompletedEventId": "4",
+          "retryPolicy": {
+            "initialInterval": "5s",
+            "backoffCoefficient": 1,
+            "maximumInterval": "5s",
+            "maximumAttempts": 5,
+            "nonRetryableErrorTypes": []
+          }
+        },
+        "attributes": {
+          "type": "activityTaskScheduledEventAttributes",
+          "activityId": "9",
+          "activityType": "activity.reset.base",
+          "taskQueue": {
+            "name": "canary-task-queue",
+            "kind": "Normal"
+          },
+          "header": {
+            "fields": {}
+          },
+          "input": {
+            "payloads": [30]
+          },
+          "scheduleToCloseTimeout": "20 minutes",
+          "scheduleToStartTimeout": "20 minutes",
+          "startToCloseTimeout": "20 seconds",
+          "heartbeatTimeout": "",
+          "workflowTaskCompletedEventId": "4",
+          "retryPolicy": {
+            "initialInterval": "5s",
+            "backoffCoefficient": 1,
+            "maximumInterval": "5s",
+            "maximumAttempts": 5,
+            "nonRetryableErrorTypes": []
+          }
+        },
+        "classification": "Scheduled",
+        "category": "activity",
+        "id": "9",
+        "name": "ActivityTaskScheduled",
+        "timestamp": "2022-07-01 UTC 20:14:48.95"
+      }
+    ],
+    "lastEvent": {
+      "eventId": "9",
+      "eventTime": "2022-07-01T20:14:48.954048586Z",
+      "eventType": "ActivityTaskScheduled",
+      "version": "0",
+      "taskId": "32096678",
+      "activityTaskScheduledEventAttributes": {
+        "activityId": "9",
+        "activityType": {
+          "name": "activity.reset.base"
+        },
+        "taskQueue": {
+          "name": "canary-task-queue",
+          "kind": "Normal"
+        },
+        "header": {
+          "fields": {}
+        },
+        "input": {
+          "payloads": [30]
+        },
+        "scheduleToCloseTimeout": "1200s",
+        "scheduleToStartTimeout": "1200s",
+        "startToCloseTimeout": "20s",
+        "heartbeatTimeout": "0s",
+        "workflowTaskCompletedEventId": "4",
+        "retryPolicy": {
+          "initialInterval": "5s",
+          "backoffCoefficient": 1,
+          "maximumInterval": "5s",
+          "maximumAttempts": 5,
+          "nonRetryableErrorTypes": []
+        }
+      },
+      "attributes": {
+        "type": "activityTaskScheduledEventAttributes",
+        "activityId": "9",
+        "activityType": "activity.reset.base",
+        "taskQueue": {
+          "name": "canary-task-queue",
+          "kind": "Normal"
+        },
+        "header": {
+          "fields": {}
+        },
+        "input": {
+          "payloads": [30]
+        },
+        "scheduleToCloseTimeout": "20 minutes",
+        "scheduleToStartTimeout": "20 minutes",
+        "startToCloseTimeout": "20 seconds",
+        "heartbeatTimeout": "",
+        "workflowTaskCompletedEventId": "4",
+        "retryPolicy": {
+          "initialInterval": "5s",
+          "backoffCoefficient": 1,
+          "maximumInterval": "5s",
+          "maximumAttempts": 5,
+          "nonRetryableErrorTypes": []
+        }
+      },
+      "classification": "Scheduled",
+      "category": "activity",
+      "id": "9",
+      "name": "ActivityTaskScheduled",
+      "timestamp": "2022-07-01 UTC 20:14:48.95"
+    },
+    "isFailureOrTimedOut": false,
+    "isCanceled": false,
+    "isTerminated": false
+  },
+  {
+    "id": "10",
+    "name": "Timer 10 (2s)",
+    "events": {},
+    "eventIds": {},
+    "initialEvent": {
+      "eventId": "10",
+      "eventTime": "2022-07-01T20:14:48.954050878Z",
+      "eventType": "TimerStarted",
+      "version": "0",
+      "taskId": "32096679",
+      "timerStartedEventAttributes": {
+        "timerId": "10",
+        "startToFireTimeout": "2s",
+        "workflowTaskCompletedEventId": "4"
+      },
+      "attributes": {
+        "type": "timerStartedEventAttributes",
+        "timerId": "10",
+        "startToFireTimeout": "2 seconds",
+        "workflowTaskCompletedEventId": "4"
+      },
+      "classification": "Started",
+      "category": "timer",
+      "id": "10",
+      "name": "TimerStarted",
+      "timestamp": "2022-07-01 UTC 20:14:48.95"
+    },
+    "timestamp": "2022-07-01 UTC 20:14:48.95",
+    "category": "timer",
+    "classification": "Started",
+    "eventTime": "2022-07-01T20:14:48.954050878Z",
+    "attributes": {
+      "type": "timerStartedEventAttributes",
+      "timerId": "10",
+      "startToFireTimeout": "2 seconds",
+      "workflowTaskCompletedEventId": "4"
+    },
+    "eventList": [
+      {
+        "eventId": "10",
+        "eventTime": "2022-07-01T20:14:48.954050878Z",
+        "eventType": "TimerStarted",
+        "version": "0",
+        "taskId": "32096679",
+        "timerStartedEventAttributes": {
+          "timerId": "10",
+          "startToFireTimeout": "2s",
+          "workflowTaskCompletedEventId": "4"
+        },
+        "attributes": {
+          "type": "timerStartedEventAttributes",
+          "timerId": "10",
+          "startToFireTimeout": "2 seconds",
+          "workflowTaskCompletedEventId": "4"
+        },
+        "classification": "Started",
+        "category": "timer",
+        "id": "10",
+        "name": "TimerStarted",
+        "timestamp": "2022-07-01 UTC 20:14:48.95"
+      }
+    ],
+    "lastEvent": {
+      "eventId": "10",
+      "eventTime": "2022-07-01T20:14:48.954050878Z",
+      "eventType": "TimerStarted",
+      "version": "0",
+      "taskId": "32096679",
+      "timerStartedEventAttributes": {
+        "timerId": "10",
+        "startToFireTimeout": "2s",
+        "workflowTaskCompletedEventId": "4"
+      },
+      "attributes": {
+        "type": "timerStartedEventAttributes",
+        "timerId": "10",
+        "startToFireTimeout": "2 seconds",
+        "workflowTaskCompletedEventId": "4"
+      },
+      "classification": "Started",
+      "category": "timer",
+      "id": "10",
+      "name": "TimerStarted",
+      "timestamp": "2022-07-01 UTC 20:14:48.95"
+    },
+    "isFailureOrTimedOut": false,
+    "isCanceled": false,
+    "isTerminated": false
+  },
+  {
+    "id": "11",
+    "name": "Timer 11 (30s)",
+    "events": {},
+    "eventIds": {},
+    "initialEvent": {
+      "eventId": "11",
+      "eventTime": "2022-07-01T20:14:48.954052044Z",
+      "eventType": "TimerStarted",
+      "version": "0",
+      "taskId": "32096680",
+      "timerStartedEventAttributes": {
+        "timerId": "11",
+        "startToFireTimeout": "30s",
+        "workflowTaskCompletedEventId": "4"
+      },
+      "attributes": {
+        "type": "timerStartedEventAttributes",
+        "timerId": "11",
+        "startToFireTimeout": "30 seconds",
+        "workflowTaskCompletedEventId": "4"
+      },
+      "classification": "Started",
+      "category": "timer",
+      "id": "11",
+      "name": "TimerStarted",
+      "timestamp": "2022-07-01 UTC 20:14:48.95"
+    },
+    "timestamp": "2022-07-01 UTC 20:14:48.95",
+    "category": "timer",
+    "classification": "Started",
+    "eventTime": "2022-07-01T20:14:48.954052044Z",
+    "attributes": {
+      "type": "timerStartedEventAttributes",
+      "timerId": "11",
+      "startToFireTimeout": "30 seconds",
+      "workflowTaskCompletedEventId": "4"
+    },
+    "eventList": [
+      {
+        "eventId": "11",
+        "eventTime": "2022-07-01T20:14:48.954052044Z",
+        "eventType": "TimerStarted",
+        "version": "0",
+        "taskId": "32096680",
+        "timerStartedEventAttributes": {
+          "timerId": "11",
+          "startToFireTimeout": "30s",
+          "workflowTaskCompletedEventId": "4"
+        },
+        "attributes": {
+          "type": "timerStartedEventAttributes",
+          "timerId": "11",
+          "startToFireTimeout": "30 seconds",
+          "workflowTaskCompletedEventId": "4"
+        },
+        "classification": "Started",
+        "category": "timer",
+        "id": "11",
+        "name": "TimerStarted",
+        "timestamp": "2022-07-01 UTC 20:14:48.95"
+      }
+    ],
+    "lastEvent": {
+      "eventId": "11",
+      "eventTime": "2022-07-01T20:14:48.954052044Z",
+      "eventType": "TimerStarted",
+      "version": "0",
+      "taskId": "32096680",
+      "timerStartedEventAttributes": {
+        "timerId": "11",
+        "startToFireTimeout": "30s",
+        "workflowTaskCompletedEventId": "4"
+      },
+      "attributes": {
+        "type": "timerStartedEventAttributes",
+        "timerId": "11",
+        "startToFireTimeout": "30 seconds",
+        "workflowTaskCompletedEventId": "4"
+      },
+      "classification": "Started",
+      "category": "timer",
+      "id": "11",
+      "name": "TimerStarted",
+      "timestamp": "2022-07-01 UTC 20:14:48.95"
+    },
+    "isFailureOrTimedOut": false,
+    "isCanceled": false,
+    "isTerminated": false
+  },
+  {
+    "id": "12",
+    "name": "Signal received: signalBeforeReset",
+    "events": {},
+    "eventIds": {},
+    "initialEvent": {
+      "eventId": "12",
+      "eventTime": "2022-07-01T20:14:48.972339419Z",
+      "eventType": "WorkflowExecutionSignaled",
+      "version": "0",
+      "taskId": "32096693",
+      "workflowExecutionSignaledEventAttributes": {
+        "signalName": "signalBeforeReset",
+        "input": {
+          "payloads": ["signalValue"]
+        },
+        "identity": "history-service",
+        "header": {
+          "fields": {}
+        }
+      },
+      "attributes": {
+        "type": "workflowExecutionSignaledEventAttributes",
+        "signalName": "signalBeforeReset",
+        "input": {
+          "payloads": ["signalValue"]
+        },
+        "identity": "history-service",
+        "header": {
+          "fields": {}
+        }
+      },
+      "classification": "Signaled",
+      "category": "signal",
+      "id": "12",
+      "name": "WorkflowExecutionSignaled",
+      "timestamp": "2022-07-01 UTC 20:14:48.97"
+    },
+    "timestamp": "2022-07-01 UTC 20:14:48.97",
+    "category": "signal",
+    "classification": "Signaled",
+    "eventTime": "2022-07-01T20:14:48.972339419Z",
+    "attributes": {
+      "type": "workflowExecutionSignaledEventAttributes",
+      "signalName": "signalBeforeReset",
+      "input": {
+        "payloads": ["signalValue"]
+      },
+      "identity": "history-service",
+      "header": {
+        "fields": {}
+      }
+    },
+    "eventList": [
+      {
+        "eventId": "12",
+        "eventTime": "2022-07-01T20:14:48.972339419Z",
+        "eventType": "WorkflowExecutionSignaled",
+        "version": "0",
+        "taskId": "32096693",
+        "workflowExecutionSignaledEventAttributes": {
+          "signalName": "signalBeforeReset",
+          "input": {
+            "payloads": ["signalValue"]
+          },
+          "identity": "history-service",
+          "header": {
+            "fields": {}
+          }
+        },
+        "attributes": {
+          "type": "workflowExecutionSignaledEventAttributes",
+          "signalName": "signalBeforeReset",
+          "input": {
+            "payloads": ["signalValue"]
+          },
+          "identity": "history-service",
+          "header": {
+            "fields": {}
+          }
+        },
+        "classification": "Signaled",
+        "category": "signal",
+        "id": "12",
+        "name": "WorkflowExecutionSignaled",
+        "timestamp": "2022-07-01 UTC 20:14:48.97"
+      }
+    ],
+    "lastEvent": {
+      "eventId": "12",
+      "eventTime": "2022-07-01T20:14:48.972339419Z",
+      "eventType": "WorkflowExecutionSignaled",
+      "version": "0",
+      "taskId": "32096693",
+      "workflowExecutionSignaledEventAttributes": {
+        "signalName": "signalBeforeReset",
+        "input": {
+          "payloads": ["signalValue"]
+        },
+        "identity": "history-service",
+        "header": {
+          "fields": {}
+        }
+      },
+      "attributes": {
+        "type": "workflowExecutionSignaledEventAttributes",
+        "signalName": "signalBeforeReset",
+        "input": {
+          "payloads": ["signalValue"]
+        },
+        "identity": "history-service",
+        "header": {
+          "fields": {}
+        }
+      },
+      "classification": "Signaled",
+      "category": "signal",
+      "id": "12",
+      "name": "WorkflowExecutionSignaled",
+      "timestamp": "2022-07-01 UTC 20:14:48.97"
+    },
+    "isFailureOrTimedOut": false,
+    "isCanceled": false,
+    "isTerminated": false
+  },
+  {
+    "id": "25",
+    "name": "Signal: signalToTrigger",
+    "events": {},
+    "eventIds": {},
+    "initialEvent": {
+      "eventId": "25",
+      "eventTime": "2022-07-01T20:14:50.970075337Z",
+      "eventType": "SignalExternalWorkflowExecutionInitiated",
+      "version": "0",
+      "taskId": "32096875",
+      "signalExternalWorkflowExecutionInitiatedEventAttributes": {
+        "workflowTaskCompletedEventId": "24",
+        "namespace": "canary",
+        "workflowExecution": {
+          "workflowId": "temporal.fixture.terminated.workflow.id",
+          "runId": "3cbbf515-36da-43b9-a1f3-18a7ec031ddd"
+        },
+        "signalName": "signalToTrigger",
+        "input": {
+          "payloads": ["signalValue"]
+        },
+        "control": "25",
+        "childWorkflowOnly": false,
+        "header": {
+          "fields": {}
+        }
+      },
+      "attributes": {
+        "type": "signalExternalWorkflowExecutionInitiatedEventAttributes",
+        "workflowTaskCompletedEventId": "24",
+        "namespace": "canary",
+        "workflowExecution": {
+          "workflowId": "temporal.fixture.terminated.workflow.id",
+          "runId": "3cbbf515-36da-43b9-a1f3-18a7ec031ddd"
+        },
+        "signalName": "signalToTrigger",
+        "input": {
+          "payloads": ["signalValue"]
+        },
+        "control": "25",
+        "childWorkflowOnly": false,
+        "header": {
+          "fields": {}
+        }
+      },
+      "classification": "Initiated",
+      "category": "signal",
+      "id": "25",
+      "name": "SignalExternalWorkflowExecutionInitiated",
+      "timestamp": "2022-07-01 UTC 20:14:50.97"
+    },
+    "timestamp": "2022-07-01 UTC 20:14:50.97",
+    "category": "signal",
+    "classification": "Initiated",
+    "eventTime": "2022-07-01T20:14:50.970075337Z",
+    "attributes": {
+      "type": "signalExternalWorkflowExecutionInitiatedEventAttributes",
+      "workflowTaskCompletedEventId": "24",
+      "namespace": "canary",
+      "workflowExecution": {
+        "workflowId": "temporal.fixture.terminated.workflow.id",
+        "runId": "3cbbf515-36da-43b9-a1f3-18a7ec031ddd"
+      },
+      "signalName": "signalToTrigger",
+      "input": {
+        "payloads": ["signalValue"]
+      },
+      "control": "25",
+      "childWorkflowOnly": false,
+      "header": {
+        "fields": {}
+      }
+    },
+    "eventList": [
+      {
+        "eventId": "25",
+        "eventTime": "2022-07-01T20:14:50.970075337Z",
+        "eventType": "SignalExternalWorkflowExecutionInitiated",
+        "version": "0",
+        "taskId": "32096875",
+        "signalExternalWorkflowExecutionInitiatedEventAttributes": {
+          "workflowTaskCompletedEventId": "24",
+          "namespace": "canary",
+          "workflowExecution": {
+            "workflowId": "temporal.fixture.terminated.workflow.id",
+            "runId": "3cbbf515-36da-43b9-a1f3-18a7ec031ddd"
+          },
+          "signalName": "signalToTrigger",
+          "input": {
+            "payloads": ["signalValue"]
+          },
+          "control": "25",
+          "childWorkflowOnly": false,
+          "header": {
+            "fields": {}
+          }
+        },
+        "attributes": {
+          "type": "signalExternalWorkflowExecutionInitiatedEventAttributes",
+          "workflowTaskCompletedEventId": "24",
+          "namespace": "canary",
+          "workflowExecution": {
+            "workflowId": "temporal.fixture.terminated.workflow.id",
+            "runId": "3cbbf515-36da-43b9-a1f3-18a7ec031ddd"
+          },
+          "signalName": "signalToTrigger",
+          "input": {
+            "payloads": ["signalValue"]
+          },
+          "control": "25",
+          "childWorkflowOnly": false,
+          "header": {
+            "fields": {}
+          }
+        },
+        "classification": "Initiated",
+        "category": "signal",
+        "id": "25",
+        "name": "SignalExternalWorkflowExecutionInitiated",
+        "timestamp": "2022-07-01 UTC 20:14:50.97"
+      }
+    ],
+    "lastEvent": {
+      "eventId": "25",
+      "eventTime": "2022-07-01T20:14:50.970075337Z",
+      "eventType": "SignalExternalWorkflowExecutionInitiated",
+      "version": "0",
+      "taskId": "32096875",
+      "signalExternalWorkflowExecutionInitiatedEventAttributes": {
+        "workflowTaskCompletedEventId": "24",
+        "namespace": "canary",
+        "workflowExecution": {
+          "workflowId": "temporal.fixture.terminated.workflow.id",
+          "runId": "3cbbf515-36da-43b9-a1f3-18a7ec031ddd"
+        },
+        "signalName": "signalToTrigger",
+        "input": {
+          "payloads": ["signalValue"]
+        },
+        "control": "25",
+        "childWorkflowOnly": false,
+        "header": {
+          "fields": {}
+        }
+      },
+      "attributes": {
+        "type": "signalExternalWorkflowExecutionInitiatedEventAttributes",
+        "workflowTaskCompletedEventId": "24",
+        "namespace": "canary",
+        "workflowExecution": {
+          "workflowId": "temporal.fixture.terminated.workflow.id",
+          "runId": "3cbbf515-36da-43b9-a1f3-18a7ec031ddd"
+        },
+        "signalName": "signalToTrigger",
+        "input": {
+          "payloads": ["signalValue"]
+        },
+        "control": "25",
+        "childWorkflowOnly": false,
+        "header": {
+          "fields": {}
+        }
+      },
+      "classification": "Initiated",
+      "category": "signal",
+      "id": "25",
+      "name": "SignalExternalWorkflowExecutionInitiated",
+      "timestamp": "2022-07-01 UTC 20:14:50.97"
+    },
+    "isFailureOrTimedOut": false,
+    "isCanceled": false,
+    "isTerminated": false
+  }
+]

@@ -1,5 +1,4 @@
 import { isEventGroup } from '$lib/models/event-groups';
-import { getLastEvent } from '$lib/models/event-groups/get-last-event';
 import { capitalize } from '$lib/utilities/format-camel-case';
 
 type SummaryAttribute = {
@@ -139,12 +138,10 @@ const getSummaryAttribute = (event: WorkflowEvent): SummaryAttribute => {
   return first;
 };
 
-export const getSummaryForEventGroup = (
-  eventGroup: EventGroup,
-): SummaryAttribute => {
-  const event = getLastEvent(eventGroup);
-
-  return getSummaryAttribute(event);
+export const getSummaryForEventGroup = ({
+  lastEvent,
+}: EventGroup): SummaryAttribute => {
+  return getSummaryAttribute(lastEvent);
 };
 
 export const getSingleAttributeForEvent = (
