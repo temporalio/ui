@@ -35,21 +35,13 @@ export const updateQueryParameters = async ({
   }
 
   if (browser && url.href !== window.location.href) {
-    goto(String(url), gotoOptions);
+    goto(addHashToURL(url), gotoOptions);
   }
 
   return value;
 };
 
 export const addHashToURL = (url: URL): string => {
-  const { href } = url;
-
-  if (href.includes('#')) return href;
-
-  if (href.includes('?')) {
-    const [before, after] = href.split('?');
-    return `${before}#?${after}`;
-  }
-
-  return href + '#';
+  url.hash = '#';
+  return String(url);
 };

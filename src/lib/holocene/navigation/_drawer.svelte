@@ -71,7 +71,7 @@
 
   .flyin {
     animation-name: flyin;
-    animation-duration: 0.6s;
+    animation-duration: 0.3s;
     animation-iteration-count: 1;
     animation-direction: normal;
     animation-timing-function: ease-in-out;
@@ -79,7 +79,7 @@
   }
   .flyout {
     animation-name: flyout;
-    animation-duration: 0.6s;
+    animation-duration: 0.3s;
     animation-iteration-count: 1;
     animation-direction: normal;
     animation-timing-function: ease-in-out;
@@ -89,7 +89,7 @@
   @media (max-width: 640px) {
     .flyin {
       animation-name: flyinSmall;
-      animation-duration: 0.6s;
+      animation-duration: 0.3s;
       animation-iteration-count: 1;
       animation-direction: normal;
       animation-timing-function: ease-in-out;
@@ -97,7 +97,7 @@
     }
     .flyout {
       animation-name: flyoutSmall;
-      animation-duration: 0.6s;
+      animation-duration: 0.3s;
       animation-iteration-count: 1;
       animation-direction: normal;
       animation-timing-function: ease-in-out;
