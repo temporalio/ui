@@ -22,7 +22,7 @@
   let:initialItem
 >
   <EventSummaryTable {compact} on:expandAll={handleExpandChange}>
-    {#each visibleItems as event (event.id)}
+    {#each visibleItems as event (`${event.id}-${event.timestamp}`)}
       <EventSummaryRow
         {event}
         {groups}
