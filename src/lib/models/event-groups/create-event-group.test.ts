@@ -35,6 +35,12 @@ const completedEvent = {
     startedEventId: '6',
     identity: '21665@temporal@',
   },
+  attributes: {
+    result: null,
+    scheduledEventId: '5',
+    startedEventId: '6',
+    identity: '21665@temporal@',
+  },
 } as unknown as ActivityTaskCompletedEvent;
 
 describe('createEventGroup', () => {
@@ -62,5 +68,73 @@ describe('createEventGroup', () => {
 
     expect(group.events.size).toBe(2);
     expect(group.events.get('ActivityTaskCompleted')).toBe(completedEvent);
+  });
+
+  it('should have the event time of the last event', () => {
+    const group = createEventGroup(scheduledEvent);
+    group.events.set(completedEvent.eventType, completedEvent);
+
+    expect(group.eventTime).toBe(completedEvent.eventTime);
+  });
+
+  it('should have the attributes of the last event', () => {
+    const group = createEventGroup(scheduledEvent);
+    group.events.set(completedEvent.eventType, completedEvent);
+
+    expect(group.attributes).toBe(completedEvent.attributes);
+  });
+
+  it('should create a group from a startChildWorkflowExecutionInitiatedEvent', () => {
+    const event = {
+      id: '123',
+      eventId: '123',
+      startChildWorkflowExecutionInitiatedEventAttributes: {},
+    } as unknown as WorkflowEvent;
+
+    expect(createEventGroup(event).id).toBe(event.id);
+  });
+
+  it('should create a group from a timerStartedEvent', () => {
+    const event = {
+      id: '123',
+      eventId: '123',
+      timerStartedEventAttributes: {},
+    } as unknown as WorkflowEvent;
+
+    expect(createEventGroup(event).id).toBe(event.id);
+  });
+
+  it('should create a group from a signalExternalWorkflowExecutionInitiatedEvent', () => {
+    const event = {
+      id: '123',
+      eventId: '123',
+      signalExternalWorkflowExecutionInitiatedEventAttributes: {},
+    } as unknown as WorkflowEvent;
+
+    expect(createEventGroup(event).id).toBe(event.id);
+  });
+
+  it('should create a group from a workflowExecutionSignaledEvent', () => {
+    const event = {
+      id: '123',
+      eventId: '123',
+      workflowExecutionSignaledEventAttributes: {},
+    } as unknown as WorkflowEvent;
+
+    expect(createEventGroup(event).id).toBe(event.id);
+  });
+
+  it('should create a group from a markerRecordedEvent', () => {
+    const event = {
+      id: '123',
+      eventId: '123',
+      markerRecordedEventAttributes: {},
+    } as unknown as WorkflowEvent;
+
+    expect(createEventGroup(event).id).toBe(event.id);
+  });
+
+  it('should ignore an event that should not create an event group', () => {
+    expect(createEventGroup(completedEvent)).toBeUndefined();
   });
 });
