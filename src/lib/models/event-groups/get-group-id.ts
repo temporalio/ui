@@ -7,6 +7,7 @@ import {
   isActivityTaskTimedOutEvent,
   isChildWorkflowExecutionCompletedEvent,
   isChildWorkflowExecutionStartedEvent,
+  isChildWorkflowExecutionTerminatedEvent,
   isTimerCanceledEvent,
   isTimerFiredEvent,
 } from '$lib/utilities/is-event-type';
@@ -40,6 +41,12 @@ export const getGroupId = (event: CommonHistoryEvent): string => {
   if (isChildWorkflowExecutionStartedEvent(event)) {
     return String(
       event.childWorkflowExecutionStartedEventAttributes.initiatedEventId,
+    );
+  }
+
+  if (isChildWorkflowExecutionTerminatedEvent(event)) {
+    return String(
+      event.childWorkflowExecutionTerminatedEventAttributes.initiatedEventId,
     );
   }
 
