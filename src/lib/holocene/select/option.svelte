@@ -17,7 +17,8 @@
 
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/index.svelte';
+  import MenuItem from '$holocene/primatives/menu/menu-item.svelte';
 
   type T = $$Generic;
 
@@ -41,7 +42,7 @@
   }
 </script>
 
-<div on:click={handleOptionClick} class="option" class:dark>
+<MenuItem on:click={handleOptionClick} class="p-4 hover:bg-gray-50" {dark}>
   <div class="mr-2 w-6">
     {#if selected}
       <Icon stroke="currentcolor" name="checkMark" scale={0.9} />
@@ -55,22 +56,14 @@
       </span>
     {/if}
   </div>
-</div>
+</MenuItem>
 
 <style lang="postcss">
-  .option {
-    @apply flex w-full cursor-pointer flex-row rounded-sm bg-white p-4 text-gray-900 hover:bg-gray-50;
-  }
-
   .option-label {
     @apply flex font-poppins font-medium;
   }
 
   .option-description {
     @apply flex font-inter font-normal;
-  }
-
-  .option.dark {
-    @apply bg-gray-900 text-white hover:bg-gray-800;
   }
 </style>

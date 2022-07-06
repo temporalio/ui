@@ -26,10 +26,7 @@
   }
 </script>
 
-<div
-  on:click={handleClick}
-  class="mt-4 cursor-pointer rounded-sm border p-4 hover:bg-gray-50"
->
+<div on:click={handleClick} class="mt-4 rounded-sm border p-4 hover:bg-gray-50">
   <h2 class="mb-4">{description}</h2>
   {#if !Component && $$slots.default}
     <slot />

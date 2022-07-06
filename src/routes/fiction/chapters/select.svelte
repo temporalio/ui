@@ -58,10 +58,6 @@
   const favoriteAnimal = writable<OptionType>(animalOptions[2]);
   const favoriteNumber = writable<OptionType>();
   const favoriteLetter = writable<string>();
-
-  function handleAnimalClick(event: CustomEvent<{ value: OptionType }>) {
-    favoriteAnimal.set(event.detail.value);
-  }
 </script>
 
 <Chapter description="A select dropdown">
@@ -70,7 +66,7 @@
     id="favorite-drink"
     options={drinkOptions}
     value={$favoriteDrink}
-    on:change={(event) => favoriteDrink.set(event.detail.value)}
+    on:select={(event) => favoriteDrink.set(event.detail.value)}
   />
 </Chapter>
 
@@ -83,7 +79,7 @@
     dark
     options={foodOptions}
     value={$favoriteFood}
-    on:change={(event) => favoriteFood.set(event.detail.value)}
+    on:select={(event) => favoriteFood.set(event.detail.value)}
   />
 </Chapter>
 
@@ -92,8 +88,9 @@
     {#each animalOptions as option}
       <Option
         value={option}
-        on:select={handleAnimalClick}
+        on:select={(event) => favoriteAnimal.set(event.detail.value)}
         selected={option.value == $favoriteAnimal.value}
+        let:handleOptionClick
       />
     {/each}
   </Select>
@@ -104,7 +101,7 @@
     label="Favorite Number"
     id="favorite-number"
     value={$favoriteNumber}
-    on:change={(event) => favoriteNumber.set(event.detail.value)}
+    on:select={(event) => favoriteNumber.set(event.detail.value)}
     options={new Array(20)
       .fill(undefined)
       .map((_, i) => ({ label: `Number ${i}`, value: i }))}

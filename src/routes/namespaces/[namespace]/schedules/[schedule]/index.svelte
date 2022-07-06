@@ -126,6 +126,7 @@
       <SplitButton
         right
         label={schedule?.schedule?.state?.paused ? 'Unpause' : 'Pause'}
+        id="pause-schedule-button"
         on:click={() => (showPauseConfirmation = !showPauseConfirmation)}
       >
         {#each options as option}

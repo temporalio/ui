@@ -1,73 +1,47 @@
 <script lang="ts">
-  import { fly } from 'svelte/transition';
-  import { clickOutside } from '$holocene/outside-click';
   import Icon from '$holocene/icon/index.svelte';
+  import MenuContainer from './primatives/menu/menu-container.svelte';
+  import MenuButton from './primatives/menu/menu-button.svelte';
+  import Menu from './primatives/menu/menu.svelte';
   export let label: string;
+  export let id: string;
   export let disabled: boolean = false;
   export let left: boolean = false;
   export let right: boolean = false;
 
-  let showDropdown: boolean = false;
-  const handleClick = () => {
-    if (!disabled) {
-      showDropdown = !showDropdown;
-    }
-  };
+  let show: boolean = false;
 </script>
 
-<div
-  class="relative inline-block"
-  on:click={handleClick}
-  use:clickOutside
-  on:click-outside={() => (showDropdown = false)}
->
-  <div class="split-button" class:disabled>
-    <button {disabled} class="segment rounded-l px-4" on:click>
-      {label}
-    </button>
-    <div class="segment rounded-r px-2">
-      <Icon stroke="currentcolor" name="caretDown" />
+<MenuContainer class={$$props.class}>
+  <MenuButton bind:show controls={id} class={$$props.class} {disabled} on:click>
+    <div class="split-button" class:disabled>
+      <button tabindex="-1" {disabled} class="segment rounded-l px-4">
+        {label}
+      </button>
+      <div class="segment rounded-r px-2">
+        <Icon stroke="currentcolor" name="caretDown" />
+      </div>
     </div>
-  </div>
-  {#if showDropdown}
-    <div
-      in:fly={{ duration: 100 }}
-      out:fly={{ duration: 100 }}
-      class="dropdown"
-      class:left
-      class:right
-    >
-      <slot />
-    </div>
-  {/if}
-</div>
+  </MenuButton>
+  <Menu class="split-button-menu" {id} {show} {left} {right}>
+    <slot />
+  </Menu>
+</MenuContainer>
 
 <style lang="postcss">
   .split-button {
     @apply flex grow cursor-pointer flex-row gap-[1px] font-poppins;
   }
 
-  .right {
-    @apply right-0 origin-top-right;
-  }
-
-  .left {
-    @apply left-0 origin-top-left;
-  }
-
   .split-button.disabled {
     @apply cursor-not-allowed opacity-50;
   }
 
-  .segment:disabled {
-    @apply cursor-not-allowed;
+  :global(.split-button-menu) {
+    @apply flex min-w-max flex-col items-start gap-y-4 border-gray-300 p-3 px-6 font-poppins text-sm;
   }
 
   .segment {
     @apply inline-block bg-gray-900 py-2 text-sm text-white shadow;
-  }
-
-  .dropdown {
-    @apply absolute z-50 mt-1 flex min-w-max flex-col gap-y-4 rounded-lg border border-gray-300 bg-white p-3 px-6 font-poppins text-sm shadow;
   }
 </style>
