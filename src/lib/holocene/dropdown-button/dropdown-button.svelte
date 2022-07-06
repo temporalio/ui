@@ -7,7 +7,7 @@
 
   export let label: string;
   export let id: string;
-  export let icon: IconName = null;
+  export let icon: IconName = '';
   export let readonly = false;
 
   let show = false;
