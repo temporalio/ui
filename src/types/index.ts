@@ -16,6 +16,16 @@ export type GetSearchAttributesResponse =
   temporal.api.workflowservice.v1.IGetSearchAttributesResponse;
 export type ListWorkflowExecutionsResponse =
   temporal.api.workflowservice.v1.IListWorkflowExecutionsResponse;
+export type ListScheduleResponse =
+  temporal.api.workflowservice.v1.IListSchedulesResponse;
+export type DescribeScheduleResponse =
+  temporal.api.workflowservice.v1.IDescribeScheduleResponse;
+export type CreateScheduleRequest =
+  temporal.api.workflowservice.v1.ICreateScheduleRequest;
+export type PatchScheduleRequest =
+  temporal.api.workflowservice.v1.IPatchScheduleRequest;
+export type UpdateScheduleRequest =
+  temporal.api.workflowservice.v1.IUpdateScheduleRequest;
 
 // api.history
 
@@ -122,6 +132,18 @@ export type Payloads = temporal.api.common.v1.IPayloads;
 
 export type PollerInfo = temporal.api.taskqueue.v1.IPollerInfo;
 export type TaskQueueStatus = temporal.api.taskqueue.v1.ITaskQueueStatus;
+
+// api.schedule
+
+export type ScheduleListEntry = temporal.api.schedule.v1.IScheduleListEntry;
+export type ScheduleSpec = temporal.api.schedule.v1.IScheduleSpec;
+export type ScheduleState = temporal.api.schedule.v1.IScheduleState;
+export type SchedulePolicies = temporal.api.schedule.v1.ISchedulePolicies;
+
+export type CalendarSpec = temporal.api.schedule.v1.ICalendarSpec;
+export type IntervalSpec = temporal.api.schedule.v1.IIntervalSpec;
+export type ScheduleActionResult =
+  temporal.api.schedule.v1.IScheduleActionResult;
 
 // google
 

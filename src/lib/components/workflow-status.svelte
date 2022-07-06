@@ -1,7 +1,7 @@
 <script lang="ts">
   import HeartBeat from './heart-beat-indicator.svelte';
 
-  export let status: WorkflowExecutionStatus | string;
+  export let status: WorkflowExecutionStatus | string = 'Running';
   export let delay: number = 0;
 
   const humanFriendlyNames = {
@@ -12,6 +12,7 @@
     ContinuedAsNew: 'Continued as New',
     Canceled: 'Canceled',
     Terminated: 'Terminated',
+    Paused: 'Paused',
   };
 
   const colors = {
@@ -22,6 +23,7 @@
     ContinuedAsNew: 'indigo',
     Canceled: 'yellow',
     Terminated: 'pink',
+    Paused: 'yellow',
   };
 
   $: color = colors[status];

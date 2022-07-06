@@ -15,7 +15,7 @@
 </script>
 
 <a
-  class="flex items-center justify-center border-2 py-2 px-4 text-sm hover:bg-gray-600 hover:text-white"
+  class="flex items-center justify-center border border-gray-900 py-2 px-4 text-sm {$$props.class}"
   class:rounded-lg={!group}
   class:active={$page.url.pathname.includes(base) || active}
   class:group
@@ -26,7 +26,7 @@
 >
   {#if icon}
     <div class="flex items-center gap-2">
-      <Icon color="currentcolor" name={icon} {scale} />
+      <Icon stroke="currentColor" name={icon} {scale} />
       <span class="hidden md:block"><slot /></span>
     </div>
   {:else}

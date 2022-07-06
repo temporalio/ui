@@ -1,18 +1,20 @@
 <script lang="ts">
+  import { page } from '$app/stores';
+
   import Icon from '$lib/holocene/icon/index.svelte';
+  import EmptyState from './empty-state.svelte';
 
   export let namespaceList: null | Promise<
     { namespace: string; href: string; onClick: () => void }[]
   >;
-  export let activeNamespace: string | undefined | null;
 
   $: searchValue = '';
 </script>
 
 <div class="prose mt-16 mb-8">
   <h2 class="text-2xl">Select a namespace</h2>
-  {#if activeNamespace}
-    <p>You are currently viewing {activeNamespace}</p>
+  {#if $page.params?.namespace}
+    <p>You are currently viewing {$page.params.namespace}</p>
   {/if}
 </div>
 
@@ -34,17 +36,19 @@
           on:click={() => namespace?.onClick()}
         >
           <div class="w-6 h-6 pl-3 active">
-            {#if namespace.namespace === activeNamespace}
+            {#if namespace.namespace === $page.params?.namespace}
               <Icon stroke="currentcolor" name="checkMark" />
             {/if}
           </div>
           <a
             href={namespace.href}
             class="link"
-            class:active={activeNamespace === namespace.namespace}
+            class:active={namespace.namespace === $page.params?.namespace}
             >{namespace.namespace}</a
           >
         </li>
+      {:else}
+        <EmptyState title="No Namespaces" />
       {/each}
     {:else}
       No Namespaces

@@ -10,6 +10,7 @@
   export let login: boolean = false;
   export let thin: boolean = false;
   export let href: string = null;
+  export let target: '_self' | '_external' = '_self';
   export let active: boolean = false;
   export let large: boolean = false;
   export let as: 'button' | 'anchor' = href ? 'anchor' : 'button';
@@ -65,6 +66,7 @@
     class:login
     class:thin
     data-cy={dataCy}
+    {target}
     {disabled}
   >
     {#if icon || loading}

@@ -9,7 +9,9 @@ type RouteParameters = {
   view?: EventView | string;
   queryParams?: Record<string, string>;
   eventId: string;
+  scheduleId: string;
   queue: string;
+  schedule: string;
 };
 
 export const isEventView = (view: string): view is EventView => {
@@ -23,6 +25,10 @@ export type NamespaceParameter = Pick<RouteParameters, 'namespace'>;
 export type WorkflowParameters = Pick<
   RouteParameters,
   'namespace' | 'workflow' | 'run'
+>;
+export type ScheduleParameters = Pick<
+  RouteParameters,
+  'namespace' | 'scheduleId'
 >;
 export type EventHistoryParameters = Pick<
   RouteParameters,
@@ -66,6 +72,25 @@ export const routeForWorkflow = ({
   const wid = encodeURIForSvelte(workflow);
 
   return `${routeForWorkflows(parameters)}/${wid}/${run}`;
+};
+
+export const routeForSchedules = (parameters: NamespaceParameter): string => {
+  return `${routeForNamespace(parameters)}/schedules`;
+};
+
+export const routeForScheduleCreate = ({
+  namespace,
+}: NamespaceParameter): string => {
+  return `${routeForSchedules({ namespace })}/new`;
+};
+
+export const routeForSchedule = ({
+  scheduleId,
+  namespace,
+}: ScheduleParameters): string => {
+  const sid = encodeURIForSvelte(scheduleId);
+
+  return `${routeForSchedules({ namespace })}/${sid}`;
 };
 
 export const routeForEventHistory = ({

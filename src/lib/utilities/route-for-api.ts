@@ -31,6 +31,7 @@ const encode = (parameters: APIRouteParameters): APIRouteParameters => {
     {
       namespace: '',
       workflowId: '',
+      scheduleId: '',
       runId: '',
       queue: '',
     },
@@ -43,8 +44,17 @@ export function routeForApi(
   shouldEncode?: boolean,
 ): string;
 export function routeForApi(
+  route: SchedulesAPIRoutePath,
+  parameters: ScheduleListRouteParameters,
+): string;
+export function routeForApi(
   route: WorkflowAPIRoutePath,
   parameters: WorkflowRouteParameters,
+  shouldEncode?: boolean,
+): string;
+export function routeForApi(
+  route: ScheduleAPIRoutePath,
+  parameters: ScheduleRouteParameters,
   shouldEncode?: boolean,
 ): string;
 export function routeForApi(
@@ -73,6 +83,9 @@ export function routeForApi(
     'events.ascending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/events`,
     'events.descending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/events/reverse`,
     query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/query`,
+    schedules: `/namespaces/${parameters?.namespace}/schedules`,
+    schedule: `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}`,
+    'schedule.delete': `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}`,
   };
 
   return withBase(routes[route], parameters?.namespace);

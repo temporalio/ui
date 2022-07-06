@@ -6,6 +6,7 @@
   import {
     routeForArchivalWorkfows,
     routeForWorkflows,
+    routeForSchedules,
     routeForNamespaces,
   } from '$lib/utilities/route-for';
 
@@ -24,6 +25,12 @@
       (namespace: string) =>
         showTemporalSystemNamespace || namespace !== 'temporal-system',
     );
+
+  $: activeNamespaceName = $page.params?.namespace ?? $lastUsedNamespace;
+  $: activeNamespace = ($page.stuff.namespaces || []).find(
+    (namespace: Namespace) =>
+      namespace?.namespaceInfo?.name === activeNamespaceName,
+  );
 
   const namespaceList = namespaces.map((namespace: string) => {
     const href = routeForWorkflows({ namespace });
@@ -51,10 +58,11 @@
   }
 
   $: linkList = {
-    home: routeForWorkflows({ namespace: $lastUsedNamespace }),
-    archive: routeForArchivalWorkfows({ namespace: $lastUsedNamespace }),
+    home: routeForWorkflows({ namespace: activeNamespaceName }),
+    archive: routeForArchivalWorkfows({ namespace: activeNamespaceName }),
     namespaces: routeForNamespaces(),
-    workflows: routeForWorkflows({ namespace: $lastUsedNamespace }),
+    schedules: routeForSchedules({ namespace: activeNamespaceName }),
+    workflows: routeForWorkflows({ namespace: activeNamespaceName }),
     feedback:
       $page.stuff?.settings?.feedbackURL ||
       'https://github.com/temporalio/ui/issues/new/choose',
@@ -65,7 +73,7 @@
 
 <Navigation
   namespaceList={Promise.resolve(namespaceList)}
-  activeNamespace={$lastUsedNamespace}
+  {activeNamespace}
   {linkList}
   {isCloud}
   user={Promise.resolve(user)}
