@@ -32,7 +32,6 @@ export const fields: Record<string, FormField> = {
     key: 'schedule.spec.interval.interval',
     label: 'Interval',
     placeholder: '86400s',
-    hint: 'Example: 60s or 10.000001s',
     required: false,
   },
   phase: {

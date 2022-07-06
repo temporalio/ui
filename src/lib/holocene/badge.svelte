@@ -7,7 +7,7 @@
 </script>
 
 <div
-  class="{type} flex h-8 w-fit flex-row items-center justify-center rounded-sm px-1 text-sm font-medium transition-colors {$$props.class}"
+  class="{type} flex w-fit flex-row items-center justify-center rounded-sm p-1 text-sm font-medium transition-colors {$$props.class}"
 >
   <slot />
 </div>

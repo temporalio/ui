@@ -97,7 +97,7 @@
             <FormInput field={fields.dayOfWeek} />
           </div>
         </div>
-        <div class="mb-4 flex flex w-full gap-4 md:w-2/3 xl:w-1/2">
+        <div class="mb-4 flex flex w-full gap-4">
           <div class="w-1/3">
             <FormInput field={fields.hour} />
           </div>

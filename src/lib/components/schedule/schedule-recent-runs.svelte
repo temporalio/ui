@@ -16,9 +16,7 @@
 
 <Panel>
   <h2 class="mb-4 text-2xl">Recent Runs</h2>
-  {#each recentRuns
-    .sort((a, b) => new Date(b.actualTime) - new Date(a.actualTime))
-    .slice(0, 5) as run (run.startWorkflowResult.workflowId)}
+  {#each recentRuns.slice(0, 5) as run (run.startWorkflowResult.workflowId)}
     {#await fetchWorkflow({ namespace, workflowId: decodeURIForSvelte(run.startWorkflowResult.workflowId), runId: run.startWorkflowResult.runId }, fetch) then workflow}
       <div class="row">
         <div class="w-28">

@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { CalendarSpec, IntervalSpec } from '$types';
+  import CodeBlock from '../code-block.svelte';
 
   export let calendar: CalendarSpec;
   export let interval: IntervalSpec;
@@ -11,7 +12,7 @@
   const getInterval = (interval: string) => {
     if (interval.endsWith('s')) {
       const seconds = parseInt(interval.slice(0, interval.length - 1));
-      return seconds / 60;
+      return seconds;
     }
     return interval;
   };
@@ -106,9 +107,9 @@
 </script>
 
 {#if !calendar}
-  <p>Every {getInterval(interval?.interval?.toString())} minutes</p>
+  <CodeBlock content={interval} />
 {:else}
-  <div class="flex flex-row gap-4">
-    {humanReadableCalendar(calendar)}
+  <div class="flex flex-row gap-4 break-all text-sm">
+    <CodeBlock content={calendar} />
   </div>
 {/if}

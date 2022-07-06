@@ -69,7 +69,8 @@
   .cell {
     @apply border-gray-700 p-2 text-left xl:table-cell xl:border-b-2;
   }
-  s .row:last-of-type .cell {
+
+  .row:last-of-type .cell {
     @apply border-b-0 first-of-type:rounded-bl-lg  last-of-type:rounded-br-lg;
   }
 </style>
