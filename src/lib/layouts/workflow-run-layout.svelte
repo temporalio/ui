@@ -4,7 +4,7 @@
 
   import PageTransition from '$lib/holocene/page-transition.svelte';
   import Header from '$lib/layouts/workflow-header.svelte';
-  import Loading from '$lib/components/loading.svelte';
+  import Loading from '$holocene/loading.svelte';
 
   const { namespace } = $page.params;
 </script>

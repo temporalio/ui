@@ -13,7 +13,7 @@
 </script>
 
 <MenuContainer class={$$props.class}>
-  <MenuButton bind:show controls={id} class={$$props.class}>
+  <MenuButton bind:show controls={id} class={$$props.class} on:click>
     <div class="split-button" class:disabled>
       <button tabindex="-1" {disabled} class="segment rounded-l px-4">
         {label}
@@ -38,7 +38,7 @@
   }
 
   :global(.split-button-menu) {
-    @apply flex min-w-max flex-col items-start gap-y-4 border-gray-300 p-6 font-poppins text-sm;
+    @apply flex min-w-max flex-col items-start gap-y-4 border-gray-300 p-3 px-6 font-poppins text-sm;
   }
 
   .segment:disabled {

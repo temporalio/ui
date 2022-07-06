@@ -17,6 +17,7 @@
   on:open-menu={open}
   on:close-menu={close}
   on:toggle-menu={toggle}
+  on:click
   class={$$props.class}
   class:dark
   {disabled}
