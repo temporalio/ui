@@ -59,7 +59,7 @@
     />
     <Icon stroke="currentcolor" name={show ? 'caretUp' : 'caretDown'} />
   </MenuButton>
-  <Menu id="{id}-menu" class="max-h-60" {show} {dark}>
+  <Menu id="{id}-menu" class="max-h-60 border-primary" {show} {dark}>
     {#if options}
       {#each options as option}
         {@const value = isOption(option) ? option.value : _value}

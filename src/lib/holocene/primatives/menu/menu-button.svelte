@@ -4,9 +4,14 @@
   export let controls: string;
   export let dark = false;
   export let disabled = false;
-  const close = () => (show = false);
-  const open = () => (show = true);
-  const toggle = () => (show = !show);
+
+  const close = () => {
+    !disabled && (show = false);
+  };
+
+  const toggle = () => {
+    !disabled && (show = !show);
+  };
 </script>
 
 <button
@@ -14,7 +19,6 @@
   aria-controls={controls}
   aria-expanded={show}
   use:triggerMenu
-  on:open-menu={open}
   on:close-menu={close}
   on:toggle-menu={toggle}
   on:click
@@ -26,8 +30,12 @@
 </button>
 
 <style lang="postcss">
-  .dark,
-  .dark > * {
+  button.dark,
+  button.dark > * {
     @apply bg-primary text-white;
+  }
+
+  button:disabled {
+    @apply cursor-not-allowed;
   }
 </style>
