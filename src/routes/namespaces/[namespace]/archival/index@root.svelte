@@ -63,6 +63,8 @@
   import EmptyState from '$lib/components/empty-state.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
   import { timeFormat } from '$lib/stores/time-format';
+  import PageTitle from '$lib/holocene/page-title.svelte';
+  import { page } from '$app/stores';
 
   export let namespace: string;
   export let workflows: WorkflowExecution[];
@@ -70,6 +72,7 @@
   export let visibilityArchivalEnabled: boolean = false;
 </script>
 
+<PageTitle title={`Archival | ${namespace}`} url={$page.url.href} />
 {#if archivalEnabled && visibilityArchivalEnabled}
   <h2 class="text-2xl" data-cy="archived-enabled-title">Archived Workflows</h2>
   <WorkflowFilters />

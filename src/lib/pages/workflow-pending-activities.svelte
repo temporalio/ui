@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { page } from '$app/stores';
   import { workflowRun } from '$lib/stores/workflow-run';
 
   import Icon from '$holocene/icon/index.svelte';
@@ -11,11 +12,16 @@
     getDuration,
     formatDuration,
   } from '$lib/utilities/format-date';
+  import PageTitle from '$lib/holocene/page-title.svelte';
 
   const { pendingActivities, defaultWorkflowTaskTimeout } =
     $workflowRun.workflow;
 </script>
 
+<PageTitle
+  title={`Pending Activities | ${$page.params?.workflow}`}
+  url={$page.url.href}
+/>
 {#if pendingActivities.length}
   <section class="event-table">
     <header class="event-table-header">
