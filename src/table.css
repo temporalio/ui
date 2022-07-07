@@ -1,55 +1,74 @@
 @layer components {
-  table.fancy {
-    @apply border-separate border-gray-900;
+  table {
+    thead tr th {
+      @apply text-left text-sm font-medium font-secondary;
+    }
 
-    border-spacing: 0;
+    tbody tr td {
+      @apply text-left text-sm;
+    }
+  }
+
+  table.fancy {
+    @apply border-separate rounded-lg border-gray-300 border-spacing-0;
 
     thead {
       @apply bg-gray-900 text-gray-100;
+
+      tr th {
+        @apply border border-b-0 border-r-0 border-l-0 p-3;
+
+        &:first-child {
+          @apply rounded-tl-lg border-l border-gray-300;
+        }
+
+        &:last-child {
+          @apply rounded-tr-lg border-r border-gray-300;
+        }
+      }
     }
 
-    th {
-      @apply border border-b-0 border-r-0 border-l-0 p-3 text-left text-sm font-medium;
-    }
+    tbody tr {
+      td {
+        @apply border-t border-l-0 border-gray-300 px-3 py-2 text-sm;
 
-    thead tr th:first-child {
-      @apply rounded-tl-lg border-l border-gray-900;
-    }
+        &:first-child {
+          @apply border-l border-gray-300;
+        }
 
-    thead tr th:last-child {
-      @apply rounded-tr-lg border-r border-gray-900;
-    }
+        &:last-child {
+          @apply border-r border-gray-300;
+        }
+      }
 
-    tbody tr td {
-      @apply border-t border-l-0 border-gray-900 p-2 text-sm;
-    }
+      &:last-child {
+        td {
+          @apply border-b border-gray-300;
 
-    tbody tr td:first-child {
-      @apply border-l border-gray-900;
-    }
+          &:first-child {
+            @apply rounded-bl-lg;
+          }
 
-    tbody tr:last-child td {
-      @apply border-b border-gray-900;
-    }
-
-    tbody tr td {
-      @apply border-r border-gray-900 p-2 text-sm;
+          &:last-child {
+            @apply rounded-br-lg;
+          }
+        }
+      }
     }
   }
 
   table.simple {
-    @apply border-separate rounded-lg border border-gray-900 p-2;
-    border-spacing: 0;
-
-    tr {
-      td {
-        @apply border-b border-gray-900 p-2;
-      }
+    thead tr th {
+      @apply border-primary border-b py-2;
     }
 
-    tr:last-child {
+    tbody tr {
       td {
-        @apply border-b-0 border-gray-900;
+        @apply border-gray-300 border-b py-2;
+      }
+
+      &:last-child td {
+        @apply border-b-0;
       }
     }
   }

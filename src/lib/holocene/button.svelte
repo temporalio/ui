@@ -86,7 +86,7 @@
 
 <style lang="postcss">
   .button {
-    @apply relative flex w-fit items-center justify-center gap-2 border py-2 px-4 font-poppins text-sm transition-colors;
+    @apply relative flex w-fit items-center justify-center gap-2 border py-2 px-4 font-secondary text-sm transition-colors;
   }
 
   .button:disabled {
