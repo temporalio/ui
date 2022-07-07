@@ -16,7 +16,8 @@ const is =
 const getTwoAhead = (tokens: Tokens, index: number): string =>
   tokens[index + 2];
 
-const getLargestDurationUnit = (duration: Duration): Duration => {
+export const getLargestDurationUnit = (duration: Duration): Duration => {
+  if (!duration) return;
   for (const key of durationKeys) {
     if (duration[key]) {
       return { [key]: duration[key] };

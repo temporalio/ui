@@ -42,7 +42,7 @@ const isValid = (value: unknown): boolean => {
   return true;
 };
 
-const isFilterKey = (key: unknown): key is FilterKey => {
+export const isFilterKey = (key: unknown): key is FilterKey => {
   if (typeof key !== 'string') return false;
 
   for (const filterKey of filterKeys) {
