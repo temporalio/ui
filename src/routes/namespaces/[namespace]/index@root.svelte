@@ -43,18 +43,21 @@
 
   import { fromSecondsToDaysOrHours } from '$lib/utilities/format-date';
   import { getClusters } from '$lib/utilities/get-clusters';
-  import { title } from '$lib/stores/page';
+  import PageTitle from '$lib/holocene/page-title.svelte';
+  import { page } from '$app/stores';
 
   export let currentNamespace: DescribeNamespaceResponse;
   export let clusters: string;
-
-  $title = `Namespaces | ${currentNamespace?.namespaceInfo?.name}`;
 
   onMount(() => {
     $lastUsedNamespace = currentNamespace?.namespaceInfo?.name;
   });
 </script>
 
+<PageTitle
+  title={`Namespaces | ${currentNamespace?.namespaceInfo?.name}`}
+  url={$page.url.href}
+/>
 <h2 class="text-2xl" data-cy="namespace-title">
   Namespace: {currentNamespace?.namespaceInfo?.name}
 </h2>

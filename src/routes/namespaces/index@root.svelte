@@ -2,10 +2,7 @@
   import type { DescribeNamespaceResponse as Namespace } from '$types';
   import { routeForNamespace } from '$lib/utilities/route-for';
   import { page } from '$app/stores';
-  import { title } from '$lib/stores/page';
-  import { onDestroy } from 'svelte';
-
-  $title = 'Namespaces';
+  import PageTitle from '$lib/holocene/page-title.svelte';
 
   const { showTemporalSystemNamespace } = $page.stuff.settings;
   const namespaces = ($page.stuff.namespaces || []).filter(
@@ -13,12 +10,9 @@
       showTemporalSystemNamespace ||
       namespace.namespaceInfo.name !== 'temporal-system',
   );
-
-  onDestroy(() => {
-    $title = 'Temporal';
-  });
 </script>
 
+<PageTitle title="Namespaces" url={$page.url.href} />
 <h1 class="mb-8 text-2xl">Namespaces</h1>
 {#if namespaces?.length > 0}
   <table class="fancy w-full ">

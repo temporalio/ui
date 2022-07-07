@@ -8,9 +8,7 @@
   import EmptyState from '$lib/components/empty-state.svelte';
   import Select from '$lib/components/select/select.svelte';
   import Button from '$holocene/button.svelte';
-  import { title } from '$lib/stores/page';
-
-  $title = `Query | ${$page.params?.workflow}`;
+  import PageTitle from '$lib/holocene/page-title.svelte';
 
   const { namespace } = $page.params;
   const { workflow } = $workflowRun;
@@ -42,6 +40,7 @@
   }
 </script>
 
+<PageTitle title={`Query | ${$page.params?.workflow}`} url={$page.url.href} />
 <section>
   {#await queryTypes}
     <div class="text-center">

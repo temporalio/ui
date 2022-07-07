@@ -16,11 +16,9 @@
   import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
   import { fetchAllSchedules } from '$lib/services/schedule-service';
   import type { ScheduleListEntry } from '$types';
-  import { title } from '$lib/stores/page';
+  import PageTitle from '$lib/holocene/page-title.svelte';
 
   let { namespace } = $page.params;
-
-  $title = `Schedules | ${namespace}`;
 
   let search = '';
 
@@ -37,6 +35,7 @@
     'Create scheduled actions using our Public API or TCTL (CLI).';
 </script>
 
+<PageTitle title={`Schedules | ${namespace}`} url={$page.url.href} />
 <div class="flex flex-row justify-between">
   <h2 class="flex items-center gap-2 text-2xl">
     Schedules<Badge type="alpha">Alpha</Badge>

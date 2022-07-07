@@ -8,13 +8,12 @@
   import { formatDate } from '$lib/utilities/format-date';
 
   import EmptyState from '$lib/components/empty-state.svelte';
-  import { title } from '$lib/stores/page';
-
-  $title = `Workers | ${$page.params?.workflow}`;
+  import PageTitle from '$lib/holocene/page-title.svelte';
 
   const { workers, workflow } = $workflowRun;
 </script>
 
+<PageTitle title={`Workers | ${$page.params?.workflow}`} url={$page.url.href} />
 <section class="flex flex-col gap-4">
   <h3 class="text-lg font-medium">
     Task Queue: <span class="select-all font-normal">{workflow.taskQueue}</span>

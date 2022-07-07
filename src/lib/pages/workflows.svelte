@@ -21,9 +21,7 @@
   import { onDestroy, onMount } from 'svelte';
   import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
   import Loading from '$holocene/loading.svelte';
-  import { title } from '$lib/stores/page';
-
-  $title = `Workflows | ${$page.params?.namespace}`;
+  import PageTitle from '$lib/holocene/page-title.svelte';
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
 
@@ -43,6 +41,10 @@
   });
 </script>
 
+<PageTitle
+  title={`Workflows | ${$page.params?.namespace}`}
+  url={$page.url.href}
+/>
 <div>
   <h1 class="text-2xl">
     Recent Workflows

@@ -57,24 +57,13 @@
   import Notifications from '$lib/components/notifications.svelte';
   import Banners from '$lib/components/banner/banners.svelte';
   import { ErrorBoundary } from '$lib/components/error-boundary';
-  import { title } from '$lib/stores/page';
+  import PageTitle from '$lib/holocene/page-title.svelte';
 
   export let user: User;
   export let uiVersionInfo: UiVersionInfo;
 </script>
 
-<svelte:head>
-  <title>{$title}</title>
-
-  <link rel="manifest" href="/site.webmanifest" />
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-  <meta property="og:title" content="Temporal" />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://temporal.io" />
-  <meta property="og:image" content="/banner.png" />
-</svelte:head>
-
+<PageTitle />
 <div class="flex h-screen w-screen flex-row">
   <Notifications />
   <div class="sticky top-0 z-20 h-screen w-auto">

@@ -12,14 +12,16 @@
     getDuration,
     formatDuration,
   } from '$lib/utilities/format-date';
-  import { title } from '$lib/stores/page';
-
-  $title = `Pending Activities | ${$page.params?.workflow}`;
+  import PageTitle from '$lib/holocene/page-title.svelte';
 
   const { pendingActivities, defaultWorkflowTaskTimeout } =
     $workflowRun.workflow;
 </script>
 
+<PageTitle
+  title={`Pending Activities | ${$page.params?.workflow}`}
+  url={$page.url.href}
+/>
 {#if pendingActivities.length}
   <section class="event-table">
     <header class="event-table-header">
