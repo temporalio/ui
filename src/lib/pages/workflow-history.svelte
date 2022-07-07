@@ -5,8 +5,11 @@
 
   import { routeForEventHistory } from '$lib/utilities/route-for';
   import { eventViewType, eventSortOrder } from '$lib/stores/event-view';
+  import { title } from '$lib/stores/page';
 
   const { namespace, workflow, run } = $page.params;
+
+  $title = `Workflow History | ${workflow}`;
 
   onMount(async () => {
     const queryParams = {

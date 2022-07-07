@@ -43,9 +43,12 @@
 
   import { fromSecondsToDaysOrHours } from '$lib/utilities/format-date';
   import { getClusters } from '$lib/utilities/get-clusters';
+  import { title } from '$lib/stores/page';
 
   export let currentNamespace: DescribeNamespaceResponse;
   export let clusters: string;
+
+  $title = `Namespaces | ${currentNamespace?.namespaceInfo?.name}`;
 
   onMount(() => {
     $lastUsedNamespace = currentNamespace?.namespaceInfo?.name;

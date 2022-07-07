@@ -17,8 +17,11 @@
   import Button from '$lib/holocene/button.svelte';
   import Loading from '$holocene/loading.svelte';
   import FormInput from '$lib/holocene/forms/form-input.svelte';
+  import { title } from '$lib/stores/page';
 
   let { namespace } = $page.params;
+
+  $title = `Create Schedule | ${namespace}`;
 
   let tab = 'interval';
   const form = useForm();

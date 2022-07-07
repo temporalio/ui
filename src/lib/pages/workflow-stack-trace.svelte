@@ -8,6 +8,9 @@
   import CodeBlock from '$lib/components/code-block.svelte';
   import Button from '$holocene/button.svelte';
   import EmptyState from '$lib/components/empty-state.svelte';
+  import { title } from '$lib/stores/page';
+
+  $title = `Stack Trace | ${$page.params?.workflow}`;
 
   const { namespace } = $page.params;
   const { workflow } = $workflowRun;

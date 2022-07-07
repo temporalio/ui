@@ -57,13 +57,14 @@
   import Notifications from '$lib/components/notifications.svelte';
   import Banners from '$lib/components/banner/banners.svelte';
   import { ErrorBoundary } from '$lib/components/error-boundary';
+  import { title } from '$lib/stores/page';
 
   export let user: User;
   export let uiVersionInfo: UiVersionInfo;
 </script>
 
 <svelte:head>
-  <title>Temporal</title>
+  <title>{$title}</title>
 
   <link rel="manifest" href="/site.webmanifest" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

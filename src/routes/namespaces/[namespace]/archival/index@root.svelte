@@ -63,11 +63,14 @@
   import EmptyState from '$lib/components/empty-state.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
   import { timeFormat } from '$lib/stores/time-format';
+  import { title } from '$lib/stores/page';
 
   export let namespace: string;
   export let workflows: WorkflowExecution[];
   export let archivalEnabled: boolean = false;
   export let visibilityArchivalEnabled: boolean = false;
+
+  $title = `Archival | ${namespace}`;
 </script>
 
 {#if archivalEnabled && visibilityArchivalEnabled}

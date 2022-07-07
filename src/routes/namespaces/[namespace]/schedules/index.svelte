@@ -16,8 +16,11 @@
   import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
   import { fetchAllSchedules } from '$lib/services/schedule-service';
   import type { ScheduleListEntry } from '$types';
+  import { title } from '$lib/stores/page';
 
   let { namespace } = $page.params;
+
+  $title = `Schedules | ${namespace}`;
 
   let search = '';
 

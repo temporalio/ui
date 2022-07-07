@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { page } from '$app/stores';
   import { workflowRun } from '$lib/stores/workflow-run';
 
   import Icon from '$holocene/icon/index.svelte';
@@ -11,6 +12,9 @@
     getDuration,
     formatDuration,
   } from '$lib/utilities/format-date';
+  import { title } from '$lib/stores/page';
+
+  $title = `Pending Activities | ${$page.params?.workflow}`;
 
   const { pendingActivities, defaultWorkflowTaskTimeout } =
     $workflowRun.workflow;

@@ -5,8 +5,12 @@
   import Loading from '$holocene/loading.svelte';
   import { fetchRawEvents } from '$lib/services/events-service';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
+  import { title } from '$lib/stores/page';
 
   const { namespace, workflow: workflowId, run: runId } = $page.params;
+
+  $title = `Workflow History | ${workflowId}`;
+
   const events = fetchRawEvents({
     namespace: decodeURIForSvelte(namespace),
     workflowId: decodeURIForSvelte(workflowId),

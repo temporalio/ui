@@ -8,6 +8,9 @@
   import EmptyState from '$lib/components/empty-state.svelte';
   import Select from '$lib/components/select/select.svelte';
   import Button from '$holocene/button.svelte';
+  import { title } from '$lib/stores/page';
+
+  $title = `Query | ${$page.params?.workflow}`;
 
   const { namespace } = $page.params;
   const { workflow } = $workflowRun;

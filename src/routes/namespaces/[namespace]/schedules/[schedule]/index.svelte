@@ -15,6 +15,7 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { timeFormat } from '$lib/stores/time-format';
   import { loading } from '$lib/stores/schedules';
+  import { title } from '$lib/stores/page';
 
   import ScheduleMemo from '$lib/components/schedule/schedule-memo.svelte';
   import ScheduleRecentRuns from '$lib/components/schedule/schedule-recent-runs.svelte';
@@ -30,6 +31,9 @@
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
+
+  $title = `Schedule | ${scheduleId}`;
+
   const parameters = {
     namespace,
     scheduleId: decodeURIForSvelte(scheduleId),

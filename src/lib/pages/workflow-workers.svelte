@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { page } from '$app/stores';
+
   import Icon from '$lib/holocene/icon/index.svelte';
   import { workflowRun } from '$lib/stores/workflow-run';
 
@@ -6,6 +8,9 @@
   import { formatDate } from '$lib/utilities/format-date';
 
   import EmptyState from '$lib/components/empty-state.svelte';
+  import { title } from '$lib/stores/page';
+
+  $title = `Workers | ${$page.params?.workflow}`;
 
   const { workers, workflow } = $workflowRun;
 </script>

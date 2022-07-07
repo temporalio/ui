@@ -21,6 +21,9 @@
   import { onDestroy, onMount } from 'svelte';
   import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
   import Loading from '$holocene/loading.svelte';
+  import { title } from '$lib/stores/page';
+
+  $title = `Workflows | ${$page.params?.namespace}`;
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
 
