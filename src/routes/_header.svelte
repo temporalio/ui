@@ -72,7 +72,7 @@
 </script>
 
 <Navigation
-  namespaceList={Promise.resolve(namespaceList)}
+  getNamespaceList={() => Promise.resolve(namespaceList)}
   {activeNamespace}
   {linkList}
   {isCloud}

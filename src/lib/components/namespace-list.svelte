@@ -2,11 +2,17 @@
   import { page } from '$app/stores';
 
   import Icon from '$lib/holocene/icon/index.svelte';
+
+  import { onMount } from 'svelte';
   import EmptyState from './empty-state.svelte';
 
-  export let namespaceList: null | Promise<
-    { namespace: string; href: string; onClick: () => void }[]
-  >;
+  export let getNamespaceList: () => Promise<NamespaceItem[]> = null;
+
+  let namespaceList = null;
+
+  onMount(() => {
+    namespaceList = getNamespaceList();
+  });
 
   $: searchValue = '';
 </script>
@@ -51,7 +57,7 @@
         <EmptyState title="No Namespaces" />
       {/each}
     {:else}
-      No Namespaces
+      <EmptyState title="Could not list Namespaces" />
     {/if}
   {/await}
 </ul>

@@ -1,8 +1,4 @@
 <script lang="ts" context="module">
-  import type { SvelteComponent } from 'svelte';
-  import FeatureTag from '$lib/holocene/feature-tag.svelte';
-  import type { DescribeNamespaceResponse as Namespace } from '$types';
-
   export interface ExtraIcon {
     component: typeof SvelteComponent;
     name: string;
@@ -11,6 +7,9 @@
 
 <script lang="ts">
   import Icon from '$lib/holocene/icon/index.svelte';
+  import type { SvelteComponent } from 'svelte';
+  import FeatureTag from '$lib/holocene/feature-tag.svelte';
+  import type { DescribeNamespaceResponse as Namespace } from '$types';
 
   import { navOpen, namespaceSelectorOpen } from '$lib/stores/nav-open';
 
@@ -27,9 +26,9 @@
 
   export let isCloud = false;
   export let activeNamespace: Namespace;
-  export let namespaceList: null | Promise<NamespaceItem[]> = null;
+  export let getNamespaceList: () => Promise<NamespaceItem[]>;
   export let linkList: Partial<Record<string, string>>;
-  export let user: null | Promise<User> = null;
+  export let user: Promise<User> | undefined;
   export let logout: () => void;
   export let extras: ExtraIcon[] | null = null;
 
@@ -177,7 +176,7 @@
       }}
     >
       {#if $namespaceSelectorOpen}
-        <NamespaceList {namespaceList} />
+        <NamespaceList {getNamespaceList} />
       {/if}
     </Drawer>
   </svelte:fragment>
