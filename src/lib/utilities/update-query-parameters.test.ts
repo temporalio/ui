@@ -69,7 +69,7 @@ describe('updateQueryParameters', () => {
     updateQueryParameters({ parameter, value, url, goto });
 
     expect(goto).toHaveBeenCalledWith(
-      'https://temporal.io/?parameter=value',
+      'https://temporal.io/?parameter=value#',
       gotoOptions,
     );
   });
@@ -82,7 +82,7 @@ describe('updateQueryParameters', () => {
     updateQueryParameters({ parameter, value, url, goto });
 
     expect(goto).toHaveBeenCalledWith(
-      'https://temporal.io/?parameter=newvalue',
+      'https://temporal.io/?parameter=newvalue#',
       gotoOptions,
     );
   });
@@ -94,7 +94,7 @@ describe('updateQueryParameters', () => {
 
     updateQueryParameters({ parameter, value, url, goto });
 
-    expect(goto).toHaveBeenCalledWith('https://temporal.io/', gotoOptions);
+    expect(goto).toHaveBeenCalledWith('https://temporal.io/#', gotoOptions);
   });
 
   it('should set the parameter to an empty string if allowEmpty is set', () => {
@@ -105,7 +105,7 @@ describe('updateQueryParameters', () => {
     updateQueryParameters({ parameter, value, url, goto, allowEmpty: true });
 
     expect(goto).toHaveBeenCalledWith(
-      'https://temporal.io/?parameter=',
+      'https://temporal.io/?parameter=#',
       gotoOptions,
     );
   });
@@ -122,9 +122,9 @@ describe('addHashToURL', () => {
     expect(addHashToURL(url)).toBe('https://temporal.io/#');
   });
 
-  it('should put the hash before the search parameters', () => {
+  it('should put the hash after the search parameters', () => {
     const url = new URL('https://temporal.io/?parameter=value');
-    expect(addHashToURL(url)).toBe('https://temporal.io/#?parameter=value');
+    expect(addHashToURL(url)).toBe('https://temporal.io/?parameter=value#');
   });
 });
 
