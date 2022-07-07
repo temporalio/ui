@@ -7,10 +7,11 @@ const replaceNamespaceInApiUrl = (
 
 const base = (namespace?: string): string => {
   let baseUrl = '';
+
   if (globalThis?.AppConfig?.apiUrl && namespace) {
     baseUrl = replaceNamespaceInApiUrl(globalThis.AppConfig.apiUrl, namespace);
   } else {
-    baseUrl = (import.meta.env?.VITE_API as string) ?? process.env.VITE_API;
+    baseUrl = import.meta.env.VITE_API;
   }
 
   if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
