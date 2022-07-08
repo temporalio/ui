@@ -10,8 +10,11 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { eventViewType } from '$lib/stores/event-view';
 
-  import { onDestroy } from 'svelte';
-  import { clearPreviousEventParameters } from '$lib/stores/events';
+  import { onMount, onDestroy } from 'svelte';
+  import {
+    activeEvent,
+    clearPreviousEventParameters,
+  } from '$lib/stores/events';
 
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
@@ -19,6 +22,10 @@
   import WorkflowStackTraceError from '$lib/components/workflow/workflow-stack-trace-error.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
+  import EventHistoryTimeline from '$lib/components/event/event-history-timeline.svelte';
+  import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
+  import EventDetailsRow from '$lib/components/event/event-details-row.svelte';
+  import Accordion from '$lib/holocene/accordion.svelte';
 
   const { namespace } = $page.params;
   const { workflow, workers } = $workflowRun;
@@ -37,11 +44,36 @@
     run: workflow.runId,
   };
 
+  let x;
+
+  const types = [
+    'completed',
+    'started',
+    // 'scheduled',
+    'failed',
+    'timedout',
+    'terminated',
+    'canceled',
+    'marker',
+  ];
+
+  let syncWorker: Worker | undefined = undefined;
+
+  const loadWorker = async () => {
+    const SyncWorker = await import('$lib/workers/index.worker?worker');
+    syncWorker = new SyncWorker.default();
+    syncWorker.postMessage({});
+  };
+
+  onMount(loadWorker);
+
   onDestroy(() => {
     clearPreviousEventParameters();
+    syncWorker = undefined;
   });
 </script>
 
+<svelte:window bind:innerWidth={x} />
 <section class="flex flex-col gap-4">
   <section class="flex flex-col gap-1">
     <WorkflowDetail title="Workflow Type" content={workflow.name} />
@@ -89,11 +121,26 @@
     />
   </section>
   <WorkflowStackTraceError {workflow} {workers} />
-  <section class="flex w-full flex-col gap-4 lg:flex-row">
-    <InputAndResults type="input" />
-    <InputAndResults type="results" />
+  <section class="flex w-full">
+    <Accordion title="Input and Results" icon="json" class="border-gray-900">
+      <div class="flex gap-2">
+        <InputAndResults type="input" />
+        <InputAndResults type="results" />
+      </div>
+    </Accordion>
   </section>
   <PendingActivties />
+  <section class="flex w-full">
+    <Accordion title="Timeline" icon="chart" class="border-gray-900">
+      {#each types as type, i}
+        <EventHistoryTimeline
+          {type}
+          {x}
+          showDateRange={i === types.length - 1}
+        />
+      {/each}
+    </Accordion>
+  </section>
   <section id="event-history">
     <nav class="flex items-end justify-between gap-4 pb-4">
       <h3 class="text-lg font-medium">Recent Events</h3>

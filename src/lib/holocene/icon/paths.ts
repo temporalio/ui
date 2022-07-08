@@ -83,6 +83,27 @@ const caretRightIcon: Icon = {
   ],
 };
 
+const chartIcon: Icon = {
+  paths: [
+    {
+      d: 'M4.75 6.75C4.75 5.64543 5.64543 4.75 6.75 4.75H17.25C18.3546 4.75 19.25 5.64543 19.25 6.75V17.25C19.25 18.3546 18.3546 19.25 17.25 19.25H6.75C5.64543 19.25 4.75 18.3546 4.75 17.25V6.75Z',
+      stroke: '#111827',
+    },
+    {
+      d: 'M8.75 15.25V9.75',
+      stroke: '#111827',
+    },
+    {
+      d: 'M15.25 15.25V9.75',
+      stroke: '#111827',
+    },
+    {
+      d: 'M12 15.25V12.75',
+      stroke: '#111827',
+    },
+  ],
+};
+
 const checkMarkIcon: Icon = {
   paths: [
     {
@@ -389,6 +410,7 @@ export const icons: { [index: string]: Icon } = {
   caretLeft: caretLeftIcon,
   caretRight: caretRightIcon,
   caretUp: caretUpIcon,
+  chart: chartIcon,
   checkMark: checkMarkIcon,
   clock: clockIcon,
   close: closeIcon,

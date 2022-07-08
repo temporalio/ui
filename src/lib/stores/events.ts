@@ -161,3 +161,4 @@ export const ascendingEventGroups: Readable<EventGroups> = derived(
 
 export const updating = writable(true);
 export const loading = writable(true);
+export const activeEvent = writable(null);
