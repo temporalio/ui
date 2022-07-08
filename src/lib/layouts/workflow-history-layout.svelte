@@ -11,10 +11,7 @@
   import { eventViewType } from '$lib/stores/event-view';
 
   import { onMount, onDestroy } from 'svelte';
-  import {
-    activeEvent,
-    clearPreviousEventParameters,
-  } from '$lib/stores/events';
+  import { clearPreviousEventParameters } from '$lib/stores/events';
 
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
@@ -23,9 +20,8 @@
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
   import EventHistoryTimeline from '$lib/components/event/event-history-timeline.svelte';
-  import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
-  import EventDetailsRow from '$lib/components/event/event-details-row.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
+  import { mouseX } from '$lib/stores/page';
 
   const { namespace } = $page.params;
   const { workflow, workers } = $workflowRun;
@@ -45,6 +41,10 @@
   };
 
   let x;
+
+  function handleMousemove(event) {
+    $mouseX = event.clientX;
+  }
 
   const types = [
     'completed',
@@ -132,13 +132,15 @@
   </section>
   <section class="flex w-full">
     <Accordion title="Timeline" icon="chart" class="border-gray-900">
-      {#each types as type, i}
-        <EventHistoryTimeline
-          {type}
-          {x}
-          showDateRange={i === types.length - 1}
-        />
-      {/each}
+      <div on:mousemove={handleMousemove}>
+        {#each types as type, i}
+          <EventHistoryTimeline
+            {type}
+            {x}
+            showDateRange={i === types.length - 1}
+          />
+        {/each}
+      </div>
     </Accordion>
   </section>
   <section id="event-history">
