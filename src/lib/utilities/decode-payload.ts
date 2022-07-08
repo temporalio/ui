@@ -83,27 +83,38 @@ export const decodePayloadAttributes = (
 };
 
 // List of fields with payloads
-const payloadFields: string[] = [
-  'input',
-  'result',
-  'details',
-  'heartbeatDetails',
-  'lastHeartbeatDetails',
-  'lastFailure',
-  'lastCompletionResult',
-  'queryArgs',
-  'answer',
-  'signalInput',
+const payloadFields: string[][] = [
+  ['data'],
+  ['input'],
+  ['result'],
+  ['details', 'change-id'],
+  ['details', 'data'],
+  ['details', 'result'],
+  ['details', 'version'],
+  ['details'],
+  ['heartbeatDetails'],
+  ['lastHeartbeatDetails'],
+  ['lastFailure'],
+  ['lastCompletionResult'],
+  ['queryArgs'],
+  ['answer'],
+  ['signalInput'],
 ];
+
+const get = (p, o) =>
+  p.reduce((xs, x) => (xs && xs[x]) ? xs[x] : null, o)
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getPotentialPayloads = (anyAttributes: any): Payload[] | null => {
   let payloads = null;
   for (const field of payloadFields) {
-    if (anyAttributes?.[field]?.payloads) {
-      payloads = anyAttributes?.[field]?.payloads;
+    const value = get(field, anyAttributes);
+    if (value) {
+      payloads = value?.payloads;
       break;
     }
   }
+
   return payloads;
 };
 
@@ -141,8 +152,9 @@ export const convertPayloadToJsonWithCodec = async ({
     }
 
     for (const field of payloadFields) {
-      if (anyAttributes?.[field]?.payloads) {
-        anyAttributes[field].payloads = JSONPayload;
+      const value = get(field, anyAttributes);
+      if (value?.payloads) {
+        value.payloads = JSONPayload;
       }
     }
   }
@@ -183,8 +195,9 @@ export const convertPayloadToJsonWithWebsocket = async (
     }
 
     for (const field of payloadFields) {
-      if (anyAttributes?.[field]?.payloads) {
-        anyAttributes[field].payloads = JSONPayload;
+      const value = get(field, anyAttributes);
+      if (value?.payloads) {
+        value.payloads = JSONPayload;
       }
     }
   }
