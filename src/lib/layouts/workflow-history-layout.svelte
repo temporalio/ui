@@ -121,6 +121,7 @@
     />
   </section>
   <WorkflowStackTraceError {workflow} {workers} />
+  <PendingActivties />
   <section class="flex w-full">
     <Accordion title="Input and Results" icon="json" class="border-gray-900">
       <div class="flex gap-2">
@@ -129,7 +130,6 @@
       </div>
     </Accordion>
   </section>
-  <PendingActivties />
   <section class="flex w-full">
     <Accordion title="Timeline" icon="chart" class="border-gray-900">
       {#each types as type, i}
