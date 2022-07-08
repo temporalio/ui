@@ -113,8 +113,8 @@ const getPotentialPayloads = (anyAttributes: any): Payload[] | null => {
   let payloads = null;
   for (const field of payloadFields) {
     const value = get(field, anyAttributes);
-    if (value) {
-      payloads = value?.payloads;
+    if (value && value?.payloads) {
+      payloads = value.payloads;
       break;
     }
   }
