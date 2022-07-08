@@ -101,8 +101,12 @@ const payloadFields: string[][] = [
   ['signalInput'],
 ];
 
-const get = (p, o) =>
-  p.reduce((xs, x) => (xs && xs[x]) ? xs[x] : null, o)
+const get = (fields, object) =>
+  fields.reduce(
+    (nestedObject, field) =>
+      nestedObject && nestedObject?.[field] ? nestedObject[field] : null,
+    object,
+  );
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getPotentialPayloads = (anyAttributes: any): Payload[] | null => {
