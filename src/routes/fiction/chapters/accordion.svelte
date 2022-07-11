@@ -2,6 +2,9 @@
   import Chapter from '../_chapter.svelte';
   import Accordion from '$holocene/accordion.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
+  import Table from '$holocene/table/table.svelte';
+  import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
+  import TableRow from '$lib/holocene/table/table-row.svelte';
 </script>
 
 <Chapter description="An Accordion with a Table">
@@ -9,28 +12,24 @@
     title="Custom Search Attributes"
     subtitle="19 custom search attributes"
   >
-    <table class="simple w-full">
-      <thead>
-        <tr>
-          <th>Attribute</th>
-          <th>Type</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>searchAttribute1</td>
-          <td>Unspecified</td>
-        </tr>
-        <tr>
-          <td>searchAttribute2</td>
-          <td>Text</td>
-        </tr>
-        <tr>
-          <td>searchAttribute3</td>
-          <td>Keyword</td>
-        </tr>
-      </tbody>
-    </table>
+    <Table variant="simple" class="w-full">
+      <TableHeaderRow slot="headers">
+        <th>Attribute</th>
+        <th>Type</th>
+      </TableHeaderRow>
+      <TableRow>
+        <td>searchAttribute1</td>
+        <td>Unspecified</td>
+      </TableRow>
+      <TableRow>
+        <td>searchAttribute2</td>
+        <td>Text</td>
+      </TableRow>
+      <TableRow>
+        <td>searchAttribute3</td>
+        <td>Keyword</td>
+      </TableRow>
+    </Table>
   </Accordion>
 </Chapter>
 
