@@ -83,27 +83,42 @@ export const decodePayloadAttributes = (
 };
 
 // List of fields with payloads
-const payloadFields: string[] = [
-  'input',
-  'result',
-  'details',
-  'heartbeatDetails',
-  'lastHeartbeatDetails',
-  'lastFailure',
-  'lastCompletionResult',
-  'queryArgs',
-  'answer',
-  'signalInput',
-];
+const payloadFields = [
+  ['data'],
+  ['input'],
+  ['result'],
+  ['details', 'change-id'],
+  ['details', 'data'],
+  ['details', 'result'],
+  ['details', 'version'],
+  ['details'],
+  ['heartbeatDetails'],
+  ['lastHeartbeatDetails'],
+  ['lastFailure'],
+  ['lastCompletionResult'],
+  ['queryArgs'],
+  ['answer'],
+  ['signalInput'],
+] as const;
+
+const getField = (fields, object) =>
+  fields.reduce(
+    (nestedObject, field) =>
+      nestedObject && nestedObject?.[field] ? nestedObject[field] : null,
+    object,
+  );
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getPotentialPayloads = (anyAttributes: any): Payload[] | null => {
+export const getPotentialPayloads = (anyAttributes: any): Payload[] | null => {
   let payloads = null;
   for (const field of payloadFields) {
-    if (anyAttributes?.[field]?.payloads) {
-      payloads = anyAttributes?.[field]?.payloads;
+    const value = getField(field, anyAttributes);
+    if (value && value?.payloads) {
+      payloads = value.payloads;
       break;
     }
   }
+
   return payloads;
 };
 
@@ -141,8 +156,9 @@ export const convertPayloadToJsonWithCodec = async ({
     }
 
     for (const field of payloadFields) {
-      if (anyAttributes?.[field]?.payloads) {
-        anyAttributes[field].payloads = JSONPayload;
+      const value = getField(field, anyAttributes);
+      if (value?.payloads) {
+        value.payloads = JSONPayload;
       }
     }
   }
@@ -183,8 +199,9 @@ export const convertPayloadToJsonWithWebsocket = async (
     }
 
     for (const field of payloadFields) {
-      if (anyAttributes?.[field]?.payloads) {
-        anyAttributes[field].payloads = JSONPayload;
+      const value = getField(field, anyAttributes);
+      if (value?.payloads) {
+        value.payloads = JSONPayload;
       }
     }
   }

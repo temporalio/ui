@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  getPotentialPayloads,
   decodePayload,
   decodePayloadAttributes,
   convertPayloadToJsonWithWebsocket,
@@ -70,6 +71,55 @@ const JsonObjectEncoded = {
   },
   data: 'eyAiVHJhbnNmb3JtZXIiOiAiT3B0aW11c1ByaW1lIiB9',
 };
+
+describe('getPotentialPayloads', () => {
+  it('Should get value of data field', () => {
+    const test = {
+      data: {
+        payloads: Base64Decoded,
+      },
+    };
+    expect(getPotentialPayloads(test)).toEqual(Base64Decoded);
+  });
+
+  it('Should get value of input field', () => {
+    const test = {
+      input: {
+        payloads: WebDecodePayload,
+      },
+    };
+    expect(getPotentialPayloads(test)).toEqual(WebDecodePayload);
+  });
+
+  it('Should get value of result field', () => {
+    const test = {
+      result: {
+        payloads: JsonPlainEncoded,
+      },
+    };
+    expect(getPotentialPayloads(test)).toEqual(JsonPlainEncoded);
+  });
+
+  it('Should get value of nested details field', () => {
+    const test = {
+      details: {
+        data: {
+          payloads: WebDecodePayload,
+        },
+      },
+    };
+    expect(getPotentialPayloads(test)).toEqual(WebDecodePayload);
+  });
+
+  it('Should get value of flat details field', () => {
+    const test = {
+      details: {
+        payloads: WebDecodePayload,
+      },
+    };
+    expect(getPotentialPayloads(test)).toEqual(WebDecodePayload);
+  });
+});
 
 describe('decodePayload', () => {
   it('Should not decode a payload with encoding binary/encrypted', () => {
