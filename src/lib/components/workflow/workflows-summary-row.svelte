@@ -42,14 +42,14 @@
 </script>
 
 <TableRow {href} class="workflow-summary-row">
-  <td class="cell">
+  <td>
     <WorkflowStatus
       status={workflow.status}
       delay={getMilliseconds(workflow.startTime)}
     />
   </td>
   <td
-    class="cell links relative truncate"
+    class="truncate relative"
     on:mouseover={() => (showFilterCopy = true)}
     on:focus={() => (showFilterCopy = true)}
     on:mouseleave={() => (showFilterCopy = false)}
@@ -66,7 +66,7 @@
     </p>
   </td>
   <td
-    class="cell links relative truncate"
+    class="truncate relative"
     on:mouseover={() => (showFilterCopy = true)}
     on:focus={() => (showFilterCopy = true)}
     on:mouseleave={() => (showFilterCopy = false)}
