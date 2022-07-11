@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { hasKeys } from '$lib/utilities/has';
   import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
   import FeedbackButton from '$lib/components/feedback-button.svelte';
 
@@ -18,7 +17,7 @@
     <slot name="links" />
   </div>
   <div class="col-span-5 col-end-13 flex items-center justify-end gap-4">
-    {#if hasKeys(user)}
+    {#if user}
       <DataEncoderStatus />
     {/if}
     <FeedbackButton />
