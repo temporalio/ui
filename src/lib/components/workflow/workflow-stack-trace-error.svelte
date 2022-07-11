@@ -12,8 +12,9 @@
 {#if runningWithNoWorkers}
   <section class="stack-trace">
     <EmptyState
-      title="An Error Occured"
-      content="Please make sure you have at least one worker running."
+      icon="warning"
+      title="No Workers Running."
+      content="Please make sure you have at least one worker connected to the {workflow.taskQueue} Task Queue."
       class="my-0"
     />
   </section>
