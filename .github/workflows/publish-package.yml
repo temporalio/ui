@@ -16,9 +16,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Node setup
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 16
+          registry-url: 'https://registry.npmjs.org'
       - name: pnpm setup
         uses: pnpm/action-setup@v2.2.2
         with:

@@ -1,6 +1,10 @@
 import { parseISO } from 'date-fns';
+import { afterEach } from 'vitest';
 import { describe, expect, it, vi } from 'vitest';
-import { toListWorkflowParameters } from './to-list-workflow-parameters';
+import {
+  getLargestDurationUnit,
+  toListWorkflowParameters,
+} from './to-list-workflow-parameters';
 
 const executionStatusQuery = 'ExecutionStatus="Completed"';
 const workflowIdQuery = 'WorkflowId="Hello"';
@@ -18,6 +22,7 @@ const defaultParameters = {
 
 describe('toListWorkflowParameters', () => {
   afterEach(() => {
+    vi.clearAllMocks();
     vi.useRealTimers();
   });
 
@@ -59,5 +64,44 @@ describe('toListWorkflowParameters', () => {
     const result = toListWorkflowParameters(startTimeQuery);
 
     expect(result).toEqual({ ...defaultParameters, timeRange: '2 days' });
+  });
+
+  it('should not throw if given an invalid start time', () => {
+    expect(() => {
+      toListWorkflowParameters('StartTime = "bogus"');
+    }).not.toThrow();
+  });
+
+  it('should console error if given an invalid start time', () => {
+    const spy = vi.spyOn(console, 'error');
+    toListWorkflowParameters('StartTime = "bogus"');
+    expect(spy).toHaveBeenCalled();
+  });
+});
+
+describe('getLargestDurationUnit', () => {
+  it('should return years if present', () => {
+    const duration: Duration = {
+      years: 1,
+      months: 2,
+      weeks: 3,
+      days: 4,
+      hours: 5,
+      minutes: 6,
+      seconds: 7,
+    };
+    expect(getLargestDurationUnit(duration)).toEqual({
+      years: 1,
+    });
+  });
+
+  it('should return undefined if not given a duration', () => {
+    expect(
+      getLargestDurationUnit(undefined as unknown as Duration),
+    ).toBeUndefined();
+  });
+
+  it('should return undefined if not given a duration', () => {
+    expect(getLargestDurationUnit({} as unknown as Duration)).toBeUndefined();
   });
 });

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { toListWorkflowQuery } from './list-workflow-query';
+import { isFilterKey, toListWorkflowQuery } from './list-workflow-query';
 
 describe('toListWorkflowQuery', () => {
   beforeEach(() => {
@@ -14,6 +14,27 @@ describe('toListWorkflowQuery', () => {
   it('should convert an executionStatus', () => {
     const query = toListWorkflowQuery({ executionStatus: 'Running' });
     expect(query).toBe('ExecutionStatus="Running"');
+  });
+
+  it('should return an empty string for "All"', () => {
+    const query = toListWorkflowQuery({ executionStatus: 'All' });
+    expect(query).toBe('');
+  });
+
+  it('should ignore undefined values', () => {
+    const query = toListWorkflowQuery({
+      executionStatus: undefined,
+      workflowId: 'abcdef123',
+    });
+    expect(query).toBe('WorkflowId="abcdef123"');
+  });
+
+  it('should ignore empty strings', () => {
+    const query = toListWorkflowQuery({
+      executionStatus: '',
+      workflowId: 'abcdef123',
+    });
+    expect(query).toBe('WorkflowId="abcdef123"');
   });
 
   it('should convert an timeRange with a Duration as a value', () => {
@@ -74,5 +95,43 @@ describe('toListWorkflowQuery', () => {
     });
 
     expect(query).toBe('ExecutionStatus="Running" and WorkflowId="abcdef123"');
+  });
+});
+
+describe('isFilterKey', () => {
+  it('should return true for workflowId', () => {
+    expect(isFilterKey('workflowId')).toBe(true);
+  });
+
+  it('should return true for workflowType', () => {
+    expect(isFilterKey('workflowType')).toBe(true);
+  });
+
+  it('should return true for timeRange', () => {
+    expect(isFilterKey('timeRange')).toBe(true);
+  });
+
+  it('should return true for executionStatus', () => {
+    expect(isFilterKey('executionStatus')).toBe(true);
+  });
+
+  it('should return true for closeTime', () => {
+    expect(isFilterKey('closeTime')).toBe(true);
+  });
+
+  it('should return false for null', () => {
+    expect(isFilterKey(null)).toBe(false);
+  });
+
+  it('should return false for numbers', () => {
+    expect(isFilterKey(12)).toBe(false);
+  });
+
+  it('should return false for arrays', () => {
+    expect(isFilterKey([])).toBe(false);
+  });
+
+  it('should return false for bogus keys', () => {
+    expect(isFilterKey('not a real key')).toBe(false);
   });
 });
