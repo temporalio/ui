@@ -49,7 +49,7 @@
     />
   </td>
   <td
-    class="truncate relative"
+    class="relative truncate"
     on:mouseover={() => (showFilterCopy = true)}
     on:focus={() => (showFilterCopy = true)}
     on:mouseleave={() => (showFilterCopy = false)}
@@ -66,7 +66,7 @@
     </p>
   </td>
   <td
-    class="truncate relative"
+    class="relative truncate"
     on:mouseover={() => (showFilterCopy = true)}
     on:focus={() => (showFilterCopy = true)}
     on:mouseleave={() => (showFilterCopy = false)}
