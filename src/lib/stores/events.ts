@@ -129,9 +129,14 @@ export const updateEventHistory: StartStopNotifier<FetchEventsResponse> = (
 
 export const eventHistory = readable(emptyEvents, updateEventHistory);
 
+export const filteredEvents = writable(null);
+
 export const events: Readable<WorkflowEvents> = derived(
-  [eventHistory, eventCategoryParam],
-  ([$eventHistory, $category]) => {
+  [eventHistory, eventCategoryParam, filteredEvents],
+  ([$eventHistory, $category, $filteredEvents]) => {
+    if ($filteredEvents) {
+      return $filteredEvents;
+    }
     const { events } = $eventHistory;
     if (!$category) return events;
     return events.filter((event) => event.category === $category);
@@ -156,6 +161,17 @@ export const ascendingEventGroups: Readable<EventGroups> = derived(
     const eventGroups = groupEvents(_events);
     if (!$category) return eventGroups;
     return eventGroups.filter((event) => event.category === $category);
+  },
+);
+
+export const ascendingEvents: Readable<WorkflowEvents> = derived(
+  [eventHistory, eventSortOrder, eventCategoryParam],
+  ([$eventHistory, $sortOrder, $category]) => {
+    const { events } = $eventHistory;
+    const _events =
+      $sortOrder === 'descending' ? events.slice().reverse() : events;
+    if (!$category) return _events;
+    return _events.filter((event) => event.category === $category);
   },
 );
 

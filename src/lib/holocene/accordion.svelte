@@ -6,7 +6,7 @@
   export let subtitle: string = '';
   export let icon: IconName | undefined = undefined;
 
-  let open: boolean = false;
+  export let open: boolean = false;
 </script>
 
 <section
@@ -32,7 +32,7 @@
       <h3>{subtitle}</h3>
     </div>
     {#if open}
-      <div class="content w-full">
+      <div id="accordion-content" class="w-full">
         <slot />
       </div>
     {/if}
