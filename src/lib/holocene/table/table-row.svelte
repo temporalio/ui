@@ -3,12 +3,14 @@
 </script>
 
 {#if href}
-  <a {href}>
+  <a class=" table-row {$$props.class}" {href}>
+    <td />
     <slot />
     <td />
   </a>
 {:else}
-  <tr>
+  <tr class={$$props.class}>
+    <td />
     <slot />
     <td />
   </tr>

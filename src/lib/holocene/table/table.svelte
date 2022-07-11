@@ -4,10 +4,7 @@
 
 <table class="{variant} {$$props.class}">
   <thead>
-    <tr>
-      <slot name="headers" />
-      <th />
-    </tr>
+    <slot name="headers" />
   </thead>
   <tbody>
     <slot />
@@ -31,11 +28,11 @@
     thead {
       @apply bg-gray-900 text-gray-100;
 
-      tr :global(th) {
-        @apply border border-b-0 border-r-0 border-l-0 p-3;
+      :global(th) {
+        @apply border-t border-gray-300 py-3 px-1;
 
         &:first-child {
-          @apply rounded-tl-lg border-l border-gray-300;
+          @apply rounded-tl-lg border-l border-gray-300 w-0;
         }
 
         &:last-child {
@@ -45,30 +42,28 @@
     }
 
     tbody :global {
-      tr {
-        td {
-          @apply border-t border-l-0 border-gray-300 px-3 py-2 text-sm;
+      td {
+        @apply border-t border-gray-300 px-1 py-3 text-sm;
 
-          &:first-child {
-            @apply border-l border-gray-300;
-          }
-
-          &:last-child {
-            @apply border-r border-gray-300 w-0 p-0;
-          }
+        &:first-child {
+          @apply border-l border-gray-300;
         }
 
         &:last-child {
-          td {
-            @apply border-b border-gray-300;
+          @apply border-r border-gray-300 w-0 p-0;
+        }
+      }
 
-            &:first-child {
-              @apply rounded-bl-lg;
-            }
+      &:last-child {
+        td {
+          @apply border-b border-gray-300;
 
-            &:last-child {
-              @apply rounded-br-lg;
-            }
+          &:first-child {
+            @apply rounded-bl-lg;
+          }
+
+          &:last-child {
+            @apply rounded-br-lg;
           }
         }
       }
