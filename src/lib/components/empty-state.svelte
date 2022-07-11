@@ -1,9 +1,11 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/index.svelte';
+  import type { IconName } from '$lib/holocene/icon/paths';
 
   export let title: string;
   export let content: string = '';
   export let error: string = '';
+  export let icon: IconName = 'comet';
 </script>
 
 <div
@@ -13,7 +15,7 @@
   <span
     class="flex h-16 w-16 items-center justify-center rounded-full bg-gray-200"
   >
-    <Icon name="comet" class="block h-full w-full" /></span
+    <Icon name={icon} class="block h-full w-full" /></span
   >
   <h2 class="text-xl font-medium">{title}</h2>
   {#if content}
@@ -26,4 +28,5 @@
       {error}
     </p>
   {/if}
+  <slot />
 </div>
