@@ -367,8 +367,6 @@ const temporalIcon: Icon = {
   ],
 };
 
-// <circle cx="12" cy = "16" r = "1" fill = "currentColor" > </circle>
-
 const warningIcon = {
   paths: [
     {

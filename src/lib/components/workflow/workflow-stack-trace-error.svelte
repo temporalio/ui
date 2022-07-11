@@ -13,7 +13,7 @@
   <section class="stack-trace">
     <EmptyState
       icon="warning"
-      title="No Workers Running."
+      title="No Workers Running"
       content="Please make sure you have at least one worker connected to the {workflow.taskQueue} Task Queue."
       class="my-0"
     />
