@@ -1,17 +1,15 @@
 <script lang="ts">
   import { formatDate } from '$lib/utilities/format-date';
-  import { activeEvent, events } from '$lib/stores/events';
+  import {
+    ascendingEventGroups,
+    eventGroups,
+    events,
+  } from '$lib/stores/events';
   import { timeFormat } from '$lib/stores/time-format';
   import { eventSortParam, eventViewType } from '$lib/stores/event-view';
   import { mouseX } from '$lib/stores/page';
 
-  export let type: string;
   export let x: number;
-  export let showDateRange = false;
-
-  $: typeEvents = $events.filter((e) =>
-    e.eventType.toLowerCase().includes(type),
-  );
 
   const dateDiff = (date1, date2): number => {
     if (!date1 || !date2) {
@@ -45,76 +43,91 @@
     }
   }
 
-  const getColor = (): string => {
-    if (type === 'completed') return 'bg-green-500';
-    if (type === 'started') return 'bg-blue-500';
-    if (type === 'scheduled') return 'bg-pink-300';
-    if (type === 'failed') return 'bg-red-300';
-    if (type === 'terminated') return 'bg-red-600';
-    if (type === 'timedout') return 'bg-orange-500';
-    if (type === 'canceled') return 'bg-yellow-400';
-    if (type === 'marker') return 'bg-indigo-500';
-    return 'bg-gray-200';
-  };
-
-  const getColorHex = (): string => {
-    if (type === 'completed') return '#22c55e';
-    if (type === 'started') return '#3b82f6';
-    if (type === 'scheduled') return '#f9a8d4';
-    if (type === 'failed') return '#fca5a5';
-    if (type === 'terminated') return '#dc2626';
-    if (type === 'timedout') return '#f97316';
-    if (type === 'canceled') return '#facc15';
-    if (type === 'marker') return '#6366f1';
+  const getColorHex = (category): string => {
+    if (category === 'activity') return '#22c55e';
+    // if (category === 'workflow') return '#3b82f6';
+    // if (category === 'scheduled') return '#f9a8d4';
+    // if (category === 'failed') return '#fca5a5';
+    // if (category === 'terminated') return '#dc2626';
+    // if (category === 'timedout') return '#f97316';
+    if (category === 'timer') return '#facc15';
+    if (category === 'marker') return '#6366f1';
     return '#e4e4e7';
   };
 
   $: startDate = $events[0]?.eventTime;
   $: endDate = $events[$events.length - 1]?.eventTime;
-  $: midDate = new Date(
-    new Date(endDate) - (new Date(endDate) - new Date(startDate)) / 2,
-  );
 
   $: getCurrentTime = (): number => {
     const start = Date.parse(startDate);
-    const current = start + $mouseX - 138;
+    const current = start + $mouseX * (totalDistance / x);
+    drawTime();
     return new Date(current);
   };
 
   function draw() {
-    const canvas = document.getElementById(`canvas-${type}`);
+    const canvas = document.getElementById('timeline-canvas');
     if (canvas?.getContext) {
       const ctx = canvas.getContext('2d');
-      typeEvents.forEach((event) => {
-        ctx.fillStyle = getColorHex();
-        ctx.fillRect(getDistance(event.eventTime), 30, 2, -30);
+      $ascendingEventGroups.forEach((group, i) => {
+        console.log('Group: ', group);
+        console.log(
+          'Start distance: ',
+          getDistance(group.eventList[0].eventTime),
+        );
+        console.log(
+          'End distance: ',
+          getDistance(group.eventList[group.eventList.length - 1].eventTime),
+        );
+        ctx.fillStyle = getColorHex(group.category);
+        ctx.fillRect(
+          getDistance(group.eventList[0].eventTime),
+          30 * (i + 1),
+          getDistance(group.eventList[group.eventList.length - 1].eventTime),
+          -30,
+        );
+        //   ctx.fillRect(getDistance(event.eventTime), 30 * (i + 1), 1, -30);
+        // ctx.fillStyle = '#000';
+        // group.eventList.forEach((event) => {
+        //   ctx.fillRect(getDistance(event.eventTime), 30 * (i + 1), 1, -30);
+        // });
       });
+    }
+  }
+
+  function drawTime() {
+    const canvas = document.getElementById('timeline-canvas');
+    if (canvas?.getContext) {
+      const ctx = canvas.getContext('2d');
+      ctx.beginPath();
+      ctx.lineWidth = '5'; // width of the line
+      ctx.strokeStyle = '#000'; // color of the line
+      ctx.moveTo($mouseX, 30 * $ascendingEventGroups.length); // begins a new sub-path based on the given x and y values.
+      ctx.lineTo($mouseX, 0); // used to create a pointer based on x and y
+      ctx.stroke(); // this is where the actual drawing happens.
+
+      // ctx.fillRect(
+      //   $mouseX,
+      //   30 * $ascendingEventGroups.length,
+      //   4,
+      //   -30 * $ascendingEventGroups.length,
+      // );
     }
   }
 </script>
 
-{#if typeEvents.length}
-  <section class="my-1 w-full">
-    <h3 class="my-2 text-sm">
-      <div class="w-2  h-2 inline-block rounded-full {getColor()}" />
-      {type} ({typeEvents.length})
-    </h3>
-    <canvas
-      id="canvas-{type}"
-      class="border-b border-b-gray-300"
-      width={totalDistance * (x / totalDistance) - 210}
-      height="30"
-    />
-  </section>
-{/if}
-{#if showDateRange}
-  <div class="font-base flex justify-between">
-    <small>
-      {formatDate(startDate, $timeFormat)}
-    </small>
-    <small>
-      {formatDate(endDate, $timeFormat)}
-    </small>
-  </div>
-  <h3 class="text-center">{formatDate(getCurrentTime(), $timeFormat)}</h3>
-{/if}
+<canvas
+  id="timeline-canvas"
+  class="border-b border-b-gray-300"
+  width={totalDistance * (x / totalDistance) - 210}
+  height={30 * ($ascendingEventGroups?.length ?? 1)}
+/>
+<div class="font-base flex justify-between">
+  <small>
+    {formatDate(startDate, $timeFormat)}
+  </small>
+  <small>
+    {formatDate(endDate, $timeFormat)}
+  </small>
+</div>
+<h3 class="text-center">{formatDate(getCurrentTime(), $timeFormat)}</h3>

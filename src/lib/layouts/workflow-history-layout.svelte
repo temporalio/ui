@@ -131,15 +131,9 @@
     </Accordion>
   </section>
   <section class="flex w-full">
-    <Accordion title="Timeline" icon="chart" class="border-gray-900">
+    <Accordion title="Timeline" icon="chart" class="border-gray-900" open>
       <div on:mousemove={handleMousemove}>
-        {#each types as type, i}
-          <EventHistoryTimeline
-            {type}
-            {x}
-            showDateRange={i === types.length - 1}
-          />
-        {/each}
+        <EventHistoryTimeline {x} />
       </div>
     </Accordion>
   </section>
