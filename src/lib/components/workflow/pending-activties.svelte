@@ -116,7 +116,7 @@
 
 <style lang="postcss">
   .pending-activity-row {
-    @apply mb-2 flex gap-2 w-full flex-row items-center;
+    @apply mb-2 flex w-full flex-row items-center gap-2;
   }
 
   .pending-activity-summary {
@@ -128,18 +128,18 @@
   }
 
   .pending-activity-inner-row {
-    @apply w-full flex flex-row gap-6 content-between;
+    @apply flex w-full flex-row content-between gap-6;
   }
 
   .pending-activity-detail {
-    @apply xl:flex xl:flex-row xl:items-center xl:gap-2 w-full whitespace-nowrap;
+    @apply w-full whitespace-nowrap xl:flex xl:flex-row xl:items-center xl:gap-2;
   }
 
   .pending-activity-detail-header {
-    @apply font-medium after:content-[':'];
+    @apply font-medium;
   }
 
   .pending-activity-failure-details {
-    @apply w-full gap-4 flex flex-row;
+    @apply flex w-full flex-row gap-4;
   }
 </style>
