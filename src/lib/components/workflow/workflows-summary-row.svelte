@@ -85,7 +85,7 @@
       onFilter={() => onTypeClick(workflow.name)}
       filtered={$page.url?.searchParams?.get('query')?.includes(workflow.name)}
     />
-    <p class="">
+    <p class="inline-time-cell">
       {formatDate(workflow.endTime, timeFormat)}
     </p>
   </td>
