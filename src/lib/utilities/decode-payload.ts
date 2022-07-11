@@ -83,7 +83,7 @@ export const decodePayloadAttributes = (
 };
 
 // List of fields with payloads
-const payloadFields: string[][] = [
+const payloadFields = [
   ['data'],
   ['input'],
   ['result'],
@@ -99,9 +99,9 @@ const payloadFields: string[][] = [
   ['queryArgs'],
   ['answer'],
   ['signalInput'],
-];
+] as const;
 
-const get = (fields, object) =>
+const getField = (fields, object) =>
   fields.reduce(
     (nestedObject, field) =>
       nestedObject && nestedObject?.[field] ? nestedObject[field] : null,
@@ -109,10 +109,10 @@ const get = (fields, object) =>
   );
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getPotentialPayloads = (anyAttributes: any): Payload[] | null => {
+export const getPotentialPayloads = (anyAttributes: any): Payload[] | null => {
   let payloads = null;
   for (const field of payloadFields) {
-    const value = get(field, anyAttributes);
+    const value = getField(field, anyAttributes);
     if (value && value?.payloads) {
       payloads = value.payloads;
       break;
@@ -156,7 +156,7 @@ export const convertPayloadToJsonWithCodec = async ({
     }
 
     for (const field of payloadFields) {
-      const value = get(field, anyAttributes);
+      const value = getField(field, anyAttributes);
       if (value?.payloads) {
         value.payloads = JSONPayload;
       }
@@ -199,7 +199,7 @@ export const convertPayloadToJsonWithWebsocket = async (
     }
 
     for (const field of payloadFields) {
-      const value = get(field, anyAttributes);
+      const value = getField(field, anyAttributes);
       if (value?.payloads) {
         value.payloads = JSONPayload;
       }
