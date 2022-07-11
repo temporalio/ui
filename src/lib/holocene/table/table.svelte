@@ -14,7 +14,7 @@
 <style lang="postcss">
   table {
     thead :global(th) {
-      @apply text-left text-sm font-medium font-secondary;
+      @apply text-left font-secondary text-sm font-medium;
     }
 
     tbody :global(td) {
@@ -23,7 +23,7 @@
   }
 
   table.fancy {
-    @apply border-separate rounded-lg border-gray-300 border-spacing-0;
+    @apply border-separate border-spacing-0 rounded-lg border-gray-300;
 
     thead {
       @apply bg-gray-900 text-gray-100;
@@ -32,11 +32,11 @@
         @apply border-t border-gray-300 py-3 px-1;
 
         &:first-child {
-          @apply rounded-tl-lg border-l border-gray-300 w-0;
+          @apply w-0 rounded-tl-lg border-l border-gray-300;
         }
 
         &:last-child {
-          @apply rounded-tr-lg border-r border-gray-300 w-0;
+          @apply w-0 rounded-tr-lg border-r border-gray-300;
         }
       }
     }
@@ -50,7 +50,7 @@
         }
 
         &:last-child {
-          @apply border-r border-gray-300 w-0 p-0;
+          @apply w-0 border-r border-gray-300 p-0;
         }
       }
 
@@ -72,11 +72,11 @@
 
   table.simple {
     thead :global(th) {
-      @apply border-primary border-b py-2;
+      @apply border-b border-primary py-2;
     }
 
     tbody :global(td) {
-      @apply border-gray-300 border-b py-2;
+      @apply border-b border-gray-300 py-2;
     }
 
     &:last-child {

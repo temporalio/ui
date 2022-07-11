@@ -5,7 +5,7 @@
 
 <Table class="w-full">
   <TableHeaderRow slot="headers">
-    <th class="hidden md:table-cell w-28">Status</th>
+    <th class="hidden w-28 md:table-cell">Status</th>
     <th class="hidden md:table-cell md:w-60 xl:w-auto">Workflow ID</th>
     <th class="hidden md:table-cell md:w-60 xl:w-80">Type</th>
     <th class="hidden xl:table-cell xl:w-64">Start</th>
