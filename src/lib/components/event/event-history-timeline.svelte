@@ -1,38 +1,17 @@
 <script lang="ts">
-  import { ascendingEvents, filteredEvents } from '$lib/stores/events';
+  import { ascendingEvents, timelineEvents } from '$lib/stores/events';
   import { mouseX } from '$lib/stores/page';
   import { onMount } from 'svelte';
   import { getEventColorHex } from '$lib/utilities/get-event-style';
+  import { getTimestampDifference } from '$lib/utilities/format-date';
 
   export let x: number;
   export let type: string;
-
-  let blockCount = 100;
-  let totalDistance = 1000;
+  export let totalDistance = 1000;
+  export let startDate: string;
+  export let blockCount;
 
   $: typeEvents = $ascendingEvents.filter((e) => e.eventType.includes(type));
-
-  function handleMouseMove(event) {
-    $mouseX = event.clientX;
-  }
-
-  const dateDiff = (date1, date2): number => {
-    if (!date1 || !date2) {
-      return 0;
-    }
-    const parse1 = Date.parse(date1);
-    const parse2 = Date.parse(date2);
-    return Math.abs(parse1 - parse2);
-  };
-
-  const getDistance = (date1): number => {
-    if (!date1) {
-      return 0;
-    }
-
-    const diff = dateDiff($ascendingEvents[0]?.eventTime, date1);
-    return diff * (x / totalDistance);
-  };
 
   onMount(() => {
     function onResize() {
@@ -47,15 +26,32 @@
 
   $: {
     if ($ascendingEvents.length) {
-      totalDistance = dateDiff(
-        $ascendingEvents[0]?.eventTime,
-        $ascendingEvents[$ascendingEvents.length - 1]?.eventTime,
-      );
       setTimeout(() => {
         draw();
       }, 0);
     }
   }
+
+  $: {
+    if (blockCount) {
+      setTimeout(() => {
+        draw();
+      }, 0);
+    }
+  }
+
+  function handleMouseMove(event) {
+    $mouseX = event.clientX;
+  }
+
+  const getDistance = (currentDate): number => {
+    if (!currentDate) {
+      return 0;
+    }
+
+    const diff = getTimestampDifference(startDate, currentDate);
+    return diff * (x / totalDistance);
+  };
 
   function draw() {
     const canvas = document.getElementById(
@@ -65,20 +61,16 @@
       const ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      const blockDistance = (totalDistance * (x / totalDistance)) / 100;
+      const blockDistance = (totalDistance * (x / totalDistance)) / blockCount;
       Array.from(Array(blockCount).keys()).forEach((block, i) => {
         const start = blockDistance * i;
         const end = start + blockDistance;
         let count = 0;
-        let active = false;
 
         for (let event of typeEvents) {
           const distance = getDistance(event.eventTime);
           if (distance > start && distance <= end) {
             count = count + 1;
-            if ($filteredEvents?.find((e) => e.id === event.id)) {
-              active = true;
-            }
           }
         }
 
@@ -93,23 +85,26 @@
   }
 
   const handleClick = (e) => {
-    const clickedX = e.clientX - 139;
-    const blockDistance = (totalDistance * (x / totalDistance)) / 100;
-    const clickedBlock = Array.from(Array(blockCount).keys()).filter(
+    const canvas = document.getElementById(
+      `timeline-canvas-${type}`,
+    ) as HTMLCanvasElement;
+
+    const { x: canvasX } = canvas.getBoundingClientRect();
+    const clickedX = e.clientX - canvasX;
+    const blockDistance = (totalDistance * (x / totalDistance)) / blockCount;
+
+    const clickedBlockIndex = Array.from(Array(blockCount).keys()).find(
       (block, i) => {
         const start = blockDistance * i;
         const end = start + blockDistance;
-        if (clickedX > start && clickedX <= end) {
-          return block;
-        }
+        return clickedX > start && clickedX <= end;
       },
     );
 
-    const activeIndex = clickedBlock[0];
-    if (activeIndex) {
-      const startOfBlock = blockDistance * activeIndex;
+    if (clickedBlockIndex >= 0) {
+      const startOfBlock = blockDistance * clickedBlockIndex;
       const endOfBlock = startOfBlock + blockDistance;
-      $filteredEvents = typeEvents.filter((event) => {
+      $timelineEvents = typeEvents.filter((event) => {
         const distance = getDistance(event.eventTime);
         return distance > startOfBlock && distance <= endOfBlock;
       });

@@ -129,13 +129,13 @@ export const updateEventHistory: StartStopNotifier<FetchEventsResponse> = (
 
 export const eventHistory = readable(emptyEvents, updateEventHistory);
 
-export const filteredEvents = writable(null);
+export const timelineEvents = writable(null);
 
 export const events: Readable<WorkflowEvents> = derived(
-  [eventHistory, eventCategoryParam, filteredEvents],
-  ([$eventHistory, $category, $filteredEvents]) => {
-    if ($filteredEvents) {
-      return $filteredEvents;
+  [eventHistory, eventCategoryParam, timelineEvents],
+  ([$eventHistory, $category, $timelineEvents]) => {
+    if ($timelineEvents) {
+      return $timelineEvents;
     }
     const { events } = $eventHistory;
     if (!$category) return events;

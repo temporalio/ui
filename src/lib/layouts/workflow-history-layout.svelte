@@ -101,8 +101,13 @@
     </Accordion>
   </section>
   <section class="flex w-full">
-    <Accordion title="Timeline" icon="chart" class="border-gray-900" open>
-      <EventHistoryTimelineContainer />
+    <Accordion
+      title="Timeline"
+      icon="chart"
+      class="select-none border-gray-900"
+      open
+    >
+      <EventHistoryTimelineContainer isRunning={workflow.isRunning} />
     </Accordion>
   </section>
   <section id="event-history">
@@ -116,7 +121,7 @@
             href={routeForEventHistory(routeParameters('feed'))}
             active={$eventViewType === 'feed'}
             data-cy="feed"
-            on:click={() => ($eventViewType = 'feed')}>Timeline</ToggleButton
+            on:click={() => ($eventViewType = 'feed')}>History</ToggleButton
           >
           <ToggleButton
             icon="compact"
