@@ -71,7 +71,6 @@
     on:focus={() => (showFilterCopy = true)}
     on:mouseleave={() => (showFilterCopy = false)}
     on:blur={() => (showFilterCopy = false)}
-    on:click|preventDefault|stopPropagation={noop}
   >
     <h3 class="md:hidden">Workflow Name:</h3>
     <span

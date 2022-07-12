@@ -105,9 +105,7 @@ describe('Workflow Executions List', () => {
           encodeURIComponent(`ExecutionStatus="Running"`),
         );
 
-        cy.get(
-          `[href="/namespaces/default/workflows/${workflowId}/${runId}"] > :nth-child(3) > .table-link`,
-        ).click();
+        cy.get('.workflow-summary-row').first().click();
 
         cy.wait('@workflow-api');
         cy.wait('@event-history-api');

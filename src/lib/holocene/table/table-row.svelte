@@ -3,7 +3,7 @@
 </script>
 
 {#if href}
-  <a class=" table-row {$$props.class}" {href}>
+  <a class="table-row {$$props.class}" {href}>
     <td />
     <slot />
     <td />
