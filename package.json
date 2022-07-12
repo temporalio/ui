@@ -1,6 +1,6 @@
 {
   "name": "@temporalio/ui",
-  "version": "2.0.22",
+  "version": "2.0.23",
   "type": "module",
   "description": "Temporal.io UI",
   "keywords": [
@@ -98,7 +98,7 @@
     "svelte-preprocess": "^4.10.4",
     "svelte-use-form": "^2.4.3",
     "svelte2tsx": "^0.5.10",
-    "tailwindcss": "^3.0.18",
+    "tailwindcss": "^3.1.4",
     "ts-node": "^10.2.1",
     "ts-proto": "^1.82.5",
     "tslib": "^2.3.1",

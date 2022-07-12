@@ -1,3 +1,5 @@
+const defaultTheme = require('tailwindcss/defaultTheme');
+
 const temporalColors = {
   primary: { DEFAULT: '#18181b' }, // gray-900
   secondary: '#64748b', // blue-gray-500
@@ -137,8 +139,8 @@ const config = {
     textColor: temporalColors,
     backgroundColor: temporalColors,
     fontFamily: {
-      poppins: ['Poppins', 'sans-serif'],
-      inter: ['Inter', 'sans-serif'],
+      primary: ['Inter', ...defaultTheme.fontFamily.sans],
+      secondary: ['Poppins', ...defaultTheme.fontFamily.sans],
     },
     extend: {
       animation: {

@@ -3,6 +3,9 @@
   import { routeForNamespace } from '$lib/utilities/route-for';
   import { page } from '$app/stores';
   import PageTitle from '$lib/holocene/page-title.svelte';
+  import Table from '$holocene/table/table.svelte';
+  import TableHeaderRow from '$holocene/table/table-header-row.svelte';
+  import TableRow from '$holocene/table/table-row.svelte';
 
   const { showTemporalSystemNamespace } = $page.stuff.settings;
   const namespaces = ($page.stuff.namespaces || []).filter(
@@ -15,28 +18,24 @@
 <PageTitle title="Namespaces" url={$page.url.href} />
 <h1 class="mb-8 text-2xl">Namespaces</h1>
 {#if namespaces?.length > 0}
-  <table class="fancy w-full ">
-    <thead class="">
-      <tr>
-        <th>Name</th>
-      </tr>
-    </thead>
-    <tbody class="">
-      {#each namespaces as namespace}
-        <tr class="">
-          <td>
-            <a
-              href={routeForNamespace({
-                namespace: namespace.namespaceInfo.name,
-              })}
-              class="hover:text-blue-700 hover:underline hover:decoration-blue-700 md:text-base"
-              >{namespace.namespaceInfo.name}</a
-            >
-          </td>
-        </tr>
-      {/each}
-    </tbody>
-  </table>
+  <Table variant="fancy" class="w-full">
+    <TableHeaderRow slot="headers">
+      <th>Name</th>
+    </TableHeaderRow>
+    {#each namespaces as namespace}
+      <TableRow>
+        <td>
+          <a
+            href={routeForNamespace({
+              namespace: namespace.namespaceInfo.name,
+            })}
+            class="hover:text-blue-700 hover:underline hover:decoration-blue-700"
+            >{namespace.namespaceInfo.name}</a
+          >
+        </td>
+      </TableRow>
+    {/each}
+  </Table>
 {:else}
   <div class="prose mt-[15vh] max-w-none text-center">
     <h3>No Namespaces Found</h3>

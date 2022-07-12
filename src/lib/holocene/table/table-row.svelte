@@ -1,7 +1,17 @@
-<script lang="ts"></script>
+<script lang="ts">
+  export let href: string = '';
+</script>
 
-<tr
-  class="break-words border-b border-gray-300 last-of-type:border-b-0 {$$props.class}"
->
-  <slot />
-</tr>
+{#if href}
+  <a class="table-row {$$props.class}" {href}>
+    <td />
+    <slot />
+    <td />
+  </a>
+{:else}
+  <tr class={$$props.class}>
+    <td />
+    <slot />
+    <td />
+  </tr>
+{/if}

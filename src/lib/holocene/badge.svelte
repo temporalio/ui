@@ -1,5 +1,11 @@
 <script lang="ts" context="module">
-  export type BadgeType = 'alpha' | 'beta' | 'warning' | 'default' | 'count';
+  export type BadgeType =
+    | 'alpha'
+    | 'beta'
+    | 'warning'
+    | 'default'
+    | 'count'
+    | 'active';
 </script>
 
 <script lang="ts">
@@ -27,6 +33,10 @@
 
   .default {
     @apply border-gray-700 bg-gray-300 text-gray-700;
+  }
+
+  .active {
+    @apply border-green-100 bg-green-100 text-green-700;
   }
 
   .count {
