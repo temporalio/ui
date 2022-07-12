@@ -42,4 +42,4 @@ jobs:
       - name: Commit and push version bump
         run: |
           git remote set-url origin https://x-access-token:${{ secrets.COMMANDER_DATA_TOKEN }}@github.com/${{ github.repository }}
-          git push
+          git push origin {{ github.ref_name }}
