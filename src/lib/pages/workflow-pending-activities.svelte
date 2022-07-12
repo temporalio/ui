@@ -16,12 +16,10 @@
 
   const { pendingActivities, defaultWorkflowTaskTimeout } =
     $workflowRun.workflow;
+  const workflow = $page.params?.workflow;
 </script>
 
-<PageTitle
-  title={`Pending Activities | ${$page.params?.workflow}`}
-  url={$page.url.href}
-/>
+<PageTitle title={`Pending Activities | ${workflow}`} url={$page.url.href} />
 {#if pendingActivities.length}
   <section class="event-table">
     <header class="event-table-header">

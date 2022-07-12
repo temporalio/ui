@@ -13,7 +13,7 @@
   const { workers, workflow } = $workflowRun;
 </script>
 
-<PageTitle title={`Workers | ${$page.params?.workflow}`} url={$page.url.href} />
+<PageTitle title={`Workers | ${workflow.id}`} url={$page.url.href} />
 <section class="flex flex-col gap-4">
   <h3 class="text-lg font-medium">
     Task Queue: <span class="select-all font-normal">{workflow.taskQueue}</span>
