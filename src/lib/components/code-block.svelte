@@ -55,7 +55,7 @@
       class="w-full overflow-x-scroll rounded-lg p-4"
       class:h-full={!inline}><code
         bind:this={root}
-        class={`language-${language}`}
+        class="language-{language}"
         data-cy={$$props['data-cy']}
       /></pre>
 
