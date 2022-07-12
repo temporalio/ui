@@ -176,7 +176,12 @@
       }}
     >
       {#if $namespaceSelectorOpen}
-        <NamespaceList {getNamespaceList} />
+        <NamespaceList
+          {getNamespaceList}
+          on:closeNamespaceList={(event) => {
+            $namespaceSelectorOpen = false;
+          }}
+        />
       {/if}
     </Drawer>
   </svelte:fragment>

@@ -5,14 +5,37 @@
 
   import { onMount } from 'svelte';
   import EmptyState from './empty-state.svelte';
+  import { createEventDispatcher } from 'svelte';
 
   export let getNamespaceList: () => Promise<NamespaceItem[]> = null;
 
   let namespaceList = null;
+  let searchField: HTMLInputElement = null;
 
   onMount(() => {
     namespaceList = getNamespaceList();
+    searchField.focus();
   });
+  const dispatch = createEventDispatcher();
+
+  /** When a user presses escape close the namespace switcher  */
+  export function rootDocumentHandler(node: Element): { destroy: () => void } {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (node && !event.defaultPrevented) {
+        if (event.key === 'Escape') {
+          dispatch('closeNamespaceList');
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown, true);
+
+    return {
+      destroy() {
+        document.removeEventListener('keydown', handleKeyDown, true);
+      },
+    };
+  }
 
   $: searchValue = '';
 </script>
@@ -28,7 +51,13 @@
   <div class="ml-4 mr-2">
     <Icon name="search" scale={1} />
   </div>
-  <input class="w-full" placeholder="Search" bind:value={searchValue} />
+  <input
+    class="w-full"
+    placeholder="Search"
+    use:rootDocumentHandler
+    bind:value={searchValue}
+    bind:this={searchField}
+  />
 </div>
 
 <ul data-cy="namespace-list">
