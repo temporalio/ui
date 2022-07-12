@@ -3,15 +3,16 @@
   import Badge from '$holocene/badge.svelte';
   import Table from '$holocene/table/table.svelte';
   import TableRow from '$holocene/table/table-row.svelte';
+  import TableHeaderRow from '$holocene/table/table-header-row.svelte';
 </script>
 
 <Chapter description="A Fancy Table">
   <Table variant="fancy" class="w-full">
-    <svelte:fragment slot="headers">
+    <TableHeaderRow slot="headers">
       <th class="w-1/5">Status</th>
       <th class="w-1/5">Email</th>
       <th>Role</th>
-    </svelte:fragment>
+    </TableHeaderRow>
     <TableRow>
       <td>
         <Badge type="active">Active</Badge>
@@ -23,7 +24,7 @@
       <td>
         <Badge type="active">Active</Badge>
       </td>
-      <td>Lucile@temporal.io</td>
+      <td>lucile@temporal.io</td>
       <td>Developer</td>
     </TableRow>
     <TableRow>
@@ -38,21 +39,21 @@
 
 <Chapter description="A Simple Table">
   <Table variant="simple" class="w-full">
-    <svelte:fragment slot="headers">
+    <tr slot="headers">
       <th>Attribute</th>
       <th>Type</th>
-    </svelte:fragment>
-    <TableRow>
+    </tr>
+    <tr>
       <td>searchAttribute1</td>
       <td>Unspecified</td>
-    </TableRow>
-    <TableRow>
+    </tr>
+    <tr>
       <td>searchAttribute2</td>
       <td>Text</td>
-    </TableRow>
-    <TableRow>
+    </tr>
+    <tr>
       <td>searchAttribute3</td>
       <td>Keyword</td>
-    </TableRow>
+    </tr>
   </Table>
 </Chapter>
