@@ -41,10 +41,7 @@
   };
 </script>
 
-<PageTitle
-  title={`Stack Trace | ${$page.params?.workflow}`}
-  url={$page.url.href}
-/>
+<PageTitle title={`Stack Trace | ${workflow.id}`} url={$page.url.href} />
 <section>
   {#if workflow.isRunning && workers?.pollers?.length > 0}
     {#await stackTrace}

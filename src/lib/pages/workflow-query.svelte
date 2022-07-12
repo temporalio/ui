@@ -41,7 +41,7 @@
   }
 </script>
 
-<PageTitle title={`Query | ${$page.params?.workflow}`} url={$page.url.href} />
+<PageTitle title={`Query | ${workflow.id}`} url={$page.url.href} />
 <section>
   {#await queryTypes}
     <div class="text-center">
