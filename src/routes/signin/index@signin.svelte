@@ -32,8 +32,8 @@
   export let settings: Settings;
 </script>
 
-<NavigationHeader href="/" user={undefined} />
-<HamburgerHeader href="/" user={undefined} />
+<NavigationHeader href="/" user={{}} />
+<HamburgerHeader href="/" user={{}} />
 <section class="my-[20vh] text-center">
   <h1 class="text-8xl font-semibold">Welcome back.</h1>
   <p class="my-7">Let's get you signed in.</p>
