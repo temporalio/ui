@@ -23,4 +23,26 @@ describe('hasKeys', () => {
     const source = {};
     expect(hasKeys(source)).toBe(false);
   });
+
+  it('should return false if given null', () => {
+    expect(hasKeys(null as unknown as Parameters<typeof hasKeys>[0])).toBe(
+      false,
+    );
+  });
+
+  it('should return false if given undefined', () => {
+    expect(hasKeys(undefined as unknown as Parameters<typeof hasKeys>[0])).toBe(
+      false,
+    );
+  });
+
+  it('should return false if given a number', () => {
+    expect(hasKeys(3 as unknown as Parameters<typeof hasKeys>[0])).toBe(false);
+  });
+
+  it('should return false if given a boolean', () => {
+    expect(hasKeys(true as unknown as Parameters<typeof hasKeys>[0])).toBe(
+      false,
+    );
+  });
 });
