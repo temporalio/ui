@@ -22,7 +22,7 @@
     return JSON.stringify(parsedData, undefined, inline ? 0 : 2);
   };
 
-  const parsedContent = isJSON ? formatJSON(content) : content;
+  $: parsedContent = isJSON ? formatJSON(content) : content;
   const { copy, copied } = copyToClipboard(parsedContent);
 
   function highlight(root: HTMLElement, language: string, source: string) {
