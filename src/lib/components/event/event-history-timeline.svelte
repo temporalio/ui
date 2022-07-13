@@ -1,17 +1,16 @@
 <script lang="ts">
-  import { ascendingEvents, timelineEvents } from '$lib/stores/events';
+  import { timelineEvents } from '$lib/stores/events';
   import { mouseX } from '$lib/stores/page';
   import { onMount } from 'svelte';
   import { getEventColorHex } from '$lib/utilities/get-event-style';
   import { getTimestampDifference } from '$lib/utilities/format-date';
 
+  export let typeEvents: WorkflowEvents;
   export let x: number;
   export let type: string;
   export let totalDistance = 1000;
   export let startDate: string;
   export let blockCount;
-
-  $: typeEvents = $ascendingEvents.filter((e) => e.eventType.includes(type));
 
   onMount(() => {
     function onResize() {
@@ -25,7 +24,7 @@
   });
 
   $: {
-    if ($ascendingEvents.length) {
+    if (typeEvents.length) {
       setTimeout(() => {
         draw();
       }, 0);
@@ -75,11 +74,26 @@
         }
 
         ctx.fillStyle = count > 0 ? getEventColorHex(type) : '#e4e4e7';
-        ctx.fillRect(start, 30, blockDistance - 2, -30);
-        // if (count > 1) {
-        // ctx.fillStyle = '#000';
-        // ctx.fillText('+', start + blockDistance / 4, 18);
-        // }
+        ctx.strokeStyle = count > 0 ? getEventColorHex(type) : '#e4e4e7';
+        // ctx.globalAlpha = count > 0 ? 0.05 * count : 1;
+        if (count > 0) {
+          ctx.fillRect(start, 30, blockDistance - 2, -count);
+          // ctx.fillRect(start, 30, blockDistance - 2, -30);
+        } else {
+          ctx.fillRect(start, 30, blockDistance - 2, -30);
+        }
+        if (count >= 1) {
+          ctx.fillStyle = '#000';
+          ctx.font = `${
+            blockCount < 100 ? '14' : '10'
+          }px Source Sans Pro, Inter`;
+          ctx.fillText(
+            count.toString(),
+            start +
+              blockDistance / (blockCount < 50 ? 2 : blockCount < 100 ? 3 : 5),
+            20,
+          );
+        }
       });
     }
   }
@@ -94,7 +108,7 @@
     const blockDistance = (totalDistance * (x / totalDistance)) / blockCount;
 
     const clickedBlockIndex = Array.from(Array(blockCount).keys()).find(
-      (block, i) => {
+      (_, i) => {
         const start = blockDistance * i;
         const end = start + blockDistance;
         return clickedX > start && clickedX <= end;

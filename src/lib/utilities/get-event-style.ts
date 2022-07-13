@@ -1,9 +1,9 @@
 export const getEventColorHex = (type: string): string => {
-  if (type === 'WorkflowTask') return '#22c55e';
-  if (type === 'ChildWorkflow') return '#64748b';
-  if (type === 'ActivityTask') return '#3b82f6';
-  if (type === 'Marker') return '#c084fc';
-  if (type === 'Signal') return '#fdba74';
-  if (type === 'Timer') return '#fde047';
+  if (type === 'ActivityTask') return '#8B5CF6';
+  if (type === 'Marker') return '#EC4899';
+  if (type === 'ChildWorkflow') return '#F59E0B';
+  if (type === 'Signal') return '#DD6B20';
+  if (type === 'Timer') return '#1D4ED8';
+  if (type === 'WorkflowTask') return '#10B981';
   return '#e4e4e7';
 };

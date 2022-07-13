@@ -99,6 +99,7 @@ export const parameters: Readable<FetchEventsParameters> = derived(
   },
 );
 
+
 export const parametersWithSettings: Readable<FetchEventsParametersWithSettings> =
   derived([parameters, settings], ([$parameters, $settings]) => {
     return {

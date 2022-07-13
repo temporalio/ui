@@ -11,7 +11,10 @@
   import { eventViewType } from '$lib/stores/event-view';
 
   import { onDestroy } from 'svelte';
-  import { clearPreviousEventParameters } from '$lib/stores/events';
+  import {
+    ascendingEvents,
+    clearPreviousEventParameters,
+  } from '$lib/stores/events';
 
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
@@ -107,7 +110,10 @@
       class="select-none border-gray-900"
       open
     >
-      <EventHistoryTimelineContainer isRunning={workflow.isRunning} />
+      <EventHistoryTimelineContainer
+        events={$ascendingEvents}
+        isRunning={workflow.isRunning}
+      />
     </Accordion>
   </section>
   <section id="event-history">

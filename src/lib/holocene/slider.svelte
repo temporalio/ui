@@ -8,7 +8,6 @@
   export let min = 0;
   export let max = 100;
   export let initialValue = 0;
-  export let step = 1;
   export let id = null;
   export let value =
     typeof initialValue === 'string' ? parseInt(initialValue) : initialValue;
@@ -123,8 +122,9 @@
     // Limit percent 0 -> 100
     percent = percent < 0 ? 0 : percent > 100 ? 100 : percent;
 
+    const newValue = parseInt((percent * (max - min)) / 100) + min;
     // Limit value min -> max
-    setValue(parseInt((percent * (max - min)) / 100) + min);
+    setValue(newValue);
   }
 
   // Handles both dragging of touch/mouse as well as simple one-off click/touches
@@ -178,7 +178,6 @@
   <div
     class="range__wrapper"
     tabindex="0"
-    {step}
     on:keydown={onKeyPress}
     bind:this={element}
     role="slider"
