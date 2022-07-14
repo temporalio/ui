@@ -26,6 +26,13 @@ const operators = [
   '!=',
   '===',
   '!==',
+  'and',
+  'or',
+  'between',
+  'order by',
+  'in',
+  '(',
+  ')',
 ] as const;
 
 export const isString = (x: unknown): x is string => typeof x === 'string';
@@ -66,6 +73,7 @@ export const isQuote = (x: unknown): x is Quote => {
 
 export const isOperator = (x: unknown): x is Operator => {
   if (!isString(x)) return false;
+  x = x.toLocaleLowerCase();
 
   for (const operator of operators) {
     if (x === operator) return true;
@@ -74,7 +82,9 @@ export const isOperator = (x: unknown): x is Operator => {
   return false;
 };
 
-export const isSortOrder = (sortOrder: string): sortOrder is EventSortOrder => {
+export const isSortOrder = (
+  sortOrder: string | EventSortOrder,
+): sortOrder is EventSortOrder => {
   if (sortOrder === 'ascending') return true;
   if (sortOrder === 'descending') return true;
   return false;

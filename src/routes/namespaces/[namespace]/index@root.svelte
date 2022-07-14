@@ -8,7 +8,6 @@
     if (searchParams.has('time-range')) searchParams.delete('time-range');
 
     const namespace = params.namespace;
-
     const namespaces: DescribeNamespaceResponse[] = stuff.namespaces;
 
     const currentNamespace = namespaces.find(
@@ -17,7 +16,7 @@
 
     if (!currentNamespace) {
       return {
-        error: `Namespace ${namespace} does not exist`,
+        error: `The namespace "${namespace}" does not exist.`,
         status: 404,
       };
     }
@@ -34,17 +33,23 @@
 </script>
 
 <script lang="ts">
-  import { dev } from '$app/env';
   import { onMount } from 'svelte';
+  import { dev } from '$app/env';
+  import { page } from '$app/stores';
 
   import { temporalVersion, uiVersion } from '$lib/stores/versions';
   import { supportsReverseOrder } from '$lib/stores/event-view';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
+  import { searchAttributes } from '$lib/stores/search-attributes';
 
   import { fromSecondsToDaysOrHours } from '$lib/utilities/format-date';
   import { getClusters } from '$lib/utilities/get-clusters';
+
   import PageTitle from '$lib/holocene/page-title.svelte';
-  import { page } from '$app/stores';
+  import Table from '$lib/holocene/table/table.svelte';
+  import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
+  import TableRow from '$lib/holocene/table/table-row.svelte';
+  import { getEnabledCategories } from 'trace_events';
 
   export let currentNamespace: DescribeNamespaceResponse;
   export let clusters: string;
@@ -99,6 +104,7 @@
       {clusters}
     </p>
   </article>
+
   <article class="namespace-info w-full p-4">
     <h1 class="my-4 text-lg font-medium">Versions</h1>
     <p data-cy="server-version">
@@ -117,3 +123,21 @@
     {/if}
   </article>
 </div>
+
+{#if $searchAttributes}
+  <section>
+    <h1 class="my-4 text-lg font-medium">Search Attributes</h1>
+    <Table class="w-full">
+      <TableHeaderRow slot="headers">
+        <th>Key</th>
+        <th>Type</th>
+      </TableHeaderRow>
+      {#each Object.entries($searchAttributes) as [key, type]}
+        <TableRow>
+          <td>{key}</td>
+          <td>{type}</td>
+        </TableRow>
+      {/each}
+    </Table>
+  </section>
+{/if}

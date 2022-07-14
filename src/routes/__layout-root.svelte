@@ -1,6 +1,6 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
-  import type { ListNamespacesResponse } from '$types';
+  import type { ListNamespacesResponse, GetClusterInfoResponse } from '$types';
 
   import '../app.css';
 
@@ -9,9 +9,10 @@
   import { fetchCluster } from '$lib/services/cluster-service';
   import { fetchNamespaces } from '$lib/services/namespaces-service';
   import { fetchLatestUiVersion } from '$lib/services/github-service';
+  import { fetchSearchAttributes } from '$lib/services/search-attributes-service';
+
   import { getDefaultNamespace } from '$lib/utilities/get-namespace';
   import { isAuthorized } from '$lib/utilities/is-authorized';
-  import type { GetClusterInfoResponse } from '$types';
 
   export const load: Load = async function ({ fetch }) {
     const settings: Settings = await fetchSettings(fetch);
@@ -28,11 +29,15 @@
       settings,
       fetch,
     );
+
     const defaultNamespace: string = getDefaultNamespace({
       namespaces: namespacesResp?.namespaces,
       settings,
     });
+
     const cluster: GetClusterInfoResponse = await fetchCluster(settings, fetch);
+
+    fetchSearchAttributes(settings);
 
     const uiVersionInfo: UiVersionInfo = {
       current: settings.version,

@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { groupEvents } from '.';
-import { createEventGroup } from './create-event-group';
 import {
   eventIsCanceled,
   eventIsFailureOrTimedOut,
