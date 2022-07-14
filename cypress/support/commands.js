@@ -32,6 +32,12 @@ Cypress.Commands.add('interceptNamespacesApi', () => {
   }).as('namespaces-api');
 });
 
+Cypress.Commands.add('interceptSearchAttributesApi', () => {
+  cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/search-attributes*', {
+    fixture: 'search-attributes.json',
+  }).as('search-attributes-api');
+});
+
 Cypress.Commands.add('interceptWorkflowsApi', () => {
   cy.intercept(
     Cypress.env('VITE_API_HOST') + `/api/v1/namespaces/*/workflows?query=*`,
@@ -112,5 +118,6 @@ Cypress.Commands.add(
     cy.interceptQueryApi();
     cy.interceptTaskQueuesApi();
     cy.interceptSettingsApi();
+    cy.interceptSearchAttributesApi();
   },
 );
