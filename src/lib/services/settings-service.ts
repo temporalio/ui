@@ -1,5 +1,6 @@
 import { browser } from '$app/env';
 import { settings } from '$lib/stores/settings';
+import { getApiOrigin } from '$lib/utilities/get-api-origin';
 import { getEnvironment } from '$lib/utilities/get-environment';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
@@ -20,8 +21,7 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
       enabled: !!settingsResponse?.Auth?.Enabled,
       options: settingsResponse?.Auth?.Options,
     },
-    baseUrl:
-      import.meta?.env?.VITE_API ?? browser ? window.location.origin : '',
+    baseUrl: getApiOrigin(),
     codec: {
       endpoint: settingsResponse?.Codec?.Endpoint,
       accessToken: settingsResponse?.Codec?.AccessToken,
