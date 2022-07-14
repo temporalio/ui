@@ -8,21 +8,17 @@ const searchAttributes = writable<SearchAttributes>({
 
 describe('isSearchAttribute', () => {
   it('should return true if the attribute is a key in the search attributes', () => {
-    expect(isSearchAttribute('WorkflowType', { WorkflowType: 'Keyword' })).toBe(
-      true,
-    );
+    expect(isSearchAttribute('WorkflowType', searchAttributes)).toBe(true);
   });
 
   it('should return false if the attribute is not a key in the search attributes', () => {
-    expect(isSearchAttribute('NotAKey', { WorkflowType: 'Keyword' })).toBe(
-      false,
-    );
+    expect(isSearchAttribute('NotAKey', searchAttributes)).toBe(false);
   });
 
   it('should return false if the attribute is null', () => {
-    expect(
-      isSearchAttribute(null as unknown as string, { WorkflowType: 'Keyword' }),
-    ).toBe(false);
+    expect(isSearchAttribute(null as unknown as string, searchAttributes)).toBe(
+      false,
+    );
   });
 
   it('should return false if the attribute is undefined', () => {
