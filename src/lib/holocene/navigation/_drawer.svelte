@@ -8,7 +8,7 @@
 </script>
 
 <div
-  class={`transition-width absolute right-[300px] z-10 h-full w-[300px] overflow-auto border-r-2 border-gray-200 bg-white p-5 text-gray-900 md:right-[500px] md:w-[500px]`}
+  class={`transition-width absolute right-[500px] z-10 h-full w-[500px] overflow-auto border-r-2 border-gray-200 bg-white p-5 text-gray-900`}
   class:flyin
   class:flyout
   use:clickOutside
@@ -46,7 +46,7 @@
     }
   }
 
-  @keyframes flyinSmall {
+  /* @keyframes flyinSmall {
     0% {
       right: 0;
       box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
@@ -67,7 +67,7 @@
       box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
         0 4px 6px -4px rgb(0 0 0 / 0.1);
     }
-  }
+  } */
 
   .flyin {
     animation-name: flyin;
@@ -85,27 +85,13 @@
     animation-timing-function: ease-in-out;
     animation-fill-mode: forwards;
   }
-
+  /* 
   @media (max-width: 640px) {
     .flyin {
       animation-name: flyinSmall;
-      animation-duration: 0.3s;
-      animation-iteration-count: 1;
-      animation-direction: normal;
-      animation-timing-function: ease-in-out;
-      animation-fill-mode: forwards;
     }
     .flyout {
       animation-name: flyoutSmall;
-      animation-duration: 0.3s;
-      animation-iteration-count: 1;
-      animation-direction: normal;
-      animation-timing-function: ease-in-out;
-      animation-fill-mode: forwards;
     }
-  }
-
-  .transition-width {
-    transition: width 0.25s linear, max-width 0.25s linear;
-  }
+  } */
 </style>
