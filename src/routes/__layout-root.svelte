@@ -37,7 +37,7 @@
 
     const cluster: GetClusterInfoResponse = await fetchCluster(settings, fetch);
 
-    fetchSearchAttributes();
+    fetchSearchAttributes(settings);
 
     const uiVersionInfo: UiVersionInfo = {
       current: settings.version,
