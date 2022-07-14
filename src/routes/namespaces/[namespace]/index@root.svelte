@@ -16,7 +16,7 @@
 
     if (!currentNamespace) {
       return {
-        error: `Namespace ${namespace} does not exist`,
+        error: `The namespace "${namespace}" does not exist.`,
         status: 404,
       };
     }
@@ -124,18 +124,20 @@
   </article>
 </div>
 
-<section>
-  <h1 class="my-4 text-lg font-medium">Search Attributes</h1>
-  <Table class="w-full">
-    <TableHeaderRow slot="headers">
-      <th>Key</th>
-      <th>Type</th>
-    </TableHeaderRow>
-    {#each Object.entries($searchAttributes) as [key, type]}
-      <TableRow>
-        <td>{key}</td>
-        <td>{type}</td>
-      </TableRow>
-    {/each}
-  </Table>
-</section>
+{#if $searchAttributes}
+  <section>
+    <h1 class="my-4 text-lg font-medium">Search Attributes</h1>
+    <Table class="w-full">
+      <TableHeaderRow slot="headers">
+        <th>Key</th>
+        <th>Type</th>
+      </TableHeaderRow>
+      {#each Object.entries($searchAttributes) as [key, type]}
+        <TableRow>
+          <td>{key}</td>
+          <td>{type}</td>
+        </TableRow>
+      {/each}
+    </Table>
+  </section>
+{/if}
