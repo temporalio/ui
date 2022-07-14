@@ -60,28 +60,28 @@ const categories = [
   'workflow',
 ] as const;
 
-type EventTypeOption = {
+export type EventTypeOption = {
   label: string;
   option: EventTypeCategory | undefined;
+  color?: string;
 };
 
 export const allEventTypeOptions: EventTypeOption[] = [
   { label: 'All', option: undefined },
-  { label: 'Activity', option: 'activity' },
-  { label: 'Child Workflow', option: 'child-workflow' },
-  { label: 'Command', option: 'command' },
-  { label: 'Marker', option: 'marker' },
-  { label: 'Signal', option: 'signal' },
-  { label: 'Timer', option: 'timer' },
-  { label: 'Workflow', option: 'workflow' },
+  { label: 'Activity', option: 'activity', color: '#8B5CF6' },
+  { label: 'Child Workflow', option: 'child-workflow', color: '#F59E0B' },
+  { label: 'Command', option: 'command', color: '#10B981' },
+  { label: 'Marker', option: 'marker', color: '#EC4899' },
+  { label: 'Signal', option: 'signal', color: '#DD6B20' },
+  { label: 'Timer', option: 'timer', color: '#1D4ED8' },
+  { label: 'Workflow', option: 'workflow', color: '#10B981' },
 ];
 
-export const compactEventTypeOptions: EventTypeOption[] = [
-  { label: 'All', option: undefined },
-  { label: 'Activity', option: 'activity' },
-  { label: 'Signal', option: 'signal' },
-  { label: 'Timer', option: 'timer' },
-];
+const compactEventTypes: (EventTypeCategory | undefined)[] = [undefined, 'activity', 'signal', 'timer'];
+export const compactEventTypeOptions: EventTypeOption[] = allEventTypeOptions.filter(({ option }) => compactEventTypes.includes(option));
+
+const timelineEventTypes: EventTypeCategory[] = ['activity', 'child-workflow', 'command', 'signal', 'timer'];
+export const timelineEventTypeOptions: EventTypeOption[] = allEventTypeOptions.filter(({ option }) => timelineEventTypes.includes(option));
 
 export const getEventCategory = (eventType: EventType): EventTypeCategory => {
   return eventTypeCategorizations[eventType];

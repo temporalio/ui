@@ -5,25 +5,21 @@
     formatDate,
     getTimestampDifference,
   } from '$lib/utilities/format-date';
-  import { getEventColorHex } from '$lib/utilities/get-event-style';
 
   import EventHistoryTimeline from '$lib/components/event/event-history-timeline.svelte';
   import { timeFormat } from '$lib/stores/time-format';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/index.svelte';
+  import {
+    getEventsInCategory,
+    timelineEventTypeOptions,
+  } from '$lib/models/event-history/get-event-categorization';
+  import EventHistoryGroupTimeline from './event-history-group-timeline.svelte';
 
   export let events: WorkflowEvents;
+  export let eventGroups: EventGroups;
   export let isRunning: boolean;
   let x: number;
-
-  const types = [
-    'ActivityTask',
-    'ChildWorkflow',
-    'Marker',
-    'Signal',
-    'Timer',
-    'WorkflowTask',
-  ];
 
   $: startDate = events[0]?.eventTime;
   $: endDate = events[events.length - 1]?.eventTime;
@@ -66,13 +62,13 @@
 
 <div class="my-4 flex flex-col xl:flex-row items-center justify-between gap-2">
   <div class="flex flex-col md:flex-row gap-2 lg:gap-4">
-    {#each types as type}
+    {#each timelineEventTypeOptions as type}
       <h3 class="flex items-center text-sm xl:text-base">
         <div
           class="mx-2 h-4 w-4 rounded-full"
-          style="background: {getEventColorHex(type)}"
+          style="background: {type.color}"
         />
-        {type}
+        {type.label}
       </h3>
     {/each}
   </div>
@@ -105,17 +101,25 @@
   </div>
 </div>
 <div bind:clientWidth={x}>
-  {#each types as type}
-    {@const typeEvents = events.filter((e) => e.eventType.includes(type))}
+  <!-- {#each timelineEventTypeOptions as type}
+    {@const typeEvents = getEventsInCategory(events, type.option)}
     <EventHistoryTimeline
-      {typeEvents}
-      {x}
+      events={typeEvents}
       {type}
+      {x}
       {startDate}
       {totalDistance}
       {blockCount}
     />
-  {/each}
+  {/each} -->
+  <EventHistoryGroupTimeline
+    {events}
+    {eventGroups}
+    {x}
+    {startDate}
+    {totalDistance}
+    {blockCount}
+  />
 </div>
 <div class="font-base">
   <div class="flex justify-end">

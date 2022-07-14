@@ -12,6 +12,7 @@
 
   import { onDestroy } from 'svelte';
   import {
+    ascendingEventGroups,
     ascendingEvents,
     clearPreviousEventParameters,
   } from '$lib/stores/events';
@@ -112,6 +113,7 @@
     >
       <EventHistoryTimelineContainer
         events={$ascendingEvents}
+        eventGroups={$ascendingEventGroups}
         isRunning={workflow.isRunning}
       />
     </Accordion>
