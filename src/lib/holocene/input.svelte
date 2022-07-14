@@ -26,6 +26,7 @@
     class="m-2 block w-full bg-white focus:outline-none"
     class:copyable
     disabled={copyable}
+    data-lpignore="true"
     {placeholder}
     {id}
     {name}
