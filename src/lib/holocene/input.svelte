@@ -11,6 +11,7 @@
   export let name = id;
   export let copyable: boolean = false;
   export let theme: 'dark' | 'light' = 'light';
+  export let autocomplete = false;
 
   const { copy, copied } = copyToClipboard(value);
 </script>
@@ -29,6 +30,7 @@
     {placeholder}
     {id}
     {name}
+    autocomplete={autocomplete ? 'on' : 'off'}
     bind:value
     on:input
     on:change
