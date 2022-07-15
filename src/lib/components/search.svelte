@@ -30,6 +30,7 @@
     {name}
     {value}
     {placeholder}
+    autocomplete="off"
     on:input
   />
   <div>

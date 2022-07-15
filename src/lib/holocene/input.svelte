@@ -12,6 +12,7 @@
   export let copyable: boolean = false;
   export let disabled = false;
   export let theme: 'dark' | 'light' = 'light';
+  export let autocomplete = false;
 
   const { copy, copied } = copyToClipboard(value);
 </script>
@@ -29,9 +30,11 @@
     class="m-2 block w-full bg-white focus:outline-none"
     class:copyable
     disabled={disabled || copyable}
+    data-lpignore="true"
     {placeholder}
     {id}
     {name}
+    autocomplete={autocomplete ? 'on' : 'off'}
     bind:value
     on:input
     on:change
