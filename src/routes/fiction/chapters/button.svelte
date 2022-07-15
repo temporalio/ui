@@ -8,13 +8,13 @@
 <Chapter
   description="A secondary button"
   component={Button}
-  props={{ secondary: true }}>Secondary</Chapter
+  props={{ variant: 'secondary' }}>Secondary</Chapter
 >
 
 <Chapter
   description="A dangerous button"
   component={Button}
-  props={{ destroy: true }}>Danger</Chapter
+  props={{ variant: 'destructive' }}>Danger</Chapter
 >
 
 <Chapter
@@ -26,7 +26,7 @@
 <Chapter
   description="A disabled secondary button"
   component={Button}
-  props={{ disabled: true, secondary: true }}>Disabled Secondary</Chapter
+  props={{ disabled: true, variant: 'secondary' }}>Disabled Secondary</Chapter
 >
 
 <Chapter

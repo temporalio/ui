@@ -84,14 +84,14 @@
 
 <style lang="postcss">
   .button {
-    @apply relative flex w-fit items-center justify-center gap-2 font-secondary text-sm;
+    @apply rounded relative flex w-fit items-center justify-center gap-2 font-secondary text-sm;
   }
 
   .primary,
   .secondary,
   .destructive,
   .login {
-    @apply border py-2 px-4  transition-colors;
+    @apply border py-2 px-4 transition-colors;
   }
 
   .button:disabled {
@@ -103,7 +103,7 @@
   }
 
   .primary {
-    @apply rounded border-primary bg-primary text-white;
+    @apply border-primary bg-primary text-white;
   }
 
   .primary:disabled {
