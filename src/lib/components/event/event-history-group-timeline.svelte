@@ -1,139 +1,115 @@
 <script lang="ts">
   import { timelineEvents } from '$lib/stores/events';
-  import { mouseX } from '$lib/stores/page';
-  import { onMount } from 'svelte';
-  import { getTimestampDifference } from '$lib/utilities/format-date';
+  import {
+    formatDate,
+    getTimestampDifference,
+  } from '$lib/utilities/format-date';
   import { timelineEventTypeOptions } from '$lib/models/event-history/get-event-categorization';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { timeFormat } from '$lib/stores/time-format';
 
+  export let events: WorkflowEvents;
   export let eventGroups: EventGroups;
-  export let x: number;
-  export let totalDistance = 1000;
-  export let startDate: string;
-  export let blockCount: number;
+  export let isRunning: boolean;
 
-  let width = totalDistance * (x / totalDistance);
+  let width;
   let canvas;
-  let height = 100;
+  let m = { x: 0, y: 0 };
   let blockHeight = 20;
-
-  onMount(() => {
-    function onResize() {
-      setTimeout(() => {
-        draw();
-      }, 0);
-    }
-
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  });
-
-  $: {
-    if (eventGroups.length) {
-      height = eventGroups.length * blockHeight;
-      setTimeout(() => {
-        draw();
-      }, 0);
-    }
-  }
+  let buffer = 50;
 
   function handleMouseMove(event) {
-    $mouseX = event.clientX;
+    const offset = canvas.getBoundingClientRect();
+    if (event.target.id === 'timeline-canvas') {
+      if (event.clientX) {
+        m.x = event.clientX - offset.x;
+      }
+    }
   }
 
-  const getDistance = (currentDate): number => {
-    if (!currentDate) {
+  $: startDate = events[0]?.eventTime;
+  $: currentDate = new Date(
+    Date.parse(startDate) + m.x * (totalDistance / width),
+  );
+  $: endDate = events[events.length - 1]?.eventTime;
+
+  $: totalDistance = getTimestampDifference(
+    startDate as string,
+    endDate as string,
+  );
+
+  $: getDistance = (date): number => {
+    if (!date) {
       return 0;
     }
 
-    const diff = getTimestampDifference(startDate, currentDate);
-    return diff * (x / totalDistance);
+    const diff = getTimestampDifference(startDate, date);
+    return diff * (width / totalDistance);
   };
 
-  function drawAxis() {
-    const ctx = canvas.getContext('2d');
-    const gridGap = 5;
+  $: getGroupProperties = (group: EventGroup) => {
+    const index = eventGroups.indexOf(group);
+    const startDistance = getDistance(group.initialEvent.eventTime);
+    const endDistance = getDistance(group.lastEvent.eventTime);
+    const duration = endDistance - startDistance;
+    const typeOption = timelineEventTypeOptions.find(
+      (o) => o.option == group.category,
+    );
+    const top = index * blockHeight + buffer / 2;
+    return `top: ${top}px; left: ${startDistance}px; width: ${
+      duration || blockHeight
+    }px; height: ${blockHeight - 4}px; background: ${
+      typeOption?.color ?? '#e4e4e7'
+    }; margin: 2px 0;`;
+  };
 
-    // no of vertical grid lines
-    var num_lines_x = Math.floor(height / blockCount);
-
-    for (var i = 0; i <= blockCount; i++) {
-      ctx.beginPath();
-      ctx.lineWidth = 1;
-
-      // If line represents X-axis draw in different color
-      if (i == num_lines_x) ctx.strokeStyle = '#000000';
-      else ctx.strokeStyle = '#e9e9e9';
-
-      if (i == num_lines_x) {
-        ctx.moveTo(0, blockCount * i);
-        ctx.lineTo(width, blockCount * i);
-      } else {
-        ctx.moveTo(0, blockCount * i + 0.5);
-        ctx.lineTo(width, blockCount * i + 0.5);
-      }
-      ctx.stroke();
-    }
-  }
-
-  function drawGroups() {
-    const ctx = canvas.getContext('2d');
-
-    for (let group of eventGroups) {
-      const index = eventGroups.indexOf(group);
-      const startDistance = getDistance(group.initialEvent.eventTime);
-      const endDistance = getDistance(group.lastEvent.eventTime);
-      const duration = endDistance - startDistance;
-      const typeOption = timelineEventTypeOptions.find(
-        (o) => o.option == group.category,
-      );
-      if (duration > 0) {
-        ctx.fillStyle = typeOption ? typeOption.color : '#e4e4e7';
-        ctx.fillRect(startDistance, blockHeight * index, duration, blockHeight);
-        ctx.font = `14px Source Sans Pro, Inter`;
-        ctx.fillText(
-          group.name,
-          endDistance + 3,
-          blockHeight * index + blockHeight - 5,
-        );
-      }
-    }
-  }
-
-  function draw() {
-    if (canvas?.getContext) {
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawAxis();
-      drawGroups();
-    }
-  }
-
-  const handleClick = (e) => {
-    const { x: canvasX, y: canvasY } = canvas.getBoundingClientRect();
-    const clickedX = e.clientX - canvasX;
-    const clickedY = e.clientY - canvasY;
-    for (let group of eventGroups) {
-      const index = eventGroups.indexOf(group);
-      const startDistance = getDistance(group.initialEvent.eventTime);
-      const endDistance = getDistance(group.lastEvent.eventTime);
-      const inX = clickedX > startDistance && clickedX <= endDistance;
-      const inY =
-        clickedY > index * blockHeight && clickedY <= (index + 1) * blockHeight;
-      if (inX && inY) {
-        $timelineEvents = group.eventList;
-      }
-    }
+  const handleGroupClick = (group) => {
+    $timelineEvents = group.eventList;
   };
 </script>
 
-{#if eventGroups.length}
-  <canvas
+<div
+  class="max-h-80 w-full cursor-crosshair overflow-auto rounded-lg bg-blueGray-900"
+  bind:clientWidth={width}
+  on:mousemove|stopPropagation={handleMouseMove}
+>
+  <div
+    id="timeline-canvas"
     bind:this={canvas}
-    id="timeline-group-canvas"
-    class="my-2 cursor-pointer p-0"
-    {width}
-    {height}
-    on:click={handleClick}
-    on:mousemove={handleMouseMove}
+    style="height: {blockHeight * eventGroups.length + buffer}px;"
+  >
+    {#each eventGroups as group}
+      {@const style = getGroupProperties(group)}
+      <div class="event-group" {style} on:click={() => handleGroupClick(group)}>
+        <Tooltip top text={group.name}
+          ><div class="rounded-full" {style} /></Tooltip
+        >
+      </div>
+    {/each}
+  </div>
+  <div
+    class="absolute top-0 bg-blueGray-500"
+    style="height: {blockHeight * eventGroups.length +
+      buffer}px;left: {m.x}px; width: 1px"
   />
-{/if}
+</div>
+<div class="font-base">
+  <div class="flex justify-end">
+    <pre class="text-right">Start: {formatDate(startDate, $timeFormat)}</pre>
+  </div>
+  <div class="flex justify-end">
+    <pre>Current: {formatDate(currentDate, $timeFormat)}</pre>
+  </div>
+  <div class="flex justify-end">
+    <pre class="text-right">{isRunning ? 'Last' : 'End'}: {formatDate(
+        endDate,
+        $timeFormat,
+      )}</pre>
+  </div>
+</div>
+
+<style lang="postcss">
+  .event-group {
+    @apply absolute cursor-pointer rounded-full text-center transition duration-300 ease-in-out hover:-translate-y-1 hover:drop-shadow-lg;
+  }
+</style>

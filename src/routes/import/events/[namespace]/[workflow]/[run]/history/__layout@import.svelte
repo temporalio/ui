@@ -26,7 +26,7 @@
       <EventHistoryTimelineContainer events={$importEvents} isRunning={false} />
     </Accordion>
   </section>
-  <nav class="flex items-end justify-end gap-4 my-4">
+  <nav class="my-4 flex items-end justify-end gap-4">
     <div id="event-view-toggle" class="flex gap-4">
       <ToggleButtons>
         <ToggleButton

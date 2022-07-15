@@ -19,49 +19,10 @@
   export let events: WorkflowEvents;
   export let eventGroups: EventGroups;
   export let isRunning: boolean;
-  let x: number;
-
-  $: startDate = events[0]?.eventTime;
-  $: endDate = events[events.length - 1]?.eventTime;
-  $: totalDistance = getTimestampDifference(
-    startDate as string,
-    endDate as string,
-  );
-
-  const allSteps = [
-    { id: '1m', value: 72000000 },
-    { id: '1w', value: 16800000 },
-    { id: '1d', value: 2400000 },
-    { id: '1h', value: 100000 },
-    { id: '1m', value: 60000 },
-    { id: '10s', value: 10000 },
-    { id: '1s', value: 1000 },
-    { id: '100ms', value: 100 },
-    { id: '20ms', value: 20 },
-    { id: '10ms', value: 10 },
-  ];
-
-  $: steps = [];
-  $: activeStep = 1000;
-
-  $: {
-    steps = allSteps.filter(
-      (step) =>
-        Math.ceil(totalDistance / step.value) <= 200 &&
-        Math.floor(totalDistance / step.value) >= 1,
-    );
-    activeStep = steps[steps.length - 1]?.value ?? 1000;
-  }
-  $: blockCount = Math.ceil(totalDistance / activeStep);
-
-  const onStepClick = (stepValue: number) => {
-    activeStep = stepValue;
-    blockCount = Math.ceil(totalDistance / stepValue);
-  };
 </script>
 
-<div class="my-4 flex flex-col xl:flex-row items-center justify-between gap-2">
-  <div class="flex flex-col md:flex-row gap-2 lg:gap-4">
+<div class="my-4 flex flex-col items-center justify-between gap-2 xl:flex-row">
+  <div class="flex flex-col gap-2 md:flex-row lg:gap-4">
     {#each timelineEventTypeOptions as type}
       <h3 class="flex items-center text-sm xl:text-base">
         <div
@@ -72,66 +33,21 @@
       </h3>
     {/each}
   </div>
-  <div
-    class="flex flex-col md:flex-row grow gap-2 items-center justify-between"
-  >
-    <div class="grow inline-flex gap-2 justify-center" role="group">
-      {#each steps as { id, value }}
-        <Button
-          active={value === activeStep}
-          secondary
-          on:click={() => onStepClick(value)}>{id}</Button
-        >
-      {/each}
-    </div>
-
-    <div class="flex gap-2">
-      <Button
-        secondary
-        disabled={$timelineEvents === null}
-        on:click={() => ($timelineEvents = null)}>Clear</Button
-      >
-      <Button
-        secondary
-        disabled={!isRunning}
-        on:click={() => window.location.reload()}
-        ><Icon name="refresh" stroke="currentcolor" scale={0.8} /></Button
-      >
-    </div>
+  <div class="flex gap-2">
+    <Button
+      secondary
+      disabled={$timelineEvents === null}
+      on:click={() => ($timelineEvents = null)}>Clear</Button
+    >
+    <Button
+      secondary
+      disabled={!isRunning}
+      on:click={() => window.location.reload()}
+      ><Icon name="refresh" stroke="currentcolor" scale={0.8} /></Button
+    >
   </div>
 </div>
-<div bind:clientWidth={x}>
-  <!-- {#each timelineEventTypeOptions as type}
-    {@const typeEvents = getEventsInCategory(events, type.option)}
-    <EventHistoryTimeline
-      events={typeEvents}
-      {type}
-      {x}
-      {startDate}
-      {totalDistance}
-      {blockCount}
-    />
-  {/each} -->
-  <EventHistoryGroupTimeline
-    {events}
-    {eventGroups}
-    {x}
-    {startDate}
-    {totalDistance}
-    {blockCount}
-  />
-</div>
-<div class="font-base">
-  <div class="flex justify-end">
-    <pre class="text-right">Start {formatDate(startDate, $timeFormat)}</pre>
-  </div>
-  <div class="flex justify-end">
-    <pre class="text-right">{isRunning ? 'Last' : 'End'} {formatDate(
-        endDate,
-        $timeFormat,
-      )}</pre>
-  </div>
-</div>
+<EventHistoryGroupTimeline {events} {eventGroups} {isRunning} />
 
 <!-- <div class="font-base flex justify-between">
   <div>

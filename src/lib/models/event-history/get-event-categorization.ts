@@ -77,11 +77,29 @@ export const allEventTypeOptions: EventTypeOption[] = [
   { label: 'Workflow', option: 'workflow', color: '#10B981' },
 ];
 
-const compactEventTypes: (EventTypeCategory | undefined)[] = [undefined, 'activity', 'signal', 'timer'];
-export const compactEventTypeOptions: EventTypeOption[] = allEventTypeOptions.filter(({ option }) => compactEventTypes.includes(option));
+const compactEventTypes: (EventTypeCategory | undefined)[] = [
+  undefined,
+  'activity',
+  'signal',
+  'timer',
+];
+export const compactEventTypeOptions: EventTypeOption[] =
+  allEventTypeOptions.filter(({ option }) =>
+    compactEventTypes.includes(option),
+  );
 
-const timelineEventTypes: EventTypeCategory[] = ['activity', 'child-workflow', 'command', 'signal', 'timer'];
-export const timelineEventTypeOptions: EventTypeOption[] = allEventTypeOptions.filter(({ option }) => timelineEventTypes.includes(option));
+const timelineEventTypes: EventTypeCategory[] = [
+  'activity',
+  'child-workflow',
+  'command',
+  'marker',
+  'signal',
+  'timer',
+];
+export const timelineEventTypeOptions: EventTypeOption[] =
+  allEventTypeOptions.filter(({ option }) =>
+    timelineEventTypes.includes(option),
+  );
 
 export const getEventCategory = (eventType: EventType): EventTypeCategory => {
   return eventTypeCategorizations[eventType];
