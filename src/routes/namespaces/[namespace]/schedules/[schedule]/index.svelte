@@ -210,7 +210,7 @@
     </Modal>
     <Modal
       open={showDeleteConfirmation}
-      confirmType="destroy"
+      confirmType="destructive"
       confirmText={'Delete'}
       on:cancelModal={() => (showDeleteConfirmation = false)}
       on:confirmModal={() => handleDelete()}
