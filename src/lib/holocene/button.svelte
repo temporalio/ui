@@ -84,7 +84,7 @@
 
 <style lang="postcss">
   .button {
-    @apply rounded relative flex w-fit items-center justify-center gap-2 font-secondary text-sm;
+    @apply relative flex w-fit items-center justify-center gap-2 rounded font-secondary text-sm;
   }
 
   .primary,
@@ -143,7 +143,7 @@
   }
 
   .link {
-    @apply bg-none border-0 p-0 text-sm shadow-none underline font-primary;
+    @apply border-0 bg-none p-0 font-primary text-sm underline shadow-none;
   }
 
   .selected {
@@ -156,9 +156,5 @@
 
   .thin {
     @apply py-1;
-  }
-
-  .ghost {
-    @apply bg-white border-0 p-0 text-sm shadow-none;
   }
 </style>
