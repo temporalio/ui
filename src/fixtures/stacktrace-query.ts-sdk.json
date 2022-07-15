@@ -5,7 +5,7 @@
         "metadata": {
           "encoding": "anNvbi9wbGFpbg=="
         },
-        "data": "IiAgICBhdCBQcm9taXNlLnRoZW4gKDxhbm9ueW1vdXM+KVxuICAgIGF0IGdsb2JhbC5zZXRUaW1lb3V0ICgvVXNlcnMvbmlrb2xhaS9EZXNrdG9wL3RzLXNkay9leGFtcGxlL25vZGVfbW9kdWxlcy9AdGVtcG9yYWxpby93b3JrZmxvdy9zcmMvd29ya2VyLWludGVyZmFjZS50czo4NTo3KVxuICAgIGF0IHNldFRpbWVvdXQgKC9Vc2Vycy9uaWtvbGFpL0Rlc2t0b3AvdHMtc2RrL2V4YW1wbGUvc3JjL3dvcmtmbG93cy50czoxMDozMylcbiAgICBhdCBuZXcgUHJvbWlzZSAoPGFub255bW91cz4pXG4gICAgYXQgZGVsYXkgKC9Vc2Vycy9uaWtvbGFpL0Rlc2t0b3AvdHMtc2RrL2V4YW1wbGUvc3JjL3dvcmtmbG93cy50czoxMDo5KVxuICAgIGF0IGRlbGF5ICgvVXNlcnMvbmlrb2xhaS9EZXNrdG9wL3RzLXNkay9leGFtcGxlL3NyYy93b3JrZmxvd3MudHM6MTY6OClcblxuICAgIGF0IGRlbGF5ICgvVXNlcnMvbmlrb2xhaS9EZXNrdG9wL3RzLXNkay9leGFtcGxlL3NyYy93b3JrZmxvd3MudHM6MTY6OCki"
+        "data": "    at Promise.then (<anonymous>)\n    at global.setTimeout (/Users/user/Desktop/ts-sdk/example/node_modules/@temporalio/workflow/src/worker-interface.ts:85:7)\n    at setTimeout (/Users/user/Desktop/ts-sdk/example/src/workflows.ts:10:33)\n    at new Promise (<anonymous>)\n    at delay (/Users/user/Desktop/ts-sdk/example/src/workflows.ts:10:9)\n    at delay (/Users/user/Desktop/ts-sdk/example/src/workflows.ts:16:8)\n\n    at delay (/Users/user/Desktop/ts-sdk/example/src/workflows.ts:16:8)"
       }
     ]
   },
