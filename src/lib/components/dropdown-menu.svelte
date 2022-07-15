@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { scale } from 'svelte/transition';
-  import IconButton from './icon-button.svelte';
+  import IconButton from '$holocene/icon-button.svelte';
+  import Icon from '$holocene/icon/index.svelte';
 
   export let value: string | undefined;
   export let left = false;
@@ -41,12 +42,15 @@
 </script>
 
 <div class="relative inline" bind:this={menu} data-cy={$$props.dataCy}>
-  <IconButton
-    icon="caretDown"
-    on:click={() => (show = !show)}
-    classes="menu focus:outline-none focus:shadow-solid"
-    dataCy="{$$props.dataCy}-button"
-  />
+  <IconButton on:click={() => (show = !show)} dataCy="{$$props.dataCy}-button">
+    <Icon
+      name="caretDown"
+      stroke="currentcolor"
+      width={16}
+      height={16}
+      scale={2 / 3}
+    />
+  </IconButton>
   {#if show}
     <div
       in:scale={{ duration: 200, start: 0.65 }}
@@ -64,7 +68,7 @@
     <span
       in:scale={{ duration: 200, start: 0.65 }}
       out:scale={{ duration: 100, start: 0.65 }}
-      class="absolute top-0 right-0.5 h-2 w-2 rounded-full bg-blue-200"
+      class="absolute h-2 w-2 rounded-full bg-blue-200"
     />
   {/if}
 </div>

@@ -64,7 +64,7 @@
           {#if $dataEncoderEndpoint}
             <p data-cy="data-encoder-endpoint">{$dataEncoder.endpoint}</p>
             <Button
-              secondary
+              variant="secondary"
               on:click={onEndpointClear}
               dataCy="data-encoder-clear-endpoint">Clear</Button
             >
@@ -76,7 +76,7 @@
               bind:value={endpoint}
             />
             <Button
-              secondary
+              variant="secondary"
               on:click={onEndpointSet}
               dataCy="data-encoder-set-endpoint">Set</Button
             >
@@ -114,7 +114,7 @@
             bind:value={endpoint}
           />
           <Button
-            secondary
+            variant="secondary"
             on:click={onEndpointSet}
             dataCy="data-encoder-set-endpoint">Set</Button
           >
@@ -134,7 +134,7 @@
         <div class="flex items-center justify-between">
           <p data-cy="data-encoder-port">{$dataConverterPort}</p>
           <Button
-            secondary
+            variant="secondary"
             on:click={onPointClear}
             dataCy="data-encoder-clear-port">Clear</Button
           >
@@ -153,7 +153,7 @@
             bind:value={port}
           />
           <Button
-            secondary
+            variant="secondary"
             on:click={() => ($dataConverterPort = port)}
             dataCy="data-encoder-set-port"
             >Set

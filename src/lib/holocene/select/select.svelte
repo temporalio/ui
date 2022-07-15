@@ -10,7 +10,7 @@
   type T = $$Generic;
   let show = false;
 
-  export let label: string = '';
+  export let label = '';
   export let id: string;
   export let value: T;
   export let options: T[] | undefined = undefined;
@@ -39,7 +39,9 @@
   }
 </script>
 
-<label class="mb-2" for={id}>{label}</label>
+{#if label}
+  <label class="mb-2" for={id}>{label}</label>
+{/if}
 <MenuContainer class="w-full {$$props.class}">
   <MenuButton
     class="select-input-container"
@@ -78,7 +80,7 @@
 
 <style lang="postcss">
   :global(.select-input-container) {
-    @apply flex h-10 w-full flex-row items-center justify-between rounded-sm border border-gray-900 bg-white px-2 text-base;
+    @apply flex h-10 w-full flex-row items-center justify-between rounded border border-gray-900 bg-white px-2 text-sm;
   }
 
   .select-input {
