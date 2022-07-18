@@ -40,7 +40,7 @@
   <div class="mx-auto">
     <Button
       variant="login"
-      name="lock"
+      icon="lock"
       on:click={() => {
         goto(
           routeForAuthentication({

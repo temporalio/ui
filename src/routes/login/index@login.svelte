@@ -40,7 +40,7 @@
   <div class="mx-auto">
     <Button
       dataCy="login-button"
-      login
+      variant="login"
       icon="lock"
       on:click={() => {
         goto(
