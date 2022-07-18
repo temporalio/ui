@@ -1,6 +1,6 @@
 <script lang="ts">
   import { routeForImport } from '$lib/utilities/route-for';
-  import { importEvents } from '$lib/stores/import-events';
+  import { importEvents, importEventGroups } from '$lib/stores/import-events';
 
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
@@ -23,7 +23,11 @@
       class="select-none border-gray-900"
       open
     >
-      <EventHistoryTimelineContainer events={$importEvents} isRunning={false} />
+      <EventHistoryTimelineContainer
+        events={$importEvents}
+        eventGroups={$importEventGroups}
+        isRunning={false}
+      />
     </Accordion>
   </section>
   <nav class="my-4 flex items-end justify-end gap-4">

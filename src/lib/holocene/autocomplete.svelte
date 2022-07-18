@@ -1,66 +1,67 @@
 <script lang="ts">
-  import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
-  import Icon from '$lib/holocene/icon/index.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
+  import { clickOutside } from '$lib/holocene/outside-click';
+  import Input from '$lib/holocene/input.svelte';
 
   export let id: string;
   export let label: string;
   export let value: string;
   export let icon: IconName = '';
-  export let placeholder = label;
-  export let name = id;
   export let copyable: boolean = false;
   export let theme: 'dark' | 'light' = 'light';
-  export let autocomplete = false;
+  export let options: string[];
+  export let onOptionClick: (option: string) => void;
 
-  const { copy, copied } = copyToClipboard(value);
+  let show = false;
+  $: filteredOptions = !value
+    ? options
+    : options.filter((option) =>
+        option.toLowerCase().includes(value.toLowerCase()),
+      );
 </script>
 
-<div class="input-container {theme}" class:copyable>
-  <label for={id} class="hidden">{label}</label>
-  {#if icon !== ''}
-    <span class="icon-container">
-      <Icon name={icon} scale={0.9} stroke="currentcolor" />
-    </span>
-  {/if}
-  <input
-    class="m-2 block w-full bg-white focus:outline-none"
-    class:copyable
-    disabled={copyable}
-    data-lpignore="true"
-    {placeholder}
+<div
+  class="autocomplete-container"
+  use:clickOutside
+  on:click-outside={() => (show = false)}
+>
+  <Input
     {id}
-    {name}
-    autocomplete={autocomplete ? 'on' : 'off'}
-    bind:value
+    {value}
+    {icon}
+    {label}
+    {theme}
+    {copyable}
     on:input
     on:change
-    on:focus
-    on:blur
+    on:focus={() => (show = true)}
   />
-  {#if copyable}
-    <div class="copy-icon-container" on:click={copy}>
-      <Icon name={$copied ? 'checkMark' : 'copy'} stroke="currentcolor" />
+  {#if show}
+    <div class="option-container">
+      {#each filteredOptions as option}
+        <div
+          class="option"
+          on:click|preventDefault|stopPropagation={() => {
+            onOptionClick(option);
+            show = false;
+          }}
+        >
+          {option}
+        </div>
+      {/each}
     </div>
   {/if}
 </div>
 
 <style lang="postcss">
-  /* Base styles */
-  .input-container {
-    @apply relative box-border inline-flex h-10 w-full items-center rounded-lg border text-base focus-within:border-blue-700;
+  .autocomplete-container {
+    @apply relative;
   }
-
-  .input-container.copyable {
-    @apply border;
+  .option-container {
+    @apply absolute z-50 h-auto max-h-80 bg-white border-2 rounded-lg overflow-auto;
   }
-
-  .icon-container {
-    @apply ml-2 flex items-center justify-center;
-  }
-
-  .copy-icon-container {
-    @apply flex h-full w-9 cursor-pointer items-center justify-center rounded-r-lg border-l;
+  .option {
+    @apply p-2 cursor-pointer hover:bg-blue-600 hover:text-white;
   }
 
   /* Light theme styles */

@@ -11,7 +11,6 @@
   export let id = null;
   export let value =
     typeof initialValue === 'string' ? parseInt(initialValue) : initialValue;
-  export let thumbValue;
 
   // Node Bindings
   let container = null;
@@ -207,7 +206,7 @@
             in:fly={{ y: 7, duration: 200 }}
             out:fade={{ duration: 100 }}
           >
-            {thumbValue ?? value}
+            {value}
           </div>
         {/if}
       </div>

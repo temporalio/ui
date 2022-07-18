@@ -1,27 +1,52 @@
 <script lang="ts">
   import { timelineEvents } from '$lib/stores/events';
 
-  import {
-    formatDate,
-    getTimestampDifference,
-  } from '$lib/utilities/format-date';
-
-  import EventHistoryTimeline from '$lib/components/event/event-history-timeline.svelte';
-  import { timeFormat } from '$lib/stores/time-format';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/index.svelte';
   import {
-    getEventsInCategory,
+    eventTypeCategorizations,
     timelineEventTypeOptions,
   } from '$lib/models/event-history/get-event-categorization';
   import EventHistoryGroupTimeline from './event-history-group-timeline.svelte';
+  import Autocomplete from '$lib/holocene/autocomplete.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
+  import Slider from '$lib/holocene/slider.svelte';
 
   export let events: WorkflowEvents;
   export let eventGroups: EventGroups;
   export let isRunning: boolean;
+
+  let zoom = 1;
+  let eventTypeValue = '';
+  let eventTypeFilters: string[] = [];
+
+  const handleOptionClick = (option: string) => {
+    eventTypeValue = '';
+    if (!eventTypeFilters.includes(option)) {
+      eventTypeFilters = [option, ...eventTypeFilters];
+    }
+  };
+
+  const handleClearOption = (option: string) => {
+    eventTypeFilters = eventTypeFilters.filter((o) => o !== option);
+  };
+
+  const handleClear = () => {
+    $timelineEvents = null;
+    eventTypeValue = '';
+    eventTypeFilters = [];
+  };
+
+  $: groups = !eventTypeFilters.length
+    ? eventGroups
+    : eventGroups.filter((group) => {
+        return group.eventList.find((event) =>
+          eventTypeFilters.includes(event.eventType),
+        );
+      });
 </script>
 
-<div class="my-4 flex flex-col items-center justify-between gap-2 xl:flex-row">
+<div class="mt-2 flex flex-col items-center justify-between gap-2 xl:flex-row">
   <div class="flex flex-col gap-2 md:flex-row lg:gap-4">
     {#each timelineEventTypeOptions as type}
       <h3 class="flex items-center text-sm xl:text-base">
@@ -36,8 +61,8 @@
   <div class="flex gap-2">
     <Button
       secondary
-      disabled={$timelineEvents === null}
-      on:click={() => ($timelineEvents = null)}>Clear</Button
+      disabled={$timelineEvents === null && !eventTypeFilters.length}
+      on:click={handleClear}>Clear</Button
     >
     <Button
       secondary
@@ -47,7 +72,30 @@
     >
   </div>
 </div>
-<EventHistoryGroupTimeline {events} {eventGroups} {isRunning} />
+<div class="flex mb-2 items-center gap-2">
+  <Autocomplete
+    id="eventType"
+    label="Event Type"
+    icon="search"
+    bind:value={eventTypeValue}
+    on:input={(e) => (eventTypeValue = e.target.value)}
+    options={Object.keys(eventTypeCategorizations)}
+    onOptionClick={handleOptionClick}
+  />
+  {#each eventTypeFilters as filter}
+    <Badge
+      ><div class="flex gap-1 items-center">
+        {filter}
+        <button
+          class="cursor-pointer"
+          on:click={() => handleClearOption(filter)}
+          ><Icon name="close" /></button
+        >
+      </div></Badge
+    >
+  {/each}
+</div>
+<EventHistoryGroupTimeline {events} eventGroups={groups} {isRunning} {zoom} />
 
 <!-- <div class="font-base flex justify-between">
   <div>

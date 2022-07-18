@@ -1,19 +1,23 @@
 // Encode reserved URI characters, \ and %
 // TODO: related issue https://github.com/sveltejs/kit/issues/3069
 export function encodeURIForSvelte(uri: string): string {
-  return uri
-    .replace(/%/g, '%25')
-    .replace(/,/g, '%2C')
-    .replace(/\//g, '%2F')
-    .replace(/\\/g, '%5C')
-    .replace(/\?/g, '%3F')
-    .replace(/:/g, '%3A')
-    .replace(/@/g, '%40')
-    .replace(/&/g, '%26')
-    .replace(/=/g, '%3D')
-    .replace(/\+/g, '%2B')
-    .replace(/\$/g, '%24')
-    .replace(/#/g, '%23');
+  try {
+    return uri
+      .replace(/%/g, '%25')
+      .replace(/,/g, '%2C')
+      .replace(/\//g, '%2F')
+      .replace(/\\/g, '%5C')
+      .replace(/\?/g, '%3F')
+      .replace(/:/g, '%3A')
+      .replace(/@/g, '%40')
+      .replace(/&/g, '%26')
+      .replace(/=/g, '%3D')
+      .replace(/\+/g, '%2B')
+      .replace(/\$/g, '%24')
+      .replace(/#/g, '%23');
+  } catch (e) {
+    console.log("CANNOT DECODE: ", uri, e)
+  }
 }
 
 // Decodes reserved URI characters, \ and % that are not automatically decoded by svelte kit/vite.

@@ -11,6 +11,7 @@
   export let events: WorkflowEvents;
   export let eventGroups: EventGroups;
   export let isRunning: boolean;
+  export let zoom: number = 1;
 
   let width;
   let canvas;
@@ -23,13 +24,14 @@
     if (event.target.id === 'timeline-canvas') {
       if (event.clientX) {
         m.x = event.clientX - offset.x;
+        m.y = event.clientY - offset.y;
       }
     }
   }
 
   $: startDate = events[0]?.eventTime;
   $: currentDate = new Date(
-    Date.parse(startDate) + m.x * (totalDistance / width),
+    Date.parse(startDate) + m.x * (totalDistance / (width * zoom)),
   );
   $: endDate = events[events.length - 1]?.eventTime;
 
@@ -44,7 +46,7 @@
     }
 
     const diff = getTimestampDifference(startDate, date);
-    return diff * (width / totalDistance);
+    return diff * ((width * zoom) / totalDistance);
   };
 
   $: getGroupProperties = (group: EventGroup) => {
@@ -55,10 +57,10 @@
     const typeOption = timelineEventTypeOptions.find(
       (o) => o.option == group.category,
     );
-    const top = index * blockHeight + buffer / 2;
+    const top = index * blockHeight * zoom + buffer / 2;
     return `top: ${top}px; left: ${startDistance}px; width: ${
       duration || blockHeight
-    }px; height: ${blockHeight - 4}px; background: ${
+    }px; height: ${blockHeight * zoom - 4}px; background: ${
       typeOption?.color ?? '#e4e4e7'
     }; margin: 2px 0;`;
   };
@@ -66,18 +68,55 @@
   const handleGroupClick = (group) => {
     $timelineEvents = group.eventList;
   };
+
+  const toggleFullScreen = () => {
+    // if already full screen; exit
+    // else go fullscreen
+    if (
+      document.fullscreenElement ||
+      document.webkitFullscreenElement ||
+      document.mozFullScreenElement ||
+      document.msFullscreenElement
+    ) {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+    } else {
+      if (canvas.requestFullscreen) {
+        canvas.requestFullscreen();
+      } else if (canvas.mozRequestFullScreen) {
+        canvas.mozRequestFullScreen();
+      } else if (canvas.webkitRequestFullscreen) {
+        canvas.webkitRequestFullscreen(canvas.ALLOW_KEYBOARD_INPUT);
+      } else if (canvas.msRequestFullscreen) {
+        canvas.msRequestFullscreen();
+      }
+    }
+  };
 </script>
 
 <div
-  class="max-h-80 w-full cursor-crosshair overflow-auto rounded-lg bg-blueGray-900"
+  class="min-h-40 max-h-96 w-full cursor-crosshair overflow-auto rounded-lg bg-blueGray-900"
   bind:clientWidth={width}
   on:mousemove|stopPropagation={handleMouseMove}
 >
   <div
     id="timeline-canvas"
     bind:this={canvas}
-    style="height: {blockHeight * eventGroups.length + buffer}px;"
+    class="overflow-auto"
+    style="height: {blockHeight * eventGroups.length +
+      buffer * zoom}px; width: {width * zoom}px;"
   >
+    <button
+      class="absolute top-2 right-2 text-sm text-white"
+      on:click={toggleFullScreen}>Fullscreen</button
+    >
     {#each eventGroups as group}
       {@const style = getGroupProperties(group)}
       <div class="event-group" {style} on:click={() => handleGroupClick(group)}>
@@ -86,19 +125,19 @@
         >
       </div>
     {/each}
+    <div
+      class="absolute top-0 bg-blueGray-500"
+      style="height: {blockHeight * eventGroups.length * zoom +
+        buffer}px;left: {m.x}px; width: 1px"
+    />
+    <pre
+      class="sticky bottom-0 right-0 text-white w-auto"
+      style="font-size: 10px;">{formatDate(currentDate, $timeFormat)}</pre>
   </div>
-  <div
-    class="absolute top-0 bg-blueGray-500"
-    style="height: {blockHeight * eventGroups.length +
-      buffer}px;left: {m.x}px; width: 1px"
-  />
 </div>
 <div class="font-base">
   <div class="flex justify-end">
     <pre class="text-right">Start: {formatDate(startDate, $timeFormat)}</pre>
-  </div>
-  <div class="flex justify-end">
-    <pre>Current: {formatDate(currentDate, $timeFormat)}</pre>
   </div>
   <div class="flex justify-end">
     <pre class="text-right">{isRunning ? 'Last' : 'End'}: {formatDate(
