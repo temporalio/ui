@@ -68,7 +68,7 @@
     <span
       in:scale={{ duration: 200, start: 0.65 }}
       out:scale={{ duration: 100, start: 0.65 }}
-      class="absolute h-2 w-2 rounded-full bg-blue-200"
+      class="absolute h-2 w-2 right-1 top-0 rounded-full bg-blue-200"
     />
   {/if}
 </div>
