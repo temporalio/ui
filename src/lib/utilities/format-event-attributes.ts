@@ -21,7 +21,7 @@ const keysToExpand: Readonly<Set<string>> = new Set([
 const keysToFormat: Readonly<Set<string>> = new Set(['maximumAttempts']);
 
 export const UnlimitedAttempts = 'Unlimited';
-export const NoExpiration = 'No expiration';
+export const NoExpiration = 'No Expiration';
 
 export const formatRetryExpiration = (
   maxAttempts: number,
