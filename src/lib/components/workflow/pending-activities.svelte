@@ -14,6 +14,7 @@
   import CodeBlock from '$lib/components/code-block.svelte';
   import {
     formatAttemptsLeft,
+    formatRetryExpiration,
     UnlimitedAttempts,
   } from '$lib/utilities/format-event-attributes';
 
@@ -70,7 +71,7 @@
                     )}
                   </Badge>
                 </div>
-                {#if failed}
+                {#if true}
                   <div class="pending-activity-detail">
                     <h4 class="pending-activity-detail-header">Next Retry</h4>
                     <Badge type={failed ? 'error' : 'default'}>
@@ -80,11 +81,14 @@
                 {/if}
                 <div class="pending-activity-detail">
                   <h4 class="pending-activity-detail-header">Expiration</h4>
-                  {formatDuration(
-                    getDuration({
-                      start: Date.now(),
-                      end: pendingActivity.expirationTime,
-                    }),
+                  {formatRetryExpiration(
+                    pendingActivity.maximumAttempts,
+                    formatDuration(
+                      getDuration({
+                        start: Date.now(),
+                        end: pendingActivity.expirationTime,
+                      }),
+                    ),
                   )}
                 </div>
               </div>

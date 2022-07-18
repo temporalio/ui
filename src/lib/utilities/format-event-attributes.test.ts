@@ -4,7 +4,9 @@ import {
   attributeGroups,
   formatAttemptsLeft,
   formatMaximumAttempts,
+  formatRetryExpiration,
   UnlimitedAttempts,
+  NoExpiration,
 } from './format-event-attributes';
 
 const workflowEvent = {
@@ -142,6 +144,14 @@ describe('formatAttributes', () => {
 
   it('should format max attempts left with unlimited max attempts', () => {
     expect(formatMaximumAttempts(0)).toBe(UnlimitedAttempts);
+  });
+
+  it('should format expiration with unlimited max attempts', () => {
+    expect(formatRetryExpiration(0, '2022-12-25')).toBe(NoExpiration);
+  });
+
+  it('should format expiration with limited max attempts', () => {
+    expect(formatRetryExpiration(5, '2022-12-25')).toBe('2022-12-25');
   });
 });
 

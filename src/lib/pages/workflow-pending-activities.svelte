@@ -16,7 +16,7 @@
   import {
     formatAttemptsLeft,
     formatMaximumAttempts,
-    UnlimitedAttempts,
+    formatRetryExpiration,
   } from '$lib/utilities/format-event-attributes';
   import { timeFormat } from '$lib/stores/time-format';
 
@@ -102,11 +102,14 @@
             <div class="event-table-row">
               <h2>Retry Expiration</h2>
               <p>
-                {formatDuration(
-                  getDuration({
-                    start: Date.now(),
-                    end: details.expirationTime,
-                  }),
+                {formatRetryExpiration(
+                  details.maximumAttempts,
+                  formatDuration(
+                    getDuration({
+                      start: Date.now(),
+                      end: details.expirationTime,
+                    }),
+                  ),
                 )}
               </p>
             </div>
