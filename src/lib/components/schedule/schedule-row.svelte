@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ScheduleListEntry } from '$types';
+  import type { ScheduleListEntry } from '$lib/extra-types';
   import { page } from '$app/stores';
   import { timeFormat } from '$lib/stores/time-format';
   import { formatDate } from '$lib/utilities/format-date';

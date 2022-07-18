@@ -1,4 +1,4 @@
-import type { Payload } from '$types';
+import type { Payload } from '$lib/extra-types';
 
 import { dataConverterWebsocket } from '$lib/utilities/data-converter-websocket';
 import type { DataConverterWebsocketInterface } from '$lib/utilities/data-converter-websocket';

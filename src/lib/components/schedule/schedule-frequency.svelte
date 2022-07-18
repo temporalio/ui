@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { CalendarSpec, IntervalSpec } from '$types';
+  import type { CalendarSpec, IntervalSpec } from '$lib/extra-types';
   import CodeBlock from '../code-block.svelte';
 
   export let calendar: CalendarSpec;

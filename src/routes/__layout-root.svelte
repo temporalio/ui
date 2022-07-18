@@ -1,6 +1,9 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
-  import type { ListNamespacesResponse, GetClusterInfoResponse } from '$types';
+  import type {
+    ListNamespacesResponse,
+    GetClusterInfoResponse,
+  } from '$lib/extra-types';
 
   import '../app.css';
 

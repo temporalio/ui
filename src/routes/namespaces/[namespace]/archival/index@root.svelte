@@ -53,7 +53,7 @@
 </script>
 
 <script lang="ts">
-  import type { DescribeNamespaceResponse } from '$types';
+  import type { DescribeNamespaceResponse } from '$lib/extra-types';
   import { fetchAllArchivedWorkflows } from '$lib/services/workflow-service';
 
   import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';

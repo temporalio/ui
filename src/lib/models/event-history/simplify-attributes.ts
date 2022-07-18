@@ -1,5 +1,5 @@
 import { formatDate, formatDuration } from '$lib/utilities/format-date';
-import type { PendingActivityInfo } from '$types';
+import type { PendingActivityInfo } from '$lib/extra-types';
 
 const keysToBeFormattedAsTime = [
   'closeTime',

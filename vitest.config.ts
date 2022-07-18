@@ -7,7 +7,6 @@ export default defineConfig({
   resolve: {
     alias: {
       $lib: path.resolve(__dirname, './src/lib'),
-      $types: path.resolve(__dirname, './src/types'),
       $components: path.resolve(__dirname, './src/lib/components/'),
       $holocene: path.resolve(__dirname, './src/lib/holocene/'),
       $app: path.resolve(__dirname, './src/lib/svelte-mocks/app/'),

@@ -1,6 +1,6 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
-  import type { DescribeNamespaceResponse } from '$types';
+  import type { DescribeNamespaceResponse } from '$lib/extra-types';
 
   export const load: Load = async function ({ params, url, stuff }) {
     const { searchParams } = url;

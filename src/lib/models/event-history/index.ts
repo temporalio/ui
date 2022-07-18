@@ -1,7 +1,7 @@
 import { get } from 'svelte/store';
 import { dataEncoderEndpoint } from '$lib/stores/data-encoder-config';
 import {
-  Decode,
+  type Decode,
   convertPayloadToJsonWithCodec,
   convertPayloadToJsonWithWebsocket,
   decodePayloadAttributes,

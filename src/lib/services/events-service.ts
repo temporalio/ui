@@ -1,4 +1,4 @@
-import type { GetWorkflowExecutionHistoryResponse } from '$types';
+import type { GetWorkflowExecutionHistoryResponse } from '$lib/extra-types';
 
 import { paginated } from '$lib/utilities/paginated';
 import { requestFromAPI } from '$lib/utilities/request-from-api';

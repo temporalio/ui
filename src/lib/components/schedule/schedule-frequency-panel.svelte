@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { CalendarSpec, IntervalSpec } from '$types';
+  import type { CalendarSpec, IntervalSpec } from '$lib/extra-types';
 
   import Panel from '$lib/components/panel.svelte';
   import ScheduleFrequency from './schedule-frequency.svelte';

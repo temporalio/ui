@@ -7,7 +7,7 @@ import type {
   CreateScheduleRequest,
   UpdateScheduleRequest,
   ScheduleListEntry,
-} from '$types';
+} from '$lib/extra-types';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 

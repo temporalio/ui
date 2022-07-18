@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import type { DescribeNamespaceResponse as Namespace } from '$types';
+  import type { DescribeNamespaceResponse as Namespace } from '$lib/extra-types';
   import { goto } from '$app/navigation';
 
   import {

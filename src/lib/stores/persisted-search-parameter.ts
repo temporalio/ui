@@ -1,6 +1,6 @@
 import { browser } from '$app/env';
 import { page } from '$app/stores';
-import { writable, get, Writable } from 'svelte/store';
+import { writable, get, type Writable } from 'svelte/store';
 
 type SearchParameterValue = string | number | boolean | null;
 

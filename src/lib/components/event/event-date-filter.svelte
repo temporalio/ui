@@ -15,7 +15,7 @@
   import {
     timeFormat,
     setTimeFormat,
-    TimeFormatOptions,
+    type TimeFormatOptions,
   } from '$lib/stores/time-format';
   import type {
     EventSortOrder,

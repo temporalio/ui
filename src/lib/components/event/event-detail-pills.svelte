@@ -2,7 +2,7 @@
   import { createEventDispatcher } from 'svelte';
   import {
     attributeGroupingProperties,
-    AttributeGrouping,
+    type AttributeGrouping,
   } from '$lib/utilities/format-event-attributes';
   import Pill from '$lib/components/pill.svelte';
 

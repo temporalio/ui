@@ -90,7 +90,7 @@ type User = {
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 };
-type ClusterInformation = import('$types').GetClusterInfoResponse;
+type ClusterInformation = import('$lib/extra-types').GetClusterInfoResponse;
 
 type TimeFormat = 'UTC' | 'relative' | 'local';
 

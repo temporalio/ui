@@ -5,7 +5,7 @@
   import {
     timeFormat,
     setTimeFormat,
-    TimeFormatOptions,
+    type TimeFormatOptions,
   } from '$lib/stores/time-format';
 
   let dateOptions: TimeFormatOptions = [

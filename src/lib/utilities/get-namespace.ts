@@ -1,4 +1,4 @@
-import type { DescribeNamespaceResponse } from '$types';
+import type { DescribeNamespaceResponse } from '$lib/extra-types';
 
 type GetNamespaceParameters = {
   namespace?: string;

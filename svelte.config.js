@@ -1,4 +1,3 @@
-import path from 'path';
 import preprocess from 'svelte-preprocess';
 import adapter from '@sveltejs/adapter-static';
 
@@ -25,43 +24,6 @@ const config = {
       assets: outputDirectory,
       fallback: 'index.html',
     }),
-    package: {
-      dir: 'package',
-      emitTypes: true,
-      // excludes all .d.ts and files starting with _ as the name
-      exports: (filepath) => {
-        console.log(filepath);
-        return true;
-      },
-      files: () => true,
-    },
-    // package: {
-    //   dir: 'package',
-    //   emitTypes: true,
-    //   // Don't include components for now.
-    //   //eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    //   // exports: (filepath) => {
-    //   //   return /^(layouts|models|pages|services|stores|utilities|holocene)/.test(
-    //   //     filepath,
-    //   //   );
-    //   // },
-    //   //eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    //   files: (filepath) =>
-    //     /^(?!.*\.(spec|test)\.ts$).*\.(svelte|ts)$/.test(filepath),
-    // },
-    // ...(!dev && {
-    //   //eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    //   routes: (filepath) => /^(?!.*(?:fiction)).*$/.test(filepath),
-    // }),
-    vite: {
-      resolve: {
-        alias: {
-          $types: path.resolve('./src/types'),
-          $holocene: path.resolve('./src/lib/holocene'),
-          $fixtures: path.resolve('./src/fixtures'),
-        },
-      },
-    },
   },
 };
 

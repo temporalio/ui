@@ -1,4 +1,4 @@
 import { writable } from 'svelte/store';
-import type { GetClusterInfoResponse } from '$types';
+import type { GetClusterInfoResponse } from '$lib/extra-types';
 
 export const cluster = writable<GetClusterInfoResponse>({});

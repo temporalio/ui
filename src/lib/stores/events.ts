@@ -2,8 +2,8 @@ import {
   derived,
   readable,
   writable,
-  Readable,
-  Writable,
+  type Readable,
+  type Writable,
   get,
 } from 'svelte/store';
 import type { StartStopNotifier } from 'svelte/store';
@@ -12,8 +12,8 @@ import { page } from '$app/stores';
 
 import {
   fetchEvents,
-  FetchEventsParameters,
-  FetchEventsParametersWithSettings,
+  type FetchEventsParameters,
+  type FetchEventsParametersWithSettings,
 } from '$lib/services/events-service';
 
 import { eventCategoryParam, eventSortOrder } from './event-view';

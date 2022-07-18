@@ -8,12 +8,16 @@
     "paths": {
       "$lib": ["src/lib"],
       "$lib/*": ["src/lib/*"],
-      "$types": ["src/types"],
       "$components/*": ["src/components/*"],
       "$holocene/*": ["src/lib/holocene/*"],
       "$fixtures/*": ["src/fixtures/*"]
     },
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "allowJs": true,
+    "checkJs": true,
     "types": ["vitest/globals"]
   },
   "include": [

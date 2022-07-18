@@ -59,11 +59,12 @@ export const requestFromAPI = async <T>(
   } = init;
   let { options } = init;
 
-  const nextPageToken = token ? { next_page_token: token } : {};
-  const query = new URLSearchParams({
-    ...params,
-    ...nextPageToken,
-  });
+  const query = new URLSearchParams(params);
+
+  if (token) {
+    query.append('next_page_token', token);
+  }
+
   const url = toURL(endpoint, query);
 
   try {

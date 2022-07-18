@@ -4,7 +4,7 @@ import {
 } from '$lib/stores/data-encoder-config';
 import { validateHttps } from '$lib/utilities/is-http';
 
-import type { Payloads } from '$types';
+import type { Payloads } from '$lib/extra-types';
 
 export async function convertPayloadsWithCodec({
   payloads,
