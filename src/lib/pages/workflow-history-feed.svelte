@@ -10,10 +10,9 @@
   onDestroy(() => {
     $timelineEvents = null;
   });
+
+  const workflow = $page.params?.workflow;
 </script>
 
-<PageTitle
-  title={`Workflow History | ${$page.params?.workflow}`}
-  url={$page.url.href}
-/>
+<PageTitle title={`Workflow History | ${workflow}`} url={$page.url.href} />
 <EventSummary items={$events} groups={$eventGroups} />

@@ -9,9 +9,11 @@
   import Button from '$holocene/button.svelte';
   import EmptyState from '$lib/components/empty-state.svelte';
   import PageTitle from '$lib/holocene/page-title.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
+  import Link from '$lib/components/link.svelte';
 
   const { namespace } = $page.params;
-  const { workflow } = $workflowRun;
+  const { workflow, workers } = $workflowRun;
 
   let currentdate = new Date();
   let isLoading = false;
@@ -39,15 +41,12 @@
   };
 </script>
 
-<PageTitle
-  title={`Stack Trace | ${$page.params?.workflow}`}
-  url={$page.url.href}
-/>
+<PageTitle title={`Stack Trace | ${workflow.id}`} url={$page.url.href} />
 <section>
-  {#if workflow.isRunning}
+  {#if workflow.isRunning && workers?.pollers?.length > 0}
     {#await stackTrace}
       <div class="text-center">
-        <h2 class="font-bold text-2xl mb-4">Loading…</h2>
+        <Loading />
         <p>(This will fail if you have no workers running.)</p>
       </div>
     {:then result}
@@ -76,9 +75,15 @@
       />
     {/await}
   {:else}
-    <EmptyState
-      title="No Stack Traces Found"
-      dataCy="query-stack-trace-empty"
-    />
+    <EmptyState title="No Stack Traces Found" dataCy="query-stack-trace-empty">
+      {#if workflow.isRunning && workers?.pollers?.length === 0}
+        <p>
+          To enable <Link
+            href="https://docs.temporal.io/concepts/what-is-a-query/#stack-trace-query"
+            >stack traces</Link
+          >, run a Worker on the {workflow?.taskQueue} Task Queue.
+        </p>
+      {/if}
+    </EmptyState>
   {/if}
 </section>

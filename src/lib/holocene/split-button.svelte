@@ -30,7 +30,7 @@
 
 <style lang="postcss">
   .split-button {
-    @apply flex grow cursor-pointer flex-row gap-[1px] font-poppins;
+    @apply flex grow cursor-pointer flex-row gap-[1px] font-secondary;
   }
 
   .split-button.disabled {
@@ -38,7 +38,7 @@
   }
 
   :global(.split-button-menu) {
-    @apply flex min-w-max flex-col items-start gap-y-4 border-gray-300 p-3 px-6 font-poppins text-sm;
+    @apply flex min-w-max flex-col items-start gap-y-4 border-gray-300 p-3 px-6 font-secondary text-sm;
   }
 
   .segment {

@@ -3,6 +3,8 @@
 
   import { fly } from 'svelte/transition';
 
+  import { hasKeys } from '$lib/utilities/has';
+
   import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
   import FeedbackButton from '$lib/components/feedback-button.svelte';
 
@@ -28,7 +30,7 @@
     </a>
   </div>
   <div class="col-span-4 flex items-center justify-end gap-4">
-    {#if user}
+    {#if hasKeys(user)}
       <DataEncoderStatus />
     {/if}
   </div>

@@ -9,6 +9,7 @@
   import Select from '$lib/components/select/select.svelte';
   import Button from '$holocene/button.svelte';
   import PageTitle from '$lib/holocene/page-title.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
 
   const { namespace } = $page.params;
   const { workflow } = $workflowRun;
@@ -40,11 +41,11 @@
   }
 </script>
 
-<PageTitle title={`Query | ${$page.params?.workflow}`} url={$page.url.href} />
+<PageTitle title={`Query | ${workflow.id}`} url={$page.url.href} />
 <section>
   {#await queryTypes}
     <div class="text-center">
-      <h2 class="font-bold text-2xl mb-4">Loading…</h2>
+      <Loading />
       <p>(This will fail if you have no workers running.)</p>
     </div>
   {:then types}
@@ -73,10 +74,11 @@
         <CodeBlock content={result} />
       {/await}
     </div>
-  {:catch}
+  {:catch _error}
     <EmptyState
       title="An Error Occurred"
       content="Please make sure you have at least one worker running."
+      error={_error?.message}
     />
   {/await}
 </section>

@@ -60,10 +60,10 @@
 
 <style lang="postcss">
   .option-label {
-    @apply flex font-poppins font-medium;
+    @apply flex font-secondary font-medium;
   }
 
   .option-description {
-    @apply flex font-inter font-normal;
+    @apply flex font-primary font-normal;
   }
 </style>

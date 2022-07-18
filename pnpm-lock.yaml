@@ -56,7 +56,7 @@ specifiers:
   svelte-preprocess: ^4.10.4
   svelte-use-form: ^2.4.3
   svelte2tsx: ^0.5.10
-  tailwindcss: ^3.0.18
+  tailwindcss: ^3.1.4
   ts-node: ^10.2.1
   ts-proto: ^1.82.5
   tslib: ^2.3.1
@@ -129,7 +129,7 @@ devDependencies:
   svelte-preprocess: 4.10.6_qvozlg3foykdex5q3jgxymgorm
   svelte-use-form: 2.4.3
   svelte2tsx: 0.5.10_wwvk7nlptlrqo2czohjtk6eiqm
-  tailwindcss: 3.0.24_ts-node@10.7.0
+  tailwindcss: 3.1.4_ts-node@10.7.0
   ts-node: 10.7.0_2jmrorcux6nsf7sy4ly74hophu
   ts-proto: 1.112.2
   tslib: 2.4.0
@@ -1811,10 +1811,10 @@ packages:
       }
     dev: true
 
-  /arg/5.0.1:
+  /arg/5.0.2:
     resolution:
       {
-        integrity: sha512-e0hDa9H2Z9AwFkk2qDlwhoMYE4eToKarchkQHovNdLTCYMHZHeRjI71crOh+dio4K6u1IcwubQqo79Ga4CyAQA==,
+        integrity: sha512-PYjyFOLKQ9y57JvQ6QLo8dAgNqswh8M1RMJYdQduT6xbWSgK36P/Z/v+p888pM69jMMfS8Xd8F6I1kQ/I9HUGg==,
       }
     dev: true
 
@@ -2975,10 +2975,10 @@ packages:
     engines: { node: '>=8' }
     dev: true
 
-  /detective/5.2.0:
+  /detective/5.2.1:
     resolution:
       {
-        integrity: sha512-6SsIx+nUUbuK0EthKjv0zrdnajCCXVYGmbYYiYjFVpzcjwEs/JMDZ8tPRG29J/HhN56t3GJp2cGSWDRjjot8Pg==,
+        integrity: sha512-v9XE1zRnz1wRtgurGu0Bs8uHKFSTdteYZNbIPFVhUZ39L/S79ppMpdmVOZAnoz1jfEFodc48n6MX483Xo3t1yw==,
       }
     engines: { node: '>=0.8.0' }
     hasBin: true
@@ -7984,18 +7984,18 @@ packages:
       strip-ansi: 6.0.1
     dev: true
 
-  /tailwindcss/3.0.24_ts-node@10.7.0:
+  /tailwindcss/3.1.4_ts-node@10.7.0:
     resolution:
       {
-        integrity: sha512-H3uMmZNWzG6aqmg9q07ZIRNIawoiEcNFKDfL+YzOPuPsXuDXxJxB9icqzLgdzKNwjG3SAro2h9SYav8ewXNgig==,
+        integrity: sha512-NrxbFV4tYsga/hpWbRyUfIaBrNMXDxx5BsHgBS4v5tlyjf+sDsgBg5m9OxjrXIqAS/uR9kicxLKP+bEHI7BSeQ==,
       }
     engines: { node: '>=12.13.0' }
     hasBin: true
     dependencies:
-      arg: 5.0.1
+      arg: 5.0.2
       chokidar: 3.5.3
       color-name: 1.1.4
-      detective: 5.2.0
+      detective: 5.2.1
       didyoumean: 1.2.2
       dlv: 1.1.3
       fast-glob: 3.2.11
@@ -8006,6 +8006,7 @@ packages:
       object-hash: 3.0.0
       picocolors: 1.0.0
       postcss: 8.4.14
+      postcss-import: 14.1.0_postcss@8.4.14
       postcss-js: 4.0.0_postcss@8.4.14
       postcss-load-config: 3.1.4_gimuzhxoryaoe5ripiipjtmpcu
       postcss-nested: 5.0.6_postcss@8.4.14

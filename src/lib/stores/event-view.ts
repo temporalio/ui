@@ -45,7 +45,6 @@ export const supportsReverseOrder = derived(
   ([$temporalVersion, $settings]) => {
     if ($settings.runtimeEnvironment.isCloud) return true;
 
-    console.log('supports reverse', isVersionNewer($temporalVersion, '1.16.0'));
     return isVersionNewer($temporalVersion, '1.16.0');
   },
 );

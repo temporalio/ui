@@ -39,8 +39,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         working-directory: ./package
-      - name: Commit version bump
+      - name: Commit and push version bump
         run: |
           git remote set-url origin https://x-access-token:${{ secrets.COMMANDER_DATA_TOKEN }}@github.com/${{ github.repository }}
-          git add .
-          git commit -m "Update package version" && git push || echo "No changes to commit"
+          git push origin ${{ github.ref_name }}

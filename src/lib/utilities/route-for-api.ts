@@ -63,7 +63,9 @@ export function routeForApi(
   parameters: TaskQueueRouteParameters,
   shouldEncode?: boolean,
 ): string;
-export function routeForApi(route: ParameterlessAPIRoutePath): string;
+export function routeForApi(
+  route: ParameterlessAPIRoutePath | SearchAttributesRoutePath,
+): string;
 export function routeForApi(
   route: APIRoutePath,
   parameters?: APIRouteParameters,
@@ -77,6 +79,7 @@ export function routeForApi(
     user: '/me',
     namespaces: '/namespaces',
     'task-queue': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}`,
+    'search-attributes': '/search-attributes',
     workflows: `/namespaces/${parameters?.namespace}/workflows`,
     'workflows.archived': `/namespaces/${parameters?.namespace}/workflows/archived`,
     workflow: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}`,

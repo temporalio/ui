@@ -81,9 +81,10 @@ TEMPORAL_ENVIRONMENT=development_sqlite make start
 
 ```bash
 make build
-./tctl --ns canary namespace register
-./tctl --ns default namespace register (if you also want a default namespace)
-./tctl --auto_confirm admin cluster add-search-attributes \
+./tctl config set version next
+./tctl -n canary namespace register
+./tctl -n default namespace register
+./tctl cluster add-search-attributes -y \
  	--name CustomKeywordField --type Keyword \
  	--name CustomStringField --type Text \
  	--name CustomTextField --type Text \

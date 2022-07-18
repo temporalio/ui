@@ -22,7 +22,7 @@
     return JSON.stringify(parsedData, undefined, inline ? 0 : 2);
   };
 
-  const parsedContent = isJSON ? formatJSON(content) : content;
+  $: parsedContent = isJSON ? formatJSON(content) : content;
   const { copy, copied } = copyToClipboard(parsedContent);
 
   function highlight(root: HTMLElement, language: string, source: string) {
@@ -55,7 +55,7 @@
       class="w-full overflow-x-scroll rounded-lg p-4"
       class:h-full={!inline}><code
         bind:this={root}
-        class={`language-${language}`}
+        class="language-{language}"
         data-cy={$$props['data-cy']}
       /></pre>
 
