@@ -1,5 +1,5 @@
 <script lang="ts">
-  import IconButton from '$lib/components/icon-button.svelte';
+  import Icon from '$lib/holocene/icon/index.svelte';
   export let title: string;
   export let subtitle: string = '';
 
@@ -17,11 +17,7 @@
     >
       <div class="space-between flex flex-row">
         <h2 class="w-full text-lg font-medium">{title}</h2>
-        <IconButton
-          icon={open ? 'caretUp' : 'caretDown'}
-          stroke="currentcolor"
-          scale={1.4}
-        />
+        <Icon name={open ? 'caretUp' : 'caretDown'} stroke="currentcolor" />
       </div>
       <h3>{subtitle}</h3>
     </div>

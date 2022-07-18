@@ -35,13 +35,13 @@
         <div class="w-full py-4 px-5">
           <div class="event-table-row">
             <h2 class="font-semibold">Activity Type</h2>
-            <Badge type={failed ? 'warning' : 'default'}>
+            <Badge type={failed ? 'error' : 'default'}>
               {details.activityType}
             </Badge>
           </div>
           <div class="event-table-row">
             <h2>Attempt</h2>
-            <Badge type={failed ? 'warning' : 'default'}>
+            <Badge type={failed ? 'error' : 'default'}>
               {#if failed}
                 <Icon
                   class="mr-1"
@@ -57,13 +57,13 @@
           {#if failed}
             <div class="event-table-row">
               <h2>Attempts Left</h2>
-              <Badge type="warning">
+              <Badge type="error">
                 {details.maximumAttempts - details.attempt}
               </Badge>
             </div>
             <div class="event-table-row">
               <h2>Next Retry</h2>
-              <Badge type="warning">
+              <Badge type="error">
                 {defaultWorkflowTaskTimeout}
               </Badge>
             </div>

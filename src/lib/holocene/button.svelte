@@ -4,17 +4,21 @@
   import Badge from '$holocene/badge.svelte';
 
   export let disabled: boolean = false;
-  export let secondary: boolean = false;
-  export let destroy: boolean = false;
-  export let loading: boolean = false;
-  export let login: boolean = false;
+  export let variant:
+    | 'primary'
+    | 'secondary'
+    | 'destructive'
+    | 'login'
+    | 'link' = 'primary';
+
   export let thin: boolean = false;
-  export let href: string | null = null;
+  export let loading: boolean = false;
+  export let href: string = null;
   export let target: '_self' | '_external' = '_self';
   export let active: boolean = false;
   export let large: boolean = false;
   export let as: 'button' | 'anchor' = href ? 'anchor' : 'button';
-  export let icon: IconName | null = null;
+  export let icon: IconName = '';
   export let iconScale: number = 1;
   export let classes: string = $$props.class;
   export let dataCy: string = $$props.dataCy;
@@ -25,12 +29,9 @@
 {#if as === 'button'}
   <button
     on:click
-    class={`button primary ${classes}`}
+    class="button {variant} {classes}"
     class:selected={active}
     class:large
-    class:secondary
-    class:destroy
-    class:login
     class:thin
     data-cy={dataCy}
     {type}
@@ -57,13 +58,10 @@
   <a
     {href}
     on:click
-    class={`button primary ${classes}`}
+    class="button {variant} {classes}"
     class:selected={active}
     class:large
-    class:secondary
-    class:destroy
     class:disabled
-    class:login
     class:thin
     data-cy={dataCy}
     {target}
@@ -86,7 +84,14 @@
 
 <style lang="postcss">
   .button {
-    @apply relative flex w-fit items-center justify-center gap-2 border py-2 px-4 font-secondary text-sm transition-colors;
+    @apply relative flex w-fit items-center justify-center gap-2 rounded font-secondary text-sm;
+  }
+
+  .primary,
+  .secondary,
+  .destructive,
+  .login {
+    @apply border py-2 px-4 transition-colors;
   }
 
   .button:disabled {
@@ -97,8 +102,9 @@
     @apply text-lg;
   }
 
-  .primary {
-    @apply rounded border-primary bg-primary text-white;
+  .primary,
+  .login {
+    @apply border-primary bg-primary text-white;
   }
 
   .primary:disabled {
@@ -125,16 +131,20 @@
     @apply border-gray-900 bg-gray-900 text-white;
   }
 
-  .destroy {
+  .destructive {
     @apply border-danger bg-danger px-5 text-white;
   }
 
-  .destroy:disabled {
+  .destructive:disabled {
     @apply border-red-900 bg-red-300 text-red-900;
   }
 
-  .destroy:hover:enabled {
+  .destructive:hover:enabled {
     @apply border-red-900 bg-red-900 text-white;
+  }
+
+  .link {
+    @apply border-0 bg-none p-0 font-primary text-sm underline shadow-none;
   }
 
   .selected {
@@ -142,7 +152,7 @@
   }
 
   .login {
-    @apply mx-auto bg-gray-900 py-4;
+    @apply mx-auto;
   }
 
   .thin {

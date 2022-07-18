@@ -1,3 +1,5 @@
+import { getApiOrigin } from './get-api-origin';
+
 const replaceNamespaceInApiUrl = (
   apiUrl: string,
   namespace: string,
@@ -11,7 +13,7 @@ const base = (namespace?: string): string => {
   if (globalThis?.AppConfig?.apiUrl && namespace) {
     baseUrl = replaceNamespaceInApiUrl(globalThis.AppConfig.apiUrl, namespace);
   } else {
-    baseUrl = import.meta.env.VITE_API;
+    baseUrl = getApiOrigin();
   }
 
   if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);

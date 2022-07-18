@@ -3,7 +3,7 @@
 
   import type { IconName } from '$lib/holocene/icon/paths';
 
-  export let icon: IconName;
+  export let icon: IconName = '';
   export let scale = 1;
   export let stroke = 'white';
   export let classes: string = '';

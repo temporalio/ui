@@ -1,0 +1,13 @@
+{
+  "queryResult": {
+    "payloads": [
+      {
+        "metadata": {
+          "encoding": "anNvbi9wbGFpbg=="
+        },
+        "data": "coroutine root [blocked on chan-1.Receive]:\ngo.temporal.io/sdk/internal.(*decodeFutureImpl).Get(0xc00050e168, {0x1b47b78, 0xc0005009f0}, {0x18ae400?, 0xc000504180})\n\t/Users/user/go/pkg/mod/go.temporal.io/sdk@v1.15.0/internal/internal_workflow.go:1353 +0x4c\ngithub.com/temporalio/samples-go/helloworld.Workflow({0x1b47b78?, 0xc000500900?}, {0xc000502040, 0x8})\n\t/Users/user/Desktop/go-sdk/samples-go/helloworld/helloworld.go:25 +0x1ff\nreflect.Value.call({0x18f1c00?, 0x1a69850?, 0x2360f18?}, {0x19ff968, 0x4}, {0xc000500930, 0x2, 0x203000?})\n\t/usr/local/go/src/reflect/value.go:556 +0x845\nreflect.Value.Call({0x18f1c00?, 0x1a69850?, 0x100494c?}, {0xc000500930, 0x2, 0x2})\n\t/usr/local/go/src/reflect/value.go:339 +0xbf\ngo.temporal.io/sdk/internal.executeFunction({0x18f1c00, 0x1a69850}, {0xc000514080, 0x2, 0xc0002c0000?})\n\t/Users/user/go/pkg/mod/go.temporal.io/sdk@v1.15.0/internal/internal_worker.go:1606 +0x136\ngo.temporal.io/sdk/internal.(*workflowEnvironmentInterceptor).ExecuteWorkflow(0xc0005080f0, {0x1b47a28?, 0xc000512120}, 0xc00050e150)\n\t/Users/user/go/pkg/mod/go.temporal.io/sdk@v1.15.0/internal/workflow.go:419 +0x166\ngo.temporal.io/sdk/internal.(*workflowExecutor).Execute(0xc0005060c0, {0x1b47a28, 0xc000512120}, 0x25?)\n\t/Users/user/go/pkg/mod/go.temporal.io/sdk@v1.15.0/internal/internal_worker.go:760 +0x292\ngo.temporal.io/sdk/internal.(*syncWorkflowDefinition).Execute.func1({0x1b47b78, 0xc0005007e0})\n\t/Users/user/go/pkg/mod/go.temporal.io/sdk@v1.15.0/internal/internal_workflow.go:501 +0xcd"
+      }
+    ]
+  },
+  "queryRejected": null
+}

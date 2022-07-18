@@ -37,11 +37,11 @@
 </script>
 
 {#if isEligibleForTermination(workflow)}
-  <Button destroy on:click={show}>Terminate</Button>
+  <Button variant="destructive" on:click={show}>Terminate</Button>
   <Modal
     open={showConfirmation}
     confirmText="Terminate"
-    confirmType="destroy"
+    confirmType="destructive"
     on:cancelModal={cancel}
     on:confirmModal={terminate}
   >
