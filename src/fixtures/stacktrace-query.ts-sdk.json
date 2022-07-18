@@ -1,0 +1,13 @@
+{
+  "queryResult": {
+    "payloads": [
+      {
+        "metadata": {
+          "encoding": "anNvbi9wbGFpbg=="
+        },
+        "data": "    at Promise.then (<anonymous>)\n    at global.setTimeout (/Users/user/Desktop/ts-sdk/example/node_modules/@temporalio/workflow/src/worker-interface.ts:85:7)\n    at setTimeout (/Users/user/Desktop/ts-sdk/example/src/workflows.ts:10:33)\n    at new Promise (<anonymous>)\n    at delay (/Users/user/Desktop/ts-sdk/example/src/workflows.ts:10:9)\n    at delay (/Users/user/Desktop/ts-sdk/example/src/workflows.ts:16:8)\n\n    at delay (/Users/user/Desktop/ts-sdk/example/src/workflows.ts:16:8)"
+      }
+    ]
+  },
+  "queryRejected": null
+}
