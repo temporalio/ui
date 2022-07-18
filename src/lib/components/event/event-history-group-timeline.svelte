@@ -46,7 +46,7 @@
     }
 
     const diff = getTimestampDifference(startDate, date);
-    return diff * ((width * zoom) / totalDistance);
+    return diff * (width / totalDistance);
   };
 
   $: getGroupProperties = (group: EventGroup) => {
@@ -57,10 +57,10 @@
     const typeOption = timelineEventTypeOptions.find(
       (o) => o.option == group.category,
     );
-    const top = index * blockHeight * zoom + buffer / 2;
+    const top = index * blockHeight + buffer / 2;
     return `top: ${top}px; left: ${startDistance}px; width: ${
       duration || blockHeight
-    }px; height: ${blockHeight * zoom - 4}px; background: ${
+    }px; height: ${blockHeight - 4}px; background: ${
       typeOption?.color ?? '#e4e4e7'
     }; margin: 2px 0;`;
   };
@@ -102,21 +102,22 @@
 </script>
 
 <div
-  class="min-h-40 max-h-96 w-full cursor-crosshair overflow-auto rounded-lg bg-blueGray-900"
+  class="relative min-h-40 max-h-96 w-full cursor-crosshair overflow-auto rounded-lg bg-blueGray-900"
   bind:clientWidth={width}
   on:mousemove|stopPropagation={handleMouseMove}
 >
   <div
     id="timeline-canvas"
     bind:this={canvas}
-    class="overflow-auto"
+    class="relative overflow-auto"
     style="height: {blockHeight * eventGroups.length +
-      buffer * zoom}px; width: {width * zoom}px;"
+      buffer}px; width: {width}px;"
   >
     <button
       class="absolute top-2 right-2 text-sm text-white"
       on:click={toggleFullScreen}>Fullscreen</button
     >
+
     {#each eventGroups as group}
       {@const style = getGroupProperties(group)}
       <div class="event-group" {style} on:click={() => handleGroupClick(group)}>
@@ -127,12 +128,9 @@
     {/each}
     <div
       class="absolute top-0 bg-blueGray-500"
-      style="height: {blockHeight * eventGroups.length * zoom +
+      style="height: {blockHeight * eventGroups.length +
         buffer}px;left: {m.x}px; width: 1px"
     />
-    <pre
-      class="sticky bottom-0 right-0 text-white w-auto"
-      style="font-size: 10px;">{formatDate(currentDate, $timeFormat)}</pre>
   </div>
 </div>
 <div class="font-base">
