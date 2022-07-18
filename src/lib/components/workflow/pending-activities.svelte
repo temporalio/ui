@@ -12,6 +12,10 @@
   import Icon from '$holocene/icon/index.svelte';
   import Badge from '$holocene/badge.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
+  import {
+    formatAttemptsLeft,
+    UnlimitedAttempts,
+  } from '$lib/utilities/format-event-attributes';
 
   const { namespace, run } = $page.params;
   const { workflow } = $workflowRun;
@@ -60,16 +64,21 @@
                 <div class="pending-activity-detail">
                   <h4 class="pending-activity-detail-header">Attempts Left</h4>
                   <Badge type={failed ? 'error' : 'default'}>
-                    {pendingActivity.maximumAttempts - pendingActivity.attempt}
+                    {formatAttemptsLeft(
+                      pendingActivity.maximumAttempts,
+                      pendingActivity.attempt,
+                    )}
                   </Badge>
                 </div>
+                {#if failed}
+                  <div class="pending-activity-detail">
+                    <h4 class="pending-activity-detail-header">Next Retry</h4>
+                    <Badge type={failed ? 'error' : 'default'}>
+                      {defaultWorkflowTaskTimeout}
+                    </Badge>
+                  </div>
+                {/if}
                 <div class="pending-activity-detail">
-                  <h4 class="pending-activity-detail-header">Next Retry</h4>
-                  <Badge type={failed ? 'error' : 'default'}>
-                    {defaultWorkflowTaskTimeout}
-                  </Badge>
-                </div>
-                <h4 class="pending-activity-detail">
                   <h4 class="pending-activity-detail-header">Expiration</h4>
                   {formatDuration(
                     getDuration({
@@ -77,7 +86,7 @@
                       end: pendingActivity.expirationTime,
                     }),
                   )}
-                </h4>
+                </div>
               </div>
             </a>
             {#if failed}

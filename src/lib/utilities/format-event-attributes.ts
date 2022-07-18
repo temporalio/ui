@@ -20,9 +20,28 @@ const keysToExpand: Readonly<Set<string>> = new Set([
 
 const keysToFormat: Readonly<Set<string>> = new Set(['maximumAttempts']);
 
+export const UnlimitedAttempts = 'Unlimited';
+
+export const formatAttemptsLeft = (
+  maxAttempts: number,
+  attempt: number,
+): number | string => {
+  if (maxAttempts === 0) {
+    return UnlimitedAttempts;
+  }
+  return maxAttempts - attempt;
+};
+
+export const formatMaximumAttempts = (maxAttempts: number): number | string => {
+  if (maxAttempts === 0) {
+    return UnlimitedAttempts;
+  }
+  return maxAttempts;
+};
+
 const formatValue = (key: string, value: unknown) => {
   if (key === 'maximumAttempts' && value === 0) {
-    return 'Unlimited';
+    return UnlimitedAttempts;
   }
   return value;
 };

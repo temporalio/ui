@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { formatAttributes, attributeGroups } from './format-event-attributes';
+import {
+  formatAttributes,
+  attributeGroups,
+  formatAttemptsLeft,
+  formatMaximumAttempts,
+  UnlimitedAttempts,
+} from './format-event-attributes';
 
 const workflowEvent = {
   eventId: '1',
@@ -107,7 +113,7 @@ const workflowEvent = {
 };
 
 describe('formatAttributes', () => {
-  it('should remove values thath should not display', () => {
+  it('should remove values that should not display', () => {
     const formattedAttributes = formatAttributes(workflowEvent);
     expect(formattedAttributes.firstWorkflowTaskBackoff).toBe(undefined);
   });
@@ -120,6 +126,22 @@ describe('formatAttributes', () => {
   it('should format nested attributes', () => {
     const formattedAttributes = formatAttributes(workflowEvent);
     expect(formattedAttributes.taskQueueName).toBe('rainbow-statuses');
+  });
+
+  it('should format attempts left with limited max attempts', () => {
+    expect(formatAttemptsLeft(10, 3)).toBe(7);
+  });
+
+  it('should format attempts left with unlimited max attempts', () => {
+    expect(formatAttemptsLeft(0, 3)).toBe(UnlimitedAttempts);
+  });
+
+  it('should format max attempts left with limited max attempts', () => {
+    expect(formatMaximumAttempts(2393)).toBe(2393);
+  });
+
+  it('should format max attempts left with unlimited max attempts', () => {
+    expect(formatMaximumAttempts(0)).toBe(UnlimitedAttempts);
   });
 });
 
