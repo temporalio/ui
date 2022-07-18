@@ -14,7 +14,7 @@
   import { goto } from '$app/navigation';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
   import { fetchAllSchedules } from '$lib/services/schedule-service';
-  import type { ScheduleListEntry } from '$lib/extra-types';
+  import type { ScheduleListEntry } from '$lib/types';
   import PageTitle from '$lib/holocene/page-title.svelte';
 
   let { namespace } = $page.params;

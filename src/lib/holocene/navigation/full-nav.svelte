@@ -9,7 +9,7 @@
   import Icon from '$lib/holocene/icon/index.svelte';
   import type { SvelteComponent } from 'svelte';
   import FeatureTag from '$lib/holocene/feature-tag.svelte';
-  import type { DescribeNamespaceResponse as Namespace } from '$lib/extra-types';
+  import type { DescribeNamespaceResponse as Namespace } from '$lib/types';
 
   import { navOpen, namespaceSelectorOpen } from '$lib/stores/nav-open';
 

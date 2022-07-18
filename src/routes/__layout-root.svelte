@@ -3,7 +3,7 @@
   import type {
     ListNamespacesResponse,
     GetClusterInfoResponse,
-  } from '$lib/extra-types';
+  } from '$lib/types';
 
   import '../app.css';
 

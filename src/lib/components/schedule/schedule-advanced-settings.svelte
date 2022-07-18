@@ -3,7 +3,7 @@
     ScheduleSpec,
     ScheduleState,
     SchedulePolicies,
-  } from '$lib/extra-types';
+  } from '$lib/types';
   import Icon from '$lib/holocene/icon/index.svelte';
 
   export let spec: ScheduleSpec;

@@ -2,7 +2,7 @@ import {
   setLastDataConverterFailure,
   setLastDataConverterSuccess,
 } from '$lib/stores/data-converter-config';
-import type { Payload } from '$lib/extra-types';
+import type { Payload } from '$lib/types';
 import type WebSocketAsPromised from 'websocket-as-promised';
 
 interface WebSocketResponse {

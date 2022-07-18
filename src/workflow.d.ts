@@ -1,7 +1,6 @@
-type WorkflowExecutionStatus =
-  import('$lib/extra-types').WorkflowExecutionStatus;
+type WorkflowExecutionStatus = import('$lib/types').WorkflowExecutionStatus;
 type ListWorkflowExecutionsResponse =
-  import('$lib/extra-types').ListWorkflowExecutionsResponse;
+  import('$lib/types').ListWorkflowExecutionsResponse;
 
 type WorkflowExecutionAPIResponse = Optional<
   DescribeWorkflowExecutionResponse,

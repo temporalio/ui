@@ -26,7 +26,7 @@
   import Modal from '$lib/components/modal.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
   import Loading from '$holocene/loading.svelte';
-  import type { DescribeScheduleResponse } from '$lib/extra-types';
+  import type { DescribeScheduleResponse } from '$lib/types';
   import PageTitle from '$lib/holocene/page-title.svelte';
 
   let namespace = $page.params.namespace;

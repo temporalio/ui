@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Timestamp } from '$lib/extra-types';
+  import type { Timestamp } from '$lib/types';
   import Panel from '$lib/components/panel.svelte';
   import { formatDate } from '$lib/utilities/format-date';
   import { timeFormat } from '$lib/stores/time-format';

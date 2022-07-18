@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { DescribeNamespaceResponse as Namespace } from '$lib/extra-types';
+  import type { DescribeNamespaceResponse as Namespace } from '$lib/types';
   import { routeForNamespace } from '$lib/utilities/route-for';
   import { page } from '$app/stores';
   import PageTitle from '$lib/holocene/page-title.svelte';

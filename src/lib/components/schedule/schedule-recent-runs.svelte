@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ScheduleActionResult } from '$lib/extra-types';
+  import type { ScheduleActionResult } from '$lib/types';
   import Panel from '$lib/components/panel.svelte';
   import WorkflowStatus from '../workflow-status.svelte';
   import { formatDate } from '$lib/utilities/format-date';

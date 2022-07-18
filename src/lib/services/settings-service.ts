@@ -4,7 +4,7 @@ import { getApiOrigin } from '$lib/utilities/get-api-origin';
 import { getEnvironment } from '$lib/utilities/get-environment';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
-import type { SettingsResponse } from '$lib/extra-types';
+import type { SettingsResponse } from '$lib/types';
 
 export const isCloudMatch = /(tmprl\.cloud|tmprl-test\.cloud)$/;
 

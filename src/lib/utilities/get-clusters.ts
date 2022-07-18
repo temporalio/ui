@@ -1,4 +1,4 @@
-import type { DescribeNamespaceResponse } from '$lib/extra-types';
+import type { DescribeNamespaceResponse } from '$lib/types';
 
 export const getClusters = (namespace: DescribeNamespaceResponse): string => {
   const clusters = namespace?.replicationConfig?.clusters;
