@@ -102,7 +102,8 @@
     @apply text-lg;
   }
 
-  .primary {
+  .primary,
+  .login {
     @apply border-primary bg-primary text-white;
   }
 
@@ -151,7 +152,7 @@
   }
 
   .login {
-    @apply mx-auto bg-gray-900 py-4;
+    @apply mx-auto;
   }
 
   .thin {
