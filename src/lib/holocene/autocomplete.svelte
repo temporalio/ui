@@ -58,10 +58,10 @@
     @apply relative;
   }
   .option-container {
-    @apply absolute z-50 h-auto max-h-80 bg-white border-2 rounded-lg overflow-auto;
+    @apply absolute z-50 h-auto max-h-80 overflow-auto rounded-lg border-2 bg-white;
   }
   .option {
-    @apply p-2 cursor-pointer hover:bg-blue-600 hover:text-white;
+    @apply cursor-pointer p-2 hover:bg-blue-600 hover:text-white;
   }
 
   /* Light theme styles */

@@ -109,7 +109,6 @@
       title="Timeline"
       icon="chart"
       class="select-none border-gray-900"
-      open
     >
       <EventHistoryTimelineContainer
         events={$ascendingEvents}

@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { flip } from 'svelte/animate';
+  import { sineIn } from 'svelte/easing';
+
   import { timelineEvents } from '$lib/stores/events';
   import {
     formatDate,
@@ -11,13 +14,12 @@
   export let events: WorkflowEvents;
   export let eventGroups: EventGroups;
   export let isRunning: boolean;
-  export let zoom: number = 1;
 
   let width;
   let canvas;
   let m = { x: 0, y: 0 };
   let blockHeight = 20;
-  let buffer = 50;
+  let buffer = 100;
 
   function handleMouseMove(event) {
     const offset = canvas.getBoundingClientRect();
@@ -31,7 +33,7 @@
 
   $: startDate = events[0]?.eventTime;
   $: currentDate = new Date(
-    Date.parse(startDate) + m.x * (totalDistance / (width * zoom)),
+    Date.parse(startDate) + m.x * (totalDistance / width),
   );
   $: endDate = events[events.length - 1]?.eventTime;
 
@@ -58,9 +60,10 @@
       (o) => o.option == group.category,
     );
     const top = index * blockHeight + buffer / 2;
-    return `top: ${top}px; left: ${startDistance}px; width: ${
-      duration || blockHeight
-    }px; height: ${blockHeight - 4}px; background: ${
+    return `top: ${top}px; left: ${startDistance}px; width: ${Math.max(
+      duration,
+      5,
+    )}px; height: ${blockHeight - 4}px; background: ${
       typeOption?.color ?? '#e4e4e7'
     }; margin: 2px 0;`;
   };
@@ -102,7 +105,7 @@
 </script>
 
 <div
-  class="relative min-h-40 max-h-96 w-full cursor-crosshair overflow-auto rounded-lg bg-blueGray-900"
+  class="min-h-40 relative max-h-96 w-full cursor-crosshair overflow-auto rounded-lg bg-blueGray-900"
   bind:clientWidth={width}
   on:mousemove|stopPropagation={handleMouseMove}
 >
@@ -114,13 +117,18 @@
       buffer}px; width: {width}px;"
   >
     <button
-      class="absolute top-2 right-2 text-sm text-white"
+      class="absolute top-2 right-2 z-50 text-sm text-white"
       on:click={toggleFullScreen}>Fullscreen</button
     >
 
-    {#each eventGroups as group}
+    {#each eventGroups as group (group.id)}
       {@const style = getGroupProperties(group)}
-      <div class="event-group" {style} on:click={() => handleGroupClick(group)}>
+      <div
+        class="event-group"
+        {style}
+        on:click={() => handleGroupClick(group)}
+        animate:flip={{ duration: 400, easing: sineIn }}
+      >
         <Tooltip top text={group.name}
           ><div class="rounded-full" {style} /></Tooltip
         >
@@ -136,6 +144,12 @@
 <div class="font-base">
   <div class="flex justify-end">
     <pre class="text-right">Start: {formatDate(startDate, $timeFormat)}</pre>
+  </div>
+  <div class="flex justify-end">
+    <pre class="text-right">Current: {formatDate(
+        currentDate,
+        $timeFormat,
+      )}</pre>
   </div>
   <div class="flex justify-end">
     <pre class="text-right">{isRunning ? 'Last' : 'End'}: {formatDate(

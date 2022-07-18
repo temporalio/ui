@@ -353,6 +353,35 @@ const settingsIcon: Icon = {
   ],
 };
 
+const slidersIcon: Icon = {
+  paths: [
+    {
+      d: 'M4.75 8H7.25',
+      stroke: 'currentColor',
+    },
+    {
+      d: 'M12.75 8H19.25',
+      stroke: 'currentColor',
+    },
+    {
+      d: 'M4.75 16H12.25',
+      stroke: 'currentColor',
+    },
+    {
+      d: 'M17.75 16H19.25',
+      stroke: 'currentColor',
+    },
+    {
+      d: 'M 10, 8 m -1, 0 a 1,1 0 1,0 2.25,0 a 1,1 0 1,0 -2.25,0',
+      stroke: 'currentColor',
+    },
+    {
+      d: 'M 15, 16 m -1, 0 a 1,1 0 1,0 2.25,0 a 1,1 0 1,0 -2.25,0',
+      stroke: 'currentColor',
+    },
+  ],
+};
+
 const spinnerIcon: Icon = {
   paths: [
     {
@@ -450,6 +479,7 @@ export const icons: { [index: string]: Icon } = {
   refresh: refreshIcon,
   search: searchIcon,
   settings: settingsIcon,
+  sliders: slidersIcon,
   spinner: spinnerIcon,
   stopwatch: stopwatchIcon,
   temporal: temporalIcon,
