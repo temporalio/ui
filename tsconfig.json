@@ -1,47 +1,34 @@
 {
+  "extends": "./.svelte-kit/tsconfig.json",
   "compilerOptions": {
     "moduleResolution": "node",
-    // "strict": true,
-    "module": "es2020",
-    "lib": ["es2020", "dom", "DOM.Iterable"],
-    "target": "es2019",
-    /**
-			svelte-preprocess cannot figure out whether you have a value or a type, so tell TypeScript
-			to enforce using \`import type\` instead of \`import\` for Types.
-			*/
-    "importsNotUsedAsValues": "error",
-    "isolatedModules": true,
-    "resolveJsonModule": true,
-    /**
-			To have warnings/errors of the Svelte compiler at the correct position,
-			enable source maps by default.
-			*/
-    "sourceMap": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
+    "module": "es2022",
+    "strict": false,
     "baseUrl": ".",
-    "allowJs": true,
-    "checkJs": true,
     "paths": {
+      "$lib": ["src/lib"],
       "$lib/*": ["src/lib/*"],
       "$types": ["src/types"],
       "$components/*": ["src/components/*"],
       "$holocene/*": ["src/lib/holocene/*"],
       "$fixtures/*": ["src/fixtures/*"]
-    }
+    },
+    "forceConsistentCasingInFileNames": true,
+    "types": ["vitest/globals"]
   },
   "include": [
     "src/**/*.d.ts",
     "src/**/*.js",
     "src/**/*.ts",
     "src/**/*.svelte",
-    "src/lib/models/**/*.test.ts"
+    "src/lib/models/**/*.test.ts",
+    "src/lib/holocene/tsconfig.json"
   ],
   "exclude": [
     "src/lib/holocene/**/*.test.ts",
     "src/lib/services/**/*.test.ts",
     "src/lib/utilities/**/*.test.ts",
-    "src/lib/stores/**/*.test.ts"
+    "src/lib/stores/**/*.test.ts",
+    "package/"
   ]
 }

@@ -13,7 +13,6 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
-  import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
   import { fetchAllSchedules } from '$lib/services/schedule-service';
   import type { ScheduleListEntry } from '$types';
   import PageTitle from '$lib/holocene/page-title.svelte';

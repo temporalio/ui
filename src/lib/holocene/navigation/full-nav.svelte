@@ -178,7 +178,7 @@
       {#if $namespaceSelectorOpen}
         <NamespaceList
           {getNamespaceList}
-          on:closeNamespaceList={(event) => {
+          on:closeNamespaceList={(_) => {
             $namespaceSelectorOpen = false;
           }}
         />

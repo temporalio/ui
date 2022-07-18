@@ -28,21 +28,31 @@ const config = {
     package: {
       dir: 'package',
       emitTypes: true,
-      // Don't include components for now.
-      //eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+      // excludes all .d.ts and files starting with _ as the name
       exports: (filepath) => {
-        return /^(layouts|models|pages|services|stores|utilities|holocene)/.test(
-          filepath,
-        );
+        console.log(filepath);
+        return true;
       },
-      //eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-      files: (filepath) =>
-        /^(?!.*\.(spec|test)\.ts$).*\.(svelte|ts)$/.test(filepath),
+      files: () => true,
     },
-    ...(!dev && {
-      //eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-      routes: (filepath) => /^(?!.*(?:fiction)).*$/.test(filepath),
-    }),
+    // package: {
+    //   dir: 'package',
+    //   emitTypes: true,
+    //   // Don't include components for now.
+    //   //eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    //   // exports: (filepath) => {
+    //   //   return /^(layouts|models|pages|services|stores|utilities|holocene)/.test(
+    //   //     filepath,
+    //   //   );
+    //   // },
+    //   //eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    //   files: (filepath) =>
+    //     /^(?!.*\.(spec|test)\.ts$).*\.(svelte|ts)$/.test(filepath),
+    // },
+    // ...(!dev && {
+    //   //eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    //   routes: (filepath) => /^(?!.*(?:fiction)).*$/.test(filepath),
+    // }),
     vite: {
       resolve: {
         alias: {

@@ -49,7 +49,6 @@
   import Table from '$lib/holocene/table/table.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
-  import { getEnabledCategories } from 'trace_events';
 
   export let currentNamespace: DescribeNamespaceResponse;
   export let clusters: string;
