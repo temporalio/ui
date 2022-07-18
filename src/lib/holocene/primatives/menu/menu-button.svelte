@@ -15,6 +15,7 @@
 </script>
 
 <button
+  type="button"
   aria-haspopup={!disabled}
   aria-controls={controls}
   aria-expanded={show}
