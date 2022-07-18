@@ -16,7 +16,7 @@
   .slider {
     @apply absolute top-0 left-0 right-0 bottom-0 cursor-pointer rounded-[8rem] border-2 border-gray-600 bg-gray-100 duration-300;
     &:before {
-      @apply absolute left-1 bottom-0.5 h-6 w-6 rounded-[50%] bg-gray-600 content-[''] duration-300;
+      @apply absolute left-1 bottom-0.5 h-6 w-6 rounded-[50%] bg-gray-600 duration-300 content-[''];
     }
   }
 
