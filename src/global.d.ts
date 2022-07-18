@@ -15,12 +15,6 @@ interface Window {
   };
 }
 
-interface ImportMeta {
-  env: {
-    VITE_API: string;
-  };
-}
-
 type Eventual<T> = T | PromiseLike<T>;
 
 type NamespaceScopedRequest = { namespace: string };

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import { getApiOrigin } from '$lib/utilities/get-api-origin';
 
   export let user: User;
 </script>
@@ -7,7 +8,7 @@
 {#if user?.email}
   <button
     class="logout-button min-w-min"
-    on:click={() => goto(import.meta.env.VITE_API + '/auth/logout')}
+    on:click={() => goto(getApiOrigin() + '/auth/logout')}
   >
     <img
       src={user.picture}

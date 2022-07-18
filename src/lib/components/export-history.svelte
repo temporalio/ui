@@ -27,6 +27,6 @@
   };
 </script>
 
-<Button secondary icon="download" on:click={exportHistory}
+<Button variant="secondary" icon="download" on:click={exportHistory}
   ><span class="hidden md:inline">Download</span></Button
 >
