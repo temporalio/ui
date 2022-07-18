@@ -35,7 +35,7 @@
               <div class="pending-activity-inner-row">
                 <div class="pending-activity-detail">
                   <h4 class="pending-activity-detail-header">Activity Type</h4>
-                  <Badge type={failed ? 'warning' : 'default'}>
+                  <Badge type={failed ? 'error' : 'default'}>
                     {pendingActivity.activityType}
                   </Badge>
                 </div>
@@ -45,7 +45,7 @@
                 </div>
                 <div class="pending-activity-detail">
                   <h4 class="pending-activity-detail-header">Attempt</h4>
-                  <Badge type={failed ? 'warning' : 'default'}>
+                  <Badge type={failed ? 'error' : 'default'}>
                     {#if failed}
                       <Icon
                         name="refresh"
@@ -59,13 +59,13 @@
                 </div>
                 <div class="pending-activity-detail">
                   <h4 class="pending-activity-detail-header">Attempts Left</h4>
-                  <Badge type={failed ? 'warning' : 'default'}>
+                  <Badge type={failed ? 'error' : 'default'}>
                     {pendingActivity.maximumAttempts - pendingActivity.attempt}
                   </Badge>
                 </div>
                 <div class="pending-activity-detail">
                   <h4 class="pending-activity-detail-header">Next Retry</h4>
-                  <Badge type={failed ? 'warning' : 'default'}>
+                  <Badge type={failed ? 'error' : 'default'}>
                     {defaultWorkflowTaskTimeout}
                   </Badge>
                 </div>

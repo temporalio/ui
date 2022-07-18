@@ -4,20 +4,23 @@
   import type { IconName } from '$lib/holocene/icon/paths';
 
   export let id: string;
-  export let label: string;
   export let value: string;
+  export let label = '';
   export let icon: IconName = '';
   export let placeholder = label;
   export let name = id;
   export let copyable: boolean = false;
+  export let disabled = false;
   export let theme: 'dark' | 'light' = 'light';
   export let autocomplete = false;
 
   const { copy, copied } = copyToClipboard(value);
 </script>
 
-<div class="input-container {theme}" class:copyable>
-  <label for={id} class="hidden">{label}</label>
+<div class="input-container w-full {theme} {$$props.class}" class:copyable>
+  {#if label}
+    <label for={id} class="hidden">{label}</label>
+  {/if}
   {#if icon !== ''}
     <span class="icon-container">
       <Icon name={icon} scale={0.9} stroke="currentcolor" />
@@ -26,7 +29,7 @@
   <input
     class="m-2 block w-full bg-white focus:outline-none"
     class:copyable
-    disabled={copyable}
+    disabled={disabled || copyable}
     data-lpignore="true"
     {placeholder}
     {id}
@@ -46,7 +49,7 @@
 <style lang="postcss">
   /* Base styles */
   .input-container {
-    @apply relative box-border inline-flex h-10 w-full items-center rounded-lg border text-base focus-within:border-blue-700;
+    @apply relative box-border inline-flex h-10 items-center rounded border border-gray-900 text-sm focus-within:border-blue-700;
   }
 
   .input-container.copyable {
@@ -58,7 +61,7 @@
   }
 
   .copy-icon-container {
-    @apply flex h-full w-9 cursor-pointer items-center justify-center rounded-r-lg border-l;
+    @apply flex h-full w-9 cursor-pointer items-center justify-center rounded-r border-l;
   }
 
   /* Light theme styles */
