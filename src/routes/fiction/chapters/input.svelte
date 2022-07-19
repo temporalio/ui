@@ -5,7 +5,7 @@
   import ChipInput from '$lib/holocene/input/chip-input.svelte';
   import { isEmail } from '$lib/utilities/is-email';
 
-  let emails = '';
+  let emails = [];
 </script>
 
 <Chapter
@@ -83,7 +83,7 @@
 
 <Chapter description="A Tag Input">
   <ChipInput
-    bind:value={emails}
+    bind:chips={emails}
     class="w-96"
     id="input7"
     label="Email Address(es)"

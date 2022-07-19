@@ -2,7 +2,7 @@
   import Chip from '$holocene/chip.svelte';
 
   export let id: string;
-  export let value: string;
+  export let chips: string[];
   export let label = '';
   export let placeholder = '';
   export let name = id;
@@ -10,15 +10,8 @@
   export let required = false;
   export let hintText = '';
   export let validator: (value: string) => boolean = () => true;
-
-  let chips: string[] = [];
   let displayValue: string = '';
-
-  $: invalid = false;
-  $: {
-    invalid = chips.some((chip) => !validator(chip));
-    value = chips.join(',');
-  }
+  $: invalid = chips.some((chip) => !validator(chip));
 
   const handleKeydown = (e: KeyboardEvent) => {
     if (e.key === ',' || e.key === 'Enter') {
@@ -41,7 +34,6 @@
   const handlePaste = (e: ClipboardEvent) => {
     e.preventDefault();
     const clipboardContents = e.clipboardData.getData('text/plain');
-    value = clipboardContents;
     chips = [...chips, ...clipboardContents.split(',')];
   };
 
