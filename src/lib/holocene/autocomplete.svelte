@@ -1,7 +1,8 @@
 <script lang="ts">
   import type { IconName } from '$lib/holocene/icon/paths';
   import { clickOutside } from '$lib/holocene/outside-click';
-  import Input from '$lib/holocene/input.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
+  import { noop } from 'svelte/internal';
 
   export let id: string;
   export let label: string;
@@ -47,6 +48,10 @@
           }}
         >
           {option}
+        </div>
+      {:else}
+        <div class="option" on:click|preventDefault|stopPropagation={noop}>
+          No Results
         </div>
       {/each}
     </div>

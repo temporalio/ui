@@ -11,7 +11,7 @@
 
   import Select from '$lib/components/select/select.svelte';
   import Option from '$lib/components/select/option.svelte';
-  import Input from '$lib/holocene/input.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
   import Search from '$lib/components/search.svelte';
 
   export let searchType: 'basic' | 'advanced';
@@ -100,20 +100,20 @@
       <Input
         icon="search"
         id="workflow-id-filter"
-        label="Workflow ID"
+        placeholder="Workflow ID"
         bind:value={parameters.workflowId}
         on:input={handleParameterChange}
       />
       <Input
         icon="search"
         id="workflow-type-filter"
-        label="Workflow Type"
+        placeholder="Workflow Type"
         bind:value={parameters.workflowType}
         on:input={handleParameterChange}
       />
       <Select
         id="time-range-filter"
-        label="Time Range"
+        placeholder="Time Range"
         bind:value={parameters.timeRange}
         on:change={handleParameterChange}
       >

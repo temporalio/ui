@@ -77,7 +77,7 @@
 <div class="mt-2 flex flex-col items-center justify-between gap-2 xl:flex-row">
   <div class="flex flex-col gap-2 md:flex-row lg:gap-4">
     <Button
-      secondary
+      variant="secondary"
       on:click={() => (showEventTypeFilter = !showEventTypeFilter)}
       ><Icon name="sliders" /></Button
     >
@@ -100,18 +100,18 @@
   </div>
   <div class="flex gap-2">
     <Button
-      secondary
+      variant="secondary"
       disabled={!eventTypeFilters.length &&
         eventGroupFilters.length === timelineEventTypeOptions.length}
       on:click={handleClearFilters}>Clear Filters</Button
     >
     <Button
-      secondary
+      variant="secondary"
       disabled={$timelineEvents === null}
       on:click={handleClearEvents}>Reset History</Button
     >
     <Button
-      secondary
+      variant="secondary"
       disabled={!isRunning}
       on:click={() => window.location.reload()}
       ><Icon name="refresh" stroke="currentcolor" scale={0.8} /></Button
