@@ -34,6 +34,7 @@ export const toWorkflowExecution = (
   const pendingActivities: PendingActivity[] = toPendingActivities(
     response.pendingActivities,
   );
+  const pendingChildren: PendingChildren[] = response.pendingChildren;
 
   return {
     name,
@@ -46,6 +47,7 @@ export const toWorkflowExecution = (
     url,
     taskQueue,
     pendingActivities,
+    pendingChildren,
     parentNamespaceId,
     parent,
     stateTransitionCount,
