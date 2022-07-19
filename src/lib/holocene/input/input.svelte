@@ -7,7 +7,7 @@
   export let value: string;
   export let label = '';
   export let icon: IconName = '';
-  export let placeholder = label;
+  export let placeholder = '';
   export let name = id;
   export let copyable: boolean = false;
   export let disabled = false;
@@ -17,37 +17,43 @@
   const { copy, copied } = copyToClipboard(value);
 </script>
 
-<div class="input-container w-full {theme} {$$props.class}" class:copyable>
+<div class={$$props.class}>
   {#if label}
-    <label for={id} class="hidden">{label}</label>
+    <label for={id}>{label}</label>
   {/if}
-  {#if icon !== ''}
-    <span class="icon-container">
-      <Icon name={icon} scale={0.9} stroke="currentcolor" />
-    </span>
-  {/if}
-  <input
-    class="m-2 block w-full bg-white focus:outline-none"
-    class:copyable
-    disabled={disabled || copyable}
-    data-lpignore="true"
-    {placeholder}
-    {id}
-    {name}
-    autocomplete={autocomplete ? 'on' : 'off'}
-    bind:value
-    on:input
-    on:change
-  />
-  {#if copyable}
-    <div class="copy-icon-container" on:click={copy}>
-      <Icon name={$copied ? 'checkMark' : 'copy'} stroke="currentcolor" />
-    </div>
-  {/if}
+  <div class="input-container w-full {theme}" class:copyable>
+    {#if icon !== ''}
+      <span class="icon-container">
+        <Icon name={icon} scale={0.9} stroke="currentcolor" />
+      </span>
+    {/if}
+    <input
+      class="m-2 block w-full bg-white focus:outline-none"
+      class:copyable
+      disabled={disabled || copyable}
+      data-lpignore="true"
+      {placeholder}
+      {id}
+      {name}
+      autocomplete={autocomplete ? 'on' : 'off'}
+      bind:value
+      on:input
+      on:change
+    />
+    {#if copyable}
+      <div class="copy-icon-container" on:click={copy}>
+        <Icon name={$copied ? 'checkMark' : 'copy'} stroke="currentcolor" />
+      </div>
+    {/if}
+  </div>
 </div>
 
 <style lang="postcss">
   /* Base styles */
+  label {
+    @apply font-medium text-sm font-secondary;
+  }
+
   .input-container {
     @apply relative box-border inline-flex h-10 items-center rounded border border-gray-900 text-sm focus-within:border-blue-700;
   }
