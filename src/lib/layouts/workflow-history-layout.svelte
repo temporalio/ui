@@ -83,7 +83,7 @@
         />
       </div>
     {/if}
-    {#each workflow?.pendingChildren ?? [] as child}
+    {#each workflow?.pendingChildren as child (child.runId)}
       <div class="gap-2 xl:flex">
         <WorkflowDetail
           title="Child"

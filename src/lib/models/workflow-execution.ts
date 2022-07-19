@@ -1,3 +1,4 @@
+import type { PendingChildrenInfo } from '$types';
 import { simplifyAttributes } from './event-history/simplify-attributes';
 
 const toPendingActivities = (
@@ -34,7 +35,7 @@ export const toWorkflowExecution = (
   const pendingActivities: PendingActivity[] = toPendingActivities(
     response.pendingActivities,
   );
-  const pendingChildren: PendingChildren[] = response.pendingChildren;
+  const pendingChildren: PendingChildren[] = response?.pendingChildren ?? [];
 
   return {
     name,
