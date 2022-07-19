@@ -13,7 +13,7 @@
 >
   <div class="w-full">
     <div
-      class="flex cursor-pointer flex-col"
+      class="accordion-open flex cursor-pointer flex-col"
       class:open
       on:click={() => (open = !open)}
     >
