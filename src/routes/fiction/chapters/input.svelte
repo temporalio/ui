@@ -2,6 +2,10 @@
   import Chapter from '../_chapter.svelte';
 
   import Input from '$lib/holocene/input/input.svelte';
+  import ChipInput from '$lib/holocene/input/chip-input.svelte';
+  import { isEmail } from '$lib/utilities/is-email';
+
+  let emails = '';
 </script>
 
 <Chapter
@@ -76,3 +80,16 @@
     copyable: true,
   }}
 />
+
+<Chapter description="A Tag Input">
+  <ChipInput
+    bind:value={emails}
+    class="w-96"
+    id="input7"
+    label="Email Address(es)"
+    required
+    hintText="Please enter a properly formatted email address."
+    validator={isEmail}
+  />
+  <small>value: {emails}</small>
+</Chapter>
