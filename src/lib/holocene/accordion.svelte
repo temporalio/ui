@@ -31,7 +31,7 @@
       <h3>{subtitle}</h3>
     </div>
     {#if open}
-      <div id="accordion-content" class="w-full">
+      <div class="w-full">
         <slot />
       </div>
     {/if}
