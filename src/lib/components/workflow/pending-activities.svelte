@@ -15,7 +15,6 @@
   import {
     formatAttemptsLeft,
     formatRetryExpiration,
-    UnlimitedAttempts,
   } from '$lib/utilities/format-event-attributes';
 
   const { namespace, run } = $page.params;
@@ -129,11 +128,11 @@
 
 <style lang="postcss">
   .pending-activity-row {
-    @apply mb-2 flex w-full flex-row items-center gap-2;
+    @apply flex w-full flex-row items-center gap-2;
   }
 
   .pending-activity-summary {
-    @apply w-full overflow-x-scroll border-b-2 border-gray-300 text-sm;
+    @apply w-full overflow-x-scroll border-b-2 border-gray-300 py-1 text-sm;
   }
 
   .pending-activity-row:last-child .pending-activity-summary {
