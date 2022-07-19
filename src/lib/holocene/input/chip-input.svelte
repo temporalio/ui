@@ -92,7 +92,7 @@
   }
 
   .input-container {
-    @apply p-2 text-gray-900 bg-white flex flex-row flex-wrap gap-1 w-full max-h-20 overflow-y-scroll rounded border border-gray-900 text-sm focus-within:border-blue-700;
+    @apply flex max-h-20 w-full flex-row flex-wrap gap-1 overflow-y-scroll rounded border border-gray-900 bg-white p-2 text-sm text-gray-900 focus-within:border-blue-700;
   }
 
   .input-container.invalid {
@@ -100,7 +100,7 @@
   }
 
   input {
-    @apply w-full bg-white rounded inline-block bg-white focus:outline-none;
+    @apply inline-block w-full rounded bg-white bg-white focus:outline-none;
   }
 
   .hint {

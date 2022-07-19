@@ -21,14 +21,14 @@
 
 <style lang="postcss">
   .chip {
-    @apply w-fit min-w-fit flex flex-row items-center justify-between border border-gray-200 bg-gray-200 text-primary rounded font-secondary font-semibold text-sm p-1 break-all;
+    @apply flex w-fit min-w-fit flex-row items-center justify-between break-all rounded border border-gray-200 bg-gray-200 p-1 font-secondary text-sm font-semibold text-primary;
 
     :global(.icon-button) {
-      @apply ml-1 w-fit h-auto w-auto;
+      @apply ml-1 h-auto w-fit w-auto;
     }
   }
 
   .warning {
-    @apply bg-red-50 border-red-700 text-red-700;
+    @apply border-red-700 bg-red-50 text-red-700;
   }
 </style>
