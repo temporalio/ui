@@ -4,6 +4,7 @@ import {
   formatDistance,
   formatDistanceAbbreviated,
   fromSecondsToDaysOrHours,
+  getTimestampDifference,
 } from './format-date';
 
 describe('getDuration', () => {
@@ -151,5 +152,24 @@ describe('fromSecondsToDaysOrHours', () => {
   it('should return hour for one hour of seconds', () => {
     const seconds = '3600s';
     expect(fromSecondsToDaysOrHours(seconds)).toBe('1 hour');
+  });
+});
+
+describe('getTimestampDifference', () => {
+  it('should return ms difference for two dates seconds apart', () => {
+    const start = '2022-04-13T11:29:32.633009Z';
+    const end = '2022-04-13T16:29:35.633009Z';
+
+    expect(getTimestampDifference(start, end)).toBe(18003000);
+  });
+  it('should return ms difference for two dates minutes apart', () => {
+    const start = '2022-04-13T11:53:12.120571Z';
+    const end = '2022-04-13T16:29:35.633009Z';
+    expect(getTimestampDifference(start, end)).toBe(16583513);
+  });
+  it('should return ms difference for two dates hours apart', () => {
+    const start = '2022-04-13T02:30:59.120571Z';
+    const end = '2022-04-13T16:29:35.633009Z';
+    expect(getTimestampDifference(start, end)).toBe(50316513);
   });
 });
