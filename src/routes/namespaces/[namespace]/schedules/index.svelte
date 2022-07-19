@@ -9,7 +9,7 @@
 
   import { columns } from './_schedule-table-columns';
   import { noop } from 'svelte/internal';
-  import Input from '$lib/holocene/input.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
@@ -50,7 +50,7 @@
   <Input
     icon="search"
     id="schedule-name-filter"
-    label="Schedule Name"
+    placeholder="Schedule Name"
     bind:value={search}
     on:submit={noop}
   />
