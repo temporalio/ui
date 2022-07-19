@@ -15,7 +15,7 @@
 
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
-  import PendingActivties from '$lib/components/workflow/pending-activties.svelte';
+  import PendingActivities from '$lib/components/workflow/pending-activities.svelte';
   import WorkflowStackTraceError from '$lib/components/workflow/workflow-stack-trace-error.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
@@ -93,7 +93,7 @@
     <InputAndResults type="input" />
     <InputAndResults type="results" />
   </section>
-  <PendingActivties />
+  <PendingActivities />
   <section id="event-history">
     <nav class="flex items-end justify-between gap-4 pb-4">
       <h3 class="text-lg font-medium">Recent Events</h3>

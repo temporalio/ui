@@ -13,6 +13,12 @@
     formatDuration,
   } from '$lib/utilities/format-date';
   import PageTitle from '$lib/holocene/page-title.svelte';
+  import {
+    formatAttemptsLeft,
+    formatMaximumAttempts,
+    formatRetryExpiration,
+  } from '$lib/utilities/format-event-attributes';
+  import { timeFormat } from '$lib/stores/time-format';
 
   const { pendingActivities, defaultWorkflowTaskTimeout } =
     $workflowRun.workflow;
@@ -58,7 +64,7 @@
             <div class="event-table-row">
               <h2>Attempts Left</h2>
               <Badge type="error">
-                {details.maximumAttempts - details.attempt}
+                {formatAttemptsLeft(details.maximumAttempts, details.attempt)}
               </Badge>
             </div>
             <div class="event-table-row">
@@ -70,7 +76,7 @@
           {/if}
           <div class="event-table-row">
             <h2>Maximum Attempts</h2>
-            <Badge>{details.maximumAttempts}</Badge>
+            <Badge>{formatMaximumAttempts(details.maximumAttempts)}</Badge>
           </div>
           {#if failed}
             {#if details.heartbeatDetails}
@@ -96,11 +102,14 @@
             <div class="event-table-row">
               <h2>Retry Expiration</h2>
               <p>
-                {formatDuration(
-                  getDuration({
-                    start: Date.now(),
-                    end: details.expirationTime,
-                  }),
+                {formatRetryExpiration(
+                  details.maximumAttempts,
+                  formatDuration(
+                    getDuration({
+                      start: Date.now(),
+                      end: details.expirationTime,
+                    }),
+                  ),
                 )}
               </p>
             </div>
@@ -116,13 +125,13 @@
           {#if details.lastStartedTime}
             <div class="event-table-row">
               <h2>Last Started Time</h2>
-              <p>{formatDate(details.lastStartedTime)}</p>
+              <p>{formatDate(details.lastStartedTime, $timeFormat)}</p>
             </div>
           {/if}
           {#if details.scheduledTime}
             <div class="event-table-row">
               <h2>Scheduled Time</h2>
-              <p>{formatDate(details.scheduledTime)}</p>
+              <p>{formatDate(details.scheduledTime, $timeFormat)}</p>
             </div>
           {/if}
           {#if details.lastWorkerIdentity}
