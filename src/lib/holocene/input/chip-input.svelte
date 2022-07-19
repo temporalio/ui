@@ -92,7 +92,7 @@
   }
 
   input {
-    @apply inline-block w-full rounded bg-white bg-white focus:outline-none;
+    @apply inline-block w-full rounded bg-white focus:outline-none;
   }
 
   .hint {
