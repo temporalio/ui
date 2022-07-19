@@ -25,24 +25,25 @@
 
   let width: number;
   let canvas: HTMLDivElement;
-  let m = { x: 0, y: 0 };
   let blockHeight = 30;
   let xBuffer = 200;
   let yBuffer = 10;
   let activeGroup: number;
+  let mouseX = xBuffer;
 
   function handleMouseMove(event: MouseEvent) {
     const offset = canvas.getBoundingClientRect();
-    if (event.clientX) {
-      m.x = event.clientX - offset.x;
-      m.y = event.clientY - offset.y;
+    const { x } = offset;
+    const { clientX } = event;
+    if (clientX && clientX - x > xBuffer) {
+      mouseX = clientX - x;
     }
   }
 
   $: startDate = events[0]?.eventTime;
   $: currentDate = new Date(
     Date.parse(startDate as string) +
-      (m.x - xBuffer) * (totalDistance / (width - xBuffer)),
+      (mouseX - xBuffer) * (totalDistance / (width - xBuffer)),
   );
   $: endDate = events[events.length - 1]?.eventTime;
 
@@ -154,7 +155,7 @@
       <div
         class="absolute top-0 bg-blueGray-400"
         style="height: {blockHeight * eventGroups.length +
-          yBuffer}px;left: {m.x}px; width: 1px"
+          yBuffer}px;left: {mouseX}px; width: 1px"
       />
     </div>
   </div>
