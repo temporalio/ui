@@ -49,7 +49,11 @@
     {/if}
   </div>
   <div class="flex w-full flex-col">
-    <span class="option-label">{label}</span>
+    {#if $$slots.default}
+      <slot />
+    {:else}
+      <span class="option-label">{label}</span>
+    {/if}
     {#if description}
       <span class="option-description">
         {description}

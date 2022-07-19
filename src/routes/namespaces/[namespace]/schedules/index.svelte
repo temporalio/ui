@@ -42,7 +42,6 @@
   </h2>
   <Button
     class="h-10"
-    primary
     on:click={() => goto(routeForScheduleCreate({ namespace }))}
     >Create Schedule</Button
   >
@@ -72,7 +71,6 @@
     <div class="my-12 flex flex-col items-center justify-start gap-2">
       <EmptyState title={'No Schedules Found'} content={errorMessage} {error} />
       <Button
-        primary
         as="anchor"
         target="_external"
         href="https://docs.temporal.io/workflows/#how-to-enable-schedules"

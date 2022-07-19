@@ -1,6 +1,5 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/index.svelte';
-  import IconButton from '$lib/components/icon-button.svelte';
   import type { IconName } from './icon/paths';
   export let title: string;
   export let subtitle: string = '';
@@ -23,8 +22,8 @@
           {#if icon}<Icon scale={1.25} name={icon} />{/if}
           {title}
         </h2>
-        <IconButton
-          icon={open ? 'caretUp' : 'caretDown'}
+        <Icon
+          name={open ? 'caretUp' : 'caretDown'}
           stroke="currentcolor"
           scale={1.4}
         />

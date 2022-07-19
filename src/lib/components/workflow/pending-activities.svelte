@@ -12,6 +12,10 @@
   import Icon from '$holocene/icon/index.svelte';
   import Badge from '$holocene/badge.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
+  import {
+    formatAttemptsLeft,
+    formatRetryExpiration,
+  } from '$lib/utilities/format-event-attributes';
 
   const { namespace, run } = $page.params;
   const { workflow } = $workflowRun;
@@ -35,7 +39,7 @@
               <div class="pending-activity-inner-row">
                 <div class="pending-activity-detail">
                   <h4 class="pending-activity-detail-header">Activity Type</h4>
-                  <Badge type={failed ? 'warning' : 'default'}>
+                  <Badge type={failed ? 'error' : 'default'}>
                     {pendingActivity.activityType}
                   </Badge>
                 </div>
@@ -45,7 +49,7 @@
                 </div>
                 <div class="pending-activity-detail">
                   <h4 class="pending-activity-detail-header">Attempt</h4>
-                  <Badge type={failed ? 'warning' : 'default'}>
+                  <Badge type={failed ? 'error' : 'default'}>
                     {#if failed}
                       <Icon
                         name="refresh"
@@ -59,25 +63,33 @@
                 </div>
                 <div class="pending-activity-detail">
                   <h4 class="pending-activity-detail-header">Attempts Left</h4>
-                  <Badge type={failed ? 'warning' : 'default'}>
-                    {pendingActivity.maximumAttempts - pendingActivity.attempt}
+                  <Badge type={failed ? 'error' : 'default'}>
+                    {formatAttemptsLeft(
+                      pendingActivity.maximumAttempts,
+                      pendingActivity.attempt,
+                    )}
                   </Badge>
                 </div>
+                {#if failed}
+                  <div class="pending-activity-detail">
+                    <h4 class="pending-activity-detail-header">Next Retry</h4>
+                    <Badge type={failed ? 'error' : 'default'}>
+                      {defaultWorkflowTaskTimeout}
+                    </Badge>
+                  </div>
+                {/if}
                 <div class="pending-activity-detail">
-                  <h4 class="pending-activity-detail-header">Next Retry</h4>
-                  <Badge type={failed ? 'warning' : 'default'}>
-                    {defaultWorkflowTaskTimeout}
-                  </Badge>
-                </div>
-                <h4 class="pending-activity-detail">
                   <h4 class="pending-activity-detail-header">Expiration</h4>
-                  {formatDuration(
-                    getDuration({
-                      start: Date.now(),
-                      end: pendingActivity.expirationTime,
-                    }),
+                  {formatRetryExpiration(
+                    pendingActivity.maximumAttempts,
+                    formatDuration(
+                      getDuration({
+                        start: Date.now(),
+                        end: pendingActivity.expirationTime,
+                      }),
+                    ),
                   )}
-                </h4>
+                </div>
               </div>
             </a>
             {#if failed}
@@ -116,11 +128,11 @@
 
 <style lang="postcss">
   .pending-activity-row {
-    @apply mb-2 flex w-full flex-row items-center gap-2;
+    @apply flex w-full flex-row items-center gap-2;
   }
 
   .pending-activity-summary {
-    @apply w-full overflow-x-scroll border-b-2 border-gray-300 text-sm;
+    @apply w-full overflow-x-scroll border-b-2 border-gray-300 py-1 text-sm;
   }
 
   .pending-activity-row:last-child .pending-activity-summary {

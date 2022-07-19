@@ -15,7 +15,7 @@
 
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
-  import PendingActivties from '$lib/components/workflow/pending-activties.svelte';
+  import PendingActivities from '$lib/components/workflow/pending-activities.svelte';
   import WorkflowStackTraceError from '$lib/components/workflow/workflow-stack-trace-error.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
@@ -90,7 +90,7 @@
     />
   </section>
   <WorkflowStackTraceError {workflow} {workers} />
-  <PendingActivties />
+  <PendingActivities />
   <section class="flex w-full">
     <Accordion title="Input and Results" icon="json" class="border-gray-900">
       <div class="flex gap-2">
