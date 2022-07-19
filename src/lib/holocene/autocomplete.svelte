@@ -63,45 +63,4 @@
   .option {
     @apply cursor-pointer p-2 hover:bg-blue-600 hover:text-white;
   }
-
-  /* Light theme styles */
-  .input-container.light,
-  .input-container.light .icon-container,
-  .input-container.light input {
-    @apply bg-white;
-  }
-
-  .input-container.light .icon-container {
-    @apply text-gray-400;
-  }
-
-  .input-container.light.copyable {
-    @apply border-gray-900 bg-gray-50;
-  }
-
-  .input-container.light.copyable input {
-    @apply bg-gray-50 text-gray-900;
-  }
-
-  .input-container.light.copyable .copy-icon-container {
-    @apply border-gray-900 bg-gray-200;
-  }
-
-  /* Dark theme styles */
-  .input-container.dark,
-  .input-container.dark .icon-container,
-  .input-container.dark input,
-  .input-container.dark .copy-icon-container {
-    @apply bg-gray-900 text-white;
-  }
-
-  .input-container.dark input {
-    @apply placeholder:text-gray-200;
-  }
-
-  .input-container.dark.copyable,
-  .input-container.dark.copyable .copy-icon-container,
-  .input-container.dark.copyable input {
-    @apply border-gray-900 bg-gray-900;
-  }
 </style>

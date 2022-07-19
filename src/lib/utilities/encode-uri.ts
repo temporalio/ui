@@ -14,7 +14,6 @@ export function encodeURIForSvelte(uri: string): string {
     .replace(/\+/g, '%2B')
     .replace(/\$/g, '%24')
     .replace(/#/g, '%23');
-
 }
 
 // Decodes reserved URI characters, \ and % that are not automatically decoded by svelte kit/vite.

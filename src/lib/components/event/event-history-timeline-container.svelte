@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte';
   import { timelineEvents } from '$lib/stores/events';
 
   import Button from '$lib/holocene/button.svelte';
@@ -22,6 +23,11 @@
     (o) => o.option,
   );
 
+  const handleInput = (e: InputEvent) => {
+    const target = e.target as HTMLInputElement;
+    eventTypeValue = target.value;
+  };
+
   const handleGroupClick = (option: string) => {
     if (eventGroupFilters.includes(option)) {
       eventGroupFilters = eventGroupFilters.filter((o) => o !== option);
@@ -41,12 +47,19 @@
     eventTypeFilters = eventTypeFilters.filter((o) => o !== option);
   };
 
-  const handleClear = () => {
-    $timelineEvents = null;
+  const handleClearFilters = () => {
     eventTypeValue = '';
     eventTypeFilters = [];
     eventGroupFilters = timelineEventTypeOptions.map((o) => o.option);
   };
+
+  const handleClearEvents = () => {
+    $timelineEvents = null;
+  };
+
+  onDestroy(() => {
+    handleClearEvents();
+  });
 
   $: groupsWithGroupFilter = eventGroups.filter((group) => {
     return eventGroupFilters.includes(group.category);
@@ -88,8 +101,14 @@
   <div class="flex gap-2">
     <Button
       secondary
-      disabled={$timelineEvents === null && !eventTypeFilters.length}
-      on:click={handleClear}>Clear</Button
+      disabled={!eventTypeFilters.length &&
+        eventGroupFilters.length === timelineEventTypeOptions.length}
+      on:click={handleClearFilters}>Clear Filters</Button
+    >
+    <Button
+      secondary
+      disabled={$timelineEvents === null}
+      on:click={handleClearEvents}>Reset History</Button
     >
     <Button
       secondary
@@ -101,13 +120,13 @@
 </div>
 <div class="my-4 flex items-center gap-2">
   {#if showEventTypeFilter}
-    <div class="w-full lg:w-1/2 xl:w-1/4">
+    <div class="w-full lg:w-1/4">
       <Autocomplete
         id="eventType"
         label="Event Type"
         icon="search"
         bind:value={eventTypeValue}
-        on:input={(e) => (eventTypeValue = e.target.value)}
+        on:input={handleInput}
         options={Object.keys(eventTypeCategorizations)}
         onOptionClick={handleOptionClick}
       />

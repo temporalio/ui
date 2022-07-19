@@ -11,11 +11,7 @@
   import { eventViewType } from '$lib/stores/event-view';
 
   import { onDestroy } from 'svelte';
-  import {
-    ascendingEventGroups,
-    ascendingEvents,
-    clearPreviousEventParameters,
-  } from '$lib/stores/events';
+  import { clearPreviousEventParameters } from '$lib/stores/events';
 
   import ToggleButton from '$lib/components/toggle-button.svelte';
   import ToggleButtons from '$lib/components/toggle-buttons.svelte';
@@ -24,7 +20,6 @@
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
-  import EventHistoryTimelineContainer from '$lib/components/event/event-history-timeline-container.svelte';
 
   const { namespace } = $page.params;
   const { workflow, workers } = $workflowRun;
@@ -104,19 +99,7 @@
       </div>
     </Accordion>
   </section>
-  <section class="flex w-full">
-    <Accordion
-      title="Timeline"
-      icon="chart"
-      class="select-none border-gray-900"
-    >
-      <EventHistoryTimelineContainer
-        events={$ascendingEvents}
-        eventGroups={$ascendingEventGroups}
-        isRunning={workflow.isRunning}
-      />
-    </Accordion>
-  </section>
+  <slot name="timeline" />
   <section id="event-history">
     <nav class="flex items-end justify-between gap-4 pb-4">
       <h3 class="text-lg font-medium">Recent Events</h3>
