@@ -128,14 +128,6 @@
       </NavRow>
     {:then user}
       {#if user?.email}
-        <NavRow {isCloud} link={linkList.settings}>
-          <Tooltip right hide={$navOpen} text="Settings">
-            <div class="nav-icon">
-              <Icon name="settings" scale={1.4} />
-            </div>
-            <div class="nav-title cursor-pointer">Settings</div>
-          </Tooltip>
-        </NavRow>
         <NavRow {isCloud} on:click={logout}>
           <Tooltip right hide={$navOpen} text="Logout">
             <div class="nav-icon">
