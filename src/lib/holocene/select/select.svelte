@@ -15,6 +15,7 @@
   export let value: T;
   export let options: T[] | undefined = undefined;
   export let dark: boolean = false;
+  export let placeholder = '';
 
   let _value: OptionType['value'] | T;
   let _selected: string | T;
@@ -39,52 +40,62 @@
   }
 </script>
 
-{#if label}
-  <label class="mb-2" for={id}>{label}</label>
-{/if}
-<MenuContainer class="w-full {$$props.class}">
-  <MenuButton
-    class="select-input-container"
-    bind:show
-    controls="{id}-menu"
-    data-cy={$$props.dataCy}
-    {dark}
-  >
-    <input
-      class="select-input"
-      class:dark
-      placeholder={label}
-      value={_selected}
-      name={id}
-      disabled
-      {id}
-    />
-    <Icon stroke="currentcolor" name={show ? 'caretUp' : 'caretDown'} />
-  </MenuButton>
-  <Menu id="{id}-menu" class="max-h-60 border-primary" {show} {dark}>
-    {#if options}
-      {#each options as option}
-        {@const value = isOption(option) ? option.value : _value}
-        <Option
-          on:select={handleOptionClick}
-          selected={value === _value}
-          value={option}
-          {dark}
-        />
-      {/each}
-    {:else}
-      <slot />
-    {/if}
-  </Menu>
-</MenuContainer>
+<div class="select">
+  {#if label}
+    <label for={id}>{label}</label>
+  {/if}
+  <MenuContainer class="w-full {$$props.class}">
+    <MenuButton
+      class="select-input-container"
+      bind:show
+      controls="{id}-menu"
+      data-cy={$$props.dataCy}
+      {dark}
+    >
+      <input
+        class="select-input"
+        class:dark
+        {placeholder}
+        value={_selected}
+        name={id}
+        disabled
+        {id}
+      />
+      <Icon stroke="currentcolor" name={show ? 'caretUp' : 'caretDown'} />
+    </MenuButton>
+    <Menu id="{id}-menu" class="max-h-96 border-primary" {show} {dark}>
+      {#if options}
+        {#each options as option}
+          {@const value = isOption(option) ? option.value : _value}
+          <Option
+            on:select={handleOptionClick}
+            selected={value === _value}
+            value={option}
+            {dark}
+          />
+        {/each}
+      {:else}
+        <slot />
+      {/if}
+    </Menu>
+  </MenuContainer>
+</div>
 
 <style lang="postcss">
-  :global(.select-input-container) {
-    @apply flex h-10 w-full flex-row items-center justify-between rounded border border-gray-900 bg-white px-2 text-sm;
+  label {
+    @apply mb-10 text-sm font-medium text-gray-900;
+  }
+
+  .select :global(.select-input-container) {
+    @apply flex h-10 w-full flex-row items-center justify-between rounded border border-gray-900 bg-white px-2 text-sm text-primary;
+  }
+
+  .select :global(.select-input-container.show) {
+    @apply border-blue-700;
   }
 
   .select-input {
-    @apply h-full w-full cursor-pointer bg-white;
+    @apply h-full w-full cursor-pointer bg-white placeholder:text-gray-900;
   }
 
   .select-input.dark {

@@ -4,6 +4,7 @@
   import Input from '$lib/holocene/input/input.svelte';
   import ChipInput from '$lib/holocene/input/chip-input.svelte';
   import { isEmail } from '$lib/utilities/is-email';
+  import CheckboxInput from '$lib/holocene/input/checkbox-input.svelte';
 
   let emails = [];
 </script>
@@ -92,4 +93,14 @@
     validator={isEmail}
   />
   <small>value: {emails}</small>
+</Chapter>
+
+<Chapter description="A Checkbox Input">
+  <CheckboxInput id="checkbox-input" label="Select All" />
+</Chapter>
+
+<Chapter description="A Checkbox Input on a dark background">
+  <div class="w-fit bg-primary p-4">
+    <CheckboxInput onDark id="checkbox-input" label="Select All" />
+  </div>
 </Chapter>

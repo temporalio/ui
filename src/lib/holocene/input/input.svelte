@@ -51,7 +51,7 @@
 <style lang="postcss">
   /* Base styles */
   label {
-    @apply font-secondary text-sm font-medium;
+    @apply mb-10 font-secondary text-sm font-medium;
   }
 
   .input-container {
