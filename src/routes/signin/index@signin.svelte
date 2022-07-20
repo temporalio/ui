@@ -39,9 +39,8 @@
   <p class="my-7">Let's get you signed in.</p>
   <div class="mx-auto">
     <Button
-      classes=""
-      login
-      name="lock"
+      variant="login"
+      icon="lock"
       on:click={() => {
         goto(
           routeForAuthentication({

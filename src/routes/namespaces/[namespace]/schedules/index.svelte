@@ -9,7 +9,7 @@
 
   import { columns } from './_schedule-table-columns';
   import { noop } from 'svelte/internal';
-  import Input from '$lib/holocene/input.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
@@ -42,7 +42,6 @@
   </h2>
   <Button
     class="h-10"
-    primary
     on:click={() => goto(routeForScheduleCreate({ namespace }))}
     >Create Schedule</Button
   >
@@ -51,7 +50,7 @@
   <Input
     icon="search"
     id="schedule-name-filter"
-    label="Schedule Name"
+    placeholder="Schedule Name"
     bind:value={search}
     on:submit={noop}
   />
@@ -72,7 +71,6 @@
     <div class="my-12 flex flex-col items-center justify-start gap-2">
       <EmptyState title={'No Schedules Found'} content={errorMessage} {error} />
       <Button
-        primary
         as="anchor"
         target="_external"
         href="https://docs.temporal.io/workflows/#how-to-enable-schedules"

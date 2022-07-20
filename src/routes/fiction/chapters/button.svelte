@@ -8,13 +8,13 @@
 <Chapter
   description="A secondary button"
   component={Button}
-  props={{ secondary: true }}>Secondary</Chapter
+  props={{ variant: 'secondary' }}>Secondary</Chapter
 >
 
 <Chapter
   description="A dangerous button"
   component={Button}
-  props={{ destroy: true }}>Danger</Chapter
+  props={{ variant: 'destructive' }}>Danger</Chapter
 >
 
 <Chapter
@@ -26,14 +26,13 @@
 <Chapter
   description="A disabled secondary button"
   component={Button}
-  props={{ disabled: true, secondary: true }}>Disabled Secondary</Chapter
+  props={{ disabled: true, variant: 'secondary' }}>Disabled Secondary</Chapter
 >
 
 <Chapter
   description="A disabled dangerous button"
   component={Button}
-  props={{ disabled: true, secondary: true, destroy: true }}
-  >Disabled Danger</Chapter
+  props={{ disabled: true, variant: 'destructive' }}>Disabled Danger</Chapter
 >
 
 <Chapter
@@ -61,9 +60,9 @@
 <Chapter description="some buttons next to each other">
   <div class="flex flex-row gap-2">
     <Button>Primary</Button>
-    <Button secondary>Secondary</Button>
-    <Button destroy>Danger</Button>
-    <Button icon="refresh" secondary>Refresh</Button>
-    <Button loading secondary>Loading</Button>
+    <Button variant="secondary">Secondary</Button>
+    <Button variant="destructive">Danger</Button>
+    <Button icon="refresh" variant="secondary">Refresh</Button>
+    <Button loading variant="secondary">Loading</Button>
   </div>
 </Chapter>

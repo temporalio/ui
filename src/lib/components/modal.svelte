@@ -6,7 +6,7 @@
   export let open: boolean = false;
   export let hideConfirm: boolean = false;
   export let confirmText: string = 'Confirm';
-  export let confirmType: 'destroy' | 'primary' = 'primary';
+  export let confirmType: 'destructive' | 'primary' = 'primary';
   export let confirmDisabled: boolean = false;
   export let large: boolean = false;
 
@@ -34,13 +34,12 @@
         </slot>
       </div>
       <div class="flex items-center justify-end space-x-2 p-6">
-        <Button secondary on:click={() => dispatch('cancelModal', {})}
+        <Button variant="secondary" on:click={() => dispatch('cancelModal', {})}
           >Cancel</Button
         >
         {#if !hideConfirm}
           <Button
-            destroy={confirmType === 'destroy'}
-            primary={confirmType === 'primary'}
+            variant={confirmType}
             disabled={confirmDisabled}
             on:click={() => dispatch('confirmModal', {})}>{confirmText}</Button
           >

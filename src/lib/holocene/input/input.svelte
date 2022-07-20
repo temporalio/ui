@@ -4,49 +4,58 @@
   import type { IconName } from '$lib/holocene/icon/paths';
 
   export let id: string;
-  export let label: string;
   export let value: string;
+  export let label = '';
   export let icon: IconName = '';
-  export let placeholder = label;
+  export let placeholder = '';
   export let name = id;
   export let copyable: boolean = false;
+  export let disabled = false;
   export let theme: 'dark' | 'light' = 'light';
   export let autocomplete = false;
 
   const { copy, copied } = copyToClipboard(value);
 </script>
 
-<div class="input-container {theme}" class:copyable>
-  <label for={id} class="hidden">{label}</label>
-  {#if icon !== ''}
-    <span class="icon-container">
-      <Icon name={icon} scale={0.9} stroke="currentcolor" />
-    </span>
+<div class={$$props.class}>
+  {#if label}
+    <label for={id}>{label}</label>
   {/if}
-  <input
-    class="m-2 block w-full bg-white focus:outline-none"
-    class:copyable
-    disabled={copyable}
-    data-lpignore="true"
-    {placeholder}
-    {id}
-    {name}
-    autocomplete={autocomplete ? 'on' : 'off'}
-    bind:value
-    on:input
-    on:change
-  />
-  {#if copyable}
-    <div class="copy-icon-container" on:click={copy}>
-      <Icon name={$copied ? 'checkMark' : 'copy'} stroke="currentcolor" />
-    </div>
-  {/if}
+  <div class="input-container w-full {theme}" class:copyable>
+    {#if icon !== ''}
+      <span class="icon-container">
+        <Icon name={icon} scale={0.9} stroke="currentcolor" />
+      </span>
+    {/if}
+    <input
+      class="m-2 block w-full bg-white focus:outline-none"
+      class:copyable
+      disabled={disabled || copyable}
+      data-lpignore="true"
+      {placeholder}
+      {id}
+      {name}
+      autocomplete={autocomplete ? 'on' : 'off'}
+      bind:value
+      on:input
+      on:change
+    />
+    {#if copyable}
+      <div class="copy-icon-container" on:click={copy}>
+        <Icon name={$copied ? 'checkMark' : 'copy'} stroke="currentcolor" />
+      </div>
+    {/if}
+  </div>
 </div>
 
 <style lang="postcss">
   /* Base styles */
+  label {
+    @apply font-secondary text-sm font-medium;
+  }
+
   .input-container {
-    @apply relative box-border inline-flex h-10 w-full items-center rounded-lg border text-base focus-within:border-blue-700;
+    @apply relative box-border inline-flex h-10 items-center rounded border border-gray-900 text-sm focus-within:border-blue-700;
   }
 
   .input-container.copyable {
@@ -58,7 +67,7 @@
   }
 
   .copy-icon-container {
-    @apply flex h-full w-9 cursor-pointer items-center justify-center rounded-r-lg border-l;
+    @apply flex h-full w-9 cursor-pointer items-center justify-center rounded-r border-l;
   }
 
   /* Light theme styles */

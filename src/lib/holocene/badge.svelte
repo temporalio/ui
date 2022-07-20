@@ -3,9 +3,18 @@
     | 'alpha'
     | 'beta'
     | 'warning'
+    | 'error'
     | 'default'
     | 'count'
-    | 'active';
+    | 'active'
+    | 'available'
+    | 'running'
+    | 'red'
+    | 'yellow'
+    | 'green'
+    | 'blue'
+    | 'purple'
+    | 'gray';
 </script>
 
 <script lang="ts">
@@ -19,24 +28,36 @@
 </div>
 
 <style lang="postcss">
-  .beta {
+  .beta,
+  .running,
+  .blue {
     @apply border-blue-700 bg-blue-100 text-blue-700;
   }
 
-  .alpha {
+  .alpha,
+  .purple {
     @apply border-purple-700 bg-purple-100 text-purple-700;
   }
 
-  .warning {
+  .error,
+  .red {
     @apply border-red-700 bg-red-50 text-red-700;
   }
 
-  .default {
+  .warning,
+  .yellow {
+    @apply border-yellow-900 bg-yellow-100 text-yellow-900;
+  }
+
+  .default,
+  .gray {
     @apply border-gray-700 bg-gray-300 text-gray-700;
   }
 
-  .active {
-    @apply border-green-100 bg-green-100 text-green-700;
+  .active,
+  .available,
+  .green {
+    @apply border-green-700 bg-green-100 text-green-700;
   }
 
   .count {
