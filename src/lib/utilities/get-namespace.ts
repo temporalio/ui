@@ -17,7 +17,7 @@ export const getNamespace = ({
   namespaces,
 }: GetNamespaceParameters): string | undefined => {
   if (!namespace) return defaultNamespace;
-  if (!namespaces.length) return defaultNamespace;
+  if (!namespaces?.length) return defaultNamespace;
 
   if (namespaces.find((ns) => ns?.namespaceInfo?.name === namespace)) {
     return namespace;
@@ -27,12 +27,12 @@ export const getNamespace = ({
 };
 
 export const getDefaultNamespace = ({
-  namespaces,
+  namespaces = [],
   settings,
 }: GetDefaultNamespaceParameters): string => {
   const { showTemporalSystemNamespace, defaultNamespace } = settings;
 
-  const namespaceNames = (namespaces || [])
+  const namespaceNames = namespaces
     .map(
       (namespace: DescribeNamespaceResponse) => namespace?.namespaceInfo?.name,
     )

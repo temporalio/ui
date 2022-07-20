@@ -10,5 +10,4 @@ export const getStatusFilterCode = (
   if (status === 'Terminated') return '5';
   if (status === 'ContinuedAsNew') return '6';
   if (status === 'TimedOut') return '7';
-  return null;
 };

@@ -29,4 +29,12 @@ describe('getStatusFilterCode', () => {
   it('should return "7" if the status is "TimedOut"', () => {
     expect(getStatusFilterCode('TimedOut')).toBe('7');
   });
+
+  it('should return "7" if the status is "TimedOut"', () => {
+    expect(getStatusFilterCode('TimedOut')).toBe('7');
+  });
+
+  it('should return undefined if the status is bogus', () => {
+    expect(getStatusFilterCode('Bogus')).toBe(undefined);
+  });
 });
