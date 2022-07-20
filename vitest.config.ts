@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { configDefaults, defineConfig } from 'vitest/config';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import path from 'path';
 
@@ -16,6 +16,14 @@ export default defineConfig({
   },
   test: {
     globals: true,
+    coverage: {
+      exclude: [
+        ...configDefaults.exclude,
+        'src/lib/svelte-mocks/**/*',
+        'src/lib/utilities/get-environment.ts',
+        '**/*.test.ts',
+      ],
+    },
     environment: 'jsdom',
     deps: {
       inline: ['date-fns'],
