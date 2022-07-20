@@ -1,8 +1,6 @@
-//  The function takes a decoded StackTraceQuery response as a string 
+//  The function takes a decoded StackTraceQuery response as a string
 //  It returns true if the response came from the GoSDK and false otherwise
 
-export const isFromGoSDK = (
-  stackTraceText: string
-): boolean => {
+export const isFromGoSDK = (stackTraceText: string): boolean => {
   return /(?:.go:\d)/.test(stackTraceText); //contains '.go:' followed by a digit
 };
