@@ -5,8 +5,9 @@
   import { noop } from 'svelte/internal';
 
   export let id: string;
-  export let label: string;
   export let value: string;
+  export let label = '';
+  export let placeholder = '';
   export let icon: IconName = '';
   export let copyable: boolean = false;
   export let theme: 'dark' | 'light' = 'light';
@@ -31,6 +32,7 @@
     {value}
     {icon}
     {label}
+    {placeholder}
     {theme}
     {copyable}
     on:input
