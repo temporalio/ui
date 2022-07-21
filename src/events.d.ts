@@ -1,5 +1,6 @@
 type HistoryEvent = import('$types').HistoryEvent;
 type PendingActivityInfo = import('$types').PendingActivityInfo;
+type PendingChildren = import('$types').PendingChildrenInfo;
 
 type EventRequestMetadata = {
   namespace: string;

@@ -83,6 +83,28 @@
         />
       </div>
     {/if}
+    {#each workflow?.pendingChildren as child (child.runId)}
+      <div class="gap-2 xl:flex">
+        <WorkflowDetail
+          title="Child"
+          content={child.workflowId}
+          href={routeForWorkflow({
+            namespace,
+            workflow: child.workflowId,
+            run: child.runId,
+          })}
+        />
+        <WorkflowDetail
+          title="Child ID"
+          content={child.runId}
+          href={routeForWorkflow({
+            namespace,
+            workflow: child.workflowId,
+            run: child.runId,
+          })}
+        />
+      </div>
+    {/each}
     <WorkflowDetail
       title="State Transitions"
       content={workflow.stateTransitionCount}
