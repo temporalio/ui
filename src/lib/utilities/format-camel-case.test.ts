@@ -36,6 +36,10 @@ describe('format', () => {
     expect(format('requestIdSomething')).toBe('Request ID Something');
   });
 
+  it('should format workflowType as "Workflow Type Name"', () => {
+    expect(format('workflowType')).toBe('Workflow Type Name');
+  });
+
   it('should format undefined as ""', () => {
     expect(format()).toBe('');
   });

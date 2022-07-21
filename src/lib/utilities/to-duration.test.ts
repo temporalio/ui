@@ -9,6 +9,7 @@ import {
   isDuration,
   fromSeconds,
   tomorrow,
+  durations,
 } from './to-duration';
 
 describe('toDuration', () => {
@@ -361,5 +362,22 @@ describe('fromSeconds', () => {
 
   it('should return undefined if given bogus input', () => {
     expect(fromSeconds('bogus')).toBeUndefined();
+  });
+});
+
+describe('durations', () => {
+  it('should validate that durations has not accidentally changed', () => {
+    expect(durations).toMatchInlineSnapshot(`
+      [
+        "10 minutes",
+        "1 hour",
+        "3 hours",
+        "1 day",
+        "3 days",
+        "7 days",
+        "30 days",
+        "90 days",
+      ]
+    `);
   });
 });
