@@ -30,11 +30,7 @@ const config = {
       emitTypes: true,
       // Don't include components for now.
       //eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-      exports: (filepath) => {
-        return /^(layouts|models|pages|services|stores|utilities|holocene)/.test(
-          filepath,
-        );
-      },
+      exports: () => true,
       //eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
       files: (filepath) =>
         /^(?!.*\.(spec|test)\.ts$).*\.(svelte|ts)$/.test(filepath),

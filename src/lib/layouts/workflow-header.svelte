@@ -20,6 +20,7 @@
   import ExportHistory from '$lib/components/export-history.svelte';
   import Tab from '$lib/components/tab.svelte';
   import { encodeURIForSvelte } from '$lib/utilities/encode-uri';
+  import { page } from '$app/stores';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
@@ -71,28 +72,37 @@
         })}
         amount={workflow?.historyEvents}
         dataCy="history-tab"
+        active={$page.url.href ===
+          routeForEventHistory({
+            view: $eventViewType,
+            ...routeParameters,
+          })}
       />
       <Tab
         label="Workers"
         href={routeForWorkers(routeParameters)}
         amount={workers?.pollers?.length}
         dataCy="workers-tab"
+        active={$page.url.href === routeForWorkers(routeParameters)}
       />
       <Tab
         label="Pending Activities"
         href={routeForPendingActivities(routeParameters)}
         amount={workflow.pendingActivities?.length}
         dataCy="pending-activities-tab"
+        active={$page.url.href === routeForPendingActivities(routeParameters)}
       />
       <Tab
         label="Stack Trace"
         href={routeForStackTrace(routeParameters)}
         dataCy="stack-trace-tab"
+        active={$page.url.href === routeForStackTrace(routeParameters)}
       />
       <Tab
         label="Queries"
         href={routeForWorkflowQuery(routeParameters)}
         dataCy="queries-tab"
+        active={$page.url.href === routeForWorkflowQuery(routeParameters)}
       />
     </nav>
   </main>
