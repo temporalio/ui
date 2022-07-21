@@ -3,7 +3,6 @@ type WorkflowsAPIRoutePath = 'workflows' | 'workflows.archived';
 type WorkflowAPIRoutePath =
   | 'workflow'
   | 'workflow.terminate'
-  | 'events'
   | 'events.ascending'
   | 'events.descending'
   | 'query';
@@ -21,7 +20,6 @@ type APIRoutePath =
   | SearchAttributesRoutePath
   | TaskQueueAPIRoutePath
   | WorkflowAPIRoutePath
-  | WorkflowsAPIArchivalRoutePath
   | WorkflowsAPIRoutePath;
 
 type APIRouteParameters = {
