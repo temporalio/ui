@@ -26,6 +26,7 @@ export type PollerWithTaskQueueTypes = PollerInfo & {
 
 export async function getPollers(
   parameters: GetAllPollersRequest,
+  options = { returnAllPollers: false },
   request = fetch,
 ): Promise<GetPollersResponse> {
   const workflowPollers = await requestFromAPI<GetPollersResponse>(
@@ -82,8 +83,16 @@ export async function getPollers(
     workflowPollers.pollers.reduce(r('WORKFLOW'), {}),
   );
 
+  const pollers =
+    options?.returnAllPollers && !activityPollers.pollers.length
+      ? workflowPollers.pollers
+      : activityPollers.pollers;
+  const taskQueueStatus =
+    options?.returnAllPollers && !activityPollers.pollers.length
+      ? workflowPollers.taskQueueStatus
+      : activityPollers.taskQueueStatus;
   return {
-    pollers: activityPollers.pollers,
-    taskQueueStatus: activityPollers.taskQueueStatus,
+    pollers,
+    taskQueueStatus,
   };
 }
