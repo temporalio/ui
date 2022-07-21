@@ -3,6 +3,7 @@
   import { timeFormat } from '$lib/stores/time-format';
   import { workflowsSearch } from '$lib/stores/workflows';
   import {
+    refresh,
     workflows,
     loading,
     updating,
@@ -22,6 +23,8 @@
   import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
   import Loading from '$holocene/loading.svelte';
   import PageTitle from '$lib/holocene/page-title.svelte';
+  import Button from '$lib/holocene/button.svelte';
+  import Icon from '$lib/holocene/icon/index.svelte';
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
 
@@ -34,6 +37,10 @@
     $lastUsedNamespace = $page.params.namespace;
   });
 
+  const refreshWorkflows = () => {
+    $refresh = Date.now();
+  };
+
   onDestroy(() => {
     const query = $page.url.searchParams.get('query');
     const parameters = query ? toListWorkflowParameters(query) : {};
@@ -45,12 +52,19 @@
   title={`Workflows | ${$page.params?.namespace}`}
   url={$page.url.href}
 />
-<div>
-  <h1 class="text-2xl">
-    Recent Workflows
-    <NamespaceSelector />
-  </h1>
-  <p class="text-sm text-gray-600">{$page.params.namespace}</p>
+<div class="flex justify-between">
+  <div>
+    <h1 class="text-2xl">
+      Recent Workflows
+      <NamespaceSelector />
+    </h1>
+    <p class="text-sm text-gray-600">{$page.params.namespace}</p>
+  </div>
+  <div>
+    <Button variant="secondary" on:click={refreshWorkflows}
+      ><Icon name="refresh" stroke="currentColor" /></Button
+    >
+  </div>
 </div>
 <WorkflowFilters bind:searchType />
 {#if $loading}
