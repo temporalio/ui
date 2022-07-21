@@ -16,6 +16,7 @@ export type ErrorCallback = (error: {
 }) => void;
 
 type toURLParams = Parameters<typeof toURL>;
+
 type RequestFromAPIOptions = {
   params?: toURLParams[1];
   request?: typeof fetch;
@@ -28,8 +29,8 @@ type RequestFromAPIOptions = {
 };
 
 export const isTemporalAPIError = (obj: unknown): obj is TemporalAPIError =>
-  (obj as TemporalAPIError).message !== undefined &&
-  typeof (obj as TemporalAPIError).message === 'string';
+  (obj as TemporalAPIError)?.message !== undefined &&
+  typeof (obj as TemporalAPIError)?.message === 'string';
 
 /**
  *  A utility method for making requests to the Temporal API.
