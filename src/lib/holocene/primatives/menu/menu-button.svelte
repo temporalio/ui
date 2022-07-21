@@ -25,6 +25,7 @@
   on:click
   class={$$props.class}
   class:dark
+  class:show
   {disabled}
 >
   <slot />

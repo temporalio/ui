@@ -39,6 +39,8 @@
       bind:value
       on:input
       on:change
+      on:focus
+      on:blur
     />
     {#if copyable}
       <div class="copy-icon-container" on:click={copy}>
@@ -51,7 +53,7 @@
 <style lang="postcss">
   /* Base styles */
   label {
-    @apply font-secondary text-sm font-medium;
+    @apply mb-10 font-secondary text-sm font-medium;
   }
 
   .input-container {

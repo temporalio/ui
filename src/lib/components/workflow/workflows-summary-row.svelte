@@ -10,7 +10,6 @@
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import FilterOrCopyButtons from '$holocene/filter-or-copy-buttons.svelte';
   import TableRow from '$holocene/table/table-row.svelte';
-  import { noop } from 'svelte/internal';
   export let namespace: string;
   export let workflow: WorkflowExecution;
   export let timeFormat: TimeFormat | string;

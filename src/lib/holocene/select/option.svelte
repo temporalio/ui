@@ -42,7 +42,12 @@
   }
 </script>
 
-<MenuItem on:click={handleOptionClick} class="p-4 hover:bg-gray-50" {dark}>
+<MenuItem
+  on:click={handleOptionClick}
+  class="p-4 hover:bg-gray-50"
+  {selected}
+  {dark}
+>
   <div class="mr-2 w-6">
     {#if selected}
       <Icon stroke="currentcolor" name="checkMark" scale={0.9} />
@@ -64,10 +69,10 @@
 
 <style lang="postcss">
   .option-label {
-    @apply flex font-secondary font-medium;
+    @apply flex font-secondary text-sm font-medium;
   }
 
   .option-description {
-    @apply flex font-primary font-normal;
+    @apply flex font-primary text-sm font-normal;
   }
 </style>

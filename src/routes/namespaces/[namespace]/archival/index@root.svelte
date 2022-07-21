@@ -59,7 +59,7 @@
   import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
   import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
   import WorkflowFilters from './_workflow-filters.svelte';
-  import Pagination from '$lib/components/pagination.svelte';
+  import Pagination from '$holocene/pagination.svelte';
   import EmptyState from '$lib/components/empty-state.svelte';
   import CodeBlock from '$lib/components/code-block.svelte';
   import { timeFormat } from '$lib/stores/time-format';

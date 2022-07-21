@@ -1,14 +1,15 @@
 import { browser } from '$app/env';
 
-export function getApiOrigin(): string | null {
-  const isRelative = !import.meta.env.VITE_API.startsWith('http');
+export function getApiOrigin(isBrowser = browser): string | null {
+  const endpoint = import.meta.env.VITE_API;
+  const isRelative = !endpoint.startsWith('http');
 
   let origin = '';
 
   if (isRelative) {
-    origin = browser ? window.location.origin : '';
+    origin = isBrowser ? window.location.origin + endpoint : '';
   } else {
-    origin = import.meta.env.VITE_API;
+    origin = endpoint;
   }
 
   if (origin.endsWith('/')) origin = origin.slice(0, -1);

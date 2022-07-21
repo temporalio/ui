@@ -1,17 +1,22 @@
 import { browser } from '$app/env';
 import { networkError } from '$lib/stores/error';
-import { notifications } from '../stores/notifications';
+import { notifications as notificationStore } from '$lib/stores/notifications';
 import { isNetworkError } from './is-network-error';
 import { routeForLoginPage } from './route-for';
 
 // This will eventually be expanded on.
-export const handleError = (error: unknown): void => {
-  if (isUnauthorized(error) && browser) {
+export const handleError = (
+  error: unknown,
+  notifications = notificationStore,
+  errors = networkError,
+  isBrowser = browser,
+): void => {
+  if (isUnauthorized(error) && isBrowser) {
     window.location.assign(routeForLoginPage());
     return;
   }
 
-  if (isForbidden(error) && browser) {
+  if (isForbidden(error) && isBrowser) {
     window.location.assign(routeForLoginPage());
     return;
   }
@@ -19,7 +24,7 @@ export const handleError = (error: unknown): void => {
   if (isNetworkError(error)) {
     notifications.add('error', `${error.statusCode} ${error.statusText}`);
     // Re-throw error to prevent other code from attempting to render
-    networkError.set(error);
+    errors.set(error);
     throw error;
   }
 

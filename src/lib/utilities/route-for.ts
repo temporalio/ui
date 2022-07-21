@@ -22,6 +22,7 @@ export const isEventView = (view: string): view is EventView => {
 };
 
 export type NamespaceParameter = Pick<RouteParameters, 'namespace'>;
+export type TaskQueueParameters = Pick<RouteParameters, 'namespace' | 'queue'>;
 export type WorkflowParameters = Pick<
   RouteParameters,
   'namespace' | 'workflow' | 'run'
@@ -105,6 +106,12 @@ export const routeForEventHistory = ({
 
 export const routeForWorkers = (parameters: WorkflowParameters): string => {
   return `${routeForWorkflow(parameters)}/workers`;
+};
+
+export const routeForTaskQueue = (parameters: TaskQueueParameters): string => {
+  return `${routeForNamespace({
+    namespace: parameters.namespace,
+  })}/task-queues/${parameters.queue}`;
 };
 
 export const routeForStackTrace = (parameters: WorkflowParameters): string => {

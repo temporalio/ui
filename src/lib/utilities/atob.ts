@@ -12,4 +12,7 @@ export function base64DecodeUnicode(str: string): string {
   );
 }
 
-export const atob = browser ? base64DecodeUnicode : (str: string) => str;
+export const atob = (str: string, isBrowser = browser): string => {
+  if (!isBrowser) return str;
+  return base64DecodeUnicode(str);
+};

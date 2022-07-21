@@ -1,7 +1,7 @@
 <script lang="ts">
   import { expandAllEvents } from '$lib/stores/event-view';
 
-  import Pagination from '$lib/components/pagination.svelte';
+  import Pagination from '$holocene/pagination.svelte';
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventEmptyRow from './event-empty-row.svelte';

@@ -121,6 +121,9 @@ export type Severity = temporal.api.enums.v1.Severity;
 // api.workflow
 
 export type PendingActivityInfo = temporal.api.workflow.v1.IPendingActivityInfo;
+export type PendingChildrenInfo =
+  temporal.api.workflow.v1.IPendingChildExecutionInfo;
+
 export type WorkflowExecutionInfo =
   temporal.api.workflow.v1.IWorkflowExecutionInfo;
 

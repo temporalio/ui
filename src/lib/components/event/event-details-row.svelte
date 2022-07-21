@@ -2,10 +2,13 @@
   import { page } from '$app/stores';
 
   import { format } from '$lib/utilities/format-camel-case';
-  import { routeForWorkflow, routeForWorkers } from '$lib/utilities/route-for';
+  import {
+    routeForWorkflow,
+    routeForTaskQueue,
+  } from '$lib/utilities/route-for';
   import {
     shouldDisplayAsExecutionLink,
-    shouldDisplayAsWorkersLink,
+    shouldDisplayAsTaskQueueLink,
     shouldDisplayAsPlainText,
     getCodeBlockValue,
   } from '$lib/utilities/get-single-attribute-for-event';
@@ -43,7 +46,7 @@
         </Copyable>
       </div>
     </div>
-  {:else if shouldDisplayAsWorkersLink(key)}
+  {:else if shouldDisplayAsTaskQueueLink(key)}
     <div class="xl:3/4 flex w-full items-center xl:items-start">
       <h2 class="mr-3 text-sm">{format(key)}</h2>
       <div class="text-sm">
@@ -51,7 +54,7 @@
           content={value}
           container-class="flex-row-reverse xl:flex-row"
         >
-          <Link href={routeForWorkers({ namespace, workflow, run })}>
+          <Link href={routeForTaskQueue({ namespace, queue: value })}>
             {value}
           </Link>
         </Copyable>

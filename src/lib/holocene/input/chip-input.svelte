@@ -14,7 +14,7 @@
   $: invalid = chips.some((chip) => !validator(chip));
 
   const handleKeydown = (e: KeyboardEvent) => {
-    if (e.key === ',' || e.key === 'Enter') {
+    if ((e.key === ',' || e.key === 'Enter') && displayValue !== '') {
       e.preventDefault();
       chips = [...chips, displayValue];
       displayValue = '';
@@ -80,15 +80,19 @@
 
 <style lang="postcss">
   label {
-    @apply text-sm font-medium text-gray-900 after:content-['*'];
+    @apply mb-10 text-sm font-medium text-gray-900;
+
+    &.required {
+      @apply after:content-['*'];
+    }
   }
 
   .input-container {
-    @apply flex max-h-20 w-full flex-row flex-wrap gap-1 overflow-y-scroll rounded border border-gray-900 bg-white p-2 text-sm text-gray-900 focus-within:border-blue-700;
-  }
+    @apply flex max-h-20 min-h-[2.5rem] w-full flex-row flex-wrap gap-1 overflow-y-scroll rounded border border-gray-900 bg-white p-2 text-sm text-gray-900 focus-within:border-blue-700;
 
-  .input-container.invalid {
-    @apply border-red-700;
+    .invalid {
+      @apply border-red-700;
+    }
   }
 
   input {
