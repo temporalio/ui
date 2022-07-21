@@ -2,5 +2,5 @@
 //  It returns true if the response came from the GoSDK and false otherwise
 
 export const isFromGoSDK = (stackTraceText: string): boolean => {
-  return /(?:.go:\d)/.test(stackTraceText); //contains '.go:' followed by a digit
+  return (/\w.go:\d/).test(stackTraceText); //contains '.go:' followed by a digit
 };

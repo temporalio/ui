@@ -2,5 +2,5 @@
 //  It returns true if the response came from the TypeScriptSDK and false otherwise
 
 export const isFromTypeScriptSDK = (stackTraceText: string): boolean => {
-  return /(?:.ts:\d)/.test(stackTraceText); //contains '.ts:' followed by a digit
+  return /(\w.ts:\d)/.test(stackTraceText); //contains '.ts:' followed by a digit
 };
