@@ -164,3 +164,15 @@ export function fromSecondsToDaysOrHours(seconds: string): string {
   });
   return durationToString(duration, { format: ['days', 'hours'] });
 }
+
+export const getTimestampDifference = (
+  date1: string,
+  date2: string,
+): number => {
+  if (!date1 || !date2) {
+    return 0;
+  }
+  const parse1 = Date.parse(date1);
+  const parse2 = Date.parse(date2);
+  return Math.abs(parse1 - parse2);
+};

@@ -13,7 +13,7 @@
       <HistoryImport />
     </div>
   </nav>
-  <nav class="flex items-end justify-end gap-4 pb-4">
+  <nav class="my-4 flex items-end justify-end gap-4">
     <div id="event-view-toggle" class="flex gap-4">
       <ToggleButtons>
         <ToggleButton

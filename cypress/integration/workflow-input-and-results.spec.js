@@ -39,6 +39,8 @@ describe('Workflow Input and Results', () => {
 
     cy.wait('@event-history-api');
 
+    cy.get('.accordion-open').click();
+
     const firstEvent = eventsCompletedFixture.history.events[0];
     const input = Buffer.from(
       firstEvent.workflowExecutionStartedEventAttributes.input.payloads[0].data,
@@ -55,6 +57,7 @@ describe('Workflow Input and Results', () => {
         .data,
       'base64',
     ).toString();
+
     cy.get('[data-cy="workflow-results"]').contains(results);
   });
 
@@ -69,6 +72,8 @@ describe('Workflow Input and Results', () => {
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-api');
+
+    cy.get('.accordion-open').click();
 
     const firstEvent = eventsCompletedNullFixture.history.events[0];
     const input = Buffer.from(
@@ -104,6 +109,8 @@ describe('Workflow Input and Results', () => {
     cy.wait('@workflow-api');
     cy.wait('@event-history-api');
 
+    cy.get('.accordion-open').click();
+
     const firstEvent = eventsRunningFixture.history.events[0];
     const input = Buffer.from(
       firstEvent.workflowExecutionStartedEventAttributes.input.payloads[0].data,
@@ -124,6 +131,8 @@ describe('Workflow Input and Results', () => {
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-api');
+
+    cy.get('.accordion-open').click();
 
     const firstEvent = eventsFailedFixture.history.events[0];
     const input = Buffer.from(
@@ -154,6 +163,8 @@ describe('Workflow Input and Results', () => {
     cy.wait('@workflow-api');
     cy.wait('@event-history-api');
 
+    cy.get('.accordion-open').click();
+
     const firstEvent = eventsCanceledFixture.history.events[0];
     const input = Buffer.from(
       firstEvent.workflowExecutionStartedEventAttributes.input.payloads[0].data,
@@ -175,6 +186,8 @@ describe('Workflow Input and Results', () => {
     cy.wait('@workflow-api');
     cy.wait('@event-history-api');
 
+    cy.get('.accordion-open').click();
+
     const firstEvent = eventsTimedOutFixture.history.events[0];
     const input = Buffer.from(
       firstEvent.workflowExecutionStartedEventAttributes.input.payloads[0].data,
@@ -195,6 +208,8 @@ describe('Workflow Input and Results', () => {
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-api');
+
+    cy.get('.accordion-open').click();
 
     const firstEvent = eventsContinuedAsNewFixture.history.events[0];
     const input = Buffer.from(

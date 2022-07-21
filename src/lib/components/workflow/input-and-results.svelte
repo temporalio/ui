@@ -15,10 +15,7 @@
   )[type];
 </script>
 
-<article
-  class="flex w-full flex-col rounded-lg border-2 border-gray-300 p-4 lg:w-1/2"
-  data-cy="workflow-{type}"
->
+<article class="flex w-full flex-col lg:w-1/2" data-cy="workflow-{type}">
   <h3 class="text-lg">{title}</h3>
   {#if content}
     {#if $updating}

@@ -39,6 +39,8 @@
       bind:value
       on:input
       on:change
+      on:focus
+      on:blur
     />
     {#if copyable}
       <div class="copy-icon-container" on:click={copy}>

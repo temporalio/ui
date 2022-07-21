@@ -83,6 +83,27 @@ const caretRightIcon: Icon = {
   ],
 };
 
+const chartIcon: Icon = {
+  paths: [
+    {
+      d: 'M4.75 6.75C4.75 5.64543 5.64543 4.75 6.75 4.75H17.25C18.3546 4.75 19.25 5.64543 19.25 6.75V17.25C19.25 18.3546 18.3546 19.25 17.25 19.25H6.75C5.64543 19.25 4.75 18.3546 4.75 17.25V6.75Z',
+      stroke: '#111827',
+    },
+    {
+      d: 'M8.75 15.25V9.75',
+      stroke: '#111827',
+    },
+    {
+      d: 'M15.25 15.25V9.75',
+      stroke: '#111827',
+    },
+    {
+      d: 'M12 15.25V12.75',
+      stroke: '#111827',
+    },
+  ],
+};
+
 const checkMarkIcon: Icon = {
   paths: [
     {
@@ -332,6 +353,35 @@ const settingsIcon: Icon = {
   ],
 };
 
+const slidersIcon: Icon = {
+  paths: [
+    {
+      d: 'M4.75 8H7.25',
+      stroke: 'currentColor',
+    },
+    {
+      d: 'M12.75 8H19.25',
+      stroke: 'currentColor',
+    },
+    {
+      d: 'M4.75 16H12.25',
+      stroke: 'currentColor',
+    },
+    {
+      d: 'M17.75 16H19.25',
+      stroke: 'currentColor',
+    },
+    {
+      d: 'M 10, 8 m -1, 0 a 1,1 0 1,0 2.25,0 a 1,1 0 1,0 -2.25,0',
+      stroke: 'currentColor',
+    },
+    {
+      d: 'M 15, 16 m -1, 0 a 1,1 0 1,0 2.25,0 a 1,1 0 1,0 -2.25,0',
+      stroke: 'currentColor',
+    },
+  ],
+};
+
 const spinnerIcon: Icon = {
   paths: [
     {
@@ -406,6 +456,7 @@ export const icons: { [index: string]: Icon } = {
   caretLeft: caretLeftIcon,
   caretRight: caretRightIcon,
   caretUp: caretUpIcon,
+  chart: chartIcon,
   checkMark: checkMarkIcon,
   clock: clockIcon,
   close: closeIcon,
@@ -428,6 +479,7 @@ export const icons: { [index: string]: Icon } = {
   refresh: refreshIcon,
   search: searchIcon,
   settings: settingsIcon,
+  sliders: slidersIcon,
   spinner: spinnerIcon,
   stopwatch: stopwatchIcon,
   temporal: temporalIcon,
