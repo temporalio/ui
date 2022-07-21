@@ -14,7 +14,7 @@
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
 
   import EmptyState from '$lib/components/empty-state.svelte';
-  import Pagination from '$lib/components/pagination.svelte';
+  import Pagination from '$lib/holocene/pagination.svelte';
   import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
   import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
   import WorkflowFilters from '$lib/components/workflow/workflow-filters.svelte';

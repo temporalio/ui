@@ -16,7 +16,7 @@
   export let floatId: string | undefined = undefined;
   export let updating = false;
 
-  import FilterSelect from './select/filter-select.svelte';
+  import FilterSelect from '$lib/components/select/filter-select.svelte';
   import { getFloatStyle } from '$lib/utilities/get-float-style';
 
   export let startingIndex: string | number = 0;
