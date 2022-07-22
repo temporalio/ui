@@ -52,7 +52,7 @@
   }
 
   .checkmark {
-    @apply box-content absolute top-[3px] left-0.5 h-4 w-4 cursor-pointer rounded-sm border border-primary bg-white;
+    @apply absolute top-[3px] left-0.5 box-content h-4 w-4 cursor-pointer rounded-sm border border-primary bg-white;
   }
 
   .checkmark.on-dark {
@@ -60,7 +60,7 @@
   }
 
   .dash {
-    @apply absolute border border-white rounded w-2 h-0 top-[7px] left-1;
+    @apply absolute top-[7px] left-1 h-0 w-2 rounded border border-white;
   }
 
   .dash.on-dark {
