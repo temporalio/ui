@@ -18,9 +18,10 @@
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
   import ExportHistory from '$lib/components/export-history.svelte';
-  import Tab from '$lib/components/tab.svelte';
+  import Tab from '$lib/holocene/tab.svelte';
   import { encodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { page } from '$app/stores';
+  import { pathMatches } from '$lib/utilities/path-matches';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
@@ -72,37 +73,51 @@
         })}
         amount={workflow?.historyEvents}
         dataCy="history-tab"
-        active={$page.url.href ===
+        active={pathMatches(
+          $page.url.pathname,
           routeForEventHistory({
             view: $eventViewType,
             ...routeParameters,
-          })}
+          }),
+        )}
       />
       <Tab
         label="Workers"
         href={routeForWorkers(routeParameters)}
         amount={workers?.pollers?.length}
         dataCy="workers-tab"
-        active={$page.url.href === routeForWorkers(routeParameters)}
+        active={pathMatches(
+          $page.url.pathname,
+          routeForWorkers(routeParameters),
+        )}
       />
       <Tab
         label="Pending Activities"
         href={routeForPendingActivities(routeParameters)}
         amount={workflow.pendingActivities?.length}
         dataCy="pending-activities-tab"
-        active={$page.url.href === routeForPendingActivities(routeParameters)}
+        active={pathMatches(
+          $page.url.pathname,
+          routeForPendingActivities(routeParameters),
+        )}
       />
       <Tab
         label="Stack Trace"
         href={routeForStackTrace(routeParameters)}
         dataCy="stack-trace-tab"
-        active={$page.url.href === routeForStackTrace(routeParameters)}
+        active={pathMatches(
+          $page.url.pathname,
+          routeForStackTrace(routeParameters),
+        )}
       />
       <Tab
         label="Queries"
         href={routeForWorkflowQuery(routeParameters)}
         dataCy="queries-tab"
-        active={$page.url.href === routeForWorkflowQuery(routeParameters)}
+        active={pathMatches(
+          $page.url.pathname,
+          routeForWorkflowQuery(routeParameters),
+        )}
       />
     </nav>
   </main>

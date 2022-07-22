@@ -6,7 +6,7 @@
 </script>
 
 <a
-  class="block whitespace-nowrap text-sm md:text-base underline-offset-4 hover:text-blue-700 hover:underline"
+  class="block whitespace-nowrap border-b-2 border-white text-sm hover:border-b-2 hover:border-blue-700 md:text-base"
   class:active
   {href}
   data-cy={$$props.dataCy}
@@ -21,6 +21,6 @@
 
 <style lang="postcss">
   a.active {
-    @apply underline font-medium text-blue-700;
+    @apply border-b-2 border-blue-700 font-medium text-blue-700;
   }
 </style>
