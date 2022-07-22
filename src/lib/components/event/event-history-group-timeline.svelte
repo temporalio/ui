@@ -41,15 +41,16 @@
   }
 
   $: startDate = events[0]?.eventTime;
-  $: currentDate = new Date(
-    Date.parse(startDate as string) +
-      (mouseX - xBuffer) * (totalDistance / (width - xBuffer)),
-  );
-  $: endDate = events[events.length - 1]?.eventTime;
-
+  $: endDate = isRunning
+    ? new Date(Date.now())
+    : events[events.length - 1]?.eventTime;
   $: totalDistance = getTimestampDifference(
     startDate as string,
     endDate as string,
+  );
+  $: currentDate = new Date(
+    Date.parse(startDate as string) +
+      (mouseX - xBuffer) * (totalDistance / (width - xBuffer)),
   );
 
   $: getDistance = (date): number => {
@@ -96,7 +97,7 @@
 
 {#if eventGroups.length}
   <div
-    class="min-h-40 relative max-h-96 w-full cursor-crosshair overflow-auto rounded-lg border-2 bg-white"
+    class="min-h-40 relative max-h-96 w-full cursor-crosshair overflow-auto rounded-lg border border-gray-900 bg-blueGray-50 bg-white"
     bind:clientWidth={width}
     on:mousemove={handleMouseMove}
   >
@@ -130,7 +131,7 @@
             1}px; background: {color};"
         />
         <button
-          class="absolute truncate pl-2 text-left text-sm font-medium hover:bg-blueGray-200"
+          class="absolute truncate border-r border-gray-900 pl-2 text-left text-sm font-medium hover:bg-blueGray-200"
           class:event-group-active={$timelineEvents?.length &&
             activeGroup === item.id}
           class:failure
@@ -182,7 +183,7 @@
 
 <style lang="postcss">
   .event-group {
-    @apply absolute rounded-sm text-center;
+    @apply absolute rounded-sm text-center drop-shadow-md;
   }
   .event-group-active {
     @apply bg-blueGray-200;
