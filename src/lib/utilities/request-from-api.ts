@@ -1,5 +1,5 @@
 import { browser } from '$app/env';
-import { handleError } from './handle-error';
+import { handleError as handleRequestError } from './handle-error';
 import { isFunction } from './is-function';
 import { toURL } from './to-url';
 
@@ -24,8 +24,10 @@ type RequestFromAPIOptions = {
   token?: string;
   onError?: ErrorCallback;
   notifyOnError?: boolean;
+  handleError?: typeof handleRequestError;
   shouldRetry?: boolean;
   retryInterval?: number;
+  isBrowser?: boolean;
 };
 
 export const isTemporalAPIError = (obj: unknown): obj is TemporalAPIError =>
@@ -55,8 +57,10 @@ export const requestFromAPI = async <T>(
     token,
     shouldRetry = false,
     notifyOnError = true,
+    handleError = handleRequestError,
     onError,
     retryInterval = 5000,
+    isBrowser = browser,
   } = init;
   let { options } = init;
 
@@ -68,12 +72,13 @@ export const requestFromAPI = async <T>(
   const url = toURL(endpoint, query);
 
   try {
-    options = withSecurityOptions(options);
+    options = withSecurityOptions(options, isBrowser);
 
     if (globalThis?.AccessToken) {
       options.headers = await withBearerToken(
         options?.headers,
         globalThis.AccessToken,
+        isBrowser,
       );
     }
 
@@ -113,17 +118,21 @@ export const requestFromAPI = async <T>(
   }
 };
 
-const withSecurityOptions = (options: RequestInit): RequestInit => {
+const withSecurityOptions = (
+  options: RequestInit,
+  isBrowser = browser,
+): RequestInit => {
   const opts: RequestInit = { credentials: 'include', ...options };
-  opts.headers = withCsrf(options?.headers);
+  opts.headers = withCsrf(options?.headers, isBrowser);
   return opts;
 };
 
 const withBearerToken = async (
   headers: HeadersInit,
   accessToken: () => Promise<string>,
+  isBrowser = browser,
 ): Promise<HeadersInit> => {
-  if (!browser) return headers;
+  if (!isBrowser) return headers;
   if (!headers) headers = {};
 
   try {
@@ -138,8 +147,8 @@ const withBearerToken = async (
   return headers;
 };
 
-const withCsrf = (headers: HeadersInit): HeadersInit => {
-  if (!browser) return headers;
+const withCsrf = (headers: HeadersInit, isBrowser = browser): HeadersInit => {
+  if (!isBrowser) return headers;
   if (!headers) headers = {};
 
   const csrfCookie = '_csrf=';
