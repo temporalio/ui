@@ -219,23 +219,23 @@ const globeIcon = {
   paths: [
     {
       d: 'M6 11C8.7614 11 11 8.7614 11 6C11 3.23857 8.7614 1 6 1C3.23857 1 1 3.23857 1 6C1 8.7614 3.23857 11 6 11Z',
-      stroke: '',
+      stroke: 'currentColor',
     },
     {
       d: 'M1.25 6.25L4 7.25L3.5 9L4 10.5',
-      stroke: '',
+      stroke: 'currentColor',
     },
     {
       d: 'M8.5 10.25L8.25 9L7 8.5V6.75L8.5 6.25L10.75 6.5',
-      stroke: '',
+      stroke: 'currentColor',
     },
     {
       d: 'M9.5 2.75L9.25 3.5L7.5 3.75V5.25L8.75 4.75H9.75L10.75 5.25',
-      stroke: '',
+      stroke: 'currentColor',
     },
     {
       d: 'M1.25 5.25L2.5 4.25L3.75 4L4.75 2.5L4.25 1.5',
-      stroke: '',
+      stroke: 'currentColor',
     },
   ],
 };
@@ -417,6 +417,19 @@ const temporalIcon: Icon = {
   ],
 };
 
+const terminalIcon: Icon = {
+  paths: [
+    {
+      d: 'M4.75,4.75h14.5v14.5h-14.5Z',
+      stroke: 'currentColor',
+    },
+    {
+      d: 'M8.75 10.75L11.25 13L8.75 15.25',
+      stroke: 'currentColor',
+    },
+  ],
+};
+
 const warningIcon = {
   paths: [
     {
@@ -483,6 +496,7 @@ export const icons: { [index: string]: Icon } = {
   spinner: spinnerIcon,
   stopwatch: stopwatchIcon,
   temporal: temporalIcon,
+  terminal: terminalIcon,
   warning: warningIcon,
   workflow: workflowIcon,
 };
