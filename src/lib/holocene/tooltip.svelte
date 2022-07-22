@@ -58,7 +58,7 @@
   }
 
   .tooltip.top {
-    @apply left-1/2 -mt-4 -translate-x-1/2 -translate-y-full;
+    @apply left-1/2 -mt-1 -translate-x-1/2 -translate-y-full;
   }
   .tooltip.bottom {
     @apply left-1/2 bottom-0 -mb-1 -translate-x-1/2 translate-y-full;

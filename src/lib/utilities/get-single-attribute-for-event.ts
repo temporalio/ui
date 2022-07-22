@@ -74,13 +74,13 @@ export const shouldDisplayAsExecutionLink = (
   return false;
 };
 
-const keysWithWorkerLinks = ['taskQueueName'] as const;
+const keysWithTaskQueueLinks = ['taskQueueName'] as const;
 
-export const shouldDisplayAsWorkersLink = (
+export const shouldDisplayAsTaskQueueLink = (
   key: string,
-): key is typeof keysWithWorkerLinks[number] => {
-  for (const workerKey of keysWithWorkerLinks) {
-    if (key === workerKey) return true;
+): key is typeof keysWithTaskQueueLinks[number] => {
+  for (const taskQueueKey of keysWithTaskQueueLinks) {
+    if (key === taskQueueKey) return true;
   }
 
   return false;

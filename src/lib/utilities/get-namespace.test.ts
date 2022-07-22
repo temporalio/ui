@@ -118,12 +118,25 @@ describe('getNamespace', () => {
       'default',
     );
   });
+
   it('should return default namespace if no namespaces given', () => {
     const namespaces = [];
     expect(getNamespace({ namespaces, defaultNamespace: 'default' })).toEqual(
       'default',
     );
   });
+
+  it('should return default namespace if no namespaces given, but a namespace was provided', () => {
+    const namespaces = [];
+    expect(
+      getNamespace({
+        namespace: 'default',
+        namespaces,
+        defaultNamespace: 'default',
+      }),
+    ).toEqual('default');
+  });
+
   it('should return namespace if namespace exists in namespaces given', () => {
     const namespaces = [defaultNamespace, canaryNamespace];
     expect(
@@ -134,6 +147,7 @@ describe('getNamespace', () => {
       }),
     ).toEqual('canary');
   });
+
   it('should return undefined if namespace does not exist in namespaces given', () => {
     const namespaces = [defaultNamespace, canaryNamespace];
     expect(
@@ -152,16 +166,19 @@ describe('getDefaultNamespace', () => {
     const settings = getSettings('default', false);
     expect(getDefaultNamespace({ namespaces, settings })).toEqual('default');
   });
+
   it('should return default namespace if it exists in namespaces and no defaultNamespace setting', () => {
     const namespaces = [defaultNamespace];
     const settings = getSettings('', false);
     expect(getDefaultNamespace({ namespaces, settings })).toEqual('default');
   });
+
   it('should return default namespace if it exists in namespaces and includes temporal system namespace with !ShowTemporalSystemNamespace', () => {
     const namespaces = [temporalSystemNamespace, defaultNamespace];
     const settings = getSettings('', false);
     expect(getDefaultNamespace({ namespaces, settings })).toEqual('default');
   });
+
   it('should return default namespace if it exists in namespaces and includes temporal system namespace with ShowTemporalSystemNamespace', () => {
     const namespaces = [temporalSystemNamespace, defaultNamespace];
     const settings = getSettings('', true);
@@ -169,26 +186,31 @@ describe('getDefaultNamespace', () => {
       'temporal-system',
     );
   });
+
   it('should return canary namespace if single namespace that does not match defaultNamespace setting', () => {
     const namespaces = [canaryNamespace];
     const settings = getSettings('default', false);
     expect(getDefaultNamespace({ namespaces, settings })).toEqual('canary');
   });
+
   it('should return default namespace if multiple namespaces and matching defaultNamespace setting', () => {
     const namespaces = [canaryNamespace, defaultNamespace];
     const settings = getSettings('default', false);
     expect(getDefaultNamespace({ namespaces, settings })).toEqual('default');
   });
+
   it('should return canary namespace if multiple namespaces and matching defaultNamespace setting', () => {
     const namespaces = [canaryNamespace, defaultNamespace];
     const settings = getSettings('canary', false);
     expect(getDefaultNamespace({ namespaces, settings })).toEqual('canary');
   });
+
   it('should return first namespace if multiple namespaces and no defaultNamespace setting', () => {
     const namespaces = [canaryNamespace, defaultNamespace];
     const settings = getSettings('', false);
     expect(getDefaultNamespace({ namespaces, settings })).toEqual('canary');
   });
+
   it('should return first namespace if multiple namespaces and no defaultNamespace setting and including ShowTemporalSystemNamespace', () => {
     const namespaces = [
       temporalSystemNamespace,
@@ -200,6 +222,7 @@ describe('getDefaultNamespace', () => {
       'temporal-system',
     );
   });
+
   it('should return defaultNamespace setting if no namespaces', () => {
     const namespaces = [];
     const settings = getSettings('default', false);

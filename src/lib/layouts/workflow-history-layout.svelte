@@ -19,6 +19,7 @@
   import WorkflowStackTraceError from '$lib/components/workflow/workflow-stack-trace-error.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
+  import Accordion from '$lib/holocene/accordion.svelte';
 
   const { namespace } = $page.params;
   const { workflow, workers } = $workflowRun;
@@ -83,17 +84,44 @@
         />
       </div>
     {/if}
+    {#each workflow?.pendingChildren as child (child.runId)}
+      <div class="gap-2 xl:flex">
+        <WorkflowDetail
+          title="Child"
+          content={child.workflowId}
+          href={routeForWorkflow({
+            namespace,
+            workflow: child.workflowId,
+            run: child.runId,
+          })}
+        />
+        <WorkflowDetail
+          title="Child ID"
+          content={child.runId}
+          href={routeForWorkflow({
+            namespace,
+            workflow: child.workflowId,
+            run: child.runId,
+          })}
+        />
+      </div>
+    {/each}
     <WorkflowDetail
       title="State Transitions"
       content={workflow.stateTransitionCount}
     />
   </section>
   <WorkflowStackTraceError {workflow} {workers} />
-  <section class="flex w-full flex-col gap-4 lg:flex-row">
-    <InputAndResults type="input" />
-    <InputAndResults type="results" />
-  </section>
   <PendingActivities />
+  <section class="flex w-full">
+    <Accordion title="Input and Results" icon="json" class="border-gray-900">
+      <div class="flex gap-2">
+        <InputAndResults type="input" />
+        <InputAndResults type="results" />
+      </div>
+    </Accordion>
+  </section>
+  <slot name="timeline" />
   <section id="event-history">
     <nav class="flex items-end justify-between gap-4 pb-4">
       <h3 class="text-lg font-medium">Recent Events</h3>
@@ -105,7 +133,7 @@
             href={routeForEventHistory(routeParameters('feed'))}
             active={$eventViewType === 'feed'}
             data-cy="feed"
-            on:click={() => ($eventViewType = 'feed')}>Timeline</ToggleButton
+            on:click={() => ($eventViewType = 'feed')}>History</ToggleButton
           >
           <ToggleButton
             icon="compact"
