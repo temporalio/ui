@@ -20,6 +20,7 @@ import { eventCategoryParam, eventSortOrder } from './event-view';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { withLoading, delay } from '$lib/utilities/stores/with-loading';
 import { groupEvents } from '$lib/models/event-groups';
+import { refresh } from '$lib/stores/workflow-run';
 
 const emptyEvents: FetchEventsResponse = {
   events: [],
@@ -100,12 +101,17 @@ export const parameters: Readable<FetchEventsParameters> = derived(
 );
 
 export const parametersWithSettings: Readable<FetchEventsParametersWithSettings> =
-  derived([parameters, settings], ([$parameters, $settings]) => {
-    return {
-      ...$parameters,
-      settings: $settings,
-    };
-  });
+  derived(
+    [parameters, settings, refresh],
+    ([$parameters, $settings, $refresh]) => {
+      return {
+        ...$parameters,
+        settings: $settings,
+        refresh,
+        $refresh,
+      };
+    },
+  );
 
 export const updateEventHistory: StartStopNotifier<FetchEventsResponse> = (
   set,

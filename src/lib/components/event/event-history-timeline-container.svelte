@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
   import { ascendingEventGroups, ascendingEvents } from '$lib/stores/events';
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import { workflowRun, refresh } from '$lib/stores/workflow-run';
   import { timelineEvents } from '$lib/stores/events';
 
   import Accordion from '$lib/holocene/accordion.svelte';
@@ -15,8 +15,7 @@
   import Autocomplete from '$lib/holocene/autocomplete.svelte';
   import Badge from '$lib/holocene/badge.svelte';
 
-  let { workflow } = $workflowRun;
-  let isRunning = workflow.isRunning;
+  $: isRunning = $workflowRun.workflow.isRunning;
 
   let showEventTypeFilter = false;
   let eventTypeValue = '';
@@ -119,7 +118,7 @@
         <Button
           variant="secondary"
           disabled={!isRunning}
-          on:click={() => window.location.reload()}
+          on:click={() => ($refresh = Date.now())}
           ><Icon name="refresh" stroke="currentcolor" scale={0.8} /></Button
         >
       </div>
