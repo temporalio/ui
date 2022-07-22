@@ -40,11 +40,11 @@
   }
 </script>
 
-<div class="select">
+<div class="select {$$props.class}">
   {#if label}
     <label for={id}>{label}</label>
   {/if}
-  <MenuContainer class="w-full {$$props.class}">
+  <MenuContainer class="w-full">
     <MenuButton
       class="select-input-container"
       bind:show
