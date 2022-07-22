@@ -54,11 +54,13 @@
 />
 <div class="flex justify-between">
   <div>
-    <h1 class="text-2xl">
+    <h1 class="text-2xl" data-cy="namespace-title">
       Recent Workflows
       <NamespaceSelector />
     </h1>
-    <p class="text-sm text-gray-600">{$page.params.namespace}</p>
+    <p class="text-sm text-gray-600" data-cy="namespace-name">
+      {$page.params.namespace}
+    </p>
   </div>
   <div>
     <Button variant="secondary" on:click={refreshWorkflows}

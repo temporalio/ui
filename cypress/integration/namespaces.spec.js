@@ -81,6 +81,6 @@ describe('Namespace Select', () => {
     cy.get('@namespace-select-button').click({ wait: 1000 });
     cy.get('.prose > .text-2xl').contains('Select a namespace');
     cy.get('[data-cy="namespace-list"] > :nth-child(2)').click();
-    cy.get('.h-full > :nth-child(1) > .text-gray-600').contains(namespaces[1]);
+    cy.get('[data-cy="namespace-name"]').contains(namespaces[1]);
   });
 });
