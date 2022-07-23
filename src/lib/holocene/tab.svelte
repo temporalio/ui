@@ -1,15 +1,12 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
   export let href: string;
   export let label: string;
   export let amount: number | Long.Long = null;
-
-  $: active = $page.url.pathname.includes(href);
+  export let active = false;
 </script>
 
 <a
-  class="block whitespace-nowrap text-sm md:text-base"
+  class="block whitespace-nowrap border-b-2 border-white text-sm hover:border-b-2 hover:border-blue-700 md:text-base"
   class:active
   {href}
   data-cy={$$props.dataCy}
@@ -24,6 +21,6 @@
 
 <style lang="postcss">
   a.active {
-    @apply rounded-b-sm border-b-2 border-blue-700 font-medium text-blue-700;
+    @apply border-b-2 border-blue-700 font-medium text-blue-700;
   }
 </style>

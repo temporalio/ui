@@ -5,6 +5,8 @@
 
   import Button from '$holocene/button.svelte';
   import Modal from '$lib/components/modal.svelte';
+  import { refresh } from '$lib/stores/workflow-run';
+  import { tick } from 'svelte';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
@@ -18,11 +20,12 @@
   const isEligibleForTermination = (workflow: WorkflowExecution) =>
     String(workflow.status) === 'Running';
 
-  const handleSuccessfulTermination = () => {
+  const handleSuccessfulTermination = async () => {
     showConfirmation = false;
     reason = '';
+    $refresh = Date.now();
+    await tick();
     notifications.add('success', 'Workflow Terminated');
-    window.location.reload();
   };
 
   const terminate = () => {

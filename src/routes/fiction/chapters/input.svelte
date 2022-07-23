@@ -99,8 +99,20 @@
   <CheckboxInput id="checkbox-input" label="Select All" />
 </Chapter>
 
+<Chapter description="An indeterminate Checkbox Input">
+  <CheckboxInput id="checkbox-input" label="Select All" indeterminate />
+</Chapter>
+
 <Chapter description="A Checkbox Input on a dark background">
   <div class="w-fit bg-primary p-4">
     <CheckboxInput onDark id="checkbox-input" label="Select All" />
+  </div>
+</Chapter>
+
+<Chapter
+  description="An indeterminate Checkbox Input on a dark background without a label"
+>
+  <div class="w-fit bg-primary p-4">
+    <CheckboxInput onDark id="checkbox-input" indeterminate />
   </div>
 </Chapter>

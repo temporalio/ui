@@ -8,17 +8,19 @@ import { getPollers } from '$lib/services/pollers-service';
 import type { GetPollersResponse } from '$lib/services/pollers-service';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 
+export const refresh = writable(0);
 const namespace = derived([page], ([$page]) => $page.params.namespace);
 const workflowId = derived([page], ([$page]) => $page.params.workflow);
 const runId = derived([page], ([$page]) => $page.params.run);
 
 const parameters = derived(
-  [namespace, workflowId, runId],
-  ([$namespace, $workflowId, $runId]) => {
+  [namespace, workflowId, runId, refresh],
+  ([$namespace, $workflowId, $runId, $refresh]) => {
     return {
       namespace: $namespace,
       workflowId: decodeURIForSvelte($workflowId ?? ''),
       runId: $runId,
+      refresh: $refresh,
     };
   },
 );
@@ -33,7 +35,7 @@ const updateWorkflowRun: StartStopNotifier<{
   workflow: WorkflowExecution;
   workers: GetPollersResponse;
 }> = (set) => {
-  return parameters.subscribe(({ namespace, workflowId, runId }) => {
+  return parameters.subscribe(({ namespace, workflowId, runId, refresh }) => {
     if (namespace && workflowId && runId) {
       withLoading(loading, updating, async () => {
         const workflow = await fetchWorkflow({ namespace, workflowId, runId });
