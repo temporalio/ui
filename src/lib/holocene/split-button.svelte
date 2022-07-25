@@ -49,7 +49,7 @@
     @apply flex grow cursor-pointer flex-row gap-[1px] font-secondary;
 
     :global(.segment) {
-      @apply relative flex w-fit items-center justify-center py-2 bg-primary text-white font-secondary text-sm disabled:opacity-50 disabled:cursor-not-allowed;
+      @apply relative flex w-fit items-center justify-center bg-primary py-2 font-secondary text-sm text-white disabled:cursor-not-allowed disabled:opacity-50;
     }
   }
 </style>
