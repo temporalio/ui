@@ -3,27 +3,43 @@
   import MenuContainer from './primatives/menu/menu-container.svelte';
   import MenuButton from './primatives/menu/menu-button.svelte';
   import Menu from './primatives/menu/menu.svelte';
+
   export let label: string;
   export let id: string;
   export let disabled: boolean = false;
   export let left: boolean = false;
   export let right: boolean = false;
+  export let href = '';
 
   let show: boolean = false;
 </script>
 
 <MenuContainer class={$$props.class}>
-  <MenuButton bind:show controls={id} class={$$props.class} {disabled} on:click>
-    <div class="split-button" class:disabled>
-      <button tabindex="-1" {disabled} class="segment rounded-l px-4">
+  <div class="split-button" class:disabled>
+    {#if href}
+      <a {href} class="segment rounded-l px-4">{label}</a>
+    {:else}
+      <button {disabled} class="segment rounded-l px-4" on:click>
         {label}
       </button>
-      <div class="segment rounded-r px-2">
-        <Icon stroke="currentcolor" name="caretDown" />
-      </div>
-    </div>
-  </MenuButton>
-  <Menu class="split-button-menu" {id} {show} {left} {right}>
+    {/if}
+    <MenuButton
+      dark
+      class="segment rounded-r px-2"
+      bind:show
+      controls={id}
+      {disabled}
+    >
+      <Icon stroke="currentcolor" name="caretDown" />
+    </MenuButton>
+  </div>
+  <Menu
+    class="flex min-w-max flex-col items-start gap-y-4 border-gray-300 p-3 px-6 font-secondary text-sm"
+    {id}
+    {show}
+    {left}
+    {right}
+  >
     <slot />
   </Menu>
 </MenuContainer>
@@ -31,17 +47,9 @@
 <style lang="postcss">
   .split-button {
     @apply flex grow cursor-pointer flex-row gap-[1px] font-secondary;
-  }
 
-  .split-button.disabled {
-    @apply cursor-not-allowed opacity-50;
-  }
-
-  :global(.split-button-menu) {
-    @apply flex min-w-max flex-col items-start gap-y-4 border-gray-300 p-3 px-6 font-secondary text-sm;
-  }
-
-  .segment {
-    @apply inline-block bg-gray-900 py-2 text-sm text-white shadow;
+    :global(.segment) {
+      @apply relative flex w-fit items-center justify-center py-2 bg-primary text-white font-secondary text-sm disabled:opacity-50 disabled:cursor-not-allowed;
+    }
   }
 </style>

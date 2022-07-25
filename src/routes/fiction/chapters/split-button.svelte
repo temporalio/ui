@@ -16,8 +16,7 @@
 
 <Chapter description="A right-aligned Split Button">
   <div class="flex flex-row justify-end">
-    <SplitButton id="button-3" label="Edit" right>
-      <MenuItem><a href="/">Edit Namespace</a></MenuItem>
+    <SplitButton id="button-3" label="Edit" right href="/">
       <MenuItem><a class="text-red-700" href="/">Delete Namespace</a></MenuItem>
     </SplitButton>
   </div>
