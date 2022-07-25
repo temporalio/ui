@@ -23,11 +23,11 @@
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import ScheduleError from '$lib/components/schedule/schedule-error.svelte';
   import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
-  import Modal from '$lib/components/modal.svelte';
-  import SplitButton from '$lib/holocene/split-button.svelte';
+  import Modal from '$holocene/modal.svelte';
+  import SplitButton from '$holocene/split-button.svelte';
   import Loading from '$holocene/loading.svelte';
   import type { DescribeScheduleResponse } from '$types';
-  import PageTitle from '$lib/holocene/page-title.svelte';
+  import PageTitle from '$holocene/page-title.svelte';
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;

@@ -4,7 +4,7 @@
   import { dataEncoder } from '$lib/stores/data-encoder';
   import { validateHttpOrHttps, validateHttps } from '$lib/utilities/is-http';
 
-  import Modal from './modal.svelte';
+  import Modal from '$holocene/modal.svelte';
   import Button from '$holocene/button.svelte';
 
   export let showSettings: boolean;

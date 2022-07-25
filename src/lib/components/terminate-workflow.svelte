@@ -4,7 +4,7 @@
   import { notifications } from '$lib/stores/notifications';
 
   import Button from '$holocene/button.svelte';
-  import Modal from '$lib/components/modal.svelte';
+  import Modal from '$holocene/modal.svelte';
   import { refresh } from '$lib/stores/workflow-run';
   import { tick } from 'svelte';
 
