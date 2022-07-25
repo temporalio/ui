@@ -33,7 +33,7 @@
       <Icon stroke="currentcolor" name="caretDown" />
     </MenuButton>
   </div>
-  <Menu {id} {show} {left} {right}>
+  <Menu class="min-w-max" {id} {show} {left} {right}>
     <slot />
   </Menu>
 </MenuContainer>

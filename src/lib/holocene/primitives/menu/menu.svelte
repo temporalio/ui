@@ -14,7 +14,7 @@
   <ul
     in:fly={{ duration: 100 }}
     role="menu"
-    class="absolute z-50 mt-1 w-full min-w-max list-none overflow-y-scroll rounded border border-gray-300 bg-white text-primary shadow {$$props.class}"
+    class="absolute z-50 mt-1 w-full list-none overflow-y-scroll rounded border border-gray-300 bg-white text-primary shadow {$$props.class}"
     class:dark
     class:left
     class:right

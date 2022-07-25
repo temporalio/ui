@@ -38,7 +38,7 @@
       </div>
     {/if}
   </MenuButton>
-  <Menu {id} {show}>
+  <Menu class="min-w-max" {id} {show}>
     <slot />
   </Menu>
 </MenuContainer>
