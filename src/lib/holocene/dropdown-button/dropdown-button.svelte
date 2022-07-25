@@ -38,7 +38,7 @@
       </div>
     {/if}
   </MenuButton>
-  <Menu {id} class="flex flex-col items-start gap-4 border-gray-300 p-4" {show}>
+  <Menu {id} {show}>
     <slot />
   </Menu>
 </MenuContainer>

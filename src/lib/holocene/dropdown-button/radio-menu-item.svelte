@@ -13,7 +13,7 @@
   }
 </script>
 
-<MenuItem class={checked ? 'text-blue-700' : ''} on:click={handleItemClick}>
+<MenuItem active={checked} on:click={handleItemClick}>
   <input {checked} class="mr-4" type="radio" {name} {value} id={value} />
   <label class="w-full cursor-pointer" for={value}><slot /></label>
 </MenuItem>

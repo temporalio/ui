@@ -43,14 +43,14 @@
 </script>
 
 <MenuItem
+  class="flex flex-row items-start"
   on:click={handleOptionClick}
-  class="p-4 hover:bg-gray-50"
   {selected}
   {dark}
 >
   <div class="mr-2 w-6">
     {#if selected}
-      <Icon stroke="currentcolor" name="checkMark" scale={0.9} />
+      <Icon stroke="currentcolor" name="checkMark" scale={0.8} />
     {/if}
   </div>
   <div class="flex w-full flex-col">

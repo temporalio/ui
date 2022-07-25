@@ -6,7 +6,7 @@
 
 <Chapter description="A Split Button">
   <SplitButton id="button-1" label="Edit">
-    <MenuItem><a class="text-red-700" href="/">Delete Namespace</a></MenuItem>
+    <MenuItem destructive>Delete Namespace</MenuItem>
   </SplitButton>
 </Chapter>
 
@@ -17,7 +17,8 @@
 <Chapter description="A right-aligned Split Button">
   <div class="flex flex-row justify-end">
     <SplitButton id="button-3" label="Edit" right href="/">
-      <MenuItem><a class="text-red-700" href="/">Delete Namespace</a></MenuItem>
+      <MenuItem destructive>Delete</MenuItem>
+      <MenuItem>Edit</MenuItem>
     </SplitButton>
   </div>
 </Chapter>
