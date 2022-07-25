@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { getFilePathsFromGoStackTrace } from './get-file-paths-from-go-stack-trace';
 import UnixGoStacktraceQueryJson from '../../../fixtures/stacktrace-query.go-sdk.json';
 import WindowsGoStacktraceQueryJson from '../../../fixtures/stacktrace-query.go-sdk.windows.json';
-import TypeScriptStacktraceQueryJson from '../../../fixtures/stacktrace-query.ts-sdk.windows.json';
+import TypeScriptStacktraceQueryJson from '../../../fixtures/stacktrace-query.typescript-sdk.windows.json';
 import JavaStacktraceQueryJson from '../../../fixtures/stacktrace-query.java-sdk.json';
 
 describe('getFilePathsFromGoStackTrace', () => {
