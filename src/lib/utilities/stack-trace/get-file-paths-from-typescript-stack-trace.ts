@@ -29,7 +29,6 @@ export const getFilePathsFromTypeScriptStackTrace = (
         paths.push(jsonObj);
       });
     }
-    console.log(paths);
     return paths;
   } else return undefined;
 };
