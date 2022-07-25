@@ -18,7 +18,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import Icon from '$holocene/icon/index.svelte';
-  import MenuItem from '$holocene/primatives/menu/menu-item.svelte';
+  import MenuItem from '$holocene/primitives/menu/menu-item.svelte';
 
   type T = $$Generic;
 

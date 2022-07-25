@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import MenuItem from '../primatives/menu/menu-item.svelte';
+  import MenuItem from '$holocene/primitives/menu/menu-item.svelte';
 
   export let checked: boolean = false;
   export let value: string;

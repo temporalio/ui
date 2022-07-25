@@ -1,8 +1,8 @@
 <script lang="ts">
   import Icon from '$holocene/icon/index.svelte';
-  import MenuContainer from './primatives/menu/menu-container.svelte';
-  import MenuButton from './primatives/menu/menu-button.svelte';
-  import Menu from './primatives/menu/menu.svelte';
+  import MenuContainer from '$holocene/primitives/menu/menu-container.svelte';
+  import MenuButton from '$holocene/primitives/menu/menu-button.svelte';
+  import Menu from '$holocene/primitives/menu/menu.svelte';
 
   export let label: string;
   export let id: string;

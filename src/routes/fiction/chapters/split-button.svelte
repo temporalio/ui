@@ -1,6 +1,6 @@
 <script lang="ts">
   import SplitButton from '$holocene/split-button.svelte';
-  import MenuItem from '$holocene/primatives/menu/menu-item.svelte';
+  import MenuItem from '$holocene/primitives/menu/menu-item.svelte';
   import Chapter from '../_chapter.svelte';
 </script>
 
