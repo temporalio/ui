@@ -3,8 +3,8 @@
   import type { IconName } from './paths';
 
   export let name: IconName;
-  export let width = 24;
-  export let height = 24;
+  export let width = 0;
+  export let height = 0;
   export let rotate = 0;
   export let scale = 1;
   export let color = '';
@@ -13,6 +13,8 @@
   export let strokeWidth: string | number = 1.5;
 
   $: icon = icons[name];
+  $: _width = width !== 0 ? width : icon.width ?? 24;
+  $: _height = height !== 0 ? height : icon.height ?? 24;
 
   function getStroke(path: svelte.JSX.SVGProps<SVGPathElement>) {
     if (path?.stroke === 'none') return '';
@@ -31,16 +33,16 @@
 
 {#if icon}
   <svg
-    {width}
-    {height}
+    width={_width}
+    height={_height}
     fill="none"
     class={$$props.class}
-    viewBox="0 0 {width} {height}"
+    viewBox="0 0 {_width} {_height}"
     xmlns="http://www.w3.org/2000/svg"
   >
     <g
-      transform="translate({width / 2} {height / 2})"
-      transform-origin="{width / 4} 0"
+      transform="translate({_width / 2} {_height / 2})"
+      transform-origin="{_width / 4} 0"
     >
       <g transform="scale({scale}) rotate({rotate})">
         {#each icon.paths as path (path.d)}
@@ -51,7 +53,7 @@
             stroke-width={strokeWidth}
             stroke={getStroke(path)}
             fill={getFill(path)}
-            transform="translate({width / -2} {height / -2})"
+            transform="translate({_width / -2} {_height / -2})"
           />
         {/each}
       </g>
