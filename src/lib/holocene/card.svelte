@@ -8,7 +8,7 @@
 
 <style lang="postcss">
   .card {
-    @apply rounded-md border p-3;
+    @apply rounded-md border p-5;
   }
 
   .card.default {

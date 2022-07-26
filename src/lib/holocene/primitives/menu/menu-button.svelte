@@ -36,8 +36,4 @@
   button.dark > * {
     @apply bg-primary text-white;
   }
-
-  button:disabled {
-    @apply cursor-not-allowed;
-  }
 </style>

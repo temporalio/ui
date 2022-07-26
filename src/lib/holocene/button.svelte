@@ -104,43 +104,31 @@
 
   .primary,
   .login {
-    @apply border-primary bg-primary text-white;
+    @apply border-primary bg-primary text-white hover:bg-blue-500 hover:text-gray-100;
   }
 
   .primary:disabled {
-    @apply opacity-50;
+    @apply opacity-50 hover:bg-primary hover:border-primary;
   }
 
-  .primary:hover:enabled {
+  .primary:hover {
     @apply border-blue-700 bg-blue-700;
   }
 
-  .primary:hover:enabled :global(.badge) {
-    @apply bg-blue-500 text-gray-100;
-  }
-
   .secondary {
-    @apply border-gray-800 bg-white text-gray-800;
+    @apply border-gray-800 bg-white text-gray-800 hover:border-primary hover:bg-primary hover:text-white;
   }
 
   .secondary:disabled {
-    @apply bg-gray-300 text-gray-900;
-  }
-
-  .secondary:hover:enabled {
-    @apply border-gray-900 bg-gray-900 text-white;
+    @apply opacity-50 hover:bg-white hover:border-gray-800 hover:text-gray-800;
   }
 
   .destructive {
-    @apply border-danger bg-danger px-5 text-white;
+    @apply border-danger bg-danger px-5 text-white hover:border-red-900 hover:bg-red-900;
   }
 
   .destructive:disabled {
-    @apply border-red-900 bg-red-300 text-red-900;
-  }
-
-  .destructive:hover:enabled {
-    @apply border-red-900 bg-red-900 text-white;
+    @apply opacity-50 hover:border-danger hover:bg-danger;
   }
 
   .link {
