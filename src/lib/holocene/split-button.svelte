@@ -50,7 +50,7 @@
     }
 
     :global(.segment.right:enabled) {
-      @apply hover:text-gray-100 hover:bg-blue-700;
+      @apply hover:bg-blue-700 hover:text-gray-100;
     }
   }
 </style>

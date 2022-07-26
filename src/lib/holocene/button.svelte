@@ -108,7 +108,7 @@
   }
 
   .primary:disabled {
-    @apply opacity-50 hover:bg-primary hover:border-primary;
+    @apply opacity-50 hover:border-primary hover:bg-primary;
   }
 
   .primary:hover {
@@ -120,7 +120,7 @@
   }
 
   .secondary:disabled {
-    @apply opacity-50 hover:bg-white hover:border-gray-800 hover:text-gray-800;
+    @apply opacity-50 hover:border-gray-800 hover:bg-white hover:text-gray-800;
   }
 
   .destructive {
