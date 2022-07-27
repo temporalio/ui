@@ -1,5 +1,4 @@
 import { browser } from '$app/env';
-import { convertPayloadWithWebsocket } from '$lib/services/data-converter';
 import { handleError as handleRequestError } from './handle-error';
 import { isFunction } from './is-function';
 import { toURL } from './to-url';
