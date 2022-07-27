@@ -1,4 +1,6 @@
 type Icon = {
+  width?: number;
+  height?: number;
   paths: svelte.JSX.SVGProps<SVGPathElement>[];
 };
 
@@ -236,6 +238,28 @@ const globeIcon = {
     {
       d: 'M1.25 5.25L2.5 4.25L3.75 4L4.75 2.5L4.25 1.5',
       stroke: 'currentColor',
+    },
+  ],
+};
+
+const infoIcon = {
+  width: 17,
+  height: 17,
+  paths: [
+    {
+      d: 'M8.5 9.2085V10.6252',
+      stroke: 'currentcolor',
+      'stroke-width': '1.41667',
+    },
+    {
+      d: 'M8.50008 7.08317C8.89128 7.08317 9.20841 6.76604 9.20841 6.37484C9.20841 5.98364 8.89128 5.6665 8.50008 5.6665C8.10888 5.6665 7.79175 5.98364 7.79175 6.37484C7.79175 6.76604 8.10888 7.08317 8.50008 7.08317Z',
+      stroke: 'none',
+      fill: 'currentcolor',
+    },
+    {
+      d: 'M8.49992 13.6356C11.3361 13.6356 13.6353 11.3364 13.6353 8.50016C13.6353 5.66395 11.3361 3.36475 8.49992 3.36475C5.66371 3.36475 3.3645 5.66395 3.3645 8.50016C3.3645 11.3364 5.66371 13.6356 8.49992 13.6356Z',
+      stroke: 'currentcolor',
+      'stroke-width': '1.0625',
     },
   ],
 };
@@ -482,6 +506,7 @@ export const icons: { [index: string]: Icon } = {
   fileUpload: fileUploadIcon,
   filter: filterIcon,
   globe: globeIcon,
+  info: infoIcon,
   json: jsonIcon,
   lock: lockIcon,
   logout: logoutIcon,

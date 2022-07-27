@@ -1,11 +1,11 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import Icon from '$lib/holocene/icon/index.svelte';
-  import Menu from '$lib/holocene/primatives/menu/menu.svelte';
-  import Option, { isOption } from '$lib/holocene/select/option.svelte';
-  import type { Option as OptionType } from '$lib/holocene/select/option.svelte';
-  import MenuButton from '../primatives/menu/menu-button.svelte';
-  import MenuContainer from '../primatives/menu/menu-container.svelte';
+  import Icon from '$holocene/icon/index.svelte';
+  import Menu from '$holocene/primitives/menu/menu.svelte';
+  import Option, { isOption } from '$holocene/select/option.svelte';
+  import type { Option as OptionType } from '$holocene/select/option.svelte';
+  import MenuButton from '$holocene/primitives/menu/menu-button.svelte';
+  import MenuContainer from '$holocene/primitives/menu/menu-container.svelte';
 
   type T = $$Generic;
   let show = false;

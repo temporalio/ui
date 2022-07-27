@@ -25,15 +25,15 @@
     class:indeterminate
   />
   <span class="checkmark" class:on-dark={onDark}>
-    {#if checked}
+    {#if indeterminate}
+      <span class="dash" class:on-dark={onDark} />
+    {:else if checked}
       <Icon
         class="absolute top-0 left-0 h-4 w-4"
         name="checkMark"
         stroke="currentcolor"
         strokeWidth="3"
       />
-    {:else if indeterminate}
-      <span class="dash" class:on-dark={onDark} />
     {/if}
   </span>
 </label>
