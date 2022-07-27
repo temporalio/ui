@@ -104,6 +104,17 @@ describe('requestFromAPI', () => {
     });
   });
 
+  it('should not add csrf cookie to headers if not presdent', async () => {
+    const token = 'token';
+
+    const request = fetchMock();
+    await withCookie(`_nope=${token}`, async () => {
+      await requestFromAPI(endpoint, { request });
+    });
+
+    expect(request).toHaveBeenCalledWith(endpoint + '?', options);
+  });
+
   it('should not add csrf cookie to headers if not running in the browser', async () => {
     const token = 'token';
 
@@ -130,6 +141,12 @@ describe('requestFromAPI', () => {
     expect(request).toHaveBeenCalledWith(endpoint + '?', opts);
   });
 
+  it('should create an empty array of headers if not provided', async () => {
+    const request = fetchMock();
+    await requestFromAPI(endpoint, { request, options: undefined });
+    expect(request).toHaveBeenCalledWith(endpoint + '?', options);
+  });
+
   it('should pass through search params', async () => {
     const params = { query: 'WorkflowId="Test"' };
     const encodedParams = new URLSearchParams(params).toString();
@@ -138,6 +155,26 @@ describe('requestFromAPI', () => {
     await requestFromAPI(endpoint, {
       request,
       params,
+    });
+
+    expect(request).toHaveBeenCalledWith(
+      endpoint + '?' + encodedParams,
+      options,
+    );
+  });
+
+  it('should add the next page token', async () => {
+    const params = { query: 'WorkflowId="Test"' };
+    const encodedParams = new URLSearchParams({
+      ...params,
+      next_page_token: 'nextPage',
+    }).toString();
+    const request = fetchMock();
+
+    await requestFromAPI(endpoint, {
+      request,
+      params,
+      token: 'nextPage',
     });
 
     expect(request).toHaveBeenCalledWith(
@@ -200,5 +237,68 @@ describe('requestFromAPI', () => {
     });
 
     expect(handleError).toHaveBeenCalled();
+  });
+
+  it('should not retry if the shouldRetry is false', async () => {
+    const status = 403;
+    const statusText = 'Unauthorized';
+    const body = { error: statusText };
+    const ok = false;
+
+    const onRetry = vi.fn();
+
+    const request = fetchMock(body, { status, ok, statusText });
+    await requestFromAPI(endpoint, {
+      request,
+      shouldRetry: false,
+      onRetry,
+    });
+
+    expect(onRetry).not.toHaveBeenCalled();
+  });
+
+  it('should retry if shouldRetry is true and there are retries left', async () => {
+    const status = 403;
+    const statusText = 'Unauthorized';
+    const body = { error: statusText };
+    const ok = false;
+
+    const onRetry = vi.fn();
+
+    const request = fetchMock(body, { status, ok, statusText });
+    await requestFromAPI(
+      endpoint,
+      {
+        request,
+        shouldRetry: true,
+        retryInterval: 0,
+        onRetry,
+      },
+      2,
+    );
+
+    expect(onRetry).toHaveBeenCalled();
+  });
+
+  it('should not retry if there are no retries left', async () => {
+    const status = 403;
+    const statusText = 'Unauthorized';
+    const body = { error: statusText };
+    const ok = false;
+
+    const onRetry = vi.fn();
+
+    const request = fetchMock(body, { status, ok, statusText });
+    await requestFromAPI(
+      endpoint,
+      {
+        request,
+        shouldRetry: true,
+        onRetry,
+      },
+      0,
+    );
+
+    expect(onRetry).not.toHaveBeenCalled();
   });
 });

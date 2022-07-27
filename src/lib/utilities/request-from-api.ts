@@ -1,4 +1,5 @@
 import { browser } from '$app/env';
+import { noop } from 'svelte/internal';
 import { handleError as handleRequestError } from './handle-error';
 import { isFunction } from './is-function';
 import { toURL } from './to-url';
@@ -58,6 +59,7 @@ export const requestFromAPI = async <T>(
     shouldRetry = false,
     notifyOnError = true,
     handleError = handleRequestError,
+    onRetry = noop,
     onError,
     retryInterval = 5000,
     isBrowser = browser,
@@ -107,8 +109,10 @@ export const requestFromAPI = async <T>(
 
       if (shouldRetry && retryCount > 0) {
         return new Promise((resolve) => {
+          const retriesRemaining = retryCount - 1;
+          onRetry(retriesRemaining);
           setTimeout(() => {
-            resolve(requestFromAPI(endpoint, init, retryCount - 1));
+            resolve(requestFromAPI(endpoint, init, retriesRemaining));
           }, retryInterval);
         });
       }
@@ -132,6 +136,8 @@ const withBearerToken = async (
   accessToken: () => Promise<string>,
   isBrowser = browser,
 ): Promise<HeadersInit> => {
+  // At this point in the code path, headers will always be set.
+  /* c8 ignore next */
   if (!headers) headers = {};
   if (!isBrowser) return headers;
 
@@ -140,8 +146,8 @@ const withBearerToken = async (
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
+    /* c8 ignore next 4 */
   } catch (e) {
-    /* c8 ignore next 3 */
     console.error(e);
   }
 
@@ -161,8 +167,8 @@ const withCsrf = (headers: HeadersInit, isBrowser = browser): HeadersInit => {
       csrf = csrf.trim().slice(csrfCookie.length);
       headers[csrfHeader] = csrf;
     }
+    /* c8 ignore next 4 */
   } catch (error) {
-    /* c8 ignore next 3 */
     console.error(error);
   }
 
