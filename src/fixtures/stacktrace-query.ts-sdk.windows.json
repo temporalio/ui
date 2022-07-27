@@ -1,0 +1,13 @@
+{
+  "queryResult": {
+    "payloads": [
+      {
+        "metadata": {
+          "encoding": "anNvbi9wbGFpbg=="
+        },
+        "data": "    at Promise.then (<anonymous>)\n    at global.setTimeout (C:\\Users\\user\\SomeFolder\\samples-typescript\\hello-world\\node_modules\\@temporalio\\workflow\\src\\worker-interface.ts:85:7)\n    at setTimeout (C:\\Users\\user\\SomeFolder\\samples-typescript\\hello-world\\src\\workflows.ts:11:33)\n    at new Promise (<anonymous>)\n    at delay (C:\\Users\\user\\SomeFolder\\samples-typescript\\hello-world\\src\\workflows.ts:11:9)\n    at delay (C:\\Users\\user\\SomeFolder\\samples-typescript\\hello-world\\src\\workflows.ts:16:8)\n\n    at delay (C:\\Users\\user\\SomeFolder\\samples-typescript\\hello-world\\src\\workflows.ts:16:8)"
+      }
+    ]
+  },
+  "queryRejected": null
+}

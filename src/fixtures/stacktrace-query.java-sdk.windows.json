@@ -1,0 +1,13 @@
+{
+  "queryResult": {
+    "payloads": [
+      {
+        "metadata": {
+          "encoding": "anNvbi9wbGFpbg=="
+        },
+        "data": "workflow-method-Trying_Queries-8ee8dd1f-5641-4734-8ad3-a0e8a5c9e3c5: (BLOCKED on await)\napp//io.temporal.internal.sync.WorkflowThreadContext.yield(WorkflowThreadContext.java:89)\napp//io.temporal.internal.sync.WorkflowThreadImpl.yield(WorkflowThreadImpl.java:412)\napp//io.temporal.internal.sync.WorkflowThread.await(WorkflowThread.java:45)\napp//io.temporal.internal.sync.SyncWorkflowContext.await(SyncWorkflowContext.java:774)\napp//io.temporal.internal.sync.WorkflowInternal.await(WorkflowInternal.java:410)\napp//io.temporal.workflow.Workflow.await(Workflow.java:547)\napp//helloworldapp.HelloWorldWorkflowImpl.sayHello(HelloWorldWorkflowImpl.java:32)\njava.base@17.0.1/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\njava.base@17.0.1/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)\njava.base@17.0.1/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\njava.base@17.0.1/java.lang.reflect.Method.invoke(Method.java:568)\napp//io.temporal.internal.sync.POJOWorkflowImplementationFactory$POJOWorkflowImplementation$RootWorkflowInboundCallsInterceptor.execute(POJOWorkflowImplementationFactory.java:310)\n"
+      }
+    ]
+  },
+  "queryRejected": null
+}
