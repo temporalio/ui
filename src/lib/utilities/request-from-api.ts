@@ -1,4 +1,5 @@
 import { browser } from '$app/env';
+import { convertPayloadWithWebsocket } from '$lib/services/data-converter';
 import { handleError as handleRequestError } from './handle-error';
 import { isFunction } from './is-function';
 import { toURL } from './to-url';
@@ -132,8 +133,8 @@ const withBearerToken = async (
   accessToken: () => Promise<string>,
   isBrowser = browser,
 ): Promise<HeadersInit> => {
-  if (!isBrowser) return headers;
   if (!headers) headers = {};
+  if (!isBrowser) return headers;
 
   try {
     const token = await accessToken();
@@ -141,6 +142,7 @@ const withBearerToken = async (
       headers['Authorization'] = `Bearer ${token}`;
     }
   } catch (e) {
+    /* c8 ignore next 3 */
     console.error(e);
   }
 
@@ -148,8 +150,8 @@ const withBearerToken = async (
 };
 
 const withCsrf = (headers: HeadersInit, isBrowser = browser): HeadersInit => {
-  if (!isBrowser) return headers;
   if (!headers) headers = {};
+  if (!isBrowser) return headers;
 
   const csrfCookie = '_csrf=';
   const csrfHeader = 'X-CSRF-TOKEN';
@@ -161,6 +163,7 @@ const withCsrf = (headers: HeadersInit, isBrowser = browser): HeadersInit => {
       headers[csrfHeader] = csrf;
     }
   } catch (error) {
+    /* c8 ignore next 3 */
     console.error(error);
   }
 

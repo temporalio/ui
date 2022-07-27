@@ -1,6 +1,7 @@
 import { URLSearchParams } from 'url';
 import { describe, expect, it, vi } from 'vitest';
 import { isTemporalAPIError, requestFromAPI } from './request-from-api';
+import { handleError } from './handle-error';
 
 import listWorkflowResponse from '$fixtures/list-workflows.json';
 
@@ -16,6 +17,26 @@ type ErrorResponse = {
   statusCode: number;
   statusText: string;
   message: string;
+};
+
+vi.mock('./handle-error', () => {
+  return { handleError: vi.fn() };
+});
+
+const withCookie = async (cookie: string, fn: () => void) => {
+  const currentCookie = document.cookie;
+
+  Object.defineProperty(document, 'cookie', {
+    writable: true,
+    value: cookie,
+  });
+
+  fn();
+
+  Object.defineProperty(document, 'cookie', {
+    writable: true,
+    value: currentCookie,
+  });
 };
 
 describe('isTemporalAPIError', () => {
@@ -61,6 +82,54 @@ describe('requestFromAPI', () => {
     expect(request).toHaveBeenCalledWith(endpoint + '?', options);
   });
 
+  it('should add credentials to options', async () => {
+    const request = fetchMock();
+    await requestFromAPI(endpoint, { request, options: {} });
+    expect(request).toHaveBeenCalledWith(endpoint + '?', options);
+  });
+
+  it('should add csrf cookie to headers', async () => {
+    const token = 'token';
+
+    const request = fetchMock();
+    await withCookie(`_csrf=${token}`, async () => {
+      await requestFromAPI(endpoint, { request });
+    });
+
+    expect(request).toHaveBeenCalledWith(endpoint + '?', {
+      ...options,
+      headers: {
+        'X-CSRF-TOKEN': token,
+      },
+    });
+  });
+
+  it('should not add csrf cookie to headers if not running in the browser', async () => {
+    const token = 'token';
+
+    const request = fetchMock();
+    await withCookie(`_csrf=${token}`, async () => {
+      await requestFromAPI(endpoint, { request, isBrowser: false });
+    });
+
+    expect(request).toHaveBeenCalledWith(endpoint + '?', options);
+  });
+
+  it('should not add csrf cookie to headers it already exists', async () => {
+    const token = 'token';
+    const headers = {
+      'X-CSRF-TOKEN': 'pre-existing',
+    };
+    const opts = { ...options, headers };
+
+    const request = fetchMock();
+    await withCookie(`_csrf=${token}`, async () => {
+      await requestFromAPI(endpoint, { request, options: opts as RequestInit });
+    });
+
+    expect(request).toHaveBeenCalledWith(endpoint + '?', opts);
+  });
+
   it('should pass through search params', async () => {
     const params = { query: 'WorkflowId="Test"' };
     const encodedParams = new URLSearchParams(params).toString();
@@ -104,19 +173,6 @@ describe('requestFromAPI', () => {
     });
   });
 
-  it('should call handleError if the response is not ok and no onError handler was provided', async () => {
-    const handleError = vi.fn();
-    const status = 403;
-    const statusText = 'Unauthorized';
-    const body = { error: statusText };
-    const ok = false;
-
-    const request = fetchMock(body, { status, ok, statusText });
-    await requestFromAPI(endpoint, { request, handleError });
-
-    expect(handleError).toHaveBeenCalled();
-  });
-
   it('should throw if the response is not ok, no onError handler was provided, and notifyOnError is false', async () => {
     const status = 403;
     const statusText = 'Unauthorized';
@@ -130,5 +186,19 @@ describe('requestFromAPI', () => {
     }).catch((error) => error);
 
     expect((error as unknown as ErrorResponse).statusCode).toBe(status);
+  });
+
+  it('should call handleError if onError is not provided', async () => {
+    const status = 403;
+    const statusText = 'Unauthorized';
+    const body = { error: statusText };
+    const ok = false;
+
+    const request = fetchMock(body, { status, ok, statusText });
+    await requestFromAPI(endpoint, {
+      request,
+    });
+
+    expect(handleError).toHaveBeenCalled();
   });
 });

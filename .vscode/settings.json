@@ -6,5 +6,6 @@
     "**/build-cloud": true
   },
   "editor.formatOnSave": true,
-  "css.customData": [".vscode/css-custom-data.json"]
+  "css.customData": [".vscode/css-custom-data.json"],
+  "typescript.tsdk": "node_modules/typescript/lib"
 }
