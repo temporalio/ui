@@ -18,6 +18,9 @@ import {
   isEventView,
   routeForArchivalWorkfows,
   routeForPendingActivities,
+  routeForSchedules,
+  routeForScheduleCreate,
+  routeForSchedule,
 } from './route-for';
 
 describe('routeFor', () => {
@@ -100,6 +103,28 @@ describe('routeFor', () => {
     expect(path).toBe(
       '/namespaces/default/workflows/abc/def/pending-activities',
     );
+  });
+
+  it('should route to schedules', () => {
+    const path = routeForSchedules({
+      namespace: 'default',
+    });
+    expect(path).toBe('/namespaces/default/schedules');
+  });
+
+  it('should route to schedule creation', () => {
+    const path = routeForScheduleCreate({
+      namespace: 'default',
+    });
+    expect(path).toBe('/namespaces/default/schedules/new');
+  });
+
+  it('should route to a schedule', () => {
+    const path = routeForSchedule({
+      scheduleId: '2',
+      namespace: 'default',
+    });
+    expect(path).toBe('/namespaces/default/schedules/2');
   });
 
   it('should route to "workflow".stack-trace', () => {
