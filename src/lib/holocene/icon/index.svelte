@@ -13,8 +13,6 @@
   export let strokeWidth: string | number = 1.5;
 
   $: icon = icons[name];
-  $: _width = width !== 0 ? width : icon.width ?? 24;
-  $: _height = height !== 0 ? height : icon.height ?? 24;
 
   function getStroke(path: svelte.JSX.SVGProps<SVGPathElement>) {
     if (path?.stroke === 'none') return '';
@@ -32,6 +30,8 @@
 </script>
 
 {#if icon}
+  {@const _width = width !== 0 ? width : icon.width ?? 24}
+  {@const _height = height !== 0 ? height : icon.height ?? 24}
   <svg
     width={_width}
     height={_height}
