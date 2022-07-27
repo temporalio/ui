@@ -10,6 +10,8 @@ export type TemporalAPIError = {
   details: unknown[];
 };
 
+export type RetryCallback = (retriesRemaining: number) => void;
+
 export type ErrorCallback = (error: {
   status: number;
   statusText: string;
@@ -23,6 +25,7 @@ type RequestFromAPIOptions = {
   request?: typeof fetch;
   options?: Parameters<typeof fetch>[1];
   token?: string;
+  onRetry?: RetryCallback;
   onError?: ErrorCallback;
   notifyOnError?: boolean;
   handleError?: typeof handleRequestError;
@@ -60,7 +63,7 @@ export const requestFromAPI = async <T>(
     notifyOnError = true,
     handleError = handleRequestError,
     onRetry = noop,
-    onError,
+    onError = noop,
     retryInterval = 5000,
     isBrowser = browser,
   } = init;
@@ -90,7 +93,7 @@ export const requestFromAPI = async <T>(
     const { status, statusText } = response;
 
     if (!response.ok) {
-      if (onError && isFunction(onError)) {
+      if (onError) {
         onError({ status, statusText, body });
       } else {
         throw {
