@@ -46,6 +46,6 @@
   }
 
   .content :global(> *) {
-    @apply text-sm font-secondary font-normal;
+    @apply font-secondary text-sm font-normal;
   }
 </style>
