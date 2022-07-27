@@ -1,5 +1,6 @@
 import { browser } from '$app/env';
-import { handleError } from './handle-error';
+import { noop } from 'svelte/internal';
+import { handleError as handleRequestError } from './handle-error';
 import { isFunction } from './is-function';
 import { toURL } from './to-url';
 
@@ -9,6 +10,8 @@ export type TemporalAPIError = {
   details: unknown[];
 };
 
+export type RetryCallback = (retriesRemaining: number) => void;
+
 export type ErrorCallback = (error: {
   status: number;
   statusText: string;
@@ -16,20 +19,24 @@ export type ErrorCallback = (error: {
 }) => void;
 
 type toURLParams = Parameters<typeof toURL>;
+
 type RequestFromAPIOptions = {
   params?: toURLParams[1];
   request?: typeof fetch;
   options?: Parameters<typeof fetch>[1];
   token?: string;
+  onRetry?: RetryCallback;
   onError?: ErrorCallback;
   notifyOnError?: boolean;
+  handleError?: typeof handleRequestError;
   shouldRetry?: boolean;
   retryInterval?: number;
+  isBrowser?: boolean;
 };
 
 export const isTemporalAPIError = (obj: unknown): obj is TemporalAPIError =>
-  (obj as TemporalAPIError).message !== undefined &&
-  typeof (obj as TemporalAPIError).message === 'string';
+  (obj as TemporalAPIError)?.message !== undefined &&
+  typeof (obj as TemporalAPIError)?.message === 'string';
 
 /**
  *  A utility method for making requests to the Temporal API.
@@ -54,8 +61,11 @@ export const requestFromAPI = async <T>(
     token,
     shouldRetry = false,
     notifyOnError = true,
+    handleError = handleRequestError,
+    onRetry = noop,
     onError,
     retryInterval = 5000,
+    isBrowser = browser,
   } = init;
   let { options } = init;
 
@@ -67,12 +77,13 @@ export const requestFromAPI = async <T>(
   const url = toURL(endpoint, query);
 
   try {
-    options = withSecurityOptions(options);
+    options = withSecurityOptions(options, isBrowser);
 
     if (globalThis?.AccessToken) {
       options.headers = await withBearerToken(
         options?.headers,
         globalThis.AccessToken,
+        isBrowser,
       );
     }
 
@@ -101,8 +112,10 @@ export const requestFromAPI = async <T>(
 
       if (shouldRetry && retryCount > 0) {
         return new Promise((resolve) => {
+          const retriesRemaining = retryCount - 1;
+          onRetry(retriesRemaining);
           setTimeout(() => {
-            resolve(requestFromAPI(endpoint, init, retryCount - 1));
+            resolve(requestFromAPI(endpoint, init, retriesRemaining));
           }, retryInterval);
         });
       }
@@ -112,24 +125,31 @@ export const requestFromAPI = async <T>(
   }
 };
 
-const withSecurityOptions = (options: RequestInit): RequestInit => {
+const withSecurityOptions = (
+  options: RequestInit,
+  isBrowser = browser,
+): RequestInit => {
   const opts: RequestInit = { credentials: 'include', ...options };
-  opts.headers = withCsrf(options?.headers);
+  opts.headers = withCsrf(options?.headers, isBrowser);
   return opts;
 };
 
 const withBearerToken = async (
   headers: HeadersInit,
   accessToken: () => Promise<string>,
+  isBrowser = browser,
 ): Promise<HeadersInit> => {
-  if (!browser) return headers;
+  // At this point in the code path, headers will always be set.
+  /* c8 ignore next */
   if (!headers) headers = {};
+  if (!isBrowser) return headers;
 
   try {
     const token = await accessToken();
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
+    /* c8 ignore next 4 */
   } catch (e) {
     console.error(e);
   }
@@ -137,9 +157,9 @@ const withBearerToken = async (
   return headers;
 };
 
-const withCsrf = (headers: HeadersInit): HeadersInit => {
-  if (!browser) return headers;
+const withCsrf = (headers: HeadersInit, isBrowser = browser): HeadersInit => {
   if (!headers) headers = {};
+  if (!isBrowser) return headers;
 
   const csrfCookie = '_csrf=';
   const csrfHeader = 'X-CSRF-TOKEN';
@@ -150,6 +170,7 @@ const withCsrf = (headers: HeadersInit): HeadersInit => {
       csrf = csrf.trim().slice(csrfCookie.length);
       headers[csrfHeader] = csrf;
     }
+    /* c8 ignore next 4 */
   } catch (error) {
     console.error(error);
   }

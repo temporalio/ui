@@ -77,21 +77,21 @@ export function routeForApi(
 
   const routes: { [K in APIRoutePath]: string } = {
     cluster: '/cluster',
-    settings: '/settings',
-    user: '/me',
-    namespaces: '/namespaces',
-    'task-queue': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}`,
-    'search-attributes': '/search-attributes',
-    workflows: `/namespaces/${parameters?.namespace}/workflows`,
-    'workflows.archived': `/namespaces/${parameters?.namespace}/workflows/archived`,
-    workflow: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}`,
-    'workflow.terminate': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/terminate`,
     'events.ascending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/events`,
     'events.descending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/events/reverse`,
+    namespaces: '/namespaces',
     query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/query`,
-    schedules: `/namespaces/${parameters?.namespace}/schedules`,
-    schedule: `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}`,
     'schedule.delete': `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}`,
+    schedule: `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}`,
+    schedules: `/namespaces/${parameters?.namespace}/schedules`,
+    'search-attributes': '/search-attributes',
+    settings: '/settings',
+    'task-queue': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}`,
+    user: '/me',
+    'workflow.terminate': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/terminate`,
+    workflow: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}`,
+    'workflows.archived': `/namespaces/${parameters?.namespace}/workflows/archived`,
+    workflows: `/namespaces/${parameters?.namespace}/workflows`,
   };
 
   return withBase(routes[route], parameters?.namespace);
