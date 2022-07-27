@@ -63,7 +63,7 @@ export const requestFromAPI = async <T>(
     notifyOnError = true,
     handleError = handleRequestError,
     onRetry = noop,
-    onError = noop,
+    onError,
     retryInterval = 5000,
     isBrowser = browser,
   } = init;
@@ -93,7 +93,7 @@ export const requestFromAPI = async <T>(
     const { status, statusText } = response;
 
     if (!response.ok) {
-      if (onError) {
+      if (onError && isFunction(onError)) {
         onError({ status, statusText, body });
       } else {
         throw {
