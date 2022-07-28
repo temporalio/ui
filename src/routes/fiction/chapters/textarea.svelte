@@ -14,6 +14,12 @@
 />
 
 <Chapter
+  description="A textarea with an error"
+  component={Textarea}
+  props={{ value, error: 'There was an error.' }}
+/>
+
+<Chapter
   description="A textarea with a placeholder"
   component={Textarea}
   props={{ placeholder: 'Add text here...' }}
