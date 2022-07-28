@@ -18,7 +18,8 @@
   const cancel = () => (showConfirmation = false);
 
   const isEligibleForTermination = (workflow: WorkflowExecution) =>
-    String(workflow.status) === 'Running';
+    String(workflow.status) === 'Running' &&
+    !import.meta.env.DISABLE_WRITE_ACTIONS;
 
   const handleSuccessfulTermination = async () => {
     showConfirmation = false;
@@ -29,6 +30,7 @@
   };
 
   const terminate = () => {
+    if (!isEligibleForTermination(workflow)) return;
     terminateWorkflow({
       workflow,
       namespace,
