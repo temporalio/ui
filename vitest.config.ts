@@ -17,6 +17,7 @@ export default defineConfig({
   test: {
     globals: true,
     coverage: {
+      reporter: ['text', 'json', 'html'],
       exclude: [
         ...configDefaults.exclude,
         'src/lib/svelte-mocks/**/*',
