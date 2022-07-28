@@ -6,7 +6,7 @@
 </script>
 
 <textarea
-  class="rounded border border-gray-900 p-5 w-full min-h-fit font-mono text-sm"
+  class="font-mono min-h-fit w-full rounded border border-gray-900 p-5 text-sm"
   bind:value
   {disabled}
   {placeholder}
