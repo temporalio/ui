@@ -21,6 +21,8 @@ import {
   routeForSchedules,
   routeForScheduleCreate,
   routeForSchedule,
+  routeForTaskQueue,
+  isNamespaceParameter,
 } from './route-for';
 
 describe('routeFor', () => {
@@ -105,28 +107,6 @@ describe('routeFor', () => {
     );
   });
 
-  it('should route to schedules', () => {
-    const path = routeForSchedules({
-      namespace: 'default',
-    });
-    expect(path).toBe('/namespaces/default/schedules');
-  });
-
-  it('should route to schedule creation', () => {
-    const path = routeForScheduleCreate({
-      namespace: 'default',
-    });
-    expect(path).toBe('/namespaces/default/schedules/new');
-  });
-
-  it('should route to a schedule', () => {
-    const path = routeForSchedule({
-      scheduleId: '2',
-      namespace: 'default',
-    });
-    expect(path).toBe('/namespaces/default/schedules/2');
-  });
-
   it('should route to "workflow".stack-trace', () => {
     const path = routeForStackTrace({
       namespace: 'default',
@@ -153,6 +133,14 @@ describe('routeFor', () => {
     });
     expect(path).toBe('/namespaces/default/workflows/abc/def/workers');
   });
+
+  it('should route to a task queue', () => {
+    const path = routeForTaskQueue({
+      namespace: 'default',
+      queue: 'some-task-queue',
+    });
+    expect(path).toBe('/namespaces/default/task-queues/some-task-queue');
+  });
 });
 
 describe('routeFor import ', () => {
@@ -169,6 +157,24 @@ describe('routeFor import ', () => {
       view: 'compact',
     });
     expect(path).toBe('/import/events/namespace/workflow/run/history/compact');
+  });
+
+  it('should return the correct route for routeForSchedules', () => {
+    expect(routeForSchedules({ namespace: 'default' })).toBe(
+      '/namespaces/default/schedules',
+    );
+  });
+
+  it('should return the correct route for routeForSchedule', () => {
+    expect(routeForSchedule({ namespace: 'default', scheduleId: '123' })).toBe(
+      '/namespaces/default/schedules/123',
+    );
+  });
+
+  it('should return the correct route for routeForScheduleCreate', () => {
+    expect(routeForScheduleCreate({ namespace: 'default' })).toBe(
+      '/namespaces/default/schedules/new',
+    );
   });
 });
 
@@ -423,4 +429,16 @@ describe('isEventView', () => {
       expect(isEventView('bogus')).toBe(false);
     });
   }
+});
+
+describe('isNamespaceParameter', () => {
+  it('should return true if it has a namespace parameter', () => {
+    const result = isNamespaceParameter({ namespace: 'default' });
+    expect(result).toBe(true);
+  });
+
+  it('should return false if it does not have a namespace parameter', () => {
+    const result = isNamespaceParameter({});
+    expect(result).toBe(false);
+  });
 });
