@@ -1,4 +1,4 @@
-import type { PendingChildrenInfo } from '$types';
+import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 import { simplifyAttributes } from './event-history/simplify-attributes';
 
 const toPendingActivities = (
@@ -54,6 +54,9 @@ export const toWorkflowExecution = (
     stateTransitionCount,
     isRunning,
     defaultWorkflowTaskTimeout,
+    get canBeTerminated(): boolean {
+      return isRunning && writeActionsAreAllowed();
+    },
   };
 };
 

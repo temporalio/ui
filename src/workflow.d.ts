@@ -43,7 +43,7 @@ type WorkflowExecution = {
   runId: string;
   startTime: string;
   endTime: string;
-  status: WorkflowExecutionStatus;
+  status: WorkflowStatus;
   taskQueue?: string;
   historyEvents: Long;
   pendingChildren: PendingChildren[];
@@ -54,4 +54,5 @@ type WorkflowExecution = {
   url: string;
   isRunning: boolean;
   defaultWorkflowTaskTimeout: Duration;
+  canBeTerminated: boolean;
 };
