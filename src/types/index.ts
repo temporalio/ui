@@ -157,6 +157,7 @@ export type SettingsResponse = {
   Auth: { Enabled: boolean; Options: string[] };
   Codec: { Endpoint: string; PassAccessToken?: boolean; AccessToken?: string };
   DefaultNamespace: string;
+  DisableWriteActions: boolean;
   ShowTemporalSystemNamespace: boolean;
   NotifyOnNewVersion: boolean;
   FeedbackURL: string;

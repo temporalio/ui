@@ -6,6 +6,7 @@ export const importSettings = {
   baseUrl: 'base',
   codec: {},
   defaultNamespace: 'namespace',
+  disableWriteActions: false,
   showTemporalSystemNamespace: false,
   notifyOnNewVersion: false,
   feedbackURL: '',

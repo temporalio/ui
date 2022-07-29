@@ -2,7 +2,7 @@
   "Version": "2.0.0",
   "Auth": { "Enabled": false, "Options": null },
   "DefaultNamespace": "default",
-  "DisableWriteActions": false,
+  "DisableWriteActions": true,
   "ShowTemporalSystemNamespace": false,
   "FeedbackURL": "",
   "NotifyOnNewVersion": true,

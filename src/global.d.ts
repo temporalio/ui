@@ -55,6 +55,7 @@ type Settings = {
     accessToken?: string;
   };
   defaultNamespace: string;
+  disableWriteActions: boolean;
   showTemporalSystemNamespace: boolean;
   notifyOnNewVersion: boolean;
   feedbackURL: string;

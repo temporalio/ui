@@ -74,7 +74,7 @@ exports[`toWorkflowExecution > should match the snapshot for Failed workflows 1`
 
 exports[`toWorkflowExecution > should match the snapshot for Running workflows 1`] = `
 {
-  "canBeTerminated": true,
+  "canBeTerminated": false,
   "defaultWorkflowTaskTimeout": "20s",
   "endTime": "null",
   "historyEvents": "13",
@@ -264,7 +264,7 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "url": "/workflows/temporal.fixture.failed.workflow.id/7e00b341-c579-4bb5-9e28-810d34ef4329",
   },
   {
-    "canBeTerminated": true,
+    "canBeTerminated": false,
     "defaultWorkflowTaskTimeout": undefined,
     "endTime": "null",
     "historyEvents": "19",
