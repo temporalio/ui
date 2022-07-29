@@ -9,7 +9,7 @@
     <td />
   </a>
 {:else}
-  <tr class={$$props.class}>
+  <tr on:click class={$$props.class}>
     <td />
     <slot />
     <td />

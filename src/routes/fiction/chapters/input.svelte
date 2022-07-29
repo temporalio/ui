@@ -21,6 +21,29 @@
 />
 
 <Chapter
+  description="An invalid Input with hint text and error state"
+  component={Input}
+  props={{
+    class: 'w-1/3',
+    id: 'invalid-input',
+    valid: false,
+    value: 'Bad input',
+    hintText: 'This is the hint text',
+  }}
+/>
+
+<Chapter
+  description="An Input with a max length"
+  component={Input}
+  props={{
+    class: 'w-1/3',
+    id: 'max-length-input',
+    value: '',
+    maxLength: 10,
+  }}
+/>
+
+<Chapter
   description="A dark input"
   component={Input}
   props={{
