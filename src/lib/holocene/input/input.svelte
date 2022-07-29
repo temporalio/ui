@@ -73,7 +73,7 @@
   }
 
   .input-container {
-    @apply relative box-border w-full inline-flex h-10 items-center rounded border border-gray-900 text-sm focus-within:border-blue-700;
+    @apply relative box-border inline-flex h-10 w-full items-center rounded border border-gray-900 text-sm focus-within:border-blue-700;
   }
 
   .input-container.copyable {
@@ -93,7 +93,7 @@
   }
 
   .count {
-    @apply invisible font-secondary text-primary font-medium text-sm mr-2;
+    @apply invisible mr-2 font-secondary text-sm font-medium text-primary;
   }
 
   .count > .warn {
