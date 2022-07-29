@@ -18,7 +18,7 @@
   {placeholder}
   {rows}
 />
-<div class="error-msg">
+<div class="error-msg" aria-live={isValid ? 'off' : 'assertive'}>
   {#if !isValid}
     {#if error}
       <p>{error}</p>
