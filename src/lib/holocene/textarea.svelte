@@ -1,29 +1,31 @@
 <script lang="ts">
-  export let value: string = '';
+  import { noop } from 'svelte/internal';
   export let disabled: boolean = false;
+  export let error: string = '';
+  export let isValid: boolean = true;
   export let placeholder: string = '';
   export let rows: number = 5;
-  export let error: string = null;
-  let hasError = error || $$slots.error;
+  export let value: string;
+  export let onBlur: (e: Event) => void = noop;
 </script>
 
 <textarea
   class="font-mono min-h-fit w-full rounded border border-gray-900 p-5 text-sm"
-  class:error={hasError}
+  class:error={!isValid}
   bind:value
+  on:blur={onBlur}
   {disabled}
   {placeholder}
   {rows}
 />
-{#if hasError}
-  <div class="error-msg">
-    {#if $$slots.error}
-      <slot name="error" />
-    {:else}
+<div class="error-msg">
+  {#if !isValid}
+    {#if error}
       <p>{error}</p>
     {/if}
-  </div>
-{/if}
+    <slot name="error" />
+  {/if}
+</div>
 
 <style lang="postcss">
   .error {
