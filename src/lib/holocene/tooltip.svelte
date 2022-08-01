@@ -9,6 +9,8 @@
   export let topRight = false;
   export let right = false;
   export let bottom = false;
+  export let bottomLeft = false;
+  export let bottomRight = false;
   export let left = false;
   export let copyable = false;
   export let hide: boolean | null = false;
@@ -24,6 +26,8 @@
       class:left
       class:right
       class:bottom
+      class:bottomLeft
+      class:bottomRight
       class:top
       class:topRight
     >
@@ -72,6 +76,12 @@
 
   .tooltip.topRight {
     @apply right-1/2 -mt-4 mr-4 -translate-x-1/2 -translate-y-full;
+  }
+  .tooltip.bottomLeft {
+    @apply left-auto right-0 bottom-0 -mb-1 translate-x-0 translate-y-full;
+  }
+  .tooltip.bottomRight {
+    @apply left-0 right-auto bottom-0 -mb-1 translate-x-0 translate-y-full;
   }
 
   .wrapper:hover .tooltip {
