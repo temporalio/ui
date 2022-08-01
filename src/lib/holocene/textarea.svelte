@@ -5,6 +5,7 @@
   export let isValid: boolean = true;
   export let placeholder: string = '';
   export let rows: number = 5;
+  export let spellcheck: boolean = null;
   export let value: string;
   export let onBlur: (e: Event) => void = noop;
 </script>
@@ -17,6 +18,7 @@
   {disabled}
   {placeholder}
   {rows}
+  {spellcheck}
 />
 <div class="error-msg" aria-live={isValid ? 'off' : 'assertive'}>
   {#if !isValid}
