@@ -58,7 +58,7 @@
 
 <style lang="postcss">
   .tooltip {
-    @apply invisible absolute left-0 top-0 z-50 inline-block translate-x-12 whitespace-nowrap text-xs opacity-0 shadow-md transition-all;
+    @apply invisible absolute left-0 top-0 z-50 inline-block translate-x-12 whitespace-nowrap text-xs opacity-0 transition-all;
   }
 
   .tooltip.top {
