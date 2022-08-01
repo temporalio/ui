@@ -26,7 +26,7 @@
   };
 
   const terminate = () => {
-    if (workflow.canBeTerminated) return;
+    if (!workflow.canBeTerminated) return;
     terminateWorkflow({
       workflow,
       namespace,
