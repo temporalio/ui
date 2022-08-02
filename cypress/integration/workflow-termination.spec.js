@@ -51,4 +51,20 @@ describe('Terminate Button is Shown', () => {
 
     cy.get('[data-cy="terminate-button"]').should('not.exist');
   });
+
+  it.only('should send a request to terminate workflows when write actions are enabled', () => {
+    cy.intercept(Cypress.env('VITE_API_HOST') + `/api/v1/settings?`, {
+      fixture: 'settings.json',
+    }).as('settings-api');
+
+    cy.visit(
+      `/namespaces/default/workflows/${workflowId}/${runId}/history/feed?sort=descending`,
+    );
+
+    cy.wait('@settings-api');
+    cy.wait('@workflow-api');
+
+    cy.get('[data-cy="terminate-button"]').click();
+    cy.get('[data-cy="modal-confirmation"]').click();
+  });
 });
