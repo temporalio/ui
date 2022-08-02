@@ -51,7 +51,7 @@
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width={strokeWidth}
-            stroke={getStroke(path)}
+            stroke={stroke || getStroke(path)}
             fill={getFill(path)}
             transform="translate({_width / -2} {_height / -2})"
           />
