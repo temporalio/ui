@@ -4,7 +4,7 @@
   import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
   import { capitalize } from '$lib/utilities/format-camel-case';
 
-  import CodeBlock from '$lib/components/code-block.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Loading from '$holocene/loading.svelte';
 
   export let type: 'input' | 'results';

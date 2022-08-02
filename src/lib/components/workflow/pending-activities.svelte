@@ -11,7 +11,7 @@
   import Link from '$lib/components/link.svelte';
   import Icon from '$holocene/icon/index.svelte';
   import Badge from '$holocene/badge.svelte';
-  import CodeBlock from '$lib/components/code-block.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
   import {
     formatAttemptsLeft,
     formatRetryExpiration,

@@ -23,7 +23,7 @@
 <script lang="ts">
   import '../../app.css';
   import { currentProps } from '$lib/stores/fiction-store';
-  import CodeBlock from '$lib/components/code-block.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
 
   export let chapters: string[];
 </script>

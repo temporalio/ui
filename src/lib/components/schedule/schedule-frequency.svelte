@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { CalendarSpec, IntervalSpec } from '$types';
-  import CodeBlock from '../code-block.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
 
   export let calendar: CalendarSpec;
   export let interval: IntervalSpec;

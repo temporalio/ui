@@ -5,7 +5,7 @@
   import { getWorkflowStackTrace } from '$lib/services/query-service';
   import type { ParsedQuery } from '$lib/services/query-service';
 
-  import CodeBlock from '$lib/components/code-block.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Button from '$holocene/button.svelte';
   import EmptyState from '$lib/components/empty-state.svelte';
   import PageTitle from '$lib/holocene/page-title.svelte';
