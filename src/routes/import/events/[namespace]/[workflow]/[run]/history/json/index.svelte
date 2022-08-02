@@ -1,5 +1,5 @@
 <script lang="ts">
-  import CodeBlock from '$lib/components/code-block.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
 
   import { importEvents } from '$lib/stores/import-events';
 </script>

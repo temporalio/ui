@@ -1,6 +1,6 @@
 <script lang="ts">
   import HistoryImport from '../_event-history-import.svelte';
-  import CodeBlock from '$lib/components/code-block.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Link from '$lib/components/link.svelte';
 
   const formatEvent = 'EventHistory';
