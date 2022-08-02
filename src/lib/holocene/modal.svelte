@@ -41,6 +41,7 @@
           <Button
             variant={confirmType}
             disabled={confirmDisabled}
+            dataCy="modal-confirmation"
             on:click={() => dispatch('confirmModal', {})}>{confirmText}</Button
           >
         {/if}
