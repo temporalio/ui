@@ -14,7 +14,7 @@
   export let left = false;
   export let copyable = false;
   export let hide: boolean | null = false;
-  export let width: number = null;
+  export let width: number | null = null;
 </script>
 
 {#if hide}
