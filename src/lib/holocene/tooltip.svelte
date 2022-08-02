@@ -14,6 +14,7 @@
   export let left = false;
   export let copyable = false;
   export let hide: boolean | null = false;
+  export let width: number = null;
 </script>
 
 {#if hide}
@@ -30,6 +31,7 @@
       class:bottomRight
       class:top
       class:topRight
+      style={width ? `white-space: pre-wrap; width: ${width}px;` : null}
     >
       <div class="inline-block rounded-lg bg-gray-800 px-2 py-2">
         {#if copyable}

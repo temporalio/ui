@@ -12,6 +12,18 @@
   </div>
 </Chapter>
 
+<Chapter description="A multiline tooltip" props={{}}>
+  <div class="center">
+    <Tooltip
+      top
+      width={100}
+      text={'Really really really really really long tooltip text goes here.'}
+    >
+      <Button as="anchor" href={'#'}>Hover Here</Button>
+    </Tooltip>
+  </div>
+</Chapter>
+
 <Chapter description="A tooltip with attribute top" props={{}}>
   <div class="center">
     <Tooltip top text={'Tooltip text goes here.'}>
