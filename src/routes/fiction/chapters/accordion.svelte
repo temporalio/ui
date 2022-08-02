@@ -38,3 +38,13 @@
     <CodeBlock content={JSON.stringify({ some: 'thing', blue: 42 })} />
   </Accordion>
 </Chapter>
+
+<Chapter description="A disabled Accordion">
+  <Accordion
+    disabled
+    title="Certificates"
+    subtitle="Expires on Wed Feb 01, 2030"
+  >
+    <p>Accordion content here.</p>
+  </Accordion>
+</Chapter>

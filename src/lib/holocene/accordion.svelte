@@ -1,11 +1,14 @@
 <script lang="ts">
+  import colors from 'tailwindcss/colors';
   import Icon from '$lib/holocene/icon/index.svelte';
   import type { IconName } from './icon/paths';
   export let title: string;
   export let subtitle: string = '';
   export let icon: IconName | undefined = undefined;
-
   export let open: boolean = false;
+  export let disabled: boolean = false;
+
+  $: open = disabled ? true : open;
 </script>
 
 <section
@@ -15,7 +18,11 @@
     <div
       class="accordion-open flex cursor-pointer flex-col"
       class:open
-      on:click={() => (open = !open)}
+      class:disabled
+      on:click={() => {
+        if (disabled) return;
+        open = !open;
+      }}
     >
       <div class="space-between flex flex-row">
         <h2 class="flex w-full items-center gap-2 text-lg font-medium">
@@ -24,7 +31,7 @@
         </h2>
         <Icon
           name={open ? 'caretUp' : 'caretDown'}
-          stroke="currentcolor"
+          stroke={disabled ? colors.gray[500] : 'currentcolor'}
           scale={1.4}
         />
       </div>
@@ -41,5 +48,9 @@
 <style lang="postcss">
   .open {
     @apply mb-8;
+  }
+
+  .disabled {
+    @apply cursor-default;
   }
 </style>
