@@ -9,9 +9,12 @@
   export let topRight = false;
   export let right = false;
   export let bottom = false;
+  export let bottomLeft = false;
+  export let bottomRight = false;
   export let left = false;
   export let copyable = false;
   export let hide: boolean | null = false;
+  export let width: number | null = null;
 </script>
 
 {#if hide}
@@ -24,8 +27,11 @@
       class:left
       class:right
       class:bottom
+      class:bottomLeft
+      class:bottomRight
       class:top
       class:topRight
+      style={width ? `white-space: pre-wrap; width: ${width}px;` : null}
     >
       <div class="inline-block rounded-lg bg-gray-800 px-2 py-2">
         {#if copyable}
@@ -54,7 +60,7 @@
 
 <style lang="postcss">
   .tooltip {
-    @apply invisible absolute left-0 top-0 z-50 inline-block translate-x-12 whitespace-nowrap text-xs opacity-0 shadow-md transition-all;
+    @apply invisible absolute left-0 top-0 z-50 inline-block translate-x-12 whitespace-nowrap text-xs opacity-0 transition-all;
   }
 
   .tooltip.top {
@@ -72,6 +78,12 @@
 
   .tooltip.topRight {
     @apply right-1/2 -mt-4 mr-4 -translate-x-1/2 -translate-y-full;
+  }
+  .tooltip.bottomLeft {
+    @apply left-auto right-0 bottom-0 -mb-1 translate-x-0 translate-y-full;
+  }
+  .tooltip.bottomRight {
+    @apply left-0 right-auto bottom-0 -mb-1 translate-x-0 translate-y-full;
   }
 
   .wrapper:hover .tooltip {
