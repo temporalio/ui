@@ -16,10 +16,9 @@
   export let valid = true;
   export let hintText = '';
   export let maxLength = 0;
-  export let locked: boolean = false;
 
   const { copy, copied } = copyToClipboard(value);
-  $: disabled = disabled || copyable || locked;
+  $: disabled = disabled || copyable;
 </script>
 
 <div class={$$props.class}>
@@ -52,8 +51,7 @@
       <div class="copy-icon-container" on:click={copy}>
         <Icon name={$copied ? 'checkMark' : 'copy'} stroke="currentcolor" />
       </div>
-    {/if}
-    {#if locked}
+    {:else if disabled}
       <div class="flex h-full w-9 items-center justify-center">
         <Icon name="lock" stroke="currentcolor" />
       </div>

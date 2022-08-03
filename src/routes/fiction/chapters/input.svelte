@@ -112,7 +112,7 @@
     class: 'w-96',
     id: 'input7',
     value: 'robin@temporal.io',
-    locked: true,
+    disabled: true,
   }}
 />
 
@@ -123,7 +123,7 @@
     class: 'w-96',
     id: 'input8',
     value: 'robin@temporal.io',
-    locked: true,
+    disabled: true,
     theme: 'dark',
   }}
 />
