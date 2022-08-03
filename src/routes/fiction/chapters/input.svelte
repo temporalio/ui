@@ -105,11 +105,34 @@
   }}
 />
 
+<Chapter
+  description="A locked input"
+  component={Input}
+  props={{
+    class: 'w-96',
+    id: 'input7',
+    value: 'robin@temporal.io',
+    locked: true,
+  }}
+/>
+
+<Chapter
+  description="A locked dark input"
+  component={Input}
+  props={{
+    class: 'w-96',
+    id: 'input8',
+    value: 'robin@temporal.io',
+    locked: true,
+    theme: 'dark',
+  }}
+/>
+
 <Chapter description="A Tag Input">
   <ChipInput
     bind:chips={emails}
     class="w-96"
-    id="input7"
+    id="input9"
     label="Email Address(es)"
     required
     hintText="Please enter a properly formatted email address."
