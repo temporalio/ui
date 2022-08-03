@@ -18,13 +18,14 @@
   export let maxLength = 0;
 
   const { copy, copied } = copyToClipboard(value);
+  $: disabled = disabled || copyable;
 </script>
 
 <div class={$$props.class}>
   {#if label}
     <label for={id}>{label}</label>
   {/if}
-  <div class="input-container {theme}" class:copyable class:invalid={!valid}>
+  <div class="input-container {theme}" class:disabled class:invalid={!valid}>
     {#if icon !== ''}
       <span class="icon-container">
         <Icon name={icon} scale={0.9} stroke="currentcolor" />
@@ -32,8 +33,8 @@
     {/if}
     <input
       class="m-2 block w-full bg-white focus:outline-none"
-      class:copyable
-      disabled={disabled || copyable}
+      class:disabled
+      {disabled}
       data-lpignore="true"
       maxlength={maxLength > 0 ? maxLength : undefined}
       {placeholder}
@@ -49,6 +50,10 @@
     {#if copyable}
       <div class="copy-icon-container" on:click={copy}>
         <Icon name={$copied ? 'checkMark' : 'copy'} stroke="currentcolor" />
+      </div>
+    {:else if disabled}
+      <div class="flex h-full w-9 items-center justify-center">
+        <Icon name="lock" stroke="currentcolor" />
       </div>
     {/if}
     {#if maxLength}
@@ -76,7 +81,7 @@
     @apply relative box-border inline-flex h-10 w-full items-center rounded border border-gray-900 text-sm focus-within:border-blue-700;
   }
 
-  .input-container.copyable {
+  .input-container.disabled {
     @apply border;
   }
 
@@ -119,16 +124,16 @@
     @apply text-gray-400;
   }
 
-  .input-container.light.copyable {
-    @apply border-gray-900 bg-gray-50;
+  .input-container.light.disabled {
+    @apply border-gray-600 bg-gray-50  text-gray-600;
   }
 
-  .input-container.light.copyable input {
-    @apply bg-gray-50 text-gray-900;
+  .input-container.light.disabled input {
+    @apply bg-gray-50;
   }
 
-  .input-container.light.copyable .copy-icon-container {
-    @apply border-gray-900 bg-gray-200;
+  .input-container.light.disabled .copy-icon-container {
+    @apply border-gray-600 bg-gray-200;
   }
 
   /* Dark theme styles */
@@ -143,9 +148,9 @@
     @apply placeholder:text-gray-200;
   }
 
-  .input-container.dark.copyable,
-  .input-container.dark.copyable .copy-icon-container,
-  .input-container.dark.copyable input {
+  .input-container.dark.disabled,
+  .input-container.dark.disabled .copy-icon-container,
+  .input-container.dark.disabled input {
     @apply border-gray-900 bg-gray-900;
   }
 </style>
