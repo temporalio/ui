@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let href: string;
+  export let href = '';
   export let label: string;
   export let amount: number | Long.Long = null;
   export let active = false;
