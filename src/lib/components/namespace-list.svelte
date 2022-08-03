@@ -4,7 +4,7 @@
   import Icon from '$lib/holocene/icon/index.svelte';
 
   import { onMount } from 'svelte';
-  import EmptyState from './empty-state.svelte';
+  import EmptyState from '$lib/holocene/empty-state.svelte';
   import { createEventDispatcher } from 'svelte';
 
   export let getNamespaceList: () => Promise<NamespaceItem[]> = null;

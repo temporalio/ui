@@ -16,19 +16,13 @@
 <MenuContainer class={$$props.class}>
   <MenuButton
     bind:show
-    class="flex flex-row items-center rounded-lg border border-gray-300 bg-white py-4"
+    class="flex flex-row items-center rounded-lg border border-gray-300 bg-white py-2"
     controls={id}
     disabled={readonly}
   >
     {#if icon}
       <div class="ml-4 flex items-center">
-        <Icon
-          name={icon}
-          strokeWidth={1}
-          width={12}
-          height={12}
-          stroke="currentcolor"
-        />
+        <Icon name={icon} />
       </div>
     {/if}
     <span class="ml-2 mr-8">{label}</span>

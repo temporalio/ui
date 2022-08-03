@@ -1,5 +1,5 @@
 <script lang="ts">
-  import EmptyState from '$lib/components/empty-state.svelte';
+  import EmptyState from '$lib/holocene/empty-state.svelte';
 
   import type { GetPollersResponse } from '$lib/services/pollers-service';
 
