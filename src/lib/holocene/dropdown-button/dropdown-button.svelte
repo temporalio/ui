@@ -22,7 +22,13 @@
   >
     {#if icon}
       <div class="ml-4 flex items-center">
-        <Icon name={icon} />
+        <Icon
+          name={icon}
+          strokeWidth={1}
+          width={12}
+          height={12}
+          stroke="currentcolor"
+        />
       </div>
     {/if}
     <span class="ml-2 mr-8">{label}</span>
