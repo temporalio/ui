@@ -5,7 +5,7 @@
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Option from '$lib/components/select/option.svelte';
-  import EmptyState from '$lib/components/empty-state.svelte';
+  import EmptyState from '$lib/holocene/empty-state.svelte';
   import Select from '$lib/components/select/select.svelte';
   import Button from '$holocene/button.svelte';
   import PageTitle from '$lib/holocene/page-title.svelte';

@@ -11,7 +11,7 @@
   } from '$lib/utilities/format-date';
   import { timelineEventTypeOptions } from '$lib/models/event-history/get-event-categorization';
   import { timeFormat } from '$lib/stores/time-format';
-  import EmptyState from '../empty-state.svelte';
+  import EmptyState from '$lib/holocene/empty-state.svelte';
 
   import {
     eventOrGroupIsCanceled,
