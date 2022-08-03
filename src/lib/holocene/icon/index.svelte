@@ -14,18 +14,26 @@
 
   $: icon = icons[name];
 
-  function getStroke(path: svelte.JSX.SVGProps<SVGPathElement>) {
-    if (path?.stroke === 'none') return '';
-    if (color !== '') return color;
-    if (stroke !== '') return stroke;
-    return path?.stroke ?? '';
+  function getStroke(params: {
+    path: svelte.JSX.SVGProps<SVGPathElement>;
+    stroke: string;
+    color: string;
+  }) {
+    if (params.path?.stroke === 'none') return '';
+    if (color !== '') return params.color;
+    if (stroke !== '') return params.stroke;
+    return params.path?.stroke ?? '';
   }
 
-  function getFill(path: svelte.JSX.SVGProps<SVGPathElement>) {
-    if (path?.fill === 'none') return '';
-    if (color !== '') return color;
-    if (fill !== '') return fill;
-    return path?.fill ?? '';
+  function getFill(params: {
+    path: svelte.JSX.SVGProps<SVGPathElement>;
+    fill: string;
+    color: string;
+  }) {
+    if (params.path?.fill === 'none') return '';
+    if (color !== '') return params.color;
+    if (fill !== '') return params.fill;
+    return params.path?.fill ?? '';
   }
 </script>
 
@@ -51,8 +59,8 @@
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width={strokeWidth}
-            stroke={getStroke(path)}
-            fill={getFill(path)}
+            stroke={getStroke({ path, stroke, color })}
+            fill={getFill({ path, fill, color })}
             transform="translate({_width / -2} {_height / -2})"
           />
         {/each}
