@@ -6,7 +6,7 @@
 
   import { isNetworkError } from '$lib/utilities/is-network-error';
 
-  import Link from './link.svelte';
+  import Link from '$lib/holocene/link.svelte';
 
   export let error: globalThis.Error = null;
   export let status = 500;

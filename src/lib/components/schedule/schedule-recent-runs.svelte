@@ -8,7 +8,7 @@
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import { routeForWorkflow } from '$lib/utilities/route-for';
-  import Link from '../link.svelte';
+  import Link from '$lib/holocene/link.svelte';
 
   export let recentRuns: ScheduleActionResult[] = [];
   export let namespace: string;

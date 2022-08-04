@@ -10,7 +10,7 @@
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import PageTitle from '$lib/holocene/page-title.svelte';
   import Loading from '$lib/holocene/loading.svelte';
-  import Link from '$lib/components/link.svelte';
+  import Link from '$lib/holocene/link.svelte';
 
   const { namespace } = $page.params;
   const { workflow, workers } = $workflowRun;

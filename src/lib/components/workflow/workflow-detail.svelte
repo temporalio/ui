@@ -1,6 +1,6 @@
 <script lang="ts">
   import Copyable from '$lib/components/copyable.svelte';
-  import Link from '$lib/components/link.svelte';
+  import Link from '$lib/holocene/link.svelte';
 
   export let title: string;
   export let content: string;
