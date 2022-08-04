@@ -5,7 +5,7 @@
   import Icon from '$holocene/icon/index.svelte';
   import Badge from '$holocene/badge.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Link from '$lib/components/link.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import {
     formatDate,

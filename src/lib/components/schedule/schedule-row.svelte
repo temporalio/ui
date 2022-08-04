@@ -5,7 +5,7 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { routeForSchedule, routeForWorkflow } from '$lib/utilities/route-for';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import Link from '$lib/components/link.svelte';
+  import Link from '$lib/holocene/link.svelte';
 
   import ScheduleFrequency from './schedule-frequency.svelte';
 
