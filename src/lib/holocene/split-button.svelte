@@ -4,6 +4,7 @@
   import MenuButton from '$holocene/primitives/menu/menu-button.svelte';
   import Menu from '$holocene/primitives/menu/menu.svelte';
   import Button from './button.svelte';
+  import { noop } from 'svelte/internal';
 
   export let label: string;
   export let id: string;

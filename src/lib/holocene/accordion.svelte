@@ -7,6 +7,7 @@
   export let icon: IconName | undefined = undefined;
   export let open: boolean = false;
   export let disabled: boolean = false;
+  export let readOnly: boolean = false;
 
   $: open = disabled ? true : open;
 </script>
@@ -16,11 +17,11 @@
 >
   <div class="w-full">
     <div
-      class="accordion-open flex cursor-pointer flex-col"
+      class="accordion-open flex {!readOnly ? 'cursor-pointer' : ''} flex-col"
       class:open
       class:disabled
       on:click={() => {
-        if (disabled) return;
+        if (disabled || readOnly) return;
         open = !open;
       }}
     >
@@ -29,11 +30,13 @@
           {#if icon}<Icon scale={1.25} name={icon} />{/if}
           {title}
         </h2>
-        <Icon
-          name={open ? 'caretUp' : 'caretDown'}
-          stroke={disabled ? colors.gray[500] : 'currentcolor'}
-          scale={1.4}
-        />
+        {#if !readOnly}
+          <Icon
+            name={open ? 'caretUp' : 'caretDown'}
+            stroke={disabled ? colors.gray[500] : 'currentcolor'}
+            scale={1.4}
+          />
+        {/if}
       </div>
       <h3>{subtitle}</h3>
     </div>
