@@ -23,7 +23,7 @@
   };
 
   $: parsedContent = isJSON ? formatJSON(content) : content;
-  const { copy, copied } = copyToClipboard(parsedContent);
+  const { copy, copied } = copyToClipboard();
 
   function highlight(root: HTMLElement, language: string, source: string) {
     root.textContent = source;
@@ -59,7 +59,10 @@
         data-cy={$$props['data-cy']}
       /></pre>
 
-    <button on:click={copy} class="absolute top-4 right-4">
+    <button
+      on:click={(e) => copy(e, parsedContent)}
+      class="absolute top-4 right-4"
+    >
       <Icon name={$copied ? 'checkMark' : 'copy'} stroke="white" />
     </button>
   </div>
