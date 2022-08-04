@@ -35,6 +35,16 @@
     if (fill !== '') return params.fill;
     return params.path?.fill ?? '';
   }
+
+  function getStrokeWidth(params: {
+    path: svelte.JSX.SVGProps<SVGPathElement>;
+    strokeWidth: string | number;
+  }) {
+    if ((params.path && params.path['stroke-width']) === 'none')
+      return strokeWidth;
+    if (strokeWidth !== 1.5) return params.strokeWidth;
+    return (params.path && params.path['stroke-width']) ?? 1.5;
+  }
 </script>
 
 {#if icon}
@@ -58,7 +68,7 @@
             {...path}
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width={strokeWidth}
+            stroke-width={getStrokeWidth({ path, strokeWidth })}
             stroke={getStroke({ path, stroke, color })}
             fill={getFill({ path, fill, color })}
             transform="translate({_width / -2} {_height / -2})"
