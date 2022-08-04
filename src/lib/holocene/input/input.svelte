@@ -17,7 +17,7 @@
   export let hintText = '';
   export let maxLength = 0;
 
-  const { copy, copied } = copyToClipboard(value);
+  const { copy, copied } = copyToClipboard();
   $: disabled = disabled || copyable;
 </script>
 
@@ -48,7 +48,7 @@
       on:blur
     />
     {#if copyable}
-      <div class="copy-icon-container" on:click={copy}>
+      <div class="copy-icon-container" on:click={(e) => copy(e, value)}>
         <Icon name={$copied ? 'checkMark' : 'copy'} stroke="currentcolor" />
       </div>
     {:else if disabled}

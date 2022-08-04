@@ -8,19 +8,19 @@
   export let color = 'black';
   export let clickAllToCopy = false;
 
-  const { copy, copied } = copyToClipboard(content, 500);
+  const { copy, copied } = copyToClipboard(500);
 </script>
 
 <div
   class="group flex items-center gap-2 {$$props['container-class']}"
-  on:click={clickAllToCopy ? copy : noop}
+  on:click={clickAllToCopy ? (e) => copy(e, content) : noop}
 >
   <slot>
     <span class={$$props.class} class:select-all={!$$slots.default}
       >{content}</span
     >
   </slot>
-  <button on:click={copy}>
+  <button on:click={(e) => copy(e, content)}>
     <Icon
       name={$copied ? 'checkMark' : 'copy'}
       stroke={color}
