@@ -22,6 +22,41 @@ const arrowUpIcon: Icon = {
   ],
 };
 
+const bookIcon: Icon = {
+  paths: [
+    {
+      d: 'M12 18.75V8.25C12 7.42157 12.6716 6.75 13.5 6.75H19.05C19.2985 6.75 19.5 6.95147 19.5 7.2V17.0357',
+      stroke: '#111827',
+      'stroke-width': '1.125',
+    },
+    {
+      d: 'M12 18.75V8.25C12 7.42157 11.3284 6.75 10.5 6.75H4.95C4.70147 6.75 4.5 6.95147 4.5 7.2V17.0357',
+      stroke: '#111827',
+      'stroke-width': '1.125',
+    },
+    {
+      d: 'M13.5 17.25H19.5',
+      stroke: '#111827',
+      'stroke-width': '1.125',
+    },
+    {
+      d: 'M10.5 17.25H4.5',
+      stroke: '#111827',
+      'stroke-width': '1.125',
+    },
+    {
+      d: 'M12 18.75C12 17.9216 12.6716 17.25 13.5 17.25',
+      stroke: '#111827',
+      'stroke-width': '1.125',
+    },
+    {
+      d: 'M12 18.75C12 17.9216 11.3284 17.25 10.5 17.25',
+      stroke: '#111827',
+      'stroke-width': '1.125',
+    },
+  ],
+};
+
 const arrowDownIcon: Icon = {
   paths: [
     {
@@ -287,7 +322,7 @@ const jsonIcon = {
 const lockIcon: Icon = {
   paths: [
     {
-      d: 'M16 12H8M16 12H17.4C17.7314 12 18 12.2686 18 12.6V19.4C18 19.7314 17.7314 20 17.4 20H6.6C6.26863 20 6 19.7314 6 19.4V12.6C6 12.2686 6.26863 12 6.6 12H8H16ZM16 12V8C16 6.66667 15.2 4 12 4C8.8 4 8 6.66667 8 8V12H16Z" stroke="#111827',
+      d: 'M16 12H8M16 12H17.4C17.7314 12 18 12.2686 18 12.6V19.4C18 19.7314 17.7314 20 17.4 20H6.6C6.26863 20 6 19.7314 6 19.4V12.6C6 12.2686 6.26863 12 6.6 12H8H16ZM16 12V8C16 6.66667 15.2 4 12 4C8.8 4 8 6.66667 8 8V12H16Z',
       stroke: '#111827',
     },
   ],
@@ -487,6 +522,7 @@ export const icons: { [index: string]: Icon } = {
   archive: archiveIcon,
   arrowDown: arrowDownIcon,
   arrowUp: arrowUpIcon,
+  book: bookIcon,
   calendar: calendarIcon,
   calendarPlus: calendarPlusIcon,
   caretDown: caretDownIcon,
