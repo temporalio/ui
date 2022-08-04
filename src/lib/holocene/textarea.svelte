@@ -11,7 +11,7 @@
 </script>
 
 <textarea
-  class="font-mono min-h-fit w-full rounded border border-gray-900 p-5 text-sm"
+  class="font-mono min-h-fit w-full rounded border border-gray-900 py-2 px-3 text-sm"
   class:error={!isValid}
   bind:value
   on:blur={onBlur}
