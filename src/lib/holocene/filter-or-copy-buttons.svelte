@@ -10,7 +10,7 @@
   export let onFilter: () => void = noop;
   export let filtered = false;
 
-  const { copy, copied } = copyToClipboard(content, 700);
+  const { copy, copied } = copyToClipboard(700);
 </script>
 
 {#if show}
@@ -28,7 +28,7 @@
       </button>
     {/if}
     {#if copyable}
-      <button on:click|preventDefault|stopPropagation={copy}>
+      <button on:click|preventDefault|stopPropagation={(e) => copy(e, content)}>
         <Icon
           name={$copied ? 'checkMark' : 'copy'}
           stroke="#000"
