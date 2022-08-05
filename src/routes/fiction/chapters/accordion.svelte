@@ -48,3 +48,14 @@
     <p>Accordion content here.</p>
   </Accordion>
 </Chapter>
+
+<Chapter description="A readOnly Accordion">
+  <Accordion
+    readOnly
+    open
+    title="Certificates"
+    subtitle="Expires on Wed Feb 01, 2030"
+  >
+    <p>Accordion content here.</p>
+  </Accordion>
+</Chapter>
