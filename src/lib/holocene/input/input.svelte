@@ -153,9 +153,4 @@
   .input-container.dark.disabled input {
     @apply border-gray-900 bg-gray-900;
   }
-
-  .input-container.light.error,
-  .input-container.dark.error {
-    @apply border-red-700;
-  }
 </style>
