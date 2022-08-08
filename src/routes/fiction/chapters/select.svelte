@@ -119,3 +119,13 @@
     {/each}
   </Select>
 </Chapter>
+
+<Chapter description="A disabled select dropdown">
+  <Select
+    id="favorite-color"
+    placeholder="Favorite Color"
+    options={[]}
+    value={null}
+    disabled
+  />
+</Chapter>
