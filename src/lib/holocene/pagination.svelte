@@ -82,6 +82,7 @@
           <Icon scale={0.8} stroke="currentcolor" name="caretRight" />
         </button>
       </div>
+      <slot name="action" />
     </nav>
   </div>
   <slot visibleItems={$store.items} initialItem={$store.initialItem} />
