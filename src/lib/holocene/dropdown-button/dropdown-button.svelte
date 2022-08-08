@@ -10,6 +10,7 @@
   export let icon: IconName = '';
   export let readonly = false;
   export let disabled = false;
+  export let border: 'light' | 'dark' = 'light';
 
   let show = false;
 </script>
@@ -17,7 +18,9 @@
 <MenuContainer class={$$props.class}>
   <MenuButton
     bind:show
-    class="flex flex-row items-center rounded-lg border border-gray-300 bg-white py-2"
+    class="flex flex-row items-center rounded-lg border {border === 'dark'
+      ? 'border-gray-600'
+      : 'border-gray-300'} bg-white py-2"
     controls={id}
     disabled={disabled || readonly}
   >
