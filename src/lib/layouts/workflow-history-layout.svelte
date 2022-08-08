@@ -13,8 +13,8 @@
   import { onDestroy } from 'svelte';
   import { clearPreviousEventParameters } from '$lib/stores/events';
 
-  import ToggleButton from '$lib/components/toggle-button.svelte';
-  import ToggleButtons from '$lib/components/toggle-buttons.svelte';
+  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
+  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import PendingActivities from '$lib/components/workflow/pending-activities.svelte';
   import WorkflowStackTraceError from '$lib/components/workflow/workflow-stack-trace-error.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';

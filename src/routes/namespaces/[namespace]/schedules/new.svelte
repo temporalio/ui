@@ -8,8 +8,8 @@
     error,
   } from '$lib/stores/schedules';
 
-  import ToggleButton from '$lib/components/toggle-button.svelte';
-  import ToggleButtons from '$lib/components/toggle-buttons.svelte';
+  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
+  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import Icon from '$holocene/icon/index.svelte';
 
   import { page } from '$app/stores';

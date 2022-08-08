@@ -1,8 +1,8 @@
 <script lang="ts">
   import { routeForImport } from '$lib/utilities/route-for';
 
-  import ToggleButton from '$lib/components/toggle-button.svelte';
-  import ToggleButtons from '$lib/components/toggle-buttons.svelte';
+  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
+  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import HistoryImport from '../../../../../_event-history-import.svelte';
 </script>
 
