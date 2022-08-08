@@ -11,7 +11,6 @@
   export let name = id;
   export let copyable: boolean = false;
   export let disabled = false;
-  export let error = false;
   export let theme: 'dark' | 'light' = 'light';
   export let autocomplete = false;
   export let valid = true;
@@ -26,12 +25,7 @@
   {#if label}
     <label for={id}>{label}</label>
   {/if}
-  <div
-    class="input-container {theme}"
-    class:disabled
-    class:error
-    class:invalid={!valid}
-  >
+  <div class="input-container {theme}" class:disabled class:invalid={!valid}>
     {#if icon !== ''}
       <span class="icon-container">
         <Icon name={icon} scale={0.9} stroke="currentcolor" />
