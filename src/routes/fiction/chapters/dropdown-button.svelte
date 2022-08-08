@@ -30,3 +30,7 @@
 <Chapter description="A readonly dropdown menu">
   <DropdownButton readonly id="region" label="region-1" icon="globe" />
 </Chapter>
+
+<Chapter description="A disabled dropdown menu">
+  <DropdownButton disabled id="namespace" label="Namespace Admin" />
+</Chapter>

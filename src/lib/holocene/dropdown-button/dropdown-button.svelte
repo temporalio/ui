@@ -9,6 +9,7 @@
   export let id: string;
   export let icon: IconName = '';
   export let readonly = false;
+  export let disabled = false;
 
   let show = false;
 </script>
@@ -18,7 +19,7 @@
     bind:show
     class="flex flex-row items-center rounded-lg border border-gray-300 bg-white py-2"
     controls={id}
-    disabled={readonly}
+    disabled={disabled || readonly}
   >
     {#if icon}
       <div class="ml-4 flex items-center">
@@ -31,10 +32,14 @@
         />
       </div>
     {/if}
-    <span class="ml-2 mr-8">{label}</span>
+    <span class="ml-2 mr-8" class:disabled>{label}</span>
     {#if !readonly}
-      <div class="mr-2">
-        <Icon scale={0.8} name={show ? 'caretUp' : 'caretDown'} />
+      <div class="mr-2" class:disabled>
+        {#if disabled}
+          <Icon scale={0.8} name="lock" stroke="currentcolor" />
+        {:else}
+          <Icon scale={0.8} name={show ? 'caretUp' : 'caretDown'} />
+        {/if}
       </div>
     {/if}
   </MenuButton>
@@ -42,3 +47,9 @@
     <slot />
   </Menu>
 </MenuContainer>
+
+<style lang="postcss">
+  .disabled {
+    @apply text-gray-600;
+  }
+</style>
