@@ -106,7 +106,7 @@
 />
 
 <Chapter
-  description="A locked input"
+  description="A disabled input"
   component={Input}
   props={{
     class: 'w-96',
@@ -117,7 +117,7 @@
 />
 
 <Chapter
-  description="A locked dark input"
+  description="A disabled dark input"
   component={Input}
   props={{
     class: 'w-96',
