@@ -50,7 +50,7 @@
   }
 
   input {
-    @apply absolute h-0 w-0 top-0 left-0 opacity-0;
+    @apply absolute top-0 left-0 h-0 w-0 opacity-0;
   }
 
   .checkmark {
@@ -92,7 +92,7 @@
   }
 
   .checkbox.disabled.on-dark .checkmark {
-    @apply text-opacity-80 border-opacity-80;
+    @apply border-opacity-80 text-opacity-80;
   }
 
   .checkbox.disabled.on-dark .checkmark .dash {
