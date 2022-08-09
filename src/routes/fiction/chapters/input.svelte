@@ -2,11 +2,6 @@
   import Chapter from '../_chapter.svelte';
 
   import Input from '$lib/holocene/input/input.svelte';
-  import ChipInput from '$lib/holocene/input/chip-input.svelte';
-  import { isEmail } from '$lib/utilities/is-email';
-  import CheckboxInput from '$lib/holocene/input/checkbox-input.svelte';
-
-  let emails = [];
 </script>
 
 <Chapter
@@ -127,38 +122,3 @@
     theme: 'dark',
   }}
 />
-
-<Chapter description="A Tag Input">
-  <ChipInput
-    bind:chips={emails}
-    class="w-96"
-    id="input9"
-    label="Email Address(es)"
-    required
-    hintText="Please enter a properly formatted email address."
-    validator={isEmail}
-  />
-  <small>value: {emails}</small>
-</Chapter>
-
-<Chapter description="A Checkbox Input">
-  <CheckboxInput id="checkbox-input" label="Select All" />
-</Chapter>
-
-<Chapter description="An indeterminate Checkbox Input">
-  <CheckboxInput id="checkbox-input" label="Select All" indeterminate />
-</Chapter>
-
-<Chapter description="A Checkbox Input on a dark background">
-  <div class="w-fit bg-primary p-4">
-    <CheckboxInput onDark id="checkbox-input" label="Select All" />
-  </div>
-</Chapter>
-
-<Chapter
-  description="An indeterminate Checkbox Input on a dark background without a label"
->
-  <div class="w-fit bg-primary p-4">
-    <CheckboxInput onDark id="checkbox-input" indeterminate />
-  </div>
-</Chapter>
