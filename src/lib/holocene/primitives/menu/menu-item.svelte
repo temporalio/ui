@@ -12,7 +12,7 @@
   class:destructive
   class:selected
   class:active
-  class="w-full cursor-pointer list-none bg-white p-2 text-sm text-primary hover:bg-gray-50 {$$props.class}"
+  class="w-full cursor-pointer list-none bg-white p-4 text-sm text-primary hover:bg-gray-50 {$$props.class}"
 >
   <slot />
 </li>
