@@ -79,10 +79,6 @@
     @apply cursor-default;
   }
 
-  .checkbox.disabled:not(.on-dark) {
-    @apply text-opacity-50;
-  }
-
   .checkbox.disabled.on-dark {
     @apply text-opacity-80;
   }

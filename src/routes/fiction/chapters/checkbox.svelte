@@ -2,30 +2,19 @@
   import Chapter from '../_chapter.svelte';
 
   import CheckboxInput from '$lib/holocene/checkbox.svelte';
-  let state = new Array(8).fill(false);
 </script>
 
 <Chapter description="A Checkbox Input">
-  <CheckboxInput id="checkbox-input" label="Select All" checked={state[0]} />
+  <CheckboxInput id="checkbox-input" label="Select All" checked />
 </Chapter>
 
 <Chapter description="An indeterminate Checkbox Input">
-  <CheckboxInput
-    id="checkbox-input"
-    label="Select All"
-    indeterminate
-    checked={state[1]}
-  />
+  <CheckboxInput id="checkbox-input" label="Select All" indeterminate checked />
 </Chapter>
 
 <Chapter description="A Checkbox Input on a dark background">
   <div class="w-fit bg-primary p-4">
-    <CheckboxInput
-      onDark
-      id="checkbox-input"
-      label="Select All"
-      checked={state[2]}
-    />
+    <CheckboxInput onDark id="checkbox-input" label="Select All" checked />
   </div>
 </Chapter>
 
@@ -33,22 +22,12 @@
   description="An indeterminate Checkbox Input on a dark background without a label"
 >
   <div class="w-fit bg-primary p-4">
-    <CheckboxInput
-      onDark
-      id="checkbox-input"
-      indeterminate
-      checked={state[3]}
-    />
+    <CheckboxInput onDark id="checkbox-input" indeterminate checked />
   </div>
 </Chapter>
 
 <Chapter description="A disabled Checkbox Input">
-  <CheckboxInput
-    id="checkbox-input"
-    label="Select All"
-    checked={state[4]}
-    disabled
-  />
+  <CheckboxInput id="checkbox-input" label="Select All" checked disabled />
 </Chapter>
 
 <Chapter description="A disabled indeterminate Checkbox Input">
@@ -56,7 +35,7 @@
     id="checkbox-input"
     label="Select All"
     indeterminate
-    checked={state[5]}
+    checked
     disabled
   />
 </Chapter>
@@ -68,7 +47,7 @@
       onDark
       id="checkbox-input"
       disabled
-      checked={state[6]}
+      checked
     />
   </div>
 </Chapter>
@@ -83,7 +62,7 @@
       id="checkbox-input"
       indeterminate
       disabled
-      checked={state[7]}
+      checked
     />
   </div>
 </Chapter>
