@@ -42,6 +42,12 @@
 >
 
 <Chapter
+  description="A button styled as a link"
+  component={Button}
+  props={{ variant: 'link' }}>Button</Chapter
+>
+
+<Chapter
   description="A button with an Icon"
   component={Button}
   props={{ icon: 'refresh', iconScale: 0.8 }}
