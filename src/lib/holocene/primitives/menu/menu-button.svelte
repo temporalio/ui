@@ -36,4 +36,8 @@
   button.dark > * {
     @apply bg-primary text-white;
   }
+
+  button.disabled {
+    @apply bg-gray-50 text-gray-600;
+  }
 </style>
