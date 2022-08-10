@@ -1,15 +1,4 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-  import colors from 'tailwindcss/colors';
-  import Icon from '$holocene/icon/index.svelte';
-  import Menu from '$holocene/primitives/menu/menu.svelte';
-  import Option, { isOption } from '$holocene/select/option.svelte';
-  import type { Option as OptionType } from '$holocene/select/option.svelte';
-  import MenuButton from '$holocene/primitives/menu/menu-button.svelte';
-  import MenuContainer from '$holocene/primitives/menu/menu-container.svelte';
-
-  let show = false;
-
   export let label = '';
   export let id: string;
   export let placeholder: string;
