@@ -6,6 +6,7 @@
   export let label = '&nbsp;';
   export let onDark = false;
   export let indeterminate = false;
+  export let disabled = false;
 
   const dispatch = createEventDispatcher();
 
@@ -14,7 +15,7 @@
   };
 </script>
 
-<label class="checkbox {$$props.class}" class:on-dark={onDark}>
+<label class="checkbox {$$props.class}" class:disabled class:on-dark={onDark}>
   {@html label}
   <input
     on:change={handleChange}
@@ -22,6 +23,7 @@
     type="checkbox"
     bind:checked
     {indeterminate}
+    {disabled}
     class:indeterminate
   />
   <span class="checkmark" class:on-dark={onDark}>
@@ -48,7 +50,7 @@
   }
 
   input {
-    @apply absolute h-0 w-0 opacity-0 opacity-0;
+    @apply absolute top-0 left-0 h-0 w-0 opacity-0;
   }
 
   .checkmark {
@@ -60,7 +62,7 @@
   }
 
   .dash {
-    @apply absolute top-[7px] left-1 h-0 w-2 rounded border border-white;
+    @apply absolute top-[7px] left-1 h-0 w-2 rounded border border-white bg-white;
   }
 
   .dash.on-dark {
@@ -70,5 +72,26 @@
   input:checked + .checkmark,
   input.indeterminate + .checkmark {
     @apply bg-primary text-white;
+  }
+
+  .checkbox.disabled,
+  .checkbox.disabled .checkmark {
+    @apply cursor-default;
+  }
+
+  .checkbox.disabled.on-dark {
+    @apply text-opacity-80;
+  }
+
+  .checkbox.disabled:not(.on-dark) .checkmark {
+    @apply bg-opacity-50;
+  }
+
+  .checkbox.disabled.on-dark .checkmark {
+    @apply border-opacity-80 text-opacity-80;
+  }
+
+  .checkbox.disabled.on-dark .checkmark .dash {
+    @apply opacity-80;
   }
 </style>
