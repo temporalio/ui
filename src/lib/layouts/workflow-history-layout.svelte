@@ -20,6 +20,7 @@
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
+  import { timeFormat } from '$lib/stores/time-format';
 
   const { namespace } = $page.params;
   const { workflow, workers } = $workflowRun;
@@ -50,11 +51,11 @@
     <div class="flex flex-col gap-1 md:flex-row md:gap-6">
       <WorkflowDetail
         title="Start Time"
-        content={formatDate(workflow.startTime, 'UTC')}
+        content={formatDate(workflow.startTime, $timeFormat)}
       />
       <WorkflowDetail
         title="Close Time"
-        content={formatDate(workflow.endTime, 'UTC')}
+        content={formatDate(workflow.endTime, $timeFormat)}
       />
     </div>
     <WorkflowDetail
