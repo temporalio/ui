@@ -309,6 +309,16 @@ const infoIcon = {
   ],
 };
 
+const invertedCheckMarkIcon: Icon = {
+  paths: [
+    {
+      d: 'M12 24C18.6274 24 24 18.6274 24 12C24 5.37258 18.6274 0 12 0C5.37258 0 0 5.37258 0 12C0 18.6274 5.37258 24 12 24ZM17.0156 9.78906C17.1562 9.64844 17.25 9.46094 17.25 9.25C17.25 8.82812 16.8984 8.5 16.5 8.5C16.2891 8.5 16.1016 8.59375 15.9609 8.73438L10.5 14.1953L8.01562 11.7344C7.875 11.5938 7.6875 11.5 7.5 11.5C7.07812 11.5 6.75 11.8281 6.75 12.25C6.75 12.4609 6.82031 12.6484 6.96094 12.7891L9.96094 15.7891C10.1016 15.9297 10.2891 16 10.5 16C10.6875 16 10.875 15.9297 11.0156 15.7891L17.0156 9.78906Z',
+      fill: 'currentcolor',
+      'fill-rule': 'evenodd',
+    },
+  ],
+};
+
 const jsonIcon = {
   paths: [
     {
@@ -556,6 +566,7 @@ export const icons: { [index: string]: Icon } = {
   globe: globeIcon,
   graph: graphIcon,
   info: infoIcon,
+  invertedCheckMark: invertedCheckMarkIcon,
   json: jsonIcon,
   lock: lockIcon,
   logout: logoutIcon,
