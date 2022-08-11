@@ -32,11 +32,11 @@
         @apply border-t border-gray-300 py-3 px-1;
 
         &:first-child {
-          @apply w-0 rounded-tl-lg border-l border-gray-300;
+          @apply w-[1px] rounded-tl-lg border-l border-gray-300;
         }
 
         &:last-child {
-          @apply w-0 rounded-tr-lg border-r border-gray-300;
+          @apply w-[1px] rounded-tr-lg border-r border-gray-300;
         }
       }
     }

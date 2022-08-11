@@ -3,9 +3,9 @@
   import { getQuery, getQueryTypes } from '$lib/services/query-service';
   import { workflowRun } from '$lib/stores/workflow-run';
 
-  import CodeBlock from '$lib/components/code-block.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Option from '$lib/components/select/option.svelte';
-  import EmptyState from '$lib/components/empty-state.svelte';
+  import EmptyState from '$lib/holocene/empty-state.svelte';
   import Select from '$lib/components/select/select.svelte';
   import Button from '$holocene/button.svelte';
   import PageTitle from '$lib/holocene/page-title.svelte';

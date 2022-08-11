@@ -4,7 +4,7 @@
   import { timeFormat } from '$lib/stores/time-format';
   import { formatDate } from '$lib/utilities/format-date';
 
-  import EmptyState from '$lib/components/empty-state.svelte';
+  import EmptyState from '$lib/holocene/empty-state.svelte';
   import type { GetPollersResponse } from '$lib/services/pollers-service';
 
   export let taskQueue: string;

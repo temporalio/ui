@@ -1,11 +1,12 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import Icon from '$lib/holocene/icon/index.svelte';
-  import Menu from '$lib/holocene/primatives/menu/menu.svelte';
-  import Option, { isOption } from '$lib/holocene/select/option.svelte';
-  import type { Option as OptionType } from '$lib/holocene/select/option.svelte';
-  import MenuButton from '../primatives/menu/menu-button.svelte';
-  import MenuContainer from '../primatives/menu/menu-container.svelte';
+  import colors from 'tailwindcss/colors';
+  import Icon from '$holocene/icon/index.svelte';
+  import Menu from '$holocene/primitives/menu/menu.svelte';
+  import Option, { isOption } from '$holocene/select/option.svelte';
+  import type { Option as OptionType } from '$holocene/select/option.svelte';
+  import MenuButton from '$holocene/primitives/menu/menu-button.svelte';
+  import MenuContainer from '$holocene/primitives/menu/menu-container.svelte';
 
   type T = $$Generic;
   let show = false;
@@ -16,6 +17,7 @@
   export let options: T[] | undefined = undefined;
   export let dark: boolean = false;
   export let placeholder = '';
+  export let disabled: boolean = false;
 
   let _value: OptionType['value'] | T;
   let _selected: string | T;
@@ -46,22 +48,28 @@
   {/if}
   <MenuContainer class="w-full">
     <MenuButton
-      class="select-input-container"
+      class="select-input-container {disabled ? 'disabled' : ''}"
       bind:show
       controls="{id}-menu"
       data-cy={$$props.dataCy}
       {dark}
+      {disabled}
     >
       <input
         class="select-input"
         class:dark
+        class:disabled
         {placeholder}
         value={_selected}
         name={id}
         disabled
         {id}
       />
-      <Icon stroke="currentcolor" name={show ? 'caretUp' : 'caretDown'} />
+      {#if disabled}
+        <Icon name="lock" stroke={colors.gray[600]} />
+      {:else}
+        <Icon stroke="currentcolor" name={show ? 'caretUp' : 'caretDown'} />
+      {/if}
     </MenuButton>
     <Menu id="{id}-menu" class="max-h-96 border-primary" {show} {dark}>
       {#if options}
@@ -100,5 +108,9 @@
 
   .select-input.dark {
     @apply bg-primary text-white placeholder:text-gray-200;
+  }
+
+  .select-input.disabled {
+    @apply bg-gray-50 placeholder:text-gray-600;
   }
 </style>

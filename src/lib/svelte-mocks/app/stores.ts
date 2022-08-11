@@ -20,6 +20,7 @@ const settings: Settings = {
     accessToken: '',
   },
   defaultNamespace: 'default',
+  disableWriteActions: false,
   showTemporalSystemNamespace: false,
   notifyOnNewVersion: true,
   feedbackURL: '',

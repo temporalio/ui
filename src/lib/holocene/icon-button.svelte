@@ -7,9 +7,10 @@
   export let scale = 1;
   export let stroke = 'white';
   export let classes: string = '';
+  export let type = 'button';
 </script>
 
-<button class="icon-button" on:click data-cy={$$props.dataCy}>
+<button class="icon-button" on:click data-cy={$$props.dataCy} {type}>
   {#if icon}
     <div class="flex items-center justify-center gap-2 {classes}">
       <Icon class="h-4" {stroke} name={icon} {scale} />

@@ -1,11 +1,15 @@
 <script lang="ts">
+  import colors from 'tailwindcss/colors';
   import Icon from '$lib/holocene/icon/index.svelte';
   import type { IconName } from './icon/paths';
   export let title: string;
   export let subtitle: string = '';
   export let icon: IconName | undefined = undefined;
-
   export let open: boolean = false;
+  export let disabled: boolean = false;
+  export let readOnly: boolean = false;
+
+  $: open = disabled ? true : open;
 </script>
 
 <section
@@ -13,20 +17,26 @@
 >
   <div class="w-full">
     <div
-      class="accordion-open flex cursor-pointer flex-col"
+      class="accordion-open flex {!readOnly ? 'cursor-pointer' : ''} flex-col"
       class:open
-      on:click={() => (open = !open)}
+      class:disabled
+      on:click={() => {
+        if (disabled || readOnly) return;
+        open = !open;
+      }}
     >
       <div class="space-between flex flex-row">
         <h2 class="flex w-full items-center gap-2 text-lg font-medium">
           {#if icon}<Icon scale={1.25} name={icon} />{/if}
           {title}
         </h2>
-        <Icon
-          name={open ? 'caretUp' : 'caretDown'}
-          stroke="currentcolor"
-          scale={1.4}
-        />
+        {#if !readOnly}
+          <Icon
+            name={open ? 'caretUp' : 'caretDown'}
+            stroke={disabled ? colors.gray[500] : 'currentcolor'}
+            scale={1.4}
+          />
+        {/if}
       </div>
       <h3>{subtitle}</h3>
     </div>
@@ -41,5 +51,9 @@
 <style lang="postcss">
   .open {
     @apply mb-8;
+  }
+
+  .disabled {
+    @apply cursor-default;
   }
 </style>

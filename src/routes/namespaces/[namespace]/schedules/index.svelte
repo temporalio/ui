@@ -1,5 +1,5 @@
 <script lang="ts">
-  import EmptyState from '$lib/components/empty-state.svelte';
+  import EmptyState from '$lib/holocene/empty-state.svelte';
   import Pagination from '$holocene/pagination.svelte';
   import Button from '$holocene/button.svelte';
   import Badge from '$holocene/badge.svelte';

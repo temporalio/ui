@@ -14,8 +14,8 @@
     shouldDisplayAsPlainText,
   } from '$lib/utilities/get-single-attribute-for-event';
 
-  import CodeBlock from '../code-block.svelte';
-  import Link from '../link.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import Copyable from '../copyable.svelte';
 
   export let key: string;

@@ -6,9 +6,9 @@
   import { timeFormat } from '$lib/stores/time-format';
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-  import EmptyState from '../empty-state.svelte';
+  import EmptyState from '$lib/holocene/empty-state.svelte';
   import { routeForWorkflow } from '$lib/utilities/route-for';
-  import Link from '../link.svelte';
+  import Link from '$lib/holocene/link.svelte';
 
   export let recentRuns: ScheduleActionResult[] = [];
   export let namespace: string;

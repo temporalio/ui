@@ -37,7 +37,7 @@
     @apply bg-primary text-white;
   }
 
-  button:disabled {
-    @apply cursor-not-allowed;
+  button.disabled {
+    @apply bg-gray-50 text-gray-600;
   }
 </style>

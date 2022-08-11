@@ -60,8 +60,8 @@
   import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
   import WorkflowFilters from './_workflow-filters.svelte';
   import Pagination from '$holocene/pagination.svelte';
-  import EmptyState from '$lib/components/empty-state.svelte';
-  import CodeBlock from '$lib/components/code-block.svelte';
+  import EmptyState from '$lib/holocene/empty-state.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
   import { timeFormat } from '$lib/stores/time-format';
   import PageTitle from '$lib/holocene/page-title.svelte';
   import { page } from '$app/stores';

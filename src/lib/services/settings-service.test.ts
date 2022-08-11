@@ -11,7 +11,7 @@ describe('isCloudMatch', () => {
   });
 
   it('should return false for non Temporal domains', () => {
-    expect(isCloudMatch.test(undefined)).toBe(false);
+    expect(isCloudMatch.test(undefined as unknown as string)).toBe(false);
     expect(isCloudMatch.test('xxx.xxx')).toBe(false);
     expect(isCloudMatch.test('localhost:3000')).toBe(false);
   });

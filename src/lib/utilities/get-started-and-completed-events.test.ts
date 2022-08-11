@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { getWorkflowStartedAndCompletedEvents } from './get-started-and-completed-events';
 
+import completedEventHistory from '$fixtures/events.completed.json';
+import canceledEventHistory from '$fixtures/events.canceled.json';
+import failedEventHistory from '$fixtures/events.failed.json';
+import runningEventHistory from '$fixtures/events.running.json';
+import terminatedEventHistory from '$fixtures/events.terminated.json';
+import timedOutEventHistory from '$fixtures/events.timed-out.json';
+
 describe('getWorkflowStartedAndCompletedEvents', () => {
   it('should return null if the input is null', () => {
     const workflowStartedEvent = {
@@ -106,5 +113,141 @@ describe('getWorkflowStartedAndCompletedEvents', () => {
     expect(
       getWorkflowStartedAndCompletedEvents([workflowStartedEvent]).input,
     ).toBe('null');
+  });
+
+  it('should get the correct input for a completed event history', () => {
+    const { input } = getWorkflowStartedAndCompletedEvents(
+      completedEventHistory,
+    );
+    expect(input).toMatchInlineSnapshot(
+      '"[\\"1656707328774263000\\",\\"canary\\"]"',
+    );
+  });
+
+  it('should get the correct result for a completed event history', () => {
+    const { results } = getWorkflowStartedAndCompletedEvents(
+      completedEventHistory,
+    );
+    expect(results).toMatchInlineSnapshot('"null"');
+  });
+
+  it('should get the correct input for a cancelled event history', () => {
+    const { input } =
+      getWorkflowStartedAndCompletedEvents(canceledEventHistory);
+    expect(input).toMatchInlineSnapshot('"[1656706850149404400,480000000000]"');
+  });
+
+  it('should get the correct result for a cancelled event history', () => {
+    const { results } =
+      getWorkflowStartedAndCompletedEvents(canceledEventHistory);
+    expect(results).toMatchInlineSnapshot(
+      '"{\\"type\\":\\"workflowExecutionCanceledEventAttributes\\",\\"workflowTaskCompletedEventId\\":\\"11\\",\\"details\\":null}"',
+    );
+  });
+
+  it('should get the correct input for a failed event history', () => {
+    const { input } = getWorkflowStartedAndCompletedEvents(failedEventHistory);
+    expect(input).toMatchInlineSnapshot('"[1656706968987842000]"');
+  });
+
+  it('should get the correct result for a failed event history', () => {
+    const { results } =
+      getWorkflowStartedAndCompletedEvents(failedEventHistory);
+    expect(results).toMatchInlineSnapshot(
+      '"{\\"type\\":\\"workflowExecutionFailedEventAttributes\\",\\"failure\\":{\\"message\\":\\"failing on attempt 2\\",\\"source\\":\\"GoSDK\\",\\"stackTrace\\":\\"\\",\\"cause\\":null,\\"applicationFailureInfo\\":{\\"type\\":\\"\\",\\"nonRetryable\\":false,\\"details\\":null}},\\"retryState\\":\\"InProgress\\",\\"workflowTaskCompletedEventId\\":\\"4\\",\\"newExecutionRunId\\":\\"15e13ed4-880a-4557-96c6-0116e3d07b8d\\"}"',
+    );
+  });
+
+  it('should get the correct input for a running event history', () => {
+    const { input } = getWorkflowStartedAndCompletedEvents(runningEventHistory);
+    expect(input).toMatchInlineSnapshot('"[1656707029044596700,\\"canary\\"]"');
+  });
+
+  it('should get the correct result for a running event history', () => {
+    const { results } =
+      getWorkflowStartedAndCompletedEvents(runningEventHistory);
+    expect(results).toMatchInlineSnapshot('undefined');
+  });
+
+  it('should get the correct input for a terminated event history', () => {
+    const { input } = getWorkflowStartedAndCompletedEvents(
+      terminatedEventHistory,
+    );
+    expect(input).toMatchInlineSnapshot(
+      '"[1656706488881881600,\\"temporal.fixture.terminated.workflow.id\\",\\"3cbbf515-36da-43b9-a1f3-18a7ec031ddd\\",\\"canary\\"]"',
+    );
+  });
+
+  it('should get the correct result for a terminated event history', () => {
+    const { results } = getWorkflowStartedAndCompletedEvents(
+      terminatedEventHistory,
+    );
+    expect(results).toMatchInlineSnapshot(
+      '"{\\"type\\":\\"workflowExecutionTerminatedEventAttributes\\",\\"reason\\":\\"reset canary\\",\\"details\\":null,\\"identity\\":\\"history-service\\"}"',
+    );
+  });
+
+  it('should get the correct input for a timedOut event history', () => {
+    const { input } =
+      getWorkflowStartedAndCompletedEvents(timedOutEventHistory);
+    expect(input).toMatchInlineSnapshot('"[1656683778738403300,\\"canary\\"]"');
+  });
+
+  it('should get the correct result for a timedOut event history', () => {
+    const { results } =
+      getWorkflowStartedAndCompletedEvents(timedOutEventHistory);
+    expect(results).toMatchInlineSnapshot(
+      '"{\\"type\\":\\"workflowExecutionTimedOutEventAttributes\\",\\"retryState\\":\\"RetryPolicyNotSet\\",\\"newExecutionRunId\\":\\"\\"}"',
+    );
+  });
+
+  it('should work as expected with a WorkflowCompletedEvent with a null result', () => {
+    const history = [
+      {
+        eventId: '11',
+        eventTime: '2022-04-11T12:59:24.614591797Z',
+        eventType: 'WorkflowExecutionCompleted',
+        version: '0',
+        taskId: '1048745',
+        workflowExecutionCompletedEventAttributes: {
+          result: null,
+          workflowTaskCompletedEventId: '10',
+          newExecutionRunId: '',
+        },
+        attributes: {
+          result: null,
+          workflowTaskCompletedEventId: '10',
+          newExecutionRunId: '',
+        },
+      },
+    ];
+
+    const { results } = getWorkflowStartedAndCompletedEvents(history);
+    expect(results).toBe('null');
+  });
+
+  it('should work as expected with a WorkflowCompletedEvent with a payloads', () => {
+    const history = [
+      {
+        eventId: '11',
+        eventTime: '2022-04-11T12:59:24.614591797Z',
+        eventType: 'WorkflowExecutionCompleted',
+        version: '0',
+        taskId: '1048745',
+        workflowExecutionCompletedEventAttributes: {
+          result: { payloads: 'result' },
+          workflowTaskCompletedEventId: '10',
+          newExecutionRunId: '',
+        },
+        attributes: {
+          result: { payloads: 'result' },
+          workflowTaskCompletedEventId: '10',
+          newExecutionRunId: '',
+        },
+      },
+    ];
+
+    const { results } = getWorkflowStartedAndCompletedEvents(history);
+    expect(results).toBe('"result"');
   });
 });

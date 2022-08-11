@@ -7,6 +7,7 @@ import {
   getEventCategory,
   getEventsInCategory,
   isCategoryType,
+  timelineEventTypeOptions,
 } from './get-event-categorization';
 
 describe('Event Category Data Structures', () => {
@@ -260,5 +261,42 @@ describe('isCategoryType', () => {
 
   it('should return false for "bogus"', () => {
     expect(isCategoryType('bogus')).toBe(false);
+  });
+});
+
+describe('timelineEventTypeOptions', () => {
+  it('should match return valid timeline event types', () => {
+    expect(timelineEventTypeOptions).toEqual([
+      {
+        color: '#8B5CF6',
+        label: 'Activity',
+        option: 'activity',
+      },
+      {
+        color: '#F59E0B',
+        label: 'Child Workflow',
+        option: 'child-workflow',
+      },
+      {
+        color: '#10B981',
+        label: 'Command',
+        option: 'command',
+      },
+      {
+        color: '#EC4899',
+        label: 'Marker',
+        option: 'marker',
+      },
+      {
+        color: '#DD6B20',
+        label: 'Signal',
+        option: 'signal',
+      },
+      {
+        color: '#1D4ED8',
+        label: 'Timer',
+        option: 'timer',
+      },
+    ]);
   });
 });

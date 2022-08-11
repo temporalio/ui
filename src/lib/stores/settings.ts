@@ -11,6 +11,7 @@ export const settings = writable<Settings>({
     accessToken: '',
   },
   defaultNamespace: null,
+  disableWriteActions: false,
   showTemporalSystemNamespace: false,
   notifyOnNewVersion: false,
   feedbackURL: '',

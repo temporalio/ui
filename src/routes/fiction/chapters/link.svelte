@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Link from '$lib/components/link.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import Chapter from '../_chapter.svelte';
 </script>
 

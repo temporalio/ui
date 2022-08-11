@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { handleError } from '$lib/utilities/handle-error';
-  import { terminateWorkflow } from '$lib/services/terminate-service';
+  import { tick } from 'svelte';
+  import { refresh } from '$lib/stores/workflow-run';
   import { notifications } from '$lib/stores/notifications';
+  import { terminateWorkflow } from '$lib/services/terminate-service';
+  import { handleError } from '$lib/utilities/handle-error';
 
   import Button from '$holocene/button.svelte';
-  import Modal from '$lib/components/modal.svelte';
-  import { refresh } from '$lib/stores/workflow-run';
-  import { tick } from 'svelte';
+  import Modal from '$holocene/modal.svelte';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
@@ -17,9 +17,6 @@
   const show = () => (showConfirmation = true);
   const cancel = () => (showConfirmation = false);
 
-  const isEligibleForTermination = (workflow: WorkflowExecution) =>
-    String(workflow.status) === 'Running';
-
   const handleSuccessfulTermination = async () => {
     showConfirmation = false;
     reason = '';
@@ -29,6 +26,7 @@
   };
 
   const terminate = () => {
+    if (!workflow.canBeTerminated) return;
     terminateWorkflow({
       workflow,
       namespace,
@@ -39,8 +37,10 @@
   };
 </script>
 
-{#if isEligibleForTermination(workflow)}
-  <Button variant="destructive" on:click={show}>Terminate</Button>
+{#if workflow.canBeTerminated}
+  <Button variant="destructive" on:click={show} dataCy="terminate-button">
+    Terminate
+  </Button>
   <Modal
     open={showConfirmation}
     confirmText="Terminate"

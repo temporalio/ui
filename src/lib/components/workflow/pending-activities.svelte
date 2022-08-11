@@ -8,10 +8,10 @@
     formatDuration,
   } from '$lib/utilities/format-date';
   import { routeForPendingActivities } from '$lib/utilities/route-for';
-  import Link from '$lib/components/link.svelte';
+  import Link from '$lib/holocene/link.svelte';
   import Icon from '$holocene/icon/index.svelte';
   import Badge from '$holocene/badge.svelte';
-  import CodeBlock from '$lib/components/code-block.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
   import {
     formatAttemptsLeft,
     formatRetryExpiration,

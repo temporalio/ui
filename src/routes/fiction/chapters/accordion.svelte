@@ -1,7 +1,7 @@
 <script lang="ts">
   import Chapter from '../_chapter.svelte';
   import Accordion from '$holocene/accordion.svelte';
-  import CodeBlock from '$lib/components/code-block.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Table from '$holocene/table/table.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
@@ -36,5 +36,26 @@
 <Chapter description="An Accordion with a CodeBlock">
   <Accordion title="Certificates" subtitle="Expires on Wed Feb 01, 2030">
     <CodeBlock content={JSON.stringify({ some: 'thing', blue: 42 })} />
+  </Accordion>
+</Chapter>
+
+<Chapter description="A disabled Accordion">
+  <Accordion
+    disabled
+    title="Certificates"
+    subtitle="Expires on Wed Feb 01, 2030"
+  >
+    <p>Accordion content here.</p>
+  </Accordion>
+</Chapter>
+
+<Chapter description="A readOnly Accordion">
+  <Accordion
+    readOnly
+    open
+    title="Certificates"
+    subtitle="Expires on Wed Feb 01, 2030"
+  >
+    <p>Accordion content here.</p>
   </Accordion>
 </Chapter>

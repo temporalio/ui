@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import CodeBlock from '$lib/components/code-block.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Loading from '$holocene/loading.svelte';
   import { fetchRawEvents } from '$lib/services/events-service';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';

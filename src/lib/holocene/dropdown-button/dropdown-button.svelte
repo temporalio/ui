@@ -1,9 +1,9 @@
 <script lang="ts">
   import Icon from '$holocene/icon/index.svelte';
   import type { IconName } from '$holocene/icon/paths';
-  import MenuContainer from '$holocene/primatives/menu/menu-container.svelte';
-  import MenuButton from '$holocene/primatives/menu/menu-button.svelte';
-  import Menu from '$holocene/primatives/menu/menu.svelte';
+  import MenuContainer from '$holocene/primitives/menu/menu-container.svelte';
+  import MenuButton from '$holocene/primitives/menu/menu-button.svelte';
+  import Menu from '$holocene/primitives/menu/menu.svelte';
 
   export let label: string;
   export let id: string;
@@ -16,7 +16,7 @@
 <MenuContainer class={$$props.class}>
   <MenuButton
     bind:show
-    class="flex flex-row items-center rounded border border-gray-300 bg-white py-4"
+    class="flex flex-row items-center rounded-lg border border-gray-300 bg-white py-2"
     controls={id}
     disabled={readonly}
   >
@@ -38,7 +38,7 @@
       </div>
     {/if}
   </MenuButton>
-  <Menu {id} class="flex flex-col items-start gap-4 border-gray-300 p-4" {show}>
+  <Menu class="min-w-max" {id} {show}>
     <slot />
   </Menu>
 </MenuContainer>

@@ -6,7 +6,7 @@
 
   import { getAppContext } from '$lib/utilities/get-context';
 
-  export let icon: IconName;
+  export let icon: IconName = null;
   export let group = getAppContext('group');
   export let scale = 1;
   export let href = '#';
