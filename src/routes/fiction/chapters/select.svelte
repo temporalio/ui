@@ -53,16 +53,16 @@
     },
   ];
 
-  const favoriteDrink = writable<OptionType>();
-  const favoriteFood = writable<OptionType>(foodOptions[0]);
-  const favoriteAnimal = writable<OptionType>(animalOptions[2]);
-  const favoriteNumber = writable<OptionType>();
-  const favoriteLetter = writable<string>();
+  const favoriteDrink = writable<OptionType<string>>();
+  const favoriteFood = writable<OptionType<string>>(foodOptions[0]);
+  const favoriteAnimal = writable<OptionType<string>>(animalOptions[2]);
+  const favoriteNumber = writable<OptionType<number>>();
 </script>
 
 <Chapter description="A select dropdown">
   <Select
     label="Favorite Drink"
+    placeholder="Favorite Drink"
     id="favorite-drink"
     options={drinkOptions}
     value={$favoriteDrink}
@@ -106,18 +106,6 @@
       .fill(undefined)
       .map((_, i) => ({ label: `Number ${i}`, value: i }))}
   />
-</Chapter>
-
-<Chapter description="A select dropdown with string values only">
-  <Select label="Favorite Letter" id="favorite letter" value={$favoriteLetter}>
-    {#each 'abcdefghijklmnop'.split('') as option}
-      <Option
-        on:select={(event) => favoriteLetter.set(event.detail.value)}
-        value={option}
-        selected={option === $favoriteLetter}
-      />
-    {/each}
-  </Select>
 </Chapter>
 
 <Chapter description="A disabled select dropdown">

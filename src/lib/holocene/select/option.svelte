@@ -9,10 +9,6 @@
     label: '',
     value: '',
   };
-
-  export const isOption = (x: unknown): x is OptionType<unknown> => {
-    return x.hasOwnProperty('label') && x.hasOwnProperty('value');
-  };
 </script>
 
 <script lang="ts">
@@ -22,23 +18,15 @@
 
   type T = $$Generic;
 
-  export let value: T;
+  export let value: OptionType<T>;
   export let selected: boolean;
   export let dark: boolean = false;
 
-  const dispatch = createEventDispatcher<{ select: { value: T } }>();
+  const dispatch =
+    createEventDispatcher<{ select: { value: OptionType<T> } }>();
 
   function handleOptionClick() {
     dispatch('select', { value });
-  }
-
-  let label: string | T;
-  let description: string | undefined;
-
-  if (isOption(value)) {
-    ({ label, description } = value);
-  } else {
-    label = value;
   }
 </script>
 
@@ -57,11 +45,11 @@
     {#if $$slots.default}
       <slot />
     {:else}
-      <span class="option-label">{label}</span>
+      <span class="option-label">{value.label}</span>
     {/if}
-    {#if description}
+    {#if value.description}
       <span class="option-description">
-        {description}
+        {value.description}
       </span>
     {/if}
   </div>
