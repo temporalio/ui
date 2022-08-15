@@ -65,7 +65,6 @@
     class:thin
     data-cy={dataCy}
     {target}
-    {disabled}
   >
     {#if icon || loading}
       <span class:animate-spin={loading}>
@@ -96,6 +95,10 @@
 
   .button:disabled {
     @apply cursor-not-allowed;
+  }
+
+  a.disabled {
+    @apply pointer-events-none opacity-50 hover:border-gray-800 hover:bg-white hover:text-gray-800;
   }
 
   .large {
