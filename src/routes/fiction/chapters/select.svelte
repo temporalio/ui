@@ -3,7 +3,7 @@
   import Chapter from '../_chapter.svelte';
   import Select from '$lib/holocene/select/select.svelte';
   import Option from '$lib/holocene/select/option.svelte';
-  import type { Option as OptionType } from '$lib/holocene/select/option.svelte';
+  import type { OptionType } from '$lib/holocene/select/option.svelte';
 
   const foodOptions = [
     {
