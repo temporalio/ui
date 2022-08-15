@@ -55,7 +55,7 @@
         <Icon stroke="currentcolor" name={show ? 'caretUp' : 'caretDown'} />
       {/if}
     </MenuButton>
-    <Menu id="{id}-menu" class="max-h-96 border-primary" {show} {dark}>
+    <Menu id="{id}-menu" class="h-auto max-h-80 min-w-fit" {show} {dark}>
       {#if options}
         {#each options as option}
           <Option

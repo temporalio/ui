@@ -117,3 +117,18 @@
     disabled
   />
 </Chapter>
+
+<Chapter description="A select dropdown with wider options">
+  <Select
+    class="w-80"
+    value={null}
+    id="wide-options"
+    placeholder="Select an option..."
+    options={new Array(3).fill(undefined).map((_, i) => ({
+      label: 'Lorem ipsum dolor sit amet consectetur adipisicing elit.',
+      value: i,
+      description:
+        'Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae vero accusamus aliquid corrupti odio dignissimos rerum voluptas dolore! Enim nesciunt nobis unde hic itaque fugiat ipsam tempora, inventore beatae maxime?',
+    }))}
+  />
+</Chapter>
