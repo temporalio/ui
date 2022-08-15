@@ -42,6 +42,13 @@
 >
 
 <Chapter
+  description="A disabled button as an anchor"
+  component={Button}
+  props={{ href: 'https://temporal.io', as: 'anchor', disabled: true }}
+  >Link</Chapter
+>
+
+<Chapter
   description="A button styled as a link"
   component={Button}
   props={{ variant: 'link' }}>Button</Chapter
