@@ -57,7 +57,7 @@
 
 <style lang="postcss">
   .option-label {
-    @apply flex font-secondary text-sm font-medium whitespace-nowrap;
+    @apply flex whitespace-nowrap font-secondary text-sm font-medium;
   }
 
   .option-description {
