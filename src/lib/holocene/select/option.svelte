@@ -1,16 +1,16 @@
 <script lang="ts" context="module">
-  export interface Option {
+  export interface OptionType<T> {
     label: string;
-    value: string | boolean | number;
+    value: T;
     description?: string;
   }
 
-  export const EMPTY_OPTION: Option = {
+  export const EMPTY_OPTION: OptionType<string> = {
     label: '',
     value: '',
   };
 
-  export const isOption = (x: unknown): x is Option => {
+  export const isOption = (x: unknown): x is OptionType<unknown> => {
     return x.hasOwnProperty('label') && x.hasOwnProperty('value');
   };
 </script>
