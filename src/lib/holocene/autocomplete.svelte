@@ -1,4 +1,6 @@
 <script lang="ts">
+  import Menu from './primitives/menu/menu.svelte';
+  import MenuItem from './primitives/menu/menu-item.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
   import { clickOutside } from '$lib/holocene/outside-click';
   import Input from '$lib/holocene/input/input.svelte';
@@ -29,7 +31,7 @@
 >
   <Input
     {id}
-    {value}
+    bind:value
     {icon}
     {label}
     {placeholder}
@@ -40,34 +42,25 @@
     on:focus={() => (show = true)}
   />
   {#if show}
-    <div class="option-container">
+    <Menu class="h-auto max-h-80" {show} id="{id}-menu">
       {#each filteredOptions as option}
-        <div
-          class="option"
-          on:click|preventDefault|stopPropagation={() => {
+        <MenuItem
+          on:click={() => {
             onOptionClick(option);
             show = false;
           }}
         >
           {option}
-        </div>
+        </MenuItem>
       {:else}
-        <div class="option" on:click|preventDefault|stopPropagation={noop}>
-          No Results
-        </div>
+        <MenuItem on:click={noop}>No Results</MenuItem>
       {/each}
-    </div>
+    </Menu>
   {/if}
 </div>
 
 <style lang="postcss">
   .autocomplete-container {
     @apply relative;
-  }
-  .option-container {
-    @apply absolute z-50 h-auto max-h-80 overflow-auto rounded-lg border-2 bg-white;
-  }
-  .option {
-    @apply cursor-pointer p-2 hover:bg-blue-600 hover:text-white;
   }
 </style>

@@ -3,8 +3,8 @@
   import colors from 'tailwindcss/colors';
   import Icon from '$holocene/icon/index.svelte';
   import Menu from '$holocene/primitives/menu/menu.svelte';
-  import Option, { isOption } from '$holocene/select/option.svelte';
-  import type { Option as OptionType } from '$holocene/select/option.svelte';
+  import Option from '$holocene/select/option.svelte';
+  import type { OptionType } from '$holocene/select/option.svelte';
   import MenuButton from '$holocene/primitives/menu/menu-button.svelte';
   import MenuContainer from '$holocene/primitives/menu/menu-container.svelte';
 
@@ -13,31 +13,15 @@
 
   export let label = '';
   export let id: string;
-  export let value: T;
-  export let options: T[] | undefined = undefined;
+  export let value: OptionType<T>;
+  export let options: OptionType<T>[] | undefined = undefined;
   export let dark: boolean = false;
   export let placeholder = '';
   export let disabled: boolean = false;
 
-  let _value: OptionType['value'] | T;
-  let _selected: string | T;
-  $: {
-    if (value) {
-      if (isOption(value)) {
-        _value = value.value;
-        _selected = value.label;
-      } else {
-        _value = value;
-        _selected = value;
-      }
-    } else {
-      _selected = '';
-    }
-  }
+  const dispatch = createEventDispatcher<{ select: { value: typeof value } }>();
 
-  const dispatch = createEventDispatcher<{ select: { value: T } }>();
-
-  function handleOptionClick(event: CustomEvent<{ value: T }>) {
+  function handleOptionClick(event: CustomEvent<{ value: typeof value }>) {
     dispatch('select', { value: event.detail.value });
   }
 </script>
@@ -60,7 +44,7 @@
         class:dark
         class:disabled
         {placeholder}
-        value={_selected}
+        value={value?.label ?? ''}
         name={id}
         disabled
         {id}
@@ -71,13 +55,12 @@
         <Icon stroke="currentcolor" name={show ? 'caretUp' : 'caretDown'} />
       {/if}
     </MenuButton>
-    <Menu id="{id}-menu" class="max-h-96 border-primary" {show} {dark}>
+    <Menu id="{id}-menu" class="h-auto max-h-80 min-w-fit" {show} {dark}>
       {#if options}
         {#each options as option}
-          {@const value = isOption(option) ? option.value : _value}
           <Option
             on:select={handleOptionClick}
-            selected={value === _value}
+            selected={value === option}
             value={option}
             {dark}
           />

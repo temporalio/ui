@@ -1,17 +1,13 @@
 <script lang="ts" context="module">
-  export interface Option {
+  export interface OptionType<T> {
     label: string;
-    value: string | boolean | number;
+    value: T;
     description?: string;
   }
 
-  export const EMPTY_OPTION: Option = {
+  export const EMPTY_OPTION: OptionType<string> = {
     label: '',
     value: '',
-  };
-
-  export const isOption = (x: unknown): x is Option => {
-    return x.hasOwnProperty('label') && x.hasOwnProperty('value');
   };
 </script>
 
@@ -22,23 +18,15 @@
 
   type T = $$Generic;
 
-  export let value: T;
+  export let value: OptionType<T>;
   export let selected: boolean;
   export let dark: boolean = false;
 
-  const dispatch = createEventDispatcher<{ select: { value: T } }>();
+  const dispatch =
+    createEventDispatcher<{ select: { value: OptionType<T> } }>();
 
   function handleOptionClick() {
     dispatch('select', { value });
-  }
-
-  let label: string | T;
-  let description: string | undefined;
-
-  if (isOption(value)) {
-    ({ label, description } = value);
-  } else {
-    label = value;
   }
 </script>
 
@@ -57,11 +45,11 @@
     {#if $$slots.default}
       <slot />
     {:else}
-      <span class="option-label">{label}</span>
+      <span class="option-label">{value.label}</span>
     {/if}
-    {#if description}
+    {#if value.description}
       <span class="option-description">
-        {description}
+        {value.description}
       </span>
     {/if}
   </div>
@@ -69,7 +57,7 @@
 
 <style lang="postcss">
   .option-label {
-    @apply flex font-secondary text-sm font-medium;
+    @apply flex whitespace-nowrap font-secondary text-sm font-medium;
   }
 
   .option-description {
