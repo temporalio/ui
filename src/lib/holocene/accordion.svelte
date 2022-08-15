@@ -40,11 +40,9 @@
       </div>
       <h3>{subtitle}</h3>
     </div>
-    {#if open}
-      <div class="w-full">
-        <slot />
-      </div>
-    {/if}
+    <div class="hidden w-full" class:content={open}>
+      <slot />
+    </div>
   </div>
 </section>
 
@@ -53,6 +51,9 @@
     @apply mb-8;
   }
 
+  .content {
+    @apply block;
+  }
   .disabled {
     @apply cursor-default;
   }

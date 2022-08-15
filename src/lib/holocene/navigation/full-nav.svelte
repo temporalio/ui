@@ -85,6 +85,7 @@
         <div class="nav-title">Namespaces</div>
       </NavRow>
     </IsCloudGuard>
+    <slot name="usage" />
     <IsCloudGuard {isCloud}>
       <NavRow link={linkList.archive} {isCloud} data-cy="archive-button">
         <Tooltip right hide={$navOpen} text="Archive">
@@ -117,6 +118,7 @@
       </Tooltip>
       <div class="nav-title">Feedback</div>
     </NavRow>
+    <slot name="settings" />
     {#await user}
       <NavRow {isCloud}>
         <div class="motion-safe:animate-pulse" style="margin-left:1rem">
