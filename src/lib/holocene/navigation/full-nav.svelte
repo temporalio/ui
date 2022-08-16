@@ -11,13 +11,13 @@
   import FeatureTag from '$lib/holocene/feature-tag.svelte';
   import type { DescribeNamespaceResponse as Namespace } from '$types';
 
-  import { navOpen, namespaceSelectorOpen } from '$lib/stores/nav-open';
+  import { namespaceSelectorOpen } from '$lib/stores/nav-open';
 
   import NavContainer from '$lib/holocene/navigation/_nav-container.svelte';
   import NavRow from '$lib/holocene/navigation/_nav-row.svelte';
   import NamespaceList from '$lib/components/namespace-list.svelte';
   import Drawer from '$lib/holocene/navigation/_drawer.svelte';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
+  import NavTooltip from '$lib/holocene/nav-tooltip.svelte';
   import IsCloudGuard from '$lib/components/is-cloud-guard.svelte';
 
   import { afterNavigate } from '$app/navigation';
@@ -48,11 +48,11 @@
 <NavContainer {isCloud} {linkList}>
   <svelte:fragment slot="top">
     <NavRow link={linkList.workflows} {isCloud} data-cy="workflows-button">
-      <Tooltip right hide={$navOpen} text="Workflows">
+      <NavTooltip right text="Workflows">
         <div class="nav-icon">
           <Icon name="workflow" scale={1.5} />
         </div>
-      </Tooltip>
+      </NavTooltip>
       <div class="nav-title">Workflows</div>
     </NavRow>
     <IsCloudGuard {isCloud}>
@@ -65,34 +65,34 @@
           data-cy="schedules-button"
           on:click={() => viewFeature('schedules')}
         >
-          <Tooltip right hide={$navOpen} text="Schedules">
+          <NavTooltip right text="Schedules">
             <div class="nav-icon">
               <Icon name="calendarPlus" scale={1} />
               <FeatureTag feature="schedules" alpha />
             </div>
-          </Tooltip>
+          </NavTooltip>
           <div class="nav-title">Schedules</div>
         </NavRow>
       </FeatureGuard>
     </IsCloudGuard>
     <IsCloudGuard>
       <NavRow link={linkList.namespaces} {isCloud} data-cy="namespaces-button">
-        <Tooltip right hide={$navOpen} text="Namespaces">
+        <NavTooltip right text="Namespaces">
           <div class="nav-icon">
             <Icon name="namespace" scale={1.5} />
           </div>
-        </Tooltip>
+        </NavTooltip>
         <div class="nav-title">Namespaces</div>
       </NavRow>
     </IsCloudGuard>
     <slot name="usage" />
     <IsCloudGuard {isCloud}>
       <NavRow link={linkList.archive} {isCloud} data-cy="archive-button">
-        <Tooltip right hide={$navOpen} text="Archive">
+        <NavTooltip right text="Archive">
           <div class="nav-icon">
             <Icon name="archive" scale={1.2} />
           </div>
-        </Tooltip>
+        </NavTooltip>
         <div class="nav-title">Archive</div>
       </NavRow>
     </IsCloudGuard>
@@ -111,11 +111,11 @@
       {/each}
     {/if}
     <NavRow link={linkList.feedback} {isCloud} externalLink>
-      <Tooltip right hide={$navOpen} text="Feedback">
+      <NavTooltip right text="Feedback">
         <div class="nav-icon">
           <Icon name="feedback" scale={1.4} />
         </div>
-      </Tooltip>
+      </NavTooltip>
       <div class="nav-title">Feedback</div>
     </NavRow>
     <slot name="settings" />
@@ -131,11 +131,11 @@
     {:then user}
       {#if user?.email}
         <NavRow {isCloud} on:click={logout}>
-          <Tooltip right hide={$navOpen} text="Logout">
+          <NavTooltip right text="Logout">
             <div class="nav-icon">
               <Icon name="logout" scale={1.4} />
             </div>
-          </Tooltip>
+          </NavTooltip>
           <div class="nav-title cursor-pointer">Logout</div>
         </NavRow>
         <div class="profile-row">
