@@ -37,6 +37,11 @@
     chips = [...chips, ...clipboardContents.split(',')];
   };
 
+  const handleBlur = () => {
+    chips = [...chips, displayValue];
+    displayValue = '';
+  };
+
   const removeChip = (index: number) => {
     chips.splice(index, 1);
     chips = chips;
@@ -67,6 +72,7 @@
       {required}
       multiple
       bind:value={displayValue}
+      on:blur={handleBlur}
       on:keydown={handleKeydown}
       on:paste={handlePaste}
     />
