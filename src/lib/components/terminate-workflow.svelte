@@ -3,7 +3,6 @@
   import { refresh } from '$lib/stores/workflow-run';
   import { notifications } from '$lib/stores/notifications';
   import { terminateWorkflow } from '$lib/services/terminate-service';
-  import { handleError } from '$lib/utilities/handle-error';
 
   import Button from '$holocene/button.svelte';
   import Modal from '$holocene/modal.svelte';
@@ -25,6 +24,12 @@
     notifications.add('success', 'Workflow Terminated');
   };
 
+  const handleTerminationError = () => {
+    showConfirmation = false;
+    reason = '';
+    notifications.add('error', 'Cannot Terminate Workflow');
+  };
+
   const terminate = () => {
     if (!workflow.canBeTerminated) return;
     terminateWorkflow({
@@ -33,7 +38,7 @@
       reason,
     })
       .then(handleSuccessfulTermination)
-      .catch(handleError);
+      .catch(handleTerminationError);
   };
 </script>
 

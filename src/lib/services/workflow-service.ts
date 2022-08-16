@@ -8,6 +8,7 @@ import {
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
+import { handleUnauthorizedOrForbiddenError } from '$lib/utilities/handle-error';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;
@@ -39,10 +40,13 @@ export const fetchAllWorkflows = async (
     : 'workflows';
 
   let error = '';
-  const onError: ErrorCallback = (err) =>
-    (error =
+  const onError: ErrorCallback = (err) => {
+    // Kick out to login if 401/403
+    handleUnauthorizedOrForbiddenError(err);
+    error =
       err?.body?.message ??
-      `Error fetching workflows: ${err.status}: ${err.statusText}`);
+      `Error fetching workflows: ${err.status}: ${err.statusText}`;
+  };
 
   const { executions, nextPageToken } =
     (await requestFromAPI<ListWorkflowExecutionsResponse>(

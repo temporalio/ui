@@ -37,6 +37,21 @@ export const handleError = (
   }
 };
 
+export const handleUnauthorizedOrForbiddenError = (
+  error: unknown,
+  isBrowser = browser,
+): void => {
+  if (isUnauthorized(error) && isBrowser) {
+    window.location.assign(routeForLoginPage());
+    return;
+  }
+
+  if (isForbidden(error) && isBrowser) {
+    window.location.assign(routeForLoginPage());
+    return;
+  }
+};
+
 const isUnauthorized = (error: unknown): error is NetworkError => {
   if (isNetworkError(error)) {
     return error.statusCode === 401;
