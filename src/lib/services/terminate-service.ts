@@ -21,6 +21,7 @@ export async function terminateWorkflow({
     {
       options: { method: 'POST', body: JSON.stringify({ reason }) },
       shouldRetry: false,
+      notifyOnError: false,
     },
   );
 }
