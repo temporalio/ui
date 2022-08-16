@@ -110,14 +110,16 @@
         </NavRow>
       {/each}
     {/if}
-    <NavRow link={linkList.feedback} {isCloud} externalLink>
-      <NavTooltip right text="Feedback">
-        <div class="nav-icon">
-          <Icon name="feedback" scale={1.4} />
-        </div>
-      </NavTooltip>
-      <div class="nav-title">Feedback</div>
-    </NavRow>
+    <slot name="feedback">
+      <NavRow link={linkList.feedback} {isCloud} externalLink>
+        <NavTooltip right text="Feedback">
+          <div class="nav-icon">
+            <Icon name="feedback" scale={1.4} />
+          </div>
+        </NavTooltip>
+        <div class="nav-title">Feedback</div>
+      </NavRow>
+    </slot>
     <slot name="settings" />
     {#await user}
       <NavRow {isCloud}>
