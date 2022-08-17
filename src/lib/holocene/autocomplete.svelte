@@ -15,6 +15,7 @@
   export let theme: 'dark' | 'light' = 'light';
   export let options: string[];
   export let onOptionClick: (option: string) => void;
+  export let disabled = false;
 
   let show = false;
   $: filteredOptions = !value
@@ -24,11 +25,7 @@
       );
 </script>
 
-<div
-  class="autocomplete-container"
-  use:clickOutside
-  on:click-outside={() => (show = false)}
->
+<div class="relative" use:clickOutside on:click-outside={() => (show = false)}>
   <Input
     {id}
     bind:value
@@ -37,6 +34,7 @@
     {placeholder}
     {theme}
     {copyable}
+    {disabled}
     on:input
     on:change
     on:focus={() => (show = true)}
@@ -58,9 +56,3 @@
     </Menu>
   {/if}
 </div>
-
-<style lang="postcss">
-  .autocomplete-container {
-    @apply relative;
-  }
-</style>
