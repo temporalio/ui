@@ -134,5 +134,5 @@ export async function getWorkflowEnhancedStackTrace(
   options: WorkflowParameters,
   request = fetch,
 ): Promise<ParsedQuery> {
-  return getQuery({ ...options, queryType: '__enhanced_stack_trace' }, request);;
+  return getQuery({ ...options, queryType: '__enhanced_stack_trace' }, request);
 }
