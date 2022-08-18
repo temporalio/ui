@@ -129,3 +129,10 @@ export async function getWorkflowStackTrace(
 ): Promise<ParsedQuery> {
   return getQuery({ ...options, queryType: '__stack_trace' }, request);
 }
+
+export async function getWorkflowEnhancedStackTrace(
+  options: WorkflowParameters,
+  request = fetch,
+): Promise<ParsedQuery> {
+  return getQuery({ ...options, queryType: '__enhanced_stack_trace' }, request);;
+}

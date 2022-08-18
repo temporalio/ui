@@ -1,8 +1,12 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { workflowRun } from '$lib/stores/workflow-run';
+  import { getSDKOrigin } from '$lib/utilities/stack-trace/get-sdk-origin';
 
-  import { getWorkflowStackTrace } from '$lib/services/query-service';
+  import {
+    getWorkflowEnhancedStackTrace,
+    getWorkflowStackTrace,
+  } from '$lib/services/query-service';
   import type { ParsedQuery } from '$lib/services/query-service';
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
@@ -14,9 +18,17 @@
 
   const { namespace } = $page.params;
   const { workflow, workers } = $workflowRun;
+  const sliceSize = 10;
 
   let currentdate = new Date();
   let isLoading = false;
+  let isEnhancedStackSelected = true;
+
+  const getEnhancedStackTrace = () =>
+    getWorkflowEnhancedStackTrace({
+      workflow,
+      namespace,
+    });
 
   const getStackTrace = () =>
     getWorkflowStackTrace({
@@ -24,16 +36,39 @@
       namespace,
     });
 
+  const getSnippet = (line: number, sourceText: string): [string, number] => {
+    const snippetBeginning = Math.max(0, line - Math.floor(sliceSize / 2));
+    const snippetEnd = Math.min(
+      sourceText.length,
+      Math.max(10, line + Math.floor(sliceSize / 2)),
+    );
+    const sourceSlice = sourceText
+      .split('\n')
+      .slice(snippetBeginning, snippetEnd)
+      .join('\n');
+    const lineInSlice =
+      line <= Math.floor(sliceSize / 2) ? line : line - snippetBeginning;
+    return [sourceSlice, lineInSlice];
+  };
+
   let stackTrace: Eventual<ParsedQuery>;
   $: {
-    if (workflow.isRunning) stackTrace = getStackTrace();
+    if (workflow.isRunning)
+      stackTrace = isEnhancedStackSelected
+        ? getEnhancedStackTrace()
+        : getStackTrace();
   }
 
   const refreshStackTrace = () => {
-    stackTrace = getWorkflowStackTrace({
-      workflow,
-      namespace,
-    });
+    stackTrace = isEnhancedStackSelected
+      ? getWorkflowEnhancedStackTrace({
+          workflow,
+          namespace,
+        })
+      : getWorkflowStackTrace({
+          workflow,
+          namespace,
+        });
 
     stackTrace.then(() => {
       currentdate = new Date();
@@ -50,6 +85,12 @@
         <p>(This will fail if you have no workers running.)</p>
       </div>
     {:then result}
+      {#if localStorage.getItem('isSDKsupported') === null}
+        {localStorage.setItem(
+          'isSDKsupported',
+          getSDKOrigin(JSON.stringify(result)) === 'typescript' ? 'yes' : 'no',
+        )}
+      {/if}
       <div class="flex items-center gap-4">
         <Button
           on:click={refreshStackTrace}
@@ -59,15 +100,80 @@
         >
           Refresh
         </Button>
+        {#if isEnhancedStackSelected}
+          <Button
+            on:click={() => {
+              isEnhancedStackSelected = false;
+            }}
+            on:click={getStackTrace}
+            >Regular view
+          </Button>
+        {:else}
+          <Button
+            on:click={() => {
+              isEnhancedStackSelected = true;
+            }}
+            on:click={getEnhancedStackTrace}
+            >Enhanced view
+          </Button>
+        {/if}
         <p>Stack Trace at {currentdate.toLocaleTimeString()}</p>
       </div>
-      <div class="flex items-start h-full">
-        <CodeBlock
-          content={result}
-          language="text"
-          dataCy="query-stack-trace"
-        />
-      </div>
+
+      {#if isEnhancedStackSelected}
+        {#if localStorage.getItem('isSDKsupported') === 'yes'}
+          <div class="text-left">
+            {#each result.stacks as stack}
+              <div>
+                {#each stack.locations as location}
+                  {#if location.filePath}
+                    <CodeBlock
+                      content={location.filePath}
+                      type="collapsible"
+                      language="text"
+                      stackHead={location === stack.locations[0]}
+                    />
+                    <CodeBlock
+                      type="snippet"
+                      content={getSnippet(
+                        location.line,
+                        result.sources[location.filePath][0].content,
+                      )[0]}
+                      highlightLine={location.line}
+                      lineOffset={location.line -
+                        getSnippet(
+                          location.line,
+                          result.sources[location.filePath][0].content,
+                        )[1]}
+                      language={result.sdk.name}
+                      dataCy="query-stack-trace"
+                    />
+                  {:else}
+                    <CodeBlock
+                      content={location.functionName}
+                      language="ts"
+                      dataCy="query-stack-trace"
+                    />
+                  {/if}
+                {/each}
+              </div>
+              <br />
+            {/each}
+          </div>
+        {:else}
+          <div class="text-center">
+            <EmptyState title="The SDK is not supported yet." />
+          </div>
+        {/if}
+      {:else}
+        <div class="flex items-start h-full">
+          <CodeBlock
+            content={result}
+            language="text"
+            dataCy="query-stack-trace"
+          />
+        </div>
+      {/if}
     {:catch _error}
       <EmptyState
         title="An Error Occured"
