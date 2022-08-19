@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Option from './option.svelte';
+  import Option from './simple-option.svelte';
 
   export let id: string;
   export let value: SelectOptionValue;

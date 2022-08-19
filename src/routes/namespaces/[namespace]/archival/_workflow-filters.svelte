@@ -3,9 +3,9 @@
   import { goto } from '$app/navigation';
   import { durations } from '$lib/utilities/to-duration';
 
-  import Select from '$lib/components/select/select.svelte';
-  import FilterSelect from '$lib/components/select/filter-select.svelte';
-  import Option from '$lib/components/select/option.svelte';
+  import Select from '$lib/holocene/select/simple-select.svelte';
+  import Option from '$lib/holocene/select/simple-option.svelte';
+  import FilterSelect from '$lib/holocene/select/filter-select.svelte';
   import FilterInput from './_filter-input.svelte';
   import Search from '$lib/components/search.svelte';
 
