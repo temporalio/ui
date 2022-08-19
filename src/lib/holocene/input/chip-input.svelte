@@ -38,8 +38,10 @@
   };
 
   const handleBlur = () => {
-    chips = [...chips, displayValue];
-    displayValue = '';
+    if (displayValue !== '') {
+      chips = [...chips, displayValue];
+      displayValue = '';
+    }
   };
 
   const removeChip = (index: number) => {
