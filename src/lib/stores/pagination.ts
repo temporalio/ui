@@ -1,7 +1,7 @@
 import { derived, writable, get } from 'svelte/store';
 import type { Readable } from 'svelte/store';
 
-const defaultItemsPerPage = 100;
+export const defaultItemsPerPage = 100;
 const options: string[] = ['100', '250', '500'];
 
 type PaginationMethods<T> = {

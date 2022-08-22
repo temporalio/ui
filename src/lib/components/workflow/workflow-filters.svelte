@@ -9,8 +9,8 @@
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
   import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
-  import Select from '$lib/components/select/select.svelte';
-  import Option from '$lib/components/select/option.svelte';
+  import Select from '$lib/holocene/select/simple-select.svelte';
+  import Option from '$lib/holocene/select/simple-option.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Search from '$lib/components/search.svelte';
 
