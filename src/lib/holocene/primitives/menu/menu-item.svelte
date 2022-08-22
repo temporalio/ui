@@ -17,13 +17,13 @@
     class:active
     class:disabled
     {disabled}
-    class="menu-item inline-block whitespace-nowrap {$$props.class}"
+    class="menu-item {$$props.class}"
   >
     <slot />
   </a>
 {:else}
   <li
-    on:click
+    on:click|preventDefault
     role="menuitem"
     class:dark
     class:destructive
