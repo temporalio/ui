@@ -2,8 +2,8 @@
   import { page } from '$app/stores';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  import Select from './select.svelte';
-  import Option from './option.svelte';
+  import Select from './simple-select.svelte';
+  import Option from './simple-option.svelte';
 
   export let label: string = null;
   export let value: SelectOptionValue;
