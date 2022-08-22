@@ -8,8 +8,7 @@
   export let label: string;
   export let id: string;
   export let disabled: boolean = false;
-  export let left: boolean = false;
-  export let right: boolean = false;
+  export let position: 'left' | 'right' = 'left';
   export let href = '';
 
   let show: boolean = false;
@@ -24,7 +23,7 @@
       <Icon stroke="currentcolor" name="caretDown" />
     </MenuButton>
   </div>
-  <Menu class="min-w-max" {id} {show} {left} {right}>
+  <Menu class="min-w-max" {id} {show} {position}>
     <slot />
   </Menu>
 </MenuContainer>

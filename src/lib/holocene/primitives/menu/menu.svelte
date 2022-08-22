@@ -4,8 +4,7 @@
   export let id: string;
   export let show = false;
   export let dark = false;
-  export let left = true;
-  export let right = false;
+  export let position: 'left' | 'right' = 'left';
 
   let width: number;
 </script>
@@ -14,10 +13,8 @@
   <ul
     in:fly={{ duration: 100 }}
     role="menu"
-    class="absolute z-50 mt-1 w-full list-none overflow-y-scroll rounded border border-gray-300 bg-white text-primary shadow {$$props.class}"
+    class="absolute z-50 mt-1 w-full list-none overflow-y-scroll rounded border border-gray-300 bg-white text-primary shadow {position} {$$props.class}"
     class:dark
-    class:left
-    class:right
     aria-labelledby={id}
     {width}
     {id}
