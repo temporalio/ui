@@ -22,7 +22,7 @@
   use:triggerMenu
   on:close-menu={close}
   on:toggle-menu={toggle}
-  on:click
+  on:click|preventDefault
   class={$$props.class}
   class:dark
   class:show

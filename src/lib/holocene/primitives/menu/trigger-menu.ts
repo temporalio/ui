@@ -6,7 +6,6 @@ export const triggerMenu = (node: HTMLElement): { destroy: () => void } => {
 
   const handleTriggerClick = (event: PointerEvent) => {
     node.dispatchEvent(new CustomEvent('toggle-menu'));
-    event.stopPropagation();
   };
 
   const handleDocumentClick = <T extends EventTarget = HTMLElement>(
@@ -18,11 +17,7 @@ export const triggerMenu = (node: HTMLElement): { destroy: () => void } => {
 
     if (!eventTarget && event.relatedTarget) eventTarget = event.relatedTarget;
 
-    if (
-      node &&
-      !node.contains(eventTarget as Node) &&
-      !event.defaultPrevented
-    ) {
+    if (node && !node.contains(eventTarget as Node)) {
       node.dispatchEvent(new CustomEvent('close-menu'));
       event.stopPropagation();
     }
