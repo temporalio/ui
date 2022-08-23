@@ -1,6 +1,5 @@
 <script lang="ts">
   export let title: string = 'Loading…';
-  export let size = 200;
 </script>
 
 <div class="my-12 flex flex-col items-center justify-start {$$props.class}">
@@ -8,8 +7,8 @@
     src="/Temporal_Logo_Animation.gif"
     style="margin-top: -40px;"
     alt="Temporal Logo"
-    width="{size}px"
-    height="{size}px"
+    width="200px"
+    height="200px"
   />
   <h2 class="text-xl font-medium" style="margin-top: -40px;">{title}</h2>
 </div>
