@@ -20,8 +20,15 @@
   } from '$lib/utilities/format-event-attributes';
   import { timeFormat } from '$lib/stores/time-format';
 
-  const { pendingActivities, defaultWorkflowTaskTimeout } =
-    $workflowRun.workflow;
+  const toTimeDifference = (date: Date | string) => {
+    try {
+      return (Number(new Date(String(date))) - Date.now()) / 1000 + 's';
+    } catch (error) {
+      return undefined;
+    }
+  };
+
+  const { pendingActivities } = $workflowRun.workflow;
   const workflow = $page.params?.workflow;
 </script>
 
@@ -70,7 +77,7 @@
             <div class="event-table-row">
               <h2>Next Retry</h2>
               <Badge type="error">
-                {defaultWorkflowTaskTimeout}
+                {toTimeDifference(details.scheduledTime)}
               </Badge>
             </div>
           {/if}
