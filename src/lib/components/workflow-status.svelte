@@ -32,7 +32,7 @@
 </script>
 
 <span class="flex text-center text-sm font-medium leading-4">
-  <h6 class="{color} z-10 flex rounded-sm px-1 py-1">
+  <h6 class="{color} z-10 flex rounded-sm px-1 py-1 whitespace-nowrap">
     {label}
     {#if isRunning}
       <HeartBeat {delay} />
