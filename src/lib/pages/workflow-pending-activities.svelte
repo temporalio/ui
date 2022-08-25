@@ -20,6 +20,7 @@
   } from '$lib/utilities/format-event-attributes';
   import { timeFormat } from '$lib/stores/time-format';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
+  import EventDetailsFull from '$lib/components/event/event-details-full.svelte';
 
   const { pendingActivities } = $workflowRun.workflow;
   const workflow = $page.params?.workflow;
@@ -67,12 +68,14 @@
                 {formatAttemptsLeft(details.maximumAttempts, details.attempt)}
               </Badge>
             </div>
-            <div class="event-table-row">
-              <h2>Next Retry</h2>
-              <Badge type="error">
-                {toTimeDifference(String(details.scheduledTime))}
-              </Badge>
-            </div>
+            {#if details.scheduledTime}
+              <div class="event-table-row">
+                <h2>Next Retry</h2>
+                <Badge type="error">
+                  {toTimeDifference(details.scheduledTime)}
+                </Badge>
+              </div>
+            {/if}
           {/if}
           <div class="event-table-row">
             <h2>Maximum Attempts</h2>

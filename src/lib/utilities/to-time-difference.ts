@@ -1,6 +1,11 @@
-export const toTimeDifference = (date: Date | string, now = Date.now()) => {
+export const toTimeDifference = (date: unknown, now = Date.now()) => {
+  if (!date) return '';
+  const start = String(date);
   try {
-    return (Number(new Date(String(date))) - now) / 1000 + 's';
+    const scheduled = Number(new Date(start));
+    const timeFromNow = (scheduled - now) / 1000 + 's';
+    console.log({ date, now });
+    return timeFromNow;
   } catch (error) {
     return undefined;
   }
