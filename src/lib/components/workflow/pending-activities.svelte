@@ -16,6 +16,7 @@
     formatAttemptsLeft,
     formatRetryExpiration,
   } from '$lib/utilities/format-event-attributes';
+  import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
   const { namespace, run } = $page.params;
   const { workflow } = $workflowRun;
@@ -74,7 +75,7 @@
                   <div class="pending-activity-detail">
                     <h4 class="pending-activity-detail-header">Next Retry</h4>
                     <Badge type={failed ? 'error' : 'default'}>
-                      {defaultWorkflowTaskTimeout}
+                      {toTimeDifference(String(pendingActivity.scheduledTime))}
                     </Badge>
                   </div>
                 {/if}
