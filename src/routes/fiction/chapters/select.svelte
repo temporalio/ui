@@ -3,6 +3,7 @@
   import Select from '$lib/holocene/select/select.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import OptionGroup from '$lib/holocene/select/option-group.svelte';
+  import { capitalize } from '$lib/utilities/format-camel-case';
 
   let favoriteDrink = '';
   let favoriteFood = '';
@@ -16,6 +17,7 @@
     placeholder="Favorite Drink"
     id="favorite-drink"
     bind:value={favoriteDrink}
+    displayValue={capitalize}
   >
     <Option value="coffee">Coffee</Option>
     <Option value="tea">Tea</Option>
@@ -33,11 +35,11 @@
     dark
     bind:value={favoriteFood}
   >
-    <Option value="pizza" description="New York style">Pizza</Option>
-    <Option value="hamburgers" description="With or without cheese"
+    <Option dark value="pizza" description="New York style">Pizza</Option>
+    <Option dark value="hamburgers" description="With or without cheese"
       >Hamburgers</Option
     >
-    <Option value="hot_dogs">Hot Dogs</Option>
+    <Option dark value="hot_dogs">Hot Dogs</Option>
   </Select>
 </Chapter>
 
