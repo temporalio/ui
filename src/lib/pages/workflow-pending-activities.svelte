@@ -165,7 +165,7 @@
   }
 
   .event-table-row {
-    @apply grid grid-cols-2 border-b border-gray-300 py-1;
+    @apply grid grid-cols-2 break-all border-b border-gray-300 py-1;
   }
 
   .event-table-row:last-child {
