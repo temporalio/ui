@@ -1,28 +1,52 @@
+<script lang="ts" context="module">
+  export type SelectContext<T> = {
+    selectValue: T;
+    onChange: (value: T) => void;
+  };
+</script>
+
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import { onDestroy, setContext } from 'svelte';
   import colors from 'tailwindcss/colors';
   import Icon from '$holocene/icon/index.svelte';
   import Menu from '$holocene/primitives/menu/menu.svelte';
-  import Option from '$holocene/select/option.svelte';
-  import type { OptionType } from '$holocene/select/option.svelte';
   import MenuButton from '$holocene/primitives/menu/menu-button.svelte';
   import MenuContainer from '$holocene/primitives/menu/menu-container.svelte';
+  import { writable } from 'svelte/store';
+  import { noop } from 'svelte/internal';
 
   type T = $$Generic;
+
   let show = false;
 
   export let label = '';
   export let id: string;
-  export let value: OptionType<T>;
-  export let options: OptionType<T>[] | undefined = undefined;
+  export let value: T = undefined;
   export let dark: boolean = false;
   export let placeholder = '';
   export let disabled: boolean = false;
+  export let displayValue: (value: T) => T | string = (value) => value;
+  export let onChange: (value: T) => void = noop;
 
-  const dispatch = createEventDispatcher<{ select: { value: typeof value } }>();
+  const context = writable<SelectContext<T>>({
+    selectValue: value,
+    onChange,
+  });
 
-  function handleOptionClick(event: CustomEvent<{ value: typeof value }>) {
-    dispatch('select', { value: event.detail.value });
+  const unsubscribe = context.subscribe((ctx) => {
+    value = ctx.selectValue;
+  });
+
+  onDestroy(() => {
+    unsubscribe();
+  });
+
+  $: {
+    if (value) {
+      context.update((previous) => ({ ...previous, selectValue: value }));
+    }
+
+    setContext('select-value', context);
   }
 </script>
 
@@ -39,16 +63,13 @@
       {dark}
       {disabled}
     >
-      <input
-        class="select-input"
-        class:dark
-        class:disabled
-        {placeholder}
-        value={value?.label ?? ''}
-        name={id}
-        disabled
-        {id}
-      />
+      <div class="select-input" class:dark class:disabled {id}>
+        {#if !value && placeholder !== ''}
+          {placeholder}
+        {:else}
+          {displayValue(value)}
+        {/if}
+      </div>
       {#if disabled}
         <Icon name="lock" stroke={colors.gray[600]} />
       {:else}
@@ -56,18 +77,7 @@
       {/if}
     </MenuButton>
     <Menu id="{id}-menu" class="h-auto max-h-80 min-w-fit" {show} {dark}>
-      {#if options}
-        {#each options as option}
-          <Option
-            on:select={handleOptionClick}
-            selected={value === option}
-            value={option}
-            {dark}
-          />
-        {/each}
-      {:else}
-        <slot />
-      {/if}
+      <slot />
     </Menu>
   </MenuContainer>
 </div>
@@ -81,16 +91,12 @@
     @apply flex h-10 w-full flex-row items-center justify-between rounded border border-gray-900 bg-white px-2 text-sm text-primary;
   }
 
-  .select :global(.select-input-container.show) {
-    @apply border-blue-700;
-  }
-
   .select-input {
-    @apply h-full w-full cursor-pointer bg-white placeholder:text-gray-900;
+    @apply inline cursor-pointer truncate bg-white;
   }
 
   .select-input.dark {
-    @apply bg-primary text-white placeholder:text-gray-200;
+    @apply bg-primary text-white;
   }
 
   .select-input.disabled {

@@ -1,62 +1,13 @@
 <script lang="ts">
-  import { writable } from 'svelte/store';
   import Chapter from '../_chapter.svelte';
   import Select from '$lib/holocene/select/select.svelte';
   import Option from '$lib/holocene/select/option.svelte';
-  import type { OptionType } from '$lib/holocene/select/option.svelte';
+  import OptionGroup from '$lib/holocene/select/option-group.svelte';
 
-  const foodOptions = [
-    {
-      label: 'Pizza 🍕',
-      value: 'pizza',
-      description: 'New York style, obviously.',
-    },
-    {
-      label: 'Hamburger 🍔',
-      value: 'hamburger',
-      description: 'Surprisingly, ham is not an ingredient.',
-    },
-    {
-      label: 'Hot Dog 🌭',
-      value: 'hot dog',
-      description: 'Or as the kids call it, a glizzy.',
-    },
-  ];
-
-  const drinkOptions = [
-    {
-      label: 'Coffee ☕️',
-      value: 'coffee',
-    },
-    {
-      label: 'Tea 🍵',
-      value: 'tea',
-    },
-    {
-      label: 'Milk 🥛',
-      value: 'milk',
-    },
-  ];
-
-  const animalOptions = [
-    {
-      label: 'Elephant 🐘',
-      value: 'elephant',
-    },
-    {
-      label: 'Tiger 🐅',
-      value: 'tiger',
-    },
-    {
-      label: 'Zebra 🦓',
-      value: 'zebra',
-    },
-  ];
-
-  const favoriteDrink = writable<OptionType<string>>();
-  const favoriteFood = writable<OptionType<string>>(foodOptions[0]);
-  const favoriteAnimal = writable<OptionType<string>>(animalOptions[2]);
-  const favoriteNumber = writable<OptionType<number>>();
+  let favoriteDrink = '';
+  let favoriteFood = '';
+  let favoriteAnimal = '';
+  let favoriteNumber: number;
 </script>
 
 <Chapter description="A select dropdown">
@@ -64,10 +15,12 @@
     label="Favorite Drink"
     placeholder="Favorite Drink"
     id="favorite-drink"
-    options={drinkOptions}
-    value={$favoriteDrink}
-    on:select={(event) => favoriteDrink.set(event.detail.value)}
-  />
+    bind:value={favoriteDrink}
+  >
+    <Option value="coffee">Coffee</Option>
+    <Option value="tea">Tea</Option>
+    <Option value="milk">Milk</Option>
+  </Select>
 </Chapter>
 
 <Chapter
@@ -76,43 +29,30 @@
   <Select
     label="Favorite Food"
     id="favorite-food"
+    placeholder="Favorite Food"
     dark
-    options={foodOptions}
-    value={$favoriteFood}
-    on:select={(event) => favoriteFood.set(event.detail.value)}
-  />
-</Chapter>
-
-<Chapter description="A select dropdown with composed options">
-  <Select label="Favorite Animal" id="favorite-animal" value={$favoriteAnimal}>
-    {#each animalOptions as option}
-      <Option
-        value={option}
-        on:select={(event) => favoriteAnimal.set(event.detail.value)}
-        selected={option.value == $favoriteAnimal.value}
-        let:handleOptionClick
-      />
-    {/each}
+    bind:value={favoriteFood}
+  >
+    <Option value="pizza" description="New York style">Pizza</Option>
+    <Option value="hamburgers" description="With or without cheese"
+      >Hamburgers</Option
+    >
+    <Option value="hot_dogs">Hot Dogs</Option>
   </Select>
 </Chapter>
 
 <Chapter description="A long select dropdown with numbers">
-  <Select
-    label="Favorite Number"
-    id="favorite-number"
-    value={$favoriteNumber}
-    on:select={(event) => favoriteNumber.set(event.detail.value)}
-    options={new Array(20)
-      .fill(undefined)
-      .map((_, i) => ({ label: `Number ${i}`, value: i }))}
-  />
+  <Select label="Favorite Number" id="favorite-number" value={favoriteNumber}>
+    {#each new Array(20).fill(undefined).map((_, i) => i) as value}
+      <Option {value}>{value}</Option>
+    {/each}
+  </Select>
 </Chapter>
 
 <Chapter description="A disabled select dropdown">
   <Select
     id="favorite-color"
     placeholder="Favorite Color"
-    options={[]}
     value={null}
     disabled
   />
@@ -124,11 +64,45 @@
     value={null}
     id="wide-options"
     placeholder="Select an option..."
-    options={new Array(3).fill(undefined).map((_, i) => ({
-      label: 'Lorem ipsum dolor sit amet consectetur adipisicing elit.',
-      value: i,
-      description:
-        'Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae vero accusamus aliquid corrupti odio dignissimos rerum voluptas dolore! Enim nesciunt nobis unde hic itaque fugiat ipsam tempora, inventore beatae maxime?',
-    }))}
-  />
+  >
+    <Option
+      description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi nisi
+    reprehenderit alias rerum minus, nulla ratione ipsum expedita. Praesentium
+    doloribus animi, dolorem nesciunt repellendus maxime deleniti vitae
+    corrupti deserunt aperiam?"
+      >Lorem ipsum dolor sit amet consectetur adipisicing elit 1.</Option
+    >
+    <Option
+      description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi nisi
+    reprehenderit alias rerum minus, nulla ratione ipsum expedita. Praesentium
+    doloribus animi, dolorem nesciunt repellendus maxime deleniti vitae
+    corrupti deserunt aperiam?"
+      >Lorem ipsum dolor sit amet consectetur adipisicing elit 2.</Option
+    >
+    <Option
+      description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi nisi
+    reprehenderit alias rerum minus, nulla ratione ipsum expedita. Praesentium
+    doloribus animi, dolorem nesciunt repellendus maxime deleniti vitae
+    corrupti deserunt aperiam?"
+      >Lorem ipsum dolor sit amet consectetur adipisicing elit 3.</Option
+    >
+  </Select>
+</Chapter>
+
+<Chapter description="A select dropdown with Option Groups">
+  <Select id="grouped-select" value={favoriteAnimal}>
+    <OptionGroup label="Mammals">
+      <Option>Horse</Option>
+      <Option>Dog</Option>
+      <Option>Cat</Option>
+    </OptionGroup>
+    <OptionGroup label="Reptiles">
+      <Option>Snake</Option>
+      <Option>Lizard</Option>
+    </OptionGroup>
+    <OptionGroup label="Amphibians">
+      <Option>Frog</Option>
+      <Option>Salamander</Option>
+    </OptionGroup>
+  </Select>
 </Chapter>

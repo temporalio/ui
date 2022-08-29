@@ -12,22 +12,35 @@
 </script>
 
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import { getContext } from 'svelte';
   import Icon from '$holocene/icon/index.svelte';
   import MenuItem from '$holocene/primitives/menu/menu-item.svelte';
+  import type { Writable } from 'svelte/store';
+  import type { SelectContext } from './select.svelte';
+
+  const context = getContext<Writable<SelectContext<T>>>('select-value');
 
   type T = $$Generic;
 
-  export let value: OptionType<T>;
-  export let selected: boolean;
+  export let value: T | undefined = undefined;
+  export let description: string = '';
   export let dark: boolean = false;
 
-  const dispatch =
-    createEventDispatcher<{ select: { value: OptionType<T> } }>();
+  let selected: boolean;
+  let _value: any;
+  let slotWrapper: HTMLSpanElement;
 
-  function handleOptionClick() {
-    dispatch('select', { value });
+  $: {
+    if (slotWrapper) {
+      _value = value ?? slotWrapper.textContent;
+      selected = $context.selectValue === _value;
+    }
   }
+
+  const handleOptionClick = () => {
+    context.update((previous) => ({ ...previous, selectValue: _value }));
+    $context.onChange(_value);
+  };
 </script>
 
 <MenuItem
@@ -42,14 +55,12 @@
     {/if}
   </div>
   <div class="flex w-full flex-col">
-    {#if $$slots.default}
+    <span bind:this={slotWrapper} class="option-label">
       <slot />
-    {:else}
-      <span class="option-label">{value.label}</span>
-    {/if}
-    {#if value.description}
+    </span>
+    {#if description}
       <span class="option-description">
-        {value.description}
+        {description}
       </span>
     {/if}
   </div>
