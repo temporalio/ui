@@ -243,6 +243,17 @@ const fileUploadIcon = {
   ],
 };
 
+const filePlusIcon = {
+  paths: [
+    {
+      d: 'M11.25 19.25H7.75C6.64543 19.25 5.75 18.3546 5.75 17.25V6.75C5.75 5.64543 6.64543 4.75 7.75 4.75H14L18.25 9V11.25',
+    },
+    { d: 'M17 14.75V19.25' },
+    { d: 'M19.25 17H14.75' },
+    { d: 'M18 9.25H13.75V5' },
+  ],
+};
+
 const filterIcon = {
   paths: [
     {
@@ -581,6 +592,7 @@ export const icons: { [index: string]: Icon } = {
   feed: feedIcon,
   feedback: feedbackIcon,
   fileUpload: fileUploadIcon,
+  filePlus: filePlusIcon,
   filter: filterIcon,
   globe: globeIcon,
   graph: graphIcon,
