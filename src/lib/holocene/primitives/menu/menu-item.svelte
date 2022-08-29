@@ -17,7 +17,7 @@
     class:active
     class:disabled
     {disabled}
-    class="menu-item {$$props.class}"
+    class="menu-item inline-block {$$props.class}"
   >
     <slot />
   </a>
