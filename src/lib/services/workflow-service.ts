@@ -48,12 +48,18 @@ export const fetchAllWorkflows = async (
       `Error fetching workflows: ${err.status}: ${err.statusText}`;
   };
 
+  const handleError = (err: unknown) => {
+    // Handle when bad namespace is entered in URL and no status code is returned
+    error = 'Failed to fetch workflows';
+  };
+
   const { executions, nextPageToken } =
     (await requestFromAPI<ListWorkflowExecutionsResponse>(
       routeForApi(endpoint, { namespace }),
       {
         params: { query },
         onError,
+        handleError,
         request,
       },
     )) ?? { executions: [], nextPageToken: '' };
