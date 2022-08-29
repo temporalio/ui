@@ -25,7 +25,7 @@
   export let dark: boolean = false;
   export let placeholder = '';
   export let disabled: boolean = false;
-  export let displayValue: (value: T) => T | string = (value) => value;
+  export let displayValue: (value: T) => T | string = (value) => value ?? '';
   export let onChange: (value: T) => void = noop;
 
   const context = writable<SelectContext<T>>({
