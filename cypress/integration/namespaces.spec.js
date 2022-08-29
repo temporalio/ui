@@ -45,8 +45,8 @@ describe('Namespaces button', () => {
   });
 
   it('have the correct namespaces in the dropdown when using navigation header', () => {
-    cy.get('@namespaces-button').click({ wait: 1000 });
-    cy.get('h1').contains('Namespaces');
+    cy.get('@namespaces-button').click();
+    cy.get('[data-cy="namespace-selector-title"]').contains('Namespaces');
     cy.get(':nth-child(1) > td').contains(namespaces[0]);
     cy.get(':nth-child(2) > td').contains(namespaces[1]);
   });

@@ -16,7 +16,7 @@
 </script>
 
 <PageTitle title="Namespaces" url={$page.url.href} />
-<h1 class="mb-8 text-2xl">Namespaces</h1>
+<h1 data-cy="namespace-selector-title" class="mb-8 text-2xl">Namespaces</h1>
 {#if namespaces?.length > 0}
   <Table variant="fancy" class="w-full">
     <TableHeaderRow slot="headers">
