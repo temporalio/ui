@@ -17,7 +17,7 @@
     class:active
     class:disabled
     {disabled}
-    class="menu-item {$$props.class}"
+    class="menu-item inline-block {$$props.class}"
   >
     <slot />
   </a>
@@ -44,21 +44,19 @@
   .dark {
     @apply bg-primary text-white hover:bg-gray-800;
 
-    &.selected {
-      @apply bg-gray-800;
+    &.selected,
+    &.active {
+      @apply bg-gray-800 text-blue-100;
     }
   }
 
-  .active {
+  .active,
+  .selected {
     @apply text-blue-700;
   }
 
   .destructive {
     @apply text-red-700 hover:bg-red-50;
-  }
-
-  .selected {
-    @apply bg-gray-50;
   }
 
   .disabled {

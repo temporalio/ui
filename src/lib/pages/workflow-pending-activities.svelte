@@ -20,7 +20,6 @@
   } from '$lib/utilities/format-event-attributes';
   import { timeFormat } from '$lib/stores/time-format';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
-  import EventDetailsFull from '$lib/components/event/event-details-full.svelte';
 
   const { pendingActivities } = $workflowRun.workflow;
   const workflow = $page.params?.workflow;
