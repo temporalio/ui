@@ -34,7 +34,10 @@
   );
 
   const namespaceList = namespaces.map((namespace: string) => {
-    const href = routeForWorkflows({ namespace });
+    const onSchedulesPage = $page.url.pathname.endsWith('schedules');
+    const href = onSchedulesPage
+      ? routeForSchedules({ namespace })
+      : routeForWorkflows({ namespace });
     return {
       namespace,
       href,
