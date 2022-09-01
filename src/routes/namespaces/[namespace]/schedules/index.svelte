@@ -16,6 +16,7 @@
   import { fetchAllSchedules } from '$lib/services/schedule-service';
   import type { ScheduleListEntry } from '$types';
   import PageTitle from '$lib/holocene/page-title.svelte';
+  import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
 
   let { namespace } = $page.params;
 
@@ -38,6 +39,7 @@
 <div class="flex flex-row justify-between">
   <h2 class="flex items-center gap-2 text-2xl">
     Schedules<Badge type="alpha">Alpha</Badge>
+    <NamespaceSelector />
   </h2>
   <Button
     class="h-10"
