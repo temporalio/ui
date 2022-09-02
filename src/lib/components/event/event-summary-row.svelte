@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
 
   import { eventSortOrder, eventShowElapsed } from '$lib/stores/event-view';
   import { timeFormat } from '$lib/stores/time-format';
@@ -127,7 +127,7 @@
     {/if}
   </td>
   <td class="cell text-right">
-    <Icon class="inline" name={expanded ? 'caretUp' : 'caretDown'} />
+    <Icon class="inline" name={expanded ? 'chevron-up' : 'chevron-down'} />
   </td>
 </tr>
 {#if expanded}

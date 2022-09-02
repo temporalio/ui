@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import NavContainer from '$lib/holocene/navigation/_nav-container.svelte';
   import NavRow from '$lib/holocene/navigation/_nav-row.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
@@ -14,7 +14,7 @@
     <NavRow link={linkList.import} {isCloud}>
       <Tooltip right hide={$navOpen} text="Import">
         <div class="nav-icon">
-          <Icon {isCloud} name="download" scale={1} />
+          <Icon {isCloud} name="download" />
         </div>
       </Tooltip>
       <div class="nav-title">Import</div>

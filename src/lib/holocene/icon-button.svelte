@@ -1,9 +1,9 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
 
   import type { IconName } from '$lib/holocene/icon/paths';
 
-  export let icon: IconName = '';
+  export let icon: IconName = null;
   export let scale = 1;
   export let stroke = 'white';
   export let classes: string = '';

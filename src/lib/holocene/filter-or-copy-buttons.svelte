@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { noop } from 'svelte/internal';
 
@@ -20,20 +20,16 @@
         {#key filtered}
           <Icon
             name="filter"
+            class="h-4 w-4"
             stroke="#000"
             fill={filtered ? '#000' : ''}
-            class="h-4 w-4"
           />
         {/key}
       </button>
     {/if}
     {#if copyable}
       <button on:click|preventDefault|stopPropagation={(e) => copy(e, content)}>
-        <Icon
-          name={$copied ? 'checkMark' : 'copy'}
-          stroke="#000"
-          class="h-4 w-4"
-        />
+        <Icon name={$copied ? 'checkmark' : 'copy'} stroke="#000" />
       </button>
     {/if}
   </div>

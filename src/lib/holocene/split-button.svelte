@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from '$holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import MenuContainer from '$holocene/primitives/menu/menu-container.svelte';
   import MenuButton from '$holocene/primitives/menu/menu-button.svelte';
   import Menu from '$holocene/primitives/menu/menu.svelte';
@@ -20,7 +20,7 @@
       {label}
     </Button>
     <MenuButton dark class="segment right" bind:show controls={id} {disabled}>
-      <Icon stroke="currentcolor" name="caretDown" />
+      <Icon name="chevron-down" />
     </MenuButton>
   </div>
   <Menu class="min-w-max" {id} {show} {position}>

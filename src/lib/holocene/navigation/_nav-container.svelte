@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import Logo from '$lib/holocene/logo.svelte';
   import { navOpen } from '$lib/stores/nav-open';
 
@@ -32,9 +32,7 @@
       style="top: 52px;"
       on:click={toggleNav}
     >
-      <div class={isCloud ? 'cloudNavIcon' : 'localNavIcon'}>
-        <Icon name={$navOpen ? 'navCollapse' : 'navExpand'} scale={1} />
-      </div>
+      <Icon name={$navOpen ? 'nav-collapse' : 'nav-expand'} />
     </button>
     <div class="mt-24 grow items-center">
       <ul class="flex flex-col gap-2">
@@ -61,10 +59,6 @@
 
   .cloud {
     @apply bg-white text-gray-900;
-  }
-  .localNavIcon :global(svg) {
-    filter: invert(100%);
-    -webkit-filter: invert(100%);
   }
 
   .close :global(.nav-title) {

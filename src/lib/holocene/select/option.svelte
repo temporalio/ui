@@ -13,7 +13,7 @@
 
 <script lang="ts">
   import { getContext } from 'svelte';
-  import Icon from '$holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import MenuItem from '$holocene/primitives/menu/menu-item.svelte';
   import type { Writable } from 'svelte/store';
   import type { SelectContext } from './select.svelte';
@@ -51,7 +51,7 @@
 >
   <div class="mr-2 w-6">
     {#if selected}
-      <Icon stroke="currentcolor" name="checkMark" scale={0.8} />
+      <Icon name="checkmark" />
     {/if}
   </div>
   <div class="flex w-full flex-col">

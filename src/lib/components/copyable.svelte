@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { noop } from 'svelte/internal';
 
@@ -22,7 +22,7 @@
   </slot>
   <button on:click={(e) => copy(e, content)}>
     <Icon
-      name={$copied ? 'checkMark' : 'copy'}
+      name={$copied ? 'checkmark' : 'copy'}
       stroke={color}
       class={`${visible ? 'visible' : 'invisible group-hover:visible'} h-4`}
     />

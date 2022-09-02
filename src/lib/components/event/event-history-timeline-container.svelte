@@ -6,7 +6,7 @@
 
   import Accordion from '$lib/holocene/accordion.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import {
     eventTypeCategorizations,
     timelineEventTypeOptions,
@@ -84,8 +84,8 @@
         <Button
           variant="secondary"
           on:click={() => (showEventTypeFilter = !showEventTypeFilter)}
-          ><Icon name="sliders" /></Button
-        >
+          ><Icon name="sliders" />
+        </Button>
         {#each timelineEventTypeOptions as type}
           <div
             class="flex cursor-pointer items-center text-sm xl:text-base"
@@ -96,7 +96,7 @@
               style="background: {type.color}"
             >
               {#if eventGroupFilters.includes(type.option)}
-                <Icon name="checkMark" scale={0.8} stroke="#fff" />
+                <Icon name="checkmark" class="text-white" />
               {/if}
             </div>
             {type.label}
@@ -118,8 +118,7 @@
         <Button
           variant="secondary"
           disabled={!isRunning}
-          on:click={() => ($refresh = Date.now())}
-          ><Icon name="refresh" stroke="currentcolor" scale={0.8} /></Button
+          on:click={() => ($refresh = Date.now())}><Icon name="retry" /></Button
         >
       </div>
     </div>

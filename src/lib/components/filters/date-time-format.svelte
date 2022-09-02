@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
 
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
   import {
@@ -31,7 +31,7 @@
     >
       <div class="check">
         {#if $timeFormat === option}
-          <Icon name="check" scale={0.8} />
+          <Icon name="checkmark" />
         {/if}
       </div>
       <div class="label">
