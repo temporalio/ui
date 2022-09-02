@@ -1,5 +1,3 @@
-/// <reference types="cypress" />
-
 import { formatDistanceToNow } from 'date-fns';
 import * as dateTz from 'date-fns-tz';
 

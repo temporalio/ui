@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from '$holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import type { IconName } from '$holocene/icon/paths';
   import MenuContainer from '$holocene/primitives/menu/menu-container.svelte';
   import MenuButton from '$holocene/primitives/menu/menu-button.svelte';

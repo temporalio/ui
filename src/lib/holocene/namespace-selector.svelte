@@ -1,7 +1,7 @@
 <script lang="ts">
   import { namespaceSelectorOpen } from '$lib/stores/nav-open';
   import { viewFeature } from '$lib/stores/new-feature-tags';
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import FeatureTag from '$lib/holocene/feature-tag.svelte';
 
   function toggleNamespaceSelector() {

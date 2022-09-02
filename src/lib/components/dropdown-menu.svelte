@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { scale } from 'svelte/transition';
   import IconButton from '$holocene/icon-button.svelte';
-  import Icon from '$holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
 
   export let value: string | undefined;
   export let left = false;

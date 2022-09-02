@@ -9,7 +9,7 @@
   } from '$lib/utilities/format-date';
   import { routeForPendingActivities } from '$lib/utilities/route-for';
   import Link from '$lib/holocene/link.svelte';
-  import Icon from '$holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import Badge from '$holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import {

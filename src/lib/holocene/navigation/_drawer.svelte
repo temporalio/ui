@@ -3,7 +3,7 @@
   export let flyout: boolean;
   export let onClose: () => void;
 
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import { clickOutside } from '$lib/holocene/outside-click';
 </script>
 

@@ -8,7 +8,7 @@
 <script lang="ts">
   import { onDestroy, setContext } from 'svelte';
   import colors from 'tailwindcss/colors';
-  import Icon from '$holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import Menu from '$holocene/primitives/menu/menu.svelte';
   import MenuButton from '$holocene/primitives/menu/menu-button.svelte';
   import MenuContainer from '$holocene/primitives/menu/menu-container.svelte';

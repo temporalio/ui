@@ -6,7 +6,7 @@
 
   import Accordion from '$lib/holocene/accordion.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import {
     eventTypeCategorizations,
     timelineEventTypeOptions,

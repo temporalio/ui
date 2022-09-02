@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { noop } from 'svelte/internal';
 

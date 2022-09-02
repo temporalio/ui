@@ -1,6 +1,6 @@
 <script lang="ts">
   import colors from 'tailwindcss/colors';
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import type { IconName } from './icon/paths';
   export let title: string;
   export let subtitle: string = '';

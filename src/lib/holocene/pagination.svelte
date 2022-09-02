@@ -7,7 +7,7 @@
     perPageOptions,
   } from '$lib/stores/pagination';
 
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
 
   type T = $$Generic;
 

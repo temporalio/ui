@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import { page } from '$app/stores';
 
   import type { IconName } from '$lib/holocene/icon/paths';

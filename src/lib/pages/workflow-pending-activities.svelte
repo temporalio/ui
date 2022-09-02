@@ -2,7 +2,7 @@
   import { page } from '$app/stores';
   import { workflowRun } from '$lib/stores/workflow-run';
 
-  import Icon from '$holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import Badge from '$holocene/badge.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';

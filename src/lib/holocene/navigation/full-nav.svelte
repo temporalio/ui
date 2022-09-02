@@ -6,7 +6,7 @@
 </script>
 
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import type { SvelteComponent } from 'svelte';
   import FeatureTag from '$lib/holocene/feature-tag.svelte';
   import type { DescribeNamespaceResponse as Namespace } from '$types';

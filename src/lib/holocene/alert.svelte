@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from '$holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import type { IconName } from './icon/paths';
 
   export let intent: 'warning' | 'error' | 'success' | 'info';

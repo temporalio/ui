@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
 
   import { onMount } from 'svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';

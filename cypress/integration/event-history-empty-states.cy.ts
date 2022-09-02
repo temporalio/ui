@@ -1,5 +1,3 @@
-/// <reference types="cypress" />
-
 import workflowsFixture from '../fixtures/workflows.json';
 
 const workflow = workflowsFixture.executions[0];

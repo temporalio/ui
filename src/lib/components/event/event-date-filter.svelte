@@ -3,7 +3,7 @@
 </script>
 
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
 
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
   import {

@@ -24,6 +24,25 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
+declare global {
+  namespace Cypress {
+    interface Chainable {
+      interceptNamespacesApi(): void;
+      interceptSearchAttributesApi(): void;
+      interceptWorkflowsApi(): void;
+      interceptWorkflowApi(): void;
+      interceptUserApi(): void;
+      interceptClusterApi(fixture?: string): void;
+      interceptArchivedWorkflowsApi(): void;
+      interceptSettingsApi(): void;
+      interceptGithubReleasesApi(): void;
+      interceptQueryApi(): void;
+      interceptTaskQueuesApi(): void;
+      interceptApi(): void;
+    }
+  }
+}
+
 import settings from '../fixtures/settings.json';
 
 Cypress.Commands.add('interceptNamespacesApi', () => {
@@ -106,18 +125,17 @@ Cypress.Commands.add('interceptTaskQueuesApi', () => {
   ).as('task-queues-api');
 });
 
-Cypress.Commands.add(
-  'interceptApi',
-  ({ namespace } = { namespace: 'default' }) => {
-    cy.interceptNamespacesApi();
-    cy.interceptWorkflowsApi();
-    cy.interceptUserApi();
-    cy.interceptClusterApi();
-    cy.interceptArchivedWorkflowsApi();
-    cy.interceptGithubReleasesApi();
-    cy.interceptQueryApi();
-    cy.interceptTaskQueuesApi();
-    cy.interceptSettingsApi();
-    cy.interceptSearchAttributesApi();
-  },
-);
+Cypress.Commands.add('interceptApi', () => {
+  cy.interceptNamespacesApi();
+  cy.interceptWorkflowsApi();
+  cy.interceptUserApi();
+  cy.interceptClusterApi();
+  cy.interceptArchivedWorkflowsApi();
+  cy.interceptGithubReleasesApi();
+  cy.interceptQueryApi();
+  cy.interceptTaskQueuesApi();
+  cy.interceptSettingsApi();
+  cy.interceptSearchAttributesApi();
+});
+
+export {};

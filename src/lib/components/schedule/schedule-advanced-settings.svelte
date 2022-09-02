@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { ScheduleSpec, ScheduleState, SchedulePolicies } from '$types';
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
 
   export let spec: ScheduleSpec;
   export let state: ScheduleState;

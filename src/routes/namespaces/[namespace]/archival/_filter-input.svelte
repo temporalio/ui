@@ -2,7 +2,7 @@
   import { page } from '$app/stores';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import debounce from 'just-debounce';
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
 
   export let parameter: string;
   export let name: string;

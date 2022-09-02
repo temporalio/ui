@@ -1,6 +1,6 @@
 <script lang="ts">
   import Copyable from '$lib/components/copyable.svelte';
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
 
   export let text: string = '';
