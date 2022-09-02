@@ -24,7 +24,7 @@ specifiers:
   concurrently: ^7.1.0
   cross-env: ^7.0.3
   cssnano: ^5.0.8
-  cypress: ^10.3.0
+  cypress: ^10.7.0
   date-fns: ^2.23.0
   date-fns-tz: ^1.2.2
   esbuild: ^0.13.15
