@@ -1,19 +1,21 @@
 import { defineConfig } from 'cypress';
 
 defineConfig({
+  viewportWidth: 1280,
+  projectId: 'g7xfxw',
+
+  env: {
+    VITE_API_HOST: 'http://localhost:8080',
+    VITE_MODE: 'test',
+    VITE_TEMPORAL_UI_BUILD_TARGET: 'local',
+  },
+
   e2e: {
     setupNodeEvents(on, config) {
       // implement node event listeners here
     },
-    specPattern: 'cypress/integration/**/*.cy.ts',
+    specPattern: 'cypress/e2e/**/*.cy.ts',
     baseUrl: 'localhost:3000',
-    viewportWidth: 1280,
-    projectId: 'g7xfxw',
-    env: {
-      VITE_API_HOST: 'http://localhost:8080',
-      VITE_MODE: 'test',
-      VITE_TEMPORAL_UI_BUILD_TARGET: 'local',
-    },
   },
 
   component: {
