@@ -1,6 +1,7 @@
 import { defineConfig } from 'cypress';
+import { addMatchImageSnapshotPlugin } from 'cypress-image-snapshot/plugin';
 
-defineConfig({
+export default defineConfig({
   viewportWidth: 1280,
   projectId: 'g7xfxw',
 
@@ -12,14 +13,19 @@ defineConfig({
 
   e2e: {
     setupNodeEvents(on, config) {
-      // implement node event listeners here
+      return config;
     },
     specPattern: 'cypress/e2e/**/*.cy.ts',
-    baseUrl: 'localhost:3000',
+    baseUrl: 'http://localhost:3000/',
   },
 
   component: {
+    setupNodeEvents(on, config) {
+      addMatchImageSnapshotPlugin(on, config);
+      return config;
+    },
     specPattern: 'src/**/*.cy.ts',
+    excludeSpecPattern: ['**/snapshots/*', '**/__image_snapshots__/*'],
     devServer: {
       framework: 'svelte',
       bundler: 'vite',
