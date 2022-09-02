@@ -22,7 +22,7 @@
   </slot>
   <button on:click={(e) => copy(e, content)}>
     <Icon
-      name={$copied ? 'checkMark' : 'copy'}
+      name={$copied ? 'checkmark' : 'copy'}
       stroke={color}
       class={`${visible ? 'visible' : 'invisible group-hover:visible'} h-4`}
     />

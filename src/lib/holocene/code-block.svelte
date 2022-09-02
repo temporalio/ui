@@ -63,7 +63,7 @@
       on:click={(e) => copy(e, parsedContent)}
       class="absolute top-4 right-4"
     >
-      <Icon name={$copied ? 'checkMark' : 'copy'} stroke="white" />
+      <Icon name={$copied ? 'checkmark' : 'copy'} class="text-white" />
     </button>
   </div>
 {/if}

@@ -64,7 +64,7 @@
   </div>
   <div>
     <Button variant="secondary" on:click={refreshWorkflows}
-      ><Icon name="refresh" stroke="currentColor" /></Button
+      ><Icon name="retry" /></Button
     >
   </div>
 </div>

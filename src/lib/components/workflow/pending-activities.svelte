@@ -52,12 +52,7 @@
                   <h4 class="pending-activity-detail-header">Attempt</h4>
                   <Badge type={failed ? 'error' : 'default'}>
                     {#if failed}
-                      <Icon
-                        name="refresh"
-                        stroke="currentcolor"
-                        scale={0.5}
-                        strokeWidth={2}
-                      />
+                      <Icon name="retry" />
                     {/if}
                     {pendingActivity.attempt}
                   </Badge>

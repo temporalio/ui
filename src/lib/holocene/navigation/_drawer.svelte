@@ -29,7 +29,7 @@
 >
   <div class="relative">
     <div class="absolute right-0 top-0 cursor-pointer" on:click={onClose}>
-      <Icon name="close" scale={1} />
+      <Icon name="close" />
     </div>
   </div>
   <slot />

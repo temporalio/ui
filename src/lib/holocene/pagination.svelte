@@ -69,7 +69,7 @@
           disabled={!$store.hasPrevious}
           on:click={() => store.previous()}
         >
-          <Icon scale={0.8} stroke="currentcolor" name="caretLeft" />
+          <Icon name="chevron-left" />
         </button>
         <p>
           {$store.startingIndex + 1}–{$store.endingIndex + 1} of {$store.length}
@@ -79,7 +79,7 @@
           disabled={!$store.hasNext}
           on:click={() => store.next()}
         >
-          <Icon scale={0.8} stroke="currentcolor" name="caretRight" />
+          <Icon name="chevron-right" />
         </button>
       </div>
       <slot name="action" />
@@ -102,7 +102,7 @@
         disabled={!$store.hasPrevious}
         on:click={() => store.previous()}
       >
-        <Icon scale={0.8} stroke="currentcolor" name="caretLeft" />
+        <Icon name="chevron-left" />
       </button>
       <p>
         {$store.startingIndex + 1}–{$store.endingIndex + 1} of {$store.length}
@@ -112,7 +112,7 @@
         disabled={!$store.hasNext}
         on:click={() => store.next()}
       >
-        <Icon scale={0.8} stroke="currentcolor" name="caretRight" />
+        <Icon name="chevron-right" />
       </button>
     </div>
   </nav>

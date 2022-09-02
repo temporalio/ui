@@ -49,13 +49,7 @@
             <h2>Attempt</h2>
             <Badge type={failed ? 'error' : 'default'}>
               {#if failed}
-                <Icon
-                  class="mr-1"
-                  stroke="currentcolor"
-                  name="refresh"
-                  strokeWidth={2}
-                  scale={0.5}
-                />
+                <Icon class="mr-1" name="retry" />
               {/if}
               {details.attempt}
             </Badge>

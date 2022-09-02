@@ -75,7 +75,7 @@
       >
         <div class="check active">
           {#if $eventSortOrder === option}
-            <Icon stroke="currentcolor" name="checkMark" scale={0.8} />
+            <Icon name="checkmark" />
           {/if}
         </div>
         <div class="label">
@@ -98,7 +98,7 @@
     >
       <div class="check active">
         {#if $timeFormat === option}
-          <Icon stroke="currentcolor" name="checkMark" scale={0.8} />
+          <Icon name="checkmark" />
         {/if}
       </div>
       <div class="label">
@@ -117,7 +117,7 @@
   >
     <div class="check active">
       {#if $eventShowElapsed === 'true'}
-        <Icon stroke="currentcolor" name="checkMark" scale={0.8} />
+        <Icon name="checkmark" />
       {/if}
     </div>
     <div class="label">Show Elapsed Time</div>

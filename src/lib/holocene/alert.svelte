@@ -5,7 +5,7 @@
   export let intent: 'warning' | 'error' | 'success' | 'info';
 
   export let title: string;
-  export let icon: IconName = '';
+  export let icon: IconName | undefined = undefined;
 </script>
 
 <div class="alert {intent} {$$props.class}">

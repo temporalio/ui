@@ -15,6 +15,6 @@
   on:click={toggleNamespaceSelector}
   data-cy="namespace-select-button"
 >
-  <Icon name="namespaceSelect" scale={1.6} class="mx-2 inline cursor-pointer" />
+  <Icon name="namespace-switcher" class="mx-2 inline cursor-pointer" />
   <FeatureTag feature="namespaceSelector" />
 </button>

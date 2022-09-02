@@ -12,7 +12,7 @@
 <p on:click={() => (show = !show)} class="settings">
   Advanced Settings <Icon
     class="inline"
-    name={show ? 'caretUp' : 'caretDown'}
+    name={show ? 'chevron-up' : 'chevron-down'}
   />
 </p>
 {#if show}

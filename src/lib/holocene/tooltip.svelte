@@ -39,8 +39,7 @@
             <span class="text-gray-100"
               >{#if icon}<Icon
                   name={icon}
-                  class="inline h-4"
-                  stroke="#fff"
+                  class="inline h-4 text-white"
                 />{/if}{text}</span
             >
           </Copyable>
@@ -48,8 +47,7 @@
           <span class="flex gap-2 text-gray-100"
             >{#if icon}<Icon
                 name={icon}
-                class="inline h-4"
-                stroke="#fff"
+                class="inline h-4 text-white"
               />{/if}{text}</span
           >
         {/if}

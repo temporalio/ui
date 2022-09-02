@@ -19,7 +19,6 @@
   export let large: boolean = false;
   export let as: 'button' | 'anchor' = href ? 'anchor' : 'button';
   export let icon: IconName = '';
-  export let iconScale: number = 1;
   export let classes: string = $$props.class;
   export let dataCy: string = $$props.dataCy;
   export let count: number = 0;
@@ -39,11 +38,7 @@
   >
     {#if icon || loading}
       <span class:animate-spin={loading}>
-        <Icon
-          scale={iconScale}
-          stroke="currentcolor"
-          name={loading ? 'spinner' : icon}
-        />
+        <Icon name={loading ? 'spinner' : icon} />
       </span>
     {/if}
     <slot />
@@ -68,13 +63,7 @@
   >
     {#if icon || loading}
       <span class:animate-spin={loading}>
-        <Icon
-          scale={iconScale}
-          width={18}
-          height={18}
-          stroke="currentcolor"
-          name={loading ? 'spinner' : icon}
-        />
+        <Icon name={loading ? 'spinner' : icon} />
       </span>
     {/if}
     <slot />

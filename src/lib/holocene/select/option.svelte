@@ -51,7 +51,7 @@
 >
   <div class="mr-2 w-6">
     {#if selected}
-      <Icon stroke="currentcolor" name="checkMark" scale={0.8} />
+      <Icon name="checkmark" />
     {/if}
   </div>
   <div class="flex w-full flex-col">

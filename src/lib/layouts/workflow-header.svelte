@@ -47,7 +47,7 @@
         data-cy="back-to-workflows"
         class="back-to-workflows"
       >
-        <Icon scale={0.8} name="caretLeft" class="inline" />Back to Workflows
+        <Icon name="chevron-left" class="inline" />Back to Workflows
       </a>
     </div>
     <div class="mb-8 flex items-center justify-between">

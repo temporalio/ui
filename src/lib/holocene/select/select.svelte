@@ -71,9 +71,9 @@
         {/if}
       </div>
       {#if disabled}
-        <Icon name="lock" stroke={colors.gray[600]} />
+        <Icon name="lock" class="text-gray-500" />
       {:else}
-        <Icon stroke="currentcolor" name={show ? 'caretUp' : 'caretDown'} />
+        <Icon name={show ? 'chevron-up' : 'chevron-down'} />
       {/if}
     </MenuButton>
     <Menu id="{id}-menu" class="h-auto max-h-80 min-w-fit" {show} {dark}>

@@ -14,7 +14,7 @@
 <button on:click class={`pill ${color} ${classes}`} class:active {disabled}>
   {#if icon}
     <span class:animate-spin={loading}>
-      <Icon name={loading ? 'spinner' : icon} scale={1} />
+      <Icon name={loading ? 'spinner' : icon} />
     </span>
   {/if}
   <slot />

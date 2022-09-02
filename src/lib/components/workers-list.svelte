@@ -39,16 +39,16 @@
         </div>
         <div class="w-3/12 text-left">
           {#if poller.taskQueueTypes.includes('WORKFLOW')}
-            <Icon name="checkMark" stroke="blue" />
+            <Icon name="checkmark" class="text-blue-700" />
           {:else}
-            <Icon name="close" stroke="black" />
+            <Icon name="close" class="text-primary" />
           {/if}
         </div>
         <div class="w-3/12 text-left">
           {#if poller.taskQueueTypes.includes('ACTIVITY')}
-            <Icon name="checkMark" stroke="blue" />
+            <Icon name="checkmark" class="text-blue-700" />
           {:else}
-            <Icon name="close" stroke="black" />
+            <Icon name="close" class="text-primary" />
           {/if}
         </div>
       </article>

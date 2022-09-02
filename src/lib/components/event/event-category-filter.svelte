@@ -39,7 +39,7 @@
     >
       <div class="check active">
         {#if _value === option}
-          <Icon stroke="currentcolor" name="checkMark" scale={0.8} />
+          <Icon name="checkmark" />
         {/if}
       </div>
       <div class="label">

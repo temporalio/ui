@@ -20,7 +20,7 @@
       {label}
     </Button>
     <MenuButton dark class="segment right" bind:show controls={id} {disabled}>
-      <Icon stroke="currentcolor" name="caretDown" />
+      <Icon name="chevron-down" />
     </MenuButton>
   </div>
   <Menu class="min-w-max" {id} {show} {position}>

@@ -8,7 +8,6 @@
 
   export let icon: IconName = null;
   export let group = getAppContext('group');
-  export let scale = 1;
   export let href = '#';
   export let base = href;
   export let active: boolean = false;
@@ -26,7 +25,7 @@
 >
   {#if icon}
     <div class="flex items-center gap-2">
-      <Icon stroke="currentColor" name={icon} {scale} />
+      <Icon name={icon} />
       <span class="hidden md:block"><slot /></span>
     </div>
   {:else}

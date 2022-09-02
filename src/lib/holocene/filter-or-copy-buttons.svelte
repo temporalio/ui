@@ -20,20 +20,16 @@
         {#key filtered}
           <Icon
             name="filter"
+            class="h-4 w-4"
             stroke="#000"
             fill={filtered ? '#000' : ''}
-            class="h-4 w-4"
           />
         {/key}
       </button>
     {/if}
     {#if copyable}
       <button on:click|preventDefault|stopPropagation={(e) => copy(e, content)}>
-        <Icon
-          name={$copied ? 'checkMark' : 'copy'}
-          stroke="#000"
-          class="h-4 w-4"
-        />
+        <Icon name={$copied ? 'checkmark' : 'copy'} stroke="#000" />
       </button>
     {/if}
   </div>

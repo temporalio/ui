@@ -31,7 +31,7 @@
     >
       <div class="check">
         {#if $timeFormat === option}
-          <Icon name="check" scale={0.8} />
+          <Icon name="checkmark" />
         {/if}
       </div>
       <div class="label">

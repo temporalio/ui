@@ -24,14 +24,7 @@
 
 <div class="input-container focus-within:border-blue-700">
   <label for={id} class="hidden">{name}</label>
-  <span
-    ><Icon
-      name="search"
-      scale={0.9}
-      stroke="gray"
-      class="flex items-center"
-    /></span
-  >
+  <span><Icon name="search" class="flex items-center text-gray-700" /></span>
   <input
     class="block w-full focus:outline-none"
     placeholder={name}

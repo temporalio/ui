@@ -97,7 +97,7 @@
           class="absolute top-0 back-to-workflows"
           style="left: -.5rem"
         >
-          <Icon scale={0.8} name="caretLeft" class="inline" />Back to Schedules
+          <Icon name="chevron-left" class="inline" />Back to Schedules
         </a>
         <div class="flex justify-between items-center mt-8">
           <h1 class="text-2xl flex relative items-center gap-4">

@@ -142,13 +142,13 @@
           on:click={() => handleGroupClick(item)}
         >
           {#if failure}
-            <Icon class="inline text-red-700" name="clock" scale={0.7} />
+            <Icon class="inline text-red-700" name="clock" />
           {/if}
           {#if canceled}
-            <Icon class="inline text-yellow-700" name="clock" scale={0.7} />
+            <Icon class="inline text-yellow-700" name="clock" />
           {/if}
           {#if terminated}
-            <Icon class="inline text-pink-700" name="clock" scale={0.7} />
+            <Icon class="inline text-pink-700" name="clock" />
           {/if}
           {item.name}
         </button>

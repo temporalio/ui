@@ -7,7 +7,7 @@
 
 <Chapter description="A Dropdown Menu">
   <DropdownMenu id="dropdown-1">
-    <Icon name="verticalEllipsis" slot="trigger" />
+    <Icon name="vertical-ellipsis" slot="trigger" />
     <svelte:fragment slot="items">
       <MenuItem href="https://temporal.io">Link</MenuItem>
       <MenuItem disabled href="https://temporal.io">Disabled Link</MenuItem>

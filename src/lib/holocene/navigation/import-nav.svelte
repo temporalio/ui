@@ -14,7 +14,7 @@
     <NavRow link={linkList.import} {isCloud}>
       <Tooltip right hide={$navOpen} text="Import">
         <div class="nav-icon">
-          <Icon {isCloud} name="download" scale={1} />
+          <Icon {isCloud} name="download" />
         </div>
       </Tooltip>
       <div class="nav-title">Import</div>

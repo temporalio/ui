@@ -15,12 +15,7 @@
   class="relative flex items-center rounded-lg border-2 transition-colors focus-within:border-blue-700"
 >
   {#if icon}
-    <Icon
-      name="search"
-      scale={0.9}
-      stroke="gray"
-      class="ml-4 flex items-center"
-    />
+    <Icon name="search" class="ml-4 flex items-center text-gray-700" />
   {/if}
   <label for={id} class="hidden">{label}</label>
   <input
