@@ -6,7 +6,7 @@
 </script>
 
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import type { SvelteComponent } from 'svelte';
   import FeatureTag from '$lib/holocene/feature-tag.svelte';
   import type { DescribeNamespaceResponse as Namespace } from '$types';
@@ -50,7 +50,7 @@
     <NavRow link={linkList.workflows} {isCloud} data-cy="workflows-button">
       <NavTooltip right text="Workflows">
         <div class="nav-icon">
-          <Icon name="workflow" scale={1.5} />
+          <Icon name="workflow" />
         </div>
       </NavTooltip>
       <div class="nav-title">Workflows</div>
@@ -67,7 +67,7 @@
         >
           <NavTooltip right text="Schedules">
             <div class="nav-icon">
-              <Icon name="calendarPlus" scale={1} />
+              <Icon name="schedules" />
               <FeatureTag feature="schedules" alpha />
             </div>
           </NavTooltip>
@@ -79,7 +79,7 @@
       <NavRow link={linkList.namespaces} {isCloud} data-cy="namespaces-button">
         <NavTooltip right text="Namespaces">
           <div class="nav-icon">
-            <Icon name="namespace" scale={1.5} />
+            <Icon name="namespace" />
           </div>
         </NavTooltip>
         <div class="nav-title">Namespaces</div>
@@ -90,7 +90,7 @@
       <NavRow link={linkList.archive} {isCloud} data-cy="archive-button">
         <NavTooltip right text="Archive">
           <div class="nav-icon">
-            <Icon name="archive" scale={1.2} />
+            <Icon name="archives" />
           </div>
         </NavTooltip>
         <div class="nav-title">Archive</div>
@@ -114,7 +114,7 @@
       <NavRow link={linkList.feedback} {isCloud} externalLink>
         <NavTooltip right text="Feedback">
           <div class="nav-icon">
-            <Icon name="feedback" scale={1.4} />
+            <Icon name="feedback" />
           </div>
         </NavTooltip>
         <div class="nav-title">Feedback</div>
@@ -135,7 +135,7 @@
         <NavRow {isCloud} on:click={logout}>
           <NavTooltip right text="Logout">
             <div class="nav-icon">
-              <Icon name="logout" scale={1.4} />
+              <Icon name="logout" />
             </div>
           </NavTooltip>
           <div class="nav-title cursor-pointer">Logout</div>

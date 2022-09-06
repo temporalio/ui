@@ -9,7 +9,7 @@
   } from '$lib/utilities/format-date';
   import { routeForPendingActivities } from '$lib/utilities/route-for';
   import Link from '$lib/holocene/link.svelte';
-  import Icon from '$holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import Badge from '$holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import {
@@ -52,12 +52,7 @@
                   <h4 class="pending-activity-detail-header">Attempt</h4>
                   <Badge type={failed ? 'error' : 'default'}>
                     {#if failed}
-                      <Icon
-                        name="refresh"
-                        stroke="currentcolor"
-                        scale={0.5}
-                        strokeWidth={2}
-                      />
+                      <Icon name="retry" />
                     {/if}
                     {pendingActivity.attempt}
                   </Badge>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from '$holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import type { IconName } from '$holocene/icon/paths';
   import MenuContainer from '$holocene/primitives/menu/menu-container.svelte';
   import MenuButton from '$holocene/primitives/menu/menu-button.svelte';
@@ -7,7 +7,7 @@
 
   export let label: string;
   export let id: string;
-  export let icon: IconName = '';
+  export let icon: IconName = null;
   export let readonly = false;
 
   let show = false;
@@ -22,19 +22,13 @@
   >
     {#if icon}
       <div class="ml-4 flex items-center">
-        <Icon
-          name={icon}
-          strokeWidth={1}
-          width={12}
-          height={12}
-          stroke="currentcolor"
-        />
+        <Icon name={icon} />
       </div>
     {/if}
     <span class="ml-2 mr-8">{label}</span>
     {#if !readonly}
       <div class="mr-2">
-        <Icon scale={0.8} name={show ? 'caretUp' : 'caretDown'} />
+        <Icon name={show ? 'chevron-up' : 'chevron-down'} />
       </div>
     {/if}
   </MenuButton>

@@ -1,12 +1,12 @@
 <script lang="ts">
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
 
   export let id: string;
   export let value: string;
   export let label = '';
-  export let icon: IconName = '';
+  export let icon: IconName = null;
   export let placeholder = '';
   export let name = id;
   export let copyable: boolean = false;
@@ -26,9 +26,9 @@
     <label for={id}>{label}</label>
   {/if}
   <div class="input-container {theme}" class:disabled class:invalid={!valid}>
-    {#if icon !== ''}
+    {#if icon}
       <span class="icon-container">
-        <Icon name={icon} scale={0.9} stroke="currentcolor" />
+        <Icon name={icon} />
       </span>
     {/if}
     <input
@@ -49,11 +49,11 @@
     />
     {#if copyable}
       <div class="copy-icon-container" on:click={(e) => copy(e, value)}>
-        <Icon name={$copied ? 'checkMark' : 'copy'} stroke="currentcolor" />
+        <Icon name={$copied ? 'checkmark' : 'copy'} />
       </div>
     {:else if disabled}
       <div class="flex h-full w-9 items-center justify-center">
-        <Icon name="lock" stroke="currentcolor" />
+        <Icon name="lock" />
       </div>
     {/if}
     {#if maxLength}
