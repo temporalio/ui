@@ -33,30 +33,33 @@
       namespace?.namespaceInfo?.name === activeNamespaceName,
   );
 
-  const namespaceList = namespaces.map((namespace: string) => {
+  function getCurrentHref(namespace: string) {
     const onSchedulesPage = $page.url.pathname.endsWith('schedules');
     const href = onSchedulesPage
       ? routeForSchedules({ namespace })
       : routeForWorkflows({ namespace });
+    return href;
+  }
+
+  let namespaceList = namespaces.map((namespace: string) => {
     return {
       namespace,
-      href,
-      onClick: () => {
+      href: (namespace: string) => getCurrentHref(namespace),
+      onClick: (namespace: string) => {
         $lastUsedNamespace = namespace;
-        goto(routeForWorkflows({ namespace }));
+        goto(getCurrentHref(namespace));
       },
     };
   });
 
   // To show single namespace on cloud
   if (isCloud && $page.params.namespace && !namespaces.length) {
-    const href = routeForWorkflows({ namespace: $page.params.namespace });
     namespaceList.push({
       namespace: $page.params.namespace,
-      href,
-      onClick: () => {
+      href: (namespace: string) => routeForWorkflows({ namespace }),
+      onClick: (namespace: string) => {
         $lastUsedNamespace = $page.params.namespace;
-        goto(href);
+        goto(routeForWorkflows({ namespace }));
       },
     });
   }

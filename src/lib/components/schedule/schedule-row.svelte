@@ -19,7 +19,7 @@
     });
 </script>
 
-<a sveltekit:prefetch href={getRoute()} class="row">
+<a href={getRoute()} class="row">
   <div class="cell">
     <WorkflowStatus status={schedule?.info?.paused ? 'Paused' : 'Running'} />
   </div>

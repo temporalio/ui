@@ -3,7 +3,7 @@
 declare module '@crownframework/svelte-error-boundary';
 declare module '@sveltejs/svelte-virtual-list';
 
-type NamespaceItem = { namespace: string; href: string; onClick: () => void };
+type NamespaceItem = { namespace: string; href: (namspace: string) => string; onClick: (namspace: string) => void };
 
 type Optional<T extends unknown, K extends keyof T = keyof T> = Omit<T, K> &
   Partial<Pick<T, K>>;
