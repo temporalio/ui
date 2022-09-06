@@ -7,8 +7,7 @@
 
 <script lang="ts">
   import { onDestroy, setContext } from 'svelte';
-  import colors from 'tailwindcss/colors';
-  import Icon from '$holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import Menu from '$holocene/primitives/menu/menu.svelte';
   import MenuButton from '$holocene/primitives/menu/menu-button.svelte';
   import MenuContainer from '$holocene/primitives/menu/menu-container.svelte';
@@ -71,9 +70,9 @@
         {/if}
       </div>
       {#if disabled}
-        <Icon name="lock" stroke={colors.gray[600]} />
+        <Icon name="lock" class="text-gray-500" />
       {:else}
-        <Icon stroke="currentcolor" name={show ? 'caretUp' : 'caretDown'} />
+        <Icon name={show ? 'chevron-up' : 'chevron-down'} />
       {/if}
     </MenuButton>
     <Menu id="{id}-menu" class="h-auto max-h-80 min-w-fit" {show} {dark}>

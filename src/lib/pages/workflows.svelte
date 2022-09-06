@@ -24,7 +24,7 @@
   import Loading from '$holocene/loading.svelte';
   import PageTitle from '$lib/holocene/page-title.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
 
@@ -64,7 +64,7 @@
   </div>
   <div>
     <Button variant="secondary" on:click={refreshWorkflows}
-      ><Icon name="refresh" stroke="currentColor" /></Button
+      ><Icon name="retry" /></Button
     >
   </div>
 </div>

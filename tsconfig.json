@@ -10,7 +10,7 @@
 			to enforce using \`import type\` instead of \`import\` for Types.
 			*/
     "importsNotUsedAsValues": "error",
-    "isolatedModules": true,
+    "isolatedModules": false,
     "resolveJsonModule": true,
     /**
 			To have warnings/errors of the Svelte compiler at the correct position,
@@ -36,10 +36,10 @@
     "src/**/*.js",
     "src/**/*.ts",
     "src/**/*.svelte",
-    "src/lib/models/**/*.test.ts"
+    "src/lib/models/**/*.test.ts",
+    "cypress/**/*.ts"
   ],
   "exclude": [
-    "src/lib/holocene/**/*.test.ts",
     "src/lib/services/**/*.test.ts",
     "src/lib/utilities/**/*.test.ts",
     "src/lib/stores/**/*.test.ts"

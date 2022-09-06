@@ -57,7 +57,7 @@
 <Chapter
   description="A button with an Icon"
   component={Button}
-  props={{ icon: 'refresh', iconScale: 0.8 }}
+  props={{ icon: 'retry' }}
 >
   Reload
 </Chapter>
@@ -75,7 +75,7 @@
     <Button>Primary</Button>
     <Button variant="secondary">Secondary</Button>
     <Button variant="destructive">Danger</Button>
-    <Button icon="refresh" variant="secondary">Refresh</Button>
+    <Button icon="retry" variant="secondary">Refresh</Button>
     <Button loading variant="secondary">Loading</Button>
   </div>
 </Chapter>

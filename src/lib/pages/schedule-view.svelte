@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import { routeForSchedules } from '$lib/utilities/route-for';
   import { goto } from '$app/navigation';
 
@@ -94,10 +94,10 @@
       <main class="flex flex-col gap-1 relative">
         <a
           href={routeForSchedules({ namespace })}
-          class="absolute top-0 back-to-workflows"
+          class="absolute top-0 back-to-schedules"
           style="left: -.5rem"
         >
-          <Icon scale={0.8} name="caretLeft" class="inline" />Back to Schedules
+          <Icon name="chevron-left" class="inline" />Back to Schedules
         </a>
         <div class="flex justify-between items-center mt-8">
           <h1 class="text-2xl flex relative items-center gap-4">
@@ -225,3 +225,13 @@
     </Modal>
   {/if}
 {/await}
+
+<style lang="postcss">
+  .back-to-schedules {
+    @apply text-sm;
+  }
+
+  .back-to-schedules:hover {
+    @apply text-blue-700 underline;
+  }
+</style>

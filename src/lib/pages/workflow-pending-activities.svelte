@@ -2,7 +2,7 @@
   import { page } from '$app/stores';
   import { workflowRun } from '$lib/stores/workflow-run';
 
-  import Icon from '$holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import Badge from '$holocene/badge.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -49,13 +49,7 @@
             <h2>Attempt</h2>
             <Badge type={failed ? 'error' : 'default'}>
               {#if failed}
-                <Icon
-                  class="mr-1"
-                  stroke="currentcolor"
-                  name="refresh"
-                  strokeWidth={2}
-                  scale={0.5}
-                />
+                <Icon class="mr-1" name="retry" />
               {/if}
               {details.attempt}
             </Badge>

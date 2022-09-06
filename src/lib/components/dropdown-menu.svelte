@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { scale } from 'svelte/transition';
   import IconButton from '$holocene/icon-button.svelte';
-  import Icon from '$holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
 
   export let value: string | undefined;
   export let left = false;
@@ -43,13 +43,7 @@
 
 <div class="relative inline" bind:this={menu} data-cy={$$props.dataCy}>
   <IconButton on:click={() => (show = !show)} dataCy="{$$props.dataCy}-button">
-    <Icon
-      name="caretDown"
-      stroke="currentcolor"
-      width={16}
-      height={16}
-      scale={2 / 3}
-    />
+    <Icon name="chevron-down" width={16} height={16} />
   </IconButton>
   {#if show}
     <div

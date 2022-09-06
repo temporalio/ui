@@ -51,4 +51,4 @@
   accept=".json"
   on:change={onFileSelect}
 />
-<Button icon="fileUpload" on:click={onConfirm}>Import</Button>
+<Button icon="file-upload" on:click={onConfirm}>Import</Button>

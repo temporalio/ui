@@ -10,7 +10,7 @@
 
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
-  import Icon from '$holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
 
   import { page } from '$app/stores';
   import { routeForSchedules } from '$lib/utilities/route-for';
@@ -36,15 +36,13 @@
     <Loading title="Creating Schedule..." />
   {:else}
     <main class="relative mb-12 flex gap-1">
-      <div class="back-to-schedules">
-        <a
-          href={routeForSchedules({ namespace })}
-          class="back-to-schedules absolute top-0"
-          style="left: 0rem"
-        >
-          <Icon scale={0.8} name="caretLeft" class="inline" />Back to Schedules
-        </a>
-      </div>
+      <a
+        href={routeForSchedules({ namespace })}
+        class="back-to-schedules absolute top-0"
+        style="left: 0rem"
+      >
+        <Icon name="chevron-left" class="inline" />Back to Schedules
+      </a>
       <h2 class="font-base mt-8 ml-0 text-2xl">Create Schedule</h2>
     </main>
     <form use:form class="mb-4 flex w-full flex-col gap-4 md:w-2/3 xl:w-1/2">
@@ -69,7 +67,7 @@
             on:click={() => (tab = 'interval')}>Interval</ToggleButton
           >
           <ToggleButton
-            icon="calendarPlus"
+            icon="calendar-plus"
             active={tab === 'calendar'}
             data-cy="calendar"
             on:click={() => (tab = 'calendar')}>Calendar</ToggleButton
@@ -138,9 +136,5 @@
 
   .back-to-schedules:hover {
     @apply text-blue-700 underline;
-  }
-
-  .back-to-schedules:hover :global(svg path) {
-    stroke: #1d4ed8;
   }
 </style>

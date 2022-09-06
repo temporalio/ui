@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
 
   import { fly } from 'svelte/transition';
 
@@ -18,9 +18,8 @@
   <div class="col-span-4 flex justify-start gap-4">
     <div on:click={() => (open = !open)} data-cy="hamburger-icon">
       <Icon
-        class="cursor-pointer"
-        name={open ? 'navCollapse' : 'navExpand'}
-        color="white"
+        class="cursor-pointer text-white"
+        name={open ? 'nav-collapse' : 'nav-expand'}
       />
     </div>
   </div>

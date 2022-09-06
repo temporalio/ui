@@ -62,8 +62,7 @@
       </Select>
       <Button
         on:click={() => query(queryType)}
-        icon="refresh"
-        iconScale={0.8}
+        icon="retry"
         loading={isLoading}
       >
         Refresh

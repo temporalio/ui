@@ -32,7 +32,7 @@
       on:click={() => (tab.b = 'auto')}>Auto</ToggleButton
     >
     <ToggleButton
-      icon="calendarPlus"
+      icon="calendar-plus"
       active={tab.b === 'manual'}
       on:click={() => (tab.b = 'manual')}>Manual</ToggleButton
     >

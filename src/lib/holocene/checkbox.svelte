@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import Icon from '$holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   export let id: string;
   export let checked = false;
   export let label = '&nbsp;';
@@ -32,9 +32,8 @@
     {:else if checked}
       <Icon
         class="absolute top-0 left-0 h-4 w-4"
-        name="checkMark"
-        stroke="currentcolor"
-        strokeWidth="3"
+        name="checkmark"
+        strokeWidth={3}
       />
     {/if}
   </span>
