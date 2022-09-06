@@ -11,7 +11,7 @@
   "homepage": "https://github.com/temporalio/ui/tree/main",
   "scripts": {
     "start": "pnpm run dev:local -- --open",
-    "dev:local": ". ./.env && VITE_TEMPORAL_UI_BUILD_TARGET=local svelte-kit dev --port 3001",
+    "dev:local": ". ./.env && VITE_TEMPORAL_UI_BUILD_TARGET=local svelte-kit dev",
     "dev:cloud": "VITE_TEMPORAL_UI_BUILD_TARGET=cloud svelte-kit dev",
     "dev:test": ". ./.env && VITE_TEMPORAL_UI_BUILD_TARGET=local VITE_MODE=test svelte-kit dev",
     "build:local": "svelte-kit build",
