@@ -2,7 +2,7 @@
   import VirtualList from '@sveltejs/svelte-virtual-list';
   import { noop } from 'svelte/internal';
 
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
 
   import { timelineEvents } from '$lib/stores/events';
   import {
@@ -142,13 +142,13 @@
           on:click={() => handleGroupClick(item)}
         >
           {#if failure}
-            <Icon class="inline text-red-700" name="clock" scale={0.7} />
+            <Icon class="inline text-red-700" name="clock" />
           {/if}
           {#if canceled}
-            <Icon class="inline text-yellow-700" name="clock" scale={0.7} />
+            <Icon class="inline text-yellow-700" name="clock" />
           {/if}
           {#if terminated}
-            <Icon class="inline text-pink-700" name="clock" scale={0.7} />
+            <Icon class="inline text-pink-700" name="clock" />
           {/if}
           {item.name}
         </button>

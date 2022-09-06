@@ -1,13 +1,13 @@
 <script lang="ts">
   import DropdownMenu from '$lib/holocene/dropdown-menu.svelte';
   import Chapter from '../_chapter.svelte';
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
 </script>
 
 <Chapter description="A Dropdown Menu">
   <DropdownMenu id="dropdown-1">
-    <Icon name="verticalEllipsis" slot="trigger" />
+    <Icon name="vertical-ellipsis" slot="trigger" />
     <svelte:fragment slot="items">
       <MenuItem href="https://temporal.io">Link</MenuItem>
       <MenuItem disabled href="https://temporal.io">Disabled Link</MenuItem>

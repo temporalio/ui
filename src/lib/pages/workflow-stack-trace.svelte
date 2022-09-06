@@ -51,12 +51,7 @@
       </div>
     {:then result}
       <div class="flex items-center gap-4">
-        <Button
-          on:click={refreshStackTrace}
-          iconScale={0.8}
-          icon="refresh"
-          loading={isLoading}
-        >
+        <Button on:click={refreshStackTrace} icon="retry" loading={isLoading}>
           Refresh
         </Button>
         <p>Stack Trace at {currentdate.toLocaleTimeString()}</p>

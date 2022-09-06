@@ -63,12 +63,7 @@
       animate:flip={{ duration: (d) => Math.sqrt(d * 200) }}
     >
       <p class="font-secondary text-sm">{message}</p>
-      <IconButton
-        scale={1.25}
-        stroke="currentcolor"
-        icon="close"
-        on:click={() => pop(key)}
-      />
+      <IconButton icon="close" on:click={() => pop(key)} />
     </article>
   {/each}
 </div>

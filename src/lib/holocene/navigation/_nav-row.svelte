@@ -46,24 +46,4 @@
   .cloud:hover {
     @apply bg-gray-900 text-white;
   }
-  .local :global(svg) {
-    filter: invert(100%);
-    -webkit-filter: invert(100%);
-  }
-  .local:hover :global(svg) {
-    filter: invert(0);
-    -webkit-filter: invert(0%);
-  }
-  .cloud:hover :global(svg) {
-    filter: invert(100%);
-    -webkit-filter: invert(100%);
-  }
-  .noFilter :global(svg) {
-    filter: invert(0%);
-    -webkit-filter: invert(0%);
-  }
-  .noFilter:hover :global(svg) {
-    filter: invert(0%);
-    -webkit-filter: invert(0%);
-  }
 </style>

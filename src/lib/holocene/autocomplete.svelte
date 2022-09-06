@@ -10,7 +10,7 @@
   export let value: string;
   export let label = '';
   export let placeholder = '';
-  export let icon: IconName = '';
+  export let icon: IconName = null;
   export let copyable: boolean = false;
   export let theme: 'dark' | 'light' = 'light';
   export let options: string[];

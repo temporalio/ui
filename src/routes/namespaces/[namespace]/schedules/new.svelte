@@ -10,7 +10,7 @@
 
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
-  import Icon from '$holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
 
   import { page } from '$app/stores';
   import { routeForSchedules } from '$lib/utilities/route-for';
@@ -41,7 +41,7 @@
           class="back-to-workflows absolute top-0"
           style="left: 0rem"
         >
-          <Icon scale={0.8} name="caretLeft" class="inline" />Back to Schedules
+          <Icon name="chevron-left" class="inline" />Back to Schedules
         </a>
       </div>
       <h2 class="font-base mt-8 ml-0 text-2xl">Create Schedule</h2>
@@ -68,7 +68,7 @@
             on:click={() => (tab = 'interval')}>Interval</ToggleButton
           >
           <ToggleButton
-            icon="calendarPlus"
+            icon="calendar-plus"
             active={tab === 'calendar'}
             data-cy="calendar"
             on:click={() => (tab = 'calendar')}>Calendar</ToggleButton

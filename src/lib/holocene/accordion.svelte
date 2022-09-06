@@ -1,10 +1,9 @@
 <script lang="ts">
-  import colors from 'tailwindcss/colors';
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import type { IconName } from './icon/paths';
   export let title: string;
   export let subtitle: string = '';
-  export let icon: IconName | undefined = undefined;
+  export let icon: IconName = null;
   export let open: boolean = false;
   export let disabled: boolean = false;
   export let readOnly: boolean = false;
@@ -27,14 +26,13 @@
     >
       <div class="space-between flex flex-row">
         <h2 class="flex w-full items-center gap-2 text-lg font-medium">
-          {#if icon}<Icon scale={1.25} name={icon} />{/if}
+          {#if icon}<Icon name={icon} />{/if}
           {title}
         </h2>
         {#if !readOnly}
           <Icon
-            name={open ? 'caretUp' : 'caretDown'}
-            stroke={disabled ? colors.gray[500] : 'currentcolor'}
-            scale={1.4}
+            name={open ? 'chevron-up' : 'chevron-down'}
+            class={disabled ? 'text-gray-500' : 'text-primary'}
           />
         {/if}
       </div>

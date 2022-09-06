@@ -1,10 +1,10 @@
 <script lang="ts">
   import Copyable from '$lib/components/copyable.svelte';
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
 
   export let text: string = '';
-  export let icon: IconName | undefined = undefined;
+  export let icon: IconName = null;
   export let top = false;
   export let topRight = false;
   export let right = false;
@@ -39,8 +39,7 @@
             <span class="text-gray-100"
               >{#if icon}<Icon
                   name={icon}
-                  class="inline h-4"
-                  stroke="#fff"
+                  class="inline h-4 text-white"
                 />{/if}{text}</span
             >
           </Copyable>
@@ -48,8 +47,7 @@
           <span class="flex gap-2 text-gray-100"
             >{#if icon}<Icon
                 name={icon}
-                class="inline h-4"
-                stroke="#fff"
+                class="inline h-4 text-white"
               />{/if}{text}</span
           >
         {/if}
