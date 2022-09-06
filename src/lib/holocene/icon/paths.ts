@@ -1,6 +1,7 @@
 import add from './svg/add.svelte';
 import archives from './svg/archives.svelte';
 import arrowUp from './svg/arrow-up.svelte';
+import book from './svg/book.svelte';
 import calendarPlus from './svg/calendar-plus.svelte';
 import chart from './svg/chart.svelte';
 import checkmark from './svg/checkmark.svelte';
@@ -25,6 +26,7 @@ import fileImport from './svg/file-import.svelte';
 import fileUpload from './svg/file-upload.svelte';
 import filter from './svg/filter.svelte';
 import filterSolid from './svg/filter-solid.svelte';
+import graph from './svg/graph.svelte';
 import hyphen from './svg/hyphen.svelte';
 import info from './svg/info.svelte';
 import invertedCheckmark from './svg/inverted-checkmark.svelte';
@@ -44,6 +46,7 @@ import settings from './svg/settings.svelte';
 import sliders from './svg/sliders.svelte';
 import spinner from './svg/spinner.svelte';
 import spinnerSolid from './svg/spinner-solid.svelte';
+import terminal from './svg/terminal.svelte';
 import upload from './svg/upload.svelte';
 import usage from './svg/usage.svelte';
 import verticalEllipsis from './svg/vertical-ellipsis.svelte';
@@ -56,6 +59,7 @@ export const icons = {
   add,
   archives,
   'arrow-up': arrowUp,
+  book,
   'calendar-plus': calendarPlus,
   chart,
   checkmark,
@@ -80,6 +84,7 @@ export const icons = {
   'file-upload': fileUpload,
   filter,
   'filter-solid': filterSolid,
+  graph,
   hyphen,
   info,
   'inverted-checkmark': invertedCheckmark,
@@ -99,6 +104,7 @@ export const icons = {
   sliders,
   spinner,
   'spinner-solid': spinnerSolid,
+  terminal,
   upload,
   usage,
   'vertical-ellipsis': verticalEllipsis,
