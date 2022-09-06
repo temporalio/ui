@@ -1,0 +1,158 @@
+{
+  "schedule": {
+    "spec": {
+      "calendar": [],
+      "interval": [
+        {
+          "interval": "30s",
+          "phase": "0s"
+        }
+      ],
+      "excludeCalendar": [],
+      "startTime": null,
+      "endTime": null,
+      "jitter": null,
+      "timezoneName": "",
+      "timezoneData": null
+    },
+    "action": {
+      "startWorkflow": {
+        "workflowId": "abcd-efgh",
+        "workflowType": {
+          "name": "workflow.sanity"
+        },
+        "taskQueue": {
+          "name": "canary-task-queue",
+          "kind": "Normal"
+        },
+        "input": null,
+        "workflowExecutionTimeout": null,
+        "workflowRunTimeout": null,
+        "workflowTaskTimeout": null,
+        "workflowIdReusePolicy": "Unspecified",
+        "retryPolicy": null,
+        "cronSchedule": "",
+        "memo": null,
+        "searchAttributes": null,
+        "header": null
+      }
+    },
+    "policies": {
+      "overlapPolicy": "Unspecified",
+      "catchupWindow": null,
+      "pauseOnFailure": false
+    },
+    "state": {
+      "notes": "pausing",
+      "paused": true,
+      "limitedActions": false,
+      "remainingActions": "0"
+    }
+  },
+  "info": {
+    "actionCount": "10",
+    "missedCatchupWindow": "0",
+    "overlapSkipped": "349",
+    "runningWorkflows": [],
+    "recentActions": [
+      {
+        "scheduleTime": "2022-09-06T14:49:30Z",
+        "actualTime": "2022-09-06T14:49:30.049541175Z",
+        "startWorkflowResult": {
+          "workflowId": "abcd-efgh-2022-09-06T14:49:30Z",
+          "runId": "473c1a84-c86d-45ed-b3af-f1099c367cb7"
+        }
+      },
+      {
+        "scheduleTime": "2022-09-06T15:08:30Z",
+        "actualTime": "2022-09-06T15:08:30.064658925Z",
+        "startWorkflowResult": {
+          "workflowId": "abcd-efgh-2022-09-06T15:08:30Z",
+          "runId": "9abf30fd-43b6-4544-85e7-88d60cfffc5a"
+        }
+      },
+      {
+        "scheduleTime": "2022-09-06T15:27:30Z",
+        "actualTime": "2022-09-06T15:27:30.024766258Z",
+        "startWorkflowResult": {
+          "workflowId": "abcd-efgh-2022-09-06T15:27:30Z",
+          "runId": "e99bf234-352a-4e8b-8887-4a359df33e10"
+        }
+      },
+      {
+        "scheduleTime": "2022-09-06T15:46:30Z",
+        "actualTime": "2022-09-06T15:46:30.036265133Z",
+        "startWorkflowResult": {
+          "workflowId": "abcd-efgh-2022-09-06T15:46:30Z",
+          "runId": "2d5443ea-cffb-4749-ae28-c1d290b29cf5"
+        }
+      },
+      {
+        "scheduleTime": "2022-09-06T16:05:30Z",
+        "actualTime": "2022-09-06T16:05:30.036110549Z",
+        "startWorkflowResult": {
+          "workflowId": "abcd-efgh-2022-09-06T16:05:30Z",
+          "runId": "46e2eebb-bf43-425d-9941-e017fb68ca3e"
+        }
+      },
+      {
+        "scheduleTime": "2022-09-06T16:24:30Z",
+        "actualTime": "2022-09-06T16:24:30.045577924Z",
+        "startWorkflowResult": {
+          "workflowId": "abcd-efgh-2022-09-06T16:24:30Z",
+          "runId": "5b225d00-e5d1-48ee-8702-5c5ecad3ff07"
+        }
+      },
+      {
+        "scheduleTime": "2022-09-06T16:43:30Z",
+        "actualTime": "2022-09-06T16:43:30.026058924Z",
+        "startWorkflowResult": {
+          "workflowId": "abcd-efgh-2022-09-06T16:43:30Z",
+          "runId": "4e0519a4-bb01-4c2c-a765-8621b9a9a245"
+        }
+      },
+      {
+        "scheduleTime": "2022-09-06T17:02:30Z",
+        "actualTime": "2022-09-06T17:02:30.066226340Z",
+        "startWorkflowResult": {
+          "workflowId": "abcd-efgh-2022-09-06T17:02:30Z",
+          "runId": "86f0a2f5-d556-4bca-8cb9-797922fc5b90"
+        }
+      },
+      {
+        "scheduleTime": "2022-09-06T17:21:30Z",
+        "actualTime": "2022-09-06T17:21:30.046587715Z",
+        "startWorkflowResult": {
+          "workflowId": "abcd-efgh-2022-09-06T17:21:30Z",
+          "runId": "432ee7ba-7e61-43fd-aba3-8016bca86595"
+        }
+      },
+      {
+        "scheduleTime": "2022-09-06T17:40:30Z",
+        "actualTime": "2022-09-06T17:40:30.055231632Z",
+        "startWorkflowResult": {
+          "workflowId": "abcd-efgh-2022-09-06T17:40:30Z",
+          "runId": "f418f96c-c3e5-47e3-b955-ed3f72abc5d7"
+        }
+      }
+    ],
+    "futureActionTimes": [
+      "2022-09-06T19:51:30Z",
+      "2022-09-06T19:52:00Z",
+      "2022-09-06T19:52:30Z",
+      "2022-09-06T19:53:00Z",
+      "2022-09-06T19:53:30Z",
+      "2022-09-06T19:54:00Z",
+      "2022-09-06T19:54:30Z",
+      "2022-09-06T19:55:00Z",
+      "2022-09-06T19:55:30Z",
+      "2022-09-06T19:56:00Z"
+    ],
+    "createTime": "2022-09-06T14:49:06.875735012Z",
+    "updateTime": null,
+    "invalidScheduleError": ""
+  },
+  "memo": null,
+  "searchAttributes": null,
+  "conflictToken": "AAAAAAAAAAI="
+}

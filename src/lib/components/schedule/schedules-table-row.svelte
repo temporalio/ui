@@ -20,7 +20,7 @@
     });
 </script>
 
-<TableRow href={getRoute()}>
+<TableRow href={getRoute()} class="schedule-row">
   <td class="cell">
     <WorkflowStatus status={schedule?.info?.paused ? 'Paused' : 'Running'} />
   </td>

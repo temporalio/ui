@@ -106,6 +106,20 @@ Cypress.Commands.add('interceptTaskQueuesApi', () => {
   ).as('task-queues-api');
 });
 
+Cypress.Commands.add('interceptSchedulesApi', () => {
+  cy.intercept(
+    Cypress.env('VITE_API_HOST') + `/api/v1/namespaces/*/schedules*`,
+    { fixture: 'schedules.json' },
+  ).as('schedules-api');
+});
+
+Cypress.Commands.add('interceptScheduleApi', () => {
+  cy.intercept(
+    Cypress.env('VITE_API_HOST') + `/api/v1/namespaces/*/schedules/*`,
+    { fixture: 'schedule.json' },
+  ).as('schedule-api');
+});
+
 Cypress.Commands.add(
   'interceptApi',
   ({ namespace } = { namespace: 'default' }) => {
@@ -119,5 +133,7 @@ Cypress.Commands.add(
     cy.interceptTaskQueuesApi();
     cy.interceptSettingsApi();
     cy.interceptSearchAttributesApi();
+    cy.interceptSchedulesApi();
+    cy.interceptScheduleApi();
   },
 );
