@@ -84,31 +84,6 @@ export const fields: Record<string, FormField> = {
   // "timezoneData": "string"
 };
 
-function getInvervalForShorthand(interval: string) {
-  switch (interval) {
-    case 'hourly': {
-      return '@hourly';
-    }
-    case 'daily': {
-      return '@daily';
-    }
-    case 'weekly': {
-      return '@weekly';
-    }
-    case 'monthly': {
-      return '@monthly';
-    }
-    case 'yearly': {
-      return '@yearly';
-    }
-    case 'custom': {
-      return '';
-    }
-    default:
-      return '';
-  }
-}
-
 export const submitScheduleForm = async (
   form: Form,
   namespace: string,
@@ -120,7 +95,6 @@ export const submitScheduleForm = async (
       spec: {
         calendar: [],
         interval: [],
-        startTime: '',
       },
       action: {
         startWorkflow: {
