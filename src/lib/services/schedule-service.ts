@@ -30,9 +30,9 @@ export const fetchAllSchedules = async (
 ): Promise<ScheduleResponse> => {
   let error = '';
   const onError: ErrorCallback = (err) =>
-  (error =
-    err?.body?.message ??
-    `Error fetching schedules: ${err.status}: ${err.statusText}`);
+    (error =
+      err?.body?.message ??
+      `Error fetching schedules: ${err.status}: ${err.statusText}`);
 
   const { schedules, nextPageToken } =
     (await requestFromAPI<ListScheduleResponse>(
@@ -79,9 +79,9 @@ export async function createSchedule({
 }: CreateScheduleOptions): Promise<{ error: string; conflictToken: string }> {
   let error = '';
   const onError: ErrorCallback = (err) =>
-  (error =
-    err?.body?.message ??
-    `Error creating schedule: ${err.status}: ${err.statusText}`);
+    (error =
+      err?.body?.message ??
+      `Error creating schedule: ${err.status}: ${err.statusText}`);
 
   const { conflictToken } = await requestFromAPI<{ conflictToken: string }>(
     routeForApi('schedules', {

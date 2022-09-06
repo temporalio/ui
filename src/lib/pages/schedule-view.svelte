@@ -127,14 +127,14 @@
         </div>
       </main>
       <SplitButton
-        right
+        position="right"
         label={schedule?.schedule?.state?.paused ? 'Unpause' : 'Pause'}
         id="pause-schedule-button"
         on:click={() => (showPauseConfirmation = !showPauseConfirmation)}
       >
         {#each options as option}
           <div
-            class="cursor-pointer flex gap-2 items-center {option?.class}"
+            class="cursor-pointer flex gap-2 p-4 items-center {option?.class}"
             on:click={option.onClick}
           >
             {option.label}

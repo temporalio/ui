@@ -22,7 +22,6 @@
   let { namespace } = $page.params;
 
   let tab = 'interval';
-  let interval = 'daily';
 
   const form = useForm();
 
@@ -78,58 +77,14 @@
         </ToggleButtons>
       </div>
       {#if tab === 'interval'}
-        <div class="my-2 flex justify-center">
-          <ToggleButtons>
-            <ToggleButton
-              active={interval === 'hourly'}
-              data-cy="interval-hourly"
-              on:click={() => (interval = 'hourly')}>Hourly</ToggleButton
-            >
-            <ToggleButton
-              active={interval === 'daily'}
-              data-cy="interval-daily"
-              on:click={() => (interval = 'daily')}>Daily</ToggleButton
-            >
-            <ToggleButton
-              active={interval === 'weekly'}
-              data-cy="interval-weekly"
-              on:click={() => (interval = 'weekly')}>Weekly</ToggleButton
-            >
-            <ToggleButton
-              active={interval === 'monthly'}
-              data-cy="interval-monthly"
-              on:click={() => (interval = 'monthly')}>Monthly</ToggleButton
-            >
-            <ToggleButton
-              active={interval === 'yearly'}
-              data-cy="interval-yearly"
-              on:click={() => (interval = 'yearly')}>Yearly</ToggleButton
-            >
-            <ToggleButton
-              active={interval === 'custom'}
-              data-cy="interval-custom"
-              on:click={() => (interval = 'custom')}>Custom</ToggleButton
-            >
-          </ToggleButtons>
-        </div>
-        <input
-          type="time"
-          id="shorthand"
-          name="shorthand"
-          min="00:00"
-          max="24:00"
-        />
-
-        {#if interval === 'custom'}
-          <div class="mb-4 flex gap-4">
-            <div class="w-full">
-              <FormInput field={fields.interval} />
-            </div>
-            <div class="w-full">
-              <FormInput field={fields.phase} />
-            </div>
+        <div class="mb-4 flex gap-4">
+          <div class="w-full">
+            <FormInput field={fields.interval} />
           </div>
-        {/if}
+          <div class="w-full">
+            <FormInput field={fields.phase} />
+          </div>
+        </div>
       {:else}
         <div class="mb-4 flex flex gap-4">
           <div class="w-1/4">
