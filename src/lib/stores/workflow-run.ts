@@ -35,7 +35,7 @@ const updateWorkflowRun: StartStopNotifier<{
   workflow: WorkflowExecution;
   workers: GetPollersResponse;
 }> = (set) => {
-  return parameters.subscribe(({ namespace, workflowId, runId, refresh }) => {
+  return parameters.subscribe(({ namespace, workflowId, runId }) => {
     if (namespace && workflowId && runId) {
       withLoading(loading, updating, async () => {
         const workflow = await fetchWorkflow({ namespace, workflowId, runId });

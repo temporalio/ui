@@ -52,8 +52,6 @@ describe('requestFromAPI (with a global access token)', () => {
   });
 
   it('should not add an authorization header if it is not running in the browser', async () => {
-    const token = 'token';
-
     const request = fetchMock();
     await requestFromAPI(endpoint, { request, isBrowser: false });
 
