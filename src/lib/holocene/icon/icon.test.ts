@@ -12,8 +12,8 @@ afterEach(() => {
   target.remove();
 });
 
-describe.each(Object.keys(icons))('$iconName Icon', (iconName) => {
-  test(`${iconName} renders`, () => {
+describe('Icon', () => {
+  test.each(Object.keys(icons))(`$iconName renders`, (iconName) => {
     const Icon = icons[iconName];
     const instance = new Icon({ target });
     expect(instance).toBeTruthy();
