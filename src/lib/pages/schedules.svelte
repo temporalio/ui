@@ -4,10 +4,7 @@
   import Button from '$holocene/button.svelte';
   import Badge from '$holocene/badge.svelte';
   import Loading from '$holocene/loading.svelte';
-  import Table from '$lib/components/table/index.svelte';
-  import ScheduleRow from '$lib/components/schedule/schedule-row.svelte';
 
-  import { columns } from './_schedule-table-columns';
   import { noop } from 'svelte/internal';
   import Input from '$lib/holocene/input/input.svelte';
   import { page } from '$app/stores';
@@ -17,6 +14,8 @@
   import type { ScheduleListEntry } from '$types';
   import PageTitle from '$lib/holocene/page-title.svelte';
   import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
+  import SchedulesTable from '$lib/components/schedule/schedules-table.svelte';
+  import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
 
   $: namespaceName = $page.params.namespace;
   $: fetchSchedules = fetchAllSchedules(namespaceName);
@@ -65,11 +64,11 @@
 {:then { schedules, error }}
   {#if schedules?.length}
     <Pagination items={filteredSchedules(schedules)} let:visibleItems>
-      <Table {columns}>
+      <SchedulesTable>
         {#each visibleItems as schedule}
-          <ScheduleRow {schedule} />
+          <SchedulesTableRow {schedule} />
         {/each}
-      </Table>
+      </SchedulesTable>
     </Pagination>
   {:else}
     <div class="my-12 flex flex-col items-center justify-start gap-2">
