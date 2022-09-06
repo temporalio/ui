@@ -1,7 +1,6 @@
 import add from './svg/add.svelte';
 import archives from './svg/archives.svelte';
 import arrowUp from './svg/arrow-up.svelte';
-import calendar from './svg/calendar.svelte';
 import calendarPlus from './svg/calendar-plus.svelte';
 import chart from './svg/chart.svelte';
 import checkmark from './svg/checkmark.svelte';
@@ -57,7 +56,6 @@ export const icons = {
   add,
   archives,
   'arrow-up': arrowUp,
-  calendar,
   'calendar-plus': calendarPlus,
   chart,
   checkmark,
