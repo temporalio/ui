@@ -22,9 +22,10 @@ import error from './svg/error.svelte';
 import feed from './svg/feed.svelte';
 import feedbackCircle from './svg/feedback-circle.svelte';
 import feedback from './svg/feedback.svelte';
-import filePlus from './svg/file-plus.svelte';
 import fileImport from './svg/file-import.svelte';
+import fileUpload from './svg/file-upload.svelte';
 import filter from './svg/filter.svelte';
+import filterSolid from './svg/filter-solid.svelte';
 import hyphen from './svg/hyphen.svelte';
 import info from './svg/info.svelte';
 import invertedCheckmark from './svg/inverted-checkmark.svelte';
@@ -78,8 +79,9 @@ export const icons = {
   'feedback-circle': feedbackCircle,
   feedback,
   'file-import': fileImport,
-  'file-plus': filePlus,
+  'file-upload': fileUpload,
   filter,
+  'filter-solid': filterSolid,
   hyphen,
   info,
   'inverted-checkmark': invertedCheckmark,

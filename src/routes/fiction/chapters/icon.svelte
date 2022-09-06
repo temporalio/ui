@@ -1,9 +1,12 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import { icons } from '$lib/holocene/icon/paths';
+  import { IconName, icons } from '$lib/holocene/icon/paths';
   import Table from '$lib/holocene/table/table.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
+
+  // gross casting because Object.keys isn't generic and always returns string[]
+  const iconNames: IconName[] = Object.keys(icons) as IconName[];
 </script>
 
 <Table variant="fancy" class="w-full">
@@ -13,7 +16,7 @@
     <th>Light</th>
     <th>Large</th>
   </TableHeaderRow>
-  {#each Object.keys(icons) as name}
+  {#each iconNames as name}
     <TableRow>
       <td>{name}</td>
       <td>
