@@ -1,6 +1,5 @@
 <script lang="ts">
-  import Chapter from '../_chapter.svelte';
-  import Icon from '$lib/holocene/icon/index.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import { icons } from '$lib/holocene/icon/paths';
   import Table from '$lib/holocene/table/table.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
