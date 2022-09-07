@@ -9,3 +9,5 @@ node_modules
 /coverage
 *.log
 *.swp
+/.vercel_build_output
+/.vercel

@@ -48,7 +48,7 @@ export const fetchAllWorkflows = async (
       `Error fetching workflows: ${err.status}: ${err.statusText}`;
   };
 
-  const handleError = (err: unknown) => {
+  const handleError = () => {
     // Handle when bad namespace is entered in URL and no status code is returned
     error = 'Failed to fetch workflows';
   };

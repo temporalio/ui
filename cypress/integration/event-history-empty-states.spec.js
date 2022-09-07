@@ -3,7 +3,7 @@
 import workflowsFixture from '../fixtures/workflows.json';
 
 const workflow = workflowsFixture.executions[0];
-const { workflowId, runId } = workflow?.execution;
+const { workflowId, runId } = workflow.execution;
 const workflowUrl = `/namespaces/default/workflows/${workflowId}/${runId}`;
 
 describe('Workflow Executions List', () => {

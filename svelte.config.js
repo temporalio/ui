@@ -1,6 +1,5 @@
-import path from 'path';
 import preprocess from 'svelte-preprocess';
-import adapter from '@sveltejs/adapter-static';
+import vercel from '@sveltejs/adapter-vercel';
 
 // Workaround until SvelteKit uses Vite 2.3.8 (and it's confirmed to fix the Tailwind JIT problem)
 const mode = process.env.NODE_ENV;
@@ -20,7 +19,7 @@ const config = {
     }),
   ],
   kit: {
-    adapter: adapter({
+    adapter: vercel({
       pages: outputDirectory,
       assets: outputDirectory,
       fallback: 'index.html',
@@ -43,15 +42,6 @@ const config = {
       //eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
       routes: (filepath) => /^(?!.*(?:fiction)).*$/.test(filepath),
     }),
-    vite: {
-      resolve: {
-        alias: {
-          $types: path.resolve('./src/types'),
-          $holocene: path.resolve('./src/lib/holocene'),
-          $fixtures: path.resolve('./src/fixtures'),
-        },
-      },
-    },
   },
 };
 
