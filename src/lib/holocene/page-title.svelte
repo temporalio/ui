@@ -1,8 +1,8 @@
 <script>
+  import { publicPath } from '$lib/utilities/get-public-path';
+
   export let title = 'Temporal';
   export let url = 'https://temporal.io';
-
-  const publicPath = import.meta.env.VITE_PUBLIC_PATH || '';
 
   export let image = `${publicPath}/banner.png`;
 </script>

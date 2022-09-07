@@ -1,7 +1,6 @@
 <script lang="ts">
+  import { publicPath } from '$lib/utilities/get-public-path';
   export let title: string = 'Loading…';
-
-  const publicPath = import.meta.env.VITE_PUBLIC_PATH || '';
 </script>
 
 <div class="my-12 flex flex-col items-center justify-start {$$props.class}">

@@ -1,6 +1,5 @@
 import { getApiOrigin } from './get-api-origin';
-
-const publicPath = import.meta.env.VITE_PUBLIC_PATH || '';
+import { publicPath } from './get-public-path';
 
 const replaceNamespaceInApiUrl = (
   apiUrl: string,

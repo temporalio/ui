@@ -1,8 +1,7 @@
 import { browser } from '$app/env';
 import { toURL } from '$lib/utilities/to-url';
+import { publicPath } from '$lib/utilities/get-public-path';
 import { encodeURIForSvelte } from '$lib/utilities/encode-uri';
-
-const publicPath = import.meta.env.VITE_PUBLIC_PATH || '';
 
 type RouteParameters = {
   namespace: string;
