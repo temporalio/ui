@@ -88,7 +88,7 @@ export const decodeAllPotentialPayloadsWithCodec = async (
   settings: Settings,
 ): Promise<EventAttribute> => {
   if (anyAttributes) {
-    for (let key of Object.keys(anyAttributes)) {
+    for (const key of Object.keys(anyAttributes)) {
       if (key === 'payloads') {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let JSONPayload: string | Payload | Record<any, any>;
@@ -123,7 +123,7 @@ export const decodeAllPotentialPayloadsWithWebsockets = async (
   ws: DataConverterWebsocketInterface,
 ): Promise<EventAttribute> => {
   if (anyAttributes) {
-    for (let key of Object.keys(anyAttributes)) {
+    for (const key of Object.keys(anyAttributes)) {
       if (key === 'payloads') {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let JSONPayload: string | Payload | Record<any, any>;
