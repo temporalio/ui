@@ -9,7 +9,7 @@ type NamespaceItem = {
   onClick: (namspace: string) => void;
 };
 
-type Optional<T extends unknown, K extends keyof T = keyof T> = Omit<T, K> &
+type Optional<T, K extends keyof T = keyof T> = Omit<T, K> &
   Partial<Pick<T, K>>;
 
 interface Window {

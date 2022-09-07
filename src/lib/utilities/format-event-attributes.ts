@@ -146,7 +146,7 @@ const consolidateActivityGroups = (
   // Move activity group into summary if activity
   if (event.category === 'activity' && groupedAttributes?.activity?.length) {
     groupedAttributes.summary = [
-      ...groupedAttributes?.activity,
+      ...groupedAttributes.activity,
       ...groupedAttributes.summary,
     ];
     groupedAttributes.activity = [];
@@ -156,7 +156,7 @@ const consolidateActivityGroups = (
   if (event.category === 'activity' && groupedAttributes?.workflow?.length) {
     groupedAttributes.summary = [
       ...groupedAttributes.summary,
-      ...groupedAttributes?.workflow,
+      ...groupedAttributes.workflow,
     ];
     groupedAttributes.workflow = [];
   }

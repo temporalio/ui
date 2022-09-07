@@ -10,7 +10,7 @@ import eventsContinuedAsNewFixture from '../fixtures/event-history-continued-as-
 import eventsTimedOutFixture from '../fixtures/event-history-timed-out.json';
 
 const workflow = workflowsFixture.executions[0];
-const { workflowId, runId } = workflow?.execution;
+const { workflowId, runId } = workflow.execution;
 
 describe('Workflow Input and Results', () => {
   beforeEach(() => {

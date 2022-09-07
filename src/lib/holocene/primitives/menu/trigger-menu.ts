@@ -4,7 +4,7 @@ export const triggerMenu = (node: HTMLElement): { destroy: () => void } => {
     path?: NodeList;
   };
 
-  const handleTriggerClick = (event: PointerEvent) => {
+  const handleTriggerClick = () => {
     node.dispatchEvent(new CustomEvent('toggle-menu'));
   };
 
