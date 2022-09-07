@@ -1,5 +1,7 @@
 import { getApiOrigin } from './get-api-origin';
 
+const publicPath = import.meta.env.VITE_PUBLIC_PATH || '';
+
 const replaceNamespaceInApiUrl = (
   apiUrl: string,
   namespace: string,
@@ -17,6 +19,8 @@ const base = (namespace?: string): string => {
   }
 
   if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+
+  baseUrl = `${baseUrl}${publicPath}`;
   return baseUrl;
 };
 

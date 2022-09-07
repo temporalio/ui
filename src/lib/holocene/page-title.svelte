@@ -1,13 +1,16 @@
 <script>
   export let title = 'Temporal';
   export let url = 'https://temporal.io';
-  export let image = '/banner.png';
+
+  const publicPath = import.meta.env.VITE_PUBLIC_PATH || '';
+
+  export let image = `${publicPath}/banner.png`;
 </script>
 
 <svelte:head>
   <title>{title}</title>
 
-  <link rel="manifest" href="/site.webmanifest" />
+  <link rel="manifest" href="{publicPath}/site.webmanifest" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
   <meta property="og:title" content={title} />

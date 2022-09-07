@@ -9,6 +9,8 @@ process.env.TAILWIND_MODE = dev ? 'watch' : 'build';
 const buildTarget = process.env.VITE_TEMPORAL_UI_BUILD_TARGET || 'local';
 let outputDirectory = `build-${buildTarget}`;
 
+const publicPath = process.env.VITE_PUBLIC_PATH || '';
+
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
   // Consult https://github.com/sveltejs/svelte-preprocess
@@ -24,6 +26,9 @@ const config = {
       assets: outputDirectory,
       fallback: 'index.html',
     }),
+    paths: {
+      base: publicPath,
+    },
     package: {
       dir: 'package',
       emitTypes: true,
