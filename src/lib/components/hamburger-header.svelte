@@ -4,6 +4,7 @@
   import { fly } from 'svelte/transition';
 
   import { hasKeys } from '$lib/utilities/has';
+  import { publicPath } from '$lib/utilities/get-public-path';
 
   import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
   import FeedbackButton from '$lib/components/feedback-button.svelte';
@@ -25,7 +26,7 @@
   </div>
   <div class="col-span-4 flex justify-center gap-4">
     <a {href} class="block">
-      <img src="/logo.svg" alt="Temporal Logo" class="max-h-10" />
+      <img src="{publicPath}/logo.svg" alt="Temporal Logo" class="max-h-10" />
     </a>
   </div>
   <div class="col-span-4 flex items-center justify-end gap-4">

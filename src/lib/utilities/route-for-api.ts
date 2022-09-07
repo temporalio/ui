@@ -1,4 +1,5 @@
 import { getApiOrigin } from './get-api-origin';
+import { publicPath } from './get-public-path';
 
 const replaceNamespaceInApiUrl = (
   apiUrl: string,
@@ -17,6 +18,8 @@ const base = (namespace?: string): string => {
   }
 
   if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+
+  baseUrl = `${baseUrl}${publicPath}`;
   return baseUrl;
 };
 
