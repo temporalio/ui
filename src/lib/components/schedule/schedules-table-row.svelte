@@ -8,6 +8,7 @@
   import Link from '$lib/holocene/link.svelte';
 
   import ScheduleFrequency from './schedule-frequency.svelte';
+  import TableRow from '$lib/holocene/table/table-row.svelte';
 
   let { namespace } = $page.params;
   export let schedule: ScheduleListEntry;
@@ -19,11 +20,11 @@
     });
 </script>
 
-<a sveltekit:prefetch href={getRoute()} class="row">
-  <div class="cell">
+<TableRow href={getRoute()} class="schedule-row">
+  <td class="cell">
     <WorkflowStatus status={schedule?.info?.paused ? 'Paused' : 'Running'} />
-  </div>
-  <div class="cell truncate">
+  </td>
+  <td class="cell truncate">
     {schedule.scheduleId}
     <p>
       <small class="text-gray-900"
@@ -33,11 +34,11 @@
         /></small
       >
     </p>
-  </div>
-  <div class="cell">
+  </td>
+  <td class="cell hidden md:table-cell">
     {schedule?.info?.workflowType?.name}
-  </div>
-  <div class="cell links hidden xl:table-cell">
+  </td>
+  <td class="cell links hidden xl:table-cell">
     {#each schedule?.info?.recentActions?.reverse().slice(0, 5) ?? [] as run}
       <p>
         <Link
@@ -49,28 +50,16 @@
         >
       </p>
     {/each}
-  </div>
-  <div class="cell hidden xl:table-cell">
+  </td>
+  <td class="cell hidden xl:table-cell">
     {#each schedule?.info?.futureActionTimes?.slice(0, 5) ?? [] as run}
       <div>{formatDate(run, $timeFormat, 'from now')}</div>
     {/each}
-  </div>
-</a>
+  </td>
+</TableRow>
 
 <style lang="postcss">
-  .row {
-    @apply block h-36 items-center border-b-2 p-2 text-sm no-underline last-of-type:border-b-0 xl:table-row xl:text-base;
-  }
-
-  .row:hover {
-    @apply bg-gray-50;
-  }
-
   .cell {
-    @apply border-gray-700 p-2 text-left xl:table-cell xl:border-b-2;
-  }
-
-  .row:last-of-type .cell {
-    @apply border-b-0 first-of-type:rounded-bl-lg  last-of-type:rounded-br-lg;
+    @apply p-2 text-left;
   }
 </style>

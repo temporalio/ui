@@ -1,0 +1,121 @@
+{
+  "schedules": [
+    {
+      "scheduleId": "test2",
+      "memo": "comments go here",
+      "searchAttributes": null,
+      "info": {
+        "spec": {
+          "calendar": [],
+          "interval": [
+            {
+              "interval": "30s",
+              "phase": "0s"
+            }
+          ],
+          "excludeCalendar": [],
+          "startTime": null,
+          "endTime": null,
+          "jitter": null,
+          "timezoneName": "",
+          "timezoneData": null
+        },
+        "workflowType": {
+          "name": "workflow.sanity"
+        },
+        "notes": "pausing",
+        "paused": true,
+        "recentActions": [
+          {
+            "scheduleTime": "2022-09-06T16:24:30Z",
+            "actualTime": "2022-09-06T16:24:30.045577924Z",
+            "startWorkflowResult": {
+              "workflowId": "abcd-efgh-2022-09-06T16:24:30Z",
+              "runId": "5b225d00-e5d1-48ee-8702-5c5ecad3ff07"
+            }
+          },
+          {
+            "scheduleTime": "2022-09-06T16:43:30Z",
+            "actualTime": "2022-09-06T16:43:30.026058924Z",
+            "startWorkflowResult": {
+              "workflowId": "abcd-efgh-2022-09-06T16:43:30Z",
+              "runId": "4e0519a4-bb01-4c2c-a765-8621b9a9a245"
+            }
+          },
+          {
+            "scheduleTime": "2022-09-06T17:02:30Z",
+            "actualTime": "2022-09-06T17:02:30.066226340Z",
+            "startWorkflowResult": {
+              "workflowId": "abcd-efgh-2022-09-06T17:02:30Z",
+              "runId": "86f0a2f5-d556-4bca-8cb9-797922fc5b90"
+            }
+          },
+          {
+            "scheduleTime": "2022-09-06T17:21:30Z",
+            "actualTime": "2022-09-06T17:21:30.046587715Z",
+            "startWorkflowResult": {
+              "workflowId": "abcd-efgh-2022-09-06T17:21:30Z",
+              "runId": "432ee7ba-7e61-43fd-aba3-8016bca86595"
+            }
+          },
+          {
+            "scheduleTime": "2022-09-06T17:40:30Z",
+            "actualTime": "2022-09-06T17:40:30.055231632Z",
+            "startWorkflowResult": {
+              "workflowId": "abcd-efgh-2022-09-06T17:40:30Z",
+              "runId": "f418f96c-c3e5-47e3-b955-ed3f72abc5d7"
+            }
+          }
+        ],
+        "futureActionTimes": [
+          "2022-09-06T19:31:30Z",
+          "2022-09-06T19:32:00Z",
+          "2022-09-06T19:32:30Z",
+          "2022-09-06T19:33:00Z",
+          "2022-09-06T19:33:30Z"
+        ]
+      }
+    },
+    {
+      "scheduleId": "test1",
+      "memo": null,
+      "searchAttributes": null,
+      "info": {
+        "spec": {
+          "calendar": [
+            {
+              "second": "",
+              "minute": "",
+              "hour": "",
+              "dayOfMonth": "",
+              "month": "",
+              "year": "",
+              "dayOfWeek": ""
+            }
+          ],
+          "interval": [],
+          "excludeCalendar": [],
+          "startTime": null,
+          "endTime": null,
+          "jitter": null,
+          "timezoneName": "",
+          "timezoneData": null
+        },
+        "workflowType": {
+          "name": "cronWorkflow"
+        },
+        "notes": "",
+        "paused": false,
+        "recentActions": [],
+        "futureActionTimes": [
+          "2022-09-07T00:00:00Z",
+          "2022-09-08T00:00:00Z",
+          "2022-09-09T00:00:00Z",
+          "2022-09-10T00:00:00Z",
+          "2022-09-11T00:00:00Z"
+        ]
+      }
+    }
+  ],
+  "nextPageToken": null
+}

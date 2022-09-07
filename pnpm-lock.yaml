@@ -9220,7 +9220,7 @@ packages:
       }
     dependencies:
       long: 4.0.0
-      protobufjs: 6.11.2
+      protobufjs: 6.11.3
     dev: true
 
   /ts-proto/1.112.2:
