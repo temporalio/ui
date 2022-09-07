@@ -1,5 +1,6 @@
 import { browser } from '$app/env';
 import { toURL } from '$lib/utilities/to-url';
+import { publicPath } from '$lib/utilities/get-public-path';
 import { encodeURIForSvelte } from '$lib/utilities/encode-uri';
 
 type RouteParameters = {
@@ -46,13 +47,13 @@ export type AuthenticationParameters = {
 };
 
 export const routeForNamespaces = (): string => {
-  return `/namespaces`;
+  return `${publicPath}/namespaces`;
 };
 
 export const routeForNamespace = ({
   namespace,
 }: NamespaceParameter): string => {
-  return `/namespaces/${namespace}`;
+  return `${publicPath}/namespaces/${namespace}`;
 };
 
 export const routeForWorkflows = (parameters: NamespaceParameter): string => {
@@ -135,7 +136,7 @@ export const routeForAuthentication = (
 ): string => {
   const { settings, searchParams: currentSearchParams, originUrl } = parameters;
 
-  const login = new URL('/auth/sso', settings.baseUrl);
+  const login = new URL(`${publicPath}/auth/sso`, settings.baseUrl);
   let opts = settings.auth.options ?? [];
 
   opts = [...opts, 'returnUrl'];
@@ -161,7 +162,7 @@ export const routeForLoginPage = (isBrowser = browser): string => {
     return login.toString();
   }
 
-  return '/login';
+  return `${publicPath}/login`;
 };
 
 type ImportParameters = {
@@ -174,9 +175,9 @@ export const routeForImport = ({
   view,
 }: ImportParameters): string => {
   if (importType === 'events' && view) {
-    return `/import/${importType}/namespace/workflow/run/history/${view}`;
+    return `${publicPath}/import/${importType}/namespace/workflow/run/history/${view}`;
   }
-  return `/import/${importType}`;
+  return `${publicPath}/import/${importType}`;
 };
 
 export const hasParameters =

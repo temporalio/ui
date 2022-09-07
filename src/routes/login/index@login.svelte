@@ -28,12 +28,13 @@
 <script lang="ts">
   import NavigationHeader from '$lib/components/navigation-header.svelte';
   import HamburgerHeader from '$lib/components/hamburger-header.svelte';
+  import { publicPath } from '$lib/utilities/get-public-path';
 
   export let settings: Settings;
 </script>
 
-<NavigationHeader href="/" user={undefined} />
-<HamburgerHeader href="/" user={undefined} />
+<NavigationHeader href="{publicPath}/" user={undefined} />
+<HamburgerHeader href="{publicPath}/" user={undefined} />
 <section class="my-[20vh] text-center">
   <h1 class="text-8xl font-semibold" data-cy="login-title">Welcome back.</h1>
   <p class="my-7" data-cy="login-info">Let's get you signed in.</p>
