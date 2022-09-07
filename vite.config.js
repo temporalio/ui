@@ -4,7 +4,9 @@ import path from 'path';
 /** @type {import('vite').UserConfig} */
 const config = {
   plugins: [sveltekit()],
-  optimizeDeps: ['date-fns', 'date-fns-tz'],
+  optimizeDeps: {
+    include: ['date-fns', 'date-fns-tz', 'websocket-as-promised'],
+  },
   resolve: {
     alias: {
       $types: path.resolve('./src/types'),
