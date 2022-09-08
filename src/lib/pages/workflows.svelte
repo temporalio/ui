@@ -25,6 +25,7 @@
   import PageTitle from '$lib/holocene/page-title.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$holocene/icon/icon.svelte';
+  import WorkflowAdvancedFilters from '$lib/components/workflow/workflow-advanced-filters.svelte';
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
 
@@ -68,7 +69,8 @@
     >
   </div>
 </div>
-<WorkflowFilters bind:searchType />
+<WorkflowAdvancedFilters />
+<!-- <WorkflowFilters bind:searchType /> -->
 {#if $loading}
   <Loading />
 {:else if $workflows.length}
