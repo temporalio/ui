@@ -9,8 +9,6 @@ import {
   lastDataEncoderStatus,
 } from './data-encoder-config';
 
-export const showDataEncoderSettings = writable(false);
-
 export const dataEncoder = derived(
   [
     page,
