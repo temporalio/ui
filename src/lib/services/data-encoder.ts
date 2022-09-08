@@ -15,7 +15,8 @@ export async function convertPayloadsWithCodec({
   namespace: string;
   settings: Settings;
 }): Promise<Payloads> {
-  const { endpoint, accessToken } = settings?.codec;
+  const endpoint = settings?.codec?.endpoint;
+  const accessToken = settings?.codec?.accessToken;
 
   const headers = {
     'Content-Type': 'application/json',
