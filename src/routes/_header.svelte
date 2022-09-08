@@ -14,7 +14,7 @@
   import DataEncoderStatus from '$lib/holocene/data-encoder-status.svelte';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { getApiOrigin } from '$lib/utilities/get-api-origin';
-  import { showDataEncoderSettings } from '$lib/stores/data-encoder';
+  import { showDataEncoderSettings } from '$lib/stores/show-data-encoder';
 
   export let user: User;
 
