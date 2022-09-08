@@ -82,38 +82,46 @@
           <Icon name="chevron-right" />
         </button>
       </div>
-      <slot name="action" />
+      <slot name="action-top-right" />
     </nav>
   </div>
   <slot visibleItems={$store.items} initialItem={$store.initialItem} />
-  <nav class="flex justify-end gap-8">
-    <div class="flex items-center justify-center gap-2">
-      <p class="w-fit text-right">Per Page</p>
-      <FilterSelect
-        label="Per Page"
-        parameter={key}
-        value={String(perPage)}
-        options={perPageOptions(perPage)}
-      />
-    </div>
-    <div class="flex items-center justify-center gap-6">
-      <button
-        class="caret"
-        disabled={!$store.hasPrevious}
-        on:click={() => store.previous()}
-      >
-        <Icon name="chevron-left" />
-      </button>
-      <p>
-        {$store.startingIndex + 1}–{$store.endingIndex + 1} of {$store.length}
-      </p>
-      <button
-        class="caret"
-        disabled={!$store.hasNext}
-        on:click={() => store.next()}
-      >
-        <Icon name="chevron-right" />
-      </button>
+  <nav
+    class={`flex ${
+      $$slots['action-bottom-left'] ? 'justify-between' : 'justify-end'
+    }`}
+  >
+    <slot name="action-bottom-left" />
+    <div class="flex gap-8">
+      <div class="flex items-center justify-center gap-2">
+        <p class="w-fit text-right">Per Page</p>
+        <FilterSelect
+          label="Per Page"
+          parameter={key}
+          value={String(perPage)}
+          options={perPageOptions(perPage)}
+        />
+      </div>
+      <div class="flex items-center justify-center gap-6">
+        <button
+          class="caret"
+          disabled={!$store.hasPrevious}
+          on:click={() => store.previous()}
+        >
+          <Icon name="chevron-left" />
+        </button>
+        <p>
+          {$store.startingIndex + 1}–{$store.endingIndex + 1} of {$store.length}
+        </p>
+        <button
+          class="caret"
+          disabled={!$store.hasNext}
+          on:click={() => store.next()}
+        >
+          <Icon name="chevron-right" />
+        </button>
+      </div>
+      <slot name="action-bottom-right" />
     </div>
   </nav>
 </div>
