@@ -44,11 +44,12 @@
 
 <div class="pagination relative mb-8 flex flex-col gap-4">
   <div class="flex justify-between">
-    <p class="mr-6 flex items-center text-gray-600">
+    <div class="flex items-center">
       {#if updating}
-        Updating…
+        <p class="mr-6 text-gray-600">Updating…</p>
       {/if}
-    </p>
+      <slot name="action-top-left" />
+    </div>
     <nav
       style={floatStyle}
       bind:clientHeight={height}
