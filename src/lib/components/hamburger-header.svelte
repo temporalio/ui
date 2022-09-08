@@ -6,7 +6,7 @@
   import { hasKeys } from '$lib/utilities/has';
   import { publicPath } from '$lib/utilities/get-public-path';
 
-  import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
+  import DataEncoderStatus from '$lib/holocene/data-encoder-status.svelte';
   import FeedbackButton from '$lib/components/feedback-button.svelte';
 
   export let href: string;
