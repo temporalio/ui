@@ -1,18 +1,20 @@
 <script lang="ts">
   import Icon from '$holocene/icon/icon.svelte';
 
-  import { dataEncoder } from '$lib/stores/data-encoder';
+  import {
+    dataEncoder,
+    showDataEncoderSettings,
+  } from '$lib/stores/data-encoder';
 
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import DataEncoderSettings from './data-encoder-settings.svelte';
 
-  let showSettings = false;
-
-  const onCancel = () => (showSettings = false);
+  const onIconClick = () => ($showDataEncoderSettings = true);
+  const onCancel = () => ($showDataEncoderSettings = false);
 </script>
 
 <DataEncoderSettings
-  {showSettings}
+  showSettings={$showDataEncoderSettings}
   {onCancel}
   accessToken={$dataEncoder.accessToken}
 />
@@ -22,7 +24,7 @@
       <button
         class="relative flex cursor-pointer"
         data-cy="data-encoder-status-configured"
-        on:click={() => (showSettings = true)}
+        on:click={onIconClick}
       >
         <Icon name="converter-down" class="-ml-1 text-blue-200" />
         <Icon name="converter-up" class="absolute left-1 text-blue-200" />
@@ -33,7 +35,7 @@
       <button
         class="relative flex cursor-pointer"
         data-cy="data-encoder-status-error"
-        on:click={() => (showSettings = true)}
+        on:click={onIconClick}
       >
         <Icon name="converter-down" class="-ml-1 text-red-400" />
         <Icon name="converter-up" class="absolute left-1 text-red-400" />
@@ -44,7 +46,7 @@
       <button
         class="relative flex cursor-pointer"
         data-cy="data-encoder-status-success"
-        on:click={() => (showSettings = true)}
+        on:click={onIconClick}
       >
         <Icon name="converter-down" class="-ml-1 text-green-400" />
         <Icon name="converter-up" class="absolute left-1 text-green-400" />
@@ -56,7 +58,7 @@
     <button
       class="relative flex cursor-pointer"
       data-cy="data-encoder-status"
-      on:click={() => (showSettings = true)}
+      on:click={onIconClick}
     >
       <Icon name="converter-down" class="-ml-1 text-gray-200" />
       <Icon name="converter-up" class="absolute left-1 text-gray-200" />
