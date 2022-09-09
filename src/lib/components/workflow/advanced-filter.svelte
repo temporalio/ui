@@ -8,74 +8,53 @@
   import Option from '$lib/holocene/select/option.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import IconButton from '$lib/holocene/icon-button.svelte';
+  import TypeFilter from './advanced-filters/type-filter.svelte';
+  import StatusFilter from './advanced-filters/status-filter.svelte';
+  import TimeRangeFilter from './advanced-filters/time-range-filter.svelte';
+  import IdFilter from './advanced-filters/id-filter.svelte';
+  import SearchAttributeFilter from './advanced-filters/search-attribute-filter.svelte';
+  import type { FilterKey } from '$lib/utilities/query/list-workflow-query';
+  import { searchAttributes } from '$lib/stores/search-attributes';
 
-  export let value = '';
+  export let filterType: FilterKey;
+  export let value: string = '';
   export let isOnly: boolean;
   export let isLast: boolean;
   export let addFilter: () => void;
   export let removeFilter: () => void;
 
-  const searchTypes = {
-    'Workflow Type': 'WorkflowType',
-    'Workflow Id': 'WorkflowId',
-    'Time Range': 'TimeRange',
-    Status: 'Status',
-    'Search Attribute': 'SearchAttribute',
-  };
+  const baseOptions = [
+    { label: 'Workflow Type', value: 'workflowType', component: TypeFilter },
+    { label: 'Workflow Id', value: 'workflowId', component: IdFilter },
+    { label: 'Status', value: 'executionStatus', component: StatusFilter },
+    { label: 'Time Range', value: 'timeRange', component: TimeRangeFilter },
+  ];
+  const searchAttributeOptions = Object.keys($searchAttributes).map((key) => {
+    return { label: key, value: key, component: SearchAttributeFilter };
+  });
+  const filterOptions = [...baseOptions, ...searchAttributeOptions];
 
-  const operations = {
-    Is: 'Is',
-    Contains: 'Contains',
-    And: 'And',
-    Between: 'Between',
-  };
+  let selected = filterOptions.find((option) => option.value === filterType);
 
-  const statuses = {
-    All: null,
-    Running: 'Running',
-    'Timed Out': 'TimedOut',
-    Completed: 'Completed',
-    Failed: 'Failed',
-    'Continued as New': 'ContinuedAsNew',
-    Canceled: 'Canceled',
-    Terminated: 'Terminated',
-  };
-
-  let searchType: keyof typeof searchTypes = 'Workflow Type';
-  let operator: keyof typeof operations = 'Is';
+  $: {
+    selected = filterOptions.find((option) => option.value === filterType);
+    value = '';
+  }
 </script>
 
 <div class="flex gap-2">
   <Select
-    id="search-type-filter"
-    bind:value={searchType}
-    class="w-44"
-    onChange={() => value === ''}
+    id="filter-type"
+    bind:value={filterType}
+    class="w-auto"
+    menuClass="border-gray-300"
+    displayValue={(value) => filterOptions.find((o) => o.value === value).label}
   >
-    {#each Object.entries(searchTypes) as [label, _] (label)}
-      <Option value={label}>{label}</Option>
-    {/each}
-  </Select>
-  <Select id="operator-filter" bind:value={operator} class="w-32">
-    {#each Object.entries(operations) as [label, value] (label)}
+    {#each filterOptions as { value, label } (value)}
       <Option {value}>{label}</Option>
     {/each}
   </Select>
-  {#if searchType === 'Status'}
-    <Select id="workflow-status" bind:value class="w-44">
-      {#each Object.entries(statuses) as [label, value] (label)}
-        <Option value={label}>{label}</Option>
-      {/each}
-    </Select>
-  {:else}
-    <Input
-      icon="search"
-      id="workflow-type-filter"
-      placeholder={searchType}
-      class="w-96"
-      bind:value
-    />
-  {/if}
+  <svelte:component this={selected.component} bind:value />
   <div class="flex gap-2 items-center">
     {#if !isOnly}
       <IconButton

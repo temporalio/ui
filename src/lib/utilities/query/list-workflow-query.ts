@@ -1,6 +1,6 @@
 import { isDuration, isDurationString, toDate, tomorrow } from '../to-duration';
 
-type QueryKey =
+export type QueryKey =
   | 'WorkflowId'
   | 'WorkflowType'
   | 'StartTime'
@@ -8,7 +8,7 @@ type QueryKey =
   | 'ExecutionTime'
   | 'ExecutionStatus';
 
-type FilterKey =
+export type FilterKey =
   | 'workflowId'
   | 'workflowType'
   | 'timeRange'
@@ -88,4 +88,23 @@ export const toListWorkflowQuery = (
   archived = false,
 ): string => {
   return toQueryStatements(parameters, archived).join(' and ');
+};
+
+const toQueryStatementsFromAdvancedFilters = (
+  filters: { filterType: keyof FilterParameters, value: string }[],
+  archived: boolean,
+): string[] => {
+  return filters
+    .map(({ filterType, value }) => {
+      if (isFilterKey(filterType) && isValid(value))
+        return toQueryStatement(filterType, value, archived);
+    })
+    .filter(Boolean);
+};
+
+export const toListWorkflowQueryFromAdvancedFilters = (
+  filters: { filterType: keyof FilterParameters, value: string }[],
+  archived = false,
+): string => {
+  return toQueryStatementsFromAdvancedFilters(filters, archived).join(' and ');
 };

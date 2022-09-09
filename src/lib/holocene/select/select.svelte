@@ -24,6 +24,7 @@
   export let dark: boolean = false;
   export let placeholder = '';
   export let disabled: boolean = false;
+  export let showIcon: boolean = true;
   export let displayValue: (value: T) => T | string = (value) => value ?? '';
   export let onChange: (value: T) => void = noop;
 
@@ -69,10 +70,15 @@
           {displayValue(value)}
         {/if}
       </div>
-      {#if disabled}
-        <Icon name="lock" class="text-gray-500" />
-      {:else}
-        <Icon name={show ? 'chevron-up' : 'chevron-down'} />
+      {#if showIcon}
+        {#if disabled}
+          <Icon name="lock" class="text-gray-500" />
+        {:else}
+          <Icon
+            name={show ? 'chevron-up' : 'chevron-down'}
+            class="pointer-events-none"
+          />
+        {/if}
       {/if}
     </MenuButton>
     <Menu id="{id}-menu" class="h-auto max-h-80 min-w-fit" {show} {dark}>
@@ -87,7 +93,7 @@
   }
 
   .select :global(.select-input-container) {
-    @apply flex h-10 w-full flex-row items-center justify-between rounded border border-gray-900 bg-white px-2 text-sm text-primary;
+    @apply flex h-10 w-full flex-row items-center justify-between rounded border border-gray-300 bg-white px-2 text-sm text-primary;
   }
 
   .select-input {

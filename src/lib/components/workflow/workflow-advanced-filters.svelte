@@ -6,9 +6,13 @@
 
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
-  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
+  import {
+    toListWorkflowQuery,
+    toListWorkflowQueryFromAdvancedFilters,
+  } from '$lib/utilities/query/list-workflow-query';
 
   import AdvancedFilter from './advanced-filter.svelte';
+  import Button from '$lib/holocene/button.svelte';
 
   const defaultQuery = toListWorkflowQuery({ timeRange: 'All' });
   $: query = $page.url.searchParams.get('query');
@@ -16,6 +20,8 @@
 
   const updateQuery = (event: SubmitEvent): void => {
     const data = new FormData(event.target as HTMLFormElement);
+    const defaultQuery = toListWorkflowQuery({ timeRange: 'All' });
+
     query = String(data.get('query'));
     parameters = toListWorkflowParameters(query);
 
@@ -26,8 +32,10 @@
     });
   };
 
-  const handleParameterChange = debounce(() => {
-    query = toListWorkflowQuery(parameters);
+  let filters = [{ filterType: 'workflowType', value: '' }];
+
+  $: {
+    query = toListWorkflowQueryFromAdvancedFilters(filters);
 
     updateQueryParameters({
       url: $page.url,
@@ -35,23 +43,29 @@
       value: query,
       allowEmpty: true,
     });
-  }, 300);
-
-  let filters = [''];
+  }
 </script>
 
 <section class="flex flex-col gap-2">
-  {#each filters as filter, index}
-    <AdvancedFilter
-      bind:value={filter}
-      isOnly={index === 0 && filters.length === 1}
-      isLast={index === filters.length - 1}
-      addFilter={() => {
-        filters = [...filters, ''];
-      }}
-      removeFilter={() => {
-        filters = filters.filter((_, i) => i !== index);
-      }}
-    />
+  {#each filters as { filterType, value }, index}
+    <div class="flex justify-between">
+      <AdvancedFilter
+        bind:filterType
+        bind:value
+        isOnly={index === 0 && filters.length === 1}
+        isLast={index === filters.length - 1}
+        addFilter={() => {
+          filters = [...filters, { filterType: 'workflowType', value: '' }];
+        }}
+        removeFilter={() => {
+          filters = filters.filter((_, i) => i !== index);
+        }}
+      />
+      {#if index === 0}
+        <Button icon="search" variant="secondary" on:click={onSearch}
+          >Search</Button
+        >
+      {/if}
+    </div>
   {/each}
 </section>
