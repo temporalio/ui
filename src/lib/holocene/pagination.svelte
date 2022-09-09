@@ -43,13 +43,16 @@
 <svelte:window bind:innerWidth={screenWidth} />
 
 <div class="pagination relative mb-8 flex flex-col gap-4">
-  <div class="flex justify-between">
-    <div class="flex items-center">
-      {#if updating}
-        <p class="mr-6 text-gray-600">Updating…</p>
-      {/if}
+  <div
+    class={`flex items-center ${
+      updating || $$slots['action-top-left'] ? 'justify-between' : 'justify-end'
+    }`}
+  >
+    {#if updating}
+      <p class="mr-6 text-gray-600">Updating…</p>
+    {:else}
       <slot name="action-top-left" />
-    </div>
+    {/if}
     <nav
       style={floatStyle}
       bind:clientHeight={height}
