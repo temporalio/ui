@@ -19,9 +19,9 @@
 
   export let filterType: FilterKey;
   export let value: string = '';
+  export let operator: string = '';
   export let isOnly: boolean = true;
-  export let isLast: boolean = false;
-  export let addFilter: () => void = () => noop;
+  export let addFilter: (operator: string) => void = () => noop;
   export let removeFilter: () => void = () => noop;
 
   const baseOptions = [
@@ -59,22 +59,28 @@
   </Select>
   <svelte:component this={selected.component} bind:value />
   <div class="flex gap-2 items-center">
-    <Button variant="secondary" classes="bg-green-200">AND</Button>
-    <Button variant="secondary" classes="bg-green-200">OR</Button>
-    <Button variant="secondary" classes="bg-green-200">()</Button>
+    <Button
+      variant="secondary"
+      active={operator === 'and'}
+      thin
+      on:click={() => addFilter('and')}>AND</Button
+    >
+    <Button
+      variant="secondary"
+      active={operator === 'or'}
+      thin
+      on:click={() => addFilter('or')}>OR</Button
+    >
+    <Button
+      variant="secondary"
+      active={operator === '('}
+      thin
+      on:click={() => addFilter('(')}>()</Button
+    >
     {#if !isOnly}
-      <IconButton
-        icon="close"
-        classes="w-8 h-8 rounded-full hover:bg-gray-100"
-        on:click={removeFilter}
-      />
+      <Button variant="secondary" icon="close" thin on:click={removeFilter} />
     {/if}
-    {#if isLast}
-      <IconButton
-        icon="add"
-        classes="w-8 h-8 rounded-full hover:bg-gray-100"
-        on:click={addFilter}
-      />
-    {/if}
+    <!-- <Button variant="secondary" icon="chevron-left" thin />
+    <Button variant="secondary" icon="chevron-right" thin /> -->
   </div>
 </div>

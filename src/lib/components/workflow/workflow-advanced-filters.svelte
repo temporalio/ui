@@ -33,12 +33,28 @@
     });
   };
 
-  let filters = [{ filterType: 'workflowType', value: '' }];
+  let filters = [{ filterType: 'workflowType', value: '', operator: '' }];
   let orderType = 'desc';
 
-  const onSearch = () => {
+  $: {
     query = toListWorkflowQueryFromAdvancedFilters(filters);
+  }
 
+  const onAddFilter = (operator, index) => {
+    if (filters[index].operator === operator) {
+      filters[index].operator = '';
+    } else {
+      filters[index] = { ...filters[index], operator };
+      if (!filters[index + 1]) {
+        filters = [
+          ...filters,
+          { filterType: 'workflowType', value: '', operator: '' },
+        ];
+      }
+    }
+  };
+
+  const onSearch = () => {
     updateQueryParameters({
       url: $page.url,
       parameter: 'query',
@@ -48,17 +64,19 @@
   };
 </script>
 
-<section class="flex flex-col gap-2 w-96">
-  {#each filters as { filterType, value }, index}
+<div class="bg-gray-100 w-full h-6">
+  <p class="h-6 flex items-center text-sm">{query}</p>
+</div>
+<section class="flex flex-col gap-2">
+  {#each filters as { filterType, value, operator }, index}
     <div class="flex justify-between gap-16">
       <AdvancedFilter
         bind:filterType
         bind:value
+        bind:operator
         isOnly={index === 0 && filters.length === 1}
         isLast={index === filters.length - 1}
-        addFilter={() => {
-          filters = [...filters, { filterType: 'workflowType', value: '' }];
-        }}
+        addFilter={(operator) => onAddFilter(operator, index)}
         removeFilter={() => {
           filters = filters.filter((_, i) => i !== index);
         }}
@@ -67,8 +85,7 @@
   {/each}
 </section>
 <div class="flex gap-4 items-center">
-  <div class="bg-gray-100"><pre>{query}</pre></div>
-  <AdvancedOrder bind:orderType />
+  <!-- <AdvancedOrder bind:orderType /> -->
   <Button icon="search" thin variant="primary" on:click={onSearch}
     >Search</Button
   >
