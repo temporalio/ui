@@ -6,12 +6,12 @@
   export let value = '';
 
   const operations = {
-    Between: 'Between',
+    'In Last': 'In Last',
     After: 'After',
     Before: 'Before',
   };
 
-  let operator: keyof typeof operations = 'Between';
+  let operator: keyof typeof operations = 'In Last';
 </script>
 
 <div class="flex gap-2">

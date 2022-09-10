@@ -2,6 +2,7 @@ import add from './svg/add.svelte';
 import archives from './svg/archives.svelte';
 import arrowUp from './svg/arrow-up.svelte';
 import book from './svg/book.svelte';
+import bookmark from './svg/bookmark.svelte';
 import calendarPlus from './svg/calendar-plus.svelte';
 import chart from './svg/chart.svelte';
 import checkmark from './svg/checkmark.svelte';

@@ -91,20 +91,23 @@ export const toListWorkflowQuery = (
 };
 
 const toQueryStatementsFromAdvancedFilters = (
-  filters: { filterType: keyof FilterParameters, value: string }[],
+  filters: { filterType: keyof FilterParameters, value: string, operator }[],
   archived: boolean,
 ): string[] => {
   return filters
-    .map(({ filterType, value }) => {
-      if (isFilterKey(filterType) && isValid(value))
-        return toQueryStatement(filterType, value, archived);
+    .map(({ filterType, value, operator }) => {
+      if (isFilterKey(filterType) && isValid(value)) {
+        const statement = toQueryStatement(filterType, value, archived);
+        if (operator) return `${statement} ${operator.toLowerCase()}` + ' ';
+        return statement;
+      }
     })
     .filter(Boolean);
 };
 
 export const toListWorkflowQueryFromAdvancedFilters = (
-  filters: { filterType: keyof FilterParameters, value: string }[],
+  filters: { filterType: keyof FilterParameters, value: string, operator: string }[],
   archived = false,
 ): string => {
-  return toQueryStatementsFromAdvancedFilters(filters, archived).join(' and ');
+  return toQueryStatementsFromAdvancedFilters(filters, archived).join('');
 };

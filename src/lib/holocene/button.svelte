@@ -128,7 +128,7 @@
   }
 
   .selected {
-    @apply bg-purple-600 text-white;
+    @apply bg-blue-600 border-blue-600 text-white;
   }
 
   .login {
@@ -136,6 +136,6 @@
   }
 
   .thin {
-    @apply py-1;
+    @apply py-1 h-8;
   }
 </style>
