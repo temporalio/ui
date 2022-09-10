@@ -64,7 +64,7 @@
   };
 </script>
 
-<div class="bg-gray-100 w-full h-6">
+<div class="fixed top-0 left-0 pl-20 bg-gray-100 w-full h-6 z-50">
   <p class="h-6 flex items-center text-sm">{query}</p>
 </div>
 <section class="flex flex-col gap-2">
@@ -88,5 +88,8 @@
   <!-- <AdvancedOrder bind:orderType /> -->
   <Button icon="search" thin variant="primary" on:click={onSearch}
     >Search</Button
+  >
+  <Button icon="bookmark" thin variant="primary" on:click={onSearch}
+    >Save</Button
   >
 </div>

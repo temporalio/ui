@@ -59,6 +59,7 @@ export const icons = {
   archives,
   'arrow-up': arrowUp,
   book,
+  bookmark,
   'calendar-plus': calendarPlus,
   chart,
   checkmark,
