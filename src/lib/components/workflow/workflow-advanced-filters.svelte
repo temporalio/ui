@@ -11,7 +11,8 @@
     toListWorkflowQueryFromAdvancedFilters,
   } from '$lib/utilities/query/list-workflow-query';
 
-  import AdvancedFilter from './advanced-filter.svelte';
+  import AdvancedFilter from './advanced-filter/index.svelte';
+  import AdvancedOrder from './advanced-filter/order.svelte';
   import Button from '$lib/holocene/button.svelte';
 
   const defaultQuery = toListWorkflowQuery({ timeRange: 'All' });
@@ -33,8 +34,9 @@
   };
 
   let filters = [{ filterType: 'workflowType', value: '' }];
+  let orderType = 'desc';
 
-  $: {
+  const onSearch = () => {
     query = toListWorkflowQueryFromAdvancedFilters(filters);
 
     updateQueryParameters({
@@ -43,12 +45,12 @@
       value: query,
       allowEmpty: true,
     });
-  }
+  };
 </script>
 
-<section class="flex flex-col gap-2">
+<section class="flex flex-col gap-2 w-96">
   {#each filters as { filterType, value }, index}
-    <div class="flex justify-between">
+    <div class="flex justify-between gap-16">
       <AdvancedFilter
         bind:filterType
         bind:value
@@ -61,11 +63,13 @@
           filters = filters.filter((_, i) => i !== index);
         }}
       />
-      {#if index === 0}
-        <Button icon="search" variant="secondary" on:click={onSearch}
-          >Search</Button
-        >
-      {/if}
     </div>
   {/each}
 </section>
+<div class="flex gap-4 items-center">
+  <div class="bg-gray-100"><pre>{query}</pre></div>
+  <AdvancedOrder bind:orderType />
+  <Button icon="search" thin variant="primary" on:click={onSearch}
+    >Search</Button
+  >
+</div>
