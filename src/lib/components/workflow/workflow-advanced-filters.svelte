@@ -1,8 +1,7 @@
 <script lang="ts">
-  import debounce from 'just-debounce';
+  import { fade, fly } from 'svelte/transition';
+  import { flip } from 'svelte/animate';
   import { page } from '$app/stores';
-
-  import { timeFormat } from '$lib/stores/time-format';
 
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
@@ -33,14 +32,16 @@
     });
   };
 
-  let filters = [{ filterType: 'workflowType', value: '', operator: '' }];
+  let filters = [
+    { filterType: 'workflowType', value: '', operator: '', parenthesis: '' },
+  ];
   let orderType = 'desc';
 
   $: {
     query = toListWorkflowQueryFromAdvancedFilters(filters);
   }
 
-  const onAddFilter = (operator, index) => {
+  const onAddFilterOperator = (operator, index) => {
     if (filters[index].operator === operator) {
       filters[index].operator = '';
     } else {
@@ -48,9 +49,22 @@
       if (!filters[index + 1]) {
         filters = [
           ...filters,
-          { filterType: 'workflowType', value: '', operator: '' },
+          {
+            filterType: 'workflowType',
+            value: '',
+            operator: '',
+            parenthesis: '',
+          },
         ];
       }
+    }
+  };
+
+  const onAddFilterParenthesis = (parenthesis, index) => {
+    if (filters[index].parenthesis === parenthesis) {
+      filters[index].parenthesis = '';
+    } else {
+      filters[index] = { ...filters[index], parenthesis };
     }
   };
 
@@ -64,19 +78,24 @@
   };
 </script>
 
-<div class="fixed top-0 left-0 pl-20 bg-gray-100 w-full h-6 z-50">
-  <p class="h-6 flex items-center text-sm">{query}</p>
+<div
+  class="fixed bottom-0 left-0 p-4 bg-gray-100 w-full h-10 z-50 overflow-auto"
+>
+  <pre class="h-full flex items-center text-lg">{query}</pre>
 </div>
 <section class="flex flex-col gap-2">
-  {#each filters as { filterType, value, operator }, index}
-    <div class="flex justify-between gap-16">
+  {#each filters as { filterType, value, operator, parenthesis }, index (index)}
+    <div class="flex justify-between gap-16" animate:flip in:fade>
       <AdvancedFilter
         bind:filterType
         bind:value
         bind:operator
+        bind:parenthesis
         isOnly={index === 0 && filters.length === 1}
         isLast={index === filters.length - 1}
-        addFilter={(operator) => onAddFilter(operator, index)}
+        setFilterOperator={(operator) => onAddFilterOperator(operator, index)}
+        setFilterParenthesis={(parenthesis) =>
+          onAddFilterParenthesis(parenthesis, index)}
         removeFilter={() => {
           filters = filters.filter((_, i) => i !== index);
         }}

@@ -20,8 +20,10 @@
   export let filterType: FilterKey;
   export let value: string = '';
   export let operator: string = '';
+  export let parenthesis: string = '';
   export let isOnly: boolean = true;
-  export let addFilter: (operator: string) => void = () => noop;
+  export let setFilterOperator: (operator: string) => void = () => noop;
+  export let setFilterParenthesis: (operator: string) => void = () => noop;
   export let removeFilter: () => void = () => noop;
 
   const baseOptions = [
@@ -61,21 +63,27 @@
   <div class="flex gap-2 items-center">
     <Button
       variant="secondary"
+      active={parenthesis === '('}
+      thin
+      on:click={() => setFilterParenthesis('(')}>(</Button
+    >
+    <Button
+      variant="secondary"
+      active={parenthesis === ')'}
+      thin
+      on:click={() => setFilterParenthesis(')')}>)</Button
+    >
+    <Button
+      variant="secondary"
       active={operator === 'and'}
       thin
-      on:click={() => addFilter('and')}>AND</Button
+      on:click={() => setFilterOperator('and')}>AND</Button
     >
     <Button
       variant="secondary"
       active={operator === 'or'}
       thin
-      on:click={() => addFilter('or')}>OR</Button
-    >
-    <Button
-      variant="secondary"
-      active={operator === '('}
-      thin
-      on:click={() => addFilter('(')}>()</Button
+      on:click={() => setFilterOperator('or')}>OR</Button
     >
     {#if !isOnly}
       <Button variant="secondary" icon="close" thin on:click={removeFilter} />

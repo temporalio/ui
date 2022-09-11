@@ -91,14 +91,21 @@ export const toListWorkflowQuery = (
 };
 
 const toQueryStatementsFromAdvancedFilters = (
-  filters: { filterType: keyof FilterParameters, value: string, operator }[],
+  filters: { filterType: keyof FilterParameters, value: string, operator: string, parenthesis: string }[],
   archived: boolean,
 ): string[] => {
   return filters
-    .map(({ filterType, value, operator }) => {
+    .map(({ filterType, value, operator, parenthesis }) => {
       if (isFilterKey(filterType) && isValid(value)) {
-        const statement = toQueryStatement(filterType, value, archived);
-        if (operator) return `${statement} ${operator.toLowerCase()}` + ' ';
+        let statement = toQueryStatement(filterType, value, archived);
+        if (parenthesis === '(') {
+          statement = `(${statement}`;
+        } else if (parenthesis === ')') {
+          statement = `${statement})`;
+        }
+        if (operator) {
+          statement = `${statement} ${operator.toLowerCase()}` + ' ';
+        };
         return statement;
       }
     })
@@ -106,7 +113,7 @@ const toQueryStatementsFromAdvancedFilters = (
 };
 
 export const toListWorkflowQueryFromAdvancedFilters = (
-  filters: { filterType: keyof FilterParameters, value: string, operator: string }[],
+  filters: { filterType: keyof FilterParameters, value: string, operator: string, parenthesis: string }[],
   archived = false,
 ): string => {
   return toQueryStatementsFromAdvancedFilters(filters, archived).join('');
