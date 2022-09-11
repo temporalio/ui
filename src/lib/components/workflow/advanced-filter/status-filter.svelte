@@ -7,10 +7,11 @@
 
   const operations = {
     Is: 'Is',
+    'Is Not': 'IsNot',
   };
 
   const statuses = {
-    All: '',
+    All: 'All',
     Running: 'Running',
     'Timed Out': 'TimedOut',
     Completed: 'Completed',
@@ -40,7 +41,7 @@
   >
     {#each Object.entries(statuses) as [label, value] (label)}
       <Option value={label}>
-        {#if value}
+        {#if value !== 'All'}
           <WorkflowStatus status={value} />
         {:else}
           {label}
