@@ -2,13 +2,10 @@
   import Select from '$lib/holocene/select/select.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import KeywordConditionals from './keyword-conditionals.svelte';
 
   export let value = '';
-
-  const operations = {
-    Is: 'Is',
-    'Is Not': 'IsNot',
-  };
+  export let conditional = '';
 
   const statuses = {
     All: 'All',
@@ -20,16 +17,10 @@
     Canceled: 'Canceled',
     Terminated: 'Terminated',
   };
-
-  let operator: keyof typeof operations = 'Is';
 </script>
 
 <div class="flex gap-2">
-  <Select showIcon={false} disabled id="operator-filter" bind:value={operator}>
-    {#each Object.entries(operations) as [label, value] (label)}
-      <Option {value}>{label}</Option>
-    {/each}
-  </Select>
+  <KeywordConditionals bind:conditional />
   <Select
     id="workflow-status"
     bind:value
