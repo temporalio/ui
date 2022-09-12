@@ -16,6 +16,7 @@
   export let valid = true;
   export let hintText = '';
   export let maxLength = 0;
+  export let spellcheck: boolean = null;
 
   const { copy, copied } = copyToClipboard();
   $: disabled = disabled || copyable;
@@ -41,6 +42,7 @@
       {id}
       {name}
       autocomplete={autocomplete ? 'on' : 'off'}
+      {spellcheck}
       bind:value
       on:input
       on:change
