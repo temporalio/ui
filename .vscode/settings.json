@@ -2,8 +2,7 @@
   "search.exclude": {
     "**/node_modules": true,
     "**/.svelte-kit": true,
-    "**/build-local": true,
-    "**/build-cloud": true
+    "**/.vercel": true
   },
   "editor.formatOnSave": true,
   "css.customData": [".vscode/css-custom-data.json"],
