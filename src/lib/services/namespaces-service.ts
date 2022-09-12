@@ -1,4 +1,5 @@
 import { notifications } from '$lib/stores/notifications';
+import { paginated } from '$lib/utilities/paginated';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
@@ -16,12 +17,12 @@ export async function fetchNamespaces(
     return emptyNamespace;
   }
 
-  const results = await requestFromAPI<ListNamespacesResponse>(
-    routeForApi('namespaces'),
-    {
+  const results = await paginated(async (token: string) =>
+    requestFromAPI<ListNamespacesResponse>(routeForApi('namespaces'), {
       request,
+      token,
       onError: () => notifications.add('error', 'Unable to fetch namespaces'),
-    },
+    }),
   );
 
   return results ?? emptyNamespace;
