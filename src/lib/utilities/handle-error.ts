@@ -53,9 +53,9 @@ export const handleUnauthorizedOrForbiddenError = (
 };
 
 const isUnauthorized = (error: any): boolean => {
-  return error?.statusCode === 401;
+  return error?.statusCode === 401 || error?.status === 401;
 };
 
 const isForbidden = (error: any): boolean => {
-  return error?.statusCode === 403;
+  return error?.statusCode === 403 || error?.status === 403;
 };
