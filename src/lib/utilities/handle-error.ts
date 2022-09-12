@@ -2,6 +2,7 @@ import { browser } from '$app/env';
 import { networkError } from '$lib/stores/error';
 import { notifications as notificationStore } from '$lib/stores/notifications';
 import { isNetworkError } from './is-network-error';
+import type { APIErrorResponse } from './request-from-api';
 import { routeForLoginPage } from './route-for';
 
 // This will eventually be expanded on.
@@ -12,12 +13,12 @@ export const handleError = (
   isBrowser = browser,
 ): void => {
   if (isUnauthorized(error) && isBrowser) {
-    window.location.assign(routeForLoginPage());
+    window.location.assign(routeForLoginPage(error?.['message']));
     return;
   }
 
   if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForLoginPage());
+    window.location.assign(routeForLoginPage(error?.['message']));
     return;
   }
 
@@ -38,24 +39,26 @@ export const handleError = (
 };
 
 export const handleUnauthorizedOrForbiddenError = (
-  error: unknown,
+  error: APIErrorResponse,
   isBrowser = browser,
 ): void => {
+  const msg = `${error?.status} ${error?.body?.message}`;
+
   if (isUnauthorized(error) && isBrowser) {
-    window.location.assign(routeForLoginPage());
+    window.location.assign(routeForLoginPage(msg));
     return;
   }
 
   if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForLoginPage());
+    window.location.assign(routeForLoginPage(msg));
     return;
   }
 };
 
-const isUnauthorized = (error: any): boolean => {
-  return error?.statusCode === 401 || error?.status === 401;
+const isUnauthorized = (error: unknown): boolean => {
+  return error?.['statusCode'] === 401 || error?.['status'] === 401;
 };
 
-const isForbidden = (error: any): boolean => {
-  return error?.statusCode === 403 || error?.status === 403;
+const isForbidden = (error: unknown): boolean => {
+  return error?.['statusCode'] === 403 || error?.['status'] === 403;
 };
