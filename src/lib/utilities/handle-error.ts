@@ -52,10 +52,10 @@ export const handleUnauthorizedOrForbiddenError = (
   }
 };
 
-const isUnauthorized = (error: any): error is NetworkError => {
+const isUnauthorized = (error: any): boolean => {
   return error?.statusCode === 401;
 };
 
-const isForbidden = (error: any): error is NetworkError => {
+const isForbidden = (error: any): boolean => {
   return error?.statusCode === 403;
 };
