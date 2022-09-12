@@ -3,6 +3,7 @@
   import { slide } from 'svelte/transition';
   import { page } from '$app/stores';
 
+  import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
   import {
@@ -16,6 +17,7 @@
   import Button from '$lib/holocene/button.svelte';
   import { removeSearch, saveSearch, searches } from '$lib/stores/searches';
   import TypeaheadInput from '$lib/holocene/input/typeahead-input.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
   const defaultQuery = toListWorkflowQuery({ timeRange: 'All' });
   $: query = $page.url.searchParams.get('query');
@@ -125,15 +127,20 @@
       allowEmpty: true,
     });
   };
+
+  const { copy, copied } = copyToClipboard(500);
 </script>
 
-<!-- {#if filters.length}
+{#if filters.length}
   <div
-    class="fixed bottom-0 left-0 p-4 bg-gray-100 w-full h-10 z-50 overflow-auto"
+    class="fixed flex items-center bottom-0 left-0 p-4 bg-gray-100 w-full h-10 z-50 overflow-x-auto"
   >
+    <button on:click={(e) => copy(e, query)} class="mx-1">
+      <Icon name={$copied ? 'checkmark' : 'copy'} class="text-black mx-1" />
+    </button>
     <pre class="h-full flex items-center text-lg">{query}</pre>
   </div>
-{/if} -->
+{/if}
 {#if activeSearch?.name}
   <div class="text-sm">{activeSearch?.name}</div>
 {/if}
@@ -149,8 +156,9 @@
       <Button
         icon="bookmark"
         variant="secondary"
-        iconClass={activeSearch ? 'text-yellow-300' : 'text-gray-300'}
-        on:click={() => (showBookmarkSave = true)}>Save</Button
+        iconClass="text-yellow-500"
+        on:click={() => (showBookmarkSave = true)}
+        >Save {activeSearch ? 'As' : ''}</Button
       >
       {#if activeSearch}
         <Button
