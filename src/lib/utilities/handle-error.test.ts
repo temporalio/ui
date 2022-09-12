@@ -19,7 +19,19 @@ describe('handleError', () => {
     vi.clearAllMocks();
   });
 
-  it('should redirect if it is an unauthorized error', () => {
+  it('should redirect if it is an unauthorized error with status', () => {
+    const error = {
+      status: 401,
+      statusText: 'Unauthorized',
+      response: null as unknown as Response,
+    };
+
+    handleError(error);
+
+    expect(window.location.assign).toHaveBeenCalledWith(routeForLoginPage());
+  });
+
+  it('should redirect if it is an unauthorized error with statusCode', () => {
     const error = {
       statusCode: 401,
       statusText: 'Unauthorized',
@@ -31,7 +43,7 @@ describe('handleError', () => {
     expect(window.location.assign).toHaveBeenCalledWith(routeForLoginPage());
   });
 
-  it('should redirect if it is an forbidden error', () => {
+  it('should redirect if it is a forbidden error with status', () => {
     const error = {
       statusCode: 403,
       statusText: 'Forbidden',
@@ -41,6 +53,29 @@ describe('handleError', () => {
     handleError(error);
 
     expect(window.location.assign).toHaveBeenCalledWith(routeForLoginPage());
+  });
+
+  it('should redirect if it is a forbidden error with statusCode', () => {
+    const error = {
+      status: 403,
+      statusText: 'Forbidden',
+      response: null as unknown as Response,
+    };
+
+    handleError(error);
+
+    expect(window.location.assign).toHaveBeenCalledWith(routeForLoginPage());
+  });
+
+  it('should not redirect if not 401/403', () => {
+    const error = {
+      statusText: 'Forbidden',
+      response: null as unknown as Response,
+    };
+
+    handleError(error);
+
+    expect(window.location.assign).not.toHaveBeenCalled();
   });
 
   it('should add notification if it is a NetworkError', () => {
