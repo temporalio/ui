@@ -13,6 +13,7 @@
   import Option from '$lib/holocene/select/simple-option.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Search from '$lib/components/search.svelte';
+  import WorkflowAdvancedFilters from './workflow-advanced-filters.svelte';
 
   export let searchType: 'basic' | 'advanced';
 
@@ -88,13 +89,7 @@
   </p>
 
   {#if searchType === 'advanced'}
-    <Search
-      icon
-      id="advanced-search"
-      placeholder="Query…"
-      value={query}
-      on:submit={updateQuery}
-    />
+    <WorkflowAdvancedFilters />
   {:else}
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-5">
       <Input

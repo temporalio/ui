@@ -69,8 +69,7 @@
     >
   </div>
 </div>
-<WorkflowAdvancedFilters />
-<!-- <WorkflowFilters bind:searchType /> -->
+<WorkflowFilters bind:searchType />
 {#if $loading}
   <Loading />
 {:else if $workflows.length}
