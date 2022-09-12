@@ -3,6 +3,7 @@
   import KeywordConditionals from './keyword-conditionals.svelte';
 
   export let id: string;
+  export let label: string = '';
   export let value = '';
   export let conditional = '';
 </script>
@@ -12,7 +13,7 @@
   <Input
     icon="search"
     id="{id}-filter"
-    placeholder={id}
+    placeholder={label}
     class="w-96"
     bind:value
   />

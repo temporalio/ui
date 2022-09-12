@@ -42,6 +42,15 @@ const isValid = (value: unknown): boolean => {
   return true;
 };
 
+const isAdvancedValid = (value: unknown): boolean => {
+  if (value === null) return false;
+  if (value === undefined) return false;
+  if (value === '') return false;
+  if (typeof value === 'string' && value === 'undefined') return false;
+
+  return true;
+};
+
 export const isFilterKey = (key: unknown): key is FilterKey => {
   if (typeof key !== 'string') return false;
 
@@ -71,6 +80,26 @@ const toQueryStatement = (
   return `${queryKey}="${value}"`;
 };
 
+const toAdvancedQueryStatement = (
+  key: FilterKey,
+  value: FilterValue,
+  conditional = '=',
+  archived: boolean,
+): string => {
+  const queryKey = queryKeys[key] ?? key;
+
+  if (value === 'All') return '';
+
+  if (isDuration(value) || isDurationString(value)) {
+    if (archived) {
+      return `${queryKey} > "${toDate(value)}"`;
+    }
+    return `${queryKey} BETWEEN "${toDate(value)}" AND "${tomorrow()}"`;
+  }
+
+  return `${queryKey}${conditional}"${value}"`;
+};
+
 const toQueryStatements = (
   parameters: FilterParameters | ArchiveFilterParameters,
   archived: boolean,
@@ -91,13 +120,24 @@ export const toListWorkflowQuery = (
 };
 
 const toQueryStatementsFromAdvancedFilters = (
-  filters: { filterType: keyof FilterParameters, value: string, operator: string, parenthesis: string }[],
+  filters: {
+    filterType: keyof FilterParameters;
+    value: string;
+    conditional: string;
+    operator: string;
+    parenthesis: string;
+  }[],
   archived: boolean,
 ): string[] => {
   return filters
-    .map(({ filterType, value, operator, parenthesis }) => {
-      if (isFilterKey(filterType) && isValid(value)) {
-        let statement = toQueryStatement(filterType, value, archived);
+    .map(({ filterType, value, conditional, operator, parenthesis }) => {
+      if (isAdvancedValid(value)) {
+        let statement = toAdvancedQueryStatement(
+          filterType,
+          value,
+          conditional,
+          archived,
+        );
         if (parenthesis === '(') {
           statement = `(${statement}`;
         } else if (parenthesis === ')') {
@@ -105,7 +145,7 @@ const toQueryStatementsFromAdvancedFilters = (
         }
         if (operator) {
           statement = `${statement} ${operator.toLowerCase()}` + ' ';
-        };
+        }
         return statement;
       }
     })
@@ -113,7 +153,13 @@ const toQueryStatementsFromAdvancedFilters = (
 };
 
 export const toListWorkflowQueryFromAdvancedFilters = (
-  filters: { filterType: keyof FilterParameters, value: string, operator: string, parenthesis: string }[],
+  filters: {
+    filterType: keyof FilterParameters;
+    value: string;
+    conditional: string;
+    operator: string;
+    parenthesis: string;
+  }[],
   archived = false,
 ): string => {
   return toQueryStatementsFromAdvancedFilters(filters, archived).join('');
