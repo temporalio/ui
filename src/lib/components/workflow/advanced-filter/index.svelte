@@ -30,7 +30,7 @@
     { label: 'Workflow Type', value: 'workflowType', component: TypeFilter },
     { label: 'Workflow Id', value: 'workflowId', component: IdFilter },
     { label: 'Status', value: 'executionStatus', component: StatusFilter },
-    { label: 'Time Range', value: 'timeRange', component: TimeRangeFilter },
+    { label: 'Start Time', value: 'timeRange', component: TimeRangeFilter },
   ];
   const searchAttributeOptions = $searchAttributes
     ? Object.keys($searchAttributes).map((key) => {
