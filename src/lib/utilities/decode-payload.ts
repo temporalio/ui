@@ -82,44 +82,75 @@ export const decodePayloadAttributes = (
   return anyAttributes;
 };
 
-// List of fields with payloads
-const payloadFields = [
-  ['data'],
-  ['input'],
-  ['result'],
-  ['details', 'change-id'],
-  ['details', 'data'],
-  ['details', 'result'],
-  ['details', 'version'],
-  ['details'],
-  ['heartbeatDetails'],
-  ['lastHeartbeatDetails'],
-  ['lastFailure'],
-  ['lastCompletionResult'],
-  ['queryArgs'],
-  ['answer'],
-  ['signalInput'],
-] as const;
-
-const getField = (fields, object) =>
-  fields.reduce(
-    (nestedObject, field) =>
-      nestedObject && nestedObject?.[field] ? nestedObject[field] : null,
-    object,
-  );
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getPotentialPayloads = (anyAttributes: any): Payload[] | null => {
-  let payloads = null;
-  for (const field of payloadFields) {
-    const value = getField(field, anyAttributes);
-    if (value && value?.payloads) {
-      payloads = value.payloads;
-      break;
+export const decodeAllPotentialPayloadsWithCodec = async (
+  anyAttributes: any,
+  namespace: string,
+  settings: Settings,
+): Promise<EventAttribute> => {
+  if (anyAttributes) {
+    for (const key of Object.keys(anyAttributes)) {
+      if (key === 'payloads') {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let JSONPayload: string | Payload | Record<any, any>;
+        const payloads = anyAttributes[key];
+        if (settings?.codec?.endpoint) {
+          // Convert Payload data
+          const awaitData = await convertPayloadsWithCodec({
+            payloads: { payloads },
+            namespace,
+            settings,
+          });
+          JSONPayload = (awaitData?.payloads ?? []).map(decodePayload);
+        } else {
+          JSONPayload = payloads.map(decodePayload);
+        }
+        anyAttributes[key] = JSONPayload;
+      } else if (typeof anyAttributes[key] === 'object') {
+        anyAttributes[key] = await decodeAllPotentialPayloadsWithCodec(
+          anyAttributes[key],
+          namespace,
+          settings,
+        );
+      }
     }
   }
 
-  return payloads;
+  return anyAttributes;
+};
+
+export const decodeAllPotentialPayloadsWithWebsockets = async (
+  anyAttributes: any,
+  ws: DataConverterWebsocketInterface,
+): Promise<EventAttribute> => {
+  if (anyAttributes) {
+    for (const key of Object.keys(anyAttributes)) {
+      if (key === 'payloads') {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let JSONPayload: string | Payload | Record<any, any>;
+        const payloads = anyAttributes[key];
+        if (ws?.hasWebsocket) {
+          // Convert Payload data
+          const awaitData = await Promise.all(
+            (payloads ?? []).map(
+              async (payload) =>
+                await convertPayloadWithWebsocket(payload, ws.websocket),
+            ),
+          );
+          JSONPayload = awaitData;
+        } else {
+          JSONPayload = payloads.map(decodePayload);
+        }
+        anyAttributes[key] = JSONPayload;
+      } else if (typeof anyAttributes[key] === 'object') {
+        anyAttributes[key] = await decodeAllPotentialPayloadsWithWebsockets(
+          anyAttributes[key],
+          ws,
+        );
+      }
+    }
+  }
+
+  return anyAttributes;
 };
 
 export const convertPayloadToJsonWithCodec = async ({
@@ -129,82 +160,26 @@ export const convertPayloadToJsonWithCodec = async ({
 }: {
   attributes: EventAttribute;
 } & EventRequestMetadata): Promise<EventAttribute> => {
-  // This anyAttribues allows us to use ?. notation to introspect the object which is a safe access pattern.
-  // Because of the way we wrote our discrimited union we have to use this any. If we have two objects that
-  // don't have the same property TS won't let us access that object without verifying the type string like
-  // attributes.type === "ATypeWithInput/Result"
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const anyAttributes = attributes as any;
-
-  const potentialPayloads = getPotentialPayloads(anyAttributes);
-
-  if (potentialPayloads) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let JSONPayload: string | Payload | Record<any, any>;
-
-    const endpoint = settings?.codec?.endpoint;
-    if (endpoint) {
-      // Convert Payload data
-      const awaitData = await convertPayloadsWithCodec({
-        payloads: { payloads: potentialPayloads },
-        namespace,
-        settings,
-      });
-      JSONPayload = (awaitData?.payloads ?? []).map(decodePayload);
-    } else {
-      JSONPayload = potentialPayloads.map(decodePayload);
-    }
-
-    for (const field of payloadFields) {
-      const value = getField(field, anyAttributes);
-      if (value?.payloads) {
-        value.payloads = JSONPayload;
-      }
-    }
-  }
-
-  return anyAttributes;
+  const decodedAttributes = await decodeAllPotentialPayloadsWithCodec(
+    anyAttributes,
+    namespace,
+    settings,
+  );
+  return decodedAttributes;
 };
 
 export const convertPayloadToJsonWithWebsocket = async (
-  eventAttribute: EventAttribute,
+  attributes: EventAttribute,
   websocket?: DataConverterWebsocketInterface,
 ): Promise<EventAttribute> => {
-  // This anyAttribues allows us to use ?. notation to introspect the object which is a safe access pattern.
-  // Because of the way we wrote our discrimited union we have to use this any. If we have two objects that
-  // don't have the same property TS won't let us access that object without verifying the type string like
-  // attributes.type === "ATypeWithInput/Result"
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const anyAttributes = eventAttribute as any;
-  const potentialPayloads = getPotentialPayloads(anyAttributes);
-
-  if (potentialPayloads) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let JSONPayload: string | Payload | Record<any, any>;
-
-    const ws = websocket ?? dataConverterWebsocket;
-
-    if (ws?.hasWebsocket) {
-      // Convert Payload data
-      const awaitData = await Promise.all(
-        (potentialPayloads ?? []).map(
-          async (payload) =>
-            await convertPayloadWithWebsocket(payload, ws.websocket),
-        ),
-      );
-
-      JSONPayload = awaitData;
-    } else {
-      JSONPayload = potentialPayloads.map(decodePayload);
-    }
-
-    for (const field of payloadFields) {
-      const value = getField(field, anyAttributes);
-      if (value?.payloads) {
-        value.payloads = JSONPayload;
-      }
-    }
-  }
-
-  return anyAttributes;
+  const anyAttributes = attributes as any;
+  const ws = websocket ?? dataConverterWebsocket;
+  const decodedAttributes = await decodeAllPotentialPayloadsWithWebsockets(
+    anyAttributes,
+    ws,
+  );
+  return decodedAttributes;
 };

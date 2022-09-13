@@ -4,8 +4,6 @@ node_modules
 /package
 /cypress/screenshots
 /cypress/videos
-/build-local
-/build-cloud
 /coverage
 *.log
 *.swp

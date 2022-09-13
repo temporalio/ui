@@ -1,0 +1,1 @@
+import{w as c}from"./index-203c0d43.js";const i=(r,e=2e3)=>{const o=c(!1);return{copy:async t=>{t.preventDefault(),t.stopPropagation();try{await navigator.clipboard.writeText(r),o.set(!0),setTimeout(()=>{o.set(!1)},e)}catch(a){console.error(a)}},copied:o}};export{i as c};

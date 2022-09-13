@@ -11,9 +11,10 @@
   } from '$lib/utilities/route-for';
 
   import Navigation from '$lib/holocene/navigation/full-nav.svelte';
-  import DataEncoderStatus from '$lib/components/data-encoder-status.svelte';
+  import DataEncoderStatus from '$lib/holocene/data-encoder-status.svelte';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { getApiOrigin } from '$lib/utilities/get-api-origin';
+  import { showDataEncoderSettings } from '$lib/stores/show-data-encoder';
 
   export let user: User;
 
@@ -85,5 +86,11 @@
   {isCloud}
   user={Promise.resolve(user)}
   {logout}
-  extras={[{ component: DataEncoderStatus, name: 'Data Encoder' }]}
+  extras={[
+    {
+      component: DataEncoderStatus,
+      name: 'Data Encoder',
+      onClick: () => ($showDataEncoderSettings = true),
+    },
+  ]}
 />

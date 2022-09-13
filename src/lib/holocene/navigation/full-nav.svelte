@@ -2,6 +2,7 @@
   export interface ExtraIcon {
     component: typeof SvelteComponent;
     name: string;
+    onClick?: () => void;
   }
 </script>
 
@@ -104,7 +105,11 @@
           <div class="nav-icon">
             <svelte:component this={extra.component} />
           </div>
-          <div class="nav-title">
+          <div
+            class="nav-title"
+            class:cursor={extra?.onClick}
+            on:click={extra?.onClick}
+          >
             {extra.name}
           </div>
         </NavRow>
@@ -194,6 +199,10 @@
 <style lang="postcss">
   .nav-icon {
     @apply ml-2 mr-2 mt-0 h-6 cursor-pointer;
+  }
+
+  .cursor {
+    @apply cursor-pointer;
   }
   .nav-title {
     width: 100px;
