@@ -5,6 +5,7 @@
   export let id: string;
   export let value: string;
   export let label = '';
+  export let units = '';
   export let icon: IconName = null;
   export let placeholder = '';
   export let name = id;
@@ -53,32 +54,27 @@
   {#if label}
     <label for={id}>{label}</label>
   {/if}
-  <div class="input-container {theme}" class:disabled class:invalid={!valid}>
-    {#if icon}
-      <span class="icon-container">
-        <Icon name={icon} />
-      </span>
-    {/if}
-    <input
-      class="m-2 block w-full bg-white text-center focus:outline-none"
-      class:disabled
-      {disabled}
-      data-lpignore="true"
-      {placeholder}
-      {id}
-      {name}
-      autocomplete={autocomplete ? 'on' : 'off'}
-      {spellcheck}
-      bind:value
-      on:input
-      on:change
-      on:focus
-      on:blur
-    />
+  <div class="flex items-center gap-2">
+    <div class="input-container {theme}" class:disabled class:invalid={!valid}>
+      <input
+        class="m-2 block w-full bg-white text-center focus:outline-none"
+        class:disabled
+        {disabled}
+        data-lpignore="true"
+        {placeholder}
+        {id}
+        {name}
+        autocomplete={autocomplete ? 'on' : 'off'}
+        {spellcheck}
+        bind:value
+        on:input
+        on:change
+        on:focus
+        on:blur
+      />
+    </div>
+    <div class="units">{units}</div>
   </div>
-  {#if label}
-    <label for={id}>{label}</label>
-  {/if}
 </div>
 {#if hintText}
   <span class="mt-1 text-xs text-red-700">{hintText}</span>
@@ -89,9 +85,12 @@
   label {
     @apply mb-10 font-secondary text-sm font-medium;
   }
+  .units {
+    @apply font-secondary text-sm font-medium;
+  }
 
   .input-container {
-    @apply relative box-border inline-flex h-10 w-16 items-center rounded border border-gray-900 text-sm focus-within:border-blue-700;
+    @apply relative box-border flex h-10 w-16 items-center rounded border border-gray-900 text-sm focus-within:border-blue-700;
   }
 
   .input-container.disabled {

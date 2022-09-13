@@ -128,20 +128,18 @@
   description="A number input"
   component={NumberInput}
   props={{
-    class: 'w-96',
-    id: 'input8',
-    label: 'days',
+    id: 'input9',
     value: '10',
   }}
 />
 
 <Chapter
-  description="A number input with max"
+  description="A number input with label, units and a max"
   component={NumberInput}
   props={{
-    class: 'w-96',
-    id: 'input8',
-    label: 'days',
+    label: 'Retention Period*',
+    id: 'input10',
+    units: 'days',
     value: '10',
     max: 50,
   }}
