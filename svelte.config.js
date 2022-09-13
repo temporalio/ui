@@ -43,10 +43,6 @@ const config = {
       files: (filepath) =>
         /^(?!.*\.(spec|test)\.ts$).*\.(svelte|ts)$/.test(filepath),
     },
-    ...(!dev && {
-      //eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-      routes: (filepath) => /^(?!.*(?:fiction)).*$/.test(filepath),
-    }),
   },
 };
 

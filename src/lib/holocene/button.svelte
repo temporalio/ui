@@ -45,7 +45,7 @@
     <slot />
     {#if count > 0}
       <Badge
-        class="badge absolute top-0 right-0 origin-bottom-left origin-bottom-left translate-y-[-10px] translate-x-[10px]"
+        class="badge absolute top-0 right-0 origin-bottom-left translate-y-[-10px] translate-x-[10px]"
         type="count">{count}</Badge
       >
     {/if}

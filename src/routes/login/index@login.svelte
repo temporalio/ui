@@ -4,7 +4,6 @@
 
   import Button from '$holocene/button.svelte';
   import { routeForAuthentication } from '$lib/utilities/route-for';
-
   import { fetchSettings } from '$lib/services/settings-service';
 
   import type { Load } from '@sveltejs/kit';
@@ -30,6 +29,8 @@
   import HamburgerHeader from '$lib/components/hamburger-header.svelte';
   import { publicPath } from '$lib/utilities/get-public-path';
 
+  const error = $page.url.searchParams.get('error');
+
   export let settings: Settings;
 </script>
 
@@ -54,4 +55,14 @@
       }}>Continue to SSO</Button
     >
   </div>
+
+  {#if error}
+    <div class="my-12 flex flex-col items-center justify-start gap-2">
+      <p
+        class="rounded-md border-2 border-orange-500 bg-orange-100 p-5 text-center"
+      >
+        {error}
+      </p>
+    </div>
+  {/if}
 </section>
