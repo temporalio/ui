@@ -1,12 +1,8 @@
 <script lang="ts">
-  import Icon from '$holocene/icon/icon.svelte';
-  import type { IconName } from '$lib/holocene/icon/paths';
-
   export let id: string;
   export let value: string;
   export let label = '';
   export let units = '';
-  export let icon: IconName = null;
   export let placeholder = '';
   export let name = id;
   export let disabled = false;
@@ -111,14 +107,6 @@
 
   .count {
     @apply invisible mr-2 font-secondary text-sm font-medium text-primary;
-  }
-
-  .count > .warn {
-    @apply text-orange-600;
-  }
-
-  .count > .error {
-    @apply text-red-700;
   }
 
   /* Light theme styles */
