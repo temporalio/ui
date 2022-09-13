@@ -7,18 +7,18 @@ import { routeForLoginPage } from './route-for';
 
 // This will eventually be expanded on.
 export const handleError = (
-  error: unknown,
+  error: any,
   notifications = notificationStore,
   errors = networkError,
   isBrowser = browser,
 ): void => {
   if (isUnauthorized(error) && isBrowser) {
-    window.location.assign(routeForLoginPage(error?.['message']));
+    window.location.assign(routeForLoginPage(error?.message));
     return;
   }
 
   if (isForbidden(error) && isBrowser) {
-    window.location.assign(routeForLoginPage(error?.['message']));
+    window.location.assign(routeForLoginPage(error?.message));
     return;
   }
 
@@ -55,10 +55,10 @@ export const handleUnauthorizedOrForbiddenError = (
   }
 };
 
-const isUnauthorized = (error: unknown): boolean => {
-  return error?.['statusCode'] === 401 || error?.['status'] === 401;
+const isUnauthorized = (error: any): boolean => {
+  return error?.statusCode === 401 || error?.status === 401;
 };
 
-const isForbidden = (error: unknown): boolean => {
-  return error?.['statusCode'] === 403 || error?.['status'] === 403;
+const isForbidden = (error: any): boolean => {
+  return error?.statusCode === 403 || error?.status === 403;
 };
