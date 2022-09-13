@@ -1,12 +1,16 @@
 import { browser } from '$app/env';
 import { writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
+import { isFunction } from '$lib/utilities/is-function';
+
 export function persistStore<T>(
   name: string,
-  initialValue: T,
+  initialValue: T | (() => T) | null = null,
   broadcastToAll = false,
-): Pick<Writable<T>, 'subscribe' | 'set'> {
-  let initialStoreValue = initialValue;
+): Pick<Writable<T | null>, 'subscribe' | 'set'> {
+  let initialStoreValue = isFunction<() => T>(initialValue)
+    ? initialValue()
+    : initialValue;
   let broadcaster: null | BroadcastChannel;
 
   if (browser) {
@@ -17,7 +21,7 @@ export function persistStore<T>(
         );
       }
     } catch (_err) {
-      console.error(`Could not get localstorage ${name}`);
+      initialStoreValue = null;
     }
   }
 
