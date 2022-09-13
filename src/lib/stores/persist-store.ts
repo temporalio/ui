@@ -4,17 +4,21 @@ import type { Writable } from 'svelte/store';
 export function persistStore<T>(
   name: string,
   initialValue: T,
-  broadcastToAll: boolean = false,
+  broadcastToAll = false,
 ): Pick<Writable<T>, 'subscribe' | 'set'> {
   let initialStoreValue = initialValue;
   let broadcaster: null | BroadcastChannel;
 
-  try {
-    if (window?.localStorage?.getItem(name)) {
-      initialStoreValue = JSON.parse(window?.localStorage?.getItem(name) ?? '');
+  if (browser) {
+    try {
+      if (window?.localStorage?.getItem(name)) {
+        initialStoreValue = JSON.parse(
+          window?.localStorage?.getItem(name) ?? '',
+        );
+      }
+    } catch (_err) {
+      console.error(`Could not get localstorage ${name}`);
     }
-  } catch (_err) {
-    console.error(`Could not get localstorage ${name}`);
   }
 
   const { subscribe, set } = writable<T>(initialStoreValue);
@@ -31,7 +35,11 @@ export function persistStore<T>(
     set: (x: T) => {
       if (browser) {
         if (broadcaster) broadcaster.postMessage(x);
-        window?.localStorage?.setItem(name, JSON.stringify(x));
+        if (x === null) {
+          window?.localStorage?.removeItem(name);
+        } else {
+          window?.localStorage?.setItem(name, JSON.stringify(x));
+        }
       }
       set(x);
     },
