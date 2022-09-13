@@ -76,7 +76,7 @@
   <Loading />
 {:else if $workflows.length}
   <Pagination items={$workflows} updating={$updating} let:visibleItems>
-    <svelte:fragment slot="action">
+    <svelte:fragment slot="action-top-right">
       <Select id="filter-by-relative-time" bind:value={$timeFormat}>
         <Option value={'relative'}>Relative</Option>
         <Option value={'UTC'}>UTC</Option>

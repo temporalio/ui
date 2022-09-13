@@ -14,7 +14,7 @@
 <div>
   <label class="hidden" for={id}>{label}</label>
   <select
-    class="inline h-10 w-full rounded-lg border-2 px-2 text-base {$$props.class}"
+    class="inline h-8 w-full rounded-lg border-2 px-2 text-base {$$props.class}"
     class:dark
     class:remove={arrow}
     {name}
