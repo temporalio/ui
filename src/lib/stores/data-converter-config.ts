@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store';
 import { persistStore } from '$lib/stores/persist-store';
 
-export const dataConverterPort = persistStore('port', null);
+export const dataConverterPort = persistStore('port', null, true);
 
 export const lastDataConverterStatus =
   writable<DataEncoderStatus>('notRequested');
