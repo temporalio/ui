@@ -64,7 +64,7 @@
   >
     {#if icon || loading}
       <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner' : icon} fill={iconFill} />
+        <Icon name={loading ? 'spinner' : icon} />
       </span>
     {/if}
     <slot />

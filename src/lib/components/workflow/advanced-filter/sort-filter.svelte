@@ -3,7 +3,7 @@
 
   import Select from '$lib/holocene/select/select.svelte';
   import Option from '$lib/holocene/select/option.svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import CustomButton from '$lib/holocene/custom-button.svelte';
 
   export let orderType: 'asc' | 'desc';
 
@@ -45,10 +45,12 @@
 </script>
 
 <div class="flex gap-2">
-  <Button
+  <CustomButton
     icon={sorts.length ? 'close' : 'converter-down'}
-    variant="secondary"
-    on:click={onOrderBy}>Order By</Button
+    class="border-gray-300 h-8"
+    add={!sorts.length}
+    remove={!!sorts.length}
+    on:click={onOrderBy}>Order By</CustomButton
   >
   {#each sorts as { label, value, order }}
     <Select

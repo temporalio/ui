@@ -18,6 +18,7 @@
   import TypeaheadInput from '$lib/holocene/input/typeahead-input.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import SortFilter from './advanced-filter/sort-filter.svelte';
+  import { onMount } from 'svelte';
 
   const defaultQuery = toListWorkflowQuery({ timeRange: 'All' });
   $: query = $page.url.searchParams.get('query');
@@ -56,6 +57,10 @@
       }
     }
   };
+
+  // onMount(() => {
+  //   onBookmarkChange('Daily Non-Cron Failures');
+  // });
 
   const onAddFilterParenthesis = (parenthesis, index) => {
     if (filters[index].parenthesis === parenthesis) {
@@ -141,14 +146,16 @@
 <div class="mb-4 flex w-full items-center gap-4">
   {#if filters.length}
     <div class="flex items-center gap-2" in:fade>
-      <Button icon="search" variant="primary" on:click={onSearch}>Search</Button
+      <Button icon="search" variant="primary" thin on:click={onSearch}
+        >Search</Button
       >
-      <Button icon="retry" variant="secondary" on:click={onRestart}
+      <Button icon="retry" variant="secondary" thin on:click={onRestart}
         >Start Over</Button
       >
       <Button
         icon="bookmark"
         variant="secondary"
+        thin
         iconClass="text-yellow-500"
         on:click={() => (showBookmarkSave = true)}
         >Save {activeSearch ? 'As' : ''}</Button
@@ -157,19 +164,21 @@
         <Button
           icon="close"
           variant="destructive"
+          thin
           on:click={() => (showBookmarkRemove = true)}>Remove</Button
         >
       {/if}
       <Button
         icon={showFilters ? 'chevron-up' : 'chevron-down'}
         variant="secondary"
+        thin
         on:click={() => (showFilters = !showFilters)}
         >{showFilters ? 'Hide' : 'Show'}</Button
       >
     </div>
   {:else}
     <div class="flex h-12 w-full items-center gap-2" in:fade>
-      <Button icon="add" variant="secondary" on:click={onStart}
+      <Button icon="add" thin variant="secondary" on:click={onStart}
         >New Search</Button
       >
       <TypeaheadInput
