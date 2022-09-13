@@ -90,11 +90,13 @@
     if (bookmarkedSearch) {
       bookmarkName = name;
       filters = [...bookmarkedSearch.filters];
-      sorts = [...bookmarkedSearch.sorts];
+      sorts = [...(bookmarkedSearch?.sorts ?? [])];
       query = bookmarkedSearch.query;
       activeSearch = bookmarkedSearch;
       showFilters = true;
-      onSearch();
+      setTimeout(() => {
+        onSearch();
+      }, 150);
     }
   };
 
@@ -134,7 +136,7 @@
 </script>
 
 {#if activeSearch?.name}
-  <div class="text-base ">{activeSearch?.name}</div>
+  <h3 class="text-base">{activeSearch?.name}</h3>
 {/if}
 <div class="mb-4 flex w-full items-center gap-4">
   {#if filters.length}
@@ -183,12 +185,12 @@
 </div>
 {#if filters.length && showFilters}
   <div
-    class="flex h-8 w-full items-center overflow-x-auto rounded-lg bg-gray-200 px-2 py-0"
+    class="flex h-8 w-full items-center overflow-x-auto rounded-lg bg-blueGray-200 px-2 py-0"
   >
     <button on:click={(e) => copy(e, query)} class="mx-1">
       <Icon name={$copied ? 'checkmark' : 'copy'} class="mx-1 text-black" />
     </button>
-    <pre class="flex h-full items-center text-lg">{query}</pre>
+    <pre class="flex h-full items-center text-sm">{query}</pre>
   </div>
   <section class="advanced-filters flex flex-col gap-2">
     {#each filters as { filterType, value, operator, parenthesis, conditional }, index (index)}
