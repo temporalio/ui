@@ -13,7 +13,6 @@
 
   import Modal from '$holocene/modal.svelte';
   import AdvancedFilter from './advanced-filter/index.svelte';
-  import AdvancedOrder from './advanced-filter/sort-filter.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { removeSearch, saveSearch, searches } from '$lib/stores/searches';
   import TypeaheadInput from '$lib/holocene/input/typeahead-input.svelte';
@@ -138,7 +137,6 @@
   <div class="text-base ">{activeSearch?.name}</div>
 {/if}
 <div class="mb-4 flex w-full items-center gap-4">
-  <!-- <AdvancedOrder bind:orderType /> -->
   {#if filters.length}
     <div class="flex items-center gap-2" in:fade>
       <Button icon="search" variant="primary" on:click={onSearch}>Search</Button
