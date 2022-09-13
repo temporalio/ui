@@ -2,16 +2,21 @@ import { get } from 'svelte/store';
 import { persistStore } from '$lib/stores/persist-store';
 
 export const searches = persistStore<
-  { name: string; query: string; filters: any[] }[]
+  { name: string; query: string; filters: any[]; sorts: any[] }[]
 >('searches', null);
 
 export const saveSearch = (search: {
   name: string;
   query: string;
   filters: any[];
+  sorts: any[];
 }): void => {
-  let _searches: { name: string; query: string; filters: any[] }[] =
-    get(searches) ?? [];
+  let _searches: {
+    name: string;
+    query: string;
+    filters: any[];
+    sorts: any[];
+  }[] = get(searches) ?? [];
   const existingSearch = _searches.find((s) => s.name === search.name);
   if (existingSearch) {
     _searches = _searches.map((s) => {
@@ -29,9 +34,14 @@ export const removeSearch = (search: {
   name: string;
   query: string;
   filters: any[];
+  sorts: any[];
 }): void => {
-  let _searches: { name: string; query: string; filters: any[] }[] =
-    get(searches) ?? [];
+  let _searches: {
+    name: string;
+    query: string;
+    filters: any[];
+    sorts: any[];
+  }[] = get(searches) ?? [];
   _searches = _searches.filter((s) => {
     return s.name !== search.name;
   });

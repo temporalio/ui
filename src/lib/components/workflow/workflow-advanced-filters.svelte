@@ -13,26 +13,29 @@
 
   import Modal from '$holocene/modal.svelte';
   import AdvancedFilter from './advanced-filter/index.svelte';
-  import AdvancedOrder from './advanced-filter/order.svelte';
+  import AdvancedOrder from './advanced-filter/sort-filter.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { removeSearch, saveSearch, searches } from '$lib/stores/searches';
   import TypeaheadInput from '$lib/holocene/input/typeahead-input.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import SortFilter from './advanced-filter/sort-filter.svelte';
 
   const defaultQuery = toListWorkflowQuery({ timeRange: 'All' });
   $: query = $page.url.searchParams.get('query');
   $: parameters = toListWorkflowParameters(query ?? defaultQuery);
 
   let filters = [];
-  let orderType = 'desc';
+  let sorts = [];
+
   let bookmarkName = '';
   let activeSearch;
+
   let showFilters = true;
   let showBookmarkSave = false;
   let showBookmarkRemove = false;
 
   $: {
-    query = toListWorkflowQueryFromAdvancedFilters(filters);
+    query = toListWorkflowQueryFromAdvancedFilters(filters, sorts);
   }
 
   const onAddFilterOperator = (operator, index) => {
@@ -56,8 +59,6 @@
   };
 
   const onAddFilterParenthesis = (parenthesis, index) => {
-    ('this is foo bar'.match(/o/g) || []).length;
-
     if (filters[index].parenthesis === parenthesis) {
       filters[index].parenthesis = '';
     } else {
@@ -76,7 +77,7 @@
 
   const onSave = () => {
     showBookmarkSave = false;
-    const search = { name: bookmarkName, query, filters };
+    const search = { name: bookmarkName, query, filters, sorts };
     saveSearch(search);
     activeSearch = search;
   };
@@ -90,6 +91,7 @@
     if (bookmarkedSearch) {
       bookmarkName = name;
       filters = [...bookmarkedSearch.filters];
+      sorts = [...bookmarkedSearch.sorts];
       query = bookmarkedSearch.query;
       activeSearch = bookmarkedSearch;
       showFilters = true;
@@ -120,6 +122,7 @@
     activeSearch = null;
     bookmarkName = '';
     filters = [];
+    sorts = [];
     updateQueryParameters({
       url: $page.url,
       parameter: 'query',
@@ -131,18 +134,8 @@
   const { copy, copied } = copyToClipboard(500);
 </script>
 
-{#if filters.length}
-  <div
-    class="fixed flex items-center bottom-0 left-0 p-4 bg-gray-100 w-full h-10 z-50 overflow-x-auto"
-  >
-    <button on:click={(e) => copy(e, query)} class="mx-1">
-      <Icon name={$copied ? 'checkmark' : 'copy'} class="text-black mx-1" />
-    </button>
-    <pre class="h-full flex items-center text-lg">{query}</pre>
-  </div>
-{/if}
 {#if activeSearch?.name}
-  <div class="text-sm">{activeSearch?.name}</div>
+  <div class="text-base ">{activeSearch?.name}</div>
 {/if}
 <div class="mb-4 flex w-full items-center gap-4">
   <!-- <AdvancedOrder bind:orderType /> -->
@@ -191,6 +184,14 @@
   {/if}
 </div>
 {#if filters.length && showFilters}
+  <div
+    class="flex h-8 w-full items-center overflow-x-auto rounded-lg bg-gray-200 px-2 py-0"
+  >
+    <button on:click={(e) => copy(e, query)} class="mx-1">
+      <Icon name={$copied ? 'checkmark' : 'copy'} class="mx-1 text-black" />
+    </button>
+    <pre class="flex h-full items-center text-lg">{query}</pre>
+  </div>
   <section class="advanced-filters flex flex-col gap-2">
     {#each filters as { filterType, value, operator, parenthesis, conditional }, index (index)}
       <div class="flex justify-between gap-16" transition:slide|local>
@@ -210,6 +211,7 @@
         />
       </div>
     {/each}
+    <SortFilter orderType="asc" {filters} bind:sorts />
   </section>
 {/if}
 <Modal
