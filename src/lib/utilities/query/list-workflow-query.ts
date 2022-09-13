@@ -159,8 +159,19 @@ export const toListWorkflowQueryFromAdvancedFilters = (
     conditional: string;
     operator: string;
     parenthesis: string;
-  }[],
+  }[] = [],
+  sorts: {
+    label: string;
+    value: string;
+    order: string;
+  }[] = [],
   archived = false,
 ): string => {
-  return toQueryStatementsFromAdvancedFilters(filters, archived).join('');
+  const sortStatement = sorts.length
+    ? ` order by ${sorts[0].value} ${sorts[0].order}`
+    : '';
+  return (
+    toQueryStatementsFromAdvancedFilters(filters, archived).join('') +
+    sortStatement
+  );
 };

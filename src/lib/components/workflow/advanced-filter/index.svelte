@@ -3,7 +3,6 @@
   import Option from '$lib/holocene/select/option.svelte';
   import Button from '$lib/holocene/button.svelte';
   import StatusFilter from './status-filter.svelte';
-  import SearchAttributeFilter from './search-attribute-filter.svelte';
   import type { FilterKey } from '$lib/utilities/query/list-workflow-query';
   import { searchAttributes } from '$lib/stores/search-attributes';
   import { noop } from 'svelte/internal';

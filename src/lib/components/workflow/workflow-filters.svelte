@@ -12,7 +12,6 @@
   import Select from '$lib/holocene/select/simple-select.svelte';
   import Option from '$lib/holocene/select/simple-option.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import Search from '$lib/components/search.svelte';
   import WorkflowAdvancedFilters from './workflow-advanced-filters.svelte';
 
   export let searchType: 'basic' | 'advanced';

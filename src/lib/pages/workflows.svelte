@@ -10,6 +10,7 @@
     workflowError,
   } from '$lib/stores/workflows';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
+  import { timeFormat } from '$lib/stores/time-format';
 
   import { getSearchType } from '$lib/utilities/search-type-parameter';
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
@@ -25,7 +26,8 @@
   import PageTitle from '$lib/holocene/page-title.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$holocene/icon/icon.svelte';
-  import WorkflowAdvancedFilters from '$lib/components/workflow/workflow-advanced-filters.svelte';
+  import Select from '$lib/holocene/select/simple-select.svelte';
+  import Option from '$lib/holocene/select/simple-option.svelte';
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
 
@@ -74,6 +76,13 @@
   <Loading />
 {:else if $workflows.length}
   <Pagination items={$workflows} updating={$updating} let:visibleItems>
+    <svelte:fragment slot="action">
+      <Select id="filter-by-relative-time" bind:value={$timeFormat}>
+        <Option value={'relative'}>Relative</Option>
+        <Option value={'UTC'}>UTC</Option>
+        <Option value={'local'}>Local</Option>
+      </Select>
+    </svelte:fragment>
     <WorkflowsSummaryTable>
       {#each visibleItems as event}
         <WorkflowsSummaryRow
