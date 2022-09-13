@@ -12,11 +12,13 @@ export type TemporalAPIError = {
 
 export type RetryCallback = (retriesRemaining: number) => void;
 
-export type ErrorCallback = (error: {
+export type APIErrorResponse = {
   status: number;
   statusText: string;
   body: TemporalAPIError;
-}) => void;
+};
+
+export type ErrorCallback = (error: APIErrorResponse) => void;
 
 type toURLParams = Parameters<typeof toURL>;
 
