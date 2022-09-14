@@ -2,6 +2,7 @@
   import Chapter from '../_chapter.svelte';
 
   import Input from '$lib/holocene/input/input.svelte';
+  import NumberInput from '$lib/holocene/input/number-input.svelte';
 </script>
 
 <Chapter
@@ -120,5 +121,26 @@
     value: 'robin@temporal.io',
     disabled: true,
     theme: 'dark',
+  }}
+/>
+
+<Chapter
+  description="A number input"
+  component={NumberInput}
+  props={{
+    id: 'input9',
+    value: '10',
+  }}
+/>
+
+<Chapter
+  description="A number input with label, units and a max"
+  component={NumberInput}
+  props={{
+    label: 'Retention Period*',
+    id: 'input10',
+    units: 'days',
+    value: '10',
+    max: 50,
   }}
 />

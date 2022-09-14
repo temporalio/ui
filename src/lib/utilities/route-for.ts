@@ -155,10 +155,13 @@ export const routeForAuthentication = (
   return login.toString();
 };
 
-export const routeForLoginPage = (isBrowser = browser): string => {
+export const routeForLoginPage = (error = '', isBrowser = browser): string => {
   if (isBrowser) {
     const login = new URL('login', window.location.origin);
     login.searchParams.set('returnUrl', window.location.href);
+    if (error) {
+      login.searchParams.set('error', error);
+    }
     return login.toString();
   }
 

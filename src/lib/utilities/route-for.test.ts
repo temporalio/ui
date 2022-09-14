@@ -332,7 +332,7 @@ describe('routeFor SSO authentication ', () => {
     });
 
     it('should return a URL with the correct returnUrl', () => {
-      expect(routeForLoginPage(false)).toBe('/login');
+      expect(routeForLoginPage('', false)).toBe('/login');
     });
   });
 
