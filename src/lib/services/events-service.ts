@@ -1,6 +1,6 @@
 import type { GetWorkflowExecutionHistoryResponse } from '$types';
 
-import { paginated } from '$lib/utilities/paginated';
+import { paginatedWithBackOff } from '$lib/utilities/paginated';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { toEventHistory } from '$lib/models/event-history';
@@ -39,11 +39,12 @@ export const fetchRawEvents = async ({
 }: FetchEventsParameters): Promise<HistoryEvent[]> => {
   const endpoint = getEndpointForSortOrder(sort);
 
-  const response = await paginated(
+  const response = await paginatedWithBackOff(
     async (token: string) => {
       return requestFromAPI<GetWorkflowExecutionHistoryResponse>(
         routeForApi(endpoint, { namespace, workflowId, runId }),
         {
+          params: { maximumPageSize: '5' },
           token,
           request: fetch,
         },

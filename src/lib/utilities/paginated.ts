@@ -5,6 +5,7 @@ import { merge } from './merge';
 type PaginatedOptions<T> = PaginationCallbacks<T> & {
   token?: NextPageToken;
   previousProps?: WithoutNextPageToken<T>;
+  delay?: number
 };
 
 /**
@@ -65,35 +66,59 @@ export const paginatedWithBackOff = async <T extends WithNextPageToken>(
     onError = handleError,
     token,
     previousProps,
+    delay = 0,
+    page = 1
   }: PaginatedOptions<T> = {},
 ): Promise<WithoutNextPageToken<T>> => {
   if (!previousProps && isFunction(onStart)) onStart();
 
+  let pageToken = token;
+  let props = previousProps;
+
+  console.log("Fetchin....")
   try {
     const response = await fn(token);
-    const { nextPageToken, ...props } = response;
-    const mergedProps = merge(previousProps, props);
+    const { nextPageToken, ...nextProps } = response;
+    pageToken = nextPageToken;
+    props = merge(previousProps, nextProps);
+    page += 1;
 
-    if (isFunction(onUpdate)) onUpdate(mergedProps, props);
+    if (isFunction(onUpdate)) onUpdate(props, nextProps);
 
     if (!nextPageToken) {
-      if (isFunction(onComplete)) onComplete(mergedProps);
-      return mergedProps;
+      if (isFunction(onComplete)) onComplete(props);
+      return props;
     }
 
     return paginated(fn, {
       onStart,
       onUpdate,
       onComplete,
-      token: nextPageToken,
-      previousProps: mergedProps,
+      token: pageToken,
+      previousProps: props,
+      delay,
+      page
     });
   } catch (error: unknown) {
-    if (error?.response?.data?.error) {
-      console.error(
-        `Received error: ${JSON.stringify(error?.response?.data?.error)}`
-      );
+    delay += 100
+    console.error(
+      `Received error: ${JSON.stringify(error)}`
+    );
+    if (delay > 1000) {
+      onError(error)
+      return;
     }
-    onError(error);
+
+    setTimeout(() => {
+      return paginated(fn, {
+        onStart,
+        onUpdate,
+        onComplete,
+        token: pageToken,
+        previousProps: props,
+        delay,
+        page
+      });
+    }, delay);
   }
 };
