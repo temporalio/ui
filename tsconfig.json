@@ -1,5 +1,4 @@
 {
-  "extends": "./.svelte-kit/tsconfig.json",
   "compilerOptions": {
     "moduleResolution": "node",
     // "strict": true,
@@ -25,7 +24,6 @@
     "allowJs": true,
     "checkJs": true,
     "paths": {
-      "$lib": ["src/lib"],
       "$lib/*": ["src/lib/*"],
       "$types": ["src/types"],
       "$components/*": ["src/components/*"],
