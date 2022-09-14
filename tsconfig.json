@@ -42,6 +42,7 @@
   "exclude": [
     "src/lib/services/**/*.test.ts",
     "src/lib/utilities/**/*.test.ts",
-    "src/lib/stores/**/*.test.ts"
+    "src/lib/stores/**/*.test.ts",
+    "src/histoire.setup.ts"
   ]
 }
