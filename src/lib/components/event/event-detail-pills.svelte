@@ -5,27 +5,37 @@
     AttributeGrouping,
   } from '$lib/utilities/format-event-attributes';
   import Pill from '$lib/components/pill.svelte';
+  import { count } from 'console';
 
   export let attributeGrouping: AttributeGrouping;
   export let activePill: string;
 
   const dispatch = createEventDispatcher();
+
+  $: pillCount = Object.values(attributeGrouping).reduce((count, value) => {
+    if (value.length) {
+      count += 1;
+    }
+    return count;
+  }, 0);
 </script>
 
-<div class="p-2 text-center xl:text-left">
-  <div class="pill-container">
-    {#each Object.entries(attributeGrouping) as [key, value] (key)}
-      {#if value.length}
-        <Pill
-          active={activePill === key}
-          on:click={() => dispatch('pillChange', { key })}
-          color={attributeGroupingProperties[key].color}
-          >{attributeGroupingProperties[key].label}</Pill
-        >
-      {/if}
-    {/each}
+{#if pillCount > 1}
+  <div class="p-2 text-center xl:text-left">
+    <div class="pill-container">
+      {#each Object.entries(attributeGrouping) as [key, value] (key)}
+        {#if value.length}
+          <Pill
+            active={activePill === key}
+            on:click={() => dispatch('pillChange', { key })}
+            color={attributeGroupingProperties[key].color}
+            >{attributeGroupingProperties[key].label}</Pill
+          >
+        {/if}
+      {/each}
+    </div>
   </div>
-</div>
+{/if}
 
 <style lang="postcss">
   .pill-container {
