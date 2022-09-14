@@ -1,4 +1,5 @@
 import { describe, expect, it, afterEach } from 'vitest';
+import { BroadcastChannel } from 'broadcast-channel';
 
 import {
   decodePayload,
@@ -29,6 +30,8 @@ import {
 
 import { get } from 'svelte/store';
 import { vi } from 'vitest';
+
+vi.mock('broadcast-channel')
 
 const WebDecodePayload = {
   metadata: {
