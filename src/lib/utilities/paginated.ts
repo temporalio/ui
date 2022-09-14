@@ -55,3 +55,40 @@ export const paginated = async <T extends WithNextPageToken>(
     onError(error);
   }
 };
+
+export const paginatedWithBackOff = async <T extends WithNextPageToken>(
+  fn: (token?: NextPageToken) => Promise<T>,
+  {
+    onStart,
+    onUpdate,
+    onComplete,
+    onError = handleError,
+    token,
+    previousProps,
+  }: PaginatedOptions<T> = {},
+): Promise<WithoutNextPageToken<T>> => {
+  if (!previousProps && isFunction(onStart)) onStart();
+
+  try {
+    const response = await fn(token);
+    const { nextPageToken, ...props } = response;
+    const mergedProps = merge(previousProps, props);
+
+    if (isFunction(onUpdate)) onUpdate(mergedProps, props);
+
+    if (!nextPageToken) {
+      if (isFunction(onComplete)) onComplete(mergedProps);
+      return mergedProps;
+    }
+
+    return paginated(fn, {
+      onStart,
+      onUpdate,
+      onComplete,
+      token: nextPageToken,
+      previousProps: mergedProps,
+    });
+  } catch (error: unknown) {
+    onError(error);
+  }
+};
