@@ -1,4 +1,5 @@
 import { browser } from '$app/env';
+import { getUser } from '$lib/stores/user';
 import { noop } from 'svelte/internal';
 import { handleError as handleRequestError } from './handle-error';
 import { isFunction } from './is-function';
@@ -80,14 +81,7 @@ export const requestFromAPI = async <T>(
 
   try {
     options = withSecurityOptions(options, isBrowser);
-
-    if (globalThis?.AccessToken) {
-      options.headers = await withBearerToken(
-        options?.headers,
-        globalThis.AccessToken,
-        isBrowser,
-      );
-    }
+    options = await withAuth(options, isBrowser);
 
     const response = await request(url, options);
     const body = await response.json();
@@ -136,6 +130,35 @@ const withSecurityOptions = (
   return opts;
 };
 
+const withAuth = async (
+  options: RequestInit,
+  isBrowser = browser,
+): Promise<RequestInit> => {
+  if (getUser().accessToken) {
+    options.headers = await withBearerToken(
+      options?.headers,
+      () =>
+        new Promise((resolve) => {
+          resolve(getUser().accessToken);
+        }),
+      isBrowser,
+    );
+    options.headers = withIdToken(
+      options?.headers,
+      getUser().idToken,
+      isBrowser,
+    );
+  } else if (globalThis?.AccessToken) {
+    options.headers = await withBearerToken(
+      options?.headers,
+      globalThis.AccessToken,
+      isBrowser,
+    );
+  }
+
+  return options;
+};
+
 const withBearerToken = async (
   headers: HeadersInit,
   accessToken: () => Promise<string>,
@@ -152,6 +175,27 @@ const withBearerToken = async (
       headers['Authorization'] = `Bearer ${token}`;
     }
     /* c8 ignore next 4 */
+  } catch (e) {
+    console.error(e);
+  }
+
+  return headers;
+};
+
+const withIdToken = (
+  headers: HeadersInit,
+  idToken: string,
+  isBrowser = browser,
+): HeadersInit => {
+  // At this point in the code path, headers will always be set.
+  /* c8 ignore next */
+  if (!headers) headers = {};
+  if (!isBrowser) return headers;
+
+  try {
+    if (idToken) {
+      headers['AuthorizationExtras'] = idToken;
+    }
   } catch (e) {
     console.error(e);
   }

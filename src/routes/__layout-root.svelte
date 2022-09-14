@@ -5,23 +5,23 @@
   import '../app.css';
 
   import { fetchSettings } from '$lib/services/settings-service';
-  import { fetchUser } from '$lib/services/user-service';
+  import { getUser } from '$lib/stores/user';
   import { fetchCluster } from '$lib/services/cluster-service';
   import { fetchNamespaces } from '$lib/services/namespaces-service';
   import { fetchLatestUiVersion } from '$lib/services/github-service';
   import { fetchSearchAttributes } from '$lib/services/search-attributes-service';
-
   import { getDefaultNamespace } from '$lib/utilities/get-namespace';
   import { isAuthorized } from '$lib/utilities/is-authorized';
+  import { routeForLoginPage } from '$lib/utilities/route-for';
 
   export const load: Load = async function ({ fetch }) {
     const settings: Settings = await fetchSettings(fetch);
-    const user = await fetchUser(fetch);
+    const user = getUser();
 
     if (!isAuthorized(settings, user)) {
       return {
         status: 302,
-        redirect: '/login',
+        redirect: routeForLoginPage(),
       };
     }
 

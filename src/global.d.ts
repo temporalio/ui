@@ -72,6 +72,8 @@ type Settings = {
 };
 
 type User = {
+  accessToken?: string;
+  idToken?: string;
   name?: string;
   given_name?: string;
   family_name?: string;
