@@ -1,9 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
-import { BroadcastChannel } from 'broadcast-channel';
-
+import { describe, expect, it } from 'vitest';
 import { isEvent } from '.';
-
-vi.mock('broadcast-channel')
 
 describe('isEvent', () => {
   it('should return true if the event has an eventType', () => {

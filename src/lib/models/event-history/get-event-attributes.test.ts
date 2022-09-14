@@ -1,12 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { writable } from 'svelte/store';
-import { BroadcastChannel } from 'broadcast-channel';
 import { getEventAttributes, toEventHistory } from '.';
 
 import settingsFixture from '$fixtures/settings.json';
 import eventsFixture from '$fixtures/raw-events.descending.completed.json';
-
-vi.mock('broadcast-channel')
 
 const historyEvent = {
   eventId: '1',

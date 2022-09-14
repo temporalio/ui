@@ -26,6 +26,7 @@ export default defineConfig({
       ],
     },
     environment: 'jsdom',
+    setupFiles: ['./vitest_setup.ts'],
     deps: {
       inline: ['date-fns'],
     },
