@@ -1,7 +1,5 @@
 {
-  "extends": [
-    "stylelint-config-recommended"
-  ],
+  "extends": ["stylelint-config-recommended"],
   "processors": [],
   "rules": {
     "at-rule-no-unknown": [
@@ -26,9 +24,7 @@
     "no-descending-specificity": [
       true,
       {
-        "ignore": [
-          "selectors-within-list"
-        ]
+        "ignore": ["selectors-within-list"]
       }
     ],
     "no-invalid-double-slash-comments": true,
