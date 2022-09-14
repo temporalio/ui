@@ -89,6 +89,11 @@ export const paginatedWithBackOff = async <T extends WithNextPageToken>(
       previousProps: mergedProps,
     });
   } catch (error: unknown) {
+    if (error?.response?.data?.error) {
+      console.error(
+        `Received error: ${JSON.stringify(error?.response?.data?.error)}`
+      );
+    }
     onError(error);
   }
 };
