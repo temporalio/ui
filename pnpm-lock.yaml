@@ -85,7 +85,7 @@ devDependencies:
   '@babel/preset-typescript': 7.17.12_@babel+core@7.17.12
   '@crownframework/svelte-error-boundary': 1.0.3
   '@grpc/grpc-js': 1.6.7
-  '@sveltejs/adapter-vercel': 1.0.0-next.72
+  '@sveltejs/adapter-vercel': 1.0.0-next.74
   '@sveltejs/kit': 1.0.0-next.405_svelte@3.48.0+vite@3.1.0
   '@sveltejs/vite-plugin-svelte': 1.0.5_svelte@3.48.0+vite@3.1.0
   '@temporalio/proto': 1.0.0-rc.0
@@ -936,14 +936,14 @@ packages:
       picomatch: 2.3.1
     dev: true
 
-  /@sveltejs/adapter-vercel/1.0.0-next.72:
+  /@sveltejs/adapter-vercel/1.0.0-next.74:
     resolution:
       {
-        integrity: sha512-oNs8FQaYC2NnwDcvX/jc9MDNqXc9HxwGPQNkd+1vBpFVWZl9mShQgCcOMzfTOIH0ka984jYNa0ZawYYHex79xg==,
+        integrity: sha512-BMAeib/aH0JdCyMncnugZteVMc47DfKtqE49BpH8JtiIBna34mkYevUWFLyIEVjoNUu2hHr9GMZXBI0q7JL8tQ==,
       }
     dependencies:
       '@vercel/nft': 0.22.1
-      esbuild: 0.14.54
+      esbuild: 0.15.7
     transitivePeerDependencies:
       - encoding
       - supports-color
