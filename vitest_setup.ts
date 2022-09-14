@@ -1,5 +1,8 @@
-import { vi } from 'vitest'
+import { vi } from 'vitest';
 
-const BroadcastChannelMock = vi.fn(() => ({ addEventListener: () => { }, postMessage: () => { } }))
+const BroadcastChannelMock = vi.fn(() => ({
+  addEventListener: () => {},
+  postMessage: () => {},
+}));
 
-vi.stubGlobal('BroadcastChannel', BroadcastChannelMock)
+vi.stubGlobal('BroadcastChannel', BroadcastChannelMock);
