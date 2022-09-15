@@ -4,10 +4,10 @@
   import { fly } from 'svelte/transition';
 
   import { hasKeys } from '$lib/utilities/has';
-  import { publicPath } from '$lib/utilities/get-public-path';
 
   import DataEncoderStatus from '$lib/holocene/data-encoder-status.svelte';
   import FeedbackButton from '$lib/components/feedback-button.svelte';
+  import Logo from '$lib/vendor/logo.svg';
 
   export let href: string;
   export let user: User;
@@ -26,7 +26,7 @@
   </div>
   <div class="col-span-4 flex justify-center gap-4">
     <a {href} class="block">
-      <img src="{publicPath}/logo.svg" alt="Temporal Logo" class="max-h-10" />
+      <img src={Logo} alt="Temporal Logo" class="max-h-10" />
     </a>
   </div>
   <div class="col-span-4 flex items-center justify-end gap-4">
