@@ -5,7 +5,6 @@ import { merge } from './merge';
 type PaginatedOptions<T> = PaginationCallbacks<T> & {
   token?: NextPageToken;
   previousProps?: WithoutNextPageToken<T>;
-  delay?: number;
 };
 
 /**

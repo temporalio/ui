@@ -40,7 +40,7 @@ export const fetchRawEvents = async ({
   const endpoint = getEndpointForSortOrder(sort);
 
   const response = await paginated(
-    async (token: string, page?: number) => {
+    async (token: string) => {
       return requestFromAPI<GetWorkflowExecutionHistoryResponse>(
         routeForApi(endpoint, { namespace, workflowId, runId }),
         {
