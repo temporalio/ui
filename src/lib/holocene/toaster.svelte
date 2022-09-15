@@ -1,10 +1,16 @@
 <script lang="ts" context="module">
-  import { Writable, writable } from 'svelte/store';
+  import { type Writable, writable } from 'svelte/store';
   import { v4 } from 'uuid';
 
-  interface Toast {
+  export type ToastVariant =
+    | 'success'
+    | 'error'
+    | 'info'
+    | 'warning'
+    | 'primary';
+  export interface Toast {
     message: string;
-    variant: 'success' | 'error' | 'info' | 'warning' | 'primary';
+    variant: ToastVariant;
     id?: string;
     duration?: number;
   }

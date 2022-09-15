@@ -1,4 +1,4 @@
-import { Writable, writable } from 'svelte/store';
+import { type Writable, writable } from 'svelte/store';
 
 type CopiedToClipboardReturnValue = {
   copy: (event: Event, content: string) => Promise<void>;

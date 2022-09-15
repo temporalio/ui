@@ -1,14 +1,13 @@
 <script lang="ts">
-  import Modal from '$holocene/modal.svelte';
-  import Button from '$holocene/button.svelte';
-  import Chapter from '../_chapter.svelte';
+  import Button from './button.svelte';
 
-  let open = false;
+  import Modal from './modal.svelte';
+
+  export let Hst;
+  let open = true;
 </script>
 
-<Chapter description="A modal">
-  <Button on:click={() => (open = true)}>Open Modal</Button>
-
+<Hst.Story>
   <Modal
     {open}
     confirmType="destructive"
@@ -21,4 +20,8 @@
       Are you sure you want to delete <strong>tobias@temporal.io</strong>?
     </p>
   </Modal>
-</Chapter>
+
+  <svelte:fragment slot="controls">
+    <Hst.Checkbox title="Open: " bind:value={open} />
+  </svelte:fragment>
+</Hst.Story>

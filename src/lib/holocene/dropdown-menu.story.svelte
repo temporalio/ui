@@ -1,11 +1,12 @@
 <script lang="ts">
   import DropdownMenu from '$lib/holocene/dropdown-menu.svelte';
-  import Chapter from '../_chapter.svelte';
   import Icon from '$holocene/icon/icon.svelte';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
+
+  export let Hst;
 </script>
 
-<Chapter description="A Dropdown Menu">
+<Hst.Story>
   <DropdownMenu id="dropdown-1">
     <Icon name="vertical-ellipsis" slot="trigger" />
     <svelte:fragment slot="items">
@@ -16,4 +17,4 @@
       <MenuItem destructive>Destructive</MenuItem>
     </svelte:fragment>
   </DropdownMenu>
-</Chapter>
+</Hst.Story>
