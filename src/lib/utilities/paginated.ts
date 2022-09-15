@@ -5,7 +5,7 @@ import { merge } from './merge';
 type PaginatedOptions<T> = PaginationCallbacks<T> & {
   token?: NextPageToken;
   previousProps?: WithoutNextPageToken<T>;
-  delay?: number
+  delay?: number;
 };
 
 /**
@@ -54,71 +54,5 @@ export const paginated = async <T extends WithNextPageToken>(
     });
   } catch (error: unknown) {
     onError(error);
-  }
-};
-
-export const paginatedWithBackOff = async <T extends WithNextPageToken>(
-  fn: (token?: NextPageToken) => Promise<T>,
-  {
-    onStart,
-    onUpdate,
-    onComplete,
-    onError = handleError,
-    token,
-    previousProps,
-    delay = 0,
-    page = 1
-  }: PaginatedOptions<T> = {},
-): Promise<WithoutNextPageToken<T>> => {
-  if (!previousProps && isFunction(onStart)) onStart();
-
-  let pageToken = token;
-  let props = previousProps;
-
-  console.log("Fetchin....")
-  try {
-    const response = await fn(token);
-    const { nextPageToken, ...nextProps } = response;
-    pageToken = nextPageToken;
-    props = merge(previousProps, nextProps);
-    page += 1;
-
-    if (isFunction(onUpdate)) onUpdate(props, nextProps);
-
-    if (!nextPageToken) {
-      if (isFunction(onComplete)) onComplete(props);
-      return props;
-    }
-
-    return paginated(fn, {
-      onStart,
-      onUpdate,
-      onComplete,
-      token: pageToken,
-      previousProps: props,
-      delay,
-      page
-    });
-  } catch (error: unknown) {
-    delay += 100
-    console.error(
-      `Received error: ${JSON.stringify(error)}`
-    );
-    if (delay > 1000) {
-      onError(error)
-      return;
-    }
-
-    setTimeout(() => {
-      return paginated(fn, {
-        onStart,
-        onUpdate,
-        onComplete,
-        token: pageToken,
-        previousProps: props,
-        delay,
-        page
-      });
-    }, delay);
   }
 };
