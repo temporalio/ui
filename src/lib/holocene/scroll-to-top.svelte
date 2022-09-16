@@ -29,7 +29,12 @@
 <div id="scroll-container" class={$$props.class}>
   <slot />
   <div class="back-to-top" class:hidden>
-    <Button icon="arrow-up" variant="secondary" on:click={scrollToTop} />
+    <Button
+      class="!py-1.5 !px-1"
+      icon="arrow-up"
+      variant="secondary"
+      on:click={scrollToTop}
+    />
   </div>
 </div>
 
