@@ -1,1 +1,0 @@
-var p=l;function l(n,o,i,c){var e,r,u;return function(){if(u=this,r=Array.prototype.slice.call(arguments),e&&(i||c))return;if(!i)return t(),e=setTimeout(a,o),e;e=setTimeout(t,o),n.apply(u,r);function a(){t(),n.apply(u,r)}function t(){clearTimeout(e),e=null}}}export{p as j};

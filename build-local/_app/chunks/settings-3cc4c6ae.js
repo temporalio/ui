@@ -1,1 +1,0 @@
-import{w as e}from"./index-203c0d43.js";const a=e({auth:{enabled:!1,options:null},baseUrl:"",codec:{endpoint:"",accessToken:""},defaultNamespace:null,showTemporalSystemNamespace:!1,notifyOnNewVersion:!1,feedbackURL:"",runtimeEnvironment:{isCloud:!1,isLocal:!0,envOverride:!0},version:""});export{a as s};
