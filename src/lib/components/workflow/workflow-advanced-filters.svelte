@@ -27,6 +27,16 @@
   $: query = $page.url.searchParams.get('query');
   $: parameters = toListWorkflowParameters(query ?? defaultQuery);
 
+  $: filterTypeOptions = $searchAttributes
+    ? Object.entries($searchAttributes).map(([key, value]) => {
+        return {
+          label: key,
+          value: key,
+          type: value,
+        };
+      })
+    : [];
+
   let filters = [];
   let sorts = [];
 
@@ -40,34 +50,6 @@
   $: {
     query = toListWorkflowQueryFromAdvancedFilters(filters, sorts);
   }
-
-  const onAddFilterOperator = (operator, index) => {
-    if (filters[index].operator === operator) {
-      filters[index].operator = '';
-    } else {
-      filters[index] = { ...filters[index], operator };
-      if (!filters[index + 1]) {
-        filters = [
-          ...filters,
-          {
-            filterType: 'workflowType',
-            value: '',
-            operator: '',
-            parenthesis: '',
-            conditional: '=',
-          },
-        ];
-      }
-    }
-  };
-
-  const onAddFilterParenthesis = (parenthesis, index) => {
-    if (filters[index].parenthesis === parenthesis) {
-      filters[index].parenthesis = '';
-    } else {
-      filters[index] = { ...filters[index], parenthesis };
-    }
-  };
 
   const onSearch = () => {
     updateQueryParameters({
@@ -124,6 +106,34 @@
     ];
   };
 
+  const onAddFilterOperator = (operator, index) => {
+    if (filters[index].operator === operator) {
+      filters[index].operator = '';
+    } else {
+      filters[index] = { ...filters[index], operator };
+      if (!filters[index + 1]) {
+        filters = [
+          ...filters,
+          {
+            filterType: 'WorkflowType',
+            value: '',
+            operator: '',
+            parenthesis: '',
+            conditional: '=',
+          },
+        ];
+      }
+    }
+  };
+
+  const onAddFilterParenthesis = (parenthesis, index) => {
+    if (filters[index].parenthesis === parenthesis) {
+      filters[index].parenthesis = '';
+    } else {
+      filters[index] = { ...filters[index], parenthesis };
+    }
+  };
+
   const onRemove = () => {
     showBookmarkRemove = false;
     removeSearch(activeSearch);
@@ -144,16 +154,6 @@
   };
 
   const { copy, copied } = copyToClipboard(500);
-
-  $: filterTypeOptions = $searchAttributes
-    ? Object.entries($searchAttributes).map(([key, value]) => {
-        return {
-          label: key,
-          value: key,
-          type: value,
-        };
-      })
-    : [];
 </script>
 
 {#if !filters.length}
@@ -208,7 +208,7 @@
         <Button icon="retry" variant="secondary" thin on:click={onRestart}
           >Reset</Button
         >
-        <!-- <Button
+        <Button
           icon="bookmark"
           variant="secondary"
           thin
@@ -230,7 +230,7 @@
           thin
           on:click={() => (showFilters = !showFilters)}
           >{showFilters ? 'Hide' : 'Show'}</Button
-        > -->
+        >
       </div>
     </div>
   </div>
