@@ -17,6 +17,7 @@
   export let hintText = '';
   export let maxLength = 0;
   export let spellcheck: boolean = null;
+  export let unroundRight: boolean = false;
 
   const { copy, copied } = copyToClipboard();
   $: disabled = disabled || copyable;
@@ -26,7 +27,12 @@
   {#if label}
     <label for={id}>{label}</label>
   {/if}
-  <div class="input-container {theme}" class:disabled class:invalid={!valid}>
+  <div
+    class="input-container {theme}"
+    class:disabled
+    class:unroundRight
+    class:invalid={!valid}
+  >
     {#if icon}
       <span class="icon-container">
         <Icon name={icon} />
@@ -81,6 +87,10 @@
 
   .input-container {
     @apply relative box-border inline-flex h-8 w-full items-center rounded border border-gray-300 text-sm focus-within:border-blue-700;
+  }
+
+  .unroundRight {
+    @apply rounded-tr-none rounded-br-none;
   }
 
   .input-container.disabled {

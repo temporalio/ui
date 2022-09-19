@@ -1,0 +1,52 @@
+<script lang="ts">
+  import Icon from '$holocene/icon/icon.svelte';
+  import MenuContainer from '$holocene/primitives/menu/menu-container.svelte';
+  import MenuButton from '$holocene/primitives/menu/menu-button.svelte';
+  import Menu from '$holocene/primitives/menu/menu.svelte';
+  import type { IconName } from './icon/paths';
+
+  export let label: string = '';
+  export let icon: IconName;
+  export let id: string;
+  export let disabled: boolean = false;
+  export let position: 'left' | 'right' = 'left';
+
+  let show: boolean = false;
+</script>
+
+<MenuContainer class={$$props.class}>
+  <div class="split-button" class:disabled>
+    <MenuButton class="segment right" bind:show controls={id} {disabled}>
+      {#if icon}
+        <Icon name={icon} />
+      {/if}
+      {label}
+      <Icon name="chevron-down" />
+    </MenuButton>
+  </div>
+  <Menu class="min-w-max" {id} {show} {position}>
+    <slot />
+  </Menu>
+</MenuContainer>
+
+<style lang="postcss">
+  .split-button {
+    @apply flex h-8 grow cursor-pointer flex-row gap-[1px] font-secondary hover:from-blue-100 hover:to-purple-200 hover:text-gray-900;
+
+    :global(.segment) {
+      @apply relative flex w-fit items-center justify-center py-2 font-secondary text-sm;
+    }
+
+    :global(.segment.left) {
+      @apply rounded-none rounded-l px-4;
+    }
+
+    :global(.segment.right) {
+      @apply rounded-r px-2;
+    }
+
+    :global(.segment.right:disabled) {
+      @apply cursor-not-allowed opacity-50;
+    }
+  }
+</style>

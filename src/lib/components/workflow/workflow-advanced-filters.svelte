@@ -22,6 +22,8 @@
   import { searchAttributes } from '$lib/stores/search-attributes';
   import SplitButton from '$lib/holocene/split-button.svelte';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
+  import CustomButton from '$lib/holocene/custom-button.svelte';
+  import CustomSplitButton from '$lib/holocene/custom-split-button.svelte';
 
   const defaultQuery = toListWorkflowQuery({ timeRange: 'All' });
   $: query = $page.url.searchParams.get('query');
@@ -46,6 +48,7 @@
   let showFilters = true;
   let showBookmarkSave = false;
   let showBookmarkRemove = false;
+  let viewQueryString = false;
 
   $: {
     query = toListWorkflowQueryFromAdvancedFilters(filters, sorts);
@@ -115,7 +118,7 @@
         filters = [
           ...filters,
           {
-            filterType: 'WorkflowType',
+            filterType: filterTypeOptions[filterTypeOptions.length - 1].value,
             value: '',
             operator: '',
             parenthesis: '',
@@ -158,7 +161,7 @@
 
 {#if !filters.length}
   <div class="mb-4 flex w-full items-center gap-4">
-    <div class="flex h-12 w-full items-center gap-2" in:fade>
+    <div class="flex h-12 w-full items-center gap-0" in:fade>
       <TypeaheadInput
         icon="filter"
         placeholder="Filter workflows"
@@ -167,11 +170,15 @@
         options={filterTypeOptions}
         onChange={onFilterChange}
       />
-      <SplitButton id="bookmark" icon="bookmark" class="h-8">
+      <CustomSplitButton
+        class="bg-gray-200 rounded-tr rounded-br border-l-2 border-gray-200"
+        id="saved"
+        icon="star-empty"
+      >
         {#each bookmarkOptions as { label, value } (value)}
           <MenuItem on:click={() => onBookmarkChange(value)}>{label}</MenuItem>
         {/each}
-      </SplitButton>
+      </CustomSplitButton>
     </div>
   </div>
 {:else}
@@ -205,43 +212,52 @@
         <Button icon="search" variant="primary" thin on:click={onSearch}
           >Search</Button
         >
-        <Button icon="retry" variant="secondary" thin on:click={onRestart}
-          >Reset</Button
-        >
-        <Button
-          icon="bookmark"
-          variant="secondary"
-          thin
-          iconClass="text-yellow-500"
-          on:click={() => (showBookmarkSave = true)}
-          >Save {activeSearch ? 'As' : ''}</Button
-        >
-        {#if activeSearch}
-          <Button
-            icon="close"
-            variant="destructive"
-            thin
-            on:click={() => (showBookmarkRemove = true)}>Remove</Button
-          >
-        {/if}
-        <Button
-          icon={showFilters ? 'chevron-up' : 'chevron-down'}
-          variant="secondary"
-          thin
-          on:click={() => (showFilters = !showFilters)}
-          >{showFilters ? 'Hide' : 'Show'}</Button
-        >
+        <CustomButton icon="retry" on:click={onRestart}>Reset</CustomButton>
       </div>
     </div>
   </div>
-  <SortFilter orderType="asc" {filters} bind:sorts />
+  {#if viewQueryString}
+    <div
+      class="flex h-8 w-full items-center overflow-x-auto rounded-tr rounded-tl bg-gray-900 text-white p-0"
+      in:fade
+    >
+      <button on:click={(e) => copy(e, query)} class="mx-1">
+        <Icon name={$copied ? 'checkmark' : 'copy'} class="mx-1 text-white" />
+      </button>
+      <pre class="flex h-full items-center text-sm">{query}</pre>
+    </div>
+  {/if}
   <div
-    class="flex h-8 w-full items-center overflow-x-auto rounded-lg bg-blueGray-200 px-2 py-0"
+    class="flex w-full items-center justify-between gap-2 p-1 rounded-br rounded-bl bg-gray-200"
+    in:fade
   >
-    <button on:click={(e) => copy(e, query)} class="mx-1">
-      <Icon name={$copied ? 'checkmark' : 'copy'} class="mx-1 text-black" />
-    </button>
-    <pre class="flex h-full items-center text-sm">{query}</pre>
+    <div class="flex items-center gap-2">
+      <SortFilter bind:sorts />
+    </div>
+    <div class="flex items-center gap-2">
+      {#if activeSearch}
+        <p class="text-sm">{activeSearch.name}</p>
+      {/if}
+      <CustomButton
+        icon={viewQueryString ? 'eye-hide' : 'eye-show'}
+        on:click={() => (viewQueryString = !viewQueryString)}
+      />
+      <CustomButton
+        icon={activeSearch ? 'star-filled' : 'star-empty'}
+        iconClass={activeSearch ? 'text-yellow-500' : ''}
+        on:click={() => (showBookmarkSave = true)}
+      />
+      {#if activeSearch}
+        <CustomButton
+          icon="trash"
+          on:click={() => (showBookmarkRemove = true)}
+        />
+      {/if}
+      <CustomButton
+        icon={showFilters ? 'chevron-up' : 'chevron-down'}
+        on:click={() => (showFilters = !showFilters)}
+      />
+    </div>
   </div>
 {/if}
 <Modal
@@ -251,7 +267,9 @@
   confirmText="Save"
   confirmDisabled={!bookmarkName}
 >
-  <h3 slot="title" data-cy="data-encoder-title">Search Name</h3>
+  <h3 slot="title" data-cy="data-encoder-title">
+    Save {activeSearch ? 'As' : ''}
+  </h3>
   <div slot="content">
     <input
       class="block w-full rounded-md border border-gray-200 p-2"

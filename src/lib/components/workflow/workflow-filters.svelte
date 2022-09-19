@@ -66,8 +66,8 @@
   }, 300);
 </script>
 
-<section class="flex flex-col gap-2">
-  <p class="text-right text-xs">
+<section class="flex flex-col">
+  <p class="text-right text-xs pb-2">
     {#if searchType === 'advanced'}
       <a
         href="{$page.url.pathname}?searchType=basic"

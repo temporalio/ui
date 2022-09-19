@@ -20,6 +20,8 @@ import converterUp from './svg/converter-up.svelte';
 import copy from './svg/copy.svelte';
 import download from './svg/download.svelte';
 import error from './svg/error.svelte';
+import eyeHide from './svg/eye-hide.svelte';
+import eyeShow from './svg/eye-show.svelte';
 import feed from './svg/feed.svelte';
 import feedbackCircle from './svg/feedback-circle.svelte';
 import feedback from './svg/feedback.svelte';
@@ -45,7 +47,10 @@ import settings from './svg/settings.svelte';
 import sliders from './svg/sliders.svelte';
 import spinner from './svg/spinner.svelte';
 import spinnerSolid from './svg/spinner-solid.svelte';
+import starEmpty from './svg/star-empty.svelte';
+import starFilled from './svg/star-filled.svelte';
 import terminal from './svg/terminal.svelte';
+import trash from './svg/trash.svelte';
 import upload from './svg/upload.svelte';
 import usage from './svg/usage.svelte';
 import verticalEllipsis from './svg/vertical-ellipsis.svelte';
@@ -77,6 +82,8 @@ export const icons = {
   copy,
   download,
   error,
+  'eye-hide': eyeHide,
+  'eye-show': eyeShow,
   feed,
   'feedback-circle': feedbackCircle,
   feedback,
@@ -101,8 +108,11 @@ export const icons = {
   settings,
   sliders,
   spinner,
+  'star-empty': starEmpty,
+  'star-filled': starFilled,
   'spinner-solid': spinnerSolid,
   terminal,
+  trash,
   upload,
   usage,
   'vertical-ellipsis': verticalEllipsis,

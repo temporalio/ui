@@ -57,6 +57,7 @@
   <Input
     {id}
     {icon}
+    unroundRight
     class={$$props.class}
     bind:value
     {placeholder}
