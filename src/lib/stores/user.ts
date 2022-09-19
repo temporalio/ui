@@ -5,7 +5,7 @@ export const user = persistStore<User>('user', {});
 
 export const getUser = (): User => get(user);
 
-export const setUser = (u: User)=> {
+export const setUser = (u: User) => {
   const { accessToken } = u;
   let { idToken, name, email, picture } = u;
 
@@ -17,15 +17,15 @@ export const setUser = (u: User)=> {
     idToken = '';
   }
 
-  if (name === '{{.Name}}') {
+  if (name === '{{.UserName}}') {
     name = '';
   }
 
-  if (email === '{{.Email}}') {
+  if (email === '{{.UserEmail}}') {
     email = '';
   }
 
-  if (picture === '{{.Picture}}') {
+  if (picture === '{{.UserPicture}}') {
     picture = '';
   }
 
@@ -40,4 +40,4 @@ export const setUser = (u: User)=> {
 
 export const clearUser = () => {
   user.set({});
-}
+};
