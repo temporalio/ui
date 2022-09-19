@@ -3,7 +3,7 @@ import { persistStore } from '$lib/stores/persist-store';
 
 export const searches = persistStore<
   { name: string; query: string; filters: any[]; sorts: any[] }[]
->('searches', null);
+>('searches', []);
 
 export const saveSearch = (search: {
   name: string;

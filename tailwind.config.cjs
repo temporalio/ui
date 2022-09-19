@@ -5,8 +5,8 @@ const temporalColors = {
   secondary: '#64748b', // blue-gray-500
   primaryText: '#141414',
   spaceGray: { DEFAULT: '#141414' },
-  offWhite: '#F2F2F2',
   white: '#ffffff',
+  offWhite: '#F8F8F7',
   danger: '#b91c1c', // red-700
   success: '#bbf7d0', // green-200
   black: '#000000',

@@ -19,14 +19,15 @@
 
   let value = '';
   let showMenu = false;
+  let filterOptions = options;
 
   $: {
     if (value) {
-      options = options.filter((o) =>
+      filterOptions = options.filter((o) =>
         o.label.toLowerCase().includes(value.toLowerCase()),
       );
     } else {
-      options = options;
+      filterOptions = options;
     }
   }
 
@@ -61,8 +62,8 @@
     {placeholder}
     on:focus={() => (showMenu = true)}
   />
-  <Menu show={showMenu} id={`menu-${id}`}>
-    {#each options as { label, value }}
+  <Menu show={showMenu} id={`menu-${id}`} class="h-auto max-h-80">
+    {#each filterOptions as { label, value }}
       <Option {value}>{label}</Option>
     {:else}
       <Option>No Results</Option>

@@ -10,15 +10,13 @@
   export let icon: IconName = null;
   export let iconClass: string = null;
   export let dataCy: string = $$props.dataCy;
-  export let type: string = 'button';
 </script>
 
 <button
   on:click
   class="button {$$props.class}"
-  class:selected={active}
+  class:active
   data-cy={dataCy}
-  {type}
   {disabled}
   class:add
   class:remove
@@ -33,7 +31,11 @@
 
 <style lang="postcss">
   .button {
-    @apply relative flex w-fit items-center justify-center gap-2 rounded font-secondary text-sm transition border p-2;
+    @apply relative flex w-fit items-center justify-center gap-2 rounded font-secondary text-sm transition px-2 py-1 hover:bg-gradient-to-r hover:from-indigo-500 hover:to-purple-400;
+  }
+
+  .active {
+    @apply bg-black text-white;
   }
 
   .add {
