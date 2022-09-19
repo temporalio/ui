@@ -163,7 +163,6 @@
   <div class="mb-4 flex w-full items-center gap-4">
     <div class="flex h-12 w-full items-center gap-0" in:fade>
       <TypeaheadInput
-        icon="filter"
         placeholder="Filter workflows"
         class="w-80"
         id="filter-type-name"
