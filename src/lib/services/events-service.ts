@@ -17,6 +17,7 @@ export type FetchEventsParameters = NamespaceScopedRequest &
 
 export type FetchEventsParametersWithSettings = FetchEventsParameters & {
   settings: Settings;
+  accessToken: string;
 };
 
 const getEndpointForSortOrder = (
@@ -58,8 +59,8 @@ export const fetchRawEvents = async ({
 export const fetchEvents = async (
   parameters: FetchEventsParametersWithSettings,
 ): Promise<FetchEventsResponse> => {
-  const { settings, namespace } = parameters;
+  const { settings, namespace, accessToken } = parameters;
   return fetchRawEvents(parameters).then((response) =>
-    toEventHistory({ response, namespace, settings }),
+    toEventHistory({ response, namespace, settings, accessToken }),
   );
 };

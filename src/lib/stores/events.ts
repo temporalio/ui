@@ -50,6 +50,8 @@ const runId = derived([page], ([$page]) => {
 
 const settings = derived([page], ([$page]) => $page.stuff.settings);
 
+const accessToken = derived([page], ([$page]) => $page.stuff.user?.accessToken);
+
 const emptyPrevious: FetchEventsParameters = {
   namespace: null,
   workflowId: null,
@@ -102,11 +104,12 @@ export const parameters: Readable<FetchEventsParameters> = derived(
 
 export const parametersWithSettings: Readable<FetchEventsParametersWithSettings> =
   derived(
-    [parameters, settings, refresh],
-    ([$parameters, $settings, $refresh]) => {
+    [parameters, settings, accessToken, refresh],
+    ([$parameters, $settings, $accessToken, $refresh]) => {
       return {
         ...$parameters,
         settings: $settings,
+        accessToken: $accessToken,
         refresh,
         $refresh,
       };

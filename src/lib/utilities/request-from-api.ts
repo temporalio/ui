@@ -194,7 +194,7 @@ const withIdToken = (
 
   try {
     if (idToken) {
-      headers['AuthorizationExtras'] = idToken;
+      headers['Authorization-Extras'] = idToken;
     }
   } catch (e) {
     console.error(e);

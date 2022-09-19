@@ -51,6 +51,7 @@
       stuff: {
         namespaces: namespacesResp?.namespaces,
         settings: { ...settings, defaultNamespace },
+        user,
         cluster,
       },
     };

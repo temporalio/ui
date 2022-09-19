@@ -5,6 +5,7 @@ type PendingChildren = import('$types').PendingChildrenInfo;
 type EventRequestMetadata = {
   namespace: string;
   settings: Settings;
+  accessToken: string;
 };
 
 type EventWithMetadata = {

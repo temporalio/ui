@@ -10,20 +10,22 @@ export async function convertPayloadsWithCodec({
   payloads,
   namespace,
   settings,
+  accessToken,
 }: {
   payloads: Payloads;
   namespace: string;
   settings: Settings;
+  accessToken: string;
 }): Promise<Payloads> {
   const endpoint = settings?.codec?.endpoint;
-  const accessToken = settings?.codec?.accessToken;
+  const passAccessToken = settings?.codec?.passAccessToken;
 
   const headers = {
     'Content-Type': 'application/json',
     'X-Namespace': namespace,
   };
 
-  if (accessToken) {
+  if (passAccessToken) {
     if (validateHttps(endpoint)) {
       headers['Authorization'] = `Bearer ${accessToken}`;
     } else {

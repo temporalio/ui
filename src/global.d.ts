@@ -56,7 +56,7 @@ type Settings = {
   baseUrl: string;
   codec: {
     endpoint?: string;
-    accessToken?: string;
+    passAccessToken?: boolean;
   };
   defaultNamespace: string;
   disableWriteActions: boolean;
