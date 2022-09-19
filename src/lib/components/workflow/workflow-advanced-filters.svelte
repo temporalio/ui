@@ -82,7 +82,7 @@
       sorts = [...(bookmarkedSearch?.sorts ?? [])];
       query = bookmarkedSearch.query;
       activeSearch = bookmarkedSearch;
-      showFilters = true;
+      showFilters = false;
       setTimeout(() => {
         onSearch();
       }, 150);
