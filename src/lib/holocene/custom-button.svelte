@@ -31,18 +31,10 @@
 
 <style lang="postcss">
   .button {
-    @apply relative flex w-fit items-center justify-center gap-2 rounded font-secondary text-sm transition px-2 py-1 hover:bg-gradient-to-r hover:from-indigo-500 hover:to-purple-400;
+    @apply relative flex w-fit items-center justify-center gap-2 rounded font-secondary text-sm transition px-2 py-1 hover:bg-gradient-to-r hover:from-blue-100 hover:to-purple-200 hover:text-gray-900;
   }
 
   .active {
     @apply bg-black text-white;
-  }
-
-  .add {
-    @apply hover:bg-green-400 hover:border-green-400;
-  }
-
-  .remove {
-    @apply hover:bg-red-700 hover:border-red-700 hover:text-white;
   }
 </style>
