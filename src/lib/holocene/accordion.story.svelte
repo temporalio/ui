@@ -1,0 +1,64 @@
+<script lang="ts">
+  import Accordion from './accordion.svelte';
+  import CodeBlock from './code-block.svelte';
+  import TableHeaderRow from './table/table-header-row.svelte';
+  import TableRow from './table/table-row.svelte';
+  import Table from './table/table.svelte';
+
+  export let Hst;
+</script>
+
+<Hst.Story layout={{ type: 'single', iframe: false }}>
+  <Hst.Variant title="With a Simple Table">
+    <Accordion
+      title="Custom Search Attributes"
+      subtitle="19 custom search attributes"
+    >
+      <Table variant="simple" class="w-full">
+        <TableHeaderRow slot="headers">
+          <th>Attribute</th>
+          <th>Type</th>
+        </TableHeaderRow>
+        <TableRow>
+          <td>searchAttribute1</td>
+          <td>Unspecified</td>
+        </TableRow>
+        <TableRow>
+          <td>searchAttribute2</td>
+          <td>Text</td>
+        </TableRow>
+        <TableRow>
+          <td>searchAttribute3</td>
+          <td>Keyword</td>
+        </TableRow>
+      </Table>
+    </Accordion>
+  </Hst.Variant>
+
+  <Hst.Variant title="With a Code Block">
+    <Accordion title="Certificates" subtitle="Expires on Wed Feb 01, 2030">
+      <CodeBlock content={JSON.stringify({ some: 'thing', blue: 42 })} />
+    </Accordion>
+  </Hst.Variant>
+
+  <Hst.Variant title="A disabled Accordion">
+    <Accordion
+      disabled
+      title="Certificates"
+      subtitle="Expires on Wed Feb 01, 2030"
+    >
+      <p>Accordion content here.</p>
+    </Accordion>
+  </Hst.Variant>
+
+  <Hst.Variant title="A read-only Accordion">
+    <Accordion
+      readOnly
+      open
+      title="Certificates"
+      subtitle="Expires on Wed Feb 01, 2030"
+    >
+      <p>Accordion content here.</p>
+    </Accordion>
+  </Hst.Variant>
+</Hst.Story>
