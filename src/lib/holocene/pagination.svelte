@@ -6,6 +6,7 @@
     perPageFromSearchParameter,
     perPageOptions,
   } from '$lib/stores/pagination';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   import Icon from '$holocene/icon/icon.svelte';
 
@@ -36,6 +37,14 @@
       width = document.getElementById(floatId)?.clientWidth;
     }
   });
+
+  const handlePageChange = () => {
+    updateQueryParameters({
+      parameter: 'page',
+      value: $store.currentPage,
+      url: $page.url,
+    });
+  };
 
   $: floatStyle = getFloatStyle({ width, height, screenWidth });
 </script>
@@ -71,7 +80,10 @@
         <button
           class="caret"
           disabled={!$store.hasPrevious}
-          on:click={() => store.previous()}
+          on:click={() => {
+            store.previous();
+            handlePageChange();
+          }}
         >
           <Icon name="chevron-left" />
         </button>
@@ -81,7 +93,10 @@
         <button
           class="caret"
           disabled={!$store.hasNext}
-          on:click={() => store.next()}
+          on:click={() => {
+            store.next();
+            handlePageChange();
+          }}
         >
           <Icon name="chevron-right" />
         </button>
