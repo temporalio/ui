@@ -19,6 +19,9 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import SortFilter from './advanced-filter/sort-filter.svelte';
   import { onMount } from 'svelte';
+  import { searchAttributes } from '$lib/stores/search-attributes';
+  import SplitButton from '$lib/holocene/split-button.svelte';
+  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
 
   const defaultQuery = toListWorkflowQuery({ timeRange: 'All' });
   $: query = $page.url.searchParams.get('query');
@@ -58,10 +61,6 @@
     }
   };
 
-  // onMount(() => {
-  //   onBookmarkChange('Daily Non-Cron Failures');
-  // });
-
   const onAddFilterParenthesis = (parenthesis, index) => {
     if (filters[index].parenthesis === parenthesis) {
       filters[index].parenthesis = '';
@@ -86,7 +85,7 @@
     activeSearch = search;
   };
 
-  $: options = (
+  $: bookmarkOptions = (
     [...$searches]?.map((s) => ({ label: s.name, value: s.name })) ?? []
   ).sort((a, b) => a?.label.localeCompare(b.label));
 
@@ -105,15 +104,22 @@
     }
   };
 
-  const onStart = () => {
+  const onFilterChange = (filterType: string) => {
     showFilters = true;
+
+    const filter = filterTypeOptions.find((o) => o.value === filterType);
+    const conditionals = {
+      Keyword: '=',
+      Int: '=',
+      Datetime: 'In Last',
+    };
     filters = [
       {
-        filterType: 'workflowType',
+        filterType,
         value: '',
         operator: '',
         parenthesis: '',
-        conditional: '=',
+        conditional: conditionals[filter.type],
       },
     ];
   };
@@ -138,61 +144,97 @@
   };
 
   const { copy, copied } = copyToClipboard(500);
+
+  $: filterTypeOptions = $searchAttributes
+    ? Object.entries($searchAttributes).map(([key, value]) => {
+        return {
+          label: key,
+          value: key,
+          type: value,
+        };
+      })
+    : [];
 </script>
 
-{#if activeSearch?.name}
-  <h3 class="text-base">{activeSearch?.name}</h3>
-{/if}
-<div class="mb-4 flex w-full items-center gap-4">
-  {#if filters.length}
-    <div class="flex items-center gap-2" in:fade>
-      <Button icon="search" variant="primary" thin on:click={onSearch}
-        >Search</Button
-      >
-      <Button icon="retry" variant="secondary" thin on:click={onRestart}
-        >Start Over</Button
-      >
-      <Button
-        icon="bookmark"
-        variant="secondary"
-        thin
-        iconClass="text-yellow-500"
-        on:click={() => (showBookmarkSave = true)}
-        >Save {activeSearch ? 'As' : ''}</Button
-      >
-      {#if activeSearch}
-        <Button
-          icon="close"
-          variant="destructive"
-          thin
-          on:click={() => (showBookmarkRemove = true)}>Remove</Button
-        >
-      {/if}
-      <Button
-        icon={showFilters ? 'chevron-up' : 'chevron-down'}
-        variant="secondary"
-        thin
-        on:click={() => (showFilters = !showFilters)}
-        >{showFilters ? 'Hide' : 'Show'}</Button
-      >
-    </div>
-  {:else}
+{#if !filters.length}
+  <div class="mb-4 flex w-full items-center gap-4">
     <div class="flex h-12 w-full items-center gap-2" in:fade>
-      <Button icon="add" thin variant="secondary" on:click={onStart}
-        >New Search</Button
-      >
       <TypeaheadInput
-        icon="bookmark"
-        placeholder="Saved Searches..."
-        class="w-96"
-        id="search-name"
-        {options}
-        onChange={onBookmarkChange}
+        icon="filter"
+        placeholder="Filter workflows"
+        class="w-80"
+        id="filter-type-name"
+        options={filterTypeOptions}
+        onChange={onFilterChange}
       />
+      <SplitButton id="bookmark" icon="bookmark" class="h-8">
+        {#each bookmarkOptions as { label, value } (value)}
+          <MenuItem on:click={() => onBookmarkChange(value)}>{label}</MenuItem>
+        {/each}
+      </SplitButton>
     </div>
-  {/if}
-</div>
-{#if filters.length && showFilters}
+  </div>
+{:else}
+  <div class="bg-offWhite rounded p-6">
+    <h3 class="text-base mb-2">Advanced Visibility</h3>
+    {#if showFilters}
+      <section class="advanced-filters flex flex-col gap-2">
+        {#each filters as { filterType, value, operator, parenthesis, conditional }, index (index)}
+          <div class="flex justify-between gap-16" transition:slide|local>
+            <AdvancedFilter
+              bind:filterType
+              bind:value
+              bind:conditional
+              bind:operator
+              bind:parenthesis
+              isOnly={index === 0 && filters.length === 1}
+              setFilterOperator={(operator) =>
+                onAddFilterOperator(operator, index)}
+              setFilterParenthesis={(parenthesis) =>
+                onAddFilterParenthesis(parenthesis, index)}
+              removeFilter={() => {
+                filters = filters.filter((_, i) => i !== index);
+              }}
+            />
+          </div>
+        {/each}
+      </section>
+    {/if}
+    <div class="mt-4 flex w-full items-center gap-4">
+      <div class="flex items-center gap-2" in:fade>
+        <Button icon="search" variant="primary" thin on:click={onSearch}
+          >Search</Button
+        >
+        <Button icon="retry" variant="secondary" thin on:click={onRestart}
+          >Reset</Button
+        >
+        <!-- <Button
+          icon="bookmark"
+          variant="secondary"
+          thin
+          iconClass="text-yellow-500"
+          on:click={() => (showBookmarkSave = true)}
+          >Save {activeSearch ? 'As' : ''}</Button
+        >
+        {#if activeSearch}
+          <Button
+            icon="close"
+            variant="destructive"
+            thin
+            on:click={() => (showBookmarkRemove = true)}>Remove</Button
+          >
+        {/if}
+        <Button
+          icon={showFilters ? 'chevron-up' : 'chevron-down'}
+          variant="secondary"
+          thin
+          on:click={() => (showFilters = !showFilters)}
+          >{showFilters ? 'Hide' : 'Show'}</Button
+        > -->
+      </div>
+    </div>
+  </div>
+  <SortFilter orderType="asc" {filters} bind:sorts />
   <div
     class="flex h-8 w-full items-center overflow-x-auto rounded-lg bg-blueGray-200 px-2 py-0"
   >
@@ -201,27 +243,6 @@
     </button>
     <pre class="flex h-full items-center text-sm">{query}</pre>
   </div>
-  <section class="advanced-filters flex flex-col gap-2">
-    {#each filters as { filterType, value, operator, parenthesis, conditional }, index (index)}
-      <div class="flex justify-between gap-16" transition:slide|local>
-        <AdvancedFilter
-          bind:filterType
-          bind:value
-          bind:conditional
-          bind:operator
-          bind:parenthesis
-          isOnly={index === 0 && filters.length === 1}
-          setFilterOperator={(operator) => onAddFilterOperator(operator, index)}
-          setFilterParenthesis={(parenthesis) =>
-            onAddFilterParenthesis(parenthesis, index)}
-          removeFilter={() => {
-            filters = filters.filter((_, i) => i !== index);
-          }}
-        />
-      </div>
-    {/each}
-    <SortFilter orderType="asc" {filters} bind:sorts />
-  </section>
 {/if}
 <Modal
   open={showBookmarkSave}

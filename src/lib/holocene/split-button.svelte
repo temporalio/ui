@@ -4,9 +4,18 @@
   import MenuButton from '$holocene/primitives/menu/menu-button.svelte';
   import Menu from '$holocene/primitives/menu/menu.svelte';
   import Button from './button.svelte';
+  import type { IconName } from './icon/paths';
 
-  export let label: string;
+  export let label: string = '';
+  export let icon: IconName;
   export let id: string;
+  export let variant:
+    | 'primary'
+    | 'secondary'
+    | 'destructive'
+    | 'login'
+    | 'link' = 'primary';
+  export let thin = false;
   export let disabled: boolean = false;
   export let position: 'left' | 'right' = 'left';
   export let href = '';
@@ -16,7 +25,10 @@
 
 <MenuContainer class={$$props.class}>
   <div class="split-button" class:disabled>
-    <Button {href} variant="primary" {disabled} class="segment left" on:click>
+    <Button {href} {variant} {thin} {disabled} class="segment left" on:click>
+      {#if icon}
+        <Icon name={icon} />
+      {/if}
       {label}
     </Button>
     <MenuButton dark class="segment right" bind:show controls={id} {disabled}>

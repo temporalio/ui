@@ -9,6 +9,8 @@
   import IntFilter from './int-filter.svelte';
   import KeywordFilter from './keyword-filter.svelte';
   import DatetimeFilter from './datetime-filter.svelte';
+  import TypeaheadInput from '$lib/holocene/input/typeahead-input.svelte';
+  import CustomButton from '$lib/holocene/custom-button.svelte';
 
   export let filterType: FilterKey;
   export let value: string = '';
@@ -26,43 +28,23 @@
     Datetime: DatetimeFilter,
   };
 
-  const baseOptions = [
-    {
-      label: 'Workflow Type',
-      value: 'workflowType',
-      type: 'Keyword',
-      component: KeywordFilter,
-    },
-    {
-      label: 'Workflow Id',
-      value: 'workflowId',
-      type: 'Keyword',
-      component: KeywordFilter,
-    },
-    {
-      label: 'Status',
-      value: 'executionStatus',
-      type: 'Keyword',
-      component: StatusFilter,
-    },
-    {
-      label: 'Start Time',
-      value: 'timeRange',
-      type: 'Datetime',
-      component: DatetimeFilter,
-    },
-  ];
+  const getFilterComponent = (key: string, value: string) => {
+    if (key === 'ExecutionStatus') {
+      return StatusFilter;
+    }
+    return FilterComponents[value] ?? KeywordFilter;
+  };
   const searchAttributeOptions = $searchAttributes
     ? Object.entries($searchAttributes).map(([key, value]) => {
         return {
           label: key,
           value: key,
           type: value,
-          component: FilterComponents[value] ?? KeywordFilter,
+          component: getFilterComponent(key, value),
         };
       })
     : [];
-  const filterOptions = [...baseOptions, ...searchAttributeOptions];
+  const filterOptions = [...searchAttributeOptions];
 
   let selected = filterOptions?.find((option) => option.value === filterType);
 
@@ -81,6 +63,15 @@
 </script>
 
 <div class="flex gap-2">
+  <!-- <TypeaheadInput
+    icon="filter"
+    placeholder="Filter workflows"
+    class="w-80"
+    id="filter-type-name"
+    options={filterOptions}
+    onChange={onTypeChange}
+  /> -->
+
   <Select
     id="filter-type"
     bind:value={filterType}
@@ -101,32 +92,37 @@
     bind:conditional
   />
   <div class="flex items-center gap-2">
-    <Button
+    <CustomButton
       variant="secondary"
       active={parenthesis === '('}
       thin
-      on:click={() => setFilterParenthesis('(')}>(</Button
+      on:click={() => setFilterParenthesis('(')}>(</CustomButton
     >
-    <Button
+    <CustomButton
       variant="secondary"
       active={parenthesis === ')'}
       thin
-      on:click={() => setFilterParenthesis(')')}>)</Button
+      on:click={() => setFilterParenthesis(')')}>)</CustomButton
     >
-    <Button
+    <CustomButton
       variant="secondary"
       active={operator === 'and'}
       thin
-      on:click={() => setFilterOperator('and')}>AND</Button
+      on:click={() => setFilterOperator('and')}>and</CustomButton
     >
-    <Button
+    <CustomButton
       variant="secondary"
       active={operator === 'or'}
       thin
-      on:click={() => setFilterOperator('or')}>OR</Button
+      on:click={() => setFilterOperator('or')}>or</CustomButton
     >
     {#if !isOnly}
-      <Button variant="secondary" icon="close" thin on:click={removeFilter} />
+      <CustomButton
+        variant="secondary"
+        icon="close"
+        thin
+        on:click={removeFilter}
+      />
     {/if}
     <!-- <Button variant="secondary" icon="chevron-left" thin />
     <Button variant="secondary" icon="chevron-right" thin /> -->
