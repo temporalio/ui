@@ -63,6 +63,7 @@
   import Banners from '$lib/components/banner/banners.svelte';
   import { ErrorBoundary } from '$lib/components/error-boundary';
   import PageTitle from '$lib/holocene/page-title.svelte';
+  import ScrollToTop from '$lib/holocene/scroll-to-top.svelte';
 
   export let user: User;
   export let uiVersionInfo: UiVersionInfo;
@@ -81,5 +82,6 @@
         <slot />
       </ErrorBoundary>
     </div>
+    <ScrollToTop />
   </section>
 </div>
