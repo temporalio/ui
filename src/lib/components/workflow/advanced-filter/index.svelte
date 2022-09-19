@@ -49,9 +49,9 @@
   let selected = filterOptions?.find((option) => option.value === filterType);
 
   function getConditionalForType(type) {
-    if (type === 'Keyword') return '=';
     if (type === 'Datetime') return 'In Last';
-    if (type === 'Int') return '=';
+    // if (type === 'Keyword') return '=';
+    // if (type === 'Int') return '=';
     return '=';
   }
 
@@ -78,7 +78,6 @@
     onChange={onTypeChange}
     class="w-auto"
     menuClass="border-gray-300"
-    displayValue={(value) => filterOptions.find((o) => o.value === value).label}
   >
     {#each filterOptions as { value, label } (value)}
       <Option {value}>{label}</Option>
