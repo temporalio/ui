@@ -45,18 +45,20 @@
   };
 
   const user = getCoreUser();
+  const terminateDisabled = user?.terminateDisabled(namespace);
 </script>
 
 {#if workflow.canBeTerminated}
   <Tooltip
     bottomLeft
-    hide={!user?.terminateDisabled(namespace)}
+    hide={!terminateDisabled}
+    width={200}
     text="You do not have permission to terminate this workflow. Contact your admin for assistance."
   >
     <Button
       variant="destructive"
       on:click={show}
-      disabled={user?.terminateDisabled(namespace)}
+      disabled={terminateDisabled}
       dataCy="terminate-button"
     >
       Terminate
