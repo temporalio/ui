@@ -29,7 +29,7 @@
   .nav-title {
     width: 100px;
     overflow: hidden;
-    transition: width 0.25s linear;
-    -webkit-transition: width 0.25s linear;
+    transition: width 0.15s linear;
+    -webkit-transition: width 0.15s linear;
   }
 </style>

@@ -1,11 +1,14 @@
 <script lang="ts">
   import { tick } from 'svelte';
+
   import { refresh } from '$lib/stores/workflow-run';
   import { notifications } from '$lib/stores/notifications';
   import { terminateWorkflow } from '$lib/services/terminate-service';
 
   import Button from '$holocene/button.svelte';
   import Modal from '$holocene/modal.svelte';
+  import { getCoreUser } from '$lib/utilities/core-user';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
@@ -40,12 +43,27 @@
       .then(handleSuccessfulTermination)
       .catch(handleTerminationError);
   };
+
+  const user = getCoreUser();
+  $: terminateDisabled = user.terminateDisabled(namespace);
 </script>
 
 {#if workflow.canBeTerminated}
-  <Button variant="destructive" on:click={show} dataCy="terminate-button">
-    Terminate
-  </Button>
+  <Tooltip
+    bottomLeft
+    hide={!terminateDisabled}
+    width={200}
+    text="You do not have permission to terminate this workflow. Contact your admin for assistance."
+  >
+    <Button
+      variant="destructive"
+      on:click={show}
+      disabled={terminateDisabled}
+      dataCy="terminate-button"
+    >
+      Terminate
+    </Button>
+  </Tooltip>
   <Modal
     open={showConfirmation}
     confirmText="Terminate"

@@ -38,8 +38,6 @@ import lock from './svg/lock.svelte';
 import logout from './svg/logout.svelte';
 import namespaceSwitcher from './svg/namespace-switcher.svelte';
 import namespace from './svg/namespace.svelte';
-import navCollapse from './svg/nav-collapse.svelte';
-import navExpand from './svg/nav-expand.svelte';
 import regions from './svg/regions.svelte';
 import retention from './svg/retention.svelte';
 import retry from './svg/retry.svelte';
@@ -102,8 +100,6 @@ export const icons = {
   logout,
   'namespace-switcher': namespaceSwitcher,
   namespace,
-  'nav-collapse': navCollapse,
-  'nav-expand': navExpand,
   regions,
   retention,
   retry,
