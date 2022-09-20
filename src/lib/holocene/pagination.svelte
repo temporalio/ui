@@ -36,6 +36,9 @@
     if (floatId) {
       width = document.getElementById(floatId)?.clientWidth;
     }
+    if (startingIndex > 0) {
+      handlePageChange();
+    }
   });
 
   const handlePageChange = () => {
