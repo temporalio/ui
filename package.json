@@ -1,6 +1,6 @@
 {
   "name": "@temporalio/ui",
-  "version": "2.1.55",
+  "version": "2.1.56",
   "type": "module",
   "description": "Temporal.io UI",
   "keywords": [
