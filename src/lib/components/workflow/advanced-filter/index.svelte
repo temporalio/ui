@@ -18,6 +18,8 @@
   export let operator: string = '';
   export let parenthesis: string = '';
   export let isOnly: boolean = true;
+  export let nestLevel: number = 0;
+
   export let setFilterOperator: (operator: string) => void = () => noop;
   export let setFilterParenthesis: (operator: string) => void = () => noop;
   export let removeFilter: () => void = () => noop;
@@ -62,7 +64,7 @@
   };
 </script>
 
-<div class="flex gap-2">
+<div class="flex gap-2" class:indented={nestLevel > 0}>
   <!-- <TypeaheadInput
     icon="filter"
     placeholder="Filter workflows"
@@ -127,3 +129,9 @@
     <Button variant="secondary" icon="chevron-right" thin /> -->
   </div>
 </div>
+
+<style lang="postcss">
+  .indented {
+    @apply pl-8;
+  }
+</style>

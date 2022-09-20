@@ -31,14 +31,14 @@
 
 <style lang="postcss">
   .split-button {
-    @apply flex h-8 grow cursor-pointer flex-row gap-[1px] font-secondary hover:from-blue-100 hover:to-purple-200 hover:text-gray-900;
+    @apply flex h-8 grow cursor-pointer flex-row gap-[1px] font-secondary;
 
     :global(.segment) {
       @apply relative flex w-fit items-center justify-center py-2 font-secondary text-sm;
     }
 
     :global(.segment.left) {
-      @apply rounded-none rounded-l px-4;
+      @apply rounded-none rounded-l px-2;
     }
 
     :global(.segment.right) {
