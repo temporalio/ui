@@ -13,6 +13,7 @@
     <Accordion
       title="Custom Search Attributes"
       subtitle="19 custom search attributes"
+      class="text-gray-900"
     >
       <Table variant="simple" class="w-full">
         <TableHeaderRow slot="headers">
@@ -36,7 +37,11 @@
   </Hst.Variant>
 
   <Hst.Variant title="With a Code Block">
-    <Accordion title="Certificates" subtitle="Expires on Wed Feb 01, 2030">
+    <Accordion
+      title="Certificates"
+      subtitle="Expires on Wed Feb 01, 2030"
+      class="text-gray-900"
+    >
       <CodeBlock content={JSON.stringify({ some: 'thing', blue: 42 })} />
     </Accordion>
   </Hst.Variant>
@@ -46,6 +51,7 @@
       disabled
       title="Certificates"
       subtitle="Expires on Wed Feb 01, 2030"
+      class="text-gray-900"
     >
       <p>Accordion content here.</p>
     </Accordion>
@@ -57,6 +63,18 @@
       open
       title="Certificates"
       subtitle="Expires on Wed Feb 01, 2030"
+      class="text-gray-900"
+    >
+      <p>Accordion content here.</p>
+    </Accordion>
+  </Hst.Variant>
+
+  <Hst.Variant title="An Accordion with an error">
+    <Accordion
+      title="Certificates"
+      subtitle="Expired on Wed Feb 01, 2030"
+      error="Expired"
+      class="text-gray-900"
     >
       <p>Accordion content here.</p>
     </Accordion>

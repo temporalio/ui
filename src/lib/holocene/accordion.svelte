@@ -1,5 +1,6 @@
 <script lang="ts">
   import Icon from '$holocene/icon/icon.svelte';
+  import Badge from '$holocene/badge.svelte';
   import type { IconName } from './icon/paths';
   export let title: string;
   export let subtitle: string = '';
@@ -7,6 +8,7 @@
   export let open: boolean = false;
   export let disabled: boolean = false;
   export let readOnly: boolean = false;
+  export let error: string = '';
 
   $: open = disabled ? true : open;
 </script>
@@ -36,7 +38,10 @@
           />
         {/if}
       </div>
-      <h3>{subtitle}</h3>
+      <h3 class="flex items-center">
+        {#if error} <Badge class="mr-2" type="error">{error}</Badge> {/if}
+        {subtitle}
+      </h3>
     </div>
     <div class="hidden w-full" class:content={open}>
       <slot />
