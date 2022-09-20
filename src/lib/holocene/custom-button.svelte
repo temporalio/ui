@@ -23,12 +23,12 @@
   class:add
   class:remove
 >
+  <slot />
   {#if icon || loading}
     <span class:animate-spin={loading}>
       <Icon name={loading ? 'spinner' : icon} class={iconClass} />
     </span>
   {/if}
-  <slot />
 </button>
 
 <style lang="postcss">
@@ -41,6 +41,6 @@
   }
 
   .primary {
-    @apply bg-gradient-to-r from-blue-300 to-blue-700 hover:from-blue-500 hover:to-blue-900 text-white hover:text-white;
+    @apply bg-blue-700 hover:from-gray-900 hover:to-gray-900 text-white hover:text-white;
   }
 </style>

@@ -184,7 +184,7 @@
         onChange={onFilterChange}
       />
       <CustomSplitButton
-        class="bg-gray-200 rounded-tr rounded-br border-l-2 border-gray-200"
+        class="bg-offWhite rounded-tr rounded-br border border-gray-900"
         id="saved"
         icon="star-empty"
       >
@@ -195,7 +195,7 @@
     </div>
   </div>
 {:else}
-  <div class="bg-offWhite rounded p-6">
+  <div class="bg-offWhite rounded-tr-lg rounded-tl-lg p-6">
     <h3 class="text-base mb-2">Advanced Visibility</h3>
     {#if showFilters}
       <section class="advanced-filters flex flex-col gap-2">
@@ -235,7 +235,7 @@
   </div>
   {#if viewQueryString}
     <div
-      class="flex h-8 w-full items-center overflow-x-auto rounded-tr rounded-tl bg-gray-900 text-white p-0"
+      class="flex h-8 w-full items-center overflow-x-auto rounded-tr-lg rounded-tl-lg bg-gray-900 text-white p-0"
       in:fade
     >
       <button on:click={(e) => copy(e, query)} class="mx-1">
@@ -245,7 +245,7 @@
     </div>
   {/if}
   <div
-    class="flex w-full items-center justify-between gap-2 p-1 rounded-br rounded-bl bg-gray-200"
+    class="flex w-full items-center justify-between gap-2 p-1 rounded-br-lg rounded-bl-lg bg-gray-200"
     in:fade
   >
     <div class="flex items-center gap-2">
