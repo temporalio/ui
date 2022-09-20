@@ -35,7 +35,7 @@
     {#each pendingActivities as { id, activityId, ...details } (id)}
       {@const failed = details.attempt > 1}
       <div class="event-table-body">
-        <div class="flex w-8 items-start p-5">
+        <div class="flex w-24 items-start break-all py-5 pl-5 pr-2">
           <Link href="#{id}">{activityId}</Link>
         </div>
         <div class="w-full py-4 px-5">
