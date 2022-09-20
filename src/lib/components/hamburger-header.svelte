@@ -20,7 +20,7 @@
     <div on:click={() => (open = !open)} data-cy="hamburger-icon">
       <Icon
         class="cursor-pointer text-white"
-        name={open ? 'nav-collapse' : 'nav-expand'}
+        name={open ? 'chevron-left' : 'chevron-right'}
       />
     </div>
   </div>
