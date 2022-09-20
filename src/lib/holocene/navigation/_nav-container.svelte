@@ -32,7 +32,7 @@
       style="top: 52px;"
       on:click={toggleNav}
     >
-      <Icon name={$navOpen ? 'nav-collapse' : 'nav-expand'} />
+      <Icon name={$navOpen ? 'chevron-left' : 'chevron-right'} />
     </button>
     <div class="mt-24 grow items-center">
       <ul class="flex flex-col gap-2">
@@ -91,12 +91,12 @@
   }
 
   .transition-left {
-    transition: left 0.25s linear, width 0.25s linear;
-    -webkit-transition: left 0.25s linear, width 0.25s linear;
+    transition: left 0.15s linear, width 0.15s linear;
+    -webkit-transition: left 0.15s linear, width 0.15s linear;
   }
 
   .transition-width {
-    transition: width 0.25s ease-in-out, width 0.25s ease-in-out;
-    -webkit-transition: width 0.25s ease-in-out, width 0.25s ease-in-out;
+    transition: width 0.15s ease-in-out, width 0.15s ease-in-out;
+    -webkit-transition: width 0.15s ease-in-out, width 0.15s ease-in-out;
   }
 </style>

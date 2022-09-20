@@ -58,8 +58,8 @@
       data-cy="data-encoder-status"
       on:click={onIconClick}
     >
-      <Icon name="converter-down" class="-ml-1 text-gray-200" />
-      <Icon name="converter-up" class="absolute left-1 text-gray-200" />
+      <Icon name="converter-down" class="-ml-1 text-gray-400" />
+      <Icon name="converter-up" class="absolute left-1 text-gray-400" />
     </button>
   </Tooltip>
 {/if}

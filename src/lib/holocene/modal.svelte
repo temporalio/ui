@@ -22,7 +22,10 @@
         class="float-right cursor-pointer p-6"
         on:click={() => dispatch('cancelModal', {})}
       >
-        <Icon name="close" />
+        <Icon
+          name="close"
+          class="rounded-full hover:bg-gray-900 hover:text-white"
+        />
       </div>
       <div class="title">
         <slot name="title">
