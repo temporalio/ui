@@ -18,13 +18,10 @@
   <div class="modal">
     <div class="overlay" />
     <div class="body" class:large>
-      <div
-        class="float-right cursor-pointer p-6"
-        on:click={() => dispatch('cancelModal', {})}
-      >
+      <div class="float-right p-6" on:click={() => dispatch('cancelModal', {})}>
         <Icon
           name="close"
-          class="rounded-full hover:bg-gray-900 hover:text-white"
+          class="cursor-pointer rounded-full hover:bg-gray-900 hover:text-white"
         />
       </div>
       <div class="title">
@@ -58,7 +55,7 @@
 
 <style lang="postcss">
   .modal {
-    @apply fixed top-0 left-0 z-50 flex h-full w-full items-center justify-center p-8 lg:p-0;
+    @apply fixed top-0 left-0 z-50 flex h-full w-full cursor-default items-center justify-center p-8 lg:p-0;
   }
 
   .overlay {

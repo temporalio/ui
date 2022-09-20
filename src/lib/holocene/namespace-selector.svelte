@@ -14,6 +14,7 @@
   <button
     class="relative"
     on:click={toggleNamespaceSelector}
+    aria-label="Namespace Select"
     data-cy="namespace-select-button"
   >
     <Icon
