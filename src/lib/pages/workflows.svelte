@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onDestroy, onMount } from 'svelte';
   import { page } from '$app/stores';
   import { timeFormat } from '$lib/stores/time-format';
   import { workflowsSearch } from '$lib/stores/workflows';
@@ -19,7 +20,6 @@
   import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
   import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
   import WorkflowFilters from '$lib/components/workflow/workflow-filters.svelte';
-  import { onDestroy, onMount } from 'svelte';
   import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
   import Loading from '$holocene/loading.svelte';
   import PageTitle from '$lib/holocene/page-title.svelte';
