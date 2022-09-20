@@ -31,87 +31,97 @@
     <section>
       {#each pendingActivities as { id, ...pendingActivity } (id)}
         {@const failed = pendingActivity.attempt > 1}
-        <div class="pending-activity-row">
-          <h3 class="w-6 self-start p-1 font-normal text-gray-500">
+        <div class="pending-activity-row-container">
+          <h3 class="w-full self-start text-sm font-normal text-gray-500">
             {pendingActivity.activityId}
           </h3>
-          <div class="pending-activity-summary">
-            <a class="flex w-full items-center hover:bg-gray-50" {href}>
-              <div class="pending-activity-inner-row">
-                <div class="pending-activity-detail">
-                  <h4 class="pending-activity-detail-header">Activity Type</h4>
-                  <Badge type={failed ? 'error' : 'default'}>
-                    {pendingActivity.activityType}
-                  </Badge>
-                </div>
-                <div class="pending-activity-detail">
-                  <h4 class="pending-activity-detail-header">Last Heartbeat</h4>
-                  {formatDate(pendingActivity.lastHeartbeatTime, 'relative')}
-                </div>
-                <div class="pending-activity-detail">
-                  <h4 class="pending-activity-detail-header">Attempt</h4>
-                  <Badge type={failed ? 'error' : 'default'}>
-                    {#if failed}
-                      <Icon name="retry" />
-                    {/if}
-                    {pendingActivity.attempt}
-                  </Badge>
-                </div>
-                <div class="pending-activity-detail">
-                  <h4 class="pending-activity-detail-header">Attempts Left</h4>
-                  <Badge type={failed ? 'error' : 'default'}>
-                    {formatAttemptsLeft(
-                      pendingActivity.maximumAttempts,
-                      pendingActivity.attempt,
-                    )}
-                  </Badge>
-                </div>
-                {#if failed && pendingActivity.scheduledTime}
+          <div class="pending-activity-row">
+            <div class="pending-activity-summary">
+              <a class="flex w-full items-center hover:bg-gray-50" {href}>
+                <div class="pending-activity-inner-row">
                   <div class="pending-activity-detail">
-                    <h4 class="pending-activity-detail-header">Next Retry</h4>
+                    <h4 class="pending-activity-detail-header">
+                      Activity Type
+                    </h4>
                     <Badge type={failed ? 'error' : 'default'}>
-                      {toTimeDifference(pendingActivity.scheduledTime)}
+                      {pendingActivity.activityType}
                     </Badge>
                   </div>
-                {/if}
-                <div class="pending-activity-detail">
-                  <h4 class="pending-activity-detail-header">Expiration</h4>
-                  {formatRetryExpiration(
-                    pendingActivity.maximumAttempts,
-                    formatDuration(
-                      getDuration({
-                        start: Date.now(),
-                        end: pendingActivity.expirationTime,
-                      }),
-                    ),
-                  )}
-                </div>
-              </div>
-            </a>
-            {#if failed}
-              <div class="pending-activity-failure-details">
-                {#if pendingActivity.heartbeatDetails}
-                  <div class="w-full">
+                  <div class="pending-activity-detail">
                     <h4 class="pending-activity-detail-header">
-                      Heartbeat Details
+                      Last Heartbeat
                     </h4>
-                    <CodeBlock
-                      class="max-h-32"
-                      content={pendingActivity.heartbeatDetails}
-                    />
+                    {formatDate(pendingActivity.lastHeartbeatTime, 'relative')}
                   </div>
-                {/if}
-                {#if pendingActivity.lastFailure}
-                  <div class="w-full">
-                    <h4 class="pending-activity-detail-header">Last Failure</h4>
-                    <CodeBlock
-                      class="max-h-32"
-                      content={pendingActivity.lastFailure}
-                    />
+                  <div class="pending-activity-detail">
+                    <h4 class="pending-activity-detail-header">Attempt</h4>
+                    <Badge type={failed ? 'error' : 'default'}>
+                      {#if failed}
+                        <Icon name="retry" />
+                      {/if}
+                      {pendingActivity.attempt}
+                    </Badge>
                   </div>
-                {/if}
-              </div>
-            {/if}
+                  <div class="pending-activity-detail">
+                    <h4 class="pending-activity-detail-header">
+                      Attempts Left
+                    </h4>
+                    <Badge type={failed ? 'error' : 'default'}>
+                      {formatAttemptsLeft(
+                        pendingActivity.maximumAttempts,
+                        pendingActivity.attempt,
+                      )}
+                    </Badge>
+                  </div>
+                  {#if failed && pendingActivity.scheduledTime}
+                    <div class="pending-activity-detail">
+                      <h4 class="pending-activity-detail-header">Next Retry</h4>
+                      <Badge type={failed ? 'error' : 'default'}>
+                        {toTimeDifference(pendingActivity.scheduledTime)}
+                      </Badge>
+                    </div>
+                  {/if}
+                  <div class="pending-activity-detail">
+                    <h4 class="pending-activity-detail-header">Expiration</h4>
+                    {formatRetryExpiration(
+                      pendingActivity.maximumAttempts,
+                      formatDuration(
+                        getDuration({
+                          start: Date.now(),
+                          end: pendingActivity.expirationTime,
+                        }),
+                      ),
+                    )}
+                  </div>
+                </div>
+              </a>
+              {#if failed}
+                <div class="pending-activity-failure-details">
+                  {#if pendingActivity.heartbeatDetails}
+                    <div class="w-full">
+                      <h4 class="pending-activity-detail-header">
+                        Heartbeat Details
+                      </h4>
+                      <CodeBlock
+                        class="max-h-32"
+                        content={pendingActivity.heartbeatDetails}
+                      />
+                    </div>
+                  {/if}
+                  {#if pendingActivity.lastFailure}
+                    <div class="w-full">
+                      <h4 class="pending-activity-detail-header">
+                        Last Failure
+                      </h4>
+                      <CodeBlock
+                        class="max-h-32"
+                        content={pendingActivity.lastFailure}
+                      />
+                    </div>
+                  {/if}
+                </div>
+              {/if}
+            </div>
           </div>
         </div>
       {/each}
@@ -123,6 +133,10 @@
 {/if}
 
 <style lang="postcss">
+  .pending-activity-row-container {
+    @apply mt-4;
+  }
+
   .pending-activity-row {
     @apply flex w-full flex-row items-center gap-2;
   }
