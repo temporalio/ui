@@ -31,6 +31,9 @@
           {#if icon}<Icon name={icon} />{/if}
           {title}
         </h2>
+        <div class="mr-1" on:click|stopPropagation>
+          <slot name="action" />
+        </div>
         {#if !readOnly}
           <Icon
             name={open ? 'chevron-up' : 'chevron-down'}
