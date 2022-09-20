@@ -82,7 +82,7 @@
       sorts = [...(bookmarkedSearch?.sorts ?? [])];
       query = bookmarkedSearch.query;
       activeSearch = bookmarkedSearch;
-      showFilters = false;
+      showFilters = true;
       setTimeout(() => {
         onSearch();
       }, 150);
@@ -157,6 +157,20 @@
   };
 
   const { copy, copied } = copyToClipboard(500);
+
+  const getNestLevel = (index: number) => {
+    let openParenthesisCount = 0;
+    const currentFilters = filters.slice(0, index + 1);
+    for (let filter of currentFilters) {
+      if (filter.parenthesis === '(') {
+        openParenthesisCount += 1;
+      } else if (filter.parenthesis === ')') {
+        openParenthesisCount -= 1;
+      }
+    }
+
+    return openParenthesisCount;
+  };
 </script>
 
 {#if !filters.length}
@@ -193,6 +207,7 @@
               bind:conditional
               bind:operator
               bind:parenthesis
+              nestLevel={getNestLevel(index)}
               isOnly={index === 0 && filters.length === 1}
               setFilterOperator={(operator) =>
                 onAddFilterOperator(operator, index)}
@@ -207,9 +222,12 @@
       </section>
     {/if}
     <div class="mt-4 flex w-full items-center gap-4">
+      <SortFilter bind:sorts />
+    </div>
+    <div class="mt-4 flex w-full items-center gap-4">
       <div class="flex items-center gap-2" in:fade>
-        <Button icon="search" variant="primary" thin on:click={onSearch}
-          >Search</Button
+        <CustomButton icon="search" primary thin on:click={onSearch}
+          >Search</CustomButton
         >
         <CustomButton icon="retry" on:click={onRestart}>Reset</CustomButton>
       </div>
@@ -231,12 +249,11 @@
     in:fade
   >
     <div class="flex items-center gap-2">
-      <SortFilter bind:sorts />
+      {#if activeSearch}
+        <p class="text-sm px-6">{activeSearch.name}</p>
+      {/if}
     </div>
     <div class="flex items-center gap-2">
-      {#if activeSearch}
-        <p class="text-sm">{activeSearch.name}</p>
-      {/if}
       <CustomButton
         icon={viewQueryString ? 'eye-hide' : 'eye-show'}
         on:click={() => (viewQueryString = !viewQueryString)}

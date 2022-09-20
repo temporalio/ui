@@ -5,6 +5,7 @@
   export let disabled: boolean = false;
   export let loading: boolean = false;
   export let active: boolean = false;
+  export let primary: boolean = false;
   export let add: boolean = false;
   export let remove: boolean = false;
   export let icon: IconName = null;
@@ -16,17 +17,18 @@
   on:click
   class="button {$$props.class}"
   class:active
+  class:primary
   data-cy={dataCy}
   {disabled}
   class:add
   class:remove
 >
-  <slot />
   {#if icon || loading}
     <span class:animate-spin={loading}>
       <Icon name={loading ? 'spinner' : icon} class={iconClass} />
     </span>
   {/if}
+  <slot />
 </button>
 
 <style lang="postcss">
@@ -36,5 +38,9 @@
 
   .active {
     @apply bg-black text-white;
+  }
+
+  .primary {
+    @apply bg-gradient-to-r from-blue-300 to-blue-700 hover:from-blue-500 hover:to-blue-900 text-white hover:text-white;
   }
 </style>
