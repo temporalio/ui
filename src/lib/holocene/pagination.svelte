@@ -6,26 +6,27 @@
     perPageFromSearchParameter,
     perPageOptions,
   } from '$lib/stores/pagination';
-
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import FilterSelect from '$lib/holocene/select/filter-select.svelte';
+  import { getFloatStyle } from '$lib/utilities/get-float-style';
   import Icon from '$holocene/icon/icon.svelte';
 
   type T = $$Generic;
 
-  export let key = 'per-page';
   export let items: T[];
   export let floatId: string | undefined = undefined;
-  export let updating = false;
-
-  import FilterSelect from '$lib/holocene/select/filter-select.svelte';
-  import { getFloatStyle } from '$lib/utilities/get-float-style';
-
   export let startingIndex: string | number = 0;
+  export let updating = false;
+  const perPageKey = 'per-page';
+  const currentPageKey = 'page';
 
   $: perPage = String(
-    perPageFromSearchParameter($page.url.searchParams.get(key)),
+    perPageFromSearchParameter($page.url.searchParams.get(perPageKey)),
   ).toString();
-  $: store = pagination(items, perPage);
-  $: store.jumpToIndex(startingIndex);
+  $: store = pagination(items, perPage, startingIndex);
+  $: currentPage =
+    $page.url.searchParams.get(currentPageKey) ?? $store.currentPage;
+  $: store.jumpToPage(currentPage);
 
   let screenWidth: number;
   let width: number | undefined;
@@ -35,7 +36,18 @@
     if (floatId) {
       width = document.getElementById(floatId)?.clientWidth;
     }
+    if (startingIndex > 0) {
+      handlePageChange();
+    }
   });
+
+  const handlePageChange = () => {
+    updateQueryParameters({
+      parameter: currentPageKey,
+      value: $store.currentPage,
+      url: $page.url,
+    });
+  };
 
   $: floatStyle = getFloatStyle({ width, height, screenWidth });
 </script>
@@ -62,7 +74,7 @@
         <p class="w-fit text-right">Per Page</p>
         <FilterSelect
           label="Per Page"
-          parameter={key}
+          parameter={perPageKey}
           value={perPage}
           options={perPageOptions(perPage)}
         />
@@ -71,7 +83,10 @@
         <button
           class="caret"
           disabled={!$store.hasPrevious}
-          on:click={() => store.previous()}
+          on:click={() => {
+            store.previous();
+            handlePageChange();
+          }}
         >
           <Icon name="chevron-left" />
         </button>
@@ -81,7 +96,10 @@
         <button
           class="caret"
           disabled={!$store.hasNext}
-          on:click={() => store.next()}
+          on:click={() => {
+            store.next();
+            handlePageChange();
+          }}
         >
           <Icon name="chevron-right" />
         </button>
@@ -101,7 +119,7 @@
         <p class="w-fit text-right">Per Page</p>
         <FilterSelect
           label="Per Page"
-          parameter={key}
+          parameter={perPageKey}
           value={String(perPage)}
           options={perPageOptions(perPage)}
         />
