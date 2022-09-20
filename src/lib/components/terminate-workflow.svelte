@@ -45,7 +45,7 @@
   };
 
   const user = getCoreUser();
-  const terminateDisabled = user?.terminateDisabled(namespace);
+  $: terminateDisabled = user.terminateDisabled(namespace);
 </script>
 
 {#if workflow.canBeTerminated}
