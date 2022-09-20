@@ -63,23 +63,25 @@
   import Banners from '$lib/components/banner/banners.svelte';
   import { ErrorBoundary } from '$lib/components/error-boundary';
   import PageTitle from '$lib/holocene/page-title.svelte';
+  import ScrollToTop from '$lib/holocene/scroll-to-top.svelte';
 
   export let user: User;
   export let uiVersionInfo: UiVersionInfo;
 </script>
 
 <PageTitle />
-<div class="flex h-screen w-screen flex-row">
+<div class="flex w-screen flex-row">
   <Notifications />
   <div class="sticky top-0 z-20 h-screen w-auto">
     <Header {user} />
   </div>
-  <section id="content" class="h-screen w-max flex-auto overflow-auto">
+  <section id="content" class="min-h-screen w-max flex-auto overflow-auto">
     <Banners {uiVersionInfo} />
-    <div class="z-10 flex h-full flex-col gap-4 px-10 pb-10 pt-8">
+    <div class="z-10 flex flex-col gap-4 px-10 pb-10 pt-8">
       <ErrorBoundary onError={() => {}}>
         <slot />
       </ErrorBoundary>
     </div>
+    <ScrollToTop />
   </section>
 </div>
