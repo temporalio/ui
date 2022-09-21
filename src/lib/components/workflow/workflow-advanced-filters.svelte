@@ -161,11 +161,16 @@
   const getNestLevel = (index: number) => {
     let openParenthesisCount = 0;
     const currentFilters = filters.slice(0, index + 1);
+    let minusNext = false;
     for (let filter of currentFilters) {
+      if (minusNext) {
+        openParenthesisCount -= 1;
+        minusNext = false;
+      }
       if (filter.parenthesis === '(') {
         openParenthesisCount += 1;
       } else if (filter.parenthesis === ')') {
-        openParenthesisCount -= 1;
+        minusNext = true;
       }
     }
 
@@ -184,7 +189,7 @@
         onChange={onFilterChange}
       />
       <CustomSplitButton
-        class="bg-offWhite rounded-tr rounded-br border border-gray-900"
+        class="bg-offWhite rounded-tr rounded-br"
         id="saved"
         icon="star-empty"
       >
