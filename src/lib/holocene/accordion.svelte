@@ -14,7 +14,7 @@
 </script>
 
 <section
-  class="flex w-full cursor-default flex-row rounded-lg border border-gray-300 bg-white p-8 {$$props.class}"
+  class="flex w-full cursor-default flex-row rounded-lg border border-gray-300 bg-white p-8 text-primary {$$props.class}"
 >
   <div class="w-full">
     <div
