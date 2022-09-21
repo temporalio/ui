@@ -7,7 +7,7 @@
 
   import Button from '$holocene/button.svelte';
   import Modal from '$holocene/modal.svelte';
-  import { getCoreUser } from '$lib/utilities/core-user';
+  import { coreUserStore } from '$lib/stores/core-user';
   import Tooltip from '$lib/holocene/tooltip.svelte';
 
   export let workflow: WorkflowExecution;
@@ -44,8 +44,8 @@
       .catch(handleTerminationError);
   };
 
-  const user = getCoreUser();
-  $: terminateDisabled = user.terminateDisabled(namespace);
+  let coreUser = coreUserStore();
+  $: terminateDisabled = $coreUser.terminateDisabled(namespace);
 </script>
 
 {#if workflow.canBeTerminated}
