@@ -40,5 +40,3 @@
     return meta.length ? meta[0]['content'] : '';
   };
 </script>
-
-<h1>CALLBACK</h1>

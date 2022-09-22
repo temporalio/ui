@@ -78,7 +78,7 @@
   };
 
   const logout = () => {
-    clearUser;
+    clearUser();
     goto(routeForLoginPage());
   };
 </script>

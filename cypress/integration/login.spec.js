@@ -16,8 +16,6 @@ describe('Login page', () => {
     cy.visit('/namespaces/default/workflows');
 
     cy.wait('@settings-api');
-    cy.wait('@user-api');
-    cy.wait('@settings-api');
 
     cy.url().should('include', `/login`);
 
@@ -29,5 +27,15 @@ describe('Login page', () => {
     cy.get('@header')
       .find('[data-cy="data-encoder-status-configured"]')
       .should('not.exist');
+  });
+
+  it('doesn not redirect to login when user session exists', () => {
+    cy.login();
+    cy.visit('/');
+    cy.wait('@settings-api');
+    cy.wait('@namespaces-api');
+    cy.wait('@workflows-api');
+
+    cy.url().should('include', `/namespaces/default/workflows`);
   });
 });

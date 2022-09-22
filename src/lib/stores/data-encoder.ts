@@ -1,4 +1,4 @@
-import { derived, writable } from 'svelte/store';
+import { derived } from 'svelte/store';
 import { page } from '$app/stores';
 import {
   dataConverterPort,
@@ -27,7 +27,8 @@ export const dataEncoder = derived(
     const namespace = $page.params.namespace;
     const settingsEndpoint = $page?.stuff?.settings?.codec?.endpoint;
     const endpoint = $dataEncoderEndpoint || settingsEndpoint;
-    const accessToken = $page.stuff?.settings?.codec?.accessToken;
+    const passAccessToken = $page.stuff?.settings?.codec?.passAccessToken;
+    const accessToken = $page.stuff?.user?.accessToken;
     const hasNotRequested = endpoint
       ? $lastDataEncoderStatus === 'notRequested'
       : $lastDataConverterStatus === 'notRequested';
@@ -44,6 +45,7 @@ export const dataEncoder = derived(
       namespace,
       settingsEndpoint,
       endpoint,
+      passAccessToken,
       accessToken,
       hasNotRequested,
       hasError,

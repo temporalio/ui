@@ -9,7 +9,6 @@ const visitWorkflow = (suffix = '') => {
 describe('Fallback to Ascending Ordering of Event History on Older Versions of Temporal Server', () => {
   beforeEach(() => {
     cy.interceptNamespacesApi();
-    cy.interceptUserApi();
     cy.interceptGithubReleasesApi();
     cy.interceptQueryApi();
     cy.interceptTaskQueuesApi();
