@@ -74,6 +74,22 @@ export const shouldDisplayAsExecutionLink = (
   return false;
 };
 
+const keysWithChildExecutionLinks = [
+  'workflowExecutionWorkflowId',
+  'workflowExecutionRunId',
+] as const;
+
+// For linking to a child workflow
+export const shouldDisplayChildWorkflowLink = (
+  key: string,
+): key is typeof keysWithChildExecutionLinks[number] => {
+  for (const workflowKey of keysWithChildExecutionLinks) {
+    if (key === workflowKey) return true;
+  }
+
+  return false;
+};
+
 const keysWithTaskQueueLinks = ['taskQueueName'] as const;
 
 export const shouldDisplayAsTaskQueueLink = (

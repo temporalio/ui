@@ -10,6 +10,7 @@
   import {
     getCodeBlockValue,
     shouldDisplayAsExecutionLink,
+    shouldDisplayChildWorkflowLink,
     shouldDisplayAsTaskQueueLink,
     shouldDisplayAsPlainText,
   } from '$lib/utilities/get-single-attribute-for-event';
@@ -20,6 +21,7 @@
 
   export let key: string;
   export let value: string | Record<string, unknown>;
+  export let attributes: object;
 
   export let inline = false;
 
@@ -58,6 +60,17 @@
       <div class="text-sm">
         <Copyable content={value} container-class="xl:flex-row">
           <Link href={routeForTaskQueue({ namespace, queue: value })}>
+            {value}
+          </Link>
+        </Copyable>
+      </div>
+    </div>
+  {:else if shouldDisplayChildWorkflowLink(key)}
+    <div class="detail-row">
+      <h2 class="text-sm">{format(key)}</h2>
+      <div class="text-sm">
+        <Copyable content={value} container-class="xl:flex-row">
+          <Link href={routeForWorkflow({ namespace, workflow: attributes.workflowExecutionWorkflowId, run: attributes.workflowExecutionRunId})}>
             {value}
           </Link>
         </Copyable>
