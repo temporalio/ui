@@ -5,9 +5,11 @@
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventEmptyRow from './event-empty-row.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
 
   export let items: IterableEvents;
   export let groups: EventGroups;
+  export let loading = false;
   export let compact = false;
 
   function handleExpandChange(event: CustomEvent) {
@@ -15,24 +17,28 @@
   }
 </script>
 
-<Pagination
-  {items}
-  floatId="event-view-toggle"
-  let:visibleItems
-  let:initialItem
->
-  <EventSummaryTable {compact} on:expandAll={handleExpandChange}>
-    {#each visibleItems as event (`${event.id}-${event.timestamp}`)}
-      <EventSummaryRow
-        {event}
-        {groups}
-        {compact}
-        expandAll={$expandAllEvents === 'true'}
-        {initialItem}
-        {visibleItems}
-      />
-    {:else}
-      <EventEmptyRow />
-    {/each}
-  </EventSummaryTable>
-</Pagination>
+{#if loading}
+  <Loading />
+{:else}
+  <Pagination
+    {items}
+    floatId="event-view-toggle"
+    let:visibleItems
+    let:initialItem
+  >
+    <EventSummaryTable {compact} on:expandAll={handleExpandChange}>
+      {#each visibleItems as event (`${event.id}-${event.timestamp}`)}
+        <EventSummaryRow
+          {event}
+          {groups}
+          {compact}
+          expandAll={$expandAllEvents === 'true'}
+          {initialItem}
+          {visibleItems}
+        />
+      {:else}
+        <EventEmptyRow />
+      {/each}
+    </EventSummaryTable>
+  </Pagination>
+{/if}

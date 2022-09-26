@@ -3,7 +3,7 @@
 
   import EventSummary from '$lib/components/event/event-summary.svelte';
   import PageTitle from '$lib/holocene/page-title.svelte';
-  import { ascendingEventGroups } from '$lib/stores/events';
+  import { ascendingEventGroups, loading } from '$lib/stores/events';
 
   const workflow = $page.params?.workflow;
 </script>
@@ -13,4 +13,5 @@
   items={$ascendingEventGroups}
   groups={$ascendingEventGroups}
   compact={true}
+  loading={$loading}
 />

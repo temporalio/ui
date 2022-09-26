@@ -23,6 +23,7 @@
 
   import EventDetailsRow from './event-details-row.svelte';
   import EventDetailsFull from './event-details-full.svelte';
+  import { formatAttributes } from '$lib/utilities/format-event-attributes';
 
   export let event: IterableEvent;
   export let groups: EventGroups;
@@ -42,6 +43,7 @@
   $: currentEvent = compact ? eventGroup.events.get(selectedId) : event;
   $: descending = $eventSortOrder === 'descending';
   $: showElapsed = $eventShowElapsed === 'true';
+  $: attributes = formatAttributes(event, { compact });
 
   $: timeDiffChange = '';
   $: {
@@ -123,7 +125,11 @@
   </td>
   <td class="cell links">
     {#if !expanded}
-      <EventDetailsRow {...getSingleAttributeForEvent(currentEvent)} inline />
+      <EventDetailsRow
+        {...getSingleAttributeForEvent(currentEvent)}
+        {attributes}
+        inline
+      />
     {/if}
   </td>
   <td class="cell text-right">
