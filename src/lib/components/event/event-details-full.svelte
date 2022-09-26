@@ -41,7 +41,7 @@
       />
       {#each Object.entries(attributes) as [key, value] (key)}
         {#if attributeGrouping[activePill]?.includes(key)}
-          <EventDetailsRowExpanded {key} {value} class="w-full" />
+          <EventDetailsRowExpanded {key} {value} {attributes} class="w-full" />
         {/if}
       {/each}
     </div>
@@ -55,7 +55,7 @@
     />
     {#each Object.entries(attributes) as [key, value] (key)}
       {#if attributeGrouping[activePill]?.includes(key)}
-        <EventDetailsRowExpanded {key} {value} class="w-full" />
+        <EventDetailsRowExpanded {key} {value} {attributes} class="w-full" />
       {/if}
     {/each}
   </div>

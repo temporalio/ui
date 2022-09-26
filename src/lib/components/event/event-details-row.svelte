@@ -11,17 +11,20 @@
     shouldDisplayAsTaskQueueLink,
     shouldDisplayAsPlainText,
     getCodeBlockValue,
+    shouldDisplayChildWorkflowLink,
   } from '$lib/utilities/get-single-attribute-for-event';
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Copyable from '../copyable.svelte';
+  import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
 
   export let key: string;
   export let value: string | Record<string, unknown>;
+  export let attributes: CombinedAttributes;
   export let inline = false;
 
-  const { workflow, namespace, run } = $page.params;
+  const { workflow, namespace } = $page.params;
 </script>
 
 <article
@@ -41,6 +44,23 @@
           container-class="flex-row-reverse xl:flex-row"
         >
           <Link href={routeForWorkflow({ namespace, workflow, run: value })}>
+            {value}
+          </Link>
+        </Copyable>
+      </div>
+    </div>
+  {:else if shouldDisplayChildWorkflowLink(key, attributes)}
+    <div class="detail-row">
+      <h2 class="text-sm">{format(key)}</h2>
+      <div class="text-sm">
+        <Copyable content={value} container-class="xl:flex-row">
+          <Link
+            href={routeForWorkflow({
+              namespace,
+              workflow: attributes.workflowExecutionWorkflowId,
+              run: attributes.workflowExecutionRunId,
+            })}
+          >
             {value}
           </Link>
         </Copyable>

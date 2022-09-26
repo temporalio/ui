@@ -1,5 +1,6 @@
 import { isEventGroup } from '$lib/models/event-groups';
 import { capitalize } from '$lib/utilities/format-camel-case';
+import type { CombinedAttributes } from './format-event-attributes';
 
 type SummaryAttribute = {
   key: string;
@@ -86,6 +87,27 @@ export const shouldDisplayAsTaskQueueLink = (
   return false;
 };
 
+const keysWithChildExecutionLinks = [
+  'workflowExecutionWorkflowId',
+  'workflowExecutionRunId',
+] as const;
+
+// For linking to a child workflow
+export const shouldDisplayChildWorkflowLink = (
+  key: string,
+  attributes: CombinedAttributes,
+): key is typeof keysWithChildExecutionLinks[number] => {
+  const workflowLinkAttributesExist = Boolean(
+    attributes?.workflowExecutionWorkflowId &&
+      attributes?.workflowExecutionRunId,
+  );
+  for (const workflowKey of keysWithChildExecutionLinks) {
+    if (key === workflowKey && workflowLinkAttributesExist) return true;
+  }
+
+  return false;
+};
+
 const formatSummaryValue = (key: string, value: unknown): SummaryAttribute => {
   if (typeof value === 'object') {
     const [firstKey] = Object.keys(value);
@@ -103,6 +125,7 @@ const preferredSummaryKeys = [
   'input',
   'activityType',
   'parentInitiatedEventId',
+  'workflowExecution',
   'workflowType',
   'taskQueue',
 ] as const;

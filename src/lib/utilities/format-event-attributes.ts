@@ -7,6 +7,8 @@ import { capitalize } from '$lib/utilities/format-camel-case';
 
 export type CombinedAttributes = EventAttribute & {
   eventTime?: string;
+  workflowExecutionRunId?: string;
+  workflowExecutionWorkflowId?: string;
 };
 
 const keysToOmit: Readonly<Set<string>> = new Set(['header']);
