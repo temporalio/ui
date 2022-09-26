@@ -7,10 +7,7 @@ import { fetchWorkflow } from '$lib/services/workflow-service';
 import { getPollers } from '$lib/services/pollers-service';
 import type { GetPollersResponse } from '$lib/services/pollers-service';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-import {
-  decodePendingActivity,
-  toDecodedPendingActivities,
-} from '$lib/models/pending-activities';
+import { toDecodedPendingActivities } from '$lib/models/pending-activities';
 
 export const refresh = writable(0);
 const namespace = derived([page], ([$page]) => $page.params.namespace);
