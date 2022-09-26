@@ -31,13 +31,13 @@
   class="flex flex-row gap-2 border-b-2 border-gray-200 py-2 first:pt-0 last:border-b-0 xl:gap-4 {$$props.class}"
 >
   {#if typeof value === 'object'}
-    <h2 class="min-w-fit items-center text-sm xl:items-start">
+    <p class="min-w-fit items-center text-sm xl:items-start">
       {format(key)}
-    </h2>
+    </p>
     <CodeBlock content={getCodeBlockValue(value)} class="w-full" {inline} />
   {:else if shouldDisplayAsExecutionLink(key)}
     <div class="xl:3/4 flex w-full items-center xl:items-start">
-      <h2 class="mr-3 text-sm">{format(key)}</h2>
+      <p class="mr-3 text-sm">{format(key)}</p>
       <div class="text-sm">
         <Copyable
           content={value}
@@ -51,7 +51,7 @@
     </div>
   {:else if shouldDisplayChildWorkflowLink(key, attributes)}
     <div class="detail-row">
-      <h2 class="text-sm">{format(key)}</h2>
+      <p class="text-sm">{format(key)}</p>
       <div class="text-sm">
         <Copyable content={value} container-class="xl:flex-row">
           <Link
@@ -68,7 +68,7 @@
     </div>
   {:else if shouldDisplayAsTaskQueueLink(key)}
     <div class="xl:3/4 flex w-full items-center xl:items-start">
-      <h2 class="mr-3 text-sm">{format(key)}</h2>
+      <p class="mr-3 text-sm">{format(key)}</p>
       <div class="text-sm">
         <Copyable
           content={value}
@@ -82,7 +82,7 @@
     </div>
   {:else}
     <div class="xl:3/4 flex w-full items-center xl:items-start">
-      <h2 class="mr-3 text-sm">{format(key)}</h2>
+      <p class="mr-3 text-sm">{format(key)}</p>
       <p class="text-right text-sm xl:text-left">
         <span
           class="select-all px-2 text-gray-700"

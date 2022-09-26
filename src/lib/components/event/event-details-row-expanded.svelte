@@ -31,9 +31,9 @@
 <article class="row flex px-4 first:pt-0 {$$props.class}">
   {#if typeof value === 'object'}
     <div class="code-block-row">
-      <h2 class="text-sm">
+      <p class="text-sm">
         {format(key)}
-      </h2>
+      </p>
       <CodeBlock
         content={getCodeBlockValue(value)}
         class="w-full text-right lg:h-auto"
@@ -42,7 +42,7 @@
     </div>
   {:else if shouldDisplayAsExecutionLink(key)}
     <div class="detail-row">
-      <h2 class="text-sm">{format(key)}</h2>
+      <p class="text-sm">{format(key)}</p>
       <div class="text-sm">
         <Copyable
           content={value}
@@ -56,7 +56,7 @@
     </div>
   {:else if shouldDisplayChildWorkflowLink(key, attributes)}
     <div class="detail-row">
-      <h2 class="text-sm">{format(key)}</h2>
+      <p class="text-sm">{format(key)}</p>
       <div class="text-sm">
         <Copyable content={value} container-class="xl:flex-row">
           <Link
@@ -73,7 +73,7 @@
     </div>
   {:else if shouldDisplayAsTaskQueueLink(key)}
     <div class="detail-row">
-      <h2 class="text-sm">{format(key)}</h2>
+      <p class="text-sm">{format(key)}</p>
       <div class="text-sm">
         <Copyable content={value} container-class="xl:flex-row">
           <Link href={routeForTaskQueue({ namespace, queue: value })}>
@@ -84,7 +84,7 @@
     </div>
   {:else}
     <div class="detail-row">
-      <h2 class="text-sm">{format(key)}</h2>
+      <p class="text-sm">{format(key)}</p>
       <p class="text-sm">
         <span
           class="select-all px-2"
