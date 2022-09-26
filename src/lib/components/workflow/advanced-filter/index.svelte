@@ -18,7 +18,6 @@
   export let operator: string = '';
   export let parenthesis: string = '';
   export let isOnly: boolean = true;
-  export let nestLevel: number = 0;
 
   export let setFilterOperator: (operator: string) => void = () => noop;
   export let setFilterParenthesis: (operator: string) => void = () => noop;
@@ -64,7 +63,7 @@
   };
 </script>
 
-<div class="flex gap-2" class:indented={nestLevel > 0}>
+<div class="flex gap-2">
   <!-- <TypeaheadInput
     icon="filter"
     placeholder="Filter workflows"
@@ -125,8 +124,6 @@
         on:click={removeFilter}
       />
     {/if}
-    <!-- <Button variant="secondary" icon="chevron-left" thin />
-    <Button variant="secondary" icon="chevron-right" thin /> -->
   </div>
 </div>
 

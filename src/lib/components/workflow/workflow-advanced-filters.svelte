@@ -18,9 +18,7 @@
   import TypeaheadInput from '$lib/holocene/input/typeahead-input.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import SortFilter from './advanced-filter/sort-filter.svelte';
-  import { onMount } from 'svelte';
   import { searchAttributes } from '$lib/stores/search-attributes';
-  import SplitButton from '$lib/holocene/split-button.svelte';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import CustomButton from '$lib/holocene/custom-button.svelte';
   import CustomSplitButton from '$lib/holocene/custom-split-button.svelte';
@@ -39,8 +37,8 @@
       })
     : [];
 
-  let filters = [];
-  let sorts = [];
+  export let filters = [];
+  export let sorts = [];
 
   let bookmarkName = '';
   let activeSearch;
@@ -68,45 +66,6 @@
     const search = { name: bookmarkName, query, filters, sorts };
     saveSearch(search);
     activeSearch = search;
-  };
-
-  $: bookmarkOptions = (
-    [...$searches]?.map((s) => ({ label: s.name, value: s.name })) ?? []
-  ).sort((a, b) => a?.label.localeCompare(b.label));
-
-  const onBookmarkChange = (name: string) => {
-    const bookmarkedSearch = $searches.find((s) => s.name === name);
-    if (bookmarkedSearch) {
-      bookmarkName = name;
-      filters = [...bookmarkedSearch.filters];
-      sorts = [...(bookmarkedSearch?.sorts ?? [])];
-      query = bookmarkedSearch.query;
-      activeSearch = bookmarkedSearch;
-      showFilters = true;
-      setTimeout(() => {
-        onSearch();
-      }, 150);
-    }
-  };
-
-  const onFilterChange = (filterType: string) => {
-    showFilters = true;
-
-    const filter = filterTypeOptions.find((o) => o.value === filterType);
-    const conditionals = {
-      Keyword: '=',
-      Int: '=',
-      Datetime: 'In Last',
-    };
-    filters = [
-      {
-        filterType,
-        value: '',
-        operator: '',
-        parenthesis: '',
-        conditional: conditionals[filter.type],
-      },
-    ];
   };
 
   const onAddFilterOperator = (operator, index) => {
@@ -157,51 +116,13 @@
   };
 
   const { copy, copied } = copyToClipboard(500);
-
-  const getNestLevel = (index: number) => {
-    let openParenthesisCount = 0;
-    const currentFilters = filters.slice(0, index + 1);
-    let minusNext = false;
-    for (let filter of currentFilters) {
-      if (minusNext) {
-        openParenthesisCount -= 1;
-        minusNext = false;
-      }
-      if (filter.parenthesis === '(') {
-        openParenthesisCount += 1;
-      } else if (filter.parenthesis === ')') {
-        minusNext = true;
-      }
-    }
-
-    return openParenthesisCount;
-  };
 </script>
 
-{#if !filters.length}
-  <div class="mb-4 flex w-full items-center gap-4">
-    <div class="flex h-12 w-full items-center gap-0" in:fade>
-      <TypeaheadInput
-        placeholder="Filter workflows"
-        class="w-80"
-        id="filter-type-name"
-        options={filterTypeOptions}
-        onChange={onFilterChange}
-      />
-      <CustomSplitButton
-        class="bg-offWhite rounded-tr rounded-br"
-        id="saved"
-        icon="star-empty"
-      >
-        {#each bookmarkOptions as { label, value } (value)}
-          <MenuItem on:click={() => onBookmarkChange(value)}>{label}</MenuItem>
-        {/each}
-      </CustomSplitButton>
-    </div>
-  </div>
-{:else}
-  <div class="bg-offWhite rounded-tr-lg rounded-tl-lg p-6">
-    <h3 class="text-base mb-2">Advanced Visibility</h3>
+{#if filters.length}
+  <div class="rounded-tr-lg rounded-tl-lg bg-offWhite p-6">
+    <h3 class="mb-2 flex items-center gap-2 text-base">
+      Advanced Visibility{activeSearch ? `: ${activeSearch.name}` : ''}
+    </h3>
     {#if showFilters}
       <section class="advanced-filters flex flex-col gap-2">
         {#each filters as { filterType, value, operator, parenthesis, conditional }, index (index)}
@@ -212,7 +133,6 @@
               bind:conditional
               bind:operator
               bind:parenthesis
-              nestLevel={getNestLevel(index)}
               isOnly={index === 0 && filters.length === 1}
               setFilterOperator={(operator) =>
                 onAddFilterOperator(operator, index)}
@@ -224,23 +144,44 @@
             />
           </div>
         {/each}
+        <div class="flex w-full items-center gap-4">
+          <SortFilter bind:sorts />
+        </div>
       </section>
     {/if}
-    <div class="mt-4 flex w-full items-center gap-4">
-      <SortFilter bind:sorts />
-    </div>
-    <div class="mt-4 flex w-full items-center gap-4">
+    <div class="mt-4 flex w-full items-center justify-between gap-4">
       <div class="flex items-center gap-2" in:fade>
-        <CustomButton icon="search" primary thin on:click={onSearch}
-          >Search</CustomButton
+        <Button variant="primary" icon="search" primary on:click={onSearch}
+          >Search</Button
         >
         <CustomButton icon="retry" on:click={onRestart}>Reset</CustomButton>
+      </div>
+      <div class="flex items-center gap-2">
+        <CustomButton
+          icon={viewQueryString ? 'eye-hide' : 'eye-show'}
+          on:click={() => (viewQueryString = !viewQueryString)}
+        />
+        <CustomButton
+          icon={activeSearch ? 'star-filled' : 'star-empty'}
+          iconClass={activeSearch ? 'text-yellow-500' : ''}
+          on:click={() => (showBookmarkSave = true)}
+        />
+        {#if activeSearch}
+          <CustomButton
+            icon="trash"
+            on:click={() => (showBookmarkRemove = true)}
+          />
+        {/if}
+        <CustomButton
+          icon={showFilters ? 'chevron-up' : 'chevron-down'}
+          on:click={() => (showFilters = !showFilters)}
+        />
       </div>
     </div>
   </div>
   {#if viewQueryString}
     <div
-      class="flex h-8 w-full items-center overflow-x-auto rounded-tr-lg rounded-tl-lg bg-gray-900 text-white p-0"
+      class="10 flex w-full items-center overflow-x-auto rounded-br-lg rounded-bl-lg bg-gray-900 p-1 text-white"
       in:fade
     >
       <button on:click={(e) => copy(e, query)} class="mx-1">
@@ -249,37 +190,6 @@
       <pre class="flex h-full items-center text-sm">{query}</pre>
     </div>
   {/if}
-  <div
-    class="flex w-full items-center justify-between gap-2 p-1 rounded-br-lg rounded-bl-lg bg-gray-200"
-    in:fade
-  >
-    <div class="flex items-center gap-2">
-      {#if activeSearch}
-        <p class="text-sm px-6">{activeSearch.name}</p>
-      {/if}
-    </div>
-    <div class="flex items-center gap-2">
-      <CustomButton
-        icon={viewQueryString ? 'eye-hide' : 'eye-show'}
-        on:click={() => (viewQueryString = !viewQueryString)}
-      />
-      <CustomButton
-        icon={activeSearch ? 'star-filled' : 'star-empty'}
-        iconClass={activeSearch ? 'text-yellow-500' : ''}
-        on:click={() => (showBookmarkSave = true)}
-      />
-      {#if activeSearch}
-        <CustomButton
-          icon="trash"
-          on:click={() => (showBookmarkRemove = true)}
-        />
-      {/if}
-      <CustomButton
-        icon={showFilters ? 'chevron-up' : 'chevron-down'}
-        on:click={() => (showFilters = !showFilters)}
-      />
-    </div>
-  </div>
 {/if}
 <Modal
   open={showBookmarkSave}

@@ -40,7 +40,7 @@
 <div class="flex gap-2">
   <CustomButton
     icon={sorts.length ? 'close' : 'converter-down'}
-    class="border-gray-300 h-8"
+    class="h-10 border-gray-300"
     add={!sorts.length}
     remove={!!sorts.length}
     on:click={onOrderBy}>Order By</CustomButton
@@ -52,7 +52,7 @@
       {/each}
     </Select>
 
-    <Select id="filter-type" bind:value={order} class="w-auto bg-transparent">
+    <Select id="filter-type" bind:value={order} class="bg-transparent w-auto">
       {#each orders as { value, label } (value)}
         <Option {value}>{label}</Option>
       {/each}

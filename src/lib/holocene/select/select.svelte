@@ -93,7 +93,7 @@
   }
 
   .select :global(.select-input-container) {
-    @apply flex h-8 w-full flex-row items-center justify-between rounded border border-gray-300 bg-white px-2 text-sm text-primary;
+    @apply flex h-10 w-full flex-row items-center justify-between rounded border border-gray-300 bg-white px-2 text-sm text-primary;
   }
 
   .select-input {

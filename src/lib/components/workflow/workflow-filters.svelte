@@ -67,7 +67,7 @@
 </script>
 
 <section class="flex flex-col">
-  <p class="text-right text-xs pb-2">
+  <p class="pb-2 text-right text-xs">
     {#if searchType === 'advanced'}
       <a
         href="{$page.url.pathname}?searchType=basic"
