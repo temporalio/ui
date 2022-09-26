@@ -41,7 +41,7 @@ export async function getActivityAttributes(
   return decodedAttributes;
 }
 
-export const decodePendingActivity = async ({
+const decodePendingActivity = async ({
   activity,
   namespace,
   settings,
@@ -52,4 +52,23 @@ export const decodePendingActivity = async ({
     settings,
   });
   return decodedActivity;
+};
+
+export const toDecodedPendingActivities = async (
+  workflow: WorkflowExecution,
+  namespace: string,
+  settings: Settings,
+) => {
+  const pendingActivities = workflow?.pendingActivities ?? [];
+  const decodedActivities: PendingActivity[] = [];
+  for (const activity of pendingActivities) {
+    const decodedActivity = await decodePendingActivity({
+      activity,
+      namespace,
+      settings,
+    });
+    decodedActivities.push(decodedActivity);
+  }
+
+  return decodedActivities;
 };

@@ -7,7 +7,10 @@ import { fetchWorkflow } from '$lib/services/workflow-service';
 import { getPollers } from '$lib/services/pollers-service';
 import type { GetPollersResponse } from '$lib/services/pollers-service';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-import { decodePendingActivity } from '$lib/models/pending-activities';
+import {
+  decodePendingActivity,
+  toDecodedPendingActivities,
+} from '$lib/models/pending-activities';
 
 export const refresh = writable(0);
 const namespace = derived([page], ([$page]) => $page.params.namespace);
@@ -44,19 +47,11 @@ const updateWorkflowRun: StartStopNotifier<{
         const workflow = await fetchWorkflow({ namespace, workflowId, runId });
         const { taskQueue } = workflow;
         const workers = await getPollers({ queue: taskQueue, namespace });
-
-        // Decode pending activities
-        const pendingActivities = workflow?.pendingActivities ?? [];
-        const decodedActivities = [];
-        for (const activity of pendingActivities) {
-          const decodedActivity = await decodePendingActivity({
-            activity,
-            namespace,
-            settings,
-          });
-          decodedActivities.push(decodedActivity);
-        }
-        workflow.pendingActivities = decodedActivities;
+        workflow.pendingActivities = await toDecodedPendingActivities(
+          workflow,
+          namespace,
+          settings,
+        );
 
         set({ workflow, workers });
       });
