@@ -43,7 +43,10 @@
           content={value}
           container-class="flex-row-reverse xl:flex-row"
         >
-          <Link href={routeForWorkflow({ namespace, workflow, run: value })}>
+          <Link
+            newTab
+            href={routeForWorkflow({ namespace, workflow, run: value })}
+          >
             {value}
           </Link>
         </Copyable>
@@ -55,6 +58,7 @@
       <div class="text-sm">
         <Copyable content={value} container-class="xl:flex-row">
           <Link
+            newTab
             href={routeForWorkflow({
               namespace,
               workflow: attributes.workflowExecutionWorkflowId,
@@ -74,7 +78,7 @@
           content={value}
           container-class="flex-row-reverse xl:flex-row"
         >
-          <Link href={routeForTaskQueue({ namespace, queue: value })}>
+          <Link newTab href={routeForTaskQueue({ namespace, queue: value })}>
             {value}
           </Link>
         </Copyable>
