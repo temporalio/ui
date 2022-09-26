@@ -1,10 +1,10 @@
 import { get } from 'svelte/store';
 import { dataEncoderEndpoint } from '$lib/stores/data-encoder-config';
 import {
-  Decode,
   convertPayloadToJsonWithCodec,
   convertPayloadToJsonWithWebsocket,
   decodePayloadAttributes,
+  type DecodeFunctions,
 } from '$lib/utilities/decode-payload';
 import { formatDate } from '$lib/utilities/format-date';
 import { has } from '$lib/utilities/has';
@@ -14,13 +14,6 @@ import { groupEvents } from '../event-groups';
 import { getEventCategory } from './get-event-categorization';
 import { getEventClassification } from './get-event-classification';
 import { simplifyAttributes } from './simplify-attributes';
-
-type DecodeFunctions = {
-  convertWithCodec?: Decode['convertPayloadToJsonWithCodec'];
-  convertWithWebsocket?: Decode['convertPayloadToJsonWithWebsocket'];
-  decodeAttributes?: Decode['decodePayloadAttributes'];
-  encoderEndpoint?: typeof dataEncoderEndpoint;
-};
 
 const getEndpoint = (
   settings: Settings,

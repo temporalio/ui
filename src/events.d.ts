@@ -47,6 +47,10 @@ interface PendingActivity extends PendingActivityInfo {
   activityType: { name: string };
 }
 
+type PendingActivityWithMetadata = {
+  activity: PendingActivity;
+} & EventRequestMetadata;
+
 type CommonEventKey =
   | 'id'
   | 'eventType'
