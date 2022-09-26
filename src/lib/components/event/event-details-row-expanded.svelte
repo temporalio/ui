@@ -12,26 +12,28 @@
     shouldDisplayAsExecutionLink,
     shouldDisplayAsTaskQueueLink,
     shouldDisplayAsPlainText,
+    shouldDisplayChildWorkflowLink,
   } from '$lib/utilities/get-single-attribute-for-event';
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Copyable from '../copyable.svelte';
+  import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
 
   export let key: string;
   export let value: string | Record<string, unknown>;
-
+  export let attributes: CombinedAttributes;
   export let inline = false;
 
-  const { workflow, namespace, run } = $page.params;
+  const { workflow, namespace } = $page.params;
 </script>
 
 <article class="row flex px-4 first:pt-0 {$$props.class}">
   {#if typeof value === 'object'}
     <div class="code-block-row">
-      <h2 class="text-sm">
+      <p class="text-sm">
         {format(key)}
-      </h2>
+      </p>
       <CodeBlock
         content={getCodeBlockValue(value)}
         class="w-full text-right lg:h-auto"
@@ -40,13 +42,34 @@
     </div>
   {:else if shouldDisplayAsExecutionLink(key)}
     <div class="detail-row">
-      <h2 class="text-sm">{format(key)}</h2>
+      <p class="text-sm">{format(key)}</p>
       <div class="text-sm">
         <Copyable
           content={value}
           container-class="flex-row-reverse xl:flex-row"
         >
-          <Link href={routeForWorkflow({ namespace, workflow, run: value })}>
+          <Link
+            newTab
+            href={routeForWorkflow({ namespace, workflow, run: value })}
+          >
+            {value}
+          </Link>
+        </Copyable>
+      </div>
+    </div>
+  {:else if shouldDisplayChildWorkflowLink(key, attributes)}
+    <div class="detail-row">
+      <p class="text-sm">{format(key)}</p>
+      <div class="text-sm">
+        <Copyable content={value} container-class="xl:flex-row">
+          <Link
+            newTab
+            href={routeForWorkflow({
+              namespace,
+              workflow: attributes.workflowExecutionWorkflowId,
+              run: attributes.workflowExecutionRunId,
+            })}
+          >
             {value}
           </Link>
         </Copyable>
@@ -54,10 +77,10 @@
     </div>
   {:else if shouldDisplayAsTaskQueueLink(key)}
     <div class="detail-row">
-      <h2 class="text-sm">{format(key)}</h2>
+      <p class="text-sm">{format(key)}</p>
       <div class="text-sm">
         <Copyable content={value} container-class="xl:flex-row">
-          <Link href={routeForTaskQueue({ namespace, queue: value })}>
+          <Link newTab href={routeForTaskQueue({ namespace, queue: value })}>
             {value}
           </Link>
         </Copyable>
@@ -65,7 +88,7 @@
     </div>
   {:else}
     <div class="detail-row">
-      <h2 class="text-sm">{format(key)}</h2>
+      <p class="text-sm">{format(key)}</p>
       <p class="text-sm">
         <span
           class="select-all px-2"

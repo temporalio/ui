@@ -1,5 +1,6 @@
 <script lang="ts">
   import Accordion from './accordion.svelte';
+  import Button from './button.svelte';
   import CodeBlock from './code-block.svelte';
   import TableHeaderRow from './table/table-header-row.svelte';
   import TableRow from './table/table-row.svelte';
@@ -58,6 +59,23 @@
       title="Certificates"
       subtitle="Expires on Wed Feb 01, 2030"
     >
+      <p>Accordion content here.</p>
+    </Accordion>
+  </Hst.Variant>
+
+  <Hst.Variant title="An Accordion with an error">
+    <Accordion
+      title="Certificates"
+      subtitle="Expired on Wed Feb 01, 2030"
+      error="Expired"
+    >
+      <p>Accordion content here.</p>
+    </Accordion>
+  </Hst.Variant>
+
+  <Hst.Variant title="An Accordion with an action">
+    <Accordion title="Certificates" subtitle="Expires on Wed Feb 01, 2030">
+      <Button class="!p-0" icon="info" variant="secondary" slot="action" />
       <p>Accordion content here.</p>
     </Accordion>
   </Hst.Variant>

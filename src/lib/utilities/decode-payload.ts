@@ -6,12 +6,21 @@ import type { DataConverterWebsocketInterface } from '$lib/utilities/data-conver
 import { convertPayloadWithWebsocket } from '$lib/services/data-converter';
 import { convertPayloadsWithCodec } from '$lib/services/data-encoder';
 
+import type { dataEncoderEndpoint } from '$lib/stores/data-encoder-config';
+
 import { atob } from './atob';
 
 export type Decode = {
   convertPayloadToJsonWithCodec: typeof convertPayloadToJsonWithCodec;
   convertPayloadToJsonWithWebsocket: typeof convertPayloadToJsonWithWebsocket;
   decodePayloadAttributes: typeof decodePayloadAttributes;
+};
+
+export type DecodeFunctions = {
+  convertWithCodec?: Decode['convertPayloadToJsonWithCodec'];
+  convertWithWebsocket?: Decode['convertPayloadToJsonWithWebsocket'];
+  decodeAttributes?: Decode['decodePayloadAttributes'];
+  encoderEndpoint?: typeof dataEncoderEndpoint;
 };
 
 export function decodePayload(

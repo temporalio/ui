@@ -1,5 +1,6 @@
 <script lang="ts">
   import Icon from '$holocene/icon/icon.svelte';
+  import Badge from '$holocene/badge.svelte';
   import type { IconName } from './icon/paths';
   export let title: string;
   export let subtitle: string = '';
@@ -7,12 +8,13 @@
   export let open: boolean = false;
   export let disabled: boolean = false;
   export let readOnly: boolean = false;
+  export let error: string = '';
 
   $: open = disabled ? true : open;
 </script>
 
 <section
-  class="flex w-full cursor-default flex-row rounded-lg border border-gray-300 bg-white p-8 {$$props.class}"
+  class="flex w-full cursor-default flex-row rounded-lg border border-gray-300 bg-white p-8 text-primary {$$props.class}"
 >
   <div class="w-full">
     <div
@@ -29,6 +31,9 @@
           {#if icon}<Icon name={icon} />{/if}
           {title}
         </h2>
+        <div class="mr-1" on:click|stopPropagation>
+          <slot name="action" />
+        </div>
         {#if !readOnly}
           <Icon
             name={open ? 'chevron-up' : 'chevron-down'}
@@ -36,7 +41,10 @@
           />
         {/if}
       </div>
-      <h3>{subtitle}</h3>
+      <h3 class="flex items-center">
+        {#if error} <Badge class="mr-2" type="error">{error}</Badge> {/if}
+        {subtitle}
+      </h3>
     </div>
     <div class="hidden w-full" class:content={open}>
       <slot />
