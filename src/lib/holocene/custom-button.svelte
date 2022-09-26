@@ -33,7 +33,7 @@
 
 <style lang="postcss">
   .button {
-    @apply relative flex w-fit items-center justify-center gap-2 rounded font-secondary text-sm transition px-2 py-1 hover:bg-gradient-to-r hover:from-blue-100 hover:to-purple-200 hover:text-gray-900;
+    @apply relative flex w-fit items-center justify-center gap-2 rounded px-2 py-1 font-secondary text-sm transition hover:bg-gradient-to-r hover:from-blue-100 hover:to-purple-200 hover:text-gray-900;
   }
 
   .active {
@@ -41,6 +41,6 @@
   }
 
   .primary {
-    @apply bg-blue-700 hover:from-gray-900 hover:to-gray-900 text-white hover:text-white;
+    @apply bg-blue-700 text-white hover:from-gray-900 hover:to-gray-900 hover:text-white;
   }
 </style>

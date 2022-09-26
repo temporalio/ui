@@ -86,7 +86,7 @@
   }
 
   .input-container {
-    @apply relative box-border inline-flex h-8 w-full items-center rounded border border-gray-900 text-sm focus-within:border-blue-700;
+    @apply relative box-border inline-flex h-10 w-full items-center rounded border border-gray-900 text-sm focus-within:border-blue-700;
   }
 
   .unroundRight {

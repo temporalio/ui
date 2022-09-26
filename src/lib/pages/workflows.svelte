@@ -28,8 +28,18 @@
   import Icon from '$holocene/icon/icon.svelte';
   import Select from '$lib/holocene/select/simple-select.svelte';
   import Option from '$lib/holocene/select/simple-option.svelte';
+  import WorkflowAdvancedFilters from '$lib/components/workflow/workflow-advanced-filters.svelte';
+  import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
+
+  let filters = [];
+  let sorts = [];
+
+  let bookmarkName = '';
+  let activeSearch;
+
+  let showFilters = true;
 
   const errorMessage =
     searchType === 'advanced'
@@ -49,6 +59,27 @@
     const parameters = query ? toListWorkflowParameters(query) : {};
     $workflowsSearch = { parameters, searchType };
   });
+
+  const onFilterChange = (filter: {
+    label: string;
+    value: string;
+    type: SearchAttributesValue;
+  }) => {
+    const conditionals = {
+      Keyword: '=',
+      Int: '=',
+      Datetime: 'In Last',
+    };
+    filters = [
+      {
+        filterType: filter.type,
+        value: '',
+        operator: '',
+        parenthesis: '',
+        conditional: conditionals[filter.type],
+      },
+    ];
+  };
 </script>
 
 <PageTitle
@@ -71,11 +102,14 @@
     >
   </div>
 </div>
-<WorkflowFilters bind:searchType />
+<WorkflowAdvancedFilters bind:filters bind:sorts />
 {#if $loading}
   <Loading />
 {:else if $workflows.length}
   <Pagination items={$workflows} updating={$updating} let:visibleItems>
+    <svelte:fragment slot="action-top-left">
+      <WorkflowAdvancedSearch bind:filters {sorts} {onFilterChange} />
+    </svelte:fragment>
     <svelte:fragment slot="action-top-right">
       <Select id="filter-by-relative-time" bind:value={$timeFormat}>
         <Option value={'relative'}>Relative</Option>

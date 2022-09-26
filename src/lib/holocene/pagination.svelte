@@ -60,18 +60,18 @@
       updating || $$slots['action-top-left'] ? 'justify-between' : 'justify-end'
     }`}
   >
-    {#if updating}
-      <p class="mr-6 text-gray-600">Updating…</p>
-    {:else}
+    <div class="flex flex-col">
       <slot name="action-top-left" />
-    {/if}
+      {#if updating}
+        <p class="mr-6 text-gray-600">Updating…</p>
+      {/if}
+    </div>
     <nav
       style={floatStyle}
       bind:clientHeight={height}
       class="flex justify-end gap-8"
     >
       <div class="flex items-center justify-center gap-2">
-        <p class="w-fit text-right">Per Page</p>
         <FilterSelect
           label="Per Page"
           parameter={perPageKey}
@@ -116,7 +116,6 @@
     <slot name="action-bottom-left" />
     <div class="flex gap-8">
       <div class="flex items-center justify-center gap-2">
-        <p class="w-fit text-right">Per Page</p>
         <FilterSelect
           label="Per Page"
           parameter={perPageKey}
