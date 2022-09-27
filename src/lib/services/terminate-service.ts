@@ -12,12 +12,13 @@ export async function terminateWorkflow({
   namespace,
   reason,
 }: TerminateWorkflowOptions): Promise<null> {
+  const route = await routeForApi('workflow.terminate', {
+    namespace,
+    workflowId: workflow.id,
+    runId: workflow.runId,
+  });
   return await requestFromAPI<null>(
-    routeForApi('workflow.terminate', {
-      namespace,
-      workflowId: workflow.id,
-      runId: workflow.runId,
-    }),
+    route,
     {
       options: { method: 'POST', body: JSON.stringify({ reason }) },
       shouldRetry: false,

@@ -30,13 +30,14 @@ export const fetchAllSchedules = async (
 ): Promise<ScheduleResponse> => {
   let error = '';
   const onError: ErrorCallback = (err) =>
-    (error =
-      err?.body?.message ??
-      `Error fetching schedules: ${err.status}: ${err.statusText}`);
+  (error =
+    err?.body?.message ??
+    `Error fetching schedules: ${err.status}: ${err.statusText}`);
 
+  const route = await routeForApi('schedules', { namespace });
   const { schedules, nextPageToken } =
     (await requestFromAPI<ListScheduleResponse>(
-      routeForApi('schedules', { namespace }),
+      route,
       {
         params: {},
         onError,
@@ -55,14 +56,16 @@ export async function fetchSchedule(
   parameters: ScheduleParameters,
   request = fetch,
 ): Promise<DescribeScheduleResponse> {
-  return requestFromAPI(routeForApi('schedule', parameters), { request });
+  const route = await routeForApi('schedule', parameters);
+  return requestFromAPI(route, { request });
 }
 
 export async function deleteSchedule(
   parameters: ScheduleParameters,
   request = fetch,
 ): Promise<void> {
-  return requestFromAPI(routeForApi('schedule.delete', parameters), {
+  const route = await routeForApi('schedule.delete', parameters);
+  return requestFromAPI(route, {
     request,
     options: { method: 'DELETE' },
   });
@@ -79,14 +82,15 @@ export async function createSchedule({
 }: CreateScheduleOptions): Promise<{ error: string; conflictToken: string }> {
   let error = '';
   const onError: ErrorCallback = (err) =>
-    (error =
-      err?.body?.message ??
-      `Error creating schedule: ${err.status}: ${err.statusText}`);
+  (error =
+    err?.body?.message ??
+    `Error creating schedule: ${err.status}: ${err.statusText}`);
 
+  const route = await routeForApi('schedules', {
+    namespace,
+  });
   const { conflictToken } = await requestFromAPI<{ conflictToken: string }>(
-    routeForApi('schedules', {
-      namespace,
-    }),
+    route,
     {
       options: {
         method: 'POST',
@@ -115,11 +119,12 @@ export async function editSchedule({
   scheduleId,
   body,
 }: EditScheduleOptions): Promise<null> {
+  const route = await routeForApi('schedule', {
+    namespace,
+    scheduleId,
+  });
   return await requestFromAPI<null>(
-    routeForApi('schedule', {
-      namespace,
-      scheduleId,
-    }),
+    route,
     {
       options: {
         method: 'POST',
@@ -151,11 +156,12 @@ export async function pauseSchedule({
     },
   };
 
+  const route = await routeForApi('schedule', {
+    namespace,
+    scheduleId: scheduleId,
+  });
   return await requestFromAPI<null>(
-    routeForApi('schedule', {
-      namespace,
-      scheduleId: scheduleId,
-    }),
+    route,
     {
       options: {
         method: 'PATCH',
@@ -187,11 +193,12 @@ export async function unpauseSchedule({
     },
   };
 
+  const route = await routeForApi('schedule', {
+    namespace,
+    scheduleId: scheduleId,
+  });
   return await requestFromAPI<null>(
-    routeForApi('schedule', {
-      namespace,
-      scheduleId: scheduleId,
-    }),
+    route,
     {
       options: {
         method: 'PATCH',

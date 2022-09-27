@@ -9,7 +9,8 @@ export const fetchCluster = async (
 ): Promise<GetClusterInfoResponse> => {
   if (settings.runtimeEnvironment.isCloud) return;
 
-  return await requestFromAPI(routeForApi('cluster'), {
+  const route = await routeForApi('cluster');
+  return await requestFromAPI(route, {
     request,
   }).then((clusterInformation) => {
     cluster.set(clusterInformation);

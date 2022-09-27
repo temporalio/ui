@@ -53,9 +53,10 @@ export const fetchAllWorkflows = async (
     error = 'Failed to fetch workflows';
   };
 
+  const route = await routeForApi(endpoint, { namespace })
   const { executions, nextPageToken } =
     (await requestFromAPI<ListWorkflowExecutionsResponse>(
-      routeForApi(endpoint, { namespace }),
+      route,
       {
         params: { query },
         onError,
@@ -83,7 +84,8 @@ export async function fetchWorkflow(
   parameters: GetWorkflowExecutionRequest,
   request = fetch,
 ): Promise<WorkflowExecution> {
-  return requestFromAPI(routeForApi('workflow', parameters), { request }).then(
+  const route = await routeForApi('workflow', parameters);
+  return requestFromAPI(route, { request }).then(
     toWorkflowExecution,
   );
 }

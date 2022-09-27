@@ -29,13 +29,14 @@ export async function getPollers(
   options = { returnAllPollers: false },
   request = fetch,
 ): Promise<GetPollersResponse> {
+  const route = await routeForApi('task-queue', parameters);
   const workflowPollers = await requestFromAPI<GetPollersResponse>(
-    routeForApi('task-queue', parameters),
+    route,
     { request, params: { taskQueueType: '1' } },
   );
 
   const activityPollers = await requestFromAPI<GetPollersResponse>(
-    routeForApi('task-queue', parameters),
+    route,
     { request, params: { taskQueueType: '2' } },
   );
 
@@ -57,7 +58,7 @@ export async function getPollers(
       pollers[poller.identity] = {
         lastAccessTime:
           !currentPoller.lastAccessTime ||
-          currentPoller.lastAccessTime < poller.lastAccessTime
+            currentPoller.lastAccessTime < poller.lastAccessTime
             ? poller.lastAccessTime
             : currentPoller.lastAccessTime,
         taskQueueTypes: currentPoller.taskQueueTypes.concat([type]),

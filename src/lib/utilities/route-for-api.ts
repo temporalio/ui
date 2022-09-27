@@ -1,12 +1,13 @@
 import { getApiOrigin } from './get-api-origin';
 import { publicPath } from './get-public-path';
 
-const base = (namespace?: string): string => {
+const base = async (namespace?: string): Promise<string> => {
   let baseUrl = '';
 
-  const configNamespace = globalThis?.AppConfig?.namespaces?.find(n => n.namespace === namespace)
-  if (configNamespace) {
-    baseUrl = configNamespace.webUri;
+  if (globalThis?.GetNamespaces) {
+    const namespaces = await globalThis?.GetNamespaces();
+    const configNamespace = namespaces?.find(n => n.namespace === namespace)
+    baseUrl = configNamespace?.webUri;
   } else {
     baseUrl = getApiOrigin();
   }
@@ -17,9 +18,10 @@ const base = (namespace?: string): string => {
   return baseUrl;
 };
 
-const withBase = (endpoint: string, namespace?: string): string => {
+const withBase = async (endpoint: string, namespace?: string): Promise<string> => {
   if (endpoint.startsWith('/')) endpoint = endpoint.slice(1);
-  return `${base(namespace)}/api/v1/${endpoint}`;
+  const baseUrl = await base(namespace);
+  return `${baseUrl}/api/v1/${endpoint}`;
 };
 
 const encode = (parameters: APIRouteParameters): APIRouteParameters => {
@@ -42,34 +44,34 @@ export function routeForApi(
   route: WorkflowsAPIRoutePath,
   parameters: WorkflowListRouteParameters,
   shouldEncode?: boolean,
-): string;
+): Promise<string>;
 export function routeForApi(
   route: SchedulesAPIRoutePath,
   parameters: ScheduleListRouteParameters,
-): string;
+): Promise<string>;
 export function routeForApi(
   route: WorkflowAPIRoutePath,
   parameters: WorkflowRouteParameters,
   shouldEncode?: boolean,
-): string;
+): Promise<string>;
 export function routeForApi(
   route: ScheduleAPIRoutePath,
   parameters: ScheduleRouteParameters,
   shouldEncode?: boolean,
-): string;
+): Promise<string>;
 export function routeForApi(
   route: TaskQueueAPIRoutePath,
   parameters: TaskQueueRouteParameters,
   shouldEncode?: boolean,
-): string;
+): Promise<string>;
 export function routeForApi(
   route: ParameterlessAPIRoutePath | SearchAttributesRoutePath,
-): string;
+): Promise<string>;
 export function routeForApi(
   route: APIRoutePath,
   parameters?: APIRouteParameters,
   shouldEncode = true,
-): string {
+): Promise<string> {
   if (shouldEncode) parameters = encode(parameters);
 
   const routes: { [K in APIRoutePath]: string } = {
