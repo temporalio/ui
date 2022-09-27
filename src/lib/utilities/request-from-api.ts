@@ -137,10 +137,7 @@ const withAuth = async (
   if (getUser().accessToken) {
     options.headers = await withBearerToken(
       options?.headers,
-      () =>
-        new Promise((resolve) => {
-          resolve(getUser().accessToken);
-        }),
+      async () => getUser().accessToken,
       isBrowser,
     );
     options.headers = withIdToken(
@@ -183,21 +180,14 @@ const withBearerToken = async (
 };
 
 const withIdToken = (
-  headers: HeadersInit,
+  headers: HeadersInit = {},
   idToken: string,
   isBrowser = browser,
 ): HeadersInit => {
-  // At this point in the code path, headers will always be set.
-  /* c8 ignore next */
-  if (!headers) headers = {};
   if (!isBrowser) return headers;
 
-  try {
-    if (idToken) {
-      headers['Authorization-Extras'] = idToken;
-    }
-  } catch (e) {
-    console.error(e);
+  if (idToken) {
+    headers['Authorization-Extras'] = idToken;
   }
 
   return headers;
