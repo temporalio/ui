@@ -136,7 +136,7 @@
         </div>
       </NavRow>
     {:then user}
-      {#if user?.email}
+      {#if user?.accessToken}
         <NavRow {isCloud} on:click={logout}>
           <NavTooltip right text="Logout">
             <div class="nav-icon">

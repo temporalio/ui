@@ -56,7 +56,7 @@ type Settings = {
   baseUrl: string;
   codec: {
     endpoint?: string;
-    accessToken?: string;
+    passAccessToken?: boolean;
   };
   defaultNamespace: string;
   disableWriteActions: boolean;
@@ -72,6 +72,8 @@ type Settings = {
 };
 
 type User = {
+  accessToken?: string;
+  idToken?: string;
   name?: string;
   given_name?: string;
   family_name?: string;

@@ -23,7 +23,7 @@ const getEndpoint = (
 };
 
 export async function getEventAttributes(
-  { historyEvent, namespace, settings }: EventWithMetadata,
+  { historyEvent, namespace, settings, accessToken }: EventWithMetadata,
   {
     convertWithCodec = convertPayloadToJsonWithCodec,
     convertWithWebsocket = convertPayloadToJsonWithWebsocket,
@@ -41,6 +41,7 @@ export async function getEventAttributes(
         attributes,
         namespace,
         settings: _settings,
+        accessToken,
       })
     : await convertWithWebsocket(attributes);
 
@@ -56,6 +57,7 @@ const toEvent = async ({
   historyEvent,
   namespace,
   settings,
+  accessToken,
 }: EventWithMetadata): Promise<WorkflowEvent> => {
   const id = String(historyEvent.eventId);
   const eventType = historyEvent.eventType as unknown as EventType;
@@ -66,6 +68,7 @@ const toEvent = async ({
     historyEvent,
     namespace,
     settings,
+    accessToken,
   }).then((attributes) => simplifyAttributes(attributes));
 
   return {
@@ -84,13 +87,14 @@ export const toEventHistory = async ({
   response,
   namespace,
   settings,
+  accessToken,
 }: EventsWithMetadata): Promise<{
   events: WorkflowEvents;
   eventGroups: EventGroups;
 }> => {
   const events = await Promise.all(
     response.map((historyEvent) =>
-      toEvent({ historyEvent, namespace, settings }),
+      toEvent({ historyEvent, namespace, settings, accessToken }),
     ),
   );
 

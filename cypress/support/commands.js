@@ -25,6 +25,7 @@
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
 import settings from '../fixtures/settings.json';
+import user from '../fixtures/user.json';
 
 Cypress.Commands.add('interceptNamespacesApi', () => {
   cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/namespaces*', {
@@ -55,10 +56,8 @@ Cypress.Commands.add(
   },
 );
 
-Cypress.Commands.add('interceptUserApi', () => {
-  cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/me*', {
-    fixture: 'me.json',
-  }).as('user-api');
+Cypress.Commands.add('login', () => {
+  window.localStorage.setItem('user', JSON.stringify(user));
 });
 
 Cypress.Commands.add('interceptClusterApi', (fixture = 'cluster.json') => {
@@ -125,7 +124,6 @@ Cypress.Commands.add(
   ({ namespace } = { namespace: 'default' }) => {
     cy.interceptNamespacesApi();
     cy.interceptWorkflowsApi();
-    cy.interceptUserApi();
     cy.interceptClusterApi();
     cy.interceptArchivedWorkflowsApi();
     cy.interceptGithubReleasesApi();

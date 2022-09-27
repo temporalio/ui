@@ -58,7 +58,7 @@ export const fetchAllWorkflows = async (
     (await requestFromAPI<ListWorkflowExecutionsResponse>(route, {
       params: { query },
       onError,
-      handleError,
+      handleError: onError,
       request,
     })) ?? { executions: [], nextPageToken: '' };
 
