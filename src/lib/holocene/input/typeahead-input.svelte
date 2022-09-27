@@ -62,6 +62,7 @@
     bind:value
     {placeholder}
     on:focus={() => (showMenu = true)}
+    on:blur={() => (showMenu = false)}
   />
   <Menu show={showMenu} id={`menu-${id}`} class="h-auto max-h-80">
     {#each filterOptions as { label, value }}

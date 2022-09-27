@@ -16,7 +16,13 @@
 
 <MenuContainer class={$$props.class}>
   <div class="split-button" class:disabled>
-    <MenuButton class="segment right" bind:show controls={id} {disabled}>
+    <slot name="middle-button" />
+    <MenuButton
+      class="segment right {$$props.buttonClass}"
+      bind:show
+      controls={id}
+      {disabled}
+    >
       {#if icon}
         <Icon name={icon} />
       {/if}
@@ -31,7 +37,7 @@
 
 <style lang="postcss">
   .split-button {
-    @apply flex h-10 grow cursor-pointer flex-row gap-[1px] font-secondary;
+    @apply flex h-10 grow cursor-pointer flex-row gap-[0px] font-secondary;
 
     :global(.segment) {
       @apply relative flex w-fit items-center justify-center py-2 font-secondary text-sm;

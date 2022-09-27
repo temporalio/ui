@@ -63,7 +63,7 @@
     <div class="flex flex-col">
       <slot name="action-top-left" />
       {#if updating}
-        <p class="mr-6 text-gray-600">Updating…</p>
+        <p class="mr-6 h-4 text-sm text-gray-500">Updating…</p>
       {/if}
     </div>
     <nav
