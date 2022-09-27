@@ -10,6 +10,8 @@
 
   let rawEvents: HistoryEvent[] | { events: HistoryEvent[] };
 
+  export let user: User = {};
+
   const onFileSelect = async (e: Event) => {
     const target = e.target as HTMLInputElement;
     const file = target?.files?.[0];
@@ -33,6 +35,7 @@
         response: Array.isArray(rawEvents) ? rawEvents : rawEvents?.events,
         namespace: importSettings.defaultNamespace,
         settings: importSettings,
+        accessToken: user.accessToken,
       });
       importEvents.set(events);
       importEventGroups.set(eventGroups);

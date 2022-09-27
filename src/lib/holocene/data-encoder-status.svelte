@@ -14,7 +14,7 @@
 <DataEncoderSettings
   showSettings={$showDataEncoderSettings}
   {onCancel}
-  accessToken={$dataEncoder.accessToken}
+  passAccessToken={$dataEncoder.passAccessToken}
 />
 {#if $dataEncoder?.hasEndpointOrPortConfigured}
   {#if $dataEncoder?.hasNotRequested}

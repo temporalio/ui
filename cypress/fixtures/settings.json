@@ -6,5 +6,5 @@
   "ShowTemporalSystemNamespace": false,
   "FeedbackURL": "",
   "NotifyOnNewVersion": true,
-  "Codec": { "Endpoint": "", "AccessToken": "" }
+  "Codec": { "Endpoint": "", "PassAccessToken": false }
 }

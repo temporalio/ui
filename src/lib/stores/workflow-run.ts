@@ -8,21 +8,24 @@ import { getPollers } from '$lib/services/pollers-service';
 import type { GetPollersResponse } from '$lib/services/pollers-service';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { toDecodedPendingActivities } from '$lib/models/pending-activities';
+import { user } from '$lib/stores/user';
 
 export const refresh = writable(0);
 const namespace = derived([page], ([$page]) => $page.params.namespace);
 const workflowId = derived([page], ([$page]) => $page.params.workflow);
 const runId = derived([page], ([$page]) => $page.params.run);
 const settings = derived([page], ([$page]) => $page.stuff.settings);
+const accessToken = derived([user], ([$user]) => $user?.accessToken);
 
 const parameters = derived(
-  [namespace, workflowId, runId, settings, refresh],
-  ([$namespace, $workflowId, $runId, $settings, $refresh]) => {
+  [namespace, workflowId, runId, settings, accessToken, refresh],
+  ([$namespace, $workflowId, $runId, $settings, $accessToken, $refresh]) => {
     return {
       namespace: $namespace,
       workflowId: decodeURIForSvelte($workflowId ?? ''),
       runId: $runId,
       settings: $settings,
+      accessToken: $accessToken,
       refresh: $refresh,
     };
   },
@@ -38,25 +41,32 @@ const updateWorkflowRun: StartStopNotifier<{
   workflow: WorkflowExecution;
   workers: GetPollersResponse;
 }> = (set) => {
-  return parameters.subscribe(({ namespace, workflowId, runId, settings }) => {
-    if (namespace && workflowId && runId) {
-      withLoading(loading, updating, async () => {
-        const workflow = await fetchWorkflow({ namespace, workflowId, runId });
-        const { taskQueue } = workflow;
-        const workers = await getPollers({ queue: taskQueue, namespace });
-        workflow.pendingActivities = await toDecodedPendingActivities(
-          workflow,
-          namespace,
-          settings,
-        );
+  return parameters.subscribe(
+    ({ namespace, workflowId, runId, settings, accessToken }) => {
+      if (namespace && workflowId && runId) {
+        withLoading(loading, updating, async () => {
+          const workflow = await fetchWorkflow({
+            namespace,
+            workflowId,
+            runId,
+          });
+          const { taskQueue } = workflow;
+          const workers = await getPollers({ queue: taskQueue, namespace });
+          workflow.pendingActivities = await toDecodedPendingActivities(
+            workflow,
+            namespace,
+            settings,
+            accessToken,
+          );
 
-        set({ workflow, workers });
-      });
-    } else {
-      loading.set(true);
-      updating.set(false);
-    }
-  });
+          set({ workflow, workers });
+        });
+      } else {
+        loading.set(true);
+        updating.set(false);
+      }
+    },
+  );
 };
 
 export const updating = writable(true);
