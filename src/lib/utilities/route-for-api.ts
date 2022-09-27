@@ -4,7 +4,7 @@ import { publicPath } from './get-public-path';
 const base = async (namespace?: string): Promise<string> => {
   let baseUrl = '';
 
-  if (globalThis?.GetNamespaces) {
+  if (globalThis?.GetNamespaces && namespace) {
     const namespaces = await globalThis?.GetNamespaces();
     const configNamespace = namespaces?.find((n) => n.namespace === namespace);
     baseUrl = configNamespace?.webUri ?? getApiOrigin();
