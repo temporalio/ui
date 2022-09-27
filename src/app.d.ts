@@ -12,7 +12,6 @@ declare namespace App {
     workflow?: WorkflowExecution;
     namespaces: ListNamespacesResponse;
     settings: Settings;
-    user: User;
     workers?: GetPollersResponse;
     cluster?: ClusterInformation;
   }

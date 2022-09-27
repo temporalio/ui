@@ -32,8 +32,6 @@ const settings: Settings = {
   version: '2.0.0',
 };
 
-const user: User = {};
-
 const stuff: App.Stuff = {
   namespaces: [
     {
@@ -162,7 +160,6 @@ const stuff: App.Stuff = {
     },
   ],
   settings,
-  user,
 };
 
 export const page = readable<Page>({
