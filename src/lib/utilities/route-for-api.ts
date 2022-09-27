@@ -6,8 +6,8 @@ const base = async (namespace?: string): Promise<string> => {
 
   if (globalThis?.GetNamespaces) {
     const namespaces = await globalThis?.GetNamespaces();
-    const configNamespace = namespaces?.find(n => n.namespace === namespace)
-    baseUrl = configNamespace?.webUri;
+    const configNamespace = namespaces?.find((n) => n.namespace === namespace);
+    baseUrl = configNamespace?.webUri ?? getApiOrigin();
   } else {
     baseUrl = getApiOrigin();
   }
@@ -18,7 +18,10 @@ const base = async (namespace?: string): Promise<string> => {
   return baseUrl;
 };
 
-const withBase = async (endpoint: string, namespace?: string): Promise<string> => {
+const withBase = async (
+  endpoint: string,
+  namespace?: string,
+): Promise<string> => {
   if (endpoint.startsWith('/')) endpoint = endpoint.slice(1);
   const baseUrl = await base(namespace);
   return `${baseUrl}/api/v1/${endpoint}`;

@@ -17,12 +17,9 @@ export async function terminateWorkflow({
     workflowId: workflow.id,
     runId: workflow.runId,
   });
-  return await requestFromAPI<null>(
-    route,
-    {
-      options: { method: 'POST', body: JSON.stringify({ reason }) },
-      shouldRetry: false,
-      notifyOnError: false,
-    },
-  );
+  return await requestFromAPI<null>(route, {
+    options: { method: 'POST', body: JSON.stringify({ reason }) },
+    shouldRetry: false,
+    notifyOnError: false,
+  });
 }

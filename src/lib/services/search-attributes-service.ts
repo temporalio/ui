@@ -9,12 +9,9 @@ export const fetchSearchAttributes = async (
   if (settings.runtimeEnvironment.isCloud) return;
 
   const route = await routeForApi('search-attributes');
-  return await requestFromAPI<SearchAttributesResponse>(
-    route,
-    {
-      request,
-    },
-  ).then((searchAttributesResponse) => {
+  return await requestFromAPI<SearchAttributesResponse>(route, {
+    request,
+  }).then((searchAttributesResponse) => {
     if (searchAttributesResponse?.keys) {
       searchAttributes.set(searchAttributesResponse.keys);
     }

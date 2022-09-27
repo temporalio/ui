@@ -30,20 +30,17 @@ export const fetchAllSchedules = async (
 ): Promise<ScheduleResponse> => {
   let error = '';
   const onError: ErrorCallback = (err) =>
-  (error =
-    err?.body?.message ??
-    `Error fetching schedules: ${err.status}: ${err.statusText}`);
+    (error =
+      err?.body?.message ??
+      `Error fetching schedules: ${err.status}: ${err.statusText}`);
 
   const route = await routeForApi('schedules', { namespace });
   const { schedules, nextPageToken } =
-    (await requestFromAPI<ListScheduleResponse>(
-      route,
-      {
-        params: {},
-        onError,
-        request,
-      },
-    )) ?? { schedules: [], nextPageToken: '' };
+    (await requestFromAPI<ListScheduleResponse>(route, {
+      params: {},
+      onError,
+      request,
+    })) ?? { schedules: [], nextPageToken: '' };
 
   return {
     schedules,
@@ -82,9 +79,9 @@ export async function createSchedule({
 }: CreateScheduleOptions): Promise<{ error: string; conflictToken: string }> {
   let error = '';
   const onError: ErrorCallback = (err) =>
-  (error =
-    err?.body?.message ??
-    `Error creating schedule: ${err.status}: ${err.statusText}`);
+    (error =
+      err?.body?.message ??
+      `Error creating schedule: ${err.status}: ${err.statusText}`);
 
   const route = await routeForApi('schedules', {
     namespace,
@@ -123,20 +120,17 @@ export async function editSchedule({
     namespace,
     scheduleId,
   });
-  return await requestFromAPI<null>(
-    route,
-    {
-      options: {
-        method: 'POST',
-        body: JSON.stringify({
-          request_id: uuidv4(),
-          ...body,
-        }),
-      },
-      shouldRetry: false,
-      onError: (error) => console.error(error),
+  return await requestFromAPI<null>(route, {
+    options: {
+      method: 'POST',
+      body: JSON.stringify({
+        request_id: uuidv4(),
+        ...body,
+      }),
     },
-  );
+    shouldRetry: false,
+    onError: (error) => console.error(error),
+  });
 }
 
 type PauseScheduleOptions = {
@@ -160,20 +154,17 @@ export async function pauseSchedule({
     namespace,
     scheduleId: scheduleId,
   });
-  return await requestFromAPI<null>(
-    route,
-    {
-      options: {
-        method: 'PATCH',
-        body: JSON.stringify({
-          ...options,
-          request_id: uuidv4(),
-        }),
-      },
-      shouldRetry: false,
-      onError: (error) => console.error(error),
+  return await requestFromAPI<null>(route, {
+    options: {
+      method: 'PATCH',
+      body: JSON.stringify({
+        ...options,
+        request_id: uuidv4(),
+      }),
     },
-  );
+    shouldRetry: false,
+    onError: (error) => console.error(error),
+  });
 }
 
 type UnpauseScheduleOptions = {
@@ -197,17 +188,14 @@ export async function unpauseSchedule({
     namespace,
     scheduleId: scheduleId,
   });
-  return await requestFromAPI<null>(
-    route,
-    {
-      options: {
-        method: 'PATCH',
-        body: JSON.stringify({
-          ...options,
-          request_id: uuidv4(),
-        }),
-      },
-      shouldRetry: false,
+  return await requestFromAPI<null>(route, {
+    options: {
+      method: 'PATCH',
+      body: JSON.stringify({
+        ...options,
+        request_id: uuidv4(),
+      }),
     },
-  );
+    shouldRetry: false,
+  });
 }

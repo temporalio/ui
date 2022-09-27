@@ -9,10 +9,12 @@ const parameters = {
 };
 
 vi.stubGlobal('GetNamespaces', async () => {
-  return [{
-    namespace: 'namespace',
-    webUri: 'https://api.url/',
-  }]
+  return [
+    {
+      namespace: 'namespace',
+      webUri: 'https://api.url/',
+    },
+  ];
 });
 
 describe('routeForApi with AppConfig.apiUrl', () => {
