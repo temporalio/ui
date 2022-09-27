@@ -9,7 +9,10 @@ const parameters = {
 };
 
 vi.stubGlobal('AppConfig', {
-  apiUrl: 'https://api.url/',
+  namespaces: [{
+    namespace: 'namespace',
+    webUri: 'https://api.url/',
+  }]
 });
 
 describe('routeForApi with AppConfig.apiUrl', () => {

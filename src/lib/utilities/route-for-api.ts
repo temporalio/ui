@@ -1,18 +1,12 @@
 import { getApiOrigin } from './get-api-origin';
 import { publicPath } from './get-public-path';
 
-const replaceNamespaceInApiUrl = (
-  apiUrl: string,
-  namespace: string,
-): string => {
-  return apiUrl.replace('%namespace%', namespace);
-};
-
 const base = (namespace?: string): string => {
   let baseUrl = '';
 
-  if (globalThis?.AppConfig?.apiUrl && namespace) {
-    baseUrl = replaceNamespaceInApiUrl(globalThis.AppConfig.apiUrl, namespace);
+  const configNamespace = globalThis?.AppConfig?.namespaces?.find(n => n.namespace === namespace)
+  if (configNamespace) {
+    baseUrl = configNamespace.webUri;
   } else {
     baseUrl = getApiOrigin();
   }
