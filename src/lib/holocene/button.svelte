@@ -24,6 +24,7 @@
   export let dataCy: string = $$props.dataCy;
   export let count: number = 0;
   export let type: string = 'button';
+  export let unroundLeft: boolean = false;
 </script>
 
 {#if as === 'button'}
@@ -33,6 +34,7 @@
     class:selected={active}
     class:large
     class:thin
+    class:unroundLeft
     data-cy={dataCy}
     {type}
     {disabled}
@@ -138,5 +140,9 @@
 
   .thin {
     @apply h-8 py-1;
+  }
+
+  .unroundLeft {
+    @apply rounded-tl-none rounded-bl-none;
   }
 </style>

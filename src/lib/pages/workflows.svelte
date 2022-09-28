@@ -11,7 +11,6 @@
     workflowError,
   } from '$lib/stores/workflows';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import { timeFormat } from '$lib/stores/time-format';
 
   import { getSearchType } from '$lib/utilities/search-type-parameter';
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
@@ -31,6 +30,7 @@
   import WorkflowAdvancedFilters from '$lib/components/workflow/workflow-advanced-filters.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import TableRow from '$holocene/table/table-row.svelte';
+  import WorkflowDateTime from '$lib/components/workflow/workflow-datetime-filter.svelte';
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
 
@@ -111,12 +111,8 @@
     <svelte:fragment slot="action-top-left">
       <WorkflowAdvancedSearch bind:filters {sorts} {onFilterChange} />
     </svelte:fragment>
-    <svelte:fragment slot="action-top-right">
-      <Select id="filter-by-relative-time" bind:value={$timeFormat}>
-        <Option value={'relative'}>Relative</Option>
-        <Option value={'UTC'}>UTC</Option>
-        <Option value={'local'}>Local</Option>
-      </Select>
+    <svelte:fragment slot="action-top-center">
+      <WorkflowDateTime />
     </svelte:fragment>
     <WorkflowsSummaryTable updating={$updating}>
       {#each visibleItems as event}
