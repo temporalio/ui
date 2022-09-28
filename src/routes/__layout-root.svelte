@@ -59,6 +59,7 @@
 </script>
 
 <script lang="ts">
+  import { updated } from '$app/stores';
   import Header from './_header.svelte';
   import Notifications from '$lib/components/notifications.svelte';
   import Banners from '$lib/components/banner/banners.svelte';
@@ -68,6 +69,13 @@
 
   export let user: User;
   export let uiVersionInfo: UiVersionInfo;
+
+  updated.subscribe(async (value) => {
+    if (value) {
+      // Hard refresh when version does not match
+      window.location.reload();
+    }
+  });
 </script>
 
 <PageTitle />
