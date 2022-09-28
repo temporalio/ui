@@ -1,6 +1,6 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
-  import { slide } from 'svelte/transition';
+  import { fly } from 'svelte/transition';
   import { page } from '$app/stores';
 
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
@@ -71,26 +71,32 @@
   <div class="mb-4 flex items-center gap-4">
     <div class="flex h-12 w-full items-center gap-0" in:fade>
       {#if manualSearch}
-        <Input
-          id="manual-search"
-          placeholder="Enter or paste"
-          icon="search"
-          class="w-[600px]"
-          unroundRight
-          bind:value={manualSearchString}
-        />
+        <div in:fly={{ x: 200, duration: 300 }}>
+          <Input
+            id="manual-search"
+            placeholder="Enter or paste"
+            icon="search"
+            class="w-[600px]"
+            unroundRight
+            autoFocus
+            bind:value={manualSearchString}
+          />
+        </div>
       {:else}
-        <TypeaheadInput
-          icon="search"
-          placeholder="Filter workflows"
-          class="w-80"
-          id="filter-type-name"
-          options={filterTypeOptions}
-          onChange={(filterType) =>
-            onFilterChange(
-              filterTypeOptions.find((o) => o.value === filterType),
-            )}
-        />
+        <div in:fly={{ x: 200, duration: 300 }}>
+          <TypeaheadInput
+            icon="search"
+            placeholder="Filter workflows"
+            class="w-80"
+            id="filter-type-name"
+            autoFocus
+            options={filterTypeOptions}
+            onChange={(filterType) =>
+              onFilterChange(
+                filterTypeOptions.find((o) => o.value === filterType),
+              )}
+          />
+        </div>
       {/if}
       <CustomSplitButton
         class="rounded-tr rounded-br bg-offWhite"

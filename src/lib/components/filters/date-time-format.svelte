@@ -22,23 +22,25 @@
 </script>
 
 <DropdownMenu {value} right dataCy="date-time-format-filter">
-  {#each dateOptions as { label, option } (option)}
-    <div
-      class="option"
-      class:active={$timeFormat === option}
-      on:click={() => onDateOptionClick(option)}
-      data-cy="event-date-filter-{option}"
-    >
-      <div class="check">
-        {#if $timeFormat === option}
-          <Icon name="checkmark" />
-        {/if}
+  <div class="w-56">
+    {#each dateOptions as { label, option } (option)}
+      <div
+        class="option"
+        class:active={$timeFormat === option}
+        on:click={() => onDateOptionClick(option)}
+        data-cy="event-date-filter-{option}"
+      >
+        <div class="check">
+          {#if $timeFormat === option}
+            <Icon name="checkmark" />
+          {/if}
+        </div>
+        <div class="label">
+          {label}
+        </div>
       </div>
-      <div class="label">
-        {label}
-      </div>
-    </div>
-  {/each}
+    {/each}
+  </div>
 </DropdownMenu>
 
 <style lang="postcss">
