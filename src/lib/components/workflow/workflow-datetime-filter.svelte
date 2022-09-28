@@ -13,20 +13,23 @@
   import Option from '$lib/holocene/select/option.svelte';
   import CustomSplitButton from '$lib/holocene/custom-split-button.svelte';
 
-  const defaultQuery = toListWorkflowQuery({ timeRange: 'All' });
-  $: query = $page.url.searchParams.get('query');
-  $: parameters = toListWorkflowParameters(query ?? defaultQuery);
+  export let datetimeFilter = [];
 
-  const handleParameterChange = debounce(() => {
-    query = toListWorkflowQuery(parameters);
-
-    updateQueryParameters({
-      url: $page.url,
-      parameter: 'query',
-      value: query,
-      allowEmpty: true,
-    });
-  }, 300);
+  const onChange = (value: string) => {
+    if (value === 'All') {
+      datetimeFilter = [];
+    } else {
+      datetimeFilter = [
+        {
+          filterType: 'StartTime',
+          value,
+          conditional: '=',
+          operator: '',
+          parenthesis: '',
+        },
+      ];
+    }
+  };
 </script>
 
 <div class="flex items-center">
@@ -35,14 +38,13 @@
     id="time-range-filter"
     placeholder="Start Time"
     unroundRight
-    bind:value={parameters.timeRange}
-    onChange={handleParameterChange}
+    {onChange}
   >
     {#each durations as value}
       <Option {value}>{value}</Option>
     {/each}
-    <Option value={'custom'}>Custom</Option>
-    <Option value={'all Time'}>All Time</Option>
+    <Option value={'Custom'}>Custom</Option>
+    <Option value={'All'}>All Time</Option>
   </Select>
   <CustomSplitButton
     class="rounded-tr rounded-br bg-offWhite"

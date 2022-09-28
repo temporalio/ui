@@ -60,9 +60,7 @@
       $$slots['action-top-left'] ? 'justify-between' : 'justify-end'
     }`}
   >
-    <div class="flex flex-col">
-      <slot name="action-top-left" />
-    </div>
+    <slot name="action-top-left" />
     <nav
       style={floatStyle}
       bind:clientHeight={height}
