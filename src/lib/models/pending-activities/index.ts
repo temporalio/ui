@@ -15,7 +15,7 @@ const getEndpoint = (
 };
 
 export async function getActivityAttributes(
-  { activity, namespace, settings }: PendingActivityWithMetadata,
+  { activity, namespace, settings, accessToken }: PendingActivityWithMetadata,
   {
     convertWithCodec = convertPayloadToJsonWithCodec,
     convertWithWebsocket = convertPayloadToJsonWithWebsocket,
@@ -32,6 +32,7 @@ export async function getActivityAttributes(
         attributes: activity,
         namespace,
         settings: _settings,
+        accessToken,
       })
     : await convertWithWebsocket(activity);
 
@@ -45,11 +46,13 @@ const decodePendingActivity = async ({
   activity,
   namespace,
   settings,
+  accessToken,
 }: PendingActivityWithMetadata): Promise<PendingActivity> => {
   const decodedActivity = await getActivityAttributes({
     activity,
     namespace,
     settings,
+    accessToken,
   });
   return decodedActivity;
 };
@@ -58,6 +61,7 @@ export const toDecodedPendingActivities = async (
   workflow: WorkflowExecution,
   namespace: string,
   settings: Settings,
+  accessToken: string,
 ) => {
   const pendingActivities = workflow?.pendingActivities ?? [];
   const decodedActivities: PendingActivity[] = [];
@@ -66,6 +70,7 @@ export const toDecodedPendingActivities = async (
       activity,
       namespace,
       settings,
+      accessToken,
     });
     decodedActivities.push(decodedActivity);
   }

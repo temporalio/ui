@@ -15,12 +15,12 @@ import {
   FetchEventsParameters,
   FetchEventsParametersWithSettings,
 } from '$lib/services/events-service';
-
 import { eventCategoryParam, eventSortOrder } from './event-view';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { withLoading, delay } from '$lib/utilities/stores/with-loading';
 import { groupEvents } from '$lib/models/event-groups';
 import { refresh } from '$lib/stores/workflow-run';
+import { user } from '$lib/stores/user';
 
 const emptyEvents: FetchEventsResponse = {
   events: [],
@@ -49,6 +49,8 @@ const runId = derived([page], ([$page]) => {
 });
 
 const settings = derived([page], ([$page]) => $page.stuff.settings);
+
+const accessToken = derived([user], ([$user]) => $user?.accessToken);
 
 const emptyPrevious: FetchEventsParameters = {
   namespace: null,
@@ -102,11 +104,12 @@ export const parameters: Readable<FetchEventsParameters> = derived(
 
 export const parametersWithSettings: Readable<FetchEventsParametersWithSettings> =
   derived(
-    [parameters, settings, refresh],
-    ([$parameters, $settings, $refresh]) => {
+    [parameters, settings, accessToken, refresh],
+    ([$parameters, $settings, $accessToken, $refresh]) => {
       return {
         ...$parameters,
         settings: $settings,
+        accessToken: $accessToken,
         refresh,
         $refresh,
       };

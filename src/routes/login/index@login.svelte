@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
-  import { goto } from '$app/navigation';
+  import { browser } from '$app/env';
   import { page } from '$app/stores';
 
   import Button from '$holocene/button.svelte';
@@ -45,13 +45,15 @@
       variant="login"
       icon="lock"
       on:click={() => {
-        goto(
-          routeForAuthentication({
-            settings,
-            searchParams: $page.url.searchParams,
-            originUrl: $page.url.origin,
-          }),
-        );
+        if (browser) {
+          window.location.assign(
+            routeForAuthentication({
+              settings,
+              searchParams: $page.url.searchParams,
+              originUrl: $page.url.origin,
+            }),
+          );
+        }
       }}>Continue to SSO</Button
     >
   </div>

@@ -2,11 +2,16 @@ import { describe, expect, it } from 'vitest';
 import { isAuthorized } from './is-authorized';
 
 const user = {
-  name: 'Test',
-  email: 'test@mail.com',
-  picture: 'image@test.com',
+  accessToken: 'xxx',
 };
-const noUser = { name: undefined, email: undefined, picture: undefined };
+
+const noUser = {
+  name: 'name',
+  email: 'email',
+  picture: 'picture',
+  idToken: 'idToken',
+};
+
 const getSettings = (enabled: boolean) => ({
   auth: {
     enabled,

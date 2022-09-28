@@ -2,6 +2,7 @@
   import HistoryImport from '../_event-history-import.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import { user } from '$lib/stores/user';
 
   const formatEvent = 'EventHistory';
   const format1 = { events: [formatEvent] };
@@ -13,7 +14,7 @@
     <nav class="block items-center justify-between gap-4 pb-4 lg:flex">
       <h3 class="text-lg font-medium">Event History Import</h3>
       <div class="flex gap-4">
-        <HistoryImport />
+        <HistoryImport {user} />
       </div>
     </nav>
   </section>

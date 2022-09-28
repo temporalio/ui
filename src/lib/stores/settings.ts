@@ -8,7 +8,7 @@ export const settings = writable<Settings>({
   baseUrl: '',
   codec: {
     endpoint: '',
-    accessToken: '',
+    passAccessToken: false,
   },
   defaultNamespace: null,
   disableWriteActions: false,

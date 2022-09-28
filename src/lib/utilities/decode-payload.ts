@@ -95,6 +95,7 @@ export const decodeAllPotentialPayloadsWithCodec = async (
   anyAttributes: any,
   namespace: string,
   settings: Settings,
+  accessToken: string,
 ): Promise<EventAttribute> => {
   if (anyAttributes) {
     for (const key of Object.keys(anyAttributes)) {
@@ -108,6 +109,7 @@ export const decodeAllPotentialPayloadsWithCodec = async (
             payloads: { payloads },
             namespace,
             settings,
+            accessToken,
           });
           JSONPayload = (awaitData?.payloads ?? []).map(decodePayload);
         } else {
@@ -119,6 +121,7 @@ export const decodeAllPotentialPayloadsWithCodec = async (
           anyAttributes[key],
           namespace,
           settings,
+          accessToken,
         );
       }
     }
@@ -166,6 +169,7 @@ export const convertPayloadToJsonWithCodec = async ({
   attributes,
   namespace,
   settings,
+  accessToken,
 }: {
   attributes: EventAttribute;
 } & EventRequestMetadata): Promise<EventAttribute> => {
@@ -175,6 +179,7 @@ export const convertPayloadToJsonWithCodec = async ({
     anyAttributes,
     namespace,
     settings,
+    accessToken,
   );
   return decodedAttributes;
 };
