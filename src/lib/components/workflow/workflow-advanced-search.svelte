@@ -100,7 +100,7 @@
       >
         <button
           slot="middle-button"
-          class="w-12 pl-3 text-center border border-r-0 border-l-0 border-gray-900 rounded-none"
+          class="w-12 rounded-none border border-r-0 border-l-0 border-gray-900 pl-3 text-center"
           class:bg-gray-900={manualSearch}
           class:text-white={manualSearch}
           on:click={() => (manualSearch = !manualSearch)}

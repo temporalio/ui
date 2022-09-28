@@ -181,7 +181,7 @@
   </div>
   {#if viewQueryString}
     <div
-      class="h-10 flex w-full items-center overflow-x-auto rounded-br-lg rounded-bl-lg bg-gray-900 p-1 text-white"
+      class="flex h-10 w-full items-center overflow-x-auto rounded-br-lg rounded-bl-lg bg-gray-900 p-1 text-white"
       in:fade
     >
       <button on:click={(e) => copy(e, query)} class="mx-1">
