@@ -43,6 +43,9 @@ const config = {
       files: (filepath) =>
         /^(?!.*\.(spec|test)\.ts$).*\.(svelte|ts)$/.test(filepath),
     },
+    version: {
+      pollInterval: 5000
+    }
   },
 };
 
