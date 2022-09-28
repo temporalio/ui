@@ -84,7 +84,7 @@
 
 <Table class="relative w-full md:table-fixed">
   <TableHeaderRow slot="headers">
-    <th class="hidden w-48 md:table-cell"
+    <th class="table-cell w-48"
       ><div class="flex items-center gap-1">
         <WorkflowStatusDropdownFilter
           bind:statusFilters
@@ -93,7 +93,7 @@
         />
       </div>
     </th>
-    <th class="hidden md:table-cell md:w-60 xl:w-auto"
+    <th class="table-cell md:w-60 xl:w-auto"
       ><div class="flex items-center gap-1">
         <WorkflowIdDropdownFilter
           bind:workflowIdFilter
@@ -102,7 +102,7 @@
         />
       </div>
     </th>
-    <th class="hidden md:table-cell md:w-60 xl:w-80">
+    <th class="table-cell md:w-60 xl:w-80">
       <div class="flex items-center gap-1">
         <WorkflowTypeDropdownFilter
           bind:workflowTypeFilter
@@ -113,7 +113,6 @@
     </th>
     <th class="hidden xl:table-cell xl:w-60">Start</th>
     <th class="hidden xl:table-cell xl:w-60">End</th>
-    <th class="table-cell md:hidden" colspan="3">Summary</th>
   </TableHeaderRow>
   {#if updating}
     <div class="updating" />
@@ -123,7 +122,6 @@
 
 <style lang="postcss">
   .updating {
-    @apply absolute top-6 h-4 w-full border-b-4 border-blue-500;
-    z-index: 20;
+    @apply absolute top-6 z-40 h-4 w-full border-b-4 border-blue-500;
   }
 </style>

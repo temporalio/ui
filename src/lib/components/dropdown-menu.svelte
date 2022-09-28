@@ -49,8 +49,8 @@
       <Icon
         name={show ? 'chevron-up' : 'chevron-down'}
         class="pointer-events-none"
-        width={16}
-        height={16}
+        width={20}
+        height={20}
       />
     </div>
   </IconButton>
