@@ -7,6 +7,7 @@
   export let value: string | undefined;
   export let left = false;
   export let right = false;
+  export let size: 'default' | 'small' = 'default';
 
   let show: boolean = false;
   let menu: any = null;
@@ -41,8 +42,18 @@
   });
 </script>
 
-<div class="relative inline" bind:this={menu} data-cy={$$props.dataCy}>
-  <IconButton on:click={() => (show = !show)} dataCy="{$$props.dataCy}-button">
+<div
+  class="relative inline"
+  class:default={size === 'default'}
+  class:small={size === 'small'}
+  bind:this={menu}
+  data-cy={$$props.dataCy}
+>
+  <IconButton
+    {size}
+    on:click={() => (show = !show)}
+    dataCy="{$$props.dataCy}-button"
+  >
     <Icon name="chevron-down" width={16} height={16} />
   </IconButton>
   {#if show}
@@ -62,7 +73,9 @@
     <span
       in:scale={{ duration: 200, start: 0.65 }}
       out:scale={{ duration: 100, start: 0.65 }}
-      class="absolute right-1 top-0 h-2 w-2 rounded-full bg-blue-200"
+      class="dot"
+      class:dot-default={size === 'default'}
+      class:dot-small={size === 'small'}
     />
   {/if}
 </div>
@@ -77,5 +90,24 @@
   }
   .dropdown-menu.right {
     @apply absolute right-0 origin-top-right;
+  }
+
+  .default {
+    @apply h-8;
+  }
+  .small {
+    @apply h-4;
+  }
+
+  .dot {
+    @apply pointer-events-none absolute h-2 w-2 rounded-full border border-blue-400 bg-blue-200;
+  }
+
+  .dot-default {
+    @apply right-1 top-0;
+  }
+
+  .dot-small {
+    @apply -right-1 -top-[1px];
   }
 </style>

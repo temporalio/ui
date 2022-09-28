@@ -30,6 +30,7 @@
   import Option from '$lib/holocene/select/simple-option.svelte';
   import WorkflowAdvancedFilters from '$lib/components/workflow/workflow-advanced-filters.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
+  import TableRow from '$holocene/table/table-row.svelte';
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
 
@@ -105,7 +106,7 @@
 <WorkflowAdvancedFilters bind:filters bind:sorts />
 {#if $loading}
   <Loading />
-{:else if $workflows.length}
+{:else}
   <Pagination items={$workflows} updating={$updating} let:visibleItems>
     <svelte:fragment slot="action-top-left">
       <WorkflowAdvancedSearch bind:filters {sorts} {onFilterChange} />
@@ -124,13 +125,17 @@
           namespace={$page.params.namespace}
           timeFormat={$timeFormat}
         />
+      {:else}
+        <TableRow>
+          <td colspan="5">
+            <EmptyState
+              title={'No Workflows Found'}
+              content={errorMessage}
+              error={$workflowError}
+            />
+          </td>
+        </TableRow>
       {/each}
     </WorkflowsSummaryTable>
   </Pagination>
-{:else}
-  <EmptyState
-    title={'No Workflows Found'}
-    content={errorMessage}
-    error={$workflowError}
-  />
 {/if}
