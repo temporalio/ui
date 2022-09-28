@@ -2,6 +2,7 @@
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import Icon from '$holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
+  import { onMount } from 'svelte';
 
   export let id: string;
   export let value: string;
@@ -18,6 +19,11 @@
   export let maxLength = 0;
   export let spellcheck: boolean = null;
   export let unroundRight: boolean = false;
+  export let autoFocus = false;
+
+  function callFocus(input) {
+    if (autoFocus) input.focus();
+  }
 
   const { copy, copied } = copyToClipboard();
   $: disabled = disabled || copyable;
@@ -54,6 +60,7 @@
       on:change
       on:focus
       on:blur
+      use:callFocus
     />
     {#if copyable}
       <div class="copy-icon-container" on:click={(e) => copy(e, value)}>

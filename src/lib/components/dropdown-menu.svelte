@@ -8,13 +8,15 @@
   export let left = false;
   export let right = false;
   export let size: 'default' | 'small' = 'default';
+  export let dropdownWidth = '';
+  export let keepOpen = false;
 
   let show: boolean = false;
   let menu: any = null;
 
   $: {
     // Close the menu any time the value changes
-    if (value || !value) {
+    if ((value || !value) && !keepOpen) {
       show = false;
     }
   }
@@ -82,8 +84,8 @@
 
 <style lang="postcss">
   .dropdown-menu {
-    @apply absolute z-50 mt-1 w-56
-        rounded bg-white py-2 text-gray-900 shadow-md;
+    @apply absolute z-50 mt-1 w-auto
+        rounded border border-gray-900 bg-white py-2 text-gray-900 shadow-md;
   }
   .dropdown-menu.left {
     @apply absolute left-0 origin-top-left;
@@ -104,7 +106,7 @@
   }
 
   .dot-default {
-    @apply right-1 top-0;
+    @apply right-2 top-0;
   }
 
   .dot-small {

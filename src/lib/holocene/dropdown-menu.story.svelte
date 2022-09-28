@@ -8,13 +8,16 @@
 
 <Hst.Story>
   <DropdownMenu id="dropdown-1">
-    <Icon name="vertical-ellipsis" slot="trigger" />
-    <svelte:fragment slot="items">
-      <MenuItem href="https://temporal.io">Link</MenuItem>
-      <MenuItem disabled href="https://temporal.io">Disabled Link</MenuItem>
-      <MenuItem selected>Selected</MenuItem>
-      <MenuItem>Standard</MenuItem>
-      <MenuItem destructive>Destructive</MenuItem>
-    </svelte:fragment>
+      <Icon name="vertical-ellipsis" slot="trigger" />
+      <div class="w-56">
+      <svelte:fragment slot="items">
+        <MenuItem href="https://temporal.io">Link</MenuItem>
+        <MenuItem disabled href="https://temporal.io">Disabled Link</MenuItem>
+        <MenuItem selected>Selected</MenuItem>
+        <MenuItem>Standard</MenuItem>
+        <MenuItem destructive>Destructive</MenuItem>
+      </svelte:fragment>
+      </div>
+    </div>
   </DropdownMenu>
 </Hst.Story>

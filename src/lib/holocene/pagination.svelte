@@ -88,7 +88,8 @@
           <Icon name="chevron-left" />
         </button>
         <p>
-          {$store.startingIndex + 1}–{$store.endingIndex + 1} of {$store.length}
+          {$store.length ? $store.startingIndex + 1 : 0}–{$store.endingIndex +
+            1} of {$store.length}
         </p>
         <button
           class="caret"
@@ -129,7 +130,8 @@
           <Icon name="chevron-left" />
         </button>
         <p>
-          {$store.startingIndex + 1}–{$store.endingIndex + 1} of {$store.length}
+          {$store.length ? $store.startingIndex + 1 : 0}–{$store.endingIndex +
+            1} of {$store.length}
         </p>
         <button
           class="caret"

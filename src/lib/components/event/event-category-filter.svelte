@@ -31,22 +31,24 @@
 </script>
 
 <DropdownMenu value={_value} left>
-  {#each options as { label, option } (option)}
-    <div
-      class="option"
-      class:active={_value === option}
-      on:click={() => onOptionClick(option)}
-    >
-      <div class="check active">
-        {#if _value === option}
-          <Icon name="checkmark" />
-        {/if}
+  <div class="w-56">
+    {#each options as { label, option } (option)}
+      <div
+        class="option"
+        class:active={_value === option}
+        on:click={() => onOptionClick(option)}
+      >
+        <div class="check active">
+          {#if _value === option}
+            <Icon name="checkmark" />
+          {/if}
+        </div>
+        <div class="label">
+          {label}
+        </div>
       </div>
-      <div class="label">
-        {label}
-      </div>
-    </div>
-  {/each}
+    {/each}
+  </div>
 </DropdownMenu>
 
 <style lang="postcss">
