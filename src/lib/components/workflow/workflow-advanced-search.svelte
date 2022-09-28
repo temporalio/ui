@@ -70,7 +70,7 @@
 </script>
 
 {#if !filters.length}
-  <div class="mb-4 flex items-center gap-4">
+  <div class="flex items-center gap-4">
     <div class="flex h-12 w-full items-center gap-0" in:fade>
       {#if manualSearch}
         <div in:fly={{ x: 200, duration: 300 }}>

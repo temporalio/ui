@@ -36,11 +36,7 @@
 
   let filters = [];
   let sorts = [];
-
-  let bookmarkName = '';
-  let activeSearch;
-
-  let showFilters = true;
+  let datetimeFilter = [];
 
   const errorMessage =
     searchType === 'advanced'
@@ -112,9 +108,9 @@
       <WorkflowAdvancedSearch bind:filters {sorts} {onFilterChange} />
     </svelte:fragment>
     <svelte:fragment slot="action-top-center">
-      <WorkflowDateTime />
+      <WorkflowDateTime bind:datetimeFilter />
     </svelte:fragment>
-    <WorkflowsSummaryTable updating={$updating}>
+    <WorkflowsSummaryTable updating={$updating} {datetimeFilter}>
       {#each visibleItems as event}
         <WorkflowsSummaryRow
           workflow={event}

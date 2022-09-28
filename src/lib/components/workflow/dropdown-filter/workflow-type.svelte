@@ -27,7 +27,8 @@
   }
 </script>
 
-<DropdownMenu {value} keepOpen left size="small">
+<DropdownMenu {value} keepOpen left>
+  <svelte:fragment slot="label">Type</svelte:fragment>
   <div class="flex w-96 flex-col gap-2 p-2">
     <Input
       icon="search"

@@ -64,12 +64,8 @@
   };
 </script>
 
-<DropdownMenu
-  value={statusFilters.map((s) => s.value).join('')}
-  keepOpen
-  left
-  size="small"
->
+<DropdownMenu value={statusFilters.map((s) => s.value).join('')} keepOpen left>
+  <svelte:fragment slot="label">Status</svelte:fragment>
   <div class="flex w-56 flex-col gap-4">
     {#each Object.entries(AllStatuses) as [label, _value] (_value)}
       <div

@@ -18,6 +18,8 @@
   import WorkflowTypeDropdownFilter from './dropdown-filter/workflow-type.svelte';
 
   export let updating = false;
+  export let datetimeFilter = [];
+
   let filters = [];
   let sorts = [];
   let statusFilters = [];
@@ -28,8 +30,10 @@
   $: query = $page.url.searchParams.get('query');
   $: parameters = toListWorkflowParameters(query ?? defaultQuery);
 
-  const combineFilters = (filter1, filter2, filter3) => {
-    const activeFilters = [filter1, filter2, filter3].filter((f) => f.length);
+  const combineFilters = (filter1, filter2, filter3, filter4) => {
+    const activeFilters = [filter1, filter2, filter3, filter4].filter(
+      (f) => f.length,
+    );
     activeFilters.forEach((filter, index) => {
       if (filter.length && activeFilters[index + 1]?.length) {
         filter[filter.length - 1].operator = 'AND';
@@ -38,7 +42,7 @@
       }
     });
 
-    return [...filter1, ...filter2, ...filter3];
+    return [...filter1, ...filter2, ...filter3, ...filter4];
   };
 
   const updateQuery = (event: SubmitEvent): void => {
@@ -58,6 +62,7 @@
       statusFilters,
       workflowIdFilter,
       workflowTypeFilter,
+      datetimeFilter,
     );
     query = toListWorkflowQueryFromAdvancedFilters(filters, sorts);
     updateQueryParameters({
@@ -67,13 +72,20 @@
       allowEmpty: true,
     });
   }, 300);
+
+  const handleDatetimeChange = (_filter) => {
+    handleParameterChange();
+  };
+
+  $: {
+    handleDatetimeChange(datetimeFilter);
+  }
 </script>
 
 <Table class="relative w-full md:table-fixed">
   <TableHeaderRow slot="headers">
     <th class="hidden w-48 md:table-cell"
       ><div class="flex items-center gap-1">
-        Status
         <WorkflowStatusDropdownFilter
           bind:statusFilters
           bind:sorts
@@ -83,7 +95,6 @@
     </th>
     <th class="hidden md:table-cell md:w-60 xl:w-auto"
       ><div class="flex items-center gap-1">
-        Workflow Id
         <WorkflowIdDropdownFilter
           bind:workflowIdFilter
           bind:sorts
@@ -93,7 +104,6 @@
     </th>
     <th class="hidden md:table-cell md:w-60 xl:w-80">
       <div class="flex items-center gap-1">
-        Type
         <WorkflowTypeDropdownFilter
           bind:workflowTypeFilter
           bind:sorts
@@ -114,5 +124,6 @@
 <style lang="postcss">
   .updating {
     @apply absolute top-6 h-4 w-full border-b-4 border-blue-500;
+    z-index: 20;
   }
 </style>
