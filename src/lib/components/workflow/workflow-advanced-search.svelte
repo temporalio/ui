@@ -14,8 +14,10 @@
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import CustomSplitButton from '$lib/holocene/custom-split-button.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import CustomButton from '$lib/holocene/custom-button.svelte';
+  import Button from '$lib/holocene/button.svelte';
 
-  let manualSearch = false;
+  let manualSearch = true;
   let manualSearchString = '';
 
   $: query = $page.url.searchParams.get('query');
@@ -74,7 +76,7 @@
         <div in:fly={{ x: 200, duration: 300 }}>
           <Input
             id="manual-search"
-            placeholder="Enter or paste"
+            placeholder="Enter or paste a query..."
             icon="search"
             class="w-[600px]"
             unroundRight
@@ -98,25 +100,14 @@
           />
         </div>
       {/if}
-      <CustomSplitButton
-        class="rounded-tr rounded-br bg-offWhite"
-        buttonClass="border border-gray-900"
-        id="saved"
-        icon="star-empty"
+      <Button
+        variant="primary"
+        class="h-10"
+        unroundLeft
+        on:click={() => (manualSearch = !manualSearch)}
       >
-        <button
-          slot="middle-button"
-          class="w-12 rounded-none border border-r-0 border-l-0 border-gray-900 pl-3 text-center"
-          class:bg-gray-900={manualSearch}
-          class:text-white={manualSearch}
-          on:click={() => (manualSearch = !manualSearch)}
-        >
-          <Icon name="terminal" />
-        </button>
-        {#each bookmarkOptions as { label, value } (value)}
-          <MenuItem on:click={() => onBookmarkChange(value)}>{label}</MenuItem>
-        {/each}
-      </CustomSplitButton>
+        Search
+      </Button>
     </div>
   </div>
 {/if}

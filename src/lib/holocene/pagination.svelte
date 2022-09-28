@@ -68,6 +68,7 @@
       bind:clientHeight={height}
       class="flex justify-end gap-8"
     >
+      <slot name="action-top-center" />
       <div class="flex items-center justify-center gap-2">
         <FilterSelect
           label="Per Page"

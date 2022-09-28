@@ -17,7 +17,7 @@ export const durations = [
   '10 minutes',
   '1 hour',
   '3 hours',
-  '1 day',
+  '24 hours',
   '3 days',
   '7 days',
   '30 days',

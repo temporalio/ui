@@ -25,6 +25,7 @@
   export let placeholder = '';
   export let disabled: boolean = false;
   export let showIcon: boolean = true;
+  export let unroundRight: boolean = false;
   export let displayValue: (value: T) => T | string = (value) => value ?? '';
   export let onChange: (value: T) => void = noop;
 
@@ -56,7 +57,9 @@
   {/if}
   <MenuContainer class="w-full">
     <MenuButton
-      class="select-input-container {disabled ? 'disabled' : ''}"
+      class="select-input-container {disabled ? 'disabled' : ''} {unroundRight
+        ? 'unroundRight'
+        : ''}"
       bind:show
       controls="{id}-menu"
       data-cy={$$props.dataCy}
@@ -93,7 +96,11 @@
   }
 
   .select :global(.select-input-container) {
-    @apply flex h-10 w-full flex-row items-center justify-between rounded border border-gray-300 bg-white px-2 text-sm text-primary;
+    @apply flex h-10 w-full flex-row items-center justify-between rounded border border-gray-900 bg-white px-2 text-sm text-primary;
+  }
+
+  .select :global(.unroundRight) {
+    @apply rounded-tr-none rounded-br-none border-r-0;
   }
 
   .select-input {
