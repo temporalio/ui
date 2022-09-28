@@ -32,6 +32,6 @@
 
 <style lang="postcss">
   .copy-or-filter {
-    @apply absolute right-0 top-0 bottom-0 z-50 inline-flex gap-2 rounded-full bg-gray-50 px-2;
+    @apply absolute right-0 top-0 bottom-0 z-30 inline-flex gap-2 rounded-full bg-gray-50 px-2;
   }
 </style>
