@@ -1,9 +1,11 @@
 <script>
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
+
+  export let updating = false;
 </script>
 
-<Table class="w-full md:table-fixed">
+<Table class="w-full md:table-fixed relative">
   <TableHeaderRow slot="headers">
     <th class="hidden w-48 md:table-cell">Status</th>
     <th class="hidden md:table-cell md:w-60 xl:w-auto">Workflow ID</th>
@@ -12,5 +14,14 @@
     <th class="hidden xl:table-cell xl:w-60">End</th>
     <th class="table-cell md:hidden" colspan="3">Summary</th>
   </TableHeaderRow>
+  {#if updating}
+    <div class="updating" />
+  {/if}
   <slot />
 </Table>
+
+<style lang="postcss">
+  .updating {
+    @apply absolute top-6 h-4 w-full border-b-4 border-blue-500;
+  }
+</style>

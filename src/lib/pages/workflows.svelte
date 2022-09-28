@@ -117,7 +117,7 @@
         <Option value={'local'}>Local</Option>
       </Select>
     </svelte:fragment>
-    <WorkflowsSummaryTable>
+    <WorkflowsSummaryTable updating={$updating}>
       {#each visibleItems as event}
         <WorkflowsSummaryRow
           workflow={event}

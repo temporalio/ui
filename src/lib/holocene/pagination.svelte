@@ -57,14 +57,11 @@
 <div class="pagination relative mb-8 flex flex-col gap-4">
   <div
     class={`flex items-center ${
-      updating || $$slots['action-top-left'] ? 'justify-between' : 'justify-end'
+      $$slots['action-top-left'] ? 'justify-between' : 'justify-end'
     }`}
   >
     <div class="flex flex-col">
       <slot name="action-top-left" />
-      {#if updating}
-        <p class="mr-6 h-4 text-sm text-gray-500">Updating…</p>
-      {/if}
     </div>
     <nav
       style={floatStyle}
