@@ -8,14 +8,17 @@ import { getPollers } from '$lib/services/pollers-service';
 import type { GetPollersResponse } from '$lib/services/pollers-service';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { toDecodedPendingActivities } from '$lib/models/pending-activities';
-import { user } from '$lib/stores/user';
+import { authUser } from '$lib/stores/auth-user';
 
 export const refresh = writable(0);
 const namespace = derived([page], ([$page]) => $page.params.namespace);
 const workflowId = derived([page], ([$page]) => $page.params.workflow);
 const runId = derived([page], ([$page]) => $page.params.run);
 const settings = derived([page], ([$page]) => $page.stuff.settings);
-const accessToken = derived([user], ([$user]) => $user?.accessToken);
+const accessToken = derived(
+  [authUser],
+  ([$authUser]) => $authUser?.accessToken,
+);
 
 const parameters = derived(
   [namespace, workflowId, runId, settings, accessToken, refresh],
