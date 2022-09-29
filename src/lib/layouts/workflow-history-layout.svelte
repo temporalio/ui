@@ -23,6 +23,7 @@
   import { timeFormat } from '$lib/stores/time-format';
 
   const { namespace } = $page.params;
+  const { namespaces } = $page.stuff;
   const { workflow, workers } = $workflowRun;
 
   const routeParameters = (view: EventView, eventId?: string) => ({
@@ -64,12 +65,17 @@
       href={routeForWorkers(workflowRoute)}
     />
     {#if workflow?.parent}
+      {@const parentNamespace = namespaces.find(
+        (n) => n.namespaceInfo.id === workflow?.parentNamespaceId,
+      )}
       <div class="gap-2 xl:flex">
         <WorkflowDetail
           title="Parent"
           content={workflow.parent?.workflowId}
           href={routeForWorkflow({
-            namespace,
+            namespace: parentNamespace
+              ? parentNamespace?.namespaceInfo?.name
+              : namespace,
             workflow: workflow.parent?.workflowId,
             run: workflow.parent?.runId,
           })}

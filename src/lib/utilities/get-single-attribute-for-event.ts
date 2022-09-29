@@ -98,11 +98,34 @@ export const shouldDisplayChildWorkflowLink = (
   attributes: CombinedAttributes,
 ): key is typeof keysWithChildExecutionLinks[number] => {
   const workflowLinkAttributesExist = Boolean(
+    attributes?.namespace &&
     attributes?.workflowExecutionWorkflowId &&
-      attributes?.workflowExecutionRunId,
+    attributes?.workflowExecutionRunId,
   );
   for (const workflowKey of keysWithChildExecutionLinks) {
     if (key === workflowKey && workflowLinkAttributesExist) return true;
+  }
+
+  return false;
+};
+
+const keysWithParentExecutionLinks = [
+  'parentWorkflowExecutionWorkflowId',
+  'parentWorkflowExecutionRunId',
+] as const;
+
+// For linking to a parent workflow
+export const shouldDisplayParentWorkflowLink = (
+  key: string,
+  attributes: CombinedAttributes,
+): key is typeof keysWithParentExecutionLinks[number] => {
+  const workflowLinkAttributesExist = Boolean(
+    attributes?.parentWorkflowNamespace &&
+    attributes?.parentWorkflowExecutionWorkflowId &&
+    attributes?.parentWorkflowExecutionRunId,
+  );
+  for (const workflowKey of keysWithParentExecutionLinks) {
+    if (key === workflowKey && workflowLinkAttributesExist) return true
   }
 
   return false;
@@ -126,6 +149,7 @@ const preferredSummaryKeys = [
   'activityType',
   'parentInitiatedEventId',
   'workflowExecution',
+  'parentWorkflowExecution',
   'workflowType',
   'taskQueue',
 ] as const;
@@ -153,8 +177,9 @@ const getSummaryAttribute = (event: WorkflowEvent): SummaryAttribute => {
 
   for (const [key, value] of Object.entries(event.attributes)) {
     for (const preferredKey of preferredSummaryKeys) {
-      if (key === preferredKey && shouldDisplayAttribute(key, value))
+      if (key === preferredKey && shouldDisplayAttribute(key, value)) {
         return formatSummaryValue(key, value);
+      }
     }
   }
 

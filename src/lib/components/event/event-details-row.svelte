@@ -60,7 +60,7 @@
           <Link
             newTab
             href={routeForWorkflow({
-              namespace,
+              namespace: attributes.namespace,
               workflow: attributes.workflowExecutionWorkflowId,
               run: attributes.workflowExecutionRunId,
             })}

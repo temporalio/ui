@@ -13,6 +13,7 @@
     shouldDisplayAsTaskQueueLink,
     shouldDisplayAsPlainText,
     shouldDisplayChildWorkflowLink,
+    shouldDisplayParentWorkflowLink,
   } from '$lib/utilities/get-single-attribute-for-event';
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
@@ -65,9 +66,27 @@
           <Link
             newTab
             href={routeForWorkflow({
-              namespace,
+              namespace: attributes.namespace,
               workflow: attributes.workflowExecutionWorkflowId,
               run: attributes.workflowExecutionRunId,
+            })}
+          >
+            {value}
+          </Link>
+        </Copyable>
+      </div>
+    </div>
+  {:else if shouldDisplayParentWorkflowLink(key, attributes)}
+    <div class="detail-row">
+      <p class="text-sm">{format(key)}</p>
+      <div class="text-sm">
+        <Copyable content={value} container-class="xl:flex-row">
+          <Link
+            newTab
+            href={routeForWorkflow({
+              namespace: attributes.parentWorkflowNamespace,
+              workflow: attributes.parentWorkflowExecutionWorkflowId,
+              run: attributes.parentWorkflowExecutionRunId,
             })}
           >
             {value}
