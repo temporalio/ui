@@ -56,8 +56,9 @@ async function fetchQuery(
 ): Promise<QueryResponse> {
   workflow = await workflow;
   const parameters = await formatParameters(namespace, workflow);
+  const route = await routeForApi('query', parameters);
 
-  return await requestFromAPI<QueryResponse>(routeForApi('query', parameters), {
+  return await requestFromAPI<QueryResponse>(route, {
     options: {
       method: 'POST',
       body: JSON.stringify({

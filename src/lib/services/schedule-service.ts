@@ -34,15 +34,13 @@ export const fetchAllSchedules = async (
       err?.body?.message ??
       `Error fetching schedules: ${err.status}: ${err.statusText}`);
 
+  const route = await routeForApi('schedules', { namespace });
   const { schedules, nextPageToken } =
-    (await requestFromAPI<ListScheduleResponse>(
-      routeForApi('schedules', { namespace }),
-      {
-        params: {},
-        onError,
-        request,
-      },
-    )) ?? { schedules: [], nextPageToken: '' };
+    (await requestFromAPI<ListScheduleResponse>(route, {
+      params: {},
+      onError,
+      request,
+    })) ?? { schedules: [], nextPageToken: '' };
 
   return {
     schedules,
@@ -55,14 +53,16 @@ export async function fetchSchedule(
   parameters: ScheduleParameters,
   request = fetch,
 ): Promise<DescribeScheduleResponse> {
-  return requestFromAPI(routeForApi('schedule', parameters), { request });
+  const route = await routeForApi('schedule', parameters);
+  return requestFromAPI(route, { request });
 }
 
 export async function deleteSchedule(
   parameters: ScheduleParameters,
   request = fetch,
 ): Promise<void> {
-  return requestFromAPI(routeForApi('schedule.delete', parameters), {
+  const route = await routeForApi('schedule.delete', parameters);
+  return requestFromAPI(route, {
     request,
     options: { method: 'DELETE' },
   });
@@ -83,10 +83,11 @@ export async function createSchedule({
       err?.body?.message ??
       `Error creating schedule: ${err.status}: ${err.statusText}`);
 
+  const route = await routeForApi('schedules', {
+    namespace,
+  });
   const { conflictToken } = await requestFromAPI<{ conflictToken: string }>(
-    routeForApi('schedules', {
-      namespace,
-    }),
+    route,
     {
       options: {
         method: 'POST',
@@ -115,23 +116,21 @@ export async function editSchedule({
   scheduleId,
   body,
 }: EditScheduleOptions): Promise<null> {
-  return await requestFromAPI<null>(
-    routeForApi('schedule', {
-      namespace,
-      scheduleId,
-    }),
-    {
-      options: {
-        method: 'POST',
-        body: JSON.stringify({
-          request_id: uuidv4(),
-          ...body,
-        }),
-      },
-      shouldRetry: false,
-      onError: (error) => console.error(error),
+  const route = await routeForApi('schedule', {
+    namespace,
+    scheduleId,
+  });
+  return await requestFromAPI<null>(route, {
+    options: {
+      method: 'POST',
+      body: JSON.stringify({
+        request_id: uuidv4(),
+        ...body,
+      }),
     },
-  );
+    shouldRetry: false,
+    onError: (error) => console.error(error),
+  });
 }
 
 type PauseScheduleOptions = {
@@ -151,23 +150,21 @@ export async function pauseSchedule({
     },
   };
 
-  return await requestFromAPI<null>(
-    routeForApi('schedule', {
-      namespace,
-      scheduleId: scheduleId,
-    }),
-    {
-      options: {
-        method: 'PATCH',
-        body: JSON.stringify({
-          ...options,
-          request_id: uuidv4(),
-        }),
-      },
-      shouldRetry: false,
-      onError: (error) => console.error(error),
+  const route = await routeForApi('schedule', {
+    namespace,
+    scheduleId: scheduleId,
+  });
+  return await requestFromAPI<null>(route, {
+    options: {
+      method: 'PATCH',
+      body: JSON.stringify({
+        ...options,
+        request_id: uuidv4(),
+      }),
     },
-  );
+    shouldRetry: false,
+    onError: (error) => console.error(error),
+  });
 }
 
 type UnpauseScheduleOptions = {
@@ -187,20 +184,18 @@ export async function unpauseSchedule({
     },
   };
 
-  return await requestFromAPI<null>(
-    routeForApi('schedule', {
-      namespace,
-      scheduleId: scheduleId,
-    }),
-    {
-      options: {
-        method: 'PATCH',
-        body: JSON.stringify({
-          ...options,
-          request_id: uuidv4(),
-        }),
-      },
-      shouldRetry: false,
+  const route = await routeForApi('schedule', {
+    namespace,
+    scheduleId: scheduleId,
+  });
+  return await requestFromAPI<null>(route, {
+    options: {
+      method: 'PATCH',
+      body: JSON.stringify({
+        ...options,
+        request_id: uuidv4(),
+      }),
     },
-  );
+    shouldRetry: false,
+  });
 }

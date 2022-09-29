@@ -48,16 +48,19 @@ export const fetchAllWorkflows = async (
       `Error fetching workflows: ${err.status}: ${err.statusText}`;
   };
 
+  const handleError = () => {
+    // Handle when bad namespace is entered in URL and no status code is returned
+    error = 'Failed to fetch workflows';
+  };
+
+  const route = await routeForApi(endpoint, { namespace });
   const { executions, nextPageToken } =
-    (await requestFromAPI<ListWorkflowExecutionsResponse>(
-      routeForApi(endpoint, { namespace }),
-      {
-        params: { query },
-        onError,
-        handleError: onError,
-        request,
-      },
-    )) ?? { executions: [], nextPageToken: '' };
+    (await requestFromAPI<ListWorkflowExecutionsResponse>(route, {
+      params: { query },
+      onError,
+      handleError: onError,
+      request,
+    })) ?? { executions: [], nextPageToken: '' };
 
   return {
     workflows: toWorkflowExecutions({ executions }),
@@ -78,7 +81,6 @@ export async function fetchWorkflow(
   parameters: GetWorkflowExecutionRequest,
   request = fetch,
 ): Promise<WorkflowExecution> {
-  return requestFromAPI(routeForApi('workflow', parameters), { request }).then(
-    toWorkflowExecution,
-  );
+  const route = await routeForApi('workflow', parameters);
+  return requestFromAPI(route, { request }).then(toWorkflowExecution);
 }
