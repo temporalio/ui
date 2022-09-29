@@ -1,13 +1,13 @@
 import { get } from 'svelte/store';
 import { persistStore } from '$lib/stores/persist-store';
 
-export const user = persistStore<User>('user', {});
+export const authUser = persistStore<User>('AuthUser', {});
 
-export const getUser = (): User => get(user);
+export const getAuthUser = (): User => get(authUser);
 
-export const setUser = (u: User) => {
-  const { accessToken } = u;
-  let { idToken, name, email, picture } = u;
+export const setAuthUser = (user: User) => {
+  const { accessToken } = user;
+  let { idToken, name, email, picture } = user;
 
   if (!accessToken || accessToken == '{{.AccessToken}}') {
     throw new Error('No access token');
@@ -29,7 +29,7 @@ export const setUser = (u: User) => {
     picture = '';
   }
 
-  user.set({
+  authUser.set({
     accessToken,
     idToken,
     name,
@@ -38,6 +38,6 @@ export const setUser = (u: User) => {
   });
 };
 
-export const clearUser = () => {
-  user.set({});
+export const clearAuthUser = () => {
+  authUser.set({});
 };

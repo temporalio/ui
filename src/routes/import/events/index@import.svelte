@@ -2,7 +2,7 @@
   import HistoryImport from '../_event-history-import.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import { user } from '$lib/stores/user';
+  import { user } from '$lib/stores/auth-user';
 
   const formatEvent = 'EventHistory';
   const format1 = { events: [formatEvent] };

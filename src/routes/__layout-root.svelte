@@ -5,7 +5,7 @@
   import '../app.css';
 
   import { fetchSettings } from '$lib/services/settings-service';
-  import { getUser } from '$lib/stores/user';
+  import { getAuthUser } from '$lib/stores/auth-user';
   import { fetchCluster } from '$lib/services/cluster-service';
   import { fetchNamespaces } from '$lib/services/namespaces-service';
   import { fetchLatestUiVersion } from '$lib/services/github-service';
@@ -16,7 +16,7 @@
 
   export const load: Load = async function ({ fetch }) {
     const settings: Settings = await fetchSettings(fetch);
-    const user = getUser();
+    const user = getAuthUser();
 
     if (!isAuthorized(settings, user)) {
       return {

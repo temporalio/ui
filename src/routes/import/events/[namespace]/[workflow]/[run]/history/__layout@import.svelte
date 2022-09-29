@@ -4,7 +4,7 @@
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import HistoryImport from '../../../../../_event-history-import.svelte';
-  import { user } from '$lib/stores/user';
+  import { user } from '$lib/stores/auth-user';
 </script>
 
 <section id="event-history">

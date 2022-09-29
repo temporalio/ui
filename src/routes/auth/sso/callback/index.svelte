@@ -1,6 +1,6 @@
 <script context="module" lang="ts">
   import { browser } from '$app/env';
-  import { setUser } from '$lib/stores/user';
+  import { setAuthUser } from '$lib/stores/auth-user';
 
   import type { Load } from '@sveltejs/kit';
 
@@ -12,7 +12,7 @@
       const picture = getMetaContent('user-picture');
       const email = getMetaContent('user-email');
 
-      setUser({
+      setAuthUser({
         accessToken,
         idToken,
         name,

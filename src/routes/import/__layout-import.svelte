@@ -4,11 +4,11 @@
   import '../../app.css';
 
   import { fetchSettings } from '$lib/services/settings-service';
-  import { getUser } from '$lib/stores/user';
+  import { getAuthUser } from '$lib/stores/auth-user';
 
   export const load: Load = async function ({ fetch }) {
     const settings: Settings = await fetchSettings(fetch);
-    const user = getUser();
+    const user = getAuthUser();
 
     return {
       props: { user },
