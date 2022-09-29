@@ -23,8 +23,8 @@
   import { timeFormat } from '$lib/stores/time-format';
 
   const { namespace } = $page.params;
-  const { namespaces } = $page.stuff;
   const { workflow, workers } = $workflowRun;
+  const namespaces = $page.stuff?.namespaces;
 
   const routeParameters = (view: EventView, eventId?: string) => ({
     namespace,

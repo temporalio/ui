@@ -99,8 +99,8 @@ export const shouldDisplayChildWorkflowLink = (
 ): key is typeof keysWithChildExecutionLinks[number] => {
   const workflowLinkAttributesExist = Boolean(
     attributes?.namespace &&
-    attributes?.workflowExecutionWorkflowId &&
-    attributes?.workflowExecutionRunId,
+      attributes?.workflowExecutionWorkflowId &&
+      attributes?.workflowExecutionRunId,
   );
   for (const workflowKey of keysWithChildExecutionLinks) {
     if (key === workflowKey && workflowLinkAttributesExist) return true;
@@ -121,11 +121,11 @@ export const shouldDisplayParentWorkflowLink = (
 ): key is typeof keysWithParentExecutionLinks[number] => {
   const workflowLinkAttributesExist = Boolean(
     attributes?.parentWorkflowNamespace &&
-    attributes?.parentWorkflowExecutionWorkflowId &&
-    attributes?.parentWorkflowExecutionRunId,
+      attributes?.parentWorkflowExecutionWorkflowId &&
+      attributes?.parentWorkflowExecutionRunId,
   );
   for (const workflowKey of keysWithParentExecutionLinks) {
-    if (key === workflowKey && workflowLinkAttributesExist) return true
+    if (key === workflowKey && workflowLinkAttributesExist) return true;
   }
 
   return false;
