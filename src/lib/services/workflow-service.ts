@@ -43,9 +43,13 @@ export const fetchAllWorkflows = async (
   const onError: ErrorCallback = (err) => {
     // Kick out to login if 401/403
     handleUnauthorizedOrForbiddenError(err);
-    error =
-      err?.body?.message ??
-      `Error fetching workflows: ${err.status}: ${err.statusText}`;
+    if (err?.body?.message || err?.status) {
+      error =
+        err?.body?.message ??
+        `Error fetching workflows: ${err.status}: ${err.statusText}`;
+    } else {
+      error = `Error fetching workflows: Server failed to respond`;
+    }
   };
 
   const handleError = () => {
