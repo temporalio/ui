@@ -137,12 +137,18 @@ const withAuth = async (
   if (getAuthUser().accessToken) {
     options.headers = await withBearerToken(
       options?.headers,
-      getAuthUser().accessToken,
+      async () => getAuthUser().accessToken,
       isBrowser,
     );
     options.headers = withIdToken(
       options?.headers,
       getAuthUser().idToken,
+      isBrowser,
+    );
+  } else if (globalThis?.AccessToken) {
+    options.headers = await withBearerToken(
+      options?.headers,
+      globalThis.AccessToken,
       isBrowser,
     );
   }
@@ -152,7 +158,7 @@ const withAuth = async (
 
 const withBearerToken = async (
   headers: HeadersInit,
-  accessToken: string,
+  accessToken: () => Promise<string>,
   isBrowser = browser,
 ): Promise<HeadersInit> => {
   // At this point in the code path, headers will always be set.
@@ -161,8 +167,9 @@ const withBearerToken = async (
   if (!isBrowser) return headers;
 
   try {
-    if (accessToken) {
-      headers['Authorization'] = `Bearer ${accessToken}`;
+    const token = await accessToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
     }
     /* c8 ignore next 4 */
   } catch (e) {
