@@ -2,6 +2,7 @@
   import Icon from '$holocene/icon/icon.svelte';
   import Badge from '$holocene/badge.svelte';
   import type { IconName } from './icon/paths';
+  import { omit } from '$lib/utilities/omit';
 
   type $$Props = ComponentProps<
     HTMLDivElement,
@@ -29,7 +30,7 @@
 
 <div
   class="flex w-full cursor-default flex-row rounded-lg border border-gray-300 bg-white p-8 text-primary {$$props.class}"
-  {...$$restProps}
+  {...omit($$restProps, 'class')}
 >
   <div class="w-full">
     <div

@@ -18,3 +18,5 @@ type ComponentProps<ParentElement, OwnProps> = Omit<
 > &
   Optional<ComponentDataProps> &
   OwnProps;
+
+type Intent = 'warning' | 'error' | 'success' | 'info';

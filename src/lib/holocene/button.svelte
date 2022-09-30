@@ -2,22 +2,24 @@
   import Icon from '$holocene/icon/icon.svelte';
   import type { IconName } from '$holocene/icon/paths';
   import Badge from '$holocene/badge.svelte';
+  import { omit } from '$lib/utilities/omit';
 
-  type OwnProps = {
-    thin?: boolean;
-    loading?: boolean;
-    href?: string | null;
-    target?: '_self' | '_external';
-    active?: boolean;
-    large?: boolean;
-    as?: 'button' | 'anchor';
-    icon?: IconName;
-    count?: number;
-    variant?: 'primary' | 'secondary' | 'destructive' | 'login' | 'link';
-    disabled?: boolean;
-  };
-
-  type $$Props = ComponentProps<HTMLButtonElement, OwnProps>;
+  type $$Props = ComponentProps<
+    HTMLButtonElement,
+    {
+      thin?: boolean;
+      loading?: boolean;
+      href?: string | null;
+      target?: '_self' | '_external';
+      active?: boolean;
+      large?: boolean;
+      as?: 'button' | 'anchor';
+      icon?: IconName;
+      count?: number;
+      variant?: 'primary' | 'secondary' | 'destructive' | 'login' | 'link';
+      disabled?: boolean;
+    }
+  >;
 
   export let disabled: boolean = false;
   export let variant:
@@ -41,13 +43,13 @@
 {#if as === 'button'}
   <button
     on:click
-    class="button {variant}"
+    class="button {variant} {$$props.class}"
     class:selected={active}
     class:large
     class:thin
     {type}
     {disabled}
-    {...$$restProps}
+    {...omit($$restProps, 'class')}
   >
     {#if icon || loading}
       <span class:animate-spin={loading}>
@@ -66,7 +68,7 @@
   <a
     {href}
     on:click
-    class="button {variant}"
+    class="button {variant} {$$props.class}"
     class:selected={active}
     class:large
     class:disabled

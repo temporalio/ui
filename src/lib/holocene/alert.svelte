@@ -1,14 +1,23 @@
 <script lang="ts">
   import Icon from '$holocene/icon/icon.svelte';
   import type { IconName } from './icon/paths';
+  import { omit } from '$lib/utilities/omit';
 
-  export let intent: 'warning' | 'error' | 'success' | 'info';
+  type $$Props = ComponentProps<
+    HTMLDivElement,
+    {
+      intent: Intent;
+      title: string;
+      icon?: IconName;
+    }
+  >;
 
+  export let intent: Intent;
   export let title: string;
   export let icon: IconName = null;
 </script>
 
-<div class="alert {intent} {$$props.class}">
+<div class="alert {intent} {$$restProps.class}" {...omit($$restProps, 'class')}>
   {#if icon}
     <div>
       <Icon name={icon} />
