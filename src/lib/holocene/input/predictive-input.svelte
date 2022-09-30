@@ -2,28 +2,50 @@
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import Icon from '$holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
+  import { onMount } from 'svelte';
 
   export let id: string;
   export let value: string;
   export let label = '';
   export let icon: IconName = null;
-  export let placeholder = '';
-  export let name = id;
   export let copyable: boolean = false;
   export let disabled = false;
   export let clearable = false;
   export let theme: 'dark' | 'light' = 'light';
-  export let autocomplete = false;
   export let valid = true;
   export let hintText = '';
   export let maxLength = 0;
-  export let spellcheck: boolean = null;
   export let unroundRight: boolean = false;
   export let unroundLeft: boolean = false;
-  export let autoFocus = false;
 
-  function callFocus(input) {
-    if (autoFocus) input.focus();
+  let match = '='; // pseudo rex
+  let content = value;
+  let editor;
+
+  function updateContent() {
+    if (editor) content = editor.textContent;
+  }
+
+  function marker(txt, rex) {
+    function markTerm(term) {
+      return ` <mark class="no-clicks text-blueGray-800 bg-blueGray-200">${term}</mark> `;
+    }
+    return txt.replace(rex, (term) => markTerm(term));
+  }
+
+  function highlight(node, [val, text]) {
+    function highlightQuotes() {
+      if (text)
+        node.innerHTML = marker(text, new RegExp(/"((?:\\.|[^"\\])*)"/, 'g'));
+    }
+    highlightQuotes();
+
+    return {
+      update(obj) {
+        [val, text] = obj;
+        highlightQuotes();
+      },
+    };
   }
 
   const { copy, copied } = copyToClipboard();
@@ -35,6 +57,10 @@
     <label for={id}>{label}</label>
   {/if}
   <div
+    contenteditable="true"
+    use:highlight={[match, content]}
+    bind:this={editor}
+    on:blur={updateContent}
     class="input-container {theme}"
     class:disabled
     class:unroundRight
@@ -46,24 +72,6 @@
         <Icon name={icon} />
       </span>
     {/if}
-    <input
-      class="m-2 block w-full bg-white focus:outline-none"
-      class:disabled
-      {disabled}
-      data-lpignore="true"
-      maxlength={maxLength > 0 ? maxLength : undefined}
-      {placeholder}
-      {id}
-      {name}
-      autocomplete={autocomplete ? 'on' : 'off'}
-      {spellcheck}
-      bind:value
-      on:input
-      on:change
-      on:focus
-      on:blur
-      use:callFocus
-    />
     {#if copyable}
       <div class="copy-icon-container" on:click={(e) => copy(e, value)}>
         <Icon name={$copied ? 'checkmark' : 'copy'} />
@@ -96,13 +104,17 @@
 </div>
 
 <style lang="postcss">
+  :global(.red) {
+    color: red;
+  }
+
   /* Base styles */
   label {
     @apply mb-10 font-secondary text-sm font-medium;
   }
 
   .input-container {
-    @apply relative box-border inline-flex h-10 w-full items-center rounded border border-gray-900 text-sm focus-within:border-blue-700;
+    @apply relative pl-2 box-border inline-flex h-10 w-full items-center rounded border border-gray-900 text-sm outline-none;
   }
 
   .unroundRight {

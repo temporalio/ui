@@ -11,6 +11,9 @@
   export let icon: IconName = null;
   export let iconClass: string = null;
   export let dataCy: string = $$props.dataCy;
+  export let unround: boolean = false;
+  export let unroundRight: boolean = false;
+  export let unroundLeft: boolean = false;
 </script>
 
 <button
@@ -22,6 +25,9 @@
   {disabled}
   class:add
   class:remove
+  class:unround
+  class:unroundRight
+  class:unroundLeft
 >
   <slot />
   {#if icon || loading}
@@ -42,5 +48,14 @@
 
   .primary {
     @apply bg-blue-700 text-white hover:from-gray-900 hover:to-gray-900 hover:text-white;
+  }
+  .unround {
+    @apply rounded-none;
+  }
+  .unroundLeft {
+    @apply rounded-tl-none rounded-bl-none;
+  }
+  .unroundRight {
+    @apply rounded-tr-none rounded-br-none;
   }
 </style>

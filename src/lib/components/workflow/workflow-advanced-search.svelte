@@ -20,6 +20,7 @@
   export let manualSearch = false;
   export let filters = [];
   export let sorts = [];
+  export let error = string;
 
   let manualSearchString = '';
 
@@ -54,35 +55,42 @@
   <div class="flex h-12 w-full items-center gap-0" in:fade>
     {#if manualSearch}
       <div
-        class="flex h-12 w-full items-center gap-0"
-        in:fly={{ x: 200, duration: 300 }}
+        class="flex h-12 w-full items-center gap-0 relative"
+        in:fly={{ x: -100, duration: 150 }}
       >
+        {#if error}
+          <span
+            class="absolute left-32 h-4 text-xs font-bold text-orange-500"
+            style="top: -16px">{error}</span
+          >
+        {/if}
+        <Button variant="primary" class="h-10" unroundRight on:click={onSearch}>
+          Search
+        </Button>
+        <CustomButton
+          icon="chevron-left"
+          class="h-10 border border-gray-900 border-r-0"
+          unround
+          on:click={() => (manualSearch = !manualSearch)}
+        />
         <Input
           id="manual-search"
           placeholder="Enter or paste a query..."
           icon="search"
           class="w-full"
-          unroundRight
+          clearable
+          unroundLeft
           autoFocus
           bind:value={manualSearchString}
+          errorText={error}
         />
-        <Button variant="primary" class="h-10" unround on:click={onSearch}>
-          Search
-        </Button>
-        <Button
-          variant="secondary"
-          class="h-10"
-          unroundLeft
-          on:click={() => (manualSearch = !manualSearch)}
-        >
-          Cancel
-        </Button>
       </div>
     {:else}
-      <div in:fly={{ x: 200, duration: 300 }}>
+      <div in:fly={{ x: -100, duration: 150 }}>
         <CustomButton
           variant="primary"
           class="h-10"
+          icon="chevron-right"
           on:click={() => (manualSearch = !manualSearch)}
         >
           Advanced Search

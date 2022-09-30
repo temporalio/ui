@@ -25,7 +25,7 @@
   <div class="flex items-center" on:click={() => onSortClick('asc')}>
     <div
       class="ml-4 mr-2 h-6 w-6 rounded-sm text-gray-900"
-      class:active={sorts.find((s) => s.order === 'asc')}
+      class:active={sorts.find((s) => s.order === 'asc' && s.value === type)}
     >
       <Icon
         class="pointer-events-none -mt-[1px]"
@@ -39,7 +39,7 @@
   <div class="flex items-center" on:click={() => onSortClick('desc')}>
     <div
       class="ml-4 mr-2 h-6 w-6 rounded-sm text-gray-900"
-      class:active={sorts.find((s) => s.order === 'desc')}
+      class:active={sorts.find((s) => s.order === 'desc' && s.value === type)}
     >
       <Icon
         class="pointer-events-none -mt-[1px]"
