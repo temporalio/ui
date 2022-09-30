@@ -2,6 +2,20 @@
   import Icon from '$holocene/icon/icon.svelte';
   import Badge from '$holocene/badge.svelte';
   import type { IconName } from './icon/paths';
+
+  type $$Props = ComponentProps<
+    HTMLDivElement,
+    {
+      title: string;
+      subtitle?: string;
+      icon?: string;
+      open?: boolean;
+      disabled?: boolean;
+      readOnly?: boolean;
+      error?: string;
+    }
+  >;
+
   export let title: string;
   export let subtitle: string = '';
   export let icon: IconName = null;
@@ -13,8 +27,9 @@
   $: open = disabled ? true : open;
 </script>
 
-<section
+<div
   class="flex w-full cursor-default flex-row rounded-lg border border-gray-300 bg-white p-8 text-primary {$$props.class}"
+  {...$$restProps}
 >
   <div class="w-full">
     <div
@@ -50,7 +65,7 @@
       <slot />
     </div>
   </div>
-</section>
+</div>
 
 <style lang="postcss">
   .open {
