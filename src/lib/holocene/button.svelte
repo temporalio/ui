@@ -24,6 +24,8 @@
   export let dataCy: string = $$props.dataCy;
   export let count: number = 0;
   export let type: string = 'button';
+  export let unround: boolean = false;
+  export let unroundRight: boolean = false;
   export let unroundLeft: boolean = false;
 </script>
 
@@ -34,6 +36,8 @@
     class:selected={active}
     class:large
     class:thin
+    class:unround
+    class:unroundRight
     class:unroundLeft
     data-cy={dataCy}
     {type}
@@ -141,8 +145,13 @@
   .thin {
     @apply h-8 py-1;
   }
-
+  .unround {
+    @apply rounded-none;
+  }
   .unroundLeft {
     @apply rounded-tl-none rounded-bl-none;
+  }
+  .unroundRight {
+    @apply rounded-tr-none rounded-br-none;
   }
 </style>

@@ -17,97 +17,77 @@
   import CustomButton from '$lib/holocene/custom-button.svelte';
   import Button from '$lib/holocene/button.svelte';
 
-  let manualSearch = true;
+  export let manualSearch = false;
+  export let filters = [];
+  export let sorts = [];
+
   let manualSearchString = '';
 
   $: query = $page.url.searchParams.get('query');
 
-  $: filterTypeOptions = $searchAttributes
-    ? Object.entries($searchAttributes).map(([key, value]) => {
-        return {
-          label: key,
-          value: key,
-          type: value,
-        };
-      })
-    : [];
-
-  export let onFilterChange: (filter: {
-    label: string;
-    value: string;
-    type: SearchAttributesValue;
-  }) => void;
-  export let filters = [];
-  export let sorts = [];
-
   $: {
     query = toListWorkflowQueryFromAdvancedFilters(filters, sorts);
+  }
+
+  function setManualString(manual, filters, sorts) {
+    if (manual) {
+      manualSearchString = query;
+    }
+  }
+
+  $: {
+    setManualString(manualSearch, filters, sorts);
   }
 
   const onSearch = () => {
     updateQueryParameters({
       url: $page.url,
       parameter: 'query',
-      value: query,
+      value: manualSearchString,
       allowEmpty: true,
     });
   };
-
-  $: bookmarkOptions = (
-    [...$searches]?.map((s) => ({ label: s.name, value: s.name })) ?? []
-  ).sort((a, b) => a?.label.localeCompare(b.label));
-
-  const onBookmarkChange = (name: string) => {
-    const bookmarkedSearch = $searches.find((s) => s.name === name);
-    if (bookmarkedSearch) {
-      filters = [...bookmarkedSearch.filters];
-      sorts = [...(bookmarkedSearch?.sorts ?? [])];
-      setTimeout(() => {
-        onSearch();
-      }, 150);
-    }
-  };
+  const { copy, copied } = copyToClipboard(500);
 </script>
 
-{#if !filters.length}
-  <div class="flex items-center gap-4">
-    <div class="flex h-12 w-full items-center gap-0" in:fade>
-      {#if manualSearch}
-        <div in:fly={{ x: 200, duration: 300 }}>
-          <Input
-            id="manual-search"
-            placeholder="Enter or paste a query..."
-            icon="search"
-            class="w-[600px]"
-            unroundRight
-            autoFocus
-            bind:value={manualSearchString}
-          />
-        </div>
-      {:else}
-        <div in:fly={{ x: 200, duration: 300 }}>
-          <TypeaheadInput
-            icon="search"
-            placeholder="Filter workflows"
-            class="w-80"
-            id="filter-type-name"
-            autoFocus
-            options={filterTypeOptions}
-            onChange={(filterType) =>
-              onFilterChange(
-                filterTypeOptions.find((o) => o.value === filterType),
-              )}
-          />
-        </div>
-      {/if}
-      <Button
-        variant="primary"
-        class="h-10"
-        unroundLeft
-        on:click={() => (manualSearch = !manualSearch)}
+<div class="flex grow flex-items-center gap-4">
+  <div class="flex h-12 w-full items-center gap-0" in:fade>
+    {#if manualSearch}
+      <div
+        class="flex h-12 w-full items-center gap-0"
+        in:fly={{ x: 200, duration: 300 }}
       >
-        Search
-      </Button>
-    </div>
+        <Input
+          id="manual-search"
+          placeholder="Enter or paste a query..."
+          icon="search"
+          class="w-full"
+          unroundRight
+          autoFocus
+          bind:value={manualSearchString}
+        />
+        <Button variant="primary" class="h-10" unround on:click={onSearch}>
+          Search
+        </Button>
+        <Button
+          variant="secondary"
+          class="h-10"
+          unroundLeft
+          on:click={() => (manualSearch = !manualSearch)}
+        >
+          Cancel
+        </Button>
+      </div>
+    {:else}
+      <div in:fly={{ x: 200, duration: 300 }}>
+        <CustomButton
+          variant="primary"
+          class="h-10"
+          on:click={() => (manualSearch = !manualSearch)}
+        >
+          Advanced Search
+        </CustomButton>
+      </div>
+    {/if}
   </div>
-{/if}
+</div>
