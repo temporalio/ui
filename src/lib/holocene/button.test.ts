@@ -39,7 +39,7 @@ describe('Button', () => {
     const instance = new Button({
       target: host,
       props: {
-        secondary: true,
+        variant: 'secondary',
       },
     });
 
@@ -52,7 +52,7 @@ describe('Button', () => {
     const instance = new Button({
       target: host,
       props: {
-        secondary: true,
+        variant: 'secondary',
       },
     });
 

@@ -59,7 +59,7 @@
       variant="destructive"
       on:click={show}
       disabled={terminateDisabled}
-      dataCy="terminate-button"
+      data-cy="terminate-button"
     >
       Terminate
     </Button>

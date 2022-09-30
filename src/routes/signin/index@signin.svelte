@@ -41,7 +41,7 @@
   <p class="my-7" data-cy="login-info">Let's get you signed in.</p>
   <div class="mx-auto">
     <Button
-      dataCy="login-button"
+      data-cy="login-button"
       variant="login"
       icon="lock"
       on:click={() => {

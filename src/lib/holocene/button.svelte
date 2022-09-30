@@ -3,6 +3,22 @@
   import type { IconName } from '$holocene/icon/paths';
   import Badge from '$holocene/badge.svelte';
 
+  type OwnProps = {
+    thin?: boolean;
+    loading?: boolean;
+    href?: string | null;
+    target?: '_self' | '_external';
+    active?: boolean;
+    large?: boolean;
+    as?: 'button' | 'anchor';
+    icon?: IconName;
+    count?: number;
+    variant?: 'primary' | 'secondary' | 'destructive' | 'login' | 'link';
+    disabled?: boolean;
+  };
+
+  type $$Props = ComponentProps<HTMLButtonElement, OwnProps>;
+
   export let disabled: boolean = false;
   export let variant:
     | 'primary'
@@ -10,7 +26,6 @@
     | 'destructive'
     | 'login'
     | 'link' = 'primary';
-
   export let thin: boolean = false;
   export let loading: boolean = false;
   export let href: string = null;
@@ -19,8 +34,6 @@
   export let large: boolean = false;
   export let as: 'button' | 'anchor' = href ? 'anchor' : 'button';
   export let icon: IconName = null;
-  export let classes: string = $$props.class;
-  export let dataCy: string = $$props.dataCy;
   export let count: number = 0;
   export let type: string = 'button';
 </script>
@@ -28,13 +41,13 @@
 {#if as === 'button'}
   <button
     on:click
-    class="button {variant} {classes}"
+    class="button {variant}"
     class:selected={active}
     class:large
     class:thin
-    data-cy={dataCy}
     {type}
     {disabled}
+    {...$$restProps}
   >
     {#if icon || loading}
       <span class:animate-spin={loading}>
@@ -53,13 +66,13 @@
   <a
     {href}
     on:click
-    class="button {variant} {classes}"
+    class="button {variant}"
     class:selected={active}
     class:large
     class:disabled
     class:thin
-    data-cy={dataCy}
     {target}
+    {...$$restProps}
   >
     {#if icon || loading}
       <span class:animate-spin={loading}>

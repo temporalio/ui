@@ -66,7 +66,7 @@
             <Button
               variant="secondary"
               on:click={onEndpointClear}
-              dataCy="data-encoder-clear-endpoint">Clear</Button
+              data-cy="data-encoder-clear-endpoint">Clear</Button
             >
           {:else}
             <input
@@ -78,7 +78,7 @@
             <Button
               variant="secondary"
               on:click={onEndpointSet}
-              dataCy="data-encoder-set-endpoint">Set</Button
+              data-cy="data-encoder-set-endpoint">Set</Button
             >
           {/if}
         </div>
@@ -116,7 +116,7 @@
           <Button
             variant="secondary"
             on:click={onEndpointSet}
-            dataCy="data-encoder-set-endpoint">Set</Button
+            data-cy="data-encoder-set-endpoint">Set</Button
           >
         </div>
         {#if error}
@@ -136,7 +136,7 @@
           <Button
             variant="secondary"
             on:click={onPointClear}
-            dataCy="data-encoder-clear-port">Clear</Button
+            data-cy="data-encoder-clear-port">Clear</Button
           >
         </div>
       </div>
@@ -155,7 +155,7 @@
           <Button
             variant="secondary"
             on:click={() => ($dataConverterPort = port)}
-            dataCy="data-encoder-set-port"
+            data-cy="data-encoder-set-port"
             >Set
           </Button>
         </div>
