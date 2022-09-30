@@ -56,7 +56,7 @@
 
 <div class="pagination relative mb-8 flex flex-col gap-4">
   <div
-    class={`flex items-center ${
+    class={`flex flex-col md:flex-row gap-4 items-center ${
       $$slots['action-top-left'] ? 'justify-between' : 'justify-end'
     }`}
   >

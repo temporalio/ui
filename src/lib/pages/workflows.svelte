@@ -37,6 +37,7 @@
   let filters = [];
   let sorts = [];
   let datetimeFilter = [];
+  let manualSearch = false;
 
   const errorMessage =
     searchType === 'advanced'
@@ -99,18 +100,30 @@
     >
   </div>
 </div>
-<WorkflowAdvancedFilters bind:filters bind:sorts />
+<!-- <WorkflowAdvancedFilters bind:filters bind:sorts /> -->
 {#if $loading}
   <Loading />
 {:else}
   <Pagination items={$workflows} updating={$updating} let:visibleItems>
     <svelte:fragment slot="action-top-left">
-      <WorkflowAdvancedSearch bind:filters {sorts} {onFilterChange} />
+      <WorkflowAdvancedSearch
+        bind:manualSearch
+        bind:filters
+        {sorts}
+        {onFilterChange}
+      />
     </svelte:fragment>
     <svelte:fragment slot="action-top-center">
-      <WorkflowDateTime bind:datetimeFilter />
+      {#if !manualSearch}
+        <WorkflowDateTime bind:datetimeFilter />
+      {/if}
     </svelte:fragment>
-    <WorkflowsSummaryTable updating={$updating} {datetimeFilter}>
+    <WorkflowsSummaryTable
+      updating={$updating}
+      {datetimeFilter}
+      bind:filters
+      bind:sorts
+    >
       {#each visibleItems as event}
         <WorkflowsSummaryRow
           workflow={event}

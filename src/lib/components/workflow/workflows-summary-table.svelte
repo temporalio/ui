@@ -20,8 +20,8 @@
   export let updating = false;
   export let datetimeFilter = [];
 
-  let filters = [];
-  let sorts = [];
+  export let filters = [];
+  export let sorts = [];
   let statusFilters = [];
   let workflowIdFilter = [];
   let workflowTypeFilter = [];
@@ -58,7 +58,7 @@
   };
 
   const handleParameterChange = debounce(() => {
-    const filters = combineFilters(
+    filters = combineFilters(
       statusFilters,
       workflowIdFilter,
       workflowTypeFilter,
