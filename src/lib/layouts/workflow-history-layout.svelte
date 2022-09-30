@@ -26,6 +26,10 @@
   const { workflow, workers } = $workflowRun;
   const namespaces = $page.stuff?.namespaces;
 
+  $: parentNamespace = namespaces.find(
+    (n) => n?.namespaceInfo?.id === workflow?.parentNamespaceId,
+  );
+
   const routeParameters = (view: EventView, eventId?: string) => ({
     namespace,
     workflow: workflow.id,
@@ -65,17 +69,12 @@
       href={routeForWorkers(workflowRoute)}
     />
     {#if workflow?.parent}
-      {@const parentNamespace = namespaces.find(
-        (n) => n.namespaceInfo.id === workflow?.parentNamespaceId,
-      )}
       <div class="gap-2 xl:flex">
         <WorkflowDetail
           title="Parent"
           content={workflow.parent?.workflowId}
           href={routeForWorkflow({
-            namespace: parentNamespace
-              ? parentNamespace?.namespaceInfo?.name
-              : namespace,
+            namespace: parentNamespace?.namespaceInfo?.name ?? namespace,
             workflow: workflow.parent?.workflowId,
             run: workflow.parent?.runId,
           })}
@@ -84,7 +83,7 @@
           title="Parent ID"
           content={workflow.parent?.runId}
           href={routeForWorkflow({
-            namespace,
+            namespace: parentNamespace?.namespaceInfo?.name ?? namespace,
             workflow: workflow.parent?.workflowId,
             run: workflow.parent?.runId,
           })}
