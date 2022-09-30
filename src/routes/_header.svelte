@@ -15,7 +15,7 @@
   import DataEncoderStatus from '$lib/holocene/data-encoder-status.svelte';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { showDataEncoderSettings } from '$lib/stores/show-data-encoder';
-  import { clearUser } from '$lib/stores/user';
+  import { clearAuthUser } from '$lib/stores/auth-user';
 
   export let user: User;
 
@@ -78,7 +78,7 @@
   };
 
   const logout = () => {
-    clearUser();
+    clearAuthUser();
     goto(routeForLoginPage());
   };
 </script>

@@ -17,7 +17,7 @@ vi.stubGlobal('GetNamespaces', async () => {
   ];
 });
 
-describe('routeForApi with AppConfig.apiUrl', () => {
+describe('routeForApi with GetNamespaces', () => {
   it('should return a route for workflow', async () => {
     const route = await routeForApi('workflow', parameters);
     expect(route).toBe(

@@ -1,5 +1,5 @@
 import { browser } from '$app/env';
-import { getUser } from '$lib/stores/user';
+import { getAuthUser } from '$lib/stores/auth-user';
 import { noop } from 'svelte/internal';
 import { handleError as handleRequestError } from './handle-error';
 import { isFunction } from './is-function';
@@ -134,15 +134,15 @@ const withAuth = async (
   options: RequestInit,
   isBrowser = browser,
 ): Promise<RequestInit> => {
-  if (getUser().accessToken) {
+  if (getAuthUser().accessToken) {
     options.headers = await withBearerToken(
       options?.headers,
-      async () => getUser().accessToken,
+      async () => getAuthUser().accessToken,
       isBrowser,
     );
     options.headers = withIdToken(
       options?.headers,
-      getUser().idToken,
+      getAuthUser().idToken,
       isBrowser,
     );
   } else if (globalThis?.AccessToken) {

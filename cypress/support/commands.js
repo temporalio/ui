@@ -57,7 +57,7 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add('login', () => {
-  window.localStorage.setItem('user', JSON.stringify(user));
+  window.localStorage.setItem('AuthUser', JSON.stringify(user));
 });
 
 Cypress.Commands.add('interceptClusterApi', (fixture = 'cluster.json') => {
