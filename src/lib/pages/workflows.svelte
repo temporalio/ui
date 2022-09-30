@@ -84,7 +84,7 @@
   title={`Workflows | ${$page.params?.namespace}`}
   url={$page.url.href}
 />
-<div class="flex justify-between">
+<div class="flex justify-between mb-2">
   <div>
     <h1 class="text-2xl" data-cy="namespace-title">
       Recent Workflows
@@ -110,7 +110,7 @@
         bind:manualSearch
         bind:filters
         {sorts}
-        {onFilterChange}
+        error={$workflowError}
       />
     </svelte:fragment>
     <svelte:fragment slot="action-top-center">
@@ -133,11 +133,7 @@
       {:else}
         <TableRow>
           <td colspan="5">
-            <EmptyState
-              title={'No Workflows Found'}
-              content={errorMessage}
-              error={$workflowError}
-            />
+            <EmptyState title={'No Workflows Found'} content={errorMessage} />
           </td>
         </TableRow>
       {/each}
