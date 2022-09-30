@@ -1,9 +1,11 @@
 <script lang="ts">
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import { triggerMenu } from './trigger-menu';
   export let show: boolean;
   export let controls: string;
   export let dark = false;
   export let disabled = false;
+  export let hasIndicator = false;
 
   const close = () => {
     !disabled && (show = false);
@@ -29,6 +31,12 @@
   {disabled}
 >
   <slot />
+  {#if hasIndicator}
+    <Icon
+      class="pointer-events-none"
+      name={show ? 'chevron-up' : 'chevron-down'}
+    />
+  {/if}
 </button>
 
 <style lang="postcss">

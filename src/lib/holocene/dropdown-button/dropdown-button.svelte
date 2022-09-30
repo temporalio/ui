@@ -16,21 +16,17 @@
 <MenuContainer class={$$props.class}>
   <MenuButton
     bind:show
-    class="flex flex-row items-center rounded-lg border border-gray-300 bg-white py-2"
+    class="flex flex-row items-center rounded-lg border border-gray-300 bg-white p-2"
     controls={id}
     disabled={readonly}
+    hasIndicator={!readonly}
   >
     {#if icon}
-      <div class="ml-4 flex items-center">
+      <div class="ml-2 flex items-center">
         <Icon name={icon} />
       </div>
     {/if}
     <span class="ml-2 mr-8">{label}</span>
-    {#if !readonly}
-      <div class="mr-2">
-        <Icon name={show ? 'chevron-up' : 'chevron-down'} />
-      </div>
-    {/if}
   </MenuButton>
   <Menu class="min-w-max" {id} {show}>
     <slot />
