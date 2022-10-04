@@ -21,6 +21,8 @@
   import CustomButton from '$lib/holocene/custom-button.svelte';
   import AddFilter from './advanced-filter/add-filter.svelte';
 
+  export let filters = [];
+  export let sorts = [];
   export let advancedSearch = false;
   export let manualSearch = false;
 
@@ -38,16 +40,8 @@
       })
     : [];
 
-  export let filters = [];
-  export let sorts = [];
-
-  let bookmarkName = '';
-  let activeSearch;
-
   let showFilters = true;
-  let showBookmarkSave = false;
-  let showBookmarkRemove = false;
-  let viewQueryString = true;
+  let showQuery = true;
 
   $: {
     query = toListWorkflowQueryFromAdvancedFilters(filters, sorts);
@@ -62,50 +56,7 @@
     });
   };
 
-  const onSave = () => {
-    showBookmarkSave = false;
-    const search = { name: bookmarkName, query, filters, sorts };
-    saveSearch(search);
-    activeSearch = search;
-  };
-
-  const onAddFilterOperator = (operator, index) => {
-    if (filters[index].operator === operator) {
-      filters[index].operator = '';
-    } else {
-      filters[index] = { ...filters[index], operator };
-      if (!filters[index + 1]) {
-        filters = [
-          ...filters,
-          {
-            filterType: filterTypeOptions[filterTypeOptions.length - 1].value,
-            value: '',
-            operator: '',
-            parenthesis: '',
-            conditional: '=',
-          },
-        ];
-      }
-    }
-  };
-
-  const onAddFilterParenthesis = (parenthesis, index) => {
-    if (filters[index].parenthesis === parenthesis) {
-      filters[index].parenthesis = '';
-    } else {
-      filters[index] = { ...filters[index], parenthesis };
-    }
-  };
-
-  const onRemove = () => {
-    showBookmarkRemove = false;
-    removeSearch(activeSearch);
-    onRestart();
-  };
-
   const onRestart = () => {
-    activeSearch = null;
-    bookmarkName = '';
     filters = [];
     sorts = [];
     updateQueryParameters({
@@ -116,37 +67,29 @@
     });
   };
 
-  const { copy, copied } = copyToClipboard(500);
+  const onRemoveFilter = (index: number) => {
+    filters = filters.filter((_, i) => i !== index);
+    const lastFilter = filters[filters.length - 1];
+    filters[filters.length - 1] = { ...lastFilter, operator: '' };
+  };
 
-  $: {
-    console.log(filters);
-  }
+  const { copy, copied } = copyToClipboard(500);
 </script>
 
 <div class="flex flex-col">
   <div
     class="rounded-tr-lg rounded-tl-lg border border-gray-900 bg-offWhite p-6"
   >
-    <h3 class="mb-2 flex items-center gap-2 text-base">
-      Advanced Visibility{activeSearch ? `: ${activeSearch.name}` : ''}
-    </h3>
+    <h3 class="mb-2 flex items-center gap-2 text-base">Advanced Visibility</h3>
     {#if showFilters}
       <section class="advanced-filters flex flex-col gap-2">
-        {#each filters as { filterType, value, operator, parenthesis, conditional }, index (index)}
+        {#each filters as { filterType, value, conditional }, index (index)}
           <div class="flex justify-between gap-16" transition:slide|local>
             <AdvancedFilter
               bind:filterType
               bind:value
               bind:conditional
-              bind:operator
-              bind:parenthesis
-              setFilterOperator={(operator) =>
-                onAddFilterOperator(operator, index)}
-              setFilterParenthesis={(parenthesis) =>
-                onAddFilterParenthesis(parenthesis, index)}
-              removeFilter={() => {
-                filters = filters.filter((_, i) => i !== index);
-              }}
+              removeFilter={() => onRemoveFilter(index)}
             />
           </div>
         {/each}
@@ -170,20 +113,9 @@
       </div>
       <div class="flex items-center gap-2">
         <CustomButton
-          icon={viewQueryString ? 'eye-hide' : 'eye-show'}
-          on:click={() => (viewQueryString = !viewQueryString)}
+          icon={showQuery ? 'eye-hide' : 'eye-show'}
+          on:click={() => (showQuery = !showQuery)}
         />
-        <CustomButton
-          icon={activeSearch ? 'star-filled' : 'star-empty'}
-          iconClass={activeSearch ? 'text-yellow-500' : ''}
-          on:click={() => (showBookmarkSave = true)}
-        />
-        {#if activeSearch}
-          <CustomButton
-            icon="trash"
-            on:click={() => (showBookmarkRemove = true)}
-          />
-        {/if}
         <CustomButton
           icon={showFilters ? 'chevron-up' : 'chevron-down'}
           on:click={() => (showFilters = !showFilters)}
@@ -191,7 +123,7 @@
       </div>
     </div>
   </div>
-  {#if viewQueryString}
+  {#if showQuery}
     <div
       class="flex h-10 w-full items-center overflow-x-auto rounded-br-lg rounded-bl-lg bg-gray-900 p-1 text-white"
       in:fade
@@ -203,34 +135,3 @@
     </div>
   {/if}
 </div>
-<Modal
-  open={showBookmarkSave}
-  on:cancelModal={() => (showBookmarkSave = false)}
-  on:confirmModal={onSave}
-  confirmText="Save"
-  confirmDisabled={!bookmarkName}
->
-  <h3 slot="title" data-cy="data-encoder-title">
-    Save {activeSearch ? 'As' : ''}
-  </h3>
-  <div slot="content">
-    <input
-      class="block w-full rounded-md border border-gray-200 p-2"
-      placeholder="Name"
-      data-cy="bookmark-name-input"
-      bind:value={bookmarkName}
-    />
-  </div>
-</Modal>
-<Modal
-  open={showBookmarkRemove}
-  on:cancelModal={() => (showBookmarkRemove = false)}
-  on:confirmModal={onRemove}
-  confirmType="destructive"
-  confirmText="Remove"
->
-  <h3 slot="title" data-cy="data-encoder-title">Remove Search</h3>
-  <div slot="content">
-    <p>Are you sure you want to remove {activeSearch.name}?</p>
-  </div>
-</Modal>

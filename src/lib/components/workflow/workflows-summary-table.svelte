@@ -17,9 +17,9 @@
 
   export let updating = false;
   export let datetimeFilter = [];
-
   export let filters = [];
   export let sorts = [];
+
   let statusFilters = [];
   let workflowIdFilter = [];
   let workflowTypeFilter = [];

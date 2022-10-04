@@ -26,8 +26,14 @@
   let adding = false;
 
   const onAddFilter = (filterType: string) => {
+    const _filters = filters.map((filter, index) => {
+      if (index === filters.length - 1) {
+        return { ...filter, operator: 'AND' };
+      }
+    });
+
     filters = [
-      ...filters,
+      ..._filters,
       {
         filterType,
         value: '',
