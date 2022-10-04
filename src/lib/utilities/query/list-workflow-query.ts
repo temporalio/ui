@@ -45,7 +45,7 @@ const isValid = (value: unknown): boolean => {
 const isAdvancedValid = (value: unknown): boolean => {
   if (value === null) return false;
   if (value === undefined) return false;
-  if (value === '') return false;
+  if (value === '') return true;
   if (typeof value === 'string' && value === 'undefined') return false;
 
   return true;

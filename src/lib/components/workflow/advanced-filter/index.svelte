@@ -13,11 +13,7 @@
   export let filterType: FilterKey;
   export let value: string = '';
   export let conditional: string = '';
-  export let operator: string = '';
-  export let parenthesis: string = '';
 
-  export let setFilterOperator: (operator: string) => void = () => noop;
-  export let setFilterParenthesis: (operator: string) => void = () => noop;
   export let removeFilter: () => void = () => noop;
 
   const FilterComponents = {
@@ -52,27 +48,10 @@
     // if (type === 'Int') return '=';
     return '=';
   }
-
-  const onTypeChange = (type: string) => {
-    selected = filterOptions?.find((option) => option.value === type);
-    value = '';
-    conditional = getConditionalForType(selected.type);
-  };
 </script>
 
 <div class="flex items-center gap-2">
   <p class="text-sm">{filterType}</p>
-  <!-- <Select
-    id="filter-type"
-    bind:value={filterType}
-    onChange={onTypeChange}
-    class="w-auto"
-    menuClass="border-gray-300"
-  >
-    {#each filterOptions as { value, label } (value)}
-      <Option {value}>{label}</Option>
-    {/each}
-  </Select> -->
   <svelte:component
     this={selected.component}
     id={selected.value}
@@ -81,30 +60,6 @@
     bind:conditional
   />
   <div class="flex items-center gap-2">
-    <!-- <CustomButton
-      variant="secondary"
-      active={parenthesis === '('}
-      thin
-      on:click={() => setFilterParenthesis('(')}>(</CustomButton
-    >
-    <CustomButton
-      variant="secondary"
-      active={parenthesis === ')'}
-      thin
-      on:click={() => setFilterParenthesis(')')}>)</CustomButton
-    >
-    <CustomButton
-      variant="secondary"
-      active={operator === 'and'}
-      thin
-      on:click={() => setFilterOperator('and')}>and</CustomButton
-    >
-    <CustomButton
-      variant="secondary"
-      active={operator === 'or'}
-      thin
-      on:click={() => setFilterOperator('or')}>or</CustomButton
-    > -->
     <CustomButton
       variant="secondary"
       icon="close"
@@ -113,9 +68,3 @@
     />
   </div>
 </div>
-
-<style lang="postcss">
-  .indented {
-    @apply pl-8;
-  }
-</style>
