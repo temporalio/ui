@@ -2,6 +2,7 @@
   import { writable } from 'svelte/store';
   import { onDestroy, setContext } from 'svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
+  import { clickOutside } from '$lib/holocene/outside-click';
 
   import type { SelectContext } from '$lib/holocene/select/select.svelte';
   import Input from '$lib/holocene/input/input.svelte';
@@ -53,22 +54,26 @@
   }
 </script>
 
-<MenuContainer class={$$props.class}>
-  <Input
-    {id}
-    {icon}
-    unroundRight
-    class={$$props.class}
-    bind:value
-    {placeholder}
-    on:focus={() => (showMenu = true)}
-    on:blur={() => (showMenu = false)}
-  />
-  <Menu show={showMenu} id={`menu-${id}`} class="h-auto max-h-80">
-    {#each filterOptions as { label, value }}
-      <Option {value}>{label}</Option>
-    {:else}
-      <Option>No Results</Option>
-    {/each}
-  </Menu>
-</MenuContainer>
+<div
+  class="relative"
+  use:clickOutside
+  on:click-outside={() => (showMenu = false)}
+>
+  <MenuContainer class={$$props.class}>
+    <Input
+      {id}
+      {icon}
+      class={$$props.class}
+      bind:value
+      {placeholder}
+      on:focus={() => (showMenu = true)}
+    />
+    <Menu show={showMenu} id={`menu-${id}`} class="h-auto max-h-80">
+      {#each filterOptions as { label, value }}
+        <Option {value}>{label}</Option>
+      {:else}
+        <Option>No Results</Option>
+      {/each}
+    </Menu>
+  </MenuContainer>
+</div>

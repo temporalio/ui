@@ -40,10 +40,8 @@
 <div class="flex gap-2">
   <CustomButton
     icon={sorts.length ? 'close' : 'converter-down'}
-    class="h-10 border-gray-300"
-    add={!sorts.length}
-    remove={!!sorts.length}
-    on:click={onOrderBy}>Order By</CustomButton
+    class="h-10 border border-gray-900 bg-white"
+    on:click={onOrderBy}>Add Sort</CustomButton
   >
   {#each sorts as { label, value, order }}
     <Select id="filter-type" bind:value class="w-auto">

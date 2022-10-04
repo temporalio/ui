@@ -74,7 +74,7 @@
       </div>
     {:else if clearable}
       <div
-        class="flex h-full w-6 h-6 mr-2 items-center rounded-full justify-center cursor-pointer hover:bg-gray-200"
+        class="mr-2 flex h-full h-6 w-6 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200"
         on:click={() => (value = '')}
       >
         <Icon name="close" />

@@ -1,7 +1,6 @@
 <script lang="ts">
   import Select from '$lib/holocene/select/select.svelte';
   import Option from '$lib/holocene/select/option.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import StatusFilter from './status-filter.svelte';
   import type { FilterKey } from '$lib/utilities/query/list-workflow-query';
   import { searchAttributes } from '$lib/stores/search-attributes';
@@ -9,7 +8,6 @@
   import IntFilter from './int-filter.svelte';
   import KeywordFilter from './keyword-filter.svelte';
   import DatetimeFilter from './datetime-filter.svelte';
-  import TypeaheadInput from '$lib/holocene/input/typeahead-input.svelte';
   import CustomButton from '$lib/holocene/custom-button.svelte';
 
   export let filterType: FilterKey;
@@ -17,7 +15,6 @@
   export let conditional: string = '';
   export let operator: string = '';
   export let parenthesis: string = '';
-  export let isOnly: boolean = true;
 
   export let setFilterOperator: (operator: string) => void = () => noop;
   export let setFilterParenthesis: (operator: string) => void = () => noop;
@@ -47,7 +44,7 @@
     : [];
   const filterOptions = [...searchAttributeOptions];
 
-  let selected = filterOptions?.find((option) => option.value === filterType);
+  $: selected = filterOptions?.find((option) => option.value === filterType);
 
   function getConditionalForType(type) {
     if (type === 'Datetime') return 'In Last';
@@ -63,17 +60,9 @@
   };
 </script>
 
-<div class="flex gap-2">
-  <!-- <TypeaheadInput
-    icon="filter"
-    placeholder="Filter workflows"
-    class="w-80"
-    id="filter-type-name"
-    options={filterOptions}
-    onChange={onTypeChange}
-  /> -->
-
-  <Select
+<div class="flex items-center gap-2">
+  <p class="text-sm">{filterType}</p>
+  <!-- <Select
     id="filter-type"
     bind:value={filterType}
     onChange={onTypeChange}
@@ -83,7 +72,7 @@
     {#each filterOptions as { value, label } (value)}
       <Option {value}>{label}</Option>
     {/each}
-  </Select>
+  </Select> -->
   <svelte:component
     this={selected.component}
     id={selected.value}
@@ -92,7 +81,7 @@
     bind:conditional
   />
   <div class="flex items-center gap-2">
-    <CustomButton
+    <!-- <CustomButton
       variant="secondary"
       active={parenthesis === '('}
       thin
@@ -115,15 +104,13 @@
       active={operator === 'or'}
       thin
       on:click={() => setFilterOperator('or')}>or</CustomButton
-    >
-    {#if !isOnly}
-      <CustomButton
-        variant="secondary"
-        icon="close"
-        thin
-        on:click={removeFilter}
-      />
-    {/if}
+    > -->
+    <CustomButton
+      variant="secondary"
+      icon="close"
+      thin
+      on:click={removeFilter}
+    />
   </div>
 </div>
 

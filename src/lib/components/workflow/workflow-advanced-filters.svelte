@@ -15,13 +15,14 @@
   import AdvancedFilter from './advanced-filter/index.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { removeSearch, saveSearch, searches } from '$lib/stores/searches';
-  import TypeaheadInput from '$lib/holocene/input/typeahead-input.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import SortFilter from './advanced-filter/sort-filter.svelte';
   import { searchAttributes } from '$lib/stores/search-attributes';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import CustomButton from '$lib/holocene/custom-button.svelte';
-  import CustomSplitButton from '$lib/holocene/custom-split-button.svelte';
+  import AddFilter from './advanced-filter/add-filter.svelte';
+
+  export let advancedSearch = false;
+  export let manualSearch = false;
 
   const defaultQuery = toListWorkflowQuery({ timeRange: 'All' });
   $: query = $page.url.searchParams.get('query');
@@ -46,7 +47,7 @@
   let showFilters = true;
   let showBookmarkSave = false;
   let showBookmarkRemove = false;
-  let viewQueryString = false;
+  let viewQueryString = true;
 
   $: {
     query = toListWorkflowQueryFromAdvancedFilters(filters, sorts);
@@ -116,10 +117,16 @@
   };
 
   const { copy, copied } = copyToClipboard(500);
+
+  $: {
+    console.log(filters);
+  }
 </script>
 
-{#if filters.length}
-  <div class="rounded-tr-lg rounded-tl-lg bg-offWhite p-6">
+<div class="flex flex-col">
+  <div
+    class="rounded-tr-lg rounded-tl-lg border border-gray-900 bg-offWhite p-6"
+  >
     <h3 class="mb-2 flex items-center gap-2 text-base">
       Advanced Visibility{activeSearch ? `: ${activeSearch.name}` : ''}
     </h3>
@@ -133,7 +140,6 @@
               bind:conditional
               bind:operator
               bind:parenthesis
-              isOnly={index === 0 && filters.length === 1}
               setFilterOperator={(operator) =>
                 onAddFilterOperator(operator, index)}
               setFilterParenthesis={(parenthesis) =>
@@ -144,17 +150,23 @@
             />
           </div>
         {/each}
-        <div class="flex w-full items-center gap-4">
-          <SortFilter bind:sorts />
-        </div>
+        <AddFilter bind:filters />
+        <SortFilter bind:sorts />
       </section>
     {/if}
-    <div class="mt-4 flex w-full items-center justify-between gap-4">
+    <div class="mt-8 flex w-full items-center justify-between gap-4">
       <div class="flex items-center gap-2" in:fade>
         <Button variant="primary" icon="search" primary on:click={onSearch}
           >Search</Button
         >
         <CustomButton icon="retry" on:click={onRestart}>Reset</CustomButton>
+        <CustomButton
+          icon="terminal"
+          on:click={() => {
+            advancedSearch = false;
+            manualSearch = true;
+          }}>Manual</CustomButton
+        >
       </div>
       <div class="flex items-center gap-2">
         <CustomButton
@@ -190,7 +202,7 @@
       <pre class="flex h-full items-center text-sm">{query}</pre>
     </div>
   {/if}
-{/if}
+</div>
 <Modal
   open={showBookmarkSave}
   on:cancelModal={() => (showBookmarkSave = false)}
