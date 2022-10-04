@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Hst } from '@histoire/plugin-svelte';
+  import type { Hst as HST } from '@histoire/plugin-svelte';
   import OptionGroup from './select/option-group.svelte';
 
   import Option from './select/option.svelte';
@@ -7,7 +7,7 @@
   import SimpleOption from './select/simple-option.svelte';
   import SimpleSelect from './select/simple-select.svelte';
 
-  export let Hst: Hst;
+  export let Hst: HST;
 
   let value = '';
   let dark = false;

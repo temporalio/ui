@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { Hst } from '@histoire/plugin-svelte';
+  import type { Hst as HST } from '@histoire/plugin-svelte';
   import Icon from './icon.svelte';
   import { type IconName, icons } from './paths';
 
-  export let Hst: Hst;
+  export let Hst: HST;
   export let size = 24;
 
   const iconNames: IconName[] = Object.keys(icons) as IconName[];

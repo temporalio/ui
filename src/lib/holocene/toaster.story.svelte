@@ -1,10 +1,10 @@
 <script lang="ts">
-  import type { Hst } from '@histoire/plugin-svelte';
+  import type { Hst as HST } from '@histoire/plugin-svelte';
   import Button from './button.svelte';
 
   import Toaster, { toaster, type ToastVariant } from './toaster.svelte';
 
-  export let Hst: Hst;
+  export let Hst: HST;
 
   let variant: ToastVariant = 'primary';
   let duration = 1000;

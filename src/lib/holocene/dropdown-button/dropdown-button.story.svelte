@@ -3,9 +3,9 @@
   import DropdownButton from './dropdown-button.svelte';
   import RadioMenuItem from '../dropdown-button/radio-menu-item.svelte';
   import MenuItem from '../primitives/menu/menu-item.svelte';
-  import type { Hst } from '@histoire/plugin-svelte';
+  import type { Hst as HST } from '@histoire/plugin-svelte';
 
-  export let Hst: Hst;
+  export let Hst: HST;
 
   let value: number = 0;
 </script>

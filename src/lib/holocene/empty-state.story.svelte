@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { Hst } from '@histoire/plugin-svelte';
+  import type { Hst as HST } from '@histoire/plugin-svelte';
   import EmptyState from './empty-state.svelte';
 
-  export let Hst: Hst;
+  export let Hst: HST;
 </script>
 
 <Hst.Story>

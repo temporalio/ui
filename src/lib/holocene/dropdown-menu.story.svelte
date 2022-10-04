@@ -2,9 +2,9 @@
   import DropdownMenu from '$lib/holocene/dropdown-menu.svelte';
   import Icon from '$holocene/icon/icon.svelte';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
-  import type { Hst } from '@histoire/plugin-svelte';
+  import type { Hst as HST } from '@histoire/plugin-svelte';
 
-  export let Hst: Hst;
+  export let Hst: HST;
 </script>
 
 <Hst.Story>
