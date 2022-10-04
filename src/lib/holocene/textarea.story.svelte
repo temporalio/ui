@@ -1,7 +1,8 @@
 <script lang="ts">
+  import type { Hst } from '@histoire/plugin-svelte';
   import Textarea from './textarea.svelte';
 
-  export let Hst;
+  export let Hst: Hst;
 
   let disabled = false;
   let isValid = true;

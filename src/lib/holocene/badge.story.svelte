@@ -1,7 +1,8 @@
 <script lang="ts">
+  import type { Hst } from '@histoire/plugin-svelte';
   import Badge from './badge.svelte';
 
-  export let Hst;
+  export let Hst: Hst;
   let count = 1;
 </script>
 

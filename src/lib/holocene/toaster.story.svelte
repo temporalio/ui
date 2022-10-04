@@ -1,9 +1,10 @@
 <script lang="ts">
+  import type { Hst } from '@histoire/plugin-svelte';
   import Button from './button.svelte';
 
   import Toaster, { toaster, type ToastVariant } from './toaster.svelte';
 
-  export let Hst;
+  export let Hst: Hst;
 
   let variant: ToastVariant = 'primary';
   let duration = 1000;
@@ -18,7 +19,7 @@
 
   <svelte:fragment slot="controls">
     <Hst.Text title="Message: " bind:value={message} />
-    <Hst.Number title="Duration: " bind:value={duration} interval={100} />
+    <Hst.Number title="Duration: " bind:value={duration} />
     <Hst.Select
       title="Variant: "
       bind:value={variant}

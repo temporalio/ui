@@ -1,7 +1,8 @@
 <script lang="ts">
+  import type { Hst } from '@histoire/plugin-svelte';
   import ScrollToTop from './scroll-to-top.svelte';
 
-  export let Hst;
+  export let Hst: Hst;
 </script>
 
 <Hst.Story>

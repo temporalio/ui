@@ -1,7 +1,8 @@
 <script lang="ts">
+  import type { Hst } from '@histoire/plugin-svelte';
   import Autocomplete from './autocomplete.svelte';
 
-  export let Hst;
+  export let Hst: Hst;
   let value = '';
 </script>
 

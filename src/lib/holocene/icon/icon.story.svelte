@@ -1,8 +1,9 @@
 <script lang="ts">
+  import type { Hst } from '@histoire/plugin-svelte';
   import Icon from './icon.svelte';
   import { type IconName, icons } from './paths';
 
-  export let Hst;
+  export let Hst: Hst;
   export let size = 24;
 
   const iconNames: IconName[] = Object.keys(icons) as IconName[];
@@ -16,6 +17,6 @@
   {/each}
 
   <svelte:fragment slot="controls">
-    <Hst.Number step={2} title="Icon Size:" bind:value={size} />
+    <Hst.Number title="Icon Size:" bind:value={size} />
   </svelte:fragment>
 </Hst.Story>

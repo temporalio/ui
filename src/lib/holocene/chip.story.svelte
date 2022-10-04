@@ -1,7 +1,8 @@
 <script lang="ts">
   import Chip from '$lib/holocene/chip.svelte';
+  import type { Hst } from '@histoire/plugin-svelte';
 
-  export let Hst;
+  export let Hst: Hst;
 
   let value = 'lucille@temporal.io';
 </script>

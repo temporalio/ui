@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Hst } from '@histoire/plugin-svelte';
   import { hstEvent } from 'histoire/client';
   import Button from './button.svelte';
 
@@ -6,7 +7,7 @@
   let thin: boolean = false;
   let loading: boolean = false;
 
-  export let Hst;
+  export let Hst: Hst;
 </script>
 
 <Hst.Story>

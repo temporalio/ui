@@ -1,8 +1,9 @@
 <script lang="ts">
+  import type { Hst } from '@histoire/plugin-svelte';
   import Input from './input/input.svelte';
   import NumberInput from './input/number-input.svelte';
 
-  export let Hst;
+  export let Hst: Hst;
 
   let value: string = '';
   let hintText: string | undefined;

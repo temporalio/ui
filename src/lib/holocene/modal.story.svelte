@@ -1,9 +1,9 @@
 <script lang="ts">
-  import Button from './button.svelte';
+  import type { Hst } from '@histoire/plugin-svelte';
 
   import Modal from './modal.svelte';
 
-  export let Hst;
+  export let Hst: Hst;
   let open = true;
 </script>
 

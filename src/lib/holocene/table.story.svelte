@@ -3,8 +3,9 @@
   import Table from '$holocene/table/table.svelte';
   import TableRow from '$holocene/table/table-row.svelte';
   import TableHeaderRow from '$holocene/table/table-header-row.svelte';
+  import type { Hst } from '@histoire/plugin-svelte';
 
-  export let Hst;
+  export let Hst: Hst;
 </script>
 
 <Hst.Story>

@@ -1,7 +1,8 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
+  import type { Hst } from '@histoire/plugin-svelte';
 
-  export let Hst;
+  export let Hst: Hst;
   let checked = true;
 </script>
 

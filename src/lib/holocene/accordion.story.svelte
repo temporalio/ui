@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Hst } from '@histoire/plugin-svelte';
   import Accordion from './accordion.svelte';
   import Button from './button.svelte';
   import CodeBlock from './code-block.svelte';
@@ -6,7 +7,7 @@
   import TableRow from './table/table-row.svelte';
   import Table from './table/table.svelte';
 
-  export let Hst;
+  export let Hst: Hst;
 </script>
 
 <Hst.Story layout={{ type: 'single', iframe: false }}>
