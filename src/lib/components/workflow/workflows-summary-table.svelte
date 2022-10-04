@@ -2,8 +2,6 @@
   import debounce from 'just-debounce';
   import { page } from '$app/stores';
 
-  import { timeFormat } from '$lib/stores/time-format';
-
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
   import {

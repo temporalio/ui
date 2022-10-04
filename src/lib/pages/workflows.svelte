@@ -19,14 +19,11 @@
   import Pagination from '$lib/holocene/pagination.svelte';
   import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
   import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
-  import WorkflowFilters from '$lib/components/workflow/workflow-filters.svelte';
   import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
   import Loading from '$holocene/loading.svelte';
   import PageTitle from '$lib/holocene/page-title.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$holocene/icon/icon.svelte';
-  import Select from '$lib/holocene/select/simple-select.svelte';
-  import Option from '$lib/holocene/select/simple-option.svelte';
   import WorkflowAdvancedFilters from '$lib/components/workflow/workflow-advanced-filters.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import TableRow from '$holocene/table/table-row.svelte';
@@ -37,6 +34,7 @@
   let filters = [];
   let sorts = [];
   let datetimeFilter = [];
+  let advancedSearch = false;
   let manualSearch = false;
 
   const errorMessage =
@@ -84,7 +82,7 @@
   title={`Workflows | ${$page.params?.namespace}`}
   url={$page.url.href}
 />
-<div class="flex justify-between mb-2">
+<div class="mb-2 flex justify-between">
   <div>
     <h1 class="text-2xl" data-cy="namespace-title">
       Recent Workflows
@@ -100,7 +98,14 @@
     >
   </div>
 </div>
-<!-- <WorkflowAdvancedFilters bind:filters bind:sorts /> -->
+{#if advancedSearch}
+  <WorkflowAdvancedFilters
+    bind:filters
+    bind:sorts
+    bind:manualSearch
+    bind:advancedSearch
+  />
+{/if}
 {#if $loading}
   <Loading />
 {:else}
@@ -108,13 +113,14 @@
     <svelte:fragment slot="action-top-left">
       <WorkflowAdvancedSearch
         bind:manualSearch
+        bind:advancedSearch
         bind:filters
         {sorts}
         error={$workflowError}
       />
     </svelte:fragment>
     <svelte:fragment slot="action-top-center">
-      {#if !manualSearch}
+      {#if !manualSearch && !advancedSearch}
         <WorkflowDateTime bind:datetimeFilter />
       {/if}
     </svelte:fragment>

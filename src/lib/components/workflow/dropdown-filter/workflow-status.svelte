@@ -21,7 +21,7 @@
 
   function mapStatusToFilter(value) {
     return {
-      filterType: 'executionStatus',
+      filterType: 'ExecutionStatus',
       value,
       conditional: '=',
       operator: '',
