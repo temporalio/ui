@@ -32,7 +32,16 @@
     return '=';
   }
 
-  const onAddFilter = (filterType: string) => {
+  function getDefaultValueForType(attribute: string) {
+    const filter = filterTypeOptions.find((t) => t.value === attribute);
+    const type = filter?.type;
+    if (type === 'Datetime') return '24 hours';
+    if (type === 'Bool') return 'true';
+
+    return '';
+  }
+
+  const onAddFilter = (attribute: string) => {
     const _filters = filters.map((filter, index) => {
       if (index === filters.length - 1) {
         return { ...filter, operator: 'AND' };
@@ -40,20 +49,16 @@
       return filter;
     });
 
-    console.log('_filters: ', _filters);
-
     filters = [
       ..._filters,
       {
-        filterType,
-        value: '',
+        attribute,
+        value: getDefaultValueForType(attribute),
         operator: '',
         parenthesis: '',
-        conditional: getConditionalForType(filterType),
+        conditional: getConditionalForType(attribute),
       },
     ];
-
-    console.log('Filters: ', filters);
   };
 
   const onTypeChange = (type: string) => {
@@ -78,6 +83,7 @@
       bind:value
       options={filterTypeOptions}
       onChange={onTypeChange}
+      autoFocus
     />
   {/if}
 </div>

@@ -144,7 +144,7 @@ const toQueryStatementsFromAdvancedFilters = (
           statement = `${statement})`;
         }
         if (operator) {
-          statement = `${statement} ${operator.toLowerCase()}` + ' ';
+          statement = `${statement} ${operator}` + ' ';
         }
         return statement;
       }

@@ -28,10 +28,11 @@
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import TableRow from '$holocene/table/table-row.svelte';
   import WorkflowDateTime from '$lib/components/workflow/workflow-datetime-filter.svelte';
+  import type { WorkflowFilter } from '$lib/models/workflow-filters';
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
 
-  let filters = [];
+  let filters: WorkflowFilter[] = [];
   let sorts = [];
   let datetimeFilter = [];
   let advancedSearch = false;
@@ -55,27 +56,6 @@
     const parameters = query ? toListWorkflowParameters(query) : {};
     $workflowsSearch = { parameters, searchType };
   });
-
-  const onFilterChange = (filter: {
-    label: string;
-    value: string;
-    type: SearchAttributesValue;
-  }) => {
-    const conditionals = {
-      Keyword: '=',
-      Int: '=',
-      Datetime: 'In Last',
-    };
-    filters = [
-      {
-        filterType: filter.type,
-        value: '',
-        operator: '',
-        parenthesis: '',
-        conditional: conditionals[filter.type],
-      },
-    ];
-  };
 </script>
 
 <PageTitle

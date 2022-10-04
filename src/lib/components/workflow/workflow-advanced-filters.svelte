@@ -5,36 +5,38 @@
 
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
+  import { toListWorkflowAdvancedParameters } from '$lib/utilities/query/to-list-workflow-advanced-parameters';
   import {
     toListWorkflowQuery,
     toListWorkflowQueryFromAdvancedFilters,
   } from '$lib/utilities/query/list-workflow-query';
 
-  import Modal from '$holocene/modal.svelte';
   import AdvancedFilter from './advanced-filter/index.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import { removeSearch, saveSearch, searches } from '$lib/stores/searches';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import SortFilter from './advanced-filter/sort-filter.svelte';
-  import { searchAttributes } from '$lib/stores/search-attributes';
   import CustomButton from '$lib/holocene/custom-button.svelte';
   import AddFilter from './advanced-filter/add-filter.svelte';
+  import type { WorkflowFilter } from '$lib/models/workflow-filters';
 
-  export let filters = [];
+  export let filters: WorkflowFilter[] = [];
   export let sorts = [];
   export let advancedSearch = false;
   export let manualSearch = false;
 
   const defaultQuery = toListWorkflowQuery({ timeRange: 'All' });
   $: query = $page.url.searchParams.get('query');
-  $: parameters = toListWorkflowParameters(query ?? defaultQuery);
+  $: parameters = toListWorkflowAdvancedParameters(query ?? defaultQuery);
+
+  $: {
+    console.log('params: ', parameters);
+  }
 
   let showFilters = true;
   let showQuery = true;
 
   $: {
-    query = toListWorkflowQueryFromAdvancedFilters(filters, sorts);
+    // query = toListWorkflowQueryFromAdvancedFilters(filters, sorts);
   }
 
   const onSearch = () => {
@@ -73,10 +75,10 @@
     <h3 class="mb-2 flex items-center gap-2 text-base">Advanced Visibility</h3>
     {#if showFilters}
       <section class="advanced-filters flex flex-col gap-2">
-        {#each filters as { filterType, value, conditional }, index (index)}
+        {#each filters as { attribute, value, conditional }, index (index)}
           <div class="flex justify-between gap-16" transition:slide|local>
             <AdvancedFilter
-              bind:filterType
+              bind:attribute
               bind:value
               bind:conditional
               removeFilter={() => onRemoveFilter(index)}
