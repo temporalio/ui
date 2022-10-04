@@ -8,7 +8,7 @@ import {
   dataEncoderEndpoint,
   lastDataEncoderStatus,
 } from './data-encoder-config';
-import { user } from './user';
+import { authUser } from './auth-user';
 
 export const dataEncoder = derived(
   [
@@ -17,7 +17,7 @@ export const dataEncoder = derived(
     lastDataEncoderStatus,
     dataConverterPort,
     lastDataConverterStatus,
-    user,
+    authUser,
   ],
   ([
     $page,
@@ -25,13 +25,13 @@ export const dataEncoder = derived(
     $lastDataEncoderStatus,
     $dataConverterPort,
     $lastDataConverterStatus,
-    $user,
+    $authUser,
   ]) => {
     const namespace = $page.params.namespace;
     const settingsEndpoint = $page?.stuff?.settings?.codec?.endpoint;
     const endpoint = $dataEncoderEndpoint || settingsEndpoint;
     const passAccessToken = $page.stuff?.settings?.codec?.passAccessToken;
-    const accessToken = $user?.accessToken;
+    const accessToken = $authUser?.accessToken;
     const hasNotRequested = endpoint
       ? $lastDataEncoderStatus === 'notRequested'
       : $lastDataConverterStatus === 'notRequested';

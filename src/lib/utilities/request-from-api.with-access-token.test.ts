@@ -17,7 +17,6 @@ const options = {
 
 const endpoint = '/api/endpoint';
 const responseBody = listWorkflowResponse;
-const token = 'token';
 
 const fetchMock = <T = unknown>(
   body: T = responseBody,
@@ -33,24 +32,7 @@ const fetchMock = <T = unknown>(
     });
   }) as unknown as typeof fetch;
 
-vi.stubGlobal('AccessToken', () => {
-  return token;
-});
-
-describe('requestFromAPI (with a global access token)', () => {
-  it('should add an authorization header if there is an AccessToken', async () => {
-    const token = 'token';
-    const headers = {
-      Authorization: `Bearer ${token}`,
-    };
-    const opts = { ...options, headers };
-
-    const request = fetchMock();
-    await requestFromAPI(endpoint, { request });
-
-    expect(request).toHaveBeenCalledWith(endpoint + '?', opts);
-  });
-
+describe('requestFromAPI', () => {
   it('should not add an authorization header if it is not running in the browser', async () => {
     const request = fetchMock();
     await requestFromAPI(endpoint, { request, isBrowser: false });

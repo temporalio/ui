@@ -8,13 +8,19 @@ const parameters = {
   queue: 'queue',
 };
 
-vi.stubGlobal('AppConfig', {
-  apiUrl: 'https://api.url/',
+vi.stubGlobal('GetNamespaces', async () => {
+  return [
+    {
+      namespace: 'namespace',
+      webUri: 'https://api.url/',
+    },
+  ];
 });
 
-describe('routeForApi with AppConfig.apiUrl', () => {
-  it('should return a route for workflow', () => {
-    expect(routeForApi('workflow', parameters)).toBe(
+describe('routeForApi with GetNamespaces', () => {
+  it('should return a route for workflow', async () => {
+    const route = await routeForApi('workflow', parameters);
+    expect(route).toBe(
       'https://api.url/api/v1/namespaces/namespace/workflows/workflow/runs/run',
     );
   });

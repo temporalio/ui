@@ -43,21 +43,28 @@ export const fetchAllWorkflows = async (
   const onError: ErrorCallback = (err) => {
     // Kick out to login if 401/403
     handleUnauthorizedOrForbiddenError(err);
-    error =
-      err?.body?.message ??
-      `Error fetching workflows: ${err.status}: ${err.statusText}`;
+    if (err?.body?.message || err?.status) {
+      error =
+        err?.body?.message ??
+        `Error fetching workflows: ${err.status}: ${err.statusText}`;
+    } else {
+      error = `Error fetching workflows: Server failed to respond`;
+    }
   };
 
+  const handleError = () => {
+    // Handle when bad namespace is entered in URL and no status code is returned
+    error = 'Failed to fetch workflows';
+  };
+
+  const route = await routeForApi(endpoint, { namespace });
   const { executions, nextPageToken } =
-    (await requestFromAPI<ListWorkflowExecutionsResponse>(
-      routeForApi(endpoint, { namespace }),
-      {
-        params: { query },
-        onError,
-        handleError: onError,
-        request,
-      },
-    )) ?? { executions: [], nextPageToken: '' };
+    (await requestFromAPI<ListWorkflowExecutionsResponse>(route, {
+      params: { query },
+      onError,
+      handleError: onError,
+      request,
+    })) ?? { executions: [], nextPageToken: '' };
 
   return {
     workflows: toWorkflowExecutions({ executions }),
@@ -78,7 +85,6 @@ export async function fetchWorkflow(
   parameters: GetWorkflowExecutionRequest,
   request = fetch,
 ): Promise<WorkflowExecution> {
-  return requestFromAPI(routeForApi('workflow', parameters), { request }).then(
-    toWorkflowExecution,
-  );
+  const route = await routeForApi('workflow', parameters);
+  return requestFromAPI(route, { request }).then(toWorkflowExecution);
 }
