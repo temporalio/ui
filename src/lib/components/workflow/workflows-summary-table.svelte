@@ -63,6 +63,8 @@
       datetimeFilter,
     );
     query = toListWorkflowQueryFromAdvancedFilters(filters, sorts);
+
+    // TODO: figure out why this is triggered onMount
     updateQueryParameters({
       url: $page.url,
       parameter: 'query',

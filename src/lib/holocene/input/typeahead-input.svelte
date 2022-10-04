@@ -15,6 +15,7 @@
   export let options: { label: string; value: string }[] = [];
   export let placeholder = '';
   export let icon: IconName = null;
+  export let autoFocus = false;
 
   export let onChange: (value: string) => void = noop;
 
@@ -66,6 +67,7 @@
       class={$$props.class}
       bind:value
       {placeholder}
+      {autoFocus}
       on:focus={() => (showMenu = true)}
     />
     <Menu show={showMenu} id={`menu-${id}`} class="h-auto max-h-80">

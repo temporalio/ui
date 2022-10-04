@@ -1,6 +1,4 @@
 <script lang="ts">
-  import Select from '$lib/holocene/select/select.svelte';
-  import Option from '$lib/holocene/select/option.svelte';
   import StatusFilter from './status-filter.svelte';
   import type { FilterKey } from '$lib/utilities/query/list-workflow-query';
   import { searchAttributes } from '$lib/stores/search-attributes';
@@ -11,10 +9,11 @@
   import CustomButton from '$lib/holocene/custom-button.svelte';
   import BooleanFilter from './boolean-filter.svelte';
 
-  export let filterType: FilterKey;
+  export let attribute: string;
   export let value: string = '';
   export let conditional: string = '';
 
+  console.log('Attribute: ', attribute);
   export let removeFilter: () => void = () => noop;
 
   const FilterComponents = {
@@ -42,11 +41,11 @@
     : [];
   const filterOptions = [...searchAttributeOptions];
 
-  $: selected = filterOptions?.find((option) => option.value === filterType);
+  $: selected = filterOptions?.find((option) => option.value === attribute);
 </script>
 
 <div class="flex items-center gap-2">
-  <p class="text-sm">{filterType}</p>
+  <p class="text-sm">{attribute}</p>
   <svelte:component
     this={selected.component}
     id={selected.value}
