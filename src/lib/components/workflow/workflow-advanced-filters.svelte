@@ -30,16 +30,6 @@
   $: query = $page.url.searchParams.get('query');
   $: parameters = toListWorkflowParameters(query ?? defaultQuery);
 
-  $: filterTypeOptions = $searchAttributes
-    ? Object.entries($searchAttributes).map(([key, value]) => {
-        return {
-          label: key,
-          value: key,
-          type: value,
-        };
-      })
-    : [];
-
   let showFilters = true;
   let showQuery = true;
 

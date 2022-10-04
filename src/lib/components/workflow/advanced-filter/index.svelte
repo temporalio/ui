@@ -9,6 +9,7 @@
   import KeywordFilter from './keyword-filter.svelte';
   import DatetimeFilter from './datetime-filter.svelte';
   import CustomButton from '$lib/holocene/custom-button.svelte';
+  import BooleanFilter from './boolean-filter.svelte';
 
   export let filterType: FilterKey;
   export let value: string = '';
@@ -20,6 +21,7 @@
     Keyword: KeywordFilter,
     Int: IntFilter,
     Datetime: DatetimeFilter,
+    Bool: BooleanFilter,
   };
 
   const getFilterComponent = (key: string, value: string) => {
@@ -41,13 +43,6 @@
   const filterOptions = [...searchAttributeOptions];
 
   $: selected = filterOptions?.find((option) => option.value === filterType);
-
-  function getConditionalForType(type) {
-    if (type === 'Datetime') return 'In Last';
-    // if (type === 'Keyword') return '=';
-    // if (type === 'Int') return '=';
-    return '=';
-  }
 </script>
 
 <div class="flex items-center gap-2">

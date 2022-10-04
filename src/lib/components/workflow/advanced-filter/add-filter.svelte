@@ -25,12 +25,22 @@
   let value = '';
   let adding = false;
 
+  function getConditionalForType(filterType: string) {
+    const filter = filterTypeOptions.find((t) => t.value === filterType);
+    const type = filter?.type;
+    if (type === 'Datetime') return 'In Last';
+    return '=';
+  }
+
   const onAddFilter = (filterType: string) => {
     const _filters = filters.map((filter, index) => {
       if (index === filters.length - 1) {
         return { ...filter, operator: 'AND' };
       }
+      return filter;
     });
+
+    console.log('_filters: ', _filters);
 
     filters = [
       ..._filters,
@@ -39,9 +49,11 @@
         value: '',
         operator: '',
         parenthesis: '',
-        conditional: '=',
+        conditional: getConditionalForType(filterType),
       },
     ];
+
+    console.log('Filters: ', filters);
   };
 
   const onTypeChange = (type: string) => {
