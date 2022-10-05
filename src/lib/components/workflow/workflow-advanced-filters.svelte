@@ -46,11 +46,11 @@
   const { copy, copied } = copyToClipboard(500);
 </script>
 
-<div class="scaleY-.4 flex flex-col">
+<div class="flex flex-col">
   <div
     class="rounded-tr-lg rounded-tl-lg border border-gray-900 bg-offWhite p-6"
   >
-    <div class="mb-4 flex items-center justify-between">
+    <div class="mb-2 flex items-center justify-between">
       <h3 class="text-base">Advanced Visibility</h3>
       <div class="flex items-center gap-2">
         <Tooltip top text="Reset search">
@@ -82,7 +82,7 @@
     {#if showFilters}
       <section class="advanced-filters flex flex-col">
         {#each $workflowFilters as { attribute, value, conditional }, index (index)}
-          <div class="my-1 flex justify-between gap-16" transition:slide|local>
+          <div class="my-1" transition:slide|local>
             <AdvancedFilter
               bind:attribute
               bind:value
