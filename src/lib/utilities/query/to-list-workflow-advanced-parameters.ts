@@ -1,5 +1,14 @@
+import type { WorkflowFilter } from '$lib/models/workflow-filters';
+import { searchAttributes } from '$lib/stores/search-attributes';
 import { formatDuration } from 'date-fns';
-import { isExecutionStatus } from '../is';
+import { get } from 'svelte/store';
+import {
+  isConditional,
+  isExecutionStatus,
+  isJoin,
+  isOperator,
+  isParenthesis,
+} from '../is';
 import { durationKeys, fromDate } from '../to-duration';
 import { tokenize } from './tokenize';
 
@@ -25,47 +34,67 @@ export const getLargestDurationUnit = (duration: Duration): Duration => {
   }
 };
 
-const isWorkflowTypeStatement = is('WorkflowType');
-const isWorkflowIdStatement = is('WorkflowId');
-const isStartTimeStatement = is('StartTime');
-const isExecutionStatusStatement = is('ExecutionStatus');
+const isDatetimeStatement = is('Datetime');
+
+const emptyFilter = () => ({
+  attribute: '',
+  value: '',
+  operator: '',
+  parenthesis: '',
+  conditional: '',
+});
 
 export const toListWorkflowAdvancedParameters = (
   query: string,
-): ParsedParameters => {
+  attributes: SearchAttributes,
+): WorkflowFilter[] => {
   const tokens = tokenize(query);
-  const parameters: ParsedParameters = {
-    workflowId: '',
-    workflowType: '',
-    executionStatus: null,
-    timeRange: null,
-  };
+  const filters: WorkflowFilter[] = [];
+  let filter = emptyFilter();
 
-  tokens.forEach((token, index) => {
-    if (isWorkflowIdStatement(token))
-      parameters.workflowId = getTwoAhead(tokens, index);
+  try {
+    tokens.forEach((token, index) => {
+      if (attributes[token]) {
+        filter.attribute = token;
+        if (isDatetimeStatement(attributes[token])) {
+          const start = getTwoAhead(tokens, index);
 
-    if (isWorkflowTypeStatement(token))
-      parameters.workflowType = getTwoAhead(tokens, index);
+          try {
+            const duration = fromDate(start);
+            const largestUnit = getLargestDurationUnit(duration);
 
-    if (isExecutionStatusStatement(token)) {
-      const value = getTwoAhead(tokens, index);
-      if (isExecutionStatus(value)) parameters.executionStatus = value;
-    }
-
-    if (isStartTimeStatement(token)) {
-      const start = getTwoAhead(tokens, index);
-
-      try {
-        const duration = fromDate(start);
-        const largestUnit = getLargestDurationUnit(duration);
-
-        parameters.timeRange = formatDuration(largestUnit);
-      } catch (error) {
-        console.error('Error parsing StartTime from query', error);
+            filter.value = formatDuration(largestUnit);
+          } catch (error) {
+            console.error('Error parsing Datetime field from query', error);
+          }
+        } else {
+          filter.value = getTwoAhead(tokens, index);
+        }
       }
-    }
-  });
 
-  return parameters;
+      if (isConditional(token)) {
+        filter.conditional = token;
+      }
+
+      if (isParenthesis(token)) {
+        filter.parenthesis = token;
+      }
+
+      if (isJoin(token)) {
+        filter.operator = token;
+        filters.push(filter);
+        filter = emptyFilter();
+      }
+
+      if (index === tokens.length - 1) {
+        filters.push(filter);
+        filter = emptyFilter();
+      }
+    });
+
+    return filters;
+  } catch (e) {
+    console.log('ERROR SETTING FILTERS: ', e);
+    return [];
+  }
 };

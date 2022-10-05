@@ -1,29 +1,26 @@
 <script lang="ts">
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import { workflowFilters } from '$lib/stores/filters';
   import Sort from './sort.svelte';
 
-  export let workflowTypeFilter = [];
-  export let sorts = [];
-  export let onChange: () => void;
-
   let value = '';
+  const getOtherFilters = () =>
+    $workflowFilters.filter((f) => f.attribute !== 'WorkflowType');
 
   $: {
     if (value) {
       const filter = {
-        filterType: 'WorkflowType',
+        attribute: 'WorkflowType',
         value,
         conditional: '=',
         operator: '',
         parenthesis: '',
       };
-      workflowTypeFilter = [filter];
+      $workflowFilters = [...getOtherFilters(), filter];
     } else {
-      workflowTypeFilter = [];
+      $workflowFilters = [...getOtherFilters()];
     }
-
-    onChange();
   }
 </script>
 
@@ -38,6 +35,6 @@
       autoFocus
       bind:value
     />
-    <Sort type="WorkflowType" bind:sorts {onChange} />
+    <Sort type="WorkflowType" />
   </div>
 </DropdownMenu>

@@ -1,3 +1,7 @@
+import type {
+  WorkflowFilter,
+  WorkflowSort,
+} from '$lib/models/workflow-filters';
 import { isDuration, isDurationString, toDate, tomorrow } from '../to-duration';
 
 export type QueryKey =
@@ -81,12 +85,12 @@ const toQueryStatement = (
 };
 
 const toAdvancedQueryStatement = (
-  key: FilterKey,
+  attribute: keyof SearchAttributes,
   value: FilterValue,
   conditional = '=',
   archived: boolean,
 ): string => {
-  const queryKey = queryKeys[key] ?? key;
+  const queryKey = queryKeys[attribute] ?? attribute;
 
   if (value === 'All') return '';
 
@@ -121,7 +125,7 @@ export const toListWorkflowQuery = (
 
 const toQueryStatementsFromAdvancedFilters = (
   filters: {
-    filterType: keyof FilterParameters;
+    attribute: keyof SearchAttributes;
     value: string;
     conditional: string;
     operator: string;
@@ -130,10 +134,10 @@ const toQueryStatementsFromAdvancedFilters = (
   archived: boolean,
 ): string[] => {
   return filters
-    .map(({ filterType, value, conditional, operator, parenthesis }) => {
+    .map(({ attribute, value, conditional, operator, parenthesis }) => {
       if (isAdvancedValid(value)) {
         let statement = toAdvancedQueryStatement(
-          filterType,
+          attribute,
           value,
           conditional,
           archived,
@@ -153,22 +157,12 @@ const toQueryStatementsFromAdvancedFilters = (
 };
 
 export const toListWorkflowQueryFromAdvancedFilters = (
-  filters: {
-    filterType: keyof FilterParameters;
-    value: string;
-    conditional: string;
-    operator: string;
-    parenthesis: string;
-  }[] = [],
-  sorts: {
-    label: string;
-    value: string;
-    order: string;
-  }[] = [],
+  filters: WorkflowFilter[] = [],
+  sorts: WorkflowSort[] = [],
   archived = false,
 ): string => {
   const sortStatement = sorts.length
-    ? ` order by ${sorts[0].value} ${sorts[0].order}`
+    ? ` order by ${sorts[0].attribute} ${sorts[0].value}`
     : '';
   return (
     toQueryStatementsFromAdvancedFilters(filters, archived).join('') +

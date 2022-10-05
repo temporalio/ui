@@ -2,11 +2,10 @@
   import Icon from '$holocene/icon/icon.svelte';
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import { workflowFilters } from '$lib/stores/filters';
   import Sort from './sort.svelte';
 
   export let statusFilters = [];
-  export let sorts = [];
-  export let onChange: () => void;
 
   const AllStatuses = {
     All: 'All',
@@ -19,9 +18,13 @@
     Terminated: 'Terminated',
   };
 
+  $: statusFilters = $workflowFilters.filter(
+    (f) => f.attribute === 'ExecutionStatus',
+  );
+
   function mapStatusToFilter(value) {
     return {
-      filterType: 'ExecutionStatus',
+      attribute: 'ExecutionStatus',
       value,
       conditional: '=',
       operator: '',
@@ -47,20 +50,35 @@
 
   const onStatusClick = (_value: string) => {
     if (_value === 'All') {
-      statusFilters = [];
-    } else if (statusFilters.find((s) => s.value === _value)) {
-      statusFilters = mapStatusesToFilters(
-        statusFilters.filter((s) => s.value !== _value),
+      $workflowFilters = $workflowFilters.filter(
+        (f) => f.attribute !== 'ExecutionStatus',
       );
+    } else if (statusFilters.find((s) => s.value === _value)) {
+      const nonStatusFilters = $workflowFilters.filter(
+        (f) => f.attribute !== 'ExecutionStatus',
+      );
+      $workflowFilters = [
+        ...nonStatusFilters,
+        ...mapStatusesToFilters(
+          statusFilters.filter((s) => s.value !== _value),
+        ),
+      ];
     } else {
       if (!statusFilters.length) {
-        statusFilters = [mapStatusToFilter(_value)];
+        $workflowFilters = [...$workflowFilters, mapStatusToFilter(_value)];
       } else {
-        const _filters = [...statusFilters, mapStatusToFilter(_value)];
-        statusFilters = mapStatusesToFilters(_filters);
+        const nonStatusFilters = $workflowFilters.filter(
+          (f) => f.attribute !== 'ExecutionStatus',
+        );
+        $workflowFilters = [
+          ...nonStatusFilters,
+          ...mapStatusesToFilters([
+            ...statusFilters,
+            mapStatusToFilter(_value),
+          ]),
+        ];
       }
     }
-    onChange();
   };
 </script>
 
@@ -95,7 +113,7 @@
         </div>
       </div>
     {/each}
-    <Sort type="ExecutionStatus" bind:sorts {onChange} />
+    <Sort type="ExecutionStatus" />
   </div></DropdownMenu
 >
 

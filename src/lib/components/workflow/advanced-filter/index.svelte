@@ -13,7 +13,6 @@
   export let value: string = '';
   export let conditional: string = '';
 
-  console.log('Attribute: ', attribute);
   export let removeFilter: () => void = () => noop;
 
   const FilterComponents = {

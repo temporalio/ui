@@ -4,7 +4,6 @@
   import { page } from '$app/stores';
 
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  import { toListWorkflowQueryFromAdvancedFilters } from '$lib/utilities/query/list-workflow-query';
 
   import Input from '$lib/holocene/input/input.svelte';
   import CustomButton from '$lib/holocene/custom-button.svelte';
@@ -12,26 +11,20 @@
 
   export let advancedSearch = false;
   export let manualSearch = false;
-  export let filters = [];
-  export let sorts = [];
   export let error = '';
 
   let manualSearchString = '';
 
   $: query = $page.url.searchParams.get('query');
 
-  $: {
-    query = toListWorkflowQueryFromAdvancedFilters(filters, sorts);
-  }
-
-  function setManualString(manual, filters, sorts) {
+  function setManualString(manual) {
     if (manual) {
       manualSearchString = query;
     }
   }
 
   $: {
-    setManualString(manualSearch, filters, sorts);
+    setManualString(manualSearch);
   }
 
   const onSearch = () => {

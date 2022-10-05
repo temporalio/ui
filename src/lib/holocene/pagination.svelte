@@ -16,7 +16,6 @@
   export let items: T[];
   export let floatId: string | undefined = undefined;
   export let startingIndex: string | number = 0;
-  export let updating = false;
   const perPageKey = 'per-page';
   const currentPageKey = 'page';
 
