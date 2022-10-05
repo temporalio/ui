@@ -1,10 +1,14 @@
 <script lang="ts">
   export let variant: 'simple' | 'fancy' = 'fancy';
+  export let updating = false;
 </script>
 
 <table class="{variant} {$$props.class}">
   <thead>
     <slot name="headers" />
+    {#if updating}
+      <div class="updating" />
+    {/if}
   </thead>
   <tbody>
     <slot />
@@ -12,6 +16,13 @@
 </table>
 
 <style lang="postcss">
+  table {
+    @apply relative;
+  }
+  .updating {
+    @apply absolute top-6 z-40 h-4 w-full border-b-4 border-blue-500;
+  }
+
   table {
     thead :global(th) {
       @apply text-left font-secondary text-sm font-medium;

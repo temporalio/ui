@@ -14,7 +14,7 @@ export const durationKeys: Readonly<DurationKey[]> = [
 ] as const;
 
 export const durations = [
-  '10 minutes',
+  '15 minutes',
   '1 hour',
   '3 hours',
   '24 hours',

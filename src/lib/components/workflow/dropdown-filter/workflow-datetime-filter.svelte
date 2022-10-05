@@ -1,33 +1,28 @@
 <script lang="ts">
-  import debounce from 'just-debounce';
-  import { page } from '$app/stores';
-
   import { timeFormat } from '$lib/stores/time-format';
 
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { durations } from '$lib/utilities/to-duration';
-  import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
-  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
   import Select from '$lib/holocene/select/select.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import CustomSplitButton from '$lib/holocene/custom-split-button.svelte';
+  import { workflowFilters } from '$lib/stores/filters';
 
-  export let datetimeFilter = [];
+  const getOtherFilters = () =>
+    $workflowFilters.filter((f) => f.attribute !== 'StartTime');
 
   const onChange = (value: string) => {
     if (value === 'All') {
-      datetimeFilter = [];
+      $workflowFilters = [...getOtherFilters()];
     } else {
-      datetimeFilter = [
-        {
-          filterType: 'StartTime',
-          value,
-          conditional: '=',
-          operator: '',
-          parenthesis: '',
-        },
-      ];
+      const filter = {
+        attribute: 'StartTime',
+        value,
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+      };
+      $workflowFilters = [...getOtherFilters(), filter];
     }
   };
 </script>

@@ -1,14 +1,8 @@
 <script lang="ts">
-  import { fade } from 'svelte/transition';
-  import { slide } from 'svelte/transition';
-  import { page } from '$app/stores';
-
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  import { toListWorkflowQueryFromAdvancedFilters } from '$lib/utilities/query/list-workflow-query';
-
   import { searchAttributes } from '$lib/stores/search-attributes';
   import CustomButton from '$lib/holocene/custom-button.svelte';
   import TypeaheadInput from '$lib/holocene/input/typeahead-input.svelte';
+  import { workflowFilters } from '$lib/stores/filters';
 
   $: filterTypeOptions = $searchAttributes
     ? Object.entries($searchAttributes).map(([key, value]) => {
@@ -19,8 +13,6 @@
         };
       })
     : [];
-
-  export let filters = [];
 
   let value = '';
   let adding = false;
@@ -42,14 +34,14 @@
   }
 
   const onAddFilter = (attribute: string) => {
-    const _filters = filters.map((filter, index) => {
-      if (index === filters.length - 1) {
+    const _filters = $workflowFilters.map((filter, index) => {
+      if (index === $workflowFilters.length - 1) {
         return { ...filter, operator: 'AND' };
       }
       return filter;
     });
 
-    filters = [
+    $workflowFilters = [
       ..._filters,
       {
         attribute,

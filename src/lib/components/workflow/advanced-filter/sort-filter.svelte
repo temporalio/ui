@@ -4,13 +4,7 @@
   import Select from '$lib/holocene/select/select.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import CustomButton from '$lib/holocene/custom-button.svelte';
-
-  export let sorts = [];
-
-  const orders = [
-    { label: 'Ascending', value: 'asc' },
-    { label: 'Descending', value: 'desc' },
-  ];
+  import { workflowSorts } from '$lib/stores/filters';
 
   const options = $searchAttributes
     ? Object.entries($searchAttributes).map(([key, value]) => {
@@ -23,14 +17,13 @@
     : [];
 
   const onOrderBy = () => {
-    if (sorts.length) {
-      sorts = [];
+    if ($workflowSorts.length) {
+      $workflowSorts = [];
     } else {
-      sorts = [
+      $workflowSorts = [
         {
-          label: 'WorkflowType',
-          value: 'WorkflowType',
-          order: orders[1].value,
+          attribute: 'WorkflowType',
+          value: 'asc',
         },
       ];
     }
@@ -38,22 +31,24 @@
 </script>
 
 <div class="flex gap-2">
-  <CustomButton
-    icon={sorts.length ? 'close' : 'converter-down'}
-    class="h-10 border border-gray-900 bg-white"
-    on:click={onOrderBy}>Add Sort</CustomButton
+  <CustomButton class="h-10 text-sm" on:click={onOrderBy}>Order by</CustomButton
   >
-  {#each sorts as { label, value, order }}
-    <Select id="filter-type" bind:value class="w-auto">
+  {#each $workflowSorts as { attribute, value }}
+    <Select id="filter-type" bind:value={attribute} class="w-auto">
       {#each options as { value, label } (value)}
         <Option {value}>{label}</Option>
       {/each}
     </Select>
-
-    <Select id="filter-type" bind:value={order} class="bg-transparent w-auto">
-      {#each orders as { value, label } (value)}
-        <Option {value}>{label}</Option>
-      {/each}
-    </Select>
+    <CustomButton
+      icon={value === 'asc' ? 'ascending' : 'descending'}
+      class="h-10 text-sm"
+      on:click={() => {
+        if (value === 'asc') {
+          value = 'desc';
+        } else {
+          value = 'asc';
+        }
+      }}>{value === 'asc' ? 'Ascending' : 'Descending'}</CustomButton
+    >
   {/each}
 </div>

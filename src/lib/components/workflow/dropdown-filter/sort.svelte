@@ -1,23 +1,21 @@
 <script lang="ts">
   import Icon from '$holocene/icon/icon.svelte';
+  import type { SortOrder } from '$lib/models/workflow-filters';
+  import { workflowSorts } from '$lib/stores/filters';
 
-  export let sorts = [];
   export let type: string;
-  export let onChange: () => void;
 
-  const onSortClick = (order: string) => {
-    if (sorts.find((s) => s.order === order)) {
-      sorts = [];
+  const onSortClick = (value: SortOrder) => {
+    if ($workflowSorts.find((s) => s.value === value)) {
+      $workflowSorts = [];
     } else {
-      sorts = [
+      $workflowSorts = [
         {
-          label: type,
-          value: type,
-          order,
+          attribute: type,
+          value,
         },
       ];
     }
-    onChange();
   };
 </script>
 
@@ -25,7 +23,9 @@
   <div class="flex items-center" on:click={() => onSortClick('asc')}>
     <div
       class="ml-4 mr-2 h-6 w-6 rounded-sm text-gray-900"
-      class:active={sorts.find((s) => s.order === 'asc' && s.value === type)}
+      class:active={$workflowSorts.find(
+        (s) => s.value === 'asc' && s.attribute === type,
+      )}
     >
       <Icon
         class="pointer-events-none -mt-[1px]"
@@ -39,7 +39,9 @@
   <div class="flex items-center" on:click={() => onSortClick('desc')}>
     <div
       class="ml-4 mr-2 h-6 w-6 rounded-sm text-gray-900"
-      class:active={sorts.find((s) => s.order === 'desc' && s.value === type)}
+      class:active={$workflowSorts.find(
+        (s) => s.value === 'desc' && s.attribute === type,
+      )}
     >
       <Icon
         class="pointer-events-none -mt-[1px]"
