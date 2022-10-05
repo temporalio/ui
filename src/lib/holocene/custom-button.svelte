@@ -7,7 +7,7 @@
   export let active: boolean = false;
   export let primary: boolean = false;
   export let add: boolean = false;
-  export let remove: boolean = false;
+  export let destructive: boolean = false;
   export let icon: IconName = null;
   export let iconClass: string = null;
   export let dataCy: string = $$props.dataCy;
@@ -24,7 +24,7 @@
   data-cy={dataCy}
   {disabled}
   class:add
-  class:remove
+  class:destructive
   class:unround
   class:unroundRight
   class:unroundLeft
@@ -40,6 +40,10 @@
 <style lang="postcss">
   .button {
     @apply relative flex w-fit items-center justify-center gap-2 rounded px-2 py-1 font-secondary text-sm transition hover:bg-gradient-to-r hover:from-blue-100 hover:to-purple-200 hover:text-gray-900;
+  }
+
+  .destructive {
+    @apply hover:bg-gradient-to-r hover:from-red-100 hover:to-red-200;
   }
 
   .active {

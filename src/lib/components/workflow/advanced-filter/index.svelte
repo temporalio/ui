@@ -1,6 +1,5 @@
 <script lang="ts">
   import StatusFilter from './status-filter.svelte';
-  import type { FilterKey } from '$lib/utilities/query/list-workflow-query';
   import { searchAttributes } from '$lib/stores/search-attributes';
   import { noop } from 'svelte/internal';
   import IntFilter from './int-filter.svelte';
@@ -53,11 +52,6 @@
     bind:conditional
   />
   <div class="flex items-center gap-2">
-    <CustomButton
-      variant="secondary"
-      icon="close"
-      thin
-      on:click={removeFilter}
-    />
+    <CustomButton icon="trash" destructive on:click={removeFilter} />
   </div>
 </div>
