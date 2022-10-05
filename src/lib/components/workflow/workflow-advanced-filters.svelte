@@ -68,15 +68,15 @@
   const { copy, copied } = copyToClipboard(500);
 </script>
 
-<div class="flex flex-col">
+<div class="flex flex-col scaleY-.4">
   <div
     class="rounded-tr-lg rounded-tl-lg border border-gray-900 bg-offWhite p-6"
   >
     <h3 class="mb-2 flex items-center gap-2 text-base">Advanced Visibility</h3>
     {#if showFilters}
-      <section class="advanced-filters flex flex-col gap-2">
+      <section class="advanced-filters flex flex-col">
         {#each filters as { attribute, value, conditional }, index (index)}
-          <div class="flex justify-between gap-16" transition:slide|local>
+          <div class="flex justify-between my-1 gap-16" transition:slide|local>
             <AdvancedFilter
               bind:attribute
               bind:value
@@ -85,8 +85,12 @@
             />
           </div>
         {/each}
-        <AddFilter bind:filters />
-        <SortFilter bind:sorts />
+        <div class="my-1">
+          <AddFilter bind:filters />
+        </div>
+        <div class="my-1">
+          <SortFilter bind:sorts />
+        </div>
       </section>
     {/if}
     <div class="mt-8 flex w-full items-center justify-between gap-4">
