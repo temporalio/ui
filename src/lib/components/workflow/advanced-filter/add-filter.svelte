@@ -60,9 +60,10 @@
   };
 </script>
 
-<div class="flex gap-2">
+<div class="flex gap-0">
   <CustomButton
     icon={adding ? 'close' : 'add'}
+    unroundRight={adding}
     class="h-10 border border-gray-900 bg-white"
     on:click={() => (adding = !adding)}>Add Filter</CustomButton
   >
@@ -70,9 +71,10 @@
     <TypeaheadInput
       icon="filter"
       placeholder="Filter type"
-      class="w-80"
+      class="w-72"
       id="filter-type-name"
       bind:value
+      unroundLeft
       options={filterTypeOptions}
       onChange={onTypeChange}
       autoFocus

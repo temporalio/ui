@@ -80,7 +80,7 @@
       </div>
     </div>
     {#if showFilters}
-      <section class="advanced-filters flex flex-col">
+      <section class="advanced-filters flex flex-col gap-0">
         {#each $workflowFilters as { attribute, value, conditional }, index (index)}
           <div class="my-1" transition:slide|local>
             <AdvancedFilter
@@ -94,10 +94,10 @@
         <div class="my-1">
           <AddFilter />
         </div>
-        <div class="my-1">
-          <SortFilter />
-        </div>
       </section>
+      <div class="my-1">
+        <SortFilter />
+      </div>
     {/if}
   </div>
   {#if showQuery}

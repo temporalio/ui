@@ -7,6 +7,7 @@
   import DatetimeFilter from './datetime-filter.svelte';
   import CustomButton from '$lib/holocene/custom-button.svelte';
   import BooleanFilter from './boolean-filter.svelte';
+  import PillSelect from '$lib/holocene/select/pill-select.svelte';
 
   export let attribute: string;
   export let value: string = '';
@@ -43,15 +44,34 @@
 </script>
 
 <div class="flex items-center gap-2">
-  <p class="text-sm">{attribute}</p>
-  <svelte:component
-    this={selected.component}
-    id={selected.value}
-    label={selected.label}
-    bind:value
-    bind:conditional
-  />
-  <div class="flex items-center gap-2">
-    <CustomButton icon="trash" destructive on:click={removeFilter} />
-  </div>
+  <PillSelect
+    id={attribute}
+    value={attribute}
+    displayValue={(attribute, show) => {
+      if (show) {
+        return attribute;
+      } else if (value) {
+        return `${attribute} ${conditional} ${value}`;
+      } else {
+        return `${attribute}`;
+      }
+    }}
+    class="rounded border border-gray-900 bg-white"
+  >
+    <div class="flex items-center gap-2">
+      <svelte:component
+        this={selected.component}
+        id={selected.value}
+        label={selected.label}
+        bind:value
+        bind:conditional
+      />
+      <CustomButton
+        icon="trash"
+        class="h-10 border border-gray-900 bg-white"
+        destructive
+        on:click={removeFilter}
+      />
+    </div>
+  </PillSelect>
 </div>

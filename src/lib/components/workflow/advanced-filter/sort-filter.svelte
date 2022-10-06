@@ -5,6 +5,12 @@
   import Option from '$lib/holocene/select/option.svelte';
   import CustomButton from '$lib/holocene/custom-button.svelte';
   import { workflowSorts } from '$lib/stores/filters';
+  import TypeaheadInput from '$lib/holocene/input/typeahead-input.svelte';
+  import type { SortOrder } from '$lib/models/workflow-filters';
+
+  let adding = false;
+  let value = '';
+  let order: SortOrder = 'desc';
 
   const options = $searchAttributes
     ? Object.entries($searchAttributes).map(([key, value]) => {
@@ -16,39 +22,73 @@
       })
     : [];
 
-  const onOrderBy = () => {
-    if ($workflowSorts.length) {
-      $workflowSorts = [];
+  const onTypeChange = (attribute: string) => {
+    $workflowSorts = [
+      {
+        attribute,
+        value: order,
+      },
+    ];
+  };
+
+  const onSortChange = (e: MouseEvent) => {
+    if (order === 'asc') {
+      order = 'desc';
     } else {
+      order = 'asc';
+    }
+
+    if ($workflowSorts[0]) {
       $workflowSorts = [
         {
-          attribute: 'WorkflowType',
-          value: 'asc',
+          ...$workflowSorts[0],
+          value: order,
         },
       ];
     }
   };
+
+  const onSortRemove = (e: MouseEvent) => {
+    adding = false;
+    $workflowSorts = [];
+  };
 </script>
 
-<div class="flex gap-2">
-  <CustomButton class="h-10 text-sm" on:click={onOrderBy}>Order by</CustomButton
+<div class="flex gap-0">
+  <CustomButton
+    icon={adding ? 'chevron-left' : 'chevron-right'}
+    unroundRight={adding}
+    class="h-10 border border-gray-900 bg-white"
+    on:click={() => (adding = !adding)}
+    >Order by {$workflowSorts[0] && !adding
+      ? `${$workflowSorts[0].attribute}`
+      : ''}</CustomButton
   >
-  {#each $workflowSorts as { attribute, value }}
-    <Select id="filter-type" bind:value={attribute} class="w-auto">
-      {#each options as { value, label } (value)}
-        <Option {value}>{label}</Option>
-      {/each}
-    </Select>
-    <CustomButton
-      icon={value === 'asc' ? 'ascending' : 'descending'}
-      class="h-10 text-sm"
-      on:click={() => {
-        if (value === 'asc') {
-          value = 'desc';
-        } else {
-          value = 'asc';
-        }
-      }}>{value === 'asc' ? 'Ascending' : 'Descending'}</CustomButton
-    >
-  {/each}
+  {#if adding}
+    <TypeaheadInput
+      icon="filter"
+      placeholder="Filter type"
+      class="w-72"
+      id="filter-type-name"
+      bind:value
+      unroundLeft
+      {options}
+      onChange={onTypeChange}
+      autoFocus
+    />
+    <div class="ml-1 flex gap-1">
+      <CustomButton
+        icon={order === 'asc' ? 'ascending' : 'descending'}
+        class="h-10 text-sm"
+        on:click={onSortChange}
+        >{order === 'asc' ? 'Ascending' : 'Descending'}</CustomButton
+      >
+      <CustomButton
+        icon="trash"
+        class="h-10"
+        destructive
+        on:click={onSortRemove}
+      />
+    </div>
+  {/if}
 </div>
