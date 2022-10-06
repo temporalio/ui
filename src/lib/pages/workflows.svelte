@@ -223,7 +223,11 @@
       {:else}
         <TableRow>
           <td colspan="5">
-            <EmptyState title={'No Workflows Found'} content={errorMessage} />
+            <EmptyState
+              title={'No Workflows Found'}
+              content={errorMessage}
+              error={$workflowError}
+            />
           </td>
         </TableRow>
       {/each}

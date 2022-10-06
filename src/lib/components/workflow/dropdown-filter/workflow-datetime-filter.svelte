@@ -1,5 +1,7 @@
 <script lang="ts">
   import { timeFormat } from '$lib/stores/time-format';
+  import { capitalize } from '$lib/utilities/format-camel-case';
+  import { formatISO } from 'date-fns';
 
   import { durations } from '$lib/utilities/to-duration';
 
@@ -8,6 +10,7 @@
   import CustomSplitButton from '$lib/holocene/custom-split-button.svelte';
   import { workflowFilters } from '$lib/stores/filters';
   import DatetimePicker from '$lib/holocene/datetime-picker.svelte';
+  import Button from '$lib/holocene/button.svelte';
 
   let custom = false;
 
@@ -33,10 +36,26 @@
     }
   };
 
-  let currentDate = new Date();
+  let startDate = new Date();
+  let endDate = new Date();
 
-  const onDateChange = (d) => {
-    currentDate = d.detail;
+  const onStartDateChange = (d) => {
+    startDate = d.detail;
+  };
+  const onEndDateChange = (d) => {
+    endDate = d.detail;
+  };
+
+  const onApply = () => {
+    const filter = {
+      attribute: 'StartTime',
+      value: `BETWEEN "${formatISO(startDate)}" AND "${formatISO(endDate)}"`,
+      conditional: '=',
+      operator: '',
+      parenthesis: '',
+      customDate: true,
+    };
+    $workflowFilters = [...getOtherFilters(), filter];
   };
 </script>
 
@@ -64,17 +83,18 @@
           <div class="flex flex-col">
             <p>Start</p>
             <DatetimePicker
-              on:datechange={onDateChange}
-              selected={currentDate}
+              on:datechange={onStartDateChange}
+              selected={startDate}
             />
           </div>
           <div class="flex flex-col">
             <p>End</p>
             <DatetimePicker
-              on:datechange={onDateChange}
-              selected={currentDate}
+              on:datechange={onEndDateChange}
+              selected={endDate}
             />
           </div>
+          <Button on:click={onApply}>Apply</Button>
         </div>
       {/if}
     </div>
@@ -83,24 +103,24 @@
     class="rounded-tr rounded-br bg-offWhite"
     buttonClass="border border-gray-900"
     id="datetime"
-    label={$timeFormat}
+    label={capitalize($timeFormat)}
     icon="clock"
   >
     <div
       on:click={() => ($timeFormat = 'relative')}
-      class="cursor-pointer px-4 py-2"
+      class="cursor-pointer px-4 py-2 text-sm"
     >
       Relative
     </div>
     <div
       on:click={() => ($timeFormat = 'UTC')}
-      class="cursor-pointer px-4 py-2"
+      class="cursor-pointer px-4 py-2 text-sm"
     >
       UTC
     </div>
     <div
       on:click={() => ($timeFormat = 'local')}
-      class="cursor-pointer px-4 py-2"
+      class="cursor-pointer px-4 py-2 text-sm"
     >
       Local
     </div>

@@ -4,6 +4,7 @@ export type WorkflowFilter = {
   operator: string;
   parenthesis: string;
   conditional: string;
+  customDate?: boolean;
 };
 
 export type SortOrder = 'asc' | 'desc';
