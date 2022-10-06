@@ -89,10 +89,16 @@ const toAdvancedQueryStatement = (
   value: FilterValue,
   conditional = '=',
   archived: boolean,
+  customDate: boolean,
 ): string => {
   const queryKey = queryKeys[attribute] ?? attribute;
 
   if (value === 'All') return '';
+
+  // Custom Dates...
+  if (customDate) {
+    return `${queryKey} ${value}`;
+  }
 
   if (isDuration(value) || isDurationString(value)) {
     if (archived) {
@@ -124,23 +130,18 @@ export const toListWorkflowQuery = (
 };
 
 const toQueryStatementsFromAdvancedFilters = (
-  filters: {
-    attribute: keyof SearchAttributes;
-    value: string;
-    conditional: string;
-    operator: string;
-    parenthesis: string;
-  }[],
+  filters: WorkflowFilter[],
   archived: boolean,
 ): string[] => {
   return filters
-    .map(({ attribute, value, conditional, operator, parenthesis }) => {
+    .map(({ attribute, value, conditional, operator, parenthesis, customDate }) => {
       if (isAdvancedValid(value)) {
         let statement = toAdvancedQueryStatement(
           attribute,
           value,
           conditional,
           archived,
+          customDate,
         );
         if (parenthesis === '(') {
           statement = `(${statement}`;
