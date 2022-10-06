@@ -44,26 +44,20 @@
 </script>
 
 <div class="flex items-center gap-2">
-  <PillSelect
-    id={attribute}
-    placeholder={attribute}
-    {value}
-    class="rounded border border-gray-900 bg-white"
-  >
-    <div class="flex items-center gap-2">
-      <svelte:component
-        this={selected.component}
-        id={selected.value}
-        label={selected.label}
-        bind:value
-        bind:conditional
-      />
-      <CustomButton
-        icon="trash"
-        class="h-8"
-        destructive
-        on:click={removeFilter}
-      />
-    </div>
-  </PillSelect>
+  <p class="text-sm">{attribute}</p>
+  <div class="flex items-center gap-2">
+    <svelte:component
+      this={selected.component}
+      id={selected.value}
+      label={selected.label}
+      bind:value
+      bind:conditional
+    />
+    <CustomButton
+      icon="trash"
+      class="h-8 rounded"
+      destructive
+      on:click={removeFilter}
+    />
+  </div>
 </div>

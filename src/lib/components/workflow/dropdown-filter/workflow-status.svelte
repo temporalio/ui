@@ -5,8 +5,6 @@
   import { workflowFilters } from '$lib/stores/filters';
   import Sort from './sort.svelte';
 
-  export let statusFilters = [];
-
   const AllStatuses = {
     All: 'All',
     Running: 'Running',
