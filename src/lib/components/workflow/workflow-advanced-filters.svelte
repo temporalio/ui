@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { fade, slide } from 'svelte/transition';
+  import { fade, fly } from 'svelte/transition';
   import { page } from '$app/stores';
 
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
@@ -22,6 +22,11 @@
 
   let showFilters = true;
   let showQuery = true;
+  let editing = false;
+
+  const onEdit = () => {
+    editing = !editing;
+  };
 
   const onRestart = () => {
     $workflowFilters = [];
@@ -80,9 +85,9 @@
       </div>
     </div>
     {#if showFilters}
-      <section class="advanced-filters flex flex-col gap-0">
+      <section class="advanced-filters flex flex-wrap gap-2">
         {#each $workflowFilters as { attribute, value, conditional }, index (index)}
-          <div class="my-1" transition:slide|local>
+          <div class="my-1" transition:fly|local>
             <AdvancedFilter
               bind:attribute
               bind:value
@@ -92,12 +97,14 @@
           </div>
         {/each}
         <div class="my-1">
-          <AddFilter />
+          <AddFilter
+            disabled={Boolean($workflowFilters.find((f) => !f.value))}
+          />
+        </div>
+        <div class="my-1">
+          <SortFilter />
         </div>
       </section>
-      <div class="my-1">
-        <SortFilter />
-      </div>
     {/if}
   </div>
   {#if showQuery}

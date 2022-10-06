@@ -55,8 +55,7 @@
         </Button>
         <CustomButton
           icon="chevron-left"
-          class="h-10 border border-r-0 border-gray-900"
-          unround
+          class="h-10 border border-gray-900"
           on:click={() => (manualSearch = !manualSearch)}
         />
         <Input

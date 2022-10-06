@@ -58,7 +58,7 @@
   <CustomButton
     icon={adding ? 'chevron-left' : 'chevron-right'}
     unroundRight={adding}
-    class="h-10 border border-gray-900 bg-white"
+    class="h-8 rounded-full border border-gray-900"
     on:click={() => (adding = !adding)}
     >Order by {$workflowSorts[0] && !adding
       ? `${$workflowSorts[0].attribute}`
@@ -79,13 +79,13 @@
     <div class="ml-1 flex gap-1">
       <CustomButton
         icon={order === 'asc' ? 'ascending' : 'descending'}
-        class="h-10 text-sm"
+        class="h-8 text-sm"
         on:click={onSortChange}
         >{order === 'asc' ? 'Ascending' : 'Descending'}</CustomButton
       >
       <CustomButton
         icon="trash"
-        class="h-10"
+        class="h-8"
         destructive
         on:click={onSortRemove}
       />

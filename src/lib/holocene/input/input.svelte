@@ -108,7 +108,7 @@
   }
 
   .thin {
-    @apply h-6;
+    @apply h-8;
   }
 
   .unroundRight {

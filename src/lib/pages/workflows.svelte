@@ -58,6 +58,15 @@
     }
   }
 
+  const addAndOperator = (filters: WorkflowFilter[]) => {
+    return filters.map((filter, index) => {
+      if (filters[index + 1]) {
+        return { ...filter, operator: 'AND' };
+      }
+      return filter;
+    });
+  };
+
   const combineFilters = (filters: WorkflowFilter[]) => {
     const dropdownAttributes = [
       'ExecutionStatus',
@@ -70,14 +79,17 @@
     const nonDropdownFilters = filters
       .filter((f) => !dropdownAttributes.includes(f.attribute))
       .filter((f) => !!f.value);
-    if (nonDropdownFilters.length) {
+    if (nonDropdownFilters.length > 1) {
       const finalDropdownFilter = dropdownFilters[dropdownFilters.length - 1];
       dropdownFilters[dropdownFilters.length - 1] = {
         ...finalDropdownFilter,
         operator: 'AND',
       };
     }
-    const allFilters = [...dropdownFilters, ...nonDropdownFilters];
+    const allFilters = [
+      ...dropdownFilters,
+      ...addAndOperator(nonDropdownFilters),
+    ];
     return allFilters;
   };
 
@@ -112,15 +124,6 @@
     });
 
     // In the case you add multiple id or type filters through Advanced Filters
-    const addAndOperator = (filters: WorkflowFilter[]) => {
-      return filters.map((filter, index) => {
-        if (filters[index + 1]) {
-          return { ...filter, operator: 'AND' };
-        }
-        return filter;
-      });
-    };
-
     return [
       ...statusFilters,
       ...addAndOperator(idFilter),
