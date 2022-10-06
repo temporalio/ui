@@ -7,6 +7,7 @@
   import Option from '$lib/holocene/select/option.svelte';
   import CustomSplitButton from '$lib/holocene/custom-split-button.svelte';
   import { workflowFilters } from '$lib/stores/filters';
+  import DatetimePicker from '$lib/holocene/datetime-picker.svelte';
 
   let custom = false;
 
@@ -31,6 +32,12 @@
       custom = false;
     }
   };
+
+  let currentDate = new Date();
+
+  const onDateChange = (d) => {
+    currentDate = d.detail;
+  };
 </script>
 
 <div class="flex items-center">
@@ -39,20 +46,35 @@
     id="time-range-filter"
     placeholder="Start Time"
     unroundRight
+    keepOpen={custom}
     {onChange}
   >
     <div class="flex">
       <div>
+        <Option value={'All'}>All Time</Option>
+        <Option value={'Custom'}>Custom</Option>
         {#each durations as value}
           <Option {value}>{value}</Option>
         {/each}
-        <Option value={'Custom'}>Custom</Option>
-        <Option value={'All'}>All Time</Option>
       </div>
       {#if custom}
-        <div class="w-80 bg-white p-4">
-          <div class="flex">Start</div>
-          <div class="flex">End</div>
+        <div
+          class="w-96 bg-white p-4 flex flex-col gap-8 border-l border-gray-900"
+        >
+          <div class="flex flex-col">
+            <p>Start</p>
+            <DatetimePicker
+              on:datechange={onDateChange}
+              selected={currentDate}
+            />
+          </div>
+          <div class="flex flex-col">
+            <p>End</p>
+            <DatetimePicker
+              on:datechange={onDateChange}
+              selected={currentDate}
+            />
+          </div>
         </div>
       {/if}
     </div>

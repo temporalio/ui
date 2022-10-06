@@ -1,7 +1,13 @@
 <script lang="ts">
+  // https://svelte.dev/repl/6116680a6c3e49d0908624105018efb7?version=3.12.1
+
+  import { timeFormat } from '$lib/stores/time-format';
+  import { formatDate } from '$lib/utilities/format-date';
   import { createEventDispatcher } from 'svelte';
   import Calender from './calendar.svelte';
   import { getMonthName } from './date-time';
+  import Icon from './icon/icon.svelte';
+  import Input from './input/input.svelte';
 
   const dispatch = createEventDispatcher();
 
@@ -50,22 +56,25 @@
 </script>
 
 <div class="relative">
-  <input
-    class="border border-gray-900 rounded px-2 py-1 h-8"
+  <Input
+    id="datepicker"
+    icon="calendar-plus"
     type="text"
     on:focus={onFocus}
-    placeholder="MM/DD/YYYY"
-    {value}
+    placeholder="MM/DD/YY"
+    value={selected.toDateString()}
   />
   {#if showDatePicker}
-    <div class="box">
-      <div class="month-name">
+    <div
+      class="absolute top-12 rounded border border-gray-900 bg-white shadow inline-block z-50"
+    >
+      <div class="flex justify-around items-center mx-3 my-2">
         <div class="center">
-          <button on:click={prev}>Prev</button>
+          <button on:click={prev}><Icon name="chevron-left" /></button>
         </div>
         <div class="center">{getMonthName(month)} {year}</div>
         <div class="center">
-          <button on:click={next}>Next</button>
+          <button on:click={next}><Icon name="chevron-right" /></button>
         </div>
       </div>
       <Calender
@@ -79,28 +88,8 @@
   {/if}
 </div>
 
-<style>
-  .relative {
-    position: relative;
-  }
-  .box {
-    position: absolute;
-    top: 40px;
-    left: 0px;
-    border: 1px solid green;
-    display: inline-block;
-  }
-
-  .month-name {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    margin: 6px 0;
-  }
-
+<style lang="postcss">
   .center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    @apply flex justify-center items-center;
   }
 </style>

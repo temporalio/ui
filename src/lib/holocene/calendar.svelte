@@ -33,15 +33,15 @@
 <div class="container">
   <div class="row">
     {#each weekdays as day}
-      <div class="cell">{day}</div>
+      <p class="cell">{day}</p>
     {/each}
   </div>
 
   <div class="row">
     {#each cells as { allowed, value } (uuid())}
-      <div
+      <p
         on:click={allowed && value ? onChange.bind(this, value) : noop}
-        class:cell={true}
+        class="cell"
         class:highlight={allowed && value}
         class:disabled={!allowed}
         class:selected={new Date(
@@ -51,34 +51,25 @@
         ).getTime() === new Date(year, month, value).getTime()}
       >
         {value || ''}
-      </div>
+      </p>
     {/each}
   </div>
 </div>
 
-<style>
+<style lang="postcss">
   .container {
-    margin-top: 8px;
-    padding: 6px;
-    width: 370px;
+    @apply mt-2 px-4 w-[265px] h-[224px];
   }
   .row {
-    display: flex;
-    margin: 2px 6px;
-    flex-wrap: wrap;
+    @apply flex flex-wrap w-[240px];
   }
 
   .cell {
-    display: inline-block;
-    width: 40px;
-    height: 20px;
-    text-align: center;
-    padding: 4px;
-    margin: 1px;
+    @apply inline-flex w-[24px] h-[24px] items-center justify-center p-1 m-1 rounded text-sm;
   }
 
   .selected {
-    background: #84e791;
+    @apply bg-blue-700 text-white;
   }
 
   .highlight {
@@ -91,14 +82,11 @@
     color: #bfbfbf;
   }
 
-  .highlight:hover {
-    background: rgb(238, 176, 60);
-    color: #fff;
-    cursor: pointer;
-    transform: scale(1.3);
+  .highlight {
+    @apply hover:bg-blue-100 hover:cursor-pointer hover:scale-125;
   }
 
   .selected.highlight:hover {
-    background: green;
+    @apply bg-blue-700 text-white;
   }
 </style>
