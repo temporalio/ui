@@ -8,14 +8,16 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Menu from '$holocene/primitives/menu/menu.svelte';
   import MenuContainer from '$holocene/primitives/menu/menu-container.svelte';
-  import Option from '$lib/holocene/select/option.svelte';
   import { noop } from 'svelte/internal';
+  import CustomOption from '../select/custom-option.svelte';
 
   export let id: string;
   export let options: { label: string; value: string }[] = [];
   export let placeholder = '';
   export let icon: IconName = null;
   export let autoFocus = false;
+  export let unroundRight: boolean = false;
+  export let unroundLeft: boolean = false;
 
   export let onChange: (value: string) => void = noop;
 
@@ -35,7 +37,10 @@
 
   const context = writable<SelectContext<string>>({
     selectValue: value,
-    onChange,
+    onChange: () => {
+      onChange(value);
+      showMenu = false;
+    },
   });
 
   const unsubscribe = context.subscribe((ctx) => {
@@ -68,13 +73,16 @@
       bind:value
       {placeholder}
       {autoFocus}
+      {unroundRight}
+      {unroundLeft}
       on:focus={() => (showMenu = true)}
     />
-    <Menu show={showMenu} id={`menu-${id}`} class="h-auto max-h-80">
+    <Menu show={showMenu} id={`menu-${id}`} class="h-auto max-h-80 w-64">
       {#each filterOptions as { label, value }}
-        <Option {value}>{label}</Option>
+        <CustomOption class="truncate text-[14px]" {value}>{label}</CustomOption
+        >
       {:else}
-        <Option>No Results</Option>
+        <CustomOption class="text-[14px] truncate">No Results</CustomOption>
       {/each}
     </Menu>
   </MenuContainer>

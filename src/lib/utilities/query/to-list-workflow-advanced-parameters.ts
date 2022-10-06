@@ -57,6 +57,7 @@ export const toListWorkflowAdvancedParameters = (
       if (attributes[token]) {
         filter.attribute = token;
         if (isDatetimeStatement(attributes[token])) {
+          debugger;
           const start = getTwoAhead(tokens, index);
 
           try {
