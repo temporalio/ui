@@ -9,14 +9,5 @@
 </script>
 
 <div class="mb-2 flex justify-center items-center mt-1/2 h-screen">
-  <DatetimePicker
-    on:datechange={onDateChange}
-    selected={currentDate}
-    isAllowed={(date) => {
-      const millisecs = date.getTime();
-      if (millisecs + 25 * 3600 * 1000 < Date.now()) return false;
-      if (millisecs > Date.now() + 3600 * 24 * 45 * 1000) return false;
-      return true;
-    }}
-  />
+  <DatetimePicker on:datechange={onDateChange} selected={currentDate} />
 </div>

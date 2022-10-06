@@ -16,7 +16,7 @@
 
   type T = $$Generic;
 
-  let show = true;
+  let show = false;
 
   export let label = '';
   export let id: string;
@@ -26,6 +26,7 @@
   export let disabled: boolean = false;
   export let showIcon: boolean = true;
   export let unroundRight: boolean = false;
+  export let keepOpen: boolean = false;
   export let displayValue: (value: T) => T | string = (value) => value ?? '';
   export let onChange: (value: T) => void = noop;
 
@@ -62,6 +63,7 @@
         ? 'unroundRight'
         : ''}"
       bind:show
+      {keepOpen}
       controls="{id}-menu"
       data-cy={$$props.dataCy}
       {dark}

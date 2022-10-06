@@ -43,21 +43,23 @@
   $: selected = filterOptions?.find((option) => option.value === attribute);
 </script>
 
-<div class="flex items-center gap-2">
-  <p class="text-sm">{attribute}</p>
+{#if selected}
   <div class="flex items-center gap-2">
-    <svelte:component
-      this={selected.component}
-      id={selected.value}
-      label={selected.label}
-      bind:value
-      bind:conditional
-    />
-    <CustomButton
-      icon="trash"
-      class="h-8 rounded"
-      destructive
-      on:click={removeFilter}
-    />
+    <p class="text-sm">{attribute}</p>
+    <div class="flex items-center gap-2">
+      <svelte:component
+        this={selected.component}
+        id={selected.value}
+        label={selected.label}
+        bind:value
+        bind:conditional
+      />
+      <CustomButton
+        icon="trash"
+        class="h-8 rounded"
+        destructive
+        on:click={removeFilter}
+      />
+    </div>
   </div>
-</div>
+{/if}

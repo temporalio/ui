@@ -209,7 +209,7 @@
       />
     </svelte:fragment>
     <svelte:fragment slot="action-top-center">
-      {#if !manualSearch && !advancedSearch}
+      {#if !manualSearch}
         <WorkflowDateTime bind:datetimeFilter />
       {/if}
     </svelte:fragment>
