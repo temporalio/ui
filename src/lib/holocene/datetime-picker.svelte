@@ -66,9 +66,9 @@
   />
   {#if showDatePicker}
     <div
-      class="absolute top-12 rounded border border-gray-900 bg-white shadow inline-block z-50"
+      class="absolute top-12 z-50 inline-block rounded border border-gray-900 bg-white shadow"
     >
-      <div class="flex justify-around items-center mx-3 my-2">
+      <div class="mx-3 my-2 flex items-center justify-around">
         <div class="center">
           <button on:click={prev}><Icon name="chevron-left" /></button>
         </div>
@@ -90,6 +90,6 @@
 
 <style lang="postcss">
   .center {
-    @apply flex justify-center items-center;
+    @apply flex items-center justify-center;
   }
 </style>

@@ -9,7 +9,7 @@
   const getOtherFilters = () =>
     $workflowFilters.filter((f) => f.attribute !== 'WorkflowId');
 
-  $: idFilter = $workflowFilters.find((f) => f.attribute === 'WorkflowType');
+  $: idFilter = $workflowFilters.find((f) => f.attribute === 'WorkflowId');
 
   $: {
     if (value) {

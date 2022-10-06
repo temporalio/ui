@@ -53,7 +53,7 @@
 
 <MenuContainer class="flex w-auto gap-0">
   <MenuButton
-    class="{$$props.class} h-8 w-full rounded-full flex flex-row items-center justify-between p-2 text-sm text-primary hover:bg-gradient-to-r hover:from-blue-100 hover:to-purple-200 hover:text-gray-900"
+    class="{$$props.class} flex h-8 w-full flex-row items-center justify-between rounded-full p-2 text-sm text-primary hover:bg-gradient-to-r hover:from-blue-100 hover:to-purple-200 hover:text-gray-900"
     on:click={() => (show = !show)}
     {show}
     controls="{id}-menu"
@@ -68,7 +68,7 @@
         {/if}
       </div>
       {#if displayValue && !show}
-        <div class="bg-gray-500 rounded-sm text-white px-1">
+        <div class="rounded-sm bg-gray-500 px-1 text-white">
           {displayValue.length > 25
             ? displayValue.slice(0, 25) + '...'
             : displayValue}
@@ -88,7 +88,7 @@
   </MenuButton>
   {#if show}
     <div
-      class="h-8 flex w-full flex-row items-center justify-between px-2 text-sm text-primary"
+      class="flex h-8 w-full flex-row items-center justify-between px-2 text-sm text-primary"
     >
       <slot />
     </div>

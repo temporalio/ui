@@ -1,4 +1,7 @@
-export const triggerMenu = (node: HTMLElement, keepOpen: boolean): { destroy: () => void, update: (open: boolean) => void } => {
+export const triggerMenu = (
+  node: HTMLElement,
+  keepOpen: boolean,
+): { destroy: () => void; update: (open: boolean) => void } => {
   type ExtendedPointerEvent<T> = PointerEvent & {
     currentTarget: EventTarget & T;
     path?: NodeList;
