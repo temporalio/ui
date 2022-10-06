@@ -78,7 +78,7 @@
       </div>
       {#if custom}
         <div
-          class="w-96 bg-white p-4 flex flex-col gap-8 border-l border-gray-900"
+          class="flex w-96 flex-col gap-8 border-l border-gray-900 bg-white p-4"
         >
           <div class="flex flex-col">
             <p>Start</p>

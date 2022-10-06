@@ -8,6 +8,6 @@
   };
 </script>
 
-<div class="mb-2 flex justify-center items-center mt-1/2 h-screen">
+<div class="mt-1/2 mb-2 flex h-screen items-center justify-center">
   <DatetimePicker on:datechange={onDateChange} selected={currentDate} />
 </div>

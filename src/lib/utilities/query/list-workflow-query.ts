@@ -134,26 +134,35 @@ const toQueryStatementsFromAdvancedFilters = (
   archived: boolean,
 ): string[] => {
   return filters
-    .map(({ attribute, value, conditional, operator, parenthesis, customDate }) => {
-      if (isAdvancedValid(value)) {
-        let statement = toAdvancedQueryStatement(
-          attribute,
-          value,
-          conditional,
-          archived,
-          customDate,
-        );
-        if (parenthesis === '(') {
-          statement = `(${statement}`;
-        } else if (parenthesis === ')') {
-          statement = `${statement})`;
+    .map(
+      ({
+        attribute,
+        value,
+        conditional,
+        operator,
+        parenthesis,
+        customDate,
+      }) => {
+        if (isAdvancedValid(value)) {
+          let statement = toAdvancedQueryStatement(
+            attribute,
+            value,
+            conditional,
+            archived,
+            customDate,
+          );
+          if (parenthesis === '(') {
+            statement = `(${statement}`;
+          } else if (parenthesis === ')') {
+            statement = `${statement})`;
+          }
+          if (operator) {
+            statement = `${statement} ${operator}` + ' ';
+          }
+          return statement;
         }
-        if (operator) {
-          statement = `${statement} ${operator}` + ' ';
-        }
-        return statement;
-      }
-    })
+      },
+    )
     .filter(Boolean);
 };
 

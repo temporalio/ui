@@ -58,14 +58,14 @@
 
 <style lang="postcss">
   .container {
-    @apply mt-2 px-4 w-[265px] h-[224px];
+    @apply mt-2 h-[224px] w-[265px] px-4;
   }
   .row {
-    @apply flex flex-wrap w-[240px];
+    @apply flex w-[240px] flex-wrap;
   }
 
   .cell {
-    @apply inline-flex w-[24px] h-[24px] items-center justify-center p-1 m-1 rounded text-sm;
+    @apply m-1 inline-flex h-[24px] w-[24px] items-center justify-center rounded p-1 text-sm;
   }
 
   .selected {
@@ -83,7 +83,7 @@
   }
 
   .highlight {
-    @apply hover:bg-blue-100 hover:cursor-pointer hover:scale-125;
+    @apply hover:scale-125 hover:cursor-pointer hover:bg-blue-100;
   }
 
   .selected.highlight:hover {
