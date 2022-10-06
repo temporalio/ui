@@ -75,6 +75,7 @@
       {autoFocus}
       {unroundRight}
       {unroundLeft}
+      thin
       on:focus={() => (showMenu = true)}
     />
     <Menu show={showMenu} id={`menu-${id}`} class="h-auto max-h-80 w-64">

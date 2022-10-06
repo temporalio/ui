@@ -18,11 +18,12 @@
 
 <button
   on:click
-  class="button {$$props.class}"
+  class="{$$props.class} button"
   class:active
   class:primary
   data-cy={dataCy}
   {disabled}
+  class:disabled
   class:add
   class:destructive
   class:unround
@@ -39,7 +40,11 @@
 
 <style lang="postcss">
   .button {
-    @apply relative flex w-fit items-center justify-center gap-2 rounded px-2 py-1 font-secondary text-sm transition hover:bg-gradient-to-r hover:from-blue-100 hover:to-purple-200 hover:text-gray-900;
+    @apply relative flex w-fit items-center justify-center gap-2 px-2 py-1 font-secondary text-sm transition hover:bg-gradient-to-r hover:from-blue-100 hover:to-purple-200 hover:text-gray-900;
+  }
+
+  .disabled {
+    @apply cursor-not-allowed bg-gray-100 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-200;
   }
 
   .destructive {

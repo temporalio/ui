@@ -46,16 +46,8 @@
 <div class="flex items-center gap-2">
   <PillSelect
     id={attribute}
-    value={attribute}
-    displayValue={(attribute, show) => {
-      if (show) {
-        return attribute;
-      } else if (value) {
-        return `${attribute} ${conditional} ${value}`;
-      } else {
-        return `${attribute}`;
-      }
-    }}
+    placeholder={attribute}
+    {value}
     class="rounded border border-gray-900 bg-white"
   >
     <div class="flex items-center gap-2">
@@ -68,7 +60,7 @@
       />
       <CustomButton
         icon="trash"
-        class="h-10 border border-gray-900 bg-white"
+        class="h-8"
         destructive
         on:click={removeFilter}
       />

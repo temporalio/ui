@@ -19,13 +19,11 @@
   let show = false;
 
   export let id: string;
-  export let value: T = undefined;
+  export let value: T;
   export let dark: boolean = false;
   export let placeholder = '';
   export let disabled: boolean = false;
   export let showIcon: boolean = true;
-  export let displayValue: (value: T, show: boolean) => T | string = (value) =>
-    value ?? '';
   export let onChange: (value: T) => void = noop;
 
   const context = writable<SelectContext<T>>({
@@ -48,11 +46,13 @@
 
     setContext('select-value', context);
   }
+
+  $: displayValue = value.toString();
 </script>
 
 <MenuContainer class="flex w-auto gap-0">
   <MenuButton
-    class="{$$props.class} flex w-full flex-row items-center justify-between p-2 text-sm text-primary hover:bg-gradient-to-r hover:from-blue-100 hover:to-purple-200 hover:text-gray-900"
+    class="{$$props.class} h-8 w-full rounded-full flex flex-row items-center justify-between p-2 text-sm text-primary hover:bg-gradient-to-r hover:from-blue-100 hover:to-purple-200 hover:text-gray-900"
     on:click={() => (show = !show)}
     {show}
     controls="{id}-menu"
@@ -60,11 +60,18 @@
     {dark}
     {disabled}
   >
-    <div class="select-input" class:dark class:disabled {id}>
-      {#if !value && placeholder !== ''}
-        {placeholder}
-      {:else}
-        {displayValue(value, show)}
+    <div class="select-input flex gap-1" class:dark class:disabled {id}>
+      <div class="text-gray-900">
+        {#if placeholder !== ''}
+          {placeholder}
+        {/if}
+      </div>
+      {#if displayValue && !show}
+        <div class="bg-gray-500 rounded-sm text-white px-1">
+          {displayValue.length > 25
+            ? displayValue.slice(0, 25) + '...'
+            : displayValue}
+        </div>
       {/if}
     </div>
     {#if showIcon}
@@ -80,7 +87,7 @@
   </MenuButton>
   {#if show}
     <div
-      class="flex w-full flex-row items-center justify-between px-2 text-sm text-primary"
+      class="h-8 flex w-full flex-row items-center justify-between px-2 text-sm text-primary"
     >
       <slot />
     </div>

@@ -4,6 +4,8 @@
   import TypeaheadInput from '$lib/holocene/input/typeahead-input.svelte';
   import { workflowFilters } from '$lib/stores/filters';
 
+  export let disabled = false;
+
   $: filterTypeOptions = $searchAttributes
     ? Object.entries($searchAttributes).map(([key, value]) => {
         return {
@@ -34,15 +36,15 @@
   }
 
   const onAddFilter = (attribute: string) => {
-    const _filters = $workflowFilters.map((filter, index) => {
-      if (index === $workflowFilters.length - 1) {
-        return { ...filter, operator: 'AND' };
-      }
-      return filter;
-    });
+    // const _filters = $workflowFilters.map((filter, index) => {
+    //   if (index === $workflowFilters.length - 1) {
+    //     return { ...filter, operator: 'AND' };
+    //   }
+    //   return filter;
+    // });
 
     $workflowFilters = [
-      ..._filters,
+      ...$workflowFilters,
       {
         attribute,
         value: getDefaultValueForType(attribute),
@@ -62,9 +64,10 @@
 
 <div class="flex gap-0">
   <CustomButton
+    {disabled}
     icon={adding ? 'close' : 'add'}
     unroundRight={adding}
-    class="h-10 border border-gray-900 bg-white"
+    class="h-8 rounded-full border border-gray-900"
     on:click={() => (adding = !adding)}>Add Filter</CustomButton
   >
   {#if adding}
