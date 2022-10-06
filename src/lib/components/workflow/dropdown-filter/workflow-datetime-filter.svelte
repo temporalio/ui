@@ -8,12 +8,17 @@
   import CustomSplitButton from '$lib/holocene/custom-split-button.svelte';
   import { workflowFilters } from '$lib/stores/filters';
 
+  let custom = false;
+
   const getOtherFilters = () =>
     $workflowFilters.filter((f) => f.attribute !== 'StartTime');
 
   const onChange = (value: string) => {
     if (value === 'All') {
       $workflowFilters = [...getOtherFilters()];
+      custom = false;
+    } else if (value === 'Custom') {
+      custom = true;
     } else {
       const filter = {
         attribute: 'StartTime',
@@ -23,6 +28,7 @@
         parenthesis: '',
       };
       $workflowFilters = [...getOtherFilters(), filter];
+      custom = false;
     }
   };
 </script>
@@ -35,11 +41,21 @@
     unroundRight
     {onChange}
   >
-    {#each durations as value}
-      <Option {value}>{value}</Option>
-    {/each}
-    <Option value={'Custom'}>Custom</Option>
-    <Option value={'All'}>All Time</Option>
+    <div class="flex">
+      <div>
+        {#each durations as value}
+          <Option {value}>{value}</Option>
+        {/each}
+        <Option value={'Custom'}>Custom</Option>
+        <Option value={'All'}>All Time</Option>
+      </div>
+      {#if custom}
+        <div class="w-80 bg-white p-4">
+          <div class="flex">Start</div>
+          <div class="flex">End</div>
+        </div>
+      {/if}
+    </div>
   </Select>
   <CustomSplitButton
     class="rounded-tr rounded-br bg-offWhite"

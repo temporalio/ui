@@ -166,6 +166,12 @@
       : {};
     $workflowsSearch = { parameters, searchType };
   });
+
+  let currentDate = new Date();
+
+  const onDateChange = (d) => {
+    currentDate = d.detail;
+  };
 </script>
 
 <PageTitle
