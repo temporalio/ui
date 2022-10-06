@@ -90,7 +90,7 @@
       ...dropdownFilters,
       ...addAndOperator(nonDropdownFilters),
     ];
-    return allFilters;
+    return addAndOperator(allFilters);
   };
 
   const combineDropdownFilters = () => {

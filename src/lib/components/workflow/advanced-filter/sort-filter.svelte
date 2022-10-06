@@ -54,15 +54,11 @@
   };
 </script>
 
-<div class="flex gap-0">
+<div class="flex gap-2">
   <CustomButton
-    icon={adding ? 'chevron-left' : 'chevron-right'}
-    unroundRight={adding}
-    class="h-8 rounded-full border border-gray-900"
-    on:click={() => (adding = !adding)}
-    >Order by {$workflowSorts[0] && !adding
-      ? `${$workflowSorts[0].attribute}`
-      : ''}</CustomButton
+    icon={adding ? 'close' : 'add'}
+    class="h-8 rounded-full underline"
+    on:click={() => (adding = !adding)}>Order by</CustomButton
   >
   {#if adding}
     <TypeaheadInput
@@ -71,7 +67,6 @@
       class="w-72"
       id="filter-type-name"
       bind:value
-      unroundLeft
       {options}
       onChange={onTypeChange}
       autoFocus

@@ -9,6 +9,8 @@
   const getOtherFilters = () =>
     $workflowFilters.filter((f) => f.attribute !== 'WorkflowId');
 
+  $: idFilter = $workflowFilters.find((f) => f.attribute === 'WorkflowType');
+
   $: {
     if (value) {
       const filter = {
@@ -18,7 +20,6 @@
         operator: '',
         parenthesis: '',
       };
-      debugger;
       $workflowFilters = [...getOtherFilters(), filter];
     } else {
       $workflowFilters = [...getOtherFilters()];
@@ -26,7 +27,7 @@
   }
 </script>
 
-<DropdownMenu {value} keepOpen left>
+<DropdownMenu value={idFilter?.value ?? ''} keepOpen left>
   <svelte:fragment slot="label">Workflow Id</svelte:fragment>
   <div class="flex w-96 flex-col gap-2 p-2">
     <Input

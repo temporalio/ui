@@ -16,12 +16,13 @@
 
   type T = $$Generic;
 
-  let show = false;
+  let show = true;
 
   export let id: string;
   export let value: T;
   export let dark: boolean = false;
   export let placeholder = '';
+  export let conditional = '';
   export let disabled: boolean = false;
   export let showIcon: boolean = true;
   export let onChange: (value: T) => void = noop;

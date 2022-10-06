@@ -74,7 +74,7 @@
       <div in:fly={{ x: -100, duration: 150 }}>
         <CustomButton
           variant="primary"
-          class="h-10"
+          class="h-8 rounded"
           icon={advancedSearch ? 'chevron-left' : 'chevron-right'}
           on:click={() => (advancedSearch = !advancedSearch)}
         >

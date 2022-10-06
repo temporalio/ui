@@ -9,5 +9,5 @@
 
 <div class="flex gap-2">
   <IntConditionals bind:conditional />
-  <Input id={`${id}-filter`} placeholder={id} class="w-96" bind:value />
+  <Input thin id={`${id}-filter`} placeholder={id} class="w-96" bind:value />
 </div>
