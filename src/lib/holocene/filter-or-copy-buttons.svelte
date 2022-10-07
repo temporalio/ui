@@ -20,7 +20,9 @@
         {#key filtered}
           <Icon
             name="filter"
-            class="h-4 w-4 rounded {filtered ? 'bg-gray-900 text-white' : ''}"
+            class="h-4 w-4 rounded-sm {filtered
+              ? 'bg-gray-900 text-white'
+              : ''}"
           />
         {/key}
       </button>
