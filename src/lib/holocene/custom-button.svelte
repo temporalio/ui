@@ -1,9 +1,11 @@
 <script lang="ts">
   import Icon from '$holocene/icon/icon.svelte';
   import type { IconName } from '$holocene/icon/paths';
+  import Badge from './badge.svelte';
 
   export let disabled: boolean = false;
   export let loading: boolean = false;
+  export let count: number = 0;
   export let active: boolean = false;
   export let primary: boolean = false;
   export let add: boolean = false;
@@ -30,11 +32,17 @@
   class:unroundRight
   class:unroundLeft
 >
-  <slot />
   {#if icon || loading}
     <span class:animate-spin={loading}>
       <Icon name={loading ? 'spinner' : icon} class={iconClass} />
     </span>
+  {/if}
+  <slot />
+  {#if count > 0}
+    <Badge
+      class="badge absolute top-0 right-0 z-20 origin-bottom-left translate-y-[-10px] translate-x-[10px]"
+      type="count">{count}</Badge
+    >
   {/if}
 </button>
 
