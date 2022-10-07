@@ -8,23 +8,30 @@
   import Input from '$lib/holocene/input/input.svelte';
   import CustomButton from '$lib/holocene/custom-button.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import TypeaheadInput from '$lib/holocene/input/typeahead-input.svelte';
+  import { workflowFilters } from '$lib/stores/filters';
+  import {
+    getConditionalForAttribute,
+    getDefaultValueForAttribute,
+  } from '$lib/utilities/query/to-list-workflow-advanced-parameters';
+  import { searchAttributeOptions } from '$lib/stores/search-attributes';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
 
   export let advancedSearch = false;
   export let manualSearch = false;
   export let error = '';
 
   let manualSearchString = '';
+  let value = '';
 
   $: query = $page.url.searchParams.get('query');
 
-  function setManualString(manual) {
-    if (manual) {
-      manualSearchString = query;
-    }
+  function setManualString(query) {
+    manualSearchString = query;
   }
 
   $: {
-    setManualString(manualSearch);
+    setManualString(query);
   }
 
   const onSearch = () => {
@@ -34,6 +41,21 @@
       value: manualSearchString,
       allowEmpty: true,
     });
+  };
+
+  const onAddFilter = (attribute: string) => {
+    $workflowFilters = [
+      ...$workflowFilters,
+      {
+        attribute,
+        value: getDefaultValueForAttribute(attribute),
+        operator: '',
+        parenthesis: '',
+        conditional: getConditionalForAttribute(attribute),
+      },
+    ];
+    value = '';
+    advancedSearch = true;
   };
 </script>
 
@@ -50,36 +72,53 @@
             style="top: -16px">{error}</span
           >
         {/if}
-        <Button variant="primary" class="h-10" unroundRight on:click={onSearch}>
-          Search
-        </Button>
-        <CustomButton
-          icon="chevron-left"
-          class="h-10 border border-gray-900"
-          on:click={() => (manualSearch = !manualSearch)}
-        />
         <Input
           id="manual-search"
-          placeholder="Enter or paste a query..."
+          placeholder="Enter a query"
           icon="search"
           class="w-full"
           clearable
-          unroundLeft
+          unroundRight
           autoFocus
           bind:value={manualSearchString}
           errorText={error}
         />
-      </div>
-    {:else}
-      <div in:fly={{ x: -100, duration: 150 }}>
         <CustomButton
-          variant="primary"
-          class="h-8 rounded"
-          icon={advancedSearch ? 'chevron-left' : 'chevron-right'}
+          icon="chevron-left"
+          class="h-10 border border-l-0 border-gray-900"
+          on:click={() => (manualSearch = !manualSearch)}
+        />
+        <Button variant="primary" class="h-10" unroundLeft on:click={onSearch}>
+          Search
+        </Button>
+      </div>
+    {:else if !advancedSearch}
+      <div
+        class="relative flex h-12 w-full items-center gap-0"
+        in:fly={{ x: -100, duration: 150 }}
+      >
+        <!-- <TypeaheadInput
+          icon="filter"
+          placeholder="Filter workflows"
+          class="w-72"
+          id="filter-type-name"
+          bind:value
+          unroundRight
+          options={searchAttributeOptions()}
+          onChange={onAddFilter}
+        /> -->
+        <!-- <CustomButton
+          icon="search"
+          class="h-10 border border-gray-900 border-l-0"
+          count={$workflowFilters.length}
           on:click={() => (advancedSearch = !advancedSearch)}
+        /> -->
+        <Button
+          variant="secondary"
+          icon="terminal"
+          class="h-10 rounded border border-gray-900"
+          on:click={() => (manualSearch = !manualSearch)}>Advanced</Button
         >
-          Advanced Search
-        </CustomButton>
       </div>
     {/if}
   </div>

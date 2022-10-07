@@ -66,6 +66,15 @@ export const fetchAllWorkflows = async (
       request,
     })) ?? { executions: [], nextPageToken: '' };
 
+  // const countRoute = await routeForApi('workflows.count', { namespace });
+  // const { count } =
+  //   (await requestFromAPI<ListWorkflowExecutionsResponse>(countRoute, {
+  //     params: { query },
+  //     onError,
+  //     handleError: onError,
+  //     request,
+  //   })) ?? 0;
+
   return {
     workflows: toWorkflowExecutions({ executions }),
     nextPageToken: String(nextPageToken),

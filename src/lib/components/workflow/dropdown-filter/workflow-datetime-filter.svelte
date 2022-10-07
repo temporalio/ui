@@ -18,7 +18,7 @@
     $workflowFilters.filter((f) => f.attribute !== 'StartTime');
 
   const onChange = (value: string) => {
-    if (value === 'All') {
+    if (value === 'All Time') {
       $workflowFilters = [...getOtherFilters()];
       custom = false;
     } else if (value === 'Custom') {
@@ -63,14 +63,14 @@
   <Select
     class="w-44 rounded"
     id="time-range-filter"
-    placeholder="Start Time"
+    placeholder="All Time"
     unroundRight
     keepOpen={custom}
     {onChange}
   >
     <div class="flex">
       <div>
-        <Option value={'All'}>All Time</Option>
+        <Option value={'All Time'}>All Time</Option>
         <Option value={'Custom'}>Custom</Option>
         {#each durations as value}
           <Option {value}>{value}</Option>

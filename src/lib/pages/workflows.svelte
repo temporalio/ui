@@ -36,7 +36,10 @@
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import TableRow from '$holocene/table/table-row.svelte';
   import WorkflowDateTime from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
-  import type { WorkflowFilter } from '$lib/models/workflow-filters';
+  import type {
+    WorkflowFilter,
+    WorkflowSort,
+  } from '$lib/models/workflow-filters';
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
 
@@ -58,52 +61,17 @@
     }
   }
 
-  const addAndOperator = (filters: WorkflowFilter[]) => {
-    return filters.map((filter, index) => {
-      if (filters[index + 1]) {
-        return { ...filter, operator: 'AND' };
-      }
-      return filter;
-    });
-  };
-
-  const combineFilters = (filters: WorkflowFilter[]) => {
-    const dropdownAttributes = [
-      'ExecutionStatus',
-      'WorkflowId',
-      'WorkflowType',
-      'StartTime',
-    ];
-
-    const dropdownFilters = combineDropdownFilters();
-    const nonDropdownFilters = filters
-      .filter((f) => !dropdownAttributes.includes(f.attribute))
-      .filter((f) => !!f.value);
-    if (nonDropdownFilters.length > 1) {
-      const finalDropdownFilter = dropdownFilters[dropdownFilters.length - 1];
-      dropdownFilters[dropdownFilters.length - 1] = {
-        ...finalDropdownFilter,
-        operator: 'AND',
-      };
-    }
-    const allFilters = [
-      ...dropdownFilters,
-      ...addAndOperator(nonDropdownFilters),
-    ];
-    return addAndOperator(allFilters);
-  };
-
-  const combineDropdownFilters = () => {
-    const statusFilters = $workflowFilters.filter(
+  const combineDropdownFilters = (filters: WorkflowFilter[]) => {
+    const statusFilters = filters.filter(
       (f) => f.attribute === 'ExecutionStatus' && f.value,
     );
-    const idFilter = $workflowFilters.filter(
+    const idFilter = filters.filter(
       (f) => f.attribute === 'WorkflowId' && f.value,
     );
-    const typeFilter = $workflowFilters.filter(
+    const typeFilter = filters.filter(
       (f) => f.attribute === 'WorkflowType' && f.value,
     );
-    const startTimeFilter = $workflowFilters.filter(
+    const startTimeFilter = filters.filter(
       (f) => f.attribute === 'StartTime' && f.value,
     );
 
@@ -114,7 +82,6 @@
       startTimeFilter,
     ].filter((f) => f.length);
 
-    // In the case you add multiple id or type filters through Advanced Filters
     activeFilters.forEach((filter, index) => {
       if (filter.length && activeFilters[index + 1]?.length) {
         filter[filter.length - 1].operator = 'AND';
@@ -123,25 +90,22 @@
       }
     });
 
-    // In the case you add multiple id or type filters through Advanced Filters
-    return [
-      ...statusFilters,
-      ...addAndOperator(idFilter),
-      ...addAndOperator(typeFilter),
-      ...startTimeFilter,
-    ];
+    return [...statusFilters, ...idFilter, ...typeFilter, ...startTimeFilter];
   };
 
-  const handleParameterChange = debounce((filters, sorts) => {
-    const allFilters = combineFilters(filters);
-    query = toListWorkflowQueryFromAdvancedFilters(allFilters, sorts);
-    updateQueryParameters({
-      url: $page.url,
-      parameter: 'query',
-      value: query,
-      allowEmpty: true,
-    });
-  }, 300);
+  const handleParameterChange = debounce(
+    (filters: WorkflowFilter[], sorts: WorkflowSort[]) => {
+      const allFilters = combineDropdownFilters(filters);
+      query = toListWorkflowQueryFromAdvancedFilters(allFilters, sorts);
+      updateQueryParameters({
+        url: $page.url,
+        parameter: 'query',
+        value: query,
+        allowEmpty: true,
+      });
+    },
+    300,
+  );
 
   $: {
     handleParameterChange($workflowFilters, $workflowSorts);
@@ -166,12 +130,6 @@
       : {};
     $workflowsSearch = { parameters, searchType };
   });
-
-  let currentDate = new Date();
-
-  const onDateChange = (d) => {
-    currentDate = d.detail;
-  };
 </script>
 
 <PageTitle
@@ -200,7 +158,7 @@
 {#if $loading}
   <Loading />
 {:else}
-  <Pagination items={$workflows} updating={$updating} let:visibleItems>
+  <Pagination items={$workflows} let:visibleItems>
     <svelte:fragment slot="action-top-left">
       <WorkflowAdvancedSearch
         bind:manualSearch

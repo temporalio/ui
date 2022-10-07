@@ -2,6 +2,7 @@
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { workflowFilters } from '$lib/stores/filters';
+  import { onMount } from 'svelte';
   import Sort from './sort.svelte';
 
   let value = '';

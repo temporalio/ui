@@ -1,5 +1,8 @@
 import type { WorkflowFilter } from '$lib/models/workflow-filters';
-import { searchAttributes } from '$lib/stores/search-attributes';
+import {
+  searchAttributeOptions,
+  searchAttributes,
+} from '$lib/stores/search-attributes';
 import { formatDuration } from 'date-fns';
 import { get } from 'svelte/store';
 import {
@@ -97,4 +100,23 @@ export const toListWorkflowAdvancedParameters = (
     console.log('ERROR SETTING FILTERS: ', e);
     return [];
   }
+};
+
+export const getConditionalForAttribute = (
+  attribute: keyof SearchAttributes,
+): string => {
+  const filter = searchAttributeOptions().find((t) => t.value === attribute);
+  const type = filter?.type;
+  if (type === 'Datetime') return 'In Last';
+  return '=';
+};
+
+export const getDefaultValueForAttribute = (
+  attribute: keyof SearchAttributes,
+) => {
+  const filter = searchAttributeOptions().find((t) => t.value === attribute);
+  const type = filter?.type;
+  if (type === 'Datetime') return '24 hours';
+  if (type === 'Bool') return 'true';
+  return '';
 };

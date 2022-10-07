@@ -18,7 +18,10 @@
     {#if filterable}
       <button on:click|preventDefault|stopPropagation={onFilter}>
         {#key filtered}
-          <Icon name={filtered ? 'filter-solid' : 'filter'} class="h-4 w-4" />
+          <Icon
+            name="filter"
+            class="h-4 w-4 rounded {filtered ? 'bg-gray-900 text-white' : ''}"
+          />
         {/key}
       </button>
     {/if}

@@ -37,7 +37,7 @@
 
 <style lang="postcss">
   .split-button {
-    @apply flex h-8 grow cursor-pointer flex-row gap-[0px] font-secondary;
+    @apply flex h-10 grow cursor-pointer flex-row gap-[0px] font-secondary;
 
     :global(.segment) {
       @apply relative flex w-fit items-center justify-center py-2 font-secondary text-sm;

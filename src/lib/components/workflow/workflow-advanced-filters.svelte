@@ -24,10 +24,6 @@
   let showQuery = true;
   let editing = false;
 
-  const onEdit = () => {
-    editing = !editing;
-  };
-
   const onRestart = () => {
     $workflowFilters = [];
     $workflowSorts = [];
@@ -37,6 +33,7 @@
       value: defaultQuery,
       allowEmpty: true,
     });
+    advancedSearch = false;
   };
 
   const onRemoveFilter = (index: number) => {
@@ -56,7 +53,17 @@
     class="rounded-tr-lg rounded-tl-lg border border-gray-900 bg-offWhite p-6"
   >
     <div class="mb-2 flex items-center justify-between">
-      <h3 class="text-base">Advanced Visibility</h3>
+      <div class="flex items-center gap-2">
+        <Tooltip top text="Back">
+          <CustomButton
+            icon="chevron-left"
+            on:click={() => {
+              advancedSearch = false;
+            }}
+          />
+        </Tooltip>
+        <h3 class="text-base">Advanced Visibility</h3>
+      </div>
       <div class="flex items-center gap-2">
         <Tooltip top text="Reset search">
           <CustomButton icon="retry" on:click={onRestart} />
