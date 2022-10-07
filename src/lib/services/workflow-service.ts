@@ -18,6 +18,7 @@ export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
 export type CombinedWorkflowExecutionsResponse = {
   workflows: WorkflowExecution[];
   nextPageToken: string;
+  count?: number;
   error?: string;
 };
 
@@ -52,11 +53,6 @@ export const fetchAllWorkflows = async (
     }
   };
 
-  const handleError = () => {
-    // Handle when bad namespace is entered in URL and no status code is returned
-    error = 'Failed to fetch workflows';
-  };
-
   const route = await routeForApi(endpoint, { namespace });
   const { executions, nextPageToken } =
     (await requestFromAPI<ListWorkflowExecutionsResponse>(route, {
@@ -66,17 +62,24 @@ export const fetchAllWorkflows = async (
       request,
     })) ?? { executions: [], nextPageToken: '' };
 
-  // const countRoute = await routeForApi('workflows.count', { namespace });
-  // const { count } =
-  //   (await requestFromAPI<ListWorkflowExecutionsResponse>(countRoute, {
-  //     params: { query },
-  //     onError,
-  //     handleError: onError,
-  //     request,
-  //   })) ?? 0;
+  let count = 0;
+  try {
+    const countRoute = await routeForApi('workflows.count', { namespace });
+    const countResult =
+      (await requestFromAPI<{ count: number }>(countRoute, {
+        params: { query },
+        onError,
+        handleError: onError,
+        request,
+      })) ?? { count: 0 };
+    count = countResult.count
+  } catch (e) {
+    // Don't fail the workflows call due to count
+  }
 
   return {
     workflows: toWorkflowExecutions({ executions }),
+    count,
     nextPageToken: String(nextPageToken),
     error,
   };

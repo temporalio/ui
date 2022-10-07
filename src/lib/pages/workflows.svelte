@@ -3,7 +3,7 @@
   import debounce from 'just-debounce';
   import { page } from '$app/stores';
   import { timeFormat } from '$lib/stores/time-format';
-  import { workflowsSearch } from '$lib/stores/workflows';
+  import { workflowCount, workflowsSearch } from '$lib/stores/workflows';
   import {
     refresh,
     workflows,
@@ -140,9 +140,15 @@
       Recent Workflows
       <NamespaceSelector />
     </h1>
-    <p class="text-sm text-gray-600" data-cy="namespace-name">
-      {$page.params.namespace}
-    </p>
+    <div class="flex items-center gap-2 text-sm text-gray-600">
+      <p data-cy="namespace-name">
+        {$page.params.namespace}
+      </p>
+      <div class="w-2 h-2 bg-gray-400 rounded-full" />
+      <p>
+        {$workflowCount} workflows
+      </p>
+    </div>
   </div>
   <div>
     <Button variant="secondary" on:click={refreshWorkflows}
