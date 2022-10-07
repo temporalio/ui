@@ -23,10 +23,15 @@ const parameters = derived(
 const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
   return parameters.subscribe(({ namespace, query }) => {
     withLoading(loading, updating, async () => {
-      const { workflows, error } = await fetchAllWorkflows(namespace, {
+      const { workflows, count, error } = await fetchAllWorkflows(namespace, {
         query,
       });
       set(workflows);
+      if (count) {
+        workflowCount.set(count)
+      } else {
+        workflowCount.set(0)
+      }
       if (error) {
         workflowError.set(error);
       } else {
@@ -47,5 +52,6 @@ export const workflowsSearch = writable<WorkflowsSearch>({
 
 export const updating = writable(true);
 export const loading = writable(true);
+export const workflowCount = writable(0);
 export const workflowError = writable('');
 export const workflows = readable<WorkflowExecution[]>([], updateWorkflows);
