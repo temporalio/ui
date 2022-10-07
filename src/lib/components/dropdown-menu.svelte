@@ -88,6 +88,6 @@
     @apply absolute right-0 origin-top-right;
   }
   .dot {
-    @apply pointer-events-none absolute top-0 -right-1 h-2 w-2 rounded-full border border-green-600 bg-green-400;
+    @apply pointer-events-none absolute top-0 -right-1 h-2 w-2 rounded-full bg-blue-300;
   }
 </style>
