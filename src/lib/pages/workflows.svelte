@@ -32,7 +32,6 @@
   import PageTitle from '$lib/holocene/page-title.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$holocene/icon/icon.svelte';
-  import WorkflowAdvancedFilters from '$lib/components/workflow/workflow-advanced-filters.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import TableRow from '$holocene/table/table-row.svelte';
   import WorkflowDateTime from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
@@ -43,7 +42,6 @@
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
 
-  let datetimeFilter = [];
   let advancedSearch = false;
   let manualSearch = false;
   let initialFetch = true;
@@ -152,9 +150,6 @@
     >
   </div>
 </div>
-{#if advancedSearch}
-  <WorkflowAdvancedFilters bind:manualSearch bind:advancedSearch />
-{/if}
 {#if $loading}
   <Loading />
 {:else}
@@ -168,7 +163,7 @@
     </svelte:fragment>
     <svelte:fragment slot="action-top-center">
       {#if !manualSearch}
-        <WorkflowDateTime bind:datetimeFilter />
+        <WorkflowDateTime />
       {/if}
     </svelte:fragment>
     <WorkflowsSummaryTable updating={$updating}>

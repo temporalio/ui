@@ -12,6 +12,7 @@
   import DatetimePicker from '$lib/holocene/datetime-picker.svelte';
   import Button from '$lib/holocene/button.svelte';
 
+  // WHY DOES THIS CAUSE A DOUBLE RERENDER OF ROOT LAYOUT???????????
   let custom = false;
 
   const getOtherFilters = () =>
