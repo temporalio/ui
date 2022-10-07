@@ -68,7 +68,7 @@
       >
         {#if error}
           <span
-            class="absolute left-32 h-4 text-xs font-bold text-orange-500"
+            class="absolute left-0 h-4 text-xs font-bold text-orange-500"
             style="top: -16px">{error}</span
           >
         {/if}
