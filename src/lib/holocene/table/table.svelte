@@ -20,7 +20,8 @@
     @apply relative;
   }
   .updating {
-    @apply absolute top-6 z-40 h-4 w-full border-b-4 border-blue-500;
+    @apply absolute top-6 h-4 w-full border-b-4 border-blue-500;
+    z-index: 5;
   }
 
   table {

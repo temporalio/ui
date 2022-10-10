@@ -9,6 +9,7 @@ import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 import { handleUnauthorizedOrForbiddenError } from '$lib/utilities/handle-error';
+import { noop } from 'svelte/internal';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;
@@ -19,12 +20,61 @@ export type CombinedWorkflowExecutionsResponse = {
   workflows: WorkflowExecution[];
   nextPageToken: string;
   count?: number;
+  totalCount?: number;
   error?: string;
 };
 
 export type FetchWorkflow =
   | typeof fetchAllWorkflows
   | typeof fetchAllArchivedWorkflows;
+
+const fetchWorkflowCount = async (
+  namespace: string,
+  query: string,
+  request = fetch,
+) => {
+  let totalCount = 0;
+  let count = 0;
+  try {
+    const countRoute = await routeForApi('workflows.count', { namespace });
+
+    if (!query) {
+      const totalCountResult = await requestFromAPI<{ count: number }>(
+        countRoute,
+        {
+          params: { query },
+          onError: noop,
+          handleError: noop,
+          request,
+        },
+      );
+      totalCount = totalCountResult?.count;
+    } else {
+      const countPromise = requestFromAPI<{ count: number }>(countRoute, {
+        params: { query },
+        onError: noop,
+        handleError: noop,
+        request,
+      });
+      const totalCountPromise = requestFromAPI<{ count: number }>(countRoute, {
+        params: { query: '' },
+        onError: noop,
+        handleError: noop,
+        request,
+      });
+      const [countResult, totalCountResult] = await Promise.all([
+        countPromise,
+        totalCountPromise,
+      ]);
+      count = countResult?.count;
+      totalCount = totalCountResult?.count;
+    }
+  } catch (e) {
+    // Don't fail the workflows call due to count
+  }
+
+  return { count, totalCount };
+};
 
 export const fetchAllWorkflows = async (
   namespace: string,
@@ -62,24 +112,16 @@ export const fetchAllWorkflows = async (
       request,
     })) ?? { executions: [], nextPageToken: '' };
 
-  let count = 0;
-  try {
-    const countRoute = await routeForApi('workflows.count', { namespace });
-    const countResult =
-      (await requestFromAPI<{ count: number }>(countRoute, {
-        params: { query },
-        onError,
-        handleError: onError,
-        request,
-      })) ?? { count: 0 };
-    count = countResult.count
-  } catch (e) {
-    // Don't fail the workflows call due to count
-  }
+  const { count, totalCount } = await fetchWorkflowCount(
+    namespace,
+    query,
+    request,
+  );
 
   return {
     workflows: toWorkflowExecutions({ executions }),
     count,
+    totalCount,
     nextPageToken: String(nextPageToken),
     error,
   };

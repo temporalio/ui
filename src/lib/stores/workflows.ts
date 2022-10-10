@@ -20,18 +20,21 @@ const parameters = derived(
   },
 );
 
+const setCounts = (count: number, totalCount: number) => {
+  workflowCount.set({ count, totalCount });
+};
+
 const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
   return parameters.subscribe(({ namespace, query }) => {
     withLoading(loading, updating, async () => {
-      const { workflows, count, error } = await fetchAllWorkflows(namespace, {
-        query,
-      });
+      const { workflows, count, totalCount, error } = await fetchAllWorkflows(
+        namespace,
+        {
+          query,
+        },
+      );
       set(workflows);
-      if (count) {
-        workflowCount.set(count)
-      } else {
-        workflowCount.set(0)
-      }
+      setCounts(count, totalCount);
       if (error) {
         workflowError.set(error);
       } else {
@@ -52,6 +55,6 @@ export const workflowsSearch = writable<WorkflowsSearch>({
 
 export const updating = writable(true);
 export const loading = writable(true);
-export const workflowCount = writable(0);
+export const workflowCount = writable({ count: 0, totalCount: 0 });
 export const workflowError = writable('');
 export const workflows = readable<WorkflowExecution[]>([], updateWorkflows);

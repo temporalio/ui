@@ -37,7 +37,7 @@
   }
 
   .remove {
-    @apply h-10 appearance-none rounded-xl py-1 pl-3 text-sm;
+    @apply h-8 appearance-none rounded-xl py-1 pl-3 text-sm;
   }
 
   .dark {

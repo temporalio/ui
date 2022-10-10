@@ -20,7 +20,7 @@
 </button>
 
 <style lang="postcss">
-  .icon-button-default {
+  .icon-button {
     @apply inline-block h-4 w-auto text-sm;
   }
 </style>
