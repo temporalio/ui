@@ -43,6 +43,8 @@
     "src/lib/services/**/*.test.ts",
     "src/lib/utilities/**/*.test.ts",
     "src/lib/stores/**/*.test.ts",
-    "src/histoire.setup.ts"
+    // Until there is better TS support for Histoire
+    "src/histoire.setup.ts",
+    "src/lib/holocene/**/*.story.svelte"
   ]
 }
