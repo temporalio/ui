@@ -13,7 +13,6 @@
   } from '$lib/stores/workflows';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
-  import { searchAttributes } from '$lib/stores/search-attributes';
 
   import { getSearchType } from '$lib/utilities/search-type-parameter';
   import {
@@ -49,7 +48,17 @@
   $: query = $page.url.searchParams.get('query');
 
   onMount(() => {
+    $lastUsedNamespace = $page.params.namespace;
     $workflowFilters = toListWorkflowAdvancedParameters(query ?? defaultQuery);
+  });
+
+  $: {
+    handleFilterChange($workflowFilters, $workflowSorts);
+  }
+
+  onDestroy(() => {
+    const parameters = query ? toListWorkflowAdvancedParameters(query) : {};
+    $workflowsSearch = { parameters, searchType };
   });
 
   const combineDropdownFilters = (filters: WorkflowFilter[]) => {
@@ -84,7 +93,7 @@
     return [...statusFilters, ...idFilter, ...typeFilter, ...startTimeFilter];
   };
 
-  const handleParameterChange = debounce(
+  const handleFilterChange = debounce(
     (filters: WorkflowFilter[], sorts: WorkflowSort[]) => {
       const allFilters = combineDropdownFilters(filters);
       query = toListWorkflowQueryFromAdvancedFilters(allFilters, sorts);
@@ -98,27 +107,14 @@
     300,
   );
 
-  $: {
-    handleParameterChange($workflowFilters, $workflowSorts);
-  }
-
   const errorMessage =
     searchType === 'advanced'
       ? 'Please check your syntax and try again.'
       : 'If you have filters applied, try adjusting them.';
 
-  onMount(() => {
-    $lastUsedNamespace = $page.params.namespace;
-  });
-
   const refreshWorkflows = () => {
     $refresh = Date.now();
   };
-
-  onDestroy(() => {
-    const parameters = query ? toListWorkflowAdvancedParameters(query) : {};
-    $workflowsSearch = { parameters, searchType };
-  });
 </script>
 
 <PageTitle

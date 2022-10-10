@@ -2,7 +2,7 @@
   import Icon from '$holocene/icon/icon.svelte';
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import { workflowFilters } from '$lib/stores/filters';
+  import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import Sort from './sort.svelte';
 
   const AllStatuses = {
@@ -19,6 +19,7 @@
   $: statusFilters = $workflowFilters.filter(
     (f) => f.attribute === 'ExecutionStatus',
   );
+  $: statusSort = $workflowSorts.find((s) => s.attribute === 'ExecutionStatus');
 
   function mapStatusToFilter(value) {
     return {
@@ -80,7 +81,13 @@
   };
 </script>
 
-<DropdownMenu value={statusFilters.map((s) => s.value).join('')} keepOpen left>
+<DropdownMenu
+  value={statusFilters.length
+    ? statusFilters.map((s) => s.value).join('')
+    : statusSort?.value ?? ''}
+  keepOpen
+  left
+>
   <svelte:fragment slot="label">Status</svelte:fragment>
   <div class="flex w-56 flex-col gap-4">
     {#each Object.entries(AllStatuses) as [label, _value] (_value)}

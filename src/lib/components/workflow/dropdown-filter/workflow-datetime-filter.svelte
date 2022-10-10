@@ -1,7 +1,14 @@
 <script lang="ts">
   import { timeFormat } from '$lib/stores/time-format';
   import { capitalize } from '$lib/utilities/format-camel-case';
-  import { formatISO } from 'date-fns';
+  import {
+    addHours,
+    addMinutes,
+    addSeconds,
+    endOfDay,
+    formatISO,
+    startOfDay,
+  } from 'date-fns';
 
   import { durations } from '$lib/utilities/to-duration';
 
@@ -9,10 +16,22 @@
   import Option from '$lib/holocene/select/option.svelte';
   import CustomSplitButton from '$lib/holocene/custom-split-button.svelte';
   import { workflowFilters } from '$lib/stores/filters';
-  import DatetimePicker from '$lib/holocene/datetime-picker.svelte';
+  import DatePicker from '$lib/holocene/date-picker.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import { onMount } from 'svelte';
+  import TimePicker from '$lib/holocene/time-picker.svelte';
 
   let custom = false;
+  let value = '';
+
+  onMount(() => {
+    const startTimeFilter = $workflowFilters.find(
+      (f) => f.attribute === 'StartTime',
+    );
+    if (startTimeFilter) {
+      value = startTimeFilter.value;
+    }
+  });
 
   const getOtherFilters = () =>
     $workflowFilters.filter((f) => f.attribute !== 'StartTime');
@@ -36,17 +55,38 @@
     }
   };
 
-  let startDate = new Date();
-  let endDate = new Date();
+  let startDate = startOfDay(new Date());
+  let endDate = endOfDay(new Date());
+  let startTime = { hour: '', minute: '', second: '' };
+  let endTime = { hour: '', minute: '', second: '' };
 
   const onStartDateChange = (d) => {
-    startDate = d.detail;
+    startDate = startOfDay(d.detail);
   };
+
+  const onStartDateTimeChange = (d) => {
+    startTime = d.detail;
+  };
+
   const onEndDateChange = (d) => {
-    endDate = d.detail;
+    endDate = startOfDay(d.detail);
+  };
+
+  const onEndDateTimeChange = (d) => {
+    endTime = d.detail;
+  };
+
+  const applyTimeChanges = (date: Date, time) => {
+    let _date = new Date(date);
+    if (time.hour) _date = addHours(_date, time.hour);
+    if (time.minute) _date = addMinutes(_date, time.minute);
+    if (time.second) _date = addSeconds(_date, time.second);
+    return _date;
   };
 
   const onApply = () => {
+    startDate = applyTimeChanges(startDate, startTime);
+    endDate = applyTimeChanges(endDate, endTime);
     const filter = {
       attribute: 'StartTime',
       value: `BETWEEN "${formatISO(startDate)}" AND "${formatISO(endDate)}"`,
@@ -66,6 +106,7 @@
     placeholder="All Time"
     unroundRight
     keepOpen={custom}
+    {value}
     {onChange}
   >
     <div class="flex">
@@ -81,18 +122,21 @@
           class="flex w-96 flex-col gap-8 border-l border-gray-900 bg-white p-4"
         >
           <div class="flex flex-col">
-            <p>Start</p>
-            <DatetimePicker
-              on:datechange={onStartDateChange}
-              selected={startDate}
-            />
+            <p class="text-sm">Start</p>
+            <div class="flex gap-2">
+              <DatePicker
+                on:datechange={onStartDateChange}
+                selected={startDate}
+              />
+              <TimePicker on:timechange={onStartDateTimeChange} />
+            </div>
           </div>
           <div class="flex flex-col">
-            <p>End</p>
-            <DatetimePicker
-              on:datechange={onEndDateChange}
-              selected={endDate}
-            />
+            <p class="text-sm">End</p>
+            <div class="flex gap-2">
+              <DatePicker on:datechange={onEndDateChange} selected={endDate} />
+              <TimePicker on:timechange={onEndDateTimeChange} />
+            </div>
           </div>
           <Button on:click={onApply}>Apply</Button>
         </div>

@@ -1,7 +1,7 @@
 <script lang="ts">
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import { workflowFilters } from '$lib/stores/filters';
+  import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import Sort from './sort.svelte';
 
   let value = '';
@@ -10,6 +10,7 @@
     $workflowFilters.filter((f) => f.attribute !== 'WorkflowId');
 
   $: idFilter = $workflowFilters.find((f) => f.attribute === 'WorkflowId');
+  $: idSort = $workflowSorts.find((s) => s.attribute === 'WorkflowId');
 
   $: {
     if (value) {
@@ -27,7 +28,11 @@
   }
 </script>
 
-<DropdownMenu value={idFilter?.value ?? ''} keepOpen left>
+<DropdownMenu
+  value={idFilter ? idFilter.value : idSort ? idSort.value : ''}
+  keepOpen
+  left
+>
   <svelte:fragment slot="label">Workflow Id</svelte:fragment>
   <div class="flex w-96 flex-col gap-2 p-2">
     <Input
