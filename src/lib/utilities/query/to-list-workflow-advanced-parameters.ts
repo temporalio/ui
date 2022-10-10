@@ -1,16 +1,13 @@
 import type { WorkflowFilter } from '$lib/models/workflow-filters';
 import {
   searchAttributeOptions,
-  searchAttributes,
 } from '$lib/stores/search-attributes';
 import { formatDuration } from 'date-fns';
-import { get } from 'svelte/store';
 import {
   isConditional,
-  isExecutionStatus,
   isJoin,
-  isOperator,
   isParenthesis,
+  isBetween,
 } from '../is';
 import { durationKeys, fromDate } from '../to-duration';
 import { tokenize } from './tokenize';
@@ -20,13 +17,16 @@ export type ParsedParameters = FilterParameters & { timeRange?: string };
 
 const is =
   (identifier: string) =>
-  (token: string): boolean => {
-    if (token.toLowerCase() === identifier.toLowerCase()) return true;
-    return false;
-  };
+    (token: string): boolean => {
+      if (token.toLowerCase() === identifier.toLowerCase()) return true;
+      return false;
+    };
 
 const getTwoAhead = (tokens: Tokens, index: number): string =>
   tokens[index + 2];
+
+const getTwoBehind = (tokens: Tokens, index: number): string =>
+  tokens[index - 2];
 
 export const getLargestDurationUnit = (duration: Duration): Duration => {
   if (!duration) return;
@@ -47,9 +47,16 @@ const emptyFilter = () => ({
   conditional: '',
 });
 
+const DefaultAttributes: SearchAttributes = {
+  "ExecutionStatus": "Keyword",
+  "StartTime": "Datetime",
+  "WorkflowId": "Keyword",
+  "WorkflowType": "Keyword"
+}
+
 export const toListWorkflowAdvancedParameters = (
   query: string,
-  attributes: SearchAttributes,
+  attributes: SearchAttributes = DefaultAttributes,
 ): WorkflowFilter[] => {
   const tokens = tokenize(query);
   const filters: WorkflowFilter[] = [];
@@ -83,7 +90,7 @@ export const toListWorkflowAdvancedParameters = (
         filter.parenthesis = token;
       }
 
-      if (isJoin(token)) {
+      if (isJoin(token) && !isBetween(getTwoBehind(tokens, index))) {
         filter.operator = token;
         filters.push(filter);
         filter = emptyFilter();

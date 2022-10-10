@@ -1,23 +1,22 @@
 <script lang="ts">
   // https://svelte.dev/repl/6116680a6c3e49d0908624105018efb7?version=3.12.1
 
-  import { timeFormat } from '$lib/stores/time-format';
-  import { formatDate } from '$lib/utilities/format-date';
   import { createEventDispatcher } from 'svelte';
   import Calender from './calendar.svelte';
-  import { getMonthName } from './date-time';
+  import { getMonthName } from '$lib/utilities/calendar';
   import Icon from './icon/icon.svelte';
   import Input from './input/input.svelte';
 
   const dispatch = createEventDispatcher();
 
-  // props
-  export let isAllowed = () => true;
+  export let isAllowed = (date: Date) => true;
   export let selected = new Date();
 
   let value = '';
-  // state
-  let date, month, year, showDatePicker;
+  let date: number | undefined;
+  let month: number | undefined;
+  let year: number | undefined;
+  let showDatePicker = false;
 
   // so that these change with props
   $: {
@@ -69,11 +68,14 @@
       class="absolute top-12 z-50 inline-block rounded border border-gray-900 bg-white shadow"
     >
       <div class="mx-3 my-2 flex items-center justify-around">
-        <div class="center">
+        <div class="flex items-center justify-center">
           <button on:click={prev}><Icon name="chevron-left" /></button>
         </div>
-        <div class="center">{getMonthName(month)} {year}</div>
-        <div class="center">
+        <div class="flex items-center justify-center">
+          {getMonthName(month)}
+          {year}
+        </div>
+        <div class="flex items-center justify-center">
           <button on:click={next}><Icon name="chevron-right" /></button>
         </div>
       </div>
@@ -87,9 +89,3 @@
     </div>
   {/if}
 </div>
-
-<style lang="postcss">
-  .center {
-    @apply flex items-center justify-center;
-  }
-</style>

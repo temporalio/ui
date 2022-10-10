@@ -6,11 +6,11 @@ export const searchAttributeOptions = () => {
   const attributes = get(searchAttributes);
   return attributes
     ? Object.entries(attributes).map(([key, value]) => {
-        return {
-          label: key,
-          value: key,
-          type: value,
-        };
-      })
+      return {
+        label: key,
+        value: key,
+        type: value,
+      };
+    })
     : [];
 };

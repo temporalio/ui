@@ -369,10 +369,10 @@ describe('durations', () => {
   it('should validate that durations has not accidentally changed', () => {
     expect(durations).toMatchInlineSnapshot(`
       [
-        "10 minutes",
+        "15 minutes",
         "1 hour",
         "3 hours",
-        "1 day",
+        "24 hours",
         "3 days",
         "7 days",
         "30 days",
