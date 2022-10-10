@@ -6,7 +6,7 @@
   export let type: string;
 
   const onSortClick = (value: SortOrder) => {
-    if ($workflowSorts.find((s) => s.value === value)) {
+    if ($workflowSorts.find((s) => s.value === value && s.attribute === type)) {
       $workflowSorts = [];
     } else {
       $workflowSorts = [

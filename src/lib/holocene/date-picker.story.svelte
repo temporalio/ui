@@ -1,5 +1,5 @@
 <script lang="ts">
-  import DatetimePicker from '$lib/holocene/datetime-picker.svelte';
+  import DatePicker from '$lib/holocene/date-picker.svelte';
 
   let currentDate = new Date();
 
@@ -11,5 +11,5 @@
 </script>
 
 <Hst.Story>
-  <DatetimePicker on:datechange={onDateChange} selected={currentDate} />
+  <DatePicker on:datechange={onDateChange} selected={currentDate} />
 </Hst.Story>
