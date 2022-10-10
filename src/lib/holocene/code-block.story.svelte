@@ -1,7 +1,8 @@
 <script lang="ts">
+  import type { Hst as HST } from '@histoire/plugin-svelte';
   import CodeBlock from './code-block.svelte';
 
-  export let Hst;
+  export let Hst: HST;
 </script>
 
 <Hst.Story>

@@ -1,8 +1,9 @@
 <script lang="ts">
+  import type { Hst as HST } from '@histoire/plugin-svelte';
   import Skeleton from './index.svelte';
   import SkeletonTable from './table.svelte';
 
-  export let Hst;
+  export let Hst: HST;
 </script>
 
 <Hst.Story>
