@@ -21,7 +21,12 @@ export const triggerMenu = (
     if (!eventTarget && event.relatedTarget) eventTarget = event.relatedTarget;
 
     // Why does this cause a rerender of root layout if node is open?
-    if (node && !node.contains(eventTarget as Node) && node.ariaExpanded === 'true' && !keepOpen) {
+    if (
+      node &&
+      !node.contains(eventTarget as Node) &&
+      node.ariaExpanded === 'true' &&
+      !keepOpen
+    ) {
       node.dispatchEvent(new CustomEvent('close-menu'));
       event.stopPropagation();
     }

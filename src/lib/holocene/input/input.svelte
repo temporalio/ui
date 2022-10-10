@@ -20,7 +20,6 @@
   export let spellcheck: boolean = null;
   export let unroundRight: boolean = false;
   export let unroundLeft: boolean = false;
-  export let thin: boolean = false;
   export let autoFocus = false;
 
   function callFocus(input) {
@@ -40,12 +39,11 @@
     class:disabled
     class:unroundRight
     class:unroundLeft
-    class:thin
     class:invalid={!valid}
   >
     {#if icon}
       <span class="icon-container">
-        <Icon name={icon} width={thin ? 12 : 24} height={thin ? 12 : 24} />
+        <Icon name={icon} />
       </span>
     {/if}
     <input
@@ -105,10 +103,6 @@
 
   .input-container {
     @apply relative box-border inline-flex h-10 w-full items-center rounded border border-gray-900 text-sm focus-within:border-blue-700;
-  }
-
-  .thin {
-    @apply h-8;
   }
 
   .unroundRight {

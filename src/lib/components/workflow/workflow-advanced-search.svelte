@@ -8,14 +8,11 @@
   import Input from '$lib/holocene/input/input.svelte';
   import CustomButton from '$lib/holocene/custom-button.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import TypeaheadInput from '$lib/holocene/input/typeahead-input.svelte';
   import { workflowFilters } from '$lib/stores/filters';
   import {
     getConditionalForAttribute,
     getDefaultValueForAttribute,
   } from '$lib/utilities/query/to-list-workflow-advanced-parameters';
-  import { searchAttributeOptions } from '$lib/stores/search-attributes';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
 
   export let advancedSearch = false;
   export let manualSearch = false;
@@ -41,21 +38,6 @@
       value: manualSearchString,
       allowEmpty: true,
     });
-  };
-
-  const onAddFilter = (attribute: string) => {
-    $workflowFilters = [
-      ...$workflowFilters,
-      {
-        attribute,
-        value: getDefaultValueForAttribute(attribute),
-        operator: '',
-        parenthesis: '',
-        conditional: getConditionalForAttribute(attribute),
-      },
-    ];
-    value = '';
-    advancedSearch = true;
   };
 </script>
 
@@ -97,27 +79,9 @@
         class="relative flex h-12 w-full items-center gap-0"
         in:fly={{ x: -100, duration: 150 }}
       >
-        <!-- <TypeaheadInput
-          icon="filter"
-          placeholder="Filter workflows"
-          class="w-72"
-          id="filter-type-name"
-          bind:value
-          unroundRight
-          options={searchAttributeOptions()}
-          onChange={onAddFilter}
-        /> -->
-        <!-- <CustomButton
-          icon="search"
-          class="h-10 border border-gray-900 border-l-0"
-          count={$workflowFilters.length}
-          on:click={() => (advancedSearch = !advancedSearch)}
-        /> -->
-        <Button
-          variant="secondary"
-          icon="terminal"
-          class="h-10 rounded border border-gray-900"
-          on:click={() => (manualSearch = !manualSearch)}>Advanced</Button
+        <CustomButton
+          class="h-10 rounded border-0"
+          on:click={() => (manualSearch = !manualSearch)}>Advanced</CustomButton
         >
       </div>
     {/if}

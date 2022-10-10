@@ -97,7 +97,7 @@ export const toListWorkflowAdvancedParameters = (
 
     return filters;
   } catch (e) {
-    console.log('ERROR SETTING FILTERS: ', e);
+    console.error('Error setting filter parameters: ', e);
     return [];
   }
 };

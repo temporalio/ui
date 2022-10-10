@@ -39,6 +39,7 @@
     WorkflowFilter,
     WorkflowSort,
   } from '$lib/models/workflow-filters';
+  import Skeleton from '$lib/holocene/skeleton/index.svelte';
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
 
@@ -50,7 +51,8 @@
   $: query = $page.url.searchParams.get('query');
 
   $: {
-    if (initialFetch && $searchAttributes) {
+    // Using query params on initial page load or manual search to set filters
+    if ($searchAttributes && (initialFetch || manualSearch)) {
       $workflowFilters = toListWorkflowAdvancedParameters(
         query ?? defaultQuery,
         $searchAttributes,
@@ -144,9 +146,16 @@
       <p data-cy="namespace-name">
         {$page.params.namespace}
       </p>
-      <div class="w-2 h-2 bg-gray-400 rounded-full" />
+      <div class="h-2 w-2 rounded-full bg-gray-400" />
       <p>
-        {$workflowCount} workflows
+        {#if !$loading && !$updating}
+          {#if query}
+            Results {$workflowCount?.count ?? 0} of {$workflowCount?.totalCount ??
+              0} workflows
+          {:else}
+            {$workflowCount?.totalCount ?? 0} workflows
+          {/if}
+        {/if}
       </p>
     </div>
   </div>

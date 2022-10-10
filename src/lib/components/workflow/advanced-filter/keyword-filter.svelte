@@ -13,7 +13,6 @@
   <Input
     icon="search"
     id="{id}-filter"
-    thin
     placeholder={label}
     class="w-96"
     bind:value
