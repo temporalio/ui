@@ -19,9 +19,14 @@
     <Button {href} variant="primary" {disabled} class="segment left" on:click>
       {label}
     </Button>
-    <MenuButton dark class="segment right" bind:show controls={id} {disabled}>
-      <Icon name="chevron-down" />
-    </MenuButton>
+    <MenuButton
+      dark
+      class="segment right"
+      bind:show
+      controls={id}
+      {disabled}
+      hasIndicator
+    />
   </div>
   <Menu class="min-w-max" {id} {show} {position}>
     <slot />

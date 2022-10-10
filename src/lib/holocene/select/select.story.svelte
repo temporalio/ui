@@ -1,15 +1,16 @@
 <script lang="ts">
-  import OptionGroup from './select/option-group.svelte';
+  import OptionGroup from './option-group.svelte';
 
-  import Option from './select/option.svelte';
-  import Select from './select/select.svelte';
-  import SimpleOption from './select/simple-option.svelte';
-  import SimpleSelect from './select/simple-select.svelte';
+  import Option from './option.svelte';
+  import Select from './select.svelte';
+  import SimpleOption from './simple-option.svelte';
+  import SimpleSelect from './simple-select.svelte';
 
   export let Hst;
 
   let value = '';
   let dark = false;
+  let disabled = false;
 </script>
 
 <Hst.Story>
@@ -19,16 +20,22 @@
       label="Favorite Food"
       placeholder="Select an Option"
       bind:value
-      {dark}
+      bind:dark
+      bind:disabled
     >
-      <Option {dark}>Pizza</Option>
-      <Option {dark}>Hamburgers</Option>
-      <Option {dark}>Hot Dogs</Option>
+      <Option bind:dark>Pizza</Option>
+      <Option bind:dark>Hamburgers</Option>
+      <Option bind:dark>Hot Dogs</Option>
     </Select>
   </Hst.Variant>
 
   <Hst.Variant title="With Option Descriptions">
-    <Select value={null} id="select-2" placeholder="Select an option...">
+    <Select
+      value={null}
+      id="select-2"
+      placeholder="Select an option..."
+      {disabled}
+    >
       <Option
         description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi nisi
         reprehenderit alias rerum minus, nulla ratione ipsum expedita. Praesentium
@@ -54,7 +61,7 @@
   </Hst.Variant>
 
   <Hst.Variant title="With Grouped Options">
-    <Select id="select-3" placeholder="Select an Option" {value}>
+    <Select id="select-3" placeholder="Select an Option" {value} {disabled}>
       <OptionGroup label="Mammals">
         <Option>Horse</Option>
         <Option>Dog</Option>
@@ -81,5 +88,6 @@
 
   <svelte:fragment slot="controls">
     <Hst.Checkbox title="Dark: " bind:value={dark} />
+    <Hst.Checkbox title="Disabled: " bind:value={disabled} />
   </svelte:fragment>
 </Hst.Story>

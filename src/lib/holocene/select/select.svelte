@@ -56,6 +56,7 @@
   <MenuContainer class="w-full">
     <MenuButton
       class="select-input-container {disabled ? 'disabled' : ''}"
+      hasIndicator={!disabled}
       bind:show
       controls="{id}-menu"
       data-cy={$$props.dataCy}
@@ -71,8 +72,6 @@
       </div>
       {#if disabled}
         <Icon name="lock" class="text-gray-500" />
-      {:else}
-        <Icon name={show ? 'chevron-up' : 'chevron-down'} />
       {/if}
     </MenuButton>
     <Menu id="{id}-menu" class="h-auto max-h-80 min-w-fit" {show} {dark}>
