@@ -110,9 +110,11 @@ export const routeForWorkers = (parameters: WorkflowParameters): string => {
 };
 
 export const routeForTaskQueue = (parameters: TaskQueueParameters): string => {
+  const queue = encodeURIForSvelte(parameters.queue);
+
   return `${routeForNamespace({
     namespace: parameters.namespace,
-  })}/task-queues/${parameters.queue}`;
+  })}/task-queues/${queue}`;
 };
 
 export const routeForStackTrace = (parameters: WorkflowParameters): string => {

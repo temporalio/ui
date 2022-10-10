@@ -141,6 +141,14 @@ describe('routeFor', () => {
     });
     expect(path).toBe('/namespaces/default/task-queues/some-task-queue');
   });
+
+  it('should route to a task queue containing slashes', () => {
+    const path = routeForTaskQueue({
+      namespace: 'default',
+      queue: 'some/task-queue',
+    });
+    expect(path).toBe('/namespaces/default/task-queues/some%2Ftask-queue');
+  });
 });
 
 describe('routeFor import ', () => {

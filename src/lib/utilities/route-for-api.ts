@@ -1,13 +1,25 @@
 import { getApiOrigin } from './get-api-origin';
 import { publicPath } from './get-public-path';
 
+const replaceNamespaceInApiUrl = (
+  apiUrl: string,
+  namespace: string,
+): string => {
+  if (apiUrl) {
+    return apiUrl.replace('%namespace%', namespace);
+  }
+  return '';
+};
+
 const base = async (namespace?: string): Promise<string> => {
   let baseUrl = '';
 
   if (globalThis?.GetNamespaces && namespace) {
     const namespaces = await globalThis.GetNamespaces();
     const configNamespace = namespaces?.find((n) => n.namespace === namespace);
-    baseUrl = configNamespace?.webUri ?? getApiOrigin();
+    baseUrl =
+      configNamespace?.webUri ??
+      replaceNamespaceInApiUrl(globalThis?.AppConfig?.apiUrl, namespace);
   } else {
     baseUrl = getApiOrigin();
   }
