@@ -61,9 +61,19 @@
 
     <button
       on:click={(e) => copy(e, parsedContent)}
-      class="absolute top-4 right-4"
+      class="absolute top-4 right-4 rounded-full opacity-90 hover:bg-white"
+      class:inline
     >
-      <Icon name={$copied ? 'checkmark' : 'copy'} class="text-white" />
+      <Icon
+        name={$copied ? 'checkmark' : 'copy'}
+        class="text-white hover:text-gray-900"
+      />
     </button>
   </div>
 {/if}
+
+<style lang="postcss">
+  .inline {
+    @apply top-5 right-2;
+  }
+</style>
