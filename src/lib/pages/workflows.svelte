@@ -39,27 +39,18 @@
     WorkflowFilter,
     WorkflowSort,
   } from '$lib/models/workflow-filters';
-  import Skeleton from '$lib/holocene/skeleton/index.svelte';
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
 
   let advancedSearch = false;
   let manualSearch = false;
-  let initialFetch = true;
 
   const defaultQuery = toListWorkflowQuery({ timeRange: 'All' });
   $: query = $page.url.searchParams.get('query');
 
-  $: {
-    // Using query params on initial page load or manual search to set filters
-    if ($searchAttributes && (initialFetch || manualSearch)) {
-      $workflowFilters = toListWorkflowAdvancedParameters(
-        query ?? defaultQuery,
-        $searchAttributes,
-      );
-      initialFetch = false;
-    }
-  }
+  onMount(() => {
+    $workflowFilters = toListWorkflowAdvancedParameters(query ?? defaultQuery);
+  });
 
   const combineDropdownFilters = (filters: WorkflowFilter[]) => {
     const statusFilters = filters.filter(
@@ -125,9 +116,7 @@
   };
 
   onDestroy(() => {
-    const parameters = query
-      ? toListWorkflowAdvancedParameters(query, $searchAttributes)
-      : {};
+    const parameters = query ? toListWorkflowAdvancedParameters(query) : {};
     $workflowsSearch = { parameters, searchType };
   });
 </script>

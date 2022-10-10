@@ -1,6 +1,5 @@
 import {
   isConditional,
-  isOperator,
   isParenthesis,
   isQuote,
   isSpace,
@@ -23,12 +22,18 @@ export const tokenize = (string: string): Tokens => {
   while (cursor < string.length) {
     const character = string[cursor];
 
+    if (isParenthesis(character)) {
+      buffer += character;
+      addBufferToTokens();
+      cursor++;
+      continue;
+    }
+
     if (isConditional(character)) {
       // Conditional can be up to three characters long (!==)
       const midConditional = `${string[cursor]}${string[cursor + 1]}`;
-      const maxConditional = `${string[cursor]}${string[cursor + 1]}${
-        string[cursor + 2]
-      }`;
+      const maxConditional = `${string[cursor]}${string[cursor + 1]}${string[cursor + 2]
+        }`;
       if (isConditional(maxConditional)) {
         addBufferToTokens();
         buffer += maxConditional;
@@ -47,7 +52,7 @@ export const tokenize = (string: string): Tokens => {
       }
     }
 
-    if (isSpace(character) || isQuote(character) || isParenthesis(character)) {
+    if (isSpace(character) || isQuote(character)) {
       addBufferToTokens();
       cursor++;
       continue;

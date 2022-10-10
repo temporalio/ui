@@ -12,6 +12,7 @@ const monthNames = [
   'November',
   'December',
 ];
+
 const monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const isLeapYear = (year) => year % 4 === 0;
 const getEmptyRows = () => {
@@ -44,12 +45,3 @@ export const getDateRows = (monthIndex, year) => {
 
   return filled[35] ? filled : filled.slice(0, -7);
 };
-
-export const noop = () => {};
-
-export const uuid = (() => {
-  let id = 1;
-  return () => {
-    return ++id;
-  };
-})();

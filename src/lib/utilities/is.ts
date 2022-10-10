@@ -135,6 +135,13 @@ export const isJoin = (x: unknown): x is Join => {
   return false;
 };
 
+export const isBetween = (x: unknown) => {
+  if (!isString(x)) return false;
+  x = x.toLocaleLowerCase();
+
+  return x === 'between';
+};
+
 export const isSortOrder = (
   sortOrder: string | EventSortOrder,
 ): sortOrder is EventSortOrder => {
