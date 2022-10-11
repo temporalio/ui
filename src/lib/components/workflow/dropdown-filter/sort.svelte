@@ -3,7 +3,7 @@
   import Icon from '$holocene/icon/icon.svelte';
   import type { SortOrder } from '$lib/models/workflow-filters';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
-  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-advanced-parameters';
+  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   export let type: string;
 
