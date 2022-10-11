@@ -1,19 +1,13 @@
-import type { WorkflowFilter, WorkflowSort } from '$lib/models/workflow-filters';
-import {
-  searchAttributeOptions,
-} from '$lib/stores/search-attributes';
+import type {
+  WorkflowFilter,
+  WorkflowSort,
+} from '$lib/models/workflow-filters';
+import { searchAttributeOptions } from '$lib/stores/search-attributes';
 import { formatDuration } from 'date-fns';
 import debounce from 'just-debounce';
-import {
-  toListWorkflowQueryFromAdvancedFilters,
-} from '$lib/utilities/query/list-workflow-query';
+import { toListWorkflowQueryFromAdvancedFilters } from '$lib/utilities/query/list-workflow-query';
 
-import {
-  isConditional,
-  isJoin,
-  isParenthesis,
-  isBetween,
-} from '../is';
+import { isConditional, isJoin, isParenthesis, isBetween } from '../is';
 import { durationKeys, fromDate } from '../to-duration';
 import { tokenize } from './tokenize';
 import { updateQueryParameters } from '../update-query-parameters';
@@ -23,10 +17,10 @@ export type ParsedParameters = FilterParameters & { timeRange?: string };
 
 const is =
   (identifier: string) =>
-    (token: string): boolean => {
-      if (token.toLowerCase() === identifier.toLowerCase()) return true;
-      return false;
-    };
+  (token: string): boolean => {
+    if (token.toLowerCase() === identifier.toLowerCase()) return true;
+    return false;
+  };
 
 const getTwoAhead = (tokens: Tokens, index: number): string =>
   tokens[index + 2];
@@ -54,11 +48,11 @@ const emptyFilter = () => ({
 });
 
 const DefaultAttributes: SearchAttributes = {
-  "ExecutionStatus": "Keyword",
-  "StartTime": "Datetime",
-  "WorkflowId": "Keyword",
-  "WorkflowType": "Keyword"
-}
+  ExecutionStatus: 'Keyword',
+  StartTime: 'Datetime',
+  WorkflowId: 'Keyword',
+  WorkflowType: 'Keyword',
+};
 
 export const toListWorkflowAdvancedParameters = (
   query: string,
@@ -108,6 +102,7 @@ export const toListWorkflowAdvancedParameters = (
       }
     });
 
+    console.log('FILTERS: ', filters);
     return filters;
   } catch (e) {
     console.error('Error setting filter parameters: ', e);
@@ -155,12 +150,11 @@ export const updateQueryParamsFromFilter = debounce(
       url,
       parameter: 'query',
       value: query,
-      allowEmpty: true,
+      allowEmpty: false,
     });
   },
   300,
 );
-
 
 export const getConditionalForAttribute = (
   attribute: keyof SearchAttributes,

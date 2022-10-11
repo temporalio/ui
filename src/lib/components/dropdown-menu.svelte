@@ -1,10 +1,12 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import { scale } from 'svelte/transition';
   import IconButton from '$holocene/icon-button.svelte';
-  import Icon from '$holocene/icon/icon.svelte';
+  import type { IconName } from '$lib/holocene/icon/paths';
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
   export let value: string | undefined;
+  export let icon: IconName | undefined = undefined;
   export let left = false;
   export let right = false;
   export let keepOpen = false;
@@ -40,14 +42,22 @@
       document.removeEventListener('keyup', handleEscape, false);
     };
   });
+
+  const dispatch = createEventDispatcher();
+  const onClick = () => {
+    show = !show;
+    dispatch('showmenu', {
+      show,
+    });
+  };
 </script>
 
 <div class="relative inline" bind:this={menu} data-cy={$$props.dataCy}>
-  <IconButton on:click={() => (show = !show)} dataCy="{$$props.dataCy}-button">
+  <IconButton on:click={onClick} dataCy="{$$props.dataCy}-button">
     <div class="inline flex items-center gap-1">
       <slot name="label" />
       <Icon
-        name={show ? 'chevron-up' : 'chevron-down'}
+        name={icon ? icon : show ? 'chevron-up' : 'chevron-down'}
         class="pointer-events-none"
         width={20}
         height={20}

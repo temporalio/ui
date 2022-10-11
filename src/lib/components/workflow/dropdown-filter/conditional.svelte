@@ -7,7 +7,7 @@
 <div class="mt-2 transition-all hover:cursor-pointer">
   <div class="flex items-center" on:click={() => (conditional = '=')}>
     <div
-      class="ml-4 mr-2 p-1 rounded-sm text-gray-900"
+      class="ml-4 mr-2 rounded-sm p-1 text-gray-900"
       class:active={conditional === '='}
     >
       Is
@@ -15,7 +15,7 @@
   </div>
   <div class="flex items-center" on:click={() => (conditional = '!=')}>
     <div
-      class="ml-4 mr-2 p-1 rounded-sm text-gray-900"
+      class="ml-4 mr-2 rounded-sm p-1 text-gray-900"
       class:active={conditional === '!='}
     >
       Is Not

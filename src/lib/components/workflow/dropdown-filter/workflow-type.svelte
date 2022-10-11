@@ -1,8 +1,9 @@
 <script lang="ts">
+  import { page } from '$app/stores';
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
-  import Sort from './sort.svelte';
+  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-advanced-parameters';
 
   let value = '';
 
@@ -12,7 +13,8 @@
   $: typeFilter = $workflowFilters.find((f) => f.attribute === 'WorkflowType');
   $: typeSort = $workflowSorts.find((s) => s.attribute === 'WorkflowType');
 
-  $: {
+  const onInput = (e: Event) => {
+    const { value } = e.target as HTMLInputElement;
     if (value) {
       const filter = {
         attribute: 'WorkflowType',
@@ -25,6 +27,15 @@
     } else {
       $workflowFilters = [...getOtherFilters()];
     }
+
+    updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
+  };
+
+  function handleShowInput(event: CustomEvent) {
+    const show = event.detail.show;
+    if (show && typeFilter && !value) {
+      value = typeFilter.value;
+    }
   }
 </script>
 
@@ -32,6 +43,8 @@
   value={typeFilter ? typeFilter.value : typeSort ? typeSort.value : ''}
   keepOpen
   left
+  icon="filter"
+  on:showmenu={handleShowInput}
 >
   <svelte:fragment slot="label">Type</svelte:fragment>
   <div class="flex w-[500px] flex-col gap-2 p-2">
@@ -42,8 +55,8 @@
       class="flex items-center px-2 transition-all hover:cursor-pointer"
       autoFocus
       clearable
+      on:input={onInput}
       bind:value
     />
-    <!-- <Sort type="WorkflowType" /> -->
   </div>
 </DropdownMenu>

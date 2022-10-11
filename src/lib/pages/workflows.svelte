@@ -13,11 +13,7 @@
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
 
-  import { getSearchType } from '$lib/utilities/search-type-parameter';
-  import {
-    toListWorkflowAdvancedParameters,
-    updateQueryParamsFromFilter,
-  } from '$lib/utilities/query/to-list-workflow-advanced-parameters';
+  import { toListWorkflowAdvancedParameters } from '$lib/utilities/query/to-list-workflow-advanced-parameters';
 
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
@@ -32,28 +28,22 @@
   import TableRow from '$holocene/table/table-row.svelte';
   import WorkflowDateTime from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
 
-  $: searchType = getSearchType($page.url);
-  $: advancedSearch = searchType === 'advanced';
   $: query = $page.url.searchParams.get('query');
 
   onMount(() => {
     $lastUsedNamespace = $page.params.namespace;
-    $workflowFilters = toListWorkflowAdvancedParameters(query);
+    if (query) {
+      $workflowFilters = toListWorkflowAdvancedParameters(query);
+    }
   });
 
-  $: {
-    updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
-  }
-
   onDestroy(() => {
-    const parameters = query ? toListWorkflowAdvancedParameters(query) : {};
-    $workflowsSearch = { parameters, searchType };
+    // const parameters = query ? toListWorkflowAdvancedParameters(query) : {};
+    // $workflowsSearch = { parameters, searchType };
   });
 
   const errorMessage =
-    searchType === 'advanced'
-      ? 'Please check your syntax and try again.'
-      : 'If you have filters applied, try adjusting them.';
+    'If you have filters applied, try adjusting them. Otherwise please check your syntax and try again.';
 
   const refreshWorkflows = () => {
     $refresh = Date.now();
@@ -98,12 +88,10 @@
 {:else}
   <Pagination items={$workflows} let:visibleItems>
     <svelte:fragment slot="action-top-left">
-      <WorkflowAdvancedSearch {advancedSearch} error={$workflowError} />
+      <WorkflowAdvancedSearch />
     </svelte:fragment>
     <svelte:fragment slot="action-top-center">
-      {#if !advancedSearch}
-        <WorkflowDateTime />
-      {/if}
+      <WorkflowDateTime />
     </svelte:fragment>
     <WorkflowsSummaryTable updating={$updating}>
       {#each visibleItems as event}

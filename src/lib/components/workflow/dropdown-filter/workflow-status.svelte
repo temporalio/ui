@@ -1,9 +1,10 @@
 <script lang="ts">
+  import { page } from '$app/stores';
   import Icon from '$holocene/icon/icon.svelte';
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
-  import Sort from './sort.svelte';
+  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-advanced-parameters';
 
   const AllStatuses = {
     All: 'All',
@@ -78,6 +79,8 @@
         ];
       }
     }
+
+    updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
   };
 </script>
 
@@ -87,6 +90,7 @@
     : statusSort?.value ?? ''}
   keepOpen
   left
+  icon="filter"
 >
   <svelte:fragment slot="label">Status</svelte:fragment>
   <div class="flex w-56 flex-col gap-4 py-2">
@@ -118,7 +122,6 @@
         </div>
       </div>
     {/each}
-    <!-- <Sort type="ExecutionStatus" /> -->
   </div>
 </DropdownMenu>
 

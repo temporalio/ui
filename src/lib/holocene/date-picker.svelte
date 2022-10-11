@@ -86,15 +86,15 @@
         {isAllowed}
         on:datechange={onDateChange}
       />
-      <div class="flex justify-between px-2 my-1">
+      <div class="my-1 flex justify-between px-2">
         <p
-          class="text-[12px] cursor-pointer"
+          class="cursor-pointer text-[12px]"
           on:click={() => (selected = new Date())}
         >
           Today
         </p>
         <p
-          class="text-[12px] cursor-pointer"
+          class="cursor-pointer text-[12px]"
           on:click={() => (showDatePicker = false)}
         >
           Close
