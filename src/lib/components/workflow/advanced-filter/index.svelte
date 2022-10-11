@@ -7,9 +7,8 @@
   import DatetimeFilter from './datetime-filter.svelte';
   import CustomButton from '$lib/holocene/custom-button.svelte';
   import BooleanFilter from './boolean-filter.svelte';
-  import PillSelect from '$lib/holocene/select/pill-select.svelte';
 
-  export let attribute: string;
+  export let attribute: string | number;
   export let value: string = '';
   export let conditional: string = '';
 

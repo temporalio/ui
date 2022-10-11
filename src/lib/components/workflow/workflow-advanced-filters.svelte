@@ -22,7 +22,6 @@
 
   let showFilters = true;
   let showQuery = true;
-  let editing = false;
 
   const onRestart = () => {
     $workflowFilters = [];

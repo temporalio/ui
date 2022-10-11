@@ -7,7 +7,7 @@
   import type { IconName } from './icon/paths';
 
   export let label: string = '';
-  export let icon: IconName;
+  export let icon: IconName | undefined = undefined;
   export let id: string;
   export let variant:
     | 'primary'
