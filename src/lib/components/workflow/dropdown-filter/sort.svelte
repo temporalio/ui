@@ -1,7 +1,9 @@
 <script lang="ts">
+  import { page } from '$app/stores';
   import Icon from '$holocene/icon/icon.svelte';
   import type { SortOrder } from '$lib/models/workflow-filters';
-  import { workflowSorts } from '$lib/stores/filters';
+  import { workflowFilters, workflowSorts } from '$lib/stores/filters';
+  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-advanced-parameters';
 
   export let type: string;
 
@@ -16,6 +18,8 @@
         },
       ];
     }
+
+    updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
   };
 </script>
 

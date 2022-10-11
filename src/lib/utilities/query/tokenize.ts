@@ -1,9 +1,4 @@
-import {
-  isConditional,
-  isParenthesis,
-  isQuote,
-  isSpace,
-} from '../is';
+import { isConditional, isParenthesis, isQuote, isSpace } from '../is';
 
 type Tokens = string[];
 
@@ -32,8 +27,9 @@ export const tokenize = (string: string): Tokens => {
     if (isConditional(character)) {
       // Conditional can be up to three characters long (!==)
       const midConditional = `${string[cursor]}${string[cursor + 1]}`;
-      const maxConditional = `${string[cursor]}${string[cursor + 1]}${string[cursor + 2]
-        }`;
+      const maxConditional = `${string[cursor]}${string[cursor + 1]}${
+        string[cursor + 2]
+      }`;
       if (isConditional(maxConditional)) {
         addBufferToTokens();
         buffer += maxConditional;

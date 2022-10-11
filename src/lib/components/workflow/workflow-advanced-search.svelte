@@ -9,9 +9,6 @@
   import CustomButton from '$lib/holocene/custom-button.svelte';
   import Button from '$lib/holocene/button.svelte';
 
-  export let advancedSearch = false;
-  export let error = '';
-
   let manualSearchString = '';
 
   $: query = $page.url.searchParams.get('query');
@@ -32,59 +29,26 @@
       allowEmpty: true,
     });
   };
-
-  const onSearchTypeChange = (newSearchType: 'basic' | 'advanced'): void => {
-    updateQueryParameters({
-      parameter: 'search',
-      value: newSearchType,
-      url: $page.url,
-    });
-  };
 </script>
 
 <div class="flex-items-center flex grow gap-4">
   <div class="flex h-12 w-full items-center gap-0" in:fade>
-    {#if advancedSearch}
-      <div
-        class="relative flex h-12 w-full items-center gap-0"
-        in:fly={{ x: -100, duration: 150 }}
-      >
-        {#if error}
-          <span
-            class="absolute left-0 h-4 text-xs font-bold text-orange-500"
-            style="top: -16px">{error}</span
-          >
-        {/if}
-        <Input
-          id="manual-search"
-          placeholder="Enter a query"
-          icon="search"
-          class="w-full"
-          clearable
-          unroundRight
-          autoFocus
-          bind:value={manualSearchString}
-          errorText={error}
-        />
-        <CustomButton
-          icon="chevron-left"
-          class="h-10 border border-l-0 border-gray-900"
-          on:click={() => onSearchTypeChange('basic')}
-        />
-        <Button variant="primary" class="h-10" unroundLeft on:click={onSearch}>
-          Search
-        </Button>
-      </div>
-    {:else}
-      <div
-        class="relative flex h-12 w-full items-center gap-0"
-        in:fly={{ x: -100, duration: 150 }}
-      >
-        <CustomButton
-          class="h-10 rounded border-0"
-          on:click={() => onSearchTypeChange('advanced')}>Advanced</CustomButton
-        >
-      </div>
-    {/if}
+    <div
+      class="relative flex h-12 w-full items-center gap-0"
+      in:fly={{ x: -100, duration: 150 }}
+    >
+      <Input
+        id="manual-search"
+        placeholder="Enter a query"
+        icon="search"
+        class="w-2/3"
+        clearable
+        unroundRight
+        bind:value={manualSearchString}
+      />
+      <Button variant="primary" class="h-10" unroundLeft on:click={onSearch}>
+        Search
+      </Button>
+    </div>
   </div>
 </div>

@@ -15,11 +15,13 @@
   import Select from '$lib/holocene/select/select.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import CustomSplitButton from '$lib/holocene/custom-split-button.svelte';
-  import { workflowFilters } from '$lib/stores/filters';
+  import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { onMount } from 'svelte';
   import TimePicker from '$lib/holocene/time-picker.svelte';
+  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-advanced-parameters';
+  import { page } from '$app/stores';
 
   let custom = false;
   let value = '';
@@ -53,6 +55,8 @@
       $workflowFilters = [...getOtherFilters(), filter];
       custom = false;
     }
+
+    updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
   };
 
   let startDate = startOfDay(new Date());
@@ -96,6 +100,8 @@
       customDate: true,
     };
     $workflowFilters = [...getOtherFilters(), filter];
+
+    updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
   };
 </script>
 
