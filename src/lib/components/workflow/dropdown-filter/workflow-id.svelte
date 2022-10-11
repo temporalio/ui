@@ -34,15 +34,16 @@
   left
 >
   <svelte:fragment slot="label">Workflow Id</svelte:fragment>
-  <div class="flex w-96 flex-col gap-2 p-2">
+  <div class="flex w-[500px] flex-col gap-2 p-2">
     <Input
       icon="search"
       id="workflowId"
       placeholder="Workflow Id"
       class="flex items-center px-2 transition-all hover:cursor-pointer"
       autoFocus
+      clearable
       bind:value
     />
-    <Sort type="WorkflowId" />
+    <!-- <Sort type="WorkflowId" /> -->
   </div>
 </DropdownMenu>

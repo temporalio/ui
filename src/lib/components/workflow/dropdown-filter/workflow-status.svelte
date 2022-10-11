@@ -89,7 +89,7 @@
   left
 >
   <svelte:fragment slot="label">Status</svelte:fragment>
-  <div class="flex w-56 flex-col gap-4">
+  <div class="flex w-56 flex-col gap-4 py-2">
     {#each Object.entries(AllStatuses) as [label, _value] (_value)}
       <div
         class="flex items-center transition-all hover:cursor-pointer"
@@ -109,7 +109,7 @@
             />
           {/if}
         </div>
-        <div class="flex h-6 items-center text-base hover:scale-[103%]">
+        <div class="flex h-6 items-center text-sm hover:scale-[103%]">
           {#if _value === 'All'}
             All Statuses
           {:else}
@@ -118,9 +118,9 @@
         </div>
       </div>
     {/each}
-    <Sort type="ExecutionStatus" />
-  </div></DropdownMenu
->
+    <!-- <Sort type="ExecutionStatus" /> -->
+  </div>
+</DropdownMenu>
 
 <style lang="postcss">
   .active {
