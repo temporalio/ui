@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
-  import debounce from 'just-debounce';
   import { page } from '$app/stores';
   import { timeFormat } from '$lib/stores/time-format';
   import { workflowCount, workflowsSearch } from '$lib/stores/workflows';
@@ -15,10 +14,6 @@
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
 
   import { getSearchType } from '$lib/utilities/search-type-parameter';
-  import {
-    toListWorkflowQuery,
-    toListWorkflowQueryFromAdvancedFilters,
-  } from '$lib/utilities/query/list-workflow-query';
   import {
     toListWorkflowAdvancedParameters,
     updateQueryParamsFromFilter,
@@ -37,23 +32,17 @@
   import TableRow from '$holocene/table/table-row.svelte';
   import WorkflowDateTime from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
 
-  let searchType: 'basic' | 'advanced' = getSearchType($page.url);
-
-  const url = $page.url;
-
-  let advancedSearch = false;
-  let manualSearch = false;
-
-  const defaultQuery = toListWorkflowQuery({ timeRange: 'All' });
+  $: searchType = getSearchType($page.url);
+  $: advancedSearch = searchType === 'advanced';
   $: query = $page.url.searchParams.get('query');
 
   onMount(() => {
     $lastUsedNamespace = $page.params.namespace;
-    $workflowFilters = toListWorkflowAdvancedParameters(query ?? defaultQuery);
+    $workflowFilters = toListWorkflowAdvancedParameters(query);
   });
 
   $: {
-    updateQueryParamsFromFilter(url, $workflowFilters, $workflowSorts);
+    updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
   }
 
   onDestroy(() => {
@@ -109,14 +98,10 @@
 {:else}
   <Pagination items={$workflows} let:visibleItems>
     <svelte:fragment slot="action-top-left">
-      <WorkflowAdvancedSearch
-        bind:manualSearch
-        bind:advancedSearch
-        error={$workflowError}
-      />
+      <WorkflowAdvancedSearch {advancedSearch} error={$workflowError} />
     </svelte:fragment>
     <svelte:fragment slot="action-top-center">
-      {#if !manualSearch}
+      {#if !advancedSearch}
         <WorkflowDateTime />
       {/if}
     </svelte:fragment>

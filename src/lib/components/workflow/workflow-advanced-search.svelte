@@ -8,18 +8,11 @@
   import Input from '$lib/holocene/input/input.svelte';
   import CustomButton from '$lib/holocene/custom-button.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import { workflowFilters } from '$lib/stores/filters';
-  import {
-    getConditionalForAttribute,
-    getDefaultValueForAttribute,
-  } from '$lib/utilities/query/to-list-workflow-advanced-parameters';
 
   export let advancedSearch = false;
-  export let manualSearch = false;
   export let error = '';
 
   let manualSearchString = '';
-  let value = '';
 
   $: query = $page.url.searchParams.get('query');
 
@@ -39,11 +32,19 @@
       allowEmpty: true,
     });
   };
+
+  const onSearchTypeChange = (newSearchType: 'basic' | 'advanced'): void => {
+    updateQueryParameters({
+      parameter: 'search',
+      value: newSearchType,
+      url: $page.url,
+    });
+  };
 </script>
 
 <div class="flex-items-center flex grow gap-4">
   <div class="flex h-12 w-full items-center gap-0" in:fade>
-    {#if manualSearch}
+    {#if advancedSearch}
       <div
         class="relative flex h-12 w-full items-center gap-0"
         in:fly={{ x: -100, duration: 150 }}
@@ -68,20 +69,20 @@
         <CustomButton
           icon="chevron-left"
           class="h-10 border border-l-0 border-gray-900"
-          on:click={() => (manualSearch = !manualSearch)}
+          on:click={() => onSearchTypeChange('basic')}
         />
         <Button variant="primary" class="h-10" unroundLeft on:click={onSearch}>
           Search
         </Button>
       </div>
-    {:else if !advancedSearch}
+    {:else}
       <div
         class="relative flex h-12 w-full items-center gap-0"
         in:fly={{ x: -100, duration: 150 }}
       >
         <CustomButton
           class="h-10 rounded border-0"
-          on:click={() => (manualSearch = !manualSearch)}>Advanced</CustomButton
+          on:click={() => onSearchTypeChange('advanced')}>Advanced</CustomButton
         >
       </div>
     {/if}

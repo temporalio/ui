@@ -155,7 +155,7 @@ export const updateQueryParamsFromFilter = debounce(
       url,
       parameter: 'query',
       value: query,
-      allowEmpty: false,
+      allowEmpty: true,
     });
   },
   300,
