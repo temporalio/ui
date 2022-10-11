@@ -2,6 +2,7 @@
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import Icon from '$holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
+  import { createEventDispatcher } from 'svelte';
 
   export let id: string;
   export let value: string;
@@ -24,6 +25,12 @@
 
   function callFocus(input) {
     if (autoFocus) input.focus();
+  }
+
+  const dispatch = createEventDispatcher();
+  function onClear() {
+    value = '';
+    dispatch('clear', {});
   }
 
   const { copy, copied } = copyToClipboard();
@@ -75,7 +82,7 @@
     {:else if clearable}
       <div
         class="mr-2 flex h-full h-6 w-6 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200"
-        on:click={() => (value = '')}
+        on:click={onClear}
       >
         <Icon name="close" />
       </div>
