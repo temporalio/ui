@@ -17,7 +17,7 @@ const monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const isLeapYear = (year) => year % 4 === 0;
 const getEmptyRows: () => number[] = () => {
   // Max days = 7 days * 6 week rows = 42
-  const rows = Array.from({ length: 42 })
+  const rows = Array.from({ length: 42 });
   return rows.map(() => 0);
 };
 const getMonthDays = (index, year) => {

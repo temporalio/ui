@@ -88,6 +88,7 @@
   value={statusFilters.length
     ? statusFilters.map((s) => s.value).join('')
     : statusSort?.value ?? ''}
+  dataCy="execution-status-filter"
   keepOpen
   left
   icon="filter"
@@ -97,6 +98,7 @@
     {#each Object.entries(AllStatuses) as [label, _value] (_value)}
       <div
         class="flex items-center transition-all hover:cursor-pointer"
+        data-cy={label}
         on:click={() => onStatusClick(_value)}
       >
         <div
