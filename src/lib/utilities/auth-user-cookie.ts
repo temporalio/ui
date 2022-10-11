@@ -46,3 +46,18 @@ export const getAuthUserCookie = (isBrowser = browser): User => {
 
   return {};
 };
+
+export const cleanAuthUserCookie = (isBrowser = browser) => {
+  if (!isBrowser) return;
+
+  const cookies = document.cookie.split(';');
+  let i = 0;
+  let next = cookies.find((c) => c.includes(cookieName + i));
+
+  while (next) {
+    const [name] = next.split('=');
+    document.cookie = `${name}=; max-age=-1; path=/`;
+    i++;
+    next = cookies.find((c) => c.includes(cookieName + i));
+  }
+};
