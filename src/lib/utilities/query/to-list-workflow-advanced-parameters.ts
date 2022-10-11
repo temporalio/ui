@@ -17,10 +17,10 @@ export type ParsedParameters = FilterParameters & { timeRange?: string };
 
 const is =
   (identifier: string) =>
-  (token: string): boolean => {
-    if (token.toLowerCase() === identifier.toLowerCase()) return true;
-    return false;
-  };
+    (token: string): boolean => {
+      if (token.toLowerCase() === identifier.toLowerCase()) return true;
+      return false;
+    };
 
 const getTwoAhead = (tokens: Tokens, index: number): string =>
   tokens[index + 2];
@@ -62,6 +62,10 @@ export const toListWorkflowAdvancedParameters = (
   const filters: WorkflowFilter[] = [];
   let filter = emptyFilter();
 
+  if (!query) {
+    return [];
+  }
+
   try {
     tokens.forEach((token, index) => {
       if (attributes[token]) {
@@ -102,7 +106,6 @@ export const toListWorkflowAdvancedParameters = (
       }
     });
 
-    console.log('FILTERS: ', filters);
     return filters;
   } catch (e) {
     console.error('Error setting filter parameters: ', e);

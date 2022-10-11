@@ -8,6 +8,8 @@
   import Input from '$lib/holocene/input/input.svelte';
   import CustomButton from '$lib/holocene/custom-button.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import { workflowFilters } from '$lib/stores/filters';
+  import { toListWorkflowAdvancedParameters } from '$lib/utilities/query/to-list-workflow-advanced-parameters';
 
   let manualSearchString = '';
 
@@ -22,6 +24,10 @@
   }
 
   const onSearch = () => {
+    try {
+      $workflowFilters = toListWorkflowAdvancedParameters(manualSearchString);
+    } catch (e) {}
+
     updateQueryParameters({
       url: $page.url,
       parameter: 'query',
@@ -29,6 +35,10 @@
       allowEmpty: true,
     });
   };
+
+  function handleClearInput() {
+    onSearch();
+  }
 </script>
 
 <div class="flex-items-center flex grow gap-4">
@@ -44,6 +54,7 @@
         class="w-2/3"
         clearable
         unroundRight
+        on:clear={handleClearInput}
         bind:value={manualSearchString}
       />
       <Button variant="primary" class="h-10" unroundLeft on:click={onSearch}>

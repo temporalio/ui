@@ -20,7 +20,7 @@
     @apply relative;
   }
   .updating {
-    @apply absolute top-6 h-4 w-full border-b-4 border-blue-500;
+    @apply absolute top-9 h-1 w-full bg-gradient-to-r from-blue-200 to-blue-600;
     z-index: 5;
   }
 
