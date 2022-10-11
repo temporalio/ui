@@ -3,7 +3,7 @@
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
-  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-advanced-parameters';
+  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   let value = '';
 

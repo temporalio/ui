@@ -9,7 +9,7 @@
   import CustomButton from '$lib/holocene/custom-button.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { workflowFilters } from '$lib/stores/filters';
-  import { toListWorkflowAdvancedParameters } from '$lib/utilities/query/to-list-workflow-advanced-parameters';
+  import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
 
   let manualSearchString = '';
 
@@ -25,7 +25,7 @@
 
   const onSearch = () => {
     try {
-      $workflowFilters = toListWorkflowAdvancedParameters(manualSearchString);
+      $workflowFilters = toListWorkflowFilters(manualSearchString);
     } catch (e) {}
 
     updateQueryParameters({

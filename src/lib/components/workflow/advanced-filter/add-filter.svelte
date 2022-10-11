@@ -6,7 +6,7 @@
   import {
     getConditionalForAttribute,
     getDefaultValueForAttribute,
-  } from '$lib/utilities/query/to-list-workflow-advanced-parameters';
+  } from '$lib/utilities/query/to-list-workflow-filters';
 
   export let disabled = false;
 

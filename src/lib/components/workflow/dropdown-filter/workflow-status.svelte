@@ -4,7 +4,7 @@
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
-  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-advanced-parameters';
+  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   const AllStatuses = {
     All: 'All',

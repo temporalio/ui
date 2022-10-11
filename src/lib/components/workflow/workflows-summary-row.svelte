@@ -8,7 +8,7 @@
   import FilterOrCopyButtons from '$holocene/filter-or-copy-buttons.svelte';
   import TableRow from '$holocene/table/table-row.svelte';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
-  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-advanced-parameters';
+  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   export let namespace: string;
   export let workflow: WorkflowExecution;
   export let timeFormat: TimeFormat | string;

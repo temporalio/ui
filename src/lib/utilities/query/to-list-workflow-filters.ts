@@ -5,7 +5,7 @@ import type {
 import { searchAttributeOptions } from '$lib/stores/search-attributes';
 import { formatDuration } from 'date-fns';
 import debounce from 'just-debounce';
-import { toListWorkflowQueryFromAdvancedFilters } from '$lib/utilities/query/list-workflow-query';
+import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
 
 import { isConditional, isJoin, isParenthesis, isBetween } from '../is';
 import { durationKeys, fromDate } from '../to-duration';
@@ -55,7 +55,7 @@ const DefaultAttributes: SearchAttributes = {
   WorkflowType: 'Keyword',
 };
 
-export const toListWorkflowAdvancedParameters = (
+export const toListWorkflowFilters = (
   query: string,
   attributes: SearchAttributes = DefaultAttributes,
 ): WorkflowFilter[] => {
@@ -150,7 +150,7 @@ export const combineDropdownFilters = (filters: WorkflowFilter[]) => {
 export const updateQueryParamsFromFilter = debounce(
   (url: URL, filters: WorkflowFilter[], sorts: WorkflowSort[]) => {
     const allFilters = combineDropdownFilters(filters);
-    const query = toListWorkflowQueryFromAdvancedFilters(allFilters, sorts);
+    const query = toListWorkflowQueryFromFilters(allFilters, sorts);
     updateQueryParameters({
       url,
       parameter: 'query',

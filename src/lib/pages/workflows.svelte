@@ -13,7 +13,7 @@
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
 
-  import { toListWorkflowAdvancedParameters } from '$lib/utilities/query/to-list-workflow-advanced-parameters';
+  import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
 
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
@@ -33,12 +33,12 @@
   onMount(() => {
     $lastUsedNamespace = $page.params.namespace;
     if (query) {
-      $workflowFilters = toListWorkflowAdvancedParameters(query);
+      $workflowFilters = toListWorkflowFilters(query);
     }
   });
 
   onDestroy(() => {
-    // const parameters = query ? toListWorkflowAdvancedParameters(query) : {};
+    // const parameters = query ? toListWorkflowFilters(query) : {};
     // $workflowsSearch = { parameters, searchType };
   });
 

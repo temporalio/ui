@@ -20,7 +20,7 @@
   import Button from '$lib/holocene/button.svelte';
   import { onMount } from 'svelte';
   import TimePicker from '$lib/holocene/time-picker.svelte';
-  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-advanced-parameters';
+  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { page } from '$app/stores';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
