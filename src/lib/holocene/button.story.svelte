@@ -1,18 +1,19 @@
 <script lang="ts">
-  import { hstEvent } from 'histoire/client';
+  import type { Hst as HST } from '@histoire/plugin-svelte';
+  import { logEvent } from 'histoire/client';
   import Button from './button.svelte';
 
   let disabled: boolean = false;
   let thin: boolean = false;
   let loading: boolean = false;
 
-  export let Hst;
+  export let Hst: HST;
 </script>
 
 <Hst.Story>
   <Hst.Variant title="Primary">
     <Button
-      on:click={(event) => hstEvent('click', event)}
+      on:click={(event) => logEvent('click', event)}
       bind:loading
       bind:thin
       bind:disabled
@@ -21,7 +22,7 @@
   </Hst.Variant>
   <Hst.Variant title="Secondary">
     <Button
-      on:click={(event) => hstEvent('click', event)}
+      on:click={(event) => logEvent('click', event)}
       bind:loading
       bind:thin
       bind:disabled
@@ -30,7 +31,7 @@
   </Hst.Variant>
   <Hst.Variant title="Destructive">
     <Button
-      on:click={(event) => hstEvent('click', event)}
+      on:click={(event) => logEvent('click', event)}
       bind:loading
       bind:thin
       bind:disabled
@@ -39,7 +40,7 @@
   </Hst.Variant>
   <Hst.Variant title="Login">
     <Button
-      on:click={(event) => hstEvent('click', event)}
+      on:click={(event) => logEvent('click', event)}
       bind:loading
       bind:thin
       bind:disabled

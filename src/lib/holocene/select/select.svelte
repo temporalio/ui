@@ -24,7 +24,6 @@
   export let dark: boolean = false;
   export let placeholder = '';
   export let disabled: boolean = false;
-  export let showIcon: boolean = true;
   export let unroundRight: boolean = false;
   export let keepOpen: boolean = false;
   export let displayValue: (value: T) => T | string = (value) => value ?? '';
@@ -75,15 +74,8 @@
           {displayValue(value)}
         {/if}
       </div>
-      {#if showIcon}
-        {#if disabled}
-          <Icon name="lock" class="text-gray-500" />
-        {:else}
-          <Icon
-            name={show ? 'chevron-up' : 'chevron-down'}
-            class="pointer-events-none"
-          />
-        {/if}
+      {#if disabled}
+        <Icon name="lock" class="text-gray-500" />
       {/if}
     </MenuButton>
     <Menu id="{id}-menu" class="h-auto max-h-96 min-w-fit" {show} {dark}>
