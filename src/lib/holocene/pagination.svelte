@@ -74,7 +74,7 @@
           options={perPageOptions(perPage)}
         />
       </div>
-      <div class="flex items-center justify-center gap-6">
+      <div class="flex w-56 items-center justify-center gap-6">
         <button
           class="caret"
           disabled={!$store.hasPrevious}
@@ -119,7 +119,7 @@
           options={perPageOptions(perPage)}
         />
       </div>
-      <div class="flex items-center justify-center gap-6">
+      <div class="flex w-56 items-center justify-center gap-6">
         <button
           class="caret"
           disabled={!$store.hasPrevious}

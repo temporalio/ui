@@ -24,6 +24,17 @@ export const durations = [
   '90 days',
 ];
 
+export const columnOrderedDurations = [
+  '15 minutes',
+  '3 days',
+  '1 hour',
+  '7 days',
+  '3 hours',
+  '30 days',
+  '24 hours',
+  '90 days',
+];
+
 const durationPattern = new RegExp(
   `(\\d+)\\s(${durationKeys.map((k) => k + '?').join('|')})`,
   'g',

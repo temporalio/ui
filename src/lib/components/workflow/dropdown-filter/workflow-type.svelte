@@ -37,6 +37,11 @@
       value = typeFilter.value;
     }
   }
+
+  function handleClearInput() {
+    $workflowFilters = [...getOtherFilters()];
+    updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
+  }
 </script>
 
 <DropdownMenu
@@ -56,6 +61,7 @@
       autoFocus
       clearable
       on:input={onInput}
+      on:clear={handleClearInput}
       bind:value
     />
   </div>

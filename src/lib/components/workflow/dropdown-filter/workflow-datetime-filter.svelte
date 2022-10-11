@@ -10,7 +10,7 @@
     startOfDay,
   } from 'date-fns';
 
-  import { durations } from '$lib/utilities/to-duration';
+  import { columnOrderedDurations } from '$lib/utilities/to-duration';
 
   import Select from '$lib/holocene/select/select.svelte';
   import Option from '$lib/holocene/select/option.svelte';
@@ -22,23 +22,29 @@
   import TimePicker from '$lib/holocene/time-picker.svelte';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-advanced-parameters';
   import { page } from '$app/stores';
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
   let custom = false;
-  let value = '';
+  let value = 'All Time';
+  let timeField = 'StartTime';
 
   onMount(() => {
-    const startTimeFilter = $workflowFilters.find(
-      (f) => f.attribute === 'StartTime',
+    const timeFilter = $workflowFilters.find(
+      (f) => f.attribute === 'StartTime' || f.attribute === 'CloseTime',
     );
-    if (startTimeFilter) {
-      value = startTimeFilter.value;
+    if (timeFilter) {
+      value = timeFilter.value;
+      timeField = timeFilter.attribute as string;
     }
   });
 
   const getOtherFilters = () =>
-    $workflowFilters.filter((f) => f.attribute !== 'StartTime');
+    $workflowFilters.filter(
+      (f) => f.attribute !== 'StartTime' && f.attribute !== 'CloseTime',
+    );
 
-  const onChange = (value: string) => {
+  const onChange = (_value: string) => {
+    value = _value;
     if (value === 'All Time') {
       $workflowFilters = [...getOtherFilters()];
       custom = false;
@@ -46,7 +52,7 @@
       custom = true;
     } else {
       const filter = {
-        attribute: 'StartTime',
+        attribute: timeField,
         value,
         conditional: '=',
         operator: '',
@@ -57,6 +63,13 @@
     }
 
     updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
+  };
+
+  const onTimeFieldChange = (field: 'StartTime' | 'CloseTime') => {
+    if (field !== timeField) {
+      timeField = field;
+      onChange(value);
+    }
   };
 
   let startDate = startOfDay(new Date());
@@ -92,7 +105,7 @@
     startDate = applyTimeChanges(startDate, startTime);
     endDate = applyTimeChanges(endDate, endTime);
     const filter = {
-      attribute: 'StartTime',
+      attribute: timeField,
       value: `BETWEEN "${formatISO(startDate)}" AND "${formatISO(endDate)}"`,
       conditional: '=',
       operator: '',
@@ -111,40 +124,80 @@
     id="time-range-filter"
     placeholder="All Time"
     unroundRight
-    keepOpen={custom}
+    keepOpen={true}
     {value}
     {onChange}
   >
-    <div class="flex">
-      <div>
-        <Option value={'All Time'}>All Time</Option>
-        <Option value={'Custom'}>Custom</Option>
-        {#each durations as value}
-          <Option {value}>{value}</Option>
-        {/each}
-      </div>
+    <div class="flex h-[320px] w-[400px] flex-col gap-8 bg-white p-4">
       {#if custom}
-        <div
-          class="flex w-96 flex-col gap-8 border-l border-gray-900 bg-white p-4"
-        >
-          <div class="flex flex-col">
-            <p class="text-sm">Start</p>
-            <div class="flex gap-2">
-              <DatePicker
-                on:datechange={onStartDateChange}
-                selected={startDate}
-              />
-              <TimePicker on:timechange={onStartDateTimeChange} />
-            </div>
+        <div class="flex flex-col">
+          <p class="text-sm">To</p>
+          <div class="flex gap-2">
+            <DatePicker
+              on:datechange={onStartDateChange}
+              selected={startDate}
+            />
+            <TimePicker on:timechange={onStartDateTimeChange} />
           </div>
-          <div class="flex flex-col">
-            <p class="text-sm">End</p>
-            <div class="flex gap-2">
-              <DatePicker on:datechange={onEndDateChange} selected={endDate} />
-              <TimePicker on:timechange={onEndDateTimeChange} />
-            </div>
+        </div>
+        <div class="flex flex-col">
+          <p class="text-sm">From</p>
+          <div class="flex gap-2">
+            <DatePicker on:datechange={onEndDateChange} selected={endDate} />
+            <TimePicker on:timechange={onEndDateTimeChange} />
           </div>
+        </div>
+        <div class="flex gap-2">
           <Button on:click={onApply}>Apply</Button>
+          <Button variant="secondary" on:click={() => (custom = false)}
+            >Cancel</Button
+          >
+        </div>
+      {:else}
+        <div>
+          <div class="flex w-full flex-wrap">
+            <div class="flex w-1/2 flex-col border-b border-gray-300">
+              <Option value={'All Time'}>All Time</Option>
+            </div>
+            <div class="flex w-1/2 flex-col border-b border-gray-300">
+              <Option value={'Custom'}>Custom</Option>
+            </div>
+            {#each columnOrderedDurations as duration}
+              <div class="flex w-1/2 flex-col justify-center">
+                <Option value={duration}>{duration}</Option>
+              </div>
+            {/each}
+            <div class="flex w-full flex-wrap">
+              <div class="flex w-1/2 flex-col border-t border-gray-300">
+                <div
+                  class="time-label"
+                  class:active={timeField === 'StartTime'}
+                  on:click={() => onTimeFieldChange('StartTime')}
+                >
+                  <div class="mr-2 w-6">
+                    {#if timeField === 'StartTime'}
+                      <Icon name="checkmark" />
+                    {/if}
+                  </div>
+                  Start Time
+                </div>
+              </div>
+              <div class="flex w-1/2 flex-col border-t border-gray-300">
+                <div
+                  class="time-label"
+                  class:active={timeField === 'CloseTime'}
+                  on:click={() => onTimeFieldChange('CloseTime')}
+                >
+                  <div class="mr-2 w-6">
+                    {#if timeField === 'CloseTime'}
+                      <Icon name="checkmark" />
+                    {/if}
+                  </div>
+                  Close Time
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       {/if}
     </div>
@@ -156,23 +209,25 @@
     label={capitalize($timeFormat)}
     icon="clock"
   >
-    <div
-      on:click={() => ($timeFormat = 'relative')}
-      class="cursor-pointer px-4 py-2 text-sm"
-    >
+    <div on:click={() => ($timeFormat = 'relative')} class="timezone-label">
       Relative
     </div>
-    <div
-      on:click={() => ($timeFormat = 'UTC')}
-      class="cursor-pointer px-4 py-2 text-sm"
-    >
-      UTC
-    </div>
-    <div
-      on:click={() => ($timeFormat = 'local')}
-      class="cursor-pointer px-4 py-2 text-sm"
-    >
+    <div on:click={() => ($timeFormat = 'UTC')} class="timezone-label">UTC</div>
+    <div on:click={() => ($timeFormat = 'local')} class="timezone-label">
       Local
     </div>
   </CustomSplitButton>
 </div>
+
+<style lang="postcss">
+  .time-label {
+    @apply flex cursor-pointer whitespace-nowrap px-4 py-3 font-secondary text-sm font-medium hover:bg-gray-50;
+  }
+
+  .active {
+    @apply text-blue-700;
+  }
+  .timezone-label {
+    @apply flex cursor-pointer whitespace-nowrap px-4 py-3 font-secondary text-sm font-medium hover:bg-gray-50;
+  }
+</style>

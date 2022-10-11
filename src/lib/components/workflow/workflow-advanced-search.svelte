@@ -51,7 +51,7 @@
         id="manual-search"
         placeholder="Enter a query"
         icon="search"
-        class="w-2/3"
+        class="w-3/4"
         clearable
         unroundRight
         on:clear={handleClearInput}
