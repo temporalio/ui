@@ -19,8 +19,10 @@
     toListWorkflowQuery,
     toListWorkflowQueryFromAdvancedFilters,
   } from '$lib/utilities/query/list-workflow-query';
-  import { toListWorkflowAdvancedParameters } from '$lib/utilities/query/to-list-workflow-advanced-parameters';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import {
+    toListWorkflowAdvancedParameters,
+    updateQueryParamsFromFilter,
+  } from '$lib/utilities/query/to-list-workflow-advanced-parameters';
 
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
@@ -34,10 +36,7 @@
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import TableRow from '$holocene/table/table-row.svelte';
   import WorkflowDateTime from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
-  import type {
-    WorkflowFilter,
-    WorkflowSort,
-  } from '$lib/models/workflow-filters';
+  import type { WorkflowFilter } from '$lib/models/workflow-filters';
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
 
@@ -53,59 +52,13 @@
   });
 
   $: {
-    handleFilterChange($workflowFilters, $workflowSorts);
+    updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
   }
 
   onDestroy(() => {
     const parameters = query ? toListWorkflowAdvancedParameters(query) : {};
     $workflowsSearch = { parameters, searchType };
   });
-
-  const combineDropdownFilters = (filters: WorkflowFilter[]) => {
-    const statusFilters = filters.filter(
-      (f) => f.attribute === 'ExecutionStatus' && f.value,
-    );
-    const idFilter = filters.filter(
-      (f) => f.attribute === 'WorkflowId' && f.value,
-    );
-    const typeFilter = filters.filter(
-      (f) => f.attribute === 'WorkflowType' && f.value,
-    );
-    const startTimeFilter = filters.filter(
-      (f) => f.attribute === 'StartTime' && f.value,
-    );
-
-    const activeFilters = [
-      statusFilters,
-      idFilter,
-      typeFilter,
-      startTimeFilter,
-    ].filter((f) => f.length);
-
-    activeFilters.forEach((filter, index) => {
-      if (filter.length && activeFilters[index + 1]?.length) {
-        filter[filter.length - 1].operator = 'AND';
-      } else if (filter.length && !activeFilters[index + 1]?.length) {
-        filter[filter.length - 1].operator = '';
-      }
-    });
-
-    return [...statusFilters, ...idFilter, ...typeFilter, ...startTimeFilter];
-  };
-
-  const handleFilterChange = debounce(
-    (filters: WorkflowFilter[], sorts: WorkflowSort[]) => {
-      const allFilters = combineDropdownFilters(filters);
-      query = toListWorkflowQueryFromAdvancedFilters(allFilters, sorts);
-      updateQueryParameters({
-        url: $page.url,
-        parameter: 'query',
-        value: query,
-        allowEmpty: true,
-      });
-    },
-    300,
-  );
 
   const errorMessage =
     searchType === 'advanced'

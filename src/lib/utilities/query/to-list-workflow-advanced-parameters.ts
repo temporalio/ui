@@ -1,8 +1,13 @@
-import type { WorkflowFilter } from '$lib/models/workflow-filters';
+import type { WorkflowFilter, WorkflowSort } from '$lib/models/workflow-filters';
 import {
   searchAttributeOptions,
 } from '$lib/stores/search-attributes';
 import { formatDuration } from 'date-fns';
+import debounce from 'just-debounce';
+import {
+  toListWorkflowQueryFromAdvancedFilters,
+} from '$lib/utilities/query/list-workflow-query';
+
 import {
   isConditional,
   isJoin,
@@ -11,6 +16,7 @@ import {
 } from '../is';
 import { durationKeys, fromDate } from '../to-duration';
 import { tokenize } from './tokenize';
+import { updateQueryParameters } from '../update-query-parameters';
 
 type Tokens = string[];
 export type ParsedParameters = FilterParameters & { timeRange?: string };
@@ -108,6 +114,53 @@ export const toListWorkflowAdvancedParameters = (
     return [];
   }
 };
+
+export const combineDropdownFilters = (filters: WorkflowFilter[]) => {
+  const statusFilters = filters.filter(
+    (f) => f.attribute === 'ExecutionStatus' && f.value,
+  );
+  const idFilter = filters.filter(
+    (f) => f.attribute === 'WorkflowId' && f.value,
+  );
+  const typeFilter = filters.filter(
+    (f) => f.attribute === 'WorkflowType' && f.value,
+  );
+  const startTimeFilter = filters.filter(
+    (f) => f.attribute === 'StartTime' && f.value,
+  );
+
+  const activeFilters = [
+    statusFilters,
+    idFilter,
+    typeFilter,
+    startTimeFilter,
+  ].filter((f) => f.length);
+
+  activeFilters.forEach((filter, index) => {
+    if (filter.length && activeFilters[index + 1]?.length) {
+      filter[filter.length - 1].operator = 'AND';
+    } else if (filter.length && !activeFilters[index + 1]?.length) {
+      filter[filter.length - 1].operator = '';
+    }
+  });
+
+  return [...statusFilters, ...idFilter, ...typeFilter, ...startTimeFilter];
+};
+
+export const updateQueryParamsFromFilter = debounce(
+  (url: URL, filters: WorkflowFilter[], sorts: WorkflowSort[]) => {
+    const allFilters = combineDropdownFilters(filters);
+    const query = toListWorkflowQueryFromAdvancedFilters(allFilters, sorts);
+    updateQueryParameters({
+      url,
+      parameter: 'query',
+      value: query,
+      allowEmpty: true,
+    });
+  },
+  300,
+);
+
 
 export const getConditionalForAttribute = (
   attribute: keyof SearchAttributes,
