@@ -24,7 +24,7 @@ export const triggerMenu = (
     if (
       node &&
       !node.contains(eventTarget as Node) &&
-      // node.ariaExpanded === 'true' &&
+      node.ariaExpanded === 'true' &&
       !keepOpen
     ) {
       node.dispatchEvent(new CustomEvent('close-menu'));

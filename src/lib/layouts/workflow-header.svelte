@@ -32,9 +32,6 @@
     workflow: workflow.id,
     run: workflow.runId,
   };
-
-  const { parameters, searchType } = $workflowsSearch;
-  const query = toListWorkflowQuery(parameters);
 </script>
 
 <header class="mb-4 flex flex-col gap-4">
@@ -42,8 +39,8 @@
     <div class="-mt-3 -ml-2 block">
       <a
         href={`/namespaces/${namespace}/workflows?query=${encodeURIForSvelte(
-          query,
-        )}&search=${searchType}`}
+          $workflowsSearch ?? '',
+        )}`}
         data-cy="back-to-workflows"
         class="back-to-workflows"
       >
