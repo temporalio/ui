@@ -36,9 +36,10 @@
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import TableRow from '$holocene/table/table-row.svelte';
   import WorkflowDateTime from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
-  import type { WorkflowFilter } from '$lib/models/workflow-filters';
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
+
+  const url = $page.url;
 
   let advancedSearch = false;
   let manualSearch = false;
@@ -52,7 +53,7 @@
   });
 
   $: {
-    updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
+    updateQueryParamsFromFilter(url, $workflowFilters, $workflowSorts);
   }
 
   onDestroy(() => {
