@@ -30,16 +30,17 @@
 
   $: query = $page.url.searchParams.get('query');
 
+  $: {
+    if (query) {
+      $workflowsSearch = query;
+    }
+  }
+
   onMount(() => {
     $lastUsedNamespace = $page.params.namespace;
     if (query) {
       $workflowFilters = toListWorkflowFilters(query);
     }
-  });
-
-  onDestroy(() => {
-    // const parameters = query ? toListWorkflowFilters(query) : {};
-    // $workflowsSearch = { parameters, searchType };
   });
 
   const errorMessage =

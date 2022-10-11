@@ -79,7 +79,7 @@
       <div class="flex h-full w-9 items-center justify-center">
         <Icon name="lock" />
       </div>
-    {:else if clearable}
+    {:else if clearable && value}
       <div
         class="mr-2 flex h-full h-6 w-6 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200"
         on:click={onClear}
