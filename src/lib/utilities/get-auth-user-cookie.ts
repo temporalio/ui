@@ -1,4 +1,5 @@
 import { browser } from '$app/env';
+import { atob } from '$lib/utilities/atob';
 
 type UserResponse = {
   AccessToken: string;
@@ -28,7 +29,7 @@ export const getAuthUserCookie = (isBrowser = browser): User => {
 
   if (userBase64) {
     try {
-      const userS = decodeB64(userBase64);
+      const userS = atob(userBase64);
       const user: UserResponse = JSON.parse(userS);
 
       return {
@@ -45,7 +46,3 @@ export const getAuthUserCookie = (isBrowser = browser): User => {
 
   return {};
 };
-
-function decodeB64(str) {
-  return decodeURIComponent(atob(str));
-}
