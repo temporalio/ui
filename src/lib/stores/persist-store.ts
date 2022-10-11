@@ -28,10 +28,14 @@ export function persistStore<T>(
   const { subscribe, set } = writable<T>(initialStoreValue);
 
   if (browser && broadcastToAll) {
-    broadcaster = new BroadcastChannel(`persist-store-${name}`);
-    broadcaster?.addEventListener('message', (event) => {
-      set(event.data);
-    });
+    try {
+      broadcaster = new BroadcastChannel(`persist-store-${name}`);
+      broadcaster?.addEventListener('message', (event) => {
+        set(event.data);
+      });
+    } catch (e) {
+      console.error('Browser does not support BroadcastChannel');
+    }
   }
 
   return {
