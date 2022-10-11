@@ -44,7 +44,7 @@
 </script>
 
 <MenuItem
-  class="flex flex-row items-start"
+  class="flex h-12 flex-row items-start"
   on:click={handleOptionClick}
   {selected}
   {dark}

@@ -17,10 +17,10 @@ export type ParsedParameters = FilterParameters & { timeRange?: string };
 
 const is =
   (identifier: string) =>
-    (token: string): boolean => {
-      if (token.toLowerCase() === identifier.toLowerCase()) return true;
-      return false;
-    };
+  (token: string): boolean => {
+    if (token.toLowerCase() === identifier.toLowerCase()) return true;
+    return false;
+  };
 
 const getTwoAhead = (tokens: Tokens, index: number): string =>
   tokens[index + 2];
@@ -50,6 +50,7 @@ const emptyFilter = () => ({
 const DefaultAttributes: SearchAttributes = {
   ExecutionStatus: 'Keyword',
   StartTime: 'Datetime',
+  CloseTime: 'Datetime',
   WorkflowId: 'Keyword',
   WorkflowType: 'Keyword',
 };
@@ -123,15 +124,16 @@ export const combineDropdownFilters = (filters: WorkflowFilter[]) => {
   const typeFilter = filters.filter(
     (f) => f.attribute === 'WorkflowType' && f.value,
   );
-  const startTimeFilter = filters.filter(
-    (f) => f.attribute === 'StartTime' && f.value,
+  const timeFilter = filters.filter(
+    (f) =>
+      (f.attribute === 'StartTime' || f.attribute === 'CloseTime') && f.value,
   );
 
   const activeFilters = [
     statusFilters,
     idFilter,
     typeFilter,
-    startTimeFilter,
+    timeFilter,
   ].filter((f) => f.length);
 
   activeFilters.forEach((filter, index) => {
@@ -142,7 +144,7 @@ export const combineDropdownFilters = (filters: WorkflowFilter[]) => {
     }
   });
 
-  return [...statusFilters, ...idFilter, ...typeFilter, ...startTimeFilter];
+  return [...statusFilters, ...idFilter, ...typeFilter, ...timeFilter];
 };
 
 export const updateQueryParamsFromFilter = debounce(

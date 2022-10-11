@@ -1,6 +1,4 @@
 <script lang="ts">
-  import Icon from '$holocene/icon/icon.svelte';
-
   export let conditional = '=';
 </script>
 
