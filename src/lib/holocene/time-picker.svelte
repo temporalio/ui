@@ -15,7 +15,8 @@
     };
   };
   const onChange = (e: Event) => {
-    const time = parseTime(e.target.value);
+    const { value } = e.target as HTMLInputElement;
+    const time = parseTime(value);
     dispatch('timechange', time);
   };
 </script>
