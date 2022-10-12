@@ -49,6 +49,7 @@
   keepOpen
   left
   icon="filter"
+  dataCy="workflow-id-filter-button"
   on:showmenu={handleShowInput}
 >
   <svelte:fragment slot="label">Workflow Id</svelte:fragment>

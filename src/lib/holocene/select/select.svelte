@@ -62,13 +62,13 @@
       class="select-input-container {disabled ? 'disabled' : ''} {unroundRight
         ? 'unroundRight'
         : ''}"
+      hasIndicator={!disabled}
       bind:show
       {keepOpen}
       controls="{id}-menu"
       data-cy={$$props.dataCy}
       {dark}
       {disabled}
-      hasIndicator
     >
       <div class="select-input" class:dark class:disabled {id}>
         {#if !value && placeholder !== ''}

@@ -2,8 +2,7 @@
   import Icon from '$holocene/icon/icon.svelte';
 
   import { eventViewType } from '$lib/stores/event-view';
-  import { workflowsSearch } from '$lib/stores/workflows';
-  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
+  import { workflowsQuery } from '$lib/stores/workflows';
 
   import {
     routeForEventHistory,
@@ -39,7 +38,7 @@
     <div class="-mt-3 -ml-2 block">
       <a
         href={`/namespaces/${namespace}/workflows?query=${encodeURIForSvelte(
-          $workflowsSearch ?? '',
+          $workflowsQuery ?? '',
         )}`}
         data-cy="back-to-workflows"
         class="back-to-workflows"

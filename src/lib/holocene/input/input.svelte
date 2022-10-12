@@ -82,6 +82,7 @@
     {:else if clearable && value}
       <div
         class="mr-2 flex h-full h-6 w-6 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200"
+        data-cy="clear-input"
         on:click={onClear}
       >
         <Icon name="close" />
