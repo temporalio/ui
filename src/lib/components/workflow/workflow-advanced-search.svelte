@@ -7,7 +7,7 @@
 
   import Input from '$lib/holocene/input/input.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import { workflowFilters } from '$lib/stores/filters';
+  import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
 
   let manualSearchString = '';
@@ -23,9 +23,14 @@
   }
 
   const onSearch = () => {
-    try {
-      $workflowFilters = toListWorkflowFilters(manualSearchString);
-    } catch (e) {}
+    if (!manualSearchString) {
+      $workflowFilters = [];
+      $workflowSorts = [];
+    } else {
+      try {
+        $workflowFilters = toListWorkflowFilters(manualSearchString);
+      } catch (e) {}
+    }
 
     updateQueryParameters({
       url: $page.url,

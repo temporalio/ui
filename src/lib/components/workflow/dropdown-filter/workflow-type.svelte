@@ -35,6 +35,8 @@
     const show = event.detail.show;
     if (show && typeFilter && !value) {
       value = typeFilter.value;
+    } else if (show && !typeFilter && value) {
+      value = '';
     }
   }
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ProgressBar from '$lib/components/progress-bar.svelte';
+  import ProgressBar from '$lib/holocene/progress-bar.svelte';
 
   export let variant: 'simple' | 'fancy' = 'fancy';
   export let updating = false;
