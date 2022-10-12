@@ -63,7 +63,7 @@
     <nav
       style={floatStyle}
       bind:clientHeight={height}
-      class="flex flex-col justify-end gap-8 md:flex-row"
+      class="flex flex-col justify-end gap-4 md:flex-row"
     >
       <slot name="action-top-center" />
       <div class="flex items-center justify-center gap-2">
@@ -74,7 +74,7 @@
           options={perPageOptions(perPage)}
         />
       </div>
-      <div class="flex w-56 items-center justify-center gap-6">
+      <div class="flex w-56 items-center justify-center gap-4">
         <button
           class="caret"
           disabled={!$store.hasPrevious}
@@ -110,7 +110,7 @@
     }`}
   >
     <slot name="action-bottom-left" />
-    <div class="flex gap-8">
+    <div class="flex gap-4">
       <div class="flex items-center justify-center gap-2">
         <FilterSelect
           label="Per Page"
@@ -119,7 +119,7 @@
           options={perPageOptions(perPage)}
         />
       </div>
-      <div class="flex w-56 items-center justify-center gap-6">
+      <div class="flex w-56 items-center justify-center gap-4">
         <button
           class="caret"
           disabled={!$store.hasPrevious}
