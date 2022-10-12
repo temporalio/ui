@@ -1,9 +1,7 @@
 <script lang="ts">
   import { searchAttributes } from '$lib/stores/search-attributes';
 
-  import Select from '$lib/holocene/select/select.svelte';
-  import Option from '$lib/holocene/select/option.svelte';
-  import CustomButton from '$lib/holocene/custom-button.svelte';
+  import CustomButton from './custom-button.svelte';
   import { workflowSorts } from '$lib/stores/filters';
   import TypeaheadInput from '$lib/holocene/input/typeahead-input.svelte';
   import type { SortOrder } from '$lib/models/workflow-filters';

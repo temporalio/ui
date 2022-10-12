@@ -5,7 +5,7 @@
   import IntFilter from './int-filter.svelte';
   import KeywordFilter from './keyword-filter.svelte';
   import DatetimeFilter from './datetime-filter.svelte';
-  import CustomButton from '$lib/holocene/custom-button.svelte';
+  import CustomButton from '$lib/components/workflow/advanced-filter/custom-button.svelte';
   import BooleanFilter from './boolean-filter.svelte';
 
   export let attribute: string | number;

@@ -44,7 +44,7 @@
 </script>
 
 <MenuItem
-  class="flex h-10 flex-row items-center"
+  class="flex h-10 flex-row items-center {$$props.class}"
   on:click={handleOptionClick}
   {selected}
   {dark}

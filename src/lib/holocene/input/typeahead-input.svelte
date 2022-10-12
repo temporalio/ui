@@ -9,7 +9,7 @@
   import Menu from '$holocene/primitives/menu/menu.svelte';
   import MenuContainer from '$holocene/primitives/menu/menu-container.svelte';
   import { noop } from 'svelte/internal';
-  import CustomOption from '../select/custom-option.svelte';
+  import Option from '../select/option.svelte';
 
   export let id: string;
   export let options: { label: string; value: string }[] = [];
@@ -79,10 +79,9 @@
     />
     <Menu show={showMenu} id={`menu-${id}`} class="h-auto max-h-80 w-64">
       {#each filterOptions as { label, value }}
-        <CustomOption class="truncate text-[14px]" {value}>{label}</CustomOption
-        >
+        <Option class="truncate" {value}>{label}</Option>
       {:else}
-        <CustomOption class="text-[14px] truncate">No Results</CustomOption>
+        <Option class="truncate">No Results</Option>
       {/each}
     </Menu>
   </MenuContainer>
