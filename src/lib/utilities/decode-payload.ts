@@ -1,4 +1,5 @@
 import type { Payload } from '$types';
+import JSONbig from 'json-bigint';
 
 import { dataConverterWebsocket } from '$lib/utilities/data-converter-websocket';
 import type { DataConverterWebsocketInterface } from '$lib/utilities/data-converter-websocket';
@@ -36,7 +37,9 @@ export function decodePayload(
     case 'json/plain':
     case 'json/protobuf':
       try {
-        return JSON.parse(atob(String(payload.data)));
+        return JSONbig.parse(atob(String(payload.data)), {
+          useNativeBigInt: true,
+        });
       } catch (_e) {
         // Couldn't correctly decode this just let the user deal with the data as is
       }

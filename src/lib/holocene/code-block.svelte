@@ -1,4 +1,5 @@
 <script lang="ts">
+  import JSONbig from 'json-bigint';
   import Icon from '$holocene/icon/icon.svelte';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
 
@@ -14,12 +15,14 @@
 
     let parsedData: string;
     try {
-      parsedData = JSON.parse(jsonData);
+      parsedData = JSONbig.parse(jsonData, {
+        useNativeBigInt: true, // toggles whether to use native BigInt instead of bignumber.js
+      });
     } catch (error) {
       parsedData = jsonData;
     }
 
-    return JSON.stringify(parsedData, undefined, inline ? 0 : 2);
+    return JSONbig.stringify(parsedData, undefined, inline ? 0 : 2);
   };
 
   $: parsedContent = isJSON ? formatJSON(content) : content;
