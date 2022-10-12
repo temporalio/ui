@@ -128,7 +128,11 @@
     {value}
     {onChange}
   >
-    <div class="flex h-[320px] w-[400px] flex-col gap-8 bg-white p-4">
+    <div
+      class="flex {custom
+        ? 'h-[500px]'
+        : 'h-[280px]'} w-[400px] flex-col gap-8 bg-white p-4"
+    >
       {#if custom}
         <div class="flex flex-col">
           <p class="text-sm">To</p>

@@ -12,7 +12,7 @@
   export let value: string = '';
   export let conditional: string = '';
 
-  export let removeFilter: () => void = () => noop;
+  export let removeFilter: () => void = noop;
 
   const FilterComponents = {
     Keyword: KeywordFilter,
