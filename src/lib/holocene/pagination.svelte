@@ -55,7 +55,7 @@
 
 <div class="pagination relative mb-8 flex flex-col gap-4">
   <div
-    class={`flex flex-col items-center gap-4 md:flex-row ${
+    class={`flex flex-col items-center gap-4 lg:flex-row ${
       $$slots['action-top-left'] ? 'justify-between' : 'justify-end'
     }`}
   >
@@ -63,7 +63,7 @@
     <nav
       style={floatStyle}
       bind:clientHeight={height}
-      class="flex justify-end gap-8"
+      class="flex flex-col justify-end gap-8 md:flex-row"
     >
       <slot name="action-top-center" />
       <div class="flex items-center justify-center gap-2">
