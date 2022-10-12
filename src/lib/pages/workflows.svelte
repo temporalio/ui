@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy, onMount } from 'svelte';
+  import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import { timeFormat } from '$lib/stores/time-format';
   import { workflowCount, workflowsSearch } from '$lib/stores/workflows';
@@ -11,7 +11,7 @@
     workflowError,
   } from '$lib/stores/workflows';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import { workflowFilters, workflowSorts } from '$lib/stores/filters';
+  import { workflowFilters } from '$lib/stores/filters';
 
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
 
@@ -84,34 +84,30 @@
     >
   </div>
 </div>
-{#if $loading}
-  <Loading />
-{:else}
-  <Pagination items={$workflows} let:visibleItems>
-    <svelte:fragment slot="action-top-left">
-      <WorkflowAdvancedSearch />
-    </svelte:fragment>
-    <svelte:fragment slot="action-top-center">
-      <WorkflowDateTime />
-    </svelte:fragment>
-    <WorkflowsSummaryTable updating={$updating}>
-      {#each visibleItems as event}
-        <WorkflowsSummaryRow
-          workflow={event}
-          namespace={$page.params.namespace}
-          timeFormat={$timeFormat}
-        />
-      {:else}
-        <TableRow>
-          <td colspan="5">
-            <EmptyState
-              title={'No Workflows Found'}
-              content={errorMessage}
-              error={$workflowError}
-            />
-          </td>
-        </TableRow>
-      {/each}
-    </WorkflowsSummaryTable>
-  </Pagination>
-{/if}
+<Pagination items={$workflows} let:visibleItems>
+  <svelte:fragment slot="action-top-left">
+    <WorkflowAdvancedSearch />
+  </svelte:fragment>
+  <svelte:fragment slot="action-top-center">
+    <WorkflowDateTime />
+  </svelte:fragment>
+  <WorkflowsSummaryTable updating={$loading || $updating}>
+    {#each visibleItems as event}
+      <WorkflowsSummaryRow
+        workflow={event}
+        namespace={$page.params.namespace}
+        timeFormat={$timeFormat}
+      />
+    {:else}
+      <TableRow>
+        <td colspan="5">
+          <EmptyState
+            title={'No Workflows Found'}
+            content={errorMessage}
+            error={$workflowError}
+          />
+        </td>
+      </TableRow>
+    {/each}
+  </WorkflowsSummaryTable>
+</Pagination>

@@ -66,6 +66,7 @@
       data-cy={$$props.dataCy}
       {dark}
       {disabled}
+      hasIndicator
     >
       <div class="select-input" class:dark class:disabled {id}>
         {#if !value && placeholder !== ''}

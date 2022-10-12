@@ -6,7 +6,6 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   import Input from '$lib/holocene/input/input.svelte';
-  import CustomButton from '$lib/holocene/custom-button.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { workflowFilters } from '$lib/stores/filters';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
