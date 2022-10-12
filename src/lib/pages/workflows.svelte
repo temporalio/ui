@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import { timeFormat } from '$lib/stores/time-format';
-  import { workflowCount, workflowsSearch } from '$lib/stores/workflows';
+  import { workflowCount, workflowsQuery } from '$lib/stores/workflows';
   import {
     refresh,
     workflows,
@@ -20,7 +20,6 @@
   import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
   import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
   import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
-  import Loading from '$holocene/loading.svelte';
   import PageTitle from '$lib/holocene/page-title.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$holocene/icon/icon.svelte';
@@ -32,13 +31,15 @@
 
   $: {
     if (query) {
-      $workflowsSearch = query;
+      // For returning to page from 'Back to Workflows' with previous search
+      $workflowsQuery = query;
     }
   }
 
   onMount(() => {
     $lastUsedNamespace = $page.params.namespace;
     if (query) {
+      // Set filters from inital page load query if it exists
       $workflowFilters = toListWorkflowFilters(query);
     }
   });
@@ -66,7 +67,7 @@
         {$page.params.namespace}
       </p>
       <div class="h-2 w-2 rounded-full bg-gray-400" />
-      <p>
+      <p data-cy="workflow-count">
         {#if !$loading && !$updating}
           {#if query}
             Results {$workflowCount?.count ?? 0} of {$workflowCount?.totalCount ??

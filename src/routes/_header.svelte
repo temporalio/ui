@@ -49,7 +49,7 @@
       href: (namespace: string) => getCurrentHref(namespace),
       onClick: (namespace: string) => {
         $lastUsedNamespace = namespace;
-        window.location.assign(getCurrentHref(namespace));
+        goto(getCurrentHref(namespace));
       },
     };
   });
@@ -61,7 +61,7 @@
       href: (namespace: string) => routeForWorkflows({ namespace }),
       onClick: (namespace: string) => {
         $lastUsedNamespace = $page.params.namespace;
-        window.location.assign(getCurrentHref(namespace));
+        goto(routeForWorkflows({ namespace }));
       },
     });
   }

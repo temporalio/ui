@@ -8,16 +8,16 @@
   export let date: Date | undefined;
   export let month: number | undefined;
   export let year: number | undefined;
-  export let isAllowed = (date: Date) => true;
+  export let isAllowed = (_date: Date) => true;
 
   const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
   let cells = [];
 
-  const onChange = (date) => {
+  const onChange = (date: number) => {
     dispatch('datechange', new Date(year, month, date));
   };
 
-  const allow = (year, month, date) => {
+  const allow = (year: number, month: number, date: number) => {
     if (!date) return true;
     return isAllowed(new Date(year, month, date));
   };

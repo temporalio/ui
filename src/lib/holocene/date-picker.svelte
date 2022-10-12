@@ -12,7 +12,6 @@
   export let isAllowed = (date: Date) => true;
   export let selected = new Date();
 
-  let value = '';
   let date: number | undefined;
   let month: number | undefined;
   let year: number | undefined;

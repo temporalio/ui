@@ -193,7 +193,7 @@
                       <Icon name="checkmark" />
                     {/if}
                   </div>
-                  Close Time
+                  End Time
                 </div>
               </div>
             </div>

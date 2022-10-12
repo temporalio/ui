@@ -56,7 +56,13 @@
         on:clear={handleClearInput}
         bind:value={manualSearchString}
       />
-      <Button variant="primary" class="h-10" unroundLeft on:click={onSearch}>
+      <Button
+        dataCy="manual-search-button"
+        variant="primary"
+        class="h-10"
+        unroundLeft
+        on:click={onSearch}
+      >
         Search
       </Button>
     </div>
