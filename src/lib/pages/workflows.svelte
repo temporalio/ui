@@ -101,13 +101,15 @@
       />
     {:else}
       <TableRow>
-        <td colspan="5">
+        <td class="hidden xl:table-cell" />
+        <td colspan="3">
           <EmptyState
-            title={'No Workflows Found'}
-            content={errorMessage}
+            title={$loading ? 'Loading' : 'No Workflows Found'}
+            content={$loading ? '' : errorMessage}
             error={$workflowError}
           />
         </td>
+        <td class="hidden xl:table-cell" />
       </TableRow>
     {/each}
   </WorkflowsSummaryTable>
