@@ -1,5 +1,5 @@
 <script lang="ts">
-  import CustomButton from '$lib/holocene/custom-button.svelte';
+  import CustomButton from './custom-button.svelte';
   import TypeaheadInput from '$lib/holocene/input/typeahead-input.svelte';
   import { workflowFilters } from '$lib/stores/filters';
   import { searchAttributeOptions } from '$lib/stores/search-attributes';

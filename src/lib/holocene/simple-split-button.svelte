@@ -6,7 +6,7 @@
   import type { IconName } from './icon/paths';
 
   export let label: string = '';
-  export let icon: IconName;
+  export let icon: IconName | undefined = undefined;
   export let id: string;
   export let disabled: boolean = false;
   export let position: 'left' | 'right' = 'left';
@@ -24,10 +24,10 @@
       {disabled}
     >
       {#if icon}
-        <Icon name={icon} />
+        <Icon name={icon} class="mr-2" />
       {/if}
       {label}
-      <Icon name="chevron-down" />
+      <Icon name="chevron-down" class="ml-2" />
     </MenuButton>
   </div>
   <Menu class="min-w-max" {id} {show} {position}>

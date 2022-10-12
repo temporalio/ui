@@ -14,7 +14,7 @@
 
   import Select from '$lib/holocene/select/select.svelte';
   import Option from '$lib/holocene/select/option.svelte';
-  import CustomSplitButton from '$lib/holocene/custom-split-button.svelte';
+  import SimpleSplitButton from '$lib/holocene/simple-split-button.svelte';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -206,7 +206,7 @@
       {/if}
     </div>
   </Select>
-  <CustomSplitButton
+  <SimpleSplitButton
     class="rounded-tr rounded-br bg-offWhite"
     buttonClass="border border-gray-900"
     id="datetime"
@@ -220,7 +220,7 @@
     <div on:click={() => ($timeFormat = 'local')} class="timezone-label">
       Local
     </div>
-  </CustomSplitButton>
+  </SimpleSplitButton>
 </div>
 
 <style lang="postcss">

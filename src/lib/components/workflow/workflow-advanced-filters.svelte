@@ -9,7 +9,7 @@
   import AdvancedFilter from './advanced-filter/index.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import SortFilter from './advanced-filter/sort-filter.svelte';
-  import CustomButton from '$lib/holocene/custom-button.svelte';
+  import CustomButton from '$lib/components/workflow/advanced-filter/custom-button.svelte';
   import AddFilter from './advanced-filter/add-filter.svelte';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import Tooltip from '$lib/holocene/tooltip.svelte';
