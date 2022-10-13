@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import { workflowRun, refresh } from '$lib/stores/workflow-run';
 
   import {
     routeForWorkflow,
@@ -25,6 +25,8 @@
   const { namespace } = $page.params;
   const { workflow, workers } = $workflowRun;
 
+  let refreshInterval;
+
   const routeParameters = (view: EventView, eventId?: string) => ({
     namespace,
     workflow: workflow.id,
@@ -39,7 +41,18 @@
     run: workflow.runId,
   };
 
+  $: {
+    if ($workflowRun.workflow.isRunning) {
+      clearInterval(refreshInterval);
+      // Auto-refresh of 15 seconds
+      refreshInterval = setInterval(() => ($refresh = Date.now()), 15000);
+    } else {
+      clearInterval(refreshInterval);
+    }
+  }
+
   onDestroy(() => {
+    clearInterval(refreshInterval);
     clearPreviousEventParameters();
   });
 </script>
