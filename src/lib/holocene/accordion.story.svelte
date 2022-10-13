@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import type { Hst as HST } from '@histoire/plugin-svelte';
   import Accordion from './accordion.svelte';
   import Button from './button.svelte';
@@ -39,7 +40,7 @@
 
   <Hst.Variant title="With a Code Block">
     <Accordion title="Certificates" subtitle="Expires on Wed Feb 01, 2030">
-      <CodeBlock content={JSON.stringify({ some: 'thing', blue: 42 })} />
+      <CodeBlock content={stringifyWithBigInt({ some: 'thing', blue: 42 })} />
     </Accordion>
   </Hst.Variant>
 
