@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { workflowCount } from '$lib/stores/workflows';
+
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import ExecutionStatusDropdownFilter from './dropdown-filter/workflow-status.svelte';
@@ -8,6 +10,9 @@
   import EndTimeDropdownFilter from './dropdown-filter/end-time.svelte';
 
   export let updating = false;
+
+  // Disable sort with workflows over 10M
+  $: disabled = $workflowCount?.totalCount >= 10000000;
 </script>
 
 <Table class="w-full md:table-fixed" {updating}>
@@ -29,12 +34,12 @@
     </th>
     <th class="hidden xl:table-cell xl:w-60">
       <div class="flex items-center gap-1">
-        <StartTimeDropdownFilter />
+        <StartTimeDropdownFilter {disabled} />
       </div>
     </th>
     <th class="hidden xl:table-cell xl:w-60">
       <div class="flex items-center gap-1">
-        <EndTimeDropdownFilter />
+        <EndTimeDropdownFilter {disabled} />
       </div>
     </th>
   </TableHeaderRow>

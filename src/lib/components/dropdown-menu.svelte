@@ -4,12 +4,15 @@
   import IconButton from '$holocene/icon-button.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { noop } from 'svelte/internal';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
 
   export let value: string | undefined;
   export let icon: IconName | undefined = undefined;
   export let left = false;
   export let right = false;
   export let keepOpen = false;
+  export let disabled = false;
 
   let show: boolean = false;
   let menu: any = null;
@@ -52,39 +55,44 @@
   };
 </script>
 
-<div class="relative inline" bind:this={menu} data-cy={$$props.dataCy}>
-  <IconButton on:click={onClick} dataCy="{$$props.dataCy}-button">
-    <div class="inline flex items-center gap-1">
-      <slot name="label" />
-      <Icon
-        name={icon ? icon : show ? 'chevron-up' : 'chevron-down'}
-        class="pointer-events-none"
-        width={20}
-        height={20}
-      />
-    </div>
-  </IconButton>
-  {#if show}
-    <div
-      in:scale={{ duration: 200, start: 0.65 }}
-      out:scale={{ duration: 100, start: 0.65 }}
-      class:left
-      class:right
-      class="dropdown-menu"
+<Tooltip text="Sort disabled" top hide={!disabled}>
+  <div class="relative inline" bind:this={menu} data-cy={$$props.dataCy}>
+    <IconButton
+      on:click={disabled ? noop : onClick}
+      dataCy="{$$props.dataCy}-button"
     >
-      <div class="block gap-4">
-        <slot />
+      <div class="inline flex items-center gap-1" class:disabled>
+        <slot name="label" />
+        <Icon
+          name={icon ? icon : show ? 'chevron-up' : 'chevron-down'}
+          class="pointer-events-none"
+          width={20}
+          height={20}
+        />
       </div>
-    </div>
-  {/if}
-  {#if value}
-    <span
-      in:scale={{ duration: 200, start: 0.65 }}
-      out:scale={{ duration: 100, start: 0.65 }}
-      class="dot"
-    />
-  {/if}
-</div>
+    </IconButton>
+    {#if show}
+      <div
+        in:scale={{ duration: 200, start: 0.65 }}
+        out:scale={{ duration: 100, start: 0.65 }}
+        class:left
+        class:right
+        class="dropdown-menu"
+      >
+        <div class="block gap-4">
+          <slot />
+        </div>
+      </div>
+    {/if}
+    {#if value}
+      <span
+        in:scale={{ duration: 200, start: 0.65 }}
+        out:scale={{ duration: 100, start: 0.65 }}
+        class="dot"
+      />
+    {/if}
+  </div>
+</Tooltip>
 
 <style lang="postcss">
   .dropdown-menu {
@@ -99,5 +107,8 @@
   }
   .dot {
     @apply pointer-events-none absolute top-0 -right-1 h-2 w-2 rounded-full bg-blue-300;
+  }
+  .disabled {
+    @apply cursor-not-allowed;
   }
 </style>

@@ -26,7 +26,6 @@
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import TableRow from '$holocene/table/table-row.svelte';
   import WorkflowDateTime from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
-  import WorkflowAdvancedFilters from '$lib/components/workflow/workflow-advanced-filters.svelte';
 
   $: query = $page.url.searchParams.get('query');
 
@@ -42,6 +41,8 @@
     if (query) {
       // Set filters from inital page load query if it exists
       $workflowFilters = toListWorkflowFilters(query);
+    } else {
+      $workflowFilters = [];
     }
   });
 
