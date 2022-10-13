@@ -60,7 +60,7 @@
     "@histoire/controls": "^0.11.3",
     "@histoire/plugin-svelte": "^0.11.3",
     "@histoire/shared": "^0.11.3",
-    "@sveltejs/adapter-vercel": "next",
+    "@sveltejs/adapter-vercel": "1.0.0-next.77",
     "@sveltejs/kit": "1.0.0-next.405",
     "@sveltejs/vite-plugin-svelte": "^1.0.1",
     "@temporalio/proto": "1.0.0-rc.0",
