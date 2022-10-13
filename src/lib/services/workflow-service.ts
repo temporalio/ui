@@ -18,9 +18,8 @@ export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
 
 export type CombinedWorkflowExecutionsResponse = {
   workflows: WorkflowExecution[];
+  workflowCount?: { totalCount: number; count: number };
   nextPageToken: string;
-  count?: number;
-  totalCount?: number;
   error?: string;
 };
 
@@ -112,16 +111,19 @@ export const fetchAllWorkflows = async (
       request,
     })) ?? { executions: [], nextPageToken: '' };
 
-  const { count, totalCount } = await fetchWorkflowCount(
-    namespace,
-    query,
-    request,
-  );
+  if (archived) {
+    return {
+      workflows: toWorkflowExecutions({ executions }),
+      nextPageToken: String(nextPageToken),
+      error,
+    };
+  }
+
+  const workflowCount = await fetchWorkflowCount(namespace, query, request);
 
   return {
     workflows: toWorkflowExecutions({ executions }),
-    count,
-    totalCount,
+    workflowCount,
     nextPageToken: String(nextPageToken),
     error,
   };
