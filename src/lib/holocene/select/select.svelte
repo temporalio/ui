@@ -16,7 +16,7 @@
 
   type T = $$Generic;
 
-  let show = false;
+  export let show = false;
 
   export let label = '';
   export let id: string;

@@ -11,6 +11,7 @@
   } from 'date-fns';
 
   import { columnOrderedDurations } from '$lib/utilities/to-duration';
+  import { clickOutside } from '$lib/holocene/outside-click';
 
   import Select from '$lib/holocene/select/select.svelte';
   import Option from '$lib/holocene/select/option.svelte';
@@ -25,6 +26,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
 
   let custom = false;
+  let show = false;
   let value = 'All Time';
   let timeField = 'StartTime';
 
@@ -118,12 +120,17 @@
   };
 </script>
 
-<div class="flex items-center">
+<div
+  class="flex items-center"
+  use:clickOutside
+  on:click-outside={() => (show = false)}
+>
   <Select
     class="w-44 rounded"
     id="time-range-filter"
     placeholder="All Time"
     unroundRight
+    bind:show
     keepOpen={true}
     {value}
     {onChange}
