@@ -4,6 +4,7 @@
         if the stack trace originates from the TypeScript SDK
   It returns undefined otherwise
  */
+import { parseWithBigInt } from '../parse-with-big-int';
 import { isFromTypeScriptSDK } from './is-from-typescript-sdk';
 
 export const getFilePathsFromTypeScriptStackTrace = (
@@ -24,7 +25,7 @@ export const getFilePathsFromTypeScriptStackTrace = (
         }
         const [pathValue, codeLineValue, characterValue] = splitLine;
         const jsonString = `{"filePath": "", "codeLine": ${codeLineValue}, "character": ${characterValue}}`;
-        const jsonObj = JSON.parse(jsonString);
+        const jsonObj = parseWithBigInt(jsonString);
         jsonObj.filePath = pathValue; //To avoid issues with parsing windows paths to JSON
         paths.push(jsonObj);
       });

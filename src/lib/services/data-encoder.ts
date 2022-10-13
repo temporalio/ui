@@ -3,6 +3,7 @@ import {
   setLastDataEncoderSuccess,
 } from '$lib/stores/data-encoder-config';
 import { validateHttps } from '$lib/utilities/is-http';
+import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
 import type { Payloads } from '$types';
 
@@ -38,7 +39,7 @@ export async function convertPayloadsWithCodec({
   const encoderResponse: Promise<Payloads> = fetch(endpoint + '/decode', {
     headers,
     method: 'POST',
-    body: JSON.stringify(payloads),
+    body: stringifyWithBigInt(payloads),
   })
     .then((r) => r.json())
     .then((response) => {

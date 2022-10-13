@@ -11,6 +11,7 @@ import {
   perPageFromSearchParameter,
   perPageOptions,
 } from './pagination';
+import { stringifyWithBigInt } from '../utilities/parse-with-big-int';
 
 const oneHundredResolutions = new Array(100).fill(null).map((_, i) => i);
 
@@ -410,7 +411,7 @@ describe('perPageOptions', () => {
   });
 
   for (const input of [null, undefined, {}, []]) {
-    it(`should ignore ${JSON.stringify(input)}`, () => {
+    it(`should ignore ${stringifyWithBigInt(input)}`, () => {
       expect(perPageOptions(input as unknown as any)).toEqual([
         '100',
         '250',

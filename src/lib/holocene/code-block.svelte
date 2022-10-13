@@ -1,7 +1,10 @@
 <script lang="ts">
-  import JSONbig from 'json-bigint';
   import Icon from '$holocene/icon/icon.svelte';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
+  import {
+    parseWithBigInt,
+    stringifyWithBigInt,
+  } from '$lib/utilities/parse-with-big-int';
 
   export let content: Parameters<typeof JSON.stringify>[0];
   export let inline = false;
@@ -15,14 +18,12 @@
 
     let parsedData: string;
     try {
-      parsedData = JSONbig.parse(jsonData, {
-        useNativeBigInt: true, // toggles whether to use native BigInt instead of bignumber.js
-      });
+      parsedData = parseWithBigInt(jsonData);
     } catch (error) {
       parsedData = jsonData;
     }
 
-    return JSONbig.stringify(parsedData, undefined, inline ? 0 : 2);
+    return stringifyWithBigInt(parsedData, undefined, inline ? 0 : 2);
   };
 
   $: parsedContent = isJSON ? formatJSON(content) : content;

@@ -11,6 +11,7 @@
   import PageTitle from '$lib/holocene/page-title.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import { authUser } from '$lib/stores/auth-user';
 
   const { namespace } = $page.params;
   const { workflow, workers } = $workflowRun;
@@ -19,10 +20,14 @@
   let isLoading = false;
 
   const getStackTrace = () =>
-    getWorkflowStackTrace({
-      workflow,
-      namespace,
-    });
+    getWorkflowStackTrace(
+      {
+        workflow,
+        namespace,
+      },
+      $page.stuff.settings,
+      $authUser?.accessToken,
+    );
 
   let stackTrace: Eventual<ParsedQuery>;
   $: {
@@ -30,10 +35,14 @@
   }
 
   const refreshStackTrace = () => {
-    stackTrace = getWorkflowStackTrace({
-      workflow,
-      namespace,
-    });
+    stackTrace = getWorkflowStackTrace(
+      {
+        workflow,
+        namespace,
+      },
+      $page.stuff.settings,
+      $authUser?.accessToken,
+    );
 
     stackTrace.then(() => {
       currentdate = new Date();

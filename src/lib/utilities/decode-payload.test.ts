@@ -29,6 +29,7 @@ import {
 
 import { get } from 'svelte/store';
 import { vi } from 'vitest';
+import { parseWithBigInt, stringifyWithBigInt } from './parse-with-big-int';
 
 const WebDecodePayload = {
   metadata: {
@@ -104,10 +105,10 @@ describe('convertPayloadToJsonWithWebsocket', () => {
     ws.nextMessage.then((data) => {
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const dataz = JSON.parse(data as any);
+        const dataz = parseWithBigInt(data as any);
 
         ws.send(
-          JSON.stringify({
+          stringifyWithBigInt({
             requestId: dataz.requestId,
             content: { Transformer: 'OptimusPrime' },
           }),
@@ -121,12 +122,12 @@ describe('convertPayloadToJsonWithWebsocket', () => {
     await ws.connected;
 
     const convertedPayload = await convertPayloadToJsonWithWebsocket(
-      JSON.parse(JSON.stringify(workflowStartedEvent)),
+      parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
       websocket,
     );
     const decodedPayload = decodePayloadAttributes(convertedPayload);
     convertPayloadToJsonWithWebsocket(
-      JSON.parse(JSON.stringify(workflowStartedEvent)),
+      parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
       {},
     );
     expect(decodedPayload).toEqual(dataConvertedWorkflowStartedEvent);
@@ -144,7 +145,7 @@ describe('convertPayloadToJsonWithWebsocket', () => {
     });
 
     const convertedPayload = await convertPayloadToJsonWithWebsocket(
-      JSON.parse(JSON.stringify(workflowStartedEvent)),
+      parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
       websocket,
     );
     const decodedPayload = decodePayloadAttributes(convertedPayload);
@@ -157,7 +158,7 @@ describe('convertPayloadToJsonWithWebsocket', () => {
 
   it('Should skip converting a payload and set the status to notRequested when the websocket and port is not set', async () => {
     const convertedPayload = await convertPayloadToJsonWithWebsocket(
-      JSON.parse(JSON.stringify(workflowStartedEvent)),
+      parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
     );
     const decodedPayload = decodePayloadAttributes(convertedPayload);
 
@@ -182,7 +183,7 @@ describe('convertPayloadToJsonWithCodec', () => {
 
     const endpoint = 'http://localhost:1337';
     const convertedPayload = await convertPayloadToJsonWithCodec({
-      attributes: JSON.parse(JSON.stringify(workflowStartedEvent)),
+      attributes: parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
       namespace: 'default',
       settings: {
         codec: {
@@ -206,7 +207,7 @@ describe('convertPayloadToJsonWithCodec', () => {
 
     const endpoint = 'http://localhost:1337';
     const convertedPayload = await convertPayloadToJsonWithCodec({
-      attributes: JSON.parse(JSON.stringify(workflowStartedEvent)),
+      attributes: parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
       namespace: 'default',
       settings: {
         codec: {
@@ -222,7 +223,7 @@ describe('convertPayloadToJsonWithCodec', () => {
   });
   it('Should skip converting a payload and set the status to notRequested when the encoder endpoint is not set', async () => {
     const convertedPayload = await convertPayloadToJsonWithCodec({
-      attributes: JSON.parse(JSON.stringify(workflowStartedEvent)),
+      attributes: parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
       namespace: 'default',
       settings: {
         codec: {
@@ -255,7 +256,9 @@ describe('getEventAttributes', () => {
     dataEncoderEndpoint.set(endpoint);
 
     const decodedPayload = await getEventAttributes({
-      historyEvent: JSON.parse(JSON.stringify(workflowStartedHistoryEvent)),
+      historyEvent: parseWithBigInt(
+        stringifyWithBigInt(workflowStartedHistoryEvent),
+      ),
       namespace: 'default',
       settings: {
         codec: {
@@ -281,7 +284,9 @@ describe('getEventAttributes', () => {
     dataConverterPort.set('3889');
 
     const decodedPayload = await getEventAttributes({
-      historyEvent: JSON.parse(JSON.stringify(workflowStartedHistoryEvent)),
+      historyEvent: parseWithBigInt(
+        stringifyWithBigInt(workflowStartedHistoryEvent),
+      ),
       namespace: 'default',
       settings: {
         codec: {

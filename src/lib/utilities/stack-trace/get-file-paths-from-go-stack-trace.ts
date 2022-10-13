@@ -4,6 +4,7 @@
       if the stack trace originates from the Go SDK
   It returns undefined otherwise
  */
+import { parseWithBigInt } from '../parse-with-big-int';
 import { isFromGoSDK } from './is-from-go-sdk';
 
 export const getFilePathsFromGoStackTrace = (
@@ -27,7 +28,7 @@ export const getFilePathsFromGoStackTrace = (
         }
         const [pathValue, codeLineValue] = splitLine;
         const jsonString = `{"filePath": "", "codeLine": ${codeLineValue}, "character": null}`;
-        const jsonObj = JSON.parse(jsonString);
+        const jsonObj = parseWithBigInt(jsonString);
         jsonObj.filePath = pathValue; //To avoid issues with parsing windows paths to JSON
         paths.push(jsonObj);
       });

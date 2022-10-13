@@ -1,4 +1,3 @@
-import { get } from 'svelte/store';
 import { dataEncoderEndpoint } from '$lib/stores/data-encoder-config';
 import {
   convertPayloadToJsonWithCodec,
@@ -9,18 +8,12 @@ import {
 import { formatDate } from '$lib/utilities/format-date';
 import { has } from '$lib/utilities/has';
 import { findAttributesAndKey } from '$lib/utilities/is-event-type';
+import { getEncoderEndpoint } from '$lib/utilities/get-encoder-endpoint';
 
 import { groupEvents } from '../event-groups';
 import { getEventCategory } from './get-event-categorization';
 import { getEventClassification } from './get-event-classification';
 import { simplifyAttributes } from './simplify-attributes';
-
-const getEndpoint = (
-  settings: Settings,
-  encoderEndpoint = dataEncoderEndpoint,
-): string => {
-  return get(encoderEndpoint) || settings?.codec?.endpoint || '';
-};
 
 export async function getEventAttributes(
   { historyEvent, namespace, settings, accessToken }: EventWithMetadata,
@@ -33,7 +26,7 @@ export async function getEventAttributes(
 ): Promise<EventAttributesWithType> {
   const { key, attributes } = findAttributesAndKey(historyEvent);
   // Use locally set endpoint over settings endpoint for testing purposes
-  const endpoint = getEndpoint(settings, encoderEndpoint);
+  const endpoint = getEncoderEndpoint(settings, encoderEndpoint);
   const _settings = { ...settings, codec: { ...settings?.codec, endpoint } };
 
   const convertedAttributes = endpoint

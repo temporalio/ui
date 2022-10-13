@@ -2,6 +2,10 @@ import { browser } from '$app/env';
 import { writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 import { isFunction } from '$lib/utilities/is-function';
+import {
+  parseWithBigInt,
+  stringifyWithBigInt,
+} from '$lib/utilities/parse-with-big-int';
 
 export function persistStore<T>(
   name: string,
@@ -16,7 +20,7 @@ export function persistStore<T>(
   if (browser) {
     try {
       if (window?.localStorage?.getItem(name)) {
-        initialStoreValue = JSON.parse(
+        initialStoreValue = parseWithBigInt(
           window?.localStorage?.getItem(name) ?? '',
         );
       }
@@ -46,7 +50,7 @@ export function persistStore<T>(
         if (x === null) {
           window?.localStorage?.removeItem(name);
         } else {
-          window?.localStorage?.setItem(name, JSON.stringify(x));
+          window?.localStorage?.setItem(name, stringifyWithBigInt(x));
         }
       }
       set(x);
