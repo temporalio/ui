@@ -8,7 +8,7 @@ export const getAuthUser = (): User => get(authUser);
 export const setAuthUser = (user: User) => {
   const { accessToken, idToken, name, email, picture } = user;
 
-  if (!accessToken || accessToken == '{{.AccessToken}}') {
+  if (!accessToken) {
     throw new Error('No access token');
   }
 

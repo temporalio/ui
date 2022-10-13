@@ -13,7 +13,10 @@
   import { getDefaultNamespace } from '$lib/utilities/get-namespace';
   import { isAuthorized } from '$lib/utilities/is-authorized';
   import { routeForLoginPage } from '$lib/utilities/route-for';
-  import { getAuthUserCookie } from '$lib/utilities/get-auth-user-cookie';
+  import {
+    getAuthUserCookie,
+    cleanAuthUserCookie,
+  } from '$lib/utilities/auth-user-cookie';
 
   export const load: Load = async function ({ fetch }) {
     const settings: Settings = await fetchSettings(fetch);
@@ -21,6 +24,7 @@
     const authUser = getAuthUserCookie();
     if (authUser?.accessToken) {
       setAuthUser(authUser);
+      cleanAuthUserCookie();
     }
 
     const user = getAuthUser();

@@ -1,5 +1,6 @@
 import { browser } from '$app/env';
 import { parseWithBigInt } from './parse-with-big-int';
+import { atob } from '$lib/utilities/atob';
 
 type UserResponse = {
   AccessToken: string;
@@ -29,7 +30,7 @@ export const getAuthUserCookie = (isBrowser = browser): User => {
 
   if (userBase64) {
     try {
-      const userS = decodeB64(userBase64);
+      const userS = atob(userBase64);
       const user: UserResponse = parseWithBigInt(userS);
 
       return {
@@ -47,6 +48,17 @@ export const getAuthUserCookie = (isBrowser = browser): User => {
   return {};
 };
 
-function decodeB64(str) {
-  return decodeURIComponent(atob(str));
-}
+export const cleanAuthUserCookie = (isBrowser = browser) => {
+  if (!isBrowser) return;
+
+  const cookies = document.cookie.split(';');
+  let i = 0;
+  let next = cookies.find((c) => c.includes(cookieName + i));
+
+  while (next) {
+    const [name] = next.split('=');
+    document.cookie = `${name}=; max-age=-1; path=/`;
+    i++;
+    next = cookies.find((c) => c.includes(cookieName + i));
+  }
+};
