@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import type { Hst as HST } from '@histoire/plugin-svelte';
+  import { stringifyWithBigInt } from '../utilities/parse-with-big-int';
   import Accordion from './accordion.svelte';
   import Button from './button.svelte';
   import CodeBlock from './code-block.svelte';
