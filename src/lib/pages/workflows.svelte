@@ -68,19 +68,21 @@
       <p data-cy="namespace-name">
         {$page.params.namespace}
       </p>
-      <div class="h-1 w-1 rounded-full bg-gray-400" />
-      <p data-cy="workflow-count">
-        {#if $loading}
-          <span class="text-gray-400">loading</span>
-        {:else if $updating}
-          <span class="text-gray-400">filtering</span>
-        {:else if query}
-          Results {$workflowCount?.count ?? 0} of {$workflowCount?.totalCount ??
-            0} workflows
-        {:else}
-          {$workflowCount?.totalCount ?? 0} workflows
-        {/if}
-      </p>
+      {#if $workflowCount?.totalCount >= 0}
+        <div class="h-1 w-1 rounded-full bg-gray-400" />
+        <p data-cy="workflow-count">
+          {#if $loading}
+            <span class="text-gray-400">loading</span>
+          {:else if $updating}
+            <span class="text-gray-400">filtering</span>
+          {:else if query}
+            Results {$workflowCount?.count ?? 0} of {$workflowCount?.totalCount ??
+              0} workflows
+          {:else}
+            {$workflowCount?.totalCount ?? 0} workflows
+          {/if}
+        </p>
+      {/if}
     </div>
   </div>
   <div>

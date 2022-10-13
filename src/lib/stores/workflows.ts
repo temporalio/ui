@@ -23,8 +23,8 @@ const parameters = derived(
   },
 );
 
-const setCounts = (count: number, totalCount: number) => {
-  workflowCount.set({ count, totalCount });
+const setCounts = (_workflowCount: { totalCount: number; count: number }) => {
+  workflowCount.set(_workflowCount);
 };
 
 const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
@@ -32,14 +32,14 @@ const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
     const isWorkflowsPage = path === `/namespaces/${namespace}/workflows`;
     if (isWorkflowsPage) {
       withLoading(loading, updating, async () => {
-        const { workflows, count, totalCount, error } = await fetchAllWorkflows(
+        const { workflows, workflowCount, error } = await fetchAllWorkflows(
           namespace,
           {
             query,
           },
         );
         set(workflows);
-        setCounts(count, totalCount);
+        setCounts(workflowCount);
         if (error) {
           workflowError.set(error);
         } else {
