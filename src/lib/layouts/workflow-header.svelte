@@ -2,7 +2,7 @@
   import Icon from '$holocene/icon/icon.svelte';
 
   import { eventViewType } from '$lib/stores/event-view';
-  import { workflowsQuery } from '$lib/stores/workflows';
+  // import { workflowsQuery } from '$lib/stores/workflows';
 
   import {
     routeForEventHistory,
@@ -37,9 +37,7 @@
   <main class="relative flex flex-col gap-1">
     <div class="-mt-3 -ml-2 block">
       <a
-        href={`/namespaces/${namespace}/workflows?query=${encodeURIForSvelte(
-          $workflowsQuery ?? '',
-        )}`}
+        href={`/namespaces/${namespace}/workflows`}
         data-cy="back-to-workflows"
         class="back-to-workflows"
       >

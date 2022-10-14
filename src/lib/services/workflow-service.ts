@@ -18,7 +18,6 @@ export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
 
 export type CombinedWorkflowExecutionsResponse = {
   workflows: WorkflowExecution[];
-  workflowCount?: { totalCount: number; count: number };
   nextPageToken: string;
   error?: string;
 };
@@ -27,11 +26,11 @@ export type FetchWorkflow =
   | typeof fetchAllWorkflows
   | typeof fetchAllArchivedWorkflows;
 
-const fetchWorkflowCount = async (
+export const fetchWorkflowCount = async (
   namespace: string,
   query: string,
   request = fetch,
-) => {
+): Promise<{ totalCount: number, count: number }> => {
   let totalCount = 0;
   let count = 0;
   try {
@@ -111,19 +110,8 @@ export const fetchAllWorkflows = async (
       request,
     })) ?? { executions: [], nextPageToken: '' };
 
-  if (archived) {
-    return {
-      workflows: toWorkflowExecutions({ executions }),
-      nextPageToken: String(nextPageToken),
-      error,
-    };
-  }
-
-  const workflowCount = await fetchWorkflowCount(namespace, query, request);
-
   return {
     workflows: toWorkflowExecutions({ executions }),
-    workflowCount,
     nextPageToken: String(nextPageToken),
     error,
   };
