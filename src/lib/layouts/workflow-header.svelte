@@ -4,7 +4,7 @@
   import { autoRefreshWorkflow, eventViewType } from '$lib/stores/event-view';
   import { workflowsSearch } from '$lib/stores/workflows';
   import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
-  import { workflowRun, refresh } from '$lib/stores/workflow-run';
+  import { workflowRun, refresh, loading } from '$lib/stores/workflow-run';
 
   import {
     routeForEventHistory,
@@ -22,7 +22,6 @@
   import { encodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { page } from '$app/stores';
   import { pathMatches } from '$lib/utilities/path-matches';
-  import { onDestroy } from 'svelte';
   import AutoRefreshWorkflow from '$lib/components/auto-refresh-workflow.svelte';
 
   export let namespace: string;
@@ -40,15 +39,32 @@
   const { parameters, searchType } = $workflowsSearch;
   const query = toListWorkflowQuery(parameters);
 
+  $: isRunning = $workflowRun.workflow.isRunning;
+
   $: {
-    // if ($workflowRun.workflow.isRunning) {
-    // Auto-refresh of 15 seconds
-    // clearInterval(refreshInterval);
-    // refreshInterval = setInterval(() => ($refresh = Date.now()), 15000);
-    // } else {
-    //   clearInterval(refreshInterval);
-    // }
+    if ($autoRefreshWorkflow === 'on' && !$loading) {
+      refreshWorkflow(isRunning);
+    }
   }
+
+  const refreshWorkflow = (running: boolean) => {
+    if (running) {
+      // Auto-refresh of 15 seconds
+      clearInterval(refreshInterval);
+      refreshInterval = setInterval(() => ($refresh = Date.now()), 5000);
+    } else {
+      clearInterval(refreshInterval);
+    }
+  };
+
+  const onRefreshClick = () => {
+    if ($autoRefreshWorkflow === 'off') {
+      $autoRefreshWorkflow = 'on';
+    } else {
+      $autoRefreshWorkflow = 'off';
+      clearInterval(refreshInterval);
+    }
+  };
 </script>
 
 <header class="mb-4 flex flex-col gap-4">
@@ -70,7 +86,7 @@
         <span class="select-all font-medium">{workflow.id}</span>
       </h1>
       <div class="ml-8 flex items-center justify-end gap-4">
-        <AutoRefreshWorkflow />
+        <AutoRefreshWorkflow onClick={onRefreshClick} />
         <TerminateWorkflow {workflow} {namespace} />
       </div>
     </div>

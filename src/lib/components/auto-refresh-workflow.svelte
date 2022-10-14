@@ -1,21 +1,14 @@
 <script lang="ts">
-  import Icon from '$holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
 
   import { autoRefreshWorkflow } from '$lib/stores/event-view';
 
-  const onClick = () => {
-    if ($autoRefreshWorkflow === 'off') {
-      $autoRefreshWorkflow = 'on';
-    } else {
-      $autoRefreshWorkflow = 'off';
-    }
-  };
+  export let onClick: () => void;
 
   $: active = $autoRefreshWorkflow === 'on';
 </script>
 
-<Tooltip left text="This page refreshes every 15 seconds">
+<Tooltip bottomLeft text="This page refreshes every 15 seconds">
   <button on:click={onClick} class:active
     ><span class="dot" />{active ? 'on' : 'off'}</button
   >
