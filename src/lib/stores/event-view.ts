@@ -13,7 +13,10 @@ export type EventSortOrderOptions = {
   option: EventSortOrder;
 }[];
 
-export const autoRefreshWorkflow = persistStore<'on' | 'off'>('autoRefreshWorkflow', 'off');
+export const autoRefreshWorkflow = persistStore<'on' | 'off'>(
+  'autoRefreshWorkflow',
+  'off',
+);
 
 export const eventViewType = persistStore<EventView>('eventView', 'feed');
 

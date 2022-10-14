@@ -1,6 +1,14 @@
 import { fetchRawEvents } from '$lib/services/events-service';
 
-export const exportHistory = async ({ namespace, workflowId, runId }: { namespace: string, workflowId: string, runId: string }) => {
+export const exportHistory = async ({
+  namespace,
+  workflowId,
+  runId,
+}: {
+  namespace: string;
+  workflowId: string;
+  runId: string;
+}) => {
   const events = await fetchRawEvents({
     namespace,
     workflowId,

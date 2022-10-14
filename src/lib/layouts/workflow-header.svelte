@@ -41,18 +41,14 @@
   const query = toListWorkflowQuery(parameters);
 
   $: {
-    clearInterval(refreshInterval);
-    if ($autoRefreshWorkflow === 'on') {
-      if ($workflowRun.workflow.isRunning) {
-        // Auto-refresh of 15 seconds
-        refreshInterval = setInterval(() => ($refresh = Date.now()), 15000);
-      }
-    }
+    // if ($workflowRun.workflow.isRunning) {
+    // Auto-refresh of 15 seconds
+    // clearInterval(refreshInterval);
+    // refreshInterval = setInterval(() => ($refresh = Date.now()), 15000);
+    // } else {
+    //   clearInterval(refreshInterval);
+    // }
   }
-
-  onDestroy(() => {
-    clearInterval(refreshInterval);
-  });
 </script>
 
 <header class="mb-4 flex flex-col gap-4">
