@@ -13,6 +13,10 @@
   import { onDestroy } from 'svelte';
   import { clearPreviousEventParameters } from '$lib/stores/events';
 
+  import WorkflowHistoryFeed from '$lib/layouts/workflow-history-feed.svelte';
+  import WorkflowHistoryCompact from '$lib/layouts/workflow-history-compact.svelte';
+  import WorkflowHistoryJson from '$lib/layouts/workflow-history-json.svelte';
+
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import PendingActivities from '$lib/components/workflow/pending-activities.svelte';
@@ -153,6 +157,12 @@
         </ToggleButtons>
       </div>
     </nav>
-    <slot />
+    {#if $eventViewType === 'compact'}
+      <WorkflowHistoryCompact />
+    {:else if $eventViewType === 'json'}
+      <WorkflowHistoryJson />
+    {:else}
+      <WorkflowHistoryFeed />
+    {/if}
   </section>
 </section>
