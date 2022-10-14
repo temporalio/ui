@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { workflowRun, refresh } from '$lib/stores/workflow-run';
+  import { workflowRun } from '$lib/stores/workflow-run';
 
   import {
     routeForWorkflow,
@@ -21,11 +21,10 @@
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
   import { timeFormat } from '$lib/stores/time-format';
+  import { exportHistory } from '$lib/utilities/export-history';
 
   const { namespace } = $page.params;
   const { workflow, workers } = $workflowRun;
-
-  let refreshInterval;
 
   const routeParameters = (view: EventView, eventId?: string) => ({
     namespace,
@@ -41,18 +40,7 @@
     run: workflow.runId,
   };
 
-  $: {
-    if ($workflowRun.workflow.isRunning) {
-      clearInterval(refreshInterval);
-      // Auto-refresh of 15 seconds
-      refreshInterval = setInterval(() => ($refresh = Date.now()), 15000);
-    } else {
-      clearInterval(refreshInterval);
-    }
-  }
-
   onDestroy(() => {
-    clearInterval(refreshInterval);
     clearPreviousEventParameters();
   });
 </script>
@@ -162,6 +150,16 @@
             active={$eventViewType === 'json'}
             data-cy="json"
             on:click={() => ($eventViewType = 'json')}>JSON</ToggleButton
+          >
+          <ToggleButton
+            icon="download"
+            data-cy="download"
+            on:click={() =>
+              exportHistory({
+                namespace,
+                workflowId: workflow.id,
+                runId: workflow.runId,
+              })}>Download</ToggleButton
           >
         </ToggleButtons>
       </div>

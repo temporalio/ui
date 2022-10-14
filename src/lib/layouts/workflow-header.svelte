@@ -1,9 +1,10 @@
 <script lang="ts">
   import Icon from '$holocene/icon/icon.svelte';
 
-  import { eventViewType } from '$lib/stores/event-view';
+  import { autoRefreshWorkflow, eventViewType } from '$lib/stores/event-view';
   import { workflowsSearch } from '$lib/stores/workflows';
   import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
+  import { workflowRun, refresh } from '$lib/stores/workflow-run';
 
   import {
     routeForEventHistory,
@@ -17,15 +18,18 @@
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
-  import ExportHistory from '$lib/components/export-history.svelte';
   import Tab from '$lib/holocene/tab.svelte';
   import { encodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { page } from '$app/stores';
   import { pathMatches } from '$lib/utilities/path-matches';
+  import { onDestroy } from 'svelte';
+  import AutoRefreshWorkflow from '$lib/components/auto-refresh-workflow.svelte';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
   export let workers: GetPollersResponse;
+
+  let refreshInterval;
 
   const routeParameters = {
     namespace,
@@ -35,6 +39,20 @@
 
   const { parameters, searchType } = $workflowsSearch;
   const query = toListWorkflowQuery(parameters);
+
+  $: {
+    clearInterval(refreshInterval);
+    if ($autoRefreshWorkflow === 'on') {
+      if ($workflowRun.workflow.isRunning) {
+        // Auto-refresh of 15 seconds
+        refreshInterval = setInterval(() => ($refresh = Date.now()), 15000);
+      }
+    }
+  }
+
+  onDestroy(() => {
+    clearInterval(refreshInterval);
+  });
 </script>
 
 <header class="mb-4 flex flex-col gap-4">
@@ -56,11 +74,7 @@
         <span class="select-all font-medium">{workflow.id}</span>
       </h1>
       <div class="ml-8 flex items-center justify-end gap-4">
-        <ExportHistory
-          {namespace}
-          workflowId={workflow.id}
-          runId={workflow.runId}
-        />
+        <AutoRefreshWorkflow />
         <TerminateWorkflow {workflow} {namespace} />
       </div>
     </div>
