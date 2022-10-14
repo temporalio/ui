@@ -30,7 +30,7 @@ export const fetchWorkflowCount = async (
   namespace: string,
   query: string,
   request = fetch,
-): Promise<{ totalCount: number, count: number }> => {
+): Promise<{ totalCount: number; count: number }> => {
   let totalCount = 0;
   let count = 0;
   try {
