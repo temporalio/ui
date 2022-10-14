@@ -23,6 +23,7 @@
   import { page } from '$app/stores';
   import { pathMatches } from '$lib/utilities/path-matches';
   import AutoRefreshWorkflow from '$lib/components/auto-refresh-workflow.svelte';
+  import { onDestroy, onMount } from 'svelte';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
@@ -41,11 +42,21 @@
 
   $: isRunning = $workflowRun.workflow.isRunning;
 
-  $: {
-    if ($autoRefreshWorkflow === 'on' && !$loading) {
-      refreshWorkflow(isRunning);
+  onMount(() => {
+    if (isRunning && $autoRefreshWorkflow === 'on') {
+      refreshInterval = setInterval(() => ($refresh = Date.now()), 5000);
     }
-  }
+  });
+
+  onDestroy(() => {
+    clearInterval(refreshInterval);
+  });
+
+  // $: {
+  //   if ($autoRefreshWorkflow === 'on' && !$loading) {
+  //     refreshWorkflow(isRunning);
+  //   }
+  // }
 
   const refreshWorkflow = (running: boolean) => {
     if (running) {
@@ -86,7 +97,9 @@
         <span class="select-all font-medium">{workflow.id}</span>
       </h1>
       <div class="ml-8 flex items-center justify-end gap-4">
-        <AutoRefreshWorkflow onClick={onRefreshClick} />
+        {#if true}
+          <AutoRefreshWorkflow onClick={onRefreshClick} />
+        {/if}
         <TerminateWorkflow {workflow} {namespace} />
       </div>
     </div>
