@@ -159,7 +159,7 @@ export const routeForAuthentication = (
 
 export const routeForLoginPage = (error = '', isBrowser = browser): string => {
   if (isBrowser) {
-    const login = new URL('login', window.location.origin);
+    const login = new URL(`${publicPath}/login`, window.location.origin);
     login.searchParams.set('returnUrl', window.location.href);
     if (error) {
       login.searchParams.set('error', error);
