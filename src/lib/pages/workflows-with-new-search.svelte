@@ -18,7 +18,7 @@
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
   import WorkflowsSummaryTableWithFilters from '$lib/components/workflow/workflows-summary-table-with-filters.svelte';
-  import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
+  import WorkflowsSummaryRowWithFilters from '$lib/components/workflow/workflows-summary-row-with-filters.svelte';
   import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
   import PageTitle from '$lib/holocene/page-title.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -100,7 +100,7 @@
   </svelte:fragment>
   <WorkflowsSummaryTableWithFilters updating={$loading || $updating}>
     {#each visibleItems as event}
-      <WorkflowsSummaryRow
+      <WorkflowsSummaryRowWithFilters
         workflow={event}
         namespace={$page.params.namespace}
         timeFormat={$timeFormat}

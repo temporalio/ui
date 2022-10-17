@@ -3,13 +3,12 @@
 
   import { formatDate, getMilliseconds } from '$lib/utilities/format-date';
   import { routeForWorkflow } from '$lib/utilities/route-for';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
-  import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import FilterOrCopyButtons from '$holocene/filter-or-copy-buttons.svelte';
   import TableRow from '$holocene/table/table-row.svelte';
+  import { workflowFilters, workflowSorts } from '$lib/stores/filters';
+  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   export let namespace: string;
   export let workflow: WorkflowExecution;
   export let timeFormat: TimeFormat | string;
@@ -22,21 +21,26 @@
 
   let showFilterCopy = false;
 
+  const getOtherFilters = () =>
+    $workflowFilters.filter((f) => f.attribute !== 'WorkflowType');
+
+  $: typeFilter = $workflowFilters.find((f) => f.attribute === 'WorkflowType');
+
   const onTypeClick = (type: string) => {
-    const defaultQuery = toListWorkflowQuery({ timeRange: 'All' });
-    const query = $page.url.searchParams.get('query');
-    const parameters = toListWorkflowParameters(query ?? defaultQuery);
-    const workflowType = parameters?.workflowType === type ? '' : type;
-    const value = toListWorkflowQuery({
-      ...parameters,
-      workflowType,
-    });
-    updateQueryParameters({
-      url: $page.url,
-      parameter: 'query',
-      value,
-      allowEmpty: true,
-    });
+    if (!typeFilter) {
+      const filter = {
+        attribute: 'WorkflowType',
+        value: type,
+        conditional: '=',
+        operator: '',
+        parenthesis: '',
+      };
+      $workflowFilters = [...getOtherFilters(), filter];
+    } else {
+      $workflowFilters = [...getOtherFilters()];
+    }
+
+    updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
   };
 </script>
 
