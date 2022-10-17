@@ -4,11 +4,11 @@ import type { PageLoad } from '@sveltejs/kit';
 import type { CombinedWorkflowExecutionsResponse } from '$lib/services/workflow-service';
 import type { DescribeNamespaceResponse } from '$types';
 
-export const load: PageLoad = async function ({ params, url, stuff }) {
+export const load: PageLoad = async function ({ params, url, parent }) {
+  const data = await parent();
   const { searchParams } = url;
 
-  if (!searchParams.has('time-range'))
-    searchParams.set('time-range', '1 day');
+  if (!searchParams.has('time-range')) searchParams.set('time-range', '1 day');
 
   const namespace = params.namespace;
   const workflowId = searchParams.get('workflow-id');
@@ -23,7 +23,7 @@ export const load: PageLoad = async function ({ params, url, stuff }) {
     executionStatus,
   };
 
-  const namespaces: DescribeNamespaceResponse[] = stuff.namespaces;
+  const namespaces: DescribeNamespaceResponse[] = data.namespaces;
 
   const currentNamespaceConfig = namespaces.find(
     (namespaceConfig) => namespaceConfig.namespaceInfo.name === namespace,

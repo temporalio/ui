@@ -55,7 +55,7 @@ export const load: LayoutLoad.root = async function ({ fetch }) {
   };
 
   return {
-    user, 
+    user,
     uiVersionInfo,
     namespaces: namespacesResp?.namespaces,
     settings: { ...settings, defaultNamespace },
