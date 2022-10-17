@@ -1,4 +1,4 @@
-import { browser } from '$app/env';
+import { browser } from '$app/environment';
 import { toURL } from '$lib/utilities/to-url';
 import { publicPath } from '$lib/utilities/get-public-path';
 import { encodeURIForSvelte } from '$lib/utilities/encode-uri';

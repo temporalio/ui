@@ -1,4 +1,4 @@
-import { browser } from '$app/env';
+import { browser } from '$app/environment';
 
 export function getApiOrigin(isBrowser = browser): string | null {
   const endpoint = import.meta.env.VITE_API;

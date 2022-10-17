@@ -1,4 +1,4 @@
-import { browser } from '$app/env';
+import { browser } from '$app/environment';
 import { parseWithBigInt } from './parse-with-big-int';
 import { atob } from '$lib/utilities/atob';
 

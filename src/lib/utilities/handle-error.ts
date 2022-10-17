@@ -1,4 +1,4 @@
-import { browser } from '$app/env';
+import { browser } from '$app/environment';
 import { networkError } from '$lib/stores/error';
 import { notifications as notificationStore } from '$lib/stores/notifications';
 import { isNetworkError } from './is-network-error';

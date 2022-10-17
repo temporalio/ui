@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { beforeNavigate } from '$app/navigation';
-  import { browser, dev } from '$app/env';
+  import { browser, dev } from '$app/environment';
   import { page } from '$app/stores';
 
   import { isNetworkError } from '$lib/utilities/is-network-error';
