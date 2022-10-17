@@ -44,43 +44,39 @@
 
   onMount(() => {
     if (isRunning && $autoRefreshWorkflow === 'on') {
+      // Auto-refresh of 15 seconds if turned on
+      clearInterval(refreshInterval);
       refreshInterval = setInterval(() => ($refresh = Date.now()), 5000);
     }
   });
+
+  $: {
+    if (!isRunning) {
+      // Stop refresh if worfklow is no longer running
+      clearInterval(refreshInterval);
+    }
+  }
+
+  const onRefreshChange = () => {
+    if ($autoRefreshWorkflow === 'on') {
+      $autoRefreshWorkflow = 'off';
+      clearInterval(refreshInterval);
+    } else {
+      $refresh = Date.now();
+      $autoRefreshWorkflow = 'on';
+      clearInterval(refreshInterval);
+      refreshInterval = setInterval(() => ($refresh = Date.now()), 5000);
+    }
+  };
 
   onDestroy(() => {
     clearInterval(refreshInterval);
   });
-
-  // $: {
-  //   if ($autoRefreshWorkflow === 'on' && !$loading) {
-  //     refreshWorkflow(isRunning);
-  //   }
-  // }
-
-  const refreshWorkflow = (running: boolean) => {
-    if (running) {
-      // Auto-refresh of 15 seconds
-      clearInterval(refreshInterval);
-      refreshInterval = setInterval(() => ($refresh = Date.now()), 5000);
-    } else {
-      clearInterval(refreshInterval);
-    }
-  };
-
-  const onRefreshClick = () => {
-    if ($autoRefreshWorkflow === 'off') {
-      $autoRefreshWorkflow = 'on';
-    } else {
-      $autoRefreshWorkflow = 'off';
-      clearInterval(refreshInterval);
-    }
-  };
 </script>
 
 <header class="mb-4 flex flex-col gap-4">
   <main class="relative flex flex-col gap-1">
-    <div class="-mt-3 -ml-2 block">
+    <div class="-mt-3 -ml-2 mb-4 block">
       <a
         href={`/namespaces/${namespace}/workflows?query=${encodeURIForSvelte(
           query,
@@ -91,17 +87,19 @@
         <Icon name="chevron-left" class="inline" />Back to Workflows
       </a>
     </div>
-    <div class="mb-8 flex items-center justify-between">
+    <div
+      class="mb-8 flex flex-col items-start justify-between gap-4 xl:flex-row xl:gap-0"
+    >
       <h1 class="relative flex items-center gap-4 text-2xl">
         <WorkflowStatus status={workflow?.status} />
         <span class="select-all font-medium">{workflow.id}</span>
       </h1>
-      <div class="ml-8 flex items-center justify-end gap-4">
-        {#if true}
-          <AutoRefreshWorkflow onClick={onRefreshClick} />
-        {/if}
-        <TerminateWorkflow {workflow} {namespace} />
-      </div>
+      {#if isRunning}
+        <div class="flex w-96 items-center justify-start gap-4 xl:justify-end">
+          <AutoRefreshWorkflow onChange={onRefreshChange} />
+          <TerminateWorkflow {workflow} {namespace} />
+        </div>
+      {/if}
     </div>
     <nav class="flex flex-wrap gap-6">
       <Tab
