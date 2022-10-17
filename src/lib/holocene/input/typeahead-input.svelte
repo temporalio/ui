@@ -79,9 +79,9 @@
     />
     <Menu show={showMenu} id={`menu-${id}`} class="h-auto max-h-80 w-64">
       {#each filterOptions as { label, value }}
-        <Option class="truncate" {value}>{label}</Option>
+        <Option {value}>{label}</Option>
       {:else}
-        <Option class="truncate">No Results</Option>
+        <Option>No Results</Option>
       {/each}
     </Menu>
   </MenuContainer>
