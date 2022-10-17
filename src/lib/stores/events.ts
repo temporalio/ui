@@ -48,7 +48,7 @@ const runId = derived([page], ([$page]) => {
   return '';
 });
 
-const settings = derived([page], ([$page]) => $page.stuff.settings);
+const settings = derived([page], ([$page]) => $page.data.settings);
 
 const accessToken = derived(
   [authUser],

@@ -20,10 +20,10 @@
 
   export let user: User;
 
-  const { showTemporalSystemNamespace } = $page.stuff.settings;
-  const { isCloud } = $page.stuff.settings.runtimeEnvironment;
+  const { showTemporalSystemNamespace } = $page.data.settings;
+  const { isCloud } = $page.data.settings.runtimeEnvironment;
 
-  const namespaces = ($page.stuff.namespaces || [])
+  const namespaces = ($page.data.namespaces || [])
     .map((namespace: Namespace) => namespace?.namespaceInfo?.name)
     .filter(
       (namespace: string) =>
@@ -31,7 +31,7 @@
     );
 
   $: activeNamespaceName = $page.params?.namespace ?? $lastUsedNamespace;
-  $: activeNamespace = ($page.stuff.namespaces || []).find(
+  $: activeNamespace = ($page.data.namespaces || []).find(
     (namespace: Namespace) =>
       namespace?.namespaceInfo?.name === activeNamespaceName,
   );
@@ -78,7 +78,7 @@
     schedules: routeForSchedules({ namespace: activeNamespaceName }),
     workflows: routeForWorkflows({ namespace: activeNamespaceName }),
     feedback:
-      $page.stuff?.settings?.feedbackURL ||
+      $page.data?.settings?.feedbackURL ||
       'https://github.com/temporalio/ui/issues/new/choose',
   };
 

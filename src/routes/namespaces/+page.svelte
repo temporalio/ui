@@ -9,8 +9,8 @@
   import TableRow from '$holocene/table/table-row.svelte';
   import type { DescribeNamespaceResponse as Namespace } from '$types';
 
-  const { showTemporalSystemNamespace } = $page.stuff.settings;
-  const namespaces: Namespace[] = ($page.stuff.namespaces || []).filter(
+  const { showTemporalSystemNamespace } = $page.data.settings;
+  const namespaces: Namespace[] = ($page.data.namespaces || []).filter(
     (namespace: Namespace) =>
       showTemporalSystemNamespace ||
       namespace.namespaceInfo.name !== 'temporal-system',

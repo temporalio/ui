@@ -40,7 +40,7 @@
         workflow: workflowParams,
         queryType,
       },
-      $page.stuff.settings,
+      $page.data.settings,
       $authUser?.accessToken,
     );
   };

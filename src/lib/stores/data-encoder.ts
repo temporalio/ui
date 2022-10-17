@@ -30,7 +30,7 @@ export const dataEncoder = derived(
     const namespace = $page.params.namespace;
     const settingsEndpoint = $page?.stuff?.settings?.codec?.endpoint;
     const endpoint = $dataEncoderEndpoint || settingsEndpoint;
-    const passAccessToken = $page.stuff?.settings?.codec?.passAccessToken;
+    const passAccessToken = $page.data?.settings?.codec?.passAccessToken;
     const accessToken = $authUser?.accessToken;
     const hasNotRequested = endpoint
       ? $lastDataEncoderStatus === 'notRequested'

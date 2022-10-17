@@ -14,7 +14,7 @@ export const refresh = writable(0);
 const namespace = derived([page], ([$page]) => $page.params.namespace);
 const workflowId = derived([page], ([$page]) => $page.params.workflow);
 const runId = derived([page], ([$page]) => $page.params.run);
-const settings = derived([page], ([$page]) => $page.stuff.settings);
+const settings = derived([page], ([$page]) => $page.data.settings);
 const accessToken = derived(
   [authUser],
   ([$authUser]) => $authUser?.accessToken,

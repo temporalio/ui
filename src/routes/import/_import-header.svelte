@@ -4,8 +4,8 @@
 
   import { routeForImport, routeForWorkflows } from '$lib/utilities/route-for';
 
-  const { isCloud } = $page.stuff.settings.runtimeEnvironment;
-  $: namespace = $page.stuff?.settings?.defaultNamespace;
+  const { isCloud } = $page.data.settings.runtimeEnvironment;
+  $: namespace = $page.data?.settings?.defaultNamespace;
 
   $: linkList = {
     home: routeForWorkflows({ namespace }),
