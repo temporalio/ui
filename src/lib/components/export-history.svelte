@@ -1,6 +1,7 @@
 <script lang="ts">
   import { fetchRawEvents } from '$lib/services/events-service';
   import Button from '$holocene/button.svelte';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   export let namespace: string;
   export let workflowId: string;
@@ -14,7 +15,7 @@
       sort: 'ascending',
     });
 
-    const content = JSON.stringify({ events }, null, 2);
+    const content = stringifyWithBigInt({ events }, null, 2);
     download(content, `${runId}/events.json`, 'text/plain');
 
     function download(content: string, fileName: string, contentType: string) {
