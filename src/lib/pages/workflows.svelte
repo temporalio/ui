@@ -24,6 +24,7 @@
   import WorkflowFilters from '$lib/components/workflow/workflow-filters.svelte';
   import { getSearchType } from '$lib/utilities/search-type-parameter';
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
+  import Loading from '$lib/holocene/loading.svelte';
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
 
@@ -71,7 +72,7 @@
 </div>
 <WorkflowFilters bind:searchType />
 <Pagination items={$workflows} let:visibleItems>
-  <WorkflowsSummaryTable updating={$loading || $updating}>
+  <WorkflowsSummaryTable updating={$updating}>
     {#each visibleItems as event}
       <WorkflowsSummaryRow
         workflow={event}
@@ -82,11 +83,15 @@
       <TableRow>
         <td class="hidden xl:table-cell" />
         <td colspan="3">
-          <EmptyState
-            title={$loading ? 'Loading' : 'No Workflows Found'}
-            content={$loading ? '' : errorMessage}
-            error={$workflowError}
-          />
+          {#if $loading}
+            <Loading />
+          {:else}
+            <EmptyState
+              title="No Workflows Found"
+              content={errorMessage}
+              error={$workflowError}
+            />
+          {/if}
         </td>
         <td class="hidden xl:table-cell" />
       </TableRow>

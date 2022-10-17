@@ -26,6 +26,7 @@
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import TableRow from '$holocene/table/table-row.svelte';
   import WorkflowDateTime from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
 
   $: query = $page.url.searchParams.get('query');
 
@@ -98,7 +99,7 @@
   <svelte:fragment slot="action-top-center">
     <WorkflowDateTime />
   </svelte:fragment>
-  <WorkflowsSummaryTableWithFilters updating={$loading || $updating}>
+  <WorkflowsSummaryTableWithFilters updating={$updating}>
     {#each visibleItems as event}
       <WorkflowsSummaryRowWithFilters
         workflow={event}
@@ -109,11 +110,15 @@
       <TableRow>
         <td class="hidden xl:table-cell" />
         <td colspan="3">
-          <EmptyState
-            title={$loading ? 'Loading' : 'No Workflows Found'}
-            content={$loading ? '' : errorMessage}
-            error={$workflowError}
-          />
+          {#if $loading}
+            <Loading />
+          {:else}
+            <EmptyState
+              title="No Workflows Found"
+              content={errorMessage}
+              error={$workflowError}
+            />
+          {/if}
         </td>
         <td class="hidden xl:table-cell" />
       </TableRow>
