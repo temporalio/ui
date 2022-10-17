@@ -1,37 +1,3 @@
-<script context="module" lang="ts">
-  import type { Load } from '@sveltejs/kit';
-  import type { DescribeNamespaceResponse } from '$types';
-
-  export const load: Load = async function ({ params, url, stuff }) {
-    const { searchParams } = url;
-
-    if (searchParams.has('time-range')) searchParams.delete('time-range');
-
-    const namespace = params.namespace;
-    const namespaces: DescribeNamespaceResponse[] = stuff.namespaces;
-
-    const currentNamespace = namespaces.find(
-      (namespaceConfig) => namespaceConfig.namespaceInfo.name === namespace,
-    );
-
-    if (!currentNamespace) {
-      return {
-        error: `The namespace "${namespace}" does not exist.`,
-        status: 404,
-      };
-    }
-
-    const clusters = getClusters(currentNamespace);
-
-    return {
-      props: {
-        currentNamespace,
-        clusters,
-      },
-    };
-  };
-</script>
-
 <script lang="ts">
   import { onMount } from 'svelte';
   import { dev } from '$app/env';
@@ -43,15 +9,17 @@
   import { searchAttributes } from '$lib/stores/search-attributes';
 
   import { fromSecondsToDaysOrHours } from '$lib/utilities/format-date';
-  import { getClusters } from '$lib/utilities/get-clusters';
 
   import PageTitle from '$lib/holocene/page-title.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
 
-  export let currentNamespace: DescribeNamespaceResponse;
-  export let clusters: string;
+  import type { PageData } from '@sveltejs/kit';
+
+  export let data: PageData;
+  let { currentNamespace, clusters } = data;
+  $: ({ currentNamespace, clusters } = data);
 
   onMount(() => {
     $lastUsedNamespace = currentNamespace?.namespaceInfo?.name;

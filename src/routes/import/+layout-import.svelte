@@ -1,22 +1,3 @@
-<script context="module" lang="ts">
-  import type { Load } from '@sveltejs/kit';
-
-  import '../../app.css';
-
-  import { fetchSettings } from '$lib/services/settings-service';
-  import { getAuthUser } from '$lib/stores/auth-user';
-
-  export const load: Load = async function ({ fetch }) {
-    const settings: Settings = await fetchSettings(fetch);
-    const user = getAuthUser();
-
-    return {
-      props: { user },
-      stuff: { settings },
-    };
-  };
-</script>
-
 <script lang="ts">
   import Header from './_import-header.svelte';
   import Notifications from '$lib/components/notifications.svelte';

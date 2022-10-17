@@ -1,61 +1,4 @@
-<script context="module" lang="ts">
-  import type { Load } from '@sveltejs/kit';
-  import type { CombinedWorkflowExecutionsResponse } from '$lib/services/workflow-service';
-
-  export const load: Load = async function ({ params, url, stuff }) {
-    const { searchParams } = url;
-
-    if (!searchParams.has('time-range'))
-      searchParams.set('time-range', '1 day');
-
-    const namespace = params.namespace;
-    const workflowId = searchParams.get('workflow-id');
-    const workflowType = searchParams.get('workflow-type');
-    const timeRange = searchParams.get('time-range');
-    const executionStatus = searchParams.get('status') as WorkflowStatus;
-
-    const parameters: ArchiveFilterParameters = {
-      workflowId,
-      workflowType,
-      closeTime: timeRange,
-      executionStatus,
-    };
-
-    const namespaces: DescribeNamespaceResponse[] = stuff.namespaces;
-
-    const currentNamespaceConfig = namespaces.find(
-      (namespaceConfig) => namespaceConfig.namespaceInfo.name === namespace,
-    );
-
-    // These are incorrectly typed as enums and need to be coerced to strings
-    const archivalEnabled =
-      (currentNamespaceConfig?.config
-        ?.historyArchivalState as unknown as string) === 'Enabled';
-
-    const visibilityArchivalEnabled =
-      (currentNamespaceConfig?.config
-        ?.visibilityArchivalState as unknown as string) === 'Enabled';
-
-    const initialData: CombinedWorkflowExecutionsResponse | null =
-      archivalEnabled && visibilityArchivalEnabled
-        ? await fetchAllArchivedWorkflows(namespace, parameters, fetch)
-        : null;
-
-    return {
-      props: {
-        workflows: initialData ? initialData.workflows : [],
-        namespace,
-        archivalEnabled,
-        visibilityArchivalEnabled,
-      },
-    };
-  };
-</script>
-
 <script lang="ts">
-  import type { DescribeNamespaceResponse } from '$types';
-  import { fetchAllArchivedWorkflows } from '$lib/services/workflow-service';
-
   import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
   import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
   import WorkflowFilters from './_workflow-filters.svelte';
@@ -65,11 +8,17 @@
   import { timeFormat } from '$lib/stores/time-format';
   import PageTitle from '$lib/holocene/page-title.svelte';
   import { page } from '$app/stores';
+  import type { PageData } from '$types';
 
-  export let namespace: string;
-  export let workflows: WorkflowExecution[];
-  export let archivalEnabled: boolean = false;
-  export let visibilityArchivalEnabled: boolean = false;
+  export let data: PageData;
+  let {
+    namespace,
+    workflows,
+    archivalEnabled = false,
+    visibilityArchivalEnabled = false,
+  } = data;
+  $: ({ namespace, workflows, archivalEnabled, visibilityArchivalEnabled } =
+    data);
 </script>
 
 <PageTitle title={`Archival | ${namespace}`} url={$page.url.href} />

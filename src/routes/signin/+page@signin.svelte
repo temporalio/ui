@@ -1,37 +1,18 @@
-<script context="module" lang="ts">
+<script lang="ts">
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-
   import Button from '$holocene/button.svelte';
-  import { routeForAuthentication } from '$lib/utilities/route-for';
-  import { fetchSettings } from '$lib/services/settings-service';
-
-  import type { Load } from '@sveltejs/kit';
-
-  export const load: Load = async function ({ fetch }) {
-    const settings: Settings = await fetchSettings(fetch);
-
-    if (!settings.auth.enabled) {
-      return {
-        status: 404,
-      };
-    }
-
-    return {
-      props: { settings },
-      stuff: { settings },
-    };
-  };
-</script>
-
-<script lang="ts">
   import NavigationHeader from '$lib/components/navigation-header.svelte';
   import HamburgerHeader from '$lib/components/hamburger-header.svelte';
   import { publicPath } from '$lib/utilities/get-public-path';
+  import { routeForAuthentication } from '$lib/utilities/route-for';
+  import type { PageData } from '$types';
 
   const error = $page.url.searchParams.get('error');
 
-  export let settings: Settings;
+  export let data: PageData;
+  let { settings } = data;
+  $: ({ settings } = data);
 </script>
 
 <NavigationHeader href="{publicPath}/" user={undefined} />
