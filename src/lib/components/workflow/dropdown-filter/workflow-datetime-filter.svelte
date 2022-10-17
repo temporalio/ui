@@ -138,7 +138,7 @@
     <div
       class="flex {custom
         ? 'h-[500px]'
-        : 'h-[280px]'} w-[400px] flex-col gap-8 bg-white p-4"
+        : 'h-[340px]'} w-[400px] flex-col gap-8 bg-white p-4"
     >
       {#if custom}
         <div class="flex flex-col">
