@@ -12,7 +12,7 @@
   import Select from '$lib/holocene/select/simple-select.svelte';
   import Option from '$lib/holocene/select/simple-option.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import Search from '$lib/components/search.svelte';
+  import WorkflowAdvancedFilters from './workflow-advanced-filters.svelte';
 
   export let searchType: 'basic' | 'advanced';
 
@@ -66,8 +66,8 @@
   }, 300);
 </script>
 
-<section class="flex flex-col gap-2">
-  <p class="text-right text-xs">
+<section class="flex flex-col">
+  <p class="pb-2 text-right text-xs">
     {#if searchType === 'advanced'}
       <a
         href="{$page.url.pathname}?searchType=basic"
@@ -88,13 +88,7 @@
   </p>
 
   {#if searchType === 'advanced'}
-    <Search
-      icon
-      id="advanced-search"
-      placeholder="Query…"
-      value={query}
-      on:submit={updateQuery}
-    />
+    <WorkflowAdvancedFilters />
   {:else}
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-5">
       <Input

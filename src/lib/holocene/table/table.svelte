@@ -1,10 +1,16 @@
 <script lang="ts">
+  import ProgressBar from '$lib/holocene/progress-bar.svelte';
+
   export let variant: 'simple' | 'fancy' = 'fancy';
+  export let updating = false;
 </script>
 
 <table class="{variant} {$$props.class}">
   <thead>
     <slot name="headers" />
+    {#if updating}
+      <ProgressBar />
+    {/if}
   </thead>
   <tbody>
     <slot />
@@ -12,6 +18,10 @@
 </table>
 
 <style lang="postcss">
+  table {
+    @apply relative;
+  }
+
   table {
     thead :global(th) {
       @apply text-left font-secondary text-sm font-medium;

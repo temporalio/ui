@@ -3,6 +3,9 @@ import type { EventSortOrder } from '$lib/stores/event-view';
 type Space = ' ';
 type Quote = "'" | '"';
 type Operator = typeof operators[number];
+type Conditional = typeof conditionals[number];
+type Parenthesis = typeof parenthesis[number];
+type Join = typeof joins[number];
 
 const executionStatuses: Readonly<WorkflowStatus[]> = [
   'Running',
@@ -16,16 +19,16 @@ const executionStatuses: Readonly<WorkflowStatus[]> = [
 ];
 
 const operators = [
-  '=',
-  '>',
-  '<',
-  '!',
+  '===',
+  '!==',
   '>=',
   '<=',
   '==',
   '!=',
-  '===',
-  '!==',
+  '=',
+  '>',
+  '<',
+  '!',
   'and',
   'or',
   'between',
@@ -34,6 +37,23 @@ const operators = [
   '(',
   ')',
 ] as const;
+
+const conditionals = [
+  '===',
+  '!==',
+  '>=',
+  '<=',
+  '==',
+  '!=',
+  '=',
+  '>',
+  '<',
+  '!',
+] as const;
+
+const joins = ['and', 'or'] as const;
+
+const parenthesis = ['(', ')'] as const;
 
 export const isString = (x: unknown): x is string => typeof x === 'string';
 
@@ -80,6 +100,46 @@ export const isOperator = (x: unknown): x is Operator => {
   }
 
   return false;
+};
+
+export const isConditional = (x: unknown): x is Conditional => {
+  if (!isString(x)) return false;
+  x = x.toLocaleLowerCase();
+
+  for (const condition of conditionals) {
+    if (x === condition) return true;
+  }
+
+  return false;
+};
+
+export const isParenthesis = (x: unknown): x is Parenthesis => {
+  if (!isString(x)) return false;
+  x = x.toLocaleLowerCase();
+
+  for (const paren of parenthesis) {
+    if (x === paren) return true;
+  }
+
+  return false;
+};
+
+export const isJoin = (x: unknown): x is Join => {
+  if (!isString(x)) return false;
+  x = x.toLocaleLowerCase();
+
+  for (const join of joins) {
+    if (x === join) return true;
+  }
+
+  return false;
+};
+
+export const isBetween = (x: unknown) => {
+  if (!isString(x)) return false;
+  x = x.toLocaleLowerCase();
+
+  return x === 'between';
 };
 
 export const isSortOrder = (

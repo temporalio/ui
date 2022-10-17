@@ -3,7 +3,6 @@
 
   import { eventViewType } from '$lib/stores/event-view';
   import { workflowsSearch } from '$lib/stores/workflows';
-  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
   import {
     routeForEventHistory,
@@ -22,6 +21,7 @@
   import { encodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { page } from '$app/stores';
   import { pathMatches } from '$lib/utilities/path-matches';
+  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
