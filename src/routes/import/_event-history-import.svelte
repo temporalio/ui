@@ -7,6 +7,7 @@
   import { notifications } from '$lib/stores/notifications';
   import { importEvents, importEventGroups } from '$lib/stores/import-events';
   import { importSettings } from './_import-settings';
+  import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   let rawEvents: HistoryEvent[] | { events: HistoryEvent[] };
 
@@ -21,7 +22,7 @@
       reader.onload = () => {
         try {
           const result = reader?.result?.toString() ?? '';
-          rawEvents = JSON.parse(result);
+          rawEvents = parseWithBigInt(result);
         } catch (e) {
           notifications.add('error', 'Could not parse JSON');
         }

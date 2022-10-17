@@ -1,10 +1,10 @@
 <script lang="ts">
   import Icon from '$holocene/icon/icon.svelte';
+  import { onDestroy, onMount } from 'svelte';
 
   import { autoRefreshWorkflow, eventViewType } from '$lib/stores/event-view';
   import { workflowsSearch } from '$lib/stores/workflows';
-  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
-  import { workflowRun, refresh, loading } from '$lib/stores/workflow-run';
+  import { workflowRun, refresh } from '$lib/stores/workflow-run';
 
   import {
     routeForEventHistory,
@@ -13,6 +13,7 @@
     routeForWorkers,
     routeForWorkflowQuery,
   } from '$lib/utilities/route-for';
+  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
   import type { GetPollersResponse } from '$lib/services/pollers-service';
 
@@ -23,7 +24,6 @@
   import { page } from '$app/stores';
   import { pathMatches } from '$lib/utilities/path-matches';
   import AutoRefreshWorkflow from '$lib/components/auto-refresh-workflow.svelte';
-  import { onDestroy, onMount } from 'svelte';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;

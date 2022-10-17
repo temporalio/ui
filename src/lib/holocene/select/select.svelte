@@ -16,7 +16,7 @@
 
   type T = $$Generic;
 
-  let show = false;
+  export let show = false;
 
   export let label = '';
   export let id: string;
@@ -24,6 +24,8 @@
   export let dark: boolean = false;
   export let placeholder = '';
   export let disabled: boolean = false;
+  export let unroundRight: boolean = false;
+  export let keepOpen: boolean = false;
   export let displayValue: (value: T) => T | string = (value) => value ?? '';
   export let onChange: (value: T) => void = noop;
 
@@ -55,9 +57,12 @@
   {/if}
   <MenuContainer class="w-full">
     <MenuButton
-      class="select-input-container {disabled ? 'disabled' : ''}"
       hasIndicator={!disabled}
+      class="select-input-container {disabled ? 'disabled' : ''} {unroundRight
+        ? 'unroundRight'
+        : ''}"
       bind:show
+      {keepOpen}
       controls="{id}-menu"
       data-cy={$$props.dataCy}
       {dark}
@@ -74,7 +79,7 @@
         <Icon name="lock" class="text-gray-500" />
       {/if}
     </MenuButton>
-    <Menu id="{id}-menu" class="h-auto max-h-80 min-w-fit" {show} {dark}>
+    <Menu id="{id}-menu" class="h-auto max-h-96 min-w-fit" {show} {dark}>
       <slot />
     </Menu>
   </MenuContainer>
@@ -87,6 +92,10 @@
 
   .select :global(.select-input-container) {
     @apply flex h-10 w-full flex-row items-center justify-between rounded border border-gray-900 bg-white px-2 text-sm text-primary;
+  }
+
+  .select :global(.unroundRight) {
+    @apply rounded-tr-none rounded-br-none border-r-0;
   }
 
   .select-input {

@@ -1,9 +1,11 @@
 <script>
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
+
+  export let updating = false;
 </script>
 
-<Table class="w-full md:table-fixed">
+<Table class="w-full md:table-fixed" {updating}>
   <TableHeaderRow slot="headers">
     <th class="hidden w-48 md:table-cell">Status</th>
     <th class="hidden md:table-cell md:w-60 xl:w-auto">Workflow ID</th>

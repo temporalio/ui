@@ -21,6 +21,6 @@
 
 <style lang="postcss">
   .icon-button {
-    @apply inline-block h-8 w-8 text-sm;
+    @apply inline-block h-4 w-auto text-sm;
   }
 </style>

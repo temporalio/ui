@@ -1,4 +1,5 @@
 import { isWorkflowExecutionCompletedEvent } from './is-event-type';
+import { stringifyWithBigInt } from './parse-with-big-int';
 
 type WorkflowInputAndResults = {
   input: string;
@@ -59,14 +60,14 @@ export const getWorkflowStartedAndCompletedEvents = (
   const workflowCompletedEvent = getWorkflowCompletedEvent(events);
 
   if (workflowStartedEvent) {
-    input = JSON.stringify(
+    input = stringifyWithBigInt(
       workflowStartedEvent?.workflowExecutionStartedEventAttributes?.input
         ?.payloads ?? null,
     );
   }
 
   if (workflowCompletedEvent) {
-    results = JSON.stringify(getEventResult(workflowCompletedEvent));
+    results = stringifyWithBigInt(getEventResult(workflowCompletedEvent));
   }
 
   return {

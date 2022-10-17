@@ -24,7 +24,13 @@
   };
 </script>
 
-<Select on:change={onChange} {id} bind:value={_value} {...$$props}>
+<Select
+  on:change={onChange}
+  {id}
+  bind:value={_value}
+  {...$$props}
+  class="border-[1px] border-gray-900 outline-none"
+>
   <slot>
     {#each options as option}
       <Option value={option} />

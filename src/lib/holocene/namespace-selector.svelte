@@ -21,7 +21,7 @@
       name="namespace-switcher"
       width={32}
       height={32}
-      class="mx-2 inline cursor-pointer rounded-full border border-gray-900 shadow-md transition-all hover:scale-105"
+      class="mx-2 inline cursor-pointer rounded-full border border-gray-900 shadow-sm transition-all hover:scale-105"
     />
   </button>
 </Tooltip>
