@@ -8,7 +8,13 @@
   $: typeSort = $workflowSorts.find((s) => s.attribute === 'StartTime');
 </script>
 
-<DropdownMenu {disabled} value={typeSort?.value ?? ''} keepOpen right>
+<DropdownMenu
+  {disabled}
+  disabledText="Sort disabled"
+  value={typeSort?.value ?? ''}
+  keepOpen
+  right
+>
   <svelte:fragment slot="label">Start Time</svelte:fragment>
   <div class="flex w-44 flex-col gap-2 p-2">
     <Sort type="StartTime" />

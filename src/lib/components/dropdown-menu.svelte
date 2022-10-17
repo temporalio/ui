@@ -13,6 +13,7 @@
   export let right = false;
   export let keepOpen = false;
   export let disabled = false;
+  export let disabledText = 'Disabled';
 
   let show: boolean = false;
   let menu: any = null;
@@ -55,7 +56,7 @@
   };
 </script>
 
-<Tooltip text="Sort disabled" top hide={!disabled}>
+<Tooltip text={disabledText} top hide={!disabled}>
   <div class="relative inline" bind:this={menu} data-cy={$$props.dataCy}>
     <IconButton
       on:click={disabled ? noop : onClick}

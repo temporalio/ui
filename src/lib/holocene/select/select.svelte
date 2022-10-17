@@ -62,7 +62,6 @@
       class="select-input-container {disabled ? 'disabled' : ''} {unroundRight
         ? 'unroundRight'
         : ''}"
-      hasIndicator={!disabled}
       bind:show
       {keepOpen}
       controls="{id}-menu"

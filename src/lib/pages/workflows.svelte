@@ -27,22 +27,24 @@
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
 
+  const errorMessage =
+    searchType === 'advanced'
+      ? 'Please check your syntax and try again.'
+      : 'If you have filters applied, try adjusting them.';
+
   onMount(() => {
     $lastUsedNamespace = $page.params.namespace;
   });
+
+  const refreshWorkflows = () => {
+    $refresh = Date.now();
+  };
 
   onDestroy(() => {
     const query = $page.url.searchParams.get('query');
     const parameters = query ? toListWorkflowParameters(query) : {};
     $workflowsSearch = { parameters, searchType };
   });
-
-  const errorMessage =
-    'If you have filters applied, try adjusting them. Otherwise please check your syntax and try again.';
-
-  const refreshWorkflows = () => {
-    $refresh = Date.now();
-  };
 </script>
 
 <PageTitle
