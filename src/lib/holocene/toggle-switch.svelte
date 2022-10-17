@@ -10,7 +10,7 @@
 
 <style lang="postcss">
   .switch {
-    @apply relative inline-block h-8 w-[52px] rounded-[8rem];
+    @apply relative mt-2 inline-block h-8 w-[52px] rounded-[8rem];
   }
 
   .slider {

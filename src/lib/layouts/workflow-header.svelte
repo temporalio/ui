@@ -30,6 +30,7 @@
   export let workers: GetPollersResponse;
 
   let refreshInterval;
+  const refreshRate = 15000;
 
   const routeParameters = {
     namespace,
@@ -46,7 +47,7 @@
     if (isRunning && $autoRefreshWorkflow === 'on') {
       // Auto-refresh of 15 seconds if turned on
       clearInterval(refreshInterval);
-      refreshInterval = setInterval(() => ($refresh = Date.now()), 5000);
+      refreshInterval = setInterval(() => ($refresh = Date.now()), refreshRate);
     }
   });
 
@@ -65,7 +66,7 @@
       $refresh = Date.now();
       $autoRefreshWorkflow = 'on';
       clearInterval(refreshInterval);
-      refreshInterval = setInterval(() => ($refresh = Date.now()), 5000);
+      refreshInterval = setInterval(() => ($refresh = Date.now()), refreshRate);
     }
   };
 
