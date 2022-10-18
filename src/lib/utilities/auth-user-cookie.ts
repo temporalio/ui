@@ -1,4 +1,5 @@
 import { browser } from '$app/env';
+import { parseWithBigInt } from './parse-with-big-int';
 import { atob } from '$lib/utilities/atob';
 
 type UserResponse = {
@@ -30,7 +31,7 @@ export const getAuthUserCookie = (isBrowser = browser): User => {
   if (userBase64) {
     try {
       const userS = atob(userBase64);
-      const user: UserResponse = JSON.parse(userS);
+      const user: UserResponse = parseWithBigInt(userS);
 
       return {
         accessToken: user?.AccessToken,

@@ -19,10 +19,14 @@
   export let large: boolean = false;
   export let as: 'button' | 'anchor' = href ? 'anchor' : 'button';
   export let icon: IconName = null;
+  export let iconClass: string = null;
   export let classes: string = $$props.class;
   export let dataCy: string = $$props.dataCy;
   export let count: number = 0;
   export let type: string = 'button';
+  export let unround: boolean = false;
+  export let unroundRight: boolean = false;
+  export let unroundLeft: boolean = false;
 </script>
 
 {#if as === 'button'}
@@ -32,13 +36,16 @@
     class:selected={active}
     class:large
     class:thin
+    class:unround
+    class:unroundRight
+    class:unroundLeft
     data-cy={dataCy}
     {type}
     {disabled}
   >
     {#if icon || loading}
       <span class:animate-spin={loading}>
-        <Icon name={loading ? 'spinner' : icon} />
+        <Icon name={loading ? 'spinner' : icon} class={iconClass} />
       </span>
     {/if}
     <slot />
@@ -128,7 +135,7 @@
   }
 
   .selected {
-    @apply bg-purple-600 text-white;
+    @apply border-blue-600 bg-blue-600 text-white;
   }
 
   .login {
@@ -136,6 +143,15 @@
   }
 
   .thin {
-    @apply py-1;
+    @apply h-8 py-1;
+  }
+  .unround {
+    @apply rounded-none;
+  }
+  .unroundLeft {
+    @apply rounded-tl-none rounded-bl-none;
+  }
+  .unroundRight {
+    @apply rounded-tr-none rounded-br-none;
   }
 </style>

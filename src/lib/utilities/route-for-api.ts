@@ -106,6 +106,7 @@ export function routeForApi(
     workflow: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}`,
     'workflows.archived': `/namespaces/${parameters?.namespace}/workflows/archived`,
     workflows: `/namespaces/${parameters?.namespace}/workflows`,
+    'workflows.count': `/namespaces/${parameters?.namespace}/workflows/count`,
   };
 
   return withBase(routes[route], parameters?.namespace);

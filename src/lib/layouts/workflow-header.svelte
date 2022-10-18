@@ -1,9 +1,10 @@
 <script lang="ts">
   import Icon from '$holocene/icon/icon.svelte';
+  import { onDestroy, onMount } from 'svelte';
 
-  import { eventViewType } from '$lib/stores/event-view';
+  import { autoRefreshWorkflow, eventViewType } from '$lib/stores/event-view';
   import { workflowsSearch } from '$lib/stores/workflows';
-  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
+  import { workflowRun, refresh } from '$lib/stores/workflow-run';
 
   import {
     routeForEventHistory,
@@ -12,20 +13,24 @@
     routeForWorkers,
     routeForWorkflowQuery,
   } from '$lib/utilities/route-for';
+  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
   import type { GetPollersResponse } from '$lib/services/pollers-service';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
-  import ExportHistory from '$lib/components/export-history.svelte';
   import Tab from '$lib/holocene/tab.svelte';
   import { encodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { page } from '$app/stores';
   import { pathMatches } from '$lib/utilities/path-matches';
+  import AutoRefreshWorkflow from '$lib/components/auto-refresh-workflow.svelte';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
   export let workers: GetPollersResponse;
+
+  let refreshInterval;
+  const refreshRate = 15000;
 
   const routeParameters = {
     namespace,
@@ -35,11 +40,44 @@
 
   const { parameters, searchType } = $workflowsSearch;
   const query = toListWorkflowQuery(parameters);
+
+  $: isRunning = $workflowRun.workflow.isRunning;
+
+  onMount(() => {
+    if (isRunning && $autoRefreshWorkflow === 'on') {
+      // Auto-refresh of 15 seconds if turned on
+      clearInterval(refreshInterval);
+      refreshInterval = setInterval(() => ($refresh = Date.now()), refreshRate);
+    }
+  });
+
+  $: {
+    if (!isRunning) {
+      // Stop refresh if worfklow is no longer running
+      clearInterval(refreshInterval);
+    }
+  }
+
+  const onRefreshChange = () => {
+    if ($autoRefreshWorkflow === 'on') {
+      $autoRefreshWorkflow = 'off';
+      clearInterval(refreshInterval);
+    } else {
+      $refresh = Date.now();
+      $autoRefreshWorkflow = 'on';
+      clearInterval(refreshInterval);
+      refreshInterval = setInterval(() => ($refresh = Date.now()), refreshRate);
+    }
+  };
+
+  onDestroy(() => {
+    clearInterval(refreshInterval);
+  });
 </script>
 
 <header class="mb-4 flex flex-col gap-4">
   <main class="relative flex flex-col gap-1">
-    <div class="-mt-3 -ml-2 block">
+    <div class="-mt-3 -ml-2 mb-4 block">
       <a
         href={`/namespaces/${namespace}/workflows?query=${encodeURIForSvelte(
           query,
@@ -50,19 +88,19 @@
         <Icon name="chevron-left" class="inline" />Back to Workflows
       </a>
     </div>
-    <div class="mb-8 flex items-center justify-between">
+    <div
+      class="mb-8 flex flex-col items-start justify-between gap-4 xl:flex-row xl:gap-0"
+    >
       <h1 class="relative flex items-center gap-4 text-2xl">
         <WorkflowStatus status={workflow?.status} />
         <span class="select-all font-medium">{workflow.id}</span>
       </h1>
-      <div class="ml-8 flex items-center justify-end gap-4">
-        <ExportHistory
-          {namespace}
-          workflowId={workflow.id}
-          runId={workflow.runId}
-        />
-        <TerminateWorkflow {workflow} {namespace} />
-      </div>
+      {#if isRunning}
+        <div class="flex w-96 items-center justify-start gap-4 xl:justify-end">
+          <AutoRefreshWorkflow onChange={onRefreshChange} />
+          <TerminateWorkflow {workflow} {namespace} />
+        </div>
+      {/if}
     </div>
     <nav class="flex flex-wrap gap-6">
       <Tab

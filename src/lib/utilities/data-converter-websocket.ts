@@ -5,6 +5,7 @@ import {
   dataConverterPort,
   setLastDataConverterFailure,
 } from '../stores/data-converter-config';
+import { parseWithBigInt, stringifyWithBigInt } from './parse-with-big-int';
 
 export interface DataConverterWebsocketInterface {
   hasWebsocket: boolean;
@@ -28,8 +29,8 @@ export const createWebsocket = (
 
   try {
     sock = new WebSocketAsPromised(`ws://localhost:${port}/`, {
-      packMessage: (data) => JSON.stringify(data),
-      unpackMessage: (data) => JSON.parse(data as string),
+      packMessage: (data) => stringifyWithBigInt(data),
+      unpackMessage: (data) => parseWithBigInt(data as string),
       attachRequestId: (data, requestId) =>
         Object.assign({ requestId: requestId }, data),
       extractRequestId: (data) => data && data.requestId,

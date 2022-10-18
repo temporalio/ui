@@ -1,4 +1,3 @@
-import { get } from 'svelte/store';
 import { dataEncoderEndpoint } from '$lib/stores/data-encoder-config';
 import {
   convertPayloadToJsonWithCodec,
@@ -6,13 +5,7 @@ import {
   decodePayloadAttributes,
   type DecodeFunctions,
 } from '$lib/utilities/decode-payload';
-
-const getEndpoint = (
-  settings: Settings,
-  encoderEndpoint = dataEncoderEndpoint,
-): string => {
-  return get(encoderEndpoint) || settings?.codec?.endpoint || '';
-};
+import { getEncoderEndpoint } from '$lib/utilities/get-encoder-endpoint';
 
 export async function getActivityAttributes(
   { activity, namespace, settings, accessToken }: PendingActivityWithMetadata,
@@ -24,7 +17,7 @@ export async function getActivityAttributes(
   }: DecodeFunctions = {},
 ): Promise<PendingActivity> {
   // Use locally set endpoint over settings endpoint for testing purposes
-  const endpoint = getEndpoint(settings, encoderEndpoint);
+  const endpoint = getEncoderEndpoint(settings, encoderEndpoint);
   const _settings = { ...settings, codec: { ...settings?.codec, endpoint } };
 
   const convertedAttributes = endpoint

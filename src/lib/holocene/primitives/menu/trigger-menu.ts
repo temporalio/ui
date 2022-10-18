@@ -1,4 +1,7 @@
-export const triggerMenu = (node: HTMLElement): { destroy: () => void } => {
+export const triggerMenu = (
+  node: HTMLElement,
+  keepOpen: boolean,
+): { destroy: () => void; update: (open: boolean) => void } => {
   type ExtendedPointerEvent<T> = PointerEvent & {
     currentTarget: EventTarget & T;
     path?: NodeList;
@@ -17,7 +20,13 @@ export const triggerMenu = (node: HTMLElement): { destroy: () => void } => {
 
     if (!eventTarget && event.relatedTarget) eventTarget = event.relatedTarget;
 
-    if (node && !node.contains(eventTarget as Node)) {
+    // Why does this cause a rerender of root layout if node is open?
+    if (
+      node &&
+      !node.contains(eventTarget as Node) &&
+      node.ariaExpanded === 'true' &&
+      !keepOpen
+    ) {
       node.dispatchEvent(new CustomEvent('close-menu'));
       event.stopPropagation();
     }
@@ -35,6 +44,9 @@ export const triggerMenu = (node: HTMLElement): { destroy: () => void } => {
   document.addEventListener('keyup', handleKeyUp, false);
 
   return {
+    update(open) {
+      keepOpen = open;
+    },
     destroy() {
       node.removeEventListener('click', handleTriggerClick, false);
       document.removeEventListener('click', handleDocumentClick, false);

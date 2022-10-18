@@ -6,6 +6,7 @@
   export let dark = false;
   export let disabled = false;
   export let hasIndicator = false;
+  export let keepOpen = false;
 
   const close = () => {
     !disabled && (show = false);
@@ -21,7 +22,7 @@
   aria-haspopup={!disabled}
   aria-controls={controls}
   aria-expanded={show}
-  use:triggerMenu
+  use:triggerMenu={keepOpen}
   on:close-menu={close}
   on:toggle-menu={toggle}
   on:click|preventDefault

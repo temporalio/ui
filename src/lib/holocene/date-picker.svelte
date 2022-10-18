@@ -1,0 +1,104 @@
+<script lang="ts">
+  // https://svelte.dev/repl/6116680a6c3e49d0908624105018efb7?version=3.12.1
+
+  import { createEventDispatcher } from 'svelte';
+  import Calender from './calendar.svelte';
+  import { getMonthName } from '$lib/utilities/calendar';
+  import Icon from './icon/icon.svelte';
+  import Input from './input/input.svelte';
+
+  const dispatch = createEventDispatcher();
+
+  export let isAllowed = (date: Date) => true;
+  export let selected = new Date();
+
+  let date: number | undefined;
+  let month: number | undefined;
+  let year: number | undefined;
+  let showDatePicker = false;
+
+  // so that these change with props
+  $: {
+    date = selected.getDate();
+    month = selected.getMonth();
+    year = selected.getFullYear();
+  }
+
+  // handlers
+  const onFocus = () => {
+    showDatePicker = true;
+  };
+
+  const next = () => {
+    if (month === 11) {
+      month = 0;
+      year = year + 1;
+      return;
+    }
+    month = month + 1;
+  };
+
+  const prev = () => {
+    if (month === 0) {
+      month = 11;
+      year -= 1;
+      return;
+    }
+    month -= 1;
+  };
+
+  const onDateChange = (d) => {
+    showDatePicker = false;
+    dispatch('datechange', d.detail);
+  };
+</script>
+
+<div class="relative">
+  <Input
+    id="datepicker"
+    icon="calendar-plus"
+    type="text"
+    on:focus={onFocus}
+    placeholder="MM/DD/YY"
+    value={selected.toDateString()}
+  />
+  {#if showDatePicker}
+    <div
+      class="absolute top-12 z-50 inline-block rounded border border-gray-900 bg-white shadow"
+    >
+      <div class="mx-3 my-2 flex items-center justify-around">
+        <div class="flex items-center justify-center">
+          <button on:click={prev}><Icon name="chevron-left" /></button>
+        </div>
+        <div class="flex items-center justify-center">
+          {getMonthName(month)}
+          {year}
+        </div>
+        <div class="flex items-center justify-center">
+          <button on:click={next}><Icon name="chevron-right" /></button>
+        </div>
+      </div>
+      <Calender
+        {month}
+        {year}
+        date={selected}
+        {isAllowed}
+        on:datechange={onDateChange}
+      />
+      <div class="my-1 flex justify-between px-2">
+        <p
+          class="cursor-pointer text-[12px]"
+          on:click={() => (selected = new Date())}
+        >
+          Today
+        </p>
+        <p
+          class="cursor-pointer text-[12px]"
+          on:click={() => (showDatePicker = false)}
+        >
+          Close
+        </p>
+      </div>
+    </div>
+  {/if}
+</div>
