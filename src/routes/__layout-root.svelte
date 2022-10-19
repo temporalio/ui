@@ -2,8 +2,6 @@
   import type { Load } from '@sveltejs/kit';
   import type { ListNamespacesResponse, GetClusterInfoResponse } from '$types';
 
-  import '$lib/vendor/css/normalize.css';
-
   import '$lib/vendor/prism/prism.css';
   import '$lib/vendor/prism/prism.js';
 

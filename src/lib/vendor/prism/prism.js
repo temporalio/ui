@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /* PrismJS 1.25.0
 https://prismjs.com/download.html#themes=prism-tomorrow&languages=json */
 var _self =
