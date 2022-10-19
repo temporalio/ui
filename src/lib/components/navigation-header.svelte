@@ -1,8 +1,8 @@
 <script lang="ts">
   import { hasKeys } from '$lib/utilities/has';
-  import { publicPath } from '$lib/utilities/get-public-path';
   import DataEncoderStatus from '$lib/holocene/data-encoder-status.svelte';
   import FeedbackButton from '$lib/components/feedback-button.svelte';
+  import Logo from '$lib/vendor/logo.svg';
 
   export let href: string;
   export let user: User;
@@ -11,7 +11,7 @@
 <header class="navigation-header" data-cy="navigation-header">
   <div class="col-span-3 flex items-center gap-4">
     <a {href} class="block">
-      <img src="{publicPath}/logo.svg" alt="Temporal Logo" class="max-h-10" />
+      <img src={Logo} alt="Temporal Logo" class="max-h-10" />
     </a>
     <slot name="logo" />
   </div>

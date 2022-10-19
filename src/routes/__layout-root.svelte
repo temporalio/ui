@@ -2,6 +2,9 @@
   import type { Load } from '@sveltejs/kit';
   import type { ListNamespacesResponse, GetClusterInfoResponse } from '$types';
 
+  import '$lib/vendor/prism/prism.css';
+  import '$lib/vendor/prism/prism.js';
+
   import '../app.css';
 
   import { fetchSettings } from '$lib/services/settings-service';
@@ -74,7 +77,6 @@
   import Notifications from '$lib/components/notifications.svelte';
   import Banners from '$lib/components/banner/banners.svelte';
   import { ErrorBoundary } from '$lib/components/error-boundary';
-  import PageTitle from '$lib/holocene/page-title.svelte';
   import ScrollToTop from '$lib/holocene/scroll-to-top.svelte';
 
   export let user: User;
@@ -88,7 +90,6 @@
   });
 </script>
 
-<PageTitle />
 <div class="flex w-screen flex-row">
   <Notifications />
   <div class="sticky top-0 z-20 h-screen w-auto">

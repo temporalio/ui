@@ -8,7 +8,6 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Button from '$holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import PageTitle from '$lib/holocene/page-title.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { authUser } from '$lib/stores/auth-user';
@@ -50,7 +49,6 @@
   };
 </script>
 
-<PageTitle title={`Stack Trace | ${workflow.id}`} url={$page.url.href} />
 <section>
   {#if workflow.isRunning && workers?.pollers?.length > 0}
     {#await stackTrace}
