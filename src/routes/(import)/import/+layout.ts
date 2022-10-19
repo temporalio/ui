@@ -1,11 +1,11 @@
-import type { LayoutLoad } from '@sveltejs/kit';
-
 import '../../../app.css';
 
 import { fetchSettings } from '$lib/services/settings-service';
 import { getAuthUser } from '$lib/stores/auth-user';
 
-export const load: LayoutLoad.import = async function ({ fetch }) {
+import type { LayoutLoad } from './$types';
+
+export const load: LayoutLoad = async function ({ fetch }) {
   const settings: Settings = await fetchSettings(fetch);
   const user = getAuthUser();
 

@@ -6,7 +6,8 @@
   import { ErrorBoundary } from '$lib/components/error-boundary';
   import PageTitle from '$lib/holocene/page-title.svelte';
   import ScrollToTop from '$lib/holocene/scroll-to-top.svelte';
-  import type { PageData } from '@sveltejs/kit';
+
+  import type { PageData } from './$types';
 
   export let data: PageData;
   let { user, uiVersionInfo } = data;

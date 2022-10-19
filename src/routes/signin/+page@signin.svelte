@@ -6,7 +6,7 @@
   import HamburgerHeader from '$lib/components/hamburger-header.svelte';
   import { publicPath } from '$lib/utilities/get-public-path';
   import { routeForAuthentication } from '$lib/utilities/route-for';
-  import type { PageData } from '$types';
+  import type { PageData } from './$types';
 
   const error = $page.url.searchParams.get('error');
 

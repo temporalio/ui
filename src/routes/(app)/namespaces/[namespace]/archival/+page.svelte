@@ -8,7 +8,7 @@
   import { timeFormat } from '$lib/stores/time-format';
   import PageTitle from '$lib/holocene/page-title.svelte';
   import { page } from '$app/stores';
-  import type { PageData } from '$types';
+  import type { PageData } from './$types';
 
   export let data: PageData;
   let {

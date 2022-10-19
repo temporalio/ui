@@ -15,7 +15,7 @@
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
 
-  import type { PageData } from '@sveltejs/kit';
+  import type { PageData } from './$types';
 
   export let data: PageData;
   let { currentNamespace, clusters } = data;

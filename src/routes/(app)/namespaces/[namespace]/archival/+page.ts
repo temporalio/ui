@@ -1,6 +1,6 @@
 import { fetchAllArchivedWorkflows } from '$lib/services/workflow-service';
 
-import type { PageLoad } from '@sveltejs/kit';
+import type { PageLoad } from './$types';
 import type { CombinedWorkflowExecutionsResponse } from '$lib/services/workflow-service';
 import type { DescribeNamespaceResponse } from '$types';
 

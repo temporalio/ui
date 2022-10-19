@@ -16,10 +16,10 @@ import {
   cleanAuthUserCookie,
 } from '$lib/utilities/auth-user-cookie';
 
-import type { LayoutLoad } from '@sveltejs/kit';
+import type { LayoutLoad } from './$types';
 import type { ListNamespacesResponse, GetClusterInfoResponse } from '$types';
 
-export const load: LayoutLoad.root = async function ({ fetch }) {
+export const load: LayoutLoad = async function ({ fetch }) {
   const settings: Settings = await fetchSettings(fetch);
 
   const authUser = getAuthUserCookie();

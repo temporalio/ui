@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 import { getClusters } from '$lib/utilities/get-clusters';
 
-import type { PageLoad } from '@sveltejs/kit';
+import type { PageLoad } from './$types';
 import type { DescribeNamespaceResponse } from '$types';
 
 export const load: PageLoad = async function ({ params, url, parent }) {

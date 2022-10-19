@@ -46,5 +46,6 @@
     // Until there is better TS support for Histoire
     "src/histoire.setup.ts",
     "src/lib/holocene/**/*.story.svelte"
-  ]
+  ],
+  "extends": "./.svelte-kit/tsconfig.json",
 }
