@@ -1,13 +1,11 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { workflowRun } from '$lib/stores/workflow-run';
 
   import WorkflowStackTrace from '$lib/pages/workflow-stack-trace.svelte';
-  import PageTitle from '$lib/holocene/page-title.svelte';
+  import PageTitle from '$lib/components/page-title.svelte';
+
+  const workflow = $page.params.workflow;
 </script>
 
-<PageTitle
-  title={`Stack Trace | ${$workflowRun?.workflow?.id}`}
-  url={$page.url.href}
-/>
+<PageTitle title={`Stack Trace | ${workflow}`} url={$page.url.href} />
 <WorkflowStackTrace />

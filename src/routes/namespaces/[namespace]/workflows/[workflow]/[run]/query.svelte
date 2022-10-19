@@ -1,13 +1,11 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { workflowRun } from '$lib/stores/workflow-run';
 
   import WorkflowQuery from '$lib/pages/workflow-query.svelte';
-  import PageTitle from '$lib/holocene/page-title.svelte';
+  import PageTitle from '$lib/components/page-title.svelte';
+
+  const workflow = $page.params.workflow;
 </script>
 
-<PageTitle
-  title={`Query | ${$workflowRun?.workflow?.id}`}
-  url={$page.url.href}
-/>
+<PageTitle title={`Query | ${workflow}`} url={$page.url.href} />
 <WorkflowQuery />
