@@ -1,2 +1,2 @@
-import '../src/vendor/prism/prism.js';
+import '../src/lib/vendor/prism/prism.js';
 import './histoire.css';
