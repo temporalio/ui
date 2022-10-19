@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/stores';
   import { workflowRun } from '$lib/stores/workflow-run';
 
   import Icon from '$holocene/icon/icon.svelte';
@@ -12,7 +11,6 @@
     getDuration,
     formatDuration,
   } from '$lib/utilities/format-date';
-  import PageTitle from '$lib/holocene/page-title.svelte';
   import {
     formatAttemptsLeft,
     formatMaximumAttempts,
@@ -22,10 +20,8 @@
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
   const { pendingActivities } = $workflowRun.workflow;
-  const workflow = $page.params?.workflow;
 </script>
 
-<PageTitle title={`Pending Activities | ${workflow}`} url={$page.url.href} />
 {#if pendingActivities.length}
   <section class="event-table">
     <header class="event-table-header">

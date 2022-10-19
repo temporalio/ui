@@ -41,7 +41,7 @@ const config = {
       },
       //eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
       files: (filepath) =>
-        /^(?!.*\.(spec|test)\.ts$).*\.(svelte|ts|js|css|png|svg|gif|webmanifest|ico)$/.test(
+        /^(?!.*\.(spec|test)\.ts$).*\.(svelte|ts|gif)$/.test(
           filepath,
         ),
     },

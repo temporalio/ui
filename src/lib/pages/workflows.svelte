@@ -17,7 +17,6 @@
   import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
   import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
   import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
-  import PageTitle from '$lib/holocene/page-title.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$holocene/icon/icon.svelte';
   import TableRow from '$holocene/table/table-row.svelte';
@@ -48,10 +47,6 @@
   });
 </script>
 
-<PageTitle
-  title={`Workflows | ${$page.params?.namespace}`}
-  url={$page.url.href}
-/>
 <div class="mb-2 flex justify-between">
   <div>
     <h1 class="text-2xl" data-cy="namespace-title">
