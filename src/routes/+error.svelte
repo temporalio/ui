@@ -1,4 +1,5 @@
 <script lang="ts">
+  import '../app.css';
   import { page } from '$app/stores';
   import Error from '$lib/components/error.svelte';
   import { isNetworkError } from '$lib/utilities/is-network-error';

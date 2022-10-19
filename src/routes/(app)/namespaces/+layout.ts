@@ -1,8 +1,6 @@
-import { redirect } from '@sveltejs/kit';
-import type { LayoutLoad } from '@sveltejs/kit';
-import type { ListNamespacesResponse, GetClusterInfoResponse } from '$types';
+import '../../../app.css';
 
-import '../app.css';
+import { redirect } from '@sveltejs/kit';
 
 import { fetchSettings } from '$lib/services/settings-service';
 import { getAuthUser, setAuthUser } from '$lib/stores/auth-user';
@@ -17,6 +15,9 @@ import {
   getAuthUserCookie,
   cleanAuthUserCookie,
 } from '$lib/utilities/auth-user-cookie';
+
+import type { LayoutLoad } from '@sveltejs/kit';
+import type { ListNamespacesResponse, GetClusterInfoResponse } from '$types';
 
 export const load: LayoutLoad.root = async function ({ fetch }) {
   const settings: Settings = await fetchSettings(fetch);

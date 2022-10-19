@@ -28,7 +28,7 @@ export const dataEncoder = derived(
     $authUser,
   ]) => {
     const namespace = $page.params.namespace;
-    const settingsEndpoint = $page?.stuff?.settings?.codec?.endpoint;
+    const settingsEndpoint = $page?.data?.settings?.codec?.endpoint;
     const endpoint = $dataEncoderEndpoint || settingsEndpoint;
     const passAccessToken = $page.data?.settings?.codec?.passAccessToken;
     const accessToken = $authUser?.accessToken;

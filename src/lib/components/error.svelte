@@ -8,7 +8,8 @@
 
   import Link from '$lib/holocene/link.svelte';
 
-  let { error = null, status = 500 } = $page;
+  export let error = null;
+  export let status = 500;
   let message = error?.message || '';
 
   if (isNetworkError(error)) {

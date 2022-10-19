@@ -1,6 +1,6 @@
 import type { LayoutLoad } from '@sveltejs/kit';
 
-import '../../app.css';
+import '../../../app.css';
 
 import { fetchSettings } from '$lib/services/settings-service';
 import { getAuthUser } from '$lib/stores/auth-user';
