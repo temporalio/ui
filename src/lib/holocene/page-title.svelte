@@ -1,17 +1,20 @@
 <script>
-  import { publicPath } from '$lib/utilities/get-public-path';
+  import banner from '$lib/vendor/banner.png';
+  import manifest from '$lib/vendor/site.webmanifest';
+  import favicon from '$lib/vendor/favicon.ico';
+  import apple from '$lib/vendor/apple-touch-icon.png';
 
   export let title = 'Temporal';
   export let url = 'https://temporal.io';
 
-  export let image = `${publicPath}/banner.png`;
+  export let image = banner;
 </script>
 
 <svelte:head>
   <title>{title}</title>
-
-  <link rel="manifest" href="{publicPath}/site.webmanifest" />
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="icon" href={favicon} />
+  <link rel="manifest" href={manifest} />
+  <link rel="apple-touch-icon" href={apple} />
 
   <meta property="og:title" content={title} />
   <meta property="og:type" content="website" />

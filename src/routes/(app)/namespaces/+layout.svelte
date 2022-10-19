@@ -4,7 +4,6 @@
   import Notifications from '$lib/components/notifications.svelte';
   import Banners from '$lib/components/banner/banners.svelte';
   import { ErrorBoundary } from '$lib/components/error-boundary';
-  import PageTitle from '$lib/holocene/page-title.svelte';
   import ScrollToTop from '$lib/holocene/scroll-to-top.svelte';
 
   import type { PageData } from './$types';
@@ -21,7 +20,6 @@
   });
 </script>
 
-<PageTitle />
 <div class="flex w-screen flex-row">
   <Notifications />
   <div class="sticky top-0 z-20 h-screen w-auto">

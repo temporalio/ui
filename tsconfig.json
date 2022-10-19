@@ -47,5 +47,5 @@
     "src/histoire.setup.ts",
     "src/lib/holocene/**/*.story.svelte"
   ],
-  "extends": "./.svelte-kit/tsconfig.json",
+  "extends": "./.svelte-kit/tsconfig.json"
 }

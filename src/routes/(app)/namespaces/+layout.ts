@@ -1,4 +1,6 @@
 import '../../../app.css';
+import '$lib/vendor/prism/prism.css';
+import '$lib/vendor/prism/prism.js';
 
 import { redirect } from '@sveltejs/kit';
 
