@@ -63,7 +63,7 @@
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { timeFormat } from '$lib/stores/time-format';
-  import PageTitle from '$lib/holocene/page-title.svelte';
+  import PageTitle from '$lib/components/page-title.svelte';
   import { page } from '$app/stores';
 
   export let namespace: string;

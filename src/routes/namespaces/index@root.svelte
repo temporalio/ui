@@ -2,7 +2,7 @@
   import { routeForNamespace } from '$lib/utilities/route-for';
   import { page } from '$app/stores';
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import PageTitle from '$lib/holocene/page-title.svelte';
+  import PageTitle from '$lib/components/page-title.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
   import Table from '$holocene/table/table.svelte';
   import TableHeaderRow from '$holocene/table/table-header-row.svelte';

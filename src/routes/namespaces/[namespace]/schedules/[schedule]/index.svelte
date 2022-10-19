@@ -1,11 +1,11 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import PageTitle from '$holocene/page-title.svelte';
+  import PageTitle from '$lib/components/page-title.svelte';
 
   import ScheduleView from '$lib/pages/schedule-view.svelte';
 
-  let scheduleId = $page.params.schedule;
+  const schedule = $page.params.schedule;
 </script>
 
-<PageTitle title={`Schedule | ${scheduleId}`} url={$page.url.href} />
+<PageTitle title={`Schedule | ${schedule}`} url={$page.url.href} />
 <ScheduleView />

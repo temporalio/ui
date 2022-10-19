@@ -2,7 +2,7 @@
   import { page } from '$app/stores';
 
   import Schedules from '$lib/pages/schedules.svelte';
-  import PageTitle from '$lib/holocene/page-title.svelte';
+  import PageTitle from '$lib/components/page-title.svelte';
 </script>
 
 <PageTitle
