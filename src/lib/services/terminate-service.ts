@@ -24,3 +24,28 @@ export async function terminateWorkflow({
     notifyOnError: false,
   });
 }
+
+type BulkTerminateWorkflowOptions = {
+  namespace: string;
+  query: string;
+  reason: string;
+};
+
+
+export async function batchTerminateWorkflows({
+  namespace,
+  query,
+  reason,
+}: BulkTerminateWorkflowOptions): Promise<null> {
+  const route = await routeForApi('workflows.batch.terminate', {
+    namespace,
+    query,
+  });
+  return await requestFromAPI<null>(route, {
+    options: { method: 'POST', body: stringifyWithBigInt({ reason }) },
+    params: { query },
+    shouldRetry: false,
+    notifyOnError: false,
+  });
+}
+

@@ -24,6 +24,7 @@
   import { getSearchType } from '$lib/utilities/search-type-parameter';
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
   import Loading from '$lib/holocene/loading.svelte';
+  import { batchTerminateWorkflows } from '$lib/services/terminate-service';
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
 
@@ -38,6 +39,14 @@
 
   const refreshWorkflows = () => {
     $refresh = Date.now();
+  };
+
+  const terminateWorkflows = () => {
+    batchTerminateWorkflows({
+      namespace: $page.params.namespace,
+      query: $page.url.searchParams.get('query'),
+      reason: 'Batch Terminate',
+    });
   };
 
   onDestroy(() => {
@@ -66,6 +75,7 @@
   </div>
 </div>
 <WorkflowFilters bind:searchType />
+<Button on:click={terminateWorkflows}>Terminate</Button>
 <Pagination items={$workflows} let:visibleItems>
   <WorkflowsSummaryTable updating={$updating}>
     {#each visibleItems as event}
