@@ -1,7 +1,10 @@
 <script lang="ts" context="module">
   import type { Load } from '@sveltejs/kit';
 
-  import { routeForWorkflows } from '$lib/utilities/route-for';
+  import {
+    routeForWorkflows,
+    routeForNamespaceSelector,
+  } from '$lib/utilities/route-for';
   import { getNamespace } from '$lib/utilities/get-namespace';
 
   export const load: Load = async ({ stuff }) => {
@@ -9,13 +12,38 @@
     const defaultNamespace = stuff?.settings?.defaultNamespace;
 
     const namespace = getNamespace({ namespaces, defaultNamespace });
-    const redirect = routeForWorkflows({
-      namespace,
-    });
 
     return {
-      status: 302,
-      redirect,
+      props: { namespace },
     };
   };
 </script>
+
+<script lang="ts">
+  import { onMount } from 'svelte';
+  import { goto } from '$app/navigation';
+
+  import { fetchWorkflowForAuthorization } from '$lib/services/workflow-service';
+  import { lastUsedNamespace } from '$lib/stores/namespaces';
+  import Loading from '$lib/holocene/loading.svelte';
+
+  export let namespace: string;
+
+  const namespaceToRedirect =
+    $lastUsedNamespace && $lastUsedNamespace !== 'default'
+      ? $lastUsedNamespace
+      : namespace;
+
+  onMount(async () => {
+    const { authorized } = await fetchWorkflowForAuthorization(
+      namespaceToRedirect,
+    );
+    if (authorized) {
+      goto(routeForWorkflows({ namespace: namespaceToRedirect }));
+    } else {
+      goto(routeForNamespaceSelector());
+    }
+  });
+</script>
+
+<Loading />
