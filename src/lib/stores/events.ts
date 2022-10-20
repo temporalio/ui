@@ -2,8 +2,8 @@ import {
   derived,
   readable,
   writable,
-  Readable,
-  Writable,
+  type Readable,
+  type Writable,
   get,
 } from 'svelte/store';
 import type { StartStopNotifier } from 'svelte/store';

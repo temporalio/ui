@@ -1,4 +1,4 @@
-import '../../../app.css';
+import '../../app.css';
 import '$lib/vendor/prism/prism.css';
 import '$lib/vendor/prism/prism.js';
 

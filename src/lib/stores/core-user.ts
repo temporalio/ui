@@ -1,6 +1,6 @@
 import { CoreUser, CoreUserKey } from '$lib/models/core-user';
 import { hasContext, getContext } from 'svelte';
-import { readable, Readable } from 'svelte/store';
+import { readable, type Readable } from 'svelte/store';
 
 export const defaultCoreUserStore: Readable<CoreUser> = readable({
   terminateDisabled: () => false,
