@@ -1,14 +1,14 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import Icon from '$holocene/icon/icon.svelte';
-  export let id: string;
+  export let id: string = '';
   export let checked = false;
-  export let label = '&nbsp;';
+  export let label: string = null;
   export let onDark = false;
   export let indeterminate = false;
   export let disabled = false;
 
-  const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher<{ change: { checked: boolean } }>();
 
   const handleChange = (event) => {
     dispatch('change', { checked: event.target.checked });
@@ -16,7 +16,13 @@
 </script>
 
 <label class="checkbox {$$props.class}" class:disabled class:on-dark={onDark}>
-  {@html label}
+  {#if label}
+    <span class="label">
+      {@html label}
+    </span>
+  {:else}
+    &nbsp;
+  {/if}
   <input
     on:change={handleChange}
     {id}
@@ -41,11 +47,16 @@
 
 <style lang="postcss">
   .checkbox {
-    @apply relative block w-fit cursor-pointer select-none gap-1 pl-7 align-middle text-sm leading-6 text-primary;
+    @apply relative block w-fit cursor-pointer select-none align-middle text-sm leading-6 text-primary;
   }
 
   .checkbox.on-dark {
     @apply text-white;
+  }
+
+  .label {
+    /* 18px is the height of .checkmark - 16x16 box with 1px border on each side */
+    @apply absolute left-6 flex h-[18px] items-center whitespace-nowrap;
   }
 
   input {
@@ -53,11 +64,11 @@
   }
 
   .checkmark {
-    @apply absolute top-[3px] left-0.5 box-content h-4 w-4 cursor-pointer rounded-sm border border-primary bg-white;
+    @apply absolute top-0 left-0 box-content h-4 w-4 cursor-pointer rounded-sm border border-gray-500 bg-white;
   }
 
   .checkmark.on-dark {
-    @apply border-white;
+    @apply border-white bg-primary;
   }
 
   .dash {
