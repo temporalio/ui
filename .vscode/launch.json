@@ -10,7 +10,10 @@
       "name": "Launch Program",
       "skipFiles": ["<node_internals>/**"],
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run-script", "start"]
+      "runtimeArgs": ["run-script", "start"],
+      "env": {
+        "VITE_PUBLIC_PATH": ""
+      }
     }
   ]
 }
