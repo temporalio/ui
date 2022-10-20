@@ -10,8 +10,18 @@
   export const load: Load = async ({ stuff }) => {
     const namespaces = stuff.namespaces;
     const defaultNamespace = stuff?.settings?.defaultNamespace;
+    const isCloud = stuff.settings.runtimeEnvironment?.isCloud;
 
     const namespace = getNamespace({ namespaces, defaultNamespace });
+
+    if (isCloud) {
+      return {
+        status: 302,
+        redirect: routeForWorkflows({
+          namespace,
+        }),
+      };
+    }
 
     return {
       props: { namespace },
@@ -35,12 +45,16 @@
       : namespace;
 
   onMount(async () => {
-    const { authorized } = await fetchWorkflowForAuthorization(
-      namespaceToRedirect,
-    );
-    if (authorized) {
-      goto(routeForWorkflows({ namespace: namespaceToRedirect }));
-    } else {
+    try {
+      const { authorized } = await fetchWorkflowForAuthorization(
+        namespaceToRedirect,
+      );
+      if (authorized) {
+        goto(routeForWorkflows({ namespace: namespaceToRedirect }));
+      } else {
+        goto(routeForNamespaceSelector());
+      }
+    } catch (e) {
       goto(routeForNamespaceSelector());
     }
   });

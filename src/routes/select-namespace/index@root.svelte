@@ -1,11 +1,16 @@
 <script lang="ts">
+  import VirtualList from '@sveltejs/svelte-virtual-list';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import type { DescribeNamespaceResponse as Namespace } from '$types';
-  import NamespaceList from '$lib/components/namespace-list.svelte';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { routeForWorkflows } from '$lib/utilities/route-for';
   import EmptyState from '$lib/holocene/empty-state.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import PageTitle from '$lib/components/page-title.svelte';
+  import es from 'date-fns/locale/es';
+
+  let searchField: HTMLInputElement = null;
 
   const showTemporalSystemNamespace =
     $page.stuff?.settings?.showTemporalSystemNamespace;
@@ -17,7 +22,7 @@
         showTemporalSystemNamespace || namespace !== 'temporal-system',
     );
 
-  const namespaceList = namespaces.map((namespace: string) => {
+  const namespaceList: NamespaceItem[] = namespaces.map((namespace: string) => {
     return {
       namespace,
       href: (namespace: string) => routeForWorkflows({ namespace }),
@@ -27,32 +32,55 @@
       },
     };
   });
+
+  let searchValue = '';
+  $: filteredList = namespaceList.filter(({ namespace }) =>
+    namespace.includes(searchValue),
+  );
 </script>
 
-<div class="p-8">
+<PageTitle title="Select Namespace" url={$page.url.href} />
+<div class="w-full p-8 xl:w-1/2">
   <h1 class="my-4 text-3xl">Welcome to Temporal</h1>
   <p class="mb-8">Select a namespace to get started.</p>
-  <ul class="w-full xl:w-1/2">
-    {#each namespaceList as namespace}
-      <li
-        class="flex border-collapse cursor-pointer gap-2 truncate border-b border-l border-r p-3 first:rounded-t-md first:border-t last:rounded-b-md hover:bg-gray-50"
-        on:click={() => namespace?.onClick(namespace.namespace)}
-      >
-        <a href={namespace.href(namespace.namespace)} class="link"
-          >{namespace.namespace}</a
-        >
-      </li>
+  <div class="mb-5 flex rounded-full border p-1 pr-4">
+    <div class="ml-4 mr-2">
+      <Icon name="search" />
+    </div>
+    <input
+      class="w-full"
+      placeholder="Search"
+      bind:value={searchValue}
+      bind:this={searchField}
+    />
+  </div>
+  <ul class="h-screen w-full">
+    {#if namespaceList.length}
+      {#if filteredList.length}
+        <VirtualList items={filteredList} let:item itemHeight={50}>
+          <li class="link-item" on:click={() => item?.onClick(item.namespace)}>
+            <a href={item.href(item.namespace)} class="link">{item.namespace}</a
+            >
+          </li>
+        </VirtualList>
+      {:else}
+        <EmptyState title="No results." />
+      {/if}
     {:else}
       <EmptyState title="No Namespaces. Contact your admin to create one." />
-    {/each}
+    {/if}
   </ul>
 </div>
 
 <style lang="postcss">
+  .link-item {
+    @apply flex border-collapse cursor-pointer gap-2 truncate border p-3 hover:bg-gray-50;
+  }
+
+  .link-item:hover .link {
+    @apply text-blue-700 underline;
+  }
   .link {
     @apply ml-2 truncate text-gray-900;
-  }
-  .link:hover {
-    @apply underline;
   }
 </style>
