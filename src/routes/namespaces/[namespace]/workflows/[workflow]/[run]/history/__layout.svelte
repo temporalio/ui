@@ -1,6 +1,5 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { workflowRun } from '$lib/stores/workflow-run';
 
   import WorkflowHistoryLayout from '$lib/layouts/workflow-history-layout.svelte';
   import PageTitle from '$lib/components/page-title.svelte';

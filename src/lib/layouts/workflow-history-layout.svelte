@@ -10,9 +10,6 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { eventViewType } from '$lib/stores/event-view';
 
-  import { onDestroy } from 'svelte';
-  import { clearPreviousEventParameters } from '$lib/stores/events';
-
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import PendingActivities from '$lib/components/workflow/pending-activities.svelte';
@@ -39,10 +36,6 @@
     workflow: workflow.id,
     run: workflow.runId,
   };
-
-  onDestroy(() => {
-    clearPreviousEventParameters();
-  });
 </script>
 
 <section class="flex flex-col gap-4">
