@@ -116,11 +116,11 @@
     <SelectableTable
       items={workflows}
       TableRowChildren={ExampleTableRow}
-      let:selectedItemIds
+      let:selectedItems
     >
       <svelte:fragment slot="bulk-action-headers">
         <th class="w-24">
-          {selectedItemIds.length} Selected
+          {selectedItems.length} Selected
         </th>
         <th class="w-1/6">
           {#if bulkActionsAvailable}

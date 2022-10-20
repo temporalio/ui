@@ -12,7 +12,7 @@
   export let items: Item[];
   export let TableRowChildren: typeof SvelteComponent;
 
-  let selectedItemIds: string[] = [];
+  let selectedItems: Item[] = [];
 
   let _items = items.map((item) => ({
     ...item,
@@ -22,7 +22,7 @@
   const handleSelectAll = (event: CustomEvent<{ checked: boolean }>) => {
     allSelected = !allSelected;
 
-    selectedItemIds = event.detail.checked ? _items.map((item) => item.id) : [];
+    selectedItems = event.detail.checked ? _items : [];
 
     _items = _items.map((item) => ({
       ...item,
@@ -32,23 +32,23 @@
 
   const handleSelectRow = (
     event: CustomEvent<{ checked: boolean }>,
-    id: string,
+    item: Item,
   ) => {
     if (event.detail.checked) {
-      selectedItemIds.push(id);
-      selectedItemIds = selectedItemIds;
+      selectedItems.push(item);
+      selectedItems = selectedItems;
     } else {
-      selectedItemIds = selectedItemIds.filter((i) => i !== id);
+      selectedItems = selectedItems.filter((i) => i.id !== item.id);
     }
 
-    allSelected = selectedItemIds.length === _items.length;
+    allSelected = selectedItems.length === _items.length;
   };
 
   $: indeterminate =
-    selectedItemIds.length !== 0 && selectedItemIds.length !== _items.length;
+    selectedItems.length !== 0 && selectedItems.length !== _items.length;
 </script>
 
-<slot {selectedItemIds} />
+<slot {selectedItems} />
 <Table variant="fancy" class={$$props.class}>
   <TableHeaderRow
     slot="headers"
@@ -57,7 +57,7 @@
     on:change={handleSelectAll}
     bind:selected={allSelected}
   >
-    {#if selectedItemIds.length > 0}
+    {#if selectedItems.length > 0}
       <slot name="bulk-action-headers" />
     {:else}
       <slot name="default-headers" />
@@ -66,7 +66,7 @@
   {#each _items as item (item.id)}
     <TableRow
       selectable
-      on:change={(event) => handleSelectRow(event, item.id)}
+      on:change={(event) => handleSelectRow(event, item)}
       bind:selected={item.selected}
     >
       <svelte:component this={TableRowChildren} {...omit(item, 'selected')} />
