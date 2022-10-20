@@ -21,6 +21,7 @@ import { withLoading, delay } from '$lib/utilities/stores/with-loading';
 import { groupEvents } from '$lib/models/event-groups';
 import { refresh } from '$lib/stores/workflow-run';
 import { authUser } from '$lib/stores/auth-user';
+import { previous } from '$lib/stores/previous-events';
 
 const emptyEvents: FetchEventsResponse = {
   events: [],
@@ -54,20 +55,6 @@ const accessToken = derived(
   [authUser],
   ([$authUser]) => $authUser?.accessToken,
 );
-
-const emptyPrevious: FetchEventsParameters = {
-  namespace: null,
-  workflowId: null,
-  runId: null,
-  rawPayloads: null,
-  sort: null,
-};
-
-const previous: Writable<FetchEventsParameters> = writable(emptyPrevious);
-
-export const clearPreviousEventParameters = (): void => {
-  previous.set(emptyPrevious);
-};
 
 const isNewRequest = (
   params: FetchEventsParameters,
