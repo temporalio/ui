@@ -12,7 +12,7 @@
     routeForStackTrace,
     routeForWorkers,
     routeForWorkflowQuery,
-    routeForWorkflows,
+    routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
   import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
@@ -79,7 +79,7 @@
   <main class="relative flex flex-col gap-1">
     <div class="-mt-3 -ml-2 mb-4 block">
       <a
-        href={routeForWorkflows({
+        href={routeForWorkflowsWithQuery({
           namespace,
           query,
           search: searchType,

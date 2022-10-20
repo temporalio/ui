@@ -62,7 +62,11 @@ export const routeForNamespace = ({
   return `${publicPath}/namespaces/${namespace}`;
 };
 
-export const routeForWorkflows = ({
+export const routeForWorkflows = (parameters: NamespaceParameter): string => {
+  return `${routeForNamespace(parameters)}/workflows`;
+};
+
+export const routeForWorkflowsWithQuery = ({
   namespace,
   query,
   search,
@@ -71,20 +75,7 @@ export const routeForWorkflows = ({
     return undefined;
   }
 
-  const url = new URL(
-    `${routeForNamespace({ namespace })}/workflows`,
-    window.location.origin,
-  );
-
-  if (query) {
-    url.searchParams.set('query', encodeURIForSvelte(query));
-  }
-
-  if (search) {
-    url.searchParams.set('search', search);
-  }
-
-  return url.toString();
+  return toURL(routeForWorkflows({ namespace }), { query, search });
 };
 
 export const routeForArchivalWorkfows = (
