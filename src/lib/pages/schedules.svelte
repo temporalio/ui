@@ -34,7 +34,7 @@
 <div class="flex flex-row justify-between">
   <div>
     <h1 class="flex items-center gap-2 text-2xl">
-      Schedules<Badge type="alpha">Alpha</Badge>
+      Schedules<Badge type="beta">Beta</Badge>
       <NamespaceSelector />
     </h1>
     <p class="text-sm text-gray-600" data-cy="namespace-name">

@@ -22,8 +22,7 @@
   import IsCloudGuard from '$lib/components/is-cloud-guard.svelte';
 
   import { afterNavigate } from '$app/navigation';
-  import { viewFeature } from '$lib/stores/new-feature-tags';
-  import FeatureGuard from '$lib/components/feature-guard.svelte';
+  // import FeatureGuard from '$lib/components/feature-guard.svelte';
 
   export let isCloud = false;
   export let activeNamespace: Namespace;
@@ -56,25 +55,20 @@
       </NavTooltip>
       <div class="nav-title">Workflows</div>
     </NavRow>
-    <IsCloudGuard {isCloud}>
-      <FeatureGuard
+    <IsCloudGuard>
+      <!-- <FeatureGuard
         enabled={Boolean(activeNamespace?.namespaceInfo?.supportsSchedules)}
-      >
-        <NavRow
-          link={linkList.schedules}
-          {isCloud}
-          data-cy="schedules-button"
-          on:click={() => viewFeature('schedules')}
-        >
-          <NavTooltip right text="Schedules">
-            <div class="nav-icon">
-              <Icon name="schedules" />
-              <FeatureTag feature="schedules" alpha />
-            </div>
-          </NavTooltip>
-          <div class="nav-title">Schedules</div>
-        </NavRow>
-      </FeatureGuard>
+      > -->
+      <NavRow link={linkList.schedules} {isCloud} data-cy="schedules-button">
+        <NavTooltip right text="Schedules">
+          <div class="nav-icon">
+            <Icon name="schedules" />
+            <FeatureTag feature="schedules" />
+          </div>
+        </NavTooltip>
+        <div class="nav-title">Schedules</div>
+      </NavRow>
+      <!-- </FeatureGuard> -->
     </IsCloudGuard>
     <IsCloudGuard>
       <NavRow link={linkList.namespaces} {isCloud} data-cy="namespaces-button">
