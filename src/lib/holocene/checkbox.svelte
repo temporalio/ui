@@ -34,7 +34,7 @@
   />
   <span class="checkmark" class:on-dark={onDark}>
     {#if indeterminate}
-      <span class="dash" class:on-dark={onDark} />
+      <Icon class="absolute top-0 left-0 h-4 w-4" name="hyphen" />
     {:else if checked}
       <Icon
         class="absolute top-0 left-0 h-4 w-4"
@@ -69,14 +69,6 @@
 
   .checkmark.on-dark {
     @apply border-white bg-primary;
-  }
-
-  .dash {
-    @apply absolute top-[7px] left-1 h-0 w-2 rounded border border-white bg-white;
-  }
-
-  .dash.on-dark {
-    @apply border-white;
   }
 
   input:checked + .checkmark,

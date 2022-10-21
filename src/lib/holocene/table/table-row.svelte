@@ -8,23 +8,21 @@
 
 {#if href}
   <a class="table-row {$$props.class}" {href}>
-    <td />
-    {#if selectable}
-      <td>
+    <td class:selectable>
+      {#if selectable}
         <Checkbox class="mt-2" bind:checked={selected} on:change />
-      </td>
-    {/if}
+      {/if}
+    </td>
     <slot />
     <td />
   </a>
 {:else}
   <tr on:click class={$$props.class}>
-    <td />
-    {#if selectable}
-      <td>
+    <td class:selectable>
+      {#if selectable}
         <Checkbox class="mt-2" bind:checked={selected} on:change />
-      </td>
-    {/if}
+      {/if}
+    </td>
     <slot />
     <td />
   </tr>

@@ -1,33 +1,40 @@
+<script lang="ts" context="module">
+  export type SelectableTableContext<T> = {
+    handleSelectRow: (
+      event: CustomEvent<{ checked: boolean }>,
+      item: T,
+    ) => void;
+  };
+</script>
+
 <script lang="ts">
-  import { omit } from '$lib/utilities/omit';
-  import type { SvelteComponent } from 'svelte';
+  import { setContext } from 'svelte';
   import TableHeaderRow from './table-header-row.svelte';
-  import TableRow from './table-row.svelte';
   import Table from './table.svelte';
+  import { type ComponentProps, createEventDispatcher } from 'svelte/internal';
 
   type T = $$Generic;
   type Item = T & { id: string };
 
-  export let allSelected: boolean = false;
+  interface $$Props extends ComponentProps<Table> {
+    items: Item[];
+  }
+
   export let items: Item[];
-  export let TableRowChildren: typeof SvelteComponent;
+
+  const dispatch = createEventDispatcher<{
+    change: { selectedItems: Item[] };
+  }>();
 
   let selectedItems: Item[] = [];
-
-  let _items = items.map((item) => ({
-    ...item,
-    selected: false,
-  }));
+  let allSelected: boolean = false;
 
   const handleSelectAll = (event: CustomEvent<{ checked: boolean }>) => {
     allSelected = !allSelected;
 
-    selectedItems = event.detail.checked ? _items : [];
+    selectedItems = event.detail.checked ? items : [];
 
-    _items = _items.map((item) => ({
-      ...item,
-      selected: event.detail.checked,
-    }));
+    dispatch('change', { selectedItems });
   };
 
   const handleSelectRow = (
@@ -41,15 +48,19 @@
       selectedItems = selectedItems.filter((i) => i.id !== item.id);
     }
 
-    allSelected = selectedItems.length === _items.length;
+    allSelected = selectedItems.length === items.length;
+    dispatch('change', { selectedItems });
   };
 
   $: indeterminate =
-    selectedItems.length !== 0 && selectedItems.length !== _items.length;
+    selectedItems.length !== 0 && selectedItems.length !== items.length;
+
+  setContext('selectable-table-context', {
+    handleSelectRow,
+  });
 </script>
 
-<slot {selectedItems} />
-<Table variant="fancy" class={$$props.class}>
+<Table variant="fancy" class={$$props.class} {...$$props}>
   <TableHeaderRow
     slot="headers"
     selectable
@@ -63,13 +74,5 @@
       <slot name="default-headers" />
     {/if}
   </TableHeaderRow>
-  {#each _items as item (item.id)}
-    <TableRow
-      selectable
-      on:change={(event) => handleSelectRow(event, item)}
-      bind:selected={item.selected}
-    >
-      <svelte:component this={TableRowChildren} {...omit(item, 'selected')} />
-    </TableRow>
-  {/each}
+  <slot />
 </Table>

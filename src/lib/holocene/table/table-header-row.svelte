@@ -1,6 +1,5 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
-  import { noop } from 'svelte/internal';
 
   export let selectable: boolean = false;
   export let selected: boolean = false;
@@ -8,9 +7,8 @@
 </script>
 
 <tr class={$$props.class}>
-  <th />
-  {#if selectable}
-    <th class="w-8">
+  <th class:selectable>
+    {#if selectable}
       <Checkbox
         class="mt-1"
         onDark
@@ -18,8 +16,8 @@
         {indeterminate}
         on:change
       />
-    </th>
-  {/if}
+    {/if}
+  </th>
   <slot />
   <th />
 </tr>

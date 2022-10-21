@@ -6,7 +6,7 @@
   import type { Hst as HST } from '@histoire/plugin-svelte';
   import BulkActionButton from './bulk-action-button.svelte';
   import SelectableTable from './selectable-table.svelte';
-  import ExampleTableRow from './example-table-row.svelte';
+  import SelectableTableRow from './selectable-table-row.svelte';
 
   export let Hst: HST;
 
@@ -57,6 +57,13 @@
   ];
 
   let bulkActionsAvailable = true;
+  let selectedItems: MockWorkflow[] = [];
+  const handleSelectedItemsChange = (
+    event: CustomEvent<{ selectedItems: MockWorkflow[] }>,
+  ) => {
+    console.log(event.detail.selectedItems);
+    selectedItems = event.detail.selectedItems;
+  };
 </script>
 
 <Hst.Story>
@@ -113,11 +120,7 @@
   </Hst.Variant>
 
   <Hst.Variant title="A Table with Selectable Rows">
-    <SelectableTable
-      items={workflows}
-      TableRowChildren={ExampleTableRow}
-      let:selectedItems
-    >
+    <SelectableTable items={workflows} on:change={handleSelectedItemsChange}>
       <svelte:fragment slot="bulk-action-headers">
         <th class="w-24">
           {selectedItems.length} Selected
@@ -142,6 +145,18 @@
         <th class="w-64">Start</th>
         <th class="w-64">End</th>
       </svelte:fragment>
+      {#each workflows as workflow}
+        <SelectableTableRow
+          selected={selectedItems.includes(workflow)}
+          item={workflow}
+        >
+          <td>{workflow.status}</td>
+          <td>{workflow.id}</td>
+          <td>{workflow.type}</td>
+          <td>{workflow.start}</td>
+          <td>{workflow.end}</td>
+        </SelectableTableRow>
+      {/each}
     </SelectableTable>
   </Hst.Variant>
 
