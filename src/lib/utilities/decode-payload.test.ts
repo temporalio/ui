@@ -47,6 +47,14 @@ const JsonPlainEncoded = {
   data: 'InRlc3RAdGVzdC5jb20i',
 };
 
+const JsonFooEncoded = {
+  metadata: {
+    encoding: 'anNvbi9mb28=',
+    type: 'S2V5d29yZA==',
+  },
+  data: 'InRlc3RAdGVzdC5jb20i',
+};
+
 const ProtobufEncoded = {
   metadata: {
     encoding: 'anNvbi9wcm90b2J1Zg==',
@@ -85,6 +93,10 @@ describe('decodePayload', () => {
 
   it('Should decode a payload with encoding json/plain', () => {
     expect(decodePayload(JsonPlainEncoded)).toEqual(Base64Decoded);
+  });
+
+  it('Should decode a payload with encoding json/foo', () => {
+    expect(decodePayload(JsonFooEncoded)).toEqual(Base64Decoded);
   });
 
   it('Should decode a payload with encoding json/protobuf', () => {
