@@ -33,14 +33,12 @@ export function decodePayload(
   // Help users out with an english encoding
   (payload.metadata.encodingDecoded as unknown as string) = encoding;
 
-  switch (encoding) {
-    case 'json/plain':
-    case 'json/protobuf':
-      try {
-        return parseWithBigInt(atob(String(payload.data)));
-      } catch (_e) {
-        // Couldn't correctly decode this just let the user deal with the data as is
-      }
+  if (encoding.startsWith('json/')) {
+    try {
+      return parseWithBigInt(atob(String(payload.data)));
+    } catch (_e) {
+      // Couldn't correctly decode this just let the user deal with the data as is
+    }
   }
 
   return payload;
