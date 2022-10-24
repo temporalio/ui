@@ -43,14 +43,14 @@
       }
 
       :global(th) {
-        @apply border-t border-gray-300 py-2;
+        @apply border-t border-gray-300 px-1 py-2;
 
         &:first-child {
           @apply rounded-tl-lg border-l border-gray-300;
         }
 
         &:first-child:not(.selectable) {
-          @apply w-[1px] px-1;
+          @apply w-[1px];
         }
 
         &:last-child {

@@ -18,12 +18,13 @@
 
   interface $$Props extends ComponentProps<Table> {
     items: Item[];
+    class?: string;
   }
 
   export let items: Item[];
 
   const dispatch = createEventDispatcher<{
-    change: { selectedItems: Item[] };
+    change: Item[];
   }>();
 
   let selectedItems: Item[] = [];
@@ -34,7 +35,7 @@
 
     selectedItems = event.detail.checked ? items : [];
 
-    dispatch('change', { selectedItems });
+    dispatch('change', selectedItems);
   };
 
   const handleSelectRow = (
@@ -49,7 +50,7 @@
     }
 
     allSelected = selectedItems.length === items.length;
-    dispatch('change', { selectedItems });
+    dispatch('change', selectedItems);
   };
 
   $: indeterminate =

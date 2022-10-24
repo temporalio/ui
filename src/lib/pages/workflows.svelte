@@ -24,6 +24,8 @@
   import { getSearchType } from '$lib/utilities/search-type-parameter';
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
   import Loading from '$lib/holocene/loading.svelte';
+  import SelectableTable from '$lib/holocene/table/selectable-table.svelte';
+  import BulkActionButton from '$lib/holocene/table/bulk-action-button.svelte';
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
 
@@ -45,6 +47,13 @@
     const parameters = query ? toListWorkflowParameters(query) : {};
     $workflowsSearch = { parameters, searchType };
   });
+
+  let selectedItems: WorkflowExecution[] = [];
+  const handleSelectedItemsChange = (
+    event: CustomEvent<WorkflowExecution[]>,
+  ) => {
+    selectedItems = event.detail;
+  };
 </script>
 
 <div class="mb-2 flex justify-between">
@@ -67,9 +76,33 @@
 </div>
 <WorkflowFilters bind:searchType />
 <Pagination items={$workflows} let:visibleItems>
-  <WorkflowsSummaryTable updating={$updating}>
+  <SelectableTable
+    class="w-full md:table-fixed"
+    updating={$updating}
+    items={visibleItems}
+    on:change={handleSelectedItemsChange}
+  >
+    <svelte:fragment slot="default-headers">
+      <th class="hidden w-48 md:table-cell">Status</th>
+      <th class="hidden md:table-cell md:w-60 xl:w-auto">Workflow ID</th>
+      <th class="hidden md:table-cell md:w-60 xl:w-80">Type</th>
+      <th class="hidden xl:table-cell xl:w-60">Start</th>
+      <th class="hidden xl:table-cell xl:w-60">End</th>
+      <th class="table-cell md:hidden" colspan="3">Summary</th>
+    </svelte:fragment>
+    <svelte:fragment slot="bulk-action-headers">
+      <th class="hidden w-48 md:table-cell">
+        <BulkActionButton>Terminate</BulkActionButton>
+      </th>
+      <th class="hidden md:table-cell md:w-60 xl:w-auto" />
+      <th class="hidden md:table-cell md:w-60 xl:w-80" />
+      <th class="hidden xl:table-cell xl:w-60" />
+      <th class="hidden xl:table-cell xl:w-60" />
+      <th class="table-cell md:hidden" colspan="3" />
+    </svelte:fragment>
     {#each visibleItems as event}
       <WorkflowsSummaryRow
+        selected={selectedItems.includes(event)}
         workflow={event}
         namespace={$page.params.namespace}
         timeFormat={$timeFormat}
@@ -91,5 +124,5 @@
         <td class="hidden xl:table-cell" />
       </TableRow>
     {/each}
-  </WorkflowsSummaryTable>
+  </SelectableTable>
 </Pagination>

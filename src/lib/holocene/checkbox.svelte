@@ -15,7 +15,12 @@
   };
 </script>
 
-<label class="checkbox {$$props.class}" class:disabled class:on-dark={onDark}>
+<label
+  on:click
+  class="checkbox {$$props.class}"
+  class:disabled
+  class:on-dark={onDark}
+>
   {#if label}
     <span class="label">
       {@html label}
@@ -24,6 +29,7 @@
     &nbsp;
   {/if}
   <input
+    on:click|stopPropagation
     on:change={handleChange}
     {id}
     type="checkbox"
@@ -91,9 +97,5 @@
 
   .checkbox.disabled.on-dark .checkmark {
     @apply border-opacity-80 text-opacity-80;
-  }
-
-  .checkbox.disabled.on-dark .checkmark .dash {
-    @apply opacity-80;
   }
 </style>

@@ -19,5 +19,5 @@
     {/if}
   </th>
   <slot />
-  <th />
+  <th class:selectable />
 </tr>

@@ -9,6 +9,7 @@
 
   interface $$Props extends ComponentProps<TableRow> {
     item: Item;
+    class?: string;
   }
 
   export let item: Item;
@@ -22,6 +23,6 @@
   };
 </script>
 
-<TableRow on:change={handleChange} selectable {...$$props}>
+<TableRow on:change={handleChange} on:click selectable {...$$props}>
   <slot />
 </TableRow>

@@ -58,17 +58,16 @@
 
   let bulkActionsAvailable = true;
   let selectedItems: MockWorkflow[] = [];
-  const handleSelectedItemsChange = (
-    event: CustomEvent<{ selectedItems: MockWorkflow[] }>,
-  ) => {
-    console.log(event.detail.selectedItems);
-    selectedItems = event.detail.selectedItems;
+  const handleSelectedItemsChange = (event: CustomEvent<MockWorkflow[]>) => {
+    selectedItems = event.detail;
   };
+
+  let updating: boolean = false;
 </script>
 
 <Hst.Story>
   <Hst.Variant title="A Fancy Table">
-    <Table variant="fancy" class="w-full">
+    <Table variant="fancy" class="w-full" bind:updating>
       <TableHeaderRow slot="headers">
         <th class="w-1/5">Status</th>
         <th class="w-1/5">Email</th>
@@ -150,7 +149,11 @@
           selected={selectedItems.includes(workflow)}
           item={workflow}
         >
-          <td>{workflow.status}</td>
+          <td>
+            <Badge type="running">
+              {workflow.status}
+            </Badge>
+          </td>
           <td>{workflow.id}</td>
           <td>{workflow.type}</td>
           <td>{workflow.start}</td>
@@ -165,5 +168,6 @@
       bind:value={bulkActionsAvailable}
       title="Bulk Actions Available:"
     />
+    <Hst.Checkbox bind:value={updating} title="Show Progress Bar:" />
   </svelte:fragment>
 </Hst.Story>
