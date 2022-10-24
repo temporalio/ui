@@ -9,11 +9,10 @@
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import FilterOrCopyButtons from '$holocene/filter-or-copy-buttons.svelte';
-  import SelectableTableRow from '$lib/holocene/table/selectable-table-row.svelte';
+  import TableRow from '$holocene/table/table-row.svelte';
   export let namespace: string;
   export let workflow: WorkflowExecution;
   export let timeFormat: TimeFormat | string;
-  export let selected: boolean;
 
   $: href = routeForWorkflow({
     namespace,
@@ -41,12 +40,7 @@
   };
 </script>
 
-<SelectableTableRow
-  {selected}
-  {href}
-  item={workflow}
-  class="workflow-summary-row cursor-pointer"
->
+<TableRow {href} class="workflow-summary-row">
   <td>
     <WorkflowStatus
       status={workflow.status}
@@ -103,7 +97,7 @@
       {formatDate(workflow.endTime, timeFormat)}
     </p>
   </td>
-</SelectableTableRow>
+</TableRow>
 
 <style lang="postcss">
   :global(.workflow-summary-row:hover) {
