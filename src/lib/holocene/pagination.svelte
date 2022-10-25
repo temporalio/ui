@@ -16,7 +16,6 @@
   export let items: T[];
   export let floatId: string | undefined = undefined;
   export let startingIndex: string | number = 0;
-  export let updating = false;
   const perPageKey = 'per-page';
   const currentPageKey = 'page';
 
@@ -56,22 +55,18 @@
 
 <div class="pagination relative mb-8 flex flex-col gap-4">
   <div
-    class={`flex items-center ${
-      updating || $$slots['action-top-left'] ? 'justify-between' : 'justify-end'
+    class={`flex flex-col items-center gap-4 lg:flex-row ${
+      $$slots['action-top-left'] ? 'justify-between' : 'justify-end'
     }`}
   >
-    {#if updating}
-      <p class="mr-6 text-gray-600">Updating…</p>
-    {:else}
-      <slot name="action-top-left" />
-    {/if}
+    <slot name="action-top-left" />
     <nav
       style={floatStyle}
       bind:clientHeight={height}
-      class="flex justify-end gap-8"
+      class="flex flex-col justify-end gap-4 md:flex-row"
     >
+      <slot name="action-top-center" />
       <div class="flex items-center justify-center gap-2">
-        <p class="w-fit text-right">Per Page</p>
         <FilterSelect
           label="Per Page"
           parameter={perPageKey}
@@ -79,7 +74,7 @@
           options={perPageOptions(perPage)}
         />
       </div>
-      <div class="flex items-center justify-center gap-6">
+      <div class="flex w-56 items-center justify-center gap-4">
         <button
           class="caret"
           disabled={!$store.hasPrevious}
@@ -91,7 +86,8 @@
           <Icon name="chevron-left" />
         </button>
         <p>
-          {$store.startingIndex + 1}–{$store.endingIndex + 1} of {$store.length}
+          {$store.length ? $store.startingIndex + 1 : 0}–{$store.endingIndex +
+            1} of {$store.length}
         </p>
         <button
           class="caret"
@@ -114,9 +110,8 @@
     }`}
   >
     <slot name="action-bottom-left" />
-    <div class="flex gap-8">
+    <div class="flex gap-4">
       <div class="flex items-center justify-center gap-2">
-        <p class="w-fit text-right">Per Page</p>
         <FilterSelect
           label="Per Page"
           parameter={perPageKey}
@@ -124,7 +119,7 @@
           options={perPageOptions(perPage)}
         />
       </div>
-      <div class="flex items-center justify-center gap-6">
+      <div class="flex w-56 items-center justify-center gap-4">
         <button
           class="caret"
           disabled={!$store.hasPrevious}
@@ -133,7 +128,8 @@
           <Icon name="chevron-left" />
         </button>
         <p>
-          {$store.startingIndex + 1}–{$store.endingIndex + 1} of {$store.length}
+          {$store.length ? $store.startingIndex + 1 : 0}–{$store.endingIndex +
+            1} of {$store.length}
         </p>
         <button
           class="caret"

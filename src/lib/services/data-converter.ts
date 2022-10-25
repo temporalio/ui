@@ -2,6 +2,10 @@ import {
   setLastDataConverterFailure,
   setLastDataConverterSuccess,
 } from '$lib/stores/data-converter-config';
+import {
+  parseWithBigInt,
+  stringifyWithBigInt,
+} from '$lib/utilities/parse-with-big-int';
 import type { Payload } from '$types';
 import type WebSocketAsPromised from 'websocket-as-promised';
 
@@ -28,13 +32,13 @@ export async function convertPayloadWithWebsocket(
 
   const socketResponse: Promise<string> = websocket
     .sendRequest({
-      payload: JSON.stringify(payload),
+      payload: stringifyWithBigInt(payload),
     })
     .then((response: WebSocketResponse) => {
       setLastDataConverterSuccess();
 
       try {
-        const decodedResponse = JSON.parse(response.content);
+        const decodedResponse = parseWithBigInt(response.content);
         return decodedResponse;
       } catch {
         // This doesn't seem to be a failure the worker _could_ send back a text response

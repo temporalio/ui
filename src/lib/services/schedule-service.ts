@@ -10,6 +10,7 @@ import type {
 } from '$types';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
+import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
 type ScheduleParameters = {
   namespace: string;
@@ -91,7 +92,7 @@ export async function createSchedule({
     {
       options: {
         method: 'POST',
-        body: JSON.stringify({
+        body: stringifyWithBigInt({
           request_id: uuidv4(),
           ...body,
         }),
@@ -123,7 +124,7 @@ export async function editSchedule({
   return await requestFromAPI<null>(route, {
     options: {
       method: 'POST',
-      body: JSON.stringify({
+      body: stringifyWithBigInt({
         request_id: uuidv4(),
         ...body,
       }),
@@ -157,7 +158,7 @@ export async function pauseSchedule({
   return await requestFromAPI<null>(route, {
     options: {
       method: 'PATCH',
-      body: JSON.stringify({
+      body: stringifyWithBigInt({
         ...options,
         request_id: uuidv4(),
       }),
@@ -191,7 +192,7 @@ export async function unpauseSchedule({
   return await requestFromAPI<null>(route, {
     options: {
       method: 'PATCH',
-      body: JSON.stringify({
+      body: stringifyWithBigInt({
         ...options,
         request_id: uuidv4(),
       }),

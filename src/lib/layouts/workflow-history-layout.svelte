@@ -10,9 +10,6 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { eventViewType } from '$lib/stores/event-view';
 
-  import { onDestroy } from 'svelte';
-  import { clearPreviousEventParameters } from '$lib/stores/events';
-
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import PendingActivities from '$lib/components/workflow/pending-activities.svelte';
@@ -21,6 +18,7 @@
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
   import { timeFormat } from '$lib/stores/time-format';
+  import { exportHistory } from '$lib/utilities/export-history';
 
   const { namespace } = $page.params;
   const { workflow, workers } = $workflowRun;
@@ -43,10 +41,6 @@
     workflow: workflow.id,
     run: workflow.runId,
   };
-
-  onDestroy(() => {
-    clearPreviousEventParameters();
-  });
 </script>
 
 <section class="flex flex-col gap-4">
@@ -154,6 +148,16 @@
             active={$eventViewType === 'json'}
             data-cy="json"
             on:click={() => ($eventViewType = 'json')}>JSON</ToggleButton
+          >
+          <ToggleButton
+            icon="download"
+            data-cy="download"
+            on:click={() =>
+              exportHistory({
+                namespace,
+                workflowId: workflow.id,
+                runId: workflow.runId,
+              })}>Download</ToggleButton
           >
         </ToggleButtons>
       </div>

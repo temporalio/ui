@@ -46,6 +46,14 @@ Cypress.Commands.add('interceptWorkflowsApi', () => {
   ).as('workflows-api');
 });
 
+Cypress.Commands.add('interceptWorkflowsCountApi', () => {
+  cy.intercept(
+    Cypress.env('VITE_API_HOST') +
+      `/api/v1/namespaces/*/workflows/count?query=*`,
+    { fixture: 'count.json' },
+  ).as('workflows-count-api');
+});
+
 Cypress.Commands.add(
   'interceptWorkflowApi',
   (fixture = 'workflow-completed.json') => {
@@ -124,6 +132,7 @@ Cypress.Commands.add(
   ({ namespace } = { namespace: 'default' }) => {
     cy.interceptNamespacesApi();
     cy.interceptWorkflowsApi();
+    cy.interceptWorkflowsCountApi();
     cy.interceptClusterApi();
     cy.interceptArchivedWorkflowsApi();
     cy.interceptGithubReleasesApi();

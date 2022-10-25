@@ -1,12 +1,12 @@
 <script lang="ts">
+  import type { Hst as HST } from '@histoire/plugin-svelte';
   import Accordion from './accordion.svelte';
   import Button from './button.svelte';
-  import CodeBlock from './code-block.svelte';
   import TableHeaderRow from './table/table-header-row.svelte';
   import TableRow from './table/table-row.svelte';
   import Table from './table/table.svelte';
 
-  export let Hst;
+  export let Hst: HST;
 </script>
 
 <Hst.Story layout={{ type: 'single', iframe: false }}>
@@ -36,11 +36,11 @@
     </Accordion>
   </Hst.Variant>
 
-  <Hst.Variant title="With a Code Block">
+  <!-- <Hst.Variant title="With a Code Block">
     <Accordion title="Certificates" subtitle="Expires on Wed Feb 01, 2030">
-      <CodeBlock content={JSON.stringify({ some: 'thing', blue: 42 })} />
+      <CodeBlock content={stringifyWithBigInt({ some: 'thing', blue: 42 })} />
     </Accordion>
-  </Hst.Variant>
+  </Hst.Variant> -->
 
   <Hst.Variant title="A disabled Accordion">
     <Accordion

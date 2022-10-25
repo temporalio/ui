@@ -65,16 +65,40 @@
       : `${$eventSortOrder}:${$timeFormat}:${$eventShowElapsed}`;
 </script>
 
-<DropdownMenu {value} right dataCy="event-date-filter">
-  {#if $supportsReverseOrder}
-    {#each sortOptions as { option, label } (option)}
+<DropdownMenu {value} left dataCy="event-date-filter">
+  <div class="w-56">
+    {#if $supportsReverseOrder}
+      {#each sortOptions as { option, label } (option)}
+        <div
+          class="option"
+          class:active={$eventSortOrder === option}
+          on:click={() => onSortOptionClick(option)}
+        >
+          <div class="check active">
+            {#if $eventSortOrder === option}
+              <Icon name="checkmark" />
+            {/if}
+          </div>
+          <div class="label">
+            {label}
+          </div>
+        </div>
+      {/each}
+
+      <div class="option pr-4">
+        <div class="check" />
+        <div class="my-2 w-full border-b-2 border-gray-300 pr-2" />
+      </div>
+    {/if}
+    {#each dateOptions as { label, option } (option)}
       <div
         class="option"
-        class:active={$eventSortOrder === option}
-        on:click={() => onSortOptionClick(option)}
+        class:active={$timeFormat === option}
+        on:click={() => onDateOptionClick(option)}
+        data-cy="event-date-filter-{option}"
       >
         <div class="check active">
-          {#if $eventSortOrder === option}
+          {#if $timeFormat === option}
             <Icon name="checkmark" />
           {/if}
         </div>
@@ -83,44 +107,22 @@
         </div>
       </div>
     {/each}
-
     <div class="option pr-4">
       <div class="check" />
       <div class="my-2 w-full border-b-2 border-gray-300 pr-2" />
     </div>
-  {/if}
-  {#each dateOptions as { label, option } (option)}
     <div
       class="option"
-      class:active={$timeFormat === option}
-      on:click={() => onDateOptionClick(option)}
-      data-cy="event-date-filter-{option}"
+      class:active={$eventShowElapsed === 'true'}
+      on:click={onShowElapsedClick}
     >
       <div class="check active">
-        {#if $timeFormat === option}
+        {#if $eventShowElapsed === 'true'}
           <Icon name="checkmark" />
         {/if}
       </div>
-      <div class="label">
-        {label}
-      </div>
+      <div class="label">Show Elapsed Time</div>
     </div>
-  {/each}
-  <div class="option pr-4">
-    <div class="check" />
-    <div class="my-2 w-full border-b-2 border-gray-300 pr-2" />
-  </div>
-  <div
-    class="option"
-    class:active={$eventShowElapsed === 'true'}
-    on:click={onShowElapsedClick}
-  >
-    <div class="check active">
-      {#if $eventShowElapsed === 'true'}
-        <Icon name="checkmark" />
-      {/if}
-    </div>
-    <div class="label">Show Elapsed Time</div>
   </div>
 </DropdownMenu>
 

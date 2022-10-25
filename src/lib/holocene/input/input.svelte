@@ -2,6 +2,7 @@
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import Icon from '$holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
+  import { createEventDispatcher } from 'svelte';
 
   export let id: string;
   export let value: string;
@@ -11,12 +12,26 @@
   export let name = id;
   export let copyable: boolean = false;
   export let disabled = false;
+  export let clearable = false;
   export let theme: 'dark' | 'light' = 'light';
   export let autocomplete = false;
   export let valid = true;
   export let hintText = '';
   export let maxLength = 0;
   export let spellcheck: boolean = null;
+  export let unroundRight: boolean = false;
+  export let unroundLeft: boolean = false;
+  export let autoFocus = false;
+
+  function callFocus(input) {
+    if (autoFocus) input.focus();
+  }
+
+  const dispatch = createEventDispatcher();
+  function onClear() {
+    value = '';
+    dispatch('clear', {});
+  }
 
   const { copy, copied } = copyToClipboard();
   $: disabled = disabled || copyable;
@@ -26,7 +41,13 @@
   {#if label}
     <label for={id}>{label}</label>
   {/if}
-  <div class="input-container {theme}" class:disabled class:invalid={!valid}>
+  <div
+    class="input-container {theme}"
+    class:disabled
+    class:unroundRight
+    class:unroundLeft
+    class:invalid={!valid}
+  >
     {#if icon}
       <span class="icon-container">
         <Icon name={icon} />
@@ -48,6 +69,7 @@
       on:change
       on:focus
       on:blur
+      use:callFocus
     />
     {#if copyable}
       <div class="copy-icon-container" on:click={(e) => copy(e, value)}>
@@ -56,6 +78,14 @@
     {:else if disabled}
       <div class="flex h-full w-9 items-center justify-center">
         <Icon name="lock" />
+      </div>
+    {:else if clearable && value}
+      <div
+        class="mr-2 flex h-full h-6 w-6 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200"
+        data-cy="clear-input"
+        on:click={onClear}
+      >
+        <Icon name="close" />
       </div>
     {/if}
     {#if maxLength}
@@ -81,6 +111,14 @@
 
   .input-container {
     @apply relative box-border inline-flex h-10 w-full items-center rounded border border-gray-900 text-sm focus-within:border-blue-700;
+  }
+
+  .unroundRight {
+    @apply rounded-tr-none rounded-br-none;
+  }
+
+  .unroundLeft {
+    @apply rounded-tl-none rounded-bl-none border-l-0;
   }
 
   .input-container.disabled {

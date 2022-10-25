@@ -45,7 +45,7 @@
   import { fromSecondsToDaysOrHours } from '$lib/utilities/format-date';
   import { getClusters } from '$lib/utilities/get-clusters';
 
-  import PageTitle from '$lib/holocene/page-title.svelte';
+  import PageTitle from '$lib/components/page-title.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';

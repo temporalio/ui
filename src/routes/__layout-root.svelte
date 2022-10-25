@@ -2,6 +2,9 @@
   import type { Load } from '@sveltejs/kit';
   import type { ListNamespacesResponse, GetClusterInfoResponse } from '$types';
 
+  import '$lib/vendor/prism/prism.css';
+  import '$lib/vendor/prism/prism.js';
+
   import '../app.css';
 
   import { fetchSettings } from '$lib/services/settings-service';
@@ -13,7 +16,10 @@
   import { getDefaultNamespace } from '$lib/utilities/get-namespace';
   import { isAuthorized } from '$lib/utilities/is-authorized';
   import { routeForLoginPage } from '$lib/utilities/route-for';
-  import { getAuthUserCookie } from '$lib/utilities/get-auth-user-cookie';
+  import {
+    getAuthUserCookie,
+    cleanAuthUserCookie,
+  } from '$lib/utilities/auth-user-cookie';
 
   export const load: Load = async function ({ fetch }) {
     const settings: Settings = await fetchSettings(fetch);
@@ -21,6 +27,7 @@
     const authUser = getAuthUserCookie();
     if (authUser?.accessToken) {
       setAuthUser(authUser);
+      cleanAuthUserCookie();
     }
 
     const user = getAuthUser();
@@ -44,7 +51,7 @@
 
     const cluster: GetClusterInfoResponse = await fetchCluster(settings, fetch);
 
-    fetchSearchAttributes(settings);
+    fetchSearchAttributes(settings, fetch);
 
     const uiVersionInfo: UiVersionInfo = {
       current: settings.version,
@@ -70,7 +77,6 @@
   import Notifications from '$lib/components/notifications.svelte';
   import Banners from '$lib/components/banner/banners.svelte';
   import { ErrorBoundary } from '$lib/components/error-boundary';
-  import PageTitle from '$lib/holocene/page-title.svelte';
   import ScrollToTop from '$lib/holocene/scroll-to-top.svelte';
 
   export let user: User;
@@ -84,7 +90,6 @@
   });
 </script>
 
-<PageTitle />
 <div class="flex w-screen flex-row">
   <Notifications />
   <div class="sticky top-0 z-20 h-screen w-auto">

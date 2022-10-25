@@ -43,10 +43,4 @@
   .dark {
     @apply bg-gray-900 text-white;
   }
-
-  .arrow::after {
-    @apply mr-4 text-sm font-normal text-white;
-    font-family: 'Font Awesome 5 Free';
-    content: '\f0dc';
-  }
 </style>

@@ -1,8 +1,9 @@
 <script lang="ts">
   import Button from '$lib/holocene/button.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import type { Hst as HST } from '@histoire/plugin-svelte';
 
-  export let Hst;
+  export let Hst: HST;
 </script>
 
 <Hst.Story>

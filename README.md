@@ -30,6 +30,8 @@ Developing the UI has the same prequisites as trying it out. Once you've created
 pnpm start
 ```
 
+and open [`localhost:3000`](http://localhost:3000).
+
 By default, the application will start up with a version of the UI for the local version of Temporal. You can start the UI for Temporal Cloud by setting the `VITE_TEMPORAL_UI_BUILD_TARGET` target to `cloud`. Alternatively, you can use either of the following scripts:
 
 ```bash

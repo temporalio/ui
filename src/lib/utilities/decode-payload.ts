@@ -9,6 +9,7 @@ import { convertPayloadsWithCodec } from '$lib/services/data-encoder';
 import type { dataEncoderEndpoint } from '$lib/stores/data-encoder-config';
 
 import { atob } from './atob';
+import { parseWithBigInt } from './parse-with-big-int';
 
 export type Decode = {
   convertPayloadToJsonWithCodec: typeof convertPayloadToJsonWithCodec;
@@ -32,14 +33,12 @@ export function decodePayload(
   // Help users out with an english encoding
   (payload.metadata.encodingDecoded as unknown as string) = encoding;
 
-  switch (encoding) {
-    case 'json/plain':
-    case 'json/protobuf':
-      try {
-        return JSON.parse(atob(String(payload.data)));
-      } catch (_e) {
-        // Couldn't correctly decode this just let the user deal with the data as is
-      }
+  if (encoding.startsWith('json/')) {
+    try {
+      return parseWithBigInt(atob(String(payload.data)));
+    } catch (_e) {
+      // Couldn't correctly decode this just let the user deal with the data as is
+    }
   }
 
   return payload;
@@ -96,7 +95,7 @@ export const decodeAllPotentialPayloadsWithCodec = async (
   namespace: string,
   settings: Settings,
   accessToken: string,
-): Promise<EventAttribute> => {
+): Promise<any> => {
   if (anyAttributes) {
     for (const key of Object.keys(anyAttributes)) {
       if (key === 'payloads') {
@@ -133,7 +132,7 @@ export const decodeAllPotentialPayloadsWithCodec = async (
 export const decodeAllPotentialPayloadsWithWebsockets = async (
   anyAttributes: any,
   ws: DataConverterWebsocketInterface,
-): Promise<EventAttribute> => {
+): Promise<any> => {
   if (anyAttributes) {
     for (const key of Object.keys(anyAttributes)) {
       if (key === 'payloads') {
@@ -171,8 +170,8 @@ export const convertPayloadToJsonWithCodec = async ({
   settings,
   accessToken,
 }: {
-  attributes: EventAttribute;
-} & EventRequestMetadata): Promise<EventAttribute> => {
+  attributes: any;
+} & EventRequestMetadata): Promise<any> => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const anyAttributes = attributes as any;
   const decodedAttributes = await decodeAllPotentialPayloadsWithCodec(
@@ -185,9 +184,9 @@ export const convertPayloadToJsonWithCodec = async ({
 };
 
 export const convertPayloadToJsonWithWebsocket = async (
-  attributes: EventAttribute,
+  attributes: any,
   websocket?: DataConverterWebsocketInterface,
-): Promise<EventAttribute> => {
+): Promise<any> => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const anyAttributes = attributes as any;
   const ws = websocket ?? dataConverterWebsocket;

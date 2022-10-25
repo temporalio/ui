@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { publicPath } from '$lib/utilities/get-public-path';
+  import Logo from '$lib/vendor/Temporal_Logo_Animation.gif';
+
   export let title: string = 'Loading…';
 </script>
 
 <div class="my-12 flex flex-col items-center justify-start {$$props.class}">
   <img
-    src="{publicPath}/Temporal_Logo_Animation.gif"
+    src={Logo}
     style="margin-top: -40px;"
     alt="Temporal Logo"
     width="200px"

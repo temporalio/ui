@@ -12,11 +12,11 @@ const config = {
     storyIgnored: ['node_modules/**', 'dist/**', 'package/**'],
     theme: {
       title: 'Holocene',
-      favicon: './static/favicon.ico',
+      favicon: './src/lib/vendor/favicon.ico',
       logo: {
-        square: '/static/logo-dark.svg',
-        dark: '/static/logo.svg',
-        light: '/static/logo-dark.svg',
+        square: '/src/lib/vendor/logo-dark.svg',
+        dark: '/src/lib/vendor/logo.svg',
+        light: '/src/lib/vendor/logo-dark.svg',
       },
       logoHref: 'https://temporal.io',
       colors: {

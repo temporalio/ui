@@ -5,7 +5,6 @@
   import Loading from '$holocene/loading.svelte';
   import { fetchRawEvents } from '$lib/services/events-service';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-  import PageTitle from '$lib/holocene/page-title.svelte';
 
   const { namespace, workflow: workflowId, run: runId } = $page.params;
 
@@ -17,7 +16,6 @@
   });
 </script>
 
-<PageTitle title={`Workflow History | ${workflowId}`} url={$page.url.href} />
 {#await events}
   <Loading />
 {:then events}

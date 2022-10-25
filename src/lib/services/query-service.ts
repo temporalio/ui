@@ -5,7 +5,15 @@ import {
 import { routeForApi } from '$lib/utilities/route-for-api';
 
 import { getQueryTypesFromError } from '$lib/utilities/get-query-types-from-error';
-import { atob } from '$lib/utilities/atob';
+import { getEncoderEndpoint } from '$lib/utilities/get-encoder-endpoint';
+import {
+  convertPayloadToJsonWithCodec,
+  convertPayloadToJsonWithWebsocket,
+} from '$lib/utilities/decode-payload';
+import {
+  parseWithBigInt,
+  stringifyWithBigInt,
+} from '$lib/utilities/parse-with-big-int';
 
 type QueryRequestParameters = {
   workflow: Eventual<{ id: string; runId: string }>;
@@ -61,7 +69,7 @@ async function fetchQuery(
   return await requestFromAPI<QueryResponse>(route, {
     options: {
       method: 'POST',
-      body: JSON.stringify({
+      body: stringifyWithBigInt({
         execution: {
           workflowId: workflow.id,
           runId: workflow.runId,
@@ -101,22 +109,37 @@ export async function getQueryTypes(
 
 export async function getQuery(
   options: QueryRequestParameters,
+  settings: Settings,
+  accessToken: string,
   request = fetch,
 ): Promise<ParsedQuery> {
-  return fetchQuery(options, request).then((execution) => {
+  return fetchQuery(options, request).then(async (execution) => {
     const { queryResult } = execution ?? { queryResult: { payloads: [] } };
 
     let data: ParsedQuery = queryResult.payloads;
-
     try {
       if (data[0]) {
-        data = atob(queryResult.payloads[0].data);
+        const endpoint = getEncoderEndpoint(settings);
+        const _settings = {
+          ...settings,
+          codec: { ...settings?.codec, endpoint },
+        };
+        const convertedAttributes = endpoint
+          ? await convertPayloadToJsonWithCodec({
+              attributes: queryResult,
+              namespace: options.namespace,
+              settings: _settings,
+              accessToken,
+            })
+          : await convertPayloadToJsonWithWebsocket(queryResult);
+
+        data = convertedAttributes?.payloads[0];
       }
 
-      return JSON.parse(data);
-    } catch {
+      return parseWithBigInt(data);
+    } catch (e) {
       if (typeof data !== 'string') {
-        return JSON.stringify(data);
+        return stringifyWithBigInt(data);
       }
 
       return data;
@@ -126,7 +149,12 @@ export async function getQuery(
 
 export async function getWorkflowStackTrace(
   options: WorkflowParameters,
-  request = fetch,
+  settings: Settings,
+  accessToken: string,
 ): Promise<ParsedQuery> {
-  return getQuery({ ...options, queryType: '__stack_trace' }, request);
+  return getQuery(
+    { ...options, queryType: '__stack_trace' },
+    settings,
+    accessToken,
+  );
 }

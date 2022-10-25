@@ -17,7 +17,6 @@
   import Button from '$lib/holocene/button.svelte';
   import Loading from '$holocene/loading.svelte';
   import FormInput from '$lib/holocene/forms/form-input.svelte';
-  import PageTitle from '$lib/holocene/page-title.svelte';
 
   let { namespace } = $page.params;
 
@@ -30,7 +29,6 @@
   };
 </script>
 
-<PageTitle title={`Create Schedule | ${namespace}`} url={$page.url.href} />
 <article class="pb-20">
   {#if $loading}
     <Loading title="Creating Schedule..." />
