@@ -29,7 +29,8 @@
     <p>
       <small class="text-gray-900"
         ><ScheduleFrequency
-          calendar={schedule?.info?.spec?.calendar?.[0]}
+          calendar={schedule?.info?.spec?.structuredCalendar?.[0] ??
+            schedule?.info?.spec?.calendar?.[0]}
           interval={schedule?.info?.spec?.interval?.[0]}
         /></small
       >

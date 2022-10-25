@@ -17,10 +17,13 @@
   import Button from '$lib/holocene/button.svelte';
   import Loading from '$holocene/loading.svelte';
   import FormInput from '$lib/holocene/forms/form-input.svelte';
+  import MonthPicker from '$lib/holocene/month-picker.svelte';
+  import DayOfMonthPicker from '$lib/holocene/day-of-month-picker.svelte';
+  import DayOfWeekPicker from '$lib/holocene/day-of-week-picker.svelte';
 
   let { namespace } = $page.params;
 
-  let tab = 'interval';
+  let tab = 'calendar';
 
   const form = useForm();
 
@@ -88,20 +91,28 @@
           </div>
         </div>
       {:else if tab === 'calendar'}
-        <div class="mb-4 flex flex gap-4">
-          <div class="w-1/4">
+        <div class="mb-4 flex flex-row gap-4">
+          <div class="w-full">
             <FormInput field={fields.year} />
           </div>
-          <div class="w-1/4">
-            <FormInput field={fields.month} />
+        </div>
+        <div class="mb-4 flex flex-row gap-4">
+          <div class="w-full md:w-1/2">
+            <MonthPicker />
+            <!-- <FormInput field={fields.month} /> -->
           </div>
-          <div class="w-1/4">
-            <FormInput field={fields.dayOfMonth} />
-          </div>
-          <div class="w-1/4">
-            <FormInput field={fields.dayOfWeek} />
+          <div class="w-full md:w-1/2">
+            <DayOfMonthPicker />
           </div>
         </div>
+        <div class="mb-4 flex flex-row gap-4">
+          <div class="w-full">
+            <DayOfWeekPicker />
+            <!-- <FormInput field={fields.dayOfMonth} /> -->
+          </div>
+        </div>
+
+        <div class="mb-4 flex flex-row gap-4" />
         <div class="mb-4 flex flex w-full gap-4">
           <div class="w-1/3">
             <FormInput field={fields.hour} />

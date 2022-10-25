@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { noop } from 'svelte/internal';
-  import { getDateRows } from '$lib/utilities/calendar';
+  import { getDateRows, weekDays } from '$lib/utilities/calendar';
 
   const dispatch = createEventDispatcher();
 
@@ -10,7 +10,6 @@
   export let year: number | undefined;
   export let isAllowed = (_date: Date) => true;
 
-  const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
   let cells = [];
 
   const onChange = (date: number) => {
@@ -30,7 +29,7 @@
 
 <div class="container">
   <div class="row">
-    {#each weekdays as day}
+    {#each weekDays as day}
       <p class="cell">{day}</p>
     {/each}
   </div>
