@@ -19,14 +19,26 @@
   import Accordion from '$lib/holocene/accordion.svelte';
   import { timeFormat } from '$lib/stores/time-format';
   import { exportHistory } from '$lib/utilities/export-history';
+  import { onMount } from 'svelte';
 
   const { namespace } = $page.params;
   const { workflow, workers } = $workflowRun;
   const namespaces = $page.stuff?.namespaces;
 
-  $: parentNamespace = namespaces.find(
-    (n) => n?.namespaceInfo?.id === workflow?.parentNamespaceId,
-  );
+  let parentNamespace;
+
+  onMount(async () => {
+    if (globalThis?.GetNamespaces()) {
+      const namespaces = await globalThis?.GetNamespaces();
+      parentNamespace = namespaces.find(
+        (n) => n?.namespaceInfo?.id === workflow?.parentNamespaceId,
+      );
+    } else {
+      parentNamespace = namespaces.find(
+        (n) => n?.namespaceInfo?.id === workflow?.parentNamespaceId,
+      );
+    }
+  });
 
   const routeParameters = (view: EventView, eventId?: string) => ({
     namespace,

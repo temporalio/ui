@@ -90,7 +90,6 @@ export const routeForWorkflow = ({
   ...parameters
 }: WorkflowParameters): string => {
   const wid = encodeURIForSvelte(workflow);
-
   return `${routeForWorkflows(parameters)}/${wid}/${run}`;
 };
 

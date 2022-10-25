@@ -4,7 +4,6 @@
   import { format } from '$lib/utilities/format-camel-case';
   import {
     routeForWorkflow,
-    routeForWorkers,
     routeForTaskQueue,
   } from '$lib/utilities/route-for';
   import {
@@ -41,7 +40,7 @@
         {inline}
       />
     </div>
-  {:else if shouldDisplayAsExecutionLink(key)}
+  {:else if shouldDisplayAsExecutionLink(key) && namespace && workflow}
     <div class="detail-row">
       <p class="text-sm">{format(key)}</p>
       <div class="text-sm">
@@ -94,7 +93,7 @@
         </Copyable>
       </div>
     </div>
-  {:else if shouldDisplayAsTaskQueueLink(key)}
+  {:else if shouldDisplayAsTaskQueueLink(key) && namespace}
     <div class="detail-row">
       <p class="text-sm">{format(key)}</p>
       <div class="text-sm">

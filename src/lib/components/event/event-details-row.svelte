@@ -35,7 +35,7 @@
       {format(key)}
     </p>
     <CodeBlock content={getCodeBlockValue(value)} class="w-[95%]" {inline} />
-  {:else if shouldDisplayAsExecutionLink(key)}
+  {:else if shouldDisplayAsExecutionLink(key) && workflow && namespace}
     <div class="xl:3/4 flex w-full items-center xl:items-start">
       <p class="mr-3 text-sm">{format(key)}</p>
       <div class="text-sm">
@@ -70,7 +70,7 @@
         </Copyable>
       </div>
     </div>
-  {:else if shouldDisplayAsTaskQueueLink(key)}
+  {:else if shouldDisplayAsTaskQueueLink(key) && namespace}
     <div class="xl:3/4 flex w-full items-center xl:items-start">
       <p class="mr-3 text-sm">{format(key)}</p>
       <div class="text-sm">
