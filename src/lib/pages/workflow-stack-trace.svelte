@@ -8,9 +8,9 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Button from '$holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import PageTitle from '$lib/holocene/page-title.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import { authUser } from '$lib/stores/auth-user';
 
   const { namespace } = $page.params;
   const { workflow, workers } = $workflowRun;
@@ -19,10 +19,14 @@
   let isLoading = false;
 
   const getStackTrace = () =>
-    getWorkflowStackTrace({
-      workflow,
-      namespace,
-    });
+    getWorkflowStackTrace(
+      {
+        workflow,
+        namespace,
+      },
+      $page.stuff.settings,
+      $authUser?.accessToken,
+    );
 
   let stackTrace: Eventual<ParsedQuery>;
   $: {
@@ -30,10 +34,14 @@
   }
 
   const refreshStackTrace = () => {
-    stackTrace = getWorkflowStackTrace({
-      workflow,
-      namespace,
-    });
+    stackTrace = getWorkflowStackTrace(
+      {
+        workflow,
+        namespace,
+      },
+      $page.stuff.settings,
+      $authUser?.accessToken,
+    );
 
     stackTrace.then(() => {
       currentdate = new Date();
@@ -41,7 +49,6 @@
   };
 </script>
 
-<PageTitle title={`Stack Trace | ${workflow.id}`} url={$page.url.href} />
 <section>
   {#if workflow.isRunning && workers?.pollers?.length > 0}
     {#await stackTrace}

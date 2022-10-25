@@ -23,6 +23,7 @@ import {
   routeForSchedule,
   routeForTaskQueue,
   isNamespaceParameter,
+  routeForWorkflowsWithQuery,
 } from './route-for';
 
 describe('routeFor', () => {
@@ -36,6 +37,17 @@ describe('routeFor', () => {
       namespace: 'default',
     });
     expect(path).toBe('/namespaces/default');
+  });
+
+  it('should route to "workflows with query"', () => {
+    const path = routeForWorkflowsWithQuery({
+      namespace: 'default',
+      query: 'ExecutionStatus="Running"',
+      search: 'basic',
+    });
+    expect(path).toBe(
+      '/namespaces/default/workflows?query=ExecutionStatus%3D%22Running%22&search=basic',
+    );
   });
 
   it('should route to "workflows"', () => {
@@ -140,6 +152,14 @@ describe('routeFor', () => {
       queue: 'some-task-queue',
     });
     expect(path).toBe('/namespaces/default/task-queues/some-task-queue');
+  });
+
+  it('should route to a task queue containing slashes', () => {
+    const path = routeForTaskQueue({
+      namespace: 'default',
+      queue: 'some/task-queue',
+    });
+    expect(path).toBe('/namespaces/default/task-queues/some%2Ftask-queue');
   });
 });
 

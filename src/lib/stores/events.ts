@@ -15,12 +15,13 @@ import {
   FetchEventsParameters,
   FetchEventsParametersWithSettings,
 } from '$lib/services/events-service';
-
 import { eventCategoryParam, eventSortOrder } from './event-view';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { withLoading, delay } from '$lib/utilities/stores/with-loading';
 import { groupEvents } from '$lib/models/event-groups';
 import { refresh } from '$lib/stores/workflow-run';
+import { authUser } from '$lib/stores/auth-user';
+import { previous } from '$lib/stores/previous-events';
 
 const emptyEvents: FetchEventsResponse = {
   events: [],
@@ -50,19 +51,10 @@ const runId = derived([page], ([$page]) => {
 
 const settings = derived([page], ([$page]) => $page.stuff.settings);
 
-const emptyPrevious: FetchEventsParameters = {
-  namespace: null,
-  workflowId: null,
-  runId: null,
-  rawPayloads: null,
-  sort: null,
-};
-
-const previous: Writable<FetchEventsParameters> = writable(emptyPrevious);
-
-export const clearPreviousEventParameters = (): void => {
-  previous.set(emptyPrevious);
-};
+const accessToken = derived(
+  [authUser],
+  ([$authUser]) => $authUser?.accessToken,
+);
 
 const isNewRequest = (
   params: FetchEventsParameters,
@@ -102,11 +94,12 @@ export const parameters: Readable<FetchEventsParameters> = derived(
 
 export const parametersWithSettings: Readable<FetchEventsParametersWithSettings> =
   derived(
-    [parameters, settings, refresh],
-    ([$parameters, $settings, $refresh]) => {
+    [parameters, settings, accessToken, refresh],
+    ([$parameters, $settings, $accessToken, $refresh]) => {
       return {
         ...$parameters,
         settings: $settings,
+        accessToken: $accessToken,
         refresh,
         $refresh,
       };

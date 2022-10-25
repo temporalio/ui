@@ -9,10 +9,10 @@ import type { SettingsResponse } from '$types';
 export const isCloudMatch = /(tmprl\.cloud|tmprl-test\.cloud)$/;
 
 export const fetchSettings = async (request = fetch): Promise<Settings> => {
-  const settingsResponse: SettingsResponse = await requestFromAPI(
-    routeForApi('settings'),
-    { request },
-  );
+  const route = await routeForApi('settings');
+  const settingsResponse: SettingsResponse = await requestFromAPI(route, {
+    request,
+  });
 
   const EnvironmentOverride = getEnvironment();
 
@@ -24,7 +24,7 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     baseUrl: getApiOrigin(),
     codec: {
       endpoint: settingsResponse?.Codec?.Endpoint,
-      accessToken: settingsResponse?.Codec?.AccessToken,
+      passAccessToken: settingsResponse?.Codec?.PassAccessToken,
     },
     defaultNamespace: settingsResponse?.DefaultNamespace || 'default', // API returns an empty string if default namespace is not configured
     disableWriteActions: !!settingsResponse?.DisableWriteActions || false,

@@ -1,11 +1,12 @@
 <script lang="ts">
+  import type { Hst as HST } from '@histoire/plugin-svelte';
   import ToggleButton from './toggle-button.svelte';
   import ToggleButtons from './toggle-buttons.svelte';
   let tab = {
     a: 'auto',
     b: 'auto',
   };
-  export let Hst;
+  export let Hst: HST;
 </script>
 
 <Hst.Story>

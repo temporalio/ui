@@ -7,8 +7,11 @@
   import { notifications } from '$lib/stores/notifications';
   import { importEvents, importEventGroups } from '$lib/stores/import-events';
   import { importSettings } from './_import-settings';
+  import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   let rawEvents: HistoryEvent[] | { events: HistoryEvent[] };
+
+  export let user: User = {};
 
   const onFileSelect = async (e: Event) => {
     const target = e.target as HTMLInputElement;
@@ -19,7 +22,7 @@
       reader.onload = () => {
         try {
           const result = reader?.result?.toString() ?? '';
-          rawEvents = JSON.parse(result);
+          rawEvents = parseWithBigInt(result);
         } catch (e) {
           notifications.add('error', 'Could not parse JSON');
         }
@@ -33,6 +36,7 @@
         response: Array.isArray(rawEvents) ? rawEvents : rawEvents?.events,
         namespace: importSettings.defaultNamespace,
         settings: importSettings,
+        accessToken: user.accessToken,
       });
       importEvents.set(events);
       importEventGroups.set(eventGroups);

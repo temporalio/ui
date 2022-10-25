@@ -2,26 +2,40 @@
   import type { Load } from '@sveltejs/kit';
   import type { ListNamespacesResponse, GetClusterInfoResponse } from '$types';
 
+  import '$lib/vendor/prism/prism.css';
+  import '$lib/vendor/prism/prism.js';
+
   import '../app.css';
 
   import { fetchSettings } from '$lib/services/settings-service';
-  import { fetchUser } from '$lib/services/user-service';
+  import { getAuthUser, setAuthUser } from '$lib/stores/auth-user';
   import { fetchCluster } from '$lib/services/cluster-service';
   import { fetchNamespaces } from '$lib/services/namespaces-service';
   import { fetchLatestUiVersion } from '$lib/services/github-service';
   import { fetchSearchAttributes } from '$lib/services/search-attributes-service';
-
   import { getDefaultNamespace } from '$lib/utilities/get-namespace';
   import { isAuthorized } from '$lib/utilities/is-authorized';
+  import { routeForLoginPage } from '$lib/utilities/route-for';
+  import {
+    getAuthUserCookie,
+    cleanAuthUserCookie,
+  } from '$lib/utilities/auth-user-cookie';
 
   export const load: Load = async function ({ fetch }) {
     const settings: Settings = await fetchSettings(fetch);
-    const user = await fetchUser(fetch);
+
+    const authUser = getAuthUserCookie();
+    if (authUser?.accessToken) {
+      setAuthUser(authUser);
+      cleanAuthUserCookie();
+    }
+
+    const user = getAuthUser();
 
     if (!isAuthorized(settings, user)) {
       return {
         status: 302,
-        redirect: '/login',
+        redirect: routeForLoginPage(),
       };
     }
 
@@ -58,18 +72,24 @@
 </script>
 
 <script lang="ts">
+  import { updated } from '$app/stores';
   import Header from './_header.svelte';
   import Notifications from '$lib/components/notifications.svelte';
   import Banners from '$lib/components/banner/banners.svelte';
   import { ErrorBoundary } from '$lib/components/error-boundary';
-  import PageTitle from '$lib/holocene/page-title.svelte';
   import ScrollToTop from '$lib/holocene/scroll-to-top.svelte';
 
   export let user: User;
   export let uiVersionInfo: UiVersionInfo;
+
+  updated.subscribe(async (value) => {
+    if (value) {
+      // Hard refresh when version does not match
+      window.location.reload();
+    }
+  });
 </script>
 
-<PageTitle />
 <div class="flex w-screen flex-row">
   <Notifications />
   <div class="sticky top-0 z-20 h-screen w-auto">

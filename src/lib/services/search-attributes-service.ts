@@ -8,12 +8,10 @@ export const fetchSearchAttributes = async (
 ): Promise<SearchAttributesResponse> => {
   if (settings.runtimeEnvironment.isCloud) return;
 
-  return await requestFromAPI<SearchAttributesResponse>(
-    routeForApi('search-attributes'),
-    {
-      request,
-    },
-  ).then((searchAttributesResponse) => {
+  const route = await routeForApi('search-attributes');
+  return await requestFromAPI<SearchAttributesResponse>(route, {
+    request,
+  }).then((searchAttributesResponse) => {
     if (searchAttributesResponse?.keys) {
       searchAttributes.set(searchAttributesResponse.keys);
     }

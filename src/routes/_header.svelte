@@ -8,13 +8,15 @@
     routeForWorkflows,
     routeForSchedules,
     routeForNamespaces,
+    routeForLoginPage,
   } from '$lib/utilities/route-for';
 
   import Navigation from '$lib/holocene/navigation/full-nav.svelte';
   import DataEncoderStatus from '$lib/holocene/data-encoder-status.svelte';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import { getApiOrigin } from '$lib/utilities/get-api-origin';
   import { showDataEncoderSettings } from '$lib/stores/show-data-encoder';
+  import { clearAuthUser } from '$lib/stores/auth-user';
+  import { workflowSorts, workflowFilters } from '$lib/stores/filters';
 
   export let user: User;
 
@@ -48,6 +50,8 @@
       href: (namespace: string) => getCurrentHref(namespace),
       onClick: (namespace: string) => {
         $lastUsedNamespace = namespace;
+        $workflowFilters = [];
+        $workflowSorts = [];
         goto(getCurrentHref(namespace));
       },
     };
@@ -60,6 +64,8 @@
       href: (namespace: string) => routeForWorkflows({ namespace }),
       onClick: (namespace: string) => {
         $lastUsedNamespace = $page.params.namespace;
+        $workflowFilters = [];
+        $workflowSorts = [];
         goto(routeForWorkflows({ namespace }));
       },
     });
@@ -76,7 +82,10 @@
       'https://github.com/temporalio/ui/issues/new/choose',
   };
 
-  const logout = () => goto(getApiOrigin() + '/auth/logout');
+  const logout = () => {
+    clearAuthUser();
+    goto(routeForLoginPage());
+  };
 </script>
 
 <Navigation

@@ -157,7 +157,7 @@ describe('Set Data Encoder Settings', () => {
         Auth: { Enabled: false, Options: null },
         Codec: {
           Endpoint: 'http://test.com',
-          AccessToken: 'abcde',
+          PassAccessToken: true,
         },
       }).as('settings-api');
 

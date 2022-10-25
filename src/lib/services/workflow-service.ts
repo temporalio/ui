@@ -9,6 +9,7 @@ import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 import { handleUnauthorizedOrForbiddenError } from '$lib/utilities/handle-error';
+import { noop } from 'svelte/internal';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;
@@ -24,6 +25,54 @@ export type CombinedWorkflowExecutionsResponse = {
 export type FetchWorkflow =
   | typeof fetchAllWorkflows
   | typeof fetchAllArchivedWorkflows;
+
+export const fetchWorkflowCount = async (
+  namespace: string,
+  query: string,
+  request = fetch,
+): Promise<{ totalCount: number; count: number }> => {
+  let totalCount = 0;
+  let count = 0;
+  try {
+    const countRoute = await routeForApi('workflows.count', { namespace });
+
+    if (!query) {
+      const totalCountResult = await requestFromAPI<{ count: number }>(
+        countRoute,
+        {
+          params: { query },
+          onError: noop,
+          handleError: noop,
+          request,
+        },
+      );
+      totalCount = totalCountResult?.count;
+    } else {
+      const countPromise = requestFromAPI<{ count: number }>(countRoute, {
+        params: { query },
+        onError: noop,
+        handleError: noop,
+        request,
+      });
+      const totalCountPromise = requestFromAPI<{ count: number }>(countRoute, {
+        params: { query: '' },
+        onError: noop,
+        handleError: noop,
+        request,
+      });
+      const [countResult, totalCountResult] = await Promise.all([
+        countPromise,
+        totalCountPromise,
+      ]);
+      count = countResult?.count;
+      totalCount = totalCountResult?.count;
+    }
+  } catch (e) {
+    // Don't fail the workflows call due to count
+  }
+
+  return { count, totalCount };
+};
 
 export const fetchAllWorkflows = async (
   namespace: string,
@@ -43,26 +92,23 @@ export const fetchAllWorkflows = async (
   const onError: ErrorCallback = (err) => {
     // Kick out to login if 401/403
     handleUnauthorizedOrForbiddenError(err);
-    error =
-      err?.body?.message ??
-      `Error fetching workflows: ${err.status}: ${err.statusText}`;
+    if (err?.body?.message || err?.status) {
+      error =
+        err?.body?.message ??
+        `Error fetching workflows: ${err.status}: ${err.statusText}`;
+    } else {
+      error = `Error fetching workflows: Server failed to respond`;
+    }
   };
 
-  const handleError = () => {
-    // Handle when bad namespace is entered in URL and no status code is returned
-    error = 'Failed to fetch workflows';
-  };
-
+  const route = await routeForApi(endpoint, { namespace });
   const { executions, nextPageToken } =
-    (await requestFromAPI<ListWorkflowExecutionsResponse>(
-      routeForApi(endpoint, { namespace }),
-      {
-        params: { query },
-        onError,
-        handleError,
-        request,
-      },
-    )) ?? { executions: [], nextPageToken: '' };
+    (await requestFromAPI<ListWorkflowExecutionsResponse>(route, {
+      params: { query },
+      onError,
+      handleError: onError,
+      request,
+    })) ?? { executions: [], nextPageToken: '' };
 
   return {
     workflows: toWorkflowExecutions({ executions }),
@@ -83,7 +129,6 @@ export async function fetchWorkflow(
   parameters: GetWorkflowExecutionRequest,
   request = fetch,
 ): Promise<WorkflowExecution> {
-  return requestFromAPI(routeForApi('workflow', parameters), { request }).then(
-    toWorkflowExecution,
-  );
+  const route = await routeForApi('workflow', parameters);
+  return requestFromAPI(route, { request }).then(toWorkflowExecution);
 }

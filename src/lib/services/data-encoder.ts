@@ -3,6 +3,7 @@ import {
   setLastDataEncoderSuccess,
 } from '$lib/stores/data-encoder-config';
 import { validateHttps } from '$lib/utilities/is-http';
+import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
 import type { Payloads } from '$types';
 
@@ -10,20 +11,22 @@ export async function convertPayloadsWithCodec({
   payloads,
   namespace,
   settings,
+  accessToken,
 }: {
   payloads: Payloads;
   namespace: string;
   settings: Settings;
+  accessToken: string;
 }): Promise<Payloads> {
   const endpoint = settings?.codec?.endpoint;
-  const accessToken = settings?.codec?.accessToken;
+  const passAccessToken = settings?.codec?.passAccessToken;
 
   const headers = {
     'Content-Type': 'application/json',
     'X-Namespace': namespace,
   };
 
-  if (accessToken) {
+  if (passAccessToken) {
     if (validateHttps(endpoint)) {
       headers['Authorization'] = `Bearer ${accessToken}`;
     } else {
@@ -36,7 +39,7 @@ export async function convertPayloadsWithCodec({
   const encoderResponse: Promise<Payloads> = fetch(endpoint + '/decode', {
     headers,
     method: 'POST',
-    body: JSON.stringify(payloads),
+    body: stringifyWithBigInt(payloads),
   })
     .then((r) => r.json())
     .then((response) => {

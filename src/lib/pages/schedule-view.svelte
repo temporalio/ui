@@ -27,7 +27,6 @@
   import SplitButton from '$holocene/split-button.svelte';
   import Loading from '$holocene/loading.svelte';
   import type { DescribeScheduleResponse } from '$types';
-  import PageTitle from '$holocene/page-title.svelte';
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
@@ -83,7 +82,6 @@
   ];
 </script>
 
-<PageTitle title={`Schedule | ${scheduleId}`} url={$page.url.href} />
 {#await scheduleFetch}
   <Loading />
 {:then schedule}

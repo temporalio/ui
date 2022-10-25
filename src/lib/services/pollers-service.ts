@@ -29,15 +29,16 @@ export async function getPollers(
   options = { returnAllPollers: false },
   request = fetch,
 ): Promise<GetPollersResponse> {
-  const workflowPollers = await requestFromAPI<GetPollersResponse>(
-    routeForApi('task-queue', parameters),
-    { request, params: { taskQueueType: '1' } },
-  );
+  const route = await routeForApi('task-queue', parameters);
+  const workflowPollers = await requestFromAPI<GetPollersResponse>(route, {
+    request,
+    params: { taskQueueType: '1' },
+  });
 
-  const activityPollers = await requestFromAPI<GetPollersResponse>(
-    routeForApi('task-queue', parameters),
-    { request, params: { taskQueueType: '2' } },
-  );
+  const activityPollers = await requestFromAPI<GetPollersResponse>(route, {
+    request,
+    params: { taskQueueType: '2' },
+  });
 
   activityPollers.pollers.forEach((poller: PollerWithTaskQueueTypes) => {
     poller.taskQueueTypes = ['ACTIVITY'];

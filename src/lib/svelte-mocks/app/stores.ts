@@ -17,7 +17,7 @@ const settings: Settings = {
   baseUrl: 'http://localhost:3000',
   codec: {
     endpoint: '',
-    accessToken: '',
+    passAccessToken: false,
   },
   defaultNamespace: 'default',
   disableWriteActions: false,

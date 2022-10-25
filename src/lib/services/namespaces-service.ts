@@ -17,8 +17,9 @@ export async function fetchNamespaces(
     return emptyNamespace;
   }
 
+  const route = await routeForApi('namespaces');
   const results = await paginated(async (token: string) =>
-    requestFromAPI<ListNamespacesResponse>(routeForApi('namespaces'), {
+    requestFromAPI<ListNamespacesResponse>(route, {
       request,
       token,
       onError: () => notifications.add('error', 'Unable to fetch namespaces'),

@@ -8,8 +8,8 @@
   import Option from '$lib/holocene/select/simple-option.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Button from '$holocene/button.svelte';
-  import PageTitle from '$lib/holocene/page-title.svelte';
   import Loading from '$lib/holocene/loading.svelte';
+  import { authUser } from '$lib/stores/auth-user';
 
   const { namespace } = $page.params;
   const { workflow } = $workflowRun;
@@ -33,7 +33,15 @@
   let queryResult: Promise<string>;
 
   const query = (queryType: string) => {
-    queryResult = getQuery({ namespace, workflow: workflowParams, queryType });
+    queryResult = getQuery(
+      {
+        namespace,
+        workflow: workflowParams,
+        queryType,
+      },
+      $page.stuff.settings,
+      $authUser?.accessToken,
+    );
   };
 
   $: {
@@ -41,7 +49,6 @@
   }
 </script>
 
-<PageTitle title={`Query | ${workflow.id}`} url={$page.url.href} />
 <section>
   {#await queryTypes}
     <div class="text-center">

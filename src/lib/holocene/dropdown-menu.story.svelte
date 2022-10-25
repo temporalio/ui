@@ -2,19 +2,20 @@
   import DropdownMenu from '$lib/holocene/dropdown-menu.svelte';
   import Icon from '$holocene/icon/icon.svelte';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
+  import type { Hst as HST } from '@histoire/plugin-svelte';
 
-  export let Hst;
+  export let Hst: HST;
 </script>
 
 <Hst.Story>
   <DropdownMenu id="dropdown-1">
     <Icon name="vertical-ellipsis" slot="trigger" />
-    <svelte:fragment slot="items">
+    <div class="w-56" slot="items">
       <MenuItem href="https://temporal.io">Link</MenuItem>
       <MenuItem disabled href="https://temporal.io">Disabled Link</MenuItem>
       <MenuItem selected>Selected</MenuItem>
       <MenuItem>Standard</MenuItem>
       <MenuItem destructive>Destructive</MenuItem>
-    </svelte:fragment>
+    </div>
   </DropdownMenu>
 </Hst.Story>

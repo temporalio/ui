@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
-  import { goto } from '$app/navigation';
+  import { browser } from '$app/env';
   import { page } from '$app/stores';
 
   import Button from '$holocene/button.svelte';
@@ -28,12 +28,14 @@
   import NavigationHeader from '$lib/components/navigation-header.svelte';
   import HamburgerHeader from '$lib/components/hamburger-header.svelte';
   import { publicPath } from '$lib/utilities/get-public-path';
+  import PageTitle from '$lib/components/page-title.svelte';
 
   const error = $page.url.searchParams.get('error');
 
   export let settings: Settings;
 </script>
 
+<PageTitle title="Login" url={$page.url.href} />
 <NavigationHeader href="{publicPath}/" user={undefined} />
 <HamburgerHeader href="{publicPath}/" user={undefined} />
 <section class="my-[20vh] text-center">
@@ -45,13 +47,15 @@
       variant="login"
       icon="lock"
       on:click={() => {
-        goto(
-          routeForAuthentication({
-            settings,
-            searchParams: $page.url.searchParams,
-            originUrl: $page.url.origin,
-          }),
-        );
+        if (browser) {
+          window.location.assign(
+            routeForAuthentication({
+              settings,
+              searchParams: $page.url.searchParams,
+              originUrl: $page.url.origin,
+            }),
+          );
+        }
       }}>Continue to SSO</Button
     >
   </div>

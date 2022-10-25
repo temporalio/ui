@@ -8,7 +8,7 @@
   import Button from '$holocene/button.svelte';
 
   export let showSettings: boolean;
-  export let accessToken: string;
+  export let passAccessToken: boolean;
   export let onCancel: () => void;
 
   let endpoint: string = '';
@@ -25,7 +25,7 @@
   };
   const onEndpointSet = () => {
     if (validateHttpOrHttps(endpoint)) {
-      if (accessToken) {
+      if (passAccessToken) {
         checkForHttps();
       } else {
         $dataEncoderEndpoint = endpoint;

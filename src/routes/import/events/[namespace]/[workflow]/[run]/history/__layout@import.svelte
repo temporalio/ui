@@ -4,13 +4,14 @@
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import HistoryImport from '../../../../../_event-history-import.svelte';
+  import { authUser } from '$lib/stores/auth-user';
 </script>
 
 <section id="event-history">
   <nav class="flex items-end justify-between gap-4 pb-4">
     <h3 class="text-lg font-medium">Event History</h3>
     <div class="flex gap-4">
-      <HistoryImport />
+      <HistoryImport user={authUser} />
     </div>
   </nav>
   <nav class="my-4 flex items-end justify-end gap-4">

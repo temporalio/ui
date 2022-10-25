@@ -9,3 +9,4 @@ node_modules
 *.swp
 /.vercel_build_output
 /.vercel
+/.histoire/*

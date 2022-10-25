@@ -33,8 +33,7 @@
     <div class="hidden xl:table-row">
       <div class="table-header w-12 rounded-tl-md" />
       <div class="table-header w-80">
-        Date & Time
-        {#if !compact}<EventDateFilter />{/if}
+        Date & Time{#if !compact}<EventDateFilter />{/if}
       </div>
       <div
         bind:offsetWidth={$workflowEventsColumnWidth}
@@ -44,16 +43,14 @@
       </div>
       <div class="table-header w-auto" />
       <div class="table-header relative w-32 rounded-tr-md">
-        <div class="absolute right-5 top-3">
-          <input
-            class="mr-1"
-            type="checkbox"
-            name="expandAll"
-            on:change={handleChange}
-            checked={expandAll}
-          />
-          <label for="expandAll">Expand all</label>
-        </div>
+        <input
+          class="mr-1"
+          type="checkbox"
+          name="expandAll"
+          on:change={handleChange}
+          checked={expandAll}
+        />
+        <label for="expandAll">Expand all</label>
       </div>
     </div>
   </div>
@@ -99,7 +96,7 @@
   }
 
   .table-header {
-    @apply flex px-3 py-2 text-left xl:table-cell;
+    @apply flex items-center px-3 py-1 text-left xl:table-cell;
   }
 
   .table-header-responsive {

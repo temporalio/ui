@@ -1,3 +1,4 @@
+import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
@@ -12,16 +13,14 @@ export async function terminateWorkflow({
   namespace,
   reason,
 }: TerminateWorkflowOptions): Promise<null> {
-  return await requestFromAPI<null>(
-    routeForApi('workflow.terminate', {
-      namespace,
-      workflowId: workflow.id,
-      runId: workflow.runId,
-    }),
-    {
-      options: { method: 'POST', body: JSON.stringify({ reason }) },
-      shouldRetry: false,
-      notifyOnError: false,
-    },
-  );
+  const route = await routeForApi('workflow.terminate', {
+    namespace,
+    workflowId: workflow.id,
+    runId: workflow.runId,
+  });
+  return await requestFromAPI<null>(route, {
+    options: { method: 'POST', body: stringifyWithBigInt({ reason }) },
+    shouldRetry: false,
+    notifyOnError: false,
+  });
 }

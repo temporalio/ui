@@ -1,6 +1,10 @@
 <script lang="ts">
   import Icon from '$holocene/icon/icon.svelte';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
+  import {
+    parseWithBigInt,
+    stringifyWithBigInt,
+  } from '$lib/utilities/parse-with-big-int';
 
   export let content: Parameters<typeof JSON.stringify>[0];
   export let inline = false;
@@ -14,12 +18,12 @@
 
     let parsedData: string;
     try {
-      parsedData = JSON.parse(jsonData);
+      parsedData = parseWithBigInt(jsonData);
     } catch (error) {
       parsedData = jsonData;
     }
 
-    return JSON.stringify(parsedData, undefined, inline ? 0 : 2);
+    return stringifyWithBigInt(parsedData, undefined, inline ? 0 : 2);
   };
 
   $: parsedContent = isJSON ? formatJSON(content) : content;
@@ -61,9 +65,19 @@
 
     <button
       on:click={(e) => copy(e, parsedContent)}
-      class="absolute top-4 right-4"
+      class="absolute top-4 right-4 rounded-full opacity-90 hover:bg-white"
+      class:inline
     >
-      <Icon name={$copied ? 'checkmark' : 'copy'} class="text-white" />
+      <Icon
+        name={$copied ? 'checkmark' : 'copy'}
+        class="text-white hover:text-gray-900"
+      />
     </button>
   </div>
 {/if}
+
+<style lang="postcss">
+  .inline {
+    @apply top-5 right-2;
+  }
+</style>

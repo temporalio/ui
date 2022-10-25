@@ -18,7 +18,12 @@
     {#if filterable}
       <button on:click|preventDefault|stopPropagation={onFilter}>
         {#key filtered}
-          <Icon name={filtered ? 'filter-solid' : 'filter'} class="h-4 w-4" />
+          <Icon
+            name="filter"
+            class="h-4 w-4 rounded-sm {filtered
+              ? 'bg-gray-900 text-white'
+              : ''}"
+          />
         {/key}
       </button>
     {/if}
@@ -32,6 +37,6 @@
 
 <style lang="postcss">
   .copy-or-filter {
-    @apply absolute right-0 top-0 bottom-0 z-50 inline-flex gap-2 rounded-full bg-gray-50 px-2;
+    @apply absolute right-0 top-0 bottom-0 inline-flex gap-2 rounded-full bg-gray-50 px-2;
   }
 </style>
