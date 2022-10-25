@@ -7,23 +7,14 @@
   let onDark = false;
   let indeterminate = false;
   let disabled = false;
+  let label = '';
 </script>
 
 <Hst.Story>
   <Hst.Variant title="A Checkbox">
     <Checkbox
       id="checkbox-input"
-      label="Select All"
-      bind:checked
-      bind:onDark
-      bind:indeterminate
-      bind:disabled
-    />
-  </Hst.Variant>
-
-  <Hst.Variant title="A Checkbox without a label">
-    <Checkbox
-      id="checkbox-without-label"
+      bind:label
       bind:checked
       bind:onDark
       bind:indeterminate
@@ -35,5 +26,6 @@
     <Hst.Checkbox bind:value={onDark} title="On Dark:" />
     <Hst.Checkbox bind:value={indeterminate} title="Indeterminate:" />
     <Hst.Checkbox bind:value={disabled} title="Disabled:" />
+    <Hst.Text bind:value={label} title="Label:" />
   </svelte:fragment>
 </Hst.Story>
