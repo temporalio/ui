@@ -4,7 +4,6 @@
   import { format } from '$lib/utilities/format-camel-case';
   import {
     routeForWorkflow,
-    routeForWorkers,
     routeForTaskQueue,
   } from '$lib/utilities/route-for';
   import {
