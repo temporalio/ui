@@ -61,7 +61,6 @@
   }
 
   .label {
-    /* 18px is the height of .checkmark - 16x16 box with 1px border on each side */
     @apply absolute ml-6 flex items-center whitespace-nowrap;
   }
 
