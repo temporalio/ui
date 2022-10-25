@@ -5,7 +5,6 @@
 </script>
 
 <a
-  data-sveltekit-prefetch
   {href}
   target={newTab ? '_blank' : '_self'}
   class:text-blue-900={active}
