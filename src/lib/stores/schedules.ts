@@ -75,6 +75,12 @@ export const fields: Record<string, FormField> = {
     label: 'Second',
     required: false,
   },
+  cronString: {
+    key: 'schedule.spec.cronString',
+    label: 'Cron String',
+    placeholder: '',
+    required: false,
+  },
 
   // TODO: Post Alpha, add support of additional fields.
   // "startTime": "2022-07-04T03:18:59.668Z",
@@ -83,6 +89,37 @@ export const fields: Record<string, FormField> = {
   // "timezoneName": "string",
   // "timezoneData": "string"
 };
+
+const structuredCalendar = [
+  {
+    "second": [],
+    "minute": [],
+    "hour": [
+      {
+        "start": 12,
+        "end": 12,
+        "step": 0
+      }
+    ],
+    "dayOfMonth": [
+      {
+        "start": 26,
+        "end": 26,
+        "step": 0
+      }
+    ],
+    "month": [
+      {
+        "start": 10,
+        "end": 10,
+        "step": 0
+      }
+    ],
+    "year": [],
+    "dayOfWeek": [],
+    "comment": "string"
+  }
+]
 
 export const submitScheduleForm = async (
   form: Form,
@@ -93,6 +130,7 @@ export const submitScheduleForm = async (
     schedule_id: '',
     schedule: {
       spec: {
+        // structuredCalendar,
         calendar: [],
         interval: [],
       },

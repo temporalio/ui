@@ -70,6 +70,12 @@
             data-cy="calendar"
             on:click={() => (tab = 'calendar')}>Calendar</ToggleButton
           >
+          <ToggleButton
+            icon="terminal"
+            active={tab === 'cronString'}
+            data-cy="cronString"
+            on:click={() => (tab = 'cronString')}>Manual</ToggleButton
+          >
         </ToggleButtons>
       </div>
       {#if tab === 'interval'}
@@ -81,7 +87,7 @@
             <FormInput field={fields.phase} />
           </div>
         </div>
-      {:else}
+      {:else if tab === 'calendar'}
         <div class="mb-4 flex flex gap-4">
           <div class="w-1/4">
             <FormInput field={fields.year} />
@@ -105,6 +111,12 @@
           </div>
           <div class="w-1/3">
             <FormInput field={fields.second} />
+          </div>
+        </div>
+      {:else}
+        <div class="mb-4 flex flex w-full gap-4">
+          <div class="w-full">
+            <FormInput field={fields.cronString} />
           </div>
         </div>
       {/if}
