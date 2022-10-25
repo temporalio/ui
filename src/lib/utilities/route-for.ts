@@ -13,6 +13,8 @@ type RouteParameters = {
   scheduleId: string;
   queue: string;
   schedule: string;
+  query?: string;
+  search?: string;
 };
 
 export const isEventView = (view: string): view is EventView => {
@@ -23,6 +25,10 @@ export const isEventView = (view: string): view is EventView => {
 };
 
 export type NamespaceParameter = Pick<RouteParameters, 'namespace'>;
+export type WorkflowsParameter = Pick<
+  RouteParameters,
+  'namespace' | 'query' | 'search'
+>;
 export type TaskQueueParameters = Pick<RouteParameters, 'namespace' | 'queue'>;
 export type WorkflowParameters = Pick<
   RouteParameters,
@@ -62,6 +68,18 @@ export const routeForNamespaceSelector = () => {
 
 export const routeForWorkflows = (parameters: NamespaceParameter): string => {
   return `${routeForNamespace(parameters)}/workflows`;
+};
+
+export const routeForWorkflowsWithQuery = ({
+  namespace,
+  query,
+  search,
+}: WorkflowsParameter): string => {
+  if (!browser) {
+    return undefined;
+  }
+
+  return toURL(routeForWorkflows({ namespace }), { query, search });
 };
 
 export const routeForArchivalWorkfows = (
