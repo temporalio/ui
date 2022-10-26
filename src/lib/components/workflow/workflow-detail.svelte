@@ -8,7 +8,7 @@
   export let textSize = 'md';
 </script>
 
-<article class="flex gap-2 text-{textSize}">
+<article class="flex gap-2 text-{textSize}" data-cy={$$props['data-cy']}>
   <div class="font-medium">{title}:</div>
   <div>
     {#if href}

@@ -45,20 +45,27 @@
 
 <section class="flex flex-col gap-4">
   <section class="flex flex-col gap-1">
-    <WorkflowDetail title="Workflow Type" content={workflow.name} />
-    <WorkflowDetail title="Run ID" content={workflow.runId} />
+    <WorkflowDetail
+      title="Workflow Type"
+      data-cy="workflow-type"
+      content={workflow.name}
+    />
+    <WorkflowDetail title="Run ID" data-cy="run-id" content={workflow.runId} />
     <div class="flex flex-col gap-1 md:flex-row md:gap-6">
       <WorkflowDetail
         title="Start Time"
+        data-cy="start-time"
         content={formatDate(workflow.startTime, $timeFormat)}
       />
       <WorkflowDetail
         title="Close Time"
+        data-cy="close-time"
         content={formatDate(workflow.endTime, $timeFormat)}
       />
     </div>
     <WorkflowDetail
       title="Task Queue"
+      data-cy="task-queue"
       content={workflow.taskQueue}
       href={routeForWorkers(workflowRoute)}
     />
@@ -67,6 +74,7 @@
         <WorkflowDetail
           title="Parent"
           content={workflow.parent?.workflowId}
+          data-cy="parent-workflow-id"
           href={routeForWorkflow({
             namespace: parentNamespace?.namespaceInfo?.name ?? namespace,
             workflow: workflow.parent?.workflowId,
@@ -76,6 +84,7 @@
         <WorkflowDetail
           title="Parent ID"
           content={workflow.parent?.runId}
+          data-cy="parent-run-id"
           href={routeForWorkflow({
             namespace: parentNamespace?.namespaceInfo?.name ?? namespace,
             workflow: workflow.parent?.workflowId,
@@ -89,6 +98,7 @@
         <WorkflowDetail
           title="Child"
           content={child.workflowId}
+          data-cy="child-workflow-id"
           href={routeForWorkflow({
             namespace,
             workflow: child.workflowId,
@@ -98,6 +108,7 @@
         <WorkflowDetail
           title="Child ID"
           content={child.runId}
+          data-cy="child-run-id"
           href={routeForWorkflow({
             namespace,
             workflow: child.workflowId,
@@ -108,6 +119,7 @@
     {/each}
     <WorkflowDetail
       title="State Transitions"
+      data-cy="state-transitions"
       content={workflow.stateTransitionCount}
     />
   </section>
