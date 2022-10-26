@@ -12,6 +12,7 @@
     routeForStackTrace,
     routeForWorkers,
     routeForWorkflowQuery,
+    routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
   import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
@@ -20,7 +21,6 @@
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
   import Tab from '$lib/holocene/tab.svelte';
-  import { encodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { page } from '$app/stores';
   import { pathMatches } from '$lib/utilities/path-matches';
   import AutoRefreshWorkflow from '$lib/components/auto-refresh-workflow.svelte';
@@ -79,9 +79,11 @@
   <main class="relative flex flex-col gap-1">
     <div class="-mt-3 -ml-2 mb-4 block">
       <a
-        href={`/namespaces/${namespace}/workflows?query=${encodeURIForSvelte(
+        href={routeForWorkflowsWithQuery({
+          namespace,
           query,
-        )}&search=${searchType}`}
+          search: searchType,
+        })}
         data-cy="back-to-workflows"
         class="back-to-workflows"
       >

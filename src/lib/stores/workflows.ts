@@ -1,13 +1,11 @@
 import { derived, readable, writable } from 'svelte/store';
 import { page } from '$app/stores';
 
-import {
-  fetchAllWorkflows,
-  fetchWorkflowCount,
-} from '$lib/services/workflow-service';
+import { fetchAllWorkflows } from '$lib/services/workflow-service';
 import { withLoading } from '$lib/utilities/stores/with-loading';
 
 import type { StartStopNotifier } from 'svelte/store';
+import { publicPath } from '$lib/utilities/get-public-path';
 
 export const refresh = writable(0);
 const namespace = derived([page], ([$page]) => $page.params.namespace);
@@ -32,7 +30,9 @@ const setCounts = (_workflowCount: { totalCount: number; count: number }) => {
 
 const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
   return parameters.subscribe(({ namespace, query, path }) => {
-    const isWorkflowsPage = path === `/namespaces/${namespace}/workflows`;
+    const isWorkflowsPage =
+      path == `${publicPath}/namespaces/${namespace}/workflows`;
+
     if (isWorkflowsPage) {
       withLoading(loading, updating, async () => {
         const { workflows, error } = await fetchAllWorkflows(namespace, {

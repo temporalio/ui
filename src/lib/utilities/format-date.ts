@@ -152,17 +152,24 @@ export function getMilliseconds(date: ValidTime | undefined | null): number {
   return getSecondAsMilliseconds(parsedDate);
 }
 
-export function fromSecondsToDaysOrHours(seconds: string): string {
+export function fromSecondsToDaysOrHours(seconds: string | number): string {
   if (!seconds) return '';
-  if (seconds.includes('s')) {
-    seconds = seconds.replace('s', '');
+
+  if (typeof seconds === 'string') {
+    if (seconds.includes('s')) {
+      seconds = seconds.replace('s', '');
+    }
+
+    seconds = parseInt(seconds);
   }
 
-  const duration = intervalToDuration({
-    start: 0,
-    end: parseInt(seconds) * 1000,
-  });
-  return durationToString(duration, { format: ['days', 'hours'] });
+  const hours = Math.floor(seconds / (60 * 60));
+  const days = Math.floor(seconds / (24 * 60 * 60));
+
+  if (days === 1) return days + ' day';
+  if (days > 1) return days + ' days';
+  if (hours === 1) return hours + ' hour';
+  return hours + ' hours';
 }
 
 export const getTimestampDifference = (

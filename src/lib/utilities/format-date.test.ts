@@ -145,13 +145,17 @@ describe('fromSecondsToDaysOrHours', () => {
     const seconds = '432000s';
     expect(fromSecondsToDaysOrHours(seconds)).toBe('5 days');
   });
-  it('should return hours for less than 1 day of seconds', () => {
+  it('should return "3 hours" for less than 1 day of seconds', () => {
     const seconds = '10800s';
     expect(fromSecondsToDaysOrHours(seconds)).toBe('3 hours');
   });
-  it('should return hour for one hour of seconds', () => {
+  it('should return "1 hour" for one hour of seconds', () => {
     const seconds = '3600s';
     expect(fromSecondsToDaysOrHours(seconds)).toBe('1 hour');
+  });
+  it('should return "33 days" for 2851200s', () => {
+    const seconds = '2851200s';
+    expect(fromSecondsToDaysOrHours(seconds)).toBe('33 days');
   });
 });
 

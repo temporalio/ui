@@ -1,6 +1,6 @@
 {
   "name": "@temporalio/ui",
-  "version": "2.1.70",
+  "version": "2.1.74",
   "type": "module",
   "description": "Temporal.io UI",
   "keywords": [
@@ -100,7 +100,7 @@
     "prettier-plugin-tailwindcss": "^0.1.11",
     "stylelint": "^14.6.1",
     "stylelint-config-recommended": "^7.0.0",
-    "svelte": "^3.47.0",
+    "svelte": "^3.52.0",
     "svelte-check": "^2.4.5",
     "svelte-highlight": "^3.4.0",
     "svelte-loader": "^3.1.2",

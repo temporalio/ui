@@ -4,33 +4,28 @@
 
   export let Hst: HST;
   let checked = true;
+  let onDark = false;
+  let indeterminate = false;
+  let disabled = false;
+  let label = '';
 </script>
 
 <Hst.Story>
   <Hst.Variant title="A Checkbox">
-    <Checkbox id="checkbox-input" label="Select All" bind:checked />
-  </Hst.Variant>
-
-  <Hst.Variant title="An indeterminate Checkbox Input">
     <Checkbox
       id="checkbox-input"
-      label="Select All"
-      indeterminate
+      bind:label
       bind:checked
+      bind:onDark
+      bind:indeterminate
+      bind:disabled
     />
   </Hst.Variant>
 
-  <Hst.Variant title="A disabled Checkbox Input">
-    <Checkbox id="checkbox-input" label="Select All" bind:checked disabled />
-  </Hst.Variant>
-
-  <Hst.Variant title="A disabled indeterminate Checkbox Input">
-    <Checkbox
-      id="checkbox-input"
-      label="Select All"
-      indeterminate
-      bind:checked
-      disabled
-    />
-  </Hst.Variant>
+  <svelte:fragment slot="controls">
+    <Hst.Checkbox bind:value={onDark} title="On Dark:" />
+    <Hst.Checkbox bind:value={indeterminate} title="Indeterminate:" />
+    <Hst.Checkbox bind:value={disabled} title="Disabled:" />
+    <Hst.Text bind:value={label} title="Label:" />
+  </svelte:fragment>
 </Hst.Story>
