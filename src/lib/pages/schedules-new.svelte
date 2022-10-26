@@ -20,6 +20,8 @@
   import MonthPicker from '$lib/holocene/month-picker.svelte';
   import DayOfMonthPicker from '$lib/holocene/day-of-month-picker.svelte';
   import DayOfWeekPicker from '$lib/holocene/day-of-week-picker.svelte';
+  import SimpleSelect from '$lib/holocene/select/simple-select.svelte';
+  import { noop } from 'svelte/internal';
 
   let { namespace } = $page.params;
 
@@ -60,103 +62,82 @@
       <div class="w-full">
         <FormInput field={fields.workflowTaskQueue} />
       </div>
-      <div class="my-2 flex justify-center">
-        <ToggleButtons>
-          <ToggleButton
-            active={tab === 'calendar'}
-            data-cy="calendar"
-            on:click={() => (tab = 'calendar')}>Calendar</ToggleButton
-          >
-          <ToggleButton
-            active={tab === 'cronString'}
-            data-cy="cronString"
-            on:click={() => (tab = 'cronString')}>String</ToggleButton
-          >
-        </ToggleButtons>
+      <div class="flex gap-4 w-full justify-center mt-8">
+        <Button
+          active={preset === 'minutes'}
+          on:click={() => (preset = 'minutes')}>Minutes</Button
+        >
+        <Button
+          active={preset === 'hourly'}
+          on:click={() => (preset = 'hourly')}>Hourly</Button
+        >
+        <Button active={preset === 'daily'} on:click={() => (preset = 'daily')}
+          >Daily</Button
+        >
+        <Button
+          active={preset === 'weekly'}
+          on:click={() => (preset = 'weekly')}>Weekly</Button
+        >
+        <Button
+          active={preset === 'monthly'}
+          on:click={() => (preset = 'monthly')}>Monthly</Button
+        >
+        <Button
+          active={preset === 'yearly'}
+          on:click={() => (preset = 'yearly')}>Yearly</Button
+        >
+        <Button
+          active={preset === 'string'}
+          on:click={() => (preset = 'string')}>String</Button
+        >
       </div>
-      {#if tab === 'calendar'}
-        <div class="flex gap-4 w-full justify-center">
-          <Button
-            active={preset === 'minutes'}
-            on:click={() => (preset = 'minutes')}>Minutes</Button
-          >
-          <Button
-            active={preset === 'hourly'}
-            on:click={() => (preset = 'hourly')}>Hourly</Button
-          >
-          <Button
-            active={preset === 'daily'}
-            on:click={() => (preset = 'daily')}>Daily</Button
-          >
-          <Button
-            active={preset === 'weekly'}
-            on:click={() => (preset = 'weekly')}>Weekly</Button
-          >
-          <Button
-            active={preset === 'monthly'}
-            on:click={() => (preset = 'monthly')}>Monthly</Button
-          >
-          <Button
-            active={preset === 'yearly'}
-            on:click={() => (preset = 'yearly')}>Yearly</Button
-          >
-          <Button
-            active={preset === 'common'}
-            on:click={() => (preset = 'common')}>Common</Button
-          >
-        </div>
-        {#if preset === 'minutes'}
-          <div class="mb-4 flex gap-4">
-            <div class="w-full">
-              <FormInput field={fields.interval} />
+      {#if preset === 'weekly'}
+        <DayOfWeekPicker />
+      {:else if preset === 'monthly'}
+        <DayOfMonthPicker />
+      {:else if preset === 'yearly'}
+        <MonthPicker />
+        <DayOfMonthPicker />
+      {:else if preset === 'string'}
+        <FormInput field={fields.cronString} hideLabel />
+      {/if}
+      {#if preset !== 'string'}
+        <div
+          class="mb-4 flex items-center justify-center w-full gap-4 border rounded p-4"
+        >
+          {#if preset !== 'minutes'}
+            <div class="flex items-center gap-4">
+              <p>{preset === 'hourly' ? 'Every' : 'Starting at'}</p>
+              <div class="w-24">
+                <FormInput field={fields.hour} hideLabel />
+              </div>
             </div>
-            <div class="w-full">
-              <FormInput field={fields.phase} />
-            </div>
-          </div>
-        {:else if preset === 'hourly'}
-          <div class="mb-4 flex gap-4">
-            <div class="w-full">
-              <FormInput field={fields.interval} />
-            </div>
-            <div class="w-full">
-              <FormInput field={fields.phase} />
-            </div>
-          </div>
-        {:else if preset === 'weekly'}
-          <DayOfWeekPicker />
-        {:else if preset === 'monthly'}
-          <DayOfMonthPicker />
-        {:else if preset === 'yearly'}
-          <MonthPicker />
-          <DayOfMonthPicker />
-        {/if}
-        {#if preset !== 'minutes' && preset !== 'hourly'}
-          <div
-            class="mb-4 flex items-center justify-center w-full gap-4 bg-gray-100 p-4"
-          >
-            <div class="w-24">
-              <FormInput field={fields.hour} hideLabel />
-            </div>
-            <div class="w-4">:</div>
+            <div>:</div>
+          {/if}
+          <div class="flex items-center gap-4">
+            {#if preset === 'minutes'}
+              <p>Every</p>
+            {/if}
             <div class="w-24">
               <FormInput field={fields.minute} hideLabel />
             </div>
-            <div class="w-4">:</div>
-            <div class="w-24">
-              <FormInput field={fields.second} hideLabel />
-            </div>
           </div>
-        {/if}
-      {:else}
-        <div class="mb-4 flex flex w-full gap-4">
-          <div class="w-full">
-            <FormInput field={fields.cronString} />
+          <div>:</div>
+          <div class="w-24">
+            <FormInput field={fields.second} hideLabel />
           </div>
         </div>
       {/if}
+      <div class="flex justify-center">
+        <Button
+          variant="secondary"
+          on:click={noop}
+          disabled={preset === 'string'}>+</Button
+        >
+      </div>
       <div class="flex justify-between">
         <Button disabled={!$form.valid} on:click={handleClick}>Create</Button>
+
         <a
           href={routeForSchedules({ namespace })}
           class="back-to-schedules"

@@ -14,6 +14,6 @@
 
 <style lang="postcss">
   .cell {
-    @apply rounded border p-2 w-full cursor-pointer hover:bg-blue-700 hover:text-white;
+    @apply rounded border p-2 w-full cursor-pointer bg-gray-300 hover:bg-blue-700 hover:text-white;
   }
 </style>
