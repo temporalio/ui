@@ -21,13 +21,13 @@
   class:disabled
   class:on-dark={onDark}
 >
-  {#if label}
-    <span class="label">
+  <span class="label">
+    {#if label}
       {@html label}
-    </span>
-  {:else}
-    &nbsp;
-  {/if}
+    {:else}
+      &nbsp;
+    {/if}
+  </span>
   <input
     on:click|stopPropagation
     on:change={handleChange}
@@ -53,7 +53,7 @@
 
 <style lang="postcss">
   .checkbox {
-    @apply relative block w-fit cursor-pointer select-none align-middle text-sm leading-6 text-primary;
+    @apply flex w-fit cursor-pointer select-none items-center text-sm leading-6 text-primary;
   }
 
   .checkbox.on-dark {
@@ -61,8 +61,7 @@
   }
 
   .label {
-    /* 18px is the height of .checkmark - 16x16 box with 1px border on each side */
-    @apply absolute left-6 flex h-[18px] items-center whitespace-nowrap;
+    @apply absolute ml-6 flex items-center whitespace-nowrap;
   }
 
   input {
@@ -70,7 +69,7 @@
   }
 
   .checkmark {
-    @apply absolute top-0 left-0 box-content h-4 w-4 cursor-pointer rounded-sm border border-gray-500 bg-white;
+    @apply absolute box-content h-4 w-4 cursor-pointer rounded-sm border border-gray-500 bg-white;
   }
 
   .checkmark.on-dark {
