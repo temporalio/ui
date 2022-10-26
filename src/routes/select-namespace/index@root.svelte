@@ -8,7 +8,8 @@
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
-  import es from 'date-fns/locale/es';
+  import { fetchWorkflowForAuthorization } from '$lib/services/workflow-service';
+  import { notifications } from '$lib/stores/notifications';
 
   let searchField: HTMLInputElement = null;
 
@@ -25,10 +26,17 @@
   const namespaceList: NamespaceItem[] = namespaces.map((namespace: string) => {
     return {
       namespace,
-      href: (namespace: string) => routeForWorkflows({ namespace }),
-      onClick: (namespace: string) => {
-        $lastUsedNamespace = namespace;
-        goto(routeForWorkflows({ namespace }));
+      onClick: async (namespace: string) => {
+        const { authorized } = await fetchWorkflowForAuthorization(namespace);
+        if (authorized) {
+          $lastUsedNamespace = namespace;
+          goto(routeForWorkflows({ namespace }));
+        } else {
+          notifications.add(
+            'error',
+            'You do not have access to this namespace.',
+          );
+        }
       },
     };
   });
@@ -59,8 +67,7 @@
       {#if filteredList.length}
         <VirtualList items={filteredList} let:item itemHeight={50}>
           <li class="link-item" on:click={() => item?.onClick(item.namespace)}>
-            <a href={item.href(item.namespace)} class="link">{item.namespace}</a
-            >
+            {item.namespace}
           </li>
         </VirtualList>
       {:else}
