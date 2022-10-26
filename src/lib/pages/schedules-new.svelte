@@ -15,14 +15,11 @@
   import Button from '$lib/holocene/button.svelte';
   import Loading from '$holocene/loading.svelte';
   import FormInput from '$lib/holocene/forms/form-input.svelte';
-  import { noop } from 'svelte/internal';
   import SchedulesCalendarView from '$lib/components/schedule/schedules-calendar-view.svelte';
-  import Tab from '$lib/holocene/tab.svelte';
 
   let { namespace } = $page.params;
 
-  let preset = 'daily';
-  let calendars = [];
+  let calendars = [1];
 
   const form = useForm();
 
@@ -58,50 +55,15 @@
       <div class="w-full">
         <FormInput field={fields.workflowTaskQueue} />
       </div>
-      <div class="flex flex-wrap gap-6 w-full justify-center mt-8">
-        <Tab
-          label="Minutes"
-          dataCy="minutes-tab"
-          active={preset === 'minutes'}
-          on:click={() => (preset = 'minutes')}
-        />
-        <Tab
-          label="Hourly"
-          dataCy="hourly-tab"
-          active={preset === 'hourly'}
-          on:click={() => (preset = 'hourly')}
-        />
-        <Tab
-          label="Daily"
-          dataCy="daily-tab"
-          active={preset === 'daily'}
-          on:click={() => (preset = 'daily')}
-        />
-        <Tab
-          label="Weekly"
-          dataCy="weekly-tab"
-          active={preset === 'weekly'}
-          on:click={() => (preset = 'weekly')}
-        />
-        <Tab
-          label="Monthly"
-          dataCy="monthly-tab"
-          active={preset === 'monthly'}
-          on:click={() => (preset = 'monthyl')}
-        />
-        <Tab
-          label="Yearly"
-          dataCy="yearly-tab"
-          active={preset === 'yearly'}
-          on:click={() => (preset = 'yearly')}
-        />
-      </div>
-      <SchedulesCalendarView {preset} />
+      {#each calendars as calendar}
+        <SchedulesCalendarView />
+      {/each}
       <div class="flex justify-center">
         <Button
           variant="secondary"
-          on:click={noop}
-          disabled={preset === 'string'}>+</Button
+          on:click={() =>
+            (calendars = [...calendars, calendars[calendars.length - 1] + 1])}
+          >+</Button
         >
       </div>
       <div class="flex justify-between">

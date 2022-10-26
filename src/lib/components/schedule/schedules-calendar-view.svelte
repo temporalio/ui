@@ -8,10 +8,49 @@
   import MonthPicker from '$lib/holocene/month-picker.svelte';
   import DayOfMonthPicker from '$lib/holocene/day-of-month-picker.svelte';
   import DayOfWeekPicker from '$lib/holocene/day-of-week-picker.svelte';
+  import Tab from '$lib/holocene/tab.svelte';
 
-  export let preset = 'daily';
+  let preset = 'daily';
 </script>
 
+<div class="flex flex-wrap gap-6 w-full justify-center mt-8">
+  <Tab
+    label="Minutes"
+    dataCy="minutes-tab"
+    active={preset === 'minutes'}
+    on:click={() => (preset = 'minutes')}
+  />
+  <Tab
+    label="Hourly"
+    dataCy="hourly-tab"
+    active={preset === 'hourly'}
+    on:click={() => (preset = 'hourly')}
+  />
+  <Tab
+    label="Daily"
+    dataCy="daily-tab"
+    active={preset === 'daily'}
+    on:click={() => (preset = 'daily')}
+  />
+  <Tab
+    label="Weekly"
+    dataCy="weekly-tab"
+    active={preset === 'weekly'}
+    on:click={() => (preset = 'weekly')}
+  />
+  <Tab
+    label="Monthly"
+    dataCy="monthly-tab"
+    active={preset === 'monthly'}
+    on:click={() => (preset = 'monthly')}
+  />
+  <Tab
+    label="Yearly"
+    dataCy="yearly-tab"
+    active={preset === 'yearly'}
+    on:click={() => (preset = 'yearly')}
+  />
+</div>
 {#if preset === 'minutes'}
   <div
     class="mb-4 flex items-center justify-center w-full gap-2 border rounded p-4"
