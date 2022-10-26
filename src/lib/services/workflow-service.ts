@@ -8,7 +8,11 @@ import {
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
-import { handleUnauthorizedOrForbiddenError } from '$lib/utilities/handle-error';
+import {
+  handleUnauthorizedOrForbiddenError,
+  isForbidden,
+  isUnauthorized,
+} from '$lib/utilities/handle-error';
 import { noop } from 'svelte/internal';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
@@ -114,6 +118,35 @@ export const fetchAllWorkflows = async (
     workflows: toWorkflowExecutions({ executions }),
     nextPageToken: String(nextPageToken),
     error,
+  };
+};
+
+export const fetchWorkflowForAuthorization = async (
+  namespace: string,
+  request = fetch,
+  archived = false,
+): Promise<{ authorized: boolean }> => {
+  const endpoint: ValidWorkflowEndpoints = archived
+    ? 'workflows.archived'
+    : 'workflows';
+
+  let authorized = true;
+  const onError: ErrorCallback = (err) => {
+    if (isUnauthorized(err) || isForbidden(err)) {
+      authorized = false;
+    }
+  };
+
+  const route = await routeForApi(endpoint, { namespace });
+  await requestFromAPI<ListWorkflowExecutionsResponse>(route, {
+    params: { pageSize: '1' },
+    onError,
+    handleError: onError,
+    request,
+  });
+
+  return {
+    authorized,
   };
 };
 
