@@ -130,8 +130,6 @@
         {:else if preset === 'yearly'}
           <MonthPicker />
           <DayOfMonthPicker />
-        {:else if preset === 'common'}
-          <MonthPicker />
         {/if}
         {#if preset !== 'minutes' && preset !== 'hourly'}
           <div
