@@ -39,7 +39,7 @@
       @apply bg-gray-900 text-gray-100;
 
       :global(th.selectable) {
-        @apply w-10 px-3;
+        @apply h-12 w-12 min-w-[36px] px-3;
       }
 
       :global(th) {
@@ -61,7 +61,7 @@
 
     tbody :global {
       td.selectable {
-        @apply w-10 px-3;
+        @apply w-12 px-3;
       }
 
       td {

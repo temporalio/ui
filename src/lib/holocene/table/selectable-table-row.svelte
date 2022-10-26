@@ -9,10 +9,12 @@
 
   interface $$Props extends ComponentProps<TableRow> {
     item: Item;
+    selected: boolean;
     class?: string;
   }
 
   export let item: Item;
+  export let selected: boolean;
 
   const { handleSelectRow } = getContext<SelectableTableContext<Item>>(
     'selectable-table-context',
@@ -23,6 +25,12 @@
   };
 </script>
 
-<TableRow on:change={handleChange} on:click selectable {...$$props}>
+<TableRow
+  on:change={handleChange}
+  on:click
+  selectable
+  bind:selected
+  {...$$props}
+>
   <slot />
 </TableRow>

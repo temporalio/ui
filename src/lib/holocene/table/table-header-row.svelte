@@ -3,6 +3,7 @@
 
   export let selectable: boolean = false;
   export let selected: boolean = false;
+  export let checkboxLabel: string = null;
   export let indeterminate: boolean = false;
 </script>
 
@@ -10,10 +11,10 @@
   <th class:selectable>
     {#if selectable}
       <Checkbox
-        class="mt-1"
         onDark
         bind:checked={selected}
         {indeterminate}
+        label={checkboxLabel}
         on:change
       />
     {/if}

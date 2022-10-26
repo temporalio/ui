@@ -10,7 +10,7 @@
   <a class="table-row align-middle {$$props.class}" {href}>
     <td class:selectable on:click|stopPropagation>
       {#if selectable}
-        <Checkbox class="mt-2" bind:checked={selected} on:change />
+        <Checkbox bind:checked={selected} on:change />
       {/if}
     </td>
     <slot />
@@ -20,7 +20,7 @@
   <tr on:click class={$$props.class}>
     <td class:selectable>
       {#if selectable}
-        <Checkbox class="mt-2" bind:checked={selected} on:change />
+        <Checkbox bind:checked={selected} on:change />
       {/if}
     </td>
     <slot />
