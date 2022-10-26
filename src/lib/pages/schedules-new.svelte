@@ -8,8 +8,6 @@
     error,
   } from '$lib/stores/schedules';
 
-  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
-  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import Icon from '$holocene/icon/icon.svelte';
 
   import { page } from '$app/stores';
@@ -17,16 +15,14 @@
   import Button from '$lib/holocene/button.svelte';
   import Loading from '$holocene/loading.svelte';
   import FormInput from '$lib/holocene/forms/form-input.svelte';
-  import MonthPicker from '$lib/holocene/month-picker.svelte';
-  import DayOfMonthPicker from '$lib/holocene/day-of-month-picker.svelte';
-  import DayOfWeekPicker from '$lib/holocene/day-of-week-picker.svelte';
-  import SimpleSelect from '$lib/holocene/select/simple-select.svelte';
   import { noop } from 'svelte/internal';
+  import SchedulesCalendarView from '$lib/components/schedule/schedules-calendar-view.svelte';
+  import Tab from '$lib/holocene/tab.svelte';
 
   let { namespace } = $page.params;
 
-  let tab = 'calendar';
   let preset = 'daily';
+  let calendars = [];
 
   const form = useForm();
 
@@ -62,72 +58,45 @@
       <div class="w-full">
         <FormInput field={fields.workflowTaskQueue} />
       </div>
-      <div class="flex gap-4 w-full justify-center mt-8">
-        <Button
+      <div class="flex flex-wrap gap-6 w-full justify-center mt-8">
+        <Tab
+          label="Minutes"
+          dataCy="minutes-tab"
           active={preset === 'minutes'}
-          on:click={() => (preset = 'minutes')}>Minutes</Button
-        >
-        <Button
+          on:click={() => (preset = 'minutes')}
+        />
+        <Tab
+          label="Hourly"
+          dataCy="hourly-tab"
           active={preset === 'hourly'}
-          on:click={() => (preset = 'hourly')}>Hourly</Button
-        >
-        <Button active={preset === 'daily'} on:click={() => (preset = 'daily')}
-          >Daily</Button
-        >
-        <Button
+          on:click={() => (preset = 'hourly')}
+        />
+        <Tab
+          label="Daily"
+          dataCy="daily-tab"
+          active={preset === 'daily'}
+          on:click={() => (preset = 'daily')}
+        />
+        <Tab
+          label="Weekly"
+          dataCy="weekly-tab"
           active={preset === 'weekly'}
-          on:click={() => (preset = 'weekly')}>Weekly</Button
-        >
-        <Button
+          on:click={() => (preset = 'weekly')}
+        />
+        <Tab
+          label="Monthly"
+          dataCy="monthly-tab"
           active={preset === 'monthly'}
-          on:click={() => (preset = 'monthly')}>Monthly</Button
-        >
-        <Button
+          on:click={() => (preset = 'monthyl')}
+        />
+        <Tab
+          label="Yearly"
+          dataCy="yearly-tab"
           active={preset === 'yearly'}
-          on:click={() => (preset = 'yearly')}>Yearly</Button
-        >
-        <Button
-          active={preset === 'string'}
-          on:click={() => (preset = 'string')}>String</Button
-        >
+          on:click={() => (preset = 'yearly')}
+        />
       </div>
-      {#if preset === 'weekly'}
-        <DayOfWeekPicker />
-      {:else if preset === 'monthly'}
-        <DayOfMonthPicker />
-      {:else if preset === 'yearly'}
-        <MonthPicker />
-        <DayOfMonthPicker />
-      {:else if preset === 'string'}
-        <FormInput field={fields.cronString} hideLabel />
-      {/if}
-      {#if preset !== 'string'}
-        <div
-          class="mb-4 flex items-center justify-center w-full gap-4 border rounded p-4"
-        >
-          {#if preset !== 'minutes'}
-            <div class="flex items-center gap-4">
-              <p>{preset === 'hourly' ? 'Every' : 'Starting at'}</p>
-              <div class="w-24">
-                <FormInput field={fields.hour} hideLabel />
-              </div>
-            </div>
-            <div>:</div>
-          {/if}
-          <div class="flex items-center gap-4">
-            {#if preset === 'minutes'}
-              <p>Every</p>
-            {/if}
-            <div class="w-24">
-              <FormInput field={fields.minute} hideLabel />
-            </div>
-          </div>
-          <div>:</div>
-          <div class="w-24">
-            <FormInput field={fields.second} hideLabel />
-          </div>
-        </div>
-      {/if}
+      <SchedulesCalendarView {preset} />
       <div class="flex justify-center">
         <Button
           variant="secondary"
