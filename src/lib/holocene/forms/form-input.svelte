@@ -8,13 +8,16 @@
   import type { FormField } from '$holocene/forms';
 
   export let field: FormField;
+  export let hideLabel = false;
 
   const { key, label, validations, hint, required, placeholder } = field;
 </script>
 
-<label for={key}
-  >{label}<span class="required">{required ? '*' : ''}</span></label
->
+{#if !hideLabel}
+  <label for={key}
+    >{label}<span class="required">{required ? '*' : ''}</span></label
+  >
+{/if}
 <input
   name={key}
   placeholder={placeholder ?? ''}

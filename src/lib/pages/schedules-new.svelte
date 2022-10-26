@@ -24,6 +24,7 @@
   let { namespace } = $page.params;
 
   let tab = 'calendar';
+  let preset = 'daily';
 
   const form = useForm();
 
@@ -62,68 +63,93 @@
       <div class="my-2 flex justify-center">
         <ToggleButtons>
           <ToggleButton
-            icon="workflow"
-            active={tab === 'interval'}
-            data-cy="interval"
-            on:click={() => (tab = 'interval')}>Interval</ToggleButton
-          >
-          <ToggleButton
-            icon="calendar-plus"
             active={tab === 'calendar'}
             data-cy="calendar"
             on:click={() => (tab = 'calendar')}>Calendar</ToggleButton
           >
           <ToggleButton
-            icon="terminal"
             active={tab === 'cronString'}
             data-cy="cronString"
-            on:click={() => (tab = 'cronString')}>Manual</ToggleButton
+            on:click={() => (tab = 'cronString')}>String</ToggleButton
           >
         </ToggleButtons>
       </div>
-      {#if tab === 'interval'}
-        <div class="mb-4 flex gap-4">
-          <div class="w-full">
-            <FormInput field={fields.interval} />
-          </div>
-          <div class="w-full">
-            <FormInput field={fields.phase} />
-          </div>
+      {#if tab === 'calendar'}
+        <div class="flex gap-4 w-full justify-center">
+          <Button
+            active={preset === 'minutes'}
+            on:click={() => (preset = 'minutes')}>Minutes</Button
+          >
+          <Button
+            active={preset === 'hourly'}
+            on:click={() => (preset = 'hourly')}>Hourly</Button
+          >
+          <Button
+            active={preset === 'daily'}
+            on:click={() => (preset = 'daily')}>Daily</Button
+          >
+          <Button
+            active={preset === 'weekly'}
+            on:click={() => (preset = 'weekly')}>Weekly</Button
+          >
+          <Button
+            active={preset === 'monthly'}
+            on:click={() => (preset = 'monthly')}>Monthly</Button
+          >
+          <Button
+            active={preset === 'yearly'}
+            on:click={() => (preset = 'yearly')}>Yearly</Button
+          >
+          <Button
+            active={preset === 'common'}
+            on:click={() => (preset = 'common')}>Common</Button
+          >
         </div>
-      {:else if tab === 'calendar'}
-        <div class="mb-4 flex flex-row gap-4">
-          <div class="w-full">
-            <FormInput field={fields.year} />
+        {#if preset === 'minutes'}
+          <div class="mb-4 flex gap-4">
+            <div class="w-full">
+              <FormInput field={fields.interval} />
+            </div>
+            <div class="w-full">
+              <FormInput field={fields.phase} />
+            </div>
           </div>
-        </div>
-        <div class="mb-4 flex flex-row gap-4">
-          <div class="w-full md:w-1/2">
-            <MonthPicker />
-            <!-- <FormInput field={fields.month} /> -->
+        {:else if preset === 'hourly'}
+          <div class="mb-4 flex gap-4">
+            <div class="w-full">
+              <FormInput field={fields.interval} />
+            </div>
+            <div class="w-full">
+              <FormInput field={fields.phase} />
+            </div>
           </div>
-          <div class="w-full md:w-1/2">
-            <DayOfMonthPicker />
+        {:else if preset === 'weekly'}
+          <DayOfWeekPicker />
+        {:else if preset === 'monthly'}
+          <DayOfMonthPicker />
+        {:else if preset === 'yearly'}
+          <MonthPicker />
+          <DayOfMonthPicker />
+        {:else if preset === 'common'}
+          <MonthPicker />
+        {/if}
+        {#if preset !== 'minutes' && preset !== 'hourly'}
+          <div
+            class="mb-4 flex items-center justify-center w-full gap-4 bg-gray-100 p-4"
+          >
+            <div class="w-24">
+              <FormInput field={fields.hour} hideLabel />
+            </div>
+            <div class="w-4">:</div>
+            <div class="w-24">
+              <FormInput field={fields.minute} hideLabel />
+            </div>
+            <div class="w-4">:</div>
+            <div class="w-24">
+              <FormInput field={fields.second} hideLabel />
+            </div>
           </div>
-        </div>
-        <div class="mb-4 flex flex-row gap-4">
-          <div class="w-full">
-            <DayOfWeekPicker />
-            <!-- <FormInput field={fields.dayOfMonth} /> -->
-          </div>
-        </div>
-
-        <div class="mb-4 flex flex-row gap-4" />
-        <div class="mb-4 flex flex w-full gap-4">
-          <div class="w-1/3">
-            <FormInput field={fields.hour} />
-          </div>
-          <div class="w-1/3">
-            <FormInput field={fields.minute} />
-          </div>
-          <div class="w-1/3">
-            <FormInput field={fields.second} />
-          </div>
-        </div>
+        {/if}
       {:else}
         <div class="mb-4 flex flex w-full gap-4">
           <div class="w-full">

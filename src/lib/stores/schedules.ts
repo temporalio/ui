@@ -63,16 +63,19 @@ export const fields: Record<string, FormField> = {
   hour: {
     key: 'schedule.spec.calendar.hour',
     label: 'Hour',
+    placeholder: '00',
     required: false,
   },
   minute: {
     key: 'schedule.spec.calendar.minute',
     label: 'Minute',
+    placeholder: '00',
     required: false,
   },
   second: {
     key: 'schedule.spec.calendar.second',
     label: 'Second',
+    placeholder: '00',
     required: false,
   },
   cronString: {
