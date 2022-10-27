@@ -90,6 +90,7 @@ export function createPaginationStore(): PaginationStore {
     _store.loading = false;
     _store.hasNext = Boolean(nextToken);
     _store.index = store.nextIndex;
+    _store.indexTokens = { ...store.indexTokens };
 
     if (store.nextIndex === store.index) {
       // First page
