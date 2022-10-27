@@ -151,4 +151,17 @@ describe('createPaginationStore', () => {
     expect(hasNext).toBe(true);
     expect(hasPrevious).toBe(false);
   });
+
+  it('should set hasNext to false and not update items if next page has no items', () => {
+    store.setNextPageToken('token1', items);
+
+    const { hasNext: initialHasNext } = get(store);
+    expect(initialHasNext).toBe(true);
+
+    store.setNextPageToken('', []);
+
+    const { hasNext, items: storeItems } = get(store);
+    expect(hasNext).toBe(false);
+    expect(storeItems).toEqual(items);
+  });
 });

@@ -85,10 +85,14 @@ export function createPaginationStore(): PaginationStore {
     store: PaginationItems,
   ) => {
     const _store = { ...store };
-    _store.items = items;
+    _store.hasNext = Boolean(nextToken);
     _store.updating = false;
     _store.loading = false;
-    _store.hasNext = Boolean(nextToken);
+
+    // Return early if page does not have any items (this can happen when the page size equals the number of items)
+    if (!items.length) return _store;
+
+    _store.items = items;
     _store.index = store.nextIndex;
     _store.indexTokens = { ...store.indexTokens };
 
