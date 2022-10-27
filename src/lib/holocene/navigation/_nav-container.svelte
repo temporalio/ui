@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { page } from '$app/stores';
   import Icon from '$holocene/icon/icon.svelte';
   import Logo from '$lib/holocene/logo.svelte';
   import { navOpen } from '$lib/stores/nav-open';
@@ -39,10 +40,17 @@
         <slot name="top" />
       </ul>
     </div>
-    <div class="grow-0 items-center">
+    <div class="relative grow-0 items-center">
       <ul class="flex flex-col gap-2 pb-32">
         <slot name="bottom" />
       </ul>
+      <div
+        class="absolute bottom-0 left-2 text-[10px] {isCloud
+          ? 'text-gray-500'
+          : 'text-gray-300'}"
+      >
+        {$page.stuff?.settings?.version ?? ''}
+      </div>
     </div>
   </div>
   <slot name="drawer" />
