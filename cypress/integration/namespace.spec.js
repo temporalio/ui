@@ -4,15 +4,7 @@ describe('Namespace page', () => {
 
     cy.visit('/namespaces/default');
 
-    cy.fixture('namespaces.json')
-      .then(({ namespaces }) => {
-        return namespaces
-          .map((n) => n.namespaceInfo.name)
-          .filter((name) => name !== 'temporal-system');
-      })
-      .as('namespaces');
-
-    cy.wait('@namespaces-api');
+    cy.wait('@namespace-api');
   });
 
   it('have the correct namespace information with labels', () => {
