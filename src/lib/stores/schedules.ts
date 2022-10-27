@@ -10,7 +10,6 @@ import type { FormField } from '$holocene/forms';
 import { setBodyProperty } from '$holocene/forms';
 
 export const fields: Record<string, FormField> = {
-  // Action
   name: { key: 'schedule_id', label: 'Schedule Name', required: true },
   workflowType: {
     key: 'schedule.action.startWorkflow.workflowType.name',
@@ -26,13 +25,6 @@ export const fields: Record<string, FormField> = {
     key: 'schedule.action.startWorkflow.taskQueue.name',
     label: 'Task Queue Name',
     required: true,
-  },
-  // Spec
-  interval: {
-    key: 'schedule.spec.interval.interval',
-    label: 'Interval',
-    placeholder: '86400s',
-    required: false,
   },
   phase: {
     key: 'schedule.spec.interval.phase',
@@ -84,7 +76,6 @@ export const fields: Record<string, FormField> = {
     placeholder: '',
     required: false,
   },
-
   // TODO: Post Alpha, add support of additional fields.
   // "startTime": "2022-07-04T03:18:59.668Z",
   // "endTime": "2022-07-04T03:18:59.668Z",
@@ -133,7 +124,7 @@ export const submitScheduleForm = async (
     schedule_id: '',
     schedule: {
       spec: {
-        // structuredCalendar,
+        structuredCalendar,
         calendar: [],
         interval: [],
       },

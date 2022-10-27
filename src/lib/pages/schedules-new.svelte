@@ -19,9 +19,8 @@
 
   let { namespace } = $page.params;
 
+  let form = useForm();
   let calendars = [1];
-
-  const form = useForm();
 
   const handleClick = () => {
     submitScheduleForm($form, namespace);
@@ -55,17 +54,7 @@
       <div class="w-full">
         <FormInput field={fields.workflowTaskQueue} />
       </div>
-      {#each calendars as calendar}
-        <SchedulesCalendarView />
-      {/each}
-      <div class="flex justify-center">
-        <Button
-          variant="secondary"
-          on:click={() =>
-            (calendars = [...calendars, calendars[calendars.length - 1] + 1])}
-          >+</Button
-        >
-      </div>
+      <SchedulesCalendarView />
       <div class="flex justify-between">
         <Button disabled={!$form.valid} on:click={handleClick}>Create</Button>
 
