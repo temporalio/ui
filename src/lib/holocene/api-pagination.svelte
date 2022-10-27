@@ -87,18 +87,15 @@
         {/if}
       </p>
       <nav
-        class="flex items-center justify-start gap-8 text-sm md:justify-end md:text-base"
+        class="flex items-center justify-start gap-4 text-sm md:justify-end md:text-base"
       >
-        <div class="flex items-center justify-center gap-2">
-          <p class="w-fit text-right">Per Page</p>
-          <FilterSelect
-            label="Per Page"
-            parameter={$store.key}
-            value={String($store.pageSize)}
-            options={perPageOptions($store.pageSize)}
-          />
-        </div>
-        <div class="flex items-center justify-center gap-6">
+        <FilterSelect
+          label="Per Page"
+          parameter={$store.key}
+          value={String($store.pageSize)}
+          options={perPageOptions($store.pageSize)}
+        />
+        <div class="flex items-center justify-center gap-1">
           <button
             class="caret"
             disabled={!$store.hasPrevious}
@@ -126,17 +123,14 @@
       <slot visibleItems={$store.items} initialItem={[]} />
     {/if}
 
-    <nav class="flex justify-end gap-8">
-      <div class="flex items-center justify-center gap-2">
-        <p class="md:text-md w-fit text-right text-sm">Per Page</p>
-        <FilterSelect
-          label="Per Page"
-          parameter={$store.key}
-          value={String($store.pageSize)}
-          options={perPageOptions($store.pageSize)}
-        />
-      </div>
-      <div class="flex items-center justify-center gap-6">
+    <nav class="flex justify-end gap-4">
+      <FilterSelect
+        label="Per Page"
+        parameter={$store.key}
+        value={String($store.pageSize)}
+        options={perPageOptions($store.pageSize)}
+      />
+      <div class="flex items-center justify-center gap-1">
         <button
           class="caret"
           disabled={!$store.hasPrevious}
