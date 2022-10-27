@@ -1,7 +1,8 @@
 type WorkflowsAPIRoutePath =
   | 'workflows'
   | 'workflows.archived'
-  | 'workflows.count';
+  | 'workflows.count'
+  | 'namespace';
 
 type WorkflowAPIRoutePath =
   | 'workflow'
