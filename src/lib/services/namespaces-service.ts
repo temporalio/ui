@@ -9,6 +9,8 @@ const emptyNamespace = {
   namespaces: [],
 };
 
+let results: ListNamespacesResponse;
+
 export async function fetchNamespaces(
   settings: Settings,
   request = fetch,
@@ -17,8 +19,10 @@ export async function fetchNamespaces(
     return emptyNamespace;
   }
 
+  if (results?.namespaces) return results;
+
   const route = await routeForApi('namespaces');
-  const results = await paginated(async (token: string) =>
+  results = await paginated(async (token: string) =>
     requestFromAPI<ListNamespacesResponse>(route, {
       request,
       token,
