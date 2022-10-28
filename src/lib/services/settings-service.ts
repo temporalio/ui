@@ -9,7 +9,7 @@ import type { SettingsResponse } from '$types';
 export const isCloudMatch = /(tmprl\.cloud|tmprl-test\.cloud)$/;
 
 export const fetchSettings = async (request = fetch): Promise<Settings> => {
-  const route = await routeForApi('settings');
+  const route = routeForApi('settings');
   const settingsResponse: SettingsResponse = await requestFromAPI(route, {
     request,
   });

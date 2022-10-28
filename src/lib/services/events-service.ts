@@ -39,7 +39,7 @@ export const fetchRawEvents = async ({
   onComplete,
 }: FetchEventsParameters): Promise<HistoryEvent[]> => {
   const endpoint = getEndpointForSortOrder(sort);
-  const route = await routeForApi(endpoint, { namespace, workflowId, runId });
+  const route = routeForApi(endpoint, { namespace, workflowId, runId });
   const response = await paginated(
     async (token: string) => {
       return requestFromAPI<GetWorkflowExecutionHistoryResponse>(route, {

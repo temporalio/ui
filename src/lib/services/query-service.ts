@@ -64,7 +64,7 @@ async function fetchQuery(
 ): Promise<QueryResponse> {
   workflow = await workflow;
   const parameters = await formatParameters(namespace, workflow);
-  const route = await routeForApi('query', parameters);
+  const route = routeForApi('query', parameters);
 
   return await requestFromAPI<QueryResponse>(route, {
     options: {
@@ -126,11 +126,11 @@ export async function getQuery(
         };
         const convertedAttributes = endpoint
           ? await convertPayloadToJsonWithCodec({
-              attributes: queryResult,
-              namespace: options.namespace,
-              settings: _settings,
-              accessToken,
-            })
+            attributes: queryResult,
+            namespace: options.namespace,
+            settings: _settings,
+            accessToken,
+          })
           : await convertPayloadToJsonWithWebsocket(queryResult);
 
         data = convertedAttributes?.payloads[0];

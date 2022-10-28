@@ -46,8 +46,10 @@ const updateWorkflowRun: StartStopNotifier<{
 }> = (set) => {
   return parameters.subscribe(
     ({ namespace, workflowId, runId, settings, accessToken }) => {
+      const webUri = settings?.webUri
       if (namespace && workflowId && runId) {
         withLoading(loading, updating, async () => {
+          debugger
           const workflow = await fetchWorkflow({
             namespace,
             workflowId,
@@ -62,6 +64,7 @@ const updateWorkflowRun: StartStopNotifier<{
             accessToken,
           );
 
+          debugger
           set({ workflow, workers });
         });
       } else {

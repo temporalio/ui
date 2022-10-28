@@ -13,7 +13,7 @@ export async function terminateWorkflow({
   namespace,
   reason,
 }: TerminateWorkflowOptions): Promise<null> {
-  const route = await routeForApi('workflow.terminate', {
+  const route = routeForApi('workflow.terminate', {
     namespace,
     workflowId: workflow.id,
     runId: workflow.runId,

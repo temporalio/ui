@@ -17,7 +17,7 @@ export async function fetchNamespaces(
     return emptyNamespace;
   }
 
-  const route = await routeForApi('namespaces');
+  const route = routeForApi('namespaces');
   const results = await paginated(async (token: string) =>
     requestFromAPI<ListNamespacesResponse>(route, {
       request,
