@@ -33,9 +33,9 @@ Cypress.Commands.add('interceptNamespacesApi', () => {
   }).as('namespaces-api');
 });
 
-Cypress.Commands.add('interceptNamespaceApi', () => {
+Cypress.Commands.add('interceptNamespaceApi', ({ archived }) => {
   cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/namespaces/*', {
-    fixture: 'namespace.json',
+    fixture: archived ? 'archived-namespace.json' : 'namespace.json',
   }).as('namespace-api');
 });
 
@@ -135,9 +135,9 @@ Cypress.Commands.add('interceptScheduleApi', () => {
 
 Cypress.Commands.add(
   'interceptApi',
-  ({ namespace } = { namespace: 'default' }) => {
+  ({ namespace, archived } = { namespace: 'default', archived: false }) => {
     cy.interceptNamespacesApi();
-    cy.interceptNamespaceApi();
+    cy.interceptNamespaceApi({ archived });
     cy.interceptWorkflowsApi();
     cy.interceptWorkflowsCountApi();
     cy.interceptClusterApi();
