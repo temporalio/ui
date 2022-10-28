@@ -8,7 +8,6 @@
   import Table from '$holocene/table/table.svelte';
   import TableHeaderRow from '$holocene/table/table-header-row.svelte';
   import TableRow from '$holocene/table/table-row.svelte';
-  import type { DescribeNamespaceResponse as Namespace } from '$types';
   import { fetchNamespaces } from '$lib/services/namespaces-service';
   import type { ListNamespacesResponse } from '$types';
 
