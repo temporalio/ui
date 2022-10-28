@@ -5,26 +5,22 @@
     routeForWorkflows,
     routeForNamespaceSelector,
   } from '$lib/utilities/route-for';
-  import { getNamespace } from '$lib/utilities/get-namespace';
 
   export const load: Load = async ({ stuff }) => {
-    const namespaces = stuff.namespaces;
     const defaultNamespace = stuff?.settings?.defaultNamespace;
     const isCloud = stuff.settings.runtimeEnvironment?.isCloud;
-
-    const namespace = getNamespace({ namespaces, defaultNamespace });
 
     if (isCloud) {
       return {
         status: 302,
         redirect: routeForWorkflows({
-          namespace,
+          namespace: defaultNamespace,
         }),
       };
     }
 
     return {
-      props: { namespace },
+      props: { namespace: defaultNamespace },
     };
   };
 </script>
