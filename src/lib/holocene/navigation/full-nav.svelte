@@ -7,10 +7,10 @@
 </script>
 
 <script lang="ts">
+  import { page } from '$app/stores';
   import Icon from '$holocene/icon/icon.svelte';
   import type { SvelteComponent } from 'svelte';
   import FeatureTag from '$lib/holocene/feature-tag.svelte';
-  import type { DescribeNamespaceResponse as Namespace } from '$types';
 
   import { namespaceSelectorOpen } from '$lib/stores/nav-open';
 
@@ -24,16 +24,37 @@
   import { afterNavigate } from '$app/navigation';
   import { viewFeature } from '$lib/stores/new-feature-tags';
   import FeatureGuard from '$lib/components/feature-guard.svelte';
+  import { fetchNamespaces } from '$lib/services/namespaces-service';
+  import { lastUsedNamespace } from '$lib/stores/namespaces';
+  import {
+    routeForArchivalWorkfows,
+    routeForWorkflows,
+    routeForSchedules,
+    routeForNamespaces,
+  } from '$lib/utilities/route-for';
+  import type { ListNamespacesResponse } from '$types';
 
-  export let isCloud = false;
-  export let activeNamespace: Namespace;
-  export let getNamespaceList: () => Promise<NamespaceItem[]>;
-  export let linkList: Partial<Record<string, string>>;
   export let user: Promise<User> | undefined;
   export let logout: () => void;
   export let extras: ExtraIcon[] | null = null;
 
+  const { isCloud } = $page.stuff.settings.runtimeEnvironment;
+  const namespacesPromise: Promise<ListNamespacesResponse> = fetchNamespaces(
+    $page.stuff.settings,
+  );
   let showProfilePic = true;
+
+  $: activeNamespaceName = $page.params?.namespace ?? $lastUsedNamespace;
+  $: linkList = {
+    home: routeForWorkflows({ namespace: activeNamespaceName }),
+    archive: routeForArchivalWorkfows({ namespace: activeNamespaceName }),
+    namespaces: routeForNamespaces(),
+    schedules: routeForSchedules({ namespace: activeNamespaceName }),
+    workflows: routeForWorkflows({ namespace: activeNamespaceName }),
+    feedback:
+      $page.stuff?.settings?.feedbackURL ||
+      'https://github.com/temporalio/ui/issues/new/choose',
+  };
 
   function fixImage() {
     showProfilePic = false;
@@ -57,24 +78,29 @@
       <div class="nav-title">Workflows</div>
     </NavRow>
     <IsCloudGuard {isCloud}>
-      <FeatureGuard
-        enabled={Boolean(activeNamespace?.namespaceInfo?.supportsSchedules)}
-      >
-        <NavRow
-          link={linkList.schedules}
-          {isCloud}
-          data-cy="schedules-button"
-          on:click={() => viewFeature('schedules')}
+      {#await namespacesPromise then namespacesResponse}
+        {@const activeNamespace = namespacesResponse.namespaces.find(
+          (namespace) => namespace?.namespaceInfo?.name === activeNamespaceName,
+        )}
+        <FeatureGuard
+          enabled={Boolean(activeNamespace?.namespaceInfo?.supportsSchedules)}
         >
-          <NavTooltip right text="Schedules">
-            <div class="nav-icon">
-              <Icon name="schedules" />
-              <FeatureTag feature="schedules" alpha />
-            </div>
-          </NavTooltip>
-          <div class="nav-title">Schedules</div>
-        </NavRow>
-      </FeatureGuard>
+          <NavRow
+            link={linkList.schedules}
+            {isCloud}
+            data-cy="schedules-button"
+            on:click={() => viewFeature('schedules')}
+          >
+            <NavTooltip right text="Schedules">
+              <div class="nav-icon">
+                <Icon name="schedules" />
+                <FeatureTag feature="schedules" alpha />
+              </div>
+            </NavTooltip>
+            <div class="nav-title">Schedules</div>
+          </NavRow>
+        </FeatureGuard>
+      {/await}
     </IsCloudGuard>
     <IsCloudGuard>
       <NavRow link={linkList.namespaces} {isCloud} data-cy="namespaces-button">
@@ -186,7 +212,6 @@
     >
       {#if $namespaceSelectorOpen}
         <NamespaceList
-          {getNamespaceList}
           on:closeNamespaceList={(event) => {
             $namespaceSelectorOpen = false;
           }}
