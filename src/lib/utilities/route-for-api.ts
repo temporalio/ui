@@ -1,3 +1,5 @@
+import { page } from '$app/stores';
+import { get } from 'svelte/store';
 import { getApiOrigin } from './get-api-origin';
 import { publicPath } from './get-public-path';
 
@@ -13,13 +15,11 @@ const replaceNamespaceInApiUrl = (
 
 const base = async (namespace?: string): Promise<string> => {
   let baseUrl = '';
-
-  if (globalThis?.GetNamespaces && namespace) {
-    const namespaces = await globalThis.GetNamespaces();
-    const configNamespace = namespaces?.find((n) => n.namespace === namespace);
-    baseUrl =
-      configNamespace?.webUri ??
-      replaceNamespaceInApiUrl(globalThis?.AppConfig?.apiUrl, namespace);
+  const currentPage = get(page);
+  const webUri = currentPage.stuff?.settings?.webUri;
+  const apiUrl = globalThis?.AppConfig?.apiUrl;
+  if ((webUri || apiUrl) && namespace) {
+    baseUrl = webUri ?? replaceNamespaceInApiUrl(apiUrl, namespace);
   } else {
     baseUrl = getApiOrigin();
   }
