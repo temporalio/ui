@@ -86,32 +86,14 @@ export const fields: Record<string, FormField> = {
 
 const structuredCalendar = [
   {
-    "second": [],
-    "minute": [],
-    "hour": [
-      {
-        "start": 12,
-        "end": 12,
-        "step": 0
-      }
-    ],
-    "dayOfMonth": [
-      {
-        "start": 26,
-        "end": 26,
-        "step": 0
-      }
-    ],
-    "month": [
-      {
-        "start": 10,
-        "end": 10,
-        "step": 0
-      }
-    ],
-    "year": [],
-    "dayOfWeek": [],
-    "comment": "string"
+    "second": [{ start: 0, end: 0, step: 0 }],
+    "minute": [{ start: 0, end: 0, step: 0 }],
+    "hour": [{ start: 12 }],
+    // dayOfMonth: [{ start: 28, end: 30, interval: 1 }],
+    // month: [{ start: 10, end: 12, interval: 1 }],
+    // year: [],
+    // dayOfWeek: [],
+    // comment: "commenting here"
   }
 ]
 
@@ -125,8 +107,8 @@ export const submitScheduleForm = async (
     schedule: {
       spec: {
         structuredCalendar,
-        calendar: [],
-        interval: [],
+        // calendar: [],
+        // interval: [],
       },
       action: {
         startWorkflow: {
@@ -152,16 +134,17 @@ export const submitScheduleForm = async (
   const minute = values['schedule.spec.calendar.minute'];
   const second = values['schedule.spec.calendar.second'];
 
-  if (interval) {
-    body.schedule.spec.interval = [{ interval, phase: phase || '0s' }];
-    body.schedule.spec.calendar = [];
-  } else {
-    body.schedule.spec.interval = [];
-    body.schedule.spec.calendar = [
-      { year, month, dayOfMonth, dayOfWeek, hour, minute, second },
-    ];
-  }
+  // if (interval) {
+  //   body.schedule.spec.interval = [{ interval, phase: phase || '0s' }];
+  //   body.schedule.spec.calendar = [];
+  // } else {
+  //   body.schedule.spec.interval = [];
+  //   body.schedule.spec.calendar = [
+  //     { year, month, dayOfMonth, dayOfWeek, hour, minute, second },
+  //   ];
+  // }
 
+  delete body.schedule.spec.calendar;
   // // Wait 2 seconds for create to get it on fetchAllSchedules
   loading.set(true);
   const { error: err } = await createSchedule({
