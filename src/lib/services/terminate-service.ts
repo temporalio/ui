@@ -2,10 +2,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
-import type {
-  StartBatchOperationRequest,
-  StartBatchOperationResponse,
-} from '$types';
 
 type TerminateWorkflowOptions = {
   workflow: WorkflowExecution;
@@ -40,7 +36,7 @@ export async function batchTerminateWorkflows({
   namespace,
   workflowExecutions,
   reason,
-}: BulkTerminateWorkflowOptions): Promise<StartBatchOperationResponse> {
+}: BulkTerminateWorkflowOptions): Promise<null> {
   const route = await routeForApi('workflows.batch.terminate', { namespace });
 
   const runIds = workflowExecutions.map((wf) => wf.runId);
@@ -53,7 +49,7 @@ export async function batchTerminateWorkflows({
     return queryString;
   }, '');
 
-  return await requestFromAPI<StartBatchOperationResponse>(route, {
+  return await requestFromAPI<null>(route, {
     options: {
       method: 'POST',
       body: stringifyWithBigInt({

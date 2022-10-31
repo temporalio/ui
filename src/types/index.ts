@@ -152,14 +152,6 @@ export type ScheduleActionResult =
 
 export type Timestamp = google.protobuf.ITimestamp;
 
-// Batch
-export type BatchOperationTermination =
-  temporal.api.batch.v1.IBatchOperationTermination;
-export type StartBatchOperationRequest =
-  temporal.api.workflowservice.v1.IStartBatchOperationRequest;
-export type StartBatchOperationResponse =
-  temporal.api.workflowservice.v1.IStartBatchOperationResponse;
-
 // extra APIs
 export type SettingsResponse = {
   Auth: { Enabled: boolean; Options: string[] };
