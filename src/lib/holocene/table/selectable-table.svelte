@@ -18,6 +18,7 @@
 
   interface $$Props extends ComponentProps<Table> {
     items: Item[];
+    selectedItems: Item[];
     allSelected?: boolean;
     checkboxLabel?: string;
     class?: string;
@@ -26,13 +27,12 @@
   export let items: Item[];
   export let checkboxLabel: string = null;
   export let allSelected: boolean = false;
+  export let selectedItems: Item[] = [];
 
   const dispatch = createEventDispatcher<{
     change: Item[];
     toggleAll: { selected: boolean };
   }>();
-
-  let selectedItems: Item[] = [];
 
   const handleSelectAll = (event: CustomEvent<{ checked: boolean }>) => {
     allSelected = !allSelected;

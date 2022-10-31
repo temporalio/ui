@@ -32,16 +32,26 @@ export async function terminateWorkflow({
 
 type BulkTerminateWorkflowOptions = {
   namespace: string;
-  query: string;
+  workflowExecutions: WorkflowExecution[];
   reason: string;
 };
 
 export async function batchTerminateWorkflows({
   namespace,
-  query,
+  workflowExecutions,
   reason,
 }: BulkTerminateWorkflowOptions): Promise<StartBatchOperationResponse> {
   const route = await routeForApi('workflows.batch.terminate', { namespace });
+
+  const runIds = workflowExecutions.map((wf) => wf.runId);
+  const query = runIds.reduce((queryString, id, index, arr) => {
+    queryString += `RunId="${id}"`;
+    if (index !== arr.length - 1) {
+      queryString += '+or+';
+    }
+
+    return queryString;
+  }, '');
 
   return await requestFromAPI<StartBatchOperationResponse>(route, {
     options: {
@@ -51,10 +61,7 @@ export async function batchTerminateWorkflows({
         namespace,
         visibilityQuery: query,
         reason,
-        terminationOperation: {
-          details: {},
-          identity: '',
-        },
+        terminationOperation: {},
       }),
     },
     shouldRetry: false,

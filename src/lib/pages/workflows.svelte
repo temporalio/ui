@@ -11,7 +11,6 @@
     workflowError,
   } from '$lib/stores/workflows';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
   import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
@@ -25,11 +24,11 @@
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
   import Loading from '$lib/holocene/loading.svelte';
   import { batchTerminateWorkflows } from '$lib/services/terminate-service';
-  import SelectableTableRow from '$lib/holocene/table/selectable-table-row.svelte';
   import BulkActionButton from '$lib/holocene/table/bulk-action-button.svelte';
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
   let selectedWorkflows: WorkflowExecution[] = [];
+  let allSelected: boolean = false;
 
   const errorMessage =
     searchType === 'advanced'
@@ -48,12 +47,16 @@
     selectedWorkflows = event.detail;
   };
 
-  const terminateWorkflows = () => {
-    batchTerminateWorkflows({
+  const terminateWorkflows = async () => {
+    await batchTerminateWorkflows({
       namespace: $page.params.namespace,
-      query: $page.url.searchParams.get('query'),
+      workflowExecutions: selectedWorkflows,
       reason: 'Batch Terminate',
     });
+
+    allSelected = false;
+    selectedWorkflows = [];
+    refreshWorkflows();
   };
 
   onDestroy(() => {
@@ -84,6 +87,8 @@
 <WorkflowFilters bind:searchType />
 <Pagination items={$workflows} let:visibleItems>
   <SelectableTable
+    bind:allSelected
+    bind:selectedItems={selectedWorkflows}
     items={visibleItems}
     updating={$updating}
     on:change={handleSelectWorkflow}
