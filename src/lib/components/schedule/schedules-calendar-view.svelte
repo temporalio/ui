@@ -7,7 +7,7 @@
   import ScheduleDayOfWeekView from './schedule-day-of-week-view.svelte';
   import ScheduleDayOfMonthView from './schedule-day-of-month-view.svelte';
 
-  let preset: SchedulePreset = 'week';
+  let preset: SchedulePreset = 'interval';
 
   export let dayOfWeek;
   export let dayOfMonth;

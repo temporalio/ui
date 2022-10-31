@@ -148,7 +148,7 @@
       {/if}
       <div class="w-full xl:w-1/2">
         <ScheduleFrequencyPanel
-          calendar={schedule?.schedule?.spec?.calendar?.[0]}
+          calendar={schedule?.schedule?.spec?.structuredCalendar?.[0]}
           interval={schedule?.schedule?.spec?.interval?.[0]}
         />
       </div>

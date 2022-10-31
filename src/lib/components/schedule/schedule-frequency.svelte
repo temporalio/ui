@@ -10,6 +10,6 @@
   <CodeBlock content={interval} />
 {:else}
   <div class="flex flex-row gap-4 break-all text-sm">
-    <CodeBlock content={calendar} />
+    <CodeBlock content={calendar} inline />
   </div>
 {/if}

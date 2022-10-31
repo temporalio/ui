@@ -133,10 +133,8 @@ export const submitScheduleForm = async (
 
   if (preset === 'interval') {
     const parseTime = (time: string) => (time ? parseInt(time) : 0);
-    const interval = `${
-      parseTime(hour) * 60 * 60 + parseTime(minute) * 60 + parseTime(second)
-    }s`;
-    debugger;
+    const interval = `${parseTime(hour) * 60 * 60 + parseTime(minute) * 60 + parseTime(second)
+      }s`;
     body.schedule.spec.interval = [{ interval, phase: phase || '0s' }];
     body.schedule.spec.calendar = [];
   } else {
