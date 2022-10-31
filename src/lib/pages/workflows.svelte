@@ -115,6 +115,7 @@
     </svelte:fragment>
     {#each visibleItems as event}
       <WorkflowsSummaryRow
+        selectable
         workflow={event}
         namespace={$page.params.namespace}
         timeFormat={$timeFormat}
