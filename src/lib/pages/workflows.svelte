@@ -14,7 +14,6 @@
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
   import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
-  import SelectableTable from '$lib/holocene/table/selectable-table.svelte';
   import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$holocene/icon/icon.svelte';
@@ -24,11 +23,12 @@
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
   import Loading from '$lib/holocene/loading.svelte';
   import { batchTerminateWorkflows } from '$lib/services/terminate-service';
-  import BulkActionButton from '$lib/holocene/table/bulk-action-button.svelte';
+  import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
+
+  export let bulkActionsEnabled: boolean = true;
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
   let selectedWorkflows: WorkflowExecution[] = [];
-  let allSelected: boolean = false;
 
   const errorMessage =
     searchType === 'advanced'
@@ -43,19 +43,15 @@
     $refresh = Date.now();
   };
 
-  const handleSelectWorkflow = (event: CustomEvent<WorkflowExecution[]>) => {
-    selectedWorkflows = event.detail;
-  };
-
-  const terminateWorkflows = async () => {
+  const terminateWorkflows = async (
+    event: CustomEvent<{ selectedWorkflows: WorkflowExecution[] }>,
+  ) => {
     await batchTerminateWorkflows({
       namespace: $page.params.namespace,
-      workflowExecutions: selectedWorkflows,
+      workflowExecutions: event.detail.selectedWorkflows,
       reason: 'Batch Terminate',
     });
 
-    allSelected = false;
-    selectedWorkflows = [];
     refreshWorkflows();
   };
 
@@ -86,36 +82,16 @@
 </div>
 <WorkflowFilters bind:searchType />
 <Pagination items={$workflows} let:visibleItems>
-  <SelectableTable
-    bind:allSelected
-    bind:selectedItems={selectedWorkflows}
-    items={visibleItems}
+  <WorkflowsSummaryTable
+    {bulkActionsEnabled}
     updating={$updating}
-    on:change={handleSelectWorkflow}
+    visibleWorkflows={visibleItems}
+    bind:selectedWorkflows
+    on:bulkTerminate={terminateWorkflows}
   >
-    <svelte:fragment slot="default-headers">
-      <th class="hidden w-48 md:table-cell">Status</th>
-      <th class="hidden md:table-cell md:w-60 xl:w-auto">Workflow ID</th>
-      <th class="hidden md:table-cell md:w-60 xl:w-80">Type</th>
-      <th class="hidden xl:table-cell xl:w-60">Start</th>
-      <th class="hidden xl:table-cell xl:w-60">End</th>
-      <th class="table-cell md:hidden" colspan="3">Summary</th>
-    </svelte:fragment>
-    <svelte:fragment slot="bulk-action-headers">
-      <th class="hidden w-48 md:table-cell">
-        <BulkActionButton on:click={terminateWorkflows}
-          >Terminate</BulkActionButton
-        >
-      </th>
-      <th class="hidden md:table-cell md:w-60 xl:w-auto" />
-      <th class="hidden md:table-cell md:w-60 xl:w-80" />
-      <th class="hidden xl:table-cell xl:w-60" />
-      <th class="hidden xl:table-cell xl:w-60" />
-      <th class="table-cell md:hidden" colspan="3" />
-    </svelte:fragment>
     {#each visibleItems as event}
       <WorkflowsSummaryRow
-        selectable
+        {bulkActionsEnabled}
         workflow={event}
         namespace={$page.params.namespace}
         timeFormat={$timeFormat}
@@ -138,5 +114,5 @@
         <td class="hidden xl:table-cell" />
       </TableRow>
     {/each}
-  </SelectableTable>
+  </WorkflowsSummaryTable>
 </Pagination>

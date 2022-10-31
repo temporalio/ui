@@ -12,11 +12,11 @@
   import SelectableTableRow from '$holocene/table/selectable-table-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
 
-  export let selectable: boolean = false;
+  export let bulkActionsEnabled: boolean = false;
+  export let selected: boolean = false;
   export let namespace: string;
   export let workflow: WorkflowExecution;
   export let timeFormat: TimeFormat | string;
-  export let selected: boolean = false;
 
   $: href = routeForWorkflow({
     namespace,
@@ -45,7 +45,7 @@
 </script>
 
 <svelte:component
-  this={selectable ? SelectableTableRow : TableRow}
+  this={bulkActionsEnabled ? SelectableTableRow : TableRow}
   item={workflow}
   {selected}
   {href}
