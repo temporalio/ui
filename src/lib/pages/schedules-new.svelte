@@ -20,10 +20,9 @@
   let { namespace } = $page.params;
 
   let form = useForm();
-  let calendars = [1];
 
-  const handleClick = () => {
-    submitScheduleForm($form, namespace);
+  const handleClick = (preset: SchedulePreset) => {
+    submitScheduleForm($form, namespace, preset);
   };
 </script>
 
@@ -54,16 +53,19 @@
       <div class="w-full">
         <FormInput field={fields.workflowTaskQueue} />
       </div>
-      <SchedulesCalendarView />
-      <div class="flex justify-between">
-        <Button disabled={!$form.valid} on:click={handleClick}>Create</Button>
+      <SchedulesCalendarView let:preset>
+        <div class="flex justify-between mt-8">
+          <Button disabled={!$form.valid} on:click={() => handleClick(preset)}
+            >Create Schedule</Button
+          >
 
-        <a
-          href={routeForSchedules({ namespace })}
-          class="back-to-schedules"
-          style="left: 0rem">Cancel</a
-        >
-      </div>
+          <a
+            href={routeForSchedules({ namespace })}
+            class="back-to-schedules"
+            style="left: 0rem">Cancel</a
+          >
+        </div>
+      </SchedulesCalendarView>
     </form>
   {/if}
   {#if $error}

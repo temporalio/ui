@@ -4,8 +4,6 @@
 
 type SchedulePreset =
   | 'interval'
-  | 'daily'
-  | 'weekly'
-  | 'monthly'
-  | 'yearly'
+  | 'week'
+  | 'month'
   | 'string';

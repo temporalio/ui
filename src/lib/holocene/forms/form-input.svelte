@@ -12,9 +12,11 @@
   const { key, label, validations, hint, required, placeholder } = field;
 </script>
 
-<label for={key}
-  >{label}<span class="required">{required ? '*' : ''}</span></label
->
+{#if label}
+  <label for={key}
+    >{label}<span class="required">{required ? '*' : ''}</span></label
+  >
+{/if}
 <input
   name={key}
   placeholder={placeholder ?? ''}

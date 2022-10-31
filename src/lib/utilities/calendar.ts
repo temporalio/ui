@@ -1,4 +1,5 @@
 export const monthNames = [
+  'Every month',
   'January',
   'February',
   'March',
@@ -13,7 +14,8 @@ export const monthNames = [
   'December',
 ];
 
-export const weekDays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+export const genericWeekDays = ['Everyday', 'Weekdays', 'Weekends'];
+export const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 const monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const isLeapYear = (year) => year % 4 === 0;

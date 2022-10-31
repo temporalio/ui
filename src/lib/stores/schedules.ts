@@ -72,7 +72,6 @@ export const fields: Record<string, FormField> = {
   },
   cronString: {
     key: 'schedule.spec.cronString',
-    label: 'Cron String',
     placeholder: '',
     required: false,
   },
@@ -84,31 +83,18 @@ export const fields: Record<string, FormField> = {
   // "timezoneData": "string"
 };
 
-const structuredCalendar = [
-  {
-    "second": [{ start: 0, end: 0, step: 0 }],
-    "minute": [{ start: 0, end: 0, step: 0 }],
-    "hour": [{ start: 12 }],
-    // dayOfMonth: [{ start: 28, end: 30, interval: 1 }],
-    // month: [{ start: 10, end: 12, interval: 1 }],
-    // year: [],
-    // dayOfWeek: [],
-    // comment: "commenting here"
-  }
-]
-
 export const submitScheduleForm = async (
   form: Form,
   namespace: string,
+  preset: SchedulePreset
 ): Promise<void> => {
   const values = form.values;
   const body = {
     schedule_id: '',
     schedule: {
       spec: {
-        structuredCalendar,
-        // calendar: [],
-        // interval: [],
+        calendar: [],
+        interval: [],
       },
       action: {
         startWorkflow: {
@@ -124,7 +110,7 @@ export const submitScheduleForm = async (
     setBodyProperty(key, body, values[key]);
   });
 
-  const interval = values['schedule.spec.interval.interval'];
+  // const interval = values['schedule.spec.interval.interval'];
   const phase = values['schedule.spec.interval.phase'];
   const year = values['schedule.spec.calendar.year'];
   const month = values['schedule.spec.calendar.month'];
@@ -134,17 +120,18 @@ export const submitScheduleForm = async (
   const minute = values['schedule.spec.calendar.minute'];
   const second = values['schedule.spec.calendar.second'];
 
-  // if (interval) {
-  //   body.schedule.spec.interval = [{ interval, phase: phase || '0s' }];
-  //   body.schedule.spec.calendar = [];
-  // } else {
-  //   body.schedule.spec.interval = [];
-  //   body.schedule.spec.calendar = [
-  //     { year, month, dayOfMonth, dayOfWeek, hour, minute, second },
-  //   ];
-  // }
+  if (preset === 'interval') {
+    const parseTime = (time: string) => time ? parseInt(time) : 0
+    const interval = `${(parseTime(hour)) * 60 * 60 + (parseTime(minute)) * 60 + (parseTime(second))}s`
+    body.schedule.spec.interval = [{ interval, phase: phase || '0s' }];
+    body.schedule.spec.calendar = [];
+  } else {
+    body.schedule.spec.interval = [];
+    body.schedule.spec.calendar = [
+      { year, month, dayOfMonth, dayOfWeek, hour, minute, second },
+    ];
+  }
 
-  delete body.schedule.spec.calendar;
   // // Wait 2 seconds for create to get it on fetchAllSchedules
   loading.set(true);
   const { error: err } = await createSchedule({
