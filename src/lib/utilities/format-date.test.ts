@@ -3,6 +3,7 @@ import {
   getDuration,
   formatDistance,
   formatDistanceAbbreviated,
+  fromSecondsToMinutesAndSeconds,
   fromSecondsToDaysOrHours,
   getTimestampDifference,
 } from './format-date';
@@ -129,6 +130,33 @@ describe('getDuration', () => {
       '2 years, 9 months, 11 days, 4 hours, 44 minutes, 18 seconds',
     );
     expect(abbvDistancer).toBe('2years 9months 11d 4h 44m 18s');
+  });
+});
+
+describe('fromSecondsToMinutesAndSeconds', () => {
+  it('should return "1 minute" for 60 seconds', () => {
+    const seconds = 60;
+    expect(fromSecondsToMinutesAndSeconds(seconds)).toBe('1 minute');
+  });
+  it('should return "1 minute" for -60 seconds', () => {
+    const seconds = -60;
+    expect(fromSecondsToMinutesAndSeconds(seconds)).toBe('1 minute');
+  });
+  it('should return "1 second" for 1 second', () => {
+    const seconds = 1;
+    expect(fromSecondsToMinutesAndSeconds(seconds)).toBe('1 second');
+  });
+  it('should return "30 seconds" for 30 seconds', () => {
+    const seconds = 30;
+    expect(fromSecondsToMinutesAndSeconds(seconds)).toBe('30 seconds');
+  });
+  it('should return "10 minutes" for 600 seconds', () => {
+    const seconds = 600;
+    expect(fromSecondsToMinutesAndSeconds(seconds)).toBe('10 minutes');
+  });
+  it('should return "1 minute and 30 seconds" for 90 seconds', () => {
+    const seconds = 90;
+    expect(fromSecondsToMinutesAndSeconds(seconds)).toBe('1 minute 30 seconds');
   });
 });
 
