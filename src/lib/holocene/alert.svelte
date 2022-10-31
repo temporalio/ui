@@ -15,7 +15,7 @@
     </div>
   {/if}
   <div class="ml-1">
-    <h5 class="font-semibold">{title}</h5>
+    <h5 class="font-semibold leading-6">{title}</h5>
     {#if $$slots.default}
       <div class="content">
         <slot />

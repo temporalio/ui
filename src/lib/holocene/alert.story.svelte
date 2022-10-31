@@ -53,4 +53,14 @@
       title="Lorem ipsum dolor sit amet consectetur adipisicing elit"
     />
   </Hst.Variant>
+  <Hst.Variant title="An Alert without a Title">
+    <Alert icon="error" intent="error" title="">
+      <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut cupiditate
+        exercitationem quia quibusdam excepturi rem saepe dolore quas, odit vero
+        sed rerum necessitatibus minima nobis, ullam minus inventore voluptates
+        itaque?
+      </p>
+    </Alert>
+  </Hst.Variant>
 </Hst.Story>
