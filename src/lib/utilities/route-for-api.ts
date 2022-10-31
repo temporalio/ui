@@ -61,6 +61,11 @@ export function routeForApi(
   shouldEncode?: boolean,
 ): Promise<string>;
 export function routeForApi(
+  route: NamespaceAPIRoutePath,
+  parameters: NamespaceRouteParameters,
+  shouldEncode?: boolean,
+): Promise<string>;
+export function routeForApi(
   route: SchedulesAPIRoutePath,
   parameters: ScheduleListRouteParameters,
 ): Promise<string>;
