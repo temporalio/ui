@@ -17,12 +17,21 @@
   import FormInput from '$lib/holocene/forms/form-input.svelte';
   import SchedulesCalendarView from '$lib/components/schedule/schedules-calendar-view.svelte';
 
+  export let dayOfWeek;
+  export let dayOfMonth;
+  export let month;
+
   let { namespace } = $page.params;
 
   let form = useForm();
 
   const handleClick = (preset: SchedulePreset) => {
-    submitScheduleForm($form, namespace, preset);
+    submitScheduleForm($form, namespace, {
+      preset,
+      dayOfWeek,
+      dayOfMonth,
+      month,
+    });
   };
 </script>
 
@@ -53,8 +62,13 @@
       <div class="w-full">
         <FormInput field={fields.workflowTaskQueue} />
       </div>
-      <SchedulesCalendarView let:preset>
-        <div class="flex justify-between mt-8">
+      <SchedulesCalendarView
+        let:preset
+        bind:dayOfWeek
+        bind:dayOfMonth
+        bind:month
+      >
+        <div class="mt-8 flex justify-between">
           <Button disabled={!$form.valid} on:click={() => handleClick(preset)}
             >Create Schedule</Button
           >

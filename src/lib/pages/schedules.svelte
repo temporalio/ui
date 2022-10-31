@@ -48,21 +48,23 @@
     >Create Schedule</Button
   >
 </div>
-<div class="w-full xl:w-1/2">
-  <Input
-    icon="search"
-    id="schedule-name-filter"
-    placeholder="Schedule Name"
-    bind:value={search}
-    on:submit={noop}
-  />
-</div>
 
 {#await fetchSchedules}
   <Loading />
 {:then { schedules, error }}
   {#if schedules?.length}
     <Pagination items={filteredSchedules(schedules)} let:visibleItems>
+      <svelte:fragment slot="action-top-left">
+        <div class="w-full xl:w-1/2">
+          <Input
+            icon="search"
+            id="schedule-name-filter"
+            placeholder="Schedule Name"
+            bind:value={search}
+            on:submit={noop}
+          />
+        </div>
+      </svelte:fragment>
       <SchedulesTable>
         {#each visibleItems as schedule}
           <SchedulesTableRow {schedule} />

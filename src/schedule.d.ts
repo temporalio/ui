@@ -2,8 +2,4 @@
 // type ListWorkflowExecutionsResponse =
 //   import('$types').ListWorkflowExecutionsResponse;
 
-type SchedulePreset =
-  | 'interval'
-  | 'week'
-  | 'month'
-  | 'string';
+type SchedulePreset = 'interval' | 'week' | 'month' | 'string';

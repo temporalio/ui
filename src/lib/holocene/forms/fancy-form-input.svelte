@@ -1,25 +1,20 @@
 <script lang="ts">
   import {
-    Hint,
-    HintGroup,
     validators,
     required as formRequired,
+    number,
+    Validator,
   } from 'svelte-use-form';
   import type { FormField } from '$holocene/forms';
-  import Input from '../input/input.svelte';
 
   export let field: FormField;
   export let suffix: string;
 
-  const { key, label, validations, hint, required, placeholder } = field;
+  const { key, placeholder } = field;
 </script>
 
 <div class="flex gap-0">
-  <input
-    name={key}
-    placeholder={placeholder ?? ''}
-    use:validators={validations ?? required ? [formRequired] : []}
-  />
+  <input name={key} placeholder={placeholder ?? ''} data-lpignore="true" />
   <div class="suffix">
     {suffix}
   </div>
@@ -40,7 +35,7 @@
     @apply block w-full rounded-tl-md rounded-bl-md border border-gray-900 p-2;
   }
   .suffix {
-    @apply block w-full rounded-tr-md rounded-br-md border border-gray-900 border-l-0 p-2 bg-gray-100;
+    @apply block w-full rounded-tr-md rounded-br-md border border-l-0 border-gray-900 bg-gray-100 p-2;
   }
   label {
     @apply text-sm text-gray-700;

@@ -4,8 +4,8 @@
   import DayOfWeekPicker from '$lib/holocene/day-of-week-picker.svelte';
   import SchedulesTimeView from './schedules-time-view.svelte';
 
-  let preset: SchedulePreset = 'month';
+  export let dayOfWeek;
 </script>
 
-<DayOfWeekPicker />
+<DayOfWeekPicker bind:dayOfWeek />
 <SchedulesTimeView />

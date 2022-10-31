@@ -72,6 +72,7 @@ export const fields: Record<string, FormField> = {
   },
   cronString: {
     key: 'schedule.spec.cronString',
+    label: '',
     placeholder: '',
     required: false,
   },
@@ -86,7 +87,17 @@ export const fields: Record<string, FormField> = {
 export const submitScheduleForm = async (
   form: Form,
   namespace: string,
-  preset: SchedulePreset
+  {
+    preset,
+    dayOfWeek,
+    dayOfMonth,
+    month,
+  }: {
+    preset: SchedulePreset;
+    dayOfWeek: string;
+    dayOfMonth: string;
+    month: string;
+  },
 ): Promise<void> => {
   const values = form.values;
   const body = {
@@ -113,16 +124,19 @@ export const submitScheduleForm = async (
   // const interval = values['schedule.spec.interval.interval'];
   const phase = values['schedule.spec.interval.phase'];
   const year = values['schedule.spec.calendar.year'];
-  const month = values['schedule.spec.calendar.month'];
-  const dayOfMonth = values['schedule.spec.calendar.dayOfMonth'];
-  const dayOfWeek = values['schedule.spec.calendar.dayOfWeek'];
+  // const month = values['schedule.spec.calendar.month'];
+  // const dayOfMonth = values['schedule.spec.calendar.dayOfMonth'];
+  // const dayOfWeek = values['schedule.spec.calendar.dayOfWeek'];
   const hour = values['schedule.spec.calendar.hour'];
   const minute = values['schedule.spec.calendar.minute'];
   const second = values['schedule.spec.calendar.second'];
 
   if (preset === 'interval') {
-    const parseTime = (time: string) => time ? parseInt(time) : 0
-    const interval = `${(parseTime(hour)) * 60 * 60 + (parseTime(minute)) * 60 + (parseTime(second))}s`
+    const parseTime = (time: string) => (time ? parseInt(time) : 0);
+    const interval = `${
+      parseTime(hour) * 60 * 60 + parseTime(minute) * 60 + parseTime(second)
+    }s`;
+    debugger;
     body.schedule.spec.interval = [{ interval, phase: phase || '0s' }];
     body.schedule.spec.calendar = [];
   } else {
@@ -131,7 +145,6 @@ export const submitScheduleForm = async (
       { year, month, dayOfMonth, dayOfWeek, hour, minute, second },
     ];
   }
-
   // // Wait 2 seconds for create to get it on fetchAllSchedules
   loading.set(true);
   const { error: err } = await createSchedule({

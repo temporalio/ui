@@ -35,7 +35,7 @@
   </a>
 {:else}
   <div
-    class="flex items-center justify-center border border-gray-900 py-2 px-4 text-sm cursor-pointer {$$props.class}"
+    class="flex cursor-pointer items-center justify-center border border-gray-900 py-2 px-4 text-sm {$$props.class}"
     class:rounded-lg={!group}
     class:active
     class:group

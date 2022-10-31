@@ -1,32 +1,35 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-
-  const dispatch = createEventDispatcher<{
-    changeDayOfWeek: { day: string };
-  }>();
-
-  const handleChange = (day: string) => {
-    dispatch('changeDayOfWeek', { day });
-  };
-
   import { genericWeekDays, weekDays } from '$lib/utilities/calendar';
+
+  export let dayOfWeek = '';
 </script>
 
 <div class="flex flex-col gap-4 text-center">
   <div class="flex gap-2 text-center">
-    {#each genericWeekDays as day}
-      <div class="cell" on:click={() => handleChange(day)}>{day}</div>
+    {#each genericWeekDays as { label, value }}
+      <button
+        class="cell"
+        class:active={dayOfWeek === value}
+        on:click|preventDefault={() => (dayOfWeek = value)}>{label}</button
+      >
     {/each}
   </div>
   <div class="flex flex-wrap gap-2 text-center">
-    {#each weekDays as day}
-      <div class="cell" on:click={() => handleChange(day)}>{day}</div>
+    {#each weekDays as { label, value }}
+      <button
+        class="cell"
+        class:active={dayOfWeek === value}
+        on:click|preventDefault={() => (dayOfWeek = value)}>{label}</button
+      >
     {/each}
   </div>
 </div>
 
 <style lang="postcss">
   .cell {
-    @apply rounded border w-24 p-2 text-sm cursor-pointer bg-gray-300 hover:bg-blue-700 hover:text-white;
+    @apply w-24 cursor-pointer rounded border bg-gray-300 p-2 text-sm hover:bg-blue-700 hover:text-white;
+  }
+  .active {
+    @apply bg-gray-900 text-white;
   }
 </style>

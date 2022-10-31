@@ -1,25 +1,26 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-
-  const dispatch = createEventDispatcher<{ changeMonth: { month: string } }>();
-
-  const handleChange = (month: string) => {
-    dispatch('changeMonth', { month });
-  };
-
   import { monthNames } from '$lib/utilities/calendar';
+
+  export let month;
 </script>
 
 <div class="flex flex-wrap gap-4 text-center">
-  {#each monthNames as month}
-    <div class="cell" on:click={() => handleChange(month)}>
-      {month}
-    </div>
+  {#each monthNames as { label, value }}
+    <button
+      class="cell"
+      class:active={value === month}
+      on:click|preventDefault={() => (month = value)}
+    >
+      {label}
+    </button>
   {/each}
 </div>
 
 <style lang="postcss">
   .cell {
-    @apply rounded border p-2 cursor-pointer bg-gray-300 hover:bg-blue-700 hover:text-white;
+    @apply cursor-pointer rounded border bg-gray-300 p-2 text-sm hover:bg-blue-700 hover:text-white;
+  }
+  .active {
+    @apply bg-gray-900 text-white;
   }
 </style>

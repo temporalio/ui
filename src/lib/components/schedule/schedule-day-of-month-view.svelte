@@ -5,11 +5,12 @@
   import DayOfMonthPicker from '$lib/holocene/day-of-month-picker.svelte';
   import MonthPicker from '$lib/holocene/month-picker.svelte';
 
-  let preset: SchedulePreset = 'month';
+  export let dayOfMonth;
+  export let month;
 </script>
 
-<div class="flex flex-col gap-4 w-full">
-  <DayOfMonthPicker />
-  <MonthPicker />
+<div class="flex w-full flex-col gap-4">
+  <DayOfMonthPicker bind:dayOfMonth />
+  <MonthPicker bind:month />
 </div>
 <SchedulesTimeView />

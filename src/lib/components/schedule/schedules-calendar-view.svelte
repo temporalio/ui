@@ -2,20 +2,20 @@
   import { fields, error } from '$lib/stores/schedules';
 
   import FormInput from '$lib/holocene/forms/form-input.svelte';
-  import MonthPicker from '$lib/holocene/month-picker.svelte';
-  import DayOfMonthPicker from '$lib/holocene/day-of-month-picker.svelte';
-  import DayOfWeekPicker from '$lib/holocene/day-of-week-picker.svelte';
   import Tab from '$lib/holocene/tab.svelte';
-  import SchedulesTimeView from './schedules-time-view.svelte';
   import SchedulesIntervalView from './schedules-interval-view.svelte';
   import ScheduleDayOfWeekView from './schedule-day-of-week-view.svelte';
   import ScheduleDayOfMonthView from './schedule-day-of-month-view.svelte';
 
-  let preset: SchedulePreset = 'month';
+  let preset: SchedulePreset = 'week';
+
+  export let dayOfWeek;
+  export let dayOfMonth;
+  export let month;
 </script>
 
-<div class="w-full mt-8">
-  <h1 class="text-2xl mb-4">Frequency</h1>
+<div class="mt-8 w-full">
+  <h1 class="mb-4 text-2xl">Frequency</h1>
   <div class="flex flex-wrap gap-6">
     <Tab
       label="Interval"
@@ -42,15 +42,15 @@
       on:click={() => (preset = 'string')}
     />
   </div>
-  <div class="flex flex-wrap gap-6 w-full mt-4">
+  <div class="mt-4 flex w-full flex-wrap gap-6">
     {#if preset === 'interval'}
       <SchedulesIntervalView />
     {:else if preset === 'week'}
-      <ScheduleDayOfWeekView />
+      <ScheduleDayOfWeekView bind:dayOfWeek />
     {:else if preset === 'month'}
-      <ScheduleDayOfMonthView />
+      <ScheduleDayOfMonthView bind:dayOfMonth bind:month />
     {:else if preset === 'string'}
-      <div class="flex flex-col gap-2 w-full">
+      <div class="flex w-full flex-col gap-2">
         <h3 class="text-base">String</h3>
         <p>Write or paste in a cron string to generate a Schedule.</p>
         <FormInput field={fields.cronString} />

@@ -26,7 +26,7 @@
   </td>
   <td class="cell truncate">
     {schedule.scheduleId}
-    <p>
+    <!-- <p>
       <small class="text-gray-900"
         ><ScheduleFrequency
           calendar={schedule?.info?.spec?.structuredCalendar?.[0] ??
@@ -34,7 +34,7 @@
           interval={schedule?.info?.spec?.interval?.[0]}
         /></small
       >
-    </p>
+    </p> -->
   </td>
   <td class="cell hidden md:table-cell">
     {schedule?.info?.workflowType?.name}

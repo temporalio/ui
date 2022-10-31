@@ -20,6 +20,7 @@
 <input
   name={key}
   placeholder={placeholder ?? ''}
+  data-lpignore="true"
   use:validators={validations ?? required ? [formRequired] : []}
 />
 {#if required}
