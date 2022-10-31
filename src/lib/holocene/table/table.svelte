@@ -38,11 +38,19 @@
     thead {
       @apply bg-gray-900 text-gray-100;
 
+      :global(th.selectable) {
+        @apply h-12 w-12 min-w-[36px] px-3;
+      }
+
       :global(th) {
-        @apply border-t border-gray-300 py-2 px-1;
+        @apply border-t border-gray-300 px-1 py-2;
 
         &:first-child {
-          @apply w-[1px] rounded-tl-lg border-l border-gray-300;
+          @apply rounded-tl-lg border-l border-gray-300;
+        }
+
+        &:first-child:not(.selectable) {
+          @apply w-[1px];
         }
 
         &:last-child {
@@ -52,11 +60,19 @@
     }
 
     tbody :global {
+      td.selectable {
+        @apply w-12 px-3;
+      }
+
       td {
-        @apply border-t border-gray-300 px-1 py-2 text-sm;
+        @apply border-t border-gray-300 py-2 text-sm;
 
         &:first-child {
           @apply border-l border-gray-300;
+        }
+
+        &:first-child:not(.selectable) {
+          @apply px-1;
         }
 
         &:last-child {
