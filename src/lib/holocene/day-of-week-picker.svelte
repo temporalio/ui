@@ -27,7 +27,7 @@
 
 <style lang="postcss">
   .cell {
-    @apply w-24 cursor-pointer rounded border bg-gray-300 p-2 text-sm hover:bg-blue-700 hover:text-white;
+    @apply w-auto cursor-pointer rounded border bg-gray-300 p-2 hover:bg-blue-700 hover:text-white;
   }
   .active {
     @apply bg-gray-900 text-white;

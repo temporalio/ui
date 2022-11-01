@@ -1,17 +1,20 @@
 <script lang="ts">
-  import { fields, error } from '$lib/stores/schedules';
-
-  import FormInput from '$lib/holocene/forms/form-input.svelte';
   import Tab from '$lib/holocene/tab.svelte';
   import SchedulesIntervalView from './schedules-interval-view.svelte';
   import ScheduleDayOfWeekView from './schedule-day-of-week-view.svelte';
   import ScheduleDayOfMonthView from './schedule-day-of-month-view.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
 
   let preset: SchedulePreset = 'interval';
 
-  export let dayOfWeek;
-  export let dayOfMonth;
-  export let month;
+  export let dayOfWeek: string;
+  export let dayOfMonth: string;
+  export let month: string;
+  export let hour: string;
+  export let minute: string;
+  export let second: string;
+  export let phase: string;
+  export let cronString: string;
 </script>
 
 <div class="mt-8 w-full">
@@ -44,16 +47,25 @@
   </div>
   <div class="mt-4 flex w-full flex-wrap gap-6">
     {#if preset === 'interval'}
-      <SchedulesIntervalView />
+      <SchedulesIntervalView bind:hour bind:minute bind:second bind:phase />
     {:else if preset === 'week'}
-      <ScheduleDayOfWeekView bind:dayOfWeek />
+      <ScheduleDayOfWeekView bind:dayOfWeek bind:hour bind:minute />
     {:else if preset === 'month'}
-      <ScheduleDayOfMonthView bind:dayOfMonth bind:month />
+      <ScheduleDayOfMonthView
+        bind:dayOfMonth
+        bind:month
+        bind:hour
+        bind:minute
+      />
     {:else if preset === 'string'}
       <div class="flex w-full flex-col gap-2">
         <h3 class="text-base">String</h3>
-        <p>Write or paste in a cron string to generate a Schedule.</p>
-        <FormInput field={fields.cronString} />
+        <p>Write or paste in a cron string to generate a schedule.</p>
+        <Input
+          id="cronString"
+          bind:value={cronString}
+          placeholder="* * * * *"
+        />
       </div>
     {/if}
   </div>

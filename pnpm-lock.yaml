@@ -60,7 +60,6 @@ specifiers:
   svelte-highlight: ^3.4.0
   svelte-loader: ^3.1.2
   svelte-preprocess: ^4.10.4
-  svelte-use-form: ^2.4.3
   svelte2tsx: ^0.5.10
   tailwindcss: ^3.1.4
   ts-node: ^10.2.1
@@ -140,7 +139,6 @@ devDependencies:
   svelte-highlight: 3.4.0
   svelte-loader: 3.1.2_svelte@3.52.0
   svelte-preprocess: 4.10.6_mzb65lhesrxcsbtmqpxwfdasfq
-  svelte-use-form: 2.4.3
   svelte2tsx: 0.5.10_r4lkni65x73edzylyqv3pim744
   tailwindcss: 3.1.4_ts-node@10.7.0
   ts-node: 10.7.0_2jmrorcux6nsf7sy4ly74hophu
@@ -9824,13 +9822,6 @@ packages:
       strip-indent: 3.0.0
       svelte: 3.52.0
       typescript: 4.6.4
-    dev: true
-
-  /svelte-use-form/2.4.3:
-    resolution:
-      {
-        integrity: sha512-+SCl4faZMXDtfpizTPsyB3HuFq6r716LV4mQ3cmXqWMJy7vcLWT5v6grHt+pDNylrvJ7+R3eihnKkru5r0QkuA==,
-      }
     dev: true
 
   /svelte/3.52.0:

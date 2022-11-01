@@ -134,7 +134,7 @@
   }
 
   .input-container.error .suffix {
-    @apply bg-red-100 border-red-700;
+    @apply border-red-700 bg-red-100;
   }
 
   .unroundRight {
