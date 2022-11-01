@@ -1,15 +1,27 @@
 <script lang="ts">
   import { monthNames } from '$lib/utilities/calendar';
 
-  export let month;
+  export let months: string[];
+
+  const onClick = (e: MouseEvent, month: string) => {
+    if (e.metaKey) {
+      if (months.includes(month)) {
+        months.filter((m) => m !== month);
+      } else {
+        months = [...months, month];
+      }
+    } else {
+      months = [month];
+    }
+  };
 </script>
 
 <div class="flex flex-wrap gap-4 text-center">
   {#each monthNames as { label, value }}
     <button
       class="cell"
-      class:active={value === month}
-      on:click|preventDefault={() => (month = value)}
+      class:active={months.includes(value)}
+      on:click|preventDefault={(e) => onClick(e, value)}
     >
       {label}
     </button>

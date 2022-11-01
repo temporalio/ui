@@ -1,9 +1,19 @@
 <script lang="ts">
-  const daysInMonth = Array.from({ length: 31 }).map((_, i) =>
-    (i + 1).toString(),
-  );
+  const daysInMonth = Array.from({ length: 31 }).map((_, i) => i + 1);
 
-  export let dayOfMonth = '';
+  export let daysOfMonth: number[];
+
+  const onClick = (e: MouseEvent, day: number) => {
+    if (e.metaKey) {
+      if (daysOfMonth.includes(day)) {
+        daysOfMonth.filter((d) => d !== day);
+      } else {
+        daysOfMonth = [...daysOfMonth, day];
+      }
+    } else {
+      daysOfMonth = [day];
+    }
+  };
 </script>
 
 <div class="text-center">
@@ -13,8 +23,8 @@
     {#each daysInMonth as day}
       <button
         class="cell"
-        class:active={dayOfMonth === day}
-        on:click|preventDefault={() => (dayOfMonth = day)}>{day}</button
+        class:active={daysOfMonth.includes(day)}
+        on:click|preventDefault={(e) => onClick(e, day)}>{day}</button
       >
     {/each}
   </div>

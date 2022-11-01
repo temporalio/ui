@@ -7,9 +7,10 @@
 
   let preset: SchedulePreset = 'interval';
 
-  export let dayOfWeek: string;
-  export let dayOfMonth: string;
-  export let month: string;
+  export let daysOfWeek: string[];
+  export let daysOfMonth: number[];
+  export let months: string[];
+  export let days: string;
   export let hour: string;
   export let minute: string;
   export let second: string;
@@ -47,13 +48,19 @@
   </div>
   <div class="mt-4 flex w-full flex-wrap gap-6">
     {#if preset === 'interval'}
-      <SchedulesIntervalView bind:hour bind:minute bind:second bind:phase />
+      <SchedulesIntervalView
+        bind:days
+        bind:hour
+        bind:minute
+        bind:second
+        bind:phase
+      />
     {:else if preset === 'week'}
-      <ScheduleDayOfWeekView bind:dayOfWeek bind:hour bind:minute />
+      <ScheduleDayOfWeekView bind:daysOfWeek bind:hour bind:minute />
     {:else if preset === 'month'}
       <ScheduleDayOfMonthView
-        bind:dayOfMonth
-        bind:month
+        bind:daysOfMonth
+        bind:months
         bind:hour
         bind:minute
       />

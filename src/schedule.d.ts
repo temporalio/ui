@@ -19,4 +19,10 @@ type ScheduleParameters = {
   second: string;
   phase: string;
   cronString: string;
+
+  // For UI
+  days: string;
+  daysOfWeek: string[];
+  daysOfMonth: number[];
+  months: string[];
 };

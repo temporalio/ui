@@ -5,6 +5,10 @@ import { routeForSchedules } from '$lib/utilities/route-for';
 
 import { createSchedule } from '$lib/services/schedule-service';
 import { calendarToComment } from '$lib/utilities/schedule-comment-formatting';
+import {
+  convertDaysAndMonths,
+  timeToInterval,
+} from '$lib/utilities/schedule-data-formatting';
 
 // TODO: Post Alpha, add support of additional fields.
 // "startTime": "2022-07-04T03:18:59.668Z",
@@ -20,15 +24,16 @@ export const submitScheduleForm = async ({
   workflowType,
   workflowId,
   taskQueue,
-  dayOfWeek,
-  dayOfMonth,
-  month,
+  daysOfWeek,
+  daysOfMonth,
+  months,
+  days,
   hour,
   minute,
   second,
   phase,
   cronString,
-}: ScheduleParameters): Promise<void> => {
+}: Partial<ScheduleParameters>): Promise<void> => {
   const body: DescribeSchedule = {
     schedule_id: name,
     schedule: {
@@ -48,16 +53,28 @@ export const submitScheduleForm = async ({
   };
 
   if (preset === 'string') {
+    // Add the cronString as a comment to the cronString to view it for frequency
     const cronStringWithComment = `${cronString}#${cronString}`;
     body.schedule.spec.cronString = [cronStringWithComment];
   } else if (preset === 'interval') {
-    const parseTime = (time: string) => (time ? parseInt(time) : 0);
-    const interval = `${
-      parseTime(hour) * 60 * 60 + parseTime(minute) * 60 + parseTime(second)
-    }s`;
+    const interval = timeToInterval(days, hour, minute, second);
     body.schedule.spec.interval = [{ interval, phase: phase || '0s' }];
     body.schedule.spec.calendar = [];
   } else {
+    const { month, dayOfMonth, dayOfWeek } = convertDaysAndMonths({
+      months,
+      daysOfMonth,
+      daysOfWeek,
+    });
+    const comment = calendarToComment({
+      preset,
+      month,
+      dayOfMonth,
+      dayOfWeek,
+      hour,
+      minute,
+      second,
+    });
     body.schedule.spec.interval = [];
     body.schedule.spec.calendar = [
       {
@@ -68,15 +85,7 @@ export const submitScheduleForm = async ({
         hour,
         minute,
         second,
-        comment: calendarToComment({
-          preset,
-          month,
-          dayOfMonth,
-          dayOfWeek,
-          hour,
-          minute,
-          second,
-        }),
+        comment,
       },
     ];
   }

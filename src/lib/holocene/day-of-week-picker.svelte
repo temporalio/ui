@@ -1,7 +1,22 @@
 <script lang="ts">
   import { genericWeekDays, weekDays } from '$lib/utilities/calendar';
 
-  export let dayOfWeek = '';
+  export let daysOfWeek: string[];
+
+  $: {
+    console.log('Days of the week: ', daysOfWeek);
+  }
+  const onClick = (e: MouseEvent, day: string) => {
+    if (e.metaKey) {
+      if (daysOfWeek.includes(day)) {
+        daysOfWeek.filter((d) => d !== day);
+      } else {
+        daysOfWeek = [...daysOfWeek, day];
+      }
+    } else {
+      daysOfWeek = [day];
+    }
+  };
 </script>
 
 <div class="flex flex-col gap-4 text-center">
@@ -9,8 +24,8 @@
     {#each genericWeekDays as { label, value }}
       <button
         class="cell"
-        class:active={dayOfWeek === value}
-        on:click|preventDefault={() => (dayOfWeek = value)}>{label}</button
+        class:active={daysOfWeek.includes(value)}
+        on:click|preventDefault={(e) => onClick(e, value)}>{label}</button
       >
     {/each}
   </div>
@@ -18,8 +33,8 @@
     {#each weekDays as { label, value }}
       <button
         class="cell"
-        class:active={dayOfWeek === value}
-        on:click|preventDefault={() => (dayOfWeek = value)}>{label}</button
+        class:active={daysOfWeek.includes(value)}
+        on:click|preventDefault={(e) => onClick(e, value)}>{label}</button
       >
     {/each}
   </div>

@@ -9,5 +9,8 @@
 {#if calendar}
   <small>{calendar?.comment ?? ''}</small>
 {:else}
-  <small>{intervalToComment(interval)}</small>
+  <div class="flex flex-col">
+    <small>{intervalToComment(interval?.interval)}</small>
+    <small>{intervalToComment(interval?.phase, true)}</small>
+  </div>
 {/if}

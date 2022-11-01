@@ -15,9 +15,10 @@
   let workflowType = '';
   let workflowId = '';
   let taskQueue = '';
-  let dayOfWeek = '*';
-  let dayOfMonth = '';
-  let month = '*';
+  let daysOfWeek: string[] = [];
+  let daysOfMonth: number[] = [];
+  let months: string[] = [];
+  let days = '';
   let hour = '';
   let minute = '';
   let second = '';
@@ -46,9 +47,10 @@
       workflowType,
       workflowId,
       taskQueue,
-      dayOfWeek,
-      dayOfMonth,
-      month,
+      daysOfWeek,
+      daysOfMonth,
+      months,
+      days,
       hour,
       minute,
       second,
@@ -75,6 +77,13 @@
       <h2 class="font-base mt-8 ml-0 text-2xl">Create Schedule</h2>
     </main>
     <form class="mb-4 flex w-full flex-col gap-4 md:w-2/3 xl:w-1/2">
+      {#if $error}
+        <p
+          class="rounded-md border-2 border-orange-500 bg-orange-100 p-5 text-center"
+        >
+          {$error}
+        </p>
+      {/if}
       <div class="w-full">
         <Input
           id="hour"
@@ -118,9 +127,10 @@
       </div>
       <SchedulesCalendarView
         let:preset
-        bind:dayOfWeek
-        bind:dayOfMonth
-        bind:month
+        bind:daysOfWeek
+        bind:daysOfMonth
+        bind:months
+        bind:days
         bind:hour
         bind:minute
         bind:second
@@ -140,13 +150,6 @@
         </div>
       </SchedulesCalendarView>
     </form>
-  {/if}
-  {#if $error}
-    <p
-      class="rounded-md border-2 border-orange-500 bg-orange-100 p-5 text-center"
-    >
-      {$error}
-    </p>
   {/if}
 </article>
 
