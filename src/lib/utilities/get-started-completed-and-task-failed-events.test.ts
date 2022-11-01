@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getWorkflowStartedAndCompletedEvents } from './get-started-and-completed-events';
+import { getWorkflowStartedCompletedAndTaskFailedEvents } from './get-started-completed-and-task-failed-events.';
 
 import completedEventHistory from '$fixtures/events.completed.json';
 import canceledEventHistory from '$fixtures/events.canceled.json';
@@ -8,7 +8,7 @@ import runningEventHistory from '$fixtures/events.running.json';
 import terminatedEventHistory from '$fixtures/events.terminated.json';
 import timedOutEventHistory from '$fixtures/events.timed-out.json';
 
-describe('getWorkflowStartedAndCompletedEvents', () => {
+describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
   it('should return null if the input is null', () => {
     const workflowStartedEvent = {
       eventId: '1',
@@ -111,12 +111,13 @@ describe('getWorkflowStartedAndCompletedEvents', () => {
     };
 
     expect(
-      getWorkflowStartedAndCompletedEvents([workflowStartedEvent]).input,
+      getWorkflowStartedCompletedAndTaskFailedEvents([workflowStartedEvent])
+        .input,
     ).toBe('null');
   });
 
   it('should get the correct input for a completed event history', () => {
-    const { input } = getWorkflowStartedAndCompletedEvents(
+    const { input } = getWorkflowStartedCompletedAndTaskFailedEvents(
       completedEventHistory,
     );
     expect(input).toMatchInlineSnapshot(
@@ -125,7 +126,7 @@ describe('getWorkflowStartedAndCompletedEvents', () => {
   });
 
   it('should get the correct result for a completed event history', () => {
-    const { results } = getWorkflowStartedAndCompletedEvents(
+    const { results } = getWorkflowStartedCompletedAndTaskFailedEvents(
       completedEventHistory,
     );
     expect(results).toMatchInlineSnapshot('"null"');
@@ -133,44 +134,46 @@ describe('getWorkflowStartedAndCompletedEvents', () => {
 
   it('should get the correct input for a cancelled event history', () => {
     const { input } =
-      getWorkflowStartedAndCompletedEvents(canceledEventHistory);
+      getWorkflowStartedCompletedAndTaskFailedEvents(canceledEventHistory);
     expect(input).toMatchInlineSnapshot('"[1656706850149404400,480000000000]"');
   });
 
   it('should get the correct result for a cancelled event history', () => {
     const { results } =
-      getWorkflowStartedAndCompletedEvents(canceledEventHistory);
+      getWorkflowStartedCompletedAndTaskFailedEvents(canceledEventHistory);
     expect(results).toMatchInlineSnapshot(
       '"{\\"type\\":\\"workflowExecutionCanceledEventAttributes\\",\\"workflowTaskCompletedEventId\\":\\"11\\",\\"details\\":null}"',
     );
   });
 
   it('should get the correct input for a failed event history', () => {
-    const { input } = getWorkflowStartedAndCompletedEvents(failedEventHistory);
+    const { input } =
+      getWorkflowStartedCompletedAndTaskFailedEvents(failedEventHistory);
     expect(input).toMatchInlineSnapshot('"[1656706968987842000]"');
   });
 
   it('should get the correct result for a failed event history', () => {
     const { results } =
-      getWorkflowStartedAndCompletedEvents(failedEventHistory);
+      getWorkflowStartedCompletedAndTaskFailedEvents(failedEventHistory);
     expect(results).toMatchInlineSnapshot(
       '"{\\"type\\":\\"workflowExecutionFailedEventAttributes\\",\\"failure\\":{\\"message\\":\\"failing on attempt 2\\",\\"source\\":\\"GoSDK\\",\\"stackTrace\\":\\"\\",\\"cause\\":null,\\"applicationFailureInfo\\":{\\"type\\":\\"\\",\\"nonRetryable\\":false,\\"details\\":null}},\\"retryState\\":\\"InProgress\\",\\"workflowTaskCompletedEventId\\":\\"4\\",\\"newExecutionRunId\\":\\"15e13ed4-880a-4557-96c6-0116e3d07b8d\\"}"',
     );
   });
 
   it('should get the correct input for a running event history', () => {
-    const { input } = getWorkflowStartedAndCompletedEvents(runningEventHistory);
+    const { input } =
+      getWorkflowStartedCompletedAndTaskFailedEvents(runningEventHistory);
     expect(input).toMatchInlineSnapshot('"[1656707029044596700,\\"canary\\"]"');
   });
 
   it('should get the correct result for a running event history', () => {
     const { results } =
-      getWorkflowStartedAndCompletedEvents(runningEventHistory);
+      getWorkflowStartedCompletedAndTaskFailedEvents(runningEventHistory);
     expect(results).toMatchInlineSnapshot('undefined');
   });
 
   it('should get the correct input for a terminated event history', () => {
-    const { input } = getWorkflowStartedAndCompletedEvents(
+    const { input } = getWorkflowStartedCompletedAndTaskFailedEvents(
       terminatedEventHistory,
     );
     expect(input).toMatchInlineSnapshot(
@@ -179,7 +182,7 @@ describe('getWorkflowStartedAndCompletedEvents', () => {
   });
 
   it('should get the correct result for a terminated event history', () => {
-    const { results } = getWorkflowStartedAndCompletedEvents(
+    const { results } = getWorkflowStartedCompletedAndTaskFailedEvents(
       terminatedEventHistory,
     );
     expect(results).toMatchInlineSnapshot(
@@ -189,13 +192,13 @@ describe('getWorkflowStartedAndCompletedEvents', () => {
 
   it('should get the correct input for a timedOut event history', () => {
     const { input } =
-      getWorkflowStartedAndCompletedEvents(timedOutEventHistory);
+      getWorkflowStartedCompletedAndTaskFailedEvents(timedOutEventHistory);
     expect(input).toMatchInlineSnapshot('"[1656683778738403300,\\"canary\\"]"');
   });
 
   it('should get the correct result for a timedOut event history', () => {
     const { results } =
-      getWorkflowStartedAndCompletedEvents(timedOutEventHistory);
+      getWorkflowStartedCompletedAndTaskFailedEvents(timedOutEventHistory);
     expect(results).toMatchInlineSnapshot(
       '"{\\"type\\":\\"workflowExecutionTimedOutEventAttributes\\",\\"retryState\\":\\"RetryPolicyNotSet\\",\\"newExecutionRunId\\":\\"\\"}"',
     );
@@ -222,7 +225,7 @@ describe('getWorkflowStartedAndCompletedEvents', () => {
       },
     ];
 
-    const { results } = getWorkflowStartedAndCompletedEvents(history);
+    const { results } = getWorkflowStartedCompletedAndTaskFailedEvents(history);
     expect(results).toBe('null');
   });
 
@@ -247,7 +250,48 @@ describe('getWorkflowStartedAndCompletedEvents', () => {
       },
     ];
 
-    const { results } = getWorkflowStartedAndCompletedEvents(history);
+    const { results } = getWorkflowStartedCompletedAndTaskFailedEvents(history);
     expect(results).toBe('"result"');
+  });
+
+  it('should get the correct error for a completed event history without any errors', () => {
+    const { error } = getWorkflowStartedCompletedAndTaskFailedEvents(
+      completedEventHistory,
+    );
+    expect(error).toMatchInlineSnapshot('undefined');
+  });
+
+  it('should get the correct error for a WorkflowTaskFailed event', () => {
+    const cause = 'NonDeterministicError';
+    const history = [
+      {
+        eventId: '11',
+        eventTime: '2022-10-31T22:41:28.917920758Z',
+        eventType: 'WorkflowTaskFailed',
+        version: '0',
+        taskId: '56713476',
+        workflowTaskFailedEventAttributes: {
+          cause,
+          failure: {
+            cause: null,
+          },
+        },
+        attributes: {
+          type: 'workflowTaskFailedEventAttributes',
+          cause,
+          failure: {
+            cause: null,
+          },
+        },
+        classification: 'Failed',
+        category: 'workflow',
+        id: '11',
+        name: 'WorkflowTaskFailed',
+        timestamp: '2022-10-31 UTC 22:41:28.91',
+      },
+    ];
+
+    const { error } = getWorkflowStartedCompletedAndTaskFailedEvents(history);
+    expect(error).toBe(cause);
   });
 });

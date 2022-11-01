@@ -4,6 +4,7 @@ import { stringifyWithBigInt } from './parse-with-big-int';
 type WorkflowInputAndResults = {
   input: string;
   results: string;
+  error: WorkflowTaskFailedCause;
 };
 
 type CompletionEvent =
@@ -23,6 +24,12 @@ const completedEventTypes = [
   'WorkflowExecutionTerminated',
 ] as const;
 
+const isStartedEvent = (
+  event: WorkflowEvent,
+): event is WorkflowExecutionStartedEvent => {
+  return !!event.workflowExecutionStartedEventAttributes;
+};
+
 const isCompletionEvent = (event: WorkflowEvent): event is CompletionEvent => {
   for (const completionType of completedEventTypes) {
     if (event.eventType === completionType) return true;
@@ -30,10 +37,10 @@ const isCompletionEvent = (event: WorkflowEvent): event is CompletionEvent => {
   return false;
 };
 
-const getWorkflowCompletedEvent = (events: WorkflowEvents): CompletionEvent => {
-  for (const event of events) {
-    if (isCompletionEvent(event)) return event;
-  }
+const isFailedTaskEvent = (
+  event: WorkflowEvent,
+): event is WorkflowTaskFailedEvent => {
+  return event.eventType === 'WorkflowTaskFailed';
 };
 
 const getEventResult = (event: CompletionEvent) => {
@@ -45,19 +52,31 @@ const getEventResult = (event: CompletionEvent) => {
   return event.attributes;
 };
 
-export const getWorkflowStartedAndCompletedEvents = (
+export const getWorkflowStartedCompletedAndTaskFailedEvents = (
   events: WorkflowEvents,
 ): WorkflowInputAndResults => {
   let input: string;
   let results: string;
+  let error: WorkflowTaskFailedCause;
 
-  const workflowStartedEvent: WorkflowEvent = events?.find(
-    (event: WorkflowEvent) => {
-      return !!event.workflowExecutionStartedEventAttributes;
-    },
-  );
+  let workflowStartedEvent: WorkflowExecutionStartedEvent;
+  let workflowCompletedEvent: CompletionEvent;
+  let workflowTaskFailedEvent: WorkflowTaskFailedEvent;
 
-  const workflowCompletedEvent = getWorkflowCompletedEvent(events);
+  for (const event of events) {
+    if (isStartedEvent(event)) {
+      workflowStartedEvent = event;
+      break;
+    }
+    if (isCompletionEvent(event)) {
+      workflowCompletedEvent = event;
+      continue;
+    }
+    if (isFailedTaskEvent(event)) {
+      workflowTaskFailedEvent = event;
+      continue;
+    }
+  }
 
   if (workflowStartedEvent) {
     input = stringifyWithBigInt(
@@ -70,8 +89,12 @@ export const getWorkflowStartedAndCompletedEvents = (
     results = stringifyWithBigInt(getEventResult(workflowCompletedEvent));
   }
 
+  if (workflowTaskFailedEvent) {
+    error = workflowTaskFailedEvent.workflowTaskFailedEventAttributes.cause;
+  }
   return {
     input,
     results,
+    error,
   };
 };
