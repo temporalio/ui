@@ -9,10 +9,10 @@
     bulkTerminate: { selectedWorkflows: WorkflowExecution[] };
   }>();
 
-  export let bulkActionsEnabled: boolean;
-  export let updating = false;
-  export let visibleWorkflows: WorkflowExecution[];
-  export let selectedWorkflows: WorkflowExecution[];
+  export let bulkActionsEnabled: boolean = false;
+  export let updating: boolean = false;
+  export let visibleWorkflows: WorkflowExecution[] = [];
+  export let selectedWorkflows: WorkflowExecution[] = [];
 
   let allSelected: boolean;
 
