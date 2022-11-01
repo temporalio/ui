@@ -73,7 +73,7 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
   for (const event of events) {
     if (isStartedEvent(event)) {
       workflowStartedEvent = event;
-      break;
+      continue;
     } else if (isCompletionEvent(event)) {
       workflowCompletedEvent = event;
       continue;

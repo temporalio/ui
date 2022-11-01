@@ -21,7 +21,7 @@
   import Accordion from '$lib/holocene/accordion.svelte';
   import { timeFormat } from '$lib/stores/time-format';
   import { exportHistory } from '$lib/utilities/export-history';
-  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events.';
+  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
 
   const { namespace } = $page.params;
   const { workflow, workers } = $workflowRun;
