@@ -1,0 +1,34 @@
+{
+  "namespaceInfo": {
+    "name": "default",
+    "state": "Registered",
+    "description": "Default namespace for Temporal Server.",
+    "ownerEmail": "",
+    "data": {},
+    "id": "398cb3a0-112f-4a36-991c-766dd8001649"
+  },
+  "config": {
+    "workflowExecutionRetentionTtl": "86400s",
+    "badBinaries": {
+      "binaries": {}
+    },
+    "historyArchivalState": "Disabled",
+    "historyArchivalUri": "",
+    "visibilityArchivalState": "Disabled",
+    "visibilityArchivalUri": ""
+  },
+  "replicationConfig": {
+    "activeClusterName": "us-east1",
+    "clusters": [
+      {
+        "clusterName": "us-east1"
+      },
+      {
+        "clusterName": "us-east2"
+      }
+    ],
+    "state": "Unspecified"
+  },
+  "failoverVersion": "0",
+  "isGlobalNamespace": false
+}
