@@ -82,7 +82,7 @@
   <slot name="empty">No Items</slot>
 {:else}
   <div class="relative mb-8 flex flex-col gap-4">
-    <div class="flex flex-col items-center gap-4 lg:flex-row justify-between">
+    <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
       <div class="flex items-center">
         <slot name="action-top-left" />
         {#if $store.updating}
