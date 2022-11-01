@@ -15,9 +15,9 @@
   let workflowType = '';
   let workflowId = '';
   let taskQueue = '';
-  let dayOfWeek = '';
+  let dayOfWeek = '*';
   let dayOfMonth = '';
-  let month = '';
+  let month = '*';
   let hour = '';
   let minute = '';
   let second = '';
@@ -79,7 +79,7 @@
         <Input
           id="hour"
           bind:value={name}
-          placeholder="Schedule Name"
+          label="Name*"
           maxLength={232}
           error={errors['name']}
           on:input={() => onInput('name')}
@@ -90,7 +90,7 @@
         <Input
           id="hour"
           bind:value={workflowType}
-          placeholder="Workflow Type"
+          label="Workflow Type*"
           error={errors['workflowType']}
           on:input={() => onInput('workflowType')}
           on:blur={() => onBlur('workflowType', workflowType)}
@@ -100,7 +100,7 @@
         <Input
           id="hour"
           bind:value={workflowId}
-          placeholder="Workflow Id"
+          label="Workflow Id*"
           error={errors['workflowId']}
           on:input={() => onInput('workflowId')}
           on:blur={() => onBlur('workflowId', workflowId)}
@@ -110,7 +110,7 @@
         <Input
           id="hour"
           bind:value={taskQueue}
-          placeholder="Task Queue"
+          label="Task Queue*"
           error={errors['taskQueue']}
           on:input={() => onInput('taskQueue')}
           on:blur={() => onBlur('taskQueue', taskQueue)}

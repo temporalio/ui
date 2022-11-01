@@ -4,6 +4,7 @@ import { writable } from 'svelte/store';
 import { routeForSchedules } from '$lib/utilities/route-for';
 
 import { createSchedule } from '$lib/services/schedule-service';
+import { calendarToComment } from '$lib/utilities/schedule-comment-formatting';
 
 // TODO: Post Alpha, add support of additional fields.
 // "startTime": "2022-07-04T03:18:59.668Z",
@@ -27,28 +28,14 @@ export const submitScheduleForm = async ({
   second,
   phase,
   cronString,
-}: {
-  namespace: string;
-  preset: SchedulePreset;
-  name: string;
-  workflowType: string;
-  workflowId: string;
-  taskQueue: string;
-  dayOfWeek: string;
-  dayOfMonth: string;
-  month: string;
-  hour: string;
-  minute: string;
-  second: string;
-  phase: string;
-  cronString: string;
-}): Promise<void> => {
-  const body = {
+}: ScheduleParameters): Promise<void> => {
+  const body: DescribeSchedule = {
     schedule_id: name,
     schedule: {
       spec: {
         calendar: [],
         interval: [],
+        cronString: [],
       },
       action: {
         startWorkflow: {
@@ -60,7 +47,10 @@ export const submitScheduleForm = async ({
     },
   };
 
-  if (preset === 'interval') {
+  if (preset === 'string') {
+    const cronStringWithComment = `${cronString}#${cronString}`;
+    body.schedule.spec.cronString = [cronStringWithComment];
+  } else if (preset === 'interval') {
     const parseTime = (time: string) => (time ? parseInt(time) : 0);
     const interval = `${
       parseTime(hour) * 60 * 60 + parseTime(minute) * 60 + parseTime(second)
@@ -70,7 +60,24 @@ export const submitScheduleForm = async ({
   } else {
     body.schedule.spec.interval = [];
     body.schedule.spec.calendar = [
-      { year: '*', month, dayOfMonth, dayOfWeek, hour, minute, second },
+      {
+        year: '*',
+        month,
+        dayOfMonth,
+        dayOfWeek,
+        hour,
+        minute,
+        second,
+        comment: calendarToComment({
+          preset,
+          month,
+          dayOfMonth,
+          dayOfWeek,
+          hour,
+          minute,
+          second,
+        }),
+      },
     ];
   }
   // // Wait 2 seconds for create to get it on fetchAllSchedules

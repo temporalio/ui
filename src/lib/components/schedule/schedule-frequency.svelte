@@ -1,15 +1,13 @@
 <script lang="ts">
+  import { intervalToComment } from '$lib/utilities/schedule-comment-formatting';
   import type { CalendarSpec, IntervalSpec } from '$types';
-  import CodeBlock from '$lib/holocene/code-block.svelte';
 
   export let calendar: CalendarSpec;
   export let interval: IntervalSpec;
 </script>
 
-{#if !calendar}
-  <CodeBlock content={interval} />
+{#if calendar}
+  <small>{calendar?.comment ?? ''}</small>
 {:else}
-  <div class="flex flex-row gap-4 break-all text-sm">
-    <CodeBlock content={calendar} inline />
-  </div>
+  <small>{intervalToComment(interval)}</small>
 {/if}

@@ -1,5 +1,22 @@
 // type WorkflowExecutionStatus = import('$types').WorkflowExecutionStatus;
-// type ListWorkflowExecutionsResponse =
-//   import('$types').ListWorkflowExecutionsResponse;
+type DescribeSchedule = import('$types').DescribeScheduleResponse;
+type ScheduleSpec = import('$types').ScheduleSpec;
 
 type SchedulePreset = 'interval' | 'week' | 'month' | 'string';
+
+type ScheduleParameters = {
+  namespace: string;
+  preset: SchedulePreset;
+  name: string;
+  workflowType: string;
+  workflowId: string;
+  taskQueue: string;
+  dayOfWeek: string;
+  dayOfMonth: string;
+  month: string;
+  hour: string;
+  minute: string;
+  second: string;
+  phase: string;
+  cronString: string;
+};
