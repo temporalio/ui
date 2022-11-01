@@ -2,6 +2,11 @@
   import { fields } from '$lib/stores/schedules';
 
   import FancyFormInput from '$lib/holocene/forms/fancy-form-input.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
+
+  export let hour = '';
+  export let minute = '';
+  export let second = '';
 </script>
 
 <div class="flex flex-col gap-8">
@@ -13,15 +18,36 @@
     </p>
     <div class="flex flex-row items-center gap-2">
       <div class="w-24">
-        <FancyFormInput field={fields.hour} suffix="hrs" />
+        <Input
+          id="hour"
+          bind:value={hour}
+          placeholder="00"
+          suffix="hrs"
+          maxLength={2}
+          error={parseInt(hour) > 60}
+        />
       </div>
       <div>:</div>
       <div class="w-24">
-        <FancyFormInput field={fields.minute} suffix="min" />
+        <Input
+          id="minute"
+          bind:value={minute}
+          placeholder="00"
+          suffix="min"
+          maxLength={2}
+          error={parseInt(minute) > 60}
+        />
       </div>
       <div>:</div>
       <div class="w-24">
-        <FancyFormInput field={fields.second} suffix="sec" />
+        <Input
+          id="second"
+          bind:value={second}
+          placeholder="00"
+          suffix="sec"
+          maxLength={2}
+          error={parseInt(second) > 60}
+        />
       </div>
     </div>
   </div>

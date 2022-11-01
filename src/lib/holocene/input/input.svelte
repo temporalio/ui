@@ -9,6 +9,7 @@
   export let label = '';
   export let icon: IconName = null;
   export let placeholder = '';
+  export let suffix = '';
   export let name = id;
   export let copyable: boolean = false;
   export let disabled = false;
@@ -22,6 +23,7 @@
   export let unroundRight: boolean = false;
   export let unroundLeft: boolean = false;
   export let autoFocus = false;
+  export let error = false;
 
   function callFocus(input) {
     if (autoFocus) input.focus();
@@ -44,7 +46,8 @@
   <div
     class="input-container {theme}"
     class:disabled
-    class:unroundRight
+    class:error
+    class:unroundRight={unroundRight ?? suffix}
     class:unroundLeft
     class:invalid={!valid}
   >
@@ -71,6 +74,11 @@
       on:blur
       use:callFocus
     />
+    {#if suffix}
+      <div class="suffix">
+        {suffix}
+      </div>
+    {/if}
     {#if copyable}
       <div class="copy-icon-container" on:click={(e) => copy(e, value)}>
         <Icon name={$copied ? 'checkmark' : 'copy'} />
@@ -88,7 +96,7 @@
         <Icon name="close" />
       </div>
     {/if}
-    {#if maxLength}
+    {#if maxLength && !suffix}
       <span class="count">
         <span
           class="text-blue-700"
@@ -110,7 +118,23 @@
   }
 
   .input-container {
-    @apply relative box-border inline-flex h-10 w-full items-center rounded border border-gray-900 text-sm focus-within:border-blue-700;
+    @apply relative box-border inline-flex w-full items-center rounded border border-gray-900 text-sm focus-within:border-blue-700;
+  }
+
+  .input-container.error {
+    @apply border-red-700;
+  }
+
+  .suffix {
+    @apply block w-full rounded-tr rounded-br border-l border-gray-900 bg-gray-100 p-2;
+  }
+
+  .input-container:active .suffix {
+    @apply border-blue-700;
+  }
+
+  .input-container.error .suffix {
+    @apply bg-red-100 border-red-700;
   }
 
   .unroundRight {
