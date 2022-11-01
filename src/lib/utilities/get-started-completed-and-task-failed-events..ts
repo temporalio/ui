@@ -43,6 +43,12 @@ const isFailedTaskEvent = (
   return event.eventType === 'WorkflowTaskFailed';
 };
 
+const isCompletedTaskEvent = (
+  event: WorkflowEvent,
+): event is WorkflowTaskCompletedEvent => {
+  return event.eventType === 'WorkflowTaskCompleted';
+};
+
 const getEventResult = (event: CompletionEvent) => {
   if (isWorkflowExecutionCompletedEvent(event)) {
     if (event.attributes.result === null) return null;
@@ -62,17 +68,21 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
   let workflowStartedEvent: WorkflowExecutionStartedEvent;
   let workflowCompletedEvent: CompletionEvent;
   let workflowTaskFailedEvent: WorkflowTaskFailedEvent;
+  let hasCompletedTaskEvent = false;
 
   for (const event of events) {
     if (isStartedEvent(event)) {
       workflowStartedEvent = event;
       break;
-    }
-    if (isCompletionEvent(event)) {
+    } else if (isCompletionEvent(event)) {
       workflowCompletedEvent = event;
       continue;
-    }
-    if (isFailedTaskEvent(event)) {
+    } else if (isCompletedTaskEvent(event)) {
+      // If there is a completed workflow task
+      hasCompletedTaskEvent = true;
+      continue;
+      // then we don't need to look for a failed task
+    } else if (!hasCompletedTaskEvent && isFailedTaskEvent(event)) {
       workflowTaskFailedEvent = event;
       continue;
     }
@@ -92,6 +102,7 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
   if (workflowTaskFailedEvent) {
     error = workflowTaskFailedEvent.workflowTaskFailedEventAttributes.cause;
   }
+
   return {
     input,
     results,

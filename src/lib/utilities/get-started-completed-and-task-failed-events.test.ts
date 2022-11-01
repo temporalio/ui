@@ -254,7 +254,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
     expect(results).toBe('"result"');
   });
 
-  it('should get the correct error for a completed event history without any errors', () => {
+  it('should get the correct error for a completed event history without any failed tasks', () => {
     const { error } = getWorkflowStartedCompletedAndTaskFailedEvents(
       completedEventHistory,
     );
@@ -293,5 +293,63 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
 
     const { error } = getWorkflowStartedCompletedAndTaskFailedEvents(history);
     expect(error).toBe(cause);
+  });
+
+  it('should get the correct error for a workflow that has a completed task after a failed task', () => {
+    const history = [
+      {
+        eventId: '17',
+        eventTime: '2022-07-01T20:28:52.916365546Z',
+        eventType: 'WorkflowTaskCompleted',
+        version: '0',
+        taskId: '29887669',
+        workflowTaskCompletedEventAttributes: {
+          scheduledEventId: '15',
+          startedEventId: '16',
+          identity: '83579@MacBook-Pro-2.local@',
+          binaryChecksum: 'e56c0141e58df0bd405138565d0526f9',
+        },
+        attributes: {
+          type: 'workflowTaskCompletedEventAttributes',
+          scheduledEventId: '15',
+          startedEventId: '16',
+          identity: '83579@MacBook-Pro-2.local@',
+          binaryChecksum: 'e56c0141e58df0bd405138565d0526f9',
+        },
+        classification: 'Completed',
+        category: 'workflow',
+        id: '17',
+        name: 'WorkflowTaskCompleted',
+        timestamp: '2022-07-01 UTC 20:28:52.91',
+      },
+      {
+        eventId: '11',
+        eventTime: '2022-10-31T22:41:28.917920758Z',
+        eventType: 'WorkflowTaskFailed',
+        version: '0',
+        taskId: '56713476',
+        workflowTaskFailedEventAttributes: {
+          cause: 'NonDeterministicError',
+          failure: {
+            cause: null,
+          },
+        },
+        attributes: {
+          type: 'workflowTaskFailedEventAttributes',
+          cause: 'NonDeterministicError',
+          failure: {
+            cause: null,
+          },
+        },
+        classification: 'Failed',
+        category: 'workflow',
+        id: '11',
+        name: 'WorkflowTaskFailed',
+        timestamp: '2022-10-31 UTC 22:41:28.91',
+      },
+    ];
+
+    const { error } = getWorkflowStartedCompletedAndTaskFailedEvents(history);
+    expect(error).toMatchInlineSnapshot('undefined');
   });
 });
