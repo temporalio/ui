@@ -1,18 +1,14 @@
 <script lang="ts">
-  import { eventHistory, updating } from '$lib/stores/events';
-
-  import { getWorkflowStartedAndCompletedEvents } from '$lib/utilities/get-started-and-completed-events';
+  import { updating } from '$lib/stores/events';
   import { capitalize } from '$lib/utilities/format-camel-case';
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Loading from '$holocene/loading.svelte';
 
   export let type: 'input' | 'results';
+  export let content: string;
 
   $: title = capitalize(type);
-  $: content = getWorkflowStartedAndCompletedEvents(
-    $eventHistory?.events ?? [],
-  )[type];
 </script>
 
 <article class="flex w-full flex-col lg:w-1/2" data-cy="workflow-{type}">

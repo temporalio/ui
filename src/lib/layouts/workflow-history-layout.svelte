@@ -9,6 +9,7 @@
   } from '$lib/utilities/route-for';
   import { formatDate } from '$lib/utilities/format-date';
   import { eventViewType } from '$lib/stores/event-view';
+  import { eventHistory } from '$lib/stores/events';
 
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
@@ -19,6 +20,7 @@
   import Accordion from '$lib/holocene/accordion.svelte';
   import { timeFormat } from '$lib/stores/time-format';
   import { exportHistory } from '$lib/utilities/export-history';
+  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events.';
 
   const { namespace } = $page.params;
   const { workflow, workers } = $workflowRun;
@@ -36,6 +38,10 @@
     workflow: workflow.id,
     run: workflow.runId,
   };
+
+  $: workflowEvents = getWorkflowStartedCompletedAndTaskFailedEvents(
+    $eventHistory?.events ?? [],
+  );
 </script>
 
 <section class="flex flex-col gap-4">
@@ -111,8 +117,8 @@
   <section class="flex w-full">
     <Accordion title="Input and Results" icon="json" class="border-gray-900">
       <div class="flex gap-2">
-        <InputAndResults type="input" />
-        <InputAndResults type="results" />
+        <InputAndResults type="input" content={workflowEvents.input} />
+        <InputAndResults type="results" content={workflowEvents.results} />
       </div>
     </Accordion>
   </section>
