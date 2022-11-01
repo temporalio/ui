@@ -13,7 +13,7 @@
     token: string,
   ) => Promise<{ items: any[]; nextPageToken: string }>;
 
-  export let isUnauthorizedError: (error: any) => boolean = () => false;
+  export let onError: (error: any) => void;
   export let onFetch: () => Promise<PaginatedRequest>;
 
   let store = createPaginationStore();
@@ -36,6 +36,7 @@
       store.setNextPageToken(nextPageToken, items);
     } catch (err: any) {
       error = err;
+      onError(error);
     }
   }
 
@@ -52,6 +53,7 @@
       store.setNextPageToken(nextPageToken, items);
     } catch (err: any) {
       error = err;
+      onError(error);
     }
   }
 
@@ -66,8 +68,8 @@
   $: isEmpty = $store.items.length === 0 && !$store.loading;
 </script>
 
-{#if isUnauthorizedError(error) && $$slots.unauthorized}
-  <slot name="unauthorized" />
+{#if error && $$slots.error}
+  <slot name="error" />
 {:else if error}
   <Alert
     intent="error"
