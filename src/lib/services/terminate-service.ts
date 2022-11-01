@@ -78,21 +78,22 @@ export async function pollBatchOperation({
   namespace,
   jobId,
 }: DescribeBatchOperationOptions) {
-  return new Promise<void>(async (resolve, reject) => {
-    const { state } = await describeBatchOperation({ namespace, jobId });
-    if (state === 'Failed') {
-      reject();
-    } else if (state !== 'Running') {
-      resolve();
-    } else {
-      setTimeout(async () => {
-        try {
-          resolve(pollBatchOperation({ namespace, jobId }));
-        } catch {
-          reject();
-        }
-      }, 1000);
-    }
+  return new Promise<void>((resolve, reject) => {
+    describeBatchOperation({ namespace, jobId }).then(({ state }) => {
+      if (state === 'Failed') {
+        reject();
+      } else if (state !== 'Running') {
+        resolve();
+      } else {
+        setTimeout(async () => {
+          try {
+            resolve(pollBatchOperation({ namespace, jobId }));
+          } catch {
+            reject();
+          }
+        }, 1000);
+      }
+    });
   });
 }
 
