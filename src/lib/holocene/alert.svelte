@@ -42,7 +42,7 @@
   }
 
   .alert.warning {
-    @apply border-yellow-700 bg-yellow-100 text-yellow-700;
+    @apply border-yellow-700 bg-yellow-50 text-yellow-700;
   }
 
   .content :global(> *) {

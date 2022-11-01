@@ -15,6 +15,7 @@
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import PendingActivities from '$lib/components/workflow/pending-activities.svelte';
   import WorkflowStackTraceError from '$lib/components/workflow/workflow-stack-trace-error.svelte';
+  import WorkflowTypedError from '$lib/components/workflow/workflow-typed-error.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
@@ -113,6 +114,7 @@
     />
   </section>
   <WorkflowStackTraceError {workflow} {workers} />
+  <WorkflowTypedError error={workflowEvents.error} />
   <PendingActivities />
   <section class="flex w-full">
     <Accordion title="Input and Results" icon="json" class="border-gray-900">
