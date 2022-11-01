@@ -56,3 +56,19 @@ type WorkflowExecution = {
   defaultWorkflowTaskTimeout: Duration;
   canBeTerminated: boolean;
 };
+
+type BatchOperationType = 'Terminate' | 'Cancel' | 'Signal';
+type BatchOperationStatus = 'Running' | 'Complete' | 'Failed' | 'Unspecified';
+
+type BatchOperationInfo = {
+  operationType: BatchOperationType;
+  jobId: string;
+  state: BatchOperationStatus;
+  startTime: string;
+  closeTime: string;
+  totalOperationCount: string;
+  completeOperationCount: string;
+  failureOperationCount: string;
+  identity: string;
+  reason: string;
+};

@@ -9,7 +9,7 @@
     TimedOut: 'Timed Out',
     Completed: 'Completed',
     Failed: 'Failed',
-    ContinuedAsNew: 'Continued as New',
+    ContinuedAsNew: "Cont'd as New",
     Canceled: 'Canceled',
     Terminated: 'Terminated',
     Paused: 'Paused',

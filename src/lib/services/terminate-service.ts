@@ -36,24 +36,26 @@ export async function batchTerminateWorkflows({
   namespace,
   workflowExecutions,
   reason,
-}: BulkTerminateWorkflowOptions): Promise<null> {
+}: BulkTerminateWorkflowOptions): Promise<string> {
   const route = await routeForApi('workflows.batch.terminate', { namespace });
 
   const runIds = workflowExecutions.map((wf) => wf.runId);
   const query = runIds.reduce((queryString, id, index, arr) => {
     queryString += `RunId="${id}"`;
     if (index !== arr.length - 1) {
-      queryString += '+or+';
+      queryString += ' OR ';
     }
 
     return queryString;
   }, '');
 
-  return await requestFromAPI<null>(route, {
+  const jobId = uuidv4();
+
+  await requestFromAPI<null>(route, {
     options: {
       method: 'POST',
       body: stringifyWithBigInt({
-        jobId: uuidv4(),
+        jobId,
         namespace,
         visibilityQuery: query,
         reason,
@@ -62,5 +64,45 @@ export async function batchTerminateWorkflows({
     },
     shouldRetry: false,
     notifyOnError: false,
+  });
+
+  return jobId;
+}
+
+type DescribeBatchOperationOptions = {
+  jobId: string;
+  namespace: string;
+};
+
+export async function pollBatchOperation({
+  namespace,
+  jobId,
+}: DescribeBatchOperationOptions) {
+  return new Promise<void>(async (resolve, reject) => {
+    const { state } = await describeBatchOperation({ namespace, jobId });
+    if (state === 'Failed') {
+      reject();
+    } else if (state !== 'Running') {
+      resolve();
+    } else {
+      setTimeout(async () => {
+        try {
+          resolve(pollBatchOperation({ namespace, jobId }));
+        } catch {
+          reject();
+        }
+      }, 1000);
+    }
+  });
+}
+
+async function describeBatchOperation({
+  jobId,
+  namespace,
+}: DescribeBatchOperationOptions): Promise<BatchOperationInfo> {
+  const route = await routeForApi('workflows.batch.describe', { namespace });
+
+  return requestFromAPI<BatchOperationInfo>(route, {
+    params: { jobId },
   });
 }

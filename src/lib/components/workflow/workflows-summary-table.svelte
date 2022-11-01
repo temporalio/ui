@@ -5,22 +5,17 @@
   import Table from '$lib/holocene/table/table.svelte';
   import { createEventDispatcher } from 'svelte';
 
-  const dispatch = createEventDispatcher<{
-    bulkTerminate: { selectedWorkflows: WorkflowExecution[] };
-  }>();
+  const dispatch = createEventDispatcher<{ terminateWorkflows: undefined }>();
 
   export let bulkActionsEnabled: boolean = false;
   export let updating: boolean = false;
   export let visibleWorkflows: WorkflowExecution[] = [];
   export let selectedWorkflows: WorkflowExecution[] = [];
+  export let terminableWorkflowCount: number = 0;
+  export let allSelected: boolean = false;
 
-  let allSelected: boolean;
-
-  const handleClickBulkTerminate = () => {
-    dispatch('bulkTerminate', { selectedWorkflows });
-
-    allSelected = false;
-    selectedWorkflows = [];
+  const handleBulkTerminate = () => {
+    dispatch('terminateWorkflows');
   };
 </script>
 
@@ -33,7 +28,7 @@
     {updating}
   >
     <svelte:fragment slot="default-headers">
-      <th class="hidden w-48 md:table-cell">Status</th>
+      <th class="hidden w-32 md:table-cell">Status</th>
       <th class="hidden md:table-cell md:w-60 xl:w-auto">Workflow ID</th>
       <th class="hidden md:table-cell md:w-60 xl:w-80">Type</th>
       <th class="hidden xl:table-cell xl:w-60">Start</th>
@@ -41,12 +36,20 @@
       <th class="table-cell md:hidden" colspan="3">Summary</th>
     </svelte:fragment>
     <svelte:fragment slot="bulk-action-headers">
-      <th class="hidden w-48 md:table-cell">
-        <BulkActionButton on:click={handleClickBulkTerminate}
-          >Terminate</BulkActionButton
-        >
+      <th class="hidden w-32 md:table-cell">
+        <span class="font-semibold">{selectedWorkflows.length} selected</span>
       </th>
-      <th class="hidden md:table-cell md:w-60 xl:w-auto" />
+      <th class="hidden md:table-cell md:w-60 xl:w-auto">
+        {#if terminableWorkflowCount > 0}
+          <BulkActionButton on:click={handleBulkTerminate}
+            >Terminate</BulkActionButton
+          >
+        {:else}
+          <span class="whitespace-nowrap italic"
+            >No bulk actions available for selected workflows.</span
+          >
+        {/if}
+      </th>
       <th class="hidden md:table-cell md:w-60 xl:w-80" />
       <th class="hidden xl:table-cell xl:w-60" />
       <th class="hidden xl:table-cell xl:w-60" />
@@ -57,7 +60,7 @@
 {:else}
   <Table class="w-full md:table-fixed" {updating}>
     <TableHeaderRow slot="headers">
-      <th class="hidden w-48 md:table-cell">Status</th>
+      <th class="hidden w-32 md:table-cell">Status</th>
       <th class="hidden md:table-cell md:w-60 xl:w-auto">Workflow ID</th>
       <th class="hidden md:table-cell md:w-60 xl:w-80">Type</th>
       <th class="hidden xl:table-cell xl:w-60">Start</th>

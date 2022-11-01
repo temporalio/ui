@@ -2,7 +2,8 @@ type WorkflowsAPIRoutePath =
   | 'workflows'
   | 'workflows.archived'
   | 'workflows.count'
-  | 'workflows.batch.terminate';
+  | 'workflows.batch.terminate'
+  | 'workflows.batch.describe';
 
 type WorkflowAPIRoutePath =
   | 'workflow'
