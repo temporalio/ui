@@ -62,6 +62,10 @@ export const routeForNamespace = ({
   return `${publicPath}/namespaces/${namespace}`;
 };
 
+export const routeForNamespaceSelector = () => {
+  return `${publicPath}/select-namespace`;
+};
+
 export const routeForWorkflows = (parameters: NamespaceParameter): string => {
   return `${routeForNamespace(parameters)}/workflows`;
 };

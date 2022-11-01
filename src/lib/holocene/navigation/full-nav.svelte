@@ -24,6 +24,7 @@
   import { afterNavigate } from '$app/navigation';
   import { viewFeature } from '$lib/stores/new-feature-tags';
   import FeatureGuard from '$lib/components/feature-guard.svelte';
+  import IsLegacyCloudGuard from '$lib/components/is-legacy-cloud-guard.svelte';
 
   export let isCloud = false;
   export let activeNamespace: Namespace;
@@ -76,7 +77,7 @@
         </NavRow>
       </FeatureGuard>
     </IsCloudGuard>
-    <IsCloudGuard>
+    <IsLegacyCloudGuard {isCloud}>
       <NavRow link={linkList.namespaces} {isCloud} data-cy="namespaces-button">
         <NavTooltip right text="Namespaces">
           <div class="nav-icon">
@@ -85,7 +86,7 @@
         </NavTooltip>
         <div class="nav-title">Namespaces</div>
       </NavRow>
-    </IsCloudGuard>
+    </IsLegacyCloudGuard>
     <slot name="usage" />
     <IsCloudGuard {isCloud}>
       <NavRow link={linkList.archive} {isCloud} data-cy="archive-button">

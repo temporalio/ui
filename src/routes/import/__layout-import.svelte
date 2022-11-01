@@ -2,6 +2,8 @@
   import type { Load } from '@sveltejs/kit';
 
   import '../../app.css';
+  import '$lib/vendor/prism/prism.css';
+  import '$lib/vendor/prism/prism.js';
 
   import { fetchSettings } from '$lib/services/settings-service';
   import { getAuthUser } from '$lib/stores/auth-user';

@@ -152,6 +152,15 @@ export function getMilliseconds(date: ValidTime | undefined | null): number {
   return getSecondAsMilliseconds(parsedDate);
 }
 
+export function fromSecondsToMinutesAndSeconds(seconds: number): string {
+  if (!seconds) return '';
+  const duration = intervalToDuration({
+    start: 0,
+    end: Math.floor(seconds) * 1000,
+  });
+  return durationToString(duration, { format: ['minutes', 'seconds'] });
+}
+
 export function fromSecondsToDaysOrHours(seconds: string | number): string {
   if (!seconds) return '';
 

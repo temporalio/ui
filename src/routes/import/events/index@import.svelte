@@ -29,9 +29,10 @@
         class="mb-8">View in Github</Link
       >
     </div>
-    <h3 class="mt-8 text-lg font-medium">Expected JSON format</h3>
-    <CodeBlock content={format1} />
-    <h4 class="text-md font-medium">or</h4>
-    <CodeBlock content={format2} />
+    <h3 class="mt-8 text-lg font-medium">Expected JSON formats</h3>
+    <div class="h-40 text-center">
+      <CodeBlock content={format1} />
+      <CodeBlock content={format2} />
+    </div>
   </section>
 </section>
