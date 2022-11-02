@@ -1,8 +1,4 @@
 import {
-  setLastDataConverterFailure,
-  setLastDataConverterSuccess,
-} from '$lib/stores/data-converter-config';
-import {
   parseWithBigInt,
   stringifyWithBigInt,
 } from '$lib/utilities/parse-with-big-int';
@@ -21,9 +17,7 @@ export async function convertPayloadWithWebsocket(
   if (!websocket.isOpened) {
     try {
       await websocket.open();
-    } catch (_e) {
-      setLastDataConverterFailure(`Error opening websocket: ${_e}`);
-    }
+    } catch (_e) {}
   }
 
   if (!websocket.isOpened) {
@@ -35,8 +29,6 @@ export async function convertPayloadWithWebsocket(
       payload: stringifyWithBigInt(payload),
     })
     .then((response: WebSocketResponse) => {
-      setLastDataConverterSuccess();
-
       try {
         const decodedResponse = parseWithBigInt(response.content);
         return decodedResponse;
@@ -46,11 +38,7 @@ export async function convertPayloadWithWebsocket(
         return response.content;
       }
     })
-    .catch((error) => {
-      setLastDataConverterFailure(
-        `Error decoding websocket response: ${error}`,
-      );
-    });
+    .catch((error) => {});
 
   return socketResponse;
 }

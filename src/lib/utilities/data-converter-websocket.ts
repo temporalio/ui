@@ -1,10 +1,5 @@
-import { get } from 'svelte/store';
 import WebSocketAsPromised from 'websocket-as-promised';
 import type Options from 'websocket-as-promised/types/options';
-import {
-  dataConverterPort,
-  setLastDataConverterFailure,
-} from '../stores/data-converter-config';
 import { parseWithBigInt, stringifyWithBigInt } from './parse-with-big-int';
 
 export interface DataConverterWebsocketInterface {
@@ -40,9 +35,7 @@ export const createWebsocket = (
     sock.onError.addListener((event: unknown) => {
       console.error(`Websocket connection error: ${event}`);
     });
-  } catch (err) {
-    setLastDataConverterFailure(`Error creating websocket: ${err}`);
-  }
+  } catch (err) {}
 
   sock.open();
 
@@ -56,6 +49,5 @@ export const createWebsocket = (
 };
 
 let sock = null;
-const port = get(dataConverterPort) ?? null;
 
-export const dataConverterWebsocket = createWebsocket(port);
+export const dataConverterWebsocket = createWebsocket(null);
