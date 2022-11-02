@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import { formatDate, toMiliseconds } from '$lib/utilities/format-date';
+  import { formatDate, toMilliseconds } from '$lib/utilities/format-date';
   import { routeForWorkflow } from '$lib/utilities/route-for';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
@@ -48,7 +48,7 @@
   <td>
     <WorkflowStatus
       status={workflow.status}
-      delay={toMiliseconds(workflow.startTime)}
+      delay={toMilliseconds(workflow.startTime)}
     />
   </td>
   <td
