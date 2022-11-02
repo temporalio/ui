@@ -1,7 +1,10 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import Icon from '$holocene/icon/icon.svelte';
-  import { routeForSchedules } from '$lib/utilities/route-for';
+  import {
+    routeForScheduleEdit,
+    routeForSchedules,
+  } from '$lib/utilities/route-for';
   import { goto } from '$app/navigation';
 
   import {
@@ -27,6 +30,7 @@
   import SplitButton from '$holocene/split-button.svelte';
   import Loading from '$holocene/loading.svelte';
   import type { DescribeScheduleResponse } from '$types';
+  import { coreUserStore } from '$lib/stores/core-user';
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
@@ -36,12 +40,14 @@
     scheduleId: decodeURIForSvelte(scheduleId),
   };
 
-  let scheduleFetch = fetchSchedule(parameters, fetch);
+  let scheduleFetch = fetchSchedule(parameters);
 
   let showPauseConfirmation = false;
   let showDeleteConfirmation = false;
-
   let reason = '';
+
+  let coreUser = coreUserStore();
+  let editDisabled = $coreUser.scheduleWriteDisabled(namespace);
 
   const handleDelete = async () => {
     try {
@@ -74,6 +80,10 @@
   };
 
   let options = [
+    {
+      label: 'Edit',
+      onClick: () => goto(routeForScheduleEdit({ namespace, scheduleId })),
+    },
     {
       label: 'Delete Schedule',
       onClick: () => (showDeleteConfirmation = true),
@@ -131,15 +141,16 @@
         position="right"
         label={schedule?.schedule?.state?.paused ? 'Unpause' : 'Pause'}
         id="pause-schedule-button"
+        disabled={editDisabled}
         on:click={() => (showPauseConfirmation = !showPauseConfirmation)}
       >
         {#each options as option}
-          <div
-            class="cursor-pointer flex gap-2 p-4 items-center {option?.class}"
+          <button
+            class="cursor-pointer flex gap-2 py-3 px-4 items-center w-full hover:bg-gray-50 {option?.class}"
             on:click={option.onClick}
           >
             {option.label}
-          </div>
+          </button>
         {/each}
       </SplitButton>
     </header>

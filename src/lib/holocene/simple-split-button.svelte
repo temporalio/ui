@@ -51,7 +51,7 @@
       @apply rounded-r px-2;
     }
 
-    :global(.segment.right:disabled) {
+    :global() :global(.segment.right:disabled) {
       @apply cursor-not-allowed opacity-50;
     }
   }

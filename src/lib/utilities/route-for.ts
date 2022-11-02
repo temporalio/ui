@@ -117,6 +117,15 @@ export const routeForSchedule = ({
   return `${routeForSchedules({ namespace })}/${sid}`;
 };
 
+export const routeForScheduleEdit = ({
+  scheduleId,
+  namespace,
+}: ScheduleParameters): string => {
+  const sid = encodeURIForSvelte(scheduleId);
+
+  return `${routeForSchedules({ namespace })}/${sid}/edit`;
+};
+
 export const routeForEventHistory = ({
   view,
   queryParams,

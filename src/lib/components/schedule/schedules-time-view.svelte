@@ -32,8 +32,8 @@
 <div class="flex flex-col gap-2">
   <h3 class="text-base">Time</h3>
   <p>
-    Specify the time for this schedule to run. By default, the schedule will run
-    at 12:00am UTC if left blank.
+    Specify the time (UTC) for this schedule to run. By default, the schedule
+    will run at 12:00am UTC if left blank.
   </p>
   <div class="flex flex-row items-center gap-2">
     <div class="w-24">

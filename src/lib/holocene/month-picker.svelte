@@ -4,9 +4,12 @@
   export let months: string[];
 
   const onClick = (e: MouseEvent, month: string) => {
-    if (e.metaKey) {
+    if (e.metaKey && month !== '*') {
+      if (months.includes('*')) {
+        months = months.filter((m) => m !== '*');
+      }
       if (months.includes(month)) {
-        months.filter((m) => m !== month);
+        months = months.filter((m) => m !== month);
       } else {
         months = [...months, month];
       }

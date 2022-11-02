@@ -3,11 +3,18 @@
 
   export let daysOfWeek: string[];
 
-  $: {
-    console.log('Days of the week: ', daysOfWeek);
-  }
   const onClick = (e: MouseEvent, day: string) => {
     if (e.metaKey) {
+      // For preventing mixing Generic and Sunday-Friday
+      if (genericWeekDays.find((g) => g.value === day)) {
+        daysOfWeek = [day];
+      } else if (
+        daysOfWeek.find((d) => genericWeekDays.find((g) => g.value === d))
+      ) {
+        daysOfWeek = [day];
+      }
+
+      // For Sunday-Friday
       if (daysOfWeek.includes(day)) {
         daysOfWeek.filter((d) => d !== day);
       } else {

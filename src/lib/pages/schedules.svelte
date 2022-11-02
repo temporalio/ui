@@ -15,12 +15,17 @@
   import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
   import SchedulesTable from '$lib/components/schedule/schedules-table.svelte';
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
-  import SimpleSplitButton from '$lib/holocene/simple-split-button.svelte';
   import { timeFormat } from '$lib/stores/time-format';
   import { capitalize } from '$lib/utilities/format-camel-case';
+  import DropdownButton from '$lib/holocene/dropdown-button/dropdown-button.svelte';
+  import { coreUserStore } from '$lib/stores/core-user';
 
-  $: namespaceName = $page.params.namespace;
-  $: fetchSchedules = fetchAllSchedules(namespaceName);
+  $: namespace = $page.params.namespace;
+
+  $: fetchSchedules = fetchAllSchedules(namespace);
+
+  let coreUser = coreUserStore();
+  $: createDisabled = $coreUser.scheduleWriteDisabled(namespace);
 
   let search = '';
   $: filteredSchedules = (schedules: ScheduleListEntry[]) =>
@@ -34,20 +39,21 @@
     'Create scheduled actions using our Public API or TCTL (CLI).';
 </script>
 
-<div class="flex flex-row justify-between">
+<div class="flex flex-col justify-between gap-2 md:flex-row">
   <div>
     <h1 class="flex items-center gap-2 text-2xl">
       Schedules<Badge type="beta">Beta</Badge>
       <NamespaceSelector />
     </h1>
     <p class="text-sm text-gray-600" data-cy="namespace-name">
-      {namespaceName}
+      {namespace}
     </p>
   </div>
   <Button
     class="h-10"
     dataCy="create-schedule"
-    on:click={() => goto(routeForScheduleCreate({ namespace: namespaceName }))}
+    disabled={createDisabled}
+    on:click={() => goto(routeForScheduleCreate({ namespace }))}
     >Create Schedule</Button
   >
 </div>
@@ -69,10 +75,8 @@
         </div>
       </svelte:fragment>
       <svelte:fragment slot="action-top-right">
-        <SimpleSplitButton
-          class="bg-white"
-          buttonClass="border border-gray-900"
-          id="datetime"
+        <DropdownButton
+          id="timezone"
           label={capitalize($timeFormat)}
           icon="clock"
         >
@@ -91,7 +95,7 @@
           >
             Local
           </button>
-        </SimpleSplitButton>
+        </DropdownButton>
       </svelte:fragment>
       <SchedulesTable>
         {#each visibleItems as schedule}
@@ -114,6 +118,6 @@
 
 <style lang="postcss">
   .timezone-label {
-    @apply flex cursor-pointer whitespace-nowrap px-4 py-3 font-secondary text-sm font-medium hover:bg-gray-50;
+    @apply flex w-full cursor-pointer whitespace-nowrap px-4 py-3 font-secondary text-sm font-medium hover:bg-gray-50;
   }
 </style>

@@ -24,7 +24,7 @@
   <td class="cell">
     <WorkflowStatus status={schedule?.info?.paused ? 'Paused' : 'Running'} />
   </td>
-  <td class="cell truncate">
+  <td class="cell whitespace-pre-line break-words">
     <p class="text-base">{schedule.scheduleId}</p>
     <p>
       <ScheduleFrequency
@@ -34,11 +34,13 @@
       />
     </p>
   </td>
-  <td class="cell hidden md:table-cell">
+  <td class="cell hidden whitespace-pre-line break-words md:table-cell">
     {schedule?.info?.workflowType?.name}
   </td>
-  <td class="cell links hidden xl:table-cell">
-    {#each schedule?.info?.recentActions?.reverse().slice(0, 5) ?? [] as run}
+  <td class="cell links hidden truncate xl:table-cell">
+    {#each schedule?.info?.recentActions
+      ?.sort((a, b) => new Date(b.actualTime).getTime() - new Date(a.actualTime).getTime())
+      .slice(0, 5) ?? [] as run}
       <p>
         <Link
           href={routeForWorkflow({
@@ -50,7 +52,7 @@
       </p>
     {/each}
   </td>
-  <td class="cell hidden xl:table-cell">
+  <td class="cell hidden truncate xl:table-cell">
     {#each schedule?.info?.futureActionTimes?.slice(0, 5) ?? [] as run}
       <div>{formatDate(run, $timeFormat, 'from now')}</div>
     {/each}
@@ -59,6 +61,6 @@
 
 <style lang="postcss">
   .cell {
-    @apply whitespace-pre-line break-words p-2 text-left;
+    @apply p-2 text-left;
   }
 </style>
