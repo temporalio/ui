@@ -117,6 +117,8 @@ export type UpsertWorkflowSearchAttributesEventAttributes =
 export type WorkflowExecutionStatus =
   temporal.api.enums.v1.WorkflowExecutionStatus;
 export type Severity = temporal.api.enums.v1.Severity;
+export type WorkflowTaskFailedCause =
+  temporal.api.enums.v1.WorkflowTaskFailedCause;
 
 // api.workflow
 
