@@ -29,7 +29,7 @@
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { searchAttributes } from '$lib/stores/search-attributes';
 
-  import { fromSecondsToDaysOrHours } from '$lib/utilities/format-date';
+  import { fromSecondsToDaysOrHours } from '$lib/utilities/format-time';
   import { getClusters } from '$lib/utilities/get-clusters';
 
   import PageTitle from '$lib/components/page-title.svelte';

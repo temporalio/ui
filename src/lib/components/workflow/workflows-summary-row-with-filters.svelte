@@ -1,7 +1,8 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import { formatDate, getMilliseconds } from '$lib/utilities/format-date';
+  import { formatDate } from '$lib/utilities/format-date';
+  import { getMilliseconds } from '$lib/utilities/format-time';
   import { routeForWorkflow } from '$lib/utilities/route-for';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
