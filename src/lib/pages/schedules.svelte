@@ -15,6 +15,9 @@
   import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
   import SchedulesTable from '$lib/components/schedule/schedules-table.svelte';
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
+  import SimpleSplitButton from '$lib/holocene/simple-split-button.svelte';
+  import { timeFormat } from '$lib/stores/time-format';
+  import { capitalize } from '$lib/utilities/format-camel-case';
 
   $: namespaceName = $page.params.namespace;
   $: fetchSchedules = fetchAllSchedules(namespaceName);
@@ -65,6 +68,31 @@
           />
         </div>
       </svelte:fragment>
+      <svelte:fragment slot="action-top-right">
+        <SimpleSplitButton
+          class="bg-white"
+          buttonClass="border border-gray-900"
+          id="datetime"
+          label={capitalize($timeFormat)}
+          icon="clock"
+        >
+          <button
+            on:click={() => ($timeFormat = 'relative')}
+            class="timezone-label"
+          >
+            Relative
+          </button>
+          <button on:click={() => ($timeFormat = 'UTC')} class="timezone-label">
+            UTC
+          </button>
+          <button
+            on:click={() => ($timeFormat = 'local')}
+            class="timezone-label"
+          >
+            Local
+          </button>
+        </SimpleSplitButton>
+      </svelte:fragment>
       <SchedulesTable>
         {#each visibleItems as schedule}
           <SchedulesTableRow {schedule} />
@@ -83,3 +111,9 @@
     </div>
   {/if}
 {/await}
+
+<style lang="postcss">
+  .timezone-label {
+    @apply flex cursor-pointer whitespace-nowrap px-4 py-3 font-secondary text-sm font-medium hover:bg-gray-50;
+  }
+</style>

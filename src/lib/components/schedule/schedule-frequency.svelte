@@ -6,11 +6,11 @@
   export let interval: IntervalSpec;
 </script>
 
-{#if calendar}
-  <small>{calendar?.comment ?? ''}</small>
-{:else}
-  <div class="flex flex-col">
-    <small>{intervalToComment(interval?.interval)}</small>
-    <small>{intervalToComment(interval?.phase, true)}</small>
-  </div>
-{/if}
+<div class="flex flex-col {$$props.class}">
+  {#if calendar}
+    <p>{calendar?.comment ?? ''}</p>
+  {:else}
+    <p>{intervalToComment(interval?.interval)}</p>
+    <p>{intervalToComment(interval?.phase, true)}</p>
+  {/if}
+</div>

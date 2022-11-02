@@ -5,7 +5,23 @@
 
   export let hour = '';
   export let minute = '';
-  export let time: 'AM' | 'PM' = 'AM';
+
+  $: {
+    if (_hour) {
+      if (_hour === '12') {
+        hour = time === 'AM' ? '00' : '12';
+      } else if (time === 'PM') {
+        hour = (parseInt(_hour) + 12).toString();
+      } else {
+        hour = _hour;
+      }
+    } else {
+      hour = '';
+    }
+  }
+
+  let _hour = '';
+  let time: 'AM' | 'PM' = 'AM';
 
   const error = (x: string, max: number) => {
     if (x) return isNaN(parseInt(x)) || parseInt(x) > max;
@@ -23,22 +39,23 @@
     <div class="w-24">
       <Input
         id="hour"
-        bind:value={hour}
+        bind:value={_hour}
         placeholder="00"
         suffix="hrs"
         maxLength={2}
-        error={error(hour, 12)}
+        error={error(_hour, 12)}
       />
     </div>
     <div>:</div>
     <div class="w-24">
       <Input
         id="minute"
+        required
         bind:value={minute}
         placeholder="00"
         suffix="min"
         maxLength={2}
-        error={error(minute, 60)}
+        error={error(minute, 59)}
       />
     </div>
     <div class="ml-2">

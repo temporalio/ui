@@ -105,9 +105,12 @@
             <span class="font-medium select-all">{scheduleId}</span>
           </h1>
         </div>
-        <div class="flex items-center text-sm">
+        <div class="flex items-center gap-2 text-sm">
           <p>
             {namespace}
+          </p>
+          <div class="w-1 h-1 rounded-full bg-gray-900" />
+          <p>
             {schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
           </p>
         </div>

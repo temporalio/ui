@@ -16,14 +16,22 @@ export const calendarToComment = ({
   minute,
 }: Partial<ScheduleParameters>): string => {
   let comment = '';
+  let time = !hour || !parseInt(hour) || parseInt(hour) < 12 ? 'am' : 'pm';
+  let properHour = !hour
+    ? '12'
+    : parseInt(hour) <= 12
+    ? hour
+    : (parseInt(hour) - 12).toString();
+  let timeStamp = `${properHour.padStart(2, '0')}:${
+    minute ? minute.padStart(2, '0') : '00'
+  }${time}`;
+
   if (preset === 'week') {
     const genericName = genericWeekDays.find(
       (template) => template.value === dayOfWeek,
     );
     if (genericName) {
-      comment = `${genericName.label} at ${
-        hour ? hour.padStart(2, '0') : '12'
-      }:${(minute ? minute.padStart(2, '0') : '00') ?? '00'}`;
+      comment = `${genericName.label} at ${timeStamp}`;
     } else {
       const split = dayOfWeek.split(',');
       const splitNames = split
@@ -32,15 +40,11 @@ export const calendarToComment = ({
           return day.label;
         })
         .join(', ');
-      comment = `${splitNames} at ${hour ? hour.padStart(2, '0') : '12'}:${
-        (minute ? minute.padStart(2, '0') : '00') ?? '00'
-      }`;
+      comment = `${splitNames} at ${timeStamp}`;
     }
   } else if (preset === 'month') {
     if (month === '*') {
-      comment = `Every ${dayOfMonth} of the month at ${
-        hour ? hour.padStart(2, '0') : '12'
-      }:${(minute ? minute.padStart(2, '0') : '00') ?? '00'}`;
+      comment = `Every ${dayOfMonth} of the month at ${timeStamp}`;
     } else {
       const split = month.split(',');
       const splitNames = split
@@ -49,9 +53,7 @@ export const calendarToComment = ({
           return _month.label;
         })
         .join(', ');
-      comment = `Every ${dayOfMonth} of ${splitNames} at ${
-        hour ? hour.padStart(2, '0') : '12'
-      }:${(minute ? minute.padStart(2, '0') : '00') ?? '00'}`;
+      comment = `Every ${dayOfMonth} of ${splitNames} at ${timeStamp}`;
     }
   }
 

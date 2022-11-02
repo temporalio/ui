@@ -25,11 +25,12 @@
     <WorkflowStatus status={schedule?.info?.paused ? 'Paused' : 'Running'} />
   </td>
   <td class="cell truncate">
-    {schedule.scheduleId}
+    <p class="text-base">{schedule.scheduleId}</p>
     <p>
       <ScheduleFrequency
         calendar={schedule?.info?.spec?.structuredCalendar?.[0]}
         interval={schedule?.info?.spec?.interval?.[0]}
+        class="text-sm"
       />
     </p>
   </td>
@@ -58,6 +59,6 @@
 
 <style lang="postcss">
   .cell {
-    @apply p-2 text-left;
+    @apply whitespace-pre-line break-words p-2 text-left;
   }
 </style>

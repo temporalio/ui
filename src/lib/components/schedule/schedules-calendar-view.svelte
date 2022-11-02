@@ -16,6 +16,22 @@
   export let second: string;
   export let phase: string;
   export let cronString: string;
+
+  const clearSchedule = (_preset: SchedulePreset) => {
+    daysOfWeek = [];
+    daysOfMonth = [];
+    months = [];
+    days = '';
+    hour = '';
+    minute = '';
+    second = '';
+    phase = '';
+    cronString = '';
+  };
+
+  $: {
+    clearSchedule(preset);
+  }
 </script>
 
 <div class="mt-8 w-full">

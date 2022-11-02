@@ -17,7 +17,7 @@ describe('calendarToComment', () => {
         minute: '30',
       };
 
-      expect(calendarToComment(options)).toBe('Weekends at 12:30');
+      expect(calendarToComment(options)).toBe('Weekends at 12:30am');
     });
 
     it(`should return correct comment for weekdays`, () => {
@@ -26,11 +26,11 @@ describe('calendarToComment', () => {
         month: '',
         dayOfMonth: '',
         dayOfWeek: '1,2,3,4,5',
-        hour: '5',
+        hour: '17',
         minute: '46',
       };
 
-      expect(calendarToComment(options)).toBe('Weekdays at 05:46');
+      expect(calendarToComment(options)).toBe('Weekdays at 05:46pm');
     });
 
     it(`should return correct comment for a range of days`, () => {
@@ -39,12 +39,12 @@ describe('calendarToComment', () => {
         month: '',
         dayOfMonth: '',
         dayOfWeek: '1,2,5',
-        hour: '12',
-        minute: '00',
+        hour: '4',
+        minute: '15',
       };
 
       expect(calendarToComment(options)).toBe(
-        'Monday, Tuesday, Friday at 12:00',
+        'Monday, Tuesday, Friday at 4:15am',
       );
     });
 
@@ -55,11 +55,11 @@ describe('calendarToComment', () => {
         dayOfMonth: '4',
         dayOfWeek: '5,6,7',
         hour: '12',
-        minute: '00',
+        minute: '0',
       };
 
       expect(calendarToComment(options)).toBe(
-        'Friday, Saturday, Sunday at 12:00',
+        'Friday, Saturday, Sunday at 12:00am',
       );
     });
   });
@@ -71,11 +71,13 @@ describe('calendarToComment', () => {
         month: '*',
         dayOfMonth: '1',
         dayOfWeek: '',
-        hour: '04',
-        minute: '05',
+        hour: '23',
+        minute: '5',
       };
 
-      expect(calendarToComment(options)).toBe('Every 1 of the month at 04:05');
+      expect(calendarToComment(options)).toBe(
+        'Every 1 of the month at 11:05pm',
+      );
     });
 
     it(`should return correct comment for all months and multiple day`, () => {
@@ -84,12 +86,12 @@ describe('calendarToComment', () => {
         month: '*',
         dayOfMonth: '3,13,19,28',
         dayOfWeek: '',
-        hour: '04',
+        hour: '00',
         minute: '05',
       };
 
       expect(calendarToComment(options)).toBe(
-        'Every 3,13,19,28 of the month at 04:05',
+        'Every 3,13,19,28 of the month at 12:05am',
       );
     });
 

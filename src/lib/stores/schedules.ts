@@ -79,9 +79,9 @@ export const submitScheduleForm = async ({
     body.schedule.spec.calendar = [
       {
         year: '*',
-        month,
-        dayOfMonth,
-        dayOfWeek,
+        month: preset === 'month' ? month : '',
+        dayOfMonth: preset === 'month' ? dayOfMonth : '',
+        dayOfWeek: preset === 'week' ? dayOfWeek : '',
         hour,
         minute,
         second,
