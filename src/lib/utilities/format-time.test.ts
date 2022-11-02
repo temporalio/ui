@@ -6,7 +6,7 @@ import {
   fromSecondsToMinutesAndSeconds,
   fromSecondsToDaysOrHours,
   getTimestampDifference,
-} from './format-date';
+} from './format-time';
 
 describe('getDuration', () => {
   it('should get no duration of a start and end date within same second', () => {
