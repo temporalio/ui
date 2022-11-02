@@ -5,7 +5,7 @@
   import {
     formatDate,
     getDuration,
-    durationToString,
+    formatDuration,
   } from '$lib/utilities/format-date';
   import { routeForPendingActivities } from '$lib/utilities/route-for';
   import Link from '$lib/holocene/link.svelte';
@@ -85,7 +85,7 @@
                     <h4 class="pending-activity-detail-header">Expiration</h4>
                     {formatRetryExpiration(
                       pendingActivity.maximumAttempts,
-                      durationToString(
+                      formatDuration(
                         getDuration({
                           start: Date.now(),
                           end: pendingActivity.expirationTime,

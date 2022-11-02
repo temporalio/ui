@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
 
-  import { formatDate, toMiliseconds } from '$lib/utilities/format-date';
+  import { formatDate, getMilliseconds } from '$lib/utilities/format-date';
   import { routeForWorkflow } from '$lib/utilities/route-for';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
@@ -44,7 +44,7 @@
   <td>
     <WorkflowStatus
       status={workflow.status}
-      delay={toMiliseconds(workflow.startTime)}
+      delay={getMilliseconds(workflow.startTime)}
     />
   </td>
   <td

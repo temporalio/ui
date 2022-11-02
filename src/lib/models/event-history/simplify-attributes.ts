@@ -1,4 +1,4 @@
-import { formatDate, durationToString } from '$lib/utilities/format-date';
+import { formatDate, formatDuration } from '$lib/utilities/format-date';
 import type { PendingActivityInfo } from '$types';
 
 const keysToBeFormattedAsTime = [
@@ -99,7 +99,7 @@ export function simplifyAttributes<
     }
 
     if (isDuration(key)) {
-      attributes[key] = durationToString(value);
+      attributes[key] = formatDuration(value);
     }
   }
 

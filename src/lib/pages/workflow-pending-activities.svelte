@@ -9,7 +9,7 @@
   import {
     formatDate,
     getDuration,
-    durationToString,
+    formatDuration,
   } from '$lib/utilities/format-date';
   import {
     formatAttemptsLeft,
@@ -96,7 +96,7 @@
               <p>
                 {formatRetryExpiration(
                   details.maximumAttempts,
-                  durationToString(
+                  formatDuration(
                     getDuration({
                       start: Date.now(),
                       end: details.expirationTime,

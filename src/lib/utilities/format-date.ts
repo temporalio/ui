@@ -1,9 +1,9 @@
 import {
   formatDistanceToNow,
   parseJSON,
-  formatDuration,
+  formatDuration as durationToString,
   intervalToDuration,
-  getMilliseconds,
+  getMilliseconds as getSecondAsMilliseconds,
 } from 'date-fns';
 import * as dateTz from 'date-fns-tz'; // `build` script fails on importing some of named CommonJS modules
 
@@ -57,13 +57,13 @@ function isTimestamp(arg: unknown): arg is Timestamp {
   return false;
 }
 
-export function durationToString(
+export function formatDuration(
   duration: Duration | string,
   delimiter = ', ',
 ): string {
   if (duration === null || !duration) return '';
   if (typeof duration === 'string') duration = fromSeconds(duration);
-  return formatDuration(duration, { delimiter });
+  return durationToString(duration, { delimiter });
 }
 
 function formatDistanceToSingleLetters(distance: string) {
@@ -127,7 +127,7 @@ export function formatDistance({
   end: ValidTime | undefined | null;
 }): string {
   const duration = getDuration({ start, end });
-  return durationToString(duration);
+  return formatDuration(duration);
 }
 
 export function formatDistanceAbbreviated({
@@ -138,18 +138,18 @@ export function formatDistanceAbbreviated({
   end: ValidTime | undefined | null;
 }): string {
   const duration = getDuration({ start, end });
-  const distance = durationToString(duration, ' ');
+  const distance = formatDuration(duration, ' ');
   return formatDistanceToSingleLetters(distance);
 }
 
-export function toMilliseconds(date: ValidTime | undefined | null): number {
+export function getMilliseconds(date: ValidTime | undefined | null): number {
   if (!date) return 0;
   if (isTimestamp(date)) {
     date = timestampToDate(date);
   }
   const parsedDate = parseJSON(date);
 
-  return getMilliseconds(parsedDate);
+  return getSecondAsMilliseconds(parsedDate);
 }
 
 export function fromSecondsToMinutesAndSeconds(seconds: number): string {
@@ -158,7 +158,7 @@ export function fromSecondsToMinutesAndSeconds(seconds: number): string {
     start: 0,
     end: Math.floor(seconds) * 1000,
   });
-  return formatDuration(duration, { format: ['minutes', 'seconds'] });
+  return durationToString(duration, { format: ['minutes', 'seconds'] });
 }
 
 export function fromSecondsToDaysOrHours(seconds: string | number): string {
