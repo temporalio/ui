@@ -45,7 +45,6 @@
           thin
           variant="secondary"
           disabled={loading}
-          {loading}
           on:click={() => dispatch('cancelModal', {})}>{cancelText}</Button
         >
         {#if !hideConfirm}
