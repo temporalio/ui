@@ -9,30 +9,31 @@
   export let passAccessToken: boolean;
   export let onCancel: () => void;
 
-  let endpoint: string = $dataEncoderEndpoint ?? '';
+  let endpoint: string = $dataEncoderEndpoint || '';
   let error = '';
+
+  const handleModelCancel = (endpoint: string) => {
+    $dataEncoderEndpoint = endpoint;
+    error = '';
+    onCancel();
+  };
 
   const checkForHttps = () => {
     if (validateHttps(endpoint)) {
-      $dataEncoderEndpoint = endpoint;
-      error = '';
-      onCancel();
+      handleModelCancel(endpoint);
     } else {
       error = 'Endpoint must start with https:// to authenticate';
     }
   };
   const onEndpointSet = () => {
     if (endpoint === '') {
-      $dataEncoderEndpoint = null;
-      onCancel();
+      handleModelCancel(null);
     } else {
       if (validateHttpOrHttps(endpoint)) {
         if (passAccessToken) {
           checkForHttps();
         } else {
-          $dataEncoderEndpoint = endpoint;
-          error = '';
-          onCancel();
+          handleModelCancel(endpoint);
         }
       } else {
         error = 'Endpoint must start with http:// or https://';
@@ -43,7 +44,7 @@
 
 <Modal
   open={showSettings}
-  on:cancelModal={onCancel}
+  on:cancelModal={() => handleModelCancel($dataEncoderEndpoint)}
   on:confirmModal={onEndpointSet}
   confirmText="Set Endpoint"
 >
@@ -71,11 +72,9 @@
         </p>
         <p data-cy="data-encoder-site-settings">Site setting</p>
       </div>
-      {#if $dataEncoderEndpoint}
-        <small class="text-yellow-700" data-cy="data-encoder-endpoint-info"
-          >Set endpoint overrides site setting endpoint.</small
-        >
-      {/if}
+      <small class="text-yellow-700" data-cy="data-encoder-endpoint-info"
+        >Set endpoint overrides site setting endpoint.</small
+      >
     {/if}
   </div>
 </Modal>
