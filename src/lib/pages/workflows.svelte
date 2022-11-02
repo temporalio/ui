@@ -31,6 +31,7 @@
   } from '$lib/services/terminate-service';
   import Input from '$lib/holocene/input/input.svelte';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import { pluralize } from '$lib/utilities/pluralize';
 
   export let bulkActionsEnabled: boolean = true;
 
@@ -116,7 +117,10 @@
   <svelte:fragment slot="content">
     <p class="mb-2">
       Are you sure you want to terminate <strong
-        >{terminableWorkflows.length} running workflows</strong
+        >{terminableWorkflows.length} running {pluralize(
+          'workflow',
+          terminableWorkflows.length,
+        )}</strong
       >? This action cannot be undone.
     </p>
     <Input
