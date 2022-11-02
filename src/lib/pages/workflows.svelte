@@ -39,6 +39,7 @@
   let terminationReason: string = '';
   let showBulkOperationConfirmationModal: boolean = false;
   let allSelected: boolean = false;
+  let terminating: boolean = false;
 
   const errorMessage =
     searchType === 'advanced'
@@ -60,6 +61,7 @@
   };
 
   const terminateWorkflows = async () => {
+    terminating = true;
     const { namespace } = $page.params;
     const jobId = await batchTerminateWorkflows({
       namespace,
@@ -85,6 +87,7 @@
     });
     selectedWorkflows = [];
     allSelected = false;
+    terminating = false;
     showBulkOperationConfirmationModal = false;
     updateQueryParameters({ parameter: 'query', value: '', url: $page.url });
   };
@@ -105,6 +108,7 @@
   confirmText="Terminate"
   confirmType="destructive"
   confirmDisabled={terminationReason === ''}
+  loading={terminating}
   on:cancelModal={() => (showBulkOperationConfirmationModal = false)}
   on:confirmModal={terminateWorkflows}
 >
