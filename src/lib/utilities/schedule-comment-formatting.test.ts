@@ -17,7 +17,7 @@ describe('calendarToComment', () => {
         minute: '30',
       };
 
-      expect(calendarToComment(options)).toBe('Weekends at 12:30am');
+      expect(calendarToComment(options)).toBe('Weekends at 12:30pm');
     });
 
     it(`should return correct comment for weekdays`, () => {
@@ -44,7 +44,7 @@ describe('calendarToComment', () => {
       };
 
       expect(calendarToComment(options)).toBe(
-        'Monday, Tuesday, Friday at 4:15am',
+        'Monday, Tuesday, Friday at 04:15am',
       );
     });
 
@@ -59,7 +59,7 @@ describe('calendarToComment', () => {
       };
 
       expect(calendarToComment(options)).toBe(
-        'Friday, Saturday, Sunday at 12:00am',
+        'Friday, Saturday, Sunday at 12:00pm',
       );
     });
   });
@@ -105,7 +105,7 @@ describe('calendarToComment', () => {
         minute: '05',
       };
 
-      expect(calendarToComment(options)).toBe('Every 3 of February at 04:05');
+      expect(calendarToComment(options)).toBe('Every 3 of February at 04:05am');
     });
 
     it(`should return correct comment for single months and multiple days`, () => {
@@ -114,12 +114,12 @@ describe('calendarToComment', () => {
         month: '2',
         dayOfMonth: '3,4,5,11',
         dayOfWeek: '',
-        hour: '04',
+        hour: '16',
         minute: '05',
       };
 
       expect(calendarToComment(options)).toBe(
-        'Every 3,4,5,11 of February at 04:05',
+        'Every 3,4,5,11 of February at 04:05pm',
       );
     });
 
@@ -129,12 +129,12 @@ describe('calendarToComment', () => {
         month: '6,7,8',
         dayOfMonth: '4',
         dayOfWeek: '',
-        hour: '7',
+        hour: '19',
         minute: '45',
       };
 
       expect(calendarToComment(options)).toBe(
-        'Every 4 of June, July, August at 07:45',
+        'Every 4 of June, July, August at 07:45pm',
       );
     });
 
@@ -149,7 +149,7 @@ describe('calendarToComment', () => {
       };
 
       expect(calendarToComment(options)).toBe(
-        'Every 1,15,30 of January, October, November, December at 06:16',
+        'Every 1,15,30 of January, October, November, December at 06:16am',
       );
     });
   });
@@ -185,7 +185,7 @@ describe('intervalToComment', () => {
 
   it(`should return correct comment for only hours interval`, () => {
     const interval = timeToInterval('', '8', '', '');
-    expect(intervalToComment(interval)).toBe('Every 8hrs:00min:00sec');
+    expect(intervalToComment(interval)).toBe('Every 08hrs:00min:00sec');
   });
 
   it(`should return correct comment for hours and minutes interval`, () => {
@@ -195,12 +195,12 @@ describe('intervalToComment', () => {
 
   it(`should return correct comment for hours and minutes and seconds interval`, () => {
     const interval = timeToInterval('', '2', '15', '30');
-    expect(intervalToComment(interval)).toBe('Every 2hrs:15min:30sec');
+    expect(intervalToComment(interval)).toBe('Every 02hrs:15min:30sec');
   });
 
   it(`should return correct comment for hours and minutes and seconds offset`, () => {
     const offset = timeToInterval('', '2', '15', '30');
-    expect(intervalToComment(offset, true)).toBe('Offset 2hrs:15min:30sec');
+    expect(intervalToComment(offset, true)).toBe('Offset 02hrs:15min:30sec');
   });
 
   it(`should return correct comment for only minutes interval`, () => {

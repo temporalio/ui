@@ -47,7 +47,7 @@
   let reason = '';
 
   let coreUser = coreUserStore();
-  let editDisabled = $coreUser.scheduleWriteDisabled(namespace);
+  let editDisabled = $coreUser.namespaceWriteDisabled(namespace);
 
   const handleDelete = async () => {
     try {

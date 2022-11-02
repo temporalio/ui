@@ -17,11 +17,12 @@ export const calendarToComment = ({
 }: Partial<ScheduleParameters>): string => {
   let comment = '';
   let time = !hour || !parseInt(hour) || parseInt(hour) < 12 ? 'am' : 'pm';
-  let properHour = !hour
-    ? '12'
-    : parseInt(hour) <= 12
-    ? hour
-    : (parseInt(hour) - 12).toString();
+  let properHour =
+    !hour || !parseInt(hour)
+      ? '12'
+      : parseInt(hour) <= 12
+      ? hour
+      : (parseInt(hour) - 12).toString();
   let timeStamp = `${properHour.padStart(2, '0')}:${
     minute ? minute.padStart(2, '0') : '00'
   }${time}`;
@@ -71,29 +72,24 @@ export const intervalToComment = (interval: string, offset = false): string => {
   remainingSeconds = remainingSeconds - (hour > 0 ? hour * 60 * 60 : 0);
   let minute = Math.floor(remainingSeconds / 60);
   let second = minute > 0 ? remainingSeconds - minute * 60 : remainingSeconds;
-  let hourString = hour.toString();
-  let minuteString = minute.toString();
-  let secondString = second.toString();
+
+  const hourLabel = `${hour ? hour.toString().padStart(2, '0') : '00'}hrs`;
+  const minuteLabel = `${
+    minute ? minute.toString().padStart(2, '0') : '00'
+  }min`;
+  const secondLabel = `${
+    second ? second.toString().padStart(2, '0') : '00'
+  }sec`;
 
   const startingWord = offset ? 'Offset' : 'Every';
   if (days) {
-    comment = `${startingWord} ${days}days:${
-      hour ? hourString.padStart(2, '0') : '00'
-    }hrs:${minute ? minuteString.padStart(2, '0') : '00'}min:${
-      second ? secondString.padStart(2, '0') : '00'
-    }sec`;
+    comment = `${startingWord} ${days}days:${hourLabel}:${minuteLabel}:${secondLabel}`;
   } else if (hour) {
-    comment = `${startingWord} ${hour}hrs:${
-      minute ? minuteString.padStart(2, '0') : '00'
-    }min:${second ? secondString.padStart(2, '0') : '00'}sec`;
+    comment = `${startingWord} ${hourLabel}:${minuteLabel}:${secondLabel}`;
   } else if (minute) {
-    comment = `${startingWord} ${
-      minute ? minuteString.padStart(2, '0') : '00'
-    }min:${second ? secondString.padStart(2, '0') : '00'}sec`;
+    comment = `${startingWord} ${minuteLabel}:${secondLabel}`;
   } else if (second) {
-    comment = `${startingWord} ${
-      second ? secondString.padStart(2, '0') : '00'
-    }sec`;
+    comment = `${startingWord} ${secondLabel}`;
   }
 
   return comment;

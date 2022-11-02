@@ -25,7 +25,7 @@
   $: fetchSchedules = fetchAllSchedules(namespace);
 
   let coreUser = coreUserStore();
-  $: createDisabled = $coreUser.scheduleWriteDisabled(namespace);
+  $: createDisabled = $coreUser.namespaceWriteDisabled(namespace);
 
   let search = '';
   $: filteredSchedules = (schedules: ScheduleListEntry[]) =>

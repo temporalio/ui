@@ -3,8 +3,7 @@ import { hasContext, getContext } from 'svelte';
 import { readable, Readable } from 'svelte/store';
 
 export const defaultCoreUserStore: Readable<CoreUser> = readable({
-  terminateDisabled: () => false,
-  scheduleWriteDisabled: () => false,
+  namespaceWriteDisabled: () => false,
 });
 
 export const coreUserStore = (): Readable<CoreUser> => {
