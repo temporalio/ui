@@ -6,11 +6,8 @@
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import {
-    formatDate,
-    getDuration,
-    formatDuration,
-  } from '$lib/utilities/format-date';
+  import { formatDate } from '$lib/utilities/format-date';
+  import { getDuration, formatDuration } from '$lib/utilities/format-time';
   import {
     formatAttemptsLeft,
     formatMaximumAttempts,

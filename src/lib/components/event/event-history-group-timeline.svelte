@@ -5,10 +5,8 @@
   import Icon from '$holocene/icon/icon.svelte';
 
   import { timelineEvents } from '$lib/stores/events';
-  import {
-    formatDate,
-    getTimestampDifference,
-  } from '$lib/utilities/format-date';
+  import { formatDate } from '$lib/utilities/format-date';
+  import { getTimestampDifference } from '$lib/utilities/format-time';
   import { timelineEventTypeOptions } from '$lib/models/event-history/get-event-categorization';
   import { timeFormat } from '$lib/stores/time-format';
   import EmptyState from '$lib/holocene/empty-state.svelte';

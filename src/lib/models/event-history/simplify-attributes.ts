@@ -1,4 +1,6 @@
-import { formatDate, formatDuration } from '$lib/utilities/format-date';
+import { formatDate } from '$lib/utilities/format-date';
+import { formatDuration } from '$lib/utilities/format-time';
+
 import type { PendingActivityInfo } from '$types';
 
 const keysToBeFormattedAsTime = [
