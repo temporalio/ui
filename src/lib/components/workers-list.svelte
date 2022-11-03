@@ -39,16 +39,16 @@
         </div>
         <div class="flex w-2/12 justify-center" data-cy="workflow-poller">
           {#if poller.taskQueueTypes.includes('WORKFLOW')}
-            <Icon name="checkmark" class="check text-blue-700" />
+            <Icon name="checkmark" class="text-blue-700" />
           {:else}
-            <Icon name="close" class="close text-primary" />
+            <Icon name="close" class="text-primary" />
           {/if}
         </div>
         <div class="flex w-2/12 justify-center" data-cy="activity-poller">
           {#if poller.taskQueueTypes.includes('ACTIVITY')}
-            <Icon name="checkmark" class="check text-blue-700" />
+            <Icon name="checkmark" class="text-blue-700" />
           {:else}
-            <Icon name="close" class="close text-primary" />
+            <Icon name="close" class="text-primary" />
           {/if}
         </div>
       </article>
