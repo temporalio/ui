@@ -37,14 +37,14 @@
             </p>
           </h3>
         </div>
-        <div class="flex w-2/12 justify-center">
+        <div class="flex w-2/12 justify-center" data-cy="workflow-poller">
           {#if poller.taskQueueTypes.includes('WORKFLOW')}
             <Icon name="checkmark" class="text-blue-700" />
           {:else}
             <Icon name="close" class="text-primary" />
           {/if}
         </div>
-        <div class="flex w-2/12 justify-center">
+        <div class="flex w-2/12 justify-center" data-cy="activity-poller">
           {#if poller.taskQueueTypes.includes('ACTIVITY')}
             <Icon name="checkmark" class="text-blue-700" />
           {:else}
