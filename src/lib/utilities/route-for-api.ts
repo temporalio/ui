@@ -61,6 +61,11 @@ export function routeForApi(
   shouldEncode?: boolean,
 ): Promise<string>;
 export function routeForApi(
+  route: NamespaceAPIRoutePath,
+  parameters: NamespaceRouteParameters,
+  shouldEncode?: boolean,
+): Promise<string>;
+export function routeForApi(
   route: SchedulesAPIRoutePath,
   parameters: ScheduleListRouteParameters,
 ): Promise<string>;
@@ -94,6 +99,7 @@ export function routeForApi(
     'events.ascending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/events`,
     'events.descending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/events/reverse`,
     namespaces: '/namespaces',
+    namespace: `/namespaces/${parameters?.namespace}`,
     query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/query`,
     'schedule.delete': `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}`,
     schedule: `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}`,

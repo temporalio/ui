@@ -99,7 +99,4 @@
   .link:hover {
     @apply underline;
   }
-  .active {
-    @apply text-blue-700;
-  }
 </style>
