@@ -55,15 +55,15 @@ export const supportsReverseOrder = derived(
 );
 
 export const eventSortOrder: Readable<EventSortOrder> = derived(
-  [eventFilterSort, supportsReverseOrder, eventSortParam],
-  ([$eventFilterSort, $supportsReverseOrder, $eventSortParam]) => {
+  [eventFilterSort, supportsReverseOrder],
+  ([$eventFilterSort, $supportsReverseOrder]) => {
     let sortOrder: EventSortOrder;
     if ($supportsReverseOrder) {
-      if ($eventSortParam) return $eventSortParam;
       sortOrder = $eventFilterSort;
     } else {
       sortOrder = 'ascending';
     }
+
     return sortOrder;
   },
 );
