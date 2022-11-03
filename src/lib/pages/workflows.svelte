@@ -33,7 +33,7 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { pluralize } from '$lib/utilities/pluralize';
 
-  export let bulkActionsEnabled: boolean = true;
+  export let bulkActionsEnabled: boolean = false;
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
   let selectedWorkflows: WorkflowExecution[] = [];
