@@ -66,15 +66,13 @@
       class="flex flex-col justify-end gap-4 md:flex-row"
     >
       <slot name="action-top-center" />
-      <div class="flex items-center justify-center gap-2">
-        <FilterSelect
-          label="Per Page"
-          parameter={perPageKey}
-          value={perPage}
-          options={perPageOptions(perPage)}
-        />
-      </div>
-      <div class="flex w-56 items-center justify-center gap-4">
+      <FilterSelect
+        label="Per Page"
+        parameter={perPageKey}
+        value={perPage}
+        options={perPageOptions(perPage)}
+      />
+      <div class="flex items-center justify-center gap-1">
         <button
           class="caret"
           disabled={!$store.hasPrevious}
@@ -111,15 +109,13 @@
   >
     <slot name="action-bottom-left" />
     <div class="flex gap-4">
-      <div class="flex items-center justify-center gap-2">
-        <FilterSelect
-          label="Per Page"
-          parameter={perPageKey}
-          value={String(perPage)}
-          options={perPageOptions(perPage)}
-        />
-      </div>
-      <div class="flex w-56 items-center justify-center gap-4">
+      <FilterSelect
+        label="Per Page"
+        parameter={perPageKey}
+        value={String(perPage)}
+        options={perPageOptions(perPage)}
+      />
+      <div class="flex items-center justify-center gap-1">
         <button
           class="caret"
           disabled={!$store.hasPrevious}

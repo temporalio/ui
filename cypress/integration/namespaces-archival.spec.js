@@ -4,15 +4,7 @@ describe('Archival disabled page', () => {
 
     cy.visit('/namespaces/default/archival');
 
-    cy.fixture('namespaces.json')
-      .then(({ namespaces }) => {
-        return namespaces
-          .map((n) => n.namespaceInfo.name)
-          .filter((name) => name !== 'temporal-system');
-      })
-      .as('namespaces');
-
-    cy.wait('@namespaces-api');
+    cy.wait('@namespace-api');
   });
 
   it('have the correct title on page', () => {
@@ -25,20 +17,12 @@ describe('Archival disabled page', () => {
 
 describe('Archival enabled page', () => {
   beforeEach(() => {
-    cy.interceptApi();
+    cy.interceptApi({ archived: true });
 
     cy.visit('/namespaces/some-other-namespace/archival');
 
-    cy.fixture('namespaces.json')
-      .then(({ namespaces }) => {
-        return namespaces
-          .map((n) => n.namespaceInfo.name)
-          .filter((name) => name !== 'temporal-system');
-      })
-      .as('namespaces');
-
     cy.wait('@workflows-archived-api');
-    cy.wait('@namespaces-api');
+    cy.wait('@namespace-api');
   });
 
   it('have the correct namespaces in the dropdown', () => {

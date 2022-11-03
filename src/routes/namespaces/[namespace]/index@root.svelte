@@ -7,25 +7,12 @@
 
     if (searchParams.has('time-range')) searchParams.delete('time-range');
 
-    const namespace = params.namespace;
-    const namespaces: DescribeNamespaceResponse[] = stuff.namespaces;
-
-    const currentNamespace = namespaces.find(
-      (namespaceConfig) => namespaceConfig.namespaceInfo.name === namespace,
-    );
-
-    if (!currentNamespace) {
-      return {
-        error: `The namespace "${namespace}" does not exist.`,
-        status: 404,
-      };
-    }
-
-    const clusters = getClusters(currentNamespace);
+    const namespace = await fetchNamespace(params.namespace);
+    const clusters = getClusters(namespace);
 
     return {
       props: {
-        currentNamespace,
+        namespace,
         clusters,
       },
     };
@@ -42,7 +29,7 @@
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { searchAttributes } from '$lib/stores/search-attributes';
 
-  import { fromSecondsToDaysOrHours } from '$lib/utilities/format-date';
+  import { fromSecondsToDaysOrHours } from '$lib/utilities/format-time';
   import { getClusters } from '$lib/utilities/get-clusters';
 
   import PageTitle from '$lib/components/page-title.svelte';
@@ -50,53 +37,55 @@
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
 
-  export let currentNamespace: DescribeNamespaceResponse;
+  import { fetchNamespace } from '$lib/services/namespaces-service';
+
+  export let namespace: DescribeNamespaceResponse;
   export let clusters: string;
 
   onMount(() => {
-    $lastUsedNamespace = currentNamespace?.namespaceInfo?.name;
+    $lastUsedNamespace = namespace?.namespaceInfo?.name;
   });
 </script>
 
 <PageTitle
-  title={`Namespaces | ${currentNamespace?.namespaceInfo?.name}`}
+  title={`Namespaces | ${namespace?.namespaceInfo?.name}`}
   url={$page.url.href}
 />
 <h2 class="text-2xl" data-cy="namespace-title">
-  Namespace: {currentNamespace?.namespaceInfo?.name}
+  Namespace: {namespace?.namespaceInfo?.name}
 </h2>
 <div class="flex">
   <article class="namespace-info w-full p-4">
     <h1 class="my-4 text-lg font-medium">Details</h1>
     <p data-cy="namespace-description">
       <span class="mr-2 font-medium">Description:</span>
-      {currentNamespace?.namespaceInfo?.description}
+      {namespace?.namespaceInfo?.description}
     </p>
     <p data-cy="namespace-owner">
       <span class="mr-2 font-medium">Owner:</span>
-      {currentNamespace?.namespaceInfo?.ownerEmail || 'Unknown'}
+      {namespace?.namespaceInfo?.ownerEmail || 'Unknown'}
     </p>
     <p data-cy="namespace-global">
       <span class="mr-2 font-medium">Global?</span>
-      {currentNamespace?.isGlobalNamespace ? 'Yes' : 'No'}
+      {namespace?.isGlobalNamespace ? 'Yes' : 'No'}
     </p>
     <p data-cy="namespace-retention">
       <span class="mr-2 font-medium">Retention Period:</span>
       {fromSecondsToDaysOrHours(
-        currentNamespace?.config?.workflowExecutionRetentionTtl.toString(),
+        namespace?.config?.workflowExecutionRetentionTtl.toString(),
       )}
     </p>
     <p data-cy="namespace-history">
       <span class="mr-2 font-medium">History Archival:</span>
-      {currentNamespace?.config?.historyArchivalState}
+      {namespace?.config?.historyArchivalState}
     </p>
     <p data-cy="namespace-visibility">
       <span class="mr-2 font-medium">Visibility Archival:</span>
-      {currentNamespace?.config?.visibilityArchivalState}
+      {namespace?.config?.visibilityArchivalState}
     </p>
     <p data-cy="namespace-failover">
       <span class="mr-2 font-medium">Failover Version:</span>
-      {currentNamespace?.failoverVersion}
+      {namespace?.failoverVersion}
     </p>
     <p data-cy="namespace-clusters">
       <span class="mr-2 font-medium">Clusters:</span>
