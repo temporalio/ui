@@ -6,7 +6,10 @@ import { routeForApi } from '$lib/utilities/route-for-api';
 
 import { getQueryTypesFromError } from '$lib/utilities/get-query-types-from-error';
 import { getEncoderEndpoint } from '$lib/utilities/get-encoder-endpoint';
-import { convertPayloadToJsonWithCodec } from '$lib/utilities/decode-payload';
+import {
+  convertPayloadToJsonWithCodec,
+  convertPayloadToJsonWithWebsocket,
+} from '$lib/utilities/decode-payload';
 import {
   parseWithBigInt,
   stringifyWithBigInt,
@@ -121,12 +124,14 @@ export async function getQuery(
           ...settings,
           codec: { ...settings?.codec, endpoint },
         };
-        const convertedAttributes = await convertPayloadToJsonWithCodec({
-          attributes: queryResult,
-          namespace: options.namespace,
-          settings: _settings,
-          accessToken,
-        });
+        const convertedAttributes = endpoint
+          ? await convertPayloadToJsonWithCodec({
+              attributes: queryResult,
+              namespace: options.namespace,
+              settings: _settings,
+              accessToken,
+            })
+          : await convertPayloadToJsonWithWebsocket(queryResult);
 
         data = convertedAttributes?.payloads[0];
       }

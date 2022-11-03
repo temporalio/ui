@@ -1,5 +1,9 @@
 import type { Payload } from '$types';
 
+import { dataConverterWebsocket } from '$lib/utilities/data-converter-websocket';
+import type { DataConverterWebsocketInterface } from '$lib/utilities/data-converter-websocket';
+
+import { convertPayloadWithWebsocket } from '$lib/services/data-converter';
 import { convertPayloadsWithCodec } from '$lib/services/data-encoder';
 
 import type { dataEncoderEndpoint } from '$lib/stores/data-encoder-config';
@@ -9,11 +13,13 @@ import { parseWithBigInt } from './parse-with-big-int';
 
 export type Decode = {
   convertPayloadToJsonWithCodec: typeof convertPayloadToJsonWithCodec;
+  convertPayloadToJsonWithWebsocket: typeof convertPayloadToJsonWithWebsocket;
   decodePayloadAttributes: typeof decodePayloadAttributes;
 };
 
 export type DecodeFunctions = {
   convertWithCodec?: Decode['convertPayloadToJsonWithCodec'];
+  convertWithWebsocket?: Decode['convertPayloadToJsonWithWebsocket'];
   decodeAttributes?: Decode['decodePayloadAttributes'];
   encoderEndpoint?: typeof dataEncoderEndpoint;
 };
@@ -123,6 +129,41 @@ export const decodeAllPotentialPayloadsWithCodec = async (
   return anyAttributes;
 };
 
+export const decodeAllPotentialPayloadsWithWebsockets = async (
+  anyAttributes: any,
+  ws: DataConverterWebsocketInterface,
+): Promise<any> => {
+  if (anyAttributes) {
+    for (const key of Object.keys(anyAttributes)) {
+      if (key === 'payloads') {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let JSONPayload: string | Payload | Record<any, any>;
+        const payloads = anyAttributes[key];
+        if (ws?.hasWebsocket) {
+          // Convert Payload data
+          const awaitData = await Promise.all(
+            (payloads ?? []).map(
+              async (payload) =>
+                await convertPayloadWithWebsocket(payload, ws.websocket),
+            ),
+          );
+          JSONPayload = awaitData;
+        } else {
+          JSONPayload = payloads.map(decodePayload);
+        }
+        anyAttributes[key] = JSONPayload;
+      } else if (typeof anyAttributes[key] === 'object') {
+        anyAttributes[key] = await decodeAllPotentialPayloadsWithWebsockets(
+          anyAttributes[key],
+          ws,
+        );
+      }
+    }
+  }
+
+  return anyAttributes;
+};
+
 export const convertPayloadToJsonWithCodec = async ({
   attributes,
   namespace,
@@ -138,6 +179,20 @@ export const convertPayloadToJsonWithCodec = async ({
     namespace,
     settings,
     accessToken,
+  );
+  return decodedAttributes;
+};
+
+export const convertPayloadToJsonWithWebsocket = async (
+  attributes: any,
+  websocket?: DataConverterWebsocketInterface,
+): Promise<any> => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const anyAttributes = attributes as any;
+  const ws = websocket ?? dataConverterWebsocket;
+  const decodedAttributes = await decodeAllPotentialPayloadsWithWebsockets(
+    anyAttributes,
+    ws,
   );
   return decodedAttributes;
 };

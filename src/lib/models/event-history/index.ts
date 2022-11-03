@@ -1,6 +1,7 @@
 import { dataEncoderEndpoint } from '$lib/stores/data-encoder-config';
 import {
   convertPayloadToJsonWithCodec,
+  convertPayloadToJsonWithWebsocket,
   decodePayloadAttributes,
   type DecodeFunctions,
 } from '$lib/utilities/decode-payload';
@@ -18,6 +19,7 @@ export async function getEventAttributes(
   { historyEvent, namespace, settings, accessToken }: EventWithMetadata,
   {
     convertWithCodec = convertPayloadToJsonWithCodec,
+    convertWithWebsocket = convertPayloadToJsonWithWebsocket,
     decodeAttributes = decodePayloadAttributes,
     encoderEndpoint = dataEncoderEndpoint,
   }: DecodeFunctions = {},
@@ -27,12 +29,14 @@ export async function getEventAttributes(
   const endpoint = getEncoderEndpoint(settings, encoderEndpoint);
   const _settings = { ...settings, codec: { ...settings?.codec, endpoint } };
 
-  const convertedAttributes = await convertWithCodec({
-    attributes,
-    namespace,
-    settings: _settings,
-    accessToken,
-  });
+  const convertedAttributes = endpoint
+    ? await convertWithCodec({
+        attributes,
+        namespace,
+        settings: _settings,
+        accessToken,
+      })
+    : await convertWithWebsocket(attributes);
 
   const decodedAttributes = decodeAttributes(convertedAttributes);
 
