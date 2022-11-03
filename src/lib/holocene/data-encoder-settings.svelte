@@ -58,7 +58,9 @@
   on:confirmModal={onCancel}
   cancelText="Done"
 >
-  <h3 slot="title" data-cy="data-encoder-title">Data Encoder</h3>
+  <h3 slot="title" data-cy="data-encoder-title" tabindex={0} autofocus>
+    Data Encoder
+  </h3>
   <div slot="content">
     {#if $dataEncoder.endpoint}
       <div class="mb-4">
