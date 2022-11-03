@@ -7,75 +7,15 @@
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Loading from '$lib/holocene/loading.svelte';
 
-  import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import { workflowSorts, workflowFilters } from '$lib/stores/filters';
-  import { goto } from '$app/navigation';
-  import {
-    routeForWorkflows,
-    routeForSchedules,
-  } from '$lib/utilities/route-for';
-  import { fetchNamespaces } from '$lib/services/namespaces-service';
+  export let getNamespaceList: () => Promise<NamespaceItem[]> = null;
 
-  import type { DescribeNamespaceResponse as Namespace } from '$types';
-  import type { ListNamespacesResponse } from '$types';
-
+  let namespaceListPromise: Promise<NamespaceItem[]> = getNamespaceList();
   let searchField: HTMLInputElement = null;
-  const {
-    showTemporalSystemNamespace,
-    runtimeEnvironment: { isCloud },
-  } = $page.stuff.settings;
-
-  const namespacesPromise: Promise<ListNamespacesResponse> = fetchNamespaces(
-    $page.stuff.settings,
-  );
-
-  function getCurrentHref(namespace: string) {
-    const onSchedulesPage = $page.url.pathname.endsWith('schedules');
-    const href = onSchedulesPage
-      ? routeForSchedules({ namespace })
-      : routeForWorkflows({ namespace });
-    return href;
-  }
-
-  function getNamespaceList(namespaces: Namespace[]) {
-    const filteredNamespaces: string[] = namespaces
-      .map((namespace: Namespace) => namespace?.namespaceInfo?.name)
-      .filter(
-        (namespace: string) =>
-          showTemporalSystemNamespace || namespace !== 'temporal-system',
-      );
-    let namespaceList = filteredNamespaces.map((namespace: string) => {
-      return {
-        namespace,
-        href: (namespace: string) => getCurrentHref(namespace),
-        onClick: (namespace: string) => {
-          $lastUsedNamespace = namespace;
-          $workflowFilters = [];
-          $workflowSorts = [];
-          goto(getCurrentHref(namespace));
-        },
-      };
-    });
-
-    // To show single namespace on cloud
-    if (isCloud && $page.params.namespace && !filteredNamespaces.length) {
-      namespaceList.push({
-        namespace: $page.params.namespace,
-        href: (namespace: string) => routeForWorkflows({ namespace }),
-        onClick: (namespace: string) => {
-          $lastUsedNamespace = $page.params.namespace;
-          $workflowFilters = [];
-          $workflowSorts = [];
-          goto(routeForWorkflows({ namespace }));
-        },
-      });
-    }
-    return namespaceList;
-  }
 
   onMount(() => {
     searchField.focus();
   });
+
   const dispatch = createEventDispatcher();
 
   /** When a user presses escape close the namespace switcher  */
@@ -121,12 +61,11 @@
 </div>
 
 <ul data-cy="namespace-list">
-  {#await namespacesPromise}
+  {#await namespaceListPromise}
     <Loading />
-  {:then namespacesResult}
-    {@const namespaceList = getNamespaceList(namespacesResult.namespaces)}
-    {#if namespaceList.length > 0}
-      {#each namespaceList.filter( ({ namespace }) => namespace.includes(searchValue), ) as namespace}
+  {:then namespacesListResult}
+    {#if namespacesListResult?.length > 0}
+      {#each namespacesListResult.filter( ({ namespace }) => namespace.includes(searchValue), ) as namespace}
         <li
           class="first:rounded-t-md first:border-t last:rounded-b-md border-b border-l border-r p-3 flex border-collapse gap-2 hover:bg-gray-50 cursor-pointer"
           on:click={() => namespace?.onClick(namespace.namespace)}
