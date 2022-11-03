@@ -101,7 +101,7 @@
     <p>{copy}</p>
     {#if actionCopy && link}
       <p>
-        Learn more about <Link newTab href={link}>{actionCopy}</Link>
+        Learn more about <Link newTab href={link}>{actionCopy}</Link>.
       </p>
     {/if}
   </Alert>
