@@ -56,6 +56,7 @@
   hideConfirm
   on:cancelModal={onCancel}
   on:confirmModal={onCancel}
+  cancelText="Done"
 >
   <h3 slot="title" data-cy="data-encoder-title">Data Encoder</h3>
   <div slot="content">
