@@ -18,15 +18,12 @@
   <div class="modal">
     <div class="overlay" />
     <div class="body" class:large>
-      <button
-        class="float-right p-6"
-        on:click={() => dispatch('cancelModal', {})}
-      >
+      <div class="float-right p-6" on:click={() => dispatch('cancelModal', {})}>
         <Icon
           name="close"
           class="cursor-pointer rounded-full hover:bg-gray-900 hover:text-white"
         />
-      </button>
+      </div>
       <div class="title">
         <slot name="title">
           <h3>Title</h3>
@@ -41,7 +38,6 @@
         <Button
           thin
           variant="secondary"
-          dataCy="modal-cancel-button"
           on:click={() => dispatch('cancelModal', {})}>{cancelText}</Button
         >
         {#if !hideConfirm}
@@ -49,7 +45,6 @@
             thin
             variant={confirmType}
             disabled={confirmDisabled}
-            dataCy="modal-confirm-button"
             on:click={() => dispatch('confirmModal', {})}>{confirmText}</Button
           >
         {/if}

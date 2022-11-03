@@ -16,7 +16,7 @@
   {onCancel}
   passAccessToken={$dataEncoder.passAccessToken}
 />
-{#if $dataEncoder?.endpoint}
+{#if $dataEncoder?.hasEndpointOrPortConfigured}
   {#if $dataEncoder?.hasNotRequested}
     <Tooltip right text={'Data encoder is configured'}>
       <button
