@@ -11,11 +11,14 @@
   export let confirmDisabled: boolean = false;
   export let large: boolean = false;
 
-  const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher<{
+    cancelModal: undefined;
+    confirmModal: undefined;
+  }>();
 
   const handleKeyUp = (event: KeyboardEvent) => {
     if (event.key === 'Escape') {
-      open = false;
+      dispatch('cancelModal');
     }
   };
 </script>
@@ -25,10 +28,7 @@
   <div class="modal">
     <div class="overlay" />
     <div class="body" class:large>
-      <button
-        class="float-right p-6"
-        on:click={() => dispatch('cancelModal', {})}
-      >
+      <button class="float-right p-6" on:click={() => dispatch('cancelModal')}>
         <Icon
           name="close"
           class="cursor-pointer rounded-full hover:bg-gray-900 hover:text-white"
@@ -49,7 +49,7 @@
           thin
           variant="secondary"
           dataCy="modal-cancel-button"
-          on:click={() => dispatch('cancelModal', {})}>{cancelText}</Button
+          on:click={() => dispatch('cancelModal')}>{cancelText}</Button
         >
         {#if !hideConfirm}
           <Button
@@ -57,7 +57,7 @@
             variant={confirmType}
             disabled={confirmDisabled}
             dataCy="modal-confirm-button"
-            on:click={() => dispatch('confirmModal', {})}>{confirmText}</Button
+            on:click={() => dispatch('confirmModal')}>{confirmText}</Button
           >
         {/if}
       </div>
