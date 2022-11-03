@@ -36,6 +36,10 @@
     }
   };
 
+  const onPortSet = () => {
+    $dataConverterPort = port;
+  };
+
   const onEndpointClear = () => {
     endpoint = '';
     $dataEncoderEndpoint = null;
@@ -60,15 +64,17 @@
         <h3 class="font-medium" data-cy="data-encoder-endpoint-title">
           Remote Codec Endpoint
         </h3>
-        <div class="flex items-center justify-between">
-          {#if $dataEncoderEndpoint}
+        {#if $dataEncoderEndpoint}
+          <div class="flex items-center justify-between">
             <p data-cy="data-encoder-endpoint">{$dataEncoder.endpoint}</p>
             <Button
               variant="secondary"
               on:click={onEndpointClear}
               dataCy="data-encoder-clear-endpoint">Clear</Button
             >
-          {:else}
+          </div>
+        {:else}
+          <form on:submit|preventDefault={onEndpointSet}>
             <input
               class="block w-80 rounded-md border border-gray-200 p-2"
               placeholder="Endpoint"
@@ -80,8 +86,8 @@
               on:click={onEndpointSet}
               dataCy="data-encoder-set-endpoint">Set</Button
             >
-          {/if}
-        </div>
+          </form>
+        {/if}
         {#if error}
           <small data-cy="data-encoder-endpoint-error" class="text-red-700"
             >{error}</small
@@ -106,7 +112,7 @@
         <h3 class="font-medium" data-cy="data-encoder-endpoint-title">
           Remote Codec Endpoint
         </h3>
-        <div class="flex items-center justify-between">
+        <form on:submit|preventDefault={onEndpointSet}>
           <input
             class="block w-80 rounded-md border border-gray-200 p-2"
             placeholder="Endpoint"
@@ -118,7 +124,7 @@
             on:click={onEndpointSet}
             dataCy="data-encoder-set-endpoint">Set</Button
           >
-        </div>
+        </form>
         {#if error}
           <small data-cy="data-encoder-endpoint-error" class="text-red-700"
             >{error}</small
@@ -151,7 +157,7 @@
             >DEPRECATED</span
           >
         </h3>
-        <div class="flex items-center justify-between">
+        <form on:submit|preventDefault={onPortSet}>
           <input
             class="block w-80 rounded-md border border-gray-200 p-2"
             placeholder="Port"
@@ -160,11 +166,11 @@
           />
           <Button
             variant="secondary"
-            on:click={() => ($dataConverterPort = port)}
+            on:click={onPortSet}
             dataCy="data-encoder-set-port"
             >Set
           </Button>
-        </div>
+        </form>
       </div>
     {/if}
     <div>
@@ -174,3 +180,9 @@
     </div>
   </div>
 </Modal>
+
+<style lang="postcss">
+  form {
+    @apply flex items-center justify-between;
+  }
+</style>
