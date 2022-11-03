@@ -6,9 +6,15 @@
   import PageTransition from '$lib/holocene/page-transition.svelte';
   import Header from '$lib/layouts/workflow-header.svelte';
   import Loading from '$holocene/loading.svelte';
-  import { onDestroy } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
+  import { eventFilterSort, EventSortOrder } from '$lib/stores/event-view';
 
   const { namespace } = $page.params;
+
+  onMount(() => {
+    const sort = $page.url.searchParams.get('sort');
+    if (sort) $eventFilterSort = sort as EventSortOrder;
+  });
 
   onDestroy(() => {
     $timelineEvents = null;
