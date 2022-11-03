@@ -10,6 +10,8 @@ type WorkflowAPIRoutePath =
   | 'events.descending'
   | 'query';
 
+type NamespaceAPIRoutePath = 'namespace';
+
 type TaskQueueAPIRoutePath = 'task-queue';
 type ParameterlessAPIRoutePath = 'cluster' | 'settings' | 'user' | 'namespaces';
 type SchedulesAPIRoutePath = 'schedules';
@@ -23,7 +25,8 @@ type APIRoutePath =
   | SearchAttributesRoutePath
   | TaskQueueAPIRoutePath
   | WorkflowAPIRoutePath
-  | WorkflowsAPIRoutePath;
+  | WorkflowsAPIRoutePath
+  | NamespaceAPIRoutePath;
 
 type APIRouteParameters = {
   namespace: string;
@@ -35,6 +38,7 @@ type APIRouteParameters = {
 };
 
 type WorkflowListRouteParameters = Pick<APIRouteParameters, 'namespace'>;
+type NamespaceRouteParameters = Pick<APIRouteParameters, 'namespace'>;
 type ScheduleListRouteParameters = Pick<APIRouteParameters, 'namespace'>;
 
 type WorkflowRouteParameters = Pick<

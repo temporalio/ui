@@ -14,10 +14,8 @@
     eventOrGroupIsCanceled,
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
-  import {
-    formatDate,
-    formatDistanceAbbreviated,
-  } from '$lib/utilities/format-date';
+  import { formatDate } from '$lib/utilities/format-date';
+  import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
   import { getTruncatedWord } from '$lib/utilities/get-truncated-word';
 

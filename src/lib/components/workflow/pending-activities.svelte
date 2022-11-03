@@ -2,11 +2,8 @@
   import { page } from '$app/stores';
   import { workflowRun } from '$lib/stores/workflow-run';
 
-  import {
-    formatDate,
-    getDuration,
-    formatDuration,
-  } from '$lib/utilities/format-date';
+  import { formatDate } from '$lib/utilities/format-date';
+  import { getDuration, formatDuration } from '$lib/utilities/format-time';
   import { routeForPendingActivities } from '$lib/utilities/route-for';
   import Link from '$lib/holocene/link.svelte';
   import Icon from '$holocene/icon/icon.svelte';

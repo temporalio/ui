@@ -128,8 +128,11 @@
     {/if}
     {#if $dataConverterPort}
       <div class="my-4">
-        <h3 class="font-medium" data-cy="data-encoder-port-title">
-          tctl plugin port
+        <h3 class="mb-1 font-medium" data-cy="data-encoder-port-title">
+          tctl plugin port <span
+            class="rounded-lg bg-orange-100 px-1 text-orange-500"
+            >DEPRECATED</span
+          >
         </h3>
         <div class="flex items-center justify-between">
           <p data-cy="data-encoder-port">{$dataConverterPort}</p>
@@ -142,8 +145,11 @@
       </div>
     {:else}
       <div class="my-4">
-        <h3 class="font-medium" data-cy="data-encoder-port-title">
-          tctl plugin port
+        <h3 class="mb-1 font-medium" data-cy="data-encoder-port-title">
+          tctl plugin port <span
+            class="rounded-lg bg-orange-100 px-1 text-orange-500"
+            >DEPRECATED</span
+          >
         </h3>
         <div class="flex items-center justify-between">
           <input
