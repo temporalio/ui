@@ -109,7 +109,7 @@
       <Button
         as="anchor"
         target="_external"
-        href="https://docs.temporal.io/workflows/#how-to-enable-schedules"
+        href="https://docs.temporal.io/workflows/#schedule"
         >Get Started With Docs</Button
       >
     </div>
