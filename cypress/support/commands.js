@@ -109,16 +109,6 @@ Cypress.Commands.add('interceptQueryApi', () => {
   ).as('query-api');
 });
 
-Cypress.Commands.add('interceptTaskQueuesApi', () => {
-  cy.intercept(
-    Cypress.env('VITE_API_HOST') +
-      `/api/v1/namespaces/*/task-queues/*?taskQueueType=*`,
-    {
-      fixture: 'task-queues.json',
-    },
-  ).as('task-queues-api');
-});
-
 Cypress.Commands.add('interceptSchedulesApi', () => {
   cy.intercept(
     Cypress.env('VITE_API_HOST') + `/api/v1/namespaces/*/schedules*`,
@@ -144,7 +134,6 @@ Cypress.Commands.add(
     cy.interceptArchivedWorkflowsApi();
     cy.interceptGithubReleasesApi();
     cy.interceptQueryApi();
-    cy.interceptTaskQueuesApi();
     cy.interceptSettingsApi();
     cy.interceptSearchAttributesApi();
     cy.interceptSchedulesApi();

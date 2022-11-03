@@ -6,7 +6,7 @@
 
   let { queue, namespace } = $page.params;
 
-  let workers = getPollers({ queue, namespace }, { returnAllPollers: true });
+  let workers = getPollers({ queue, namespace });
 </script>
 
 {#await workers then workers}
