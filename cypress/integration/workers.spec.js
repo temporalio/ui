@@ -42,7 +42,7 @@ describe('Workflow Workers', () => {
     cy.wait('@workflow-api');
   });
 
-  it('default to last viewed event view when visiting a workflow', () => {
+  it('View both worker and activity poller', () => {
     cy.get('[data-cy=workers-tab]').click();
 
     cy.wait('@worker-task-queues-api');
@@ -95,7 +95,7 @@ describe('Workflow Workers - Workflow Worker Only', () => {
     cy.wait('@workflow-api');
   });
 
-  it('view workflow worker only poller', () => {
+  it('View workflow worker only poller', () => {
     cy.get('[data-cy=workers-tab]').click();
 
     cy.wait('@worker-task-queues-api');
@@ -148,7 +148,7 @@ describe('Workflow Workers - Activity Worker Only', () => {
     cy.wait('@workflow-api');
   });
 
-  it('view workflow worker only poller', () => {
+  it('View activity worker only poller', () => {
     cy.get('[data-cy=workers-tab]').click();
 
     cy.wait('@worker-task-queues-api');

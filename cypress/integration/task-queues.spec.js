@@ -30,7 +30,7 @@ describe('Task Queues Page', () => {
     ).as('activity-task-queues-api');
   });
 
-  it('default to last viewed event view when visiting a workflow', () => {
+  it('View a task queue page with a worker', () => {
     cy.wait('@worker-task-queues-api');
     cy.wait('@activity-task-queues-api');
 
