@@ -55,7 +55,7 @@ Cypress.Commands.add('interceptWorkflowsApi', () => {
 Cypress.Commands.add('interceptWorkflowsCountApi', () => {
   cy.intercept(
     Cypress.env('VITE_API_HOST') +
-      `/api/v1/namespaces/*/workflows/count?query=*`,
+    `/api/v1/namespaces/*/workflows/count?query=*`,
     { fixture: 'count.json' },
   ).as('workflows-count-api');
 });
@@ -83,7 +83,7 @@ Cypress.Commands.add('interceptClusterApi', (fixture = 'cluster.json') => {
 Cypress.Commands.add('interceptArchivedWorkflowsApi', () => {
   cy.intercept(
     Cypress.env('VITE_API_HOST') +
-      `/api/v1/namespaces/*/workflows/archived?query=*`,
+    `/api/v1/namespaces/*/workflows/archived?query=*`,
     { fixture: 'workflows.json' },
   ).as('workflows-archived-api');
 });
@@ -104,9 +104,19 @@ Cypress.Commands.add('interceptGithubReleasesApi', () => {
 Cypress.Commands.add('interceptQueryApi', () => {
   cy.intercept(
     Cypress.env('VITE_API_HOST') +
-      `/api/v1/namespaces/*/workflows/*/runs/*/query*`,
+    `/api/v1/namespaces/*/workflows/*/runs/*/query*`,
     { fixture: 'query-stack-trace.json' },
   ).as('query-api');
+});
+
+Cypress.Commands.add('interceptTaskQueuesApi', () => {
+  cy.intercept(
+    Cypress.env('VITE_API_HOST') +
+    `/api/v1/namespaces/*/task-queues/*?taskQueueType=*`,
+    {
+      fixture: 'worker-task-queues.json',
+    },
+  ).as('task-queues-api');
 });
 
 Cypress.Commands.add('interceptSchedulesApi', () => {
@@ -134,6 +144,7 @@ Cypress.Commands.add(
     cy.interceptArchivedWorkflowsApi();
     cy.interceptGithubReleasesApi();
     cy.interceptQueryApi();
+    cy.interceptTaskQueuesApi();
     cy.interceptSettingsApi();
     cy.interceptSearchAttributesApi();
     cy.interceptSchedulesApi();
