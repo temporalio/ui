@@ -1,7 +1,6 @@
 import { dataEncoderEndpoint } from '$lib/stores/data-encoder-config';
 import {
   convertPayloadToJsonWithCodec,
-  convertPayloadToJsonWithWebsocket,
   decodePayloadAttributes,
   type DecodeFunctions,
 } from '$lib/utilities/decode-payload';
@@ -11,7 +10,6 @@ export async function getActivityAttributes(
   { activity, namespace, settings, accessToken }: PendingActivityWithMetadata,
   {
     convertWithCodec = convertPayloadToJsonWithCodec,
-    convertWithWebsocket = convertPayloadToJsonWithWebsocket,
     decodeAttributes = decodePayloadAttributes,
     encoderEndpoint = dataEncoderEndpoint,
   }: DecodeFunctions = {},
@@ -20,14 +18,12 @@ export async function getActivityAttributes(
   const endpoint = getEncoderEndpoint(settings, encoderEndpoint);
   const _settings = { ...settings, codec: { ...settings?.codec, endpoint } };
 
-  const convertedAttributes = endpoint
-    ? await convertWithCodec({
-        attributes: activity,
-        namespace,
-        settings: _settings,
-        accessToken,
-      })
-    : await convertWithWebsocket(activity);
+  const convertedAttributes = await convertWithCodec({
+    attributes: activity,
+    namespace,
+    settings: _settings,
+    accessToken,
+  });
 
   const decodedAttributes = decodeAttributes(
     convertedAttributes,
