@@ -36,15 +36,6 @@ export const eventCategoryParam = derived([page], ([$page]) =>
   $page.url.searchParams.get('category'),
 );
 
-export const eventSortParam: Readable<EventSortOrder> = derived<
-  [PageStore],
-  EventSortOrder
->([page], ([$page]): EventSortOrder => {
-  const sortParameter = $page.url.searchParams.get('sort');
-  if (isSortOrder(sortParameter)) return sortParameter;
-  return 'descending';
-});
-
 export const supportsReverseOrder = derived(
   [temporalVersion, settings],
   ([$temporalVersion, $settings]) => {
