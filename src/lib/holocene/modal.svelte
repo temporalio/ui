@@ -12,8 +12,15 @@
   export let large: boolean = false;
 
   const dispatch = createEventDispatcher();
+
+  const handleKeyUp = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      open = false;
+    }
+  };
 </script>
 
+<svelte:window on:keyup={handleKeyUp} />
 {#if open}
   <div class="modal">
     <div class="overlay" />

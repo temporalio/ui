@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
+  import Button from './button.svelte';
 
   import Modal from './modal.svelte';
 
@@ -8,8 +9,9 @@
 </script>
 
 <Hst.Story>
+  <Button on:click={() => (open = true)}>Open Modal</Button>
   <Modal
-    {open}
+    bind:open
     confirmType="destructive"
     confirmText="Delete"
     on:confirmModal={() => (open = false)}
