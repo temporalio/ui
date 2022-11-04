@@ -90,9 +90,12 @@
     },
   };
 
-  export let error: WorkflowTaskFailedCause;
+  export let error: WorkflowTaskFailedEvent;
 
-  $: errorCopy = WORKFLOW_TASK_FAILED_ERROR_COPY[error] ?? {};
+  $: errorCopy =
+    WORKFLOW_TASK_FAILED_ERROR_COPY[
+      error?.workflowTaskFailedEventAttributes?.cause
+    ] ?? {};
   $: ({ title = '', copy = '', actionCopy = '', link = '' } = errorCopy);
 </script>
 
