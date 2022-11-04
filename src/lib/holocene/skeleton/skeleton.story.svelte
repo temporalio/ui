@@ -8,7 +8,7 @@
 
 <Hst.Story>
   <Hst.Variant title="A Default Skeleton Loader">
-    <Skeleton />
+    <Skeleton class="h-4" />
   </Hst.Variant>
 
   <Hst.Variant title="A Card Skeleton Loader">
