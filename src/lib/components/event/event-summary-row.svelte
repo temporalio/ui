@@ -220,17 +220,10 @@
     @apply border-b-0;
   }
 
-  .row {
-    &.typedError {
-      @apply rounded-lg;
-    }
-  }
-
-  .row {
-    &.typedError {
-      &.expanded {
-        @apply rounded-b-none;
-      }
+  .row.typedError {
+    @apply rounded-lg;
+    &.expanded {
+      @apply rounded-b-none;
     }
   }
 

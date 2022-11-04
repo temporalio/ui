@@ -27,15 +27,13 @@
 </script>
 
 <section
-  class="event-table {typedError
-    ? 'table border border-yellow-700'
-    : 'border-2 border-gray-900 xl:table'}"
+  class="event-table"
+  class:error-table={typedError}
   data-cy="event-summary-table"
 >
   <div
-    class="table-header-row xl:table-header-group {typedError
-      ? 'header-hidden'
-      : ''}"
+    class="table-header-row xl:table-header-group"
+    class:header-hidden={typedError}
     data-cy="event-summary-table-header-desktop"
   >
     <div class="hidden xl:table-row">
@@ -63,9 +61,8 @@
     </div>
   </div>
   <div
-    class="table-header-row-responsive rounded-t-md {typedError
-      ? 'header-hidden-responsive'
-      : ''}"
+    class="table-header-row-responsive rounded-t-md"
+    class:header-hidden-responsive={typedError}
   >
     <div class="table-header-responsive w-2/3">
       Date & Time
@@ -96,7 +93,7 @@
 
 <style lang="postcss">
   .event-table {
-    @apply w-full table-fixed rounded-lg;
+    @apply w-full table-fixed rounded-lg border-2 border-gray-900 xl:table;
   }
 
   .table-header-row {
@@ -113,6 +110,10 @@
 
   .table-header-responsive {
     @apply flex items-center p-2;
+  }
+
+  .error-table {
+    @apply table border border-yellow-700;
   }
 
   .header-hidden {
