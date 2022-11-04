@@ -10,6 +10,7 @@
   import { expandAllEvents } from '$lib/stores/event-view';
 
   export let compact = false;
+  export let typedError = false;
 
   let title = compact ? 'Event Type' : 'Workflow Events';
   let expandAll = $expandAllEvents === 'true';
@@ -25,9 +26,16 @@
   }
 </script>
 
-<section class="event-table" data-cy="event-summary-table">
+<section
+  class="event-table {typedError
+    ? 'table border border-yellow-700'
+    : 'border-2 border-gray-900 xl:table'}"
+  data-cy="event-summary-table"
+>
   <div
-    class="table-header-row xl:table-header-group"
+    class="table-header-row xl:table-header-group {typedError
+      ? 'header-hidden'
+      : ''}"
     data-cy="event-summary-table-header-desktop"
   >
     <div class="hidden xl:table-row">
@@ -54,7 +62,11 @@
       </div>
     </div>
   </div>
-  <div class="table-header-row-responsive rounded-t-md">
+  <div
+    class="table-header-row-responsive rounded-t-md {typedError
+      ? 'header-hidden-responsive'
+      : ''}"
+  >
     <div class="table-header-responsive w-2/3">
       Date & Time
       {#if !compact}<EventDateFilter />{/if}
@@ -84,7 +96,7 @@
 
 <style lang="postcss">
   .event-table {
-    @apply w-full table-fixed rounded-lg border-2 border-gray-900 xl:table;
+    @apply w-full table-fixed rounded-lg;
   }
 
   .table-header-row {
@@ -101,5 +113,13 @@
 
   .table-header-responsive {
     @apply flex items-center p-2;
+  }
+
+  .header-hidden {
+    visibility: collapse;
+  }
+
+  .header-hidden-responsive {
+    @apply hidden;
   }
 </style>

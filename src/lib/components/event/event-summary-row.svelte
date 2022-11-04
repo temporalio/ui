@@ -29,6 +29,7 @@
   export let initialItem: IterableEvent;
   export let compact = false;
   export let expandAll = false;
+  export let typedError = false;
 
   let selectedId = event.id;
 
@@ -82,6 +83,7 @@
   class:failure
   class:canceled
   class:terminated
+  class:typedError
   data-cy="event-summary-row"
   on:click|stopPropagation={onLinkClick}
 >
@@ -135,7 +137,7 @@
   </td>
 </tr>
 {#if expanded}
-  <tr class="expanded-row">
+  <tr class="expanded-row" class:typedError>
     <td class="expanded-cell" colspan="5">
       <EventDetailsFull
         event={currentEvent}
@@ -212,5 +214,28 @@
 
   .expanded-cell {
     @apply flex w-full flex-wrap border-b-2 border-gray-700 text-sm no-underline xl:table-cell xl:text-base;
+  }
+
+  .typedError .expanded-cell {
+    @apply border-b-0;
+  }
+
+  .row {
+    &.typedError {
+      @apply rounded-lg;
+    }
+  }
+
+  .row {
+    &.typedError {
+      &.expanded {
+        @apply rounded-b-none;
+      }
+    }
+  }
+
+  .typedError .cell,
+  .typedError .id-cell {
+    @apply first-of-type:rounded-tl-lg  last-of-type:rounded-tr-lg;
   }
 </style>

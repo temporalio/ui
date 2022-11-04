@@ -1,8 +1,10 @@
 <script lang="ts">
-  import { updating } from '$lib/stores/events';
+  import { events, eventGroups, updating } from '$lib/stores/events';
 
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
+  import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
 
   const WORKFLOW_TASK_FAILED_ERROR_COPY = {
     UnhandledCommand: {
@@ -107,5 +109,16 @@
         Learn more about <Link newTab href={link}>{actionCopy}</Link>.
       </p>
     {/if}
+    <div class="mt-2 bg-white">
+      <EventSummaryTable typedError>
+        <EventSummaryRow
+          event={error}
+          groups={$eventGroups}
+          initialItem={error}
+          visibleItems={$events}
+          typedError
+        />
+      </EventSummaryTable>
+    </div>
   </Alert>
 {/if}
