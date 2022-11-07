@@ -64,13 +64,13 @@
   const terminateWorkflows = async () => {
     terminating = true;
     const { namespace } = $page.params;
-    const jobId = await batchTerminateWorkflows({
-      namespace,
-      workflowExecutions: terminableWorkflows,
-      reason: terminationReason,
-    });
-
     try {
+      const jobId = await batchTerminateWorkflows({
+        namespace,
+        workflowExecutions: terminableWorkflows,
+        reason: terminationReason,
+      });
+
       await pollBatchOperation({ namespace, jobId });
     } catch (error) {
       showBulkOperationConfirmationModal = false;
