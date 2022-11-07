@@ -51,9 +51,13 @@
     $lastUsedNamespace = $page.params.namespace;
   });
 
-  const refreshWorkflows = () => {
+  const resetSelection = () => {
     allSelected = false;
     selectedWorkflows = [];
+  };
+
+  const refreshWorkflows = () => {
+    resetSelection();
     $refresh = Date.now();
   };
 
@@ -90,6 +94,7 @@
     allSelected = false;
     terminating = false;
     showBulkOperationConfirmationModal = false;
+    terminationReason = '';
     updateQueryParameters({ parameter: 'query', value: '', url: $page.url });
   };
 
@@ -149,7 +154,7 @@
     >
   </div>
 </div>
-<WorkflowFilters bind:searchType />
+<WorkflowFilters on:search={resetSelection} bind:searchType />
 <Pagination items={$workflows} let:visibleItems>
   <WorkflowsSummaryTable
     {bulkActionsEnabled}
