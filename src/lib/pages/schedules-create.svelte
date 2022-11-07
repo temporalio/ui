@@ -137,7 +137,7 @@
         bind:phase
         bind:cronString
       >
-        <div class="mt-8 flex justify-between">
+        <div class="mt-8 flex items-center gap-8">
           <Button {disabled} on:click={() => handleClick(preset)}
             >Create Schedule</Button
           >

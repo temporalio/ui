@@ -4,9 +4,14 @@
   import ScheduleDayOfWeekView from './schedule-day-of-week-view.svelte';
   import ScheduleDayOfMonthView from './schedule-day-of-month-view.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import { page } from '$app/stores';
+  import ScheduleFrequency from './schedule-frequency.svelte';
 
-  let preset: SchedulePreset = 'interval';
+  let scheduleId = $page.params.schedule;
 
+  let preset: SchedulePreset = scheduleId ? 'existing' : 'interval';
+
+  export let schedule: DescribeSchedule | null = null;
   export let daysOfWeek: string[];
   export let daysOfMonth: number[];
   export let months: string[];
@@ -37,6 +42,14 @@
 <div class="mt-8 w-full">
   <h1 class="mb-4 text-2xl">Frequency</h1>
   <div class="flex flex-wrap gap-6">
+    {#if schedule}
+      <Tab
+        label="Existing"
+        dataCy="interval-tab"
+        active={preset === 'existing'}
+        on:click={() => (preset = 'existing')}
+      />
+    {/if}
     <Tab
       label="Interval"
       dataCy="interval-tab"
@@ -63,7 +76,13 @@
     />
   </div>
   <div class="mt-4 flex w-full flex-wrap gap-6">
-    {#if preset === 'interval'}
+    {#if preset === 'existing'}
+      <ScheduleFrequency
+        calendar={schedule?.spec?.structuredCalendar?.[0]}
+        interval={schedule?.spec?.interval?.[0]}
+        class="text-base"
+      />
+    {:else if preset === 'interval'}
       <SchedulesIntervalView
         bind:days
         bind:hour

@@ -105,7 +105,7 @@ export const routeForSchedules = (parameters: NamespaceParameter): string => {
 export const routeForScheduleCreate = ({
   namespace,
 }: NamespaceParameter): string => {
-  return `${routeForSchedules({ namespace })}/new`;
+  return `${routeForSchedules({ namespace })}/create`;
 };
 
 export const routeForSchedule = ({

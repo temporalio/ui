@@ -1,9 +1,9 @@
 import { goto } from '$app/navigation';
 import { writable } from 'svelte/store';
 
-import { routeForSchedules } from '$lib/utilities/route-for';
+import { routeForSchedule, routeForSchedules } from '$lib/utilities/route-for';
 
-import { createSchedule } from '$lib/services/schedule-service';
+import { createSchedule, editSchedule } from '$lib/services/schedule-service';
 import { calendarToComment } from '$lib/utilities/schedule-comment-formatting';
 import {
   convertDaysAndMonths,
@@ -17,23 +17,27 @@ import {
 // "timezoneName": "string",
 // "timezoneData": "string"
 
-export const submitScheduleForm = async ({
-  namespace,
-  preset,
-  name,
-  workflowType,
-  workflowId,
-  taskQueue,
-  daysOfWeek,
-  daysOfMonth,
-  months,
-  days,
-  hour,
-  minute,
-  second,
-  phase,
-  cronString,
-}: Partial<ScheduleParameters>): Promise<void> => {
+export const submitScheduleForm = async (
+  {
+    namespace,
+    preset,
+    name,
+    workflowType,
+    workflowId,
+    taskQueue,
+    daysOfWeek,
+    daysOfMonth,
+    months,
+    days,
+    hour,
+    minute,
+    second,
+    phase,
+    cronString,
+  }: Partial<ScheduleParameters>,
+  schedule?: DescribeSchedule,
+  scheduleId?: string,
+): Promise<void> => {
   const body: DescribeSchedule = {
     schedule_id: name,
     schedule: {
@@ -52,7 +56,9 @@ export const submitScheduleForm = async ({
     },
   };
 
-  if (preset === 'string') {
+  if (preset === 'existing' && schedule) {
+    body.schedule.spec = schedule.spec;
+  } else if (preset === 'string') {
     // Add the cronString as a comment to the cronString to view it for frequency
     const cronStringWithComment = `${cronString}#${cronString}`;
     body.schedule.spec.cronString = [cronStringWithComment];
@@ -91,19 +97,38 @@ export const submitScheduleForm = async ({
   }
   // // Wait 2 seconds for create to get it on fetchAllSchedules
   loading.set(true);
-  const { error: err } = await createSchedule({
-    namespace,
-    body,
-  });
-  if (err) {
-    error.set(err);
-    loading.set(false);
-  } else {
-    error.set('');
-    setTimeout(() => {
-      goto(routeForSchedules({ namespace }));
+
+  if (schedule && scheduleId) {
+    const { error: err } = await editSchedule({
+      namespace,
+      scheduleId,
+      body,
+    });
+    if (err) {
+      error.set(err);
       loading.set(false);
-    }, 2000);
+    } else {
+      setTimeout(() => {
+        goto(routeForSchedule({ namespace, scheduleId: name }));
+        loading.set(false);
+        error.set('');
+      }, 2000);
+    }
+  } else {
+    const { error: err } = await createSchedule({
+      namespace,
+      body,
+    });
+    if (err) {
+      error.set(err);
+      loading.set(false);
+    } else {
+      setTimeout(() => {
+        goto(routeForSchedules({ namespace }));
+        loading.set(false);
+        error.set('');
+      }, 2000);
+    }
   }
 };
 

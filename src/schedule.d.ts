@@ -1,8 +1,7 @@
-// type WorkflowExecutionStatus = import('$types').WorkflowExecutionStatus;
 type DescribeSchedule = import('$types').DescribeScheduleResponse;
 type ScheduleSpec = import('$types').ScheduleSpec;
 
-type SchedulePreset = 'interval' | 'week' | 'month' | 'string';
+type SchedulePreset = 'existing' | 'interval' | 'week' | 'month' | 'string';
 
 type ScheduleParameters = {
   namespace: string;

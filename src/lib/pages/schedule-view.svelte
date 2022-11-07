@@ -126,16 +126,17 @@
         </div>
         <div class="flex items-center gap-2 text-sm">
           <p>Created: {formatDate(schedule?.info?.createTime, $timeFormat)}</p>
-          {#if schedule?.info?.updateTime}
-            <p>-</p>
+        </div>
+        {#if schedule?.info?.updateTime}
+          <div class="flex items-center gap-2 text-sm">
             <p>
               Last updated: {formatDate(
                 schedule?.info?.updateTime,
                 $timeFormat,
               )}
             </p>
-          {/if}
-        </div>
+          </div>
+        {/if}
       </main>
       <SplitButton
         position="right"

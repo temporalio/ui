@@ -96,7 +96,7 @@
         <Icon name="close" />
       </div>
     {/if}
-    {#if maxLength && !suffix}
+    {#if maxLength && !suffix && !disabled}
       <span class="count">
         <span
           class="text-blue-700"
