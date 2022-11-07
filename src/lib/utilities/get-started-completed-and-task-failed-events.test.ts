@@ -293,7 +293,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
     expect(error).toBe(failedEvent);
   });
 
-  it('should get the correct error for a workflow that has a completed task after a failed task', () => {
+  it('should get the correct error for a workflow that has a completed task after a failed task in descending order', () => {
     const history = [
       {
         eventId: '12',
@@ -347,7 +347,71 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
       },
     ];
 
-    const { error } = getWorkflowStartedCompletedAndTaskFailedEvents(history);
+    const { error } = getWorkflowStartedCompletedAndTaskFailedEvents(
+      history,
+      'descending',
+    );
+    expect(error).toMatchInlineSnapshot('undefined');
+  });
+
+  it('should get the correct error for a workflow that has a completed task after a failed task is ascending order', () => {
+    const history = [
+      {
+        eventId: '11',
+        eventTime: '2022-10-31T22:41:28.917920758Z',
+        eventType: 'WorkflowTaskFailed',
+        version: '0',
+        taskId: '56713476',
+        workflowTaskFailedEventAttributes: {
+          cause: 'NonDeterministicError',
+          failure: {
+            cause: null,
+          },
+        },
+        attributes: {
+          type: 'workflowTaskFailedEventAttributes',
+          cause: 'NonDeterministicError',
+          failure: {
+            cause: null,
+          },
+        },
+        classification: 'Failed',
+        category: 'workflow',
+        id: '11',
+        name: 'WorkflowTaskFailed',
+        timestamp: '2022-10-31 UTC 22:41:28.91',
+      },
+      {
+        eventId: '12',
+        eventTime: '2022-07-01T20:28:52.916365546Z',
+        eventType: 'WorkflowTaskCompleted',
+        version: '0',
+        taskId: '29887669',
+        workflowTaskCompletedEventAttributes: {
+          scheduledEventId: '15',
+          startedEventId: '16',
+          identity: '83579@MacBook-Pro-2.local@',
+          binaryChecksum: 'e56c0141e58df0bd405138565d0526f9',
+        },
+        attributes: {
+          type: 'workflowTaskCompletedEventAttributes',
+          scheduledEventId: '15',
+          startedEventId: '16',
+          identity: '83579@MacBook-Pro-2.local@',
+          binaryChecksum: 'e56c0141e58df0bd405138565d0526f9',
+        },
+        classification: 'Completed',
+        category: 'workflow',
+        id: '12',
+        name: 'WorkflowTaskCompleted',
+        timestamp: '2022-07-01 UTC 20:28:52.91',
+      },
+    ];
+
+    const { error } = getWorkflowStartedCompletedAndTaskFailedEvents(
+      history,
+      'ascending',
+    );
     expect(error).toMatchInlineSnapshot('undefined');
   });
 });
