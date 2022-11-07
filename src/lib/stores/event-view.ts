@@ -4,9 +4,7 @@ import { persistStore } from '$lib/stores/persist-store';
 import { settings } from '$lib/stores/settings';
 import { temporalVersion } from './versions';
 import { isVersionNewer } from '$lib/utilities/version-check';
-import { isSortOrder } from '$lib/utilities/is';
 
-type PageStore = typeof page;
 export type EventSortOrder = 'ascending' | 'descending';
 export type EventSortOrderOptions = {
   label: string;
