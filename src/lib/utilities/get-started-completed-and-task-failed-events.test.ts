@@ -262,43 +262,41 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
   });
 
   it('should get the correct error for a WorkflowTaskFailed event', () => {
-    const cause = 'NonDeterministicError';
-    const history = [
-      {
-        eventId: '11',
-        eventTime: '2022-10-31T22:41:28.917920758Z',
-        eventType: 'WorkflowTaskFailed',
-        version: '0',
-        taskId: '56713476',
-        workflowTaskFailedEventAttributes: {
-          cause,
-          failure: {
-            cause: null,
-          },
+    const failedEvent = {
+      eventId: '15',
+      eventTime: '2022-10-31T22:41:28.917920758Z',
+      eventType: 'WorkflowTaskFailed',
+      version: '0',
+      taskId: '56713476',
+      workflowTaskFailedEventAttributes: {
+        cause: 'NonDeterministicError',
+        failure: {
+          cause: null,
         },
-        attributes: {
-          type: 'workflowTaskFailedEventAttributes',
-          cause,
-          failure: {
-            cause: null,
-          },
-        },
-        classification: 'Failed',
-        category: 'workflow',
-        id: '11',
-        name: 'WorkflowTaskFailed',
-        timestamp: '2022-10-31 UTC 22:41:28.91',
       },
-    ];
+      attributes: {
+        type: 'workflowTaskFailedEventAttributes',
+        cause: 'NonDeterministicError',
+        failure: {
+          cause: null,
+        },
+      },
+      classification: 'Failed',
+      category: 'workflow',
+      id: '11',
+      name: 'WorkflowTaskFailed',
+      timestamp: '2022-10-31 UTC 22:41:28.91',
+    };
+    const history = [failedEvent, ...runningEventHistory];
 
     const { error } = getWorkflowStartedCompletedAndTaskFailedEvents(history);
-    expect(error).toBe(cause);
+    expect(error).toBe(failedEvent);
   });
 
   it('should get the correct error for a workflow that has a completed task after a failed task', () => {
     const history = [
       {
-        eventId: '17',
+        eventId: '12',
         eventTime: '2022-07-01T20:28:52.916365546Z',
         eventType: 'WorkflowTaskCompleted',
         version: '0',
@@ -318,7 +316,7 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
         },
         classification: 'Completed',
         category: 'workflow',
-        id: '17',
+        id: '12',
         name: 'WorkflowTaskCompleted',
         timestamp: '2022-07-01 UTC 20:28:52.91',
       },

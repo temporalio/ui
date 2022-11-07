@@ -1,6 +1,5 @@
 <div
-  class="background-animate 
-      h-12
+  class="background-animate
       w-full
       rounded-full
       bg-gradient-to-r

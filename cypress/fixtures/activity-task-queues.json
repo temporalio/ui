@@ -1,0 +1,10 @@
+{
+  "pollers": [
+    {
+      "lastAccessTime": "2022-05-05T21:42:46.576609378Z",
+      "identity": "@poller",
+      "ratePerSecond": 100000
+    }
+  ],
+  "taskQueueStatus": null
+}

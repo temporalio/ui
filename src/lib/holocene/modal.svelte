@@ -11,14 +11,28 @@
   export let confirmDisabled: boolean = false;
   export let large: boolean = false;
 
-  const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher<{
+    cancelModal: undefined;
+    confirmModal: undefined;
+  }>();
+
+  const cancelModal = () => {
+    dispatch('cancelModal');
+  };
+
+  const handleKeyUp = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      cancelModal();
+    }
+  };
 </script>
 
+<svelte:window on:keyup={handleKeyUp} />
 {#if open}
   <div class="modal">
-    <div class="overlay" />
+    <div on:click={cancelModal} class="overlay" />
     <div class="body" class:large>
-      <div class="float-right p-6" on:click={() => dispatch('cancelModal', {})}>
+      <div class="float-right p-6" on:click={cancelModal}>
         <Icon
           name="close"
           class="cursor-pointer rounded-full hover:bg-gray-900 hover:text-white"
@@ -35,17 +49,15 @@
         </slot>
       </div>
       <div class="flex items-center justify-end space-x-2 p-6">
-        <Button
-          thin
-          variant="secondary"
-          on:click={() => dispatch('cancelModal', {})}>{cancelText}</Button
+        <Button thin variant="secondary" on:click={cancelModal}
+          >{cancelText}</Button
         >
         {#if !hideConfirm}
           <Button
             thin
             variant={confirmType}
             disabled={confirmDisabled}
-            on:click={() => dispatch('confirmModal', {})}>{confirmText}</Button
+            on:click={() => dispatch('confirmModal')}>{confirmText}</Button
           >
         {/if}
       </div>
