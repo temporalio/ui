@@ -326,12 +326,11 @@ export const isUpsertWorkflowSearchAttributesEvent =
   );
 
 export const isLocalActivityMarkerEvent = (event) => {
+  const payload: any =
+    event?.markerRecordedEventAttributes?.details?.data?.payloads?.[0];
   return (
     isMarkerRecordedEvent(event) &&
     event?.markerRecordedEventAttributes?.markerName === 'LocalActivity' &&
-    Boolean(
-      event.markerRecordedEventAttributes?.details?.data?.payloads?.[0]
-        ?.ActivityType,
-    )
+    Boolean(payload?.ActivityType)
   );
 };
