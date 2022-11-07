@@ -8,7 +8,7 @@
 
 <div class="flex flex-col {$$props.class}">
   {#if calendar}
-    <p>{calendar?.comment ?? ''}</p>
+    <p>{calendar?.comment ?? ''} UTC</p>
   {:else}
     <p>{intervalToComment(interval?.interval)}</p>
     <p>{intervalToComment(interval?.phase, true)}</p>
