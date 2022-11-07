@@ -324,3 +324,14 @@ export const isUpsertWorkflowSearchAttributesEvent =
   hasAttributes<UpsertWorkflowSearchAttributesEvent>(
     'upsertWorkflowSearchAttributesEventAttributes',
   );
+
+export const isLocalActivityMarkerEvent = (event) => {
+  return (
+    isMarkerRecordedEvent(event) &&
+    event?.markerRecordedEventAttributes?.markerName === 'LocalActivity' &&
+    Boolean(
+      event.markerRecordedEventAttributes?.details?.data?.payloads?.[0]
+        ?.ActivityType,
+    )
+  );
+};

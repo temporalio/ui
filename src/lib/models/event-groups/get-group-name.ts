@@ -5,6 +5,7 @@ import {
   isStartChildWorkflowExecutionInitiatedEvent,
   isWorkflowExecutionSignaledEvent,
   isTimerStartedEvent,
+  isLocalActivityMarkerEvent,
 } from '$lib/utilities/is-event-type';
 
 export const getEventGroupName = (event: CommonHistoryEvent): string => {
@@ -27,6 +28,9 @@ export const getEventGroupName = (event: CommonHistoryEvent): string => {
   }
 
   if (isMarkerRecordedEvent(event)) {
+    if (isLocalActivityMarkerEvent(event)) {
+      return 'Local Activity';
+    }
     return `Marker: ${event.markerRecordedEventAttributes?.markerName}`;
   }
 
