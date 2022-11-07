@@ -4,7 +4,7 @@ import { stringifyWithBigInt } from './parse-with-big-int';
 type WorkflowInputAndResults = {
   input: string;
   results: string;
-  error: WorkflowTaskFailedCause;
+  error: WorkflowTaskFailedEvent;
 };
 
 type CompletionEvent =
@@ -63,7 +63,7 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
 ): WorkflowInputAndResults => {
   let input: string;
   let results: string;
-  let error: WorkflowTaskFailedCause;
+  let error: WorkflowTaskFailedEvent;
 
   let workflowStartedEvent: WorkflowExecutionStartedEvent;
   let workflowCompletedEvent: CompletionEvent;
@@ -100,7 +100,7 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
   }
 
   if (workflowTaskFailedEvent) {
-    error = workflowTaskFailedEvent.workflowTaskFailedEventAttributes.cause;
+    error = workflowTaskFailedEvent;
   }
 
   return {
