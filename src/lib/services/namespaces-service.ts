@@ -1,4 +1,5 @@
 import { notifications } from '$lib/stores/notifications';
+import { namespaces } from '$lib/stores/namespaces';
 import { paginated } from '$lib/utilities/paginated';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
@@ -12,21 +13,33 @@ const emptyNamespace = {
 export async function fetchNamespaces(
   settings: Settings,
   request = fetch,
-): Promise<ListNamespacesResponse> {
+): Promise<void> {
   if (settings.runtimeEnvironment.isCloud) {
-    return emptyNamespace;
+    namespaces.set([]);
   }
 
-  const route = await routeForApi('namespaces');
-  const results = await paginated(async (token: string) =>
-    requestFromAPI<ListNamespacesResponse>(route, {
-      request,
-      token,
-      onError: () => notifications.add('error', 'Unable to fetch namespaces'),
-    }),
-  );
+  try {
+    const route = await routeForApi('namespaces');
+    const results = await paginated(async (token: string) =>
+      requestFromAPI<ListNamespacesResponse>(route, {
+        request,
+        token,
+        onError: () => notifications.add('error', 'Unable to fetch namespaces'),
+      }),
+    );
 
-  return results ?? emptyNamespace;
+    const { showTemporalSystemNamespace } = settings;
+    const _namespaces: DescribeNamespaceResponse[] = (
+      results?.namespaces ?? []
+    ).filter(
+      (namespace: DescribeNamespaceResponse) =>
+        showTemporalSystemNamespace ||
+        namespace.namespaceInfo.name !== 'temporal-system',
+    );
+    namespaces.set(_namespaces);
+  } catch (e) {
+    namespaces.set([]);
+  }
 }
 
 export async function fetchNamespace(

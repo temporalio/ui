@@ -64,7 +64,7 @@
             variant={confirmType}
             {loading}
             disabled={confirmDisabled || loading}
-            on:click={cancelModal}>{confirmText}</Button
+            on:click={() => dispatch('confirmModal')}>{confirmText}</Button
           >
         {/if}
       </div>
