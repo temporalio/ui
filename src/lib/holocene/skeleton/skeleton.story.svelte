@@ -5,6 +5,11 @@
 
   let rows: number = 10;
   let columns: number = 4;
+  let columnWidths: number[] = [25, 25, 25, 25];
+
+  $: {
+    columnWidths = Array.from(new Array(columns)).fill(100 / columns);
+  }
   export let Hst: HST;
 </script>
 
@@ -18,7 +23,7 @@
   </Hst.Variant>
 
   <Hst.Variant title="A Table Skeleton Loader">
-    <SkeletonTable bind:rows bind:columns />
+    <SkeletonTable bind:rows bind:columns bind:columnWidths />
   </Hst.Variant>
 
   <Hst.Variant title="A Table Skeleton Loader with column widths">

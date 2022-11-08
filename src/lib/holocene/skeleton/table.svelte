@@ -6,7 +6,7 @@
 
   export let rows = 10;
   export let columns = 4;
-  export let columnWidths = new Array(columns).fill(100 / columns);
+  export let columnWidths: number[] = new Array(columns).fill(100 / columns);
 </script>
 
 <Table class="w-full table-fixed" variant="fancy">
