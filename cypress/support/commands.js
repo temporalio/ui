@@ -114,7 +114,7 @@ Cypress.Commands.add('interceptTaskQueuesApi', () => {
     Cypress.env('VITE_API_HOST') +
       `/api/v1/namespaces/*/task-queues/*?taskQueueType=*`,
     {
-      fixture: 'task-queues.json',
+      fixture: 'worker-task-queues.json',
     },
   ).as('task-queues-api');
 });

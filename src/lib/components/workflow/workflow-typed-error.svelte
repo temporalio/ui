@@ -1,8 +1,10 @@
 <script lang="ts">
-  import { updating } from '$lib/stores/events';
+  import { events, eventGroups, updating } from '$lib/stores/events';
 
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
+  import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
 
   const WORKFLOW_TASK_FAILED_ERROR_COPY = {
     UnhandledCommand: {
@@ -82,7 +84,7 @@
       title: 'Missing Search Attributes',
       copy: 'It looks like you might be missing search attributes, which might cause workflow tasks to continue to retry without success.',
       actionCopy: 'configuring search attributes',
-      link: 'https://docs.temporal.io/concepts/what-is-a-search-attribute/',
+      link: 'https://docs.temporal.io/visibility#search-attribute',
     },
     NonDeterministicError: {
       title: 'Cause Non Deterministic Error',
@@ -90,9 +92,12 @@
     },
   };
 
-  export let error: WorkflowTaskFailedCause;
+  export let error: WorkflowTaskFailedEvent;
 
-  $: errorCopy = WORKFLOW_TASK_FAILED_ERROR_COPY[error] ?? {};
+  $: errorCopy =
+    WORKFLOW_TASK_FAILED_ERROR_COPY[
+      error?.workflowTaskFailedEventAttributes?.cause
+    ] ?? {};
   $: ({ title = '', copy = '', actionCopy = '', link = '' } = errorCopy);
 </script>
 
@@ -101,8 +106,19 @@
     <p>{copy}</p>
     {#if actionCopy && link}
       <p>
-        Learn more about <Link newTab href={link}>{actionCopy}</Link>
+        Learn more about <Link newTab href={link}>{actionCopy}</Link>.
       </p>
     {/if}
+    <div class="mt-2 bg-white">
+      <EventSummaryTable typedError>
+        <EventSummaryRow
+          event={error}
+          groups={$eventGroups}
+          initialItem={error}
+          visibleItems={$events}
+          typedError
+        />
+      </EventSummaryTable>
+    </div>
   </Alert>
 {/if}
