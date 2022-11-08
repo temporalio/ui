@@ -64,7 +64,7 @@
   import PageTitle from '$lib/components/page-title.svelte';
   import { page } from '$app/stores';
 
-  export let namespace: string;
+  export let namespace: DescribeNamespaceResponse;
   export let workflows: WorkflowExecution[];
   export let archivalEnabled: boolean = false;
   export let visibilityArchivalEnabled: boolean = false;
@@ -80,7 +80,7 @@
         {#each visibleItems as event}
           <WorkflowsSummaryRow
             workflow={event}
-            {namespace}
+            namespace={namespace.namespaceInfo.name}
             timeFormat={$timeFormat}
           />
         {/each}
@@ -99,7 +99,7 @@
   </h2>
   <p>To enable Visibility Archival:</p>
   <CodeBlock
-    content={`tctl --namespace ${namespace} namespace update -vas enabled`}
+    content={`tctl --namespace ${namespace.namespaceInfo.name} namespace update -vas enabled`}
     language="text"
     inline
   />
@@ -116,14 +116,14 @@
   </h2>
   <p>Run this command to enable Archival for Event Histories:</p>
   <CodeBlock
-    content={`tctl --namespace ${namespace} namespace update --has enabled`}
+    content={`tctl --namespace ${namespace.namespaceInfo.name} namespace update --has enabled`}
     language="text"
     inline
   />
   {#if !visibilityArchivalEnabled}
     <p>To enable Visibility Archival:</p>
     <CodeBlock
-      content={`tctl --namespace ${namespace} namespace update -vas enabled`}
+      content={`tctl --namespace ${namespace.namespaceInfo.name} namespace update -vas enabled`}
       language="text"
       inline
     />

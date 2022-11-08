@@ -13,25 +13,20 @@
 
   import Navigation from '$lib/holocene/navigation/full-nav.svelte';
   import DataEncoderStatus from '$lib/holocene/data-encoder-status.svelte';
-  import { lastUsedNamespace } from '$lib/stores/namespaces';
+  import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
   import { showDataEncoderSettings } from '$lib/stores/show-data-encoder';
   import { clearAuthUser } from '$lib/stores/auth-user';
   import { workflowSorts, workflowFilters } from '$lib/stores/filters';
 
   export let user: User;
 
-  const { showTemporalSystemNamespace } = $page.stuff.settings;
   const { isCloud } = $page.stuff.settings.runtimeEnvironment;
 
-  const namespaces = ($page.stuff.namespaces || [])
-    .map((namespace: Namespace) => namespace?.namespaceInfo?.name)
-    .filter(
-      (namespace: string) =>
-        showTemporalSystemNamespace || namespace !== 'temporal-system',
-    );
-
+  $: namespaceNames = ($namespaces || []).map(
+    (namespace: Namespace) => namespace?.namespaceInfo?.name,
+  );
   $: activeNamespaceName = $page.params?.namespace ?? $lastUsedNamespace;
-  $: activeNamespace = ($page.stuff.namespaces || []).find(
+  $: activeNamespace = ($namespaces || []).find(
     (namespace: Namespace) =>
       namespace?.namespaceInfo?.name === activeNamespaceName,
   );
@@ -44,7 +39,7 @@
     return href;
   }
 
-  let namespaceList = namespaces.map((namespace: string) => {
+  $: namespaceList = namespaceNames.map((namespace: string) => {
     return {
       namespace,
       href: (namespace: string) => getCurrentHref(namespace),
@@ -58,7 +53,7 @@
   });
 
   // To show single namespace on cloud
-  if (isCloud && $page.params.namespace && !namespaces.length) {
+  if (isCloud && $page.params.namespace && !namespaceNames.length) {
     namespaceList.push({
       namespace: $page.params.namespace,
       href: (namespace: string) => routeForWorkflows({ namespace }),

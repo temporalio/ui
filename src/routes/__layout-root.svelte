@@ -1,6 +1,6 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
-  import type { ListNamespacesResponse, GetClusterInfoResponse } from '$types';
+  import type { GetClusterInfoResponse } from '$types';
 
   import '$lib/vendor/prism/prism.css';
   import '$lib/vendor/prism/prism.js';
@@ -13,7 +13,6 @@
   import { fetchNamespaces } from '$lib/services/namespaces-service';
   import { fetchLatestUiVersion } from '$lib/services/github-service';
   import { fetchSearchAttributes } from '$lib/services/search-attributes-service';
-  import { getDefaultNamespace } from '$lib/utilities/get-namespace';
   import { isAuthorized } from '$lib/utilities/is-authorized';
   import { routeForLoginPage } from '$lib/utilities/route-for';
   import {
@@ -39,19 +38,10 @@
       };
     }
 
-    const namespacesResp: ListNamespacesResponse = await fetchNamespaces(
-      settings,
-      fetch,
-    );
-
-    const defaultNamespace: string = getDefaultNamespace({
-      namespaces: namespacesResp?.namespaces,
-      settings,
-    });
+    fetchNamespaces(settings, fetch);
+    fetchSearchAttributes(settings, fetch);
 
     const cluster: GetClusterInfoResponse = await fetchCluster(settings, fetch);
-
-    fetchSearchAttributes(settings, fetch);
 
     const uiVersionInfo: UiVersionInfo = {
       current: settings.version,
@@ -63,8 +53,7 @@
     return {
       props: { user, uiVersionInfo },
       stuff: {
-        namespaces: namespacesResp?.namespaces,
-        settings: { ...settings, defaultNamespace },
+        settings,
         cluster,
       },
     };
