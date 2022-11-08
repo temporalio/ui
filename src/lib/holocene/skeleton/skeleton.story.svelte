@@ -3,6 +3,8 @@
   import Skeleton from './index.svelte';
   import SkeletonTable from './table.svelte';
 
+  let rows: number = 10;
+  let columns: number = 4;
   export let Hst: HST;
 </script>
 
@@ -16,6 +18,11 @@
   </Hst.Variant>
 
   <Hst.Variant title="A Table Skeleton Loader">
-    <SkeletonTable />
+    <SkeletonTable bind:rows bind:columns columnWidths={[10, 25, 50, 15]} />
   </Hst.Variant>
+
+  <svelte:fragment slot="controls">
+    <Hst.Number bind:value={rows} title="Rows: " />
+    <Hst.Number bind:value={columns} title="Columns: " />
+  </svelte:fragment>
 </Hst.Story>

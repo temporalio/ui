@@ -1,20 +1,29 @@
 <script lang="ts">
   import Table from '$lib/holocene/table/table.svelte';
+  import TableHeaderRow from '../table/table-header-row.svelte';
+  import TableRow from '../table/table-row.svelte';
   import Skeleton from './index.svelte';
 
   export let rows = 10;
+  export let columns = 4;
+  export let columnWidths = new Array(columns).fill(100 / columns);
 </script>
 
-<Table class="w-full border" variant="fancy">
-  <tr slot="headers" class="h-8">
-    <th />
-  </tr>
+<Table class="w-full table-fixed" variant="fancy">
+  <TableHeaderRow slot="headers" class="h-8">
+    <slot name="headers">
+      {#each Array.from(new Array(columns)) as _column, i}
+        <th style="width: {columnWidths[i]}%" />
+      {/each}
+    </slot>
+  </TableHeaderRow>
   {#each Array.from(Array(rows).keys()) as _row}
-    <tr class="flex items-center gap-4 p-3">
-      <Skeleton class="h-5 w-44" />
-      <Skeleton class="h-5" />
-      <Skeleton class="h-5 w-96" />
-      <Skeleton class="h-5 w-96" />
-    </tr>
+    <TableRow>
+      {#each Array.from(new Array(columns)) as _column}
+        <td style="padding-right: 0.5rem;">
+          <Skeleton class="h-4 w-full" />
+        </td>
+      {/each}
+    </TableRow>
   {/each}
 </Table>
