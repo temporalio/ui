@@ -9,21 +9,16 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
   import { fetchWorkflowForAuthorization } from '$lib/services/workflow-service';
+  import { namespaces } from '$lib/stores/namespaces';
   import { notifications } from '$lib/stores/notifications';
 
   let searchField: HTMLInputElement = null;
 
-  const showTemporalSystemNamespace =
-    $page.stuff?.settings?.showTemporalSystemNamespace;
+  $: namespaceNames = $namespaces.map(
+    (namespace: Namespace) => namespace?.namespaceInfo?.name,
+  );
 
-  const namespaces = ($page.stuff.namespaces || [])
-    .map((namespace: Namespace) => namespace?.namespaceInfo?.name)
-    .filter(
-      (namespace: string) =>
-        showTemporalSystemNamespace || namespace !== 'temporal-system',
-    );
-
-  const namespaceList: NamespaceItem[] = namespaces.map((namespace: string) => {
+  $: namespaceList = namespaceNames.map((namespace: string) => {
     return {
       namespace,
       onClick: async (namespace: string) => {

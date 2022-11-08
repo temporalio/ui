@@ -10,7 +10,6 @@ declare namespace App {
 
   interface Stuff {
     workflow?: WorkflowExecution;
-    namespaces: ListNamespacesResponse;
     settings: Settings;
     workers?: GetPollersResponse;
     cluster?: ClusterInformation;
