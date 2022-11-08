@@ -13,6 +13,8 @@
   import Option from '$lib/holocene/select/simple-option.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Search from '$lib/components/search.svelte';
+  import { createEventDispatcher } from 'svelte';
+  const dispatch = createEventDispatcher<{ search: undefined }>();
 
   export let searchType: 'basic' | 'advanced';
 
@@ -43,6 +45,7 @@
     };
 
   const updateQuery = (event: SubmitEvent): void => {
+    dispatch('search');
     const data = new FormData(event.target as HTMLFormElement);
     query = String(data.get('query'));
     parameters = toListWorkflowParameters(query);
@@ -55,6 +58,7 @@
   };
 
   const handleParameterChange = debounce(() => {
+    dispatch('search');
     query = toListWorkflowQuery(parameters);
 
     updateQueryParameters({

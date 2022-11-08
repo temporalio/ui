@@ -11,13 +11,14 @@
   import { setContext } from 'svelte';
   import TableHeaderRow from './table-header-row.svelte';
   import Table from './table.svelte';
-  import { type ComponentProps, createEventDispatcher } from 'svelte/internal';
+  import type { ComponentProps } from 'svelte/internal';
 
   type T = $$Generic;
   type Item = T & { id: string };
 
   interface $$Props extends ComponentProps<Table> {
     items: Item[];
+    selectedItems: Item[];
     allSelected?: boolean;
     checkboxLabel?: string;
     class?: string;
@@ -26,21 +27,12 @@
   export let items: Item[];
   export let checkboxLabel: string = null;
   export let allSelected: boolean = false;
-
-  const dispatch = createEventDispatcher<{
-    change: Item[];
-    toggleAll: { selected: boolean };
-  }>();
-
-  let selectedItems: Item[] = [];
+  export let selectedItems: Item[] = [];
 
   const handleSelectAll = (event: CustomEvent<{ checked: boolean }>) => {
     allSelected = !allSelected;
 
     selectedItems = event.detail.checked ? items : [];
-
-    dispatch('toggleAll', { selected: event.detail.checked });
-    dispatch('change', selectedItems);
   };
 
   const handleSelectRow = (
@@ -56,7 +48,6 @@
     }
 
     allSelected = selectedItems.length === items.length;
-    dispatch('change', selectedItems);
   };
 
   $: indeterminate =

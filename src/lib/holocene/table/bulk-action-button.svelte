@@ -1,6 +1,17 @@
-<button
-  on:click
-  class="h-6 rounded border border-red-500 bg-red-100 px-2 py-1 leading-3 text-red-500 hover:border-white hover:bg-blue-700 hover:text-white"
->
+<script lang="ts">
+  export let disabled: boolean = true;
+</script>
+
+<button {disabled} on:click class="bulk-action-button">
   <slot />
 </button>
+
+<style lang="postcss">
+  .bulk-action-button {
+    @apply rounded border border-danger bg-danger px-2 py-1 leading-3 text-white hover:border-white hover:bg-blue-700;
+  }
+
+  .bulk-action-button:disabled {
+    @apply pointer-events-none cursor-not-allowed opacity-75;
+  }
+</style>
