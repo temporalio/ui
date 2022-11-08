@@ -155,7 +155,7 @@ const getSummaryAttribute = (event: WorkflowEvent): SummaryAttribute => {
   if (isLocalActivityMarkerEvent(event as MarkerRecordedEvent)) {
     const payload: any =
       event.markerRecordedEventAttributes?.details?.data?.payloads?.[0];
-    const activityType = payload?.ActivityType;
+    const activityType = payload?.ActivityType ?? payload?.activity_type;
     if (activityType) {
       return formatSummaryValue('ActivityType', activityType);
     }

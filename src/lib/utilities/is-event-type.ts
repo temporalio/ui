@@ -331,6 +331,6 @@ export const isLocalActivityMarkerEvent = (event) => {
   return (
     isMarkerRecordedEvent(event) &&
     event?.markerRecordedEventAttributes?.markerName === 'LocalActivity' &&
-    Boolean(payload?.ActivityType)
+    Boolean(payload?.ActivityType ?? payload?.activity_type)
   );
 };
