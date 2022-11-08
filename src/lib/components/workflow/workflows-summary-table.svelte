@@ -47,6 +47,7 @@
       <th class="hidden h-10 md:table-cell md:w-60 xl:w-auto">
         {#if terminableWorkflowCount > 0}
           <BulkActionButton
+            dataCy="bulk-terminate-button"
             disabled={terminateDisabled}
             on:click={handleBulkTerminate}>Terminate</BulkActionButton
           >
