@@ -1,8 +1,10 @@
 <script lang="ts">
+  import { page } from '$app/stores';
   import BulkActionButton from '$lib/holocene/table/bulk-action-button.svelte';
   import SelectableTable from '$lib/holocene/table/selectable-table.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
+  import { coreUserStore } from '$lib/stores/core-user';
   import { createEventDispatcher } from 'svelte';
 
   const dispatch = createEventDispatcher<{ terminateWorkflows: undefined }>();
@@ -17,6 +19,9 @@
   const handleBulkTerminate = () => {
     dispatch('terminateWorkflows');
   };
+
+  let coreUser = coreUserStore();
+  $: terminateDisabled = $coreUser.terminateDisabled($page.params.namespace);
 </script>
 
 {#if bulkActionsEnabled}
@@ -41,8 +46,9 @@
       </th>
       <th class="hidden h-10 md:table-cell md:w-60 xl:w-auto">
         {#if terminableWorkflowCount > 0}
-          <BulkActionButton on:click={handleBulkTerminate}
-            >Terminate</BulkActionButton
+          <BulkActionButton
+            disabled={terminateDisabled}
+            on:click={handleBulkTerminate}>Terminate</BulkActionButton
           >
         {:else}
           <span class="whitespace-nowrap italic"
