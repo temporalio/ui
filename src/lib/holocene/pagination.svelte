@@ -6,6 +6,7 @@
     pagination,
     perPageFromSearchParameter,
     options,
+    defaultItemsPerPage,
   } from '$lib/stores/pagination';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
@@ -29,6 +30,12 @@
       updateQueryParameters({
         parameter: perPageKey,
         value: MAX_PAGE_SIZE,
+        url: $page.url,
+      });
+    } else if (!options.includes(perPage)) {
+      updateQueryParameters({
+        parameter: perPageKey,
+        value: defaultItemsPerPage,
         url: $page.url,
       });
     }
