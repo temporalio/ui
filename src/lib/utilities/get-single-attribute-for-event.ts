@@ -1,6 +1,7 @@
 import { isEventGroup } from '$lib/models/event-groups';
 import { capitalize } from '$lib/utilities/format-camel-case';
 import type { CombinedAttributes } from './format-event-attributes';
+import { isLocalActivityMarkerEvent } from './is-event-type';
 
 type SummaryAttribute = {
   key: string;
@@ -150,6 +151,15 @@ const getFirstDisplayAttribute = ({
  */
 const getSummaryAttribute = (event: WorkflowEvent): SummaryAttribute => {
   const first = getFirstDisplayAttribute(event);
+
+  if (isLocalActivityMarkerEvent(event as MarkerRecordedEvent)) {
+    const payload: any =
+      event.markerRecordedEventAttributes?.details?.data?.payloads?.[0];
+    const activityType = payload?.ActivityType ?? payload?.activity_type;
+    if (activityType) {
+      return formatSummaryValue('ActivityType', activityType);
+    }
+  }
 
   for (const [key, value] of Object.entries(event.attributes)) {
     for (const preferredKey of preferredSummaryKeys) {

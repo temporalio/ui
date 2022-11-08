@@ -22,6 +22,7 @@
   import EventDetailsRow from './event-details-row.svelte';
   import EventDetailsFull from './event-details-full.svelte';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
+  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
 
   export let event: IterableEvent;
   export let groups: EventGroups;
@@ -120,7 +121,10 @@
       {#if compact && terminated}
         <Icon class="inline text-pink-700" name="clock" />
       {/if}
-      {getTruncatedWord(event.name, truncateWidth - 30)}
+      {getTruncatedWord(
+        isLocalActivityMarkerEvent(event) ? 'LocalActivity' : event.name,
+        truncateWidth - 30,
+      )}
     </p>
   </td>
   <td class="cell links">
