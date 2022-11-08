@@ -5,7 +5,7 @@
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
 
   import { createPaginationStore } from '$lib/stores/api-pagination';
-  import { perPageOptions } from '$lib/stores/pagination';
+  import { options } from '$lib/stores/pagination';
 
   type T = $$Generic;
   type PaginatedRequest = (
@@ -101,7 +101,7 @@
           label="Per Page"
           parameter={$store.key}
           value={String($store.pageSize)}
-          options={perPageOptions($store.pageSize)}
+          {options}
         />
         <div class="flex items-center justify-center gap-1">
           <button
@@ -142,7 +142,7 @@
           label="Per Page"
           parameter={$store.key}
           value={String($store.pageSize)}
-          options={perPageOptions($store.pageSize)}
+          {options}
         />
         <div class="flex items-center justify-center gap-1">
           <button
