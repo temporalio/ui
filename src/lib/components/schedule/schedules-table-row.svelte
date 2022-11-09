@@ -35,7 +35,7 @@
     </p>
   </td>
   <td class="cell hidden whitespace-pre-line break-words md:table-cell">
-    {schedule?.info?.workflowType?.name}
+    {schedule?.info?.workflowType?.name ?? ''}
   </td>
   <td class="cell links hidden truncate xl:table-cell">
     {#each schedule?.info?.recentActions
