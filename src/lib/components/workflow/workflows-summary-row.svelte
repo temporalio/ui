@@ -10,7 +10,11 @@
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import FilterOrCopyButtons from '$holocene/filter-or-copy-buttons.svelte';
-  import TableRow from '$holocene/table/table-row.svelte';
+  import SelectableTableRow from '$holocene/table/selectable-table-row.svelte';
+  import TableRow from '$lib/holocene/table/table-row.svelte';
+
+  export let bulkActionsEnabled: boolean = false;
+  export let selected: boolean = false;
   export let namespace: string;
   export let workflow: WorkflowExecution;
   export let timeFormat: TimeFormat | string;
@@ -41,7 +45,13 @@
   };
 </script>
 
-<TableRow {href} class="workflow-summary-row">
+<svelte:component
+  this={bulkActionsEnabled ? SelectableTableRow : TableRow}
+  item={workflow}
+  {selected}
+  {href}
+  class="workflow-summary-row"
+>
   <td>
     <WorkflowStatus
       status={workflow.status}
@@ -98,7 +108,7 @@
       {formatDate(workflow.endTime, timeFormat)}
     </p>
   </td>
-</TableRow>
+</svelte:component>
 
 <style lang="postcss">
   :global(.workflow-summary-row:hover) {

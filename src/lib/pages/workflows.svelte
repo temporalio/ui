@@ -11,10 +11,8 @@
     workflowError,
   } from '$lib/stores/workflows';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
-  import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
   import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
   import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -24,8 +22,25 @@
   import { getSearchType } from '$lib/utilities/search-type-parameter';
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
   import Loading from '$lib/holocene/loading.svelte';
+  import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
+  import { toaster } from '$lib/holocene/toaster.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
+  import {
+    batchTerminateWorkflows,
+    pollBatchOperation,
+  } from '$lib/services/terminate-service';
+  import Input from '$lib/holocene/input/input.svelte';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import { pluralize } from '$lib/utilities/pluralize';
+
+  export let bulkActionsEnabled: boolean = false;
 
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
+  let selectedWorkflows: WorkflowExecution[] = [];
+  let terminationReason: string = '';
+  let showBulkOperationConfirmationModal: boolean = false;
+  let allSelected: boolean = false;
+  let terminating: boolean = false;
 
   const errorMessage =
     searchType === 'advanced'
@@ -36,8 +51,51 @@
     $lastUsedNamespace = $page.params.namespace;
   });
 
+  const resetSelection = () => {
+    allSelected = false;
+    selectedWorkflows = [];
+  };
+
   const refreshWorkflows = () => {
+    resetSelection();
     $refresh = Date.now();
+  };
+
+  const handleBulkTerminate = () => {
+    showBulkOperationConfirmationModal = true;
+  };
+
+  const terminateWorkflows = async () => {
+    terminating = true;
+    const { namespace } = $page.params;
+    try {
+      const jobId = await batchTerminateWorkflows({
+        namespace,
+        workflowExecutions: terminableWorkflows,
+        reason: terminationReason,
+      });
+
+      await pollBatchOperation({ namespace, jobId });
+    } catch (error) {
+      showBulkOperationConfirmationModal = false;
+      toaster.push({
+        variant: 'error',
+        message: 'Unable to terminate workflows.',
+      });
+
+      return;
+    }
+
+    toaster.push({
+      variant: 'primary',
+      message: `Successfully terminated ${terminableWorkflows.length} workflows.`,
+    });
+    selectedWorkflows = [];
+    allSelected = false;
+    terminating = false;
+    showBulkOperationConfirmationModal = false;
+    terminationReason = '';
+    updateQueryParameters({ parameter: 'query', value: '', url: $page.url });
   };
 
   onDestroy(() => {
@@ -45,7 +103,38 @@
     const parameters = query ? toListWorkflowParameters(query) : {};
     $workflowsSearch = { parameters, searchType };
   });
+
+  $: terminableWorkflows = selectedWorkflows.filter(
+    (workflows) => workflows.canBeTerminated,
+  );
 </script>
+
+<Modal
+  open={showBulkOperationConfirmationModal}
+  confirmText="Terminate"
+  confirmType="destructive"
+  confirmDisabled={terminationReason === ''}
+  loading={terminating}
+  on:cancelModal={() => (showBulkOperationConfirmationModal = false)}
+  on:confirmModal={terminateWorkflows}
+>
+  <h3 slot="title">Terminate Workflows</h3>
+  <svelte:fragment slot="content">
+    <p class="mb-2">
+      Are you sure you want to terminate <strong
+        >{terminableWorkflows.length} running {pluralize(
+          'workflow',
+          terminableWorkflows.length,
+        )}</strong
+      >? This action cannot be undone.
+    </p>
+    <Input
+      id="bulk-terminate-reason"
+      bind:value={terminationReason}
+      placeholder="Enter a reason"
+    />
+  </svelte:fragment>
+</Modal>
 
 <div class="mb-2 flex justify-between">
   <div>
@@ -65,14 +154,24 @@
     >
   </div>
 </div>
-<WorkflowFilters bind:searchType />
+<WorkflowFilters on:search={resetSelection} bind:searchType />
 <Pagination items={$workflows} let:visibleItems>
-  <WorkflowsSummaryTable updating={$updating}>
+  <WorkflowsSummaryTable
+    {bulkActionsEnabled}
+    updating={$updating}
+    visibleWorkflows={visibleItems}
+    terminableWorkflowCount={terminableWorkflows.length}
+    bind:selectedWorkflows
+    bind:allSelected
+    on:terminateWorkflows={handleBulkTerminate}
+  >
     {#each visibleItems as event}
       <WorkflowsSummaryRow
+        {bulkActionsEnabled}
         workflow={event}
         namespace={$page.params.namespace}
         timeFormat={$timeFormat}
+        selected={selectedWorkflows.includes(event)}
       />
     {:else}
       <TableRow>

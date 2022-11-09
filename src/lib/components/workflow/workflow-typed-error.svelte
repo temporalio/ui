@@ -84,7 +84,7 @@
       title: 'Missing Search Attributes',
       copy: 'It looks like you might be missing search attributes, which might cause workflow tasks to continue to retry without success.',
       actionCopy: 'configuring search attributes',
-      link: 'https://docs.temporal.io/concepts/what-is-a-search-attribute/',
+      link: 'https://docs.temporal.io/visibility#search-attribute',
     },
     NonDeterministicError: {
       title: 'Cause Non Deterministic Error',

@@ -1,6 +1,7 @@
 import {
   isActivityTaskScheduledEvent,
   isMarkerRecordedEvent,
+  isLocalActivityMarkerEvent,
   isSignalExternalWorkflowExecutionInitiatedEvent,
   isStartChildWorkflowExecutionInitiatedEvent,
   isWorkflowExecutionSignaledEvent,
@@ -22,6 +23,7 @@ type StartingEvents = {
   Timer: TimerStartedEvent;
   Signal: SignalExternalWorkflowExecutionInitiatedEvent;
   SignalReceived: WorkflowExecutionSignaledEvent;
+  LocalActivity: MarkerRecordedEvent;
   Marker: MarkerRecordedEvent;
 };
 
@@ -88,5 +90,10 @@ export const createEventGroup = (event: CommonHistoryEvent): EventGroup => {
   if (isWorkflowExecutionSignaledEvent(event))
     return createGroupFor<'SignalReceived'>(event);
 
-  if (isMarkerRecordedEvent(event)) return createGroupFor<'Marker'>(event);
+  if (isMarkerRecordedEvent(event)) {
+    if (isLocalActivityMarkerEvent(event)) {
+      return createGroupFor<'LocalActivity'>(event);
+    }
+    return createGroupFor<'Marker'>(event);
+  }
 };

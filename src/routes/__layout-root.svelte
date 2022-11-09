@@ -1,6 +1,6 @@
 <script context="module" lang="ts">
   import type { Load } from '@sveltejs/kit';
-  import type { ListNamespacesResponse, GetClusterInfoResponse } from '$types';
+  import type { GetClusterInfoResponse } from '$types';
 
   import '$lib/vendor/prism/prism.css';
   import '$lib/vendor/prism/prism.js';
@@ -13,7 +13,6 @@
   import { fetchNamespaces } from '$lib/services/namespaces-service';
   import { fetchLatestUiVersion } from '$lib/services/github-service';
   import { fetchSearchAttributes } from '$lib/services/search-attributes-service';
-  import { getDefaultNamespace } from '$lib/utilities/get-namespace';
   import { isAuthorized } from '$lib/utilities/is-authorized';
   import { routeForLoginPage } from '$lib/utilities/route-for';
   import {
@@ -39,19 +38,10 @@
       };
     }
 
-    const namespacesResp: ListNamespacesResponse = await fetchNamespaces(
-      settings,
-      fetch,
-    );
-
-    const defaultNamespace: string = getDefaultNamespace({
-      namespaces: namespacesResp?.namespaces,
-      settings,
-    });
+    fetchNamespaces(settings, fetch);
+    fetchSearchAttributes(settings, fetch);
 
     const cluster: GetClusterInfoResponse = await fetchCluster(settings, fetch);
-
-    fetchSearchAttributes(settings, fetch);
 
     const uiVersionInfo: UiVersionInfo = {
       current: settings.version,
@@ -63,8 +53,7 @@
     return {
       props: { user, uiVersionInfo },
       stuff: {
-        namespaces: namespacesResp?.namespaces,
-        settings: { ...settings, defaultNamespace },
+        settings,
         cluster,
       },
     };
@@ -78,6 +67,7 @@
   import Banners from '$lib/components/banner/banners.svelte';
   import { ErrorBoundary } from '$lib/components/error-boundary';
   import ScrollToTop from '$lib/holocene/scroll-to-top.svelte';
+  import Toaster, { toaster } from '$lib/holocene/toaster.svelte';
 
   export let user: User;
   export let uiVersionInfo: UiVersionInfo;
@@ -92,6 +82,7 @@
 
 <div class="flex w-screen flex-row">
   <Notifications />
+  <Toaster pop={toaster.pop} toasts={toaster.toasts} />
   <div class="sticky top-0 z-20 h-screen w-auto">
     <Header {user} />
   </div>

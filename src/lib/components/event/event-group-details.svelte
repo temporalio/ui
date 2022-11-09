@@ -4,6 +4,7 @@
     eventOrGroupIsCanceled,
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
+  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
 
   export let eventGroup: EventGroup | null;
   export let selectedId: string;
@@ -24,7 +25,9 @@
             class:failure={eventOrGroupIsFailureOrTimedOut(eventInGroup)}
             class:canceled={eventOrGroupIsCanceled(eventInGroup)}
             class:terminated={eventOrGroupIsTerminated(eventInGroup)}
-            >{eventInGroup.eventType}</span
+            >{isLocalActivityMarkerEvent(eventInGroup)
+              ? 'LocalActivity'
+              : eventInGroup.eventType}</span
           >
         </div>
       </li>

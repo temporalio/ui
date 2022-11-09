@@ -10,6 +10,7 @@
   export let confirmType: 'destructive' | 'primary' = 'primary';
   export let confirmDisabled: boolean = false;
   export let large: boolean = false;
+  export let loading: boolean = false;
 
   const dispatch = createEventDispatcher<{
     cancelModal: undefined;
@@ -32,12 +33,14 @@
   <div class="modal">
     <div on:click={cancelModal} class="overlay" />
     <div class="body" class:large>
-      <div class="float-right p-6" on:click={cancelModal}>
-        <Icon
-          name="close"
-          class="cursor-pointer rounded-full hover:bg-gray-900 hover:text-white"
-        />
-      </div>
+      {#if !loading}
+        <div class="float-right p-6" on:click={cancelModal}>
+          <Icon
+            name="close"
+            class="cursor-pointer rounded-full hover:bg-gray-900 hover:text-white"
+          />
+        </div>
+      {/if}
       <div class="title">
         <slot name="title">
           <h3>Title</h3>
@@ -49,14 +52,18 @@
         </slot>
       </div>
       <div class="flex items-center justify-end space-x-2 p-6">
-        <Button thin variant="secondary" on:click={cancelModal}
-          >{cancelText}</Button
+        <Button
+          thin
+          variant="secondary"
+          disabled={loading}
+          on:click={cancelModal}>{cancelText}</Button
         >
         {#if !hideConfirm}
           <Button
             thin
             variant={confirmType}
-            disabled={confirmDisabled}
+            {loading}
+            disabled={confirmDisabled || loading}
             on:click={() => dispatch('confirmModal')}>{confirmText}</Button
           >
         {/if}
@@ -75,7 +82,7 @@
   }
 
   .body {
-    @apply z-50 mx-auto w-full overflow-y-auto rounded-lg  bg-white text-gray-900 shadow-xl md:h-max lg:w-1/3;
+    @apply z-50 mx-auto w-full max-w-md overflow-y-auto rounded-lg bg-white text-gray-900 shadow-xl md:h-max;
   }
 
   .large {

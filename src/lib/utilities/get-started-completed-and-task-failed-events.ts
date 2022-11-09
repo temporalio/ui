@@ -1,5 +1,6 @@
 import { isWorkflowExecutionCompletedEvent } from './is-event-type';
 import { stringifyWithBigInt } from './parse-with-big-int';
+import type { EventSortOrder } from '$lib/stores/event-view';
 
 type WorkflowInputAndResults = {
   input: string;
@@ -60,6 +61,7 @@ const getEventResult = (event: CompletionEvent) => {
 
 export const getWorkflowStartedCompletedAndTaskFailedEvents = (
   events: WorkflowEvents,
+  eventSortOrder: EventSortOrder = 'descending',
 ): WorkflowInputAndResults => {
   let input: string;
   let results: string;
@@ -78,10 +80,15 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
       workflowCompletedEvent = event;
       continue;
     } else if (isCompletedTaskEvent(event)) {
-      // If there is a completed workflow task
-      hasCompletedTaskEvent = true;
+      // If there is a completed workflow task after a failed task
+      if (eventSortOrder === 'descending') {
+        // then we don't need to look for a failed task
+        hasCompletedTaskEvent = true;
+      } else if (eventSortOrder === 'ascending' && workflowTaskFailedEvent) {
+        // or we need to reset the failed event
+        workflowTaskFailedEvent = undefined;
+      }
       continue;
-      // then we don't need to look for a failed task
     } else if (!hasCompletedTaskEvent && isFailedTaskEvent(event)) {
       workflowTaskFailedEvent = event;
       continue;

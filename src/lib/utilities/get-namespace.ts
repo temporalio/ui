@@ -6,11 +6,6 @@ type GetNamespaceParameters = {
   namespaces: DescribeNamespaceResponse[];
 };
 
-type GetDefaultNamespaceParameters = {
-  namespaces: DescribeNamespaceResponse[];
-  settings: Settings;
-};
-
 export const getNamespace = ({
   namespace,
   defaultNamespace,
@@ -24,26 +19,4 @@ export const getNamespace = ({
   }
 
   return undefined;
-};
-
-export const getDefaultNamespace = ({
-  namespaces = [],
-  settings,
-}: GetDefaultNamespaceParameters): string => {
-  const { showTemporalSystemNamespace, defaultNamespace } = settings;
-
-  const namespaceNames = namespaces
-    .map(
-      (namespace: DescribeNamespaceResponse) => namespace?.namespaceInfo?.name,
-    )
-    .filter(
-      (namespace: string) =>
-        showTemporalSystemNamespace || namespace !== 'temporal-system',
-    );
-
-  return (
-    namespaceNames.find((ns) => ns === defaultNamespace) ??
-    namespaceNames[0] ??
-    defaultNamespace
-  );
 };
