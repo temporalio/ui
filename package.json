@@ -19,7 +19,7 @@
     "test": "TZ=UTC vitest",
     "preview:local": "VITE_TEMPORAL_UI_BUILD_TARGET=local vite preview --port 3000",
     "preview:cloud": "VITE_TEMPORAL_UI_BUILD_TARGET=cloud vite preview --port 3000",
-    "check": "VITE_TEMPORAL_UI_BUILD_TARGET=local svelte-check --tsconfig ./tsconfig.json",
+    "check": "VITE_TEMPORAL_UI_BUILD_TARGET=local svelte-check --threshold error --tsconfig ./tsconfig.json",
     "check:watch": "VITE_TEMPORAL_UI_BUILD_TARGET=local svelte-check --tsconfig ./tsconfig.json --watch",
     "check:local": "VITE_TEMPORAL_UI_BUILD_TARGET=local svelte-check --tsconfig ./tsconfig.json",
     "check:local:watch": "VITE_TEMPORAL_UI_BUILD_TARGET=local svelte-check --tsconfig ./tsconfig.json --watch",
