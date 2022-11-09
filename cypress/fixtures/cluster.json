@@ -7,7 +7,7 @@
     "temporal-server": "\u003c2.0.0",
     "temporal-typescript": "\u003c2.0.0"
   },
-  "serverVersion": "1.18.3",
+  "serverVersion": "1.16.2",
   "clusterId": "fe325f09-1d00-45c0-8924-ce6f0e465258",
   "versionInfo": {
     "current": {

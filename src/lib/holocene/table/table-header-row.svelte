@@ -11,6 +11,7 @@
   <th class:selectable>
     {#if selectable}
       <Checkbox
+        id="selectable-table-check-all"
         onDark
         bind:checked={selected}
         {indeterminate}

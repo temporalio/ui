@@ -26,6 +26,7 @@
 
 {#if bulkActionsEnabled}
   <SelectableTable
+    id="workflows-table-with-bulk-actions"
     class="w-full md:table-fixed"
     bind:allSelected
     bind:selectedItems={selectedWorkflows}
