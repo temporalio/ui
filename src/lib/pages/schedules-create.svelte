@@ -64,7 +64,14 @@
     submitCreateSchedule({ action, spec, presets });
   };
 
-  $: disabled = !name || !workflowType || !workflowId || !taskQueue;
+  $: isDisabled = (preset: SchedulePreset) => {
+    if (!name || !workflowType || !workflowId || !taskQueue) return true;
+    if (preset === 'interval') return !days && !hour && !minute && !second;
+    if (preset === 'week') return !daysOfWeek.length;
+    if (preset === 'month') return !daysOfMonth.length || !months.length;
+    if (preset === 'string') return !cronString;
+    return false;
+  };
 </script>
 
 <article class="pb-20">
@@ -143,8 +150,9 @@
         bind:cronString
       >
         <div class="mt-8 flex items-center gap-8">
-          <Button {disabled} on:click={() => handleClick(preset)}
-            >Create Schedule</Button
+          <Button
+            disabled={isDisabled(preset)}
+            on:click={() => handleClick(preset)}>Create Schedule</Button
           >
 
           <a

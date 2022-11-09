@@ -4,8 +4,8 @@
   import Panel from '$lib/components/panel.svelte';
   import ScheduleFrequency from './schedule-frequency.svelte';
 
-  export let calendar: CalendarSpec;
-  export let interval: IntervalSpec;
+  export let calendar: CalendarSpec | undefined = undefined;
+  export let interval: IntervalSpec | undefined = undefined;
 </script>
 
 <Panel>

@@ -9,7 +9,7 @@ type ScheduleActionParameters = {
   workflowType: string;
   workflowId: string;
   taskQueue: string;
-}
+};
 
 type ScheduleSpecParameters = {
   dayOfWeek: string;
@@ -20,7 +20,7 @@ type ScheduleSpecParameters = {
   second: string;
   phase: string;
   cronString: string;
-}
+};
 
 // For UI Only
 type SchedulePresetsParameters = {
@@ -31,4 +31,6 @@ type SchedulePresetsParameters = {
   months: string[];
 };
 
-type ScheduleParameters = ScheduleRequiredParameters & ScheduleSpecParameters & ScheduleUISpecParameters;
+type ScheduleParameters = ScheduleRequiredParameters &
+  ScheduleSpecParameters &
+  ScheduleUISpecParameters;

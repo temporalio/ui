@@ -61,8 +61,13 @@ export const calendarToComment = ({
   return comment;
 };
 
-export const intervalToComment = (interval: string, offset = false): string => {
+export const intervalToComment = (
+  interval: string = '',
+  offset = false,
+): string => {
   let comment = '';
+  if (!interval) return comment;
+
   const intervalAsNumber = parseInt(interval.slice(0, -1));
 
   let days = Math.floor(intervalAsNumber / (60 * 60 * 24));

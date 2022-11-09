@@ -2,8 +2,8 @@
   import { intervalToComment } from '$lib/utilities/schedule-comment-formatting';
   import type { CalendarSpec, IntervalSpec } from '$types';
 
-  export let calendar: CalendarSpec;
-  export let interval: IntervalSpec;
+  export let calendar: CalendarSpec | undefined = undefined;
+  export let interval: IntervalSpec | undefined = undefined;
 </script>
 
 <div class="flex flex-col {$$props.class}">

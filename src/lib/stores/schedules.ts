@@ -18,7 +18,11 @@ import {
 // "timezoneName": "string",
 // "timezoneData": "string"
 
-const setBodySpec = (body: DescribeSchedule, spec: ScheduleSpecParameters, presets: SchedulePresetsParameters) => {
+const setBodySpec = (
+  body: DescribeSchedule,
+  spec: ScheduleSpecParameters,
+  presets: SchedulePresetsParameters,
+) => {
   const { hour, minute, second, phase, cronString } = spec;
   const { preset, months, days, daysOfMonth, daysOfWeek } = presets;
   if (preset === 'string') {
@@ -62,11 +66,13 @@ const setBodySpec = (body: DescribeSchedule, spec: ScheduleSpecParameters, prese
     body.schedule.spec.interval = [];
     body.schedule.spec.cronString = [];
   }
-}
+};
 
-export const submitCreateSchedule = async (
-  { action, spec, presets }: ScheduleParameters
-): Promise<void> => {
+export const submitCreateSchedule = async ({
+  action,
+  spec,
+  presets,
+}: ScheduleParameters): Promise<void> => {
   const { namespace, name, workflowId, workflowType, taskQueue } = action;
   const body: DescribeSchedule = {
     schedule_id: name,
@@ -86,14 +92,14 @@ export const submitCreateSchedule = async (
     },
   };
 
-  setBodySpec(body, spec, presets)
+  setBodySpec(body, spec, presets);
 
   // Wait 2 seconds for create to get it on fetchAllSchedules
   loading.set(true);
   const { error: err } = await createSchedule({
     namespace,
     body,
-  })
+  });
 
   if (err) {
     error.set(err);
@@ -124,15 +130,15 @@ export const submitEditSchedule = async (
           workflowId,
           workflowType: { name: workflowType },
           taskQueue: { name: taskQueue },
-        }
+        },
       },
-    }
+    },
   };
 
   if (preset === 'existing') {
     body.schedule.spec = schedule.spec;
   } else {
-    setBodySpec(body, spec, presets)
+    setBodySpec(body, spec, presets);
     body.schedule.spec.structuredCalendar = [];
   }
 
@@ -142,7 +148,7 @@ export const submitEditSchedule = async (
     namespace,
     scheduleId,
     body,
-  })
+  });
 
   if (err) {
     error.set(err);
