@@ -32,6 +32,7 @@
   import Input from '$lib/holocene/input/input.svelte';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { pluralize } from '$lib/utilities/pluralize';
+  import Error from '$lib/holocene/icon/svg/error.svelte';
 
   export let bulkActionsEnabled: boolean = false;
 
