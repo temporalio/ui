@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { submitScheduleForm, loading, error } from '$lib/stores/schedules';
+  import { submitCreateSchedule, loading, error } from '$lib/stores/schedules';
 
   import Icon from '$holocene/icon/icon.svelte';
 
@@ -40,23 +40,28 @@
   };
 
   const handleClick = (preset: SchedulePreset) => {
-    submitScheduleForm({
+    const action: ScheduleActionParameters = {
       namespace,
-      preset,
       name,
       workflowType,
       workflowId,
       taskQueue,
-      daysOfWeek,
-      daysOfMonth,
-      months,
-      days,
+    };
+    const spec: Partial<ScheduleSpecParameters> = {
       hour,
       minute,
       second,
       phase,
       cronString,
-    });
+    };
+    const presets: SchedulePresetsParameters = {
+      preset,
+      daysOfWeek,
+      daysOfMonth,
+      months,
+      days,
+    };
+    submitCreateSchedule({ action, spec, presets });
   };
 
   $: disabled = !name || !workflowType || !workflowId || !taskQueue;

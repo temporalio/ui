@@ -3,13 +3,15 @@ type ScheduleSpec = import('$types').ScheduleSpec;
 
 type SchedulePreset = 'existing' | 'interval' | 'week' | 'month' | 'string';
 
-type ScheduleParameters = {
+type ScheduleActionParameters = {
   namespace: string;
-  preset: SchedulePreset;
   name: string;
   workflowType: string;
   workflowId: string;
   taskQueue: string;
+}
+
+type ScheduleSpecParameters = {
   dayOfWeek: string;
   dayOfMonth: string;
   month: string;
@@ -18,10 +20,15 @@ type ScheduleParameters = {
   second: string;
   phase: string;
   cronString: string;
+}
 
-  // For UI
+// For UI Only
+type SchedulePresetsParameters = {
+  preset: SchedulePreset;
   days: string;
   daysOfWeek: string[];
   daysOfMonth: number[];
   months: string[];
 };
+
+type ScheduleParameters = ScheduleRequiredParameters & ScheduleSpecParameters & ScheduleUISpecParameters;

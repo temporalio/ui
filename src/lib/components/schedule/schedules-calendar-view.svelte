@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Schedule } from '$types';
   import Tab from '$lib/holocene/tab.svelte';
   import SchedulesIntervalView from './schedules-interval-view.svelte';
   import ScheduleDayOfWeekView from './schedule-day-of-week-view.svelte';
@@ -11,7 +12,7 @@
 
   let preset: SchedulePreset = scheduleId ? 'existing' : 'interval';
 
-  export let schedule: DescribeSchedule | null = null;
+  export let schedule: Schedule | null = null;
   export let daysOfWeek: string[];
   export let daysOfMonth: number[];
   export let months: string[];

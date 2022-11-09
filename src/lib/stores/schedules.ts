@@ -1,5 +1,6 @@
 import { goto } from '$app/navigation';
 import { writable } from 'svelte/store';
+import type { Schedule } from '$types';
 
 import { routeForSchedule, routeForSchedules } from '$lib/utilities/route-for';
 
@@ -10,61 +11,26 @@ import {
   timeToInterval,
 } from '$lib/utilities/schedule-data-formatting';
 
-// TODO: Post Alpha, add support of additional fields.
+// TODO: Post Beta, add support of additional fields.
 // "startTime": "2022-07-04T03:18:59.668Z",
 // "endTime": "2022-07-04T03:18:59.668Z",
 // "jitter": "string",
 // "timezoneName": "string",
 // "timezoneData": "string"
 
-export const submitScheduleForm = async (
-  {
-    namespace,
-    preset,
-    name,
-    workflowType,
-    workflowId,
-    taskQueue,
-    daysOfWeek,
-    daysOfMonth,
-    months,
-    days,
-    hour,
-    minute,
-    second,
-    phase,
-    cronString,
-  }: Partial<ScheduleParameters>,
-  schedule?: DescribeSchedule,
-  scheduleId?: string,
-): Promise<void> => {
-  const body: DescribeSchedule = {
-    schedule_id: name,
-    schedule: {
-      spec: {
-        calendar: [],
-        interval: [],
-        cronString: [],
-      },
-      action: {
-        startWorkflow: {
-          workflowId,
-          workflowType: { name: workflowType },
-          taskQueue: { name: taskQueue },
-        },
-      },
-    },
-  };
-
-  if (preset === 'existing' && schedule) {
-    body.schedule.spec = schedule.spec;
-  } else if (preset === 'string') {
+const setBodySpec = (body: DescribeSchedule, spec: ScheduleSpecParameters, presets: SchedulePresetsParameters) => {
+  const { hour, minute, second, phase, cronString } = spec;
+  const { preset, months, days, daysOfMonth, daysOfWeek } = presets;
+  if (preset === 'string') {
     // Add the cronString as a comment to the cronString to view it for frequency
     const cronStringWithComment = `${cronString}#${cronString}`;
     body.schedule.spec.cronString = [cronStringWithComment];
+    body.schedule.spec.calendar = [];
+    body.schedule.spec.interval = [];
   } else if (preset === 'interval') {
     const interval = timeToInterval(days, hour, minute, second);
     body.schedule.spec.interval = [{ interval, phase: phase || '0s' }];
+    body.schedule.spec.cronString = [];
     body.schedule.spec.calendar = [];
   } else {
     const { month, dayOfMonth, dayOfWeek } = convertDaysAndMonths({
@@ -81,7 +47,6 @@ export const submitScheduleForm = async (
       minute,
       second,
     });
-    body.schedule.spec.interval = [];
     body.schedule.spec.calendar = [
       {
         year: '*',
@@ -94,41 +59,100 @@ export const submitScheduleForm = async (
         comment,
       },
     ];
+    body.schedule.spec.interval = [];
+    body.schedule.spec.cronString = [];
   }
-  // // Wait 2 seconds for create to get it on fetchAllSchedules
-  loading.set(true);
+}
 
-  if (schedule && scheduleId) {
-    const { error: err } = await editSchedule({
-      namespace,
-      scheduleId,
-      body,
-    });
-    if (err) {
-      error.set(err);
-      loading.set(false);
-    } else {
-      setTimeout(() => {
-        goto(routeForSchedule({ namespace, scheduleId: name }));
-        loading.set(false);
-        error.set('');
-      }, 2000);
-    }
+export const submitCreateSchedule = async (
+  { action, spec, presets }: ScheduleParameters
+): Promise<void> => {
+  const { namespace, name, workflowId, workflowType, taskQueue } = action;
+  const body: DescribeSchedule = {
+    schedule_id: name,
+    schedule: {
+      spec: {
+        calendar: [],
+        interval: [],
+        cronString: [],
+      },
+      action: {
+        startWorkflow: {
+          workflowId: workflowId,
+          workflowType: { name: workflowType },
+          taskQueue: { name: taskQueue },
+        },
+      },
+    },
+  };
+
+  setBodySpec(body, spec, presets)
+
+  // Wait 2 seconds for create to get it on fetchAllSchedules
+  loading.set(true);
+  const { error: err } = await createSchedule({
+    namespace,
+    body,
+  })
+
+  if (err) {
+    error.set(err);
+    loading.set(false);
   } else {
-    const { error: err } = await createSchedule({
-      namespace,
-      body,
-    });
-    if (err) {
-      error.set(err);
+    setTimeout(() => {
+      error.set('');
       loading.set(false);
-    } else {
-      setTimeout(() => {
-        goto(routeForSchedules({ namespace }));
-        loading.set(false);
-        error.set('');
-      }, 2000);
+      goto(routeForSchedules({ namespace }));
+    }, 2000);
+  }
+};
+
+export const submitEditSchedule = async (
+  { action, spec, presets }: ScheduleParameters,
+  schedule: Schedule,
+  scheduleId: string,
+): Promise<void> => {
+  const { namespace, name, workflowId, workflowType, taskQueue } = action;
+  const { preset } = presets;
+
+  const body: DescribeSchedule = {
+    schedule: {
+      ...schedule,
+      action: {
+        startWorkflow: {
+          ...schedule.action.startWorkflow,
+          workflowId,
+          workflowType: { name: workflowType },
+          taskQueue: { name: taskQueue },
+        }
+      },
     }
+  };
+
+  if (preset === 'existing') {
+    body.schedule.spec = schedule.spec;
+  } else {
+    setBodySpec(body, spec, presets)
+    body.schedule.spec.structuredCalendar = [];
+  }
+
+  // Wait 2 seconds for edit to get it on fetchSchedule
+  loading.set(true);
+  const { error: err } = await editSchedule({
+    namespace,
+    scheduleId,
+    body,
+  })
+
+  if (err) {
+    error.set(err);
+    loading.set(false);
+  } else {
+    setTimeout(() => {
+      goto(routeForSchedule({ namespace, scheduleId: name }));
+      error.set('');
+      loading.set(false);
+    }, 2000);
   }
 };
 

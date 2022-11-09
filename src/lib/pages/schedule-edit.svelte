@@ -1,17 +1,16 @@
 <script lang="ts">
-  import { submitScheduleForm, loading, error } from '$lib/stores/schedules';
-
-  import Icon from '$holocene/icon/icon.svelte';
-
   import { page } from '$app/stores';
+
+  import { submitEditSchedule, loading, error } from '$lib/stores/schedules';
   import { routeForSchedule } from '$lib/utilities/route-for';
+
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Loading from '$holocene/loading.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-  import { onMount } from 'svelte';
   import { fetchSchedule } from '$lib/services/schedule-service';
   import SchedulesCalendarView from '$lib/components/schedule/schedules-calendar-view.svelte';
+  import type { Schedule } from '$types';
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
@@ -52,28 +51,29 @@
     }
   };
 
-  const handleClick = (preset: SchedulePreset, schedule: DescribeSchedule) => {
-    submitScheduleForm(
-      {
-        namespace,
-        preset,
-        name,
-        workflowType,
-        workflowId,
-        taskQueue,
-        daysOfWeek,
-        daysOfMonth,
-        months,
-        days,
-        hour,
-        minute,
-        second,
-        phase,
-        cronString,
-      },
-      schedule,
-      scheduleId,
-    );
+  const handleClick = (preset: SchedulePreset, schedule: Schedule) => {
+    const action: ScheduleActionParameters = {
+      namespace,
+      name,
+      workflowType,
+      workflowId,
+      taskQueue,
+    };
+    const spec: Partial<ScheduleSpecParameters> = {
+      hour,
+      minute,
+      second,
+      phase,
+      cronString,
+    };
+    const presets: SchedulePresetsParameters = {
+      preset,
+      daysOfWeek,
+      daysOfMonth,
+      months,
+      days,
+    };
+    submitEditSchedule({ action, spec, presets }, schedule, scheduleId);
   };
 
   $: disabled = !name || !workflowType || !workflowId || !taskQueue;

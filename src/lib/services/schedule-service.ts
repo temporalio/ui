@@ -31,9 +31,9 @@ export const fetchAllSchedules = async (
 ): Promise<ScheduleResponse> => {
   let error = '';
   const onError: ErrorCallback = (err) =>
-    (error =
-      err?.body?.message ??
-      `Error fetching schedules: ${err.status}: ${err.statusText}`);
+  (error =
+    err?.body?.message ??
+    `Error fetching schedules: ${err.status}: ${err.statusText}`);
 
   const route = await routeForApi('schedules', { namespace });
   const { schedules, nextPageToken } =
@@ -80,9 +80,9 @@ export async function createSchedule({
 }: CreateScheduleOptions): Promise<{ error: string; conflictToken: string }> {
   let error = '';
   const onError: ErrorCallback = (err) =>
-    (error =
-      err?.body?.message ??
-      `Error creating schedule: ${err.status}: ${err.statusText}`);
+  (error =
+    err?.body?.message ??
+    `Error creating schedule: ${err.status}: ${err.statusText}`);
 
   const route = await routeForApi('schedules', {
     namespace,
@@ -119,15 +119,15 @@ export async function editSchedule({
 }: Partial<EditScheduleOptions>): Promise<{ error: string }> {
   let error = '';
   const onError: ErrorCallback = (err) =>
-    (error =
-      err?.body?.message ??
-      `Error editing schedule: ${err.status}: ${err.statusText}`);
+  (error =
+    err?.body?.message ??
+    `Error editing schedule: ${err.status}: ${err.statusText}`);
 
   const route = await routeForApi('schedule', {
     namespace,
     scheduleId,
   });
-  return await requestFromAPI<null>(route, {
+  await requestFromAPI<null>(route, {
     options: {
       method: 'POST',
       body: stringifyWithBigInt({
@@ -138,6 +138,8 @@ export async function editSchedule({
     shouldRetry: false,
     onError,
   });
+
+  return { error }
 }
 
 type PauseScheduleOptions = {

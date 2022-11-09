@@ -69,6 +69,7 @@
             icon="search"
             id="schedule-name-filter"
             placeholder="Schedule Name"
+            clearable
             bind:value={search}
             on:submit={noop}
           />
