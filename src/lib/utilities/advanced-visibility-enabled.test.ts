@@ -15,6 +15,6 @@ describe('advancedVisbilityEnabled', () => {
   });
 
   it('returns false when "elasticsearch" is not included in the cluster\'s visbilityStores', () => {
-    expect(advancedVisibilityEnabled({ visibilityStore: 'mysql' })).toBe(true);
+    expect(advancedVisibilityEnabled({ visibilityStore: 'mysql' })).toBe(false);
   });
 });
