@@ -3,8 +3,8 @@
 
   import Workflows from '$lib/pages/workflows.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
-  import { temporalVersion } from '$lib/stores/versions';
-  import { isVersionNewer } from '$lib/utilities/version-check';
+
+  import { supportsBulkActions } from '$lib/stores/bulk-actions';
 </script>
 
 <PageTitle
@@ -12,4 +12,4 @@
   url={$page.url.href}
 />
 
-<Workflows bulkActionsEnabled={isVersionNewer($temporalVersion, '1.18.0')} />
+<Workflows bulkActionsEnabled={$supportsBulkActions} />
