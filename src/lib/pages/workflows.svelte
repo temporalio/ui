@@ -89,6 +89,7 @@
     toaster.push({
       variant: 'primary',
       message: `Successfully terminated ${terminableWorkflows.length} workflows.`,
+      id: 'batch-terminate-success-toast',
     });
     selectedWorkflows = [];
     allSelected = false;

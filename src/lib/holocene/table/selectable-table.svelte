@@ -22,12 +22,14 @@
     allSelected?: boolean;
     checkboxLabel?: string;
     class?: string;
+    id?: string;
   }
 
   export let items: Item[];
   export let checkboxLabel: string = null;
   export let allSelected: boolean = false;
   export let selectedItems: Item[] = [];
+  export let id: string = null;
 
   const handleSelectAll = (event: CustomEvent<{ checked: boolean }>) => {
     allSelected = !allSelected;
@@ -58,7 +60,7 @@
   });
 </script>
 
-<Table variant="fancy" class={$$props.class} {...$$props}>
+<Table variant="fancy" {id} class={$$props.class} {...$$props}>
   <TableHeaderRow
     slot="headers"
     selectable

@@ -2,7 +2,8 @@ import { derived, writable, get } from 'svelte/store';
 import type { Readable } from 'svelte/store';
 
 export const defaultItemsPerPage = 100;
-const options: string[] = ['100', '250', '500'];
+export const options: string[] = ['100', '250', '500'];
+export const MAX_PAGE_SIZE = options[options.length - 1];
 
 type PaginationMethods<T> = {
   adjustPageSize: (n: number | string) => void;
@@ -27,11 +28,6 @@ type PaginationStore<T> = PaginationMethods<T> &
     currentPage: number;
     totalPages: number;
   }>;
-
-export const perPageOptions = (perPage: number | string): string[] => {
-  const itemsPerPage = String(perPageFromSearchParameter(perPage));
-  return options.includes(itemsPerPage) ? options : [itemsPerPage, ...options];
-};
 
 export const getPageForIndex = (i: number, pageSize: number): number => {
   return Math.floor(i / pageSize) + 1;

@@ -133,6 +133,22 @@ Cypress.Commands.add('interceptScheduleApi', () => {
   ).as('schedule-api');
 });
 
+Cypress.Commands.add('interceptBatchTerminateApi', () => {
+  cy.intercept(
+    Cypress.env('VITE_API_HOST') +
+      `/api/v1/namespaces/*/workflows/batch/terminate?`,
+    { statusCode: 200, body: {} },
+  ).as('batch-terminate-api');
+});
+
+Cypress.Commands.add('interceptDescribeBatchOperationApi', () => {
+  cy.intercept(
+    Cypress.env('VITE_API_HOST') +
+      `/api/v1/namespaces/*/workflows/batch/describe?jobId=*`,
+    { fixture: 'batch-operation-status.json' },
+  ).as('describe-batch-operation-api');
+});
+
 Cypress.Commands.add(
   'interceptApi',
   ({ namespace, archived } = { namespace: 'default', archived: false }) => {
@@ -149,5 +165,7 @@ Cypress.Commands.add(
     cy.interceptSearchAttributesApi();
     cy.interceptSchedulesApi();
     cy.interceptScheduleApi();
+    cy.interceptBatchTerminateApi();
+    cy.interceptDescribeBatchOperationApi();
   },
 );
