@@ -18,7 +18,7 @@ export const dataEncoder = derived(
   ],
   ([
     $page,
-    $dataEncoderEndpoint,
+    $codecEndpoint,
     $lastDataEncoderStatus,
     $dataConverterPort,
     $lastDataConverterStatus,
@@ -26,7 +26,7 @@ export const dataEncoder = derived(
   ]) => {
     const namespace = $page.params.namespace;
     const settingsEndpoint = $page?.stuff?.settings?.codec?.endpoint;
-    const endpoint = $dataEncoderEndpoint || settingsEndpoint;
+    const endpoint = $codecEndpoint || settingsEndpoint;
     const accessToken = $authUser?.accessToken;
     const hasNotRequested = endpoint
       ? $lastDataEncoderStatus === 'notRequested'
