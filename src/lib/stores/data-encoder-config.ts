@@ -1,7 +1,13 @@
 import { writable } from 'svelte/store';
 import { persistStore } from '$lib/stores/persist-store';
 
-export const dataEncoderEndpoint = persistStore('endpoint', null, true);
+export const codecEndpoint = persistStore('endpoint', null, true);
+
+export const passAccessToken = persistStore<boolean>(
+  'passAccessToken',
+  false,
+  true,
+);
 
 export const lastDataEncoderStatus =
   writable<DataEncoderStatus>('notRequested');

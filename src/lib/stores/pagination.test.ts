@@ -9,7 +9,6 @@ import {
   getValidPage,
   pagination,
   perPageFromSearchParameter,
-  perPageOptions,
 } from './pagination';
 import { stringifyWithBigInt } from '../utilities/parse-with-big-int';
 
@@ -383,40 +382,4 @@ describe('perPageFromSearchParameter', () => {
   it("should fallback to 100 in the event that it's given an object", () => {
     expect(perPageFromSearchParameter({} as any)).toBe(100);
   });
-});
-
-describe('perPageOptions', () => {
-  it('should return the default options', () => {
-    expect(perPageOptions(undefined)).toEqual(['100', '250', '500']);
-  });
-
-  it('should return the default options with an additional string', () => {
-    expect(perPageOptions('25')).toEqual(['25', '100', '250', '500']);
-  });
-
-  it('should return the default options with an additional number a a string', () => {
-    expect(perPageOptions(25)).toEqual(['25', '100', '250', '500']);
-  });
-
-  it('should not return duplicate options', () => {
-    expect(perPageOptions('250')).toEqual(['100', '250', '500']);
-  });
-
-  it('should return not return duplicate options if passed in as a number', () => {
-    expect(perPageOptions(250)).toEqual(['100', '250', '500']);
-  });
-
-  it('should accept bogus strings', () => {
-    expect(perPageOptions('bogus input')).toEqual(['100', '250', '500']);
-  });
-
-  for (const input of [null, undefined, {}, []]) {
-    it(`should ignore ${stringifyWithBigInt(input)}`, () => {
-      expect(perPageOptions(input as unknown as any)).toEqual([
-        '100',
-        '250',
-        '500',
-      ]);
-    });
-  }
 });

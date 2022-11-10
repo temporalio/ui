@@ -5,7 +5,7 @@ import {
 import { routeForApi } from '$lib/utilities/route-for-api';
 
 import { getQueryTypesFromError } from '$lib/utilities/get-query-types-from-error';
-import { getEncoderEndpoint } from '$lib/utilities/get-encoder-endpoint';
+import { getCodecEndpoint } from '$lib/utilities/get-codec';
 import {
   convertPayloadToJsonWithCodec,
   convertPayloadToJsonWithWebsocket,
@@ -119,7 +119,7 @@ export async function getQuery(
     let data: ParsedQuery = queryResult.payloads;
     try {
       if (data[0]) {
-        const endpoint = getEncoderEndpoint(settings);
+        const endpoint = getCodecEndpoint(settings);
         const _settings = {
           ...settings,
           codec: { ...settings?.codec, endpoint },

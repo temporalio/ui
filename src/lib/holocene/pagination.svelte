@@ -2,9 +2,11 @@
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import {
+    MAX_PAGE_SIZE,
     pagination,
     perPageFromSearchParameter,
-    perPageOptions,
+    options,
+    defaultItemsPerPage,
   } from '$lib/stores/pagination';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
@@ -22,6 +24,22 @@
   $: perPage = String(
     perPageFromSearchParameter($page.url.searchParams.get(perPageKey)),
   ).toString();
+
+  $: {
+    if (parseInt(perPage, 10) > parseInt(MAX_PAGE_SIZE, 10)) {
+      updateQueryParameters({
+        parameter: perPageKey,
+        value: MAX_PAGE_SIZE,
+        url: $page.url,
+      });
+    } else if (!options.includes(perPage)) {
+      updateQueryParameters({
+        parameter: perPageKey,
+        value: defaultItemsPerPage,
+        url: $page.url,
+      });
+    }
+  }
   $: store = pagination(items, perPage, startingIndex);
   $: currentPage =
     $page.url.searchParams.get(currentPageKey) ?? $store.currentPage;
@@ -70,7 +88,7 @@
         label="Per Page"
         parameter={perPageKey}
         value={perPage}
-        options={perPageOptions(perPage)}
+        {options}
       />
       <div class="flex items-center justify-center gap-1">
         <button
@@ -112,8 +130,8 @@
       <FilterSelect
         label="Per Page"
         parameter={perPageKey}
-        value={String(perPage)}
-        options={perPageOptions(perPage)}
+        value={perPage}
+        {options}
       />
       <div class="flex items-center justify-center gap-1">
         <button

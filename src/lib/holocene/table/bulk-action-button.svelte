@@ -1,8 +1,9 @@
 <script lang="ts">
+  export let dataCy: string = null;
   export let disabled: boolean = true;
 </script>
 
-<button {disabled} on:click class="bulk-action-button">
+<button data-cy={dataCy} {disabled} on:click class="bulk-action-button">
   <slot />
 </button>
 

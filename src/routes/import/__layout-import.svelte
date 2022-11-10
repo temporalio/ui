@@ -22,7 +22,7 @@
 <script lang="ts">
   import Header from './_import-header.svelte';
   import Notifications from '$lib/components/notifications.svelte';
-  import { ErrorBoundary } from '$lib/components/error-boundary';
+  import { ErrorBoundary } from '$lib/holocene/error-boundary';
 </script>
 
 <svelte:head>
