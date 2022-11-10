@@ -16,6 +16,7 @@ export async function fetchNamespaces(
 ): Promise<void> {
   if (settings.runtimeEnvironment.isCloud) {
     namespaces.set([]);
+    return;
   }
 
   try {

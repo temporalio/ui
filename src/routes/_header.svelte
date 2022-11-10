@@ -22,11 +22,11 @@
 
   const { isCloud } = $page.stuff.settings.runtimeEnvironment;
 
-  $: namespaceNames = ($namespaces || []).map(
-    (namespace: Namespace) => namespace?.namespaceInfo?.name,
-  );
+  $: namespaceNames = isCloud
+    ? [$page.params.namespace]
+    : $namespaces.map((namespace: Namespace) => namespace?.namespaceInfo?.name);
   $: activeNamespaceName = $page.params?.namespace ?? $lastUsedNamespace;
-  $: activeNamespace = ($namespaces || []).find(
+  $: activeNamespace = $namespaces.find(
     (namespace: Namespace) =>
       namespace?.namespaceInfo?.name === activeNamespaceName,
   );
@@ -40,31 +40,19 @@
   }
 
   $: namespaceList = namespaceNames.map((namespace: string) => {
+    const getHref = (namespace) =>
+      isCloud ? routeForWorkflows({ namespace }) : getCurrentHref(namespace);
     return {
       namespace,
-      href: (namespace: string) => getCurrentHref(namespace),
+      href: (namespace: string) => getHref(namespace),
       onClick: (namespace: string) => {
         $lastUsedNamespace = namespace;
         $workflowFilters = [];
         $workflowSorts = [];
-        goto(getCurrentHref(namespace));
+        goto(getHref(namespace));
       },
     };
   });
-
-  // To show single namespace on cloud
-  if (isCloud && $page.params.namespace && !namespaceNames.length) {
-    namespaceList.push({
-      namespace: $page.params.namespace,
-      href: (namespace: string) => routeForWorkflows({ namespace }),
-      onClick: (namespace: string) => {
-        $lastUsedNamespace = $page.params.namespace;
-        $workflowFilters = [];
-        $workflowSorts = [];
-        goto(routeForWorkflows({ namespace }));
-      },
-    });
-  }
 
   $: linkList = {
     home: routeForWorkflows({ namespace: activeNamespaceName }),
