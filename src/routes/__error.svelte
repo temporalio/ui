@@ -14,7 +14,7 @@
 </script>
 
 <script lang="ts">
-  import Error from '$lib/components/error.svelte';
+  import Error from '$lib/holocene/error.svelte';
   import { isNetworkError } from '$lib/utilities/is-network-error';
   import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
 
