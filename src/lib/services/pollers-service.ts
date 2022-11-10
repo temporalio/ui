@@ -28,7 +28,7 @@ export async function getPollers(
   parameters: GetAllPollersRequest,
   request = fetch,
 ): Promise<GetPollersResponse> {
-  const route = await routeForApi('task-queue', parameters);
+  const route = routeForApi('task-queue', parameters);
   const workflowPollers = await requestFromAPI<GetPollersResponse>(route, {
     request,
     params: { taskQueueType: '1' },
@@ -57,7 +57,7 @@ export async function getPollers(
       pollers[poller.identity] = {
         lastAccessTime:
           !currentPoller.lastAccessTime ||
-          currentPoller.lastAccessTime < poller.lastAccessTime
+            currentPoller.lastAccessTime < poller.lastAccessTime
             ? poller.lastAccessTime
             : currentPoller.lastAccessTime,
         taskQueueTypes: currentPoller.taskQueueTypes.concat([type]),

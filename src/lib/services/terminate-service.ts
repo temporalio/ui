@@ -14,7 +14,7 @@ export async function terminateWorkflow({
   namespace,
   reason,
 }: TerminateWorkflowOptions): Promise<null> {
-  const route = await routeForApi('workflow.terminate', {
+  const route = routeForApi('workflow.terminate', {
     namespace,
     workflowId: workflow.id,
     runId: workflow.runId,
@@ -37,7 +37,7 @@ export async function batchTerminateWorkflows({
   workflowExecutions,
   reason,
 }: BulkTerminateWorkflowOptions): Promise<string> {
-  const route = await routeForApi('workflows.batch.terminate', { namespace });
+  const route = routeForApi('workflows.batch.terminate', { namespace });
 
   const runIds = workflowExecutions.map((wf) => wf.runId);
   const query = runIds.reduce((queryString, id, index, arr) => {
@@ -101,7 +101,7 @@ async function describeBatchOperation({
   jobId,
   namespace,
 }: DescribeBatchOperationOptions): Promise<BatchOperationInfo> {
-  const route = await routeForApi('workflows.batch.describe', { namespace });
+  const route = routeForApi('workflows.batch.describe', { namespace });
 
   return requestFromAPI<BatchOperationInfo>(route, {
     params: { jobId },
