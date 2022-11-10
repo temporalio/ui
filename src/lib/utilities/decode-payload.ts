@@ -6,7 +6,10 @@ import type { DataConverterWebsocketInterface } from '$lib/utilities/data-conver
 import { convertPayloadWithWebsocket } from '$lib/services/data-converter';
 import { convertPayloadsWithCodec } from '$lib/services/data-encoder';
 
-import type { dataEncoderEndpoint } from '$lib/stores/data-encoder-config';
+import type {
+  codecEndpoint,
+  passAccessToken,
+} from '$lib/stores/data-encoder-config';
 
 import { atob } from './atob';
 import { parseWithBigInt } from './parse-with-big-int';
@@ -21,7 +24,8 @@ export type DecodeFunctions = {
   convertWithCodec?: Decode['convertPayloadToJsonWithCodec'];
   convertWithWebsocket?: Decode['convertPayloadToJsonWithWebsocket'];
   decodeAttributes?: Decode['decodePayloadAttributes'];
-  encoderEndpoint?: typeof dataEncoderEndpoint;
+  encoderEndpoint?: typeof codecEndpoint;
+  codecPassAccessToken?: typeof passAccessToken;
 };
 
 export function decodePayload(

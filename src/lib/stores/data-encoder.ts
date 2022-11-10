@@ -4,16 +4,13 @@ import {
   dataConverterPort,
   lastDataConverterStatus,
 } from './data-converter-config';
-import {
-  dataEncoderEndpoint,
-  lastDataEncoderStatus,
-} from './data-encoder-config';
+import { codecEndpoint, lastDataEncoderStatus } from './data-encoder-config';
 import { authUser } from './auth-user';
 
 export const dataEncoder = derived(
   [
     page,
-    dataEncoderEndpoint,
+    codecEndpoint,
     lastDataEncoderStatus,
     dataConverterPort,
     lastDataConverterStatus,
@@ -30,7 +27,6 @@ export const dataEncoder = derived(
     const namespace = $page.params.namespace;
     const settingsEndpoint = $page?.stuff?.settings?.codec?.endpoint;
     const endpoint = $dataEncoderEndpoint || settingsEndpoint;
-    const passAccessToken = $page.stuff?.settings?.codec?.passAccessToken;
     const accessToken = $authUser?.accessToken;
     const hasNotRequested = endpoint
       ? $lastDataEncoderStatus === 'notRequested'
@@ -48,7 +44,6 @@ export const dataEncoder = derived(
       namespace,
       settingsEndpoint,
       endpoint,
-      passAccessToken,
       accessToken,
       hasNotRequested,
       hasError,

@@ -61,7 +61,7 @@
   }
 
   .label {
-    @apply absolute ml-6 flex items-center whitespace-nowrap;
+    @apply ml-6 flex items-center whitespace-nowrap;
   }
 
   input {

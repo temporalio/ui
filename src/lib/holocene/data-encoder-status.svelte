@@ -11,11 +11,7 @@
   const onCancel = () => ($showDataEncoderSettings = false);
 </script>
 
-<DataEncoderSettings
-  showSettings={$showDataEncoderSettings}
-  {onCancel}
-  passAccessToken={$dataEncoder.passAccessToken}
-/>
+<DataEncoderSettings showSettings={$showDataEncoderSettings} {onCancel} />
 {#if $dataEncoder?.hasEndpointOrPortConfigured}
   {#if $dataEncoder?.hasNotRequested}
     <Tooltip right text={'Data encoder is configured'}>
