@@ -8,14 +8,10 @@
   import DataEncoderSettings from './data-encoder-settings.svelte';
 
   const onIconClick = () => ($showDataEncoderSettings = true);
-  const onCancel = () => ($showDataEncoderSettings = false);
+  const onClose = () => ($showDataEncoderSettings = false);
 </script>
 
-<DataEncoderSettings
-  showSettings={$showDataEncoderSettings}
-  {onCancel}
-  passAccessToken={$dataEncoder.passAccessToken}
-/>
+<DataEncoderSettings showSettings={$showDataEncoderSettings} {onClose} />
 {#if $dataEncoder?.hasEndpointOrPortConfigured}
   {#if $dataEncoder?.hasNotRequested}
     <Tooltip right text={'Data encoder is configured'}>

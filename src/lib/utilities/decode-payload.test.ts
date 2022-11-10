@@ -22,7 +22,7 @@ import {
   resetLastDataConverterSuccess,
 } from '../stores/data-converter-config';
 import {
-  dataEncoderEndpoint,
+  codecEndpoint,
   lastDataEncoderStatus,
   resetLastDataEncoderSuccess,
 } from '../stores/data-encoder-config';
@@ -265,7 +265,7 @@ describe('getEventAttributes', () => {
     });
 
     const endpoint = 'http://localhost:1337';
-    dataEncoderEndpoint.set(endpoint);
+    codecEndpoint.set(endpoint);
 
     const decodedPayload = await getEventAttributes({
       historyEvent: parseWithBigInt(
@@ -292,7 +292,7 @@ describe('getEventAttributes', () => {
     });
 
     const endpoint = 'http://localhost:1337';
-    dataEncoderEndpoint.set(endpoint);
+    codecEndpoint.set(endpoint);
     dataConverterPort.set('3889');
 
     const decodedPayload = await getEventAttributes({

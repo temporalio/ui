@@ -17,6 +17,7 @@
 
 <label
   on:click
+  on:keypress
   class="checkbox {$$props.class}"
   class:disabled
   class:on-dark={onDark}

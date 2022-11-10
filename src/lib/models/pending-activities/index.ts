@@ -1,11 +1,11 @@
-import { dataEncoderEndpoint } from '$lib/stores/data-encoder-config';
+import { codecEndpoint } from '$lib/stores/data-encoder-config';
 import {
   convertPayloadToJsonWithCodec,
   convertPayloadToJsonWithWebsocket,
   decodePayloadAttributes,
   type DecodeFunctions,
 } from '$lib/utilities/decode-payload';
-import { getEncoderEndpoint } from '$lib/utilities/get-encoder-endpoint';
+import { getCodecEndpoint } from '$lib/utilities/get-codec';
 
 export async function getActivityAttributes(
   { activity, namespace, settings, accessToken }: PendingActivityWithMetadata,
@@ -13,11 +13,11 @@ export async function getActivityAttributes(
     convertWithCodec = convertPayloadToJsonWithCodec,
     convertWithWebsocket = convertPayloadToJsonWithWebsocket,
     decodeAttributes = decodePayloadAttributes,
-    encoderEndpoint = dataEncoderEndpoint,
+    encoderEndpoint = codecEndpoint,
   }: DecodeFunctions = {},
 ): Promise<PendingActivity> {
   // Use locally set endpoint over settings endpoint for testing purposes
-  const endpoint = getEncoderEndpoint(settings, encoderEndpoint);
+  const endpoint = getCodecEndpoint(settings, encoderEndpoint);
   const _settings = { ...settings, codec: { ...settings?.codec, endpoint } };
 
   const convertedAttributes = endpoint

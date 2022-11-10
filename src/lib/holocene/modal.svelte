@@ -64,6 +64,7 @@
             variant={confirmType}
             {loading}
             disabled={confirmDisabled || loading}
+            dataCy="confirm-modal-button"
             on:click={() => dispatch('confirmModal')}>{confirmText}</Button
           >
         {/if}
@@ -82,7 +83,7 @@
   }
 
   .body {
-    @apply z-50 mx-auto w-full max-w-md overflow-y-auto rounded-lg bg-white text-gray-900 shadow-xl md:h-max;
+    @apply z-50 mx-auto w-full max-w-lg overflow-y-auto rounded-lg bg-white text-gray-900 shadow-xl md:h-max;
   }
 
   .large {

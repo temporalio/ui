@@ -1,4 +1,7 @@
-import { dataEncoderEndpoint } from '$lib/stores/data-encoder-config';
+import {
+  codecEndpoint,
+  passAccessToken,
+} from '$lib/stores/data-encoder-config';
 import {
   convertPayloadToJsonWithCodec,
   convertPayloadToJsonWithWebsocket,
@@ -8,7 +11,10 @@ import {
 import { formatDate } from '$lib/utilities/format-date';
 import { has } from '$lib/utilities/has';
 import { findAttributesAndKey } from '$lib/utilities/is-event-type';
-import { getEncoderEndpoint } from '$lib/utilities/get-encoder-endpoint';
+import {
+  getCodecEndpoint,
+  getCodecPassAccessToken,
+} from '$lib/utilities/get-codec';
 
 import { groupEvents } from '../event-groups';
 import { getEventCategory } from './get-event-categorization';
@@ -21,13 +27,21 @@ export async function getEventAttributes(
     convertWithCodec = convertPayloadToJsonWithCodec,
     convertWithWebsocket = convertPayloadToJsonWithWebsocket,
     decodeAttributes = decodePayloadAttributes,
-    encoderEndpoint = dataEncoderEndpoint,
+    encoderEndpoint = codecEndpoint,
+    codecPassAccessToken = passAccessToken,
   }: DecodeFunctions = {},
 ): Promise<EventAttributesWithType> {
   const { key, attributes } = findAttributesAndKey(historyEvent);
   // Use locally set endpoint over settings endpoint for testing purposes
-  const endpoint = getEncoderEndpoint(settings, encoderEndpoint);
-  const _settings = { ...settings, codec: { ...settings?.codec, endpoint } };
+  const endpoint = getCodecEndpoint(settings, encoderEndpoint);
+  const passAccessToken = getCodecPassAccessToken(
+    settings,
+    codecPassAccessToken,
+  );
+  const _settings = {
+    ...settings,
+    codec: { ...settings?.codec, endpoint, passAccessToken },
+  };
 
   const convertedAttributes = endpoint
     ? await convertWithCodec({
