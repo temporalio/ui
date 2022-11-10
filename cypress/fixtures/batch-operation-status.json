@@ -1,0 +1,12 @@
+{
+  "operationType": "Terminate",
+  "jobId": "6216d7c6-c987-4b27-a854-3bb9c72b3bbb",
+  "state": "Completed",
+  "startTime": "2022-11-01T00:00:00.000000000Z",
+  "closeTime": "2022-11-01T00:00:00.000000000Z",
+  "totalOperationCount": "10",
+  "completeOperationCount": "10",
+  "failureOperationCount": "0",
+  "identity": "",
+  "reason": ""
+}

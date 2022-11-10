@@ -26,6 +26,7 @@
 
 {#if bulkActionsEnabled}
   <SelectableTable
+    id="workflows-table-with-bulk-actions"
     class="w-full md:table-fixed"
     bind:allSelected
     bind:selectedItems={selectedWorkflows}
@@ -41,12 +42,13 @@
       <th class="table-cell md:hidden" colspan="3">Summary</th>
     </svelte:fragment>
     <svelte:fragment slot="bulk-action-headers">
-      <th class="hidden w-32 md:table-cell">
+      <th class="inline-block w-32 md:table-cell">
         <span class="font-semibold">{selectedWorkflows.length} selected</span>
       </th>
-      <th class="hidden h-10 md:table-cell md:w-60 xl:w-auto">
+      <th class="h-10 md:w-60 xl:w-auto">
         {#if terminableWorkflowCount > 0}
           <BulkActionButton
+            dataCy="bulk-terminate-button"
             disabled={terminateDisabled}
             on:click={handleBulkTerminate}>Terminate</BulkActionButton
           >

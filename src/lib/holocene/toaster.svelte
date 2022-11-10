@@ -63,6 +63,7 @@
 <div class="absolute top-4 right-4 z-50 flex flex-col items-end gap-2">
   {#each $toasts as { message, variant, id: key } (key)}
     <article
+      id={key}
       class="flex grow-0 items-center justify-between gap-4 rounded py-3 px-4 shadow {variant}"
       in:send={{ key }}
       out:receive={{ key }}

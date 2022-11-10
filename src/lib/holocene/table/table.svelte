@@ -3,9 +3,10 @@
 
   export let variant: 'simple' | 'fancy' = 'fancy';
   export let updating = false;
+  export let id: string = null;
 </script>
 
-<table class="{variant} {$$props.class}">
+<table class="{variant} {$$props.class}" {id}>
   <thead>
     <slot name="headers" />
     {#if updating}

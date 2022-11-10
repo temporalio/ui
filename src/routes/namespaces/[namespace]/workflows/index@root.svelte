@@ -3,6 +3,8 @@
 
   import Workflows from '$lib/pages/workflows.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
+
+  import { supportsBulkActions } from '$lib/stores/bulk-actions';
 </script>
 
 <PageTitle
@@ -10,4 +12,4 @@
   url={$page.url.href}
 />
 
-<Workflows />
+<Workflows bulkActionsEnabled={$supportsBulkActions} />
