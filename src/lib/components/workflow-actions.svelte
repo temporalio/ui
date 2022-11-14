@@ -94,7 +94,7 @@
     disabled={actionsDisabled}
     label="Cancel"
     on:click={showCancellationModal}
-    id="workflow-{workflow.id}-actions"
+    id="workflow-actions"
   >
     {#if workflow.canBeTerminated}
       <MenuItem

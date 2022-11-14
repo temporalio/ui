@@ -34,6 +34,7 @@ describe('Terminate Button is Shown', () => {
     cy.wait('@settings-api');
     cy.wait('@workflow-api');
 
+    cy.get('[aria-controls="workflow-actions"]').click();
     cy.get('[data-cy="terminate-button"]');
   });
 
