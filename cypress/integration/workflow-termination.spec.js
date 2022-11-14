@@ -50,6 +50,6 @@ describe('Terminate Button is Shown', () => {
     cy.wait('@settings-api');
     cy.wait('@workflow-api');
 
-    cy.get('[data-cy="terminate-button"]').should('not.exist');
+    cy.get('[aria-controls="workflow-actions"]').should('not.exist');
   });
 });
