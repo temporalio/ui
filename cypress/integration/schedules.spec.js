@@ -36,9 +36,9 @@ describe('Schedules Create', () => {
     cy.wait('@schedules-api');
   });
 
-  it('should show Create Schedules Button and navigate to /new', () => {
+  it('should show Create Schedules Button and navigate to /create', () => {
     cy.get('[data-cy="create-schedule"]').click();
-    cy.url().should('contain', '/schedules/new');
+    cy.url().should('contain', '/schedules/create');
     cy.get('#content').contains('Create Schedule');
   });
 });
