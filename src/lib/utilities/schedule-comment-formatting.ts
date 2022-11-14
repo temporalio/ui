@@ -16,14 +16,14 @@ export const calendarToComment = ({
   minute,
 }: Partial<ScheduleParameters>): string => {
   let comment = '';
-  let time = !hour || !parseInt(hour) || parseInt(hour) < 12 ? 'am' : 'pm';
-  let properHour =
+  const time = !hour || !parseInt(hour) || parseInt(hour) < 12 ? 'am' : 'pm';
+  const properHour =
     !hour || !parseInt(hour)
       ? '12'
       : parseInt(hour) <= 12
       ? hour
       : (parseInt(hour) - 12).toString();
-  let timeStamp = `${properHour.padStart(2, '0')}:${
+  const timeStamp = `${properHour.padStart(2, '0')}:${
     minute ? minute.padStart(2, '0') : '00'
   }${time}`;
 
@@ -61,22 +61,19 @@ export const calendarToComment = ({
   return comment;
 };
 
-export const intervalToComment = (
-  interval: string = '',
-  offset = false,
-): string => {
+export const intervalToComment = (interval = '', offset = false): string => {
   let comment = '';
   if (!interval) return comment;
 
   const intervalAsNumber = parseInt(interval.slice(0, -1));
 
-  let days = Math.floor(intervalAsNumber / (60 * 60 * 24));
+  const days = Math.floor(intervalAsNumber / (60 * 60 * 24));
   let remainingSeconds =
     intervalAsNumber - (days > 0 ? days * 60 * 60 * 24 : 0);
-  let hour = Math.floor(remainingSeconds / (60 * 60));
+  const hour = Math.floor(remainingSeconds / (60 * 60));
   remainingSeconds = remainingSeconds - (hour > 0 ? hour * 60 * 60 : 0);
-  let minute = Math.floor(remainingSeconds / 60);
-  let second = minute > 0 ? remainingSeconds - minute * 60 : remainingSeconds;
+  const minute = Math.floor(remainingSeconds / 60);
+  const second = minute > 0 ? remainingSeconds - minute * 60 : remainingSeconds;
 
   const hourLabel = `${hour ? hour.toString().padStart(2, '0') : '00'}hrs`;
   const minuteLabel = `${
