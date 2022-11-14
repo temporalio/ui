@@ -12,7 +12,7 @@
 
   let preset: SchedulePreset = scheduleId ? 'existing' : 'interval';
 
-  export let schedule: Schedule | null = null;
+  export let schedule: FullScheduleSpec | null = null;
   export let daysOfWeek: string[];
   export let daysOfMonth: number[];
   export let months: string[];

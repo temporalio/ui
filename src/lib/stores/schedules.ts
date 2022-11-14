@@ -19,7 +19,7 @@ import {
 // "timezoneData": "string"
 
 const setBodySpec = (
-  body: DescribeSchedule,
+  body: DescribeFullSchedule,
   spec: ScheduleSpecParameters,
   presets: SchedulePresetsParameters,
 ) => {
@@ -74,7 +74,7 @@ export const submitCreateSchedule = async ({
   presets,
 }: ScheduleParameters): Promise<void> => {
   const { namespace, name, workflowId, workflowType, taskQueue } = action;
-  const body: DescribeSchedule = {
+  const body: DescribeFullSchedule = {
     schedule_id: name,
     schedule: {
       spec: {
@@ -121,7 +121,7 @@ export const submitEditSchedule = async (
   const { namespace, name, workflowId, workflowType, taskQueue } = action;
   const { preset } = presets;
 
-  const body: DescribeSchedule = {
+  const body: DescribeFullSchedule = {
     schedule: {
       ...schedule,
       action: {

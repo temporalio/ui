@@ -11,7 +11,7 @@
   import TableRow from '$lib/holocene/table/table-row.svelte';
 
   let { namespace } = $page.params;
-  export let schedule: ScheduleListEntry;
+  export let schedule: FullScheduleSpec;
 
   const getRoute = () =>
     routeForSchedule({

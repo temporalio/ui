@@ -1,5 +1,36 @@
 type DescribeSchedule = import('$types').DescribeScheduleResponse;
-type ScheduleSpec = import('$types').ScheduleSpec;
+type CalendarSpec = import('types').ICalendarSpec;
+
+type DescribeFullSchedule = DescribeScheduleResponse & {
+  schedule_id: string;
+  schedule?: FullScheduleSpec;
+};
+
+type FullScheduleSpec = Schedule & {
+  calendar: FullCalendarSpec;
+}
+
+type FullCalendarSpec = CalendarSpec & {
+  cronString?: string[];
+  structuredCalendar?: any[];
+}
+
+type StartEndInterval = {
+  start?: number;
+  end?: number;
+  step?: number;
+}
+
+type StructuredCalendar = {
+  second?: StartEndInterval[];
+  minute?: StartEndInterval[];
+  hour?: StartEndInterval[];
+  dayOfMonth?: StartEndInterval[];
+  dayOfWeek?: StartEndInterval[];
+  month?: StartEndInterval[];
+  year?: StartEndInterval[];
+  comment?: string;
+}
 
 type SchedulePreset = 'existing' | 'interval' | 'week' | 'month' | 'string';
 
