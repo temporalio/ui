@@ -8,18 +8,18 @@ type DescribeFullSchedule = DescribeScheduleResponse & {
 
 type FullScheduleSpec = Schedule & {
   calendar: FullCalendarSpec;
-}
+};
 
 type FullCalendarSpec = CalendarSpec & {
   cronString?: string[];
   structuredCalendar?: any[];
-}
+};
 
 type StartEndInterval = {
   start?: number;
   end?: number;
   step?: number;
-}
+};
 
 type StructuredCalendar = {
   second?: StartEndInterval[];
@@ -30,7 +30,7 @@ type StructuredCalendar = {
   month?: StartEndInterval[];
   year?: StartEndInterval[];
   comment?: string;
-}
+};
 
 type SchedulePreset = 'existing' | 'interval' | 'week' | 'month' | 'string';
 

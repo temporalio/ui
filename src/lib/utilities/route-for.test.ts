@@ -193,7 +193,7 @@ describe('routeFor import ', () => {
 
   it('should return the correct route for routeForScheduleCreate', () => {
     expect(routeForScheduleCreate({ namespace: 'default' })).toBe(
-      '/namespaces/default/schedules/new',
+      '/namespaces/default/schedules/create',
     );
   });
 });
