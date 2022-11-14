@@ -19,7 +19,7 @@
   import type { GetPollersResponse } from '$lib/services/pollers-service';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
+  import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import Tab from '$lib/holocene/tab.svelte';
   import { page } from '$app/stores';
   import { pathMatches } from '$lib/utilities/path-matches';
@@ -100,7 +100,7 @@
       {#if isRunning}
         <div class="flex w-96 items-center justify-start gap-4 xl:justify-end">
           <AutoRefreshWorkflow onChange={onRefreshChange} />
-          <TerminateWorkflow {workflow} {namespace} />
+          <WorkflowActions {workflow} {namespace} />
         </div>
       {/if}
     </div>

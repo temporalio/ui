@@ -8,11 +8,14 @@
     | 'info'
     | 'warning'
     | 'primary';
+
   export interface Toast {
     message: string;
-    variant: ToastVariant;
+    variant?: ToastVariant;
     id?: string;
     duration?: number;
+    xPosition?: 'left' | 'right';
+    yPosition?: 'top' | 'bottom';
   }
 
   interface Toaster {
@@ -24,13 +27,19 @@
   const toasts = writable<Toast[]>([]);
 
   const push = (toast: Toast) => {
-    const id = toast.id ?? v4();
-    const duration = toast.duration ?? 3000;
-    toasts.update((ts) => [...ts, { id, ...toast }]);
+    const toastWithDefaults: Toast = {
+      id: v4(),
+      duration: 3000,
+      xPosition: 'right',
+      yPosition: 'top',
+      variant: 'primary',
+      ...toast,
+    };
+    toasts.update((ts) => [...ts, toastWithDefaults]);
     const timeoutId = setTimeout(() => {
-      pop(id);
+      pop(toastWithDefaults.id);
       clearTimeout(timeoutId);
-    }, duration);
+    }, toastWithDefaults.duration);
   };
 
   const pop = (id: string) => {
@@ -45,54 +54,64 @@
 </script>
 
 <script lang="ts">
-  import IconButton from '$holocene/icon-button.svelte';
-  import { crossfade, fly } from 'svelte/transition';
-  import { cubicInOut } from 'svelte/easing';
-  import { flip } from 'svelte/animate';
+  import ToastComponent from './toast.svelte';
 
   export let pop: Toaster['pop'];
   export let toasts: Toaster['toasts'];
 
-  const [send, receive] = crossfade({
-    duration: 500,
-    easing: cubicInOut,
-    fallback: (node) => fly(node, { x: 250, duration: 250 }),
-  });
+  const dismissToast = (event: CustomEvent<{ id: string }>) => {
+    pop(event.detail.id);
+  };
+
+  $: topRightToasts = $toasts.filter(
+    (toast) => toast.yPosition === 'top' && toast.xPosition === 'right',
+  );
+  $: bottomRightToasts = $toasts
+    .filter(
+      (toast) => toast.yPosition === 'bottom' && toast.xPosition === 'right',
+    )
+    .reverse();
+  $: bottomLeftToasts = $toasts
+    .filter(
+      (toast) => toast.yPosition === 'bottom' && toast.xPosition === 'left',
+    )
+    .reverse();
+  $: topLeftToasts = $toasts.filter(
+    (toast) => toast.yPosition === 'top' && toast.xPosition === 'left',
+  );
 </script>
 
-<div class="absolute top-4 right-4 z-50 flex flex-col items-end gap-2">
-  {#each $toasts as { message, variant, id: key } (key)}
-    <article
-      id={key}
-      class="flex grow-0 items-center justify-between gap-4 rounded py-3 px-4 shadow {variant}"
-      in:send={{ key }}
-      out:receive={{ key }}
-      animate:flip={{ duration: (d) => Math.sqrt(d * 200) }}
-    >
-      <p class="font-secondary text-sm">{message}</p>
-      <IconButton icon="close" on:click={() => pop(key)} />
-    </article>
+<div class="toast-container top-5 right-5">
+  {#each topRightToasts as { message, variant, id } (id)}
+    <ToastComponent {variant} {id} on:dismiss={dismissToast}>
+      {message}
+    </ToastComponent>
+  {/each}
+</div>
+<div class="toast-container bottom-5 right-5">
+  {#each bottomRightToasts as { message, variant, id } (id)}
+    <ToastComponent {variant} {id} on:dismiss={dismissToast}>
+      {message}
+    </ToastComponent>
+  {/each}
+</div>
+<div class="toast-container bottom-5 left-5">
+  {#each bottomLeftToasts as { message, variant, id } (id)}
+    <ToastComponent {variant} {id} on:dismiss={dismissToast}>
+      {message}
+    </ToastComponent>
+  {/each}
+</div>
+<div class="toast-container top-5 left-5">
+  {#each topLeftToasts as { message, variant, id } (id)}
+    <ToastComponent {variant} {id} on:dismiss={dismissToast}>
+      {message}
+    </ToastComponent>
   {/each}
 </div>
 
 <style lang="postcss">
-  .primary {
-    @apply bg-primary text-white;
-  }
-
-  .success {
-    @apply bg-green-50 text-green-900;
-  }
-
-  .error {
-    @apply bg-red-50 text-red-900;
-  }
-
-  .info {
-    @apply bg-blue-50 text-blue-900;
-  }
-
-  .warning {
-    @apply bg-yellow-50 text-yellow-900;
+  .toast-container {
+    @apply fixed z-50 flex flex-col items-end gap-2;
   }
 </style>

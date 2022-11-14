@@ -1,0 +1,147 @@
+<script lang="ts">
+  import { tick } from 'svelte';
+
+  import { refresh } from '$lib/stores/workflow-run';
+  import { terminateWorkflow } from '$lib/services/terminate-service';
+
+  import Modal from '$holocene/modal.svelte';
+  import { coreUserStore } from '$lib/stores/core-user';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
+  import SplitButton from '$lib/holocene/split-button.svelte';
+  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
+  import { cancelWorkflow } from '$lib/services/workflow-service';
+  import { toaster } from '$lib/holocene/toaster.svelte';
+
+  export let workflow: WorkflowExecution;
+  export let namespace: string;
+
+  let reason = '';
+  let showTerminationConfirmation = false;
+  let showCancellationConfirmation = false;
+  let loading = false;
+
+  const showTerminationModal = () => (showTerminationConfirmation = true);
+  const hideTerminationModal = () => (showTerminationConfirmation = false);
+  const showCancellationModal = () => (showCancellationConfirmation = true);
+  const hideCancellationModal = () => (showCancellationConfirmation = false);
+
+  const handleSuccessfulTermination = async () => {
+    showTerminationConfirmation = false;
+    reason = '';
+    $refresh = Date.now();
+    await tick();
+    toaster.push({
+      message: 'Workflow terminated.',
+      variant: 'success',
+      yPosition: 'bottom',
+    });
+  };
+
+  const handleTerminationError = () => {
+    showTerminationConfirmation = false;
+    reason = '';
+    toaster.push({ message: 'Cannot terminate workflow.', variant: 'error' });
+  };
+
+  const terminate = () => {
+    if (!workflow.canBeTerminated) return;
+    terminateWorkflow({
+      workflow,
+      namespace,
+      reason,
+    })
+      .then(handleSuccessfulTermination)
+      .catch(handleTerminationError);
+  };
+
+  const cancel = async () => {
+    loading = true;
+    try {
+      await cancelWorkflow({
+        namespace,
+        workflowId: workflow.id,
+        runId: workflow.runId,
+      });
+
+      setTimeout(() => {
+        toaster.push({
+          message: 'Canceled workflow.',
+          yPosition: 'bottom',
+        });
+        showCancellationConfirmation = false;
+        loading = false;
+        $refresh = Date.now();
+      }, 1000);
+    } catch {
+      toaster.push({
+        variant: 'error',
+        message: 'Unable to cancel workflow.',
+      });
+    }
+  };
+
+  let coreUser = coreUserStore();
+  $: actionsDisabled = $coreUser.namespaceWriteDisabled(namespace);
+</script>
+
+<Tooltip
+  bottomLeft
+  hide={!actionsDisabled}
+  width={200}
+  text="You do not have permission to edit this workflow. Contact your admin for assistance."
+>
+  <SplitButton
+    disabled={actionsDisabled}
+    label="Cancel"
+    on:click={showCancellationModal}
+    id="workflow-{workflow.id}-actions"
+  >
+    {#if workflow.canBeTerminated}
+      <MenuItem
+        destructive
+        on:click={showTerminationModal}
+        disabled={actionsDisabled}
+        dataCy="terminate-button"
+      >
+        Terminate
+      </MenuItem>
+    {/if}
+  </SplitButton>
+</Tooltip>
+
+<Modal
+  open={showCancellationConfirmation}
+  {loading}
+  confirmType="destructive"
+  on:cancelModal={hideCancellationModal}
+  on:confirmModal={cancel}
+>
+  <h3 slot="title">Cancel Workflow</h3>
+  <svelte:fragment slot="content">
+    <p>
+      Are you sure you want to cancel this workflow? This action cannot be
+      undone.
+    </p>
+  </svelte:fragment>
+</Modal>
+
+<Modal
+  open={showTerminationConfirmation}
+  confirmText="Terminate"
+  confirmType="destructive"
+  on:cancelModal={hideTerminationModal}
+  on:confirmModal={terminate}
+>
+  <h3 slot="title">Terminate Workflow</h3>
+  <div slot="content">
+    <p>
+      Are you sure you want to terminate this workflow? This action cannot be
+      undone.
+    </p>
+    <input
+      class="mt-4 block w-full rounded-md border border-gray-200 p-2"
+      placeholder="Enter a reason"
+      bind:value={reason}
+    />
+  </div>
+</Modal>

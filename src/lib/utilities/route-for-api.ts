@@ -109,6 +109,7 @@ export function routeForApi(
     'task-queue': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}`,
     user: '/me',
     'workflow.terminate': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/terminate`,
+    'workflow.cancel': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/runs/${parameters.runId}/cancel`,
     workflow: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}`,
     'workflows.archived': `/namespaces/${parameters?.namespace}/workflows/archived`,
     workflows: `/namespaces/${parameters?.namespace}/workflows`,

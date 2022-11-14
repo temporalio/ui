@@ -21,7 +21,9 @@
   };
 
   let coreUser = coreUserStore();
-  $: terminateDisabled = $coreUser.terminateDisabled($page.params.namespace);
+  $: terminateDisabled = $coreUser.namespaceWriteDisabled(
+    $page.params.namespace,
+  );
 </script>
 
 {#if bulkActionsEnabled}
