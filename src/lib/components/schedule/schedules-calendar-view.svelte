@@ -114,6 +114,3 @@
   </div>
   <slot {preset} />
 </div>
-
-<style lang="postcss">
-</style>

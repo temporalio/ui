@@ -34,6 +34,8 @@ type StructuredCalendar = {
 
 type SchedulePreset = 'existing' | 'interval' | 'week' | 'month' | 'string';
 
+type ScheduleOffsetUnit = 'days' | 'hrs' | 'min' | 'sec';
+
 type ScheduleActionParameters = {
   namespace: string;
   name: string;

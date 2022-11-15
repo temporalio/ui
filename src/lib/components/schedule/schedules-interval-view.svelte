@@ -9,7 +9,7 @@
   export let phase = '';
 
   let offset = '';
-  let offsetUnit = 'min';
+  let offsetUnit: ScheduleOffsetUnit = 'min';
 
   const error = (x: string) => {
     if (x) return isNaN(parseInt(x));
@@ -20,7 +20,6 @@
     if (offset) {
       if (offsetUnit === 'days') {
         phase = (parseInt(offset) * 60 * 60 * 24).toString() + 's';
-        console.log('Phase: ', phase);
       } else if (offsetUnit === 'hrs') {
         phase = (parseInt(offset) * 60 * 60).toString() + 's';
       } else if (offsetUnit === 'min') {
@@ -31,7 +30,7 @@
     }
   }
 
-  const onPhaseClick = (unit: string) => {
+  const onPhaseClick = (unit: ScheduleOffsetUnit) => {
     offsetUnit = unit;
   };
 </script>
@@ -45,7 +44,7 @@
   <div class="flex flex-row items-center gap-2">
     <div class="w-24">
       <Input
-        id="hour"
+        id="days"
         bind:value={days}
         placeholder="00"
         suffix="days"
