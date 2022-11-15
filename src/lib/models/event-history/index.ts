@@ -45,14 +45,14 @@ export async function getEventAttributes(
 
   const convertedAttributes = endpoint
     ? await convertWithCodec({
-        attributes,
-        namespace,
-        settings: _settings,
-        accessToken,
-      })
+      attributes,
+      namespace,
+      settings: _settings,
+      accessToken,
+    })
     : await convertWithWebsocket(attributes);
 
-  const decodedAttributes = decodeAttributes(convertedAttributes);
+  const decodedAttributes = decodeAttributes(convertedAttributes) as object;
 
   return {
     type: key,

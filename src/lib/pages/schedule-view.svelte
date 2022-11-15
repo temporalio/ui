@@ -112,7 +112,9 @@
             <WorkflowStatus
               status={schedule?.schedule.state.paused ? 'Paused' : 'Running'}
             />
-            <span class="font-medium select-all">{scheduleId}</span>
+            <span class="font-medium select-all" data-cy="schedule-name"
+              >{scheduleId}</span
+            >
           </h1>
         </div>
         <div class="flex items-center gap-2 text-sm">

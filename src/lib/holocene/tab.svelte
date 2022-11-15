@@ -1,7 +1,7 @@
 <script lang="ts">
   export let href = '';
   export let label: string;
-  export let amount: number | Long.Long = null;
+  export let amount: number = null;
   export let active = false;
   export let disabled = false;
 </script>
