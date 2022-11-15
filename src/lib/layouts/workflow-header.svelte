@@ -93,7 +93,10 @@
     <div
       class="mb-8 flex flex-col items-start justify-between gap-4 xl:flex-row xl:gap-0"
     >
-      <h1 class="relative flex items-center gap-4 text-2xl">
+      <h1
+        data-cy="workflow-id-heading"
+        class="relative flex items-center gap-4 text-2xl"
+      >
         <WorkflowStatus status={workflow?.status} />
         <span class="select-all font-medium">{workflow.id}</span>
       </h1>

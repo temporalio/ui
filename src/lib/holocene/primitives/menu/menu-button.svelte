@@ -7,6 +7,7 @@
   export let disabled = false;
   export let hasIndicator = false;
   export let keepOpen = false;
+  export let id: string = null;
 
   const close = () => {
     !disabled && (show = false);
@@ -19,6 +20,7 @@
 
 <button
   type="button"
+  {id}
   aria-haspopup={!disabled}
   aria-controls={controls}
   aria-expanded={show}

@@ -11,6 +11,7 @@
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import { cancelWorkflow } from '$lib/services/workflow-service';
   import { toaster } from '$lib/holocene/toaster.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
@@ -31,6 +32,7 @@
     $refresh = Date.now();
     await tick();
     toaster.push({
+      id: 'workflow-termination-success-toast',
       message: 'Workflow terminated.',
       variant: 'success',
       yPosition: 'bottom',
@@ -65,6 +67,7 @@
 
       setTimeout(() => {
         toaster.push({
+          id: 'workflow-cancellation-success-toast',
           message: 'Canceled workflow.',
           yPosition: 'bottom',
         });
@@ -138,8 +141,9 @@
       Are you sure you want to terminate this workflow? This action cannot be
       undone.
     </p>
-    <input
-      class="mt-4 block w-full rounded-md border border-gray-200 p-2"
+    <Input
+      id="workflow-termination-reason"
+      class="mt-4"
       placeholder="Enter a reason"
       bind:value={reason}
     />

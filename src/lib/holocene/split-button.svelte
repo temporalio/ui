@@ -25,22 +25,31 @@
 
 <MenuContainer class={$$props.class}>
   <div class="split-button" class:disabled>
-    <Button {href} {variant} {thin} {disabled} class="segment left" on:click>
+    <Button
+      {href}
+      {variant}
+      {thin}
+      {disabled}
+      id="{id}-primary-button"
+      class="segment left"
+      on:click
+    >
       {#if icon}
         <Icon name={icon} />
       {/if}
       {label}
     </Button>
     <MenuButton
+      id="{id}-menu-button"
       dark
       class="segment right"
       bind:show
-      controls={id}
+      controls="{id}-menu"
       {disabled}
       hasIndicator
     />
   </div>
-  <Menu class="min-w-max" {id} {show} {position}>
+  <Menu class="min-w-max" id="{id}-menu" {show} {position}>
     <slot />
   </Menu>
 </MenuContainer>
