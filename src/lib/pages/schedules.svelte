@@ -19,6 +19,7 @@
   import { capitalize } from '$lib/utilities/format-camel-case';
   import DropdownButton from '$lib/holocene/dropdown-button/dropdown-button.svelte';
   import { coreUserStore } from '$lib/stores/core-user';
+  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
 
   $: namespace = $page.params.namespace;
 
@@ -81,21 +82,11 @@
           label={capitalize($timeFormat)}
           icon="clock"
         >
-          <button
-            on:click={() => ($timeFormat = 'relative')}
-            class="timezone-label"
+          <MenuItem on:click={() => ($timeFormat = 'relative')}
+            >Relative</MenuItem
           >
-            Relative
-          </button>
-          <button on:click={() => ($timeFormat = 'UTC')} class="timezone-label">
-            UTC
-          </button>
-          <button
-            on:click={() => ($timeFormat = 'local')}
-            class="timezone-label"
-          >
-            Local
-          </button>
+          <MenuItem on:click={() => ($timeFormat = 'UTC')}>UTC</MenuItem>
+          <MenuItem on:click={() => ($timeFormat = 'local')}>Local</MenuItem>
         </DropdownButton>
       </svelte:fragment>
       <SchedulesTable>
@@ -116,9 +107,3 @@
     </div>
   {/if}
 {/await}
-
-<style lang="postcss">
-  .timezone-label {
-    @apply flex w-full cursor-pointer whitespace-nowrap px-4 py-3 font-secondary text-sm font-medium hover:bg-gray-50;
-  }
-</style>
