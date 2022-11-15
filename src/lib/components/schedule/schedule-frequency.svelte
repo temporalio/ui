@@ -1,6 +1,6 @@
 <script lang="ts">
   import { intervalToComment } from '$lib/utilities/schedule-comment-formatting';
-  import type { CalendarSpec, IntervalSpec } from '$types';
+  import type { IntervalSpec } from '$types';
 
   export let calendar: FullCalendarSpec | undefined = undefined;
   export let interval: IntervalSpec | undefined = undefined;
@@ -11,9 +11,13 @@
 
 <div class="flex flex-col {$$props.class}">
   {#if calendar}
-    <p>{calendar?.comment ?? ''} UTC</p>
+    <p data-cy="schedule-calendar-frequency">{calendar?.comment ?? ''} UTC</p>
   {:else}
-    <p>{intervalToComment(intervalSecs)}</p>
-    <p>{intervalToComment(phaseSecs, true)}</p>
+    <p data-cy="schedule-interval-frequency">
+      {intervalToComment(intervalSecs)}
+    </p>
+    <p data-cy="schedule-phase-frequency">
+      {intervalToComment(phaseSecs, true)}
+    </p>
   {/if}
 </div>

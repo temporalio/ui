@@ -36,7 +36,7 @@ describe('Schedules View', () => {
     cy.wait('@schedules-api');
   });
 
-  it('should show schedule ID and workflow name in first row', () => {
+  it('should navigate to a schedule and view the name and frequency', () => {
     cy.get('.schedule-row').first().contains(scheduleId);
     cy.get('.schedule-row').first().contains(name);
 
@@ -44,41 +44,56 @@ describe('Schedules View', () => {
 
     cy.wait('@schedule-api');
 
-    cy.get('[data-cy="schedule-name"]').should('have.value', scheduleId);
+    cy.get('[data-cy="schedule-name"]').should('exist');
+    cy.get('[data-cy="schedule-name"]').contains(scheduleId);
 
-    // cy.url().should(`contain', '/schedules/${scheduleId}`);
+    cy.get('[data-cy="schedule-interval-frequency"]').contains('Every 30sec');
   });
 });
 
-// describe('Schedules Edit', () => {
-//   beforeEach(() => {
-//     cy.interceptApi();
+describe('Schedules Edit', () => {
+  beforeEach(() => {
+    cy.interceptApi();
 
-//     cy.visit('/namespaces/default/schedules');
+    cy.visit('/namespaces/default/schedules');
 
-//     cy.wait('@namespaces-api');
-//     cy.wait('@schedules-api');
-//   });
+    cy.wait('@namespaces-api');
+    cy.wait('@schedules-api');
+  });
 
-//   it('should show schedule ID and workflow name in first row', () => {
-//     cy.get('.schedule-row').first().contains(scheduleId);
-//     cy.get('.schedule-row').first().contains(name);
-//   });
-// });
+  it('should navigate to a schedule and click edit', () => {
+    cy.get('.schedule-row').first().contains(scheduleId);
+    cy.get('.schedule-row').first().contains(name);
 
-// describe('Schedules Create', () => {
-//   beforeEach(() => {
-//     cy.interceptApi();
+    cy.get('.schedule-row').first().click();
 
-//     cy.visit('/namespaces/default/schedules');
+    cy.wait('@schedule-api');
 
-//     cy.wait('@namespaces-api');
-//     cy.wait('@schedules-api');
-//   });
+    cy.get('[data-cy="schedule-name"]').should('exist');
+    cy.get('[data-cy="schedule-name"]').contains(scheduleId);
 
-//   it('should show Create Schedules Button and navigate to /create', () => {
-//     cy.get('[data-cy="create-schedule"]').click();
-//     cy.url().should('contain', '/schedules/create');
-//     cy.get('#content').contains('Create Schedule');
-//   });
-// });
+    cy.get('[data-cy="schedule-interval-frequency"]').contains('Every 30sec');
+
+    cy.get('.split-button > .right').click();
+    cy.get('#schedule-action-button > .edit').click();
+    cy.url().should('contain', `/schedules/${scheduleId}/edit`);
+    cy.get('#content').contains('Edit Schedule');
+  });
+});
+
+describe('Schedules Create', () => {
+  beforeEach(() => {
+    cy.interceptApi();
+
+    cy.visit('/namespaces/default/schedules');
+
+    cy.wait('@namespaces-api');
+    cy.wait('@schedules-api');
+  });
+
+  it('should show Create Schedules Button and navigate to /create', () => {
+    cy.get('[data-cy="create-schedule"]').click();
+    cy.url().should('contain', '/schedules/create');
+    cy.get('#content').contains('Create Schedule');
+  });
+});

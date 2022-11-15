@@ -83,11 +83,12 @@
     {
       label: 'Edit',
       onClick: () => goto(routeForScheduleEdit({ namespace, scheduleId })),
+      class: 'edit',
     },
     {
       label: 'Delete Schedule',
       onClick: () => (showDeleteConfirmation = true),
-      class: 'text-red-500',
+      class: 'text-red-500 terminate',
     },
   ];
 </script>
@@ -112,9 +113,9 @@
             <WorkflowStatus
               status={schedule?.schedule.state.paused ? 'Paused' : 'Running'}
             />
-            <span class="font-medium select-all" data-cy="schedule-name"
-              >{scheduleId}</span
-            >
+            <h1 class="font-medium select-all" data-cy="schedule-name">
+              {scheduleId}
+            </h1>
           </h1>
         </div>
         <div class="flex items-center gap-2 text-sm">
@@ -143,7 +144,7 @@
       <SplitButton
         position="right"
         label={schedule?.schedule?.state?.paused ? 'Unpause' : 'Pause'}
-        id="pause-schedule-button"
+        id="schedule-action-button"
         disabled={editDisabled}
         on:click={() => (showPauseConfirmation = !showPauseConfirmation)}
       >
