@@ -5,6 +5,7 @@
   import { autoRefreshWorkflow, eventViewType } from '$lib/stores/event-view';
   import { workflowsSearch } from '$lib/stores/workflows';
   import { workflowRun, refresh } from '$lib/stores/workflow-run';
+  import { eventHistory } from '$lib/stores/events';
 
   import {
     routeForEventHistory,
@@ -24,6 +25,7 @@
   import { page } from '$app/stores';
   import { pathMatches } from '$lib/utilities/path-matches';
   import AutoRefreshWorkflow from '$lib/components/auto-refresh-workflow.svelte';
+  import Alert from '$lib/holocene/alert.svelte';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
@@ -73,6 +75,12 @@
   onDestroy(() => {
     clearInterval(refreshInterval);
   });
+
+  $: cancelInProgress =
+    $workflowRun?.workflow?.status !== 'Canceled' &&
+    $eventHistory.events.some(
+      (event) => event?.eventType === 'WorkflowExecutionCancelRequested',
+    );
 </script>
 
 <header class="mb-4 flex flex-col gap-4">
@@ -91,7 +99,7 @@
       </a>
     </div>
     <div
-      class="mb-8 flex flex-col items-start justify-between gap-4 xl:flex-row xl:gap-0"
+      class="mb-8 flex flex-col items-center justify-between gap-4 xl:flex-row xl:gap-0"
     >
       <h1
         data-cy="workflow-id-heading"
@@ -107,6 +115,16 @@
         </div>
       {/if}
     </div>
+    {#if cancelInProgress}
+      <Alert
+        class="-mt-4 mb-4"
+        icon="warning"
+        intent="warning"
+        title="Cancellation in progress."
+      >
+        We have triggered a cancellation request for your workflow.
+      </Alert>
+    {/if}
     <nav class="flex flex-wrap gap-6">
       <Tab
         label="History"

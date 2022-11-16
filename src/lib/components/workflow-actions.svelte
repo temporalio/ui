@@ -64,19 +64,14 @@
         workflowId: workflow.id,
         runId: workflow.runId,
       });
-
       setTimeout(() => {
-        toaster.push({
-          id: 'workflow-cancellation-success-toast',
-          message: 'Canceled workflow.',
-          yPosition: 'bottom',
-        });
-        showCancellationConfirmation = false;
         loading = false;
+        showCancellationConfirmation = false;
         $refresh = Date.now();
       }, 1000);
     } catch {
       toaster.push({
+        xPosition: 'right',
         variant: 'error',
         message: 'Unable to cancel workflow.',
       });
