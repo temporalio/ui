@@ -1,6 +1,7 @@
 import add from './svg/add.svelte';
 import archives from './svg/archives.svelte';
 import arrowUp from './svg/arrow-up.svelte';
+import arrowRight from './svg/arrow-right.svelte';
 import ascending from './svg/ascending.svelte';
 import book from './svg/book.svelte';
 import bookmark from './svg/bookmark.svelte';
@@ -43,6 +44,7 @@ import namespace from './svg/namespace.svelte';
 import regions from './svg/regions.svelte';
 import retention from './svg/retention.svelte';
 import retry from './svg/retry.svelte';
+import rocketShip from './svg/rocket-ship.svelte';
 import schedules from './svg/schedules.svelte';
 import search from './svg/search.svelte';
 import settings from './svg/settings.svelte';
@@ -65,6 +67,7 @@ export const icons = {
   add,
   archives,
   'arrow-up': arrowUp,
+  'arrow-right': arrowRight,
   ascending,
   book,
   bookmark,
@@ -107,6 +110,7 @@ export const icons = {
   regions,
   retention,
   retry,
+  'rocket-ship': rocketShip,
   schedules,
   search,
   settings,
