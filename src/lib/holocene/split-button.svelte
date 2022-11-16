@@ -19,6 +19,7 @@
   export let disabled: boolean = false;
   export let position: 'left' | 'right' = 'left';
   export let href = '';
+  export let primaryActionDisabled: boolean = false;
 
   let show: boolean = false;
 </script>
@@ -29,7 +30,7 @@
       {href}
       {variant}
       {thin}
-      {disabled}
+      disabled={disabled || primaryActionDisabled}
       id="{id}-primary-button"
       class="segment left"
       on:click

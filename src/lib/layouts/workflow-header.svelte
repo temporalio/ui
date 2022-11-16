@@ -112,7 +112,7 @@
       {#if isRunning}
         <div class="flex items-center justify-start gap-4 xl:justify-end">
           <AutoRefreshWorkflow onChange={onRefreshChange} />
-          <WorkflowActions {workflow} {namespace} />
+          <WorkflowActions {cancelInProgress} {workflow} {namespace} />
         </div>
       {/if}
     </div>

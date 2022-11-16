@@ -17,6 +17,7 @@
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
+  export let cancelInProgress: boolean;
 
   let reason = '';
   let showTerminationConfirmation = false;
@@ -66,14 +67,12 @@
         workflowId: workflow.id,
         runId: workflow.runId,
       });
-      setTimeout(() => {
-        loading = false;
-        showCancellationConfirmation = false;
-        $refresh = Date.now();
-      }, 1000);
+      loading = false;
+      showCancellationConfirmation = false;
+      $refresh = Date.now();
     } catch {
       toaster.push({
-        xPosition: 'right',
+        yPosition: 'top',
         variant: 'error',
         message: 'Unable to cancel workflow.',
       });
@@ -94,6 +93,7 @@
   text="You do not have permission to edit this workflow. Contact your admin for assistance."
 >
   <SplitButton
+    primaryActionDisabled={cancelInProgress}
     disabled={actionsDisabled}
     label="Request Cancellation"
     on:click={showCancellationModal}
