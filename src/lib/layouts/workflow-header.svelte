@@ -78,7 +78,7 @@
   });
 
   $: cancelInProgress =
-    $workflowRun?.workflow?.status !== 'Canceled' &&
+    $workflowRun?.workflow?.status === 'Running' &&
     $eventHistory.events.some(
       (event) => event?.eventType === 'WorkflowExecutionCancelRequested',
     );
