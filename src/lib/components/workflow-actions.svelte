@@ -126,26 +126,25 @@
       </p>
     </svelte:fragment>
   </Modal>
+  <Modal
+    open={showTerminationConfirmation}
+    confirmText="Terminate"
+    confirmType="destructive"
+    on:cancelModal={hideTerminationModal}
+    on:confirmModal={terminate}
+  >
+    <h3 slot="title">Terminate Workflow</h3>
+    <div slot="content">
+      <p>
+        Are you sure you want to terminate this workflow? This action cannot be
+        undone.
+      </p>
+      <Input
+        id="workflow-termination-reason"
+        class="mt-4"
+        placeholder="Enter a reason"
+        bind:value={reason}
+      />
+    </div>
+  </Modal>
 {/if}
-
-<Modal
-  open={showTerminationConfirmation}
-  confirmText="Terminate"
-  confirmType="destructive"
-  on:cancelModal={hideTerminationModal}
-  on:confirmModal={terminate}
->
-  <h3 slot="title">Terminate Workflow</h3>
-  <div slot="content">
-    <p>
-      Are you sure you want to terminate this workflow? This action cannot be
-      undone.
-    </p>
-    <Input
-      id="workflow-termination-reason"
-      class="mt-4"
-      placeholder="Enter a reason"
-      bind:value={reason}
-    />
-  </div>
-</Modal>
