@@ -105,7 +105,7 @@ export const routeForSchedules = (parameters: NamespaceParameter): string => {
 export const routeForScheduleCreate = ({
   namespace,
 }: NamespaceParameter): string => {
-  return `${routeForSchedules({ namespace })}/new`;
+  return `${routeForSchedules({ namespace })}/create`;
 };
 
 export const routeForSchedule = ({
@@ -115,6 +115,15 @@ export const routeForSchedule = ({
   const sid = encodeURIForSvelte(scheduleId);
 
   return `${routeForSchedules({ namespace })}/${sid}`;
+};
+
+export const routeForScheduleEdit = ({
+  scheduleId,
+  namespace,
+}: ScheduleParameters): string => {
+  const sid = encodeURIForSvelte(scheduleId);
+
+  return `${routeForSchedules({ namespace })}/${sid}/edit`;
 };
 
 export const routeForEventHistory = ({
