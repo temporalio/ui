@@ -23,6 +23,7 @@ import copy from './svg/copy.svelte';
 import descending from './svg/descending.svelte';
 import download from './svg/download.svelte';
 import error from './svg/error.svelte';
+import exit from './svg/exit.svelte';
 import eyeHide from './svg/eye-hide.svelte';
 import eyeShow from './svg/eye-show.svelte';
 import feed from './svg/feed.svelte';
@@ -55,6 +56,7 @@ import starEmpty from './svg/star-empty.svelte';
 import starFilled from './svg/star-filled.svelte';
 import terminal from './svg/terminal.svelte';
 import trash from './svg/trash.svelte';
+import tutorial from './svg/tutorial.svelte';
 import upload from './svg/upload.svelte';
 import usage from './svg/usage.svelte';
 import verticalEllipsis from './svg/vertical-ellipsis.svelte';
@@ -89,6 +91,7 @@ export const icons = {
   descending,
   download,
   error,
+  exit,
   'eye-hide': eyeHide,
   'eye-show': eyeShow,
   feed,
@@ -121,6 +124,7 @@ export const icons = {
   'spinner-solid': spinnerSolid,
   terminal,
   trash,
+  tutorial,
   upload,
   usage,
   'vertical-ellipsis': verticalEllipsis,
