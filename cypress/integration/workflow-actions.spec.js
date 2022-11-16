@@ -55,7 +55,8 @@ describe('Workflow Actions', () => {
       cy.wait('@workflow-api');
 
       cy.get('[data-cy="workflow-id-heading"]').should('exist');
-      cy.get('[aria-controls="workflow-actions"]').should('not.exist');
+      cy.get('#workflow-actions-menu-button').click();
+      cy.get('[data-cy="terminate-button"]').should('have.class', 'disabled');
     });
   });
 
@@ -74,7 +75,6 @@ describe('Workflow Actions', () => {
 
       cy.get('#workflow-actions-primary-button').click();
       cy.get('[data-cy="confirm-modal-button"]').click();
-      cy.get('#workflow-cancellation-success-toast');
     });
   });
 });

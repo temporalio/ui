@@ -94,16 +94,14 @@
     on:click={showCancellationModal}
     id="workflow-actions"
   >
-    {#if workflow.canBeTerminated}
-      <MenuItem
-        destructive
-        on:click={showTerminationModal}
-        disabled={actionsDisabled}
-        dataCy="terminate-button"
-      >
-        Terminate
-      </MenuItem>
-    {/if}
+    <MenuItem
+      destructive
+      on:click={showTerminationModal}
+      disabled={actionsDisabled || !workflow.canBeTerminated}
+      dataCy="terminate-button"
+    >
+      Terminate
+    </MenuItem>
   </SplitButton>
 </Tooltip>
 
