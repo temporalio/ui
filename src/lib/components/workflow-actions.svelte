@@ -95,7 +95,7 @@
 >
   <SplitButton
     disabled={actionsDisabled}
-    label="Cancel"
+    label="Request Cancellation"
     on:click={showCancellationModal}
     id="workflow-actions"
   >
