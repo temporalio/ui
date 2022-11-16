@@ -9,8 +9,8 @@
   export let minute: string;
 </script>
 
-<div class="my-4 flex flex-col  gap-4">
-  <h3 class="text-base">Recurring date(s)</h3>
+<div class="my-2 flex flex-col gap-4">
+  <h3 class="text-lg font-medium">Recurring date(s)</h3>
   <p>Select the specific dates for the schedule to always run on.</p>
   <div class="flex w-full flex-col gap-4">
     <DayOfMonthPicker bind:daysOfMonth />

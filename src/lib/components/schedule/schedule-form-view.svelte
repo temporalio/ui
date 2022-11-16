@@ -8,30 +8,34 @@
   import SchedulesCalendarView from '$lib/components/schedule/schedules-calendar-view.svelte';
   import type { Schedule } from '$types';
   import { page } from '$app/stores';
+  import {
+    routeForSchedule,
+    routeForSchedules,
+  } from '$lib/utilities/route-for';
 
   export let schedule: FullScheduleSpec | null = null;
-  export let title: string;
-  export let loadingText: string;
-  export let backTitle: string;
-  export let backHref: string;
-  export let confirmText: string;
   export let onConfirm: (
     preset: SchedulePreset,
     args: ScheduleParameters,
     schedule?: Schedule,
   ) => void;
 
+  let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
+
+  let title = schedule ? 'Edit Schedule' : 'Create Schedule';
+  let loadingText = schedule ? 'Editing Schedule...' : 'Creating Schedule...';
+  let backTitle = schedule ? 'Back to Schedule' : 'Back to Schedules';
+  let backHref = schedule
+    ? routeForSchedule({ namespace, scheduleId })
+    : routeForSchedules({ namespace });
+  let confirmText = schedule ? 'Save' : 'Create Schedule';
 
   let errors = {};
   let name = scheduleId ?? '';
-  let workflowType = schedule
-    ? schedule?.action?.startWorkflow?.workflowType?.name
-    : '';
-  let workflowId = schedule ? schedule?.action?.startWorkflow?.workflowId : '';
-  let taskQueue = schedule
-    ? schedule?.action?.startWorkflow?.taskQueue?.name
-    : '';
+  let workflowType = schedule?.action?.startWorkflow?.workflowType?.name ?? '';
+  let workflowId = schedule?.action?.startWorkflow?.workflowId ?? '';
+  let taskQueue = schedule?.action?.startWorkflow?.taskQueue?.name ?? '';
   let daysOfWeek: string[] = [];
   let daysOfMonth: number[] = [];
   let months: string[] = [];
@@ -41,18 +45,6 @@
   let second = '';
   let phase = '';
   let cronString = '';
-
-  const onInput = (key: string) => {
-    errors[key] = false;
-  };
-
-  const onBlur = (key: string, value: string) => {
-    if (!value) {
-      errors[key] = true;
-    } else {
-      errors[key] = false;
-    }
-  };
 
   const handleConfirm = (preset: SchedulePreset, schedule?: Schedule) => {
     const args: ScheduleParameters = {
@@ -74,6 +66,20 @@
     onConfirm(preset, args, schedule);
   };
 
+  const onInput = (e: Event) => {
+    const { id } = e.target as HTMLInputElement;
+    errors[id] = false;
+  };
+
+  const onBlur = (e: Event) => {
+    const { value, id } = e.target as HTMLInputElement;
+    if (!value.trim()) {
+      errors[id] = true;
+    } else {
+      errors[id] = false;
+    }
+  };
+
   $: isDisabled = (preset: SchedulePreset) => {
     if (!name || !workflowType || !workflowId || !taskQueue) return true;
     if (preset === 'interval') return !days && !hour && !minute && !second;
@@ -88,12 +94,12 @@
   {#if $loading}
     <Loading title={loadingText} />
   {:else}
-    <main class="relative mb-12 flex gap-1">
+    <header class="relative mb-12 flex gap-1">
       <a href={backHref} class="back absolute top-0" style="left: 0rem">
         <Icon name="chevron-left" class="inline" />{backTitle}
       </a>
       <h2 class="font-base mt-8 ml-0 text-2xl">{title}</h2>
-    </main>
+    </header>
     <form class="mb-4 flex w-full flex-col gap-4 md:w-2/3 xl:w-1/2">
       {#if $error}
         <p
@@ -107,8 +113,11 @@
           id="name"
           bind:value={name}
           label="Name"
+          error={errors['name']}
           maxLength={232}
           disabled={Boolean(scheduleId)}
+          on:input={onInput}
+          on:blur={onBlur}
         />
       </div>
       <div class="w-full">
@@ -117,8 +126,8 @@
           bind:value={workflowType}
           label="Workflow Type*"
           error={errors['workflowType']}
-          on:input={() => onInput('workflowType')}
-          on:blur={() => onBlur('workflowType', workflowType)}
+          on:input={onInput}
+          on:blur={onBlur}
         />
       </div>
       <div class="w-full">
@@ -127,8 +136,8 @@
           bind:value={workflowId}
           label="Workflow Id*"
           error={errors['workflowId']}
-          on:input={() => onInput('workflowId')}
-          on:blur={() => onBlur('workflowId', workflowId)}
+          on:input={onInput}
+          on:blur={onBlur}
         />
       </div>
       <div class="w-full">
@@ -137,8 +146,8 @@
           bind:value={taskQueue}
           label="Task Queue*"
           error={errors['taskQueue']}
-          on:input={() => onInput('taskQueue')}
-          on:blur={() => onBlur('taskQueue', taskQueue)}
+          on:input={onInput}
+          on:blur={onBlur}
         />
       </div>
       <SchedulesCalendarView

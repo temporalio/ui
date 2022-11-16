@@ -2,17 +2,21 @@
   import { page } from '$app/stores';
 
   import { submitEditSchedule } from '$lib/stores/schedules';
-  import { routeForSchedule } from '$lib/utilities/route-for';
 
   import Loading from '$holocene/loading.svelte';
   import { fetchSchedule } from '$lib/services/schedule-service';
 
   import ScheduleFormView from '$lib/components/schedule/schedule-form-view.svelte';
+  import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
 
-  let scheduleFetch = fetchSchedule({ namespace, scheduleId });
+  const parameters = {
+    namespace,
+    scheduleId: decodeURIForSvelte(scheduleId),
+  };
+  let scheduleFetch = fetchSchedule(parameters);
 
   const handleEdit = (
     preset: SchedulePreset,
@@ -63,13 +67,5 @@
 {#await scheduleFetch}
   <Loading title="Loading Schedule..." />
 {:then { schedule }}
-  <ScheduleFormView
-    title="Edit Schedule"
-    loadingText="Editing Schedule..."
-    backHref={routeForSchedule({ namespace, scheduleId })}
-    backTitle="Back to Schedule"
-    confirmText="Save"
-    onConfirm={handleEdit}
-    {schedule}
-  />
+  <ScheduleFormView onConfirm={handleEdit} {schedule} />
 {/await}

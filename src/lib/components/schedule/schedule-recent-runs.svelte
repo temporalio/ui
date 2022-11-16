@@ -7,8 +7,9 @@
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import { routeForWorkflow } from '$lib/utilities/route-for';
+  import { routeForEventHistory } from '$lib/utilities/route-for';
   import Link from '$lib/holocene/link.svelte';
+  import { eventViewType } from '$lib/stores/event-view';
 
   export let recentRuns: ScheduleActionResult[] = [];
   export let namespace: string;
@@ -16,7 +17,7 @@
 
 <Panel>
   <h2 class="mb-4 text-2xl">Recent Runs</h2>
-  {#each recentRuns.slice(0, 5) as run (run.startWorkflowResult.workflowId)}
+  {#each recentRuns.slice(0, 5) as run (run?.startWorkflowResult?.workflowId)}
     {#await fetchWorkflow({ namespace, workflowId: decodeURIForSvelte(run.startWorkflowResult.workflowId), runId: run.startWorkflowResult.runId }, fetch) then workflow}
       <div class="row">
         <div class="w-28">
@@ -25,7 +26,8 @@
         <div class="w-96">
           <Link
             sveltekit:prefetch
-            href={routeForWorkflow({
+            href={routeForEventHistory({
+              view: $eventViewType,
               workflow: run.startWorkflowResult.workflowId,
               run: run.startWorkflowResult.runId,
               namespace,

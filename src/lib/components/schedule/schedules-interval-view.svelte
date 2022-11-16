@@ -35,8 +35,8 @@
   };
 </script>
 
-<div class="my-4 flex flex-col gap-4">
-  <h3 class="text-base">Recurring Time</h3>
+<div class="my-2 flex flex-col gap-4">
+  <h3 class="text-lg font-medium">Recurring Time</h3>
   <p>
     Specify the time interval for this schedule to run (for example every 5
     minutes).
@@ -86,7 +86,7 @@
       />
     </div>
   </div>
-  <h3 class="mt-4 text-base">Offset</h3>
+  <h3 class="mt-4 text-lg font-medium">Offset</h3>
   <p>
     Specify the time to offset when this schedule will run (for example 15 min
     past the hour).

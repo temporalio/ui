@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { Schedule } from '$types';
   import Tab from '$lib/holocene/tab.svelte';
   import SchedulesIntervalView from './schedules-interval-view.svelte';
   import ScheduleDayOfWeekView from './schedule-day-of-week-view.svelte';
@@ -23,7 +22,7 @@
   export let phase: string;
   export let cronString: string;
 
-  const clearSchedule = (_preset: SchedulePreset) => {
+  const clearSchedule = () => {
     daysOfWeek = [];
     daysOfMonth = [];
     months = [];
@@ -35,9 +34,7 @@
     cronString = '';
   };
 
-  $: {
-    clearSchedule(preset);
-  }
+  $: preset, clearSchedule();
 </script>
 
 <div class="mt-8 w-full">
@@ -49,6 +46,7 @@
         dataCy="interval-tab"
         active={preset === 'existing'}
         on:click={() => (preset = 'existing')}
+        on:keypress={() => (preset = 'existing')}
       />
     {/if}
     <Tab
@@ -56,24 +54,28 @@
       dataCy="interval-tab"
       active={preset === 'interval'}
       on:click={() => (preset = 'interval')}
+      on:keypress={() => (preset = 'interval')}
     />
     <Tab
       label="Days of the Week"
       dataCy="daily-tab"
       active={preset === 'week'}
       on:click={() => (preset = 'week')}
+      on:keypress={() => (preset = 'week')}
     />
     <Tab
       label="Days of the Month"
       dataCy="monthly-tab"
       active={preset === 'month'}
       on:click={() => (preset = 'month')}
+      on:keypress={() => (preset = 'month')}
     />
     <Tab
       label="String"
       dataCy="string-tab"
       active={preset === 'string'}
       on:click={() => (preset = 'string')}
+      on:keypress={() => (preset = 'string')}
     />
   </div>
   <div class="mt-4 flex w-full flex-wrap gap-6">
@@ -101,8 +103,8 @@
         bind:minute
       />
     {:else if preset === 'string'}
-      <div class="flex w-full flex-col gap-2">
-        <h3 class="text-base">String</h3>
+      <div class="my-2 flex w-full flex-col gap-4">
+        <h3 class="text-lg font-medium">String</h3>
         <p>Write or paste in a cron string to generate a schedule.</p>
         <Input
           id="cronString"

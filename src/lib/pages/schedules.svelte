@@ -20,6 +20,7 @@
   import DropdownButton from '$lib/holocene/dropdown-button/dropdown-button.svelte';
   import { coreUserStore } from '$lib/stores/core-user';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
+  import TableRow from '$lib/holocene/table/table-row.svelte';
 
   $: namespace = $page.params.namespace;
 
@@ -92,6 +93,17 @@
       <SchedulesTable>
         {#each visibleItems as schedule}
           <SchedulesTableRow {schedule} />
+        {:else}
+          <TableRow>
+            <td class="hidden xl:table-cell" />
+            <td colspan="3">
+              <EmptyState
+                title="No Schedules Found"
+                content={'Try a different search'}
+              />
+            </td>
+            <td class="hidden xl:table-cell" />
+          </TableRow>
         {/each}
       </SchedulesTable>
     </Pagination>

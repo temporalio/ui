@@ -7,8 +7,8 @@
   export let minute: string;
 </script>
 
-<div class="my-4 flex flex-col gap-4">
-  <h3 class="text-base">Recurring day(s)</h3>
+<div class="my-2 flex flex-col gap-4">
+  <h3 class="text-lg font-medium">Recurring day(s)</h3>
   <p>Select the day(s) of the week this schedule will always run on.</p>
   <DayOfWeekPicker bind:daysOfWeek />
 </div>

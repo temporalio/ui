@@ -29,8 +29,8 @@
   };
 </script>
 
-<div class="flex flex-col gap-2">
-  <h3 class="text-base">Time</h3>
+<div class="flex flex-col gap-4">
+  <h3 class="text-lg font-medium">Time</h3>
   <p>
     Specify the time (UTC) for this schedule to run. By default, the schedule
     will run at 12:00am UTC if left blank.

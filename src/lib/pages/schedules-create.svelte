@@ -2,7 +2,6 @@
   import { page } from '$app/stores';
 
   import { submitCreateSchedule } from '$lib/stores/schedules';
-  import { routeForSchedules } from '$lib/utilities/route-for';
 
   import ScheduleFormView from '$lib/components/schedule/schedule-form-view.svelte';
 
@@ -49,11 +48,4 @@
   };
 </script>
 
-<ScheduleFormView
-  title="Create Schedule"
-  loadingText="Creating Schedule..."
-  backHref={routeForSchedules({ namespace })}
-  backTitle="Back to Schedules"
-  confirmText="Create Schedule"
-  onConfirm={handleCreate}
-/>
+<ScheduleFormView onConfirm={handleCreate} />

@@ -11,6 +11,7 @@
     class="block whitespace-nowrap border-b-2 border-white text-sm hover:border-b-2 hover:border-blue-700 md:text-base"
     class:active
     class:disabled
+    tabindex="0"
     {href}
     data-cy={$$props.dataCy}
   >
@@ -27,7 +28,9 @@
     class:active
     class:disabled
     data-cy={$$props.dataCy}
+    tabindex="0"
     on:click
+    on:keypress
   >
     {#if amount || amount === 0}
       {label}

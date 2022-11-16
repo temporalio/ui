@@ -122,7 +122,7 @@
   }
 
   .input-container.error {
-    @apply border-red-700;
+    @apply border-2 border-red-700;
   }
 
   .suffix {
