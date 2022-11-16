@@ -52,7 +52,7 @@ export async function getEventAttributes(
       })
     : await convertWithWebsocket(attributes);
 
-  const decodedAttributes = decodeAttributes(convertedAttributes);
+  const decodedAttributes = decodeAttributes(convertedAttributes) as object;
 
   return {
     type: key,

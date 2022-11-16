@@ -165,3 +165,19 @@ export async function fetchWorkflow(
   const route = await routeForApi('workflow', parameters);
   return requestFromAPI(route, { request }).then(toWorkflowExecution);
 }
+
+export async function fetchWorkflowForSchedule(
+  parameters: GetWorkflowExecutionRequest,
+  request = fetch,
+): Promise<WorkflowExecution> {
+  const onError: ErrorCallback = (err) => {
+    console.error(err);
+  };
+
+  const route = await routeForApi('workflow', parameters);
+  return requestFromAPI(route, {
+    request,
+    onError,
+    handleError: onError,
+  }).then(toWorkflowExecution);
+}

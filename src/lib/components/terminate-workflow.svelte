@@ -45,7 +45,7 @@
   };
 
   let coreUser = coreUserStore();
-  $: terminateDisabled = $coreUser.terminateDisabled(namespace);
+  $: terminateDisabled = $coreUser.namespaceWriteDisabled(namespace);
 </script>
 
 {#if workflow.canBeTerminated}

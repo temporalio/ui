@@ -53,7 +53,7 @@ export const fetchAllSchedules = async (
 export async function fetchSchedule(
   parameters: ScheduleParameters,
   request = fetch,
-): Promise<DescribeScheduleResponse> {
+): Promise<DescribeFullSchedule> {
   const route = await routeForApi('schedule', parameters);
   return requestFromAPI(route, { request });
 }
@@ -116,12 +116,18 @@ export async function editSchedule({
   namespace,
   scheduleId,
   body,
-}: EditScheduleOptions): Promise<null> {
+}: Partial<EditScheduleOptions>): Promise<{ error: string }> {
+  let error = '';
+  const onError: ErrorCallback = (err) =>
+    (error =
+      err?.body?.message ??
+      `Error editing schedule: ${err.status}: ${err.statusText}`);
+
   const route = await routeForApi('schedule', {
     namespace,
     scheduleId,
   });
-  return await requestFromAPI<null>(route, {
+  await requestFromAPI<null>(route, {
     options: {
       method: 'POST',
       body: stringifyWithBigInt({
@@ -130,8 +136,10 @@ export async function editSchedule({
       }),
     },
     shouldRetry: false,
-    onError: (error) => console.error(error),
+    onError,
   });
+
+  return { error };
 }
 
 type PauseScheduleOptions = {
