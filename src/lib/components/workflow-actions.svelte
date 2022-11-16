@@ -3,6 +3,8 @@
 
   import { refresh } from '$lib/stores/workflow-run';
   import { terminateWorkflow } from '$lib/services/terminate-service';
+  import { settings } from '$lib/stores/settings';
+  import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
   import Modal from '$holocene/modal.svelte';
   import { coreUserStore } from '$lib/stores/core-user';
@@ -35,7 +37,7 @@
       id: 'workflow-termination-success-toast',
       message: 'Workflow terminated.',
       variant: 'success',
-      yPosition: 'bottom',
+      yPosition: 'top',
     });
   };
 
@@ -79,7 +81,10 @@
   };
 
   let coreUser = coreUserStore();
-  $: actionsDisabled = $coreUser.namespaceWriteDisabled(namespace);
+
+  $: actionsDisabled =
+    $coreUser.namespaceWriteDisabled(namespace) ||
+    !writeActionsAreAllowed(settings);
 </script>
 
 <Tooltip
@@ -97,7 +102,7 @@
     <MenuItem
       destructive
       on:click={showTerminationModal}
-      disabled={actionsDisabled || !workflow.canBeTerminated}
+      disabled={actionsDisabled}
       dataCy="terminate-button"
     >
       Terminate
@@ -105,21 +110,23 @@
   </SplitButton>
 </Tooltip>
 
-<Modal
-  open={showCancellationConfirmation}
-  {loading}
-  confirmType="destructive"
-  on:cancelModal={hideCancellationModal}
-  on:confirmModal={cancel}
->
-  <h3 slot="title">Cancel Workflow</h3>
-  <svelte:fragment slot="content">
-    <p>
-      Are you sure you want to cancel this workflow? This action cannot be
-      undone.
-    </p>
-  </svelte:fragment>
-</Modal>
+{#if !actionsDisabled}
+  <Modal
+    open={showCancellationConfirmation}
+    {loading}
+    confirmType="destructive"
+    on:cancelModal={hideCancellationModal}
+    on:confirmModal={cancel}
+  >
+    <h3 slot="title">Cancel Workflow</h3>
+    <svelte:fragment slot="content">
+      <p>
+        Are you sure you want to cancel this workflow? This action cannot be
+        undone.
+      </p>
+    </svelte:fragment>
+  </Modal>
+{/if}
 
 <Modal
   open={showTerminationConfirmation}
