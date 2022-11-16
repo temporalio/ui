@@ -4,11 +4,12 @@
   import WorkflowStatus from '../workflow-status.svelte';
   import { formatDate } from '$lib/utilities/format-date';
   import { timeFormat } from '$lib/stores/time-format';
-  import { fetchWorkflow } from '$lib/services/workflow-service';
+  import { fetchWorkflowForSchedule } from '$lib/services/workflow-service';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import { routeForWorkflow } from '$lib/utilities/route-for';
+  import { routeForEventHistory } from '$lib/utilities/route-for';
   import Link from '$lib/holocene/link.svelte';
+  import { eventViewType } from '$lib/stores/event-view';
 
   export let recentRuns: ScheduleActionResult[] = [];
   export let namespace: string;
@@ -16,8 +17,8 @@
 
 <Panel>
   <h2 class="mb-4 text-2xl">Recent Runs</h2>
-  {#each recentRuns.slice(0, 5) as run (run.startWorkflowResult.workflowId)}
-    {#await fetchWorkflow({ namespace, workflowId: decodeURIForSvelte(run.startWorkflowResult.workflowId), runId: run.startWorkflowResult.runId }, fetch) then workflow}
+  {#each recentRuns.slice(0, 5) as run (run?.startWorkflowResult?.workflowId)}
+    {#await fetchWorkflowForSchedule({ namespace, workflowId: decodeURIForSvelte(run.startWorkflowResult.workflowId), runId: run.startWorkflowResult.runId }, fetch) then workflow}
       <div class="row">
         <div class="w-28">
           <WorkflowStatus status={workflow.status} />
@@ -25,7 +26,8 @@
         <div class="w-96">
           <Link
             sveltekit:prefetch
-            href={routeForWorkflow({
+            href={routeForEventHistory({
+              view: $eventViewType,
               workflow: run.startWorkflowResult.workflowId,
               run: run.startWorkflowResult.runId,
               namespace,
@@ -33,6 +35,16 @@
           >
             {run.startWorkflowResult.workflowId}
           </Link>
+        </div>
+        <div class="ml-auto">
+          <p>{formatDate(run.actualTime, $timeFormat)}</p>
+        </div>
+      </div>
+    {:catch}
+      <div class="row">
+        <div class="w-28" />
+        <div class="w-96">
+          {run.startWorkflowResult.workflowId}
         </div>
         <div class="ml-auto">
           <p>{formatDate(run.actualTime, $timeFormat)}</p>

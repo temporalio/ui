@@ -1,15 +1,23 @@
 <script lang="ts">
-  import type { CalendarSpec, IntervalSpec } from '$types';
-  import CodeBlock from '$lib/holocene/code-block.svelte';
+  import { intervalToComment } from '$lib/utilities/schedule-comment-formatting';
+  import type { IntervalSpec } from '$types';
 
-  export let calendar: CalendarSpec;
-  export let interval: IntervalSpec;
+  export let calendar: FullCalendarSpec | undefined = undefined;
+  export let interval: IntervalSpec | undefined = undefined;
+
+  const intervalSecs = interval?.interval as string;
+  const phaseSecs = interval?.phase as string;
 </script>
 
-{#if !calendar}
-  <CodeBlock content={interval} />
-{:else}
-  <div class="flex flex-row gap-4 break-all text-sm">
-    <CodeBlock content={calendar} />
-  </div>
-{/if}
+<div class="flex flex-col {$$props.class}">
+  {#if calendar}
+    <p data-cy="schedule-calendar-frequency">{calendar?.comment ?? ''} UTC</p>
+  {:else}
+    <p data-cy="schedule-interval-frequency">
+      {intervalToComment(intervalSecs)}
+    </p>
+    <p data-cy="schedule-phase-frequency">
+      {intervalToComment(phaseSecs, true)}
+    </p>
+  {/if}
+</div>

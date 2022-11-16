@@ -9,7 +9,6 @@
 <script lang="ts">
   import Icon from '$holocene/icon/icon.svelte';
   import type { SvelteComponent } from 'svelte';
-  import FeatureTag from '$lib/holocene/feature-tag.svelte';
   import type { DescribeNamespaceResponse as Namespace } from '$types';
 
   import { namespaceSelectorOpen } from '$lib/stores/nav-open';
@@ -22,7 +21,6 @@
   import IsCloudGuard from '$lib/components/is-cloud-guard.svelte';
 
   import { afterNavigate } from '$app/navigation';
-  import { viewFeature } from '$lib/stores/new-feature-tags';
   import FeatureGuard from '$lib/components/feature-guard.svelte';
   import IsLegacyCloudGuard from '$lib/components/is-legacy-cloud-guard.svelte';
 
@@ -57,26 +55,26 @@
       </NavTooltip>
       <div class="nav-title">Workflows</div>
     </NavRow>
-    <IsCloudGuard {isCloud}>
-      <FeatureGuard
-        enabled={Boolean(activeNamespace?.namespaceInfo?.supportsSchedules)}
-      >
-        <NavRow
-          link={linkList.schedules}
-          {isCloud}
-          data-cy="schedules-button"
-          on:click={() => viewFeature('schedules')}
+    <slot name="schedules">
+      <IsCloudGuard {isCloud}>
+        <FeatureGuard
+          enabled={Boolean(activeNamespace?.namespaceInfo?.supportsSchedules)}
         >
-          <NavTooltip right text="Schedules">
-            <div class="nav-icon">
-              <Icon name="schedules" />
-              <FeatureTag feature="schedules" alpha />
-            </div>
-          </NavTooltip>
-          <div class="nav-title">Schedules</div>
-        </NavRow>
-      </FeatureGuard>
-    </IsCloudGuard>
+          <NavRow
+            link={linkList.schedules}
+            {isCloud}
+            data-cy="schedules-button"
+          >
+            <NavTooltip right text="Schedules">
+              <div class="nav-icon">
+                <Icon name="schedules" />
+              </div>
+            </NavTooltip>
+            <div class="nav-title">Schedules</div>
+          </NavRow>
+        </FeatureGuard>
+      </IsCloudGuard>
+    </slot>
     <IsLegacyCloudGuard {isCloud}>
       <NavRow link={linkList.namespaces} {isCloud} data-cy="namespaces-button">
         <NavTooltip right text="Namespaces">

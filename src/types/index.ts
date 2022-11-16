@@ -20,6 +20,7 @@ export type ListScheduleResponse =
   temporal.api.workflowservice.v1.IListSchedulesResponse;
 export type DescribeScheduleResponse =
   temporal.api.workflowservice.v1.IDescribeScheduleResponse;
+export type Schedule = temporal.api.schedule.v1.ISchedule;
 export type CreateScheduleRequest =
   temporal.api.workflowservice.v1.ICreateScheduleRequest;
 export type PatchScheduleRequest =
