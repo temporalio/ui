@@ -147,7 +147,7 @@
       <SplitButton
         position="right"
         label={schedule?.schedule?.state?.paused ? 'Unpause' : 'Pause'}
-        id="schedule-action-button"
+        id="schedule-actions"
         disabled={editDisabled}
         on:click={() => (showPauseConfirmation = !showPauseConfirmation)}
       >
