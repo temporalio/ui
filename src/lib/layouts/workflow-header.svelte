@@ -1,6 +1,7 @@
 <script lang="ts">
   import Icon from '$holocene/icon/icon.svelte';
   import { onDestroy, onMount } from 'svelte';
+  import { fly } from 'svelte/transition';
 
   import { autoRefreshWorkflow, eventViewType } from '$lib/stores/event-view';
   import { workflowsSearch } from '$lib/stores/workflows';
@@ -116,14 +117,15 @@
       {/if}
     </div>
     {#if cancelInProgress}
-      <Alert
-        class="-mt-4 mb-4"
-        icon="warning"
-        intent="warning"
-        title="Cancellation in progress."
-      >
-        We have triggered a cancellation request for your workflow.
-      </Alert>
+      <div class="-mt-4 mb-4" transition:fly={{ duration: 200, delay: 100 }}>
+        <Alert
+          icon="warning"
+          intent="warning"
+          title="Cancellation in progress."
+        >
+          We have triggered a cancellation request for your workflow.
+        </Alert>
+      </div>
     {/if}
     <nav class="flex flex-wrap gap-6">
       <Tab
