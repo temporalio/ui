@@ -4,7 +4,7 @@
   import WorkflowStatus from '../workflow-status.svelte';
   import { formatDate } from '$lib/utilities/format-date';
   import { timeFormat } from '$lib/stores/time-format';
-  import { fetchWorkflow } from '$lib/services/workflow-service';
+  import { fetchWorkflowForSchedule } from '$lib/services/workflow-service';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import { routeForEventHistory } from '$lib/utilities/route-for';
@@ -18,7 +18,7 @@
 <Panel>
   <h2 class="mb-4 text-2xl">Recent Runs</h2>
   {#each recentRuns.slice(0, 5) as run (run?.startWorkflowResult?.workflowId)}
-    {#await fetchWorkflow({ namespace, workflowId: decodeURIForSvelte(run.startWorkflowResult.workflowId), runId: run.startWorkflowResult.runId }, fetch) then workflow}
+    {#await fetchWorkflowForSchedule({ namespace, workflowId: decodeURIForSvelte(run.startWorkflowResult.workflowId), runId: run.startWorkflowResult.runId }, fetch) then workflow}
       <div class="row">
         <div class="w-28">
           <WorkflowStatus status={workflow.status} />
@@ -35,6 +35,16 @@
           >
             {run.startWorkflowResult.workflowId}
           </Link>
+        </div>
+        <div class="ml-auto">
+          <p>{formatDate(run.actualTime, $timeFormat)}</p>
+        </div>
+      </div>
+    {:catch}
+      <div class="row">
+        <div class="w-28" />
+        <div class="w-96">
+          {run.startWorkflowResult.workflowId}
         </div>
         <div class="ml-auto">
           <p>{formatDate(run.actualTime, $timeFormat)}</p>
