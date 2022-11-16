@@ -119,9 +119,9 @@
     {#if cancelInProgress}
       <div class="-mt-4 mb-4" transition:fly={{ duration: 200, delay: 100 }}>
         <Alert icon="info" intent="info" title="Cancel Request Sent">
-          The request to cancel this workflow has been sent. If the workflow has
-          been built to call the cancelation API, it'll cancel at the next
-          available opportunity.
+          The request to cancel this Workflow Execution has been sent. If the
+          Workflow uses the cancellation API, it'll cancel at the next available
+          opportunity.
         </Alert>
       </div>
     {/if}
