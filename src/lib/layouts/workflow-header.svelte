@@ -1,10 +1,12 @@
 <script lang="ts">
   import Icon from '$holocene/icon/icon.svelte';
   import { onDestroy, onMount } from 'svelte';
+  import { fly } from 'svelte/transition';
 
   import { autoRefreshWorkflow, eventViewType } from '$lib/stores/event-view';
   import { workflowsSearch } from '$lib/stores/workflows';
   import { workflowRun, refresh } from '$lib/stores/workflow-run';
+  import { eventHistory } from '$lib/stores/events';
 
   import {
     routeForEventHistory,
@@ -19,11 +21,12 @@
   import type { GetPollersResponse } from '$lib/services/pollers-service';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import TerminateWorkflow from '$lib/components/terminate-workflow.svelte';
+  import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import Tab from '$lib/holocene/tab.svelte';
   import { page } from '$app/stores';
   import { pathMatches } from '$lib/utilities/path-matches';
   import AutoRefreshWorkflow from '$lib/components/auto-refresh-workflow.svelte';
+  import Alert from '$lib/holocene/alert.svelte';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
@@ -73,6 +76,12 @@
   onDestroy(() => {
     clearInterval(refreshInterval);
   });
+
+  $: cancelInProgress =
+    $workflowRun?.workflow?.status === 'Running' &&
+    $eventHistory.events.some(
+      (event) => event?.eventType === 'WorkflowExecutionCancelRequested',
+    );
 </script>
 
 <header class="mb-4 flex flex-col gap-4">
@@ -91,19 +100,31 @@
       </a>
     </div>
     <div
-      class="mb-8 flex flex-col items-start justify-between gap-4 xl:flex-row xl:gap-0"
+      class="mb-8 flex flex-col items-center justify-between gap-4 xl:flex-row xl:gap-0"
     >
-      <h1 class="relative flex items-center gap-4 text-2xl">
+      <h1
+        data-cy="workflow-id-heading"
+        class="relative flex items-center gap-4 text-2xl"
+      >
         <WorkflowStatus status={workflow?.status} />
         <span class="select-all font-medium">{workflow.id}</span>
       </h1>
       {#if isRunning}
-        <div class="flex w-96 items-center justify-start gap-4 xl:justify-end">
+        <div class="flex items-center justify-start gap-4 xl:justify-end">
           <AutoRefreshWorkflow onChange={onRefreshChange} />
-          <TerminateWorkflow {workflow} {namespace} />
+          <WorkflowActions {cancelInProgress} {workflow} {namespace} />
         </div>
       {/if}
     </div>
+    {#if cancelInProgress}
+      <div class="-mt-4 mb-4" transition:fly={{ duration: 200, delay: 100 }}>
+        <Alert icon="info" intent="info" title="Cancel Request Sent">
+          The request to cancel this Workflow Execution has been sent. If the
+          Workflow uses the cancellation API, it'll cancel at the next available
+          opportunity.
+        </Alert>
+      </div>
+    {/if}
     <nav class="flex flex-wrap gap-6">
       <Tab
         label="History"

@@ -74,8 +74,8 @@ describe('Schedules Edit', () => {
 
     cy.get('[data-cy="schedule-interval-frequency"]').contains('Every 30sec');
 
-    cy.get('.split-button > .right').click();
-    cy.get('#schedule-action-button > .edit').click();
+    cy.get('#schedule-actions-menu-button').click();
+    cy.get('#schedule-actions-menu > .edit').click();
     cy.url().should('contain', `/schedules/${scheduleId}/edit`);
     cy.get('#content').contains('Edit Schedule');
   });

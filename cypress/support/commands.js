@@ -149,6 +149,22 @@ Cypress.Commands.add('interceptDescribeBatchOperationApi', () => {
   ).as('describe-batch-operation-api');
 });
 
+Cypress.Commands.add('interceptTerminateWorkflowApi', () => {
+  cy.intercept(
+    Cypress.env('VITE_API_HOST') +
+      `/api/v1/namespaces/*/workflows/*/runs/*/terminate?`,
+    { statusCode: 200, body: {} },
+  ).as('terminate-workflow-api');
+});
+
+Cypress.Commands.add('interceptCancelWorkflowApi', () => {
+  cy.intercept(
+    Cypress.env('VITE_API_HOST') +
+      `/api/v1/namespaces/*/workflows/*/runs/*/cancel?`,
+    { statusCode: 200, body: {} },
+  ).as('cancel-workflow-api');
+});
+
 Cypress.Commands.add(
   'interceptApi',
   ({ namespace, archived } = { namespace: 'default', archived: false }) => {
@@ -167,5 +183,7 @@ Cypress.Commands.add(
     cy.interceptScheduleApi();
     cy.interceptBatchTerminateApi();
     cy.interceptDescribeBatchOperationApi();
+    cy.interceptTerminateWorkflowApi();
+    cy.interceptCancelWorkflowApi();
   },
 );
