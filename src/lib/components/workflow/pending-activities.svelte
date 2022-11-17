@@ -15,11 +15,13 @@
   } from '$lib/utilities/format-event-attributes';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
-  const { namespace, run } = $page.params;
-  const { workflow } = $workflowRun;
-  const { pendingActivities, defaultWorkflowTaskTimeout, id } = workflow;
+  $: pendingActivities = $workflowRun.workflow.pendingActivities;
 
-  const href = routeForPendingActivities({ namespace, workflow: id, run });
+  $: href = routeForPendingActivities({
+    namespace: $page.params.namespace,
+    workflow: $page.params.workflow,
+    run: $page.params.run,
+  });
 </script>
 
 {#if pendingActivities.length}
@@ -92,32 +94,28 @@
                   </div>
                 </div>
               </a>
-              {#if failed}
-                <div class="pending-activity-failure-details">
-                  {#if pendingActivity.heartbeatDetails}
-                    <div class="w-full">
-                      <h4 class="pending-activity-detail-header">
-                        Heartbeat Details
-                      </h4>
-                      <CodeBlock
-                        class="max-h-32"
-                        content={pendingActivity.heartbeatDetails}
-                      />
-                    </div>
-                  {/if}
-                  {#if pendingActivity.lastFailure}
-                    <div class="w-full">
-                      <h4 class="pending-activity-detail-header">
-                        Last Failure
-                      </h4>
-                      <CodeBlock
-                        class="max-h-32"
-                        content={pendingActivity.lastFailure}
-                      />
-                    </div>
-                  {/if}
-                </div>
-              {/if}
+              <div class="pending-activity-failure-details">
+                {#if pendingActivity?.heartbeatDetails}
+                  <div class="w-1/2 grow">
+                    <h4 class="pending-activity-detail-header">
+                      Heartbeat Details
+                    </h4>
+                    <CodeBlock
+                      class="max-h-32"
+                      content={pendingActivity.heartbeatDetails}
+                    />
+                  </div>
+                {/if}
+                {#if pendingActivity?.lastFailure}
+                  <div class="w-1/2 grow">
+                    <h4 class="pending-activity-detail-header">Last Failure</h4>
+                    <CodeBlock
+                      class="max-h-32"
+                      content={pendingActivity.lastFailure}
+                    />
+                  </div>
+                {/if}
+              </div>
             </div>
           </div>
         </div>

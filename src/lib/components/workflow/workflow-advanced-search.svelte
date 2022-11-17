@@ -9,6 +9,7 @@
   import Button from '$lib/holocene/button.svelte';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
+  import { workflowsQuery } from '$lib/stores/workflows';
 
   let manualSearchString = '';
 
@@ -26,6 +27,7 @@
     if (!manualSearchString) {
       $workflowFilters = [];
       $workflowSorts = [];
+      $workflowsQuery = '';
     } else {
       try {
         $workflowFilters = toListWorkflowFilters(manualSearchString);

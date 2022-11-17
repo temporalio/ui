@@ -10,7 +10,7 @@ describe('Archival disabled page', () => {
   it('have the correct title on page', () => {
     cy.get('[data-cy="archived-disabled-title"]').should(
       'contain',
-      'This namespace is currently not enabled for archival.',
+      'This Namespace is currently not enabled for archival.',
     );
   });
 });

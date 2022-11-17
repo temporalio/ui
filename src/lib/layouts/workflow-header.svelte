@@ -4,7 +4,7 @@
   import { fly } from 'svelte/transition';
 
   import { autoRefreshWorkflow, eventViewType } from '$lib/stores/event-view';
-  import { workflowsSearch } from '$lib/stores/workflows';
+  import { workflowsQuery, workflowsSearch } from '$lib/stores/workflows';
   import { workflowRun, refresh } from '$lib/stores/workflow-run';
   import { eventHistory } from '$lib/stores/events';
 
@@ -31,20 +31,21 @@
   export let namespace: string;
   export let workflow: WorkflowExecution;
   export let workers: GetPollersResponse;
+  export let cancelEnabled: boolean = true;
 
   let refreshInterval;
   const refreshRate = 15000;
 
-  const routeParameters = {
+  $: routeParameters = {
     namespace,
-    workflow: workflow.id,
-    run: workflow.runId,
+    workflow: workflow?.id,
+    run: workflow?.runId,
   };
 
   const { parameters, searchType } = $workflowsSearch;
   const query = toListWorkflowQuery(parameters);
 
-  $: isRunning = $workflowRun.workflow.isRunning;
+  $: isRunning = $workflowRun?.workflow?.isRunning;
 
   onMount(() => {
     if (isRunning && $autoRefreshWorkflow === 'on') {
@@ -90,7 +91,7 @@
       <a
         href={routeForWorkflowsWithQuery({
           namespace,
-          query,
+          query: $workflowsQuery || query,
           search: searchType,
         })}
         data-cy="back-to-workflows"
@@ -100,19 +101,30 @@
       </a>
     </div>
     <div
-      class="mb-8 flex flex-col items-center justify-between gap-4 xl:flex-row xl:gap-0"
+      class="mb-8 flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
     >
-      <h1
-        data-cy="workflow-id-heading"
-        class="relative flex items-center gap-4 text-2xl"
+      <div
+        class="flex w-full items-center justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
       >
         <WorkflowStatus status={workflow?.status} />
-        <span class="select-all font-medium">{workflow.id}</span>
-      </h1>
+        <h1
+          data-cy="workflow-id-heading"
+          class="select-all overflow-hidden text-ellipsis text-2xl font-medium"
+        >
+          {workflow.id}
+        </h1>
+      </div>
       {#if isRunning}
-        <div class="flex items-center justify-start gap-4 xl:justify-end">
+        <div
+          class="flex flex-col items-center justify-center gap-4 whitespace-nowrap sm:flex-row lg:justify-end"
+        >
           <AutoRefreshWorkflow onChange={onRefreshChange} />
-          <WorkflowActions {cancelInProgress} {workflow} {namespace} />
+          <WorkflowActions
+            {cancelEnabled}
+            {cancelInProgress}
+            {workflow}
+            {namespace}
+          />
         </div>
       {/if}
     </div>

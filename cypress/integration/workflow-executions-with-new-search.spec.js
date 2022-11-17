@@ -5,19 +5,18 @@ import workflowsFixture from '../fixtures/workflows.json';
 const workflowRunningFixture = workflowsFixture.executions[0];
 const { workflowId, runId } = workflowRunningFixture.execution;
 
-describe.skip('Workflow Executions List With Search', () => {
+describe('Workflow Executions List With Search', () => {
   beforeEach(() => {
     cy.interceptApi();
+    cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/cluster*', {
+      fixture: 'cluster-with-elasticsearch.json',
+    }).as('cluster-api-elasticsearch');
 
     cy.visit('/namespaces/default/workflows');
 
-    cy.wait('@workflows-api');
-    cy.wait('@workflows-count-api');
+    cy.wait('@cluster-api-elasticsearch');
     cy.wait('@namespaces-api');
-  });
-
-  it('should show count of workflows', () => {
-    cy.get('[data-cy="workflow-count"]').should('contain', '15 workflows');
+    cy.wait('@workflows-api');
   });
 
   it('should default to All for the time range', () => {
@@ -36,7 +35,7 @@ describe.skip('Workflow Executions List With Search', () => {
       cy.get('#workflowType').should('have.value', 'ImportantWorkflowType');
 
       cy.get('[data-cy="workflow-count"]').should(
-        'contain',
+        'have.text',
         'Results 15 of 15 workflows',
       );
     });
@@ -56,7 +55,7 @@ describe.skip('Workflow Executions List With Search', () => {
       );
 
       cy.get('[data-cy="workflow-count"]').should(
-        'contain',
+        'have.text',
         'Results 15 of 15 workflows',
       );
 
@@ -65,7 +64,6 @@ describe.skip('Workflow Executions List With Search', () => {
       ).click();
 
       cy.url().should('not.contain', result);
-      cy.get('[data-cy="workflow-count"]').should('contain', '15 workflows');
     });
 
     it('should send the correct query for Workflow ID, autocomplete manual search and be clearable', () => {
@@ -80,7 +78,7 @@ describe.skip('Workflow Executions List With Search', () => {
         'WorkflowId="002c98_Running"',
       );
       cy.get('[data-cy="workflow-count"]').should(
-        'contain',
+        'have.text',
         'Results 15 of 15 workflows',
       );
 
@@ -89,7 +87,6 @@ describe.skip('Workflow Executions List With Search', () => {
       ).click();
 
       cy.url().should('not.contain', result);
-      cy.get('[data-cy="workflow-count"]').should('contain', '15 workflows');
     });
 
     it('should change url on single Execution Status change', () => {
@@ -103,7 +100,7 @@ describe.skip('Workflow Executions List With Search', () => {
         'ExecutionStatus="Running"',
       );
       cy.get('[data-cy="workflow-count"]').should(
-        'contain',
+        'have.text',
         'Results 15 of 15 workflows',
       );
     });
@@ -160,7 +157,7 @@ describe.skip('Workflow Executions List With Search', () => {
 
       cy.url().should('contain', 'StartTime+BETWEEN');
       cy.get('[data-cy="workflow-count"]').should(
-        'contain',
+        'have.text',
         'Results 15 of 15 workflows',
       );
     });
@@ -172,7 +169,7 @@ describe.skip('Workflow Executions List With Search', () => {
 
       cy.url().should('contain', 'CloseTime+BETWEEN');
       cy.get('[data-cy="workflow-count"]').should(
-        'contain',
+        'have.text',
         'Results 15 of 15 workflows',
       );
     });
@@ -216,7 +213,7 @@ describe.skip('Workflow Executions List With Search', () => {
           encodeURIComponent(`ExecutionStatus="Running"`),
         );
         cy.get('[data-cy="workflow-count"]').should(
-          'contain',
+          'have.text',
           'Results 15 of 15 workflows',
         );
       });

@@ -9,7 +9,9 @@
   $: checked = $autoRefreshWorkflow === 'on';
 </script>
 
-<label for="autorefresh" class="font-secondary text-sm">Auto refresh</label>
-<Tooltip bottomLeft text="15 second page refresh">
-  <ToggleSwitch id="autorefresh" {checked} on:change={onChange} />
-</Tooltip>
+<label for="autorefresh" class="flex items-center gap-4 font-secondary text-sm"
+  >Auto refresh
+  <Tooltip bottomLeft text="15 second page refresh">
+    <ToggleSwitch id="autorefresh" {checked} on:change={onChange} />
+  </Tooltip>
+</label>

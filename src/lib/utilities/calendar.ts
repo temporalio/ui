@@ -49,7 +49,8 @@ const getMonthStats = (monthIndex, year) => {
   };
 };
 
-export const getMonthName = (index) => monthNames[index];
+export const getMonthName = (index) =>
+  monthNames.filter((m) => m.value !== '*')[index];
 
 export const getDateRows = (monthIndex, year) => {
   const { days } = getMonthStats(monthIndex, year);

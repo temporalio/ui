@@ -1,9 +1,7 @@
 type WorkflowsAPIRoutePath =
   | 'workflows'
   | 'workflows.archived'
-  | 'workflows.count'
-  | 'workflows.batch.terminate'
-  | 'workflows.batch.describe';
+  | 'workflows.count';
 
 type WorkflowAPIRoutePath =
   | 'workflow'
@@ -12,6 +10,8 @@ type WorkflowAPIRoutePath =
   | 'events.ascending'
   | 'events.descending'
   | 'query';
+
+type BatchAPIRoutePath = 'batch-operations' | 'batch-operation.describe';
 
 type NamespaceAPIRoutePath = 'namespace';
 
@@ -29,7 +29,8 @@ type APIRoutePath =
   | TaskQueueAPIRoutePath
   | WorkflowAPIRoutePath
   | WorkflowsAPIRoutePath
-  | NamespaceAPIRoutePath;
+  | NamespaceAPIRoutePath
+  | BatchAPIRoutePath;
 
 type APIRouteParameters = {
   namespace: string;
@@ -48,6 +49,8 @@ type WorkflowRouteParameters = Pick<
   APIRouteParameters,
   'namespace' | 'workflowId' | 'runId'
 >;
+
+type BatchRouteParameters = Pick<APIRouteParameters, 'namespace'>;
 
 type TaskQueueRouteParameters = Pick<APIRouteParameters, 'namespace' | 'queue'>;
 

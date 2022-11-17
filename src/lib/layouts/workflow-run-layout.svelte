@@ -9,7 +9,7 @@
   import { onDestroy, onMount } from 'svelte';
   import { eventFilterSort, EventSortOrder } from '$lib/stores/event-view';
 
-  const { namespace } = $page.params;
+  export let cancelEnabled: boolean = true;
 
   onMount(() => {
     const sort = $page.url.searchParams.get('sort');
@@ -27,9 +27,10 @@
   {:else}
     <PageTransition>
       <Header
-        {namespace}
+        namespace={$page.params.namespace}
         workflow={$workflowRun.workflow}
         workers={$workflowRun.workers}
+        {cancelEnabled}
       />
       <slot />
     </PageTransition>

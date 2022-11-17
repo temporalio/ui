@@ -3,23 +3,22 @@
 
   import { formatDate } from '$lib/utilities/format-date';
   import { getMilliseconds } from '$lib/utilities/format-time';
-  import { routeForWorkflow } from '$lib/utilities/route-for';
+  import { routeForEventHistory } from '$lib/utilities/route-for';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import FilterOrCopyButtons from '$holocene/filter-or-copy-buttons.svelte';
-  import SelectableTableRow from '$holocene/table/selectable-table-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
+  import { eventViewType } from '$lib/stores/event-view';
 
-  export let bulkActionsEnabled: boolean = false;
-  export let selected: boolean = false;
   export let namespace: string;
   export let workflow: WorkflowExecution;
   export let timeFormat: TimeFormat | string;
 
-  $: href = routeForWorkflow({
+  $: href = routeForEventHistory({
+    view: $eventViewType,
     namespace,
     workflow: workflow.id,
     run: workflow.runId,
@@ -45,13 +44,7 @@
   };
 </script>
 
-<svelte:component
-  this={bulkActionsEnabled ? SelectableTableRow : TableRow}
-  item={workflow}
-  {selected}
-  {href}
-  class="workflow-summary-row"
->
+<TableRow {href} class="workflow-summary-row">
   <td>
     <WorkflowStatus
       status={workflow.status}
@@ -108,7 +101,7 @@
       {formatDate(workflow.endTime, timeFormat)}
     </p>
   </td>
-</svelte:component>
+</TableRow>
 
 <style lang="postcss">
   :global(.workflow-summary-row:hover) {
