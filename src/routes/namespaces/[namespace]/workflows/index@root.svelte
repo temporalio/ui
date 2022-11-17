@@ -5,6 +5,8 @@
   import PageTitle from '$lib/components/page-title.svelte';
 
   import { supportsBulkActions } from '$lib/stores/bulk-actions';
+  import AdvancedVisibilityGuard from '$lib/components/advanced-visibility-guard.svelte';
+  import WorkflowsWithNewSearch from '$lib/pages/workflows-with-new-search.svelte';
 </script>
 
 <PageTitle
@@ -12,4 +14,7 @@
   url={$page.url.href}
 />
 
-<Workflows bulkActionsEnabled={$supportsBulkActions} />
+<AdvancedVisibilityGuard>
+  <WorkflowsWithNewSearch bulkActionsEnabled={$supportsBulkActions} />
+  <Workflows bulkActionsEnabled={$supportsBulkActions} slot="fallback" />
+</AdvancedVisibilityGuard>

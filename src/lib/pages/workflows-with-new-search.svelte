@@ -26,6 +26,23 @@
   import TableRow from '$holocene/table/table-row.svelte';
   import WorkflowDateTime from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
   import Loading from '$lib/holocene/loading.svelte';
+  import {
+    batchTerminateWorkflows,
+    pollBatchOperation,
+  } from '$lib/services/terminate-service';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import { toaster } from '$lib/holocene/toaster.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
+  import { pluralize } from '$lib/utilities/pluralize';
+
+  export let bulkActionsEnabled: boolean = false;
+
+  let selectedWorkflows: WorkflowExecution[] = [];
+  let terminationReason: string = '';
+  let showBulkOperationConfirmationModal: boolean = false;
+  let allSelected: boolean = false;
+  let terminating: boolean = false;
 
   $: query = $page.url.searchParams.get('query');
 
@@ -46,13 +63,88 @@
     }
   });
 
+  const resetSelection = () => {
+    allSelected = false;
+    selectedWorkflows = [];
+  };
+
   const errorMessage =
     'If you have filters applied, try adjusting them. Otherwise please check your syntax and try again.';
 
   const refreshWorkflows = () => {
+    resetSelection();
     $refresh = Date.now();
   };
+
+  const handleBulkTerminate = () => {
+    showBulkOperationConfirmationModal = true;
+  };
+
+  const terminateWorkflows = async () => {
+    terminating = true;
+    const { namespace } = $page.params;
+    try {
+      const jobId = await batchTerminateWorkflows({
+        namespace,
+        workflowExecutions: terminableWorkflows,
+        reason: terminationReason,
+      });
+
+      await pollBatchOperation({ namespace, jobId });
+    } catch (error) {
+      showBulkOperationConfirmationModal = false;
+      toaster.push({
+        variant: 'error',
+        message: 'Unable to terminate workflows.',
+      });
+
+      return;
+    }
+
+    toaster.push({
+      variant: 'success',
+      message: `Successfully terminated ${terminableWorkflows.length} workflows.`,
+      id: 'batch-terminate-success-toast',
+    });
+    selectedWorkflows = [];
+    allSelected = false;
+    terminating = false;
+    showBulkOperationConfirmationModal = false;
+    terminationReason = '';
+    updateQueryParameters({ parameter: 'query', value: '', url: $page.url });
+  };
+
+  $: terminableWorkflows = selectedWorkflows.filter(
+    (workflows) => workflows.canBeTerminated,
+  );
 </script>
+
+<Modal
+  open={showBulkOperationConfirmationModal}
+  confirmText="Terminate"
+  confirmType="destructive"
+  confirmDisabled={terminationReason === ''}
+  loading={terminating}
+  on:cancelModal={() => (showBulkOperationConfirmationModal = false)}
+  on:confirmModal={terminateWorkflows}
+>
+  <h3 slot="title">Terminate Workflows</h3>
+  <svelte:fragment slot="content">
+    <p class="mb-2">
+      Are you sure you want to terminate <strong
+        >{terminableWorkflows.length} running {pluralize(
+          'workflow',
+          terminableWorkflows.length,
+        )}</strong
+      >? This action cannot be undone.
+    </p>
+    <Input
+      id="bulk-terminate-reason"
+      bind:value={terminationReason}
+      placeholder="Enter a reason"
+    />
+  </svelte:fragment>
+</Modal>
 
 <div class="mb-2 flex justify-between">
   <div>
@@ -94,12 +186,22 @@
   <svelte:fragment slot="action-top-center">
     <WorkflowDateTime />
   </svelte:fragment>
-  <WorkflowsSummaryTableWithFilters updating={$updating}>
+  <WorkflowsSummaryTableWithFilters
+    {bulkActionsEnabled}
+    updating={$updating}
+    visibleWorkflows={visibleItems}
+    terminableWorkflowCount={terminableWorkflows.length}
+    bind:selectedWorkflows
+    bind:allSelected
+    on:terminateWorkflows={handleBulkTerminate}
+  >
     {#each visibleItems as event}
       <WorkflowsSummaryRowWithFilters
+        {bulkActionsEnabled}
         workflow={event}
         namespace={$page.params.namespace}
         timeFormat={$timeFormat}
+        selected={selectedWorkflows.includes(event)}
       />
     {:else}
       <TableRow>
