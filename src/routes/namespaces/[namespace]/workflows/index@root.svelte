@@ -16,5 +16,5 @@
 
 <AdvancedVisibilityGuard>
   <WorkflowsWithNewSearch bulkActionsEnabled={$supportsBulkActions} />
-  <Workflows bulkActionsEnabled={$supportsBulkActions} slot="fallback" />
+  <Workflows slot="fallback" />
 </AdvancedVisibilityGuard>

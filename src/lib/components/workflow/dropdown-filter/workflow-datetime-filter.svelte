@@ -24,6 +24,7 @@
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { page } from '$app/stores';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
 
   let custom = false;
   let show = false;
@@ -220,13 +221,9 @@
     label={capitalize($timeFormat)}
     icon="clock"
   >
-    <div on:click={() => ($timeFormat = 'relative')} class="timezone-label">
-      Relative
-    </div>
-    <div on:click={() => ($timeFormat = 'UTC')} class="timezone-label">UTC</div>
-    <div on:click={() => ($timeFormat = 'local')} class="timezone-label">
-      Local
-    </div>
+    <MenuItem on:click={() => ($timeFormat = 'relative')}>Relative</MenuItem>
+    <MenuItem on:click={() => ($timeFormat = 'UTC')}>UTC</MenuItem>
+    <MenuItem on:click={() => ($timeFormat = 'local')}>Local</MenuItem>
   </SimpleSplitButton>
 </div>
 

@@ -71,7 +71,7 @@
           <button on:click={prev}><Icon name="chevron-left" /></button>
         </div>
         <div class="flex items-center justify-center">
-          {getMonthName(month)}
+          {getMonthName(month).label}
           {year}
         </div>
         <div class="flex items-center justify-center">
@@ -86,18 +86,18 @@
         on:datechange={onDateChange}
       />
       <div class="my-1 flex justify-between px-2">
-        <p
+        <button
           class="cursor-pointer text-[12px]"
           on:click={() => (selected = new Date())}
         >
           Today
-        </p>
-        <p
+        </button>
+        <button
           class="cursor-pointer text-[12px]"
           on:click={() => (showDatePicker = false)}
         >
           Close
-        </p>
+        </button>
       </div>
     </div>
   {/if}
