@@ -112,7 +112,7 @@
         <Input
           id="name"
           bind:value={name}
-          label="Name"
+          label="Name*"
           error={errors['name']}
           maxLength={232}
           disabled={Boolean(scheduleId)}
