@@ -12,14 +12,16 @@
 
 <Hst.Story>
   <Hst.Variant title="A Checkbox">
-    <Checkbox
-      id="checkbox-input"
-      bind:label
-      bind:checked
-      bind:onDark
-      bind:indeterminate
-      bind:disabled
-    />
+    <div class="h-20 w-20 py-5 px-4" class:bg-primary={onDark}>
+      <Checkbox
+        id="checkbox-input"
+        bind:label
+        bind:checked
+        bind:onDark
+        bind:indeterminate
+        bind:disabled
+      />
+    </div>
   </Hst.Variant>
 
   <svelte:fragment slot="controls">

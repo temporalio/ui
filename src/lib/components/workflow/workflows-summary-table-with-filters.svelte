@@ -1,6 +1,8 @@
 <script lang="ts">
-  import { workflowCount } from '$lib/stores/workflows';
+  import { createEventDispatcher } from 'svelte';
+  import { page } from '$app/stores';
 
+  import { workflowCount } from '$lib/stores/workflows';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import ExecutionStatusDropdownFilter from './dropdown-filter/workflow-status.svelte';
@@ -8,20 +10,23 @@
   import WorkflowTypeDropdownFilter from './dropdown-filter/workflow-type.svelte';
   import StartTimeDropdownFilter from './dropdown-filter/start-time.svelte';
   import EndTimeDropdownFilter from './dropdown-filter/end-time.svelte';
-  import SelectableTable from '$lib/holocene/table/selectable-table.svelte';
   import BulkActionButton from '$lib/holocene/table/bulk-action-button.svelte';
   import { coreUserStore } from '$lib/stores/core-user';
-  import { createEventDispatcher } from 'svelte';
-  import { page } from '$app/stores';
+  import Checkbox from '$lib/holocene/checkbox.svelte';
 
-  const dispatch = createEventDispatcher<{ terminateWorkflows: undefined }>();
+  const dispatch = createEventDispatcher<{
+    terminateWorkflows: undefined;
+    toggleAll: { checked: boolean };
+    togglePage: { checked: boolean; visibleWorkflows: WorkflowExecution[] };
+  }>();
 
   export let bulkActionsEnabled: boolean = false;
   export let updating: boolean = false;
-  export let visibleWorkflows: WorkflowExecution[] = [];
-  export let selectedWorkflows: WorkflowExecution[] = [];
-  export let terminableWorkflowCount: number = 0;
-  export let allSelected: boolean = false;
+  export let visibleWorkflows: WorkflowExecution[];
+  export let selectedWorkflowsCount: number;
+  export let allSelected: boolean;
+  export let pageSelected: boolean;
+  export let filteredWorkflowCount: string;
 
   // Disable sort with workflows over 10M
   $: disabled = $workflowCount?.totalCount >= 10000000;
@@ -30,72 +35,117 @@
     dispatch('terminateWorkflows');
   };
 
+  const handleSelectAll = (event: MouseEvent | KeyboardEvent) => {
+    if (
+      event instanceof MouseEvent ||
+      (event instanceof KeyboardEvent && event.key === 'Enter')
+    ) {
+      dispatch('toggleAll', { checked: true });
+    }
+  };
+
+  const handleCheckboxChange = (event: CustomEvent<{ checked: boolean }>) => {
+    const { checked } = event.detail;
+    if (checked) {
+      dispatch('togglePage', { checked: true, visibleWorkflows });
+    } else {
+      dispatch('toggleAll', { checked: false });
+    }
+  };
+
   let coreUser = coreUserStore();
+
   $: terminateDisabled = $coreUser.namespaceWriteDisabled(
     $page.params.namespace,
   );
+
+  $: checked =
+    allSelected ||
+    pageSelected ||
+    (selectedWorkflowsCount === visibleWorkflows.length &&
+      selectedWorkflowsCount !== 0);
+
+  $: showBulkActions = selectedWorkflowsCount > 0 || allSelected;
+
+  $: indeterminate =
+    selectedWorkflowsCount > 0 &&
+    selectedWorkflowsCount < visibleWorkflows.length;
 </script>
 
 {#if bulkActionsEnabled}
-  <SelectableTable
+  <Table
     id="workflows-table-with-bulk-actions"
     class="w-full md:table-fixed"
-    bind:allSelected
-    bind:selectedItems={selectedWorkflows}
-    items={visibleWorkflows}
     {updating}
   >
-    <svelte:fragment slot="default-headers">
-      <th class="table-cell w-48"
-        ><div class="flex items-center gap-1">
-          <ExecutionStatusDropdownFilter />
-        </div>
+    <TableHeaderRow slot="headers">
+      <th class="h-10 w-12">
+        <Checkbox
+          id="selectable-table-check-all"
+          onDark
+          {checked}
+          {indeterminate}
+          on:change={handleCheckboxChange}
+        />
       </th>
-      <th class="table-cell md:w-60 xl:w-auto"
-        ><div class="flex items-center gap-1">
-          <WorkflowIdDropdownFilter />
-        </div>
-      </th>
-      <th class="table-cell md:w-60 xl:w-80">
-        <div class="flex items-center gap-1">
-          <WorkflowTypeDropdownFilter />
-        </div>
-      </th>
-      <th class="hidden xl:table-cell xl:w-60">
-        <div class="flex items-center gap-1">
-          <StartTimeDropdownFilter {disabled} />
-        </div>
-      </th>
-      <th class="hidden xl:table-cell xl:w-60">
-        <div class="flex items-center gap-1">
-          <EndTimeDropdownFilter {disabled} />
-        </div>
-      </th>
-    </svelte:fragment>
-    <svelte:fragment slot="bulk-action-headers">
-      <th class="inline-block w-32 md:table-cell">
-        <span class="font-semibold">{selectedWorkflows.length} selected</span>
-      </th>
-      <th class="h-10 md:w-60 xl:w-auto">
-        {#if terminableWorkflowCount > 0}
+      {#if showBulkActions}
+        <th class="w-48 overflow-visible whitespace-nowrap">
+          {#if allSelected}
+            <span class="font-semibold"
+              >All {filteredWorkflowCount} selected</span
+            >
+          {:else}
+            <span class="font-semibold">{selectedWorkflowsCount} selected</span>
+            <span>
+              (or <button
+                on:click={handleSelectAll}
+                class="cursor-pointer underline"
+                >select all {filteredWorkflowCount}</button
+              >)
+            </span>
+          {/if}
           <BulkActionButton
+            class="ml-4"
             dataCy="bulk-terminate-button"
             disabled={terminateDisabled}
             on:click={handleBulkTerminate}>Terminate</BulkActionButton
           >
-        {:else}
-          <span class="whitespace-nowrap italic"
-            >No bulk actions available for selected workflows.</span
-          >
-        {/if}
-      </th>
-      <th class="hidden md:table-cell md:w-60 xl:w-80" />
-      <th class="hidden xl:table-cell xl:w-60" />
-      <th class="hidden xl:table-cell xl:w-60" />
-      <th class="table-cell md:hidden" colspan="3" />
-    </svelte:fragment>
+        </th>
+        <th class="table-cell md:w-60 xl:w-auto" />
+        <th class="hidden md:table-cell md:w-60 xl:w-80" />
+        <th class="hidden xl:table-cell xl:w-60" />
+        <th class="hidden xl:table-cell xl:w-60" />
+        <th class="table-cell md:hidden" />
+      {:else}
+        <th class="table-cell w-48"
+          ><div class="flex items-center gap-1">
+            <ExecutionStatusDropdownFilter />
+          </div>
+        </th>
+        <th class="table-cell md:w-60 xl:w-auto"
+          ><div class="flex items-center gap-1">
+            <WorkflowIdDropdownFilter />
+          </div>
+        </th>
+        <th class="table-cell md:w-60 xl:w-80">
+          <div class="flex items-center gap-1">
+            <WorkflowTypeDropdownFilter />
+          </div>
+        </th>
+        <th class="hidden xl:table-cell xl:w-60">
+          <div class="flex items-center gap-1">
+            <StartTimeDropdownFilter {disabled} />
+          </div>
+        </th>
+        <th class="hidden xl:table-cell xl:w-60">
+          <div class="flex items-center gap-1">
+            <EndTimeDropdownFilter {disabled} />
+          </div>
+        </th>
+      {/if}
+    </TableHeaderRow>
     <slot />
-  </SelectableTable>
+  </Table>
 {:else}
   <Table class="w-full md:table-fixed" {updating}>
     <TableHeaderRow slot="headers">

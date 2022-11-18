@@ -92,7 +92,7 @@
   }
 
   .checkbox.disabled:not(.on-dark) .checkmark {
-    @apply bg-opacity-50;
+    @apply bg-gray-300;
   }
 
   .checkbox.disabled.on-dark .checkmark {

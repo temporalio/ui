@@ -3,7 +3,12 @@
   export let disabled: boolean = true;
 </script>
 
-<button data-cy={dataCy} {disabled} on:click class="bulk-action-button">
+<button
+  data-cy={dataCy}
+  {disabled}
+  on:click
+  class="bulk-action-button {$$props.class}"
+>
   <slot />
 </button>
 
