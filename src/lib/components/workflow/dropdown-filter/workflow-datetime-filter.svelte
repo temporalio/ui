@@ -25,11 +25,20 @@
   import { page } from '$app/stores';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
+  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
+  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
+  import DatetimeInputs from './datetime-inputs.svelte';
 
   let custom = false;
   let show = false;
   let value = 'All Time';
   let timeField = 'StartTime';
+
+  let hour = '';
+  let minute = '';
+  let second = '';
+  let time = 'AM';
 
   onMount(() => {
     const timeFilter = $workflowFilters.find(
@@ -76,24 +85,35 @@
   };
 
   let startDate = startOfDay(new Date());
-  let endDate = endOfDay(new Date());
-  let startTime = { hour: '', minute: '', second: '' };
-  let endTime = { hour: '', minute: '', second: '' };
+  let endDate = startOfDay(new Date());
+  let startHour = '';
+  let startMinute = '';
+  let startSecond = '';
+  let startHalf = 'AM';
+  $: startTime = {
+    hour: startHour,
+    minute: startMinute,
+    second: startSecond,
+    half: startHalf,
+  };
+
+  let endHour = '';
+  let endMinute = '';
+  let endSecond = '';
+  let endHalf = 'AM';
+  $: endTime = {
+    hour: endHour,
+    minute: endMinute,
+    second: endSecond,
+    half: endHalf,
+  };
 
   const onStartDateChange = (d) => {
     startDate = startOfDay(d.detail);
   };
 
-  const onStartDateTimeChange = (d) => {
-    startTime = d.detail;
-  };
-
   const onEndDateChange = (d) => {
     endDate = startOfDay(d.detail);
-  };
-
-  const onEndDateTimeChange = (d) => {
-    endTime = d.detail;
   };
 
   const applyTimeChanges = (date: Date, time) => {
@@ -105,11 +125,23 @@
   };
 
   const onApply = () => {
-    startDate = applyTimeChanges(startDate, startTime);
-    endDate = applyTimeChanges(endDate, endTime);
+    let startDateWithTime = applyTimeChanges(startDate, {
+      hour: startHour,
+      minute: startMinute,
+      second: startSecond,
+      half: startHalf,
+    });
+    let endDateWithTime = applyTimeChanges(endDate, {
+      hour: endHour,
+      minute: endMinute,
+      second: endSecond,
+      half: endHalf,
+    });
     const filter = {
       attribute: timeField,
-      value: `BETWEEN "${formatISO(startDate)}" AND "${formatISO(endDate)}"`,
+      value: `BETWEEN "${formatISO(startDateWithTime)}" AND "${formatISO(
+        endDateWithTime,
+      )}"`,
       conditional: '=',
       operator: '',
       parenthesis: '',
@@ -144,19 +176,29 @@
       {#if custom}
         <div class="flex flex-col">
           <p class="text-sm">To</p>
-          <div class="flex gap-2">
+          <div class="flex flex-col gap-2">
             <DatePicker
               on:datechange={onStartDateChange}
               selected={startDate}
             />
-            <TimePicker on:timechange={onStartDateTimeChange} />
+            <TimePicker
+              bind:hour={startHour}
+              bind:minute={startMinute}
+              bind:second={startSecond}
+              bind:half={startHalf}
+            />
           </div>
         </div>
         <div class="flex flex-col">
           <p class="text-sm">From</p>
-          <div class="flex gap-2">
+          <div class="flex flex-col gap-2">
             <DatePicker on:datechange={onEndDateChange} selected={endDate} />
-            <TimePicker on:timechange={onEndDateTimeChange} />
+            <TimePicker
+              bind:hour={endHour}
+              bind:minute={endMinute}
+              bind:second={endSecond}
+              bind:half={endHalf}
+            />
           </div>
         </div>
         <div class="flex gap-2">

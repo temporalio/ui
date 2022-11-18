@@ -6,7 +6,7 @@
   export let hour = '';
   export let minute = '';
   export let second = '';
-  export let half = 'AM';
+  export let time = 'AM';
 </script>
 
 <div class="flex gap-2">
@@ -33,10 +33,10 @@
     maxLength={2}
   />
   <ToggleButtons>
-    <ToggleButton active={half === 'AM'} on:click={() => (half = 'AM')}
+    <ToggleButton active={time === 'AM'} on:click={() => (time = 'AM')}
       >AM</ToggleButton
     >
-    <ToggleButton active={half === 'PM'} on:click={() => (half = 'PM')}
+    <ToggleButton active={time === 'PM'} on:click={() => (time = 'PM')}
       >PM</ToggleButton
     >
   </ToggleButtons>
