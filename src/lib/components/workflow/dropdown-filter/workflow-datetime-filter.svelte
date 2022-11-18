@@ -5,7 +5,6 @@
     addHours,
     addMinutes,
     addSeconds,
-    endOfDay,
     formatISO,
     startOfDay,
   } from 'date-fns';
@@ -25,10 +24,6 @@
   import { page } from '$app/stores';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
-  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
-  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
-  import Input from '$lib/holocene/input/input.svelte';
-  import DatetimeInputs from './datetime-inputs.svelte';
 
   let custom = false;
   let show = false;
@@ -223,7 +218,7 @@
             {/each}
             <div class="flex w-full flex-wrap">
               <div class="flex w-1/2 flex-col border-t border-gray-300">
-                <div
+                <button
                   class="time-label"
                   class:active={timeField === 'StartTime'}
                   on:click={() => onTimeFieldChange('StartTime')}
@@ -234,10 +229,10 @@
                     {/if}
                   </div>
                   Start Time
-                </div>
+                </button>
               </div>
               <div class="flex w-1/2 flex-col border-t border-gray-300">
-                <div
+                <button
                   class="time-label"
                   class:active={timeField === 'CloseTime'}
                   on:click={() => onTimeFieldChange('CloseTime')}
@@ -248,7 +243,7 @@
                     {/if}
                   </div>
                   End Time
-                </div>
+                </button>
               </div>
             </div>
           </div>

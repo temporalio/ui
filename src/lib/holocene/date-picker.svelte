@@ -2,6 +2,7 @@
   // https://svelte.dev/repl/6116680a6c3e49d0908624105018efb7?version=3.12.1
 
   import { createEventDispatcher } from 'svelte';
+  import { clickOutside } from '$lib/holocene/outside-click';
   import Calender from './calendar.svelte';
   import { getMonthName } from '$lib/utilities/calendar';
   import Icon from './icon/icon.svelte';
@@ -53,7 +54,11 @@
   };
 </script>
 
-<div class="relative">
+<div
+  class="relative"
+  use:clickOutside
+  on:click-outside={() => (showDatePicker = false)}
+>
   <Input
     id="datepicker"
     icon="calendar-plus"
