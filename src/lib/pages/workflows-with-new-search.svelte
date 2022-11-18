@@ -11,7 +11,7 @@
     workflowError,
   } from '$lib/stores/workflows';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import { workflowFilters } from '$lib/stores/filters';
+  import { workflowFilters, workflowSorts } from '$lib/stores/filters';
 
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
 
@@ -80,6 +80,23 @@
     showBulkOperationConfirmationModal = true;
   };
 
+  const clearAfterTerminate = () => {
+    selectedWorkflows = [];
+    allSelected = false;
+    terminating = false;
+    showBulkOperationConfirmationModal = false;
+    terminationReason = '';
+
+    $workflowFilters = [];
+    $workflowSorts = [];
+    updateQueryParameters({
+      url: $page.url,
+      parameter: 'query',
+      value: '',
+      allowEmpty: true,
+    });
+  };
+
   const terminateWorkflows = async () => {
     terminating = true;
     const { namespace } = $page.params;
@@ -106,12 +123,7 @@
       message: `Successfully terminated ${terminableWorkflows.length} workflows.`,
       id: 'batch-terminate-success-toast',
     });
-    selectedWorkflows = [];
-    allSelected = false;
-    terminating = false;
-    showBulkOperationConfirmationModal = false;
-    terminationReason = '';
-    updateQueryParameters({ parameter: 'query', value: '', url: $page.url });
+    clearAfterTerminate();
   };
 
   $: terminableWorkflows = selectedWorkflows.filter(

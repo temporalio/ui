@@ -26,21 +26,23 @@
 
   let showFilterCopy = false;
 
-  const getOtherFilters = () =>
-    $workflowFilters.filter((f) => f.attribute !== 'WorkflowType');
+  const onRowFilterClick = (
+    attribute: 'WorkflowId' | 'WorkflowType',
+    value: string,
+  ) => {
+    const filter = $workflowFilters.find((f) => f.attribute === attribute);
+    const getOtherFilters = () =>
+      $workflowFilters.filter((f) => f.attribute !== attribute);
 
-  $: typeFilter = $workflowFilters.find((f) => f.attribute === 'WorkflowType');
-
-  const onTypeClick = (type: string) => {
-    if (!typeFilter) {
-      const filter = {
-        attribute: 'WorkflowType',
-        value: type,
+    if (!filter) {
+      const newFilter = {
+        attribute,
+        value,
         conditional: '=',
         operator: '',
         parenthesis: '',
       };
-      $workflowFilters = [...getOtherFilters(), filter];
+      $workflowFilters = [...getOtherFilters(), newFilter];
     } else {
       $workflowFilters = [...getOtherFilters()];
     }
@@ -73,7 +75,12 @@
     <FilterOrCopyButtons
       show={showFilterCopy}
       content={workflow.id}
-      filterable={false}
+      onFilter={() => onRowFilterClick('WorkflowId', workflow.id)}
+      filtered={Boolean(
+        $workflowFilters.find(
+          (f) => f.attribute === 'WorkflowId' && f.value === workflow.id,
+        ),
+      )}
     />
     <p class="inline-time-cell">
       {formatDate(workflow.startTime, timeFormat)}
@@ -89,14 +96,18 @@
     <h3 class="md:hidden">Workflow Name:</h3>
     <span
       class="table-link"
-      on:click|preventDefault|stopPropagation={() => onTypeClick(workflow.name)}
-      >{workflow.name}</span
+      on:click|preventDefault|stopPropagation={() =>
+        onRowFilterClick('WorkflowType', workflow.name)}>{workflow.name}</span
     >
     <FilterOrCopyButtons
       show={showFilterCopy}
       content={workflow.name}
-      onFilter={() => onTypeClick(workflow.name)}
-      filtered={$page.url?.searchParams?.get('query')?.includes(workflow.name)}
+      onFilter={() => onRowFilterClick('WorkflowType', workflow.name)}
+      filtered={Boolean(
+        $workflowFilters.find(
+          (f) => f.attribute === 'WorkflowType' && f.value === workflow.name,
+        ),
+      )}
     />
     <p class="inline-time-cell">
       {formatDate(workflow.endTime, timeFormat)}
