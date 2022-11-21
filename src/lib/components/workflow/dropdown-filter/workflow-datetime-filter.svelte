@@ -30,20 +30,32 @@
   let value = 'All Time';
   let timeField = 'StartTime';
 
-  let hour = '';
-  let minute = '';
-  let second = '';
-  let time = 'AM';
+  let startDate = startOfDay(new Date());
+  let endDate = startOfDay(new Date());
 
-  onMount(() => {
-    const timeFilter = $workflowFilters.find(
-      (f) => f.attribute === 'StartTime' || f.attribute === 'CloseTime',
-    );
-    if (timeFilter) {
+  let startHour = '';
+  let startMinute = '';
+  let startSecond = '';
+  let startHalf = 'AM';
+
+  let endHour = '';
+  let endMinute = '';
+  let endSecond = '';
+  let endHalf = 'AM';
+
+  $: timeFilter = $workflowFilters.find(
+    (f) => f.attribute === 'StartTime' || f.attribute === 'CloseTime',
+  );
+
+  $: {
+    if (!timeFilter) {
+      value = 'All Time';
+      timeField = 'StartTime';
+    } else {
       value = timeFilter.value;
       timeField = timeFilter.attribute as string;
     }
-  });
+  }
 
   const getOtherFilters = () =>
     $workflowFilters.filter(
@@ -77,30 +89,6 @@
       timeField = field;
       onChange(value);
     }
-  };
-
-  let startDate = startOfDay(new Date());
-  let endDate = startOfDay(new Date());
-  let startHour = '';
-  let startMinute = '';
-  let startSecond = '';
-  let startHalf = 'AM';
-  $: startTime = {
-    hour: startHour,
-    minute: startMinute,
-    second: startSecond,
-    half: startHalf,
-  };
-
-  let endHour = '';
-  let endMinute = '';
-  let endSecond = '';
-  let endHalf = 'AM';
-  $: endTime = {
-    hour: endHour,
-    minute: endMinute,
-    second: endSecond,
-    half: endHalf,
   };
 
   const onStartDateChange = (d) => {
@@ -170,7 +158,7 @@
     >
       {#if custom}
         <div class="flex flex-col">
-          <p class="text-sm">To</p>
+          <p class="text-sm">Start</p>
           <div class="flex flex-col gap-2">
             <DatePicker
               on:datechange={onStartDateChange}
@@ -185,7 +173,7 @@
           </div>
         </div>
         <div class="flex flex-col">
-          <p class="text-sm">From</p>
+          <p class="text-sm">End</p>
           <div class="flex flex-col gap-2">
             <DatePicker on:datechange={onEndDateChange} selected={endDate} />
             <TimePicker

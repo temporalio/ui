@@ -4,7 +4,10 @@
 
   import { formatDate } from '$lib/utilities/format-date';
   import { getMilliseconds } from '$lib/utilities/format-time';
-  import { routeForWorkflow } from '$lib/utilities/route-for';
+  import {
+    routeForEventHistory,
+    routeForWorkflow,
+  } from '$lib/utilities/route-for';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import FilterOrCopyButtons from '$holocene/filter-or-copy-buttons.svelte';
@@ -12,6 +15,7 @@
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import Checkbox from '$lib/holocene/checkbox.svelte';
+  import { eventViewType } from '$lib/stores/event-view';
 
   const dispatch = createEventDispatcher<{
     toggleWorkflow: { workflowRunId: string; checked: boolean };
@@ -24,7 +28,8 @@
   export let timeFormat: TimeFormat | string;
   export let checkboxDisabled: boolean;
 
-  $: href = routeForWorkflow({
+  $: href = routeForEventHistory({
+    view: $eventViewType,
     namespace,
     workflow: workflow.id,
     run: workflow.runId,
