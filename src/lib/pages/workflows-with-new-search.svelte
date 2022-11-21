@@ -167,6 +167,11 @@
     clearAfterTerminate();
   };
 
+  const handleCancelBulkTerminateModal = () => {
+    showBulkOperationConfirmationModal = false;
+    reason = '';
+  };
+
   $: terminableWorkflows = $workflows.filter(
     (workflow) => selectedWorkflows[workflow.runId] && workflow.canBeTerminated,
   );
@@ -193,7 +198,7 @@
   confirmType="destructive"
   confirmDisabled={reason === ''}
   loading={terminating}
-  on:cancelModal={() => (showBulkOperationConfirmationModal = false)}
+  on:cancelModal={handleCancelBulkTerminateModal}
   on:confirmModal={terminateWorkflows}
 >
   <h3 slot="title">Terminate Workflows</h3>
