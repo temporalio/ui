@@ -15,14 +15,14 @@
   const values = writable<string[]>(chips);
   let displayValue: string = '';
   let shouldScrollToInput = false;
+  let inputContainer: HTMLDivElement;
+  let input: HTMLInputElement;
 
   $: invalid = $values.some((chip) => !validator(chip));
 
   const scrollToInput = () => {
-    const container = document.querySelector('div.input-container');
-    const input = document.getElementById(id);
     let rect = input.getBoundingClientRect();
-    container.scrollTo(rect.x, rect.y);
+    inputContainer.scrollTo(rect.x, rect.y);
     shouldScrollToInput = false;
   };
 
@@ -84,7 +84,7 @@
   {#if label}
     {label}{#if required}*{/if}
   {/if}
-  <div class="input-container" class:invalid>
+  <div bind:this={inputContainer} class="input-container" class:invalid>
     {#if $values.length > 0}
       {#each $values as chip, i (`${chip}-${i}`)}
         {@const valid = validator(chip)}
@@ -103,6 +103,7 @@
       {name}
       {required}
       multiple
+      bind:this={input}
       bind:value={displayValue}
       on:blur={handleBlur}
       on:keydown={handleKeydown}
