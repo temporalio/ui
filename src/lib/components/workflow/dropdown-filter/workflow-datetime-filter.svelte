@@ -7,6 +7,7 @@
     addSeconds,
     formatISO,
     startOfDay,
+    subMinutes,
   } from 'date-fns';
 
   import { columnOrderedDurations } from '$lib/utilities/to-duration';
@@ -35,26 +36,28 @@
   let startHour = '';
   let startMinute = '';
   let startSecond = '';
-  let startHalf = 'AM';
+  let startHalf: 'AM' | 'PM' = 'AM';
 
   let endHour = '';
   let endMinute = '';
   let endSecond = '';
-  let endHalf = 'AM';
+  let endHalf: 'AM' | 'PM' = 'AM';
 
   $: timeFilter = $workflowFilters.find(
     (f) => f.attribute === 'StartTime' || f.attribute === 'CloseTime',
   );
 
-  $: {
+  const setTimeValues = () => {
     if (!timeFilter) {
       value = 'All Time';
       timeField = 'StartTime';
     } else {
-      value = timeFilter.value;
+      value = custom ? 'Custom' : timeFilter.value;
       timeField = timeFilter.attribute as string;
     }
-  }
+  };
+
+  $: timeFilter, setTimeValues();
 
   const getOtherFilters = () =>
     $workflowFilters.filter(
@@ -103,6 +106,7 @@
     if (time.hour) _date = addHours(_date, time.hour);
     if (time.minute) _date = addMinutes(_date, time.minute);
     if (time.second) _date = addSeconds(_date, time.second);
+
     return _date;
   };
 
@@ -119,6 +123,7 @@
       second: endSecond,
       half: endHalf,
     });
+
     const filter = {
       attribute: timeField,
       value: `BETWEEN "${formatISO(startDateWithTime)}" AND "${formatISO(
