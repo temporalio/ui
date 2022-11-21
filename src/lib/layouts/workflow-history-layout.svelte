@@ -23,6 +23,12 @@
   import { timeFormat } from '$lib/stores/time-format';
   import { exportHistory } from '$lib/utilities/export-history';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
+  import Table from '$lib/holocene/table/table.svelte';
+  import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
+  import TableRow from '$lib/holocene/table/table-row.svelte';
+  import Pagination from '$lib/holocene/pagination.svelte';
+  import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
+  import { workflows } from '$lib/stores/workflows';
 
   const { namespace } = $page.params;
   const { workflow, workers } = $workflowRun;
@@ -88,32 +94,16 @@
         />
       </div>
     {/if}
-    {#each workflow?.pendingChildren as child (child.runId)}
-      <div class="gap-2 xl:flex">
-        <WorkflowDetail
-          title="Child"
-          content={child.workflowId}
-          href={routeForWorkflow({
-            namespace,
-            workflow: child.workflowId,
-            run: child.runId,
-          })}
-        />
-        <WorkflowDetail
-          title="Child ID"
-          content={child.runId}
-          href={routeForWorkflow({
-            namespace,
-            workflow: child.workflowId,
-            run: child.runId,
-          })}
-        />
-      </div>
-    {/each}
     <WorkflowDetail
       title="State Transitions"
       content={workflow.stateTransitionCount}
     />
+    {#if workflow?.pendingChildren.length}
+      <ChildWorkflowsTable
+        pendingChildren={workflow?.pendingChildren}
+        {namespace}
+      />
+    {/if}
   </section>
   <WorkflowStackTraceError {workflow} {workers} />
   <WorkflowTypedError error={workflowEvents.error} />
