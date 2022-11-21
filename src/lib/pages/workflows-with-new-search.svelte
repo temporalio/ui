@@ -136,8 +136,7 @@
       // Idea: persist the job ID and display a progress indicator for large jobs
       batchTerminateByQuery({ namespace, reason, query });
       toaster.push({
-        variant: 'success',
-        message: `Successfully requested to terminate ${filteredWorkflowCount} workflows. This operation could take a while, please check back later.`,
+        message: 'The batch terminate request is processing in the background.',
         id: 'batch-terminate-success-toast',
       });
     } else {
@@ -153,7 +152,6 @@
           jobId,
         });
         toaster.push({
-          variant: 'success',
           message: `Successfully terminated ${workflowsTerminated} workflows.`,
           id: 'batch-terminate-success-toast',
         });
@@ -214,7 +212,9 @@
           </code>
         </div>
         <span class="text-xs italic"
-          >Note: this may affect workflows that are not currently visible.</span
+          >Note: The actual count of workflows that will be terminated is the
+          total number of running workflows matching this query at the time of
+          clicking “Terminate”.</span
         >
       {:else}
         <p class="mb-4">
