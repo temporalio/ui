@@ -1,5 +1,6 @@
 <script lang="ts">
   import { routeForEventHistory } from '$lib/utilities/route-for';
+  import { eventViewType } from '$lib/stores/event-view';
 
   import Pagination from '$lib/holocene/pagination.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
@@ -24,6 +25,7 @@
           namespace,
           workflow: child.workflowId,
           run: child.runId,
+          view: $eventViewType,
         })}
       >
         <td>
