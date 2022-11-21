@@ -50,9 +50,9 @@
   };
 </script>
 
-<div class={$$props.class}>
+<label class={$$props.class} for={id}>
   {#if label}
-    <label class:required for={id}>{label}</label>
+    {label}{#if required}*{/if}
   {/if}
   <div class="input-container" class:invalid>
     {#if chips.length > 0}
@@ -84,15 +84,11 @@
       {hintText}
     </span>
   {/if}
-</div>
+</label>
 
 <style lang="postcss">
   label {
     @apply mb-10 text-sm font-medium text-gray-900;
-
-    &.required {
-      @apply after:content-['*'];
-    }
   }
 
   .input-container {
