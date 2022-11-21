@@ -200,18 +200,18 @@
   <svelte:fragment slot="content">
     <div class="mb-4 flex flex-col">
       {#if allSelected}
-        <p class="mb-4">
+        <p class="mb-2">
           Are you sure you want to terminate all worklfows matching the
           following query? This action cannot be undone.
         </p>
         <div
-          class="mb-1 overflow-scroll whitespace-nowrap rounded border border-primary bg-gray-100 p-2"
+          class="mb-2 overflow-scroll whitespace-nowrap rounded border border-primary bg-gray-100 p-2"
         >
           <code>
             {!$workflowsQuery ? 'ExecutionStatus="Running"' : $workflowsQuery}
           </code>
         </div>
-        <span class="text-xs italic"
+        <span class="text-xs"
           >Note: The actual count of workflows that will be terminated is the
           total number of running workflows matching this query at the time of
           clicking “Terminate”.</span
