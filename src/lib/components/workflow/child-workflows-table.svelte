@@ -9,8 +9,6 @@
 
   export let pendingChildren: WorkflowExecution['pendingChildren'] = [];
   export let namespace: string;
-
-  console.log(pendingChildren);
 </script>
 
 <Pagination items={pendingChildren} itemsPerPage={10} let:visibleItems>
