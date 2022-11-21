@@ -75,7 +75,7 @@
 
 <svelte:window bind:innerWidth={screenWidth} />
 
-<div class="relative flex flex-col gap-4 mb-8 pagination">
+<div class="pagination relative mb-8 flex flex-col gap-4">
   <div
     class={`flex flex-col items-center gap-4 lg:flex-row ${
       $$slots['action-top-left'] ? 'justify-between' : 'justify-end'
