@@ -18,7 +18,6 @@
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import { onMount } from 'svelte';
   import TimePicker from '$lib/holocene/time-picker.svelte';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { page } from '$app/stores';
