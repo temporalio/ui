@@ -183,6 +183,7 @@ export const cancelWorkflow = async (
 
   return requestFromAPI(route, {
     request,
+    notifyOnError: false,
     options: {
       method: 'POST',
     },
