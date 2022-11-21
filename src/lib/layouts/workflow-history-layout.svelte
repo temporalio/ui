@@ -21,6 +21,7 @@
   import { timeFormat } from '$lib/stores/time-format';
   import { exportHistory } from '$lib/utilities/export-history';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
+  import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
 
   const { namespace } = $page.params;
   const { workflow, workers } = $workflowRun;
@@ -64,6 +65,10 @@
       content={workflow.taskQueue}
       href={routeForWorkers(workflowRoute)}
     />
+    <WorkflowDetail
+      title="State Transitions"
+      content={workflow.stateTransitionCount}
+    />
     {#if workflow?.parent}
       <div class="gap-2 xl:flex">
         <WorkflowDetail
@@ -88,34 +93,12 @@
         />
       </div>
     {/if}
-    {#each workflow?.pendingChildren as child (child.runId)}
-      <div class="gap-2 xl:flex">
-        <WorkflowDetail
-          title="Child"
-          content={child.workflowId}
-          href={routeForEventHistory({
-            view: $eventViewType,
-            namespace,
-            workflow: child.workflowId,
-            run: child.runId,
-          })}
-        />
-        <WorkflowDetail
-          title="Child ID"
-          content={child.runId}
-          href={routeForEventHistory({
-            view: $eventViewType,
-            namespace,
-            workflow: child.workflowId,
-            run: child.runId,
-          })}
-        />
-      </div>
-    {/each}
-    <WorkflowDetail
-      title="State Transitions"
-      content={workflow.stateTransitionCount}
-    />
+    {#if workflow?.pendingChildren.length}
+      <ChildWorkflowsTable
+        pendingChildren={workflow?.pendingChildren}
+        {namespace}
+      />
+    {/if}
   </section>
   <WorkflowStackTraceError {workflow} {workers} />
   <WorkflowTypedError error={workflowEvents.error} />
