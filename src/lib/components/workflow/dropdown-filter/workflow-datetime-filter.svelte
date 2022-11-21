@@ -170,7 +170,7 @@
     >
       {#if custom}
         <div class="flex flex-col">
-          <p class="text-sm">To</p>
+          <p class="text-sm">Start</p>
           <div class="flex flex-col gap-2">
             <DatePicker
               on:datechange={onStartDateChange}
@@ -185,7 +185,7 @@
           </div>
         </div>
         <div class="flex flex-col">
-          <p class="text-sm">From</p>
+          <p class="text-sm">End</p>
           <div class="flex flex-col gap-2">
             <DatePicker on:datechange={onEndDateChange} selected={endDate} />
             <TimePicker
