@@ -87,7 +87,7 @@
       link: 'https://docs.temporal.io/visibility#search-attribute',
     },
     NonDeterministicError: {
-      title: 'Cause Non Deterministic Error',
+      title: 'Non Deterministic Error',
       copy: 'The workflow task has failed due to non-deterministic error from workflow code. This usually means the workflow code has a non-backward compatible change without proper versioning branch.',
     },
   };
