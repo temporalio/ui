@@ -1,11 +1,9 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { workflowRun } from '$lib/stores/workflow-run';
-
   import {
-    routeForWorkflow,
-    routeForWorkers,
     routeForEventHistory,
+    routeForWorkers,
   } from '$lib/utilities/route-for';
   import { formatDate } from '$lib/utilities/format-date';
   import { eventViewType } from '$lib/stores/event-view';
@@ -71,7 +69,8 @@
         <WorkflowDetail
           title="Parent"
           content={workflow.parent?.workflowId}
-          href={routeForWorkflow({
+          href={routeForEventHistory({
+            view: $eventViewType,
             namespace,
             workflow: workflow.parent?.workflowId,
             run: workflow.parent?.runId,
@@ -80,7 +79,8 @@
         <WorkflowDetail
           title="Parent ID"
           content={workflow.parent?.runId}
-          href={routeForWorkflow({
+          href={routeForEventHistory({
+            view: $eventViewType,
             namespace,
             workflow: workflow.parent?.workflowId,
             run: workflow.parent?.runId,
@@ -93,7 +93,8 @@
         <WorkflowDetail
           title="Child"
           content={child.workflowId}
-          href={routeForWorkflow({
+          href={routeForEventHistory({
+            view: $eventViewType,
             namespace,
             workflow: child.workflowId,
             run: child.runId,
@@ -102,7 +103,8 @@
         <WorkflowDetail
           title="Child ID"
           content={child.runId}
-          href={routeForWorkflow({
+          href={routeForEventHistory({
+            view: $eventViewType,
             namespace,
             workflow: child.workflowId,
             run: child.runId,

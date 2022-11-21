@@ -3,7 +3,7 @@
 
   import { formatDate } from '$lib/utilities/format-date';
   import { getMilliseconds } from '$lib/utilities/format-time';
-  import { routeForWorkflow } from '$lib/utilities/route-for';
+  import { routeForEventHistory } from '$lib/utilities/route-for';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
@@ -12,6 +12,7 @@
   import FilterOrCopyButtons from '$holocene/filter-or-copy-buttons.svelte';
   import SelectableTableRow from '$holocene/table/selectable-table-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
+  import { eventViewType } from '$lib/stores/event-view';
 
   export let bulkActionsEnabled: boolean = false;
   export let selected: boolean = false;
@@ -19,7 +20,8 @@
   export let workflow: WorkflowExecution;
   export let timeFormat: TimeFormat | string;
 
-  $: href = routeForWorkflow({
+  $: href = routeForEventHistory({
+    view: $eventViewType,
     namespace,
     workflow: workflow.id,
     run: workflow.runId,
