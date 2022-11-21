@@ -18,12 +18,16 @@
   export let items: T[];
   export let floatId: string | undefined = undefined;
   export let startingIndex: string | number = 0;
-  const perPageKey = 'per-page';
-  const currentPageKey = 'page';
+  export let perPageKey = 'per-page';
+  export let currentPageKey = 'page';
+  export let itemsPerPage: number | null = null;
 
-  $: perPage = String(
-    perPageFromSearchParameter($page.url.searchParams.get(perPageKey)),
-  ).toString();
+  $: perPage =
+    itemsPerPage !== null
+      ? String(itemsPerPage)
+      : String(
+          perPageFromSearchParameter($page.url.searchParams.get(perPageKey)),
+        ).toString();
 
   $: {
     if (parseInt(perPage, 10) > parseInt(MAX_PAGE_SIZE, 10)) {
@@ -84,12 +88,14 @@
       class="flex flex-col justify-end gap-4 md:flex-row"
     >
       <slot name="action-top-center" />
-      <FilterSelect
-        label="Per Page"
-        parameter={perPageKey}
-        value={perPage}
-        {options}
-      />
+      {#if !itemsPerPage}
+        <FilterSelect
+          label="Per Page"
+          parameter={perPageKey}
+          value={perPage}
+          {options}
+        />
+      {/if}
       <div class="flex items-center justify-center gap-1">
         <button
           class="caret"
@@ -127,12 +133,14 @@
   >
     <slot name="action-bottom-left" />
     <div class="flex gap-4">
-      <FilterSelect
-        label="Per Page"
-        parameter={perPageKey}
-        value={perPage}
-        {options}
-      />
+      {#if !itemsPerPage}
+        <FilterSelect
+          label="Per Page"
+          parameter={perPageKey}
+          value={perPage}
+          {options}
+        />
+      {/if}
       <div class="flex items-center justify-center gap-1">
         <button
           class="caret"
