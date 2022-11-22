@@ -6,7 +6,7 @@
   export let hour = '';
   export let minute = '';
   export let second = '';
-  export let half = 'AM';
+  export let half: 'AM' | 'PM' = 'AM';
 </script>
 
 <div class="flex gap-2">

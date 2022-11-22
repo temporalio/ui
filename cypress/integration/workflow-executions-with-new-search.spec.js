@@ -8,12 +8,16 @@ const { workflowId, runId } = workflowRunningFixture.execution;
 describe('Workflow Executions List With Search', () => {
   beforeEach(() => {
     cy.interceptApi();
+    cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/cluster*', {
+      fixture: 'cluster-with-elasticsearch.json',
+    }).as('cluster-api-elasticsearch');
 
     cy.visit('/namespaces/default/workflows');
 
+    cy.wait('@cluster-api-elasticsearch');
+    cy.wait('@namespaces-api');
     cy.wait('@workflows-api');
     cy.wait('@workflows-count-api');
-    cy.wait('@namespaces-api');
   });
 
   it('should show count of workflows', () => {
@@ -183,13 +187,13 @@ describe('Workflow Executions List With Search', () => {
 
         cy.intercept(
           Cypress.env('VITE_API_HOST') +
-          `/api/v1/namespaces/default/workflows/*/runs/*/events/reverse*`,
+            `/api/v1/namespaces/default/workflows/*/runs/*/events/reverse*`,
           { fixture: 'event-history-completed.json' },
         ).as('event-history-api');
 
         cy.intercept(
           Cypress.env('VITE_API_HOST') +
-          `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}?`,
+            `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}?`,
           { fixture: 'workflow-completed.json' },
         ).as('workflow-api');
       });

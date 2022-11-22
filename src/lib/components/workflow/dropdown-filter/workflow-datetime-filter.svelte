@@ -7,7 +7,6 @@
     addSeconds,
     formatISO,
     startOfDay,
-    subMinutes,
   } from 'date-fns';
 
   import { columnOrderedDurations } from '$lib/utilities/to-duration';
