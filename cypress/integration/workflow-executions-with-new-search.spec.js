@@ -5,15 +5,19 @@ import workflowsFixture from '../fixtures/workflows.json';
 const workflowRunningFixture = workflowsFixture.executions[0];
 const { workflowId, runId } = workflowRunningFixture.execution;
 
-describe.skip('Workflow Executions List With Search', () => {
+describe('Workflow Executions List With Search', () => {
   beforeEach(() => {
     cy.interceptApi();
+    cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/cluster*', {
+      fixture: 'cluster-with-elasticsearch.json',
+    }).as('cluster-api-elasticsearch');
 
     cy.visit('/namespaces/default/workflows');
 
+    cy.wait('@cluster-api-elasticsearch');
+    cy.wait('@namespaces-api');
     cy.wait('@workflows-api');
     cy.wait('@workflows-count-api');
-    cy.wait('@namespaces-api');
   });
 
   it('should show count of workflows', () => {

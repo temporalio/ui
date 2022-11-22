@@ -18,7 +18,6 @@
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import { onMount } from 'svelte';
   import TimePicker from '$lib/holocene/time-picker.svelte';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { page } from '$app/stores';
@@ -36,26 +35,28 @@
   let startHour = '';
   let startMinute = '';
   let startSecond = '';
-  let startHalf = 'AM';
+  let startHalf: 'AM' | 'PM' = 'AM';
 
   let endHour = '';
   let endMinute = '';
   let endSecond = '';
-  let endHalf = 'AM';
+  let endHalf: 'AM' | 'PM' = 'AM';
 
   $: timeFilter = $workflowFilters.find(
     (f) => f.attribute === 'StartTime' || f.attribute === 'CloseTime',
   );
 
-  $: {
+  const setTimeValues = () => {
     if (!timeFilter) {
       value = 'All Time';
       timeField = 'StartTime';
     } else {
-      value = timeFilter.value;
+      value = custom ? 'Custom' : timeFilter.value;
       timeField = timeFilter.attribute as string;
     }
-  }
+  };
+
+  $: timeFilter, setTimeValues();
 
   const getOtherFilters = () =>
     $workflowFilters.filter(
@@ -104,22 +105,36 @@
     if (time.hour) _date = addHours(_date, time.hour);
     if (time.minute) _date = addMinutes(_date, time.minute);
     if (time.second) _date = addSeconds(_date, time.second);
+
     return _date;
+  };
+
+  const setHours = (hour: string, half: 'AM' | 'PM') => {
+    if (hour) {
+      if (hour === '12') {
+        return half === 'AM' ? '00' : '12';
+      } else if (half === 'PM') {
+        return (parseInt(hour) + 12).toString();
+      } else {
+        return hour;
+      }
+    } else {
+      hour = '';
+    }
   };
 
   const onApply = () => {
     let startDateWithTime = applyTimeChanges(startDate, {
-      hour: startHour,
+      hour: setHours(startHour, startHalf),
       minute: startMinute,
       second: startSecond,
-      half: startHalf,
     });
     let endDateWithTime = applyTimeChanges(endDate, {
-      hour: endHour,
+      hour: setHours(endHour, endHalf),
       minute: endMinute,
       second: endSecond,
-      half: endHalf,
     });
+
     const filter = {
       attribute: timeField,
       value: `BETWEEN "${formatISO(startDateWithTime)}" AND "${formatISO(

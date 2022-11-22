@@ -1,3 +1,3 @@
 export const advancedVisibilityEnabled = (cluster: ClusterInformation) => {
-  return cluster.visibilityStore.includes('elasticsearch');
+  return cluster?.visibilityStore?.includes('elasticsearch');
 };

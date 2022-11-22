@@ -90,7 +90,7 @@
       <a
         href={routeForWorkflowsWithQuery({
           namespace,
-          query: $workflowsQuery ?? query,
+          query: $workflowsQuery || query,
           search: searchType,
         })}
         data-cy="back-to-workflows"

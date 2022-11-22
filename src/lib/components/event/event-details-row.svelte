@@ -3,7 +3,7 @@
 
   import { format } from '$lib/utilities/format-camel-case';
   import {
-    routeForWorkflow,
+    routeForEventHistory,
     routeForTaskQueue,
   } from '$lib/utilities/route-for';
   import {
@@ -18,6 +18,7 @@
   import Link from '$lib/holocene/link.svelte';
   import Copyable from '../copyable.svelte';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
+  import { eventViewType } from '$lib/stores/event-view';
 
   export let key: string;
   export let value: string | Record<string, unknown>;
@@ -45,7 +46,12 @@
         >
           <Link
             newTab
-            href={routeForWorkflow({ namespace, workflow, run: value })}
+            href={routeForEventHistory({
+              view: $eventViewType,
+              namespace,
+              workflow,
+              run: value,
+            })}
           >
             {value}
           </Link>
@@ -59,7 +65,8 @@
         <Copyable content={value} container-class="xl:flex-row">
           <Link
             newTab
-            href={routeForWorkflow({
+            href={routeForEventHistory({
+              view: $eventViewType,
               namespace,
               workflow: attributes.workflowExecutionWorkflowId,
               run: attributes.workflowExecutionRunId,
