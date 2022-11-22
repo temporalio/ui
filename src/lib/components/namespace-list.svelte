@@ -41,7 +41,7 @@
 </script>
 
 <div class="prose mt-16 mb-8">
-  <h2 class="text-2xl">Select a Namespace</h2>
+  <h2 class="text-2xl" data-cy="namespace-select-header">Select a Namespace</h2>
   {#if $page.params?.namespace}
     <p>You are currently viewing {$page.params.namespace}</p>
   {/if}
