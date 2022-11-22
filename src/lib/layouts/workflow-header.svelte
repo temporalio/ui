@@ -100,17 +100,23 @@
       </a>
     </div>
     <div
-      class="mb-8 flex flex-col items-center justify-between gap-4 xl:flex-row xl:gap-0"
+      class="mb-8 flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
     >
-      <h1
-        data-cy="workflow-id-heading"
-        class="relative flex items-center gap-4 text-2xl"
+      <div
+        class="flex w-full items-center justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
       >
         <WorkflowStatus status={workflow?.status} />
-        <span class="select-all font-medium">{workflow.id}</span>
-      </h1>
+        <h1
+          data-cy="workflow-id-heading"
+          class="select-all overflow-hidden text-ellipsis text-2xl font-medium"
+        >
+          {workflow.id}
+        </h1>
+      </div>
       {#if isRunning}
-        <div class="flex items-center justify-start gap-4 xl:justify-end">
+        <div
+          class="flex flex-col items-center justify-center gap-4 whitespace-nowrap sm:flex-row lg:justify-end"
+        >
           <AutoRefreshWorkflow onChange={onRefreshChange} />
           <WorkflowActions {cancelInProgress} {workflow} {namespace} />
         </div>
