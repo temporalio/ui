@@ -5,7 +5,7 @@ import workflowsFixture from '../fixtures/workflows.json';
 const workflowRunningFixture = workflowsFixture.executions[0];
 const { workflowId, runId } = workflowRunningFixture.execution;
 
-describe.skip('Workflow Executions List With Search', () => {
+describe('Workflow Executions List With Search', () => {
   beforeEach(() => {
     cy.interceptApi();
 
@@ -183,13 +183,13 @@ describe.skip('Workflow Executions List With Search', () => {
 
         cy.intercept(
           Cypress.env('VITE_API_HOST') +
-            `/api/v1/namespaces/default/workflows/*/runs/*/events/reverse*`,
+          `/api/v1/namespaces/default/workflows/*/runs/*/events/reverse*`,
           { fixture: 'event-history-completed.json' },
         ).as('event-history-api');
 
         cy.intercept(
           Cypress.env('VITE_API_HOST') +
-            `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}?`,
+          `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}?`,
           { fixture: 'workflow-completed.json' },
         ).as('workflow-api');
       });

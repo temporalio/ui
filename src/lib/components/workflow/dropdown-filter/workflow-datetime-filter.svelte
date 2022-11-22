@@ -110,18 +110,30 @@
     return _date;
   };
 
+  const setHours = (hour: string, half: 'AM' | 'PM') => {
+    if (hour) {
+      if (hour === '12') {
+        return half === 'AM' ? '00' : '12';
+      } else if (half === 'PM') {
+        return (parseInt(hour) + 12).toString();
+      } else {
+        return hour;
+      }
+    } else {
+      hour = '';
+    }
+  };
+
   const onApply = () => {
     let startDateWithTime = applyTimeChanges(startDate, {
-      hour: startHour,
+      hour: setHours(startHour, startHalf),
       minute: startMinute,
       second: startSecond,
-      half: startHalf,
     });
     let endDateWithTime = applyTimeChanges(endDate, {
-      hour: endHour,
+      hour: setHours(endHour, endHalf),
       minute: endMinute,
       second: endSecond,
-      half: endHalf,
     });
 
     const filter = {
