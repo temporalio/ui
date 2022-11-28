@@ -17,11 +17,6 @@ describe('Workflow Executions List With Search', () => {
     cy.wait('@cluster-api-elasticsearch');
     cy.wait('@namespaces-api');
     cy.wait('@workflows-api');
-    cy.wait('@workflows-count-api');
-  });
-
-  it('should show count of workflows', () => {
-    cy.get('[data-cy="workflow-count"]').should('contain', '15 workflows');
   });
 
   it('should default to All for the time range', () => {
@@ -69,7 +64,6 @@ describe('Workflow Executions List With Search', () => {
       ).click();
 
       cy.url().should('not.contain', result);
-      cy.get('[data-cy="workflow-count"]').should('contain', '15 workflows');
     });
 
     it('should send the correct query for Workflow ID, autocomplete manual search and be clearable', () => {
@@ -93,7 +87,6 @@ describe('Workflow Executions List With Search', () => {
       ).click();
 
       cy.url().should('not.contain', result);
-      cy.get('[data-cy="workflow-count"]').should('contain', '15 workflows');
     });
 
     it('should change url on single Execution Status change', () => {
