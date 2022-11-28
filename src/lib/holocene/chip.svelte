@@ -7,7 +7,8 @@
 
   const dispatch = createEventDispatcher();
 
-  const handleRemove = () => {
+  const handleRemove = (e: Event) => {
+    e.preventDefault();
     dispatch('remove');
   };
 </script>

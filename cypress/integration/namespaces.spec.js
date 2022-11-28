@@ -74,12 +74,16 @@ describe('Namespace Select', () => {
 
   it('have the correct namespaces in the dropdown when using navigation header', () => {
     cy.get('@namespace-select-button').click({ wait: 1000 });
-    cy.get('.prose > .text-2xl').contains('Select a namespace');
+    cy.get('[data-cy="namespace-select-header"]').contains(
+      'Select a Namespace',
+    );
   });
 
   it('navigates to the correct namespaces in the dropdown when using navigation header', () => {
     cy.get('@namespace-select-button').click({ wait: 1000 });
-    cy.get('.prose > .text-2xl').contains('Select a namespace');
+    cy.get('[data-cy="namespace-select-header"]').contains(
+      'Select a Namespace',
+    );
     cy.get('[data-cy="namespace-list"] > :nth-child(2)').click();
     cy.get('[data-cy="namespace-name"]').contains(namespaces[1]);
   });

@@ -94,7 +94,7 @@
   {/if}
 {:else if archivalEnabled}
   <h2 class="text-2xl" data-cy="visibility-disabled-title">
-    This namespace is currently enabled for archival but visibility is not
+    This Namespace is currently enabled for archival but visibility is not
     enabled.
   </h2>
   <p>To enable Visibility Archival:</p>
@@ -112,7 +112,7 @@
   </p>
 {:else}
   <h2 class="text-2xl" data-cy="archived-disabled-title">
-    This namespace is currently not enabled for archival.
+    This Namespace is currently not enabled for archival.
   </h2>
   <p>Run this command to enable Archival for Event Histories:</p>
   <CodeBlock

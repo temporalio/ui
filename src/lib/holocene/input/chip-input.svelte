@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onDestroy, afterUpdate } from 'svelte';
+  import { writable } from 'svelte/store';
   import Chip from '$holocene/chip.svelte';
 
   export let id: string;
@@ -10,13 +12,39 @@
   export let required = false;
   export let hintText = '';
   export let validator: (value: string) => boolean = () => true;
+  const values = writable<string[]>(chips);
   let displayValue: string = '';
-  $: invalid = chips.some((chip) => !validator(chip));
+  let shouldScrollToInput = false;
+  let inputContainer: HTMLDivElement;
+  let input: HTMLInputElement;
+
+  $: invalid = $values.some((chip) => !validator(chip));
+
+  const scrollToInput = () => {
+    let rect = input.getBoundingClientRect();
+    inputContainer.scrollTo(rect.x, rect.y);
+    shouldScrollToInput = false;
+  };
+
+  const unsubscribe = values.subscribe((updatedChips) => {
+    shouldScrollToInput = updatedChips.length > chips.length;
+    chips = updatedChips;
+  });
+
+  afterUpdate(() => {
+    if (shouldScrollToInput) {
+      scrollToInput();
+    }
+  });
+
+  onDestroy(() => {
+    unsubscribe();
+  });
 
   const handleKeydown = (e: KeyboardEvent) => {
     if ((e.key === ',' || e.key === 'Enter') && displayValue !== '') {
       e.preventDefault();
-      chips = [...chips, displayValue];
+      values.update((previous) => [...previous, displayValue]);
       displayValue = '';
     }
 
@@ -25,38 +53,40 @@
       e.key === 'Backspace' &&
       eventTarget &&
       eventTarget.value === '' &&
-      chips.length > 0
+      $values.length > 0
     ) {
-      chips = chips.slice(0, -1);
+      values.update((previous) => previous.slice(0, -1));
     }
   };
 
   const handlePaste = (e: ClipboardEvent) => {
     e.preventDefault();
     const clipboardContents = e.clipboardData.getData('text/plain');
-    chips = [...chips, ...clipboardContents.split(',')];
+    values.update((previous) => [...previous, ...clipboardContents.split(',')]);
   };
 
   const handleBlur = () => {
     if (displayValue !== '') {
-      chips = [...chips, displayValue];
+      values.update((previous) => [...previous, displayValue]);
       displayValue = '';
     }
   };
 
   const removeChip = (index: number) => {
-    chips.splice(index, 1);
-    chips = chips;
+    values.update((previous) => {
+      previous.splice(index, 1);
+      return previous;
+    });
   };
 </script>
 
-<div class={$$props.class}>
+<label class={$$props.class} for={id}>
   {#if label}
-    <label class:required for={id}>{label}</label>
+    {label}{#if required}*{/if}
   {/if}
-  <div class="input-container" class:invalid>
-    {#if chips.length > 0}
-      {#each chips as chip, i (`${chip}-${i}`)}
+  <div bind:this={inputContainer} class="input-container" class:invalid>
+    {#if $values.length > 0}
+      {#each $values as chip, i (`${chip}-${i}`)}
         {@const valid = validator(chip)}
         <Chip
           on:remove={() => removeChip(i)}
@@ -73,6 +103,7 @@
       {name}
       {required}
       multiple
+      bind:this={input}
       bind:value={displayValue}
       on:blur={handleBlur}
       on:keydown={handleKeydown}
@@ -84,15 +115,11 @@
       {hintText}
     </span>
   {/if}
-</div>
+</label>
 
 <style lang="postcss">
   label {
     @apply mb-10 text-sm font-medium text-gray-900;
-
-    &.required {
-      @apply after:content-['*'];
-    }
   }
 
   .input-container {
