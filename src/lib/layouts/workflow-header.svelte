@@ -35,6 +35,12 @@
   let refreshInterval;
   const refreshRate = 15000;
 
+  $: routeParameters = {
+    namespace,
+    workflow: workflow.id,
+    run: workflow.runId,
+  };
+
   const { parameters, searchType } = $workflowsSearch;
   const query = toListWorkflowQuery(parameters);
 
@@ -124,9 +130,7 @@
         label="History"
         href={routeForEventHistory({
           view: $eventViewType,
-          namespace,
-          workflow: workflow.id,
-          run: workflow.runId,
+          ...routeParameters,
         })}
         amount={workflow?.historyEvents}
         dataCy="history-tab"
@@ -134,80 +138,46 @@
           $page.url.pathname,
           routeForEventHistory({
             view: $eventViewType,
-            namespace,
-            workflow: workflow.id,
-            run: workflow.runId,
+            ...routeParameters,
           }),
         )}
       />
       <Tab
         label="Workers"
-        href={routeForWorkers({
-          namespace,
-          workflow: workflow.id,
-          run: workflow.runId,
-        })}
+        href={routeForWorkers(routeParameters)}
         amount={workers?.pollers?.length}
         dataCy="workers-tab"
         active={pathMatches(
           $page.url.pathname,
-          routeForWorkers({
-            namespace,
-            workflow: workflow.id,
-            run: workflow.runId,
-          }),
+          routeForWorkers(routeParameters),
         )}
       />
       <Tab
         label="Pending Activities"
-        href={routeForPendingActivities({
-          namespace,
-          workflow: workflow.id,
-          run: workflow.runId,
-        })}
+        href={routeForPendingActivities(routeParameters)}
         amount={workflow.pendingActivities?.length}
         dataCy="pending-activities-tab"
         active={pathMatches(
           $page.url.pathname,
-          routeForPendingActivities({
-            namespace,
-            workflow: workflow.id,
-            run: workflow.runId,
-          }),
+          routeForPendingActivities(routeParameters),
         )}
       />
       <Tab
         label="Stack Trace"
-        href={routeForStackTrace({
-          namespace,
-          workflow: workflow.id,
-          run: workflow.runId,
-        })}
+        href={routeForStackTrace(routeParameters)}
         dataCy="stack-trace-tab"
         active={pathMatches(
           $page.url.pathname,
-          routeForStackTrace({
-            namespace,
-            workflow: workflow.id,
-            run: workflow.runId,
-          }),
+          routeForStackTrace(routeParameters),
         )}
       />
       <Tab
         label="Queries"
-        href={routeForWorkflowQuery({
-          namespace,
-          workflow: workflow.id,
-          run: workflow.runId,
-        })}
+        href={routeForWorkflowQuery(routeParameters)}
         dataCy="queries-tab"
         active={pathMatches(
           $page.url.pathname,
-          routeForWorkflowQuery({
-            namespace,
-            workflow: workflow.id,
-            run: workflow.runId,
-          }),
+          routeForWorkflowQuery(routeParameters),
         )}
       />
     </nav>
