@@ -1,16 +1,32 @@
-const monthNames = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
+export const monthNames = [
+  { label: 'Every month', value: '*' },
+  { label: 'January', value: '1' },
+  { label: 'February', value: '2' },
+  { label: 'March', value: '3' },
+  { label: 'April', value: '4' },
+  { label: 'May', value: '5' },
+  { label: 'June', value: '6' },
+  { label: 'July', value: '7' },
+  { label: 'August', value: '8' },
+  { label: 'September', value: '9' },
+  { label: 'October', value: '10' },
+  { label: 'November', value: '11' },
+  { label: 'December', value: '12' },
+];
+
+export const genericWeekDays = [
+  { label: 'Everyday', value: '*' },
+  { label: 'Weekdays', value: '1,2,3,4,5' },
+  { label: 'Weekends', value: '6,7' },
+];
+export const weekDays = [
+  { label: 'Sunday', value: '7' },
+  { label: 'Monday', value: '1' },
+  { label: 'Tuesday', value: '2' },
+  { label: 'Wednesday', value: '3' },
+  { label: 'Thursday', value: '4' },
+  { label: 'Friday', value: '5' },
+  { label: 'Saturday', value: '6' },
 ];
 
 const monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];

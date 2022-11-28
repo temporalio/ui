@@ -1,11 +1,9 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { workflowRun } from '$lib/stores/workflow-run';
-
   import {
-    routeForWorkflow,
-    routeForWorkers,
     routeForEventHistory,
+    routeForWorkers,
   } from '$lib/utilities/route-for';
   import { formatDate } from '$lib/utilities/format-date';
   import { eventViewType } from '$lib/stores/event-view';
@@ -23,6 +21,7 @@
   import { timeFormat } from '$lib/stores/time-format';
   import { exportHistory } from '$lib/utilities/export-history';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
+  import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
 
   const { namespace } = $page.params;
   const { workflow, workers } = $workflowRun;
@@ -66,12 +65,17 @@
       content={workflow.taskQueue}
       href={routeForWorkers(workflowRoute)}
     />
+    <WorkflowDetail
+      title="State Transitions"
+      content={workflow.stateTransitionCount}
+    />
     {#if workflow?.parent}
       <div class="gap-2 xl:flex">
         <WorkflowDetail
           title="Parent"
           content={workflow.parent?.workflowId}
-          href={routeForWorkflow({
+          href={routeForEventHistory({
+            view: $eventViewType,
             namespace,
             workflow: workflow.parent?.workflowId,
             run: workflow.parent?.runId,
@@ -80,7 +84,8 @@
         <WorkflowDetail
           title="Parent ID"
           content={workflow.parent?.runId}
-          href={routeForWorkflow({
+          href={routeForEventHistory({
+            view: $eventViewType,
             namespace,
             workflow: workflow.parent?.workflowId,
             run: workflow.parent?.runId,
@@ -88,32 +93,12 @@
         />
       </div>
     {/if}
-    {#each workflow?.pendingChildren as child (child.runId)}
-      <div class="gap-2 xl:flex">
-        <WorkflowDetail
-          title="Child"
-          content={child.workflowId}
-          href={routeForWorkflow({
-            namespace,
-            workflow: child.workflowId,
-            run: child.runId,
-          })}
-        />
-        <WorkflowDetail
-          title="Child ID"
-          content={child.runId}
-          href={routeForWorkflow({
-            namespace,
-            workflow: child.workflowId,
-            run: child.runId,
-          })}
-        />
-      </div>
-    {/each}
-    <WorkflowDetail
-      title="State Transitions"
-      content={workflow.stateTransitionCount}
-    />
+    {#if workflow?.pendingChildren.length}
+      <ChildWorkflowsTable
+        pendingChildren={workflow?.pendingChildren}
+        {namespace}
+      />
+    {/if}
   </section>
   <WorkflowStackTraceError {workflow} {workers} />
   <WorkflowTypedError error={workflowEvents.error} />

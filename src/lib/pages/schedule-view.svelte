@@ -1,8 +1,11 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import Icon from '$holocene/icon/icon.svelte';
-  import { routeForSchedules } from '$lib/utilities/route-for';
-  import { goto } from '$app/navigation';
+  import {
+    routeForScheduleEdit,
+    routeForSchedules,
+  } from '$lib/utilities/route-for';
+  import { afterNavigate, goto } from '$app/navigation';
 
   import {
     fetchSchedule,
@@ -27,6 +30,7 @@
   import SplitButton from '$holocene/split-button.svelte';
   import Loading from '$holocene/loading.svelte';
   import type { DescribeScheduleResponse } from '$types';
+  import { coreUserStore } from '$lib/stores/core-user';
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
@@ -36,12 +40,18 @@
     scheduleId: decodeURIForSvelte(scheduleId),
   };
 
-  let scheduleFetch = fetchSchedule(parameters, fetch);
+  let scheduleFetch = fetchSchedule(parameters);
 
   let showPauseConfirmation = false;
   let showDeleteConfirmation = false;
-
   let reason = '';
+
+  let coreUser = coreUserStore();
+  let editDisabled = $coreUser.namespaceWriteDisabled(namespace);
+
+  afterNavigate(() => {
+    $loading = false;
+  });
 
   const handleDelete = async () => {
     try {
@@ -49,7 +59,6 @@
       await deleteSchedule({ namespace, scheduleId });
       setTimeout(() => {
         goto(routeForSchedules({ namespace }));
-        $loading = false;
       }, 2000);
     } catch (e) {
       $loading = false;
@@ -75,9 +84,14 @@
 
   let options = [
     {
+      label: 'Edit',
+      onClick: () => goto(routeForScheduleEdit({ namespace, scheduleId })),
+      class: 'edit',
+    },
+    {
       label: 'Delete Schedule',
       onClick: () => (showDeleteConfirmation = true),
-      class: 'text-red-500',
+      class: 'text-red-500 terminate',
     },
   ];
 </script>
@@ -102,41 +116,48 @@
             <WorkflowStatus
               status={schedule?.schedule.state.paused ? 'Paused' : 'Running'}
             />
-            <span class="font-medium select-all">{scheduleId}</span>
+            <h1 class="font-medium select-all" data-cy="schedule-name">
+              {scheduleId}
+            </h1>
           </h1>
         </div>
-        <div class="flex items-center text-sm">
+        <div class="flex items-center gap-2 text-sm">
           <p>
             {namespace}
+          </p>
+          <div class="w-1 h-1 rounded-full bg-gray-900" />
+          <p>
             {schedule?.schedule?.action?.startWorkflow?.workflowType?.name}
           </p>
         </div>
         <div class="flex items-center gap-2 text-sm">
           <p>Created: {formatDate(schedule?.info?.createTime, $timeFormat)}</p>
-          {#if schedule?.info?.updateTime}
-            <p>-</p>
+        </div>
+        {#if schedule?.info?.updateTime}
+          <div class="flex items-center gap-2 text-sm">
             <p>
               Last updated: {formatDate(
                 schedule?.info?.updateTime,
                 $timeFormat,
               )}
             </p>
-          {/if}
-        </div>
+          </div>
+        {/if}
       </main>
       <SplitButton
         position="right"
         label={schedule?.schedule?.state?.paused ? 'Unpause' : 'Pause'}
-        id="pause-schedule-button"
+        id="schedule-actions"
+        disabled={editDisabled}
         on:click={() => (showPauseConfirmation = !showPauseConfirmation)}
       >
         {#each options as option}
-          <div
-            class="cursor-pointer flex gap-2 p-4 items-center {option?.class}"
+          <button
+            class="cursor-pointer flex gap-2 py-3 px-4 items-center w-full hover:bg-gray-50 {option?.class}"
             on:click={option.onClick}
           >
             {option.label}
-          </div>
+          </button>
         {/each}
       </SplitButton>
     </header>
@@ -148,7 +169,7 @@
       {/if}
       <div class="w-full xl:w-1/2">
         <ScheduleFrequencyPanel
-          calendar={schedule?.schedule?.spec?.calendar?.[0]}
+          calendar={schedule?.schedule?.spec?.structuredCalendar?.[0]}
           interval={schedule?.schedule?.spec?.interval?.[0]}
         />
       </div>

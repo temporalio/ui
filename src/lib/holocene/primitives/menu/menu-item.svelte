@@ -5,6 +5,7 @@
   export let active = false;
   export let disabled = false;
   export let href = '';
+  export let dataCy: string = null;
 </script>
 
 {#if href}
@@ -17,6 +18,7 @@
     class:active
     class:disabled
     {disabled}
+    data-cy={dataCy}
     class="menu-item inline-block {$$props.class}"
   >
     <slot />
@@ -30,6 +32,7 @@
     class:selected
     class:active
     class:disabled
+    data-cy={dataCy}
     class="menu-item {$$props.class}"
   >
     <slot />

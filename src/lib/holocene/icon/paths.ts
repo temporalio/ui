@@ -1,6 +1,7 @@
 import add from './svg/add.svelte';
 import archives from './svg/archives.svelte';
 import arrowUp from './svg/arrow-up.svelte';
+import arrowRight from './svg/arrow-right.svelte';
 import ascending from './svg/ascending.svelte';
 import book from './svg/book.svelte';
 import bookmark from './svg/bookmark.svelte';
@@ -22,6 +23,7 @@ import copy from './svg/copy.svelte';
 import descending from './svg/descending.svelte';
 import download from './svg/download.svelte';
 import error from './svg/error.svelte';
+import exit from './svg/exit.svelte';
 import eyeHide from './svg/eye-hide.svelte';
 import eyeShow from './svg/eye-show.svelte';
 import feed from './svg/feed.svelte';
@@ -43,6 +45,7 @@ import namespace from './svg/namespace.svelte';
 import regions from './svg/regions.svelte';
 import retention from './svg/retention.svelte';
 import retry from './svg/retry.svelte';
+import rocketShip from './svg/rocket-ship.svelte';
 import schedules from './svg/schedules.svelte';
 import search from './svg/search.svelte';
 import settings from './svg/settings.svelte';
@@ -53,6 +56,7 @@ import starEmpty from './svg/star-empty.svelte';
 import starFilled from './svg/star-filled.svelte';
 import terminal from './svg/terminal.svelte';
 import trash from './svg/trash.svelte';
+import tutorial from './svg/tutorial.svelte';
 import upload from './svg/upload.svelte';
 import usage from './svg/usage.svelte';
 import verticalEllipsis from './svg/vertical-ellipsis.svelte';
@@ -65,6 +69,7 @@ export const icons = {
   add,
   archives,
   'arrow-up': arrowUp,
+  'arrow-right': arrowRight,
   ascending,
   book,
   bookmark,
@@ -86,6 +91,7 @@ export const icons = {
   descending,
   download,
   error,
+  exit,
   'eye-hide': eyeHide,
   'eye-show': eyeShow,
   feed,
@@ -107,6 +113,7 @@ export const icons = {
   regions,
   retention,
   retry,
+  'rocket-ship': rocketShip,
   schedules,
   search,
   settings,
@@ -117,6 +124,7 @@ export const icons = {
   'spinner-solid': spinnerSolid,
   terminal,
   trash,
+  tutorial,
   upload,
   usage,
   'vertical-ellipsis': verticalEllipsis,

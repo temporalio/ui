@@ -27,6 +27,7 @@
   export let unround: boolean = false;
   export let unroundRight: boolean = false;
   export let unroundLeft: boolean = false;
+  export let id: string = null;
 </script>
 
 {#if as === 'button'}
@@ -42,6 +43,7 @@
     data-cy={dataCy}
     {type}
     {disabled}
+    {id}
   >
     {#if icon || loading}
       <span class:animate-spin={loading}>
@@ -67,6 +69,7 @@
     class:thin
     data-cy={dataCy}
     {target}
+    {id}
   >
     {#if icon || loading}
       <span class:animate-spin={loading}>

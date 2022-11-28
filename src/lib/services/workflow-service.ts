@@ -26,6 +26,12 @@ export type CombinedWorkflowExecutionsResponse = {
   error?: string;
 };
 
+type CancelWorkflowExecutionParameters = {
+  namespace: string;
+  workflowId: string;
+  runId: string;
+};
+
 export type FetchWorkflow =
   | typeof fetchAllWorkflows
   | typeof fetchAllArchivedWorkflows;
@@ -164,4 +170,39 @@ export async function fetchWorkflow(
 ): Promise<WorkflowExecution> {
   const route = routeForApi('workflow', parameters);
   return requestFromAPI(route, { request }).then(toWorkflowExecution);
+}
+
+export const cancelWorkflow = async (
+  { namespace, workflowId, runId }: CancelWorkflowExecutionParameters,
+  request = fetch,
+) => {
+  const route = await routeForApi('workflow.cancel', {
+    namespace,
+    workflowId,
+    runId,
+  });
+
+  return requestFromAPI(route, {
+    request,
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+    },
+  });
+};
+
+export async function fetchWorkflowForSchedule(
+  parameters: GetWorkflowExecutionRequest,
+  request = fetch,
+): Promise<WorkflowExecution> {
+  const onError: ErrorCallback = (err) => {
+    console.error(err);
+  };
+
+  const route = await routeForApi('workflow', parameters);
+  return requestFromAPI(route, {
+    request,
+    onError,
+    handleError: onError,
+  }).then(toWorkflowExecution);
 }
