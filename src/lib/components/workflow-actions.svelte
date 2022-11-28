@@ -95,7 +95,7 @@
   width={200}
   text="You do not have permission to edit this workflow. Contact your admin for assistance."
 >
-  <FeatureGuard enabled={false}>
+  <FeatureGuard enabled={!cancelDisabled}>
     <SplitButton
       primaryActionDisabled={cancelInProgress}
       disabled={actionsDisabled}
