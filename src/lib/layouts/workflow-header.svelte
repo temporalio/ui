@@ -31,7 +31,7 @@
   export let namespace: string;
   export let workflow: WorkflowExecution;
   export let workers: GetPollersResponse;
-  export let cancelDisabled: boolean = false;
+  export let cancelEnabled: boolean = false;
 
   let refreshInterval;
   const refreshRate = 15000;
@@ -114,7 +114,7 @@
         <div class="flex items-center justify-start gap-4 xl:justify-end">
           <AutoRefreshWorkflow onChange={onRefreshChange} />
           <WorkflowActions
-            {cancelDisabled}
+            {cancelEnabled}
             {cancelInProgress}
             {workflow}
             {namespace}

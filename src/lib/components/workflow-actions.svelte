@@ -20,7 +20,7 @@
   export let workflow: WorkflowExecution;
   export let namespace: string;
   export let cancelInProgress: boolean;
-  export let cancelDisabled: boolean;
+  export let cancelEnabled: boolean;
 
   let reason = '';
   let showTerminationConfirmation = false;
@@ -95,7 +95,7 @@
   width={200}
   text="You do not have permission to edit this workflow. Contact your admin for assistance."
 >
-  <FeatureGuard enabled={!cancelDisabled}>
+  <FeatureGuard enabled={cancelEnabled}>
     <SplitButton
       primaryActionDisabled={cancelInProgress}
       disabled={actionsDisabled}
