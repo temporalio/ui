@@ -69,7 +69,6 @@ type Settings = {
     envOverride: boolean;
   };
   version: string;
-  webUri?: string;
 };
 
 type User = {
