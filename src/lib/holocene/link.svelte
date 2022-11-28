@@ -4,13 +4,26 @@
   export let newTab = false;
 </script>
 
-<a
-  {href}
-  target={newTab ? '_blank' : '_self'}
-  class:text-blue-900={active}
-  {...$$props}
-  class="{$$props.class} underline underline-offset-2 hover:text-blue-700"
-  on:click|stopPropagation
->
-  <slot />
-</a>
+{#if newTab}
+  <a
+    {href}
+    target="_blank"
+    rel="noreferrer"
+    class:text-blue-900={active}
+    {...$$props}
+    class="{$$props.class} underline underline-offset-2 hover:text-blue-700"
+    on:click|stopPropagation
+  >
+    <slot />
+  </a>
+{:else}
+  <a
+    {href}
+    class:text-blue-900={active}
+    {...$$props}
+    class="{$$props.class} underline underline-offset-2 hover:text-blue-700"
+    on:click
+  >
+    <slot />
+  </a>
+{/if}
