@@ -3,12 +3,11 @@
 
   import WorkflowHistoryLayout from '$lib/layouts/workflow-history-layout.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
+
+  const workflow = $page.params.workflow;
 </script>
 
-<PageTitle
-  title={`Workflow History | ${$page.params.workflow}`}
-  url={$page.url.href}
-/>
+<PageTitle title={`Workflow History | ${workflow}`} url={$page.url.href} />
 <WorkflowHistoryLayout>
   <!-- <svelte:fragment slot="timeline">
     <EventHistoryTimelineContainer />
