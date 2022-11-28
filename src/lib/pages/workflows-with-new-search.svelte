@@ -2,13 +2,14 @@
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import { timeFormat } from '$lib/stores/time-format';
-  import { workflowCount, workflowsQuery } from '$lib/stores/workflows';
   import {
     refresh,
     workflows,
     loading,
     updating,
     workflowError,
+    workflowCount,
+    workflowsQuery,
   } from '$lib/stores/workflows';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
@@ -212,7 +213,7 @@
         <div
           class="mb-2 overflow-scroll whitespace-nowrap rounded border border-primary bg-gray-100 p-2"
         >
-          <code>
+          <code data-cy="batch-action-workflows-query">
             {!$workflowsQuery ? 'ExecutionStatus="Running"' : $workflowsQuery}
           </code>
         </div>

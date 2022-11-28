@@ -80,13 +80,15 @@
   >
     <TableHeaderRow slot="headers">
       <th class="h-10 w-12">
-        <Checkbox
-          id="selectable-table-check-all"
-          onDark
-          {checked}
-          {indeterminate}
-          on:change={handleCheckboxChange}
-        />
+        {#if !updating}
+          <Checkbox
+            id="select-visible-workflows"
+            onDark
+            {checked}
+            {indeterminate}
+            on:change={handleCheckboxChange}
+          />
+        {/if}
       </th>
       {#if showBulkActions}
         <th class="w-48 overflow-visible whitespace-nowrap">
@@ -98,6 +100,7 @@
             <span class="font-semibold">{selectedWorkflowsCount} selected</span>
             <span>
               (or <button
+                data-cy="select-all-workflows"
                 on:click={handleSelectAll}
                 class="cursor-pointer underline"
                 >select all {filteredWorkflowCount}</button
