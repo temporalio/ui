@@ -14,8 +14,8 @@
 <Pagination items={pendingChildren} itemsPerPage={10} let:visibleItems>
   <Table class="w-full">
     <TableHeaderRow slot="headers">
-      <th class="md:table-cell">Child Workflow</th>
-      <th class="md:table-cell">Child ID</th>
+      <th class="md:table-cell">Child Workflow ID</th>
+      <th class="md:table-cell">Child Run ID</th>
     </TableHeaderRow>
     {#each visibleItems as child (child.runId)}
       <TableRow
