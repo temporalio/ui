@@ -24,7 +24,7 @@
   import Icon from '$holocene/icon/icon.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import TableRow from '$holocene/table/table-row.svelte';
-  import WorkflowDateTime from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
+  import WorkflowDateTimeFilter from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import {
     batchTerminateWorkflows,
@@ -196,7 +196,7 @@
     <WorkflowAdvancedSearch />
   </svelte:fragment>
   <svelte:fragment slot="action-top-center">
-    <WorkflowDateTime />
+    <WorkflowDateTimeFilter />
   </svelte:fragment>
   <WorkflowsSummaryTableWithFilters
     {bulkActionsEnabled}
