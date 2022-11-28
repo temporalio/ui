@@ -31,7 +31,7 @@
   export let namespace: string;
   export let workflow: WorkflowExecution;
   export let workers: GetPollersResponse;
-  export let cancelEnabled: boolean = false;
+  export let cancelEnabled: boolean = true;
 
   let refreshInterval;
   const refreshRate = 15000;
