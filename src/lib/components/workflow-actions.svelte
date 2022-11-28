@@ -14,10 +14,13 @@
   import { cancelWorkflow } from '$lib/services/workflow-service';
   import { toaster } from '$lib/holocene/toaster.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import FeatureGuard from './feature-guard.svelte';
+  import Button from '$lib/holocene/button.svelte';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
   export let cancelInProgress: boolean;
+  export let cancelDisabled: boolean;
 
   let reason = '';
   let showTerminationConfirmation = false;
@@ -92,22 +95,33 @@
   width={200}
   text="You do not have permission to edit this workflow. Contact your admin for assistance."
 >
-  <SplitButton
-    primaryActionDisabled={cancelInProgress}
-    disabled={actionsDisabled}
-    label="Request Cancellation"
-    on:click={showCancellationModal}
-    id="workflow-actions"
-  >
-    <MenuItem
-      destructive
+  <FeatureGuard enabled={false}>
+    <SplitButton
+      primaryActionDisabled={cancelInProgress}
+      disabled={actionsDisabled}
+      label="Request Cancellation"
+      on:click={showCancellationModal}
+      id="workflow-actions"
+    >
+      <MenuItem
+        destructive
+        on:click={showTerminationModal}
+        disabled={actionsDisabled}
+        dataCy="terminate-button"
+      >
+        Terminate
+      </MenuItem>
+    </SplitButton>
+    <Button
+      slot="fallback"
+      variant="destructive"
       on:click={showTerminationModal}
       disabled={actionsDisabled}
       dataCy="terminate-button"
     >
       Terminate
-    </MenuItem>
-  </SplitButton>
+    </Button>
+  </FeatureGuard>
 </Tooltip>
 
 {#if !actionsDisabled}
