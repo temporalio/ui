@@ -61,3 +61,40 @@ export const fetchEvents = async (
     toEventHistory({ response, namespace, settings, accessToken }),
   );
 };
+
+
+export const fetchPartialRawEvents = async ({
+  namespace,
+  workflowId,
+  runId,
+  sort,
+  onStart,
+  onUpdate,
+  onComplete,
+}: FetchEventsParameters): Promise<HistoryEvent[]> => {
+  const descendingRoute = await routeForApi('events.descending', { namespace, workflowId, runId });
+  const ascendingRoute = await routeForApi('events.ascending', { namespace, workflowId, runId });
+
+  const descendingRequest = requestFromAPI<GetWorkflowExecutionHistoryResponse>(descendingRoute, {
+    request: fetch,
+    params: { maximumPageSize: '100' }
+  });
+  const ascendingRouteRequest = requestFromAPI<GetWorkflowExecutionHistoryResponse>(ascendingRoute, {
+    request: fetch,
+    params: { maximumPageSize: '100' }
+  });
+
+  const [descendingResponse, ascendingRouteResponse] = await Promise.all([descendingRequest, ascendingRouteRequest])
+
+
+  return descendingResponse.history.events;
+};
+
+export const fetchPartialEvents = async (
+  parameters: FetchEventsParametersWithSettings,
+): Promise<FetchEventsResponse> => {
+  const { settings, namespace, accessToken } = parameters;
+  return fetchPartialRawEvents(parameters).then((response) =>
+    toEventHistory({ response, namespace, settings, accessToken }),
+  );
+};

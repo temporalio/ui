@@ -14,6 +14,7 @@ import {
   fetchEvents,
   FetchEventsParameters,
   FetchEventsParametersWithSettings,
+  fetchPartialEvents,
 } from '$lib/services/events-service';
 import { eventCategoryParam, eventSortOrder } from './event-view';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
@@ -106,6 +107,26 @@ export const parametersWithSettings: Readable<FetchEventsParametersWithSettings>
     },
   );
 
+// export const updateEventHistory: StartStopNotifier<FetchEventsResponse> = (
+//   set,
+// ) => {
+//   return parametersWithSettings.subscribe(async (params) => {
+//     const { settings: _, ...rest } = params;
+//     if (isNewRequest(rest, previous)) {
+//       withLoading(loading, updating, async () => {
+//         const events = await fetchEvents(params);
+//         if (events?.events?.length) {
+//           set(events);
+//         } else {
+//           setTimeout(() => {
+//             set(events);
+//           }, delay);
+//         }
+//       });
+//     }
+//   });
+// };
+
 export const updateEventHistory: StartStopNotifier<FetchEventsResponse> = (
   set,
 ) => {
@@ -113,7 +134,7 @@ export const updateEventHistory: StartStopNotifier<FetchEventsResponse> = (
     const { settings: _, ...rest } = params;
     if (isNewRequest(rest, previous)) {
       withLoading(loading, updating, async () => {
-        const events = await fetchEvents(params);
+        const events = await fetchPartialEvents(params);
         if (events?.events?.length) {
           set(events);
         } else {
