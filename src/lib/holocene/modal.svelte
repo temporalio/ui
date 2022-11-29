@@ -47,15 +47,29 @@
       }
     }
   };
+
+  $: {
+    if (open && closeButton) {
+      closeButton.focus({ focusVisible: true } as any);
+    }
+  }
 </script>
 
 <svelte:window on:keydown={handleKeyboardNavigation} />
 {#if open}
   <div class="modal">
     <div on:click={cancelModal} class="overlay" />
-    <div class="body" class:large>
+    <div
+      class="body"
+      class:large
+      aria-modal="true"
+      role="alertdialog"
+      aria-labelledby="modal-title"
+      aria-describedby="modal-description"
+    >
       {#if !loading}
         <button
+          aria-label="Close Modal"
           bind:this={closeButton}
           class="float-right m-4"
           on:click={cancelModal}
@@ -66,12 +80,12 @@
           />
         </button>
       {/if}
-      <div class="title">
+      <div id="modal-title" class="title">
         <slot name="title">
           <h3>Title</h3>
         </slot>
       </div>
-      <div class="content">
+      <div id="modal-content" class="content">
         <slot name="content">
           <span>Content</span>
         </slot>

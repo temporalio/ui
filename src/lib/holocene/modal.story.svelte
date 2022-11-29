@@ -7,7 +7,7 @@
   import Modal from './modal.svelte';
 
   export let Hst: HST;
-  let open = true;
+  let open = false;
 
   const handleConfirm = () => {
     logEvent('Confirm', {});
