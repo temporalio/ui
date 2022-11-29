@@ -1,11 +1,23 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
+  import { logEvent } from 'histoire/client';
+
   import Button from './button.svelte';
 
   import Modal from './modal.svelte';
 
   export let Hst: HST;
   let open = true;
+
+  const handleConfirm = () => {
+    logEvent('Confirm', {});
+    open = false;
+  };
+
+  const handleCancel = () => {
+    logEvent('Cancel', {});
+    open = false;
+  };
 </script>
 
 <Hst.Story>
@@ -14,8 +26,8 @@
     bind:open
     confirmType="destructive"
     confirmText="Delete"
-    on:confirmModal={() => (open = false)}
-    on:cancelModal={() => (open = false)}
+    on:confirmModal={handleConfirm}
+    on:cancelModal={handleCancel}
   >
     <h3 slot="title">Delete User</h3>
     <p slot="content">

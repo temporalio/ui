@@ -1,3 +1,5 @@
+<svelte:options accessors />
+
 <script lang="ts">
   import Icon from '$holocene/icon/icon.svelte';
   import type { IconName } from '$holocene/icon/paths';
@@ -28,10 +30,15 @@
   export let unroundRight: boolean = false;
   export let unroundLeft: boolean = false;
   export let id: string = null;
+
+  export let buttonElement: HTMLButtonElement | HTMLAnchorElement = null;
+
+  export const focus = () => buttonElement.focus();
 </script>
 
 {#if as === 'button'}
   <button
+    bind:this={buttonElement}
     on:click
     class="button {variant} {classes}"
     class:selected={active}
@@ -61,6 +68,7 @@
 {:else}
   <a
     {href}
+    bind:this={buttonElement}
     on:click
     class="button {variant} {classes}"
     class:selected={active}

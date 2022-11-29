@@ -12,6 +12,10 @@
   export let large: boolean = false;
   export let loading: boolean = false;
 
+  let closeButton: HTMLButtonElement;
+  let cancelButton: Button;
+  let confirmButton: Button;
+
   const dispatch = createEventDispatcher<{
     cancelModal: undefined;
     confirmModal: undefined;
@@ -21,25 +25,46 @@
     dispatch('cancelModal');
   };
 
-  const handleKeyUp = (event: KeyboardEvent) => {
+  const handleKeyboardNavigation = (event: KeyboardEvent) => {
+    if (!open) {
+      return;
+    }
+
     if (event.key === 'Escape') {
       cancelModal();
+      return;
+    }
+
+    if (event.key === 'Tab') {
+      if (event.shiftKey) {
+        if (document.activeElement === closeButton) {
+          confirmButton.focus();
+          event.preventDefault();
+        }
+      } else if (document.activeElement === confirmButton.buttonElement) {
+        closeButton.focus();
+        event.preventDefault();
+      }
     }
   };
 </script>
 
-<svelte:window on:keyup={handleKeyUp} />
+<svelte:window on:keydown={handleKeyboardNavigation} />
 {#if open}
   <div class="modal">
     <div on:click={cancelModal} class="overlay" />
     <div class="body" class:large>
       {#if !loading}
-        <div class="float-right p-6" on:click={cancelModal}>
+        <button
+          bind:this={closeButton}
+          class="float-right m-4"
+          on:click={cancelModal}
+        >
           <Icon
             name="close"
             class="cursor-pointer rounded-full hover:bg-gray-900 hover:text-white"
           />
-        </div>
+        </button>
       {/if}
       <div class="title">
         <slot name="title">
@@ -53,6 +78,7 @@
       </div>
       <div class="flex items-center justify-end space-x-2 p-6">
         <Button
+          bind:this={cancelButton}
           thin
           variant="secondary"
           disabled={loading}
@@ -60,6 +86,7 @@
         >
         {#if !hideConfirm}
           <Button
+            bind:this={confirmButton}
             thin
             variant={confirmType}
             {loading}
