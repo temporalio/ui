@@ -111,6 +111,26 @@
       title: 'Non Deterministic Error',
       copy: 'A non-deterministic error has caused the Workflow Task to fail. This usually means the workflow code has a non-backward compatible change without a proper versioning branch.',
     },
+    BadModifyWorkflowPropertiesAttributes: {
+      title: 'Bad Modify Workflow Properties Attributes',
+      copy: 'The Workflow Task failed to validate attributes on ModifyWorkflowProperty on the upsert memo.',
+    },
+    PendingChildWorkflowsLimitExceeded: {
+      title: 'Pending Child Workflows Limit Exceeded',
+      copy: 'The capacity for pending child Workflows has been reached. The Workflow Task was failed to prevent any more child Workflows from being added.',
+    },
+    PendingActivitiesLimitExceeded: {
+      title: 'Pending Activities Limit Exceeded',
+      copy: 'The capacity for pending Activities has been reached. The Workflow Task was failed to prevent another Activity from being created.',
+    },
+    PendingSignalsLimitExceeded: {
+      title: 'Pending Signals Limit Exceeded',
+      copy: 'The capacity for pending Signals to be sent from this Workflow has been reached.',
+    },
+    PendingRequestCancelLimitExceeded: {
+      title: 'Pending Request Cancel Limit Exceeded',
+      copy: 'The capacity for pending requests to cancel other Workflows has been reached.',
+    },
   };
 
   export let error: WorkflowTaskFailedEvent;
