@@ -35,16 +35,16 @@
   let refreshInterval;
   const refreshRate = 15000;
 
-  const routeParameters = {
+  $: routeParameters = {
     namespace,
-    workflow: workflow.id,
-    run: workflow.runId,
+    workflow: workflow?.id,
+    run: workflow?.runId,
   };
 
   const { parameters, searchType } = $workflowsSearch;
   const query = toListWorkflowQuery(parameters);
 
-  $: isRunning = $workflowRun.workflow.isRunning;
+  $: isRunning = $workflowRun?.workflow?.isRunning;
 
   onMount(() => {
     if (isRunning && $autoRefreshWorkflow === 'on') {

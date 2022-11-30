@@ -15,11 +15,13 @@
   } from '$lib/utilities/format-event-attributes';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
-  const { namespace, run } = $page.params;
-  const { workflow } = $workflowRun;
-  const { pendingActivities, defaultWorkflowTaskTimeout, id } = workflow;
+  $: pendingActivities = $workflowRun.workflow.pendingActivities;
 
-  const href = routeForPendingActivities({ namespace, workflow: id, run });
+  $: href = routeForPendingActivities({
+    namespace: $page.params.namespace,
+    workflow: $page.params.workflow,
+    run: $page.params.run,
+  });
 </script>
 
 {#if pendingActivities.length}

@@ -30,6 +30,20 @@
     showDatePicker = true;
   };
 
+  const onInput = (e: Event) => {
+    const target = e.target as HTMLInputElement;
+    const inputDate = target.value;
+    if (inputDate.length === 8) {
+      const inputDateSplit = inputDate?.split('/');
+      const yearEnd = parseInt(inputDateSplit[2]);
+      const year = 2000 + yearEnd;
+      const month = parseInt(inputDateSplit[0]) - 1;
+      const date = parseInt(inputDateSplit[1]);
+      const newDate = new Date(year, month, date);
+      dispatch('datechange', newDate);
+    }
+  };
+
   const next = () => {
     if (month === 11) {
       month = 0;
@@ -64,8 +78,10 @@
     icon="calendar-plus"
     type="text"
     on:focus={onFocus}
+    on:input={onInput}
     placeholder="MM/DD/YY"
     value={selected.toDateString()}
+    clearable
   />
   {#if showDatePicker}
     <div
@@ -76,7 +92,7 @@
           <button on:click={prev}><Icon name="chevron-left" /></button>
         </div>
         <div class="flex items-center justify-center">
-          {getMonthName(month).label}
+          {getMonthName(month)?.label ?? ''}
           {year}
         </div>
         <div class="flex items-center justify-center">
