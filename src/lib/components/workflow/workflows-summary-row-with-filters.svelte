@@ -3,18 +3,27 @@
 
   import { formatDate } from '$lib/utilities/format-date';
   import { getMilliseconds } from '$lib/utilities/format-time';
-  import { routeForWorkflow } from '$lib/utilities/route-for';
+  import {
+    routeForEventHistory,
+    routeForWorkflow,
+  } from '$lib/utilities/route-for';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import FilterOrCopyButtons from '$holocene/filter-or-copy-buttons.svelte';
   import TableRow from '$holocene/table/table-row.svelte';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import SelectableTableRow from '$lib/holocene/table/selectable-table-row.svelte';
+  import { eventViewType } from '$lib/stores/event-view';
+
+  export let bulkActionsEnabled: boolean = false;
+  export let selected: boolean = false;
   export let namespace: string;
   export let workflow: WorkflowExecution;
   export let timeFormat: TimeFormat | string;
 
-  $: href = routeForWorkflow({
+  $: href = routeForEventHistory({
+    view: $eventViewType,
     namespace,
     workflow: workflow.id,
     run: workflow.runId,
@@ -22,21 +31,23 @@
 
   let showFilterCopy = false;
 
-  const getOtherFilters = () =>
-    $workflowFilters.filter((f) => f.attribute !== 'WorkflowType');
+  const onRowFilterClick = (
+    attribute: 'WorkflowId' | 'WorkflowType',
+    value: string,
+  ) => {
+    const filter = $workflowFilters.find((f) => f.attribute === attribute);
+    const getOtherFilters = () =>
+      $workflowFilters.filter((f) => f.attribute !== attribute);
 
-  $: typeFilter = $workflowFilters.find((f) => f.attribute === 'WorkflowType');
-
-  const onTypeClick = (type: string) => {
-    if (!typeFilter) {
-      const filter = {
-        attribute: 'WorkflowType',
-        value: type,
+    if (!filter) {
+      const newFilter = {
+        attribute,
+        value,
         conditional: '=',
         operator: '',
         parenthesis: '',
       };
-      $workflowFilters = [...getOtherFilters(), filter];
+      $workflowFilters = [...getOtherFilters(), newFilter];
     } else {
       $workflowFilters = [...getOtherFilters()];
     }
@@ -45,7 +56,13 @@
   };
 </script>
 
-<TableRow {href} class="workflow-summary-row">
+<svelte:component
+  this={bulkActionsEnabled ? SelectableTableRow : TableRow}
+  item={workflow}
+  {selected}
+  {href}
+  class="workflow-summary-row"
+>
   <td>
     <WorkflowStatus
       status={workflow.status}
@@ -63,7 +80,12 @@
     <FilterOrCopyButtons
       show={showFilterCopy}
       content={workflow.id}
-      filterable={false}
+      onFilter={() => onRowFilterClick('WorkflowId', workflow.id)}
+      filtered={Boolean(
+        $workflowFilters.find(
+          (f) => f.attribute === 'WorkflowId' && f.value === workflow.id,
+        ),
+      )}
     />
     <p class="inline-time-cell">
       {formatDate(workflow.startTime, timeFormat)}
@@ -79,14 +101,18 @@
     <h3 class="md:hidden">Workflow Name:</h3>
     <span
       class="table-link"
-      on:click|preventDefault|stopPropagation={() => onTypeClick(workflow.name)}
-      >{workflow.name}</span
+      on:click|preventDefault|stopPropagation={() =>
+        onRowFilterClick('WorkflowType', workflow.name)}>{workflow.name}</span
     >
     <FilterOrCopyButtons
       show={showFilterCopy}
       content={workflow.name}
-      onFilter={() => onTypeClick(workflow.name)}
-      filtered={$page.url?.searchParams?.get('query')?.includes(workflow.name)}
+      onFilter={() => onRowFilterClick('WorkflowType', workflow.name)}
+      filtered={Boolean(
+        $workflowFilters.find(
+          (f) => f.attribute === 'WorkflowType' && f.value === workflow.name,
+        ),
+      )}
     />
     <p class="inline-time-cell">
       {formatDate(workflow.endTime, timeFormat)}
@@ -102,7 +128,7 @@
       {formatDate(workflow.endTime, timeFormat)}
     </p>
   </td>
-</TableRow>
+</svelte:component>
 
 <style lang="postcss">
   :global(.workflow-summary-row:hover) {

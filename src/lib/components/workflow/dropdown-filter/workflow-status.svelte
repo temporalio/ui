@@ -96,7 +96,7 @@
   <svelte:fragment slot="label">Status</svelte:fragment>
   <div class="flex w-56 flex-col gap-4 py-2">
     {#each Object.entries(AllStatuses) as [label, _value] (_value)}
-      <div
+      <button
         class="flex items-center transition-all hover:cursor-pointer"
         data-cy={label}
         on:click={() => onStatusClick(_value)}
@@ -122,7 +122,7 @@
             <WorkflowStatus status={_value} />
           {/if}
         </div>
-      </div>
+      </button>
     {/each}
   </div>
 </DropdownMenu>

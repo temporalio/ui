@@ -2,6 +2,7 @@
   // https://svelte.dev/repl/6116680a6c3e49d0908624105018efb7?version=3.12.1
 
   import { createEventDispatcher } from 'svelte';
+  import { clickOutside } from '$lib/holocene/outside-click';
   import Calender from './calendar.svelte';
   import { getMonthName } from '$lib/utilities/calendar';
   import Icon from './icon/icon.svelte';
@@ -29,6 +30,20 @@
     showDatePicker = true;
   };
 
+  const onInput = (e: Event) => {
+    const target = e.target as HTMLInputElement;
+    const inputDate = target.value;
+    if (inputDate.length === 8) {
+      const inputDateSplit = inputDate?.split('/');
+      const yearEnd = parseInt(inputDateSplit[2]);
+      const year = 2000 + yearEnd;
+      const month = parseInt(inputDateSplit[0]) - 1;
+      const date = parseInt(inputDateSplit[1]);
+      const newDate = new Date(year, month, date);
+      dispatch('datechange', newDate);
+    }
+  };
+
   const next = () => {
     if (month === 11) {
       month = 0;
@@ -53,14 +68,20 @@
   };
 </script>
 
-<div class="relative">
+<div
+  class="relative"
+  use:clickOutside
+  on:click-outside={() => (showDatePicker = false)}
+>
   <Input
     id="datepicker"
     icon="calendar-plus"
     type="text"
     on:focus={onFocus}
+    on:input={onInput}
     placeholder="MM/DD/YY"
     value={selected.toDateString()}
+    clearable
   />
   {#if showDatePicker}
     <div
@@ -71,7 +92,7 @@
           <button on:click={prev}><Icon name="chevron-left" /></button>
         </div>
         <div class="flex items-center justify-center">
-          {getMonthName(month)}
+          {getMonthName(month)?.label ?? ''}
           {year}
         </div>
         <div class="flex items-center justify-center">
@@ -86,18 +107,18 @@
         on:datechange={onDateChange}
       />
       <div class="my-1 flex justify-between px-2">
-        <p
+        <button
           class="cursor-pointer text-[12px]"
           on:click={() => (selected = new Date())}
         >
           Today
-        </p>
-        <p
+        </button>
+        <button
           class="cursor-pointer text-[12px]"
           on:click={() => (showDatePicker = false)}
         >
           Close
-        </p>
+        </button>
       </div>
     </div>
   {/if}

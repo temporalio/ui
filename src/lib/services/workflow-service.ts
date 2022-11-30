@@ -45,12 +45,11 @@ export const fetchWorkflowCount = async (
   let count = 0;
   try {
     const countRoute = await routeForApi('workflows.count', { namespace });
-
     if (!query) {
       const totalCountResult = await requestFromAPI<{ count: number }>(
         countRoute,
         {
-          params: { query },
+          params: {},
           onError: noop,
           handleError: noop,
           request,

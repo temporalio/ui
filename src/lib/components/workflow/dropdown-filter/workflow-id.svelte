@@ -54,12 +54,12 @@
   dataCy="workflow-id-filter-button"
   on:showmenu={handleShowInput}
 >
-  <svelte:fragment slot="label">Workflow Id</svelte:fragment>
+  <svelte:fragment slot="label">Workflow ID</svelte:fragment>
   <div class="flex w-[500px] flex-col gap-2 p-2">
     <Input
       icon="search"
       id="workflowId"
-      placeholder="Workflow Id"
+      placeholder="Workflow ID"
       class="flex items-center px-2 transition-all hover:cursor-pointer"
       autoFocus
       clearable
