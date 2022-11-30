@@ -30,13 +30,13 @@
 <div class="container">
   <div class="row">
     {#each weekDays as day}
-      <p class="cell">{day}</p>
+      <p class="cell">{day.label.slice(0, 2)}</p>
     {/each}
   </div>
 
   <div class="row">
     {#each cells as { allowed, value }, index (index)}
-      <p
+      <button
         on:click={allowed && value ? () => onChange(value) : noop}
         class="cell"
         class:highlight={allowed && value}
@@ -48,7 +48,7 @@
         ).getTime() === new Date(year, month, value).getTime()}
       >
         {value || ''}
-      </p>
+      </button>
     {/each}
   </div>
 </div>

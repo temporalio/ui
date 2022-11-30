@@ -4,7 +4,7 @@
   import { fly } from 'svelte/transition';
 
   import { autoRefreshWorkflow, eventViewType } from '$lib/stores/event-view';
-  import { workflowsSearch } from '$lib/stores/workflows';
+  import { workflowsQuery, workflowsSearch } from '$lib/stores/workflows';
   import { workflowRun, refresh } from '$lib/stores/workflow-run';
   import { eventHistory } from '$lib/stores/events';
 
@@ -91,7 +91,7 @@
       <a
         href={routeForWorkflowsWithQuery({
           namespace,
-          query,
+          query: $workflowsQuery || query,
           search: searchType,
         })}
         data-cy="back-to-workflows"

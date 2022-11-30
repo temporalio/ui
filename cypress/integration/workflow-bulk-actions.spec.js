@@ -6,8 +6,8 @@ describe('Bulk Termination', () => {
 
     cy.visit('/namespaces/default/workflows');
 
-    cy.wait('@workflows-api');
     cy.wait('@cluster-api');
+    cy.wait('@workflows-api');
 
     cy.get('#workflows-table-with-bulk-actions').should('not.exist');
   });
@@ -20,8 +20,8 @@ describe('Bulk Termination', () => {
 
     cy.visit('/namespaces/default/workflows');
 
-    cy.wait('@workflows-api');
     cy.wait('@cluster-api-elasticsearch');
+    cy.wait('@workflows-api');
 
     cy.get('#workflows-table-with-bulk-actions').should('exist');
 
