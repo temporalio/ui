@@ -94,32 +94,28 @@
                   </div>
                 </div>
               </a>
-              {#if failed}
-                <div class="pending-activity-failure-details">
-                  {#if pendingActivity.heartbeatDetails}
-                    <div class="w-full">
-                      <h4 class="pending-activity-detail-header">
-                        Heartbeat Details
-                      </h4>
-                      <CodeBlock
-                        class="max-h-32"
-                        content={pendingActivity.heartbeatDetails}
-                      />
-                    </div>
-                  {/if}
-                  {#if pendingActivity.lastFailure}
-                    <div class="w-full">
-                      <h4 class="pending-activity-detail-header">
-                        Last Failure
-                      </h4>
-                      <CodeBlock
-                        class="max-h-32"
-                        content={pendingActivity.lastFailure}
-                      />
-                    </div>
-                  {/if}
-                </div>
-              {/if}
+              <div class="pending-activity-failure-details">
+                {#if pendingActivity?.heartbeatDetails}
+                  <div class="w-1/2 grow">
+                    <h4 class="pending-activity-detail-header">
+                      Heartbeat Details
+                    </h4>
+                    <CodeBlock
+                      class="max-h-32"
+                      content={pendingActivity.heartbeatDetails}
+                    />
+                  </div>
+                {/if}
+                {#if pendingActivity?.lastFailure}
+                  <div class="w-1/2 grow">
+                    <h4 class="pending-activity-detail-header">Last Failure</h4>
+                    <CodeBlock
+                      class="max-h-32"
+                      content={pendingActivity.lastFailure}
+                    />
+                  </div>
+                {/if}
+              </div>
             </div>
           </div>
         </div>
