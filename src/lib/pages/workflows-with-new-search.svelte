@@ -51,7 +51,9 @@
 
   $: {
     // For returning to page from 'Back to Workflows' with previous search
-    $workflowsQuery = query;
+    if (query) {
+      $workflowsQuery = query;
+    }
   }
 
   onMount(() => {
@@ -177,10 +179,11 @@
     (workflow) => selectedWorkflows[workflow.runId] && workflow.canBeTerminated,
   );
 
+  $: totalWorkflowCount = new Intl.NumberFormat('en-US').format(
+    $workflowCount?.totalCount ?? 0,
+  );
   $: filteredWorkflowCount = new Intl.NumberFormat('en-US').format(
-    $workflowFilters.length === 0
-      ? $workflowCount.totalCount
-      : $workflowCount.count,
+    $workflowCount?.count ?? 0,
   );
 
   $: selectedWorkflowsCount =
@@ -259,10 +262,9 @@
           {:else if $updating}
             <span class="text-gray-400">filtering</span>
           {:else if query}
-            Results {$workflowCount?.count ?? 0} of {$workflowCount?.totalCount ??
-              0} workflows
+            Results {filteredWorkflowCount} of {totalWorkflowCount} workflows
           {:else}
-            {$workflowCount?.totalCount ?? 0} workflows
+            {totalWorkflowCount} workflows
           {/if}
         </p>
       {/if}
@@ -286,7 +288,7 @@
     updating={$updating}
     visibleWorkflows={visibleItems}
     {selectedWorkflowsCount}
-    {filteredWorkflowCount}
+    filteredWorkflowCount={query ? filteredWorkflowCount : totalWorkflowCount}
     {allSelected}
     {pageSelected}
     on:terminateWorkflows={handleBulkTerminate}

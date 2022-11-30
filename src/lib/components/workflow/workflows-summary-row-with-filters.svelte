@@ -4,10 +4,7 @@
 
   import { formatDate } from '$lib/utilities/format-date';
   import { getMilliseconds } from '$lib/utilities/format-time';
-  import {
-    routeForEventHistory,
-    routeForWorkflow,
-  } from '$lib/utilities/route-for';
+  import { routeForEventHistory } from '$lib/utilities/route-for';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import FilterOrCopyButtons from '$holocene/filter-or-copy-buttons.svelte';

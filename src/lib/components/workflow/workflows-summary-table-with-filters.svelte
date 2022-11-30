@@ -28,8 +28,8 @@
   export let pageSelected: boolean;
   export let filteredWorkflowCount: string;
 
-  // Disable sort with workflows over 10M
-  $: disabled = $workflowCount?.totalCount >= 10000000;
+  // Disable sort with workflows over 1M
+  $: disabled = $workflowCount?.totalCount >= 1000000;
 
   const handleBulkTerminate = () => {
     dispatch('terminateWorkflows');
