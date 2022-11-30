@@ -1,26 +1,29 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  import { createEventDispatcher } from 'svelte';
 
   import { formatDate } from '$lib/utilities/format-date';
   import { getMilliseconds } from '$lib/utilities/format-time';
-  import {
-    routeForEventHistory,
-    routeForWorkflow,
-  } from '$lib/utilities/route-for';
+  import { routeForEventHistory } from '$lib/utilities/route-for';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import FilterOrCopyButtons from '$holocene/filter-or-copy-buttons.svelte';
   import TableRow from '$holocene/table/table-row.svelte';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
-  import SelectableTableRow from '$lib/holocene/table/selectable-table-row.svelte';
+  import Checkbox from '$lib/holocene/checkbox.svelte';
   import { eventViewType } from '$lib/stores/event-view';
+
+  const dispatch = createEventDispatcher<{
+    toggleWorkflow: { workflowRunId: string; checked: boolean };
+  }>();
 
   export let bulkActionsEnabled: boolean = false;
   export let selected: boolean = false;
   export let namespace: string;
   export let workflow: WorkflowExecution;
   export let timeFormat: TimeFormat | string;
+  export let checkboxDisabled: boolean;
 
   $: href = routeForEventHistory({
     view: $eventViewType,
@@ -54,15 +57,27 @@
 
     updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
   };
+
+  const handleCheckboxChange = (event: CustomEvent<{ checked: boolean }>) => {
+    dispatch('toggleWorkflow', {
+      workflowRunId: workflow.runId,
+      checked: event.detail.checked,
+    });
+  };
 </script>
 
-<svelte:component
-  this={bulkActionsEnabled ? SelectableTableRow : TableRow}
-  item={workflow}
-  {selected}
-  {href}
-  class="workflow-summary-row"
->
+<TableRow {href} class="workflow-summary-row">
+  {#if bulkActionsEnabled}
+    <td on:keypress|stopPropagation on:click|stopPropagation>
+      <div class="absolute">
+        <Checkbox
+          disabled={checkboxDisabled}
+          bind:checked={selected}
+          on:change={handleCheckboxChange}
+        />
+      </div>
+    </td>
+  {/if}
   <td>
     <WorkflowStatus
       status={workflow.status}
@@ -128,7 +143,7 @@
       {formatDate(workflow.endTime, timeFormat)}
     </p>
   </td>
-</svelte:component>
+</TableRow>
 
 <style lang="postcss">
   :global(.workflow-summary-row:hover) {

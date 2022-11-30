@@ -2,13 +2,14 @@
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import { timeFormat } from '$lib/stores/time-format';
-  import { workflowCount, workflowsQuery } from '$lib/stores/workflows';
   import {
     refresh,
     workflows,
     loading,
     updating,
     workflowError,
+    workflowCount,
+    workflowsQuery,
   } from '$lib/stores/workflows';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
@@ -27,7 +28,8 @@
   import WorkflowDateTimeFilter from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import {
-    batchTerminateWorkflows,
+    batchTerminateByQuery,
+    bulkTerminateBySelection,
     pollBatchOperation,
   } from '$lib/services/terminate-service';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
@@ -38,17 +40,18 @@
 
   export let bulkActionsEnabled: boolean = false;
 
-  let selectedWorkflows: WorkflowExecution[] = [];
-  let terminationReason: string = '';
+  let selectedWorkflows: { [index: string]: boolean } = {};
+  let reason: string = '';
   let showBulkOperationConfirmationModal: boolean = false;
   let allSelected: boolean = false;
+  let pageSelected: boolean = false;
   let terminating: boolean = false;
 
   $: query = $page.url.searchParams.get('query');
 
   $: {
+    // For returning to page from 'Back to Workflows' with previous search
     if (query) {
-      // For returning to page from 'Back to Workflows' with previous search
       $workflowsQuery = query;
     }
   }
@@ -65,7 +68,9 @@
 
   const resetSelection = () => {
     allSelected = false;
-    selectedWorkflows = [];
+    pageSelected = false;
+    selectedWorkflows = {};
+    selectedWorkflowsCount = 0;
   };
 
   const errorMessage =
@@ -81,11 +86,9 @@
   };
 
   const clearAfterTerminate = () => {
-    selectedWorkflows = [];
-    allSelected = false;
     terminating = false;
     showBulkOperationConfirmationModal = false;
-    terminationReason = '';
+    reason = '';
 
     $workflowFilters = [];
     $workflowSorts = [];
@@ -95,64 +98,147 @@
       value: '',
       allowEmpty: true,
     });
+    refreshWorkflows();
+  };
+
+  const handleSelectWorkflow = (
+    event: CustomEvent<{ checked: boolean; workflowRunId: string }>,
+  ) => {
+    const { checked, workflowRunId } = event.detail;
+    selectedWorkflows[workflowRunId] = checked;
+  };
+
+  const handleToggleAll = (event: CustomEvent<{ checked: boolean }>) => {
+    const { checked } = event.detail;
+    allSelected = checked;
+    $workflows.forEach(
+      (workflow) => (selectedWorkflows[workflow.runId] = checked),
+    );
+  };
+
+  const handleTogglePage = (
+    event: CustomEvent<{
+      checked: boolean;
+      visibleWorkflows: WorkflowExecution[];
+    }>,
+  ) => {
+    const { checked, visibleWorkflows } = event.detail;
+    pageSelected = checked;
+    visibleWorkflows.forEach(
+      (workflow) => (selectedWorkflows[workflow.runId] = checked),
+    );
   };
 
   const terminateWorkflows = async () => {
-    terminating = true;
     const { namespace } = $page.params;
-    try {
-      const jobId = await batchTerminateWorkflows({
-        namespace,
-        workflowExecutions: terminableWorkflows,
-        reason: terminationReason,
-      });
 
-      await pollBatchOperation({ namespace, jobId });
-    } catch (error) {
-      showBulkOperationConfirmationModal = false;
+    if (allSelected) {
+      const query = !$workflowsQuery
+        ? 'ExecutionStatus="Running"'
+        : $workflowsQuery;
+      // Idea: persist the job ID and display a progress indicator for large jobs
+      batchTerminateByQuery({ namespace, reason, query });
       toaster.push({
-        variant: 'error',
-        message: 'Unable to terminate workflows.',
+        message: 'The batch terminate request is processing in the background.',
+        id: 'batch-terminate-success-toast',
       });
-
-      return;
+    } else {
+      terminating = true;
+      try {
+        const jobId = await bulkTerminateBySelection({
+          namespace,
+          reason,
+          workflows: terminableWorkflows,
+        });
+        const workflowsTerminated = await pollBatchOperation({
+          namespace,
+          jobId,
+        });
+        toaster.push({
+          message: `Successfully terminated ${workflowsTerminated} workflows.`,
+          id: 'batch-terminate-success-toast',
+        });
+      } catch (error) {
+        showBulkOperationConfirmationModal = false;
+        toaster.push({
+          variant: 'error',
+          message: 'Unable to terminate workflows.',
+        });
+      }
     }
 
-    toaster.push({
-      variant: 'success',
-      message: `Successfully terminated ${terminableWorkflows.length} workflows.`,
-      id: 'batch-terminate-success-toast',
-    });
     clearAfterTerminate();
   };
 
-  $: terminableWorkflows = selectedWorkflows.filter(
-    (workflows) => workflows.canBeTerminated,
+  const handleCancelBulkTerminateModal = () => {
+    showBulkOperationConfirmationModal = false;
+    reason = '';
+  };
+
+  $: terminableWorkflows = $workflows.filter(
+    (workflow) => selectedWorkflows[workflow.runId] && workflow.canBeTerminated,
   );
+
+  $: totalWorkflowCount = new Intl.NumberFormat('en-US').format(
+    $workflowCount?.totalCount ?? 0,
+  );
+  $: filteredWorkflowCount = new Intl.NumberFormat('en-US').format(
+    $workflowCount?.count ?? 0,
+  );
+
+  $: selectedWorkflowsCount =
+    Object.values(selectedWorkflows).filter(Boolean).length;
+
+  $: {
+    if ($workflowFilters) {
+      resetSelection();
+    }
+  }
 </script>
 
 <Modal
   open={showBulkOperationConfirmationModal}
   confirmText="Terminate"
   confirmType="destructive"
-  confirmDisabled={terminationReason === ''}
+  confirmDisabled={reason === ''}
   loading={terminating}
-  on:cancelModal={() => (showBulkOperationConfirmationModal = false)}
+  on:cancelModal={handleCancelBulkTerminateModal}
   on:confirmModal={terminateWorkflows}
 >
   <h3 slot="title">Terminate Workflows</h3>
   <svelte:fragment slot="content">
-    <p class="mb-2">
-      Are you sure you want to terminate <strong
-        >{terminableWorkflows.length} running {pluralize(
-          'workflow',
-          terminableWorkflows.length,
-        )}</strong
-      >? This action cannot be undone.
-    </p>
+    <div class="mb-4 flex flex-col">
+      {#if allSelected}
+        <p class="mb-2">
+          Are you sure you want to terminate all worklfows matching the
+          following query? This action cannot be undone.
+        </p>
+        <div
+          class="mb-2 overflow-scroll whitespace-nowrap rounded border border-primary bg-gray-100 p-2"
+        >
+          <code data-cy="batch-action-workflows-query">
+            {!$workflowsQuery ? 'ExecutionStatus="Running"' : $workflowsQuery}
+          </code>
+        </div>
+        <span class="text-xs"
+          >Note: The actual count of workflows that will be terminated is the
+          total number of running workflows matching this query at the time of
+          clicking “Terminate”.</span
+        >
+      {:else}
+        <p class="mb-4">
+          Are you sure you want to terminate <strong
+            >{terminableWorkflows.length} running {pluralize(
+              'workflow',
+              terminableWorkflows.length,
+            )}</strong
+          >?
+        </p>
+      {/if}
+    </div>
     <Input
       id="bulk-terminate-reason"
-      bind:value={terminationReason}
+      bind:value={reason}
       placeholder="Enter a reason"
     />
   </svelte:fragment>
@@ -176,10 +262,9 @@
           {:else if $updating}
             <span class="text-gray-400">filtering</span>
           {:else if query}
-            Results {$workflowCount?.count ?? 0} of {$workflowCount?.totalCount ??
-              0} workflows
+            Results {filteredWorkflowCount} of {totalWorkflowCount} workflows
           {:else}
-            {$workflowCount?.totalCount ?? 0} workflows
+            {totalWorkflowCount} workflows
           {/if}
         </p>
       {/if}
@@ -202,10 +287,13 @@
     {bulkActionsEnabled}
     updating={$updating}
     visibleWorkflows={visibleItems}
-    terminableWorkflowCount={terminableWorkflows.length}
-    bind:selectedWorkflows
-    bind:allSelected
+    {selectedWorkflowsCount}
+    filteredWorkflowCount={query ? filteredWorkflowCount : totalWorkflowCount}
+    {allSelected}
+    {pageSelected}
     on:terminateWorkflows={handleBulkTerminate}
+    on:toggleAll={handleToggleAll}
+    on:togglePage={handleTogglePage}
   >
     {#each visibleItems as event}
       <WorkflowsSummaryRowWithFilters
@@ -213,11 +301,13 @@
         workflow={event}
         namespace={$page.params.namespace}
         timeFormat={$timeFormat}
-        selected={selectedWorkflows.includes(event)}
+        checkboxDisabled={allSelected}
+        selected={selectedWorkflows[event.runId]}
+        on:toggleWorkflow={handleSelectWorkflow}
       />
     {:else}
       <TableRow>
-        <td class="hidden xl:table-cell" />
+        <td colspan="2" class="hidden xl:table-cell" />
         <td colspan="3">
           {#if $loading}
             <Loading />
