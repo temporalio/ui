@@ -70,6 +70,10 @@
       actionCopy: 'deterministic constraints',
       link: 'https://docs.temporal.io/workflows/#deterministic-constraints',
     },
+    WorkflowTaskHeartbeatError: {
+      title: 'Workflow Task Heartbeat Error',
+      copy: 'The Workflow Task failed to send a heartbeat while executing long-running local Activities. These local Activities will re-execute on the next Workflow Task attempt. If this error is persistent, these local Activities will run repeatedly until the Workflow times out.',
+    },
     BadSignalWorkflowExecutionAttributes: {
       title: 'Bad Signal Workflow Execution Attributes',
       copy: 'The Workflow Task failed to validate attributes for SignalWorkflowExecution. Check the failure message for more details.',
@@ -134,12 +138,29 @@
     },
   };
 
+  function getErrorCause(
+    error: WorkflowTaskFailedEvent,
+  ): WorkflowTaskFailedCause | 'WorkflowTaskHeartbeatError' {
+    if (!error || !error.workflowTaskFailedEventAttributes) {
+      return;
+    }
+
+    const {
+      workflowTaskFailedEventAttributes: { failure, cause },
+    } = error;
+
+    if (
+      failure?.applicationFailureInfo?.type === 'workflowTaskHeartbeatError'
+    ) {
+      return 'WorkflowTaskHeartbeatError';
+    }
+    return cause;
+  }
+
   export let error: WorkflowTaskFailedEvent;
 
-  $: errorCopy =
-    WORKFLOW_TASK_FAILED_ERROR_COPY[
-      error?.workflowTaskFailedEventAttributes?.cause
-    ] ?? {};
+  $: cause = getErrorCause(error);
+  $: errorCopy = WORKFLOW_TASK_FAILED_ERROR_COPY[cause] ?? {};
   $: ({
     title = '',
     copy = '',
