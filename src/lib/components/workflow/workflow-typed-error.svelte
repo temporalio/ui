@@ -10,6 +10,7 @@
     Unspecified: {
       title: 'Unspecified',
       copy: 'The Workflow Task failed for an unknown reason.',
+      contactSupport: true,
     },
     UnhandledCommand: {
       title: 'Unhandled Command',
@@ -139,12 +140,25 @@
     WORKFLOW_TASK_FAILED_ERROR_COPY[
       error?.workflowTaskFailedEventAttributes?.cause
     ] ?? {};
-  $: ({ title = '', copy = '', actionCopy = '', link = '' } = errorCopy);
+  $: ({
+    title = '',
+    copy = '',
+    actionCopy = '',
+    link = '',
+    contactSupport = false,
+  } = errorCopy);
 </script>
 
 {#if !$updating && (title || copy)}
   <Alert icon="warning" intent="warning" {title}>
-    <p>{copy}</p>
+    <p>
+      {copy}
+      {#if contactSupport}
+        Please <Link newTab href="http://support.temporal.io/"
+          >contact support</Link
+        >.
+      {/if}
+    </p>
     {#if actionCopy && link}
       <p>
         Learn more about <Link newTab href={link}>{actionCopy}</Link>.
