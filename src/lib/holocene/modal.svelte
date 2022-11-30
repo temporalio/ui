@@ -15,6 +15,7 @@
   let closeButton: HTMLButtonElement;
   let cancelButton: Button;
   let confirmButton: Button;
+  let modalElement: HTMLDivElement;
 
   const dispatch = createEventDispatcher<{
     cancelModal: undefined;
@@ -49,20 +50,20 @@
   };
 
   $: {
-    if (open && closeButton) {
-      closeButton.focus({ focusVisible: true } as any);
+    if (open && modalElement) {
+      modalElement.focus();
     }
   }
 </script>
 
 <svelte:window on:keydown={handleKeyboardNavigation} />
 {#if open}
-  <div class="modal">
+  <div bind:this={modalElement} class="modal">
     <div on:click={cancelModal} class="overlay" />
     <div
       class="body"
       class:large
-      aria-modal="true"
+      tabindex="-1"
       role="alertdialog"
       aria-labelledby="modal-title"
       aria-describedby="modal-description"
