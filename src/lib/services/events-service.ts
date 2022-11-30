@@ -86,6 +86,8 @@ export const fetchPartialRawEvents = async ({
 
   const [descendingResponse, ascendingRouteResponse] = await Promise.all([descendingRequest, ascendingRouteRequest])
 
+  console.log("Descending: ", descendingResponse)
+  console.log("Ascending: ", ascendingRouteResponse)
 
   return descendingResponse.history.events;
 };
