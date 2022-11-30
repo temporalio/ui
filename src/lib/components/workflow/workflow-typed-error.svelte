@@ -50,11 +50,11 @@
     },
     BadRequestCancelExternalAttributes: {
       title: 'Bad Request Cancel External Attributes',
-      copy: 'The Workflow Task failed due to an invalid attribute on a request to cancel an external Workflow. Check the failure message for more details.',
+      copy: 'The Workflow Task failed due to an invalid attribute on a request to cancel an external Workflow. Check the Failure Message for more details.',
     },
     BadContinueAsNewAttributes: {
       title: 'Bad Continue As New Attributes',
-      copy: 'The Workflow Task failed because it failed to validate on a ContinueAsNew attribute. Check the failure message for more details.',
+      copy: 'The Workflow Task failed because it failed to validate on a ContinueAsNew attribute. Check the Failure Message for more details.',
     },
     StartTimerDuplicateId: {
       title: 'Start Timer Duplicate',
@@ -76,11 +76,11 @@
     },
     BadSignalWorkflowExecutionAttributes: {
       title: 'Bad Signal Workflow Execution Attributes',
-      copy: 'The Workflow Task failed to validate attributes for SignalWorkflowExecution. Check the failure message for more details.',
+      copy: 'The Workflow Task failed to validate attributes for SignalWorkflowExecution. Check the Failure Message for more details.',
     },
     BadStartChildExecutionAttributes: {
       title: 'Bad Start Child Execution Attributes',
-      copy: 'The Workflow Task failed to validate attributes needed for StartChildWorkflowExecution. Check the failure message for more details.',
+      copy: 'The Workflow Task failed to validate attributes needed for StartChildWorkflowExecution. Check the Failure Message for more details.',
     },
     ForceCloseCommand: {
       title: 'Force Close Command',
@@ -118,7 +118,7 @@
     },
     BadModifyWorkflowPropertiesAttributes: {
       title: 'Bad Modify Workflow Properties Attributes',
-      copy: 'The Workflow Task failed to validate attributes on ModifyWorkflowProperty on the upsert memo.',
+      copy: 'The Workflow Task failed to validate attributes on ModifyWorkflowProperty on the upsert memo. Check the Failure Message for more details.',
     },
     PendingChildWorkflowsLimitExceeded: {
       title: 'Pending Child Workflows Limit Exceeded',
