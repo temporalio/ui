@@ -113,22 +113,28 @@
   <td class="cell w-10 text-right text-sm font-normal xl:text-left">
     <p tabindex="0" class="event-name text-sm font-semibold md:text-base">
       {#if compact && failure}
-        <Icon class="inline text-red-700" name="clock" />
+        <Icon class="inline align-top text-red-700" name="clock" />
       {/if}
       {#if compact && canceled}
-        <Icon class="inline text-yellow-700" name="clock" />
+        <Icon class="inline align-top text-yellow-700" name="clock" />
       {/if}
       {#if compact && terminated}
-        <Icon class="inline text-pink-700" name="clock" />
+        <Icon class="inline align-top text-pink-700" name="clock" />
       {/if}
       {getTruncatedWord(
         isLocalActivityMarkerEvent(event) ? 'LocalActivity' : event.name,
         truncateWidth - 30,
       )}
+      {#if compact}
+        <Icon
+          class="ml-1.5 inline align-top"
+          name={expanded ? 'chevron-up' : 'chevron-down'}
+        />
+      {/if}
     </p>
   </td>
   <td class="cell links">
-    {#if !expanded}
+    {#if !expanded && !compact}
       <EventDetailsRow
         {...getSingleAttributeForEvent(currentEvent)}
         {attributes}
@@ -137,7 +143,9 @@
     {/if}
   </td>
   <td class="cell text-right">
-    <Icon class="inline" name={expanded ? 'chevron-up' : 'chevron-down'} />
+    {#if !compact}
+      <Icon class="inline" name={expanded ? 'chevron-up' : 'chevron-down'} />
+    {/if}
   </td>
 </tr>
 {#if expanded}
