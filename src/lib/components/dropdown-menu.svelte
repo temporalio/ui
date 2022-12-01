@@ -62,7 +62,7 @@
       on:click={disabled ? noop : onClick}
       dataCy="{$$props.dataCy}-button"
     >
-      <div class="inline flex items-center gap-1" class:disabled>
+      <div class="inline flex items-center gap-1 truncate" class:disabled>
         <slot name="label" />
         <Icon
           name={icon ? icon : show ? 'chevron-up' : 'chevron-down'}

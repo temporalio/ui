@@ -1,7 +1,6 @@
 <script lang="ts">
   import Alert from '$lib/holocene/alert.svelte';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
 
   import { createPaginationStore } from '$lib/stores/api-pagination';
@@ -16,6 +15,7 @@
   export let onError: (error: any) => void;
   export let onFetch: () => Promise<PaginatedRequest>;
   export let reset: any;
+  export let total: string | number = '';
 
   let store = createPaginationStore();
   let error: any;
@@ -58,18 +58,15 @@
     }
   }
 
-  $: {
-    onPageChange(nextIndex);
-  }
-
+  $: onPageChange(nextIndex);
   $: reset, onPageSizeChange(pageSize);
 
   $: isEmpty = $store.items.length === 0 && !$store.loading;
 
   function handleKeydown(event) {
-    if (event.key === 'ArrowRight') {
+    if (event.key === 'ArrowRight' && $store.hasNext) {
       store.nextPage();
-    } else if (event.key === 'ArrowLeft') {
+    } else if (event.key === 'ArrowLeft' && $store.hasPrevious) {
       store.previousPage();
     }
   }
@@ -114,9 +111,14 @@
               class:arrow-left-disabled={!$store.hasPrevious}
             />
           </button>
-          <p>
-            {$store.currentPageNumber}–{$store.endingPageNumber}
-          </p>
+          <div class="flex gap-1">
+            <p>
+              {$store.currentPageNumber}–{$store.endingPageNumber}
+            </p>
+            <p>
+              {#if total}of {total}{/if}
+            </p>
+          </div>
           <button
             class="caret"
             disabled={!$store.hasNext}
@@ -165,9 +167,14 @@
               class:arrow-left-disabled={!$store.hasPrevious}
             />
           </button>
-          <p>
-            {$store.currentPageNumber}–{$store.endingPageNumber}
-          </p>
+          <div class="flex gap-1">
+            <p>
+              {$store.currentPageNumber}–{$store.endingPageNumber}
+            </p>
+            <p>
+              {#if total}of {total}{/if}
+            </p>
+          </div>
           <button
             class="caret"
             disabled={!$store.hasNext}

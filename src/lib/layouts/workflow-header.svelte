@@ -80,7 +80,7 @@
 
   $: cancelInProgress =
     $workflowRun?.workflow?.status === 'Running' &&
-    $eventHistory.events.some(
+    $eventHistory.end.some(
       (event) => event?.eventType === 'WorkflowExecutionCancelRequested',
     );
 </script>

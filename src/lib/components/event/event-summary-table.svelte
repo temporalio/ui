@@ -88,7 +88,7 @@ class:header-hidden-responsive={typedError}
 <Table {updating} class="dark w-full table-fixed">
   <TableHeaderRow slot="headers">
     <th class="table-cell w-14" />
-    <th class="table-cell w-28">
+    <th class="table-cell w-14 md:w-28">
       {#if !compact}<EventDateFilter label="Date & Time" />{:else}Date & Time{/if}
     </th>
     <th class="table-cell w-44"><EventCategoryFilter label={title} /></th>

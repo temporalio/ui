@@ -67,49 +67,49 @@ export const fetchPartialRawEvents = async ({
   workflowId,
   runId,
   sort,
-  onStart,
-  onUpdate,
-  onComplete,
 }: FetchEventsParameters): Promise<HistoryEvent[]> => {
-  const descendingRoute = await routeForApi('events.descending', {
-    namespace,
-    workflowId,
-    runId,
-  });
-  const ascendingRoute = await routeForApi('events.ascending', {
+  const route = await routeForApi(`events.${sort}`, {
     namespace,
     workflowId,
     runId,
   });
 
-  const descendingRequest = requestFromAPI<GetWorkflowExecutionHistoryResponse>(
-    descendingRoute,
+  const response = await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
+    route,
     {
       request: fetch,
       params: { maximumPageSize: '100' },
     },
   );
-  const ascendingRouteRequest =
-    requestFromAPI<GetWorkflowExecutionHistoryResponse>(ascendingRoute, {
-      request: fetch,
-      params: { maximumPageSize: '100' },
-    });
 
-  const [descendingResponse, ascendingRouteResponse] = await Promise.all([
-    descendingRequest,
-    ascendingRouteRequest,
-  ]);
-
-  return descendingResponse.history.events;
+  return response.history.events;
 };
 
-export const fetchPartialEvents = async (
+export const fetchStartAndEndEvents = async (
   parameters: FetchEventsParametersWithSettings,
-): Promise<FetchEventsResponse> => {
+): Promise<{ start: WorkflowEvents; end: WorkflowEvents }> => {
   const { settings, namespace, accessToken } = parameters;
-  return fetchPartialRawEvents(parameters).then((response) =>
-    toEventHistory({ response, namespace, settings, accessToken }),
-  );
+  const startEventsRaw = await fetchPartialRawEvents({
+    ...parameters,
+    sort: 'ascending',
+  });
+  const endEventsRaw = await fetchPartialRawEvents({
+    ...parameters,
+    sort: 'descending',
+  });
+  const { events: start } = await toEventHistory({
+    response: startEventsRaw,
+    namespace,
+    settings,
+    accessToken,
+  });
+  const { events: end } = await toEventHistory({
+    response: endEventsRaw,
+    namespace,
+    settings,
+    accessToken,
+  });
+  return { start, end };
 };
 
 export async function getPaginatedEvents({
@@ -117,6 +117,7 @@ export async function getPaginatedEvents({
   workflowId,
   runId,
   sort,
+  compact,
 }): Promise<() => Promise<{ items: HistoryEvent[]; nextPageToken: string }>> {
   return async (pageSize = 100, token = '') => {
     const descendingRoute = await routeForApi(`events.${sort}`, {
@@ -140,6 +141,9 @@ export async function getPaginatedEvents({
       response: history.events,
       namespace,
     });
-    return { items: events, nextPageToken };
+    return {
+      items: compact ? eventGroups : events,
+      nextPageToken: nextPageToken ?? '',
+    };
   };
 }

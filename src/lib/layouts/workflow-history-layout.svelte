@@ -31,10 +31,8 @@
     eventId,
   });
 
-  $: workflowEvents = getWorkflowStartedCompletedAndTaskFailedEvents(
-    $eventHistory?.events ?? [],
-    $eventSortOrder,
-  );
+  $: workflowEvents =
+    getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
 </script>
 
 <section class="flex flex-col gap-4">

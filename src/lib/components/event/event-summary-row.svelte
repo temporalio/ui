@@ -25,7 +25,6 @@
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
 
   export let event: IterableEvent;
-  export let groups: EventGroups;
   export let visibleItems: IterableEvent[];
   export let initialItem: IterableEvent;
   export let compact = false;
@@ -34,9 +33,7 @@
 
   let selectedId = event.id;
 
-  let eventGroup = isEventGroup(event)
-    ? event
-    : getGroupForEvent(event, groups);
+  let eventGroup = !compact ? event : getGroupForEvent(event, visibleItems);
 
   $: expanded = expandAll;
 
@@ -64,9 +61,15 @@
     expanded = !expanded;
   };
 
-  const failure = eventOrGroupIsFailureOrTimedOut(compact ? eventGroup : event);
-  const canceled = eventOrGroupIsCanceled(compact ? eventGroup : event);
-  const terminated = eventOrGroupIsTerminated(compact ? eventGroup : event);
+  const failure = eventOrGroupIsFailureOrTimedOut(
+    compact && eventGroup ? eventGroup : event,
+  );
+  const canceled = eventOrGroupIsCanceled(
+    compact && eventGroup ? eventGroup : event,
+  );
+  const terminated = eventOrGroupIsTerminated(
+    compact && eventGroup ? eventGroup : event,
+  );
 
   let truncateWidth: number;
   workflowEventsColumnWidth.subscribe((value) => {
@@ -89,16 +92,13 @@
   on:click|stopPropagation={onLinkClick}
 >
   <td />
-  <td class="id-cell text-left">
+  <td class="table-cell w-24 text-left">
     <a class="text-sm text-gray-500 md:text-base" href="#{event.id}"
       >{event.id}</a
     >
   </td>
-  <td class="cell flex w-1/4 text-left">
-    <a class="text-sm text-gray-500 md:text-base xl:hidden" href="#{event.id}"
-      >{event.id}</a
-    >
-    <p class="m-0 text-sm md:text-base">
+  <td class="flex table-cell text-left">
+    <p class="text-sm md:text-base">
       {#if showElapsed && event.id !== initialItem.id}
         {formatDistanceAbbreviated({
           start: initialItem.eventTime,
@@ -110,7 +110,7 @@
       {/if}
     </p>
   </td>
-  <td class="cell text-right text-sm font-normal xl:text-left">
+  <td class="table-cell text-right text-sm font-normal xl:text-left">
     <p tabindex="0" class="event-name text-sm font-semibold md:text-base">
       {#if compact && failure}
         <Icon class="inline text-red-700" name="clock" />
@@ -127,21 +127,26 @@
       )}
     </p>
   </td>
-  <td class="cell links">
-    {#if !expanded}
-      <EventDetailsRow
-        {...getSingleAttributeForEvent(currentEvent)}
-        {attributes}
-        inline
-      />
-    {/if}
+  <td class="links table-cell items-center">
+    <div class="flex justify-between">
+      <div class="invisible w-full md:visible">
+        {#if !expanded}
+          <EventDetailsRow
+            {...getSingleAttributeForEvent(currentEvent)}
+            {attributes}
+            inline
+          />
+        {/if}
+      </div>
+      <div class="w-4">
+        <Icon class="inline" name={expanded ? 'chevron-up' : 'chevron-down'} />
+      </div>
+    </div>
   </td>
-  <td class="cell mx-4">
-    <Icon class="inline" name={expanded ? 'chevron-up' : 'chevron-down'} />
-  </td>
+  <td />
 </tr>
 {#if expanded}
-  <tr class="expanded-row" class:typedError>
+  <tr class="table-row" class:typedError>
     <td />
     <td class="expanded-cell" colspan="5">
       <EventDetailsFull
@@ -156,7 +161,7 @@
 
 <style lang="postcss">
   .row {
-    @apply flex flex-wrap items-center border-gray-900 text-sm no-underline xl:table-row xl:py-3 xl:text-base;
+    @apply flex table-row flex-wrap items-center border-gray-900 text-sm no-underline xl:py-3 xl:text-base;
   }
 
   .row:hover {
@@ -194,31 +199,8 @@
     @apply text-pink-700;
   }
 
-  .cell {
-    @apply leading-4 xl:table-cell;
-    flex: 40%;
-  }
-
-  .id-cell {
-    @apply hidden w-24 border-gray-700 py-1 px-3 leading-4 xl:table-cell;
-  }
-
-  .expanded .cell,
-  .expanded .id-cell {
-    @apply border-b-0;
-  }
-
-  .row:last-of-type .cell,
-  .row:last-of-type .id-cell {
-    @apply border-b-0 first-of-type:rounded-bl-lg  last-of-type:rounded-br-lg;
-  }
-
-  .expanded-row {
-    @apply block xl:table-row;
-  }
-
   .expanded-cell {
-    @apply flex w-full flex-wrap text-sm no-underline xl:table-cell xl:text-base;
+    @apply flex table-cell w-full flex-wrap text-sm no-underline xl:text-base;
   }
 
   .typedError .expanded-cell {

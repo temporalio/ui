@@ -108,7 +108,11 @@ export function createPaginationStore(): PaginationStore {
       _store.hasPrevious = true;
     } else if (store.nextIndex < store.index) {
       // Previous Page
-      if (store.nextIndex === 0) _store.hasPrevious = false;
+      if (store.nextIndex === 0) {
+        _store.indexTokens = {};
+        _store.indexTokens[store.nextIndex + 1] = nextToken;
+        _store.hasPrevious = false;
+      }
     }
 
     return _store;
@@ -128,7 +132,11 @@ export function createPaginationStore(): PaginationStore {
         return store;
       }),
     setNextPageToken: (token: string, items: any[]) =>
-      update((store) => setNextPageToken(token, items, store)),
+      update((store) => {
+        return {
+          ...setNextPageToken(token, items, store),
+        };
+      }),
     setUpdating: () =>
       update((store) => {
         return { ...store, updating: true };
