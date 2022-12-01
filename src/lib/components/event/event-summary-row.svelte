@@ -167,7 +167,7 @@
   }
 
   .row:hover {
-    @apply cursor-pointer bg-gray-50;
+    @apply z-50 cursor-pointer bg-gradient-to-b from-blue-100 to-purple-100;
   }
 
   .expanded.row {
