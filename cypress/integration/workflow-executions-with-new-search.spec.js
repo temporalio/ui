@@ -35,7 +35,7 @@ describe('Workflow Executions List With Search', () => {
       cy.get('#workflowType').should('have.value', 'ImportantWorkflowType');
 
       cy.get('[data-cy="workflow-count"]').should(
-        'contain',
+        'have.text',
         'Results 15 of 15 workflows',
       );
     });
@@ -55,7 +55,7 @@ describe('Workflow Executions List With Search', () => {
       );
 
       cy.get('[data-cy="workflow-count"]').should(
-        'contain',
+        'have.text',
         'Results 15 of 15 workflows',
       );
 
@@ -78,7 +78,7 @@ describe('Workflow Executions List With Search', () => {
         'WorkflowId="002c98_Running"',
       );
       cy.get('[data-cy="workflow-count"]').should(
-        'contain',
+        'have.text',
         'Results 15 of 15 workflows',
       );
 
@@ -100,7 +100,7 @@ describe('Workflow Executions List With Search', () => {
         'ExecutionStatus="Running"',
       );
       cy.get('[data-cy="workflow-count"]').should(
-        'contain',
+        'have.text',
         'Results 15 of 15 workflows',
       );
     });
@@ -157,7 +157,7 @@ describe('Workflow Executions List With Search', () => {
 
       cy.url().should('contain', 'StartTime+BETWEEN');
       cy.get('[data-cy="workflow-count"]').should(
-        'contain',
+        'have.text',
         'Results 15 of 15 workflows',
       );
     });
@@ -169,7 +169,7 @@ describe('Workflow Executions List With Search', () => {
 
       cy.url().should('contain', 'CloseTime+BETWEEN');
       cy.get('[data-cy="workflow-count"]').should(
-        'contain',
+        'have.text',
         'Results 15 of 15 workflows',
       );
     });
@@ -213,7 +213,7 @@ describe('Workflow Executions List With Search', () => {
           encodeURIComponent(`ExecutionStatus="Running"`),
         );
         cy.get('[data-cy="workflow-count"]').should(
-          'contain',
+          'have.text',
           'Results 15 of 15 workflows',
         );
       });

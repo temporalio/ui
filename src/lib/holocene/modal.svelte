@@ -95,6 +95,6 @@
   }
 
   .content {
-    @apply p-8;
+    @apply whitespace-normal p-8;
   }
 </style>
