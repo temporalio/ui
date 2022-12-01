@@ -171,7 +171,7 @@
   }
 
   .expanded.row {
-    @apply border-b-0 bg-blue-50;
+    @apply bg-blue-50;
   }
 
   .failure,
@@ -208,11 +208,6 @@
 
   .id-cell {
     @apply hidden border-gray-700 py-1 px-3 leading-4 xl:table-cell xl:border-b-2;
-  }
-
-  .expanded .cell,
-  .expanded .id-cell {
-    @apply border-b-0;
   }
 
   .row:last-of-type .cell,
