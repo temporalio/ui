@@ -171,7 +171,7 @@
   }
 
   .expanded.row {
-    @apply border-b-0;
+    @apply border-b-0 bg-blue-50;
   }
 
   .failure,
