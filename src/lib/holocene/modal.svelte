@@ -12,9 +12,6 @@
   export let large: boolean = false;
   export let loading: boolean = false;
 
-  let closeButton: HTMLButtonElement;
-  let cancelButton: Button;
-  let confirmButton: Button;
   let modalElement: HTMLDivElement;
 
   const dispatch = createEventDispatcher<{
@@ -36,14 +33,17 @@
       return;
     }
 
+    const focusable = modalElement.querySelectorAll('button');
+    const firstFocusable = focusable[0];
+    const lastFocusable = focusable[focusable.length - 1];
     if (event.key === 'Tab') {
       if (event.shiftKey) {
-        if (document.activeElement === closeButton) {
-          confirmButton.focus();
+        if (document.activeElement === firstFocusable) {
+          lastFocusable.focus();
           event.preventDefault();
         }
-      } else if (document.activeElement === confirmButton.buttonElement) {
-        closeButton.focus();
+      } else if (document.activeElement === lastFocusable) {
+        firstFocusable.focus();
         event.preventDefault();
       }
     }
@@ -58,9 +58,10 @@
 
 <svelte:window on:keydown={handleKeyboardNavigation} />
 {#if open}
-  <div bind:this={modalElement} class="modal">
+  <div class="modal">
     <div on:click={cancelModal} class="overlay" />
     <div
+      bind:this={modalElement}
       class="body"
       class:large
       tabindex="-1"
@@ -71,7 +72,6 @@
       {#if !loading}
         <button
           aria-label="Close Modal"
-          bind:this={closeButton}
           class="float-right m-4"
           on:click={cancelModal}
         >
@@ -93,7 +93,6 @@
       </div>
       <div class="flex items-center justify-end space-x-2 p-6">
         <Button
-          bind:this={cancelButton}
           thin
           variant="secondary"
           disabled={loading}
@@ -101,7 +100,6 @@
         >
         {#if !hideConfirm}
           <Button
-            bind:this={confirmButton}
             thin
             variant={confirmType}
             {loading}
