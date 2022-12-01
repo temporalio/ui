@@ -62,7 +62,6 @@ export const fetchEvents = async (
   );
 };
 
-
 export const fetchPartialRawEvents = async ({
   namespace,
   workflowId,
@@ -72,19 +71,34 @@ export const fetchPartialRawEvents = async ({
   onUpdate,
   onComplete,
 }: FetchEventsParameters): Promise<HistoryEvent[]> => {
-  const descendingRoute = await routeForApi('events.descending', { namespace, workflowId, runId });
-  const ascendingRoute = await routeForApi('events.ascending', { namespace, workflowId, runId });
-
-  const descendingRequest = requestFromAPI<GetWorkflowExecutionHistoryResponse>(descendingRoute, {
-    request: fetch,
-    params: { maximumPageSize: '100' }
+  const descendingRoute = await routeForApi('events.descending', {
+    namespace,
+    workflowId,
+    runId,
   });
-  const ascendingRouteRequest = requestFromAPI<GetWorkflowExecutionHistoryResponse>(ascendingRoute, {
-    request: fetch,
-    params: { maximumPageSize: '100' }
+  const ascendingRoute = await routeForApi('events.ascending', {
+    namespace,
+    workflowId,
+    runId,
   });
 
-  const [descendingResponse, ascendingRouteResponse] = await Promise.all([descendingRequest, ascendingRouteRequest])
+  const descendingRequest = requestFromAPI<GetWorkflowExecutionHistoryResponse>(
+    descendingRoute,
+    {
+      request: fetch,
+      params: { maximumPageSize: '100' },
+    },
+  );
+  const ascendingRouteRequest =
+    requestFromAPI<GetWorkflowExecutionHistoryResponse>(ascendingRoute, {
+      request: fetch,
+      params: { maximumPageSize: '100' },
+    });
+
+  const [descendingResponse, ascendingRouteResponse] = await Promise.all([
+    descendingRequest,
+    ascendingRouteRequest,
+  ]);
 
   return descendingResponse.history.events;
 };
@@ -98,22 +112,34 @@ export const fetchPartialEvents = async (
   );
 };
 
-
 export async function getPaginatedEvents({
   namespace,
   workflowId,
   runId,
   sort,
-}): Promise<() => Promise<{ items: HistoryEvent[], nextPageToken: string }>> {
+}): Promise<() => Promise<{ items: HistoryEvent[]; nextPageToken: string }>> {
   return async (pageSize = 100, token = '') => {
-    const descendingRoute = await routeForApi(`events.${sort}`, { namespace, workflowId, runId });
-    const { history, nextPageToken } = await requestFromAPI<GetWorkflowExecutionHistoryResponse>(descendingRoute, {
-      request: fetch,
-      params: { maximumPageSize: pageSize.toString(), nextPageToken: token }
+    const descendingRoute = await routeForApi(`events.${sort}`, {
+      namespace,
+      workflowId,
+      runId,
     });
+    const { history, nextPageToken } =
+      await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
+        descendingRoute,
+        {
+          request: fetch,
+          params: {
+            maximumPageSize: pageSize.toString(),
+            nextPageToken: token,
+          },
+        },
+      );
 
-    const { events, eventGroups } = await toEventHistory({ response: history.events, namespace })
-    return { items: events, nextPageToken }
+    const { events, eventGroups } = await toEventHistory({
+      response: history.events,
+      namespace,
+    });
+    return { items: events, nextPageToken };
   };
 }
-

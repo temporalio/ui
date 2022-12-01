@@ -112,6 +112,12 @@
   .detail-row {
     @apply block w-full items-start gap-4 border-b-2 border-gray-200 py-2 text-left xl:flex;
   }
+
+  .detail-row:hover,
+  .code-block-row:hover {
+    @apply bg-gradient-to-b from-blue-100 to-purple-100;
+  }
+
   .row:last-of-type .detail-row {
     @apply border-b-0;
   }

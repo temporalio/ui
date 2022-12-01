@@ -11,6 +11,7 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   export let compact: boolean = false;
+  export let label: string;
 
   let parameter = 'category';
   let options = compact ? compactEventTypeOptions : allEventTypeOptions;
@@ -31,6 +32,7 @@
 </script>
 
 <DropdownMenu value={_value} left>
+  <svelte:fragment slot="label">{label}</svelte:fragment>
   <div class="w-56">
     {#each options as { label, option } (option)}
       <div

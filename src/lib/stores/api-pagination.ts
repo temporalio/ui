@@ -21,7 +21,7 @@ type PaginationItems = {
   currentPageNumber: number;
   endingPageNumber: number;
   items: any[];
-  initialItem: any,
+  initialItem: any;
   loading: boolean;
   updating: boolean;
   indexTokens: Record<number, string>;

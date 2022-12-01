@@ -97,6 +97,42 @@
     }
   }
 
+  table.dark {
+    @apply border-gray-900;
+
+    thead {
+      :global(th) {
+        @apply border-t-2 border-gray-900;
+
+        &:first-child {
+          @apply border-l-2 border-gray-900;
+        }
+
+        &:last-child {
+          @apply border-r-2 border-gray-900;
+        }
+      }
+    }
+
+    tbody :global {
+      td {
+        @apply border-t-2 border-gray-900;
+
+        &:first-child {
+          @apply border-l-2 border-gray-900;
+        }
+        &:last-child {
+          @apply border-r-2 border-gray-900;
+        }
+      }
+      &:last-child {
+        td {
+          @apply border-b-2 border-gray-900;
+        }
+      }
+    }
+  }
+
   table.simple {
     thead :global(th) {
       @apply border-b border-primary py-2;

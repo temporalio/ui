@@ -65,7 +65,17 @@
   $: reset, onPageSizeChange(pageSize);
 
   $: isEmpty = $store.items.length === 0 && !$store.loading;
+
+  function handleKeydown(event) {
+    if (event.key === 'ArrowRight') {
+      store.nextPage();
+    } else if (event.key === 'ArrowLeft') {
+      store.previousPage();
+    }
+  }
 </script>
+
+<svelte:window on:keydown={handleKeydown} />
 
 {#if error && $$slots.error}
   <slot name="error" />
@@ -84,15 +94,6 @@
     <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
       <div class="flex items-center">
         <slot name="action-top-left" />
-        {#if $store.updating}
-          <p
-            class={`${
-              $$slots['action-top-left'] ? 'ml-6' : 'mr-6'
-            } text-gray-600`}
-          >
-            Updating…
-          </p>
-        {/if}
       </div>
       <nav class="flex flex-col justify-end gap-4 md:flex-row">
         <slot name="action-top-center" />
@@ -102,13 +103,16 @@
           value={String($store.pageSize)}
           {options}
         />
-        <div class="flex items-center justify-center gap-1">
+        <div class="flex items-center justify-center gap-3">
           <button
             class="caret"
             disabled={!$store.hasPrevious}
             on:click={store.previousPage}
           >
-            <Icon name="chevron-left" />
+            <span
+              class="arrow arrow-left"
+              class:arrow-left-disabled={!$store.hasPrevious}
+            />
           </button>
           <p>
             {$store.currentPageNumber}–{$store.endingPageNumber}
@@ -118,7 +122,10 @@
             disabled={!$store.hasNext}
             on:click={store.nextPage}
           >
-            <Icon name="chevron-right" />
+            <span
+              class="arrow arrow-right"
+              class:arrow-right-disabled={!$store.hasNext}
+            />
           </button>
         </div>
         <slot name="action-top-right" />
@@ -127,7 +134,11 @@
     {#if $store.loading}
       <SkeletonTable rows={15} />
     {:else if !isEmpty}
-      <slot visibleItems={$store.items} initialItem={[]} />
+      <slot
+        visibleItems={$store.items}
+        initialItem={[]}
+        updating={$store.updating}
+      />
     {/if}
 
     <nav
@@ -143,13 +154,16 @@
           value={String($store.pageSize)}
           {options}
         />
-        <div class="flex items-center justify-center gap-1">
+        <div class="flex items-center justify-center gap-3">
           <button
             class="caret"
             disabled={!$store.hasPrevious}
             on:click={store.previousPage}
           >
-            <Icon name="chevron-left" />
+            <span
+              class="arrow arrow-left"
+              class:arrow-left-disabled={!$store.hasPrevious}
+            />
           </button>
           <p>
             {$store.currentPageNumber}–{$store.endingPageNumber}
@@ -159,7 +173,10 @@
             disabled={!$store.hasNext}
             on:click={store.nextPage}
           >
-            <Icon name="chevron-right" />
+            <span
+              class="arrow arrow-right"
+              class:arrow-right-disabled={!$store.hasNext}
+            />
           </button>
         </div>
         <slot name="action-bottom-right" />
@@ -169,8 +186,35 @@
 {/if}
 
 <style lang="postcss">
+  .arrow {
+    @apply absolute top-0 h-0 w-0;
+    border-style: solid;
+    border-width: 6px 12px 6px 0;
+  }
+  .arrow-left {
+    @apply left-0;
+    border-width: 6px 12px 6px 0;
+    border-color: transparent #18181b transparent transparent;
+  }
+
+  .arrow-left-disabled {
+    border-color: transparent #d4d4d8 transparent transparent;
+  }
+
+  .arrow-right {
+    @apply right-0;
+    border-width: 6px 0 6px 12px;
+    border-color: transparent transparent transparent #18181b;
+  }
+
+  .arrow-right-disabled {
+    border-color: transparent transparent transparent #d4d4d8;
+  }
+
   .caret {
-    @apply text-gray-500;
+    @apply relative text-gray-500;
+    width: 12px;
+    height: 12px;
   }
 
   .caret:disabled {

@@ -8,6 +8,8 @@
   import ApiPagination from '$lib/holocene/api-pagination.svelte';
   import { getPaginatedEvents } from '$lib/services/events-service';
   import { page } from '$app/stores';
+  import TableRow from '$lib/holocene/table/table-row.svelte';
+  import Skeleton from '$lib/holocene/skeleton/index.svelte';
 
   export let items: IterableEvents;
   export let groups: EventGroups;
@@ -27,6 +29,8 @@
       runId,
       sort: $eventFilterSort,
     });
+
+  let columns = 4;
 </script>
 
 {#if loading}
@@ -35,11 +39,12 @@
   <ApiPagination
     let:visibleItems
     let:initialItem
+    let:updating
     onFetch={fetchEvents}
     onError={(error) => console.error(error)}
     reset={$eventFilterSort}
   >
-    <EventSummaryTable {compact} on:expandAll={handleExpandChange}>
+    <EventSummaryTable {compact} on:expandAll={handleExpandChange} {updating}>
       {#each visibleItems as event (`${event.id}-${event.timestamp}`)}
         <EventSummaryRow
           {event}

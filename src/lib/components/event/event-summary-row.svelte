@@ -88,6 +88,7 @@
   data-cy="event-summary-row"
   on:click|stopPropagation={onLinkClick}
 >
+  <td />
   <td class="id-cell text-left">
     <a class="text-sm text-gray-500 md:text-base" href="#{event.id}"
       >{event.id}</a
@@ -109,7 +110,7 @@
       {/if}
     </p>
   </td>
-  <td class="cell w-10 text-right text-sm font-normal xl:text-left">
+  <td class="cell text-right text-sm font-normal xl:text-left">
     <p tabindex="0" class="event-name text-sm font-semibold md:text-base">
       {#if compact && failure}
         <Icon class="inline text-red-700" name="clock" />
@@ -135,12 +136,13 @@
       />
     {/if}
   </td>
-  <td class="cell text-right">
+  <td class="cell mx-4">
     <Icon class="inline" name={expanded ? 'chevron-up' : 'chevron-down'} />
   </td>
 </tr>
 {#if expanded}
   <tr class="expanded-row" class:typedError>
+    <td />
     <td class="expanded-cell" colspan="5">
       <EventDetailsFull
         event={currentEvent}
@@ -154,11 +156,11 @@
 
 <style lang="postcss">
   .row {
-    @apply flex flex-wrap items-center border-b-2 border-gray-700 text-sm no-underline last-of-type:border-b-0 xl:table-row xl:py-3 xl:text-base;
+    @apply flex flex-wrap items-center border-gray-900 text-sm no-underline xl:table-row xl:py-3 xl:text-base;
   }
 
   .row:hover {
-    @apply cursor-pointer bg-gray-50;
+    @apply z-50 cursor-pointer border-2 border-gray-900 bg-gradient-to-b from-blue-100 to-purple-100;
   }
 
   .expanded.row {
@@ -193,12 +195,12 @@
   }
 
   .cell {
-    @apply border-gray-700 px-3 pt-1 pb-0 leading-4 xl:table-cell xl:border-b-2;
+    @apply leading-4 xl:table-cell;
     flex: 40%;
   }
 
   .id-cell {
-    @apply hidden border-gray-700 py-1 px-3 leading-4 xl:table-cell xl:border-b-2 w-24;
+    @apply hidden w-24 border-gray-700 py-1 px-3 leading-4 xl:table-cell;
   }
 
   .expanded .cell,
@@ -212,11 +214,11 @@
   }
 
   .expanded-row {
-    @apply block xl:table-row xl:border-b-2 xl:border-gray-700;
+    @apply block xl:table-row;
   }
 
   .expanded-cell {
-    @apply flex w-full flex-wrap border-b-2 border-gray-700 text-sm no-underline xl:table-cell xl:text-base;
+    @apply flex w-full flex-wrap text-sm no-underline xl:table-cell xl:text-base;
   }
 
   .typedError .expanded-cell {
