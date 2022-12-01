@@ -331,8 +331,8 @@
       />
     {:else}
       <TableRow>
-        <td colspan="2" class="hidden xl:table-cell" />
-        <td colspan="3">
+        <td class="hidden xl:table-cell" />
+        <td colspan="4">
           {#if $loading}
             <Loading />
           {:else}

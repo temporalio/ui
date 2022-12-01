@@ -131,7 +131,7 @@
           </div>
         </th>
         <th class="table-cell md:w-60 xl:w-auto" />
-        <th class="hidden md:table-cell md:w-60 xl:w-80" />
+        <th class="table-cell md:w-60 xl:w-80" />
         <th class="hidden xl:table-cell xl:w-60" />
         <th class="hidden xl:table-cell xl:w-60" />
         <th class="table-cell md:hidden" />
