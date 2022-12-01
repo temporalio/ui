@@ -6,6 +6,7 @@
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventEmptyRow from './event-empty-row.svelte';
   import Loading from '$lib/holocene/loading.svelte';
+  import ApiPagination from '$lib/holocene/api-pagination.svelte';
 
   export let items: IterableEvents;
   export let groups: EventGroups;
@@ -20,6 +21,11 @@
 {#if loading}
   <Loading />
 {:else}
+  <ApiPagination
+    let:visibleItems
+    onFetch={() => getNamespacesPaginatedUsage(currentPeriod)}
+    onError={handlePaginationError}
+  />
   <Pagination
     {items}
     floatId="event-view-toggle"
