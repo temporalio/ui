@@ -89,14 +89,13 @@
   on:click|stopPropagation={onLinkClick}
 >
   <td class="id-cell text-left">
-    <a class="mx-1 text-sm text-gray-500 md:text-base" href="#{event.id}"
+    <a class="text-sm text-gray-500 md:text-base" href="#{event.id}"
       >{event.id}</a
     >
   </td>
   <td class="cell flex w-1/4 text-left">
-    <a
-      class="mx-1 text-sm text-gray-500 md:text-base xl:hidden"
-      href="#{event.id}">{event.id}</a
+    <a class="text-sm text-gray-500 md:text-base xl:hidden" href="#{event.id}"
+      >{event.id}</a
     >
     <p class="m-0 text-sm md:text-base">
       {#if showElapsed && event.id !== initialItem.id}
@@ -199,7 +198,7 @@
   }
 
   .id-cell {
-    @apply hidden border-gray-700 py-1 px-3 leading-4 xl:table-cell xl:border-b-2;
+    @apply hidden border-gray-700 py-1 px-3 leading-4 xl:table-cell xl:border-b-2 w-24;
   }
 
   .expanded .cell,

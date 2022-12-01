@@ -15,6 +15,7 @@
 
   export let onError: (error: any) => void;
   export let onFetch: () => Promise<PaginatedRequest>;
+  export let reset: any;
 
   let store = createPaginationStore();
   let error: any;
@@ -61,9 +62,7 @@
     onPageChange(nextIndex);
   }
 
-  $: {
-    onPageSizeChange(pageSize);
-  }
+  $: reset, onPageSizeChange(pageSize);
 
   $: isEmpty = $store.items.length === 0 && !$store.loading;
 </script>

@@ -21,6 +21,7 @@ type PaginationItems = {
   currentPageNumber: number;
   endingPageNumber: number;
   items: any[];
+  initialItem: any,
   loading: boolean;
   updating: boolean;
   indexTokens: Record<number, string>;
@@ -36,6 +37,7 @@ const initialStore: PaginationItems = {
   currentPageNumber: 1,
   endingPageNumber: defaultItemsPerPage,
   items: [],
+  initialItem: null,
   loading: true,
   updating: true,
   indexTokens: {},

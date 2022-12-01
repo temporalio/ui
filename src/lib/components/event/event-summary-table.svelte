@@ -37,7 +37,7 @@
     data-cy="event-summary-table-header-desktop"
   >
     <div class="hidden xl:table-row">
-      <div class="table-header w-12 rounded-tl-md" />
+      <div class="table-header w-14 rounded-tl-md" />
       <div class="table-header w-80">
         Date & Time{#if !compact}<EventDateFilter />{/if}
       </div>

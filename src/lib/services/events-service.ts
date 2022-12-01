@@ -86,9 +86,6 @@ export const fetchPartialRawEvents = async ({
 
   const [descendingResponse, ascendingRouteResponse] = await Promise.all([descendingRequest, ascendingRouteRequest])
 
-  console.log("Descending: ", descendingResponse)
-  console.log("Ascending: ", ascendingRouteResponse)
-
   return descendingResponse.history.events;
 };
 
@@ -100,3 +97,23 @@ export const fetchPartialEvents = async (
     toEventHistory({ response, namespace, settings, accessToken }),
   );
 };
+
+
+export async function getPaginatedEvents({
+  namespace,
+  workflowId,
+  runId,
+  sort,
+}): Promise<() => Promise<{ items: HistoryEvent[], nextPageToken: string }>> {
+  return async (pageSize = 100, token = '') => {
+    const descendingRoute = await routeForApi(`events.${sort}`, { namespace, workflowId, runId });
+    const { history, nextPageToken } = await requestFromAPI<GetWorkflowExecutionHistoryResponse>(descendingRoute, {
+      request: fetch,
+      params: { maximumPageSize: pageSize.toString(), nextPageToken: token }
+    });
+
+    const { events, eventGroups } = await toEventHistory({ response: history.events, namespace })
+    return { items: events, nextPageToken }
+  };
+}
+
