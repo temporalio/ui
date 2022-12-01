@@ -32,11 +32,12 @@
   export let expandAll = false;
   export let typedError = false;
 
-  let selectedId = event.id;
-
   let eventGroup = isEventGroup(event)
     ? event
     : getGroupForEvent(event, groups);
+  let selectedId = compact
+    ? Array.from(eventGroup.events.keys()).pop()
+    : event.id;
 
   $: expanded = expandAll;
 
