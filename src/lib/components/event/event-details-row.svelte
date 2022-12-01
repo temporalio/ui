@@ -106,6 +106,6 @@
 
 <style lang="postcss">
   .badge {
-    @apply bg-gray-300;
+    @apply rounded-sm bg-gray-100 p-1 text-gray-900;
   }
 </style>
