@@ -121,6 +121,9 @@ export function routeForApi(
     'workflows.count': `/namespaces/${parameters?.namespace}/workflows/count`,
     'batch-operations': `/namespaces/${parameters.namespace}/batch-operations`,
     'batch-operation.describe': `/namespaces/${parameters.namespace}/batch-operations/describe`,
+    // TODO: Remove when new batch APIs are deployed
+    'workflows.batch.terminate': `/namespaces/${parameters.namespace}/workflows/batch/terminate`,
+    'workflows.batch.describe': `/namespaces/${parameters.namespace}/workflows/batch/describe`,
   };
 
   return withBase(routes[route], parameters?.namespace);

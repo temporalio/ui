@@ -11,7 +11,12 @@ type WorkflowAPIRoutePath =
   | 'events.descending'
   | 'query';
 
-type BatchAPIRoutePath = 'batch-operations' | 'batch-operation.describe';
+type BatchAPIRoutePath =
+  | 'batch-operations'
+  | 'batch-operation.describe'
+  // TODO: Remove when new batch APIs are deployed
+  | 'workflows.batch.terminate'
+  | 'workflows.batch.describe';
 
 type NamespaceAPIRoutePath = 'namespace';
 

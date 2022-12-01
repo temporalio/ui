@@ -2,6 +2,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
+import { uiVersion } from '$lib/stores/versions';
+import { get } from 'svelte/store';
+import { isVersionNewer } from '$lib/utilities/version-check';
 
 const queryFromWorkflows = (
   workflowExecutions: WorkflowExecution[],
@@ -72,7 +75,11 @@ async function cancelWorkflows(
   query: string,
   reason: string,
 ): Promise<string> {
-  const route = await routeForApi('batch-operations', { namespace });
+  const version = get(uiVersion);
+  const routeId = isVersionNewer(version, '2.9.0')
+    ? 'batch-operations'
+    : 'workflows.batch.terminate';
+  const route = await routeForApi(routeId, { namespace });
   const jobId = uuidv4();
 
   await requestFromAPI<null>(route, {
@@ -98,7 +105,11 @@ async function terminateWorkflows(
   query: string,
   reason: string,
 ): Promise<string> {
-  const route = await routeForApi('batch-operations', { namespace });
+  const version = get(uiVersion);
+  const routeId = isVersionNewer(version, '2.9.0')
+    ? 'batch-operations'
+    : 'workflows.batch.terminate';
+  const route = await routeForApi(routeId, { namespace });
   const jobId = uuidv4();
 
   await requestFromAPI<null>(route, {
@@ -148,7 +159,11 @@ async function describeBatchOperation({
   jobId,
   namespace,
 }: DescribeBatchOperationOptions): Promise<BatchOperationInfo> {
-  const route = await routeForApi('batch-operation.describe', {
+  const version = get(uiVersion);
+  const routeId = isVersionNewer(version, '2.9.0')
+    ? 'batch-operation.describe'
+    : 'workflows.batch.describe';
+  const route = await routeForApi(routeId, {
     namespace,
   });
 
