@@ -15,7 +15,6 @@
       id="histoire-accordion-1"
       title="Custom Search Attributes"
       subtitle="19 custom search attributes"
-      data-cy="hello"
     >
       <Table variant="simple" class="w-full">
         <TableHeaderRow slot="headers">
