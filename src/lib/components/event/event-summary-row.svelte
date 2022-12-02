@@ -201,6 +201,14 @@
     @apply text-pink-700;
   }
 
+  .row:last-of-type .cell {
+    @apply border-b-0 first-of-type:rounded-bl-lg  last-of-type:rounded-br-lg;
+  }
+
+  .expanded-row {
+    @apply block xl:table-row xl:border-b-2 xl:border-gray-700;
+  }
+
   .expanded-cell {
     @apply flex table-cell w-full flex-wrap text-sm no-underline xl:text-base;
   }
@@ -216,8 +224,7 @@
     }
   }
 
-  .typedError .cell,
-  .typedError .id-cell {
+  .typedError .cell {
     @apply first-of-type:rounded-tl-lg  last-of-type:rounded-tr-lg;
   }
 </style>
