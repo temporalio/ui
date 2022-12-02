@@ -13,7 +13,7 @@
 
 <div class="w-full border-gray-700 lg:w-1/3 lg:border-r-2">
   <table class="w-full table-fixed">
-    {#each [...eventGroup.events] as [id, eventInGroup] (id)}
+    {#each [...eventGroup.events].reverse() as [id, eventInGroup] (id)}
       <tr
         class="row"
         class:active={id === selectedId}
