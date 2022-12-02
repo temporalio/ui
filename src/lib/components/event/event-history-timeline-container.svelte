@@ -4,7 +4,7 @@
   import { workflowRun, refresh } from '$lib/stores/workflow-run';
   import { timelineEvents } from '$lib/stores/events';
 
-  import Accordion from '$lib/holocene/accordion.svelte';
+  import Accordion from '$lib/holocene/accordion';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$holocene/icon/icon.svelte';
   import {
@@ -76,7 +76,12 @@
 </script>
 
 <section class="flex w-full">
-  <Accordion title="Timeline" icon="chart" class="select-none border-gray-900">
+  <Accordion
+    id="event-history-timeline-accordion"
+    title="Timeline"
+    icon="chart"
+    class="select-none border-gray-900"
+  >
     <div
       class="mt-2 flex flex-col items-center justify-between gap-2 xl:flex-row"
     >

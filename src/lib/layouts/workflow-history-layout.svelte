@@ -17,7 +17,7 @@
   import WorkflowTypedError from '$lib/components/workflow/workflow-typed-error.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
-  import Accordion from '$lib/holocene/accordion.svelte';
+  import Accordion from '$lib/holocene/accordion';
   import { timeFormat } from '$lib/stores/time-format';
   import { exportHistory } from '$lib/utilities/export-history';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
@@ -105,7 +105,12 @@
   <WorkflowTypedError error={workflowEvents.error} />
   <PendingActivities />
   <section class="flex w-full">
-    <Accordion title="Input and Results" icon="json" class="border-gray-900">
+    <Accordion
+      id="input-and-results-accordion"
+      title="Input and Results"
+      icon="json"
+      class="border-gray-900"
+    >
       <div class="flex gap-2">
         <InputAndResults type="input" content={workflowEvents.input} />
         <InputAndResults type="results" content={workflowEvents.results} />
