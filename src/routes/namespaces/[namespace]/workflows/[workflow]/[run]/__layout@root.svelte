@@ -8,6 +8,6 @@
   });
 </script>
 
-<WorkflowRunLayout>
+<WorkflowRunLayout cancelEnabled>
   <slot />
 </WorkflowRunLayout>
