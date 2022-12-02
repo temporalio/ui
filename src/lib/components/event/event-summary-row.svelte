@@ -124,7 +124,10 @@
       {/if}
       {getTruncatedWord(
         isLocalActivityMarkerEvent(event) ? 'LocalActivity' : event.name,
-        truncateWidth - 30,
+        truncateWidth -
+          30 *
+            // account for additional width of icons
+            (compact ? (failure || canceled || terminated ? 3 : 2) : 1),
       )}
       {#if compact}
         <Icon
