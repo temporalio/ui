@@ -113,11 +113,6 @@
     @apply block w-full items-start gap-4 border-b-2 border-gray-200 py-2 text-left xl:flex;
   }
 
-  .detail-row:hover,
-  .code-block-row:hover {
-    @apply bg-gradient-to-b from-blue-100 to-purple-100;
-  }
-
   .row:last-of-type .detail-row {
     @apply border-b-0;
   }
@@ -125,6 +120,6 @@
     @apply border-b-0;
   }
   .badge {
-    @apply bg-gray-300 text-gray-700;
+    @apply rounded-sm bg-gray-100 p-1 text-gray-900;
   }
 </style>

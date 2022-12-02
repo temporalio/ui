@@ -144,7 +144,9 @@
           view: $eventViewType,
           ...routeParameters,
         })}
-        amount={workflow?.historyEvents}
+        amount={$eventHistory.end[0]?.id
+          ? parseInt($eventHistory.end[0].id)
+          : undefined}
         dataCy="history-tab"
         active={pathMatches(
           $page.url.pathname,

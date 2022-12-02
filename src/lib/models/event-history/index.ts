@@ -95,19 +95,14 @@ export const toEventHistory = async ({
   namespace,
   settings,
   accessToken,
-}: EventsWithMetadata): Promise<{
-  events: WorkflowEvents;
-  eventGroups: EventGroups;
-}> => {
+}: EventsWithMetadata): Promise<WorkflowEvents> => {
   const events = await Promise.all(
     response.map((historyEvent) =>
       toEvent({ historyEvent, namespace, settings, accessToken }),
     ),
   );
 
-  const eventGroups = groupEvents(events);
-
-  return { events, eventGroups };
+  return events;
 };
 
 export const isEvent = (event: unknown): event is WorkflowEvent => {
@@ -117,3 +112,5 @@ export const isEvent = (event: unknown): event is WorkflowEvent => {
   if (has(event, 'eventType')) return true;
   return false;
 };
+
+// const eventGroups = groupEvents(events);

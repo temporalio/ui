@@ -11,47 +11,55 @@
   export let onGroupClick: (id: string) => void;
 </script>
 
-<div
-  class="block max-h-full w-full flex-col border-gray-200 p-4 lg:flex lg:w-1/3 lg:border-r-2"
->
-  <ul class="gap-2">
-    {#each [...eventGroup.events] as [id, eventInGroup] (id)}
-      <li on:click|preventDefault|stopPropagation={() => onGroupClick(id)}>
-        <div class="flex gap-2">
-          <span class="mx-1 text-gray-500">{id}</span>
-          <span
-            class="event-type"
-            class:active={id === selectedId}
-            class:failure={eventOrGroupIsFailureOrTimedOut(eventInGroup)}
-            class:canceled={eventOrGroupIsCanceled(eventInGroup)}
-            class:terminated={eventOrGroupIsTerminated(eventInGroup)}
-            >{isLocalActivityMarkerEvent(eventInGroup)
-              ? 'LocalActivity'
-              : eventInGroup.eventType}</span
-          >
-        </div>
-      </li>
+<div class="w-full border-gray-700 lg:w-1/3">
+  <table class="w-full table-fixed">
+    {#each [...eventGroup.events].reverse() as [id, eventInGroup] (id)}
+      <tr
+        class="row"
+        class:active={id === selectedId}
+        on:click|preventDefault|stopPropagation={() => onGroupClick(id)}
+      >
+        <td class="cell table-cell">
+          <div class="flex gap-2 text-left">
+            <p class="mx-1 text-sm text-gray-500 md:text-base">{id}</p>
+            <p
+              class="truncate text-sm md:text-base"
+              class:active={id === selectedId}
+              class:failure={eventOrGroupIsFailureOrTimedOut(eventInGroup)}
+              class:canceled={eventOrGroupIsCanceled(eventInGroup)}
+              class:terminated={eventOrGroupIsTerminated(eventInGroup)}
+            >
+              {isLocalActivityMarkerEvent(eventInGroup)
+                ? 'LocalActivity'
+                : eventInGroup.eventType}
+            </p>
+          </div>
+        </td>
+      </tr>
     {/each}
-  </ul>
+  </table>
 </div>
 
 <style lang="postcss">
-  li {
-    @apply my-2 cursor-pointer pl-8;
+  .row {
+    @apply table-row h-12;
   }
-  .event-type:hover {
-    @apply text-blue-700 underline decoration-blue-700;
+  .row:hover {
+    @apply cursor-pointer bg-gradient-to-b from-blue-100 to-purple-100;
   }
-  .active {
-    @apply text-blue-700 underline decoration-blue-700;
+  .active.row {
+    @apply bg-blue-50;
+  }
+  .cell {
+    @apply border-b-2 border-gray-700 px-3 py-1 leading-4;
   }
   .failure {
-    @apply text-red-700 decoration-red-700;
+    @apply text-red-700;
   }
   .canceled {
-    @apply text-yellow-700 decoration-yellow-700;
+    @apply text-yellow-700;
   }
   .terminated {
-    @apply text-pink-700 decoration-pink-700;
+    @apply text-pink-700;
   }
 </style>

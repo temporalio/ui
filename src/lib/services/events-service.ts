@@ -97,13 +97,13 @@ export const fetchStartAndEndEvents = async (
     ...parameters,
     sort: 'descending',
   });
-  const { events: start } = await toEventHistory({
+  const start = await toEventHistory({
     response: startEventsRaw,
     namespace,
     settings,
     accessToken,
   });
-  const { events: end } = await toEventHistory({
+  const end = await toEventHistory({
     response: endEventsRaw,
     namespace,
     settings,
@@ -118,7 +118,9 @@ export async function getPaginatedEvents({
   runId,
   sort,
   compact,
-}): Promise<() => Promise<{ items: HistoryEvent[]; nextPageToken: string }>> {
+}): Promise<
+  () => Promise<{ items: HistoryEvent[]; nextPageToken: Uint8Array | string }>
+> {
   return async (pageSize = 100, token = '') => {
     const descendingRoute = await routeForApi(`events.${sort}`, {
       namespace,
@@ -137,12 +139,12 @@ export async function getPaginatedEvents({
         },
       );
 
-    const { events, eventGroups } = await toEventHistory({
+    const events = await toEventHistory({
       response: history.events,
       namespace,
     });
     return {
-      items: compact ? eventGroups : events,
+      items: events,
       nextPageToken: nextPageToken ?? '',
     };
   };

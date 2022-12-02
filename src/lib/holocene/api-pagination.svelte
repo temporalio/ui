@@ -14,6 +14,10 @@
 
   export let onError: (error: any) => void;
   export let onFetch: () => Promise<PaginatedRequest>;
+  export let onArrowUp: () => void | undefined = undefined;
+  export let onArrowDown: () => void | undefined = undefined;
+  export let onPageReset: () => void | undefined = undefined;
+
   export let reset: any;
   export let total: string | number = '';
 
@@ -64,10 +68,36 @@
   $: isEmpty = $store.items.length === 0 && !$store.loading;
 
   function handleKeydown(event) {
-    if (event.key === 'ArrowRight' && $store.hasNext) {
-      store.nextPage();
-    } else if (event.key === 'ArrowLeft' && $store.hasPrevious) {
-      store.previousPage();
+    switch (event.key) {
+      case 'ArrowRight':
+        if ($store.hasNext && !$store.loading) {
+          store.nextPage();
+        }
+        break;
+      case 'ArrowLeft':
+        if ($store.hasPrevious && !$store.loading) {
+          store.previousPage();
+          if ($store.nextIndex === 0 && onPageReset) {
+            onPageReset();
+          }
+        }
+        break;
+      case 'ArrowUp':
+        if (onArrowUp) {
+          event.preventDefault();
+          onArrowUp();
+          if (onPageReset) onPageReset();
+        }
+        break;
+      case 'ArrowDown':
+        if (onArrowDown) {
+          event.preventDefault();
+          onArrowDown();
+          if (onPageReset) onPageReset();
+        }
+        break;
+      default:
+        break;
     }
   }
 </script>

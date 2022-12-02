@@ -8,7 +8,6 @@
     workflowEventsResponsiveColumnWidth,
   } from '$lib/stores/column-width';
 
-  import { getGroupForEvent, isEventGroup } from '$lib/models/event-groups';
   import {
     eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsCanceled,
@@ -17,27 +16,28 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
-  import { getTruncatedWord } from '$lib/utilities/get-truncated-word';
 
   import EventDetailsRow from './event-details-row.svelte';
   import EventDetailsFull from './event-details-full.svelte';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
 
-  export let event: IterableEvent;
+  export let event: IterableEvent | EventGroup;
   export let visibleItems: IterableEvent[];
   export let initialItem: IterableEvent;
   export let compact = false;
   export let expandAll = false;
   export let typedError = false;
 
-  let selectedId = event.id;
-
-  let eventGroup = !compact ? event : getGroupForEvent(event, visibleItems);
+  let selectedId = compact
+    ? Array.from((event as EventGroup).events.keys()).pop()
+    : event.id;
 
   $: expanded = expandAll;
 
-  $: currentEvent = compact ? eventGroup.events.get(selectedId) : event;
+  $: currentEvent = compact
+    ? (event as EventGroup).events.get(selectedId)
+    : event;
   $: descending = $eventSortOrder === 'descending';
   $: showElapsed = $eventShowElapsed === 'true';
   $: attributes = formatAttributes(event, { compact });
@@ -61,15 +61,9 @@
     expanded = !expanded;
   };
 
-  const failure = eventOrGroupIsFailureOrTimedOut(
-    compact && eventGroup ? eventGroup : event,
-  );
-  const canceled = eventOrGroupIsCanceled(
-    compact && eventGroup ? eventGroup : event,
-  );
-  const terminated = eventOrGroupIsTerminated(
-    compact && eventGroup ? eventGroup : event,
-  );
+  const failure = eventOrGroupIsFailureOrTimedOut(compact && event);
+  const canceled = eventOrGroupIsCanceled(compact && event);
+  const terminated = eventOrGroupIsTerminated(compact && event);
 
   let truncateWidth: number;
   workflowEventsColumnWidth.subscribe((value) => {
@@ -113,24 +107,27 @@
   <td class="table-cell text-right text-sm font-normal xl:text-left">
     <p tabindex="0" class="event-name text-sm font-semibold md:text-base">
       {#if compact && failure}
-        <Icon class="inline text-red-700" name="clock" />
+        <Icon class="inline align-top text-red-700" name="clock" />
       {/if}
       {#if compact && canceled}
-        <Icon class="inline text-yellow-700" name="clock" />
+        <Icon class="inline align-top text-yellow-700" name="clock" />
       {/if}
       {#if compact && terminated}
-        <Icon class="inline text-pink-700" name="clock" />
+        <Icon class="inline align-top text-pink-700" name="clock" />
       {/if}
-      {getTruncatedWord(
-        isLocalActivityMarkerEvent(event) ? 'LocalActivity' : event.name,
-        truncateWidth - 30,
-      )}
+      {isLocalActivityMarkerEvent(event) ? 'LocalActivity' : event.name}
+      {#if compact}
+        <Icon
+          class="ml-1.5 inline align-top"
+          name={expanded ? 'chevron-up' : 'chevron-down'}
+        />
+      {/if}
     </p>
   </td>
   <td class="links table-cell items-center">
     <div class="flex justify-between">
       <div class="invisible w-full md:visible">
-        {#if !expanded}
+        {#if !expanded && !compact}
           <EventDetailsRow
             {...getSingleAttributeForEvent(currentEvent)}
             {attributes}
@@ -139,7 +136,12 @@
         {/if}
       </div>
       <div class="w-4">
-        <Icon class="inline" name={expanded ? 'chevron-up' : 'chevron-down'} />
+        {#if !compact}
+          <Icon
+            class="inline"
+            name={expanded ? 'chevron-up' : 'chevron-down'}
+          />
+        {/if}
       </div>
     </div>
   </td>
@@ -147,15 +149,15 @@
 </tr>
 {#if expanded}
   <tr class="table-row" class:typedError>
-    <td />
     <td class="expanded-cell" colspan="5">
       <EventDetailsFull
         event={currentEvent}
         {compact}
-        {eventGroup}
+        eventGroup={event}
         bind:selectedId
       />
     </td>
+    <td />
   </tr>
 {/if}
 
@@ -165,11 +167,11 @@
   }
 
   .row:hover {
-    @apply z-50 cursor-pointer border-2 border-gray-900 bg-gradient-to-b from-blue-100 to-purple-100;
+    @apply z-50 cursor-pointer bg-gradient-to-b from-blue-100 to-purple-100;
   }
 
   .expanded.row {
-    @apply border-b-0;
+    @apply bg-blue-50;
   }
 
   .failure,

@@ -9,6 +9,8 @@
   import ApiPagination from '$lib/holocene/api-pagination.svelte';
   import { getPaginatedEvents } from '$lib/services/events-service';
   import { eventHistory } from '$lib/stores/events';
+  import { groupEvents } from '$lib/models/event-groups';
+  import { refresh } from '$lib/stores/workflow-run';
 
   export let compact = false;
 
@@ -19,7 +21,6 @@
   const { namespace, workflow: workflowId, run: runId } = $page.params;
 
   let fetchEvents = () => {
-    console.log('fetching...');
     return getPaginatedEvents({
       namespace,
       workflowId,
@@ -27,6 +28,10 @@
       sort: $eventFilterSort,
       compact,
     });
+  };
+
+  const onPageReset = () => {
+    $refresh = Date.now();
   };
 </script>
 
@@ -36,11 +41,14 @@
   let:updating
   onFetch={fetchEvents}
   onError={(error) => console.error(error)}
+  onArrowUp={() => ($eventFilterSort = 'descending')}
+  onArrowDown={() => ($eventFilterSort = 'ascending')}
+  {onPageReset}
   reset={$eventFilterSort}
   total={$eventHistory.end[0]?.id}
 >
   <EventSummaryTable {compact} on:expandAll={handleExpandChange} {updating}>
-    {#each visibleItems as event (`${event.id}-${event.timestamp}`)}
+    {#each compact ? groupEvents(visibleItems) : visibleItems as event (`${event.id}-${event.timestamp}`)}
       <EventSummaryRow
         {event}
         {compact}
