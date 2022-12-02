@@ -71,7 +71,7 @@
     >
       {#if !loading}
         <button
-          aria-label="Close Modal"
+          aria-label={cancelText}
           class="float-right m-4"
           on:click={cancelModal}
         >
