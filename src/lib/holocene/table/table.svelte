@@ -106,6 +106,11 @@
               @apply rounded-bl-none;
             }
           }
+          &:last-child {
+            &:last-child {
+              @apply rounded-br-none;
+            }
+          }
         }
       }
     }

@@ -20,11 +20,11 @@
         class:active={id === selectedId}
         on:click|preventDefault|stopPropagation={() => onGroupClick(id)}
       >
-        <td class="w-1" />
+        <td class="w-1/12" />
         <td class="table-cell w-24 text-left">
           <p class="truncate text-sm text-gray-500 md:text-base">{id}</p>
         </td>
-        <td class="table-cell pr-2">
+        <td class="table-cell pr-2 text-left">
           <p
             class="truncate text-sm md:text-base"
             class:active={id === selectedId}
@@ -45,7 +45,7 @@
 
 <style lang="postcss">
   .row {
-    @apply table-row h-12;
+    @apply table-row;
   }
   .row:hover {
     @apply cursor-pointer bg-gradient-to-b from-blue-100 to-purple-100;
