@@ -88,7 +88,7 @@
   <td />
   <td class="table-cell w-24 text-left">
     <a class="text-sm text-gray-500 md:text-base" href="#{event.id}"
-      >{event.id}</a
+      ><p class="truncate">{event.id}</p></a
     >
   </td>
   <td class="flex table-cell text-left">
@@ -149,7 +149,7 @@
 </tr>
 {#if expanded}
   <tr class="table-row" class:typedError>
-    <td class="expanded-cell" colspan="5">
+    <td class="expanded-cell" colspan="6">
       <EventDetailsFull
         event={currentEvent}
         {compact}
@@ -157,7 +157,6 @@
         bind:selectedId
       />
     </td>
-    <td />
   </tr>
 {/if}
 
