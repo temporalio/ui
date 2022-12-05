@@ -14,12 +14,13 @@
 
   export let onError: (error: any) => void;
   export let onFetch: () => Promise<PaginatedRequest>;
-  export let onArrowUp: () => void | undefined = undefined;
-  export let onArrowDown: () => void | undefined = undefined;
+  export let onKeyA: () => void | undefined = undefined;
+  export let onKeyD: () => void | undefined = undefined;
   export let onPageReset: () => void | undefined = undefined;
 
   export let reset: any;
   export let total: string | number = '';
+  export let pageSizeOptions = options;
 
   let store = createPaginationStore();
   let error: any;
@@ -68,12 +69,13 @@
   $: {
     onPageChange(nextIndex);
   }
+
   $: reset, onPageSizeChange(pageSize);
 
   $: isEmpty = $store.items.length === 0 && !$store.loading;
 
   function handleKeydown(event) {
-    switch (event.key) {
+    switch (event.code) {
       case 'ArrowRight':
         arrowRightActive = true;
         setTimeout(() => {
@@ -96,16 +98,22 @@
         }
         break;
       case 'ArrowUp':
-        if (onArrowUp) {
-          event.preventDefault();
-          onArrowUp();
-          if (onPageReset) onPageReset();
+        if ($store.activeRow > 0) {
+          store.previousRow();
         }
         break;
       case 'ArrowDown':
-        if (onArrowDown) {
-          event.preventDefault();
-          onArrowDown();
+        store.nextRow();
+        break;
+      case 'KeyA':
+        if (onKeyA) {
+          onKeyA();
+          if (onPageReset) onPageReset();
+        }
+        break;
+      case 'KeyD':
+        if (onKeyD) {
+          onKeyD();
           if (onPageReset) onPageReset();
         }
         break;
@@ -141,7 +149,7 @@
           label="Per Page"
           parameter={$store.key}
           value={String($store.pageSize)}
-          {options}
+          options={pageSizeOptions}
         />
         <div class="flex items-center justify-center gap-3">
           <button
@@ -185,6 +193,7 @@
         visibleItems={$store.items}
         initialItem={[]}
         updating={$store.updating}
+        activeRow={$store.activeRow}
       />
     {/if}
 
@@ -199,7 +208,7 @@
           label="Per Page"
           parameter={$store.key}
           value={String($store.pageSize)}
-          {options}
+          options={pageSizeOptions}
         />
         <div class="flex items-center justify-center gap-3">
           <button

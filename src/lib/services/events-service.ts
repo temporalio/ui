@@ -117,7 +117,6 @@ export async function getPaginatedEvents({
   workflowId,
   runId,
   sort,
-  compact,
 }): Promise<
   () => Promise<{ items: HistoryEvent[]; nextPageToken: Uint8Array | string }>
 > {
@@ -133,7 +132,7 @@ export async function getPaginatedEvents({
         {
           request: fetch,
           params: {
-            maximumPageSize: pageSize.toString(),
+            maximumPageSize: '300',
             nextPageToken: token,
           },
         },

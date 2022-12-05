@@ -25,6 +25,7 @@
   export let event: IterableEvent | EventGroup;
   export let visibleItems: IterableEvent[];
   export let initialItem: IterableEvent;
+  export let active = false;
   export let compact = false;
   export let expandAll = false;
   export let typedError = false;
@@ -72,7 +73,22 @@
   workflowEventsResponsiveColumnWidth.subscribe((value) => {
     if (value !== 0) truncateWidth = value;
   });
+
+  function handleKeydown(event) {
+    switch (event.code) {
+      case 'Space':
+        if (active) {
+          event.preventDefault();
+          onLinkClick();
+        }
+        break;
+      default:
+        break;
+    }
+  }
 </script>
+
+<svelte:window on:keydown={handleKeydown} />
 
 <tr
   class="row"
@@ -82,6 +98,7 @@
   class:canceled
   class:terminated
   class:typedError
+  class:active
   data-cy="event-summary-row"
   on:click|stopPropagation={onLinkClick}
 >
@@ -173,6 +190,10 @@
 
   .expanded.row {
     @apply bg-blue-50;
+  }
+
+  .active.row {
+    @apply bg-purple-50;
   }
 
   .failure,

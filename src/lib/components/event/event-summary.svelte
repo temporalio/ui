@@ -39,22 +39,25 @@
   let:visibleItems
   let:initialItem
   let:updating
+  let:activeRow
   onFetch={fetchEvents}
   onError={(error) => console.error(error)}
-  onArrowUp={() => ($eventFilterSort = 'descending')}
-  onArrowDown={() => ($eventFilterSort = 'ascending')}
+  onKeyD={() => ($eventFilterSort = 'descending')}
+  onKeyA={() => ($eventFilterSort = 'ascending')}
   {onPageReset}
   reset={$eventFilterSort}
   total={$eventHistory.end[0]?.id}
+  pageSizeOptions={['100', '500', '1000']}
 >
   <EventSummaryTable {compact} on:expandAll={handleExpandChange} {updating}>
-    {#each compact ? groupEvents(visibleItems) : visibleItems as event (`${event.id}-${event.timestamp}`)}
+    {#each compact ? groupEvents(visibleItems) : visibleItems as event, index (`${event.id}-${event.timestamp}`)}
       <EventSummaryRow
         {event}
         {compact}
         expandAll={$expandAllEvents === 'true'}
         {initialItem}
         {visibleItems}
+        active={activeRow === index}
       />
     {:else}
       <EventEmptyRow />

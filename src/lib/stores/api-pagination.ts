@@ -11,6 +11,8 @@ type PaginationMethods = {
   setUpdating: () => void;
   reset: () => void;
   resetPageSize: () => void;
+  nextRow: () => void;
+  previousRow: () => void;
 };
 
 type PaginationItems = {
@@ -27,6 +29,7 @@ type PaginationItems = {
   indexTokens: Record<number, string>;
   hasNext: boolean;
   hasPrevious: boolean;
+  activeRow: number;
 };
 
 const initialStore: PaginationItems = {
@@ -43,6 +46,7 @@ const initialStore: PaginationItems = {
   indexTokens: {},
   hasNext: true,
   hasPrevious: false,
+  activeRow: 0,
 };
 
 export type PaginationStore = PaginationMethods & Readable<PaginationItems>;
@@ -97,6 +101,7 @@ export function createPaginationStore(): PaginationStore {
     _store.items = items;
     _store.index = store.nextIndex;
     _store.indexTokens = { ...store.indexTokens };
+    _store.activeRow = 0;
 
     if (store.nextIndex === store.index) {
       // First page
