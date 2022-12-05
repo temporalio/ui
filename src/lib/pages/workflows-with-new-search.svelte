@@ -338,7 +338,7 @@
     {:else}
       <TableRow>
         <td class="hidden xl:table-cell" />
-        <td colspan="4">
+        <td colspan={bulkActionsEnabled ? 4 : 3}>
           {#if $loading}
             <Loading />
           {:else}
