@@ -62,7 +62,10 @@
     }
   }
 
-  $: onPageChange(nextIndex);
+  $: {
+    console.log('Page change');
+    onPageChange(nextIndex);
+  }
   $: reset, onPageSizeChange(pageSize);
 
   $: isEmpty = $store.items.length === 0 && !$store.loading;
