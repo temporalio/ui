@@ -12,6 +12,8 @@
   export let large: boolean = false;
   export let loading: boolean = false;
 
+  let modalElement: HTMLDivElement;
+
   const dispatch = createEventDispatcher<{
     cancelModal: undefined;
     confirmModal: undefined;
@@ -21,32 +23,70 @@
     dispatch('cancelModal');
   };
 
-  const handleKeyUp = (event: KeyboardEvent) => {
+  const handleKeyboardNavigation = (event: KeyboardEvent) => {
+    if (!open) {
+      return;
+    }
+
     if (event.key === 'Escape') {
       cancelModal();
+      return;
+    }
+
+    const focusable = modalElement.querySelectorAll('button');
+    const firstFocusable = focusable[0];
+    const lastFocusable = focusable[focusable.length - 1];
+    if (event.key === 'Tab') {
+      if (event.shiftKey) {
+        if (document.activeElement === firstFocusable) {
+          lastFocusable.focus();
+          event.preventDefault();
+        }
+      } else if (document.activeElement === lastFocusable) {
+        firstFocusable.focus();
+        event.preventDefault();
+      }
     }
   };
+
+  $: {
+    if (open && modalElement) {
+      modalElement.focus();
+    }
+  }
 </script>
 
-<svelte:window on:keyup={handleKeyUp} />
+<svelte:window on:keydown={handleKeyboardNavigation} />
 {#if open}
   <div class="modal">
     <div on:click={cancelModal} class="overlay" />
-    <div class="body" class:large>
+    <div
+      bind:this={modalElement}
+      class="body"
+      class:large
+      tabindex="-1"
+      role="alertdialog"
+      aria-labelledby="modal-title"
+      aria-describedby="modal-description"
+    >
       {#if !loading}
-        <div class="float-right p-6" on:click={cancelModal}>
+        <button
+          aria-label={cancelText}
+          class="float-right m-4"
+          on:click={cancelModal}
+        >
           <Icon
             name="close"
             class="cursor-pointer rounded-full hover:bg-gray-900 hover:text-white"
           />
-        </div>
+        </button>
       {/if}
-      <div class="title">
+      <div id="modal-title" class="title">
         <slot name="title">
           <h3>Title</h3>
         </slot>
       </div>
-      <div class="content">
+      <div id="modal-content" class="content">
         <slot name="content">
           <span>Content</span>
         </slot>

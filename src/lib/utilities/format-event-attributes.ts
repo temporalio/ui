@@ -121,20 +121,19 @@ const attributeGroupings: Readonly<AttributeGroup[]> = [
 
 type GroupingOption = {
   label: string;
-  color: Color;
 };
 
 export const attributeGroupingProperties: Readonly<
   Record<AttributeGroup, GroupingOption>
 > = {
-  activity: { label: 'Activity', color: 'gray' },
-  parent: { label: 'Parent', color: 'gray' },
-  retryPolicy: { label: 'Retry Policy', color: 'gray' },
-  schedule: { label: 'Schedule', color: 'gray' },
-  searchAttributes: { label: 'Search Attributes', color: 'gray' },
-  summary: { label: 'Summary', color: 'gray' },
-  taskQueue: { label: 'Task Queue', color: 'gray' },
-  workflow: { label: 'Workflow', color: 'gray' },
+  activity: { label: 'Activity' },
+  parent: { label: 'Parent' },
+  retryPolicy: { label: 'Retry Policy' },
+  schedule: { label: 'Schedule' },
+  searchAttributes: { label: 'Search Attributes' },
+  summary: { label: 'Summary' },
+  taskQueue: { label: 'Task Queue' },
+  workflow: { label: 'Workflow' },
 };
 
 export type AttributeGrouping = Partial<

@@ -5,7 +5,6 @@
     AttributeGrouping,
   } from '$lib/utilities/format-event-attributes';
   import Pill from '$lib/components/pill.svelte';
-  import { count } from 'console';
 
   export let attributeGrouping: AttributeGrouping;
   export let activePill: string;
@@ -24,11 +23,12 @@
   <div class="p-2 text-center xl:text-left">
     <div class="pill-container">
       {#each Object.entries(attributeGrouping) as [key, value] (key)}
+        {@const active = activePill === key}
         {#if value.length}
           <Pill
-            active={activePill === key}
+            {active}
             on:click={() => dispatch('pillChange', { key })}
-            color={attributeGroupingProperties[key].color}
+            color={active ? 'lightBlue' : 'gray'}
             >{attributeGroupingProperties[key].label}</Pill
           >
         {/if}

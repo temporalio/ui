@@ -2,7 +2,7 @@
   import { tick } from 'svelte';
 
   import { refresh } from '$lib/stores/workflow-run';
-  import { terminateWorkflow } from '$lib/services/terminate-service';
+  import { terminateWorkflow } from '$lib/services/workflow-service';
   import { settings } from '$lib/stores/settings';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 

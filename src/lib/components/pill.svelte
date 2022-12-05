@@ -46,6 +46,10 @@
     @apply border-2 border-blue-700;
   }
 
+  .lightBlue.active {
+    @apply border-2 border-gray-900 bg-blue-50 text-gray-900;
+  }
+
   .green {
     @apply bg-green-100 text-green-700;
   }

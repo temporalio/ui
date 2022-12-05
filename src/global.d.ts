@@ -119,6 +119,7 @@ type DataEncoderStatus = 'notRequested' | 'success' | 'error';
 
 type Color =
   | 'blue'
+  | 'lightBlue'
   | 'blueGray'
   | 'gray'
   | 'orange'
