@@ -24,8 +24,8 @@
   let store = createPaginationStore();
   let error: any;
 
-  let arrowLeft = false;
-  let arrowRight = false;
+  let arrowLeftActive = false;
+  let arrowRightActive = false;
 
   $: nextIndex = $store.nextIndex;
   $: pageSize = $store.pageSize;
@@ -66,7 +66,6 @@
   }
 
   $: {
-    console.log('Page change');
     onPageChange(nextIndex);
   }
   $: reset, onPageSizeChange(pageSize);
@@ -76,10 +75,10 @@
   function handleKeydown(event) {
     switch (event.key) {
       case 'ArrowRight':
-        arrowRight = true;
+        arrowRightActive = true;
         setTimeout(() => {
-          arrowRight = false;
-        }, 300);
+          arrowRightActive = false;
+        }, 100);
         if ($store.hasNext && !$store.loading) {
           store.nextPage();
         }
@@ -87,10 +86,10 @@
       case 'ArrowLeft':
         if ($store.hasPrevious && !$store.loading) {
           store.previousPage();
-          arrowLeft = true;
+          arrowLeftActive = true;
           setTimeout(() => {
-            arrowLeft = false;
-          }, 300);
+            arrowLeftActive = false;
+          }, 100);
           if ($store.nextIndex === 0 && onPageReset) {
             onPageReset();
           }
@@ -152,6 +151,7 @@
           >
             <span
               class="arrow arrow-left"
+              class:arrow-left-active={arrowLeftActive}
               class:arrow-left-disabled={!$store.hasPrevious}
             />
           </button>
@@ -170,6 +170,7 @@
           >
             <span
               class="arrow arrow-right"
+              class:arrow-right-active={arrowRightActive}
               class:arrow-right-disabled={!$store.hasNext}
             />
           </button>
@@ -253,9 +254,15 @@
   }
 
   .arrow-right {
-    @apply right-0;
     border-width: 6px 0 6px 12px;
     border-color: transparent transparent transparent #18181b;
+  }
+
+  .arrow-left-active {
+    border-color: transparent #e9d5ff transparent transparent;
+  }
+  .arrow-right-active {
+    border-color: transparent transparent transparent #e9d5ff;
   }
 
   .arrow-right-disabled {
@@ -263,7 +270,7 @@
   }
 
   .caret {
-    @apply relative text-gray-500;
+    @apply relative text-gray-500 rounded-full;
     width: 12px;
     height: 12px;
   }

@@ -146,5 +146,13 @@ export function createPaginationStore(): PaginationStore {
       update((store) => {
         return { ...store, index: 0, nextIndex: 0, updating: true };
       }),
+    nextRow: () =>
+      update((store) => {
+        return { ...store, activeRow: store.activeRow + 1 };
+      }),
+    previousRow: () =>
+      update((store) => {
+        return { ...store, activeRow: store.activeRow - 1 };
+      }),
   };
 }

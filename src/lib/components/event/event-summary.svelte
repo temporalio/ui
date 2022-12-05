@@ -33,8 +33,6 @@
   const onPageReset = () => {
     $refresh = Date.now();
   };
-
-  console.log('RENDERING');
 </script>
 
 <ApiPagination
