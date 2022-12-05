@@ -24,6 +24,9 @@
   let store = createPaginationStore();
   let error: any;
 
+  let arrowLeft = false;
+  let arrowRight = false;
+
   $: nextIndex = $store.nextIndex;
   $: pageSize = $store.pageSize;
 
@@ -73,6 +76,10 @@
   function handleKeydown(event) {
     switch (event.key) {
       case 'ArrowRight':
+        arrowRight = true;
+        setTimeout(() => {
+          arrowRight = false;
+        }, 300);
         if ($store.hasNext && !$store.loading) {
           store.nextPage();
         }
@@ -80,6 +87,10 @@
       case 'ArrowLeft':
         if ($store.hasPrevious && !$store.loading) {
           store.previousPage();
+          arrowLeft = true;
+          setTimeout(() => {
+            arrowLeft = false;
+          }, 300);
           if ($store.nextIndex === 0 && onPageReset) {
             onPageReset();
           }

@@ -97,7 +97,8 @@ class:header-hidden-responsive={typedError}
         <Button
           thin
           icon={expandAll ? 'chevron-up' : 'chevron-down'}
-          on:click={handleChange}>Expand all</Button
+          on:click={handleChange}
+          >{expandAll ? 'Collapse all' : 'Expand All'}</Button
         >
       </div>
     </th>

@@ -31,7 +31,7 @@
   };
 </script>
 
-<DropdownMenu value={_value} left>
+<DropdownMenu value={_value} left icon="filter">
   <svelte:fragment slot="label">{label}</svelte:fragment>
   <div class="w-56">
     {#each options as { label, option } (option)}
