@@ -16,11 +16,13 @@
 
   const dispatch = createEventDispatcher<{
     terminateWorkflows: undefined;
+    cancelWorkflows: undefined;
     toggleAll: { checked: boolean };
     togglePage: { checked: boolean; visibleWorkflows: WorkflowExecution[] };
   }>();
 
   export let bulkActionsEnabled: boolean = false;
+  export let cancelEnabled: boolean = false;
   export let updating: boolean = false;
   export let visibleWorkflows: WorkflowExecution[];
   export let selectedWorkflowsCount: number;
@@ -33,6 +35,10 @@
 
   const handleBulkTerminate = () => {
     dispatch('terminateWorkflows');
+  };
+
+  const handleBulkCancel = () => {
+    dispatch('cancelWorkflows');
   };
 
   const handleSelectAll = (event: MouseEvent | KeyboardEvent) => {
@@ -55,7 +61,7 @@
 
   let coreUser = coreUserStore();
 
-  $: terminateDisabled = $coreUser.namespaceWriteDisabled(
+  $: namespaceWriteDisabled = $coreUser.namespaceWriteDisabled(
     $page.params.namespace,
   );
 
@@ -107,18 +113,27 @@
               >)
             </span>
           {/if}
-          <BulkActionButton
-            class="ml-4"
-            dataCy="bulk-terminate-button"
-            disabled={terminateDisabled}
-            on:click={handleBulkTerminate}>Terminate</BulkActionButton
-          >
+          <div class="ml-4 inline-flex gap-2">
+            {#if cancelEnabled}
+              <BulkActionButton
+                dataCy="bulk-cancel-button"
+                disabled={namespaceWriteDisabled}
+                on:click={handleBulkCancel}
+                >Request Cancellation</BulkActionButton
+              >
+            {/if}
+            <BulkActionButton
+              variant="destructive"
+              dataCy="bulk-terminate-button"
+              disabled={namespaceWriteDisabled}
+              on:click={handleBulkTerminate}>Terminate</BulkActionButton
+            >
+          </div>
         </th>
         <th class="table-cell md:w-60 xl:w-auto" />
-        <th class="hidden md:table-cell md:w-60 xl:w-80" />
+        <th class="table-cell md:w-60 xl:w-80" />
         <th class="hidden xl:table-cell xl:w-60" />
         <th class="hidden xl:table-cell xl:w-60" />
-        <th class="table-cell md:hidden" />
       {:else}
         <th class="table-cell w-48"
           ><div class="flex items-center gap-1">

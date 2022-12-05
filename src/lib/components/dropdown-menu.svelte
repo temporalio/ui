@@ -86,11 +86,7 @@
       </div>
     {/if}
     {#if value}
-      <span
-        in:scale={{ duration: 200, start: 0.65 }}
-        out:scale={{ duration: 100, start: 0.65 }}
-        class="dot"
-      />
+      <span in:scale={{ duration: 200, start: 0.65 }} class="dot" />
     {/if}
   </div>
 </Tooltip>

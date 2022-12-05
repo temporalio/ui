@@ -14,6 +14,7 @@ import {
   isUnauthorized,
 } from '$lib/utilities/handle-error';
 import { noop } from 'svelte/internal';
+import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;
@@ -30,6 +31,12 @@ type CancelWorkflowExecutionParameters = {
   namespace: string;
   workflowId: string;
   runId: string;
+};
+
+type TerminateWorkflowOptions = {
+  workflow: WorkflowExecution;
+  namespace: string;
+  reason: string;
 };
 
 export type FetchWorkflow =
@@ -171,10 +178,27 @@ export async function fetchWorkflow(
   return requestFromAPI(route, { request }).then(toWorkflowExecution);
 }
 
-export const cancelWorkflow = async (
+export async function terminateWorkflow({
+  workflow,
+  namespace,
+  reason,
+}: TerminateWorkflowOptions): Promise<null> {
+  const route = await routeForApi('workflow.terminate', {
+    namespace,
+    workflowId: workflow.id,
+    runId: workflow.runId,
+  });
+  return await requestFromAPI<null>(route, {
+    options: { method: 'POST', body: stringifyWithBigInt({ reason }) },
+    shouldRetry: false,
+    notifyOnError: false,
+  });
+}
+
+export async function cancelWorkflow(
   { namespace, workflowId, runId }: CancelWorkflowExecutionParameters,
   request = fetch,
-) => {
+) {
   const route = await routeForApi('workflow.cancel', {
     namespace,
     workflowId,
@@ -188,7 +212,7 @@ export const cancelWorkflow = async (
       method: 'POST',
     },
   });
-};
+}
 
 export async function fetchWorkflowForSchedule(
   parameters: GetWorkflowExecutionRequest,
