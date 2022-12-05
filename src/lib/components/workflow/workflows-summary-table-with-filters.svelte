@@ -134,7 +134,6 @@
         <th class="table-cell md:w-60 xl:w-80" />
         <th class="hidden xl:table-cell xl:w-60" />
         <th class="hidden xl:table-cell xl:w-60" />
-        <th class="table-cell md:hidden" />
       {:else}
         <th class="table-cell w-48"
           ><div class="flex items-center gap-1">
