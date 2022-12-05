@@ -56,6 +56,12 @@
     }
   }
 
+  $: {
+    if (!$workflowFilters.length && !$workflowSorts.length) {
+      $workflowsQuery = '';
+    }
+  }
+
   onMount(() => {
     $lastUsedNamespace = $page.params.namespace;
     if (query) {
