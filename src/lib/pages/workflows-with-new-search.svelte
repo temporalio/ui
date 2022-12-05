@@ -337,8 +337,8 @@
       />
     {:else}
       <TableRow>
-        <td class="hidden xl:table-cell" />
-        <td colspan={bulkActionsEnabled ? 4 : 3}>
+        <td colspan={bulkActionsEnabled ? 2 : 1} class="hidden xl:table-cell" />
+        <td colspan="3">
           {#if $loading}
             <Loading />
           {:else}
