@@ -132,7 +132,7 @@ export async function getPaginatedEvents({
         {
           request: fetch,
           params: {
-            maximumPageSize: '300',
+            maximumPageSize: pageSize.toString(),
             nextPageToken: token,
           },
         },
