@@ -1,7 +1,7 @@
 <script lang="ts">
   import Icon from '$holocene/icon/icon.svelte';
   import Badge from '$holocene/badge.svelte';
-  import type { IconName } from '../icon/paths';
+  import type { IconName } from './icon/paths';
   import type { HoloceneComponentProps } from 'src/types/holocene';
 
   interface $$Props extends HoloceneComponentProps<'div'> {

@@ -17,7 +17,7 @@
   import WorkflowTypedError from '$lib/components/workflow/workflow-typed-error.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
-  import Accordion from '$lib/holocene/accordion';
+  import Accordion from '$lib/holocene/accordion.svelte';
   import { timeFormat } from '$lib/stores/time-format';
   import { exportHistory } from '$lib/utilities/export-history';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';

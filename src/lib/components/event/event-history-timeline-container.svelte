@@ -4,7 +4,7 @@
   import { workflowRun, refresh } from '$lib/stores/workflow-run';
   import { timelineEvents } from '$lib/stores/events';
 
-  import Accordion from '$lib/holocene/accordion';
+  import Accordion from '$lib/holocene/accordion.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Icon from '$holocene/icon/icon.svelte';
   import {
