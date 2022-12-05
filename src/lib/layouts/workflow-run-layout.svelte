@@ -9,7 +9,7 @@
   import { onDestroy, onMount } from 'svelte';
   import { eventFilterSort, EventSortOrder } from '$lib/stores/event-view';
 
-  export let cancelEnabled: boolean = true;
+  export let cancelEnabled: boolean = false;
 
   onMount(() => {
     const sort = $page.url.searchParams.get('sort');
