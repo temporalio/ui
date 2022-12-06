@@ -121,8 +121,8 @@
       {/if}
     </p>
   </td>
-  <td class="table-cell text-right text-sm font-normal xl:text-left">
-    <div tabindex="0" class="flex">
+  <td class="cell w-10 text-right text-sm font-normal xl:text-left">
+    <div tabindex="0" class="flex items-center">
       {#if compact && failure}
         <Icon class="mr-1.5 inline text-red-700" name="clock" />
       {/if}
@@ -142,6 +142,15 @@
         />
       {/if}
     </div>
+  </td>
+  <td class="cell links">
+    {#if !expanded && !compact}
+      <EventDetailsRow
+        {...getSingleAttributeForEvent(currentEvent)}
+        {attributes}
+        inline
+      />
+    {/if}
   </td>
   <td class="links table-cell items-center">
     <div class="flex justify-between">

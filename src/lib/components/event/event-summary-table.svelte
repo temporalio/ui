@@ -29,62 +29,6 @@
   }
 </script>
 
-<!-- <div
-class="table-header-row xl:table-header-group"
-class:header-hidden={typedError}
-data-cy="event-summary-table-header-desktop"
->
-<div class="hidden xl:table-row">
-  <div class="table-header w-14 rounded-tl-md" />
-  <div class="table-header w-80">
-    Date & Time{#if !compact}<EventDateFilter />{/if}
-  </div>
-  <div
-    bind:offsetWidth={$workflowEventsColumnWidth}
-    class="table-header relative w-1/5"
-  >
-    {title}<EventCategoryFilter />
-  </div>
-  <div class="table-header w-auto" />
-  <div class="table-header relative w-32 rounded-tr-md">
-    <input
-      class="mr-1"
-      type="checkbox"
-      name="expandAll"
-      on:change={handleChange}
-      checked={expandAll}
-    />
-    <label for="expandAll">Expand all</label>
-  </div>
-</div>
-</div>
-<div
-class="table-header-row-responsive rounded-t-md"
-class:header-hidden-responsive={typedError}
->
-<div class="table-header-responsive w-2/3">
-  Date & Time
-  {#if !compact}<EventDateFilter />{/if}
-</div>
-<div
-  bind:offsetWidth={$workflowEventsResponsiveColumnWidth}
-  class="table-header-responsive w-1/3 justify-end"
->
-  {title}<EventCategoryFilter />
-</div>
-<div class="table-header-responsive" />
-<div class="table-header-responsive min-w-fit">
-  <input
-    class="mr-1"
-    type="checkbox"
-    name="expandAll"
-    on:change={handleChange}
-    checked={expandAll}
-  />
-  <label for="expandAll">Expand all</label>
-</div>
-</div> -->
-
 <Table {updating} class="dark w-full table-fixed">
   <TableHeaderRow slot="headers">
     <th class="table-cell w-14 xl:w-10" />
