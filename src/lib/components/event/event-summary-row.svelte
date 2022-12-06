@@ -110,25 +110,27 @@
       {/if}
     </p>
   </td>
-  <td class="cell w-10 truncate text-right text-sm font-normal xl:text-left">
-    <p tabindex="0" class="event-name text-sm font-semibold md:text-base">
+  <td class="cell w-10 text-right text-sm font-normal xl:text-left">
+    <div tabindex="0" class="flex items-center">
       {#if compact && failure}
-        <Icon class="inline align-top text-red-700" name="clock" />
+        <Icon class="mr-1.5 inline text-red-700" name="clock" />
       {/if}
       {#if compact && canceled}
-        <Icon class="inline align-top text-yellow-700" name="clock" />
+        <Icon class="mr-1.5 inline text-yellow-700" name="clock" />
       {/if}
       {#if compact && terminated}
-        <Icon class="inline align-top text-pink-700" name="clock" />
+        <Icon class="mr-1.5 inline text-pink-700" name="clock" />
       {/if}
-      {isLocalActivityMarkerEvent(event) ? 'LocalActivity' : event.name}
+      <p class="event-name truncate text-sm font-semibold md:text-base">
+        {isLocalActivityMarkerEvent(event) ? 'LocalActivity' : event.name}
+      </p>
       {#if compact}
         <Icon
-          class="ml-1.5 inline align-top"
+          class="ml-1.5 inline"
           name={expanded ? 'chevron-up' : 'chevron-down'}
         />
       {/if}
-    </p>
+    </div>
   </td>
   <td class="cell links">
     {#if !expanded && !compact}
