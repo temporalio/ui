@@ -119,6 +119,24 @@ export const decodeAllPotentialPayloadsWithCodec = async (
           JSONPayload = payloads.map(decodePayload);
         }
         anyAttributes[key] = JSONPayload;
+      } else if (key === 'encodedAttributes') {
+        // Can expand if more fields have single payload
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let JSONPayload: string | Payload | Record<any, any>;
+        const payload = anyAttributes[key];
+        if (settings?.codec?.endpoint) {
+          // Convert Payload data
+          const awaitData = await convertPayloadsWithCodec({
+            payloads: { payloads: [payload] },
+            namespace,
+            settings,
+            accessToken,
+          });
+          JSONPayload = decodePayload(awaitData?.payloads[0]);
+        } else {
+          JSONPayload = decodePayload(payload);
+        }
+        anyAttributes[key] = JSONPayload;
       } else if (typeof anyAttributes[key] === 'object') {
         anyAttributes[key] = await decodeAllPotentialPayloadsWithCodec(
           anyAttributes[key],
@@ -143,6 +161,7 @@ export const decodeAllPotentialPayloadsWithWebsockets = async (
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let JSONPayload: string | Payload | Record<any, any>;
         const payloads = anyAttributes[key];
+
         if (ws?.hasWebsocket) {
           // Convert Payload data
           const awaitData = await Promise.all(
@@ -154,6 +173,22 @@ export const decodeAllPotentialPayloadsWithWebsockets = async (
           JSONPayload = awaitData;
         } else {
           JSONPayload = payloads.map(decodePayload);
+        }
+        anyAttributes[key] = JSONPayload;
+      } else if (key === 'encodedAttributes') {
+        // Can expand if more fields have single payload
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let JSONPayload: string | Payload | Record<any, any>;
+        const payload = anyAttributes[key];
+        if (ws?.hasWebsocket) {
+          // Convert Payload data
+          const awaitData = await convertPayloadWithWebsocket(
+            payload,
+            ws.websocket,
+          );
+          JSONPayload = awaitData;
+        } else {
+          JSONPayload = decodePayload(payload);
         }
         anyAttributes[key] = JSONPayload;
       } else if (typeof anyAttributes[key] === 'object') {
