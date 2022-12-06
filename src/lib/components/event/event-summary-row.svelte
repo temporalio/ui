@@ -17,7 +17,6 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
-  import { getTruncatedWord } from '$lib/utilities/get-truncated-word';
 
   import EventDetailsRow from './event-details-row.svelte';
   import EventDetailsFull from './event-details-full.svelte';
@@ -122,10 +121,7 @@
       {#if compact && terminated}
         <Icon class="inline align-top text-pink-700" name="clock" />
       {/if}
-      {getTruncatedWord(
-        isLocalActivityMarkerEvent(event) ? 'LocalActivity' : event.name,
-        truncateWidth,
-      )}
+      {isLocalActivityMarkerEvent(event) ? 'LocalActivity' : event.name}
       {#if compact}
         <Icon
           class="ml-1.5 inline align-top"
