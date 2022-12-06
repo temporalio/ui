@@ -34,14 +34,16 @@ export function decodePayload(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Payload | Record<any, any> | string {
   const encoding = atob(String(payload?.metadata?.encoding ?? ''));
-  // Help users out with an english encoding
-  (payload.metadata.encodingDecoded as unknown as string) = encoding;
+  if (payload?.metadata) {
+    // Help users out with an english encoding
+    (payload.metadata.encodingDecoded as unknown as string) = encoding;
 
-  if (encoding.startsWith('json/')) {
-    try {
-      return parseWithBigInt(atob(String(payload.data)));
-    } catch (_e) {
-      // Couldn't correctly decode this just let the user deal with the data as is
+    if (encoding?.startsWith('json/')) {
+      try {
+        return parseWithBigInt(atob(String(payload?.data ?? '')));
+      } catch (_e) {
+        // Couldn't correctly decode this just let the user deal with the data as is
+      }
     }
   }
 
@@ -119,7 +121,7 @@ export const decodeAllPotentialPayloadsWithCodec = async (
           JSONPayload = payloads.map(decodePayload);
         }
         anyAttributes[key] = JSONPayload;
-      } else if (key === 'encodedAttributes') {
+      } else if (key === 'encodedAttributes' && anyAttributes[key]) {
         // Can expand if more fields have single payload
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let JSONPayload: string | Payload | Record<any, any>;
@@ -175,7 +177,7 @@ export const decodeAllPotentialPayloadsWithWebsockets = async (
           JSONPayload = payloads.map(decodePayload);
         }
         anyAttributes[key] = JSONPayload;
-      } else if (key === 'encodedAttributes') {
+      } else if (key === 'encodedAttributes' && anyAttributes[key]) {
         // Can expand if more fields have single payload
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let JSONPayload: string | Payload | Record<any, any>;
