@@ -3,6 +3,8 @@ import { describe, expect, it, afterEach } from 'vitest';
 import {
   decodePayload,
   decodePayloadAttributes,
+  decodeAllPotentialPayloadsWithCodec,
+  decodeAllPotentialPayloadsWithWebsockets,
   convertPayloadToJsonWithWebsocket,
   convertPayloadToJsonWithCodec,
 } from './decode-payload';
@@ -14,6 +16,7 @@ import {
   dataConvertedWorkflowStartedEvent,
   workflowStartedEvent,
   workflowStartedHistoryEvent,
+  getTestPayloadEvent,
 } from './decode-payload-test-fixtures';
 import WS from 'jest-websocket-mock';
 import {
@@ -80,27 +83,51 @@ const JsonObjectEncoded = {
   data: 'eyAiVHJhbnNmb3JtZXIiOiAiT3B0aW11c1ByaW1lIiB9',
 };
 
+const JsonObjectDecoded = { Transformer: 'OptimusPrime' };
+
 describe('decodePayload', () => {
   it('Should not decode a payload with encoding binary/encrypted', () => {
     expect(decodePayload(WebDecodePayload)).toEqual(WebDecodePayload);
   });
-
   it('Should not decode a payload with encoding binary/encrypted', () => {
     expect(decodePayload(BinaryNullEncodedNoData)).toEqual(
       BinaryNullEncodedNoData,
     );
   });
-
   it('Should decode a payload with encoding json/plain', () => {
     expect(decodePayload(JsonPlainEncoded)).toEqual(Base64Decoded);
   });
-
   it('Should decode a payload with encoding json/foo', () => {
     expect(decodePayload(JsonFooEncoded)).toEqual(Base64Decoded);
   });
-
   it('Should decode a payload with encoding json/protobuf', () => {
     expect(decodePayload(ProtobufEncoded)).toEqual(Base64Decoded);
+  });
+  it('Should decode a json payload with encoding json/plain', () => {
+    expect(decodePayload(JsonObjectEncoded)).toEqual(JsonObjectDecoded);
+  });
+});
+
+describe('decode all potential payloads', () => {
+  it('Should decode a payload with codec endpoint with encoding json/plain`', async () => {
+    const event = await decodeAllPotentialPayloadsWithCodec(
+      getTestPayloadEvent(),
+      'default',
+      {},
+      '',
+    );
+    expect(event.input).toEqual({ payloads: ['test@test.com'] });
+    expect(event.encodedAttributes).toEqual('a test attribute');
+    expect(event.details.detail1).toEqual({ payloads: [{ test: 'detail' }] });
+  });
+  it('Should decode a payload with websockets with encoding json/plain`', async () => {
+    const event = await decodeAllPotentialPayloadsWithWebsockets(
+      getTestPayloadEvent(),
+      {},
+    );
+    expect(event.input).toEqual({ payloads: ['test@test.com'] });
+    expect(event.encodedAttributes).toEqual('a test attribute');
+    expect(event.details.detail1).toEqual({ payloads: [{ test: 'detail' }] });
   });
 });
 
@@ -122,7 +149,7 @@ describe('convertPayloadToJsonWithWebsocket', () => {
         ws.send(
           stringifyWithBigInt({
             requestId: dataz.requestId,
-            content: { Transformer: 'OptimusPrime' },
+            content: 'test@test.com',
           }),
         );
       } catch (e) {
@@ -189,7 +216,7 @@ describe('convertPayloadToJsonWithCodec', () => {
   it('Should convert a payload through data-converter and set the success status when the endpoint is set and the endpoint connects', async () => {
     vi.stubGlobal('fetch', async () => {
       return {
-        json: () => Promise.resolve({ payloads: [JsonObjectEncoded] }),
+        json: () => Promise.resolve({ payloads: [JsonPlainEncoded] }),
       };
     });
 
@@ -260,7 +287,7 @@ describe('getEventAttributes', () => {
   it('Should convert a payload through data-converter and set the success status when the endpoint is set locally and the endpoint connects', async () => {
     vi.stubGlobal('fetch', async () => {
       return {
-        json: () => Promise.resolve({ payloads: [JsonObjectEncoded] }),
+        json: () => Promise.resolve({ payloads: [JsonPlainEncoded] }),
       };
     });
 
@@ -287,7 +314,7 @@ describe('getEventAttributes', () => {
     // tslint:disable-next-line
     vi.stubGlobal('fetch', async () => {
       return {
-        json: () => Promise.resolve({ payloads: [JsonObjectEncoded] }),
+        json: () => Promise.resolve({ payloads: [JsonPlainEncoded] }),
       };
     });
 
