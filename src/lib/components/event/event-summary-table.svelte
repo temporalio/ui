@@ -43,7 +43,7 @@
       </div>
       <div
         bind:offsetWidth={$workflowEventsColumnWidth}
-        class="table-header relative w-1/5"
+        class="table-header relative {compact ? 'w-3/5' : 'w-1/5'}"
       >
         {title}<EventCategoryFilter />
       </div>
@@ -64,7 +64,7 @@
     class="table-header-row-responsive rounded-t-md"
     class:header-hidden-responsive={typedError}
   >
-    <div class="table-header-responsive w-2/3">
+    <div class="table-header-responsive w-1/3">
       Date & Time
       {#if !compact}<EventDateFilter />{/if}
     </div>
