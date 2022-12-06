@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Table from '$lib/holocene/table/table.svelte';
   import {
     eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsCanceled,
@@ -11,47 +12,46 @@
   export let onGroupClick: (id: string) => void;
 </script>
 
-<div class="w-full border-gray-700 lg:w-1/3">
-  <table class="w-full table-fixed">
+<div class="w-full border-r-2 border-gray-700 lg:w-1/3">
+  <Table class="w-full table-fixed pb-2">
     {#each [...eventGroup.events].reverse() as [id, eventInGroup] (id)}
       <tr
         class="row"
         class:active={id === selectedId}
         on:click|preventDefault|stopPropagation={() => onGroupClick(id)}
       >
-        <td class="cell table-cell">
-          <div class="flex gap-2 text-left">
-            <p class="mx-1 text-sm text-gray-500 md:text-base">{id}</p>
-            <p
-              class="truncate text-sm md:text-base"
-              class:active={id === selectedId}
-              class:failure={eventOrGroupIsFailureOrTimedOut(eventInGroup)}
-              class:canceled={eventOrGroupIsCanceled(eventInGroup)}
-              class:terminated={eventOrGroupIsTerminated(eventInGroup)}
-            >
-              {isLocalActivityMarkerEvent(eventInGroup)
-                ? 'LocalActivity'
-                : eventInGroup.eventType}
-            </p>
-          </div>
+        <td class="w-1/12" />
+        <td class="table-cell w-24 text-left">
+          <p class="truncate text-sm text-gray-500 md:text-base">{id}</p>
         </td>
+        <td class="table-cell pr-2 text-left">
+          <p
+            class="truncate text-sm md:text-base"
+            class:active={id === selectedId}
+            class:failure={eventOrGroupIsFailureOrTimedOut(eventInGroup)}
+            class:canceled={eventOrGroupIsCanceled(eventInGroup)}
+            class:terminated={eventOrGroupIsTerminated(eventInGroup)}
+          >
+            {isLocalActivityMarkerEvent(eventInGroup)
+              ? 'LocalActivity'
+              : eventInGroup.eventType}
+          </p>
+        </td>
+        <td />
       </tr>
     {/each}
-  </table>
+  </Table>
 </div>
 
 <style lang="postcss">
   .row {
-    @apply table-row h-12;
+    @apply table-row;
   }
   .row:hover {
     @apply cursor-pointer bg-gradient-to-b from-blue-100 to-purple-100;
   }
   .active.row {
     @apply bg-blue-50;
-  }
-  .cell {
-    @apply border-b-2 border-gray-700 px-3 py-1 leading-4;
   }
   .failure {
     @apply text-red-700;

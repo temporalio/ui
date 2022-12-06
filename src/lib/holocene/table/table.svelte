@@ -76,6 +76,10 @@
           @apply px-1;
         }
 
+        &:first-child:is(.expanded-cell) {
+          @apply px-0;
+        }
+
         &:last-child {
           @apply w-0 border-r border-gray-300 p-0;
         }
@@ -91,6 +95,21 @@
 
           &:last-child {
             @apply rounded-br-lg;
+          }
+        }
+      }
+
+      tbody :global {
+        td {
+          &:first-child {
+            &:first-child {
+              @apply rounded-bl-none;
+            }
+          }
+          &:last-child {
+            &:last-child {
+              @apply rounded-br-none;
+            }
           }
         }
       }
@@ -128,6 +147,18 @@
       &:last-child {
         td {
           @apply border-b-2 border-gray-900;
+        }
+      }
+      tbody :global {
+        td {
+          @apply border-t-0;
+
+          &:first-child {
+            @apply border-l-0;
+          }
+          &:last-child {
+            @apply border-r-0;
+          }
         }
       }
     }
