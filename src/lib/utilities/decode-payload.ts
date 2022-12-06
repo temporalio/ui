@@ -34,16 +34,15 @@ export function decodePayload(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Payload | Record<any, any> | string {
   const encoding = atob(String(payload?.metadata?.encoding ?? ''));
-  if (payload?.metadata) {
-    // Help users out with an english encoding
-    (payload.metadata.encodingDecoded as unknown as string) = encoding;
 
-    if (encoding?.startsWith('json/')) {
-      try {
-        return parseWithBigInt(atob(String(payload?.data ?? '')));
-      } catch (_e) {
-        // Couldn't correctly decode this just let the user deal with the data as is
-      }
+  // Help users out with an english encoding
+  (payload.metadata.encodingDecoded as unknown as string) = encoding;
+
+  if (encoding?.startsWith('json/')) {
+    try {
+      return parseWithBigInt(atob(String(payload?.data ?? '')));
+    } catch (_e) {
+      // Couldn't correctly decode this just let the user deal with the data as is
     }
   }
 
