@@ -110,7 +110,7 @@
       {/if}
     </p>
   </td>
-  <td class="cell w-10 text-right text-sm font-normal xl:text-left">
+  <td class="cell w-10 truncate text-right text-sm font-normal xl:text-left">
     <p tabindex="0" class="event-name text-sm font-semibold md:text-base">
       {#if compact && failure}
         <Icon class="inline align-top text-red-700" name="clock" />
