@@ -117,11 +117,12 @@ export async function getPaginatedEvents({
   workflowId,
   runId,
   sort,
+  compact
 }): Promise<
   () => Promise<{ items: HistoryEvent[]; nextPageToken: Uint8Array | string }>
 > {
   return async (pageSize = 100, token = '') => {
-    const descendingRoute = await routeForApi(`events.${sort}`, {
+    const descendingRoute = await routeForApi(compact ? 'events.ascending' : `events.${sort}`, {
       namespace,
       workflowId,
       runId,
