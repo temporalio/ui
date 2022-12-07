@@ -1,16 +1,16 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
 
-  import {
-    workflowEventsColumnWidth,
-    workflowEventsResponsiveColumnWidth,
-  } from '$lib/stores/column-width';
   import EventCategoryFilter from '$lib/components/event/event-category-filter.svelte';
   import EventDateFilter from '$lib/components/event/event-date-filter.svelte';
   import { expandAllEvents } from '$lib/stores/event-view';
+  import Table from '$lib/holocene/table/table.svelte';
+  import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
+  import Button from '$lib/holocene/button.svelte';
 
   export let compact = false;
   export let typedError = false;
+  export let updating = false;
 
   let title = compact ? 'Event Type' : 'Workflow Events';
   let expandAll = $expandAllEvents === 'true';
@@ -18,15 +18,14 @@
   const dispatch = createEventDispatcher();
 
   function handleChange(e: Event) {
-    const { checked } = e.target as HTMLInputElement;
-    expandAll = checked;
+    expandAll = !expandAll;
     dispatch('expandAll', {
-      expanded: checked ? 'true' : 'false',
+      expanded: expandAll ? 'true' : 'false',
     });
   }
 </script>
 
-<section
+<!-- <section
   class="event-table"
   class:error-table={typedError}
   data-cy="event-summary-table"
@@ -89,7 +88,28 @@
   <div class="overflow-y-auto xl:table-row-group">
     <slot />
   </div>
-</section>
+</section> -->
+
+<Table {updating} class="dark w-full table-fixed">
+  <TableHeaderRow slot="headers">
+    <th class="table-cell w-14 xl:w-10" />
+    <th class="table-cell w-14 md:w-28">
+      {#if !compact}<EventDateFilter label="Date & Time" />{:else}Date & Time{/if}
+    </th>
+    <th class="table-cell w-44"><EventCategoryFilter label={title} /></th>
+    <th class="table-cell w-auto xl:w-80">
+      <div class="flex w-full justify-end">
+        <Button
+          thin
+          icon={expandAll ? 'chevron-up' : 'chevron-down'}
+          on:click={handleChange}
+          >{expandAll ? 'Collapse all' : 'Expand All'}</Button
+        >
+      </div>
+    </th>
+  </TableHeaderRow>
+  <slot />
+</Table>
 
 <style lang="postcss">
   .event-table {

@@ -88,17 +88,14 @@
   data-cy="event-summary-row"
   on:click|stopPropagation={onLinkClick}
 >
-  <td class="id-cell text-left">
-    <a class="mx-1 text-sm text-gray-500 md:text-base" href="#{event.id}"
-      >{event.id}</a
+  <td />
+  <td class="table-cell w-24 text-left">
+    <a class="text-sm text-gray-500 md:text-base" href="#{event.id}"
+      ><p class="truncate">{event.id}</p></a
     >
   </td>
-  <td class="cell flex w-1/4 text-left">
-    <a
-      class="mx-1 text-sm text-gray-500 md:text-base xl:hidden"
-      href="#{event.id}">{event.id}</a
-    >
-    <p class="m-0 text-sm md:text-base">
+  <td class="flex table-cell text-left">
+    <p class="pr-2 text-sm md:text-base">
       {#if showElapsed && event.id !== initialItem.id}
         {formatDistanceAbbreviated({
           start: initialItem.eventTime,
@@ -110,8 +107,8 @@
       {/if}
     </p>
   </td>
-  <td class="cell w-10 text-right text-sm font-normal xl:text-left">
-    <div tabindex="0" class="flex items-center">
+  <td class="table-cell text-right text-sm font-normal xl:text-left">
+    <div tabindex="0" class="flex">
       {#if compact && failure}
         <Icon class="mr-1.5 inline text-red-700" name="clock" />
       {/if}
@@ -141,15 +138,15 @@
       />
     {/if}
   </td>
-  <td class="cell text-right">
+  <td class="cell">
     {#if !compact}
       <Icon class="inline" name={expanded ? 'chevron-up' : 'chevron-down'} />
     {/if}
   </td>
 </tr>
 {#if expanded}
-  <tr class="expanded-row" class:typedError>
-    <td class="expanded-cell" colspan="5">
+  <tr class="table-row" class:typedError>
+    <td class="expanded-cell" colspan="6">
       <EventDetailsFull
         event={currentEvent}
         {compact}
@@ -162,7 +159,7 @@
 
 <style lang="postcss">
   .row {
-    @apply flex flex-wrap items-center border-b-2 border-gray-700 text-sm no-underline last-of-type:border-b-0 xl:table-row xl:py-3 xl:text-base;
+    @apply flex table-row flex-wrap items-center border-gray-900 text-sm no-underline xl:py-3 xl:text-base;
   }
 
   .row:hover {
@@ -200,26 +197,12 @@
     @apply text-pink-700;
   }
 
-  .cell {
-    @apply border-gray-700 px-3 pt-1 pb-0 leading-4 xl:table-cell xl:border-b-2;
-    flex: 40%;
-  }
-
-  .id-cell {
-    @apply hidden border-gray-700 py-1 px-3 leading-4 xl:table-cell xl:border-b-2;
-  }
-
-  .row:last-of-type .cell,
-  .row:last-of-type .id-cell {
-    @apply border-b-0 first-of-type:rounded-bl-lg  last-of-type:rounded-br-lg;
-  }
-
   .expanded-row {
     @apply block xl:table-row xl:border-b-2 xl:border-gray-700;
   }
 
   .expanded-cell {
-    @apply flex w-full flex-wrap border-b-2 border-gray-700 text-sm no-underline xl:table-cell xl:text-base;
+    @apply flex table-cell w-full flex-wrap text-sm no-underline xl:text-base;
   }
 
   .typedError .expanded-cell {
@@ -231,10 +214,5 @@
     &.expanded {
       @apply rounded-b-none;
     }
-  }
-
-  .typedError .cell,
-  .typedError .id-cell {
-    @apply first-of-type:rounded-tl-lg  last-of-type:rounded-tr-lg;
   }
 </style>

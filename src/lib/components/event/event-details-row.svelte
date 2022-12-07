@@ -29,7 +29,7 @@
 </script>
 
 <article
-  class="flex flex-row gap-2 border-b-2 border-gray-200 py-2 first:pt-0 last:border-b-0 xl:gap-4 {$$props.class}"
+  class="flex flex-row gap-2 first:pt-0 last:border-b-0 xl:gap-4 {$$props.class}"
 >
   {#if typeof value === 'object'}
     <p class="min-w-fit items-center text-sm xl:items-start">
