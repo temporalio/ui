@@ -143,15 +143,6 @@
       {/if}
     </div>
   </td>
-  <td class="cell links">
-    {#if !expanded && !compact}
-      <EventDetailsRow
-        {...getSingleAttributeForEvent(currentEvent)}
-        {attributes}
-        inline
-      />
-    {/if}
-  </td>
   <td class="links table-cell items-center">
     <div class="flex justify-between">
       <div class="invisible w-full md:visible">
