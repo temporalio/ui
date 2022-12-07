@@ -6,8 +6,13 @@
   export let rows: number = 5;
   export let spellcheck: boolean = null;
   export let value: string;
+  export let label: string = null;
+  export let id: string = null;
 </script>
 
+{#if label}
+  <label class="font-secondary text-sm font-medium" for={id}>{label}</label>
+{/if}
 <textarea
   class="font-mono min-h-fit w-full rounded border border-gray-900 py-2 px-3 text-sm"
   class:error={!isValid}
@@ -16,6 +21,7 @@
   {placeholder}
   {rows}
   {spellcheck}
+  {id}
   on:input
   on:change
   on:focus

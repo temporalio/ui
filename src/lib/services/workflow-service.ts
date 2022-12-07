@@ -14,7 +14,10 @@ import {
   isUnauthorized,
 } from '$lib/utilities/handle-error';
 import { noop } from 'svelte/internal';
-import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+import {
+  parseWithBigInt,
+  stringifyWithBigInt,
+} from '$lib/utilities/parse-with-big-int';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;
@@ -27,10 +30,18 @@ export type CombinedWorkflowExecutionsResponse = {
   error?: string;
 };
 
-type CancelWorkflowExecutionParameters = {
+type CancelWorkflowOptions = {
   namespace: string;
   workflowId: string;
   runId: string;
+};
+
+type SignalWorkflowOptions = {
+  namespace: string;
+  workflowId: string;
+  runId: string;
+  signalName: string;
+  input: string;
 };
 
 type TerminateWorkflowOptions = {
@@ -196,7 +207,7 @@ export async function terminateWorkflow({
 }
 
 export async function cancelWorkflow(
-  { namespace, workflowId, runId }: CancelWorkflowExecutionParameters,
+  { namespace, workflowId, runId }: CancelWorkflowOptions,
   request = fetch,
 ) {
   const route = await routeForApi('workflow.cancel', {
@@ -210,6 +221,33 @@ export async function cancelWorkflow(
     notifyOnError: false,
     options: {
       method: 'POST',
+    },
+  });
+}
+
+export async function signalWorkflow({
+  namespace,
+  workflowId,
+  runId,
+  signalName,
+  input,
+}: SignalWorkflowOptions) {
+  const route = await routeForApi('workflow.signal', {
+    namespace,
+    workflowId,
+    runId,
+  });
+
+  return requestFromAPI(route, {
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({
+        signalName,
+        input: {
+          payloads: [{ metadata: parseWithBigInt(input) }],
+        },
+      }),
     },
   });
 }

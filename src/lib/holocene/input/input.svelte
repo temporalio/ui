@@ -24,6 +24,7 @@
   export let unroundLeft: boolean = false;
   export let autoFocus = false;
   export let error = false;
+  export let required = false;
 
   function callFocus(input) {
     if (autoFocus) input.focus();
@@ -41,7 +42,9 @@
 
 <div class={$$props.class}>
   {#if label}
-    <label for={id}>{label}</label>
+    <label for={id}
+      >{label}{#if required}*{/if}</label
+    >
   {/if}
   <div
     class="input-container {theme}"
@@ -65,8 +68,9 @@
       {placeholder}
       {id}
       {name}
-      autocomplete={autocomplete ? 'on' : 'off'}
       {spellcheck}
+      {required}
+      autocomplete={autocomplete ? 'on' : 'off'}
       bind:value
       on:input
       on:change

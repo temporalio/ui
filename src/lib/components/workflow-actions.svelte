@@ -2,7 +2,10 @@
   import { tick } from 'svelte';
 
   import { refresh } from '$lib/stores/workflow-run';
-  import { terminateWorkflow } from '$lib/services/workflow-service';
+  import {
+    signalWorkflow,
+    terminateWorkflow,
+  } from '$lib/services/workflow-service';
   import { settings } from '$lib/stores/settings';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
@@ -16,6 +19,8 @@
   import Input from '$lib/holocene/input/input.svelte';
   import FeatureGuard from './feature-guard.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Textarea from '$lib/holocene/textarea.svelte';
+  import MenuDivider from '$lib/holocene/primitives/menu/menu-divider.svelte';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
@@ -23,14 +28,19 @@
   export let cancelEnabled: boolean;
 
   let reason = '';
+  let signalInput = '';
+  let signalName = '';
   let showTerminationConfirmation = false;
   let showCancellationConfirmation = false;
+  let showSignalConfirmation = false;
   let loading = false;
 
   const showTerminationModal = () => (showTerminationConfirmation = true);
   const hideTerminationModal = () => (showTerminationConfirmation = false);
   const showCancellationModal = () => (showCancellationConfirmation = true);
   const hideCancellationModal = () => (showCancellationConfirmation = false);
+  const showSignalModal = () => (showSignalConfirmation = true);
+  const hideSignalModal = () => (showSignalConfirmation = false);
 
   const handleSuccessfulTermination = async () => {
     showTerminationConfirmation = false;
@@ -82,6 +92,29 @@
     }
   };
 
+  const sendSignal = async () => {
+    try {
+      await signalWorkflow({
+        namespace,
+        workflowId: workflow.id,
+        runId: workflow.runId,
+        input: signalInput,
+        signalName,
+      });
+      toaster.push({
+        message: 'Workflow successfully signaled.',
+        yPosition: 'bottom',
+      });
+    } catch (error) {
+      toaster.push({
+        variant: 'error',
+        message: 'Error signaling workflow.',
+        yPosition: 'bottom',
+      });
+    }
+    showSignalConfirmation = false;
+  };
+
   let coreUser = coreUserStore();
 
   $: actionsDisabled =
@@ -103,6 +136,10 @@
       on:click={showCancellationModal}
       id="workflow-actions"
     >
+      <MenuItem on:click={showSignalModal} disabled={actionsDisabled}
+        >Send a Signal</MenuItem
+      >
+      <MenuDivider />
       <MenuItem
         destructive
         on:click={showTerminationModal}
@@ -159,6 +196,26 @@
         placeholder="Enter a reason"
         bind:value={reason}
       />
+    </div>
+  </Modal>
+  <Modal
+    open={showSignalConfirmation}
+    confirmText="Submit"
+    confirmDisabled={!signalName}
+    on:cancelModal={hideSignalModal}
+    on:confirmModal={sendSignal}
+  >
+    <h3 slot="title">Send a Signal</h3>
+    <div slot="content" class="flex flex-col gap-4">
+      <Input
+        id="signal-name"
+        label="Signal name"
+        required
+        bind:value={signalName}
+      />
+      <div>
+        <Textarea id="signal-input" label="Input" bind:value={signalInput} />
+      </div>
     </div>
   </Modal>
 {/if}
