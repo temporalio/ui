@@ -23,7 +23,7 @@
         <div class="w-28">
           <WorkflowStatus status={workflow.status} />
         </div>
-        <div class="w-96">
+        <div class="w-auto break-words mx-2">
           <Link
             sveltekit:prefetch
             href={routeForEventHistory({
@@ -59,6 +59,6 @@
 
 <style lang="postcss">
   .row {
-    @apply my-1 inline-flex h-10 w-full border-b-2 border-gray-300 py-1;
+    @apply my-1 inline-flex w-full items-center border-b-2 border-gray-300 py-1;
   }
 </style>
