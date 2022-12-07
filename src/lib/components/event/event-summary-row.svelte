@@ -17,7 +17,6 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
-  import { getTruncatedWord } from '$lib/utilities/get-truncated-word';
 
   import EventDetailsRow from './event-details-row.svelte';
   import EventDetailsFull from './event-details-full.svelte';
@@ -112,30 +111,26 @@
     </p>
   </td>
   <td class="cell w-10 text-right text-sm font-normal xl:text-left">
-    <p tabindex="0" class="event-name text-sm font-semibold md:text-base">
+    <div tabindex="0" class="flex items-center">
       {#if compact && failure}
-        <Icon class="inline align-top text-red-700" name="clock" />
+        <Icon class="mr-1.5 inline text-red-700" name="clock" />
       {/if}
       {#if compact && canceled}
-        <Icon class="inline align-top text-yellow-700" name="clock" />
+        <Icon class="mr-1.5 inline text-yellow-700" name="clock" />
       {/if}
       {#if compact && terminated}
-        <Icon class="inline align-top text-pink-700" name="clock" />
+        <Icon class="mr-1.5 inline text-pink-700" name="clock" />
       {/if}
-      {getTruncatedWord(
-        isLocalActivityMarkerEvent(event) ? 'LocalActivity' : event.name,
-        truncateWidth -
-          30 *
-            // account for additional width of icons
-            (compact ? (failure || canceled || terminated ? 3 : 2) : 1),
-      )}
+      <p class="event-name truncate text-sm font-semibold md:text-base">
+        {isLocalActivityMarkerEvent(event) ? 'LocalActivity' : event.name}
+      </p>
       {#if compact}
         <Icon
-          class="ml-1.5 inline align-top"
+          class="ml-1.5 inline"
           name={expanded ? 'chevron-up' : 'chevron-down'}
         />
       {/if}
-    </p>
+    </div>
   </td>
   <td class="cell links">
     {#if !expanded && !compact}

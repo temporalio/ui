@@ -23,7 +23,7 @@
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
 
-  const routeParameters = (view: EventView, eventId?: string) => ({
+  $: routeParameters = (view: EventView, eventId?: string) => ({
     namespace: $page.params.namespace,
     workflow: $workflowRun.workflow.id,
     run: $workflowRun.workflow.runId,

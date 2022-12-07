@@ -14,10 +14,9 @@ export const workflowStartedEvent = {
     payloads: [
       {
         metadata: {
-          encoding: 'YmluYXJ5L2VuY3J5cHRlZA==',
-          'encryption-key-id': '',
+          encoding: 'anNvbi9wbGFpbg==',
         },
-        data: 'jfgr8zMj+jHMPeSgxnMnUw//hBOox6L38f52OX/ftDAoJkUi/zdtl7950O6wJG68GdX0WtwmV48GaGkC04pYyCjr5E2MSi/pG/SZbIRHoqs3GmWdvcBjQIAzTElk8aqP3r0ttRynyyLe',
+        data: 'InRlc3RAdGVzdC5jb20i',
       },
     ],
   },
@@ -68,7 +67,7 @@ export const dataConvertedWorkflowStartedEvent = {
   parentWorkflowExecution: null,
   parentInitiatedEventId: '0',
   taskQueue: { name: 'background-checks-main', kind: 'Normal' },
-  input: { payloads: [{ Transformer: 'OptimusPrime' }] },
+  input: { payloads: ['test@test.com'] },
   workflowExecutionTimeout: '0s',
   workflowRunTimeout: '0s',
   workflowTaskTimeout: '10s',
@@ -111,10 +110,9 @@ export const dataConvertedFailureWorkflowStartedEvent = {
     payloads: [
       {
         metadata: {
-          encoding: 'YmluYXJ5L2VuY3J5cHRlZA==',
-          'encryption-key-id': '',
+          encoding: 'anNvbi9wbGFpbg==',
         },
-        data: 'jfgr8zMj+jHMPeSgxnMnUw//hBOox6L38f52OX/ftDAoJkUi/zdtl7950O6wJG68GdX0WtwmV48GaGkC04pYyCjr5E2MSi/pG/SZbIRHoqs3GmWdvcBjQIAzTElk8aqP3r0ttRynyyLe',
+        data: 'InRlc3RAdGVzdC5jb20i',
       },
     ],
   },
@@ -156,18 +154,7 @@ export const noRemoteDataConverterWorkflowStartedEvent = {
   parentWorkflowExecution: null,
   parentInitiatedEventId: '0',
   taskQueue: { name: 'background-checks-main', kind: 'Normal' },
-  input: {
-    payloads: [
-      {
-        metadata: {
-          encoding: 'YmluYXJ5L2VuY3J5cHRlZA==',
-          'encryption-key-id': '',
-          encodingDecoded: 'binary/encrypted',
-        },
-        data: 'jfgr8zMj+jHMPeSgxnMnUw//hBOox6L38f52OX/ftDAoJkUi/zdtl7950O6wJG68GdX0WtwmV48GaGkC04pYyCjr5E2MSi/pG/SZbIRHoqs3GmWdvcBjQIAzTElk8aqP3r0ttRynyyLe',
-      },
-    ],
-  },
+  input: { payloads: ['test@test.com'] },
   workflowExecutionTimeout: '0s',
   workflowRunTimeout: '0s',
   workflowTaskTimeout: '10s',
@@ -215,10 +202,10 @@ export const workflowStartedHistoryEvent = {
       payloads: [
         {
           metadata: {
-            encoding: 'YmluYXJ5L2VuY3J5cHRlZA==',
+            encoding: 'anNvbi9wbGFpbg==',
             'encryption-key-id': '',
           },
-          data: 'jfgr8zMj+jHMPeSgxnMnUw//hBOox6L38f52OX/ftDAoJkUi/zdtl7950O6wJG68GdX0WtwmV48GaGkC04pYyCjr5E2MSi/pG/SZbIRHoqs3GmWdvcBjQIAzTElk8aqP3r0ttRynyyLe',
+          data: 'InRlc3RAdGVzdC5jb20i',
         },
       ],
     },
@@ -262,3 +249,62 @@ export const workflowStartedHistoryEvent = {
     },
   },
 };
+
+export const getTestPayloadEvent = () => ({
+  type: 'workflowExecutionStartedEventAttributes',
+  workflowType: {
+    name: 'BackgroundCheck',
+  },
+  parentWorkflowNamespace: '',
+  parentWorkflowExecution: null,
+  parentInitiatedEventId: '0',
+  taskQueue: {
+    name: 'background-checks-main',
+    kind: 'Normal',
+  },
+  input: {
+    payloads: [
+      {
+        metadata: {
+          encoding: 'anNvbi9wbGFpbg==',
+        },
+        data: 'InRlc3RAdGVzdC5jb20i',
+      },
+    ],
+  },
+  details: {
+    detail1: {
+      payloads: [
+        {
+          metadata: {
+            encoding: 'anNvbi9wbGFpbg==',
+          },
+          data: 'eyAidGVzdCI6ICJkZXRhaWwiIH0=',
+        },
+      ],
+    },
+  },
+  encodedAttributes: {
+    metadata: {
+      encoding: 'anNvbi9wbGFpbg==',
+    },
+    data: 'ImEgdGVzdCBhdHRyaWJ1dGUi',
+  },
+  workflowExecutionTimeout: '0s',
+  workflowRunTimeout: '0s',
+  workflowTaskTimeout: '10s',
+  continuedExecutionRunId: '',
+  initiator: 'Unspecified',
+  continuedFailure: null,
+  lastCompletionResult: null,
+  originalExecutionRunId: 'b4351cb3-f54f-4ed4-be5a-b13ef429b861',
+  identity: '1@ac0cd56257aa@',
+  firstExecutionRunId: 'b4351cb3-f54f-4ed4-be5a-b13ef429b861',
+  retryPolicy: null,
+  attempt: 1,
+  workflowExecutionExpirationTime: null,
+  cronSchedule: '',
+  firstWorkflowTaskBackoff: '0s',
+  memo: null,
+  prevAutoResetPoints: null,
+});
