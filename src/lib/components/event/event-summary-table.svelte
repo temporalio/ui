@@ -7,6 +7,7 @@
   import Table from '$lib/holocene/table/table.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
   export let compact = false;
   export let typedError = false;
@@ -99,11 +100,10 @@
     <th class="table-cell w-44"><EventCategoryFilter label={title} /></th>
     <th class="table-cell w-auto xl:w-80">
       <div class="flex w-full justify-end">
-        <Button
-          thin
-          icon={expandAll ? 'chevron-up' : 'chevron-down'}
-          on:click={handleChange}
-          >{expandAll ? 'Collapse all' : 'Expand All'}</Button
+        <Button thin on:click={handleChange}
+          >{expandAll ? 'Collapse all' : 'Expand All'}<Icon
+            name={expandAll ? 'chevron-up' : 'chevron-down'}
+          /></Button
         >
       </div>
     </th>

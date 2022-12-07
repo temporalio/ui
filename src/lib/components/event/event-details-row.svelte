@@ -29,13 +29,13 @@
 </script>
 
 <article
-  class="flex flex-row gap-2 first:pt-0 last:border-b-0 xl:gap-4 {$$props.class}"
+  class="flex flex-row items-center gap-2 first:pt-0 last:border-b-0 xl:gap-4 {$$props.class}"
 >
   {#if typeof value === 'object'}
-    <p class="min-w-fit items-center text-sm xl:items-start">
+    <p class="min-w-fit text-sm">
       {format(key)}
     </p>
-    <CodeBlock content={getCodeBlockValue(value)} class="w-[95%]" {inline} />
+    <CodeBlock content={getCodeBlockValue(value)} {inline} />
   {:else if shouldDisplayAsExecutionLink(key)}
     <div class="xl:3/4 flex w-full items-center xl:items-start">
       <p class="mr-3 text-sm">{format(key)}</p>

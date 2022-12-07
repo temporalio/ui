@@ -129,7 +129,7 @@
       {/if}
     </div>
   </td>
-  <td class="cell links">
+  <td class="table-cell overflow-hidden">
     {#if !expanded && !compact}
       <EventDetailsRow
         {...getSingleAttributeForEvent(currentEvent)}
@@ -138,9 +138,11 @@
       />
     {/if}
   </td>
-  <td class="cell">
+  <td class="table-cell">
     {#if !compact}
-      <Icon class="inline" name={expanded ? 'chevron-up' : 'chevron-down'} />
+      <div class="flex justify-start">
+        <Icon class="inline" name={expanded ? 'chevron-up' : 'chevron-down'} />
+      </div>
     {/if}
   </td>
 </tr>
