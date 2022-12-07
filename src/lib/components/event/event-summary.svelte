@@ -25,21 +25,21 @@
     $expandAllEvents = event.detail.expanded;
   }
 
-  // $: {
-  //   if (nextPageToken && end > 0 && end === items.length - nextFetchBuffer) {
-  //     getPaginatedEvents({
-  //       namespace,
-  //       workflowId,
-  //       runId,
-  //       pageToken: nextPageToken,
-  //       sort: $eventFilterSort,
-  //       compact,
-  //     }).then((data) => {
-  //       items = [...items, ...data.items];
-  //       nextPageToken = data.nextPageToken;
-  //     });
-  //   }
-  // }
+  $: {
+    if (nextPageToken && end > 0 && end === items.length - nextFetchBuffer) {
+      getPaginatedEvents({
+        namespace,
+        workflowId,
+        runId,
+        pageToken: nextPageToken,
+        sort: $eventFilterSort,
+        compact,
+      }).then((data) => {
+        items = [...items, ...data.items];
+        nextPageToken = data.nextPageToken;
+      });
+    }
+  }
 
   const { namespace, workflow: workflowId, run: runId } = $page.params;
 
