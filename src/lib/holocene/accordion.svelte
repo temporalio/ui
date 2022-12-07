@@ -3,10 +3,11 @@
   import Badge from '$holocene/badge.svelte';
   import type { IconName } from './icon/paths';
   import type { HoloceneComponentProps } from 'src/types/holocene';
+  import { v4 } from 'uuid';
 
   interface $$Props extends HoloceneComponentProps<'div'> {
     title: string;
-    id: string;
+    id?: string;
     subtitle?: string;
     icon?: IconName;
     open?: boolean;
@@ -16,7 +17,7 @@
   }
 
   export let title: string;
-  export let id: string;
+  export let id: string = v4();
   export let subtitle = '';
   export let icon = null;
   export let open = false;

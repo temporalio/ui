@@ -76,12 +76,7 @@
 </script>
 
 <section class="flex w-full">
-  <Accordion
-    id="event-history-timeline-accordion"
-    title="Timeline"
-    icon="chart"
-    class="select-none border-gray-900"
-  >
+  <Accordion title="Timeline" icon="chart" class="select-none border-gray-900">
     <div
       class="mt-2 flex flex-col items-center justify-between gap-2 xl:flex-row"
     >
