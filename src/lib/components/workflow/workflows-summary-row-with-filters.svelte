@@ -85,7 +85,7 @@
     />
   </td>
   <td
-    class="relative truncate"
+    class="relative break-words pr-4"
     on:mouseover={() => (showFilterCopy = true)}
     on:focus={() => (showFilterCopy = true)}
     on:mouseleave={() => (showFilterCopy = false)}
