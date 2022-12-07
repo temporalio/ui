@@ -97,7 +97,7 @@
         {/if}
       </th>
       {#if showBulkActions}
-        <th class="w-48 overflow-visible whitespace-nowrap">
+        <th class="w-32 overflow-visible whitespace-nowrap">
           {#if allSelected}
             <span class="font-semibold"
               >All {filteredWorkflowCount} selected</span
@@ -131,11 +131,11 @@
           </div>
         </th>
         <th class="table-cell md:w-60 xl:w-auto" />
-        <th class="table-cell md:w-60 xl:w-80" />
+        <th class="table-cell xl:w-60" />
         <th class="hidden xl:table-cell xl:w-60" />
         <th class="hidden xl:table-cell xl:w-60" />
       {:else}
-        <th class="table-cell w-48"
+        <th class="table-cell w-32"
           ><div class="flex items-center gap-1">
             <ExecutionStatusDropdownFilter />
           </div>
@@ -145,7 +145,7 @@
             <WorkflowIdDropdownFilter />
           </div>
         </th>
-        <th class="table-cell md:w-60 xl:w-80">
+        <th class="table-cell xl:w-60">
           <div class="flex items-center gap-1">
             <WorkflowTypeDropdownFilter />
           </div>
@@ -167,7 +167,7 @@
 {:else}
   <Table class="w-full md:table-fixed" {updating}>
     <TableHeaderRow slot="headers">
-      <th class="table-cell w-48"
+      <th class="table-cell w-32"
         ><div class="flex items-center gap-1">
           <ExecutionStatusDropdownFilter />
         </div>
@@ -177,7 +177,7 @@
           <WorkflowIdDropdownFilter />
         </div>
       </th>
-      <th class="table-cell md:w-60 xl:w-80">
+      <th class="table-cell xl:w-60">
         <div class="flex items-center gap-1">
           <WorkflowTypeDropdownFilter />
         </div>
