@@ -12,7 +12,6 @@
 <Hst.Story layout={{ type: 'single', iframe: false }}>
   <Hst.Variant title="With a Simple Table">
     <Accordion
-      id="histoire-accordion-1"
       title="Custom Search Attributes"
       subtitle="19 custom search attributes"
     >
@@ -45,7 +44,6 @@
 
   <Hst.Variant title="A disabled Accordion">
     <Accordion
-      id="histoire-accordion-2"
       disabled
       title="Certificates"
       subtitle="Expires on Wed Feb 01, 2030"
@@ -56,7 +54,6 @@
 
   <Hst.Variant title="A read-only Accordion">
     <Accordion
-      id="histoire-accordion-3"
       readOnly
       open
       title="Certificates"
@@ -68,7 +65,6 @@
 
   <Hst.Variant title="An Accordion with an error">
     <Accordion
-      id="histoire-accordion-4"
       title="Certificates"
       subtitle="Expired on Wed Feb 01, 2030"
       error="Expired"
@@ -78,11 +74,7 @@
   </Hst.Variant>
 
   <Hst.Variant title="An Accordion with an action">
-    <Accordion
-      id="histoire-accordion-5"
-      title="Certificates"
-      subtitle="Expires on Wed Feb 01, 2030"
-    >
+    <Accordion title="Certificates" subtitle="Expires on Wed Feb 01, 2030">
       <Button class="!p-0" icon="info" variant="secondary" slot="action" />
       <p>Accordion content here.</p>
     </Accordion>
