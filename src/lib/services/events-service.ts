@@ -116,36 +116,32 @@ export async function getPaginatedEvents({
   namespace,
   workflowId,
   runId,
+  pageToken,
   sort,
   compact
-}): Promise<
-  () => Promise<{ items: HistoryEvent[]; nextPageToken: Uint8Array | string }>
-> {
-  return async (pageSize = 100, token = '') => {
-    const descendingRoute = await routeForApi(compact ? 'events.ascending' : `events.${sort}`, {
-      namespace,
-      workflowId,
-      runId,
-    });
-    const { history, nextPageToken } =
-      await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
-        descendingRoute,
-        {
-          request: fetch,
-          params: {
-            maximumPageSize: pageSize.toString(),
-            nextPageToken: token,
-          },
+}): Promise<{ items: HistoryEvent[]; nextPageToken: Uint8Array | string }> {
+  const route = await routeForApi(compact ? 'events.ascending' : `events.${sort}`, {
+    namespace,
+    workflowId,
+    runId,
+  });
+  const { history, nextPageToken } =
+    await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
+      route,
+      {
+        request: fetch,
+        params: {
+          nextPageToken: pageToken,
         },
-      );
+      },
+    );
 
-    const events = await toEventHistory({
-      response: history.events,
-      namespace,
-    });
-    return {
-      items: events,
-      nextPageToken: nextPageToken ?? '',
-    };
+  const events = await toEventHistory({
+    response: history.events,
+    namespace,
+  });
+  return {
+    items: events,
+    nextPageToken: nextPageToken ?? '',
   };
 }

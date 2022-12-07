@@ -73,24 +73,9 @@
   workflowEventsResponsiveColumnWidth.subscribe((value) => {
     if (value !== 0) truncateWidth = value;
   });
-
-  function handleKeydown(event) {
-    switch (event.code) {
-      case 'Space':
-        if (active) {
-          event.preventDefault();
-          onLinkClick();
-        }
-        break;
-      default:
-        break;
-    }
-  }
 </script>
 
-<svelte:window on:keydown={handleKeydown} />
-
-<tr
+<div
   class="row"
   id={event.id}
   class:expanded={expanded && !expandAll}
@@ -102,13 +87,12 @@
   data-cy="event-summary-row"
   on:click|stopPropagation={onLinkClick}
 >
-  <td />
-  <td class="table-cell w-24 text-left">
+  <div class="w-24 text-left">
     <a class="text-sm text-gray-500 md:text-base" href="#{event.id}"
       ><p class="truncate">{event.id}</p></a
     >
-  </td>
-  <td class="flex table-cell text-left">
+  </div>
+  <div class="flex w-auto text-left">
     <p class="pr-2 text-sm md:text-base">
       {#if showElapsed && event.id !== initialItem.id}
         {formatDistanceAbbreviated({
@@ -120,8 +104,8 @@
         {formatDate(event?.eventTime, $timeFormat)}
       {/if}
     </p>
-  </td>
-  <td class="cell w-10 text-right text-sm font-normal xl:text-left">
+  </div>
+  <div class="text-right w-96 text-sm font-normal xl:text-left">
     <div tabindex="0" class="flex items-center">
       {#if compact && failure}
         <Icon class="mr-1.5 inline text-red-700" name="clock" />
@@ -142,8 +126,8 @@
         />
       {/if}
     </div>
-  </td>
-  <td class="links table-cell items-center">
+  </div>
+  <div class="links table-cell items-center">
     <div class="flex justify-between">
       <div class="invisible w-full md:visible">
         {#if !expanded && !compact}
@@ -163,25 +147,24 @@
         {/if}
       </div>
     </div>
-  </td>
-  <td />
-</tr>
+  </div>
+</div>
 {#if expanded}
-  <tr class="table-row" class:typedError>
-    <td class="expanded-cell" colspan="6">
+  <div class="border border-gray-900 border-b-0 border-t-0 " class:typedError>
+    <div class="expanded-cell" colspan="6">
       <EventDetailsFull
         event={currentEvent}
         {compact}
         eventGroup={event}
         bind:selectedId
       />
-    </td>
-  </tr>
+    </div>
+  </div>
 {/if}
 
 <style lang="postcss">
   .row {
-    @apply flex table-row flex-wrap items-center border-gray-900 text-sm no-underline xl:py-3 xl:text-base;
+    @apply w-full flex gap-4 border border-gray-900 border-b-0 flex-wrap items-center border-gray-900 text-sm no-underline px-2 xl:py-3 xl:text-base;
   }
 
   .row:hover {
@@ -227,12 +210,8 @@
     @apply border-b-0 first-of-type:rounded-bl-lg  last-of-type:rounded-br-lg;
   }
 
-  .expanded-row {
-    @apply block xl:table-row xl:border-b-2 xl:border-gray-700;
-  }
-
   .expanded-cell {
-    @apply flex table-cell w-full flex-wrap text-sm no-underline xl:text-base;
+    @apply flex w-full flex-wrap text-sm no-underline xl:text-base;
   }
 
   .typedError .expanded-cell {

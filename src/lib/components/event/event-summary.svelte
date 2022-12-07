@@ -1,12 +1,11 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  import VirtualList from '@sveltejs/svelte-virtual-list';
 
   import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
 
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
-  import EventEmptyRow from './event-empty-row.svelte';
-  import ApiPagination from '$lib/holocene/api-pagination.svelte';
   import { getPaginatedEvents } from '$lib/services/events-service';
   import { eventHistory } from '$lib/stores/events';
   import { groupEvents } from '$lib/models/event-groups';
@@ -14,53 +13,71 @@
 
   export let compact = false;
 
+  let items = [];
+  let nextPageToken: NextPageToken = '';
+
+  let start;
+  let end;
+
+  const nextFetchBuffer = 150;
+
   function handleExpandChange(event: CustomEvent) {
     $expandAllEvents = event.detail.expanded;
   }
 
+  // $: {
+  //   if (nextPageToken && end > 0 && end === items.length - nextFetchBuffer) {
+  //     getPaginatedEvents({
+  //       namespace,
+  //       workflowId,
+  //       runId,
+  //       pageToken: nextPageToken,
+  //       sort: $eventFilterSort,
+  //       compact,
+  //     }).then((data) => {
+  //       items = [...items, ...data.items];
+  //       nextPageToken = data.nextPageToken;
+  //     });
+  //   }
+  // }
+
   const { namespace, workflow: workflowId, run: runId } = $page.params;
 
-  let fetchEvents = () => {
-    return getPaginatedEvents({
-      namespace,
-      workflowId,
-      runId,
-      sort: $eventFilterSort,
-      compact,
-    });
-  };
+  let fetchEvents = getPaginatedEvents({
+    namespace,
+    workflowId,
+    runId,
+    pageToken: nextPageToken,
+    sort: $eventFilterSort,
+    compact,
+  }).then((data) => {
+    items = data.items;
+    nextPageToken = data.nextPageToken;
+  });
 
   const onPageReset = () => {
     $refresh = Date.now();
   };
 </script>
 
-<ApiPagination
-  let:visibleItems
-  let:initialItem
-  let:updating
-  let:activeRow
-  onFetch={fetchEvents}
-  onError={(error) => console.error(error)}
-  onKeyD={() => ($eventFilterSort = 'descending')}
-  onKeyA={() => ($eventFilterSort = 'ascending')}
-  {onPageReset}
-  reset={$eventFilterSort}
-  total={$eventHistory.end[0]?.id}
-  pageSizeOptions={['100', '500', '1000']}
->
-  <EventSummaryTable {compact} on:expandAll={handleExpandChange} {updating}>
-    {#each compact ? groupEvents(visibleItems) : visibleItems as event, index (`${event.id}-${event.timestamp}`)}
+{#await fetchEvents then}
+  <EventSummaryTable {compact} on:expandAll={handleExpandChange} />
+  <div class="h-[800px]">
+    <VirtualList
+      items={compact ? groupEvents(items) : items}
+      let:item
+      bind:start
+      bind:end
+      class="timeline-list"
+    >
       <EventSummaryRow
-        {event}
+        event={item}
         {compact}
         expandAll={$expandAllEvents === 'true'}
-        {initialItem}
-        {visibleItems}
-        active={activeRow === index}
+        initialItem={null}
+        visibleItems={items}
+        active={false}
       />
-    {:else}
-      <EventEmptyRow />
-    {/each}
-  </EventSummaryTable>
-</ApiPagination>
+    </VirtualList>
+  </div>
+{/await}
