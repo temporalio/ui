@@ -6,6 +6,7 @@
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventEmptyRow from './event-empty-row.svelte';
   import Loading from '$lib/holocene/loading.svelte';
+  import { updating } from '$lib/stores/events';
 
   export let items: IterableEvents;
   export let groups: EventGroups;
@@ -26,7 +27,11 @@
     let:visibleItems
     let:initialItem
   >
-    <EventSummaryTable {compact} on:expandAll={handleExpandChange}>
+    <EventSummaryTable
+      updating={$updating}
+      {compact}
+      on:expandAll={handleExpandChange}
+    >
       {#each visibleItems as event (`${event.id}-${event.timestamp}`)}
         <EventSummaryRow
           {event}

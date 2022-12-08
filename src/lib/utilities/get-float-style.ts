@@ -2,7 +2,7 @@ export const getFloatStyle = ({
   width,
   height,
   screenWidth,
-  breakpoint = 1024,
+  breakpoint = 1279, // 'xl' max-width breakpoint in tailwindcss
 }: {
   width?: number;
   height?: number;
