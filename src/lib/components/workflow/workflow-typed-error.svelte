@@ -3,7 +3,6 @@
 
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
@@ -173,7 +172,6 @@
 </script>
 
 {#if !$updating && (title || copy)}
-  {console.log('ERROR??', title, copy)}
   <Alert icon="warning" intent="warning" {title}>
     <p>
       {copy}
