@@ -98,7 +98,7 @@
         namespace,
         workflowId: workflow.id,
         runId: workflow.runId,
-        input: signalInput,
+        signalInput,
         signalName,
       });
       toaster.push({
@@ -214,7 +214,11 @@
         bind:value={signalName}
       />
       <div>
-        <Textarea id="signal-input" label="Input" bind:value={signalInput} />
+        <span class="font-secondary text-sm font-medium">Input</span>
+        <span class="font-secondary text-xs font-light italic">
+          (only JSON payloads are supported)
+        </span>
+        <Textarea bind:value={signalInput} />
       </div>
     </div>
   </Modal>

@@ -14,10 +14,8 @@ import {
   isUnauthorized,
 } from '$lib/utilities/handle-error';
 import { noop } from 'svelte/internal';
-import {
-  parseWithBigInt,
-  stringifyWithBigInt,
-} from '$lib/utilities/parse-with-big-int';
+import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+import { btoa } from '$lib/utilities/btoa';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;
@@ -41,7 +39,7 @@ type SignalWorkflowOptions = {
   workflowId: string;
   runId: string;
   signalName: string;
-  input: string;
+  signalInput: string;
 };
 
 type TerminateWorkflowOptions = {
@@ -230,7 +228,7 @@ export async function signalWorkflow({
   workflowId,
   runId,
   signalName,
-  input,
+  signalInput,
 }: SignalWorkflowOptions) {
   const route = await routeForApi('workflow.signal', {
     namespace,
@@ -245,7 +243,16 @@ export async function signalWorkflow({
       body: stringifyWithBigInt({
         signalName,
         input: {
-          payloads: [{ metadata: parseWithBigInt(input) }],
+          payloads: signalInput
+            ? [
+                {
+                  metadata: {
+                    encoding: btoa('json/plain'),
+                  },
+                  data: btoa(stringifyWithBigInt(signalInput)),
+                },
+              ]
+            : null,
         },
       }),
     },
