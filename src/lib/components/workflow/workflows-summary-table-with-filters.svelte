@@ -130,7 +130,7 @@
             >
           </div>
         </th>
-        <th class="table-cell md:w-60 xl:w-auto" />
+        <th class="table-cell md:w-auto" />
         <th class="table-cell xl:w-60" />
         <th class="hidden xl:table-cell xl:w-60" />
         <th class="hidden xl:table-cell xl:w-60" />
@@ -140,7 +140,7 @@
             <ExecutionStatusDropdownFilter />
           </div>
         </th>
-        <th class="table-cell md:w-60 xl:w-auto"
+        <th class="table-cell md:w-auto"
           ><div class="flex items-center gap-1">
             <WorkflowIdDropdownFilter />
           </div>
@@ -172,7 +172,7 @@
           <ExecutionStatusDropdownFilter />
         </div>
       </th>
-      <th class="table-cell md:w-60 xl:w-auto"
+      <th class="table-cell md:w-auto"
         ><div class="flex items-center gap-1">
           <WorkflowIdDropdownFilter />
         </div>
