@@ -85,16 +85,18 @@
     {updating}
   >
     <TableHeaderRow slot="headers">
-      <th class="h-10 w-12">
-        {#if !updating}
-          <Checkbox
-            id="select-visible-workflows"
-            onDark
-            {checked}
-            {indeterminate}
-            on:change={handleCheckboxChange}
-          />
-        {/if}
+      <th class="table-cell h-10 w-12">
+        <div class="w-12">
+          {#if !updating}
+            <Checkbox
+              id="select-visible-workflows"
+              onDark
+              {checked}
+              {indeterminate}
+              on:change={handleCheckboxChange}
+            />
+          {/if}
+        </div>
       </th>
       {#if showBulkActions}
         <th class="w-32 overflow-visible whitespace-nowrap">
