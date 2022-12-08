@@ -35,13 +35,13 @@
     <th class="table-cell w-auto xl:w-80">
       <div class="flex w-full justify-end">
         <button
-          class="relative flex w-28 items-center justify-between rounded"
+          class="relative flex w-28 items-center justify-end rounded sm:justify-between"
           on:click={handleChange}
         >
-          <div>{expandAll ? 'Collapse all' : 'Expand All'}</div>
-          <div class="">
-            <Icon name={expandAll ? 'chevron-up' : 'chevron-down'} />
-          </div>
+          <span class="hidden sm:block">
+            {expandAll ? 'Collapse all' : 'Expand All'}
+          </span>
+          <Icon name={expandAll ? 'chevron-up' : 'chevron-down'} />
         </button>
       </div>
     </th>
