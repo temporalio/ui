@@ -35,7 +35,7 @@
     <p class="min-w-fit text-sm">
       {format(key)}
     </p>
-    <CodeBlock content={getCodeBlockValue(value)} {inline} />
+    <CodeBlock content={getCodeBlockValue(value)} class="w-[95%]" {inline} />
   {:else if shouldDisplayAsExecutionLink(key)}
     <div class="xl:3/4 flex w-full items-center xl:items-start">
       <p class="mr-3 text-sm">{format(key)}</p>

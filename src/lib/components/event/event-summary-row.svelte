@@ -130,8 +130,8 @@
     </div>
   </td>
   <td class="flex table-cell justify-between overflow-hidden">
-    <div class="flex items-center justify-between">
-      <div class="flex justify-start">
+    <div class="flex w-full items-center justify-between">
+      <div class="grow truncate">
         {#if !expanded && !compact}
           <EventDetailsRow
             {...getSingleAttributeForEvent(currentEvent)}
@@ -141,7 +141,7 @@
           />
         {/if}
       </div>
-      <div class="flex justify-start">
+      <div>
         {#if !compact}
           <Icon
             class="inline"
