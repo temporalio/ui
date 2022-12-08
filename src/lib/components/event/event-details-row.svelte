@@ -37,14 +37,12 @@
     </p>
     <CodeBlock content={getCodeBlockValue(value)} class="w-[95%]" {inline} />
   {:else if shouldDisplayAsExecutionLink(key)}
-    <div class="flex flex-wrap gap-1">
+    <div class="flex w-full flex-wrap gap-1 pr-1">
       <p class="mr-3 truncate text-sm">{format(key)}</p>
-      <div class="text-sm">
-        <Copyable
-          content={value}
-          container-class="flex-row-reverse xl:flex-row"
-        >
+      <div class="truncate text-sm">
+        <Copyable content={value} container-class=" xl:flex-row">
           <Link
+            class="truncate"
             newTab
             href={routeForEventHistory({
               view: $eventViewType,
@@ -59,11 +57,12 @@
       </div>
     </div>
   {:else if shouldDisplayChildWorkflowLink(key, attributes)}
-    <div class="detail-row">
+    <div class="flex w-full flex-wrap  gap-1 pr-1">
       <p class="truncate text-sm">{format(key)}</p>
-      <div class="text-sm">
+      <div class="truncate text-sm">
         <Copyable content={value} container-class="xl:flex-row">
           <Link
+            class="truncate"
             newTab
             href={routeForEventHistory({
               view: $eventViewType,
@@ -78,25 +77,26 @@
       </div>
     </div>
   {:else if shouldDisplayAsTaskQueueLink(key)}
-    <div class="flex flex-wrap gap-1">
+    <div class="flex w-full flex-wrap  gap-1 pr-1">
       <p class="mr-3 truncate text-sm">{format(key)}</p>
-      <div class="text-sm">
-        <Copyable
-          content={value}
-          container-class="flex-row-reverse xl:flex-row"
-        >
-          <Link newTab href={routeForTaskQueue({ namespace, queue: value })}>
+      <div class="truncate  text-sm ">
+        <Copyable content={value} container-class="">
+          <Link
+            class="truncate"
+            newTab
+            href={routeForTaskQueue({ namespace, queue: value })}
+          >
             {value}
           </Link>
         </Copyable>
       </div>
     </div>
   {:else}
-    <div class="flex w-full flex-wrap gap-1">
+    <div class="flex w-full flex-wrap gap-1 pr-1">
       <p class="mr-3 truncate text-sm">{format(key)}</p>
       <p class="truncate text-right text-sm xl:text-left">
         <span
-          class="w-full select-all px-2 text-gray-700"
+          class="w-full select-all text-gray-700"
           class:badge={!shouldDisplayAsPlainText(key)}>{value}</span
         >
       </p>
