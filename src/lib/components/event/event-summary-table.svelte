@@ -26,8 +26,10 @@
 <Table {updating} class="dark w-full table-fixed">
   <TableHeaderRow slot="headers">
     <th class="table-cell w-14 xl:w-10" />
-    <th class="table-cell w-14 md:w-28">
-      {#if !compact}<EventDateFilter />{:else}Date & Time{/if}
+    <th class="table-cell w-16 md:w-32">
+      {#if !compact}<EventDateFilter />{:else}
+        <span class="hidden md:block">Date & Time</span>
+        <span class="block md:hidden"><Icon name="clock" /></span>{/if}
     </th>
     <th class="table-cell w-44"><EventCategoryFilter {compact} /></th>
     <th class="table-cell w-auto xl:w-80">

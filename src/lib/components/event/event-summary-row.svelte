@@ -95,7 +95,9 @@
     >
   </td>
   <td class="flex table-cell text-left">
-    <p class="pr-2 text-sm md:text-base">
+    <p
+      class="break-word truncate pr-2 text-sm md:whitespace-normal md:text-base"
+    >
       {#if showElapsed && event.id !== initialItem.id}
         {formatDistanceAbbreviated({
           start: initialItem.eventTime,
