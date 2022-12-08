@@ -29,22 +29,24 @@
 </script>
 
 <article
-  class="flex flex-row gap-2 border-b-2 border-gray-200 py-2 first:pt-0 last:border-b-0 xl:gap-4 {$$props.class}"
+  class="flex flex-row items-center gap-2 first:pt-0 last:border-b-0 xl:gap-4 {$$props.class}"
 >
   {#if typeof value === 'object'}
-    <p class="min-w-fit items-center text-sm xl:items-start">
-      {format(key)}
-    </p>
-    <CodeBlock content={getCodeBlockValue(value)} class="w-[95%]" {inline} />
+    <div
+      class="flex w-full flex-wrap items-center pr-1 xl:flex-nowrap xl:gap-4"
+    >
+      <p class="min-w-fit text-sm">
+        {format(key)}
+      </p>
+      <CodeBlock content={getCodeBlockValue(value)} class="w-[95%]" {inline} />
+    </div>
   {:else if shouldDisplayAsExecutionLink(key)}
-    <div class="xl:3/4 flex w-full items-center xl:items-start">
-      <p class="mr-3 text-sm">{format(key)}</p>
-      <div class="text-sm">
-        <Copyable
-          content={value}
-          container-class="flex-row-reverse xl:flex-row"
-        >
+    <div class="flex w-full flex-wrap gap-1 pr-1">
+      <p class="mr-3 truncate text-sm">{format(key)}</p>
+      <div class="truncate text-sm">
+        <Copyable content={value} container-class=" xl:flex-row">
           <Link
+            class="truncate"
             newTab
             href={routeForEventHistory({
               view: $eventViewType,
@@ -59,11 +61,12 @@
       </div>
     </div>
   {:else if shouldDisplayChildWorkflowLink(key, attributes)}
-    <div class="detail-row">
-      <p class="text-sm">{format(key)}</p>
-      <div class="text-sm">
+    <div class="flex w-full flex-wrap  gap-1 pr-1">
+      <p class="truncate text-sm">{format(key)}</p>
+      <div class="truncate text-sm">
         <Copyable content={value} container-class="xl:flex-row">
           <Link
+            class="truncate"
             newTab
             href={routeForEventHistory({
               view: $eventViewType,
@@ -78,25 +81,26 @@
       </div>
     </div>
   {:else if shouldDisplayAsTaskQueueLink(key)}
-    <div class="xl:3/4 flex w-full items-center xl:items-start">
-      <p class="mr-3 text-sm">{format(key)}</p>
-      <div class="text-sm">
-        <Copyable
-          content={value}
-          container-class="flex-row-reverse xl:flex-row"
-        >
-          <Link newTab href={routeForTaskQueue({ namespace, queue: value })}>
+    <div class="flex w-full flex-wrap  gap-1 pr-1">
+      <p class="mr-3 truncate text-sm">{format(key)}</p>
+      <div class="truncate  text-sm ">
+        <Copyable content={value} container-class="">
+          <Link
+            class="truncate"
+            newTab
+            href={routeForTaskQueue({ namespace, queue: value })}
+          >
             {value}
           </Link>
         </Copyable>
       </div>
     </div>
   {:else}
-    <div class="xl:3/4 flex w-full items-center xl:items-start">
-      <p class="mr-3 text-sm">{format(key)}</p>
-      <p class="text-right text-sm xl:text-left">
+    <div class="flex w-full flex-wrap gap-1 pr-1">
+      <p class="mr-3 truncate text-sm">{format(key)}</p>
+      <p class="truncate text-right text-sm xl:text-left">
         <span
-          class="select-all px-2 text-gray-700"
+          class="w-full select-all text-gray-700"
           class:badge={!shouldDisplayAsPlainText(key)}>{value}</span
         >
       </p>
