@@ -107,7 +107,10 @@
       {/if}
     </p>
   </td>
-  <td class="table-cell text-right text-sm font-normal xl:text-left">
+  <td
+    colspan={compact ? 2 : null}
+    class="table-cell text-right text-sm font-normal xl:text-left"
+  >
     <div tabindex="0" class="flex">
       {#if compact && failure}
         <Icon class="mr-1.5 inline text-red-700" name="clock" />
@@ -129,28 +132,29 @@
       {/if}
     </div>
   </td>
-  <td class="flex table-cell justify-between overflow-hidden">
-    <div class="flex w-full items-center justify-between">
-      <div class="grow truncate">
-        {#if !expanded && !compact}
-          <EventDetailsRow
-            {...getSingleAttributeForEvent(currentEvent)}
-            {attributes}
-            class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
-            inline
-          />
-        {/if}
-      </div>
-      <div>
-        {#if !compact}
+  {#if !compact}
+    <td class="flex table-cell justify-between overflow-hidden">
+      <div class="flex w-full items-center justify-between">
+        <div class="grow truncate">
+          {#if !expanded}
+            <EventDetailsRow
+              {...getSingleAttributeForEvent(currentEvent)}
+              {attributes}
+              class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
+              inline
+            />
+          {/if}
+        </div>
+        <div>
           <Icon
             class="inline"
             name={expanded ? 'chevron-up' : 'chevron-down'}
           />
-        {/if}
+        </div>
       </div>
-    </div>
-  </td>
+    </td>
+  {/if}
+
   <td class="table-cell" />
 </tr>
 {#if expanded}
