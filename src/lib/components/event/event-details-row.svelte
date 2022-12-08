@@ -32,10 +32,14 @@
   class="flex flex-row items-center gap-2 first:pt-0 last:border-b-0 xl:gap-4 {$$props.class}"
 >
   {#if typeof value === 'object'}
-    <p class="min-w-fit text-sm">
-      {format(key)}
-    </p>
-    <CodeBlock content={getCodeBlockValue(value)} class="w-[95%]" {inline} />
+    <div
+      class="flex w-full flex-wrap items-center pr-1 xl:flex-nowrap xl:gap-4"
+    >
+      <p class="min-w-fit text-sm">
+        {format(key)}
+      </p>
+      <CodeBlock content={getCodeBlockValue(value)} class="w-[95%]" {inline} />
+    </div>
   {:else if shouldDisplayAsExecutionLink(key)}
     <div class="flex w-full flex-wrap gap-1 pr-1">
       <p class="mr-3 truncate text-sm">{format(key)}</p>
