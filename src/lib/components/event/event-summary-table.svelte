@@ -6,7 +6,6 @@
   import { expandAllEvents } from '$lib/stores/event-view';
   import Table from '$lib/holocene/table/table.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
   export let compact = false;
