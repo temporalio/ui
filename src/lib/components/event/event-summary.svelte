@@ -15,7 +15,6 @@
   function handleExpandChange(event: CustomEvent) {
     $expandAllEvents = event.detail.expanded;
   }
-  console.log('EVENT SUMMARY RENDERING');
 </script>
 
 {#if loading}
