@@ -133,7 +133,7 @@
     </div>
   </td>
   {#if !compact}
-    <td class="flex table-cell justify-between overflow-hidden">
+    <td class="table-cell overflow-hidden">
       <div class="flex w-full items-center justify-between">
         <div class="grow truncate">
           {#if !expanded}

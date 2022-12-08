@@ -37,8 +37,8 @@
     </p>
     <CodeBlock content={getCodeBlockValue(value)} class="w-[95%]" {inline} />
   {:else if shouldDisplayAsExecutionLink(key)}
-    <div class="xl:3/4 flex w-full items-center xl:items-start">
-      <p class="mr-3 text-sm">{format(key)}</p>
+    <div class="flex flex-wrap gap-1">
+      <p class="mr-3 truncate text-sm">{format(key)}</p>
       <div class="text-sm">
         <Copyable
           content={value}
@@ -60,7 +60,7 @@
     </div>
   {:else if shouldDisplayChildWorkflowLink(key, attributes)}
     <div class="detail-row">
-      <p class="text-sm">{format(key)}</p>
+      <p class="truncate text-sm">{format(key)}</p>
       <div class="text-sm">
         <Copyable content={value} container-class="xl:flex-row">
           <Link
@@ -78,8 +78,8 @@
       </div>
     </div>
   {:else if shouldDisplayAsTaskQueueLink(key)}
-    <div class="xl:3/4 flex w-full items-center xl:items-start">
-      <p class="mr-3 text-sm">{format(key)}</p>
+    <div class="flex flex-wrap gap-1">
+      <p class="mr-3 truncate text-sm">{format(key)}</p>
       <div class="text-sm">
         <Copyable
           content={value}
@@ -92,11 +92,11 @@
       </div>
     </div>
   {:else}
-    <div class="xl:3/4 flex w-full items-center xl:items-start">
-      <p class="mr-3 text-sm">{format(key)}</p>
-      <p class="text-right text-sm xl:text-left">
+    <div class="flex w-full flex-wrap gap-1">
+      <p class="mr-3 truncate text-sm">{format(key)}</p>
+      <p class="truncate text-right text-sm xl:text-left">
         <span
-          class="select-all px-2 text-gray-700"
+          class="w-full select-all px-2 text-gray-700"
           class:badge={!shouldDisplayAsPlainText(key)}>{value}</span
         >
       </p>
