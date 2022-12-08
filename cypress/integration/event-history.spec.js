@@ -81,9 +81,7 @@ describe('Workflow Events', () => {
       eventsFixtureDescending.history.events.length,
     );
 
-    cy.get('[data-cy="event-summary-table"]').contains(
-      firstEventInDescendingOrder.eventId,
-    );
+    cy.get('table').contains(firstEventInDescendingOrder.eventId);
   });
 
   it('should render event time in various formats', () => {
@@ -96,32 +94,20 @@ describe('Workflow Events', () => {
 
     const dt = new Date(eventsFixtureDescending.history.events[0].eventTime);
 
-    cy.get(
-      '[data-cy="event-summary-table-header-desktop"] [data-cy=event-date-filter-button]',
-    ).click();
-    cy.get(
-      '[data-cy="event-summary-table-header-desktop"] [data-cy=event-date-filter-relative]',
-    ).click();
+    cy.get('[data-cy=event-date-filter-button]').click();
+    cy.get('[data-cy=event-date-filter-relative]').click();
     const relative = formatDistanceToNow(dt);
-    cy.get('[data-cy="event-summary-table"]').contains(relative);
+    cy.get('table').contains(relative);
 
-    cy.get(
-      '[data-cy="event-summary-table-header-desktop"] [data-cy=event-date-filter-button]',
-    ).click();
-    cy.get(
-      '[data-cy="event-summary-table-header-desktop"] [data-cy=event-date-filter-UTC]',
-    ).click();
+    cy.get('[data-cy=event-date-filter-button]').click();
+    cy.get('[data-cy=event-date-filter-UTC]').click();
     const utc = dateTz.formatInTimeZone(dt, 'UTC', 'yyyy-MM-dd z HH:mm:ss.SS');
-    cy.get('[data-cy="event-summary-table"]').contains(utc);
+    cy.get('table').contains(utc);
 
-    cy.get(
-      '[data-cy="event-summary-table-header-desktop"] [data-cy=event-date-filter-button]',
-    ).click();
-    cy.get(
-      '[data-cy="event-summary-table-header-desktop"] [data-cy=event-date-filter-local]',
-    ).click();
+    cy.get('[data-cy=event-date-filter-button]').click();
+    cy.get('[data-cy=event-date-filter-local]').click();
     const local = dateTz.format(dt, 'yyyy-MM-dd z HH:mm:ss.SS');
-    cy.get('[data-cy="event-summary-table"]').contains(local);
+    cy.get('table').contains(local);
   });
 
   it('should render events in compact view', () => {
@@ -135,7 +121,7 @@ describe('Workflow Events', () => {
     cy.get('[data-cy="event-summary-row"]')
       .should('not.have.length', 0)
       .should('not.have.length', eventsFixtureDescending.history.events.length);
-    cy.get('[data-cy="event-summary-table"]').contains('activity.timeout');
+    cy.get('table').contains('activity.timeout');
   });
 
   it('should be viewable as JSON', () => {
