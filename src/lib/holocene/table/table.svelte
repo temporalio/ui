@@ -66,7 +66,7 @@
       }
 
       td {
-        @apply border-t border-gray-300 py-2 text-sm;
+        @apply border-t border-gray-300 px-1 py-2 text-sm;
 
         &:first-child {
           @apply border-l border-gray-300;

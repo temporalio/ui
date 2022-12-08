@@ -24,7 +24,7 @@
         <td class="table-cell w-24 text-left">
           <p class="truncate text-sm text-gray-500 md:text-base">{id}</p>
         </td>
-        <td class="table-cell pr-2 text-left">
+        <td class="table-cell text-left">
           <p
             class="truncate text-sm md:text-base"
             class:active={id === selectedId}
