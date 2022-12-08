@@ -114,7 +114,9 @@
   </section>
   <slot name="timeline" />
   <section id="event-history">
-    <nav class="flex items-end justify-between gap-4 pb-4">
+    <nav
+      class="flex flex-col items-center justify-between gap-4 pb-4 lg:flex-row lg:items-end"
+    >
       <h3 class="text-lg font-medium">Recent Events</h3>
       <div id="event-view-toggle" class="flex gap-4">
         <ToggleButtons>
