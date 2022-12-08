@@ -129,22 +129,29 @@
       {/if}
     </div>
   </td>
-  <td class="table-cell overflow-hidden">
-    {#if !expanded && !compact}
-      <EventDetailsRow
-        {...getSingleAttributeForEvent(currentEvent)}
-        {attributes}
-        inline
-      />
-    {/if}
-  </td>
-  <td class="table-cell">
-    {#if !compact}
+  <td class="flex table-cell justify-between overflow-hidden">
+    <div class="flex items-center justify-between">
       <div class="flex justify-start">
-        <Icon class="inline" name={expanded ? 'chevron-up' : 'chevron-down'} />
+        {#if !expanded && !compact}
+          <EventDetailsRow
+            {...getSingleAttributeForEvent(currentEvent)}
+            {attributes}
+            class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
+            inline
+          />
+        {/if}
       </div>
-    {/if}
+      <div class="flex justify-start">
+        {#if !compact}
+          <Icon
+            class="inline"
+            name={expanded ? 'chevron-up' : 'chevron-down'}
+          />
+        {/if}
+      </div>
+    </div>
   </td>
+  <td class="table-cell" />
 </tr>
 {#if expanded}
   <tr class="table-row" class:typedError>
@@ -198,11 +205,6 @@
   .terminated .event-name {
     @apply text-pink-700;
   }
-
-  .expanded-row {
-    @apply block xl:table-row xl:border-b-2 xl:border-gray-700;
-  }
-
   .expanded-cell {
     @apply flex table-cell w-full flex-wrap text-sm no-underline xl:text-base;
   }

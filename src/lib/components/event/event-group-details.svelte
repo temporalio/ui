@@ -12,7 +12,7 @@
   export let onGroupClick: (id: string) => void;
 </script>
 
-<div class="w-full border-r-2 border-gray-700 lg:w-1/3">
+<div class="w-full border-gray-700 lg:w-1/3 lg:border-r-2">
   <Table class="w-full table-fixed pb-2">
     {#each [...eventGroup.events].reverse() as [id, eventInGroup] (id)}
       <tr

@@ -13,7 +13,6 @@
   export let typedError = false;
   export let updating = false;
 
-  let title = compact ? 'Event Type' : 'Workflow Events';
   let expandAll = $expandAllEvents === 'true';
 
   const dispatch = createEventDispatcher();
@@ -95,16 +94,20 @@
   <TableHeaderRow slot="headers">
     <th class="table-cell w-14 xl:w-10" />
     <th class="table-cell w-14 md:w-28">
-      {#if !compact}<EventDateFilter label="Date & Time" />{:else}Date & Time{/if}
+      {#if !compact}<EventDateFilter />{:else}Date & Time{/if}
     </th>
-    <th class="table-cell w-44"><EventCategoryFilter label={title} /></th>
+    <th class="table-cell w-44"><EventCategoryFilter {compact} /></th>
     <th class="table-cell w-auto xl:w-80">
       <div class="flex w-full justify-end">
-        <Button thin on:click={handleChange}
-          >{expandAll ? 'Collapse all' : 'Expand All'}<Icon
-            name={expandAll ? 'chevron-up' : 'chevron-down'}
-          /></Button
+        <button
+          class="relative flex w-28 items-center justify-between rounded"
+          on:click={handleChange}
         >
+          <div>{expandAll ? 'Collapse all' : 'Expand All'}</div>
+          <div class="">
+            <Icon name={expandAll ? 'chevron-up' : 'chevron-down'} />
+          </div>
+        </button>
       </div>
     </th>
   </TableHeaderRow>

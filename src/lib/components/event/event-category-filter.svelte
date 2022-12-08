@@ -11,7 +11,8 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   export let compact: boolean = false;
-  export let label: string;
+
+  $: label = compact ? 'Event Type' : 'Workflow Events';
 
   let parameter = 'category';
   let options = compact ? compactEventTypeOptions : allEventTypeOptions;
@@ -32,7 +33,9 @@
 </script>
 
 <DropdownMenu value={_value} left icon="filter">
-  <svelte:fragment slot="label">{label}</svelte:fragment>
+  <svelte:fragment slot="label">
+    {label}
+  </svelte:fragment>
   <div class="w-56">
     {#each options as { label, option } (option)}
       <div

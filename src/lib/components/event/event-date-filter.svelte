@@ -25,8 +25,6 @@
   import { page } from '$app/stores';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
-  export let label: string;
-
   let sortOptions: EventSortOrderOptions = [
     { label: 'Sort 1-9', option: 'ascending' },
     { label: 'Sort 9-1', option: 'descending' },
@@ -68,7 +66,10 @@
 </script>
 
 <DropdownMenu {value} left dataCy="event-date-filter">
-  <svelte:fragment slot="label">{label}</svelte:fragment>
+  <svelte:fragment slot="label">
+    <span class="hidden md:block">Date & Time</span>
+    <span class="block md:hidden"><Icon name="clock" /></span>
+  </svelte:fragment>
   <div class="w-56">
     {#if $supportsReverseOrder}
       {#each sortOptions as { option, label } (option)}
