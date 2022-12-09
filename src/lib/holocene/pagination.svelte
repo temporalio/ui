@@ -54,9 +54,8 @@
   let height: number | undefined;
 
   onMount(() => {
-    if (floatId) {
-      width = document.getElementById(floatId)?.clientWidth;
-    }
+    updateWidth();
+
     if (startingIndex > 0) {
       handlePageChange();
     }
@@ -70,10 +69,16 @@
     });
   };
 
+  const updateWidth = () => {
+    if (floatId) {
+      width = document.getElementById(floatId)?.clientWidth;
+    }
+  };
+
   $: floatStyle = getFloatStyle({ width, height, screenWidth });
 </script>
 
-<svelte:window bind:innerWidth={screenWidth} />
+<svelte:window bind:innerWidth={screenWidth} on:resize={updateWidth} />
 
 <div class="pagination relative mb-8 flex flex-col gap-4">
   <div
