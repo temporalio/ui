@@ -63,6 +63,7 @@
       show={showFilterCopy}
       content={workflow.id}
       filterable={false}
+      class="bg-gradient-to-b from-blue-100 to-purple-100"
     />
     <p class="inline-time-cell">
       {formatDate(workflow.startTime, timeFormat)}
@@ -86,6 +87,7 @@
       content={workflow.name}
       onFilter={() => onTypeClick(workflow.name)}
       filtered={$page.url?.searchParams?.get('query')?.includes(workflow.name)}
+      class="bg-gradient-to-b from-blue-100 to-purple-100"
     />
     <p class="inline-time-cell">
       {formatDate(workflow.endTime, timeFormat)}
@@ -105,7 +107,7 @@
 
 <style lang="postcss">
   :global(.workflow-summary-row:hover) {
-    @apply bg-gray-50;
+    @apply bg-gradient-to-b from-blue-100 to-purple-100;
 
     .table-link {
       @apply text-blue-700 underline decoration-blue-700;
