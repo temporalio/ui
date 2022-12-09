@@ -1,7 +1,5 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
   import { page } from '$app/stores';
-  import { clearPreviousEventParameters } from '$lib/stores/previous-events';
   import { eventViewType } from '$lib/stores/event-view';
 
   import WorkflowRunLayout from '$lib/layouts/workflow-run-layout.svelte';
@@ -11,10 +9,6 @@
   import WorkflowHistoryCompact from '$lib/pages/workflow-history-compact.svelte';
 
   import PageTitle from '$lib/components/page-title.svelte';
-
-  onDestroy(() => {
-    clearPreviousEventParameters();
-  });
 
   const workflow = $page.params.workflow;
 
