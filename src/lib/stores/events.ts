@@ -14,6 +14,7 @@ import {
   fetchEvents,
   FetchEventsParameters,
   FetchEventsParametersWithSettings,
+  fetchStartAndEndEvents,
 } from '$lib/services/events-service';
 import { eventCategoryParam, eventSortOrder } from './event-view';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
@@ -106,27 +107,34 @@ export const parametersWithSettings: Readable<FetchEventsParametersWithSettings>
     },
   );
 
-export const updateEventHistory: StartStopNotifier<FetchEventsResponse> = (
+export const updateEventHistory: StartStopNotifier<{
+  start: WorkflowEvents;
+  end: WorkflowEvents;
+}> = (
   set,
 ) => {
-  return parametersWithSettings.subscribe(async (params) => {
-    const { settings: _, ...rest } = params;
-    if (isNewRequest(rest, previous)) {
-      withLoading(loading, updating, async () => {
-        const events = await fetchEvents(params);
-        if (events?.events?.length) {
-          set(events);
-        } else {
-          setTimeout(() => {
+    return parametersWithSettings.subscribe(async (params) => {
+      const { settings: _, ...rest } = params;
+      if (isNewRequest(rest, previous)) {
+        withLoading(loading, updating, async () => {
+          const events = await fetchStartAndEndEvents(params);
+          if (events?.start && events?.end) {
             set(events);
-          }, delay);
-        }
-      });
-    }
-  });
-};
+          } else {
+            setTimeout(() => {
+              set(events);
+            }, delay);
+          }
+        });
+      }
+    });
+  };
 
-export const eventHistory = readable(emptyEvents, updateEventHistory);
+
+export const eventHistory = readable(
+  { start: [], end: [] },
+  updateEventHistory,
+);
 
 export const timelineEvents = writable(null);
 

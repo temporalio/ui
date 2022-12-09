@@ -23,10 +23,8 @@
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
 
-  $: workflowEvents = getWorkflowStartedCompletedAndTaskFailedEvents(
-    $eventHistory?.events ?? [],
-    $eventSortOrder,
-  );
+  $: workflowEvents =
+    getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
 </script>
 
 <section class="flex flex-col gap-4">

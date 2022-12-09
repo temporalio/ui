@@ -23,24 +23,22 @@
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
 
-  export let event: IterableEvent;
-  export let groups: EventGroups;
+  export let event: IterableEvent | EventGroup;
   export let visibleItems: IterableEvent[];
   export let initialItem: IterableEvent;
   export let compact = false;
   export let expandAll = false;
   export let typedError = false;
 
-  let eventGroup = isEventGroup(event)
-    ? event
-    : getGroupForEvent(event, groups);
   let selectedId = compact
-    ? Array.from(eventGroup.events.keys()).pop()
+    ? Array.from((event as EventGroup).events.keys()).pop()
     : event.id;
 
   $: expanded = expandAll;
 
-  $: currentEvent = compact ? eventGroup.events.get(selectedId) : event;
+  $: currentEvent = compact
+    ? (event as EventGroup).events.get(selectedId)
+    : event;
   $: descending = $eventSortOrder === 'descending';
   $: showElapsed = $eventShowElapsed === 'true';
   $: attributes = formatAttributes(event, { compact });
@@ -64,9 +62,15 @@
     expanded = !expanded;
   };
 
-  const failure = eventOrGroupIsFailureOrTimedOut(compact ? eventGroup : event);
-  const canceled = eventOrGroupIsCanceled(compact ? eventGroup : event);
-  const terminated = eventOrGroupIsTerminated(compact ? eventGroup : event);
+  const failure = eventOrGroupIsFailureOrTimedOut(
+    compact ? (event as EventGroup) : event,
+  );
+  const canceled = eventOrGroupIsCanceled(
+    compact ? (event as EventGroup) : event,
+  );
+  const terminated = eventOrGroupIsTerminated(
+    compact ? (event as EventGroup) : event,
+  );
 
   let truncateWidth: number;
   workflowEventsColumnWidth.subscribe((value) => {
@@ -163,7 +167,7 @@
       <EventDetailsFull
         event={currentEvent}
         {compact}
-        {eventGroup}
+        eventGroup={event}
         bind:selectedId
       />
     </td>

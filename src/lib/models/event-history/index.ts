@@ -45,11 +45,11 @@ export async function getEventAttributes(
 
   const convertedAttributes = endpoint
     ? await convertWithCodec({
-        attributes,
-        namespace,
-        settings: _settings,
-        accessToken,
-      })
+      attributes,
+      namespace,
+      settings: _settings,
+      accessToken,
+    })
     : await convertWithWebsocket(attributes);
 
   const decodedAttributes = decodeAttributes(convertedAttributes) as object;
@@ -95,19 +95,12 @@ export const toEventHistory = async ({
   namespace,
   settings,
   accessToken,
-}: EventsWithMetadata): Promise<{
-  events: WorkflowEvents;
-  eventGroups: EventGroups;
-}> => {
-  const events = await Promise.all(
+}: EventsWithMetadata): Promise<WorkflowEvents> => {
+  return await Promise.all(
     response.map((historyEvent) =>
       toEvent({ historyEvent, namespace, settings, accessToken }),
     ),
   );
-
-  const eventGroups = groupEvents(events);
-
-  return { events, eventGroups };
 };
 
 export const isEvent = (event: unknown): event is WorkflowEvent => {

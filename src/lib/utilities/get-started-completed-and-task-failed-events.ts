@@ -60,7 +60,10 @@ const getEventResult = (event: CompletionEvent) => {
 };
 
 export const getWorkflowStartedCompletedAndTaskFailedEvents = (
-  events: WorkflowEvents,
+  eventHistory: {
+    start: WorkflowEvents,
+    end: WorkflowEvents,
+  },
   eventSortOrder: EventSortOrder = 'descending',
 ): WorkflowInputAndResults => {
   let input: string;
@@ -72,7 +75,7 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
   let workflowTaskFailedEvent: WorkflowTaskFailedEvent;
   let hasCompletedTaskEvent = false;
 
-  for (const event of events) {
+  for (const event of eventHistory.start) {
     if (isStartedEvent(event)) {
       workflowStartedEvent = event;
       continue;
@@ -81,13 +84,26 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
       continue;
     } else if (isCompletedTaskEvent(event)) {
       // If there is a completed workflow task after a failed task
-      if (eventSortOrder === 'descending') {
-        // then we don't need to look for a failed task
-        hasCompletedTaskEvent = true;
-      } else if (eventSortOrder === 'ascending' && workflowTaskFailedEvent) {
+      if (workflowTaskFailedEvent) {
         // or we need to reset the failed event
         workflowTaskFailedEvent = undefined;
       }
+      continue;
+    } else if (!hasCompletedTaskEvent && isFailedTaskEvent(event)) {
+      workflowTaskFailedEvent = event;
+      continue;
+    }
+  }
+
+  for (const event of eventHistory.end) {
+    if (isStartedEvent(event)) {
+      workflowStartedEvent = event;
+      continue;
+    } else if (isCompletionEvent(event)) {
+      workflowCompletedEvent = event;
+      continue;
+    } else if (isCompletedTaskEvent(event)) {
+      hasCompletedTaskEvent = true;
       continue;
     } else if (!hasCompletedTaskEvent && isFailedTaskEvent(event)) {
       workflowTaskFailedEvent = event;

@@ -61,3 +61,91 @@ export const fetchEvents = async (
     toEventHistory({ response, namespace, settings, accessToken }),
   );
 };
+
+
+export const fetchPartialRawEvents = async ({
+  namespace,
+  workflowId,
+  runId,
+  sort,
+}: FetchEventsParameters): Promise<HistoryEvent[]> => {
+  const route = await routeForApi(`events.${sort}`, {
+    namespace,
+    workflowId,
+    runId,
+  });
+
+  const response = await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
+    route,
+    {
+      request: fetch,
+      params: { maximumPageSize: '50' },
+    },
+  );
+
+  return response.history.events;
+};
+
+export const fetchStartAndEndEvents = async (
+  parameters: FetchEventsParametersWithSettings,
+): Promise<{ start: WorkflowEvents; end: WorkflowEvents }> => {
+  const { settings, namespace, accessToken } = parameters;
+  const startEventsRaw = await fetchPartialRawEvents({
+    ...parameters,
+    sort: 'ascending',
+  });
+  const endEventsRaw = await fetchPartialRawEvents({
+    ...parameters,
+    sort: 'descending',
+  });
+  const start = await toEventHistory({
+    response: startEventsRaw,
+    namespace,
+    settings,
+    accessToken,
+  });
+  const end = await toEventHistory({
+    response: endEventsRaw,
+    namespace,
+    settings,
+    accessToken,
+  });
+  return { start, end };
+};
+
+export async function getPaginatedEvents({
+  namespace,
+  workflowId,
+  runId,
+  sort,
+  compact,
+}): Promise<
+  () => Promise<{ items: HistoryEvent[]; nextPageToken: Uint8Array | string }>
+> {
+  return async (pageSize = 100, token = '') => {
+    const descendingRoute = await routeForApi(compact ? 'events.ascending' : `events.${sort}`, {
+      namespace,
+      workflowId,
+      runId,
+    });
+    const { history, nextPageToken } =
+      await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
+        descendingRoute,
+        {
+          request: fetch,
+          params: {
+            nextPageToken: token,
+          },
+        },
+      );
+
+    const events = await toEventHistory({
+      response: history.events,
+      namespace,
+    });
+    return {
+      items: events,
+      nextPageToken: nextPageToken ?? '',
+    };
+  };
+}

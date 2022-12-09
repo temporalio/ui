@@ -26,6 +26,7 @@ type PaginationItems = {
   indexTokens: Record<number, string>;
   hasNext: boolean;
   hasPrevious: boolean;
+  activeRow: number;
 };
 
 const initialStore: PaginationItems = {
@@ -41,6 +42,7 @@ const initialStore: PaginationItems = {
   indexTokens: {},
   hasNext: true,
   hasPrevious: false,
+  activeRow: 0,
 };
 
 export type PaginationStore = PaginationMethods & Readable<PaginationItems>;
@@ -106,7 +108,11 @@ export function createPaginationStore(): PaginationStore {
       _store.hasPrevious = true;
     } else if (store.nextIndex < store.index) {
       // Previous Page
-      if (store.nextIndex === 0) _store.hasPrevious = false;
+      if (store.nextIndex === 0) {
+        _store.indexTokens = {};
+        _store.indexTokens[store.nextIndex + 1] = nextToken;
+        _store.hasPrevious = false;
+      }
     }
 
     return _store;
@@ -135,6 +141,14 @@ export function createPaginationStore(): PaginationStore {
     resetPageSize: () =>
       update((store) => {
         return { ...store, index: 0, nextIndex: 0, updating: true };
+      }),
+    nextRow: () =>
+      update((store) => {
+        return { ...store, activeRow: store.activeRow + 1 };
+      }),
+    previousRow: () =>
+      update((store) => {
+        return { ...store, activeRow: store.activeRow - 1 };
       }),
   };
 }
