@@ -12,7 +12,6 @@
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import Checkbox from '$lib/holocene/checkbox.svelte';
-  import { eventViewType } from '$lib/stores/event-view';
 
   const dispatch = createEventDispatcher<{
     toggleWorkflow: { workflowRunId: string; checked: boolean };
@@ -26,7 +25,6 @@
   export let checkboxDisabled: boolean;
 
   $: href = routeForEventHistory({
-    view: $eventViewType,
     namespace,
     workflow: workflow.id,
     run: workflow.runId,

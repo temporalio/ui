@@ -2,6 +2,7 @@
   import { onDestroy } from 'svelte';
   import { page } from '$app/stores';
   import { clearPreviousEventParameters } from '$lib/stores/previous-events';
+  import { eventViewType } from '$lib/stores/event-view';
 
   import WorkflowRunLayout from '$lib/layouts/workflow-run-layout.svelte';
   import WorkflowHistoryLayout from '$lib/layouts/workflow-history-layout.svelte';
@@ -17,8 +18,12 @@
 
   const workflow = $page.params.workflow;
 
-  $: compactPage = $page.url.pathname.endsWith('compact');
-  $: jsonPage = $page.url.pathname.endsWith('json');
+  const views = {
+    feed: WorkflowHistoryFeed,
+    compact: WorkflowHistoryCompact,
+    json: WorkflowHistoryJson,
+  };
+  $: view = views[$eventViewType] ?? WorkflowHistoryFeed;
 </script>
 
 <PageTitle title={`Workflow History | ${workflow}`} url={$page.url.href} />
@@ -27,12 +32,6 @@
     <!-- <svelte:fragment slot="timeline">
     <EventHistoryTimelineContainer />
     </svelte:fragment> -->
-    {#if jsonPage}
-      <WorkflowHistoryJson />
-    {:else if compactPage}
-      <WorkflowHistoryCompact />
-    {:else}
-      <WorkflowHistoryFeed />
-    {/if}
+    <svelte:component this={view} />
   </WorkflowHistoryLayout>
 </WorkflowRunLayout>

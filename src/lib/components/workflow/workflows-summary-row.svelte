@@ -11,14 +11,12 @@
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import FilterOrCopyButtons from '$holocene/filter-or-copy-buttons.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
-  import { eventViewType } from '$lib/stores/event-view';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
   export let timeFormat: TimeFormat | string;
 
   $: href = routeForEventHistory({
-    view: $eventViewType,
     namespace,
     workflow: workflow.id,
     run: workflow.runId,

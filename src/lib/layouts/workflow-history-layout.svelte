@@ -23,11 +23,10 @@
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
 
-  $: routeParameters = (view: EventView, eventId?: string) => ({
+  $: routeParameters = (eventId?: string) => ({
     namespace: $page.params.namespace,
     workflow: $workflowRun.workflow.id,
     run: $workflowRun.workflow.runId,
-    view,
     eventId,
   });
 
@@ -73,7 +72,6 @@
           title="Parent Workflow ID"
           content={$workflowRun.workflow.parent?.workflowId}
           href={routeForEventHistory({
-            view: $eventViewType,
             namespace: $page.params.namespace,
             workflow: $workflowRun.workflow.parent?.workflowId,
             run: $workflowRun.workflow.parent?.runId,
@@ -83,7 +81,6 @@
           title="Parent Run ID"
           content={$workflowRun.workflow.parent?.runId}
           href={routeForEventHistory({
-            view: $eventViewType,
             namespace: $page.params.namespace,
             workflow: $workflowRun.workflow.parent?.workflowId,
             run: $workflowRun.workflow.parent?.runId,
@@ -122,22 +119,18 @@
         <ToggleButtons>
           <ToggleButton
             icon="feed"
-            base={routeForEventHistory(routeParameters('feed'))}
-            href={routeForEventHistory(routeParameters('feed'))}
             active={$eventViewType === 'feed'}
             data-cy="feed"
             on:click={() => ($eventViewType = 'feed')}>History</ToggleButton
           >
           <ToggleButton
             icon="compact"
-            href={routeForEventHistory(routeParameters('compact'))}
             active={$eventViewType === 'compact'}
             data-cy="compact"
             on:click={() => ($eventViewType = 'compact')}>Compact</ToggleButton
           >
           <ToggleButton
             icon="json"
-            href={routeForEventHistory(routeParameters('json'))}
             active={$eventViewType === 'json'}
             data-cy="json"
             on:click={() => ($eventViewType = 'json')}>JSON</ToggleButton

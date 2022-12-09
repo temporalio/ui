@@ -12,7 +12,6 @@
 
   import ScheduleFrequency from './schedule-frequency.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
-  import { eventViewType } from '$lib/stores/event-view';
 
   let { namespace } = $page.params;
 
@@ -59,7 +58,6 @@
       <p>
         <Link
           href={routeForEventHistory({
-            view: $eventViewType,
             namespace,
             workflow: run?.startWorkflowResult?.workflowId,
             run: run?.startWorkflowResult?.runId,

@@ -3,7 +3,7 @@
   import { onDestroy, onMount } from 'svelte';
   import { fly } from 'svelte/transition';
 
-  import { autoRefreshWorkflow, eventViewType } from '$lib/stores/event-view';
+  import { autoRefreshWorkflow } from '$lib/stores/event-view';
   import { workflowsQuery, workflowsSearch } from '$lib/stores/workflows';
   import { workflowRun, refresh } from '$lib/stores/workflow-run';
   import { eventHistory } from '$lib/stores/events';
@@ -141,7 +141,6 @@
       <Tab
         label="History"
         href={routeForEventHistory({
-          view: $eventViewType,
           ...routeParameters,
         })}
         amount={workflow?.historyEvents}
@@ -149,7 +148,6 @@
         active={pathMatches(
           $page.url.pathname,
           routeForEventHistory({
-            view: $eventViewType,
             ...routeParameters,
           }),
         )}
