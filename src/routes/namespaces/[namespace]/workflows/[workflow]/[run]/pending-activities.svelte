@@ -10,6 +10,6 @@
 </script>
 
 <PageTitle title={`Pending Activities | ${workflow}`} url={$page.url.href} />
-<WorkflowRunLayout cancelEnabled>
+<WorkflowRunLayout cancelEnabled signalEnabled>
   <WorkflowPendingActivities />
 </WorkflowRunLayout>

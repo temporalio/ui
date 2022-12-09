@@ -21,7 +21,7 @@
 </script>
 
 <PageTitle title={`Workflow History | ${workflow}`} url={$page.url.href} />
-<WorkflowRunLayout cancelEnabled>
+<WorkflowRunLayout cancelEnabled signalEnabled>
   <WorkflowHistoryLayout>
     <!-- <svelte:fragment slot="timeline">
     <EventHistoryTimelineContainer />

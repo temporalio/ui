@@ -10,6 +10,6 @@
 </script>
 
 <PageTitle title={`Workers | ${workflow}`} url={$page.url.href} />
-<WorkflowRunLayout cancelEnabled>
+<WorkflowRunLayout cancelEnabled signalEnabled>
   <WorkflowWorkers />
 </WorkflowRunLayout>
