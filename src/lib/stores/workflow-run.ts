@@ -9,6 +9,7 @@ import type { GetPollersResponse } from '$lib/services/pollers-service';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { toDecodedPendingActivities } from '$lib/models/pending-activities';
 import { authUser } from '$lib/stores/auth-user';
+import { loading } from '$lib/stores/workflow-run-loading';
 
 export const refresh = writable(0);
 const namespace = derived([page], ([$page]) => $page.params.namespace);
@@ -73,7 +74,6 @@ const updateWorkflowRun: StartStopNotifier<{
 };
 
 export const updating = writable(true);
-export const loading = writable(true);
 export const workflowRun = readable<WorkflowRunStore>(
   initialWorkflowRun,
   updateWorkflowRun,
