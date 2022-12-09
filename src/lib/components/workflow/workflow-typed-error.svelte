@@ -3,8 +3,9 @@
 
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
+  import Table from '$lib/holocene/table/table.svelte';
+  import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
 
   const WORKFLOW_TASK_FAILED_ERROR_COPY = {
     Unspecified: {
@@ -186,7 +187,13 @@
       </p>
     {/if}
     <div class="mt-2 bg-white">
-      <EventSummaryTable typedError>
+      <Table class="dark w-full table-fixed">
+        <TableHeaderRow slot="headers">
+          <th class="table-cell w-14 xl:w-10" />
+          <th class="table-cell w-14 md:w-28">Date & Time</th>
+          <th class="table-cell w-44">Event</th>
+          <th class="table-cell w-auto xl:w-80" />
+        </TableHeaderRow>
         <EventSummaryRow
           event={error}
           groups={$eventGroups}
@@ -194,7 +201,7 @@
           visibleItems={$events}
           typedError
         />
-      </EventSummaryTable>
+      </Table>
     </div>
   </Alert>
 {/if}

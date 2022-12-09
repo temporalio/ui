@@ -11,14 +11,12 @@
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import FilterOrCopyButtons from '$holocene/filter-or-copy-buttons.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
-  import { eventViewType } from '$lib/stores/event-view';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
   export let timeFormat: TimeFormat | string;
 
   $: href = routeForEventHistory({
-    view: $eventViewType,
     namespace,
     workflow: workflow.id,
     run: workflow.runId,
@@ -52,7 +50,7 @@
     />
   </td>
   <td
-    class="relative truncate"
+    class="relative break-words pr-4"
     on:mouseover={() => (showFilterCopy = true)}
     on:focus={() => (showFilterCopy = true)}
     on:mouseleave={() => (showFilterCopy = false)}
@@ -63,6 +61,7 @@
       show={showFilterCopy}
       content={workflow.id}
       filterable={false}
+      class="bg-gradient-to-b from-blue-100 to-purple-100"
     />
     <p class="inline-time-cell">
       {formatDate(workflow.startTime, timeFormat)}
@@ -86,6 +85,7 @@
       content={workflow.name}
       onFilter={() => onTypeClick(workflow.name)}
       filtered={$page.url?.searchParams?.get('query')?.includes(workflow.name)}
+      class="bg-gradient-to-b from-blue-100 to-purple-100"
     />
     <p class="inline-time-cell">
       {formatDate(workflow.endTime, timeFormat)}
@@ -105,7 +105,7 @@
 
 <style lang="postcss">
   :global(.workflow-summary-row:hover) {
-    @apply bg-gray-50;
+    @apply bg-gradient-to-b from-blue-100 to-purple-100;
 
     .table-link {
       @apply text-blue-700 underline decoration-blue-700;

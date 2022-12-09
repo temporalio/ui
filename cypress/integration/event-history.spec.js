@@ -48,7 +48,7 @@ describe('Workflow Events', () => {
     cy.wait('@workflow-api');
     cy.wait('@event-history-descending');
 
-    cy.url().should('contain', '/feed');
+    cy.url().should('contain', '/history');
   });
 
   it('default to last viewed event view when visiting a workflow', () => {
@@ -57,21 +57,41 @@ describe('Workflow Events', () => {
     cy.wait('@workflow-api');
     cy.wait('@event-history-descending');
 
-    cy.url().should('contain', '/feed');
+    cy.url().should('contain', '/history');
 
-    cy.get('[data-cy="feed"]').click();
-    cy.url().should('contain', '/feed');
+    cy.get('[data-cy="feed"]').should('have.class', 'active');
+    cy.get('[data-cy="compact"]').should('not.have.class', 'active');
+    cy.get('[data-cy="json"]').should('not.have.class', 'active');
+
+    cy.get('[data-cy="compact"]').click();
 
     cy.visit('/namespaces/default/workflows');
 
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
-    cy.url().should('contain', '/feed');
+
+    cy.url().should('contain', '/history');
+    cy.get('[data-cy="compact"]').should('have.class', 'active');
+    cy.get('[data-cy="json"]').should('not.have.class', 'active');
+    cy.get('[data-cy="feed"]').should('not.have.class', 'active');
+
+    cy.get('[data-cy="event-summary-row"]')
+      .should('not.have.length', 0)
+      .should('not.have.length', eventsFixtureDescending.history.events.length);
+    cy.get('table').contains('activity.timeout');
+
+    cy.get('[data-cy="json"]').click();
+
+    cy.visit('/namespaces/default/workflows');
+
+    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
+
+    cy.get('[data-cy="json"]').should('have.class', 'active');
+    cy.get('[data-cy="compact"]').should('not.have.class', 'active');
+    cy.get('[data-cy="feed"]').should('not.have.class', 'active');
   });
 
   it('should render events in feed view', () => {
-    cy.visit(
-      `/namespaces/default/workflows/${workflowId}/${runId}/history/feed`,
-    );
+    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}/history`);
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-descending');
@@ -81,61 +101,45 @@ describe('Workflow Events', () => {
       eventsFixtureDescending.history.events.length,
     );
 
-    cy.get('[data-cy="event-summary-table"]').contains(
-      firstEventInDescendingOrder.eventId,
-    );
+    cy.get('table').contains(firstEventInDescendingOrder.eventId);
   });
 
   it('should render event time in various formats', () => {
-    cy.visit(
-      `/namespaces/default/workflows/${workflowId}/${runId}/history/feed`,
-    );
+    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}/history`);
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-descending');
 
     const dt = new Date(eventsFixtureDescending.history.events[0].eventTime);
 
-    cy.get(
-      '[data-cy="event-summary-table-header-desktop"] [data-cy=event-date-filter-button]',
-    ).click();
-    cy.get(
-      '[data-cy="event-summary-table-header-desktop"] [data-cy=event-date-filter-relative]',
-    ).click();
+    cy.get('[data-cy=event-date-filter-button]').click();
+    cy.get('[data-cy=event-date-filter-relative]').click();
     const relative = formatDistanceToNow(dt);
-    cy.get('[data-cy="event-summary-table"]').contains(relative);
+    cy.get('table').contains(relative);
 
-    cy.get(
-      '[data-cy="event-summary-table-header-desktop"] [data-cy=event-date-filter-button]',
-    ).click();
-    cy.get(
-      '[data-cy="event-summary-table-header-desktop"] [data-cy=event-date-filter-UTC]',
-    ).click();
+    cy.get('[data-cy=event-date-filter-button]').click();
+    cy.get('[data-cy=event-date-filter-UTC]').click();
     const utc = dateTz.formatInTimeZone(dt, 'UTC', 'yyyy-MM-dd z HH:mm:ss.SS');
-    cy.get('[data-cy="event-summary-table"]').contains(utc);
+    cy.get('table').contains(utc);
 
-    cy.get(
-      '[data-cy="event-summary-table-header-desktop"] [data-cy=event-date-filter-button]',
-    ).click();
-    cy.get(
-      '[data-cy="event-summary-table-header-desktop"] [data-cy=event-date-filter-local]',
-    ).click();
+    cy.get('[data-cy=event-date-filter-button]').click();
+    cy.get('[data-cy=event-date-filter-local]').click();
     const local = dateTz.format(dt, 'yyyy-MM-dd z HH:mm:ss.SS');
-    cy.get('[data-cy="event-summary-table"]').contains(local);
+    cy.get('table').contains(local);
   });
 
   it('should render events in compact view', () => {
-    cy.visit(
-      `/namespaces/default/workflows/${workflowId}/${runId}/history/compact`,
-    );
+    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}/history`);
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-descending');
 
+    cy.get('[data-cy="compact"]').click();
+
     cy.get('[data-cy="event-summary-row"]')
       .should('not.have.length', 0)
       .should('not.have.length', eventsFixtureDescending.history.events.length);
-    cy.get('[data-cy="event-summary-table"]').contains('activity.timeout');
+    cy.get('table').contains('activity.timeout');
   });
 
   it('should be viewable as JSON', () => {

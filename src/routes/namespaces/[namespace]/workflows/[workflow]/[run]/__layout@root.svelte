@@ -1,13 +1,12 @@
 <script lang="ts">
-  import WorkflowRunLayout from '$lib/layouts/workflow-run-layout.svelte';
   import { onDestroy } from 'svelte';
+  import { loading } from '$lib/stores/workflow-run';
   import { clearPreviousEventParameters } from '$lib/stores/previous-events';
 
   onDestroy(() => {
     clearPreviousEventParameters();
+    $loading = true;
   });
 </script>
 
-<WorkflowRunLayout cancelEnabled signalEnabled>
-  <slot />
-</WorkflowRunLayout>
+<slot />

@@ -23,14 +23,6 @@
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
 
-  $: routeParameters = (view: EventView, eventId?: string) => ({
-    namespace: $page.params.namespace,
-    workflow: $workflowRun.workflow.id,
-    run: $workflowRun.workflow.runId,
-    view,
-    eventId,
-  });
-
   $: workflowEvents = getWorkflowStartedCompletedAndTaskFailedEvents(
     $eventHistory?.events ?? [],
     $eventSortOrder,
@@ -73,7 +65,6 @@
           title="Parent Workflow ID"
           content={$workflowRun.workflow.parent?.workflowId}
           href={routeForEventHistory({
-            view: $eventViewType,
             namespace: $page.params.namespace,
             workflow: $workflowRun.workflow.parent?.workflowId,
             run: $workflowRun.workflow.parent?.runId,
@@ -83,7 +74,6 @@
           title="Parent Run ID"
           content={$workflowRun.workflow.parent?.runId}
           href={routeForEventHistory({
-            view: $eventViewType,
             namespace: $page.params.namespace,
             workflow: $workflowRun.workflow.parent?.workflowId,
             run: $workflowRun.workflow.parent?.runId,
@@ -114,28 +104,26 @@
   </section>
   <slot name="timeline" />
   <section id="event-history">
-    <nav class="flex items-end justify-between gap-4 pb-4">
+    <nav
+      class="flex flex-col items-center justify-between gap-4 pb-4 lg:flex-row lg:items-end"
+    >
       <h3 class="text-lg font-medium">Recent Events</h3>
       <div id="event-view-toggle" class="flex gap-4">
         <ToggleButtons>
           <ToggleButton
             icon="feed"
-            base={routeForEventHistory(routeParameters('feed'))}
-            href={routeForEventHistory(routeParameters('feed'))}
             active={$eventViewType === 'feed'}
             data-cy="feed"
             on:click={() => ($eventViewType = 'feed')}>History</ToggleButton
           >
           <ToggleButton
             icon="compact"
-            href={routeForEventHistory(routeParameters('compact'))}
             active={$eventViewType === 'compact'}
             data-cy="compact"
             on:click={() => ($eventViewType = 'compact')}>Compact</ToggleButton
           >
           <ToggleButton
             icon="json"
-            href={routeForEventHistory(routeParameters('json'))}
             active={$eventViewType === 'json'}
             data-cy="json"
             on:click={() => ($eventViewType = 'json')}>JSON</ToggleButton

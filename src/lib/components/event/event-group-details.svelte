@@ -5,6 +5,7 @@
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
+  import Table from '$lib/holocene/table/table.svelte';
 
   export let eventGroup: EventGroup | null;
   export let selectedId: string;
@@ -12,22 +13,21 @@
 </script>
 
 <div class="w-full border-gray-700 lg:w-1/3 lg:border-r-2">
-  <table class="w-full table-fixed">
+  <Table class="w-full table-fixed pb-2">
     {#each [...eventGroup.events].reverse() as [id, eventInGroup] (id)}
       <tr
         class="row"
         class:active={id === selectedId}
         on:click|preventDefault|stopPropagation={() => onGroupClick(id)}
       >
-        <td class="cell hidden w-12 py-1 px-3 text-left xl:table-cell">
-          <span class="mx-1 text-sm text-gray-500 md:text-base">{id}</span>
+        <td class="w-1/12" />
+        <td class="table-cell w-24 text-left">
+          <p class="truncate text-sm text-gray-500 md:text-base">{id}</p>
         </td>
-        <td class="cell flex px-3 pt-1 pb-0 text-left xl:table-cell">
-          <span class="mx-1 text-sm text-gray-500 md:text-base xl:hidden"
-            >{id}</span
-          >
+        <td class="table-cell text-left">
           <p
-            class="m-0 overflow-hidden text-ellipsis whitespace-nowrap text-sm md:text-base"
+            class="truncate text-sm md:text-base"
+            class:active={id === selectedId}
             class:failure={eventOrGroupIsFailureOrTimedOut(eventInGroup)}
             class:canceled={eventOrGroupIsCanceled(eventInGroup)}
             class:terminated={eventOrGroupIsTerminated(eventInGroup)}
@@ -37,9 +37,10 @@
               : eventInGroup.eventType}
           </p>
         </td>
+        <td />
       </tr>
     {/each}
-  </table>
+  </Table>
 </div>
 
 <style lang="postcss">
@@ -51,9 +52,6 @@
   }
   .active.row {
     @apply bg-blue-50;
-  }
-  .cell {
-    @apply border-b-2 border-gray-700 px-3 py-1 leading-4;
   }
   .failure {
     @apply text-red-700;

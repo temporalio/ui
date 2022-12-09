@@ -9,7 +9,6 @@
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import { routeForEventHistory } from '$lib/utilities/route-for';
   import Link from '$lib/holocene/link.svelte';
-  import { eventViewType } from '$lib/stores/event-view';
 
   export let recentRuns: ScheduleActionResult[] = [];
   export let namespace: string;
@@ -27,7 +26,6 @@
           <Link
             sveltekit:prefetch
             href={routeForEventHistory({
-              view: $eventViewType,
               workflow: run.startWorkflowResult.workflowId,
               run: run.startWorkflowResult.runId,
               namespace,

@@ -10,11 +10,17 @@
   export let onFilter: () => void = noop;
   export let filtered = false;
 
+  let className = '';
+  export { className as class };
+
   const { copy, copied } = copyToClipboard(700);
 </script>
 
 {#if show}
-  <div class="copy-or-filter" on:click|preventDefault|stopPropagation={noop}>
+  <div
+    class="copy-or-filter {className}"
+    on:click|preventDefault|stopPropagation={noop}
+  >
     {#if filterable}
       <button on:click|preventDefault|stopPropagation={onFilter}>
         {#key filtered}
@@ -37,6 +43,6 @@
 
 <style lang="postcss">
   .copy-or-filter {
-    @apply absolute right-0 top-0 bottom-0 inline-flex gap-2 rounded-full bg-gray-50 px-2;
+    @apply absolute right-0 top-0 bottom-0 inline-flex gap-2 px-2;
   }
 </style>

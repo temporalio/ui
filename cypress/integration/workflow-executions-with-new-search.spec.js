@@ -205,7 +205,7 @@ describe('Workflow Executions List With Search', () => {
         cy.wait('@workflow-api');
         cy.wait('@event-history-api');
 
-        cy.url().should('contain', '/feed');
+        cy.url().should('contain', '/history');
         cy.get('[data-cy="back-to-workflows"]').click();
 
         cy.url().should(
