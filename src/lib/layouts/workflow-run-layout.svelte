@@ -3,7 +3,6 @@
   import { workflowRun, loading } from '$lib/stores/workflow-run';
   import { timelineEvents } from '$lib/stores/events';
 
-  import PageTransition from '$lib/holocene/page-transition.svelte';
   import Header from '$lib/layouts/workflow-header.svelte';
   import Loading from '$holocene/loading.svelte';
   import { onDestroy, onMount } from 'svelte';
@@ -25,14 +24,12 @@
   {#if $loading}
     <Loading />
   {:else}
-    <PageTransition>
-      <Header
-        namespace={$page.params.namespace}
-        workflow={$workflowRun.workflow}
-        workers={$workflowRun.workers}
-        {cancelEnabled}
-      />
-      <slot />
-    </PageTransition>
+    <Header
+      namespace={$page.params.namespace}
+      workflow={$workflowRun.workflow}
+      workers={$workflowRun.workers}
+      {cancelEnabled}
+    />
+    <slot />
   {/if}
 </main>

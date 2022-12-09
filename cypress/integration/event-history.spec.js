@@ -48,7 +48,7 @@ describe('Workflow Events', () => {
     cy.wait('@workflow-api');
     cy.wait('@event-history-descending');
 
-    cy.url().should('contain', '/feed');
+    cy.url().should('contain', '/history');
   });
 
   it('default to last viewed event view when visiting a workflow', () => {
@@ -57,21 +57,41 @@ describe('Workflow Events', () => {
     cy.wait('@workflow-api');
     cy.wait('@event-history-descending');
 
-    cy.url().should('contain', '/feed');
+    cy.url().should('contain', '/history');
 
-    cy.get('[data-cy="feed"]').click();
-    cy.url().should('contain', '/feed');
+    cy.get('[data-cy="feed"]').should('have.class', 'active');
+    cy.get('[data-cy="compact"]').should('not.have.class', 'active');
+    cy.get('[data-cy="json"]').should('not.have.class', 'active');
+
+    cy.get('[data-cy="compact"]').click();
 
     cy.visit('/namespaces/default/workflows');
 
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
-    cy.url().should('contain', '/feed');
+
+    cy.url().should('contain', '/history');
+    cy.get('[data-cy="compact"]').should('have.class', 'active');
+    cy.get('[data-cy="json"]').should('not.have.class', 'active');
+    cy.get('[data-cy="feed"]').should('not.have.class', 'active');
+
+    cy.get('[data-cy="event-summary-row"]')
+      .should('not.have.length', 0)
+      .should('not.have.length', eventsFixtureDescending.history.events.length);
+    cy.get('table').contains('activity.timeout');
+
+    cy.get('[data-cy="json"]').click();
+
+    cy.visit('/namespaces/default/workflows');
+
+    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
+
+    cy.get('[data-cy="json"]').should('have.class', 'active');
+    cy.get('[data-cy="compact"]').should('not.have.class', 'active');
+    cy.get('[data-cy="feed"]').should('not.have.class', 'active');
   });
 
   it('should render events in feed view', () => {
-    cy.visit(
-      `/namespaces/default/workflows/${workflowId}/${runId}/history/feed`,
-    );
+    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}/history`);
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-descending');
@@ -85,9 +105,7 @@ describe('Workflow Events', () => {
   });
 
   it('should render event time in various formats', () => {
-    cy.visit(
-      `/namespaces/default/workflows/${workflowId}/${runId}/history/feed`,
-    );
+    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}/history`);
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-descending');
@@ -111,12 +129,12 @@ describe('Workflow Events', () => {
   });
 
   it('should render events in compact view', () => {
-    cy.visit(
-      `/namespaces/default/workflows/${workflowId}/${runId}/history/compact`,
-    );
+    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}/history`);
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-descending');
+
+    cy.get('[data-cy="compact"]').click();
 
     cy.get('[data-cy="event-summary-row"]')
       .should('not.have.length', 0)

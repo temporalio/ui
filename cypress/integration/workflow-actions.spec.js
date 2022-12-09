@@ -25,7 +25,7 @@ describe('Workflow Actions', () => {
   describe('Terminate', () => {
     it('works if the workflow is running and write actions are enabled', () => {
       cy.visit(
-        `/namespaces/default/workflows/${workflowId}/${runId}/history/feed?sort=descending`,
+        `/namespaces/default/workflows/${workflowId}/${runId}/history?sort=descending`,
       );
 
       cy.wait('@settings-api');
@@ -42,7 +42,7 @@ describe('Workflow Actions', () => {
   describe('Cancel', () => {
     it('works if the workflow is running a write actions are enabled', () => {
       cy.visit(
-        `/namespaces/default/workflows/${workflowId}/${runId}/history/feed?sort=descending`,
+        `/namespaces/default/workflows/${workflowId}/${runId}/history?sort=descending`,
       );
 
       cy.wait('@settings-api');
@@ -62,7 +62,7 @@ describe('Workflow Actions', () => {
       }).as('settings-api');
 
       cy.visit(
-        `/namespaces/default/workflows/${workflowId}/${runId}/history/feed?sort=descending`,
+        `/namespaces/default/workflows/${workflowId}/${runId}/history?sort=descending`,
       );
 
       cy.wait('@settings-api');

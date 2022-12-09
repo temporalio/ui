@@ -17,13 +17,6 @@ type RouteParameters = {
   search?: string;
 };
 
-export const isEventView = (view: string): view is EventView => {
-  if (view === 'feed') return true;
-  if (view === 'compact') return true;
-  if (view === 'json') return true;
-  return false;
-};
-
 export type NamespaceParameter = Pick<RouteParameters, 'namespace'>;
 export type WorkflowsParameter = Pick<
   RouteParameters,
@@ -127,13 +120,11 @@ export const routeForScheduleEdit = ({
 };
 
 export const routeForEventHistory = ({
-  view,
   queryParams,
   ...parameters
 }: EventHistoryParameters): string => {
   const eventHistoryPath = `${routeForWorkflow(parameters)}/history`;
-  if (!view || !isEventView(view)) return `${eventHistoryPath}/feed`;
-  return toURL(`${eventHistoryPath}/${view}`, queryParams);
+  return toURL(`${eventHistoryPath}`, queryParams);
 };
 
 export const routeForWorkers = (parameters: WorkflowParameters): string => {

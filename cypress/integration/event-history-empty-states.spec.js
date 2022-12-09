@@ -23,26 +23,36 @@ describe('Workflow Executions List', () => {
     ).as('workflow-api');
   });
 
-  for (const view of ['feed', 'compact']) {
-    it(`should show an empty state in the ${view} view`, () => {
-      cy.visit(workflowUrl + `/history/${view}`);
+  it(`should show an empty state in the feed view`, () => {
+    cy.visit(workflowUrl + `/history`);
 
-      cy.wait('@workflow-api');
-      cy.wait('@event-history-api');
-      cy.wait('@query-api');
+    cy.wait('@workflow-api');
+    cy.wait('@event-history-api');
 
-      cy.contains('No Events Match');
-    });
-  }
+    cy.contains('No Events Match');
+  });
 
-  it.only('should display a custom empty state if there are events, but no event groups', () => {
+  it(`should show an empty state in the compact view`, () => {
+    cy.visit(workflowUrl + `/history`);
+
+    cy.wait('@workflow-api');
+    cy.wait('@event-history-api');
+
+    cy.get('[data-cy="compact"]').click();
+
+    cy.contains('No Events Match');
+  });
+
+  it('should display a custom empty state if there are events, but no event groups', () => {
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
         `/api/v1/namespaces/default/workflows/*/runs/*/events*`,
       { fixture: 'event-history-with-no-activities.json' },
     ).as('event-history-api');
 
-    cy.visit(workflowUrl + `/history/compact`);
+    cy.visit(workflowUrl + `/history`);
+
+    cy.get('[data-cy="compact"]').click();
 
     cy.contains('No Events Match');
   });

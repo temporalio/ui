@@ -15,7 +15,6 @@ import {
   isEventParameters,
   routeForNamespace,
   routeForNamespaces,
-  isEventView,
   routeForArchivalWorkfows,
   routeForPendingActivities,
   routeForSchedules,
@@ -69,43 +68,13 @@ describe('routeFor', () => {
     expect(path).toBe('/namespaces/default/workflows/abc/def');
   });
 
-  it('should route to "workflow.events" feed page', () => {
-    const path = routeForEventHistory({
-      namespace: 'default',
-      workflow: 'abc',
-      run: 'def',
-      view: 'feed',
-    });
-    expect(path).toBe('/namespaces/default/workflows/abc/def/history/feed');
-  });
-
-  it('should route to "workflow.events" compact page', () => {
-    const path = routeForEventHistory({
-      namespace: 'default',
-      workflow: 'abc',
-      run: 'def',
-      view: 'compact',
-    });
-    expect(path).toBe('/namespaces/default/workflows/abc/def/history/compact');
-  });
-
-  it('should route to "workflow.events" json page', () => {
-    const path = routeForEventHistory({
-      namespace: 'default',
-      workflow: 'abc',
-      run: 'def',
-      view: 'json',
-    });
-    expect(path).toBe('/namespaces/default/workflows/abc/def/history/json');
-  });
-
-  it('should route to default "workflow.events" feed page if no view provided', () => {
+  it('should route to "workflow.events" history page', () => {
     const path = routeForEventHistory({
       namespace: 'default',
       workflow: 'abc',
       run: 'def',
     });
-    expect(path).toBe('/namespaces/default/workflows/abc/def/history/feed');
+    expect(path).toBe('/namespaces/default/workflows/abc/def/history');
   });
 
   it('should route to pending activities', () => {
@@ -437,18 +406,6 @@ describe('routeFor SSO authentication ', () => {
       });
     });
   });
-});
-
-describe('isEventView', () => {
-  for (const validEventView of ['feed', 'compact', 'json']) {
-    it(`should return true if provided "${validEventView}"`, () => {
-      expect(isEventView(validEventView)).toBe(true);
-    });
-
-    it('should return false if given a bogus event view', () => {
-      expect(isEventView('bogus')).toBe(false);
-    });
-  }
 });
 
 describe('isNamespaceParameter', () => {

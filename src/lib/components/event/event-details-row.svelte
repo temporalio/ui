@@ -18,7 +18,6 @@
   import Link from '$lib/holocene/link.svelte';
   import Copyable from '../copyable.svelte';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
-  import { eventViewType } from '$lib/stores/event-view';
 
   export let key: string;
   export let value: string | Record<string, unknown>;
@@ -49,7 +48,6 @@
             class="truncate"
             newTab
             href={routeForEventHistory({
-              view: $eventViewType,
               namespace,
               workflow,
               run: value,
@@ -69,7 +67,6 @@
             class="truncate"
             newTab
             href={routeForEventHistory({
-              view: $eventViewType,
               namespace,
               workflow: attributes.workflowExecutionWorkflowId,
               run: attributes.workflowExecutionRunId,

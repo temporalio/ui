@@ -1,9 +1,7 @@
 /// <reference types="cypress" />
 
 const visitWorkflow = (suffix = '') => {
-  cy.visit(
-    `/namespaces/default/workflows/workflowId/runId/history/feed${suffix}`,
-  );
+  cy.visit(`/namespaces/default/workflows/workflowId/runId/history${suffix}`);
 };
 
 describe('Fallback to Ascending Ordering of Event History on Older Versions of Temporal Server', () => {
