@@ -81,7 +81,7 @@
 {#if bulkActionsEnabled}
   <Table
     id="workflows-table-with-bulk-actions"
-    class="w-full md:table-fixed"
+    class="w-full min-w-[600px] table-fixed"
     {updating}
   >
     <TableHeaderRow slot="headers">
