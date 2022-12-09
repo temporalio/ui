@@ -31,7 +31,9 @@
   export let namespace: string;
   export let workflow: WorkflowExecution;
   export let workers: GetPollersResponse;
+
   export let cancelEnabled: boolean = false;
+  export let signalEnabled: boolean = false;
 
   let refreshInterval;
   const refreshRate = 15000;
@@ -120,6 +122,7 @@
         >
           <AutoRefreshWorkflow onChange={onRefreshChange} />
           <WorkflowActions
+            {signalEnabled}
             {cancelEnabled}
             {cancelInProgress}
             {workflow}

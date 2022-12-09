@@ -26,6 +26,7 @@
   export let namespace: string;
   export let cancelInProgress: boolean;
   export let cancelEnabled: boolean;
+  export let signalEnabled: boolean;
 
   let reason = '';
   let signalInput = '';
@@ -145,12 +146,14 @@
       on:click={showCancellationModal}
       id="workflow-actions"
     >
-      <MenuItem
-        dataCy="signal-button"
-        on:click={showSignalModal}
-        disabled={actionsDisabled}>Send a Signal</MenuItem
-      >
-      <MenuDivider />
+      {#if signalEnabled}
+        <MenuItem
+          dataCy="signal-button"
+          on:click={showSignalModal}
+          disabled={actionsDisabled}>Send a Signal</MenuItem
+        >
+        <MenuDivider />
+      {/if}
       <MenuItem
         destructive
         on:click={showTerminationModal}

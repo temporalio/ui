@@ -10,6 +10,7 @@
   import { eventFilterSort, EventSortOrder } from '$lib/stores/event-view';
 
   export let cancelEnabled: boolean = false;
+  export let signalEnabled: boolean = false;
 
   onMount(() => {
     const sort = $page.url.searchParams.get('sort');
@@ -31,6 +32,7 @@
         workflow={$workflowRun.workflow}
         workers={$workflowRun.workers}
         {cancelEnabled}
+        {signalEnabled}
       />
       <slot />
     </PageTransition>
