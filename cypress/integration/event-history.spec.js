@@ -59,6 +59,10 @@ describe('Workflow Events', () => {
 
     cy.url().should('contain', '/history');
 
+    cy.get('[data-cy="feed"]').should('have.class', 'active');
+    cy.get('[data-cy="compact"]').should('not.have.class', 'active');
+    cy.get('[data-cy="json"]').should('not.have.class', 'active');
+
     cy.get('[data-cy="compact"]').click();
 
     cy.visit('/namespaces/default/workflows');
@@ -66,10 +70,24 @@ describe('Workflow Events', () => {
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
     cy.url().should('contain', '/history');
+    cy.get('[data-cy="compact"]').should('have.class', 'active');
+    cy.get('[data-cy="json"]').should('not.have.class', 'active');
+    cy.get('[data-cy="feed"]').should('not.have.class', 'active');
+
     cy.get('[data-cy="event-summary-row"]')
       .should('not.have.length', 0)
       .should('not.have.length', eventsFixtureDescending.history.events.length);
     cy.get('table').contains('activity.timeout');
+
+    cy.get('[data-cy="json"]').click();
+
+    cy.visit('/namespaces/default/workflows');
+
+    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
+
+    cy.get('[data-cy="json"]').should('have.class', 'active');
+    cy.get('[data-cy="compact"]').should('not.have.class', 'active');
+    cy.get('[data-cy="feed"]').should('not.have.class', 'active');
   });
 
   it('should render events in feed view', () => {
