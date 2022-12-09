@@ -1,126 +1,56 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
 
-  import {
-    workflowEventsColumnWidth,
-    workflowEventsResponsiveColumnWidth,
-  } from '$lib/stores/column-width';
   import EventCategoryFilter from '$lib/components/event/event-category-filter.svelte';
   import EventDateFilter from '$lib/components/event/event-date-filter.svelte';
   import { expandAllEvents } from '$lib/stores/event-view';
+  import Table from '$lib/holocene/table/table.svelte';
+  import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
   export let compact = false;
-  export let typedError = false;
+  export let updating = false;
 
-  let title = compact ? 'Event Type' : 'Workflow Events';
   let expandAll = $expandAllEvents === 'true';
 
   const dispatch = createEventDispatcher();
 
   function handleChange(e: Event) {
-    const { checked } = e.target as HTMLInputElement;
-    expandAll = checked;
+    expandAll = !expandAll;
     dispatch('expandAll', {
-      expanded: checked ? 'true' : 'false',
+      expanded: expandAll ? 'true' : 'false',
     });
   }
 </script>
 
-<section
-  class="event-table"
-  class:error-table={typedError}
-  data-cy="event-summary-table"
->
-  <div
-    class="table-header-row xl:table-header-group"
-    class:header-hidden={typedError}
-    data-cy="event-summary-table-header-desktop"
-  >
-    <div class="hidden xl:table-row">
-      <div class="table-header w-12 rounded-tl-md" />
-      <div class="table-header w-80">
-        Date & Time{#if !compact}<EventDateFilter />{/if}
+<Table {updating} class="dark w-full table-fixed">
+  <TableHeaderRow slot="headers">
+    <th class="table-cell w-14 xl:w-10" />
+    <th class="table-cell w-16 md:w-32">
+      {#if !compact}<EventDateFilter />{:else}
+        <span class="hidden md:block">Date & Time</span>
+        <span class="block md:hidden"><Icon name="clock" /></span>{/if}
+    </th>
+    <th class="table-cell w-44"><EventCategoryFilter {compact} /></th>
+    <th class="table-cell w-auto xl:w-80">
+      <div class="flex w-full justify-end">
+        <button
+          class="relative flex w-28 items-center justify-end rounded sm:justify-between"
+          on:click={handleChange}
+        >
+          <span class="hidden sm:block">
+            {expandAll ? 'Collapse all' : 'Expand All'}
+          </span>
+          <Icon name={expandAll ? 'chevron-up' : 'chevron-down'} />
+        </button>
       </div>
-      <div
-        bind:offsetWidth={$workflowEventsColumnWidth}
-        class="table-header relative {compact ? 'w-3/5' : 'w-1/5'}"
-      >
-        {title}<EventCategoryFilter />
-      </div>
-      <div class="table-header w-auto" />
-      <div class="table-header relative w-32 rounded-tr-md">
-        <input
-          class="mr-1"
-          type="checkbox"
-          name="expandAll"
-          on:change={handleChange}
-          checked={expandAll}
-        />
-        <label for="expandAll">Expand all</label>
-      </div>
-    </div>
-  </div>
-  <div
-    class="table-header-row-responsive rounded-t-md"
-    class:header-hidden-responsive={typedError}
-  >
-    <div class="table-header-responsive w-1/3">
-      Date & Time
-      {#if !compact}<EventDateFilter />{/if}
-    </div>
-    <div
-      bind:offsetWidth={$workflowEventsResponsiveColumnWidth}
-      class="table-header-responsive w-1/3 justify-end"
-    >
-      {title}<EventCategoryFilter />
-    </div>
-    <div class="table-header-responsive" />
-    <div class="table-header-responsive min-w-fit">
-      <input
-        class="mr-1"
-        type="checkbox"
-        name="expandAll"
-        on:change={handleChange}
-        checked={expandAll}
-      />
-      <label for="expandAll">Expand all</label>
-    </div>
-  </div>
-  <div class="overflow-y-auto xl:table-row-group">
-    <slot />
-  </div>
-</section>
+    </th>
+  </TableHeaderRow>
+  <slot />
+</Table>
 
 <style lang="postcss">
-  .event-table {
-    @apply w-full table-fixed rounded-lg border-2 border-gray-900 xl:table;
-  }
-
-  .table-header-row {
-    @apply bg-gray-900 px-3 text-gray-100;
-  }
-
-  .table-header-row-responsive {
-    @apply flex justify-between bg-gray-900 px-3 text-gray-100 xl:hidden;
-  }
-
-  .table-header {
-    @apply flex items-center px-3 py-1 text-left xl:table-cell;
-  }
-
-  .table-header-responsive {
-    @apply flex items-center p-2;
-  }
-
   .error-table {
     @apply table border border-yellow-700;
-  }
-
-  .header-hidden {
-    visibility: collapse;
-  }
-
-  .header-hidden-responsive {
-    @apply hidden;
   }
 </style>
