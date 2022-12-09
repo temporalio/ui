@@ -81,7 +81,6 @@
         runId: workflow.runId,
       });
       loading = false;
-      showCancellationConfirmation = false;
       $refresh = Date.now();
     } catch {
       toaster.push({
@@ -90,6 +89,7 @@
         message: 'Unable to cancel workflow.',
       });
     }
+    showCancellationConfirmation = false;
   };
 
   const handleSignalInputChange = (event: CustomEvent<string>) => {
@@ -105,9 +105,12 @@
         signalInput,
         signalName,
       });
+      $refresh = Date.now();
+      await tick();
       toaster.push({
         message: 'Workflow successfully signaled.',
         yPosition: 'bottom',
+        id: 'workflow-signal-success-toast',
       });
     } catch (error) {
       toaster.push({
@@ -116,6 +119,8 @@
         yPosition: 'bottom',
       });
     }
+    signalInput = '';
+    signalName = '';
     showSignalConfirmation = false;
   };
 
@@ -140,8 +145,10 @@
       on:click={showCancellationModal}
       id="workflow-actions"
     >
-      <MenuItem on:click={showSignalModal} disabled={actionsDisabled}
-        >Send a Signal</MenuItem
+      <MenuItem
+        dataCy="signal-button"
+        on:click={showSignalModal}
+        disabled={actionsDisabled}>Send a Signal</MenuItem
       >
       <MenuDivider />
       <MenuItem

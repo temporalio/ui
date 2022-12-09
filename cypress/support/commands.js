@@ -165,6 +165,14 @@ Cypress.Commands.add('interceptCancelWorkflowApi', () => {
   ).as('cancel-workflow-api');
 });
 
+Cypress.Commands.add('interceptSignalWorkflowApi', () => {
+  cy.intercept(
+    Cypress.env('VITE_API_HOST') +
+      `/api/v1/namespaces/*/workflows/*/runs/*/signal?`,
+    { statusCode: 200, body: {} },
+  ).as('signal-workflow-api');
+});
+
 Cypress.Commands.add(
   'interceptApi',
   ({ namespace, archived } = { namespace: 'default', archived: false }) => {
@@ -185,5 +193,6 @@ Cypress.Commands.add(
     cy.interceptDescribeBatchOperationApi();
     cy.interceptTerminateWorkflowApi();
     cy.interceptCancelWorkflowApi();
+    cy.interceptSignalWorkflowApi();
   },
 );
