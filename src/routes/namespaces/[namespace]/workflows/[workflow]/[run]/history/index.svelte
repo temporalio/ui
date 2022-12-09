@@ -1,28 +1,37 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onDestroy } from 'svelte';
   import { page } from '$app/stores';
-  import { goto } from '$app/navigation';
+  import { clearPreviousEventParameters } from '$lib/stores/previous-events';
+  import { eventViewType } from '$lib/stores/event-view';
 
-  import { routeForEventHistory } from '$lib/utilities/route-for';
-  import { eventSortOrder } from '$lib/stores/event-view';
+  import WorkflowRunLayout from '$lib/layouts/workflow-run-layout.svelte';
+  import WorkflowHistoryLayout from '$lib/layouts/workflow-history-layout.svelte';
+  import WorkflowHistoryFeed from '$lib/pages/workflow-history-feed.svelte';
+  import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
+  import WorkflowHistoryCompact from '$lib/pages/workflow-history-compact.svelte';
 
-  const { namespace, workflow, run } = $page.params;
+  import PageTitle from '$lib/components/page-title.svelte';
 
-  onMount(async () => {
-    const queryParams = {
-      sort: $eventSortOrder,
-    };
-
-    goto(
-      routeForEventHistory({
-        queryParams,
-        namespace,
-        workflow,
-        run,
-      }),
-      {
-        replaceState: true,
-      },
-    );
+  onDestroy(() => {
+    clearPreviousEventParameters();
   });
+
+  const workflow = $page.params.workflow;
+
+  const views = {
+    feed: WorkflowHistoryFeed,
+    compact: WorkflowHistoryCompact,
+    json: WorkflowHistoryJson,
+  };
+  $: view = views[$eventViewType] ?? WorkflowHistoryFeed;
 </script>
+
+<PageTitle title={`Workflow History | ${workflow}`} url={$page.url.href} />
+<WorkflowRunLayout cancelEnabled>
+  <WorkflowHistoryLayout>
+    <!-- <svelte:fragment slot="timeline">
+    <EventHistoryTimelineContainer />
+    </svelte:fragment> -->
+    <svelte:component this={view} />
+  </WorkflowHistoryLayout>
+</WorkflowRunLayout>
