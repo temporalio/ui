@@ -19,8 +19,8 @@
   import Input from '$lib/holocene/input/input.svelte';
   import FeatureGuard from './feature-guard.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import Textarea from '$lib/holocene/textarea.svelte';
   import MenuDivider from '$lib/holocene/primitives/menu/menu-divider.svelte';
+  import JSONEditor from '$lib/holocene/JSON-editor.svelte';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
@@ -90,6 +90,10 @@
         message: 'Unable to cancel workflow.',
       });
     }
+  };
+
+  const handleSignalInputChange = (event: CustomEvent<string>) => {
+    signalInput = event.detail;
   };
 
   const sendSignal = async () => {
@@ -218,7 +222,7 @@
         <span class="font-secondary text-xs font-light italic">
           (only JSON payloads are supported)
         </span>
-        <Textarea bind:value={signalInput} />
+        <JSONEditor value={signalInput} on:change={handleSignalInputChange} />
       </div>
     </div>
   </Modal>
