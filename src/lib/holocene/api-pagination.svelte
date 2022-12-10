@@ -1,12 +1,10 @@
 <script lang="ts">
   import Alert from '$lib/holocene/alert.svelte';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
 
   import { createPaginationStore } from '$lib/stores/api-pagination';
   import { options } from '$lib/stores/pagination';
-  import { prevent_default } from 'svelte/internal';
 
   type T = $$Generic;
   type PaginatedRequest = (
