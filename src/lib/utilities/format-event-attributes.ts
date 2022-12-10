@@ -39,14 +39,14 @@ export const formatAttemptsLeft = (
   maxAttempts: number,
   attempt: number,
 ): number | string => {
-  if (maxAttempts === 0) {
+  if (!maxAttempts) {
     return UnlimitedAttempts;
   }
   return maxAttempts - attempt;
 };
 
 export const formatMaximumAttempts = (maxAttempts: number): number | string => {
-  if (maxAttempts === 0) {
+  if (!maxAttempts) {
     return UnlimitedAttempts;
   }
   return maxAttempts;
