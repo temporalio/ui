@@ -64,7 +64,6 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
     start: WorkflowEvents,
     end: WorkflowEvents,
   },
-  eventSortOrder: EventSortOrder = 'descending',
 ): WorkflowInputAndResults => {
   let input: string;
   let results: string;

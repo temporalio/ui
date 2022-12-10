@@ -31,13 +31,16 @@
     if (error) error = undefined;
   }
 
-  async function onPageChange(nextIndex: number) {
+  async function onPageChange(index: number, size: number) {
     clearError();
     store.setUpdating();
+    console.log('TODO: Reset index to 0 on pageSize change');
     console.log('onPageChange');
+    console.log('nextIndex', index);
+    console.log('pageSize', size);
     try {
       const fetchData: PaginatedRequest = await onFetch();
-      const response = await fetchData(pageSize, $store.indexTokens[nextIndex]);
+      const response = await fetchData(size, $store.indexTokens[index]);
       const { items, nextPageToken } = response;
       store.setNextPageToken(nextPageToken, items);
     } catch (err: any) {
@@ -46,26 +49,7 @@
     }
   }
 
-  async function onPageSizeChange(pageSize: number) {
-    clearError();
-    store.resetPageSize();
-    console.log('onPageSizeChange');
-    try {
-      const fetchData: PaginatedRequest = await onFetch();
-      const response = await fetchData(
-        pageSize,
-        $store.indexTokens[$store.index],
-      );
-      const { items, nextPageToken } = response;
-      store.setNextPageToken(nextPageToken, items);
-    } catch (err: any) {
-      error = err;
-      onError(error);
-    }
-  }
-
-  $: onPageChange(nextIndex);
-  // $: reset, onPageSizeChange(pageSize);
+  $: reset, onPageChange(nextIndex, pageSize);
 
   $: isEmpty = $store.items.length === 0 && !$store.loading;
 

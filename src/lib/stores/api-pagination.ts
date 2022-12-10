@@ -18,6 +18,7 @@ type PaginationItems = {
   index: number;
   nextIndex: number;
   pageSize: number;
+  nextPageSize: number;
   currentPageNumber: number;
   endingPageNumber: number;
   items: any[];
@@ -34,6 +35,7 @@ const initialStore: PaginationItems = {
   index: 0,
   nextIndex: 0,
   pageSize: defaultItemsPerPage,
+  nextPageSize: defaultItemsPerPage,
   currentPageNumber: 1,
   endingPageNumber: defaultItemsPerPage,
   items: [],
