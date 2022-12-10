@@ -6,6 +6,7 @@
 
   import { createPaginationStore } from '$lib/stores/api-pagination';
   import { options } from '$lib/stores/pagination';
+  import { prevent_default } from 'svelte/internal';
 
   type T = $$Generic;
   type PaginatedRequest = (
@@ -53,7 +54,7 @@
 
   function handleKeydown(event) {
     console.log('event: ', event);
-    switch (event.key) {
+    switch (event.code) {
       case 'ArrowRight':
         if ($store.hasNext && !$store.loading) {
           store.nextPage();
@@ -72,6 +73,10 @@
         break;
       case 'ArrowDown':
         store.nextRow();
+        break;
+      case 'Space':
+        event.preventDefault();
+        // Use an open row array in store???
         break;
       default:
         break;

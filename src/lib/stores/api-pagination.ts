@@ -148,10 +148,12 @@ export function createPaginationStore(): PaginationStore {
       }),
     nextRow: () =>
       update((store) => {
-        return { ...store, activeRow: store.activeRow + 1 };
+        // Add until at the bottom
+        return { ...store, activeRow: store.activeRow < store.items.length - 1 ? store.activeRow + 1 : store.activeRow };
       }),
     previousRow: () =>
       update((store) => {
+        // Subtract until at the top
         return { ...store, activeRow: store.activeRow > 1 ? store.activeRow - 1 : 0 };
       }),
   };
