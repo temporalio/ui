@@ -32,28 +32,29 @@
   const onPageReset = () => {
     $refresh = Date.now();
   };
+  console.log('Event Summary');
 </script>
 
 <ApiPagination
   let:visibleItems
   let:initialItem
   let:updating
+  let:activeRow
   onFetch={fetchEvents}
   onError={(error) => console.error(error)}
-  onArrowUp={() => ($eventFilterSort = 'descending')}
-  onArrowDown={() => ($eventFilterSort = 'ascending')}
   {onPageReset}
   reset={$eventFilterSort}
   total={$eventHistory.end[0]?.id}
 >
   <EventSummaryTable {updating} {compact} on:expandAll={handleExpandChange}>
-    {#each compact ? groupEvents(visibleItems) : visibleItems as event (`${event.id}-${event.timestamp}`)}
+    {#each compact ? groupEvents(visibleItems) : visibleItems as event, index (`${event.id}-${event.timestamp}`)}
       <EventSummaryRow
         {event}
         {compact}
         expandAll={$expandAllEvents === 'true'}
         {initialItem}
         {visibleItems}
+        active={activeRow === index}
       />
     {:else}
       <EventEmptyRow />

@@ -8,7 +8,6 @@
     workflowEventsResponsiveColumnWidth,
   } from '$lib/stores/column-width';
 
-  import { getGroupForEvent, isEventGroup } from '$lib/models/event-groups';
   import {
     eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsCanceled,
@@ -29,6 +28,7 @@
   export let compact = false;
   export let expandAll = false;
   export let typedError = false;
+  export let active = false;
 
   let selectedId = compact
     ? Array.from((event as EventGroup).events.keys()).pop()
@@ -85,6 +85,7 @@
   class="row"
   id={event.id}
   class:expanded={expanded && !expandAll}
+  class:active
   class:failure
   class:canceled
   class:terminated
@@ -182,7 +183,6 @@
   .row:hover {
     @apply z-50 cursor-pointer bg-gradient-to-b from-blue-100 to-purple-100;
   }
-
   .expanded.row {
     @apply bg-blue-50;
   }
@@ -226,5 +226,9 @@
     &.expanded {
       @apply rounded-b-none;
     }
+  }
+
+  .active {
+    @apply bg-purple-100;
   }
 </style>

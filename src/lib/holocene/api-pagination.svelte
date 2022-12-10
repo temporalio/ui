@@ -10,13 +10,11 @@
   type T = $$Generic;
   type PaginatedRequest = (
     size: number,
-    token: string,
+    token: string | Uint8Array,
   ) => Promise<{ items: any[]; nextPageToken: string }>;
 
   export let onError: (error: any) => void;
   export let onFetch: () => Promise<PaginatedRequest>;
-  export let onArrowUp: () => void | undefined = undefined;
-  export let onArrowDown: () => void | undefined = undefined;
   export let onPageReset: () => void | undefined = undefined;
   export let reset: any;
   export let total: string | number = '';
@@ -54,6 +52,7 @@
   $: isEmpty = $store.items.length === 0 && !$store.loading;
 
   function handleKeydown(event) {
+    console.log('event: ', event);
     switch (event.key) {
       case 'ArrowRight':
         if ($store.hasNext && !$store.loading) {
@@ -69,18 +68,10 @@
         }
         break;
       case 'ArrowUp':
-        if (onArrowUp) {
-          event.preventDefault();
-          onArrowUp();
-          if (onPageReset) onPageReset();
-        }
+        store.previousRow();
         break;
       case 'ArrowDown':
-        if (onArrowDown) {
-          event.preventDefault();
-          onArrowDown();
-          if (onPageReset) onPageReset();
-        }
+        store.nextRow();
         break;
       default:
         break;
@@ -156,6 +147,7 @@
         visibleItems={$store.items}
         initialItem={[]}
         updating={$store.updating}
+        activeRow={$store.activeRow}
       />
     {/if}
 

@@ -11,6 +11,8 @@ type PaginationMethods = {
   setUpdating: () => void;
   reset: () => void;
   resetPageSize: () => void;
+  nextRow: () => void;
+  previousRow: () => void;
 };
 
 type PaginationItems = {
@@ -150,7 +152,7 @@ export function createPaginationStore(): PaginationStore {
       }),
     previousRow: () =>
       update((store) => {
-        return { ...store, activeRow: store.activeRow - 1 };
+        return { ...store, activeRow: store.activeRow > 1 ? store.activeRow - 1 : 0 };
       }),
   };
 }
