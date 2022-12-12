@@ -19,7 +19,7 @@
   export let onShiftUp: () => void | undefined = undefined;
   export let onShiftDown: () => void | undefined = undefined;
 
-  export let pageSizeOptions = options;
+  export let pageSizeOptions: string[] = options;
   export let reset: any;
   export let total: string | number = '';
 
@@ -39,9 +39,6 @@
     clearError();
     store.setUpdating();
     console.log('TODO: Reset index to 0 on pageSize change');
-    console.log('onPageChange');
-    console.log('nextIndex', index);
-    console.log('pageSize', size);
     try {
       const fetchData: PaginatedRequest = await onFetch();
       const response = await fetchData(size, $store.indexTokens[index]);
@@ -74,6 +71,7 @@
         break;
       case 'ArrowUp':
         if (shifted && onShiftUp) {
+          store.reset();
           onShiftUp();
         } else {
           store.previousRow();
@@ -81,6 +79,7 @@
         break;
       case 'ArrowDown':
         if (shifted && onShiftDown) {
+          store.reset();
           onShiftDown();
         } else {
           store.nextRow();
@@ -184,7 +183,7 @@
       <SkeletonTable rows={15} />
     {:else if !isEmpty}
       <slot
-        visibleItems={$store.items}
+        visibleItems={$store.indexData[$store.index].items}
         initialItem={[]}
         updating={$store.updating}
         activeRow={$store.activeRow}
