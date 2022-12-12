@@ -47,18 +47,23 @@
   .row {
     @apply table-row;
   }
+
   .row:hover {
     @apply cursor-pointer bg-gradient-to-b from-blue-100 to-purple-100;
   }
+
   .active.row {
     @apply bg-blue-50;
   }
+
   .failure {
     @apply text-red-700;
   }
+
   .canceled {
     @apply text-yellow-700;
   }
+
   .terminated {
     @apply text-pink-700;
   }

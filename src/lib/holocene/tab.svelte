@@ -49,6 +49,7 @@
   a.disabled {
     @apply pointer-events-none border-0 text-gray-800 opacity-50;
   }
+
   div.active {
     @apply border-b-2 border-blue-700 font-medium text-blue-700;
   }

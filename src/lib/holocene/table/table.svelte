@@ -21,9 +21,7 @@
 <style lang="postcss">
   table {
     @apply relative;
-  }
 
-  table {
     thead :global(th) {
       @apply text-left font-secondary text-sm font-medium;
     }
@@ -106,6 +104,7 @@
               @apply rounded-bl-none;
             }
           }
+
           &:last-child {
             &:last-child {
               @apply rounded-br-none;
@@ -115,40 +114,51 @@
       }
     }
   }
+
   table.dark {
     @apply border-gray-900;
+
     thead {
       :global(th) {
         @apply border-t-2 border-gray-900;
+
         &:first-child {
           @apply border-l-2 border-r-2 border-gray-900;
         }
+
         &:last-child {
           @apply border-l-2 border-r-2 border-gray-900;
         }
       }
     }
+
     tbody :global {
       td {
         @apply border-t-2 border-gray-900;
+
         &:first-child {
           @apply border-l-2 border-gray-900;
         }
+
         &:last-child {
           @apply border-r-2 border-gray-900;
         }
       }
+
       &:last-child {
         td {
           @apply border-b-2 border-gray-900;
         }
       }
+
       tbody :global {
         td {
           @apply border-t-0;
+
           &:first-child {
             @apply border-l-0;
           }
+
           &:last-child {
             @apply border-r-0;
           }

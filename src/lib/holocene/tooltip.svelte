@@ -64,12 +64,15 @@
   .tooltip.top {
     @apply left-1/2 -mt-1 -translate-x-1/2 -translate-y-full;
   }
+
   .tooltip.bottom {
     @apply left-1/2 bottom-0 -mb-1 -translate-x-1/2 translate-y-full;
   }
+
   .tooltip.left {
     @apply left-0 -ml-4 -translate-x-full;
   }
+
   .tooltip.right {
     @apply right-0 -mr-4 translate-x-full;
   }
@@ -77,9 +80,11 @@
   .tooltip.topRight {
     @apply right-1/2 -mt-4 mr-4 -translate-x-1/2 -translate-y-full;
   }
+
   .tooltip.bottomLeft {
     @apply left-auto right-0 bottom-0 -mb-1 translate-x-0 translate-y-full;
   }
+
   .tooltip.bottomRight {
     @apply left-0 right-auto bottom-0 -mb-1 translate-x-0 translate-y-full;
   }

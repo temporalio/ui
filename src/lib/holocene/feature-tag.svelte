@@ -17,6 +17,7 @@
   .new-tag {
     @apply absolute top-1 right-1 h-2 w-2 animate-pulse rounded-full bg-green-500;
   }
+
   .alpha {
     @apply bg-purple-300;
   }
