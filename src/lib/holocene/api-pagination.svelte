@@ -5,6 +5,7 @@
 
   import { createPaginationStore } from '$lib/stores/api-pagination';
   import { options } from '$lib/stores/pagination';
+  import KeyboardShortcut from '$holocene/keyboard-shortcut/shortcut.svelte';
 
   type T = $$Generic;
   type PaginatedRequest = (
@@ -15,11 +16,17 @@
   export let onError: (error: any) => void;
   export let onFetch: () => Promise<PaginatedRequest>;
   export let onPageReset: () => void | undefined = undefined;
+  export let onShiftUp: () => void | undefined = undefined;
+  export let onShiftDown: () => void | undefined = undefined;
+
+  export let pageSizeOptions = options;
   export let reset: any;
   export let total: string | number = '';
 
   let store = createPaginationStore();
   let error: any;
+
+  let shifted = false;
 
   $: nextIndex = $store.nextIndex;
   $: pageSize = $store.pageSize;
@@ -51,7 +58,6 @@
   $: isEmpty = $store.items.length === 0 && !$store.loading;
 
   function handleKeydown(event) {
-    console.log('event: ', event);
     switch (event.code) {
       case 'ArrowRight':
         if ($store.hasNext && !$store.loading) {
@@ -67,14 +73,37 @@
         }
         break;
       case 'ArrowUp':
-        store.previousRow();
+        if (shifted && onShiftUp) {
+          onShiftUp();
+        } else {
+          store.previousRow();
+        }
         break;
       case 'ArrowDown':
-        store.nextRow();
+        if (shifted && onShiftDown) {
+          onShiftDown();
+        } else {
+          store.nextRow();
+        }
         break;
       case 'Space':
         event.preventDefault();
         // Use an open row array in store???
+        break;
+      case 'ShiftLeft':
+      case 'ShiftRight':
+        shifted = true;
+        break;
+      default:
+        break;
+    }
+  }
+
+  function handleKeyup(event) {
+    switch (event.code) {
+      case 'ShiftLeft':
+      case 'ShiftRight':
+        shifted = false;
         break;
       default:
         break;
@@ -82,7 +111,7 @@
   }
 </script>
 
-<svelte:window on:keydown={handleKeydown} />
+<svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
 
 {#if error && $$slots.error}
   <slot name="error" />
@@ -99,17 +128,25 @@
 {:else}
   <div class="relative mb-8 flex flex-col gap-4">
     <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
-      <div class="flex items-center">
-        <slot name="action-top-left" />
+      <div class="flex items-center gap-1 lg:gap-2 xl:gap-3">
+        <slot name="action-top-left">
+          <KeyboardShortcut arrow="left" tooltipText="Previous Page" />
+          <KeyboardShortcut arrow="up" tooltipText="Previous Row" />
+          <KeyboardShortcut arrow="down" tooltipText="Next Row" />
+          <KeyboardShortcut arrow="right" tooltipText="Next Page" />
+          <slot name="shortcuts" />
+        </slot>
       </div>
       <nav class="flex flex-col justify-end gap-4 md:flex-row">
         <slot name="action-top-center" />
-        <FilterSelect
-          label="Per Page"
-          parameter={$store.key}
-          value={String($store.pageSize)}
-          {options}
-        />
+        {#if pageSizeOptions.length}
+          <FilterSelect
+            label="Per Page"
+            parameter={$store.key}
+            value={String($store.pageSize)}
+            options={pageSizeOptions}
+          />
+        {/if}
         <div class="flex items-center justify-center gap-3">
           <button
             class="caret"
@@ -161,12 +198,14 @@
     >
       <slot name="action-bottom-left" />
       <div class="flex gap-4">
-        <FilterSelect
-          label="Per Page"
-          parameter={$store.key}
-          value={String($store.pageSize)}
-          {options}
-        />
+        {#if pageSizeOptions.length}
+          <FilterSelect
+            label="Per Page"
+            parameter={$store.key}
+            value={String($store.pageSize)}
+            options={pageSizeOptions}
+          />
+        {/if}
         <div class="flex items-center justify-center gap-1">
           <button
             class="caret"
