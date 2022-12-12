@@ -7,7 +7,8 @@ import type { Readable } from 'svelte/store';
 type PaginationMethods = {
   nextPage: () => void;
   previousPage: () => void;
-  setNextPageToken: (t: string, items: any[]) => void;
+  setNextPage: (t: string, items: any[]) => void;
+  setPreviousPage: () => void;
   setUpdating: () => void;
   reset: () => void;
   resetPageSize: () => void;
@@ -17,37 +18,29 @@ type PaginationMethods = {
 
 type PaginationItems = {
   key: string;
+  loading: boolean;
+  updating: boolean;
+  hasNext: boolean;
+  hasPrevious: boolean;
   index: number;
   nextIndex: number;
   pageSize: number;
   nextPageSize: number;
-  currentPageNumber: number;
-  endingPageNumber: number;
-  items: any[];
   indexData: Record<number, { nextToken: string, start: number, end: number, items: any[] }>;
-  loading: boolean;
-  updating: boolean;
-  indexTokens: Record<number, string>;
-  hasNext: boolean;
-  hasPrevious: boolean;
   activeRow: number;
 };
 
 const initialStore: PaginationItems = {
   key: 'per-page',
+  loading: true,
+  updating: true,
+  hasNext: true,
+  hasPrevious: false,
   index: 0,
   nextIndex: 0,
   pageSize: defaultItemsPerPage,
   nextPageSize: defaultItemsPerPage,
-  currentPageNumber: 1,
-  endingPageNumber: defaultItemsPerPage,
-  items: [],
   indexData: {},
-  loading: true,
-  updating: true,
-  indexTokens: {},
-  hasNext: true,
-  hasPrevious: false,
   activeRow: 0,
 };
 
@@ -66,28 +59,15 @@ export function createPaginationStore(): PaginationStore {
   const { subscribe } = derived(
     [paginationStore, pageSize],
     ([$pagination, $pageSize]) => {
-      const getEndingPageNumber = () => {
-        if ($pagination.items.length < $pageSize && $pagination.index === 0) {
-          return $pagination.items.length;
-        }
-
-        if ($pagination.items.length < $pageSize) {
-          return $pagination.index * $pageSize + $pagination.items.length;
-        }
-
-        return $pagination.index * $pageSize + $pageSize;
-      };
 
       return {
         ...$pagination,
-        currentPageNumber: $pagination.index * $pageSize + 1,
-        endingPageNumber: getEndingPageNumber(),
         pageSize: $pageSize,
       };
     },
   );
 
-  const setNextPageToken = (
+  const setNextPage = (
     nextToken: string,
     items: any[],
     store: PaginationItems,
@@ -121,22 +101,21 @@ export function createPaginationStore(): PaginationStore {
       }
     }
 
-    // if (store.nextIndex === store.index) {
-    //   // First page
-    //   _store.indexTokens[store.nextIndex + 1] = nextToken;
-    //   _store.hasPrevious = false;
-    // } else if (store.nextIndex > store.index) {
-    //   // Next Page
-    //   _store.indexTokens[store.nextIndex + 1] = nextToken;
-    //   _store.hasPrevious = true;
-    // } else if (store.nextIndex < store.index) {
-    //   // Previous Page
-    //   if (store.nextIndex === 0) {
-    //     _store.indexTokens = {};
-    //     _store.indexTokens[store.nextIndex + 1] = nextToken;
-    //     _store.hasPrevious = false;
-    //   }
-    // }
+    return _store;
+  };
+
+  const setPreviousPage = (
+    store: PaginationItems,
+  ) => {
+    const _store = { ...store };
+    _store.hasNext = true;
+    _store.updating = false;
+    _store.loading = false;
+    _store.index = store.nextIndex;
+
+    if (store.nextIndex === 0) {
+      _store.hasPrevious = false;
+    }
 
     return _store;
   };
@@ -154,8 +133,12 @@ export function createPaginationStore(): PaginationStore {
         }
         return store;
       }),
-    setNextPageToken: (token: string, items: any[]) =>
-      update((store) => setNextPageToken(token, items, store)),
+    setNextPage: (token: string, items: any[]) =>
+      update((store) => setNextPage(token, items, store)),
+    setPreviousPage: () =>
+      update((store) => {
+        return { ...store, index: store.nextIndex }
+      }),
     setUpdating: () =>
       update((store) => {
         return { ...store, updating: true };
@@ -168,7 +151,7 @@ export function createPaginationStore(): PaginationStore {
     nextRow: () =>
       update((store) => {
         // Add until at the bottom
-        return { ...store, activeRow: store.activeRow < store.items.length - 1 ? store.activeRow + 1 : store.activeRow };
+        return { ...store, activeRow: store.activeRow < store.indexData[store.index].items.length - 1 ? store.activeRow + 1 : store.activeRow };
       }),
     previousRow: () =>
       update((store) => {

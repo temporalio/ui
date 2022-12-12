@@ -25,15 +25,17 @@
   import { page } from '$app/stores';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
+  export let compact: boolean;
+
   let sortOptions: EventSortOrderOptions = [
     { label: 'Sort 1-9', option: 'ascending' },
     { label: 'Sort 9-1', option: 'descending' },
   ];
 
   let dateOptions: TimeFormatOptions = [
-    { label: 'UTC Time', option: 'UTC' },
-    { label: 'Relative Time', option: 'relative' },
-    { label: 'Local Time', option: 'local' },
+    { label: 'Relative', option: 'relative' },
+    { label: 'UTC', option: 'UTC' },
+    { label: 'Local', option: 'local' },
   ];
 
   const onSortOptionClick = (option: EventSortOrder) => {
@@ -58,7 +60,7 @@
   };
 
   $: value =
-    $eventSortOrder === 'descending' &&
+    (compact ? true : $eventSortOrder === 'descending') &&
     $timeFormat === 'UTC' &&
     $eventShowElapsed === 'false'
       ? undefined
@@ -71,7 +73,7 @@
     <span class="block md:hidden"><Icon name="clock" /></span>
   </svelte:fragment>
   <div class="w-56">
-    {#if $supportsReverseOrder}
+    {#if $supportsReverseOrder && !compact}
       {#each sortOptions as { option, label } (option)}
         <div
           class="option"

@@ -181,7 +181,7 @@
   }
 
   .row:hover {
-    @apply z-50 cursor-pointer bg-gradient-to-b from-blue-100 to-purple-100;
+    @apply z-50 cursor-pointer bg-gray-50;
   }
   .expanded.row {
     @apply bg-blue-50;
@@ -229,6 +229,6 @@
   }
 
   .active {
-    @apply bg-purple-100;
+    @apply z-50 cursor-pointer bg-gradient-to-b from-blue-100 to-purple-100;
   }
 </style>

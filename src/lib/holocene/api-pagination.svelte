@@ -30,35 +30,41 @@
 
   $: nextIndex = $store.nextIndex;
   $: pageSize = $store.pageSize;
+  $: items = $store.indexData[$store.index]?.items ?? [];
+  $: isEmpty = items.length === 0 && !$store.loading;
+  $: start = $store.indexData[$store.index]?.start ?? 0;
+  $: end = $store.indexData[$store.index]?.end ?? 0;
 
   function clearError() {
     if (error) error = undefined;
   }
 
+  $: {
+    console.log('Store index: ', $store.index);
+  }
+
   async function onPageChange(index: number, size: number) {
     clearError();
-    store.setUpdating();
-    console.log('TODO: Reset index to 0 on pageSize change');
-    try {
-      const fetchData: PaginatedRequest = await onFetch();
-      const response = await fetchData(
-        size,
-        $store.indexData[$store.index]?.nextToken ?? '',
-      );
-      const { items, nextPageToken } = response;
-      store.setNextPageToken(nextPageToken, items);
-    } catch (err: any) {
-      error = err;
-      onError(error);
+    if (index >= $store.index) {
+      store.setUpdating();
+      try {
+        const fetchData: PaginatedRequest = await onFetch();
+        const response = await fetchData(
+          size,
+          $store.indexData[$store.index]?.nextToken ?? '',
+        );
+        const { items, nextPageToken } = response;
+        store.setNextPage(nextPageToken, items);
+      } catch (err: any) {
+        error = err;
+        onError(error);
+      }
+    } else {
+      store.setPreviousPage();
     }
   }
 
   $: reset, onPageChange(nextIndex, pageSize);
-
-  $: items = $store.indexData[$store.index]?.items ?? [];
-  $: isEmpty = items.length === 0 && !$store.loading;
-  $: start = $store.indexData[$store.index]?.start;
-  $: end = $store.indexData[$store.index]?.end;
 
   function handleKeydown(event) {
     switch (event.code) {
