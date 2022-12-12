@@ -33,12 +33,7 @@ jobs:
       - name: Bump version
         run: npm version --no-commit-hooks ${{ inputs.bump }}
       - name: Create Pull Request
-        run: |
-          tag=${{ git describe --abbrev=0 --tags }}
-          branch="releases/${{ tag }}"
-          git checkout -b ${{ branch }}
-          git remote set-url origin https://x-access-token:${{ secrets.COMMANDER_DATA_TOKEN }}@github.com/${{ github.repository }}
-          git push --tags origin ${{ branch }}
-          gh pr create -B main -H ${{ branch }} --title 'bump version in package.json to ${{ tag }}'
+        run: ./.github/scripts/bump-version.sh
         env:
           GITHUB_TOKEN: ${{ secrets.COMMANDER_DATA_TOKEN }}
+          GITHUB_REPO: ${{ github.repository }}
