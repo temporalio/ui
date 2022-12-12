@@ -43,7 +43,7 @@
       const fetchData: PaginatedRequest = await onFetch();
       const response = await fetchData(
         size,
-        $store.indexData[index]?.nextToken ?? '',
+        $store.indexData[$store.index]?.nextToken ?? '',
       );
       const { items, nextPageToken } = response;
       store.setNextPageToken(nextPageToken, items);
@@ -57,6 +57,8 @@
 
   $: items = $store.indexData[$store.index]?.items ?? [];
   $: isEmpty = items.length === 0 && !$store.loading;
+  $: start = $store.indexData[$store.index]?.start;
+  $: end = $store.indexData[$store.index]?.end;
 
   function handleKeydown(event) {
     switch (event.code) {
@@ -163,7 +165,7 @@
           </button>
           <div class="flex gap-1">
             <p>
-              {$store.currentPageNumber}–{$store.endingPageNumber}
+              {start}–{end}
             </p>
             <p>
               {#if total}of {total}{/if}
@@ -222,7 +224,7 @@
           </button>
           <div class="flex gap-1">
             <p>
-              {$store.currentPageNumber}–{$store.endingPageNumber}
+              {start}–{end}
             </p>
             <p>
               {#if total}of {total}{/if}
