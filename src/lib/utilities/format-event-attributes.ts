@@ -36,24 +36,26 @@ export const formatRetryExpiration = (
 };
 
 export const formatAttemptsLeft = (
-  maxAttempts: number,
+  maxAttempts: number | null,
   attempt: number,
 ): number | string => {
-  if (maxAttempts === 0) {
+  if (!maxAttempts) {
     return UnlimitedAttempts;
   }
   return maxAttempts - attempt;
 };
 
-export const formatMaximumAttempts = (maxAttempts: number): number | string => {
-  if (maxAttempts === 0) {
+export const formatMaximumAttempts = (
+  maxAttempts: number | null,
+): number | string => {
+  if (!maxAttempts) {
     return UnlimitedAttempts;
   }
   return maxAttempts;
 };
 
 const formatValue = (key: string, value: unknown) => {
-  if (key === 'maximumAttempts' && value === 0) {
+  if (key === 'maximumAttempts' && !value) {
     return UnlimitedAttempts;
   }
   return value;
