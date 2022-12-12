@@ -47,7 +47,6 @@
     showTerminationConfirmation = false;
     reason = '';
     $refresh = Date.now();
-    await tick();
     toaster.push({
       id: 'workflow-termination-success-toast',
       message: 'Workflow terminated.',
@@ -107,7 +106,6 @@
         signalName,
       });
       $refresh = Date.now();
-      await tick();
       toaster.push({
         message: 'Workflow successfully signaled.',
         yPosition: 'bottom',
