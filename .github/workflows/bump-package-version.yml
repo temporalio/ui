@@ -6,8 +6,14 @@ on:
       - main
     inputs:
       bump:
-        description: 'bump type, major or minor or patch'
+        required: true
+        description: 'Release Type'
+        type: choice
         default: 'patch'
+        options:
+          - patch
+          - minor
+          - major
 
 jobs:
   bump-version:
