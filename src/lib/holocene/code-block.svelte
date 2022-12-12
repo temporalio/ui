@@ -48,31 +48,31 @@
 
 {#if parsedContent || parsedContent === null}
   <div
-    class="relative h-auto w-full rounded-lg {$$props.class} {inline
-      ? ''
-      : 'lg:h-full'}"
-    data-cy={$$props.dataCy}
+    class="w-full rounded-lg {inline
+      ? 'h-auto overflow-auto'
+      : 'h-full'} {$$props.class} data-cy={$$props.dataCy}"
   >
-    <!-- The spacing for this if statement is like this because PRE's honor all whitespace and 
+    <div class="relative h-full">
+      <!-- The spacing for this if statement is like this because PRE's honor all whitespace and
       line breaks so we have this peculiar formatting to preserve this components output -->
-    <pre
-      class="w-full overflow-x-scroll rounded-lg p-4"
-      class:h-full={!inline}><code
-        bind:this={root}
-        class="language-{language}"
-        data-cy={$$props['data-cy']}
-      /></pre>
+      <pre
+        class="w-full overflow-x-scroll rounded-lg p-4"
+        class:h-full={!inline}><code
+          bind:this={root}
+          class="language-{language}"
+          data-cy={$$props['data-cy']}
+        /></pre>
 
-    <button
-      on:click={(e) => copy(e, parsedContent)}
-      class="absolute top-4 right-4 rounded-full opacity-90 hover:bg-white"
-      class:inline
-    >
-      <Icon
-        name={$copied ? 'checkmark' : 'copy'}
-        class="text-white hover:text-gray-900"
-      />
-    </button>
+      <button
+        on:click={(e) => copy(e, parsedContent)}
+        class="absolute top-2.5 right-2.5 rounded-md bg-gray-900 opacity-90 hover:bg-white"
+      >
+        <Icon
+          name={$copied ? 'checkmark' : 'copy'}
+          class="text-white hover:text-gray-900"
+        />
+      </button>
+    </div>
   </div>
 {/if}
 
