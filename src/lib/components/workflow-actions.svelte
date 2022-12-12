@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { tick } from 'svelte';
-
   import { refresh } from '$lib/stores/workflow-run';
   import {
     signalWorkflow,
@@ -20,7 +18,7 @@
   import FeatureGuard from './feature-guard.svelte';
   import Button from '$lib/holocene/button.svelte';
   import MenuDivider from '$lib/holocene/primitives/menu/menu-divider.svelte';
-  import JSONEditor from '$lib/holocene/JSON-editor.svelte';
+  import JSONEditor from '$lib/holocene/json-editor.svelte';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
