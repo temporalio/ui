@@ -70,6 +70,7 @@ describe('Workflow Actions', () => {
       cy.get('div.cm-content').type('{{}{enter}"sos":true');
       cy.get('[data-cy="confirm-modal-button"').click();
       cy.get('#workflow-signal-success-toast').should('exist');
+      cy.get('[data-cy="confirm-modal-button"').should('not.exist');
     });
   });
 
