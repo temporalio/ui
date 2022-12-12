@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { workflowRun, loading } from '$lib/stores/workflow-run';
+  import { workflowRun } from '$lib/stores/workflow-run';
+  import { loading } from '$lib/stores/workflow-run-loading';
   import { timelineEvents } from '$lib/stores/events';
 
   import Header from '$lib/layouts/workflow-header.svelte';
