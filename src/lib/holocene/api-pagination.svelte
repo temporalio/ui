@@ -41,11 +41,15 @@
   }
 
   onMount(async () => {
+    initalDataFetch();
+  });
+
+  async function initalDataFetch() {
     const fetchData: PaginatedRequest = await onFetch();
     const response = await fetchData($store.pageSize, '');
     const { items, nextPageToken } = response;
     store.nextPageWithItems(nextPageToken, items);
-  });
+  }
 
   async function fetchIndexData() {
     clearError();
