@@ -6,6 +6,7 @@
   import { createPaginationStore } from '$lib/stores/api-pagination';
   import { options } from '$lib/stores/pagination';
   import KeyboardShortcut from '$holocene/keyboard-shortcut/shortcut.svelte';
+  import { onMount, tick } from 'svelte';
 
   type T = $$Generic;
   type PaginatedRequest = (
@@ -28,8 +29,8 @@
 
   let shifted = false;
 
-  $: nextIndex = $store.nextIndex;
-  $: pageSize = $store.pageSize;
+  // $: nextIndex = $store.nextIndex;
+  // $: pageSize = $store.pageSize;
   $: items = $store.indexData[$store.index]?.items ?? [];
   $: isEmpty = items.length === 0 && !$store.loading;
   $: start = $store.indexData[$store.index]?.start ?? 0;
@@ -39,46 +40,49 @@
     if (error) error = undefined;
   }
 
-  $: {
-    console.log('Store index: ', $store.index);
-  }
+  onMount(async () => {
+    const fetchData: PaginatedRequest = await onFetch();
+    const response = await fetchData($store.pageSize, '');
+    const { items, nextPageToken } = response;
+    store.nextPageWithItems(nextPageToken, items);
+  });
 
-  async function onPageChange(index: number, size: number) {
+  async function fetchIndexData() {
     clearError();
-    if (index >= $store.index) {
-      store.setUpdating();
+    store.setUpdating();
+    if (!$store.indexData[$store.index + 1]) {
       try {
         const fetchData: PaginatedRequest = await onFetch();
         const response = await fetchData(
-          size,
-          $store.indexData[$store.index]?.nextToken ?? '',
+          $store.pageSize,
+          $store.indexData[$store.index].nextToken,
         );
         const { items, nextPageToken } = response;
-        store.setNextPage(nextPageToken, items);
+        store.nextPageWithItems(nextPageToken, items);
       } catch (err: any) {
         error = err;
         onError(error);
       }
     } else {
-      store.setPreviousPage();
+      store.nextPage();
     }
   }
 
-  $: reset, onPageChange(nextIndex, pageSize);
+  // $: reset, onPageChange(nextIndex, pageSize);
 
   function handleKeydown(event) {
     switch (event.code) {
       case 'ArrowRight':
-        if ($store.hasNext && !$store.loading) {
-          store.nextPage();
+        if ($store.hasNext && !$store.updating) {
+          fetchIndexData();
         }
         break;
       case 'ArrowLeft':
-        if ($store.hasPrevious && !$store.loading) {
+        if ($store.hasPrevious && !$store.updating) {
           store.previousPage();
-          if ($store.nextIndex === 0 && onPageReset) {
-            onPageReset();
-          }
+          // if ($store.index === 0 && onPageReset) {
+          //   onPageReset();
+          // }
         }
         break;
       case 'ArrowUp':
@@ -180,7 +184,7 @@
           <button
             class="caret"
             disabled={!$store.hasNext}
-            on:click={store.nextPage}
+            on:click={fetchIndexData}
           >
             <span
               class="arrow arrow-right"
@@ -239,7 +243,7 @@
           <button
             class="caret"
             disabled={!$store.hasNext}
-            on:click={store.nextPage}
+            on:click={fetchIndexData}
           >
             <span
               class="arrow arrow-right"

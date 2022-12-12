@@ -62,7 +62,6 @@ export const fetchEvents = async (
   );
 };
 
-
 export const fetchPartialRawEvents = async ({
   namespace,
   workflowId,
@@ -123,11 +122,14 @@ export async function getPaginatedEvents({
   () => Promise<{ items: HistoryEvent[]; nextPageToken: Uint8Array | string }>
 > {
   return async (pageSize = 100, token = '') => {
-    const descendingRoute = await routeForApi(compact ? 'events.ascending' : `events.${sort}`, {
-      namespace,
-      workflowId,
-      runId,
-    });
+    const descendingRoute = await routeForApi(
+      compact ? 'events.ascending' : `events.${sort}`,
+      {
+        namespace,
+        workflowId,
+        runId,
+      },
+    );
     const { history, nextPageToken } =
       await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
         descendingRoute,

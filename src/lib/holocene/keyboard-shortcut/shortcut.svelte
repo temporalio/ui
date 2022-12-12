@@ -28,6 +28,6 @@
 
 <style lang="postcss">
   .shortcut {
-    @apply inline-flex items-center px-2 py-1.5 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500;
+    @apply inline-flex items-center rounded-lg border border-gray-200 bg-gray-100 px-2 py-1.5 text-xs font-semibold text-gray-800 dark:border-gray-500 dark:bg-gray-600 dark:text-gray-100;
   }
 </style>

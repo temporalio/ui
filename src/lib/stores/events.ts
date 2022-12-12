@@ -110,26 +110,23 @@ export const parametersWithSettings: Readable<FetchEventsParametersWithSettings>
 export const updateEventHistory: StartStopNotifier<{
   start: WorkflowEvents;
   end: WorkflowEvents;
-}> = (
-  set,
-) => {
-    return parametersWithSettings.subscribe(async (params) => {
-      const { settings: _, ...rest } = params;
-      if (isNewRequest(rest, previous)) {
-        withLoading(loading, updating, async () => {
-          const events = await fetchStartAndEndEvents(params);
-          if (events?.start && events?.end) {
+}> = (set) => {
+  return parametersWithSettings.subscribe(async (params) => {
+    const { settings: _, ...rest } = params;
+    if (isNewRequest(rest, previous)) {
+      withLoading(loading, updating, async () => {
+        const events = await fetchStartAndEndEvents(params);
+        if (events?.start && events?.end) {
+          set(events);
+        } else {
+          setTimeout(() => {
             set(events);
-          } else {
-            setTimeout(() => {
-              set(events);
-            }, delay);
-          }
-        });
-      }
-    });
-  };
-
+          }, delay);
+        }
+      });
+    }
+  });
+};
 
 export const eventHistory = readable(
   { start: [], end: [] },
