@@ -41,7 +41,10 @@
     console.log('TODO: Reset index to 0 on pageSize change');
     try {
       const fetchData: PaginatedRequest = await onFetch();
-      const response = await fetchData(size, $store.indexTokens[index]);
+      const response = await fetchData(
+        size,
+        $store.indexData[index]?.nextToken ?? '',
+      );
       const { items, nextPageToken } = response;
       store.setNextPageToken(nextPageToken, items);
     } catch (err: any) {
@@ -52,7 +55,8 @@
 
   $: reset, onPageChange(nextIndex, pageSize);
 
-  $: isEmpty = $store.items.length === 0 && !$store.loading;
+  $: items = $store.indexData[$store.index]?.items ?? [];
+  $: isEmpty = items.length === 0 && !$store.loading;
 
   function handleKeydown(event) {
     switch (event.code) {
@@ -183,7 +187,7 @@
       <SkeletonTable rows={15} />
     {:else if !isEmpty}
       <slot
-        visibleItems={$store.indexData[$store.index].items}
+        visibleItems={items}
         initialItem={[]}
         updating={$store.updating}
         activeRow={$store.activeRow}
