@@ -42,9 +42,7 @@
 
 <div class={$$props.class}>
   {#if label}
-    <label for={id}
-      >{label}{#if required}*{/if}</label
-    >
+    <label class:required for={id}>{label}</label>
   {/if}
   <div
     class="input-container {theme}"
@@ -119,6 +117,10 @@
   /* Base styles */
   label {
     @apply mb-10 font-secondary text-sm font-medium;
+  }
+
+  label.required {
+    @apply after:content-['*'];
   }
 
   .input-container {
