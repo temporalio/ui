@@ -31,7 +31,7 @@ jobs:
           git config --local user.name 'Temporal Data (cicd)'
           git config --local user.email 'commander-data@temporal.io'
       - name: Bump version
-        run: npm version ${{ inputs.bump }}
+        run: npm version --no-commit-hooks ${{ inputs.bump }}
       - name: Create Pull Request
         run: |
           tag=${{ git describe --abbrev=0 --tags }}
