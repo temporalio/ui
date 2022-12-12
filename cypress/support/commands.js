@@ -167,7 +167,7 @@ Cypress.Commands.add('interceptCancelWorkflowApi', () => {
 
 Cypress.Commands.add(
   'interceptApi',
-  ({ namespace, archived } = { namespace: 'default', archived: false }) => {
+  ({ archived } = { namespace: 'default', archived: false }) => {
     cy.interceptNamespacesApi();
     cy.interceptNamespaceApi({ archived });
     cy.interceptWorkflowsApi();
