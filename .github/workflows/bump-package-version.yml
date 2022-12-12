@@ -1,0 +1,38 @@
+name: Publish package to npm
+
+on:
+  workflow_dispatch:
+    branches:
+      - main
+    inputs:
+      bump:
+        description: 'bump type, major or minor or patch'
+        default: 'patch'
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Node setup
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          registry-url: 'https://registry.npmjs.org'
+      - name: Configure Git
+        run: |
+          git config --local user.name 'Temporal Data (cicd)'
+          git config --local user.email 'commander-data@temporal.io'
+      - name: Bump version
+        run: npm run package:${{ inputs.bump }}
+      - name: Create Pull Request
+        run: |
+          tag=${{ git describe --abbrev=0 --tags }}
+          branch="releases/${{ tag }}"
+          git checkout -b ${{ branch }}
+          git remote set-url origin https://x-access-token:${{ secrets.COMMANDER_DATA_TOKEN }}@github.com/${{ github.repository }}
+          git push --tags origin ${{ branch }}
+          gh pr create -B main -H ${{ branch }} --title 'bump version in package.json to ${{ tag }}'
+        env:
+          GITHUB_TOKEN: ${{ secrets.COMMANDER_DATA_TOKEN }}

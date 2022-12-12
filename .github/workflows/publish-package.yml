@@ -1,45 +1,44 @@
-name: Publish package to npm
-
 on:
-  workflow_dispatch:
+  push:
     branches:
       - main
-    inputs:
-      bump:
-        description: 'bump type, major or minor or patch'
-        default: 'patch'
 
 jobs:
-  release:
+  publish:
+    if: github.ref_type == 'branch' && contains(github.ref_name, 'releases/')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Node setup
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          registry-url: 'https://registry.npmjs.org'
-      - name: pnpm setup
+      - name: Setup
         uses: pnpm/action-setup@v2.2.2
         with:
           version: 7
-      - name: Configure Git
+      - name: Checkout Release Tag
         run: |
-          git config --local user.name 'Temporal Data (cicd)'
-          git config --local user.email 'commander-data@temporal.io'
-      - name: Install
+          git fetch --tags
+          tag=${{ git describe --tags `git rev-list --tags --max-count=1` }}
+          git checkout ${{ tag }}
+      - name: Install dependencies
         run: pnpm install
-      - name: Build
-        run: pnpm run build:local
-      - name: Bump version
-        run: pnpm run package:${{ inputs.bump }}
+      - name: Build Package
+        run: pnpm package
       - name: Publish package to NPM
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         working-directory: ./package
-      - name: Commit and push version bump
+  create_release:
+    needs: publish
+    if: github.ref_type == 'branch' && contains(github.ref_name, 'releases/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Create Release
         run: |
-          git remote set-url origin https://x-access-token:${{ secrets.COMMANDER_DATA_TOKEN }}@github.com/${{ github.repository }}
-          git push origin ${{ github.ref_name }}
+          git fetch --tags
+          tag=${{ git describe --tags `git rev-list --tags --max-count=1` }}
+          gh release create ${{ tag }} --generate-notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.COMMANDER_DATA_TOKEN }}

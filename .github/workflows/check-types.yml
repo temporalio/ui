@@ -2,7 +2,9 @@ name: Check Types
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - !'releases/**'
   pull_request:
     branches: [main]
 
