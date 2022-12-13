@@ -46,26 +46,29 @@
     @keyframes flyin {
       0% {
         right: 0;
-        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
-          0 4px 6px -4px rgb(0 0 0 / 0.1);
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%),
+          0 4px 6px -4px rgb(0 0 0 / 10%);
       }
+
       100% {
         right: var(--animationRight);
-        box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+        box-shadow: 0 25px 50px -12px rgb(0 0 0 / 25%);
       }
     }
     @keyframes flyout {
       0% {
         right: var(--animationRight);
-        box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+        box-shadow: 0 25px 50px -12px rgb(0 0 0 / 25%);
       }
+
       100% {
         right: 0;
-        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
-          0 4px 6px -4px rgb(0 0 0 / 0.1);
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%),
+          0 4px 6px -4px rgb(0 0 0 / 10%);
       }
     }
   }
+
   .flyin {
     animation-name: flyin;
     animation-duration: 0.3s;
@@ -74,6 +77,7 @@
     animation-timing-function: ease-in-out;
     animation-fill-mode: forwards;
   }
+
   .flyout {
     animation-name: flyout;
     animation-duration: 0.3s;

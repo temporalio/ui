@@ -95,7 +95,7 @@
     <Loading title={loadingText} />
   {:else}
     <header class="relative mb-12 flex gap-1">
-      <a href={backHref} class="back absolute top-0" style="left: 0rem">
+      <a href={backHref} class="back absolute top-0" style="left: 0">
         <Icon name="chevron-left" class="inline" />{backTitle}
       </a>
       <h2 class="font-base mt-8 ml-0 text-2xl">{title}</h2>
@@ -169,7 +169,7 @@
             on:click={() => handleConfirm(preset, schedule)}
             >{confirmText}</Button
           >
-          <a href={backHref} class="back" style="left: 0rem">Cancel</a>
+          <a href={backHref} class="back" style="left: 0">Cancel</a>
         </div>
       </SchedulesCalendarView>
     </form>
