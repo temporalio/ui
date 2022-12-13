@@ -1,3 +1,5 @@
+import { has } from './has';
+
 export type ActivityType = typeof activityEvents[number];
 export const activityEvents = [
   'ActivityTaskCanceled',
@@ -131,7 +133,7 @@ export const findAttributesAndKey = (
 
 const hasAttributes =
   <T extends EventWithAttributes<EventAttributeKey>>(key: EventAttributeKey) =>
-  (event: CommonHistoryEvent): event is T => {
+  (event: IterableEvent | CommonHistoryEvent): event is T => {
     return Boolean(event[key]);
   };
 
@@ -325,12 +327,14 @@ export const isUpsertWorkflowSearchAttributesEvent =
     'upsertWorkflowSearchAttributesEventAttributes',
   );
 
-export const isLocalActivityMarkerEvent = (event) => {
-  const payload: any =
-    event?.markerRecordedEventAttributes?.details?.data?.payloads?.[0];
-  return (
-    isMarkerRecordedEvent(event) &&
-    event?.markerRecordedEventAttributes?.markerName === 'LocalActivity' &&
-    Boolean(payload?.ActivityType ?? payload?.activity_type)
-  );
+export const isLocalActivityMarkerEvent = (
+  event: IterableEvent | CommonHistoryEvent,
+) => {
+  if (!isMarkerRecordedEvent(event)) return false;
+
+  if (event.markerRecordedEventAttributes.markerName !== 'LocalActivity') {
+    return false;
+  }
+
+  return true;
 };
