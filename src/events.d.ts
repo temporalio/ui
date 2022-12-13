@@ -1,19 +1,39 @@
-type EventHistory = Omit<import('$types').History, 'events'> & {
-  events: HistoryEvent[];
-};
+type EventHistory = Replace<
+  import('$types').History,
+  { events: HistoryEvent[] }
+>;
 
-type HistoryEvent = Omit<import('$types').HistoryEvent, 'eventType'> & {
-  eventType: EventType;
-};
+type HistoryEvent = Replace<
+  import('$types').HistoryEvent,
+  { eventType: EventType }
+>;
 
-type GetWorkflowExecutionHistoryResponse = Omit<
+type GetWorkflowExecutionHistoryResponse = Replace<
   import('$types').GetWorkflowExecutionHistoryResponse,
-  'history'
-> & {
-  history: EventHistory;
-};
+  { history: EventHistory }
+>;
 
-type PendingActivityInfo = import('$types').PendingActivityInfo;
+type PendingActivityInfo = Replace<
+  import('$types').PendingActivityInfo,
+  { activityId: string }
+>;
+
+type PendingActivity = Replace<
+  PendingActivityInfo,
+  'activityId',
+  {
+    id: string;
+    state: PendingActivityState;
+    activityType?: { name: string };
+  }
+>;
+
+type PendingActivityState =
+  | 'Unspecified'
+  | 'Scheduled'
+  | 'Started'
+  | 'CancelRequested';
+
 type PendingChildren = import('$types').PendingChildrenInfo;
 
 type EventRequestMetadata = {
@@ -54,12 +74,6 @@ interface WorkflowEvent extends HistoryEvent {
 }
 
 type WorkflowEvents = WorkflowEvent[];
-
-interface PendingActivity extends PendingActivityInfo {
-  id: typeof PendingActivityInfo.activityId;
-  state: 'Unspecified' | 'Scheduled' | 'Started' | 'CancelRequested';
-  activityType: { name: string };
-}
 
 type PendingActivityWithMetadata = {
   activity: PendingActivity;
