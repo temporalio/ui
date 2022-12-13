@@ -41,7 +41,6 @@
       id: 'workflow-termination-success-toast',
       message: 'Workflow terminated.',
       variant: 'success',
-      yPosition: 'top',
     });
   };
 
@@ -75,7 +74,6 @@
       $refresh = Date.now();
     } catch {
       toaster.push({
-        yPosition: 'top',
         variant: 'error',
         message: 'Unable to cancel workflow.',
       });

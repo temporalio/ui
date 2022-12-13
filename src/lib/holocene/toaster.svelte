@@ -14,8 +14,6 @@
     variant?: ToastVariant;
     id?: string;
     duration?: number;
-    xPosition?: 'left' | 'right';
-    yPosition?: 'top' | 'bottom';
   }
 
   interface Toaster {
@@ -30,8 +28,6 @@
     const toastWithDefaults: Toast = {
       id: v4(),
       duration: 3000,
-      xPosition: 'right',
-      yPosition: 'top',
       variant: 'primary',
       ...toast,
     };
@@ -62,56 +58,12 @@
   const dismissToast = (event: CustomEvent<{ id: string }>) => {
     pop(event.detail.id);
   };
-
-  $: topRightToasts = $toasts.filter(
-    (toast) => toast.yPosition === 'top' && toast.xPosition === 'right',
-  );
-  $: bottomRightToasts = $toasts
-    .filter(
-      (toast) => toast.yPosition === 'bottom' && toast.xPosition === 'right',
-    )
-    .reverse();
-  $: bottomLeftToasts = $toasts
-    .filter(
-      (toast) => toast.yPosition === 'bottom' && toast.xPosition === 'left',
-    )
-    .reverse();
-  $: topLeftToasts = $toasts.filter(
-    (toast) => toast.yPosition === 'top' && toast.xPosition === 'left',
-  );
 </script>
 
-<div class="toast-container top-5 right-5">
-  {#each topRightToasts as { message, variant, id } (id)}
+<div class="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-2">
+  {#each $toasts as { message, variant, id } (id)}
     <ToastComponent {variant} {id} on:dismiss={dismissToast}>
       {message}
     </ToastComponent>
   {/each}
 </div>
-<div class="toast-container bottom-5 right-5">
-  {#each bottomRightToasts as { message, variant, id } (id)}
-    <ToastComponent {variant} {id} on:dismiss={dismissToast}>
-      {message}
-    </ToastComponent>
-  {/each}
-</div>
-<div class="toast-container bottom-5 left-5">
-  {#each bottomLeftToasts as { message, variant, id } (id)}
-    <ToastComponent {variant} {id} on:dismiss={dismissToast}>
-      {message}
-    </ToastComponent>
-  {/each}
-</div>
-<div class="toast-container top-5 left-5">
-  {#each topLeftToasts as { message, variant, id } (id)}
-    <ToastComponent {variant} {id} on:dismiss={dismissToast}>
-      {message}
-    </ToastComponent>
-  {/each}
-</div>
-
-<style lang="postcss">
-  .toast-container {
-    @apply fixed z-50 flex flex-col items-end gap-2;
-  }
-</style>
