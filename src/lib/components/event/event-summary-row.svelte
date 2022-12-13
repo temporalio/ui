@@ -183,6 +183,7 @@
   .row:hover {
     @apply z-50 cursor-pointer bg-gray-50;
   }
+
   .expanded.row {
     @apply bg-blue-50;
   }

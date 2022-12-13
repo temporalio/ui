@@ -13,6 +13,7 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import KeyboardShortcut from '$lib/holocene/keyboard-shortcut/shortcut.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { authUser } from '$lib/stores/auth-user';
 
   export let compact = false;
 
@@ -22,13 +23,18 @@
 
   const { namespace, workflow: workflowId, run: runId } = $page.params;
 
-  let fetchEvents = () => {
+  $: category = $page.url.searchParams.get('category');
+
+  $: fetchEvents = () => {
     return getPaginatedEvents({
       namespace,
       workflowId,
       runId,
       sort: $eventFilterSort,
+      category,
       compact,
+      settings: $page.stuff.settings,
+      accessToken: $authUser?.accessToken,
     });
   };
 
@@ -55,55 +61,53 @@
       });
     }
   };
-
-  $: category = $page.url.searchParams.get('category');
-  $: getEventsForCategory = (events) => {
-    return events?.filter((event) => event.category === category);
-  };
 </script>
 
-<ApiPagination
-  let:visibleItems
-  let:updating
-  let:activeRow
-  onFetch={fetchEvents}
-  onError={(error) => console.error(error)}
-  pageSizeOptions={[]}
-  {onShiftUp}
-  {onShiftDown}
-  total={$eventHistory.end[0]?.id}
->
-  <svelte:fragment slot="shortcuts">
-    <KeyboardShortcut tooltipText="Open / Close Row">Space</KeyboardShortcut>
-    {#if !compact}
-      <Tooltip text="Ascending order" top>
-        <div class="flex gap-1 text-gray-500 dark:text-gray-400">
-          <KeyboardShortcut>Shift</KeyboardShortcut>
-          +
-          <KeyboardShortcut arrow="up" />
-        </div>
-      </Tooltip>
-      <Tooltip text="Descending order" top>
-        <div class="flex gap-1 text-gray-500 dark:text-gray-400">
-          <KeyboardShortcut>Shift</KeyboardShortcut>
-          +
-          <KeyboardShortcut arrow="down" />
-        </div>
-      </Tooltip>
-    {/if}
-  </svelte:fragment>
-  <EventSummaryTable {updating} {compact} on:expandAll={handleExpandChange}>
-    {#each compact ? groupEvents(visibleItems) : visibleItems as event, index (`${event.id}-${event.timestamp}`)}
-      <EventSummaryRow
-        {event}
-        {compact}
-        {visibleItems}
-        expandAll={$expandAllEvents === 'true'}
-        initialItem={$eventHistory?.start?.[0]}
-        active={activeRow === index}
-      />
-    {:else}
-      <EventEmptyRow />
-    {/each}
-  </EventSummaryTable>
-</ApiPagination>
+{#key [$eventFilterSort, category, $refresh]}
+  <ApiPagination
+    let:visibleItems
+    let:updating
+    let:activeRow
+    onFetch={fetchEvents}
+    onError={(error) => console.error(error)}
+    pageSizeOptions={[]}
+    {onShiftUp}
+    {onShiftDown}
+    total={$eventHistory.end[0]?.id}
+  >
+    <svelte:fragment slot="shortcuts">
+      <KeyboardShortcut tooltipText="Open / Close Row">Space</KeyboardShortcut>
+      {#if !compact}
+        <Tooltip text="Ascending order" top>
+          <div class="flex gap-1 text-gray-500 dark:text-gray-400">
+            <KeyboardShortcut>Shift</KeyboardShortcut>
+            +
+            <KeyboardShortcut arrow="up" />
+          </div>
+        </Tooltip>
+        <Tooltip text="Descending order" top>
+          <div class="flex gap-1 text-gray-500 dark:text-gray-400">
+            <KeyboardShortcut>Shift</KeyboardShortcut>
+            +
+            <KeyboardShortcut arrow="down" />
+          </div>
+        </Tooltip>
+      {/if}
+    </svelte:fragment>
+    <EventSummaryTable {updating} {compact} on:expandAll={handleExpandChange}>
+      {@const events = compact ? groupEvents(visibleItems) : visibleItems}
+      {#each events as event, index (`${event.id}-${event.timestamp}`)}
+        <EventSummaryRow
+          {event}
+          {compact}
+          {visibleItems}
+          expandAll={$expandAllEvents === 'true'}
+          initialItem={$eventHistory?.start?.[0]}
+          active={activeRow === index}
+        />
+      {:else}
+        <EventEmptyRow />
+      {/each}
+    </EventSummaryTable>
+  </ApiPagination>
+{/key}

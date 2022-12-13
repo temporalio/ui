@@ -112,14 +112,28 @@ export const fetchStartAndEndEvents = async (
   return { start, end };
 };
 
+type PaginatedEventParams = {
+  namespace: string;
+  workflowId: string;
+  runId: string;
+  sort?: EventSortOrder;
+  category?: string;
+  compact: boolean;
+  settings: Settings;
+  accessToken: string;
+};
+
 export async function getPaginatedEvents({
   namespace,
   workflowId,
   runId,
   sort,
+  category,
   compact,
-}): Promise<
-  () => Promise<{ items: HistoryEvent[]; nextPageToken: Uint8Array | string }>
+  settings,
+  accessToken,
+}: PaginatedEventParams): Promise<
+  () => Promise<{ items: WorkflowEvents; nextPageToken: Uint8Array | string }>
 > {
   return async (pageSize = 100, token = '') => {
     const descendingRoute = await routeForApi(
@@ -144,7 +158,16 @@ export async function getPaginatedEvents({
     const events = await toEventHistory({
       response: history.events,
       namespace,
+      settings,
+      accessToken,
     });
+
+    if (category) {
+      return {
+        items: events?.filter((event) => event.category === category),
+        nextPageToken: nextPageToken ?? '',
+      };
+    }
     return {
       items: events,
       nextPageToken: nextPageToken ?? '',

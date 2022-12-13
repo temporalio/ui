@@ -11,7 +11,6 @@ import type { StartStopNotifier } from 'svelte/store';
 import { page } from '$app/stores';
 
 import {
-  fetchEvents,
   FetchEventsParameters,
   FetchEventsParametersWithSettings,
   fetchStartAndEndEvents,

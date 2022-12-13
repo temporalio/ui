@@ -197,9 +197,9 @@
         </TableHeaderRow>
         <EventSummaryRow
           event={error}
-          groups={groupEvents($events)}
+          groups={groupEvents([error])}
           initialItem={error}
-          visibleItems={$events}
+          visibleItems={[error]}
           typedError
         />
       </Table>

@@ -28,7 +28,7 @@
   let shifted = false;
 
   $: items = $store.indexData[$store.index]?.items ?? [];
-  $: isEmpty = items.length === 0 && !$store.loading;
+  $: nextIndex = $store.indexData[$store.index + 1];
   $: start = $store.indexData[$store.index]?.start ?? 0;
   $: end = $store.indexData[$store.index]?.end ?? 0;
 
@@ -51,7 +51,7 @@
   async function fetchIndexData() {
     clearError();
     store.setUpdating();
-    if (!$store.indexData[$store.index + 1]) {
+    if (!nextIndex) {
       try {
         const fetchData: PaginatedRequest = await onFetch();
         const response = await fetchData(
@@ -134,148 +134,150 @@
   />
 {/if}
 
-{#if isEmpty}
-  <slot name="empty">No Items</slot>
-{:else}
-  <div class="relative mb-8 flex flex-col gap-4">
-    <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
-      <div class="flex items-center gap-1 lg:gap-2 xl:gap-3">
-        <slot name="action-top-left">
-          <KeyboardShortcut arrow="left" tooltipText="Previous Page" />
-          <KeyboardShortcut arrow="up" tooltipText="Previous Row" />
-          <KeyboardShortcut arrow="down" tooltipText="Next Row" />
-          <KeyboardShortcut arrow="right" tooltipText="Next Page" />
-          <slot name="shortcuts" />
-        </slot>
-      </div>
-      <nav class="flex flex-col justify-end gap-4 md:flex-row">
-        <slot name="action-top-center" />
-        {#if pageSizeOptions.length}
-          <FilterSelect
-            label="Per Page"
-            parameter={$store.key}
-            value={String($store.pageSize)}
-            options={pageSizeOptions}
-          />
-        {/if}
-        <div class="flex items-center justify-center gap-3">
-          <button
-            class="caret"
-            disabled={!$store.hasPrevious}
-            on:click={store.previousPage}
-          >
-            <span
-              class="arrow arrow-left"
-              class:arrow-left-disabled={!$store.hasPrevious}
-            />
-          </button>
-          <div class="flex gap-1">
-            <p>
-              {start}–{end}
-            </p>
-            <p>
-              {#if total}of {total}{/if}
-            </p>
-          </div>
-          <button
-            class="caret"
-            disabled={!$store.hasNext}
-            on:click={fetchIndexData}
-          >
-            <span
-              class="arrow arrow-right"
-              class:arrow-right-disabled={!$store.hasNext}
-            />
-          </button>
-        </div>
-        <slot name="action-top-right" />
-      </nav>
+<div class="relative mb-8 flex flex-col gap-4">
+  <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
+    <div class="flex items-center gap-1 lg:gap-2 xl:gap-3">
+      <slot name="action-top-left">
+        <KeyboardShortcut arrow="left" tooltipText="Previous Page" />
+        <KeyboardShortcut arrow="up" tooltipText="Previous Row" />
+        <KeyboardShortcut arrow="down" tooltipText="Next Row" />
+        <KeyboardShortcut arrow="right" tooltipText="Next Page" />
+        <slot name="shortcuts" />
+      </slot>
     </div>
-    {#if $store.loading}
-      <SkeletonTable rows={15} />
-    {:else if !isEmpty}
-      <slot
-        visibleItems={items}
-        updating={$store.updating}
-        activeRow={$store.activeRow}
-      />
-    {/if}
-
-    <nav
-      class={`flex ${
-        $$slots['action-bottom-left'] ? 'justify-between' : 'justify-end'
-      }`}
-    >
-      <slot name="action-bottom-left" />
-      <div class="flex gap-4">
-        {#if pageSizeOptions.length}
-          <FilterSelect
-            label="Per Page"
-            parameter={$store.key}
-            value={String($store.pageSize)}
-            options={pageSizeOptions}
+    <nav class="flex flex-col justify-end gap-4 md:flex-row">
+      <slot name="action-top-center" />
+      {#if pageSizeOptions.length}
+        <FilterSelect
+          label="Per Page"
+          parameter={$store.key}
+          value={String($store.pageSize)}
+          options={pageSizeOptions}
+        />
+      {/if}
+      <div class="flex items-center justify-center gap-3">
+        <button
+          class="caret"
+          disabled={!$store.hasPrevious}
+          on:click={store.previousPage}
+        >
+          <span
+            class="arrow arrow-left"
+            class:arrow-left-disabled={!$store.hasPrevious}
           />
-        {/if}
-        <div class="flex items-center justify-center gap-1">
-          <button
-            class="caret"
-            disabled={!$store.hasPrevious}
-            on:click={store.previousPage}
-          >
-            <span
-              class="arrow arrow-left"
-              class:arrow-left-disabled={!$store.hasPrevious}
-            />
-          </button>
-          <div class="flex gap-1">
-            <p>
-              {start}–{end}
-            </p>
-            <p>
-              {#if total}of {total}{/if}
-            </p>
-          </div>
-          <button
-            class="caret"
-            disabled={!$store.hasNext}
-            on:click={fetchIndexData}
-          >
-            <span
-              class="arrow arrow-right"
-              class:arrow-right-disabled={!$store.hasNext}
-            />
-          </button>
+        </button>
+        <div class="flex gap-1">
+          <p>
+            {start}–{end}
+          </p>
+          <p>
+            {#if total}of {total}{/if}
+          </p>
         </div>
-        <slot name="action-bottom-right" />
+        <button
+          class="caret"
+          disabled={!$store.hasNext}
+          on:click={fetchIndexData}
+        >
+          <span
+            class="arrow arrow-right"
+            class:arrow-right-disabled={!$store.hasNext}
+          />
+        </button>
       </div>
+      <slot name="action-top-right" />
     </nav>
   </div>
-{/if}
+  {#if $store.loading}
+    <SkeletonTable rows={15} />
+  {:else}
+    <slot
+      visibleItems={items}
+      updating={$store.updating}
+      activeRow={$store.activeRow}
+    />
+  {/if}
+  <nav
+    class={`flex ${
+      $$slots['action-bottom-left'] ? 'justify-between' : 'justify-end'
+    }`}
+  >
+    <slot name="action-bottom-left" />
+    <div class="flex gap-4">
+      {#if pageSizeOptions.length}
+        <FilterSelect
+          label="Per Page"
+          parameter={$store.key}
+          value={String($store.pageSize)}
+          options={pageSizeOptions}
+        />
+      {/if}
+      <div class="flex items-center justify-center gap-1">
+        <button
+          class="caret"
+          disabled={!$store.hasPrevious}
+          on:click={store.previousPage}
+        >
+          <span
+            class="arrow arrow-left"
+            class:arrow-left-disabled={!$store.hasPrevious}
+          />
+        </button>
+        <div class="flex gap-1">
+          <p>
+            {start}–{end}
+          </p>
+          <p>
+            {#if total}of {total}{/if}
+          </p>
+        </div>
+        <button
+          class="caret"
+          disabled={!$store.hasNext}
+          on:click={fetchIndexData}
+        >
+          <span
+            class="arrow arrow-right"
+            class:arrow-right-disabled={!$store.hasNext}
+          />
+        </button>
+      </div>
+      <slot name="action-bottom-right" />
+    </div>
+  </nav>
+</div>
 
 <style lang="postcss">
   .arrow {
     @apply absolute top-0 h-0 w-0;
+
     border-style: solid;
     border-width: 6px 12px 6px 0;
   }
+
   .arrow-left {
     @apply left-0;
+
     border-width: 6px 12px 6px 0;
     border-color: transparent #18181b transparent transparent;
   }
+
   .arrow-left-disabled {
     border-color: transparent #d4d4d8 transparent transparent;
   }
+
   .arrow-right {
     border-width: 6px 0 6px 12px;
     border-color: transparent transparent transparent #18181b;
   }
+
   .arrow-right-disabled {
     border-color: transparent transparent transparent #d4d4d8;
   }
 
   .caret {
     @apply relative;
+
     width: 12px;
     height: 12px;
   }
