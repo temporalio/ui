@@ -1,4 +1,4 @@
-import { toaster } from '$holocene/stores/toaster';
+import { toaster } from '$lib/stores/toaster';
 import { namespaces } from '$lib/stores/namespaces';
 import { paginated } from '$lib/utilities/paginated';
 import { requestFromAPI } from '$lib/utilities/request-from-api';

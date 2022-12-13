@@ -10,7 +10,7 @@
   import PageTitle from '$lib/components/page-title.svelte';
   import { fetchWorkflowForAuthorization } from '$lib/services/workflow-service';
   import { namespaces } from '$lib/stores/namespaces';
-  import { toaster } from '$holocene/stores/toaster';
+  import { toaster } from '$lib/stores/toaster';
 
   let searchField: HTMLInputElement = null;
 

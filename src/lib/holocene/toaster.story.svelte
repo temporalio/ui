@@ -3,7 +3,7 @@
   import type { ToastVariant } from 'src/types/holocene';
   import Button from './button.svelte';
   import Toaster from './toaster.svelte';
-  import { toaster } from './stores/toaster';
+  import { toaster } from '../stores/toaster';
 
   export let Hst: HST;
 

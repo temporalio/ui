@@ -4,7 +4,7 @@
 
   import Button from '$holocene/button.svelte';
   import { toEventHistory } from '$lib/models/event-history';
-  import { toaster } from '$holocene/stores/toaster';
+  import { toaster } from '$lib/stores/toaster';
   import { importEvents, importEventGroups } from '$lib/stores/import-events';
   import { importSettings } from './_import-settings';
   import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';

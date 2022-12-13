@@ -67,7 +67,7 @@
   import { ErrorBoundary } from '$lib/holocene/error-boundary';
   import ScrollToTop from '$lib/holocene/scroll-to-top.svelte';
   import Toaster from '$holocene/toaster.svelte';
-  import { toaster } from '$holocene/stores/toaster';
+  import { toaster } from '$lib/stores/toaster';
 
   export let user: User;
   export let uiVersionInfo: UiVersionInfo;

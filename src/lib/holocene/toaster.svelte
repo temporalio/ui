@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  import type { Toaster } from './stores/toaster';
+  import type { Toaster } from '../stores/toaster';
 </script>
 
 <script lang="ts">

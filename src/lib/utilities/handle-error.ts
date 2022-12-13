@@ -1,6 +1,6 @@
 import { browser } from '$app/env';
 import { networkError } from '$lib/stores/error';
-import { toaster } from '$holocene/stores/toaster';
+import { toaster } from '$lib/stores/toaster';
 import { isNetworkError } from './is-network-error';
 import type { APIErrorResponse } from './request-from-api';
 import { routeForLoginPage } from './route-for';

@@ -23,7 +23,7 @@
   import Header from './_import-header.svelte';
   import { ErrorBoundary } from '$lib/holocene/error-boundary';
   import Toaster from '$holocene/toaster.svelte';
-  import { toaster } from '$holocene/stores/toaster';
+  import { toaster } from '$lib/stores/toaster';
 </script>
 
 <svelte:head>
