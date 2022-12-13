@@ -1,38 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getNamespace } from './get-namespace';
 
-const temporalSystemNamespace = {
-  namespaceInfo: {
-    name: 'temporal-system',
-    state: 'Registered',
-    description: 'Temporal internal system namespace',
-    ownerEmail: 'temporal-core@temporal.io',
-    data: {},
-    id: '32049b68-7872-4094-8e63-d0dd59896a83',
-  },
-  config: {
-    workflowExecutionRetentionTtl: '604800s',
-    badBinaries: {
-      binaries: {},
-    },
-    historyArchivalState: 'Disabled',
-    historyArchivalUri: '',
-    visibilityArchivalState: 'Disabled',
-    visibilityArchivalUri: '',
-  },
-  replicationConfig: {
-    activeClusterName: 'active',
-    clusters: [
-      {
-        clusterName: 'active',
-      },
-    ],
-    state: 'Unspecified',
-  },
-  failoverVersion: '0',
-  isGlobalNamespace: false,
-};
-
 const canaryNamespace = {
   namespaceInfo: {
     name: 'canary',
@@ -95,20 +63,6 @@ const defaultNamespace = {
   },
   failoverVersion: '0',
   isGlobalNamespace: false,
-};
-
-const getSettings = (
-  defaultNamespace: string,
-  showTemporalSystemNamespace: boolean,
-) => {
-  return {
-    auth: {
-      enabled: false,
-      options: ['organization', 'invitation', 'audience'],
-    },
-    defaultNamespace,
-    showTemporalSystemNamespace,
-  };
 };
 
 describe('getNamespace', () => {

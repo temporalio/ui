@@ -10,7 +10,6 @@ import {
   pagination,
   perPageFromSearchParameter,
 } from './pagination';
-import { stringifyWithBigInt } from '../utilities/parse-with-big-int';
 
 const oneHundredResolutions = new Array(100).fill(null).map((_, i) => i);
 
