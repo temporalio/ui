@@ -60,6 +60,26 @@ export async function getEventAttributes(
   };
 }
 
+export const createEvent = (historyEvent: HistoryEvent): CommonHistoryEvent => {
+  const id = String(historyEvent.eventId);
+  const eventType = historyEvent.eventType as unknown as EventType;
+  const timestamp = formatDate(String(historyEvent.eventTime));
+  const classification = getEventClassification(eventType);
+  const category = getEventCategory(eventType);
+  const { attributes } = findAttributesAndKey(historyEvent);
+
+  return {
+    ...historyEvent,
+    name: eventType,
+    id,
+    eventType,
+    timestamp,
+    classification,
+    category,
+    attributes,
+  };
+};
+
 const toEvent = async ({
   historyEvent,
   namespace,
