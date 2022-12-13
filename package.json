@@ -65,6 +65,7 @@
     "@sveltejs/vite-plugin-svelte": "^1.0.1",
     "@temporalio/proto": "^1.4.4",
     "@types/base-64": "^1.0.0",
+    "@types/json-bigint": "^1.0.1",
     "@types/node": "^16.3.2",
     "@types/sanitize-html": "^2.6.1",
     "@types/uuid": "^9.0.0",
