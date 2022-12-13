@@ -96,7 +96,10 @@ describe('handleError', () => {
     try {
       handleError(error, toasts, errors);
     } catch (error) {
-      expect(toasts.push).toHaveBeenCalledWith('error', '500 Uh oh');
+      expect(toasts.push).toHaveBeenCalledWith({
+        variant: 'error',
+        message: '500 Uh oh',
+      });
       expect(errors.set).toHaveBeenCalledWith({ ...error });
     }
   });
@@ -107,7 +110,10 @@ describe('handleError', () => {
     };
 
     handleError('lol', toasts);
-    expect(toasts.push).toHaveBeenCalledWith('error', 'lol');
+    expect(toasts.push).toHaveBeenCalledWith({
+      variant: 'error',
+      message: 'lol',
+    });
   });
 
   it('should add a toast on an error', () => {
@@ -116,6 +122,9 @@ describe('handleError', () => {
     };
 
     handleError(new Error('lol'), toasts);
-    expect(toasts.push).toHaveBeenCalledWith('error', 'lol');
+    expect(toasts.push).toHaveBeenCalledWith({
+      variant: 'error',
+      message: 'lol',
+    });
   });
 });
