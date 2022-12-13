@@ -1,6 +1,18 @@
+type EventHistory = Omit<import('$types').History, 'events'> & {
+  events: HistoryEvent[];
+};
+
 type HistoryEvent = Omit<import('$types').HistoryEvent, 'eventType'> & {
   eventType: EventType;
 };
+
+type GetWorkflowExecutionHistoryResponse = Omit<
+  import('$types').GetWorkflowExecutionHistoryResponse,
+  'history'
+> & {
+  history: EventHistory;
+};
+
 type PendingActivityInfo = import('$types').PendingActivityInfo;
 type PendingChildren = import('$types').PendingChildrenInfo;
 
@@ -34,7 +46,6 @@ type EventClassification =
 
 interface WorkflowEvent extends HistoryEvent {
   id: string;
-  eventType: EventType;
   attributes: EventAttribute;
   timestamp: string;
   classification: EventClassification;
