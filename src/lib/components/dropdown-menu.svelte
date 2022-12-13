@@ -96,15 +96,19 @@
     @apply absolute z-50 mt-1 w-auto
         rounded border border-gray-900 bg-white py-2 text-gray-900 shadow-md;
   }
+
   .dropdown-menu.left {
     @apply absolute left-0 origin-top-left;
   }
+
   .dropdown-menu.right {
     @apply absolute right-0 origin-top-right;
   }
+
   .dot {
     @apply pointer-events-none absolute top-0 -right-1 h-2 w-2 rounded-full bg-blue-300;
   }
+
   .disabled {
     @apply cursor-not-allowed;
   }

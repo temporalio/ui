@@ -81,6 +81,7 @@
   label {
     @apply mb-10 font-secondary text-sm font-medium;
   }
+
   .units {
     @apply font-secondary text-sm font-medium;
   }

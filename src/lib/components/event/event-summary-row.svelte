@@ -209,6 +209,7 @@
   .terminated .event-name {
     @apply text-pink-700;
   }
+
   .expanded-cell {
     @apply flex table-cell w-full flex-wrap text-sm no-underline xl:text-base;
   }
@@ -219,6 +220,7 @@
 
   .row.typedError {
     @apply rounded-lg;
+
     &.expanded {
       @apply rounded-b-none;
     }

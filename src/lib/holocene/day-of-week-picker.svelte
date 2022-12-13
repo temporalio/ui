@@ -51,6 +51,7 @@
   .cell {
     @apply w-auto cursor-pointer rounded border bg-gray-300 p-2 hover:bg-blue-700 hover:text-white;
   }
+
   .active {
     @apply bg-gray-900 text-white;
   }
