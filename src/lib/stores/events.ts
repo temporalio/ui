@@ -24,11 +24,6 @@ import { refresh } from '$lib/stores/workflow-run';
 import { authUser } from '$lib/stores/auth-user';
 import { previous } from '$lib/stores/previous-events';
 
-const emptyEvents: FetchEventsResponse = {
-  events: [],
-  eventGroups: [],
-};
-
 const namespace = derived([page], ([$page]) => {
   if ($page.params.namespace) {
     return decodeURIForSvelte($page.params.namespace);

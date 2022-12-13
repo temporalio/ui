@@ -5,7 +5,7 @@ import { perPageFromSearchParameter, defaultItemsPerPage } from './pagination';
 import type { Readable } from 'svelte/store';
 
 type PaginationMethods = {
-  nextPageWithItems: (t: string, items: any[]) => void;
+  nextPageWithItems: (t: string | Uint8Array, items: any[]) => void;
   nextPage: () => void;
   previousPage: () => void;
   setUpdating: () => void;

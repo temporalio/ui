@@ -6,6 +6,7 @@
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
+  import { groupEvents } from '$lib/models/event-groups';
 
   const WORKFLOW_TASK_FAILED_ERROR_COPY = {
     Unspecified: {
@@ -196,7 +197,7 @@
         </TableHeaderRow>
         <EventSummaryRow
           event={error}
-          groups={$eventGroups}
+          groups={groupEvents($events)}
           initialItem={error}
           visibleItems={$events}
           typedError

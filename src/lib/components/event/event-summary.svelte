@@ -32,12 +32,6 @@
     });
   };
 
-  const onPageReset = () => {
-    if ($workflowRun.workflow.isRunning) {
-      $refresh = Date.now();
-    }
-  };
-
   const onShiftUp = () => {
     if (!compact) {
       const sort = 'ascending';
@@ -61,11 +55,15 @@
       });
     }
   };
+
+  $: category = $page.url.searchParams.get('category');
+  $: getEventsForCategory = (events) => {
+    return events?.filter((event) => event.category === category);
+  };
 </script>
 
 <ApiPagination
   let:visibleItems
-  let:initialItem
   let:updating
   let:activeRow
   onFetch={fetchEvents}
@@ -73,8 +71,6 @@
   pageSizeOptions={[]}
   {onShiftUp}
   {onShiftDown}
-  {onPageReset}
-  reset={$eventFilterSort}
   total={$eventHistory.end[0]?.id}
 >
   <svelte:fragment slot="shortcuts">
@@ -101,9 +97,9 @@
       <EventSummaryRow
         {event}
         {compact}
-        expandAll={$expandAllEvents === 'true'}
-        {initialItem}
         {visibleItems}
+        expandAll={$expandAllEvents === 'true'}
+        initialItem={$eventHistory?.start?.[0]}
         active={activeRow === index}
       />
     {:else}

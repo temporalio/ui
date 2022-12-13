@@ -12,16 +12,14 @@
   type PaginatedRequest = (
     size: number,
     token: string | Uint8Array,
-  ) => Promise<{ items: any[]; nextPageToken: string }>;
+  ) => Promise<{ items: any[]; nextPageToken: string | Uint8Array }>;
 
   export let onError: (error: any) => void;
   export let onFetch: () => Promise<PaginatedRequest>;
-  export let onPageReset: () => void | undefined = undefined;
   export let onShiftUp: () => void | undefined = undefined;
   export let onShiftDown: () => void | undefined = undefined;
 
   export let pageSizeOptions: string[] = options;
-  export let reset: any;
   export let total: string | number = '';
 
   let store = createPaginationStore();
@@ -29,8 +27,6 @@
 
   let shifted = false;
 
-  // $: nextIndex = $store.nextIndex;
-  // $: pageSize = $store.pageSize;
   $: items = $store.indexData[$store.index]?.items ?? [];
   $: isEmpty = items.length === 0 && !$store.loading;
   $: start = $store.indexData[$store.index]?.start ?? 0;
@@ -40,11 +36,12 @@
     if (error) error = undefined;
   }
 
-  onMount(async () => {
+  onMount(() => {
     initalDataFetch();
   });
 
   async function initalDataFetch() {
+    store.reset();
     const fetchData: PaginatedRequest = await onFetch();
     const response = await fetchData($store.pageSize, '');
     const { items, nextPageToken } = response;
@@ -72,8 +69,6 @@
     }
   }
 
-  // $: reset, onPageChange(nextIndex, pageSize);
-
   function handleKeydown(event) {
     switch (event.code) {
       case 'ArrowRight':
@@ -84,23 +79,20 @@
       case 'ArrowLeft':
         if ($store.hasPrevious && !$store.updating) {
           store.previousPage();
-          // if ($store.index === 0 && onPageReset) {
-          //   onPageReset();
-          // }
         }
         break;
       case 'ArrowUp':
         if (shifted && onShiftUp) {
-          store.reset();
           onShiftUp();
+          initalDataFetch();
         } else {
           store.previousRow();
         }
         break;
       case 'ArrowDown':
         if (shifted && onShiftDown) {
-          store.reset();
           onShiftDown();
+          initalDataFetch();
         } else {
           store.nextRow();
         }
@@ -204,7 +196,6 @@
     {:else if !isEmpty}
       <slot
         visibleItems={items}
-        initialItem={[]}
         updating={$store.updating}
         activeRow={$store.activeRow}
       />
