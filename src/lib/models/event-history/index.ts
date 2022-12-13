@@ -86,11 +86,7 @@ const toEvent = async ({
   settings,
   accessToken,
 }: EventWithMetadata): Promise<WorkflowEvent> => {
-  const id = String(historyEvent.eventId);
-  const eventType = historyEvent.eventType as unknown as EventType;
-  const timestamp = formatDate(String(historyEvent.eventTime));
-  const classification = getEventClassification(eventType);
-  const category = getEventCategory(eventType);
+  const event = createEvent(historyEvent);
   const attributes = await getEventAttributes({
     historyEvent,
     namespace,
@@ -99,14 +95,8 @@ const toEvent = async ({
   }).then((attributes) => simplifyAttributes(attributes));
 
   return {
-    ...historyEvent,
+    ...event,
     attributes,
-    eventType,
-    classification,
-    category,
-    id,
-    name: eventType,
-    timestamp,
   };
 };
 
