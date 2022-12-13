@@ -332,13 +332,9 @@ export const isLocalActivityMarkerEvent = (
 ) => {
   if (!isMarkerRecordedEvent(event)) return false;
 
-  if (event?.markerRecordedEventAttributes?.markerName !== 'LocalActivity')
+  if (event.markerRecordedEventAttributes.markerName !== 'LocalActivity') {
     return false;
+  }
 
-  const payload =
-    event?.markerRecordedEventAttributes?.details?.data?.payloads?.[0];
-
-  if (!payload) return false;
-
-  return Boolean(has(payload, 'ActivityType') || has(payload, 'activity_type'));
+  return true;
 };

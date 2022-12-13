@@ -1,4 +1,6 @@
-type HistoryEvent = import('$types').HistoryEvent;
+type HistoryEvent = Omit<import('$types').HistoryEvent, 'eventType'> & {
+  eventType: EventType;
+};
 type PendingActivityInfo = import('$types').PendingActivityInfo;
 type PendingChildren = import('$types').PendingChildrenInfo;
 

@@ -60,13 +60,23 @@ export async function getEventAttributes(
   };
 }
 
-export const createEvent = (historyEvent: HistoryEvent): CommonHistoryEvent => {
+export const toEvent = async ({
+  historyEvent,
+  namespace,
+  settings,
+  accessToken,
+}: EventWithMetadata): Promise<WorkflowEvent> => {
   const id = String(historyEvent.eventId);
   const eventType = historyEvent.eventType as unknown as EventType;
   const timestamp = formatDate(String(historyEvent.eventTime));
   const classification = getEventClassification(eventType);
   const category = getEventCategory(eventType);
-  const { attributes } = findAttributesAndKey(historyEvent);
+  const attributes = await getEventAttributes({
+    historyEvent,
+    namespace,
+    settings,
+    accessToken,
+  }).then((attributes) => simplifyAttributes(attributes));
 
   return {
     ...historyEvent,
@@ -76,26 +86,6 @@ export const createEvent = (historyEvent: HistoryEvent): CommonHistoryEvent => {
     timestamp,
     classification,
     category,
-    attributes,
-  };
-};
-
-const toEvent = async ({
-  historyEvent,
-  namespace,
-  settings,
-  accessToken,
-}: EventWithMetadata): Promise<WorkflowEvent> => {
-  const event = createEvent(historyEvent);
-  const attributes = await getEventAttributes({
-    historyEvent,
-    namespace,
-    settings,
-    accessToken,
-  }).then((attributes) => simplifyAttributes(attributes));
-
-  return {
-    ...event,
     attributes,
   };
 };
