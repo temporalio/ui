@@ -36,9 +36,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Create Release
-        run: |
-          git fetch --tags
-          tag=${{ git describe --tags `git rev-list --tags --max-count=1` }}
-          gh release create ${{ tag }} --generate-notes
+        run: ./.github/scripts/create-release.sh
         env:
           GITHUB_TOKEN: ${{ secrets.COMMANDER_DATA_TOKEN }}
