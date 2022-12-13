@@ -12,9 +12,6 @@
 <style lang="postcss">
   .background-animate {
     background-size: 400%;
-
-    -webkit-animation: Loading 3s ease infinite;
-    -moz-animation: Loading 3s ease infinite;
     animation: Loading 3s ease infinite;
   }
 
@@ -23,6 +20,7 @@
     100% {
       background-position: 0% 50%;
     }
+
     50% {
       background-position: 100% 50%;
     }

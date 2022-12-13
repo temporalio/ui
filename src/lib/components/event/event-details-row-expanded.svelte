@@ -102,15 +102,19 @@
   .code-block-row {
     @apply block w-full border-b-2 border-gray-200 py-2 text-left;
   }
+
   .detail-row {
     @apply block w-full items-start gap-4 border-b-2 border-gray-200 py-2 text-left xl:flex;
   }
+
   .row:last-of-type .detail-row {
     @apply border-b-0;
   }
+
   .row:last-of-type .code-block-row {
     @apply border-b-0;
   }
+
   .badge {
     @apply rounded-sm bg-gray-100 p-1 text-gray-900;
   }

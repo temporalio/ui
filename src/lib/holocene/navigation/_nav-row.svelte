@@ -31,18 +31,23 @@
   .nav-row {
     @apply flex flex-row items-center whitespace-nowrap rounded-lg py-1 text-sm font-medium;
   }
+
   .wrap {
     @apply whitespace-normal;
   }
+
   .local {
     @apply text-white;
   }
+
   .cloud {
     @apply text-gray-900;
   }
+
   .local:hover {
     @apply bg-white text-gray-900;
   }
+
   .cloud:hover {
     @apply bg-gray-900 text-white;
   }
