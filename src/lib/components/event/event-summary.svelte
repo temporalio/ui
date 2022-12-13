@@ -24,6 +24,7 @@
   const { namespace, workflow: workflowId, run: runId } = $page.params;
 
   $: category = $page.url.searchParams.get('category');
+  $: total = category ? '' : $eventHistory.end[0]?.id ?? '';
 
   $: fetchEvents = () => {
     return getPaginatedEvents({
@@ -73,7 +74,7 @@
     pageSizeOptions={[]}
     {onShiftUp}
     {onShiftDown}
-    total={$eventHistory.end[0]?.id}
+    {total}
   >
     <svelte:fragment slot="shortcuts">
       <KeyboardShortcut tooltipText="Open / Close Row">Space</KeyboardShortcut>

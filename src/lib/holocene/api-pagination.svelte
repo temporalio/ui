@@ -170,9 +170,11 @@
           <p>
             {start}–{end}
           </p>
-          <p>
-            {#if total}of {total}{/if}
-          </p>
+          {#if total}
+            <p>
+              of {total}
+            </p>
+          {/if}
         </div>
         <button
           class="caret"
@@ -204,44 +206,48 @@
   >
     <slot name="action-bottom-left" />
     <div class="flex gap-4">
-      {#if pageSizeOptions.length}
-        <FilterSelect
-          label="Per Page"
-          parameter={$store.key}
-          value={String($store.pageSize)}
-          options={pageSizeOptions}
-        />
-      {/if}
-      <div class="flex items-center justify-center gap-1">
-        <button
-          class="caret"
-          disabled={!$store.hasPrevious}
-          on:click={store.previousPage}
-        >
-          <span
-            class="arrow arrow-left"
-            class:arrow-left-disabled={!$store.hasPrevious}
+      {#if items.length}
+        {#if pageSizeOptions.length}
+          <FilterSelect
+            label="Per Page"
+            parameter={$store.key}
+            value={String($store.pageSize)}
+            options={pageSizeOptions}
           />
-        </button>
-        <div class="flex gap-1">
-          <p>
-            {start}–{end}
-          </p>
-          <p>
-            {#if total}of {total}{/if}
-          </p>
+        {/if}
+        <div class="flex items-center justify-center gap-3">
+          <button
+            class="caret"
+            disabled={!$store.hasPrevious}
+            on:click={store.previousPage}
+          >
+            <span
+              class="arrow arrow-left"
+              class:arrow-left-disabled={!$store.hasPrevious}
+            />
+          </button>
+          <div class="flex gap-1">
+            <p>
+              {start}–{end}
+            </p>
+            {#if total}
+              <p>
+                of {total}
+              </p>
+            {/if}
+          </div>
+          <button
+            class="caret"
+            disabled={!$store.hasNext}
+            on:click={fetchIndexData}
+          >
+            <span
+              class="arrow arrow-right"
+              class:arrow-right-disabled={!$store.hasNext}
+            />
+          </button>
         </div>
-        <button
-          class="caret"
-          disabled={!$store.hasNext}
-          on:click={fetchIndexData}
-        >
-          <span
-            class="arrow arrow-right"
-            class:arrow-right-disabled={!$store.hasNext}
-          />
-        </button>
-      </div>
+      {/if}
       <slot name="action-bottom-right" />
     </div>
   </nav>

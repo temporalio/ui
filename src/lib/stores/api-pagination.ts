@@ -48,7 +48,7 @@ export type PaginationStore = PaginationMethods & Readable<PaginationItems>;
 
 export function createPaginationStore(): PaginationStore {
   const paginationStore = writable(initialStore);
-  const { set, update, subscribe } = paginationStore;
+  const { set, update } = paginationStore;
 
   const pageSize = derived([page], ([$page]) => {
     return perPageFromSearchParameter(
@@ -56,16 +56,15 @@ export function createPaginationStore(): PaginationStore {
     );
   });
 
-  // const { subscribe } = derived(
-  //   [paginationStore, pageSize],
-  //   ([$pagination, $pageSize]) => {
-
-  //     return {
-  //       ...$pagination,
-  //       pageSize: $pageSize,
-  //     };
-  //   },
-  // );
+  const { subscribe } = derived(
+    [paginationStore, pageSize],
+    ([$pagination, $pageSize]) => {
+      return {
+        ...$pagination,
+        pageSize: $pageSize,
+      };
+    },
+  );
 
   const setNextPageWithItems = (
     nextToken: string,
@@ -78,7 +77,7 @@ export function createPaginationStore(): PaginationStore {
     _store.loading = false;
 
     // Return early if page does not have any items (this can happen when the page size equals the number of items)
-    if (!items.length) return _store;
+    if (!items.length) return { ..._store, hasNext: false };
 
     _store.indexData = { ...store.indexData };
     // _store.activeRow = 0;
