@@ -34,6 +34,7 @@
   .cell {
     @apply h-10 w-full cursor-pointer rounded p-1 hover:bg-blue-700 hover:text-white;
   }
+
   .active {
     @apply bg-gray-900 text-white;
   }

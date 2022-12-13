@@ -43,6 +43,7 @@
 
   .heart-rate {
     @apply relative;
+
     width: 20px;
     height: 18px;
     margin: 0;
@@ -50,6 +51,7 @@
 
   .fade-in {
     @apply absolute top-0 right-0 h-full w-full bg-blue-100;
+
     animation: heartRateIn 2s linear infinite;
     animation-delay: var(--animation-delay, 0);
   }
@@ -61,36 +63,36 @@
     left: 0;
     animation: heartRateOut 2s linear infinite;
     animation-delay: var(--animation-delay, 0);
-    background: rgb(219, 234, 254);
-    background: -moz-linear-gradient(
+    background: rgb(219 234 254);
+    background: linear-gradient(
       left,
-      rgb(219, 234, 254) 0%,
-      rgb(219, 234, 254) 50%,
-      rgba(255, 255, 255, 0) 100%
+      rgb(219 234 254) 0%,
+      rgb(219 234 254) 50%,
+      rgb(255 255 255 / 0%) 100%
     );
-    background: -webkit-linear-gradient(
+    background: linear-gradient(
       left,
-      rgb(219, 234, 254) 0%,
-      rgb(219, 234, 254) 50%,
-      rgba(255, 255, 255, 0) 100%
+      rgb(219 234 254) 0%,
+      rgb(219 234 254) 50%,
+      rgb(255 255 255 / 0%) 100%
     );
-    background: -o-linear-gradient(
+    background: linear-gradient(
       left,
-      rgb(219, 234, 254) 0%,
-      rgb(219, 234, 254) 50%,
-      rgba(255, 255, 255, 0) 100%
+      rgb(219 234 254) 0%,
+      rgb(219 234 254) 50%,
+      rgb(255 255 255 / 0%) 100%
     );
-    background: -ms-linear-gradient(
+    background: linear-gradient(
       left,
-      rgb(219, 234, 254) 0%,
-      rgb(219, 234, 254) 50%,
-      rgba(255, 255, 255, 0) 100%
+      rgb(219 234 254) 0%,
+      rgb(219 234 254) 50%,
+      rgb(255 255 255 / 0%) 100%
     );
     background: linear-gradient(
       to right,
-      rgb(219, 234, 254) 0%,
-      rgb(219, 234, 254) 80%,
-      rgba(255, 255, 255, 0) 100%
+      rgb(219 234 254) 0%,
+      rgb(219 234 254) 80%,
+      rgb(255 255 255 / 0%) 100%
     );
   }
 
@@ -98,9 +100,11 @@
     0% {
       width: 100%;
     }
+
     50% {
       width: 0;
     }
+
     100% {
       width: 0;
     }
@@ -110,6 +114,7 @@
     0% {
       width: 0%;
     }
+
     100% {
       width: 100%;
     }

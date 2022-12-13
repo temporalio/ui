@@ -8,30 +8,35 @@
 
 <style lang="postcss">
   .meter {
-    box-shadow: inset 0 -1px 1px rgba(255, 255, 255, 0.3);
+    box-shadow: inset 0 -1px 1px rgb(255 255 255 / 30%);
     @apply absolute left-0 right-0 box-content h-[5px] bg-gradient-to-r from-blue-200 to-blue-600;
+
     z-index: 5;
   }
+
   .meter > span {
     @apply relative block h-full overflow-hidden bg-blue-500;
+
     background-image: linear-gradient(
       center bottom,
-      rgb(96, 165, 250) 32%,
-      rgb(59, 130, 246) 77%
+      rgb(96 165 250) 32%,
+      rgb(59 130 246) 77%
     );
-    box-shadow: inset 0 2px 9px rgba(255, 255, 255, 0.25),
-      inset 0 -2px 6px rgba(0, 0, 0, 0.4);
+    box-shadow: inset 0 2px 9px rgb(255 255 255 / 25%),
+      inset 0 -2px 6px rgb(0 0 0 / 40%);
   }
-  .meter > span:after {
+
+  .meter > span::after {
     @apply absolute top-0 left-0 bottom-0 right-0 overflow-hidden;
+
     content: '';
     background-image: linear-gradient(
       -45deg,
-      rgba(255, 255, 255, 0.2) 25%,
+      rgb(255 255 255 / 20%) 25%,
       transparent 25%,
       transparent 50%,
-      rgba(255, 255, 255, 0.2) 50%,
-      rgba(255, 255, 255, 0.2) 75%,
+      rgb(255 255 255 / 20%) 50%,
+      rgb(255 255 255 / 20%) 75%,
       transparent 75%,
       transparent
     );
@@ -48,6 +53,7 @@
     0% {
       background-position: 0 0;
     }
+
     100% {
       background-position: 25px 25px;
     }

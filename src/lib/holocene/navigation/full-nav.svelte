@@ -203,12 +203,13 @@
   .cursor {
     @apply cursor-pointer;
   }
+
   .nav-title {
     width: 100px;
     overflow: hidden;
     transition: width 0.15s linear;
-    -webkit-transition: width 0.15s linear;
   }
+
   .profile-row {
     @apply ml-1 flex flex-row items-center rounded-lg py-1 text-sm font-medium;
   }
