@@ -3,7 +3,7 @@
   import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
   import { eventHistory } from '$lib/stores/events';
   import { getPaginatedEvents } from '$lib/services/events-service';
-  import { refresh, workflowRun } from '$lib/stores/workflow-run';
+  import { refresh } from '$lib/stores/workflow-run';
 
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
@@ -76,7 +76,11 @@
     {onShiftDown}
     {total}
   >
-    <svelte:fragment slot="shortcuts">
+    <svelte:fragment slot="action-top-left">
+      <KeyboardShortcut arrow="left" tooltipText="Previous Page" />
+      <KeyboardShortcut arrow="up" tooltipText="Previous Row" />
+      <KeyboardShortcut arrow="down" tooltipText="Next Row" />
+      <KeyboardShortcut arrow="right" tooltipText="Next Page" />
       <KeyboardShortcut tooltipText="Open / Close Row">Space</KeyboardShortcut>
       {#if !compact}
         <Tooltip text="Ascending order" top>

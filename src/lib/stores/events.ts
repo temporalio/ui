@@ -15,10 +15,9 @@ import {
   FetchEventsParametersWithSettings,
   fetchStartAndEndEvents,
 } from '$lib/services/events-service';
-import { eventCategoryParam, eventSortOrder } from './event-view';
+import { eventSortOrder } from './event-view';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { withLoading, delay } from '$lib/utilities/stores/with-loading';
-import { groupEvents } from '$lib/models/event-groups';
 import { refresh } from '$lib/stores/workflow-run';
 import { authUser } from '$lib/stores/auth-user';
 import { previous } from '$lib/stores/previous-events';
@@ -128,51 +127,6 @@ export const eventHistory = readable(
 );
 
 export const timelineEvents = writable(null);
-
-export const events: Readable<WorkflowEvents> = derived(
-  [eventHistory, eventCategoryParam, timelineEvents],
-  ([$eventHistory, $category, $timelineEvents]) => {
-    if ($timelineEvents) {
-      return $timelineEvents;
-    }
-    const { events } = $eventHistory;
-    if (!$category) return events;
-    return events.filter((event) => event.category === $category);
-  },
-);
-
-export const eventGroups: Readable<EventGroups> = derived(
-  [eventHistory, eventCategoryParam],
-  ([$eventHistory, $category]) => {
-    const { eventGroups } = $eventHistory;
-    if (!$category) return eventGroups;
-    return eventGroups.filter((event) => event.category === $category);
-  },
-);
-
-export const ascendingEventGroups: Readable<EventGroups> = derived(
-  [eventHistory, eventSortOrder, eventCategoryParam],
-  ([$eventHistory, $sortOrder, $category]) => {
-    const { events } = $eventHistory;
-    const _events =
-      $sortOrder === 'descending' ? events.slice().reverse() : events;
-    const eventGroups = groupEvents(_events);
-    if (!$category) return eventGroups;
-    return eventGroups.filter((event) => event.category === $category);
-  },
-);
-
-export const ascendingEvents: Readable<WorkflowEvents> = derived(
-  [eventHistory, eventSortOrder, eventCategoryParam],
-  ([$eventHistory, $sortOrder, $category]) => {
-    const { events } = $eventHistory;
-    const _events =
-      $sortOrder === 'descending' ? events.slice().reverse() : events;
-    if (!$category) return _events;
-    return _events.filter((event) => event.category === $category);
-  },
-);
-
 export const updating = writable(true);
 export const loading = writable(true);
 export const activeEvent = writable(null);

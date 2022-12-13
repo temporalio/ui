@@ -6,7 +6,7 @@
   import { createPaginationStore } from '$lib/stores/api-pagination';
   import { options } from '$lib/stores/pagination';
   import KeyboardShortcut from '$holocene/keyboard-shortcut/shortcut.svelte';
-  import { onMount, tick } from 'svelte';
+  import { onMount } from 'svelte';
 
   type T = $$Generic;
   type PaginatedRequest = (
@@ -22,7 +22,7 @@
   export let pageSizeOptions: string[] = options;
   export let total: string | number = '';
 
-  let store = createPaginationStore();
+  let store = createPaginationStore(pageSizeOptions);
   let error: any;
 
   let shifted = false;
@@ -137,13 +137,7 @@
 <div class="relative mb-8 flex flex-col gap-4">
   <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
     <div class="flex items-center gap-1 lg:gap-2 xl:gap-3">
-      <slot name="action-top-left">
-        <KeyboardShortcut arrow="left" tooltipText="Previous Page" />
-        <KeyboardShortcut arrow="up" tooltipText="Previous Row" />
-        <KeyboardShortcut arrow="down" tooltipText="Next Row" />
-        <KeyboardShortcut arrow="right" tooltipText="Next Page" />
-        <slot name="shortcuts" />
-      </slot>
+      <slot name="action-top-left" />
     </div>
     <nav class="flex flex-col justify-end gap-4 md:flex-row">
       <slot name="action-top-center" />

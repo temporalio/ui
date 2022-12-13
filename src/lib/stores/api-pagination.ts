@@ -23,7 +23,6 @@ type PaginationItems = {
   hasPrevious: boolean;
   index: number;
   pageSize: number;
-  nextPageSize: number;
   indexData: Record<
     number,
     { nextToken: string; start: number; end: number; items: any[] }
@@ -39,14 +38,16 @@ const initialStore: PaginationItems = {
   hasPrevious: false,
   index: 0,
   pageSize: defaultItemsPerPage,
-  nextPageSize: defaultItemsPerPage,
   indexData: {},
   activeRow: 0,
 };
 
 export type PaginationStore = PaginationMethods & Readable<PaginationItems>;
 
-export function createPaginationStore(): PaginationStore {
+export function createPaginationStore(
+  pageSizeOptions: string[],
+): PaginationStore {
+  // TODO, use first option in pageSizeOptions for pageSize instead of defaultItemsPerPage
   const paginationStore = writable(initialStore);
   const { set, update } = paginationStore;
 
