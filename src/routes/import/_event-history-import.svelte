@@ -4,7 +4,7 @@
 
   import Button from '$holocene/button.svelte';
   import { toEventHistory } from '$lib/models/event-history';
-  import { notifications } from '$lib/stores/notifications';
+  import { toaster } from '$holocene/stores/toaster';
   import { importEvents, importEventGroups } from '$lib/stores/import-events';
   import { importSettings } from './_import-settings';
   import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
@@ -24,7 +24,7 @@
           const result = reader?.result?.toString() ?? '';
           rawEvents = parseWithBigInt(result);
         } catch (e) {
-          notifications.add('error', 'Could not parse JSON');
+          toaster.push({ variant: 'error', message: 'Could not parse JSON' });
         }
       };
     }
@@ -44,7 +44,10 @@
       goto(path);
     } catch (e) {
       console.error(e);
-      notifications.add('error', 'Could not create event history from JSON');
+      toaster.push({
+        variant: 'error',
+        message: 'Could not create event history from JSON',
+      });
     }
   };
 </script>

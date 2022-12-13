@@ -1,4 +1,4 @@
-import { notifications } from '$lib/stores/notifications';
+import { toaster } from '$holocene/stores/toaster';
 import { namespaces } from '$lib/stores/namespaces';
 import { paginated } from '$lib/utilities/paginated';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
@@ -25,7 +25,11 @@ export async function fetchNamespaces(
       requestFromAPI<ListNamespacesResponse>(route, {
         request,
         token,
-        onError: () => notifications.add('error', 'Unable to fetch namespaces'),
+        onError: () =>
+          toaster.push({
+            variant: 'error',
+            message: 'Unable to fetch namespaces',
+          }),
       }),
     );
 
@@ -57,7 +61,8 @@ export async function fetchNamespace(
   const route = await routeForApi('namespace', { namespace });
   const results = await requestFromAPI<DescribeNamespaceResponse>(route, {
     request,
-    onError: () => notifications.add('error', 'Unable to fetch namespaces'),
+    onError: () =>
+      toaster.push({ variant: 'error', message: 'Unable to fetch namespaces' }),
   });
 
   return results ?? empty;

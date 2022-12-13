@@ -1,52 +1,5 @@
 <script lang="ts" context="module">
-  import { type Writable, writable } from 'svelte/store';
-  import { v4 } from 'uuid';
-
-  export type ToastVariant =
-    | 'success'
-    | 'error'
-    | 'info'
-    | 'warning'
-    | 'primary';
-
-  export interface Toast {
-    message: string;
-    variant?: ToastVariant;
-    id?: string;
-    duration?: number;
-  }
-
-  interface Toaster {
-    push: (toast: Toast) => void;
-    pop: (id: string) => void;
-    toasts: Writable<Toast[]>;
-  }
-
-  const toasts = writable<Toast[]>([]);
-
-  const push = (toast: Toast) => {
-    const toastWithDefaults: Toast = {
-      id: v4(),
-      duration: 3000,
-      variant: 'primary',
-      ...toast,
-    };
-    toasts.update((ts) => [...ts, toastWithDefaults]);
-    const timeoutId = setTimeout(() => {
-      pop(toastWithDefaults.id);
-      clearTimeout(timeoutId);
-    }, toastWithDefaults.duration);
-  };
-
-  const pop = (id: string) => {
-    toasts.update((ts) => ts.filter((t) => t.id !== id));
-  };
-
-  export const toaster: Toaster = {
-    push,
-    pop,
-    toasts,
-  };
+  import type { Toaster } from './stores/toaster';
 </script>
 
 <script lang="ts">

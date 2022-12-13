@@ -63,11 +63,11 @@
 <script lang="ts">
   import { updated } from '$app/stores';
   import Header from './_header.svelte';
-  import Notifications from '$lib/components/notifications.svelte';
   import Banners from '$lib/components/banner/banners.svelte';
   import { ErrorBoundary } from '$lib/holocene/error-boundary';
   import ScrollToTop from '$lib/holocene/scroll-to-top.svelte';
-  import Toaster, { toaster } from '$lib/holocene/toaster.svelte';
+  import Toaster from '$holocene/toaster.svelte';
+  import { toaster } from '$holocene/stores/toaster';
 
   export let user: User;
   export let uiVersionInfo: UiVersionInfo;
@@ -81,7 +81,6 @@
 </script>
 
 <div class="flex w-screen flex-row">
-  <Notifications />
   <Toaster pop={toaster.pop} toasts={toaster.toasts} />
   <div class="sticky top-0 z-20 h-screen w-auto">
     <Header {user} />
