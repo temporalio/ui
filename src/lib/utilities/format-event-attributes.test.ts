@@ -134,16 +134,24 @@ describe('formatAttributes', () => {
     expect(formatAttemptsLeft(10, 3)).toBe(7);
   });
 
-  it('should format attempts left with unlimited max attempts', () => {
+  it('should format attempts left with 0 max attempts to be unlimited', () => {
     expect(formatAttemptsLeft(0, 3)).toBe(UnlimitedAttempts);
+  });
+
+  it('should format attempts left with null max attempts to be unlimited', () => {
+    expect(formatAttemptsLeft(null, 18)).toBe(UnlimitedAttempts);
   });
 
   it('should format max attempts left with limited max attempts', () => {
     expect(formatMaximumAttempts(2393)).toBe(2393);
   });
 
-  it('should format max attempts left with unlimited max attempts', () => {
+  it('should format max attempts left with 0 max attempts', () => {
     expect(formatMaximumAttempts(0)).toBe(UnlimitedAttempts);
+  });
+
+  it('should format max attempts left with null max attempts', () => {
+    expect(formatMaximumAttempts(null)).toBe(UnlimitedAttempts);
   });
 
   it('should format expiration with unlimited max attempts', () => {

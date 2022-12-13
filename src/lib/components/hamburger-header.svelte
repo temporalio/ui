@@ -60,6 +60,7 @@
   .hamburger-header {
     @apply fixed top-0 left-0 right-0 z-50 grid h-16 grid-cols-12 grid-rows-1 items-center gap-6 bg-gray-900 px-10 py-2 shadow-lg xl:hidden;
   }
+
   .hamburger-header img {
     user-select: none;
   }

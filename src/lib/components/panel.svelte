@@ -10,6 +10,7 @@
   .panel {
     @apply rounded-lg border-2 border-gray-300 p-8;
   }
+
   .error {
     @apply border-red-700 bg-red-50;
   }

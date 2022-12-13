@@ -148,12 +148,15 @@
   .thin {
     @apply h-8 py-1;
   }
+
   .unround {
     @apply rounded-none;
   }
+
   .unroundLeft {
     @apply rounded-tl-none rounded-bl-none;
   }
+
   .unroundRight {
     @apply rounded-tr-none rounded-br-none;
   }
