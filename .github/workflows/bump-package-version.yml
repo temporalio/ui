@@ -1,4 +1,4 @@
-name: Publish package to npm
+name: Bump Package Version
 
 on:
   workflow_dispatch:
@@ -35,5 +35,5 @@ jobs:
       - name: Create Pull Request
         run: ./.github/scripts/bump-version.sh
         env:
-          GITHUB_TOKEN: ${{ secrets.COMMANDER_DATA_TOKEN }}
+          GH_TOKEN: ${{ secrets.TEMPORAL_UI_TOKEN }}
           GITHUB_REPO: ${{ github.repository }}

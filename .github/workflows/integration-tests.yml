@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - '!releases/**'
+      - '!npm-*'
   pull_request:
     branches: [main]
 

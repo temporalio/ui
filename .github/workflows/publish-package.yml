@@ -1,3 +1,5 @@
+name: Publish NPM Package
+
 on:
   push:
     branches:
@@ -38,4 +40,4 @@ jobs:
       - name: Create Release
         run: ./.github/scripts/create-release.sh
         env:
-          GITHUB_TOKEN: ${{ secrets.COMMANDER_DATA_TOKEN }}
+          GH_TOKEN: ${{ secrets.TEMPORAL_UI_TOKEN }}
