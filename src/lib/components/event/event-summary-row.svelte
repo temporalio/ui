@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { fade, fly, slide } from 'svelte/transition';
+
   import Icon from '$holocene/icon/icon.svelte';
 
   import { eventSortOrder, eventShowElapsed } from '$lib/stores/event-view';
@@ -21,6 +23,7 @@
   import EventDetailsFull from './event-details-full.svelte';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
+  import { noop, tick } from 'svelte/internal';
 
   export let event: IterableEvent | EventGroup;
   export let visibleItems: IterableEvent[];
@@ -29,12 +32,13 @@
   export let expandAll = false;
   export let typedError = false;
   export let active = false;
+  export let onRowClick: () => void = noop;
 
   let selectedId = compact
     ? Array.from((event as EventGroup).events.keys()).pop()
     : event.id;
 
-  $: expanded = expandAll;
+  $: expanded = expandAll || active;
 
   $: currentEvent = compact
     ? (event as EventGroup).events.get(selectedId)
@@ -60,6 +64,7 @@
 
   const onLinkClick = () => {
     expanded = !expanded;
+    onRowClick();
   };
 
   const failure = eventOrGroupIsFailureOrTimedOut(
@@ -163,7 +168,7 @@
   <td class="table-cell" />
 </tr>
 {#if expanded}
-  <tr class="table-row" class:typedError>
+  <tr in:fade|local class="table-row" class:typedError>
     <td class="expanded-cell" colspan="6">
       <EventDetailsFull
         event={currentEvent}
@@ -233,5 +238,14 @@
 
   .active {
     @apply z-50 cursor-pointer bg-gradient-to-b from-blue-100 to-purple-100;
+  }
+  .active.canceled {
+    @apply bg-gradient-to-b from-yellow-100 to-yellow-200;
+  }
+  .active.failure {
+    @apply bg-gradient-to-b from-red-100 to-red-200;
+  }
+  .active.terminated {
+    @apply bg-gradient-to-b from-pink-100 to-pink-200;
   }
 </style>

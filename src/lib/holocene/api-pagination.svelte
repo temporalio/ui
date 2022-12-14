@@ -15,8 +15,10 @@
 
   export let onError: (error: any) => void;
   export let onFetch: () => Promise<PaginatedRequest>;
-  export let onShiftUp: () => void | undefined = undefined;
-  export let onShiftDown: () => void | undefined = undefined;
+  export let onShiftUp: (event: KeyboardEvent) => void | undefined = undefined;
+  export let onShiftDown: (event: KeyboardEvent) => void | undefined =
+    undefined;
+  export let onSpace: (event: KeyboardEvent) => void | undefined = undefined;
 
   export let pageSizeOptions: string[] = options;
   export let total: string | number = '';
@@ -69,7 +71,7 @@
     }
   }
 
-  function handleKeydown(event) {
+  async function handleKeydown(event: KeyboardEvent) {
     switch (event.code) {
       case 'ArrowRight':
         if ($store.hasNext && !$store.updating) {
@@ -83,7 +85,7 @@
         break;
       case 'ArrowUp':
         if (shifted && onShiftUp) {
-          onShiftUp();
+          onShiftUp(event);
           initalDataFetch();
         } else {
           store.previousRow();
@@ -91,15 +93,16 @@
         break;
       case 'ArrowDown':
         if (shifted && onShiftDown) {
-          onShiftDown();
+          onShiftDown(event);
           initalDataFetch();
         } else {
           store.nextRow();
         }
         break;
       case 'Space':
-        event.preventDefault();
-        // Use an open row array in store???
+        if (onSpace) {
+          onSpace(event);
+        }
         break;
       case 'ShiftLeft':
       case 'ShiftRight':
@@ -191,6 +194,7 @@
       visibleItems={items}
       updating={$store.updating}
       activeRow={$store.activeRow}
+      setActiveRow={store.setActiveRow}
     />
   {/if}
   <nav

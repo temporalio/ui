@@ -37,7 +37,7 @@
     });
   };
 
-  const onShiftUp = () => {
+  const onShiftUp = (event: KeyboardEvent) => {
     if (!compact) {
       const sort = 'ascending';
       $eventFilterSort = sort;
@@ -49,7 +49,7 @@
     }
   };
 
-  const onShiftDown = () => {
+  const onShiftDown = (event: KeyboardEvent) => {
     if (!compact) {
       const sort = 'descending';
       $eventFilterSort = sort;
@@ -67,6 +67,7 @@
     let:visibleItems
     let:updating
     let:activeRow
+    let:setActiveRow
     onFetch={fetchEvents}
     onError={(error) => console.error(error)}
     pageSizeOptions={[]}
@@ -107,6 +108,7 @@
           expandAll={$expandAllEvents === 'true'}
           initialItem={$eventHistory?.start?.[0]}
           active={activeRow === index}
+          onRowClick={() => setActiveRow(index)}
         />
       {:else}
         <EventEmptyRow />

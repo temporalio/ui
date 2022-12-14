@@ -17,6 +17,7 @@ type PaginationMethods = {
   resetPageSize: () => void;
   nextRow: () => void;
   previousRow: () => void;
+  setActiveRow: (activeRow: number) => void;
 };
 
 type PaginationItems = {
@@ -79,11 +80,12 @@ export function createPaginationStore(
     const currentIndex = _store.index;
     const store = {
       ..._store,
+      indexData: { ..._store.indexData },
       hasNext: Boolean(nextToken),
       updating: false,
       loading: false,
     };
-    store.indexData = { ...store.indexData };
+    ;
     // Return early if page does not have any items
     // This can happen when the page size equals the number of items or visibleItems is filtered
     if (!items.length) return { ...store, hasNext: false };
@@ -142,6 +144,31 @@ export function createPaginationStore(
     return store;
   };
 
+  const setNextRow = (_store: PaginationItems) => {
+    const store = { ..._store };
+    const indexLength = store.indexData[store.index]?.items?.length ?? 0;
+
+    if (store.activeRow < indexLength - 1) {
+      store.activeRow = store.activeRow + 1;
+    }
+
+    return store
+  }
+
+  const setPreviousRow = (_store: PaginationItems) => {
+    const store = { ..._store };
+    const activeRow = store.activeRow >= 1 ? store.activeRow - 1 : 0
+
+    store.activeRow = activeRow;
+
+    return store
+  }
+
+  const setActiveRow = (_store: PaginationItems, activeRow: number) => {
+    const store = { ..._store, activeRow };
+    return store
+  }
+
   return {
     subscribe,
     nextPageWithItems: (token: string, items: any[]) =>
@@ -163,24 +190,8 @@ export function createPaginationStore(
           updating: true,
         };
       }),
-    nextRow: () =>
-      update((store) => {
-        // Add until at the bottom
-        return {
-          ...store,
-          activeRow:
-            store.activeRow < store.indexData[store.index].items.length - 1
-              ? store.activeRow + 1
-              : store.activeRow,
-        };
-      }),
-    previousRow: () =>
-      update((store) => {
-        // Subtract until at the top
-        return {
-          ...store,
-          activeRow: store.activeRow > 1 ? store.activeRow - 1 : 0,
-        };
-      }),
+    nextRow: () => update((store) => setNextRow(store)),
+    previousRow: () => update((store) => setPreviousRow(store)),
+    setActiveRow: (activeRow: number) => update((store) => setActiveRow(store, activeRow)),
   };
 }
