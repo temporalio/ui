@@ -28,11 +28,6 @@
 
   let shifted = false;
 
-  $: items = $store.indexData[$store.index]?.items ?? [];
-  $: nextIndex = $store.indexData[$store.index + 1];
-  $: start = $store.indexData[$store.index]?.start ?? 0;
-  $: end = $store.indexData[$store.index]?.end ?? 0;
-
   function clearError() {
     if (error) error = undefined;
   }
@@ -53,7 +48,7 @@
   async function fetchIndexData() {
     clearError();
     store.setUpdating();
-    if (!nextIndex) {
+    if (!$store.hasNextIndexData) {
       try {
         const fetchData: PaginatedRequest = await onFetch();
         const response = await fetchData(
@@ -165,7 +160,7 @@
         </button>
         <div class="flex gap-1">
           <p>
-            {start}–{end}
+            {$store.indexStart}–{$store.indexEnd}
           </p>
           {#if total}
             <p>
@@ -191,10 +186,10 @@
     <SkeletonTable rows={15} />
   {:else}
     <slot
-      visibleItems={items}
       updating={$store.updating}
-      activeRow={$store.activeRow}
-      setActiveRow={store.setActiveRow}
+      visibleItems={$store.visibleItems}
+      activeIndex={$store.activeIndex}
+      setActiveIndex={store.setActiveIndex}
     />
   {/if}
   <nav
@@ -204,7 +199,7 @@
   >
     <slot name="action-bottom-left" />
     <div class="flex gap-4">
-      {#if items.length}
+      {#if $store.visibleItems.length}
         {#if pageSizeOptions.length}
           <FilterSelect
             label="Per Page"
@@ -226,7 +221,7 @@
           </button>
           <div class="flex gap-1">
             <p>
-              {start}–{end}
+              {$store.indexStart}–{$store.indexEnd}
             </p>
             {#if total}
               <p>

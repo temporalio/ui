@@ -17,7 +17,7 @@ type PaginationMethods = {
   resetPageSize: () => void;
   nextRow: () => void;
   previousRow: () => void;
-  setActiveRow: (activeRow: number) => void;
+  setActiveIndex: (activeIndex: number) => void;
 };
 
 type PaginationItems = {
@@ -32,7 +32,11 @@ type PaginationItems = {
     number,
     { nextToken: string; start: number; end: number; items: any[] }
   >;
-  activeRow: number;
+  visibleItems: any[];
+  hasNextIndexData: boolean;
+  indexStart: number;
+  indexEnd: number;
+  activeIndex: number;
 };
 
 const defaultStore: PaginationItems = {
@@ -44,7 +48,11 @@ const defaultStore: PaginationItems = {
   index: 0,
   pageSize: defaultItemsPerPage,
   indexData: {},
-  activeRow: 0,
+  visibleItems: [],
+  hasNextIndexData: false,
+  indexStart: 0,
+  indexEnd: 0,
+  activeIndex: 0,
 };
 
 export type PaginationStore = PaginationMethods & Readable<PaginationItems>;
@@ -65,8 +73,20 @@ export function createPaginationStore(
   const { subscribe } = derived(
     [paginationStore, pageSize],
     ([$pagination, $pageSize]) => {
+      const visibleItems =
+        $pagination.indexData[$pagination.index]?.items ?? [];
+      const indexStart = $pagination.indexData[$pagination.index]?.start ?? 0;
+      const indexEnd = $pagination.indexData[$pagination.index]?.end ?? 0;
+      const hasNextIndexData = Boolean(
+        $pagination.indexData[$pagination.index + 1],
+      );
+
       return {
         ...$pagination,
+        visibleItems,
+        indexStart,
+        indexEnd,
+        hasNextIndexData,
         pageSize: $pageSize,
       };
     },
@@ -85,7 +105,6 @@ export function createPaginationStore(
       updating: false,
       loading: false,
     };
-    ;
     // Return early if page does not have any items
     // This can happen when the page size equals the number of items or visibleItems is filtered
     if (!items.length) return { ...store, hasNext: false };
@@ -134,7 +153,7 @@ export function createPaginationStore(
       hasNext: true,
       updating: false,
       loading: false,
-      index: _store.index - 1,
+      index: _store.index > 0 ? _store.index - 1 : 0,
     };
 
     if (store.index === 0) {
@@ -148,26 +167,34 @@ export function createPaginationStore(
     const store = { ..._store };
     const indexLength = store.indexData[store.index]?.items?.length ?? 0;
 
-    if (store.activeRow < indexLength - 1) {
-      store.activeRow = store.activeRow + 1;
+    if (store.activeIndex < indexLength - 1) {
+      store.activeIndex = store.activeIndex + 1;
     }
 
-    return store
-  }
+    return store;
+  };
 
   const setPreviousRow = (_store: PaginationItems) => {
     const store = { ..._store };
-    const activeRow = store.activeRow >= 1 ? store.activeRow - 1 : 0
+    const activeIndex = store.activeIndex >= 1 ? store.activeIndex - 1 : 0;
 
-    store.activeRow = activeRow;
+    store.activeIndex = activeIndex;
 
-    return store
-  }
+    return store;
+  };
 
-  const setActiveRow = (_store: PaginationItems, activeRow: number) => {
-    const store = { ..._store, activeRow };
-    return store
-  }
+  const setActiveIndex = (_store: PaginationItems, activeIndex: number) => {
+    return { ..._store, activeIndex };
+  };
+
+  const resetPageSize = (_store: PaginationItems) => {
+    return {
+      ..._store,
+      index: 0,
+      indexData: {},
+      updating: true,
+    };
+  };
 
   return {
     subscribe,
@@ -175,23 +202,12 @@ export function createPaginationStore(
       update((store) => setNextPageWithItems(token, items, store)),
     nextPage: () => update((store) => setNextPage(store)),
     previousPage: () => update((store) => setPreviousPage(store)),
-    setUpdating: () =>
-      update((store) => {
-        return { ...store, updating: true };
-      }),
+    setUpdating: () => update((store) => ({ ...store, updating: true })),
     reset: () => set(defaultStore),
-    resetPageSize: () =>
-      update((store) => {
-        return {
-          ...store,
-          index: 0,
-          nextIndex: 0,
-          indexData: {},
-          updating: true,
-        };
-      }),
+    resetPageSize: () => update((store) => resetPageSize(store)),
     nextRow: () => update((store) => setNextRow(store)),
     previousRow: () => update((store) => setPreviousRow(store)),
-    setActiveRow: (activeRow: number) => update((store) => setActiveRow(store, activeRow)),
+    setActiveIndex: (activeIndex: number) =>
+      update((store) => setActiveIndex(store, activeIndex)),
   };
 }

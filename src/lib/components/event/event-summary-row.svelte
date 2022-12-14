@@ -239,12 +239,15 @@
   .active {
     @apply z-50 cursor-pointer bg-gradient-to-b from-blue-100 to-purple-100;
   }
+
   .active.canceled {
     @apply bg-gradient-to-b from-yellow-100 to-yellow-200;
   }
+
   .active.failure {
     @apply bg-gradient-to-b from-red-100 to-red-200;
   }
+
   .active.terminated {
     @apply bg-gradient-to-b from-pink-100 to-pink-200;
   }

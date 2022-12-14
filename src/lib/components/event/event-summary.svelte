@@ -66,8 +66,8 @@
   <ApiPagination
     let:visibleItems
     let:updating
-    let:activeRow
-    let:setActiveRow
+    let:activeIndex
+    let:setActiveIndex
     onFetch={fetchEvents}
     onError={(error) => console.error(error)}
     pageSizeOptions={[]}
@@ -107,8 +107,8 @@
           {visibleItems}
           expandAll={$expandAllEvents === 'true'}
           initialItem={$eventHistory?.start?.[0]}
-          active={activeRow === index}
-          onRowClick={() => setActiveRow(index)}
+          active={activeIndex === index}
+          onRowClick={() => setActiveIndex(index)}
         />
       {:else}
         <EventEmptyRow />

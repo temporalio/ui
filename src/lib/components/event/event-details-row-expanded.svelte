@@ -122,6 +122,7 @@
   .row:last-of-type .content {
     @apply border-b-0;
   }
+
   .badge {
     @apply rounded-sm bg-gray-100 p-1 text-gray-900;
   }
