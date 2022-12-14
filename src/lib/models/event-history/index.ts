@@ -60,7 +60,7 @@ export async function getEventAttributes(
   };
 }
 
-const toEvent = async ({
+export const toEvent = async ({
   historyEvent,
   namespace,
   settings,
@@ -80,13 +80,13 @@ const toEvent = async ({
 
   return {
     ...historyEvent,
-    attributes,
+    name: eventType,
+    id,
     eventType,
+    timestamp,
     classification,
     category,
-    id,
-    name: eventType,
-    timestamp,
+    attributes,
   };
 };
 

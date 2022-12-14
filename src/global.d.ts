@@ -12,6 +12,8 @@ type NamespaceItem = {
 type Optional<T, K extends keyof T = keyof T> = Omit<T, K> &
   Partial<Pick<T, K>>;
 
+type Replace<T, U extends { [key: string]: unknown }> = Omit<T, keyof U> & U;
+
 interface Window {
   Prism: {
     highlightAll: () => void;

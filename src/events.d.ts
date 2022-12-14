@@ -1,5 +1,39 @@
-type HistoryEvent = import('$types').HistoryEvent;
-type PendingActivityInfo = import('$types').PendingActivityInfo;
+type EventHistory = Replace<
+  import('$types').History,
+  { events: HistoryEvent[] }
+>;
+
+type HistoryEvent = Replace<
+  import('$types').HistoryEvent,
+  { eventType: EventType }
+>;
+
+type GetWorkflowExecutionHistoryResponse = Replace<
+  import('$types').GetWorkflowExecutionHistoryResponse,
+  { history: EventHistory }
+>;
+
+type PendingActivityInfo = Replace<
+  import('$types').PendingActivityInfo,
+  { activityId: string }
+>;
+
+type PendingActivity = Replace<
+  PendingActivityInfo,
+  'activityId',
+  {
+    id: string;
+    state: PendingActivityState;
+    activityType?: { name: string };
+  }
+>;
+
+type PendingActivityState =
+  | 'Unspecified'
+  | 'Scheduled'
+  | 'Started'
+  | 'CancelRequested';
+
 type PendingChildren = import('$types').PendingChildrenInfo;
 
 type EventRequestMetadata = {
@@ -32,7 +66,6 @@ type EventClassification =
 
 interface WorkflowEvent extends HistoryEvent {
   id: string;
-  eventType: EventType;
   attributes: EventAttribute;
   timestamp: string;
   classification: EventClassification;
@@ -41,12 +74,6 @@ interface WorkflowEvent extends HistoryEvent {
 }
 
 type WorkflowEvents = WorkflowEvent[];
-
-interface PendingActivity extends PendingActivityInfo {
-  id: typeof PendingActivityInfo.activityId;
-  state: 'Unspecified' | 'Scheduled' | 'Started' | 'CancelRequested';
-  activityType: { name: string };
-}
 
 type PendingActivityWithMetadata = {
   activity: PendingActivity;
