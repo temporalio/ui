@@ -5,14 +5,13 @@
 
   import { createPaginationStore } from '$lib/stores/api-pagination';
   import { options } from '$lib/stores/pagination';
-  import KeyboardShortcut from '$holocene/keyboard-shortcut/shortcut.svelte';
   import { onMount } from 'svelte';
 
   type T = $$Generic;
   type PaginatedRequest = (
     size: number,
-    token: string | Uint8Array,
-  ) => Promise<{ items: any[]; nextPageToken: string | Uint8Array }>;
+    token: NextPageToken,
+  ) => Promise<{ items: any[]; nextPageToken: NextPageToken }>;
 
   export let onError: (error: any) => void;
   export let onFetch: () => Promise<PaginatedRequest>;
@@ -42,6 +41,7 @@
 
   async function initalDataFetch() {
     store.reset();
+
     const fetchData: PaginatedRequest = await onFetch();
     const response = await fetchData($store.pageSize, '');
     const { items, nextPageToken } = response;
@@ -249,15 +249,13 @@
 
 <style lang="postcss">
   .arrow {
-    @apply absolute top-0 h-0 w-0;
+    @apply absolute top-0 left-0 h-0 w-0;
 
     border-style: solid;
     border-width: 6px 12px 6px 0;
   }
 
   .arrow-left {
-    @apply left-0;
-
     border-width: 6px 12px 6px 0;
     border-color: transparent #18181b transparent transparent;
   }

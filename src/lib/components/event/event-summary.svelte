@@ -21,16 +21,14 @@
     $expandAllEvents = event.detail.expanded;
   }
 
-  const { namespace, workflow: workflowId, run: runId } = $page.params;
-
   $: category = $page.url.searchParams.get('category');
-  $: total = category ? '' : $eventHistory.end[0]?.id ?? '';
+  $: total = category ? '' : $eventHistory.end[0]?.id;
 
   $: fetchEvents = () => {
     return getPaginatedEvents({
-      namespace,
-      workflowId,
-      runId,
+      namespace: $page.params.namespace,
+      workflowId: $page.params.workflow,
+      runId: $page.params.run,
       sort: $eventFilterSort,
       category,
       compact,

@@ -133,7 +133,7 @@ export async function getPaginatedEvents({
   settings,
   accessToken,
 }: PaginatedEventParams): Promise<
-  () => Promise<{ items: WorkflowEvents; nextPageToken: Uint8Array | string }>
+  () => Promise<{ items: WorkflowEvents; nextPageToken: NextPageToken }>
 > {
   return async (pageSize = 100, token = '') => {
     const descendingRoute = await routeForApi(

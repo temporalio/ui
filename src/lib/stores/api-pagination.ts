@@ -1,11 +1,15 @@
 import { derived, writable } from 'svelte/store';
 import { page } from '$app/stores';
-import { perPageFromSearchParameter, defaultItemsPerPage } from './pagination';
+import {
+  perPageFromSearchParameter,
+  defaultItemsPerPage,
+  options,
+} from './pagination';
 
 import type { Readable } from 'svelte/store';
 
 type PaginationMethods = {
-  nextPageWithItems: (t: string | Uint8Array, items: any[]) => void;
+  nextPageWithItems: (t: NextPageToken, items: any[]) => void;
   nextPage: () => void;
   previousPage: () => void;
   setUpdating: () => void;
@@ -30,11 +34,11 @@ type PaginationItems = {
   activeRow: number;
 };
 
-const initialStore: PaginationItems = {
+const defaultStore: PaginationItems = {
   key: 'per-page',
   loading: true,
-  updating: true,
-  hasNext: true,
+  updating: false,
+  hasNext: false,
   hasPrevious: false,
   index: 0,
   pageSize: defaultItemsPerPage,
@@ -45,10 +49,10 @@ const initialStore: PaginationItems = {
 export type PaginationStore = PaginationMethods & Readable<PaginationItems>;
 
 export function createPaginationStore(
-  pageSizeOptions: string[],
+  pageSizeOptions: string[] = options,
 ): PaginationStore {
   // TODO, use first option in pageSizeOptions for pageSize instead of defaultItemsPerPage
-  const paginationStore = writable(initialStore);
+  const paginationStore = writable(defaultStore);
   const { set, update } = paginationStore;
 
   const pageSize = derived([page], ([$page]) => {
@@ -70,67 +74,72 @@ export function createPaginationStore(
   const setNextPageWithItems = (
     nextToken: string,
     items: any[],
-    store: PaginationItems,
+    _store: PaginationItems,
   ) => {
-    const _store = { ...store };
-    _store.hasNext = Boolean(nextToken);
-    _store.updating = false;
-    _store.loading = false;
+    const currentIndex = _store.index;
+    const store = {
+      ..._store,
+      hasNext: Boolean(nextToken),
+      updating: false,
+      loading: false,
+    };
+    store.indexData = { ...store.indexData };
+    // Return early if page does not have any items
+    // This can happen when the page size equals the number of items or visibleItems is filtered
+    if (!items.length) return { ...store, hasNext: false };
 
-    // Return early if page does not have any items (this can happen when the page size equals the number of items)
-    if (!items.length) return { ..._store, hasNext: false };
-
-    _store.indexData = { ...store.indexData };
-    // _store.activeRow = 0;
-
-    if (!store.indexData[store.index]) {
-      _store.indexData[store.index] = {
+    if (!store.indexData[currentIndex]) {
+      store.indexData[currentIndex] = {
         nextToken,
         start: 1,
         end: items.length,
         items,
       };
-      _store.hasPrevious = false;
+      store.hasPrevious = false;
     } else {
-      _store.index = store.index + 1;
-      _store.indexData[_store.index] = {
-        nextToken,
-        start: _store.indexData[store.index].end + 1,
-        end: _store.indexData[store.index].end + items.length,
-        items,
-      };
-      _store.hasPrevious = true;
+      (store.index = currentIndex + 1),
+        (store.indexData[store.index] = {
+          nextToken,
+          start: store.indexData[currentIndex].end + 1,
+          end: store.indexData[currentIndex].end + items.length,
+          items,
+        });
+      store.hasPrevious = true;
     }
 
-    return _store;
+    return store;
   };
 
-  const setNextPage = (store: PaginationItems) => {
-    const _store = { ...store };
-    _store.hasPrevious = true;
-    _store.updating = false;
-    _store.loading = false;
-    _store.index = store.index + 1;
+  const setNextPage = (_store: PaginationItems) => {
+    const store = {
+      ..._store,
+      index: _store.index + 1,
+      hasPrevious: true,
+      loading: false,
+      updating: false,
+    };
 
-    if (!_store.indexData[_store.index]?.nextToken) {
-      _store.hasNext = false;
+    if (!store.indexData[store.index]?.nextToken) {
+      store.hasNext = false;
     }
 
-    return _store;
+    return store;
   };
 
-  const setPreviousPage = (store: PaginationItems) => {
-    const _store = { ...store };
-    _store.hasNext = true;
-    _store.updating = false;
-    _store.loading = false;
-    _store.index = store.index - 1;
+  const setPreviousPage = (_store: PaginationItems) => {
+    const store = {
+      ..._store,
+      hasNext: true,
+      updating: false,
+      loading: false,
+      index: _store.index - 1,
+    };
 
-    if (_store.index === 0) {
-      _store.hasPrevious = false;
+    if (store.index === 0) {
+      store.hasPrevious = false;
     }
 
-    return _store;
+    return store;
   };
 
   return {
@@ -143,7 +152,7 @@ export function createPaginationStore(
       update((store) => {
         return { ...store, updating: true };
       }),
-    reset: () => set(initialStore),
+    reset: () => set(defaultStore),
     resetPageSize: () =>
       update((store) => {
         return {
@@ -175,129 +184,3 @@ export function createPaginationStore(
       }),
   };
 }
-
-// type PaginationMethods = {
-//   nextPage: () => void;
-//   previousPage: () => void;
-//   setNextPageToken: (t: string, items: any[]) => void;
-//   setNextPage: () => void;
-//   setUpdating: () => void;
-//   reset: () => void;
-//   resetPageSize: () => void;
-//   nextRow: () => void;
-//   previousRow: () => void;
-// };
-
-// type PaginationItems = {
-//   key: string;
-//   index: number;
-//   nextIndex: number;
-//   pageSize: number;
-//   initialItem: any;
-//   loading: boolean;
-//   updating: boolean;
-//   indexData: Record<number, { nextToken: string, start: number, end: number, items: any[] }>;
-//   hasNext: boolean;
-//   hasPrevious: boolean;
-//   activeRow: number;
-// };
-
-// const initialStore: PaginationItems = {
-//   key: 'per-page',
-//   index: 0,
-//   nextIndex: 0,
-//   pageSize: defaultItemsPerPage,
-//   initialItem: null,
-//   loading: true,
-//   updating: true,
-//   indexData: {},
-//   hasNext: true,
-//   hasPrevious: false,
-//   activeRow: 0,
-// };
-
-// export type PaginationStore = PaginationMethods & Readable<PaginationItems>;
-
-// export function createPaginationStore(): PaginationStore {
-//   const paginationStore = writable(initialStore);
-//   const { set, update, subscribe } = paginationStore;
-
-//   const setNextPageToken = (
-//     nextToken: string,
-//     items: any[],
-//     store: PaginationItems,
-//   ) => {
-//     const _store = { ...store };
-//     _store.hasNext = Boolean(nextToken);
-//     _store.updating = false;
-//     _store.loading = false;
-
-//     // Return early if page does not have any items (this can happen when the page size equals the number of items)
-//     if (!items.length) return _store;
-
-//     _store.index = store.nextIndex;
-//     _store.indexData = { ...store.indexData };
-//     _store.activeRow = 0;
-
-// if (store.nextIndex === store.index) {
-//   // First page
-//   _store.indexData[store.nextIndex] = { nextToken, start: 1, end: items.length, items }
-//   _store.hasPrevious = false;
-// } else if (store.nextIndex > store.index) {
-//   // Next Pages
-//   _store.indexData[store.nextIndex] = { nextToken, start: _store.indexData[store.index].end + 1, end: _store.indexData[store.index].end + items.length, items }
-//   _store.hasPrevious = true;
-// } else if (store.nextIndex < store.index) {
-//   // Previous Page
-//   if (store.nextIndex === 0) {
-//     _store.indexData = {};
-//     _store.indexData[store.nextIndex] = { nextToken, start: 1, end: items.length, items: items }
-//     _store.hasPrevious = false;
-//   }
-// }
-
-//     return _store;
-//   };
-
-//   return {
-//     subscribe,
-//     nextPage: () =>
-//       update((store) => {
-//         return { ...store, nextIndex: store.index + 1 };
-//       }),
-//     previousPage: () =>
-//       update((store) => {
-//         if (store.index > 0) {
-//           return { ...store, nextIndex: store.index - 1 };
-//         }
-//         return store;
-//       }),
-//     setNextPageToken: (token: string, items: any[]) =>
-//       update((store) => {
-//         return {
-//           ...setNextPageToken(token, items, store),
-//         };
-//       }),
-//     setNextPage: () =>
-//       update((store) => {
-//         return { ...store, index: store.nextIndex };
-//       }),
-//     setUpdating: () =>
-//       update((store) => {
-//         return { ...store, updating: true };
-//       }),
-//     reset: () => set(initialStore),
-//     resetPageSize: () =>
-//       update((store) => {
-// return { ...store, index: 0, nextIndex: 0, indexData: {}, updating: true };
-//       }),
-//     nextRow: () =>
-//       update((store) => {
-//         return { ...store, activeRow: store.activeRow + 1 };
-//       }),
-//     previousRow: () =>
-//       update((store) => {
-//         return { ...store, activeRow: store.activeRow - 1 };
-//       }),
-//   };
-// }
