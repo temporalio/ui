@@ -1,5 +1,5 @@
 {
-  "name": "@temporalio/ui",
+  "name": "@rossedfort/temporal-ui",
   "version": "2.1.94",
   "type": "module",
   "description": "Temporal.io UI",
