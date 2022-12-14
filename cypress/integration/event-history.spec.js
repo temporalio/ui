@@ -94,6 +94,7 @@ describe('Workflow Events', () => {
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}/history`);
 
     cy.wait('@workflow-api');
+    cy.wait('@event-history-ascending');
     cy.wait('@event-history-descending');
 
     cy.get('[data-cy="event-summary-row"]').should(

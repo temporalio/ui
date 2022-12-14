@@ -53,15 +53,6 @@ export const fetchRawEvents = async ({
   return response.history.events;
 };
 
-export const fetchEvents = async (
-  parameters: FetchEventsParametersWithSettings,
-): Promise<FetchEventsResponse> => {
-  const { settings, namespace, accessToken } = parameters;
-  return fetchRawEvents(parameters).then((response) =>
-    toEventHistory({ response, namespace, settings, accessToken }),
-  );
-};
-
 export const fetchPartialRawEvents = async ({
   namespace,
   workflowId,
@@ -104,12 +95,14 @@ export const fetchStartAndEndEvents = async (
       namespace,
       settings,
       accessToken,
-    }), toEventHistory({
+    }),
+    toEventHistory({
       response: endEventsRaw,
       namespace,
       settings,
       accessToken,
-    })])
+    }),
+  ]);
   return { start, end };
 };
 
