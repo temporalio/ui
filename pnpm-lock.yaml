@@ -5,9 +5,9 @@ specifiers:
   '@babel/preset-typescript': ^7.16.7
   '@crownframework/svelte-error-boundary': ^1.0.3
   '@grpc/grpc-js': ^1.3.7
-  '@histoire/controls': ^0.11.9
-  '@histoire/plugin-svelte': ^0.11.9
-  '@histoire/shared': ^0.11.9
+  '@histoire/controls': ^0.11.8
+  '@histoire/plugin-svelte': ^0.11.8
+  '@histoire/shared': ^0.11.8
   '@sveltejs/adapter-vercel': 1.0.0-next.77
   '@sveltejs/kit': 1.0.0-next.405
   '@sveltejs/svelte-virtual-list': ^3.0.1
@@ -39,7 +39,7 @@ specifiers:
   eslint-plugin-svelte3: ^3.2.0
   eslint-plugin-vitest: ^0.0.8
   google-protobuf: ^3.17.3
-  histoire: ^0.11.9
+  histoire: ^0.11.8
   husky: ^8.0.1
   jest-websocket-mock: ^2.2.1
   jsdom: ^20.0.0
@@ -5248,7 +5248,7 @@ packages:
   /mlly/0.5.14:
     resolution: {integrity: sha512-DgRgNUSX9NIxxCxygX4Xeg9C7GX7OUx1wuQ8cXx9o9LE0e9wrH+OZ9fcnrlEedsC/rtqry3ZhUddC759XD/L0w==}
     dependencies:
-      acorn: 8.8.0
+      acorn: 8.8.1
       pathe: 0.3.7
       pkg-types: 0.3.5
       ufo: 0.8.5
@@ -5919,7 +5919,7 @@ packages:
     peerDependencies:
       postcss: ^8.2.14
     dependencies:
-      postcss: 8.4.16
+      postcss: 8.4.20
       postcss-selector-parser: 6.0.11
     dev: true
 
@@ -7256,7 +7256,7 @@ packages:
     hasBin: true
     dependencies:
       '@jridgewell/source-map': 0.3.2
-      acorn: 8.8.0
+      acorn: 8.8.1
       commander: 2.20.3
       source-map-support: 0.5.21
     dev: true
