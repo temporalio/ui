@@ -6,7 +6,7 @@
   import { autoRefreshWorkflow } from '$lib/stores/event-view';
   import { workflowsQuery, workflowsSearch } from '$lib/stores/workflows';
   import { workflowRun, refresh } from '$lib/stores/workflow-run';
-  import { eventHistory } from '$lib/stores/events';
+  import { eventHistory, updating } from '$lib/stores/events';
 
   import {
     routeForEventHistory,
@@ -80,6 +80,7 @@
 
   $: cancelInProgress =
     $workflowRun?.workflow?.status === 'Running' &&
+    !$updating &&
     $eventHistory.end.some(
       (event) => event?.eventType === 'WorkflowExecutionCancelRequested',
     );
@@ -129,7 +130,7 @@
       {/if}
     </div>
     {#if cancelInProgress}
-      <div class="-mt-4 mb-4" transition:fly={{ duration: 200, delay: 100 }}>
+      <div class="-mt-4 mb-4" in:fly={{ duration: 200, delay: 100 }}>
         <Alert icon="info" intent="info" title="Cancel Request Sent">
           The request to cancel this Workflow Execution has been sent. If the
           Workflow uses the cancellation API, it'll cancel at the next available

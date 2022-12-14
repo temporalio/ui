@@ -33,11 +33,7 @@
       <p class="text-sm">
         {format(key)}
       </p>
-      <CodeBlock
-        content={getCodeBlockValue(value)}
-        class="w-full text-right lg:h-auto"
-        {inline}
-      />
+      <CodeBlock content={getCodeBlockValue(value)} class="h-auto" {inline} />
     </div>
   {:else if shouldDisplayAsExecutionLink(key)}
     <div class="content detail-row">
