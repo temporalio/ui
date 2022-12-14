@@ -78,7 +78,7 @@ export const fetchPartialRawEvents = async ({
     route,
     {
       request: fetch,
-      params: { maximumPageSize: '50' },
+      params: { maximumPageSize: '20' },
     },
   );
 
@@ -97,18 +97,19 @@ export const fetchStartAndEndEvents = async (
     ...parameters,
     sort: 'descending',
   });
-  const start = await toEventHistory({
-    response: startEventsRaw,
-    namespace,
-    settings,
-    accessToken,
-  });
-  const end = await toEventHistory({
-    response: endEventsRaw,
-    namespace,
-    settings,
-    accessToken,
-  });
+
+  const [start, end] = await Promise.all([
+    toEventHistory({
+      response: startEventsRaw,
+      namespace,
+      settings,
+      accessToken,
+    }), toEventHistory({
+      response: endEventsRaw,
+      namespace,
+      settings,
+      accessToken,
+    })])
   return { start, end };
 };
 
