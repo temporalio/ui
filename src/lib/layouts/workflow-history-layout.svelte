@@ -8,7 +8,6 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { eventViewType } from '$lib/stores/event-view';
   import { eventHistory } from '$lib/stores/events';
-  import { eventSortOrder } from '$lib/stores/event-view';
 
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';

@@ -1,6 +1,5 @@
 import { isWorkflowExecutionCompletedEvent } from './is-event-type';
 import { stringifyWithBigInt } from './parse-with-big-int';
-import type { EventSortOrder } from '$lib/stores/event-view';
 
 type WorkflowInputAndResults = {
   input: string;
