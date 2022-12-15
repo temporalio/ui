@@ -1,11 +1,12 @@
+name: Publish NPM Package
+
 on:
-  push:
-    branches:
-      - main
+  pull_request:
+    types: [closed]
 
 jobs:
   publish:
-    if: github.ref_type == 'branch' && contains(github.ref_name, 'releases/')
+    if: startsWith(github.head_ref, 'releases/') && github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -17,8 +18,8 @@ jobs:
       - name: Checkout Release Tag
         run: |
           git fetch --tags
-          tag=${{ git describe --tags `git rev-list --tags --max-count=1` }}
-          git checkout ${{ tag }}
+          tag=`git describe --always --abbrev=0 --tags`
+          git checkout $tag
       - name: Install dependencies
         run: pnpm install
       - name: Build Package
@@ -30,12 +31,14 @@ jobs:
         working-directory: ./package
   create_release:
     needs: publish
-    if: github.ref_type == 'branch' && contains(github.ref_name, 'releases/')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Create Release
-        run: ./.github/scripts/create-release.sh
+        run: |
+          git fetch --tags
+          tag=`git describe --always --abbrev=0 --tags`
+          gh release create $tag --generate-notes
         env:
-          GITHUB_TOKEN: ${{ secrets.COMMANDER_DATA_TOKEN }}
+          GH_TOKEN: ${{ secrets.TEMPORAL_UI_TOKEN }}
