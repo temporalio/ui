@@ -14,8 +14,10 @@
   import KeyboardShortcut from '$lib/holocene/keyboard-shortcut/shortcut.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { authUser } from '$lib/stores/auth-user';
+  import EventShortcutKeys from './event-shortcut-keys.svelte';
 
   export let compact = false;
+  let showShortcuts = false;
 
   function handleExpandChange(event: CustomEvent) {
     $expandAllEvents = event.detail.expanded;
@@ -60,8 +62,14 @@
       });
     }
   };
+
+  const onSpace = (event: KeyboardEvent) => {
+    event.preventDefault();
+    showShortcuts = !showShortcuts;
+  };
 </script>
 
+<EventShortcutKeys open={showShortcuts} {compact} />
 {#key [$eventFilterSort, category, $refresh]}
   <ApiPagination
     let:visibleItems
@@ -73,31 +81,9 @@
     pageSizeOptions={[]}
     {onShiftUp}
     {onShiftDown}
+    {onSpace}
     {total}
   >
-    <svelte:fragment slot="action-top-left">
-      <KeyboardShortcut arrow="left" tooltipText="Previous Page" />
-      <KeyboardShortcut arrow="up" tooltipText="Previous Row" />
-      <KeyboardShortcut arrow="down" tooltipText="Next Row" />
-      <KeyboardShortcut arrow="right" tooltipText="Next Page" />
-      <KeyboardShortcut tooltipText="Open / Close Row">Space</KeyboardShortcut>
-      {#if !compact}
-        <Tooltip text="Ascending order" top>
-          <div class="flex gap-1 text-gray-500 dark:text-gray-400">
-            <KeyboardShortcut>Shift</KeyboardShortcut>
-            +
-            <KeyboardShortcut arrow="up" />
-          </div>
-        </Tooltip>
-        <Tooltip text="Descending order" top>
-          <div class="flex gap-1 text-gray-500 dark:text-gray-400">
-            <KeyboardShortcut>Shift</KeyboardShortcut>
-            +
-            <KeyboardShortcut arrow="down" />
-          </div>
-        </Tooltip>
-      {/if}
-    </svelte:fragment>
     <EventSummaryTable {updating} {compact} on:expandAll={handleExpandChange}>
       {@const events = compact ? groupEvents(visibleItems) : visibleItems}
       {#each events as event, index (`${event.id}-${event.timestamp}`)}
