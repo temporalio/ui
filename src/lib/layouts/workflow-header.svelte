@@ -112,7 +112,7 @@
           data-cy="workflow-id-heading"
           class="select-all overflow-hidden text-ellipsis text-2xl font-medium"
         >
-          {workflow.id}
+          {workflow?.id}
         </h1>
       </div>
       {#if isRunning}
