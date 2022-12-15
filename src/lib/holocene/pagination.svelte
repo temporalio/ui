@@ -7,6 +7,7 @@
     perPageFromSearchParameter,
     options,
     defaultItemsPerPage,
+    perPageKey,
   } from '$lib/stores/pagination';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
@@ -18,7 +19,6 @@
   export let items: T[];
   export let floatId: string | undefined = undefined;
   export let startingIndex: string | number = 0;
-  export let perPageKey = 'per-page';
   export let currentPageKey = 'page';
   export let itemsPerPage: number | null = null;
 

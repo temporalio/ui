@@ -128,7 +128,7 @@ export async function getPaginatedEvents({
 }: PaginatedEventParams): Promise<
   () => Promise<{ items: WorkflowEvents; nextPageToken: NextPageToken }>
 > {
-  return async (pageSize = 100, token = '') => {
+  return async (_pageSize = 100, token = '') => {
     const descendingRoute = await routeForApi(
       compact ? 'events.ascending' : `events.${sort}`,
       {

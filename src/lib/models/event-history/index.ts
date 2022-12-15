@@ -16,7 +16,6 @@ import {
   getCodecPassAccessToken,
 } from '$lib/utilities/get-codec';
 
-import { groupEvents } from '../event-groups';
 import { getEventCategory } from './get-event-categorization';
 import { getEventClassification } from './get-event-classification';
 import { simplifyAttributes } from './simplify-attributes';

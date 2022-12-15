@@ -4,6 +4,7 @@ import {
   perPageFromSearchParameter,
   defaultItemsPerPage,
   options,
+  perPageKey,
 } from './pagination';
 
 import type { Readable } from 'svelte/store';
@@ -38,8 +39,6 @@ type PaginationItems = {
   indexEnd: number;
   activeIndex: number;
 };
-
-let perPageKey = 'per-page';
 
 const defaultStore: PaginationItems = {
   key: perPageKey,
