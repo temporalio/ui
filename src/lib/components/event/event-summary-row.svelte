@@ -58,7 +58,27 @@
       });
       timeDiffChange = timeDiff ? `(${descending ? '-' : '+'}${timeDiff})` : '';
     }
+
+    if (currentEvent.name === 'StartChildWorkflowExecutionInitiated') {
+      if (compact) {
+        for (let [_, value] of eventGroup.events) {
+          addChildWorkflowExecutionRunIdAttribute(value);
+        }
+      } else {
+        const nextEvent = descending
+          ? previousItem
+          : visibleItems[currentIndex + 1];
+        addChildWorkflowExecutionRunIdAttribute(nextEvent);
+      }
+    }
   }
+
+  const addChildWorkflowExecutionRunIdAttribute = (nextEvent) => {
+    if (nextEvent?.name === 'ChildWorkflowExecutionStarted') {
+      currentEvent.attributes['childWorkflowExecutionRunId'] =
+        nextEvent.attributes?.workflowExecution?.runId;
+    }
+  };
 
   const onLinkClick = () => {
     expanded = !expanded;

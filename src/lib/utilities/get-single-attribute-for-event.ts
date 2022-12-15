@@ -109,6 +109,19 @@ export const shouldDisplayChildWorkflowLink = (
   return false;
 };
 
+// For linking to a child workflow on a StartChildWorkflowExecutionInitiated event
+export const shouldDisplayChildWorkflowExecutionLink = (
+  key: string,
+  attributes: CombinedAttributes,
+): key is typeof keysWithChildExecutionLinks[number] => {
+  const workflowLinkAttributesExist = Boolean(
+    attributes?.workflowId && attributes?.childWorkflowExecutionRunId,
+  );
+  if (key === 'workflowId' && workflowLinkAttributesExist) return true;
+
+  return false;
+};
+
 const formatSummaryValue = (key: string, value: unknown): SummaryAttribute => {
   if (typeof value === 'object') {
     const [firstKey] = Object.keys(value);

@@ -9,6 +9,8 @@ export type CombinedAttributes = EventAttribute & {
   eventTime?: string;
   workflowExecutionRunId?: string;
   workflowExecutionWorkflowId?: string;
+  workflowId?: string;
+  childWorkflowExecutionRunId?: string;
 };
 
 const keysToOmit: Readonly<Set<string>> = new Set(['header']);
@@ -191,7 +193,7 @@ export const attributeGroups = (
     }
   });
 
-  for (const key of Object.keys(attributes)) {
+  for (const key in attributes) {
     const attributeGroup = attributeGroupings.find((group) =>
       key.includes(group),
     );
