@@ -17,20 +17,20 @@
       <h1 class="title">Keyboard Shortcuts</h1>
       <div class="content flex flex-col gap-4 text-gray-500 dark:text-gray-400">
         <div class="row">
-          <Shortcut arrow="left" /> Previous Page
+          <Shortcut arrow="right" tooltipText="Next Page" /> Next Page
         </div>
         <div class="row">
-          <Shortcut arrow="up" tooltipText="Previous Row" /> Previous Row
+          <Shortcut arrow="left" /> Previous Page
         </div>
         <div class="row">
           <Shortcut arrow="down" tooltipText="Next Row" /> Next Row
         </div>
         <div class="row">
-          <Shortcut arrow="right" tooltipText="Next Page" /> Next Page
+          <Shortcut arrow="up" tooltipText="Previous Row" /> Previous Row
         </div>
         {#if !compact}
           <div class="row">
-            <div class="flex gap-2 items-center">
+            <div class="flex items-center gap-2">
               <Shortcut>Shift</Shortcut>
               +
               <Shortcut arrow="up" />
@@ -38,7 +38,7 @@
             Ascending Sort
           </div>
           <div class="row">
-            <div class="flex gap-2 items-center">
+            <div class="flex items-center gap-2">
               <Shortcut>Shift</Shortcut>
               +
               <Shortcut arrow="down" />
