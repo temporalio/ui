@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { fade, fly, slide } from 'svelte/transition';
+  import { fade } from 'svelte/transition';
 
   import Icon from '$holocene/icon/icon.svelte';
 
@@ -23,9 +23,10 @@
   import EventDetailsFull from './event-details-full.svelte';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
-  import { noop, tick } from 'svelte/internal';
+  import { noop } from 'svelte/internal';
+  import { isEventGroup } from '$lib/models/event-groups';
 
-  export let event: IterableEvent | EventGroup;
+  export let event: IterableEvent;
   export let visibleItems: IterableEvent[];
   export let initialItem: IterableEvent | undefined;
   export let compact = false;
@@ -34,14 +35,13 @@
   export let active = false;
   export let onRowClick: () => void = noop;
 
-  let eventGroup: EventGroup = compact ? (event as EventGroup) : null;
-  let selectedId = compact
-    ? Array.from(eventGroup.events.keys()).pop()
+  let selectedId = isEventGroup(event)
+    ? Array.from(event.events.keys()).pop()
     : event.id;
 
   $: expanded = expandAll || active;
 
-  $: currentEvent = compact ? eventGroup.events.get(selectedId) : event;
+  $: currentEvent = isEventGroup(event) ? event.events.get(selectedId) : event;
   $: descending = $eventSortOrder === 'descending';
   $: showElapsed = $eventShowElapsed === 'true';
   $: attributes = formatAttributes(event, { compact });
@@ -52,10 +52,10 @@
     const previousItem = visibleItems[currentIndex - 1];
     if (previousItem) {
       const timeDiff = formatDistanceAbbreviated({
-        start: compact
-          ? (previousItem as EventGroup)?.initialEvent?.eventTime
+        start: isEventGroup(previousItem)
+          ? previousItem?.initialEvent?.eventTime
           : previousItem?.eventTime,
-        end: compact ? currentEvent?.eventTime : event?.eventTime,
+        end: currentEvent?.eventTime,
       });
       timeDiffChange = timeDiff ? `(${descending ? '-' : '+'}${timeDiff})` : '';
     }
@@ -66,15 +66,9 @@
     onRowClick();
   };
 
-  const failure = eventOrGroupIsFailureOrTimedOut(
-    compact ? (event as EventGroup) : event,
-  );
-  const canceled = eventOrGroupIsCanceled(
-    compact ? (event as EventGroup) : event,
-  );
-  const terminated = eventOrGroupIsTerminated(
-    compact ? (event as EventGroup) : event,
-  );
+  const failure = eventOrGroupIsFailureOrTimedOut(event);
+  const canceled = eventOrGroupIsCanceled(event);
+  const terminated = eventOrGroupIsTerminated(event);
 
   let truncateWidth: number;
   workflowEventsColumnWidth.subscribe((value) => {
@@ -169,12 +163,7 @@
 {#if expanded}
   <tr in:fade|local class="table-row" class:typedError>
     <td class="expanded-cell" colspan="6">
-      <EventDetailsFull
-        event={currentEvent}
-        {compact}
-        {eventGroup}
-        bind:selectedId
-      />
+      <EventDetailsFull {event} {currentEvent} {compact} bind:selectedId />
     </td>
   </tr>
 {/if}

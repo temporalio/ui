@@ -11,8 +11,6 @@
   import ApiPagination from '$lib/holocene/api-pagination.svelte';
   import { groupEvents } from '$lib/models/event-groups';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  import KeyboardShortcut from '$lib/holocene/keyboard-shortcut/shortcut.svelte';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
   import { authUser } from '$lib/stores/auth-user';
   import EventShortcutKeys from './event-shortcut-keys.svelte';
 

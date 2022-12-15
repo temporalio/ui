@@ -7,7 +7,7 @@
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
   import Table from '$lib/holocene/table/table.svelte';
 
-  export let eventGroup: EventGroup | null;
+  export let eventGroup: EventGroup;
   export let selectedId: string;
   export let onGroupClick: (id: string) => void;
 </script>
