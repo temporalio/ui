@@ -73,7 +73,7 @@
                 <h2>Heartbeat Details</h2>
                 <CodeBlock
                   slot="value"
-                  class="w-full pb-2"
+                  class="pb-2"
                   content={details.heartbeatDetails}
                 />
               </div>
@@ -83,7 +83,7 @@
                 <h2>Last Failure</h2>
                 <CodeBlock
                   slot="value"
-                  class="w-full pb-2"
+                  class="pb-2"
                   content={details.lastFailure}
                 />
               </div>

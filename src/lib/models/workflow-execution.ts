@@ -4,11 +4,11 @@ import { simplifyAttributes } from './event-history/simplify-attributes';
 const toPendingActivities = (
   pendingActivity: PendingActivityInfo[] = [],
 ): PendingActivity[] => {
-  return pendingActivity.map((activity) => {
+  return pendingActivity.map((activity): PendingActivity => {
     const attributes = simplifyAttributes(activity, true);
     const id = activity.activityId;
 
-    return { ...attributes, id } as unknown as PendingActivity;
+    return { ...attributes, id };
   });
 };
 

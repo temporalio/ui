@@ -5,6 +5,7 @@
   import TableHeaderRow from './table/table-header-row.svelte';
   import TableRow from './table/table-row.svelte';
   import Table from './table/table.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
 
   export let Hst: HST;
 </script>
@@ -36,11 +37,11 @@
     </Accordion>
   </Hst.Variant>
 
-  <!-- <Hst.Variant title="With a Code Block">
+  <Hst.Variant title="With a Code Block">
     <Accordion title="Certificates" subtitle="Expires on Wed Feb 01, 2030">
-      <CodeBlock content={stringifyWithBigInt({ some: 'thing', blue: 42 })} />
+      <CodeBlock content={{ some: 'thing', blue: 42 }} />
     </Accordion>
-  </Hst.Variant> -->
+  </Hst.Variant>
 
   <Hst.Variant title="A disabled Accordion">
     <Accordion
