@@ -66,12 +66,15 @@
   .primary {
     @apply bg-blue-700 text-white hover:from-gray-900 hover:to-gray-900 hover:text-white;
   }
+
   .unround {
     @apply rounded-none;
   }
+
   .unroundLeft {
     @apply rounded-tl-none rounded-bl-none;
   }
+
   .unroundRight {
     @apply rounded-tr-none rounded-br-none;
   }

@@ -1,11 +1,10 @@
-import type { GetWorkflowExecutionHistoryResponse } from '$types';
-
 import { paginated } from '$lib/utilities/paginated';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { toEventHistory } from '$lib/models/event-history';
-import type { EventSortOrder } from '$lib/stores/event-view';
 import { isSortOrder } from '$lib/utilities/is';
+
+import type { EventSortOrder } from '$lib/stores/event-view';
 
 export type FetchEventsParameters = NamespaceScopedRequest &
   PaginationCallbacks<GetWorkflowExecutionHistoryResponse> & {

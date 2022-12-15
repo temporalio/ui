@@ -70,11 +70,13 @@
   }
 
   .close :global(.nav-title) {
-    width: 0px;
+    width: 0;
   }
+
   .open :global(.nav-title) {
     width: 100px;
   }
+
   .open :global(.namespace) {
     width: 100px;
   }
@@ -94,17 +96,16 @@
   .close .nav-toggle {
     left: 18px;
   }
+
   .open .nav-toggle {
     left: 132px;
   }
 
   .transition-left {
     transition: left 0.15s linear, width 0.15s linear;
-    -webkit-transition: left 0.15s linear, width 0.15s linear;
   }
 
   .transition-width {
     transition: width 0.15s ease-in-out, width 0.15s ease-in-out;
-    -webkit-transition: width 0.15s ease-in-out, width 0.15s ease-in-out;
   }
 </style>

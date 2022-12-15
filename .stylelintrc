@@ -1,6 +1,14 @@
 {
-  "extends": ["stylelint-config-recommended"],
+  "extends": ["stylelint-config-standard", "stylelint-config-prettier"],
   "processors": [],
+  "customSyntax": "postcss-html",
+  "ignoreFiles": [
+    "node_modules/*",
+    "src/assets/**",
+    "build/**",
+    "src/lib/vendor/css/normalize.css",
+    "src/lib/vendor/prism/prism.css"
+  ],
   "rules": {
     "at-rule-no-unknown": [
       true,
@@ -20,14 +28,21 @@
         ]
       }
     ],
+    "custom-property-pattern": null,
     "declaration-block-trailing-semicolon": null,
-    "no-descending-specificity": [
+    "declaration-block-no-redundant-longhand-properties": [
       true,
-      {
-        "ignore": ["selectors-within-list"]
-      }
+      { "ignoreShorthands": ["border-radius"] }
     ],
-    "no-invalid-double-slash-comments": true,
-    "block-no-empty": null
+    "function-linear-gradient-no-nonstandard-direction": null,
+    "keyframes-name-pattern": null,
+    "max-line-length": null,
+    "no-descending-specificity": null,
+    "selector-class-pattern": null,
+    "selector-pseudo-class-no-unknown": [
+      true,
+      { "ignorePseudoClasses": ["global"] }
+    ],
+    "value-keyword-case": null
   }
 }

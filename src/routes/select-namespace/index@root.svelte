@@ -82,6 +82,7 @@
   .link-item:hover .link {
     @apply text-blue-700 underline;
   }
+
   .link {
     @apply ml-2 truncate text-gray-900;
   }

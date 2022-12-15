@@ -1,12 +1,13 @@
 import JSONbig from 'json-bigint';
 
-export const parseWithBigInt = (content: string) =>
-  JSONbig.parse(content, {
-    useNativeBigInt: true,
-  });
+JSONbig({
+  useNativeBigInt: true,
+});
 
-export const stringifyWithBigInt = (
-  value: any,
-  replacer?: (this: any, key: string, value: any) => any,
+export const parseWithBigInt = (content: string) => JSONbig.parse(content);
+
+export const stringifyWithBigInt = <T = unknown>(
+  value: T,
+  replacer?: (key: string, value: T) => T,
   space?: string | number,
 ) => JSONbig.stringify(value, replacer, space);

@@ -183,24 +183,31 @@
   .event-group {
     @apply absolute rounded-sm text-center drop-shadow-md;
   }
+
   .event-group-active {
     @apply bg-blueGray-200;
   }
+
   .failure {
     @apply bg-red-100 text-red-700 hover:bg-red-200;
   }
+
   .event-group-active.failure {
     @apply bg-red-200;
   }
+
   .canceled {
     @apply bg-yellow-100 text-yellow-700 hover:bg-yellow-200;
   }
+
   .event-group-active.canceled {
     @apply bg-yellow-200;
   }
+
   .terminated {
     @apply bg-pink-100 text-pink-700 hover:bg-pink-200;
   }
+
   .event-group-active.terminated {
     @apply bg-pink-200;
   }
