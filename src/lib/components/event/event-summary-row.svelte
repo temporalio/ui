@@ -34,15 +34,14 @@
   export let active = false;
   export let onRowClick: () => void = noop;
 
+  let eventGroup: EventGroup = compact ? (event as EventGroup) : null;
   let selectedId = compact
-    ? Array.from((event as EventGroup).events.keys()).pop()
+    ? Array.from(eventGroup.events.keys()).pop()
     : event.id;
 
   $: expanded = expandAll || active;
 
-  $: currentEvent = compact
-    ? (event as EventGroup).events.get(selectedId)
-    : event;
+  $: currentEvent = compact ? eventGroup.events.get(selectedId) : event;
   $: descending = $eventSortOrder === 'descending';
   $: showElapsed = $eventShowElapsed === 'true';
   $: attributes = formatAttributes(event, { compact });
@@ -121,7 +120,7 @@
     colspan={compact ? 2 : null}
     class="table-cell text-right text-sm font-normal xl:text-left"
   >
-    <div tabindex="0" class="flex">
+    <div class="flex">
       {#if compact && failure}
         <Icon class="mr-1.5 inline text-red-700" name="clock" />
       {/if}
@@ -173,7 +172,7 @@
       <EventDetailsFull
         event={currentEvent}
         {compact}
-        eventGroup={event}
+        {eventGroup}
         bind:selectedId
       />
     </td>

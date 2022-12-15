@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { page } from '$app/stores';
   import Alert from '$lib/holocene/alert.svelte';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
@@ -25,7 +26,6 @@
 
   let store = createPaginationStore(pageSizeOptions);
   let error: any;
-
   let shifted = false;
 
   function clearError() {
@@ -37,8 +37,6 @@
   });
 
   async function initalDataFetch() {
-    store.reset();
-
     const fetchData: PaginatedRequest = await onFetch();
     const response = await fetchData($store.pageSize, '');
     const { items, nextPageToken } = response;
@@ -81,6 +79,7 @@
       case 'ArrowUp':
         if (shifted && onShiftUp) {
           onShiftUp(event);
+          store.reset();
           initalDataFetch();
         } else {
           store.previousRow();
@@ -89,6 +88,7 @@
       case 'ArrowDown':
         if (shifted && onShiftDown) {
           onShiftDown(event);
+          store.reset();
           initalDataFetch();
         } else {
           store.nextRow();

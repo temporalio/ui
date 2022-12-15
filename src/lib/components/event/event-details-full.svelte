@@ -8,7 +8,7 @@
   import EventDetailPills from './event-detail-pills.svelte';
   import EventGroupDetails from './event-group-details.svelte';
 
-  export let event: IterableEvent;
+  export let event: IterableEvent | EventGroup;
   export let compact = false;
   export let eventGroup: EventGroup | null;
   export let selectedId: string;

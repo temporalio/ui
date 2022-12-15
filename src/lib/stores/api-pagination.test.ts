@@ -5,7 +5,7 @@ import { createPaginationStore } from './api-pagination';
 
 const items = new Array(50).fill(null).map((_, i) => i);
 
-describe('createPaginationStore', () => {
+describe('createPaginationStore with default pageSizeOptions', () => {
   it('should set default values', () => {
     const store = createPaginationStore();
 
@@ -33,38 +33,6 @@ describe('createPaginationStore', () => {
     expect(indexEnd).toBe(0);
     expect(indexData).toStrictEqual({});
     expect(pageSize).toBe(100);
-    expect(activeIndex).toBe(0);
-    expect(hasPrevious).toBe(false);
-    expect(hasNext).toBe(false);
-  });
-
-  it.skip('should set default values with custom pageSizeOptions', () => {
-    const store = createPaginationStore(['10', '20', '50']);
-
-    const {
-      key,
-      loading,
-      updating,
-      index,
-      hasNextIndexData,
-      indexStart,
-      indexEnd,
-      indexData,
-      pageSize,
-      activeIndex,
-      hasNext,
-      hasPrevious,
-    } = get(store);
-
-    expect(key).toBe('per-page');
-    expect(loading).toBe(true);
-    expect(updating).toBe(false);
-    expect(index).toBe(0);
-    expect(hasNextIndexData).toBe(false);
-    expect(indexStart).toBe(0);
-    expect(indexEnd).toBe(0);
-    expect(indexData).toStrictEqual({});
-    expect(pageSize).toBe(10);
     expect(activeIndex).toBe(0);
     expect(hasPrevious).toBe(false);
     expect(hasNext).toBe(false);
@@ -488,4 +456,38 @@ describe('createPaginationStore', () => {
   //   expect(hasNext).toBe(false);
   //   expect(storeItems).toEqual(items);
   // });
+});
+
+describe('createPaginationStore with custom pageSizeOptions', () => {
+  it('should set default values', () => {
+    const store = createPaginationStore(['10', '20', '50']);
+
+    const {
+      key,
+      loading,
+      updating,
+      index,
+      hasNextIndexData,
+      indexStart,
+      indexEnd,
+      indexData,
+      pageSize,
+      activeIndex,
+      hasNext,
+      hasPrevious,
+    } = get(store);
+
+    expect(key).toBe('per-page');
+    expect(loading).toBe(true);
+    expect(updating).toBe(false);
+    expect(index).toBe(0);
+    expect(hasNextIndexData).toBe(false);
+    expect(indexStart).toBe(0);
+    expect(indexEnd).toBe(0);
+    expect(indexData).toStrictEqual({});
+    expect(pageSize).toBe(10);
+    expect(activeIndex).toBe(0);
+    expect(hasPrevious).toBe(false);
+    expect(hasNext).toBe(false);
+  });
 });

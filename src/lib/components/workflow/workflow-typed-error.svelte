@@ -1,12 +1,11 @@
 <script lang="ts">
-  import { events, eventGroups, updating } from '$lib/stores/events';
+  import { updating } from '$lib/stores/events';
 
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
-  import { groupEvents } from '$lib/models/event-groups';
 
   const WORKFLOW_TASK_FAILED_ERROR_COPY = {
     Unspecified: {
@@ -197,7 +196,6 @@
         </TableHeaderRow>
         <EventSummaryRow
           event={error}
-          groups={groupEvents([error])}
           initialItem={error}
           visibleItems={[error]}
           typedError

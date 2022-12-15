@@ -39,8 +39,10 @@ type PaginationItems = {
   activeIndex: number;
 };
 
+let perPageKey = 'per-page';
+
 const defaultStore: PaginationItems = {
-  key: 'per-page',
+  key: perPageKey,
   loading: true,
   updating: false,
   hasNext: false,
@@ -61,13 +63,16 @@ export function createPaginationStore(
   pageSizeOptions: string[] = options,
 ): PaginationStore {
   // TODO, use first option in pageSizeOptions for pageSize instead of defaultItemsPerPage
-  const paginationStore = writable(defaultStore);
+  const initialPageSize = parseInt(pageSizeOptions?.[0]) ?? defaultItemsPerPage;
+  const paginationStore = writable({
+    ...defaultStore,
+    pageSize: initialPageSize,
+  });
   const { set, update } = paginationStore;
 
   const pageSize = derived([page], ([$page]) => {
-    return perPageFromSearchParameter(
-      $page.url.searchParams.get('per-page') ?? undefined,
-    );
+    const perPage = $page.url.searchParams.get(perPageKey);
+    return perPage ? perPageFromSearchParameter(perPage) : undefined;
   });
 
   const { subscribe } = derived(
@@ -87,7 +92,7 @@ export function createPaginationStore(
         indexStart,
         indexEnd,
         hasNextIndexData,
-        pageSize: $pageSize,
+        pageSize: $pageSize ?? $pagination.pageSize,
       };
     },
   );
