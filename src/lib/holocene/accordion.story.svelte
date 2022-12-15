@@ -80,4 +80,17 @@
       <p>Accordion content here.</p>
     </Accordion>
   </Hst.Variant>
+
+  <Hst.Variant title="An Accordion in a form that doesn't submit the form">
+    <form
+      on:submit={() => {
+        throw new Error("The form submitted and that's bad");
+      }}
+    >
+      <Accordion title="Certificates" subtitle="Expires on Wed Feb 01, 2030">
+        <Button class="!p-0" icon="info" variant="secondary" slot="action" />
+        <p>Accordion content here.</p>
+      </Accordion>
+    </form>
+  </Hst.Variant>
 </Hst.Story>
