@@ -65,25 +65,25 @@
     animation-delay: var(--animation-delay, 0);
     background: rgb(219 234 254);
     background: linear-gradient(
-      left,
+      to left,
       rgb(219 234 254) 0%,
       rgb(219 234 254) 50%,
       rgb(255 255 255 / 0%) 100%
     );
     background: linear-gradient(
-      left,
+      to left,
       rgb(219 234 254) 0%,
       rgb(219 234 254) 50%,
       rgb(255 255 255 / 0%) 100%
     );
     background: linear-gradient(
-      left,
+      to left,
       rgb(219 234 254) 0%,
       rgb(219 234 254) 50%,
       rgb(255 255 255 / 0%) 100%
     );
     background: linear-gradient(
-      left,
+      to left,
       rgb(219 234 254) 0%,
       rgb(219 234 254) 50%,
       rgb(255 255 255 / 0%) 100%
