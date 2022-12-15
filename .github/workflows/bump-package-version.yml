@@ -37,9 +37,8 @@ jobs:
           version=`git describe --abbrev=0 --tags`
           branch="releases/$version"
           git checkout -b $branch
-          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPO}"
+          git remote set-url origin "https://x-access-token:${{ secrets.COMMANDER_DATA_TOKEN }}@github.com/${{ github.repository }}"
           git push --tags origin $branch
           gh pr create -B main -H $branch --title "bump version in package.json to $version" --body "release version $version"
         env:
-          GH_TOKEN: ${{ secrets.TEMPORAL_UI_TOKEN }}
-          GITHUB_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.COMMANDER_DATA_TOKEN }}

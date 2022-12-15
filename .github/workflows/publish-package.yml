@@ -41,4 +41,4 @@ jobs:
           tag=`git describe --always --abbrev=0 --tags`
           gh release create $tag --generate-notes
         env:
-          GH_TOKEN: ${{ secrets.TEMPORAL_UI_TOKEN }}
+          GH_TOKEN: ${{ secrets.COMMANDER_DATA_TOKEN }}
