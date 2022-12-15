@@ -228,7 +228,11 @@
         <span class="font-secondary text-xs font-light italic">
           (only JSON payloads are supported)
         </span>
-        <JSONEditor value={signalInput} on:change={handleSignalInputChange} />
+        <JSONEditor
+          class="max-h-80 overflow-y-scroll overscroll-contain"
+          value={signalInput}
+          on:change={handleSignalInputChange}
+        />
       </div>
     </div>
   </Modal>

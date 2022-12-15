@@ -16,10 +16,18 @@
     TEMPORAL_SYNTAX,
     TEMPORAL_THEME,
   } from '$lib/vendor/codemirror/theme';
+  import type { HoloceneComponentProps } from 'src/types/holocene';
+
+  interface $$Props extends HoloceneComponentProps<'div'> {
+    value: string;
+    class?: string;
+  }
 
   const dispatch = createEventDispatcher<{ change: string }>();
 
   export let value: string;
+  let className: string = null;
+  export { className as class };
 
   let editor: HTMLElement;
   let view: EditorView;
@@ -57,4 +65,4 @@
   onMount(() => (view = createEditorView()));
 </script>
 
-<div bind:this={editor} />
+<div bind:this={editor} class={className} {...$$restProps} />
