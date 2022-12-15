@@ -35,11 +35,18 @@
   let loading = false;
 
   const showTerminationModal = () => (showTerminationConfirmation = true);
-  const hideTerminationModal = () => (showTerminationConfirmation = false);
+  const hideTerminationModal = () => {
+    showTerminationConfirmation = false;
+    reason = '';
+  };
   const showCancellationModal = () => (showCancellationConfirmation = true);
   const hideCancellationModal = () => (showCancellationConfirmation = false);
   const showSignalModal = () => (showSignalConfirmation = true);
-  const hideSignalModal = () => (showSignalConfirmation = false);
+  const hideSignalModal = () => {
+    showSignalConfirmation = false;
+    signalInput = '';
+    signalName = '';
+  };
 
   const handleSuccessfulTermination = async () => {
     showTerminationConfirmation = false;
