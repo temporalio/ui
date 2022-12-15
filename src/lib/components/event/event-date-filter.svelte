@@ -24,6 +24,7 @@
 
   import { page } from '$app/stores';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import { getDateFilterValue } from '$lib/utilities/event-formatting';
 
   export let compact: boolean;
 
@@ -59,12 +60,12 @@
     }
   };
 
-  $: value =
-    (compact ? true : $eventSortOrder === 'descending') &&
-    $timeFormat === 'UTC' &&
-    $eventShowElapsed === 'false'
-      ? undefined
-      : `${$eventSortOrder}:${$timeFormat}:${$eventShowElapsed}`;
+  $: value = getDateFilterValue({
+    compact,
+    timeFormat: $timeFormat,
+    sortOrder: $eventSortOrder,
+    showElapsed: $eventShowElapsed,
+  });
 </script>
 
 <DropdownMenu {value} left dataCy="event-date-filter">

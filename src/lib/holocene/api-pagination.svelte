@@ -26,7 +26,6 @@
 
   let store = createPaginationStore(pageSizeOptions);
   let error: any;
-  let shifted = false;
 
   function clearError() {
     if (error) error = undefined;
@@ -65,18 +64,22 @@
   }
 
   async function handleKeydown(event: KeyboardEvent) {
+    const shifted = event.shiftKey;
     switch (event.code) {
       case 'ArrowRight':
+      case 'KeyL':
         if ($store.hasNext && !$store.updating) {
           fetchIndexData();
         }
         break;
       case 'ArrowLeft':
+      case 'KeyH':
         if ($store.hasPrevious && !$store.updating) {
           store.previousPage();
         }
         break;
       case 'ArrowUp':
+      case 'KeyK':
         if (shifted && onShiftUp) {
           onShiftUp(event);
           store.reset();
@@ -86,6 +89,7 @@
         }
         break;
       case 'ArrowDown':
+      case 'KeyJ':
         if (shifted && onShiftDown) {
           onShiftDown(event);
           store.reset();
@@ -99,28 +103,11 @@
           onSpace(event);
         }
         break;
-      case 'ShiftLeft':
-      case 'ShiftRight':
-        shifted = true;
-        break;
-      default:
-        break;
-    }
-  }
-
-  function handleKeyup(event) {
-    switch (event.code) {
-      case 'ShiftLeft':
-      case 'ShiftRight':
-        shifted = false;
-        break;
-      default:
-        break;
     }
   }
 </script>
 
-<svelte:window on:keydown={handleKeydown} on:keyup={handleKeyup} />
+<svelte:window on:keydown={handleKeydown} />
 
 {#if error && $$slots.error}
   <slot name="error" />
