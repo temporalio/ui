@@ -8,7 +8,7 @@
   import AdvancedVisibilityGuard from '$lib/components/advanced-visibility-guard.svelte';
   import WorkflowsWithNewSearch from '$lib/pages/workflows-with-new-search.svelte';
 
-  const isCloud = $page.stuff?.settings?.runtimeEnvironment?.isCloud;
+  $: isCloud = $page.stuff?.settings?.runtimeEnvironment?.isCloud;
 </script>
 
 <PageTitle
