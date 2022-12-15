@@ -3,7 +3,7 @@ import type { Readable } from 'svelte/store';
 
 export const defaultItemsPerPage = 100;
 export const options: string[] = ['100', '250', '500'];
-export let perPageKey = 'per-page';
+export const perPageKey = 'per-page';
 export const MAX_PAGE_SIZE = options[options.length - 1];
 
 type PaginationMethods<T> = {
