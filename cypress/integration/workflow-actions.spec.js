@@ -40,7 +40,7 @@ describe('Workflow Actions', () => {
   });
 
   describe('Cancel', () => {
-    it('works if the workflow is running a write actions are enabled', () => {
+    it('works if the workflow is running and write actions are enabled', () => {
       cy.visit(
         `/namespaces/default/workflows/${workflowId}/${runId}/history?sort=descending`,
       );
@@ -52,6 +52,25 @@ describe('Workflow Actions', () => {
       cy.get('[data-cy="confirm-modal-button"]').click();
 
       cy.wait('@cancel-workflow-api');
+    });
+  });
+
+  describe('Signal', () => {
+    it('works if the workflow is running and write actions are enabled', () => {
+      cy.visit(
+        `/namespaces/default/workflows/${workflowId}/${runId}/history/feed?sort=descending`,
+      );
+
+      cy.wait('@settings-api');
+      cy.wait('@workflow-api');
+
+      cy.get('#workflow-actions-menu-button').click();
+      cy.get('#workflow-actions-menu > [data-cy="signal-button"]').click();
+      cy.get('#signal-name').type('sos');
+      cy.get('div.cm-content').type('{{}{enter}"sos":true');
+      cy.get('[data-cy="confirm-modal-button"').click();
+      cy.get('#workflow-signal-success-toast').should('exist');
+      cy.get('[data-cy="confirm-modal-button"').should('not.exist');
     });
   });
 

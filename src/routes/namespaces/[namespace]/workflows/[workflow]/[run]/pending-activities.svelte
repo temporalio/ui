@@ -11,6 +11,6 @@
 </script>
 
 <PageTitle title={`Pending Activities | ${workflow}`} url={$page.url.href} />
-<WorkflowRunLayout cancelEnabled={!isCloud}>
+<WorkflowRunLayout cancelEnabled={!isCloud} signalEnabled={!isCloud}>
   <WorkflowPendingActivities />
 </WorkflowRunLayout>
