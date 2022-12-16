@@ -11,8 +11,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
           node-version: '16.x'
@@ -21,11 +19,6 @@ jobs:
         uses: pnpm/action-setup@v2.2.2
         with:
           version: 7
-      - name: Checkout Release Tag
-        run: |
-          tag=`git describe --abbrev=0 --tags`
-          echo "latest tag: $tag"
-          git checkout $tag
       - name: Install dependencies
         run: pnpm install
       - name: Build Package
@@ -41,13 +34,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
       - name: Create Release
         run: |
-          git fetch --tags
-          tag=`git describe --abbrev=0 --tags`
-          echo "latest tag: $tag"
+          version=`cat ./package.json | jq -r .version`
+          echo "latest version: $version"
+          tag="v$version"
+          echo "creating release: $tag"
           gh release create $tag --generate-notes
         env:
           GH_TOKEN: ${{ secrets.COMMANDER_DATA_TOKEN }}
