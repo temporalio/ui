@@ -58,11 +58,18 @@ const defaultStore: PaginationItems = {
 
 export type PaginationStore = PaginationMethods & Readable<PaginationItems>;
 
+export const getInitialPageSize = (options: string[]) => {
+  const defaultOption = options[0];
+  if (!defaultOption) return defaultItemsPerPage;
+  const optionAsInt = parseInt(defaultOption);
+  if (isNaN(optionAsInt)) return defaultItemsPerPage;
+  return optionAsInt;
+};
+
 export function createPaginationStore(
   pageSizeOptions: string[] = options,
 ): PaginationStore {
-  // TODO, use first option in pageSizeOptions for pageSize instead of defaultItemsPerPage
-  const initialPageSize = parseInt(pageSizeOptions?.[0]) ?? defaultItemsPerPage;
+  const initialPageSize = getInitialPageSize(pageSizeOptions);
   const paginationStore = writable({
     ...defaultStore,
     pageSize: initialPageSize,
@@ -109,8 +116,7 @@ export function createPaginationStore(
       updating: false,
       loading: false,
     };
-    // Return early if page does not have any items
-    // This can happen when the page size equals the number of items or visibleItems is filtered
+
     if (!items.length) return { ...store, hasNext: false };
 
     if (!store.indexData[currentIndex]) {

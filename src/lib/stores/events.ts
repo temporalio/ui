@@ -100,20 +100,32 @@ export const parametersWithSettings: Readable<FetchEventsParametersWithSettings>
     },
   );
 
-export const updateEventHistory: StartStopNotifier<{
+export type StartAndEndEventHistory = {
   start: WorkflowEvents;
   end: WorkflowEvents;
-}> = (set) => {
+  total: number;
+};
+
+const getTotalFromEndOfHistory = (endHistory: WorkflowEvents) => {
+  const endingId = endHistory[0]?.id;
+  if (!endingId || isNaN(parseInt(endingId))) return 0;
+  return parseInt(endingId);
+};
+
+export const updateEventHistory: StartStopNotifier<StartAndEndEventHistory> = (
+  set,
+) => {
   return parametersWithSettings.subscribe(async (params) => {
     const { settings: _, ...rest } = params;
     if (isNewRequest(rest, previous)) {
       withLoading(loading, updating, async () => {
         const events = await fetchStartAndEndEvents(params);
         if (events?.start && events?.end) {
-          set(events);
+          const total = getTotalFromEndOfHistory(events.end);
+          set({ ...events, total });
         } else {
           setTimeout(() => {
-            set(events);
+            set({ ...events, total: 0 });
           }, delay);
         }
       });
@@ -121,8 +133,8 @@ export const updateEventHistory: StartStopNotifier<{
   });
 };
 
-export const eventHistory = readable(
-  { start: [], end: [] },
+export const eventHistory = readable<StartAndEndEventHistory>(
+  { start: [], end: [], total: 0 },
   updateEventHistory,
 );
 

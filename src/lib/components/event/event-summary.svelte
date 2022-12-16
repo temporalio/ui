@@ -22,7 +22,7 @@
   }
 
   $: category = $page.url.searchParams.get('category');
-  $: total = category ? '' : $eventHistory.end[0]?.id;
+  $: total = category ? '' : $eventHistory.total;
 
   $: fetchEvents = () => {
     return getPaginatedEvents({

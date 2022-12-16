@@ -27,6 +27,7 @@
   import { pathMatches } from '$lib/utilities/path-matches';
   import AutoRefreshWorkflow from '$lib/components/auto-refresh-workflow.svelte';
   import Alert from '$lib/holocene/alert.svelte';
+  import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
@@ -78,12 +79,11 @@
     clearInterval(refreshInterval);
   });
 
-  $: cancelInProgress =
-    $workflowRun?.workflow?.status === 'Running' &&
-    !$updating &&
-    $eventHistory.end.some(
-      (event) => event?.eventType === 'WorkflowExecutionCancelRequested',
-    );
+  $: cancelInProgress = isCancelInProgress(
+    $workflowRun?.workflow?.status,
+    $updating,
+    $eventHistory,
+  );
 </script>
 
 <header class="mb-4 flex flex-col gap-4">
@@ -112,7 +112,7 @@
           data-cy="workflow-id-heading"
           class="select-all overflow-hidden text-ellipsis text-2xl font-medium"
         >
-          {workflow.id}
+          {workflow?.id}
         </h1>
       </div>
       {#if isRunning}
@@ -144,9 +144,7 @@
         href={routeForEventHistory({
           ...routeParameters,
         })}
-        amount={$eventHistory.end[0]?.id
-          ? parseInt($eventHistory.end[0].id)
-          : undefined}
+        amount={$eventHistory.total}
         dataCy="history-tab"
         active={pathMatches(
           $page.url.pathname,

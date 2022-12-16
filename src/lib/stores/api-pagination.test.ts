@@ -1,11 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, expect, it } from 'vitest';
 import { get } from 'svelte/store';
-import { createPaginationStore } from './api-pagination';
+import { createPaginationStore, getInitialPageSize } from './api-pagination';
+import { options } from './pagination';
 
 const items = new Array(50).fill(null).map((_, i) => i);
 
 describe('createPaginationStore with default pageSizeOptions', () => {
+  it('should set correct getInitialPageSize with default options', () => {
+    const pageSize = getInitialPageSize(options);
+    expect(pageSize).toBe(100);
+  });
+
   it('should set default values', () => {
     const store = createPaginationStore();
 
@@ -459,6 +465,24 @@ describe('createPaginationStore with default pageSizeOptions', () => {
 });
 
 describe('createPaginationStore with custom pageSizeOptions', () => {
+  it('should set correct getInitialPageSize', () => {
+    const options = ['10', '20', '50'];
+    const pageSize = getInitialPageSize(options);
+    expect(pageSize).toBe(10);
+  });
+
+  it('should set fallback to default pageSize with no options', () => {
+    const options = [];
+    const pageSize = getInitialPageSize(options);
+    expect(pageSize).toBe(100);
+  });
+
+  it('should set fallback to default pageSize with no options', () => {
+    const options = ['a', 'b', 'c'];
+    const pageSize = getInitialPageSize(options);
+    expect(pageSize).toBe(100);
+  });
+
   it('should set default values', () => {
     const store = createPaginationStore(['10', '20', '50']);
 
