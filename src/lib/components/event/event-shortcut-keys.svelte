@@ -17,16 +17,36 @@
       <h1 class="title">Keyboard Shortcuts</h1>
       <div class="content flex flex-col gap-4 text-gray-500 dark:text-gray-400">
         <div class="row">
-          <Shortcut arrow="right" tooltipText="Next Page" /> Next Page
+          <div class="flex items-center gap-2">
+            <Shortcut arrow="right" />
+            |
+            <Shortcut>L</Shortcut>
+          </div>
+          Next Page
         </div>
         <div class="row">
-          <Shortcut arrow="left" /> Previous Page
+          <div class="flex items-center gap-2">
+            <Shortcut arrow="left" />
+            |
+            <Shortcut>H</Shortcut>
+          </div>
+          Previous Page
         </div>
         <div class="row">
-          <Shortcut arrow="down" tooltipText="Next Row" /> Next Row
+          <div class="flex items-center gap-2">
+            <Shortcut arrow="down" />
+            |
+            <Shortcut>J</Shortcut>
+          </div>
+          Next Row
         </div>
         <div class="row">
-          <Shortcut arrow="up" tooltipText="Previous Row" /> Previous Row
+          <div class="flex items-center gap-2">
+            <Shortcut arrow="up" />
+            |
+            <Shortcut>K</Shortcut>
+          </div>
+          Previous Row
         </div>
         {#if !compact}
           <div class="row">
