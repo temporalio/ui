@@ -1,6 +1,6 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
-  import type { ToastVariant } from './toaster.svelte';
+  import type { ToastVariant } from 'src/types/holocene';
   import { createEventDispatcher } from 'svelte';
   import IconButton from './icon-button.svelte';
 

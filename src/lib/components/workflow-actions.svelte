@@ -12,7 +12,7 @@
   import SplitButton from '$lib/holocene/split-button.svelte';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import { cancelWorkflow } from '$lib/services/workflow-service';
-  import { toaster } from '$lib/holocene/toaster.svelte';
+  import { toaster } from '$lib/stores/toaster';
   import Input from '$lib/holocene/input/input.svelte';
   import FeatureGuard from './feature-guard.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -41,7 +41,6 @@
       id: 'workflow-termination-success-toast',
       message: 'Workflow terminated.',
       variant: 'success',
-      yPosition: 'top',
     });
   };
 
@@ -75,7 +74,6 @@
       $refresh = Date.now();
     } catch {
       toaster.push({
-        yPosition: 'top',
         variant: 'error',
         message: 'Unable to cancel workflow.',
       });

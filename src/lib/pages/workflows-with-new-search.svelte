@@ -35,7 +35,7 @@
     pollBatchOperation,
   } from '$lib/services/batch-service';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  import { toaster } from '$lib/holocene/toaster.svelte';
+  import { toaster } from '$lib/stores/toaster';
   import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
 
   export let bulkActionsEnabled: boolean = false;

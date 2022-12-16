@@ -10,7 +10,7 @@
   import PageTitle from '$lib/components/page-title.svelte';
   import { fetchWorkflowForAuthorization } from '$lib/services/workflow-service';
   import { namespaces } from '$lib/stores/namespaces';
-  import { notifications } from '$lib/stores/notifications';
+  import { toaster } from '$lib/stores/toaster';
 
   let searchField: HTMLInputElement = null;
 
@@ -27,10 +27,10 @@
           $lastUsedNamespace = namespace;
           goto(routeForWorkflows({ namespace }));
         } else {
-          notifications.add(
-            'error',
-            'You do not have access to this namespace.',
-          );
+          toaster.push({
+            variant: 'error',
+            message: 'You do not have access to this namespace.',
+          });
         }
       },
     };

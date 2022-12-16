@@ -21,8 +21,9 @@
 
 <script lang="ts">
   import Header from './_import-header.svelte';
-  import Notifications from '$lib/components/notifications.svelte';
   import { ErrorBoundary } from '$lib/holocene/error-boundary';
+  import Toaster from '$holocene/toaster.svelte';
+  import { toaster } from '$lib/stores/toaster';
 </script>
 
 <svelte:head>
@@ -33,7 +34,7 @@
 </svelte:head>
 
 <div class="flex h-screen w-screen flex-row">
-  <Notifications />
+  <Toaster toasts={toaster.toasts} pop={toaster.pop} />
   <div class="sticky top-0 z-20 h-screen w-auto">
     <Header />
   </div>
