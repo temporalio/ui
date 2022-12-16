@@ -7,9 +7,10 @@
   import WorkflowRunLayout from '$lib/layouts/workflow-run-layout.svelte';
 
   const workflow = $page.params.workflow;
+  $: isCloud = $page.stuff?.settings?.runtimeEnvironment?.isCloud;
 </script>
 
 <PageTitle title={`Stack Trace | ${workflow}`} url={$page.url.href} />
-<WorkflowRunLayout cancelEnabled>
+<WorkflowRunLayout cancelEnabled={!isCloud}>
   <WorkflowStackTrace />
 </WorkflowRunLayout>

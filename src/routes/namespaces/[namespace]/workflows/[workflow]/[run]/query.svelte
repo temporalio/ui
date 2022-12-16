@@ -7,9 +7,10 @@
   import PageTitle from '$lib/components/page-title.svelte';
 
   const workflow = $page.params.workflow;
+  $: isCloud = $page.stuff?.settings?.runtimeEnvironment?.isCloud;
 </script>
 
 <PageTitle title={`Query | ${workflow}`} url={$page.url.href} />
-<WorkflowRunLayout cancelEnabled>
+<WorkflowRunLayout cancelEnabled={!isCloud}>
   <WorkflowQuery />
 </WorkflowRunLayout>

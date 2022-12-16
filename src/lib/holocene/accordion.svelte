@@ -46,6 +46,7 @@
     aria-controls="{id}-content"
     class="accordion-open flex w-full flex-col"
     disabled={disabled || readOnly}
+    type="button"
     on:click={toggleAccordion}
   >
     <div class="space-between flex w-full flex-row items-center">
