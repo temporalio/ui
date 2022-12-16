@@ -7,6 +7,8 @@
   import { supportsBulkActions } from '$lib/stores/bulk-actions';
   import AdvancedVisibilityGuard from '$lib/components/advanced-visibility-guard.svelte';
   import WorkflowsWithNewSearch from '$lib/pages/workflows-with-new-search.svelte';
+
+  $: isCloud = $page.stuff?.settings?.runtimeEnvironment?.isCloud;
 </script>
 
 <PageTitle
@@ -17,7 +19,7 @@
 <AdvancedVisibilityGuard>
   <WorkflowsWithNewSearch
     bulkActionsEnabled={$supportsBulkActions}
-    cancelEnabled
+    cancelEnabled={!isCloud}
   />
   <Workflows slot="fallback" />
 </AdvancedVisibilityGuard>

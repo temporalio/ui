@@ -7,9 +7,10 @@
   import PageTitle from '$lib/components/page-title.svelte';
 
   const workflow = $page.params.workflow;
+  $: isCloud = $page.stuff?.settings?.runtimeEnvironment?.isCloud;
 </script>
 
 <PageTitle title={`Pending Activities | ${workflow}`} url={$page.url.href} />
-<WorkflowRunLayout cancelEnabled signalEnabled>
+<WorkflowRunLayout cancelEnabled={!isCloud} signalEnabled={!isCloud}>
   <WorkflowPendingActivities />
 </WorkflowRunLayout>

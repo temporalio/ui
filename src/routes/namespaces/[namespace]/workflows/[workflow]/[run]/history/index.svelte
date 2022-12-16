@@ -11,6 +11,7 @@
   import PageTitle from '$lib/components/page-title.svelte';
 
   const workflow = $page.params.workflow;
+  $: isCloud = $page.stuff?.settings?.runtimeEnvironment?.isCloud;
 
   const views = {
     feed: WorkflowHistoryFeed,
@@ -21,7 +22,7 @@
 </script>
 
 <PageTitle title={`Workflow History | ${workflow}`} url={$page.url.href} />
-<WorkflowRunLayout cancelEnabled signalEnabled>
+<WorkflowRunLayout cancelEnabled={!isCloud} signalEnabled={!isCloud}>
   <WorkflowHistoryLayout>
     <!-- <svelte:fragment slot="timeline">
     <EventHistoryTimelineContainer />
