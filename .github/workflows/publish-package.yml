@@ -11,34 +11,43 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Setup
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Setup PNPM
         uses: pnpm/action-setup@v2.2.2
         with:
           version: 7
       - name: Checkout Release Tag
         run: |
-          git fetch --tags
-          tag=`git describe --always --abbrev=0 --tags`
+          tag=`git describe --abbrev=0 --tags`
+          echo "latest tag: $tag"
           git checkout $tag
       - name: Install dependencies
         run: pnpm install
       - name: Build Package
         run: pnpm package
       - name: Publish package to NPM
-        run: npm publish --access public
+        run: npm publish
+        working-directory: ./package
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        working-directory: ./package
   create_release:
     needs: publish
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Create Release
         run: |
           git fetch --tags
-          tag=`git describe --always --abbrev=0 --tags`
+          tag=`git describe --abbrev=0 --tags`
+          echo "latest tag: $tag"
           gh release create $tag --generate-notes
         env:
           GH_TOKEN: ${{ secrets.COMMANDER_DATA_TOKEN }}
