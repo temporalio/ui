@@ -68,7 +68,7 @@
     "@histoire/plugin-svelte": "^0.11.8",
     "@histoire/shared": "^0.11.8",
     "@sveltejs/adapter-vercel": "1.0.0-next.77",
-    "@sveltejs/kit": "1.0.0-next.587",
+    "@sveltejs/kit": "1.0.1",
     "@sveltejs/vite-plugin-svelte": "^2.0.2",
     "@temporalio/proto": "^1.4.4",
     "@types/base-64": "^1.0.0",
