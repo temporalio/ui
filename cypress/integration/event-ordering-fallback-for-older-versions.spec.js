@@ -1,8 +1,9 @@
 /// <reference types="cypress" />
 
-const visitWorkflow = (suffix = '') => {
-  cy.visit(`/namespaces/default/workflows/workflowId/runId/history${suffix}`);
-};
+import workflowsFixture from '../fixtures/workflows.json';
+
+const workflow = workflowsFixture.executions[0];
+const { workflowId, runId } = workflow.execution;
 
 describe('Fallback to Ascending Ordering of Event History on Older Versions of Temporal Server', () => {
   beforeEach(() => {
@@ -11,54 +12,106 @@ describe('Fallback to Ascending Ordering of Event History on Older Versions of T
     cy.interceptQueryApi();
     cy.interceptTaskQueuesApi();
     cy.interceptSettingsApi();
-    cy.interceptWorkflowApi();
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        '/api/v1/namespaces/default/workflows/workflowId/runs/runId/events?',
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}?`,
+      { fixture: 'workflow-completed.json' },
+    ).as('workflow-api');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?maximumPageSize=20`,
       { fixture: 'event-history-completed.json' },
-    ).as('events-ascending-api');
+    ).as('event-history-start');
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        '/api/v1/namespaces/default/workflows/workflowId/runs/runId/events/reverse?',
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?maximumPageSize=20`,
       { fixture: 'event-history-completed-reverse.json' },
-    ).as('events-descending-api');
+    ).as('event-history-end');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?nextPageToken=*`,
+      { fixture: 'event-history-completed.json' },
+    ).as('event-history-ascending');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?nextPageToken=*`,
+      { fixture: 'event-history-completed-reverse.json' },
+    ).as('event-history-descending');
   });
 
   it('should default to sorting events in descending order if on a modern version', () => {
     cy.interceptClusterApi();
-    visitWorkflow();
-    cy.wait('@events-descending-api');
+
+    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}/history`);
+
+    cy.wait('@workflow-api');
+    cy.wait('@event-history-start');
+    cy.wait('@event-history-end');
+    cy.wait('@event-history-descending');
   });
 
   it('should sort events in ascending if a query param is set', () => {
     cy.interceptClusterApi();
-    visitWorkflow('?sort=ascending');
-    cy.wait('@events-ascending-api');
+
+    cy.visit(
+      `/namespaces/default/workflows/${workflowId}/${runId}/history?sort=ascending`,
+    );
+
+    cy.wait('@workflow-api');
+    cy.wait('@event-history-start');
+    cy.wait('@event-history-end');
+    cy.wait('@event-history-ascending');
   });
 
   it('should sort events in descending if a query param is set', () => {
     cy.interceptClusterApi();
-    visitWorkflow('?sort=descending');
-    cy.wait('@events-descending-api');
+
+    cy.visit(
+      `/namespaces/default/workflows/${workflowId}/${runId}/history?sort=descending`,
+    );
+
+    cy.wait('@event-history-descending');
   });
 
   it('should sort events in ascending if version history does not support it', () => {
     cy.interceptClusterApi('cluster-server-without-reserve-event-sorting.json');
-    visitWorkflow();
-    cy.wait('@events-ascending-api');
+
+    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}/history`);
+
+    cy.wait('@workflow-api');
+    cy.wait('@event-history-start');
+    cy.wait('@event-history-end');
+    cy.wait('@event-history-ascending');
   });
 
   it('should sort events in ascending with ascending in query param if version history does not support it', () => {
     cy.interceptClusterApi('cluster-server-without-reserve-event-sorting.json');
-    visitWorkflow('?sort=ascending');
-    cy.wait('@events-ascending-api');
+
+    cy.visit(
+      `/namespaces/default/workflows/${workflowId}/${runId}/history?sort=ascending`,
+    );
+
+    cy.wait('@workflow-api');
+    cy.wait('@event-history-start');
+    cy.wait('@event-history-end');
+    cy.wait('@event-history-ascending');
   });
 
   it('should sort events in ascending with descending in query param if version history does not support it', () => {
     cy.interceptClusterApi('cluster-server-without-reserve-event-sorting.json');
-    visitWorkflow('?sort=descending');
-    cy.wait('@events-ascending-api');
+
+    cy.visit(
+      `/namespaces/default/workflows/${workflowId}/${runId}/history?sort=descending`,
+    );
+
+    cy.wait('@workflow-api');
+    cy.wait('@event-history-start');
+    cy.wait('@event-history-end');
+    cy.wait('@event-history-ascending');
   });
 });

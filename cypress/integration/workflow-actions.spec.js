@@ -11,15 +11,33 @@ describe('Workflow Actions', () => {
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/*/runs/*/events/*`,
-      { fixture: 'event-history-completed-reverse.json' },
-    ).as('event-history-api');
-
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
         `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}?`,
       { fixture: 'workflow-running.json' },
     ).as('workflow-api');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?maximumPageSize=20`,
+      { fixture: 'event-history-completed.json' },
+    ).as('event-history-start');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?maximumPageSize=20`,
+      { fixture: 'event-history-completed.json' },
+    ).as('event-history-end');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?nextPageToken=*`,
+      { fixture: 'event-history-completed-reverse.json' },
+    ).as('event-history-ascending');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?nextPageToken=*`,
+      { fixture: 'event-history-completed-reverse.json' },
+    ).as('event-history-descending');
   });
 
   describe('Terminate', () => {
@@ -30,6 +48,9 @@ describe('Workflow Actions', () => {
 
       cy.wait('@settings-api');
       cy.wait('@workflow-api');
+      cy.wait('@event-history-start');
+      cy.wait('@event-history-end');
+      cy.wait('@event-history-descending');
 
       cy.get('#workflow-actions-menu-button').click();
       cy.get('#workflow-actions-menu > [data-cy="terminate-button"]').click();
@@ -47,6 +68,9 @@ describe('Workflow Actions', () => {
 
       cy.wait('@settings-api');
       cy.wait('@workflow-api');
+      cy.wait('@event-history-start');
+      cy.wait('@event-history-end');
+      cy.wait('@event-history-descending');
 
       cy.get('#workflow-actions-primary-button').click();
       cy.get('[data-cy="confirm-modal-button"]').click();
@@ -67,6 +91,9 @@ describe('Workflow Actions', () => {
 
       cy.wait('@settings-api');
       cy.wait('@workflow-api');
+      cy.wait('@event-history-start');
+      cy.wait('@event-history-end');
+      cy.wait('@event-history-descending');
 
       cy.get('#workflow-actions-primary-button').should('be.disabled');
       cy.get('#workflow-actions-menu-button').should('be.disabled');

@@ -4,6 +4,7 @@ import { routeForApi } from '$lib/utilities/route-for-api';
 import { toEventHistory } from '$lib/models/event-history';
 import { isSortOrder } from '$lib/utilities/is';
 
+import { supportsReverseOrder } from '$lib/stores/event-view';
 import type { EventSortOrder } from '$lib/stores/event-view';
 
 export type FetchEventsParameters = NamespaceScopedRequest &
@@ -64,15 +65,19 @@ export const fetchPartialRawEvents = async ({
     runId,
   });
 
-  const response = await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
-    route,
-    {
-      request: fetch,
-      params: { maximumPageSize: '20' },
-    },
-  );
+  try {
+    const response = await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
+      route,
+      {
+        request: fetch,
+        params: { maximumPageSize: '20' },
+      },
+    );
 
-  return response.history.events;
+    return response.history.events;
+  } catch (e) {
+    return [];
+  }
 };
 
 export const fetchStartAndEndEvents = async (
@@ -114,6 +119,7 @@ type PaginatedEventParams = {
   compact: boolean;
   settings: Settings;
   accessToken: string;
+  supportsReverseOrder: boolean;
 };
 
 export async function getPaginatedEvents({
@@ -125,12 +131,13 @@ export async function getPaginatedEvents({
   compact,
   settings,
   accessToken,
+  supportsReverseOrder,
 }: PaginatedEventParams): Promise<
   () => Promise<{ items: WorkflowEvents; nextPageToken: NextPageToken }>
 > {
   return async (_pageSize = 100, token = '') => {
-    const descendingRoute = await routeForApi(
-      compact ? 'events.ascending' : `events.${sort}`,
+    const historyRoute = await routeForApi(
+      !supportsReverseOrder || compact ? 'events.ascending' : `events.${sort}`,
       {
         namespace,
         workflowId,
@@ -138,15 +145,12 @@ export async function getPaginatedEvents({
       },
     );
     const { history, nextPageToken } =
-      await requestFromAPI<GetWorkflowExecutionHistoryResponse>(
-        descendingRoute,
-        {
-          request: fetch,
-          params: {
-            nextPageToken: token,
-          },
+      await requestFromAPI<GetWorkflowExecutionHistoryResponse>(historyRoute, {
+        request: fetch,
+        params: {
+          nextPageToken: token,
         },
-      );
+      });
 
     const events = await toEventHistory({
       response: history.events,

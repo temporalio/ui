@@ -1,6 +1,10 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
+  import {
+    eventFilterSort,
+    expandAllEvents,
+    supportsReverseOrder,
+  } from '$lib/stores/event-view';
   import { eventHistory } from '$lib/stores/events';
   import { getPaginatedEvents } from '$lib/services/events-service';
   import { refresh } from '$lib/stores/workflow-run';
@@ -34,10 +38,11 @@
       compact,
       settings: $page.stuff.settings,
       accessToken: $authUser?.accessToken,
+      supportsReverseOrder: $supportsReverseOrder,
     });
   };
 
-  const onShiftUp = (event: KeyboardEvent) => {
+  const onShiftUp = (_event: KeyboardEvent) => {
     if (!compact) {
       const sort = 'ascending';
       $eventFilterSort = sort;
@@ -49,7 +54,7 @@
     }
   };
 
-  const onShiftDown = (event: KeyboardEvent) => {
+  const onShiftDown = (_event: KeyboardEvent) => {
     if (!compact) {
       const sort = 'descending';
       $eventFilterSort = sort;
