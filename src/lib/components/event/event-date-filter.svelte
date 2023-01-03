@@ -24,6 +24,9 @@
 
   import { page } from '$app/stores';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import { getDateFilterValue } from '$lib/utilities/event-formatting';
+
+  export let compact: boolean;
 
   let sortOptions: EventSortOrderOptions = [
     { label: 'Sort 1-9', option: 'ascending' },
@@ -31,9 +34,9 @@
   ];
 
   let dateOptions: TimeFormatOptions = [
-    { label: 'UTC Time', option: 'UTC' },
-    { label: 'Relative Time', option: 'relative' },
-    { label: 'Local Time', option: 'local' },
+    { label: 'Relative', option: 'relative' },
+    { label: 'UTC', option: 'UTC' },
+    { label: 'Local', option: 'local' },
   ];
 
   const onSortOptionClick = (option: EventSortOrder) => {
@@ -57,12 +60,12 @@
     }
   };
 
-  $: value =
-    $eventSortOrder === 'descending' &&
-    $timeFormat === 'UTC' &&
-    $eventShowElapsed === 'false'
-      ? undefined
-      : `${$eventSortOrder}:${$timeFormat}:${$eventShowElapsed}`;
+  $: value = getDateFilterValue({
+    compact,
+    timeFormat: $timeFormat,
+    sortOrder: $eventSortOrder,
+    showElapsed: $eventShowElapsed,
+  });
 </script>
 
 <DropdownMenu {value} left dataCy="event-date-filter">
@@ -71,7 +74,7 @@
     <span class="block md:hidden"><Icon name="clock" /></span>
   </svelte:fragment>
   <div class="w-56">
-    {#if $supportsReverseOrder}
+    {#if $supportsReverseOrder && !compact}
       {#each sortOptions as { option, label } (option)}
         <div
           class="option"

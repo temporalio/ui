@@ -8,6 +8,7 @@
   import { importEvents, importEventGroups } from '$lib/stores/import-events';
   import { importSettings } from './_import-settings';
   import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
+  import { groupEvents } from '$lib/models/event-groups';
 
   let rawEvents: HistoryEvent[] | { events: HistoryEvent[] };
 
@@ -32,12 +33,13 @@
 
   const onConfirm = async () => {
     try {
-      const { events, eventGroups } = await toEventHistory({
+      const events = await toEventHistory({
         response: Array.isArray(rawEvents) ? rawEvents : rawEvents?.events,
         namespace: importSettings.defaultNamespace,
         settings: importSettings,
         accessToken: user.accessToken,
       });
+      const eventGroups = groupEvents(events);
       importEvents.set(events);
       importEventGroups.set(eventGroups);
       const path = routeForImport({ importType: 'events', view: 'feed' });

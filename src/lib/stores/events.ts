@@ -11,22 +11,22 @@ import type { StartStopNotifier } from 'svelte/store';
 import { page } from '$app/stores';
 
 import {
-  fetchEvents,
   FetchEventsParameters,
   FetchEventsParametersWithSettings,
+  fetchStartAndEndEvents,
+  getPaginatedEvents,
 } from '$lib/services/events-service';
-import { eventCategoryParam, eventSortOrder } from './event-view';
+import {
+  eventFilterSort,
+  eventSortOrder,
+  eventViewType,
+  supportsReverseOrder,
+} from './event-view';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { withLoading, delay } from '$lib/utilities/stores/with-loading';
-import { groupEvents } from '$lib/models/event-groups';
 import { refresh } from '$lib/stores/workflow-run';
 import { authUser } from '$lib/stores/auth-user';
 import { previous } from '$lib/stores/previous-events';
-
-const emptyEvents: FetchEventsResponse = {
-  events: [],
-  eventGroups: [],
-};
 
 const namespace = derived([page], ([$page]) => {
   if ($page.params.namespace) {
@@ -106,19 +106,32 @@ export const parametersWithSettings: Readable<FetchEventsParametersWithSettings>
     },
   );
 
-export const updateEventHistory: StartStopNotifier<FetchEventsResponse> = (
+export type StartAndEndEventHistory = {
+  start: WorkflowEvents;
+  end: WorkflowEvents;
+  total: number;
+};
+
+const getTotalFromEndOfHistory = (endHistory: WorkflowEvents) => {
+  const endingId = endHistory[0]?.id;
+  if (!endingId || isNaN(parseInt(endingId))) return 0;
+  return parseInt(endingId);
+};
+
+export const updateEventHistory: StartStopNotifier<StartAndEndEventHistory> = (
   set,
 ) => {
   return parametersWithSettings.subscribe(async (params) => {
     const { settings: _, ...rest } = params;
     if (isNewRequest(rest, previous)) {
       withLoading(loading, updating, async () => {
-        const events = await fetchEvents(params);
-        if (events?.events?.length) {
-          set(events);
+        const events = await fetchStartAndEndEvents(params);
+        if (events?.start && events?.end) {
+          const total = getTotalFromEndOfHistory(events.end);
+          set({ ...events, total });
         } else {
           setTimeout(() => {
-            set(events);
+            set({ ...events, total: 0 });
           }, delay);
         }
       });
@@ -126,54 +139,35 @@ export const updateEventHistory: StartStopNotifier<FetchEventsResponse> = (
   });
 };
 
-export const eventHistory = readable(emptyEvents, updateEventHistory);
+export const eventHistory = readable<StartAndEndEventHistory>(
+  { start: [], end: [], total: 0 },
+  updateEventHistory,
+);
 
 export const timelineEvents = writable(null);
-
-export const events: Readable<WorkflowEvents> = derived(
-  [eventHistory, eventCategoryParam, timelineEvents],
-  ([$eventHistory, $category, $timelineEvents]) => {
-    if ($timelineEvents) {
-      return $timelineEvents;
-    }
-    const { events } = $eventHistory;
-    if (!$category) return events;
-    return events.filter((event) => event.category === $category);
-  },
-);
-
-export const eventGroups: Readable<EventGroups> = derived(
-  [eventHistory, eventCategoryParam],
-  ([$eventHistory, $category]) => {
-    const { eventGroups } = $eventHistory;
-    if (!$category) return eventGroups;
-    return eventGroups.filter((event) => event.category === $category);
-  },
-);
-
-export const ascendingEventGroups: Readable<EventGroups> = derived(
-  [eventHistory, eventSortOrder, eventCategoryParam],
-  ([$eventHistory, $sortOrder, $category]) => {
-    const { events } = $eventHistory;
-    const _events =
-      $sortOrder === 'descending' ? events.slice().reverse() : events;
-    const eventGroups = groupEvents(_events);
-    if (!$category) return eventGroups;
-    return eventGroups.filter((event) => event.category === $category);
-  },
-);
-
-export const ascendingEvents: Readable<WorkflowEvents> = derived(
-  [eventHistory, eventSortOrder, eventCategoryParam],
-  ([$eventHistory, $sortOrder, $category]) => {
-    const { events } = $eventHistory;
-    const _events =
-      $sortOrder === 'descending' ? events.slice().reverse() : events;
-    if (!$category) return _events;
-    return _events.filter((event) => event.category === $category);
-  },
-);
-
 export const updating = writable(true);
 export const loading = writable(true);
 export const activeEvent = writable(null);
+
+export const fetchPaginatedEvents = derived(
+  [page, eventFilterSort, eventViewType, authUser, supportsReverseOrder],
+  async ([
+    $page,
+    $eventFilterSort,
+    $eventViewType,
+    $authUser,
+    $supportsReverseOrder,
+  ]) => {
+    return getPaginatedEvents({
+      namespace: $page.params.namespace,
+      workflowId: $page.params.workflow,
+      runId: $page.params.run,
+      sort: $eventFilterSort,
+      category: $page.url.searchParams.get('category'),
+      compact: $eventViewType === 'compact',
+      settings: $page.stuff.settings,
+      accessToken: $authUser?.accessToken,
+      supportsReverseOrder: $supportsReverseOrder,
+    });
+  },
+);

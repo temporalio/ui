@@ -190,7 +190,7 @@ describe('toEventHistory', () => {
 
   for (const property of additionalProperties) {
     it(`should add a[n] ${property} property`, async () => {
-      const { events } = await toEventHistory({
+      const events = await toEventHistory({
         response: eventsFixture.history.events as unknown as HistoryEvent[],
         namespace,
         settings,

@@ -8,7 +8,6 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { eventViewType } from '$lib/stores/event-view';
   import { eventHistory } from '$lib/stores/events';
-  import { eventSortOrder } from '$lib/stores/event-view';
 
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
@@ -23,10 +22,8 @@
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
 
-  $: workflowEvents = getWorkflowStartedCompletedAndTaskFailedEvents(
-    $eventHistory?.events ?? [],
-    $eventSortOrder,
-  );
+  $: workflowEvents =
+    getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
 </script>
 
 <section class="flex flex-col gap-4">
