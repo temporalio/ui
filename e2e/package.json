@@ -9,20 +9,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/temporalio/ui-server.git"
+    "url": "git+https://github.com/temporalio/ui.git"
   },
   "keywords": [],
   "author": "",
   "license": "",
   "bugs": {
-    "url": "https://github.com/temporalio/ui-server/issues"
+    "url": "https://github.com/temporalio/ui/issues"
   },
-  "homepage": "https://github.com/temporalio/ui-server#readme",
+  "homepage": "https://github.com/temporalio/ui#readme",
   "devDependencies": {
     "@playwright/test": "^1.26.1",
     "@types/node": "^18.0.0"
-  },
-  "dependencies": {
-    "dotenv": "^16.0.1"
   }
 }
