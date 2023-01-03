@@ -36,13 +36,22 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: temporalio/cli
+          ref: codec # https://github.com/temporalio/cli/pull/54
           path: cli
       - name: Build CLI
         run: |
-          cd cli && go mod edit -replace github.com/temporalio/ui-server/v2=../ && go build -o dist/temporal ./cmd/temporal
+          cd cli && go mod edit -replace github.com/temporalio/ui-server/v2=../ && go build -o ../temporal-cli ./cmd/temporal
+      - name: Checkout Samples
+        uses: actions/checkout@v2
+        with:
+          repository: temporalio/samples-go
+          path: samples
       - name: Run Playwright Tests
         run: |
-          (cli/dist/temporal server start-dev &)
+          (./temporal-cli server start-dev --ui-codec-endpoint http://localhost:8234 &)
+          (cd samples/codec-server && go run worker/main.go &)
+          (cd samples/codec-server && go run starter/main.go)
+          (cd samples/codec-server && go run ./codec-server -port 8234 -web http://localhost:8233 &)
           cd e2e
           export E2E_UI_ADDRESS=http://localhost:8233
           npm ci --quiet
