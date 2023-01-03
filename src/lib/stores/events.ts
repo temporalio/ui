@@ -14,8 +14,14 @@ import {
   FetchEventsParameters,
   FetchEventsParametersWithSettings,
   fetchStartAndEndEvents,
+  getPaginatedEvents,
 } from '$lib/services/events-service';
-import { eventSortOrder } from './event-view';
+import {
+  eventFilterSort,
+  eventSortOrder,
+  eventViewType,
+  supportsReverseOrder,
+} from './event-view';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { withLoading, delay } from '$lib/utilities/stores/with-loading';
 import { refresh } from '$lib/stores/workflow-run';
@@ -142,3 +148,26 @@ export const timelineEvents = writable(null);
 export const updating = writable(true);
 export const loading = writable(true);
 export const activeEvent = writable(null);
+
+export const fetchPaginatedEvents = derived(
+  [page, eventFilterSort, eventViewType, authUser, supportsReverseOrder],
+  async ([
+    $page,
+    $eventFilterSort,
+    $eventViewType,
+    $authUser,
+    $supportsReverseOrder,
+  ]) => {
+    return getPaginatedEvents({
+      namespace: $page.params.namespace,
+      workflowId: $page.params.workflow,
+      runId: $page.params.run,
+      sort: $eventFilterSort,
+      category: $page.url.searchParams.get('category'),
+      compact: $eventViewType === 'compact',
+      settings: $page.stuff.settings,
+      accessToken: $authUser?.accessToken,
+      supportsReverseOrder: $supportsReverseOrder,
+    });
+  },
+);

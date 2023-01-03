@@ -1,12 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import {
-    eventFilterSort,
-    expandAllEvents,
-    supportsReverseOrder,
-  } from '$lib/stores/event-view';
-  import { eventHistory } from '$lib/stores/events';
-  import { getPaginatedEvents } from '$lib/services/events-service';
+  import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
+  import { eventHistory, fetchPaginatedEvents } from '$lib/stores/events';
   import { refresh } from '$lib/stores/workflow-run';
 
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
@@ -15,7 +10,6 @@
   import ApiPagination from '$lib/holocene/api-pagination.svelte';
   import { groupEvents } from '$lib/models/event-groups';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  import { authUser } from '$lib/stores/auth-user';
   import EventShortcutKeys from './event-shortcut-keys.svelte';
 
   export let compact = false;
@@ -27,20 +21,7 @@
 
   $: category = $page.url.searchParams.get('category');
   $: total = category ? '' : $eventHistory.total;
-
-  $: fetchEvents = () => {
-    return getPaginatedEvents({
-      namespace: $page.params.namespace,
-      workflowId: $page.params.workflow,
-      runId: $page.params.run,
-      sort: $eventFilterSort,
-      category,
-      compact,
-      settings: $page.stuff.settings,
-      accessToken: $authUser?.accessToken,
-      supportsReverseOrder: $supportsReverseOrder,
-    });
-  };
+  $: initialItem = $eventHistory?.start?.[0];
 
   const onShiftUp = (_event: KeyboardEvent) => {
     if (!compact) {
@@ -70,6 +51,10 @@
     event.preventDefault();
     showShortcuts = !showShortcuts;
   };
+
+  const getEvents = (items: CommonHistoryEvent[]): IterableEvent[] => {
+    return compact ? groupEvents(items) : items;
+  };
 </script>
 
 <EventShortcutKeys open={showShortcuts} {compact} />
@@ -79,8 +64,7 @@
     let:updating
     let:activeIndex
     let:setActiveIndex
-    onFetch={fetchEvents}
-    onError={(error) => console.error(error)}
+    onFetch={() => $fetchPaginatedEvents}
     pageSizeOptions={[]}
     {onShiftUp}
     {onShiftDown}
@@ -88,14 +72,13 @@
     {total}
   >
     <EventSummaryTable {updating} {compact} on:expandAll={handleExpandChange}>
-      {@const events = compact ? groupEvents(visibleItems) : visibleItems}
-      {#each events as event, index (`${event.id}-${event.timestamp}`)}
+      {#each getEvents(visibleItems) as event, index (`${event.id}-${event.timestamp}`)}
         <EventSummaryRow
           {event}
           {compact}
           {visibleItems}
           expandAll={$expandAllEvents === 'true'}
-          initialItem={$eventHistory?.start?.[0]}
+          {initialItem}
           active={activeIndex === index}
           onRowClick={() => setActiveIndex(index)}
         />

@@ -44,6 +44,8 @@
   $: currentEvent = isEventGroup(event) ? event.events.get(selectedId) : event;
   $: descending = $eventSortOrder === 'descending';
   $: showElapsed = $eventShowElapsed === 'true';
+  $: showElapsedTimeDiff =
+    showElapsed && initialItem && event.id !== initialItem.id;
   $: attributes = formatAttributes(event, { compact });
 
   $: timeDiffChange = '';
@@ -99,7 +101,7 @@
   </td>
   <td class="flex table-cell text-left">
     <p class="break-word truncate text-sm md:whitespace-normal md:text-base">
-      {#if showElapsed && initialItem && event.id !== initialItem.id}
+      {#if showElapsedTimeDiff}
         {formatDistanceAbbreviated({
           start: initialItem.eventTime,
           end: currentEvent.eventTime,

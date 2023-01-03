@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/stores';
   import Alert from '$lib/holocene/alert.svelte';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
@@ -14,7 +13,7 @@
     token: NextPageToken,
   ) => Promise<{ items: any[]; nextPageToken: NextPageToken }>;
 
-  export let onError: (error: any) => void;
+  export let onError: (error: any) => void | undefined = undefined;
   export let onFetch: () => Promise<PaginatedRequest>;
   export let onShiftUp: (event: KeyboardEvent) => void | undefined = undefined;
   export let onShiftDown: (event: KeyboardEvent) => void | undefined =
@@ -37,9 +36,14 @@
 
   async function initalDataFetch() {
     const fetchData: PaginatedRequest = await onFetch();
-    const response = await fetchData($store.pageSize, '');
-    const { items, nextPageToken } = response;
-    store.nextPageWithItems(nextPageToken, items);
+    try {
+      const response = await fetchData($store.pageSize, '');
+      const { items, nextPageToken } = response;
+      store.nextPageWithItems(nextPageToken, items);
+    } catch (err) {
+      error = err;
+      if (onError) onError(error);
+    }
   }
 
   async function fetchIndexData() {
@@ -56,7 +60,7 @@
         store.nextPageWithItems(nextPageToken, items);
       } catch (err: any) {
         error = err;
-        onError(error);
+        if (onError) onError(error);
       }
     } else {
       store.nextPage();
