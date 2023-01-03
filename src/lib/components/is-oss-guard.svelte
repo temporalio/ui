@@ -4,7 +4,7 @@
   export let isCloud = false;
 </script>
 
-{#if isCloud || $page.stuff?.settings?.runtimeEnvironment?.isCloud}
+{#if isCloud || $page.data?.settings?.runtimeEnvironment?.isCloud}
   <slot />
 {:else}
   <slot name="fallback" />

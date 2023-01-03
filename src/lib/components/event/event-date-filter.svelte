@@ -12,11 +12,8 @@
     eventShowElapsed,
     supportsReverseOrder,
   } from '$lib/stores/event-view';
-  import {
-    timeFormat,
-    setTimeFormat,
-    TimeFormatOptions,
-  } from '$lib/stores/time-format';
+  import { timeFormat, setTimeFormat } from '$lib/stores/time-format';
+  import type { TimeFormatOptions } from '$lib/stores/time-format';
   import type {
     EventSortOrder,
     EventSortOrderOptions,

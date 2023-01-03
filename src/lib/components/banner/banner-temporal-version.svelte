@@ -6,7 +6,7 @@
 
   export let shownBanner: BannersState;
 
-  const { cluster } = $page.stuff;
+  const { cluster } = $page.data;
 
   const severities = {
     High: 'high',

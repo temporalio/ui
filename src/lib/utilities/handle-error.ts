@@ -1,4 +1,4 @@
-import { browser } from '$app/env';
+import { browser } from '$app/environment';
 import { networkError } from '$lib/stores/error';
 import { toaster } from '$lib/stores/toaster';
 import { isNetworkError } from './is-network-error';

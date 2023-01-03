@@ -49,7 +49,7 @@
           ? 'text-gray-500'
           : 'text-gray-300'}"
       >
-        {$page.stuff?.settings?.version ?? ''}
+        {$page.data?.settings?.version ?? ''}
       </div>
     </div>
   </div>

@@ -111,14 +111,12 @@
       $refresh = Date.now();
       toaster.push({
         message: 'Workflow successfully signaled.',
-        yPosition: 'bottom',
         id: 'workflow-signal-success-toast',
       });
     } catch (error) {
       toaster.push({
         variant: 'error',
         message: 'Error signaling workflow.',
-        yPosition: 'bottom',
       });
     }
     signalInput = '';

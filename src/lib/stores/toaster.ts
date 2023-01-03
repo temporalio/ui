@@ -1,6 +1,7 @@
 import { v4 } from 'uuid';
 import type { Toast } from 'src/types/holocene';
-import { Writable, writable } from 'svelte/store';
+import { writable } from 'svelte/store';
+import type { Writable } from 'svelte/store';
 
 const toasts = writable<Toast[]>([]);
 

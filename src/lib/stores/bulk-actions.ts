@@ -9,7 +9,7 @@ import { temporalVersion } from './versions';
 
 const isCloud = derived(
   [page],
-  ([$page]) => $page.stuff?.settings?.runtimeEnvironment?.isCloud,
+  ([$page]) => $page.data?.settings?.runtimeEnvironment?.isCloud,
 );
 
 export const supportsBulkActions = derived(
