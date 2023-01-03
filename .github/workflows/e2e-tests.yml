@@ -52,7 +52,7 @@ jobs:
           (cd samples/codec-server && go run worker/main.go &)
           (cd samples/codec-server && go run starter/main.go)
           (cd samples/codec-server && go run ./codec-server -port 8234 -web http://localhost:8233 &)
-          cd e2e
+          cd ui/e2e
           export E2E_UI_ADDRESS=http://localhost:8233
           npm ci --quiet
           npx playwright install chromium --with-deps
