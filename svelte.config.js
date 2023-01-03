@@ -12,7 +12,7 @@ let outputDirectory = `build-${buildTarget}`;
 const publicPath = process.env.VITE_PUBLIC_PATH || '';
 
 /** @type {import('@sveltejs/kit').Config} */
-const config = {
+export default {
   // Consult https://github.com/sveltejs/svelte-preprocess
   // for more information about preprocessors
   preprocess: [
@@ -48,5 +48,3 @@ const config = {
     },
   },
 };
-
-export default config;

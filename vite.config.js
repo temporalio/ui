@@ -4,7 +4,7 @@ import { defaultColors } from 'histoire';
 import path from 'path';
 
 /** @type {import('vite').UserConfig} */
-const config = {
+export default {
   plugins: [sveltekit()],
   histoire: {
     plugins: [HstSvelte()],
@@ -44,5 +44,3 @@ const config = {
     },
   },
 };
-
-export default config;
