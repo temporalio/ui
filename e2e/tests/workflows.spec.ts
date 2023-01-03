@@ -7,20 +7,10 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe("Workflows list", () => {
-  test("should render Workflow Executions page", async ({ page }) => {
-    await expect(page.locator("text=Recent Workflows")).toBeVisible();
-  });
+  test("should render decoded Payloads", async ({ page }) => {
+    await page.locator("text=codecserver_workflowID").first().click();
+    await page.locator("text=Input and Results").first().click();
 
-  test("should render Workflow Execution details", async ({ page }) => {
-    await page.locator('a.workflow-summary-row').first().click();
-
-    await expect(page.locator("text=Workflow Type").first()).toBeVisible();
-    await expect(page.locator("text=Task Queue").first()).toBeVisible();
-  });
-
-  test("should render Workflow Execution Events", async ({ page }) => {
-    await page.locator("a.workflow-summary-row").first().click();
-
-    await expect(page.locator('[data-cy="event-summary-row"]').first()).toBeVisible();
+    await expect(page.locator("text=Plain text input").first()).toBeVisible();
   });
 });
