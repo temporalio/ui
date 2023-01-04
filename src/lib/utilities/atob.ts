@@ -1,4 +1,4 @@
-import { browser } from '$app/env';
+import { browser } from '$app/environment';
 
 export function base64DecodeUnicode(str: string): string {
   return decodeURIComponent(

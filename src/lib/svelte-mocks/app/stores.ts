@@ -4,7 +4,7 @@ interface Page<Params extends Record<string, string> = Record<string, string>> {
   url: URL;
   params: Params;
   routeId: string | null;
-  stuff: App.Stuff;
+  data: App.PageData;
   status: number;
   error: Error | null;
 }
@@ -32,7 +32,7 @@ const settings: Settings = {
   version: '2.0.0',
 };
 
-const stuff: App.Stuff = {
+const data: App.PageData = {
   settings,
 };
 
@@ -43,7 +43,7 @@ export const page = readable<Page>({
   },
   routeId: 'namespaces/[namespace]/workflows@root',
   status: 200,
-  stuff,
+  data,
   url: new URL(
     'http://localhost:3000/namespaces/default/workflows?search=basic&query=WorkflowType%3D%22testing%22',
   ),

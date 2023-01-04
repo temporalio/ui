@@ -4,7 +4,7 @@ import { defaultColors } from 'histoire';
 import path from 'path';
 
 /** @type {import('vite').UserConfig} */
-const config = {
+export default {
   plugins: [sveltekit()],
   histoire: {
     plugins: [HstSvelte()],
@@ -14,9 +14,9 @@ const config = {
       title: 'Holocene',
       favicon: './src/lib/vendor/favicon.ico',
       logo: {
-        square: '/src/lib/vendor/logo-dark.svg',
-        dark: '/src/lib/vendor/logo.svg',
-        light: '/src/lib/vendor/logo-dark.svg',
+        square: './src/lib/vendor/logo-dark.svg',
+        dark: './src/lib/vendor/logo.svg',
+        light: './src/lib/vendor/logo-dark.svg',
       },
       logoHref: 'https://temporal.io',
       colors: {
@@ -25,6 +25,7 @@ const config = {
       },
     },
     vite: {
+      publicDir: './src/lib/vendor/',
       resolve: {
         alias: {
           $lib: path.resolve('./src/lib'),
@@ -44,5 +45,3 @@ const config = {
     },
   },
 };
-
-export default config;

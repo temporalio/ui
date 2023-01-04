@@ -1,4 +1,4 @@
-import { browser } from '$app/env';
+import { browser } from '$app/environment';
 import { goto as navigateTo } from '$app/navigation';
 import type { invalidate } from '$app/navigation';
 
@@ -13,8 +13,8 @@ type UpdateQueryParams = {
 
 const gotoOptions = {
   replaceState: true,
-  keepfocus: true,
-  noscroll: true,
+  keepFocus: true,
+  noScroll: true,
 };
 
 export const updateQueryParameters = async ({

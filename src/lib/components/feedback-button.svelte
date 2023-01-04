@@ -3,7 +3,7 @@
   import { page } from '$app/stores';
 
   const href =
-    $page.stuff.settings.feedbackURL ||
+    $page.data?.settings?.feedbackURL ||
     'https://github.com/temporalio/ui/issues/new/choose';
 </script>
 

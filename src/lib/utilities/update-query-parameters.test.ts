@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { addHashToURL, updateQueryParameters } from './update-query-parameters';
 
-const gotoOptions = { replaceState: true, keepfocus: true, noscroll: true };
+const gotoOptions = { replaceState: true, keepFocus: true, noScroll: true };
 const url = new URL('https://temporal.io');
 
 describe('updateQueryParameters', () => {

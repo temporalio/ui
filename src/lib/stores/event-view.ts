@@ -1,4 +1,4 @@
-import { derived, Readable } from 'svelte/store';
+import { derived, type Readable } from 'svelte/store';
 import { page } from '$app/stores';
 import { persistStore } from '$lib/stores/persist-store';
 import { settings } from '$lib/stores/settings';

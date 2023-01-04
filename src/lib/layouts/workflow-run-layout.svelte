@@ -7,7 +7,7 @@
   import Header from '$lib/layouts/workflow-header.svelte';
   import Loading from '$holocene/loading.svelte';
   import { onDestroy, onMount } from 'svelte';
-  import { eventFilterSort, EventSortOrder } from '$lib/stores/event-view';
+  import { type EventSortOrder, eventFilterSort } from '$lib/stores/event-view';
 
   export let cancelEnabled: boolean = false;
   export let signalEnabled: boolean = false;
