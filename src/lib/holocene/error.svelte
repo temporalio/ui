@@ -8,7 +8,7 @@
 
   import Link from '$lib/holocene/link.svelte';
 
-  export let error: App.Error = null;
+  export let error: App.Error | NetworkError = null;
   export let status = 500;
   let message = error?.message || '';
 
