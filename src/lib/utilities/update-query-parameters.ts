@@ -35,7 +35,7 @@ export const updateQueryParameters = async ({
   }
 
   if (browser && url.href !== window.location.href) {
-    goto(addHashToURL(url), gotoOptions);
+    goto(url, gotoOptions);
   }
 
   return value;
