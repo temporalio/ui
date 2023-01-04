@@ -16,7 +16,10 @@
   } from '$lib/models/event-groups/get-event-in-group';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
-  import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
+  import {
+    getSingleAttributeForEvent,
+    checkForChildWorkflowExecutionAndAddRunIdAttribute,
+  } from '$lib/utilities/get-single-attribute-for-event';
 
   import EventDetailsRow from './event-details-row.svelte';
   import EventDetailsFull from './event-details-full.svelte';
@@ -59,26 +62,14 @@
       timeDiffChange = timeDiff ? `(${descending ? '-' : '+'}${timeDiff})` : '';
     }
 
-    if (currentEvent.name === 'StartChildWorkflowExecutionInitiated') {
-      if (compact) {
-        for (let [_, value] of eventGroup.events) {
-          addChildWorkflowExecutionRunIdAttribute(value);
-        }
-      } else {
-        const nextEvent = descending
-          ? previousItem
-          : visibleItems[currentIndex + 1];
-        addChildWorkflowExecutionRunIdAttribute(nextEvent);
-      }
-    }
+    checkForChildWorkflowExecutionAndAddRunIdAttribute({
+      currentEvent,
+      eventGroup,
+      visibleItems,
+      compact,
+      descending,
+    });
   }
-
-  const addChildWorkflowExecutionRunIdAttribute = (nextEvent) => {
-    if (nextEvent?.name === 'ChildWorkflowExecutionStarted') {
-      currentEvent.attributes['childWorkflowExecutionRunId'] =
-        nextEvent.attributes?.workflowExecution?.runId;
-    }
-  };
 
   const onLinkClick = () => {
     expanded = !expanded;
