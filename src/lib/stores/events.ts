@@ -26,7 +26,6 @@ import {
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { withLoading, delay } from '$lib/utilities/stores/with-loading';
 import { refresh } from '$lib/stores/workflow-run';
-import { authUser } from '$lib/stores/auth-user';
 import { previous } from '$lib/stores/previous-events';
 
 const namespace = derived([page], ([$page]) => {
@@ -52,10 +51,7 @@ const runId = derived([page], ([$page]) => {
 
 const settings = derived([page], ([$page]) => $page.data?.settings);
 
-const accessToken = derived(
-  [authUser],
-  ([$authUser]) => $authUser?.accessToken,
-);
+const accessToken = derived([page], ([$page]) => $page?.data.user?.accessToken);
 
 const isNewRequest = (
   params: FetchEventsParameters,
@@ -151,14 +147,8 @@ export const loading = writable(true);
 export const activeEvent = writable(null);
 
 export const fetchPaginatedEvents = derived(
-  [page, eventFilterSort, eventViewType, authUser, supportsReverseOrder],
-  async ([
-    $page,
-    $eventFilterSort,
-    $eventViewType,
-    $authUser,
-    $supportsReverseOrder,
-  ]) => {
+  [page, eventFilterSort, eventViewType, supportsReverseOrder],
+  async ([$page, $eventFilterSort, $eventViewType, $supportsReverseOrder]) => {
     return getPaginatedEvents({
       namespace: $page.params.namespace,
       workflowId: $page.params.workflow,
@@ -167,7 +157,7 @@ export const fetchPaginatedEvents = derived(
       category: $page.url.searchParams.get('category'),
       compact: $eventViewType === 'compact',
       settings: $page.data?.settings,
-      accessToken: $authUser?.accessToken,
+      accessToken: $page.data?.user?.accessToken,
       supportsReverseOrder: $supportsReverseOrder,
     });
   },

@@ -9,7 +9,6 @@
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import { authUser } from '$lib/stores/auth-user';
   import type { GetPollersResponse } from '$lib/services/pollers-service';
 
   export let workflow: WorkflowExecution;
@@ -27,7 +26,7 @@
         namespace,
       },
       $page.data?.settings,
-      $authUser?.accessToken,
+      $page.data?.user?.accessToken,
     );
 
   let stackTrace: Eventual<ParsedQuery>;
@@ -42,7 +41,7 @@
         namespace,
       },
       $page.data?.settings,
-      $authUser?.accessToken,
+      $page.data?.user?.accessToken,
     );
 
     stackTrace.then(() => {

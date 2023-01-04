@@ -8,7 +8,6 @@
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Button from '$holocene/button.svelte';
   import Loading from '$lib/holocene/loading.svelte';
-  import { authUser } from '$lib/stores/auth-user';
 
   export let workflow: WorkflowExecution;
 
@@ -40,7 +39,7 @@
         queryType,
       },
       $page.data?.settings,
-      $authUser?.accessToken,
+      $page.data?.user?.accessToken,
     );
   };
 
