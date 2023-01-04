@@ -9,7 +9,7 @@ export default {
   histoire: {
     plugins: [HstSvelte()],
     setupFile: './src/histoire.setup.ts',
-    storyIgnored: ['node_modules/**', 'dist/**', 'package/**'],
+    storyIgnored: ['node_modules/**', 'dist/**', 'package/**', '.vercel/**'],
     theme: {
       title: 'Holocene',
       favicon: './src/lib/vendor/favicon.ico',
