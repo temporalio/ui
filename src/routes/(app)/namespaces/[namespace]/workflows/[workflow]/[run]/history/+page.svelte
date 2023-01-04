@@ -25,10 +25,15 @@
 </script>
 
 <PageTitle title={`Workflow History | ${workflow.id}`} url={$page.url.href} />
-<WorkflowRunLayout cancelEnabled={!isCloud} signalEnabled={!isCloud}>
+<WorkflowRunLayout
+  {workflow}
+  {workers}
+  cancelEnabled={!isCloud}
+  signalEnabled={!isCloud}
+>
   <WorkflowHistoryLayout {workflow} {workers}>
     <!-- <svelte:fragment slot="timeline">
-    <EventHistoryTimelineContainer />
+    <EventHistoryTimelineContainer {workflow} />
     </svelte:fragment> -->
     <svelte:component this={view} />
   </WorkflowHistoryLayout>

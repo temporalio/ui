@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
   import { eventHistory } from '$lib/stores/events';
-  import { workflowRun, refresh } from '$lib/stores/workflow-run';
+  import { refresh } from '$lib/stores/workflow-run';
   import { timelineEvents } from '$lib/stores/events';
 
   import Accordion from '$lib/holocene/accordion.svelte';
@@ -16,7 +16,9 @@
   import Badge from '$lib/holocene/badge.svelte';
   import { groupEvents } from '$lib/models/event-groups';
 
-  $: isRunning = $workflowRun.workflow.isRunning;
+  export let workflow: WorkflowExecution;
+
+  $: isRunning = workflow.isRunning;
 
   let showEventTypeFilter = false;
   let eventTypeValue = '';

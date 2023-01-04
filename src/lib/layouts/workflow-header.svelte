@@ -5,7 +5,7 @@
 
   import { autoRefreshWorkflow } from '$lib/stores/event-view';
   import { workflowsQuery, workflowsSearch } from '$lib/stores/workflows';
-  import { workflowRun, refresh } from '$lib/stores/workflow-run';
+  import { refresh } from '$lib/stores/workflow-run';
   import { eventHistory, updating } from '$lib/stores/events';
 
   import {
@@ -48,7 +48,7 @@
   const { parameters, searchType } = $workflowsSearch;
   const query = toListWorkflowQuery(parameters);
 
-  $: isRunning = $workflowRun?.workflow?.isRunning;
+  $: isRunning = workflow?.isRunning;
 
   onMount(() => {
     if (isRunning && $autoRefreshWorkflow === 'on') {
@@ -82,7 +82,7 @@
   });
 
   $: cancelInProgress = isCancelInProgress(
-    $workflowRun?.workflow?.status,
+    workflow?.status,
     $updating,
     $eventHistory,
   );

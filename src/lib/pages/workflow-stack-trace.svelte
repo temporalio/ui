@@ -1,6 +1,5 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { workflowRun } from '$lib/stores/workflow-run';
 
   import { getWorkflowStackTrace } from '$lib/services/query-service';
   import type { ParsedQuery } from '$lib/services/query-service';
@@ -11,9 +10,12 @@
   import Loading from '$lib/holocene/loading.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { authUser } from '$lib/stores/auth-user';
+  import type { GetPollersResponse } from '$lib/services/pollers-service';
+
+  export let workflow: WorkflowExecution;
+  export let workers: GetPollersResponse;
 
   const { namespace } = $page.params;
-  const { workflow, workers } = $workflowRun;
 
   let currentdate = new Date();
   let isLoading = false;

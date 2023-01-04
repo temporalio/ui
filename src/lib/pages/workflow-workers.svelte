@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { workflowRun } from '$lib/stores/workflow-run';
-
   import WorkersList from '$lib/components/workers-list.svelte';
+  import type { GetPollersResponse } from '$lib/services/pollers-service';
 
-  const { workers, workflow } = $workflowRun;
+  export let workflow: WorkflowExecution;
+  export let workers: GetPollersResponse;
 </script>
 
 <WorkersList taskQueue={workflow.taskQueue} {workers} />

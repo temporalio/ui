@@ -7,7 +7,11 @@
 </script>
 
 {#if href}
-  <a class="table-row align-middle {$$props.class}" {href}>
+  <a
+    class="table-row align-middle {$$props.class}"
+    {href}
+    data-sveltekit-preload-data="hover"
+  >
     <td class:selectable on:click|stopPropagation>
       {#if selectable}
         <div class="absolute">

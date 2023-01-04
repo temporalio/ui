@@ -87,7 +87,7 @@
   </section>
   <WorkflowStackTraceError {workflow} {workers} />
   <WorkflowTypedError error={workflowEvents.error} />
-  <PendingActivities />
+  <PendingActivities {workflow} />
   <section class="flex w-full">
     <Accordion title="Input and Results" icon="json" class="border-gray-900">
       <div class="flex gap-2">

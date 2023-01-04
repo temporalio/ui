@@ -1,6 +1,5 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { workflowRun } from '$lib/stores/workflow-run';
 
   import { formatDate } from '$lib/utilities/format-date';
   import { getDuration, formatDuration } from '$lib/utilities/format-time';
@@ -15,7 +14,8 @@
   } from '$lib/utilities/format-event-attributes';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
-  $: pendingActivities = $workflowRun.workflow.pendingActivities;
+  export let workflow: WorkflowExecution;
+  let pendingActivities = workflow.pendingActivities;
 
   $: href = routeForPendingActivities({
     namespace: $page.params.namespace,
