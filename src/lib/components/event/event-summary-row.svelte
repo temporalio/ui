@@ -16,10 +16,7 @@
   } from '$lib/models/event-groups/get-event-in-group';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
-  import {
-    getSingleAttributeForEvent,
-    checkForChildWorkflowExecutionAndAddRunIdAttribute,
-  } from '$lib/utilities/get-single-attribute-for-event';
+  import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
 
   import EventDetailsRow from './event-details-row.svelte';
   import EventDetailsFull from './event-details-full.svelte';
@@ -61,14 +58,6 @@
       });
       timeDiffChange = timeDiff ? `(${descending ? '-' : '+'}${timeDiff})` : '';
     }
-
-    checkForChildWorkflowExecutionAndAddRunIdAttribute({
-      currentEvent,
-      eventGroup,
-      visibleItems,
-      compact,
-      descending,
-    });
   }
 
   const onLinkClick = () => {

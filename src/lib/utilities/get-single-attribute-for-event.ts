@@ -109,19 +109,6 @@ export const shouldDisplayChildWorkflowLink = (
   return false;
 };
 
-// For linking to a child workflow on a StartChildWorkflowExecutionInitiated event
-export const shouldDisplayChildWorkflowExecutionLink = (
-  key: string,
-  attributes: CombinedAttributes,
-): key is typeof keysWithChildExecutionLinks[number] => {
-  const workflowLinkAttributesExist = Boolean(
-    attributes?.workflowId && attributes?.childWorkflowExecutionRunId,
-  );
-  if (key === 'workflowId' && workflowLinkAttributesExist) return true;
-
-  return false;
-};
-
 const formatSummaryValue = (key: string, value: unknown): SummaryAttribute => {
   if (typeof value === 'object') {
     const [firstKey] = Object.keys(value);
@@ -200,39 +187,4 @@ export const getSingleAttributeForEvent = (
   }
 
   return getSummaryAttribute(event);
-};
-
-export const checkForChildWorkflowExecutionAndAddRunIdAttribute = ({
-  currentEvent,
-  eventGroup,
-  visibleItems,
-  compact,
-  descending,
-}: {
-  currentEvent: IterableEvent;
-  eventGroup: EventGroup;
-  visibleItems: IterableEvent[];
-  compact: boolean;
-  descending: boolean;
-}) => {
-  const addChildWorkflowExecutionRunIdAttribute = (nextEvent) => {
-    if (nextEvent?.name === 'ChildWorkflowExecutionStarted') {
-      currentEvent.attributes['childWorkflowExecutionRunId'] =
-        nextEvent.attributes?.workflowExecution?.runId;
-    }
-  };
-
-  if (currentEvent.name === 'StartChildWorkflowExecutionInitiated') {
-    if (compact) {
-      for (const [_, nextEvent] of eventGroup.events) {
-        addChildWorkflowExecutionRunIdAttribute(nextEvent);
-      }
-    } else {
-      const currentIndex = visibleItems.indexOf(currentEvent);
-      const nextEvent = descending
-        ? visibleItems[currentIndex - 1]
-        : visibleItems[currentIndex + 1];
-      addChildWorkflowExecutionRunIdAttribute(nextEvent);
-    }
-  }
 };

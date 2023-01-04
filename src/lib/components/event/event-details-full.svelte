@@ -18,9 +18,7 @@
   $: activePill = Object.keys(attributeGrouping).find(
     (key) => attributeGrouping[key].length,
   );
-  $: eventDetails = Object.entries(attributes).filter(
-    ([key, _]) => key !== 'childWorkflowExecutionRunId',
-  );
+  $: eventDetails = Object.entries(attributes);
 
   const handlePillChange = (event: CustomEvent) => {
     activePill = event.detail.key;

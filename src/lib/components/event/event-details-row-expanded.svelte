@@ -12,7 +12,6 @@
     shouldDisplayAsTaskQueueLink,
     shouldDisplayAsPlainText,
     shouldDisplayChildWorkflowLink,
-    shouldDisplayChildWorkflowExecutionLink,
   } from '$lib/utilities/get-single-attribute-for-event';
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
@@ -68,24 +67,6 @@
               namespace,
               workflow: attributes.workflowExecutionWorkflowId,
               run: attributes.workflowExecutionRunId,
-            })}
-          >
-            {value}
-          </Link>
-        </Copyable>
-      </div>
-    </div>
-  {:else if shouldDisplayChildWorkflowExecutionLink(key, attributes)}
-    <div class="detail-row">
-      <p class="text-sm">{format(key)}</p>
-      <div class="text-sm">
-        <Copyable content={value} container-class="xl:flex-row">
-          <Link
-            newTab
-            href={routeForEventHistory({
-              namespace,
-              workflow: attributes.workflowId,
-              run: attributes.childWorkflowExecutionRunId,
             })}
           >
             {value}
