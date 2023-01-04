@@ -1,15 +1,20 @@
-import { derived, readable, writable, get } from 'svelte/store';
-import type { Readable, Writable, StartStopNotifier } from 'svelte/store';
+import {
+  derived,
+  readable,
+  writable,
+  get,
+  type Readable,
+  type Writable,
+  type StartStopNotifier,
+} from 'svelte/store';
 
 import { page } from '$app/stores';
 
 import {
   fetchStartAndEndEvents,
   getPaginatedEvents,
-} from '$lib/services/events-service';
-import type {
-  FetchEventsParameters,
-  FetchEventsParametersWithSettings,
+  type FetchEventsParameters,
+  type FetchEventsParametersWithSettings,
 } from '$lib/services/events-service';
 
 import {
@@ -45,7 +50,7 @@ const runId = derived([page], ([$page]) => {
   return '';
 });
 
-const settings = derived([page], ([$page]) => $page.data.settings);
+const settings = derived([page], ([$page]) => $page.data?.settings);
 
 const accessToken = derived(
   [authUser],
@@ -161,7 +166,7 @@ export const fetchPaginatedEvents = derived(
       sort: $eventFilterSort,
       category: $page.url.searchParams.get('category'),
       compact: $eventViewType === 'compact',
-      settings: $page.data.settings,
+      settings: $page.data?.settings,
       accessToken: $authUser?.accessToken,
       supportsReverseOrder: $supportsReverseOrder,
     });

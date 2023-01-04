@@ -20,7 +20,7 @@
 
   export let user: User;
 
-  const { isCloud } = $page.data.settings.runtimeEnvironment;
+  const { isCloud } = $page.data?.settings?.runtimeEnvironment;
 
   $: namespaceNames = isCloud
     ? [$page.params.namespace]

@@ -7,7 +7,7 @@
   export let uiVersionInfo: UiVersionInfo;
 
   let shownBanner = BannersState.TemporalVersion;
-  const notifyOnNewVersion = $page.data.settings.notifyOnNewVersion;
+  const notifyOnNewVersion = $page.data?.settings.notifyOnNewVersion;
 </script>
 
 {#if notifyOnNewVersion}

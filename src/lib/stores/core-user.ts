@@ -1,8 +1,6 @@
-import { CoreUserKey } from '$lib/models/core-user';
-import type { CoreUser } from '$lib/models/core-user';
+import { CoreUserKey, type CoreUser } from '$lib/models/core-user';
 import { hasContext, getContext } from 'svelte';
-import { readable } from 'svelte/store';
-import type { Readable } from 'svelte/store';
+import { readable, type Readable } from 'svelte/store';
 
 export const defaultCoreUserStore: Readable<CoreUser> = readable({
   namespaceWriteDisabled: () => false,

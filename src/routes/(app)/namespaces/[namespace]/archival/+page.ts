@@ -1,6 +1,8 @@
 import type { PageLoad } from './$types';
-import { fetchAllArchivedWorkflows } from '$lib/services/workflow-service';
-import type { CombinedWorkflowExecutionsResponse } from '$lib/services/workflow-service';
+import {
+  fetchAllArchivedWorkflows,
+  type CombinedWorkflowExecutionsResponse,
+} from '$lib/services/workflow-service';
 import { fetchNamespace } from '$lib/services/namespaces-service';
 import type { DescribeNamespaceResponse } from '$types';
 

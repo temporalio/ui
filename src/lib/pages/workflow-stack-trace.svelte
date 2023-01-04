@@ -24,7 +24,7 @@
         workflow,
         namespace,
       },
-      $page.data.settings,
+      $page.data?.settings,
       $authUser?.accessToken,
     );
 
@@ -39,7 +39,7 @@
         workflow,
         namespace,
       },
-      $page.data.settings,
+      $page.data?.settings,
       $authUser?.accessToken,
     );
 
