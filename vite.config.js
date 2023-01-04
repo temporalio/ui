@@ -14,9 +14,9 @@ export default {
       title: 'Holocene',
       favicon: './src/lib/vendor/favicon.ico',
       logo: {
-        square: '/src/lib/vendor/logo-dark.svg',
-        dark: '/src/lib/vendor/logo.svg',
-        light: '/src/lib/vendor/logo-dark.svg',
+        square: './src/lib/vendor/logo-dark.svg',
+        dark: './src/lib/vendor/logo.svg',
+        light: './src/lib/vendor/logo-dark.svg',
       },
       logoHref: 'https://temporal.io',
       colors: {
@@ -25,6 +25,7 @@ export default {
       },
     },
     vite: {
+      publicDir: './src/lib/vendor/',
       resolve: {
         alias: {
           $lib: path.resolve('./src/lib'),
