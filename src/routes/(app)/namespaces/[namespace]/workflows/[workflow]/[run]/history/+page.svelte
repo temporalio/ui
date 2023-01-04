@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { PageData } from './$types';
   import { page } from '$app/stores';
   import { eventViewType } from '$lib/stores/event-view';
 
@@ -10,7 +11,9 @@
 
   import PageTitle from '$lib/components/page-title.svelte';
 
-  const workflow = $page.params.workflow;
+  export let data: PageData;
+
+  $: ({ workflow, workers } = data);
   $: isCloud = $page.data?.settings?.runtimeEnvironment?.isCloud;
 
   const views = {
@@ -21,9 +24,9 @@
   $: view = views[$eventViewType] ?? WorkflowHistoryFeed;
 </script>
 
-<PageTitle title={`Workflow History | ${workflow}`} url={$page.url.href} />
+<PageTitle title={`Workflow History | ${workflow.id}`} url={$page.url.href} />
 <WorkflowRunLayout cancelEnabled={!isCloud} signalEnabled={!isCloud}>
-  <WorkflowHistoryLayout>
+  <WorkflowHistoryLayout {workflow} {workers}>
     <!-- <svelte:fragment slot="timeline">
     <EventHistoryTimelineContainer />
     </svelte:fragment> -->

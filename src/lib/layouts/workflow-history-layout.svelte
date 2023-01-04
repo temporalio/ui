@@ -1,6 +1,5 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { workflowRun } from '$lib/stores/workflow-run';
   import {
     routeForEventHistory,
     routeForWorkers,
@@ -8,6 +7,7 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { eventViewType } from '$lib/stores/event-view';
   import { eventHistory } from '$lib/stores/events';
+  import type { GetPollersResponse } from '$lib/services/pollers-service';
 
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
@@ -22,73 +22,70 @@
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
 
+  export let workflow: WorkflowExecution;
+  export let workers: GetPollersResponse;
+
   $: workflowEvents =
     getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
 </script>
 
 <section class="flex flex-col gap-4">
   <section class="flex flex-col gap-1">
-    <WorkflowDetail
-      title="Workflow Type"
-      content={$workflowRun.workflow.name}
-    />
-    <WorkflowDetail title="Run ID" content={$workflowRun.workflow.runId} />
+    <WorkflowDetail title="Workflow Type" content={workflow.name} />
+    <WorkflowDetail title="Run ID" content={workflow.runId} />
     <div class="flex flex-col gap-1 md:flex-row md:gap-6">
       <WorkflowDetail
         title="Start Time"
-        content={formatDate($workflowRun.workflow.startTime, $timeFormat)}
+        content={formatDate(workflow.startTime, $timeFormat)}
       />
       <WorkflowDetail
         title="Close Time"
-        content={formatDate($workflowRun.workflow.endTime, $timeFormat)}
+        content={formatDate(workflow.endTime, $timeFormat)}
       />
     </div>
     <WorkflowDetail
       title="Task Queue"
-      content={$workflowRun.workflow.taskQueue}
+      content={workflow.taskQueue}
       href={routeForWorkers({
         namespace: $page.params.namespace,
-        workflow: $workflowRun.workflow.id,
-        run: $workflowRun.workflow.runId,
+        workflow: workflow.id,
+        run: workflow.runId,
       })}
     />
     <WorkflowDetail
       title="State Transitions"
-      content={$workflowRun.workflow.stateTransitionCount}
+      content={workflow.stateTransitionCount}
     />
-    {#if $workflowRun.workflow?.parent}
+    {#if workflow?.parent}
       <div class="gap-2 xl:flex">
         <WorkflowDetail
           title="Parent Workflow ID"
-          content={$workflowRun.workflow.parent?.workflowId}
+          content={workflow.parent?.workflowId}
           href={routeForEventHistory({
             namespace: $page.params.namespace,
-            workflow: $workflowRun.workflow.parent?.workflowId,
-            run: $workflowRun.workflow.parent?.runId,
+            workflow: workflow.parent?.workflowId,
+            run: workflow.parent?.runId,
           })}
         />
         <WorkflowDetail
           title="Parent Run ID"
-          content={$workflowRun.workflow.parent?.runId}
+          content={workflow.parent?.runId}
           href={routeForEventHistory({
             namespace: $page.params.namespace,
-            workflow: $workflowRun.workflow.parent?.workflowId,
-            run: $workflowRun.workflow.parent?.runId,
+            workflow: workflow.parent?.workflowId,
+            run: workflow.parent?.runId,
           })}
         />
       </div>
     {/if}
-    {#if $workflowRun.workflow?.pendingChildren.length}
+    {#if workflow?.pendingChildren.length}
       <ChildWorkflowsTable
-        pendingChildren={$workflowRun.workflow?.pendingChildren}
+        pendingChildren={workflow?.pendingChildren}
         namespace={$page.params.namespace}
       />
     {/if}
   </section>
-  <WorkflowStackTraceError
-    workflow={$workflowRun.workflow}
-    workers={$workflowRun.workers}
-  />
+  <WorkflowStackTraceError {workflow} {workers} />
   <WorkflowTypedError error={workflowEvents.error} />
   <PendingActivities />
   <section class="flex w-full">
@@ -131,8 +128,8 @@
             on:click={() =>
               exportHistory({
                 namespace: $page.params.namespace,
-                workflowId: $workflowRun.workflow.id,
-                runId: $workflowRun.workflow.runId,
+                workflowId: workflow.id,
+                runId: workflow.runId,
               })}>Download</ToggleButton
           >
         </ToggleButtons>
