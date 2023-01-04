@@ -32,9 +32,6 @@ export default {
           $app: path.resolve('./src/lib/svelte-mocks/app'),
         },
       },
-      version: {
-        pollInterval: 10000,
-      },
     },
   },
   optimizeDeps: {
