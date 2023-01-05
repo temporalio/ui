@@ -8,6 +8,27 @@ Temporal UI requires [Temporal v1.16.0](https://github.com/temporalio/temporal/r
 
 ## Trying it out
 
+### Using Temporal CLI
+
+You can install [Temporal CLI][] using [Homebrew][]:
+
+```sh
+brew install temporal
+```
+
+You can start a Temporal server in development using the following command:
+
+```sh
+temporal server start-dev
+```
+
+You can access the UI by visiting `http://localhost:8233`.
+
+[temporal cli]: https://github.com/temporalio/cli
+[homebrew]: https://brew.sh
+
+### Using Docker
+
 After pulling down the lastest version of Temporal's [`docker-compose`](https://github.com/temporalio/docker-compose), you can access the UI by visiting `http://localhost:8080`.
 
 ## Trying it out: Bleeding edge
@@ -20,6 +41,15 @@ Once you have the prerequisites going, run the following:
 pnpm install
 pnpm run build:local
 pnpm run preview:local
+```
+
+### Using Docker
+
+If you're running the development version of the UI and you want to point it at the `docker-compose` version of Temporal, you can run this command:
+
+```
+pnpn run build:docker
+pnpn run preview:docker
 ```
 
 ## Developing
@@ -37,6 +67,14 @@ By default, the application will start up with a version of the UI for the local
 ```bash
 pnpm run dev:local
 pnpm run dev:cloud
+```
+
+### Using Docker
+
+If you want to point the development environment at the `docker-compose` version of Temporal, you can use the following command:
+
+```
+pnpm run dev:docker
 ```
 
 ## Building
@@ -58,28 +96,28 @@ Set these environment variables if you want to change their defaults
 
 | Variable  | Description                                                      | Default               | Stage |
 | --------- | ---------------------------------------------------------------- | --------------------- | ----- |
-| VITE_API  | Temporal HTTP API address. Set to empty `` to use relative paths | http://localhost:8080 | Build |
+| VITE_API  | Temporal HTTP API address. Set to empty `` to use relative paths | http://localhost:8322 | Build |
 | VITE_MODE | Build target                                                     | development           | Build |
 
 ## Developing with Canary
 
-To get a better representation of production data, you can run our UI with the [canary-go](https://github.com/temporalio/canary-go) repo. You will need go installed on your machine.
+To get a better representation of production data, you can run our UI with the [canary-go](https://github.com/temporalio/canary-go) repo. You will need Go installed on your machine.
 
-### canary-go
+### `canary-go`
 
 ```bash
 make bins
 ./temporal-canary start
 ```
 
-### temporal
+### `temporal`
 
 ```bash
 make bins
 TEMPORAL_ENVIRONMENT=development_sqlite make start
 ```
 
-### tctl
+### `tctl`
 
 ```bash
 make build
@@ -99,7 +137,7 @@ make build
 To view the search attributes code:
 https://github.com/temporalio/docker-builds/blob/main/docker/auto-setup.sh#L297
 
-### ui-server
+### `ui-server`
 
 ```bash
 make build-server
