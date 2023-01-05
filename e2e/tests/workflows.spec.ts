@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => {
 
 test.describe("Workflows list", () => {
   test("should render decoded Payloads", async ({ page }) => {
-    await page.getByText("e2e-workflow-1").first().click();
+    await page.getByText("e2e-workflow-1").click();
 
     var region: Locator
     var toggle: Locator
@@ -51,5 +51,22 @@ test.describe("Workflows list", () => {
     await toggle.click();
     await expect(region.getByText('"Received Plain text input 1"')).toBeVisible();
     await toggle.click();
+  });
+
+  test("should render decoded stack trace", async ({ page }) => {
+    await page.getByText("e2e-workflow-2").click();
+
+    await page.getByText("Stack Trace").click();
+
+    await expect(page.getByRole('code', { text: 'github.com/temporalio/ui/e2e.Workflow' })).toBeVisible();
+  });
+
+  test("should render decoded query results", async ({ page }) => {
+    await page.getByText("e2e-workflow-2").click();
+
+    await page.getByText("Queries").click();
+    await page.getByLabel("Query Type").selectOption("current_result");
+
+    await expect(page.getByRole('code', { text: '"Received Plain text input 2"' })).toBeVisible();
   });
 });
