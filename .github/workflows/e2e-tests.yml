@@ -18,7 +18,7 @@ jobs:
           ref: main
       - uses: actions/setup-go@v3
         with:
-          go-version-file: "go.mod"
+          go-version-file: 'go.mod'
       - uses: actions/setup-node@v1
         with:
           node-version: 16
