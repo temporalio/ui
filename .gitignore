@@ -10,3 +10,4 @@ node_modules
 /.vercel_build_output
 /.vercel
 /.histoire/*
+/build-local

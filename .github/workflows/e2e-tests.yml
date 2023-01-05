@@ -1,0 +1,53 @@
+name: End To End Integration Tests
+
+on:
+  push:
+    # branches: [main]
+    branches: [rh-integration]
+  # pull_request:
+  #   branches: [rh-integration]
+
+jobs:
+  e2e-integration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Server
+        uses: actions/checkout@v2
+        with:
+          repository: temporalio/ui-server
+          ref: main
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: "go.mod"
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 16
+      - uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7
+      - name: Checkout UI
+        uses: actions/checkout@v2
+        with:
+          path: ui
+      - name: Re-build UI
+        run: |
+          make install-ui build-ui
+      - name: Checkout CLI
+        uses: actions/checkout@v2
+        with:
+          repository: temporalio/cli
+          path: cli
+      - name: Build CLI
+        run: |
+          cd cli && go mod edit -replace github.com/temporalio/ui-server/v2=../ && go build -o ../temporal-cli ./cmd/temporal
+      - name: Run Playwright Tests
+        run: |
+          ./temporal-cli server start-dev --ui-codec-endpoint http://localhost:8234 &
+          cd ui/e2e
+          go run worker/main.go &
+          go run starter/main.go
+          go run ./codec-server -port 8234 -web http://localhost:8233 &
+          export E2E_UI_ADDRESS=http://localhost:8233
+          pnpm install
+          npx playwright install chromium --with-deps
+          npx playwright test
