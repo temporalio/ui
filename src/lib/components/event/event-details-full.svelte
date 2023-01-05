@@ -19,6 +19,7 @@
   $: activePill = Object.keys(attributeGrouping).find(
     (key) => attributeGrouping[key].length,
   );
+  $: eventDetails = Object.entries(attributes);
 
   const handlePillChange = (event: CustomEvent) => {
     activePill = event.detail.key;
@@ -40,7 +41,7 @@
         {activePill}
         on:pillChange={handlePillChange}
       />
-      {#each Object.entries(attributes) as [key, value] (key)}
+      {#each eventDetails as [key, value] (key)}
         {#if attributeGrouping[activePill]?.includes(key)}
           <EventDetailsRowExpanded {key} {value} {attributes} class="w-full" />
         {/if}
@@ -54,7 +55,7 @@
       {activePill}
       on:pillChange={handlePillChange}
     />
-    {#each Object.entries(attributes) as [key, value] (key)}
+    {#each eventDetails as [key, value] (key)}
       {#if attributeGrouping[activePill]?.includes(key)}
         <EventDetailsRowExpanded {key} {value} {attributes} class="w-full" />
       {/if}

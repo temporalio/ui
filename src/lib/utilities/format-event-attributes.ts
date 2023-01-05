@@ -191,7 +191,7 @@ export const attributeGroups = (
     }
   });
 
-  for (const key of Object.keys(attributes)) {
+  for (const key in attributes) {
     const attributeGroup = attributeGroupings.find((group) =>
       key.includes(group),
     );
