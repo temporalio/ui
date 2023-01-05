@@ -94,7 +94,7 @@
   />
   <WorkflowTypedError error={workflowEvents.error} />
   <PendingActivities />
-  <section class="flex w-full">
+  <section class="flex w-full" data-cy="inputs-results">
     <Accordion title="Input and Results" icon="json" class="border-gray-900">
       <div class="flex gap-2">
         <InputAndResults type="input" content={workflowEvents.input} />
