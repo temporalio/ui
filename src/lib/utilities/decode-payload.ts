@@ -33,6 +33,10 @@ export function decodePayload(
   // This could decode to any object. So we either use the payload object passed in or decode it
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Payload | Record<any, any> | string {
+  if (payload == null) {
+    return payload;
+  }
+
   const encoding = atob(String(payload?.metadata?.encoding ?? ''));
 
   // Help users out with an english encoding
