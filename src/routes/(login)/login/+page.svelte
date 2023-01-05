@@ -10,7 +10,6 @@
   import Button from '$lib/holocene/button.svelte';
   import { routeForAuthentication } from '$lib/utilities/route-for';
 
-  export const ssr = false;
   export let data: PageData;
 
   let { settings } = data;

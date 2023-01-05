@@ -3,6 +3,8 @@ import { fetchSettings } from '$lib/services/settings-service';
 
 import type { PageLoad } from './$types';
 
+export const ssr = false;
+
 export const load: PageLoad = async function ({ fetch }) {
   const settings: Settings = await fetchSettings(fetch);
 
