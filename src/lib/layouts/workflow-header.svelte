@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Badge from '$holocene/badge.svelte';
   import Icon from '$holocene/icon/icon.svelte';
   import { onDestroy, onMount } from 'svelte';
   import { fly } from 'svelte/transition';
@@ -147,7 +148,6 @@
         href={routeForEventHistory({
           ...routeParameters,
         })}
-        amount={$eventHistory.total}
         dataCy="history-tab"
         active={pathMatches(
           $page.url.pathname,
@@ -155,27 +155,33 @@
             ...routeParameters,
           }),
         )}
-      />
+      >
+        <Badge type="blue" class="px-2 py-0">{$eventHistory.total}</Badge>
+      </Tab>
       <Tab
         label="Workers"
         href={routeForWorkers(routeParameters)}
-        amount={workers?.pollers?.length}
         dataCy="workers-tab"
         active={pathMatches(
           $page.url.pathname,
           routeForWorkers(routeParameters),
         )}
-      />
+      >
+        <Badge type="blue" class="px-2 py-0">{workers?.pollers?.length}</Badge>
+      </Tab>
       <Tab
         label="Pending Activities"
         href={routeForPendingActivities(routeParameters)}
-        amount={workflow.pendingActivities?.length}
         dataCy="pending-activities-tab"
         active={pathMatches(
           $page.url.pathname,
           routeForPendingActivities(routeParameters),
         )}
-      />
+      >
+        <Badge type="blue" class="px-2 py-0">
+          {workflow.pendingActivities?.length}
+        </Badge>
+      </Tab>
       <Tab
         label="Stack Trace"
         href={routeForStackTrace(routeParameters)}
