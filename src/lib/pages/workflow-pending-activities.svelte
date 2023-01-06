@@ -6,6 +6,8 @@
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
+  import Table from '$lib/holocene/table/table.svelte';
+  import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import { formatDate } from '$lib/utilities/format-date';
   import { getDuration, formatDuration } from '$lib/utilities/format-time';
   import {
@@ -20,18 +22,23 @@
 </script>
 
 {#if pendingActivities.length}
-  <section class="event-table">
-    <header class="event-table-header">
-      <h2>Activity Id</h2>
-      <h2>Details</h2>
-    </header>
+  <Table class="mb-6 w-full min-w-[600px] table-fixed">
+    <TableHeaderRow slot="headers">
+      <th class="table-cell w-44"><h2>Activity Id</h2></th>
+      <th class="table-cell w-auto"><h2>Details</h2></th>
+    </TableHeaderRow>
     {#each pendingActivities as { id, activityId, ...details } (id)}
       {@const failed = details.attempt > 1}
-      <div class="event-table-body">
-        <div class="flex w-24 items-start break-all py-5 pl-5 pr-2">
-          <Link href="#{id}">{activityId}</Link>
-        </div>
-        <div class="w-full py-4 px-5">
+      <tr class="event-table-body">
+        <td />
+        <td
+          class="table-cell w-44 items-start break-all py-5 pl-5 pr-2 align-top"
+        >
+          <div class="pt-1">
+            <Link href="#{id}">{activityId}</Link>
+          </div>
+        </td>
+        <td class="table-cell py-4 px-5">
           <div class="event-table-row">
             <h2 class="font-semibold">Activity Type</h2>
             <Badge type={failed ? 'error' : 'default'}>
@@ -129,25 +136,22 @@
               <p>{details.lastWorkerIdentity}</p>
             </div>
           {/if}
-        </div>
-      </div>
+        </td>
+        <td />
+      </tr>
     {/each}
-  </section>
+  </Table>
 {:else}
   <EmptyState title="No Pending Activities" />
 {/if}
 
 <style lang="postcss">
-  .event-table {
-    @apply mb-6 w-full table-fixed xl:table;
-  }
-
   .event-table-header {
     @apply grid grid-cols-2 rounded-t-lg border-2 border-gray-300 bg-gray-900 p-3 text-white;
   }
 
   .event-table-body {
-    @apply flex w-full flex-row border-2 border-t-0 border-gray-300;
+    @apply table-row w-full border-2 border-t-0 border-gray-300;
   }
 
   .event-table-row {
