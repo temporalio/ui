@@ -50,6 +50,9 @@
   const query = toListWorkflowQuery(parameters);
 
   $: isRunning = $workflowRun?.workflow?.isRunning;
+  $: activitiesCanceled = ['Terminated', 'TimedOut', 'Canceled'].includes(
+    $workflowRun.workflow.status,
+  );
 
   onMount(() => {
     if (isRunning && $autoRefreshWorkflow === 'on') {
@@ -178,7 +181,13 @@
           routeForPendingActivities(routeParameters),
         )}
       >
-        <Badge type="blue" class="px-2 py-0">
+        <Badge type={activitiesCanceled ? 'warning' : 'blue'} class="px-2 py-0">
+          {#if activitiesCanceled}<Icon
+              name="canceled"
+              width={20}
+              height={20}
+            />
+          {/if}
           {workflow.pendingActivities?.length}
         </Badge>
       </Tab>

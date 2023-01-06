@@ -9,6 +9,7 @@
   import Icon from '$holocene/icon/icon.svelte';
   import Badge from '$holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
   import {
     formatAttemptsLeft,
     formatRetryExpiration,
@@ -22,11 +23,22 @@
     workflow: $page.params.workflow,
     run: $page.params.run,
   });
+
+  $: canceled = ['Terminated', 'TimedOut', 'Canceled'].includes(
+    $workflowRun.workflow.status,
+  );
 </script>
 
 {#if pendingActivities.length}
   <section class="rounded-lg border-2 border-gray-300 p-4">
-    <h3 class="mb-2 text-lg font-medium">Pending Activities</h3>
+    <h3 class="mb-2 flex gap-2 text-lg font-medium">
+      Pending Activities
+      {#if canceled}
+        <Tooltip bottom text="Pending activities have been canceled.">
+          <Badge type="warning" class="py-0"><Icon name="canceled" /></Badge>
+        </Tooltip>
+      {/if}
+    </h3>
     <section>
       {#each pendingActivities as { id, ...pendingActivity } (id)}
         {@const failed = pendingActivity.attempt > 1}
