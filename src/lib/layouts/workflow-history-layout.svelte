@@ -21,6 +21,10 @@
   import { exportHistory } from '$lib/utilities/export-history';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
+  import Button from '$lib/holocene/button.svelte';
+  import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
+
+  let showShortcuts = false;
 
   $: workflowEvents =
     getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
@@ -140,4 +144,10 @@
     </nav>
     <slot />
   </section>
+  <EventShortcutKeys
+    open={showShortcuts}
+    compact={$eventViewType === 'compact'}
+    onOpen={() => (showShortcuts = true)}
+    onClose={() => (showShortcuts = false)}
+  />
 </section>
