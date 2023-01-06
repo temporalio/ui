@@ -10,10 +10,8 @@
   import ApiPagination from '$lib/holocene/api-pagination.svelte';
   import { groupEvents } from '$lib/models/event-groups';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  import EventShortcutKeys from './event-shortcut-keys.svelte';
 
   export let compact = false;
-  let showShortcuts = false;
 
   function handleExpandChange(event: CustomEvent) {
     $expandAllEvents = event.detail.expanded;
@@ -47,17 +45,11 @@
     }
   };
 
-  const onSpace = (event: KeyboardEvent) => {
-    event.preventDefault();
-    showShortcuts = !showShortcuts;
-  };
-
   const getEvents = (items: CommonHistoryEvent[]): IterableEvent[] => {
     return compact ? groupEvents(items) : items;
   };
 </script>
 
-<EventShortcutKeys open={showShortcuts} {compact} />
 {#key [$eventFilterSort, category, $refresh]}
   <ApiPagination
     let:visibleItems
@@ -68,7 +60,6 @@
     pageSizeOptions={[]}
     {onShiftUp}
     {onShiftDown}
-    {onSpace}
     {total}
   >
     <EventSummaryTable {updating} {compact} on:expandAll={handleExpandChange}>
