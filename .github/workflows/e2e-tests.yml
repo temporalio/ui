@@ -11,39 +11,35 @@ jobs:
   e2e-integration:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Server
+      - name: Checkout UI
         uses: actions/checkout@v2
-        with:
-          repository: temporalio/ui-server
-          ref: main
       - uses: actions/setup-go@v3
         with:
-          go-version-file: 'go.mod'
+          go-version-file: e2e/go.mod
+          cache: true
+          cache-dependency-path: e2e/go.sum
       - uses: actions/setup-node@v1
         with:
           node-version: 16
       - uses: pnpm/action-setup@v2.2.2
         with:
           version: 7
-      - name: Checkout UI
-        uses: actions/checkout@v2
-        with:
-          path: ui
-      - name: Re-build UI
-        run: |
-          make install-ui build-ui
       - name: Checkout CLI
         uses: actions/checkout@v2
         with:
           repository: temporalio/cli
           path: cli
-      - name: Build CLI
+      - name: Install CLI
         run: |
-          cd cli && go mod edit -replace github.com/temporalio/ui-server/v2=../ && go build -o ../temporal-cli ./cmd/temporal
+          cd cli && go install ./cmd/temporal
+      - name: Build UI
+        run: |
+          pnpm install
+          VITE_API="" pnpm build:local
       - name: Run Playwright Tests
         run: |
-          ./temporal-cli server start-dev --ui-codec-endpoint http://localhost:8234 &
-          cd ui/e2e
+          temporal server start-dev --ui-asset-path ./.vercel/output/static/ --ui-codec-endpoint http://localhost:8234 &
+          cd e2e
           go run worker/main.go &
           go run starter/main.go
           go run ./codec-server -port 8234 -web http://localhost:8233 &
