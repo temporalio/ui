@@ -1,6 +1,6 @@
 import { test, expect, Locator } from '@playwright/test';
 
-const address = process.env.E2E_UI_ADDRESS ?? '';
+const address = process.env.E2E_UI_ADDRESS ?? 'http://localhost:8233';
 
 test.beforeEach(async ({ page }) => {
   await page.goto(address);
