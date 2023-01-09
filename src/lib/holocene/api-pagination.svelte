@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { page } from '$app/stores';
   import Alert from '$lib/holocene/alert.svelte';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
@@ -30,9 +31,20 @@
     if (error) error = undefined;
   }
 
+  $: isEmpty = $store.visibleItems.length === 0 && !$store.loading;
+  $: pageSizeChange =
+    !$store.loading && $store.pageSize !== $store.previousPageSize;
+
   onMount(() => {
     initalDataFetch();
   });
+
+  $: {
+    if (pageSizeChange) {
+      store.resetPageSize($store.pageSize);
+      initalDataFetch();
+    }
+  }
 
   async function initalDataFetch() {
     const fetchData: PaginatedRequest = await onFetch();
@@ -175,6 +187,8 @@
   </div>
   {#if $store.loading}
     <SkeletonTable rows={15} />
+  {:else if isEmpty}
+    <slot name="empty">No Items</slot>
   {:else}
     <slot
       updating={$store.updating}

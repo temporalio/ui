@@ -15,7 +15,7 @@ type PaginationMethods = {
   previousPage: () => void;
   setUpdating: () => void;
   reset: () => void;
-  resetPageSize: () => void;
+  resetPageSize: (pageSize: number) => void;
   nextRow: () => void;
   previousRow: () => void;
   setActiveIndex: (activeIndex: number) => void;
@@ -28,6 +28,7 @@ type PaginationItems = {
   hasNext: boolean;
   hasPrevious: boolean;
   index: number;
+  previousPageSize: number;
   pageSize: number;
   indexData: Record<
     number,
@@ -47,6 +48,7 @@ const defaultStore: PaginationItems = {
   hasNext: false,
   hasPrevious: false,
   index: 0,
+  previousPageSize: defaultItemsPerPage,
   pageSize: defaultItemsPerPage,
   indexData: {},
   visibleItems: [],
@@ -72,6 +74,7 @@ export function createPaginationStore(
   const initialPageSize = getInitialPageSize(pageSizeOptions);
   const paginationStore = writable({
     ...defaultStore,
+    previousPageSize: initialPageSize,
     pageSize: initialPageSize,
   });
   const { set, update } = paginationStore;
@@ -197,12 +200,15 @@ export function createPaginationStore(
     return { ..._store, activeIndex };
   };
 
-  const resetPageSize = (_store: PaginationItems) => {
+  const resetPageSize = (_store: PaginationItems, pageSize) => {
     return {
       ..._store,
+      pageSize,
+      previousPageSize: pageSize,
       index: 0,
       indexData: {},
-      updating: true,
+      loading: true,
+      updating: false,
     };
   };
 
@@ -214,7 +220,8 @@ export function createPaginationStore(
     previousPage: () => update((store) => setPreviousPage(store)),
     setUpdating: () => update((store) => ({ ...store, updating: true })),
     reset: () => set(defaultStore),
-    resetPageSize: () => update((store) => resetPageSize(store)),
+    resetPageSize: (pageSize) =>
+      update((store) => resetPageSize(store, pageSize)),
     nextRow: () => update((store) => setNextRow(store)),
     previousRow: () => update((store) => setPreviousRow(store)),
     setActiveIndex: (activeIndex: number) =>

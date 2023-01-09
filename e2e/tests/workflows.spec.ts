@@ -67,7 +67,9 @@ test.describe('Workflows list', () => {
     await page.getByText('Stack Trace').click();
 
     await expect(
-      page.getByRole('code').filter({ hasText: 'github.com/temporalio/ui/e2e.Workflow' }),
+      page
+        .getByRole('code')
+        .filter({ hasText: 'github.com/temporalio/ui/e2e.Workflow' }),
     ).toBeVisible();
   });
 
@@ -78,7 +80,9 @@ test.describe('Workflows list', () => {
     await page.getByLabel('Query Type').selectOption('current_result');
 
     await expect(
-      page.getByRole('code').filter({ hasText: '"Received Plain text input 2"' }),
+      page
+        .getByRole('code')
+        .filter({ hasText: '"Received Plain text input 2"' }),
     ).toBeVisible();
   });
 });
