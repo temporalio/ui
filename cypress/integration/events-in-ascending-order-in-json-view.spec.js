@@ -50,7 +50,6 @@ describe('Fallback to Ascending Ordering of Event History on Older Versions of T
     cy.wait('@workflow-api');
     cy.wait('@event-history-start');
     cy.wait('@event-history-end');
-    cy.wait('@event-history-descending');
 
     cy.get('[data-cy="json"]').click();
 
