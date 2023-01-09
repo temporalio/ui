@@ -1,6 +1,6 @@
 <script lang="ts">
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
-  import Icon from '$holocene/icon/icon.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
   import { createEventDispatcher } from 'svelte';
 

@@ -7,7 +7,7 @@
 </script>
 
 <script lang="ts">
-  import Icon from '$holocene/icon/icon.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import type { SvelteComponent } from 'svelte';
   import type { DescribeNamespaceResponse as Namespace } from '$types';
 

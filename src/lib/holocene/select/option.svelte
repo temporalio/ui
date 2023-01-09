@@ -13,8 +13,8 @@
 
 <script lang="ts">
   import { getContext } from 'svelte';
-  import Icon from '$holocene/icon/icon.svelte';
-  import MenuItem from '$holocene/primitives/menu/menu-item.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import type { Writable } from 'svelte/store';
   import type { SelectContext } from './select.svelte';
 

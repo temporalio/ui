@@ -3,7 +3,7 @@
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import Loading from '$holocene/loading.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import SchedulesCalendarView from '$lib/components/schedule/schedules-calendar-view.svelte';
   import type { Schedule } from '$types';

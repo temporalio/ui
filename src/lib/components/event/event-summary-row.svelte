@@ -1,7 +1,7 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
 
-  import Icon from '$holocene/icon/icon.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
   import { eventSortOrder, eventShowElapsed } from '$lib/stores/event-view';
   import { timeFormat } from '$lib/stores/time-format';

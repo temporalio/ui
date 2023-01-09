@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from '$holocene/icon/icon.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
   import { dataEncoder } from '$lib/stores/data-encoder';
   import { showDataEncoderSettings } from '$lib/stores/show-data-encoder';
