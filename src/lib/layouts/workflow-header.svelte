@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Badge from '$holocene/badge.svelte';
-  import Icon from '$holocene/icon/icon.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import { onDestroy, onMount } from 'svelte';
   import { fly } from 'svelte/transition';
 

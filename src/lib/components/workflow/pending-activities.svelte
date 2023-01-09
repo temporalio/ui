@@ -6,8 +6,8 @@
   import { getDuration, formatDuration } from '$lib/utilities/format-time';
   import { routeForPendingActivities } from '$lib/utilities/route-for';
   import Link from '$lib/holocene/link.svelte';
-  import Icon from '$holocene/icon/icon.svelte';
-  import Badge from '$holocene/badge.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import {

@@ -11,7 +11,7 @@ type UpdateQueryParams = {
   invalidate?: typeof invalidate;
 };
 
-const gotoOptions = {
+export const gotoOptions = {
   replaceState: true,
   keepFocus: true,
   noScroll: true,
@@ -39,9 +39,4 @@ export const updateQueryParameters = async ({
   }
 
   return value;
-};
-
-export const addHashToURL = (url: URL): string => {
-  url.hash = '#';
-  return String(url);
 };

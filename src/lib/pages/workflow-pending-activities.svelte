@@ -1,8 +1,8 @@
 <script lang="ts">
   import { workflowRun } from '$lib/stores/workflow-run';
 
-  import Icon from '$holocene/icon/icon.svelte';
-  import Badge from '$holocene/badge.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Link from '$lib/holocene/link.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';

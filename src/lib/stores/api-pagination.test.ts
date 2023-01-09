@@ -26,6 +26,7 @@ describe('createPaginationStore with default pageSizeOptions', () => {
       activeIndex,
       indexData,
       pageSize,
+      previousPageSize,
       hasNext,
       hasPrevious,
     } = get(store);
@@ -39,6 +40,7 @@ describe('createPaginationStore with default pageSizeOptions', () => {
     expect(indexEnd).toBe(0);
     expect(indexData).toStrictEqual({});
     expect(pageSize).toBe(100);
+    expect(previousPageSize).toBe(100);
     expect(activeIndex).toBe(0);
     expect(hasPrevious).toBe(false);
     expect(hasNext).toBe(false);
@@ -432,6 +434,7 @@ describe('createPaginationStore with default pageSizeOptions', () => {
       activeIndex,
       indexData,
       pageSize,
+      previousPageSize,
       hasNext,
       hasPrevious,
     } = get(store);
@@ -445,23 +448,11 @@ describe('createPaginationStore with default pageSizeOptions', () => {
     expect(indexEnd).toBe(0);
     expect(indexData).toStrictEqual({});
     expect(pageSize).toBe(100);
+    expect(previousPageSize).toBe(100);
     expect(activeIndex).toBe(0);
     expect(hasPrevious).toBe(false);
     expect(hasNext).toBe(false);
   });
-
-  // it('should set hasNext to false and not update items if next page has no items', () => {
-  //   store.setNextPageToken('token1', items);
-
-  //   const { hasNext: initialHasNext } = get(store);
-  //   expect(initialHasNext).toBe(true);
-
-  //   store.setNextPageToken('', []);
-
-  //   const { hasNext, items: storeItems } = get(store);
-  //   expect(hasNext).toBe(false);
-  //   expect(storeItems).toEqual(items);
-  // });
 });
 
 describe('createPaginationStore with custom pageSizeOptions', () => {
@@ -483,6 +474,27 @@ describe('createPaginationStore with custom pageSizeOptions', () => {
     expect(pageSize).toBe(100);
   });
 
+  it('should set correct getInitialPageSize with defaultPageSize', () => {
+    const options = [10, 25, 50];
+    const defaultPageSize = 25;
+    const pageSize = getInitialPageSize(options, defaultPageSize);
+    expect(pageSize).toBe(25);
+  });
+
+  it('should set correct getInitialPageSize with defaultPageSize that does not match options', () => {
+    const options = [10, 25, 50];
+    const defaultPageSize = 20;
+    const pageSize = getInitialPageSize(options, defaultPageSize);
+    expect(pageSize).toBe(20);
+  });
+
+  it('should set fallback getInitialPageSize with bad defaultPageSize', () => {
+    const options = [10, 25, 50];
+    const defaultPageSize = 'cats';
+    const pageSize = getInitialPageSize(options, defaultPageSize);
+    expect(pageSize).toBe(10);
+  });
+
   it('should set default values', () => {
     const store = createPaginationStore(['10', '20', '50']);
 
@@ -496,6 +508,7 @@ describe('createPaginationStore with custom pageSizeOptions', () => {
       indexEnd,
       indexData,
       pageSize,
+      previousPageSize,
       activeIndex,
       hasNext,
       hasPrevious,
@@ -510,6 +523,42 @@ describe('createPaginationStore with custom pageSizeOptions', () => {
     expect(indexEnd).toBe(0);
     expect(indexData).toStrictEqual({});
     expect(pageSize).toBe(10);
+    expect(previousPageSize).toBe(10);
+    expect(activeIndex).toBe(0);
+    expect(hasPrevious).toBe(false);
+    expect(hasNext).toBe(false);
+  });
+
+  it('should resetPageSize', () => {
+    const store = createPaginationStore(['10', '20', '50']);
+    store.resetPageSize(50);
+
+    const {
+      key,
+      loading,
+      updating,
+      index,
+      hasNextIndexData,
+      indexStart,
+      indexEnd,
+      indexData,
+      pageSize,
+      previousPageSize,
+      activeIndex,
+      hasNext,
+      hasPrevious,
+    } = get(store);
+
+    expect(key).toBe('per-page');
+    expect(loading).toBe(true);
+    expect(updating).toBe(false);
+    expect(index).toBe(0);
+    expect(hasNextIndexData).toBe(false);
+    expect(indexStart).toBe(0);
+    expect(indexEnd).toBe(0);
+    expect(indexData).toStrictEqual({});
+    expect(pageSize).toBe(50);
+    expect(previousPageSize).toBe(50);
     expect(activeIndex).toBe(0);
     expect(hasPrevious).toBe(false);
     expect(hasNext).toBe(false);

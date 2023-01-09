@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import Icon from '$holocene/icon/icon.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import {
     routeForScheduleEdit,
     routeForSchedules,
@@ -26,9 +26,9 @@
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import ScheduleError from '$lib/components/schedule/schedule-error.svelte';
   import ScheduleFrequencyPanel from '$lib/components/schedule/schedule-frequency-panel.svelte';
-  import Modal from '$holocene/modal.svelte';
-  import SplitButton from '$holocene/split-button.svelte';
-  import Loading from '$holocene/loading.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
+  import SplitButton from '$lib/holocene/split-button.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
   import type { DescribeScheduleResponse } from '$types';
   import { coreUserStore } from '$lib/stores/core-user';
 

@@ -9,7 +9,7 @@
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import FilterOrCopyButtons from '$holocene/filter-or-copy-buttons.svelte';
+  import FilterOrCopyButtons from '$lib/holocene/filter-or-copy-buttons.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
 
   export let namespace: string;

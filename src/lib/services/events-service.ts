@@ -4,7 +4,6 @@ import { routeForApi } from '$lib/utilities/route-for-api';
 import { toEventHistory } from '$lib/models/event-history';
 import { isSortOrder } from '$lib/utilities/is';
 
-import { supportsReverseOrder } from '$lib/stores/event-view';
 import type { EventSortOrder } from '$lib/stores/event-view';
 
 export type FetchEventsParameters = NamespaceScopedRequest &
