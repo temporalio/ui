@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Icon from '$holocene/icon/icon.svelte';
-  import Badge from '$holocene/badge.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
   import type { IconName } from './icon/paths';
   import type { HoloceneComponentProps } from 'src/types/holocene';
   import { v4 } from 'uuid';

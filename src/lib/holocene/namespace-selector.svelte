@@ -1,8 +1,8 @@
 <script lang="ts">
   import { namespaceSelectorOpen } from '$lib/stores/nav-open';
   import { viewFeature } from '$lib/stores/new-feature-tags';
-  import Icon from '$holocene/icon/icon.svelte';
-  import Tooltip from '$holocene/tooltip.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
 
   function toggleNamespaceSelector() {
     $namespaceSelectorOpen = !$namespaceSelectorOpen;

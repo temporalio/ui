@@ -1,6 +1,6 @@
 <script lang="ts">
   import DropdownMenu from '$lib/holocene/dropdown-menu.svelte';
-  import Icon from '$holocene/icon/icon.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import type { Hst as HST } from '@histoire/plugin-svelte';
 

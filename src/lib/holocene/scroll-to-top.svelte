@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Button from '$holocene/button.svelte';
+  import Button from '$lib/holocene/button.svelte';
 
   export let showOn = 150; // pixels
   export let scrollToContainer = false;
