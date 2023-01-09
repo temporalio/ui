@@ -22,9 +22,9 @@
   import WorkflowsSummaryRowWithFilters from '$lib/components/workflow/workflows-summary-row-with-filters.svelte';
   import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$holocene/icon/icon.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
-  import TableRow from '$holocene/table/table-row.svelte';
+  import TableRow from '$lib/holocene/table/table-row.svelte';
   import WorkflowDateTimeFilter from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import {

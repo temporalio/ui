@@ -1,7 +1,7 @@
 <script lang="ts">
   import Header from './_import-header.svelte';
   import { ErrorBoundary } from '$lib/holocene/error-boundary';
-  import Toaster from '$holocene/toaster.svelte';
+  import Toaster from '$lib/holocene/toaster.svelte';
   import { toaster } from '$lib/stores/toaster';
 </script>
 

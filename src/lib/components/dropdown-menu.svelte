@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte';
   import { scale } from 'svelte/transition';
-  import IconButton from '$holocene/icon-button.svelte';
+  import IconButton from '$lib/holocene/icon-button.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { noop } from 'svelte/internal';

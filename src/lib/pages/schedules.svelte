@@ -1,9 +1,9 @@
 <script lang="ts">
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Pagination from '$holocene/pagination.svelte';
-  import Button from '$holocene/button.svelte';
-  import Badge from '$holocene/badge.svelte';
-  import Loading from '$holocene/loading.svelte';
+  import Pagination from '$lib/holocene/pagination.svelte';
+  import Button from '$lib/holocene/button.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
 
   import { noop } from 'svelte/internal';
   import Input from '$lib/holocene/input/input.svelte';

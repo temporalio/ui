@@ -3,7 +3,7 @@
   import { capitalize } from '$lib/utilities/format-camel-case';
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Loading from '$holocene/loading.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
 
   export let type: 'input' | 'results';
   export let content: string;
