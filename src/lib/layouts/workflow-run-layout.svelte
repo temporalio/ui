@@ -9,6 +9,7 @@
   import { onDestroy, onMount } from 'svelte';
   import { type EventSortOrder, eventFilterSort } from '$lib/stores/event-view';
 
+  export let terminateEnabled: boolean = false;
   export let cancelEnabled: boolean = false;
   export let signalEnabled: boolean = false;
 
@@ -30,6 +31,7 @@
       namespace={$page.params.namespace}
       workflow={$workflowRun.workflow}
       workers={$workflowRun.workers}
+      {terminateEnabled}
       {cancelEnabled}
       {signalEnabled}
     />

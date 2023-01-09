@@ -1,5 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  import { settings } from '$lib/stores/settings';
 
   import WorkflowWorkers from '$lib/pages/workflow-workers.svelte';
 
@@ -7,10 +8,13 @@
   import WorkflowRunLayout from '$lib/layouts/workflow-run-layout.svelte';
 
   const workflow = $page.params.workflow;
-  $: isCloud = $page.data?.settings?.runtimeEnvironment?.isCloud;
 </script>
 
 <PageTitle title={`Workers | ${workflow}`} url={$page.url.href} />
-<WorkflowRunLayout cancelEnabled={!isCloud} signalEnabled={!isCloud}>
+<WorkflowRunLayout
+  cancelEnabled={!$settings.workflowCancelDisabled}
+  signalEnabled={!$settings.workflowSignalDisabled}
+  terminateEnabled={!$settings.workflowTerminateDisabled}
+>
   <WorkflowWorkers />
 </WorkflowRunLayout>

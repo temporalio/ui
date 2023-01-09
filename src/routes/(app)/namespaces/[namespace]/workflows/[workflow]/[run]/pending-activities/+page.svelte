@@ -1,5 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  import { settings } from '$lib/stores/settings';
 
   import WorkflowPendingActivities from '$lib/pages/workflow-pending-activities.svelte';
 
@@ -7,10 +8,13 @@
   import PageTitle from '$lib/components/page-title.svelte';
 
   const workflow = $page.params.workflow;
-  $: isCloud = $page.data?.settings?.runtimeEnvironment?.isCloud;
 </script>
 
 <PageTitle title={`Pending Activities | ${workflow}`} url={$page.url.href} />
-<WorkflowRunLayout cancelEnabled={!isCloud} signalEnabled={!isCloud}>
+<WorkflowRunLayout
+  cancelEnabled={!$settings.workflowCancelDisabled}
+  signalEnabled={!$settings.workflowSignalDisabled}
+  terminateEnabled={!$settings.workflowTerminateDisabled}
+>
   <WorkflowPendingActivities />
 </WorkflowRunLayout>

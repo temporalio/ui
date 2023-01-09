@@ -161,6 +161,10 @@ export type SettingsResponse = {
   Codec: { Endpoint: string; PassAccessToken?: boolean };
   DefaultNamespace: string;
   DisableWriteActions: boolean;
+  WorkflowTerminateDisabled: boolean;
+  WorkflowCancelDisabled: boolean;
+  WorkflowSignalDisabled: boolean;
+  WorkflowResetDisabled: boolean;
   ShowTemporalSystemNamespace: boolean;
   NotifyOnNewVersion: boolean;
   FeedbackURL: string;

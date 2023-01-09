@@ -28,6 +28,10 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     },
     defaultNamespace: settingsResponse?.DefaultNamespace || 'default', // API returns an empty string if default namespace is not configured
     disableWriteActions: !!settingsResponse?.DisableWriteActions || false,
+    workflowTerminateDisabled: !!settingsResponse?.WorkflowTerminateDisabled,
+    workflowCancelDisabled: !!settingsResponse?.WorkflowCancelDisabled,
+    workflowSignalDisabled: !!settingsResponse?.WorkflowSignalDisabled,
+    workflowResetDisabled: !!settingsResponse?.WorkflowResetDisabled,
     showTemporalSystemNamespace: settingsResponse?.ShowTemporalSystemNamespace,
     notifyOnNewVersion: settingsResponse?.NotifyOnNewVersion,
     feedbackURL: settingsResponse?.FeedbackURL,
