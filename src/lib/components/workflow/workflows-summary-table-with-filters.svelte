@@ -23,6 +23,7 @@
 
   export let bulkActionsEnabled: boolean = false;
   export let cancelEnabled: boolean = false;
+  export let terminateEnabled: boolean = false;
   export let updating: boolean = false;
   export let visibleWorkflows: WorkflowExecution[];
   export let selectedWorkflowsCount: number;
@@ -124,12 +125,14 @@
                 >Request Cancellation</BulkActionButton
               >
             {/if}
-            <BulkActionButton
-              variant="destructive"
-              dataCy="bulk-terminate-button"
-              disabled={namespaceWriteDisabled}
-              on:click={handleBulkTerminate}>Terminate</BulkActionButton
-            >
+            {#if terminateEnabled}
+              <BulkActionButton
+                variant="destructive"
+                dataCy="bulk-terminate-button"
+                disabled={namespaceWriteDisabled}
+                on:click={handleBulkTerminate}>Terminate</BulkActionButton
+              >
+            {/if}
           </div>
         </th>
         <th class="table-cell md:w-auto" />
