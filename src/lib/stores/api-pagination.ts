@@ -60,18 +60,32 @@ const defaultStore: PaginationItems = {
 
 export type PaginationStore = PaginationMethods & Readable<PaginationItems>;
 
-export const getInitialPageSize = (options: string[]) => {
+const setFirstOption = (options: string[] | number[]) => {
   const defaultOption = options[0];
   if (!defaultOption) return defaultItemsPerPage;
-  const optionAsInt = parseInt(defaultOption);
+  const optionAsInt = parseInt(defaultOption.toString());
   if (isNaN(optionAsInt)) return defaultItemsPerPage;
   return optionAsInt;
 };
 
+export const getInitialPageSize = (
+  options: string[] | number[],
+  defaultPageSize: string | number | undefined,
+) => {
+  if (defaultPageSize) {
+    const optionAsInt = parseInt(defaultPageSize.toString());
+    if (!isNaN(optionAsInt)) return setFirstOption(options);
+    return optionAsInt;
+  } else {
+    return setFirstOption(options);
+  }
+};
+
 export function createPaginationStore(
-  pageSizeOptions: string[] = options,
+  pageSizeOptions: string[] | number[] = options,
+  defaultPageSize: string | number | undefined,
 ): PaginationStore {
-  const initialPageSize = getInitialPageSize(pageSizeOptions);
+  const initialPageSize = getInitialPageSize(pageSizeOptions, defaultPageSize);
   const paginationStore = writable({
     ...defaultStore,
     previousPageSize: initialPageSize,

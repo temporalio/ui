@@ -20,10 +20,11 @@
     undefined;
   export let onSpace: (event: KeyboardEvent) => void | undefined = undefined;
 
-  export let pageSizeOptions: string[] = options;
+  export let pageSizeOptions: string[] | number[] = options;
+  export let defaultPageSize: string | number | undefined = undefined;
   export let total: string | number = '';
 
-  let store = createPaginationStore(pageSizeOptions);
+  let store = createPaginationStore(pageSizeOptions, defaultPageSize);
   let error: any;
 
   function clearError() {
