@@ -10,6 +10,7 @@
   import ApiPagination from '$lib/holocene/api-pagination.svelte';
   import { groupEvents } from '$lib/models/event-groups';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import EmptyState from '$lib/holocene/empty-state.svelte';
 
   export let compact = false;
 
@@ -77,5 +78,17 @@
         <EventEmptyRow />
       {/each}
     </EventSummaryTable>
+    <div slot="empty">
+      <EventSummaryTable {updating} {compact} on:expandAll={handleExpandChange}>
+        <tr>
+          <td colspan="6">
+            <EmptyState
+              title="No Events Match"
+              content="There are no events that match your filters or selected view. Adjust your filters or view to see your events."
+            />
+          </td>
+        </tr>
+      </EventSummaryTable>
+    </div>
   </ApiPagination>
 {/key}
