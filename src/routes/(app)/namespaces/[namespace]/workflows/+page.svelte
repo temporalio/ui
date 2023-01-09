@@ -1,5 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  import { settings } from '$lib/stores/settings';
 
   import Workflows from '$lib/pages/workflows.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
@@ -8,7 +9,9 @@
   import AdvancedVisibilityGuard from '$lib/components/advanced-visibility-guard.svelte';
   import WorkflowsWithNewSearch from '$lib/pages/workflows-with-new-search.svelte';
 
-  $: isCloud = $page.data?.settings?.runtimeEnvironment?.isCloud;
+  $: bulkActionsEnabled =
+    $supportsBulkActions &&
+    (!$settings.workflowCancelDisabled || !$settings.workflowTerminateDisabled);
 </script>
 
 <PageTitle
@@ -18,8 +21,9 @@
 
 <AdvancedVisibilityGuard>
   <WorkflowsWithNewSearch
-    bulkActionsEnabled={$supportsBulkActions}
-    cancelEnabled={!isCloud}
+    {bulkActionsEnabled}
+    cancelEnabled={!$settings.workflowCancelDisabled}
+    terminateEnabled={!$settings.workflowTerminateDisabled}
   />
   <Workflows slot="fallback" />
 </AdvancedVisibilityGuard>

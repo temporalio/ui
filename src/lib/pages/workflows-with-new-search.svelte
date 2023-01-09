@@ -40,6 +40,7 @@
 
   export let bulkActionsEnabled: boolean = false;
   export let cancelEnabled: boolean = false;
+  export let terminateEnabled: boolean = false;
 
   let selectedWorkflows: { [index: string]: boolean } = {};
   let showBatchTerminateConfirmationModal: boolean = false;
@@ -314,6 +315,7 @@
   <WorkflowsSummaryTableWithFilters
     {bulkActionsEnabled}
     {cancelEnabled}
+    {terminateEnabled}
     updating={$updating}
     visibleWorkflows={visibleItems}
     {selectedWorkflowsCount}
