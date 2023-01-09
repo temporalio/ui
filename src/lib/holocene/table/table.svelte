@@ -6,7 +6,7 @@
   export let id: string = null;
 </script>
 
-<table class="{variant} {$$props.class}" {id}>
+<table class="bg-white {variant} {$$props.class}" {id}>
   <thead>
     <slot name="headers" />
     {#if updating}

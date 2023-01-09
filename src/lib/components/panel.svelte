@@ -2,7 +2,7 @@
   export let error: boolean = false;
 </script>
 
-<div class="panel" class:error>
+<div class="panel bg-white {$$props.class}" class:error>
   <slot />
 </div>
 

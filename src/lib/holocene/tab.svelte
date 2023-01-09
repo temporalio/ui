@@ -8,7 +8,7 @@
 
 {#if href}
   <a
-    class="block whitespace-nowrap border-b-2 border-white text-sm hover:border-b-2 hover:border-blue-700 md:text-base"
+    class="block whitespace-nowrap border-b-2 border-gray-100 text-sm hover:border-b-2 hover:border-blue-700 md:text-base"
     class:active
     class:disabled
     tabindex="0"
@@ -24,7 +24,7 @@
   </a>
 {:else}
   <div
-    class="block cursor-pointer whitespace-nowrap border-b-2 border-white text-sm hover:border-b-2 hover:border-blue-700 md:text-base"
+    class="block cursor-pointer whitespace-nowrap border-b-2 border-gray-100 text-sm hover:border-b-2 hover:border-blue-700 md:text-base"
     class:active
     class:disabled
     data-cy={$$props.dataCy}
