@@ -24,6 +24,7 @@ export default defineConfig({
         '**/*.test.ts',
       ],
     },
+    exclude: [...configDefaults.exclude, 'e2e'],
     environment: 'jsdom',
     setupFiles: ['./vitest_setup.ts'],
     deps: {
