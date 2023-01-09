@@ -62,6 +62,10 @@ type Settings = {
   };
   defaultNamespace: string;
   disableWriteActions: boolean;
+  workflowTerminateDisabled: boolean;
+  workflowCancelDisabled: boolean;
+  workflowSignalDisabled: boolean;
+  workflowResetDisabled: boolean;
   showTemporalSystemNamespace: boolean;
   notifyOnNewVersion: boolean;
   feedbackURL: string;

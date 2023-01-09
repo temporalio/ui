@@ -33,6 +33,7 @@
   export let workflow: WorkflowExecution;
   export let workers: GetPollersResponse;
 
+  export let terminateEnabled: boolean = false;
   export let cancelEnabled: boolean = false;
   export let signalEnabled: boolean = false;
 
@@ -123,6 +124,7 @@
         >
           <AutoRefreshWorkflow onChange={onRefreshChange} />
           <WorkflowActions
+            {terminateEnabled}
             {signalEnabled}
             {cancelEnabled}
             {cancelInProgress}
