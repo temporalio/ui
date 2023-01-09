@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Icon from '$holocene/icon/icon.svelte';
-  import NavContainer from '$lib/holocene/navigation/_nav-container.svelte';
-  import NavRow from '$lib/holocene/navigation/_nav-row.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import NavContainer from '$lib/holocene/navigation/nav-container.svelte';
+  import NavRow from '$lib/holocene/navigation/nav-row.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import { navOpen } from '$lib/stores/nav-open';
 

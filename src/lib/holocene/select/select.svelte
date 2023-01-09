@@ -7,10 +7,10 @@
 
 <script lang="ts">
   import { onDestroy, setContext } from 'svelte';
-  import Icon from '$holocene/icon/icon.svelte';
-  import Menu from '$holocene/primitives/menu/menu.svelte';
-  import MenuButton from '$holocene/primitives/menu/menu-button.svelte';
-  import MenuContainer from '$holocene/primitives/menu/menu-container.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
+  import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
+  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
   import { writable } from 'svelte/store';
   import { noop } from 'svelte/internal';
 

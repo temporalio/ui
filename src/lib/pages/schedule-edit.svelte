@@ -3,7 +3,7 @@
 
   import { submitEditSchedule } from '$lib/stores/schedules';
 
-  import Loading from '$holocene/loading.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
   import { fetchSchedule } from '$lib/services/schedule-service';
 
   import ScheduleFormView from '$lib/components/schedule/schedule-form-view.svelte';

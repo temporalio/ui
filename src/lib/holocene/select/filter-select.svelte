@@ -32,7 +32,7 @@
   class="border-[1px] border-gray-900 outline-none"
 >
   <slot>
-    {#each options as option}
+    {#each options.map((o) => o.toString()) as option}
       <Option value={option} />
     {/each}
   </slot>

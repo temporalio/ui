@@ -1,12 +1,12 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
-  import { ascendingEventGroups, ascendingEvents } from '$lib/stores/events';
+  import { eventHistory } from '$lib/stores/events';
   import { workflowRun, refresh } from '$lib/stores/workflow-run';
   import { timelineEvents } from '$lib/stores/events';
 
   import Accordion from '$lib/holocene/accordion.svelte';
   import Button from '$lib/holocene/button.svelte';
-  import Icon from '$holocene/icon/icon.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import {
     eventTypeCategorizations,
     timelineEventTypeOptions,
@@ -14,6 +14,7 @@
   import EventHistoryGroupTimeline from './event-history-group-timeline.svelte';
   import Autocomplete from '$lib/holocene/autocomplete.svelte';
   import Badge from '$lib/holocene/badge.svelte';
+  import { groupEvents } from '$lib/models/event-groups';
 
   $: isRunning = $workflowRun.workflow.isRunning;
 
@@ -62,9 +63,11 @@
     handleClearEvents();
   });
 
-  $: groupsWithGroupFilter = $ascendingEventGroups.filter((group) => {
-    return eventGroupFilters.includes(group.category);
-  });
+  $: groupsWithGroupFilter = groupEvents($eventHistory.start).filter(
+    (group) => {
+      return eventGroupFilters.includes(group.category);
+    },
+  );
 
   $: groups = !eventTypeFilters.length
     ? groupsWithGroupFilter
@@ -150,7 +153,7 @@
       {/if}
     </div>
     <EventHistoryGroupTimeline
-      events={$ascendingEvents}
+      events={$eventHistory.start}
       eventGroups={groups}
       {isRunning}
     />

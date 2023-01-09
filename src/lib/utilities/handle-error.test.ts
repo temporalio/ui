@@ -78,15 +78,15 @@ describe('handleError', () => {
     expect(window.location.assign).not.toHaveBeenCalled();
   });
 
-  it('should add notification if it is a NetworkError', () => {
+  it('should add toast if it is a NetworkError', () => {
     const error = {
       statusCode: 500,
       statusText: 'Uh oh',
       response: 'lol' as unknown as Response,
     };
 
-    const notifications = {
-      add: vi.fn(),
+    const toasts = {
+      push: vi.fn(),
     };
 
     const errors = {
@@ -94,28 +94,37 @@ describe('handleError', () => {
     };
 
     try {
-      handleError(error, notifications, errors);
+      handleError(error, toasts, errors);
     } catch (error) {
-      expect(notifications.add).toHaveBeenCalledWith('error', '500 Uh oh');
+      expect(toasts.push).toHaveBeenCalledWith({
+        variant: 'error',
+        message: '500 Uh oh',
+      });
       expect(errors.set).toHaveBeenCalledWith({ ...error });
     }
   });
 
-  it('should add a notification on a string error', () => {
-    const notifications = {
-      add: vi.fn(),
+  it('should add a toast on a string error', () => {
+    const toasts = {
+      push: vi.fn(),
     };
 
-    handleError('lol', notifications);
-    expect(notifications.add).toHaveBeenCalledWith('error', 'lol');
+    handleError('lol', toasts);
+    expect(toasts.push).toHaveBeenCalledWith({
+      variant: 'error',
+      message: 'lol',
+    });
   });
 
-  it('should add a notification on an error', () => {
-    const notifications = {
-      add: vi.fn(),
+  it('should add a toast on an error', () => {
+    const toasts = {
+      push: vi.fn(),
     };
 
-    handleError(new Error('lol'), notifications);
-    expect(notifications.add).toHaveBeenCalledWith('error', 'lol');
+    handleError(new Error('lol'), toasts);
+    expect(toasts.push).toHaveBeenCalledWith({
+      variant: 'error',
+      message: 'lol',
+    });
   });
 });

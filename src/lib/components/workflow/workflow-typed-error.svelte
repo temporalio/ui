@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { events, eventGroups, updating } from '$lib/stores/events';
+  import { updating } from '$lib/stores/events';
 
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -196,9 +196,8 @@
         </TableHeaderRow>
         <EventSummaryRow
           event={error}
-          groups={$eventGroups}
           initialItem={error}
-          visibleItems={$events}
+          visibleItems={[error]}
           typedError
         />
       </Table>

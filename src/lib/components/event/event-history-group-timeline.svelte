@@ -2,7 +2,7 @@
   import VirtualList from '@sveltejs/svelte-virtual-list';
   import { noop } from 'svelte/internal';
 
-  import Icon from '$holocene/icon/icon.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
   import { timelineEvents } from '$lib/stores/events';
   import { formatDate } from '$lib/utilities/format-date';

@@ -8,7 +8,6 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { eventViewType } from '$lib/stores/event-view';
   import { eventHistory } from '$lib/stores/events';
-  import { eventSortOrder } from '$lib/stores/event-view';
 
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
@@ -22,11 +21,13 @@
   import { exportHistory } from '$lib/utilities/export-history';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
+  import Button from '$lib/holocene/button.svelte';
+  import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
 
-  $: workflowEvents = getWorkflowStartedCompletedAndTaskFailedEvents(
-    $eventHistory?.events ?? [],
-    $eventSortOrder,
-  );
+  let showShortcuts = false;
+
+  $: workflowEvents =
+    getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
 </script>
 
 <section class="flex flex-col gap-4">
@@ -94,7 +95,7 @@
   />
   <WorkflowTypedError error={workflowEvents.error} />
   <PendingActivities />
-  <section class="flex w-full">
+  <section class="flex w-full" data-cy="inputs-results">
     <Accordion title="Input and Results" icon="json" class="border-gray-900">
       <div class="flex gap-2">
         <InputAndResults type="input" content={workflowEvents.input} />
@@ -143,4 +144,10 @@
     </nav>
     <slot />
   </section>
+  <EventShortcutKeys
+    open={showShortcuts}
+    compact={$eventViewType === 'compact'}
+    onOpen={() => (showShortcuts = true)}
+    onClose={() => (showShortcuts = false)}
+  />
 </section>

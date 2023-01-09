@@ -6,8 +6,8 @@
 
   import type { SelectContext } from '$lib/holocene/select/select.svelte';
   import Input from '$lib/holocene/input/input.svelte';
-  import Menu from '$holocene/primitives/menu/menu.svelte';
-  import MenuContainer from '$holocene/primitives/menu/menu-container.svelte';
+  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
+  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
   import { noop } from 'svelte/internal';
   import Option from '../select/option.svelte';
 

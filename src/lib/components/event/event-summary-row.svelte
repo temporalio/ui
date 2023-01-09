@@ -1,5 +1,7 @@
 <script lang="ts">
-  import Icon from '$holocene/icon/icon.svelte';
+  import { fade } from 'svelte/transition';
+
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
   import { eventSortOrder, eventShowElapsed } from '$lib/stores/event-view';
   import { timeFormat } from '$lib/stores/time-format';
@@ -8,7 +10,6 @@
     workflowEventsResponsiveColumnWidth,
   } from '$lib/stores/column-width';
 
-  import { getGroupForEvent, isEventGroup } from '$lib/models/event-groups';
   import {
     eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsCanceled,
@@ -22,27 +23,29 @@
   import EventDetailsFull from './event-details-full.svelte';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
+  import { noop } from 'svelte/internal';
+  import { isEventGroup } from '$lib/models/event-groups';
 
   export let event: IterableEvent;
-  export let groups: EventGroups;
   export let visibleItems: IterableEvent[];
-  export let initialItem: IterableEvent;
+  export let initialItem: IterableEvent | undefined;
   export let compact = false;
   export let expandAll = false;
   export let typedError = false;
+  export let active = false;
+  export let onRowClick: () => void = noop;
 
-  let eventGroup = isEventGroup(event)
-    ? event
-    : getGroupForEvent(event, groups);
-  let selectedId = compact
-    ? Array.from(eventGroup.events.keys()).pop()
+  let selectedId = isEventGroup(event)
+    ? Array.from(event.events.keys()).pop()
     : event.id;
 
-  $: expanded = expandAll;
+  $: expanded = expandAll || active;
 
-  $: currentEvent = compact ? eventGroup.events.get(selectedId) : event;
+  $: currentEvent = isEventGroup(event) ? event.events.get(selectedId) : event;
   $: descending = $eventSortOrder === 'descending';
   $: showElapsed = $eventShowElapsed === 'true';
+  $: showElapsedTimeDiff =
+    showElapsed && initialItem && event.id !== initialItem.id;
   $: attributes = formatAttributes(event, { compact });
 
   $: timeDiffChange = '';
@@ -51,10 +54,10 @@
     const previousItem = visibleItems[currentIndex - 1];
     if (previousItem) {
       const timeDiff = formatDistanceAbbreviated({
-        start: compact
-          ? (previousItem as EventGroup)?.initialEvent?.eventTime
+        start: isEventGroup(previousItem)
+          ? previousItem?.initialEvent?.eventTime
           : previousItem?.eventTime,
-        end: compact ? currentEvent?.eventTime : event?.eventTime,
+        end: currentEvent?.eventTime,
       });
       timeDiffChange = timeDiff ? `(${descending ? '-' : '+'}${timeDiff})` : '';
     }
@@ -62,11 +65,12 @@
 
   const onLinkClick = () => {
     expanded = !expanded;
+    onRowClick();
   };
 
-  const failure = eventOrGroupIsFailureOrTimedOut(compact ? eventGroup : event);
-  const canceled = eventOrGroupIsCanceled(compact ? eventGroup : event);
-  const terminated = eventOrGroupIsTerminated(compact ? eventGroup : event);
+  const failure = eventOrGroupIsFailureOrTimedOut(event);
+  const canceled = eventOrGroupIsCanceled(event);
+  const terminated = eventOrGroupIsTerminated(event);
 
   let truncateWidth: number;
   workflowEventsColumnWidth.subscribe((value) => {
@@ -81,6 +85,7 @@
   class="row"
   id={event.id}
   class:expanded={expanded && !expandAll}
+  class:active
   class:failure
   class:canceled
   class:terminated
@@ -96,7 +101,7 @@
   </td>
   <td class="flex table-cell text-left">
     <p class="break-word truncate text-sm md:whitespace-normal md:text-base">
-      {#if showElapsed && event.id !== initialItem.id}
+      {#if showElapsedTimeDiff}
         {formatDistanceAbbreviated({
           start: initialItem.eventTime,
           end: currentEvent.eventTime,
@@ -111,7 +116,7 @@
     colspan={compact ? 2 : null}
     class="table-cell text-right text-sm font-normal xl:text-left"
   >
-    <div tabindex="0" class="flex">
+    <div class="flex">
       {#if compact && failure}
         <Icon class="mr-1.5 inline text-red-700" name="clock" />
       {/if}
@@ -158,14 +163,9 @@
   <td class="table-cell" />
 </tr>
 {#if expanded}
-  <tr class="table-row" class:typedError>
+  <tr in:fade|local class="table-row" class:typedError>
     <td class="expanded-cell" colspan="6">
-      <EventDetailsFull
-        event={currentEvent}
-        {compact}
-        {eventGroup}
-        bind:selectedId
-      />
+      <EventDetailsFull {event} {currentEvent} {compact} bind:selectedId />
     </td>
   </tr>
 {/if}
@@ -176,7 +176,7 @@
   }
 
   .row:hover {
-    @apply z-50 cursor-pointer bg-gradient-to-b from-blue-100 to-purple-100;
+    @apply z-50 cursor-pointer bg-gray-50;
   }
 
   .expanded.row {
@@ -224,5 +224,21 @@
     &.expanded {
       @apply rounded-b-none;
     }
+  }
+
+  .active {
+    @apply z-50 cursor-pointer bg-gradient-to-b from-blue-100 to-purple-100;
+  }
+
+  .active.canceled {
+    @apply bg-gradient-to-b from-yellow-100 to-yellow-200;
+  }
+
+  .active.failure {
+    @apply bg-gradient-to-b from-red-100 to-red-200;
+  }
+
+  .active.terminated {
+    @apply bg-gradient-to-b from-pink-100 to-pink-200;
   }
 </style>

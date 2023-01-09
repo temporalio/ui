@@ -1,4 +1,4 @@
-import { browser } from '$app/env';
+import { browser } from '$app/environment';
 import { goto as navigateTo } from '$app/navigation';
 import type { invalidate } from '$app/navigation';
 
@@ -11,10 +11,10 @@ type UpdateQueryParams = {
   invalidate?: typeof invalidate;
 };
 
-const gotoOptions = {
+export const gotoOptions = {
   replaceState: true,
-  keepfocus: true,
-  noscroll: true,
+  keepFocus: true,
+  noScroll: true,
 };
 
 export const updateQueryParameters = async ({
@@ -35,13 +35,8 @@ export const updateQueryParameters = async ({
   }
 
   if (browser && url.href !== window.location.href) {
-    goto(addHashToURL(url), gotoOptions);
+    goto(url, gotoOptions);
   }
 
   return value;
-};
-
-export const addHashToURL = (url: URL): string => {
-  url.hash = '#';
-  return String(url);
 };

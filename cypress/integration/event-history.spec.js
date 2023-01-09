@@ -18,26 +18,39 @@ describe('Workflow Events', () => {
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/*/runs/*/events/reverse*`,
-      { fixture: 'event-history-completed-reverse.json' },
-    ).as('event-history-descending');
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}?`,
+      { fixture: 'workflow-completed.json' },
+    ).as('workflow-api');
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/*/runs/*/events?`,
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?maximumPageSize=20`,
+      { fixture: 'event-history-completed.json' },
+    ).as('event-history-start');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?maximumPageSize=20`,
+      { fixture: 'event-history-completed.json' },
+    ).as('event-history-end');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?nextPageToken=*`,
       { fixture: 'event-history-completed.json' },
     ).as('event-history-ascending');
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}?`,
-      { fixture: 'workflow-completed.json' },
-    ).as('workflow-api');
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?nextPageToken=*`,
+      { fixture: 'event-history-completed-reverse.json' },
+    ).as('event-history-descending');
 
-    cy.visit('/namespaces/default/workflows');
-
-    cy.wait('@workflows-api');
-    cy.wait('@namespaces-api');
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?`,
+      { fixture: 'event-history-completed.json' },
+    ).as('event-history-ascending-all');
   });
 
   it('default to the summary page when visiting a workflow', () => {
@@ -45,31 +58,46 @@ describe('Workflow Events', () => {
 
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
-    cy.wait('@workflow-api');
-    cy.wait('@event-history-descending');
-
     cy.url().should('contain', '/history');
+
+    cy.wait('@workflow-api');
+    cy.wait('@event-history-start');
+    cy.wait('@event-history-end');
+    cy.wait('@event-history-descending');
   });
 
   it('default to last viewed event view when visiting a workflow', () => {
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
-    cy.wait('@workflow-api');
-    cy.wait('@event-history-descending');
-
     cy.url().should('contain', '/history');
+
+    cy.wait('@workflow-api');
+    cy.wait('@event-history-start');
+    cy.wait('@event-history-end');
+    cy.wait('@event-history-descending');
 
     cy.get('[data-cy="feed"]').should('have.class', 'active');
     cy.get('[data-cy="compact"]').should('not.have.class', 'active');
     cy.get('[data-cy="json"]').should('not.have.class', 'active');
 
+    cy.get('[data-cy="event-summary-row"]')
+      .should('not.have.length', 0)
+      .should('have.length', eventsFixtureDescending.history.events.length);
+
     cy.get('[data-cy="compact"]').click();
+
+    cy.wait('@event-history-ascending');
 
     cy.visit('/namespaces/default/workflows');
 
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
     cy.url().should('contain', '/history');
+
+    cy.wait('@event-history-start');
+    cy.wait('@event-history-end');
+    cy.wait('@event-history-ascending');
+
     cy.get('[data-cy="compact"]').should('have.class', 'active');
     cy.get('[data-cy="json"]').should('not.have.class', 'active');
     cy.get('[data-cy="feed"]').should('not.have.class', 'active');
@@ -77,23 +105,14 @@ describe('Workflow Events', () => {
     cy.get('[data-cy="event-summary-row"]')
       .should('not.have.length', 0)
       .should('not.have.length', eventsFixtureDescending.history.events.length);
-    cy.get('table').contains('activity.timeout');
-
-    cy.get('[data-cy="json"]').click();
-
-    cy.visit('/namespaces/default/workflows');
-
-    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
-
-    cy.get('[data-cy="json"]').should('have.class', 'active');
-    cy.get('[data-cy="compact"]').should('not.have.class', 'active');
-    cy.get('[data-cy="feed"]').should('not.have.class', 'active');
   });
 
   it('should render events in feed view', () => {
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}/history`);
 
     cy.wait('@workflow-api');
+    cy.wait('@event-history-start');
+    cy.wait('@event-history-end');
     cy.wait('@event-history-descending');
 
     cy.get('[data-cy="event-summary-row"]').should(
@@ -108,6 +127,8 @@ describe('Workflow Events', () => {
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}/history`);
 
     cy.wait('@workflow-api');
+    cy.wait('@event-history-start');
+    cy.wait('@event-history-end');
     cy.wait('@event-history-descending');
 
     const dt = new Date(eventsFixtureDescending.history.events[0].eventTime);
@@ -132,24 +153,30 @@ describe('Workflow Events', () => {
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}/history`);
 
     cy.wait('@workflow-api');
+    cy.wait('@event-history-start');
+    cy.wait('@event-history-end');
     cy.wait('@event-history-descending');
 
     cy.get('[data-cy="compact"]').click();
 
+    cy.wait('@event-history-ascending');
+
     cy.get('[data-cy="event-summary-row"]')
       .should('not.have.length', 0)
       .should('not.have.length', eventsFixtureDescending.history.events.length);
-    cy.get('table').contains('activity.timeout');
   });
 
   it('should be viewable as JSON', () => {
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
     cy.wait('@workflow-api');
+    cy.wait('@event-history-start');
+    cy.wait('@event-history-end');
+    cy.wait('@event-history-descending');
 
     cy.get('[data-cy="json"]').click();
 
-    cy.wait('@event-history-ascending');
+    cy.wait('@event-history-ascending-all');
 
     const match = eventsFixtureAscending.history.events[0].eventTime;
     cy.get('[data-cy="event-history-json"]').contains(match);

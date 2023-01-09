@@ -1,14 +1,14 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { beforeNavigate } from '$app/navigation';
-  import { browser, dev } from '$app/env';
+  import { browser } from '$app/environment';
   import { page } from '$app/stores';
 
   import { isNetworkError } from '$lib/utilities/is-network-error';
 
   import Link from '$lib/holocene/link.svelte';
 
-  export let error: globalThis.Error = null;
+  export let error: App.Error | NetworkError = null;
   export let status = 500;
   let message = error?.message || '';
 
@@ -47,12 +47,6 @@
     <Link href="https://temporal.io/slack">jump on our Slack Channel</Link>.
   </p>
 </section>
-
-{#if dev}
-  <pre class="trace">
-    {error?.stack ?? ''}
-  </pre>
-{/if}
 
 <style>
   .trace {

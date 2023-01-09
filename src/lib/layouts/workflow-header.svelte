@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from '$holocene/icon/icon.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import { onDestroy, onMount } from 'svelte';
   import { fly } from 'svelte/transition';
 
@@ -27,11 +27,14 @@
   import { pathMatches } from '$lib/utilities/path-matches';
   import AutoRefreshWorkflow from '$lib/components/auto-refresh-workflow.svelte';
   import Alert from '$lib/holocene/alert.svelte';
+  import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;
   export let workers: GetPollersResponse;
+
   export let cancelEnabled: boolean = false;
+  export let signalEnabled: boolean = false;
 
   let refreshInterval;
   const refreshRate = 15000;
@@ -78,12 +81,11 @@
     clearInterval(refreshInterval);
   });
 
-  $: cancelInProgress =
-    $workflowRun?.workflow?.status === 'Running' &&
-    !$updating &&
-    $eventHistory.events.some(
-      (event) => event?.eventType === 'WorkflowExecutionCancelRequested',
-    );
+  $: cancelInProgress = isCancelInProgress(
+    $workflowRun?.workflow?.status,
+    $updating,
+    $eventHistory,
+  );
 </script>
 
 <header class="mb-4 flex flex-col gap-4">
@@ -112,7 +114,7 @@
           data-cy="workflow-id-heading"
           class="select-all overflow-hidden text-ellipsis text-2xl font-medium"
         >
-          {workflow.id}
+          {workflow?.id}
         </h1>
       </div>
       {#if isRunning}
@@ -121,6 +123,7 @@
         >
           <AutoRefreshWorkflow onChange={onRefreshChange} />
           <WorkflowActions
+            {signalEnabled}
             {cancelEnabled}
             {cancelInProgress}
             {workflow}
@@ -144,7 +147,7 @@
         href={routeForEventHistory({
           ...routeParameters,
         })}
-        amount={workflow?.historyEvents}
+        amount={$eventHistory.total}
         dataCy="history-tab"
         active={pathMatches(
           $page.url.pathname,

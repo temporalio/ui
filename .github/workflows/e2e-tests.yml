@@ -1,0 +1,47 @@
+name: End To End Integration Tests
+
+on:
+  push:
+    # branches: [main]
+    branches: [rh-integration]
+  # pull_request:
+  #   branches: [rh-integration]
+
+jobs:
+  e2e-integration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout UI
+        uses: actions/checkout@v2
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: e2e/go.mod
+          cache: true
+          cache-dependency-path: e2e/go.sum
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 16
+      - uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7
+      - name: Build UI
+        run: |
+          pnpm install
+          VITE_API="" pnpm build:local
+      - name: Checkout CLI
+        uses: actions/checkout@v2
+        with:
+          repository: temporalio/cli
+          path: cli
+      - name: Install CLI
+        run: |
+          cd cli && go install ./cmd/temporal
+      - name: Run Playwright Tests
+        working-directory: e2e
+        run: |
+          pnpm install
+          npx playwright install chromium --with-deps
+          pnpm run test:server &
+          pnpm run test:worker &
+          pnpm run test:workflows
+          pnpm run test

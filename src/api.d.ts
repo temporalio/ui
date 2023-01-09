@@ -7,6 +7,7 @@ type WorkflowAPIRoutePath =
   | 'workflow'
   | 'workflow.terminate'
   | 'workflow.cancel'
+  | 'workflow.signal'
   | 'events.ascending'
   | 'events.descending'
   | 'query';

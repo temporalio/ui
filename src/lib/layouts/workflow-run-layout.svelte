@@ -5,11 +5,12 @@
   import { timelineEvents } from '$lib/stores/events';
 
   import Header from '$lib/layouts/workflow-header.svelte';
-  import Loading from '$holocene/loading.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
   import { onDestroy, onMount } from 'svelte';
-  import { eventFilterSort, EventSortOrder } from '$lib/stores/event-view';
+  import { type EventSortOrder, eventFilterSort } from '$lib/stores/event-view';
 
   export let cancelEnabled: boolean = false;
+  export let signalEnabled: boolean = false;
 
   onMount(() => {
     const sort = $page.url.searchParams.get('sort');
@@ -30,6 +31,7 @@
       workflow={$workflowRun.workflow}
       workers={$workflowRun.workers}
       {cancelEnabled}
+      {signalEnabled}
     />
     <slot />
   {/if}

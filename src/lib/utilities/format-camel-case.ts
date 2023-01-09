@@ -7,11 +7,20 @@ export const capitalize = (word: string): string => {
   return word[0].toUpperCase() + word.slice(1);
 };
 
-const labelsToAddName = new Set(['workflowType']);
+const labelsToAddName: Readonly<Set<string>> = new Set(['workflowType']);
+const labelsToShorten: Readonly<{ [key: string]: string }> = {
+  workflowExecutionWorkflowId: 'workflowExecution',
+  workflowExecutionRunId: 'workflowExecution',
+};
 
-const addNameIfNeeded = (label?: string) => {
+const formatLabel = (label?: string) => {
+  // Add name if needed
   if (labelsToAddName.has(label)) {
     return `${label}Name`;
+  }
+  // Shorten label if needed
+  if (labelsToShorten[label]) {
+    return label.replace(labelsToShorten[label], '');
   }
   return label;
 };
@@ -20,7 +29,7 @@ export const format = (label?: string): string => {
   let result = '';
   let index = 0;
 
-  label = addNameIfNeeded(label);
+  label = formatLabel(label);
 
   while (index < label?.length) {
     const current = label[index];

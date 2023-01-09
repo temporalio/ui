@@ -1,0 +1,31 @@
+{
+  "name": "ui-server-e2e",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "temporal-server": "temporal server start-dev --ui-asset-path ../.vercel/output/static/ --ui-codec-endpoint http://localhost:8234",
+    "codec-server": "go run ./codec-server -port 8234 -web http://localhost:8233",
+    "test:worker": "go run ./worker",
+    "test:workflows": "go run ./starter",
+    "test:server": "concurrently \"pnpm run temporal-server\" \"pnpm run codec-server\"",
+    "test": "npx playwright test",
+    "debug": "PWDEBUG=1 npx playwright test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/temporalio/ui.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "",
+  "bugs": {
+    "url": "https://github.com/temporalio/ui/issues"
+  },
+  "homepage": "https://github.com/temporalio/ui#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.26.1",
+    "@types/node": "^18.0.0",
+    "concurrently": "^7.1.0"
+  }
+}

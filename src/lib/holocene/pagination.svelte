@@ -7,18 +7,18 @@
     perPageFromSearchParameter,
     options,
     defaultItemsPerPage,
+    perPageKey,
   } from '$lib/stores/pagination';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
   import { getFloatStyle } from '$lib/utilities/get-float-style';
-  import Icon from '$holocene/icon/icon.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
   type T = $$Generic;
 
   export let items: T[];
   export let floatId: string | undefined = undefined;
   export let startingIndex: string | number = 0;
-  export let perPageKey = 'per-page';
   export let currentPageKey = 'page';
   export let itemsPerPage: number | null = null;
 

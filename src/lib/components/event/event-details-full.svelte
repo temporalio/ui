@@ -7,17 +7,19 @@
   } from '$lib/utilities/format-event-attributes';
   import EventDetailPills from './event-detail-pills.svelte';
   import EventGroupDetails from './event-group-details.svelte';
+  import { isEventGroup } from '$lib/models/event-groups';
 
   export let event: IterableEvent;
+  export let currentEvent: WorkflowEvent;
   export let compact = false;
-  export let eventGroup: EventGroup | null;
   export let selectedId: string;
 
-  $: attributes = formatAttributes(event, { compact });
+  $: attributes = formatAttributes(currentEvent, { compact });
   $: attributeGrouping = attributeGroups(event, attributes);
   $: activePill = Object.keys(attributeGrouping).find(
     (key) => attributeGrouping[key].length,
   );
+  $: eventDetails = Object.entries(attributes);
 
   const handlePillChange = (event: CustomEvent) => {
     activePill = event.detail.key;
@@ -26,10 +28,10 @@
   const handleGroupClick = (id: string) => (selectedId = id);
 </script>
 
-{#if compact && eventGroup}
+{#if compact && isEventGroup(event)}
   <div class="flex w-full flex-col lg:flex-row">
     <EventGroupDetails
-      {eventGroup}
+      eventGroup={event}
       {selectedId}
       onGroupClick={handleGroupClick}
     />
@@ -39,7 +41,7 @@
         {activePill}
         on:pillChange={handlePillChange}
       />
-      {#each Object.entries(attributes) as [key, value] (key)}
+      {#each eventDetails as [key, value] (key)}
         {#if attributeGrouping[activePill]?.includes(key)}
           <EventDetailsRowExpanded {key} {value} {attributes} class="w-full" />
         {/if}
@@ -53,7 +55,7 @@
       {activePill}
       on:pillChange={handlePillChange}
     />
-    {#each Object.entries(attributes) as [key, value] (key)}
+    {#each eventDetails as [key, value] (key)}
       {#if attributeGrouping[activePill]?.includes(key)}
         <EventDetailsRowExpanded {key} {value} {attributes} class="w-full" />
       {/if}

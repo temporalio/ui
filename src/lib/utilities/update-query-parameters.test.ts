@@ -1,8 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { addHashToURL, updateQueryParameters } from './update-query-parameters';
+import { updateQueryParameters, gotoOptions } from './update-query-parameters';
 
-const gotoOptions = { replaceState: true, keepfocus: true, noscroll: true };
 const url = new URL('https://temporal.io');
 
 describe('updateQueryParameters', () => {
@@ -69,7 +68,7 @@ describe('updateQueryParameters', () => {
     updateQueryParameters({ parameter, value, url, goto });
 
     expect(goto).toHaveBeenCalledWith(
-      'https://temporal.io/?parameter=value#',
+      new URL('https://temporal.io/?parameter=value'),
       gotoOptions,
     );
   });
@@ -82,7 +81,7 @@ describe('updateQueryParameters', () => {
     updateQueryParameters({ parameter, value, url, goto });
 
     expect(goto).toHaveBeenCalledWith(
-      'https://temporal.io/?parameter=newvalue#',
+      new URL('https://temporal.io/?parameter=newvalue'),
       gotoOptions,
     );
   });
@@ -94,7 +93,10 @@ describe('updateQueryParameters', () => {
 
     updateQueryParameters({ parameter, value, url, goto });
 
-    expect(goto).toHaveBeenCalledWith('https://temporal.io/#', gotoOptions);
+    expect(goto).toHaveBeenCalledWith(
+      new URL('https://temporal.io/'),
+      gotoOptions,
+    );
   });
 
   it('should set the parameter to an empty string if allowEmpty is set', () => {
@@ -105,26 +107,9 @@ describe('updateQueryParameters', () => {
     updateQueryParameters({ parameter, value, url, goto, allowEmpty: true });
 
     expect(goto).toHaveBeenCalledWith(
-      'https://temporal.io/?parameter=#',
+      new URL('https://temporal.io/?parameter='),
       gotoOptions,
     );
-  });
-});
-
-describe('addHashToURL', () => {
-  it('should add a hash to a URL', () => {
-    const url = new URL('https://temporal.io/');
-    expect(addHashToURL(url)).toBe('https://temporal.io/#');
-  });
-
-  it('should not add a duplicate hash to a URL', () => {
-    const url = new URL('https://temporal.io/#');
-    expect(addHashToURL(url)).toBe('https://temporal.io/#');
-  });
-
-  it('should put the hash after the search parameters', () => {
-    const url = new URL('https://temporal.io/?parameter=value');
-    expect(addHashToURL(url)).toBe('https://temporal.io/?parameter=value#');
   });
 });
 

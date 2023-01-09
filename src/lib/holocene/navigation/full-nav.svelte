@@ -7,16 +7,16 @@
 </script>
 
 <script lang="ts">
-  import Icon from '$holocene/icon/icon.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import type { SvelteComponent } from 'svelte';
   import type { DescribeNamespaceResponse as Namespace } from '$types';
 
   import { namespaceSelectorOpen } from '$lib/stores/nav-open';
 
-  import NavContainer from '$lib/holocene/navigation/_nav-container.svelte';
-  import NavRow from '$lib/holocene/navigation/_nav-row.svelte';
+  import NavContainer from '$lib/holocene/navigation/nav-container.svelte';
+  import NavRow from '$lib/holocene/navigation/nav-row.svelte';
   import NamespaceList from '$lib/components/namespace-list.svelte';
-  import Drawer from '$lib/holocene/navigation/_drawer.svelte';
+  import Drawer from '$lib/holocene/navigation/drawer.svelte';
   import NavTooltip from '$lib/holocene/nav-tooltip.svelte';
   import IsCloudGuard from '$lib/components/is-cloud-guard.svelte';
 

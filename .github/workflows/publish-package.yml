@@ -1,45 +1,45 @@
-name: Publish package to npm
+name: Publish NPM Package
 
 on:
-  workflow_dispatch:
-    branches:
-      - main
-    inputs:
-      bump:
-        description: 'bump type, major or minor or patch'
-        default: 'patch'
+  pull_request:
+    types: [closed]
 
 jobs:
-  release:
+  publish:
+    if: startsWith(github.head_ref, 'releases/') && github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Node setup
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
-      - name: pnpm setup
+      - name: Setup PNPM
         uses: pnpm/action-setup@v2.2.2
         with:
           version: 7
-      - name: Configure Git
-        run: |
-          git config --local user.name 'Temporal Data (cicd)'
-          git config --local user.email 'commander-data@temporal.io'
-      - name: Install
+      - name: Install dependencies
         run: pnpm install
-      - name: Build
-        run: pnpm run build:local
-      - name: Bump version
-        run: pnpm run package:${{ inputs.bump }}
+      - name: Build Package
+        run: pnpm package
       - name: Publish package to NPM
-        run: npm publish --access public
+        run: npm publish
+        working-directory: ./package
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        working-directory: ./package
-      - name: Commit and push version bump
+  create_release:
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Create Release
         run: |
-          git remote set-url origin https://x-access-token:${{ secrets.COMMANDER_DATA_TOKEN }}@github.com/${{ github.repository }}
-          git push origin ${{ github.ref_name }}
+          version=`cat ./package.json | jq -r .version`
+          echo "latest version: $version"
+          tag="v$version"
+          echo "creating release: $tag"
+          gh release create $tag --generate-notes
+        env:
+          GH_TOKEN: ${{ secrets.COMMANDER_DATA_TOKEN }}

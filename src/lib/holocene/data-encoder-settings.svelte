@@ -6,7 +6,7 @@
   } from '$lib/stores/data-encoder-config';
   import { validateHttpOrHttps, validateHttps } from '$lib/utilities/is-http';
 
-  import Modal from '$holocene/modal.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
   import CodecEndpointSettings from './codec-endpoint-settings.svelte';
   import DataConverterPortSettings from './data-converter-port-settings.svelte';
 

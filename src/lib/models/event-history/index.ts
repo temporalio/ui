@@ -16,7 +16,6 @@ import {
   getCodecPassAccessToken,
 } from '$lib/utilities/get-codec';
 
-import { groupEvents } from '../event-groups';
 import { getEventCategory } from './get-event-categorization';
 import { getEventClassification } from './get-event-classification';
 import { simplifyAttributes } from './simplify-attributes';
@@ -95,19 +94,12 @@ export const toEventHistory = async ({
   namespace,
   settings,
   accessToken,
-}: EventsWithMetadata): Promise<{
-  events: WorkflowEvents;
-  eventGroups: EventGroups;
-}> => {
-  const events = await Promise.all(
+}: EventsWithMetadata): Promise<WorkflowEvents> => {
+  return await Promise.all(
     response.map((historyEvent) =>
       toEvent({ historyEvent, namespace, settings, accessToken }),
     ),
   );
-
-  const eventGroups = groupEvents(events);
-
-  return { events, eventGroups };
 };
 
 export const isEvent = (event: unknown): event is WorkflowEvent => {

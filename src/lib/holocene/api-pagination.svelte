@@ -1,72 +1,129 @@
 <script lang="ts">
   import Alert from '$lib/holocene/alert.svelte';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
 
   import { createPaginationStore } from '$lib/stores/api-pagination';
   import { options } from '$lib/stores/pagination';
+  import { onMount } from 'svelte';
 
   type T = $$Generic;
   type PaginatedRequest = (
     size: number,
-    token: string,
-  ) => Promise<{ items: any[]; nextPageToken: string }>;
+    token: NextPageToken,
+  ) => Promise<{ items: any[]; nextPageToken: NextPageToken }>;
 
-  export let onError: (error: any) => void;
+  export let onError: (error: any) => void | undefined = undefined;
   export let onFetch: () => Promise<PaginatedRequest>;
+  export let onShiftUp: (event: KeyboardEvent) => void | undefined = undefined;
+  export let onShiftDown: (event: KeyboardEvent) => void | undefined =
+    undefined;
+  export let onSpace: (event: KeyboardEvent) => void | undefined = undefined;
 
-  let store = createPaginationStore();
+  export let pageSizeOptions: string[] | number[] = options;
+  export let defaultPageSize: string | number | undefined = undefined;
+  export let total: string | number = '';
+
+  let store = createPaginationStore(pageSizeOptions, defaultPageSize);
   let error: any;
-
-  $: nextIndex = $store.nextIndex;
-  $: pageSize = $store.pageSize;
 
   function clearError() {
     if (error) error = undefined;
   }
 
-  async function onPageChange(nextIndex: number) {
+  $: isEmpty = $store.visibleItems.length === 0 && !$store.loading;
+  $: pageSizeChange =
+    !$store.loading && $store.pageSize !== $store.previousPageSize;
+
+  onMount(() => {
+    initalDataFetch();
+  });
+
+  $: {
+    if (pageSizeChange) {
+      store.resetPageSize($store.pageSize);
+      initalDataFetch();
+    }
+  }
+
+  async function initalDataFetch() {
+    const fetchData: PaginatedRequest = await onFetch();
+    try {
+      const response = await fetchData($store.pageSize, '');
+      const { items, nextPageToken } = response;
+      store.nextPageWithItems(nextPageToken, items);
+    } catch (err) {
+      error = err;
+      if (onError) onError(error);
+    }
+  }
+
+  async function fetchIndexData() {
     clearError();
     store.setUpdating();
-    try {
-      const fetchData: PaginatedRequest = await onFetch();
-      const response = await fetchData(pageSize, $store.indexTokens[nextIndex]);
-      const { items, nextPageToken } = response;
-      store.setNextPageToken(nextPageToken, items);
-    } catch (err: any) {
-      error = err;
-      onError(error);
+    if (!$store.hasNextIndexData) {
+      try {
+        const fetchData: PaginatedRequest = await onFetch();
+        const response = await fetchData(
+          $store.pageSize,
+          $store.indexData[$store.index].nextToken,
+        );
+        const { items, nextPageToken } = response;
+        store.nextPageWithItems(nextPageToken, items);
+      } catch (err: any) {
+        error = err;
+        if (onError) onError(error);
+      }
+    } else {
+      store.nextPage();
     }
   }
 
-  async function onPageSizeChange(pageSize: number) {
-    clearError();
-    store.resetPageSize();
-    try {
-      const fetchData: PaginatedRequest = await onFetch();
-      const response = await fetchData(
-        pageSize,
-        $store.indexTokens[$store.index],
-      );
-      const { items, nextPageToken } = response;
-      store.setNextPageToken(nextPageToken, items);
-    } catch (err: any) {
-      error = err;
-      onError(error);
+  async function handleKeydown(event: KeyboardEvent) {
+    const shifted = event.shiftKey;
+    switch (event.code) {
+      case 'ArrowRight':
+      case 'KeyL':
+        if ($store.hasNext && !$store.updating) {
+          fetchIndexData();
+        }
+        break;
+      case 'ArrowLeft':
+      case 'KeyH':
+        if ($store.hasPrevious && !$store.updating) {
+          store.previousPage();
+        }
+        break;
+      case 'ArrowUp':
+      case 'KeyK':
+        if (shifted && onShiftUp) {
+          onShiftUp(event);
+          store.reset();
+          initalDataFetch();
+        } else {
+          store.previousRow();
+        }
+        break;
+      case 'ArrowDown':
+      case 'KeyJ':
+        if (shifted && onShiftDown) {
+          onShiftDown(event);
+          store.reset();
+          initalDataFetch();
+        } else {
+          store.nextRow();
+        }
+        break;
+      case 'Space':
+        if (onSpace) {
+          onSpace(event);
+        }
+        break;
     }
   }
-
-  $: {
-    onPageChange(nextIndex);
-  }
-
-  $: {
-    onPageSizeChange(pageSize);
-  }
-
-  $: isEmpty = $store.items.length === 0 && !$store.loading;
 </script>
+
+<svelte:window on:keydown={handleKeydown} />
 
 {#if error && $$slots.error}
   <slot name="error" />
@@ -78,100 +135,153 @@
   />
 {/if}
 
-{#if isEmpty}
-  <slot name="empty">No Items</slot>
-{:else}
-  <div class="relative mb-8 flex flex-col gap-4">
-    <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
-      <div class="flex items-center">
-        <slot name="action-top-left" />
-        {#if $store.updating}
-          <p
-            class={`${
-              $$slots['action-top-left'] ? 'ml-6' : 'mr-6'
-            } text-gray-600`}
-          >
-            Updating…
-          </p>
-        {/if}
-      </div>
-      <nav class="flex flex-col justify-end gap-4 md:flex-row">
-        <slot name="action-top-center" />
-        <FilterSelect
-          label="Per Page"
-          parameter={$store.key}
-          value={String($store.pageSize)}
-          {options}
-        />
-        <div class="flex items-center justify-center gap-1">
-          <button
-            class="caret"
-            disabled={!$store.hasPrevious}
-            on:click={store.previousPage}
-          >
-            <Icon name="chevron-left" />
-          </button>
-          <p>
-            {$store.currentPageNumber}–{$store.endingPageNumber}
-          </p>
-          <button
-            class="caret"
-            disabled={!$store.hasNext}
-            on:click={store.nextPage}
-          >
-            <Icon name="chevron-right" />
-          </button>
-        </div>
-        <slot name="action-top-right" />
-      </nav>
+<div class="relative mb-8 flex flex-col gap-4">
+  <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
+    <div class="flex items-center gap-1 lg:gap-2 xl:gap-3">
+      <slot name="action-top-left" />
     </div>
-    {#if $store.loading}
-      <SkeletonTable rows={15} />
-    {:else if !isEmpty}
-      <slot visibleItems={$store.items} initialItem={[]} />
-    {/if}
-
-    <nav
-      class={`flex ${
-        $$slots['action-bottom-left'] ? 'justify-between' : 'justify-end'
-      }`}
-    >
-      <slot name="action-bottom-left" />
-      <div class="flex gap-4">
+    <nav class="flex flex-col justify-end gap-4 md:flex-row">
+      <slot name="action-top-center" />
+      {#if pageSizeOptions.length}
         <FilterSelect
           label="Per Page"
           parameter={$store.key}
           value={String($store.pageSize)}
-          {options}
+          options={pageSizeOptions}
         />
-        <div class="flex items-center justify-center gap-1">
-          <button
-            class="caret"
-            disabled={!$store.hasPrevious}
-            on:click={store.previousPage}
-          >
-            <Icon name="chevron-left" />
-          </button>
+      {/if}
+      <div class="flex items-center justify-center gap-3">
+        <button
+          class="caret"
+          disabled={!$store.hasPrevious}
+          on:click={store.previousPage}
+        >
+          <span
+            class="arrow arrow-left"
+            class:arrow-left-disabled={!$store.hasPrevious}
+          />
+        </button>
+        <div class="flex gap-1">
           <p>
-            {$store.currentPageNumber}–{$store.endingPageNumber}
+            {$store.indexStart}–{$store.indexEnd}
           </p>
-          <button
-            class="caret"
-            disabled={!$store.hasNext}
-            on:click={store.nextPage}
-          >
-            <Icon name="chevron-right" />
-          </button>
+          {#if total}
+            <p>
+              of {total}
+            </p>
+          {/if}
         </div>
-        <slot name="action-bottom-right" />
+        <button
+          class="caret"
+          disabled={!$store.hasNext}
+          on:click={fetchIndexData}
+        >
+          <span
+            class="arrow arrow-right"
+            class:arrow-right-disabled={!$store.hasNext}
+          />
+        </button>
       </div>
+      <slot name="action-top-right" />
     </nav>
   </div>
-{/if}
+  {#if $store.loading}
+    <SkeletonTable rows={15} />
+  {:else if isEmpty}
+    <slot name="empty">No Items</slot>
+  {:else}
+    <slot
+      updating={$store.updating}
+      visibleItems={$store.visibleItems}
+      activeIndex={$store.activeIndex}
+      setActiveIndex={store.setActiveIndex}
+    />
+  {/if}
+  <nav
+    class={`flex ${
+      $$slots['action-bottom-left'] ? 'justify-between' : 'justify-end'
+    }`}
+  >
+    <slot name="action-bottom-left" />
+    <div class="flex gap-4">
+      {#if $store.visibleItems.length}
+        {#if pageSizeOptions.length}
+          <FilterSelect
+            label="Per Page"
+            parameter={$store.key}
+            value={String($store.pageSize)}
+            options={pageSizeOptions}
+          />
+        {/if}
+        <div class="flex items-center justify-center gap-3">
+          <button
+            class="caret"
+            disabled={!$store.hasPrevious}
+            on:click={store.previousPage}
+          >
+            <span
+              class="arrow arrow-left"
+              class:arrow-left-disabled={!$store.hasPrevious}
+            />
+          </button>
+          <div class="flex gap-1">
+            <p>
+              {$store.indexStart}–{$store.indexEnd}
+            </p>
+            {#if total}
+              <p>
+                of {total}
+              </p>
+            {/if}
+          </div>
+          <button
+            class="caret"
+            disabled={!$store.hasNext}
+            on:click={fetchIndexData}
+          >
+            <span
+              class="arrow arrow-right"
+              class:arrow-right-disabled={!$store.hasNext}
+            />
+          </button>
+        </div>
+      {/if}
+      <slot name="action-bottom-right" />
+    </div>
+  </nav>
+</div>
 
 <style lang="postcss">
+  .arrow {
+    @apply absolute top-0 left-0 h-0 w-0;
+
+    border-style: solid;
+    border-width: 6px 12px 6px 0;
+  }
+
+  .arrow-left {
+    border-width: 6px 12px 6px 0;
+    border-color: transparent #18181b transparent transparent;
+  }
+
+  .arrow-left-disabled {
+    border-color: transparent #d4d4d8 transparent transparent;
+  }
+
+  .arrow-right {
+    border-width: 6px 0 6px 12px;
+    border-color: transparent transparent transparent #18181b;
+  }
+
+  .arrow-right-disabled {
+    border-color: transparent transparent transparent #d4d4d8;
+  }
+
   .caret {
-    @apply text-gray-500;
+    @apply relative;
+
+    width: 12px;
+    height: 12px;
   }
 
   .caret:disabled {

@@ -6,7 +6,7 @@
   import type { ParsedQuery } from '$lib/services/query-service';
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Button from '$holocene/button.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import Link from '$lib/holocene/link.svelte';
@@ -24,7 +24,7 @@
         workflow,
         namespace,
       },
-      $page.stuff.settings,
+      $page.data?.settings,
       $authUser?.accessToken,
     );
 
@@ -39,7 +39,7 @@
         workflow,
         namespace,
       },
-      $page.stuff.settings,
+      $page.data?.settings,
       $authUser?.accessToken,
     );
 

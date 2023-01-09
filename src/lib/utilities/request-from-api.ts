@@ -1,4 +1,4 @@
-import { browser } from '$app/env';
+import { browser } from '$app/environment';
 import { getAuthUser } from '$lib/stores/auth-user';
 import { noop } from 'svelte/internal';
 import { handleError as handleRequestError } from './handle-error';
