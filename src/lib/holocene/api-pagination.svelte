@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/stores';
   import Alert from '$lib/holocene/alert.svelte';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
