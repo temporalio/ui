@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { eventViewType } from '$lib/stores/event-view';
+  import { settings } from '$lib/stores/settings';
 
   import WorkflowRunLayout from '$lib/layouts/workflow-run-layout.svelte';
   import WorkflowHistoryLayout from '$lib/layouts/workflow-history-layout.svelte';
