@@ -70,11 +70,11 @@ const setFirstOption = (options: string[] | number[]) => {
 
 export const getInitialPageSize = (
   options: string[] | number[],
-  defaultPageSize: string | number | undefined,
+  defaultPageSize: string | number | undefined = undefined,
 ) => {
   if (defaultPageSize) {
     const optionAsInt = parseInt(defaultPageSize.toString());
-    if (!isNaN(optionAsInt)) return setFirstOption(options);
+    if (isNaN(optionAsInt)) return setFirstOption(options);
     return optionAsInt;
   } else {
     return setFirstOption(options);
@@ -83,7 +83,7 @@ export const getInitialPageSize = (
 
 export function createPaginationStore(
   pageSizeOptions: string[] | number[] = options,
-  defaultPageSize: string | number | undefined,
+  defaultPageSize: string | number | undefined = undefined,
 ): PaginationStore {
   const initialPageSize = getInitialPageSize(pageSizeOptions, defaultPageSize);
   const paginationStore = writable({

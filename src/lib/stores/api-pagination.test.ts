@@ -474,6 +474,27 @@ describe('createPaginationStore with custom pageSizeOptions', () => {
     expect(pageSize).toBe(100);
   });
 
+  it('should set correct getInitialPageSize with defaultPageSize', () => {
+    const options = [10, 25, 50];
+    const defaultPageSize = 25;
+    const pageSize = getInitialPageSize(options, defaultPageSize);
+    expect(pageSize).toBe(25);
+  });
+
+  it('should set correct getInitialPageSize with defaultPageSize that does not match options', () => {
+    const options = [10, 25, 50];
+    const defaultPageSize = 20;
+    const pageSize = getInitialPageSize(options, defaultPageSize);
+    expect(pageSize).toBe(20);
+  });
+
+  it('should set fallback getInitialPageSize with bad defaultPageSize', () => {
+    const options = [10, 25, 50];
+    const defaultPageSize = 'cats';
+    const pageSize = getInitialPageSize(options, defaultPageSize);
+    expect(pageSize).toBe(10);
+  });
+
   it('should set default values', () => {
     const store = createPaginationStore(['10', '20', '50']);
 
