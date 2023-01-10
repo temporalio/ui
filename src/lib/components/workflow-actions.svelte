@@ -15,7 +15,6 @@
   import { cancelWorkflow } from '$lib/services/workflow-service';
   import { toaster } from '$lib/stores/toaster';
   import Input from '$lib/holocene/input/input.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import MenuDivider from '$lib/holocene/primitives/menu/menu-divider.svelte';
   import JSONEditor from '$lib/holocene/json-editor.svelte';
 
@@ -168,29 +167,22 @@
     !writeActionsAreAllowed(settings);
 </script>
 
-<Tooltip
-  bottomLeft
-  hide={!actionsDisabled}
-  width={200}
-  text="You do not have permission to edit this Workflow. Contact your admin for assistance."
+<SplitButton
+  id="workflow-actions"
+  disabled={actionsDisabled}
+  primaryActionDisabled={!cancelEnabled || cancelInProgress}
+  on:click={showCancellationModal}
+  label="Request Cancellation"
 >
-  <SplitButton
-    id="workflow-actions"
-    disabled={actionsDisabled}
-    primaryActionDisabled={!cancelEnabled || cancelInProgress}
-    on:click={showCancellationModal}
-    label="Request Cancellation"
-  >
-    {#each workflowActions as { onClick, destructive, label, allowed, dataCy }}
-      {#if destructive}
-        <MenuDivider />
-      {/if}
-      <MenuItem on:click={onClick} {destructive} {dataCy} disabled={!allowed}>
-        {label}
-      </MenuItem>
-    {/each}
-  </SplitButton>
-</Tooltip>
+  {#each workflowActions as { onClick, destructive, label, allowed, dataCy }}
+    {#if destructive}
+      <MenuDivider />
+    {/if}
+    <MenuItem on:click={onClick} {destructive} {dataCy} disabled={!allowed}>
+      {label}
+    </MenuItem>
+  {/each}
+</SplitButton>
 
 <Modal
   open={showCancellationConfirmation}
