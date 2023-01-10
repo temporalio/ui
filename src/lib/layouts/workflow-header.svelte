@@ -159,7 +159,7 @@
           }),
         )}
       >
-        <Badge type="blue" class="px-2 py-0">{$eventHistory.total}</Badge>
+        <Badge type="blue" class="px-2 py-0">{workflow.historyEvents}</Badge>
       </Tab>
       <Tab
         label="Workers"

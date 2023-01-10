@@ -21,6 +21,7 @@
   export let startingIndex: string | number = 0;
   export let currentPageKey = 'page';
   export let itemsPerPage: number | null = null;
+  export let updating: boolean = false;
 
   $: perPage =
     itemsPerPage !== null
@@ -76,9 +77,42 @@
   };
 
   $: floatStyle = getFloatStyle({ width, height, screenWidth });
+
+  async function handleKeydown(event: KeyboardEvent) {
+    switch (event.code) {
+      case 'ArrowRight':
+      case 'KeyL':
+        if ($store.hasNext) {
+          store.next();
+          handlePageChange();
+        }
+        break;
+      case 'ArrowLeft':
+      case 'KeyH':
+        if ($store.hasPrevious) {
+          store.previous();
+          handlePageChange();
+        }
+        break;
+      case 'ArrowUp':
+      case 'KeyK':
+        store.previousRow();
+        break;
+      case 'ArrowDown':
+      case 'KeyJ':
+        store.nextRow();
+        break;
+      default:
+        break;
+    }
+  }
 </script>
 
-<svelte:window bind:innerWidth={screenWidth} on:resize={updateWidth} />
+<svelte:window
+  bind:innerWidth={screenWidth}
+  on:resize={updateWidth}
+  on:keydown={handleKeydown}
+/>
 
 <div class="pagination relative mb-8 flex flex-col gap-4">
   <div
@@ -113,8 +147,12 @@
           <Icon name="chevron-left" />
         </button>
         <p>
-          {$store.length ? $store.startingIndex + 1 : 0}–{$store.endingIndex +
-            1} of {$store.length}
+          {#if updating}
+            ...
+          {:else}
+            {$store.length ? $store.startingIndex + 1 : 0}–{$store.endingIndex +
+              1} of {$store.length}
+          {/if}
         </p>
         <button
           class="caret"
@@ -130,7 +168,12 @@
       <slot name="action-top-right" />
     </nav>
   </div>
-  <slot visibleItems={$store.items} initialItem={$store.initialItem} />
+  <slot
+    visibleItems={$store.items}
+    initialItem={$store.initialItem}
+    activeRowIndex={$store.activeRowIndex}
+    setActiveRowIndex={store.setActiveRowIndex}
+  />
   <nav
     class={`flex ${
       $$slots['action-bottom-left'] ? 'justify-between' : 'justify-end'
@@ -155,8 +198,12 @@
           <Icon name="chevron-left" />
         </button>
         <p>
-          {$store.length ? $store.startingIndex + 1 : 0}–{$store.endingIndex +
-            1} of {$store.length}
+          {#if updating}
+            ...
+          {:else}
+            {$store.length ? $store.startingIndex + 1 : 0}–{$store.endingIndex +
+              1} of {$store.length}
+          {/if}
         </p>
         <button
           class="caret"

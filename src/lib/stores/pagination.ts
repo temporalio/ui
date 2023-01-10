@@ -14,6 +14,9 @@ type PaginationMethods<T> = {
   jumpToIndex: (x: number | string) => void;
   findIndex: (fn: (item: T) => boolean) => number;
   findPage: (fn: (item: T) => boolean) => number;
+  nextRow: () => void;
+  previousRow: () => void;
+  setActiveRowIndex: (activeRowIndex: number) => void;
 };
 
 type PaginationStore<T> = PaginationMethods<T> &
@@ -28,6 +31,7 @@ type PaginationStore<T> = PaginationMethods<T> &
     pageSize: number;
     currentPage: number;
     totalPages: number;
+    activeRowIndex: number;
   }>;
 
 export const getPageForIndex = (i: number, pageSize: number): number => {
@@ -112,6 +116,7 @@ export const pagination = <T>(
 
   const pageSize = writable(perPage);
   const index = writable(start);
+  const activeRowIndex = writable(start);
 
   const adjustPageSize = (n: number | string) => {
     pageSize.set(toNumber(n));
@@ -121,11 +126,13 @@ export const pagination = <T>(
     index.update((index) => {
       const nextIndex = index + get(pageSize);
       if (outOfBounds(nextIndex, items)) return index;
+      resetActiveRowIndex();
       return getIndex(nextIndex, items);
     });
   };
 
   const previous = () => {
+    resetActiveRowIndex();
     index.update((index) => {
       const nextStart = index - get(pageSize);
       return getIndex(nextStart, items);
@@ -134,14 +141,20 @@ export const pagination = <T>(
 
   const jumpToPage = (page: number | string) => {
     const itemsPerPage = get(pageSize);
+    resetActiveRowIndex();
     return index.set(
       getStartingIndexForPage(Number(page), itemsPerPage, items),
     );
   };
 
+  const resetActiveRowIndex = () => {
+    activeRowIndex.set(0);
+  };
+
   const jumpToIndex = (i: number | string) => {
     const page = getPageForIndex(Number(i), get(pageSize));
     jumpToPage(page);
+    resetActiveRowIndex();
   };
 
   const findIndex = (fn: (item: T) => boolean): number => {
@@ -155,20 +168,39 @@ export const pagination = <T>(
     return getPageForIndex(i, get(pageSize));
   };
 
-  const { subscribe } = derived([index, pageSize], ([$index, $pageSize]) => {
-    return {
-      items: items.slice($index, $index + $pageSize),
-      initialItem: items[0],
-      hasPrevious: !outOfBounds($index - $pageSize, items),
-      hasNext: !outOfBounds($index + $pageSize, items),
-      startingIndex: $index,
-      endingIndex: getIndex($index + $pageSize - 1, items),
-      length: items.length,
-      pageSize: $pageSize,
-      currentPage: getPageForIndex($index, $pageSize),
-      totalPages: getTotalPages($pageSize, items),
-    };
-  });
+  const setActiveRowIndex = (index: number) => {
+    activeRowIndex.set(index);
+  };
+
+  const nextRow = () => {
+    if (get(activeRowIndex) < get(pageSize)) {
+      activeRowIndex.set(get(activeRowIndex) + 1);
+    }
+  };
+
+  const previousRow = () => {
+    const nextIndex = get(activeRowIndex) >= 1 ? get(activeRowIndex) - 1 : 0;
+    activeRowIndex.set(nextIndex);
+  };
+
+  const { subscribe } = derived(
+    [index, pageSize, activeRowIndex],
+    ([$index, $pageSize, $activeRowIndex]) => {
+      return {
+        items: items.slice($index, $index + $pageSize),
+        initialItem: items[0],
+        hasPrevious: !outOfBounds($index - $pageSize, items),
+        hasNext: !outOfBounds($index + $pageSize, items),
+        startingIndex: $index,
+        endingIndex: getIndex($index + $pageSize - 1, items),
+        length: items.length,
+        pageSize: $pageSize,
+        currentPage: getPageForIndex($index, $pageSize),
+        totalPages: getTotalPages($pageSize, items),
+        activeRowIndex: $activeRowIndex,
+      };
+    },
+  );
 
   return {
     subscribe,
@@ -179,6 +211,9 @@ export const pagination = <T>(
     jumpToIndex,
     findIndex,
     findPage,
+    nextRow,
+    previousRow,
+    setActiveRowIndex,
   };
 };
 

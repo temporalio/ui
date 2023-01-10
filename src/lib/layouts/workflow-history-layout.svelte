@@ -21,13 +21,19 @@
   import { exportHistory } from '$lib/utilities/export-history';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
 
   let showShortcuts = false;
 
   $: workflowEvents =
     getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
+
+  const onViewClick = (view: EventView) => {
+    if ($page.url.searchParams.get('page')) {
+      $page.url.searchParams.delete('page');
+    }
+    $eventViewType = view;
+  };
 </script>
 
 <section class="flex flex-col gap-4">
@@ -115,19 +121,19 @@
             icon="feed"
             active={$eventViewType === 'feed'}
             data-cy="feed"
-            on:click={() => ($eventViewType = 'feed')}>History</ToggleButton
+            on:click={() => onViewClick('feed')}>History</ToggleButton
           >
           <ToggleButton
             icon="compact"
             active={$eventViewType === 'compact'}
             data-cy="compact"
-            on:click={() => ($eventViewType = 'compact')}>Compact</ToggleButton
+            on:click={() => onViewClick('compact')}>Compact</ToggleButton
           >
           <ToggleButton
             icon="json"
             active={$eventViewType === 'json'}
             data-cy="json"
-            on:click={() => ($eventViewType = 'json')}>JSON</ToggleButton
+            on:click={() => onViewClick('json')}>JSON</ToggleButton
           >
           <ToggleButton
             icon="download"
@@ -146,7 +152,6 @@
   </section>
   <EventShortcutKeys
     open={showShortcuts}
-    compact={$eventViewType === 'compact'}
     onOpen={() => (showShortcuts = true)}
     onClose={() => (showShortcuts = false)}
   />

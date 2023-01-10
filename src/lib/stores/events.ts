@@ -12,17 +12,11 @@ import { page } from '$app/stores';
 
 import {
   fetchStartAndEndEvents,
-  getPaginatedEvents,
   type FetchEventsParameters,
   type FetchEventsParametersWithSettings,
 } from '$lib/services/events-service';
 
-import {
-  eventFilterSort,
-  eventSortOrder,
-  eventViewType,
-  supportsReverseOrder,
-} from './event-view';
+import { eventSortOrder } from './event-view';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { withLoading, delay } from '$lib/utilities/stores/with-loading';
 import { refresh } from '$lib/stores/workflow-run';
@@ -110,13 +104,6 @@ export const parametersWithSettings: Readable<FetchEventsParametersWithSettings>
 export type StartAndEndEventHistory = {
   start: WorkflowEvents;
   end: WorkflowEvents;
-  total: number;
-};
-
-const getTotalFromEndOfHistory = (endHistory: WorkflowEvents) => {
-  const endingId = endHistory[0]?.id;
-  if (!endingId || isNaN(parseInt(endingId))) return 0;
-  return parseInt(endingId);
 };
 
 export const updateEventHistory: StartStopNotifier<StartAndEndEventHistory> = (
@@ -128,11 +115,10 @@ export const updateEventHistory: StartStopNotifier<StartAndEndEventHistory> = (
       withLoading(loading, updating, async () => {
         const events = await fetchStartAndEndEvents(params);
         if (events?.start && events?.end) {
-          const total = getTotalFromEndOfHistory(events.end);
-          set({ ...events, total });
+          set({ ...events });
         } else {
           setTimeout(() => {
-            set({ ...events, total: 0 });
+            set({ ...events });
           }, delay);
         }
       });
@@ -141,34 +127,10 @@ export const updateEventHistory: StartStopNotifier<StartAndEndEventHistory> = (
 };
 
 export const eventHistory = readable<StartAndEndEventHistory>(
-  { start: [], end: [], total: 0 },
+  { start: [], end: [] },
   updateEventHistory,
 );
 
 export const timelineEvents = writable(null);
 export const updating = writable(true);
 export const loading = writable(true);
-export const activeEvent = writable(null);
-
-export const fetchPaginatedEvents = derived(
-  [page, eventFilterSort, eventViewType, authUser, supportsReverseOrder],
-  async ([
-    $page,
-    $eventFilterSort,
-    $eventViewType,
-    $authUser,
-    $supportsReverseOrder,
-  ]) => {
-    return getPaginatedEvents({
-      namespace: $page.params.namespace,
-      workflowId: $page.params.workflow,
-      runId: $page.params.run,
-      sort: $eventFilterSort,
-      category: $page.url.searchParams.get('category'),
-      compact: $eventViewType === 'compact',
-      settings: $page.data?.settings,
-      accessToken: $authUser?.accessToken,
-      supportsReverseOrder: $supportsReverseOrder,
-    });
-  },
-);

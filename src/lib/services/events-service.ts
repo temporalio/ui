@@ -12,6 +12,8 @@ export type FetchEventsParameters = NamespaceScopedRequest &
     runId: string;
     rawPayloads?: boolean;
     sort?: EventSortOrder;
+    settings?: Settings;
+    accessToken?: string;
   };
 
 export type FetchEventsParametersWithSettings = FetchEventsParameters & {
@@ -50,6 +52,39 @@ export const fetchRawEvents = async ({
   );
 
   return response.history.events;
+};
+
+export const fetchAllEvents = async ({
+  namespace,
+  workflowId,
+  runId,
+  sort,
+  settings,
+  accessToken,
+  onStart,
+  onUpdate,
+  onComplete,
+}: FetchEventsParameters): Promise<CommonHistoryEvent[]> => {
+  const endpoint = getEndpointForSortOrder(sort);
+  const route = await routeForApi(endpoint, { namespace, workflowId, runId });
+  const response = await paginated(
+    async (token: string) => {
+      return requestFromAPI<GetWorkflowExecutionHistoryResponse>(route, {
+        token,
+        request: fetch,
+      });
+    },
+    { onStart, onUpdate, onComplete },
+  );
+
+  const allEvents = await toEventHistory({
+    response: response.history.events,
+    namespace,
+    settings,
+    accessToken,
+  });
+
+  return allEvents;
 };
 
 export const fetchPartialRawEvents = async ({
