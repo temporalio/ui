@@ -169,6 +169,7 @@
 
 <SplitButton
   id="workflow-actions"
+  position="right"
   disabled={actionsDisabled}
   primaryActionDisabled={!cancelEnabled || cancelInProgress}
   on:click={showCancellationModal}
