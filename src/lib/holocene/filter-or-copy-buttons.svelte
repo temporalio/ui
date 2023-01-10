@@ -22,14 +22,9 @@
     on:click|preventDefault|stopPropagation={noop}
   >
     {#if filterable}
-      <button on:click|preventDefault|stopPropagation={onFilter}>
+      <button on:click|preventDefault|stopPropagation={onFilter} class:filtered>
         {#key filtered}
-          <Icon
-            name="filter"
-            class="h-4 w-4 rounded-sm {filtered
-              ? 'bg-gray-900 text-white'
-              : ''}"
-          />
+          <Icon name="filter" class="h-5 w-5 " />
         {/key}
       </button>
     {/if}
@@ -44,5 +39,13 @@
 <style lang="postcss">
   .copy-or-filter {
     @apply absolute right-0 top-0 bottom-0 inline-flex gap-2 px-2;
+  }
+
+  .copy-or-filter button {
+    @apply relative top-[50%] h-fit translate-y-[-50%] rounded-full p-0.5 hover:bg-white hover:text-primary;
+  }
+
+  .filtered {
+    @apply bg-gray-900 text-white;
   }
 </style>
