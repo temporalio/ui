@@ -25,7 +25,7 @@
 </script>
 
 {#if pendingActivities.length}
-  <section class="rounded-lg border-2 border-gray-300 bg-white p-4">
+  <section class="rounded-xl border-[3px] border-gray-900 bg-white p-4">
     <h3 class="mb-2 text-lg font-medium">Pending Activities</h3>
     <section>
       {#each pendingActivities as { id, ...pendingActivity } (id)}

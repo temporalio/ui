@@ -172,7 +172,12 @@
 </script>
 
 {#if !$updating && (title || copy)}
-  <Alert icon="warning" intent="warning" {title}>
+  <Alert
+    class="rounded-xl border-[3px]"
+    icon="warning"
+    intent="warning"
+    {title}
+  >
     <p>
       {copy}
       {#if contactSupport}
