@@ -89,7 +89,7 @@
   .secondary,
   .destructive,
   .login {
-    @apply border py-2 px-4 transition-colors;
+    @apply border-[3px] py-2 px-4 transition-colors;
   }
 
   .button:disabled {
@@ -106,15 +106,11 @@
 
   .primary,
   .login {
-    @apply border-primary bg-primary text-white hover:bg-blue-500 hover:text-gray-100;
+    @apply border-primary bg-primary from-blue-100 to-purple-100 text-white hover:bg-gradient-to-b hover:text-primary;
   }
 
   .primary:disabled {
     @apply opacity-50 hover:border-primary hover:bg-primary;
-  }
-
-  .primary:hover {
-    @apply border-blue-700 bg-blue-700;
   }
 
   .secondary {
@@ -138,7 +134,7 @@
   }
 
   .selected {
-    @apply border-blue-600 bg-blue-600 text-white;
+    @apply bg-gradient-to-b from-blue-100 to-purple-100 text-gray-900;
   }
 
   .login {

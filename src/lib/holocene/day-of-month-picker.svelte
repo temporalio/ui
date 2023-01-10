@@ -18,7 +18,7 @@
 
 <div class="text-center">
   <div
-    class="grid grid-cols-7 gap-y-4 gap-x-4 rounded border border border-gray-900 px-0 py-4 text-center md:gap-x-8 md:px-2 xl:gap-x-16 xl:px-4"
+    class="grid gap-y-4 gap-x-4 rounded border border-gray-900 px-0 py-4 text-center md:gap-x-8 md:px-2 xl:gap-x-16 xl:px-4"
   >
     {#each daysInMonth as day}
       <button
@@ -31,11 +31,15 @@
 </div>
 
 <style lang="postcss">
+  .grid {
+    grid-template-columns: repeat(7, minmax(45px, 1fr));
+  }
+
   .cell {
-    @apply h-10 w-full cursor-pointer rounded p-1 hover:bg-blue-700 hover:text-white;
+    @apply h-10 cursor-pointer rounded border-[3px] border-gray-100 from-blue-100 to-purple-100 p-1  hover:border-gray-900 hover:bg-gradient-to-b hover:text-gray-900;
   }
 
   .active {
-    @apply bg-gray-900 text-white;
+    @apply border-gray-900 bg-gray-900 text-white;
   }
 </style>
