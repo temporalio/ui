@@ -53,7 +53,7 @@ describe('Workflow Actions', () => {
       cy.wait('@event-history-descending');
 
       cy.get('#workflow-actions-menu-button').click();
-      cy.get('#workflow-actions-menu > [data-cy="terminate-button"]').click();
+      cy.get('#workflow-actions-menu >> [data-cy="terminate-button"]').click();
       cy.get('#workflow-termination-reason').type('test');
       cy.get('[data-cy="confirm-modal-button"').click();
       cy.get('#workflow-termination-success-toast').should('exist');
@@ -89,7 +89,7 @@ describe('Workflow Actions', () => {
       cy.wait('@workflow-api');
 
       cy.get('#workflow-actions-menu-button').click();
-      cy.get('#workflow-actions-menu > [data-cy="signal-button"]').click();
+      cy.get('#workflow-actions-menu >> [data-cy="signal-button"]').click();
       cy.get('#signal-name').type('sos');
       cy.get('div.cm-content').type('{{}{enter}"sos":true');
       cy.get('[data-cy="confirm-modal-button"').click();
