@@ -16,6 +16,7 @@
     runId: string,
   ) => {
     const { settings, user } = $page.data;
+    events = [];
     events = await fetchAllEvents({
       namespace,
       workflowId,

@@ -12,7 +12,6 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
   import { getFloatStyle } from '$lib/utilities/get-float-style';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
 
   type T = $$Generic;
@@ -136,7 +135,7 @@
           {options}
         />
       {/if}
-      <div class="flex items-center justify-center gap-1">
+      <div class="flex items-center justify-center gap-3">
         <button
           class="caret"
           disabled={!$store.hasPrevious}
@@ -145,7 +144,10 @@
             handlePageChange();
           }}
         >
-          <Icon name="chevron-left" />
+          <span
+            class="arrow arrow-left"
+            class:arrow-left-disabled={!$store.hasPrevious}
+          />
         </button>
         <p>
           {#if updating}
@@ -163,7 +165,10 @@
             handlePageChange();
           }}
         >
-          <Icon name="chevron-right" />
+          <span
+            class="arrow arrow-right"
+            class:arrow-right-disabled={!$store.hasNext}
+          />
         </button>
       </div>
       <slot name="action-top-right" />
@@ -190,13 +195,16 @@
           {options}
         />
       {/if}
-      <div class="flex items-center justify-center gap-1">
+      <div class="flex items-center justify-center gap-3">
         <button
           class="caret"
           disabled={!$store.hasPrevious}
           on:click={() => store.previous()}
         >
-          <Icon name="chevron-left" />
+          <span
+            class="arrow arrow-left"
+            class:arrow-left-disabled={!$store.hasPrevious}
+          />
         </button>
         <p>
           {#if updating}
@@ -211,7 +219,10 @@
           disabled={!$store.hasNext}
           on:click={() => store.next()}
         >
-          <Icon name="chevron-right" />
+          <span
+            class="arrow arrow-right"
+            class:arrow-right-disabled={!$store.hasNext}
+          />
         </button>
       </div>
       <slot name="action-bottom-right" />
@@ -221,10 +232,38 @@
 
 <style lang="postcss">
   .caret {
-    @apply text-gray-500;
+    @apply relative;
+
+    width: 12px;
+    height: 12px;
   }
 
   .caret:disabled {
     @apply cursor-not-allowed text-gray-300;
+  }
+
+  .arrow {
+    @apply absolute top-0 left-0 h-0 w-0;
+
+    border-style: solid;
+    border-width: 6px 12px 6px 0;
+  }
+
+  .arrow-left {
+    border-width: 6px 12px 6px 0;
+    border-color: transparent #18181b transparent transparent;
+  }
+
+  .arrow-left-disabled {
+    border-color: transparent #d4d4d8 transparent transparent;
+  }
+
+  .arrow-right {
+    border-width: 6px 0 6px 12px;
+    border-color: transparent transparent transparent #18181b;
+  }
+
+  .arrow-right-disabled {
+    border-color: transparent transparent transparent #d4d4d8;
   }
 </style>
