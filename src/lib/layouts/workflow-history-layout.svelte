@@ -21,7 +21,6 @@
   import { exportHistory } from '$lib/utilities/export-history';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
 
   let showShortcuts = false;
@@ -31,39 +30,58 @@
 </script>
 
 <section class="flex flex-col gap-4">
-  <section class="flex flex-col gap-1">
-    <WorkflowDetail
-      title="Workflow Type"
-      content={$workflowRun.workflow.name}
-    />
-    <WorkflowDetail title="Run ID" content={$workflowRun.workflow.runId} />
-    <div class="flex flex-col gap-1 md:flex-row md:gap-6">
-      <WorkflowDetail
-        title="Start Time"
-        content={formatDate($workflowRun.workflow.startTime, $timeFormat)}
-      />
-      <WorkflowDetail
-        title="Close Time"
-        content={formatDate($workflowRun.workflow.endTime, $timeFormat)}
-      />
-    </div>
-    <WorkflowDetail
-      title="Task Queue"
-      content={$workflowRun.workflow.taskQueue}
-      href={routeForWorkers({
-        namespace: $page.params.namespace,
-        workflow: $workflowRun.workflow.id,
-        run: $workflowRun.workflow.runId,
-      })}
-    />
-    <WorkflowDetail
-      title="State Transitions"
-      content={$workflowRun.workflow.stateTransitionCount}
-    />
-    {#if $workflowRun.workflow?.parent}
-      <div class="gap-2 xl:flex">
+  <Accordion title="Summary" icon="summary">
+    <div
+      class="grid-row-3 grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 xl:w-11/12"
+    >
+      <div class="col-span-1 md:col-span-2">
+        <h3 class="font-medium">Workflow Type</h3>
+        <div class="h-0.5 rounded-full bg-gray-900" />
+        <WorkflowDetail content={$workflowRun.workflow.name} copyable />
         <WorkflowDetail
-          title="Parent Workflow ID"
+          title="Run ID"
+          content={$workflowRun.workflow.runId}
+          copyable
+        />
+      </div>
+      <div class="col-span-1">
+        <h3 class="font-medium">Task Queue</h3>
+        <div class="h-0.5 rounded-full bg-gray-900" />
+        <WorkflowDetail
+          content={$workflowRun.workflow.taskQueue}
+          href={routeForWorkers({
+            namespace: $page.params.namespace,
+            workflow: $workflowRun.workflow.id,
+            run: $workflowRun.workflow.runId,
+          })}
+          copyable
+        />
+        <WorkflowDetail
+          title="State Transitions"
+          content={$workflowRun.workflow.stateTransitionCount}
+        />
+      </div>
+      <div class="col-span-1">
+        <h3 class="font-medium">Start & Close Time</h3>
+        <div class="h-0.5 rounded-full bg-gray-900" />
+        <WorkflowDetail
+          title="Start Time"
+          content={formatDate($workflowRun.workflow.startTime, $timeFormat)}
+        />
+        <WorkflowDetail
+          title="Close Time"
+          content={formatDate($workflowRun.workflow.endTime, $timeFormat)}
+        />
+      </div>
+    </div>
+  </Accordion>
+  {#if $workflowRun.workflow?.parent || $workflowRun.workflow?.pendingChildren.length}
+    <Accordion title="Relationships" icon="relationship">
+      {#if $workflowRun.workflow?.parent}
+        <h3 class="font-medium">Parent</h3>
+        <div class="h-0.5 w-full rounded-full bg-gray-900 lg:w-3/4" />
+        <WorkflowDetail
+          title="Workflow ID"
           content={$workflowRun.workflow.parent?.workflowId}
           href={routeForEventHistory({
             namespace: $page.params.namespace,
@@ -72,7 +90,7 @@
           })}
         />
         <WorkflowDetail
-          title="Parent Run ID"
+          title="Run ID"
           content={$workflowRun.workflow.parent?.runId}
           href={routeForEventHistory({
             namespace: $page.params.namespace,
@@ -80,15 +98,16 @@
             run: $workflowRun.workflow.parent?.runId,
           })}
         />
-      </div>
-    {/if}
-    {#if $workflowRun.workflow?.pendingChildren.length}
-      <ChildWorkflowsTable
-        pendingChildren={$workflowRun.workflow?.pendingChildren}
-        namespace={$page.params.namespace}
-      />
-    {/if}
-  </section>
+      {/if}
+      {#if $workflowRun.workflow?.pendingChildren.length}
+        <ChildWorkflowsTable
+          pendingChildren={$workflowRun.workflow?.pendingChildren}
+          namespace={$page.params.namespace}
+        />
+      {/if}
+    </Accordion>
+  {/if}
+
   <WorkflowStackTraceError
     workflow={$workflowRun.workflow}
     workers={$workflowRun.workers}

@@ -37,7 +37,7 @@
 </script>
 
 <div
-  class="flex w-full cursor-default flex-col rounded-xl border-[3px] border-gray-900 bg-white p-8 text-primary {className}"
+  class="flex w-full cursor-default flex-col rounded-xl border-[3px] border-gray-900 bg-white p-4 text-primary {className}"
   {...$$restProps}
 >
   <button

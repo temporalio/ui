@@ -43,6 +43,7 @@ import logout from './svg/logout.svelte';
 import namespaceSwitcher from './svg/namespace-switcher.svelte';
 import namespace from './svg/namespace.svelte';
 import regions from './svg/regions.svelte';
+import relationship from './svg/relationship.svelte';
 import retention from './svg/retention.svelte';
 import retry from './svg/retry.svelte';
 import rocketShip from './svg/rocket-ship.svelte';
@@ -54,7 +55,9 @@ import spinner from './svg/spinner.svelte';
 import spinnerSolid from './svg/spinner-solid.svelte';
 import starEmpty from './svg/star-empty.svelte';
 import starFilled from './svg/star-filled.svelte';
+import summary from './svg/summary.svelte';
 import terminal from './svg/terminal.svelte';
+import timeline from './svg/timeline.svelte';
 import trash from './svg/trash.svelte';
 import tutorial from './svg/tutorial.svelte';
 import upload from './svg/upload.svelte';
@@ -111,6 +114,7 @@ export const icons = {
   'namespace-switcher': namespaceSwitcher,
   namespace,
   regions,
+  relationship,
   retention,
   retry,
   'rocket-ship': rocketShip,
@@ -121,8 +125,10 @@ export const icons = {
   spinner,
   'star-empty': starEmpty,
   'star-filled': starFilled,
+  summary,
   'spinner-solid': spinnerSolid,
   terminal,
+  timeline,
   trash,
   tutorial,
   upload,
