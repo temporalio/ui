@@ -7,7 +7,7 @@
   import Select from '$lib/holocene/select/simple-select.svelte';
   import Option from '$lib/holocene/select/simple-option.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Button from '$holocene/button.svelte';
+  import Button from '$lib/holocene/button.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import { authUser } from '$lib/stores/auth-user';
 

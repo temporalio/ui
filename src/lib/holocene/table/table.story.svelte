@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Badge from '$holocene/badge.svelte';
-  import Table from '$holocene/table/table.svelte';
-  import TableRow from '$holocene/table/table-row.svelte';
-  import TableHeaderRow from '$holocene/table/table-header-row.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
+  import Table from '$lib/holocene/table/table.svelte';
+  import TableRow from '$lib/holocene/table/table-row.svelte';
+  import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import type { Hst as HST } from '@histoire/plugin-svelte';
   import BulkActionButton from './bulk-action-button.svelte';
   import SelectableTable from './selectable-table.svelte';

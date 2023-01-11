@@ -5,9 +5,9 @@
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
-  import Table from '$holocene/table/table.svelte';
-  import TableHeaderRow from '$holocene/table/table-header-row.svelte';
-  import TableRow from '$holocene/table/table-row.svelte';
+  import Table from '$lib/holocene/table/table.svelte';
+  import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
+  import TableRow from '$lib/holocene/table/table-row.svelte';
 </script>
 
 <PageTitle title="Namespaces" url={$page.url.href} />

@@ -5,7 +5,7 @@
   import Banners from '$lib/components/banner/banners.svelte';
   import { ErrorBoundary } from '$lib/holocene/error-boundary';
   import ScrollToTop from '$lib/holocene/scroll-to-top.svelte';
-  import Toaster from '$holocene/toaster.svelte';
+  import Toaster from '$lib/holocene/toaster.svelte';
   import { toaster } from '$lib/stores/toaster';
 
   export let data: PageData;

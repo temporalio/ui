@@ -1,6 +1,6 @@
 import { test, expect, Locator } from '@playwright/test';
 
-const address = process.env.E2E_UI_ADDRESS ?? '';
+const address = process.env.E2E_UI_ADDRESS ?? 'http://localhost:8233';
 
 test.beforeEach(async ({ page }) => {
   await page.goto(address);
@@ -10,8 +10,8 @@ test.describe('Workflows list', () => {
   test('should render decoded Payloads', async ({ page }) => {
     await page.getByText('e2e-workflow-1').click();
 
-    var region: Locator;
-    var toggle: Locator;
+    let region: Locator;
+    let toggle: Locator;
 
     region = page.getByTestId('inputs-results');
 
@@ -67,7 +67,9 @@ test.describe('Workflows list', () => {
     await page.getByText('Stack Trace').click();
 
     await expect(
-      page.getByRole('code', { text: 'github.com/temporalio/ui/e2e.Workflow' }),
+      page
+        .getByRole('code')
+        .filter({ hasText: 'github.com/temporalio/ui/e2e.Workflow' }),
     ).toBeVisible();
   });
 
@@ -78,7 +80,9 @@ test.describe('Workflows list', () => {
     await page.getByLabel('Query Type').selectOption('current_result');
 
     await expect(
-      page.getByRole('code', { text: '"Received Plain text input 2"' }),
+      page
+        .getByRole('code')
+        .filter({ hasText: '"Received Plain text input 2"' }),
     ).toBeVisible();
   });
 });

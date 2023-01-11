@@ -5,7 +5,7 @@
   import { timelineEvents } from '$lib/stores/events';
 
   import Header from '$lib/layouts/workflow-header.svelte';
-  import Loading from '$holocene/loading.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
   import { onDestroy, onMount } from 'svelte';
   import { type EventSortOrder, eventFilterSort } from '$lib/stores/event-view';
 

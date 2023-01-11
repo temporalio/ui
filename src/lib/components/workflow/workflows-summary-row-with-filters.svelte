@@ -7,8 +7,8 @@
   import { routeForEventHistory } from '$lib/utilities/route-for';
 
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import FilterOrCopyButtons from '$holocene/filter-or-copy-buttons.svelte';
-  import TableRow from '$holocene/table/table-row.svelte';
+  import FilterOrCopyButtons from '$lib/holocene/filter-or-copy-buttons.svelte';
+  import TableRow from '$lib/holocene/table/table-row.svelte';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import Checkbox from '$lib/holocene/checkbox.svelte';

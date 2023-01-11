@@ -20,19 +20,31 @@
     undefined;
   export let onSpace: (event: KeyboardEvent) => void | undefined = undefined;
 
-  export let pageSizeOptions: string[] = options;
+  export let pageSizeOptions: string[] | number[] = options;
+  export let defaultPageSize: string | number | undefined = undefined;
   export let total: string | number = '';
 
-  let store = createPaginationStore(pageSizeOptions);
+  let store = createPaginationStore(pageSizeOptions, defaultPageSize);
   let error: any;
 
   function clearError() {
     if (error) error = undefined;
   }
 
+  $: isEmpty = $store.visibleItems.length === 0 && !$store.loading;
+  $: pageSizeChange =
+    !$store.loading && $store.pageSize !== $store.previousPageSize;
+
   onMount(() => {
     initalDataFetch();
   });
+
+  $: {
+    if (pageSizeChange) {
+      store.resetPageSize($store.pageSize);
+      initalDataFetch();
+    }
+  }
 
   async function initalDataFetch() {
     const fetchData: PaginatedRequest = await onFetch();
@@ -175,6 +187,8 @@
   </div>
   {#if $store.loading}
     <SkeletonTable rows={15} />
+  {:else if isEmpty}
+    <slot name="empty">No Items</slot>
   {:else}
     <slot
       updating={$store.updating}

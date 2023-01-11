@@ -12,7 +12,7 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
   import { getFloatStyle } from '$lib/utilities/get-float-style';
-  import Icon from '$holocene/icon/icon.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
   type T = $$Generic;
 

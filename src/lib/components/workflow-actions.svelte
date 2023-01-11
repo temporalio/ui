@@ -7,7 +7,7 @@
   import { settings } from '$lib/stores/settings';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
-  import Modal from '$holocene/modal.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
   import { coreUserStore } from '$lib/stores/core-user';
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';

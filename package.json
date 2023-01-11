@@ -1,6 +1,6 @@
 {
   "name": "@temporalio/ui",
-  "version": "2.2.0-beta.0",
+  "version": "2.2.0",
   "type": "module",
   "description": "Temporal.io UI",
   "keywords": [
@@ -29,7 +29,7 @@
     "format": "prettier --write --plugin-search-dir=. . && stylelint \"src/**/*.{css,postcss,svelte}\" --fix",
     "cypress": "concurrently \"pnpm run dev:test\" \"cypress open\"",
     "cypress:run": "cypress run",
-    "package": "svelte-package && rsync -r ./package/lib/ ./package/ && rm -rf ./package/lib",
+    "package": "svelte-package",
     "package:patch": "pnpm version patch && svelte-package",
     "package:minor": "pnpm version minor && svelte-package",
     "package:major": "pnpm version major && svelte-package",

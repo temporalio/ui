@@ -5,7 +5,7 @@
   } from '$lib/stores/data-encoder-config';
   import { dataEncoder } from '$lib/stores/data-encoder';
 
-  import Checkbox from '$holocene/checkbox.svelte';
+  import Checkbox from '$lib/holocene/checkbox.svelte';
 
   export let endpoint = '';
   export let passToken = false;

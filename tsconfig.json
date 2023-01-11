@@ -29,7 +29,6 @@
       "$lib/*": ["src/lib/*"],
       "$types": ["src/types"],
       "$components/*": ["src/components/*"],
-      "$holocene/*": ["src/lib/holocene/*"],
       "$fixtures/*": ["src/fixtures/*"]
     }
   },
