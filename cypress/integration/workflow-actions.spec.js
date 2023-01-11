@@ -24,14 +24,8 @@ describe('Workflow Actions', () => {
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
         `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?maximumPageSize=20`,
-      { fixture: 'event-history-completed.json' },
-    ).as('event-history-end');
-
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?`,
       { fixture: 'event-history-completed-reverse.json' },
-    ).as('event-history-ascending');
+    ).as('event-history-end');
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +

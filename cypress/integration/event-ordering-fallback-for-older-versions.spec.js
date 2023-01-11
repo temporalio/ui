@@ -15,31 +15,31 @@ describe('Fallback to Ascending Ordering of Event History on Older Versions of T
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-      `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}?`,
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}?`,
       { fixture: 'workflow-completed.json' },
     ).as('workflow-api');
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-      `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?maximumPageSize=20`,
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?maximumPageSize=20`,
       { fixture: 'event-history-completed.json' },
     ).as('event-history-start');
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-      `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?maximumPageSize=20`,
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?maximumPageSize=20`,
       { fixture: 'event-history-completed-reverse.json' },
     ).as('event-history-end');
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-      `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?`,
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?`,
       { fixture: 'event-history-completed.json' },
     ).as('event-history-ascending');
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-      `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?`,
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?`,
       { fixture: 'event-history-completed-reverse.json' },
     ).as('event-history-descending');
   });
