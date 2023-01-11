@@ -61,6 +61,13 @@ export const getNearestStartingIndex = (
   return getStartingIndexForPage(page, itemsPerPage, items);
 };
 
+export const getMaxRowIndex = (
+  itemsOfPage: number,
+  itemsPerPage: number,
+): number => {
+  return Math.min(itemsOfPage - 1, itemsPerPage - 1);
+};
+
 export const getValidPage = (
   page: number,
   itemsPerPage: number,
@@ -126,13 +133,11 @@ export const pagination = <T>(
     index.update((index) => {
       const nextIndex = index + get(pageSize);
       if (outOfBounds(nextIndex, items)) return index;
-      resetActiveRowIndex();
       return getIndex(nextIndex, items);
     });
   };
 
   const previous = () => {
-    resetActiveRowIndex();
     index.update((index) => {
       const nextStart = index - get(pageSize);
       return getIndex(nextStart, items);
@@ -141,20 +146,24 @@ export const pagination = <T>(
 
   const jumpToPage = (page: number | string) => {
     const itemsPerPage = get(pageSize);
-    resetActiveRowIndex();
-    return index.set(
-      getStartingIndexForPage(Number(page), itemsPerPage, items),
+    const nextIndex = getStartingIndexForPage(
+      Number(page),
+      itemsPerPage,
+      items,
     );
-  };
-
-  const resetActiveRowIndex = () => {
-    activeRowIndex.set(0);
+    const pageItemSize = items.slice(
+      nextIndex,
+      nextIndex + itemsPerPage,
+    ).length;
+    if (get(activeRowIndex) > pageItemSize - 1) {
+      activeRowIndex.set(pageItemSize - 1);
+    }
+    return index.set(nextIndex);
   };
 
   const jumpToIndex = (i: number | string) => {
     const page = getPageForIndex(Number(i), get(pageSize));
     jumpToPage(page);
-    resetActiveRowIndex();
   };
 
   const findIndex = (fn: (item: T) => boolean): number => {
@@ -168,12 +177,24 @@ export const pagination = <T>(
     return getPageForIndex(i, get(pageSize));
   };
 
-  const setActiveRowIndex = (index: number) => {
-    activeRowIndex.set(index);
+  const setActiveRowIndex = (nextIndex: number) => {
+    const pageItemSize = items.slice(
+      get(index),
+      get(index) + get(pageSize),
+    ).length;
+    const maxRowIndex = getMaxRowIndex(pageItemSize, get(pageSize));
+    if (nextIndex <= maxRowIndex) {
+      activeRowIndex.set(nextIndex);
+    }
   };
 
   const nextRow = () => {
-    if (get(activeRowIndex) < get(pageSize)) {
+    const pageItemSize = items.slice(
+      get(index),
+      get(index) + get(pageSize),
+    ).length;
+    const maxRowIndex = getMaxRowIndex(pageItemSize, get(pageSize));
+    if (get(activeRowIndex) < maxRowIndex) {
       activeRowIndex.set(get(activeRowIndex) + 1);
     }
   };
