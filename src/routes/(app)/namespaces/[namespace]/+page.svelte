@@ -203,28 +203,64 @@
     </Table>
   </article>
 
-  <article class="namespace-info w-full p-4">
+  <article class="namespace-info flex w-full flex-col">
     <h1 class="my-4 text-lg font-medium">Client Actions</h1>
-    <p>
-      <span class="mr-2 font-medium">Client Actions Disabled:</span>
-      {$settings.disableWriteActions}
-    </p>
-    <p>
-      <span class="mr-2 font-medium">Terminate Disabled:</span>
-      {$settings.workflowTerminateDisabled}
-    </p>
-    <p>
-      <span class="mr-2 font-medium">Cancel Disabled:</span>
-      {$settings.workflowCancelDisabled}
-    </p>
-    <p>
-      <span class="mr-2 font-medium">Signal Disabled:</span>
-      {$settings.workflowSignalDisabled}
-    </p>
-    <p>
-      <span class="mr-2 font-medium">Reset Disabled:</span>
-      {$settings.workflowResetDisabled}
-    </p>
+    <Table variant="simple">
+      <tr slot="headers">
+        <th class="w-1/2 lg:w-3/5" /><th />
+      </tr>
+
+      <tr>
+        <td>Client Actions</td>
+        <td
+          ><Badge
+            class="px-1 py-0"
+            type={badgeTypeForBoolean($settings.disableWriteActions)}
+            >{badgeTextForBoolean($settings.disableWriteActions)}</Badge
+          ></td
+        >
+      </tr>
+      <tr>
+        <td>Terminate Workflow</td>
+        <td
+          ><Badge
+            class="px-1 py-0"
+            type={badgeTypeForBoolean($settings.workflowTerminateDisabled)}
+            >{badgeTextForBoolean($settings.workflowTerminateDisabled)}</Badge
+          ></td
+        >
+      </tr>
+      <tr>
+        <td>Cancel Workflow</td>
+        <td
+          ><Badge
+            class="px-1 py-0"
+            type={badgeTypeForBoolean($settings.workflowCancelDisabled)}
+            >{badgeTextForBoolean($settings.workflowCancelDisabled)}</Badge
+          ></td
+        >
+      </tr>
+      <tr>
+        <td>Signal Workflow</td>
+        <td
+          ><Badge
+            class="px-1 py-0"
+            type={badgeTypeForBoolean($settings.workflowSignalDisabled)}
+            >{badgeTextForBoolean($settings.workflowSignalDisabled)}</Badge
+          ></td
+        >
+      </tr>
+      <tr>
+        <td>Reset Workflow</td>
+        <td
+          ><Badge
+            class="px-1 py-0"
+            type={badgeTypeForBoolean($settings.workflowResetDisabled)}
+            >{badgeTextForBoolean($settings.workflowResetDisabled)}</Badge
+          ></td
+        >
+      </tr>
+    </Table>
   </article>
 </div>
 
