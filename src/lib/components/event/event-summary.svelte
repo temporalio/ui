@@ -41,6 +41,7 @@
 
 {#key [$eventFilterSort, category, $refresh]}
   <Pagination
+    floatId="event-view-toggle"
     {items}
     {updating}
     let:visibleItems
