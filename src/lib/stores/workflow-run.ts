@@ -74,7 +74,4 @@ const updateWorkflowRun: StartStopNotifier<{
 };
 
 export const updating = writable(true);
-export const workflowRun = readable<WorkflowRunStore>(
-  initialWorkflowRun,
-  updateWorkflowRun,
-);
+export const workflowRun = writable<WorkflowRunStore>(initialWorkflowRun);

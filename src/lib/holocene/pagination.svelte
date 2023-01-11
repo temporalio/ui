@@ -13,6 +13,7 @@
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
   import { getFloatStyle } from '$lib/utilities/get-float-style';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import Skeleton from '$lib/holocene/skeleton/index.svelte';
 
   type T = $$Generic;
 
@@ -148,7 +149,7 @@
         </button>
         <p>
           {#if updating}
-            ...
+            <Skeleton class="block h-5 w-24" />
           {:else}
             {$store.length ? $store.startingIndex + 1 : 0}–{$store.endingIndex +
               1} of {$store.length}
@@ -199,7 +200,7 @@
         </button>
         <p>
           {#if updating}
-            ...
+            <Skeleton class="block h-5 w-24" />
           {:else}
             {$store.length ? $store.startingIndex + 1 : 0}–{$store.endingIndex +
               1} of {$store.length}

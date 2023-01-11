@@ -5,8 +5,13 @@
   import { page } from '$app/stores';
   import { fetchAllEvents } from '$lib/services/events-service';
   import { eventFilterSort, type EventSortOrder } from '$lib/stores/event-view';
+  import { refresh } from '$lib/stores/workflow-run';
 
   let events: CommonHistoryEvent[] = [];
+
+  $: namespace = $page.params.namespace;
+  $: workflowId = $page.params.workflow;
+  $: runId = $page.params.run;
 
   const fetchEvents = async (
     namespace: string,
@@ -25,12 +30,7 @@
     });
   };
 
-  $: fetchEvents(
-    $page.params.namespace,
-    $page.params.workflow,
-    $page.params.run,
-    $eventFilterSort,
-  );
+  $: $refresh, fetchEvents(namespace, workflowId, runId, $eventFilterSort);
 
   onDestroy(() => {
     $timelineEvents = null;

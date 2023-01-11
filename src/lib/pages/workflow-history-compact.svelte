@@ -2,8 +2,13 @@
   import EventSummary from '$lib/components/event/event-summary.svelte';
   import { page } from '$app/stores';
   import { fetchAllEvents } from '$lib/services/events-service';
+  import { refresh } from '$lib/stores/workflow-run';
 
   let events: CommonHistoryEvent[] = [];
+
+  $: namespace = $page.params.namespace;
+  $: workflowId = $page.params.workflow;
+  $: runId = $page.params.run;
 
   const fetchEvents = async (
     namespace: string,
@@ -21,11 +26,7 @@
     });
   };
 
-  $: fetchEvents(
-    $page.params.namespace,
-    $page.params.workflow,
-    $page.params.run,
-  );
+  $: $refresh, fetchEvents(namespace, workflowId, runId);
 </script>
 
 <EventSummary {events} compact={true} />
