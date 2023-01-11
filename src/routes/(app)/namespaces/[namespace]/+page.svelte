@@ -8,6 +8,7 @@
   import { supportsReverseOrder } from '$lib/stores/event-view';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { searchAttributes } from '$lib/stores/search-attributes';
+  import { settings } from '$lib/stores/settings';
 
   import { fromSecondsToDaysOrHours } from '$lib/utilities/format-time';
 
@@ -87,6 +88,30 @@
         {$supportsReverseOrder}
       </p>
     {/if}
+  </article>
+
+  <article class="namespace-info w-full p-4">
+    <h1 class="my-4 text-lg font-medium">Client Actions</h1>
+    <p>
+      <span class="mr-2 font-medium">Client Actions Disabled:</span>
+      {$settings.disableWriteActions}
+    </p>
+    <p>
+      <span class="mr-2 font-medium">Terminate Disabled:</span>
+      {$settings.workflowTerminateDisabled}
+    </p>
+    <p>
+      <span class="mr-2 font-medium">Cancel Disabled:</span>
+      {$settings.workflowCancelDisabled}
+    </p>
+    <p>
+      <span class="mr-2 font-medium">Signal Disabled:</span>
+      {$settings.workflowSignalDisabled}
+    </p>
+    <p>
+      <span class="mr-2 font-medium">Reset Disabled:</span>
+      {$settings.workflowResetDisabled}
+    </p>
   </article>
 </div>
 
