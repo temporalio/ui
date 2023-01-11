@@ -56,6 +56,7 @@
       <h2 class="flex w-full items-center gap-2 text-lg font-medium">
         {#if icon}<Icon name={icon} />{/if}
         {title}
+        <slot name="summary" />
       </h2>
       <div class="mr-1" on:click|stopPropagation on:keyup|stopPropagation>
         <slot name="action" />
