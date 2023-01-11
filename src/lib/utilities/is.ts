@@ -2,10 +2,10 @@ import type { EventSortOrder } from '$lib/stores/event-view';
 
 type Space = ' ';
 type Quote = "'" | '"';
-type Operator = typeof operators[number];
-type Conditional = typeof conditionals[number];
-type Parenthesis = typeof parenthesis[number];
-type Join = typeof joins[number];
+type Operator = (typeof operators)[number];
+type Conditional = (typeof conditionals)[number];
+type Parenthesis = (typeof parenthesis)[number];
+type Join = (typeof joins)[number];
 
 const executionStatuses: Readonly<WorkflowStatus[]> = [
   'Running',
