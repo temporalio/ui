@@ -29,13 +29,13 @@ describe('Workflow Actions', () => {
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?nextPageToken=*`,
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?`,
       { fixture: 'event-history-completed-reverse.json' },
     ).as('event-history-ascending');
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?nextPageToken=*`,
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?`,
       { fixture: 'event-history-completed-reverse.json' },
     ).as('event-history-descending');
   });

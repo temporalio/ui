@@ -43,7 +43,7 @@ describe('Workflow Input and Results', () => {
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?nextPageToken=*`,
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?`,
       { fixture: 'event-history-completed-reverse.json' },
     ).as('event-history-descending');
 
@@ -91,7 +91,7 @@ describe('Workflow Input and Results', () => {
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?nextPageToken=*`,
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?`,
       { fixture: 'event-history-completed-null.json' },
     ).as('event-history-descending');
 
@@ -142,7 +142,7 @@ describe('Workflow Input and Results', () => {
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?nextPageToken=*`,
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?`,
       { fixture: 'event-history-running.json' },
     ).as('event-history-descending');
 
@@ -179,7 +179,7 @@ describe('Workflow Input and Results', () => {
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?nextPageToken=*`,
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?`,
       { fixture: 'event-history-failed.json' },
     ).as('event-history-descending');
 
@@ -224,7 +224,7 @@ describe('Workflow Input and Results', () => {
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?nextPageToken=*`,
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?`,
       { fixture: 'event-history-canceled.json' },
     ).as('event-history-descending');
 
@@ -261,7 +261,7 @@ describe('Workflow Input and Results', () => {
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?nextPageToken=*`,
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/reverse?`,
       { fixture: 'event-history-timed-out.json' },
     ).as('event-history-descending');
 
@@ -298,7 +298,7 @@ describe('Workflow Input and Results', () => {
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?nextPageToken=*`,
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?`,
       { fixture: 'event-history-continued-as-new.json' },
     ).as('event-history-descending');
 
