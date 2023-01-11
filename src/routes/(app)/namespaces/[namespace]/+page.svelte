@@ -1,11 +1,9 @@
 <script lang="ts">
   import type { PageData } from './$types';
   import { onMount } from 'svelte';
-  import { dev } from '$app/environment';
   import { page } from '$app/stores';
 
   import { temporalVersion, uiVersion } from '$lib/stores/versions';
-  import { supportsReverseOrder } from '$lib/stores/event-view';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { searchAttributes } from '$lib/stores/search-attributes';
 
@@ -81,12 +79,6 @@
       <span class="mr-2 font-medium">Temporal UI Version:</span>
       {$uiVersion}
     </p>
-    {#if dev}
-      <p data-cy="supports-reverse-order">
-        <span class="mr-2 font-medium">Supports Descending Event History:</span>
-        {$supportsReverseOrder}
-      </p>
-    {/if}
   </article>
 </div>
 

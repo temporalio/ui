@@ -261,7 +261,7 @@ describe('Workflow Input and Results', () => {
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/reverse?`,
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?`,
       { fixture: 'event-history-timed-out.json' },
     ).as('event-history-descending');
 

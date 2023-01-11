@@ -10,12 +10,6 @@ describe('Stack Trace', () => {
   beforeEach(() => {
     cy.interceptApi();
 
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/*/runs/*/events/reverse*`,
-      { fixture: 'event-history-completed.json' },
-    ).as('event-history-api');
-
     cy.visit('/namespaces/default/workflows');
 
     cy.wait('@workflows-api');
@@ -31,8 +25,28 @@ describe('Stack Trace', () => {
       { fixture: 'workflow-completed.json' },
     ).as('workflow-api');
 
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?maximumPageSize=20`,
+      { fixture: 'event-history-completed.json' },
+    ).as('event-history-start');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?maximumPageSize=20`,
+      { fixture: 'event-history-completed-reverse.json' },
+    ).as('event-history-end');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?`,
+      { fixture: 'event-history-completed-reverse.json' },
+    ).as('event-history-descending');
+
     cy.wait('@workflow-api');
-    cy.wait('@event-history-api');
+    cy.wait('@event-history-start');
+    cy.wait('@event-history-end');
+    cy.wait('@event-history-descending');
 
     cy.get('[data-cy=stack-trace-tab]').click();
 
@@ -53,8 +67,28 @@ describe('Stack Trace', () => {
       { fixture: 'workflow-running.json' },
     ).as('workflow-api');
 
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?maximumPageSize=20`,
+      { fixture: 'event-history-running.json' },
+    ).as('event-history-start');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?maximumPageSize=20`,
+      { fixture: 'event-history-running.json' },
+    ).as('event-history-end');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?`,
+      { fixture: 'event-history-running.json' },
+    ).as('event-history-descending');
+
     cy.wait('@workflow-api');
-    cy.wait('@event-history-api');
+    cy.wait('@event-history-start');
+    cy.wait('@event-history-end');
+    cy.wait('@event-history-descending');
 
     cy.get('[data-cy=stack-trace-tab]').click();
 
@@ -79,10 +113,30 @@ describe('Stack Trace', () => {
       { fixture: 'workflow-running.json' },
     ).as('workflow-api');
 
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?maximumPageSize=20`,
+      { fixture: 'event-history-running.json' },
+    ).as('event-history-start');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?maximumPageSize=20`,
+      { fixture: 'event-history-running.json' },
+    ).as('event-history-end');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?`,
+      { fixture: 'event-history-running.json' },
+    ).as('event-history-descending');
+
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
     cy.wait('@workflow-api');
-    cy.wait('@event-history-api');
+    cy.wait('@event-history-start');
+    cy.wait('@event-history-end');
+    cy.wait('@event-history-descending');
 
     cy.get('[data-cy=stack-trace-tab]').click();
 

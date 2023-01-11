@@ -88,7 +88,19 @@ describe('Navigate to Workflow Workers', () => {
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/*/runs/*/events/reverse*`,
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?maximumPageSize=20`,
+      { fixture: 'event-history-completed.json' },
+    ).as('event-history-start');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?maximumPageSize=20`,
+      { fixture: 'event-history-completed-reverse.json' },
+    ).as('event-history-end');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?`,
       { fixture: 'event-history-completed-reverse.json' },
     ).as('event-history-descending');
 
@@ -96,6 +108,8 @@ describe('Navigate to Workflow Workers', () => {
 
     cy.wait('@namespaces-api');
     cy.wait('@workflow-api');
+    cy.wait('@event-history-start');
+    cy.wait('@event-history-end');
     cy.wait('@event-history-descending');
   });
 

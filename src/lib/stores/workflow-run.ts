@@ -41,37 +41,5 @@ type WorkflowRunStore = {
 };
 const initialWorkflowRun: WorkflowRunStore = { workflow: null, workers: null };
 
-const updateWorkflowRun: StartStopNotifier<{
-  workflow: WorkflowExecution;
-  workers: GetPollersResponse;
-}> = (set) => {
-  return parameters.subscribe(
-    ({ namespace, workflowId, runId, settings, accessToken }) => {
-      if (namespace && workflowId && runId) {
-        withLoading(loading, updating, async () => {
-          const workflow = await fetchWorkflow({
-            namespace,
-            workflowId,
-            runId,
-          });
-          const { taskQueue } = workflow;
-          const workers = await getPollers({ queue: taskQueue, namespace });
-          workflow.pendingActivities = await toDecodedPendingActivities(
-            workflow,
-            namespace,
-            settings,
-            accessToken,
-          );
-
-          set({ workflow, workers });
-        });
-      } else {
-        loading.set(true);
-        updating.set(false);
-      }
-    },
-  );
-};
-
 export const updating = writable(true);
 export const workflowRun = writable<WorkflowRunStore>(initialWorkflowRun);

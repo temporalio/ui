@@ -153,7 +153,6 @@ type PaginatedEventParams = {
   compact: boolean;
   settings: Settings;
   accessToken: string;
-  supportsReverseOrder: boolean;
 };
 
 export async function getPaginatedEvents({
@@ -165,13 +164,12 @@ export async function getPaginatedEvents({
   compact,
   settings,
   accessToken,
-  supportsReverseOrder,
 }: PaginatedEventParams): Promise<
   () => Promise<{ items: WorkflowEvents; nextPageToken: NextPageToken }>
 > {
   return async (_pageSize = 100, token = '') => {
     const historyRoute = await routeForApi(
-      !supportsReverseOrder || compact ? 'events.ascending' : `events.${sort}`,
+      compact ? 'events.ascending' : `events.${sort}`,
       {
         namespace,
         workflowId,

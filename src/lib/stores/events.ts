@@ -16,7 +16,7 @@ import {
   type FetchEventsParametersWithSettings,
 } from '$lib/services/events-service';
 
-import { eventSortOrder } from './event-view';
+import { eventFilterSort } from './event-view';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { withLoading, delay } from '$lib/utilities/stores/with-loading';
 import { refresh } from '$lib/stores/workflow-run';
@@ -76,7 +76,7 @@ const isNewRequest = (
 };
 
 export const parameters: Readable<FetchEventsParameters> = derived(
-  [namespace, workflowId, runId, eventSortOrder],
+  [namespace, workflowId, runId, eventFilterSort],
   ([$namespace, $workflowId, $runId, $sort]) => {
     return {
       namespace: $namespace,

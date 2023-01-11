@@ -87,6 +87,9 @@ describe('Workflow Actions', () => {
 
       cy.wait('@settings-api');
       cy.wait('@workflow-api');
+      cy.wait('@event-history-start');
+      cy.wait('@event-history-end');
+      cy.wait('@event-history-descending');
 
       cy.get('#workflow-actions-menu-button').click();
       cy.get('#workflow-actions-menu > [data-cy="signal-button"]').click();
