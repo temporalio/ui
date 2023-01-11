@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-Temporal must be running in development. (For details, see [Run a dev Cluster](https://docs.temporal.io/application-development/foundations#run-a-development-cluster) in the documentation.)
+Temporal must be running in development. (For details, see [Run a dev Cluster](https://docs.temporal.io/application-development-guide#run-a-dev-cluster) in the documentation.)
 
 Temporal UI requires [Temporal v1.16.0](https://github.com/temporalio/temporal/releases/tag/v1.16.0) or later.
 
