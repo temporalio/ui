@@ -120,6 +120,7 @@ export type WorkflowExecutionStatus =
 export type Severity = temporal.api.enums.v1.Severity;
 export type WorkflowTaskFailedCause =
   temporal.api.enums.v1.WorkflowTaskFailedCause;
+export type ArchivalState = temporal.api.enums.v1.ArchivalState;
 
 // api.workflow
 
