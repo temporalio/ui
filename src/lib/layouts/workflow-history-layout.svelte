@@ -1,6 +1,9 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import {
+    workflowRun,
+    workflowSummaryViewOpen,
+  } from '$lib/stores/workflow-run';
   import {
     routeForEventHistory,
     routeForWorkers,
@@ -30,7 +33,14 @@
 </script>
 
 <section class="flex flex-col gap-4">
-  <Accordion title="Summary" icon="summary">
+  <Accordion
+    title="Summary"
+    icon="summary"
+    open={$workflowSummaryViewOpen}
+    onToggle={() => {
+      $workflowSummaryViewOpen = !$workflowSummaryViewOpen;
+    }}
+  >
     <div
       class="grid-row-3 grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 xl:w-11/12"
     >

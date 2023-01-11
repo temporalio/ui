@@ -14,6 +14,7 @@
     disabled?: boolean;
     readOnly?: boolean;
     error?: string;
+    onToggle?: () => void;
   }
 
   export let title: string;
@@ -24,6 +25,7 @@
   export let disabled = false;
   export let readOnly = false;
   export let error = '';
+  export let onToggle = () => {};
 
   let className = '';
   export { className as class };
@@ -33,6 +35,7 @@
   const toggleAccordion = () => {
     if (disabled || readOnly) return;
     open = !open;
+    onToggle();
   };
 </script>
 

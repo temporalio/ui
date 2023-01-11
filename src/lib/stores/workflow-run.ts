@@ -1,6 +1,6 @@
 import { derived, readable, writable } from 'svelte/store';
 import { page } from '$app/stores';
-
+import { persistStore } from '$lib/stores/persist-store';
 import { withLoading } from '$lib/utilities/stores/with-loading';
 import type { StartStopNotifier } from 'svelte/store';
 import { fetchWorkflow } from '$lib/services/workflow-service';
@@ -77,4 +77,9 @@ export const updating = writable(true);
 export const workflowRun = readable<WorkflowRunStore>(
   initialWorkflowRun,
   updateWorkflowRun,
+);
+export const workflowSummaryViewOpen = persistStore<boolean>(
+  'workflowSummaryView',
+  true,
+  true,
 );
