@@ -6,6 +6,7 @@ import workflowCompletedFixture from '../fixtures/workflow-completed.json';
 describe('Stack Trace With Completed Workflow', () => {
   const { workflowId, runId } =
     workflowCompletedFixture.workflowExecutionInfo.execution;
+  const { name } = workflowCompletedFixture.executionConfig.taskQueue;
 
   beforeEach(() => {
     cy.interceptApi();
@@ -33,6 +34,22 @@ describe('Stack Trace With Completed Workflow', () => {
         `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}?`,
       { fixture: 'workflow-completed.json' },
     ).as('workflow-api');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/task-queues/${name}?taskQueueType=1`,
+      {
+        fixture: 'worker-task-queues.json',
+      },
+    ).as('worker-task-queues-api');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/task-queues/${name}?taskQueueType=2`,
+      {
+        fixture: 'empty-task-queues.json',
+      },
+    ).as('activity-task-queues-api');
   });
 
   it('should show No Stack Trace for completed workflow', () => {
@@ -47,6 +64,8 @@ describe('Stack Trace With Completed Workflow', () => {
     cy.get('[data-cy=stack-trace-tab]').click();
 
     cy.wait('@workflow-api');
+    cy.wait('@worker-task-queues-api');
+    cy.wait('@activity-task-queues-api');
 
     cy.get('[data-cy="query-stack-trace-empty"]').contains(
       'No Stack Traces Found',
@@ -57,6 +76,7 @@ describe('Stack Trace With Completed Workflow', () => {
 describe('Stack Trace with Running Workflow', () => {
   const { workflowId, runId } =
     workflowRunningFixture.workflowExecutionInfo.execution;
+  const { name } = workflowRunningFixture.executionConfig.taskQueue;
 
   beforeEach(() => {
     cy.interceptApi();
@@ -84,6 +104,22 @@ describe('Stack Trace with Running Workflow', () => {
         `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}?`,
       { fixture: 'workflow-running.json' },
     ).as('workflow-api');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/task-queues/${name}?taskQueueType=1`,
+      {
+        fixture: 'worker-task-queues.json',
+      },
+    ).as('worker-task-queues-api');
+
+    cy.intercept(
+      Cypress.env('VITE_API_HOST') +
+        `/api/v1/namespaces/default/task-queues/${name}?taskQueueType=2`,
+      {
+        fixture: 'empty-task-queues.json',
+      },
+    ).as('activity-task-queues-api');
   });
 
   it('should show stack trace for running workflow', () => {
@@ -98,6 +134,8 @@ describe('Stack Trace with Running Workflow', () => {
     cy.get('[data-cy=stack-trace-tab]').click();
 
     cy.wait('@workflow-api');
+    cy.wait('@worker-task-queues-api');
+    cy.wait('@activity-task-queues-api');
     cy.wait('@query-api');
 
     cy.get('[data-cy="query-stack-trace"]').contains('go.temporal.io/sdk');
@@ -121,6 +159,8 @@ describe('Stack Trace with Running Workflow', () => {
     cy.get('[data-cy=stack-trace-tab]').click();
 
     cy.wait('@workflow-api');
+    cy.wait('@worker-task-queues-api');
+    cy.wait('@activity-task-queues-api');
     cy.wait('@query-api-error');
 
     cy.get('[data-cy="query-stack-trace"]').contains('[{"an":"error"}]');

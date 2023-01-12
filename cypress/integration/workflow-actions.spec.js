@@ -18,19 +18,19 @@ describe('Workflow Actions', () => {
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
         `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?maximumPageSize=20`,
-      { fixture: 'event-history-completed.json' },
+      { fixture: 'event-history-running.json' },
     ).as('event-history-start');
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
         `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?maximumPageSize=20`,
-      { fixture: 'event-history-completed-reverse.json' },
+      { fixture: 'event-history-running.json' },
     ).as('event-history-end');
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
         `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?`,
-      { fixture: 'event-history-completed-reverse.json' },
+      { fixture: 'event-history-running.json' },
     ).as('event-history-descending');
 
     cy.visit(
@@ -92,10 +92,6 @@ describe('Workflow Actions', () => {
       cy.intercept(Cypress.env('VITE_API_HOST') + `/api/v1/settings?`, {
         fixture: 'settings.write-actions-disabled.json',
       }).as('settings-api');
-
-      cy.visit(
-        `/namespaces/default/workflows/${workflowId}/${runId}/history?sort=descending`,
-      );
 
       cy.wait('@settings-api');
       cy.wait('@workflow-api');
