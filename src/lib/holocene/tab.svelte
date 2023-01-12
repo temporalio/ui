@@ -7,7 +7,7 @@
 
 {#if href}
   <a
-    class="flex items-center gap-1 whitespace-nowrap border-b-2 border-gray-100 text-sm hover:border-b-2 hover:border-blue-700 md:text-base"
+    class="tab"
     class:active
     class:disabled
     tabindex="0"
@@ -19,7 +19,7 @@
   </a>
 {:else}
   <div
-    class="flex cursor-pointer items-center gap-1 whitespace-nowrap border-b-2 border-gray-100 text-sm hover:border-b-2 hover:border-blue-700 md:text-base"
+    class="tab cursor-pointer"
     class:active
     class:disabled
     data-cy={$$props.dataCy}
@@ -33,12 +33,17 @@
 {/if}
 
 <style lang="postcss">
+  .tab {
+    border-color: transparent;
+    @apply flex items-center gap-1 whitespace-nowrap border-b-2 text-sm hover:border-b-2 hover:border-blue-700 md:text-base;
+  }
+
   a.active {
     @apply border-b-2 border-blue-700 font-medium text-blue-700;
   }
 
   a.disabled {
-    @apply pointer-events-none border-0 text-gray-800 opacity-50;
+    @apply pointer-events-none text-gray-800 opacity-50;
   }
 
   div.active {
@@ -46,6 +51,10 @@
   }
 
   div.disabled {
-    @apply cursor-not-allowed border-0 text-gray-800 opacity-50;
+    @apply cursor-not-allowed text-gray-800 opacity-50;
+  }
+
+  div.disabled:hover {
+    border-color: transparent;
   }
 </style>
