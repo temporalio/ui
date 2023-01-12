@@ -1,13 +1,17 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import { workflowRun, refresh } from '$lib/stores/workflow-run';
   import {
     routeForEventHistory,
     routeForWorkers,
   } from '$lib/utilities/route-for';
   import { formatDate } from '$lib/utilities/format-date';
   import { eventViewType } from '$lib/stores/event-view';
+  import { timeFormat } from '$lib/stores/time-format';
   import { eventHistory } from '$lib/stores/events';
+  import { fetchStartAndEndEvents } from '$lib/services/events-service';
+  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
+  import { exportHistory } from '$lib/utilities/export-history';
 
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
@@ -17,16 +21,35 @@
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
-  import { timeFormat } from '$lib/stores/time-format';
-  import { exportHistory } from '$lib/utilities/export-history';
-  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
   import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
 
   let showShortcuts = false;
 
+  $: namespace = $page.params.namespace;
+  $: workflowId = $page.params.workflow;
+  $: runId = $page.params.run;
+
+  $: $refresh, getStartAndEndEvents(namespace, workflowId, runId);
+
   $: workflowEvents =
     getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
+
+  const getStartAndEndEvents = async (
+    namespace: string,
+    workflowId: string,
+    runId: string,
+  ) => {
+    const { settings, user } = $page.data;
+    const events = await fetchStartAndEndEvents({
+      namespace,
+      workflowId,
+      runId,
+      settings,
+      accessToken: user?.accessToken,
+    });
+    $eventHistory = events;
+  };
 
   const onViewClick = (view: EventView) => {
     if ($page.url.searchParams.get('page')) {

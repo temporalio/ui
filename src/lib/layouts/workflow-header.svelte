@@ -7,7 +7,7 @@
   import { autoRefreshWorkflow } from '$lib/stores/event-view';
   import { workflowsQuery, workflowsSearch } from '$lib/stores/workflows';
   import { workflowRun, refresh } from '$lib/stores/workflow-run';
-  import { eventHistory, updating } from '$lib/stores/events';
+  import { eventHistory } from '$lib/stores/events';
 
   import {
     routeForEventHistory,
@@ -88,7 +88,6 @@
 
   $: cancelInProgress = isCancelInProgress(
     $workflowRun?.workflow?.status,
-    $updating,
     $eventHistory,
   );
 </script>
