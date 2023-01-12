@@ -32,14 +32,14 @@ describe('Workflow Actions', () => {
         `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?`,
       { fixture: 'event-history-completed-reverse.json' },
     ).as('event-history-descending');
+
+    cy.visit(
+      `/namespaces/default/workflows/${workflowId}/${runId}/history/feed?sort=descending`,
+    );
   });
 
   describe('Terminate', () => {
     it('works if the workflow is running and write actions are enabled', () => {
-      cy.visit(
-        `/namespaces/default/workflows/${workflowId}/${runId}/history?sort=descending`,
-      );
-
       cy.wait('@settings-api');
       cy.wait('@workflow-api');
       cy.wait('@event-history-start');
@@ -56,10 +56,6 @@ describe('Workflow Actions', () => {
 
   describe('Cancel', () => {
     it('works if the workflow is running and write actions are enabled', () => {
-      cy.visit(
-        `/namespaces/default/workflows/${workflowId}/${runId}/history?sort=descending`,
-      );
-
       cy.wait('@settings-api');
       cy.wait('@workflow-api');
       cy.wait('@event-history-start');
@@ -75,10 +71,6 @@ describe('Workflow Actions', () => {
 
   describe('Signal', () => {
     it('works if the workflow is running and write actions are enabled', () => {
-      cy.visit(
-        `/namespaces/default/workflows/${workflowId}/${runId}/history/feed?sort=descending`,
-      );
-
       cy.wait('@settings-api');
       cy.wait('@workflow-api');
       cy.wait('@event-history-start');

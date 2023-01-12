@@ -3,9 +3,6 @@
 import workflowRunningFixture from '../fixtures/workflow-running.json';
 import workflowCompletedFixture from '../fixtures/workflow-completed.json';
 
-const { workflowId, runId } =
-  workflowCompletedFixture.workflowExecutionInfo.execution;
-
 describe('Stack Trace', () => {
   beforeEach(() => {
     cy.interceptApi();
@@ -17,7 +14,8 @@ describe('Stack Trace', () => {
   });
 
   it('should show No Stack Trace for completed workflow', () => {
-    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
+    const { workflowId, runId } =
+      workflowCompletedFixture.workflowExecutionInfo.execution;
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
@@ -43,6 +41,8 @@ describe('Stack Trace', () => {
       { fixture: 'event-history-completed-reverse.json' },
     ).as('event-history-descending');
 
+    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
+
     cy.wait('@workflow-api');
     cy.wait('@event-history-start');
     cy.wait('@event-history-end');
@@ -58,8 +58,6 @@ describe('Stack Trace', () => {
   it('should show stack trace for running workflow', () => {
     const { workflowId, runId } =
       workflowRunningFixture.workflowExecutionInfo.execution;
-
-    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
@@ -84,6 +82,8 @@ describe('Stack Trace', () => {
         `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?`,
       { fixture: 'event-history-running.json' },
     ).as('event-history-descending');
+
+    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
     cy.wait('@workflow-api');
     cy.wait('@event-history-start');
