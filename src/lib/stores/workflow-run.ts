@@ -10,7 +10,7 @@ type WorkflowRunStore = {
 };
 const initialWorkflowRun: WorkflowRunStore = {
   workflow: null,
-  workers: { pollers: [], taskQueueStatus: '' },
+  workers: { pollers: [], taskQueueStatus: null },
 };
 
 export const updating = writable(true);
