@@ -32,3 +32,11 @@ jobs:
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           VITE_MODE: test
+    - name: Capture Cypress tests
+      uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: cypress-report
+          path: |
+              cypress/screenshots/
+              cypress/videos/

@@ -134,8 +134,6 @@ describe('Stack Trace with Running Workflow', () => {
     cy.get('[data-cy=stack-trace-tab]').click();
 
     cy.wait('@workflow-api');
-    cy.wait('@worker-task-queues-api');
-    cy.wait('@activity-task-queues-api');
     cy.wait('@query-api');
 
     cy.get('[data-cy="query-stack-trace"]').contains('go.temporal.io/sdk');
@@ -159,8 +157,6 @@ describe('Stack Trace with Running Workflow', () => {
     cy.get('[data-cy=stack-trace-tab]').click();
 
     cy.wait('@workflow-api');
-    cy.wait('@worker-task-queues-api');
-    cy.wait('@activity-task-queues-api');
     cy.wait('@query-api-error');
 
     cy.get('[data-cy="query-stack-trace"]').contains('[{"an":"error"}]');
