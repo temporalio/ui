@@ -21,7 +21,6 @@
   import WorkflowsSummaryTableWithFilters from '$lib/components/workflow/workflows-summary-table-with-filters.svelte';
   import WorkflowsSummaryRowWithFilters from '$lib/components/workflow/workflows-summary-row-with-filters.svelte';
   import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
@@ -299,9 +298,13 @@
     </div>
   </div>
   <div>
-    <Button variant="secondary" on:click={refreshWorkflows}
-      ><Icon name="retry" /></Button
+    <button
+      aria-label="retry workflows"
+      class="cursor-pointer rounded-full p-1 hover:bg-gray-900 hover:text-white"
+      on:click={refreshWorkflows}
     >
+      <Icon name="retry" class="h-8 w-8" />
+    </button>
   </div>
 </div>
 <Pagination items={$workflows} let:visibleItems>

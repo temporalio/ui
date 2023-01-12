@@ -24,7 +24,7 @@
     {#if filterable}
       <button on:click|preventDefault|stopPropagation={onFilter} class:filtered>
         {#key filtered}
-          <Icon name="filter" class="h-5 w-5 " />
+          <Icon name="filter" class="h-5 w-5" />
         {/key}
       </button>
     {/if}
