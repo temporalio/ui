@@ -52,7 +52,7 @@
 
   $: isRunning = $workflowRun?.workflow?.isRunning;
   $: activitiesCanceled = ['Terminated', 'TimedOut', 'Canceled'].includes(
-    $workflowRun.workflow.status,
+    $workflowRun.workflow?.status,
   );
 
   onMount(() => {

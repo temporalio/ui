@@ -40,31 +40,31 @@
   <section class="flex flex-col gap-1">
     <WorkflowDetail
       title="Workflow Type"
-      content={$workflowRun.workflow.name}
+      content={$workflowRun.workflow?.name}
     />
-    <WorkflowDetail title="Run ID" content={$workflowRun.workflow.runId} />
+    <WorkflowDetail title="Run ID" content={$workflowRun.workflow?.runId} />
     <div class="flex flex-col gap-1 md:flex-row md:gap-6">
       <WorkflowDetail
         title="Start Time"
-        content={formatDate($workflowRun.workflow.startTime, $timeFormat)}
+        content={formatDate($workflowRun.workflow?.startTime, $timeFormat)}
       />
       <WorkflowDetail
         title="Close Time"
-        content={formatDate($workflowRun.workflow.endTime, $timeFormat)}
+        content={formatDate($workflowRun.workflow?.endTime, $timeFormat)}
       />
     </div>
     <WorkflowDetail
       title="Task Queue"
-      content={$workflowRun.workflow.taskQueue}
+      content={$workflowRun.workflow?.taskQueue}
       href={routeForWorkers({
         namespace: $page.params.namespace,
-        workflow: $workflowRun.workflow.id,
-        run: $workflowRun.workflow.runId,
+        workflow: $workflowRun.workflow?.id,
+        run: $workflowRun.workflow?.runId,
       })}
     />
     <WorkflowDetail
       title="State Transitions"
-      content={$workflowRun.workflow.stateTransitionCount}
+      content={$workflowRun.workflow?.stateTransitionCount}
     />
     {#if $workflowRun.workflow?.parent}
       <div class="gap-2 xl:flex">
@@ -141,8 +141,8 @@
             on:click={() =>
               exportHistory({
                 namespace: $page.params.namespace,
-                workflowId: $workflowRun.workflow.id,
-                runId: $workflowRun.workflow.runId,
+                workflowId: $workflowRun.workflow?.id,
+                runId: $workflowRun.workflow?.runId,
               })}>Download</ToggleButton
           >
         </ToggleButtons>

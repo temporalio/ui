@@ -18,7 +18,7 @@
   import { timeFormat } from '$lib/stores/time-format';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
-  const { pendingActivities } = $workflowRun.workflow;
+  $: pendingActivities = $workflowRun.workflow?.pendingActivities;
 </script>
 
 {#if pendingActivities.length}
