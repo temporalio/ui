@@ -106,7 +106,7 @@
 
   .primary,
   .login {
-    @apply border-primary bg-primary from-blue-100 to-purple-100 text-white hover:bg-gradient-to-b hover:text-primary;
+    @apply border-primary bg-primary from-blue-100 to-purple-100 text-white hover:bg-gradient-to-br hover:text-primary;
   }
 
   .primary:disabled {
@@ -134,7 +134,7 @@
   }
 
   .selected {
-    @apply bg-gradient-to-b from-blue-100 to-purple-100 text-gray-900;
+    @apply bg-gradient-to-br from-blue-100 to-purple-100 text-gray-900;
   }
 
   .login {

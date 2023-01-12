@@ -61,7 +61,6 @@
       show={showFilterCopy}
       content={workflow.id}
       filterable={false}
-      class="bg-gradient-to-b from-blue-100 to-purple-100"
     />
     <p class="inline-time-cell">
       {formatDate(workflow.startTime, timeFormat)}
@@ -85,7 +84,6 @@
       content={workflow.name}
       onFilter={() => onTypeClick(workflow.name)}
       filtered={$page.url?.searchParams?.get('query')?.includes(workflow.name)}
-      class="bg-gradient-to-b from-blue-100 to-purple-100"
     />
     <p class="inline-time-cell">
       {formatDate(workflow.endTime, timeFormat)}

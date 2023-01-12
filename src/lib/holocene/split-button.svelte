@@ -76,7 +76,7 @@
     }
 
     :global(.segment.right:enabled) {
-      @apply border-[3px] border-gray-900 from-blue-100 to-purple-100 hover:bg-gradient-to-b hover:text-gray-900;
+      @apply border-[3px] border-gray-900 from-blue-100 to-purple-100 hover:bg-gradient-to-br hover:text-gray-900;
     }
   }
 </style>

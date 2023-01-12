@@ -26,8 +26,7 @@
     lastEvent?.workflowExecutionContinuedAsNewEventAttributes
       ?.newExecutionRunId;
   $: hasRelationships = parent || children || first || previous || next;
-
-  const { workflow, namespace } = $page.params;
+  $: ({ workflow, namespace } = $page.params);
 </script>
 
 <Accordion title="Relationships" icon="relationship">
