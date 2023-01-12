@@ -1,4 +1,4 @@
-export const importSettings = {
+export const importSettings: Settings = {
   auth: {
     enabled: false,
     options: [],
@@ -7,6 +7,10 @@ export const importSettings = {
   codec: {},
   defaultNamespace: 'namespace',
   disableWriteActions: false,
+  workflowCancelDisabled: false,
+  workflowResetDisabled: false,
+  workflowSignalDisabled: false,
+  workflowTerminateDisabled: false,
   showTemporalSystemNamespace: false,
   notifyOnNewVersion: false,
   feedbackURL: '',

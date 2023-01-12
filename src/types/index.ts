@@ -120,6 +120,7 @@ export type WorkflowExecutionStatus =
 export type Severity = temporal.api.enums.v1.Severity;
 export type WorkflowTaskFailedCause =
   temporal.api.enums.v1.WorkflowTaskFailedCause;
+export type ArchivalState = temporal.api.enums.v1.ArchivalState;
 
 // api.workflow
 
@@ -161,6 +162,10 @@ export type SettingsResponse = {
   Codec: { Endpoint: string; PassAccessToken?: boolean };
   DefaultNamespace: string;
   DisableWriteActions: boolean;
+  WorkflowTerminateDisabled: boolean;
+  WorkflowCancelDisabled: boolean;
+  WorkflowSignalDisabled: boolean;
+  WorkflowResetDisabled: boolean;
   ShowTemporalSystemNamespace: boolean;
   NotifyOnNewVersion: boolean;
   FeedbackURL: string;

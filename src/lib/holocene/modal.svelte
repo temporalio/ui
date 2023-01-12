@@ -56,7 +56,7 @@
   }
 </script>
 
-<svelte:window on:keydown={handleKeyboardNavigation} />
+<svelte:window on:keydown|stopPropagation={handleKeyboardNavigation} />
 {#if open}
   <div class="modal">
     <div on:click={cancelModal} class="overlay" />

@@ -12,6 +12,7 @@
   import { getPollers } from '$lib/services/pollers-service';
   import { toDecodedPendingActivities } from '$lib/models/pending-activities';
 
+  export let terminateEnabled: boolean = false;
   export let cancelEnabled: boolean = false;
   export let signalEnabled: boolean = false;
 
@@ -62,6 +63,7 @@
       namespace={$page.params.namespace}
       workflow={$workflowRun.workflow}
       workers={$workflowRun.workers}
+      {terminateEnabled}
       {cancelEnabled}
       {signalEnabled}
     />
