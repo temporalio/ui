@@ -16,7 +16,6 @@
   import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
   import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import TableRow from '$lib/holocene/table/table-row.svelte';
   import WorkflowFilters from '$lib/components/workflow/workflow-filters.svelte';
   import { getSearchType } from '$lib/utilities/search-type-parameter';
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
@@ -77,9 +76,8 @@
         timeFormat={$timeFormat}
       />
     {:else}
-      <TableRow>
-        <td class="hidden xl:table-cell" />
-        <td colspan="3">
+      <tr>
+        <td colspan="5" class="xl:hidden">
           {#if $loading}
             <Loading />
           {:else}
@@ -90,8 +88,18 @@
             />
           {/if}
         </td>
-        <td class="hidden xl:table-cell" />
-      </TableRow>
+        <td colspan="7" class="hidden xl:table-cell">
+          {#if $loading}
+            <Loading />
+          {:else}
+            <EmptyState
+              title="No Workflows Found"
+              content={errorMessage}
+              error={$workflowError}
+            />
+          {/if}
+        </td>
+      </tr>
     {/each}
   </WorkflowsSummaryTable>
 </Pagination>
