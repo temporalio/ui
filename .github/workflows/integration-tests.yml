@@ -38,5 +38,5 @@ jobs:
         with:
           name: cypress-report
           path: |
-              cypress/screenshots/
-              cypress/videos/
+            cypress/screenshots/
+            cypress/videos/
