@@ -8,38 +8,43 @@
   export let dataCy: string = null;
 </script>
 
-{#if href}
-  <a
-    {href}
-    role="menuitem"
-    class:dark
-    class:destructive
-    class:selected
-    class:active
-    class:disabled
-    {disabled}
-    data-cy={dataCy}
-    class="menu-item inline-block {$$props.class}"
-  >
-    <slot />
-  </a>
-{:else}
-  <li
-    on:click|preventDefault
-    role="menuitem"
-    class:dark
-    class:destructive
-    class:selected
-    class:active
-    class:disabled
-    data-cy={dataCy}
-    class="menu-item {$$props.class}"
-  >
-    <slot />
-  </li>
-{/if}
+<div class="menu-item-wrapper" class:disabled>
+  {#if href}
+    <a
+      {href}
+      role="menuitem"
+      class:dark
+      class:destructive
+      class:selected
+      class:active
+      class:disabled
+      data-cy={dataCy}
+      class="menu-item inline-block {$$props.class}"
+    >
+      <slot />
+    </a>
+  {:else}
+    <li
+      on:click|preventDefault
+      role="menuitem"
+      class:dark
+      class:destructive
+      class:selected
+      class:active
+      class:disabled
+      data-cy={dataCy}
+      class="menu-item {$$props.class}"
+    >
+      <slot />
+    </li>
+  {/if}
+</div>
 
 <style lang="postcss">
+  .menu-item-wrapper.disabled {
+    @apply cursor-not-allowed;
+  }
+
   .menu-item {
     @apply w-full cursor-pointer list-none bg-white p-4 font-secondary text-sm font-medium text-primary hover:bg-gray-50;
   }
@@ -62,7 +67,7 @@
     @apply text-red-700 hover:bg-red-50;
   }
 
-  .disabled {
+  .menu-item.disabled {
     @apply pointer-events-none text-gray-500;
   }
 </style>

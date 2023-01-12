@@ -14,32 +14,29 @@ describe('Namespace page', () => {
     );
     cy.get('[data-cy="namespace-description"]').should(
       'to.contain',
-      'Description: Default namespace for Temporal Server.',
+      'Default namespace for Temporal Server.',
     );
-    cy.get('[data-cy="namespace-owner"]').should(
-      'to.contain',
-      'Owner: Unknown',
-    );
-    cy.get('[data-cy="namespace-global"]').should('to.contain', 'Global? No');
+    cy.get('[data-cy="namespace-owner"]').should('to.contain', 'Owner Unknown');
+    cy.get('[data-cy="namespace-global"]').should('to.contain', 'Global No');
     cy.get('[data-cy="namespace-retention"]').should(
       'to.contain',
-      'Retention Period: 1 day',
+      'Retention Period 1 day',
     );
     cy.get('[data-cy="namespace-history"]').should(
       'to.contain',
-      'History Archival: Disabled',
+      'History Archival Disabled',
     );
     cy.get('[data-cy="namespace-visibility"]').should(
       'to.contain',
-      'Visibility Archival: Disabled',
+      'Visibility Archival Disabled',
     );
     cy.get('[data-cy="namespace-failover"]').should(
       'to.contain',
-      'Failover Version: 0',
+      'Failover Version 0',
     );
     cy.get('[data-cy="namespace-clusters"]').should(
       'to.contain',
-      'Clusters: us-east1 (active), us-east2',
+      'Clusters us-east1 (active), us-east2',
     );
   });
 });
