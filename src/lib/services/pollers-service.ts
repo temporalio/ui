@@ -57,7 +57,7 @@ export async function getPollers(
       pollers[poller.identity] = {
         lastAccessTime:
           !currentPoller.lastAccessTime ||
-          currentPoller.lastAccessTime < poller.lastAccessTime
+            currentPoller.lastAccessTime < poller.lastAccessTime
             ? poller.lastAccessTime
             : currentPoller.lastAccessTime,
         taskQueueTypes: currentPoller.taskQueueTypes.concat([type]),

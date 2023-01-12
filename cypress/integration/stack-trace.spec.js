@@ -6,7 +6,6 @@ import workflowCompletedFixture from '../fixtures/workflow-completed.json';
 describe('Stack Trace With Completed Workflow', () => {
   const { workflowId, runId } =
     workflowCompletedFixture.workflowExecutionInfo.execution;
-  const { name } = workflowCompletedFixture.executionConfig.taskQueue;
 
   beforeEach(() => {
     cy.interceptApi();
@@ -56,7 +55,6 @@ describe('Stack Trace With Completed Workflow', () => {
   describe('Stack Trace with Running Workflow', () => {
     const { workflowId, runId } =
       workflowRunningFixture.workflowExecutionInfo.execution;
-    const { name } = workflowRunningFixture.executionConfig.taskQueue;
 
     beforeEach(() => {
       cy.interceptApi();
@@ -123,3 +121,5 @@ describe('Stack Trace With Completed Workflow', () => {
         cy.get('[data-cy="query-stack-trace"]').contains('[{"an":"error"}]');
       });
     });
+  });
+});
