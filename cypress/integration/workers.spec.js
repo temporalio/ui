@@ -120,6 +120,7 @@ describe('Navigate to Workflow Workers', () => {
 
     cy.url().should('contain', '/workers');
 
+    cy.wait('@workflow-api');
     cy.wait('@worker-task-queues-api');
     cy.wait('@activity-task-queues-api');
 
