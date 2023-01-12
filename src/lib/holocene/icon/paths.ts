@@ -6,6 +6,7 @@ import ascending from './svg/ascending.svelte';
 import book from './svg/book.svelte';
 import bookmark from './svg/bookmark.svelte';
 import calendarPlus from './svg/calendar-plus.svelte';
+import canceled from './svg/canceled.svelte';
 import chart from './svg/chart.svelte';
 import checkmark from './svg/checkmark.svelte';
 import chevronDown from './svg/chevron-down.svelte';
@@ -77,6 +78,7 @@ export const icons = {
   book,
   bookmark,
   'calendar-plus': calendarPlus,
+  canceled,
   chart,
   checkmark,
   'chevron-down': chevronDown,

@@ -81,7 +81,7 @@
       {#if workflow.isRunning && workers?.pollers?.length === 0}
         <p>
           To enable <Link
-            href="https://docs.temporal.io/concepts/what-is-a-query/#stack-trace-query"
+            href="https://docs.temporal.io/workflows#stack-trace-query"
             >stack traces</Link
           >, run a Worker on the {workflow?.taskQueue} Task Queue.
         </p>

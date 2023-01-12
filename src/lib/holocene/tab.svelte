@@ -1,30 +1,25 @@
 <script lang="ts">
   export let href = '';
   export let label: string;
-  export let amount: number = null;
   export let active = false;
   export let disabled = false;
 </script>
 
 {#if href}
   <a
-    class="block whitespace-nowrap border-b-2 border-gray-100 text-sm hover:border-b-2 hover:border-blue-700 md:text-base"
+    class="flex items-center gap-1 whitespace-nowrap border-b-2 border-gray-100 text-sm hover:border-b-2 hover:border-blue-700 md:text-base"
     class:active
     class:disabled
     tabindex="0"
     {href}
     data-cy={$$props.dataCy}
   >
-    {#if amount || amount === 0}
-      {label}
-      <span class="rounded-sm bg-blue-100 px-2 text-blue-700">{amount}</span>
-    {:else}
-      {label}
-    {/if}
+    {label}
+    <slot />
   </a>
 {:else}
   <div
-    class="block cursor-pointer whitespace-nowrap border-b-2 border-gray-100 text-sm hover:border-b-2 hover:border-blue-700 md:text-base"
+    class="flex cursor-pointer items-center gap-1 whitespace-nowrap border-b-2 border-gray-100 text-sm hover:border-b-2 hover:border-blue-700 md:text-base"
     class:active
     class:disabled
     data-cy={$$props.dataCy}
@@ -32,12 +27,8 @@
     on:click
     on:keypress
   >
-    {#if amount || amount === 0}
-      {label}
-      <span class="rounded-sm bg-blue-100 px-2 text-blue-700">{amount}</span>
-    {:else}
-      {label}
-    {/if}
+    {label}
+    <slot />
   </div>
 {/if}
 

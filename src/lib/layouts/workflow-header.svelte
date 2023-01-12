@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Badge from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { onDestroy, onMount } from 'svelte';
   import { fly } from 'svelte/transition';
@@ -49,6 +50,9 @@
   const query = toListWorkflowQuery(parameters);
 
   $: isRunning = $workflowRun?.workflow?.isRunning;
+  $: activitiesCanceled = ['Terminated', 'TimedOut', 'Canceled'].includes(
+    $workflowRun.workflow.status,
+  );
 
   onMount(() => {
     if (isRunning && $autoRefreshWorkflow === 'on') {
@@ -152,7 +156,6 @@
         href={routeForEventHistory({
           ...routeParameters,
         })}
-        amount={$eventHistory.total}
         dataCy="history-tab"
         active={pathMatches(
           $page.url.pathname,
@@ -160,27 +163,39 @@
             ...routeParameters,
           }),
         )}
-      />
+      >
+        <Badge type="blue" class="px-2 py-0">{$eventHistory.total}</Badge>
+      </Tab>
       <Tab
         label="Workers"
         href={routeForWorkers(routeParameters)}
-        amount={workers?.pollers?.length}
         dataCy="workers-tab"
         active={pathMatches(
           $page.url.pathname,
           routeForWorkers(routeParameters),
         )}
-      />
+      >
+        <Badge type="blue" class="px-2 py-0">{workers?.pollers?.length}</Badge>
+      </Tab>
       <Tab
         label="Pending Activities"
         href={routeForPendingActivities(routeParameters)}
-        amount={workflow.pendingActivities?.length}
         dataCy="pending-activities-tab"
         active={pathMatches(
           $page.url.pathname,
           routeForPendingActivities(routeParameters),
         )}
-      />
+      >
+        <Badge type={activitiesCanceled ? 'warning' : 'blue'} class="px-2 py-0">
+          {#if activitiesCanceled}<Icon
+              name="canceled"
+              width={20}
+              height={20}
+            />
+          {/if}
+          {workflow.pendingActivities?.length}
+        </Badge>
+      </Tab>
       <Tab
         label="Stack Trace"
         href={routeForStackTrace(routeParameters)}

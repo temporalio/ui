@@ -1,6 +1,6 @@
 import { has } from './has';
 
-export type ActivityType = typeof activityEvents[number];
+export type ActivityType = (typeof activityEvents)[number];
 export const activityEvents = [
   'ActivityTaskCanceled',
   'ActivityTaskCancelRequested',
@@ -11,21 +11,21 @@ export const activityEvents = [
   'ActivityTaskTimedOut',
 ] as const;
 
-export type TimerType = typeof timerEvents[number];
+export type TimerType = (typeof timerEvents)[number];
 export const timerEvents = [
   'TimerStarted',
   'TimerCanceled',
   'TimerFired',
 ] as const;
 
-export type SignalType = typeof signalEvents[number];
+export type SignalType = (typeof signalEvents)[number];
 export const signalEvents = [
   'WorkflowExecutionSignaled',
   'SignalExternalWorkflowExecutionFailed',
   'SignalExternalWorkflowExecutionInitiated',
 ] as const;
 
-export type MarkerType = typeof markerEvents[number];
+export type MarkerType = (typeof markerEvents)[number];
 export const markerEvents = ['MarkerRecorded'] as const;
 
 const childEvents = [
@@ -39,7 +39,7 @@ const childEvents = [
   'StartChildWorkflowExecutionFailed',
 ] as const;
 
-export type EventType = typeof eventTypes[number];
+export type EventType = (typeof eventTypes)[number];
 export const eventTypes = [
   ...activityEvents,
   ...timerEvents,
