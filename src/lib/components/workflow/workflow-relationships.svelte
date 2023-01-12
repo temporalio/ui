@@ -25,8 +25,7 @@
   $: next =
     lastEvent?.workflowExecutionContinuedAsNewEventAttributes
       ?.newExecutionRunId;
-  $: continued = first || previous || next;
-  $: hasRelationships = parent || children || continued;
+  $: hasRelationships = parent || children || first || previous || next;
 
   const { workflow, namespace } = $page.params;
 </script>
@@ -36,20 +35,21 @@
     <Badge type={parent ? 'purple' : 'gray'}>{parent ? 1 : 0} Parent</Badge>
     <Badge type={children ? 'purple' : 'gray'}>{children} Children</Badge>
     <Badge type={first ? 'purple' : 'gray'}>{first ? 1 : 0} First</Badge>
-    <Badge type={previous ? 'purple' : 'gray'}
-      >{previous ? 1 : 0} Previous</Badge
-    >
+    <Badge type={previous ? 'purple' : 'gray'}>
+      {previous ? 1 : 0} Previous
+    </Badge>
     <Badge type={next ? 'purple' : 'gray'}>{next ? 1 : 0} Next</Badge>
   </div>
-  <div class="grid-row-3 grid w-full grid-cols-1 gap-4 md:grid-cols-2">
-    {#if hasRelationships}
+  {#if hasRelationships}
+    <div class="flex w-full flex-wrap gap-4">
       {#if parent}
-        <div class="col-span-2 lg:col-span-1">
+        <div class="w-[calc(50%-1rem)]">
           <h3 class="font-medium">Parent</h3>
           <div class="h-0.5 w-full rounded-full bg-gray-900" />
           <WorkflowDetail
             title="Workflow ID"
             content={$workflowRun.workflow.parent?.workflowId}
+            copyable
             href={routeForEventHistory({
               namespace,
               workflow: $workflowRun.workflow.parent?.workflowId,
@@ -59,6 +59,7 @@
           <WorkflowDetail
             title="Run ID"
             content={$workflowRun.workflow.parent?.runId}
+            copyable
             href={routeForEventHistory({
               namespace,
               workflow: $workflowRun.workflow.parent?.workflowId,
@@ -67,55 +68,62 @@
           />
         </div>
       {/if}
-      {#if continued}
-        <div class="col-span-2 lg:col-span-1">
-          <h3 class="font-medium">Continued</h3>
+      {#if first}
+        <div class="w-[calc(50%-1rem)]">
+          <h3 class="font-medium">First</h3>
           <div class="h-0.5 w-full rounded-full bg-gray-900" />
-          {#if first}
-            <WorkflowDetail
-              title="First Execution Run ID"
-              content={first}
-              href={routeForEventHistory({
-                namespace,
-                workflow,
-                run: first,
-              })}
-            />
-          {/if}
-          {#if previous}
-            <WorkflowDetail
-              title="Continued Execution Run ID"
-              content={previous}
-              href={routeForEventHistory({
-                namespace,
-                workflow,
-                run: previous,
-              })}
-            />
-          {/if}
-          {#if next}
-            <WorkflowDetail
-              title="New Execution Run ID"
-              content={next}
-              href={routeForEventHistory({
-                namespace,
-                workflow,
-                run: next,
-              })}
-            />
-          {/if}
-        </div>
-      {/if}
-      {#if $workflowRun.workflow?.pendingChildren.length}
-        <div class="col-span-2">
-          <ChildWorkflowsTable
-            pendingChildren={$workflowRun.workflow?.pendingChildren}
-            namespace={$page.params.namespace}
+          <WorkflowDetail
+            title="First Execution Run ID"
+            content={first}
+            copyable
+            href={routeForEventHistory({
+              namespace,
+              workflow,
+              run: first,
+            })}
           />
         </div>
       {/if}
-    {:else}
-      <p class="col-span-2">This workflow doesn’t have any relationships</p>
+      {#if previous}
+        <div class="w-[calc(50%-1rem)]">
+          <h3 class="font-medium">Previous</h3>
+          <div class="h-0.5 w-full rounded-full bg-gray-900" />
+          <WorkflowDetail
+            title="Continued Execution Run ID"
+            content={previous}
+            copyable
+            href={routeForEventHistory({
+              namespace,
+              workflow,
+              run: previous,
+            })}
+          />
+        </div>
+      {/if}
+      {#if next}
+        <div class="w-[calc(50%-1rem)]">
+          <h3 class="font-medium">Next</h3>
+          <div class="h-0.5 w-full rounded-full bg-gray-900" />
+          <WorkflowDetail
+            title="New Execution Run ID"
+            content={next}
+            copyable
+            href={routeForEventHistory({
+              namespace,
+              workflow,
+              run: next,
+            })}
+          />
+        </div>
+      {/if}
+    </div>
+    {#if $workflowRun.workflow?.pendingChildren.length}
+      <ChildWorkflowsTable
+        pendingChildren={$workflowRun.workflow?.pendingChildren}
+        namespace={$page.params.namespace}
+      />
     {/if}
-  </div>
+  {:else}
+    <p>This workflow doesn’t have any relationships</p>
+  {/if}
 </Accordion>
