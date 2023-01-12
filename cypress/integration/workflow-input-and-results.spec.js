@@ -54,7 +54,7 @@ describe('Workflow Input and Results', () => {
     cy.wait('@event-history-end');
     cy.wait('@event-history-descending');
 
-    cy.get('.accordion-open').click();
+    cy.get('[data-cy="input-and-results"]').click();
 
     const firstEvent = eventsCompletedFixture.history.events[0];
     const input = Buffer.from(
@@ -102,7 +102,7 @@ describe('Workflow Input and Results', () => {
     cy.wait('@event-history-end');
     cy.wait('@event-history-descending');
 
-    cy.get('.accordion-open').click();
+    cy.get('[data-cy="input-and-results"]').click();
 
     const firstEvent = eventsCompletedNullFixture.history.events[0];
     const input = Buffer.from(
@@ -153,7 +153,7 @@ describe('Workflow Input and Results', () => {
     cy.wait('@event-history-end');
     cy.wait('@event-history-descending');
 
-    cy.get('.accordion-open').click();
+    cy.get('[data-cy="input-and-results"]').click();
 
     const firstEvent = eventsRunningFixture.history.events[0];
     const input = Buffer.from(
@@ -190,7 +190,7 @@ describe('Workflow Input and Results', () => {
     cy.wait('@event-history-end');
     cy.wait('@event-history-descending');
 
-    cy.get('.accordion-open').click();
+    cy.get('[data-cy="input-and-results"]').click();
 
     const firstEvent = eventsFailedFixture.history.events[0];
     const input = Buffer.from(
@@ -235,7 +235,7 @@ describe('Workflow Input and Results', () => {
     cy.wait('@event-history-end');
     cy.wait('@event-history-descending');
 
-    cy.get('.accordion-open').click();
+    cy.get('[data-cy="input-and-results"]').click();
 
     const firstEvent = eventsCanceledFixture.history.events[0];
     const input = Buffer.from(
@@ -272,7 +272,7 @@ describe('Workflow Input and Results', () => {
     cy.wait('@event-history-end');
     cy.wait('@event-history-descending');
 
-    cy.get('.accordion-open').click();
+    cy.get('[data-cy="input-and-results"]').click();
 
     const firstEvent = eventsTimedOutFixture.history.events[0];
     const input = Buffer.from(
@@ -309,7 +309,7 @@ describe('Workflow Input and Results', () => {
     cy.wait('@event-history-end');
     cy.wait('@event-history-descending');
 
-    cy.get('.accordion-open').click();
+    cy.get('[data-cy="input-and-results"]').click();
 
     const firstEvent = eventsContinuedAsNewFixture.history.events[0];
     const input = Buffer.from(
