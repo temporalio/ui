@@ -22,7 +22,7 @@
       <div class="w-2/12 text-center">Workflow Task Handler</div>
       <div class="w-2/12 text-center">Activity Handler</div>
     </div>
-    {#each workers.pollers as poller (poller.identity)}
+    {#each workers?.pollers as poller (poller.identity)}
       <article
         class="flex h-full w-full flex-row border-b-2 p-2 no-underline last:border-b-0"
         data-cy="worker-row"
