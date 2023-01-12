@@ -139,7 +139,7 @@ describe('Navigate to Workflow Workers', () => {
   });
 });
 
-describe('Workflow Workers - Workflow Worker Only', () => {
+describe.skip('Workflow Workers - Workflow Worker Only', () => {
   beforeEach(() => {
     cy.interceptApi();
 

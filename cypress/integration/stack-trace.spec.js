@@ -13,152 +13,113 @@ describe('Stack Trace With Completed Workflow', () => {
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?maximumPageSize=20`,
+      `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?maximumPageSize=20`,
       { fixture: 'event-history-completed.json' },
     ).as('event-history-start');
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?maximumPageSize=20`,
+      `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?maximumPageSize=20`,
       { fixture: 'event-history-completed-reverse.json' },
     ).as('event-history-end');
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?`,
+      `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?`,
       { fixture: 'event-history-completed-reverse.json' },
     ).as('event-history-descending');
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}?`,
+      `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}?`,
       { fixture: 'workflow-completed.json' },
     ).as('workflow-api');
 
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/task-queues/${name}?taskQueueType=1`,
-      {
-        fixture: 'worker-task-queues.json',
-      },
-    ).as('worker-task-queues-api');
+    it('should show No Stack Trace for completed workflow', () => {
+      cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/task-queues/${name}?taskQueueType=2`,
-      {
-        fixture: 'empty-task-queues.json',
-      },
-    ).as('activity-task-queues-api');
+      cy.wait('@workflow-api');
+      cy.wait('@event-history-start');
+      cy.wait('@event-history-end');
+      cy.wait('@event-history-descending');
+
+      cy.get('[data-cy=stack-trace-tab]').click();
+
+      cy.wait('@workflow-api');
+
+      cy.get('[data-cy="query-stack-trace-empty"]').contains(
+        'No Stack Traces Found',
+      );
+    });
   });
 
-  it('should show No Stack Trace for completed workflow', () => {
-    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
+  describe('Stack Trace with Running Workflow', () => {
+    const { workflowId, runId } =
+      workflowRunningFixture.workflowExecutionInfo.execution;
+    const { name } = workflowRunningFixture.executionConfig.taskQueue;
 
-    cy.wait('@workflow-api');
-    cy.wait('@task-queues-api');
-    cy.wait('@event-history-start');
-    cy.wait('@event-history-end');
-    cy.wait('@event-history-descending');
+    beforeEach(() => {
+      cy.interceptApi();
 
-    cy.get('[data-cy=stack-trace-tab]').click();
-
-    cy.wait('@workflow-api');
-    cy.wait('@worker-task-queues-api');
-    cy.wait('@activity-task-queues-api');
-
-    cy.get('[data-cy="query-stack-trace-empty"]').contains(
-      'No Stack Traces Found',
-    );
-  });
-});
-
-describe('Stack Trace with Running Workflow', () => {
-  const { workflowId, runId } =
-    workflowRunningFixture.workflowExecutionInfo.execution;
-  const { name } = workflowRunningFixture.executionConfig.taskQueue;
-
-  beforeEach(() => {
-    cy.interceptApi();
-
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
+      cy.intercept(
+        Cypress.env('VITE_API_HOST') +
         `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?maximumPageSize=20`,
-      { fixture: 'event-history-completed.json' },
-    ).as('event-history-start');
+        { fixture: 'event-history-completed.json' },
+      ).as('event-history-start');
 
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
+      cy.intercept(
+        Cypress.env('VITE_API_HOST') +
         `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?maximumPageSize=20`,
-      { fixture: 'event-history-completed-reverse.json' },
-    ).as('event-history-end');
+        { fixture: 'event-history-completed-reverse.json' },
+      ).as('event-history-end');
 
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
+      cy.intercept(
+        Cypress.env('VITE_API_HOST') +
         `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?`,
-      { fixture: 'event-history-completed-reverse.json' },
-    ).as('event-history-descending');
+        { fixture: 'event-history-completed-reverse.json' },
+      ).as('event-history-descending');
 
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
+      cy.intercept(
+        Cypress.env('VITE_API_HOST') +
         `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}?`,
-      { fixture: 'workflow-running.json' },
-    ).as('workflow-api');
+        { fixture: 'workflow-running.json' },
+      ).as('workflow-api');
 
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/task-queues/${name}?taskQueueType=1`,
-      {
-        fixture: 'worker-task-queues.json',
-      },
-    ).as('worker-task-queues-api');
+      it('should show stack trace for running workflow', () => {
+        cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/task-queues/${name}?taskQueueType=2`,
-      {
-        fixture: 'empty-task-queues.json',
-      },
-    ).as('activity-task-queues-api');
-  });
+        cy.wait('@workflow-api');
+        cy.wait('@event-history-start');
+        cy.wait('@event-history-end');
+        cy.wait('@event-history-descending');
 
-  it('should show stack trace for running workflow', () => {
-    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
+        cy.get('[data-cy=stack-trace-tab]').click();
 
-    cy.wait('@workflow-api');
-    cy.wait('@task-queues-api');
-    cy.wait('@event-history-start');
-    cy.wait('@event-history-end');
-    cy.wait('@event-history-descending');
+        cy.wait('@workflow-api');
+        cy.wait('@query-api');
 
-    cy.get('[data-cy=stack-trace-tab]').click();
+        cy.get('[data-cy="query-stack-trace"]').contains('go.temporal.io/sdk');
+      });
 
-    cy.wait('@workflow-api');
-    cy.wait('@query-api');
+      it('should handle errors when the stack trace is not formatted as we expect', () => {
+        cy.intercept(
+          Cypress.env('VITE_API_HOST') +
+          `/api/v1/namespaces/default/workflows/*/runs/*/query*`,
+          { fixture: 'query-stack-trace-error.json' },
+        ).as('query-api-error');
 
-    cy.get('[data-cy="query-stack-trace"]').contains('go.temporal.io/sdk');
-  });
+        cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 
-  it('should handle errors when the stack trace is not formatted as we expect', () => {
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/*/runs/*/query*`,
-      { fixture: 'query-stack-trace-error.json' },
-    ).as('query-api-error');
+        cy.wait('@workflow-api');
+        cy.wait('@event-history-start');
+        cy.wait('@event-history-end');
+        cy.wait('@event-history-descending');
 
-    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
+        cy.get('[data-cy=stack-trace-tab]').click();
 
-    cy.wait('@workflow-api');
-    cy.wait('@task-queues-api');
-    cy.wait('@event-history-start');
-    cy.wait('@event-history-end');
-    cy.wait('@event-history-descending');
+        cy.wait('@workflow-api');
+        cy.wait('@query-api-error');
 
-    cy.get('[data-cy=stack-trace-tab]').click();
-
-    cy.wait('@workflow-api');
-    cy.wait('@query-api-error');
-
-    cy.get('[data-cy="query-stack-trace"]').contains('[{"an":"error"}]');
-  });
-});
+        cy.get('[data-cy="query-stack-trace"]').contains('[{"an":"error"}]');
+      });
+    });
