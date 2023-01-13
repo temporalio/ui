@@ -97,7 +97,7 @@
   }
 
   a.disabled {
-    @apply pointer-events-none opacity-50 hover:border-gray-800 hover:bg-white hover:text-gray-800;
+    @apply pointer-events-none opacity-75 hover:border-gray-800 hover:bg-white hover:text-gray-800;
   }
 
   .large {
@@ -106,11 +106,12 @@
 
   .primary,
   .login {
-    @apply border-primary bg-primary from-blue-100 to-purple-100 text-white hover:bg-gradient-to-br hover:text-primary;
+    @apply border-primary bg-primary bg-gradient-to-br text-white hover:from-blue-100 hover:to-purple-100 hover:text-primary;
   }
 
-  .primary:disabled {
-    @apply opacity-50 hover:border-primary hover:bg-primary;
+  .primary:disabled,
+  .login:disabled {
+    @apply text-white opacity-75 hover:from-primary hover:to-primary;
   }
 
   .secondary {
@@ -118,7 +119,7 @@
   }
 
   .secondary:disabled {
-    @apply opacity-50 hover:border-gray-800 hover:bg-white hover:text-gray-800;
+    @apply opacity-75 hover:border-gray-800 hover:bg-white hover:text-gray-800;
   }
 
   .destructive {
