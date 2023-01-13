@@ -202,66 +202,6 @@
       </tr>
     </Table>
   </article>
-
-  <article class="namespace-info flex w-full flex-col">
-    <h1 class="my-4 text-lg font-medium">Client Actions</h1>
-    <Table variant="simple">
-      <tr slot="headers">
-        <th class="w-1/2 lg:w-3/5" /><th />
-      </tr>
-
-      <tr>
-        <td>Client Actions</td>
-        <td
-          ><Badge
-            class="px-1 py-0"
-            type={badgeTypeForBoolean($settings.disableWriteActions)}
-            >{badgeTextForBoolean($settings.disableWriteActions)}</Badge
-          ></td
-        >
-      </tr>
-      <tr>
-        <td>Terminate Workflow</td>
-        <td
-          ><Badge
-            class="px-1 py-0"
-            type={badgeTypeForBoolean($settings.workflowTerminateDisabled)}
-            >{badgeTextForBoolean($settings.workflowTerminateDisabled)}</Badge
-          ></td
-        >
-      </tr>
-      <tr>
-        <td>Cancel Workflow</td>
-        <td
-          ><Badge
-            class="px-1 py-0"
-            type={badgeTypeForBoolean($settings.workflowCancelDisabled)}
-            >{badgeTextForBoolean($settings.workflowCancelDisabled)}</Badge
-          ></td
-        >
-      </tr>
-      <tr>
-        <td>Signal Workflow</td>
-        <td
-          ><Badge
-            class="px-1 py-0"
-            type={badgeTypeForBoolean($settings.workflowSignalDisabled)}
-            >{badgeTextForBoolean($settings.workflowSignalDisabled)}</Badge
-          ></td
-        >
-      </tr>
-      <tr>
-        <td>Reset Workflow</td>
-        <td
-          ><Badge
-            class="px-1 py-0"
-            type={badgeTypeForBoolean($settings.workflowResetDisabled)}
-            >{badgeTextForBoolean($settings.workflowResetDisabled)}</Badge
-          ></td
-        >
-      </tr>
-    </Table>
-  </article>
 </div>
 
 {#if $searchAttributes}
