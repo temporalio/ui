@@ -7,7 +7,7 @@
   import { autoRefreshWorkflow } from '$lib/stores/event-view';
   import { workflowsQuery, workflowsSearch } from '$lib/stores/workflows';
   import { workflowRun, refresh } from '$lib/stores/workflow-run';
-  import { eventHistory, updating } from '$lib/stores/events';
+  import { eventHistory } from '$lib/stores/events';
 
   import {
     routeForEventHistory,
@@ -52,7 +52,7 @@
 
   $: isRunning = $workflowRun?.workflow?.isRunning;
   $: activitiesCanceled = ['Terminated', 'TimedOut', 'Canceled'].includes(
-    $workflowRun.workflow.status,
+    $workflowRun.workflow?.status,
   );
 
   onMount(() => {
@@ -88,7 +88,6 @@
 
   $: cancelInProgress = isCancelInProgress(
     $workflowRun?.workflow?.status,
-    $updating,
     $eventHistory,
   );
 </script>
@@ -161,7 +160,7 @@
           }),
         )}
       >
-        <Badge type="blue" class="px-2 py-0">{$eventHistory.total}</Badge>
+        <Badge type="blue" class="px-2 py-0">{workflow.historyEvents}</Badge>
       </Tab>
       <Tab
         label="Workers"
