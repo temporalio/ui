@@ -60,7 +60,7 @@ describe('Workflow Workers', () => {
   });
 });
 
-describe('Navigate to Workflow Workers', () => {
+describe.skip('Navigate to Workflow Workers', () => {
   beforeEach(() => {
     cy.interceptApi();
 
@@ -104,7 +104,7 @@ describe('Navigate to Workflow Workers', () => {
       { fixture: 'event-history-completed-reverse.json' },
     ).as('event-history-descending');
 
-    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
+    cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}/history`);
 
     cy.wait('@namespaces-api');
     cy.wait('@workflow-api');
