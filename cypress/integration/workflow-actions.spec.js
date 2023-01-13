@@ -38,61 +38,87 @@ describe('Workflow Actions', () => {
     );
   });
 
-  it('Terminate works if the workflow is running and write actions are enabled', () => {
-    cy.wait('@settings-api');
-    cy.wait('@workflow-api');
-    cy.wait('@event-history-start');
-    cy.wait('@event-history-end');
-    cy.wait('@event-history-descending');
+  describe('Terminate', () => {
+    it('works if the workflow is running and write actions are enabled', () => {
+      cy.wait('@settings-api');
+      cy.wait('@workflow-api');
+      cy.wait('@event-history-start');
+      cy.wait('@event-history-end');
+      cy.wait('@event-history-descending');
 
-    cy.get('#workflow-actions-menu-button').click();
-    cy.get('#workflow-actions-menu >> [data-cy="terminate-button"]').click();
-    cy.get('#workflow-termination-reason').type('test');
-    cy.get('[data-cy="confirm-modal-button"').click();
-    cy.get('#workflow-termination-success-toast').should('exist');
+      cy.get('#workflow-actions-menu-button').click();
+      cy.get('#workflow-actions-menu >> [data-cy="terminate-button"]').click();
+      cy.get('#workflow-termination-reason').type('test');
+      cy.get('[data-cy="confirm-modal-button"').click();
+
+      cy.wait('@terminate-workflow-api');
+      cy.wait('@workflow-api');
+      cy.wait('@event-history-start');
+      cy.wait('@event-history-end');
+      cy.wait('@event-history-descending');
+
+      cy.get('#workflow-termination-success-toast').should('exist');
+    });
   });
 
-  it('Cancel works if the workflow is running and write actions are enabled', () => {
-    cy.wait('@settings-api');
-    cy.wait('@workflow-api');
-    cy.wait('@event-history-start');
-    cy.wait('@event-history-end');
-    cy.wait('@event-history-descending');
+  describe('Cancel', () => {
+    it('works if the workflow is running and write actions are enabled', () => {
+      cy.wait('@settings-api');
+      cy.wait('@workflow-api');
+      cy.wait('@event-history-start');
+      cy.wait('@event-history-end');
+      cy.wait('@event-history-descending');
 
-    cy.get('#workflow-actions-primary-button').click();
-    cy.get('[data-cy="confirm-modal-button"]').click();
+      cy.get('#workflow-actions-primary-button').click();
+      cy.get('[data-cy="confirm-modal-button"]').click();
 
-    cy.wait('@cancel-workflow-api');
+      cy.wait('@cancel-workflow-api');
+      cy.wait('@workflow-api');
+      cy.wait('@event-history-start');
+      cy.wait('@event-history-end');
+      cy.wait('@event-history-descending');
+    });
   });
 
-  it('Signal works if the workflow is running and write actions are enabled', () => {
-    cy.wait('@settings-api');
-    cy.wait('@workflow-api');
-    cy.wait('@event-history-start');
-    cy.wait('@event-history-end');
-    cy.wait('@event-history-descending');
+  describe('Signal', () => {
+    it('works if the workflow is running and write actions are enabled', () => {
+      cy.wait('@settings-api');
+      cy.wait('@workflow-api');
+      cy.wait('@event-history-start');
+      cy.wait('@event-history-end');
+      cy.wait('@event-history-descending');
 
-    cy.get('#workflow-actions-menu-button').click();
-    cy.get('#workflow-actions-menu >> [data-cy="signal-button"]').click();
-    cy.get('#signal-name').type('sos');
-    cy.get('div.cm-content').type('{{}{enter}"sos":true');
-    cy.get('[data-cy="confirm-modal-button"').click();
-    cy.get('#workflow-signal-success-toast').should('exist');
-    cy.get('[data-cy="confirm-modal-button"').should('not.exist');
+      cy.get('#workflow-actions-menu-button').click();
+      cy.get('#workflow-actions-menu >> [data-cy="signal-button"]').click();
+      cy.get('#signal-name').type('sos');
+      cy.get('div.cm-content').type('{{}{enter}"sos":true');
+      cy.get('[data-cy="confirm-modal-button"').click();
+
+      cy.wait('@signal-workflow-api');
+      cy.wait('@workflow-api');
+      cy.wait('@event-history-start');
+      cy.wait('@event-history-end');
+      cy.wait('@event-history-descending');
+
+      cy.get('#workflow-signal-success-toast').should('exist');
+      cy.get('[data-cy="confirm-modal-button"').should('not.exist');
+    });
   });
 
-  it('the Cancel button is disabled if write actions are disabled', () => {
-    cy.intercept(Cypress.env('VITE_API_HOST') + `/api/v1/settings?`, {
-      fixture: 'settings.write-actions-disabled.json',
-    }).as('settings-api');
+  describe('Write Actions Disabled', () => {
+    it('the Cancel button is disabled if write actions are disabled', () => {
+      cy.intercept(Cypress.env('VITE_API_HOST') + `/api/v1/settings?`, {
+        fixture: 'settings.write-actions-disabled.json',
+      }).as('settings-api');
 
-    cy.wait('@settings-api');
-    cy.wait('@workflow-api');
-    cy.wait('@event-history-start');
-    cy.wait('@event-history-end');
-    cy.wait('@event-history-descending');
+      cy.wait('@settings-api');
+      cy.wait('@workflow-api');
+      cy.wait('@event-history-start');
+      cy.wait('@event-history-end');
+      cy.wait('@event-history-descending');
 
-    cy.get('#workflow-actions-primary-button').should('be.disabled');
-    cy.get('#workflow-actions-menu-button').should('be.disabled');
+      cy.get('#workflow-actions-primary-button').should('be.disabled');
+      cy.get('#workflow-actions-menu-button').should('be.disabled');
+    });
   });
 });
