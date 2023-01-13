@@ -1,9 +1,9 @@
 /// <reference types="cypress" />
 
-import workflowCompletedFixture from '../fixtures/workflow-running.json';
+import workflowRunningFixture from '../fixtures/workflow-running.json';
 
 const { workflowId, runId } =
-  workflowCompletedFixture.workflowExecutionInfo.execution;
+  workflowRunningFixture.workflowExecutionInfo.execution;
 
 describe('Workflow Actions', () => {
   beforeEach(() => {
