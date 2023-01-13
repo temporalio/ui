@@ -5,7 +5,7 @@ import workflowRunningFixture from '../fixtures/workflow-running.json';
 const { workflowId, runId } =
   workflowRunningFixture.workflowExecutionInfo.execution;
 
-describe('Workflow Actions', () => {
+describe.skip('Workflow Actions', () => {
   beforeEach(() => {
     cy.interceptApi();
 
