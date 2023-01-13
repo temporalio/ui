@@ -10,6 +10,7 @@
 
   import { fromSecondsToDaysOrHours } from '$lib/utilities/format-time';
 
+  import Card from '$lib/holocene/card.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
@@ -58,9 +59,9 @@
   Namespace: {namespace?.namespaceInfo?.name}
 </h2>
 <h3 data-cy="namespace-description">{namespace?.namespaceInfo?.description}</h3>
-<div class="flex flex-col gap-4 lg:flex-row">
+<Card class="flex flex-col gap-4 lg:flex-row">
   <article class="namespace-info flex w-full flex-col">
-    <h1 class="my-4 text-lg font-medium">Details</h1>
+    <h1 class="text-lg font-medium">Details</h1>
     <Table variant="simple">
       <tr slot="headers">
         <th class="w-1/2 lg:w-3/5" /><th />
@@ -126,7 +127,7 @@
   </article>
 
   <article class="namespace-info flex w-full flex-col">
-    <h1 class="my-4 text-lg font-medium">Versions</h1>
+    <h1 class="text-lg font-medium">Versions</h1>
     <Table variant="simple">
       <tr slot="headers">
         <th class="w-1/2 lg:w-3/4" /><th />
@@ -144,7 +145,7 @@
   </article>
 
   <article class="namespace-info flex w-full flex-col">
-    <h1 class="my-4 text-lg font-medium">Client Actions</h1>
+    <h1 class="text-lg font-medium">Client Actions</h1>
     <Table variant="simple">
       <tr slot="headers">
         <th class="w-1/2 lg:w-3/5" /><th />
@@ -202,7 +203,7 @@
       </tr>
     </Table>
   </article>
-</div>
+</Card>
 
 {#if $searchAttributes}
   <section>

@@ -8,7 +8,7 @@
   export let icon: IconName = null;
 </script>
 
-<div class="alert {intent} {$$props.class}">
+<div class="alert rounded-md border {intent} {$$props.class}">
   {#if icon}
     <div>
       <Icon name={icon} />
@@ -26,7 +26,7 @@
 
 <style lang="postcss">
   .alert {
-    @apply flex rounded-md border p-5 font-secondary text-sm;
+    @apply flex p-5 font-secondary text-sm;
   }
 
   .alert.success {

@@ -19,11 +19,11 @@
   }
 
   .bulk-action-button.primary {
-    @apply border-white bg-primary hover:bg-blue-700;
+    @apply border-white bg-primary from-blue-100 to-purple-100 hover:border-gray-900 hover:bg-gradient-to-br hover:text-gray-900;
   }
 
   .bulk-action-button.destructive {
-    @apply border-danger bg-danger hover:border-white hover:bg-blue-700;
+    @apply border-danger bg-danger hover:border-red-900 hover:bg-red-900;
   }
 
   .bulk-action-button:disabled {

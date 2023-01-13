@@ -23,6 +23,10 @@
     }
   }
 
+  input + .slider {
+    @apply bg-white;
+  }
+
   input:checked + .slider {
     @apply border-gray-900 bg-gray-900;
 

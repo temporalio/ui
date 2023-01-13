@@ -15,9 +15,7 @@
   import Pagination from '$lib/holocene/pagination.svelte';
   import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
   import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import TableRow from '$lib/holocene/table/table-row.svelte';
   import WorkflowFilters from '$lib/components/workflow/workflow-filters.svelte';
   import { getSearchType } from '$lib/utilities/search-type-parameter';
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
@@ -59,9 +57,13 @@
     </div>
   </div>
   <div>
-    <Button variant="secondary" on:click={refreshWorkflows}
-      ><Icon name="retry" /></Button
+    <button
+      aria-label="retry workflows"
+      class="cursor-pointer rounded-full p-1 hover:bg-gray-900 hover:text-white"
+      on:click={refreshWorkflows}
     >
+      <Icon name="retry" class="h-8 w-8" />
+    </button>
   </div>
 </div>
 <WorkflowFilters bind:searchType />
@@ -74,9 +76,8 @@
         timeFormat={$timeFormat}
       />
     {:else}
-      <TableRow>
-        <td class="hidden xl:table-cell" />
-        <td colspan="3">
+      <tr>
+        <td colspan="5" class="xl:hidden">
           {#if $loading}
             <Loading />
           {:else}
@@ -87,8 +88,18 @@
             />
           {/if}
         </td>
-        <td class="hidden xl:table-cell" />
-      </TableRow>
+        <td colspan="7" class="hidden xl:table-cell">
+          {#if $loading}
+            <Loading />
+          {:else}
+            <EmptyState
+              title="No Workflows Found"
+              content={errorMessage}
+              error={$workflowError}
+            />
+          {/if}
+        </td>
+      </tr>
     {/each}
   </WorkflowsSummaryTable>
 </Pagination>

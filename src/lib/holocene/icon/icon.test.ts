@@ -13,7 +13,7 @@ afterEach(() => {
 });
 
 describe('Icon', () => {
-  test.each(Object.keys(icons))(`$iconName renders`, (iconName) => {
+  test.each(Object.keys(icons))('%s renders', (iconName) => {
     const Icon = icons[iconName];
     const instance = new Icon({ target });
     expect(instance).toBeTruthy();

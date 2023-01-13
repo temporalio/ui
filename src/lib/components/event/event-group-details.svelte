@@ -13,7 +13,7 @@
 </script>
 
 <div class="w-full border-gray-700 lg:w-1/3 lg:border-r-2">
-  <Table class="w-full table-fixed pb-2">
+  <Table class="w-full table-fixed pb-2" variant="simple">
     {#each [...eventGroup.events].reverse() as [id, eventInGroup] (id)}
       <tr
         class="row"
@@ -49,7 +49,7 @@
   }
 
   .row:hover {
-    @apply cursor-pointer bg-gradient-to-b from-blue-100 to-purple-100;
+    @apply cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100;
   }
 
   .active.row {
