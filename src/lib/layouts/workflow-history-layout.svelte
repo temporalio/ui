@@ -1,8 +1,11 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import { workflowRun, refresh } from '$lib/stores/workflow-run';
   import { eventViewType } from '$lib/stores/event-view';
   import { eventHistory } from '$lib/stores/events';
+  import { fetchStartAndEndEvents } from '$lib/services/events-service';
+  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
+  import { exportHistory } from '$lib/utilities/export-history';
 
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
@@ -13,14 +16,41 @@
   import WorkflowTypedError from '$lib/components/workflow/workflow-typed-error.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
-  import { exportHistory } from '$lib/utilities/export-history';
-  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
 
   let showShortcuts = false;
 
+  $: namespace = $page.params.namespace;
+  $: workflowId = $page.params.workflow;
+  $: runId = $page.params.run;
+
+  $: $refresh, getStartAndEndEvents(namespace, workflowId, runId);
+
   $: workflowEvents =
     getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
+
+  const getStartAndEndEvents = async (
+    namespace: string,
+    workflowId: string,
+    runId: string,
+  ) => {
+    const { settings, user } = $page.data;
+    const events = await fetchStartAndEndEvents({
+      namespace,
+      workflowId,
+      runId,
+      settings,
+      accessToken: user?.accessToken,
+    });
+    $eventHistory = events;
+  };
+
+  const onViewClick = (view: EventView) => {
+    if ($page.url.searchParams.get('page')) {
+      $page.url.searchParams.delete('page');
+    }
+    $eventViewType = view;
+  };
 </script>
 
 <section class="flex flex-col gap-4">
@@ -57,19 +87,19 @@
             icon="feed"
             active={$eventViewType === 'feed'}
             data-cy="feed"
-            on:click={() => ($eventViewType = 'feed')}>History</ToggleButton
+            on:click={() => onViewClick('feed')}>History</ToggleButton
           >
           <ToggleButton
             icon="compact"
             active={$eventViewType === 'compact'}
             data-cy="compact"
-            on:click={() => ($eventViewType = 'compact')}>Compact</ToggleButton
+            on:click={() => onViewClick('compact')}>Compact</ToggleButton
           >
           <ToggleButton
             icon="json"
             active={$eventViewType === 'json'}
             data-cy="json"
-            on:click={() => ($eventViewType = 'json')}>JSON</ToggleButton
+            on:click={() => onViewClick('json')}>JSON</ToggleButton
           >
           <ToggleButton
             icon="download"
@@ -77,8 +107,8 @@
             on:click={() =>
               exportHistory({
                 namespace: $page.params.namespace,
-                workflowId: $workflowRun.workflow.id,
-                runId: $workflowRun.workflow.runId,
+                workflowId: $workflowRun.workflow?.id,
+                runId: $workflowRun.workflow?.runId,
               })}>Download</ToggleButton
           >
         </ToggleButtons>
@@ -88,7 +118,6 @@
   </section>
   <EventShortcutKeys
     open={showShortcuts}
-    compact={$eventViewType === 'compact'}
     onOpen={() => (showShortcuts = true)}
     onClose={() => (showShortcuts = false)}
   />

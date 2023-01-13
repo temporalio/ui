@@ -14,6 +14,9 @@ type PaginationMethods<T> = {
   jumpToIndex: (x: number | string) => void;
   findIndex: (fn: (item: T) => boolean) => number;
   findPage: (fn: (item: T) => boolean) => number;
+  nextRow: () => void;
+  previousRow: () => void;
+  setActiveRowIndex: (activeRowIndex: number) => void;
 };
 
 type PaginationStore<T> = PaginationMethods<T> &
@@ -28,6 +31,7 @@ type PaginationStore<T> = PaginationMethods<T> &
     pageSize: number;
     currentPage: number;
     totalPages: number;
+    activeRowIndex: number;
   }>;
 
 export const getPageForIndex = (i: number, pageSize: number): number => {
@@ -55,6 +59,13 @@ export const getNearestStartingIndex = (
 ): number => {
   const page = getPageForIndex(index, itemsPerPage);
   return getStartingIndexForPage(page, itemsPerPage, items);
+};
+
+export const getMaxRowIndex = (
+  itemsOfPage: number,
+  itemsPerPage: number,
+): number => {
+  return Math.min(itemsOfPage - 1, itemsPerPage - 1);
 };
 
 export const getValidPage = (
@@ -112,6 +123,7 @@ export const pagination = <T>(
 
   const pageSize = writable(perPage);
   const index = writable(start);
+  const activeRowIndex = writable(start);
 
   const adjustPageSize = (n: number | string) => {
     pageSize.set(toNumber(n));
@@ -134,9 +146,19 @@ export const pagination = <T>(
 
   const jumpToPage = (page: number | string) => {
     const itemsPerPage = get(pageSize);
-    return index.set(
-      getStartingIndexForPage(Number(page), itemsPerPage, items),
+    const nextIndex = getStartingIndexForPage(
+      Number(page),
+      itemsPerPage,
+      items,
     );
+    const pageItemSize = items.slice(
+      nextIndex,
+      nextIndex + itemsPerPage,
+    ).length;
+    if (get(activeRowIndex) > pageItemSize - 1) {
+      activeRowIndex.set(pageItemSize - 1);
+    }
+    return index.set(nextIndex);
   };
 
   const jumpToIndex = (i: number | string) => {
@@ -155,20 +177,51 @@ export const pagination = <T>(
     return getPageForIndex(i, get(pageSize));
   };
 
-  const { subscribe } = derived([index, pageSize], ([$index, $pageSize]) => {
-    return {
-      items: items.slice($index, $index + $pageSize),
-      initialItem: items[0],
-      hasPrevious: !outOfBounds($index - $pageSize, items),
-      hasNext: !outOfBounds($index + $pageSize, items),
-      startingIndex: $index,
-      endingIndex: getIndex($index + $pageSize - 1, items),
-      length: items.length,
-      pageSize: $pageSize,
-      currentPage: getPageForIndex($index, $pageSize),
-      totalPages: getTotalPages($pageSize, items),
-    };
-  });
+  const setActiveRowIndex = (nextIndex: number) => {
+    const pageItemSize = items.slice(
+      get(index),
+      get(index) + get(pageSize),
+    ).length;
+    const maxRowIndex = getMaxRowIndex(pageItemSize, get(pageSize));
+    if (nextIndex <= maxRowIndex) {
+      activeRowIndex.set(nextIndex);
+    }
+  };
+
+  const nextRow = () => {
+    const pageItemSize = items.slice(
+      get(index),
+      get(index) + get(pageSize),
+    ).length;
+    const maxRowIndex = getMaxRowIndex(pageItemSize, get(pageSize));
+    if (get(activeRowIndex) < maxRowIndex) {
+      activeRowIndex.set(get(activeRowIndex) + 1);
+    }
+  };
+
+  const previousRow = () => {
+    const nextIndex = get(activeRowIndex) >= 1 ? get(activeRowIndex) - 1 : 0;
+    activeRowIndex.set(nextIndex);
+  };
+
+  const { subscribe } = derived(
+    [index, pageSize, activeRowIndex],
+    ([$index, $pageSize, $activeRowIndex]) => {
+      return {
+        items: items.slice($index, $index + $pageSize),
+        initialItem: items[0],
+        hasPrevious: !outOfBounds($index - $pageSize, items),
+        hasNext: !outOfBounds($index + $pageSize, items),
+        startingIndex: $index,
+        endingIndex: getIndex($index + $pageSize - 1, items),
+        length: items.length,
+        pageSize: $pageSize,
+        currentPage: getPageForIndex($index, $pageSize),
+        totalPages: getTotalPages($pageSize, items),
+        activeRowIndex: $activeRowIndex,
+      };
+    },
+  );
 
   return {
     subscribe,
@@ -179,6 +232,9 @@ export const pagination = <T>(
     jumpToIndex,
     findIndex,
     findPage,
+    nextRow,
+    previousRow,
+    setActiveRowIndex,
   };
 };
 

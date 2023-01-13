@@ -30,13 +30,13 @@ describe('Workflow Executions List', () => {
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?nextPageToken=*`,
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?`,
       { fixture: 'event-history-empty.json' },
     ).as('event-history-descending');
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?nextPageToken=*`,
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?`,
       { fixture: 'event-history-empty.json' },
     ).as('event-history-ascending');
   });
@@ -70,13 +70,13 @@ describe('Workflow Executions List', () => {
   it('should display a custom empty state if there are events, but no event groups', () => {
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?nextPageToken=*`,
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events/reverse?`,
       { fixture: 'event-history-with-no-activities.json' },
     ).as('event-history-descending');
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?nextPageToken=*`,
+        `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?`,
       { fixture: 'event-history-with-no-activities.json' },
     ).as('event-history-ascending');
 

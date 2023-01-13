@@ -3,7 +3,7 @@
 
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  import { eventSortOrder, eventShowElapsed } from '$lib/stores/event-view';
+  import { eventShowElapsed, eventFilterSort } from '$lib/stores/event-view';
   import { timeFormat } from '$lib/stores/time-format';
   import {
     workflowEventsColumnWidth,
@@ -42,7 +42,7 @@
   $: expanded = expandAll || active;
 
   $: currentEvent = isEventGroup(event) ? event.events.get(selectedId) : event;
-  $: descending = $eventSortOrder === 'descending';
+  $: descending = $eventFilterSort === 'descending';
   $: showElapsed = $eventShowElapsed === 'true';
   $: showElapsedTimeDiff =
     showElapsed && initialItem && event.id !== initialItem.id;

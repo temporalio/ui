@@ -1,9 +1,6 @@
-import { derived, type Readable } from 'svelte/store';
+import { derived } from 'svelte/store';
 import { page } from '$app/stores';
 import { persistStore } from '$lib/stores/persist-store';
-import { settings } from '$lib/stores/settings';
-import { temporalVersion } from './versions';
-import { isVersionNewer } from '$lib/utilities/version-check';
 
 export type EventSortOrder = 'ascending' | 'descending';
 export type EventSortOrderOptions = {
@@ -32,24 +29,4 @@ export const eventShowElapsed = persistStore<BooleanString>(
 
 export const eventCategoryParam = derived([page], ([$page]) =>
   $page.url.searchParams.get('category'),
-);
-
-export const supportsReverseOrder = derived(
-  [temporalVersion, settings],
-  ([$temporalVersion, $settings]) => {
-    if ($settings.runtimeEnvironment.isCloud) return true;
-
-    return isVersionNewer($temporalVersion, '1.16.0');
-  },
-);
-
-export const eventSortOrder: Readable<EventSortOrder> = derived(
-  [eventFilterSort, supportsReverseOrder],
-  ([$eventFilterSort, $supportsReverseOrder]) => {
-    let sortOrder: EventSortOrder = 'ascending';
-    if ($supportsReverseOrder) {
-      sortOrder = $eventFilterSort;
-    }
-    return sortOrder;
-  },
 );

@@ -4,7 +4,6 @@
   import Button from '$lib/holocene/button.svelte';
 
   export let open = false;
-  export let compact: boolean;
   export let onOpen: () => void;
   export let onClose: () => void;
 </script>
@@ -44,20 +43,6 @@
         <Shortcut arrow="up" />|<Shortcut>K</Shortcut>
       </div>
     </div>
-    {#if !compact}
-      <div class="cell">
-        Ascending Sort
-        <div class="shortcut">
-          <Shortcut>Shift</Shortcut>+<Shortcut arrow="up" />
-        </div>
-      </div>
-      <div class="cell">
-        Descending Sort
-        <div class="shortcut">
-          <Shortcut>Shift</Shortcut>+<Shortcut arrow="down" />
-        </div>
-      </div>
-    {/if}
   </div>
 </Drawer>
 
