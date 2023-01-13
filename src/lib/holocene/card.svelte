@@ -1,4 +1,4 @@
-<div class="card {$$props.class}">
+<div class="card bg-white {$$props.class}">
   <slot />
 </div>
 

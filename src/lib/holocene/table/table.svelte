@@ -6,7 +6,7 @@
   export let id: string = null;
 </script>
 
-<table class="bg-white {variant} {$$props.class}" {id}>
+<table class="{variant} {$$props.class}" {id}>
   <thead>
     <slot name="headers" />
     {#if updating}
@@ -32,7 +32,7 @@
   }
 
   table.fancy {
-    @apply border-separate border-spacing-0 rounded-xl border-[3px] border-gray-900;
+    @apply border-separate border-spacing-0 rounded-xl border-[3px] border-gray-900 bg-white;
 
     thead {
       @apply bg-gray-900 text-gray-100;
