@@ -99,6 +99,53 @@ export const fetchWorkflowCount = async (
   return { count, totalCount };
 };
 
+export const fetchPaginatedWorkflows = async (
+  namespace: string,
+  parameters: ValidWorkflowParameters,
+  token: NextPageToken,
+  pageSize: string,
+  request = fetch,
+  archived = false,
+): Promise<CombinedWorkflowExecutionsResponse> => {
+  const query = decodeURIComponent(
+    parameters.query || toListWorkflowQuery(parameters, archived),
+  );
+
+  const endpoint: ValidWorkflowEndpoints = archived
+    ? 'workflows.archived'
+    : 'workflows';
+
+  let error = '';
+  const onError: ErrorCallback = (err) => {
+    // Kick out to login if 401/403
+    handleUnauthorizedOrForbiddenError(err);
+    if (err?.body?.message || err?.status) {
+      error =
+        err?.body?.message ??
+        `Error fetching workflows: ${err.status}: ${err.statusText}`;
+    } else {
+      error = `Error fetching workflows: Server failed to respond`;
+    }
+  };
+
+  const route = await routeForApi(endpoint, { namespace });
+  const { executions, nextPageToken } =
+    (await requestFromAPI<ListWorkflowExecutionsResponse>(route, {
+      params: { query, pageSize },
+      token,
+      onError,
+      handleError: onError,
+      request,
+    })) ?? { executions: [], nextPageToken: '' };
+
+  return {
+    workflows: toWorkflowExecutions({ executions }),
+    nextPageToken: String(nextPageToken),
+    error,
+  };
+};
+
+
 export const fetchAllWorkflows = async (
   namespace: string,
   parameters: ValidWorkflowParameters,
@@ -245,13 +292,13 @@ export async function signalWorkflow({
         input: {
           payloads: signalInput
             ? [
-                {
-                  metadata: {
-                    encoding: btoa('json/plain'),
-                  },
-                  data: btoa(stringifyWithBigInt(signalInput)),
+              {
+                metadata: {
+                  encoding: btoa('json/plain'),
                 },
-              ]
+                data: btoa(stringifyWithBigInt(signalInput)),
+              },
+            ]
             : null,
         },
       }),

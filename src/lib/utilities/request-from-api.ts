@@ -27,7 +27,7 @@ type RequestFromAPIOptions = {
   params?: toURLParams[1];
   request?: typeof fetch;
   options?: Parameters<typeof fetch>[1];
-  token?: string;
+  token?: NextPageToken;
   onRetry?: RetryCallback;
   onError?: ErrorCallback;
   notifyOnError?: boolean;

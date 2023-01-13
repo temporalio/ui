@@ -23,6 +23,7 @@
   export let pageSizeOptions: string[] | number[] = options;
   export let defaultPageSize: string | number | undefined = undefined;
   export let total: string | number = '';
+  export let hideBottomControls: boolean = false;
 
   let store = createPaginationStore(pageSizeOptions, defaultPageSize);
   let error: any;
@@ -204,7 +205,7 @@
   >
     <slot name="action-bottom-left" />
     <div class="flex gap-4">
-      {#if $store.visibleItems.length}
+      {#if $store.visibleItems.length && !hideBottomControls}
         {#if pageSizeOptions.length}
           <FilterSelect
             label="Per Page"

@@ -10,7 +10,7 @@
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
   import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
-  import WorkflowsImagination from '$lib/pages/workflows-imagination.svelte';
+  import WorkflowsImagination from '$lib/pages/imagination/workflows-imagination.svelte';
 </script>
 
 <PageTitle

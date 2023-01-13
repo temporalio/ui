@@ -39,6 +39,12 @@
   import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
   import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
   import WorkflowsSummaryRow from '$lib/components/workflow/workflows-summary-row.svelte';
+  import ApiPagination from '$lib/holocene/api-pagination.svelte';
+  import {
+    fetchAllWorkflows,
+    fetchPaginatedWorkflows,
+  } from '$lib/services/workflow-service';
+  import EmptyRow from './_empty-row.svelte';
 
   export let bulkActionsEnabled: boolean = false;
   export let cancelEnabled: boolean = false;
@@ -254,6 +260,21 @@
       resetSelection();
     }
   }
+
+  $: namespace = $page.params.namespace;
+  const onWorkflowFetch = async (status: WorkflowStatus) => {
+    return async (pageSize = 100, token) => {
+      const { workflows, nextPageToken, error } = await fetchPaginatedWorkflows(
+        namespace,
+        {
+          query: `ExecutionStatus="${status}"`,
+        },
+        token,
+        '5',
+      );
+      return { items: workflows, nextPageToken };
+    };
+  };
 </script>
 
 <BatchOperationConfirmationModal
@@ -276,14 +297,14 @@
 />
 
 <div class="mb-2 flex justify-between">
-  <div>
+  <div class="justify-between">
     <h1 class="text-2xl" data-cy="namespace-title">
       Recent Workflows
       <NamespaceSelector />
     </h1>
     <div class="flex items-center gap-2 text-sm">
       <p data-cy="namespace-name">
-        {$page.params.namespace}
+        {namespace}
       </p>
       {#if $workflowCount?.totalCount >= 0}
         <div class="h-1 w-1 rounded-full bg-gray-400" />
@@ -301,42 +322,49 @@
       {/if}
     </div>
   </div>
-  <div>
-    <Button variant="secondary" on:click={refreshWorkflows}
+  <div class="flex gap-4 items-center">
+    <Button variant="secondary" class="h-10 w-10" on:click={refreshWorkflows}
       ><Icon name="retry" /></Button
     >
+    <WorkflowDateTimeFilter />
   </div>
 </div>
-<!-- <svelte:fragment slot="action-top-left">
-    <WorkflowAdvancedSearch />
-  </svelte:fragment> -->
-<div class="flex justify-end">
-  <WorkflowDateTimeFilter />
+<div class="flex flex-col gap-8">
+  <ApiPagination
+    onFetch={() => onWorkflowFetch('Running')}
+    let:visibleItems
+    hideBottomControls
+  >
+    <WorkflowsSummaryTable
+      headerClass="bg-blue-50 text-gray-900"
+      updating={$updating}
+    >
+      {#each visibleItems as event}
+        <WorkflowsSummaryRow
+          workflow={event}
+          {namespace}
+          timeFormat={$timeFormat}
+        />
+      {:else}
+        <EmptyRow loading={$loading} {errorMessage} error={$workflowError} />
+      {/each}
+    </WorkflowsSummaryTable>
+  </ApiPagination>
+  <ApiPagination
+    onFetch={() => onWorkflowFetch('Completed')}
+    let:visibleItems
+    hideBottomControls
+  >
+    <WorkflowsSummaryTable updating={$updating}>
+      {#each visibleItems as event}
+        <WorkflowsSummaryRow
+          workflow={event}
+          {namespace}
+          timeFormat={$timeFormat}
+        />
+      {:else}
+        <EmptyRow loading={$loading} {errorMessage} error={$workflowError} />
+      {/each}
+    </WorkflowsSummaryTable>
+  </ApiPagination>
 </div>
-<Pagination items={$workflows} let:visibleItems>
-  <WorkflowsSummaryTable updating={$updating}>
-    {#each visibleItems as event}
-      <WorkflowsSummaryRow
-        workflow={event}
-        namespace={$page.params.namespace}
-        timeFormat={$timeFormat}
-      />
-    {:else}
-      <TableRow>
-        <td class="hidden xl:table-cell" />
-        <td colspan="3">
-          {#if $loading}
-            <Loading />
-          {:else}
-            <EmptyState
-              title="No Workflows Found"
-              content={errorMessage}
-              error={$workflowError}
-            />
-          {/if}
-        </td>
-        <td class="hidden xl:table-cell" />
-      </TableRow>
-    {/each}
-  </WorkflowsSummaryTable>
-</Pagination>
