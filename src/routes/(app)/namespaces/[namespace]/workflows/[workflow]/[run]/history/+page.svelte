@@ -9,9 +9,11 @@
   import WorkflowHistoryCompact from '$lib/pages/workflow-history-compact.svelte';
 
   import PageTitle from '$lib/components/page-title.svelte';
+  import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
+  import { workflowSignalEnabled } from '$lib/utilities/workflow-signal-enabled';
+  import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
 
   const workflow = $page.params.workflow;
-  $: isCloud = $page.data?.settings?.runtimeEnvironment?.isCloud;
 
   const views = {
     feed: WorkflowHistoryFeed,
@@ -22,7 +24,11 @@
 </script>
 
 <PageTitle title={`Workflow History | ${workflow}`} url={$page.url.href} />
-<WorkflowRunLayout cancelEnabled={!isCloud} signalEnabled={!isCloud}>
+<WorkflowRunLayout
+  cancelEnabled={workflowCancelEnabled($page.data.settings)}
+  signalEnabled={workflowSignalEnabled($page.data.settings)}
+  terminateEnabled={workflowTerminateEnabled($page.data.settings)}
+>
   <WorkflowHistoryLayout>
     <!-- <svelte:fragment slot="timeline">
     <EventHistoryTimelineContainer />
