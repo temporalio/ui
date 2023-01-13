@@ -1,11 +1,13 @@
 <script lang="ts">
   import { refresh } from '$lib/stores/workflow-run';
   import {
+    resetWorkflow,
     signalWorkflow,
     terminateWorkflow,
   } from '$lib/services/workflow-service';
   import { settings } from '$lib/stores/settings';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
+  import { ResetType } from '$types';
 
   import Modal from '$lib/holocene/modal.svelte';
   import { coreUserStore } from '$lib/stores/core-user';
@@ -16,6 +18,8 @@
   import Input from '$lib/holocene/input/input.svelte';
   import MenuDivider from '$lib/holocene/primitives/menu/menu-divider.svelte';
   import JSONEditor from '$lib/holocene/json-editor.svelte';
+  import { eventHistory } from '$lib/stores/events';
+  import { getFirstResetEventID } from '$lib/utilities/get-first-reset-event-id';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
@@ -23,6 +27,7 @@
   export let terminateEnabled: boolean;
   export let cancelEnabled: boolean;
   export let signalEnabled: boolean;
+  export let resetEnabled: boolean;
 
   let reason = '';
   let signalInput = '';
@@ -135,6 +140,38 @@
     showSignalConfirmation = false;
   };
 
+  const reset = async (type: ResetType) => {
+    if (workflow.pendingChildren.length > 0) {
+      toaster.push({
+        message: 'Cannot reset a workflow with pending children.',
+      });
+      return;
+    }
+    let eventId: string;
+    switch (type) {
+      case ResetType.FirstWorkflowTask:
+        eventId = getFirstResetEventID($eventHistory.start);
+        break;
+      case ResetType.LastWorkflowTask: {
+        eventId = getFirstResetEventID($eventHistory.end);
+        break;
+      }
+    }
+
+    try {
+      await resetWorkflow({
+        namespace,
+        workflowId: workflow.id,
+        runId: workflow.runId,
+        eventId,
+      });
+      $refresh = Date.now();
+      toaster.push({ message: 'Workflow successfully reset' });
+    } catch (error) {
+      toaster.push({ message: 'Error resetting workflow.', variant: 'error' });
+    }
+  };
+
   let workflowActions: {
     label: string;
     onClick: () => void;
@@ -144,6 +181,18 @@
   }[];
 
   $: workflowActions = [
+    {
+      label: 'Reset first workflow task',
+      onClick: () => reset(ResetType.FirstWorkflowTask),
+      dataCy: 'reset-first-task-button',
+      allowed: resetEnabled,
+    },
+    {
+      label: 'Reset last workflow task',
+      onClick: () => reset(ResetType.LastWorkflowTask),
+      dataCy: 'reset-last-task-button',
+      allowed: resetEnabled,
+    },
     {
       label: 'Send a Signal',
       onClick: showSignalModal,

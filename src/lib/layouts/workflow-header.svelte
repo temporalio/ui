@@ -37,6 +37,7 @@
   export let terminateEnabled: boolean = false;
   export let cancelEnabled: boolean = false;
   export let signalEnabled: boolean = false;
+  export let resetEnabled: boolean = false;
 
   let refreshInterval;
   const refreshRate = 15000;
@@ -130,6 +131,7 @@
             {terminateEnabled}
             {signalEnabled}
             {cancelEnabled}
+            {resetEnabled}
             {cancelInProgress}
             {workflow}
             {namespace}

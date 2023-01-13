@@ -15,6 +15,7 @@
   export let terminateEnabled: boolean = false;
   export let cancelEnabled: boolean = false;
   export let signalEnabled: boolean = false;
+  export let resetEnabled: boolean = false;
 
   $: namespace = $page.params.namespace;
   $: workflowId = $page.params.workflow;
@@ -66,6 +67,7 @@
       {terminateEnabled}
       {cancelEnabled}
       {signalEnabled}
+      {resetEnabled}
     />
     <slot />
   {/if}

@@ -13,6 +13,7 @@
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
   import { workflowSignalEnabled } from '$lib/utilities/workflow-signal-enabled';
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
+  import { workflowResetEnabled } from '$lib/utilities/workflow-reset-enabled';
 
   const workflow = $page.params.workflow;
 
@@ -29,6 +30,7 @@
   cancelEnabled={workflowCancelEnabled($page.data.settings)}
   signalEnabled={workflowSignalEnabled($page.data.settings)}
   terminateEnabled={workflowTerminateEnabled($page.data.settings)}
+  resetEnabled={workflowResetEnabled($page.data.settings)}
 >
   <WorkflowHistoryLayout>
     <!-- <svelte:fragment slot="timeline">
