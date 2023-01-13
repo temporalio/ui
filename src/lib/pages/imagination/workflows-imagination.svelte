@@ -262,15 +262,15 @@
   }
 
   $: namespace = $page.params.namespace;
-  const onWorkflowFetch = async (status: WorkflowStatus) => {
-    return async (pageSize = 100, token) => {
+  const onWorkflowFetch = async (status: WorkflowStatus, pageSize = '5') => {
+    return async (_pageSize = 100, token) => {
       const { workflows, nextPageToken, error } = await fetchPaginatedWorkflows(
         namespace,
         {
           query: `ExecutionStatus="${status}"`,
         },
         token,
-        '5',
+        pageSize,
       );
       return { items: workflows, nextPageToken };
     };
@@ -329,42 +329,73 @@
     <WorkflowDateTimeFilter />
   </div>
 </div>
-<div class="flex flex-col gap-8">
-  <ApiPagination
-    onFetch={() => onWorkflowFetch('Running')}
-    let:visibleItems
-    hideBottomControls
-  >
-    <WorkflowsSummaryTable
-      headerClass="bg-blue-50 text-gray-900"
-      updating={$updating}
+<div class="flex flex-col gap-4">
+  <section>
+    <ApiPagination
+      onFetch={() => onWorkflowFetch('Running', '10')}
+      let:visibleItems
+      hideBottomControls
     >
-      {#each visibleItems as event}
-        <WorkflowsSummaryRow
-          workflow={event}
-          {namespace}
-          timeFormat={$timeFormat}
-        />
-      {:else}
-        <EmptyRow loading={$loading} {errorMessage} error={$workflowError} />
-      {/each}
-    </WorkflowsSummaryTable>
-  </ApiPagination>
-  <ApiPagination
-    onFetch={() => onWorkflowFetch('Completed')}
-    let:visibleItems
-    hideBottomControls
-  >
-    <WorkflowsSummaryTable updating={$updating}>
-      {#each visibleItems as event}
-        <WorkflowsSummaryRow
-          workflow={event}
-          {namespace}
-          timeFormat={$timeFormat}
-        />
-      {:else}
-        <EmptyRow loading={$loading} {errorMessage} error={$workflowError} />
-      {/each}
-    </WorkflowsSummaryTable>
-  </ApiPagination>
+      <WorkflowsSummaryTable
+        headerClass="bg-blue-50 text-gray-900"
+        updating={$updating}
+      >
+        {#each visibleItems as event}
+          <WorkflowsSummaryRow
+            workflow={event}
+            {namespace}
+            timeFormat={$timeFormat}
+          />
+        {:else}
+          <EmptyRow loading={$loading} {errorMessage} error={$workflowError} />
+        {/each}
+      </WorkflowsSummaryTable>
+    </ApiPagination>
+  </section>
+  <section>
+    <ApiPagination
+      onFetch={() => onWorkflowFetch('Failed')}
+      let:visibleItems
+      hideBottomControls
+    >
+      <h1 slot="action-top-left">Recently Failed</h1>
+      <WorkflowsSummaryTable
+        headerClass="bg-red-50 text-gray-900"
+        updating={$updating}
+      >
+        {#each visibleItems as event}
+          <WorkflowsSummaryRow
+            workflow={event}
+            {namespace}
+            timeFormat={$timeFormat}
+          />
+        {:else}
+          <EmptyRow loading={$loading} {errorMessage} error={$workflowError} />
+        {/each}
+      </WorkflowsSummaryTable>
+    </ApiPagination>
+  </section>
+  <section>
+    <ApiPagination
+      onFetch={() => onWorkflowFetch('TimedOut')}
+      let:visibleItems
+      hideBottomControls
+    >
+      <h1 slot="action-top-left">Recently Timed Out</h1>
+      <WorkflowsSummaryTable
+        headerClass="bg-yellow-50 text-gray-900"
+        updating={$updating}
+      >
+        {#each visibleItems as event}
+          <WorkflowsSummaryRow
+            workflow={event}
+            {namespace}
+            timeFormat={$timeFormat}
+          />
+        {:else}
+          <EmptyRow loading={$loading} {errorMessage} error={$workflowError} />
+        {/each}
+      </WorkflowsSummaryTable>
+    </ApiPagination>
+  </section>
 </div>
