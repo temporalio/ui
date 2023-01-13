@@ -26,10 +26,10 @@
     <div class="col-span-1 md:col-span-2">
       <h3 class="font-medium">Workflow Type</h3>
       <div class="h-0.5 rounded-full bg-gray-900" />
-      <WorkflowDetail content={$workflowRun.workflow.name} copyable />
+      <WorkflowDetail content={$workflowRun.workflow?.name} copyable />
       <WorkflowDetail
         title="Run ID"
-        content={$workflowRun.workflow.runId}
+        content={$workflowRun.workflow?.runId}
         copyable
       />
     </div>
@@ -37,17 +37,17 @@
       <h3 class="font-medium">Task Queue</h3>
       <div class="h-0.5 rounded-full bg-gray-900" />
       <WorkflowDetail
-        content={$workflowRun.workflow.taskQueue}
+        content={$workflowRun.workflow?.taskQueue}
         href={routeForWorkers({
           namespace: $page.params.namespace,
-          workflow: $workflowRun.workflow.id,
-          run: $workflowRun.workflow.runId,
+          workflow: $workflowRun.workflow?.id,
+          run: $workflowRun.workflow?.runId,
         })}
         copyable
       />
       <WorkflowDetail
         title="State Transitions"
-        content={$workflowRun.workflow.stateTransitionCount}
+        content={$workflowRun.workflow?.stateTransitionCount}
       />
     </div>
     <div class="col-span-1">
@@ -55,11 +55,11 @@
       <div class="h-0.5 rounded-full bg-gray-900" />
       <WorkflowDetail
         title="Start Time"
-        content={formatDate($workflowRun.workflow.startTime, $timeFormat)}
+        content={formatDate($workflowRun.workflow?.startTime, $timeFormat)}
       />
       <WorkflowDetail
         title="Close Time"
-        content={formatDate($workflowRun.workflow.endTime, $timeFormat)}
+        content={formatDate($workflowRun.workflow?.endTime, $timeFormat)}
       />
     </div>
   </div>

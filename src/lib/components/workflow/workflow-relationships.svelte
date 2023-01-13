@@ -47,22 +47,22 @@
           <div class="h-0.5 w-full rounded-full bg-gray-900" />
           <WorkflowDetail
             title="Workflow ID"
-            content={$workflowRun.workflow.parent?.workflowId}
+            content={parent.workflowId}
             copyable
             href={routeForEventHistory({
               namespace,
-              workflow: $workflowRun.workflow.parent?.workflowId,
-              run: $workflowRun.workflow.parent?.runId,
+              workflow: parent.workflowId,
+              run: parent.runId,
             })}
           />
           <WorkflowDetail
             title="Run ID"
-            content={$workflowRun.workflow.parent?.runId}
+            content={parent.runId}
             copyable
             href={routeForEventHistory({
               namespace,
-              workflow: $workflowRun.workflow.parent?.workflowId,
-              run: $workflowRun.workflow.parent?.runId,
+              workflow: parent.workflowId,
+              run: parent.runId,
             })}
           />
         </div>
@@ -116,9 +116,9 @@
         </div>
       {/if}
     </div>
-    {#if $workflowRun.workflow?.pendingChildren.length}
+    {#if children}
       <ChildWorkflowsTable
-        pendingChildren={$workflowRun.workflow?.pendingChildren}
+        pendingChildren={$workflowRun.workflow.pendingChildren}
         namespace={$page.params.namespace}
       />
     {/if}
