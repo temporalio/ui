@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { updating } from '$lib/stores/events';
-
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
@@ -171,7 +169,7 @@
   } = errorCopy);
 </script>
 
-{#if !$updating && (title || copy)}
+{#if title || copy}
   <Alert icon="warning" intent="warning" {title}>
     <p>
       {copy}

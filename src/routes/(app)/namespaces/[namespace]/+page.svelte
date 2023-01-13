@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { PageData } from './$types';
   import { onMount } from 'svelte';
-  import { dev } from '$app/environment';
   import { page } from '$app/stores';
 
   import { temporalVersion, uiVersion } from '$lib/stores/versions';

@@ -272,6 +272,136 @@ describe('pagination', () => {
 
     expect(initialItem).toBe(0);
   });
+
+  it('should have default active row index', () => {
+    const store = pagination(oneHundredResolutions, 5);
+    const { activeRowIndex } = get(store);
+
+    expect(activeRowIndex).toBe(0);
+  });
+
+  it('should go to the next row', () => {
+    const store = pagination(oneHundredResolutions, 5);
+
+    expect(get(store).activeRowIndex).toBe(0);
+
+    store.nextRow();
+
+    expect(get(store).activeRowIndex).toBe(1);
+
+    for (let i = 0; i < 2; i++) {
+      store.nextRow();
+    }
+
+    expect(get(store).activeRowIndex).toBe(3);
+  });
+
+  it('should go to the previous row', () => {
+    const store = pagination(oneHundredResolutions, 5);
+
+    for (let i = 0; i < 3; i++) {
+      store.nextRow();
+    }
+
+    expect(get(store).activeRowIndex).toBe(3);
+
+    for (let i = 0; i < 2; i++) {
+      store.previousRow();
+    }
+
+    expect(get(store).activeRowIndex).toBe(1);
+  });
+
+  it('should not exceed pageSize on next row', () => {
+    const store = pagination(oneHundredResolutions, 5);
+
+    for (let i = 0; i < 10; i++) {
+      store.nextRow();
+    }
+
+    expect(get(store).activeRowIndex).toBe(4);
+  });
+
+  it('should not exceed items on page on next row', () => {
+    const store = pagination([1, 2], 5);
+
+    for (let i = 0; i < 10; i++) {
+      store.nextRow();
+    }
+
+    expect(get(store).activeRowIndex).toBe(1);
+  });
+
+  it('should set active row to current row item on next ', () => {
+    const store = pagination(oneHundredResolutions, 5);
+
+    for (let i = 0; i < 3; i++) {
+      store.nextRow();
+    }
+
+    expect(get(store).activeRowIndex).toBe(3);
+
+    store.next();
+
+    expect(get(store).activeRowIndex).toBe(3);
+  });
+
+  it('should set active row to last row item on next if next page has less items', () => {
+    const store = pagination([1, 2, 3, 4, 5, 6, 7, 8], 5);
+
+    for (let i = 0; i < 4; i++) {
+      store.nextRow();
+    }
+
+    expect(get(store).activeRowIndex).toBe(4);
+
+    store.jumpToIndex(6);
+
+    expect(get(store).activeRowIndex).toBe(2);
+  });
+
+  it('should not go below first index of page on previous row', () => {
+    const store = pagination(oneHundredResolutions, 5);
+
+    store.nextRow();
+    store.nextRow();
+
+    for (let i = 0; i <= 10; i++) {
+      store.previousRow();
+    }
+
+    expect(get(store).activeRowIndex).toBe(0);
+  });
+
+  it('should set active row index', () => {
+    const store = pagination(oneHundredResolutions, 5);
+
+    expect(get(store).activeRowIndex).toBe(0);
+
+    store.setActiveRowIndex(4);
+
+    expect(get(store).activeRowIndex).toBe(4);
+  });
+
+  it('should not exceed pageSize on set active row index', () => {
+    const store = pagination(oneHundredResolutions, 5);
+
+    expect(get(store).activeRowIndex).toBe(0);
+
+    store.setActiveRowIndex(8);
+
+    expect(get(store).activeRowIndex).toBe(0);
+  });
+
+  it('should not exceed item size on set active row index', () => {
+    const store = pagination([1, 2], 5);
+
+    expect(get(store).activeRowIndex).toBe(0);
+
+    store.setActiveRowIndex(8);
+
+    expect(get(store).activeRowIndex).toBe(0);
+  });
 });
 
 describe('getPageForIndex', () => {

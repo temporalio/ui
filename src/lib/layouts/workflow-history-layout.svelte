@@ -1,13 +1,17 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import { workflowRun, refresh } from '$lib/stores/workflow-run';
   import {
     routeForEventHistory,
     routeForWorkers,
   } from '$lib/utilities/route-for';
   import { formatDate } from '$lib/utilities/format-date';
   import { eventViewType } from '$lib/stores/event-view';
+  import { timeFormat } from '$lib/stores/time-format';
   import { eventHistory } from '$lib/stores/events';
+  import { fetchStartAndEndEvents } from '$lib/services/events-service';
+  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
+  import { exportHistory } from '$lib/utilities/export-history';
 
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
@@ -17,48 +21,73 @@
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
-  import { timeFormat } from '$lib/stores/time-format';
-  import { exportHistory } from '$lib/utilities/export-history';
-  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
 
   let showShortcuts = false;
 
+  $: namespace = $page.params.namespace;
+  $: workflowId = $page.params.workflow;
+  $: runId = $page.params.run;
+
+  $: $refresh, getStartAndEndEvents(namespace, workflowId, runId);
+
   $: workflowEvents =
     getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
+
+  const getStartAndEndEvents = async (
+    namespace: string,
+    workflowId: string,
+    runId: string,
+  ) => {
+    const { settings, user } = $page.data;
+    const events = await fetchStartAndEndEvents({
+      namespace,
+      workflowId,
+      runId,
+      settings,
+      accessToken: user?.accessToken,
+    });
+    $eventHistory = events;
+  };
+
+  const onViewClick = (view: EventView) => {
+    if ($page.url.searchParams.get('page')) {
+      $page.url.searchParams.delete('page');
+    }
+    $eventViewType = view;
+  };
 </script>
 
 <section class="flex flex-col gap-4">
   <section class="flex flex-col gap-1">
     <WorkflowDetail
       title="Workflow Type"
-      content={$workflowRun.workflow.name}
+      content={$workflowRun.workflow?.name}
     />
-    <WorkflowDetail title="Run ID" content={$workflowRun.workflow.runId} />
+    <WorkflowDetail title="Run ID" content={$workflowRun.workflow?.runId} />
     <div class="flex flex-col gap-1 md:flex-row md:gap-6">
       <WorkflowDetail
         title="Start Time"
-        content={formatDate($workflowRun.workflow.startTime, $timeFormat)}
+        content={formatDate($workflowRun.workflow?.startTime, $timeFormat)}
       />
       <WorkflowDetail
         title="Close Time"
-        content={formatDate($workflowRun.workflow.endTime, $timeFormat)}
+        content={formatDate($workflowRun.workflow?.endTime, $timeFormat)}
       />
     </div>
     <WorkflowDetail
       title="Task Queue"
-      content={$workflowRun.workflow.taskQueue}
+      content={$workflowRun.workflow?.taskQueue}
       href={routeForWorkers({
         namespace: $page.params.namespace,
-        workflow: $workflowRun.workflow.id,
-        run: $workflowRun.workflow.runId,
+        workflow: $workflowRun.workflow?.id,
+        run: $workflowRun.workflow?.runId,
       })}
     />
     <WorkflowDetail
       title="State Transitions"
-      content={$workflowRun.workflow.stateTransitionCount}
+      content={$workflowRun.workflow?.stateTransitionCount}
     />
     {#if $workflowRun.workflow?.parent}
       <div class="gap-2 xl:flex">
@@ -115,19 +144,19 @@
             icon="feed"
             active={$eventViewType === 'feed'}
             data-cy="feed"
-            on:click={() => ($eventViewType = 'feed')}>History</ToggleButton
+            on:click={() => onViewClick('feed')}>History</ToggleButton
           >
           <ToggleButton
             icon="compact"
             active={$eventViewType === 'compact'}
             data-cy="compact"
-            on:click={() => ($eventViewType = 'compact')}>Compact</ToggleButton
+            on:click={() => onViewClick('compact')}>Compact</ToggleButton
           >
           <ToggleButton
             icon="json"
             active={$eventViewType === 'json'}
             data-cy="json"
-            on:click={() => ($eventViewType = 'json')}>JSON</ToggleButton
+            on:click={() => onViewClick('json')}>JSON</ToggleButton
           >
           <ToggleButton
             icon="download"
@@ -135,8 +164,8 @@
             on:click={() =>
               exportHistory({
                 namespace: $page.params.namespace,
-                workflowId: $workflowRun.workflow.id,
-                runId: $workflowRun.workflow.runId,
+                workflowId: $workflowRun.workflow?.id,
+                runId: $workflowRun.workflow?.runId,
               })}>Download</ToggleButton
           >
         </ToggleButtons>
@@ -146,7 +175,6 @@
   </section>
   <EventShortcutKeys
     open={showShortcuts}
-    compact={$eventViewType === 'compact'}
     onOpen={() => (showShortcuts = true)}
     onClose={() => (showShortcuts = false)}
   />

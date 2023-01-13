@@ -6,12 +6,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
 
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
-  import {
-    eventFilterSort,
-    eventSortOrder,
-    eventShowElapsed,
-    supportsReverseOrder,
-  } from '$lib/stores/event-view';
+  import { eventFilterSort, eventShowElapsed } from '$lib/stores/event-view';
   import { timeFormat, setTimeFormat } from '$lib/stores/time-format';
   import type { TimeFormatOptions } from '$lib/stores/time-format';
   import type {
@@ -60,7 +55,7 @@
   $: value = getDateFilterValue({
     compact,
     timeFormat: $timeFormat,
-    sortOrder: $eventSortOrder,
+    sortOrder: $eventFilterSort,
     showElapsed: $eventShowElapsed,
   });
 </script>
@@ -71,15 +66,15 @@
     <span class="block md:hidden"><Icon name="clock" /></span>
   </svelte:fragment>
   <div class="w-56">
-    {#if $supportsReverseOrder && !compact}
+    {#if !compact}
       {#each sortOptions as { option, label } (option)}
         <div
           class="option"
-          class:active={$eventSortOrder === option}
+          class:active={$eventFilterSort === option}
           on:click={() => onSortOptionClick(option)}
         >
           <div class="check active">
-            {#if $eventSortOrder === option}
+            {#if $eventFilterSort === option}
               <Icon name="checkmark" />
             {/if}
           </div>

@@ -16,7 +16,7 @@
   import Badge from '$lib/holocene/badge.svelte';
   import { groupEvents } from '$lib/models/event-groups';
 
-  $: isRunning = $workflowRun.workflow.isRunning;
+  $: isRunning = $workflowRun.workflow?.isRunning;
 
   let showEventTypeFilter = false;
   let eventTypeValue = '';
