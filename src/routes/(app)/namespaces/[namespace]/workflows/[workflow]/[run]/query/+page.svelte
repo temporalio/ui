@@ -1,6 +1,5 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { settings } from '$lib/stores/settings';
 
   import WorkflowQuery from '$lib/pages/workflow-query.svelte';
 

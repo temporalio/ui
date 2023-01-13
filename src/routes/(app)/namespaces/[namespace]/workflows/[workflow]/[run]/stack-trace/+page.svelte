@@ -1,6 +1,5 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { settings } from '$lib/stores/settings';
 
   import WorkflowStackTrace from '$lib/pages/workflow-stack-trace.svelte';
 

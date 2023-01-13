@@ -1,6 +1,5 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { settings } from '$lib/stores/settings';
 
   import WorkflowWorkers from '$lib/pages/workflow-workers.svelte';
 

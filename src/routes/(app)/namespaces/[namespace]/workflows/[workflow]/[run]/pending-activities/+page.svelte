@@ -1,6 +1,5 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { settings } from '$lib/stores/settings';
 
   import WorkflowPendingActivities from '$lib/pages/workflow-pending-activities.svelte';
 
