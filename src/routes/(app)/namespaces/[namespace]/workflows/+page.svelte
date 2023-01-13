@@ -10,6 +10,7 @@
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
   import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
+  import WorkflowsImagination from '$lib/pages/workflows-imagination.svelte';
 </script>
 
 <PageTitle
@@ -18,7 +19,8 @@
 />
 
 <AdvancedVisibilityGuard>
-  <WorkflowsWithNewSearch
+  <WorkflowsImagination />
+  <!-- <WorkflowsWithNewSearch
     bulkActionsEnabled={bulkActionsEnabled(
       $page.data.settings,
       $supportsAdvancedVisibility,
@@ -26,5 +28,5 @@
     cancelEnabled={workflowCancelEnabled($page.data.settings)}
     terminateEnabled={workflowTerminateEnabled($page.data.settings)}
   />
-  <Workflows slot="fallback" />
+  <Workflows slot="fallback" /> -->
 </AdvancedVisibilityGuard>
