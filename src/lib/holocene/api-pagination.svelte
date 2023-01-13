@@ -23,6 +23,7 @@
   export let pageSizeOptions: string[] | number[] = options;
   export let defaultPageSize: string | number | undefined = undefined;
   export let total: string | number = '';
+  export let active: boolean = true;
   export let hideBottomControls: boolean = false;
 
   let store = createPaginationStore(pageSizeOptions, defaultPageSize);
@@ -82,44 +83,46 @@
 
   async function handleKeydown(event: KeyboardEvent) {
     const shifted = event.shiftKey;
-    switch (event.code) {
-      case 'ArrowRight':
-      case 'KeyL':
-        if ($store.hasNext && !$store.updating) {
-          fetchIndexData();
-        }
-        break;
-      case 'ArrowLeft':
-      case 'KeyH':
-        if ($store.hasPrevious && !$store.updating) {
-          store.previousPage();
-        }
-        break;
-      case 'ArrowUp':
-      case 'KeyK':
-        if (shifted && onShiftUp) {
-          onShiftUp(event);
-          store.reset();
-          initalDataFetch();
-        } else {
-          store.previousRow();
-        }
-        break;
-      case 'ArrowDown':
-      case 'KeyJ':
-        if (shifted && onShiftDown) {
-          onShiftDown(event);
-          store.reset();
-          initalDataFetch();
-        } else {
-          store.nextRow();
-        }
-        break;
-      case 'Space':
-        if (onSpace) {
-          onSpace(event);
-        }
-        break;
+    if (active) {
+      switch (event.code) {
+        case 'ArrowRight':
+        case 'KeyL':
+          if ($store.hasNext && !$store.updating) {
+            fetchIndexData();
+          }
+          break;
+        case 'ArrowLeft':
+        case 'KeyH':
+          if ($store.hasPrevious && !$store.updating) {
+            store.previousPage();
+          }
+          break;
+        case 'ArrowUp':
+        case 'KeyK':
+          if (shifted && onShiftUp) {
+            onShiftUp(event);
+            store.reset();
+            initalDataFetch();
+          } else {
+            store.previousRow();
+          }
+          break;
+        case 'ArrowDown':
+        case 'KeyJ':
+          if (shifted && onShiftDown) {
+            onShiftDown(event);
+            store.reset();
+            initalDataFetch();
+          } else {
+            store.nextRow();
+          }
+          break;
+        case 'Space':
+          if (onSpace) {
+            onSpace(event);
+          }
+          break;
+      }
     }
   }
 </script>

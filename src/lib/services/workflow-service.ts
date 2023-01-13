@@ -99,6 +99,69 @@ export const fetchWorkflowCount = async (
   return { count, totalCount };
 };
 
+export const fetchStatusesWorkflowCount = async (
+  namespace: string,
+  request = fetch,
+): Promise<{
+  runningCount: number;
+  failedCount: number;
+  timedOutCount: number;
+  terminatedCount: number;
+  canceledCount: number;
+  completedCount: number;
+}> => {
+  let runningCount = 0;
+  let failedCount = 0;
+  let terminatedCount = 0;
+  let timedOutCount = 0;
+  let canceledCount = 0;
+  let completedCount = 0;
+
+  try {
+    const countRoute = await routeForApi('workflows.count', { namespace });
+    const statusPromise = (status: WorkflowStatus) =>
+      requestFromAPI<{ count: number }>(countRoute, {
+        params: { query: `ExecutionStatus="${status}"` },
+        onError: noop,
+        handleError: noop,
+        request,
+      });
+
+    const [
+      runningResult,
+      failedResult,
+      terminatedResult,
+      timedOutResult,
+      canceledResult,
+      completedResult,
+    ] = await Promise.all([
+      statusPromise('Running'),
+      statusPromise('Failed'),
+      statusPromise('Terminated'),
+      statusPromise('TimedOut'),
+      statusPromise('Canceled'),
+      statusPromise('Completed'),
+    ]);
+    runningCount = runningResult?.count;
+    failedCount = failedResult?.count;
+    terminatedCount = terminatedResult?.count;
+    timedOutCount = timedOutResult?.count;
+    canceledCount = canceledResult?.count;
+    completedCount = completedResult?.count;
+  } catch (e) {
+    // Don't fail the workflows call due to count
+  }
+
+  return {
+    runningCount,
+    failedCount,
+    terminatedCount,
+    timedOutCount,
+    canceledCount,
+    completedCount,
+  };
+};
+
 export const fetchPaginatedWorkflows = async (
   namespace: string,
   parameters: ValidWorkflowParameters,
@@ -140,11 +203,10 @@ export const fetchPaginatedWorkflows = async (
 
   return {
     workflows: toWorkflowExecutions({ executions }),
-    nextPageToken: String(nextPageToken),
+    nextPageToken: nextPageToken ? String(nextPageToken) : '',
     error,
   };
 };
-
 
 export const fetchAllWorkflows = async (
   namespace: string,
@@ -292,13 +354,13 @@ export async function signalWorkflow({
         input: {
           payloads: signalInput
             ? [
-              {
-                metadata: {
-                  encoding: btoa('json/plain'),
+                {
+                  metadata: {
+                    encoding: btoa('json/plain'),
+                  },
+                  data: btoa(stringifyWithBigInt(signalInput)),
                 },
-                data: btoa(stringifyWithBigInt(signalInput)),
-              },
-            ]
+              ]
             : null,
         },
       }),

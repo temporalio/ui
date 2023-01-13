@@ -43,6 +43,7 @@
   import {
     fetchAllWorkflows,
     fetchPaginatedWorkflows,
+    fetchStatusesWorkflowCount,
   } from '$lib/services/workflow-service';
   import EmptyRow from './_empty-row.svelte';
 
@@ -261,8 +262,36 @@
     }
   }
 
+  // For Imagination Pagination
+
   $: namespace = $page.params.namespace;
-  const onWorkflowFetch = async (status: WorkflowStatus, pageSize = '5') => {
+  let activeTable: WorkflowStatus = 'Running';
+
+  let runningTotal = 0;
+  let failedTotal = 0;
+  let terminatedTotal = 0;
+  let timedOutTotal = 0;
+  let canceledTotal = 0;
+  let completedTotal = 0;
+
+  // onMount(async () => {
+  //   const {
+  //     runningCount,
+  //     failedCount,
+  //     terminatedCount,
+  //     timedOutCount,
+  //     canceledCount,
+  //     completedCount,
+  //   } = await fetchStatusesWorkflowCount(namespace);
+  //   runningTotal = runningCount;
+  //   failedTotal = failedCount;
+  //   terminatedTotal = terminatedCount;
+  //   timedOutTotal = timedOutCount;
+  //   canceledTotal = canceledCount;
+  //   completedTotal = completedCount;
+  // });
+
+  const onWorkflowFetch = async (status: WorkflowStatus, pageSize = '10') => {
     return async (_pageSize = 100, token) => {
       const { workflows, nextPageToken, error } = await fetchPaginatedWorkflows(
         namespace,
@@ -322,11 +351,11 @@
       {/if}
     </div>
   </div>
-  <div class="flex gap-4 items-center">
+  <div class="flex items-center gap-4">
     <Button variant="secondary" class="h-10 w-10" on:click={refreshWorkflows}
       ><Icon name="retry" /></Button
     >
-    <WorkflowDateTimeFilter />
+    <!-- <WorkflowDateTimeFilter /> -->
   </div>
 </div>
 <div class="flex flex-col gap-4">
@@ -334,11 +363,15 @@
     <ApiPagination
       onFetch={() => onWorkflowFetch('Running', '10')}
       let:visibleItems
+      active={activeTable === 'Running'}
       hideBottomControls
     >
       <WorkflowsSummaryTable
-        headerClass="bg-blue-50 text-gray-900"
+        headerClass="text-gray-900 cursor-pointer {activeTable === 'Running'
+          ? 'bg-blue-300'
+          : 'bg-blue-100'}"
         updating={$updating}
+        onHeaderClick={() => (activeTable = 'Running')}
       >
         {#each visibleItems as event}
           <WorkflowsSummaryRow
@@ -356,12 +389,18 @@
     <ApiPagination
       onFetch={() => onWorkflowFetch('Failed')}
       let:visibleItems
+      active={activeTable === 'Failed'}
       hideBottomControls
     >
       <h1 slot="action-top-left">Recently Failed</h1>
       <WorkflowsSummaryTable
-        headerClass="bg-red-50 text-gray-900"
+        headerClass="text-gray-900 cursor-pointer {activeTable === 'Failed'
+          ? 'bg-red-300'
+          : 'bg-red-100'}"
         updating={$updating}
+        onHeaderClick={() => {
+          activeTable = 'Failed';
+        }}
       >
         {#each visibleItems as event}
           <WorkflowsSummaryRow
@@ -379,12 +418,97 @@
     <ApiPagination
       onFetch={() => onWorkflowFetch('TimedOut')}
       let:visibleItems
+      active={activeTable === 'TimedOut'}
       hideBottomControls
     >
       <h1 slot="action-top-left">Recently Timed Out</h1>
       <WorkflowsSummaryTable
-        headerClass="bg-yellow-50 text-gray-900"
+        headerClass="text-gray-900 cursor-pointer {activeTable === 'TimedOut'
+          ? 'bg-orange-300'
+          : 'bg-orange-100'}"
         updating={$updating}
+        onHeaderClick={() => (activeTable = 'TimedOut')}
+      >
+        {#each visibleItems as event}
+          <WorkflowsSummaryRow
+            workflow={event}
+            {namespace}
+            timeFormat={$timeFormat}
+          />
+        {:else}
+          <EmptyRow loading={$loading} {errorMessage} error={$workflowError} />
+        {/each}
+      </WorkflowsSummaryTable>
+    </ApiPagination>
+  </section>
+  <section>
+    <ApiPagination
+      onFetch={() => onWorkflowFetch('Terminated')}
+      let:visibleItems
+      active={activeTable === 'Terminated'}
+      hideBottomControls
+    >
+      <h1 slot="action-top-left">Recently Terminated</h1>
+      <WorkflowsSummaryTable
+        headerClass="text-gray-900 cursor-pointer {activeTable === 'Terminated'
+          ? 'bg-gray-300'
+          : 'bg-gray-100'}"
+        updating={$updating}
+        onHeaderClick={() => (activeTable = 'Terminated')}
+      >
+        {#each visibleItems as event}
+          <WorkflowsSummaryRow
+            workflow={event}
+            {namespace}
+            timeFormat={$timeFormat}
+          />
+        {:else}
+          <EmptyRow loading={$loading} {errorMessage} error={$workflowError} />
+        {/each}
+      </WorkflowsSummaryTable>
+    </ApiPagination>
+  </section>
+  <section>
+    <ApiPagination
+      onFetch={() => onWorkflowFetch('Canceled')}
+      let:visibleItems
+      active={activeTable === 'Canceled'}
+      hideBottomControls
+    >
+      <h1 slot="action-top-left">Recently Canceled</h1>
+      <WorkflowsSummaryTable
+        headerClass="text-gray-900 cursor-pointer {activeTable === 'Canceled'
+          ? 'bg-yellow-300'
+          : 'bg-yellow-100'}"
+        updating={$updating}
+        onHeaderClick={() => (activeTable = 'Canceled')}
+      >
+        {#each visibleItems as event}
+          <WorkflowsSummaryRow
+            workflow={event}
+            {namespace}
+            timeFormat={$timeFormat}
+          />
+        {:else}
+          <EmptyRow loading={$loading} {errorMessage} error={$workflowError} />
+        {/each}
+      </WorkflowsSummaryTable>
+    </ApiPagination>
+  </section>
+  <section>
+    <ApiPagination
+      onFetch={() => onWorkflowFetch('Completed')}
+      let:visibleItems
+      active={activeTable === 'Completed'}
+      hideBottomControls
+    >
+      <h1 slot="action-top-left">Recently Completed</h1>
+      <WorkflowsSummaryTable
+        headerClass="text-gray-900 cursor-pointer {activeTable === 'Completed'
+          ? 'bg-green-300'
+          : 'bg-green-100'}"
+        updating={$updating}
+        onHeaderClick={() => (activeTable = 'Completed')}
       >
         {#each visibleItems as event}
           <WorkflowsSummaryRow

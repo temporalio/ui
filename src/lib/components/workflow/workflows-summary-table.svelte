@@ -1,12 +1,18 @@
 <script lang="ts">
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
+  import { noop } from 'svelte/internal';
 
   export let updating: boolean = false;
+  export let onHeaderClick: () => void = noop;
 </script>
 
 <Table class="w-full md:table-fixed" {updating}>
-  <TableHeaderRow slot="headers" class={$$props.headerClass}>
+  <TableHeaderRow
+    slot="headers"
+    class={$$props.headerClass}
+    on:click={onHeaderClick}
+  >
     <th class="hidden w-32 md:table-cell">Status</th>
     <th class="hidden md:table-cell md:w-auto">Workflow ID</th>
     <th class="hidden md:table-cell xl:w-60">Type</th>
