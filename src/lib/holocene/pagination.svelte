@@ -173,10 +173,10 @@
 
 <style lang="postcss">
   .caret {
-    @apply text-gray-500;
+    @apply text-gray-900;
   }
 
   .caret:disabled {
-    @apply cursor-not-allowed text-gray-300;
+    @apply cursor-not-allowed text-gray-400;
   }
 </style>
