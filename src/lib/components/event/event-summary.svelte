@@ -1,8 +1,8 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
-  import { eventHistory } from '$lib/stores/events';
   import { refresh } from '$lib/stores/workflow-run';
+  import type { StartAndEndEventHistory } from '$lib/stores/events';
 
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
@@ -10,6 +10,7 @@
   import { groupEvents } from '$lib/models/event-groups';
   import Pagination from '$lib/holocene/pagination.svelte';
 
+  export let eventHistory: StartAndEndEventHistory;
   export let events: CommonHistoryEvent[];
   export let compact = false;
 
@@ -31,11 +32,13 @@
   $: category = $page.url.searchParams.get('category');
   $: intialEvents =
     $eventFilterSort === 'descending' && !compact
-      ? $eventHistory?.end
-      : $eventHistory?.start;
+      ? eventHistory?.end
+      : eventHistory?.start;
   $: currentEvents = events.length ? events : intialEvents;
   $: initialItem = currentEvents?.[0];
   $: items = getEvents(currentEvents, category);
+
+  $: loading = !eventHistory?.start.length;
   $: updating = currentEvents.length && !events.length;
 </script>
 
@@ -60,7 +63,7 @@
           onRowClick={() => setActiveRowIndex(index)}
         />
       {:else}
-        <EventEmptyRow />
+        <EventEmptyRow {loading} />
       {/each}
     </EventSummaryTable>
   </Pagination>

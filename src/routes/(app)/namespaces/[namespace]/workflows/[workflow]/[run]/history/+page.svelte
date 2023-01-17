@@ -28,11 +28,13 @@
   cancelEnabled={workflowCancelEnabled($page.data.settings)}
   signalEnabled={workflowSignalEnabled($page.data.settings)}
   terminateEnabled={workflowTerminateEnabled($page.data.settings)}
+  let:workflowRun
+  let:eventHistory
 >
-  <WorkflowHistoryLayout>
+  <WorkflowHistoryLayout {workflowRun} {eventHistory}>
     <!-- <svelte:fragment slot="timeline">
-    <EventHistoryTimelineContainer />
+    <EventHistoryTimelineContainer {workflowRun} {eventHistory} />
     </svelte:fragment> -->
-    <svelte:component this={view} />
+    <svelte:component this={view} {eventHistory} />
   </WorkflowHistoryLayout>
 </WorkflowRunLayout>

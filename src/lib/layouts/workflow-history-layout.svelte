@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { workflowRun, refresh } from '$lib/stores/workflow-run';
+  import type { WorkflowRunWithWorkers } from '$lib/stores/workflow-run';
   import {
     routeForEventHistory,
     routeForWorkers,
@@ -8,8 +8,7 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { eventViewType } from '$lib/stores/event-view';
   import { timeFormat } from '$lib/stores/time-format';
-  import { eventHistory } from '$lib/stores/events';
-  import { fetchStartAndEndEvents } from '$lib/services/events-service';
+  import type { StartAndEndEventHistory } from '$lib/stores/events';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { exportHistory } from '$lib/utilities/export-history';
 
@@ -24,32 +23,13 @@
   import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
   import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
 
+  export let workflowRun: WorkflowRunWithWorkers;
+  export let eventHistory: StartAndEndEventHistory;
+
   let showShortcuts = false;
 
-  $: namespace = $page.params.namespace;
-  $: workflowId = $page.params.workflow;
-  $: runId = $page.params.run;
-
-  $: $refresh, getStartAndEndEvents(namespace, workflowId, runId);
-
   $: workflowEvents =
-    getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
-
-  const getStartAndEndEvents = async (
-    namespace: string,
-    workflowId: string,
-    runId: string,
-  ) => {
-    const { settings, user } = $page.data;
-    const events = await fetchStartAndEndEvents({
-      namespace,
-      workflowId,
-      runId,
-      settings,
-      accessToken: user?.accessToken,
-    });
-    $eventHistory = events;
-  };
+    getWorkflowStartedCompletedAndTaskFailedEvents(eventHistory);
 
   const onViewClick = (view: EventView) => {
     if ($page.url.searchParams.get('page')) {
@@ -63,67 +43,67 @@
   <section class="flex flex-col gap-1">
     <WorkflowDetail
       title="Workflow Type"
-      content={$workflowRun.workflow?.name}
+      content={workflowRun.workflow?.name}
     />
-    <WorkflowDetail title="Run ID" content={$workflowRun.workflow?.runId} />
+    <WorkflowDetail title="Run ID" content={workflowRun.workflow?.runId} />
     <div class="flex flex-col gap-1 md:flex-row md:gap-6">
       <WorkflowDetail
         title="Start Time"
-        content={formatDate($workflowRun.workflow?.startTime, $timeFormat)}
+        content={formatDate(workflowRun.workflow?.startTime, $timeFormat)}
       />
       <WorkflowDetail
         title="Close Time"
-        content={formatDate($workflowRun.workflow?.endTime, $timeFormat)}
+        content={formatDate(workflowRun.workflow?.endTime, $timeFormat)}
       />
     </div>
     <WorkflowDetail
       title="Task Queue"
-      content={$workflowRun.workflow?.taskQueue}
+      content={workflowRun.workflow?.taskQueue}
       href={routeForWorkers({
         namespace: $page.params.namespace,
-        workflow: $workflowRun.workflow?.id,
-        run: $workflowRun.workflow?.runId,
+        workflow: workflowRun.workflow?.id,
+        run: workflowRun.workflow?.runId,
       })}
     />
     <WorkflowDetail
       title="State Transitions"
-      content={$workflowRun.workflow?.stateTransitionCount}
+      content={workflowRun.workflow?.stateTransitionCount}
     />
-    {#if $workflowRun.workflow?.parent}
+    {#if workflowRun.workflow?.parent}
       <div class="gap-2 xl:flex">
         <WorkflowDetail
           title="Parent Workflow ID"
-          content={$workflowRun.workflow.parent?.workflowId}
+          content={workflowRun.workflow.parent?.workflowId}
           href={routeForEventHistory({
             namespace: $page.params.namespace,
-            workflow: $workflowRun.workflow.parent?.workflowId,
-            run: $workflowRun.workflow.parent?.runId,
+            workflow: workflowRun.workflow.parent?.workflowId,
+            run: workflowRun.workflow.parent?.runId,
           })}
         />
         <WorkflowDetail
           title="Parent Run ID"
-          content={$workflowRun.workflow.parent?.runId}
+          content={workflowRun.workflow.parent?.runId}
           href={routeForEventHistory({
             namespace: $page.params.namespace,
-            workflow: $workflowRun.workflow.parent?.workflowId,
-            run: $workflowRun.workflow.parent?.runId,
+            workflow: workflowRun.workflow.parent?.workflowId,
+            run: workflowRun.workflow.parent?.runId,
           })}
         />
       </div>
     {/if}
-    {#if $workflowRun.workflow?.pendingChildren.length}
+    {#if workflowRun.workflow?.pendingChildren.length}
       <ChildWorkflowsTable
-        pendingChildren={$workflowRun.workflow?.pendingChildren}
+        pendingChildren={workflowRun.workflow?.pendingChildren}
         namespace={$page.params.namespace}
       />
     {/if}
   </section>
   <WorkflowStackTraceError
-    workflow={$workflowRun.workflow}
-    workers={$workflowRun.workers}
+    workflow={workflowRun.workflow}
+    workers={workflowRun.workers}
   />
   <WorkflowTypedError error={workflowEvents.error} />
-  <PendingActivities />
+  <PendingActivities {workflowRun} />
   <section class="flex w-full" data-cy="inputs-results">
     <Accordion title="Input and Results" icon="json" class="border-gray-900">
       <div class="flex gap-2">
@@ -164,8 +144,8 @@
             on:click={() =>
               exportHistory({
                 namespace: $page.params.namespace,
-                workflowId: $workflowRun.workflow?.id,
-                runId: $workflowRun.workflow?.runId,
+                workflowId: workflowRun.workflow?.id,
+                runId: workflowRun.workflow?.runId,
               })}>Download</ToggleButton
           >
         </ToggleButtons>

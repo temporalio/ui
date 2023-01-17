@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import type { WorkflowRunWithWorkers } from '$lib/stores/workflow-run';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Badge from '$lib/holocene/badge.svelte';
@@ -18,7 +18,9 @@
   import { timeFormat } from '$lib/stores/time-format';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
-  $: pendingActivities = $workflowRun.workflow?.pendingActivities;
+  export let workflowRun: WorkflowRunWithWorkers;
+
+  $: pendingActivities = workflowRun.workflow?.pendingActivities;
 </script>
 
 {#if pendingActivities.length}

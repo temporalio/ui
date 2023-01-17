@@ -1,8 +1,15 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { workflowRun, refresh } from '$lib/stores/workflow-run';
-  import { loading } from '$lib/stores/workflow-run-loading';
-  import { timelineEvents } from '$lib/stores/events';
+  import {
+    initialWorkflowRun,
+    refresh,
+    type WorkflowRunWithWorkers,
+  } from '$lib/stores/workflow-run';
+  import {
+    initialEventHistory,
+    type StartAndEndEventHistory,
+    timelineEvents,
+  } from '$lib/stores/events';
 
   import Header from '$lib/layouts/workflow-header.svelte';
   import Loading from '$lib/holocene/loading.svelte';
@@ -11,6 +18,7 @@
   import { fetchWorkflow } from '$lib/services/workflow-service';
   import { getPollers } from '$lib/services/pollers-service';
   import { toDecodedPendingActivities } from '$lib/models/pending-activities';
+  import { fetchStartAndEndEvents } from '$lib/services/events-service';
 
   export let terminateEnabled: boolean = false;
   export let cancelEnabled: boolean = false;
@@ -20,12 +28,16 @@
   $: workflowId = $page.params.workflow;
   $: runId = $page.params.run;
 
-  const getWorkflow = async (
+  let workflowRun: WorkflowRunWithWorkers = initialWorkflowRun;
+  let eventHistory: StartAndEndEventHistory = initialEventHistory;
+
+  const getWorkflowAndEventHistory = async (
     namespace: string,
     workflowId: string,
     runId: string,
   ) => {
     const { settings, user } = $page.data;
+
     const workflow = await fetchWorkflow({
       namespace,
       workflowId,
@@ -39,11 +51,18 @@
       settings,
       user?.accessToken,
     );
-    $workflowRun = { workflow, workers };
-    $loading = false;
+    workflowRun = { workflow, workers };
+    const events = await fetchStartAndEndEvents({
+      namespace,
+      workflowId,
+      runId,
+      settings,
+      accessToken: user?.accessToken,
+    });
+    eventHistory = events;
   };
 
-  $: $refresh, getWorkflow(namespace, workflowId, runId);
+  $: $refresh, getWorkflowAndEventHistory(namespace, workflowId, runId);
 
   onMount(() => {
     const sort = $page.url.searchParams.get('sort');
@@ -56,17 +75,18 @@
 </script>
 
 <main class="flex h-full flex-col gap-6">
-  {#if $loading}
+  {#if !workflowRun.workflow}
     <Loading />
   {:else}
     <Header
       namespace={$page.params.namespace}
-      workflow={$workflowRun.workflow}
-      workers={$workflowRun.workers}
+      {workflowRun}
+      {eventHistory}
       {terminateEnabled}
       {cancelEnabled}
       {signalEnabled}
     />
-    <slot />
+    {console.log('WORKFLOW RUN IN LAYOUT: ', workflowRun)}
+    <slot {workflowRun} {eventHistory} />
   {/if}
 </main>

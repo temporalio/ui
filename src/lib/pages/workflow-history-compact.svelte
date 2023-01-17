@@ -3,7 +3,9 @@
   import { page } from '$app/stores';
   import { fetchAllEvents } from '$lib/services/events-service';
   import { refresh } from '$lib/stores/workflow-run';
+  import type { StartAndEndEventHistory } from '$lib/stores/events';
 
+  export let eventHistory: StartAndEndEventHistory;
   let events: CommonHistoryEvent[] = [];
 
   $: namespace = $page.params.namespace;
@@ -30,4 +32,4 @@
   $: $refresh, fetchEvents(namespace, workflowId, runId);
 </script>
 
-<EventSummary {events} compact={true} />
+<EventSummary {events} {eventHistory} compact={true} />

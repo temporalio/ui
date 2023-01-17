@@ -17,6 +17,7 @@
   cancelEnabled={workflowCancelEnabled($page.data.settings)}
   signalEnabled={workflowSignalEnabled($page.data.settings)}
   terminateEnabled={workflowTerminateEnabled($page.data.settings)}
+  let:workflowRun
 >
-  <WorkflowWorkers />
+  <WorkflowWorkers {workflowRun} />
 </WorkflowRunLayout>
