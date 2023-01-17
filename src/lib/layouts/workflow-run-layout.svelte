@@ -86,7 +86,6 @@
       {cancelEnabled}
       {signalEnabled}
     />
-    {console.log('WORKFLOW RUN IN LAYOUT: ', workflowRun)}
     <slot {workflowRun} {eventHistory} />
   {/if}
 </main>

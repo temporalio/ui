@@ -24,7 +24,7 @@
   let queryType: string;
   let isLoading = false;
 
-  let queryTypes = getQueryTypes({
+  $: queryTypes = getQueryTypes({
     namespace,
     workflow: workflowParams,
   }).then((queryTypes) => {
