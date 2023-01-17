@@ -1,13 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { workflowRun, refresh } from '$lib/stores/workflow-run';
-  import {
-    routeForEventHistory,
-    routeForWorkers,
-  } from '$lib/utilities/route-for';
-  import { formatDate } from '$lib/utilities/format-date';
   import { eventViewType } from '$lib/stores/event-view';
-  import { timeFormat } from '$lib/stores/time-format';
   import { eventHistory } from '$lib/stores/events';
   import { fetchStartAndEndEvents } from '$lib/services/events-service';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
@@ -16,12 +10,12 @@
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import PendingActivities from '$lib/components/workflow/pending-activities.svelte';
+  import WorkflowRelationships from '$lib/components/workflow/workflow-relationships.svelte';
   import WorkflowStackTraceError from '$lib/components/workflow/workflow-stack-trace-error.svelte';
+  import WorkflowSummary from '$lib/components/workflow/workflow-summary.svelte';
   import WorkflowTypedError from '$lib/components/workflow/workflow-typed-error.svelte';
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
-  import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
-  import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
   import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
 
   let showShortcuts = false;
@@ -60,64 +54,8 @@
 </script>
 
 <section class="flex flex-col gap-4">
-  <section class="flex flex-col gap-1">
-    <WorkflowDetail
-      title="Workflow Type"
-      content={$workflowRun.workflow?.name}
-    />
-    <WorkflowDetail title="Run ID" content={$workflowRun.workflow?.runId} />
-    <div class="flex flex-col gap-1 md:flex-row md:gap-6">
-      <WorkflowDetail
-        title="Start Time"
-        content={formatDate($workflowRun.workflow?.startTime, $timeFormat)}
-      />
-      <WorkflowDetail
-        title="Close Time"
-        content={formatDate($workflowRun.workflow?.endTime, $timeFormat)}
-      />
-    </div>
-    <WorkflowDetail
-      title="Task Queue"
-      content={$workflowRun.workflow?.taskQueue}
-      href={routeForWorkers({
-        namespace: $page.params.namespace,
-        workflow: $workflowRun.workflow?.id,
-        run: $workflowRun.workflow?.runId,
-      })}
-    />
-    <WorkflowDetail
-      title="State Transitions"
-      content={$workflowRun.workflow?.stateTransitionCount}
-    />
-    {#if $workflowRun.workflow?.parent}
-      <div class="gap-2 xl:flex">
-        <WorkflowDetail
-          title="Parent Workflow ID"
-          content={$workflowRun.workflow.parent?.workflowId}
-          href={routeForEventHistory({
-            namespace: $page.params.namespace,
-            workflow: $workflowRun.workflow.parent?.workflowId,
-            run: $workflowRun.workflow.parent?.runId,
-          })}
-        />
-        <WorkflowDetail
-          title="Parent Run ID"
-          content={$workflowRun.workflow.parent?.runId}
-          href={routeForEventHistory({
-            namespace: $page.params.namespace,
-            workflow: $workflowRun.workflow.parent?.workflowId,
-            run: $workflowRun.workflow.parent?.runId,
-          })}
-        />
-      </div>
-    {/if}
-    {#if $workflowRun.workflow?.pendingChildren.length}
-      <ChildWorkflowsTable
-        pendingChildren={$workflowRun.workflow?.pendingChildren}
-        namespace={$page.params.namespace}
-      />
-    {/if}
-  </section>
+  <WorkflowSummary />
+  <WorkflowRelationships />
   <WorkflowStackTraceError
     workflow={$workflowRun.workflow}
     workers={$workflowRun.workers}
@@ -125,7 +63,12 @@
   <WorkflowTypedError error={workflowEvents.error} />
   <PendingActivities />
   <section class="flex w-full" data-cy="inputs-results">
-    <Accordion title="Input and Results" icon="json" class="border-gray-900">
+    <Accordion
+      title="Input and Results"
+      icon="json"
+      class="border-gray-900"
+      data-cy="input-and-results"
+    >
       <div class="flex gap-2">
         <InputAndResults type="input" content={workflowEvents.input} />
         <InputAndResults type="results" content={workflowEvents.results} />
@@ -138,7 +81,7 @@
       class="flex flex-col items-center justify-between gap-4 pb-4 lg:flex-row lg:items-end"
     >
       <h3 class="text-lg font-medium">Recent Events</h3>
-      <div id="event-view-toggle" class="flex gap-4">
+      <div id="event-view-toggle" class="flex gap-4 bg-white">
         <ToggleButtons>
           <ToggleButton
             icon="feed"
