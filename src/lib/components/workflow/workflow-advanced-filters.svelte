@@ -48,9 +48,7 @@
 </script>
 
 <div class="flex flex-col">
-  <div
-    class="rounded-tr-lg rounded-tl-lg border border-gray-900 bg-offWhite p-6"
-  >
+  <div class="rounded-tr-lg rounded-tl-lg border border-gray-900 bg-white p-6">
     <div class="mb-2 flex items-center justify-between">
       <div class="flex items-center gap-2">
         <Tooltip top text="Back">

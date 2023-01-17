@@ -20,14 +20,14 @@
 
 <button
   on:click
-  class="{$$props.class} button"
+  class="button rounded {$$props.class}"
   class:active
   class:primary
+  class:destructive
   data-cy={dataCy}
   {disabled}
   class:disabled
   class:add
-  class:destructive
   class:unround
   class:unroundRight
   class:unroundLeft
@@ -48,23 +48,23 @@
 
 <style lang="postcss">
   .button {
-    @apply relative flex w-fit items-center justify-center gap-2 px-2 py-1 font-secondary text-sm transition hover:bg-gradient-to-r hover:from-blue-100 hover:to-purple-200 hover:text-gray-900;
+    @apply relative flex w-fit items-center justify-center gap-2 border-[3px] border-primary bg-white px-2 py-1 font-secondary text-sm transition hover:bg-primary hover:text-white;
   }
 
   .disabled {
-    @apply cursor-not-allowed bg-gray-100 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-200;
+    @apply cursor-not-allowed bg-gray-100  hover:bg-gray-100 hover:text-primary;
   }
 
   .destructive {
-    @apply hover:bg-gradient-to-r hover:from-red-100 hover:to-red-200;
+    @apply border-danger bg-danger text-white hover:border-red-900 hover:bg-red-900;
   }
 
   .active {
-    @apply bg-black text-white;
+    @apply bg-primary text-white;
   }
 
   .primary {
-    @apply bg-blue-700 text-white hover:from-gray-900 hover:to-gray-900 hover:text-white;
+    @apply bg-primary from-blue-100 to-purple-200 text-white hover:bg-gradient-to-r hover:text-primary;
   }
 
   .unround {

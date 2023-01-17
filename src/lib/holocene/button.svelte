@@ -89,7 +89,7 @@
   .secondary,
   .destructive,
   .login {
-    @apply border py-2 px-4 transition-colors;
+    @apply border-[3px] py-2 px-4 transition-colors;
   }
 
   .button:disabled {
@@ -97,7 +97,7 @@
   }
 
   a.disabled {
-    @apply pointer-events-none opacity-50 hover:border-gray-800 hover:bg-white hover:text-gray-800;
+    @apply pointer-events-none opacity-75 hover:border-gray-800 hover:bg-white hover:text-gray-800;
   }
 
   .large {
@@ -106,15 +106,12 @@
 
   .primary,
   .login {
-    @apply border-primary bg-primary text-white hover:bg-blue-500 hover:text-gray-100;
+    @apply border-primary bg-primary bg-gradient-to-br text-white hover:from-blue-100 hover:to-purple-100 hover:text-primary;
   }
 
-  .primary:disabled {
-    @apply opacity-50 hover:border-primary hover:bg-primary;
-  }
-
-  .primary:hover {
-    @apply border-blue-700 bg-blue-700;
+  .primary:disabled,
+  .login:disabled {
+    @apply text-white opacity-75 hover:from-primary hover:to-primary;
   }
 
   .secondary {
@@ -122,7 +119,7 @@
   }
 
   .secondary:disabled {
-    @apply opacity-50 hover:border-gray-800 hover:bg-white hover:text-gray-800;
+    @apply opacity-75 hover:border-gray-800 hover:bg-white hover:text-gray-800;
   }
 
   .destructive {
@@ -138,7 +135,7 @@
   }
 
   .selected {
-    @apply border-blue-600 bg-blue-600 text-white;
+    @apply bg-gradient-to-br from-blue-100 to-purple-100 text-gray-900;
   }
 
   .login {

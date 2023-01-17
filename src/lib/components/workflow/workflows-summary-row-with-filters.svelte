@@ -99,7 +99,6 @@
           (f) => f.attribute === 'WorkflowId' && f.value === workflow.id,
         ),
       )}
-      class="bg-gradient-to-b from-blue-100 to-purple-100"
     />
     <p class="inline-time-cell">
       {formatDate(workflow.startTime, timeFormat)}
@@ -127,7 +126,6 @@
           (f) => f.attribute === 'WorkflowType' && f.value === workflow.name,
         ),
       )}
-      class="bg-gradient-to-b from-blue-100 to-purple-100"
     />
     <p class="inline-time-cell">
       {formatDate(workflow.endTime, timeFormat)}
@@ -147,7 +145,7 @@
 
 <style lang="postcss">
   :global(.workflow-summary-row:hover) {
-    @apply bg-gradient-to-b from-blue-100 to-purple-100;
+    @apply bg-gradient-to-br from-blue-100 to-purple-100;
 
     .table-link {
       @apply text-blue-700 underline decoration-blue-700;

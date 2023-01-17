@@ -22,6 +22,6 @@
 
 <style lang="postcss">
   .stack-trace {
-    @apply relative flex w-full flex-col rounded-lg border-2 border-yellow-700 bg-yellow-50 p-4 text-yellow-900;
+    @apply relative flex w-full flex-col rounded-xl border-[3px] border-yellow-700 bg-yellow-50 p-4 text-yellow-900;
   }
 </style>

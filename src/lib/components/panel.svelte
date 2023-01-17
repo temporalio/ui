@@ -2,13 +2,13 @@
   export let error: boolean = false;
 </script>
 
-<div class="panel" class:error>
+<div class="panel bg-white {$$props.class}" class:error>
   <slot />
 </div>
 
 <style lang="postcss">
   .panel {
-    @apply rounded-lg border-2 border-gray-300 p-8;
+    @apply rounded-xl border-[3px] border-gray-900 p-8;
   }
 
   .error {
