@@ -1,8 +1,5 @@
 <script lang="ts">
-  import {
-    type StartAndEndEventHistory,
-    timelineEvents,
-  } from '$lib/stores/events';
+  import { timelineEvents } from '$lib/stores/events';
   import EventSummary from '$lib/components/event/event-summary.svelte';
   import { onDestroy } from 'svelte';
   import { page } from '$app/stores';
@@ -10,7 +7,6 @@
   import { eventFilterSort, type EventSortOrder } from '$lib/stores/event-view';
   import { refresh } from '$lib/stores/workflow-run';
 
-  export let eventHistory: StartAndEndEventHistory;
   let events: CommonHistoryEvent[] = [];
 
   $: namespace = $page.params.namespace;
@@ -42,4 +38,4 @@
   });
 </script>
 
-<EventSummary {events} {eventHistory} />
+<EventSummary {events} />

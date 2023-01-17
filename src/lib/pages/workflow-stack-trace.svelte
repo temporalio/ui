@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import type { WorkflowRunWithWorkers } from '$lib/stores/workflow-run';
+  import { workflowRun } from '$lib/stores/workflow-run';
 
   import { getWorkflowStackTrace } from '$lib/services/query-service';
   import type { ParsedQuery } from '$lib/services/query-service';
@@ -12,10 +12,8 @@
   import Link from '$lib/holocene/link.svelte';
   import { authUser } from '$lib/stores/auth-user';
 
-  export let workflowRun: WorkflowRunWithWorkers;
-
   const { namespace } = $page.params;
-  $: ({ workflow, workers } = workflowRun);
+  $: ({ workflow, workers } = $workflowRun);
 
   let currentdate = new Date();
   let isLoading = false;

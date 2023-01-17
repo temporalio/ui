@@ -1,15 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import {
-    initialWorkflowRun,
-    refresh,
-    type WorkflowRunWithWorkers,
-  } from '$lib/stores/workflow-run';
-  import {
-    initialEventHistory,
-    type StartAndEndEventHistory,
-    timelineEvents,
-  } from '$lib/stores/events';
+  import { refresh, workflowRun } from '$lib/stores/workflow-run';
+  import { timelineEvents, eventHistory } from '$lib/stores/events';
 
   import Header from '$lib/layouts/workflow-header.svelte';
   import Loading from '$lib/holocene/loading.svelte';
@@ -27,9 +19,6 @@
   $: namespace = $page.params.namespace;
   $: workflowId = $page.params.workflow;
   $: runId = $page.params.run;
-
-  let workflowRun: WorkflowRunWithWorkers = initialWorkflowRun;
-  let eventHistory: StartAndEndEventHistory = initialEventHistory;
 
   const getWorkflowAndEventHistory = async (
     namespace: string,
@@ -51,7 +40,7 @@
       settings,
       user?.accessToken,
     );
-    workflowRun = { workflow, workers };
+    $workflowRun = { workflow, workers };
     const events = await fetchStartAndEndEvents({
       namespace,
       workflowId,
@@ -59,7 +48,7 @@
       settings,
       accessToken: user?.accessToken,
     });
-    eventHistory = events;
+    $eventHistory = events;
   };
 
   $: $refresh, getWorkflowAndEventHistory(namespace, workflowId, runId);
@@ -75,17 +64,15 @@
 </script>
 
 <main class="flex h-full flex-col gap-6">
-  {#if !workflowRun.workflow}
+  {#if !$workflowRun.workflow}
     <Loading />
   {:else}
     <Header
       namespace={$page.params.namespace}
-      {workflowRun}
-      {eventHistory}
       {terminateEnabled}
       {cancelEnabled}
       {signalEnabled}
     />
-    <slot {workflowRun} {eventHistory} />
+    <slot />
   {/if}
 </main>

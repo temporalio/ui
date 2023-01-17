@@ -15,6 +15,7 @@ export const initialWorkflowRun: WorkflowRunWithWorkers = {
   workers: { pollers: [], taskQueueStatus: null },
 };
 
+export const workflowRun = writable<WorkflowRunWithWorkers>(initialWorkflowRun);
 export const workflowSummaryViewOpen = persistStore<boolean>(
   'workflowSummaryView',
   true,

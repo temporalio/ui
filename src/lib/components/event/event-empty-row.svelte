@@ -1,7 +1,6 @@
 <script lang="ts">
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Loading from '$lib/holocene/loading.svelte';
-  import { trace } from 'console';
 
   export let loading = false;
 </script>

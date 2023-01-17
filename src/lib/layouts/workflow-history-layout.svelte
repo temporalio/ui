@@ -1,10 +1,10 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import type { WorkflowRunWithWorkers } from '$lib/stores/workflow-run';
   import { eventViewType } from '$lib/stores/event-view';
-  import type { StartAndEndEventHistory } from '$lib/stores/events';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { exportHistory } from '$lib/utilities/export-history';
+  import { workflowRun } from '$lib/stores/workflow-run';
+  import { eventHistory } from '$lib/stores/events';
 
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
@@ -17,13 +17,10 @@
   import Accordion from '$lib/holocene/accordion.svelte';
   import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
 
-  export let workflowRun: WorkflowRunWithWorkers;
-  export let eventHistory: StartAndEndEventHistory;
-
   let showShortcuts = false;
 
   $: workflowEvents =
-    getWorkflowStartedCompletedAndTaskFailedEvents(eventHistory);
+    getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
 
   const onViewClick = (view: EventView) => {
     if ($page.url.searchParams.get('page')) {
@@ -34,14 +31,17 @@
 </script>
 
 <section class="flex flex-col gap-4">
-  <WorkflowSummary {workflowRun} />
-  <WorkflowRelationships {workflowRun} {eventHistory} />
+  <WorkflowSummary workflowRun={$workflowRun} />
+  <WorkflowRelationships
+    workflowRun={$workflowRun}
+    eventHistory={$eventHistory}
+  />
   <WorkflowStackTraceError
-    workflow={workflowRun.workflow}
-    workers={workflowRun.workers}
+    workflow={$workflowRun.workflow}
+    workers={$workflowRun.workers}
   />
   <WorkflowTypedError error={workflowEvents.error} />
-  <PendingActivities {workflowRun} />
+  <PendingActivities workflowRun={$workflowRun} />
   <section class="flex w-full" data-cy="inputs-results">
     <Accordion
       title="Input and Results"
@@ -87,8 +87,8 @@
             on:click={() =>
               exportHistory({
                 namespace: $page.params.namespace,
-                workflowId: workflowRun.workflow?.id,
-                runId: workflowRun.workflow?.runId,
+                workflowId: $workflowRun.workflow?.id,
+                runId: $workflowRun.workflow?.runId,
               })}>Download</ToggleButton
           >
         </ToggleButtons>

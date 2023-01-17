@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { getQuery, getQueryTypes } from '$lib/services/query-service';
-  import type { WorkflowRunWithWorkers } from '$lib/stores/workflow-run';
+  import { workflowRun } from '$lib/stores/workflow-run';
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Select from '$lib/holocene/select/simple-select.svelte';
@@ -11,10 +11,8 @@
   import Loading from '$lib/holocene/loading.svelte';
   import { authUser } from '$lib/stores/auth-user';
 
-  export let workflowRun: WorkflowRunWithWorkers;
-
   const { namespace } = $page.params;
-  $: ({ workflow } = workflowRun);
+  $: ({ workflow } = $workflowRun);
 
   $: workflowParams = {
     id: workflow?.id,
@@ -24,7 +22,7 @@
   let queryType: string;
   let isLoading = false;
 
-  $: queryTypes = getQueryTypes({
+  let queryTypes = getQueryTypes({
     namespace,
     workflow: workflowParams,
   }).then((queryTypes) => {

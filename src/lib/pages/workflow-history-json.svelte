@@ -4,10 +4,7 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import { fetchRawEvents } from '$lib/services/events-service';
-  import type { StartAndEndEventHistory } from '$lib/stores/events';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-
-  export let eventHistory: StartAndEndEventHistory;
 
   const { namespace, workflow: workflowId, run: runId } = $page.params;
 
