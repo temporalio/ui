@@ -11,6 +11,7 @@
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
   import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
   import WorkflowsImagination from '$lib/pages/imagination/workflows-imagination.svelte';
+  import WorkflowsDashboard from '$lib/pages/imagination/workflows-dashboard.svelte';
 </script>
 
 <PageTitle
@@ -19,7 +20,7 @@
 />
 
 <AdvancedVisibilityGuard>
-  <WorkflowsImagination />
+  <WorkflowsDashboard />
   <!-- <WorkflowsWithNewSearch
     bulkActionsEnabled={bulkActionsEnabled(
       $page.data.settings,

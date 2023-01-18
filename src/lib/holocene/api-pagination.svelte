@@ -23,8 +23,6 @@
   export let pageSizeOptions: string[] | number[] = options;
   export let defaultPageSize: string | number | undefined = undefined;
   export let total: string | number = '';
-  export let active: boolean = true;
-  export let hideBottomControls: boolean = false;
 
   let store = createPaginationStore(pageSizeOptions, defaultPageSize);
   let error: any;
@@ -83,51 +81,49 @@
 
   async function handleKeydown(event: KeyboardEvent) {
     const shifted = event.shiftKey;
-    if (active) {
-      switch (event.code) {
-        case 'ArrowRight':
-        case 'KeyL':
-          if ($store.hasNext && !$store.updating) {
-            fetchIndexData();
-          }
-          break;
-        case 'ArrowLeft':
-        case 'KeyH':
-          if ($store.hasPrevious && !$store.updating) {
-            store.previousPage();
-          }
-          break;
-        case 'ArrowUp':
-        case 'KeyK':
-          if (shifted && onShiftUp) {
-            onShiftUp(event);
-            store.reset();
-            initalDataFetch();
-          } else {
-            store.previousRow();
-          }
-          break;
-        case 'ArrowDown':
-        case 'KeyJ':
-          if (shifted && onShiftDown) {
-            onShiftDown(event);
-            store.reset();
-            initalDataFetch();
-          } else {
-            store.nextRow();
-          }
-          break;
-        case 'Space':
-          if (onSpace) {
-            onSpace(event);
-          }
-          break;
-      }
+    switch (event.code) {
+      case 'ArrowRight':
+      case 'KeyL':
+        if ($store.hasNext && !$store.updating) {
+          fetchIndexData();
+        }
+        break;
+      case 'ArrowLeft':
+      case 'KeyH':
+        if ($store.hasPrevious && !$store.updating) {
+          store.previousPage();
+        }
+        break;
+      case 'ArrowUp':
+      case 'KeyK':
+        if (shifted && onShiftUp) {
+          onShiftUp(event);
+          store.reset();
+          initalDataFetch();
+        } else {
+          store.previousRow();
+        }
+        break;
+      case 'ArrowDown':
+      case 'KeyJ':
+        if (shifted && onShiftDown) {
+          onShiftDown(event);
+          store.reset();
+          initalDataFetch();
+        } else {
+          store.nextRow();
+        }
+        break;
+      case 'Space':
+        if (onSpace) {
+          onSpace(event);
+        }
+        break;
     }
   }
 </script>
 
-<svelte:window on:keydown={handleKeydown} />
+<svelte:window on:keyup={handleKeydown} />
 
 {#if error && $$slots.error}
   <slot name="error" />
@@ -208,7 +204,7 @@
   >
     <slot name="action-bottom-left" />
     <div class="flex gap-4">
-      {#if $store.visibleItems.length && !hideBottomControls}
+      {#if $store.visibleItems.length}
         {#if pageSizeOptions.length}
           <FilterSelect
             label="Per Page"

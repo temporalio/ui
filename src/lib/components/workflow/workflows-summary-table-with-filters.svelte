@@ -30,6 +30,7 @@
   export let allSelected: boolean;
   export let pageSelected: boolean;
   export let filteredWorkflowCount: string;
+  export let noStatusFilter: boolean = false;
 
   // Disable sort with workflows over 1M
   $: disabled = $workflowCount?.totalCount >= 1000000;
@@ -142,7 +143,11 @@
       {:else}
         <th class="table-cell w-32"
           ><div class="flex items-center gap-1">
-            <ExecutionStatusDropdownFilter />
+            {#if noStatusFilter}
+              Status
+            {:else}
+              <ExecutionStatusDropdownFilter />
+            {/if}
           </div>
         </th>
         <th class="table-cell md:w-auto"
@@ -174,7 +179,11 @@
     <TableHeaderRow slot="headers">
       <th class="table-cell w-32"
         ><div class="flex items-center gap-1">
-          <ExecutionStatusDropdownFilter />
+          {#if noStatusFilter}
+            Status
+          {:else}
+            <ExecutionStatusDropdownFilter />
+          {/if}
         </div>
       </th>
       <th class="table-cell md:w-auto"
