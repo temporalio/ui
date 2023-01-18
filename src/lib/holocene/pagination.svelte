@@ -239,7 +239,7 @@
   }
 
   .caret:disabled {
-    @apply cursor-not-allowed text-gray-300;
+    @apply cursor-not-allowed text-gray-400;
   }
 
   .arrow {

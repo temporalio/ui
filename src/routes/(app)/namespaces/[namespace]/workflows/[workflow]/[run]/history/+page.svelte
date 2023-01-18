@@ -2,18 +2,12 @@
   import { page } from '$app/stores';
   import { eventViewType } from '$lib/stores/event-view';
 
-  import WorkflowRunLayout from '$lib/layouts/workflow-run-layout.svelte';
   import WorkflowHistoryLayout from '$lib/layouts/workflow-history-layout.svelte';
   import WorkflowHistoryFeed from '$lib/pages/workflow-history-feed.svelte';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
   import WorkflowHistoryCompact from '$lib/pages/workflow-history-compact.svelte';
 
   import PageTitle from '$lib/components/page-title.svelte';
-  import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
-  import { workflowSignalEnabled } from '$lib/utilities/workflow-signal-enabled';
-  import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
-  import { workflowResetEnabled } from '$lib/utilities/workflow-reset-enabled';
-
   const workflow = $page.params.workflow;
 
   const views = {
@@ -25,16 +19,9 @@
 </script>
 
 <PageTitle title={`Workflow History | ${workflow}`} url={$page.url.href} />
-<WorkflowRunLayout
-  cancelEnabled={workflowCancelEnabled($page.data.settings)}
-  signalEnabled={workflowSignalEnabled($page.data.settings)}
-  terminateEnabled={workflowTerminateEnabled($page.data.settings)}
-  resetEnabled={workflowResetEnabled($page.data.settings)}
->
-  <WorkflowHistoryLayout>
-    <!-- <svelte:fragment slot="timeline">
+<WorkflowHistoryLayout>
+  <!-- <svelte:fragment slot="timeline">
     <EventHistoryTimelineContainer />
     </svelte:fragment> -->
-    <svelte:component this={view} />
-  </WorkflowHistoryLayout>
-</WorkflowRunLayout>
+  <svelte:component this={view} />
+</WorkflowHistoryLayout>

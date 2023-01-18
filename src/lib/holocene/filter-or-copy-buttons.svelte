@@ -22,20 +22,26 @@
     on:click|preventDefault|stopPropagation={noop}
   >
     {#if filterable}
-      <button on:click|preventDefault|stopPropagation={onFilter}>
+      <button
+        on:click|preventDefault|stopPropagation={onFilter}
+        class="copy-or-filter-button"
+        class:filtered
+      >
         {#key filtered}
-          <Icon
-            name="filter"
-            class="h-4 w-4 rounded-sm {filtered
-              ? 'bg-gray-900 text-white'
-              : ''}"
-          />
+          <Icon name="filter" class="h-5 w-5" />
         {/key}
       </button>
     {/if}
     {#if copyable}
-      <button on:click|preventDefault|stopPropagation={(e) => copy(e, content)}>
-        <Icon name={$copied ? 'checkmark' : 'copy'} stroke="#000" />
+      <button
+        class="copy-or-filter-button"
+        on:click|preventDefault|stopPropagation={(e) => copy(e, content)}
+      >
+        <Icon
+          name={$copied ? 'checkmark' : 'copy'}
+          stroke="#000"
+          class="h-5 w-5"
+        />
       </button>
     {/if}
   </div>
@@ -44,5 +50,13 @@
 <style lang="postcss">
   .copy-or-filter {
     @apply absolute right-0 top-0 bottom-0 inline-flex gap-2 px-2;
+  }
+
+  .copy-or-filter-button {
+    @apply relative top-[50%] h-fit translate-y-[-50%] rounded-full bg-white p-1 text-primary hover:bg-gray-900 hover:text-white;
+  }
+
+  .filtered {
+    @apply bg-gray-900 text-white;
   }
 </style>

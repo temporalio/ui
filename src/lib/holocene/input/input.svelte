@@ -132,7 +132,7 @@
   }
 
   .suffix {
-    @apply block h-full w-full rounded-tr rounded-br border-l border-gray-900 bg-gray-100 p-2;
+    @apply block h-full w-full rounded-tr rounded-br border-l border-gray-900 bg-offWhite p-2;
   }
 
   .input-container:active .suffix {

@@ -130,7 +130,7 @@
 {:else if error}
   <Alert
     intent="error"
-    class="mb-10"
+    class="mb-10 rounded-xl border-[3px]"
     title={error?.message ?? 'Error fetching data.'}
   />
 {/if}
@@ -285,6 +285,6 @@
   }
 
   .caret:disabled {
-    @apply cursor-not-allowed text-gray-300;
+    @apply cursor-not-allowed text-gray-400;
   }
 </style>

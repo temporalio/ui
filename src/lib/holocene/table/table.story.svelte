@@ -126,7 +126,7 @@
         </th>
         <th class="w-1/6">
           {#if bulkActionsAvailable}
-            <BulkActionButton>Terminate</BulkActionButton>
+            <BulkActionButton variant="destructive">Terminate</BulkActionButton>
           {:else}
             <span class="absolute top-3 whitespace-nowrap italic">
               No bulk actions available for selected workflows
