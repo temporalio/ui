@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { getQuery, getQueryTypes } from '$lib/services/query-service';
-  import { workflowRun } from '$lib/stores/workflow-run';
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Select from '$lib/holocene/select/simple-select.svelte';
