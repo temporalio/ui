@@ -66,14 +66,14 @@ export const parametersWithSettings: Readable<FetchEventsParametersWithSettings>
     },
   );
 
-export const initialEventHistory = {
-  start: [],
-  end: [],
-};
-
 export type StartAndEndEventHistory = {
   start: WorkflowEvents;
   end: WorkflowEvents;
+};
+
+export const initialEventHistory: StartAndEndEventHistory = {
+  start: [],
+  end: [],
 };
 
 export const eventHistory =

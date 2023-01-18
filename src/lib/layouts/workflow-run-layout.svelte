@@ -24,9 +24,7 @@
   export let cancelEnabled: boolean = false;
   export let signalEnabled: boolean = false;
 
-  $: namespace = $page.params.namespace;
-  $: workflowId = $page.params.workflow;
-  $: runId = $page.params.run;
+  $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
 
   const getWorkflowAndEventHistory = async (
     namespace: string,
