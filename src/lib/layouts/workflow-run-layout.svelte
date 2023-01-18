@@ -1,7 +1,15 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { refresh, workflowRun } from '$lib/stores/workflow-run';
-  import { timelineEvents, eventHistory } from '$lib/stores/events';
+  import {
+    initialWorkflowRun,
+    refresh,
+    workflowRun,
+  } from '$lib/stores/workflow-run';
+  import {
+    timelineEvents,
+    eventHistory,
+    initialEventHistory,
+  } from '$lib/stores/events';
 
   import Header from '$lib/layouts/workflow-header.svelte';
   import Loading from '$lib/holocene/loading.svelte';
@@ -60,6 +68,8 @@
 
   onDestroy(() => {
     $timelineEvents = null;
+    $workflowRun = initialWorkflowRun;
+    $eventHistory = initialEventHistory;
   });
 </script>
 

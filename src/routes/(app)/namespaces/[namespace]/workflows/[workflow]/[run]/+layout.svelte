@@ -7,13 +7,9 @@
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
   import { workflowSignalEnabled } from '$lib/utilities/workflow-signal-enabled';
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
-  import { initialWorkflowRun, workflowRun } from '$lib/stores/workflow-run';
-  import { eventHistory, initialEventHistory } from '$lib/stores/events';
 
   onDestroy(() => {
     clearPreviousEventParameters();
-    $workflowRun = initialWorkflowRun;
-    $eventHistory = initialEventHistory;
   });
 </script>
 

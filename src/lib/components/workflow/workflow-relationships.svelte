@@ -1,23 +1,22 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { routeForEventHistory } from '$lib/utilities/route-for';
+  import { workflowRun } from '$lib/stores/workflow-run';
+  import { eventHistory } from '$lib/stores/events';
 
   import Accordion from '$lib/holocene/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
 
-  export let workflowRun: WorkflowRunWithWorkers;
-  export let eventHistory: StartAndEndEventHistory;
-
-  $: children = workflowRun.workflow?.pendingChildren.length;
-  $: parent = workflowRun.workflow?.parent;
-  $: lastEvent = eventHistory.end[0];
-  $: firstEvent = eventHistory.start[0];
+  $: children = $workflowRun.workflow?.pendingChildren.length;
+  $: parent = $workflowRun.workflow?.parent;
+  $: lastEvent = $eventHistory.end[0];
+  $: firstEvent = $eventHistory.start[0];
   $: firstExecutionRunId =
     firstEvent?.workflowExecutionStartedEventAttributes?.firstExecutionRunId;
   $: first =
-    firstExecutionRunId === workflowRun.workflow?.runId
+    firstExecutionRunId === $workflowRun.workflow?.runId
       ? undefined // don't show first if it is the same as the current workflow run ID
       : firstExecutionRunId;
   $: previous =
@@ -119,7 +118,7 @@
     </div>
     {#if children}
       <ChildWorkflowsTable
-        pendingChildren={workflowRun.workflow.pendingChildren}
+        pendingChildren={$workflowRun.workflow.pendingChildren}
         namespace={$page.params.namespace}
       />
     {/if}

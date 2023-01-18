@@ -1,10 +1,7 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
-  import type { StartAndEndEventHistory } from '$lib/stores/events';
-  import {
-    type WorkflowRunWithWorkers,
-    refresh,
-  } from '$lib/stores/workflow-run';
+  import { eventHistory } from '$lib/stores/events';
+  import { workflowRun, refresh } from '$lib/stores/workflow-run';
   import { timelineEvents } from '$lib/stores/events';
 
   import Accordion from '$lib/holocene/accordion.svelte';
@@ -19,10 +16,9 @@
   import Badge from '$lib/holocene/badge.svelte';
   import { groupEvents } from '$lib/models/event-groups';
 
-  export let workflowRun: WorkflowRunWithWorkers;
-  export let eventHistory: StartAndEndEventHistory;
+  $: ({ workflow } = $workflowRun);
 
-  $: isRunning = workflowRun.workflow?.isRunning;
+  $: isRunning = workflow?.isRunning;
 
   let showEventTypeFilter = false;
   let eventTypeValue = '';
@@ -69,9 +65,11 @@
     handleClearEvents();
   });
 
-  $: groupsWithGroupFilter = groupEvents(eventHistory.start).filter((group) => {
-    return eventGroupFilters.includes(group.category);
-  });
+  $: groupsWithGroupFilter = groupEvents($eventHistory.start).filter(
+    (group) => {
+      return eventGroupFilters.includes(group.category);
+    },
+  );
 
   $: groups = !eventTypeFilters.length
     ? groupsWithGroupFilter
@@ -161,7 +159,7 @@
       {/if}
     </div>
     <EventHistoryGroupTimeline
-      events={eventHistory.start}
+      events={$eventHistory.start}
       eventGroups={groups}
       {isRunning}
     />

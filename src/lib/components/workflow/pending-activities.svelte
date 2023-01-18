@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import type { WorkflowRunWithWorkers } from '$lib/stores/workflow-run';
+  import { workflowRun } from '$lib/stores/workflow-run';
 
   import { formatDate } from '$lib/utilities/format-date';
   import { getDuration, formatDuration } from '$lib/utilities/format-time';
@@ -16,9 +16,8 @@
   } from '$lib/utilities/format-event-attributes';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
-  export let workflowRun: WorkflowRunWithWorkers;
-
-  $: pendingActivities = workflowRun.workflow?.pendingActivities;
+  $: ({ workflow } = $workflowRun);
+  $: pendingActivities = workflow?.pendingActivities;
 
   $: href = routeForPendingActivities({
     namespace: $page.params.namespace,
@@ -27,7 +26,7 @@
   });
 
   $: canceled = ['Terminated', 'TimedOut', 'Canceled'].includes(
-    workflowRun.workflow?.status,
+    workflow?.status,
   );
 </script>
 

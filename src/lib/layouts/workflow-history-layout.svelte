@@ -31,17 +31,11 @@
 </script>
 
 <section class="flex flex-col gap-4">
-  <WorkflowSummary workflowRun={$workflowRun} />
-  <WorkflowRelationships
-    workflowRun={$workflowRun}
-    eventHistory={$eventHistory}
-  />
-  <WorkflowStackTraceError
-    workflow={$workflowRun.workflow}
-    workers={$workflowRun.workers}
-  />
+  <WorkflowSummary />
+  <WorkflowRelationships />
+  <WorkflowStackTraceError />
   <WorkflowTypedError error={workflowEvents.error} />
-  <PendingActivities workflowRun={$workflowRun} />
+  <PendingActivities />
   <section class="flex w-full" data-cy="inputs-results">
     <Accordion
       title="Input and Results"
