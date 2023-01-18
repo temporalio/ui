@@ -1,11 +1,10 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { workflowRun, refresh } from '$lib/stores/workflow-run';
   import { eventViewType } from '$lib/stores/event-view';
-  import { eventHistory } from '$lib/stores/events';
-  import { fetchStartAndEndEvents } from '$lib/services/events-service';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { exportHistory } from '$lib/utilities/export-history';
+  import { workflowRun } from '$lib/stores/workflow-run';
+  import { eventHistory } from '$lib/stores/events';
 
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
@@ -20,30 +19,8 @@
 
   let showShortcuts = false;
 
-  $: namespace = $page.params.namespace;
-  $: workflowId = $page.params.workflow;
-  $: runId = $page.params.run;
-
-  $: $refresh, getStartAndEndEvents(namespace, workflowId, runId);
-
   $: workflowEvents =
     getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
-
-  const getStartAndEndEvents = async (
-    namespace: string,
-    workflowId: string,
-    runId: string,
-  ) => {
-    const { settings, user } = $page.data;
-    const events = await fetchStartAndEndEvents({
-      namespace,
-      workflowId,
-      runId,
-      settings,
-      accessToken: user?.accessToken,
-    });
-    $eventHistory = events;
-  };
 
   const onViewClick = (view: EventView) => {
     if ($page.url.searchParams.get('page')) {
@@ -56,10 +33,7 @@
 <section class="flex flex-col gap-4">
   <WorkflowSummary />
   <WorkflowRelationships />
-  <WorkflowStackTraceError
-    workflow={$workflowRun.workflow}
-    workers={$workflowRun.workers}
-  />
+  <WorkflowStackTraceError />
   <WorkflowTypedError error={workflowEvents.error} />
   <PendingActivities />
   <section class="flex w-full" data-cy="inputs-results">

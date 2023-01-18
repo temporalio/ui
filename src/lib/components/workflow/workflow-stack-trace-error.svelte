@@ -1,11 +1,9 @@
 <script lang="ts">
   import EmptyState from '$lib/holocene/empty-state.svelte';
 
-  import type { GetPollersResponse } from '$lib/services/pollers-service';
+  import { workflowRun } from '$lib/stores/workflow-run';
 
-  export let workflow: WorkflowExecution;
-  export let workers: GetPollersResponse;
-
+  $: ({ workflow, workers } = $workflowRun);
   $: runningWithNoWorkers = workflow.isRunning && !workers?.pollers?.length;
 </script>
 

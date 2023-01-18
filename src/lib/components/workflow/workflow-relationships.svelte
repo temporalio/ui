@@ -1,8 +1,8 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { eventHistory } from '$lib/stores/events';
-  import { workflowRun } from '$lib/stores/workflow-run';
   import { routeForEventHistory } from '$lib/utilities/route-for';
+  import { workflowRun } from '$lib/stores/workflow-run';
+  import { eventHistory } from '$lib/stores/events';
 
   import Accordion from '$lib/holocene/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';

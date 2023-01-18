@@ -1,12 +1,10 @@
 <script lang="ts">
-  import Badge from '$lib/holocene/badge.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { onDestroy, onMount } from 'svelte';
   import { fly } from 'svelte/transition';
 
   import { autoRefreshWorkflow } from '$lib/stores/event-view';
   import { workflowsQuery, workflowsSearch } from '$lib/stores/workflows';
-  import { workflowRun, refresh } from '$lib/stores/workflow-run';
+  import { refresh, workflowRun } from '$lib/stores/workflow-run';
   import { eventHistory } from '$lib/stores/events';
 
   import {
@@ -19,8 +17,8 @@
   } from '$lib/utilities/route-for';
   import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
-  import type { GetPollersResponse } from '$lib/services/pollers-service';
-
+  import Badge from '$lib/holocene/badge.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
   import Tab from '$lib/holocene/tab.svelte';
@@ -31,8 +29,8 @@
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
 
   export let namespace: string;
-  export let workflow: WorkflowExecution;
-  export let workers: GetPollersResponse;
+
+  $: ({ workflow, workers } = $workflowRun);
 
   export let terminateEnabled: boolean = false;
   export let cancelEnabled: boolean = false;

@@ -1,23 +1,58 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
-  import { eventHistory } from '$lib/stores/events';
+  import {
+    eventFilterSort,
+    type EventSortOrder,
+    expandAllEvents,
+  } from '$lib/stores/event-view';
   import { refresh } from '$lib/stores/workflow-run';
+  import { eventHistory } from '$lib/stores/events';
 
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventEmptyRow from './event-empty-row.svelte';
   import { groupEvents } from '$lib/models/event-groups';
   import Pagination from '$lib/holocene/pagination.svelte';
+  import { fetchAllEvents } from '$lib/services/events-service';
 
-  export let events: CommonHistoryEvent[];
   export let compact = false;
+
+  $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
+
+  let fullHistory: CommonHistoryEvent[] = [];
+  let loading: boolean = true;
+
+  const resetFullHistory = () => {
+    fullHistory = [];
+    loading = true;
+  };
+
+  const fetchEvents = async (
+    namespace: string,
+    workflowId: string,
+    runId: string,
+    sort: EventSortOrder,
+  ) => {
+    const { settings, user } = $page.data;
+    resetFullHistory();
+    fullHistory = await fetchAllEvents({
+      namespace,
+      workflowId,
+      runId,
+      settings,
+      accessToken: user?.accessToken,
+      sort: compact ? 'ascending' : sort,
+    });
+    loading = false;
+  };
+
+  $: $refresh, fetchEvents(namespace, workflowId, runId, $eventFilterSort);
 
   function handleExpandChange(event: CustomEvent) {
     $expandAllEvents = event.detail.expanded;
   }
 
-  const getEvents = (
+  const getEventsOrGroups = (
     items: CommonHistoryEvent[],
     category: string,
   ): IterableEvent[] => {
@@ -33,10 +68,10 @@
     $eventFilterSort === 'descending' && !compact
       ? $eventHistory?.end
       : $eventHistory?.start;
-  $: currentEvents = events.length ? events : intialEvents;
+  $: currentEvents = fullHistory.length ? fullHistory : intialEvents;
   $: initialItem = currentEvents?.[0];
-  $: items = getEvents(currentEvents, category);
-  $: updating = currentEvents.length && !events.length;
+  $: items = getEventsOrGroups(currentEvents, category);
+  $: updating = currentEvents.length && !fullHistory.length;
 </script>
 
 {#key [$eventFilterSort, category, $refresh]}
@@ -60,7 +95,7 @@
           onRowClick={() => setActiveRowIndex(index)}
         />
       {:else}
-        <EventEmptyRow />
+        <EventEmptyRow {loading} />
       {/each}
     </EventSummaryTable>
   </Pagination>
