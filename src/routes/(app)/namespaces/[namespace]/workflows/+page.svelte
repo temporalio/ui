@@ -1,6 +1,5 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { settings } from '$lib/stores/settings';
 
   import Workflows from '$lib/pages/workflows.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
