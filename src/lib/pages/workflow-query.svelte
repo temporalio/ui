@@ -75,7 +75,7 @@
     </div>
     <div class="flex items-start h-full">
       {#await queryResult then result}
-        <CodeBlock content={result} />
+        <CodeBlock content={result} language="text" />
       {/await}
     </div>
   {:catch _error}
