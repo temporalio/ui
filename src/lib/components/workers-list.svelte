@@ -15,7 +15,9 @@
   <h3 class="text-lg font-medium">
     Task Queue: <span class="select-all font-normal">{taskQueue}</span>
   </h3>
-  <section class="flex w-full flex-col rounded-lg border-2 border-gray-900">
+  <section
+    class="flex w-full flex-col rounded-lg border-[3px] border-gray-900 bg-white"
+  >
     <div class="flex flex-row bg-gray-900 p-2 text-white">
       <div class="w-6/12 text-left">ID</div>
       <div class="w-2/12 text-left">Last Accessed</div>

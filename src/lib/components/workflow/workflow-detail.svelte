@@ -2,21 +2,33 @@
   import Copyable from '$lib/components/copyable.svelte';
   import Link from '$lib/holocene/link.svelte';
 
-  export let title: string;
+  export let title = '';
   export let content: string;
+  export let copyable = false;
   export let href: string = null;
   export let textSize = 'md';
 </script>
 
-<article class="flex gap-2 text-{textSize}">
-  <div class="font-medium">{title}:</div>
-  <div>
-    {#if href}
-      <Copyable {content}>
-        <Link {href}>{content}</Link>
-      </Copyable>
-    {:else}
-      <div class="select-all">{content}</div>
+<p class="flex items-center gap-2 text-{textSize} whitespace-nowrap pt-2">
+  {#if copyable}
+    <Copyable {content} visible container-class="gap-1 w-full">
+      {#if title}
+        {title}:
+      {/if}
+      {#if href}
+        <Link {href} class="truncate">{content}</Link>
+      {:else}
+        <span class="select-all truncate">{content}</span>
+      {/if}
+    </Copyable>
+  {:else}
+    {#if title}
+      {title}:
     {/if}
-  </div>
-</article>
+    {#if href}
+      <Link {href} class="truncate">{content}</Link>
+    {:else}
+      <span class="select-all truncate">{content}</span>
+    {/if}
+  {/if}
+</p>

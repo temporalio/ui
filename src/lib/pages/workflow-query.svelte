@@ -11,12 +11,10 @@
   import Loading from '$lib/holocene/loading.svelte';
   import { authUser } from '$lib/stores/auth-user';
 
-  const { namespace } = $page.params;
-  const { workflow } = $workflowRun;
-
-  const workflowParams: { id: string; runId: string } = {
-    id: workflow.id,
-    runId: workflow.runId,
+  const { namespace, workflow: workflowId, run: runId } = $page.params;
+  const params = {
+    id: workflowId,
+    runId,
   };
 
   let queryType: string;
@@ -24,7 +22,7 @@
 
   let queryTypes = getQueryTypes({
     namespace,
-    workflow: workflowParams,
+    workflow: params,
   }).then((queryTypes) => {
     queryType = queryType || queryTypes[0];
     return queryTypes;
@@ -36,7 +34,7 @@
     queryResult = getQuery(
       {
         namespace,
-        workflow: workflowParams,
+        workflow: params,
         queryType,
       },
       $page.data?.settings,

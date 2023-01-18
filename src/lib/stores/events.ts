@@ -71,9 +71,11 @@ export type StartAndEndEventHistory = {
   end: WorkflowEvents;
 };
 
-export const eventHistory = writable<StartAndEndEventHistory>({
+export const initialEventHistory: StartAndEndEventHistory = {
   start: [],
   end: [],
-});
+};
 
+export const eventHistory =
+  writable<StartAndEndEventHistory>(initialEventHistory);
 export const timelineEvents = writable(null);

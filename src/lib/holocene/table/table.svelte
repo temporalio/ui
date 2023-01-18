@@ -32,7 +32,7 @@
   }
 
   table.fancy {
-    @apply border-separate border-spacing-0 rounded-lg border-gray-300;
+    @apply border-separate border-spacing-0 rounded-xl border-[3px] border-gray-900 bg-white;
 
     thead {
       @apply bg-gray-900 text-gray-100;
@@ -42,10 +42,10 @@
       }
 
       :global(th) {
-        @apply border-t border-gray-300 px-1 py-2;
+        @apply border-t border-gray-900 px-1 py-2;
 
         &:first-child {
-          @apply rounded-tl-lg border-l border-gray-300;
+          @apply rounded-tl-lg border-l border-gray-900;
         }
 
         &:first-child:not(.selectable) {
@@ -53,7 +53,7 @@
         }
 
         &:last-child {
-          @apply w-[1px] rounded-tr-lg border-r border-gray-300;
+          @apply w-[1px] rounded-tr-lg border-r border-gray-900;
         }
       }
     }
@@ -64,10 +64,10 @@
       }
 
       td {
-        @apply border-t border-gray-300 px-1 py-2 text-sm;
+        @apply border-t border-gray-900 px-1 py-2 text-sm;
 
         &:first-child {
-          @apply border-l border-gray-300;
+          @apply border-l border-gray-900;
         }
 
         &:first-child:not(.selectable) {
@@ -79,13 +79,13 @@
         }
 
         &:last-child {
-          @apply w-0 border-r border-gray-300 p-0;
+          @apply w-0 border-r border-gray-900 p-0;
         }
       }
 
       &:last-child {
         td {
-          @apply border-b border-gray-300;
+          @apply border-b border-gray-900;
 
           &:first-child {
             @apply rounded-bl-lg;
@@ -115,65 +115,13 @@
     }
   }
 
-  table.dark {
-    @apply border-gray-900;
-
-    thead {
-      :global(th) {
-        @apply border-t-2 border-gray-900;
-
-        &:first-child {
-          @apply border-l-2 border-r-2 border-gray-900;
-        }
-
-        &:last-child {
-          @apply border-l-2 border-r-2 border-gray-900;
-        }
-      }
-    }
-
-    tbody :global {
-      td {
-        @apply border-t-2 border-gray-900;
-
-        &:first-child {
-          @apply border-l-2 border-gray-900;
-        }
-
-        &:last-child {
-          @apply border-r-2 border-gray-900;
-        }
-      }
-
-      &:last-child {
-        td {
-          @apply border-b-2 border-gray-900;
-        }
-      }
-
-      tbody :global {
-        td {
-          @apply border-t-0;
-
-          &:first-child {
-            @apply border-l-0;
-          }
-
-          &:last-child {
-            @apply border-r-0;
-          }
-        }
-      }
-    }
-  }
-
   table.simple {
     thead :global(th) {
       @apply border-b border-primary py-2;
     }
 
     tbody :global(td) {
-      @apply border-b border-gray-300 py-2;
+      @apply border-b border-gray-900 py-2;
     }
 
     &:last-child {

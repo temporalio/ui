@@ -16,7 +16,8 @@
   } from '$lib/utilities/format-event-attributes';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
-  $: pendingActivities = $workflowRun.workflow?.pendingActivities;
+  $: ({ workflow } = $workflowRun);
+  $: pendingActivities = workflow?.pendingActivities;
 
   $: href = routeForPendingActivities({
     namespace: $page.params.namespace,
@@ -25,12 +26,12 @@
   });
 
   $: canceled = ['Terminated', 'TimedOut', 'Canceled'].includes(
-    $workflowRun.workflow?.status,
+    workflow?.status,
   );
 </script>
 
 {#if pendingActivities.length}
-  <section class="rounded-lg border-2 border-gray-300 p-4">
+  <section class="rounded-xl border-[3px] border-gray-900 bg-white p-4">
     <h3 class="mb-2 flex gap-2 text-lg font-medium">
       Pending Activities
       {#if canceled}

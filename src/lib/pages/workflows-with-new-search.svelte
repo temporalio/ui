@@ -21,10 +21,8 @@
   import WorkflowsSummaryTableWithFilters from '$lib/components/workflow/workflows-summary-table-with-filters.svelte';
   import WorkflowsSummaryRowWithFilters from '$lib/components/workflow/workflows-summary-row-with-filters.svelte';
   import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
-  import Button from '$lib/holocene/button.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
-  import TableRow from '$lib/holocene/table/table-row.svelte';
   import WorkflowDateTimeFilter from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import {
@@ -300,9 +298,13 @@
     </div>
   </div>
   <div>
-    <Button variant="secondary" on:click={refreshWorkflows}
-      ><Icon name="retry" /></Button
+    <button
+      aria-label="retry workflows"
+      class="cursor-pointer rounded-full p-1 hover:bg-gray-900 hover:text-white"
+      on:click={refreshWorkflows}
     >
+      <Icon name="retry" class="h-8 w-8" />
+    </button>
   </div>
 </div>
 <Pagination items={$workflows} let:visibleItems>
@@ -338,9 +340,8 @@
         on:toggleWorkflow={handleSelectWorkflow}
       />
     {:else}
-      <TableRow>
-        <td colspan={bulkActionsEnabled ? 2 : 1} class="hidden xl:table-cell" />
-        <td colspan="3">
+      <tr>
+        <td colspan={bulkActionsEnabled ? 6 : 5} class="xl:hidden">
           {#if $loading}
             <Loading />
           {:else}
@@ -351,8 +352,18 @@
             />
           {/if}
         </td>
-        <td class="hidden xl:table-cell" />
-      </TableRow>
+        <td colspan={bulkActionsEnabled ? 8 : 7} class="hidden xl:table-cell">
+          {#if $loading}
+            <Loading />
+          {:else}
+            <EmptyState
+              title="No Workflows Found"
+              content={errorMessage}
+              error={$workflowError}
+            />
+          {/if}
+        </td>
+      </tr>
     {/each}
   </WorkflowsSummaryTableWithFilters>
 </Pagination>
