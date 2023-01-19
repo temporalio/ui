@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { hasKeys } from '$lib/utilities/has';
+  import { hasAnyKeys } from '$lib/utilities/has';
   import DataEncoderStatus from '$lib/holocene/data-encoder-status.svelte';
   import FeedbackButton from '$lib/components/feedback-button.svelte';
   import Logo from '$lib/vendor/logo.svg';
@@ -19,7 +19,7 @@
     <slot name="links" />
   </div>
   <div class="col-span-5 col-end-13 flex items-center justify-end gap-4">
-    {#if hasKeys(user)}
+    {#if hasAnyKeys(user)}
       <DataEncoderStatus />
     {/if}
     <FeedbackButton />

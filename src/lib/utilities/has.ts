@@ -7,7 +7,18 @@ export const has = <K extends string, V = unknown>(
   return Object.prototype.hasOwnProperty.call(target, property);
 };
 
-export const hasKeys = (obj: {
+export const hasKeys = <K extends Readonly<string[]>>(
+  target: unknown,
+  ...keys: K
+): target is Record<K[number], unknown> => {
+  if (!hasAnyKeys) return false;
+  for (const key of keys) {
+    if (!has(target, key)) return false;
+  }
+  return true;
+};
+
+export const hasAnyKeys = (obj: {
   [key: string | number | symbol]: unknown;
 }): boolean => {
   if (!isObject(obj)) return false;

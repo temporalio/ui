@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { has, hasKeys } from './has';
+import { has, hasAnyKeys } from './has';
 
 describe('has', () => {
   it('returns true if an object has a key', () => {
@@ -13,36 +13,38 @@ describe('has', () => {
   });
 });
 
-describe('hasKeys', () => {
+describe('hasAnyKeys', () => {
   it('returns true if an object has keys', () => {
     const source = { foo: 123 };
-    expect(hasKeys(source)).toBe(true);
+    expect(hasAnyKeys(source)).toBe(true);
   });
 
   it('returns false if an object has no keys', () => {
     const source = {};
-    expect(hasKeys(source)).toBe(false);
+    expect(hasAnyKeys(source)).toBe(false);
   });
 
   it('should return false if given null', () => {
-    expect(hasKeys(null as unknown as Parameters<typeof hasKeys>[0])).toBe(
-      false,
-    );
+    expect(
+      hasAnyKeys(null as unknown as Parameters<typeof hasAnyKeys>[0]),
+    ).toBe(false);
   });
 
   it('should return false if given undefined', () => {
-    expect(hasKeys(undefined as unknown as Parameters<typeof hasKeys>[0])).toBe(
-      false,
-    );
+    expect(
+      hasAnyKeys(undefined as unknown as Parameters<typeof hasAnyKeys>[0]),
+    ).toBe(false);
   });
 
   it('should return false if given a number', () => {
-    expect(hasKeys(3 as unknown as Parameters<typeof hasKeys>[0])).toBe(false);
+    expect(hasAnyKeys(3 as unknown as Parameters<typeof hasAnyKeys>[0])).toBe(
+      false,
+    );
   });
 
   it('should return false if given a boolean', () => {
-    expect(hasKeys(true as unknown as Parameters<typeof hasKeys>[0])).toBe(
-      false,
-    );
+    expect(
+      hasAnyKeys(true as unknown as Parameters<typeof hasAnyKeys>[0]),
+    ).toBe(false);
   });
 });
