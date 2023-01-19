@@ -13,7 +13,6 @@ export const handleError = (
   errors = networkError,
   isBrowser = browser,
 ): void => {
-  console.log({ error });
   if (typeof error === 'string') {
     return toasts.push({ variant: 'error', message: error });
   }
