@@ -297,7 +297,7 @@
   <section>
     <ApiPagination
       onFetch={onWorkflowFetch}
-      total={activeTotal}
+      total={$workflowCount.count}
       let:visibleItems
     >
       <WorkflowsSummaryTableWithFilters
