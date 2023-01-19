@@ -26,6 +26,27 @@ describe('has', () => {
     const source = { foo: 123 };
     expect(has(source, 'foo', 'bar')).toBe(false);
   });
+
+  it('returns false if an object has no keys', () => {
+    const source = {};
+    expect(has(source)).toBe(false);
+  });
+
+  it('should return false if given null', () => {
+    expect(has(null)).toBe(false);
+  });
+
+  it('should return false if given undefined', () => {
+    expect(has(undefined)).toBe(false);
+  });
+
+  it('should return false if given a number', () => {
+    expect(has(3)).toBe(false);
+  });
+
+  it('should return false if given a boolean', () => {
+    expect(has(true)).toBe(false);
+  });
 });
 
 describe('hasAnyKeys', () => {
