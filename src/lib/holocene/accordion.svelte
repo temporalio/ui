@@ -47,7 +47,7 @@
     id="{id}-trigger"
     aria-expanded={open}
     aria-controls="{id}-content"
-    class="accordion-open flex w-full flex-col"
+    class="flex w-full flex-col"
     disabled={disabled || readOnly}
     type="button"
     on:click={toggleAccordion}
@@ -64,7 +64,9 @@
       {#if !readOnly}
         <Icon
           name={open ? 'chevron-up' : 'chevron-down'}
-          class={disabled ? 'text-gray-500' : 'text-primary'}
+          class="rounded-full from-blue-100 to-purple-100 hover:bg-gradient-to-br {disabled
+            ? 'text-gray-500'
+            : 'text-primary'}"
         />
       {/if}
     </div>
