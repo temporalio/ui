@@ -71,6 +71,7 @@
       autocomplete={autocomplete ? 'on' : 'off'}
       bind:value
       on:input
+      on:keydown|stopPropagation
       on:change
       on:focus
       on:blur
