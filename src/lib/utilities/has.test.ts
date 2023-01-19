@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { has, hasAnyKeys, hasKeys } from './has';
+import { has, hasAnyKeys } from './has';
 
 describe('has', () => {
   it('returns true if an object has a key', () => {
@@ -10,6 +10,21 @@ describe('has', () => {
   it('returns false if an object does not have key', () => {
     const source = { foo: 123 };
     expect(has(source, 'bar')).toBe(false);
+  });
+
+  it('returns true if an object has a multiple keys', () => {
+    const source = { foo: 123, bar: 456 };
+    expect(has(source, 'foo', 'bar')).toBe(true);
+  });
+
+  it('returns false if an object has a no keys', () => {
+    const source = {};
+    expect(has(source, 'foo', 'bar')).toBe(false);
+  });
+
+  it('returns false if an object does not have the required keys', () => {
+    const source = { foo: 123 };
+    expect(has(source, 'foo', 'bar')).toBe(false);
   });
 });
 
@@ -46,27 +61,5 @@ describe('hasAnyKeys', () => {
     expect(
       hasAnyKeys(true as unknown as Parameters<typeof hasAnyKeys>[0]),
     ).toBe(false);
-  });
-});
-
-describe('hasKeys', () => {
-  it('returns true if an object has a key', () => {
-    const source = { foo: 123 };
-    expect(hasKeys(source, 'foo')).toBe(true);
-  });
-
-  it('returns true if an object has a multiple keys', () => {
-    const source = { foo: 123, bar: 456 };
-    expect(hasKeys(source, 'foo', 'bar')).toBe(true);
-  });
-
-  it('returns false if an object has a no keys', () => {
-    const source = {};
-    expect(hasKeys(source, 'foo', 'bar')).toBe(false);
-  });
-
-  it('returns false if an object does not have the required keys', () => {
-    const source = { foo: 123 };
-    expect(hasKeys(source, 'foo', 'bar')).toBe(false);
   });
 });
