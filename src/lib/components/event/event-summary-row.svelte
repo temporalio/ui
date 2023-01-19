@@ -172,7 +172,7 @@
 
 <style lang="postcss">
   .row {
-    @apply flex table-row flex-wrap items-center border-gray-900 text-sm no-underline xl:py-3 xl:text-base;
+    @apply table-row flex-wrap items-center border-gray-900 text-sm no-underline xl:py-3 xl:text-base;
   }
 
   .row:hover {
@@ -208,7 +208,7 @@
   }
 
   .expanded-cell {
-    @apply flex table-cell w-full flex-wrap text-sm no-underline xl:text-base;
+    @apply table-cell w-full flex-wrap text-sm no-underline xl:text-base;
   }
 
   .typedError .expanded-cell {
