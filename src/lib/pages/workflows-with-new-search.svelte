@@ -342,7 +342,6 @@
     {:else}
       <tr>
         <td colspan={bulkActionsEnabled ? 6 : 5} class="xl:hidden">
-<<<<<<< HEAD
           {#if $loading}
             <Loading />
           {:else}
@@ -354,8 +353,6 @@
           {/if}
         </td>
         <td colspan={bulkActionsEnabled ? 8 : 7} class="hidden xl:table-cell">
-=======
->>>>>>> main
           {#if $loading}
             <Loading />
           {:else}
@@ -366,20 +363,6 @@
             />
           {/if}
         </td>
-<<<<<<< HEAD
-=======
-        <td colspan={bulkActionsEnabled ? 8 : 7} class="hidden xl:table-cell">
-          {#if $loading}
-            <Loading />
-          {:else}
-            <EmptyState
-              title="No Workflows Found"
-              content={errorMessage}
-              error={$workflowError}
-            />
-          {/if}
-        </td>
->>>>>>> main
       </tr>
     {/each}
   </WorkflowsSummaryTableWithFilters>

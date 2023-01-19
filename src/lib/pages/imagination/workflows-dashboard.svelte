@@ -102,7 +102,7 @@
 
 <section>
   <slot />
-  <div class="flex flex-row gap-4 items-stretch">
+  <div class="flex flex-row items-stretch gap-4">
     <Card class="bg-gray-700">
       {#key totals}
         <PieChart {totals} />

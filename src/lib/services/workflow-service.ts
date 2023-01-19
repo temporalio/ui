@@ -7,7 +7,10 @@ import {
 
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
-import { toListWorkflowQuery, toListWorkflowQueryFromFilters } from '$lib/utilities/query/list-workflow-query';
+import {
+  toListWorkflowQuery,
+  toListWorkflowQueryFromFilters,
+} from '$lib/utilities/query/list-workflow-query';
 import {
   handleUnauthorizedOrForbiddenError,
   isForbidden,
@@ -179,7 +182,10 @@ export const fetchStatusWorkflowCount = async (
       operator: filters.length ? 'AND' : '',
       parenthesis: '',
     };
-    const query = toListWorkflowQueryFromFilters([executionStatusFilter, ...filters]);
+    const query = toListWorkflowQueryFromFilters([
+      executionStatusFilter,
+      ...filters,
+    ]);
     const result = await requestFromAPI<{ count: string }>(countRoute, {
       params: { query },
       onError: noop,
@@ -193,7 +199,6 @@ export const fetchStatusWorkflowCount = async (
 
   return count;
 };
-
 
 export const fetchPaginatedWorkflows = async (
   namespace: string,
@@ -387,13 +392,13 @@ export async function signalWorkflow({
         input: {
           payloads: signalInput
             ? [
-              {
-                metadata: {
-                  encoding: btoa('json/plain'),
+                {
+                  metadata: {
+                    encoding: btoa('json/plain'),
+                  },
+                  data: btoa(stringifyWithBigInt(signalInput)),
                 },
-                data: btoa(stringifyWithBigInt(signalInput)),
-              },
-            ]
+              ]
             : null,
         },
       }),

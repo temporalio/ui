@@ -358,5 +358,11 @@
         {/each}
       </WorkflowsSummaryTableWithFilters>
     </ApiPagination>
+    <EmptyState
+      slot="empty"
+      title="No Workflows Found"
+      content={errorMessage}
+      error={$workflowError}
+    />
   {/key}
 </section>

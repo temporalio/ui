@@ -16,9 +16,8 @@ const namespace = derived([page], ([$page]) => $page.params.namespace);
 const searchParams = derived([page], ([$page]) => {
   const query = $page.url.searchParams.get('query');
   const searchView = $page.url.searchParams.get('search');
-  return { query, searchView }
+  return { query, searchView };
 });
-
 
 const parameters = derived(
   [namespace, searchParams, refresh, supportsAdvancedVisibility],
@@ -39,7 +38,7 @@ const setCounts = (_workflowCount: { totalCount: number; count: number }) => {
 const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
   return parameters.subscribe(
     ({ namespace, searchParams, supportsAdvancedVisibility }) => {
-      const { query, searchView } = searchParams
+      const { query, searchView } = searchParams;
       if (searchView === 'advanced') {
         withLoading(loading, updating, async () => {
           const { workflows, error } = await fetchAllWorkflows(namespace, {
@@ -59,7 +58,8 @@ const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
           }
         });
       }
-    });
+    },
+  );
 };
 
 export type ParsedParameters = FilterParameters & { timeRange?: string };

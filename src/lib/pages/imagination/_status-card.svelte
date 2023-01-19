@@ -21,10 +21,10 @@
 
 <style lang="postcss">
   .card {
-    @apply w-auto text-center h-full;
+    @apply h-full w-auto text-center;
   }
   .active :global(.card) {
-    @apply ease-in duration-300 -translate-y-1 bg-gradient-to-br from-blue-100 to-purple-100;
+    @apply -translate-y-1 bg-gradient-to-br from-blue-100 to-purple-100 duration-300 ease-in;
     box-shadow: 5px 5px #18181b, 5px 5px 0px 3px #18181b;
   }
 </style>
