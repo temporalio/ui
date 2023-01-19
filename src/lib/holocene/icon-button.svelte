@@ -11,7 +11,7 @@
 <button class="icon-button" on:click data-cy={$$props.dataCy} {type}>
   {#if icon}
     <div class="flex items-center justify-center gap-2 {classes}">
-      <Icon class="h-4" name={icon} />
+      <Icon name={icon} />
       <slot />
     </div>
   {:else}
@@ -21,6 +21,6 @@
 
 <style lang="postcss">
   .icon-button {
-    @apply inline-block h-4 w-auto text-sm;
+    @apply inline-block w-auto text-sm;
   }
 </style>
