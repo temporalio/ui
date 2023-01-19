@@ -12,6 +12,8 @@ type WorkflowAPIRoutePath =
   | 'events.descending'
   | 'query';
 
+type WorkflowActivitiesAPIRoutePath = 'activity.complete' | 'activity.fail';
+
 type BatchAPIRoutePath =
   | 'batch-operations'
   | 'batch-operation.describe'
@@ -34,6 +36,7 @@ type APIRoutePath =
   | SearchAttributesRoutePath
   | TaskQueueAPIRoutePath
   | WorkflowAPIRoutePath
+  | WorkflowActivitiesAPIRoutePath
   | WorkflowsAPIRoutePath
   | NamespaceAPIRoutePath
   | BatchAPIRoutePath;
@@ -45,6 +48,7 @@ type APIRouteParameters = {
   runId: string;
   queue: string;
   scheduleId: string;
+  activityId: string;
 };
 
 type WorkflowListRouteParameters = Pick<APIRouteParameters, 'namespace'>;
@@ -55,6 +59,9 @@ type WorkflowRouteParameters = Pick<
   APIRouteParameters,
   'namespace' | 'workflowId' | 'runId'
 >;
+
+type WorkflowActivitiesRouteParameters = WorkflowRouteParameters &
+  Pick<APIRouteParameters, 'activityId'>;
 
 type BatchRouteParameters = Pick<APIRouteParameters, 'namespace'>;
 
