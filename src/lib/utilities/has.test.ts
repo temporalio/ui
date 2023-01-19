@@ -40,26 +40,18 @@ describe('hasAnyKeys', () => {
   });
 
   it('should return false if given null', () => {
-    expect(
-      hasAnyKeys(null as unknown as Parameters<typeof hasAnyKeys>[0]),
-    ).toBe(false);
+    expect(hasAnyKeys(null)).toBe(false);
   });
 
   it('should return false if given undefined', () => {
-    expect(
-      hasAnyKeys(undefined as unknown as Parameters<typeof hasAnyKeys>[0]),
-    ).toBe(false);
+    expect(hasAnyKeys(undefined)).toBe(false);
   });
 
   it('should return false if given a number', () => {
-    expect(hasAnyKeys(3 as unknown as Parameters<typeof hasAnyKeys>[0])).toBe(
-      false,
-    );
+    expect(hasAnyKeys(3)).toBe(false);
   });
 
   it('should return false if given a boolean', () => {
-    expect(
-      hasAnyKeys(true as unknown as Parameters<typeof hasAnyKeys>[0]),
-    ).toBe(false);
+    expect(hasAnyKeys(true)).toBe(false);
   });
 });
