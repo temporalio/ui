@@ -7,7 +7,7 @@ import {
 
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
-import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
+import { toListWorkflowQuery, toListWorkflowQueryFromFilters } from '$lib/utilities/query/list-workflow-query';
 import {
   handleUnauthorizedOrForbiddenError,
   isForbidden,
@@ -16,6 +16,7 @@ import {
 import { noop } from 'svelte/internal';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { btoa } from '$lib/utilities/btoa';
+import type { WorkflowFilter } from '$lib/models/workflow-filters';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;
@@ -165,21 +166,27 @@ export const fetchStatusesWorkflowCount = async (
 export const fetchStatusWorkflowCount = async (
   namespace: string,
   status: WorkflowStatus,
+  filters: WorkflowFilter[],
   request = fetch,
 ): Promise<number> => {
   let count = 0;
   try {
     const countRoute = await routeForApi('workflows.count', { namespace });
-    const statusPromise = (status: WorkflowStatus) =>
-      requestFromAPI<{ count: number }>(countRoute, {
-        params: { query: `ExecutionStatus="${status}"` },
-        onError: noop,
-        handleError: noop,
-        request,
-      });
-
-    const result = await statusPromise(status);
-    count = result?.count;
+    const executionStatusFilter = {
+      attribute: 'ExecutionStatus',
+      value: status,
+      conditional: '=',
+      operator: filters.length ? 'AND' : '',
+      parenthesis: '',
+    };
+    const query = toListWorkflowQueryFromFilters([executionStatusFilter, ...filters]);
+    const result = await requestFromAPI<{ count: string }>(countRoute, {
+      params: { query },
+      onError: noop,
+      handleError: noop,
+      request,
+    });
+    count = parseInt(result?.count);
   } catch (e) {
     // Don't fail the workflows call due to count
   }

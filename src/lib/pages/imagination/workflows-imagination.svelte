@@ -34,6 +34,7 @@
   import WorkflowsSummaryRowWithFilters from '$lib/components/workflow/workflows-summary-row-with-filters.svelte';
   import WorkflowsSummaryTableWithFilters from '$lib/components/workflow/workflows-summary-table-with-filters.svelte';
   import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/list-workflow-query';
+  import EmptyState from '$lib/holocene/empty-state.svelte';
 
   export let bulkActionsEnabled: boolean = false;
   export let cancelEnabled: boolean = false;
@@ -252,15 +253,24 @@
 
   // For Imagination Pagination
   export let activeTotal: number;
+  export let activeStatus: WorkflowStatus;
 
   $: namespace = $page.params.namespace;
 
-  const onWorkflowFetch = async () => {
+  $: onWorkflowFetch = async () => {
     return async (pageSize = 100, token) => {
-      const query = toListWorkflowQueryFromFilters(
-        $workflowFilters,
-        $workflowSorts,
-      );
+      const executionStatusFilter = {
+        attribute: 'ExecutionStatus',
+        value: activeStatus,
+        conditional: '=',
+        operator: $workflowFilters.length ? 'AND' : '',
+        parenthesis: '',
+      };
+      const query = toListWorkflowQueryFromFilters([
+        executionStatusFilter,
+        ...$workflowFilters,
+      ]);
+
       const { workflows, nextPageToken, error } = await fetchPaginatedWorkflows(
         namespace,
         {
@@ -293,45 +303,27 @@
   on:confirm={cancelWorkflows}
 />
 
-{#key query}
+{#key [activeStatus, activeTotal, query]}
   <section>
     <ApiPagination
       onFetch={onWorkflowFetch}
-      total={$workflowCount.count}
+      total={activeTotal}
       let:visibleItems
     >
-      <WorkflowsSummaryTableWithFilters
-        {bulkActionsEnabled}
-        {cancelEnabled}
-        {terminateEnabled}
-        updating={$updating}
-        visibleWorkflows={visibleItems}
-        {selectedWorkflowsCount}
-        filteredWorkflowCount={query
-          ? filteredWorkflowCount
-          : totalWorkflowCount}
-        {allSelected}
-        {pageSelected}
-        noStatusFilter
-        on:terminateWorkflows={handleBatchTerminate}
-        on:cancelWorkflows={handleBatchCancel}
-        on:toggleAll={handleToggleAll}
-        on:togglePage={handleTogglePage}
-      >
+      <WorkflowsSummaryTable>
         {#each visibleItems as event}
-          <WorkflowsSummaryRowWithFilters
-            {bulkActionsEnabled}
+          <WorkflowsSummaryRow
             workflow={event}
             namespace={$page.params.namespace}
             timeFormat={$timeFormat}
-            checkboxDisabled={allSelected}
-            selected={selectedWorkflows[event.runId]}
-            on:toggleWorkflow={handleSelectWorkflow}
           />
-        {:else}
-          <EmptyRow loading={$loading} {errorMessage} error={$workflowError} />
         {/each}
-      </WorkflowsSummaryTableWithFilters>
+      </WorkflowsSummaryTable>
+      <div slot="empty">
+        <WorkflowsSummaryTable>
+          <EmptyRow loading={false} {errorMessage} error={$workflowError} />
+        </WorkflowsSummaryTable>
+      </div>
     </ApiPagination>
   </section>
 {/key}

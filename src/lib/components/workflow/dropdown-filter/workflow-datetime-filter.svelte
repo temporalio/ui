@@ -253,7 +253,7 @@
       {/if}
     </div>
   </Select>
-  <!-- <SimpleSplitButton
+  <SimpleSplitButton
     class="rounded-tr rounded-br bg-white"
     buttonClass="border border-gray-900"
     id="datetime"
@@ -263,7 +263,7 @@
     <MenuItem on:click={() => ($timeFormat = 'relative')}>Relative</MenuItem>
     <MenuItem on:click={() => ($timeFormat = 'UTC')}>UTC</MenuItem>
     <MenuItem on:click={() => ($timeFormat = 'local')}>Local</MenuItem>
-  </SimpleSplitButton> -->
+  </SimpleSplitButton>
 </div>
 
 <style lang="postcss">

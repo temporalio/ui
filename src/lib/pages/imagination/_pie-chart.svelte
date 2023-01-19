@@ -1,9 +1,7 @@
 <script lang="ts">
   import * as echarts from 'echarts';
   import { onMount } from 'svelte';
-  import type { UsageSeries } from './chart-usage';
-  export let seriesData: UsageSeries[] = [];
-  export let title: string;
+  export let totals = {};
   export let tooltip = true;
   export let valueFormatter: (value: string | number) => string = (value) =>
     value.toLocaleString();
@@ -11,19 +9,27 @@
   let pie: HTMLElement;
   let pieChart: echarts.ECharts;
 
+  const fullTotal = Object.values(totals).reduce(
+    (sum, current) => (sum += parseInt(current.count)),
+    0,
+  );
+
   function drawPieChart() {
     pieChart = echarts.init(pie);
     pieChart.setOption({
       tooltip: {
         trigger: tooltip ? 'item' : '',
-        valueFormatter,
+        valueFormatter: (value) => {
+          return Math.round((value / fullTotal) * 100).toString() + '%';
+        },
+        position: ['10%', '100%'],
         textStyle: {
           fontFamily: 'Inter',
           fontWeight: 400,
         },
       },
       title: {
-        text: title,
+        text: '',
         left: 'center',
         top: 'center',
         textStyle: {
@@ -35,7 +41,7 @@
       series: [
         {
           type: 'pie',
-          radius: ['98%', '90%'],
+          radius: ['100%', '50%'],
           avoidLabelOverlap: false,
           label: {
             show: false,
@@ -51,10 +57,10 @@
           labelLine: {
             show: false,
           },
-          data: seriesData.map(({ label, color, data }) => ({
-            value: data[0],
-            name: label,
-            itemStyle: { color },
+          data: Object.keys(totals).map((key) => ({
+            value: totals[key].count,
+            name: key,
+            itemStyle: { color: totals[key].color },
           })),
         },
       ],
@@ -86,6 +92,6 @@
   }
 </script>
 
-<div class="h-[20vh] w-[50vw] lg:w-[30vh]">
+<div class="h-[64px] w-[64px]">
   <div class="h-full w-full" bind:this={pie} use:resizer />
 </div>

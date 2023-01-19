@@ -53,6 +53,8 @@
   import Card from '$lib/holocene/card.svelte';
   import WorkflowsImagination from './workflows-imagination.svelte';
   import StatusCard from './_status-card.svelte';
+  import PieChart from './_pie-chart.svelte';
+  import TimePicker from './_time-picker.svelte';
 
   export let bulkActionsEnabled: boolean = false;
   export let cancelEnabled: boolean = false;
@@ -269,24 +271,59 @@
     }
   }
 
-  // For Imagination Pagination
+  let totals = {
+    running: { count: 0, color: '#93c5fd' },
+    failed: { count: 0, color: '#fca5a5' },
+    timedOut: { count: 0, color: '#fdba74' },
+    canceled: { count: 0, color: '#fde047' },
+    terminated: { count: 0, color: '#d4d4d8' },
+    completed: { count: 0, color: '#86efac' },
+  };
 
   $: namespace = $page.params.namespace;
-  let activeTotal = 0;
+
+  const fetchStatusCounts = async () => {
+    totals.running.count = await fetchStatusWorkflowCount(
+      namespace,
+      'Running',
+      $workflowFilters,
+    );
+    totals.failed.count = await fetchStatusWorkflowCount(
+      namespace,
+      'Failed',
+      $workflowFilters,
+    );
+    totals.timedOut.count = await fetchStatusWorkflowCount(
+      namespace,
+      'TimedOut',
+      $workflowFilters,
+    );
+    totals.canceled.count = await fetchStatusWorkflowCount(
+      namespace,
+      'Canceled',
+      $workflowFilters,
+    );
+    totals.terminated.count = await fetchStatusWorkflowCount(
+      namespace,
+      'Terminated',
+      $workflowFilters,
+    );
+    totals.completed.count = await fetchStatusWorkflowCount(
+      namespace,
+      'Completed',
+      $workflowFilters,
+    );
+  };
+
+  $: query, fetchStatusCounts();
+
+  // For Imagination Pagination
+
+  let activeTotal: number = 0;
+  let activeStatus: WorkflowStatus = 'Running';
 
   const onStatusClick = (status: WorkflowStatus, count: number) => {
-    const nonStatusFilters = $workflowFilters.filter(
-      (f) => f.attribute !== 'ExecutionStatus',
-    );
-    const statusFilter = {
-      attribute: 'ExecutionStatus',
-      value: status,
-      conditional: '=',
-      operator: '',
-      parenthesis: '',
-    };
-    $workflowFilters = [statusFilter, ...nonStatusFilters];
-    updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
+    activeStatus = status;
     activeTotal = count;
   };
 </script>
@@ -320,7 +357,7 @@
       <p data-cy="namespace-name">
         {namespace}
       </p>
-      {#if $workflowCount?.totalCount >= 0}
+      <!-- {#if $workflowCount?.totalCount >= 0}
         <div class="h-1 w-1 rounded-full bg-gray-400" />
         <p data-cy="workflow-count">
           {#if $loading}
@@ -333,7 +370,7 @@
             {totalWorkflowCount} workflows
           {/if}
         </p>
-      {/if}
+      {/if} -->
     </div>
   </div>
   <div class="flex items-center gap-4">
@@ -343,46 +380,51 @@
     <!-- <WorkflowDateTimeFilter /> -->
   </div>
 </div>
-<div class="flex flex-row gap-4">
+<div class="flex flex-row gap-4 items-stretch">
+  <Card class="bg-gray-700">
+    {#key totals}
+      <PieChart {totals} />
+    {/key}
+  </Card>
   <StatusCard
-    {namespace}
+    count={totals.running.count}
     status="Running"
     onClick={onStatusClick}
-    class="bg-blue-100"
+    active={activeStatus === 'Running'}
   />
   <StatusCard
-    {namespace}
+    count={totals.failed.count}
     status="Failed"
     onClick={onStatusClick}
-    class="bg-red-100"
+    active={activeStatus === 'Failed'}
   />
   <StatusCard
-    {namespace}
+    count={totals.timedOut.count}
     status="TimedOut"
     onClick={onStatusClick}
-    class="bg-orange-100"
+    active={activeStatus === 'TimedOut'}
   />
   <StatusCard
-    {namespace}
+    count={totals.terminated.count}
     status="Terminated"
     onClick={onStatusClick}
-    class="bg-gray-100"
+    active={activeStatus === 'Terminated'}
   />
   <StatusCard
-    {namespace}
+    count={totals.canceled.count}
     status="Canceled"
     onClick={onStatusClick}
-    class="bg-yellow-100"
+    active={activeStatus === 'Canceled'}
   />
   <StatusCard
-    {namespace}
+    count={totals.completed.count}
     status="Completed"
     onClick={onStatusClick}
-    class="bg-green-100"
+    active={activeStatus === 'Completed'}
   />
   <Card class="w-auto text-center">
     <h3>In the Last</h3>
-    <WorkflowDateTimeFilter />
+    <TimePicker />
   </Card>
 </div>
-<WorkflowsImagination {activeTotal} />
+<WorkflowsImagination {activeTotal} {activeStatus} />

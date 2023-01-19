@@ -123,7 +123,7 @@
   }
 </script>
 
-<svelte:window on:keyup={handleKeydown} />
+<svelte:window on:keydown={handleKeydown} />
 
 {#if error && $$slots.error}
   <slot name="error" />

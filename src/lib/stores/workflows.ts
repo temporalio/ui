@@ -36,28 +36,28 @@ const setCounts = (_workflowCount: { totalCount: number; count: number }) => {
 const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
   return parameters.subscribe(
     ({ namespace, query, path, supportsAdvancedVisibility }) => {
-      const isWorkflowsPage =
-        path == `${publicPath}/namespaces/${namespace}/workflows`;
+      // const isWorkflowsPage =
+      //   path == `${publicPath}/namespaces/${namespace}/workflows`;
 
-      if (isWorkflowsPage) {
-        withLoading(loading, updating, async () => {
-          const { workflows, error } = await fetchAllWorkflows(namespace, {
-            query,
-          });
-          set(workflows);
+      // if (isWorkflowsPage) {
+      //   withLoading(loading, updating, async () => {
+      //     const { workflows, error } = await fetchAllWorkflows(namespace, {
+      //       query,
+      //     });
+      //     set(workflows);
 
-          if (supportsAdvancedVisibility) {
-            const workflowCount = await fetchWorkflowCount(namespace, query);
-            setCounts(workflowCount);
-          }
+      //     if (supportsAdvancedVisibility) {
+      //       const workflowCount = await fetchWorkflowCount(namespace, query);
+      //       setCounts(workflowCount);
+      //     }
 
-          if (error) {
-            workflowError.set(error);
-          } else {
-            workflowError.set('');
-          }
-        });
-      }
+      //     if (error) {
+      //       workflowError.set(error);
+      //     } else {
+      //       workflowError.set('');
+      //     }
+      //   });
+      // }
     },
   );
 };

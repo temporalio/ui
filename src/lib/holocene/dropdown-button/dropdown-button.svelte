@@ -16,7 +16,7 @@
 <MenuContainer class={$$props.class}>
   <MenuButton
     bind:show
-    class="flex flex-row items-center rounded-lg border border-gray-900 bg-white p-2"
+    class="flex flex-row items-center rounded-lg border border-gray-900 bg-white p-2 {$$props.menuClass}"
     controls={id}
     disabled={readonly}
     hasIndicator={!readonly}
