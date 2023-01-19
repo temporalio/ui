@@ -8,21 +8,23 @@ import {
 import { withLoading } from '$lib/utilities/stores/with-loading';
 
 import type { StartStopNotifier } from 'svelte/store';
-import { publicPath } from '$lib/utilities/get-public-path';
 import { supportsAdvancedVisibility } from './bulk-actions';
 
 export const refresh = writable(0);
 const namespace = derived([page], ([$page]) => $page.params.namespace);
-const query = derived([page], ([$page]) => $page.url.searchParams.get('query'));
-const path = derived([page], ([$page]) => $page.url.pathname);
+const searchParams = derived([page], ([$page]) => {
+  const query = $page.url.searchParams.get('query');
+  const searchView = $page.url.searchParams.get('search');
+  return { query, searchView }
+});
+
 
 const parameters = derived(
-  [namespace, query, path, refresh, supportsAdvancedVisibility],
-  ([$namespace, $query, $path, $refresh, $supportsAdvancedVisibility]) => {
+  [namespace, searchParams, refresh, supportsAdvancedVisibility],
+  ([$namespace, $searchParams, $refresh, $supportsAdvancedVisibility]) => {
     return {
       namespace: $namespace,
-      query: $query,
-      path: $path,
+      searchParams: $searchParams,
       refresh: $refresh,
       supportsAdvancedVisibility: $supportsAdvancedVisibility,
     };
@@ -35,29 +37,27 @@ const setCounts = (_workflowCount: { totalCount: number; count: number }) => {
 
 const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
   return parameters.subscribe(
-    ({ namespace, query, path, supportsAdvancedVisibility }) => {
-      // const isWorkflowsPage =
-      //   path == `${publicPath}/namespaces/${namespace}/workflows`;
+    ({ namespace, searchParams, supportsAdvancedVisibility }) => {
+      const { query, searchView } = searchParams
+      if (searchView === 'advanced') {
+        withLoading(loading, updating, async () => {
+          const { workflows, error } = await fetchAllWorkflows(namespace, {
+            query,
+          });
+          set(workflows);
 
-      // if (isWorkflowsPage) {
-      //   withLoading(loading, updating, async () => {
-      //     const { workflows, error } = await fetchAllWorkflows(namespace, {
-      //       query,
-      //     });
-      //     set(workflows);
+          if (supportsAdvancedVisibility) {
+            const workflowCount = await fetchWorkflowCount(namespace, query);
+            setCounts(workflowCount);
+          }
 
-      //     if (supportsAdvancedVisibility) {
-      //       const workflowCount = await fetchWorkflowCount(namespace, query);
-      //       setCounts(workflowCount);
-      //     }
-
-      //     if (error) {
-      //       workflowError.set(error);
-      //     } else {
-      //       workflowError.set('');
-      //     }
-      //   });
-      // }
+          if (error) {
+            workflowError.set(error);
+          } else {
+            workflowError.set('');
+          }
+        });
+      }
     },
   );
 };

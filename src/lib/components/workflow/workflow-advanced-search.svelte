@@ -55,8 +55,8 @@
     >
       <Input
         id="manual-search"
-        placeholder="Enter a query"
-        icon="search"
+        placeholder={`Enter a query (i.e. WorkflowId="workflowid")`}
+        icon="terminal"
         class="w-3/4"
         clearable
         unroundRight
@@ -70,7 +70,7 @@
         unroundLeft
         on:click={onSearch}
       >
-        Search
+        Run Query
       </Button>
     </div>
   </div>

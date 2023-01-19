@@ -162,6 +162,7 @@
     placeholder="All Time"
     bind:show
     keepOpen={true}
+    unroundRight
     {value}
     {onChange}
   >

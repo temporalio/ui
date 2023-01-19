@@ -20,8 +20,6 @@
   import Pagination from '$lib/holocene/pagination.svelte';
   import WorkflowsSummaryTableWithFilters from '$lib/components/workflow/workflows-summary-table-with-filters.svelte';
   import WorkflowsSummaryRowWithFilters from '$lib/components/workflow/workflows-summary-row-with-filters.svelte';
-  import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import WorkflowDateTimeFilter from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
   import Loading from '$lib/holocene/loading.svelte';
@@ -35,6 +33,8 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { toaster } from '$lib/stores/toaster';
   import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
+  import ApiPagination from '$lib/holocene/api-pagination.svelte';
+  import { fetchPaginatedWorkflows } from '$lib/services/workflow-service';
 
   export let bulkActionsEnabled: boolean = false;
   export let cancelEnabled: boolean = false;
@@ -48,6 +48,7 @@
   let terminating: boolean = false;
   let cancelling: boolean = false;
 
+  $: namespace = $page.params.namespace;
   $: query = $page.url.searchParams.get('query');
 
   $: {
@@ -250,6 +251,20 @@
       resetSelection();
     }
   }
+
+  $: onWorkflowFetch = async () => {
+    return async (pageSize = 100, token) => {
+      const { workflows, nextPageToken, error } = await fetchPaginatedWorkflows(
+        namespace,
+        {
+          query,
+        },
+        token,
+        pageSize.toString(),
+      );
+      return { items: workflows, nextPageToken };
+    };
+  };
 </script>
 
 <BatchOperationConfirmationModal
@@ -271,63 +286,77 @@
   on:confirm={cancelWorkflows}
 />
 
-<Pagination items={$workflows} let:visibleItems>
-  <svelte:fragment slot="action-top-left">
-    <WorkflowAdvancedSearch />
-  </svelte:fragment>
-  <svelte:fragment slot="action-top-center">
-    <WorkflowDateTimeFilter />
-  </svelte:fragment>
-  <WorkflowsSummaryTableWithFilters
-    {bulkActionsEnabled}
-    {cancelEnabled}
-    {terminateEnabled}
-    updating={$updating}
-    visibleWorkflows={visibleItems}
-    {selectedWorkflowsCount}
-    filteredWorkflowCount={query ? filteredWorkflowCount : totalWorkflowCount}
-    {allSelected}
-    {pageSelected}
-    on:terminateWorkflows={handleBatchTerminate}
-    on:cancelWorkflows={handleBatchCancel}
-    on:toggleAll={handleToggleAll}
-    on:togglePage={handleTogglePage}
-  >
-    {#each visibleItems as event}
-      <WorkflowsSummaryRowWithFilters
+<section>
+  <slot />
+  {#key query}
+    <ApiPagination
+      onFetch={onWorkflowFetch}
+      total={query ? filteredWorkflowCount : totalWorkflowCount}
+      let:visibleItems
+    >
+      <svelte:fragment slot="action-top-left">
+        <WorkflowAdvancedSearch />
+      </svelte:fragment>
+      <svelte:fragment slot="action-top-center">
+        <WorkflowDateTimeFilter />
+      </svelte:fragment>
+      <WorkflowsSummaryTableWithFilters
         {bulkActionsEnabled}
-        workflow={event}
-        namespace={$page.params.namespace}
-        timeFormat={$timeFormat}
-        checkboxDisabled={allSelected}
-        selected={selectedWorkflows[event.runId]}
-        on:toggleWorkflow={handleSelectWorkflow}
-      />
-    {:else}
-      <tr>
-        <td colspan={bulkActionsEnabled ? 6 : 5} class="xl:hidden">
-          {#if $loading}
-            <Loading />
-          {:else}
-            <EmptyState
-              title="No Workflows Found"
-              content={errorMessage}
-              error={$workflowError}
-            />
-          {/if}
-        </td>
-        <td colspan={bulkActionsEnabled ? 8 : 7} class="hidden xl:table-cell">
-          {#if $loading}
-            <Loading />
-          {:else}
-            <EmptyState
-              title="No Workflows Found"
-              content={errorMessage}
-              error={$workflowError}
-            />
-          {/if}
-        </td>
-      </tr>
-    {/each}
-  </WorkflowsSummaryTableWithFilters>
-</Pagination>
+        {cancelEnabled}
+        {terminateEnabled}
+        updating={$updating}
+        visibleWorkflows={visibleItems}
+        {selectedWorkflowsCount}
+        filteredWorkflowCount={query
+          ? filteredWorkflowCount
+          : totalWorkflowCount}
+        {allSelected}
+        {pageSelected}
+        on:terminateWorkflows={handleBatchTerminate}
+        on:cancelWorkflows={handleBatchCancel}
+        on:toggleAll={handleToggleAll}
+        on:togglePage={handleTogglePage}
+      >
+        {#each visibleItems as event}
+          <WorkflowsSummaryRowWithFilters
+            {bulkActionsEnabled}
+            workflow={event}
+            namespace={$page.params.namespace}
+            timeFormat={$timeFormat}
+            checkboxDisabled={allSelected}
+            selected={selectedWorkflows[event.runId]}
+            on:toggleWorkflow={handleSelectWorkflow}
+          />
+        {:else}
+          <tr>
+            <td colspan={bulkActionsEnabled ? 6 : 5} class="xl:hidden">
+              {#if $loading}
+                <Loading />
+              {:else}
+                <EmptyState
+                  title="No Workflows Found"
+                  content={errorMessage}
+                  error={$workflowError}
+                />
+              {/if}
+            </td>
+            <td
+              colspan={bulkActionsEnabled ? 8 : 7}
+              class="hidden xl:table-cell"
+            >
+              {#if $loading}
+                <Loading />
+              {:else}
+                <EmptyState
+                  title="No Workflows Found"
+                  content={errorMessage}
+                  error={$workflowError}
+                />
+              {/if}
+            </td>
+          </tr>
+        {/each}
+      </WorkflowsSummaryTableWithFilters>
+    </ApiPagination>
+  {/key}
+</section>
