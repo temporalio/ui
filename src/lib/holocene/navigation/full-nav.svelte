@@ -104,13 +104,13 @@
           <div class="nav-icon">
             <svelte:component this={extra.component} />
           </div>
-          <div
+          <button
             class="nav-title"
             class:cursor={extra?.onClick}
             on:click={extra?.onClick}
           >
             {extra.name}
-          </div>
+          </button>
         </NavRow>
       {/each}
     {/if}
