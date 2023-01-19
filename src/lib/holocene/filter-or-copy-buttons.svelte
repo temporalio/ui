@@ -20,6 +20,7 @@
   <div
     class="copy-or-filter {className}"
     on:click|preventDefault|stopPropagation={noop}
+    on:keyup|preventDefault|stopPropagation={noop}
   >
     {#if filterable}
       <button
