@@ -1,6 +1,9 @@
 import { isObject } from './is';
 
-export const has = (target: unknown, property: string): boolean => {
+export const has = <K extends string, V = unknown>(
+  target: unknown,
+  property: K,
+): target is Record<K, V> => {
   return Object.prototype.hasOwnProperty.call(target, property);
 };
 
