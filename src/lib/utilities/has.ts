@@ -18,9 +18,9 @@ export const hasKeys = <K extends Readonly<string[]>>(
   return true;
 };
 
-export const hasAnyKeys = (obj: {
-  [key: string | number | symbol]: unknown;
-}): boolean => {
+export const hasAnyKeys = (
+  obj: unknown,
+): obj is ReturnType<typeof isObject> => {
   if (!isObject(obj)) return false;
   return !!Object.keys(obj).length;
 };
