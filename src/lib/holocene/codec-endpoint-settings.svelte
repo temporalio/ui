@@ -29,6 +29,7 @@
       placeholder="Endpoint"
       data-cy="data-encoder-endpoint-input"
       bind:value={endpoint}
+      on:keydown|stopPropagation
     />
     {#if error}
       <small data-cy="data-encoder-endpoint-error" class="text-red-700"

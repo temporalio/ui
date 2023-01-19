@@ -30,6 +30,7 @@
     placeholder={name}
     {id}
     bind:value={_value}
+    on:keydown|stopPropagation
   />
 </div>
 
