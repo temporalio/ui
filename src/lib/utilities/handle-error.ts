@@ -70,11 +70,11 @@ const hasStatusCode = (
   statusCode: number | string,
 ): error is TemporalAPIError => {
   if (has(error, 'statusCode')) {
-    return error?.statusCode === statusCode;
+    return error.statusCode === statusCode;
   }
 
   if (has(error, 'status')) {
-    return error?.status === statusCode;
+    return error.status === statusCode;
   }
 
   return false;
