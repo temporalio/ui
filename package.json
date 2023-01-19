@@ -41,7 +41,8 @@
     "story:build": "histoire build",
     "story:preview": "histoire preview",
     "coverage": "TZ=UTC vitest run --coverage",
-    "test-ui": "TZ=UTC vitest --ui"
+    "test-ui": "TZ=UTC vitest --ui",
+    "postinstall": "node download-temporal-cli.js"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.3.4",
@@ -58,7 +59,9 @@
     "json-beautify": "^1.1.1",
     "json-bigint": "^1.0.0",
     "just-debounce": "^1.1.0",
+    "node-fetch": "^3.3.0",
     "sanitize-html": "^2.7.1",
+    "tar-fs": "^2.1.1",
     "url-pattern": "^1.0.3",
     "uuid": "^9.0.0",
     "websocket-as-promised": "^2.0.1"
@@ -78,8 +81,11 @@
     "@temporalio/proto": "^1.4.4",
     "@types/base-64": "^1.0.0",
     "@types/json-bigint": "^1.0.1",
+    "@types/mkdirp": "^1.0.2",
     "@types/node": "^16.3.2",
+    "@types/rimraf": "^3.0.2",
     "@types/sanitize-html": "^2.6.1",
+    "@types/tar-fs": "^2.0.1",
     "@types/uuid": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
@@ -104,8 +110,11 @@
     "husky": "^8.0.1",
     "jest-websocket-mock": "^2.2.1",
     "jsdom": "^20.0.0",
+    "kleur": "^4.1.5",
     "lint-staged": "^13.0.3",
+    "mkdirp": "^2.1.3",
     "mock-socket": "^9.1.0",
+    "node": "^19.6.0",
     "postcss": "^8.4.5",
     "postcss-cli": "^9.1.0",
     "postcss-html": "^1.5.0",
@@ -113,6 +122,7 @@
     "postcss-load-config": "^3.1.0",
     "prettier": "^2.7.1",
     "prettier-plugin-tailwindcss": "^0.1.11",
+    "rimraf": "^4.1.2",
     "stylelint": "^14.16.0",
     "stylelint-config-prettier": "^9.0.4",
     "stylelint-config-recommended": "^7.0.0",
@@ -124,6 +134,7 @@
     "svelte-preprocess": "^4.10.4",
     "svelte2tsx": "^0.5.10",
     "tailwindcss": "^3.1.4",
+    "tar": "^6.1.13",
     "ts-node": "^10.2.1",
     "ts-proto": "^1.82.5",
     "tslib": "^2.3.1",
@@ -131,7 +142,8 @@
     "vite": "^4.0.2",
     "vite-node": "^0.23.2",
     "vitest": "^0.15.2",
-    "webpack": "^5.73.0"
+    "webpack": "^5.73.0",
+    "zlib": "^1.0.5"
   },
   "peerDependencies": {
     "date-fns": "2.29.x",
