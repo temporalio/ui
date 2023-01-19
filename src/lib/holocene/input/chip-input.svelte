@@ -106,7 +106,7 @@
       bind:this={input}
       bind:value={displayValue}
       on:blur={handleBlur}
-      on:keydown={handleKeydown}
+      on:keydown|stopPropagation={handleKeydown}
       on:paste={handlePaste}
     />
   </div>

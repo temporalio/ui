@@ -27,6 +27,7 @@
     {placeholder}
     autocomplete="off"
     on:input
+    on:keydown|stopPropagation
   />
   <div>
     <Button class="m-2" type="submit">{label}</Button>
