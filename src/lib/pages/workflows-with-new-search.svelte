@@ -271,6 +271,42 @@
   on:confirm={cancelWorkflows}
 />
 
+<div class="mb-2 flex justify-between">
+  <div>
+    <h1 class="text-2xl" data-cy="namespace-title">
+      Recent Workflows
+      <NamespaceSelector />
+    </h1>
+    <div class="flex items-center gap-2 text-sm">
+      <p data-cy="namespace-name">
+        {$page.params.namespace}
+      </p>
+      {#if $workflowCount?.totalCount >= 0}
+        <div class="h-1 w-1 rounded-full bg-gray-400" />
+        <p data-cy="workflow-count">
+          {#if $loading}
+            <span class="text-gray-400">loading</span>
+          {:else if $updating}
+            <span class="text-gray-400">filtering</span>
+          {:else if query}
+            Results {filteredWorkflowCount} of {totalWorkflowCount} workflows
+          {:else}
+            {totalWorkflowCount} workflows
+          {/if}
+        </p>
+      {/if}
+    </div>
+  </div>
+  <div>
+    <button
+      aria-label="retry workflows"
+      class="cursor-pointer rounded-full p-1 hover:bg-gray-900 hover:text-white"
+      on:click={refreshWorkflows}
+    >
+      <Icon name="retry" class="h-8 w-8" />
+    </button>
+  </div>
+</div>
 <Pagination items={$workflows} let:visibleItems>
   <svelte:fragment slot="action-top-left">
     <WorkflowAdvancedSearch />
@@ -306,6 +342,7 @@
     {:else}
       <tr>
         <td colspan={bulkActionsEnabled ? 6 : 5} class="xl:hidden">
+<<<<<<< HEAD
           {#if $loading}
             <Loading />
           {:else}
@@ -317,6 +354,8 @@
           {/if}
         </td>
         <td colspan={bulkActionsEnabled ? 8 : 7} class="hidden xl:table-cell">
+=======
+>>>>>>> main
           {#if $loading}
             <Loading />
           {:else}
@@ -327,6 +366,20 @@
             />
           {/if}
         </td>
+<<<<<<< HEAD
+=======
+        <td colspan={bulkActionsEnabled ? 8 : 7} class="hidden xl:table-cell">
+          {#if $loading}
+            <Loading />
+          {:else}
+            <EmptyState
+              title="No Workflows Found"
+              content={errorMessage}
+              error={$workflowError}
+            />
+          {/if}
+        </td>
+>>>>>>> main
       </tr>
     {/each}
   </WorkflowsSummaryTableWithFilters>

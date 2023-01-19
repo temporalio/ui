@@ -80,9 +80,9 @@
   };
 </script>
 
-<label class={$$props.class} for={id}>
+<div class={$$props.class}>
   {#if label}
-    {label}{#if required}*{/if}
+    <label class:required for={id}>{label}</label>
   {/if}
   <div bind:this={inputContainer} class="input-container" class:invalid>
     {#if $values.length > 0}
@@ -106,7 +106,7 @@
       bind:this={input}
       bind:value={displayValue}
       on:blur={handleBlur}
-      on:keydown={handleKeydown}
+      on:keydown|stopPropagation={handleKeydown}
       on:paste={handlePaste}
     />
   </div>
@@ -115,11 +115,15 @@
       {hintText}
     </span>
   {/if}
-</label>
+</div>
 
 <style lang="postcss">
   label {
     @apply mb-10 text-sm font-medium text-gray-900;
+  }
+
+  label.required {
+    @apply after:content-['*'];
   }
 
   .input-container {

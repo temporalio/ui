@@ -47,7 +47,7 @@
   {/if}
 </div>
 
-<div class="mb-5 flex rounded-full border p-1 pr-4">
+<div class="mb-5 flex rounded-md border border-gray-900 p-1 pr-4">
   <div class="ml-4 mr-2">
     <Icon name="search" />
   </div>
@@ -55,6 +55,7 @@
     class="w-full"
     placeholder="Search"
     use:rootDocumentHandler
+    on:keydown|stopPropagation
     bind:value={searchValue}
     bind:this={searchField}
   />
@@ -67,7 +68,7 @@
     {#if namespacesResult}
       {#each namespacesResult.filter( ({ namespace }) => namespace.includes(searchValue), ) as namespace}
         <li
-          class="first:rounded-t-md first:border-t last:rounded-b-md border-b border-l border-r p-3 flex border-collapse gap-2 hover:bg-gray-50 cursor-pointer"
+          class="first:rounded-t-xl first:border-t-[3px] last:rounded-b-xl last:border-b-[3px] border-b border-l-[3px] border-r-[3px] border-gray-900 p-3 flex border-collapse gap-2 hover:bg-gradient-to-br from-blue-100 to-purple-100 cursor-pointer"
           on:click={() => namespace?.onClick(namespace.namespace)}
         >
           <div class="w-6 h-6 pl-3 active">

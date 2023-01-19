@@ -11,6 +11,7 @@ import type { StartStopNotifier } from 'svelte/store';
 import { supportsAdvancedVisibility } from './bulk-actions';
 
 export const refresh = writable(0);
+
 const namespace = derived([page], ([$page]) => $page.params.namespace);
 const searchParams = derived([page], ([$page]) => {
   const query = $page.url.searchParams.get('query');
@@ -58,8 +59,7 @@ const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
           }
         });
       }
-    },
-  );
+    });
 };
 
 export type ParsedParameters = FilterParameters & { timeRange?: string };

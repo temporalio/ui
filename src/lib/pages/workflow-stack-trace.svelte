@@ -13,7 +13,7 @@
   import { authUser } from '$lib/stores/auth-user';
 
   const { namespace } = $page.params;
-  const { workflow, workers } = $workflowRun;
+  $: ({ workflow, workers } = $workflowRun);
 
   let currentdate = new Date();
   let isLoading = false;

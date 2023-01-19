@@ -16,7 +16,8 @@
   } from '$lib/utilities/format-event-attributes';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
 
-  $: pendingActivities = $workflowRun.workflow?.pendingActivities;
+  $: ({ workflow } = $workflowRun);
+  $: pendingActivities = workflow?.pendingActivities;
 
   $: href = routeForPendingActivities({
     namespace: $page.params.namespace,
@@ -25,7 +26,7 @@
   });
 
   $: canceled = ['Terminated', 'TimedOut', 'Canceled'].includes(
-    $workflowRun.workflow?.status,
+    workflow?.status,
   );
 </script>
 
