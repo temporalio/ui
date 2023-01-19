@@ -5,7 +5,7 @@
 
   export let icon: IconName = null;
   export let classes: string = '';
-  export let type = 'button';
+  export let type: 'button' | 'submit' | 'reset' = 'button';
 </script>
 
 <button class="icon-button" on:click data-cy={$$props.dataCy} {type}>
