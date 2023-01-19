@@ -176,15 +176,14 @@
   }
 
   .row:hover {
-    @apply z-50 cursor-pointer bg-gray-50;
+    @apply z-50 cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100;
   }
 
   .expanded.row {
     @apply bg-blue-50;
   }
 
-  .failure,
-  .failure:hover {
+  .failure {
     @apply bg-red-50;
   }
 
@@ -192,8 +191,7 @@
     @apply text-red-700;
   }
 
-  .canceled,
-  .canceled:hover {
+  .canceled {
     @apply bg-yellow-50;
   }
 
@@ -201,8 +199,7 @@
     @apply text-yellow-700;
   }
 
-  .terminated,
-  .terminated:hover {
+  .terminated {
     @apply bg-pink-50;
   }
 
@@ -230,14 +227,17 @@
     @apply z-50 cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100;
   }
 
+  .canceled:hover,
   .active.canceled {
     @apply bg-gradient-to-br from-yellow-100 to-yellow-200;
   }
 
+  .failure:hover,
   .active.failure {
     @apply bg-gradient-to-br from-red-100 to-red-200;
   }
 
+  .terminated:hover,
   .active.terminated {
     @apply bg-gradient-to-br from-pink-100 to-pink-200;
   }
