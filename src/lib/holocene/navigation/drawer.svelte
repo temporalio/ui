@@ -6,12 +6,6 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { clickOutside } from '$lib/holocene/outside-click';
   import IconButton from '../icon-button.svelte';
-
-  const handleKeyUp = (event: KeyboardEvent) => {
-    if (event.key === 'Escape') {
-      onClose();
-    }
-  };
 </script>
 
 <div
