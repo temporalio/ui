@@ -82,7 +82,6 @@
     {
       component: DataEncoderStatus,
       name: 'Data Encoder',
-      onClick: () => ($showDataEncoderSettings = true),
     },
   ]}
 />
