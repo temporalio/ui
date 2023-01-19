@@ -27,14 +27,6 @@ export type PatchScheduleRequest =
   temporal.api.workflowservice.v1.IPatchScheduleRequest;
 export type UpdateScheduleRequest =
   temporal.api.workflowservice.v1.IUpdateScheduleRequest;
-export type FailActivityTaskRequest =
-  temporal.api.workflowservice.v1.IRespondActivityTaskFailedByIdRequest;
-export type FailActivityTaskResponse =
-  temporal.api.workflowservice.v1.IRespondActivityTaskFailedByIdResponse;
-export type CompleteActivityTaskRequest =
-  temporal.api.workflowservice.v1.IRespondActivityTaskCompletedByIdRequest;
-export type CompleteActivityTaskResponse =
-  temporal.api.workflowservice.v1.IRespondActivityTaskCompletedByIdResponse;
 
 // api.history
 
@@ -129,10 +121,6 @@ export type Severity = temporal.api.enums.v1.Severity;
 export type WorkflowTaskFailedCause =
   temporal.api.enums.v1.WorkflowTaskFailedCause;
 export type ArchivalState = temporal.api.enums.v1.ArchivalState;
-
-// api.failure
-
-export type ActivityFailure = temporal.api.failure.v1.Failure;
 
 // api.workflow
 
