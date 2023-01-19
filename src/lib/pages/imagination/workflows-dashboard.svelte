@@ -14,7 +14,10 @@
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
 
-  import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
+  import {
+    toListWorkflowFilters,
+    updateQueryParamsFromFilter,
+  } from '$lib/utilities/query/to-list-workflow-filters';
 
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
@@ -44,10 +47,12 @@
     fetchAllWorkflows,
     fetchPaginatedWorkflows,
     fetchStatusesWorkflowCount,
+    fetchStatusWorkflowCount,
   } from '$lib/services/workflow-service';
   import EmptyRow from './_empty-row.svelte';
   import Card from '$lib/holocene/card.svelte';
   import WorkflowsImagination from './workflows-imagination.svelte';
+  import StatusCard from './_status-card.svelte';
 
   export let bulkActionsEnabled: boolean = false;
   export let cancelEnabled: boolean = false;
@@ -267,47 +272,22 @@
   // For Imagination Pagination
 
   $: namespace = $page.params.namespace;
-  let activeStatus: WorkflowStatus = 'Running';
   let activeTotal = 0;
 
-  let runningTotal = 0;
-  let failedTotal = 0;
-  let terminatedTotal = 0;
-  let timedOutTotal = 0;
-  let canceledTotal = 0;
-  let completedTotal = 0;
-
-  onMount(async () => {
-    const {
-      runningCount,
-      failedCount,
-      terminatedCount,
-      timedOutCount,
-      canceledCount,
-      completedCount,
-    } = await fetchStatusesWorkflowCount(namespace);
-    runningTotal = runningCount;
-    failedTotal = failedCount;
-    terminatedTotal = terminatedCount;
-    timedOutTotal = timedOutCount;
-    canceledTotal = canceledCount;
-    completedTotal = completedCount;
-
-    activeTotal = runningCount;
-  });
-
-  const onWorkflowFetch = async (status: WorkflowStatus, pageSize = '10') => {
-    return async (_pageSize = 100, token) => {
-      const { workflows, nextPageToken, error } = await fetchPaginatedWorkflows(
-        namespace,
-        {
-          query: `ExecutionStatus="${status}"`,
-        },
-        token,
-        pageSize,
-      );
-      return { items: workflows, nextPageToken };
+  const onStatusClick = (status: WorkflowStatus, count: number) => {
+    const nonStatusFilters = $workflowFilters.filter(
+      (f) => f.attribute !== 'ExecutionStatus',
+    );
+    const statusFilter = {
+      attribute: 'ExecutionStatus',
+      value: status,
+      conditional: '=',
+      operator: '',
+      parenthesis: '',
     };
+    $workflowFilters = [statusFilter, ...nonStatusFilters];
+    updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
+    activeTotal = count;
   };
 </script>
 
@@ -364,71 +344,45 @@
   </div>
 </div>
 <div class="flex flex-row gap-4">
-  <Card class="w-auto text-center bg-blue-100">
-    <button
-      on:click={() => {
-        activeStatus = 'Running';
-        activeTotal = runningTotal;
-      }}
-    >
-      <h3>Running</h3>
-      <strong>{runningTotal}</strong>
-    </button>
+  <StatusCard
+    {namespace}
+    status="Running"
+    onClick={onStatusClick}
+    class="bg-blue-100"
+  />
+  <StatusCard
+    {namespace}
+    status="Failed"
+    onClick={onStatusClick}
+    class="bg-red-100"
+  />
+  <StatusCard
+    {namespace}
+    status="TimedOut"
+    onClick={onStatusClick}
+    class="bg-orange-100"
+  />
+  <StatusCard
+    {namespace}
+    status="Terminated"
+    onClick={onStatusClick}
+    class="bg-gray-100"
+  />
+  <StatusCard
+    {namespace}
+    status="Canceled"
+    onClick={onStatusClick}
+    class="bg-yellow-100"
+  />
+  <StatusCard
+    {namespace}
+    status="Completed"
+    onClick={onStatusClick}
+    class="bg-green-100"
+  />
+  <Card class="w-auto text-center">
+    <h3>In the Last</h3>
+    <WorkflowDateTimeFilter />
   </Card>
-  <Card class="w-auto text-center bg-red-100">
-    <button
-      on:click={() => {
-        activeStatus = 'Failed';
-        activeTotal = failedTotal;
-      }}
-    >
-      <h3>Failed</h3>
-      <strong>{failedTotal}</strong>
-    </button>
-  </Card>
-  <Card class="w-auto text-center bg-orange-100">
-    <button
-      on:click={() => {
-        activeStatus = 'TimedOut';
-        activeTotal = timedOutTotal;
-      }}
-    >
-      <h3>Timed Out</h3>
-      <strong>{timedOutTotal}</strong>
-    </button></Card
-  >
-  <Card class="w-auto text-center bg-gray-100">
-    <button
-      on:click={() => {
-        activeStatus = 'Terminated';
-        activeTotal = terminatedTotal;
-      }}
-    >
-      <h3>Terminated</h3>
-      <strong>{terminatedTotal}</strong>
-    </button></Card
-  >
-  <Card class="w-auto text-center bg-yellow-100">
-    <button
-      on:click={() => {
-        activeStatus = 'Canceled';
-        activeTotal = canceledTotal;
-      }}
-    >
-      <h3>Canceled</h3>
-      <strong>{canceledTotal}</strong>
-    </button></Card
-  >
-  <Card class="w-auto text-center bg-green-100">
-    <button
-      on:click={() => {
-        activeStatus = 'Completed';
-        activeTotal = completedTotal;
-      }}
-    >
-      <h3>Completed</h3>
-      <strong>{completedTotal}</strong>
-    </button></Card
-  >
 </div>
-<WorkflowsImagination {activeStatus} {activeTotal} />
+<WorkflowsImagination {activeTotal} />

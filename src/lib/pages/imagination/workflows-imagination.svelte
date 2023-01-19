@@ -33,6 +33,7 @@
   import EmptyRow from './_empty-row.svelte';
   import WorkflowsSummaryRowWithFilters from '$lib/components/workflow/workflows-summary-row-with-filters.svelte';
   import WorkflowsSummaryTableWithFilters from '$lib/components/workflow/workflows-summary-table-with-filters.svelte';
+  import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/list-workflow-query';
 
   export let bulkActionsEnabled: boolean = false;
   export let cancelEnabled: boolean = false;
@@ -250,17 +251,20 @@
   }
 
   // For Imagination Pagination
-  $: namespace = $page.params.namespace;
-
-  export let activeStatus: WorkflowStatus;
   export let activeTotal: number;
 
-  $: onWorkflowFetch = async (status) => {
+  $: namespace = $page.params.namespace;
+
+  const onWorkflowFetch = async () => {
     return async (pageSize = 100, token) => {
+      const query = toListWorkflowQueryFromFilters(
+        $workflowFilters,
+        $workflowSorts,
+      );
       const { workflows, nextPageToken, error } = await fetchPaginatedWorkflows(
         namespace,
         {
-          query: `ExecutionStatus="${status}"`,
+          query,
         },
         token,
         pageSize.toString(),
@@ -289,10 +293,10 @@
   on:confirm={cancelWorkflows}
 />
 
-{#key activeStatus}
+{#key query}
   <section>
     <ApiPagination
-      onFetch={() => onWorkflowFetch(activeStatus)}
+      onFetch={onWorkflowFetch}
       total={activeTotal}
       let:visibleItems
     >

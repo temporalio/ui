@@ -162,6 +162,32 @@ export const fetchStatusesWorkflowCount = async (
   };
 };
 
+export const fetchStatusWorkflowCount = async (
+  namespace: string,
+  status: WorkflowStatus,
+  request = fetch,
+): Promise<number> => {
+  let count = 0;
+  try {
+    const countRoute = await routeForApi('workflows.count', { namespace });
+    const statusPromise = (status: WorkflowStatus) =>
+      requestFromAPI<{ count: number }>(countRoute, {
+        params: { query: `ExecutionStatus="${status}"` },
+        onError: noop,
+        handleError: noop,
+        request,
+      });
+
+    const result = await statusPromise(status);
+    count = result?.count;
+  } catch (e) {
+    // Don't fail the workflows call due to count
+  }
+
+  return count;
+};
+
+
 export const fetchPaginatedWorkflows = async (
   namespace: string,
   parameters: ValidWorkflowParameters,
@@ -354,13 +380,13 @@ export async function signalWorkflow({
         input: {
           payloads: signalInput
             ? [
-                {
-                  metadata: {
-                    encoding: btoa('json/plain'),
-                  },
-                  data: btoa(stringifyWithBigInt(signalInput)),
+              {
+                metadata: {
+                  encoding: btoa('json/plain'),
                 },
-              ]
+                data: btoa(stringifyWithBigInt(signalInput)),
+              },
+            ]
             : null,
         },
       }),
