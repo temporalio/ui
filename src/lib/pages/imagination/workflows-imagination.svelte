@@ -80,7 +80,7 @@
   };
 </script>
 
-{#key [activeStatus, activeTotal, query, $refresh]}
+{#key [activeStatus, query, $refresh]}
   <section>
     <ApiPagination
       onFetch={onWorkflowFetch}

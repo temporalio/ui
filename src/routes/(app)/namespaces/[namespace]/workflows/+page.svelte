@@ -19,6 +19,7 @@
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
   import { workflowsSearch } from '$lib/stores/workflows';
 
+  $: namespace = $page.params.namespace;
   $: searchType = getSearchType($page.url);
   $: basicView = searchType === 'basic';
 
@@ -45,7 +46,7 @@
   url={$page.url.href}
 />
 
-{#key $page.params.namespace}
+{#key namespace}
   {#if basicView}
     <WorkflowsDashboard>
       <WorkflowsDashboardHeader onClick={() => updateSearchType('advanced')} />
