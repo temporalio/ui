@@ -194,7 +194,6 @@
         id: 'batch-cancel-success-toast',
       });
     } else {
-      cancelling = true;
       try {
         const jobId = await bulkCancelByIDs({
           namespace,
