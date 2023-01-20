@@ -12,8 +12,6 @@
   import { namespaces } from '$lib/stores/namespaces';
   import { toaster } from '$lib/stores/toaster';
 
-  let searchField: HTMLInputElement = null;
-
   $: namespaceNames = $namespaces.map(
     (namespace: Namespace) => namespace?.namespaceInfo?.name,
   );

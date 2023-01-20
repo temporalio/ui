@@ -72,7 +72,6 @@
   const canceled = eventOrGroupIsCanceled(event);
   const terminated = eventOrGroupIsTerminated(event);
 
-  let truncateWidth: number;
   workflowEventsColumnWidth.subscribe((value) => {
     if (value !== 0) truncateWidth = value;
   });
