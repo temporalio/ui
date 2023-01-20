@@ -44,22 +44,25 @@
   title={`Workflows | ${$page.params.namespace}`}
   url={$page.url.href}
 />
-{#if basicView}
-  <WorkflowsDashboard>
-    <WorkflowsDashboardHeader onClick={() => updateSearchType('advanced')} />
-  </WorkflowsDashboard>
-{:else}
-  <AdvancedVisibilityGuard>
-    <WorkflowsLiveFeed
-      bulkActionsEnabled={bulkActionsEnabled(
-        $page.data.settings,
-        $supportsAdvancedVisibility,
-      )}
-      cancelEnabled={workflowCancelEnabled($page.data.settings)}
-      terminateEnabled={workflowTerminateEnabled($page.data.settings)}
-    >
-      <WorkflowsLiveFeedHeader onClick={() => updateSearchType('basic')} />
-    </WorkflowsLiveFeed>
-    <Workflows slot="fallback" />
-  </AdvancedVisibilityGuard>
-{/if}
+
+{#key $page.params.namespace}
+  {#if basicView}
+    <WorkflowsDashboard>
+      <WorkflowsDashboardHeader onClick={() => updateSearchType('advanced')} />
+    </WorkflowsDashboard>
+  {:else}
+    <AdvancedVisibilityGuard>
+      <WorkflowsLiveFeed
+        bulkActionsEnabled={bulkActionsEnabled(
+          $page.data.settings,
+          $supportsAdvancedVisibility,
+        )}
+        cancelEnabled={workflowCancelEnabled($page.data.settings)}
+        terminateEnabled={workflowTerminateEnabled($page.data.settings)}
+      >
+        <WorkflowsLiveFeedHeader onClick={() => updateSearchType('basic')} />
+      </WorkflowsLiveFeed>
+      <Workflows slot="fallback" />
+    </AdvancedVisibilityGuard>
+  {/if}
+{/key}

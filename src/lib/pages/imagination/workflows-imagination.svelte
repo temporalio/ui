@@ -2,7 +2,11 @@
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import { timeFormat } from '$lib/stores/time-format';
-  import { workflowError, workflowsQuery } from '$lib/stores/workflows';
+  import {
+    workflowError,
+    workflowsQuery,
+    refresh,
+  } from '$lib/stores/workflows';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
 
@@ -76,7 +80,7 @@
   };
 </script>
 
-{#key [activeStatus, activeTotal, query]}
+{#key [activeStatus, activeTotal, query, $refresh]}
   <section>
     <ApiPagination
       onFetch={onWorkflowFetch}

@@ -186,7 +186,7 @@
     </nav>
   </div>
   {#if $store.loading}
-    <SkeletonTable rows={15} />
+    <SkeletonTable rows={5} />
   {:else if isEmpty}
     <slot name="empty">No Items</slot>
   {:else}

@@ -81,6 +81,7 @@
       'Completed',
       $workflowFilters,
     );
+    activeTotal = totals.Running.count;
   };
 
   $: query, $refresh, fetchStatusCounts();
