@@ -11,7 +11,18 @@
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { workflowsQuery } from '$lib/stores/workflows';
 
+  export let searchAttributePreset = '';
+  export let clearSearchAttributePreset: () => void;
+
   let manualSearchString = '';
+
+  $: {
+    const input = document.getElementById('manual-search');
+    if (searchAttributePreset && input) {
+      manualSearchString = searchAttributePreset;
+      input.focus();
+    }
+  }
 
   $: query = $page.url.searchParams.get('query');
 
@@ -44,6 +55,7 @@
 
   function handleClearInput() {
     onSearch();
+    clearSearchAttributePreset();
   }
 </script>
 

@@ -47,10 +47,6 @@
       refreshInterval = setInterval(() => ($refresh = Date.now()), 5000);
     }
   };
-
-  const refreshWorkflows = () => {
-    $refresh = Date.now();
-  };
 </script>
 
 <PageTitle

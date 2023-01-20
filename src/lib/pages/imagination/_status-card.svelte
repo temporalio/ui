@@ -4,15 +4,11 @@
 
   export let status: WorkflowStatus;
   export let count: number = 0;
-  export let onClick: (status: WorkflowStatus, count: number) => void;
+  export let onClick: (status: WorkflowStatus) => void;
   export let active: boolean = false;
 </script>
 
-<button
-  class="flex items-center"
-  class:active
-  on:click={() => onClick(status, count)}
->
+<button class="flex items-center" class:active on:click={() => onClick(status)}>
   <Card class="card">
     <h3 class="my-1 text-xl">{count.toLocaleString()}</h3>
     <StatusBadge {status} />
@@ -23,8 +19,10 @@
   .card {
     @apply h-full w-auto text-center;
   }
+
   .active :global(.card) {
     @apply -translate-y-1 bg-gradient-to-br from-blue-100 to-purple-100 duration-300 ease-in;
-    box-shadow: 5px 5px #18181b, 5px 5px 0px 3px #18181b;
+
+    box-shadow: 5px 5px #18181b, 5px 5px 0 3px #18181b;
   }
 </style>

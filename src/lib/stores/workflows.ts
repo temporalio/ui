@@ -1,10 +1,7 @@
 import { derived, readable, writable } from 'svelte/store';
 import { page } from '$app/stores';
 
-import {
-  fetchAllWorkflows,
-  fetchWorkflowCount,
-} from '$lib/services/workflow-service';
+import { fetchWorkflowCount } from '$lib/services/workflow-service';
 import { withLoading } from '$lib/utilities/stores/with-loading';
 
 import type { StartStopNotifier } from 'svelte/store';
@@ -41,20 +38,9 @@ const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
       const { query, searchView } = searchParams;
       if (searchView === 'advanced') {
         withLoading(loading, updating, async () => {
-          const { workflows, error } = await fetchAllWorkflows(namespace, {
-            query,
-          });
-          set(workflows);
-
           if (supportsAdvancedVisibility) {
             const workflowCount = await fetchWorkflowCount(namespace, query);
             setCounts(workflowCount);
-          }
-
-          if (error) {
-            workflowError.set(error);
-          } else {
-            workflowError.set('');
           }
         });
       }

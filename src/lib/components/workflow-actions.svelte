@@ -9,7 +9,6 @@
 
   import Modal from '$lib/holocene/modal.svelte';
   import { coreUserStore } from '$lib/stores/core-user';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
   import SplitButton from '$lib/holocene/split-button.svelte';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import { cancelWorkflow } from '$lib/services/workflow-service';

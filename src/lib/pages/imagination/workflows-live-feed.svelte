@@ -17,7 +17,6 @@
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
 
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import Pagination from '$lib/holocene/pagination.svelte';
   import WorkflowsSummaryTableWithFilters from '$lib/components/workflow/workflows-summary-table-with-filters.svelte';
   import WorkflowsSummaryRowWithFilters from '$lib/components/workflow/workflows-summary-row-with-filters.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
@@ -35,6 +34,7 @@
   import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
   import ApiPagination from '$lib/holocene/api-pagination.svelte';
   import { fetchPaginatedWorkflows } from '$lib/services/workflow-service';
+  import WorkflowsLiveFeedAdvancedSearch from './workflows-live-feed-advanced-search.svelte';
 
   export let bulkActionsEnabled: boolean = false;
   export let cancelEnabled: boolean = false;
@@ -262,8 +262,21 @@
         token,
         pageSize.toString(),
       );
+      if (error) {
+        $workflowError = error;
+      } else {
+        $workflowError = '';
+      }
       return { items: workflows, nextPageToken };
     };
+  };
+
+  let searchAttributePreset = '';
+  const setAdvancedSearchPreset = (searchAttribute: string) => {
+    searchAttributePreset = `${searchAttribute}=`;
+  };
+  const clearSearchAttributePreset = () => {
+    searchAttributePreset = '';
   };
 </script>
 
@@ -288,6 +301,7 @@
 
 <section>
   <slot />
+  <WorkflowsLiveFeedAdvancedSearch onClick={setAdvancedSearchPreset} />
   {#key query}
     <ApiPagination
       onFetch={onWorkflowFetch}
@@ -295,7 +309,10 @@
       let:visibleItems
     >
       <svelte:fragment slot="action-top-left">
-        <WorkflowAdvancedSearch />
+        <WorkflowAdvancedSearch
+          {searchAttributePreset}
+          {clearSearchAttributePreset}
+        />
       </svelte:fragment>
       <svelte:fragment slot="action-top-center">
         <WorkflowDateTimeFilter />
@@ -357,12 +374,41 @@
           </tr>
         {/each}
       </WorkflowsSummaryTableWithFilters>
+      <WorkflowsSummaryTableWithFilters
+        slot="empty"
+        {bulkActionsEnabled}
+        {cancelEnabled}
+        {terminateEnabled}
+        updating={$updating}
+        visibleWorkflows={visibleItems}
+        {selectedWorkflowsCount}
+        filteredWorkflowCount={query
+          ? filteredWorkflowCount
+          : totalWorkflowCount}
+        {allSelected}
+        {pageSelected}
+        on:terminateWorkflows={handleBatchTerminate}
+        on:cancelWorkflows={handleBatchCancel}
+        on:toggleAll={handleToggleAll}
+        on:togglePage={handleTogglePage}
+      >
+        <tr>
+          <td colspan={bulkActionsEnabled ? 6 : 5} class="xl:hidden">
+            <EmptyState
+              title="No Workflows Found"
+              content={errorMessage}
+              error={$workflowError}
+            />
+          </td>
+          <td colspan={bulkActionsEnabled ? 8 : 7} class="hidden xl:table-cell">
+            <EmptyState
+              title="No Workflows Found"
+              content={errorMessage}
+              error={$workflowError}
+            />
+          </td>
+        </tr>
+      </WorkflowsSummaryTableWithFilters>
     </ApiPagination>
-    <EmptyState
-      slot="empty"
-      title="No Workflows Found"
-      content={errorMessage}
-      error={$workflowError}
-    />
   {/key}
 </section>

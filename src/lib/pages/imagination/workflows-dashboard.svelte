@@ -39,48 +39,44 @@
     }
   });
 
-  const refreshWorkflows = () => {
-    $refresh = Date.now();
-  };
-
   let totals = {
-    running: { count: 0, color: '#93c5fd' },
-    failed: { count: 0, color: '#fca5a5' },
-    timedOut: { count: 0, color: '#fdba74' },
-    canceled: { count: 0, color: '#fde047' },
-    terminated: { count: 0, color: '#d4d4d8' },
-    completed: { count: 0, color: '#86efac' },
+    Running: { count: 0, color: '#93c5fd' },
+    Failed: { count: 0, color: '#fca5a5' },
+    TimedOut: { count: 0, color: '#fdba74' },
+    Canceled: { count: 0, color: '#fde047' },
+    Terminated: { count: 0, color: '#d4d4d8' },
+    Completed: { count: 0, color: '#86efac' },
   };
 
   $: namespace = $page.params.namespace;
 
   const fetchStatusCounts = async () => {
-    totals.running.count = await fetchStatusWorkflowCount(
+    totals.Running.count = await fetchStatusWorkflowCount(
       namespace,
       'Running',
       $workflowFilters,
     );
-    totals.failed.count = await fetchStatusWorkflowCount(
+    totals.Failed.count = await fetchStatusWorkflowCount(
       namespace,
       'Failed',
       $workflowFilters,
     );
-    totals.timedOut.count = await fetchStatusWorkflowCount(
+    totals.TimedOut.count = await fetchStatusWorkflowCount(
       namespace,
       'TimedOut',
       $workflowFilters,
     );
-    totals.canceled.count = await fetchStatusWorkflowCount(
+    totals.Canceled.count = await fetchStatusWorkflowCount(
       namespace,
       'Canceled',
       $workflowFilters,
     );
-    totals.terminated.count = await fetchStatusWorkflowCount(
+    totals.Terminated.count = await fetchStatusWorkflowCount(
       namespace,
       'Terminated',
       $workflowFilters,
     );
-    totals.completed.count = await fetchStatusWorkflowCount(
+    totals.Completed.count = await fetchStatusWorkflowCount(
       namespace,
       'Completed',
       $workflowFilters,
@@ -94,9 +90,14 @@
   let activeTotal: number = 0;
   let activeStatus: WorkflowStatus = 'Running';
 
-  const onStatusClick = (status: WorkflowStatus, count: number) => {
+  const onStatusClick = async (status: WorkflowStatus) => {
     activeStatus = status;
-    activeTotal = count;
+    totals[status].count = await fetchStatusWorkflowCount(
+      namespace,
+      status,
+      $workflowFilters,
+    );
+    activeTotal = totals[status].count;
   };
 </script>
 
@@ -109,37 +110,37 @@
       {/key}
     </Card>
     <StatusCard
-      count={totals.running.count}
+      count={totals.Running.count}
       status="Running"
       onClick={onStatusClick}
       active={activeStatus === 'Running'}
     />
     <StatusCard
-      count={totals.failed.count}
+      count={totals.Failed.count}
       status="Failed"
       onClick={onStatusClick}
       active={activeStatus === 'Failed'}
     />
     <StatusCard
-      count={totals.timedOut.count}
+      count={totals.TimedOut.count}
       status="TimedOut"
       onClick={onStatusClick}
       active={activeStatus === 'TimedOut'}
     />
     <StatusCard
-      count={totals.terminated.count}
+      count={totals.Terminated.count}
       status="Terminated"
       onClick={onStatusClick}
       active={activeStatus === 'Terminated'}
     />
     <StatusCard
-      count={totals.canceled.count}
+      count={totals.Canceled.count}
       status="Canceled"
       onClick={onStatusClick}
       active={activeStatus === 'Canceled'}
     />
     <StatusCard
-      count={totals.completed.count}
+      count={totals.Completed.count}
       status="Completed"
       onClick={onStatusClick}
       active={activeStatus === 'Completed'}
