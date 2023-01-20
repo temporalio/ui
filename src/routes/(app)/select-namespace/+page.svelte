@@ -53,7 +53,6 @@
       placeholder="Search"
       on:keydown|stopPropagation
       bind:value={searchValue}
-      bind:this={searchField}
     />
   </div>
   <ul class="h-screen w-full">
