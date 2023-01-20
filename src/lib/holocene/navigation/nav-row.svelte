@@ -8,30 +8,28 @@
   let classes = `nav-row ${$$props.class} ${isCloud ? 'cloud' : 'local'}`;
 </script>
 
-{#if handleClick !== null}
-  <button on:click={handleClick} class="{classes} text-left">
-    <slot />
-  </button>
-{:else}
-  <li
-    class={link ? '' : classes}
-    class:noFilter
-    class:wrap
-    data-cy={$$props['data-cy']}
-  >
-    {#if link && externalLink}
-      <a href={link} rel="noreferrer" target="_blank" class={classes}>
-        <slot />
-      </a>
-    {:else if link}
-      <a href={link} class={classes}>
-        <slot />
-      </a>
-    {:else}
+<li
+  class={link ? '' : classes}
+  class:noFilter
+  class:wrap
+  data-cy={$$props['data-cy']}
+>
+  {#if handleClick !== null}
+    <button on:click={handleClick} class="{classes} text-left">
       <slot />
-    {/if}
-  </li>
-{/if}
+    </button>
+  {:else if link && externalLink}
+    <a href={link} rel="noreferrer" target="_blank" class={classes}>
+      <slot />
+    </a>
+  {:else if link}
+    <a href={link} class={classes}>
+      <slot />
+    </a>
+  {:else}
+    <slot />
+  {/if}
+</li>
 
 <style lang="postcss">
   .nav-row {

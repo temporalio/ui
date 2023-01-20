@@ -14,7 +14,6 @@
   import Navigation from '$lib/holocene/navigation/full-nav.svelte';
   import DataEncoderStatus from '$lib/holocene/data-encoder-status.svelte';
   import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
-  import { showDataEncoderSettings } from '$lib/stores/show-data-encoder';
   import { clearAuthUser } from '$lib/stores/auth-user';
   import { workflowSorts, workflowFilters } from '$lib/stores/filters';
 
