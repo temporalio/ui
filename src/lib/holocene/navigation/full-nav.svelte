@@ -144,12 +144,12 @@
           </NavTooltip>
           <div class="nav-title cursor-pointer">Logout</div>
         </NavRow>
-        <div class="profile-row">
+        <li class="profile-row">
           <div>
             {#if user?.picture}
               <img
                 src={user?.picture}
-                alt={user?.profile}
+                alt={user?.profile ?? 'user profile'}
                 class="rounded-md p-1 w-8 h-8"
                 on:error={fixImage}
                 class:hidden={!showProfilePic}
@@ -171,7 +171,7 @@
               {user?.name}
             {/if}
           </div>
-        </div>
+        </li>
       {/if}
     {/await}
   </svelte:fragment>
