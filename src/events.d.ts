@@ -214,3 +214,12 @@ type ExternalWorkflowExecutionSignaledEvent =
   EventWithAttributes<'externalWorkflowExecutionSignaledEventAttributes'>;
 type UpsertWorkflowSearchAttributesEvent =
   EventWithAttributes<'upsertWorkflowSearchAttributesEventAttributes'>;
+
+type FailActivityTaskRequest =
+  import('$types').IRespondActivityTaskFailedByIdRequest;
+type FailActivityTaskResponse =
+  import('$types').IRespondActivityTaskFailedByIdResponse;
+type CompleteActivityTaskRequest =
+  import('$types').IRespondActivityTaskCompletedByIdRequest;
+type CompleteActivityTaskResponse =
+  import('$types').IRespondActivityTaskCompletedByIdResponse;

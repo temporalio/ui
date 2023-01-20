@@ -55,6 +55,7 @@
     class="w-full"
     placeholder="Search"
     use:rootDocumentHandler
+    on:keydown|stopPropagation
     bind:value={searchValue}
     bind:this={searchField}
   />

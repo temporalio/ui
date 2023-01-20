@@ -53,6 +53,7 @@
     <input
       class="w-full"
       placeholder="Search"
+      on:keydown|stopPropagation
       bind:value={searchValue}
       bind:this={searchField}
     />

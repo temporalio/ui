@@ -11,3 +11,4 @@ node_modules
 /.vercel
 /.histoire/*
 /build-local
+/.history

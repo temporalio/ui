@@ -1,10 +1,8 @@
+import { has } from './has';
+
 export function isNetworkError(
   error: unknown | NetworkError,
 ): error is NetworkError {
-  const networkErr = error as NetworkError;
-  return (
-    networkErr?.statusCode !== undefined &&
-    networkErr?.statusText !== undefined &&
-    networkErr?.response !== undefined
-  );
+  if (!error) return false;
+  return has(error, 'statusCode', 'statusText', 'response');
 }

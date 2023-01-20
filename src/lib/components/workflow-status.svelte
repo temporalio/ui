@@ -62,7 +62,7 @@
   }
 
   .gray {
-    @apply bg-gray-100 text-gray-900;
+    @apply bg-gray-200 text-gray-900;
   }
 
   .orange {
