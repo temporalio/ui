@@ -6,13 +6,18 @@
 
   export let isCloud = false;
   export let linkList: Partial<Record<string, string>>;
+  export let ariaLabel = 'primary';
 
   function toggleNav() {
     $navOpen = !$navOpen;
   }
 </script>
 
-<nav class="nav-header transition-width " data-cy="navigation-header">
+<nav
+  class="nav-header transition-width "
+  data-cy="navigation-header"
+  aria-label={ariaLabel}
+>
   <div
     class="nav-wrapper transition-width"
     class:cloud={isCloud}
