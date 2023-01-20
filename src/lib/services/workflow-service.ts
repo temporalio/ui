@@ -286,6 +286,7 @@ export async function resetWorkflow({
     },
     workflowTaskFinishEventId: eventId,
     requestId: v4(),
+    reason: 'reset from UI',
     resetReapplyType: 2,
   };
 

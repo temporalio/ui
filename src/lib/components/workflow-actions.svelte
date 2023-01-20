@@ -141,12 +141,6 @@
   };
 
   const reset = async (type: ResetType) => {
-    if (workflow.pendingChildren.length > 0) {
-      toaster.push({
-        message: 'Cannot reset a workflow with pending children.',
-      });
-      return;
-    }
     let eventId: string;
     switch (type) {
       case ResetType.FirstWorkflowTask:
@@ -182,16 +176,16 @@
 
   $: workflowActions = [
     {
-      label: 'Reset first workflow task',
+      label: 'Reset to first workflow task',
       onClick: () => reset(ResetType.FirstWorkflowTask),
       dataCy: 'reset-first-task-button',
-      allowed: resetEnabled,
+      allowed: resetEnabled && workflow?.pendingChildren?.length === 0,
     },
     {
-      label: 'Reset last workflow task',
+      label: 'Reset to last workflow task',
       onClick: () => reset(ResetType.LastWorkflowTask),
       dataCy: 'reset-last-task-button',
-      allowed: resetEnabled,
+      allowed: resetEnabled && workflow?.pendingChildren?.length === 0,
     },
     {
       label: 'Send a Signal',
