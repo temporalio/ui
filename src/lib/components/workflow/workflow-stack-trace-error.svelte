@@ -1,11 +1,9 @@
 <script lang="ts">
   import EmptyState from '$lib/holocene/empty-state.svelte';
 
-  import type { GetPollersResponse } from '$lib/services/pollers-service';
+  import { workflowRun } from '$lib/stores/workflow-run';
 
-  export let workflow: WorkflowExecution;
-  export let workers: GetPollersResponse;
-
+  $: ({ workflow, workers } = $workflowRun);
   $: runningWithNoWorkers = workflow.isRunning && !workers?.pollers?.length;
 </script>
 
@@ -22,6 +20,6 @@
 
 <style lang="postcss">
   .stack-trace {
-    @apply relative flex w-full flex-col rounded-lg border-2 border-yellow-700 bg-yellow-50 p-4 text-yellow-900;
+    @apply relative flex w-full flex-col rounded-xl border-[3px] border-yellow-700 bg-yellow-50 p-4 text-yellow-900;
   }
 </style>

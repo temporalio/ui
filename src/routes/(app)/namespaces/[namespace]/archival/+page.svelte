@@ -52,7 +52,7 @@
   <p>
     For more details, please check out <a
       class="text-blue-700 underline"
-      href="https://docs.temporal.io/server/archive-data/"
+      href="https://docs.temporal.io/clusters#archival"
       target="_blank">Archival documentation</a
     >.
   </p>
@@ -77,7 +77,7 @@
   <p>
     For more details, please check out <a
       class="text-blue-700 underline"
-      href="https://docs.temporal.io/server/archive-data/"
+      href="https://docs.temporal.io/clusters#archival"
       target="_blank">Archival documentation</a
     >.
   </p>

@@ -17,12 +17,12 @@
 
   const colors = {
     Running: 'blue',
-    TimedOut: 'red',
+    TimedOut: 'orange',
     Completed: 'green',
     Failed: 'red',
-    ContinuedAsNew: 'indigo',
+    ContinuedAsNew: 'purple',
     Canceled: 'yellow',
-    Terminated: 'pink',
+    Terminated: 'gray',
     Paused: 'yellow',
   };
 
@@ -57,15 +57,15 @@
     @apply bg-red-100 text-red-700;
   }
 
-  .indigo {
-    @apply bg-indigo-100 text-indigo-700;
-  }
-
   .purple {
-    @apply bg-purple-100 text-purple-700;
+    @apply bg-purple-100 text-purple-900;
   }
 
-  .pink {
-    @apply bg-pink-100 text-pink-700;
+  .gray {
+    @apply bg-gray-200 text-gray-900;
+  }
+
+  .orange {
+    @apply bg-orange-100 text-orange-900;
   }
 </style>

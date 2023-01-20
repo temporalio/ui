@@ -31,7 +31,7 @@
 
 <style lang="postcss">
   .drawer {
-    @apply fixed bottom-0 left-0 right-0 z-[55] h-1/3 rounded-t-lg bg-gray-900 text-gray-100 shadow-xl;
+    @apply fixed bottom-0 left-0 right-0 z-[55] h-auto rounded-t-lg bg-gray-900 text-gray-100 shadow-xl;
   }
 
   .title {

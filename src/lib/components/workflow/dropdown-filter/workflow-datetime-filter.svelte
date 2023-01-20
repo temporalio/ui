@@ -255,7 +255,7 @@
     </div>
   </Select>
   <SimpleSplitButton
-    class="rounded-tr rounded-br bg-offWhite"
+    class="rounded-tr rounded-br bg-white"
     buttonClass="border border-gray-900"
     id="datetime"
     label={capitalize($timeFormat)}

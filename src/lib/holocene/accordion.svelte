@@ -14,6 +14,7 @@
     disabled?: boolean;
     readOnly?: boolean;
     error?: string;
+    onToggle?: () => void;
   }
 
   export let title: string;
@@ -24,6 +25,7 @@
   export let disabled = false;
   export let readOnly = false;
   export let error = '';
+  export let onToggle = () => {};
 
   let className = '';
   export { className as class };
@@ -33,18 +35,19 @@
   const toggleAccordion = () => {
     if (disabled || readOnly) return;
     open = !open;
+    onToggle();
   };
 </script>
 
 <div
-  class="flex w-full cursor-default flex-col rounded-lg border border-gray-300 bg-white p-8 text-primary {className}"
+  class="flex w-full cursor-default flex-col rounded-xl border-[3px] border-gray-900 bg-white p-4 text-primary {className}"
   {...$$restProps}
 >
   <button
     id="{id}-trigger"
     aria-expanded={open}
     aria-controls="{id}-content"
-    class="accordion-open flex w-full flex-col"
+    class="flex w-full flex-col"
     disabled={disabled || readOnly}
     type="button"
     on:click={toggleAccordion}
@@ -53,6 +56,7 @@
       <h2 class="flex w-full items-center gap-2 text-lg font-medium">
         {#if icon}<Icon name={icon} />{/if}
         {title}
+        <slot name="summary" />
       </h2>
       <div class="mr-1" on:click|stopPropagation on:keyup|stopPropagation>
         <slot name="action" />
@@ -60,7 +64,9 @@
       {#if !readOnly}
         <Icon
           name={open ? 'chevron-up' : 'chevron-down'}
-          class={disabled ? 'text-gray-500' : 'text-primary'}
+          class="rounded-full from-blue-100 to-purple-100 hover:bg-gradient-to-br {disabled
+            ? 'text-gray-500'
+            : 'text-primary'}"
         />
       {/if}
     </div>

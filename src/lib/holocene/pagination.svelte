@@ -12,7 +12,7 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
   import { getFloatStyle } from '$lib/utilities/get-float-style';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Skeleton from '$lib/holocene/skeleton/index.svelte';
 
   type T = $$Generic;
 
@@ -21,6 +21,7 @@
   export let startingIndex: string | number = 0;
   export let currentPageKey = 'page';
   export let itemsPerPage: number | null = null;
+  export let updating: boolean = false;
 
   $: perPage =
     itemsPerPage !== null
@@ -76,9 +77,42 @@
   };
 
   $: floatStyle = getFloatStyle({ width, height, screenWidth });
+
+  async function handleKeydown(event: KeyboardEvent) {
+    switch (event.code) {
+      case 'ArrowRight':
+      case 'KeyL':
+        if ($store.hasNext) {
+          store.next();
+          handlePageChange();
+        }
+        break;
+      case 'ArrowLeft':
+      case 'KeyH':
+        if ($store.hasPrevious) {
+          store.previous();
+          handlePageChange();
+        }
+        break;
+      case 'ArrowUp':
+      case 'KeyK':
+        store.previousRow();
+        break;
+      case 'ArrowDown':
+      case 'KeyJ':
+        store.nextRow();
+        break;
+      default:
+        break;
+    }
+  }
 </script>
 
-<svelte:window bind:innerWidth={screenWidth} on:resize={updateWidth} />
+<svelte:window
+  bind:innerWidth={screenWidth}
+  on:resize={updateWidth}
+  on:keydown={handleKeydown}
+/>
 
 <div class="pagination relative mb-8 flex flex-col gap-4">
   <div
@@ -101,7 +135,7 @@
           {options}
         />
       {/if}
-      <div class="flex items-center justify-center gap-1">
+      <div class="flex items-center justify-center gap-3">
         <button
           class="caret"
           disabled={!$store.hasPrevious}
@@ -110,11 +144,18 @@
             handlePageChange();
           }}
         >
-          <Icon name="chevron-left" />
+          <span
+            class="arrow arrow-left"
+            class:arrow-left-disabled={!$store.hasPrevious}
+          />
         </button>
         <p>
-          {$store.length ? $store.startingIndex + 1 : 0}–{$store.endingIndex +
-            1} of {$store.length}
+          {#if updating}
+            <Skeleton class="block h-5 w-24" />
+          {:else}
+            {$store.length ? $store.startingIndex + 1 : 0}–{$store.endingIndex +
+              1} of {$store.length}
+          {/if}
         </p>
         <button
           class="caret"
@@ -124,13 +165,21 @@
             handlePageChange();
           }}
         >
-          <Icon name="chevron-right" />
+          <span
+            class="arrow arrow-right"
+            class:arrow-right-disabled={!$store.hasNext}
+          />
         </button>
       </div>
       <slot name="action-top-right" />
     </nav>
   </div>
-  <slot visibleItems={$store.items} initialItem={$store.initialItem} />
+  <slot
+    visibleItems={$store.items}
+    initialItem={$store.initialItem}
+    activeRowIndex={$store.activeRowIndex}
+    setActiveRowIndex={store.setActiveRowIndex}
+  />
   <nav
     class={`flex ${
       $$slots['action-bottom-left'] ? 'justify-between' : 'justify-end'
@@ -146,24 +195,34 @@
           {options}
         />
       {/if}
-      <div class="flex items-center justify-center gap-1">
+      <div class="flex items-center justify-center gap-3">
         <button
           class="caret"
           disabled={!$store.hasPrevious}
           on:click={() => store.previous()}
         >
-          <Icon name="chevron-left" />
+          <span
+            class="arrow arrow-left"
+            class:arrow-left-disabled={!$store.hasPrevious}
+          />
         </button>
         <p>
-          {$store.length ? $store.startingIndex + 1 : 0}–{$store.endingIndex +
-            1} of {$store.length}
+          {#if updating}
+            <Skeleton class="block h-5 w-24" />
+          {:else}
+            {$store.length ? $store.startingIndex + 1 : 0}–{$store.endingIndex +
+              1} of {$store.length}
+          {/if}
         </p>
         <button
           class="caret"
           disabled={!$store.hasNext}
           on:click={() => store.next()}
         >
-          <Icon name="chevron-right" />
+          <span
+            class="arrow arrow-right"
+            class:arrow-right-disabled={!$store.hasNext}
+          />
         </button>
       </div>
       <slot name="action-bottom-right" />
@@ -173,10 +232,38 @@
 
 <style lang="postcss">
   .caret {
-    @apply text-gray-500;
+    @apply relative;
+
+    width: 12px;
+    height: 12px;
   }
 
   .caret:disabled {
-    @apply cursor-not-allowed text-gray-300;
+    @apply cursor-not-allowed text-gray-400;
+  }
+
+  .arrow {
+    @apply absolute top-0 left-0 h-0 w-0;
+
+    border-style: solid;
+    border-width: 6px 12px 6px 0;
+  }
+
+  .arrow-left {
+    border-width: 6px 12px 6px 0;
+    border-color: transparent #18181b transparent transparent;
+  }
+
+  .arrow-left-disabled {
+    border-color: transparent #d4d4d8 transparent transparent;
+  }
+
+  .arrow-right {
+    border-width: 6px 0 6px 12px;
+    border-color: transparent transparent transparent #18181b;
+  }
+
+  .arrow-right-disabled {
+    border-color: transparent transparent transparent #d4d4d8;
   }
 </style>

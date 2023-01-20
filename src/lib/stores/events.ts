@@ -1,33 +1,16 @@
-import {
-  derived,
-  readable,
-  writable,
-  get,
-  type Readable,
-  type Writable,
-  type StartStopNotifier,
-} from 'svelte/store';
+import { derived, writable, type Readable } from 'svelte/store';
 
 import { page } from '$app/stores';
 
-import {
-  fetchStartAndEndEvents,
-  getPaginatedEvents,
-  type FetchEventsParameters,
-  type FetchEventsParametersWithSettings,
+import type {
+  FetchEventsParameters,
+  FetchEventsParametersWithSettings,
 } from '$lib/services/events-service';
 
-import {
-  eventFilterSort,
-  eventSortOrder,
-  eventViewType,
-  supportsReverseOrder,
-} from './event-view';
+import { eventFilterSort } from './event-view';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
-import { withLoading, delay } from '$lib/utilities/stores/with-loading';
 import { refresh } from '$lib/stores/workflow-run';
 import { authUser } from '$lib/stores/auth-user';
-import { previous } from '$lib/stores/previous-events';
 
 const namespace = derived([page], ([$page]) => {
   if ($page.params.namespace) {
@@ -57,32 +40,8 @@ const accessToken = derived(
   ([$authUser]) => $authUser?.accessToken,
 );
 
-const isNewRequest = (
-  params: FetchEventsParameters,
-  previous: Writable<FetchEventsParameters>,
-): boolean => {
-  for (const required of ['namespace', 'workflowId', 'runId']) {
-    if (!params[required]) return false;
-  }
-
-  let matchedPrevious = true;
-  const previousParameters = get(previous);
-  for (const key of Object.keys(previousParameters)) {
-    if (previousParameters[key] !== params[key]) {
-      matchedPrevious = false;
-      break;
-    }
-  }
-
-  if (matchedPrevious) return false;
-
-  previous.set(params);
-
-  return true;
-};
-
 export const parameters: Readable<FetchEventsParameters> = derived(
-  [namespace, workflowId, runId, eventSortOrder],
+  [namespace, workflowId, runId, eventFilterSort],
   ([$namespace, $workflowId, $runId, $sort]) => {
     return {
       namespace: $namespace,
@@ -110,65 +69,13 @@ export const parametersWithSettings: Readable<FetchEventsParametersWithSettings>
 export type StartAndEndEventHistory = {
   start: WorkflowEvents;
   end: WorkflowEvents;
-  total: number;
 };
 
-const getTotalFromEndOfHistory = (endHistory: WorkflowEvents) => {
-  const endingId = endHistory[0]?.id;
-  if (!endingId || isNaN(parseInt(endingId))) return 0;
-  return parseInt(endingId);
+export const initialEventHistory: StartAndEndEventHistory = {
+  start: [],
+  end: [],
 };
 
-export const updateEventHistory: StartStopNotifier<StartAndEndEventHistory> = (
-  set,
-) => {
-  return parametersWithSettings.subscribe(async (params) => {
-    const { settings: _, ...rest } = params;
-    if (isNewRequest(rest, previous)) {
-      withLoading(loading, updating, async () => {
-        const events = await fetchStartAndEndEvents(params);
-        if (events?.start && events?.end) {
-          const total = getTotalFromEndOfHistory(events.end);
-          set({ ...events, total });
-        } else {
-          setTimeout(() => {
-            set({ ...events, total: 0 });
-          }, delay);
-        }
-      });
-    }
-  });
-};
-
-export const eventHistory = readable<StartAndEndEventHistory>(
-  { start: [], end: [], total: 0 },
-  updateEventHistory,
-);
-
+export const eventHistory =
+  writable<StartAndEndEventHistory>(initialEventHistory);
 export const timelineEvents = writable(null);
-export const updating = writable(true);
-export const loading = writable(true);
-export const activeEvent = writable(null);
-
-export const fetchPaginatedEvents = derived(
-  [page, eventFilterSort, eventViewType, authUser, supportsReverseOrder],
-  async ([
-    $page,
-    $eventFilterSort,
-    $eventViewType,
-    $authUser,
-    $supportsReverseOrder,
-  ]) => {
-    return getPaginatedEvents({
-      namespace: $page.params.namespace,
-      workflowId: $page.params.workflow,
-      runId: $page.params.run,
-      sort: $eventFilterSort,
-      category: $page.url.searchParams.get('category'),
-      compact: $eventViewType === 'compact',
-      settings: $page.data?.settings,
-      accessToken: $authUser?.accessToken,
-      supportsReverseOrder: $supportsReverseOrder,
-    });
-  },
-);

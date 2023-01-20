@@ -20,6 +20,7 @@
   on:change
   on:focus
   on:blur
+  on:keydown|stopPropagation
 />
 <div class="error-msg" aria-live={isValid ? 'off' : 'assertive'}>
   {#if !isValid}

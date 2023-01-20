@@ -13,7 +13,7 @@
   import { authUser } from '$lib/stores/auth-user';
 
   const { namespace } = $page.params;
-  const { workflow, workers } = $workflowRun;
+  $: ({ workflow, workers } = $workflowRun);
 
   let currentdate = new Date();
   let isLoading = false;
@@ -50,7 +50,7 @@
 </script>
 
 <section>
-  {#if workflow.isRunning && workers?.pollers?.length > 0}
+  {#if workflow?.isRunning && workers?.pollers?.length > 0}
     {#await stackTrace}
       <div class="text-center">
         <Loading />
@@ -78,10 +78,10 @@
     {/await}
   {:else}
     <EmptyState title="No Stack Traces Found" dataCy="query-stack-trace-empty">
-      {#if workflow.isRunning && workers?.pollers?.length === 0}
+      {#if workflow?.isRunning && workers?.pollers?.length === 0}
         <p>
           To enable <Link
-            href="https://docs.temporal.io/concepts/what-is-a-query/#stack-trace-query"
+            href="https://docs.temporal.io/workflows#stack-trace-query"
             >stack traces</Link
           >, run a Worker on the {workflow?.taskQueue} Task Queue.
         </p>

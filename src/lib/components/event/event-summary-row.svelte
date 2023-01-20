@@ -3,7 +3,7 @@
 
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  import { eventSortOrder, eventShowElapsed } from '$lib/stores/event-view';
+  import { eventShowElapsed, eventFilterSort } from '$lib/stores/event-view';
   import { timeFormat } from '$lib/stores/time-format';
   import {
     workflowEventsColumnWidth,
@@ -42,7 +42,7 @@
   $: expanded = expandAll || active;
 
   $: currentEvent = isEventGroup(event) ? event.events.get(selectedId) : event;
-  $: descending = $eventSortOrder === 'descending';
+  $: descending = $eventFilterSort === 'descending';
   $: showElapsed = $eventShowElapsed === 'true';
   $: showElapsedTimeDiff =
     showElapsed && initialItem && event.id !== initialItem.id;
@@ -172,19 +172,18 @@
 
 <style lang="postcss">
   .row {
-    @apply flex table-row flex-wrap items-center border-gray-900 text-sm no-underline xl:py-3 xl:text-base;
+    @apply table-row flex-wrap items-center border-gray-900 text-sm no-underline xl:py-3 xl:text-base;
   }
 
   .row:hover {
-    @apply z-50 cursor-pointer bg-gray-50;
+    @apply z-50 cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100;
   }
 
   .expanded.row {
     @apply bg-blue-50;
   }
 
-  .failure,
-  .failure:hover {
+  .failure {
     @apply bg-red-50;
   }
 
@@ -192,8 +191,7 @@
     @apply text-red-700;
   }
 
-  .canceled,
-  .canceled:hover {
+  .canceled {
     @apply bg-yellow-50;
   }
 
@@ -201,8 +199,7 @@
     @apply text-yellow-700;
   }
 
-  .terminated,
-  .terminated:hover {
+  .terminated {
     @apply bg-pink-50;
   }
 
@@ -211,7 +208,7 @@
   }
 
   .expanded-cell {
-    @apply flex table-cell w-full flex-wrap text-sm no-underline xl:text-base;
+    @apply table-cell w-full flex-wrap text-sm no-underline xl:text-base;
   }
 
   .typedError .expanded-cell {
@@ -227,18 +224,21 @@
   }
 
   .active {
-    @apply z-50 cursor-pointer bg-gradient-to-b from-blue-100 to-purple-100;
+    @apply z-50 cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100;
   }
 
+  .canceled:hover,
   .active.canceled {
-    @apply bg-gradient-to-b from-yellow-100 to-yellow-200;
+    @apply bg-gradient-to-br from-yellow-100 to-yellow-200;
   }
 
+  .failure:hover,
   .active.failure {
-    @apply bg-gradient-to-b from-red-100 to-red-200;
+    @apply bg-gradient-to-br from-red-100 to-red-200;
   }
 
+  .terminated:hover,
   .active.terminated {
-    @apply bg-gradient-to-b from-pink-100 to-pink-200;
+    @apply bg-gradient-to-br from-pink-100 to-pink-200;
   }
 </style>
