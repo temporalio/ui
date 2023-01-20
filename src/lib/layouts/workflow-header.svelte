@@ -149,7 +149,7 @@
         </Alert>
       </div>
     {/if}
-    <nav class="flex flex-wrap gap-6">
+    <nav class="flex flex-wrap gap-6" aria-label="workflow detail">
       <Tab
         label="History"
         href={routeForEventHistory({
