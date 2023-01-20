@@ -10,7 +10,12 @@
   export let namespace: string;
 </script>
 
-<Pagination items={pendingChildren} itemsPerPage={10} let:visibleItems>
+<Pagination
+  items={pendingChildren}
+  itemsPerPage={10}
+  let:visibleItems
+  ariaLabel="child workflows"
+>
   <Table class="w-full">
     <TableHeaderRow slot="headers">
       <th class="md:table-cell">Child Workflow ID</th>

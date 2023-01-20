@@ -26,6 +26,7 @@
   floatId="event-view-toggle"
   let:visibleItems
   let:initialItem
+  ariaLabel="recent events"
 >
   <EventSummaryTable {compact} on:expandAll={handleExpandChange}>
     {#each visibleItems as event (`${event.id}-${event.timestamp}`)}

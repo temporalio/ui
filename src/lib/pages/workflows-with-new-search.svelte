@@ -307,7 +307,7 @@
     </button>
   </div>
 </div>
-<Pagination items={$workflows} let:visibleItems>
+<Pagination items={$workflows} let:visibleItems ariaLabel="recent workflows">
   <svelte:fragment slot="action-top-left">
     <WorkflowAdvancedSearch />
   </svelte:fragment>

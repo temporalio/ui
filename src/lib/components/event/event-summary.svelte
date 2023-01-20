@@ -82,6 +82,7 @@
     let:visibleItems
     let:activeRowIndex
     let:setActiveRowIndex
+    ariaLabel="recent events"
   >
     <EventSummaryTable {updating} {compact} on:expandAll={handleExpandChange}>
       {#each visibleItems as event, index (`${event.id}-${event.timestamp}`)}

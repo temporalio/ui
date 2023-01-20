@@ -16,6 +16,7 @@
 
   type T = $$Generic;
 
+  export let ariaLabel: string;
   export let items: T[];
   export let floatId: string | undefined = undefined;
   export let startingIndex: string | number = 0;
@@ -125,6 +126,7 @@
       style={floatStyle}
       bind:clientHeight={height}
       class="flex flex-col justify-end gap-4 md:flex-row"
+      aria-label={ariaLabel}
     >
       <slot name="action-top-center" />
       {#if !itemsPerPage}
@@ -184,6 +186,7 @@
     class={`flex ${
       $$slots['action-bottom-left'] ? 'justify-between' : 'justify-end'
     }`}
+    aria-label={ariaLabel}
   >
     <slot name="action-bottom-left" />
     <div class="flex gap-4">

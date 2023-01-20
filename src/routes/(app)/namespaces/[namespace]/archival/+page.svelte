@@ -21,7 +21,11 @@
   <h2 class="text-2xl" data-cy="archived-enabled-title">Archived Workflows</h2>
   <WorkflowFilters />
   {#if workflows?.length}
-    <Pagination items={workflows} let:visibleItems>
+    <Pagination
+      items={workflows}
+      let:visibleItems
+      ariaLabel="archived workflows"
+    >
       <WorkflowsSummaryTable>
         {#each visibleItems as event}
           <WorkflowsSummaryRow

@@ -20,6 +20,7 @@
     undefined;
   export let onSpace: (event: KeyboardEvent) => void | undefined = undefined;
 
+  export let ariaLabel: string;
   export let pageSizeOptions: string[] | number[] = options;
   export let defaultPageSize: string | number | undefined = undefined;
   export let total: string | number = '';
@@ -140,7 +141,10 @@
     <div class="flex items-center gap-1 lg:gap-2 xl:gap-3">
       <slot name="action-top-left" />
     </div>
-    <nav class="flex flex-col justify-end gap-4 md:flex-row">
+    <nav
+      class="flex flex-col justify-end gap-4 md:flex-row"
+      aria-label={ariaLabel}
+    >
       <slot name="action-top-center" />
       {#if pageSizeOptions.length}
         <FilterSelect
@@ -201,6 +205,7 @@
     class={`flex ${
       $$slots['action-bottom-left'] ? 'justify-between' : 'justify-end'
     }`}
+    aria-label={ariaLabel}
   >
     <slot name="action-bottom-left" />
     <div class="flex gap-4">
