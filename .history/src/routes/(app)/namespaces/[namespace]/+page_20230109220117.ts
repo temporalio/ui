@@ -1,4 +1,5 @@
 import type { PageLoad } from './$types';
+import type { DescribeNamespaceResponse } from '$types';
 import { fetchNamespace } from '$lib/services/namespaces-service';
 import { getClusters } from '$lib/utilities/get-clusters';
 
