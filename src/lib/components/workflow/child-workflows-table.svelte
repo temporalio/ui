@@ -14,7 +14,7 @@
   items={pendingChildren}
   itemsPerPage={10}
   let:visibleItems
-  ariaLabel="child workflows"
+  aria-label="child workflows"
 >
   <Table class="w-full">
     <TableHeaderRow slot="headers">

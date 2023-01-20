@@ -67,7 +67,7 @@
     <Pagination
       items={filteredSchedules(schedules)}
       let:visibleItems
-      ariaLabel="schedules"
+      aria-label="schedules"
     >
       <svelte:fragment slot="action-top-left">
         <div class="w-full xl:w-1/2">

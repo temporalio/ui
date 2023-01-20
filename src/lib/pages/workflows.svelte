@@ -67,7 +67,7 @@
   </div>
 </div>
 <WorkflowFilters bind:searchType />
-<Pagination items={$workflows} let:visibleItems ariaLabel="recent workflows">
+<Pagination items={$workflows} let:visibleItems aria-label="recent workflows">
   <WorkflowsSummaryTable updating={$updating}>
     {#each visibleItems as event}
       <WorkflowsSummaryRow

@@ -7,7 +7,18 @@
   import { options } from '$lib/stores/pagination';
   import { onMount } from 'svelte';
 
-  type T = $$Generic;
+  import type { HoloceneComponentProps } from 'src/types/holocene';
+
+  interface $$Props extends HoloceneComponentProps<'div'> {
+    onError?: (error: any) => void | undefined;
+    onFetch: () => Promise<PaginatedRequest>;
+    onShiftUp?: (event: KeyboardEvent) => void | undefined;
+    onShiftDown?: (event: KeyboardEvent) => void | undefined;
+    onSpace?: (event: KeyboardEvent) => void | undefined;
+    pageSizeOptions?: string[] | number[];
+    defaultPageSize?: string | number | undefined;
+    total?: string | number;
+  }
   type PaginatedRequest = (
     size: number,
     token: NextPageToken,
@@ -20,7 +31,6 @@
     undefined;
   export let onSpace: (event: KeyboardEvent) => void | undefined = undefined;
 
-  export let ariaLabel: string;
   export let pageSizeOptions: string[] | number[] = options;
   export let defaultPageSize: string | number | undefined = undefined;
   export let total: string | number = '';
@@ -143,7 +153,7 @@
     </div>
     <nav
       class="flex flex-col justify-end gap-4 md:flex-row"
-      aria-label={ariaLabel}
+      aria-label={$$restProps['aria-label']}
     >
       <slot name="action-top-center" />
       {#if pageSizeOptions.length}
@@ -205,7 +215,7 @@
     class={`flex ${
       $$slots['action-bottom-left'] ? 'justify-between' : 'justify-end'
     }`}
-    aria-label={ariaLabel}
+    aria-label={$$restProps['aria-label']}
   >
     <slot name="action-bottom-left" />
     <div class="flex gap-4">

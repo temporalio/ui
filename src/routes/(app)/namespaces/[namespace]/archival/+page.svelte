@@ -24,7 +24,7 @@
     <Pagination
       items={workflows}
       let:visibleItems
-      ariaLabel="archived workflows"
+      aria-label="archived workflows"
     >
       <WorkflowsSummaryTable>
         {#each visibleItems as event}

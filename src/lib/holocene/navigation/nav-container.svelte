@@ -6,7 +6,6 @@
 
   export let isCloud = false;
   export let linkList: Partial<Record<string, string>>;
-  export let ariaLabel = 'primary';
 
   function toggleNav() {
     $navOpen = !$navOpen;
@@ -16,7 +15,8 @@
 <nav
   class="nav-header transition-width "
   data-cy="navigation-header"
-  aria-label={ariaLabel}
+  aria-label="primary"
+  {...$$restProps}
 >
   <div
     class="nav-wrapper transition-width"
