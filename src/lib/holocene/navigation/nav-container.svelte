@@ -37,6 +37,7 @@
       class="nav-toggle transition-left"
       style="top: 52px;"
       on:click={toggleNav}
+      title={$navOpen ? 'Collapse menu' : 'Expand menu'}
     >
       <Icon name={$navOpen ? 'chevron-left' : 'chevron-right'} />
     </button>
