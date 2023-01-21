@@ -71,7 +71,6 @@
   const failure = eventOrGroupIsFailureOrTimedOut(event);
   const canceled = eventOrGroupIsCanceled(event);
   const terminated = eventOrGroupIsTerminated(event);
-
 </script>
 
 <tr
