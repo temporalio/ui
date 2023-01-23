@@ -13,7 +13,7 @@
   <ul
     in:fly={{ duration: 100 }}
     role="menu"
-    class="absolute z-50 mt-1 w-full list-none overflow-y-scroll rounded border border-gray-300 bg-white text-primary shadow {position} {$$props.class}"
+    class="absolute z-50 mt-1 w-full list-none rounded border border-gray-300 bg-white text-primary shadow {position} {$$props.class}"
     class:dark
     aria-labelledby={id}
     {width}

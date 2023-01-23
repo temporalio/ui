@@ -172,26 +172,40 @@
     allowed: boolean;
     dataCy: string;
     destructive?: boolean;
+    tooltip?: string;
   }[];
+
+  $: resetIsEnabled = !resetEnabled || workflow?.pendingChildren?.length === 0;
+
+  $: resetTooltipText = resetIsEnabled
+    ? ''
+    : workflow?.pendingChildren?.length > 0
+    ? 'Cannot reset workflows with pending children.'
+    : 'Resetting workflows is not enabled, please contact your administrator for assistance.';
 
   $: workflowActions = [
     {
       label: 'Reset to first workflow task',
       onClick: () => reset(ResetType.FirstWorkflowTask),
       dataCy: 'reset-first-task-button',
-      allowed: resetEnabled && workflow?.pendingChildren?.length === 0,
+      allowed: resetIsEnabled,
+      tooltip: resetTooltipText,
     },
     {
       label: 'Reset to last workflow task',
       onClick: () => reset(ResetType.LastWorkflowTask),
       dataCy: 'reset-last-task-button',
-      allowed: resetEnabled && workflow?.pendingChildren?.length === 0,
+      allowed: resetIsEnabled,
+      tooltip: resetTooltipText,
     },
     {
       label: 'Send a Signal',
       onClick: showSignalModal,
       dataCy: 'signal-button',
       allowed: signalEnabled,
+      tooltip: signalEnabled
+        ? ''
+        : 'Signaling workflows is not enabled, please contact your administrator for assistance.',
     },
     {
       label: 'Terminate',
@@ -199,6 +213,9 @@
       dataCy: 'terminate-button',
       allowed: terminateEnabled,
       destructive: true,
+      tooltip: terminateEnabled
+        ? ''
+        : 'Terminating workflows is not enabled, please contact your adminstrator for assistance.',
     },
   ];
 
@@ -217,11 +234,17 @@
   on:click={showCancellationModal}
   label="Request Cancellation"
 >
-  {#each workflowActions as { onClick, destructive, label, allowed, dataCy }}
+  {#each workflowActions as { onClick, destructive, label, allowed, dataCy, tooltip }}
     {#if destructive}
       <MenuDivider />
     {/if}
-    <MenuItem on:click={onClick} {destructive} {dataCy} disabled={!allowed}>
+    <MenuItem
+      on:click={onClick}
+      {destructive}
+      {dataCy}
+      disabled={!allowed}
+      tooltipProps={{ text: tooltip, left: true, width: 200 }}
+    >
       {label}
     </MenuItem>
   {/each}

@@ -1,4 +1,7 @@
 <script lang="ts">
+  import Tooltip from '$lib/holocene/tooltip.svelte';
+  import type { ComponentProps } from 'svelte';
+
   export let dark = false;
   export let selected = false;
   export let destructive = false;
@@ -6,38 +9,43 @@
   export let disabled = false;
   export let href = '';
   export let dataCy: string = null;
+  export let tooltipProps: ComponentProps<Tooltip> = {};
+
+  $: ({ text, ...restTooltipProps } = tooltipProps);
 </script>
 
 <div class="menu-item-wrapper" class:disabled>
-  {#if href}
-    <a
-      {href}
-      role="menuitem"
-      class:dark
-      class:destructive
-      class:selected
-      class:active
-      class:disabled
-      data-cy={dataCy}
-      class="menu-item inline-block {$$props.class}"
-    >
-      <slot />
-    </a>
-  {:else}
-    <li
-      on:click|preventDefault
-      role="menuitem"
-      class:dark
-      class:destructive
-      class:selected
-      class:active
-      class:disabled
-      data-cy={dataCy}
-      class="menu-item {$$props.class}"
-    >
-      <slot />
-    </li>
-  {/if}
+  <Tooltip class="w-full" hide={!text} {text} {...restTooltipProps}>
+    {#if href}
+      <a
+        {href}
+        role="menuitem"
+        class:dark
+        class:destructive
+        class:selected
+        class:active
+        class:disabled
+        data-cy={dataCy}
+        class="menu-item inline-block {$$props.class}"
+      >
+        <slot />
+      </a>
+    {:else}
+      <li
+        on:click|preventDefault
+        role="menuitem"
+        class:dark
+        class:destructive
+        class:selected
+        class:active
+        class:disabled
+        data-cy={dataCy}
+        class="menu-item {$$props.class}"
+      >
+        <slot />
+      </li>
+    {/if}
+  </Tooltip>
 </div>
 
 <style lang="postcss">
