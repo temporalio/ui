@@ -13,7 +13,7 @@ const toPendingActivities = (
 };
 
 export const toWorkflowExecution = (
-  response?: WorkflowExecutionAPIResponse,
+  response: WorkflowExecutionAPIResponse,
 ): WorkflowExecution => {
   const name = response.workflowExecutionInfo.type.name;
   const id = response.workflowExecutionInfo.execution.workflowId;
@@ -24,9 +24,9 @@ export const toWorkflowExecution = (
   const isRunning = response.workflowExecutionInfo.status === 'Running';
   const historyEvents = response.workflowExecutionInfo.historyLength;
   const url = `/workflows/${id}/${runId}`;
-  const taskQueue = response?.executionConfig?.taskQueue?.name;
-  const parentNamespaceId = response?.workflowExecutionInfo?.parentNamespaceId;
-  const parent = response?.workflowExecutionInfo?.parentExecution;
+  const taskQueue = response.executionConfig?.taskQueue?.name;
+  const parentNamespaceId = response.workflowExecutionInfo?.parentNamespaceId;
+  const parent = response.workflowExecutionInfo?.parentExecution;
   const stateTransitionCount =
     response.workflowExecutionInfo.stateTransitionCount;
   const defaultWorkflowTaskTimeout =
@@ -63,7 +63,11 @@ export const toWorkflowExecution = (
 export const toWorkflowExecutions = (
   response: Pick<ListWorkflowExecutionsResponse, 'executions'>,
 ): WorkflowExecution[] => {
-  return (response.executions || []).map((workflowExecutionInfo) =>
-    toWorkflowExecution({ workflowExecutionInfo }),
-  );
+  const workflowExecutions = [];
+  (response.executions || []).forEach((workflowExecutionInfo) => {
+    if (workflowExecutionInfo) {
+      workflowExecutions.push(toWorkflowExecution({ workflowExecutionInfo }));
+    }
+  });
+  return workflowExecutions;
 };
