@@ -29,7 +29,7 @@
     ];
   };
 
-  const onSortChange = (e: MouseEvent) => {
+  const onSortChange = () => {
     if (order === 'asc') {
       order = 'desc';
     } else {
@@ -46,7 +46,7 @@
     }
   };
 
-  const onSortRemove = (e: MouseEvent) => {
+  const onSortRemove = () => {
     adding = false;
     $workflowSorts = [];
   };

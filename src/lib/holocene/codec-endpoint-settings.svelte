@@ -1,8 +1,5 @@
 <script lang="ts">
-  import {
-    codecEndpoint,
-    passAccessToken,
-  } from '$lib/stores/data-encoder-config';
+  import { codecEndpoint } from '$lib/stores/data-encoder-config';
   import { dataEncoder } from '$lib/stores/data-encoder';
 
   import Checkbox from '$lib/holocene/checkbox.svelte';
