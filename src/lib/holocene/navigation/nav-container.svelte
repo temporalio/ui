@@ -25,13 +25,19 @@
         class="absolute block"
         style="top: 22px; left: 18px;"
       >
-        <Logo height="24px" width="24px" {isCloud} />
+        <Logo
+          height="24px"
+          width="24px"
+          {isCloud}
+          title="View Recent Workflows"
+        />
       </a>
     </div>
     <button
       class="nav-toggle transition-left"
       style="top: 52px;"
       on:click={toggleNav}
+      title={$navOpen ? 'Collapse menu' : 'Expand menu'}
     >
       <Icon name={$navOpen ? 'chevron-left' : 'chevron-right'} />
     </button>
