@@ -41,16 +41,24 @@
         </td>
         <td data-cy="workflow-poller">
           {#if poller.taskQueueTypes.includes('WORKFLOW')}
-            <Icon name="checkmark" class="m-auto text-blue-700" />
+            <Icon
+              name="checkmark"
+              class="m-auto text-blue-700"
+              title="exists"
+            />
           {:else}
-            <Icon name="close" class="m-auto text-primary" />
+            <Icon name="close" class="m-auto text-primary" title="none" />
           {/if}
         </td>
         <td data-cy="activity-poller">
           {#if poller.taskQueueTypes.includes('ACTIVITY')}
-            <Icon name="checkmark" class="m-auto text-blue-700" />
+            <Icon
+              name="checkmark"
+              class="m-auto text-blue-700"
+              title="exists"
+            />
           {:else}
-            <Icon name="close" class="m-auto text-primary" />
+            <Icon name="close" class="m-auto text-primary" title="none" />
           {/if}
         </td>
         <td />
