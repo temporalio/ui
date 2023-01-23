@@ -3,6 +3,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
   import { createEventDispatcher } from 'svelte';
+  import IconButton from '../icon-button.svelte';
 
   export let id: string;
   export let value: string;
@@ -83,20 +84,19 @@
       </div>
     {/if}
     {#if copyable}
-      <div class="copy-icon-container" on:click={(e) => copy(e, value)}>
-        <Icon name={$copied ? 'checkmark' : 'copy'} />
+      <div class="copy-icon-container">
+        <IconButton
+          on:click={(e) => copy(e, value)}
+          icon={$copied ? 'checkmark' : 'copy'}
+        />
       </div>
     {:else if disabled}
       <div class="flex h-full w-9 items-center justify-center">
         <Icon name="lock" />
       </div>
     {:else if clearable && value}
-      <div
-        class="mr-2 flex h-full h-6 w-6 cursor-pointer items-center justify-center rounded-full hover:bg-gray-200"
-        data-cy="clear-input"
-        on:click={onClear}
-      >
-        <Icon name="close" />
+      <div class="clear-icon-container" data-cy="clear-input">
+        <IconButton on:click={onClear} icon="close" />
       </div>
     {/if}
     {#if maxLength && !suffix && !disabled}
@@ -162,6 +162,10 @@
 
   .copy-icon-container {
     @apply flex h-full w-9 cursor-pointer items-center justify-center rounded-r border-l;
+  }
+
+  .clear-icon-container {
+    @apply mr-2 flex w-6 cursor-pointer items-center justify-center rounded-full text-primary hover:bg-gray-200;
   }
 
   .input-container.invalid {

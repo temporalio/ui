@@ -2,6 +2,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { createEventDispatcher } from 'svelte';
   import Button from '$lib/holocene/button.svelte';
+  import { noop } from 'svelte/internal';
 
   export let open: boolean = false;
   export let hideConfirm: boolean = false;
@@ -59,7 +60,11 @@
 <svelte:window on:keydown|stopPropagation={handleKeyboardNavigation} />
 {#if open}
   <div class="modal">
-    <div on:click={cancelModal} class="overlay" />
+    <div
+      on:keyup|stopPropagation={noop}
+      on:click={cancelModal}
+      class="overlay"
+    />
     <div
       bind:this={modalElement}
       class="body"
