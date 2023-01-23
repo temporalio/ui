@@ -18,7 +18,7 @@
 
 <PageTitle title={`Archival | ${namespace}`} url={$page.url.href} />
 {#if archivalEnabled && visibilityArchivalEnabled}
-  <h2 class="text-2xl" data-cy="archived-enabled-title">Archived Workflows</h2>
+  <h1 class="text-2xl" data-cy="archived-enabled-title">Archived Workflows</h1>
   <WorkflowFilters />
   {#if workflows?.length}
     <Pagination items={workflows} let:visibleItems>
@@ -39,10 +39,10 @@
     />
   {/if}
 {:else if archivalEnabled}
-  <h2 class="text-2xl" data-cy="visibility-disabled-title">
+  <h1 class="text-2xl" data-cy="visibility-disabled-title">
     This Namespace is currently enabled for archival but visibility is not
     enabled.
-  </h2>
+  </h1>
   <p>To enable Visibility Archival:</p>
   <CodeBlock
     content={`tctl --namespace ${namespace.namespaceInfo.name} namespace update -vas enabled`}
@@ -57,9 +57,9 @@
     >.
   </p>
 {:else}
-  <h2 class="text-2xl" data-cy="archived-disabled-title">
+  <h1 class="text-2xl" data-cy="archived-disabled-title">
     This Namespace is currently not enabled for archival.
-  </h2>
+  </h1>
   <p>Run this command to enable Archival for Event Histories:</p>
   <CodeBlock
     content={`tctl --namespace ${namespace.namespaceInfo.name} namespace update --has enabled`}

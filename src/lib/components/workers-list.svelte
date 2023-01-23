@@ -12,9 +12,9 @@
 </script>
 
 <section class="flex flex-col gap-4">
-  <h3 class="text-lg font-medium">
+  <h2 class="text-lg font-medium">
     Task Queue: <span class="select-all font-normal">{taskQueue}</span>
-  </h3>
+  </h2>
   <section
     class="flex w-full flex-col rounded-lg border-[3px] border-gray-900 bg-white"
   >
