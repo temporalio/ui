@@ -25,7 +25,7 @@
       <div class="w-2/12 text-center">Activity Handler</div>
     </div>
     {#each workers?.pollers as poller (poller.identity)}
-      <article
+      <div
         class="flex h-full w-full flex-row border-b-2 p-2 no-underline last:border-b-0"
         data-cy="worker-row"
       >
@@ -53,7 +53,7 @@
             <Icon name="close" class="text-primary" />
           {/if}
         </div>
-      </article>
+      </div>
     {:else}
       <EmptyState title={'No Workers Found'} />
     {/each}

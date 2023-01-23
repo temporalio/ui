@@ -13,7 +13,7 @@
 <PageTitle title="Namespaces" url={$page.url.href} />
 <h1 data-cy="namespace-selector-title" class="mb-8 text-2xl">Namespaces</h1>
 {#if $namespaces?.length > 0}
-  <Pagination items={$namespaces} let:visibleItems>
+  <Pagination items={$namespaces} let:visibleItems aria-label="namespaces">
     <Table variant="fancy" class="w-full">
       <TableHeaderRow slot="headers">
         <th>Name</th>

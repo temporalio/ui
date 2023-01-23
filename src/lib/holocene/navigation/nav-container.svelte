@@ -12,7 +12,12 @@
   }
 </script>
 
-<nav class="nav-header transition-width " data-cy="navigation-header">
+<nav
+  class="nav-header transition-width "
+  data-cy="navigation-header"
+  aria-label="primary"
+  {...$$restProps}
+>
   <div
     class="nav-wrapper transition-width"
     class:cloud={isCloud}

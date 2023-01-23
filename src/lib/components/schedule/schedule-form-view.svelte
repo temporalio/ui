@@ -90,7 +90,7 @@
   };
 </script>
 
-<article class="pb-20">
+<div class="pb-20">
   {#if $loading}
     <Loading title={loadingText} />
   {:else}
@@ -174,7 +174,7 @@
       </SchedulesCalendarView>
     </form>
   {/if}
-</article>
+</div>
 
 <style lang="postcss">
   .back {

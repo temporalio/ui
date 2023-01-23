@@ -1,4 +1,4 @@
-<article class="row">
+<div class="row">
   <div class="cell md:table-cell">
     <p />
   </div>
@@ -14,7 +14,7 @@
   <div class="cell inline-block md:hidden xl:table-cell">
     <p />
   </div>
-</article>
+</div>
 
 <style lang="postcss">
   .row {
