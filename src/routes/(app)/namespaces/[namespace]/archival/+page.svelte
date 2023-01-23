@@ -12,21 +12,31 @@
 
   export let data: PageData;
 
-  $: ({ namespace, workflows, archivalEnabled, visibilityArchivalEnabled } =
-    data);
+  $: ({
+    namespace: {
+      namespaceInfo: { name: namespaceName },
+    },
+    workflows,
+    archivalEnabled,
+    visibilityArchivalEnabled,
+  } = data);
 </script>
 
-<PageTitle title={`Archival | ${namespace}`} url={$page.url.href} />
+<PageTitle title={`Archival | ${namespaceName}`} url={$page.url.href} />
 {#if archivalEnabled && visibilityArchivalEnabled}
   <h1 class="text-2xl" data-cy="archived-enabled-title">Archived Workflows</h1>
   <WorkflowFilters />
   {#if workflows?.length}
-    <Pagination items={workflows} let:visibleItems>
+    <Pagination
+      items={workflows}
+      let:visibleItems
+      aria-label="archived workflows"
+    >
       <WorkflowsSummaryTable>
         {#each visibleItems as event}
           <WorkflowsSummaryRow
             workflow={event}
-            namespace={namespace.namespaceInfo.name}
+            namespace={namespaceName}
             timeFormat={$timeFormat}
           />
         {/each}
@@ -45,7 +55,7 @@
   </h1>
   <p>To enable Visibility Archival:</p>
   <CodeBlock
-    content={`tctl --namespace ${namespace.namespaceInfo.name} namespace update -vas enabled`}
+    content={`tctl --namespace ${namespaceName} namespace update -vas enabled`}
     language="text"
     inline
   />
@@ -62,14 +72,14 @@
   </h1>
   <p>Run this command to enable Archival for Event Histories:</p>
   <CodeBlock
-    content={`tctl --namespace ${namespace.namespaceInfo.name} namespace update --has enabled`}
+    content={`tctl --namespace ${namespaceName} namespace update --has enabled`}
     language="text"
     inline
   />
   {#if !visibilityArchivalEnabled}
     <p>To enable Visibility Archival:</p>
     <CodeBlock
-      content={`tctl --namespace ${namespace.namespaceInfo.name} namespace update -vas enabled`}
+      content={`tctl --namespace ${namespaceName} namespace update -vas enabled`}
       language="text"
       inline
     />

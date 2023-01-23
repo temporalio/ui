@@ -64,7 +64,11 @@
   <Loading />
 {:then { schedules, error }}
   {#if schedules?.length}
-    <Pagination items={filteredSchedules(schedules)} let:visibleItems>
+    <Pagination
+      items={filteredSchedules(schedules)}
+      let:visibleItems
+      aria-label="schedules"
+    >
       <svelte:fragment slot="action-top-left">
         <div class="w-full xl:w-1/2">
           <Input

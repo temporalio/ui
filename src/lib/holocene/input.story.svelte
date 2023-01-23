@@ -11,6 +11,7 @@
   let maxLength: number | undefined;
   let dark = false;
   let disabled = false;
+  let clearable = false;
 </script>
 
 <Hst.Story>
@@ -24,6 +25,7 @@
       {valid}
       {maxLength}
       {disabled}
+      {clearable}
       theme={dark ? 'dark' : 'light'}
     />
   </Hst.Variant>
@@ -61,5 +63,6 @@
     <Hst.Number title="Max Length: " bind:value={maxLength} />
     <Hst.Checkbox title="Dark: " bind:value={dark} />
     <Hst.Checkbox title="Disabled: " bind:value={disabled} />
+    <Hst.Checkbox title="Clearable: " bind:value={clearable} />
   </svelte:fragment>
 </Hst.Story>

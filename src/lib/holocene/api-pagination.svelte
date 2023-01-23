@@ -7,7 +7,18 @@
   import { options } from '$lib/stores/pagination';
   import { onMount } from 'svelte';
 
-  type T = $$Generic;
+  import type { HoloceneComponentProps } from 'src/types/holocene';
+
+  interface $$Props extends HoloceneComponentProps<'div'> {
+    onError?: (error: any) => void | undefined;
+    onFetch: () => Promise<PaginatedRequest>;
+    onShiftUp?: (event: KeyboardEvent) => void | undefined;
+    onShiftDown?: (event: KeyboardEvent) => void | undefined;
+    onSpace?: (event: KeyboardEvent) => void | undefined;
+    pageSizeOptions?: string[] | number[];
+    defaultPageSize?: string | number | undefined;
+    total?: string | number;
+  }
   type PaginatedRequest = (
     size: number,
     token: NextPageToken,
@@ -140,7 +151,10 @@
     <div class="flex items-center gap-1 lg:gap-2 xl:gap-3">
       <slot name="action-top-left" />
     </div>
-    <nav class="flex flex-col justify-end gap-4 md:flex-row">
+    <nav
+      class="flex flex-col justify-end gap-4 md:flex-row"
+      aria-label={$$restProps['aria-label']}
+    >
       <slot name="action-top-center" />
       {#if pageSizeOptions.length}
         <FilterSelect
@@ -201,6 +215,7 @@
     class={`flex ${
       $$slots['action-bottom-left'] ? 'justify-between' : 'justify-end'
     }`}
+    aria-label={$$restProps['aria-label']}
   >
     <slot name="action-bottom-left" />
     <div class="flex gap-4">

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { createEventDispatcher } from 'svelte';
   export let dark = false;
   export let selected = false;
   export let destructive = false;
@@ -6,6 +7,14 @@
   export let disabled = false;
   export let href = '';
   export let dataCy: string = null;
+
+  const dispatch = createEventDispatcher<{ click: undefined }>();
+
+  const handleKeyUp = (event: KeyboardEvent) => {
+    if (event.key === ' ' || event.key === 'Enter') {
+      dispatch('click');
+    }
+  };
 </script>
 
 <div class="menu-item-wrapper" class:disabled>
@@ -13,11 +22,11 @@
     <a
       {href}
       role="menuitem"
+      tabindex="0"
       class:dark
       class:destructive
       class:selected
       class:active
-      class:disabled
       data-cy={dataCy}
       class="menu-item inline-block {$$props.class}"
     >
@@ -26,6 +35,8 @@
   {:else}
     <li
       on:click|preventDefault
+      on:keyup={handleKeyUp}
+      tabindex="0"
       role="menuitem"
       class:dark
       class:destructive
@@ -46,7 +57,7 @@
   }
 
   .menu-item {
-    @apply w-full cursor-pointer list-none bg-white p-4 font-secondary text-sm font-medium text-primary hover:bg-gray-50;
+    @apply w-full cursor-pointer list-none bg-white p-4 font-secondary text-sm font-medium text-primary focus-within:bg-gray-50 focus-within:outline-none hover:bg-gray-50;
   }
 
   .dark {
