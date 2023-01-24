@@ -154,7 +154,7 @@
   {#if workflowHasBeenReset}
     <div class="mb-4" in:fly={{ duration: 200, delay: 100 }}>
       <Alert
-        class="rounded-xl border-[3px]"
+        bold
         icon="info"
         intent="info"
         title="This Workflow has been Reset"
