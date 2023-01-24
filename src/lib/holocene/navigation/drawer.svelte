@@ -3,8 +3,8 @@
   export let flyout: boolean;
   export let onClose: () => void;
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import { clickOutside } from '$lib/holocene/outside-click';
+  import IconButton from '../icon-button.svelte';
 </script>
 
 <div
@@ -28,8 +28,8 @@
   on:click-outside={onClose}
 >
   <div class="relative">
-    <div class="absolute right-0 top-0 cursor-pointer" on:click={onClose}>
-      <Icon name="close" />
+    <div class="absolute right-0 top-0">
+      <IconButton on:click={onClose} icon="close" />
     </div>
   </div>
   <slot />

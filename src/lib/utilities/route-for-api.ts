@@ -51,6 +51,7 @@ const encode = (parameters: APIRouteParameters): APIRouteParameters => {
       scheduleId: '',
       runId: '',
       queue: '',
+      activityId: '',
     },
   );
 };
@@ -72,6 +73,11 @@ export function routeForApi(
 export function routeForApi(
   route: WorkflowAPIRoutePath,
   parameters: WorkflowRouteParameters,
+  shouldEncode?: boolean,
+): Promise<string>;
+export function routeForApi(
+  route: WorkflowActivitiesAPIRoutePath,
+  parameters: WorkflowActivitiesRouteParameters,
   shouldEncode?: boolean,
 ): Promise<string>;
 export function routeForApi(
@@ -120,6 +126,8 @@ export function routeForApi(
     'workflows.archived': `/namespaces/${parameters?.namespace}/workflows/archived`,
     workflows: `/namespaces/${parameters?.namespace}/workflows`,
     'workflows.count': `/namespaces/${parameters?.namespace}/workflows/count`,
+    'activity.complete': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/runs/${parameters.runId}/activities/${parameters.activityId}/complete`,
+    'activity.fail': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/runs/${parameters.runId}/activities/${parameters.activityId}/fail`,
     'batch-operations': `/namespaces/${parameters.namespace}/batch-operations`,
     'batch-operation.describe': `/namespaces/${parameters.namespace}/batch-operations/describe`,
     // TODO: Remove when new batch APIs are deployed

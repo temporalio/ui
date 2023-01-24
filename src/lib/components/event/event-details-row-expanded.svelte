@@ -27,7 +27,7 @@
   const { workflow, namespace } = $page.params;
 </script>
 
-<article class="row {$$props.class}">
+<div class="row {$$props.class}">
   {#if typeof value === 'object'}
     <div class="content code-block-row">
       <p class="text-sm">
@@ -96,7 +96,7 @@
       </p>
     </div>
   {/if}
-</article>
+</div>
 
 <style lang="postcss">
   .row {

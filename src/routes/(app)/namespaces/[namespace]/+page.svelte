@@ -55,13 +55,13 @@
   title={`Namespaces | ${namespace?.namespaceInfo?.name}`}
   url={$page.url.href}
 />
-<h2 class="text-2xl" data-cy="namespace-title">
+<h1 class="text-2xl" data-cy="namespace-title">
   Namespace: {namespace?.namespaceInfo?.name}
-</h2>
-<h3 data-cy="namespace-description">{namespace?.namespaceInfo?.description}</h3>
+</h1>
+<h2 data-cy="namespace-description">{namespace?.namespaceInfo?.description}</h2>
 <Card class="flex flex-col gap-4 lg:flex-row">
   <article class="namespace-info flex w-full flex-col">
-    <h1 class="text-lg font-medium">Details</h1>
+    <h3 class="text-lg font-medium">Details</h3>
     <Table variant="simple">
       <tr slot="headers">
         <th class="w-1/2 lg:w-3/5" /><th />
@@ -127,7 +127,7 @@
   </article>
 
   <article class="namespace-info flex w-full flex-col">
-    <h1 class="text-lg font-medium">Versions</h1>
+    <h3 class="text-lg font-medium">Versions</h3>
     <Table variant="simple">
       <tr slot="headers">
         <th class="w-1/2 lg:w-3/4" /><th />
@@ -145,7 +145,7 @@
   </article>
 
   <article class="namespace-info flex w-full flex-col">
-    <h1 class="text-lg font-medium">Client Actions</h1>
+    <h3 class="text-lg font-medium">Client Actions</h3>
     <Table variant="simple">
       <tr slot="headers">
         <th class="w-1/2 lg:w-3/5" /><th />
@@ -207,7 +207,7 @@
 
 {#if $searchAttributes}
   <section>
-    <h1 class="my-4 text-lg font-medium">Search Attributes</h1>
+    <h3 class="my-4 text-lg font-medium">Search Attributes</h3>
     <Table class="w-full">
       <TableHeaderRow slot="headers">
         <th>Key</th>

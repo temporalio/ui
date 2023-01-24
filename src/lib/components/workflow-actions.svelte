@@ -1,18 +1,20 @@
 <script lang="ts">
-  import { refresh } from '$lib/stores/workflow-run';
   import {
     signalWorkflow,
     terminateWorkflow,
   } from '$lib/services/workflow-service';
-  import { settings } from '$lib/stores/settings';
+
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 
-  import Modal from '$lib/holocene/modal.svelte';
+  import { refresh } from '$lib/stores/workflow-run';
+  import { settings } from '$lib/stores/settings';
   import { coreUserStore } from '$lib/stores/core-user';
-  import SplitButton from '$lib/holocene/split-button.svelte';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import { cancelWorkflow } from '$lib/services/workflow-service';
   import { toaster } from '$lib/stores/toaster';
+
+  import SplitButton from '$lib/holocene/split-button.svelte';
+  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
+  import Modal from '$lib/holocene/modal.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import MenuDivider from '$lib/holocene/primitives/menu/menu-divider.svelte';
   import JSONEditor from '$lib/holocene/json-editor.svelte';

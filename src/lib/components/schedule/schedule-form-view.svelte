@@ -90,7 +90,7 @@
   };
 </script>
 
-<article class="pb-20">
+<div class="pb-20">
   {#if $loading}
     <Loading title={loadingText} />
   {:else}
@@ -98,7 +98,7 @@
       <a href={backHref} class="back absolute top-0" style="left: 0">
         <Icon name="chevron-left" class="inline" />{backTitle}
       </a>
-      <h2 class="font-base mt-8 ml-0 text-2xl">{title}</h2>
+      <h1 class="font-base mt-8 ml-0 text-2xl">{title}</h1>
     </header>
     <form class="mb-4 flex w-full flex-col gap-4 md:w-2/3 xl:w-1/2">
       {#if $error}
@@ -174,7 +174,7 @@
       </SchedulesCalendarView>
     </form>
   {/if}
-</article>
+</div>
 
 <style lang="postcss">
   .back {

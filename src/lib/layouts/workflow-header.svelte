@@ -90,131 +90,117 @@
   );
 </script>
 
-<header class="mb-4 flex flex-col gap-4">
-  <main class="relative flex flex-col gap-1">
-    <div class="-mt-3 -ml-2 mb-4 block">
-      <a
-        href={routeForWorkflowsWithQuery({
-          namespace,
-          query: $workflowsQuery || query,
-          search: searchType,
-        })}
-        data-cy="back-to-workflows"
-        class="back-to-workflows"
-      >
-        <Icon name="chevron-left" class="inline" />Back to Workflows
-      </a>
-    </div>
-    <div
-      class="mb-8 flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
+<header class="mb-4 flex flex-col gap-1">
+  <div class="-mt-3 -ml-2 mb-4 block">
+    <a
+      href={routeForWorkflowsWithQuery({
+        namespace,
+        query: $workflowsQuery || query,
+        search: searchType,
+      })}
+      data-cy="back-to-workflows"
+      class="back-to-workflows"
     >
-      <div
-        class="flex w-full items-center justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
+      <Icon name="chevron-left" class="inline" />Back to Workflows
+    </a>
+  </div>
+  <div
+    class="mb-8 flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
+  >
+    <div
+      class="flex w-full items-center justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
+    >
+      <WorkflowStatus status={workflow?.status} />
+      <h1
+        data-cy="workflow-id-heading"
+        class="select-all overflow-hidden text-ellipsis text-2xl font-medium"
       >
-        <WorkflowStatus status={workflow?.status} />
-        <h1
-          data-cy="workflow-id-heading"
-          class="select-all overflow-hidden text-ellipsis text-2xl font-medium"
-        >
-          {workflow?.id}
-        </h1>
-      </div>
-      {#if isRunning}
-        <div
-          class="flex flex-col items-center justify-center gap-4 whitespace-nowrap sm:flex-row lg:justify-end"
-        >
-          <AutoRefreshWorkflow onChange={onRefreshChange} />
-          <WorkflowActions
-            {terminateEnabled}
-            {signalEnabled}
-            {cancelEnabled}
-            {cancelInProgress}
-            {workflow}
-            {namespace}
-          />
-        </div>
-      {/if}
+        {workflow?.id}
+      </h1>
     </div>
-    {#if cancelInProgress}
-      <div class="mb-4" in:fly={{ duration: 200, delay: 100 }}>
-        <Alert
-          class="rounded-xl border-[3px]"
-          icon="info"
-          intent="info"
-          title="Cancel Request Sent"
-        >
-          The request to cancel this Workflow Execution has been sent. If the
-          Workflow uses the cancellation API, it'll cancel at the next available
-          opportunity.
-        </Alert>
+    {#if isRunning}
+      <div
+        class="flex flex-col items-center justify-center gap-4 whitespace-nowrap sm:flex-row lg:justify-end"
+      >
+        <AutoRefreshWorkflow onChange={onRefreshChange} />
+        <WorkflowActions
+          {terminateEnabled}
+          {signalEnabled}
+          {cancelEnabled}
+          {cancelInProgress}
+          {workflow}
+          {namespace}
+        />
       </div>
     {/if}
-    <nav class="flex flex-wrap gap-6">
-      <Tab
-        label="History"
-        href={routeForEventHistory({
+  </div>
+  {#if cancelInProgress}
+    <div class="mb-4" in:fly={{ duration: 200, delay: 100 }}>
+      <Alert bold icon="info" intent="info" title="Cancel Request Sent">
+        The request to cancel this Workflow Execution has been sent. If the
+        Workflow uses the cancellation API, it'll cancel at the next available
+        opportunity.
+      </Alert>
+    </div>
+  {/if}
+  <nav class="flex flex-wrap gap-6" aria-label="workflow detail">
+    <Tab
+      label="History"
+      href={routeForEventHistory({
+        ...routeParameters,
+      })}
+      dataCy="history-tab"
+      active={pathMatches(
+        $page.url.pathname,
+        routeForEventHistory({
           ...routeParameters,
-        })}
-        dataCy="history-tab"
-        active={pathMatches(
-          $page.url.pathname,
-          routeForEventHistory({
-            ...routeParameters,
-          }),
-        )}
-      >
-        <Badge type="blue" class="px-2 py-0">{workflow.historyEvents}</Badge>
-      </Tab>
-      <Tab
-        label="Workers"
-        href={routeForWorkers(routeParameters)}
-        dataCy="workers-tab"
-        active={pathMatches(
-          $page.url.pathname,
-          routeForWorkers(routeParameters),
-        )}
-      >
-        <Badge type="blue" class="px-2 py-0">{workers?.pollers?.length}</Badge>
-      </Tab>
-      <Tab
-        label="Pending Activities"
-        href={routeForPendingActivities(routeParameters)}
-        dataCy="pending-activities-tab"
-        active={pathMatches(
-          $page.url.pathname,
-          routeForPendingActivities(routeParameters),
-        )}
-      >
-        <Badge type={activitiesCanceled ? 'warning' : 'blue'} class="px-2 py-0">
-          {#if activitiesCanceled}<Icon
-              name="canceled"
-              width={20}
-              height={20}
-            />
-          {/if}
-          {workflow.pendingActivities?.length}
-        </Badge>
-      </Tab>
-      <Tab
-        label="Stack Trace"
-        href={routeForStackTrace(routeParameters)}
-        dataCy="stack-trace-tab"
-        active={pathMatches(
-          $page.url.pathname,
-          routeForStackTrace(routeParameters),
-        )}
-      />
-      <Tab
-        label="Queries"
-        href={routeForWorkflowQuery(routeParameters)}
-        dataCy="queries-tab"
-        active={pathMatches(
-          $page.url.pathname,
-          routeForWorkflowQuery(routeParameters),
-        )}
-      />
-    </nav>
-  </main>
+        }),
+      )}
+    >
+      <Badge type="blue" class="px-2 py-0">{workflow.historyEvents}</Badge>
+    </Tab>
+    <Tab
+      label="Workers"
+      href={routeForWorkers(routeParameters)}
+      dataCy="workers-tab"
+      active={pathMatches($page.url.pathname, routeForWorkers(routeParameters))}
+    >
+      <Badge type="blue" class="px-2 py-0">{workers?.pollers?.length}</Badge>
+    </Tab>
+    <Tab
+      label="Pending Activities"
+      href={routeForPendingActivities(routeParameters)}
+      dataCy="pending-activities-tab"
+      active={pathMatches(
+        $page.url.pathname,
+        routeForPendingActivities(routeParameters),
+      )}
+    >
+      <Badge type={activitiesCanceled ? 'warning' : 'blue'} class="px-2 py-0">
+        {#if activitiesCanceled}<Icon name="canceled" width={20} height={20} />
+        {/if}
+        {workflow.pendingActivities?.length}
+      </Badge>
+    </Tab>
+    <Tab
+      label="Stack Trace"
+      href={routeForStackTrace(routeParameters)}
+      dataCy="stack-trace-tab"
+      active={pathMatches(
+        $page.url.pathname,
+        routeForStackTrace(routeParameters),
+      )}
+    />
+    <Tab
+      label="Queries"
+      href={routeForWorkflowQuery(routeParameters)}
+      dataCy="queries-tab"
+      active={pathMatches(
+        $page.url.pathname,
+        routeForWorkflowQuery(routeParameters),
+      )}
+    />
+  </nav>
 </header>
 
 <style lang="postcss">

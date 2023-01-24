@@ -53,8 +53,9 @@
   <section id="event-history">
     <nav
       class="flex flex-col items-center justify-between gap-4 pb-4 lg:flex-row lg:items-end"
+      aria-label="recent events view"
     >
-      <h3 class="text-lg font-medium">Recent Events</h3>
+      <h2 class="text-lg font-medium">Recent Events</h2>
       <div id="event-view-toggle" class="flex gap-4 bg-white">
         <ToggleButtons>
           <ToggleButton

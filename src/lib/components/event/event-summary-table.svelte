@@ -15,7 +15,7 @@
 
   const dispatch = createEventDispatcher();
 
-  function handleChange(e: Event) {
+  function handleChange() {
     expandAll = !expandAll;
     dispatch('expandAll', {
       expanded: expandAll ? 'true' : 'false',

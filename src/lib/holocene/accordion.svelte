@@ -2,10 +2,10 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import type { IconName } from './icon/paths';
-  import type { HoloceneComponentProps } from 'src/types/holocene';
+  import type { HTMLAttributes } from 'svelte/elements';
   import { v4 } from 'uuid';
 
-  interface $$Props extends HoloceneComponentProps<'div'> {
+  interface $$Props extends HTMLAttributes<HTMLDivElement> {
     title: string;
     id?: string;
     subtitle?: string;

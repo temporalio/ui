@@ -16,6 +16,7 @@ export type RetryCallback = (retriesRemaining: number) => void;
 export type APIErrorResponse = {
   status: number;
   statusText: string;
+  statusCode?: number;
   body: TemporalAPIError;
 };
 

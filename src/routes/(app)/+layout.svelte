@@ -25,7 +25,7 @@
   <div class="sticky top-0 z-20 h-screen w-auto">
     <Header {user} />
   </div>
-  <section
+  <main
     id="content"
     class="min-h-screen w-max flex-auto overflow-auto bg-gray-100"
   >
@@ -36,5 +36,5 @@
       </ErrorBoundary>
     </div>
     <ScrollToTop />
-  </section>
+  </main>
 </div>

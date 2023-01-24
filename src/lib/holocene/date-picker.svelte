@@ -10,17 +10,15 @@
 
   const dispatch = createEventDispatcher();
 
-  export let isAllowed = (date: Date) => true;
+  export let isAllowed = () => true;
   export let selected = new Date();
 
-  let date: number | undefined;
   let month: number | undefined;
   let year: number | undefined;
   let showDatePicker = false;
 
   // so that these change with props
   $: {
-    date = selected.getDate();
     month = selected.getMonth();
     year = selected.getFullYear();
   }

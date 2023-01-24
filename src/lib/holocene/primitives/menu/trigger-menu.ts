@@ -33,7 +33,7 @@ export const triggerMenu = (
   };
 
   const handleKeyUp = (event: KeyboardEvent) => {
-    if (event?.key === 'Escape') {
+    if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
       node.dispatchEvent(new CustomEvent('close-menu'));
     }
   };

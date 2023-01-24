@@ -27,7 +27,7 @@
   const { workflow, namespace } = $page.params;
 </script>
 
-<article
+<div
   class="flex flex-row items-center gap-2 first:pt-0 last:border-b-0 xl:gap-4 {$$props.class}"
 >
   {#if typeof value === 'object'}
@@ -103,7 +103,7 @@
       </p>
     </div>
   {/if}
-</article>
+</div>
 
 <style lang="postcss">
   .badge {

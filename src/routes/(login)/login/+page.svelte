@@ -3,12 +3,11 @@
   import { page } from '$app/stores';
   import { browser } from '$app/environment';
 
-  import NavigationHeader from '$lib/components/navigation-header.svelte';
-  import HamburgerHeader from '$lib/components/hamburger-header.svelte';
-  import { publicPath } from '$lib/utilities/get-public-path';
   import PageTitle from '$lib/components/page-title.svelte';
   import Button from '$lib/holocene/button.svelte';
   import { routeForAuthentication } from '$lib/utilities/route-for';
+  import Logo from '$lib/vendor/logo.svg';
+  import FeedbackButton from '$lib/components/feedback-button.svelte';
 
   export let data: PageData;
 
@@ -17,8 +16,12 @@
 </script>
 
 <PageTitle title="Login" url={$page.url.href} />
-<NavigationHeader href="{publicPath}/" user={undefined} />
-<HamburgerHeader href="{publicPath}/" user={undefined} />
+<header class="flex h-16 w-full items-center justify-between bg-primary px-10">
+  <a href="/" class="inline-block">
+    <img src={Logo} alt="Temporal Logo" class="max-h-10" />
+  </a>
+  <FeedbackButton />
+</header>
 <section class="my-[20vh] text-center">
   <h1 class="text-8xl font-semibold" data-cy="login-title">Welcome back.</h1>
   <p class="my-7" data-cy="login-info">Let's get you signed in.</p>
