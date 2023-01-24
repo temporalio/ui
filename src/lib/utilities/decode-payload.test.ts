@@ -296,8 +296,11 @@ describe('convertPayloadToJsonWithCodec', () => {
       },
     });
 
-    expect(mockFetch).toBeCalledWith(expect.any(String), expect.objectContaining({credentials: 'include'}))
-  })
+    expect(mockFetch).toBeCalledWith(
+      expect.any(String),
+      expect.objectContaining({ credentials: 'include' }),
+    );
+  });
 });
 
 // Integration test
