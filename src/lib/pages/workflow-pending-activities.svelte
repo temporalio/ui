@@ -24,8 +24,8 @@
 {#if pendingActivities.length}
   <Table class="mb-6 w-full min-w-[600px] table-fixed">
     <TableHeaderRow slot="headers">
-      <th class="table-cell w-44"><h2>Activity Id</h2></th>
-      <th class="table-cell w-auto"><h2>Details</h2></th>
+      <th class="table-cell w-44">Activity Id</th>
+      <th class="table-cell w-auto">Details</th>
     </TableHeaderRow>
     {#each pendingActivities as { id, activityId, ...details } (id)}
       {@const failed = details.attempt > 1}
@@ -39,103 +39,105 @@
           </div>
         </td>
         <td class="table-cell py-4 px-5">
-          <div class="event-table-row">
-            <h2 class="font-semibold">Activity Type</h2>
-            <Badge type={failed ? 'error' : 'default'}>
-              {details.activityType}
-            </Badge>
-          </div>
-          <div class="event-table-row">
-            <h2>Attempt</h2>
-            <Badge type={failed ? 'error' : 'default'}>
-              {#if failed}
-                <Icon class="mr-1" name="retry" />
-              {/if}
-              {details.attempt}
-            </Badge>
-          </div>
-          {#if failed}
-            <div class="event-table-row">
-              <h2>Attempts Left</h2>
-              <Badge type="error">
-                {formatAttemptsLeft(details.maximumAttempts, details.attempt)}
+          <ul>
+            <li class="event-table-row">
+              <h4 class="font-semibold">Activity Type</h4>
+              <Badge type={failed ? 'error' : 'default'}>
+                {details.activityType}
               </Badge>
-            </div>
-            {#if details.scheduledTime}
-              <div class="event-table-row">
-                <h2>Next Retry</h2>
+            </li>
+            <li class="event-table-row">
+              <h4>Attempt</h4>
+              <Badge type={failed ? 'error' : 'default'}>
+                {#if failed}
+                  <Icon class="mr-1" name="retry" />
+                {/if}
+                {details.attempt}
+              </Badge>
+            </li>
+            {#if failed}
+              <li class="event-table-row">
+                <h4>Attempts Left</h4>
                 <Badge type="error">
-                  {toTimeDifference(details.scheduledTime)}
+                  {formatAttemptsLeft(details.maximumAttempts, details.attempt)}
                 </Badge>
-              </div>
+              </li>
+              {#if details.scheduledTime}
+                <li class="event-table-row">
+                  <h4>Next Retry</h4>
+                  <Badge type="error">
+                    {toTimeDifference(details.scheduledTime)}
+                  </Badge>
+                </li>
+              {/if}
             {/if}
-          {/if}
-          <div class="event-table-row">
-            <h2>Maximum Attempts</h2>
-            <Badge>{formatMaximumAttempts(details.maximumAttempts)}</Badge>
-          </div>
-          {#if failed}
-            {#if details.heartbeatDetails}
-              <div class="event-table-row">
-                <h2>Heartbeat Details</h2>
-                <CodeBlock
-                  slot="value"
-                  class="pb-2"
-                  content={details.heartbeatDetails}
-                />
-              </div>
+            <li class="event-table-row">
+              <h4>Maximum Attempts</h4>
+              <Badge>{formatMaximumAttempts(details.maximumAttempts)}</Badge>
+            </li>
+            {#if failed}
+              {#if details.heartbeatDetails}
+                <li class="event-table-row">
+                  <h4>Heartbeat Details</h4>
+                  <CodeBlock
+                    slot="value"
+                    class="pb-2"
+                    content={details.heartbeatDetails}
+                  />
+                </li>
+              {/if}
+              {#if details.lastFailure}
+                <li class="event-table-row">
+                  <h4>Last Failure</h4>
+                  <CodeBlock
+                    slot="value"
+                    class="pb-2"
+                    content={details.lastFailure}
+                  />
+                </li>
+              {/if}
+              <li class="event-table-row">
+                <h4>Retry Expiration</h4>
+                <p>
+                  {formatRetryExpiration(
+                    details.maximumAttempts,
+                    formatDuration(
+                      getDuration({
+                        start: Date.now(),
+                        end: details.expirationTime,
+                      }),
+                    ),
+                  )}
+                </p>
+              </li>
             {/if}
-            {#if details.lastFailure}
-              <div class="event-table-row">
-                <h2>Last Failure</h2>
-                <CodeBlock
-                  slot="value"
-                  class="pb-2"
-                  content={details.lastFailure}
-                />
-              </div>
+            <li class="event-table-row">
+              <h4>Last Heartbeat</h4>
+              <p>{formatDate(details.lastHeartbeatTime, 'relative')}</p>
+            </li>
+            <li class="event-table-row">
+              <h4>State</h4>
+              <p>{details.state}</p>
+            </li>
+            {#if details.lastStartedTime}
+              <li class="event-table-row">
+                <h4>Last Started Time</h4>
+                <p>{formatDate(details.lastStartedTime, $timeFormat)}</p>
+              </li>
             {/if}
-            <div class="event-table-row">
-              <h2>Retry Expiration</h2>
-              <p>
-                {formatRetryExpiration(
-                  details.maximumAttempts,
-                  formatDuration(
-                    getDuration({
-                      start: Date.now(),
-                      end: details.expirationTime,
-                    }),
-                  ),
-                )}
-              </p>
-            </div>
-          {/if}
-          <div class="event-table-row">
-            <h2>Last Heartbeat</h2>
-            <p>{formatDate(details.lastHeartbeatTime, 'relative')}</p>
-          </div>
-          <div class="event-table-row">
-            <h2>State</h2>
-            <p>{details.state}</p>
-          </div>
-          {#if details.lastStartedTime}
-            <div class="event-table-row">
-              <h2>Last Started Time</h2>
-              <p>{formatDate(details.lastStartedTime, $timeFormat)}</p>
-            </div>
-          {/if}
-          {#if details.scheduledTime}
-            <div class="event-table-row">
-              <h2>Scheduled Time</h2>
-              <p>{formatDate(details.scheduledTime, $timeFormat)}</p>
-            </div>
-          {/if}
-          {#if details.lastWorkerIdentity}
-            <div class="event-table-row">
-              <h2>Last Worker Identity</h2>
-              <p>{details.lastWorkerIdentity}</p>
-            </div>
-          {/if}
+            {#if details.scheduledTime}
+              <li class="event-table-row">
+                <h4>Scheduled Time</h4>
+                <p>{formatDate(details.scheduledTime, $timeFormat)}</p>
+              </li>
+            {/if}
+            {#if details.lastWorkerIdentity}
+              <li class="event-table-row">
+                <h4>Last Worker Identity</h4>
+                <p>{details.lastWorkerIdentity}</p>
+              </li>
+            {/if}
+          </ul>
         </td>
         <td />
       </tr>

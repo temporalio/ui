@@ -17,7 +17,7 @@
   >
     <Icon name={icon} class="block h-full w-full" /></span
   >
-  <h2 class="text-xl font-medium">{title}</h2>
+  <h3 class="text-xl font-medium">{title}</h3>
   {#if content}
     <p class="text-center">{content}</p>
   {/if}
