@@ -140,8 +140,9 @@
   <slot name="error" />
 {:else if error}
   <Alert
+    bold
     intent="error"
-    class="mb-10 rounded-xl border-[3px]"
+    class="mb-10"
     title={error?.message ?? 'Error fetching data.'}
   />
 {/if}

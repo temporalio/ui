@@ -16,9 +16,18 @@
       </p>
     </Alert>
   </Hst.Variant>
-
   <Hst.Variant title="An Error Alert">
     <Alert icon="error" intent="error" title="Alert Title">
+      <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut cupiditate
+        exercitationem quia quibusdam excepturi rem saepe dolore quas, odit vero
+        sed rerum necessitatibus minima nobis, ullam minus inventore voluptates
+        itaque?
+      </p>
+    </Alert>
+  </Hst.Variant>
+  <Hst.Variant title="A Bold Error Alert">
+    <Alert icon="error" intent="error" title="Alert Title" bold>
       <p>
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut cupiditate
         exercitationem quia quibusdam excepturi rem saepe dolore quas, odit vero
