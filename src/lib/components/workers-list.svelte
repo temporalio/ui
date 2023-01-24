@@ -56,7 +56,11 @@
         <td />
       </tr>
     {:else}
-      <EmptyState title={'No Workers Found'} />
+      <tr class="table-row w-full">
+        <td colspan="6">
+          <EmptyState title={'No Workers Found'} />
+        </td>
+      </tr>
     {/each}
   </Table>
 </section>
