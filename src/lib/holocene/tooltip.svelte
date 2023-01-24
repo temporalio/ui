@@ -68,7 +68,7 @@
 
 <style lang="postcss">
   .tooltip {
-    @apply invisible absolute left-0 top-0 z-50 inline-block translate-x-12 whitespace-nowrap text-xs opacity-0 transition-all;
+    @apply absolute left-0 top-0 z-50 hidden translate-x-12 whitespace-nowrap text-xs opacity-0 transition-all;
   }
 
   .tooltip.top {
@@ -104,6 +104,6 @@
   }
 
   .wrapper:hover .tooltip {
-    @apply visible opacity-90;
+    @apply inline-block opacity-90;
   }
 </style>

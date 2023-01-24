@@ -103,7 +103,7 @@
     <Loading title="Deleting Schedule..." class="my-2" />
   {:else}
     <header class="flex flex-row justify-between gap-4 mb-8">
-      <main class="flex flex-col gap-1 relative">
+      <div class="flex flex-col gap-1 relative">
         <a
           href={routeForSchedules({ namespace })}
           class="absolute top-0 back-to-schedules"
@@ -116,9 +116,9 @@
             <WorkflowStatus
               status={schedule?.schedule.state.paused ? 'Paused' : 'Running'}
             />
-            <h1 class="font-medium select-all" data-cy="schedule-name">
+            <p class="font-medium select-all" data-cy="schedule-name">
               {scheduleId}
-            </h1>
+            </p>
           </h1>
         </div>
         <div class="flex items-center gap-2 text-sm">
@@ -131,7 +131,9 @@
           </p>
         </div>
         <div class="flex items-center gap-2 text-sm">
-          <p>Created: {formatDate(schedule?.info?.createTime, $timeFormat)}</p>
+          <p>
+            Created: {formatDate(schedule?.info?.createTime, $timeFormat)}
+          </p>
         </div>
         {#if schedule?.info?.updateTime}
           <div class="flex items-center gap-2 text-sm">
@@ -143,7 +145,7 @@
             </p>
           </div>
         {/if}
-      </main>
+      </div>
       <SplitButton
         position="right"
         label={schedule?.schedule?.state?.paused ? 'Unpause' : 'Pause'}
@@ -224,6 +226,7 @@
           class="block w-full border border-gray-200 rounded-md p-2 mt-4"
           placeholder="Enter a reason"
           bind:value={reason}
+          on:keydown|stopPropagation
         />
       </div>
     </Modal>

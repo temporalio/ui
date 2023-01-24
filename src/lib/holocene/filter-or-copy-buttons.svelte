@@ -20,6 +20,7 @@
   <div
     class="copy-or-filter {className}"
     on:click|preventDefault|stopPropagation={noop}
+    on:keyup|preventDefault|stopPropagation={noop}
   >
     {#if filterable}
       <button
@@ -28,7 +29,7 @@
         class:filtered
       >
         {#key filtered}
-          <Icon name="filter" class="h-5 w-5" />
+          <Icon name="filter" />
         {/key}
       </button>
     {/if}
@@ -37,11 +38,7 @@
         class="copy-or-filter-button"
         on:click|preventDefault|stopPropagation={(e) => copy(e, content)}
       >
-        <Icon
-          name={$copied ? 'checkmark' : 'copy'}
-          stroke="#000"
-          class="h-5 w-5"
-        />
+        <Icon name={$copied ? 'checkmark' : 'copy'} stroke="#000" />
       </button>
     {/if}
   </div>

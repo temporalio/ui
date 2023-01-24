@@ -100,17 +100,12 @@
   <svelte:fragment slot="bottom">
     {#if extras}
       {#each extras as extra}
-        <NavRow {isCloud} noFilter>
-          <div class="nav-icon">
-            <svelte:component this={extra.component} />
-          </div>
-          <div
-            class="nav-title"
-            class:cursor={extra?.onClick}
-            on:click={extra?.onClick}
-          >
-            {extra.name}
-          </div>
+        <NavRow {isCloud} noFilter handleClick={extra.onClick}>
+          <svelte:component this={extra.component}>
+            <div class="nav-title">
+              {extra.name}
+            </div>
+          </svelte:component>
         </NavRow>
       {/each}
     {/if}
@@ -136,20 +131,20 @@
       </NavRow>
     {:then user}
       {#if user?.accessToken}
-        <NavRow {isCloud} on:click={logout}>
+        <NavRow class="cursor-pointer" handleClick={logout} {isCloud}>
           <NavTooltip right text="Logout">
             <div class="nav-icon">
               <Icon name="logout" />
             </div>
           </NavTooltip>
-          <div class="nav-title cursor-pointer">Logout</div>
+          <div class="nav-title">Logout</div>
         </NavRow>
-        <div class="profile-row">
+        <li class="profile-row">
           <div>
             {#if user?.picture}
               <img
                 src={user?.picture}
-                alt={user?.profile}
+                alt={user?.profile ?? 'user profile'}
                 class="rounded-md p-1 w-8 h-8"
                 on:error={fixImage}
                 class:hidden={!showProfilePic}
@@ -171,7 +166,7 @@
               {user?.name}
             {/if}
           </div>
-        </div>
+        </li>
       {/if}
     {/await}
   </svelte:fragment>
@@ -186,7 +181,7 @@
       {#if $namespaceSelectorOpen}
         <NamespaceList
           {getNamespaceList}
-          on:closeNamespaceList={(event) => {
+          on:closeNamespaceList={() => {
             $namespaceSelectorOpen = false;
           }}
         />

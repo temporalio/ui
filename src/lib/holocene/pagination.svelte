@@ -14,12 +14,22 @@
   import { getFloatStyle } from '$lib/utilities/get-float-style';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
 
+  import type { HoloceneComponentProps } from 'src/types/holocene';
+
   type T = $$Generic;
+  interface $$Props extends HoloceneComponentProps<'div'> {
+    items: T[];
+    floatId?: string | undefined;
+    startingIndex?: string | number;
+    currentPageKey?: string;
+    itemsPerPage?: number | null;
+    updating?: boolean;
+  }
 
   export let items: T[];
   export let floatId: string | undefined = undefined;
   export let startingIndex: string | number = 0;
-  export let currentPageKey = 'page';
+  export let currentPageKey: string = 'page';
   export let itemsPerPage: number | null = null;
   export let updating: boolean = false;
 
@@ -125,6 +135,7 @@
       style={floatStyle}
       bind:clientHeight={height}
       class="flex flex-col justify-end gap-4 md:flex-row"
+      aria-label={$$restProps['aria-label']}
     >
       <slot name="action-top-center" />
       {#if !itemsPerPage}
@@ -184,6 +195,7 @@
     class={`flex ${
       $$slots['action-bottom-left'] ? 'justify-between' : 'justify-end'
     }`}
+    aria-label={$$restProps['aria-label']}
   >
     <slot name="action-bottom-left" />
     <div class="flex gap-4">

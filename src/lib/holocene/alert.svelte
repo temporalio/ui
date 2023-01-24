@@ -6,9 +6,10 @@
 
   export let title: string;
   export let icon: IconName = null;
+  export let bold = false;
 </script>
 
-<div class="alert rounded-md border {intent} {$$props.class}">
+<div class="alert {intent} {$$props.class}" class:bold>
   {#if icon}
     <div>
       <Icon name={icon} />
@@ -26,7 +27,11 @@
 
 <style lang="postcss">
   .alert {
-    @apply flex p-5 font-secondary text-sm;
+    @apply flex rounded-md border p-5 font-secondary text-sm;
+  }
+
+  .alert.bold {
+    @apply rounded-xl border-[3px];
   }
 
   .alert.success {

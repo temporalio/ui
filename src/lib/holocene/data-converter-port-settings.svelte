@@ -14,5 +14,6 @@
     placeholder="Port"
     data-cy="data-encoder-port-input"
     bind:value={port}
+    on:keydown|stopPropagation
   />
 </div>

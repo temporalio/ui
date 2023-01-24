@@ -12,8 +12,6 @@
   import { namespaces } from '$lib/stores/namespaces';
   import { toaster } from '$lib/stores/toaster';
 
-  let searchField: HTMLInputElement = null;
-
   $: namespaceNames = $namespaces.map(
     (namespace: Namespace) => namespace?.namespaceInfo?.name,
   );
@@ -53,8 +51,8 @@
     <input
       class="w-full"
       placeholder="Search"
+      on:keydown|stopPropagation
       bind:value={searchValue}
-      bind:this={searchField}
     />
   </div>
   <ul class="h-screen w-full">

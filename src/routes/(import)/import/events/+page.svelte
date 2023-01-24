@@ -11,7 +11,10 @@
 
 <section class="flex flex-col gap-4">
   <section id="event-history">
-    <nav class="block items-center justify-between gap-4 pb-4 lg:flex">
+    <nav
+      class="block items-center justify-between gap-4 pb-4 lg:flex"
+      aria-label="event history import"
+    >
       <h3 class="text-lg font-medium">Event History Import</h3>
       <div class="flex gap-4">
         <HistoryImport user={authUser} />

@@ -8,7 +8,7 @@
 
 {#if href}
   <a class="table-row align-middle {$$props.class}" {href}>
-    <td class:selectable on:click|stopPropagation>
+    <td class:selectable on:click|stopPropagation on:keyup|stopPropagation>
       {#if selectable}
         <div class="absolute">
           <Checkbox bind:checked={selected} on:change />

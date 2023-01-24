@@ -72,7 +72,7 @@
   });
 </script>
 
-<main class="flex h-full flex-col gap-6">
+<div class="flex h-full flex-col gap-6">
   {#if !$workflowRun.workflow}
     <Loading />
   {:else}
@@ -85,4 +85,4 @@
     />
     <slot />
   {/if}
-</main>
+</div>

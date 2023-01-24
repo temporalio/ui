@@ -38,7 +38,7 @@
 </script>
 
 <div class="mt-8 w-full">
-  <h1 class="mb-4 text-2xl">Frequency</h1>
+  <h2 class="mb-4 text-2xl">Frequency</h2>
   <div class="flex flex-wrap gap-6">
     {#if schedule}
       <Tab

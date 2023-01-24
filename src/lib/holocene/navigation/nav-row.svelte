@@ -4,6 +4,7 @@
   export let noFilter = false;
   export let wrap = false;
   export let externalLink = false;
+  export let handleClick: () => void = null;
   let classes = `nav-row ${$$props.class} ${isCloud ? 'cloud' : 'local'}`;
 </script>
 
@@ -12,10 +13,13 @@
   class:noFilter
   class:wrap
   data-cy={$$props['data-cy']}
-  on:click
 >
-  {#if link && externalLink}
-    <a href={link} target="_blank" class={classes}>
+  {#if handleClick !== null}
+    <button on:click={handleClick} class="{classes} text-left">
+      <slot />
+    </button>
+  {:else if link && externalLink}
+    <a href={link} rel="noreferrer" target="_blank" class={classes}>
       <slot />
     </a>
   {:else if link}

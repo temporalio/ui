@@ -1,5 +1,3 @@
-import { has } from './has';
-
 export type ActivityType = (typeof activityEvents)[number];
 export const activityEvents = [
   'ActivityTaskCanceled',

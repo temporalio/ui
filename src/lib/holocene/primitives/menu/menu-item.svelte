@@ -1,6 +1,6 @@
 <script lang="ts">
+  import { type ComponentProps, createEventDispatcher } from 'svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
-  import type { ComponentProps } from 'svelte';
 
   export let dark = false;
   export let selected = false;
@@ -10,6 +10,14 @@
   export let href = '';
   export let dataCy: string = null;
   export let tooltipProps: ComponentProps<Tooltip> = {};
+
+  const dispatch = createEventDispatcher<{ click: undefined }>();
+
+  const handleKeyUp = (event: KeyboardEvent) => {
+    if (event.key === ' ' || event.key === 'Enter') {
+      dispatch('click');
+    }
+  };
 
   $: ({ text, ...restTooltipProps } = tooltipProps);
 </script>
@@ -33,6 +41,7 @@
     {:else}
       <li
         on:click|preventDefault
+        on:keyup={handleKeyUp}
         role="menuitem"
         class:dark
         class:destructive
@@ -54,7 +63,7 @@
   }
 
   .menu-item {
-    @apply w-full cursor-pointer list-none bg-white p-4 font-secondary text-sm font-medium text-primary hover:bg-gray-50;
+    @apply w-full cursor-pointer list-none bg-white p-4 font-secondary text-sm font-medium text-primary focus-within:bg-gray-50 focus-within:outline-none hover:bg-gray-50;
   }
 
   .dark {

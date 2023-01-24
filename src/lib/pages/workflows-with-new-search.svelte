@@ -46,7 +46,6 @@
   let allSelected: boolean = false;
   let pageSelected: boolean = false;
   let terminating: boolean = false;
-  let cancelling: boolean = false;
 
   $: query = $page.url.searchParams.get('query');
 
@@ -195,7 +194,6 @@
         id: 'batch-cancel-success-toast',
       });
     } else {
-      cancelling = true;
       try {
         const jobId = await bulkCancelByIDs({
           namespace,
@@ -307,7 +305,7 @@
     </button>
   </div>
 </div>
-<Pagination items={$workflows} let:visibleItems>
+<Pagination items={$workflows} let:visibleItems aria-label="recent workflows">
   <svelte:fragment slot="action-top-left">
     <WorkflowAdvancedSearch />
   </svelte:fragment>
