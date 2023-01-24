@@ -20,6 +20,8 @@
   import JSONEditor from '$lib/holocene/json-editor.svelte';
   import { eventHistory } from '$lib/stores/events';
   import { getFirstResetEventID } from '$lib/utilities/get-first-reset-event-id';
+  import Select from '$lib/holocene/select/select.svelte';
+  import Option from '$lib/holocene/select/option.svelte';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
@@ -35,6 +37,9 @@
   let showTerminationConfirmation = false;
   let showCancellationConfirmation = false;
   let showSignalConfirmation = false;
+  let showResetConfirmation = false;
+  let resetType: ResetType = ResetType.FirstWorkflowTask;
+  let resetId: string | undefined = undefined;
   let loading = false;
 
   const showTerminationModal = () => {
@@ -62,6 +67,16 @@
     showSignalConfirmation = false;
     signalInput = '';
     signalName = '';
+  };
+
+  const showResetModal = () => {
+    showResetConfirmation = true;
+  };
+
+  const hideResetModal = () => {
+    showResetConfirmation = false;
+    resetType = ResetType.FirstWorkflowTask;
+    resetId = undefined;
   };
 
   const handleSuccessfulTermination = async () => {
@@ -108,7 +123,7 @@
         message: 'Unable to cancel workflow.',
       });
     }
-    showCancellationConfirmation = false;
+    hideResetModal();
   };
 
   const handleSignalInputChange = (event: CustomEvent<string>) => {
@@ -140,14 +155,13 @@
     showSignalConfirmation = false;
   };
 
-  const reset = async (type: ResetType) => {
-    let eventId: string;
-    switch (type) {
+  const reset = async () => {
+    switch (resetType) {
       case ResetType.FirstWorkflowTask:
-        eventId = getFirstResetEventID($eventHistory.start);
+        resetId = getFirstResetEventID($eventHistory.start);
         break;
       case ResetType.LastWorkflowTask: {
-        eventId = getFirstResetEventID($eventHistory.end);
+        resetId = getFirstResetEventID($eventHistory.end);
         break;
       }
     }
@@ -157,13 +171,20 @@
         namespace,
         workflowId: workflow.id,
         runId: workflow.runId,
-        eventId,
+        eventId: resetId,
       });
       $refresh = Date.now();
-      toaster.push({ message: 'Workflow successfully reset' });
     } catch (error) {
       toaster.push({ message: 'Error resetting workflow.', variant: 'error' });
     }
+  };
+
+  const copyForResetType = (type: ResetType): string => {
+    return {
+      [ResetType.FirstWorkflowTask]: 'Reset to first workflow task',
+      [ResetType.LastWorkflowTask]: 'Reset to last workflow task',
+      [ResetType.EventId]: 'Reset to Event ID',
+    }[type];
   };
 
   let workflowActions: {
@@ -185,16 +206,9 @@
 
   $: workflowActions = [
     {
-      label: 'Reset to first workflow task',
-      onClick: () => reset(ResetType.FirstWorkflowTask),
+      label: 'Reset',
+      onClick: showResetModal,
       dataCy: 'reset-first-task-button',
-      allowed: resetIsEnabled,
-      tooltip: resetTooltipText,
-    },
-    {
-      label: 'Reset to last workflow task',
-      onClick: () => reset(ResetType.LastWorkflowTask),
-      dataCy: 'reset-last-task-button',
       allowed: resetIsEnabled,
       tooltip: resetTooltipText,
     },
@@ -250,6 +264,41 @@
   {/each}
 </SplitButton>
 
+<Modal
+  open={showResetConfirmation}
+  on:confirmModal={reset}
+  on:cancelModal={hideResetModal}
+>
+  <h3 slot="title">Reset Workflow</h3>
+  <svelte:fragment slot="content">
+    <div class="flex h-40 w-full flex-col gap-4">
+      <Select
+        id="reset-type-select"
+        bind:value={resetType}
+        displayValue={copyForResetType}
+      >
+        <Option value={ResetType.FirstWorkflowTask}
+          >{copyForResetType(ResetType.FirstWorkflowTask)}</Option
+        >
+        <Option value={ResetType.LastWorkflowTask}
+          >{copyForResetType(ResetType.LastWorkflowTask)}</Option
+        >
+        <Option value={ResetType.EventId}
+          >{copyForResetType(ResetType.EventId)}</Option
+        >
+      </Select>
+      {#if resetType === ResetType.EventId}
+        <Input
+          id="reset-event-id"
+          type="number"
+          label="Event Id"
+          hintText="Note: only Workflow Events of type WorkflowTaskCompleted, WorkflowTaskFailed, or WorkflowTaskTimeout are supported."
+          bind:value={resetId}
+        />
+      {/if}
+    </div>
+  </svelte:fragment>
+</Modal>
 <Modal
   open={showCancellationConfirmation}
   {loading}

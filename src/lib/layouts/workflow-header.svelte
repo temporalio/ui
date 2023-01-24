@@ -27,6 +27,7 @@
   import AutoRefreshWorkflow from '$lib/components/auto-refresh-workflow.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
+  import { hasBeenReset } from '$lib/utilities/has-been-reset';
 
   export let namespace: string;
 
@@ -89,6 +90,11 @@
     $workflowRun?.workflow?.status,
     $eventHistory,
   );
+
+  $: workflowHasBeenReset = hasBeenReset(
+    $workflowRun?.workflow.status,
+    $eventHistory,
+  );
 </script>
 
 <header class="mb-4 flex flex-col gap-4">
@@ -149,6 +155,16 @@
           Workflow uses the cancellation API, it'll cancel at the next available
           opportunity.
         </Alert>
+      </div>
+    {/if}
+    {#if workflowHasBeenReset}
+      <div class="mb-4" in:fly={{ duration: 200, delay: 100 }}>
+        <Alert
+          class="rounded-xl border-[3px]"
+          icon="info"
+          intent="info"
+          title="This Workflow has been Reset"
+        />
       </div>
     {/if}
     <nav class="flex flex-wrap gap-6">

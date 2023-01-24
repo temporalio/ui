@@ -60,6 +60,8 @@ export type FetchWorkflow =
   | typeof fetchAllWorkflows
   | typeof fetchAllArchivedWorkflows;
 
+export const WORKFLOW_RESET_REASON = 'reset from UI';
+
 export const fetchWorkflowCount = async (
   namespace: string,
   query: string,
@@ -286,8 +288,7 @@ export async function resetWorkflow({
     },
     workflowTaskFinishEventId: eventId,
     requestId: v4(),
-    reason: 'reset from UI',
-    resetReapplyType: 2,
+    reason: WORKFLOW_RESET_REASON,
   };
 
   return requestFromAPI<{ runId: string }>(route, {

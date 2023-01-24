@@ -175,5 +175,5 @@ export type SettingsResponse = {
 export enum ResetType {
   FirstWorkflowTask = 0,
   LastWorkflowTask = 1,
-  LastContinuedAsNew = 2,
+  EventId = 2,
 }

@@ -109,7 +109,7 @@
     {/if}
   </div>
   {#if hintText}
-    <span class="mt-1 text-xs text-red-700">{hintText}</span>
+    <span class="hint-text" class:invalid={!valid} class:error>{hintText}</span>
   {/if}
 </div>
 
@@ -181,6 +181,15 @@
 
   input:focus + .count {
     @apply visible;
+  }
+
+  .hint-text {
+    @apply mt-1 text-xs;
+  }
+
+  .hint-text.error,
+  .hint-text.invalid {
+    @apply text-red-700;
   }
 
   /* Light theme styles */
