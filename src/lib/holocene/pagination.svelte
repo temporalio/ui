@@ -14,10 +14,10 @@
   import { getFloatStyle } from '$lib/utilities/get-float-style';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
 
-  import type { HoloceneComponentProps } from 'src/types/holocene';
+  import type { HTMLAttributes } from 'svelte/elements';
 
   type T = $$Generic;
-  interface $$Props extends HoloceneComponentProps<'div'> {
+  interface $$Props extends HTMLAttributes<HTMLDivElement> {
     items: T[];
     floatId?: string | undefined;
     startingIndex?: string | number;
