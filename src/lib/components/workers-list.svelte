@@ -58,7 +58,7 @@
     {:else}
       <tr class="table-row w-full">
         <td colspan="6">
-          <EmptyState class="w-full" title={'No Workers Found'} />
+          <EmptyState title={'No Workers Found'} />
         </td>
       </tr>
     {/each}
