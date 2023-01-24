@@ -16,9 +16,9 @@
     TEMPORAL_SYNTAX,
     TEMPORAL_THEME,
   } from '$lib/vendor/codemirror/theme';
-  import type { HoloceneComponentProps } from 'src/types/holocene';
+  import type { HTMLAttributes } from 'svelte/elements';
 
-  interface $$Props extends HoloceneComponentProps<'div'> {
+  interface $$Props extends HTMLAttributes<HTMLDivElement> {
     value: string;
     class?: string;
   }

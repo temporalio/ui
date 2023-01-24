@@ -7,9 +7,9 @@
   import { options } from '$lib/stores/pagination';
   import { onMount } from 'svelte';
 
-  import type { HoloceneComponentProps } from 'src/types/holocene';
+  import type { HTMLAttributes } from 'svelte/elements';
 
-  interface $$Props extends HoloceneComponentProps<'div'> {
+  interface $$Props extends HTMLAttributes<HTMLDivElement> {
     onError?: (error: any) => void | undefined;
     onFetch: () => Promise<PaginatedRequest>;
     onShiftUp?: (event: KeyboardEvent) => void | undefined;
