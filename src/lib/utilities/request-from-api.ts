@@ -73,7 +73,7 @@ export const requestFromAPI = async <T>(
   } = init;
   let { options } = init;
 
-  const nextPageToken = token ? { next_page_token: token } : {};
+  const nextPageToken = token ? { next_page_token: token.toString() } : {};
   const query = new URLSearchParams({
     ...params,
     ...nextPageToken,

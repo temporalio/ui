@@ -1,14 +1,4 @@
 <script lang="ts">
-  import { timeFormat } from '$lib/stores/time-format';
-  import { capitalize } from '$lib/utilities/format-camel-case';
-  import {
-    addHours,
-    addMinutes,
-    addSeconds,
-    formatISO,
-    startOfDay,
-  } from 'date-fns';
-
   import { durations } from '$lib/utilities/to-duration';
 
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
@@ -20,19 +10,6 @@
   let custom = false;
   let value = 'All Time';
   let timeField = 'StartTime';
-
-  let startDate = startOfDay(new Date());
-  let endDate = startOfDay(new Date());
-
-  let startHour = '';
-  let startMinute = '';
-  let startSecond = '';
-  let startHalf: 'AM' | 'PM' = 'AM';
-
-  let endHour = '';
-  let endMinute = '';
-  let endSecond = '';
-  let endHalf: 'AM' | 'PM' = 'AM';
 
   $: timeFilter = $workflowFilters.find(
     (f) => f.attribute === 'StartTime' || f.attribute === 'CloseTime',
@@ -73,56 +50,6 @@
       $workflowFilters = [...getOtherFilters(), filter];
       custom = false;
     }
-
-    updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
-  };
-
-  const applyTimeChanges = (date: Date, time) => {
-    let _date = new Date(date);
-    if (time.hour) _date = addHours(_date, time.hour);
-    if (time.minute) _date = addMinutes(_date, time.minute);
-    if (time.second) _date = addSeconds(_date, time.second);
-
-    return _date;
-  };
-
-  const setHours = (hour: string, half: 'AM' | 'PM') => {
-    if (hour) {
-      if (hour === '12') {
-        return half === 'AM' ? '00' : '12';
-      } else if (half === 'PM') {
-        return (parseInt(hour) + 12).toString();
-      } else {
-        return hour;
-      }
-    } else {
-      hour = '';
-    }
-  };
-
-  const onApply = () => {
-    let startDateWithTime = applyTimeChanges(startDate, {
-      hour: setHours(startHour, startHalf),
-      minute: startMinute,
-      second: startSecond,
-    });
-    let endDateWithTime = applyTimeChanges(endDate, {
-      hour: setHours(endHour, endHalf),
-      minute: endMinute,
-      second: endSecond,
-    });
-
-    const filter = {
-      attribute: timeField,
-      value: `BETWEEN "${formatISO(startDateWithTime)}" AND "${formatISO(
-        endDateWithTime,
-      )}"`,
-      conditional: '=',
-      operator: '',
-      parenthesis: '',
-      customDate: true,
-    };
-    $workflowFilters = [...getOtherFilters(), filter];
 
     updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
   };

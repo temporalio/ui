@@ -100,11 +100,14 @@
     endDate = startOfDay(d.detail);
   };
 
-  const applyTimeChanges = (date: Date, time) => {
+  const applyTimeChanges = (
+    date: Date,
+    time: { hour: string; minute: string; second: string },
+  ) => {
     let _date = new Date(date);
-    if (time.hour) _date = addHours(_date, time.hour);
-    if (time.minute) _date = addMinutes(_date, time.minute);
-    if (time.second) _date = addSeconds(_date, time.second);
+    if (time.hour) _date = addHours(_date, parseInt(time.hour));
+    if (time.minute) _date = addMinutes(_date, parseInt(time.minute));
+    if (time.second) _date = addSeconds(_date, parseInt(time.second));
 
     return _date;
   };
