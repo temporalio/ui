@@ -160,9 +160,9 @@
     class="w-44 rounded"
     id="time-range-filter"
     placeholder="All Time"
+    unroundRight
     bind:show
     keepOpen={true}
-    unroundRight
     {value}
     {onChange}
   >
