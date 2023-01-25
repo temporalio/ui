@@ -5,7 +5,7 @@
     routeForScheduleEdit,
     routeForSchedules,
   } from '$lib/utilities/route-for';
-  import { afterNavigate, goto } from '$app/navigation';
+  import { goto } from '$app/navigation';
 
   import {
     fetchSchedule,
@@ -49,15 +49,12 @@
   let coreUser = coreUserStore();
   let editDisabled = $coreUser.namespaceWriteDisabled(namespace);
 
-  afterNavigate(() => {
-    $loading = false;
-  });
-
   const handleDelete = async () => {
     try {
       $loading = true;
       await deleteSchedule({ namespace, scheduleId });
       setTimeout(() => {
+        $loading = false;
         goto(routeForSchedules({ namespace }));
       }, 2000);
     } catch (e) {
