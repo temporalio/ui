@@ -31,6 +31,7 @@
   import Loading from '$lib/holocene/loading.svelte';
   import type { DescribeScheduleResponse } from '$types';
   import { coreUserStore } from '$lib/stores/core-user';
+  import { toaster } from '$lib/stores/toaster';
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
@@ -58,6 +59,10 @@
         goto(routeForSchedules({ namespace }));
       }, 2000);
     } catch (e) {
+      toaster.push({
+        message: `Cannot delete schedule. ${e?.message}`,
+        variant: 'error',
+      });
       $loading = false;
     }
   };
