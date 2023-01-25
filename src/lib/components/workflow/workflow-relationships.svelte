@@ -8,11 +8,16 @@
   import Badge from '$lib/holocene/badge.svelte';
   import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
+  import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
+
+  type WorkflowEventWithAttributes = WorkflowEvent & {
+    attributes: CombinedAttributes;
+  };
 
   $: children = $workflowRun.workflow?.pendingChildren.length;
   $: parent = $workflowRun.workflow?.parent;
-  $: lastEvent = $eventHistory.end[0];
-  $: firstEvent = $eventHistory.start[0];
+  $: lastEvent = $eventHistory.end[0] as WorkflowEventWithAttributes;
+  $: firstEvent = $eventHistory.start[0] as WorkflowEventWithAttributes;
   $: firstExecutionRunId = firstEvent?.attributes?.firstExecutionRunId;
   $: first =
     firstExecutionRunId === $workflowRun.workflow?.runId
