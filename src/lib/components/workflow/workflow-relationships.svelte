@@ -13,18 +13,13 @@
   $: parent = $workflowRun.workflow?.parent;
   $: lastEvent = $eventHistory.end[0];
   $: firstEvent = $eventHistory.start[0];
-  $: firstExecutionRunId =
-    firstEvent?.workflowExecutionStartedEventAttributes?.firstExecutionRunId;
+  $: firstExecutionRunId = firstEvent?.attributes?.firstExecutionRunId;
   $: first =
     firstExecutionRunId === $workflowRun.workflow?.runId
       ? undefined // don't show first if it is the same as the current workflow run ID
       : firstExecutionRunId;
-  $: previous =
-    firstEvent?.workflowExecutionStartedEventAttributes
-      ?.continuedExecutionRunId;
-  $: next =
-    lastEvent?.workflowExecutionContinuedAsNewEventAttributes
-      ?.newExecutionRunId;
+  $: previous = firstEvent?.attributes?.continuedExecutionRunId;
+  $: next = lastEvent?.attributes?.newExecutionRunId;
   $: hasRelationships = parent || children || first || previous || next;
   $: ({ workflow, namespace } = $page.params);
 </script>
