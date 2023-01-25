@@ -27,7 +27,7 @@
   );
 
   let refreshInterval;
-  let autoRefresh = true;
+  let autoRefresh = false;
 
   onMount(() => {
     refreshInterval = setInterval(() => {
