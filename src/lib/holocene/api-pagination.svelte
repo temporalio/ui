@@ -149,7 +149,7 @@
 
 <div class="relative mb-8 flex flex-col gap-4">
   <div class="flex flex-col items-center justify-between gap-4 lg:flex-row">
-    <div class="flex grow items-center gap-1 lg:gap-2 xl:gap-3">
+    <div class="flex items-center gap-1 lg:gap-2 xl:gap-3">
       <slot name="action-top-left" />
     </div>
     <nav

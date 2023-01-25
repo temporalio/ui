@@ -10,10 +10,10 @@
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
   import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
-  import WorkflowsDashboard from '$lib/pages/operator-and-dev-views/workflows-dashboard.svelte';
-  import WorkflowsDashboardHeader from '$lib/pages/operator-and-dev-views/workflows-dashboard-header.svelte';
-  import WorkflowsLiveFeed from '$lib/pages/operator-and-dev-views/workflows-live-feed.svelte';
-  import WorkflowsLiveFeedHeader from '$lib/pages/operator-and-dev-views/workflows-live-feed-header.svelte';
+  import WorkflowsDashboard from '$lib/pages/dashboard-and-feed-views/workflows-dashboard.svelte';
+  import WorkflowsDashboardHeader from '$lib/pages/dashboard-and-feed-views/workflows-dashboard-header.svelte';
+  import WorkflowsLiveFeed from '$lib/pages/dashboard-and-feed-views/workflows-live-feed.svelte';
+  import WorkflowsLiveFeedHeader from '$lib/pages/dashboard-and-feed-views/workflows-live-feed-header.svelte';
   import { getSearchType } from '$lib/utilities/search-type-parameter';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';

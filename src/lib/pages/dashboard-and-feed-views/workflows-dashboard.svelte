@@ -9,7 +9,7 @@
 
   import { fetchStatusWorkflowCount } from '$lib/services/workflow-service';
   import Card from '$lib/holocene/card.svelte';
-  import WorkflowsImagination from './workflows-imagination.svelte';
+  import WorkflowsStatusTable from './workflows-status-table.svelte';
   import StatusCard from './_status-card.svelte';
   import PieChart from './_pie-chart.svelte';
   import TimePicker from './_workflows-start-time-picker.svelte';
@@ -151,5 +151,5 @@
       <TimePicker />
     </Card>
   </div>
-  <WorkflowsImagination {activeTotal} {activeStatus} />
+  <WorkflowsStatusTable {activeTotal} {activeStatus} />
 </section>

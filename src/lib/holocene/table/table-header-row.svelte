@@ -7,7 +7,7 @@
   export let indeterminate: boolean = false;
 </script>
 
-<tr class={$$props.class} on:click>
+<tr class={$$props.class}>
   <th class:selectable>
     {#if selectable}
       <Checkbox

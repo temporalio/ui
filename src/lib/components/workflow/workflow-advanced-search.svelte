@@ -10,9 +10,10 @@
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { workflowsQuery } from '$lib/stores/workflows';
+  import { noop } from 'svelte/internal';
 
   export let searchAttributePreset = '';
-  export let clearSearchAttributePreset: () => void;
+  export let clearSearchAttributePreset: () => void = noop;
 
   let manualSearchString = '';
 

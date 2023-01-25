@@ -3,7 +3,7 @@
 
   import { searchAttributeOptions } from '$lib/stores/search-attributes';
 
-  const { copy, copied } = copyToClipboard(500);
+  const { copy } = copyToClipboard(500);
 
   export let onClick: (searchAttribute: string) => void;
 

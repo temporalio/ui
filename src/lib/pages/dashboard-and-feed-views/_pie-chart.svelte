@@ -1,16 +1,14 @@
 <script lang="ts">
   import * as echarts from 'echarts';
   import { onMount } from 'svelte';
-  export let totals = {};
+  export let totals: Record<string, { count: number; color: string }> = {};
   export let tooltip = true;
-  export let valueFormatter: (value: string | number) => string = (value) =>
-    value.toLocaleString();
 
   let pie: HTMLElement;
   let pieChart: echarts.ECharts;
 
-  const fullTotal = Object.values(totals).reduce(
-    (sum, current) => (sum += parseInt(current.count)),
+  const fullTotal: number = Object.values(totals).reduce(
+    (sum, current) => (sum += current.count),
     0,
   );
 
