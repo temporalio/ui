@@ -12,7 +12,7 @@
   import WorkflowsImagination from './workflows-imagination.svelte';
   import StatusCard from './_status-card.svelte';
   import PieChart from './_pie-chart.svelte';
-  import TimePicker from './_time-picker.svelte';
+  import TimePicker from './_workflows-start-time-picker.svelte';
 
   $: query = $page.url.searchParams.get('query');
 
