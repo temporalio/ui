@@ -44,6 +44,7 @@
     id="reset-type-select"
     bind:value={resetType}
     displayValue={copyForResetType}
+    dataCy="workflow-reset-type-select"
   >
     <Option value={ResetType.FirstWorkflowTask}
       >{copyForResetType(ResetType.FirstWorkflowTask)}</Option

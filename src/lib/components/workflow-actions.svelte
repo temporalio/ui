@@ -214,7 +214,7 @@
     {
       label: 'Reset',
       onClick: showResetModal,
-      dataCy: 'reset-first-task-button',
+      dataCy: 'reset-button',
       allowed: resetIsEnabled,
       tooltip: resetTooltipText,
     },

@@ -156,6 +156,7 @@
         bold
         icon="info"
         intent="info"
+        dataCy="workflow-reset-alert"
         title="This Workflow has been reset"
       >
         You can find the resulting Workflow Execution <Link

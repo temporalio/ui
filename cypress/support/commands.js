@@ -173,6 +173,14 @@ Cypress.Commands.add('interceptSignalWorkflowApi', () => {
   ).as('signal-workflow-api');
 });
 
+Cypress.Commands.add('interceptResetWorkflowApi', () => {
+  cy.intercept(
+    Cypress.env('VITE_API_HOST') +
+      `/api/v1/namespaces/*/workflows/*/runs/*/reset?`,
+    { statusCode: 200, body: { runId: 'abc-123' } },
+  ).as('reset-workflow-api');
+});
+
 Cypress.Commands.add(
   'interceptApi',
   ({ archived } = { namespace: 'default', archived: false }) => {
@@ -180,6 +188,7 @@ Cypress.Commands.add(
     cy.interceptNamespaceApi({ archived });
     cy.interceptWorkflowsApi();
     cy.interceptWorkflowsCountApi();
+    cy.interceptWorkflowApi();
     cy.interceptClusterApi();
     cy.interceptArchivedWorkflowsApi();
     cy.interceptGithubReleasesApi();
@@ -194,5 +203,6 @@ Cypress.Commands.add(
     cy.interceptTerminateWorkflowApi();
     cy.interceptCancelWorkflowApi();
     cy.interceptSignalWorkflowApi();
+    cy.interceptResetWorkflowApi();
   },
 );

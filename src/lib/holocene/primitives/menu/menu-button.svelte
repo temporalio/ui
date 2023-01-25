@@ -32,6 +32,7 @@
   class:dark
   class:show
   {disabled}
+  data-cy={$$props.dataCy}
 >
   <slot />
   {#if hasIndicator}
