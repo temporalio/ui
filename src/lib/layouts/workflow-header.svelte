@@ -27,7 +27,9 @@
   import AutoRefreshWorkflow from '$lib/components/auto-refresh-workflow.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
-  import { hasBeenReset } from '$lib/utilities/has-been-reset';
+  import { resetWorkflows } from '$lib/stores/reset-workflows';
+  import { has } from '$lib/utilities/has';
+  import Link from '$lib/holocene/link.svelte';
 
   export let namespace: string;
 
@@ -91,10 +93,7 @@
     $eventHistory,
   );
 
-  $: workflowHasBeenReset = hasBeenReset(
-    $workflowRun?.workflow.status,
-    $eventHistory,
-  );
+  $: workflowHasBeenReset = has($resetWorkflows, $workflowRun?.workflow.runId);
 </script>
 
 <header class="mb-4 flex flex-col gap-1">
@@ -157,8 +156,16 @@
         bold
         icon="info"
         intent="info"
-        title="This Workflow has been Reset"
-      />
+        title="This Workflow has been reset"
+      >
+        You can find the resulting Workflow Execution <Link
+          href={routeForEventHistory({
+            namespace,
+            workflow: $workflowRun?.workflow?.id,
+            run: $resetWorkflows[$workflowRun?.workflow?.runId],
+          })}>here</Link
+        >.
+      </Alert>
     </div>
   {/if}
   <nav class="flex flex-wrap gap-6" aria-label="workflow detail">

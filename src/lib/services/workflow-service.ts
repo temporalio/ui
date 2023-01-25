@@ -54,13 +54,12 @@ export type ResetWorkflowOptions = {
   workflowId: string;
   runId: string;
   eventId: string;
+  reason: string;
 };
 
 export type FetchWorkflow =
   | typeof fetchAllWorkflows
   | typeof fetchAllArchivedWorkflows;
-
-export const WORKFLOW_RESET_REASON = 'reset from UI';
 
 export const fetchWorkflowCount = async (
   namespace: string,
@@ -274,6 +273,7 @@ export async function resetWorkflow({
   workflowId,
   runId,
   eventId,
+  reason,
 }: ResetWorkflowOptions): Promise<{ runId: string }> {
   const route = await routeForApi('workflow.reset', {
     namespace,
@@ -288,7 +288,7 @@ export async function resetWorkflow({
     },
     workflowTaskFinishEventId: eventId,
     requestId: v4(),
-    reason: WORKFLOW_RESET_REASON,
+    reason,
   };
 
   return requestFromAPI<{ runId: string }>(route, {
