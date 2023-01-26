@@ -2,8 +2,6 @@ type WorkflowExecutionStatus = import('$types').WorkflowExecutionStatus;
 type WorkflowTaskFailedCause = import('$types').WorkflowTaskFailedCause;
 type ListWorkflowExecutionsResponse =
   import('$types').ListWorkflowExecutionsResponse;
-type DescribeWorkflowExecutionResponse =
-  import('$types').DescribeWorkflowExecutionResponse;
 
 type WorkflowExecutionAPIResponse = Optional<
   DescribeWorkflowExecutionResponse,
@@ -58,6 +56,11 @@ type WorkflowExecution = {
   isRunning: boolean;
   defaultWorkflowTaskTimeout: Duration;
   canBeTerminated: boolean;
+};
+
+type WorkflowIdentifier = {
+  workflowId?: string;
+  runId?: string;
 };
 
 type BatchOperationType = 'Terminate' | 'Cancel' | 'Signal';
