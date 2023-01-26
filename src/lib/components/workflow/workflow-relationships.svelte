@@ -22,7 +22,7 @@
   <div slot="summary" class="hidden flex-row gap-2 lg:flex">
     <Badge type={parent ? 'purple' : 'gray'}>{parent ? 1 : 0} Parent</Badge>
     <Badge type={hasChildren ? 'purple' : 'gray'}
-      >{hasChildren} Pending Children</Badge
+      >{$workflowRun.workflow.pendingChildren.length} Pending Children</Badge
     >
     <Badge type={first ? 'purple' : 'gray'}>{first ? 1 : 0} First</Badge>
     <Badge type={previous ? 'purple' : 'gray'}>
