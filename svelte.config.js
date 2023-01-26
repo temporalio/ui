@@ -7,7 +7,7 @@ const mode = process.env.NODE_ENV;
 const dev = mode === 'development';
 process.env.TAILWIND_MODE = dev ? 'watch' : 'build';
 
-const buildTarget = process.env.VITE_TEMPORAL_UI_BUILD_TARGET || 'local';
+const ci = !!process.env.VERCEL;
 
 const publicPath = process.env.VITE_PUBLIC_PATH || '';
 
@@ -21,12 +21,11 @@ export default {
     }),
   ],
   kit: {
-    adapter:
-      buildTarget === 'local'
-        ? adapter({
-            fallback: 'index.html',
-          })
-        : vercel(),
+    adapter: ci
+      ? vercel()
+      : adapter({
+          fallback: 'index.html',
+        }),
     paths: {
       base: publicPath,
     },
