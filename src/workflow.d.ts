@@ -2,6 +2,8 @@ type WorkflowExecutionStatus = import('$types').WorkflowExecutionStatus;
 type WorkflowTaskFailedCause = import('$types').WorkflowTaskFailedCause;
 type ListWorkflowExecutionsResponse =
   import('$types').ListWorkflowExecutionsResponse;
+type DescribeWorkflowExecutionResponse =
+  import('$types').DescribeWorkflowExecutionResponse;
 
 type WorkflowExecutionAPIResponse = Optional<
   DescribeWorkflowExecutionResponse,
