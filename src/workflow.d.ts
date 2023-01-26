@@ -51,7 +51,7 @@ type WorkflowExecution = {
   pendingActivities: PendingActivity[];
   stateTransitionCount: string;
   parentNamespaceId?: string;
-  parent?: IWorkflowExecution;
+  parent?: WorkflowIdentifier;
   url: string;
   isRunning: boolean;
   defaultWorkflowTaskTimeout: Duration;
