@@ -16,7 +16,7 @@ const getNewExecutionId = (events: WorkflowEvents): string | undefined => {
   }
 };
 
-export const getWorkflowRelationship = (
+export const getWorkflowRelationships = (
   workflowRun: WorkflowRunWithWorkers,
   eventHistory: StartAndEndEventHistory,
 ) => {

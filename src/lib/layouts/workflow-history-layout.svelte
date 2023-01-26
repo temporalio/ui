@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
   import { eventViewType } from '$lib/stores/event-view';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
+  import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
   import { exportHistory } from '$lib/utilities/export-history';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { eventHistory } from '$lib/stores/events';
@@ -16,13 +17,12 @@
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
   import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
-  import { getWorkflowRelationship } from '$lib/utilities/get-workflow-relationship';
 
   let showShortcuts = false;
 
   $: workflowEvents =
     getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
-  $: workflowRelationships = getWorkflowRelationship(
+  $: workflowRelationships = getWorkflowRelationships(
     $workflowRun,
     $eventHistory,
   );
