@@ -8,32 +8,18 @@
   import Badge from '$lib/holocene/badge.svelte';
   import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
-  import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
+  import { getWorkflowRelationship } from '$lib/utilities/get-workflow-relationship';
 
-  type WorkflowEventWithAttributes = WorkflowEvent & {
-    attributes: CombinedAttributes;
-  };
-
-  $: children = $workflowRun.workflow?.pendingChildren.length;
-  $: parent = $workflowRun.workflow?.parent;
-  $: lastEvent = $eventHistory.end[0] as WorkflowEventWithAttributes;
-  $: firstEvent = $eventHistory.start[0] as WorkflowEventWithAttributes;
-  $: firstExecutionRunId = firstEvent?.attributes?.firstExecutionRunId;
-  $: first =
-    firstExecutionRunId === $workflowRun.workflow?.runId
-      ? undefined // don't show first if it is the same as the current workflow run ID
-      : firstExecutionRunId;
-  $: previous = firstEvent?.attributes?.continuedExecutionRunId;
-  $: next = lastEvent?.attributes?.newExecutionRunId;
-  $: hasRelationships = parent || children || first || previous || next;
   $: ({ workflow, namespace } = $page.params);
+  $: ({ hasChildren, hasRelationships, first, previous, parent, next } =
+    getWorkflowRelationship($workflowRun, $eventHistory));
 </script>
 
 <Accordion title="Relationships" icon="relationship">
   <div slot="summary" class="hidden flex-row gap-2 lg:flex">
     <Badge type={parent ? 'purple' : 'gray'}>{parent ? 1 : 0} Parent</Badge>
-    <Badge type={children ? 'purple' : 'gray'}
-      >{children} Pending Children</Badge
+    <Badge type={hasChildren ? 'purple' : 'gray'}
+      >{hasChildren} Pending Children</Badge
     >
     <Badge type={first ? 'purple' : 'gray'}>{first ? 1 : 0} First</Badge>
     <Badge type={previous ? 'purple' : 'gray'}>
@@ -118,7 +104,7 @@
         </div>
       {/if}
     </div>
-    {#if children}
+    {#if hasChildren}
       <ChildWorkflowsTable
         pendingChildren={$workflowRun.workflow.pendingChildren}
         namespace={$page.params.namespace}
