@@ -30,6 +30,9 @@ export default {
     paths: {
       base: publicPath,
     },
+    prerender: {
+      entries: [],
+    },
     version: {
       pollInterval: 10000,
     },
