@@ -40,14 +40,20 @@ export const getWorkflowRelationship = (
   const previous =
     workflowExecutionStartedEvent?.attributes?.continuedExecutionRunId;
 
-  const next = newExecutionRunId;
   const hasRelationships = !!(
     parent ||
     hasChildren ||
     first ||
     previous ||
-    next
+    newExecutionRunId
   );
 
-  return { hasRelationships, hasChildren, first, previous, parent, next };
+  return {
+    hasRelationships,
+    hasChildren,
+    first,
+    previous,
+    parent,
+    next: newExecutionRunId,
+  };
 };
