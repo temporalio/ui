@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { routeForEventHistory } from '$lib/utilities/route-for';
+  import { getWorkflowRelationship } from '$lib/utilities/get-workflow-relationship';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { eventHistory } from '$lib/stores/events';
 
@@ -8,7 +9,6 @@
   import Badge from '$lib/holocene/badge.svelte';
   import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
-  import { getWorkflowRelationship } from '$lib/utilities/get-workflow-relationship';
 
   $: ({ workflow, namespace } = $page.params);
   $: ({ hasChildren, hasRelationships, first, previous, parent, next } =
