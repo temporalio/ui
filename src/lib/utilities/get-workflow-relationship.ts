@@ -1,8 +1,9 @@
-import type { WorkflowRunWithWorkers } from '../stores/workflow-run';
-import type { StartAndEndEventHistory } from '../stores/events';
 import { isWorkflowExecutionStartedEvent } from './is-event-type';
 import { has } from './has';
 import { isString } from './is';
+
+import type { WorkflowRunWithWorkers } from '../stores/workflow-run';
+import type { StartAndEndEventHistory } from '../stores/events';
 
 const getNewExecutionId = (events: WorkflowEvents): string | undefined => {
   for (const event of events) {
