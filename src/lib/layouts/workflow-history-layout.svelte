@@ -16,11 +16,16 @@
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
   import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
+  import { getWorkflowRelationship } from '$lib/utilities/get-workflow-relationship';
 
   let showShortcuts = false;
 
   $: workflowEvents =
     getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
+  $: workflowRelationships = getWorkflowRelationship(
+    $workflowRun,
+    $eventHistory,
+  );
 
   const onViewClick = (view: EventView) => {
     if ($page.url.searchParams.get('page')) {
@@ -32,7 +37,7 @@
 
 <section class="flex flex-col gap-4">
   <WorkflowSummary />
-  <WorkflowRelationships />
+  <WorkflowRelationships {...workflowRelationships} />
   <WorkflowStackTraceError />
   <WorkflowTypedError error={workflowEvents.error} />
   <PendingActivities />

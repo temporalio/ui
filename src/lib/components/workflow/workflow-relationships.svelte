@@ -1,18 +1,21 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { routeForEventHistory } from '$lib/utilities/route-for';
-  import { getWorkflowRelationship } from '$lib/utilities/get-workflow-relationship';
   import { workflowRun } from '$lib/stores/workflow-run';
-  import { eventHistory } from '$lib/stores/events';
 
   import Accordion from '$lib/holocene/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
 
+  export let hasChildren: boolean;
+  export let hasRelationships: boolean;
+  export let first: string;
+  export let parent: WorkflowIdentifier;
+  export let next: string;
+  export let previous: string;
+
   $: ({ workflow, namespace } = $page.params);
-  $: ({ hasChildren, hasRelationships, first, previous, parent, next } =
-    getWorkflowRelationship($workflowRun, $eventHistory));
 </script>
 
 <Accordion title="Relationships" icon="relationship">
