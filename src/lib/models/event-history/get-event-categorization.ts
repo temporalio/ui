@@ -119,3 +119,5 @@ export const getEventsInCategory = (
   if (!isCategoryType(category)) return events;
   return events.filter((event: IterableEvent) => event.category === category);
 };
+
+console.log('hello');
