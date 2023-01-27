@@ -68,20 +68,20 @@
     {#if namespacesResult}
       {#each namespacesResult.filter( ({ namespace }) => namespace.includes(searchValue), ) as namespace}
         <li
-          class="first:rounded-t-xl first:border-t-[3px] last:rounded-b-xl last:border-b-[3px] border-b border-l-[3px] border-r-[3px] border-gray-900 p-3 flex border-collapse gap-2 hover:bg-gradient-to-br from-blue-100 to-purple-100 cursor-pointer"
-          on:click={() => namespace?.onClick(namespace.namespace)}
+          class="first:rounded-t-xl first:border-t-[3px] last:rounded-b-xl last:border-b-[3px] border-b border-l-[3px] border-r-[3px] border-gray-900 flex border-collapse gap-2 hover:bg-gradient-to-br from-blue-100 to-purple-100 cursor-pointer"
         >
-          <div class="w-6 h-6 pl-3 active">
-            {#if namespace.namespace === $page.params?.namespace}
-              <Icon name="checkmark" />
-            {/if}
-          </div>
           <a
             href={namespace.href(namespace.namespace)}
-            class="link"
+            class="w-full flex p-3"
             class:active={namespace.namespace === $page.params?.namespace}
-            >{namespace.namespace}</a
           >
+            <div class="w-6 h-6 active">
+              {#if namespace.namespace === $page.params?.namespace}
+                <Icon name="checkmark" />
+              {/if}
+            </div>
+            <p class="link">{namespace.namespace}</p>
+          </a>
         </li>
       {:else}
         <EmptyState title="No Namespaces" />
