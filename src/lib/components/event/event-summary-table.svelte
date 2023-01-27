@@ -47,8 +47,3 @@
   <slot />
 </Table>
 
-<style lang="postcss">
-  .error-table {
-    @apply table border border-yellow-700;
-  }
-</style>
