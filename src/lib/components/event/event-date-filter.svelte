@@ -86,17 +86,16 @@
       </div>
     {/if}
     {#each dateOptions as { label, option } (option)}
-      <div
-        class="option"
-        class:active={$timeFormat === option}
-        data-cy="event-date-filter-{option}"
-      >
+      <div class="option" class:active={$timeFormat === option}>
         <div class="check active">
           {#if $timeFormat === option}
             <Icon name="checkmark" />
           {/if}
         </div>
-        <button on:click={() => onDateOptionClick(option)}>
+        <button
+          data-cy="event-date-filter-{option}"
+          on:click={() => onDateOptionClick(option)}
+        >
           {label}
         </button>
       </div>

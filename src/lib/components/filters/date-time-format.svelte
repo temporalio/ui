@@ -24,17 +24,16 @@
 <DropdownMenu {value} right dataCy="date-time-format-filter">
   <div class="w-56">
     {#each dateOptions as { label, option } (option)}
-      <div
-        class="option"
-        class:active={$timeFormat === option}
-        data-cy="event-date-filter-{option}"
-      >
+      <div class="option" class:active={$timeFormat === option}>
         <div class="check">
           {#if $timeFormat === option}
             <Icon name="checkmark" />
           {/if}
         </div>
-        <button on:click={() => onDateOptionClick(option)}>
+        <button
+          data-cy="event-date-filter-{option}"
+          on:click={() => onDateOptionClick(option)}
+        >
           {label}
         </button>
       </div>
