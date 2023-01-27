@@ -12,3 +12,4 @@ node_modules
 /.histoire/*
 /build-local
 /.history
+/build

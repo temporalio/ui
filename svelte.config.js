@@ -1,4 +1,5 @@
 import preprocess from 'svelte-preprocess';
+import adapter from '@sveltejs/adapter-static';
 import vercel from '@sveltejs/adapter-vercel';
 
 // Workaround until SvelteKit uses Vite 2.3.8 (and it's confirmed to fix the Tailwind JIT problem)
@@ -6,8 +7,7 @@ const mode = process.env.NODE_ENV;
 const dev = mode === 'development';
 process.env.TAILWIND_MODE = dev ? 'watch' : 'build';
 
-const buildTarget = process.env.VITE_TEMPORAL_UI_BUILD_TARGET || 'local';
-let outputDirectory = `build-${buildTarget}`;
+const ci = !!process.env.VERCEL;
 
 const publicPath = process.env.VITE_PUBLIC_PATH || '';
 
@@ -21,13 +21,16 @@ export default {
     }),
   ],
   kit: {
-    adapter: vercel({
-      pages: outputDirectory,
-      assets: outputDirectory,
-      fallback: 'index.html',
-    }),
+    adapter: ci
+      ? vercel()
+      : adapter({
+          fallback: 'index.html',
+        }),
     paths: {
       base: publicPath,
+    },
+    prerender: {
+      entries: [],
     },
     version: {
       pollInterval: 10000,

@@ -9,6 +9,9 @@ export type CombinedAttributes = EventAttribute & {
   eventTime?: string;
   workflowExecutionRunId?: string;
   workflowExecutionWorkflowId?: string;
+  firstExecutionRunId?: string;
+  continuedExecutionRunId?: string;
+  newExecutionRunId?: string;
 };
 
 const keysToOmit: Readonly<Set<string>> = new Set(['header']);

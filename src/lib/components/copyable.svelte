@@ -24,7 +24,7 @@
       <Icon
         name={$copied ? 'checkmark' : 'copy'}
         stroke={color}
-        class={`${visible ? 'visible' : 'invisible group-hover:visible'} h-fit`}
+        class={`${visible ? 'visible' : 'invisible group-hover:visible'}`}
       />
     </button>
   </button>
@@ -39,7 +39,7 @@
       <Icon
         name={$copied ? 'checkmark' : 'copy'}
         stroke={color}
-        class={`${visible ? 'visible' : 'invisible group-hover:visible'} h-fit`}
+        class={`${visible ? 'visible' : 'invisible group-hover:visible'}`}
       />
     </button>
   </div>

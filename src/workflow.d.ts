@@ -38,6 +38,8 @@ type ArchiveFilterParameters = Omit<FilterParameters, 'timeRange'> & {
   closeTime?: Duration | string;
 };
 
+type WorkflowIdentifier = IWorkflowExecution;
+
 type WorkflowExecution = {
   name: string;
   id: string;
@@ -51,7 +53,7 @@ type WorkflowExecution = {
   pendingActivities: PendingActivity[];
   stateTransitionCount: string;
   parentNamespaceId?: string;
-  parent?: IWorkflowExecution;
+  parent?: WorkflowIdentifier;
   url: string;
   isRunning: boolean;
   defaultWorkflowTaskTimeout: Duration;

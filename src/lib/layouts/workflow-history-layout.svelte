@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
   import { eventViewType } from '$lib/stores/event-view';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
+  import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
   import { exportHistory } from '$lib/utilities/export-history';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { eventHistory } from '$lib/stores/events';
@@ -21,6 +22,10 @@
 
   $: workflowEvents =
     getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
+  $: workflowRelationships = getWorkflowRelationships(
+    $workflowRun,
+    $eventHistory,
+  );
 
   const onViewClick = (view: EventView) => {
     if ($page.url.searchParams.get('page')) {
@@ -32,7 +37,7 @@
 
 <section class="flex flex-col gap-4">
   <WorkflowSummary />
-  <WorkflowRelationships />
+  <WorkflowRelationships {...workflowRelationships} />
   <WorkflowStackTraceError />
   <WorkflowTypedError error={workflowEvents.error} />
   <PendingActivities />
