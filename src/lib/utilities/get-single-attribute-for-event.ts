@@ -68,7 +68,7 @@ const keysWithExecutionLinks = [
 // For linking to same workflow but different execution
 export const shouldDisplayAsExecutionLink = (
   key: string,
-): key is (typeof keysWithExecutionLinks)[number] => {
+): key is typeof keysWithExecutionLinks[number] => {
   for (const workflowKey of keysWithExecutionLinks) {
     if (key === workflowKey) return true;
   }
@@ -80,7 +80,7 @@ const keysWithTaskQueueLinks = ['taskQueueName'] as const;
 
 export const shouldDisplayAsTaskQueueLink = (
   key: string,
-): key is (typeof keysWithTaskQueueLinks)[number] => {
+): key is typeof keysWithTaskQueueLinks[number] => {
   for (const taskQueueKey of keysWithTaskQueueLinks) {
     if (key === taskQueueKey) return true;
   }
@@ -97,7 +97,7 @@ const keysWithChildExecutionLinks = [
 export const shouldDisplayChildWorkflowLink = (
   key: string,
   attributes: CombinedAttributes,
-): key is (typeof keysWithChildExecutionLinks)[number] => {
+): key is typeof keysWithChildExecutionLinks[number] => {
   const workflowLinkAttributesExist = Boolean(
     attributes?.workflowExecutionWorkflowId &&
       attributes?.workflowExecutionRunId,

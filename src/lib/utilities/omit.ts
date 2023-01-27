@@ -13,7 +13,7 @@ type Omit = {
 
 export const omit: Omit = (object, ...keys) => {
   const result = {} as {
-    [K in keyof typeof object]: (typeof object)[K];
+    [K in keyof typeof object]: typeof object[K];
   };
 
   for (const key of Object.keys(object)) {

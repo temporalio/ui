@@ -275,5 +275,4 @@
   .active {
     @apply text-blue-700;
   }
-
 </style>

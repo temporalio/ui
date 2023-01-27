@@ -76,5 +76,4 @@
   .link-item {
     @apply flex border-collapse cursor-pointer gap-2 truncate border p-3 hover:bg-gray-50;
   }
-
 </style>

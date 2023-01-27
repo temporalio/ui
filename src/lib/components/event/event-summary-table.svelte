@@ -46,4 +46,3 @@
   </TableHeaderRow>
   <slot />
 </Table>
-
