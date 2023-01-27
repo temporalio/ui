@@ -60,7 +60,7 @@
   <div class="relative inline" bind:this={menu} data-cy={$$props.dataCy}>
     <IconButton
       on:click={disabled ? noop : onClick}
-      dataCy="{$$props.dataCy}-button"
+      data-cy="{$$props.dataCy}-button"
     >
       <div class="inline flex items-center gap-1 truncate" class:disabled>
         <slot name="label" />
