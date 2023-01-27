@@ -38,19 +38,15 @@
   </svelte:fragment>
   <div class="w-56">
     {#each options as { label, option } (option)}
-      <div
-        class="option"
-        class:active={_value === option}
-        on:click={() => onOptionClick(option)}
-      >
+      <div class="option" class:active={_value === option}>
         <div class="check active">
           {#if _value === option}
             <Icon name="checkmark" />
           {/if}
         </div>
-        <div class="label">
+        <button on:click={() => onOptionClick(option)}>
           {label}
-        </div>
+        </button>
       </div>
     {/each}
   </div>
@@ -59,10 +55,6 @@
 <style lang="postcss">
   .option {
     @apply my-2 flex font-normal;
-  }
-
-  .label {
-    @apply cursor-pointer;
   }
 
   .check {

@@ -68,19 +68,15 @@
   <div class="w-56">
     {#if !compact}
       {#each sortOptions as { option, label } (option)}
-        <div
-          class="option"
-          class:active={$eventFilterSort === option}
-          on:click={() => onSortOptionClick(option)}
-        >
+        <div class="option" class:active={$eventFilterSort === option}>
           <div class="check active">
             {#if $eventFilterSort === option}
               <Icon name="checkmark" />
             {/if}
           </div>
-          <div class="label">
+          <button on:click={() => onSortOptionClick(option)}>
             {label}
-          </div>
+          </button>
         </div>
       {/each}
 
@@ -93,7 +89,6 @@
       <div
         class="option"
         class:active={$timeFormat === option}
-        on:click={() => onDateOptionClick(option)}
         data-cy="event-date-filter-{option}"
       >
         <div class="check active">
@@ -101,26 +96,22 @@
             <Icon name="checkmark" />
           {/if}
         </div>
-        <div class="label">
+        <button on:click={() => onDateOptionClick(option)}>
           {label}
-        </div>
+        </button>
       </div>
     {/each}
     <div class="option pr-4">
       <div class="check" />
       <div class="my-2 w-full border-b-2 border-gray-300 pr-2" />
     </div>
-    <div
-      class="option"
-      class:active={$eventShowElapsed === 'true'}
-      on:click={onShowElapsedClick}
-    >
+    <div class="option" class:active={$eventShowElapsed === 'true'}>
       <div class="check active">
         {#if $eventShowElapsed === 'true'}
           <Icon name="checkmark" />
         {/if}
       </div>
-      <div class="label">Show Elapsed Time</div>
+      <button on:click={onShowElapsedClick}>Show Elapsed Time</button>
     </div>
   </div>
 </DropdownMenu>
@@ -128,10 +119,6 @@
 <style lang="postcss">
   .option {
     @apply my-2 flex font-normal;
-  }
-
-  .label {
-    @apply cursor-pointer;
   }
 
   .check {
