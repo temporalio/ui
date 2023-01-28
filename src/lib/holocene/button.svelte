@@ -32,7 +32,7 @@
 
 {#if as === 'button'}
   <button
-    on:click
+    on:click|stopPropagation
     class="button {variant} {classes}"
     class:selected={active}
     class:large
@@ -61,7 +61,7 @@
 {:else}
   <a
     {href}
-    on:click
+    on:click|stopPropagation
     class="button {variant} {classes}"
     class:selected={active}
     class:large
