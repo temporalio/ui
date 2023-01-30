@@ -202,21 +202,20 @@
     tooltip?: string;
   }[];
 
-  $: resetIsEnabled = !resetEnabled || workflow?.pendingChildren?.length === 0;
-
-  $: resetTooltipText = resetIsEnabled
-    ? ''
-    : workflow?.pendingChildren?.length > 0
-    ? 'Cannot reset workflows with pending children.'
-    : 'Resetting workflows is not enabled, please contact your administrator for assistance.';
+  const resetTooltipText = (): string | undefined => {
+    if (!resetEnabled)
+      return 'Resetting workflows is not enabled, please contact your administrator for assistance.';
+    if (resetEnabled && workflow?.pendingChildren?.length > 0)
+      return 'Cannot reset workflows with pending children.';
+  };
 
   $: workflowActions = [
     {
       label: 'Reset',
       onClick: showResetModal,
       dataCy: 'reset-button',
-      allowed: resetIsEnabled,
-      tooltip: resetTooltipText,
+      allowed: resetEnabled && workflow?.pendingChildren?.length === 0,
+      tooltip: resetTooltipText(),
     },
     {
       label: 'Send a Signal',
