@@ -68,7 +68,7 @@
     {#if namespacesResult}
       {#each namespacesResult.filter( ({ namespace }) => namespace.includes(searchValue), ) as namespace}
         <li
-          class="first:rounded-t-xl first:border-t-[3px] last:rounded-b-xl last:border-b-[3px] border-b border-l-[3px] border-r-[3px] border-gray-900 flex border-collapse gap-2 hover:bg-gradient-to-br from-blue-100 to-purple-100 cursor-pointer"
+          class="first:rounded-t-xl first:border-t-3 last:rounded-b-xl last:border-b-3 border-b border-l-3 border-r-3 border-gray-900 flex border-collapse gap-2 hover:bg-gradient-to-br from-blue-100 to-purple-100 cursor-pointer"
         >
           <a
             href={namespace.href(namespace.namespace)}

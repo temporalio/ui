@@ -89,7 +89,7 @@
   .secondary,
   .destructive,
   .login {
-    @apply border-[3px] py-2 px-4 transition-colors;
+    @apply border-3 py-2 px-4 transition-colors;
   }
 
   .button:disabled {
