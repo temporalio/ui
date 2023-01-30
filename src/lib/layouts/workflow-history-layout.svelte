@@ -36,10 +36,10 @@
 </script>
 
 <section class="flex flex-col gap-4">
+  <WorkflowTypedError error={workflowEvents.error} />
   <WorkflowSummary />
   <WorkflowRelationships {...workflowRelationships} />
   <WorkflowStackTraceError />
-  <WorkflowTypedError error={workflowEvents.error} />
   <PendingActivities />
   <section class="flex w-full" data-cy="inputs-results">
     <Accordion
