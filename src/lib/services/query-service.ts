@@ -14,6 +14,7 @@ import {
   parseWithBigInt,
   stringifyWithBigInt,
 } from '$lib/utilities/parse-with-big-int';
+import { has } from '$lib/utilities/has';
 
 type QueryRequestParameters = {
   workflow: Eventual<{ id: string; runId: string }>;
@@ -133,7 +134,12 @@ export async function getQuery(
             })
           : await convertPayloadToJsonWithWebsocket(queryResult);
 
-        data = convertedAttributes?.payloads[0];
+        if (
+          has(convertedAttributes, 'payloads') &&
+          Array.isArray(convertedAttributes.payloads)
+        ) {
+          data = convertedAttributes.payloads[0];
+        }
       }
 
       return parseWithBigInt(data);
