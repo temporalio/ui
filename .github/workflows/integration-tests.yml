@@ -17,13 +17,16 @@ jobs:
         with:
           version: 7
       - name: Install dependencies
+        working-directory: ui
         run: pnpm install
       - name: Build assets
+        working-directory: ui
         run: VITE_MODE=test pnpm run build:local
       - name: Run Cypress tests
         uses: cypress-io/github-action@v2
         with:
           install: false
+          working-directory: ui
           start: pnpm run preview:local
           wait-on: 'http://localhost:3000'
           wait-on-timeout: 120

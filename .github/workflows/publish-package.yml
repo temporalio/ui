@@ -20,12 +20,14 @@ jobs:
         with:
           version: 7
       - name: Install dependencies
+        working-directory: ui
         run: pnpm install
       - name: Build Package
+        working-directory: ui
         run: pnpm package
       - name: Publish package to NPM
+        working-directory: ui/package
         run: npm publish
-        working-directory: ./package
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   create_release:
