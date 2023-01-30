@@ -5,10 +5,6 @@
 
   import { eventShowElapsed, eventFilterSort } from '$lib/stores/event-view';
   import { timeFormat } from '$lib/stores/time-format';
-  import {
-    workflowEventsColumnWidth,
-    workflowEventsResponsiveColumnWidth,
-  } from '$lib/stores/column-width';
 
   import {
     eventOrGroupIsFailureOrTimedOut,
@@ -104,10 +100,7 @@
       {/if}
     </p>
   </td>
-  <td
-    colspan={compact ? 2 : null}
-    class="table-cell text-right text-sm font-normal xl:text-left"
-  >
+  <td class="table-cell text-right text-sm font-normal xl:text-left">
     <div class="flex">
       {#if compact && failure}
         <Icon class="mr-1.5 inline text-red-700" name="clock" />
@@ -121,36 +114,25 @@
       <p class="event-name truncate text-sm font-semibold md:text-base">
         {isLocalActivityMarkerEvent(event) ? 'LocalActivity' : event.name}
       </p>
-      {#if compact}
-        <Icon
-          class="ml-1.5 inline"
-          name={expanded ? 'chevron-up' : 'chevron-down'}
-        />
-      {/if}
     </div>
   </td>
-  {#if !compact}
-    <td class="table-cell overflow-hidden">
-      <div class="flex w-full items-center justify-between">
-        <div class="grow truncate">
-          {#if !expanded}
-            <EventDetailsRow
-              {...getSingleAttributeForEvent(currentEvent)}
-              {attributes}
-              class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
-              inline
-            />
-          {/if}
-        </div>
-        <div>
-          <Icon
-            class="inline"
-            name={expanded ? 'chevron-up' : 'chevron-down'}
+  <td class="table-cell overflow-hidden">
+    <div class="flex w-full items-center justify-between">
+      <div class="grow truncate">
+        {#if !expanded}
+          <EventDetailsRow
+            {...getSingleAttributeForEvent(currentEvent)}
+            {attributes}
+            class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
+            inline
           />
-        </div>
+        {/if}
       </div>
-    </td>
-  {/if}
+      <div>
+        <Icon class="inline" name={expanded ? 'chevron-up' : 'chevron-down'} />
+      </div>
+    </div>
+  </td>
 
   <td class="table-cell" />
 </tr>
