@@ -62,7 +62,7 @@
   <div class="modal">
     <div
       on:keyup|stopPropagation={noop}
-      on:click={cancelModal}
+      on:click|stopPropagation={cancelModal}
       class="overlay"
     />
     <div
@@ -78,7 +78,7 @@
         <button
           aria-label={cancelText}
           class="float-right m-4"
-          on:click={cancelModal}
+          on:click|stopPropagation={cancelModal}
         >
           <Icon
             name="close"
