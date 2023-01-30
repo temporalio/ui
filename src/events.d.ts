@@ -18,6 +18,15 @@ type PendingActivityInfo = Replace<
   { activityId: string }
 >;
 
+type Payload = {
+  metadata?: { [k: string]: string };
+  data?: string;
+};
+
+type Payloads = {
+  payloads: Payload[];
+};
+
 type PendingActivity = Replace<
   PendingActivityInfo,
   'activityId',

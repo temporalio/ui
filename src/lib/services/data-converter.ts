@@ -2,11 +2,12 @@ import {
   setLastDataConverterFailure,
   setLastDataConverterSuccess,
 } from '$lib/stores/data-converter-config';
+
 import {
   parseWithBigInt,
   stringifyWithBigInt,
 } from '$lib/utilities/parse-with-big-int';
-import type { Payload } from '$types';
+
 import type WebSocketAsPromised from 'websocket-as-promised';
 
 interface WebSocketResponse {
@@ -17,7 +18,7 @@ interface WebSocketResponse {
 export async function convertPayloadWithWebsocket(
   payload: Payload,
   websocket: WebSocketAsPromised,
-): Promise<string | Payload> {
+): Promise<Payload> {
   if (!websocket.isOpened) {
     try {
       await websocket.open();
@@ -30,7 +31,7 @@ export async function convertPayloadWithWebsocket(
     return Promise.resolve(payload);
   }
 
-  const socketResponse: Promise<string> = websocket
+  const socketResponse = websocket
     .sendRequest({
       payload: stringifyWithBigInt(payload),
     })
