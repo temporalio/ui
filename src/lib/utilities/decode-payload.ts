@@ -1,5 +1,3 @@
-import type { Payload } from '$types';
-
 import { dataConverterWebsocket } from '$lib/utilities/data-converter-websocket';
 import type { DataConverterWebsocketInterface } from '$lib/utilities/data-converter-websocket';
 
@@ -13,6 +11,12 @@ import type {
 
 import { atob } from './atob';
 import { parseWithBigInt } from './parse-with-big-int';
+import { isObject } from './is';
+import { has } from './has';
+
+type PotentiallyDecodable =
+  | Record<string | number | symbol, unknown>
+  | EventAttribute;
 
 export type Decode = {
   convertPayloadToJsonWithCodec: typeof convertPayloadToJsonWithCodec;
@@ -28,11 +32,18 @@ export type DecodeFunctions = {
   codecPassAccessToken?: typeof passAccessToken;
 };
 
+const toArray = (payloads: Payload | Payload[]): Payload[] => {
+  if (Array.isArray(payloads)) {
+    return payloads;
+  } else {
+    return [payloads];
+  }
+};
+
 export function decodePayload(
   payload: Payload,
   // This could decode to any object. So we either use the payload object passed in or decode it
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): Payload | Record<any, any> | string {
+): Payload {
   if (payload === null) {
     return payload;
   }
@@ -57,12 +68,12 @@ export function decodePayload(
 export const decodePayloadAttributes = (
   eventAttribute: EventAttribute,
 ): EventAttribute => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const anyAttributes = eventAttribute as any;
-
   // Decode Search Attributes
-  if (anyAttributes?.searchAttributes?.indexedFields) {
-    const searchAttributes = anyAttributes?.searchAttributes?.indexedFields;
+  if (
+    has(eventAttribute, 'searchAttributes') &&
+    has(eventAttribute.searchAttributes, 'indexedFields')
+  ) {
+    const searchAttributes = eventAttribute.searchAttributes.indexedFields;
 
     Object.entries(searchAttributes).forEach(([key, value]) => {
       searchAttributes[key] = decodePayload(value);
@@ -70,8 +81,8 @@ export const decodePayloadAttributes = (
   }
 
   // Decode Memo
-  if (anyAttributes?.memo?.fields) {
-    const memo = anyAttributes?.memo?.fields;
+  if (has(eventAttribute, 'memo') && has(eventAttribute.memo, 'fields')) {
+    const memo = eventAttribute.memo.fields;
 
     Object.entries(memo).forEach(([key, value]) => {
       memo[key] = decodePayload(value);
@@ -79,8 +90,8 @@ export const decodePayloadAttributes = (
   }
 
   // Decode Header
-  if (anyAttributes?.header?.fields) {
-    const header = anyAttributes?.header?.fields;
+  if (has(eventAttribute, 'header') && has(eventAttribute.header, 'fields')) {
+    const header = eventAttribute.header.fields;
 
     Object.entries(header).forEach(([key, value]) => {
       header[key] = decodePayload(value);
@@ -89,67 +100,66 @@ export const decodePayloadAttributes = (
 
   // Decode Query Result
   // This one is a best guess from the previous codebase and needs verified
-  if (anyAttributes?.queryResult) {
-    const queryResult = anyAttributes?.queryResult;
+  if (has(eventAttribute, 'queryResult')) {
+    const queryResult = eventAttribute?.queryResult;
 
     Object.entries(queryResult).forEach(([key, value]) => {
       queryResult[key] = decodePayload(value);
     });
   }
 
-  return anyAttributes;
+  return eventAttribute;
+};
+
+const decodePayloadWithCodec =
+  (namespace: string, settings: Settings, accessToken: string) =>
+  async (payloads: unknown[]): Promise<unknown[]> => {
+    if (settings?.codec?.endpoint) {
+      // Convert Payload data
+      const awaitData = await convertPayloadsWithCodec({
+        payloads: { payloads },
+        namespace,
+        settings,
+        accessToken,
+      });
+      return awaitData.payloads.map(decodePayload);
+    } else {
+      return payloads.map(decodePayload);
+    }
+  };
+
+const keyIs = (key: string, ...validKeys: string[]) => {
+  for (const validKey of validKeys) {
+    if (key === validKey) return true;
+  }
+  return false;
 };
 
 export const decodeAllPotentialPayloadsWithCodec = async (
-  anyAttributes: any,
+  anyAttributes: PotentiallyDecodable,
   namespace: string,
   settings: Settings,
   accessToken: string,
-): Promise<any> => {
+): Promise<PotentiallyDecodable> => {
+  const decode = decodePayloadWithCodec(namespace, settings, accessToken);
   if (anyAttributes) {
     for (const key of Object.keys(anyAttributes)) {
-      if (key === 'payloads') {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let JSONPayload: string | Payload | Record<any, any>;
-        const payloads = anyAttributes[key];
-        if (settings?.codec?.endpoint) {
-          // Convert Payload data
-          const awaitData = await convertPayloadsWithCodec({
-            payloads: { payloads },
+      if (keyIs(key, 'payloads', 'encodedAttributes')) {
+        const data = toArray(anyAttributes[key]);
+        const decoded = await decode(data);
+        anyAttributes[key] = keyIs(key, 'encodedAttributes')
+          ? decoded[0]
+          : decoded;
+      } else {
+        const next = anyAttributes[key];
+        if (isObject(next)) {
+          anyAttributes[key] = await decodeAllPotentialPayloadsWithCodec(
+            next,
             namespace,
             settings,
             accessToken,
-          });
-          JSONPayload = (awaitData?.payloads ?? []).map(decodePayload);
-        } else {
-          JSONPayload = payloads.map(decodePayload);
+          );
         }
-        anyAttributes[key] = JSONPayload;
-      } else if (key === 'encodedAttributes' && anyAttributes[key]) {
-        // Can expand if more fields have single payload
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let JSONPayload: string | Payload | Record<any, any>;
-        const payload = anyAttributes[key];
-        if (settings?.codec?.endpoint) {
-          // Convert Payload data
-          const awaitData = await convertPayloadsWithCodec({
-            payloads: { payloads: [payload] },
-            namespace,
-            settings,
-            accessToken,
-          });
-          JSONPayload = decodePayload(awaitData?.payloads[0]);
-        } else {
-          JSONPayload = decodePayload(payload);
-        }
-        anyAttributes[key] = JSONPayload;
-      } else if (typeof anyAttributes[key] === 'object') {
-        anyAttributes[key] = await decodeAllPotentialPayloadsWithCodec(
-          anyAttributes[key],
-          namespace,
-          settings,
-          accessToken,
-        );
       }
     }
   }
@@ -158,15 +168,14 @@ export const decodeAllPotentialPayloadsWithCodec = async (
 };
 
 export const decodeAllPotentialPayloadsWithWebsockets = async (
-  anyAttributes: any,
+  anyAttributes: PotentiallyDecodable,
   ws: DataConverterWebsocketInterface,
-): Promise<any> => {
+): Promise<PotentiallyDecodable> => {
   if (anyAttributes) {
     for (const key of Object.keys(anyAttributes)) {
       if (key === 'payloads') {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let JSONPayload: string | Payload | Record<any, any>;
-        const payloads = anyAttributes[key];
+        let JSONPayload: Payload[];
+        const payloads = toArray(anyAttributes[key]);
 
         if (ws?.hasWebsocket) {
           // Convert Payload data
@@ -183,8 +192,8 @@ export const decodeAllPotentialPayloadsWithWebsockets = async (
         anyAttributes[key] = JSONPayload;
       } else if (key === 'encodedAttributes' && anyAttributes[key]) {
         // Can expand if more fields have single payload
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let JSONPayload: string | Payload | Record<any, any>;
+
+        let JSONPayload: PotentiallyDecodable;
         const payload = anyAttributes[key];
         if (ws?.hasWebsocket) {
           // Convert Payload data
@@ -197,11 +206,14 @@ export const decodeAllPotentialPayloadsWithWebsockets = async (
           JSONPayload = decodePayload(payload);
         }
         anyAttributes[key] = JSONPayload;
-      } else if (typeof anyAttributes[key] === 'object') {
-        anyAttributes[key] = await decodeAllPotentialPayloadsWithWebsockets(
-          anyAttributes[key],
-          ws,
-        );
+      } else {
+        const next = anyAttributes[key];
+        if (isObject(next)) {
+          anyAttributes[key] = await decodeAllPotentialPayloadsWithWebsockets(
+            next,
+            ws,
+          );
+        }
       }
     }
   }
@@ -215,12 +227,10 @@ export const convertPayloadToJsonWithCodec = async ({
   settings,
   accessToken,
 }: {
-  attributes: any;
-} & EventRequestMetadata): Promise<any> => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const anyAttributes = attributes as any;
+  attributes: PotentiallyDecodable;
+} & EventRequestMetadata): Promise<PotentiallyDecodable> => {
   const decodedAttributes = await decodeAllPotentialPayloadsWithCodec(
-    anyAttributes,
+    attributes,
     namespace,
     settings,
     accessToken,
@@ -229,14 +239,12 @@ export const convertPayloadToJsonWithCodec = async ({
 };
 
 export const convertPayloadToJsonWithWebsocket = async (
-  attributes: any,
+  attributes: PotentiallyDecodable,
   websocket?: DataConverterWebsocketInterface,
-): Promise<any> => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const anyAttributes = attributes as any;
+): Promise<PotentiallyDecodable> => {
   const ws = websocket ?? dataConverterWebsocket;
   const decodedAttributes = await decodeAllPotentialPayloadsWithWebsockets(
-    anyAttributes,
+    attributes,
     ws,
   );
   return decodedAttributes;
