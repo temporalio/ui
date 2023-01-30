@@ -1,10 +1,12 @@
 <script lang="ts">
   import {
+    resetWorkflow,
     signalWorkflow,
     terminateWorkflow,
   } from '$lib/services/workflow-service';
 
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
+  import { ResetType } from '$types';
 
   import { refresh } from '$lib/stores/workflow-run';
   import { settings } from '$lib/stores/settings';
@@ -18,6 +20,10 @@
   import Input from '$lib/holocene/input/input.svelte';
   import MenuDivider from '$lib/holocene/primitives/menu/menu-divider.svelte';
   import JSONEditor from '$lib/holocene/json-editor.svelte';
+  import { eventHistory } from '$lib/stores/events';
+  import { getFirstResetEventID } from '$lib/utilities/get-first-reset-event-id';
+  import { resetWorkflows } from '$lib/stores/reset-workflows';
+  import WorkflowResetForm from '$lib/components/workflow/workflow-reset-form.svelte';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
@@ -25,6 +31,7 @@
   export let terminateEnabled: boolean;
   export let cancelEnabled: boolean;
   export let signalEnabled: boolean;
+  export let resetEnabled: boolean;
 
   let reason = '';
   let signalInput = '';
@@ -32,6 +39,11 @@
   let showTerminationConfirmation = false;
   let showCancellationConfirmation = false;
   let showSignalConfirmation = false;
+  let showResetConfirmation = false;
+  let resetType: ResetType = ResetType.FirstWorkflowTask;
+  let resetId: string | undefined = undefined;
+  let resetReason: string | undefined = undefined;
+  let eventIdValid: boolean = true;
   let loading = false;
 
   const showTerminationModal = () => {
@@ -59,6 +71,18 @@
     showSignalConfirmation = false;
     signalInput = '';
     signalName = '';
+  };
+
+  const showResetModal = () => {
+    showResetConfirmation = true;
+  };
+
+  const hideResetModal = () => {
+    showResetConfirmation = false;
+    resetType = ResetType.FirstWorkflowTask;
+    resetId = undefined;
+    resetReason = undefined;
+    eventIdValid = true;
   };
 
   const handleSuccessfulTermination = async () => {
@@ -105,7 +129,7 @@
         message: 'Unable to cancel workflow.',
       });
     }
-    showCancellationConfirmation = false;
+    hideResetModal();
   };
 
   const handleSignalInputChange = (event: CustomEvent<string>) => {
@@ -137,20 +161,70 @@
     showSignalConfirmation = false;
   };
 
+  const reset = async () => {
+    switch (resetType) {
+      case ResetType.FirstWorkflowTask:
+        resetId = getFirstResetEventID($eventHistory.start);
+        break;
+      case ResetType.LastWorkflowTask: {
+        resetId = getFirstResetEventID($eventHistory.end);
+        break;
+      }
+    }
+
+    try {
+      const response = await resetWorkflow({
+        namespace,
+        workflowId: workflow.id,
+        runId: workflow.runId,
+        eventId: resetId,
+        reason: resetReason,
+      });
+
+      if (response && response.runId) {
+        resetWorkflows.update((previous) => ({
+          ...previous,
+          [workflow.runId]: response.runId,
+        }));
+      }
+      $refresh = Date.now();
+    } catch (error) {
+      toaster.push({ message: 'Error resetting workflow.', variant: 'error' });
+    }
+  };
+
   let workflowActions: {
     label: string;
     onClick: () => void;
     allowed: boolean;
     dataCy: string;
     destructive?: boolean;
+    tooltip?: string;
   }[];
 
+  const resetTooltipText = (): string | undefined => {
+    if (!resetEnabled)
+      return 'Resetting workflows is not enabled, please contact your administrator for assistance.';
+    if (resetEnabled && workflow?.pendingChildren?.length > 0)
+      return 'Cannot reset workflows with pending children.';
+  };
+
   $: workflowActions = [
+    {
+      label: 'Reset',
+      onClick: showResetModal,
+      dataCy: 'reset-button',
+      allowed: resetEnabled && workflow?.pendingChildren?.length === 0,
+      tooltip: resetTooltipText(),
+    },
     {
       label: 'Send a Signal',
       onClick: showSignalModal,
       dataCy: 'signal-button',
       allowed: signalEnabled,
+      tooltip: signalEnabled
+        ? ''
+        : 'Signaling workflows is not enabled, please contact your administrator for assistance.',
     },
     {
       label: 'Terminate',
@@ -158,6 +232,9 @@
       dataCy: 'terminate-button',
       allowed: terminateEnabled,
       destructive: true,
+      tooltip: terminateEnabled
+        ? ''
+        : 'Terminating workflows is not enabled, please contact your adminstrator for assistance.',
     },
   ];
 
@@ -176,16 +253,39 @@
   on:click={showCancellationModal}
   label="Request Cancellation"
 >
-  {#each workflowActions as { onClick, destructive, label, allowed, dataCy }}
+  {#each workflowActions as { onClick, destructive, label, allowed, dataCy, tooltip }}
     {#if destructive}
       <MenuDivider />
     {/if}
-    <MenuItem on:click={onClick} {destructive} {dataCy} disabled={!allowed}>
+    <MenuItem
+      on:click={onClick}
+      {destructive}
+      {dataCy}
+      disabled={!allowed}
+      tooltipProps={{ text: tooltip, left: true, width: 200 }}
+    >
       {label}
     </MenuItem>
   {/each}
 </SplitButton>
 
+<Modal
+  open={showResetConfirmation}
+  on:confirmModal={reset}
+  on:cancelModal={hideResetModal}
+  confirmDisabled={resetType === ResetType.EventId && !eventIdValid}
+>
+  <h3 slot="title">Reset Workflow</h3>
+  <svelte:fragment slot="content">
+    <WorkflowResetForm
+      bind:eventId={resetId}
+      bind:eventIdValid
+      bind:resetType
+      bind:reason={resetReason}
+      lastEvent={$eventHistory.end[0]}
+    />
+  </svelte:fragment>
+</Modal>
 <Modal
   open={showCancellationConfirmation}
   {loading}

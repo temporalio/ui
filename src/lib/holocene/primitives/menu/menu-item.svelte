@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import { type ComponentProps, createEventDispatcher } from 'svelte';
+  import Tooltip from '$lib/holocene/tooltip.svelte';
+
   export let dark = false;
   export let selected = false;
   export let destructive = false;
@@ -7,6 +9,7 @@
   export let disabled = false;
   export let href = '';
   export let dataCy: string = null;
+  export let tooltipProps: ComponentProps<Tooltip> = {};
 
   const dispatch = createEventDispatcher<{ click: undefined }>();
 
@@ -15,40 +18,43 @@
       dispatch('click');
     }
   };
+
+  $: ({ text, ...restTooltipProps } = tooltipProps);
 </script>
 
 <div class="menu-item-wrapper" class:disabled>
-  {#if href}
-    <a
-      {href}
-      role="menuitem"
-      tabindex="0"
-      class:dark
-      class:destructive
-      class:selected
-      class:active
-      data-cy={dataCy}
-      class="menu-item inline-block {$$props.class}"
-    >
-      <slot />
-    </a>
-  {:else}
-    <li
-      on:click|preventDefault
-      on:keyup={handleKeyUp}
-      tabindex="0"
-      role="menuitem"
-      class:dark
-      class:destructive
-      class:selected
-      class:active
-      class:disabled
-      data-cy={dataCy}
-      class="menu-item {$$props.class}"
-    >
-      <slot />
-    </li>
-  {/if}
+  <Tooltip class="w-full" hide={!text} {text} {...restTooltipProps}>
+    {#if href}
+      <a
+        {href}
+        role="menuitem"
+        class:dark
+        class:destructive
+        class:selected
+        class:active
+        class:disabled
+        data-cy={dataCy}
+        class="menu-item inline-block {$$props.class}"
+      >
+        <slot />
+      </a>
+    {:else}
+      <li
+        on:click|preventDefault
+        on:keyup={handleKeyUp}
+        role="menuitem"
+        class:dark
+        class:destructive
+        class:selected
+        class:active
+        class:disabled
+        data-cy={dataCy}
+        class="menu-item {$$props.class}"
+      >
+        <slot />
+      </li>
+    {/if}
+  </Tooltip>
 </div>
 
 <style lang="postcss">
