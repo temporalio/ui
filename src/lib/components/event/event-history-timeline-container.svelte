@@ -96,8 +96,8 @@
           ><Icon name="sliders" />
         </Button>
         {#each timelineEventTypeOptions as type}
-          <div
-            class="flex cursor-pointer items-center text-sm xl:text-base"
+          <button
+            class="flex items-center text-sm xl:text-base"
             on:click={() => handleGroupClick(type.option)}
           >
             <div
@@ -109,7 +109,7 @@
               {/if}
             </div>
             {type.label}
-          </div>
+          </button>
         {/each}
       </div>
       <div class="flex gap-2">

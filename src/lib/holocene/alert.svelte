@@ -30,7 +30,7 @@
   }
 
   .alert.bold {
-    @apply rounded-xl border-[3px];
+    @apply rounded-xl border-3;
   }
 
   .alert.success {

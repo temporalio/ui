@@ -24,7 +24,7 @@
 </script>
 
 <div class="mt-2 transition-all hover:cursor-pointer">
-  <div class="flex items-center" on:click={() => onSortClick('asc')}>
+  <button class="flex items-center" on:click={() => onSortClick('asc')}>
     <div
       class="ml-4 mr-2 h-6 w-6 rounded-sm text-gray-900"
       class:active={$workflowSorts.find(
@@ -39,8 +39,8 @@
       />
     </div>
     <div class="p-1 hover:scale-[103%]">Ascending</div>
-  </div>
-  <div class="flex items-center" on:click={() => onSortClick('desc')}>
+  </button>
+  <button class="flex items-center" on:click={() => onSortClick('desc')}>
     <div
       class="ml-4 mr-2 h-6 w-6 rounded-sm text-gray-900"
       class:active={$workflowSorts.find(
@@ -55,7 +55,7 @@
       />
     </div>
     <div class="p-1 hover:scale-[103%]">Descending</div>
-  </div>
+  </button>
 </div>
 
 <style lang="postcss">

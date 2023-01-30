@@ -32,7 +32,7 @@
   }
 
   table.fancy {
-    @apply border-separate border-spacing-0 rounded-xl border-[3px] border-gray-900 bg-white;
+    @apply border-separate border-spacing-0 rounded-xl border-3 border-gray-900 bg-white;
 
     thead {
       @apply bg-gray-900 text-gray-100;
