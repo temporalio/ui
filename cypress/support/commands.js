@@ -112,11 +112,19 @@ Cypress.Commands.add('interceptQueryApi', () => {
 Cypress.Commands.add('interceptTaskQueuesApi', () => {
   cy.intercept(
     Cypress.env('VITE_API_HOST') +
-      `/api/v1/namespaces/*/task-queues/*?taskQueueType=*`,
+      `/api/v1/namespaces/*/task-queues/*?taskQueueType=1`,
     {
       fixture: 'worker-task-queues.json',
     },
-  ).as('task-queues-api');
+  ).as('worker-task-queues-api');
+
+  cy.intercept(
+    Cypress.env('VITE_API_HOST') +
+      `/api/v1/namespaces/*/task-queues/*?taskQueueType=2`,
+    {
+      fixture: 'activity-task-queues.json',
+    },
+  ).as('activity-task-queues-api');
 });
 
 Cypress.Commands.add('interceptSchedulesApi', () => {
@@ -179,6 +187,16 @@ Cypress.Commands.add('interceptResetWorkflowApi', () => {
       `/api/v1/namespaces/*/workflows/*/runs/*/reset?`,
     { statusCode: 200, body: { runId: 'abc-123' } },
   ).as('reset-workflow-api');
+});
+
+Cypress.Commands.add('waitForWorkflowAPIs', () => {
+  cy.wait('@settings-api');
+  cy.wait('@workflow-api');
+  cy.wait('@event-history-start');
+  cy.wait('@event-history-end');
+  cy.wait('@event-history-descending');
+  cy.wait('@worker-task-queues-api');
+  cy.wait('@activity-task-queues-api');
 });
 
 Cypress.Commands.add(

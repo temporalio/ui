@@ -12,22 +12,6 @@ describe('Task Queues Page', () => {
     cy.visit(`/namespaces/default/task-queues/a-task-queue`);
 
     cy.wait('@namespaces-api');
-
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/task-queues/a-task-queue?taskQueueType=1`,
-      {
-        fixture: 'worker-task-queues.json',
-      },
-    ).as('worker-task-queues-api');
-
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/task-queues/a-task-queue?taskQueueType=2`,
-      {
-        fixture: 'activity-task-queues.json',
-      },
-    ).as('activity-task-queues-api');
   });
 
   it('View a task queue page with a worker', () => {

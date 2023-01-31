@@ -20,22 +20,6 @@ describe('Workflow Workers', () => {
       { fixture: 'workflow-completed.json' },
     ).as('workflow-api');
 
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/task-queues/${name}?taskQueueType=1`,
-      {
-        fixture: 'worker-task-queues.json',
-      },
-    ).as('worker-task-queues-api');
-
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/task-queues/${name}?taskQueueType=2`,
-      {
-        fixture: 'activity-task-queues.json',
-      },
-    ).as('activity-task-queues-api');
-
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}/workers`);
 
     cy.wait('@namespaces-api');
@@ -69,22 +53,6 @@ describe.skip('Navigate to Workflow Workers', () => {
         `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}?`,
       { fixture: 'workflow-completed.json' },
     ).as('workflow-api');
-
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/task-queues/${name}?taskQueueType=1`,
-      {
-        fixture: 'worker-task-queues.json',
-      },
-    ).as('worker-task-queues-api');
-
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/task-queues/${name}?taskQueueType=2`,
-      {
-        fixture: 'activity-task-queues.json',
-      },
-    ).as('activity-task-queues-api');
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
@@ -151,14 +119,6 @@ describe('Workflow Workers - Workflow Worker Only', () => {
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/task-queues/${name}?taskQueueType=1`,
-      {
-        fixture: 'worker-task-queues.json',
-      },
-    ).as('worker-task-queues-api');
-
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
         `/api/v1/namespaces/default/task-queues/${name}?taskQueueType=2`,
       {
         fixture: 'empty-task-queues.json',
@@ -206,14 +166,6 @@ describe('Workflow Workers - Activity Worker Only', () => {
         fixture: 'empty-task-queues.json',
       },
     ).as('worker-task-queues-api');
-
-    cy.intercept(
-      Cypress.env('VITE_API_HOST') +
-        `/api/v1/namespaces/default/task-queues/${name}?taskQueueType=2`,
-      {
-        fixture: 'activity-task-queues.json',
-      },
-    ).as('activity-task-queues-api');
 
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}/workers`);
 
