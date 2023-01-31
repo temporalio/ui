@@ -1,0 +1,32 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: "go.mod"
+          cache: true
+          check-latest: true
+      - name: Set up Protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          version: "3.x"
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 16
+      - uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7
+      - name: Build
+        run: make install build
+      - name: Test
+        run: make test
