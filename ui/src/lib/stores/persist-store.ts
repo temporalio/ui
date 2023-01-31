@@ -11,7 +11,7 @@ export function persistStore<T>(
   name: string,
   initialValue: T | (() => T) | null = null,
   broadcastToAll = false,
-): Pick<Writable<T | null>, 'subscribe' | 'set'> {
+): Pick<Writable<T | null>, 'subscribe' | 'set' | 'update'> {
   let initialStoreValue = isFunction<() => T>(initialValue)
     ? initialValue()
     : initialValue;
@@ -29,7 +29,7 @@ export function persistStore<T>(
     }
   }
 
-  const { subscribe, set } = writable<T>(initialStoreValue);
+  const { subscribe, set, update } = writable<T>(initialStoreValue);
 
   if (browser && broadcastToAll) {
     try {
@@ -54,6 +54,19 @@ export function persistStore<T>(
         }
       }
       set(x);
+    },
+    update: (updater: (x: T) => T) => {
+      if (browser) {
+        window?.localStorage?.removeItem(name);
+        update((previousValue) => {
+          const updatedValue = updater(previousValue);
+          window?.localStorage?.setItem(
+            name,
+            stringifyWithBigInt(updatedValue),
+          );
+          return updatedValue;
+        });
+      }
     },
   };
 }

@@ -44,7 +44,7 @@
 <div class="w-full p-8 xl:w-1/2">
   <h1 class="my-4 text-3xl">Welcome to Temporal</h1>
   <p class="mb-8">Select a Namespace to get started.</p>
-  <div class="mb-5 flex rounded-full border p-1 pr-4">
+  <div class="search">
     <div class="ml-4 mr-2">
       <Icon name="search" />
     </div>
@@ -55,12 +55,19 @@
       bind:value={searchValue}
     />
   </div>
-  <ul class="h-screen w-full">
+  <ul class="h-screen w-full" aria-label="namespaces">
     {#if namespaceList.length}
       {#if filteredList.length}
         <VirtualList items={filteredList} let:item itemHeight={50}>
-          <li class="link-item" on:click={() => item?.onClick(item.namespace)}>
-            {item.namespace}
+          {@const first = item === filteredList[0]}
+          {@const last = item === filteredList[filteredList.length - 1]}
+          <li class="link-item" class:first class:last>
+            <button
+              class="w-full p-3 text-left"
+              on:click={() => item?.onClick(item.namespace)}
+            >
+              {item.namespace}
+            </button>
           </li>
         </VirtualList>
       {:else}
@@ -73,15 +80,19 @@
 </div>
 
 <style lang="postcss">
+  .search {
+    @apply mb-5 flex rounded-full border-3 border-gray-900 bg-white p-1 pr-4;
+  }
+
   .link-item {
-    @apply flex border-collapse cursor-pointer gap-2 truncate border p-3 hover:bg-gray-50;
+    @apply flex border-collapse cursor-pointer gap-2 truncate border border-x-3 border-gray-900 bg-white from-blue-100 to-purple-100 hover:bg-gradient-to-br;
   }
 
-  .link-item:hover .link {
-    @apply text-blue-700 underline;
+  .link-item.first {
+    @apply rounded-t-lg border-t-3;
   }
 
-  .link {
-    @apply ml-2 truncate text-gray-900;
+  .link-item.last {
+    @apply rounded-b-lg border-b-3;
   }
 </style>

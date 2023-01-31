@@ -3,13 +3,12 @@
   import type { IconName } from './icon/paths';
 
   export let intent: 'warning' | 'error' | 'success' | 'info';
-
   export let title: string;
   export let icon: IconName = null;
   export let bold = false;
 </script>
 
-<div class="alert {intent} {$$props.class}" class:bold>
+<div class="alert {intent} {$$props.class}" class:bold data-cy={$$props.dataCy}>
   {#if icon}
     <div>
       <Icon name={icon} />
@@ -31,7 +30,7 @@
   }
 
   .alert.bold {
-    @apply rounded-xl border-[3px];
+    @apply rounded-xl border-3;
   }
 
   .alert.success {

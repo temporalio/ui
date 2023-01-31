@@ -74,11 +74,13 @@
     on:blur={() => (showFilterCopy = false)}
   >
     <h3 class="md:hidden">Workflow Name:</h3>
-    <span
+    <button
       class="table-link"
       on:click|preventDefault|stopPropagation={() => onTypeClick(workflow.name)}
-      >{workflow.name}</span
+      aria-label="filter by {workflow.name} type"
     >
+      {workflow.name}
+    </button>
     <FilterOrCopyButtons
       show={showFilterCopy}
       content={workflow.name}

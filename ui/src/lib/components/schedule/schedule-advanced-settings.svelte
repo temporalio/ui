@@ -9,12 +9,12 @@
   let show = false;
 </script>
 
-<p on:click={() => (show = !show)} class="settings">
+<button on:click={() => (show = !show)} class="settings">
   Advanced Settings <Icon
     class="inline"
     name={show ? 'chevron-up' : 'chevron-down'}
   />
-</p>
+</button>
 {#if show}
   <p>Schedule Start Time: {spec?.startTime ?? ''}</p>
   <p>Schedule End Time: {spec?.endTime ?? ''}</p>
@@ -26,6 +26,6 @@
 
 <style lang="postcss">
   .settings {
-    @apply mb-4 cursor-pointer underline decoration-gray-900;
+    @apply mb-4 underline decoration-gray-900;
   }
 </style>

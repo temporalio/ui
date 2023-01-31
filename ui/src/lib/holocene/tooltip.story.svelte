@@ -43,6 +43,14 @@
     </div>
   </Hst.Variant>
 
+  <Hst.Variant title="A tooltip with attribute topLeft">
+    <div class="center">
+      <Tooltip topLeft text={'Tooltip text goes here.'}>
+        <Button as="anchor" href={'#'}>Hover Here</Button>
+      </Tooltip>
+    </div>
+  </Hst.Variant>
+
   <Hst.Variant title="A tooltip with attribute right">
     <div class="center">
       <Tooltip right text={'Tooltip text goes here.'}>

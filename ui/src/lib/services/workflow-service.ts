@@ -16,6 +16,7 @@ import {
 import { noop } from 'svelte/internal';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { btoa } from '$lib/utilities/btoa';
+import { v4 } from 'uuid';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;
@@ -45,6 +46,14 @@ type SignalWorkflowOptions = {
 type TerminateWorkflowOptions = {
   workflow: WorkflowExecution;
   namespace: string;
+  reason: string;
+};
+
+export type ResetWorkflowOptions = {
+  namespace: string;
+  workflowId: string;
+  runId: string;
+  eventId: string;
   reason: string;
 };
 
@@ -255,6 +264,38 @@ export async function signalWorkflow({
             : null,
         },
       }),
+    },
+  });
+}
+
+export async function resetWorkflow({
+  namespace,
+  workflowId,
+  runId,
+  eventId,
+  reason,
+}: ResetWorkflowOptions): Promise<{ runId: string }> {
+  const route = await routeForApi('workflow.reset', {
+    namespace,
+    workflowId,
+    runId,
+  });
+
+  const body = {
+    workflowExecution: {
+      workflowId,
+      runId,
+    },
+    workflowTaskFinishEventId: eventId,
+    requestId: v4(),
+    reason,
+  };
+
+  return requestFromAPI<{ runId: string }>(route, {
+    notifyOnError: false,
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt(body),
     },
   });
 }
