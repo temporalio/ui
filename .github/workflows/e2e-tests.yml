@@ -2,10 +2,9 @@ name: End To End Integration Tests
 
 on:
   push:
-    # branches: [main]
-    branches: [rh-integration]
-  # pull_request:
-  #   branches: [rh-integration]
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   e2e-integration:
