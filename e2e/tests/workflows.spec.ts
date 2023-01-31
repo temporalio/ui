@@ -80,9 +80,7 @@ test.describe('Workflows list', () => {
     await page.getByLabel('Query Type').selectOption('current_result');
 
     await expect(
-      page
-        .getByRole('code')
-        .filter({ hasText: 'Received Plain text input 2' }),
+      page.getByRole('code').filter({ hasText: 'Received Plain text input 2' }),
     ).toBeVisible();
   });
 });
