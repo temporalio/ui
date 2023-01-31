@@ -2,8 +2,6 @@ name: Bump Package Version
 
 on:
   workflow_dispatch:
-    branches:
-      - main
     inputs:
       bump:
         required: true
