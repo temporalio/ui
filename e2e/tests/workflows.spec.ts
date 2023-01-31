@@ -82,7 +82,7 @@ test.describe('Workflows list', () => {
     await expect(
       page
         .getByRole('code')
-        .filter({ hasText: '"Received Plain text input 2"' }),
+        .filter({ hasText: 'Received Plain text input 2' }),
     ).toBeVisible();
   });
 });
