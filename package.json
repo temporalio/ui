@@ -1,6 +1,6 @@
 {
   "name": "@temporalio/ui",
-  "version": "2.2.5",
+  "version": "2.2.7",
   "type": "module",
   "description": "Temporal.io UI",
   "keywords": [
@@ -12,12 +12,15 @@
   "scripts": {
     "start": "pnpm run dev:local -- --open",
     "dev:local": ". ./.env && VITE_TEMPORAL_UI_BUILD_TARGET=local vite dev --port 3000",
+    "dev:docker": ". ./.env && VITE_API=http://localhost:8080 vite dev --port 3000",
     "dev:cloud": "VITE_TEMPORAL_UI_BUILD_TARGET=cloud vite dev --port 3000",
     "dev:test": ". ./.env && VITE_TEMPORAL_UI_BUILD_TARGET=local VITE_MODE=test vite dev --port 3000",
     "build:local": "vite build",
+    "build:docker": "VITE_API=http://localhost:8080 vite build",
     "build:cloud": "VITE_TEMPORAL_UI_BUILD_TARGET=cloud vite build",
     "test": "TZ=UTC vitest",
     "preview:local": "VITE_TEMPORAL_UI_BUILD_TARGET=local vite preview --port 3000",
+    "preview:docker": "VITE_API=http://localhost:8080 VITE_TEMPORAL_UI_BUILD_TARGET=local vite preview --port 3000",
     "preview:cloud": "VITE_TEMPORAL_UI_BUILD_TARGET=cloud vite preview --port 3000",
     "check": "VITE_TEMPORAL_UI_BUILD_TARGET=local svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "VITE_TEMPORAL_UI_BUILD_TARGET=local svelte-check --tsconfig ./tsconfig.json --watch",
@@ -68,7 +71,8 @@
     "@histoire/controls": "^0.12.0",
     "@histoire/plugin-svelte": "^0.12.0",
     "@histoire/shared": "^0.12.0",
-    "@sveltejs/adapter-vercel": "1.0.0",
+    "@sveltejs/adapter-static": "^1.0.5",
+    "@sveltejs/adapter-vercel": "^1.0.5",
     "@sveltejs/kit": "1.0.1",
     "@sveltejs/vite-plugin-svelte": "^2.0.2",
     "@temporalio/proto": "^1.4.4",

@@ -2,37 +2,28 @@
   import { page } from '$app/stores';
   import { routeForEventHistory } from '$lib/utilities/route-for';
   import { workflowRun } from '$lib/stores/workflow-run';
-  import { eventHistory } from '$lib/stores/events';
 
   import Accordion from '$lib/holocene/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
   import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
 
-  $: children = $workflowRun.workflow?.pendingChildren.length;
-  $: parent = $workflowRun.workflow?.parent;
-  $: lastEvent = $eventHistory.end[0];
-  $: firstEvent = $eventHistory.start[0];
-  $: firstExecutionRunId =
-    firstEvent?.workflowExecutionStartedEventAttributes?.firstExecutionRunId;
-  $: first =
-    firstExecutionRunId === $workflowRun.workflow?.runId
-      ? undefined // don't show first if it is the same as the current workflow run ID
-      : firstExecutionRunId;
-  $: previous =
-    firstEvent?.workflowExecutionStartedEventAttributes
-      ?.continuedExecutionRunId;
-  $: next =
-    lastEvent?.workflowExecutionContinuedAsNewEventAttributes
-      ?.newExecutionRunId;
-  $: hasRelationships = parent || children || first || previous || next;
+  export let hasChildren: boolean;
+  export let hasRelationships: boolean;
+  export let first: string;
+  export let parent: WorkflowIdentifier;
+  export let next: string;
+  export let previous: string;
+
   $: ({ workflow, namespace } = $page.params);
 </script>
 
 <Accordion title="Relationships" icon="relationship">
   <div slot="summary" class="hidden flex-row gap-2 lg:flex">
     <Badge type={parent ? 'purple' : 'gray'}>{parent ? 1 : 0} Parent</Badge>
-    <Badge type={children ? 'purple' : 'gray'}>{children} Children</Badge>
+    <Badge type={hasChildren ? 'purple' : 'gray'}
+      >{$workflowRun.workflow.pendingChildren.length} Pending Children</Badge
+    >
     <Badge type={first ? 'purple' : 'gray'}>{first ? 1 : 0} First</Badge>
     <Badge type={previous ? 'purple' : 'gray'}>
       {previous ? 1 : 0} Previous
@@ -116,7 +107,7 @@
         </div>
       {/if}
     </div>
-    {#if children}
+    {#if hasChildren}
       <ChildWorkflowsTable
         pendingChildren={$workflowRun.workflow.pendingChildren}
         namespace={$page.params.namespace}

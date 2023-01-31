@@ -32,7 +32,7 @@
 
 {#if as === 'button'}
   <button
-    on:click
+    on:click|stopPropagation
     class="button {variant} {classes}"
     class:selected={active}
     class:large
@@ -61,7 +61,7 @@
 {:else}
   <a
     {href}
-    on:click
+    on:click|stopPropagation
     class="button {variant} {classes}"
     class:selected={active}
     class:large
@@ -89,7 +89,7 @@
   .secondary,
   .destructive,
   .login {
-    @apply border-[3px] py-2 px-4 transition-colors;
+    @apply border-3 py-2 px-4 transition-colors;
   }
 
   .button:disabled {

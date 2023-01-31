@@ -275,8 +275,4 @@
   .active {
     @apply text-blue-700;
   }
-
-  .timezone-label {
-    @apply flex cursor-pointer whitespace-nowrap px-4 py-3 font-secondary text-sm font-medium hover:bg-gray-50;
-  }
 </style>

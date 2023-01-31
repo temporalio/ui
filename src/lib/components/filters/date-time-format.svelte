@@ -5,7 +5,7 @@
   import {
     timeFormat,
     setTimeFormat,
-    TimeFormatOptions,
+    type TimeFormatOptions,
   } from '$lib/stores/time-format';
 
   let dateOptions: TimeFormatOptions = [
@@ -24,20 +24,18 @@
 <DropdownMenu {value} right dataCy="date-time-format-filter">
   <div class="w-56">
     {#each dateOptions as { label, option } (option)}
-      <div
-        class="option"
-        class:active={$timeFormat === option}
-        on:click={() => onDateOptionClick(option)}
-        data-cy="event-date-filter-{option}"
-      >
+      <div class="option" class:active={$timeFormat === option}>
         <div class="check">
           {#if $timeFormat === option}
             <Icon name="checkmark" />
           {/if}
         </div>
-        <div class="label">
+        <button
+          data-cy="event-date-filter-{option}"
+          on:click={() => onDateOptionClick(option)}
+        >
           {label}
-        </div>
+        </button>
       </div>
     {/each}
   </div>
@@ -46,10 +44,6 @@
 <style lang="postcss">
   .option {
     @apply my-2 flex font-normal;
-  }
-
-  .label {
-    @apply cursor-pointer;
   }
 
   .check {

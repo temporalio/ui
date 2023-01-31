@@ -20,6 +20,6 @@
 
 <style lang="postcss">
   .row {
-    @apply border-[3px] border-gray-900 p-2 text-center text-sm;
+    @apply border-3 border-gray-900 p-2 text-center text-sm;
   }
 </style>

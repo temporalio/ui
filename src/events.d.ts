@@ -90,6 +90,7 @@ type CommonEventKey =
   | 'timestamp'
   | 'classification'
   | 'category'
+  | 'workerMayIgnore'
   | 'name';
 
 type CommonHistoryEvent = Pick<WorkflowEvent, CommonEventKey>;

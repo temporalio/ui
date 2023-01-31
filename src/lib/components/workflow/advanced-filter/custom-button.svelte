@@ -48,7 +48,7 @@
 
 <style lang="postcss">
   .button {
-    @apply relative flex w-fit items-center justify-center gap-2 border-[3px] border-primary bg-white px-2 py-1 font-secondary text-sm transition hover:bg-primary hover:text-white;
+    @apply relative flex w-fit items-center justify-center gap-2 border-3 border-primary bg-white px-2 py-1 font-secondary text-sm transition hover:bg-primary hover:text-white;
   }
 
   .disabled {

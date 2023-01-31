@@ -47,9 +47,3 @@
     <Link href="https://temporal.io/slack">jump on our Slack Channel</Link>.
   </p>
 </section>
-
-<style>
-  .trace {
-    font-family: monospace;
-  }
-</style>

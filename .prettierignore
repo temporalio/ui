@@ -6,3 +6,4 @@ coverage/**
 .vercel/**
 /package
 pnpm-lock.yaml
+.histoire/**
