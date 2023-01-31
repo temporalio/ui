@@ -1,0 +1,9 @@
+version: v1
+breaking:
+  use:
+    - PACKAGE
+lint:
+  use:
+    - DEFAULT
+  ignore:
+    - dependencies

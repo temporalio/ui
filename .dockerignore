@@ -1,0 +1,10 @@
+.git
+.github
+.husky
+.vscode
+
+e2e
+ui/.svelte-kit
+ui/build
+ui/node_modules
+ui-server

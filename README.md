@@ -1,113 +1,48 @@
-# Temporal UI
 
-## Prerequisites
+# ui-server 
 
-Temporal must be running in development. (For details, see [Run a dev Cluster](https://docs.temporal.io/application-development/foundations#run-a-development-cluster) in the documentation.)
+[![build](https://github.com/temporalio/ui-server/actions/workflows/test.yml/badge.svg)](https://github.com/temporalio/ui-server/actions/workflows/test.yml)
+[![E2E Tests](https://github.com/temporalio/ui-server/actions/workflows/e2e.yml/badge.svg)](https://github.com/temporalio/ui-server/actions/workflows/e2e.yml)
+[![Publish Docker image](https://github.com/temporalio/ui-server/actions/workflows/docker.yml/badge.svg)](https://github.com/temporalio/ui-server/actions/workflows/docker.yml)
+[![Update UI Submodule](https://github.com/temporalio/ui-server/actions/workflows/update-ui.yml/badge.svg)](https://github.com/temporalio/ui-server/actions/workflows/update-ui.yml)
 
-Temporal UI requires [Temporal v1.16.0](https://github.com/temporalio/temporal/releases/tag/v1.16.0) or later.
+ui-server serves an HTTP API analogue of [Temporal gRPC API](https://github.com/temporalio/api) as well as serves Temporal UI https://github.com/temporalio/ui. It can be compiled into a binary or consumed as a Go library.
 
-## Trying it out
+# Docker
 
-After pulling down the lastest version of Temporal's [`docker-compose`](https://github.com/temporalio/docker-compose), you can access the UI by visiting `http://localhost:8080`.
+ui-server is published on Docker Hub: https://hub.docker.com/r/temporalio/ui
 
-## Trying it out: Bleeding edge
+You can run it with Temporal Server using the [Temporal docker-compose](https://github.com/temporalio/docker-compose/blob/main/docker-compose.yml).
 
-Starting the UI API server will give you a somewhat recent version on `localhost:8080`. If you want to use the most recent commit to `main`, you can spin up a bleeding-edge build as described below.
+See [Docker README](https://github.com/temporalio/ui-server/blob/main/docker/README.md) for more details on running Docker images 
 
-Once you have the prerequisites going, run the following:
+# Configuration
 
-```bash
-pnpm install
-pnpm run build:local
-pnpm run preview:local
-```
+- When running ui-server as a docker image, you can pass docker env variables to configure auth, TLS and other options. See [quickstart for production](https://github.com/temporalio/ui-server/tree/main/docker#quickstart-for-production). For all options refer to [Dockerize config template](https://github.com/temporalio/ui-server/blob/main/docker/config_template.yaml)
 
-## Developing
+- Alternatively you can pass a .yaml configuration file based on the Dockerize template . Ex [development.yml config](https://github.com/temporalio/ui-server/tree/main/config)
 
-Developing the UI has the same prequisites as trying it out. Once you've created a project and installed dependencies with `pnpm install`, start the development server:
+Check out [the configuration docs](https://docs.temporal.io/references/ui-configuration) for more details
 
-```bash
-pnpm start
-```
+# Development
 
-and open [`localhost:3000`](http://localhost:3000).
+Pre-requirements:
+ - Go v1.18 or later installed on your development machine
+ - Protobuf installed on your development machine (`brew install protobuf`) (Note: M1 macs will need `/opt/homebrew/bin` on the PATH or you may get `/bin/sh: protoc: command not found` errors (or you can [manually download protoc](http://google.github.io/proto-lens/installing-protoc.html)))
 
-By default, the application will start up with a version of the UI for the local version of Temporal. You can start the UI for Temporal Cloud by setting the `VITE_TEMPORAL_UI_BUILD_TARGET` target to `cloud`. Alternatively, you can use either of the following scripts:
-
-```bash
-pnpm run dev:local
-pnpm run dev:cloud
-```
-
-## Building
-
-The Temporal UI _must_ be built for either the local version or Temporal Cloud. You must set the `VITE_TEMPORAL_UI_BUILD_TARGET` environment variable in order to build the assets. This will be set for you if you use either of the following `pnpm` scripts.
-
-```bash
-pnpm run build:local
-pnpm run build:cloud
-```
-
-The resulting assets will be placed in `.vercel/output/static`.
-
-> You can preview the built app with `pnpm run preview`, regardless of whether you installed an adapter. This should _not_ be used to serve your app in production.
-
-## Configuration
-
-Set these environment variables if you want to change their defaults
-
-| Variable  | Description                                                      | Default               | Stage |
-| --------- | ---------------------------------------------------------------- | --------------------- | ----- |
-| VITE_API  | Temporal HTTP API address. Set to empty `` to use relative paths | http://localhost:8080 | Build |
-| VITE_MODE | Build target                                                     | development           | Build |
-
-## Developing with Canary
-
-To get a better representation of production data, you can run our UI with the [canary-go](https://github.com/temporalio/canary-go) repo. You will need go installed on your machine.
-
-### canary-go
-
-```bash
-make bins
-./temporal-canary start
-```
-
-### temporal
-
-```bash
-make bins
-TEMPORAL_ENVIRONMENT=development_sqlite make start
-```
-
-### tctl
-
-```bash
-make build
-./tctl config set version next
-./tctl -n canary namespace register
-./tctl -n default namespace register
-./tctl cluster add-search-attributes -y \
- 	--name CustomKeywordField --type Keyword \
- 	--name CustomStringField --type Text \
- 	--name CustomTextField --type Text \
- 	--name CustomIntField --type Int \
- 	--name CustomDatetimeField --type Datetime \
- 	--name CustomDoubleField --type Double \
- 	--name CustomBoolField --type Bool
-```
-
-To view the search attributes code:
-https://github.com/temporalio/docker-builds/blob/main/docker/auto-setup.sh#L297
-
-### ui-server
-
-```bash
+Execute from the project folder to build a binary:
+``` bash
 make build-server
+```
+
+To start the server, execute
+```
 ./ui-server start
 ```
 
-### ui
+- Open http://localhost:8080/ in the browser to explore the UI
+- Open http://localhost:8080/openapi/ in the browser to explore HTTP API
 
-```bash
-pnpm start
-```
+## Debugging
+
+In VSCode launch "Debug Server" script (or press F5)
