@@ -13,7 +13,7 @@ test.describe('Workflows list', () => {
     let region: Locator;
     let toggle: Locator;
 
-    region = page.getByTestId('inputs-results');
+    region = page.getByTestId('input-and-results');
 
     toggle = region.getByRole('heading', { name: 'Input and Results' });
     await toggle.click();
