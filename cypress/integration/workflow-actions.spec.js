@@ -37,11 +37,7 @@ describe('Workflow Actions', () => {
       `/namespaces/default/workflows/${workflowId}/${runId}/history/feed?sort=descending`,
     );
 
-    cy.wait('@settings-api');
-    cy.wait('@workflow-api');
-    cy.wait('@event-history-start');
-    cy.wait('@event-history-end');
-    cy.wait('@event-history-descending');
+    cy.waitForWorkflowAPIs();
   });
 
   describe('Terminate', () => {
@@ -52,10 +48,7 @@ describe('Workflow Actions', () => {
       cy.get('[data-cy="confirm-modal-button"').click();
 
       cy.wait('@terminate-workflow-api');
-      cy.wait('@workflow-api');
-      cy.wait('@event-history-start');
-      cy.wait('@event-history-end');
-      cy.wait('@event-history-descending');
+      cy.waitForWorkflowAPIs();
 
       cy.get('#workflow-termination-success-toast').should('exist');
     });
@@ -67,10 +60,8 @@ describe('Workflow Actions', () => {
       cy.get('[data-cy="confirm-modal-button"]').click();
 
       cy.wait('@cancel-workflow-api');
-      cy.wait('@workflow-api');
-      cy.wait('@event-history-start');
-      cy.wait('@event-history-end');
-      cy.wait('@event-history-descending');
+      cy.waitForWorkflowAPIs();
+      cy.get('#workflow-cancelation-success-toast').should('exist');
     });
   });
 
@@ -83,10 +74,7 @@ describe('Workflow Actions', () => {
       cy.get('[data-cy="confirm-modal-button"').click();
 
       cy.wait('@signal-workflow-api');
-      cy.wait('@workflow-api');
-      cy.wait('@event-history-start');
-      cy.wait('@event-history-end');
-      cy.wait('@event-history-descending');
+      cy.waitForWorkflowAPIs();
 
       cy.get('#workflow-signal-success-toast').should('exist');
       cy.get('[data-cy="confirm-modal-button"').should('not.exist');
@@ -103,9 +91,7 @@ describe('Workflow Actions', () => {
       cy.get('[data-cy="confirm-modal-button"]').click();
 
       cy.wait('@reset-workflow-api');
-      cy.wait('@workflow-api');
-      cy.wait('@event-history-descending');
-      cy.wait('@task-queues-api');
+      cy.waitForWorkflowAPIs();
 
       cy.get('[data-cy="workflow-reset-alert"]').should('be.visible');
     });
@@ -121,9 +107,7 @@ describe('Workflow Actions', () => {
       cy.get('[data-cy="confirm-modal-button"]').click();
 
       cy.wait('@reset-workflow-api');
-      cy.wait('@workflow-api');
-      cy.wait('@event-history-descending');
-      cy.wait('@task-queues-api');
+      cy.waitForWorkflowAPIs();
 
       cy.get('[data-cy="workflow-reset-alert"]').should('be.visible');
     });
@@ -140,9 +124,7 @@ describe('Workflow Actions', () => {
       cy.get('[data-cy="confirm-modal-button"]').click();
 
       cy.wait('@reset-workflow-api');
-      cy.wait('@workflow-api');
-      cy.wait('@event-history-descending');
-      cy.wait('@task-queues-api');
+      cy.waitForWorkflowAPIs();
 
       cy.get('[data-cy="workflow-reset-alert"]').should('be.visible');
     });
@@ -183,11 +165,7 @@ describe('Write Actions Disabled', () => {
       `/namespaces/default/workflows/${workflowId}/${runId}/history/feed?sort=descending`,
     );
 
-    cy.wait('@settings-api');
-    cy.wait('@workflow-api');
-    cy.wait('@event-history-start');
-    cy.wait('@event-history-end');
-    cy.wait('@event-history-descending');
+    cy.waitForWorkflowAPIs();
   });
 
   it('the Cancel button is disabled if write actions are disabled', () => {

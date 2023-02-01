@@ -92,7 +92,6 @@
     toaster.push({
       id: 'workflow-termination-success-toast',
       message: 'Workflow terminated.',
-      variant: 'success',
     });
   };
 
@@ -123,6 +122,10 @@
       });
       loading = false;
       $refresh = Date.now();
+      toaster.push({
+        id: 'workflow-cancelation-success-toast',
+        message: 'Workflow canceled.',
+      });
     } catch {
       toaster.push({
         variant: 'error',
@@ -147,7 +150,7 @@
       });
       $refresh = Date.now();
       toaster.push({
-        message: 'Workflow successfully signaled.',
+        message: 'Workflow signaled.',
         id: 'workflow-signal-success-toast',
       });
     } catch (error) {

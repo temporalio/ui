@@ -29,7 +29,7 @@
 >
   <div class="relative">
     <div class="absolute right-0 top-0">
-      <IconButton on:click={onClose} icon="close" />
+      <IconButton aria-expanded={flyin} on:click={onClose} icon="close" />
     </div>
   </div>
   <slot />

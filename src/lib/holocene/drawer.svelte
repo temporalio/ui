@@ -14,12 +14,19 @@
     class="drawer"
     transition:fly={{ y: 200, duration: 500 }}
     use:clickOutside
+    id="navigation-drawer"
+    role="region"
     on:click-outside={onClick}
   >
     <div class="title">
       <div />
       <h1>{title}</h1>
-      <button class="mx-4 cursor-pointer" on:click={onClick}>
+      <button
+        aria-expanded={open}
+        aria-controls="navigation-drawer"
+        class="mx-4 cursor-pointer"
+        on:click={onClick}
+      >
         <Icon name="close" />
       </button>
     </div>

@@ -73,6 +73,7 @@
   class="row"
   id={event.id}
   class:expanded={expanded && !expandAll}
+  aria-expanded={expanded || expandAll}
   class:active
   class:failure
   class:canceled
