@@ -30,11 +30,11 @@ export const fetchAllSchedules = async (
 ): Promise<ScheduleResponse> => {
   let error = '';
   const onError: ErrorCallback = (err) =>
-    (error =
-      err?.body?.message ??
-      `Error fetching schedules: ${err.status}: ${err.statusText}`);
+  (error =
+    err?.body?.message ??
+    `Error fetching schedules: ${err.status}: ${err.statusText}`);
 
-  const route = await routeForApi('schedules', { namespace });
+  const route = routeForApi('schedules', { namespace });
   const { schedules, nextPageToken } =
     (await requestFromAPI<ListScheduleResponse>(route, {
       params: {},
@@ -53,7 +53,7 @@ export async function fetchSchedule(
   parameters: ScheduleParameters,
   request = fetch,
 ): Promise<DescribeFullSchedule> {
-  const route = await routeForApi('schedule', parameters);
+  const route = routeForApi('schedule', parameters);
   return requestFromAPI(route, { request });
 }
 
@@ -61,7 +61,7 @@ export async function deleteSchedule(
   parameters: ScheduleParameters,
   request = fetch,
 ): Promise<void> {
-  const route = await routeForApi('schedule.delete', parameters);
+  const route = routeForApi('schedule.delete', parameters);
   return requestFromAPI(route, {
     request,
     options: { method: 'DELETE' },
@@ -79,11 +79,11 @@ export async function createSchedule({
 }: CreateScheduleOptions): Promise<{ error: string; conflictToken: string }> {
   let error = '';
   const onError: ErrorCallback = (err) =>
-    (error =
-      err?.body?.message ??
-      `Error creating schedule: ${err.status}: ${err.statusText}`);
+  (error =
+    err?.body?.message ??
+    `Error creating schedule: ${err.status}: ${err.statusText}`);
 
-  const route = await routeForApi('schedules', {
+  const route = routeForApi('schedules', {
     namespace,
   });
   const { conflictToken } = await requestFromAPI<{ conflictToken: string }>(
@@ -118,11 +118,11 @@ export async function editSchedule({
 }: Partial<EditScheduleOptions>): Promise<{ error: string }> {
   let error = '';
   const onError: ErrorCallback = (err) =>
-    (error =
-      err?.body?.message ??
-      `Error editing schedule: ${err.status}: ${err.statusText}`);
+  (error =
+    err?.body?.message ??
+    `Error editing schedule: ${err.status}: ${err.statusText}`);
 
-  const route = await routeForApi('schedule', {
+  const route = routeForApi('schedule', {
     namespace,
     scheduleId,
   });
@@ -158,7 +158,7 @@ export async function pauseSchedule({
     },
   };
 
-  const route = await routeForApi('schedule', {
+  const route = routeForApi('schedule', {
     namespace,
     scheduleId: scheduleId,
   });
@@ -192,7 +192,7 @@ export async function unpauseSchedule({
     },
   };
 
-  const route = await routeForApi('schedule', {
+  const route = routeForApi('schedule', {
     namespace,
     scheduleId: scheduleId,
   });
