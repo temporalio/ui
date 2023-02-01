@@ -126,11 +126,11 @@ export async function getQuery(
         };
         const convertedAttributes = endpoint
           ? await convertPayloadToJsonWithCodec({
-            attributes: queryResult,
-            namespace: options.namespace,
-            settings: _settings,
-            accessToken,
-          })
+              attributes: queryResult,
+              namespace: options.namespace,
+              settings: _settings,
+              accessToken,
+            })
           : await convertPayloadToJsonWithWebsocket(queryResult);
 
         data = convertedAttributes?.payloads[0];

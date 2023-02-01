@@ -254,13 +254,13 @@ export async function signalWorkflow({
         input: {
           payloads: signalInput
             ? [
-              {
-                metadata: {
-                  encoding: btoa('json/plain'),
+                {
+                  metadata: {
+                    encoding: btoa('json/plain'),
+                  },
+                  data: btoa(stringifyWithBigInt(signalInput)),
                 },
-                data: btoa(stringifyWithBigInt(signalInput)),
-              },
-            ]
+              ]
             : null,
         },
       }),

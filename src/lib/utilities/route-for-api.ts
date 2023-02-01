@@ -1,3 +1,5 @@
+import { page } from '$app/stores';
+import { get } from 'svelte/store';
 import { getApiOrigin } from './get-api-origin';
 import { publicPath } from './get-public-path';
 
@@ -13,12 +15,13 @@ const replaceNamespaceInApiUrl = (
 
 const base = (namespace?: string): string => {
   let baseUrl = '';
+  const webUrl: string | undefined = get(page).data?.webUrl;
 
   // Use GetNamespace webUrl or fallback env var
-  const apiUrl = globalThis?.AppConfig?.webUrl || globalThis?.AppConfig?.apiUrl;
+  const apiUrl = webUrl || globalThis?.AppConfig?.apiUrl;
   if (apiUrl && namespace) {
     baseUrl =
-      globalThis?.AppConfig?.webUrl ||
+      webUrl ||
       replaceNamespaceInApiUrl(globalThis?.AppConfig?.apiUrl, namespace);
   } else {
     baseUrl = getApiOrigin();
@@ -30,10 +33,7 @@ const base = (namespace?: string): string => {
   return baseUrl;
 };
 
-const withBase = (
-  endpoint: string,
-  namespace?: string,
-): string => {
+const withBase = (endpoint: string, namespace?: string): string => {
   if (endpoint.startsWith('/')) endpoint = endpoint.slice(1);
   const baseUrl = base(namespace);
   return `${baseUrl}/api/v1/${endpoint}`;
