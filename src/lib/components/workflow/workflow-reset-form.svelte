@@ -2,7 +2,7 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
-  import { ResetType } from '$lib/models/workflow-execution';
+  import { ResetType } from '$lib/models/workflow-actions';
 
   const DEFAULT_RESET_ID_HINT_TEXT =
     'Only Workflow Events of type WorkflowTaskCompleted, WorkflowTaskFailed, or WorkflowTaskTimeout are supported.';
