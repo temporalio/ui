@@ -2,10 +2,9 @@ import { describe, test, expect } from 'vitest';
 import { workflowSignalEnabled } from './workflow-signal-enabled';
 
 describe('workflowSignalEnabled', () => {
-  test("returns true when we're not in legacy cloud, when write actions are enabled, and when signal is enabled", () => {
+  test('returns true when write actions are enabled and when signal is enabled', () => {
     expect(
       workflowSignalEnabled({
-        runtimeEnvironemt: { isCloud: false },
         disableWriteActions: false,
         worklowCancelDisabled: false,
       }),
@@ -13,17 +12,11 @@ describe('workflowSignalEnabled', () => {
   });
 
   describe('returns false', () => {
-    test('for legacy cloud', () => {
-      expect(
-        workflowSignalEnabled({ runtimeEnvironment: { isCloud: true } }),
-      ).toBe(false);
-    });
-
     test('when write actions are disabled', () => {
       expect(
         workflowSignalEnabled({
-          runtimeEnvironment: { isCloud: false },
           disableWriteActions: true,
+          workflowCancelDisabled: false,
         }),
       ).toBe(false);
     });
@@ -31,8 +24,16 @@ describe('workflowSignalEnabled', () => {
     test('when signal is disabled', () => {
       expect(
         workflowSignalEnabled({
-          runtimeEnvironment: { isCloud: false },
           disableWriteActions: false,
+          workflowSignalDisabled: true,
+        }),
+      ).toBe(false);
+    });
+
+    test('when write actions and signal are both disabled', () => {
+      expect(
+        workflowSignalEnabled({
+          disableWriteActions: true,
           workflowSignalDisabled: true,
         }),
       ).toBe(false);
