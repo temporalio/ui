@@ -15,6 +15,7 @@
     readOnly?: boolean;
     error?: string;
     onToggle?: () => void;
+    'data-cy'?: String;
   }
 
   export let title: string;
