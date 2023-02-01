@@ -43,13 +43,13 @@
           rangeInputElement.clientWidth - floatingValueSpanElement.clientWidth,
         ),
       );
-      console.log(floatingValueXPos);
     }
   }
 
   const handleInput = (
     event: Event & { currentTarget: EventTarget & HTMLInputElement },
   ) => {
+    if (Number.isNaN(event.currentTarget.valueAsNumber)) return;
     valid =
       event.currentTarget.valueAsNumber >= min &&
       event.currentTarget.valueAsNumber <= max;
@@ -64,7 +64,7 @@
       class:hidden={!valid}
       style="transform: translateX({floatingValueXPos}px);"
     >
-      {value}
+      {value ?? ''}
     </span>
     <div class="relative w-auto grow">
       <span class="absolute -bottom-6 left-0 text-xs font-normal">
@@ -139,11 +139,11 @@
   }
 
   input[type='range']::-webkit-slider-thumb {
-    @apply h-4 w-8 appearance-none rounded-full bg-gradient-to-br from-blue-100 to-purple-100 outline outline-1 outline-primary;
+    @apply h-4 w-8 appearance-none rounded-full border border-solid border-primary bg-gradient-to-br from-blue-100 to-purple-100;
   }
 
   input[type='range']::-moz-range-thumb {
-    @apply h-4 w-8 rounded-full border-0 bg-gradient-to-br from-blue-100 to-purple-100 shadow-none outline outline-1 outline-primary;
+    @apply h-4 w-8 rounded-full border border-solid border-primary bg-gradient-to-br from-blue-100 to-purple-100 shadow-none;
   }
 
   input[type='range']:focus {
@@ -155,6 +155,6 @@
   }
 
   input[type='range']:focus::-moz-range-thumb {
-    @apply border-none outline outline-2 outline-blue-700;
+    @apply border border-primary outline outline-2 outline-blue-700;
   }
 </style>
