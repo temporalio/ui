@@ -18,6 +18,9 @@
       <tr
         class="row"
         class:active={id === selectedId}
+        class:failure={eventOrGroupIsFailureOrTimedOut(eventInGroup)}
+        class:canceled={eventOrGroupIsCanceled(eventInGroup)}
+        class:terminated={eventOrGroupIsTerminated(eventInGroup)}
         on:click|preventDefault|stopPropagation={() => onGroupClick(id)}
       >
         <td class="w-1/12" />
@@ -25,13 +28,7 @@
           <p class="truncate text-sm text-gray-500 md:text-base">{id}</p>
         </td>
         <td class="table-cell text-left">
-          <p
-            class="truncate text-sm md:text-base"
-            class:active={id === selectedId}
-            class:failure={eventOrGroupIsFailureOrTimedOut(eventInGroup)}
-            class:canceled={eventOrGroupIsCanceled(eventInGroup)}
-            class:terminated={eventOrGroupIsTerminated(eventInGroup)}
-          >
+          <p class="event-type truncate text-sm md:text-base">
             {isLocalActivityMarkerEvent(eventInGroup)
               ? 'LocalActivity'
               : eventInGroup.eventType}
@@ -52,19 +49,46 @@
     @apply cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
   }
 
-  .active.row {
+  .active {
     @apply bg-blue-50;
   }
 
   .failure {
+    @apply bg-red-50;
+  }
+
+  .failure .event-type {
     @apply text-red-700;
   }
 
   .canceled {
+    @apply bg-yellow-50;
+  }
+
+  .canceled .event-type {
     @apply text-yellow-700;
   }
 
   .terminated {
+    @apply bg-pink-50;
+  }
+
+  .terminated .event-type {
     @apply text-pink-700;
+  }
+
+  .failure:hover,
+  .active.canceled {
+    @apply bg-gradient-to-br from-red-100 to-red-200 bg-fixed;
+  }
+
+  .canceled:hover,
+  .active.canceled {
+    @apply bg-gradient-to-br from-yellow-100 to-yellow-200 bg-fixed;
+  }
+
+  .terminated:hover,
+  .active.terminated {
+    @apply bg-gradient-to-br from-pink-100 to-pink-200 bg-fixed;
   }
 </style>
