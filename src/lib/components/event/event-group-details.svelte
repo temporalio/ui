@@ -49,7 +49,7 @@
   }
 
   .row:hover {
-    @apply cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100;
+    @apply cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
   }
 
   .active.row {

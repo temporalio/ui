@@ -150,7 +150,7 @@
   }
 
   .row:hover {
-    @apply z-50 cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100;
+    @apply z-50 cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
   }
 
   .expanded.row {
@@ -198,21 +198,21 @@
   }
 
   .active {
-    @apply z-50 cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100;
+    @apply z-50 cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
   }
 
   .canceled:hover,
   .active.canceled {
-    @apply bg-gradient-to-br from-yellow-100 to-yellow-200;
+    @apply bg-gradient-to-br from-yellow-100 to-yellow-200 bg-fixed;
   }
 
   .failure:hover,
   .active.failure {
-    @apply bg-gradient-to-br from-red-100 to-red-200;
+    @apply bg-gradient-to-br from-red-100 to-red-200 bg-fixed;
   }
 
   .terminated:hover,
   .active.terminated {
-    @apply bg-gradient-to-br from-pink-100 to-pink-200;
+    @apply bg-gradient-to-br from-pink-100 to-pink-200 bg-fixed;
   }
 </style>
