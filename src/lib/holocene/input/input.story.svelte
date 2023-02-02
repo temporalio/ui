@@ -7,13 +7,15 @@
   export let Hst: HST;
 
   let value: string = '';
-  let numberValue: string = '20';
+  let numberValue: number;
   let hintText: string | undefined;
   let valid = true;
   let maxLength: number | undefined;
   let dark = false;
   let disabled = false;
   let clearable = false;
+  let min = 0;
+  let max = 100;
 </script>
 
 <Hst.Story>
@@ -59,12 +61,12 @@
     />
   </Hst.Variant>
 
-  <Hst.Variant title="A Slider Input">
+  <Hst.Variant title="A Range Input">
     <RangeInput
       label="day(s) retention"
-      id="number-input-3"
-      min={1}
-      max={90}
+      id="range-input-1"
+      {min}
+      {max}
       bind:value={numberValue}
     />
   </Hst.Variant>
@@ -76,5 +78,7 @@
     <Hst.Checkbox title="Dark: " bind:value={dark} />
     <Hst.Checkbox title="Disabled: " bind:value={disabled} />
     <Hst.Checkbox title="Clearable: " bind:value={clearable} />
+    <Hst.Number title="Min:" bind:value={min} />
+    <Hst.Number title="Max:" bind:value={max} />
   </svelte:fragment>
 </Hst.Story>

@@ -3,7 +3,7 @@
   import type { HTMLInputAttributes } from 'svelte/elements';
 
   interface $$Props extends HTMLInputAttributes {
-    value: string;
+    value: number;
     id: string;
     label?: string;
     min?: number;
@@ -12,69 +12,74 @@
   }
 
   export let label: string = undefined;
-  export let value: string;
   export let min: number = undefined;
   export let max: number = undefined;
   export let id: string = undefined;
-
-  let floatingValueXPos: number = 0;
-  let rangeInputElement: HTMLInputElement;
-  let floatingValueSpanElement: HTMLSpanElement;
+  export let value: number = Math.round((min + max) / 2);
   let valid: boolean = true;
+  let outputElement: HTMLOutputElement;
 
-  const scale = (
-    number: number,
-    inMin: number,
-    inMax: number,
-    outMin: number,
-    outMax: number,
-  ) => {
-    return ((number - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
-  };
-
+  $: outputXPos = getOutputXPos();
+  $: outputXPosOffset = getOutputXPosOffset();
   $: {
-    if (value && rangeInputElement && floatingValueSpanElement) {
-      floatingValueXPos = Math.floor(
-        scale(
-          parseInt(value),
-          min,
-          max,
-          0,
-          rangeInputElement.clientWidth - floatingValueSpanElement.clientWidth,
-        ),
-      );
+    if (value) {
+      outputXPos = getOutputXPos();
+      outputXPosOffset = getOutputXPosOffset();
+    } else {
+      outputXPos = 0;
+      outputXPosOffset = 0;
     }
   }
 
   const handleInput = (
     event: Event & { currentTarget: EventTarget & HTMLInputElement },
   ) => {
-    if (Number.isNaN(event.currentTarget.valueAsNumber)) return;
+    if (Number.isNaN(event.currentTarget.valueAsNumber)) {
+      value = min;
+      return;
+    }
     valid =
       event.currentTarget.valueAsNumber >= min &&
       event.currentTarget.valueAsNumber <= max;
   };
+
+  const getOutputXPos = () => {
+    // calculates the value as a percentage to position the output text
+    return ((value - min) * 100) / (max - min);
+  };
+
+  const getOutputXPosOffset = () => {
+    // as the output text moves to the right with the slider thumb, it needs to shift left slightly
+    // such that it doesn't overflow the width of the slider track.
+    const offset = outputElement?.clientWidth ?? 15;
+    return Math.floor((outputXPos * offset) / 100);
+  };
+
+  const handleWindowResize = () => {
+    outputXPos = getOutputXPos();
+    outputXPosOffset = getOutputXPosOffset();
+  };
 </script>
 
+<svelte:window on:resize={handleWindowResize} />
 <div class="w-full px-1 py-4 {$$props.class}">
   <div class="range-input-container">
-    <span
-      bind:this={floatingValueSpanElement}
-      class="absolute top-2 text-center text-xs font-normal"
-      class:hidden={!valid}
-      style="transform: translateX({floatingValueXPos}px);"
-    >
-      {value ?? ''}
-    </span>
     <div class="relative w-auto grow">
       <span class="absolute -bottom-6 left-0 text-xs font-normal">
         {min}
       </span>
-      <div class="flex items-center">
+      <div class="relative flex items-center">
+        <output
+          bind:this={outputElement}
+          class:hidden={!valid}
+          class="absolute -top-6 text-center text-xs font-normal"
+          style="left: calc({outputXPos}% - ({outputXPosOffset}px))"
+          for="range">{value ?? ''}</output
+        >
         <input
-          class="h-0 w-full cursor-pointer appearance-none rounded border-y-2 border-primary"
+          name="range"
           type="range"
-          bind:this={rangeInputElement}
+          class="h-0 w-full cursor-pointer appearance-none rounded border-y-2 border-primary"
           bind:value
           on:input={handleInput}
           {min}
