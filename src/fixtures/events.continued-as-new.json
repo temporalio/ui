@@ -1,0 +1,266 @@
+[
+  {
+    "eventId": "5",
+    "eventTime": "2023-02-01T21:33:21.033103713Z",
+    "eventType": "WorkflowExecutionContinuedAsNew",
+    "version": "0",
+    "taskId": "1048853",
+    "workerMayIgnore": false,
+    "workflowExecutionContinuedAsNewEventAttributes": {
+      "newExecutionRunId": "85b7da2b-5144-43cd-9dce-729a3be71543",
+      "workflowType": {
+        "name": "SampleChildWorkflow"
+      },
+      "taskQueue": {
+        "name": "child-workflow-continue-as-new",
+        "kind": "Normal"
+      },
+      "input": {
+        "payloads": [4, 1]
+      },
+      "workflowRunTimeout": "0s",
+      "workflowTaskTimeout": "10s",
+      "workflowTaskCompletedEventId": "4",
+      "backoffStartInterval": null,
+      "initiator": "Unspecified",
+      "failure": null,
+      "lastCompletionResult": null,
+      "header": {
+        "fields": {}
+      },
+      "memo": null,
+      "searchAttributes": null
+    },
+    "name": "WorkflowExecutionContinuedAsNew",
+    "id": "5",
+    "timestamp": "2023-02-01 UTC 21:33:21.03",
+    "classification": "New",
+    "category": "workflow",
+    "attributes": {
+      "type": "workflowExecutionContinuedAsNewEventAttributes",
+      "newExecutionRunId": "85b7da2b-5144-43cd-9dce-729a3be71543",
+      "workflowType": "SampleChildWorkflow",
+      "taskQueue": {
+        "name": "child-workflow-continue-as-new",
+        "kind": "Normal"
+      },
+      "input": {
+        "payloads": [4, 1]
+      },
+      "workflowRunTimeout": "",
+      "workflowTaskTimeout": "10 seconds",
+      "workflowTaskCompletedEventId": "4",
+      "backoffStartInterval": "",
+      "initiator": "Unspecified",
+      "failure": null,
+      "lastCompletionResult": null,
+      "header": {
+        "fields": {}
+      },
+      "memo": null,
+      "searchAttributes": null
+    }
+  },
+  {
+    "eventId": "4",
+    "eventTime": "2023-02-01T21:33:21.033086213Z",
+    "eventType": "WorkflowTaskCompleted",
+    "version": "0",
+    "taskId": "1048852",
+    "workerMayIgnore": false,
+    "workflowTaskCompletedEventAttributes": {
+      "scheduledEventId": "2",
+      "startedEventId": "3",
+      "identity": "5727@LauraWhakersMBP.lan@",
+      "binaryChecksum": "4d821097ce6ca5f72e7afc13f84d73db",
+      "workerVersioningId": null
+    },
+    "name": "WorkflowTaskCompleted",
+    "id": "4",
+    "timestamp": "2023-02-01 UTC 21:33:21.03",
+    "classification": "Completed",
+    "category": "workflow",
+    "attributes": {
+      "type": "workflowTaskCompletedEventAttributes",
+      "scheduledEventId": "2",
+      "startedEventId": "3",
+      "identity": "5727@LauraWhakersMBP.lan@",
+      "binaryChecksum": "4d821097ce6ca5f72e7afc13f84d73db",
+      "workerVersioningId": null
+    }
+  },
+  {
+    "eventId": "3",
+    "eventTime": "2023-02-01T21:33:21.024782672Z",
+    "eventType": "WorkflowTaskStarted",
+    "version": "0",
+    "taskId": "1048848",
+    "workerMayIgnore": false,
+    "workflowTaskStartedEventAttributes": {
+      "scheduledEventId": "2",
+      "identity": "5727@LauraWhakersMBP.lan@",
+      "requestId": "8d70fac6-1630-4f02-845b-fcfd2ab45124",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "0"
+    },
+    "name": "WorkflowTaskStarted",
+    "id": "3",
+    "timestamp": "2023-02-01 UTC 21:33:21.02",
+    "classification": "Started",
+    "category": "workflow",
+    "attributes": {
+      "type": "workflowTaskStartedEventAttributes",
+      "scheduledEventId": "2",
+      "identity": "5727@LauraWhakersMBP.lan@",
+      "requestId": "8d70fac6-1630-4f02-845b-fcfd2ab45124",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "0"
+    }
+  },
+  {
+    "eventId": "2",
+    "eventTime": "2023-02-01T21:33:20.983864880Z",
+    "eventType": "WorkflowTaskScheduled",
+    "version": "0",
+    "taskId": "1048845",
+    "workerMayIgnore": false,
+    "workflowTaskScheduledEventAttributes": {
+      "taskQueue": {
+        "name": "child-workflow-continue-as-new",
+        "kind": "Normal"
+      },
+      "startToCloseTimeout": "10s",
+      "attempt": 1
+    },
+    "name": "WorkflowTaskScheduled",
+    "id": "2",
+    "timestamp": "2023-02-01 UTC 21:33:20.98",
+    "classification": "Scheduled",
+    "category": "workflow",
+    "attributes": {
+      "type": "workflowTaskScheduledEventAttributes",
+      "taskQueue": {
+        "name": "child-workflow-continue-as-new",
+        "kind": "Normal"
+      },
+      "startToCloseTimeout": "10 seconds",
+      "attempt": 1
+    }
+  },
+  {
+    "eventId": "1",
+    "eventTime": "2023-02-01T21:33:20.020052838Z",
+    "eventType": "WorkflowExecutionStarted",
+    "version": "0",
+    "taskId": "1048838",
+    "workerMayIgnore": false,
+    "workflowExecutionStartedEventAttributes": {
+      "workflowType": {
+        "name": "SampleChildWorkflow"
+      },
+      "parentWorkflowNamespace": "default",
+      "parentWorkflowNamespaceId": "7635a64b-dd16-407e-a7d3-9e72a97a51ba",
+      "parentWorkflowExecution": {
+        "workflowId": "parent-workflow_3eaa9ff1-3927-461d-94b4-271631094c8d",
+        "runId": "24240710-e6a1-4541-91b9-9f117bc407f4"
+      },
+      "parentInitiatedEventId": "5",
+      "taskQueue": {
+        "name": "child-workflow-continue-as-new",
+        "kind": "Normal"
+      },
+      "input": {
+        "payloads": [3, 2]
+      },
+      "workflowExecutionTimeout": "0s",
+      "workflowRunTimeout": "0s",
+      "workflowTaskTimeout": "10s",
+      "continuedExecutionRunId": "51e7c1a3-0205-4e11-8044-ce9e06bb3881",
+      "initiator": "Workflow",
+      "continuedFailure": null,
+      "lastCompletionResult": null,
+      "originalExecutionRunId": "4da1552a-97b7-46f5-8df0-8a09caaf5951",
+      "identity": "",
+      "firstExecutionRunId": "dd65e55d-d058-401c-9cb6-77dd4846a98e",
+      "retryPolicy": null,
+      "attempt": 1,
+      "workflowExecutionExpirationTime": null,
+      "cronSchedule": "",
+      "firstWorkflowTaskBackoff": "0.957939332s",
+      "memo": null,
+      "searchAttributes": null,
+      "prevAutoResetPoints": {
+        "points": [
+          {
+            "binaryChecksum": "4d821097ce6ca5f72e7afc13f84d73db",
+            "runId": "dd65e55d-d058-401c-9cb6-77dd4846a98e",
+            "firstWorkflowTaskCompletedId": "4",
+            "createTime": "2023-02-01T21:33:18.002926045Z",
+            "expireTime": "2023-02-02T21:33:18.002943629Z",
+            "resettable": true
+          }
+        ]
+      },
+      "header": {
+        "fields": {}
+      },
+      "parentInitiatedEventVersion": "0"
+    },
+    "name": "WorkflowExecutionStarted",
+    "id": "1",
+    "timestamp": "2023-02-01 UTC 21:33:20.02",
+    "classification": "Started",
+    "category": "workflow",
+    "attributes": {
+      "type": "workflowExecutionStartedEventAttributes",
+      "workflowType": "SampleChildWorkflow",
+      "parentWorkflowNamespace": "default",
+      "parentWorkflowNamespaceId": "7635a64b-dd16-407e-a7d3-9e72a97a51ba",
+      "parentWorkflowExecution": {
+        "workflowId": "parent-workflow_3eaa9ff1-3927-461d-94b4-271631094c8d",
+        "runId": "24240710-e6a1-4541-91b9-9f117bc407f4"
+      },
+      "parentInitiatedEventId": "5",
+      "taskQueue": {
+        "name": "child-workflow-continue-as-new",
+        "kind": "Normal"
+      },
+      "input": {
+        "payloads": [3, 2]
+      },
+      "workflowExecutionTimeout": "",
+      "workflowRunTimeout": "",
+      "workflowTaskTimeout": "10 seconds",
+      "continuedExecutionRunId": "51e7c1a3-0205-4e11-8044-ce9e06bb3881",
+      "initiator": "Workflow",
+      "continuedFailure": null,
+      "lastCompletionResult": null,
+      "originalExecutionRunId": "4da1552a-97b7-46f5-8df0-8a09caaf5951",
+      "identity": "",
+      "firstExecutionRunId": "dd65e55d-d058-401c-9cb6-77dd4846a98e",
+      "retryPolicy": null,
+      "attempt": 1,
+      "workflowExecutionExpirationTime": "",
+      "cronSchedule": "",
+      "firstWorkflowTaskBackoff": "",
+      "memo": null,
+      "searchAttributes": null,
+      "prevAutoResetPoints": {
+        "points": [
+          {
+            "binaryChecksum": "4d821097ce6ca5f72e7afc13f84d73db",
+            "runId": "dd65e55d-d058-401c-9cb6-77dd4846a98e",
+            "firstWorkflowTaskCompletedId": "4",
+            "createTime": "2023-02-01T21:33:18.002926045Z",
+            "expireTime": "2023-02-02T21:33:18.002943629Z",
+            "resettable": true
+          }
+        ]
+      },
+      "header": {
+        "fields": {}
+      },
+      "parentInitiatedEventVersion": "0"
+    }
+  }
+]

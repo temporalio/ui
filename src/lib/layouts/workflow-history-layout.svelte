@@ -22,10 +22,8 @@
 
   $: workflowEvents =
     getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
-  $: workflowRelationships = getWorkflowRelationships(
-    $workflowRun,
-    $eventHistory,
-  );
+  $: ({ workflow } = $workflowRun);
+  $: workflowRelationships = getWorkflowRelationships(workflow, $eventHistory);
 
   const onViewClick = (view: EventView) => {
     if ($page.url.searchParams.get('page')) {
