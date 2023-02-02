@@ -17,32 +17,14 @@
   export let max: number = undefined;
   export let id: string = undefined;
 
-  let floatingValueXPos: number = 0;
-  let rangeInputElement: HTMLInputElement;
-  let floatingValueSpanElement: HTMLSpanElement;
   let valid: boolean = true;
 
-  const scale = (
-    number: number,
-    inMin: number,
-    inMax: number,
-    outMin: number,
-    outMax: number,
-  ) => {
-    return ((number - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
-  };
-
+  $: outputXPos = getOutputXPos();
+  $: outputXPosPadding = getOutputXPosPadding();
   $: {
-    if (value && rangeInputElement && floatingValueSpanElement) {
-      floatingValueXPos = Math.floor(
-        scale(
-          parseInt(value),
-          min,
-          max,
-          0,
-          rangeInputElement.clientWidth - floatingValueSpanElement.clientWidth,
-        ),
-      );
+    if (value) {
+      outputXPos = getOutputXPos();
+      outputXPosPadding = getOutputXPosPadding();
     }
   }
 
@@ -54,27 +36,42 @@
       event.currentTarget.valueAsNumber >= min &&
       event.currentTarget.valueAsNumber <= max;
   };
+
+  const getOutputXPos = () => {
+    // calculates the value as a percentage to position the output text
+    return Math.floor(((Number(value) - min) * 100) / (max - min));
+  };
+
+  const getOutputXPosPadding = () => {
+    // as the output text moves to the right with the slider thumb, it needs to shift left slightly
+    // such that it doesn't overflow the width of the slider track.
+    return Math.floor(outputXPos * 0.15);
+  };
+
+  const handleWindowResize = () => {
+    outputXPos = getOutputXPos();
+    outputXPosPadding = getOutputXPosPadding();
+  };
 </script>
 
+<svelte:window on:resize={handleWindowResize} />
 <div class="w-full px-1 py-4 {$$props.class}">
   <div class="range-input-container">
-    <span
-      bind:this={floatingValueSpanElement}
-      class="absolute -top-1.5 text-center text-xs font-normal"
-      class:hidden={!valid}
-      style="transform: translateX({floatingValueXPos}px);"
-    >
-      {value ?? ''}
-    </span>
     <div class="relative w-auto grow">
       <span class="absolute -bottom-6 left-0 text-xs font-normal">
         {min}
       </span>
-      <div class="flex items-center">
+      <div class="relative flex items-center">
+        <output
+          class:hidden={!valid}
+          class="absolute -top-6 text-center text-xs font-normal"
+          style="left: calc({outputXPos}% - ({outputXPosPadding}px))"
+          for="range">{value}</output
+        >
         <input
-          class="h-0 w-full cursor-pointer appearance-none rounded border-y-2 border-primary"
+          name="range"
           type="range"
-          bind:this={rangeInputElement}
+          class="h-0 w-full cursor-pointer appearance-none rounded border-y-2 border-primary"
           bind:value
           on:input={handleInput}
           {min}
@@ -111,7 +108,7 @@
 
 <style lang="postcss">
   .range-input-container {
-    @apply relative inline-flex w-full flex-row items-center gap-4 whitespace-nowrap;
+    @apply inline-flex w-full flex-row items-center gap-4 whitespace-nowrap;
   }
 
   .numeric-input {

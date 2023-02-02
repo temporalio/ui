@@ -59,10 +59,10 @@
     />
   </Hst.Variant>
 
-  <Hst.Variant title="A Slider Input">
+  <Hst.Variant title="A Range Input">
     <RangeInput
       label="day(s) retention"
-      id="number-input-3"
+      id="range-input-1"
       min={1}
       max={90}
       bind:value={numberValue}
