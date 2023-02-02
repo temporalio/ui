@@ -17,12 +17,14 @@ const base = (namespace?: string): string => {
   let baseUrl = '';
   const webUrl: string | undefined = get(page).data?.webUrl;
 
-  // Use GetNamespace webUrl or fallback env var
-  const apiUrl = webUrl || globalThis?.AppConfig?.apiUrl;
-  if (apiUrl && namespace) {
-    baseUrl =
-      webUrl ||
-      replaceNamespaceInApiUrl(globalThis?.AppConfig?.apiUrl, namespace);
+  const webUrlExistsWithNamespace = webUrl && namespace;
+  const apiUrlExistsWithNamespace = globalThis?.AppConfig?.apiUrl && namespace;
+
+  if (webUrlExistsWithNamespace) {
+    baseUrl = webUrl;
+  } else if (apiUrlExistsWithNamespace) {
+    console.warn('Using fallback api url, web url not found');
+    baseUrl = replaceNamespaceInApiUrl(globalThis.AppConfig.apiUrl, namespace);
   } else {
     baseUrl = getApiOrigin();
   }
