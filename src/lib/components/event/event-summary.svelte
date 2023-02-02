@@ -7,6 +7,7 @@
   } from '$lib/stores/event-view';
   import { refresh } from '$lib/stores/workflow-run';
   import { eventHistory } from '$lib/stores/events';
+  import { authUser } from '$lib/stores/auth-user';
 
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
@@ -33,14 +34,14 @@
     runId: string,
     sort: EventSortOrder,
   ) => {
-    const { settings, user } = $page.data;
+    const { settings } = $page.data;
     resetFullHistory();
     fullHistory = await fetchAllEvents({
       namespace,
       workflowId,
       runId,
       settings,
-      accessToken: user?.accessToken,
+      accessToken: $authUser?.accessToken,
       sort: compact ? 'ascending' : sort,
     });
     loading = false;

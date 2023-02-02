@@ -10,6 +10,7 @@
     eventHistory,
     initialEventHistory,
   } from '$lib/stores/events';
+  import { authUser } from '$lib/stores/auth-user';
 
   import Header from '$lib/layouts/workflow-header.svelte';
   import Loading from '$lib/holocene/loading.svelte';
@@ -32,7 +33,7 @@
     workflowId: string,
     runId: string,
   ) => {
-    const { settings, user } = $page.data;
+    const { settings } = $page.data;
 
     const workflow = await fetchWorkflow({
       namespace,
@@ -45,7 +46,7 @@
       workflow,
       namespace,
       settings,
-      user?.accessToken,
+      $authUser?.accessToken,
     );
     $workflowRun = { workflow, workers };
     const events = await fetchStartAndEndEvents({
@@ -53,7 +54,7 @@
       workflowId,
       runId,
       settings,
-      accessToken: user?.accessToken,
+      accessToken: $authUser?.accessToken,
     });
     $eventHistory = events;
   };
