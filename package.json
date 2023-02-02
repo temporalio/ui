@@ -1,6 +1,6 @@
 {
   "name": "@temporalio/ui",
-  "version": "2.11.0",
+  "version": "2.2.0-topNav.0",
   "type": "module",
   "description": "Temporal.io UI",
   "keywords": [
