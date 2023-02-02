@@ -6,7 +6,7 @@
   } from '$lib/services/workflow-service';
 
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
-  import { ResetType } from '$types';
+  import { ResetType } from '$lib/models/workflow-actions';
 
   import { refresh } from '$lib/stores/workflow-run';
   import { settings } from '$lib/stores/settings';

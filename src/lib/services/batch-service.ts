@@ -79,7 +79,7 @@ async function cancelWorkflows(
   const routeId = isVersionNewer(version, '2.9.0')
     ? 'batch-operations'
     : 'workflows.batch.terminate';
-  const route = await routeForApi(routeId, { namespace });
+  const route = routeForApi(routeId, { namespace });
   const jobId = uuidv4();
 
   await requestFromAPI<null>(route, {
@@ -109,7 +109,7 @@ async function terminateWorkflows(
   const routeId = isVersionNewer(version, '2.9.0')
     ? 'batch-operations'
     : 'workflows.batch.terminate';
-  const route = await routeForApi(routeId, { namespace });
+  const route = routeForApi(routeId, { namespace });
   const jobId = uuidv4();
 
   await requestFromAPI<null>(route, {
@@ -163,7 +163,7 @@ async function describeBatchOperation({
   const routeId = isVersionNewer(version, '2.9.0')
     ? 'batch-operation.describe'
     : 'workflows.batch.describe';
-  const route = await routeForApi(routeId, {
+  const route = routeForApi(routeId, {
     namespace,
   });
 

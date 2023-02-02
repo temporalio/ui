@@ -28,7 +28,7 @@ export async function getPollers(
   parameters: GetAllPollersRequest,
   request = fetch,
 ): Promise<GetPollersResponse> {
-  const route = await routeForApi('task-queue', parameters);
+  const route = routeForApi('task-queue', parameters);
   const workflowPollers = await requestFromAPI<GetPollersResponse>(route, {
     request,
     params: { taskQueueType: '1' },
