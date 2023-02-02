@@ -60,7 +60,7 @@
   <div class="range-input-container">
     <span
       bind:this={floatingValueSpanElement}
-      class="absolute top-2 text-center text-xs font-normal"
+      class="absolute -top-1.5 text-center text-xs font-normal"
       class:hidden={!valid}
       style="transform: translateX({floatingValueXPos}px);"
     >
@@ -111,7 +111,7 @@
 
 <style lang="postcss">
   .range-input-container {
-    @apply inline-flex w-full flex-row items-center gap-4 whitespace-nowrap;
+    @apply relative inline-flex w-full flex-row items-center gap-4 whitespace-nowrap;
   }
 
   .numeric-input {
