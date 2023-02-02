@@ -3,7 +3,7 @@
   import type { HTMLInputAttributes } from 'svelte/elements';
 
   interface $$Props extends HTMLInputAttributes {
-    value: string;
+    value: number;
     id: string;
     label?: string;
     min?: number;
@@ -12,11 +12,10 @@
   }
 
   export let label: string = undefined;
-  export let value: string;
   export let min: number = undefined;
   export let max: number = undefined;
   export let id: string = undefined;
-
+  export let value: number = Math.round((min + max) / 2);
   let valid: boolean = true;
   let outputElement: HTMLOutputElement;
 
@@ -26,13 +25,19 @@
     if (value) {
       outputXPos = getOutputXPos();
       outputXPosOffset = getOutputXPosOffset();
+    } else {
+      outputXPos = 0;
+      outputXPosOffset = 0;
     }
   }
 
   const handleInput = (
     event: Event & { currentTarget: EventTarget & HTMLInputElement },
   ) => {
-    if (Number.isNaN(event.currentTarget.valueAsNumber)) return;
+    if (Number.isNaN(event.currentTarget.valueAsNumber)) {
+      value = min;
+      return;
+    }
     valid =
       event.currentTarget.valueAsNumber >= min &&
       event.currentTarget.valueAsNumber <= max;
@@ -40,7 +45,7 @@
 
   const getOutputXPos = () => {
     // calculates the value as a percentage to position the output text
-    return ((Number(value) - min) * 100) / (max - min);
+    return ((value - min) * 100) / (max - min);
   };
 
   const getOutputXPosOffset = () => {

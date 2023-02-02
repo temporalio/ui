@@ -7,7 +7,7 @@
   export let Hst: HST;
 
   let value: string = '';
-  let numberValue: string = '20';
+  let numberValue: number;
   let hintText: string | undefined;
   let valid = true;
   let maxLength: number | undefined;
