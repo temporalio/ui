@@ -14,6 +14,8 @@
   let dark = false;
   let disabled = false;
   let clearable = false;
+  let min = 0;
+  let max = 100;
 </script>
 
 <Hst.Story>
@@ -63,8 +65,8 @@
     <RangeInput
       label="day(s) retention"
       id="range-input-1"
-      min={1}
-      max={90}
+      {min}
+      {max}
       bind:value={numberValue}
     />
   </Hst.Variant>
@@ -76,5 +78,7 @@
     <Hst.Checkbox title="Dark: " bind:value={dark} />
     <Hst.Checkbox title="Disabled: " bind:value={disabled} />
     <Hst.Checkbox title="Clearable: " bind:value={clearable} />
+    <Hst.Number title="Min:" bind:value={min} />
+    <Hst.Number title="Max:" bind:value={max} />
   </svelte:fragment>
 </Hst.Story>

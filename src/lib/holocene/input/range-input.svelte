@@ -18,13 +18,14 @@
   export let id: string = undefined;
 
   let valid: boolean = true;
+  let outputElement: HTMLOutputElement;
 
   $: outputXPos = getOutputXPos();
-  $: outputXPosPadding = getOutputXPosPadding();
+  $: outputXPosOffset = getOutputXPosOffset();
   $: {
     if (value) {
       outputXPos = getOutputXPos();
-      outputXPosPadding = getOutputXPosPadding();
+      outputXPosOffset = getOutputXPosOffset();
     }
   }
 
@@ -39,18 +40,19 @@
 
   const getOutputXPos = () => {
     // calculates the value as a percentage to position the output text
-    return Math.floor(((Number(value) - min) * 100) / (max - min));
+    return ((Number(value) - min) * 100) / (max - min);
   };
 
-  const getOutputXPosPadding = () => {
+  const getOutputXPosOffset = () => {
     // as the output text moves to the right with the slider thumb, it needs to shift left slightly
     // such that it doesn't overflow the width of the slider track.
-    return Math.floor(outputXPos * 0.15);
+    const offset = outputElement?.clientWidth ?? 15;
+    return Math.floor((outputXPos * offset) / 100);
   };
 
   const handleWindowResize = () => {
     outputXPos = getOutputXPos();
-    outputXPosPadding = getOutputXPosPadding();
+    outputXPosOffset = getOutputXPosOffset();
   };
 </script>
 
@@ -63,10 +65,11 @@
       </span>
       <div class="relative flex items-center">
         <output
+          bind:this={outputElement}
           class:hidden={!valid}
           class="absolute -top-6 text-center text-xs font-normal"
-          style="left: calc({outputXPos}% - ({outputXPosPadding}px))"
-          for="range">{value}</output
+          style="left: calc({outputXPos}% - ({outputXPosOffset}px))"
+          for="range">{value ?? ''}</output
         >
         <input
           name="range"
