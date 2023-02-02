@@ -101,7 +101,7 @@
       </NavRow>
     </IsCloudGuard>
   </svelte:fragment>
-  <!-- <svelte:fragment slot="bottom">
+  <svelte:fragment slot="bottom">
     {#if extras}
       {#each extras as extra}
         <NavRow {isCloud} noFilter handleClick={extra.onClick}>
@@ -114,68 +114,19 @@
       {/each}
     {/if}
     <slot name="feedback">
-      <NavRow link={linkList.feedback} {isCloud} externalLink>
+      <!-- <NavRow link={linkList.feedback} {isCloud} externalLink>
         <NavTooltip right text="Feedback">
           <div class="nav-icon">
             <Icon name="feedback" />
           </div>
         </NavTooltip>
         <div class="nav-title">Feedback</div>
-      </NavRow>
+      </NavRow> -->
     </slot>
     <slot name="settings" />
-    {#await user}
-      <NavRow {isCloud}>
-        <div class="motion-safe:animate-pulse" style="margin-left: 1rem;">
-          <div class="rounded-full bg-blueGray-200 h-full aspect-square" />
-        </div>
-        <div class="nav-title">
-          <div class="h-2 bg-blueGray-50 rounded mt-1" />
-        </div>
-      </NavRow>
-    {:then user}
-      {#if user?.accessToken}
-        <NavRow class="cursor-pointer" handleClick={logout} {isCloud}>
-          <NavTooltip right text="Logout">
-            <div class="nav-icon">
-              <Icon name="logout" />
-            </div>
-          </NavTooltip>
-          <div class="nav-title">Logout</div>
-        </NavRow>
-        <li class="profile-row">
-          <div>
-            {#if user?.picture}
-              <img
-                src={user?.picture}
-                alt={user?.profile ?? 'user profile'}
-                class="rounded-md p-1 w-8 h-8"
-                on:error={fixImage}
-                class:hidden={!showProfilePic}
-              />
-              <div
-                class="rounded-full p-0.5 bg-blue-200 h-full aspect-square"
-                class:hidden={showProfilePic}
-              >
-                {#if user?.name}
-                  <div class="text-black text-center ">
-                    {user?.name.trim().charAt(0)}
-                  </div>
-                {/if}
-              </div>
-            {/if}
-          </div>
-          <div class="nav-title truncate">
-            {#if user?.name}
-              {user?.name}
-            {/if}
-          </div>
-        </li>
-      {/if}
-    {/await}
-  </svelte:fragment> -->
+  </svelte:fragment>
   <svelte:fragment slot="drawer">
-    <Drawer
+    <!-- <Drawer
       flyin={$namespaceSelectorOpen === true}
       flyout={$namespaceSelectorOpen === false}
       onClose={() => {
@@ -190,7 +141,7 @@
           }}
         />
       {/if}
-    </Drawer>
+    </Drawer> -->
   </svelte:fragment>
 </NavContainer>
 
