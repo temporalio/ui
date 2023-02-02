@@ -58,10 +58,6 @@
 
   let bulkActionsAvailable = true;
   let selectedItems: MockWorkflow[] = [];
-  const handleSelectedItemsChange = (event: CustomEvent<MockWorkflow[]>) => {
-    selectedItems = event.detail;
-  };
-
   let updating: boolean = false;
 </script>
 
@@ -119,7 +115,7 @@
   </Hst.Variant>
 
   <Hst.Variant title="A Table with Selectable Rows">
-    <SelectableTable items={workflows} on:change={handleSelectedItemsChange}>
+    <SelectableTable items={workflows} bind:selectedItems>
       <svelte:fragment slot="bulk-action-headers">
         <th class="w-24">
           {selectedItems.length} Selected
