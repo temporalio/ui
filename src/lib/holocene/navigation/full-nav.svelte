@@ -101,7 +101,7 @@
       </NavRow>
     </IsCloudGuard>
   </svelte:fragment>
-  <svelte:fragment slot="bottom">
+  <!-- <svelte:fragment slot="bottom">
     {#if extras}
       {#each extras as extra}
         <NavRow {isCloud} noFilter handleClick={extra.onClick}>
@@ -173,7 +173,7 @@
         </li>
       {/if}
     {/await}
-  </svelte:fragment>
+  </svelte:fragment> -->
   <svelte:fragment slot="drawer">
     <Drawer
       flyin={$namespaceSelectorOpen === true}

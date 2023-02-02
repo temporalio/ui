@@ -1,12 +1,15 @@
 <script lang="ts">
   import type { PageData } from './$types';
-  import { updated } from '$app/stores';
+  import { page, updated } from '$app/stores';
   import Header from './_header.svelte';
   import Banners from '$lib/components/banner/banners.svelte';
   import { ErrorBoundary } from '$lib/holocene/error-boundary';
   import ScrollToTop from '$lib/holocene/scroll-to-top.svelte';
   import Toaster from '$lib/holocene/toaster.svelte';
   import { toaster } from '$lib/stores/toaster';
+  import Badge from '$lib/holocene/badge.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import TopActionNav from '$lib/components/top-action-nav.svelte';
 
   export let data: PageData;
 
@@ -25,10 +28,8 @@
   <div class="sticky top-0 z-20 h-screen w-auto">
     <Header {user} />
   </div>
-  <main
-    id="content"
-    class="min-h-screen w-max flex-auto overflow-auto bg-gray-100"
-  >
+  <main id="content" class="min-h-screen w-max flex-auto bg-gray-100">
+    <TopActionNav />
     <Banners {uiVersionInfo} />
     <div class="z-10 flex flex-col gap-4 px-10 pb-10 pt-8">
       <ErrorBoundary onError={() => {}}>

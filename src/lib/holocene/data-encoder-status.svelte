@@ -14,7 +14,7 @@
 <DataEncoderSettings />
 {#if $dataEncoder?.hasEndpointOrPortConfigured}
   {#if $dataEncoder?.hasNotRequested}
-    <Tooltip right text={'Data encoder is configured'}>
+    <Tooltip bottomRight text={'Data encoder is configured'}>
       <button
         class="relative flex items-center"
         data-testid="data-encoder-status-configured"
@@ -28,7 +28,10 @@
       </button>
     </Tooltip>
   {:else if $dataEncoder.hasError}
-    <Tooltip right text={`Data encoder couldn't connect to the remote encoder`}>
+    <Tooltip
+      bottomRight
+      text={`Data encoder couldn't connect to the remote encoder`}
+    >
       <button
         class="relative flex items-center"
         data-testid="data-encoder-status-error"
@@ -42,7 +45,7 @@
       </button>
     </Tooltip>
   {:else if $dataEncoder.hasSuccess}
-    <Tooltip right text={'Data encoder succesfully converted content'}>
+    <Tooltip bottomRight text={'Data encoder succesfully converted content'}>
       <button
         class="relative flex items-center"
         data-testid="data-encoder-status-success"
@@ -57,7 +60,7 @@
     </Tooltip>
   {/if}
 {:else}
-  <Tooltip right text={'Configure data encoder'}>
+  <Tooltip bottomRight text={'Configure data encoder'}>
     <button
       class="relative flex items-center"
       data-testid="data-encoder-status"

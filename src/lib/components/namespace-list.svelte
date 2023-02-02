@@ -6,6 +6,7 @@
   import { onMount } from 'svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import { createEventDispatcher } from 'svelte';
+  import Input from '$lib/holocene/input/input.svelte';
 
   export let getNamespaceList: () => Promise<NamespaceItem[]> = null;
 
@@ -14,7 +15,6 @@
 
   onMount(() => {
     namespaceList = getNamespaceList();
-    searchField.focus();
   });
   const dispatch = createEventDispatcher();
 
@@ -40,60 +40,53 @@
   $: searchValue = '';
 </script>
 
-<div class="prose mt-16 mb-8">
-  <h2 class="text-2xl" data-testid="namespace-select-header">
-    Select a Namespace
-  </h2>
-  {#if $page.params?.namespace}
-    <p>You are currently viewing {$page.params.namespace}</p>
-  {/if}
-</div>
-
-<div class="mb-5 flex rounded-md border border-gray-900 p-1 pr-4" role="search">
-  <div class="ml-4 mr-2">
-    <Icon name="search" />
+<div class="h-[400px] w-[500px] overflow-auto py-4 px-12">
+  <div class="prose my-4">
+    <h2 class="text-2xl" data-cy="namespace-select-header">
+      Select a Namespace
+    </h2>
   </div>
-  <input
-    class="w-full"
-    type="search"
-    placeholder="Search"
-    use:rootDocumentHandler
-    on:keydown|stopPropagation
-    bind:value={searchValue}
-    bind:this={searchField}
-  />
-</div>
+  <div class="mb-4">
+    <Input
+      id="namespace-search"
+      bind:value={searchValue}
+      autoFocus
+      icon="search"
+      placeholder="Search"
+    />
+  </div>
 
-<ul data-testid="namespace-list">
-  {#await namespaceList}
-    Loading ...
-  {:then namespacesResult}
-    {#if namespacesResult}
-      {#each namespacesResult.filter( ({ namespace }) => namespace.includes(searchValue), ) as namespace}
-        <li
-          class="first:rounded-t-xl first:border-t-3 last:rounded-b-xl last:border-b-3 border-b border-l-3 border-r-3 border-gray-900 flex border-collapse gap-2 hover:bg-gradient-to-br from-blue-100 to-purple-100 cursor-pointer"
-        >
-          <a
-            href={namespace.href(namespace.namespace)}
-            class="w-full flex p-3"
-            class:active={namespace.namespace === $page.params?.namespace}
+  <ul data-cy="namespace-list">
+    {#await namespaceList}
+      Loading ...
+    {:then namespacesResult}
+      {#if namespacesResult}
+        {#each namespacesResult.filter( ({ namespace }) => namespace.includes(searchValue), ) as namespace}
+          <li
+            class="first:rounded-t-xl first:border-t-3 last:rounded-b-xl last:border-b-3 border-b border-l-3 border-r-3 border-gray-900 flex border-collapse gap-2 bg-white hover:bg-gradient-to-br from-blue-100 to-purple-100 cursor-pointer"
           >
-            <div class="w-6 h-6 active">
-              {#if namespace.namespace === $page.params?.namespace}
-                <Icon name="checkmark" />
-              {/if}
-            </div>
-            <p class="link">{namespace.namespace}</p>
-          </a>
-        </li>
+            <a
+              href={namespace.href(namespace.namespace)}
+              class="w-full flex p-3"
+              class:active={namespace.namespace === $page.params?.namespace}
+            >
+              <div class="w-6 h-6 active">
+                {#if namespace.namespace === $page.params?.namespace}
+                  <Icon name="checkmark" />
+                {/if}
+              </div>
+              <p class="link">{namespace.namespace}</p>
+            </a>
+          </li>
+        {:else}
+          <EmptyState title="No Namespaces" />
+        {/each}
       {:else}
-        <EmptyState title="No Namespaces" />
-      {/each}
-    {:else}
-      <EmptyState title="Could not list Namespaces" />
-    {/if}
-  {/await}
-</ul>
+        <EmptyState title="Could not list Namespaces" />
+      {/if}
+    {/await}
+  </ul>
+</div>
 
 <style lang="postcss">
   .link {
