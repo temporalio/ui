@@ -1,11 +1,13 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
-  import Input from './input/input.svelte';
-  import NumberInput from './input/number-input.svelte';
+  import Input from './input.svelte';
+  import NumberInput from './number-input.svelte';
+  import RangeInput from './range-input.svelte';
 
   export let Hst: HST;
 
   let value: string = '';
+  let numberValue: string = '20';
   let hintText: string | undefined;
   let valid = true;
   let maxLength: number | undefined;
@@ -54,6 +56,16 @@
       units="days"
       max={50}
       bind:value
+    />
+  </Hst.Variant>
+
+  <Hst.Variant title="A Slider Input">
+    <RangeInput
+      label="day(s) retention"
+      id="number-input-3"
+      min={1}
+      max={90}
+      bind:value={numberValue}
     />
   </Hst.Variant>
 
