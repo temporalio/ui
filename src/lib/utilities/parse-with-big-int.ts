@@ -2,6 +2,8 @@ import JSONbig from 'json-bigint';
 
 JSONbig({
   useNativeBigInt: true,
+  // This should work but doesn't
+  constructorAction: 'preserve'
 });
 
 export const parseWithBigInt = (content: string) => JSONbig.parse(content);
