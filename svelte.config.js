@@ -25,10 +25,10 @@ export default {
     adapter: ci
       ? vercel()
       : adapter({
-        fallback: 'index.html',
-        pages: buildPath,
-        assets: buildPath,
-      }),
+          fallback: 'index.html',
+          pages: buildPath,
+          assets: buildPath,
+        }),
     paths: {
       base: publicPath,
     },
