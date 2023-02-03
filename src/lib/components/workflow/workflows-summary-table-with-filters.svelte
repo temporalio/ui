@@ -13,6 +13,8 @@
   import BulkActionButton from '$lib/holocene/table/bulk-action-button.svelte';
   import { coreUserStore } from '$lib/stores/core-user';
   import Checkbox from '$lib/holocene/checkbox.svelte';
+  import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
+  import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
 
   const dispatch = createEventDispatcher<{
     terminateWorkflows: undefined;
@@ -22,14 +24,15 @@
   }>();
 
   export let bulkActionsEnabled: boolean = false;
-  export let cancelEnabled: boolean = false;
-  export let terminateEnabled: boolean = false;
   export let updating: boolean = false;
   export let visibleWorkflows: WorkflowExecution[];
   export let selectedWorkflowsCount: number;
   export let allSelected: boolean;
   export let pageSelected: boolean;
   export let filteredWorkflowCount: string;
+
+  $: terminateEnabled = workflowTerminateEnabled($page.data.settings);
+  $: cancelEnabled = workflowCancelEnabled($page.data.settings);
 
   // Disable sort with workflows over 1M
   $: disabled = $workflowCount?.totalCount >= 1000000;
