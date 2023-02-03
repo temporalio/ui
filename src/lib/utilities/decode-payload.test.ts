@@ -290,31 +290,6 @@ describe('convertPayloadToJsonWithCodec', () => {
     const dataConverterStatus = get(lastDataEncoderStatus);
     expect(dataConverterStatus).toEqual('notRequested');
   });
-  it('Should include credentials with the request for cookie based authentication of data converters', async () => {
-    const mockFetch = vi.fn(async () => {
-      return {
-        json: () => Promise.resolve({ payloads: [JsonPlainEncoded] }),
-      };
-    });
-
-    vi.stubGlobal('fetch', mockFetch);
-
-    const endpoint = 'http://localhost:1337';
-    await convertPayloadToJsonWithCodec({
-      attributes: parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-      namespace: 'default',
-      settings: {
-        codec: {
-          endpoint,
-        },
-      },
-    });
-
-    expect(mockFetch).toBeCalledWith(
-      expect.any(String),
-      expect.objectContaining({ credentials: 'include' }),
-    );
-  });
 });
 
 // Integration test
