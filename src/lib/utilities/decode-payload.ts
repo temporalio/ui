@@ -46,7 +46,7 @@ export function decodePayload(
     try {
       return parseWithBigInt(atob(String(payload?.data ?? '')));
     } catch (_e) {
-      console.warn('Could not parse payload: ', _e)
+      console.warn('Could not parse payload: ', _e);
       // Couldn't correctly decode this just let the user deal with the data as is
     }
   }
