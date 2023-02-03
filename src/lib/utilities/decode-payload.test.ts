@@ -88,12 +88,11 @@ const JsonObjectEncodedWithConstructor = {
     encoding: 'anNvbi9wbGFpbg==',
     type: 'S2V5d29yZA==',
   },
-  data: 'eyBDb25zdHJ1Y3RvcjogJ09wdGltdXNQcmltZScgfQ==',
+  data: 'eyAiQ29uc3RydWN0b3JPdXRwdXQiOiAiT3B0aW11c1ByaW1lIiB9',
 };
 
-
 const JsonObjectDecoded = { Transformer: 'OptimusPrime' };
-const JsonObjectDecodedWithConstructor = { Constructor: 'OptimusPrime' };
+const JsonObjectDecodedWithConstructor = { ConstructorOutput: 'OptimusPrime' };
 
 describe('decodePayload', () => {
   it('Should not decode a payload with encoding binary/encrypted', () => {
@@ -116,8 +115,10 @@ describe('decodePayload', () => {
   it('Should decode a json payload with encoding json/plain', () => {
     expect(decodePayload(JsonObjectEncoded)).toEqual(JsonObjectDecoded);
   });
-  it('Should decode a json payload with constructor keyworkd with encoding json/plain', () => {
-    expect(decodePayload(JsonObjectEncodedWithConstructor)).toEqual(JsonObjectDecodedWithConstructor);
+  it('Should decode a json payload with constructor keyword with encoding json/plain', () => {
+    expect(decodePayload(JsonObjectEncodedWithConstructor)).toEqual(
+      JsonObjectDecodedWithConstructor,
+    );
   });
 });
 
