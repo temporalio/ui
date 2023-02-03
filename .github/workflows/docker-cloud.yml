@@ -14,14 +14,14 @@ jobs:
 
       - uses: actions/setup-go@v3
         with:
-          go-version-file: "go.mod"
+          go-version-file: 'go.mod'
           cache: true
           check-latest: true
 
       - name: Set up Protoc
         uses: arduino/setup-protoc@v1
         with:
-          version: "3.x"
+          version: '3.x'
 
       - name: Build GRPC
         working-directory: server
