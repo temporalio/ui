@@ -1,0 +1,9 @@
+.github
+.husky
+.svelte-kit
+.vscode
+build
+cypress
+e2e
+node_modules
+server/ui/assets

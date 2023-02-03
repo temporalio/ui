@@ -18,6 +18,7 @@
     "build:local": "vite build",
     "build:docker": "VITE_API=http://localhost:8080 vite build",
     "build:cloud": "VITE_TEMPORAL_UI_BUILD_TARGET=cloud vite build",
+    "build:server": "VITE_API= BUILD_PATH=server/ui/assets vite build",
     "test": "TZ=UTC vitest",
     "preview:local": "VITE_TEMPORAL_UI_BUILD_TARGET=local vite preview --port 3000",
     "preview:docker": "VITE_API=http://localhost:8080 VITE_TEMPORAL_UI_BUILD_TARGET=local vite preview --port 3000",
