@@ -44,7 +44,6 @@ export function decodePayload(
 
   if (encoding?.startsWith('json/')) {
     try {
-      // return JSON.parse(atob(String(payload?.data ?? '')))
       return parseWithBigInt(atob(String(payload?.data ?? '')));
     } catch (_e) {
       console.warn('Could not parse payload: ', _e)
