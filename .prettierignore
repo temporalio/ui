@@ -1,8 +1,11 @@
 .svelte-kit/**
 static/**
 build/**
+e2e/test-results/**
+e2e/playwright-report/**
 node_modules/**
 coverage/**
+server/**
 .vercel/**
 /package
 pnpm-lock.yaml
