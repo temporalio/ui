@@ -51,6 +51,7 @@ describe('Workflow Actions', () => {
       cy.waitForWorkflowAPIs();
 
       cy.get('#workflow-termination-success-toast').should('exist');
+      cy.get('[data-cy="confirm-modal-button"').should('not.exist');
     });
   });
 
@@ -62,6 +63,7 @@ describe('Workflow Actions', () => {
       cy.wait('@cancel-workflow-api');
       cy.waitForWorkflowAPIs();
       cy.get('#workflow-cancelation-success-toast').should('exist');
+      cy.get('[data-cy="confirm-modal-button"').should('not.exist');
     });
   });
 
@@ -94,6 +96,7 @@ describe('Workflow Actions', () => {
       cy.waitForWorkflowAPIs();
 
       cy.get('[data-cy="workflow-reset-alert"]').should('be.visible');
+      cy.get('[data-cy="confirm-modal-button"').should('not.exist');
     });
 
     it('to the last workflow task if the workflow is running, and the action is enabled', () => {
@@ -110,6 +113,7 @@ describe('Workflow Actions', () => {
       cy.waitForWorkflowAPIs();
 
       cy.get('[data-cy="workflow-reset-alert"]').should('be.visible');
+      cy.get('[data-cy="confirm-modal-button"').should('not.exist');
     });
 
     it('to an arbitrary workflow task if the workflow is running, and the action is enabled', () => {
@@ -127,6 +131,7 @@ describe('Workflow Actions', () => {
       cy.waitForWorkflowAPIs();
 
       cy.get('[data-cy="workflow-reset-alert"]').should('be.visible');
+      cy.get('[data-cy="confirm-modal-button"').should('not.exist');
     });
   });
 });
