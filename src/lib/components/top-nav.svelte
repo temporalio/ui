@@ -9,16 +9,17 @@
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import { goto } from '$app/navigation';
   import {
-    routeForLoginPage,
     routeForSchedules,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
   import type { DescribeNamespaceResponse as Namespace } from '$types';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import DataEncoderStatus from '$lib/holocene/data-encoder-status.svelte';
-  import { authUser, clearAuthUser } from '$lib/stores/auth-user';
+  import { authUser } from '$lib/stores/auth-user';
 
-  const { isCloud } = $page.data?.settings?.runtimeEnvironment;
+  export let logout: () => void;
+
+  $: isCloud = $page.data?.settings?.runtimeEnvironment?.isCloud;
 
   $: namespace = $page.params.namespace;
 
@@ -49,11 +50,6 @@
     return href;
   }
 
-  const logout = () => {
-    clearAuthUser();
-    goto(routeForLoginPage());
-  };
-
   let showProfilePic = true;
 
   function fixImage() {
@@ -61,14 +57,14 @@
   }
 </script>
 
-{#if namespace}
-  <div
-    class="sticky top-0 z-30 flex h-10 w-full items-center justify-between border-b-2 bg-gray-100 p-1 px-12"
-  >
-    <div class="flex items-center text-sm italic">
-      {$page.data?.settings?.version ?? ''}
-    </div>
-    <div class="flex items-center gap-2">
+<div
+  class="sticky top-0 z-30 flex h-10 w-full items-center justify-between border-b-2 bg-gray-100 p-1 px-12"
+>
+  <div class="flex items-center text-sm italic">
+    {$page.data?.settings?.version ?? ''}
+  </div>
+  <div class="flex items-center gap-2">
+    {#if namespace}
       <DropdownMenu id="namespace" position="right" class="bg-purple-100">
         <div slot="trigger">
           <Badge type="purple" class="flex gap-1 pl-2"
@@ -79,36 +75,37 @@
           <NamespaceList {namespaceList} />
         </div>
       </DropdownMenu>
-      <DataEncoderStatus />
-      {#if $authUser.accessToken}
-        <DropdownMenu id="namespace" position="right">
-          <div slot="trigger">
-            {#if $authUser?.picture}
-              <img
-                src={$authUser?.picture}
-                alt={$authUser?.profile ?? 'user profile'}
-                class="mt-1 h-[30px] w-[30px] rounded-md cursor-pointer"
-                on:error={fixImage}
-                class:hidden={!showProfilePic}
-              />
-              <div
-                class="aspect-square h-full rounded-full bg-blue-200 p-0.5"
-                class:hidden={showProfilePic}
-              >
-                {#if $authUser?.name}
-                  <div class="text-center text-black ">
-                    {$authUser?.name.trim().charAt(0)}
-                  </div>
-                {/if}
-              </div>
-            {/if}
-          </div>
-          <div class="h-auto w-[400px]" slot="items">
-            <MenuItem class="rounded-t-xl">{$authUser.email}</MenuItem>
-            <MenuItem class="rounded-b-xl" on:click={logout}>Log out</MenuItem>
-          </div>
-        </DropdownMenu>
-      {/if}
-    </div>
+    {/if}
+    <DataEncoderStatus />
+    {#if $authUser.accessToken}
+      <DropdownMenu id="namespace" position="right">
+        <div slot="trigger" class="flex items-center gap-1">
+          {#if $authUser?.picture}
+            <img
+              src={$authUser?.picture}
+              alt={$authUser?.profile ?? 'user profile'}
+              class="mt-2 h-[30px] w-[30px] rounded-md cursor-pointer"
+              on:error={fixImage}
+              class:hidden={!showProfilePic}
+            />
+            <Icon name="chevron-down" class="mt-2" />
+            <div
+              class="aspect-square h-full rounded-full bg-blue-200 p-0.5"
+              class:hidden={showProfilePic}
+            >
+              {#if $authUser?.name}
+                <div class="text-center text-black ">
+                  {$authUser?.name.trim().charAt(0)}
+                </div>
+              {/if}
+            </div>
+          {/if}
+        </div>
+        <div class="h-auto w-[400px]" slot="items">
+          <MenuItem class="rounded-t-xl">{$authUser.email}</MenuItem>
+          <MenuItem class="rounded-b-xl" on:click={logout}>Log out</MenuItem>
+        </div>
+      </DropdownMenu>
+    {/if}
   </div>
-{/if}
+</div>

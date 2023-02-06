@@ -11,38 +11,18 @@
   import type { SvelteComponent } from 'svelte';
   import type { DescribeNamespaceResponse as Namespace } from '$types';
 
-  import { namespaceSelectorOpen } from '$lib/stores/nav-open';
-
   import NavContainer from '$lib/holocene/navigation/nav-container.svelte';
   import NavRow from '$lib/holocene/navigation/nav-row.svelte';
-  import NamespaceList from '$lib/components/namespace-list.svelte';
-  import Drawer from '$lib/holocene/navigation/drawer.svelte';
   import NavTooltip from '$lib/holocene/nav-tooltip.svelte';
   import IsCloudGuard from '$lib/components/is-cloud-guard.svelte';
 
-  import { afterNavigate } from '$app/navigation';
   import FeatureGuard from '$lib/components/feature-guard.svelte';
   import IsLegacyCloudGuard from '$lib/components/is-legacy-cloud-guard.svelte';
 
   export let isCloud = false;
   export let activeNamespace: Namespace;
-  export let getNamespaceList: () => Promise<NamespaceItem[]>;
   export let linkList: Partial<Record<string, string>>;
-  export let user: Promise<User> | undefined;
-  export let logout: () => void;
   export let extras: ExtraIcon[] | null = null;
-
-  let showProfilePic = true;
-
-  function fixImage() {
-    showProfilePic = false;
-  }
-
-  afterNavigate(() => {
-    if ($namespaceSelectorOpen) {
-      $namespaceSelectorOpen = false;
-    }
-  });
 </script>
 
 <NavContainer {isCloud} {linkList}>
@@ -124,24 +104,6 @@
       </NavRow> -->
     </slot>
     <slot name="settings" />
-  </svelte:fragment>
-  <svelte:fragment slot="drawer">
-    <!-- <Drawer
-      flyin={$namespaceSelectorOpen === true}
-      flyout={$namespaceSelectorOpen === false}
-      onClose={() => {
-        if ($namespaceSelectorOpen === true) $namespaceSelectorOpen = false;
-      }}
-    >
-      {#if $namespaceSelectorOpen}
-        <NamespaceList
-          {getNamespaceList}
-          on:closeNamespaceList={() => {
-            $namespaceSelectorOpen = false;
-          }}
-        />
-      {/if}
-    </Drawer> -->
   </svelte:fragment>
 </NavContainer>
 
