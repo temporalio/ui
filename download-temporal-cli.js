@@ -9,7 +9,14 @@ import mkdirp from 'mkdirp';
 import rimraf from 'rimraf';
 import kleur from 'kleur';
 
-if (process.env.VERCEL) process.exit(0);
+console.log(kleur.cyan('Getting ready to download Temporal CLI…'));
+
+if (process.env.VERCEL) {
+  console.log(
+    kleur.blue('Running on Vercel; skipping downloading Temporal CLI.'),
+  );
+  process.exit(0);
+}
 
 const reportError = (error, exitCode = 1, callback) => {
   console.error(kleur.bgRed('Error:'), kleur.red(error));
@@ -17,6 +24,10 @@ const reportError = (error, exitCode = 1, callback) => {
     callback();
   }
   process.exit(exitCode);
+};
+
+const removeDirectory = () => {
+  rimraf(destination);
 };
 
 const destinationDirectory = './bin';
@@ -28,10 +39,6 @@ let arch = process.arch;
 if (arch === 'x64') arch = 'amd64';
 
 const downloadUrl = `https://temporal.download/cli/archive/latest?platform=${platform}&arch=${arch}`;
-
-const removeDirectory = () => {
-  rimraf(destination);
-};
 
 removeDirectory();
 await mkdirp(destinationDirectory);
