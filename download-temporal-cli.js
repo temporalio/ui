@@ -2,9 +2,12 @@ import { join } from 'path';
 import { chmod } from 'fs/promises';
 import { finished } from 'stream/promises';
 
+import fetch from 'node-fetch';
+import kleur from 'kleur';
 import mkdirp from 'mkdirp';
 import rimraf from 'rimraf';
-import kleur from 'kleur';
+import tar from 'tar-fs';
+import zlib from 'zlib';
 
 console.log(kleur.cyan('Getting ready to download Temporal CLI…'));
 
@@ -14,10 +17,6 @@ if (process.env.VERCEL) {
   );
   process.exit(0);
 }
-
-const zlib = await import('zlib').then((module) => module.default);
-const tar = await import('tar-fs').then((module) => module.default);
-const fetch = await import('node-fetch').then((module) => module.default);
 
 const reportError = (error, exitCode = 1, callback) => {
   console.error(kleur.bgRed('Error:'), kleur.red(error));
