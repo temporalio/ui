@@ -3,8 +3,6 @@ import { chmod } from 'fs/promises';
 import { finished } from 'stream/promises';
 
 import fetch from 'node-fetch';
-import zlib from 'zlib';
-import tar from 'tar-fs';
 import mkdirp from 'mkdirp';
 import rimraf from 'rimraf';
 import kleur from 'kleur';
@@ -18,49 +16,58 @@ if (process.env.VERCEL) {
   process.exit(0);
 }
 
-const reportError = (error, exitCode = 1, callback) => {
-  console.error(kleur.bgRed('Error:'), kleur.red(error));
-  if (callback && typeof callback === 'function') {
-    callback();
-  }
-  process.exit(exitCode);
-};
+const run = async () => {
+  const zlib = await import('zlib').then((module) => module.default);
+  const tar = await import('tar-fs').then((module) => module.default);
 
-const removeDirectory = () => {
-  rimraf(destination);
-};
+  const reportError = (error, exitCode = 1, callback) => {
+    console.error(kleur.bgRed('Error:'), kleur.red(error));
+    if (callback && typeof callback === 'function') {
+      callback();
+    }
+    process.exit(exitCode);
+  };
 
-const destinationDirectory = './bin';
-const destination = join(destinationDirectory, 'cli');
+  const removeDirectory = () => {
+    rimraf(destination);
+  };
 
-let platform = process.platform;
-let arch = process.arch;
+  const destinationDirectory = './bin';
+  const destination = join(destinationDirectory, 'cli');
 
-if (arch === 'x64') arch = 'amd64';
+  const platform = process.platform;
+  let arch = process.arch;
 
-const downloadUrl = `https://temporal.download/cli/archive/latest?platform=${platform}&arch=${arch}`;
+  if (arch === 'x64') arch = 'amd64';
 
-removeDirectory();
-await mkdirp(destinationDirectory);
+  const downloadUrl = `https://temporal.download/cli/archive/latest?platform=${platform}&arch=${arch}`;
 
-console.log(
-  kleur.bgYellow('Downloading:'),
-  kleur.yellow().underline(downloadUrl),
-);
-
-try {
-  const response = await fetch(downloadUrl);
-
-  await finished(
-    response.body.pipe(zlib.createGunzip()).pipe(tar.extract(destination)),
-  );
-
-  await chmod(destination, 0o755);
+  removeDirectory();
+  await mkdirp(destinationDirectory);
 
   console.log(
-    kleur.bgGreen('Download complete:'),
-    kleur.green().underline(join(destination, 'temporal')),
+    kleur.bgYellow('Downloading:'),
+    kleur.yellow().underline(downloadUrl),
   );
-} catch (error) {
-  reportError(error, 2, removeDirectory);
-}
+
+  try {
+    const response = await fetch(downloadUrl);
+
+    await finished(
+      response.body.pipe(zlib.createGunzip()).pipe(tar.extract(destination)),
+    );
+
+    await chmod(destination, 0o755);
+
+    console.log(
+      kleur.bgGreen('Download complete:'),
+      kleur.green().underline(join(destination, 'temporal')),
+    );
+  } catch (error) {
+    reportError(error, 2, removeDirectory);
+  }
+};
+
+run()
+  .then(() => process.exit(0))
+  .catch(console.error);
