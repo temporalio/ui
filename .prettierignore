@@ -7,3 +7,4 @@ coverage/**
 /package
 pnpm-lock.yaml
 .histoire/**
+README.md
