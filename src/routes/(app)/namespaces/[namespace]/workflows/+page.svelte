@@ -6,10 +6,6 @@
 
   import AdvancedVisibilityGuard from '$lib/components/advanced-visibility-guard.svelte';
   import WorkflowsWithNewSearch from '$lib/pages/workflows-with-new-search.svelte';
-  import { bulkActionsEnabled } from '$lib/utilities/bulk-actions-enabled';
-  import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
-  import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
-  import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
 </script>
 
 <PageTitle
@@ -18,13 +14,6 @@
 />
 
 <AdvancedVisibilityGuard>
-  <WorkflowsWithNewSearch
-    bulkActionsEnabled={bulkActionsEnabled(
-      $page.data.settings,
-      $supportsAdvancedVisibility,
-    )}
-    cancelEnabled={workflowCancelEnabled($page.data.settings)}
-    terminateEnabled={workflowTerminateEnabled($page.data.settings)}
-  />
+  <WorkflowsWithNewSearch />
   <Workflows slot="fallback" />
 </AdvancedVisibilityGuard>

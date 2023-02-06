@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { page } from '$app/stores';
   import {
     resetWorkflow,
     signalWorkflow,
@@ -24,14 +25,14 @@
   import { getFirstResetEventID } from '$lib/utilities/get-first-reset-event-id';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import WorkflowResetForm from '$lib/components/workflow/workflow-reset-form.svelte';
+  import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
+  import { workflowSignalEnabled } from '$lib/utilities/workflow-signal-enabled';
+  import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
+  import { workflowResetEnabled } from '$lib/utilities/workflow-reset-enabled';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
   export let cancelInProgress: boolean;
-  export let terminateEnabled: boolean;
-  export let cancelEnabled: boolean;
-  export let signalEnabled: boolean;
-  export let resetEnabled: boolean;
 
   let reason = '';
   let signalInput = '';
@@ -45,6 +46,11 @@
   let resetReason: string | undefined = undefined;
   let eventIdValid: boolean = true;
   let loading = false;
+
+  $: cancelEnabled = workflowCancelEnabled($page.data.settings);
+  $: signalEnabled = workflowSignalEnabled($page.data.settings);
+  $: terminateEnabled = workflowTerminateEnabled($page.data.settings);
+  $: resetEnabled = workflowResetEnabled($page.data.settings);
 
   const showTerminationModal = () => {
     showTerminationConfirmation = true;

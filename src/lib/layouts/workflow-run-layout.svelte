@@ -21,11 +21,6 @@
   import { toDecodedPendingActivities } from '$lib/models/pending-activities';
   import { fetchStartAndEndEvents } from '$lib/services/events-service';
 
-  export let terminateEnabled: boolean = false;
-  export let cancelEnabled: boolean = false;
-  export let signalEnabled: boolean = false;
-  export let resetEnabled: boolean = false;
-
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
 
   const getWorkflowAndEventHistory = async (
@@ -77,13 +72,7 @@
   {#if !$workflowRun.workflow}
     <Loading />
   {:else}
-    <Header
-      namespace={$page.params.namespace}
-      {terminateEnabled}
-      {cancelEnabled}
-      {signalEnabled}
-      {resetEnabled}
-    />
+    <Header namespace={$page.params.namespace} />
     <slot />
   {/if}
 </div>
