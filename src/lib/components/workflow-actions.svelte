@@ -92,8 +92,7 @@
   };
 
   const handleSuccessfulTermination = async () => {
-    showTerminationConfirmation = false;
-    reason = '';
+    hideTerminationModal();
     $refresh = Date.now();
     toaster.push({
       id: 'workflow-termination-success-toast',
@@ -138,7 +137,7 @@
         message: 'Unable to cancel workflow.',
       });
     }
-    hideResetModal();
+    hideCancellationModal();
   };
 
   const handleSignalInputChange = (event: CustomEvent<string>) => {
@@ -165,9 +164,7 @@
         message: 'Error signaling workflow.',
       });
     }
-    signalInput = '';
-    signalName = '';
-    showSignalConfirmation = false;
+    hideSignalModal();
   };
 
   const reset = async () => {
@@ -200,6 +197,7 @@
     } catch (error) {
       toaster.push({ message: 'Error resetting workflow.', variant: 'error' });
     }
+    hideResetModal();
   };
 
   let workflowActions: {
