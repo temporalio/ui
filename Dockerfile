@@ -32,7 +32,7 @@ COPY server/go.mod server/go.sum ./
 RUN go mod download
 
 COPY server ./
-COPY --from=ui-builder /home/ui-builder/server/ui/assets ./server/ui/assets
+COPY --from=ui-builder /home/ui-builder/server/ui/assets ./ui/assets
 
 RUN make build-server
 
