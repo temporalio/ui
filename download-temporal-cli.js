@@ -1,13 +1,13 @@
 import { join } from 'path';
 import { chmod } from 'fs/promises';
 import { finished } from 'stream/promises';
+import zlib from 'node:zlib';
 
 import fetch from 'node-fetch';
 import kleur from 'kleur';
 import mkdirp from 'mkdirp';
 import rimraf from 'rimraf';
 import tar from 'tar-fs';
-import zlib from 'zlib';
 
 console.log(kleur.cyan('Getting ready to download Temporal CLI…'));
 
