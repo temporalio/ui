@@ -66,25 +66,23 @@
     <span class="block md:hidden"><Icon name="clock" /></span>
   </svelte:fragment>
   <div class="w-56">
-    {#if !compact}
-      {#each sortOptions as { option, label } (option)}
-        <div class="option" class:active={$eventFilterSort === option}>
-          <div class="check active">
-            {#if $eventFilterSort === option}
-              <Icon name="checkmark" />
-            {/if}
-          </div>
-          <button on:click={() => onSortOptionClick(option)}>
-            {label}
-          </button>
+    {#each sortOptions as { option, label } (option)}
+      <div class="option" class:active={$eventFilterSort === option}>
+        <div class="check active">
+          {#if $eventFilterSort === option}
+            <Icon name="checkmark" />
+          {/if}
         </div>
-      {/each}
-
-      <div class="option pr-4">
-        <div class="check" />
-        <div class="my-2 w-full border-b-2 border-gray-300 pr-2" />
+        <button on:click={() => onSortOptionClick(option)}>
+          {label}
+        </button>
       </div>
-    {/if}
+    {/each}
+
+    <div class="option pr-4">
+      <div class="check" />
+      <div class="my-2 w-full border-b-2 border-gray-300 pr-2" />
+    </div>
     {#each dateOptions as { label, option } (option)}
       <div class="option" class:active={$timeFormat === option}>
         <div class="check active">

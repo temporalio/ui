@@ -99,11 +99,41 @@ describe('groupEvents', () => {
     expect(Object.keys(groups).length).toBe(2);
   });
 
+  it('should be able to get event groups in ascending order by default', () => {
+    const groups = groupEvents([
+      scheduledEvent,
+      anotherScheduledEvent,
+    ] as unknown as WorkflowEvents);
+
+    expect(groups[0].id).toBe(scheduledEvent.id);
+  });
+
+  it('should be able to get event groups in descending order', () => {
+    const groups = groupEvents(
+      [scheduledEvent, anotherScheduledEvent] as unknown as WorkflowEvents,
+      'descending',
+    );
+
+    expect(groups[0].id).toBe(anotherScheduledEvent.id);
+  });
+
   it('should add a completed event to the correct group', () => {
     const groups = groupEvents([
       scheduledEvent,
       completedEvent,
     ] as unknown as WorkflowEvents);
+
+    const group = groups.find(({ id }) => id === scheduledEvent.id);
+
+    expect(group.events.size).toBe(2);
+    expect(group.events.get(completedEvent.id)).toBe(completedEvent);
+  });
+
+  it('should add a completed event to the correct group in descending order', () => {
+    const groups = groupEvents(
+      [scheduledEvent, completedEvent] as unknown as WorkflowEvents,
+      'descending',
+    );
 
     const group = groups.find(({ id }) => id === scheduledEvent.id);
 
