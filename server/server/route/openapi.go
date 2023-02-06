@@ -45,7 +45,7 @@ func SetOpenAPIUIRoutes(e *echo.Echo, assets embed.FS) error {
 }
 
 func buildOpenAPIUIHandler(assets fs.FS) (echo.HandlerFunc, error) {
-	indexHTML, err := fs.ReadFile(assets, "index.html")
+	indexHTML, err := fs.ReadFile(assets, "assets/index.html")
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func buildOpenAPIUIHandler(assets fs.FS) (echo.HandlerFunc, error) {
 
 func buildOpenAPIUIAssetsHander(assets embed.FS) echo.HandlerFunc {
 	stream := fs.FS(assets)
-	stream, _ = fs.Sub(stream, "generated")
+	stream, _ = fs.Sub(stream, "assets")
 	handler := http.FileServer(http.FS(stream))
 	return echo.WrapHandler(handler)
 }

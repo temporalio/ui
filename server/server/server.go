@@ -108,7 +108,7 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 		if cfg.UIAssetPath != "" {
 			assets = os.DirFS(cfg.UIAssetPath)
 		} else {
-			assets, err = fs.Sub(ui.Assets, "build")
+			assets, err = fs.Sub(ui.Assets, "assets")
 			if err != nil {
 				panic(err)
 			}
