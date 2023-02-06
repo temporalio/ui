@@ -36,9 +36,13 @@ func SetOpenAPIUIRoutes(e *echo.Echo, assets fs.FS) error {
 	if err != nil {
 		return err
 	}
-	e.GET("/openapi", indexHandler)
+	e.GET("/openapi/", indexHandler)
 
 	e.GET("/openapi/*", buildOpenAPIUIAssetsHander(assets))
+
+	e.GET("/openapi", func(c echo.Context) (err error) {
+		return c.Redirect(http.StatusMovedPermanently, "/openapi/")
+	})
 
 	return nil
 }
@@ -55,6 +59,6 @@ func buildOpenAPIUIHandler(assets fs.FS) (echo.HandlerFunc, error) {
 }
 
 func buildOpenAPIUIAssetsHander(assets fs.FS) echo.HandlerFunc {
-	handler := http.FileServer(http.FS(assets))
+	handler := http.StripPrefix("/openapi/", http.FileServer(http.FS(assets)))
 	return echo.WrapHandler(handler)
 }
