@@ -66,6 +66,7 @@ type Settings = {
   workflowCancelDisabled: boolean;
   workflowSignalDisabled: boolean;
   workflowResetDisabled: boolean;
+  batchActionsDisabled: boolean;
   showTemporalSystemNamespace: boolean;
   notifyOnNewVersion: boolean;
   feedbackURL: string;

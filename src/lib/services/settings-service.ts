@@ -32,6 +32,7 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     workflowCancelDisabled: !!settingsResponse?.WorkflowCancelDisabled,
     workflowSignalDisabled: !!settingsResponse?.WorkflowSignalDisabled,
     workflowResetDisabled: !!settingsResponse?.WorkflowResetDisabled,
+    batchActionsDisabled: !!settingsResponse?.BatchActionsDisabled,
     showTemporalSystemNamespace: settingsResponse?.ShowTemporalSystemNamespace,
     notifyOnNewVersion: settingsResponse?.NotifyOnNewVersion,
     feedbackURL: settingsResponse?.FeedbackURL,
