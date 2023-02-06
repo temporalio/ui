@@ -24,7 +24,6 @@ package route
 
 import (
 	"bytes"
-	"embed"
 	"io/fs"
 	"net/http"
 
@@ -32,7 +31,7 @@ import (
 )
 
 // SetOpenAPIRoutes sets api routes
-func SetOpenAPIUIRoutes(e *echo.Echo, assets embed.FS) error {
+func SetOpenAPIUIRoutes(e *echo.Echo, assets fs.FS) error {
 	indexHandler, err := buildOpenAPIUIHandler(assets)
 	if err != nil {
 		return err
@@ -45,7 +44,7 @@ func SetOpenAPIUIRoutes(e *echo.Echo, assets embed.FS) error {
 }
 
 func buildOpenAPIUIHandler(assets fs.FS) (echo.HandlerFunc, error) {
-	indexHTML, err := fs.ReadFile(assets, "assets/index.html")
+	indexHTML, err := fs.ReadFile(assets, "index.html")
 	if err != nil {
 		return nil, err
 	}
@@ -55,9 +54,7 @@ func buildOpenAPIUIHandler(assets fs.FS) (echo.HandlerFunc, error) {
 	}, nil
 }
 
-func buildOpenAPIUIAssetsHander(assets embed.FS) echo.HandlerFunc {
-	stream := fs.FS(assets)
-	stream, _ = fs.Sub(stream, "assets")
-	handler := http.FileServer(http.FS(stream))
+func buildOpenAPIUIAssetsHander(assets fs.FS) echo.HandlerFunc {
+	handler := http.FileServer(http.FS(assets))
 	return echo.WrapHandler(handler)
 }

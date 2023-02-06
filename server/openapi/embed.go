@@ -1,6 +1,13 @@
 package openapi
 
-import "embed"
+import (
+	"embed"
+	"io/fs"
+)
 
 //go:embed all:assets/*
-var Assets embed.FS
+var assets embed.FS
+
+func Assets() (fs.FS, error) {
+	return fs.Sub(assets, "assets")
+}

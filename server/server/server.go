@@ -101,14 +101,18 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 	route.SetAPIRoutes(e, cfgProvider, serverOpts.APIMiddleware)
 	route.SetAuthRoutes(e, cfgProvider)
 	if cfg.EnableOpenAPI {
-		route.SetOpenAPIUIRoutes(e, openapi.Assets)
+		assets, err := openapi.Assets()
+		if err != nil {
+			panic(err)
+		}
+		route.SetOpenAPIUIRoutes(e, assets)
 	}
 	if cfg.EnableUI {
 		var assets fs.FS
 		if cfg.UIAssetPath != "" {
 			assets = os.DirFS(cfg.UIAssetPath)
 		} else {
-			assets, err = fs.Sub(ui.Assets, "assets")
+			assets, err = ui.Assets()
 			if err != nil {
 				panic(err)
 			}
