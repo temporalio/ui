@@ -43,7 +43,7 @@ export async function getEventAttributes(
   const passCredentials = getCodecPassCredentials(
     settings,
     codecPassCredentials,
-  )
+  );
   const _settings = {
     ...settings,
     codec: { ...settings?.codec, endpoint, passAccessToken, passCredentials },
@@ -51,11 +51,11 @@ export async function getEventAttributes(
 
   const convertedAttributes = endpoint
     ? await convertWithCodec({
-      attributes,
-      namespace,
-      settings: _settings,
-      accessToken,
-    })
+        attributes,
+        namespace,
+        settings: _settings,
+        accessToken,
+      })
     : await convertWithWebsocket(attributes);
 
   const decodedAttributes = decodeAttributes(convertedAttributes) as object;

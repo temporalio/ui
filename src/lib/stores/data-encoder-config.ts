@@ -12,8 +12,8 @@ export const passAccessToken = persistStore<boolean>(
 export const passCredentials = persistStore<boolean>(
   'passCredentials',
   false,
-  true
-)
+  true,
+);
 
 export const lastDataEncoderStatus =
   writable<DataEncoderStatus>('notRequested');

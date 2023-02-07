@@ -20,7 +20,9 @@ export async function convertPayloadsWithCodec({
 }): Promise<Payloads> {
   const endpoint = settings?.codec?.endpoint;
   const passAccessToken = settings?.codec?.passAccessToken;
-  const credentials = settings?.codec?.passCredentials ? 'include' : 'same-origin';
+  const credentials = settings?.codec?.passCredentials
+    ? 'include'
+    : 'same-origin';
 
   const headers = {
     'Content-Type': 'application/json',
