@@ -2,6 +2,8 @@ import { has } from '$lib/utilities/has';
 import { createEventGroup } from './create-event-group';
 import { getGroupId } from './get-group-id';
 
+import type { EventSortOrder } from '$lib/stores/event-view';
+
 export { getGroupForEvent } from './get-group-for-event';
 
 const addToExistingGroup = (group: EventGroup, event: WorkflowEvent): void => {
@@ -13,7 +15,10 @@ const addToExistingGroup = (group: EventGroup, event: WorkflowEvent): void => {
   group.timestamp = event.timestamp;
 };
 
-export const groupEvents = (events: CommonHistoryEvent[]): EventGroups => {
+export const groupEvents = (
+  events: CommonHistoryEvent[],
+  sort: EventSortOrder = 'ascending',
+): EventGroups => {
   const groups: Record<string, EventGroup> = {};
 
   for (const event of events) {
@@ -27,7 +32,9 @@ export const groupEvents = (events: CommonHistoryEvent[]): EventGroups => {
     }
   }
 
-  return Object.values(groups);
+  return sort === 'descending'
+    ? Object.values(groups).reverse()
+    : Object.values(groups);
 };
 
 export const isEventGroup = (
