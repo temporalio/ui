@@ -5,21 +5,19 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
-    paths-ignore:
-      - '**.md'
-      - 'LICENSE'
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
   cypress-run:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Checkout and Setup Node
-        uses: ./.github/actions/checkout-and-setup
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup
+        uses: pnpm/action-setup@v2.2.4
+        with:
+          version: 7
+      - name: Install dependencies
+        run: pnpm install
       - name: Build assets
         run: VITE_MODE=test pnpm run build:local
       - name: Run Cypress tests
