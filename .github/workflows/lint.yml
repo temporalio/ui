@@ -18,23 +18,6 @@ defaults:
     shell: bash
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Checkout and Setup Node
-        uses: ./.github/actions/checkout-and-setup
-      - name: Build application
-        run: pnpm run build:local
-      - name: Ls
-        run: ls
-      - name: Get built application
-        id: application-cache
-        uses: actions/cache@v3
-        with:
-          path: ~/build
-          key: build-${{ github.sha }}
-          restore-keys: build-${{ github.sha }}-
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -43,52 +26,27 @@ jobs:
         uses: ./.github/actions/checkout-and-setup
       - name: Lint
         run: pnpm run --if-present lint
-    needs: build
   check-types:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Checkout and Setup Node
         uses: ./.github/actions/checkout-and-setup
-      - name: Get built application
-        id: application-cache
-        uses: actions/cache@v3
-        with:
-          path: ~/build
-          key: build-${{ github.sha }}
-          restore-keys: build-${{ github.sha }}-
       - name: Check Types
         run: pnpm run check
-    needs: build
   unit-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Checkout and Setup Node
         uses: ./.github/actions/checkout-and-setup
-      - name: Get built application
-        id: application-cache
-        uses: actions/cache@v3
-        with:
-          path: ~/build
-          key: build-${{ github.sha }}
-          restore-keys: build-${{ github.sha }}-
       - name: Run Unit Tests
         run: pnpm test
-    needs: build
   snapshot-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Checkout and Setup Node
         uses: ./.github/actions/checkout-and-setup
-      - name: Get built application
-        id: application-cache
-        uses: actions/cache@v3
-        with:
-          path: ~/build
-          key: build-${{ github.sha }}
-          restore-keys: build-${{ github.sha }}-
       - name: Run Snapshot Tests
         run: pnpm snapshot
-    needs: build
