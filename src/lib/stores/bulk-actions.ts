@@ -16,10 +16,11 @@ export const supportsBulkActions = derived(
   [temporalVersion, cluster],
   ([$temporalVersion, $cluster]) =>
     isVersionNewer($temporalVersion, '1.18.0') &&
-    advancedVisibilityEnabled($cluster),
+    advancedVisibilityEnabled($cluster, $temporalVersion),
 );
 
 export const supportsAdvancedVisibility = derived(
-  [cluster, isCloud],
-  ([$cluster, $isCloud]) => advancedVisibilityEnabled($cluster) ?? $isCloud,
+  [cluster, temporalVersion, isCloud],
+  ([$cluster, $temporalVersion, $isCloud]) =>
+    advancedVisibilityEnabled($cluster, $temporalVersion) ?? $isCloud,
 );
