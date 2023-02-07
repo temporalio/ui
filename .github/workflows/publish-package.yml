@@ -9,22 +9,12 @@ jobs:
     if: startsWith(github.head_ref, 'releases/') && github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup PNPM
-        uses: pnpm/action-setup@v2.2.2
-        with:
-          version: 7
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          registry-url: 'https://registry.npmjs.org'
-          cache: 'pnpm'
-      - name: Install dependencies
-        run: pnpm install
-      - name: Build Package
+      - uses: actions/checkout@v3
+      - name: Checkout and Setup Node
+        uses: ./.github/actions/checkout-and-setup
+      - name: Build package
         run: pnpm package
-      - name: Publish package to NPM
+      - name: Publish package to npm
         run: npm publish
         working-directory: ./package
         env:
