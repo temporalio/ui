@@ -72,7 +72,7 @@ describe('Set Data Encoder Settings', () => {
       cy.get('[data-cy="data-encoder-port-input"]').should('have.value', '');
 
       // Set pass access token to true
-      cy.get('.checkmark').click();
+      cy.get('[data-cy="data-encoder-pass-access-token"]').click();
 
       cy.get('[data-cy="data-encoder-endpoint-error"]').contains(
         'Endpoint must be https:// if passing access token',

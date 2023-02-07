@@ -22,7 +22,7 @@
   class:disabled
   class:on-dark={onDark}
 >
-  <span class="label">
+  <span class="label" data-cy={$$props['data-cy']}>
     {#if label}
       {@html label}
     {:else}
