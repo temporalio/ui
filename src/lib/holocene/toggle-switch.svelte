@@ -4,13 +4,20 @@
 </script>
 
 <label for={id} class="switch">
-  <input on:change {id} bind:checked type="checkbox" class="hidden" />
+  <input
+    on:change
+    {id}
+    bind:checked
+    type="checkbox"
+    class="hidden"
+    data-cy={$$props['data-cy']}
+  />
   <span class="slider" />
 </label>
 
 <style lang="postcss">
   .switch {
-    @apply relative mt-2 inline-block h-8 w-[52px] rounded-[8rem];
+    @apply relative inline-block h-8 w-[52px] rounded-[8rem];
   }
 
   .slider {
