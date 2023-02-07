@@ -42,7 +42,7 @@
     "story:preview": "histoire preview",
     "coverage": "TZ=UTC vitest run --coverage",
     "test-ui": "TZ=UTC vitest --ui",
-    "postinstall": "node download-temporal-cli.js"
+    "prepare": "node download-temporal-cli.js && husky install"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.3.4",
@@ -109,7 +109,7 @@
     "jest-websocket-mock": "^2.2.1",
     "jsdom": "^20.0.0",
     "kleur": "^4.1.5",
-    "lint-staged": "^13.0.3",
+    "lint-staged": "^13.1.0",
     "mkdirp": "^2.1.3",
     "mock-socket": "^9.1.0",
     "node-fetch": "^3.3.0",
@@ -146,8 +146,5 @@
     "date-fns": "2.29.x",
     "date-fns-tz": "1.3.x",
     "websocket-as-promised": "2.0.x"
-  },
-  "lint-staged": {
-    "*.{js,ts,json,css,svelte}": "pnpm format"
   }
 }
