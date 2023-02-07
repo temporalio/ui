@@ -65,8 +65,8 @@
       {error}
     />
     <DataConverterPortSettings bind:port />
-    <small data-cy="data-encoder-info"
-      >If both are set, the Remote Codec Endpoint will be used.</small
-    >
+    <p data-cy="data-encoder-info">
+      *If both are set, the remote codec endpoint will be used.
+    </p>
   </div>
 </Modal>

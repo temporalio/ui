@@ -24,7 +24,7 @@ describe('Set Data Encoder Settings', () => {
       cy.get('@header').find('[data-cy="data-encoder-status"]').click();
       cy.get('[data-cy="data-encoder-title"]').contains('Data Encoder');
       cy.get('[data-cy="data-encoder-endpoint-title"]').contains(
-        'Remote Codec Endpoint',
+        'Remote codec endpoint',
       );
       cy.get('[data-cy="data-encoder-endpoint-input"]').should(
         'have.value',
@@ -63,7 +63,7 @@ describe('Set Data Encoder Settings', () => {
       cy.get('@header').find('[data-cy="data-encoder-status"]').click();
       cy.get('[data-cy="data-encoder-title"]').contains('Data Encoder');
       cy.get('[data-cy="data-encoder-endpoint-title"]').contains(
-        'Remote Codec Endpoint',
+        'Remote codec endpoint',
       );
       cy.get('[data-cy="data-encoder-endpoint-input"]').should(
         'have.value',
@@ -72,7 +72,9 @@ describe('Set Data Encoder Settings', () => {
       cy.get('[data-cy="data-encoder-port-input"]').should('have.value', '');
 
       // Set pass access token to true
-      cy.get('[data-cy="data-encoder-pass-access-token"]').click();
+      cy.get('[data-cy="data-encoder-pass-access-token"]').click({
+        force: true,
+      });
 
       cy.get('[data-cy="data-encoder-endpoint-error"]').contains(
         'Endpoint must be https:// if passing access token',
@@ -104,11 +106,46 @@ describe('Set Data Encoder Settings', () => {
       );
     });
 
+    it('Check pass credentials', () => {
+      cy.get('@header').find('[data-cy="data-encoder-status"]').click();
+      cy.get('[data-cy="data-encoder-title"]').contains('Data Encoder');
+      cy.get('[data-cy="data-encoder-endpoint-title"]').contains(
+        'Remote codec endpoint',
+      );
+      cy.get('[data-cy="data-encoder-endpoint-input"]').should(
+        'have.value',
+        '',
+      );
+      cy.get('[data-cy="data-encoder-port-input"]').should('have.value', '');
+
+      // Set pass access token to true
+      cy.get('[data-cy="data-encoder-pass-credentials"]').click({
+        force: true,
+      });
+
+      cy.get('[data-cy="data-encoder-endpoint-input"]').type('http://test.com');
+      cy.get('[data-cy="confirm-modal-button"]').should('be.enabled');
+
+      cy.get('[data-cy="confirm-modal-button"]').click();
+
+      cy.get('@header')
+        .find('[data-cy="data-encoder-status-configured"]')
+        .should('be.visible');
+      cy.get('@header')
+        .find('[data-cy="data-encoder-status-configured"]')
+        .click();
+
+      cy.get('[data-cy="data-encoder-endpoint-input"]').should(
+        'have.value',
+        'http://test.com',
+      );
+    });
+
     it('Enter port with confirm', () => {
       cy.get('@header').find('[data-cy="data-encoder-status"]').click();
       cy.get('[data-cy="data-encoder-title"]').contains('Data Encoder');
       cy.get('[data-cy="data-encoder-endpoint-title"]').contains(
-        'Remote Codec Endpoint',
+        'Remote codec endpoint',
       );
       cy.get('[data-cy="data-encoder-endpoint-input"]').should(
         'have.value',
@@ -167,7 +204,7 @@ describe('Set Data Encoder Settings', () => {
         .click();
       cy.get('[data-cy="data-encoder-title"]').contains('Data Encoder');
       cy.get('[data-cy="data-encoder-endpoint-title"]').contains(
-        'Remote Codec Endpoint',
+        'Remote codec endpoint',
       );
 
       cy.get('[data-cy="data-encoder-site-endpoint"]').contains(
