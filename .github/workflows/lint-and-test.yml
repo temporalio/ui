@@ -21,6 +21,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Checkout and Setup Node
         uses: ./.github/actions/checkout-and-setup
       - name: Lint
@@ -28,6 +29,7 @@ jobs:
   check-types:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Checkout and Setup Node
         uses: ./.github/actions/checkout-and-setup
       - name: Check Types
@@ -35,6 +37,7 @@ jobs:
   unit-tests:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Checkout and Setup Node
         uses: ./.github/actions/checkout-and-setup
       - name: Run Unit Tests
@@ -42,6 +45,7 @@ jobs:
   snapshot-tests:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Checkout and Setup Node
         uses: ./.github/actions/checkout-and-setup
       - name: Run Snapshot Tests
