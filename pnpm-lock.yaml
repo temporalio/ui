@@ -59,7 +59,7 @@ specifiers:
   json-bigint: ^1.0.0
   just-debounce: ^1.1.0
   kleur: ^4.1.5
-  lint-staged: ^13.0.3
+  lint-staged: ^13.1.0
   mkdirp: ^2.1.3
   mock-socket: ^9.1.0
   node-fetch: ^3.3.0
