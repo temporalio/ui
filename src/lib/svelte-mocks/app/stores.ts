@@ -18,6 +18,7 @@ const settings: Settings = {
   codec: {
     endpoint: '',
     passAccessToken: false,
+    passCredentials: false,
   },
   defaultNamespace: 'default',
   disableWriteActions: false,

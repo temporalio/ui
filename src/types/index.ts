@@ -159,7 +159,7 @@ export type Timestamp = google.protobuf.ITimestamp;
 // extra APIs
 export type SettingsResponse = {
   Auth: { Enabled: boolean; Options: string[] };
-  Codec: { Endpoint: string; PassAccessToken?: boolean };
+  Codec: { Endpoint: string; PassAccessToken?: boolean, PassCredentials?: boolean };
   DefaultNamespace: string;
   DisableWriteActions: boolean;
   WorkflowTerminateDisabled: boolean;

@@ -6,6 +6,7 @@
 
   export let endpoint = '';
   export let passToken = false;
+  export let passCreds = false;
   export let error = '';
 </script>
 
@@ -18,6 +19,12 @@
       bind:checked={passToken}
       data-cy="data-encoder-pass-access-token"
       label="Pass access token"
+      class="mt-2 mb-2 block h-5 w-full"
+    />
+    <Checkbox
+      bind:checked={passCreds}
+      data-cy="data-encoder-pass-credentials"
+      label="Pass cross-origin credentials"
       class="mt-2 mb-2 block h-5 w-full"
     />
     <textarea

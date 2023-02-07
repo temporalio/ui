@@ -20,6 +20,7 @@ export async function convertPayloadsWithCodec({
 }): Promise<Payloads> {
   const endpoint = settings?.codec?.endpoint;
   const passAccessToken = settings?.codec?.passAccessToken;
+  const credentials = settings?.codec?.passCredentials ? 'include' : 'same-origin';
 
   const headers = {
     'Content-Type': 'application/json',
@@ -39,6 +40,7 @@ export async function convertPayloadsWithCodec({
   const encoderResponse: Promise<Payloads> = fetch(endpoint + '/decode', {
     headers,
     method: 'POST',
+    credentials,
     body: stringifyWithBigInt(payloads),
   })
     .then((r) => r.json())

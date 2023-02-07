@@ -25,6 +25,7 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     codec: {
       endpoint: settingsResponse?.Codec?.Endpoint,
       passAccessToken: settingsResponse?.Codec?.PassAccessToken,
+      passCredentials: settingsResponse?.Codec?.PassCredentials,
     },
     defaultNamespace: settingsResponse?.DefaultNamespace || 'default', // API returns an empty string if default namespace is not configured
     disableWriteActions: !!settingsResponse?.DisableWriteActions || false,

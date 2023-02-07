@@ -290,6 +290,57 @@ describe('convertPayloadToJsonWithCodec', () => {
     const dataConverterStatus = get(lastDataEncoderStatus);
     expect(dataConverterStatus).toEqual('notRequested');
   });
+  it('Should include same-origin credentials with the request for cookie based authentication of data converters by default', async () => {
+    const mockFetch = vi.fn(async () => {
+      return {
+        json: () => Promise.resolve({ payloads: [JsonPlainEncoded] }),
+      };
+    });
+
+    vi.stubGlobal('fetch', mockFetch);
+
+    const endpoint = 'http://localhost:1337';
+    await convertPayloadToJsonWithCodec({
+      attributes: parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
+      namespace: 'default',
+      settings: {
+        codec: {
+          endpoint,
+        },
+      },
+    });
+
+    expect(mockFetch).toBeCalledWith(
+      expect.any(String),
+      expect.objectContaining({ credentials: 'same-origin' }),
+    );
+  });
+  it('Should include cross-origin credentials with the request for cookie based authentication of data converters when passCredentials is set', async () => {
+    const mockFetch = vi.fn(async () => {
+      return {
+        json: () => Promise.resolve({ payloads: [JsonPlainEncoded] }),
+      };
+    });
+
+    vi.stubGlobal('fetch', mockFetch);
+
+    const endpoint = 'http://localhost:1337';
+    await convertPayloadToJsonWithCodec({
+      attributes: parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
+      namespace: 'default',
+      settings: {
+        codec: {
+          endpoint,
+          passCredentials: true,
+        },
+      },
+    });
+
+    expect(mockFetch).toBeCalledWith(
+      expect.any(String),
+      expect.objectContaining({ credentials: 'include' }),
+    );
+  });
 });
 
 // Integration test

@@ -9,6 +9,7 @@ import { convertPayloadsWithCodec } from '$lib/services/data-encoder';
 import type {
   codecEndpoint,
   passAccessToken,
+  passCredentials,
 } from '$lib/stores/data-encoder-config';
 
 import { atob } from './atob';
@@ -26,6 +27,7 @@ export type DecodeFunctions = {
   decodeAttributes?: Decode['decodePayloadAttributes'];
   encoderEndpoint?: typeof codecEndpoint;
   codecPassAccessToken?: typeof passAccessToken;
+  codecPassCredentials?: typeof passCredentials;
 };
 
 export function decodePayload(
