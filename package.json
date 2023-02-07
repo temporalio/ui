@@ -42,7 +42,7 @@
     "story:preview": "histoire preview",
     "coverage": "TZ=UTC vitest run --coverage",
     "test-ui": "TZ=UTC vitest --ui",
-    "prepare": "node download-temporal-cli.js && husky install"
+    "prepare": "node download-temporal-cli.js && husky install && svelte-kit sync"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.3.4",
