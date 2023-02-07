@@ -17,12 +17,13 @@ jobs:
           go-version-file: e2e/go.mod
           cache: true
           cache-dependency-path: e2e/go.sum
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 16
       - uses: pnpm/action-setup@v2.2.2
         with:
           version: 7
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
       - name: Build UI
         run: |
           pnpm install
