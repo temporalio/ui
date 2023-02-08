@@ -9,8 +9,8 @@
       "request": "launch",
       "name": "Launch Program",
       "skipFiles": ["<node_internals>/**"],
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run-script", "start"],
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["start"],
       "env": {
         "VITE_PUBLIC_PATH": ""
       }
