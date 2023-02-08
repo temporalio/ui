@@ -51,7 +51,7 @@
       <NamespaceSelector />
     </h1>
     <div class="flex items-center gap-2 text-sm">
-      <p data-cy="namespace-name">
+      <p data-cy="namespace-name" data-testid="namespace-name">
         {$page.params.namespace}
       </p>
     </div>
