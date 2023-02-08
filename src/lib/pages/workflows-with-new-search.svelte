@@ -35,10 +35,13 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { toaster } from '$lib/stores/toaster';
   import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
+  import { bulkActionsEnabled as workflowBulkActionsEnabled } from '$lib/utilities/bulk-actions-enabled';
+  import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
 
-  export let bulkActionsEnabled: boolean = false;
-  export let cancelEnabled: boolean = false;
-  export let terminateEnabled: boolean = false;
+  $: bulkActionsEnabled = workflowBulkActionsEnabled(
+    $page.data.settings,
+    $supportsAdvancedVisibility,
+  );
 
   let selectedWorkflows: { [index: string]: boolean } = {};
   let showBatchTerminateConfirmationModal: boolean = false;
@@ -314,8 +317,6 @@
   </svelte:fragment>
   <WorkflowsSummaryTableWithFilters
     {bulkActionsEnabled}
-    {cancelEnabled}
-    {terminateEnabled}
     updating={$updating}
     visibleWorkflows={visibleItems}
     {selectedWorkflowsCount}

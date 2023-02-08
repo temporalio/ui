@@ -10,6 +10,7 @@
     eventHistory,
     initialEventHistory,
   } from '$lib/stores/events';
+  import { authUser } from '$lib/stores/auth-user';
 
   import Header from '$lib/layouts/workflow-header.svelte';
   import Loading from '$lib/holocene/loading.svelte';
@@ -20,11 +21,6 @@
   import { toDecodedPendingActivities } from '$lib/models/pending-activities';
   import { fetchStartAndEndEvents } from '$lib/services/events-service';
 
-  export let terminateEnabled: boolean = false;
-  export let cancelEnabled: boolean = false;
-  export let signalEnabled: boolean = false;
-  export let resetEnabled: boolean = false;
-
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
 
   const getWorkflowAndEventHistory = async (
@@ -32,7 +28,7 @@
     workflowId: string,
     runId: string,
   ) => {
-    const { settings, user } = $page.data;
+    const { settings } = $page.data;
 
     const workflow = await fetchWorkflow({
       namespace,
@@ -45,7 +41,7 @@
       workflow,
       namespace,
       settings,
-      user?.accessToken,
+      $authUser?.accessToken,
     );
     $workflowRun = { workflow, workers };
     const events = await fetchStartAndEndEvents({
@@ -53,7 +49,7 @@
       workflowId,
       runId,
       settings,
-      accessToken: user?.accessToken,
+      accessToken: $authUser?.accessToken,
     });
     $eventHistory = events;
   };
@@ -76,13 +72,7 @@
   {#if !$workflowRun.workflow}
     <Loading />
   {:else}
-    <Header
-      namespace={$page.params.namespace}
-      {terminateEnabled}
-      {cancelEnabled}
-      {signalEnabled}
-      {resetEnabled}
-    />
+    <Header namespace={$page.params.namespace} />
     <slot />
   {/if}
 </div>

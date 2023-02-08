@@ -15,6 +15,7 @@
 </script>
 
 <button
+  type="button"
   class="icon-button"
   on:click
   data-cy={$$props['data-cy']}

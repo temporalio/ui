@@ -1,17 +1,21 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
-  import Input from './input/input.svelte';
-  import NumberInput from './input/number-input.svelte';
+  import Input from './input.svelte';
+  import NumberInput from './number-input.svelte';
+  import RangeInput from './range-input.svelte';
 
   export let Hst: HST;
 
   let value: string = '';
+  let numberValue: number;
   let hintText: string | undefined;
   let valid = true;
   let maxLength: number | undefined;
   let dark = false;
   let disabled = false;
   let clearable = false;
+  let min = 0;
+  let max = 100;
 </script>
 
 <Hst.Story>
@@ -57,6 +61,16 @@
     />
   </Hst.Variant>
 
+  <Hst.Variant title="A Range Input">
+    <RangeInput
+      label="day(s) retention"
+      id="range-input-1"
+      {min}
+      {max}
+      bind:value={numberValue}
+    />
+  </Hst.Variant>
+
   <svelte:fragment slot="controls">
     <Hst.Text title="Hint Text:" bind:value={hintText} />
     <Hst.Checkbox title="Valid: " bind:value={valid} />
@@ -64,5 +78,7 @@
     <Hst.Checkbox title="Dark: " bind:value={dark} />
     <Hst.Checkbox title="Disabled: " bind:value={disabled} />
     <Hst.Checkbox title="Clearable: " bind:value={clearable} />
+    <Hst.Number title="Min:" bind:value={min} />
+    <Hst.Number title="Max:" bind:value={max} />
   </svelte:fragment>
 </Hst.Story>

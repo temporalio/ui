@@ -35,11 +35,6 @@
 
   $: ({ workflow, workers } = $workflowRun);
 
-  export let terminateEnabled: boolean = false;
-  export let cancelEnabled: boolean = false;
-  export let signalEnabled: boolean = false;
-  export let resetEnabled: boolean = false;
-
   let refreshInterval;
   const refreshRate = 15000;
 
@@ -129,15 +124,7 @@
         class="flex flex-col items-center justify-center gap-4 whitespace-nowrap sm:flex-row lg:justify-end"
       >
         <AutoRefreshWorkflow onChange={onRefreshChange} />
-        <WorkflowActions
-          {terminateEnabled}
-          {signalEnabled}
-          {cancelEnabled}
-          {resetEnabled}
-          {cancelInProgress}
-          {workflow}
-          {namespace}
-        />
+        <WorkflowActions {cancelInProgress} {workflow} {namespace} />
       </div>
     {/if}
   </div>

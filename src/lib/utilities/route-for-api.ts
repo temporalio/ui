@@ -1,3 +1,5 @@
+import { page } from '$app/stores';
+import { get } from 'svelte/store';
 import { getApiOrigin } from './get-api-origin';
 import { publicPath } from './get-public-path';
 
@@ -11,15 +13,18 @@ const replaceNamespaceInApiUrl = (
   return '';
 };
 
-const base = async (namespace?: string): Promise<string> => {
+const base = (namespace?: string): string => {
   let baseUrl = '';
+  const webUrl: string | undefined = get(page).data?.webUrl;
 
-  if (globalThis?.GetNamespaces && namespace) {
-    const namespaces = await globalThis.GetNamespaces();
-    const configNamespace = namespaces?.find((n) => n.namespace === namespace);
-    baseUrl =
-      configNamespace?.webUri ??
-      replaceNamespaceInApiUrl(globalThis?.AppConfig?.apiUrl, namespace);
+  const webUrlExistsWithNamespace = webUrl && namespace;
+  const apiUrlExistsWithNamespace = globalThis?.AppConfig?.apiUrl && namespace;
+
+  if (webUrlExistsWithNamespace) {
+    baseUrl = webUrl;
+  } else if (apiUrlExistsWithNamespace) {
+    console.warn('Using fallback api url, web url not found');
+    baseUrl = replaceNamespaceInApiUrl(globalThis.AppConfig.apiUrl, namespace);
   } else {
     baseUrl = getApiOrigin();
   }
@@ -30,12 +35,9 @@ const base = async (namespace?: string): Promise<string> => {
   return baseUrl;
 };
 
-const withBase = async (
-  endpoint: string,
-  namespace?: string,
-): Promise<string> => {
+const withBase = (endpoint: string, namespace?: string): string => {
   if (endpoint.startsWith('/')) endpoint = endpoint.slice(1);
-  const baseUrl = await base(namespace);
+  const baseUrl = base(namespace);
   return `${baseUrl}/api/v1/${endpoint}`;
 };
 
@@ -60,49 +62,49 @@ export function routeForApi(
   route: WorkflowsAPIRoutePath,
   parameters: WorkflowListRouteParameters,
   shouldEncode?: boolean,
-): Promise<string>;
+): string;
 export function routeForApi(
   route: NamespaceAPIRoutePath,
   parameters: NamespaceRouteParameters,
   shouldEncode?: boolean,
-): Promise<string>;
+): string;
 export function routeForApi(
   route: SchedulesAPIRoutePath,
   parameters: ScheduleListRouteParameters,
-): Promise<string>;
+): string;
 export function routeForApi(
   route: WorkflowAPIRoutePath,
   parameters: WorkflowRouteParameters,
   shouldEncode?: boolean,
-): Promise<string>;
+): string;
 export function routeForApi(
   route: WorkflowActivitiesAPIRoutePath,
   parameters: WorkflowActivitiesRouteParameters,
   shouldEncode?: boolean,
-): Promise<string>;
+): string;
 export function routeForApi(
   route: BatchAPIRoutePath,
   parameters: BatchRouteParameters,
   shouldEncode?: boolean,
-): Promise<string>;
+): string;
 export function routeForApi(
   route: ScheduleAPIRoutePath,
   parameters: ScheduleRouteParameters,
   shouldEncode?: boolean,
-): Promise<string>;
+): string;
 export function routeForApi(
   route: TaskQueueAPIRoutePath,
   parameters: TaskQueueRouteParameters,
   shouldEncode?: boolean,
-): Promise<string>;
+): string;
 export function routeForApi(
   route: ParameterlessAPIRoutePath | SearchAttributesRoutePath,
-): Promise<string>;
+): string;
 export function routeForApi(
   route: APIRoutePath,
   parameters?: APIRouteParameters,
   shouldEncode = true,
-): Promise<string> {
+): string {
   if (shouldEncode) parameters = encode(parameters);
 
   const routes: { [K in APIRoutePath]: string } = {

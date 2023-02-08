@@ -2,7 +2,6 @@ import { isWorkflowExecutionStartedEvent } from './is-event-type';
 import { has } from './has';
 import { isString } from './is';
 
-import type { WorkflowRunWithWorkers } from '../stores/workflow-run';
 import type { StartAndEndEventHistory } from '../stores/events';
 
 const getNewExecutionId = (events: WorkflowEvents): string | undefined => {
@@ -17,11 +16,11 @@ const getNewExecutionId = (events: WorkflowEvents): string | undefined => {
 };
 
 export const getWorkflowRelationships = (
-  workflowRun: WorkflowRunWithWorkers,
+  workflow: WorkflowExecution | null,
   eventHistory: StartAndEndEventHistory,
 ) => {
-  const hasChildren = !!workflowRun.workflow?.pendingChildren.length;
-  const parent = workflowRun.workflow?.parent;
+  const hasChildren = !!workflow?.pendingChildren.length;
+  const parent = workflow?.parent;
 
   const workflowExecutionStartedEvent = eventHistory.start.find(
     isWorkflowExecutionStartedEvent,
@@ -33,9 +32,7 @@ export const getWorkflowRelationships = (
     workflowExecutionStartedEvent?.attributes?.firstExecutionRunId;
 
   const first =
-    firstExecutionRunId === workflowRun.workflow?.runId
-      ? undefined
-      : firstExecutionRunId;
+    firstExecutionRunId === workflow?.runId ? undefined : firstExecutionRunId;
 
   const previous =
     workflowExecutionStartedEvent?.attributes?.continuedExecutionRunId;

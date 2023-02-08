@@ -7,6 +7,7 @@ export const importSettings: Settings = {
   codec: {},
   defaultNamespace: 'namespace',
   disableWriteActions: false,
+  batchActionsDisabled: false,
   workflowCancelDisabled: false,
   workflowResetDisabled: false,
   workflowSignalDisabled: false,

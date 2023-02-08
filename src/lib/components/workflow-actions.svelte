@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { page } from '$app/stores';
   import {
     resetWorkflow,
     signalWorkflow,
@@ -6,7 +7,7 @@
   } from '$lib/services/workflow-service';
 
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
-  import { ResetType } from '$types';
+  import { ResetType } from '$lib/models/workflow-actions';
 
   import { refresh } from '$lib/stores/workflow-run';
   import { settings } from '$lib/stores/settings';
@@ -24,14 +25,14 @@
   import { getFirstResetEventID } from '$lib/utilities/get-first-reset-event-id';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import WorkflowResetForm from '$lib/components/workflow/workflow-reset-form.svelte';
+  import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
+  import { workflowSignalEnabled } from '$lib/utilities/workflow-signal-enabled';
+  import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
+  import { workflowResetEnabled } from '$lib/utilities/workflow-reset-enabled';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
   export let cancelInProgress: boolean;
-  export let terminateEnabled: boolean;
-  export let cancelEnabled: boolean;
-  export let signalEnabled: boolean;
-  export let resetEnabled: boolean;
 
   let reason = '';
   let signalInput = '';
@@ -45,6 +46,11 @@
   let resetReason: string | undefined = undefined;
   let eventIdValid: boolean = true;
   let loading = false;
+
+  $: cancelEnabled = workflowCancelEnabled($page.data.settings);
+  $: signalEnabled = workflowSignalEnabled($page.data.settings);
+  $: terminateEnabled = workflowTerminateEnabled($page.data.settings);
+  $: resetEnabled = workflowResetEnabled($page.data.settings);
 
   const showTerminationModal = () => {
     showTerminationConfirmation = true;
@@ -86,8 +92,7 @@
   };
 
   const handleSuccessfulTermination = async () => {
-    showTerminationConfirmation = false;
-    reason = '';
+    hideTerminationModal();
     $refresh = Date.now();
     toaster.push({
       id: 'workflow-termination-success-toast',
@@ -132,7 +137,7 @@
         message: 'Unable to cancel workflow.',
       });
     }
-    hideResetModal();
+    hideCancellationModal();
   };
 
   const handleSignalInputChange = (event: CustomEvent<string>) => {
@@ -159,9 +164,7 @@
         message: 'Error signaling workflow.',
       });
     }
-    signalInput = '';
-    signalName = '';
-    showSignalConfirmation = false;
+    hideSignalModal();
   };
 
   const reset = async () => {
@@ -194,6 +197,7 @@
     } catch (error) {
       toaster.push({ message: 'Error resetting workflow.', variant: 'error' });
     }
+    hideResetModal();
   };
 
   let workflowActions: {

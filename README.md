@@ -86,7 +86,7 @@ pnpm run build:local
 pnpm run build:cloud
 ```
 
-The resulting assets will be placed in `.vercel/output/static`.
+The resulting assets will be placed in `./build`.
 
 > You can preview the built app with `pnpm run preview`, regardless of whether you installed an adapter. This should _not_ be used to serve your app in production.
 

@@ -12,6 +12,7 @@ export const settings = writable<Settings>({
   },
   defaultNamespace: null,
   disableWriteActions: false,
+  batchActionsDisabled: false,
   workflowTerminateDisabled: false,
   workflowCancelDisabled: false,
   workflowSignalDisabled: false,

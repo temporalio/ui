@@ -69,7 +69,7 @@ export const fetchWorkflowCount = async (
   let totalCount = 0;
   let count = 0;
   try {
-    const countRoute = await routeForApi('workflows.count', { namespace });
+    const countRoute = routeForApi('workflows.count', { namespace });
     if (!query) {
       const totalCountResult = await requestFromAPI<{ count: number }>(
         countRoute,
@@ -135,7 +135,7 @@ export const fetchAllWorkflows = async (
     }
   };
 
-  const route = await routeForApi(endpoint, { namespace });
+  const route = routeForApi(endpoint, { namespace });
   const { executions, nextPageToken } =
     (await requestFromAPI<ListWorkflowExecutionsResponse>(route, {
       params: { query },
@@ -167,7 +167,7 @@ export const fetchWorkflowForAuthorization = async (
     }
   };
 
-  const route = await routeForApi(endpoint, { namespace });
+  const route = routeForApi(endpoint, { namespace });
   await requestFromAPI<ListWorkflowExecutionsResponse>(route, {
     params: { pageSize: '1' },
     onError,
@@ -192,7 +192,7 @@ export async function fetchWorkflow(
   parameters: GetWorkflowExecutionRequest,
   request = fetch,
 ): Promise<WorkflowExecution> {
-  const route = await routeForApi('workflow', parameters);
+  const route = routeForApi('workflow', parameters);
   return requestFromAPI(route, { request }).then(toWorkflowExecution);
 }
 
@@ -201,7 +201,7 @@ export async function terminateWorkflow({
   namespace,
   reason,
 }: TerminateWorkflowOptions): Promise<null> {
-  const route = await routeForApi('workflow.terminate', {
+  const route = routeForApi('workflow.terminate', {
     namespace,
     workflowId: workflow.id,
     runId: workflow.runId,
@@ -217,7 +217,7 @@ export async function cancelWorkflow(
   { namespace, workflowId, runId }: CancelWorkflowOptions,
   request = fetch,
 ) {
-  const route = await routeForApi('workflow.cancel', {
+  const route = routeForApi('workflow.cancel', {
     namespace,
     workflowId,
     runId,
@@ -239,7 +239,7 @@ export async function signalWorkflow({
   signalName,
   signalInput,
 }: SignalWorkflowOptions) {
-  const route = await routeForApi('workflow.signal', {
+  const route = routeForApi('workflow.signal', {
     namespace,
     workflowId,
     runId,
@@ -275,7 +275,7 @@ export async function resetWorkflow({
   eventId,
   reason,
 }: ResetWorkflowOptions): Promise<{ runId: string }> {
-  const route = await routeForApi('workflow.reset', {
+  const route = routeForApi('workflow.reset', {
     namespace,
     workflowId,
     runId,
@@ -308,7 +308,7 @@ export async function fetchWorkflowForSchedule(
     console.error(err);
   };
 
-  const route = await routeForApi('workflow', parameters);
+  const route = routeForApi('workflow', parameters);
   return requestFromAPI(route, {
     request,
     onError,

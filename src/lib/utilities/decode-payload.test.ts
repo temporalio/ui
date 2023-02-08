@@ -83,7 +83,16 @@ const JsonObjectEncoded = {
   data: 'eyAiVHJhbnNmb3JtZXIiOiAiT3B0aW11c1ByaW1lIiB9',
 };
 
+const JsonObjectEncodedWithConstructor = {
+  metadata: {
+    encoding: 'anNvbi9wbGFpbg==',
+    type: 'S2V5d29yZA==',
+  },
+  data: 'eyAiQ29uc3RydWN0b3JPdXRwdXQiOiAiT3B0aW11c1ByaW1lIiB9',
+};
+
 const JsonObjectDecoded = { Transformer: 'OptimusPrime' };
+const JsonObjectDecodedWithConstructor = { ConstructorOutput: 'OptimusPrime' };
 
 describe('decodePayload', () => {
   it('Should not decode a payload with encoding binary/encrypted', () => {
@@ -105,6 +114,11 @@ describe('decodePayload', () => {
   });
   it('Should decode a json payload with encoding json/plain', () => {
     expect(decodePayload(JsonObjectEncoded)).toEqual(JsonObjectDecoded);
+  });
+  it('Should decode a json payload with constructor keyword with encoding json/plain', () => {
+    expect(decodePayload(JsonObjectEncodedWithConstructor)).toEqual(
+      JsonObjectDecodedWithConstructor,
+    );
   });
 });
 
@@ -275,31 +289,6 @@ describe('convertPayloadToJsonWithCodec', () => {
 
     const dataConverterStatus = get(lastDataEncoderStatus);
     expect(dataConverterStatus).toEqual('notRequested');
-  });
-  it('Should include credentials with the request for cookie based authentication of data converters', async () => {
-    const mockFetch = vi.fn(async () => {
-      return {
-        json: () => Promise.resolve({ payloads: [JsonPlainEncoded] }),
-      };
-    });
-
-    vi.stubGlobal('fetch', mockFetch);
-
-    const endpoint = 'http://localhost:1337';
-    await convertPayloadToJsonWithCodec({
-      attributes: parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
-      namespace: 'default',
-      settings: {
-        codec: {
-          endpoint,
-        },
-      },
-    });
-
-    expect(mockFetch).toBeCalledWith(
-      expect.any(String),
-      expect.objectContaining({ credentials: 'include' }),
-    );
   });
 });
 

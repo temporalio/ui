@@ -39,7 +39,6 @@ export async function convertPayloadsWithCodec({
   const encoderResponse: Promise<Payloads> = fetch(endpoint + '/decode', {
     headers,
     method: 'POST',
-    credentials: 'include',
     body: stringifyWithBigInt(payloads),
   })
     .then((r) => r.json())

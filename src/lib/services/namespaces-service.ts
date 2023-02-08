@@ -20,7 +20,7 @@ export async function fetchNamespaces(
   }
 
   try {
-    const route = await routeForApi('namespaces');
+    const route = routeForApi('namespaces');
     const results = await paginated(async (token: string) =>
       requestFromAPI<ListNamespacesResponse>(route, {
         request,
@@ -58,7 +58,7 @@ export async function fetchNamespace(
     return empty;
   }
 
-  const route = await routeForApi('namespace', { namespace });
+  const route = routeForApi('namespace', { namespace });
   const results = await requestFromAPI<DescribeNamespaceResponse>(route, {
     request,
     onError: () =>

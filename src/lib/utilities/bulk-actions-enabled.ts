@@ -11,8 +11,8 @@ export const bulkActionsEnabled = (
   supportsAdvancedVisibility: boolean,
 ) => {
   if (!supportsAdvancedVisibility) return false;
-  if (settings?.runtimeEnvironment?.isCloud) return false;
   if (settings.disableWriteActions) return false;
+  if (settings.batchActionsDisabled) return false;
 
   return ALLOWED_BULK_ACTIONS.some((action) => !settings[action]);
 };

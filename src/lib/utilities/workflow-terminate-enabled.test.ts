@@ -26,5 +26,14 @@ describe('workflowTerminateEnabled', () => {
         }),
       ).toBe(false);
     });
+
+    test('when write actions and terminate are both disabled', () => {
+      expect(
+        workflowTerminateEnabled({
+          disableWriteActions: true,
+          workflowTerminateDisabled: true,
+        }),
+      ).toBe(false);
+    });
   });
 });

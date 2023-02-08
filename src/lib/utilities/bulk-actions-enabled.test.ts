@@ -7,6 +7,7 @@ describe('bulkActionsEnabled', () => {
       bulkActionsEnabled(
         {
           disableWriteActions: false,
+          disableBulkActions: false,
           workflowTerminateDisabled: false,
           workflowCancelDisabled: false,
         },
@@ -20,16 +21,32 @@ describe('bulkActionsEnabled', () => {
       expect(bulkActionsEnabled({}, false)).toBe(false);
     });
 
-    test('for legacy cloud', () => {
+    test('when write actions are disabled', () => {
       expect(
-        bulkActionsEnabled({ runtimeEnvironment: { isCloud: true } }, true),
+        bulkActionsEnabled(
+          {
+            disableWriteActions: true,
+            batchActionsDisabled: false,
+            workflowCancelDisabled: false,
+            workflowTerminateDisabled: false,
+          },
+          true,
+        ),
       ).toBe(false);
     });
 
-    test('when write actions are disabled', () => {
-      expect(bulkActionsEnabled({ disableWriteActions: true }, false)).toBe(
-        false,
-      );
+    test('when bulk actions are disabled', () => {
+      expect(
+        bulkActionsEnabled(
+          {
+            disableWriteActions: false,
+            batchActionsDisabled: true,
+            workflowCancelDisabled: false,
+            workflowTerminateDisabled: false,
+          },
+          true,
+        ),
+      ).toBe(false);
     });
 
     test('when neither terminate or cancel are enabled', () => {
@@ -37,10 +54,11 @@ describe('bulkActionsEnabled', () => {
         bulkActionsEnabled(
           {
             disableWriteActions: false,
+            batchActionsDisabled: false,
             workflowCancelDisabled: true,
             workflowTerminateDisabled: true,
           },
-          false,
+          true,
         ),
       ).toBe(false);
     });

@@ -11,7 +11,7 @@ export const failActivityTask = async ({
   identity,
   lastHeartbeatDetails,
 }: FailActivityTaskRequest): Promise<FailActivityTaskResponse> => {
-  const route = await routeForApi('activity.fail', {
+  const route = routeForApi('activity.fail', {
     namespace,
     workflowId,
     runId,
@@ -33,7 +33,7 @@ export const completeActivityTask = async ({
   identity,
   result,
 }: CompleteActivityTaskRequest): Promise<CompleteActivityTaskResponse> => {
-  const route = await routeForApi('activity.complete', {
+  const route = routeForApi('activity.complete', {
     namespace,
     workflowId,
     runId,

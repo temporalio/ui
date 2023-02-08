@@ -166,14 +166,9 @@ export type SettingsResponse = {
   WorkflowCancelDisabled: boolean;
   WorkflowSignalDisabled: boolean;
   WorkflowResetDisabled: boolean;
+  BatchActionsDisabled: boolean;
   ShowTemporalSystemNamespace: boolean;
   NotifyOnNewVersion: boolean;
   FeedbackURL: string;
   Version: string;
 };
-
-export enum ResetType {
-  FirstWorkflowTask = 0,
-  LastWorkflowTask = 1,
-  EventId = 2,
-}

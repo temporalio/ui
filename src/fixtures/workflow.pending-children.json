@@ -1,0 +1,27 @@
+{
+  "name": "SampleParentWorkflow",
+  "id": "parent-workflow_b84f7ba9-e645-4324-b300-77028d21c116",
+  "runId": "e50934b8-fad0-414c-93dd-d260a2476bc0",
+  "startTime": "2023-02-01T20:49:11.358822126Z",
+  "endTime": "null",
+  "status": "Running",
+  "historyEvents": "9",
+  "url": "/workflows/parent-workflow_b84f7ba9-e645-4324-b300-77028d21c116/e50934b8-fad0-414c-93dd-d260a2476bc0",
+  "taskQueue": "child-workflow-continue-as-new",
+  "pendingActivities": [],
+  "pendingChildren": [
+    {
+      "workflowId": "child_workflow:e50934b8-fad0-414c-93dd-d260a2476bc0",
+      "runId": "7eb6a801-bae1-409e-98d8-10c38816eb0d",
+      "workflowTypeName": "SampleChildWorkflow",
+      "initiatedId": "5",
+      "parentClosePolicy": "Terminate"
+    }
+  ],
+  "parentNamespaceId": "",
+  "parent": null,
+  "stateTransitionCount": "6",
+  "isRunning": true,
+  "defaultWorkflowTaskTimeout": "10s",
+  "canBeTerminated": true
+}
