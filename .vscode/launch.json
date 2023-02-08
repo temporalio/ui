@@ -7,10 +7,20 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
+      "name": "Start UI Development Server",
       "skipFiles": ["<node_internals>/**"],
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["start"],
+      "runtimeArgs": [
+        "exec",
+        "concurrently",
+        "\"temporal server start-dev\"",
+        "\"pnpm start\""
+      ],
+      "serverReadyAction": {
+        "action": "startDebugging",
+        "name": "Launch Browser",
+        "killOnServerStop": false
+      },
       "env": {
         "VITE_PUBLIC_PATH": ""
       }
