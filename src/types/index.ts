@@ -112,6 +112,8 @@ export type ExternalWorkflowExecutionSignaledEventAttributes =
   temporal.api.history.v1.IExternalWorkflowExecutionSignaledEventAttributes;
 export type UpsertWorkflowSearchAttributesEventAttributes =
   temporal.api.history.v1.IUpsertWorkflowSearchAttributesEventAttributes;
+export type StartBatchOperationRequest =
+  temporal.api.workflowservice.v1.IStartBatchOperationRequest;
 
 // api.enums
 

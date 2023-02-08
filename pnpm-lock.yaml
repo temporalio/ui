@@ -21,7 +21,7 @@ specifiers:
   '@sveltejs/package': ^1.0.1
   '@sveltejs/svelte-virtual-list': ^3.0.1
   '@sveltejs/vite-plugin-svelte': ^2.0.2
-  '@temporalio/proto': ^1.4.4
+  '@temporalio/proto': ^1.6.0
   '@types/base-64': ^1.0.0
   '@types/json-bigint': ^1.0.1
   '@types/mkdirp': ^1.0.2
@@ -128,7 +128,7 @@ devDependencies:
   '@sveltejs/adapter-vercel': 1.0.5_@sveltejs+kit@1.0.1
   '@sveltejs/kit': 1.0.1_svelte@3.55.1+vite@4.0.4
   '@sveltejs/vite-plugin-svelte': 2.0.2_svelte@3.55.1+vite@4.0.4
-  '@temporalio/proto': 1.5.2
+  '@temporalio/proto': 1.6.0
   '@types/base-64': 1.0.0
   '@types/json-bigint': 1.0.1
   '@types/mkdirp': 1.0.2
@@ -1248,8 +1248,8 @@ packages:
       - supports-color
     dev: true
 
-  /@temporalio/proto/1.5.2:
-    resolution: {integrity: sha512-yi9sktBF7EVM1wfh8IZe0iaz54zXpnfUD7zGsdWc7MyXZfl0Ub9Qrx7CxPVJSk+qbvQAx/2OpRzaFgXnyIkhEA==}
+  /@temporalio/proto/1.6.0:
+    resolution: {integrity: sha512-qFTlZdtVX1e7Aoq0MCySCnfyZpZC/VAxm19XNMKrx4veJTEdbXV69RXDthyUSJhdztgtN3GQ5jRldhrVDME+vg==}
     dependencies:
       long: 5.2.1
       protobufjs: 7.1.2
