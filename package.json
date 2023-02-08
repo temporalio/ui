@@ -25,6 +25,7 @@
     "test:integration": "playwright test",
     "test:snapshot": "vitest run --dir src/lib/holocene",
     "lint": "prettier --check --plugin-search-dir=. . && eslint --ignore-path .gitignore . && stylelint \"src/**/*.{css,postcss,svelte}\"",
+    "lint:fix": "eslint --ignore-path .gitignore --fix",
     "format": "prettier --write --plugin-search-dir=. . && stylelint \"src/**/*.{css,postcss,svelte}\" --fix",
     "check": "VITE_TEMPORAL_UI_BUILD_TARGET=local svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "VITE_TEMPORAL_UI_BUILD_TARGET=local svelte-check --tsconfig ./tsconfig.json --watch",
