@@ -13,7 +13,7 @@
       "runtimeArgs": [
         "exec",
         "concurrently",
-        "\"temporal server start-dev\"",
+        "\"./bin/temporal server start-dev\"",
         "\"pnpm start\""
       ],
       "serverReadyAction": {
