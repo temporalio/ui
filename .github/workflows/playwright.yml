@@ -1,12 +1,18 @@
 name: Playwright Tests
+
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
-  paths-ignore:
-    - '**.md'
-    - 'LICENSE'
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   playwright:
     timeout-minutes: 60
