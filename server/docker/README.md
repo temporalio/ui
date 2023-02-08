@@ -45,13 +45,13 @@ Build the image
 
 ``` bash
 make install-submodules
-docker build --build-arg TEMPORAL_PUBLIC_PATH=/custom-path -t temporal-ui .
+docker build --build-arg UI_PUBLIC_PATH=/custom-path -t temporal-ui .
 ```
 
 Run the image
 
 ```
-docker run -d --network host -e TEMPORAL_PUBLIC_PATH=/custom-path -t temporal-ui
+docker run -d --network host -e TEMPORAL_UI_PUBLIC_PATH=/custom-path -t temporal-ui
 ```
 
 Then navigate to http://localhost:8080/custom-path
