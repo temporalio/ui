@@ -19,9 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
+      - name: Checkout and Setup Node
+        uses: ./.github/actions/checkout-and-setup
       - name: Install dependencies
         run: pnpm install
       - name: Install Playwright Browsers
