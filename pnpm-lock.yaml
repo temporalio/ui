@@ -17,7 +17,7 @@ specifiers:
   '@lezer/highlight': ^1.1.3
   '@sveltejs/adapter-static': ^1.0.5
   '@sveltejs/adapter-vercel': 2.0.2
-  '@sveltejs/kit': 1.0.1
+  '@sveltejs/kit': 1.0.5
   '@sveltejs/package': ^1.0.1
   '@sveltejs/svelte-virtual-list': ^3.0.1
   '@sveltejs/vite-plugin-svelte': ^2.0.2
@@ -124,9 +124,9 @@ devDependencies:
   '@histoire/controls': 0.12.4
   '@histoire/plugin-svelte': 0.12.4_76dbu7m65vjnozzv4fj7qep6aq
   '@histoire/shared': 0.12.4_vite@4.0.4
-  '@sveltejs/adapter-static': 1.0.5_@sveltejs+kit@1.0.1
-  '@sveltejs/adapter-vercel': 2.0.2_@sveltejs+kit@1.0.1
-  '@sveltejs/kit': 1.0.1_svelte@3.55.1+vite@4.0.4
+  '@sveltejs/adapter-static': 1.0.5_@sveltejs+kit@1.0.5
+  '@sveltejs/adapter-vercel': 2.0.2_@sveltejs+kit@1.0.5
+  '@sveltejs/kit': 1.0.5_svelte@3.55.1+vite@4.0.4
   '@sveltejs/vite-plugin-svelte': 2.0.2_svelte@3.55.1+vite@4.0.4
   '@temporalio/proto': 1.5.2
   '@types/base-64': 1.0.0
@@ -1156,20 +1156,20 @@ packages:
     resolution: {integrity: sha512-1P1OROm/rdubP5aFDSZQILU0vrLCJ4fvHt6EoqHEM+2D/G5MK3bIaymUKLit8Js9gbns5UyJnkP/TZROLw4tUA==}
     dev: true
 
-  /@sveltejs/adapter-static/1.0.5_@sveltejs+kit@1.0.1:
+  /@sveltejs/adapter-static/1.0.5_@sveltejs+kit@1.0.5:
     resolution: {integrity: sha512-W5jbgvy9sbYEHs27NQOSFEun+zQwdcL4kpk5qc2kSHl8cKsP5wfXuWDTDRmD1Co40aFcesi5Az5ZzdnPI8KCVg==}
     peerDependencies:
       '@sveltejs/kit': ^1.0.0
     dependencies:
-      '@sveltejs/kit': 1.0.1_svelte@3.55.1+vite@4.0.4
+      '@sveltejs/kit': 1.0.5_svelte@3.55.1+vite@4.0.4
     dev: true
 
-  /@sveltejs/adapter-vercel/2.0.2_@sveltejs+kit@1.0.1:
+  /@sveltejs/adapter-vercel/2.0.2_@sveltejs+kit@1.0.5:
     resolution: {integrity: sha512-Mn80jy3rPNWB9iBp93MHXWwOh1qyxNzMNal0Dd80rD3As5Qi5L3lGhr1cIZ3T3Y3giwAVxzjMiHEflaUb8sjqg==}
     peerDependencies:
       '@sveltejs/kit': ^1.5.0
     dependencies:
-      '@sveltejs/kit': 1.0.1_svelte@3.55.1+vite@4.0.4
+      '@sveltejs/kit': 1.0.5_svelte@3.55.1+vite@4.0.4
       '@vercel/nft': 0.22.6
       esbuild: 0.16.16
     transitivePeerDependencies:
@@ -1177,8 +1177,8 @@ packages:
       - supports-color
     dev: true
 
-  /@sveltejs/kit/1.0.1_svelte@3.55.1+vite@4.0.4:
-    resolution: {integrity: sha512-C41aCaDjA7xoUdsrc/lSdU1059UdLPIRE1vEIRRynzpMujNgp82bTMHkDosb6vykH6LrLf3tT2w2/5NYQhKYGQ==}
+  /@sveltejs/kit/1.0.5_svelte@3.55.1+vite@4.0.4:
+    resolution: {integrity: sha512-8DXJiAaaW9FBaJ0i5MereT2nHN9ofTGsBO+N3RvFOPu2lc074DXu+SmGBX1Vw9zAdw5qL9j0y6GqRbYuH00PCg==}
     engines: {node: ^16.14 || >=18}
     hasBin: true
     requiresBuild: true
