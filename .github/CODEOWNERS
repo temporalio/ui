@@ -2,11 +2,20 @@
 # the repo. Unless a later match takes precedence,
 # @temporalio/frontend-engineering will be requested for
 # review when someone opens a pull request.
-*                   @temporalio/frontend-engineering
-/src/lib/holocene/  @rossedfort
-/server/						@feedmeapples @robholland
-*.go							  @feedmeapples @robholland
-/src/lib/models     @stevekinney
-/src/lib/services   @stevekinney
-/src/lib/utilities  @stevekinney
-/src/lib/stores     @stevekinney
+*                                       @temporalio/frontend-engineering
+/src/routes/                            @temporalio/frontend-engineering
+/src/lib/holocene/                      @rossedfort
+/src/lib/components/                    @rossedfort
+/server/						                    @feedmeapples @robholland
+*.go							                      @feedmeapples @robholland
+/src/types                              @stevekinney
+/src/lib/models                         @stevekinney
+/src/lib/services                       @stevekinney
+/src/lib/utilities                      @stevekinney
+/src/lib/stores                         @stevekinney
+/src/routes/(import)                    @Alex-Tideman
+/src/lib/services/data-converter.ts     @Alex-Tideman @GiantRobots @robholland
+/src/lib/services/data-encoder.ts       @Alex-Tideman @GiantRobots @robholland
+/.husky/                                @stevekinney
+/.github/                               @stevekinney
+/.vscode/                               @stevekinney
