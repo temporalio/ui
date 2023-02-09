@@ -60,7 +60,7 @@ describe('Workflow Executions List', () => {
     cy.wait('@event-history-end');
     cy.wait('@event-history-descending');
 
-    cy.get('[data-cy="compact"]').click();
+    cy.get('[data-testid="compact"]').click();
 
     cy.wait('@event-history-ascending');
 
@@ -87,7 +87,7 @@ describe('Workflow Executions List', () => {
     cy.wait('@event-history-end');
     cy.wait('@event-history-descending');
 
-    cy.get('[data-cy="compact"]').click();
+    cy.get('[data-testid="compact"]').click();
 
     cy.wait('@event-history-ascending');
 

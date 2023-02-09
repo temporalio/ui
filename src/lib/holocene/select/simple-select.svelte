@@ -21,7 +21,7 @@
     {id}
     bind:value
     on:change
-    data-cy={$$props.dataCy}
+    data-testid={$$props.dataCy}
   >
     <slot>
       {#each options as option}

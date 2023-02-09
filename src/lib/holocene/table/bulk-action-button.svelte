@@ -5,7 +5,7 @@
 </script>
 
 <button
-  data-cy={dataCy}
+  data-testid={dataCy}
   {disabled}
   on:click
   class="bulk-action-button {variant} {$$props.class}"

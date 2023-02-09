@@ -8,7 +8,11 @@
   export let bold = false;
 </script>
 
-<div class="alert {intent} {$$props.class}" class:bold data-cy={$$props.dataCy}>
+<div
+  class="alert {intent} {$$props.class}"
+  class:bold
+  data-testid={$$props.dataCy}
+>
   {#if icon}
     <div>
       <Icon name={icon} />

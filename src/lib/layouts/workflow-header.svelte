@@ -99,7 +99,7 @@
         query: $workflowsQuery || query,
         search: searchType,
       })}
-      data-cy="back-to-workflows"
+      data-testid="back-to-workflows"
       class="back-to-workflows"
     >
       <Icon name="chevron-left" class="inline" />Back to Workflows
@@ -113,7 +113,7 @@
     >
       <WorkflowStatus status={workflow?.status} />
       <h1
-        data-cy="workflow-id-heading"
+        data-testid="workflow-id-heading"
         class="select-all overflow-hidden text-ellipsis text-2xl font-medium"
       >
         {workflow?.id}

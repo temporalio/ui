@@ -40,7 +40,7 @@
     class:unround
     class:unroundRight
     class:unroundLeft
-    data-cy={dataCy}
+    data-testid={dataCy}
     {type}
     {disabled}
     {id}
@@ -67,7 +67,7 @@
     class:large
     class:disabled
     class:thin
-    data-cy={dataCy}
+    data-testid={dataCy}
     {target}
     {id}
   >

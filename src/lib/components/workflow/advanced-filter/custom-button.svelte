@@ -24,7 +24,7 @@
   class:active
   class:primary
   class:destructive
-  data-cy={dataCy}
+  data-testid={dataCy}
   {disabled}
   class:disabled
   class:add

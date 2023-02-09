@@ -98,7 +98,7 @@
     {#each Object.entries(AllStatuses) as [label, _value] (_value)}
       <button
         class="flex items-center transition-all hover:cursor-pointer"
-        data-cy={label}
+        data-testid={label}
         on:click={() => onStatusClick(_value)}
       >
         <div

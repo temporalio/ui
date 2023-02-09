@@ -32,7 +32,7 @@ describe('Batch and Bulk Workflow Actions', () => {
       cy.get('#workflows-table-with-bulk-actions').should('exist');
 
       cy.get('#select-visible-workflows').click({ force: true });
-      cy.get('[data-cy="bulk-terminate-button"]').click();
+      cy.get('[data-testid="bulk-terminate-button"]').click();
       cy.get('#bulk-action-reason').type('Sarah Connor');
       cy.get('div.modal button.destructive').click();
       cy.get('#batch-terminate-success-toast');
@@ -42,9 +42,9 @@ describe('Batch and Bulk Workflow Actions', () => {
       cy.get('#workflows-table-with-bulk-actions').should('exist');
 
       cy.get('#select-visible-workflows').click({ force: true });
-      cy.get('[data-cy="select-all-workflows"]').click();
-      cy.get('[data-cy="bulk-terminate-button"]').click();
-      cy.get('[data-cy="batch-action-workflows-query"]').should(
+      cy.get('[data-testid="select-all-workflows"]').click();
+      cy.get('[data-testid="bulk-terminate-button"]').click();
+      cy.get('[data-testid="batch-action-workflows-query"]').should(
         'have.text',
         'ExecutionStatus="Running"',
       );
@@ -57,7 +57,7 @@ describe('Batch and Bulk Workflow Actions', () => {
       cy.get('#workflows-table-with-bulk-actions').should('exist');
 
       cy.get('#select-visible-workflows').click({ force: true });
-      cy.get('[data-cy="bulk-cancel-button"]').click();
+      cy.get('[data-testid="bulk-cancel-button"]').click();
       cy.get('#bulk-action-reason').type('Sarah Connor');
       cy.get('div.modal button.destructive').click();
       cy.get('#batch-cancel-success-toast');
@@ -67,9 +67,9 @@ describe('Batch and Bulk Workflow Actions', () => {
       cy.get('#workflows-table-with-bulk-actions').should('exist');
 
       cy.get('#select-visible-workflows').click({ force: true });
-      cy.get('[data-cy="select-all-workflows"]').click();
-      cy.get('[data-cy="bulk-cancel-button"]').click();
-      cy.get('[data-cy="batch-action-workflows-query"]').should(
+      cy.get('[data-testid="select-all-workflows"]').click();
+      cy.get('[data-testid="bulk-cancel-button"]').click();
+      cy.get('[data-testid="batch-action-workflows-query"]').should(
         'have.text',
         'ExecutionStatus="Running"',
       );

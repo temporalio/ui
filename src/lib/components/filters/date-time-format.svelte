@@ -31,7 +31,7 @@
           {/if}
         </div>
         <button
-          data-cy="event-date-filter-{option}"
+          data-testid="event-date-filter-{option}"
           on:click={() => onDateOptionClick(option)}
         >
           {label}

@@ -51,7 +51,7 @@
     class="w-full rounded-lg {inline
       ? 'h-auto overflow-auto'
       : 'h-full'} {$$props.class}"
-    data-cy={$$props.dataCy}
+    data-testid={$$props.dataCy}
   >
     <div class="relative h-full">
       <!-- The spacing for this if statement is like this because PRE's honor all whitespace and
@@ -61,7 +61,7 @@
         class:h-full={!inline}><code
           bind:this={root}
           class="language-{language}"
-          data-cy={$$props['data-cy']}
+          data-testid={$$props['data-testid']}
         /></pre>
 
       <button

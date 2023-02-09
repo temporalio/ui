@@ -112,7 +112,7 @@
             <span class="font-semibold">{selectedWorkflowsCount} selected</span>
             <span>
               (or <button
-                data-cy="select-all-workflows"
+                data-testid="select-all-workflows"
                 on:click={handleSelectAll}
                 class="cursor-pointer underline"
                 >select all {filteredWorkflowCount}</button

@@ -8,7 +8,7 @@ describe('Archival disabled page', () => {
   });
 
   it('have the correct title on page', () => {
-    cy.get('[data-cy="archived-disabled-title"]').should(
+    cy.get('[data-testid="archived-disabled-title"]').should(
       'contain',
       'This Namespace is currently not enabled for archival.',
     );
@@ -26,7 +26,7 @@ describe('Archival enabled page', () => {
   });
 
   it('have the correct namespaces in the dropdown', () => {
-    cy.get('[data-cy="archived-enabled-title"]').should(
+    cy.get('[data-testid="archived-enabled-title"]').should(
       'contain',
       'Archived Workflows',
     );

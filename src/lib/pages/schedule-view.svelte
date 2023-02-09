@@ -118,7 +118,7 @@
             <WorkflowStatus
               status={schedule?.schedule.state.paused ? 'Paused' : 'Running'}
             />
-            <p class="font-medium select-all" data-cy="schedule-name">
+            <p class="font-medium select-all" data-testid="schedule-name">
               {scheduleId}
             </p>
           </h1>
