@@ -24,9 +24,9 @@ export default defineConfig({
         '**/*.test.ts',
       ],
     },
-    exclude: [...configDefaults.exclude, 'e2e'],
+    exclude: [...configDefaults.exclude, 'e2e', 'tests'],
     environment: 'jsdom',
-    setupFiles: ['./vitest_setup.ts'],
+    setupFiles: ['./vitest-setup.ts'],
     deps: {
       inline: ['date-fns'],
     },
