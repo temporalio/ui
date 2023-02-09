@@ -29,9 +29,9 @@ describe('Workflow Workers', () => {
   });
 
   it('View both worker and activity poller', () => {
-    cy.get('[data-cy=worker-row]').should('have.length', 1);
-    cy.get('[data-cy=worker-identity]').contains(wtq.pollers[0].identity);
-    cy.get('[data-cy=worker-last-access-time]').contains(
+    cy.get('[data-testid=worker-row]').should('have.length', 1);
+    cy.get('[data-testid=worker-identity]').contains(wtq.pollers[0].identity);
+    cy.get('[data-testid=worker-last-access-time]').contains(
       dateTz.formatInTimeZone(
         new Date(atq.pollers[0].lastAccessTime),
         'UTC',
@@ -39,8 +39,8 @@ describe('Workflow Workers', () => {
       ),
     );
 
-    cy.get('[data-cy="workflow-poller"] > .text-blue-700').should('exist');
-    cy.get('[data-cy="activity-poller"] > .text-blue-700').should('exist');
+    cy.get('[data-testid="workflow-poller"] > .text-blue-700').should('exist');
+    cy.get('[data-testid="activity-poller"] > .text-blue-700').should('exist');
   });
 });
 
@@ -84,7 +84,7 @@ describe.skip('Navigate to Workflow Workers', () => {
   it('View both worker and activity poller', () => {
     cy.url().should('contain', '/history');
 
-    cy.get('[data-cy=workers-tab]').click();
+    cy.get('[data-testid=workers-tab]').click();
 
     cy.url().should('contain', '/workers');
 
@@ -92,9 +92,9 @@ describe.skip('Navigate to Workflow Workers', () => {
     cy.wait('@worker-task-queues-api');
     cy.wait('@activity-task-queues-api');
 
-    cy.get('[data-cy=worker-row]').should('have.length', 1);
-    cy.get('[data-cy=worker-identity]').contains(wtq.pollers[0].identity);
-    cy.get('[data-cy=worker-last-access-time]').contains(
+    cy.get('[data-testid=worker-row]').should('have.length', 1);
+    cy.get('[data-testid=worker-identity]').contains(wtq.pollers[0].identity);
+    cy.get('[data-testid=worker-last-access-time]').contains(
       dateTz.formatInTimeZone(
         new Date(atq.pollers[0].lastAccessTime),
         'UTC',
@@ -102,8 +102,8 @@ describe.skip('Navigate to Workflow Workers', () => {
       ),
     );
 
-    cy.get('[data-cy="workflow-poller"] > .text-blue-700').should('exist');
-    cy.get('[data-cy="activity-poller"] > .text-blue-700').should('exist');
+    cy.get('[data-testid="workflow-poller"] > .text-blue-700').should('exist');
+    cy.get('[data-testid="activity-poller"] > .text-blue-700').should('exist');
   });
 });
 
@@ -134,9 +134,9 @@ describe('Workflow Workers - Workflow Worker Only', () => {
   });
 
   it('View workflow worker only poller', () => {
-    cy.get('[data-cy=worker-row]').should('have.length', 1);
-    cy.get('[data-cy=worker-identity]').contains(wtq.pollers[0].identity);
-    cy.get('[data-cy=worker-last-access-time]').contains(
+    cy.get('[data-testid=worker-row]').should('have.length', 1);
+    cy.get('[data-testid=worker-identity]').contains(wtq.pollers[0].identity);
+    cy.get('[data-testid=worker-last-access-time]').contains(
       dateTz.formatInTimeZone(
         new Date(wtq.pollers[0].lastAccessTime),
         'UTC',
@@ -144,8 +144,10 @@ describe('Workflow Workers - Workflow Worker Only', () => {
       ),
     );
 
-    cy.get('[data-cy="workflow-poller"] > .text-blue-700').should('exist');
-    cy.get('[data-cy="activity-poller"] > .text-blue-700').should('not.exist');
+    cy.get('[data-testid="workflow-poller"] > .text-blue-700').should('exist');
+    cy.get('[data-testid="activity-poller"] > .text-blue-700').should(
+      'not.exist',
+    );
   });
 });
 
@@ -176,9 +178,9 @@ describe('Workflow Workers - Activity Worker Only', () => {
   });
 
   it('View activity worker only poller', () => {
-    cy.get('[data-cy=worker-row]').should('have.length', 1);
-    cy.get('[data-cy=worker-identity]').contains(atq.pollers[0].identity);
-    cy.get('[data-cy=worker-last-access-time]').contains(
+    cy.get('[data-testid=worker-row]').should('have.length', 1);
+    cy.get('[data-testid=worker-identity]').contains(atq.pollers[0].identity);
+    cy.get('[data-testid=worker-last-access-time]').contains(
       dateTz.formatInTimeZone(
         new Date(atq.pollers[0].lastAccessTime),
         'UTC',
@@ -186,7 +188,9 @@ describe('Workflow Workers - Activity Worker Only', () => {
       ),
     );
 
-    cy.get('[data-cy="workflow-poller"] > .text-blue-700').should('not.exist');
-    cy.get('[data-cy="activity-poller"] > .text-blue-700').should('exist');
+    cy.get('[data-testid="workflow-poller"] > .text-blue-700').should(
+      'not.exist',
+    );
+    cy.get('[data-testid="activity-poller"] > .text-blue-700').should('exist');
   });
 });

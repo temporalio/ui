@@ -51,7 +51,7 @@
   keepOpen
   left
   icon="filter"
-  dataCy="workflow-type-filter-button"
+  testId="workflow-type-filter-button"
   on:showmenu={handleShowInput}
 >
   <svelte:fragment slot="label">Type</svelte:fragment>

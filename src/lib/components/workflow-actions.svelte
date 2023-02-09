@@ -204,7 +204,7 @@
     label: string;
     onClick: () => void;
     allowed: boolean;
-    dataCy: string;
+    testId: string;
     destructive?: boolean;
     tooltip?: string;
   }[];
@@ -220,14 +220,14 @@
     {
       label: 'Reset',
       onClick: showResetModal,
-      dataCy: 'reset-button',
+      testId: 'reset-button',
       allowed: resetEnabled && workflow?.pendingChildren?.length === 0,
       tooltip: resetTooltipText(),
     },
     {
       label: 'Send a Signal',
       onClick: showSignalModal,
-      dataCy: 'signal-button',
+      testId: 'signal-button',
       allowed: signalEnabled,
       tooltip: signalEnabled
         ? ''
@@ -236,7 +236,7 @@
     {
       label: 'Terminate',
       onClick: showTerminationModal,
-      dataCy: 'terminate-button',
+      testId: 'terminate-button',
       allowed: terminateEnabled,
       destructive: true,
       tooltip: terminateEnabled
@@ -260,14 +260,14 @@
   on:click={showCancellationModal}
   label="Request Cancellation"
 >
-  {#each workflowActions as { onClick, destructive, label, allowed, dataCy, tooltip }}
+  {#each workflowActions as { onClick, destructive, label, allowed, testId, tooltip }}
     {#if destructive}
       <MenuDivider />
     {/if}
     <MenuItem
       on:click={onClick}
       {destructive}
-      {dataCy}
+      {testId}
       disabled={!allowed}
       tooltipProps={{ text: tooltip, left: true, width: 200 }}
     >

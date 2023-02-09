@@ -41,7 +41,9 @@
 </script>
 
 <div class="prose mt-16 mb-8">
-  <h2 class="text-2xl" data-cy="namespace-select-header">Select a Namespace</h2>
+  <h2 class="text-2xl" data-testid="namespace-select-header">
+    Select a Namespace
+  </h2>
   {#if $page.params?.namespace}
     <p>You are currently viewing {$page.params.namespace}</p>
   {/if}
@@ -61,7 +63,7 @@
   />
 </div>
 
-<ul data-cy="namespace-list">
+<ul data-testid="namespace-list">
   {#await namespaceList}
     Loading ...
   {:then namespacesResult}
