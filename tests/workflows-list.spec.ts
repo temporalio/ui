@@ -99,10 +99,10 @@ test('toggle to advanced search', async ({ page }) => {
   await page.goto(workflowsUrl);
   await page.getByRole('link', { name: 'Advanced Search' }).click();
 
-  expect(page.url()).toMatch('?search=advanced');
+  await expect(page.getByRole('link', { name: 'Basic Search' })).toBeVisible();
+  await expect(page.locator('#advanced-search')).toBeVisible();
 
-  expect(page.getByRole('link', { name: 'Basic Search' })).toBeVisible();
-  expect(page.locator('#advanced-search')).toBeVisible();
+  expect(page.url()).toMatch('?search=advanced');
 });
 
 test('it loads the basic search when the parameter is set', async ({
@@ -110,7 +110,9 @@ test('it loads the basic search when the parameter is set', async ({
 }) => {
   await page.goto(workflowsUrl + '?search=basic');
 
-  expect(page.getByRole('link', { name: 'Advanced Search' })).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Advanced Search' }),
+  ).toBeVisible();
 });
 
 test('it loads the advanced search when the parameter is set', async ({
@@ -118,6 +120,6 @@ test('it loads the advanced search when the parameter is set', async ({
 }) => {
   await page.goto(workflowsUrl + '?search=advanced');
 
-  expect(page.getByRole('link', { name: 'Basic Search' })).toBeVisible();
-  expect(page.locator('#advanced-search')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Basic Search' })).toBeVisible();
+  await expect(page.locator('#advanced-search')).toBeVisible();
 });
