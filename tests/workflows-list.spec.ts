@@ -1,7 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const baseUrl = 'http://localhost:3000';
-const workflowsUrl = baseUrl + '/namespaces/default/workflows';
+const workflowsUrl = '/namespaces/default/workflows';
 const apiUrl = 'http://localhost:8233/api/v1';
 const workflowsApi = apiUrl + '/namespaces/default/workflows?query=';
 
@@ -16,7 +15,7 @@ test('it displays the namespace', async ({ page }) => {
   const namespace = await page.getByTestId('namespace-name').innerText();
   expect(namespace).toBe('default');
 
-  await page.goto(baseUrl + '/namespaces/not-real/workflows');
+  await page.goto('/namespaces/not-real/workflows');
 
   const fictitiousNamespace = await page
     .getByTestId('namespace-name')

@@ -1,7 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const baseUrl = 'http://localhost:3000';
-const workflowsUrl = baseUrl + '/namespaces/default/workflows';
+const workflowsUrl = '/namespaces/default/workflows';
 const workflowsApiMatch = new RegExp('/api/v1/namespaces/default/workflows');
 
 test.beforeEach(async ({ page }) => {

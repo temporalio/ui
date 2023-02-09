@@ -13,7 +13,7 @@ export default defineConfig({
   reporter: process.env.CI ? 'github' : 'list',
   use: {
     actionTimeout: 0,
-    baseURL: 'http://localhost:3000',
+    baseURL: 'http://localhost:3333',
     trace: 'on-first-retry',
     timezoneId: 'America/Denver',
   },
@@ -35,6 +35,6 @@ export default defineConfig({
   ],
   webServer: {
     command: 'pnpm start',
-    port: 3000,
+    port: 3333,
   },
 });
