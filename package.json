@@ -73,7 +73,7 @@
     "@histoire/plugin-svelte": "^0.12.0",
     "@histoire/shared": "^0.12.0",
     "@sveltejs/adapter-static": "^1.0.5",
-    "@sveltejs/adapter-vercel": "^1.0.5",
+    "@sveltejs/adapter-vercel": "2.0.2",
     "@sveltejs/kit": "1.0.1",
     "@sveltejs/vite-plugin-svelte": "^2.0.2",
     "@temporalio/proto": "^1.4.4",
