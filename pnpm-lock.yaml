@@ -49,6 +49,7 @@ specifiers:
   eslint: ^8.0.0
   eslint-config-prettier: ^8.3.0
   eslint-plugin-cypress: ^2.11.3
+  eslint-plugin-playwright: ^0.12.0
   eslint-plugin-svelte3: ^3.2.0
   eslint-plugin-vitest: ^0.0.8
   google-protobuf: ^3.17.3
@@ -156,6 +157,7 @@ devDependencies:
   eslint: 8.31.0
   eslint-config-prettier: 8.6.0_eslint@8.31.0
   eslint-plugin-cypress: 2.12.1_eslint@8.31.0
+  eslint-plugin-playwright: 0.12.0_eslint@8.31.0
   eslint-plugin-svelte3: 3.4.1_btuntbn75dxkba3nofpps2nvzm
   eslint-plugin-vitest: 0.0.8_iukboom6ndih5an6iafl45j2fe
   google-protobuf: 3.21.2
@@ -3851,6 +3853,18 @@ packages:
     dependencies:
       eslint: 8.31.0
       globals: 11.12.0
+    dev: true
+
+  /eslint-plugin-playwright/0.12.0_eslint@8.31.0:
+    resolution: {integrity: sha512-KXuzQjVzca5irMT/7rvzJKsVDGbQr43oQPc8i+SLEBqmfrTxlwMwRqfv9vtZqh4hpU0jmrnA/EOfwtls+5QC1w==}
+    peerDependencies:
+      eslint: '>=7'
+      eslint-plugin-jest: '>=24'
+    peerDependenciesMeta:
+      eslint-plugin-jest:
+        optional: true
+    dependencies:
+      eslint: 8.31.0
     dev: true
 
   /eslint-plugin-svelte3/3.4.1_btuntbn75dxkba3nofpps2nvzm:

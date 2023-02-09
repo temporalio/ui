@@ -13,6 +13,14 @@ module.exports = {
       files: ['*.svelte'],
       processor: 'svelte3/svelte3',
     },
+    {
+      files: ['cypress/**/*.js'],
+      extends: ['plugin:cypress/recommended'],
+    },
+    {
+      files: ['tests/**/*.spec.ts'],
+      extends: ['plugin:playwright/playwright-test'],
+    },
   ],
   settings: {
     'svelte3/typescript': () => require('typescript'),
@@ -26,12 +34,6 @@ module.exports = {
     es2017: true,
     node: true,
   },
-  overrides: [
-    {
-      files: ['cypress/**/*.js'],
-      extends: ['plugin:cypress/recommended'],
-    },
-  ],
   rules: {
     '@typescript-eslint/no-unused-vars': [
       1,
