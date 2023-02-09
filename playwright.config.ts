@@ -10,7 +10,11 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: [['html'], ['json'], [process.env.CI ? 'list' : 'github']],
+  reporter: [
+    ['html'],
+    ['json', { outputFile: 'test-results.json' }],
+    [process.env.CI ? 'list' : 'github'],
+  ],
   use: {
     actionTimeout: 0,
     baseURL: 'http://localhost:3333',
