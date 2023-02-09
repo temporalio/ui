@@ -30,14 +30,14 @@ jobs:
         run: |
           VITE_API="" pnpm build:local
       - name: Checkout CLI
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: temporalio/cli
           path: cli
       - name: Install CLI
         run: |
           cd cli && go install ./cmd/temporal
-      - name: Run Playwright Tests
+      - name: Run Playwright tests
         working-directory: e2e
         run: |
           pnpm install
