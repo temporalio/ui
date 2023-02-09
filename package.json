@@ -25,7 +25,6 @@
     "test:ui": "TZ=UTC vitest --ui",
     "test:coverage": "TZ=UTC vitest run --coverage",
     "test:integration": "playwright test",
-    "test:integration:server": "npm-run-all server test:integration --parallel",
     "test:snapshot": "vitest run --dir src/lib/holocene",
     "lint": "prettier --check --plugin-search-dir=. . && eslint --ignore-path .gitignore . && stylelint \"src/**/*.{css,postcss,svelte}\"",
     "lint:fix": "eslint --ignore-path .gitignore --fix",
