@@ -9,10 +9,11 @@ module.exports = {
   plugins: ['svelte3', '@typescript-eslint', 'vitest'],
   ignorePatterns: ['*.cjs', 'prism.js'],
   overrides: [
-    {
-      files: ['*.svelte'],
-      processor: 'svelte3/svelte3',
-    },
+    // This was previously being overwritten by a duplicate and will cause the build to fail.
+    // {
+    //   files: ['*.svelte'],
+    //   processor: 'svelte3/svelte3',
+    // },
     {
       files: ['cypress/**/*.js'],
       extends: ['plugin:cypress/recommended'],
