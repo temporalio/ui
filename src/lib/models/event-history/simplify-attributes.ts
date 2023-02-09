@@ -42,7 +42,9 @@ const keysToBeFormattedAsDuration = [
   'workflowTaskTimeout',
 ] as const;
 
-const isTime = (key: string): key is typeof keysToBeFormattedAsTime[number] => {
+const isTime = (
+  key: string,
+): key is (typeof keysToBeFormattedAsTime)[number] => {
   for (const timeKey of keysToBeFormattedAsTime) {
     if (timeKey === key) return true;
   }
@@ -51,7 +53,7 @@ const isTime = (key: string): key is typeof keysToBeFormattedAsTime[number] => {
 
 const isDuration = (
   key: string,
-): key is typeof keysToBeFormattedAsDuration[number] => {
+): key is (typeof keysToBeFormattedAsDuration)[number] => {
   for (const timeKey of keysToBeFormattedAsDuration) {
     if (timeKey === key) return true;
   }
