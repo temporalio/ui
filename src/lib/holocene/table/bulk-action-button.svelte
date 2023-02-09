@@ -1,11 +1,11 @@
 <script lang="ts">
-  export let dataCy: string = null;
+  export let testId: string = null;
   export let disabled: boolean = false;
   export let variant: 'primary' | 'destructive' = 'primary';
 </script>
 
 <button
-  data-testid={dataCy}
+  data-testid={testId}
   {disabled}
   on:click
   class="bulk-action-button {variant} {$$props.class}"

@@ -51,7 +51,7 @@
     class="w-full rounded-lg {inline
       ? 'h-auto overflow-auto'
       : 'h-full'} {$$props.class}"
-    data-testid={$$props.dataCy}
+    data-testid={$$props.testId}
   >
     <div class="relative h-full">
       <!-- The spacing for this if statement is like this because PRE's honor all whitespace and

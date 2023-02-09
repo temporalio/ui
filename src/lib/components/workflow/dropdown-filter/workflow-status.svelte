@@ -88,7 +88,7 @@
   value={statusFilters.length
     ? statusFilters.map((s) => s.value).join('')
     : statusSort?.value ?? ''}
-  dataCy="execution-status-filter"
+  testId="execution-status-filter"
   keepOpen
   left
   icon="filter"

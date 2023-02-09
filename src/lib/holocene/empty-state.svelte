@@ -10,7 +10,7 @@
 
 <div
   class="my-12 flex flex-col items-center justify-start gap-2 {$$props.class}"
-  data-testid={$$props.dataCy}
+  data-testid={$$props.testId}
 >
   <span
     class="flex h-16 w-16 items-center justify-center rounded-full bg-gray-200"

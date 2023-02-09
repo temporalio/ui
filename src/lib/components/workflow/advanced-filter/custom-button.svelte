@@ -12,7 +12,7 @@
   export let destructive: boolean = false;
   export let icon: IconName = null;
   export let iconClass: string = null;
-  export let dataCy: string = $$props.dataCy;
+  export let testId: string = $$props.testId;
   export let unround: boolean = false;
   export let unroundRight: boolean = false;
   export let unroundLeft: boolean = false;
@@ -24,7 +24,7 @@
   class:active
   class:primary
   class:destructive
-  data-testid={dataCy}
+  data-testid={testId}
   {disabled}
   class:disabled
   class:add

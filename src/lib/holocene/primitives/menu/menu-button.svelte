@@ -32,7 +32,7 @@
   class:dark
   class:show
   {disabled}
-  data-testid={$$props.dataCy}
+  data-testid={$$props.testId}
 >
   <slot />
   {#if hasIndicator}

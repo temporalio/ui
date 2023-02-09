@@ -29,7 +29,7 @@
   <p class="my-7" data-testid="login-info">Let's get you signed in.</p>
   <div class="mx-auto">
     <Button
-      dataCy="login-button"
+      testId="login-button"
       variant="login"
       icon="lock"
       on:click={() => {

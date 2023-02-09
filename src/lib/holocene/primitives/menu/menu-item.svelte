@@ -8,7 +8,7 @@
   export let active = false;
   export let disabled = false;
   export let href = '';
-  export let dataCy: string = null;
+  export let testId: string = null;
   export let tooltipProps: ComponentProps<Tooltip> = {};
 
   const dispatch = createEventDispatcher<{ click: undefined }>();
@@ -33,7 +33,7 @@
         class:selected
         class:active
         class:disabled
-        data-testid={dataCy}
+        data-testid={testId}
         class="menu-item inline-block {$$props.class}"
       >
         <slot />
@@ -48,7 +48,7 @@
         class:selected
         class:active
         class:disabled
-        data-testid={dataCy}
+        data-testid={testId}
         class="menu-item {$$props.class}"
       >
         <slot />

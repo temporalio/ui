@@ -11,7 +11,7 @@
 <div
   class="alert {intent} {$$props.class}"
   class:bold
-  data-testid={$$props.dataCy}
+  data-testid={$$props.testId}
 >
   {#if icon}
     <div>

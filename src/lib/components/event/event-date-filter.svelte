@@ -60,7 +60,7 @@
   });
 </script>
 
-<DropdownMenu {value} left dataCy="event-date-filter">
+<DropdownMenu {value} left testId="event-date-filter">
   <svelte:fragment slot="label">
     <span class="hidden md:block">Date & Time</span>
     <span class="block md:hidden"><Icon name="clock" /></span>

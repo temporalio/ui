@@ -53,7 +53,7 @@
   </div>
   <Button
     class="h-10"
-    dataCy="create-schedule"
+    testId="create-schedule"
     disabled={createDisabled}
     on:click={() => goto(routeForScheduleCreate({ namespace }))}
     >Create Schedule</Button

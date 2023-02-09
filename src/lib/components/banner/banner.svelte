@@ -19,7 +19,7 @@
 {#if show}
   <section
     class={`relative block text-center leading-10 ${severity}`}
-    data-testid={$$props.dataCy}
+    data-testid={$$props.testId}
   >
     <a href={link} target="_blank">
       {message}
