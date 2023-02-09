@@ -12,7 +12,7 @@
   "scripts": {
     "start": "pnpm run dev:local -- --open",
     "server": "./bin/cli/temporal server start-dev",
-    "start:server": "npm-run-all server dev:local --parallel",
+    "start:server": "concurrently \"pnpm run server\" \"pnpm run dev:local\"",
     "prepare": "node download-temporal-cli.js && husky install && svelte-kit sync",
     "dev:local": ". ./.env && VITE_TEMPORAL_UI_BUILD_TARGET=local vite dev --port 3000",
     "dev:docker": ". ./.env && VITE_API=http://localhost:8080 vite dev --port 3000",
