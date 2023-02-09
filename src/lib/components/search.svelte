@@ -12,7 +12,7 @@
 
 <form
   on:submit|preventDefault
-  class="relative flex items-center rounded-lg border-2 transition-colors focus-within:border-blue-700"
+  class="relative flex items-center rounded-lg border-2 bg-white transition-colors focus-within:border-blue-700"
 >
   {#if icon}
     <Icon name="search" class="ml-4 flex items-center text-gray-700" />

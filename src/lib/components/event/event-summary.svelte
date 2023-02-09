@@ -77,7 +77,7 @@
   $: updating = currentEvents.length && !fullHistory.length;
 </script>
 
-{#key [$eventFilterSort, category, $refresh]}
+{#key [$eventFilterSort, category]}
   <Pagination
     floatId="event-view-toggle"
     {items}
