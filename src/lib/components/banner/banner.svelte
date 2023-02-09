@@ -21,7 +21,7 @@
     class={`relative block text-center leading-10 ${severity}`}
     data-cy={$$props.dataCy}
   >
-    <a href={link} target="_blank">
+    <a href={link} target="_blank" rel="noreferrer">
       {message}
     </a>
     <button

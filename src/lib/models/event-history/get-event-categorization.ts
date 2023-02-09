@@ -49,7 +49,7 @@ export const eventTypeCategorizations: Readonly<
   UpsertWorkflowSearchAttributes: 'command',
 };
 
-export type EventTypeCategory = (typeof categories)[number];
+export type EventTypeCategory = typeof categories[number];
 const categories = [
   'activity',
   'child-workflow',
