@@ -25,15 +25,27 @@
   export let inline = false;
 
   const { workflow, namespace } = $page.params;
+  $: codeBlockValue = getCodeBlockValue(value);
+  $: stackTrace =
+    codeBlockValue?.stackTrace || codeBlockValue?.cause?.stackTrace;
 </script>
 
 <div class="row {$$props.class}">
   {#if typeof value === 'object'}
-    <div class="content code-block-row">
-      <p class="text-sm">
-        {format(key)}
-      </p>
-      <CodeBlock content={getCodeBlockValue(value)} class="h-auto" {inline} />
+    <div
+      class="content code-block-row"
+      class:code-with-stack-trace={stackTrace}
+    >
+      <div>
+        <p class="text-sm">{format(key)}</p>
+        <CodeBlock content={codeBlockValue} class="h-auto" {inline} />
+      </div>
+      {#if stackTrace && !inline}
+        <div>
+          <p class="text-sm">Stack trace</p>
+          <CodeBlock content={stackTrace} class="h-auto" language="text" />
+        </div>
+      {/if}
     </div>
   {:else if shouldDisplayAsExecutionLink(key)}
     <div class="content detail-row">
@@ -109,6 +121,10 @@
 
   .code-block-row {
     @apply block w-full py-2 text-left;
+  }
+
+  .code-with-stack-trace {
+    @apply grid grid-cols-1 gap-2 lg:grid-cols-2;
   }
 
   .detail-row {
