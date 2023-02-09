@@ -1,5 +1,5 @@
 name: End To End Integration Tests
-run-name: ${{github.event.pull_request.title}} (${{ github.event_name  }}) by @${{ github.triggering_actor }} (Attempt \#${{ github.run_attempt }})
+run-name: ${{github.event.pull_request.title}} (${{ github.event.pull_request.number }}) by @${{ github.triggering_actor }} (Attempt \#${{ github.run_attempt }})
 
 on:
   push:
