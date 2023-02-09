@@ -36,14 +36,22 @@
       class="content code-block-row"
       class:code-with-stack-trace={stackTrace}
     >
-      <div>
+      <div class="flex flex-col {stackTrace ? 'lg:w-1/2' : ''}">
         <p class="text-sm">{format(key)}</p>
-        <CodeBlock content={codeBlockValue} class="h-auto" {inline} />
+        <CodeBlock
+          content={codeBlockValue}
+          class="h-auto {stackTrace ? 'mb-2' : ''}"
+          {inline}
+        />
       </div>
       {#if stackTrace && !inline}
-        <div>
+        <div class="flex flex-col lg:w-1/2">
           <p class="text-sm">Stack trace</p>
-          <CodeBlock content={stackTrace} class="h-auto" language="text" />
+          <CodeBlock
+            content={stackTrace}
+            class="mb-2 h-full lg:pr-2"
+            language="text"
+          />
         </div>
       {/if}
     </div>
@@ -124,7 +132,7 @@
   }
 
   .code-with-stack-trace {
-    @apply grid grid-cols-1 gap-2 lg:grid-cols-2;
+    @apply flex flex-col gap-2 lg:flex-row;
   }
 
   .detail-row {
