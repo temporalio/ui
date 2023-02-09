@@ -17,6 +17,8 @@
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
   import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
+  import IsUserSettingGuard from '$lib/components/is-user-setting-guard.svelte';
+  import { CoreUserSettings } from '$lib/models/core-user';
 
   let showShortcuts = false;
 
@@ -36,20 +38,28 @@
 <section class="flex flex-col gap-4">
   <WorkflowStackTraceError />
   <WorkflowTypedError error={workflowEvents.error} />
-  <WorkflowSummary />
-  <WorkflowRelationships {...workflowRelationships} />
-  <PendingActivities />
-  <Accordion
-    title="Input and Results"
-    icon="json"
-    class="border-gray-900"
-    data-cy="input-and-results"
-  >
-    <div class="flex w-full flex-col gap-2 lg:flex-row">
-      <InputAndResults type="input" content={workflowEvents.input} />
-      <InputAndResults type="results" content={workflowEvents.results} />
-    </div>
-  </Accordion>
+  <IsUserSettingGuard option={CoreUserSettings.WORKFLOW_SUMMARY}>
+    <WorkflowSummary />
+  </IsUserSettingGuard>
+  <IsUserSettingGuard option={CoreUserSettings.WORKFLOW_RELATIONSHIPS}>
+    <WorkflowRelationships {...workflowRelationships} />
+  </IsUserSettingGuard>
+  <IsUserSettingGuard option={CoreUserSettings.WORKFLOW_PENDING_ACTIVITIES}>
+    <PendingActivities />
+  </IsUserSettingGuard>
+  <IsUserSettingGuard option={CoreUserSettings.WORKFLOW_INPUT_AND_RESULTS}>
+    <Accordion
+      title="Input and Results"
+      icon="json"
+      class="border-gray-900"
+      data-cy="input-and-results"
+    >
+      <div class="flex w-full flex-col gap-2 lg:flex-row">
+        <InputAndResults type="input" content={workflowEvents.input} />
+        <InputAndResults type="results" content={workflowEvents.results} />
+      </div>
+    </Accordion>
+  </IsUserSettingGuard>
   <slot name="timeline" />
   <section id="event-history">
     <nav

@@ -120,6 +120,14 @@
       </NavRow>
     </slot>
     <slot name="settings" />
+    <NavRow link={linkList.settings} {isCloud}>
+      <NavTooltip right text="Settings">
+        <div class="nav-icon">
+          <Icon name="settings" />
+        </div>
+      </NavTooltip>
+      <div class="nav-title">Settings</div>
+    </NavRow>
     {#await user}
       <NavRow {isCloud}>
         <div class="motion-safe:animate-pulse" style="margin-left:1rem">

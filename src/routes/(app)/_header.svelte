@@ -9,6 +9,7 @@
     routeForSchedules,
     routeForNamespaces,
     routeForLoginPage,
+    routeForSettings,
   } from '$lib/utilities/route-for';
 
   import Navigation from '$lib/holocene/navigation/full-nav.svelte';
@@ -62,6 +63,7 @@
     feedback:
       $page.data?.settings?.feedbackURL ||
       'https://github.com/temporalio/ui/issues/new/choose',
+    settings: routeForSettings(),
   };
 
   const logout = () => {

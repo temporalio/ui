@@ -37,6 +37,11 @@
   import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
   import { bulkActionsEnabled as workflowBulkActionsEnabled } from '$lib/utilities/bulk-actions-enabled';
   import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
+  import IsUserSettingGuard from '$lib/components/is-user-setting-guard.svelte';
+  import { CoreUserSettings } from '$lib/models/core-user';
+  import AutoRefreshWorkflow from '$lib/components/auto-refresh-workflow.svelte';
+  import { noop } from 'svelte/internal';
+  import { userSettings } from '$lib/stores/user-settings';
 
   $: bulkActionsEnabled = workflowBulkActionsEnabled(
     $page.data.settings,
@@ -299,13 +304,17 @@
     </div>
   </div>
   <div>
-    <button
-      aria-label="retry workflows"
-      class="cursor-pointer rounded-full p-1 hover:bg-gray-900 hover:text-white"
-      on:click={refreshWorkflows}
-    >
-      <Icon name="retry" class="h-8 w-8" />
-    </button>
+    <IsUserSettingGuard option={CoreUserSettings.WORKFLOWS_AUTOREFRESH}>
+      <AutoRefreshWorkflow onChange={noop} />
+      <button
+        slot="fallback"
+        aria-label="retry workflows"
+        class="cursor-pointer rounded-full p-1 hover:bg-gray-900 hover:text-white"
+        on:click={refreshWorkflows}
+      >
+        <Icon name="retry" class="h-8 w-8" />
+      </button>
+    </IsUserSettingGuard>
   </div>
 </div>
 <Pagination items={$workflows} let:visibleItems aria-label="recent workflows">
