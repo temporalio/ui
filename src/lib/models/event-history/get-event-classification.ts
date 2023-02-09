@@ -1,4 +1,4 @@
-export type EventClassification = (typeof eventClassifications)[number];
+export type EventClassification = typeof eventClassifications[number];
 
 export const eventClassifications = [
   'Unspecified',
