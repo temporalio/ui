@@ -10,7 +10,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: process.env.CI ? 'github' : 'list',
+  reporter: process.env.CI ? 'github' : 'html',
   use: {
     actionTimeout: 0,
     baseURL: 'http://localhost:3333',
@@ -33,8 +33,16 @@ export default defineConfig({
       use: { ...devices['Desktop Safari'] },
     },
   ],
-  webServer: {
-    command: 'pnpm start',
-    port: 3333,
-  },
+  webServer: [
+    {
+      command: 'VITE_API=http://localhost:7777 pnpm run dev:local --port=3333',
+      port: 3333,
+      reuseExistingServer: !process.env.CI,
+    },
+    {
+      command: 'pnpm run server --ui-port=7777 --port=6666',
+      port: 7777,
+      reuseExistingServer: !process.env.CI,
+    },
+  ],
 });
