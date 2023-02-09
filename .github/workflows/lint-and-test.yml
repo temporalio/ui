@@ -1,4 +1,5 @@
 name: Run Tests, Lint, and Check Types
+run-name: Merge ${{ github.ref_name }} into main by @${{ github.triggering_actor }} (Attempt \#${{ github.run_attempt }})
 
 on:
   push:
@@ -8,6 +9,7 @@ on:
     paths-ignore:
       - '**.md'
       - 'LICENSE'
+      - 'CODEOWNERS'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
