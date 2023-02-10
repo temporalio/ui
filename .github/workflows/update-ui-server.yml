@@ -29,6 +29,7 @@ jobs:
       - name: Commit update
         run: |
           cd ./ui-server
+          git add .
           git diff --stat
       #     git config --local user.name 'Temporal Data (cicd)'
       #     git config --local user.email 'commander-data@temporal.io'
