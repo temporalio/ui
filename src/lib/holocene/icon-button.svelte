@@ -7,7 +7,7 @@
   interface $$Props extends HTMLButtonAttributes {
     icon?: IconName;
     classes?: string;
-    'data-cy'?: string;
+    'data-testid'?: string;
   }
 
   export let icon: IconName = null;
@@ -15,9 +15,10 @@
 </script>
 
 <button
+  type="button"
   class="icon-button"
   on:click
-  data-cy={$$props['data-cy']}
+  data-testid={$$props['data-testid']}
   {...$$restProps}
 >
   {#if icon}

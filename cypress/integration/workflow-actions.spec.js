@@ -43,95 +43,97 @@ describe('Workflow Actions', () => {
   describe('Terminate', () => {
     it('works if the workflow is running and write actions are enabled', () => {
       cy.get('#workflow-actions-menu-button').click();
-      cy.get('#workflow-actions-menu >> [data-cy="terminate-button"]').click();
+      cy.get(
+        '#workflow-actions-menu >> [data-testid="terminate-button"]',
+      ).click();
       cy.get('#workflow-termination-reason').type('test');
-      cy.get('[data-cy="confirm-modal-button"').click();
+      cy.get('[data-testid="confirm-modal-button"').click();
 
       cy.wait('@terminate-workflow-api');
       cy.waitForWorkflowAPIs();
 
       cy.get('#workflow-termination-success-toast').should('exist');
-      cy.get('[data-cy="confirm-modal-button"').should('not.exist');
+      cy.get('[data-testid="confirm-modal-button"').should('not.exist');
     });
   });
 
   describe('Cancel', () => {
     it('works if the workflow is running and write actions are enabled', () => {
       cy.get('#workflow-actions-primary-button').click();
-      cy.get('[data-cy="confirm-modal-button"]').click();
+      cy.get('[data-testid="confirm-modal-button"]').click();
 
       cy.wait('@cancel-workflow-api');
       cy.waitForWorkflowAPIs();
       cy.get('#workflow-cancelation-success-toast').should('exist');
-      cy.get('[data-cy="confirm-modal-button"').should('not.exist');
+      cy.get('[data-testid="confirm-modal-button"').should('not.exist');
     });
   });
 
   describe('Signal', () => {
     it('works if the workflow is running and write actions are enabled', () => {
       cy.get('#workflow-actions-menu-button').click();
-      cy.get('#workflow-actions-menu >> [data-cy="signal-button"]').click();
+      cy.get('#workflow-actions-menu >> [data-testid="signal-button"]').click();
       cy.get('#signal-name').type('sos');
       cy.get('div.cm-content').type('{{}{enter}"sos":true');
-      cy.get('[data-cy="confirm-modal-button"').click();
+      cy.get('[data-testid="confirm-modal-button"').click();
 
       cy.wait('@signal-workflow-api');
       cy.waitForWorkflowAPIs();
 
       cy.get('#workflow-signal-success-toast').should('exist');
-      cy.get('[data-cy="confirm-modal-button"').should('not.exist');
+      cy.get('[data-testid="confirm-modal-button"').should('not.exist');
     });
   });
 
   describe('Reset', () => {
     it('to the first workflow task if the workflow is running, and the action is enabled', () => {
       cy.get('#workflow-actions-menu-button').click();
-      cy.get('#workflow-actions-menu >> [data-cy="reset-button"]').click();
-      cy.get('[data-cy="workflow-reset-type-select"]').click();
+      cy.get('#workflow-actions-menu >> [data-testid="reset-button"]').click();
+      cy.get('[data-testid="workflow-reset-type-select"]').click();
       cy.get('#reset-type-select-menu >> li[role="menuitem"]').first().click();
       cy.get('#reset-reason').type('test');
-      cy.get('[data-cy="confirm-modal-button"]').click();
+      cy.get('[data-testid="confirm-modal-button"]').click();
 
       cy.wait('@reset-workflow-api');
       cy.waitForWorkflowAPIs();
 
-      cy.get('[data-cy="workflow-reset-alert"]').should('be.visible');
-      cy.get('[data-cy="confirm-modal-button"').should('not.exist');
+      cy.get('[data-testid="workflow-reset-alert"]').should('be.visible');
+      cy.get('[data-testid="confirm-modal-button"').should('not.exist');
     });
 
     it('to the last workflow task if the workflow is running, and the action is enabled', () => {
       cy.get('#workflow-actions-menu-button').click();
-      cy.get('#workflow-actions-menu >> [data-cy="reset-button"]').click();
-      cy.get('[data-cy="workflow-reset-type-select"]').click();
+      cy.get('#workflow-actions-menu >> [data-testid="reset-button"]').click();
+      cy.get('[data-testid="workflow-reset-type-select"]').click();
       cy.get(
         '#reset-type-select-menu > div:nth-child(2) > li[role="menuitem"]',
       ).click();
       cy.get('#reset-reason').type('test');
-      cy.get('[data-cy="confirm-modal-button"]').click();
+      cy.get('[data-testid="confirm-modal-button"]').click();
 
       cy.wait('@reset-workflow-api');
       cy.waitForWorkflowAPIs();
 
-      cy.get('[data-cy="workflow-reset-alert"]').should('be.visible');
-      cy.get('[data-cy="confirm-modal-button"').should('not.exist');
+      cy.get('[data-testid="workflow-reset-alert"]').should('be.visible');
+      cy.get('[data-testid="confirm-modal-button"').should('not.exist');
     });
 
     it('to an arbitrary workflow task if the workflow is running, and the action is enabled', () => {
       cy.get('#workflow-actions-menu-button').click();
-      cy.get('#workflow-actions-menu >> [data-cy="reset-button"]').click();
-      cy.get('[data-cy="workflow-reset-type-select"]').click();
+      cy.get('#workflow-actions-menu >> [data-testid="reset-button"]').click();
+      cy.get('[data-testid="workflow-reset-type-select"]').click();
       cy.get(
         '#reset-type-select-menu > div:nth-child(3) > li[role="menuitem"]',
       ).click();
       cy.get('#reset-reason').type('test');
       cy.get('#reset-event-id').type('1');
-      cy.get('[data-cy="confirm-modal-button"]').click();
+      cy.get('[data-testid="confirm-modal-button"]').click();
 
       cy.wait('@reset-workflow-api');
       cy.waitForWorkflowAPIs();
 
-      cy.get('[data-cy="workflow-reset-alert"]').should('be.visible');
-      cy.get('[data-cy="confirm-modal-button"').should('not.exist');
+      cy.get('[data-testid="workflow-reset-alert"]').should('be.visible');
+      cy.get('[data-testid="confirm-modal-button"').should('not.exist');
     });
   });
 });
