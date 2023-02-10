@@ -12,7 +12,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: [
     ['html'],
-    ['json', { outputFile: 'test-results.json' }],
+    ['json', { outputFile: 'playwright-report/test-results.json' }],
     [process.env.CI ? 'list' : 'github'],
   ],
   use: {
