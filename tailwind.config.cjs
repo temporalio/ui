@@ -2,10 +2,6 @@ const defaultTheme = require('tailwindcss/defaultTheme');
 
 const temporalColors = {
   primary: { DEFAULT: '#18181b' }, // gray-900
-asdad
-
-asdas
-da
   secondary: '#64748b', // blue-gray-500
   primaryText: '#141414',
   spaceGray: { DEFAULT: '#141414' },
