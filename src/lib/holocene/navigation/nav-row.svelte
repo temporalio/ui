@@ -12,7 +12,7 @@
   class={link ? '' : classes}
   class:noFilter
   class:wrap
-  data-cy={$$props['data-cy']}
+  data-testid={$$props['data-testid']}
 >
   {#if handleClick !== null}
     <button on:click={handleClick} class="{classes} text-left">

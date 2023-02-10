@@ -9,9 +9,18 @@ module.exports = {
   plugins: ['svelte3', '@typescript-eslint', 'vitest'],
   ignorePatterns: ['*.cjs', 'prism.js', '/server'],
   overrides: [
+    // This was previously being overwritten by a duplicate and will cause the build to fail.
+    // {
+    //   files: ['*.svelte'],
+    //   processor: 'svelte3/svelte3',
+    // },
     {
-      files: ['*.svelte'],
-      processor: 'svelte3/svelte3',
+      files: ['cypress/**/*.js'],
+      extends: ['plugin:cypress/recommended'],
+    },
+    {
+      files: ['tests/**/*.spec.ts'],
+      extends: ['plugin:playwright/playwright-test'],
     },
   ],
   settings: {
@@ -26,12 +35,6 @@ module.exports = {
     es2017: true,
     node: true,
   },
-  overrides: [
-    {
-      files: ['cypress/**/*.js'],
-      extends: ['plugin:cypress/recommended'],
-    },
-  ],
   rules: {
     '@typescript-eslint/no-unused-vars': [
       1,

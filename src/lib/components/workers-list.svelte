@@ -29,24 +29,24 @@
       </th>
     </TableHeaderRow>
     {#each workers?.pollers as poller (poller.identity)}
-      <tr class="table-row w-full" data-cy="worker-row">
+      <tr class="table-row w-full" data-testid="worker-row">
         <td />
-        <td class="text-left" data-cy="worker-identity">
+        <td class="text-left" data-testid="worker-identity">
           <p class="select-all">{poller.identity}</p>
         </td>
-        <td class="text-left" data-cy="worker-last-access-time">
+        <td class="text-left" data-testid="worker-last-access-time">
           <p class="select-all">
             {formatDate(poller.lastAccessTime, $timeFormat)}
           </p>
         </td>
-        <td data-cy="workflow-poller">
+        <td data-testid="workflow-poller">
           {#if poller.taskQueueTypes.includes('WORKFLOW')}
             <Icon name="checkmark" class="m-auto text-blue-700" title="yes" />
           {:else}
             <Icon name="close" class="m-auto text-primary" title="no" />
           {/if}
         </td>
-        <td data-cy="activity-poller">
+        <td data-testid="activity-poller">
           {#if poller.taskQueueTypes.includes('ACTIVITY')}
             <Icon name="checkmark" class="m-auto text-blue-700" title="yes" />
           {:else}

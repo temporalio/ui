@@ -33,6 +33,6 @@
     {message}
     {link}
     bind:shownBanner
-    dataCy="temporal-version-banner"
+    testId="temporal-version-banner"
   />
 {/if}

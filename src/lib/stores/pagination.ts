@@ -31,7 +31,7 @@ type PaginationStore<T> = PaginationMethods<T> &
     pageSize: number;
     currentPage: number;
     totalPages: number;
-    activeRowIndex: number;
+    activeRowIndex: number | undefined;
   }>;
 
 export const getPageForIndex = (i: number, pageSize: number): number => {
@@ -123,7 +123,7 @@ export const pagination = <T>(
 
   const pageSize = writable(perPage);
   const index = writable(start);
-  const activeRowIndex = writable(start);
+  const activeRowIndex = writable(undefined);
 
   const adjustPageSize = (n: number | string) => {
     pageSize.set(toNumber(n));
@@ -194,7 +194,9 @@ export const pagination = <T>(
       get(index) + get(pageSize),
     ).length;
     const maxRowIndex = getMaxRowIndex(pageItemSize, get(pageSize));
-    if (get(activeRowIndex) < maxRowIndex) {
+    if (get(activeRowIndex) === undefined) {
+      activeRowIndex.set(0);
+    } else if (get(activeRowIndex) < maxRowIndex) {
       activeRowIndex.set(get(activeRowIndex) + 1);
     }
   };

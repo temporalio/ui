@@ -58,7 +58,7 @@
         id="query-select"
         label="Query Type"
         bind:value={queryType}
-        dataCy="query-select"
+        testId="query-select"
       >
         {#each types as value}
           <Option {value}>{value}</Option>

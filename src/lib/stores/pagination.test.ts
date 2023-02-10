@@ -273,15 +273,29 @@ describe('pagination', () => {
     expect(initialItem).toBe(0);
   });
 
-  it('should have default active row index', () => {
+  it('should not have default active row index', () => {
     const store = pagination(oneHundredResolutions, 5);
     const { activeRowIndex } = get(store);
 
-    expect(activeRowIndex).toBe(0);
+    expect(activeRowIndex).toBe(undefined);
+  });
+
+  it('should go to the first row', () => {
+    const store = pagination(oneHundredResolutions, 5);
+
+    expect(get(store).activeRowIndex).toBe(undefined);
+
+    store.nextRow();
+
+    expect(get(store).activeRowIndex).toBe(0);
   });
 
   it('should go to the next row', () => {
     const store = pagination(oneHundredResolutions, 5);
+
+    expect(get(store).activeRowIndex).toBe(undefined);
+
+    store.nextRow();
 
     expect(get(store).activeRowIndex).toBe(0);
 
@@ -299,7 +313,7 @@ describe('pagination', () => {
   it('should go to the previous row', () => {
     const store = pagination(oneHundredResolutions, 5);
 
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 4; i++) {
       store.nextRow();
     }
 
@@ -335,7 +349,7 @@ describe('pagination', () => {
   it('should set active row to current row item on next ', () => {
     const store = pagination(oneHundredResolutions, 5);
 
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 4; i++) {
       store.nextRow();
     }
 
@@ -349,7 +363,7 @@ describe('pagination', () => {
   it('should set active row to last row item on next if next page has less items', () => {
     const store = pagination([1, 2, 3, 4, 5, 6, 7, 8], 5);
 
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 5; i++) {
       store.nextRow();
     }
 
@@ -376,7 +390,7 @@ describe('pagination', () => {
   it('should set active row index', () => {
     const store = pagination(oneHundredResolutions, 5);
 
-    expect(get(store).activeRowIndex).toBe(0);
+    expect(get(store).activeRowIndex).toBe(undefined);
 
     store.setActiveRowIndex(4);
 
@@ -386,21 +400,21 @@ describe('pagination', () => {
   it('should not exceed pageSize on set active row index', () => {
     const store = pagination(oneHundredResolutions, 5);
 
-    expect(get(store).activeRowIndex).toBe(0);
+    expect(get(store).activeRowIndex).toBe(undefined);
 
     store.setActiveRowIndex(8);
 
-    expect(get(store).activeRowIndex).toBe(0);
+    expect(get(store).activeRowIndex).toBe(undefined);
   });
 
   it('should not exceed item size on set active row index', () => {
     const store = pagination([1, 2], 5);
 
-    expect(get(store).activeRowIndex).toBe(0);
+    expect(get(store).activeRowIndex).toBe(undefined);
 
     store.setActiveRowIndex(8);
 
-    expect(get(store).activeRowIndex).toBe(0);
+    expect(get(store).activeRowIndex).toBe(undefined);
   });
 });
 

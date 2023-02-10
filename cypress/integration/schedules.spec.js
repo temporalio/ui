@@ -44,10 +44,12 @@ describe('Schedules View', () => {
 
     cy.wait('@schedule-api');
 
-    cy.get('[data-cy="schedule-name"]').should('exist');
-    cy.get('[data-cy="schedule-name"]').contains(scheduleId);
+    cy.get('[data-testid="schedule-name"]').should('exist');
+    cy.get('[data-testid="schedule-name"]').contains(scheduleId);
 
-    cy.get('[data-cy="schedule-interval-frequency"]').contains('Every 30sec');
+    cy.get('[data-testid="schedule-interval-frequency"]').contains(
+      'Every 30sec',
+    );
   });
 });
 
@@ -69,10 +71,12 @@ describe('Schedules Edit', () => {
 
     cy.wait('@schedule-api');
 
-    cy.get('[data-cy="schedule-name"]').should('exist');
-    cy.get('[data-cy="schedule-name"]').contains(scheduleId);
+    cy.get('[data-testid="schedule-name"]').should('exist');
+    cy.get('[data-testid="schedule-name"]').contains(scheduleId);
 
-    cy.get('[data-cy="schedule-interval-frequency"]').contains('Every 30sec');
+    cy.get('[data-testid="schedule-interval-frequency"]').contains(
+      'Every 30sec',
+    );
 
     cy.get('#schedule-actions-menu-button').click();
     cy.get('#schedule-actions-menu > .edit').click();
@@ -92,7 +96,7 @@ describe('Schedules Create', () => {
   });
 
   it('should show Create Schedules Button and navigate to /create', () => {
-    cy.get('[data-cy="create-schedule"]').click();
+    cy.get('[data-testid="create-schedule"]').click();
     cy.url().should('contain', '/schedules/create');
     cy.get('#content').contains('Create Schedule');
   });

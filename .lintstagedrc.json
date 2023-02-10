@@ -1,5 +1,5 @@
 {
-  "*.{ts,js,svelte}": ["eslint --fix", "prettier --write"],
+  "*.{ts,js}": ["pnpm lint:fix", "prettier --write"],
   "*.{css,postcss,svelte}": "stylelint --fix",
   "*.{json,md}": "prettier --write"
 }

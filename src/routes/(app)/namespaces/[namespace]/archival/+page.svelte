@@ -24,7 +24,9 @@
 
 <PageTitle title={`Archival | ${namespaceName}`} url={$page.url.href} />
 {#if archivalEnabled && visibilityArchivalEnabled}
-  <h1 class="text-2xl" data-cy="archived-enabled-title">Archived Workflows</h1>
+  <h1 class="text-2xl" data-testid="archived-enabled-title">
+    Archived Workflows
+  </h1>
   <WorkflowFilters />
   {#if workflows?.length}
     <Pagination
@@ -49,7 +51,7 @@
     />
   {/if}
 {:else if archivalEnabled}
-  <h1 class="text-2xl" data-cy="visibility-disabled-title">
+  <h1 class="text-2xl" data-testid="visibility-disabled-title">
     This Namespace is currently enabled for archival but visibility is not
     enabled.
   </h1>
@@ -63,11 +65,12 @@
     For more details, please check out <a
       class="text-blue-700 underline"
       href="https://docs.temporal.io/clusters#archival"
-      target="_blank">Archival documentation</a
+      target="_blank"
+      rel="noreferrer">Archival documentation</a
     >.
   </p>
 {:else}
-  <h1 class="text-2xl" data-cy="archived-disabled-title">
+  <h1 class="text-2xl" data-testid="archived-disabled-title">
     This Namespace is currently not enabled for archival.
   </h1>
   <p>Run this command to enable Archival for Event Histories:</p>
@@ -88,7 +91,8 @@
     For more details, please check out <a
       class="text-blue-700 underline"
       href="https://docs.temporal.io/clusters#archival"
-      target="_blank">Archival documentation</a
+      target="_blank"
+      rel="noreferrer">Archival documentation</a
     >.
   </p>
 {/if}
