@@ -1,66 +1,52 @@
-import { join } from 'path';
-import { chmod } from 'fs/promises';
-import { finished } from 'stream/promises';
-import zlib from 'node:zlib';
-
-import fetch from 'node-fetch';
 import kleur from 'kleur';
-import mkdirp from 'mkdirp';
-import rimraf from 'rimraf';
-import tar from 'tar-fs';
+import { TestWorkflowEnvironment } from '@temporalio/testing';
+import { keyIn } from 'readline-sync';
+
+const port = 7233;
 
 console.log(kleur.cyan('Getting ready to download Temporal CLI…'));
 
 if (process.env.VERCEL) {
   console.log(
-    kleur.blue('Running on Vercel; skipping downloading Temporal CLI.'),
+    kleur.blue('Running on Vercel; skipping downloading Temporal CLI'),
   );
   process.exit(0);
 }
 
-const reportError = (error, exitCode = 1, callback) => {
-  console.error(kleur.bgRed('Error:'), kleur.red(error));
-  if (callback && typeof callback === 'function') {
-    callback();
-  }
-  process.exit(exitCode);
-};
+const startServer = process.argv.includes('--start');
+if (startServer) {
+  console.log(kleur.cyan(`Starting Temporal development server`));
+}
 
-const removeDirectory = () => {
-  rimraf(destination);
-};
+const server = await TestWorkflowEnvironment.createTimeSkipping({
+  server: { port },
+});
 
-const destinationDirectory = './bin';
-const destination = join(destinationDirectory, 'cli');
-
-const platform = process.platform;
-let arch = process.arch;
-
-if (arch === 'x64') arch = 'amd64';
-
-const downloadUrl = `https://temporal.download/cli/archive/latest?platform=${platform}&arch=${arch}`;
-
-removeDirectory();
-await mkdirp(destinationDirectory);
-
-console.log(
-  kleur.bgYellow('Downloading:'),
-  kleur.yellow().underline(downloadUrl),
-);
-
-try {
-  const response = await fetch(downloadUrl);
-
-  await finished(
-    response.body.pipe(zlib.createGunzip()).pipe(tar.extract(destination)),
-  );
-
-  await chmod(destination, 0o755);
-
+if (startServer) {
   console.log(
-    kleur.bgGreen('Download complete:'),
-    kleur.green().underline(join(destination, 'temporal')),
+    kleur.bgGreen('OK'),
+    kleur.green(`Started Temporal development server at`),
+    kleur.green().underline(`127.0.0.1:${port}`),
   );
-} catch (error) {
-  reportError(error, 2, removeDirectory);
+  keepAlive();
+} else {
+  console.log(
+    kleur.bgGreen('OK'),
+    kleur.green(
+      'Temporal CLI installed. Run dev server with `pnpm run server`',
+    ),
+  );
+}
+
+await server.teardown();
+
+async function keepAlive() {
+  let answer = '';
+  while (answer !== 'q') {
+    answer = keyIn(kleur.cyan(`Press ${kleur.bold('q')} to exit: `));
+
+    if (answer === 'q') {
+      return;
+    }
+  }
 }
