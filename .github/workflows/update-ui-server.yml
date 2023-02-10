@@ -29,7 +29,7 @@ jobs:
       - name: Commit update
         run: |
           cd ./ui-server
-          git diff
+          git diff --stat
       #     git config --local user.name 'Temporal Data (cicd)'
       #     git config --local user.email 'commander-data@temporal.io'
       #     git remote set-url origin https://x-access-token:${{ secrets.COMMANDER_DATA_TOKEN }}@github.com/temporalio/ui-server
