@@ -11,9 +11,7 @@
   "homepage": "https://github.com/temporalio/ui/tree/main",
   "scripts": {
     "start": "pnpm run dev:local -- --open",
-    "server": "./bin/cli/temporal server start-dev",
-    "start:server": "concurrently \"pnpm run server\" \"pnpm run dev:local\"",
-    "prepare": "node download-temporal-cli.js && husky install && svelte-kit sync",
+    "prepare": "husky install && svelte-kit sync",
     "dev:local": ". ./.env && VITE_TEMPORAL_UI_BUILD_TARGET=local vite dev --port 3000",
     "dev:docker": ". ./.env && VITE_API=http://localhost:8080 vite dev --port 3000",
     "dev:cloud": "VITE_TEMPORAL_UI_BUILD_TARGET=cloud vite dev --port 3000",
