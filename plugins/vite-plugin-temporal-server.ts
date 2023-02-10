@@ -14,7 +14,7 @@ export function temporalServer(): Plugin {
 
       server.httpServer?.on('listening', async () => {
         temporalServer = await TestWorkflowEnvironment.createLocal({
-          server: { port, ui: true, extraArgs },
+          server: { port, ui: true, extraArgs, namespace: 'default' }, // TODO remove `namespace: 'default'` once SDKs switch to Temporal CLI
         });
       });
 
