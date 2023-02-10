@@ -51,6 +51,11 @@ console.log(
 try {
   const response = await fetch(downloadUrl);
 
+  if (!response.body)
+    throw new Error(
+      `Failed to find a "body" in the response form ${downloadUrl}.`,
+    );
+
   await finished(
     response.body.pipe(zlib.createGunzip()).pipe(tar.extract(destination)),
   );
