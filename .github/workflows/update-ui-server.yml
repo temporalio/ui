@@ -37,9 +37,8 @@ jobs:
         run: |
           rm -rf ./ui-server/*
           cp -r server/* ui-server/
-      - name: Commit update
-        run: |
           cd ./ui-server
+          ls -lR .
           git add .
           git diff --stat HEAD
       #     git config --local user.name 'Temporal Data (cicd)'
