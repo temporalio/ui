@@ -1,0 +1,33 @@
+name: "Update UI Server"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sync:
+    name: "Update UI Server"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Checkout and Setup Node
+        uses: ./.github/actions/checkout-and-setup
+      - name: Build Assets
+        run: pnpm build:server
+      - name: Checkout UI Server
+        uses: actions/checkout@v3
+        with:
+          repository: temporalio/ui-server
+          path: ui-server
+      - name: Sync
+        run: |
+          find ./ui-server | grep -v "^\.git$" | xargs rm -rf
+          cp -r server/* ui-server/
+      - name: Commit update
+        run: |
+          git diff
+      #     git config --local user.name 'Temporal Data (cicd)'
+      #     git config --local user.email 'commander-data@temporal.io'
+      #     git remote set-url origin https://x-access-token:${{ secrets.COMMANDER_DATA_TOKEN }}@github.com/temporalio/ui-server
+      #     git add .
+      #     git commit -m "Update UI Server" && git push || echo "No changes to commit"
