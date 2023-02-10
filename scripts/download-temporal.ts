@@ -18,7 +18,7 @@ if (process.env.VERCEL) {
   process.exit(0);
 }
 
-const reportError = (error, exitCode = 1, callback) => {
+const reportError = (error: string, exitCode = 1, callback?: () => void) => {
   console.error(kleur.bgRed('Error:'), kleur.red(error));
   if (callback && typeof callback === 'function') {
     callback();
