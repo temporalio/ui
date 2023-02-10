@@ -39,7 +39,7 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: 'pnpm run dev:local --port=3333 --mode testing',
+      command: 'pnpm run dev:local --port=3333 --mode=test',
       port: 3333,
     },
   ],

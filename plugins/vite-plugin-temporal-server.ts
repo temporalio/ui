@@ -1,26 +1,31 @@
-import { TestWorkflowEnvironment } from '@temporalio/testing';
 import type { Plugin } from 'vite';
+import {
+  type TemporalServer,
+  createTemporalServer,
+} from '../scripts/start-temporal-server';
+
+let temporal: TemporalServer;
 
 export function temporalServer(): Plugin {
   return {
     name: 'vite-plugin-temporal-server',
-    configureServer(server) {
-      let temporalServer: TestWorkflowEnvironment;
+    enforce: 'post',
+    apply: 'serve',
+    async configureServer(server) {
+      if (temporal) return;
+
       const port = +server.config.env.VITE_TEMPORAL_PORT;
-      const api = server.config.env.VITE_UI_SERVER_PORT;
-      const extraArgs = [`--ui-port=${api}`];
 
-      console.log({ port, api, extraArgs });
+      temporal = createTemporalServer({ port });
 
-      server.httpServer?.on('listening', async () => {
-        temporalServer = await TestWorkflowEnvironment.createLocal({
-          server: { port, ui: true, extraArgs },
-        });
-      });
-
-      server.httpServer?.on('close', () => {
-        temporalServer.teardown();
-      });
+      await temporal.ready();
+    },
+    async closeBundle() {
+      await temporal.shutdown();
     },
   };
 }
+
+process.on('beforeExit', async () => {
+  await temporal.shutdown();
+});

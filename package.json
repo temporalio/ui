@@ -60,6 +60,7 @@
     "sanitize-html": "^2.7.1",
     "url-pattern": "^1.0.3",
     "uuid": "^9.0.0",
+    "wait-port": "^1.0.4",
     "websocket-as-promised": "^2.0.1"
   },
   "devDependencies": {
@@ -141,8 +142,10 @@
     "typescript": "^4.4.2",
     "vite": "^4.0.2",
     "vite-node": "^0.23.2",
+    "vite-plugin-child-process": "^1.0.5",
     "vitest": "^0.15.2",
-    "webpack": "^5.73.0"
+    "webpack": "^5.73.0",
+    "zx": "^7.1.1"
   },
   "peerDependencies": {
     "date-fns": "2.29.x",
