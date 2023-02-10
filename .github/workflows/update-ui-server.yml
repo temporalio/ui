@@ -1,6 +1,10 @@
 name: Update UI Server
 
 on:
+  # Have to add push here for now.
+  # There is no way to trigger a workflow dispatch for a workflow until the file exists on the main branch :(
+  # As this action currently only runs a diff, it does not commit, this is fine to test it
+  push:
   workflow_dispatch:
 
 jobs:
