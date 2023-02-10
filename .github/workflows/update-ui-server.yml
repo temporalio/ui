@@ -1,11 +1,10 @@
-name: "Update UI Server"
+name: Update UI Server
 
 on:
   workflow_dispatch:
 
 jobs:
   sync:
-    name: "Update UI Server"
     runs-on: ubuntu-latest
 
     steps:
