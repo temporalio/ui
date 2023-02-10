@@ -49,4 +49,4 @@ jobs:
       - name: Checkout and Setup Node
         uses: ./.github/actions/checkout-and-setup
       - name: Run Snapshot Tests
-        run: pnpm snapshot
+        run: pnpm test:snapshot

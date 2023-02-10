@@ -10,7 +10,7 @@
   $: title = capitalize(type);
 </script>
 
-<article class="flex w-full flex-col lg:w-1/2" data-cy="workflow-{type}">
+<article class="flex w-full flex-col lg:w-1/2" data-testid="workflow-{type}">
   <h3 class="text-lg">{title}</h3>
   {#if content}
     <CodeBlock {content} class="mb-2 max-h-96" />

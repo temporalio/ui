@@ -109,7 +109,7 @@
             variant={confirmType}
             {loading}
             disabled={confirmDisabled || loading}
-            dataCy="confirm-modal-button"
+            testId="confirm-modal-button"
             on:click={() => dispatch('confirmModal')}>{confirmText}</Button
           >
         {/if}

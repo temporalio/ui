@@ -11,12 +11,14 @@
 
 <div class="flex flex-col {$$props.class}">
   {#if calendar}
-    <p data-cy="schedule-calendar-frequency">{calendar?.comment ?? ''} UTC</p>
+    <p data-testid="schedule-calendar-frequency">
+      {calendar?.comment ?? ''} UTC
+    </p>
   {:else}
-    <p data-cy="schedule-interval-frequency">
+    <p data-testid="schedule-interval-frequency">
       {intervalToComment(intervalSecs)}
     </p>
-    <p data-cy="schedule-phase-frequency">
+    <p data-testid="schedule-phase-frequency">
       {intervalToComment(phaseSecs, true)}
     </p>
   {/if}

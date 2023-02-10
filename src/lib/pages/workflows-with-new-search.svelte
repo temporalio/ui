@@ -279,17 +279,17 @@
 
 <div class="mb-2 flex justify-between">
   <div>
-    <h1 class="text-2xl" data-cy="namespace-title">
+    <h1 class="text-2xl" data-testid="namespace-title">
       Recent Workflows
       <NamespaceSelector />
     </h1>
     <div class="flex items-center gap-2 text-sm">
-      <p data-cy="namespace-name">
+      <p data-testid="namespace-name">
         {$page.params.namespace}
       </p>
       {#if $workflowCount?.totalCount >= 0}
         <div class="h-1 w-1 rounded-full bg-gray-400" />
-        <p data-cy="workflow-count">
+        <p data-testid="workflow-count">
           {#if $loading}
             <span class="text-gray-400">loading</span>
           {:else if $updating}
