@@ -20,8 +20,12 @@ jobs:
           go-version-file: server/go.mod
           cache: true
           cache-dependency-path: server/go.sum
+      - name: Setup Protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          version: "3.x"
       - name: Build
-        run: cd server && make build-grpc build-ui
+        run: cd server && make install-utils build-grpc build-ui
       - name: Checkout UI Server
         uses: actions/checkout@v3
         with:
