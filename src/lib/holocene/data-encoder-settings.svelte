@@ -52,11 +52,11 @@
   cancelText="Cancel"
   confirmDisabled={Boolean(error)}
 >
-  <h3 slot="title" data-cy="data-encoder-title">Data Encoder</h3>
+  <h3 slot="title" data-testid="data-encoder-title">Data Encoder</h3>
   <div slot="content">
     <CodecEndpointSettings bind:endpoint bind:passToken {error} />
     <DataConverterPortSettings bind:port />
-    <small data-cy="data-encoder-info"
+    <small data-testid="data-encoder-info"
       >If both are set, the Remote Codec Endpoint will be used.</small
     >
   </div>

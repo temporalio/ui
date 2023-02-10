@@ -64,7 +64,7 @@
       bind:show
       {keepOpen}
       controls="{id}-menu"
-      dataCy={$$props.dataCy}
+      testId={$$props.testId}
       {dark}
       {disabled}
     >

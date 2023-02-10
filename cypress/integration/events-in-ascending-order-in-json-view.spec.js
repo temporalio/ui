@@ -51,7 +51,7 @@ describe('Fallback to Ascending Ordering of Event History on Older Versions of T
     cy.wait('@event-history-start');
     cy.wait('@event-history-end');
 
-    cy.get('[data-cy="json"]').click();
+    cy.get('[data-testid="json"]').click();
 
     cy.wait('@event-history-json-ascending');
   });

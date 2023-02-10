@@ -7,7 +7,7 @@
     'https://github.com/temporalio/ui/issues/new/choose';
 </script>
 
-<a {href} target="_blank" data-cy="give-feedback" rel="noreferrer">
+<a {href} target="_blank" data-testid="give-feedback" rel="noreferrer">
   <div class="feedback-button">
     <div class="feedback-icon">
       <Icon class="text-purple-200" name="feedback" height={12} width={12} />
