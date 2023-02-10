@@ -24,7 +24,7 @@ jobs:
           path: ui-server
       - name: Sync
         run: |
-          find ./ui-server | grep -v "^\.git$" | xargs rm -rf
+          rm -rf ./ui-server/*
           cp -r server/* ui-server/
       - name: Commit update
         run: |
