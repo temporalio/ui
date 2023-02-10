@@ -4,7 +4,7 @@ import { keyIn } from 'readline-sync';
 
 const port = 7233;
 
-console.log(kleur.cyan('Getting ready to download Temporal CLI…'));
+console.log(kleur.cyan('Getting ready to download Temporal CLI..'));
 
 if (process.env.VERCEL) {
   console.log(
@@ -15,7 +15,7 @@ if (process.env.VERCEL) {
 
 const startServer = process.argv.includes('--start');
 if (startServer) {
-  console.log(kleur.cyan(`Starting Temporal development server`));
+  console.log(kleur.cyan(`Starting Temporal development server..`));
 }
 
 const server = await TestWorkflowEnvironment.createTimeSkipping({
@@ -44,9 +44,5 @@ async function keepAlive() {
   let answer = '';
   while (answer !== 'q') {
     answer = keyIn(kleur.cyan(`Press ${kleur.bold('q')} to exit: `));
-
-    if (answer === 'q') {
-      return;
-    }
   }
 }
