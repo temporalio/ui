@@ -8,6 +8,7 @@
   } from '$lib/utilities/route-for';
   import {
     getCodeBlockValue,
+    getStackTrace,
     shouldDisplayAsExecutionLink,
     shouldDisplayAsTaskQueueLink,
     shouldDisplayAsPlainText,
@@ -26,8 +27,7 @@
 
   const { workflow, namespace } = $page.params;
   $: codeBlockValue = getCodeBlockValue(value);
-  $: stackTrace =
-    codeBlockValue?.stackTrace || codeBlockValue?.cause?.stackTrace;
+  $: stackTrace = getStackTrace(codeBlockValue);
 </script>
 
 <div class="row {$$props.class}">
