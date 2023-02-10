@@ -28,6 +28,7 @@ jobs:
           cp -r server/* ui-server/
       - name: Commit update
         run: |
+          cd ./ui-server
           git diff
       #     git config --local user.name 'Temporal Data (cicd)'
       #     git config --local user.email 'commander-data@temporal.io'
