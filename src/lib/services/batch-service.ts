@@ -1,14 +1,20 @@
 import { v4 as uuidv4 } from 'uuid';
+import { get } from 'svelte/store';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
-import type { StartBatchOperationRequest } from 'src/types';
+import type {
+  StartBatchOperationRequest,
+  WorkflowExecutionInput,
+} from 'src/types';
+import { isVersionNewer } from '$lib/utilities/version-check';
+import { temporalVersion } from '$lib/stores/versions';
 
 type CreateBatchOperationOptions = {
   namespace: string;
   reason: string;
   query?: string;
-  executions?: { workflowId: string; runId: string }[];
+  executions?: WorkflowExecutionInput[];
 };
 
 type CreateBatchOperationWithQueryOptions = CreateBatchOperationOptions & {
@@ -24,16 +30,53 @@ type DescribeBatchOperationOptions = {
   namespace: string;
 };
 
-export async function bulkTerminateByIDs({
+const queryFromWorkflows = (
+  workflowExecutions: WorkflowExecution[],
+): string => {
+  const runIds = workflowExecutions.map((wf) => wf.runId);
+  return runIds.reduce((queryString, id, index, arr) => {
+    queryString += `RunId="${id}"`;
+    if (index !== arr.length - 1) {
+      queryString += ' OR ';
+    }
+
+    return queryString;
+  }, '');
+};
+
+const toWorkflowExecutionInput = ({
+  id,
+  runId,
+}: WorkflowExecution): WorkflowExecutionInput => ({ workflowId: id, runId });
+
+const createBatchOperationOptions = ({
   namespace,
   reason,
   workflows,
-}: CreateBatchOperationWithIDsOptions) {
-  const executions = workflows.map(({ runId, id }) => ({
-    runId,
-    workflowId: id,
-  }));
-  return terminateWorkflows({ namespace, reason, executions });
+}: CreateBatchOperationWithIDsOptions): CreateBatchOperationOptions => {
+  const options: CreateBatchOperationOptions = {
+    namespace,
+    reason,
+  };
+
+  if (isVersionNewer(get(temporalVersion), '1.19')) {
+    return {
+      ...options,
+      executions: workflows.map(toWorkflowExecutionInput),
+    };
+  } else {
+    return {
+      ...options,
+      query: queryFromWorkflows(workflows),
+    };
+  }
+};
+
+export async function bulkTerminateByIDs(
+  options: CreateBatchOperationWithIDsOptions,
+) {
+  const fullOptions = createBatchOperationOptions(options);
+  return terminateWorkflows(fullOptions);
 }
 
 export async function batchTerminateByQuery({
@@ -44,16 +87,11 @@ export async function batchTerminateByQuery({
   return terminateWorkflows({ namespace, query, reason });
 }
 
-export async function bulkCancelByIDs({
-  namespace,
-  workflows,
-  reason,
-}: CreateBatchOperationWithIDsOptions): Promise<string> {
-  const executions = workflows.map(({ runId, id }) => ({
-    runId,
-    workflowId: id,
-  }));
-  return cancelWorkflows({ namespace, executions, reason });
+export async function bulkCancelByIDs(
+  options: CreateBatchOperationWithIDsOptions,
+): Promise<string> {
+  const fullOptions = createBatchOperationOptions(options);
+  return cancelWorkflows(fullOptions);
 }
 
 export async function batchCancelByQuery({

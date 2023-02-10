@@ -136,6 +136,7 @@ export type WorkflowExecutionInfo =
 // api response
 export type Payload = temporal.api.common.v1.IPayload;
 export type Payloads = temporal.api.common.v1.IPayloads;
+export type WorkflowExecutionInput = temporal.api.common.v1.IWorkflowExecution;
 
 // api.taskqueue
 
