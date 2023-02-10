@@ -65,7 +65,8 @@
     For more details, please check out <a
       class="text-blue-700 underline"
       href="https://docs.temporal.io/clusters#archival"
-      target="_blank">Archival documentation</a
+      target="_blank"
+      rel="noreferrer">Archival documentation</a
     >.
   </p>
 {:else}
@@ -90,7 +91,8 @@
     For more details, please check out <a
       class="text-blue-700 underline"
       href="https://docs.temporal.io/clusters#archival"
-      target="_blank">Archival documentation</a
+      target="_blank"
+      rel="noreferrer">Archival documentation</a
     >.
   </p>
 {/if}
