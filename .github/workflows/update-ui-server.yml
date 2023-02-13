@@ -33,19 +33,14 @@ jobs:
         with:
           repository: temporalio/ui-server
           path: ui-server
+          ref: ui-release
       - name: Sync
-        # For now we have to delete the ui submodule after checkout as in the sync'd version
-        # ui will be a normal directory, not a submodule.
-        # Once the first of these sync commits is pushed we need to remove the `git rm ui` here
         run: |
-          (cd ui-server && git rm ui)
           rm -rf ui-server/*
           cp -r server/* ui-server
           cd ui-server
+          git config --local user.name 'Temporal Data (cicd)'
+          git config --local user.email 'commander-data@temporal.io'
+          git remote set-url origin https://x-access-token:${{ secrets.COMMANDER_DATA_TOKEN }}@github.com/temporalio/ui-server
           git add .
-          git diff --stat HEAD
-      #     git config --local user.name 'Temporal Data (cicd)'
-      #     git config --local user.email 'commander-data@temporal.io'
-      #     git remote set-url origin https://x-access-token:${{ secrets.COMMANDER_DATA_TOKEN }}@github.com/temporalio/ui-server
-      #     git add .
-      #     git commit -m "Update UI Server" && git push || echo "No changes to commit"
+          git commit -m "Update UI Server" && git push || echo "No changes to commit"
