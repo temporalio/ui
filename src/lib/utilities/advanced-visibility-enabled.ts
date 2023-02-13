@@ -5,7 +5,7 @@ export const advancedVisibilityEnabled = (
   version: string,
 ) => {
   return (
-    cluster?.visibilityStore?.includes('elasticsearch') ??
+    cluster?.visibilityStore?.includes('elasticsearch') ||
     isVersionNewer(version, '1.19')
   );
 };
