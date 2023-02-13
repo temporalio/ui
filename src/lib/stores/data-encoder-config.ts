@@ -23,3 +23,5 @@ export function setLastDataEncoderSuccess(): void {
 export function resetLastDataEncoderSuccess(): void {
   lastDataEncoderStatus.set('notRequested');
 }
+
+export const decodeJSON = persistStore('decodeJSON', false, true);

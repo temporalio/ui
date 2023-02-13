@@ -6,6 +6,7 @@
   import { exportHistory } from '$lib/utilities/export-history';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { eventHistory } from '$lib/stores/events';
+  import { decodeJSON } from '$lib/stores/data-encoder-config';
 
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
@@ -17,6 +18,9 @@
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
   import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
+  import { authUser } from '$lib/stores/auth-user';
+
+  const { settings } = $page.data;
 
   let showShortcuts = false;
 
@@ -85,6 +89,9 @@
                 namespace: $page.params.namespace,
                 workflowId: $workflowRun.workflow?.id,
                 runId: $workflowRun.workflow?.runId,
+                decodeJSON: $decodeJSON,
+                settings,
+                accessToken: $authUser?.accessToken,
               })}>Download</ToggleButton
           >
         </ToggleButtons>
