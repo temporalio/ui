@@ -20,15 +20,6 @@ export type TemporalServer = {
   ready: () => Promise<boolean>;
 };
 
-const findTemporalPath = async () => {
-  try {
-    const { stdout } = await $`which temporal`.quiet();
-    return stdout;
-  } catch {
-    return;
-  }
-};
-
 const getCLIPath = async (cliPath = localCLIPath): Promise<string | void> => {
   const stylizedPath = chalk.yellowBright(cliPath);
 
