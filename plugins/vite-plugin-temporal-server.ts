@@ -1,11 +1,11 @@
+import { chalk } from 'zx';
 import type { Plugin } from 'vite';
 import {
   type TemporalServer,
   createTemporalServer,
 } from '../scripts/start-temporal-server';
-import kleur from 'kleur';
 
-const { cyan, magenta } = kleur;
+const { cyan, magenta } = chalk;
 
 let temporal: TemporalServer;
 
