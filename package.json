@@ -143,7 +143,6 @@
     "typescript": "^4.4.2",
     "vite": "^4.0.2",
     "vite-node": "^0.23.2",
-    "vite-plugin-child-process": "^1.0.5",
     "vitest": "^0.15.2",
     "webpack": "^5.73.0",
     "zx": "^7.1.1"
