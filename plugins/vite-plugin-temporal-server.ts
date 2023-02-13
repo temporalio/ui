@@ -9,6 +9,8 @@ const { cyan, magenta } = kleur;
 
 let temporal: TemporalServer;
 
+const isVercel = !!process.env.VERCEL;
+
 const getPortFromApiEndpoint = (endpoint: string, fallback = 8233): number => {
   return validatePort(
     endpoint.slice(endpoint.lastIndexOf(':') + 1, endpoint.length),
@@ -40,6 +42,7 @@ export function temporalServer(): Plugin {
     enforce: 'post',
     apply: 'serve',
     async configureServer(server) {
+      if (isVercel) return;
       if (temporal) return;
 
       const port = validatePort(server.config.env.VITE_TEMPORAL_PORT, 7233);
@@ -48,7 +51,7 @@ export function temporalServer(): Plugin {
       console.log(magenta(`Starting Temporal Server on Port ${port}…`));
       console.log(cyan(`Starting Temporal UI Server on Port ${uiPort}…`));
 
-      temporal = createTemporalServer({
+      temporal = await createTemporalServer({
         port,
         uiPort,
       });

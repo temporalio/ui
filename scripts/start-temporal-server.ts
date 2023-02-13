@@ -1,12 +1,13 @@
 import { join } from 'path';
 import waitForPort from 'wait-port';
-import { $ } from 'zx';
+import { $, chalk } from 'zx';
 
 const temporalCliPath = join(process.cwd(), 'bin', 'cli', 'temporal');
 
 type TemporalServerOptions = {
   port?: number;
   uiPort?: number;
+  logLevel?: string;
 };
 
 export type TemporalServer = {
@@ -14,13 +15,31 @@ export type TemporalServer = {
   ready: () => Promise<boolean>;
 };
 
-export const createTemporalServer = ({
+export const createTemporalServer = async ({
   port = 7233,
   uiPort = port + 1000,
+  logLevel = 'fatal',
 }: TemporalServerOptions = {}) => {
-  const temporal = $`${temporalCliPath} server start-dev --port=${port} --ui-port=${uiPort} --log-level="fatal"`;
+  const flags = [
+    `--port=${port}`,
+    `--ui-port=${uiPort}`,
+    `--log-level=${logLevel}`,
+  ];
 
-  temporal.quiet();
+  const temporal = $`${temporalCliPath} server start-dev ${flags}`.quiet();
+
+  temporal.catch(async ({ stdout }) => {
+    const { error }: { error: string } = JSON.parse(stdout);
+    if (error.includes('address already in use')) {
+      return console.warn(
+        `${chalk.bgYellow.black(
+          'WARN',
+        )}: Port ${port} is already in use. Falling back to using whatever is running on that port.`,
+      );
+    }
+
+    throw new Error(stdout);
+  });
 
   const shutdown = async () => {
     await temporal.kill();
@@ -36,7 +55,7 @@ export const createTemporalServer = ({
   };
 
   return {
-    shutdown,
     ready,
+    shutdown,
   };
 };
