@@ -14,51 +14,53 @@
   $: ({ workflow } = $workflowRun);
 </script>
 
-<Accordion
-  title="Summary"
-  icon="summary"
-  open={$workflowSummaryViewOpen}
-  onToggle={() => {
-    $workflowSummaryViewOpen = !$workflowSummaryViewOpen;
-  }}
->
-  <div
-    class="grid-row-3 grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 xl:w-11/12"
+<section>
+  <Accordion
+    title="Summary"
+    icon="summary"
+    open={$workflowSummaryViewOpen}
+    onToggle={() => {
+      $workflowSummaryViewOpen = !$workflowSummaryViewOpen;
+    }}
   >
-    <div class="col-span-1 md:col-span-2">
-      <h3 class="font-medium">Workflow Type</h3>
-      <div class="h-0.5 rounded-full bg-gray-900" />
-      <WorkflowDetail content={workflow?.name} copyable />
-      <WorkflowDetail title="Run ID" content={workflow?.runId} copyable />
+    <div
+      class="grid-row-3 grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 xl:w-11/12"
+    >
+      <div class="col-span-1 md:col-span-2">
+        <h3 class="font-medium">Workflow Type</h3>
+        <div class="h-0.5 rounded-full bg-gray-900" />
+        <WorkflowDetail content={workflow?.name} copyable />
+        <WorkflowDetail title="Run ID" content={workflow?.runId} copyable />
+      </div>
+      <div class="col-span-1">
+        <h3 class="font-medium">Task Queue</h3>
+        <div class="h-0.5 rounded-full bg-gray-900" />
+        <WorkflowDetail
+          content={workflow?.taskQueue}
+          href={routeForWorkers({
+            namespace: $page.params.namespace,
+            workflow: workflow?.id,
+            run: workflow?.runId,
+          })}
+          copyable
+        />
+        <WorkflowDetail
+          title="State Transitions"
+          content={workflow?.stateTransitionCount}
+        />
+      </div>
+      <div class="col-span-1">
+        <h3 class="font-medium">Start & Close Time</h3>
+        <div class="h-0.5 rounded-full bg-gray-900" />
+        <WorkflowDetail
+          title="Start Time"
+          content={formatDate(workflow?.startTime, $timeFormat)}
+        />
+        <WorkflowDetail
+          title="Close Time"
+          content={formatDate(workflow?.endTime, $timeFormat)}
+        />
+      </div>
     </div>
-    <div class="col-span-1">
-      <h3 class="font-medium">Task Queue</h3>
-      <div class="h-0.5 rounded-full bg-gray-900" />
-      <WorkflowDetail
-        content={workflow?.taskQueue}
-        href={routeForWorkers({
-          namespace: $page.params.namespace,
-          workflow: workflow?.id,
-          run: workflow?.runId,
-        })}
-        copyable
-      />
-      <WorkflowDetail
-        title="State Transitions"
-        content={workflow?.stateTransitionCount}
-      />
-    </div>
-    <div class="col-span-1">
-      <h3 class="font-medium">Start & Close Time</h3>
-      <div class="h-0.5 rounded-full bg-gray-900" />
-      <WorkflowDetail
-        title="Start Time"
-        content={formatDate(workflow?.startTime, $timeFormat)}
-      />
-      <WorkflowDetail
-        title="Close Time"
-        content={formatDate(workflow?.endTime, $timeFormat)}
-      />
-    </div>
-  </div>
-</Accordion>
+  </Accordion>
+</section>

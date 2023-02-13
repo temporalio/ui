@@ -41,7 +41,7 @@
     'Create scheduled actions using our Public API or TCTL (CLI).';
 </script>
 
-<div class="flex flex-col justify-between gap-2 md:flex-row">
+<header class="flex flex-col justify-between gap-2 md:flex-row">
   <div>
     <h1 class="flex items-center gap-2 text-2xl">
       Schedules<Badge type="beta">Beta</Badge>
@@ -58,7 +58,7 @@
     on:click={() => goto(routeForScheduleCreate({ namespace }))}
     >Create Schedule</Button
   >
-</div>
+</header>
 
 {#await fetchSchedules}
   <Loading />

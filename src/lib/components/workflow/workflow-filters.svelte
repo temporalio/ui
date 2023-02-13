@@ -70,7 +70,7 @@
   }, 300);
 </script>
 
-<section class="flex flex-col">
+<dev class="flex flex-col">
   <p class="pb-2 text-right text-xs">
     {#if searchType === 'advanced'}
       <a
@@ -146,4 +146,4 @@
       </Select>
     </div>
   {/if}
-</section>
+</dev>
