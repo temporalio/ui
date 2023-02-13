@@ -9,8 +9,6 @@
   $: left = $userSettings[`${page}.LEFT`];
   $: right = $userSettings[`${page}.RIGHT`];
   $: bottom = $userSettings[`${page}.BOTTOM`];
-
-  let width = 600;
 </script>
 
 {#if top}
@@ -18,19 +16,19 @@
 {/if}
 {#if left}
   <div class="flex gap-2">
-    <div class={`w-[${width.toString()}px] left-0 top-0 min-h-screen`}>
+    <div class={`w-1/3 left-0 top-0 min-h-screen`}>
       <EmbeddedContentIframe title="left" src={left} />
     </div>
-    <div class={`w-[calc(100vw-${width.toString()}px)]`}>
+    <div class={`w-2/3`}>
       <slot />
     </div>
   </div>
 {:else if right}
   <div class="flex gap-2">
-    <div class={`w-[calc(100vw-${width.toString()}px)]`}>
+    <div class={`w-2/3`}>
       <slot />
     </div>
-    <div class={`w-[${width.toString()}px] left-2/3 top-0 min-h-screen`}>
+    <div class={`w-1/3 left-2/3 top-0 min-h-screen`}>
       <EmbeddedContentIframe title="right" src={right} />
     </div>
   </div>
