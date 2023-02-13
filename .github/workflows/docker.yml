@@ -24,6 +24,7 @@ jobs:
         uses: arduino/setup-protoc@v1
         with:
           version: '3.x'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build GRPC
         run: make install-utils build-grpc
