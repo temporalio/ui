@@ -10,6 +10,10 @@ type TemporalServerOptions = {
   logLevel?: string;
 };
 
+const warn = (message: string) => {
+  console.warn(`${chalk.bgYellow.black('WARN')}: ${message}`);
+};
+
 export type TemporalServer = {
   shutdown: () => Promise<number | null>;
   ready: () => Promise<boolean>;
@@ -31,10 +35,8 @@ export const createTemporalServer = async ({
   temporal.catch(async ({ stdout }) => {
     const { error }: { error: string } = JSON.parse(stdout);
     if (error.includes('address already in use')) {
-      return console.warn(
-        `${chalk.bgYellow.black(
-          'WARN',
-        )}: Port ${port} is already in use. Falling back to using whatever is running on that port.`,
+      return warn(
+        `Port ${port} is already in use. Falling back to whatever is running on that port.`,
       );
     }
 
