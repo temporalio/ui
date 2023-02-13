@@ -62,7 +62,7 @@ export function temporalServer(): Plugin {
       console.log(cyan(`Temporal UI Server is running on Port ${uiPort}.`));
     },
     async closeBundle() {
-      await temporal.shutdown();
+      await temporal?.shutdown();
     },
   };
 }
