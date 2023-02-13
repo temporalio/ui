@@ -100,9 +100,13 @@
       on:submit={updateQuery}
     />
   {:else}
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-5">
+    <div
+      role="search"
+      class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-5"
+    >
       <Input
         icon="search"
+        type="search"
         id="workflow-id-filter"
         placeholder="Workflow ID"
         bind:value={parameters.workflowId}
@@ -110,6 +114,7 @@
       />
       <Input
         icon="search"
+        type="search"
         id="workflow-type-filter"
         placeholder="Workflow Type"
         bind:value={parameters.workflowType}

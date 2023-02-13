@@ -35,7 +35,13 @@
   </Hst.Variant>
 
   <Hst.Variant title="A Text Input with an Icon">
-    <Input id="input-2" bind:value placeholder="Search" icon="search" />
+    <Input
+      id="input-2"
+      bind:value
+      placeholder="Search"
+      icon="search"
+      type="search"
+    />
   </Hst.Variant>
 
   <Hst.Variant title="A Copyable Input">

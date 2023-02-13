@@ -73,6 +73,7 @@
         <div class="w-full xl:w-1/2">
           <Input
             icon="search"
+            type="search"
             id="schedule-name-filter"
             placeholder="Schedule Name"
             clearable
