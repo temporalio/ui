@@ -117,7 +117,7 @@
       />
       <Select
         id="time-range-filter"
-        placeholder="Time Range"
+        label="Time Range"
         bind:value={parameters.timeRange}
         on:change={handleParameterChange}
       >
@@ -139,7 +139,11 @@
           <Option {value}>{label}</Option>
         {/each}
       </Select>
-      <Select id="filter-by-relative-time" bind:value={$timeFormat}>
+      <Select
+        id="filter-by-relative-time"
+        bind:value={$timeFormat}
+        label="Time Format"
+      >
         <Option value={'relative'}>Relative</Option>
         <Option value={'UTC'}>UTC</Option>
         <Option value={'local'}>Local</Option>
