@@ -4,11 +4,19 @@
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import HoverCard from '$lib/holocene/hover-card.svelte';
   import { userSettings } from '$lib/stores/user-settings';
-  import { CoreUserSettings } from '$lib/models/core-user';
+  import {
+    CoreUserSettings,
+    CoreUserEmbeddedContent,
+  } from '$lib/models/core-user';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
+  import DropdownButton from '$lib/holocene/dropdown-button/dropdown-button.svelte';
+  import { capitalize } from '$lib/utilities/format-camel-case';
+  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
+  import { timeFormat } from '$lib/stores/time-format';
 
   let activeTemplate = 'developer';
 
@@ -41,10 +49,10 @@
       label: 'Show Input and Results',
       option: CoreUserSettings.WORKFLOW_INPUT_AND_RESULTS,
     },
-    {
-      label: 'Decode JSON View Payloads',
-      option: CoreUserSettings.WORKFLOW_DECODE_JSON_VIEW,
-    },
+    // {
+    //   label: 'Decode JSON View Payloads',
+    //   option: CoreUserSettings.WORKFLOW_DECODE_JSON_VIEW,
+    // },
   ];
 </script>
 
@@ -78,7 +86,20 @@
         <td>Option</td>
       </TableHeaderRow>
       <TableRow>
-        <td><h3>Timezone preference picker goes here...</h3></td>
+        <td class="flex items-center gap-8"
+          >Time Preference
+          <DropdownButton
+            id="timezone"
+            label={capitalize($timeFormat)}
+            icon="clock"
+          >
+            <MenuItem on:click={() => ($timeFormat = 'relative')}
+              >Relative</MenuItem
+            >
+            <MenuItem on:click={() => ($timeFormat = 'UTC')}>UTC</MenuItem>
+            <MenuItem on:click={() => ($timeFormat = 'local')}>Local</MenuItem>
+          </DropdownButton>
+        </td>
       </TableRow>
     </Table>
   </section>
@@ -131,6 +152,65 @@
               />{widget.label}
             </label>
           {/each}
+        </td>
+      </TableRow>
+    </Table>
+  </section>
+  <section class="flex flex-col gap-4">
+    <h2 class="text-xl">Embedded Content</h2>
+    <Table variant="fancy">
+      <TableHeaderRow>
+        <td>Page</td>
+        <td>Src</td>
+      </TableHeaderRow>
+      <TableRow>
+        <td><h3>Workflows List</h3></td>
+        <td class="flex flex-col gap-2">
+          <Input
+            id={CoreUserEmbeddedContent.WORKFLOWS.TOP}
+            label="Top"
+            bind:value={$userSettings['WORKFLOWS.TOP']}
+          />
+          <Input
+            id={CoreUserEmbeddedContent.WORKFLOWS.LEFT}
+            label="Left"
+            bind:value={$userSettings['WORKFLOWS.LEFT']}
+          />
+          <Input
+            id={CoreUserEmbeddedContent.WORKFLOWS.RIGHT}
+            label="Right"
+            bind:value={$userSettings['WORKFLOWS.RIGHT']}
+          />
+          <Input
+            id={CoreUserEmbeddedContent.WORKFLOWS.BOTTOM}
+            label="Bottom"
+            bind:value={$userSettings['WORKFLOWS.BOTTOM']}
+          />
+        </td>
+      </TableRow>
+      <TableRow>
+        <td><h3>Workflow Execution</h3></td>
+        <td class="flex flex-col gap-2">
+          <Input
+            id={CoreUserEmbeddedContent.WORKFLOW.TOP}
+            label="Top"
+            bind:value={$userSettings['WORKFLOW.TOP']}
+          />
+          <Input
+            id={CoreUserEmbeddedContent.WORKFLOW.LEFT}
+            label="Left"
+            bind:value={$userSettings['WORKFLOW.LEFT']}
+          />
+          <Input
+            id={CoreUserEmbeddedContent.WORKFLOW.RIGHT}
+            label="Right"
+            bind:value={$userSettings['WORKFLOW.RIGHT']}
+          />
+          <Input
+            id={CoreUserEmbeddedContent.WORKFLOW.BOTTOM}
+            label="Bottom"
+            bind:value={$userSettings['WORKFLOW.BOTTOM']}
+          />
         </td>
       </TableRow>
     </Table>
