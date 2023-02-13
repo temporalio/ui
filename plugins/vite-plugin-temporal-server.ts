@@ -9,7 +9,11 @@ const { cyan, magenta } = kleur;
 
 let temporal: TemporalServer;
 
-const shouldSkip = !!process.env.VERCEL;
+const shouldSkip = (): boolean => {
+  if (process.env.VERCEL) return true;
+  if (temporal) return true;
+  return false;
+};
 
 const getPortFromApiEndpoint = (endpoint: string, fallback = 8233): number => {
   return validatePort(
@@ -27,10 +31,14 @@ const isValidPort = (port: number): boolean => {
 };
 
 const validatePort = (port: number | string, fallback: number): number => {
-  if (typeof port !== 'number') port = Number(port);
+  port = Number(port);
+
   if (isValidPort(port)) return port;
-  console.error(`${port} is not a valid port. Falling back to ${fallback}`);
+
+  console.error(`${port} is not a valid port. Falling back to ${fallback}.`);
+
   if (isValidPort(fallback)) return fallback;
+
   throw new Error(
     `Both the provided port, ${port}, and its fallback, ${fallback}, are invalid ports.`,
   );
@@ -42,8 +50,7 @@ export function temporalServer(): Plugin {
     enforce: 'post',
     apply: 'serve',
     async configureServer(server) {
-      if (shouldSkip) return;
-      if (temporal) return;
+      if (shouldSkip()) return;
 
       const port = validatePort(server.config.env.VITE_TEMPORAL_PORT, 7233);
       const uiPort = getPortFromApiEndpoint(server.config.env.VITE_API);
@@ -62,14 +69,12 @@ export function temporalServer(): Plugin {
       console.log(cyan(`Temporal UI Server is running on Port ${uiPort}.`));
     },
     async closeBundle() {
-      if (!shouldSkip) return;
-      if (!temporal) return;
-
       await temporal?.shutdown();
     },
   };
 }
 
 process.on('beforeExit', async () => {
-  await temporal.shutdown();
+  if (!temporal) return;
+  await temporal?.shutdown();
 });
