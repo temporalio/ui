@@ -1,9 +1,12 @@
-import { formatDate } from '$lib/utilities/format-date';
+import { get } from 'svelte/store';
+import { timeFormat } from '$lib/stores/time-format';
+
 import {
   shouldDisplayAttribute,
   shouldDisplayNestedAttribute,
 } from '$lib/utilities/get-single-attribute-for-event';
 import { capitalize } from '$lib/utilities/format-camel-case';
+import { formatDate } from '$lib/utilities/format-date';
 
 export type CombinedAttributes = EventAttribute & {
   eventTime?: string;
@@ -92,7 +95,8 @@ export const formatAttributes = (
 ): CombinedAttributes => {
   const attributes: CombinedAttributes = {};
 
-  if (compact) attributes.eventTime = formatDate(event.eventTime);
+  if (compact)
+    attributes.eventTime = formatDate(event.eventTime, get(timeFormat));
 
   for (const [key, value] of Object.entries(event.attributes)) {
     const shouldDisplay = shouldDisplayAttribute(key, value);
