@@ -25,7 +25,7 @@ jobs:
       - name: Setup Protoc
         uses: arduino/setup-protoc@v1
         with:
-          version: "3.x"
+          version: '3.x'
       - name: Build
         run: cd server && make install-utils build-grpc build-ui
       - name: Checkout UI Server
@@ -34,6 +34,7 @@ jobs:
           repository: temporalio/ui-server
           path: ui-server
           ref: ui-release
+          token: ${{ secrets.COMMANDER_DATA_TOKEN }}
       - name: Sync
         run: |
           rm -rf ui-server/*
@@ -41,6 +42,5 @@ jobs:
           cd ui-server
           git config --local user.name 'Temporal Data (cicd)'
           git config --local user.email 'commander-data@temporal.io'
-          git remote set-url origin https://x-access-token:${{ secrets.COMMANDER_DATA_TOKEN }}@github.com/temporalio/ui-server
           git add .
           git commit -m "Update UI Server" && git push || echo "No changes to commit"
