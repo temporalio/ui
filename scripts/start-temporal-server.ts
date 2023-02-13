@@ -2,6 +2,11 @@ import { join } from 'path';
 import waitForPort from 'wait-port';
 import { $, chalk } from 'zx';
 
+export type TemporalServer = {
+  shutdown: () => Promise<number | null>;
+  ready: () => Promise<boolean>;
+};
+
 const localCLIPath = join(process.cwd(), 'bin', 'cli', 'temporal');
 
 type TemporalServerOptions = {
@@ -13,11 +18,6 @@ type TemporalServerOptions = {
 
 const warn = (message: Parameters<typeof console.warn>[0]) => {
   console.warn(`${chalk.bgYellow.black('WARN')}: ${message}`);
-};
-
-export type TemporalServer = {
-  shutdown: () => Promise<number | null>;
-  ready: () => Promise<boolean>;
 };
 
 const getCLIPath = async (cliPath = localCLIPath): Promise<string | void> => {
@@ -63,18 +63,21 @@ export const createTemporalServer = async ({
 
   const temporal = $`${cliPath} server start-dev ${flags}`.quiet();
 
-  temporal.catch(async ({ stdout, exitCode }) => {
-    try {
-      const { error }: { error: string } = JSON.parse(stdout);
-      if (error.includes('address already in use')) {
-        return warn(
-          `Port ${port} is already in use. Falling back to whatever is running on that port.`,
-        );
-      }
+  temporal.catch(async ({ stdout, stderr, exitCode }) => {
+    if (exitCode) {
+      try {
+        const { error }: { error: string } = JSON.parse(stdout);
 
-      throw new Error(stdout);
-    } catch (error) {
-      warn(exitCode);
+        if (error.includes('address already in use')) {
+          return warn(
+            `Port ${port} is already in use. Falling back to whatever is running on that port.`,
+          );
+        }
+
+        throw new Error(stderr ?? stdout);
+      } catch (error) {
+        throw new Error(stderr ?? stdout);
+      }
     }
   });
 
