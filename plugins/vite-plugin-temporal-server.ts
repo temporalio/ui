@@ -11,6 +11,8 @@ let temporal: TemporalServer;
 
 const shouldSkip = (): boolean => {
   if (process.env.VERCEL) return true;
+  if (process.env.HISTOIRE) return true;
+  if (process.env.VITEST) return true;
   if (temporal) return true;
   if (process.platform === 'win32') return true;
 
