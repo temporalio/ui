@@ -17,7 +17,7 @@ jobs:
         uses: ./.github/actions/checkout-and-setup
       - name: Build UI
         run: pnpm build:server
-      
+
       - uses: actions/setup-go@v3
         with:
           go-version-file: server/go.mod
