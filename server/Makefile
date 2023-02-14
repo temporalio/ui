@@ -26,20 +26,11 @@ PROTO_IMPORTS := \
 	-I ./proto/dependencies/
 PROTO_REFS := Mgoogle/protobuf/wrappers.proto=github.com/gogo/protobuf/types,Mgoogle/protobuf/duration.proto=github.com/gogo/protobuf/types,Mgoogle/protobuf/empty.proto=github.com/gogo/protobuf/types,Mgoogle/protobuf/descriptor.proto=github.com/gogo/protobuf/protoc-gen-gogo/descriptor,Mgoogle/protobuf/timestamp.proto=github.com/gogo/protobuf/types,Mgoogle/api/annotations.proto=github.com/gogo/googleapis/google/api
 OPENAPI_OUT := openapi/assets
-UI_OUT := ui/assets
 
 ##### Build #####
-build: build-ui build-grpc build-server
+build: build-grpc build-server
 
-build-cloud: build-ui-cloud build-grpc build-server
-
-build-ui:
-	rm -rf $(UI_OUT)
-	go generate ./ui
-
-build-ui-cloud:
-	rm -rf $(UI_OUT)
-	VITE_TEMPORAL_UI_BUILD_TARGET=cloud go generate ./ui
+build-cloud: build-grpc build-server
 
 build-server:
 	go mod tidy
@@ -60,7 +51,7 @@ build-grpc:
 	mv -f $(PROTO_OUT)/temporal/api/* $(PROTO_OUT) && rm -rf $(PROTO_OUT)/temporal
 
 ##### Install dependencies #####
-install: install-submodules install-utils install-ui
+install: install-submodules install-utils
 
 install-utils:
 	@go install github.com/temporalio/gogo-protobuf/protoc-gen-gogoslick@latest
@@ -73,9 +64,6 @@ install-utils:
 install-submodules:
 	@printf $(COLOR) "fetching submodules..."
 	git submodule update --init
-
-install-ui:
-	(cd ../ && pnpm install)
 
 ##### Test #####
 test: clean-test-results
