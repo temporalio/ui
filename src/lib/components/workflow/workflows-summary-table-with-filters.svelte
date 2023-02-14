@@ -15,6 +15,7 @@
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
+  import { supportsAdvancedVisibilityFully } from '$lib/stores/bulk-actions';
 
   const dispatch = createEventDispatcher<{
     terminateWorkflows: undefined;
@@ -34,8 +35,9 @@
   $: terminateEnabled = workflowTerminateEnabled($page.data.settings);
   $: cancelEnabled = workflowCancelEnabled($page.data.settings);
 
-  // Disable sort with workflows over 1M
-  $: disabled = $workflowCount?.totalCount >= 1000000;
+  // Disable sort with workflows over 1M or if <= 1.20
+  $: disabled =
+    $workflowCount?.totalCount >= 1000000 || !$supportsAdvancedVisibilityFully;
 
   const handleBulkTerminate = () => {
     dispatch('terminateWorkflows');

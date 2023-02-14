@@ -1,7 +1,10 @@
 import { derived } from 'svelte/store';
 import { page } from '$app/stores';
 
-import { advancedVisibilityEnabled } from '$lib/utilities/advanced-visibility-enabled';
+import {
+  advancedVisibilityEnabled,
+  advancedVisibilityEnabledFully,
+} from '$lib/utilities/advanced-visibility-enabled';
 import { isVersionNewer } from '$lib/utilities/version-check';
 
 import { cluster } from './cluster';
@@ -23,4 +26,10 @@ export const supportsAdvancedVisibility = derived(
   [cluster, temporalVersion, isCloud],
   ([$cluster, $temporalVersion, $isCloud]) =>
     advancedVisibilityEnabled($cluster, $temporalVersion) ?? $isCloud,
+);
+
+export const supportsAdvancedVisibilityFully = derived(
+  [cluster, temporalVersion, isCloud],
+  ([$cluster, $temporalVersion, $isCloud]) =>
+    advancedVisibilityEnabledFully($cluster, $temporalVersion) ?? $isCloud,
 );
