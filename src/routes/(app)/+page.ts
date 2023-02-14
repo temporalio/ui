@@ -8,7 +8,7 @@ export const load: PageLoad = async ({ parent }) => {
 
   const defaultNamespace = data?.settings?.defaultNamespace;
   const isCloud = data.settings.runtimeEnvironment?.isCloud;
-
+  console.log('hello');
   if (isCloud) {
     throw redirect(
       302,
