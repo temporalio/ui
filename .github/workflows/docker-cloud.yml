@@ -16,7 +16,8 @@ jobs:
 
       - uses: actions/setup-go@v3
         with:
-          go-version-file: 'go.mod'
+          go-version-file: server/go.mod
+          cache-dependency-path: server/go.sum
           cache: true
           check-latest: true
       - name: Set up Protoc

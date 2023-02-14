@@ -18,7 +18,8 @@ jobs:
 
       - uses: actions/setup-go@v3
         with:
-          go-version-file: 'go.mod'
+          go-version-file: server/go.mod
+          cache-dependency-path: server/go.sum
           cache: true
           check-latest: true
       - name: Set up Protoc
@@ -27,6 +28,7 @@ jobs:
           version: '3.x'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build GRPC
+        working-directory: server
         run: make install-utils build-grpc
 
       - name: Set up QEMU
