@@ -17,6 +17,8 @@ jobs:
           submodules: true
       - name: Checkout and Setup Node
         uses: ./.github/actions/checkout-and-setup
+      - name: Build UI
+        run: pnpm build:server
       - uses: actions/setup-go@v3
         with:
           go-version-file: server/go.mod
@@ -28,7 +30,7 @@ jobs:
           version: '3.x'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build
-        run: cd server && make install-utils build-grpc build-ui
+        run: cd server && make install-utils build-grpc
       - name: Checkout UI Server
         uses: actions/checkout@v3
         with:
