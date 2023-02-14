@@ -1,11 +1,12 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { HstSvelte } from '@histoire/plugin-svelte';
 import { defaultColors } from 'histoire';
+import { temporalServer } from './plugins/vite-plugin-temporal-server';
 import path from 'path';
 
 /** @type {import('vite').UserConfig} */
 export default {
-  plugins: [sveltekit()],
+  plugins: [sveltekit(), temporalServer()],
   histoire: {
     plugins: [HstSvelte()],
     setupFile: './src/histoire.setup.ts',

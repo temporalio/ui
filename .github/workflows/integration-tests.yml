@@ -1,10 +1,15 @@
 name: Cypress Tests
+run-name: ${{github.event.pull_request.title}} (${{ github.event.pull_request.number }}) by @${{ github.triggering_actor }} (Attempt ${{ github.run_attempt }})
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
 
 jobs:
   cypress-run:

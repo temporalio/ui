@@ -4,22 +4,22 @@ import { finished } from 'stream/promises';
 import zlib from 'node:zlib';
 
 import fetch from 'node-fetch';
-import kleur from 'kleur';
+import { chalk } from 'zx';
 import mkdirp from 'mkdirp';
 import rimraf from 'rimraf';
 import tar from 'tar-fs';
 
-console.log(kleur.cyan('Getting ready to download Temporal CLI…'));
+console.log(chalk.cyan('Getting ready to download Temporal CLI…'));
 
 if (process.env.VERCEL) {
   console.log(
-    kleur.blue('Running on Vercel; skipping downloading Temporal CLI.'),
+    chalk.blue('Running on Vercel; skipping downloading Temporal CLI.'),
   );
   process.exit(0);
 }
 
-const reportError = (error, exitCode = 1, callback) => {
-  console.error(kleur.bgRed('Error:'), kleur.red(error));
+const reportError = (error: string, exitCode = 1, callback?: () => void) => {
+  console.error(chalk.bgRed('Error:'), chalk.red(error));
   if (callback && typeof callback === 'function') {
     callback();
   }
@@ -44,12 +44,17 @@ removeDirectory();
 await mkdirp(destinationDirectory);
 
 console.log(
-  kleur.bgYellow('Downloading:'),
-  kleur.yellow().underline(downloadUrl),
+  chalk.bgYellow('Downloading:'),
+  chalk.yellow.underline(downloadUrl),
 );
 
 try {
   const response = await fetch(downloadUrl);
+
+  if (!response.body)
+    throw new Error(
+      `Failed to find a "body" in the response form ${downloadUrl}.`,
+    );
 
   await finished(
     response.body.pipe(zlib.createGunzip()).pipe(tar.extract(destination)),
@@ -58,8 +63,8 @@ try {
   await chmod(destination, 0o755);
 
   console.log(
-    kleur.bgGreen('Download complete:'),
-    kleur.green().underline(join(destination, 'temporal')),
+    chalk.bgGreen('Download complete:'),
+    chalk.green.underline(join(destination, 'temporal')),
   );
 } catch (error) {
   reportError(error, 2, removeDirectory);
