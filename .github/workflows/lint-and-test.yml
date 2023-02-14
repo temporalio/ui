@@ -1,0 +1,54 @@
+name: Run Tests, Lint, and Check Types
+run-name: ${{github.event.pull_request.title}} (${{ github.event.pull_request.number }}) by @${{ github.triggering_actor }} (Attempt ${{ github.run_attempt }})
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Checkout and Setup Node
+        uses: ./.github/actions/checkout-and-setup
+      - name: Lint
+        run: pnpm run --if-present lint
+  check-types:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Checkout and Setup Node
+        uses: ./.github/actions/checkout-and-setup
+      - name: Check Types
+        run: pnpm run check
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Checkout and Setup Node
+        uses: ./.github/actions/checkout-and-setup
+      - name: Run Unit Tests
+        run: pnpm test
+  snapshot-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Checkout and Setup Node
+        uses: ./.github/actions/checkout-and-setup
+      - name: Run Snapshot Tests
+        run: pnpm test:snapshot

@@ -95,7 +95,7 @@
         <Icon name="lock" />
       </div>
     {:else if clearable && value}
-      <div class="clear-icon-container" data-cy="clear-input">
+      <div class="clear-icon-container" data-testid="clear-input">
         <IconButton on:click={onClear} icon="close" />
       </div>
     {/if}

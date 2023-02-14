@@ -55,10 +55,12 @@
   title={`Namespaces | ${namespace?.namespaceInfo?.name}`}
   url={$page.url.href}
 />
-<h1 class="text-2xl" data-cy="namespace-title">
+<h1 class="text-2xl" data-testid="namespace-title">
   Namespace: {namespace?.namespaceInfo?.name}
 </h1>
-<h2 data-cy="namespace-description">{namespace?.namespaceInfo?.description}</h2>
+<h2 data-testid="namespace-description">
+  {namespace?.namespaceInfo?.description}
+</h2>
 <Card class="flex flex-col gap-4 lg:flex-row">
   <article class="namespace-info flex w-full flex-col">
     <h3 class="text-lg font-medium">Details</h3>
@@ -66,11 +68,11 @@
       <tr slot="headers">
         <th class="w-1/2 lg:w-3/5" /><th />
       </tr>
-      <tr data-cy="namespace-owner">
+      <tr data-testid="namespace-owner">
         <td>Owner</td>
         <td>{namespace?.namespaceInfo?.ownerEmail || 'Unknown'}</td>
       </tr>
-      <tr data-cy="namespace-global">
+      <tr data-testid="namespace-global">
         <td>Global</td>
         <td>
           <Badge
@@ -81,7 +83,7 @@
           </Badge>
         </td>
       </tr>
-      <tr data-cy="namespace-retention">
+      <tr data-testid="namespace-retention">
         <td>Retention Period</td>
         <td
           >{fromSecondsToDaysOrHours(
@@ -89,7 +91,7 @@
           )}</td
         >
       </tr>
-      <tr data-cy="namespace-history">
+      <tr data-testid="namespace-history">
         <td>History Archival</td>
         <td
           ><Badge
@@ -102,7 +104,7 @@
           </Badge></td
         >
       </tr>
-      <tr data-cy="namespace-visibility">
+      <tr data-testid="namespace-visibility">
         <td>Visibility Archival</td>
         <td
           ><Badge
@@ -115,11 +117,11 @@
           </Badge></td
         >
       </tr>
-      <tr data-cy="namespace-failover">
+      <tr data-testid="namespace-failover">
         <td>Failover Version</td>
         <td>{namespace?.failoverVersion}</td>
       </tr>
-      <tr data-cy="namespace-clusters">
+      <tr data-testid="namespace-clusters">
         <td>Clusters</td>
         <td>{clusters}</td>
       </tr>
@@ -133,11 +135,11 @@
         <th class="w-1/2 lg:w-3/4" /><th />
       </tr>
 
-      <tr data-cy="server-version">
+      <tr data-testid="server-version">
         <td>Temporal Server Version</td>
         <td>{$temporalVersion}</td>
       </tr>
-      <tr data-cy="ui-version">
+      <tr data-testid="ui-version">
         <td>Temporal UI Version</td>
         <td>{$uiVersion}</td>
       </tr>

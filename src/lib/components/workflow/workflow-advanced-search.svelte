@@ -9,7 +9,7 @@
   import Button from '$lib/holocene/button.svelte';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
-  import { workflowsQuery } from '$lib/stores/workflows';
+  import { refresh, workflowsQuery } from '$lib/stores/workflows';
 
   let manualSearchString = '';
 
@@ -34,12 +34,16 @@
       } catch (e) {}
     }
 
-    updateQueryParameters({
-      url: $page.url,
-      parameter: 'query',
-      value: manualSearchString,
-      allowEmpty: true,
-    });
+    if (manualSearchString && manualSearchString === query) {
+      $refresh = Date.now();
+    } else {
+      updateQueryParameters({
+        url: $page.url,
+        parameter: 'query',
+        value: manualSearchString,
+        allowEmpty: true,
+      });
+    }
   };
 
   function handleClearInput() {
@@ -65,7 +69,7 @@
         bind:value={manualSearchString}
       />
       <Button
-        dataCy="manual-search-button"
+        testId="manual-search-button"
         variant="primary"
         class="h-10"
         unroundLeft

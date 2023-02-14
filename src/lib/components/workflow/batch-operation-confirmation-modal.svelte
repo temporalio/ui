@@ -50,7 +50,7 @@
         <div
           class="mb-2 overflow-scroll whitespace-nowrap rounded border border-primary bg-gray-100 p-2"
         >
-          <code data-cy="batch-action-workflows-query">
+          <code data-testid="batch-action-workflows-query">
             {query}
           </code>
         </div>

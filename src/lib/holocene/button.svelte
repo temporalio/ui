@@ -21,7 +21,7 @@
   export let icon: IconName = null;
   export let iconClass: string = null;
   export let classes: string = $$props.class;
-  export let dataCy: string = $$props.dataCy;
+  export let testId: string = $$props.testId;
   export let count: number = 0;
   export let type: string = 'button';
   export let unround: boolean = false;
@@ -40,7 +40,7 @@
     class:unround
     class:unroundRight
     class:unroundLeft
-    data-cy={dataCy}
+    data-testid={testId}
     {type}
     {disabled}
     {id}
@@ -67,7 +67,7 @@
     class:large
     class:disabled
     class:thin
-    data-cy={dataCy}
+    data-testid={testId}
     {target}
     {id}
   >

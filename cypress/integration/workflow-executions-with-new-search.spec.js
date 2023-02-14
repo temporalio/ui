@@ -26,15 +26,15 @@ describe('Workflow Executions List With Search', () => {
   describe('Workflow Manual Search', () => {
     it('should change url on manual search and update filters and show results count', () => {
       cy.get('#manual-search').type('WorkflowType="ImportantWorkflowType"');
-      cy.get('[data-cy="manual-search-button"]').click();
+      cy.get('[data-testid="manual-search-button"]').click();
 
       const result = encodeURIComponent('WorkflowType="ImportantWorkflowType"');
       cy.url().should('contain', result);
 
-      cy.get('[data-cy="workflow-type-filter-button"]').click();
+      cy.get('[data-testid="workflow-type-filter-button"]').click();
       cy.get('#workflowType').should('have.value', 'ImportantWorkflowType');
 
-      cy.get('[data-cy="workflow-count"]').should(
+      cy.get('[data-testid="workflow-count"]').should(
         'have.text',
         'Results 15 of 15 workflows',
       );
@@ -43,7 +43,7 @@ describe('Workflow Executions List With Search', () => {
 
   describe('Workflow Filters', () => {
     it('should send the correct query for Workflow Type, autocomplete manual search and be clearable', () => {
-      cy.get('[data-cy="workflow-type-filter-button"]').click();
+      cy.get('[data-testid="workflow-type-filter-button"]').click();
 
       cy.get('#workflowType').type('ImportantWorkflowType');
 
@@ -54,20 +54,20 @@ describe('Workflow Executions List With Search', () => {
         'WorkflowType="ImportantWorkflowType"',
       );
 
-      cy.get('[data-cy="workflow-count"]').should(
+      cy.get('[data-testid="workflow-count"]').should(
         'have.text',
         'Results 15 of 15 workflows',
       );
 
       cy.get(
-        '.px-2 > .input-container > [data-cy="clear-input"] > .icon-button',
+        '.px-2 > .input-container > [data-testid="clear-input"] > .icon-button',
       ).click();
 
       cy.url().should('not.contain', result);
     });
 
     it('should send the correct query for Workflow ID, autocomplete manual search and be clearable', () => {
-      cy.get('[data-cy="workflow-id-filter-button"]').click();
+      cy.get('[data-testid="workflow-id-filter-button"]').click();
 
       cy.get('#workflowId').type('002c98_Running');
 
@@ -77,21 +77,21 @@ describe('Workflow Executions List With Search', () => {
         'have.value',
         'WorkflowId="002c98_Running"',
       );
-      cy.get('[data-cy="workflow-count"]').should(
+      cy.get('[data-testid="workflow-count"]').should(
         'have.text',
         'Results 15 of 15 workflows',
       );
 
       cy.get(
-        '.px-2 > .input-container > [data-cy="clear-input"] > .icon-button',
+        '.px-2 > .input-container > [data-testid="clear-input"] > .icon-button',
       ).click();
 
       cy.url().should('not.contain', result);
     });
 
     it('should change url on single Execution Status change', () => {
-      cy.get('[data-cy="execution-status-filter-button"]').click();
-      cy.get('[data-cy="Running"]').click();
+      cy.get('[data-testid="execution-status-filter-button"]').click();
+      cy.get('[data-testid="Running"]').click();
 
       const result = encodeURIComponent('ExecutionStatus="Running"');
       cy.url().should('contain', result);
@@ -99,16 +99,16 @@ describe('Workflow Executions List With Search', () => {
         'have.value',
         'ExecutionStatus="Running"',
       );
-      cy.get('[data-cy="workflow-count"]').should(
+      cy.get('[data-testid="workflow-count"]').should(
         'have.text',
         'Results 15 of 15 workflows',
       );
     });
 
     it('should change url on multiple Execution Status change', () => {
-      cy.get('[data-cy="execution-status-filter-button"]').click();
-      cy.get('[data-cy="Running"]').click();
-      cy.get('[data-cy="Failed"]').click();
+      cy.get('[data-testid="execution-status-filter-button"]').click();
+      cy.get('[data-testid="Running"]').click();
+      cy.get('[data-testid="Failed"]').click();
 
       const result =
         '%28ExecutionStatus%3D%22Running%22+OR+ExecutionStatus%3D%22Failed%22%29';
@@ -120,26 +120,26 @@ describe('Workflow Executions List With Search', () => {
     });
 
     it('should clear Execution Status on All', () => {
-      cy.get('[data-cy="execution-status-filter-button"]').click();
-      cy.get('[data-cy="Running"]').click();
-      cy.get('[data-cy="Failed"]').click();
+      cy.get('[data-testid="execution-status-filter-button"]').click();
+      cy.get('[data-testid="Running"]').click();
+      cy.get('[data-testid="Failed"]').click();
 
       const result =
         '%28ExecutionStatus%3D%22Running%22+OR+ExecutionStatus%3D%22Failed%22%29';
       cy.url().should('contain', result);
 
-      cy.get('[data-cy="All"]').click();
+      cy.get('[data-testid="All"]').click();
       cy.url().should('contain.not', result);
     });
 
     it('should combine all three filters', () => {
-      cy.get('[data-cy="execution-status-filter-button"]').click();
-      cy.get('[data-cy="Running"]').click();
+      cy.get('[data-testid="execution-status-filter-button"]').click();
+      cy.get('[data-testid="Running"]').click();
 
-      cy.get('[data-cy="workflow-id-filter-button"]').click();
+      cy.get('[data-testid="workflow-id-filter-button"]').click();
       cy.get('#workflowId').type('002c98_Running');
 
-      cy.get('[data-cy="workflow-type-filter-button"]').click();
+      cy.get('[data-testid="workflow-type-filter-button"]').click();
       cy.get('#workflowType').type('ImportantWorkflowType');
 
       const result =
@@ -156,7 +156,7 @@ describe('Workflow Executions List With Search', () => {
       cy.contains('15 minutes').click();
 
       cy.url().should('contain', 'StartTime+BETWEEN');
-      cy.get('[data-cy="workflow-count"]').should(
+      cy.get('[data-testid="workflow-count"]').should(
         'have.text',
         'Results 15 of 15 workflows',
       );
@@ -168,7 +168,7 @@ describe('Workflow Executions List With Search', () => {
       cy.contains('End Time').click();
 
       cy.url().should('contain', 'CloseTime+BETWEEN');
-      cy.get('[data-cy="workflow-count"]').should(
+      cy.get('[data-testid="workflow-count"]').should(
         'have.text',
         'Results 15 of 15 workflows',
       );
@@ -192,8 +192,8 @@ describe('Workflow Executions List With Search', () => {
       });
 
       it('should keep single workflow filter after navigating away and back to workflow list', () => {
-        cy.get('[data-cy="execution-status-filter-button"]').click();
-        cy.get('[data-cy="Running"]').click();
+        cy.get('[data-testid="execution-status-filter-button"]').click();
+        cy.get('[data-testid="Running"]').click();
 
         cy.url().should(
           'contain',
@@ -206,13 +206,13 @@ describe('Workflow Executions List With Search', () => {
         cy.wait('@event-history-api');
 
         cy.url().should('contain', '/history');
-        cy.get('[data-cy="back-to-workflows"]').click();
+        cy.get('[data-testid="back-to-workflows"]').click();
 
         cy.url().should(
           'contain',
           encodeURIComponent(`ExecutionStatus="Running"`),
         );
-        cy.get('[data-cy="workflow-count"]').should(
+        cy.get('[data-testid="workflow-count"]').should(
           'have.text',
           'Results 15 of 15 workflows',
         );

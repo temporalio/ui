@@ -12,7 +12,7 @@
     class:disabled
     tabindex="0"
     {href}
-    data-cy={$$props.dataCy}
+    data-testid={$$props.testId}
   >
     {label}
     <slot />
@@ -22,7 +22,7 @@
     class="tab cursor-pointer"
     class:active
     class:disabled
-    data-cy={$$props.dataCy}
+    data-testid={$$props.testId}
     tabindex="0"
     on:click
     on:keypress

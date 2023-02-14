@@ -1,0 +1,50 @@
+name: Update UI Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Checkout and Setup Node
+        uses: ./.github/actions/checkout-and-setup
+      - name: Build UI
+        run: pnpm build:server
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: server/go.mod
+          cache: true
+          cache-dependency-path: server/go.sum
+      - name: Setup Protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          version: '3.x'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build
+        run: cd server && make install-utils build-grpc
+
+      - name: Checkout UI Server
+        uses: actions/checkout@v3
+        with:
+          repository: temporalio/ui-server
+          path: ui-server
+          ref: main
+          token: ${{ secrets.COMMANDER_DATA_TOKEN }}
+      - name: Sync
+        run: |
+          rm -rf ui-server/*
+          cp -r server/* ui-server
+          cd ui-server
+          rm -rf server/proto/dependencies/api/.git
+          git config --local user.name 'Temporal Data (cicd)'
+          git config --local user.email 'commander-data@temporal.io'
+          git add .
+          git commit -m "Update UI Server" && git push || echo "No changes to commit"

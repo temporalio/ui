@@ -59,9 +59,11 @@
   ): IterableEvent[] => {
     if (category) {
       const filteredItems = items.filter((i) => i.category === category);
-      return compact ? groupEvents(filteredItems) : filteredItems;
+      return compact
+        ? groupEvents(filteredItems, $eventFilterSort)
+        : filteredItems;
     }
-    return compact ? groupEvents(items) : items;
+    return compact ? groupEvents(items, $eventFilterSort) : items;
   };
 
   $: category = $page.url.searchParams.get('category');
@@ -75,7 +77,7 @@
   $: updating = currentEvents.length && !fullHistory.length;
 </script>
 
-{#key [$eventFilterSort, category, $refresh]}
+{#key [$eventFilterSort, category]}
   <Pagination
     floatId="event-view-toggle"
     {items}
