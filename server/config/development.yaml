@@ -1,0 +1,49 @@
+publicPath:
+enableUi: true
+enableOpenApi: true
+cors:
+  allowOrigins:
+    - http://localhost:3000 # used at development by https://github.com/temporalio/ui
+refreshInterval: 1m
+defaultNamespace: default
+showTemporalSystemNamespace: false
+feedbackUrl:
+notifyOnNewVersion: true
+disableWriteActions: false
+workflowTerminateDisabled: false
+workflowCancelDisabled: false
+workflowSignalDisabled: false
+workflowResetDisabled: false
+batchActionsDisabled: false
+auth:
+  enabled: false
+  providers:
+    - label: Auth0 oidc # for internal use; in future may expose as button text
+      type: oidc # for futureproofing; only oidc is supported today
+      providerUrl: https://myorg.us.auth0.com/
+      issuerUrl: "" # needed if the Issuer Url and the Provider Url are different
+      clientId: xxxxxxxxxxxxxxxxxxxx
+      clientSecret: xxxxxxxxxxxxxxxxxxxx
+      scopes:
+        - openid
+        - profile
+        - email
+      callbackUrl: http://localhost:8080/auth/sso/callback
+      options: # added as URL query params when redirecting to auth provider
+        audience: myorg-dev
+        organization: org_xxxxxxxxxxxx
+        invitation:
+tls:
+  caFile:
+  certFile:
+  keyFile:
+  caData:
+  certData:
+  keyData:
+  enableHostVerification: false
+  serverName:
+codec:
+  endpoint:
+  passAccessToken: false
+forwardHeaders: # can be used to pass additional HTTP headers from HTTP requests to Temporal gRPC backend
+  - X-Forwarded-For
