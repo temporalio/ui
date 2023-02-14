@@ -1,10 +1,9 @@
+import { noop } from 'svelte/internal';
 import { vi } from 'vitest';
 
 const BroadcastChannelMock = vi.fn(() => ({
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  addEventListener: () => {},
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  postMessage: () => {},
+  addEventListener: noop,
+  postMessage: noop,
 }));
 
 vi.stubGlobal('BroadcastChannel', BroadcastChannelMock);
