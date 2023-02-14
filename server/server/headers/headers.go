@@ -28,7 +28,7 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/labstack/echo/v4"
-	"github.com/temporalio/ui/server/v2/server/api"
+	"github.com/temporalio/ui-server/v2/server/api"
 	"google.golang.org/grpc/metadata"
 )
 

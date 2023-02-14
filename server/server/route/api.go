@@ -25,8 +25,8 @@ package route
 import (
 	"github.com/labstack/echo/v4"
 
-	"github.com/temporalio/ui/server/v2/server/api"
-	"github.com/temporalio/ui/server/v2/server/config"
+	"github.com/temporalio/ui-server/v2/server/api"
+	"github.com/temporalio/ui-server/v2/server/config"
 )
 
 // SetAPIRoutes sets api routes

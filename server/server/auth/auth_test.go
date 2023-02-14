@@ -29,7 +29,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
-	"github.com/temporalio/ui/server/v2/server/auth"
+	"github.com/temporalio/ui-server/v2/server/auth"
 	"golang.org/x/oauth2"
 )
 

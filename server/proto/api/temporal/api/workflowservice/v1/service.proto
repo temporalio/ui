@@ -24,7 +24,7 @@ syntax = "proto3";
 
 package temporal.api.workflowservice.v1;
 
-option go_package = "github.com/temporalio/ui/server/v2/server/generated/api/workflowservice/v1;workflowservice";
+option go_package = "github.com/temporalio/ui-server/v2/server/generated/api/workflowservice/v1;workflowservice";
 
 import "temporal/api/workflowservice/v1/request_response.proto";
 import "google/api/annotations.proto";

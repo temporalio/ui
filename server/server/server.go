@@ -31,16 +31,16 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	"github.com/temporalio/ui/server/v2/server/api"
-	"github.com/temporalio/ui/server/v2/server/auth"
-	"github.com/temporalio/ui/server/v2/server/config"
-	"github.com/temporalio/ui/server/v2/server/csrf"
-	"github.com/temporalio/ui/server/v2/server/headers"
-	"github.com/temporalio/ui/server/v2/server/route"
-	"github.com/temporalio/ui/server/v2/server/server_options"
+	"github.com/temporalio/ui-server/v2/server/api"
+	"github.com/temporalio/ui-server/v2/server/auth"
+	"github.com/temporalio/ui-server/v2/server/config"
+	"github.com/temporalio/ui-server/v2/server/csrf"
+	"github.com/temporalio/ui-server/v2/server/headers"
+	"github.com/temporalio/ui-server/v2/server/route"
+	"github.com/temporalio/ui-server/v2/server/server_options"
 
-	"github.com/temporalio/ui/server/v2/openapi"
-	"github.com/temporalio/ui/server/v2/ui"
+	"github.com/temporalio/ui-server/v2/openapi"
+	"github.com/temporalio/ui-server/v2/ui"
 )
 
 type (

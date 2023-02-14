@@ -34,7 +34,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/labstack/echo/v4"
-	"github.com/temporalio/ui/server/v2/server/config"
+	"github.com/temporalio/ui-server/v2/server/config"
 )
 
 const (

@@ -56,6 +56,8 @@ type (
 		WorkflowCancelDisabled    bool `yaml:"workflowCancelDisabled"`
 		WorkflowSignalDisabled    bool `yaml:"workflowSignalDisabled"`
 		WorkflowResetDisabled     bool `yaml:"workflowResetDisabled"`
+		// Whether bulk/batch actions are enabled in the UI
+		BatchActionsDisabled bool `yaml:"batchActionsDisabled"`
 		// Forward specified HTTP headers from HTTP API requests to Temporal gRPC backend
 		ForwardHeaders []string `yaml:"forwardHeaders"`
 	}

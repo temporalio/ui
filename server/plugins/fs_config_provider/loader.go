@@ -33,7 +33,7 @@ import (
 	"gopkg.in/validator.v2"
 	"gopkg.in/yaml.v3"
 
-	"github.com/temporalio/ui/server/v2/server/config"
+	"github.com/temporalio/ui-server/v2/server/config"
 )
 
 const (

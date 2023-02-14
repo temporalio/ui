@@ -14,6 +14,7 @@ workflowTerminateDisabled: {{ default .Env.TEMPORAL_WORKFLOW_TERMINATE_DISABLED 
 workflowCancelDisabled: {{ default .Env.TEMPORAL_WORKFLOW_CANCEL_DISABLED "false" }}
 workflowSignalDisabled: {{ default .Env.TEMPORAL_WORKFLOW_SIGNAL_DISABLED "false" }}
 workflowResetDisabled: {{ default .Env.TEMPORAL_WORKFLOW_RESET_DISABLED "false" }}
+batchActionsDisabled: {{ default .Env.TEMPORAL_BATCH_ACTIONS_DISABLED "false" }}
 cors:
   allowOrigins:
     # override framework's default that allows all origins "*"

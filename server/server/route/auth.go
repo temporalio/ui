@@ -34,8 +34,8 @@ import (
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/gorilla/securecookie"
 	"github.com/labstack/echo/v4"
-	"github.com/temporalio/ui/server/v2/server/auth"
-	"github.com/temporalio/ui/server/v2/server/config"
+	"github.com/temporalio/ui-server/v2/server/auth"
+	"github.com/temporalio/ui-server/v2/server/config"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 )

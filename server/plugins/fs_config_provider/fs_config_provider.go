@@ -25,7 +25,7 @@
 package fs_config_provider
 
 import (
-	"github.com/temporalio/ui/server/v2/server/config"
+	"github.com/temporalio/ui-server/v2/server/config"
 )
 
 type (

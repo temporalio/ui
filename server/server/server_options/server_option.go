@@ -25,8 +25,8 @@
 package server_options
 
 import (
-	"github.com/temporalio/ui/server/v2/server/api"
-	"github.com/temporalio/ui/server/v2/server/config"
+	"github.com/temporalio/ui-server/v2/server/api"
+	"github.com/temporalio/ui-server/v2/server/config"
 )
 
 type (

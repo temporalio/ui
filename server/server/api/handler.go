@@ -32,11 +32,11 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	"github.com/temporalio/ui/server/v2/api/workflowservice/v1"
-	"github.com/temporalio/ui/server/v2/server/auth"
-	"github.com/temporalio/ui/server/v2/server/config"
-	"github.com/temporalio/ui/server/v2/server/rpc"
-	"github.com/temporalio/ui/server/v2/server/version"
+	"github.com/temporalio/ui-server/v2/api/workflowservice/v1"
+	"github.com/temporalio/ui-server/v2/server/auth"
+	"github.com/temporalio/ui-server/v2/server/config"
+	"github.com/temporalio/ui-server/v2/server/rpc"
+	"github.com/temporalio/ui-server/v2/server/version"
 )
 
 type Auth struct {
@@ -62,6 +62,7 @@ type SettingsResponse struct {
 	WorkflowCancelDisabled      bool
 	WorkflowSignalDisabled      bool
 	WorkflowResetDisabled       bool
+	BatchActionsDisabled        bool
 }
 
 func TemporalAPIHandler(cfgProvider *config.ConfigProviderWithRefresh, apiMiddleware []Middleware) echo.HandlerFunc {
@@ -127,6 +128,7 @@ func GetSettings(cfgProvier *config.ConfigProviderWithRefresh) func(echo.Context
 			WorkflowCancelDisabled:    cfg.WorkflowCancelDisabled,
 			WorkflowSignalDisabled:    cfg.WorkflowSignalDisabled,
 			WorkflowResetDisabled:     cfg.WorkflowResetDisabled,
+			BatchActionsDisabled:      cfg.BatchActionsDisabled,
 		}
 
 		return c.JSON(http.StatusOK, settings)
