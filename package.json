@@ -87,7 +87,7 @@
     "@types/uuid": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
-    "@vitest/ui": "^0.16.0",
+    "@vitest/ui": "^0.28.5",
     "autoprefixer": "^10.4.2",
     "babel-loader": "^8.2.4",
     "babel-preset-vite": "^1.0.4",
@@ -141,7 +141,7 @@
     "typescript": "^4.4.2",
     "vite": "^4.0.2",
     "vite-node": "^0.23.2",
-    "vitest": "^0.15.2",
+    "vitest": "^0.28.5",
     "wait-port": "^1.0.4",
     "webpack": "^5.73.0",
     "zx": "^7.1.1"
