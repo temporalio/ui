@@ -51,6 +51,15 @@ console.log(
 try {
   const response = await fetch(downloadUrl);
 
+  if (!response.ok) {
+    console.warn(
+      chalk.magenta.bold(`There was an error fetching Temporal CLI`),
+      chalk.bgRed.white.bold(` ${response.status} (${response.statusText}) `),
+      chalk.cyan('Skipping…'),
+    );
+    process.exit(0);
+  }
+
   if (!response.body)
     throw new Error(
       `Failed to find a "body" in the response form ${downloadUrl}.`,
