@@ -1,7 +1,9 @@
 name: Update UI Server
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   sync:
