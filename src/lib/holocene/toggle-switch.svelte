@@ -10,7 +10,7 @@
     bind:checked
     type="checkbox"
     class="hidden"
-    data-cy={$$props['data-cy']}
+    data-testid={$$props['data-testid']}
   />
   <span class="slider" />
 </label>
