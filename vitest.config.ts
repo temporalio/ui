@@ -1,9 +1,10 @@
-import { configDefaults, defineConfig } from 'vitest/config';
-import { svelte } from '@sveltejs/vite-plugin-svelte';
 import path from 'path';
+import { defineConfig } from 'vite';
+import { configDefaults } from 'vitest/config';
+import { svelte } from '@sveltejs/vite-plugin-svelte';
 
 export default defineConfig({
-  plugins: [svelte({ hot: !process.env.VITEST })],
+  plugins: [svelte({ hot: false })],
   resolve: {
     alias: {
       $lib: path.resolve(__dirname, './src/lib'),
@@ -24,6 +25,7 @@ export default defineConfig({
         '**/*.test.ts',
       ],
     },
+    include: ['src/**/*.test.ts'],
     exclude: [...configDefaults.exclude, 'e2e', 'tests'],
     environment: 'jsdom',
     setupFiles: ['./vitest-setup.ts'],
