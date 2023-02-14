@@ -7,7 +7,7 @@ module.exports = {
     'prettier',
   ],
   plugins: ['svelte3', '@typescript-eslint', 'vitest'],
-  ignorePatterns: ['*.cjs', 'prism.js'],
+  ignorePatterns: ['*.cjs', 'prism.js', '/server'],
   overrides: [
     // This was previously being overwritten by a duplicate and will cause the build to fail.
     // {

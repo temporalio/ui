@@ -19,18 +19,17 @@ jobs:
   e2e-integration:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout UI
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+      - name: Checkout and setup Node
+        uses: ./.github/actions/checkout-and-setup
+      - name: Build UI
+        run: VITE_API="" pnpm build:local
+
       - uses: actions/setup-go@v3
         with:
           go-version-file: e2e/go.mod
           cache: true
           cache-dependency-path: e2e/go.sum
-      - name: Checkout and setup Node
-        uses: ./.github/actions/checkout-and-setup
-      - name: Build UI
-        run: |
-          VITE_API="" pnpm build:local
       - name: Checkout CLI
         uses: actions/checkout@v3
         with:

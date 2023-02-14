@@ -23,10 +23,9 @@ jobs:
       - uses: actions/checkout@v3
       - name: Checkout and Setup Node
         uses: ./.github/actions/checkout-and-setup
-      - name: Install dependencies
-        run: pnpm install
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
+
       - name: Run Playwright tests
         run: pnpm run test:integration
       - uses: actions/upload-artifact@v3
