@@ -10,16 +10,12 @@ jobs:
   cypress-run:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup
-        uses: pnpm/action-setup@v2.2.4
-        with:
-          version: 7
-      - name: Install dependencies
-        run: pnpm install
+      - uses: actions/checkout@v3
+      - name: Checkout and setup Node
+        uses: ./.github/actions/checkout-and-setup
       - name: Build assets
         run: VITE_MODE=test pnpm run build:local
+
       - name: Run Cypress tests
         uses: cypress-io/github-action@v2
         with:

@@ -11,31 +11,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
+        with:
+          submodules: true
+      - name: Checkout and setup Node
+        uses: ./.github/actions/checkout-and-setup
+      - name: Build UI
+        run: pnpm build:server
+      
       - uses: actions/setup-go@v3
         with:
           go-version-file: server/go.mod
           cache-dependency-path: server/go.sum
           cache: true
           check-latest: true
-
       - name: Set up Protoc
         uses: arduino/setup-protoc@v1
         with:
           version: '3.x'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 16
-
-      - uses: pnpm/action-setup@v2.2.2
-        with:
-          version: 7
-
       - name: build
         working-directory: server
-        run: make install build
+        run: make install-utils build
 
       - name: test
         working-directory: server

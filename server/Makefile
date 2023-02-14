@@ -1,7 +1,7 @@
 .ONESHELL:
 .PHONY:
 
-all: install build
+all: install-utils build
 
 ##### Variables ######
 
@@ -30,8 +30,6 @@ OPENAPI_OUT := openapi/assets
 ##### Build #####
 build: build-grpc build-server
 
-build-cloud: build-grpc build-server
-
 build-server:
 	go mod tidy
 	go build -o ui-server ./cmd/server/main.go
@@ -51,7 +49,6 @@ build-grpc:
 	mv -f $(PROTO_OUT)/temporal/api/* $(PROTO_OUT) && rm -rf $(PROTO_OUT)/temporal
 
 ##### Install dependencies #####
-install: install-submodules install-utils
 
 install-utils:
 	@go install github.com/temporalio/gogo-protobuf/protoc-gen-gogoslick@latest
@@ -60,10 +57,6 @@ install-utils:
 
 	@go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@latest
 	@go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
-
-install-submodules:
-	@printf $(COLOR) "fetching submodules..."
-	git submodule update --init
 
 ##### Test #####
 test: clean-test-results

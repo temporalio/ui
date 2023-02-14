@@ -19,6 +19,7 @@ jobs:
         uses: ./.github/actions/checkout-and-setup
       - name: Build UI
         run: pnpm build:server
+      
       - uses: actions/setup-go@v3
         with:
           go-version-file: server/go.mod
@@ -31,6 +32,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build
         run: cd server && make install-utils build-grpc
+      
       - name: Checkout UI Server
         uses: actions/checkout@v3
         with:
