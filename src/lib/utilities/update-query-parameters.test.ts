@@ -67,10 +67,10 @@ describe('updateQueryParameters', () => {
 
     updateQueryParameters({ parameter, value, url, goto });
 
-    expect(goto).toHaveBeenCalledWith(
-      new URL('https://temporal.io/?parameter=value'),
-      gotoOptions,
-    );
+    const [{ href }, options] = goto.mock.calls[0];
+
+    expect(href).toBe('https://temporal.io/?parameter=value');
+    expect(options).toEqual(gotoOptions);
   });
 
   it('should call `goto` with the correct path when query parameters already exist', () => {
@@ -80,10 +80,10 @@ describe('updateQueryParameters', () => {
 
     updateQueryParameters({ parameter, value, url, goto });
 
-    expect(goto).toHaveBeenCalledWith(
-      new URL('https://temporal.io/?parameter=newvalue'),
-      gotoOptions,
-    );
+    const [{ href }, options] = goto.mock.calls[0];
+
+    expect(href).toBe('https://temporal.io/?parameter=newvalue');
+    expect(options).toEqual(gotoOptions);
   });
 
   it('should call `goto` with without the "?" if the query params are empty', () => {
@@ -93,10 +93,10 @@ describe('updateQueryParameters', () => {
 
     updateQueryParameters({ parameter, value, url, goto });
 
-    expect(goto).toHaveBeenCalledWith(
-      new URL('https://temporal.io/'),
-      gotoOptions,
-    );
+    const [{ href }, options] = goto.mock.calls[0];
+
+    expect(href).toBe('https://temporal.io/');
+    expect(options).toEqual(gotoOptions);
   });
 
   it('should set the parameter to an empty string if allowEmpty is set', () => {
@@ -106,10 +106,10 @@ describe('updateQueryParameters', () => {
 
     updateQueryParameters({ parameter, value, url, goto, allowEmpty: true });
 
-    expect(goto).toHaveBeenCalledWith(
-      new URL('https://temporal.io/?parameter='),
-      gotoOptions,
-    );
+    const [{ href }, options] = goto.mock.calls[0];
+
+    expect(href).toBe('https://temporal.io/?parameter=');
+    expect(options).toEqual(gotoOptions);
   });
 });
 
