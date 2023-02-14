@@ -47,13 +47,13 @@
       Schedules<Badge type="beta">Beta</Badge>
       <NamespaceSelector />
     </h1>
-    <p class="text-sm text-gray-600" data-cy="namespace-name">
+    <p class="text-sm text-gray-600" data-testid="namespace-name">
       {namespace}
     </p>
   </div>
   <Button
     class="h-10"
-    dataCy="create-schedule"
+    testId="create-schedule"
     disabled={createDisabled}
     on:click={() => goto(routeForScheduleCreate({ namespace }))}
     >Create Schedule</Button

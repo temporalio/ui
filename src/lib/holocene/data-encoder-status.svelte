@@ -17,7 +17,7 @@
     <Tooltip right text={'Data encoder is configured'}>
       <button
         class="relative flex items-center"
-        data-cy="data-encoder-status-configured"
+        data-testid="data-encoder-status-configured"
         on:click={onIconClick}
       >
         <div class="mr-2 ml-1 flex items-center">
@@ -31,7 +31,7 @@
     <Tooltip right text={`Data encoder couldn't connect to the remote encoder`}>
       <button
         class="relative flex items-center"
-        data-cy="data-encoder-status-error"
+        data-testid="data-encoder-status-error"
         on:click={onIconClick}
       >
         <div class="mr-2 ml-1 flex items-center">
@@ -45,7 +45,7 @@
     <Tooltip right text={'Data encoder succesfully converted content'}>
       <button
         class="relative flex items-center"
-        data-cy="data-encoder-status-success"
+        data-testid="data-encoder-status-success"
         on:click={onIconClick}
       >
         <div class="mr-2 ml-1 flex items-center">
@@ -60,7 +60,7 @@
   <Tooltip right text={'Configure data encoder'}>
     <button
       class="relative flex items-center"
-      data-cy="data-encoder-status"
+      data-testid="data-encoder-status"
       on:click={onIconClick}
     >
       <div class="mr-2 ml-1 flex items-center">

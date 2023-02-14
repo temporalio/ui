@@ -47,7 +47,7 @@
 
 <NavContainer {isCloud} {linkList}>
   <svelte:fragment slot="top">
-    <NavRow link={linkList.workflows} {isCloud} data-cy="workflows-button">
+    <NavRow link={linkList.workflows} {isCloud} data-testid="workflows-button">
       <NavTooltip right text="Workflows">
         <div class="nav-icon">
           <Icon name="workflow" />
@@ -63,7 +63,7 @@
           <NavRow
             link={linkList.schedules}
             {isCloud}
-            data-cy="schedules-button"
+            data-testid="schedules-button"
           >
             <NavTooltip right text="Schedules">
               <div class="nav-icon">
@@ -76,7 +76,11 @@
       </IsCloudGuard>
     </slot>
     <IsLegacyCloudGuard {isCloud}>
-      <NavRow link={linkList.namespaces} {isCloud} data-cy="namespaces-button">
+      <NavRow
+        link={linkList.namespaces}
+        {isCloud}
+        data-testid="namespaces-button"
+      >
         <NavTooltip right text="Namespaces">
           <div class="nav-icon">
             <Icon name="namespace" />
@@ -87,7 +91,7 @@
     </IsLegacyCloudGuard>
     <slot name="usage" />
     <IsCloudGuard {isCloud}>
-      <NavRow link={linkList.archive} {isCloud} data-cy="archive-button">
+      <NavRow link={linkList.archive} {isCloud} data-testid="archive-button">
         <NavTooltip right text="Archive">
           <div class="nav-icon">
             <Icon name="archives" />

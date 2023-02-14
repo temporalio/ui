@@ -23,6 +23,6 @@
     {message}
     {link}
     bind:shownBanner
-    dataCy="ui-version-banner"
+    testId="ui-version-banner"
   />
 {/if}

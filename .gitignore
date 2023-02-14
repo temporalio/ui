@@ -14,6 +14,10 @@ node_modules
 /.history
 /build
 /bin
+server/ui-server
+server/api
+server/openapi/assets/temporal
+server/ui/assets
 /test-results/
 /playwright-report/
 /playwright/.cache/

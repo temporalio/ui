@@ -18,11 +18,11 @@ describe('Task Queues Page', () => {
     cy.wait('@worker-task-queues-api');
     cy.wait('@activity-task-queues-api');
 
-    cy.get('[data-cy="pollers-title"]').contains('Pollers');
+    cy.get('[data-testid="pollers-title"]').contains('Pollers');
     cy.get('.text-lg').contains('Task Queue: a-task-queue');
-    cy.get('[data-cy=worker-row]').should('have.length', 1);
-    cy.get('[data-cy=worker-identity]').contains(wtq.pollers[0].identity);
-    cy.get('[data-cy=worker-last-access-time]').contains(
+    cy.get('[data-testid=worker-row]').should('have.length', 1);
+    cy.get('[data-testid=worker-identity]').contains(wtq.pollers[0].identity);
+    cy.get('[data-testid=worker-last-access-time]').contains(
       dateTz.formatInTimeZone(
         new Date(atq.pollers[0].lastAccessTime),
         'UTC',
@@ -30,7 +30,7 @@ describe('Task Queues Page', () => {
       ),
     );
 
-    cy.get('[data-cy="workflow-poller"] > .text-blue-700').should('exist');
-    cy.get('[data-cy="activity-poller"] > .text-blue-700').should('exist');
+    cy.get('[data-testid="workflow-poller"] > .text-blue-700').should('exist');
+    cy.get('[data-testid="activity-poller"] > .text-blue-700').should('exist');
   });
 });

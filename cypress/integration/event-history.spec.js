@@ -70,15 +70,15 @@ describe('Workflow Events', () => {
     cy.wait('@event-history-end');
     cy.wait('@event-history-descending');
 
-    cy.get('[data-cy="feed"]').should('have.class', 'active');
-    cy.get('[data-cy="compact"]').should('not.have.class', 'active');
-    cy.get('[data-cy="json"]').should('not.have.class', 'active');
+    cy.get('[data-testid="feed"]').should('have.class', 'active');
+    cy.get('[data-testid="compact"]').should('not.have.class', 'active');
+    cy.get('[data-testid="json"]').should('not.have.class', 'active');
 
-    cy.get('[data-cy="event-summary-row"]')
+    cy.get('[data-testid="event-summary-row"]')
       .should('not.have.length', 0)
       .should('have.length', eventsFixtureDescending.history.events.length);
 
-    cy.get('[data-cy="compact"]').click();
+    cy.get('[data-testid="compact"]').click();
 
     cy.wait('@event-history-ascending');
 
@@ -92,11 +92,11 @@ describe('Workflow Events', () => {
     cy.wait('@event-history-end');
     cy.wait('@event-history-ascending');
 
-    cy.get('[data-cy="compact"]').should('have.class', 'active');
-    cy.get('[data-cy="json"]').should('not.have.class', 'active');
-    cy.get('[data-cy="feed"]').should('not.have.class', 'active');
+    cy.get('[data-testid="compact"]').should('have.class', 'active');
+    cy.get('[data-testid="json"]').should('not.have.class', 'active');
+    cy.get('[data-testid="feed"]').should('not.have.class', 'active');
 
-    cy.get('[data-cy="event-summary-row"]')
+    cy.get('[data-testid="event-summary-row"]')
       .should('not.have.length', 0)
       .should('not.have.length', eventsFixtureDescending.history.events.length);
   });
@@ -109,7 +109,7 @@ describe('Workflow Events', () => {
     cy.wait('@event-history-end');
     cy.wait('@event-history-descending');
 
-    cy.get('[data-cy="event-summary-row"]').should(
+    cy.get('[data-testid="event-summary-row"]').should(
       'have.length',
       eventsFixtureDescending.history.events.length,
     );
@@ -127,18 +127,18 @@ describe('Workflow Events', () => {
 
     const dt = new Date(eventsFixtureDescending.history.events[0].eventTime);
 
-    cy.get('[data-cy=event-date-filter-button]').click();
-    cy.get('[data-cy=event-date-filter-relative]').click();
+    cy.get('[data-testid=event-date-filter-button]').click();
+    cy.get('[data-testid=event-date-filter-relative]').click();
     const relative = formatDistanceToNow(dt);
     cy.get('table').contains(relative);
 
-    cy.get('[data-cy=event-date-filter-button]').click();
-    cy.get('[data-cy=event-date-filter-UTC]').click();
+    cy.get('[data-testid=event-date-filter-button]').click();
+    cy.get('[data-testid=event-date-filter-UTC]').click();
     const utc = dateTz.formatInTimeZone(dt, 'UTC', 'yyyy-MM-dd z HH:mm:ss.SS');
     cy.get('table').contains(utc);
 
-    cy.get('[data-cy=event-date-filter-button]').click();
-    cy.get('[data-cy=event-date-filter-local]').click();
+    cy.get('[data-testid=event-date-filter-button]').click();
+    cy.get('[data-testid=event-date-filter-local]').click();
     const local = dateTz.format(dt, 'yyyy-MM-dd z HH:mm:ss.SS');
     cy.get('table').contains(local);
   });
@@ -151,11 +151,11 @@ describe('Workflow Events', () => {
     cy.wait('@event-history-end');
     cy.wait('@event-history-descending');
 
-    cy.get('[data-cy="compact"]').click();
+    cy.get('[data-testid="compact"]').click();
 
     cy.wait('@event-history-ascending');
 
-    cy.get('[data-cy="event-summary-row"]')
+    cy.get('[data-testid="event-summary-row"]')
       .should('not.have.length', 0)
       .should('not.have.length', eventsFixtureDescending.history.events.length);
   });
@@ -168,11 +168,11 @@ describe('Workflow Events', () => {
     cy.wait('@event-history-end');
     cy.wait('@event-history-descending');
 
-    cy.get('[data-cy="json"]').click();
+    cy.get('[data-testid="json"]').click();
 
     cy.wait('@event-history-ascending');
 
     const match = eventsFixtureAscending.history.events[0].eventTime;
-    cy.get('[data-cy="event-history-json"]').contains(match);
+    cy.get('[data-testid="event-history-json"]').contains(match);
   });
 });

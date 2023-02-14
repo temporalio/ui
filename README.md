@@ -33,15 +33,20 @@ After pulling down the lastest version of Temporal's [`docker-compose`](https://
 
 ## Trying it out: Bleeding edge
 
-Starting the UI API server will give you a somewhat recent version on `localhost:8080`. If you want to use the most recent commit to `main`, you can spin up a bleeding-edge build as described below.
+If you want to use the most recent commit to `main`, you can spin up a bleeding-edge build as described below.
 
 Once you have the prerequisites going, run the following:
 
 ```bash
 pnpm install
-pnpm run build:local
-pnpm run preview:local
+pnpm start
 ```
+
+Running `pnpm install` will attempt to download and install the most recent version of [Temporal CLI][] into `./bin/cli/temporal`. The development server will attempt to use use this version of this Temporal when starting up.
+
+- If that port is already in use, the UI will fallback to trying to talk to whatever process is running on that port.
+- If you do not have a version of Temporal CLI at `./bin/cli/temporal`, the development server will look for a version of Temporal CLI in your path.
+- For Windows users, you will need to start Temporal using one of the methods listed above until we have sufficiently tested this functionality on Windows. (We would absolutely welcome a pull request.)
 
 ### Using Docker
 
