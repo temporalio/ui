@@ -76,7 +76,7 @@
       const filter = {
         attribute: timeField,
         value,
-        conditional: '=',
+        conditional: '>',
         operator: '',
         parenthesis: '',
       };
