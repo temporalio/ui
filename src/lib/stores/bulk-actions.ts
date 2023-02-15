@@ -3,7 +3,7 @@ import { page } from '$app/stores';
 
 import {
   advancedVisibilityEnabled,
-  advancedVisibilityEnabledFully,
+  advancedVisibilityEnabledWithOrderBy,
 } from '$lib/utilities/advanced-visibility-enabled';
 import { isVersionNewer } from '$lib/utilities/version-check';
 
@@ -28,8 +28,9 @@ export const supportsAdvancedVisibility = derived(
     advancedVisibilityEnabled($cluster, $temporalVersion) ?? $isCloud,
 );
 
-export const supportsAdvancedVisibilityFully = derived(
+export const supportsAdvancedVisibilityWithOrderBy = derived(
   [cluster, temporalVersion, isCloud],
   ([$cluster, $temporalVersion, $isCloud]) =>
-    advancedVisibilityEnabledFully($cluster, $temporalVersion) ?? $isCloud,
+    advancedVisibilityEnabledWithOrderBy($cluster, $temporalVersion) ??
+    $isCloud,
 );

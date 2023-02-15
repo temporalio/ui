@@ -8,14 +8,14 @@ import {
 import { withLoading } from '$lib/utilities/stores/with-loading';
 
 import type { StartStopNotifier } from 'svelte/store';
-import { supportsAdvancedVisibilityFully } from './bulk-actions';
+import { supportsAdvancedVisibility } from './bulk-actions';
 
 export const refresh = writable(0);
 
 const namespace = derived([page], ([$page]) => $page.params.namespace);
 const query = derived([page], ([$page]) => $page.url.searchParams.get('query'));
 const parameters = derived(
-  [namespace, query, refresh, supportsAdvancedVisibilityFully],
+  [namespace, query, refresh, supportsAdvancedVisibility],
   ([$namespace, $query, $refresh, $supportsAdvancedVisibility]) => {
     return {
       namespace: $namespace,

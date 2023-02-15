@@ -36,11 +36,11 @@
   import { toaster } from '$lib/stores/toaster';
   import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
   import { bulkActionsEnabled as workflowBulkActionsEnabled } from '$lib/utilities/bulk-actions-enabled';
-  import { supportsAdvancedVisibilityFully } from '$lib/stores/bulk-actions';
+  import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
 
   $: bulkActionsEnabled = workflowBulkActionsEnabled(
     $page.data.settings,
-    $supportsAdvancedVisibilityFully,
+    $supportsAdvancedVisibility,
   );
 
   let selectedWorkflows: { [index: string]: boolean } = {};
@@ -282,7 +282,7 @@
       <p data-testid="namespace-name">
         {$page.params.namespace}
       </p>
-      {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibilityFully}
+      {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility}
         <div class="h-1 w-1 rounded-full bg-gray-400" />
         <p data-testid="workflow-count">
           {#if $loading}

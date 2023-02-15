@@ -2,8 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { tokenize } from './tokenize';
 
 const executionStatusQuery = 'ExecutionStatus="Completed"';
-const startTimeQuery =
-  'StartTime BETWEEN "2022-04-18T17:45:18-06:00" AND "2022-04-20T17:45:18-06:00"';
+const startTimeQuery = 'StartTime > "2022-04-18T17:45:18-06:00"';
 const workflowQuery = 'WorkflowId="Hello" and WorkflowType="World"';
 const combinedQuery =
   'WorkflowId="Hello" and WorkflowType="World" and StartTime BETWEEN "2022-04-18T18:09:49-06:00" AND "2022-04-20T18:09:49-06:00"';
@@ -38,10 +37,8 @@ describe('tokenize', () => {
 
     expect(tokenize(query)).toEqual([
       'StartTime',
-      'BETWEEN',
+      '>',
       '2022-04-18T17:45:18-06:00',
-      'AND',
-      '2022-04-20T17:45:18-06:00',
     ]);
   });
 

@@ -149,9 +149,7 @@ describe('toListWorkflowQueryFromFilters', () => {
     const query = toListWorkflowQueryFromFilters(
       combineDropdownFilters(filters),
     );
-    expect(query).toBe(
-      'StartTime BETWEEN "2019-12-30T00:00:00Z" AND "2020-01-02T00:00:00Z"',
-    );
+    expect(query).toBe('StartTime > "2019-12-30T00:00:00Z"');
   });
 
   it('should convert two filters, one as datetime filter', () => {
@@ -175,7 +173,7 @@ describe('toListWorkflowQueryFromFilters', () => {
       combineDropdownFilters(filters),
     );
     expect(query).toBe(
-      'WorkflowType="cronWorkflow" AND StartTime BETWEEN "2019-12-30T00:00:00Z" AND "2020-01-02T00:00:00Z"',
+      'WorkflowType="cronWorkflow" AND StartTime > "2019-12-30T00:00:00Z"',
     );
   });
 });

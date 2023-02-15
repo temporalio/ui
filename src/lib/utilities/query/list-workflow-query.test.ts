@@ -38,14 +38,11 @@ describe('toListWorkflowQuery', () => {
   });
 
   it('should convert an timeRange with a Duration as a value', () => {
-    const tomorrow = '2020-01-02T00:00:00Z';
     const twentyFourHoursEarlier = '2019-12-31T00:00:00Z';
 
     const query = toListWorkflowQuery({ timeRange: { hours: 24 } });
 
-    expect(query).toBe(
-      `StartTime BETWEEN "${twentyFourHoursEarlier}" AND "${tomorrow}"`,
-    );
+    expect(query).toBe(`StartTime > "${twentyFourHoursEarlier}"`);
   });
 
   it('should convert an timeRange with a Duration as a value when archived', () => {

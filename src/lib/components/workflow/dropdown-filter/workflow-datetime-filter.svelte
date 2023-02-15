@@ -23,6 +23,7 @@
   import { page } from '$app/stores';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
+  import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
 
   let custom = false;
   let show = false;
@@ -45,6 +46,7 @@
   $: timeFilter = $workflowFilters.find(
     (f) => f.attribute === 'StartTime' || f.attribute === 'CloseTime',
   );
+  $: useBetweenDateTimeQuery = custom || !$supportsAdvancedVisibility;
 
   const setTimeValues = () => {
     if (!timeFilter) {
@@ -135,11 +137,15 @@
       second: endSecond,
     });
 
+    const query = useBetweenDateTimeQuery
+      ? `BETWEEN "${formatISO(startDateWithTime)}" AND "${formatISO(
+          endDateWithTime,
+        )}"`
+      : `> "${formatISO(startDateWithTime)}"`;
+
     const filter = {
       attribute: timeField,
-      value: `BETWEEN "${formatISO(startDateWithTime)}" AND "${formatISO(
-        endDateWithTime,
-      )}"`,
+      value: query,
       conditional: '=',
       operator: '',
       parenthesis: '',

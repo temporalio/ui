@@ -7,6 +7,7 @@ describe('isRecommendedVersionNewer', () => {
     expect(isVersionNewer('1.02.1', '1.01.1')).toBe(true);
     expect(isVersionNewer('1.01.2', '1.01.1')).toBe(true);
     expect(isVersionNewer('1.02', '1.01')).toBe(true);
+    expect(isVersionNewer('1.20', '1.19')).toBe(true);
     expect(isVersionNewer('2', '1')).toBe(true);
   });
 
@@ -21,6 +22,7 @@ describe('isRecommendedVersionNewer', () => {
     expect(isVersionNewer('xxx', '1.01.1')).toBe(false);
     expect(isVersionNewer('1.1', '1.01.1')).toBe(false);
     expect(isVersionNewer('1.01', '1.02')).toBe(false);
+    expect(isVersionNewer('1.19.3', '1.19')).toBe(false);
     expect(isVersionNewer('1', '2')).toBe(false);
   });
 });
