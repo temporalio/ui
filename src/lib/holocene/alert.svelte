@@ -20,7 +20,12 @@
   export { className as class };
 </script>
 
-<div class="alert {intent} {className}" class:bold {...$$restProps}>
+<div
+  class="alert {intent} {className}"
+  class:bold
+  role="alert"
+  {...$$restProps}
+>
   {#if icon}
     <div>
       <Icon name={icon} />

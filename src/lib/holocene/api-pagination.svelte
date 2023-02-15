@@ -144,7 +144,6 @@
     intent="error"
     class="mb-10"
     title={error?.message ?? 'Error fetching data.'}
-    role="alert"
   />
 {/if}
 

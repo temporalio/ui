@@ -151,6 +151,7 @@
         intent="info"
         data-testid="workflow-reset-alert"
         title="This Workflow has been reset"
+        role="status"
       >
         You can find the resulting Workflow Execution <Link
           href={routeForEventHistory({
