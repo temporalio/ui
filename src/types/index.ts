@@ -112,6 +112,8 @@ export type ExternalWorkflowExecutionSignaledEventAttributes =
   temporal.api.history.v1.IExternalWorkflowExecutionSignaledEventAttributes;
 export type UpsertWorkflowSearchAttributesEventAttributes =
   temporal.api.history.v1.IUpsertWorkflowSearchAttributesEventAttributes;
+export type StartBatchOperationRequest =
+  temporal.api.workflowservice.v1.IStartBatchOperationRequest;
 
 // api.enums
 
@@ -134,6 +136,7 @@ export type WorkflowExecutionInfo =
 // api response
 export type Payload = temporal.api.common.v1.IPayload;
 export type Payloads = temporal.api.common.v1.IPayloads;
+export type WorkflowExecutionInput = temporal.api.common.v1.IWorkflowExecution;
 
 // api.taskqueue
 
