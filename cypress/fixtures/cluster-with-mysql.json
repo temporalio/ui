@@ -1,0 +1,37 @@
+{
+  "supportedClients": {
+    "temporal-cli": "\u003c2.0.0",
+    "temporal-go": "\u003c2.0.0",
+    "temporal-java": "\u003c2.0.0",
+    "temporal-php": "\u003c2.0.0",
+    "temporal-server": "\u003c2.0.0",
+    "temporal-typescript": "\u003c2.0.0",
+    "temporal-ui": "\u003c3.0.0"
+  },
+  "serverVersion": "1.20.0",
+  "clusterId": "17235226-f862-4d2a-a809-898c52dc8ab4",
+  "versionInfo": {
+    "current": {
+      "version": "1.20.0",
+      "releaseTime": "2023-2-20T22:14:46Z",
+      "notes": ""
+    },
+    "recommended": {
+      "version": "1.20.0",
+      "releaseTime": "2023-2-20T22:14:46Z",
+      "notes": ""
+    },
+    "instructions": "",
+    "alerts": [
+      {
+        "message": "🪐 A new release is available!",
+        "severity": "Low"
+      }
+    ],
+    "lastUpdateTime": "2022-11-09T22:29:04.612659335Z"
+  },
+  "clusterName": "active",
+  "historyShardCount": 4,
+  "persistenceStore": "mysql",
+  "visibilityStore": "mysql"
+}

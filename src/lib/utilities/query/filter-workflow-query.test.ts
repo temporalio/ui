@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { isVersionNewer } from '../version-check';
 import { toListWorkflowQueryFromFilters } from './list-workflow-query';
 import { combineDropdownFilters } from './to-list-workflow-filters';
 
@@ -140,14 +141,18 @@ describe('toListWorkflowQueryFromFilters', () => {
     const filters = [
       {
         attribute: 'StartTime',
-        conditional: '=',
+        conditional: '>',
         operator: '',
         parenthesis: '',
         value: '2 days',
       },
     ];
+
+    const supportsAdvancedVisibility = isVersionNewer('1.20', '1.19');
     const query = toListWorkflowQueryFromFilters(
       combineDropdownFilters(filters),
+      [],
+      supportsAdvancedVisibility,
     );
     expect(query).toBe('StartTime > "2019-12-30T00:00:00Z"');
   });
@@ -163,14 +168,17 @@ describe('toListWorkflowQueryFromFilters', () => {
       },
       {
         attribute: 'StartTime',
-        conditional: '=',
+        conditional: '>',
         operator: '',
         parenthesis: '',
         value: '2 days',
       },
     ];
+    const supportsAdvancedVisibility = isVersionNewer('1.20', '1.19');
     const query = toListWorkflowQueryFromFilters(
       combineDropdownFilters(filters),
+      [],
+      supportsAdvancedVisibility,
     );
     expect(query).toBe(
       'WorkflowType="cronWorkflow" AND StartTime > "2019-12-30T00:00:00Z"',

@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { isVersionNewer } from '../version-check';
 import { isFilterKey, toListWorkflowQuery } from './list-workflow-query';
 
 describe('toListWorkflowQuery', () => {
@@ -40,8 +41,11 @@ describe('toListWorkflowQuery', () => {
   it('should convert an timeRange with a Duration as a value', () => {
     const twentyFourHoursEarlier = '2019-12-31T00:00:00Z';
 
-    const query = toListWorkflowQuery({ timeRange: { hours: 24 } });
-
+    const supportsAdvancedVisibility = isVersionNewer('1.20', '1.19');
+    const query = toListWorkflowQuery(
+      { timeRange: { hours: 24 } },
+      supportsAdvancedVisibility,
+    );
     expect(query).toBe(`StartTime > "${twentyFourHoursEarlier}"`);
   });
 

@@ -138,7 +138,7 @@ describe('toListWorkflowParameters', () => {
     const expectedFilters = [
       {
         attribute: 'StartTime',
-        conditional: '',
+        conditional: '>',
         operator: '',
         parenthesis: '',
         value: '2 days',
@@ -155,7 +155,7 @@ describe('toListWorkflowParameters', () => {
     const expectedFilters = [
       {
         attribute: 'CloseTime',
-        conditional: '',
+        conditional: '>',
         operator: '',
         parenthesis: '',
         value: '2 days',
@@ -178,7 +178,7 @@ describe('toListWorkflowParameters', () => {
       },
       {
         attribute: 'StartTime',
-        conditional: '',
+        conditional: '>',
         operator: '',
         parenthesis: '',
         value: '2 days',
@@ -202,7 +202,7 @@ describe('toListWorkflowParameters', () => {
       },
       {
         attribute: 'StartTime',
-        conditional: '',
+        conditional: '>',
         operator: 'AND',
         parenthesis: '',
         value: '2 days',
@@ -254,7 +254,7 @@ describe('toListWorkflowParameters', () => {
       },
       {
         attribute: 'StartTime',
-        conditional: '',
+        conditional: '>',
         operator: '',
         parenthesis: '',
         value: '2 days',
@@ -324,7 +324,7 @@ describe('combineDropdownFilters', () => {
       },
       {
         attribute: 'StartTime',
-        conditional: '=',
+        conditional: '>',
         operator: '',
         parenthesis: '',
         value: '2 days',
@@ -342,7 +342,7 @@ describe('combineDropdownFilters', () => {
       },
       {
         attribute: 'StartTime',
-        conditional: '=',
+        conditional: '>',
         operator: '',
         parenthesis: '',
         value: '2 days',
