@@ -15,6 +15,7 @@
     "dev:local": ". ./.env && VITE_TEMPORAL_UI_BUILD_TARGET=local vite dev --port 3000",
     "dev:docker": ". ./.env && VITE_API=http://localhost:8080 vite dev --port 3000",
     "dev:cloud": "VITE_TEMPORAL_UI_BUILD_TARGET=cloud vite dev --port 3000",
+    "dev:ui-server": "vite dev --mode ui-server --port 3000",
     "dev:test": ". ./.env && VITE_TEMPORAL_UI_BUILD_TARGET=local VITE_MODE=test vite dev --port 3000",
     "build:local": "vite build",
     "build:docker": "VITE_API=http://localhost:8080 vite build",
