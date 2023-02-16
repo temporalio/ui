@@ -1,28 +1,20 @@
 import { v4 as uuidv4 } from 'uuid';
+import { get } from 'svelte/store';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
-import { uiVersion } from '$lib/stores/versions';
-import { get } from 'svelte/store';
+import type {
+  StartBatchOperationRequest,
+  WorkflowExecutionInput,
+} from 'src/types';
 import { isVersionNewer } from '$lib/utilities/version-check';
-
-const queryFromWorkflows = (
-  workflowExecutions: WorkflowExecution[],
-): string => {
-  const runIds = workflowExecutions.map((wf) => wf.runId);
-  return runIds.reduce((queryString, id, index, arr) => {
-    queryString += `RunId="${id}"`;
-    if (index !== arr.length - 1) {
-      queryString += ' OR ';
-    }
-
-    return queryString;
-  }, '');
-};
+import { temporalVersion } from '$lib/stores/versions';
 
 type CreateBatchOperationOptions = {
   namespace: string;
   reason: string;
+  query?: string;
+  executions?: WorkflowExecutionInput[];
 };
 
 type CreateBatchOperationWithQueryOptions = CreateBatchOperationOptions & {
@@ -38,12 +30,53 @@ type DescribeBatchOperationOptions = {
   namespace: string;
 };
 
-export async function bulkTerminateByIDs({
+const queryFromWorkflows = (
+  workflowExecutions: WorkflowExecution[],
+): string => {
+  const runIds = workflowExecutions.map((wf) => wf.runId);
+  return runIds.reduce((queryString, id, index, arr) => {
+    queryString += `RunId="${id}"`;
+    if (index !== arr.length - 1) {
+      queryString += ' OR ';
+    }
+
+    return queryString;
+  }, '');
+};
+
+const toWorkflowExecutionInput = ({
+  id,
+  runId,
+}: WorkflowExecution): WorkflowExecutionInput => ({ workflowId: id, runId });
+
+const createBatchOperationOptions = ({
   namespace,
   reason,
   workflows,
-}: CreateBatchOperationWithIDsOptions) {
-  return terminateWorkflows(namespace, queryFromWorkflows(workflows), reason);
+}: CreateBatchOperationWithIDsOptions): CreateBatchOperationOptions => {
+  const options: CreateBatchOperationOptions = {
+    namespace,
+    reason,
+  };
+
+  if (isVersionNewer(get(temporalVersion), '1.19')) {
+    return {
+      ...options,
+      executions: workflows.map(toWorkflowExecutionInput),
+    };
+  } else {
+    return {
+      ...options,
+      query: queryFromWorkflows(workflows),
+    };
+  }
+};
+
+export async function bulkTerminateByIDs(
+  options: CreateBatchOperationWithIDsOptions,
+) {
+  const fullOptions = createBatchOperationOptions(options);
+  return terminateWorkflows(fullOptions);
 }
 
 export async function batchTerminateByQuery({
@@ -51,15 +84,14 @@ export async function batchTerminateByQuery({
   query,
   reason,
 }: CreateBatchOperationWithQueryOptions) {
-  return terminateWorkflows(namespace, query, reason);
+  return terminateWorkflows({ namespace, query, reason });
 }
 
-export async function bulkCancelByIDs({
-  namespace,
-  workflows,
-  reason,
-}: CreateBatchOperationWithIDsOptions): Promise<string> {
-  return cancelWorkflows(namespace, queryFromWorkflows(workflows), reason);
+export async function bulkCancelByIDs(
+  options: CreateBatchOperationWithIDsOptions,
+): Promise<string> {
+  const fullOptions = createBatchOperationOptions(options);
+  return cancelWorkflows(fullOptions);
 }
 
 export async function batchCancelByQuery({
@@ -67,31 +99,31 @@ export async function batchCancelByQuery({
   query,
   reason,
 }: CreateBatchOperationWithQueryOptions) {
-  return cancelWorkflows(namespace, query, reason);
+  return cancelWorkflows({ namespace, query, reason });
 }
 
-async function cancelWorkflows(
-  namespace: string,
-  query: string,
-  reason: string,
-): Promise<string> {
-  const version = get(uiVersion);
-  const routeId = isVersionNewer(version, '2.9.0')
-    ? 'batch-operations'
-    : 'workflows.batch.terminate';
-  const route = routeForApi(routeId, { namespace });
+async function cancelWorkflows({
+  namespace,
+  query,
+  executions,
+  reason,
+}: CreateBatchOperationOptions): Promise<string> {
+  const route = routeForApi('batch-operations', { namespace });
   const jobId = uuidv4();
+
+  const body: StartBatchOperationRequest = {
+    jobId,
+    namespace,
+    reason,
+    cancellationOperation: {},
+    ...(query && { visibilityQuery: query }),
+    ...(executions && { executions }),
+  };
 
   await requestFromAPI<null>(route, {
     options: {
       method: 'POST',
-      body: stringifyWithBigInt({
-        jobId,
-        namespace,
-        visibilityQuery: query,
-        reason,
-        cancellationOperation: {},
-      }),
+      body: stringifyWithBigInt(body),
     },
     shouldRetry: false,
     notifyOnError: false,
@@ -100,28 +132,28 @@ async function cancelWorkflows(
   return jobId;
 }
 
-async function terminateWorkflows(
-  namespace: string,
-  query: string,
-  reason: string,
-): Promise<string> {
-  const version = get(uiVersion);
-  const routeId = isVersionNewer(version, '2.9.0')
-    ? 'batch-operations'
-    : 'workflows.batch.terminate';
-  const route = routeForApi(routeId, { namespace });
+async function terminateWorkflows({
+  namespace,
+  query,
+  executions,
+  reason,
+}: CreateBatchOperationOptions): Promise<string> {
+  const route = routeForApi('batch-operations', { namespace });
   const jobId = uuidv4();
+
+  const body: StartBatchOperationRequest = {
+    jobId,
+    namespace,
+    reason,
+    terminationOperation: {},
+    ...(query && { visibilityQuery: query }),
+    ...(executions && { executions }),
+  };
 
   await requestFromAPI<null>(route, {
     options: {
       method: 'POST',
-      body: stringifyWithBigInt({
-        jobId,
-        namespace,
-        visibilityQuery: query,
-        reason,
-        terminationOperation: {},
-      }),
+      body: stringifyWithBigInt(body),
     },
     shouldRetry: false,
     notifyOnError: false,
@@ -159,11 +191,7 @@ async function describeBatchOperation({
   jobId,
   namespace,
 }: DescribeBatchOperationOptions): Promise<BatchOperationInfo> {
-  const version = get(uiVersion);
-  const routeId = isVersionNewer(version, '2.9.0')
-    ? 'batch-operation.describe'
-    : 'workflows.batch.describe';
-  const route = routeForApi(routeId, {
+  const route = routeForApi('batch-operation.describe', {
     namespace,
   });
 

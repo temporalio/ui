@@ -92,7 +92,7 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 		CookiePath:     "/",
 		CookieHTTPOnly: false,
 		CookieSameSite: http.SameSiteStrictMode,
-		CookieSecure:   true,
+		CookieSecure:   !cfg.CORS.CookieInsecure,
 		Skipper:        csrf.SkipOnAuthorizationHeader,
 	}))
 

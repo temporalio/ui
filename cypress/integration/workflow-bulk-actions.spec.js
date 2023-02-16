@@ -22,6 +22,11 @@ describe('Batch and Bulk Workflow Actions', () => {
         fixture: 'cluster-with-elasticsearch.json',
       }).as('cluster-api-elasticsearch');
 
+      cy.intercept(
+        Cypress.env('VITE_API_HOST') + `/api/v1/namespaces/*/workflows/count?`,
+        { fixture: 'workflows-count.json' },
+      ).as('workflows-count-api');
+
       cy.visit('/namespaces/default/workflows');
 
       cy.wait('@cluster-api-elasticsearch');
