@@ -5,7 +5,6 @@ import { isLocalActivityMarkerEvent } from './is-event-type';
 
 import type { Payload } from '$types';
 import type { CombinedAttributes } from './format-event-attributes';
-import { isObject } from './is';
 
 type SummaryAttribute = {
   key: string;
@@ -13,11 +12,6 @@ type SummaryAttribute = {
 };
 
 const emptyAttribute: SummaryAttribute = { key: '', value: '' };
-
-const entries = function* (summaryAttribute: SummaryAttribute) {
-  yield ['key', summaryAttribute.key];
-  yield ['value', summaryAttribute.value];
-};
 
 const keysForPlainText: Readonly<Set<string>> = new Set([
   'activityId',
@@ -40,7 +34,7 @@ export const shouldDisplayAsPlainText = (key: string): boolean => {
 export const shouldDisplayAttribute = (
   key: string,
   value: unknown,
-): boolean => {
+): key is string => {
   if (value === null) return false;
   if (value === undefined) return false;
   if (value === '') return false;
@@ -119,13 +113,12 @@ export const shouldDisplayChildWorkflowLink = (
 };
 
 const formatSummaryValue = (key: string, value: unknown): SummaryAttribute => {
-  if (isObject(value)) {
+  if (typeof value === 'object') {
     const [firstKey] = Object.keys(value);
-    if (!has(value, firstKey)) {
-      return { key: key + capitalize(firstKey), value: value[firstKey] };
-    }
+    return { key: key + capitalize(firstKey), value: value[firstKey] };
+  } else {
+    return { key, value: value.toString() };
   }
-  return { key, value: String(value) };
 };
 
 /**
@@ -170,8 +163,6 @@ const getSummaryAttribute = (event: WorkflowEvent): SummaryAttribute => {
   if (isLocalActivityMarkerEvent(event as MarkerRecordedEvent)) {
     const payload =
       event.markerRecordedEventAttributes?.details?.data?.payloads?.[0];
-
-    if (!payload) return first;
 
     const activityType = getActivityType(payload);
 
