@@ -1,17 +1,34 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import { createEventDispatcher } from 'svelte';
-  import Button from '$lib/holocene/button.svelte';
+  import type { HTMLAttributes } from 'svelte/elements';
   import { noop } from 'svelte/internal';
+  import { createEventDispatcher, type ComponentProps } from 'svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import Button from '$lib/holocene/button.svelte';
 
-  export let open: boolean = false;
+  interface $$Props extends HTMLAttributes<HTMLDivElement> {
+    open: boolean;
+    hideConfirm?: boolean;
+    confirmText?: string;
+    cancelText?: string;
+    confirmType?: ComponentProps<Button>['variant'];
+    confirmDisabled?: boolean;
+    large?: boolean;
+    loading?: boolean;
+    hasInput?: boolean;
+  }
+
+  export let open: boolean;
   export let hideConfirm: boolean = false;
   export let confirmText: string = 'Confirm';
   export let cancelText: string = 'Cancel';
-  export let confirmType: 'destructive' | 'primary' = 'primary';
+  export let confirmType: ComponentProps<Button>['variant'] = 'primary';
   export let confirmDisabled: boolean = false;
   export let large: boolean = false;
   export let loading: boolean = false;
+  export let hasInput: boolean = false;
+
+  let className: string = '';
+  export { className as class };
 
   let modalElement: HTMLDivElement;
 
@@ -24,6 +41,10 @@
     dispatch('cancelModal');
   };
 
+  const confirmModal = () => {
+    dispatch('confirmModal');
+  };
+
   const handleKeyboardNavigation = (event: KeyboardEvent) => {
     if (!open) {
       return;
@@ -34,7 +55,14 @@
       return;
     }
 
-    const focusable = modalElement.querySelectorAll('button');
+    const focusable = Array.from(
+      modalElement.querySelectorAll<
+        HTMLButtonElement | HTMLInputElement | HTMLDivElement
+      >('button, input, div[contenteditable="true"]'),
+    ).filter((element) => {
+      if (element instanceof HTMLDivElement) return element.isContentEditable;
+      return !element.disabled;
+    });
     const firstFocusable = focusable[0];
     const lastFocusable = focusable[focusable.length - 1];
     if (event.key === 'Tab') {
@@ -67,12 +95,13 @@
     />
     <div
       bind:this={modalElement}
-      class="body"
+      class="body {className}"
       class:large
       tabindex="-1"
       role="alertdialog"
       aria-labelledby="modal-title"
       aria-describedby="modal-description"
+      {...$$restProps}
     >
       {#if !loading}
         <button
@@ -91,29 +120,35 @@
           <h3>Title</h3>
         </slot>
       </div>
-      <div id="modal-content" class="content">
-        <slot name="content">
-          <span>Content</span>
-        </slot>
-      </div>
-      <div class="flex items-center justify-end space-x-2 p-6">
-        <Button
-          thin
-          variant="secondary"
-          disabled={loading}
-          on:click={cancelModal}>{cancelText}</Button
-        >
-        {#if !hideConfirm}
+      <svelte:element
+        this={hasInput ? 'form' : 'div'}
+        on:submit|preventDefault|stopPropagation={confirmModal}
+      >
+        <div id="modal-content" class="content">
+          <slot name="content">
+            <span>Content</span>
+          </slot>
+        </div>
+        <div class="flex items-center justify-end space-x-2 p-6">
           <Button
             thin
-            variant={confirmType}
-            {loading}
-            disabled={confirmDisabled || loading}
-            testId="confirm-modal-button"
-            on:click={() => dispatch('confirmModal')}>{confirmText}</Button
+            variant="secondary"
+            disabled={loading}
+            on:click={cancelModal}>{cancelText}</Button
           >
-        {/if}
-      </div>
+          {#if !hideConfirm}
+            <Button
+              thin
+              variant={confirmType}
+              {loading}
+              disabled={confirmDisabled || loading}
+              testId="confirm-modal-button"
+              type={hasInput ? 'submit' : 'button'}
+              on:click={hasInput ? noop : confirmModal}>{confirmText}</Button
+            >
+          {/if}
+        </div>
+      </svelte:element>
     </div>
   </div>
 {/if}

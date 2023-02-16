@@ -278,6 +278,7 @@
 
 <Modal
   open={showResetConfirmation}
+  hasInput
   on:confirmModal={reset}
   on:cancelModal={hideResetModal}
   confirmDisabled={resetType === ResetType.EventId && !eventIdValid}
@@ -310,6 +311,7 @@
 </Modal>
 <Modal
   open={showTerminationConfirmation}
+  hasInput
   confirmText="Terminate"
   confirmType="destructive"
   on:cancelModal={hideTerminationModal}
@@ -331,6 +333,7 @@
 </Modal>
 <Modal
   open={showSignalConfirmation}
+  hasInput
   confirmText="Submit"
   confirmDisabled={!signalName}
   on:cancelModal={hideSignalModal}
