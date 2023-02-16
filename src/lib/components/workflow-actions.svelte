@@ -37,10 +37,10 @@
   let reason = '';
   let signalInput = '';
   let signalName = '';
-  let showTerminationConfirmation = false;
-  let showCancellationConfirmation = false;
-  let showSignalConfirmation = false;
-  let showResetConfirmation = false;
+  let cancelConfirmationModal: Modal;
+  let terminateConfirmationModal: Modal;
+  let resetConfirmationModal: Modal;
+  let signalConfirmationModal: Modal;
   let resetType: ResetType = ResetType.FirstWorkflowTask;
   let resetId: string | undefined = undefined;
   let resetReason: string | undefined = undefined;
@@ -52,39 +52,16 @@
   $: terminateEnabled = workflowTerminateEnabled($page.data.settings);
   $: resetEnabled = workflowResetEnabled($page.data.settings);
 
-  const showTerminationModal = () => {
-    showTerminationConfirmation = true;
-  };
-
   const hideTerminationModal = () => {
-    showTerminationConfirmation = false;
     reason = '';
   };
 
-  const showCancellationModal = () => {
-    showCancellationConfirmation = true;
-  };
-
-  const hideCancellationModal = () => {
-    showCancellationConfirmation = false;
-  };
-
-  const showSignalModal = () => {
-    showSignalConfirmation = true;
-  };
-
   const hideSignalModal = () => {
-    showSignalConfirmation = false;
     signalInput = '';
     signalName = '';
   };
 
-  const showResetModal = () => {
-    showResetConfirmation = true;
-  };
-
   const hideResetModal = () => {
-    showResetConfirmation = false;
     resetType = ResetType.FirstWorkflowTask;
     resetId = undefined;
     resetReason = undefined;
@@ -92,7 +69,6 @@
   };
 
   const handleSuccessfulTermination = async () => {
-    hideTerminationModal();
     $refresh = Date.now();
     toaster.push({
       id: 'workflow-termination-success-toast',
@@ -101,7 +77,6 @@
   };
 
   const handleTerminationError = () => {
-    showTerminationConfirmation = false;
     reason = '';
     toaster.push({ message: 'Cannot terminate workflow.', variant: 'error' });
   };
@@ -137,7 +112,6 @@
         message: 'Unable to cancel workflow.',
       });
     }
-    hideCancellationModal();
   };
 
   const handleSignalInputChange = (event: CustomEvent<string>) => {
@@ -219,14 +193,14 @@
   $: workflowActions = [
     {
       label: 'Reset',
-      onClick: showResetModal,
+      onClick: () => resetConfirmationModal.open(),
       testId: 'reset-button',
       allowed: resetEnabled && workflow?.pendingChildren?.length === 0,
       tooltip: resetTooltipText(),
     },
     {
       label: 'Send a Signal',
-      onClick: showSignalModal,
+      onClick: () => signalConfirmationModal.open(),
       testId: 'signal-button',
       allowed: signalEnabled,
       tooltip: signalEnabled
@@ -235,7 +209,7 @@
     },
     {
       label: 'Terminate',
-      onClick: showTerminationModal,
+      onClick: () => terminateConfirmationModal.open(),
       testId: 'terminate-button',
       allowed: terminateEnabled,
       destructive: true,
@@ -257,7 +231,7 @@
   position="right"
   disabled={actionsDisabled}
   primaryActionDisabled={!cancelEnabled || cancelInProgress}
-  on:click={showCancellationModal}
+  on:click={() => cancelConfirmationModal.open()}
   label="Request Cancellation"
 >
   {#each workflowActions as { onClick, destructive, label, allowed, testId, tooltip }}
@@ -277,7 +251,7 @@
 </SplitButton>
 
 <Modal
-  open={showResetConfirmation}
+  bind:this={resetConfirmationModal}
   on:confirmModal={reset}
   on:cancelModal={hideResetModal}
   confirmDisabled={resetType === ResetType.EventId && !eventIdValid}
@@ -294,10 +268,9 @@
   </svelte:fragment>
 </Modal>
 <Modal
-  open={showCancellationConfirmation}
+  bind:this={cancelConfirmationModal}
   {loading}
   confirmType="destructive"
-  on:cancelModal={hideCancellationModal}
   on:confirmModal={cancel}
 >
   <h3 slot="title">Cancel Workflow</h3>
@@ -309,7 +282,7 @@
   </svelte:fragment>
 </Modal>
 <Modal
-  open={showTerminationConfirmation}
+  bind:this={terminateConfirmationModal}
   confirmText="Terminate"
   confirmType="destructive"
   on:cancelModal={hideTerminationModal}
@@ -330,7 +303,7 @@
   </div>
 </Modal>
 <Modal
-  open={showSignalConfirmation}
+  bind:this={signalConfirmationModal}
   confirmText="Submit"
   confirmDisabled={!signalName}
   on:cancelModal={hideSignalModal}

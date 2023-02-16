@@ -44,8 +44,8 @@
   );
 
   let selectedWorkflows: { [index: string]: boolean } = {};
-  let showBatchTerminateConfirmationModal: boolean = false;
-  let showBatchCancelConfirmationModal: boolean = false;
+  let batchTerminateConfirmationModal: BatchOperationConfirmationModal;
+  let batchCancelConfirmationModal: BatchOperationConfirmationModal;
   let allSelected: boolean = false;
   let pageSelected: boolean = false;
   let terminating: boolean = false;
@@ -88,14 +88,6 @@
   const refreshWorkflows = () => {
     resetSelection();
     $refresh = Date.now();
-  };
-
-  const handleBatchTerminate = () => {
-    showBatchTerminateConfirmationModal = true;
-  };
-
-  const handleBatchCancel = () => {
-    showBatchCancelConfirmationModal = true;
   };
 
   const resetPageToDefaultState = () => {
@@ -178,7 +170,6 @@
         });
       }
     }
-    showBatchTerminateConfirmationModal = false;
     resetPageToDefaultState();
   };
 
@@ -218,7 +209,6 @@
         });
       }
     }
-    showBatchCancelConfirmationModal = false;
     resetPageToDefaultState();
   };
 
@@ -255,7 +245,7 @@
 
 <BatchOperationConfirmationModal
   action="Terminate"
-  bind:open={showBatchTerminateConfirmationModal}
+  bind:this={batchTerminateConfirmationModal}
   loading={terminating}
   {allSelected}
   actionableWorkflowsLength={terminableWorkflows.length}
@@ -264,7 +254,7 @@
 />
 <BatchOperationConfirmationModal
   action="Cancel"
-  bind:open={showBatchCancelConfirmationModal}
+  bind:this={batchCancelConfirmationModal}
   loading={false}
   {allSelected}
   actionableWorkflowsLength={cancelableWorkflows.length}
@@ -323,8 +313,8 @@
     filteredWorkflowCount={query ? filteredWorkflowCount : totalWorkflowCount}
     {allSelected}
     {pageSelected}
-    on:terminateWorkflows={handleBatchTerminate}
-    on:cancelWorkflows={handleBatchCancel}
+    on:terminateWorkflows={() => batchTerminateConfirmationModal.open()}
+    on:cancelWorkflows={() => batchCancelConfirmationModal.open()}
     on:toggleAll={handleToggleAll}
     on:togglePage={handleTogglePage}
   >

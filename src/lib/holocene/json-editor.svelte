@@ -65,4 +65,9 @@
   onMount(() => (view = createEditorView()));
 </script>
 
-<div bind:this={editor} class={className} {...$$restProps} />
+<div
+  on:keydown|stopPropagation
+  bind:this={editor}
+  class={className}
+  {...$$restProps}
+/>

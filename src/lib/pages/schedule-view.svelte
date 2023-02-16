@@ -43,8 +43,8 @@
 
   let scheduleFetch = fetchSchedule(parameters);
 
-  let showPauseConfirmation = false;
-  let showDeleteConfirmation = false;
+  let pauseConfirmationModal: Modal;
+  let deleteConfirmationModal: Modal;
   let reason = '';
 
   let coreUser = coreUserStore();
@@ -80,7 +80,6 @@
           reason,
         });
     scheduleFetch = fetchSchedule(parameters, fetch);
-    showPauseConfirmation = false;
     reason = '';
   };
 
@@ -92,7 +91,7 @@
     },
     {
       label: 'Delete Schedule',
-      onClick: () => (showDeleteConfirmation = true),
+      onClick: () => deleteConfirmationModal.open(),
       class: 'text-red-500 terminate',
     },
   ];
@@ -153,7 +152,7 @@
         label={schedule?.schedule?.state?.paused ? 'Unpause' : 'Pause'}
         id="schedule-actions"
         disabled={editDisabled}
-        on:click={() => (showPauseConfirmation = !showPauseConfirmation)}
+        on:click={() => pauseConfirmationModal.open()}
       >
         {#each options as option}
           <button
@@ -202,11 +201,10 @@
       </div>
     </div>
     <Modal
-      open={showPauseConfirmation}
+      bind:this={pauseConfirmationModal}
       confirmType="primary"
       confirmText={schedule.schedule.state.paused ? 'Unpause' : 'Pause'}
       confirmDisabled={!reason}
-      on:cancelModal={() => (showPauseConfirmation = false)}
       on:confirmModal={() => handlePause(schedule)}
     >
       <h3 slot="title">
@@ -233,11 +231,10 @@
       </div>
     </Modal>
     <Modal
-      open={showDeleteConfirmation}
+      bind:this={deleteConfirmationModal}
       confirmType="destructive"
       confirmText={'Delete'}
-      on:cancelModal={() => (showDeleteConfirmation = false)}
-      on:confirmModal={() => handleDelete()}
+      on:confirmModal={handleDelete}
     >
       <h3 slot="title">Delete Schedule?</h3>
       <div slot="content">

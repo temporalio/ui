@@ -1,12 +1,10 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  import { noop } from 'svelte/internal';
   import { createEventDispatcher, type ComponentProps } from 'svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import IconButton from './icon-button.svelte';
 
-  interface $$Props extends HTMLAttributes<HTMLDivElement> {
-    open: boolean;
+  interface $$Props extends HTMLAttributes<HTMLDialogElement> {
     hideConfirm?: boolean;
     confirmText?: string;
     cancelText?: string;
@@ -16,7 +14,6 @@
     loading?: boolean;
   }
 
-  export let open: boolean;
   export let hideConfirm: boolean = false;
   export let confirmText: string = 'Confirm';
   export let cancelText: string = 'Cancel';
@@ -25,10 +22,13 @@
   export let large: boolean = false;
   export let loading: boolean = false;
 
+  export const open = () => modalElement.showModal();
+  export const close = () => modalElement.close();
+
   let className: string = '';
   export { className as class };
 
-  let modalElement: HTMLDivElement;
+  let modalElement: HTMLDialogElement;
   let hasInput: boolean = false;
   $: {
     if (modalElement) {
@@ -41,7 +41,8 @@
     confirmModal: undefined;
   }>();
 
-  const cancelModal = () => {
+  const handleCancel = () => {
+    modalElement.close();
     dispatch('cancelModal');
   };
 
@@ -51,11 +52,6 @@
 
   const handleKeyboardNavigation = (event: KeyboardEvent) => {
     if (!open) {
-      return;
-    }
-
-    if (event.key === 'Escape') {
-      cancelModal();
       return;
     }
 
@@ -82,6 +78,10 @@
     }
   };
 
+  const handleClick = (event: MouseEvent) => {
+    if (event.target === modalElement) handleCancel();
+  };
+
   $: {
     if (open && modalElement) {
       modalElement.focus();
@@ -89,85 +89,64 @@
   }
 </script>
 
-<svelte:window on:keydown|stopPropagation={handleKeyboardNavigation} />
-{#if open}
-  <div class="modal">
-    <div
-      on:keyup|stopPropagation={noop}
-      on:click|stopPropagation={cancelModal}
-      class="overlay"
+<svelte:window
+  on:click={handleClick}
+  on:keydown|stopPropagation={handleKeyboardNavigation}
+/>
+<dialog
+  bind:this={modalElement}
+  class="body {className}"
+  class:large
+  aria-labelledby="modal-title"
+  {...$$restProps}
+>
+  {#if !loading}
+    <IconButton
+      aria-label={cancelText}
+      icon="close"
+      class="float-right m-4"
+      on:click={handleCancel}
     />
-    <div
-      bind:this={modalElement}
-      class="body {className}"
-      class:large
-      tabindex="-1"
-      role="alertdialog"
-      aria-labelledby="modal-title"
-      aria-describedby="modal-description"
-      {...$$restProps}
-    >
-      {#if !loading}
-        <button
-          aria-label={cancelText}
-          class="float-right m-4"
-          on:click|stopPropagation={cancelModal}
-        >
-          <Icon
-            name="close"
-            class="cursor-pointer rounded-full hover:bg-gray-900 hover:text-white"
-          />
-        </button>
-      {/if}
-      <div id="modal-title" class="title">
-        <slot name="title">
-          <h3>Title</h3>
-        </slot>
-      </div>
-      <svelte:element
-        this={hasInput ? 'form' : 'div'}
-        on:submit|preventDefault|stopPropagation={confirmModal}
-      >
-        <div id="modal-content" class="content">
-          <slot name="content">
-            <span>Content</span>
-          </slot>
-        </div>
-        <div class="flex items-center justify-end space-x-2 p-6">
-          <Button
-            thin
-            variant="secondary"
-            disabled={loading}
-            on:click={cancelModal}>{cancelText}</Button
-          >
-          {#if !hideConfirm}
-            <Button
-              thin
-              variant={confirmType}
-              {loading}
-              disabled={confirmDisabled || loading}
-              testId="confirm-modal-button"
-              type={hasInput ? 'submit' : 'button'}
-              on:click={hasInput ? noop : confirmModal}>{confirmText}</Button
-            >
-          {/if}
-        </div>
-      </svelte:element>
-    </div>
+  {/if}
+  <div id="modal-title" class="title">
+    <slot name="title">
+      <h3>Title</h3>
+    </slot>
   </div>
-{/if}
+  <form on:submit={confirmModal} method="dialog">
+    <div id="modal-content" class="content">
+      <slot name="content">
+        <span>Content</span>
+      </slot>
+    </div>
+    <div class="flex items-center justify-end space-x-2 p-6">
+      <Button
+        thin
+        variant="secondary"
+        disabled={loading}
+        on:click={handleCancel}>{cancelText}</Button
+      >
+      {#if !hideConfirm}
+        <Button
+          thin
+          variant={confirmType}
+          {loading}
+          disabled={confirmDisabled || loading}
+          testId="confirm-modal-button"
+          type="submit">{confirmText}</Button
+        >
+      {/if}
+    </div>
+  </form>
+</dialog>
 
 <style lang="postcss">
-  .modal {
-    @apply fixed top-0 left-0 z-50 flex h-full w-full cursor-default items-center justify-center p-8 lg:p-0;
-  }
-
-  .overlay {
-    @apply fixed h-full w-full bg-gray-900 opacity-50;
-  }
-
   .body {
-    @apply z-50 mx-auto w-full max-w-lg overflow-y-auto rounded-lg bg-white text-gray-900 shadow-xl md:h-max;
+    @apply z-50 mx-auto w-full max-w-lg overflow-y-auto rounded-lg bg-white text-gray-900 shadow-xl md:h-max p-0;
+  }
+
+  .body::backdrop {
+    @apply bg-gray-900 opacity-50 cursor-pointer;
   }
 
   .large {

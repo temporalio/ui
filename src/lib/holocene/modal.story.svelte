@@ -8,26 +8,27 @@
   import Modal from './modal.svelte';
 
   export let Hst: HST;
-  let open = false;
   let deleteConfirm: string;
+  let modal: Modal;
+
+  const openModal = () => {
+    modal.open();
+  };
 
   const handleConfirm = () => {
     logEvent('Confirm', {});
-    open = false;
   };
 
   const handleCancel = () => {
     logEvent('Cancel', {});
-    open = false;
   };
 </script>
 
 <Hst.Story>
-  <Button on:click={() => (open = true)}>Open Modal</Button>
-
   <Hst.Variant title="A Basic Confirmation Modal">
+    <Button on:click={openModal}>Open Modal</Button>
     <Modal
-      bind:open
+      bind:this={modal}
       confirmType="destructive"
       confirmText="Delete"
       on:confirmModal={handleConfirm}
@@ -40,8 +41,9 @@
     </Modal>
   </Hst.Variant>
   <Hst.Variant title="A Modal with a Form">
+    <Button on:click={openModal}>Open Modal</Button>
     <Modal
-      bind:open
+      bind:this={modal}
       confirmType="destructive"
       confirmText="Delete"
       on:cancelModal={handleCancel}
@@ -58,7 +60,4 @@
       </div>
     </Modal>
   </Hst.Variant>
-  <svelte:fragment slot="controls">
-    <Hst.Checkbox title="Open: " bind:value={open} />
-  </svelte:fragment>
 </Hst.Story>

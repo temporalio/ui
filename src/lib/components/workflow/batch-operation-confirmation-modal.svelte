@@ -3,12 +3,14 @@
   import Modal from '$lib/holocene/modal.svelte';
   import { pluralize } from '$lib/utilities/pluralize';
   import Input from '$lib/holocene/input/input.svelte';
-  export let open: boolean;
   export let action: 'Terminate' | 'Cancel';
   export let loading: boolean;
   export let allSelected: boolean;
   export let actionableWorkflowsLength: number;
   export let query: string;
+
+  let modal: Modal;
+  export const open = () => modal.open();
 
   const dispatch = createEventDispatcher<{
     confirm: { reason: string };
@@ -18,12 +20,10 @@
 
   const handleConfirmModal = () => {
     dispatch('confirm', { reason });
-    open = false;
     reason = '';
   };
 
   const handleCancelModal = () => {
-    open = false;
     reason = '';
   };
 
@@ -31,7 +31,7 @@
 </script>
 
 <Modal
-  {open}
+  bind:this={modal}
   confirmType="destructive"
   confirmDisabled={reason === ''}
   {confirmText}
