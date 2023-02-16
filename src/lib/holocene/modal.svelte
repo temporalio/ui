@@ -142,11 +142,11 @@
 
 <style lang="postcss">
   .body {
-    @apply z-50 mx-auto w-full max-w-lg overflow-y-auto rounded-lg bg-white text-gray-900 shadow-xl md:h-max p-0;
+    @apply z-50 mx-auto w-full max-w-lg overflow-y-auto rounded-lg bg-white p-0 text-gray-900 shadow-xl md:h-max;
   }
 
   .body::backdrop {
-    @apply bg-gray-900 opacity-50 cursor-pointer;
+    @apply cursor-pointer bg-gray-900 opacity-50;
   }
 
   .large {
