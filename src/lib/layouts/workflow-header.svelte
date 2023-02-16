@@ -92,7 +92,7 @@
 </script>
 
 <header class="mb-4 flex flex-col gap-1">
-  <div class="-mt-3 -ml-2 mb-4 block">
+  <div class="mb-4 block">
     <a
       href={routeForWorkflowsWithQuery({
         namespace,
@@ -130,7 +130,13 @@
   </div>
   {#if cancelInProgress}
     <div class="mb-4" in:fly={{ duration: 200, delay: 100 }}>
-      <Alert bold icon="info" intent="info" title="Cancel Request Sent">
+      <Alert
+        bold
+        icon="info"
+        intent="info"
+        title="Cancel Request Sent"
+        role="status"
+      >
         The request to cancel this Workflow Execution has been sent. If the
         Workflow uses the cancellation API, it'll cancel at the next available
         opportunity.
@@ -143,8 +149,9 @@
         bold
         icon="info"
         intent="info"
-        testId="workflow-reset-alert"
+        data-testid="workflow-reset-alert"
         title="This Workflow has been reset"
+        role="status"
       >
         You can find the resulting Workflow Execution <Link
           href={routeForEventHistory({

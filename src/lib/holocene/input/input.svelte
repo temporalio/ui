@@ -1,9 +1,28 @@
 <script lang="ts">
+  import { createEventDispatcher } from 'svelte';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { IconName } from '$lib/holocene/icon/paths';
-  import { createEventDispatcher } from 'svelte';
   import IconButton from '../icon-button.svelte';
+  import type { HTMLInputAttributes } from 'svelte/elements';
+  import type { IconName } from '$lib/holocene/icon/paths';
+  interface $$Props extends HTMLInputAttributes {
+    id: string;
+    value: string;
+    label?: string;
+    icon?: IconName;
+    suffix?: string;
+    copyable?: boolean;
+    clearable?: boolean;
+    theme?: 'dark' | 'light';
+    valid?: boolean;
+    hintText?: string;
+    maxLength?: number;
+    spellcheck?: boolean;
+    unroundRight?: boolean;
+    unroundLeft?: boolean;
+    autoFocus?: boolean;
+    error?: boolean;
+  }
 
   export let id: string;
   export let value: string;
@@ -16,7 +35,7 @@
   export let disabled = false;
   export let clearable = false;
   export let theme: 'dark' | 'light' = 'light';
-  export let autocomplete = false;
+  export let autocomplete = 'off';
   export let valid = true;
   export let hintText = '';
   export let maxLength = 0;
@@ -26,6 +45,9 @@
   export let autoFocus = false;
   export let error = false;
   export let required = false;
+
+  let className = '';
+  export { className as class };
 
   function callFocus(input) {
     if (autoFocus) input.focus();
@@ -41,7 +63,7 @@
   $: disabled = disabled || copyable;
 </script>
 
-<div class={$$props.class}>
+<div class={className}>
   {#if label}
     <label class:required for={id}>{label}</label>
   {/if}
@@ -69,7 +91,7 @@
       {name}
       {spellcheck}
       {required}
-      autocomplete={autocomplete ? 'on' : 'off'}
+      {autocomplete}
       bind:value
       on:input
       on:keydown|stopPropagation
@@ -77,6 +99,7 @@
       on:focus
       on:blur
       use:callFocus
+      {...$$restProps}
     />
     {#if suffix}
       <div class="suffix">

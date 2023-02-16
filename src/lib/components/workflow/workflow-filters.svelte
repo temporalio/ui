@@ -70,7 +70,7 @@
   }, 300);
 </script>
 
-<section class="flex flex-col">
+<div class="flex flex-col">
   <p class="pb-2 text-right text-xs">
     {#if searchType === 'advanced'}
       <a
@@ -100,9 +100,13 @@
       on:submit={updateQuery}
     />
   {:else}
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-5">
+    <div
+      role="search"
+      class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-5"
+    >
       <Input
         icon="search"
+        type="search"
         id="workflow-id-filter"
         placeholder="Workflow ID"
         bind:value={parameters.workflowId}
@@ -110,6 +114,7 @@
       />
       <Input
         icon="search"
+        type="search"
         id="workflow-type-filter"
         placeholder="Workflow Type"
         bind:value={parameters.workflowType}
@@ -117,7 +122,7 @@
       />
       <Select
         id="time-range-filter"
-        placeholder="Time Range"
+        label="Time Range"
         bind:value={parameters.timeRange}
         on:change={handleParameterChange}
       >
@@ -139,11 +144,15 @@
           <Option {value}>{label}</Option>
         {/each}
       </Select>
-      <Select id="filter-by-relative-time" bind:value={$timeFormat}>
+      <Select
+        id="filter-by-relative-time"
+        bind:value={$timeFormat}
+        label="Time Format"
+      >
         <Option value={'relative'}>Relative</Option>
         <Option value={'UTC'}>UTC</Option>
         <Option value={'local'}>Local</Option>
       </Select>
     </div>
   {/if}
-</section>
+</div>

@@ -154,6 +154,7 @@
             store.previous();
             handlePageChange();
           }}
+          aria-label="previous"
         >
           <span
             class="arrow arrow-left"
@@ -175,6 +176,7 @@
             store.next();
             handlePageChange();
           }}
+          aria-label="next"
         >
           <span
             class="arrow arrow-right"
@@ -212,6 +214,7 @@
           class="caret"
           disabled={!$store.hasPrevious}
           on:click={() => store.previous()}
+          aria-label="previous"
         >
           <span
             class="arrow arrow-left"
@@ -230,6 +233,7 @@
           class="caret"
           disabled={!$store.hasNext}
           on:click={() => store.next()}
+          aria-label="next"
         >
           <span
             class="arrow arrow-right"

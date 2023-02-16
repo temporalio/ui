@@ -272,7 +272,7 @@
   on:confirm={cancelWorkflows}
 />
 
-<div class="mb-2 flex justify-between">
+<header class="mb-2 flex justify-between">
   <div>
     <h1 class="text-2xl" data-testid="namespace-title">
       Recent Workflows
@@ -307,7 +307,7 @@
       <Icon name="retry" class="h-8 w-8" />
     </button>
   </div>
-</div>
+</header>
 <Pagination items={$workflows} let:visibleItems aria-label="recent workflows">
   <svelte:fragment slot="action-top-left">
     <WorkflowAdvancedSearch />

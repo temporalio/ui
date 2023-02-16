@@ -58,6 +58,7 @@
   <div class="flex w-[500px] flex-col gap-2 p-2">
     <Input
       icon="search"
+      type="search"
       id="workflowType"
       placeholder="Workflow Type"
       class="flex items-center px-2 transition-all hover:cursor-pointer"
