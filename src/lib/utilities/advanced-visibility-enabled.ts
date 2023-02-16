@@ -10,7 +10,6 @@ export const advancedVisibilityEnabled = (
   );
 };
 
-// Add isVersionNewer check when we know when orderBy is supported
 export const advancedVisibilityEnabledWithOrderBy = (
   cluster: ClusterInformation,
 ) => {
