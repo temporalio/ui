@@ -155,7 +155,7 @@ describe('Workflow Executions List With Search', () => {
       cy.get('#time-range-filter').click();
       cy.contains('15 minutes').click();
 
-      cy.url().should('contain', 'StartTime+>');
+      cy.url().should('contain', 'StartTime+%3E');
       cy.get('[data-testid="workflow-count"]').should(
         'have.text',
         'Results 15 of 15 workflows',
@@ -167,7 +167,7 @@ describe('Workflow Executions List With Search', () => {
       cy.contains('3 hours').click();
       cy.contains('End Time').click();
 
-      cy.url().should('contain', 'CloseTime+>');
+      cy.url().should('contain', 'CloseTime+%3E');
       cy.get('[data-testid="workflow-count"]').should(
         'have.text',
         'Results 15 of 15 workflows',
@@ -371,7 +371,7 @@ describe('Workflow Executions List With Search using only MySql on 1.20', () => 
       cy.get('#time-range-filter').click();
       cy.contains('15 minutes').click();
 
-      cy.url().should('contain', 'StartTime+>');
+      cy.url().should('contain', 'StartTime+%3E');
       cy.get('[data-testid="workflow-count"]').should(
         'have.text',
         'Results 15 of 15 workflows',
@@ -383,7 +383,7 @@ describe('Workflow Executions List With Search using only MySql on 1.20', () => 
       cy.contains('3 hours').click();
       cy.contains('End Time').click();
 
-      cy.url().should('contain', 'CloseTime+>');
+      cy.url().should('contain', 'CloseTime+%3E');
       cy.get('[data-testid="workflow-count"]').should(
         'have.text',
         'Results 15 of 15 workflows',

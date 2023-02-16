@@ -29,8 +29,7 @@ export const supportsAdvancedVisibility = derived(
 );
 
 export const supportsAdvancedVisibilityWithOrderBy = derived(
-  [cluster, temporalVersion, isCloud],
-  ([$cluster, $temporalVersion, $isCloud]) =>
-    advancedVisibilityEnabledWithOrderBy($cluster, $temporalVersion) ||
-    $isCloud,
+  [cluster, isCloud],
+  ([$cluster, $isCloud]) =>
+    advancedVisibilityEnabledWithOrderBy($cluster) || $isCloud,
 );

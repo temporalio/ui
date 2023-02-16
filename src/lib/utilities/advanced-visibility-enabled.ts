@@ -13,8 +13,6 @@ export const advancedVisibilityEnabled = (
 // Add isVersionNewer check when we know when orderBy is supported
 export const advancedVisibilityEnabledWithOrderBy = (
   cluster: ClusterInformation,
-  version: string,
 ) => {
   return cluster?.visibilityStore?.includes('elasticsearch');
-  // || isVersionNewer(version, '1.20')
 };
