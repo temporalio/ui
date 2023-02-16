@@ -46,7 +46,6 @@
 </script>
 
 <Modal
-  hasInput
   open={showSettings}
   on:cancelModal={onCancel}
   on:confirmModal={onConfirm}

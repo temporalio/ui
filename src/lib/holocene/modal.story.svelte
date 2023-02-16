@@ -42,7 +42,6 @@
   <Hst.Variant title="A Modal with a Form">
     <Modal
       bind:open
-      hasInput
       confirmType="destructive"
       confirmText="Delete"
       on:cancelModal={handleCancel}

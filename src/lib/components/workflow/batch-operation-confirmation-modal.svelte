@@ -32,7 +32,6 @@
 
 <Modal
   {open}
-  hasInput
   confirmType="destructive"
   confirmDisabled={reason === ''}
   {confirmText}

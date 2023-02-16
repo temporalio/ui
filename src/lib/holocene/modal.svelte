@@ -14,7 +14,6 @@
     confirmDisabled?: boolean;
     large?: boolean;
     loading?: boolean;
-    hasInput?: boolean;
   }
 
   export let open: boolean;
@@ -25,12 +24,17 @@
   export let confirmDisabled: boolean = false;
   export let large: boolean = false;
   export let loading: boolean = false;
-  export let hasInput: boolean = false;
 
   let className: string = '';
   export { className as class };
 
   let modalElement: HTMLDivElement;
+  let hasInput: boolean = false;
+  $: {
+    if (modalElement) {
+      hasInput = modalElement.querySelector('input') !== null;
+    }
+  }
 
   const dispatch = createEventDispatcher<{
     cancelModal: undefined;

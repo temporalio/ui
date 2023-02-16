@@ -203,7 +203,6 @@
     </div>
     <Modal
       open={showPauseConfirmation}
-      hasInput
       confirmType="primary"
       confirmText={schedule.schedule.state.paused ? 'Unpause' : 'Pause'}
       confirmDisabled={!reason}
