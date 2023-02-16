@@ -11,6 +11,8 @@
   import { authUser } from '$lib/stores/auth-user';
 
   const { namespace, workflow: workflowId, run: runId } = $page.params;
+  const { settings } = $page.data?.settings;
+
   const params = {
     id: workflowId,
     runId,
@@ -36,7 +38,7 @@
         workflow: params,
         queryType,
       },
-      $page.data?.settings,
+      settings,
       $authUser?.accessToken,
     );
   };
