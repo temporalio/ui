@@ -124,7 +124,6 @@ export const fetchStartAndEndEvents = async (
     ...parameters,
     sort: 'descending',
   });
-
   const [start, end] = await Promise.all([
     toEventHistory({
       response: startEventsRaw,

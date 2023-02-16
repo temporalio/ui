@@ -3,9 +3,11 @@ import {
   requestFromAPI,
 } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
-
 import { getQueryTypesFromError } from '$lib/utilities/get-query-types-from-error';
-import { getCodecEndpoint } from '$lib/utilities/get-codec';
+import {
+  getCodecEndpoint,
+  getCodecPassAccessToken,
+} from '$lib/utilities/get-codec';
 import {
   convertPayloadToJsonWithCodec,
   convertPayloadToJsonWithWebsocket,
@@ -14,6 +16,7 @@ import {
   parseWithBigInt,
   stringifyWithBigInt,
 } from '$lib/utilities/parse-with-big-int';
+import { passAccessToken as codecPassAccessToken } from '$lib/stores/data-encoder-config';
 
 type QueryRequestParameters = {
   workflow: Eventual<{ id: string; runId: string }>;
@@ -120,9 +123,13 @@ export async function getQuery(
     try {
       if (data[0]) {
         const endpoint = getCodecEndpoint(settings);
+        const passAccessToken = getCodecPassAccessToken(
+          settings,
+          codecPassAccessToken,
+        );
         const _settings = {
           ...settings,
-          codec: { ...settings?.codec, endpoint },
+          codec: { ...settings?.codec, endpoint, passAccessToken },
         };
         const convertedAttributes = endpoint
           ? await convertPayloadToJsonWithCodec({

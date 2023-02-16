@@ -11,6 +11,7 @@
   import { authUser } from '$lib/stores/auth-user';
 
   const { namespace, workflow: workflowId, run: runId } = $page.params;
+
   const params = {
     id: workflowId,
     runId,
