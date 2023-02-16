@@ -29,6 +29,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
@@ -188,6 +189,15 @@ func randNonce(c echo.Context) (string, error) {
 	}
 
 	returnURL := c.QueryParam("returnUrl")
+	u, err := url.Parse(returnURL)
+	if err != nil {
+		return "", fmt.Errorf("invalid returnUrl: %w", err)
+	}
+
+	// Reject redirects to other hosts, our use case only needs to handle local redirects.
+	if u.Host != "" && u.Host != c.Request().Host {
+		return "", fmt.Errorf("invalid returnUrl: does not match expected host %s", c.Request().Host)
+	}
 
 	n := &Nonce{
 		Nonce:     v,
