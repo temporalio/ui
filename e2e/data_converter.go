@@ -33,7 +33,7 @@ func (e *Codec) Encode(payloads []*commonpb.Payload) ([]*commonpb.Payload, error
 		// Compress
 		b := snappy.Encode(nil, origBytes)
 		result[i] = &commonpb.Payload{
-			Metadata: map[string][]byte{converter.MetadataEncoding: []byte("json/snappy")},
+			Metadata: map[string][]byte{converter.MetadataEncoding: []byte("binary/snappy")},
 			Data:     b,
 		}
 	}
@@ -46,7 +46,7 @@ func (*Codec) Decode(payloads []*commonpb.Payload) ([]*commonpb.Payload, error) 
 	result := make([]*commonpb.Payload, len(payloads))
 	for i, p := range payloads {
 		// Only if it's our encoding
-		if string(p.Metadata[converter.MetadataEncoding]) != "json/snappy" {
+		if string(p.Metadata[converter.MetadataEncoding]) != "binary/snappy" {
 			result[i] = p
 			continue
 		}
