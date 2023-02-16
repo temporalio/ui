@@ -1,17 +1,30 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import type { HTMLAttributes } from 'svelte/elements';
   import type { IconName } from './icon/paths';
+
+  interface $$Props extends HTMLAttributes<HTMLDivElement> {
+    intent: 'warning' | 'error' | 'success' | 'info';
+    title: string;
+    icon?: IconName;
+    bold?: boolean;
+    'data-testid'?: string;
+  }
 
   export let intent: 'warning' | 'error' | 'success' | 'info';
   export let title: string;
   export let icon: IconName = null;
   export let bold = false;
+
+  let className = '';
+  export { className as class };
 </script>
 
 <div
-  class="alert {intent} {$$props.class}"
+  class="alert {intent} {className}"
   class:bold
-  data-testid={$$props.testId}
+  role="alert"
+  {...$$restProps}
 >
   {#if icon}
     <div>

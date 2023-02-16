@@ -14,7 +14,7 @@
   };
 </script>
 
-<article
+<div
   {id}
   class="flex grow-0 items-center justify-between gap-4 rounded py-3 px-4 shadow {variant}"
   transition:fly={{ x: 250 }}
@@ -23,7 +23,7 @@
     <slot />
   </p>
   <IconButton icon="close" on:click={handleDismiss} />
-</article>
+</div>
 
 <style lang="postcss">
   .primary {

@@ -33,23 +33,25 @@
   };
 </script>
 
-<section class="flex flex-col gap-4">
+<div class="flex flex-col gap-4">
   <WorkflowStackTraceError />
   <WorkflowTypedError error={workflowEvents.error} />
   <WorkflowSummary />
   <WorkflowRelationships {...workflowRelationships} />
   <PendingActivities />
-  <Accordion
-    title="Input and Results"
-    icon="json"
-    class="border-gray-900"
-    data-testid="input-and-results"
-  >
-    <div class="flex w-full flex-col gap-2 lg:flex-row">
-      <InputAndResults type="input" content={workflowEvents.input} />
-      <InputAndResults type="results" content={workflowEvents.results} />
-    </div>
-  </Accordion>
+  <section>
+    <Accordion
+      title="Input and Results"
+      icon="json"
+      class="border-gray-900"
+      data-testid="input-and-results"
+    >
+      <div class="flex w-full flex-col gap-2 lg:flex-row">
+        <InputAndResults type="input" content={workflowEvents.input} />
+        <InputAndResults type="results" content={workflowEvents.results} />
+      </div>
+    </Accordion>
+  </section>
   <slot name="timeline" />
   <section id="event-history">
     <nav
@@ -97,4 +99,4 @@
     onOpen={() => (showShortcuts = true)}
     onClose={() => (showShortcuts = false)}
   />
-</section>
+</div>

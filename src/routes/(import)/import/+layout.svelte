@@ -17,11 +17,11 @@
   <div class="sticky top-0 z-20 h-screen w-auto">
     <Header />
   </div>
-  <section id="content" class="h-screen w-max flex-auto overflow-auto">
+  <main id="content" class="h-screen w-max flex-auto overflow-auto">
     <div class="z-10 flex h-full flex-col gap-4 px-10 pb-10 pt-8">
       <ErrorBoundary onError={() => {}}>
         <slot />
       </ErrorBoundary>
     </div>
-  </section>
+  </main>
 </div>

@@ -40,7 +40,7 @@
         </Tooltip>
       {/if}
     </h3>
-    <section>
+    <div>
       {#each pendingActivities as { id, ...pendingActivity } (id)}
         {@const failed = pendingActivity.attempt > 1}
         <div class="pending-activity-row-container">
@@ -133,7 +133,7 @@
           </div>
         </div>
       {/each}
-    </section>
+    </div>
     <div class="text-right">
       <Link {href}>Show all</Link>
     </div>

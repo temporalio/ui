@@ -25,7 +25,11 @@
   });
 </script>
 
-<section aria-roledescription="error" class="mt-32 text-center align-middle">
+<section
+  aria-roledescription="error"
+  class="mt-32 text-center align-middle"
+  role="alert"
+>
   <h1 class="text-[12rem] font-semibold ">{status}</h1>
   <p class="-mt-6 mb-5 text-lg">Uh oh. There's an error.</p>
   <p class="my-4 w-auto text-2xl font-extrabold text-red-700">

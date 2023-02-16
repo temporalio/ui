@@ -170,7 +170,7 @@
 </script>
 
 {#if title || copy}
-  <Alert bold icon="warning" intent="warning" {title}>
+  <Alert bold icon="warning" intent="warning" {title} role="status">
     <p>
       {copy}
       {#if contactSupport}

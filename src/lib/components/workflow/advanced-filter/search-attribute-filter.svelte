@@ -11,6 +11,7 @@
   <KeywordConditionals bind:conditional />
   <Input
     icon="search"
+    type="search"
     id="{id}-filter"
     placeholder={id}
     class="w-96"

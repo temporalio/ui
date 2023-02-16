@@ -13,7 +13,10 @@
   };
 </script>
 
-<div class="fixed bottom-5 right-5 z-[99999] flex flex-col items-end gap-2">
+<div
+  class="fixed bottom-5 right-5 z-[99999] flex flex-col items-end gap-2"
+  role="log"
+>
   {#each $toasts as { message, variant, id } (id)}
     <ToastComponent {variant} {id} on:dismiss={dismissToast}>
       {message}
