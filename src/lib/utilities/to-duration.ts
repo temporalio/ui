@@ -74,6 +74,8 @@ export const toDuration = (value: string): Duration => {
   const duration: Duration = {};
   const segments = value.match(durationPattern);
 
+  if (!segments) return duration;
+
   for (const segment of segments) {
     const [amount, unit] = segment.split(' ');
     const n = parseInt(amount, 10);
@@ -90,13 +92,14 @@ export const toDuration = (value: string): Duration => {
   return duration;
 };
 
+const singularlize = (unit: string, amount: number): string => {
+  if (amount === 1) return unit.slice(0, unit.length - 1);
+  return unit;
+};
+
 export const toString = (duration: Duration): string => {
-  let units = Object.keys(duration)[0];
-  const amount: number = duration[units];
-
-  if (amount === 1) units = units.slice(0, units.length - 1);
-
-  return `${amount} ${units}`;
+  const [[units, amount]] = Object.entries(duration);
+  return `${amount} ${singularlize(units, amount)}`;
 };
 
 export const toDate = (timeRange: Duration | string): string => {
@@ -116,7 +119,7 @@ export const fromDate = (
   return intervalToDuration({ start, end });
 };
 
-export const fromSeconds = (seconds: string): Duration => {
+export const fromSeconds = (seconds: string): Duration | undefined => {
   const milliseconds = parseInt(seconds) * 1000;
 
   if (!seconds.endsWith('s')) return undefined;

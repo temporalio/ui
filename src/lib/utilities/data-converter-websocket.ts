@@ -9,9 +9,12 @@ import { parseWithBigInt, stringifyWithBigInt } from './parse-with-big-int';
 
 export interface DataConverterWebsocketInterface {
   hasWebsocket: boolean;
-  websocket: WebSocketAsPromised;
-  closeSocket: () => Promise<CloseEvent>;
+  websocket: WebSocketAsPromised | null;
+  closeSocket: () => Promise<CloseEvent> | null;
 }
+
+let sock: WebSocketAsPromised | null = null;
+const port = get(dataConverterPort) ?? null;
 
 export const createWebsocket = (
   port: string | null,
@@ -21,9 +24,7 @@ export const createWebsocket = (
     return {
       hasWebsocket: false,
       websocket: null,
-      closeSocket: function () {
-        return null;
-      },
+      closeSocket: () => null,
     };
   }
 
@@ -44,18 +45,16 @@ export const createWebsocket = (
     setLastDataConverterFailure(`Error creating websocket: ${err}`);
   }
 
-  sock.open();
+  sock?.open();
 
   return {
     hasWebsocket: true,
     websocket: sock,
-    closeSocket: function (): Promise<CloseEvent> {
+    closeSocket: () => {
+      if (!sock) return null;
       return sock.close();
     },
   };
 };
-
-let sock = null;
-const port = get(dataConverterPort) ?? null;
 
 export const dataConverterWebsocket = createWebsocket(port);

@@ -19,14 +19,18 @@ export const convertDaysAndMonths = ({
   daysOfMonth = [],
   daysOfWeek = [],
 }: Partial<ScheduleParameters>): Partial<ScheduleParameters> => {
-  const month = months.sort((a, b) => parseInt(a) - parseInt(b)).join(',');
-  const dayOfMonth = daysOfMonth.sort((a, b) => a - b).join(',');
+  const month = months
+    .sort((a: string, b: string) => parseInt(a) - parseInt(b))
+    .join(',');
+  const dayOfMonth = daysOfMonth
+    .sort((a: number, b: number) => a - b)
+    .join(',');
   const normalizedDaysOfWeek =
     daysOfWeek?.[0]?.split(',')?.length > 1
       ? daysOfWeek[0].split(',')
       : daysOfWeek;
   const dayOfWeek = normalizedDaysOfWeek
-    .sort((a, b) => parseInt(a) - parseInt(b))
+    .sort((a: string, b: string) => parseInt(a) - parseInt(b))
     .join(',');
 
   return { month, dayOfMonth, dayOfWeek };

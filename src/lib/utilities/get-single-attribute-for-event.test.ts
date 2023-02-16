@@ -128,8 +128,15 @@ describe('getSingleAttributeForEvent', () => {
 
   it('should return "parentInitiatedEventId" if the workflow type and task queue does not exist', () => {
     const event = { ...workflowEvent };
-    event.attributes.workflowType = null;
-    event.attributes.taskQueue = null;
+    event.attributes.workflowType = null as unknown as {
+      name: string;
+    };
+
+    event.attributes.taskQueue = null as unknown as {
+      name: string;
+      kind: string;
+    };
+
     expect(getSingleAttributeForEvent(event)).toStrictEqual({
       key: 'parentInitiatedEventId',
       value: '0',

@@ -6,7 +6,7 @@ export const getFloatStyle = ({
 }: {
   width?: number;
   height?: number;
-  screenWidth?: number;
+  screenWidth: number;
   breakpoint?: number;
 }): string => {
   return width && height && screenWidth > breakpoint

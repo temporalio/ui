@@ -13,7 +13,9 @@ const labelsToShorten: Readonly<{ [key: string]: string }> = {
   workflowExecutionRunId: 'workflowExecution',
 };
 
-const formatLabel = (label?: string) => {
+const formatLabel = (label?: string): string => {
+  if (!label) return '';
+
   // Add name if needed
   if (labelsToAddName.has(label)) {
     return `${label}Name`;
@@ -22,16 +24,19 @@ const formatLabel = (label?: string) => {
   if (labelsToShorten[label]) {
     return label.replace(labelsToShorten[label], '');
   }
+
   return label;
 };
 
 export const format = (label?: string): string => {
+  if (!label) return '';
+
   let result = '';
   let index = 0;
 
   label = formatLabel(label);
 
-  while (index < label?.length) {
+  while (index < label.length) {
     const current = label[index];
     const next = label[index + 1];
 
