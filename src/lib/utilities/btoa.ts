@@ -1,6 +1,6 @@
 import { browser } from '$app/environment';
 
-export const base64EncodeUnicode = (str) => {
+export const base64EncodeUnicode = (str: string) => {
   return window.btoa(
     encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_, p1) =>
       String.fromCharCode(parseInt(p1, 16)),
