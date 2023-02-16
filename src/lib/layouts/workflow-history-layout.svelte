@@ -24,6 +24,7 @@
     getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
   $: ({ workflow } = $workflowRun);
   $: workflowRelationships = getWorkflowRelationships(workflow, $eventHistory);
+  $: isContinuedAsNew = workflow?.status === 'ContinuedAsNew';
 
   const onViewClick = (view: EventView) => {
     if ($page.url.searchParams.get('page')) {
@@ -40,14 +41,20 @@
   <WorkflowRelationships {...workflowRelationships} />
   <PendingActivities />
   <Accordion
-    title="Input and Results"
+    title="Input and {isContinuedAsNew
+      ? 'Continued as New with Input'
+      : 'Results'}"
     icon="json"
     class="border-gray-900"
     data-testid="input-and-results"
   >
     <div class="flex w-full flex-col gap-2 lg:flex-row">
       <InputAndResults type="input" content={workflowEvents.input} />
-      <InputAndResults type="results" content={workflowEvents.results} />
+      <InputAndResults
+        type="results"
+        content={workflowEvents.results}
+        title={isContinuedAsNew ? 'Continued as New with Input' : null}
+      />
     </div>
   </Accordion>
   <slot name="timeline" />

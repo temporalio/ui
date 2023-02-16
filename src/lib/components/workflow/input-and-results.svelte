@@ -6,8 +6,9 @@
 
   export let type: 'input' | 'results';
   export let content: string;
+  export let title: string = null;
 
-  $: title = capitalize(type);
+  $: title = title ?? capitalize(type);
 </script>
 
 <article class="flex w-full flex-col lg:w-1/2" data-testid="workflow-{type}">
