@@ -129,7 +129,7 @@ export async function getQuery(
         );
         const _settings = {
           ...settings,
-          codec: { ...settings?.codec, endpoint },
+          codec: { ...settings?.codec, endpoint, passAccessToken },
         };
         const convertedAttributes = endpoint
           ? await convertPayloadToJsonWithCodec({
