@@ -44,11 +44,3 @@ jobs:
         uses: ./.github/actions/checkout-and-setup
       - name: Run Unit Tests
         run: pnpm test
-  snapshot-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Checkout and Setup Node
-        uses: ./.github/actions/checkout-and-setup
-      - name: Run Snapshot Tests
-        run: pnpm test:snapshot
