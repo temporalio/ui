@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { mockDate } from '$utilities/mock-date.js';
+import { mockClusterApi } from '$utilities/mock-apis.js';
 
 const workflowsUrl = '/namespaces/default/workflows';
 const workflowsApiMatch = new RegExp('/api/v1/namespaces/default/workflows');
@@ -8,6 +9,7 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(mockDate);
 
   await page.goto(workflowsUrl);
+  await mockClusterApi(page);
 });
 
 const timeFrames = [
