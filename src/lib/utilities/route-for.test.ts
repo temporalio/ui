@@ -7,7 +7,7 @@ import {
   routeForWorkflow,
   routeForWorkflowQuery,
   routeForWorkflows,
-  routeForImport,
+  routeForEventHistoryImport,
   routeForLoginPage,
   hasParameters,
   isEventHistoryParameters,
@@ -134,17 +134,12 @@ describe('routeFor', () => {
 
 describe('routeFor import ', () => {
   it('should default route to "import/events" for import', () => {
-    const path = routeForImport({
-      importType: 'events',
-    });
+    const path = routeForEventHistoryImport();
     expect(path).toBe('/import/events');
   });
 
   it('should route to specific view for import', () => {
-    const path = routeForImport({
-      importType: 'events',
-      view: 'compact',
-    });
+    const path = routeForEventHistoryImport('compact');
     expect(path).toBe('/import/events/namespace/workflow/run/history/compact');
   });
 

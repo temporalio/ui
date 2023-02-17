@@ -124,6 +124,14 @@
       </NavRow>
     </slot>
     <slot name="settings" />
+    <NavRow link={linkList.import} {isCloud}>
+      <NavTooltip right text="Import">
+        <div class="nav-icon">
+          <Icon name="download" />
+        </div>
+      </NavTooltip>
+      <div class="nav-title">Import</div>
+    </NavRow>
     {#await user}
       <NavRow {isCloud}>
         <div class="motion-safe:animate-pulse" style="margin-left:1rem">

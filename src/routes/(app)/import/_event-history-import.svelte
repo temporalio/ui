@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { routeForImport } from '$lib/utilities/route-for';
+  import { routeForEventHistoryImport } from '$lib/utilities/route-for';
   import { goto } from '$app/navigation';
 
   import Button from '$lib/holocene/button.svelte';
@@ -42,7 +42,7 @@
       const eventGroups = groupEvents(events);
       importEvents.set(events);
       importEventGroups.set(eventGroups);
-      const path = routeForImport({ importType: 'events', view: 'feed' });
+      const path = routeForEventHistoryImport('feed');
       goto(path);
     } catch (e) {
       console.error(e);

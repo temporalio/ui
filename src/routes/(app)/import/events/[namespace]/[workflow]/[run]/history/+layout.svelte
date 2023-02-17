@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { routeForImport } from '$lib/utilities/route-for';
+  import { routeForEventHistoryImport } from '$lib/utilities/route-for';
 
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
@@ -23,19 +23,14 @@
   >
     <div id="event-view-toggle" class="flex gap-4 bg-white">
       <ToggleButtons>
-        <ToggleButton
-          icon="feed"
-          href={routeForImport({ importType: 'events', view: 'feed' })}
+        <ToggleButton icon="feed" href={routeForEventHistoryImport('feed')}
           >Timeline</ToggleButton
         >
         <ToggleButton
           icon="compact"
-          href={routeForImport({ importType: 'events', view: 'compact' })}
-          >Compact</ToggleButton
+          href={routeForEventHistoryImport('compact')}>Compact</ToggleButton
         >
-        <ToggleButton
-          icon="json"
-          href={routeForImport({ importType: 'events', view: 'json' })}
+        <ToggleButton icon="json" href={routeForEventHistoryImport('json')}
           >JSON</ToggleButton
         >
       </ToggleButtons>
