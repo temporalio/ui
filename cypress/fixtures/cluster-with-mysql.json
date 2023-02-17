@@ -22,12 +22,7 @@
       "notes": ""
     },
     "instructions": "",
-    "alerts": [
-      {
-        "message": "🪐 A new release is available!",
-        "severity": "Low"
-      }
-    ],
+    "alerts": [],
     "lastUpdateTime": "2022-11-09T22:29:04.612659335Z"
   },
   "clusterName": "active",
