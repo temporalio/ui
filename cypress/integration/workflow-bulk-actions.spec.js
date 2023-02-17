@@ -38,8 +38,12 @@ describe('Batch and Bulk Workflow Actions', () => {
 
       cy.get('#select-visible-workflows').click({ force: true });
       cy.get('[data-testid="bulk-terminate-button"]').click();
-      cy.get('#bulk-action-reason').type('Sarah Connor');
-      cy.get('div.modal button.destructive').click();
+      cy.get(
+        '[data-testid="batch-Terminate-confirmation"] #bulk-action-reason',
+      ).type('Sarah Connor');
+      cy.get(
+        '[data-testid="batch-Terminate-confirmation"] button.destructive',
+      ).click();
       cy.get('#batch-terminate-success-toast');
     });
 
@@ -49,12 +53,15 @@ describe('Batch and Bulk Workflow Actions', () => {
       cy.get('#select-visible-workflows').click({ force: true });
       cy.get('[data-testid="select-all-workflows"]').click();
       cy.get('[data-testid="bulk-terminate-button"]').click();
-      cy.get('[data-testid="batch-action-workflows-query"]').should(
-        'have.text',
-        'ExecutionStatus="Running"',
-      );
-      cy.get('#bulk-action-reason').type('Sarah Connor');
-      cy.get('div.modal button.destructive').click();
+      cy.get(
+        '[data-testid="batch-Terminate-confirmation"] [data-testid="batch-action-workflows-query"]',
+      ).should('have.text', 'ExecutionStatus="Running"');
+      cy.get(
+        '[data-testid="batch-Terminate-confirmation"] #bulk-action-reason',
+      ).type('Sarah Connor');
+      cy.get(
+        '[data-testid="batch-Terminate-confirmation"] button.destructive',
+      ).click();
       cy.get('#batch-terminate-success-toast');
     });
 
@@ -63,8 +70,12 @@ describe('Batch and Bulk Workflow Actions', () => {
 
       cy.get('#select-visible-workflows').click({ force: true });
       cy.get('[data-testid="bulk-cancel-button"]').click();
-      cy.get('#bulk-action-reason').type('Sarah Connor');
-      cy.get('div.modal button.destructive').click();
+      cy.get(
+        '[data-testid="batch-Cancel-confirmation"] #bulk-action-reason',
+      ).type('Sarah Connor');
+      cy.get(
+        '[data-testid="batch-Cancel-confirmation"] button.destructive',
+      ).click();
       cy.get('#batch-cancel-success-toast');
     });
 
@@ -74,12 +85,15 @@ describe('Batch and Bulk Workflow Actions', () => {
       cy.get('#select-visible-workflows').click({ force: true });
       cy.get('[data-testid="select-all-workflows"]').click();
       cy.get('[data-testid="bulk-cancel-button"]').click();
-      cy.get('[data-testid="batch-action-workflows-query"]').should(
-        'have.text',
-        'ExecutionStatus="Running"',
-      );
-      cy.get('#bulk-action-reason').type('Sarah Connor');
-      cy.get('div.modal button.destructive').click();
+      cy.get(
+        '[data-testid="batch-Cancel-confirmation"] [data-testid="batch-action-workflows-query"]',
+      ).should('have.text', 'ExecutionStatus="Running"');
+      cy.get(
+        '[data-testid="batch-Cancel-confirmation"] #bulk-action-reason',
+      ).type('Sarah Connor');
+      cy.get(
+        '[data-testid="batch-Cancel-confirmation"] button.destructive',
+      ).click();
       cy.get('#batch-cancel-success-toast');
     });
   });

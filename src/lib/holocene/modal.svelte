@@ -12,6 +12,7 @@
     confirmDisabled?: boolean;
     large?: boolean;
     loading?: boolean;
+    'data-testid'?: string;
   }
 
   export let hideConfirm: boolean = false;
@@ -98,6 +99,7 @@
   class="body {className}"
   class:large
   aria-labelledby="modal-title"
+  data-testid={$$props['data-testid']}
   {...$$restProps}
 >
   {#if !loading}

@@ -32,6 +32,7 @@
 
 <Modal
   bind:this={modal}
+  data-testid="batch-{action}-confirmation"
   confirmType="destructive"
   confirmDisabled={reason === ''}
   {confirmText}
