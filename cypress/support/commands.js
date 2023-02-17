@@ -143,8 +143,7 @@ Cypress.Commands.add('interceptScheduleApi', () => {
 
 Cypress.Commands.add('interceptCreateBatchOperationApi', () => {
   cy.intercept(
-    Cypress.env('VITE_API_HOST') +
-      `/api/v1/namespaces/*/workflows/batch/terminate?`,
+    Cypress.env('VITE_API_HOST') + `/api/v1/namespaces/*/batch-operations?`,
     { statusCode: 200, body: {} },
   ).as('create-batch-operation-api');
 });
@@ -152,7 +151,7 @@ Cypress.Commands.add('interceptCreateBatchOperationApi', () => {
 Cypress.Commands.add('interceptDescribeBatchOperationApi', () => {
   cy.intercept(
     Cypress.env('VITE_API_HOST') +
-      `/api/v1/namespaces/*/workflows/batch/describe?jobId=*`,
+      `/api/v1/namespaces/*/batch-operations/describe?jobId=*`,
     { fixture: 'batch-operation-status.json' },
   ).as('describe-batch-operation-api');
 });

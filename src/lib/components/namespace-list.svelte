@@ -49,12 +49,13 @@
   {/if}
 </div>
 
-<div class="mb-5 flex rounded-md border border-gray-900 p-1 pr-4">
+<div class="mb-5 flex rounded-md border border-gray-900 p-1 pr-4" role="search">
   <div class="ml-4 mr-2">
     <Icon name="search" />
   </div>
   <input
     class="w-full"
+    type="search"
     placeholder="Search"
     use:rootDocumentHandler
     on:keydown|stopPropagation

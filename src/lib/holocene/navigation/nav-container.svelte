@@ -51,15 +51,11 @@
         <slot name="top" />
       </ul>
     </div>
-    <div class="relative grow-0 items-center">
+    <div class="flex flex-col items-center justify-between">
       <ul class="flex flex-col gap-2 pb-32">
         <slot name="bottom" />
       </ul>
-      <div
-        class="absolute bottom-0 left-2 text-[10px] {isCloud
-          ? 'text-gray-500'
-          : 'text-gray-300'}"
-      >
+      <div class="text-[10px] {isCloud ? 'text-gray-500' : 'text-gray-300'}">
         {$page.data?.settings?.version ?? ''}
       </div>
     </div>

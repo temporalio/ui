@@ -63,7 +63,8 @@ type (
 	}
 
 	CORS struct {
-		AllowOrigins []string `yaml:"allowOrigins"`
+		AllowOrigins   []string `yaml:"allowOrigins"`
+		CookieInsecure bool     `yaml:"cookieInsecure"`
 	}
 
 	TLS struct {

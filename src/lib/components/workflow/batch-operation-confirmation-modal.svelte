@@ -14,7 +14,7 @@
     confirm: { reason: string };
   }>();
 
-  let reason: string;
+  let reason: string = '';
 
   const handleConfirmModal = () => {
     dispatch('confirm', { reason });

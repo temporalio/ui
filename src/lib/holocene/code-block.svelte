@@ -11,7 +11,7 @@
   export let language = 'json';
 
   let root: HTMLElement;
-  let isJSON = language === 'json';
+  $: isJSON = language === 'json';
 
   const formatJSON = (jsonData: string): string => {
     if (!jsonData) return;
