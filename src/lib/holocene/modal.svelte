@@ -98,6 +98,7 @@
   bind:this={modalElement}
   class="body {className}"
   class:large
+  aria-modal="true"
   aria-labelledby="modal-title"
   data-testid={$$props['data-testid']}
   {...$$restProps}
