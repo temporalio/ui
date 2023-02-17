@@ -13,6 +13,7 @@
 <form
   on:submit|preventDefault
   class="relative flex items-center rounded-lg border-2 bg-white transition-colors focus-within:border-blue-700"
+  role="search"
 >
   {#if icon}
     <Icon name="search" class="ml-4 flex items-center text-gray-700" />
@@ -20,7 +21,7 @@
   <label for={id} class="hidden">{label}</label>
   <input
     {id}
-    type="text"
+    type="search"
     class="w-full rounded-l-lg px-4 focus:outline-none"
     {name}
     {value}

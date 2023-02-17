@@ -44,17 +44,18 @@
 <div class="w-full p-8 xl:w-1/2">
   <h1 class="my-4 text-3xl">Welcome to Temporal</h1>
   <p class="mb-8">Select a Namespace to get started.</p>
-  <div class="search">
+  <form class="search" role="search">
     <div class="ml-4 mr-2">
       <Icon name="search" />
     </div>
     <input
       class="w-full"
       placeholder="Search"
+      type="search"
       on:keydown|stopPropagation
       bind:value={searchValue}
     />
-  </div>
+  </form>
   <ul class="h-screen w-full" aria-label="namespaces">
     {#if namespaceList.length}
       {#if filteredList.length}

@@ -13,6 +13,7 @@
       label="Example"
       {value}
       icon="search"
+      type="search"
       options={['Avacado', 'Bacon', 'Cheese', 'Donuts', 'Eggs']}
       onOptionClick={(v) => (value = v)}
     />

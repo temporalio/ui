@@ -136,6 +136,7 @@
         <div class="w-full lg:w-1/4">
           <Autocomplete
             id="eventType"
+            type="search"
             placeholder="Event Type"
             icon="search"
             bind:value={eventTypeValue}
