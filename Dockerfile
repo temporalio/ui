@@ -10,8 +10,10 @@ RUN apk add --update --no-cache npm
 RUN npm install -g pnpm
 
 COPY package.json pnpm-lock.yaml ./
+COPY scripts scripts
 RUN pnpm install
 
+COPY plugins plugins
 COPY .babelrc .npmrc *.json *.yaml *.cjs *.js *.ts ./
 COPY src src
 
