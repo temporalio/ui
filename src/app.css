@@ -31,3 +31,7 @@ labels {
   max-height: 25em;
   overflow-y: scroll;
 }
+
+input[type='search']::-webkit-search-cancel-button {
+  display: none;
+}
