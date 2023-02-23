@@ -1,17 +1,12 @@
 <script lang="ts">
-  import { capitalize } from '$lib/utilities/format-camel-case';
-
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Loading from '$lib/holocene/loading.svelte';
 
-  export let type: 'input' | 'results';
   export let content: string;
-  export let title: string = null;
-
-  $: title = title ?? capitalize(type);
+  export let title: string;
 </script>
 
-<article class="flex w-full flex-col lg:w-1/2" data-testid="workflow-{type}">
+<article class="flex w-full flex-col lg:w-1/2" {...$$restProps}>
   <h3 class="text-lg">{title}</h3>
   {#if content}
     <CodeBlock {content} class="mb-2 max-h-96" />

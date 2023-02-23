@@ -283,7 +283,7 @@ describe('Workflow Input and Results', () => {
     cy.get('[data-testid="workflow-results"]').contains('Timeout');
   });
 
-  it('should show the input and results for continued as new workflow', () => {
+  it('should show the input and continued as new input for continued as new workflow', () => {
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
         `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}/events?maximumPageSize=20`,
@@ -312,11 +312,20 @@ describe('Workflow Input and Results', () => {
     cy.get('[data-testid="input-and-results"]').click();
 
     const firstEvent = eventsContinuedAsNewFixture.history.events[0];
+    const lastEvent =
+      eventsContinuedAsNewFixture.history.events[
+        eventsContinuedAsNewFixture.history.events.length - 1
+      ];
     const input = Buffer.from(
       firstEvent.workflowExecutionStartedEventAttributes.input.payloads[0].data,
       'base64',
     ).toString();
+    const result = Buffer.from(
+      lastEvent.workflowExecutionContinuedAsNewEventAttributes.input.payloads[0]
+        .data,
+      'base64',
+    ).toString();
     cy.get('[data-testid="workflow-input"]').contains(input);
-    cy.get('[data-testid="workflow-results"]').contains('ContinuedAsNew');
+    cy.get('[data-testid="workflow-results"]').contains(result);
   });
 });
