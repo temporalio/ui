@@ -16,7 +16,7 @@
 <Select
   id="int-operation-filter"
   bind:value={conditional}
-  displayValue={(value) => operations[value]}
+  setDisplayValue={(value) => operations[value]}
 >
   {#each Object.entries(operations) as [value, label] (value)}
     <Option {value}>{label}</Option>

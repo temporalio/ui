@@ -79,6 +79,24 @@
     </Select>
   </Hst.Variant>
 
+  <Hst.Variant title="With Grouped Options different value and display">
+    <Select id="select-3" placeholder="Select an Option" {value} {disabled}>
+      <OptionGroup label="Mammals">
+        <Option value={1}>Horse</Option>
+        <Option value={2}>Dog</Option>
+        <Option value={3}>Cat</Option>
+      </OptionGroup>
+      <OptionGroup label="Reptiles">
+        <Option value={4}>Snake</Option>
+        <Option value={5}>Lizard</Option>
+      </OptionGroup>
+      <OptionGroup label="Amphibians">
+        <Option value={6}>Frog</Option>
+        <Option value={7}>Salamander</Option>
+      </OptionGroup>
+    </Select>
+  </Hst.Variant>
+
   <Hst.Variant title="A Simple Select">
     <SimpleSelect id="select-4" bind:value>
       <SimpleOption>Option 1</SimpleOption>

@@ -25,7 +25,7 @@
     id="workflow-status"
     bind:value
     class="w-44"
-    displayValue={(value) => {
+    setDisplayValue={(value) => {
       if (!value) return 'All';
       return value;
     }}

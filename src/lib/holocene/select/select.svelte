@@ -1,6 +1,7 @@
 <script lang="ts" context="module">
   export type SelectContext<T> = {
     selectValue: T;
+    displayValue: string;
     onChange: (value: T) => void;
   };
 </script>
@@ -21,21 +22,24 @@
   export let label = '';
   export let id: string;
   export let value: T = undefined;
+  export let displayValue: string = undefined;
   export let dark: boolean = false;
   export let placeholder = '';
   export let disabled: boolean = false;
   export let unroundRight: boolean = false;
   export let keepOpen: boolean = false;
-  export let displayValue: (value: T) => T | string = (value) => value ?? '';
+  export let setDisplayValue: (value: T) => T | string = undefined;
   export let onChange: (value: T) => void = noop;
 
   const context = writable<SelectContext<T>>({
     selectValue: value,
+    displayValue: value?.toString(),
     onChange,
   });
 
   const unsubscribe = context.subscribe((ctx) => {
     value = ctx.selectValue;
+    displayValue = ctx.displayValue;
   });
 
   onDestroy(() => {
@@ -44,7 +48,11 @@
 
   $: {
     if (value) {
-      context.update((previous) => ({ ...previous, selectValue: value }));
+      context.update((previous) => ({
+        ...previous,
+        selectValue: value,
+        displayValue,
+      }));
     }
 
     setContext('select-value', context);
@@ -71,8 +79,10 @@
       <div class="select-input" class:dark class:disabled {id}>
         {#if !value && placeholder !== ''}
           {placeholder}
+        {:else if setDisplayValue}
+          {setDisplayValue(value)}
         {:else}
-          {displayValue(value)}
+          {displayValue}
         {/if}
       </div>
       {#if disabled}

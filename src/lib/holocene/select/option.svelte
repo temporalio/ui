@@ -29,16 +29,23 @@
   let selected: boolean;
   let _value: any;
   let slotWrapper: HTMLSpanElement;
+  let displayValue: string;
 
   $: {
     if (slotWrapper) {
       _value = value ?? slotWrapper.textContent;
       selected = $context.selectValue === _value;
+      displayValue = slotWrapper.textContent;
     }
   }
 
   const handleOptionClick = () => {
-    context.update((previous) => ({ ...previous, selectValue: _value }));
+    context.update((previous) => ({
+      ...previous,
+      selectValue: _value,
+      displayValue,
+    }));
+
     $context.onChange(_value);
   };
 </script>

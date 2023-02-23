@@ -43,7 +43,7 @@
   <Select
     id="reset-type-select"
     bind:value={resetType}
-    displayValue={copyForResetType}
+    setDisplayValue={copyForResetType}
     testId="workflow-reset-type-select"
   >
     <Option value={ResetType.FirstWorkflowTask}
