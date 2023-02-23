@@ -6,6 +6,7 @@
   import WorkflowHistoryFeed from '$lib/pages/workflow-history-feed.svelte';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
   import WorkflowHistoryCompact from '$lib/pages/workflow-history-compact.svelte';
+  import WorkflowHistoryCompactV2 from '$lib/pages/workflow-history-compact-v2.svelte';
 
   import PageTitle from '$lib/components/page-title.svelte';
   const workflow = $page.params.workflow;
@@ -13,6 +14,7 @@
   const views = {
     feed: WorkflowHistoryFeed,
     compact: WorkflowHistoryCompact,
+    compactV2: WorkflowHistoryCompactV2,
     json: WorkflowHistoryJson,
   };
   $: view = views[$eventViewType] ?? WorkflowHistoryFeed;

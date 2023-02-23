@@ -6,10 +6,15 @@ import {
   isWorkflowExecutionSignaledEvent,
   isTimerStartedEvent,
   isLocalActivityMarkerEvent,
+  isWorkflowTaskScheduledEvent,
 } from '$lib/utilities/is-event-type';
 
 export const getEventGroupName = (event: CommonHistoryEvent): string => {
   if (!event) return;
+
+  if (isWorkflowTaskScheduledEvent(event)) {
+    return 'Workflow Task';
+  }
 
   if (isActivityTaskScheduledEvent(event)) {
     return event.activityTaskScheduledEventAttributes?.activityType?.name;
