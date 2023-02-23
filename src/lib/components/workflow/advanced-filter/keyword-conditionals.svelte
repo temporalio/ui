@@ -10,11 +10,7 @@
   };
 </script>
 
-<Select
-  id="operator-filter"
-  bind:value={conditional}
-  setDisplayValue={(value) => operations[value]}
->
+<Select id="operator-filter" bind:value={conditional}>
   {#each Object.entries(operations) as [value, label] (value)}
     <Option {value}>{label}</Option>
   {/each}

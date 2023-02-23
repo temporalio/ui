@@ -12,13 +12,15 @@
 </script>
 
 <script lang="ts">
-  import { getContext } from 'svelte';
+  import { getContext, onDestroy, onMount } from 'svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import type { Writable } from 'svelte/store';
-  import type { SelectContext } from './select.svelte';
+  import type { SelectContext, SelectOption } from './select.svelte';
 
   const context = getContext<Writable<SelectContext<T>>>('select-value');
+  const optionContext =
+    getContext<Writable<SelectOption<T>[]>>('select-options');
 
   type T = $$Generic;
 
@@ -29,24 +31,34 @@
   let selected: boolean;
   let _value: any;
   let slotWrapper: HTMLSpanElement;
-  let displayValue: string;
+  let label: string;
 
   $: {
     if (slotWrapper) {
       _value = value ?? slotWrapper.textContent;
-      selected = $context.selectValue === _value;
-      displayValue = slotWrapper.textContent;
+      selected = $context.value === _value;
+      label = slotWrapper.textContent;
     }
   }
 
-  const handleOptionClick = () => {
-    context.update((previous) => ({
-      ...previous,
-      selectValue: _value,
-      displayValue,
-    }));
+  onMount(() => {
+    if (slotWrapper) {
+      label = slotWrapper.textContent;
+      $optionContext.push({ value, label });
+    }
+  });
 
-    $context.onChange(_value);
+  onDestroy(() => {
+    // Remove options from the optionContext if it no longer exists
+    let theIndex = $optionContext.findIndex((option) => option.value === value);
+    if (theIndex !== undefined) {
+      $optionContext.splice(theIndex, 1);
+    }
+  });
+
+  const handleOptionClick = () => {
+    $context.value = _value;
+    $context.label = label;
   };
 </script>
 

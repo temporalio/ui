@@ -15,13 +15,20 @@
 
   let resetIdHintText: string = DEFAULT_RESET_ID_HINT_TEXT;
 
-  const copyForResetType = (type: ResetType): string => {
-    return {
-      [ResetType.FirstWorkflowTask]: 'Reset to first workflow task',
-      [ResetType.LastWorkflowTask]: 'Reset to last workflow task',
-      [ResetType.EventId]: 'Reset to Event ID',
-    }[type];
-  };
+  const resetTypes = [
+    {
+      value: ResetType.FirstWorkflowTask,
+      label: 'Reset to first workflow task',
+    },
+    {
+      value: ResetType.LastWorkflowTask,
+      label: 'Reset to last workflow task',
+    },
+    {
+      value: ResetType.EventId,
+      label: 'Reset to Event ID',
+    },
+  ];
 
   const handleResetIdInput = (event: InputEvent) => {
     const eventTarget = event.target as HTMLInputElement;
@@ -43,18 +50,13 @@
   <Select
     id="reset-type-select"
     bind:value={resetType}
-    setDisplayValue={copyForResetType}
     testId="workflow-reset-type-select"
   >
-    <Option value={ResetType.FirstWorkflowTask}
-      >{copyForResetType(ResetType.FirstWorkflowTask)}</Option
-    >
-    <Option value={ResetType.LastWorkflowTask}
-      >{copyForResetType(ResetType.LastWorkflowTask)}</Option
-    >
-    <Option value={ResetType.EventId}
-      >{copyForResetType(ResetType.EventId)}</Option
-    >
+    {#each resetTypes as { value, label }}
+      <Option value={Number(value)}>
+        {label}
+      </Option>
+    {/each}
   </Select>
   <Input id="reset-reason" bind:value={reason} label="Reason" />
   {#if resetType === ResetType.EventId}
