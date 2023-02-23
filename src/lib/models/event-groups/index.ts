@@ -19,19 +19,20 @@ export const groupEvents = (
   events: CommonHistoryEvent[],
   sort: EventSortOrder = 'ascending',
 ): EventGroups => {
-  const groups: Record<string, EventGroup> = {};
+  const groupMap: Record<string, EventGroup> = {};
 
   for (const event of events) {
     const id = getGroupId(event);
     const group = createEventGroup(event);
 
     if (group) {
-      groups[group.id] = group;
+      groupMap[group.id] = group;
     } else {
-      addToExistingGroup(groups[id], event);
+      addToExistingGroup(groupMap[id], event);
     }
   }
 
+  const groups = Object.values(groupMap);
   return sort === 'descending'
     ? Object.values(groups).reverse()
     : Object.values(groups);

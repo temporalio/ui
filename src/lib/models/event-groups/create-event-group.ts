@@ -6,6 +6,7 @@ import {
   isStartChildWorkflowExecutionInitiatedEvent,
   isWorkflowExecutionSignaledEvent,
   isTimerStartedEvent,
+  isWorkflowTaskScheduledEvent,
 } from '$lib/utilities/is-event-type';
 import {
   eventIsFailureOrTimedOut,
@@ -25,6 +26,7 @@ type StartingEvents = {
   SignalReceived: WorkflowExecutionSignaledEvent;
   LocalActivity: MarkerRecordedEvent;
   Marker: MarkerRecordedEvent;
+  WorkflowTask: WorkflowTaskScheduledEvent;
 };
 
 const createGroupFor = <K extends keyof StartingEvents>(
@@ -76,19 +78,19 @@ const createGroupFor = <K extends keyof StartingEvents>(
 };
 
 export const createEventGroup = (event: CommonHistoryEvent): EventGroup => {
-  if (isActivityTaskScheduledEvent(event))
-    return createGroupFor<'Activity'>(event);
-
   if (isStartChildWorkflowExecutionInitiatedEvent(event))
     return createGroupFor<'ChildWorkflow'>(event);
 
-  if (isTimerStartedEvent(event)) return createGroupFor<'Timer'>(event);
-
-  if (isSignalExternalWorkflowExecutionInitiatedEvent(event))
-    return createGroupFor<'Signal'>(event);
-
   if (isWorkflowExecutionSignaledEvent(event))
     return createGroupFor<'SignalReceived'>(event);
+
+  // if (isWorkflowTaskScheduledEvent(event)) {
+  //   return createGroupFor<'WorkflowTask'>(event);
+  // }
+
+  if (isActivityTaskScheduledEvent(event)) {
+    return createGroupFor<'Activity'>(event);
+  }
 
   if (isMarkerRecordedEvent(event)) {
     if (isLocalActivityMarkerEvent(event)) {
@@ -96,4 +98,9 @@ export const createEventGroup = (event: CommonHistoryEvent): EventGroup => {
     }
     return createGroupFor<'Marker'>(event);
   }
+
+  if (isTimerStartedEvent(event)) return createGroupFor<'Timer'>(event);
+
+  if (isSignalExternalWorkflowExecutionInitiatedEvent(event))
+    return createGroupFor<'Signal'>(event);
 };

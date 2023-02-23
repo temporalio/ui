@@ -84,6 +84,12 @@
             on:click={() => onViewClick('compact')}>Compact</ToggleButton
           >
           <ToggleButton
+            icon="compact"
+            active={$eventViewType === 'compactV2'}
+            data-testid="compactV2"
+            on:click={() => onViewClick('compactV2')}>Compact V2</ToggleButton
+          >
+          <ToggleButton
             icon="json"
             active={$eventViewType === 'json'}
             data-testid="json"

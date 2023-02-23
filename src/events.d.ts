@@ -138,7 +138,7 @@ type ChildEvent = StartChildWorkflowExecutionInitiatedEvent &
   ChildWorkflowExecutionTimedOutEvent &
   ChildWorkflowExecutionTerminatedEvent;
 
-type EventView = 'feed' | 'compact' | 'json';
+type EventView = 'feed' | 'compact' | 'json' | 'compactV2';
 
 type FetchEventsResponse = {
   events: WorkflowEvents;
