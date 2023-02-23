@@ -2,16 +2,16 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
 
   import { dataEncoder } from '$lib/stores/data-encoder';
-  import { showDataEncoderSettings } from '$lib/stores/show-data-encoder';
 
   import Tooltip from '$lib/holocene/tooltip.svelte';
-  import DataEncoderSettings from './data-encoder-settings.svelte';
+  import DataEncoderSettings, {
+    dataEncoderSettings,
+  } from './data-encoder-settings.svelte';
 
-  const onIconClick = () => ($showDataEncoderSettings = true);
-  const onClose = () => ($showDataEncoderSettings = false);
+  const onIconClick = () => $dataEncoderSettings.open();
 </script>
 
-<DataEncoderSettings showSettings={$showDataEncoderSettings} {onClose} />
+<DataEncoderSettings />
 {#if $dataEncoder?.hasEndpointOrPortConfigured}
   {#if $dataEncoder?.hasNotRequested}
     <Tooltip right text={'Data encoder is configured'}>

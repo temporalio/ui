@@ -30,7 +30,7 @@ jobs:
         with:
           install: false
           start: pnpm run preview:local
-          wait-on: 'http://localhost:3000'
+          wait-on: 'pnpm dlx wait-on --timeout 60000 tcp:3000'
           wait-on-timeout: 120
           browser: chrome
           record: true

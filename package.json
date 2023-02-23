@@ -1,6 +1,6 @@
 {
   "name": "@temporalio/ui",
-  "version": "2.2.12",
+  "version": "2.11.0",
   "type": "module",
   "description": "Temporal.io UI",
   "keywords": [
@@ -25,7 +25,6 @@
     "test:ui": "TZ=UTC vitest --ui",
     "test:coverage": "TZ=UTC vitest run --coverage",
     "test:integration": "playwright test",
-    "test:snapshot": "vitest run --dir src/lib/holocene",
     "lint": "prettier --check --plugin-search-dir=. . && eslint --ignore-path .gitignore . && stylelint \"src/**/*.{css,postcss,svelte}\"",
     "lint:fix": "eslint --ignore-path .gitignore --fix",
     "format": "prettier --write --plugin-search-dir=. . && stylelint \"src/**/*.{css,postcss,svelte}\" --fix",
