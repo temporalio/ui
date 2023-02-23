@@ -13,7 +13,7 @@ type FullScheduleSpec = Schedule & {
 
 type FullCalendarSpec = CalendarSpec & {
   cronString?: string[];
-  structuredCalendar?: StructuredCalendarSpec;
+  structuredCalendar?: StructuredCalendarSpec[];
 };
 
 type StartEndInterval = {
