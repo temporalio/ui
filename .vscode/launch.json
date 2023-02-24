@@ -19,6 +19,15 @@
       "env": {
         "VITE_PUBLIC_PATH": ""
       }
+    },
+    {
+      "name": "Debug Go server",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "server/cmd/server",
+      "cwd": "${workspaceFolder}/server",
+      "args": ["start"]
     }
   ]
 }
