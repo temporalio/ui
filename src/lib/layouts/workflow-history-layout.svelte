@@ -33,23 +33,25 @@
   };
 </script>
 
-<section class="flex flex-col gap-4">
+<div class="flex flex-col gap-4">
   <WorkflowStackTraceError />
   <WorkflowTypedError error={workflowEvents.error} />
   <WorkflowSummary />
   <WorkflowRelationships {...workflowRelationships} />
   <PendingActivities />
-  <Accordion
-    title="Input and Results"
-    icon="json"
-    class="border-gray-900"
-    data-cy="input-and-results"
-  >
-    <div class="flex w-full flex-col gap-2 lg:flex-row">
-      <InputAndResults type="input" content={workflowEvents.input} />
-      <InputAndResults type="results" content={workflowEvents.results} />
-    </div>
-  </Accordion>
+  <section>
+    <Accordion
+      title="Input and Results"
+      icon="json"
+      class="border-gray-900"
+      data-testid="input-and-results"
+    >
+      <div class="flex w-full flex-col gap-2 lg:flex-row">
+        <InputAndResults type="input" content={workflowEvents.input} />
+        <InputAndResults type="results" content={workflowEvents.results} />
+      </div>
+    </Accordion>
+  </section>
   <slot name="timeline" />
   <section id="event-history">
     <nav
@@ -62,24 +64,24 @@
           <ToggleButton
             icon="feed"
             active={$eventViewType === 'feed'}
-            data-cy="feed"
+            data-testid="feed"
             on:click={() => onViewClick('feed')}>History</ToggleButton
           >
           <ToggleButton
             icon="compact"
             active={$eventViewType === 'compact'}
-            data-cy="compact"
+            data-testid="compact"
             on:click={() => onViewClick('compact')}>Compact</ToggleButton
           >
           <ToggleButton
             icon="json"
             active={$eventViewType === 'json'}
-            data-cy="json"
+            data-testid="json"
             on:click={() => onViewClick('json')}>JSON</ToggleButton
           >
           <ToggleButton
             icon="download"
-            data-cy="download"
+            data-testid="download"
             on:click={() =>
               exportHistory({
                 namespace: $page.params.namespace,
@@ -97,4 +99,4 @@
     onOpen={() => (showShortcuts = true)}
     onClose={() => (showShortcuts = false)}
   />
-</section>
+</div>

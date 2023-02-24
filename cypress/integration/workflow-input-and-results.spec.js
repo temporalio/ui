@@ -54,14 +54,14 @@ describe('Workflow Input and Results', () => {
     cy.wait('@event-history-end');
     cy.wait('@event-history-descending');
 
-    cy.get('[data-cy="input-and-results"]').click();
+    cy.get('[data-testid="input-and-results"]').click();
 
     const firstEvent = eventsCompletedFixture.history.events[0];
     const input = Buffer.from(
       firstEvent.workflowExecutionStartedEventAttributes.input.payloads[0].data,
       'base64',
     ).toString();
-    cy.get('[data-cy="workflow-input"]').contains(input);
+    cy.get('[data-testid="workflow-input"]').contains(input);
 
     const lastEvent =
       eventsCompletedFixture.history.events[
@@ -73,7 +73,7 @@ describe('Workflow Input and Results', () => {
       'base64',
     ).toString();
 
-    cy.get('[data-cy="workflow-results"]').contains(results);
+    cy.get('[data-testid="workflow-results"]').contains(results);
   });
 
   it('should show the input and result for completed workflow and null result', () => {
@@ -102,14 +102,14 @@ describe('Workflow Input and Results', () => {
     cy.wait('@event-history-end');
     cy.wait('@event-history-descending');
 
-    cy.get('[data-cy="input-and-results"]').click();
+    cy.get('[data-testid="input-and-results"]').click();
 
     const firstEvent = eventsCompletedNullFixture.history.events[0];
     const input = Buffer.from(
       firstEvent.workflowExecutionStartedEventAttributes.input.payloads[0].data,
       'base64',
     ).toString();
-    cy.get('[data-cy="workflow-input"]').contains(input);
+    cy.get('[data-testid="workflow-input"]').contains(input);
 
     const lastEvent =
       eventsCompletedNullFixture.history.events[
@@ -118,7 +118,7 @@ describe('Workflow Input and Results', () => {
     const results = String(
       lastEvent.workflowExecutionCompletedEventAttributes.result,
     );
-    cy.get('[data-cy="workflow-results"]').contains(results);
+    cy.get('[data-testid="workflow-results"]').contains(results);
   });
 
   it('should show the input and result for running workflow', () => {
@@ -153,15 +153,15 @@ describe('Workflow Input and Results', () => {
     cy.wait('@event-history-end');
     cy.wait('@event-history-descending');
 
-    cy.get('[data-cy="input-and-results"]').click();
+    cy.get('[data-testid="input-and-results"]').click();
 
     const firstEvent = eventsRunningFixture.history.events[0];
     const input = Buffer.from(
       firstEvent.workflowExecutionStartedEventAttributes.input.payloads[0].data,
       'base64',
     ).toString();
-    cy.get('[data-cy="workflow-input"]').contains(input);
-    cy.get('[data-cy="workflow-results"]').contains('In progress');
+    cy.get('[data-testid="workflow-input"]').contains(input);
+    cy.get('[data-testid="workflow-results"]').contains('In progress');
   });
 
   it('should show the input and results for failed workflow', () => {
@@ -190,14 +190,14 @@ describe('Workflow Input and Results', () => {
     cy.wait('@event-history-end');
     cy.wait('@event-history-descending');
 
-    cy.get('[data-cy="input-and-results"]').click();
+    cy.get('[data-testid="input-and-results"]').click();
 
     const firstEvent = eventsFailedFixture.history.events[0];
     const input = Buffer.from(
       firstEvent.workflowExecutionStartedEventAttributes.input.payloads[0].data,
       'base64',
     ).toString();
-    cy.get('[data-cy="workflow-input"]').contains(input);
+    cy.get('[data-testid="workflow-input"]').contains(input);
 
     const lastEvent =
       eventsFailedFixture.history.events[
@@ -206,7 +206,7 @@ describe('Workflow Input and Results', () => {
     const results = String(
       lastEvent.workflowExecutionFailedEventAttributes.failure.cause.message,
     );
-    cy.get('[data-cy="workflow-results"]').contains(results);
+    cy.get('[data-testid="workflow-results"]').contains(results);
   });
 
   it('should show the input and results for cancelled workflow', () => {
@@ -235,15 +235,15 @@ describe('Workflow Input and Results', () => {
     cy.wait('@event-history-end');
     cy.wait('@event-history-descending');
 
-    cy.get('[data-cy="input-and-results"]').click();
+    cy.get('[data-testid="input-and-results"]').click();
 
     const firstEvent = eventsCanceledFixture.history.events[0];
     const input = Buffer.from(
       firstEvent.workflowExecutionStartedEventAttributes.input.payloads[0].data,
       'base64',
     ).toString();
-    cy.get('[data-cy="workflow-input"]').contains(input);
-    cy.get('[data-cy="workflow-results"]').contains('Canceled');
+    cy.get('[data-testid="workflow-input"]').contains(input);
+    cy.get('[data-testid="workflow-results"]').contains('Canceled');
   });
 
   it('should show the input and results for timed out workflow', () => {
@@ -272,15 +272,15 @@ describe('Workflow Input and Results', () => {
     cy.wait('@event-history-end');
     cy.wait('@event-history-descending');
 
-    cy.get('[data-cy="input-and-results"]').click();
+    cy.get('[data-testid="input-and-results"]').click();
 
     const firstEvent = eventsTimedOutFixture.history.events[0];
     const input = Buffer.from(
       firstEvent.workflowExecutionStartedEventAttributes.input.payloads[0].data,
       'base64',
     ).toString();
-    cy.get('[data-cy="workflow-input"]').contains(input);
-    cy.get('[data-cy="workflow-results"]').contains('Timeout');
+    cy.get('[data-testid="workflow-input"]').contains(input);
+    cy.get('[data-testid="workflow-results"]').contains('Timeout');
   });
 
   it('should show the input and results for continued as new workflow', () => {
@@ -309,14 +309,14 @@ describe('Workflow Input and Results', () => {
     cy.wait('@event-history-end');
     cy.wait('@event-history-descending');
 
-    cy.get('[data-cy="input-and-results"]').click();
+    cy.get('[data-testid="input-and-results"]').click();
 
     const firstEvent = eventsContinuedAsNewFixture.history.events[0];
     const input = Buffer.from(
       firstEvent.workflowExecutionStartedEventAttributes.input.payloads[0].data,
       'base64',
     ).toString();
-    cy.get('[data-cy="workflow-input"]').contains(input);
-    cy.get('[data-cy="workflow-results"]').contains('ContinuedAsNew');
+    cy.get('[data-testid="workflow-input"]').contains(input);
+    cy.get('[data-testid="workflow-results"]').contains('ContinuedAsNew');
   });
 });

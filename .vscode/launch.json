@@ -10,7 +10,7 @@
       "name": "Start UI Development Server",
       "skipFiles": ["<node_internals>/**"],
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["run", "start:server"],
+      "runtimeArgs": ["run", "start"],
       "serverReadyAction": {
         "action": "startDebugging",
         "name": "Launch Browser",

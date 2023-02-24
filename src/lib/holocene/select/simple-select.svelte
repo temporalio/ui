@@ -12,7 +12,7 @@
 </script>
 
 <div>
-  <label class="hidden" for={id}>{label}</label>
+  <label class="sr-only" for={id}>{label}</label>
   <select
     class="inline h-10 w-full rounded-lg border-2 px-2 text-base {$$props.class}"
     class:dark
@@ -21,7 +21,7 @@
     {id}
     bind:value
     on:change
-    data-cy={$$props.dataCy}
+    data-testid={$$props.testId}
   >
     <slot>
       {#each options as option}

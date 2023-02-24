@@ -3,39 +3,61 @@
   import { logEvent } from 'histoire/client';
 
   import Button from './button.svelte';
+  import Input from './input/input.svelte';
 
   import Modal from './modal.svelte';
 
   export let Hst: HST;
-  let open = false;
+  let deleteConfirm: string;
+  let modal: Modal;
+
+  const openModal = () => {
+    modal.open();
+  };
 
   const handleConfirm = () => {
     logEvent('Confirm', {});
-    open = false;
   };
 
   const handleCancel = () => {
     logEvent('Cancel', {});
-    open = false;
   };
 </script>
 
 <Hst.Story>
-  <Button on:click={() => (open = true)}>Open Modal</Button>
-  <Modal
-    bind:open
-    confirmType="destructive"
-    confirmText="Delete"
-    on:confirmModal={handleConfirm}
-    on:cancelModal={handleCancel}
-  >
-    <h3 slot="title">Delete User</h3>
-    <p slot="content">
-      Are you sure you want to delete <strong>tobias@temporal.io</strong>?
-    </p>
-  </Modal>
-
-  <svelte:fragment slot="controls">
-    <Hst.Checkbox title="Open: " bind:value={open} />
-  </svelte:fragment>
+  <Hst.Variant title="A Basic Confirmation Modal">
+    <Button on:click={openModal}>Open Modal</Button>
+    <Modal
+      bind:this={modal}
+      confirmType="destructive"
+      confirmText="Delete"
+      on:confirmModal={handleConfirm}
+      on:cancelModal={handleCancel}
+    >
+      <h3 slot="title">Delete User</h3>
+      <p slot="content">
+        Are you sure you want to delete <strong>tobias@temporal.io</strong>?
+      </p>
+    </Modal>
+  </Hst.Variant>
+  <Hst.Variant title="A Modal with a Form">
+    <Button on:click={openModal}>Open Modal</Button>
+    <Modal
+      bind:this={modal}
+      confirmType="destructive"
+      confirmText="Delete"
+      on:cancelModal={handleCancel}
+      on:confirmModal={handleConfirm}
+    >
+      <h3 slot="title">Delete Namespace</h3>
+      <div slot="content" class="flex flex-col gap-2">
+        <p>Are you sure you want to delete this namespace?</p>
+        <Input
+          id="delete-confirm"
+          bind:value={deleteConfirm}
+          label="type 'DELETE' to confirm"
+        />
+      </div>
+    </Modal>
+  </Hst.Variant>
 </Hst.Story>

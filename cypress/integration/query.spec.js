@@ -48,6 +48,6 @@ describe('Query', () => {
 
     cy.wait('@query-unknown-type-api');
 
-    cy.get('[data-cy=query-select]').contains('query1');
+    cy.get('[data-testid=query-select]').contains('query1');
   });
 });

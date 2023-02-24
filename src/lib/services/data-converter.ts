@@ -17,8 +17,10 @@ interface WebSocketResponse {
 
 export async function convertPayloadWithWebsocket(
   payload: Payload,
-  websocket: WebSocketAsPromised,
+  websocket: WebSocketAsPromised | null,
 ): Promise<Payload> {
+  if (!websocket) return payload;
+
   if (!websocket.isOpened) {
     try {
       await websocket.open();

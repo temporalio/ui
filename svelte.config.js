@@ -10,6 +10,7 @@ process.env.TAILWIND_MODE = dev ? 'watch' : 'build';
 const ci = !!process.env.VERCEL;
 
 const publicPath = process.env.VITE_PUBLIC_PATH || '';
+const buildPath = process.env.BUILD_PATH || 'build';
 
 /** @type {import('@sveltejs/kit').Config} */
 export default {
@@ -25,6 +26,8 @@ export default {
       ? vercel()
       : adapter({
           fallback: 'index.html',
+          pages: buildPath,
+          assets: buildPath,
         }),
     paths: {
       base: publicPath,

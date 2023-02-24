@@ -60,7 +60,7 @@
   });
 </script>
 
-<DropdownMenu {value} left dataCy="event-date-filter">
+<DropdownMenu {value} left testId="event-date-filter">
   <svelte:fragment slot="label">
     <span class="hidden md:block">Date & Time</span>
     <span class="block md:hidden"><Icon name="clock" /></span>
@@ -91,7 +91,7 @@
           {/if}
         </div>
         <button
-          data-cy="event-date-filter-{option}"
+          data-testid="event-date-filter-{option}"
           on:click={() => onDateOptionClick(option)}
         >
           {label}

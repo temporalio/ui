@@ -7,6 +7,7 @@ import {
 
 import type { Timestamp } from '$types';
 import { fromSeconds } from './to-duration';
+import { has } from './has';
 
 export type ValidTime = Parameters<typeof parseJSON>[0] | Timestamp;
 
@@ -15,16 +16,16 @@ export function timestampToDate(ts: Timestamp): Date {
     throw new TypeError('provided value is not a timestamp');
   }
 
-  const d = new Date(null);
+  const d = new Date();
 
-  d.setTime(Number(ts.seconds) * 1000 + ts.nanos / 1000);
+  d.setTime(Number(ts.seconds) * 1000 + (ts.nanos || 0) / 1000);
 
   return d;
 }
 
 export function isTimestamp(arg: unknown): arg is Timestamp {
   if (typeof arg === 'object') {
-    return arg['seconds'] !== undefined && arg['nanos'] !== undefined;
+    return has(arg, 'seconds') && has(arg, 'nanos');
   }
   return false;
 }

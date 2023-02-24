@@ -1,3 +1,9 @@
+<script lang="ts" context="module">
+  import { writable } from 'svelte/store';
+
+  export const dataEncoderSettings = writable<Modal>(null);
+</script>
+
 <script lang="ts">
   import { dataConverterPort } from '$lib/stores/data-converter-config';
   import {
@@ -9,9 +15,6 @@
   import Modal from '$lib/holocene/modal.svelte';
   import CodecEndpointSettings from './codec-endpoint-settings.svelte';
   import DataConverterPortSettings from './data-converter-port-settings.svelte';
-
-  export let showSettings: boolean;
-  export let onClose: () => void;
 
   let endpoint = $codecEndpoint ?? '';
   let port = $dataConverterPort ?? '';
@@ -33,7 +36,7 @@
     endpoint = $codecEndpoint ?? '';
     port = $dataConverterPort ?? '';
     passToken = $passAccessToken ?? false;
-    onClose();
+    $dataEncoderSettings.close();
   };
 
   const onConfirm = () => {
@@ -41,22 +44,22 @@
     $codecEndpoint = endpoint;
     $passAccessToken = passToken;
     $dataConverterPort = port;
-    onClose();
+    $dataEncoderSettings.close();
   };
 </script>
 
 <Modal
-  open={showSettings}
+  bind:this={$dataEncoderSettings}
   on:cancelModal={onCancel}
   on:confirmModal={onConfirm}
   cancelText="Cancel"
   confirmDisabled={Boolean(error)}
 >
-  <h3 slot="title" data-cy="data-encoder-title">Data Encoder</h3>
+  <h3 slot="title" data-testid="data-encoder-title">Data Encoder</h3>
   <div slot="content">
     <CodecEndpointSettings bind:endpoint bind:passToken {error} />
     <DataConverterPortSettings bind:port />
-    <small data-cy="data-encoder-info"
+    <small data-testid="data-encoder-info"
       >If both are set, the Remote Codec Endpoint will be used.</small
     >
   </div>

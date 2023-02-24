@@ -19,15 +19,15 @@
 {#if show}
   <section
     class={`relative block text-center leading-10 ${severity}`}
-    data-cy={$$props.dataCy}
+    data-testid={$$props.testId}
   >
-    <a href={link} target="_blank">
+    <a href={link} target="_blank" rel="noreferrer">
       {message}
     </a>
     <button
       on:click={() => close(key)}
       class="text-black-600 absolute top-0 right-0 mr-5"
-      data-cy="close-banner"
+      data-testid="close-banner"
     >
       ✕
     </button>

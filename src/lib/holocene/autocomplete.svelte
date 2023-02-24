@@ -1,10 +1,23 @@
 <script lang="ts">
+  import { clickOutside } from '$lib/holocene/outside-click';
+  import { noop } from 'svelte/internal';
+  import Input from '$lib/holocene/input/input.svelte';
   import Menu from './primitives/menu/menu.svelte';
   import MenuItem from './primitives/menu/menu-item.svelte';
+  import type { HTMLInputAttributes } from 'svelte/elements';
   import type { IconName } from '$lib/holocene/icon/paths';
-  import { clickOutside } from '$lib/holocene/outside-click';
-  import Input from '$lib/holocene/input/input.svelte';
-  import { noop } from 'svelte/internal';
+
+  interface $$Props extends HTMLInputAttributes {
+    id: string;
+    value: string;
+    label?: string;
+    icon?: IconName;
+    copyable?: boolean;
+    clearable?: boolean;
+    theme?: 'dark' | 'light';
+    options: string[];
+    onOptionClick: (option: string) => void;
+  }
 
   export let id: string;
   export let value: string;
@@ -17,6 +30,9 @@
   export let onOptionClick: (option: string) => void;
   export let disabled = false;
 
+  let className = '';
+  export { className as class };
+
   let show = false;
   $: filteredOptions = !value
     ? options
@@ -25,7 +41,11 @@
       );
 </script>
 
-<div class="relative" use:clickOutside on:click-outside={() => (show = false)}>
+<div
+  class="relative {className}"
+  use:clickOutside
+  on:click-outside={() => (show = false)}
+>
   <Input
     {id}
     bind:value
@@ -38,6 +58,7 @@
     on:input
     on:change
     on:focus={() => (show = true)}
+    {...$$restProps}
   />
   {#if show}
     <Menu class="h-auto max-h-80" {show} id="{id}-menu">

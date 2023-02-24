@@ -42,11 +42,11 @@ describe('Stack Trace With Completed Workflow', () => {
       cy.wait('@event-history-end');
       cy.wait('@event-history-descending');
 
-      cy.get('[data-cy=stack-trace-tab]').click();
+      cy.get('[data-testid=stack-trace-tab]').click();
 
       cy.wait('@workflow-api');
 
-      cy.get('[data-cy="query-stack-trace-empty"]').contains(
+      cy.get('[data-testid="query-stack-trace-empty"]').contains(
         'No Stack Traces Found',
       );
     });
@@ -91,12 +91,14 @@ describe('Stack Trace With Completed Workflow', () => {
         cy.wait('@event-history-end');
         cy.wait('@event-history-descending');
 
-        cy.get('[data-cy=stack-trace-tab]').click();
+        cy.get('[data-testid=stack-trace-tab]').click();
 
         cy.wait('@workflow-api');
         cy.wait('@query-api');
 
-        cy.get('[data-cy="query-stack-trace"]').contains('go.temporal.io/sdk');
+        cy.get('[data-testid="query-stack-trace"]').contains(
+          'go.temporal.io/sdk',
+        );
       });
 
       it('should handle errors when the stack trace is not formatted as we expect', () => {
@@ -113,12 +115,14 @@ describe('Stack Trace With Completed Workflow', () => {
         cy.wait('@event-history-end');
         cy.wait('@event-history-descending');
 
-        cy.get('[data-cy=stack-trace-tab]').click();
+        cy.get('[data-testid=stack-trace-tab]').click();
 
         cy.wait('@workflow-api');
         cy.wait('@query-api-error');
 
-        cy.get('[data-cy="query-stack-trace"]').contains('[{"an":"error"}]');
+        cy.get('[data-testid="query-stack-trace"]').contains(
+          '[{"an":"error"}]',
+        );
       });
     });
   });

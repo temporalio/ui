@@ -8,7 +8,7 @@
     label?: string;
     min?: number;
     max?: number;
-    'data-cy'?: string;
+    'data-testid'?: string;
   }
 
   export let label: string = undefined;

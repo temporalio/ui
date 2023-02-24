@@ -44,8 +44,8 @@
   );
 
   let selectedWorkflows: { [index: string]: boolean } = {};
-  let showBatchTerminateConfirmationModal: boolean = false;
-  let showBatchCancelConfirmationModal: boolean = false;
+  let batchTerminateConfirmationModal: BatchOperationConfirmationModal;
+  let batchCancelConfirmationModal: BatchOperationConfirmationModal;
   let allSelected: boolean = false;
   let pageSelected: boolean = false;
   let terminating: boolean = false;
@@ -88,14 +88,6 @@
   const refreshWorkflows = () => {
     resetSelection();
     $refresh = Date.now();
-  };
-
-  const handleBatchTerminate = () => {
-    showBatchTerminateConfirmationModal = true;
-  };
-
-  const handleBatchCancel = () => {
-    showBatchCancelConfirmationModal = true;
   };
 
   const resetPageToDefaultState = () => {
@@ -178,7 +170,6 @@
         });
       }
     }
-    showBatchTerminateConfirmationModal = false;
     resetPageToDefaultState();
   };
 
@@ -218,7 +209,6 @@
         });
       }
     }
-    showBatchCancelConfirmationModal = false;
     resetPageToDefaultState();
   };
 
@@ -255,7 +245,7 @@
 
 <BatchOperationConfirmationModal
   action="Terminate"
-  bind:open={showBatchTerminateConfirmationModal}
+  bind:this={batchTerminateConfirmationModal}
   loading={terminating}
   {allSelected}
   actionableWorkflowsLength={terminableWorkflows.length}
@@ -264,7 +254,7 @@
 />
 <BatchOperationConfirmationModal
   action="Cancel"
-  bind:open={showBatchCancelConfirmationModal}
+  bind:this={batchCancelConfirmationModal}
   loading={false}
   {allSelected}
   actionableWorkflowsLength={cancelableWorkflows.length}
@@ -272,19 +262,19 @@
   on:confirm={cancelWorkflows}
 />
 
-<div class="mb-2 flex justify-between">
+<header class="mb-2 flex justify-between">
   <div>
-    <h1 class="text-2xl" data-cy="namespace-title">
+    <h1 class="text-2xl" data-testid="namespace-title">
       Recent Workflows
       <NamespaceSelector />
     </h1>
     <div class="flex items-center gap-2 text-sm">
-      <p data-cy="namespace-name">
+      <p data-testid="namespace-name">
         {$page.params.namespace}
       </p>
       {#if $workflowCount?.totalCount >= 0}
         <div class="h-1 w-1 rounded-full bg-gray-400" />
-        <p data-cy="workflow-count">
+        <p data-testid="workflow-count">
           {#if $loading}
             <span class="text-gray-400">loading</span>
           {:else if $updating}
@@ -307,7 +297,7 @@
       <Icon name="retry" class="h-8 w-8" />
     </button>
   </div>
-</div>
+</header>
 <Pagination items={$workflows} let:visibleItems aria-label="recent workflows">
   <svelte:fragment slot="action-top-left">
     <WorkflowAdvancedSearch />
@@ -323,8 +313,8 @@
     filteredWorkflowCount={query ? filteredWorkflowCount : totalWorkflowCount}
     {allSelected}
     {pageSelected}
-    on:terminateWorkflows={handleBatchTerminate}
-    on:cancelWorkflows={handleBatchCancel}
+    on:terminateWorkflows={() => batchTerminateConfirmationModal.open()}
+    on:cancelWorkflows={() => batchCancelConfirmationModal.open()}
     on:toggleAll={handleToggleAll}
     on:togglePage={handleTogglePage}
   >

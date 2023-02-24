@@ -57,9 +57,11 @@
       on:submit|preventDefault={onSearch}
       class="relative flex h-12 w-full items-center gap-0"
       in:fly={{ x: -100, duration: 150 }}
+      role="search"
     >
       <Input
         id="manual-search"
+        type="search"
         placeholder="Enter a query"
         icon="search"
         class="w-3/4"
@@ -69,7 +71,7 @@
         bind:value={manualSearchString}
       />
       <Button
-        dataCy="manual-search-button"
+        testId="manual-search-button"
         variant="primary"
         class="h-10"
         unroundLeft

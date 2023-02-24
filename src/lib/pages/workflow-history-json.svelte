@@ -19,5 +19,5 @@
 {#await events}
   <Loading />
 {:then events}
-  <CodeBlock content={events} data-cy="event-history-json" />
+  <CodeBlock content={events} data-testid="event-history-json" />
 {/await}

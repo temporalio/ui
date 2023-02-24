@@ -57,10 +57,10 @@
 </script>
 
 <Tooltip text={disabledText} top hide={!disabled}>
-  <div class="relative inline" bind:this={menu} data-cy={$$props.dataCy}>
+  <div class="relative inline" bind:this={menu} data-testid={$$props.testId}>
     <IconButton
       on:click={disabled ? noop : onClick}
-      data-cy="{$$props.dataCy}-button"
+      data-testid="{$$props.testId}-button"
     >
       <div class="inline flex items-center gap-1 truncate" class:disabled>
         <slot name="label" />

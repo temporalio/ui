@@ -14,12 +14,12 @@
     <ToggleButtons>
       <ToggleButton
         active={tab.a === 'auto'}
-        data-cy="auto"
+        data-testid="auto"
         on:click={() => (tab.a = 'auto')}>Auto</ToggleButton
       >
       <ToggleButton
         active={tab.a === 'manual'}
-        data-cy="manual"
+        data-testid="manual"
         on:click={() => (tab.a = 'manual')}>Manual</ToggleButton
       >
     </ToggleButtons>

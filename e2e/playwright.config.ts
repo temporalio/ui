@@ -40,7 +40,7 @@ const config: PlaywrightTestConfig = {
 
     screenshot: 'only-on-failure',
 
-    testIdAttribute: 'data-cy',
+    testIdAttribute: 'data-testid',
 
     video: 'retain-on-failure',
   },

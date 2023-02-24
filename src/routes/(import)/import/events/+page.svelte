@@ -10,18 +10,17 @@
 </script>
 
 <section class="flex flex-col gap-4">
-  <section id="event-history">
-    <nav
-      class="block items-center justify-between gap-4 pb-4 lg:flex"
-      aria-label="event history import"
-    >
-      <h3 class="text-lg font-medium">Event History Import</h3>
-      <div class="flex gap-4">
-        <HistoryImport user={authUser} />
-      </div>
-    </nav>
-  </section>
-  <section class="w-full md:w-1/2">
+  <nav
+    id="event-history"
+    class="block items-center justify-between gap-4 pb-4 lg:flex"
+    aria-label="event history import"
+  >
+    <h1 class="text-lg font-medium">Event History Import</h1>
+    <div class="flex gap-4">
+      <HistoryImport user={authUser} />
+    </div>
+  </nav>
+  <div class="w-full md:w-1/2">
     <code class="text-md bg-gray-200 p-2 font-medium"
       >type HistoryEvent = temporal.api.history.v1.IHistoryEvent</code
     >
@@ -37,5 +36,5 @@
       <CodeBlock content={format1} />
       <CodeBlock content={format2} />
     </div>
-  </section>
+  </div>
 </section>

@@ -1,6 +1,6 @@
 export type DataAttributes = {
   // [index: `data-${string}`]: any;
-  'data-cy'?: string;
+  'data-testid'?: string;
 };
 
 export type ToastVariant = 'success' | 'error' | 'info' | 'warning' | 'primary';

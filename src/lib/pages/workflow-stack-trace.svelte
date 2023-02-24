@@ -67,7 +67,7 @@
         <CodeBlock
           content={result}
           language="text"
-          dataCy="query-stack-trace"
+          testId="query-stack-trace"
         />
       </div>
     {:catch _error}
@@ -77,7 +77,7 @@
       />
     {/await}
   {:else}
-    <EmptyState title="No Stack Traces Found" dataCy="query-stack-trace-empty">
+    <EmptyState title="No Stack Traces Found" testId="query-stack-trace-empty">
       {#if workflow?.isRunning && workers?.pollers?.length === 0}
         <p>
           To enable <Link

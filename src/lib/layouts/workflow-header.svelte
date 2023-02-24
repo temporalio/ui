@@ -92,14 +92,14 @@
 </script>
 
 <header class="mb-4 flex flex-col gap-1">
-  <div class="-mt-3 -ml-2 mb-4 block">
+  <div class="mb-4 block">
     <a
       href={routeForWorkflowsWithQuery({
         namespace,
         query: $workflowsQuery || query,
         search: searchType,
       })}
-      data-cy="back-to-workflows"
+      data-testid="back-to-workflows"
       class="back-to-workflows"
     >
       <Icon name="chevron-left" class="inline" />Back to Workflows
@@ -113,7 +113,7 @@
     >
       <WorkflowStatus status={workflow?.status} />
       <h1
-        data-cy="workflow-id-heading"
+        data-testid="workflow-id-heading"
         class="select-all overflow-hidden text-ellipsis text-2xl font-medium"
       >
         {workflow?.id}
@@ -130,7 +130,13 @@
   </div>
   {#if cancelInProgress}
     <div class="mb-4" in:fly={{ duration: 200, delay: 100 }}>
-      <Alert bold icon="info" intent="info" title="Cancel Request Sent">
+      <Alert
+        bold
+        icon="info"
+        intent="info"
+        title="Cancel Request Sent"
+        role="status"
+      >
         The request to cancel this Workflow Execution has been sent. If the
         Workflow uses the cancellation API, it'll cancel at the next available
         opportunity.
@@ -143,8 +149,9 @@
         bold
         icon="info"
         intent="info"
-        dataCy="workflow-reset-alert"
+        data-testid="workflow-reset-alert"
         title="This Workflow has been reset"
+        role="status"
       >
         You can find the resulting Workflow Execution <Link
           href={routeForEventHistory({
@@ -162,7 +169,7 @@
       href={routeForEventHistory({
         ...routeParameters,
       })}
-      dataCy="history-tab"
+      testId="history-tab"
       active={pathMatches(
         $page.url.pathname,
         routeForEventHistory({
@@ -175,7 +182,7 @@
     <Tab
       label="Workers"
       href={routeForWorkers(routeParameters)}
-      dataCy="workers-tab"
+      testId="workers-tab"
       active={pathMatches($page.url.pathname, routeForWorkers(routeParameters))}
     >
       <Badge type="blue" class="px-2 py-0">{workers?.pollers?.length}</Badge>
@@ -183,7 +190,7 @@
     <Tab
       label="Pending Activities"
       href={routeForPendingActivities(routeParameters)}
-      dataCy="pending-activities-tab"
+      testId="pending-activities-tab"
       active={pathMatches(
         $page.url.pathname,
         routeForPendingActivities(routeParameters),
@@ -198,7 +205,7 @@
     <Tab
       label="Stack Trace"
       href={routeForStackTrace(routeParameters)}
-      dataCy="stack-trace-tab"
+      testId="stack-trace-tab"
       active={pathMatches(
         $page.url.pathname,
         routeForStackTrace(routeParameters),
@@ -207,7 +214,7 @@
     <Tab
       label="Queries"
       href={routeForWorkflowQuery(routeParameters)}
-      dataCy="queries-tab"
+      testId="queries-tab"
       active={pathMatches(
         $page.url.pathname,
         routeForWorkflowQuery(routeParameters),

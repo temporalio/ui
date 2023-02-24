@@ -41,24 +41,24 @@
     'Create scheduled actions using our Public API or TCTL (CLI).';
 </script>
 
-<div class="flex flex-col justify-between gap-2 md:flex-row">
+<header class="flex flex-col justify-between gap-2 md:flex-row">
   <div>
     <h1 class="flex items-center gap-2 text-2xl">
       Schedules<Badge type="beta">Beta</Badge>
       <NamespaceSelector />
     </h1>
-    <p class="text-sm text-gray-600" data-cy="namespace-name">
+    <p class="text-sm text-gray-600" data-testid="namespace-name">
       {namespace}
     </p>
   </div>
   <Button
     class="h-10"
-    dataCy="create-schedule"
+    testId="create-schedule"
     disabled={createDisabled}
     on:click={() => goto(routeForScheduleCreate({ namespace }))}
     >Create Schedule</Button
   >
-</div>
+</header>
 
 {#await fetchSchedules}
   <Loading />
@@ -73,6 +73,7 @@
         <div class="w-full xl:w-1/2">
           <Input
             icon="search"
+            type="search"
             id="schedule-name-filter"
             placeholder="Schedule Name"
             clearable

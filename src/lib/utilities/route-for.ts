@@ -67,7 +67,7 @@ export const routeForWorkflowsWithQuery = ({
   namespace,
   query,
   search,
-}: WorkflowsParameter): string => {
+}: WorkflowsParameter): string | undefined => {
   if (!browser) {
     return undefined;
   }
@@ -166,6 +166,7 @@ export const routeForAuthentication = (
   opts = [...opts, 'returnUrl'];
 
   opts.forEach((option) => {
+    if (!currentSearchParams) return;
     const searchParam = currentSearchParams.get(option);
     if (searchParam) {
       login.searchParams.set(option, searchParam);

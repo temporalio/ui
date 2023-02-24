@@ -21,7 +21,7 @@
   $: value = $timeFormat === 'UTC' ? undefined : `${$timeFormat}`;
 </script>
 
-<DropdownMenu {value} right dataCy="date-time-format-filter">
+<DropdownMenu {value} right testId="date-time-format-filter">
   <div class="w-56">
     {#each dateOptions as { label, option } (option)}
       <div class="option" class:active={$timeFormat === option}>
@@ -31,7 +31,7 @@
           {/if}
         </div>
         <button
-          data-cy="event-date-filter-{option}"
+          data-testid="event-date-filter-{option}"
           on:click={() => onDateOptionClick(option)}
         >
           {label}

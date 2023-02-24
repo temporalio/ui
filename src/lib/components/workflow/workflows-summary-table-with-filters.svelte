@@ -112,7 +112,7 @@
             <span class="font-semibold">{selectedWorkflowsCount} selected</span>
             <span>
               (or <button
-                data-cy="select-all-workflows"
+                data-testid="select-all-workflows"
                 on:click={handleSelectAll}
                 class="cursor-pointer underline"
                 >select all {filteredWorkflowCount}</button
@@ -122,7 +122,7 @@
           <div class="ml-4 inline-flex gap-2">
             {#if cancelEnabled}
               <BulkActionButton
-                dataCy="bulk-cancel-button"
+                testId="bulk-cancel-button"
                 disabled={namespaceWriteDisabled}
                 on:click={handleBulkCancel}
                 >Request Cancellation</BulkActionButton
@@ -131,7 +131,7 @@
             {#if terminateEnabled}
               <BulkActionButton
                 variant="destructive"
-                dataCy="bulk-terminate-button"
+                testId="bulk-terminate-button"
                 disabled={namespaceWriteDisabled}
                 on:click={handleBulkTerminate}>Terminate</BulkActionButton
               >

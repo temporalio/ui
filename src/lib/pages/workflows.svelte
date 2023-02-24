@@ -44,14 +44,14 @@
   });
 </script>
 
-<div class="mb-2 flex justify-between">
+<header class="mb-2 flex justify-between">
   <div>
-    <h1 class="text-2xl" data-cy="namespace-title">
+    <h1 class="text-2xl" data-testid="namespace-title">
       Recent Workflows
       <NamespaceSelector />
     </h1>
     <div class="flex items-center gap-2 text-sm">
-      <p data-cy="namespace-name" data-testid="namespace-name">
+      <p data-testid="namespace-name">
         {$page.params.namespace}
       </p>
     </div>
@@ -65,7 +65,7 @@
       <Icon name="retry" class="h-8 w-8" />
     </button>
   </div>
-</div>
+</header>
 <WorkflowFilters bind:searchType />
 <Pagination items={$workflows} let:visibleItems aria-label="recent workflows">
   <WorkflowsSummaryTable updating={$updating}>

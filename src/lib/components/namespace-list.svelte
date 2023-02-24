@@ -41,18 +41,21 @@
 </script>
 
 <div class="prose mt-16 mb-8">
-  <h2 class="text-2xl" data-cy="namespace-select-header">Select a Namespace</h2>
+  <h2 class="text-2xl" data-testid="namespace-select-header">
+    Select a Namespace
+  </h2>
   {#if $page.params?.namespace}
     <p>You are currently viewing {$page.params.namespace}</p>
   {/if}
 </div>
 
-<div class="mb-5 flex rounded-md border border-gray-900 p-1 pr-4">
+<div class="mb-5 flex rounded-md border border-gray-900 p-1 pr-4" role="search">
   <div class="ml-4 mr-2">
     <Icon name="search" />
   </div>
   <input
     class="w-full"
+    type="search"
     placeholder="Search"
     use:rootDocumentHandler
     on:keydown|stopPropagation
@@ -61,7 +64,7 @@
   />
 </div>
 
-<ul data-cy="namespace-list">
+<ul data-testid="namespace-list">
   {#await namespaceList}
     Loading ...
   {:then namespacesResult}

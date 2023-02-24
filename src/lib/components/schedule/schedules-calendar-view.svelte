@@ -43,7 +43,7 @@
     {#if schedule}
       <Tab
         label="Existing"
-        dataCy="interval-tab"
+        testId="interval-tab"
         active={preset === 'existing'}
         on:click={() => (preset = 'existing')}
         on:keypress={() => (preset = 'existing')}
@@ -51,28 +51,28 @@
     {/if}
     <Tab
       label="Interval"
-      dataCy="interval-tab"
+      testId="interval-tab"
       active={preset === 'interval'}
       on:click={() => (preset = 'interval')}
       on:keypress={() => (preset = 'interval')}
     />
     <Tab
       label="Days of the Week"
-      dataCy="daily-tab"
+      testId="daily-tab"
       active={preset === 'week'}
       on:click={() => (preset = 'week')}
       on:keypress={() => (preset = 'week')}
     />
     <Tab
       label="Days of the Month"
-      dataCy="monthly-tab"
+      testId="monthly-tab"
       active={preset === 'month'}
       on:click={() => (preset = 'month')}
       on:keypress={() => (preset = 'month')}
     />
     <Tab
       label="String"
-      dataCy="string-tab"
+      testId="string-tab"
       active={preset === 'string'}
       on:click={() => (preset = 'string')}
       on:keypress={() => (preset = 'string')}
