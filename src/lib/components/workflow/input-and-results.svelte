@@ -1,6 +1,5 @@
 <script lang="ts">
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Loading from '$lib/holocene/loading.svelte';
 
   export let content: string;
   export let title: string;
@@ -11,6 +10,11 @@
   {#if content}
     <CodeBlock {content} class="mb-2 max-h-96" />
   {:else}
-    <Loading title="In progress..." />
+    <CodeBlock
+      content="Results will appear upon completion."
+      language="text"
+      class="mb-2 max-h-96"
+      copyable={false}
+    />
   {/if}
 </article>

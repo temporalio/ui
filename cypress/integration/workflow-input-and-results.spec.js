@@ -161,7 +161,9 @@ describe('Workflow Input and Results', () => {
       'base64',
     ).toString();
     cy.get('[data-testid="workflow-input"]').contains(input);
-    cy.get('[data-testid="workflow-results"]').contains('In progress');
+    cy.get('[data-testid="workflow-results"]').contains(
+      'Results will appear upon completion',
+    );
   });
 
   it('should show the input and results for failed workflow', () => {
