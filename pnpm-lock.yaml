@@ -103,7 +103,7 @@ specifiers:
   zx: ^7.1.1
 
 dependencies:
-  '@codemirror/autocomplete': 6.4.0_czcfkg2f66rxeiodoti7r2gulu
+  '@codemirror/autocomplete': 6.4.0
   '@codemirror/commands': 6.1.3
   '@codemirror/lang-json': 6.0.1
   '@codemirror/language': 6.3.2
@@ -193,7 +193,7 @@ devDependencies:
   svelte-loader: 3.1.4_svelte@3.55.1
   svelte-preprocess: 4.10.7_7quwau4g5mtdmags7ertlm5xv4
   svelte2tsx: 0.5.23_4x7phaipmicbaooxtnresslofa
-  tailwindcss: 3.2.4_aesdjsunmf4wiehhujt67my7tu
+  tailwindcss: 3.2.4_ts-node@10.9.1
   tar-fs: 2.1.1
   ts-node: 10.9.1_iedef3djpnfxdpbmfr4x6l3blq
   ts-proto: 1.138.0
@@ -525,12 +525,8 @@ packages:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
     dev: true
 
-  /@codemirror/autocomplete/6.4.0_czcfkg2f66rxeiodoti7r2gulu:
+  /@codemirror/autocomplete/6.4.0:
     resolution: {integrity: sha512-HLF2PnZAm1s4kGs30EiqKMgD7XsYaQ0XJnMR0rofEWQ5t5D60SfqpDIkIh1ze5tiEbyUWm8+VJ6W1/erVvBMIA==}
-    peerDependencies:
-      '@codemirror/language': ^6.0.0
-      '@codemirror/state': ^6.0.0
-      '@codemirror/view': ^6.0.0
     dependencies:
       '@codemirror/language': 6.3.2
       '@codemirror/state': 6.2.0
@@ -8127,12 +8123,10 @@ packages:
       strip-ansi: 6.0.1
     dev: true
 
-  /tailwindcss/3.2.4_aesdjsunmf4wiehhujt67my7tu:
+  /tailwindcss/3.2.4_ts-node@10.9.1:
     resolution: {integrity: sha512-AhwtHCKMtR71JgeYDaswmZXhPcW9iuI9Sp2LvZPo9upDZ7231ZJ7eA9RaURbhpXGVlrjX4cFNlB4ieTetEb7hQ==}
     engines: {node: '>=12.13.0'}
     hasBin: true
-    peerDependencies:
-      postcss: ^8.0.9
     dependencies:
       arg: 5.0.2
       chokidar: 3.5.3
