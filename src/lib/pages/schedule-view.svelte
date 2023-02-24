@@ -108,7 +108,7 @@
         <a
           href={routeForSchedules({ namespace })}
           class="absolute top-0 back-to-schedules"
-          style="left: -.5rem"
+          style="left: -0.5rem;"
         >
           <Icon name="chevron-left" class="inline" />Back to Schedules
         </a>

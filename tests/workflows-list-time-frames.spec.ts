@@ -7,9 +7,8 @@ const workflowsApiMatch = new RegExp('/api/v1/namespaces/default/workflows');
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(mockDate);
-
-  await page.goto(workflowsUrl);
   await mockClusterApi(page);
+  await page.goto(workflowsUrl);
 });
 
 const timeFrames = [

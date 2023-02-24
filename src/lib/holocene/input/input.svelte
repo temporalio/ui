@@ -144,7 +144,7 @@
   }
 
   label.required {
-    @apply after:content-['*'];
+    @apply after:content-["*"];
   }
 
   .input-container {
@@ -261,7 +261,7 @@
     @apply border-gray-900 bg-gray-900;
   }
 
-  input[type='search']::-webkit-search-cancel-button {
+  input[type="search"]::-webkit-search-cancel-button {
     @apply hidden;
   }
 </style>
