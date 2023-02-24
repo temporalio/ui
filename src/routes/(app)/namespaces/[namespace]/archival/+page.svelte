@@ -56,12 +56,14 @@
     This namespace is currently enabled for archival but visibility is not
     enabled.
   </h1>
-  <p>To enable <a
-    class="text-blue-700 underline"
-    href="https://docs.temporal.io/clusters#archival"
-    target="_blank"
-    rel="noreferrer">archival visibility</a
-  >:</p>
+  <p>
+    To enable <a
+      class="text-blue-700 underline"
+      href="https://docs.temporal.io/clusters#archival"
+      target="_blank"
+      rel="noreferrer">archival visibility</a
+    >:
+  </p>
   <CodeBlock
     content={`tctl --namespace ${namespaceName} namespace update -vas enabled`}
     language="text"
