@@ -18,6 +18,7 @@
   import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
   import Badge from '$lib/holocene/badge.svelte';
+  import Copyable from '$lib/components/copyable.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
@@ -114,9 +115,14 @@
       <WorkflowStatus status={workflow?.status} />
       <h1
         data-testid="workflow-id-heading"
-        class="select-all overflow-hidden text-ellipsis text-2xl font-medium"
+        class="overflow-hidden text-2xl font-medium"
       >
-        {workflow?.id}
+        <Copyable
+          content={workflow?.id}
+          clickAllToCopy
+          container-class="w-full"
+          class="overflow-hidden text-ellipsis"
+        />
       </h1>
     </div>
     {#if isRunning}
