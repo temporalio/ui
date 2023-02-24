@@ -8,9 +8,9 @@
 
 <style lang="postcss">
   .meter {
-    box-shadow: inset 0 -1px 1px rgb(255 255 255 / 30%);
     @apply absolute left-0 right-0 box-content h-[5px] bg-gradient-to-r from-blue-200 to-blue-600;
 
+    box-shadow: inset 0 -1px 1px rgb(255 255 255 / 30%);
     z-index: 5;
   }
 

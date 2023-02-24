@@ -55,6 +55,7 @@
         box-shadow: 0 25px 50px -12px rgb(0 0 0 / 25%);
       }
     }
+
     @keyframes flyout {
       0% {
         right: var(--animationRight);
