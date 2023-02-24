@@ -1,8 +1,5 @@
 {
-  "extends": [
-    "stylelint-config-recommended",
-    "stylelint-config-standard"
-  ],
+  "extends": ["stylelint-config-recommended", "stylelint-config-standard"],
   "processors": [],
   "customSyntax": "postcss-html",
   "ignoreFiles": [
@@ -36,9 +33,7 @@
     "declaration-block-no-redundant-longhand-properties": [
       true,
       {
-        "ignoreShorthands": [
-          "border-radius"
-        ]
+        "ignoreShorthands": ["border-radius"]
       }
     ],
     "function-linear-gradient-no-nonstandard-direction": null,
@@ -49,9 +44,7 @@
     "selector-pseudo-class-no-unknown": [
       true,
       {
-        "ignorePseudoClasses": [
-          "global"
-        ]
+        "ignorePseudoClasses": ["global"]
       }
     ],
     "value-keyword-case": null
