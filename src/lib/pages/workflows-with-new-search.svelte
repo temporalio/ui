@@ -92,7 +92,6 @@
 
   const resetPageToDefaultState = () => {
     terminating = false;
-
     $workflowFilters = [];
     $workflowSorts = [];
     updateQueryParameters({
@@ -136,20 +135,21 @@
     const { namespace } = $page.params;
     const { reason } = event.detail;
 
-    if (allSelected) {
-      // Idea: persist the job ID and display a progress indicator for large jobs
-      await batchTerminateByQuery({
-        namespace,
-        reason,
-        query: batchOperationQuery,
-      });
-      toaster.push({
-        message: 'The batch terminate request is processing in the background.',
-        id: 'batch-terminate-success-toast',
-      });
-    } else {
-      terminating = true;
-      try {
+    try {
+      if (allSelected) {
+        // Idea: persist the job ID and display a progress indicator for large jobs
+        await batchTerminateByQuery({
+          namespace,
+          reason,
+          query: batchOperationQuery,
+        });
+        toaster.push({
+          message:
+            'The batch terminate request is processing in the background.',
+          id: 'batch-terminate-success-toast',
+        });
+      } else {
+        terminating = true;
         const jobId = await bulkTerminateByIDs({
           namespace,
           reason,
@@ -163,32 +163,33 @@
           message: `Successfully terminated ${workflowsTerminated} workflows.`,
           id: 'batch-terminate-success-toast',
         });
-      } catch (error) {
-        toaster.push({
-          variant: 'error',
-          message: 'Unable to terminate workflows.',
-        });
       }
+    } catch (error) {
+      toaster.push({
+        message: 'Unable to terminate Workflows.',
+        variant: 'error',
+      });
+    } finally {
+      resetPageToDefaultState();
     }
-    resetPageToDefaultState();
   };
 
   const cancelWorkflows = async (event: CustomEvent<{ reason: string }>) => {
     const { namespace } = $page.params;
     const { reason } = event.detail;
 
-    if (allSelected) {
-      await batchCancelByQuery({
-        namespace,
-        reason,
-        query: batchOperationQuery,
-      });
-      toaster.push({
-        message: 'The batch cancel request is processing in the background.',
-        id: 'batch-cancel-success-toast',
-      });
-    } else {
-      try {
+    try {
+      if (allSelected) {
+        await batchCancelByQuery({
+          namespace,
+          reason,
+          query: batchOperationQuery,
+        });
+        toaster.push({
+          message: 'The batch cancel request is processing in the background.',
+          id: 'batch-cancel-success-toast',
+        });
+      } else {
         const jobId = await bulkCancelByIDs({
           namespace,
           reason,
@@ -202,14 +203,15 @@
           message: `Successfully cancelled ${workflowsCancelled} workflows.`,
           id: 'batch-cancel-success-toast',
         });
-      } catch {
-        toaster.push({
-          variant: 'error',
-          message: 'Unable to cancel workflows.',
-        });
       }
+    } catch (error) {
+      toaster.push({
+        message: 'Unable to cancel Workflows.',
+        variant: 'error',
+      });
+    } finally {
+      resetPageToDefaultState();
     }
-    resetPageToDefaultState();
   };
 
   $: batchOperationQuery = !$workflowsQuery
