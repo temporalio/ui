@@ -13,16 +13,14 @@ const multipleExecutionStatusQuery =
 const workflowIdQuery = 'WorkflowId="Hello"';
 const workflowTypeQuery = 'WorkflowType="World"';
 const workflowQuery1 = 'WorkflowId="Hello" AND WorkflowType="World"';
-const startTimeQuery =
-  'StartTime BETWEEN "2022-04-18T17:45:18-06:00" AND "2022-04-20T17:45:18-06:00"';
-const closeTimeQuery =
-  'CloseTime BETWEEN "2022-04-18T17:45:18-06:00" AND "2022-04-20T17:45:18-06:00"';
+const startTimeQuery = 'StartTime > "2022-04-18T17:45:18-06:00"';
+const closeTimeQuery = 'CloseTime > "2022-04-18T17:45:18-06:00"';
 const workflowQuery2 =
-  'WorkflowType="World" AND StartTime BETWEEN "2022-04-18T17:45:18-06:00" AND "2022-04-20T17:45:18-06:00"';
+  'WorkflowType="World" AND StartTime > "2022-04-18T17:45:18-06:00"';
 const workflowQuery3 =
-  'WorkflowType="World" AND StartTime BETWEEN "2022-04-18T17:45:18-06:00" AND "2022-04-20T17:45:18-06:00" AND ExecutionStatus="Canceled"';
+  'WorkflowType="World" AND StartTime > "2022-04-18T17:45:18-06:00" AND ExecutionStatus="Canceled"';
 const workflowQuery4 =
-  '(ExecutionStatus="Canceled" OR ExecutionStatus="Failed" OR ExecutionStatus="Completed") AND WorkflowType="World" AND StartTime BETWEEN "2022-04-18T17:45:18-06:00" AND "2022-04-20T17:45:18-06:00"';
+  '(ExecutionStatus="Canceled" OR ExecutionStatus="Failed" OR ExecutionStatus="Completed") AND WorkflowType="World" AND StartTime > "2022-04-18T17:45:18-06:00"';
 
 const attributes = {
   CloseTime: 'Datetime',
@@ -140,7 +138,7 @@ describe('toListWorkflowParameters', () => {
     const expectedFilters = [
       {
         attribute: 'StartTime',
-        conditional: '',
+        conditional: '>',
         operator: '',
         parenthesis: '',
         value: '2 days',
@@ -157,7 +155,7 @@ describe('toListWorkflowParameters', () => {
     const expectedFilters = [
       {
         attribute: 'CloseTime',
-        conditional: '',
+        conditional: '>',
         operator: '',
         parenthesis: '',
         value: '2 days',
@@ -180,7 +178,7 @@ describe('toListWorkflowParameters', () => {
       },
       {
         attribute: 'StartTime',
-        conditional: '',
+        conditional: '>',
         operator: '',
         parenthesis: '',
         value: '2 days',
@@ -204,7 +202,7 @@ describe('toListWorkflowParameters', () => {
       },
       {
         attribute: 'StartTime',
-        conditional: '',
+        conditional: '>',
         operator: 'AND',
         parenthesis: '',
         value: '2 days',
@@ -256,7 +254,7 @@ describe('toListWorkflowParameters', () => {
       },
       {
         attribute: 'StartTime',
-        conditional: '',
+        conditional: '>',
         operator: '',
         parenthesis: '',
         value: '2 days',
@@ -326,7 +324,7 @@ describe('combineDropdownFilters', () => {
       },
       {
         attribute: 'StartTime',
-        conditional: '=',
+        conditional: '>',
         operator: '',
         parenthesis: '',
         value: '2 days',
@@ -344,7 +342,7 @@ describe('combineDropdownFilters', () => {
       },
       {
         attribute: 'StartTime',
-        conditional: '=',
+        conditional: '>',
         operator: '',
         parenthesis: '',
         value: '2 days',

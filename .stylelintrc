@@ -32,15 +32,20 @@
     "custom-property-pattern": null,
     "declaration-block-no-redundant-longhand-properties": [
       true,
-      { "ignoreShorthands": ["border-radius"] }
+      {
+        "ignoreShorthands": ["border-radius"]
+      }
     ],
     "function-linear-gradient-no-nonstandard-direction": null,
     "keyframes-name-pattern": null,
+    "max-line-length": null,
     "no-descending-specificity": null,
     "selector-class-pattern": null,
     "selector-pseudo-class-no-unknown": [
       true,
-      { "ignorePseudoClasses": ["global"] }
+      {
+        "ignorePseudoClasses": ["global"]
+      }
     ],
     "value-keyword-case": null
   }

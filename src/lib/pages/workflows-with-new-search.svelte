@@ -272,7 +272,7 @@
       <p data-testid="namespace-name">
         {$page.params.namespace}
       </p>
-      {#if $workflowCount?.totalCount >= 0}
+      {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility}
         <div class="h-1 w-1 rounded-full bg-gray-400" />
         <p data-testid="workflow-count">
           {#if $loading}

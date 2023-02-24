@@ -3,6 +3,8 @@ import type {
   WorkflowSort,
 } from '$lib/models/workflow-filters';
 import { isDuration, isDurationString, toDate, tomorrow } from '../to-duration';
+import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
+import { get } from 'svelte/store';
 
 export type QueryKey =
   | 'WorkflowId'
@@ -75,7 +77,7 @@ const toQueryStatement = (
   if (value === 'All') return '';
 
   if (isDuration(value) || isDurationString(value)) {
-    if (archived) {
+    if (archived || get(supportsAdvancedVisibility)) {
       return `${queryKey} > "${toDate(value)}"`;
     }
     return `${queryKey} BETWEEN "${toDate(value)}" AND "${tomorrow()}"`;
@@ -101,7 +103,7 @@ const toFilterQueryStatement = (
   }
 
   if (isDuration(value) || isDurationString(value)) {
-    if (archived) {
+    if (archived || get(supportsAdvancedVisibility)) {
       return `${queryKey} > "${toDate(value)}"`;
     }
     return `${queryKey} BETWEEN "${toDate(value)}" AND "${tomorrow()}"`;

@@ -1,8 +1,10 @@
 import { test, expect } from '@playwright/test';
-
+import { workflowsApi, mockClusterApi } from '$utilities/mock-apis.js';
 const workflowsUrl = '/namespaces/default/workflows';
-const apiUrl = 'http://localhost:8233/api/v1';
-const workflowsApi = apiUrl + '/namespaces/default/workflows?query=';
+
+test.beforeEach(async ({ page }) => {
+  await mockClusterApi(page);
+});
 
 test('requests workflows', async ({ page }) => {
   await page.goto(workflowsUrl);
@@ -27,6 +29,7 @@ test('it has the correct defaults for basic query filters', async ({
   page,
 }) => {
   await page.goto(workflowsUrl);
+
   expect(await page.locator('#workflow-id-filter').inputValue()).toBe('');
   expect(await page.locator('#workflow-type-filter').inputValue()).toBe('');
   expect(await page.locator('#execution-status-filter').inputValue()).toBe(
@@ -47,6 +50,7 @@ for (const [selector, parameter] of [
     const expectedQuery = encodeURIComponent(`${parameter}="${input}"`);
 
     await page.goto(workflowsUrl);
+
     await page.fill(selector, input);
 
     await page.waitForRequest(workflowsApi + expectedQuery);
@@ -70,6 +74,7 @@ for (const status of [
     page,
   }) => {
     await page.goto(workflowsUrl);
+
     await page.locator('#execution-status-filter').selectOption(status);
 
     await page.waitForRequest(workflowsApi + expectedQuery);
@@ -81,6 +86,7 @@ for (const status of [
     page,
   }) => {
     await page.goto(workflowsUrl + '?query=' + expectedQuery);
+
     await page
       .locator('#execution-status-filter')
       .evaluate((select) => select.nodeValue === status);
@@ -90,6 +96,7 @@ for (const status of [
     page,
   }) => {
     await page.goto(workflowsUrl + '?search=advanced&query=' + expectedQuery);
+
     const query = await page.locator('#advanced-search').inputValue();
     expect(query).toBe(`ExecutionStatus="${status}"`);
   });
