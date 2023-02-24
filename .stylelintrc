@@ -1,5 +1,5 @@
 {
-  "extends": ["stylelint-config-standard", "stylelint-config-prettier"],
+  "extends": ["stylelint-config-recommended", "stylelint-config-standard"],
   "processors": [],
   "customSyntax": "postcss-html",
   "ignoreFiles": [
@@ -30,14 +30,12 @@
       }
     ],
     "custom-property-pattern": null,
-    "declaration-block-trailing-semicolon": null,
     "declaration-block-no-redundant-longhand-properties": [
       true,
       { "ignoreShorthands": ["border-radius"] }
     ],
     "function-linear-gradient-no-nonstandard-direction": null,
     "keyframes-name-pattern": null,
-    "max-line-length": null,
     "no-descending-specificity": null,
     "selector-class-pattern": null,
     "selector-pseudo-class-no-unknown": [
