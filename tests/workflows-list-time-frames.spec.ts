@@ -6,6 +6,8 @@ const workflowsUrl = '/namespaces/default/workflows';
 const workflowsApiMatch = new RegExp('/api/v1/namespaces/default/workflows');
 
 test.beforeEach(async ({ page }) => {
+  test.setTimeout(10000);
+
   await page.addInitScript(mockDate);
   await mockClusterApi(page);
   await page.goto(workflowsUrl);
