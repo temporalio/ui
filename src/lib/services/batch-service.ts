@@ -9,6 +9,7 @@ import type {
 } from 'src/types';
 import { isVersionNewer } from '$lib/utilities/version-check';
 import { temporalVersion } from '$lib/stores/versions';
+import { toaster } from '$lib/stores/toaster';
 
 type CreateBatchOperationOptions = {
   namespace: string;
@@ -74,32 +75,84 @@ const createBatchOperationOptions = ({
 
 export async function bulkTerminateByIDs(
   options: CreateBatchOperationWithIDsOptions,
-) {
-  const fullOptions = createBatchOperationOptions(options);
-  return terminateWorkflows(fullOptions);
+): Promise<void> {
+  try {
+    const fullOptions = createBatchOperationOptions(options);
+    const jobId = await terminateWorkflows(fullOptions);
+    const workflowsTerminated = await pollBatchOperation({
+      namespace: fullOptions.namespace,
+      jobId,
+    });
+    toaster.push({
+      message: `Successfully terminated ${workflowsTerminated} workflows.`,
+      id: 'batch-terminate-success-toast',
+    });
+  } catch {
+    toaster.push({
+      message: 'Unable to terminate Workflows.',
+      variant: 'error',
+    });
+  }
 }
 
 export async function batchTerminateByQuery({
   namespace,
   query,
   reason,
-}: CreateBatchOperationWithQueryOptions) {
-  return terminateWorkflows({ namespace, query, reason });
+}: CreateBatchOperationWithQueryOptions): Promise<void> {
+  try {
+    await terminateWorkflows({ namespace, query, reason });
+    toaster.push({
+      message: 'The batch terminate request is processing in the background.',
+      id: 'batch-terminate-success-toast',
+    });
+  } catch {
+    toaster.push({
+      message: 'Unable to terminate Workflows.',
+      variant: 'error',
+    });
+  }
 }
 
 export async function bulkCancelByIDs(
   options: CreateBatchOperationWithIDsOptions,
-): Promise<string> {
-  const fullOptions = createBatchOperationOptions(options);
-  return cancelWorkflows(fullOptions);
+): Promise<void> {
+  try {
+    const fullOptions = createBatchOperationOptions(options);
+    const jobId = await cancelWorkflows(fullOptions);
+    const workflowsCancelled = await pollBatchOperation({
+      namespace: fullOptions.namespace,
+      jobId,
+    });
+    toaster.push({
+      message: `Successfully cancelled ${workflowsCancelled} workflows.`,
+      id: 'batch-cancel-success-toast',
+    });
+  } catch {
+    toaster.push({
+      message: 'Unable to cancel Workflows.',
+      variant: 'error',
+    });
+  }
 }
 
 export async function batchCancelByQuery({
   namespace,
   query,
   reason,
-}: CreateBatchOperationWithQueryOptions) {
-  return cancelWorkflows({ namespace, query, reason });
+}: CreateBatchOperationWithQueryOptions): Promise<void> {
+  try {
+    await cancelWorkflows({ namespace, query, reason });
+    toaster.push({
+      message: 'The batch cancel request is processing in the background.',
+      id: 'batch-cancel-success-toast',
+    });
+  } catch {
+    toaster.push({
+      message: 'Unable to cancel Workflows.',
+      variant: 'error',
+    });
+  }
 }
 
 async function cancelWorkflows({
