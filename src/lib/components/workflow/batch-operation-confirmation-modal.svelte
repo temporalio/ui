@@ -4,7 +4,6 @@
   import { pluralize } from '$lib/utilities/pluralize';
   import Input from '$lib/holocene/input/input.svelte';
   export let action: 'Terminate' | 'Cancel';
-  export let loading: boolean;
   export let allSelected: boolean;
   export let actionableWorkflowsLength: number;
   export let query: string;
@@ -36,7 +35,6 @@
   confirmType="destructive"
   confirmDisabled={reason === ''}
   {confirmText}
-  {loading}
   on:cancelModal={handleCancelModal}
   on:confirmModal={handleConfirmModal}
 >
