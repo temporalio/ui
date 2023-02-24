@@ -61,7 +61,7 @@
     href="https://docs.temporal.io/clusters#archival"
     target="_blank"
     rel="noreferrer">archival visibility</a
-  >archival visibility</p>:</p>
+  >:</p>
   <CodeBlock
     content={`tctl --namespace ${namespaceName} namespace update -vas enabled`}
     language="text"
