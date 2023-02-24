@@ -260,4 +260,8 @@
   .input-container.dark.disabled input {
     @apply border-gray-900 bg-gray-900;
   }
+
+  input[type='search']::-webkit-search-cancel-button {
+    @apply hidden;
+  }
 </style>
