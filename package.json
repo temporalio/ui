@@ -46,7 +46,7 @@
     "package:patch": "pnpm version patch && svelte-package",
     "package:minor": "pnpm version minor && svelte-package",
     "package:major": "pnpm version major && svelte-package",
-    "story:dev": "histoire dev --port 3030",
+    "story:dev": "histoire dev",
     "story:build": "histoire build",
     "story:preview": "histoire preview"
   },
