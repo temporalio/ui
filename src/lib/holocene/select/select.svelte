@@ -1,18 +1,22 @@
 <script lang="ts" context="module">
-  export type SelectContext<T> = {
-    selectValue: T;
+  export interface SelectContext<T> extends SelectOption<T> {
     onChange: (value: T) => void;
-  };
+  }
+
+  export interface SelectOption<T> {
+    value: T;
+    label: string;
+  }
 </script>
 
 <script lang="ts">
-  import { onDestroy, setContext } from 'svelte';
+  import { setContext } from 'svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Menu from '$lib/holocene/primitives/menu/menu.svelte';
   import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
   import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
   import { writable } from 'svelte/store';
-  import { noop } from 'svelte/internal';
+  import { noop, onMount } from 'svelte/internal';
 
   type T = $$Generic;
 
@@ -26,29 +30,35 @@
   export let disabled: boolean = false;
   export let unroundRight: boolean = false;
   export let keepOpen: boolean = false;
-  export let displayValue: (value: T) => T | string = (value) => value ?? '';
   export let onChange: (value: T) => void = noop;
 
+  let selectedLabel: string = undefined;
+
   const context = writable<SelectContext<T>>({
-    selectValue: value,
+    value: value,
+    // We get the "true" value of this further down but before the mount happens we should have some kind of value
+    label: value?.toString(),
     onChange,
   });
 
-  const unsubscribe = context.subscribe((ctx) => {
-    value = ctx.selectValue;
-  });
-
-  onDestroy(() => {
-    unsubscribe();
-  });
-
   $: {
-    if (value) {
-      context.update((previous) => ({ ...previous, selectValue: value }));
-    }
-
-    setContext('select-value', context);
+    value = $context.value;
+    selectedLabel = $context.label;
+    onChange(value);
   }
+
+  const optionContext = writable<SelectOption<T>[]>([]);
+  setContext('select-value', context);
+  setContext('select-options', optionContext);
+
+  onMount(() => {
+    // After all the Options are mounted use context to read the label assocaited with the value
+    let selectedVal = $optionContext.find((option) => option.value === value);
+
+    if (selectedVal !== undefined) {
+      selectedLabel = selectedVal?.label;
+    }
+  });
 </script>
 
 <div class="select {$$props.class}">
@@ -72,7 +82,7 @@
         {#if !value && placeholder !== ''}
           {placeholder}
         {:else}
-          {displayValue(value)}
+          {selectedLabel}
         {/if}
       </div>
       {#if disabled}

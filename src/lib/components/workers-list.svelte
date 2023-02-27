@@ -14,7 +14,7 @@
 </script>
 
 <section class="flex flex-col gap-4">
-  <h2 class="text-lg font-medium">
+  <h2 class="text-lg font-medium" data-testid="task-queue-name">
     Task Queue: <span class="select-all font-normal">{taskQueue}</span>
   </h2>
   <Table class="mb-6 w-full min-w-[600px] table-fixed">

@@ -1,7 +1,10 @@
 import { derived } from 'svelte/store';
 import { page } from '$app/stores';
 
-import { advancedVisibilityEnabled } from '$lib/utilities/advanced-visibility-enabled';
+import {
+  advancedVisibilityEnabled,
+  advancedVisibilityEnabledWithOrderBy,
+} from '$lib/utilities/advanced-visibility-enabled';
 import { isVersionNewer } from '$lib/utilities/version-check';
 
 import { cluster } from './cluster';
@@ -16,10 +19,17 @@ export const supportsBulkActions = derived(
   [temporalVersion, cluster],
   ([$temporalVersion, $cluster]) =>
     isVersionNewer($temporalVersion, '1.18.0') &&
-    advancedVisibilityEnabled($cluster),
+    advancedVisibilityEnabled($cluster, $temporalVersion),
 );
 
 export const supportsAdvancedVisibility = derived(
+  [cluster, temporalVersion, isCloud],
+  ([$cluster, $temporalVersion, $isCloud]) =>
+    advancedVisibilityEnabled($cluster, $temporalVersion) || $isCloud,
+);
+
+export const supportsAdvancedVisibilityWithOrderBy = derived(
   [cluster, isCloud],
-  ([$cluster, $isCloud]) => advancedVisibilityEnabled($cluster) ?? $isCloud,
+  ([$cluster, $isCloud]) =>
+    advancedVisibilityEnabledWithOrderBy($cluster) || $isCloud,
 );

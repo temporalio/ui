@@ -19,7 +19,7 @@
   a.active::after {
     @apply absolute inset-x-0 bottom-0 rounded-t bg-blue-200;
 
-    content: '';
+    content: "";
     height: 3px;
   }
 

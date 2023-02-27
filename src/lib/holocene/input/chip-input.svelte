@@ -123,7 +123,7 @@
   }
 
   label.required {
-    @apply after:content-['*'];
+    @apply after:content-["*"];
   }
 
   .input-container {

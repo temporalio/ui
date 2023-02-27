@@ -1,5 +1,6 @@
 type DescribeSchedule = import('$types').DescribeScheduleResponse;
 type CalendarSpec = import('types').ICalendarSpec;
+type StructuredCalendarSpec = import('types').IStructuredCalendarSpec;
 
 type DescribeFullSchedule = DescribeScheduleResponse & {
   schedule_id: string;
@@ -12,7 +13,7 @@ type FullScheduleSpec = Schedule & {
 
 type FullCalendarSpec = CalendarSpec & {
   cronString?: string[];
-  structuredCalendar?: any[];
+  structuredCalendar?: StructuredCalendarSpec[];
 };
 
 type StartEndInterval = {

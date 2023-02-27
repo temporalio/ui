@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { isVersionNewer } from '../version-check';
 import { toListWorkflowQueryFromFilters } from './list-workflow-query';
 import { combineDropdownFilters } from './to-list-workflow-filters';
 
@@ -140,18 +141,20 @@ describe('toListWorkflowQueryFromFilters', () => {
     const filters = [
       {
         attribute: 'StartTime',
-        conditional: '=',
+        conditional: '>',
         operator: '',
         parenthesis: '',
         value: '2 days',
       },
     ];
+
+    const supportsAdvancedVisibility = isVersionNewer('1.20', '1.19');
     const query = toListWorkflowQueryFromFilters(
       combineDropdownFilters(filters),
+      [],
+      supportsAdvancedVisibility,
     );
-    expect(query).toBe(
-      'StartTime BETWEEN "2019-12-30T00:00:00Z" AND "2020-01-02T00:00:00Z"',
-    );
+    expect(query).toBe('StartTime > "2019-12-30T00:00:00Z"');
   });
 
   it('should convert two filters, one as datetime filter', () => {
@@ -165,17 +168,20 @@ describe('toListWorkflowQueryFromFilters', () => {
       },
       {
         attribute: 'StartTime',
-        conditional: '=',
+        conditional: '>',
         operator: '',
         parenthesis: '',
         value: '2 days',
       },
     ];
+    const supportsAdvancedVisibility = isVersionNewer('1.20', '1.19');
     const query = toListWorkflowQueryFromFilters(
       combineDropdownFilters(filters),
+      [],
+      supportsAdvancedVisibility,
     );
     expect(query).toBe(
-      'WorkflowType="cronWorkflow" AND StartTime BETWEEN "2019-12-30T00:00:00Z" AND "2020-01-02T00:00:00Z"',
+      'WorkflowType="cronWorkflow" AND StartTime > "2019-12-30T00:00:00Z"',
     );
   });
 });

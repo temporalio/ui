@@ -102,8 +102,9 @@
     <div
       bind:this={canvas}
       class="relative"
-      style="height: {blockHeight * eventGroups.length +
-        yBuffer}px; width: {width}px;"
+      style="height:
+            {blockHeight * eventGroups.length +
+            yBuffer}px; width: {width}px;"
     >
       <VirtualList
         items={eventGroups}
@@ -123,10 +124,12 @@
         } = getGroupProperties(item)}
         <div
           class="event-group"
-          style="top: {top +
-            blockHeight /
-              4}px; left: {left}px; width: {width}px; height: {height -
-            1}px; background: {color};"
+          style="top:
+                {top +
+                blockHeight /
+                4}px; left: {left}px; width: {width}px; height:
+                {height -
+                1}px; background: {color};"
         />
         <button
           class="absolute truncate border-r border-gray-900 pl-2 text-left text-sm font-medium hover:bg-blueGray-200"
@@ -153,8 +156,9 @@
       </VirtualList>
       <div
         class="absolute top-0 bg-blueGray-400"
-        style="height: {blockHeight * eventGroups.length +
-          yBuffer}px;left: {mouseX}px; width: 1px"
+        style="height:
+              {blockHeight * eventGroups.length +
+              yBuffer}px;left: {mouseX}px; width: 1px;"
       />
     </div>
   </div>

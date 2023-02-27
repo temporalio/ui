@@ -134,7 +134,7 @@
     </NavRow>
     {#await user}
       <NavRow {isCloud}>
-        <div class="motion-safe:animate-pulse" style="margin-left:1rem">
+        <div class="motion-safe:animate-pulse" style="margin-left: 1rem;">
           <div class="rounded-full bg-blueGray-200 h-full aspect-square" />
         </div>
         <div class="nav-title">
