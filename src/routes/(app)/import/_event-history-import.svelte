@@ -11,6 +11,7 @@
   import { groupEvents } from '$lib/models/event-groups';
 
   let rawEvents: HistoryEvent[] | { events: HistoryEvent[] };
+  let fileLoaded = false;
 
   export let user: User = {};
 
@@ -24,8 +25,10 @@
         try {
           const result = reader?.result?.toString() ?? '';
           rawEvents = parseWithBigInt(result);
+          fileLoaded = true;
         } catch (e) {
           toaster.push({ variant: 'error', message: 'Could not parse JSON' });
+          fileLoaded = false;
         }
       };
     }
@@ -42,6 +45,7 @@
       const eventGroups = groupEvents(events);
       importEvents.set(events);
       importEventGroups.set(eventGroups);
+      fileLoaded = false;
       const path = routeForEventHistoryImport('feed');
       goto(path);
     } catch (e) {
@@ -60,4 +64,6 @@
   accept=".json"
   on:change={onFileSelect}
 />
-<Button icon="file-upload" on:click={onConfirm}>Import</Button>
+<Button icon="file-upload" on:click={onConfirm} disabled={!fileLoaded}
+  >Import</Button
+>

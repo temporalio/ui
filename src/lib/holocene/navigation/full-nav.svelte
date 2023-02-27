@@ -127,7 +127,7 @@
     <NavRow link={linkList.import} {isCloud}>
       <NavTooltip right text="Import">
         <div class="nav-icon">
-          <Icon name="download" />
+          <Icon name="import" />
         </div>
       </NavTooltip>
       <div class="nav-title">Import</div>

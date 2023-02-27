@@ -7,6 +7,7 @@
   import Pagination from '$lib/holocene/pagination.svelte';
   import EventEmptyRow from '$lib/components/event/event-empty-row.svelte';
   import { expandAllEvents } from '$lib/stores/event-view';
+  import type { EventSortOrder } from '$lib/stores/event-view';
 
   $: category = $page.url.searchParams.get('category') as EventTypeCategory;
   $: filteredEvents = $importEvents.filter((event: WorkflowEvent) => {

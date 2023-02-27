@@ -15,7 +15,9 @@
     class="block items-center justify-between gap-4 pb-4 lg:flex"
     aria-label="event history import"
   >
-    <h1 class="text-lg font-medium">Event History Import</h1>
+    <h1 class="text-lg font-medium" data-testid="import-event-history">
+      Event History Import
+    </h1>
     <div class="flex gap-4">
       <HistoryImport user={authUser} />
     </div>
