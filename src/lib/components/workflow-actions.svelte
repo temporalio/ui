@@ -69,6 +69,7 @@
   };
 
   const handleSuccessfulTermination = async () => {
+    terminateConfirmationModal.close();
     $refresh = Date.now();
     toaster.push({
       id: 'workflow-termination-success-toast',
@@ -76,9 +77,11 @@
     });
   };
 
-  const handleTerminationError = () => {
+  const handleTerminationError = (error: NetworkError) => {
     reason = '';
-    toaster.push({ message: 'Cannot terminate workflow.', variant: 'error' });
+    terminateConfirmationModal.setError(
+      error?.message ?? 'An unknown error occurred.',
+    );
   };
 
   const terminate = () => {
@@ -100,17 +103,17 @@
         workflowId: workflow.id,
         runId: workflow.runId,
       });
+      cancelConfirmationModal.close();
       loading = false;
       $refresh = Date.now();
       toaster.push({
         id: 'workflow-cancelation-success-toast',
         message: 'Workflow canceled.',
       });
-    } catch {
-      toaster.push({
-        variant: 'error',
-        message: 'Unable to cancel workflow.',
-      });
+    } catch (error) {
+      cancelConfirmationModal.setError(
+        error?.message ?? 'An unknown error occurred.',
+      );
     }
   };
 
@@ -127,17 +130,18 @@
         signalInput,
         signalName,
       });
+      signalConfirmationModal.close();
       $refresh = Date.now();
       toaster.push({
         message: 'Workflow signaled.',
         id: 'workflow-signal-success-toast',
       });
     } catch (error) {
-      toaster.push({
-        variant: 'error',
-        message: 'Error signaling workflow.',
-      });
+      signalConfirmationModal.setError(
+        error?.message ?? 'An unknown error occurred.',
+      );
     }
+
     hideSignalModal();
   };
 
@@ -167,9 +171,12 @@
           [workflow.runId]: response.runId,
         }));
       }
+      resetConfirmationModal.close();
       $refresh = Date.now();
     } catch (error) {
-      toaster.push({ message: 'Error resetting workflow.', variant: 'error' });
+      resetConfirmationModal.setError(
+        error?.message ?? 'An unknown error occurred.',
+      );
     }
     hideResetModal();
   };

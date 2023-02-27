@@ -3,6 +3,7 @@
   import { logEvent } from 'histoire/client';
 
   import Button from './button.svelte';
+  import Checkbox from './checkbox.svelte';
   import Input from './input/input.svelte';
 
   import Modal from './modal.svelte';
@@ -10,6 +11,8 @@
   export let Hst: HST;
   let deleteConfirm: string;
   let modal: Modal;
+
+  let shouldError: boolean = false;
 
   const openModal = () => {
     modal.open();
@@ -21,6 +24,21 @@
 
   const handleCancel = () => {
     logEvent('Cancel', {});
+  };
+
+  const makeFakeApiRequest = async () => {
+    try {
+      await new Promise<void>((resolve, reject) => {
+        if (shouldError) {
+          reject();
+        } else {
+          resolve();
+        }
+      });
+      modal.close();
+    } catch {
+      modal.setError('An error occurred.');
+    }
   };
 </script>
 
@@ -47,7 +65,7 @@
       confirmType="destructive"
       confirmText="Delete"
       on:cancelModal={handleCancel}
-      on:confirmModal={handleConfirm}
+      on:confirmModal={makeFakeApiRequest}
     >
       <h3 slot="title">Delete Namespace</h3>
       <div slot="content" class="flex flex-col gap-2">
@@ -60,4 +78,8 @@
       </div>
     </Modal>
   </Hst.Variant>
+
+  <svelte:fragment slot="controls">
+    <Hst.Checkbox bind:value={shouldError} title="Should Error: " />
+  </svelte:fragment>
 </Hst.Story>

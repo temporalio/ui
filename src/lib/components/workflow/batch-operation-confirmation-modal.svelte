@@ -19,6 +19,7 @@
 
   const handleConfirmModal = () => {
     dispatch('confirm', { reason });
+    modal.close();
     reason = '';
   };
 
