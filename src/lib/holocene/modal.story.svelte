@@ -11,9 +11,11 @@
   export let Hst: HST;
   let deleteConfirm: string;
   let modal: Modal;
+  let loading: boolean = false;
 
   let shouldError: boolean = false;
-
+  let errorText: string =
+    'Quo sint nisi nostrum quis nesciunt est. Delectus adipisci reiciendis nihil fuga libero exercitationem. Distinctio nihil sit et consequatur sit quia. Quia aut et temporibus doloremque veritatis corporis.';
   const openModal = () => {
     modal.open();
   };
@@ -28,16 +30,19 @@
 
   const makeFakeApiRequest = async () => {
     try {
+      loading = true;
       await new Promise<void>((resolve, reject) => {
         if (shouldError) {
-          reject();
+          setTimeout(reject, 250);
         } else {
-          resolve();
+          setTimeout(resolve, 250);
         }
       });
       modal.close();
     } catch {
-      modal.setError('An error occurred.');
+      modal.setError(errorText);
+    } finally {
+      loading = false;
     }
   };
 </script>
@@ -64,6 +69,7 @@
       bind:this={modal}
       confirmType="destructive"
       confirmText="Delete"
+      {loading}
       on:cancelModal={handleCancel}
       on:confirmModal={makeFakeApiRequest}
     >
@@ -81,5 +87,6 @@
 
   <svelte:fragment slot="controls">
     <Hst.Checkbox bind:value={shouldError} title="Should Error: " />
+    <Hst.Text bind:value={errorText} title="Error Text: " />
   </svelte:fragment>
 </Hst.Story>
