@@ -64,7 +64,7 @@
   };
 </script>
 
-<TableRow {href} class="workflow-summary-row">
+<TableRow href={bulkActionsEnabled ? null : href} class="workflow-summary-row">
   {#if bulkActionsEnabled}
     <td on:keypress|stopPropagation on:click|stopPropagation>
       <div class="absolute">
@@ -89,7 +89,13 @@
     on:mouseleave={() => (showFilterCopy = false)}
     on:blur={() => (showFilterCopy = false)}
   >
-    <span class="table-link">{workflow.id}</span>
+    <span class="table-link">
+      {#if bulkActionsEnabled}
+        <a {href}>{workflow.id}</a>
+      {:else}
+        {workflow.id}
+      {/if}
+    </span>
     <FilterOrCopyButtons
       show={showFilterCopy}
       content={workflow.id}
