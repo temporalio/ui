@@ -194,13 +194,14 @@ describe('Workflow Executions List With Search', () => {
       it('should keep single workflow filter after navigating away and back to workflow list', () => {
         cy.get('[data-testid="execution-status-filter-button"]').click();
         cy.get('[data-testid="Running"]').click();
+        cy.get('body').click(0, 0); // close the filter dropdown
 
         cy.url().should(
           'contain',
           encodeURIComponent(`ExecutionStatus="Running"`),
         );
 
-        cy.get('.workflow-summary-row').first().click();
+        cy.get('.workflow-summary-row:first-child a').click();
 
         cy.wait('@workflow-api');
         cy.wait('@event-history-api');
@@ -410,13 +411,14 @@ describe('Workflow Executions List With Search using only MySql on 1.20', () => 
       it('should keep single workflow filter after navigating away and back to workflow list', () => {
         cy.get('[data-testid="execution-status-filter-button"]').click();
         cy.get('[data-testid="Running"]').click();
+        cy.get('body').click(0, 0); // close the filter dropdown
 
         cy.url().should(
           'contain',
           encodeURIComponent(`ExecutionStatus="Running"`),
         );
 
-        cy.get('.workflow-summary-row').first().click();
+        cy.get('.workflow-summary-row:first-child a').click();
 
         cy.wait('@workflow-api');
         cy.wait('@event-history-api');
