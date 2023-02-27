@@ -7,6 +7,13 @@
     "temporal",
     "ui"
   ],
+  "typesVersions": {
+    ">4.0": {
+      "*": [
+        "./lib/*"
+      ]
+    }
+  },
   "license": "MIT",
   "homepage": "https://github.com/temporalio/ui/tree/main",
   "scripts": {
@@ -35,7 +42,7 @@
     "preview:local": "VITE_TEMPORAL_UI_BUILD_TARGET=local vite preview --port 3000",
     "preview:docker": "VITE_API=http://localhost:8080 VITE_TEMPORAL_UI_BUILD_TARGET=local vite preview --port 3000",
     "preview:cloud": "VITE_TEMPORAL_UI_BUILD_TARGET=cloud vite preview --port 3000",
-    "package": "svelte-package && rsync -r ./package/lib/ ./package/ && rm -rf ./package/lib",
+    "package": "svelte-package",
     "package:patch": "pnpm version patch && svelte-package",
     "package:minor": "pnpm version minor && svelte-package",
     "package:major": "pnpm version major && svelte-package",
