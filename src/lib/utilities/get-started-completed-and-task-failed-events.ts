@@ -1,11 +1,15 @@
 import type { StartAndEndEventHistory } from '$lib/stores/events';
-import { isWorkflowExecutionCompletedEvent } from './is-event-type';
+import {
+  isWorkflowExecutionCompletedEvent,
+  isWorkflowExecutionContinuedAsNewEvent,
+} from './is-event-type';
 import { stringifyWithBigInt } from './parse-with-big-int';
 
 type WorkflowInputAndResults = {
   input: string;
   results: string;
   error: WorkflowTaskFailedEvent;
+  contAsNew: boolean;
 };
 
 type CompletionEvent =
@@ -51,6 +55,10 @@ const isCompletedTaskEvent = (
 };
 
 const getEventResult = (event: CompletionEvent) => {
+  if (isWorkflowExecutionContinuedAsNewEvent(event)) {
+    return event.attributes.input?.payloads;
+  }
+
   if (isWorkflowExecutionCompletedEvent(event)) {
     if (event.attributes.result === null) return null;
     return event.attributes.result.payloads;
@@ -65,6 +73,7 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
   let input: string;
   let results: string;
   let error: WorkflowTaskFailedEvent;
+  let contAsNew = false;
 
   let workflowStartedEvent: WorkflowExecutionStartedEvent;
   let workflowCompletedEvent: CompletionEvent;
@@ -115,6 +124,7 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
   }
 
   if (workflowCompletedEvent) {
+    contAsNew = isWorkflowExecutionContinuedAsNewEvent(workflowCompletedEvent);
     results = stringifyWithBigInt(getEventResult(workflowCompletedEvent));
   }
 
@@ -126,5 +136,6 @@ export const getWorkflowStartedCompletedAndTaskFailedEvents = (
     input,
     results,
     error,
+    contAsNew,
   };
 };
