@@ -1,42 +1,5 @@
 <script lang="ts">
-  import HistoryImport from '../_event-history-import.svelte';
-  import CodeBlock from '$lib/holocene/code-block.svelte';
-  import Link from '$lib/holocene/link.svelte';
-  import { authUser } from '$lib/stores/auth-user';
-
-  const formatEvent = 'EventHistory';
-  const format1 = { events: [formatEvent] };
-  const format2 = [formatEvent];
+  import ImportEvents from '$lib/pages/import-events.svelte';
 </script>
 
-<section class="flex flex-col gap-4">
-  <nav
-    id="event-history"
-    class="block items-center justify-between gap-4 pb-4 lg:flex"
-    aria-label="event history import"
-  >
-    <h1 class="text-lg font-medium" data-testid="import-event-history">
-      Event History Import
-    </h1>
-    <div class="flex gap-4">
-      <HistoryImport user={authUser} />
-    </div>
-  </nav>
-  <div class="w-full md:w-1/2">
-    <code class="text-md bg-gray-200 p-2 font-medium"
-      >type HistoryEvent = temporal.api.history.v1.IHistoryEvent</code
-    >
-    <div class="mt-4">
-      <Link
-        target="_blank"
-        href="https://github.com/temporalio/api/blob/1cd0ac0bbd8e71c7bfc9fe1900c678b432e66e5b/temporal/api/history/v1/message.proto"
-        class="mb-8">View in Github</Link
-      >
-    </div>
-    <h3 class="mt-8 text-lg font-medium">Expected JSON formats</h3>
-    <div class="h-40 text-center">
-      <CodeBlock content={format1} />
-      <CodeBlock content={format2} />
-    </div>
-  </div>
-</section>
+<ImportEvents />

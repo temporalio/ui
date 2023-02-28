@@ -1,40 +1,7 @@
 <script lang="ts">
-  import { routeForEventHistoryImport } from '$lib/utilities/route-for';
-
-  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
-  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
-  import HistoryImport from '../../../../../_event-history-import.svelte';
-  import { authUser } from '$lib/stores/auth-user';
+  import ImportEventsView from '$lib/pages/import-events-view.svelte';
 </script>
 
-<section id="event-history">
-  <nav
-    class="flex items-end justify-between gap-4 pb-4"
-    aria-label="event history import"
-  >
-    <h3 class="text-lg font-medium">Import Event History</h3>
-    <div class="flex gap-4">
-      <HistoryImport user={authUser} />
-    </div>
-  </nav>
-  <nav
-    class="my-4 flex items-end justify-end gap-4"
-    aria-label="event history view"
-  >
-    <div id="event-view-toggle" class="flex gap-4 bg-white">
-      <ToggleButtons>
-        <ToggleButton icon="feed" href={routeForEventHistoryImport('feed')}
-          >Timeline</ToggleButton
-        >
-        <ToggleButton
-          icon="compact"
-          href={routeForEventHistoryImport('compact')}>Compact</ToggleButton
-        >
-        <ToggleButton icon="json" href={routeForEventHistoryImport('json')}
-          >JSON</ToggleButton
-        >
-      </ToggleButtons>
-    </div>
-  </nav>
+<ImportEventsView>
   <slot />
-</section>
+</ImportEventsView>
