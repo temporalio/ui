@@ -54,7 +54,6 @@
 
   const handleCancel = () => {
     close();
-    error = '';
     dispatch('cancelModal');
   };
 
