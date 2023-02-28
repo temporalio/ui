@@ -26,7 +26,10 @@ test('Navigate to import page and upload a json file for event history import', 
   await expect(importButton).toBeEnabled();
   await importButton.click();
 
-  await page.waitForNavigation();
+  const navigationPromise = page.waitForNavigation({
+    url: importEventHistoryUrl,
+  });
+  await navigationPromise;
 
   const table = await page.locator('table');
   await expect(table).toBeVisible();
