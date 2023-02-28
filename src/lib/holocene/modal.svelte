@@ -134,7 +134,7 @@
         <span>Content</span>
       </slot>
       {#if error}
-        <span class="text-sm font-normal italic text-danger">{error}</span>
+        <span class="text-sm font-normal text-danger">{error}</span>
       {/if}
     </div>
     <div class="flex items-center justify-end space-x-2 p-6">
