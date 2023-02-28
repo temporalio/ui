@@ -53,7 +53,7 @@
   }>();
 
   const handleCancel = () => {
-    modalElement.close();
+    close();
     error = '';
     dispatch('cancelModal');
   };
