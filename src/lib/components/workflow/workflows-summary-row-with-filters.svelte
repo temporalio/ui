@@ -64,16 +64,15 @@
   };
 </script>
 
-<TableRow href={bulkActionsEnabled ? null : href} class="workflow-summary-row">
+<TableRow {href} class="workflow-summary-row">
   {#if bulkActionsEnabled}
-    <td on:keypress|stopPropagation on:click|stopPropagation>
-      <div class="absolute">
-        <Checkbox
-          disabled={checkboxDisabled}
-          bind:checked={selected}
-          on:change={handleCheckboxChange}
-        />
-      </div>
+    <td style="padding: 0;">
+      <Checkbox
+        hoverable
+        disabled={checkboxDisabled}
+        bind:checked={selected}
+        on:change={handleCheckboxChange}
+      />
     </td>
   {/if}
   <td>
@@ -90,11 +89,7 @@
     on:blur={() => (showFilterCopy = false)}
   >
     <span class="table-link">
-      {#if bulkActionsEnabled}
-        <a {href}>{workflow.id}</a>
-      {:else}
-        {workflow.id}
-      {/if}
+      {workflow.id}
     </span>
     <FilterOrCopyButtons
       show={showFilterCopy}
