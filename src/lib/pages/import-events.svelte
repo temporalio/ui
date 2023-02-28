@@ -3,8 +3,8 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Link from '$lib/holocene/link.svelte';
 
-  const format1 = { events: 'EventHistory[]' };
-  const format2 = 'EventHistory[]';
+  const format1 = { events: 'HistoryEvent[]' };
+  const format2 = 'HistoryEvent[]';
 </script>
 
 <section class="flex flex-col gap-4">
