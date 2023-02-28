@@ -8,6 +8,7 @@
   } from '$lib/utilities/route-for';
   import {
     getCodeBlockValue,
+    getStackTrace,
     shouldDisplayAsExecutionLink,
     shouldDisplayAsTaskQueueLink,
     shouldDisplayAsPlainText,
@@ -25,15 +26,34 @@
   export let inline = false;
 
   const { workflow, namespace } = $page.params;
+  $: codeBlockValue = getCodeBlockValue(value);
+  $: stackTrace = getStackTrace(codeBlockValue);
 </script>
 
 <div class="row {$$props.class}">
   {#if typeof value === 'object'}
-    <div class="content code-block-row">
-      <p class="text-sm">
-        {format(key)}
-      </p>
-      <CodeBlock content={getCodeBlockValue(value)} class="h-auto" {inline} />
+    <div
+      class="content code-block-row"
+      class:code-with-stack-trace={stackTrace}
+    >
+      <div class="flex flex-col {stackTrace ? 'lg:w-1/2' : ''}">
+        <p class="text-sm">{format(key)}</p>
+        <CodeBlock
+          content={codeBlockValue}
+          class="h-auto {stackTrace ? 'mb-2' : ''}"
+          {inline}
+        />
+      </div>
+      {#if stackTrace && !inline}
+        <div class="flex flex-col lg:w-1/2">
+          <p class="text-sm">Stack trace</p>
+          <CodeBlock
+            content={stackTrace}
+            class="mb-2 h-full lg:pr-2"
+            language="text"
+          />
+        </div>
+      {/if}
     </div>
   {:else if shouldDisplayAsExecutionLink(key)}
     <div class="content detail-row">
@@ -109,6 +129,10 @@
 
   .code-block-row {
     @apply block w-full py-2 text-left;
+  }
+
+  .code-with-stack-trace {
+    @apply flex flex-col gap-2 lg:flex-row;
   }
 
   .detail-row {
