@@ -113,17 +113,6 @@
         </NavRow>
       {/each}
     {/if}
-    <slot name="feedback">
-      <NavRow link={linkList.feedback} {isCloud} externalLink>
-        <NavTooltip right text="Feedback">
-          <div class="nav-icon">
-            <Icon name="feedback" />
-          </div>
-        </NavTooltip>
-        <div class="nav-title">Feedback</div>
-      </NavRow>
-    </slot>
-    <slot name="settings" />
     <slot name="import">
       <IsCloudGuard {isCloud}>
         <NavRow link={linkList.import} {isCloud} data-testid="import-button">
@@ -136,6 +125,17 @@
         </NavRow>
       </IsCloudGuard>
     </slot>
+    <slot name="feedback">
+      <NavRow link={linkList.feedback} {isCloud} externalLink>
+        <NavTooltip right text="Feedback">
+          <div class="nav-icon">
+            <Icon name="feedback" />
+          </div>
+        </NavTooltip>
+        <div class="nav-title">Feedback</div>
+      </NavRow>
+    </slot>
+    <slot name="settings" />
     {#await user}
       <NavRow {isCloud}>
         <div class="motion-safe:animate-pulse" style="margin-left: 1rem;">
