@@ -181,10 +181,6 @@
       selectedWorkflows[workflow.runId] && workflow.status === 'Running',
   );
 
-  $: {
-    console.log($workflowCount);
-  }
-
   $: totalWorkflowCount = new Intl.NumberFormat('en-US').format(
     $workflowCount?.totalCount ?? 0,
   );
