@@ -20,7 +20,7 @@
 <Hst.Story>
   <Hst.Variant title="A Checkbox">
     <div
-      class="h-20 w-full flex items-center justify-center"
+      class="flex h-20 w-full items-center justify-center"
       class:bg-primary={onDark}
     >
       <Checkbox

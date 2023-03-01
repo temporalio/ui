@@ -94,7 +94,7 @@
 
 <style lang="postcss">
   .checkbox {
-    @apply block cursor-pointer select-none w-[18px] leading-[18px] text-sm text-primary;
+    @apply block w-[18px] cursor-pointer select-none text-sm leading-[18px] text-primary;
   }
 
   .checkbox.hoverable {
@@ -118,7 +118,7 @@
   }
 
   .checkmark {
-    @apply absolute box-content top-0 left-0 h-4 w-4 cursor-pointer rounded-sm border border-gray-500 bg-white;
+    @apply absolute top-0 left-0 box-content h-4 w-4 cursor-pointer rounded-sm border border-gray-500 bg-white;
   }
 
   .checkmark.hoverable {
