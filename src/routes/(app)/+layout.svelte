@@ -35,7 +35,7 @@
   <div class="sticky top-0 z-20 h-screen w-auto">
     <SideNavigation />
   </div>
-  <main id="content" class="min-h-screen w-max flex-auto bg-gray-100">
+  <main id="content" class="min-h-screen w-max flex-auto bg-gray-100 -mt-8">
     <TopNavigation {logout} />
     <Banners {uiVersionInfo} />
     <div class="z-10 flex flex-col gap-4 px-10 pb-10 pt-8">
