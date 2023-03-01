@@ -21,13 +21,13 @@ We work best with you when we have accepted the idea first before you code. -->
 
 ### Steps for others to test: 🚶🏽‍♂️🚶🏽‍♀️ <!--- Please describe how we can test the changes in the PR -->
 
-### Issue(s) closed <!-- add issue number here -->
-
 ## Checklists
 
 ### Draft Checklist <!-- Add todos if not ready to review -->
 
 ### Merge Checklist <!-- Add todos if not ready to merge -->
+
+### Issue(s) closed <!-- add issue number here -->
 
 ## Docs
 
