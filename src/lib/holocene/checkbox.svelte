@@ -98,7 +98,7 @@
   }
 
   .checkbox.hoverable {
-    @apply h-[36px] w-[36px] rounded-full hover:outline hover:outline-purple-300 hover:bg-purple-200;
+    @apply h-[36px] w-[36px] rounded-full hover:border hover:border-purple-300 hover:bg-purple-200;
   }
 
   .checkbox.on-dark {
@@ -106,11 +106,11 @@
   }
 
   .label {
-    @apply ml-6 flex h-full items-center whitespace-nowrap;
+    @apply absolute top-0 left-6 flex h-full items-center whitespace-nowrap;
   }
 
   .label.hoverable {
-    @apply ml-10;
+    @apply left-10;
   }
 
   input {
