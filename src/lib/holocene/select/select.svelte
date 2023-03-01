@@ -32,8 +32,6 @@
   export let keepOpen: boolean = false;
   export let onChange: (value: T) => void = noop;
 
-  let selectedLabel: string = undefined;
-
   const context = writable<SelectContext<T>>({
     value: value,
     // We get the "true" value of this further down but before the mount happens we should have some kind of value
@@ -42,22 +40,31 @@
   });
 
   $: {
-    value = $context.value;
-    selectedLabel = $context.label;
+    $context.value = value;
+    $context.label = getLabelFromOptions(value);
+  }
+
+  const handleOnChange = (newValue: T) => {
+    value = newValue;
     onChange(value);
+  };
+
+  function getLabelFromOptions(value: T): string {
+    let selectedVal = $optionContext.find((option) => option.value === value);
+
+    if (selectedVal !== undefined) {
+      return selectedVal.label;
+    }
   }
 
   const optionContext = writable<SelectOption<T>[]>([]);
   setContext('select-value', context);
+  setContext('select-change', handleOnChange);
   setContext('select-options', optionContext);
 
   onMount(() => {
     // After all the Options are mounted use context to read the label assocaited with the value
-    let selectedVal = $optionContext.find((option) => option.value === value);
-
-    if (selectedVal !== undefined) {
-      selectedLabel = selectedVal?.label;
-    }
+    $context.label = getLabelFromOptions(value);
   });
 </script>
 
@@ -82,7 +89,7 @@
         {#if !value && placeholder !== ''}
           {placeholder}
         {:else}
-          {selectedLabel}
+          {$context.label}
         {/if}
       </div>
       {#if disabled}
