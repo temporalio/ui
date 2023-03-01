@@ -94,11 +94,11 @@
 
 <style lang="postcss">
   .checkbox {
-    @apply block cursor-pointer select-none w-[18px] h-[18px] leading-[18px] text-sm text-primary;
+    @apply block cursor-pointer select-none w-[18px] leading-[18px] text-sm text-primary;
   }
 
   .checkbox.hoverable {
-    @apply h-[36px] w-[36px] rounded-full hover:border hover:border-purple-300 hover:bg-purple-200;
+    @apply h-9 w-9 rounded-full hover:bg-purple-200;
   }
 
   .checkbox.on-dark {
