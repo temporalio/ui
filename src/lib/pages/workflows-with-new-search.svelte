@@ -35,6 +35,7 @@
   import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
   import { bulkActionsEnabled as workflowBulkActionsEnabled } from '$lib/utilities/bulk-actions-enabled';
   import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
+  import { toaster } from '$lib/stores/toaster';
 
   $: bulkActionsEnabled = workflowBulkActionsEnabled(
     $page.data.settings,
