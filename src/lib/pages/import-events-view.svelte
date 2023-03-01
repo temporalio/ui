@@ -1,20 +1,20 @@
 <script lang="ts">
-  import { routeForImport } from '$lib/utilities/route-for';
+  import { routeForEventHistoryImport } from '$lib/utilities/route-for';
 
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
-  import HistoryImport from '../../../../../_event-history-import.svelte';
-  import { authUser } from '$lib/stores/auth-user';
+  import HistoryImport from '$lib/components/import/event-history-file-import.svelte';
+  import { lastUsedNamespace } from '$lib/stores/namespaces';
 </script>
 
 <section id="event-history">
   <nav
     class="flex items-end justify-between gap-4 pb-4"
-    aria-label="event history import"
+    aria-label="import event history"
   >
-    <h3 class="text-lg font-medium">Event History</h3>
+    <h3 class="text-lg font-medium">Import Event History</h3>
     <div class="flex gap-4">
-      <HistoryImport user={authUser} />
+      <HistoryImport />
     </div>
   </nav>
   <nav
@@ -25,17 +25,17 @@
       <ToggleButtons>
         <ToggleButton
           icon="feed"
-          href={routeForImport({ importType: 'events', view: 'feed' })}
+          href={routeForEventHistoryImport($lastUsedNamespace, 'feed')}
           >Timeline</ToggleButton
         >
         <ToggleButton
           icon="compact"
-          href={routeForImport({ importType: 'events', view: 'compact' })}
+          href={routeForEventHistoryImport($lastUsedNamespace, 'compact')}
           >Compact</ToggleButton
         >
         <ToggleButton
           icon="json"
-          href={routeForImport({ importType: 'events', view: 'json' })}
+          href={routeForEventHistoryImport($lastUsedNamespace, 'json')}
           >JSON</ToggleButton
         >
       </ToggleButtons>
