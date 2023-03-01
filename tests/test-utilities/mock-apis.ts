@@ -2,6 +2,7 @@ import { Page } from '@playwright/test';
 
 export const apiUrl = 'http://localhost:8233/api/v1';
 export const workflowsApi = apiUrl + '/namespaces/default/workflows?query=';
+export const settingsApi = apiUrl + '/settings**';
 
 const clusterApi = apiUrl + '/cluster**';
 const clusterInfo = {

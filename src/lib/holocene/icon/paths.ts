@@ -36,6 +36,7 @@ import filter from './svg/filter.svelte';
 import filterSolid from './svg/filter-solid.svelte';
 import graph from './svg/graph.svelte';
 import hyphen from './svg/hyphen.svelte';
+import importIcon from './svg/import.svelte';
 import info from './svg/info.svelte';
 import invertedCheckmark from './svg/inverted-checkmark.svelte';
 import json from './svg/json.svelte';
@@ -108,6 +109,7 @@ export const icons = {
   'filter-solid': filterSolid,
   graph,
   hyphen,
+  import: importIcon,
   info,
   'inverted-checkmark': invertedCheckmark,
   json,

@@ -93,6 +93,18 @@
         </NavRow>
       {/each}
     {/if}
+    <slot name="import">
+      <IsCloudGuard {isCloud}>
+        <NavRow link={linkList.import} {isCloud} data-testid="import-button">
+          <NavTooltip right text="Import">
+            <div class="nav-icon">
+              <Icon name="import" />
+            </div>
+          </NavTooltip>
+          <div class="nav-title">Import</div>
+        </NavRow>
+      </IsCloudGuard>
+    </slot>
     <slot name="feedback">
       <!-- <NavRow link={linkList.feedback} {isCloud} externalLink>
         <NavTooltip right text="Feedback">
