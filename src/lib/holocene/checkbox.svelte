@@ -1,60 +1,104 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import type { HTMLInputAttributes } from 'svelte/elements';
+
+  type T = $$Generic;
+
+  interface $$Props extends HTMLInputAttributes {
+    checked?: boolean;
+    label?: string;
+    onDark?: boolean;
+    indeterminate?: boolean;
+    hoverable?: boolean;
+    value?: T;
+    group?: T[];
+  }
+
   export let id: string = '';
   export let checked = false;
-  export let label: string = null;
+  export let label: string = '';
   export let onDark = false;
   export let indeterminate = false;
   export let disabled = false;
+  export let hoverable: boolean = false;
+  export let value: T = undefined;
+  export let group: T[] = undefined;
 
-  const dispatch = createEventDispatcher<{ change: { checked: boolean } }>();
+  const dispatch = createEventDispatcher<{
+    change: { checked: boolean; value?: T };
+  }>();
 
-  const handleChange = (event) => {
-    dispatch('change', { checked: event.target.checked });
+  const handleChange = (
+    event: Event & {
+      currentTarget: EventTarget & HTMLInputElement;
+    },
+  ) => {
+    const { checked: isChecked } = event.currentTarget;
+    if (group !== undefined) {
+      if (isChecked) {
+        group = [...group, value];
+      } else {
+        group = group.filter((v) => v !== value);
+      }
+    }
+
+    checked = isChecked;
+
+    dispatch('change', { checked: event.currentTarget.checked, value });
   };
+
+  checked = group !== undefined ? group.includes(value) : checked;
 </script>
 
-<label
-  on:click
-  on:keypress
-  class="checkbox {$$props.class}"
-  class:disabled
-  class:on-dark={onDark}
+<div
+  on:click|stopPropagation
+  on:keypress|stopPropagation
+  class="relative {$$props.class}"
 >
-  <span class="label">
-    {#if label}
-      {@html label}
-    {:else}
-      &nbsp;
-    {/if}
-  </span>
-  <input
-    on:click|stopPropagation
-    on:change={handleChange}
-    {id}
-    type="checkbox"
-    bind:checked
-    {indeterminate}
-    {disabled}
-    class:indeterminate
-  />
-  <span class="checkmark" class:on-dark={onDark}>
-    {#if indeterminate}
-      <Icon class="absolute top-0 left-0 h-4 w-4" name="hyphen" />
-    {:else if checked}
-      <Icon
-        class="absolute top-0 left-0 h-4 w-4"
-        name="checkmark"
-        strokeWidth={3}
-      />
-    {/if}
-  </span>
-</label>
+  <label
+    on:click
+    on:keypress
+    class="checkbox"
+    class:hoverable
+    class:disabled
+    class:on-dark={onDark}
+  >
+    <span class="label" class:hoverable>
+      {label}
+    </span>
+    <input
+      on:click|stopPropagation
+      on:change={handleChange}
+      {id}
+      {value}
+      type="checkbox"
+      bind:checked
+      {indeterminate}
+      {disabled}
+      class:indeterminate
+    />
+    <span class="checkmark" class:hoverable class:on-dark={onDark}>
+      {#if indeterminate}
+        <Icon class="absolute top-0 left-0 h-4 w-4" name="hyphen" />
+      {:else if checked}
+        <Icon
+          class="absolute top-0 left-0 h-4 w-4"
+          name="checkmark"
+          strokeWidth={3}
+        />
+      {/if}
+    </span>
+  </label>
+</div>
 
 <style lang="postcss">
   .checkbox {
-    @apply flex w-fit cursor-pointer select-none items-center text-sm leading-6 text-primary;
+    @apply block cursor-pointer select-none w-[18px] leading-[18px] text-sm text-primary;
+  }
+
+  .checkbox.hoverable {
+    @apply h-9 w-9 rounded-full hover:bg-purple-200;
   }
 
   .checkbox.on-dark {
@@ -62,7 +106,11 @@
   }
 
   .label {
-    @apply absolute ml-6 flex items-center whitespace-nowrap;
+    @apply absolute top-0 left-6 flex h-full items-center whitespace-nowrap;
+  }
+
+  .label.hoverable {
+    @apply left-10;
   }
 
   input {
@@ -70,7 +118,11 @@
   }
 
   .checkmark {
-    @apply absolute box-content h-4 w-4 cursor-pointer rounded-sm border border-gray-500 bg-white;
+    @apply absolute box-content top-0 left-0 h-4 w-4 cursor-pointer rounded-sm border border-gray-500 bg-white;
+  }
+
+  .checkmark.hoverable {
+    @apply translate-x-1/2 translate-y-1/2;
   }
 
   .checkmark.on-dark {

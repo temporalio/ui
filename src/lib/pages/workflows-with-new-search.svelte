@@ -30,10 +30,8 @@
     batchTerminateByQuery,
     bulkCancelByIDs,
     bulkTerminateByIDs,
-    pollBatchOperation,
   } from '$lib/services/batch-service';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  import { toaster } from '$lib/stores/toaster';
   import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
   import { bulkActionsEnabled as workflowBulkActionsEnabled } from '$lib/utilities/bulk-actions-enabled';
   import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
