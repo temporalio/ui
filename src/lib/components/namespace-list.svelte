@@ -6,10 +6,9 @@
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import { createEventDispatcher } from 'svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import { lastUsedNamespace } from '$lib/stores/namespaces';
 
   export let namespaceList: NamespaceItem[] = [];
-
-  let searchField: HTMLInputElement = null;
 
   const dispatch = createEventDispatcher();
 
@@ -57,6 +56,7 @@
         class="first:rounded-t-xl first:border-t-3 last:rounded-b-xl last:border-b-3 border-b border-l-3 border-r-3 border-gray-900 flex border-collapse gap-2 bg-white hover:bg-gradient-to-br from-blue-100 to-purple-100 cursor-pointer"
       >
         <a
+          on:click={() => ($lastUsedNamespace = namespace.namespace)}
           href={namespace.href(namespace.namespace)}
           class="w-full flex p-3"
           class:active={namespace.namespace === $page.params?.namespace}

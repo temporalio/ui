@@ -55,50 +55,20 @@
   function fixImage() {
     showProfilePic = false;
   }
+
+  let scrollY;
+
+  $: {
+    console.log('scrollY: ', scrollY);
+  }
 </script>
 
+<svelte:window bind:scrollY />
 <div
-  class="sticky top-0 z-30 flex h-10 w-full items-center justify-between border-b-2 bg-gray-100 p-1 px-10"
+  class="sticky top-0 z-30 flex h-10 w-full items-center justify-between bg-gray-100 p-1 px-10"
+  class:border={scrollY !== 0}
 >
-  <div class="flex items-center gap-2">
-    <DropdownMenu id="links" position="left">
-      <div slot="trigger">
-        <Badge type="blue" class="flex gap-1 pl-2"
-          >Links<Icon name="chevron-down" /></Badge
-        >
-      </div>
-      <div class="w-[300px]" slot="items">
-        <div class="overflow-auto py-4 px-4">
-          <ul data-cy="namespace-list">
-            <li>
-              <a
-                class="w-auto text-base block hover:underline underline-blue-100"
-                href="/">Internal Login</a
-              >
-            </li>
-            <li>
-              <a
-                class="w-auto text-base block hover:underline underline-blue-100"
-                href="/">Internal Doc</a
-              >
-            </li>
-            <li>
-              <a
-                class="w-auto text-base block hover:underline underline-blue-100"
-                href="/">Vendor Docs</a
-              >
-            </li>
-            <li>
-              <a
-                class="w-auto text-base block hover:underline underline-blue-100"
-                href="/">Tutorial</a
-              >
-            </li>
-          </ul>
-        </div>
-      </div>
-    </DropdownMenu>
-  </div>
+  <div class="flex items-center gap-2" />
   <div class="flex items-center gap-2">
     {#if namespace}
       <DropdownMenu id="namespace" position="right" class="bg-purple-100">
@@ -145,3 +115,9 @@
     {/if}
   </div>
 </div>
+
+<style lang="postcss">
+  .border {
+    @apply border-b-2;
+  }
+</style>
