@@ -134,19 +134,34 @@
       namespace: $page.params.namespace,
       reason: event.detail.reason,
     };
-    if (allSelected) {
-      await batchTerminateByQuery({
-        ...options,
-        query: batchOperationQuery,
-      });
-    } else {
-      await bulkTerminateByIDs({
-        ...options,
-        workflows: terminableWorkflows,
-      });
+    try {
+      if (allSelected) {
+        await batchTerminateByQuery({
+          ...options,
+          query: batchOperationQuery,
+        });
+        toaster.push({
+          message:
+            'The batch terminate request is processing in the background.',
+          id: 'batch-terminate-success-toast',
+        });
+      } else {
+        const workflowsTerminated = await bulkTerminateByIDs({
+          ...options,
+          workflows: terminableWorkflows,
+        });
+        toaster.push({
+          message: `Successfully terminated ${workflowsTerminated} workflows.`,
+          id: 'batch-terminate-success-toast',
+        });
+      }
+      batchTerminateConfirmationModal.close();
+      resetPageToDefaultState();
+    } catch (error) {
+      batchTerminateConfirmationModal.setError(
+        error?.message ?? 'An unknown error occurred.',
+      );
     }
-
-    resetPageToDefaultState();
   };
 
   const cancelWorkflows = async (event: CustomEvent<{ reason: string }>) => {
@@ -155,19 +170,33 @@
       reason: event.detail.reason,
     };
 
-    if (allSelected) {
-      await batchCancelByQuery({
-        ...options,
-        query: batchOperationQuery,
-      });
-    } else {
-      await bulkCancelByIDs({
-        ...options,
-        workflows: cancelableWorkflows,
-      });
+    try {
+      if (allSelected) {
+        await batchCancelByQuery({
+          ...options,
+          query: batchOperationQuery,
+        });
+        toaster.push({
+          message: 'The batch cancel request is processing in the background.',
+          id: 'batch-cancel-success-toast',
+        });
+      } else {
+        const workflowsCanceled = await bulkCancelByIDs({
+          ...options,
+          workflows: cancelableWorkflows,
+        });
+        toaster.push({
+          message: `Successfully cancelled ${workflowsCanceled} workflows.`,
+          id: 'batch-cancel-success-toast',
+        });
+      }
+      batchCancelConfirmationModal.close();
+      resetPageToDefaultState();
+    } catch (error) {
+      batchCancelConfirmationModal.setError(
+        error?.message ?? 'An unknown error occurred.',
+      );
     }
-
-    resetPageToDefaultState();
   };
 
   $: batchOperationQuery = !$workflowsQuery

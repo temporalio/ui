@@ -10,6 +10,8 @@
 
   let modal: Modal;
   export const open = () => modal.open();
+  export const close = () => modal.close();
+  export const setError = (error: string) => modal.setError(error);
 
   const dispatch = createEventDispatcher<{
     confirm: { reason: string };
@@ -19,7 +21,6 @@
 
   const handleConfirmModal = () => {
     dispatch('confirm', { reason });
-    modal.close();
     reason = '';
   };
 
