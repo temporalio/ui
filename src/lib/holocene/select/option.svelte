@@ -18,7 +18,10 @@
   import type { Writable } from 'svelte/store';
   import type { SelectContext, SelectOption } from './select.svelte';
 
-  const context = getContext<Writable<SelectContext<T>>>('select-value');
+  const parentSelectValues =
+    getContext<Writable<SelectContext<T>>>('select-value');
+  const selectOnChange =
+    getContext<(params: SelectOption<T>) => void>('select-change');
   const optionContext =
     getContext<Writable<SelectOption<T>[]>>('select-options');
 
@@ -28,7 +31,7 @@
   export let description: string = '';
   export let dark: boolean = false;
 
-  let selected: boolean;
+  let selected: boolean = false;
   let _value: any;
   let slotWrapper: HTMLSpanElement;
   let label: string;
@@ -36,7 +39,7 @@
   $: {
     if (slotWrapper) {
       _value = value ?? slotWrapper.textContent;
-      selected = $context.value === _value;
+      selected = $parentSelectValues.value === _value;
       label = slotWrapper.textContent;
     }
   }
@@ -57,8 +60,7 @@
   });
 
   const handleOptionClick = () => {
-    $context.value = _value;
-    $context.label = label;
+    selectOnChange(_value);
   };
 </script>
 
