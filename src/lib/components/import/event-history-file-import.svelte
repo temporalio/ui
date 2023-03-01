@@ -39,7 +39,7 @@
     try {
       const events = await toEventHistory({
         response: Array.isArray(rawEvents) ? rawEvents : rawEvents?.events,
-        namespace: 'default',
+        namespace: $lastUsedNamespace,
         settings,
         accessToken: $authUser.accessToken,
       });
