@@ -23,8 +23,18 @@
   export let large: boolean = false;
   export let loading: boolean = false;
 
+  let error: string;
+
   export const open = () => modalElement.showModal();
-  export const close = () => modalElement.close();
+
+  export const close = () => {
+    error = '';
+    modalElement.close();
+  };
+
+  export const setError = (err: string) => {
+    error = err;
+  };
 
   let className: string = '';
   export { className as class };
@@ -43,11 +53,12 @@
   }>();
 
   const handleCancel = () => {
-    modalElement.close();
+    close();
     dispatch('cancelModal');
   };
 
   const confirmModal = () => {
+    error = '';
     dispatch('confirmModal');
   };
 
@@ -116,11 +127,14 @@
       <h3>Title</h3>
     </slot>
   </div>
-  <form on:submit={confirmModal} method="dialog">
+  <form on:submit|preventDefault={confirmModal} method="dialog">
     <div id="modal-content" class="content">
       <slot name="content">
         <span>Content</span>
       </slot>
+      {#if error}
+        <p class="text-sm font-normal text-danger mt-2">{error}</p>
+      {/if}
     </div>
     <div class="flex items-center justify-end space-x-2 p-6">
       <Button
