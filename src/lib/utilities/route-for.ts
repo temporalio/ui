@@ -193,9 +193,12 @@ export const routeForLoginPage = (error = '', isBrowser = browser): string => {
   return `${publicPath}/login`;
 };
 
-export const routeForEventHistoryImport = (view?: EventView): string => {
-  if (view) {
-    return `${publicPath}/import/events/namespace/workflow/run/history/${view}`;
+export const routeForEventHistoryImport = (
+  namespace?: string,
+  view?: EventView,
+): string => {
+  if (namespace && view) {
+    return `${publicPath}/import/events/${namespace}/workflow/run/history/${view}`;
   }
   return `${publicPath}/import/events`;
 };

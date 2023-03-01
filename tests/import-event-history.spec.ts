@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 
 const importUrl = '/import/events';
 const importEventHistoryUrl =
-  '/import/events/namespace/workflow/run/history/feed';
+  '/import/events/default/workflow/run/history/feed';
 const workflowsUrl = '/namespaces/default/workflows';
 
 test.beforeEach(async ({ page }) => {

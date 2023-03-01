@@ -6,11 +6,14 @@
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
   import EventEmptyRow from '$lib/components/event/event-empty-row.svelte';
-  import { expandAllEvents } from '$lib/stores/event-view';
-  import type { EventSortOrder } from '$lib/stores/event-view';
+  import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
 
   $: category = $page.url.searchParams.get('category') as EventTypeCategory;
-  $: filteredEvents = $importEvents.filter((event: WorkflowEvent) => {
+  $: sortedEvents =
+    $eventFilterSort === 'descending'
+      ? [...$importEvents].reverse()
+      : $importEvents;
+  $: filteredEvents = sortedEvents.filter((event: WorkflowEvent) => {
     if (category) return event.category === category;
     return event;
   });

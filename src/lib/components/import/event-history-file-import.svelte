@@ -10,6 +10,7 @@
   import { groupEvents } from '$lib/models/event-groups';
   import { page } from '$app/stores';
   import { authUser } from '$lib/stores/auth-user';
+  import { lastUsedNamespace } from '$lib/stores/namespaces';
 
   let rawEvents: HistoryEvent[] | { events: HistoryEvent[] };
   let fileLoaded = false;
@@ -46,7 +47,7 @@
       importEvents.set(events);
       importEventGroups.set(eventGroups);
       fileLoaded = false;
-      const path = routeForEventHistoryImport('feed');
+      const path = routeForEventHistoryImport($lastUsedNamespace, 'feed');
       goto(path);
     } catch (e) {
       console.error(e);

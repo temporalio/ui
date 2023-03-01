@@ -4,6 +4,7 @@
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
   import HistoryImport from '$lib/components/import/event-history-file-import.svelte';
+  import { lastUsedNamespace } from '$lib/stores/namespaces';
 </script>
 
 <section id="event-history">
@@ -22,14 +23,19 @@
   >
     <div id="event-view-toggle" class="flex gap-4 bg-white">
       <ToggleButtons>
-        <ToggleButton icon="feed" href={routeForEventHistoryImport('feed')}
+        <ToggleButton
+          icon="feed"
+          href={routeForEventHistoryImport($lastUsedNamespace, 'feed')}
           >Timeline</ToggleButton
         >
         <ToggleButton
           icon="compact"
-          href={routeForEventHistoryImport('compact')}>Compact</ToggleButton
+          href={routeForEventHistoryImport($lastUsedNamespace, 'compact')}
+          >Compact</ToggleButton
         >
-        <ToggleButton icon="json" href={routeForEventHistoryImport('json')}
+        <ToggleButton
+          icon="json"
+          href={routeForEventHistoryImport($lastUsedNamespace, 'json')}
           >JSON</ToggleButton
         >
       </ToggleButtons>
