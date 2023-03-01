@@ -7,6 +7,8 @@
     routeForWorkflows,
     routeForSchedules,
     routeForNamespaces,
+    routeForEventHistory,
+    routeForEventHistoryImport,
   } from '$lib/utilities/route-for';
 
   import Navigation from '$lib/holocene/navigation/full-nav.svelte';
@@ -26,6 +28,7 @@
     namespaces: routeForNamespaces(),
     schedules: routeForSchedules({ namespace: activeNamespaceName }),
     workflows: routeForWorkflows({ namespace: activeNamespaceName }),
+    import: routeForEventHistoryImport(),
     feedback:
       $page.data?.settings?.feedbackURL ||
       'https://github.com/temporalio/ui/issues/new/choose',

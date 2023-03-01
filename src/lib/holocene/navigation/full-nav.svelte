@@ -106,14 +106,14 @@
       </IsCloudGuard>
     </slot>
     <slot name="feedback">
-      <!-- <NavRow link={linkList.feedback} {isCloud} externalLink>
+      <NavRow link={linkList.feedback} {isCloud} externalLink>
         <NavTooltip right text="Feedback">
           <div class="nav-icon">
             <Icon name="feedback" />
           </div>
         </NavTooltip>
         <div class="nav-title">Feedback</div>
-      </NavRow> -->
+      </NavRow>
     </slot>
     <slot name="settings" />
   </svelte:fragment>

@@ -57,21 +57,17 @@
   }
 
   let scrollY;
-
-  $: {
-    console.log('scrollY: ', scrollY);
-  }
 </script>
 
 <svelte:window bind:scrollY />
 <div
   class="sticky top-0 z-30 flex h-10 w-full items-center justify-between bg-gray-100 p-1 px-10"
-  class:border={scrollY !== 0}
+  class:border={scrollY >= 20}
 >
   <div class="flex items-center gap-2" />
   <div class="flex items-center gap-2">
     {#if namespace}
-      <DropdownMenu id="namespace" position="right" class="bg-purple-100">
+      <DropdownMenu id="namespace" position="right" class="bg-purple-200">
         <div slot="trigger">
           <Badge type="purple" class="flex gap-1 pl-2"
             >{namespace}<Icon name="chevron-down" /></Badge
