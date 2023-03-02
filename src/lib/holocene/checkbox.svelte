@@ -13,6 +13,7 @@
     hoverable?: boolean;
     value?: T;
     group?: T[];
+    'data-testid'?: string;
   }
 
   export let id: string = '';
@@ -64,9 +65,11 @@
     class:disabled
     class:on-dark={onDark}
   >
-    <span class="label" class:hoverable>
-      {label}
-    </span>
+    {#if label}
+      <span class="label" class:hoverable>
+        {label}
+      </span>
+    {/if}
     <input
       on:click|stopPropagation
       on:change={handleChange}
@@ -77,6 +80,7 @@
       {indeterminate}
       {disabled}
       class:indeterminate
+      {...$$restProps}
     />
     <span class="checkmark" class:hoverable class:on-dark={onDark}>
       {#if indeterminate}
@@ -94,7 +98,7 @@
 
 <style lang="postcss">
   .checkbox {
-    @apply block w-[18px] cursor-pointer select-none text-sm leading-[18px] text-primary;
+    @apply block cursor-pointer select-none h-[18px] w-[18px] leading-[18px] text-sm text-primary;
   }
 
   .checkbox.hoverable {
@@ -106,11 +110,11 @@
   }
 
   .label {
-    @apply absolute top-0 left-6 flex h-full items-center whitespace-nowrap;
+    @apply ml-6 h-full whitespace-nowrap flex items-center;
   }
 
   .label.hoverable {
-    @apply left-10;
+    @apply ml-10;
   }
 
   input {
