@@ -74,11 +74,8 @@
       // Set filters from inital page load query if it exists
       $workflowFilters = toListWorkflowFilters(query);
     } else {
-      updateQueryParamsFromFilter(
-        $page.url,
-        $persistedWorkflowFilters,
-        $workflowSorts,
-      );
+      $workflowFilters = $persistedWorkflowFilters;
+      updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
     }
   });
 

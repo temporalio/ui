@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { timeFormat } from '$lib/stores/time-format';
   import { capitalize } from '$lib/utilities/format-camel-case';
   import {
@@ -66,13 +65,6 @@
   };
 
   $: timeFilter, setTimeValues();
-
-  onMount(() => {
-    const persistedTimeFilter = getTimeFilter($persistedWorkflowFilters);
-    if (persistedTimeFilter) {
-      timeFilter = persistedTimeFilter;
-    }
-  });
 
   const getTimeFilter = (filters: WorkflowFilter[]) =>
     filters.find(
