@@ -1,0 +1,5 @@
+.env.* linguist-language=Shell
+
+*.{ts,json,svelte} text eol=lf
+.postcss           text diff=css
+.scss              text diff=css
