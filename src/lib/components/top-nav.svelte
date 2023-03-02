@@ -67,7 +67,11 @@
   <div class="flex items-center gap-2" />
   <div class="flex items-center gap-2">
     {#if namespace}
-      <DropdownMenu id="namespace" position="right" class="bg-purple-200">
+      <DropdownMenu
+        id="namespace"
+        position="right"
+        class="border-3 bg-purple-200"
+      >
         <div slot="trigger">
           <Badge type="purple" class="flex gap-1 pl-2"
             >{namespace}<Icon name="chevron-down" /></Badge
@@ -86,25 +90,27 @@
             <img
               src={$authUser?.picture}
               alt={$authUser?.profile ?? 'user profile'}
-              class="mt-2 h-[30px] w-[30px] rounded-md cursor-pointer"
+              class="mt-2 h-[24px] w-[24px] cursor-pointer rounded-md"
               on:error={fixImage}
               class:hidden={!showProfilePic}
             />
-            <Icon name="chevron-down" class="mt-2" />
             <div
-              class="aspect-square h-full rounded-full bg-blue-200 p-0.5"
+              class="aspect-square h-[24px] h-full w-[24px] rounded-full bg-blue-200 p-0.5"
               class:hidden={showProfilePic}
             >
               {#if $authUser?.name}
-                <div class="text-center text-black ">
+                <div class="text-center text-sm text-black">
                   {$authUser?.name.trim().charAt(0)}
                 </div>
               {/if}
             </div>
+            <Icon name="chevron-down" class="mt-1" />
           {/if}
         </div>
         <div class="h-auto w-[400px]" slot="items">
-          <MenuItem class="rounded-t-xl">{$authUser.email}</MenuItem>
+          <MenuItem class="cursor-normal rounded-t-xl"
+            >{$authUser.email}</MenuItem
+          >
           <MenuItem class="rounded-b-xl" on:click={logout}>Log out</MenuItem>
         </div>
       </DropdownMenu>

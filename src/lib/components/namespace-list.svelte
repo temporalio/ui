@@ -53,15 +53,15 @@
   <ul data-cy="namespace-list">
     {#each namespaceList.filter( ({ namespace }) => namespace.includes(searchValue), ) as namespace}
       <li
-        class="first:rounded-t-xl first:border-t-3 last:rounded-b-xl last:border-b-3 border-b border-l-3 border-r-3 border-gray-900 flex border-collapse gap-2 bg-white hover:bg-gradient-to-br from-blue-100 to-purple-100 cursor-pointer"
+        class="flex border-collapse cursor-pointer gap-2 border-b border-l-3 border-r-3 border-gray-900 bg-white from-blue-100 to-purple-100 first:rounded-t-xl first:border-t-3 last:rounded-b-xl last:border-b-3 hover:bg-gradient-to-br"
       >
         <a
           on:click={() => ($lastUsedNamespace = namespace.namespace)}
           href={namespace.href(namespace.namespace)}
-          class="w-full flex p-3"
+          class="flex w-full p-3"
           class:active={namespace.namespace === $page.params?.namespace}
         >
-          <div class="w-6 h-6 active">
+          <div class="active h-6 w-6">
             {#if namespace.namespace === $page.params?.namespace}
               <Icon name="checkmark" />
             {/if}
