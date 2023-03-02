@@ -53,6 +53,7 @@ const createGroupFor = <K extends keyof StartingEvents>(
     timestamp,
     category,
     classification,
+    subGroups: [],
     get eventTime() {
       return this.lastEvent?.eventTime;
     },
@@ -84,9 +85,9 @@ export const createEventGroup = (event: CommonHistoryEvent): EventGroup => {
   if (isWorkflowExecutionSignaledEvent(event))
     return createGroupFor<'SignalReceived'>(event);
 
-  // if (isWorkflowTaskScheduledEvent(event)) {
-  //   return createGroupFor<'WorkflowTask'>(event);
-  // }
+  if (isWorkflowTaskScheduledEvent(event)) {
+    return createGroupFor<'WorkflowTask'>(event);
+  }
 
   if (isActivityTaskScheduledEvent(event)) {
     return createGroupFor<'Activity'>(event);

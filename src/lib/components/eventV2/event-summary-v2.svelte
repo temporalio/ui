@@ -11,12 +11,12 @@
 
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
-  import EventEmptyRow from './event-empty-row.svelte';
+  import EventEmptyRow from '../event/event-empty-row.svelte';
   import { groupEvents } from '$lib/models/event-groups';
   import Pagination from '$lib/holocene/pagination.svelte';
   import { fetchAllEvents } from '$lib/services/events-service';
   import Card from '$lib/holocene/card.svelte';
-  import EventSummaryCard from './event-summary-card.svelte';
+  import EventSummaryCard from './event-group-summary-card.svelte';
 
   export let compact = false;
 
@@ -77,10 +77,6 @@
   $: initialItem = currentEvents?.[0];
   $: items = getEventsOrGroups(currentEvents, category);
   $: updating = currentEvents.length && !fullHistory.length;
-
-  $: {
-    console.log('initialItem: ', initialItem);
-  }
 </script>
 
 {#each items as item}
@@ -88,31 +84,3 @@
     >{item.name}</EventSummaryCard
   >
 {/each}
-
-<!-- {#key [$eventFilterSort, category]}
-  <Pagination
-    floatId="event-view-toggle"
-    {items}
-    {updating}
-    let:visibleItems
-    let:activeRowIndex
-    let:setActiveRowIndex
-    aria-label="recent events"
-  >
-    <EventSummaryTable {updating} {compact} on:expandAll={handleExpandChange}>
-      {#each visibleItems as event, index (`${event.id}-${event.timestamp}`)}
-        <EventSummaryRow
-          {event}
-          {compact}
-          {visibleItems}
-          expandAll={$expandAllEvents === 'true'}
-          {initialItem}
-          active={activeRowIndex === index}
-          onRowClick={() => setActiveRowIndex(index)}
-        />
-      {:else}
-        <EventEmptyRow {loading} />
-      {/each}
-    </EventSummaryTable>
-  </Pagination>
-{/key} -->

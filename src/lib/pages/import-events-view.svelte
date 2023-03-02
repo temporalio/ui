@@ -28,10 +28,15 @@
           href={routeForEventHistoryImport($lastUsedNamespace, 'feed')}
           >Timeline</ToggleButton
         >
-        <ToggleButton
+        <!-- <ToggleButton
           icon="compact"
           href={routeForEventHistoryImport($lastUsedNamespace, 'compact')}
           >Compact</ToggleButton
+        > -->
+        <ToggleButton
+          icon="compact"
+          href={routeForEventHistoryImport($lastUsedNamespace, 'compactV2')}
+          >Compact V2</ToggleButton
         >
         <ToggleButton
           icon="json"
