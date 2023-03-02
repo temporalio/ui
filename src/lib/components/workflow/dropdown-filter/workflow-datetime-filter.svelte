@@ -86,14 +86,18 @@
 
   const onChange = (_value: string) => {
     value = _value;
+
+    if (value === 'Custom') {
+      custom = true;
+      return;
+    }
+
     if (value === 'All Time') {
       $workflowFilters = [...getOtherFilters($workflowFilters)];
       $persistedWorkflowFilters = [
         ...getOtherFilters($persistedWorkflowFilters),
       ];
       custom = false;
-    } else if (value === 'Custom') {
-      custom = true;
     } else {
       const filter = {
         attribute: timeField,
