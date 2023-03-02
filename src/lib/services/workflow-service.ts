@@ -114,9 +114,14 @@ export const fetchAllWorkflows = async (
   request = fetch,
   archived = false,
 ): Promise<CombinedWorkflowExecutionsResponse> => {
-  const query = decodeURIComponent(
-    parameters.query || toListWorkflowQuery(parameters, archived),
-  );
+  const rawQuery =
+    parameters.query || toListWorkflowQuery(parameters, archived);
+  let query: string;
+  try {
+    query = decodeURIComponent(rawQuery);
+  } catch {
+    query = rawQuery;
+  }
 
   const endpoint: ValidWorkflowEndpoints = archived
     ? 'workflows.archived'
