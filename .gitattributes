@@ -1,4 +1,6 @@
-.env.** linguist-language=Shell
+*.env.* linguist-language=Shell
+
+src/lib/vendor/** linguist-vendored
 
 *.{ts,json,svelte} text eol=lf
 .postcss           text diff=css
