@@ -21,7 +21,7 @@ describe('workflow service', () => {
 
   describe('fetchAllWorkflows', () => {
     test('preserves queries with "%"', async () => {
-      const resp = await fetchAllWorkflows('test', {
+      await fetchAllWorkflows('test', {
         query: 'WorkflowType LIKE "cron%"',
       });
 
