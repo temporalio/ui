@@ -32,7 +32,24 @@ export const groupEvents = (
     }
   }
 
-  const groups = Object.values(groupMap);
+  let groups = Object.values(groupMap);
+  console.log('Groups: ', groups);
+
+  for (const group of groups) {
+    const workflowTaskId = group.attributes?.workflowTaskCompletedEventId;
+    if (workflowTaskId) {
+      const workflowTaskGroup = groups.find(
+        (g) => g.lastEvent?.eventId === workflowTaskId,
+      );
+      if (workflowTaskGroup) {
+        workflowTaskGroup.subGroups.push(group);
+        groups = groups.filter((g) => g.id !== group.id);
+      } else {
+        console.error('No task group found!');
+      }
+    }
+  }
+
   return sort === 'descending'
     ? Object.values(groups).reverse()
     : Object.values(groups);

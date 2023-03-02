@@ -47,7 +47,7 @@
       importEvents.set(events);
       importEventGroups.set(eventGroups);
       fileLoaded = false;
-      const path = routeForEventHistoryImport($lastUsedNamespace, 'feed');
+      const path = routeForEventHistoryImport($lastUsedNamespace, 'compactV2');
       goto(path);
     } catch (e) {
       console.error(e);
