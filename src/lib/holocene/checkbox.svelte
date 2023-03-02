@@ -122,7 +122,7 @@
   }
 
   .checkmark {
-    @apply absolute box-content top-0 left-0 h-4 w-4 cursor-pointer rounded-sm border border-gray-500 bg-white;
+    @apply absolute top-0 left-0 box-content h-4 w-4 cursor-pointer rounded-sm border border-gray-500 bg-white;
   }
 
   .checkmark.hoverable {
