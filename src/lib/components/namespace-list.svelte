@@ -1,14 +1,17 @@
 <script lang="ts">
+  import { createEventDispatcher, onMount } from 'svelte';
   import { page } from '$app/stores';
 
+  import { workflowsQuery, workflowsSearch } from '$lib/stores/workflows';
+  import { routeForWorkflowsWithQuery } from '$lib/utilities/route-for';
+  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
+
+  import EmptyState from '$lib/holocene/empty-state.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  import { onMount } from 'svelte';
-  import EmptyState from '$lib/holocene/empty-state.svelte';
-  import { createEventDispatcher } from 'svelte';
-
   export let getNamespaceList: () => Promise<NamespaceItem[]> = null;
-
+  const { parameters, searchType } = $workflowsSearch;
+  const query = toListWorkflowQuery(parameters);
   let namespaceList = null;
   let searchField: HTMLInputElement = null;
 
@@ -74,7 +77,11 @@
           class="first:rounded-t-xl first:border-t-3 last:rounded-b-xl last:border-b-3 border-b border-l-3 border-r-3 border-gray-900 flex border-collapse gap-2 hover:bg-gradient-to-br from-blue-100 to-purple-100 cursor-pointer"
         >
           <a
-            href={namespace.href(namespace.namespace)}
+            href={routeForWorkflowsWithQuery({
+              namespace: namespace.namespace,
+              query: $workflowsQuery || query,
+              search: searchType,
+            })}
             class="w-full flex p-3"
             class:active={namespace.namespace === $page.params?.namespace}
           >
