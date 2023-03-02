@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { timeFormat } from '$lib/stores/time-format';
   import { capitalize } from '$lib/utilities/format-camel-case';
   import {
@@ -15,7 +16,11 @@
   import Select from '$lib/holocene/select/select.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import SimpleSplitButton from '$lib/holocene/simple-split-button.svelte';
-  import { workflowFilters, workflowSorts } from '$lib/stores/filters';
+  import {
+    persistedWorkflowFilters,
+    workflowFilters,
+    workflowSorts,
+  } from '$lib/stores/filters';
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Button from '$lib/holocene/button.svelte';
   import TimePicker from '$lib/holocene/time-picker.svelte';
@@ -24,6 +29,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
+  import type { WorkflowFilter } from '$lib/models/workflow-filters';
 
   let custom = false;
   let show = false;
@@ -43,9 +49,7 @@
   let endSecond = '';
   let endHalf: 'AM' | 'PM' = 'AM';
 
-  $: timeFilter = $workflowFilters.find(
-    (f) => f.attribute === 'StartTime' || f.attribute === 'CloseTime',
-  );
+  $: timeFilter = getTimeFilter($workflowFilters);
   $: useBetweenDateTimeQuery = custom || !$supportsAdvancedVisibility;
 
   const setTimeValues = () => {
@@ -53,22 +57,40 @@
       value = 'All Time';
       timeField = 'StartTime';
     } else {
-      value = custom ? 'Custom' : timeFilter.value;
+      value =
+        custom || !columnOrderedDurations.find((d) => timeFilter.value === d)
+          ? 'Custom'
+          : timeFilter.value;
       timeField = timeFilter.attribute as string;
     }
   };
 
   $: timeFilter, setTimeValues();
 
-  const getOtherFilters = () =>
-    $workflowFilters.filter(
+  onMount(() => {
+    const persistedTimeFilter = getTimeFilter($persistedWorkflowFilters);
+    if (persistedTimeFilter) {
+      timeFilter = persistedTimeFilter;
+    }
+  });
+
+  const getTimeFilter = (filters: WorkflowFilter[]) =>
+    filters.find(
+      (f) => f.attribute === 'StartTime' || f.attribute === 'CloseTime',
+    );
+
+  const getOtherFilters = (filters: WorkflowFilter[]) =>
+    filters.filter(
       (f) => f.attribute !== 'StartTime' && f.attribute !== 'CloseTime',
     );
 
   const onChange = (_value: string) => {
     value = _value;
     if (value === 'All Time') {
-      $workflowFilters = [...getOtherFilters()];
+      $workflowFilters = [...getOtherFilters($workflowFilters)];
+      $persistedWorkflowFilters = [
+        ...getOtherFilters($persistedWorkflowFilters),
+      ];
       custom = false;
     } else if (value === 'Custom') {
       custom = true;
@@ -80,7 +102,12 @@
         operator: '',
         parenthesis: '',
       };
-      $workflowFilters = [...getOtherFilters(), filter];
+      $workflowFilters = [...getOtherFilters($workflowFilters), filter];
+      $persistedWorkflowFilters = [
+        ...getOtherFilters($persistedWorkflowFilters),
+        filter,
+      ];
+
       custom = false;
     }
 
@@ -151,7 +178,11 @@
       parenthesis: '',
       customDate: true,
     };
-    $workflowFilters = [...getOtherFilters(), filter];
+    $workflowFilters = [...getOtherFilters($workflowFilters), filter];
+    $persistedWorkflowFilters = [
+      ...getOtherFilters($persistedWorkflowFilters),
+      filter,
+    ];
 
     updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
   };

@@ -12,9 +12,14 @@
     workflowsQuery,
   } from '$lib/stores/workflows';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import { workflowFilters, workflowSorts } from '$lib/stores/filters';
+  import {
+    persistedWorkflowFilters,
+    workflowFilters,
+    workflowSorts,
+  } from '$lib/stores/filters';
 
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
+  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
@@ -69,7 +74,11 @@
       // Set filters from inital page load query if it exists
       $workflowFilters = toListWorkflowFilters(query);
     } else {
-      $workflowFilters = [];
+      updateQueryParamsFromFilter(
+        $page.url,
+        $persistedWorkflowFilters,
+        $workflowSorts,
+      );
     }
   });
 
