@@ -66,14 +66,13 @@
 
 <TableRow {href} class="workflow-summary-row">
   {#if bulkActionsEnabled}
-    <td on:keypress|stopPropagation on:click|stopPropagation>
-      <div class="absolute">
-        <Checkbox
-          disabled={checkboxDisabled}
-          bind:checked={selected}
-          on:change={handleCheckboxChange}
-        />
-      </div>
+    <td style="padding: 0;">
+      <Checkbox
+        hoverable
+        disabled={checkboxDisabled}
+        bind:checked={selected}
+        on:change={handleCheckboxChange}
+      />
     </td>
   {/if}
   <td>
@@ -89,7 +88,9 @@
     on:mouseleave={() => (showFilterCopy = false)}
     on:blur={() => (showFilterCopy = false)}
   >
-    <span class="table-link">{workflow.id}</span>
+    <span class="table-link">
+      {workflow.id}
+    </span>
     <FilterOrCopyButtons
       show={showFilterCopy}
       content={workflow.id}

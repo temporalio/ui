@@ -123,8 +123,8 @@
         <div
           class="event-group"
           style="top:
-                  {top +
-                  blockHeight / 4}px; left: {left}px; width: {width}px; height: {height - 1}px; background: {color};"
+              {top +
+              blockHeight / 4}px; left: {left}px; width: {width}px; height: {height - 1}px; background: {color};"
         />
         <button
           class="absolute truncate border-r border-gray-900 pl-2 text-left text-sm font-medium hover:bg-blueGray-200"
@@ -152,8 +152,8 @@
       <div
         class="absolute top-0 bg-blueGray-400"
         style="height:
-                {blockHeight * eventGroups.length +
-                yBuffer}px;left: {mouseX}px; width: 1px;"
+            {blockHeight * eventGroups.length +
+            yBuffer}px;left: {mouseX}px; width: 1px;"
       />
     </div>
   </div>
