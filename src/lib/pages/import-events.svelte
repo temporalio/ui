@@ -1,23 +1,23 @@
 <script lang="ts">
-  import HistoryImport from '../_event-history-import.svelte';
+  import HistoryImport from '$lib/components/import/event-history-file-import.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Link from '$lib/holocene/link.svelte';
-  import { authUser } from '$lib/stores/auth-user';
 
-  const formatEvent = 'EventHistory';
-  const format1 = { events: [formatEvent] };
-  const format2 = [formatEvent];
+  const format1 = { events: 'HistoryEvent[]' };
+  const format2 = 'HistoryEvent[]';
 </script>
 
 <section class="flex flex-col gap-4">
   <nav
     id="event-history"
     class="block items-center justify-between gap-4 pb-4 lg:flex"
-    aria-label="event history import"
+    aria-label="import event history"
   >
-    <h1 class="text-lg font-medium">Event History Import</h1>
+    <h1 class="text-lg font-medium" data-testid="import-event-history">
+      Import Event History
+    </h1>
     <div class="flex gap-4">
-      <HistoryImport user={authUser} />
+      <HistoryImport />
     </div>
   </nav>
   <div class="w-full md:w-1/2">
@@ -33,8 +33,8 @@
     </div>
     <h3 class="mt-8 text-lg font-medium">Expected JSON formats</h3>
     <div class="h-40 text-center">
-      <CodeBlock content={format1} />
-      <CodeBlock content={format2} />
+      <CodeBlock content={format1} inline />
+      <CodeBlock content={format2} inline />
     </div>
   </div>
 </section>

@@ -12,7 +12,15 @@ const mockWorkflows = [
 ];
 
 vi.mock('../utilities/request-from-api', () => ({
-  requestFromAPI: vi.fn().mockResolvedValue({ jobId: 'abc-123' }),
+  requestFromAPI: vi.fn().mockImplementation((route) => {
+    if (route.includes('/describe')) {
+      return new Promise((resolve) =>
+        resolve({ state: 'Completed', completedOperationCount: '10' }),
+      );
+    }
+
+    return new Promise((resolve) => resolve('xxx'));
+  }),
 }));
 
 vi.mock('uuid', () => ({
@@ -27,7 +35,7 @@ vi.mock('../stores/versions', () => {
 
 describe('Batch Service', () => {
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('when temporal server version is <= 1.19', () => {
@@ -44,7 +52,7 @@ describe('Batch Service', () => {
         workflows: mockWorkflows,
       });
 
-      expect(requestFromAPI).toHaveBeenCalledOnce();
+      expect(requestFromAPI).toHaveBeenCalledTimes(2);
       expect(requestFromAPI).toHaveBeenCalledWith(
         'http://localhost:8233/api/v1/namespaces/default/batch-operations',
         {
@@ -65,7 +73,7 @@ describe('Batch Service', () => {
         workflows: mockWorkflows,
       });
 
-      expect(requestFromAPI).toHaveBeenCalledOnce();
+      expect(requestFromAPI).toHaveBeenCalledTimes(2);
       expect(requestFromAPI).toHaveBeenCalledWith(
         'http://localhost:8233/api/v1/namespaces/default/batch-operations',
         {
@@ -94,7 +102,7 @@ describe('Batch Service', () => {
         workflows: mockWorkflows,
       });
 
-      expect(requestFromAPI).toHaveBeenCalledOnce();
+      expect(requestFromAPI).toHaveBeenCalledTimes(2);
       expect(requestFromAPI).toHaveBeenCalledWith(
         'http://localhost:8233/api/v1/namespaces/default/batch-operations',
         {
@@ -115,7 +123,7 @@ describe('Batch Service', () => {
         workflows: mockWorkflows,
       });
 
-      expect(requestFromAPI).toHaveBeenCalledOnce();
+      expect(requestFromAPI).toHaveBeenCalledTimes(2);
       expect(requestFromAPI).toHaveBeenCalledWith(
         'http://localhost:8233/api/v1/namespaces/default/batch-operations',
         {

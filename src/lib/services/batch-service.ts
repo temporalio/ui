@@ -74,16 +74,20 @@ const createBatchOperationOptions = ({
 
 export async function bulkTerminateByIDs(
   options: CreateBatchOperationWithIDsOptions,
-) {
+): Promise<string> {
   const fullOptions = createBatchOperationOptions(options);
-  return terminateWorkflows(fullOptions);
+  const jobId = await terminateWorkflows(fullOptions);
+  return pollBatchOperation({
+    namespace: fullOptions.namespace,
+    jobId,
+  });
 }
 
-export async function batchTerminateByQuery({
+export function batchTerminateByQuery({
   namespace,
   query,
   reason,
-}: CreateBatchOperationWithQueryOptions) {
+}: CreateBatchOperationWithQueryOptions): Promise<string> {
   return terminateWorkflows({ namespace, query, reason });
 }
 
@@ -91,14 +95,18 @@ export async function bulkCancelByIDs(
   options: CreateBatchOperationWithIDsOptions,
 ): Promise<string> {
   const fullOptions = createBatchOperationOptions(options);
-  return cancelWorkflows(fullOptions);
+  const jobId = await cancelWorkflows(fullOptions);
+  return pollBatchOperation({
+    namespace: fullOptions.namespace,
+    jobId,
+  });
 }
 
-export async function batchCancelByQuery({
+export function batchCancelByQuery({
   namespace,
   query,
   reason,
-}: CreateBatchOperationWithQueryOptions) {
+}: CreateBatchOperationWithQueryOptions): Promise<string> {
   return cancelWorkflows({ namespace, query, reason });
 }
 

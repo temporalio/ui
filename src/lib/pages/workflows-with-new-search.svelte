@@ -30,13 +30,12 @@
     batchTerminateByQuery,
     bulkCancelByIDs,
     bulkTerminateByIDs,
-    pollBatchOperation,
   } from '$lib/services/batch-service';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  import { toaster } from '$lib/stores/toaster';
   import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
   import { bulkActionsEnabled as workflowBulkActionsEnabled } from '$lib/utilities/bulk-actions-enabled';
   import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
+  import { toaster } from '$lib/stores/toaster';
 
   $: bulkActionsEnabled = workflowBulkActionsEnabled(
     $page.data.settings,
@@ -48,7 +47,6 @@
   let batchCancelConfirmationModal: BatchOperationConfirmationModal;
   let allSelected: boolean = false;
   let pageSelected: boolean = false;
-  let terminating: boolean = false;
 
   $: query = $page.url.searchParams.get('query');
 
@@ -91,8 +89,6 @@
   };
 
   const resetPageToDefaultState = () => {
-    terminating = false;
-
     $workflowFilters = [];
     $workflowSorts = [];
     updateQueryParameters({
@@ -133,83 +129,73 @@
   };
 
   const terminateWorkflows = async (event: CustomEvent<{ reason: string }>) => {
-    const { namespace } = $page.params;
-    const { reason } = event.detail;
-
-    if (allSelected) {
-      // Idea: persist the job ID and display a progress indicator for large jobs
-      await batchTerminateByQuery({
-        namespace,
-        reason,
-        query: batchOperationQuery,
-      });
-      toaster.push({
-        message: 'The batch terminate request is processing in the background.',
-        id: 'batch-terminate-success-toast',
-      });
-    } else {
-      terminating = true;
-      try {
-        const jobId = await bulkTerminateByIDs({
-          namespace,
-          reason,
-          workflows: terminableWorkflows,
+    const options = {
+      namespace: $page.params.namespace,
+      reason: event.detail.reason,
+    };
+    try {
+      if (allSelected) {
+        await batchTerminateByQuery({
+          ...options,
+          query: batchOperationQuery,
         });
-        const workflowsTerminated = await pollBatchOperation({
-          namespace,
-          jobId,
+        toaster.push({
+          message:
+            'The batch terminate request is processing in the background.',
+          id: 'batch-terminate-success-toast',
+        });
+      } else {
+        const workflowsTerminated = await bulkTerminateByIDs({
+          ...options,
+          workflows: terminableWorkflows,
         });
         toaster.push({
           message: `Successfully terminated ${workflowsTerminated} workflows.`,
           id: 'batch-terminate-success-toast',
         });
-      } catch (error) {
-        toaster.push({
-          variant: 'error',
-          message: 'Unable to terminate workflows.',
-        });
       }
+      batchTerminateConfirmationModal.close();
+      resetPageToDefaultState();
+    } catch (error) {
+      batchTerminateConfirmationModal.setError(
+        error?.message ?? 'An unknown error occurred.',
+      );
     }
-    resetPageToDefaultState();
   };
 
   const cancelWorkflows = async (event: CustomEvent<{ reason: string }>) => {
-    const { namespace } = $page.params;
-    const { reason } = event.detail;
+    const options = {
+      namespace: $page.params.namespace,
+      reason: event.detail.reason,
+    };
 
-    if (allSelected) {
-      await batchCancelByQuery({
-        namespace,
-        reason,
-        query: batchOperationQuery,
-      });
-      toaster.push({
-        message: 'The batch cancel request is processing in the background.',
-        id: 'batch-cancel-success-toast',
-      });
-    } else {
-      try {
-        const jobId = await bulkCancelByIDs({
-          namespace,
-          reason,
-          workflows: cancelableWorkflows,
-        });
-        const workflowsCancelled = await pollBatchOperation({
-          namespace,
-          jobId,
+    try {
+      if (allSelected) {
+        await batchCancelByQuery({
+          ...options,
+          query: batchOperationQuery,
         });
         toaster.push({
-          message: `Successfully cancelled ${workflowsCancelled} workflows.`,
+          message: 'The batch cancel request is processing in the background.',
           id: 'batch-cancel-success-toast',
         });
-      } catch {
+      } else {
+        const workflowsCanceled = await bulkCancelByIDs({
+          ...options,
+          workflows: cancelableWorkflows,
+        });
         toaster.push({
-          variant: 'error',
-          message: 'Unable to cancel workflows.',
+          message: `Successfully cancelled ${workflowsCanceled} workflows.`,
+          id: 'batch-cancel-success-toast',
         });
       }
+      batchCancelConfirmationModal.close();
+      resetPageToDefaultState();
+    } catch (error) {
+      batchCancelConfirmationModal.setError(
+        error?.message ?? 'An unknown error occurred.',
+      );
     }
-    resetPageToDefaultState();
   };
 
   $: batchOperationQuery = !$workflowsQuery
@@ -246,7 +232,6 @@
 <BatchOperationConfirmationModal
   action="Terminate"
   bind:this={batchTerminateConfirmationModal}
-  loading={terminating}
   {allSelected}
   actionableWorkflowsLength={terminableWorkflows.length}
   query={batchOperationQuery}
@@ -255,7 +240,6 @@
 <BatchOperationConfirmationModal
   action="Cancel"
   bind:this={batchCancelConfirmationModal}
-  loading={false}
   {allSelected}
   actionableWorkflowsLength={cancelableWorkflows.length}
   query={batchOperationQuery}
@@ -272,7 +256,7 @@
       <p data-testid="namespace-name">
         {$page.params.namespace}
       </p>
-      {#if $workflowCount?.totalCount >= 0}
+      {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility}
         <div class="h-1 w-1 rounded-full bg-gray-400" />
         <p data-testid="workflow-count">
           {#if $loading}

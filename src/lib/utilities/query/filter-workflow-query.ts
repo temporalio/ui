@@ -2,6 +2,8 @@ import type {
   WorkflowFilter,
   WorkflowSort,
 } from '$lib/models/workflow-filters';
+import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
+import { get } from 'svelte/store';
 import { isDuration, isDurationString, toDate, tomorrow } from '../to-duration';
 
 export type QueryKey =
@@ -48,7 +50,7 @@ const toFilterQueryStatement = (
   }
 
   if (isDuration(value) || isDurationString(value)) {
-    if (archived) {
+    if (archived || get(supportsAdvancedVisibility)) {
       return `${queryKey} > "${toDate(value)}"`;
     }
     return `${queryKey} BETWEEN "${toDate(value)}" AND "${tomorrow()}"`;

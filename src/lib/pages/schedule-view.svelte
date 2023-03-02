@@ -54,15 +54,13 @@
     try {
       $loading = true;
       await deleteSchedule({ namespace, scheduleId });
+      deleteConfirmationModal.close();
       setTimeout(() => {
         $loading = false;
         goto(routeForSchedules({ namespace }));
       }, 2000);
     } catch (e) {
-      toaster.push({
-        message: `Cannot delete schedule. ${e?.message}`,
-        variant: 'error',
-      });
+      deleteConfirmationModal.setError(`Cannot delete schedule. ${e?.message}`);
       $loading = false;
     }
   };
@@ -80,6 +78,7 @@
           reason,
         });
     scheduleFetch = fetchSchedule(parameters, fetch);
+    pauseConfirmationModal.close();
     reason = '';
   };
 
@@ -108,7 +107,7 @@
         <a
           href={routeForSchedules({ namespace })}
           class="absolute top-0 back-to-schedules"
-          style="left: -.5rem"
+          style="left: -0.5rem;"
         >
           <Icon name="chevron-left" class="inline" />Back to Schedules
         </a>
