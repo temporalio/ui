@@ -1,6 +1,8 @@
 <script lang="ts">
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { timeFormat } from '$lib/stores/time-format';
+  import { formatDate } from '$lib/utilities/format-date';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import EventDetailRowItem from './event-detail-row-item.svelte';
@@ -11,21 +13,17 @@
   $: attributes = formatAttributes(event, { compact });
 
   $: eventDetails = Object.entries(attributes);
-  const allowedKeys = [
+
+  const denyKeys = [
     'eventTime',
-    'identity',
-    'signalName',
-    'markerName',
-    // 'details',
-    // 'input',
-    'namespace',
-    'startToFireTimeout',
+    'binaryChecksum',
+    'scheduledEventId',
+    'startedEventId',
   ];
 
   $: filteredDetails = eventDetails.filter(([key, value]) => {
-    return allowedKeys.includes(key);
+    return !denyKeys.includes(key);
   });
-
   let expanded = false;
 </script>
 
@@ -34,9 +32,14 @@
   on:click|preventDefault|stopPropagation={() => (expanded = !expanded)}
 >
   <div class="w-full flex gap-4">
-    <div class="flex gap-4 items-center w-48 truncate">
-      <p>{event.id}</p>
-      <p>{event?.classification ?? event?.name}</p>
+    <div class="flex flex-col gap-0 w-auto truncate">
+      <div class="flex gap-4 items-center">
+        <p>{event.id}</p>
+        <p>{event?.classification ?? event?.name}</p>
+      </div>
+      <div>
+        <p class="text-[11px]">{formatDate(event?.eventTime, $timeFormat)}</p>
+      </div>
     </div>
     <div class="flex gap-4">
       {#each filteredDetails as [key, value] (key)}
