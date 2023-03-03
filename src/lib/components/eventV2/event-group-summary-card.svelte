@@ -26,6 +26,7 @@
   import EventPayload from './event-payload.svelte';
   import EventGroupPrimaryContent from './event-group-primary-content.svelte';
   import EventCard from './event-card.svelte';
+  import EventGroupDetailsWithTimeline from './event-group-details-with-timeline.svelte';
 
   export let event: IterableEvent;
   export let visibleItems: IterableEvent[];
@@ -143,16 +144,17 @@
             />
           </div>
         </div>
-        <div class="secondary">
-          {#if expanded}
-            <EventDetailsFull
-              event={currentEvent}
-              {currentEvent}
-              {compact}
-              bind:selectedId
-            />
-          {/if}
-        </div>
+        {#if expanded && isEventGroup(event)}
+          <div class="secondary">
+            {#each event?.eventList.reverse() ?? [] as event}
+              <EventGroupDetailsWithTimeline
+                {event}
+                {compact}
+                bind:selectedId
+              />
+            {/each}
+          </div>
+        {/if}
       </div>
     </EventCard>
   </div>
@@ -163,12 +165,16 @@
     @apply w-full rounded-xl flex-wrap items-center border-gray-900 text-sm no-underline pl-8 pr-2 xl:py-3 xl:text-base;
   }
 
-  .row:hover {
+  /* .row:hover {
     @apply z-50 cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
+  } */
+
+  .secondary {
+    @apply mt-4 flex flex-col gap-2;
   }
 
   .expanded.row {
-    @apply bg-blue-50;
+    @apply bg-gray-50;
   }
 
   .failure {
