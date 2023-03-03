@@ -13,6 +13,7 @@ import chevronDown from './svg/chevron-down.svelte';
 import chevronLeft from './svg/chevron-left.svelte';
 import chevronRight from './svg/chevron-right.svelte';
 import chevronUp from './svg/chevron-up.svelte';
+import chevronSelectorVertical from './svg/chevron-selector-vertical.svelte';
 import clock from './svg/clock.svelte';
 import close from './svg/close.svelte';
 import cometSolid from './svg/comet-solid.svelte';
@@ -86,6 +87,7 @@ export const icons = {
   'chevron-left': chevronLeft,
   'chevron-right': chevronRight,
   'chevron-up': chevronUp,
+  'chevron-selector-vertical': chevronSelectorVertical,
   clock,
   close,
   'comet-solid': cometSolid,
