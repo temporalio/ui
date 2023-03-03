@@ -15,7 +15,6 @@
     shouldDisplayChildWorkflowLink,
   } from '$lib/utilities/get-single-attribute-for-event';
 
-  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Link from '$lib/holocene/link.svelte';
   import Copyable from '../copyable.svelte';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
@@ -25,7 +24,6 @@
   export let key: string;
   export let value: string | Record<string, unknown>;
   export let attributes: CombinedAttributes;
-  export let inline = false;
 
   const { workflow, namespace } = $page.params;
   $: codeBlockValue = getCodeBlockValue(value);
@@ -53,57 +51,63 @@
     {/if}
   </div> -->
 
-{#if typeof value !== 'object'}
-  {#if shouldDisplayAsExecutionLink(key)}
-    <Badge type="alpha" flexDirection="col">
-      <Copyable content={value} container-class="flex-row-reverse xl:flex-row">
-        <Link
-          newTab
-          href={routeForEventHistory({
-            namespace,
-            workflow,
-            run: value,
-          })}
-        >
-          {value}
-        </Link>
-      </Copyable>
-      <p class="text-[11px]">{format(key)}</p>
-    </Badge>
-  {:else if shouldDisplayChildWorkflowLink(key, attributes)}
-    <Badge type="alpha" flexDirection="col">
-      <Copyable content={value} container-class="xl:flex-row">
-        <Link
-          newTab
-          href={routeForEventHistory({
-            namespace,
-            workflow: attributes.workflowExecutionWorkflowId,
-            run: attributes.workflowExecutionRunId,
-          })}
-        >
-          {value}
-        </Link>
-      </Copyable>
-      <p class="text-[11px]">{format(key)}</p>
-    </Badge>
-  {:else if shouldDisplayAsTaskQueueLink(key)}
-    <Badge type="alpha" flexDirection="col">
-      <Copyable content={value} container-class="xl:flex-row">
-        <Link newTab href={routeForTaskQueue({ namespace, queue: value })}>
-          {value}
-        </Link>
-      </Copyable>
-      <p class="text-[11px]">{format(key)}</p>
-    </Badge>
-  {:else}
-    <Badge type="alpha" flexDirection="col">
-      <p class="select-all px-2" class:badge={!shouldDisplayAsPlainText(key)}>
-        {value}
-      </p>
-      <p class="text-[11px]">{format(key)}</p>
-    </Badge>
+<div class="h-auto">
+  {#if typeof value !== 'object'}
+    <Tooltip top text={format(key)}>
+      {#if shouldDisplayAsExecutionLink(key)}
+        <Badge type="alpha" flexDirection="col">
+          <Copyable
+            content={value}
+            container-class="flex-row-reverse xl:flex-row"
+          >
+            <Link
+              newTab
+              href={routeForEventHistory({
+                namespace,
+                workflow,
+                run: value,
+              })}
+            >
+              {value}
+            </Link>
+          </Copyable>
+        </Badge>
+      {:else if shouldDisplayChildWorkflowLink(key, attributes)}
+        <Badge type="alpha" flexDirection="col">
+          <Copyable content={value} container-class="xl:flex-row">
+            <Link
+              newTab
+              href={routeForEventHistory({
+                namespace,
+                workflow: attributes.workflowExecutionWorkflowId,
+                run: attributes.workflowExecutionRunId,
+              })}
+            >
+              {value}
+            </Link>
+          </Copyable>
+        </Badge>
+      {:else if shouldDisplayAsTaskQueueLink(key)}
+        <Badge type="alpha" flexDirection="col">
+          <Copyable content={value} container-class="xl:flex-row">
+            <Link newTab href={routeForTaskQueue({ namespace, queue: value })}>
+              {value}
+            </Link>
+          </Copyable>
+        </Badge>
+      {:else}
+        <Badge type="alpha" flexDirection="col">
+          <p
+            class="select-all px-2"
+            class:badge={!shouldDisplayAsPlainText(key)}
+          >
+            {value}
+          </p>
+        </Badge>
+      {/if}
+    </Tooltip>
   {/if}
-{/if}
+</div>
 
 <style lang="postcss">
   .row {
