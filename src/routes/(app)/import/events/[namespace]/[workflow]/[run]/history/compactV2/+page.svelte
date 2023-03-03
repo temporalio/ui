@@ -16,6 +16,7 @@
   });
 
   $: initialItem = $importEvents[0];
+  $: finalItem = $importEvents[$importEvents.length - 1];
 </script>
 
 <div class="flex gap-4">
@@ -29,7 +30,7 @@
     {/if}
     {#each filteredEventGroups as item}
       <EventGroupSummaryCard
-        subGroup={Boolean(item.subGroups.length)}
+        hasSubGroup={Boolean(item.subGroups.length)}
         event={item}
         visibleItems={filteredEventGroups}
         {initialItem}>{item.name}</EventGroupSummaryCard
@@ -38,6 +39,7 @@
         <div class="ml-8 flex flex-col gap-2 w-full">
           {#each item.subGroups as group}
             <EventGroupSummaryCard
+              isSubGroup
               event={group}
               visibleItems={filteredEventGroups}
               {initialItem}>{group.name}</EventGroupSummaryCard
@@ -46,5 +48,12 @@
         </div>
       {/if}
     {/each}
+    {#if finalItem}
+      <EventGroupSummaryCard
+        event={finalItem}
+        visibleItems={filteredEventGroups}
+        {initialItem}
+      />
+    {/if}
   </div>
 </div>

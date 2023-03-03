@@ -27,12 +27,20 @@
   import EventGroupPrimaryContent from './event-group-primary-content.svelte';
   import EventCard from './event-card.svelte';
   import EventGroupDetailsWithTimeline from './event-group-details-with-timeline.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
+  import PrimaryEventGroupDetails from './primary-event-group-details.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
+  import {
+    parseWithBigInt,
+    stringifyWithBigInt,
+  } from '$lib/utilities/parse-with-big-int';
 
   export let event: IterableEvent;
   export let visibleItems: IterableEvent[];
   export let initialItem: IterableEvent | undefined;
   export let compact = true;
-  export let subGroup = false;
+  export let hasSubGroup = false;
+  export let isSubGroup = false;
   export let expandAll = false;
   export let typedError = false;
   export let active = false;
@@ -44,7 +52,8 @@
 
   $: expanded = expandAll || active;
 
-  $: currentEvent = isEventGroup(event) ? event.lastEvent : event;
+  $: initialEvent = isEventGroup(event) ? event.initialEvent : event;
+  $: lastEvent = isEventGroup(event) ? event.lastEvent : event;
   $: descending = $eventFilterSort === 'descending';
   $: showElapsed = $eventShowElapsed === 'true';
   $: showElapsedTimeDiff =
@@ -60,7 +69,7 @@
         start: isEventGroup(previousItem)
           ? previousItem?.initialEvent?.eventTime
           : previousItem?.eventTime,
-        end: currentEvent?.eventTime,
+        end: lastEvent?.eventTime,
       });
       timeDiffChange = timeDiff ? `(${descending ? '-' : '+'}${timeDiff})` : '';
     }
@@ -74,43 +83,50 @@
   const failure = eventOrGroupIsFailureOrTimedOut(event);
   const canceled = eventOrGroupIsCanceled(event);
   const terminated = eventOrGroupIsTerminated(event);
+
+  $: hasGroupEvents = event?.eventList?.length > 1;
 </script>
 
 <div class="flex gap-4">
-  <div class="w-1/12 flex items-center justify-center">
+  <div class="w-[120px] flex items-center justify-center">
     <p
-      class="break-word truncate text-sm md:whitespace-normal md:text-[14px] w-auto"
+      class="w-[100px] break-word truncate md:whitespace-normal md:text-[11px] leading-0"
     >
       {#if showElapsedTimeDiff}
         {formatDistanceAbbreviated({
           start: initialItem.eventTime,
-          end: currentEvent.eventTime,
+          end: initialEvent.eventTime,
         })}
         {timeDiffChange}
       {:else}
-        {formatDate(currentEvent?.eventTime, $timeFormat)}
+        {formatDate(initialEvent?.eventTime, $timeFormat)}
       {/if}
     </p>
-    <div class="rounded-full w-6 h-4 border-3 border-gray-900 bg-white" />
-  </div>
-  <div class="w-11/12">
-    <EventCard thick={subGroup}>
+    <div class="w-[20px]">
       <div
-        class="row"
-        id={currentEvent.id}
-        class:expanded={expanded && !expandAll}
-        aria-expanded={expanded || expandAll}
-        class:active
+        class="rounded-full w-6 h-6 border-3 border-gray-900 bg-white"
         class:failure
         class:canceled
         class:terminated
+      />
+    </div>
+  </div>
+  <div class="grow">
+    <EventCard thick={hasSubGroup}>
+      <div
+        class="row"
+        id={lastEvent.id}
+        class:expanded={expanded && !expandAll}
+        aria-expanded={expanded || expandAll}
+        class:active
         class:typedError
         data-testid="event-summary-row"
         on:click={onLinkClick}
+        on:keydown={onLinkClick}
       >
-        <div class="primary w-full flex justify-between">
+        <div class="primary w-full flex justify-between cursor-pointer">
           <div class="flex items-center gap-4">
-            <p class="truncate">{currentEvent.id}</p>
+            <p class="truncate">{lastEvent.id}</p>
             <div class="flex">
               {#if compact && failure}
                 <Icon class="mr-1.5 inline text-red-700" name="clock" />
@@ -121,20 +137,22 @@
               {#if compact && terminated}
                 <Icon class="mr-1.5 inline text-pink-700" name="clock" />
               {/if}
-              <p class="event-name truncate text-sm font-semibold md:text-base">
-                {isLocalActivityMarkerEvent(currentEvent)
+              <p
+                class="event-name truncate text-sm font-semibold md:text-base xl:{isSubGroup
+                  ? 'text-base'
+                  : 'text-lg'}"
+              >
+                {isLocalActivityMarkerEvent(event)
                   ? 'LocalActivity'
-                  : currentEvent.name}
+                  : event.name}
               </p>
             </div>
-            <EventGroupPrimaryContent
-              {...getSingleAttributeForEvent(currentEvent)}
-              {attributes}
-              class="invisible h-0 w-0 md:visible md:h-auto md:w-auto"
-              inline
-            />
+            <PrimaryEventGroupDetails event={lastEvent} {hasGroupEvents} />
           </div>
-          <div
+          <div>
+            <Icon name={expanded ? 'chevron-up' : 'chevron-down'} />
+          </div>
+          <!-- <div
             class="flex items-center right-1 top-1 h-8 overflow-auto rounded"
           >
             <EventPayload
@@ -142,9 +160,9 @@
               {attributes}
               {expanded}
             />
-          </div>
+          </div> -->
         </div>
-        {#if expanded && isEventGroup(event)}
+        {#if expanded && hasGroupEvents}
           <div class="secondary">
             {#each event?.eventList.reverse() ?? [] as event}
               <EventGroupDetailsWithTimeline
@@ -156,6 +174,11 @@
           </div>
         {/if}
       </div>
+      {#if expanded && !hasGroupEvents}
+        <div class="h-80">
+          <CodeBlock content={stringifyWithBigInt(lastEvent)} />
+        </div>
+      {/if}
     </EventCard>
   </div>
 </div>
@@ -178,7 +201,7 @@
   }
 
   .failure {
-    @apply bg-red-50;
+    @apply bg-red-500;
   }
 
   .failure .event-name {
@@ -186,7 +209,7 @@
   }
 
   .canceled {
-    @apply bg-yellow-50;
+    @apply bg-yellow-500;
   }
 
   .canceled .event-name {
@@ -194,7 +217,7 @@
   }
 
   .terminated {
-    @apply bg-pink-50;
+    @apply bg-pink-500;
   }
 
   .terminated .event-name {

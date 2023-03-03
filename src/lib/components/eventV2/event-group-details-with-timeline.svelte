@@ -1,15 +1,9 @@
 <script lang="ts">
-  import EventDetailsRowExpanded from '$lib/components/event/event-details-row-expanded.svelte';
-
-  import {
-    formatAttributes,
-    attributeGroups,
-  } from '$lib/utilities/format-event-attributes';
-  import EventDetailPills from '$lib/components/event/event-detail-pills.svelte';
-  import EventGroupDetails from '$lib/components/event/event-group-details.svelte';
-  import { isEventGroup } from '$lib/models/event-groups';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { formatAttributes } from '$lib/utilities/format-event-attributes';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import EventDetailRowItem from './event-detail-row-item.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
 
   export let event: WorkflowEvent;
   export let compact = true;
@@ -31,13 +25,18 @@
   $: filteredDetails = eventDetails.filter(([key, value]) => {
     return allowedKeys.includes(key);
   });
+
+  let expanded = false;
 </script>
 
-<div class="flex w-full flex-col lg:flex-row">
+<div
+  class="flex w-full flex-col lg:flex-row justify-between cursor-pointer border-b-3 border-gray-900 p-2"
+  on:click|preventDefault|stopPropagation={() => (expanded = !expanded)}
+>
   <div class="w-full flex gap-4">
-    <div class="flex gap-4 w-48 truncate">
+    <div class="flex gap-4 items-center w-48 truncate">
       <p>{event.id}</p>
-      <p>{event.classification}</p>
+      <p>{event?.classification ?? event?.name}</p>
     </div>
     <div class="flex gap-4">
       {#each filteredDetails as [key, value] (key)}
@@ -45,4 +44,12 @@
       {/each}
     </div>
   </div>
+  <div>
+    <Icon name={expanded ? 'chevron-up' : 'chevron-down'} />
+  </div>
 </div>
+{#if expanded}
+  <div class="h-80">
+    <CodeBlock content={stringifyWithBigInt(event)} />
+  </div>
+{/if}

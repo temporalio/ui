@@ -23,7 +23,6 @@
   export let key: string;
   export let value: string | Record<string, unknown>;
   export let attributes: CombinedAttributes;
-  export let inline = false;
 
   const { workflow, namespace } = $page.params;
 </script>
