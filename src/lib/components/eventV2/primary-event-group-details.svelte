@@ -28,8 +28,8 @@
   });
 </script>
 
-<div class="flex flex-wrap gap-4 items-center">
-  {#each filteredDetails.slice(0, 3) as [key, value] (key)}
+<div class="flex flex-wrap gap-2 items-center">
+  {#each filteredDetails.slice(0, 5) as [key, value] (key)}
     <EventDetailRowItem {key} {value} {attributes} />
   {/each}
 </div>

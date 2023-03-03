@@ -123,7 +123,7 @@
       </div>
     </div>
   </div>
-  <div class="grow h-full">
+  <div class="grow h-full py-2">
     <EventCard thick={hasSubGroup}>
       <div
         class="row"
@@ -137,9 +137,14 @@
         on:keydown={onLinkClick}
       >
         <div class="primary w-full flex justify-between cursor-pointer">
-          <div class="flex items-center gap-4">
-            <p class="truncate">{lastEvent.id}</p>
-            <div class="flex" class:failure class:canceled class:terminated>
+          <div class="flex items-center gap-4 w-1/4">
+            <p>{lastEvent.id}</p>
+            <div
+              class="flex items-center"
+              class:failure
+              class:canceled
+              class:terminated
+            >
               <p
                 class="event-name truncate text-sm font-semibold md:text-base xl:{isSubGroup
                   ? 'text-base'
@@ -150,10 +155,10 @@
                   : event.name}
               </p>
             </div>
-            <PrimaryEventGroupDetails event={lastEvent} {hasGroupEvents} />
           </div>
-          <div>
-            <Icon name={expanded ? 'chevron-up' : 'chevron-down'} />
+          <div class="flex">
+            <PrimaryEventGroupDetails event={lastEvent} {hasGroupEvents} />
+            <Icon name={expanded ? 'chevron-up' : 'chevron-down'} class="w-4" />
           </div>
           <!-- <div
             class="flex items-center right-1 top-1 h-8 overflow-auto rounded"

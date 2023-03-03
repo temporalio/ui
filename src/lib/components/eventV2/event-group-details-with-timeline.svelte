@@ -41,7 +41,7 @@
         <p class="text-[11px]">{formatDate(event?.eventTime, $timeFormat)}</p>
       </div>
     </div>
-    <div class="flex gap-4">
+    <div class="flex gap-4 items-center">
       {#each filteredDetails as [key, value] (key)}
         <EventDetailRowItem {key} {value} {attributes} class="w-full" />
       {/each}
