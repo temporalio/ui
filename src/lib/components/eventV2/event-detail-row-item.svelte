@@ -32,8 +32,7 @@
   $: stackTrace = getStackTrace(codeBlockValue);
 </script>
 
-{#if typeof value === 'object'}
-  <div class="content code-block-row" class:code-with-stack-trace={stackTrace}>
+<!-- <div class="content code-block-row" class:code-with-stack-trace={stackTrace}>
     <div class="flex flex-col {stackTrace ? 'lg:w-1/2' : ''}">
       <p class="text-sm">{format(key)}</p>
       <CodeBlock
@@ -52,10 +51,11 @@
         />
       </div>
     {/if}
-  </div>
-{:else if shouldDisplayAsExecutionLink(key)}
-  <Tooltip top text={format(key)}>
-    <Badge type="green">
+  </div> -->
+
+{#if typeof value !== 'object'}
+  {#if shouldDisplayAsExecutionLink(key)}
+    <Badge type="alpha" flexDirection="col">
       <Copyable content={value} container-class="flex-row-reverse xl:flex-row">
         <Link
           newTab
@@ -68,11 +68,10 @@
           {value}
         </Link>
       </Copyable>
+      <p class="text-[11px]">{format(key)}</p>
     </Badge>
-  </Tooltip>
-{:else if shouldDisplayChildWorkflowLink(key, attributes)}
-  <Tooltip top text={format(key)}>
-    <Badge type="purple">
+  {:else if shouldDisplayChildWorkflowLink(key, attributes)}
+    <Badge type="alpha" flexDirection="col">
       <Copyable content={value} container-class="xl:flex-row">
         <Link
           newTab
@@ -85,26 +84,25 @@
           {value}
         </Link>
       </Copyable>
+      <p class="text-[11px]">{format(key)}</p>
     </Badge>
-  </Tooltip>
-{:else if shouldDisplayAsTaskQueueLink(key)}
-  <Tooltip top text={format(key)}>
-    <Badge type="yellow">
+  {:else if shouldDisplayAsTaskQueueLink(key)}
+    <Badge type="alpha" flexDirection="col">
       <Copyable content={value} container-class="xl:flex-row">
         <Link newTab href={routeForTaskQueue({ namespace, queue: value })}>
           {value}
         </Link>
       </Copyable>
+      <p class="text-[11px]">{format(key)}</p>
     </Badge>
-  </Tooltip>
-{:else}
-  <Tooltip top text={format(key)}>
-    <Badge type="alpha">
+  {:else}
+    <Badge type="alpha" flexDirection="col">
       <p class="select-all px-2" class:badge={!shouldDisplayAsPlainText(key)}>
         {value}
       </p>
+      <p class="text-[11px]">{format(key)}</p>
     </Badge>
-  </Tooltip>
+  {/if}
 {/if}
 
 <style lang="postcss">

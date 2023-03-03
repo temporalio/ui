@@ -16,6 +16,8 @@
     | 'purple'
     | 'gray'
     | 'white';
+
+  export let flexDirection: 'row' | 'col' = 'col';
 </script>
 
 <script lang="ts">
@@ -23,7 +25,8 @@
 </script>
 
 <div
-  class="{type} flex w-fit flex-row items-center justify-center break-all rounded-sm p-1 text-sm font-medium transition-colors {$$props.class}"
+  class="{type} flex w-fit items-center justify-center break-all rounded-sm p-0 text-sm font-medium transition-colors {$$props.class}"
+  class:flex-col={flexDirection === 'col'}
 >
   <slot />
 </div>

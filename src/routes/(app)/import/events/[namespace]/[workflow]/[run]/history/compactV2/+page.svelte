@@ -15,8 +15,14 @@
     return event;
   });
 
-  $: initialItem = $importEvents[0];
-  $: finalItem = $importEvents[$importEvents.length - 1];
+  $: initialItem =
+    $eventFilterSort === 'descending'
+      ? $importEvents?.[$importEvents?.length - 1]
+      : $importEvents?.[0];
+  $: finalItem =
+    $eventFilterSort === 'descending'
+      ? $importEvents?.[0]
+      : $importEvents?.[$importEvents?.length - 1];
 </script>
 
 <div class="flex gap-4">

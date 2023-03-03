@@ -1,6 +1,8 @@
 import type { IconName } from '$lib/holocene/icon/paths';
 import {
+  isActivityTaskCanceledEvent,
   isActivityTaskCompletedEvent,
+  isActivityTaskFailedEvent,
   isActivityTaskScheduledEvent,
   isChildWorkflowExecutionCompletedEvent,
   isChildWorkflowExecutionStartedEvent,
@@ -13,169 +15,128 @@ import {
   isWorkflowExecutionFailedEvent,
   isWorkflowExecutionSignaledEvent,
   isWorkflowExecutionStartedEvent,
+  isWorkflowExecutionTerminatedEvent,
   isWorkflowTaskCompletedEvent,
   isWorkflowTaskFailedEvent,
   isWorkflowTaskScheduledEvent,
   isWorkflowTaskTimedOutEvent,
 } from '$lib/utilities/is-event-type';
 
-export const allowedKeys = [
-  'eventTime',
-  'identity',
-  'signalName',
-  'markerName',
-  // 'details',
-  // 'input',
-  'namespace',
-  'startToFireTimeout',
-];
-
 export const getPrimaryEventDetail = (
   event: WorkflowEvent,
-): { icon: IconName; label: string | number } => {
+): string | number => {
   if (isWorkflowExecutionStartedEvent(event)) {
     console.log('WorkflowExecutionStartedEvent: ', event);
-    return {
-      icon: 'eye-show',
-      label: event.workflowExecutionStartedEventAttributes.attempt,
-    };
+    return event.workflowExecutionStartedEventAttributes.attempt;
   }
 
   if (isWorkflowExecutionCanceledEvent(event)) {
     console.log('WorkflowExecutionCanceledEvent: ', event);
-    return {
-      icon: 'eye-show',
-      label:
-        event.workflowExecutionCanceledEventAttributes?.details ?? 'No details',
-    };
+    return 'Details';
+    // return event.workflowExecutionCanceledEventAttributes?.details ?? 'No details';
   }
 
   if (isWorkflowExecutionFailedEvent(event)) {
     console.log('WorkflowExecutionFailedEvent: ', event);
-    return {
-      icon: 'eye-show',
-      label:
-        event.workflowExecutionFailedEventAttributes.failure.cause?.cause
-          ?.message ??
-        event.workflowExecutionFailedEventAttributes.failure?.message,
-    };
+    return (
+      event.workflowExecutionFailedEventAttributes.failure.cause?.cause
+        ?.message ??
+      event.workflowExecutionFailedEventAttributes.failure?.message
+    );
+  }
+
+  if (isWorkflowExecutionTerminatedEvent(event)) {
+    console.log('WorkflowExecutionTerminatedEvent: ', event);
+    return event.workflowExecutionTerminatedEventAttributes.reason;
   }
 
   if (isStartChildWorkflowExecutionInitiatedEvent(event)) {
     console.log('StartChildWorkflowExecutionInitiatedEvent: ', event);
-    return {
-      icon: 'relationship',
-      label:
-        event.startChildWorkflowExecutionInitiatedEventAttributes?.workflowType
-          ?.name,
-    };
+    return event.startChildWorkflowExecutionInitiatedEventAttributes
+      ?.workflowType?.name;
   }
 
   if (isChildWorkflowExecutionStartedEvent(event)) {
     console.log('ChildWorkflowExecutionStartedEvent: ', event);
-    return {
-      icon: 'relationship',
-      label:
-        event.childWorkflowExecutionStartedEventAttributes?.workflowType?.name,
-    };
+    return event.childWorkflowExecutionStartedEventAttributes?.workflowType
+      ?.name;
   }
 
   if (isChildWorkflowExecutionCompletedEvent(event)) {
     console.log('ChildWorkflowExecutionCompletedEvent: ', event);
-    return {
-      icon: 'relationship',
-      label:
-        event.childWorkflowExecutionCompletedEventAttributes?.workflowType
-          ?.name,
-    };
+    return event.childWorkflowExecutionCompletedEventAttributes?.workflowType
+      ?.name;
   }
 
   if (isWorkflowTaskCompletedEvent(event)) {
     console.log('WorkflowTaskCompletedEvent: ', event);
-    return {
-      icon: 'eye-show',
-      label: event.workflowTaskCompletedEventAttributes.identity,
-    };
+    return event.workflowTaskCompletedEventAttributes.identity;
   }
 
   if (isWorkflowExecutionSignaledEvent(event)) {
     console.log('WorkflowExecutionSignaledEvent: ', event);
-    return {
-      icon: 'eye-show',
-      label: event.workflowExecutionSignaledEventAttributes?.signalName,
-    };
+    return event.workflowExecutionSignaledEventAttributes?.signalName;
   }
 
   if (isWorkflowTaskScheduledEvent(event)) {
     console.log('WorkflowTaskScheduledEvent: ', event);
-    return {
-      icon: 'eye-show',
-      label: event.workflowTaskScheduledEventAttributes?.taskQueue,
-    };
+    return event.workflowTaskScheduledEventAttributes?.taskQueue?.name;
   }
 
   if (isWorkflowTaskFailedEvent(event)) {
     console.log('WorkflowTaskFailedEvent: ', event);
-    return {
-      icon: 'eye-show',
-      label: event.workflowTaskFailedEventAttributes?.cause,
-    };
+    return event.workflowTaskFailedEventAttributes?.cause;
   }
 
   if (isWorkflowTaskTimedOutEvent(event)) {
     console.log('WorkflowTaskTimedOutEvent: ', event);
-    return {
-      icon: 'eye-show',
-      label: event.workflowTaskTimedOutEventAttributes?.timeoutType,
-    };
+    return event.workflowTaskTimedOutEventAttributes?.timeoutType;
   }
 
   if (isActivityTaskCompletedEvent(event)) {
     console.log('ActivityTaskCompletedEvent: ', event);
-    return {
-      icon: 'eye-show',
-      label: event.activityTaskCompletedEventAttributes?.identity,
-    };
+    return event.activityTaskCompletedEventAttributes?.identity;
+  }
+
+  if (isActivityTaskFailedEvent(event)) {
+    console.log('ActivityTaskFailedEvent: ', event);
+    return (
+      event.activityTaskFailedEventAttributes?.failure.cause?.cause?.message ??
+      event.activityTaskFailedEventAttributes.failure?.message
+    );
+  }
+
+  if (isActivityTaskCanceledEvent(event)) {
+    console.log('ActivityTaskCanceledEvent: ', event);
+    return 'Task Canceled...';
+    // return event.activityTaskCanceledEventAttributes.details;
   }
 
   if (isActivityTaskScheduledEvent(event)) {
     console.log('ActivityTaskScheduledEvent: ', event);
-    return {
-      icon: 'eye-show',
-      label: event.activityTaskScheduledEventAttributes?.activityType?.name,
-    };
+    return event.activityTaskScheduledEventAttributes?.activityType?.name;
   }
 
   if (isMarkerRecordedEvent(event)) {
     if (isLocalActivityMarkerEvent(event)) {
       console.log('LocalActivityMarkerEvent: ', event);
-      return { icon: 'eye-show', label: event.eventType };
+      return event.eventType;
     }
     console.log('MarkerRecordedEvent: ', event);
-    return {
-      icon: 'eye-show',
-      label: event.markerRecordedEventAttributes.markerName,
-    };
+    return event.markerRecordedEventAttributes.markerName;
   }
 
   if (isTimerStartedEvent(event)) {
     console.log('TimerStartedEvent: ', event);
-    return {
-      icon: 'clock',
-      label: event.timerStartedEventAttributes?.startToFireTimeout,
-    };
+    return event.timerStartedEventAttributes?.startToFireTimeout;
     // return event.timerStartedEventAttributes?.timerId;
   }
 
   if (isSignalExternalWorkflowExecutionInitiatedEvent(event)) {
     console.log('SignalExternalWorkflowExecutionInitiatedEvent: ', event);
-    return {
-      icon: 'eye-show',
-      label:
-        event.signalExternalWorkflowExecutionInitiatedEventAttributes
-          ?.signalName,
-    };
+    return event.signalExternalWorkflowExecutionInitiatedEventAttributes;
   }
 
-  return { icon: 'eye-show', label: 'Event Label Missing' };
+  console.log('Missing Label Event: ', event);
+  return 'Missing Label';
 };

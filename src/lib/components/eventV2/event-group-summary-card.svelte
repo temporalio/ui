@@ -88,9 +88,9 @@
 </script>
 
 <div class="flex gap-4">
-  <div class="w-[120px] flex items-center justify-center">
+  <div class="w-[120px] flex items-center justify-center h-full">
     <p
-      class="w-[100px] break-word truncate md:whitespace-normal md:text-[11px] leading-0"
+      class="w-[100px] text-center break-word truncate md:whitespace-normal md:text-[11px] leading-0"
     >
       {#if showElapsedTimeDiff}
         {formatDistanceAbbreviated({
@@ -102,16 +102,28 @@
         {formatDate(initialEvent?.eventTime, $timeFormat)}
       {/if}
     </p>
-    <div class="w-[20px]">
+    <div class="w-[20px] flex flex-col items-center justify-center h-full">
+      <div class="flex gap-0 w-[10x] h-1/2">
+        <div class="w-[4px]" />
+        <div class="w-[2px] bg-gray-900" />
+        <div class="w-[4px]" />
+      </div>
       <div
-        class="rounded-full w-6 h-6 border-3 border-gray-900 bg-white"
+        class="grow"
+        class:dot={!isSubGroup}
+        class:subgroup-dot={isSubGroup}
         class:failure
         class:canceled
         class:terminated
       />
+      <div class="flex gap-0 w-[10x] h-1/2">
+        <div class="w-[4px]" />
+        <div class="w-[2px] bg-gray-900" />
+        <div class="w-[4px]" />
+      </div>
     </div>
   </div>
-  <div class="grow">
+  <div class="grow h-full">
     <EventCard thick={hasSubGroup}>
       <div
         class="row"
@@ -127,16 +139,7 @@
         <div class="primary w-full flex justify-between cursor-pointer">
           <div class="flex items-center gap-4">
             <p class="truncate">{lastEvent.id}</p>
-            <div class="flex">
-              {#if compact && failure}
-                <Icon class="mr-1.5 inline text-red-700" name="clock" />
-              {/if}
-              {#if compact && canceled}
-                <Icon class="mr-1.5 inline text-yellow-700" name="clock" />
-              {/if}
-              {#if compact && terminated}
-                <Icon class="mr-1.5 inline text-pink-700" name="clock" />
-              {/if}
+            <div class="flex" class:failure class:canceled class:terminated>
               <p
                 class="event-name truncate text-sm font-semibold md:text-base xl:{isSubGroup
                   ? 'text-base'
@@ -200,27 +203,35 @@
     @apply bg-gray-50;
   }
 
-  .failure {
+  .dot {
+    @apply rounded-full w-4 h-4 border-3 border-gray-900 bg-white;
+  }
+
+  .subgroup-dot {
+    @apply rounded-full w-3 h-3 border-2 border-gray-900 bg-white;
+  }
+
+  .dot.failure {
     @apply bg-red-500;
   }
 
-  .failure .event-name {
+  .failure p {
     @apply text-red-700;
   }
 
-  .canceled {
-    @apply bg-yellow-500;
+  .dot.canceled {
+    @apply bg-yellow-300;
   }
 
-  .canceled .event-name {
+  .canceled p {
     @apply text-yellow-700;
   }
 
-  .terminated {
+  .dot.terminated {
     @apply bg-pink-500;
   }
 
-  .terminated .event-name {
+  .terminated p {
     @apply text-pink-700;
   }
 
@@ -242,20 +253,5 @@
 
   .active {
     @apply z-50 cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
-  }
-
-  .canceled:hover,
-  .active.canceled {
-    @apply bg-gradient-to-br from-yellow-100 to-yellow-200 bg-fixed;
-  }
-
-  .failure:hover,
-  .active.failure {
-    @apply bg-gradient-to-br from-red-100 to-red-200 bg-fixed;
-  }
-
-  .terminated:hover,
-  .active.terminated {
-    @apply bg-gradient-to-br from-pink-100 to-pink-200 bg-fixed;
   }
 </style>

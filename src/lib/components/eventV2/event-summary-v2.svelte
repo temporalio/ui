@@ -72,8 +72,14 @@
       : $eventHistory?.start;
   $: currentEvents = fullHistory.length ? fullHistory : intialEvents;
   $: items = getEventsOrGroups(currentEvents, category);
-  $: initialItem = currentEvents?.[0];
-  $: finalItem = currentEvents?.[currentEvents?.length - 1];
+  $: initialItem =
+    $eventFilterSort === 'descending'
+      ? currentEvents?.[currentEvents?.length - 1]
+      : currentEvents?.[0];
+  $: finalItem =
+    $eventFilterSort === 'descending'
+      ? currentEvents?.[0]
+      : currentEvents?.[currentEvents?.length - 1];
 </script>
 
 <div class="flex gap-4">
