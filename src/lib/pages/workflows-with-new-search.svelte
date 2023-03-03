@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, afterUpdate } from 'svelte';
   import { page } from '$app/stores';
   import { timeFormat } from '$lib/stores/time-format';
   import {
@@ -75,6 +75,12 @@
       $workflowFilters = toListWorkflowFilters(query);
     } else {
       $workflowFilters = $persistedWorkflowFilters;
+      updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
+    }
+  });
+
+  afterUpdate(() => {
+    if (!query && ($workflowFilters.length || $workflowSorts.length)) {
       updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
     }
   });
