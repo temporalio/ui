@@ -14,7 +14,8 @@
     | 'green'
     | 'blue'
     | 'purple'
-    | 'gray';
+    | 'gray'
+    | 'white';
 </script>
 
 <script lang="ts">
@@ -52,6 +53,10 @@
   .default,
   .gray {
     @apply border-gray-900 bg-gray-100 text-gray-900;
+  }
+
+  .white {
+    @apply border-gray-900 bg-white text-gray-900;
   }
 
   .active,

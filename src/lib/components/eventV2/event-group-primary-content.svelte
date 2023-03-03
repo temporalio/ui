@@ -35,7 +35,7 @@
     {#if shouldDisplayAsExecutionLink(key)}
       <div class="flex w-full flex-wrap items-center gap-1 pr-1">
         <p class="mr-3 truncate text-sm">{format(key)}</p>
-        <div class="truncate text-sm">
+        <Badge type="blue" class="truncate text-sm">
           <Copyable content={value} container-class=" xl:flex-row">
             <Link
               class="truncate"
@@ -49,12 +49,12 @@
               {value}
             </Link>
           </Copyable>
-        </div>
+        </Badge>
       </div>
     {:else if shouldDisplayChildWorkflowLink(key, attributes)}
       <div class="flex w-full flex-wrap items-center gap-1 pr-1">
         <p class="truncate text-sm">{format(key)}</p>
-        <div class="truncate text-sm">
+        <Badge type="blue" class="truncate text-sm">
           <Copyable content={value} container-class="xl:flex-row">
             <Link
               class="truncate"
@@ -68,12 +68,12 @@
               {value}
             </Link>
           </Copyable>
-        </div>
+        </Badge>
       </div>
     {:else if shouldDisplayAsTaskQueueLink(key)}
       <div class="flex w-full flex-wrap items-center gap-1 pr-1">
         <p class="mr-3 truncate text-sm">{format(key)}</p>
-        <div class="truncate  text-sm ">
+        <Badge type="blue" class="truncate text-sm">
           <Copyable content={value} container-class="">
             <Link
               class="truncate"
@@ -83,17 +83,11 @@
               {value}
             </Link>
           </Copyable>
-        </div>
+        </Badge>
       </div>
     {:else}
       <div class="flex w-full flex-wrap items-center gap-1 pr-1">
         <Badge type="blue" class="truncate text-sm">{value}</Badge>
-        <!-- <p class="truncate text-right text-sm xl:text-left">
-          <span
-            class="w-full select-all text-gray-700"
-            class:badge={!shouldDisplayAsPlainText(key)}>{value}</span
-          >
-        </p> -->
       </div>
     {/if}
   </div>
