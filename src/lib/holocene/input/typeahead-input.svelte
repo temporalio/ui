@@ -82,7 +82,7 @@
       {#each filterOptions as { label, value }}
         <Option {value}>{label}</Option>
       {:else}
-        <Option>No Results</Option>
+        <Option value={null}>No Results</Option>
       {/each}
     </Menu>
   </MenuContainer>

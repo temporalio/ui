@@ -24,9 +24,9 @@
       bind:dark
       bind:disabled
     >
-      <Option bind:dark>Pizza</Option>
-      <Option bind:dark>Hamburgers</Option>
-      <Option bind:dark>Hot Dogs</Option>
+      <Option value="pizza" bind:dark>Pizza</Option>
+      <Option value="hamburger" bind:dark>Hamburgers</Option>
+      <Option value="hot dog" bind:dark>Hot Dogs</Option>
     </Select>
   </Hst.Variant>
 
@@ -42,6 +42,7 @@
         reprehenderit alias rerum minus, nulla ratione ipsum expedita. Praesentium
         doloribus animi, dolorem nesciunt repellendus maxime deleniti vitae
         corrupti deserunt aperiam?"
+        value={1}
         >Lorem ipsum dolor sit amet consectetur adipisicing elit 1.</Option
       >
       <Option
@@ -49,6 +50,7 @@
         reprehenderit alias rerum minus, nulla ratione ipsum expedita. Praesentium
         doloribus animi, dolorem nesciunt repellendus maxime deleniti vitae
         corrupti deserunt aperiam?"
+        value={2}
         >Lorem ipsum dolor sit amet consectetur adipisicing elit 2.</Option
       >
       <Option
@@ -56,6 +58,7 @@
         reprehenderit alias rerum minus, nulla ratione ipsum expedita. Praesentium
         doloribus animi, dolorem nesciunt repellendus maxime deleniti vitae
         corrupti deserunt aperiam?"
+        value={3}
         >Lorem ipsum dolor sit amet consectetur adipisicing elit 3.</Option
       >
     </Select>
@@ -64,17 +67,17 @@
   <Hst.Variant title="With Grouped Options">
     <Select id="select-3" placeholder="Select an Option" {value} {disabled}>
       <OptionGroup label="Mammals">
-        <Option>Horse</Option>
-        <Option>Dog</Option>
-        <Option>Cat</Option>
+        <Option value="horse">Horse</Option>
+        <Option value="dog">Dog</Option>
+        <Option value="cat">Cat</Option>
       </OptionGroup>
       <OptionGroup label="Reptiles">
-        <Option>Snake</Option>
-        <Option>Lizard</Option>
+        <Option value="snake">Snake</Option>
+        <Option value="lizard">Lizard</Option>
       </OptionGroup>
       <OptionGroup label="Amphibians">
-        <Option>Frog</Option>
-        <Option>Salamander</Option>
+        <Option value="frog">Frog</Option>
+        <Option value="salamander">Salamander</Option>
       </OptionGroup>
     </Select>
   </Hst.Variant>
