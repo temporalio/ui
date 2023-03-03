@@ -21,25 +21,25 @@ export const getEventGroupName = (event: CommonHistoryEvent): string => {
   }
 
   if (isTimerStartedEvent(event)) {
-    return `Timer ${event.timerStartedEventAttributes?.timerId} (${event.timerStartedEventAttributes?.startToFireTimeout})`;
+    return `Timer Started`;
   }
 
   if (isSignalExternalWorkflowExecutionInitiatedEvent(event)) {
-    return `Signal: ${event.signalExternalWorkflowExecutionInitiatedEventAttributes?.signalName}`;
+    return `Signal initiated`;
   }
 
   if (isWorkflowExecutionSignaledEvent(event)) {
-    return `Signal received: ${event.workflowExecutionSignaledEventAttributes?.signalName}`;
+    return `Signal received`;
   }
 
   if (isMarkerRecordedEvent(event)) {
     if (isLocalActivityMarkerEvent(event)) {
       return 'Local Activity';
     }
-    return `Marker: ${event.markerRecordedEventAttributes?.markerName}`;
+    return `Marker`;
   }
 
   if (isStartChildWorkflowExecutionInitiatedEvent(event)) {
-    return `Child Workflow: ${event.startChildWorkflowExecutionInitiatedEventAttributes?.workflowType?.name}`;
+    return `Child Workflow`;
   }
 };

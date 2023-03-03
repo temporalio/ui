@@ -17,6 +17,7 @@
   import { fetchAllEvents } from '$lib/services/events-service';
   import Card from '$lib/holocene/card.svelte';
   import EventSummaryCard from './event-group-summary-card.svelte';
+  import EventGroupSummaryCard from './event-group-summary-card.svelte';
 
   export let compact = false;
 
@@ -51,10 +52,6 @@
 
   $: $refresh, fetchEvents(namespace, workflowId, runId, $eventFilterSort);
 
-  function handleExpandChange(event: CustomEvent) {
-    $expandAllEvents = event.detail.expanded;
-  }
-
   const getEventsOrGroups = (
     items: CommonHistoryEvent[],
     category: string,
@@ -74,13 +71,46 @@
       ? $eventHistory?.end
       : $eventHistory?.start;
   $: currentEvents = fullHistory.length ? fullHistory : intialEvents;
-  $: initialItem = currentEvents?.[0];
   $: items = getEventsOrGroups(currentEvents, category);
-  $: updating = currentEvents.length && !fullHistory.length;
+  $: initialItem = currentEvents?.[0];
+  $: finalItem = currentEvents?.[currentEvents?.length - 1];
 </script>
 
-{#each items as item}
-  <EventSummaryCard event={item} visibleItems={items} {initialItem}
-    >{item.name}</EventSummaryCard
-  >
-{/each}
+<div class="flex gap-4">
+  <div class="flex flex-col gap-4 w-full">
+    {#if initialItem}
+      <EventGroupSummaryCard
+        event={initialItem}
+        visibleItems={currentEvents}
+        {initialItem}
+      />
+    {/if}
+    {#each items as item}
+      <EventGroupSummaryCard
+        hasSubGroup={Boolean(item.subGroups.length)}
+        event={item}
+        visibleItems={items}
+        {initialItem}
+      />
+      {#if item?.subGroups?.length}
+        <div class="ml-8 flex flex-col gap-2 w-full">
+          {#each item?.subGroups as group}
+            <EventGroupSummaryCard
+              isSubGroup
+              event={group}
+              visibleItems={items}
+              {initialItem}
+            />
+          {/each}
+        </div>
+      {/if}
+    {/each}
+    {#if finalItem}
+      <EventGroupSummaryCard
+        event={finalItem}
+        visibleItems={currentEvents}
+        {initialItem}
+      />
+    {/if}
+  </div>
+</div>
