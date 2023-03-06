@@ -26,7 +26,7 @@
 </script>
 
 <div class="flex gap-4">
-  <div class="flex flex-col gap-4 w-full">
+  <div class="flex flex-col w-full">
     {#if initialItem}
       <EventGroupSummaryCard
         event={initialItem}
