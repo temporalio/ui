@@ -33,7 +33,6 @@ export const groupEvents = (
   }
 
   let groups = Object.values(groupMap);
-  console.log('Groups: ', groups);
 
   for (const group of groups) {
     const workflowTaskId = group.attributes?.workflowTaskCompletedEventId;

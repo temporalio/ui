@@ -1,11 +1,8 @@
-<svelte:options immutable />
-
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
 
   import { eventShowElapsed, eventFilterSort } from '$lib/stores/event-view';
   import { timeFormat } from '$lib/stores/time-format';
-  import { format } from '$lib/utilities/format-camel-case';
 
   import {
     eventOrGroupIsFailureOrTimedOut,
@@ -15,29 +12,23 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
-  import {
-    isActivityTaskScheduledEvent,
-    isLocalActivityMarkerEvent,
-  } from '$lib/utilities/is-event-type';
   import { noop } from 'svelte/internal';
   import { isEventGroup } from '$lib/models/event-groups';
   import EventCard from './event-card.svelte';
-  import EventGroupDetailsWithTimeline from './event-group-details-with-timeline.svelte';
-  import PrimaryEventGroupDetails from './primary-event-group-details.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import {
-    getCodeBlockValue,
-    getStackTrace,
-  } from '$lib/utilities/get-single-attribute-for-event';
-  import { getAttributePayloads } from './event-detail-keys';
+    parseWithBigInt,
+    stringifyWithBigInt,
+  } from '$lib/utilities/parse-with-big-int';
+  import { getStackTrace } from '$lib/utilities/get-single-attribute-for-event';
+  import { eventHistory } from '$lib/stores/events';
+  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import EventTimelineDotLine from './event-timeline-dot-line.svelte';
   import EventGroupTimestamp from './event-group-timestamp.svelte';
 
   export let event: IterableEvent;
   export let visibleItems: IterableEvent[];
   export let initialItem: IterableEvent | undefined;
-  export let compact = true;
   export let isSubGroup = false;
   export let expandAll = false;
   export let typedError = false;
@@ -77,20 +68,14 @@
   const canceled = eventOrGroupIsCanceled(event);
   const terminated = eventOrGroupIsTerminated(event);
 
-  $: hasGroupEvents = isEventGroup(event) && event?.eventList?.length > 1;
-  $: payloadAttributes = getAttributePayloads(event.attributes);
-
-  const getEventGroupName = (event: IterableEvent) => {
-    if (isEventGroup(event)) {
-      if (isActivityTaskScheduledEvent(event.initialEvent)) {
-        return `${event.lastEvent.name}: ${event.initialEvent.activityTaskScheduledEventAttributes?.activityType?.name}`;
-      }
-      if (isLocalActivityMarkerEvent(event.lastEvent)) return 'LocalActivity';
-      return event.lastEvent.name;
-    } else {
-      return event.name;
-    }
-  };
+  $: ({ input, results } =
+    getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory));
+  $: isInitialEvent = event.id === $eventHistory.start[0]?.id;
+  $: codeBlockContent = isInitialEvent ? input : results;
+  $: stackTrace =
+    isInitialEvent &&
+    codeBlockContent &&
+    getStackTrace(parseWithBigInt(codeBlockContent));
 </script>
 
 <div class="flex gap-4">
@@ -99,7 +84,7 @@
     <EventTimelineDotLine {event} isSubGroup />
   </div>
   <div class="h-full grow py-2">
-    <EventCard thick={hasGroupEvents}>
+    <EventCard>
       <div
         class="row"
         id={lastEvent.id}
@@ -125,54 +110,41 @@
                   ? 'text-base'
                   : 'text-lg'}"
               >
-                {getEventGroupName(event)}
+                {event.name}
               </p>
             </div>
-            <PrimaryEventGroupDetails event={lastEvent} />
           </div>
           <div class="flex">
             <Icon name={expanded ? 'chevron-up' : 'chevron-down'} class="w-4" />
           </div>
         </div>
-        {#if expanded && hasGroupEvents}
-          <div class="secondary">
-            {#each event?.eventList.reverse() ?? [] as event}
-              <EventGroupDetailsWithTimeline {event} {compact} />
-            {/each}
-          </div>
-        {/if}
-      </div>
-      {#if expanded && !hasGroupEvents}
         <div class="p-2">
-          {#each payloadAttributes as attribute}
-            {@const codeBlockValue = getCodeBlockValue(attribute.value)}
-            {@const stackTrace = getStackTrace(codeBlockValue)}
-            <div class:code-with-stack-trace={stackTrace}>
-              <div class="flex flex-col {stackTrace ? 'lg:w-1/2' : ''}">
-                <p class="text-sm">{format(attribute.key)}</p>
+          <div class:code-with-stack-trace={stackTrace}>
+            <div class="flex flex-col {stackTrace ? 'lg:w-1/2' : ''}">
+              <CodeBlock
+                content={codeBlockContent}
+                class="h-auto {stackTrace ? 'mb-2' : ''}"
+              />
+            </div>
+            {#if stackTrace}
+              <div class="flex flex-col lg:w-1/2">
+                <p class="text-sm">Stack trace</p>
                 <CodeBlock
-                  content={codeBlockValue}
-                  class="h-auto {stackTrace ? 'mb-2' : ''}"
+                  content={stackTrace}
+                  class="mb-2 h-full lg:pr-2"
+                  language="text"
                 />
               </div>
-              {#if stackTrace}
-                <div class="flex flex-col lg:w-1/2">
-                  <p class="text-sm">Stack trace</p>
-                  <CodeBlock
-                    content={stackTrace}
-                    class="mb-2 h-full lg:pr-2"
-                    language="text"
-                  />
-                </div>
-              {/if}
-            </div>
-          {/each}
+            {/if}
+          </div>
+        </div>
+        {#if expanded}
           <p>Full Event Details</p>
           <div class="h-80">
             <CodeBlock content={stringifyWithBigInt(lastEvent)} />
           </div>
-        </div>
-      {/if}
+        {/if}
+      </div>
     </EventCard>
   </div>
 </div>
@@ -180,14 +152,6 @@
 <style lang="postcss">
   .row {
     @apply w-full flex-wrap items-center rounded-xl border-gray-900 pl-8 pr-2 text-sm no-underline xl:py-3 xl:text-base;
-  }
-
-  .secondary {
-    @apply mt-4 flex flex-col gap-2;
-  }
-
-  .expanded.row {
-    @apply bg-gray-50;
   }
 
   .dot {
@@ -222,20 +186,8 @@
     @apply text-pink-700;
   }
 
-  .expanded-cell {
-    @apply table-cell w-full flex-wrap text-sm no-underline xl:text-base;
-  }
-
-  .typedError .expanded-cell {
-    @apply border-b-0;
-  }
-
   .row.typedError {
     @apply rounded-lg;
-
-    &.expanded {
-      @apply rounded-b-none;
-    }
   }
 
   .active {

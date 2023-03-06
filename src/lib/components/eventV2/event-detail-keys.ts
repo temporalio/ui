@@ -1,4 +1,4 @@
-import type { IconName } from '$lib/holocene/icon/paths';
+import { isObject } from '$lib/utilities/is';
 import {
   isActivityTaskCanceledEvent,
   isActivityTaskCompletedEvent,
@@ -139,4 +139,32 @@ export const getPrimaryEventDetail = (
 
   console.log('Missing Label Event: ', event);
   return 'Missing Label';
+};
+
+type PotentiallyDecodable =
+  | Record<string | number | symbol, unknown>
+  | EventAttribute;
+
+export const getAttributePayloads = (attributes: PotentiallyDecodable) => {
+  const payloadAttributes = [];
+
+  const findPayloadAttributes = (
+    attributes: PotentiallyDecodable,
+    payloadsKey?: string,
+  ) => {
+    for (const key of Object.keys(attributes)) {
+      if (key === 'payloads') {
+        payloadAttributes.push({ key: payloadsKey, value: attributes[key] });
+      } else {
+        const next = attributes[key];
+        if (isObject(next)) {
+          findPayloadAttributes(next, key);
+        }
+      }
+    }
+  };
+
+  findPayloadAttributes(attributes);
+
+  return payloadAttributes;
 };
