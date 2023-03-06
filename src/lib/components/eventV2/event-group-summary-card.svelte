@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { fade } from 'svelte/transition';
-
   import Icon from '$lib/holocene/icon/icon.svelte';
 
   import { eventShowElapsed, eventFilterSort } from '$lib/stores/event-view';
@@ -13,27 +11,16 @@
   } from '$lib/models/event-groups/get-event-in-group';
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
-  import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
 
-  import EventDetailsRow from '../event/event-details-row.svelte';
-  import EventDetailsFull from '../event/event-details-full.svelte';
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
   import { noop } from 'svelte/internal';
   import { isEventGroup } from '$lib/models/event-groups';
-  import { has } from '$lib/utilities/has';
-  import { importEvents } from '$lib/stores/import-events';
-  import EventPayload from './event-payload.svelte';
-  import EventGroupPrimaryContent from './event-group-primary-content.svelte';
   import EventCard from './event-card.svelte';
   import EventGroupDetailsWithTimeline from './event-group-details-with-timeline.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import PrimaryEventGroupDetails from './primary-event-group-details.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import {
-    parseWithBigInt,
-    stringifyWithBigInt,
-  } from '$lib/utilities/parse-with-big-int';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   export let event: IterableEvent;
   export let visibleItems: IterableEvent[];
@@ -58,7 +45,6 @@
   $: showElapsed = $eventShowElapsed === 'true';
   $: showElapsedTimeDiff =
     showElapsed && initialItem && event.id !== initialItem.id;
-  $: attributes = formatAttributes(event, { compact });
 
   $: timeDiffChange = '';
   $: {
@@ -137,7 +123,7 @@
         on:keydown={onLinkClick}
       >
         <div class="primary w-full flex justify-between cursor-pointer">
-          <div class="flex items-center gap-4 w-1/4">
+          <div class="flex items-center gap-4">
             <p>{lastEvent.id}</p>
             <div
               class="flex items-center"
@@ -155,20 +141,11 @@
                   : event.name}
               </p>
             </div>
+            <PrimaryEventGroupDetails event={lastEvent} {hasGroupEvents} />
           </div>
           <div class="flex">
-            <PrimaryEventGroupDetails event={lastEvent} {hasGroupEvents} />
             <Icon name={expanded ? 'chevron-up' : 'chevron-down'} class="w-4" />
           </div>
-          <!-- <div
-            class="flex items-center right-1 top-1 h-8 overflow-auto rounded"
-          >
-            <EventPayload
-              {...getSingleAttributeForEvent(currentEvent)}
-              {attributes}
-              {expanded}
-            />
-          </div> -->
         </div>
         {#if expanded && hasGroupEvents}
           <div class="secondary">

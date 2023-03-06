@@ -99,7 +99,7 @@
         {initialItem}
       />
       {#if item?.subGroups?.length}
-        <div class="ml-8 flex flex-col gap-2 w-full">
+        <div class="pl-12 flex flex-col w-full">
           {#each item?.subGroups as group}
             <EventGroupSummaryCard
               isSubGroup
