@@ -13,7 +13,6 @@
   export let compact = true;
 
   $: attributes = formatAttributes(event, { compact });
-  $: attributeGrouping = attributeGroups(event, attributes);
 
   $: eventDetails = Object.entries(attributes);
   const denyKeys = [
@@ -29,7 +28,7 @@
 </script>
 
 <div class="flex flex-wrap gap-2 items-center">
-  {#each filteredDetails.slice(0, 5) as [key, value] (key)}
+  {#each filteredDetails.slice(0, 3) as [key, value] (key)}
     <EventDetailRowItem {key} {value} {attributes} />
   {/each}
 </div>
