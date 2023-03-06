@@ -13,7 +13,6 @@ export const getEventGroupName = (event: CommonHistoryEvent): string => {
   if (!event) return;
 
   if (isWorkflowTaskScheduledEvent(event)) {
-    console.log('WORKFLOW TASK: ', event);
     return 'Workflow Task';
   }
 

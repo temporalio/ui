@@ -26,30 +26,29 @@
 </script>
 
 <div class="flex gap-4">
-  <div class="flex flex-col w-full">
+  <div class="flex w-full flex-col">
     {#if initialItem}
       <EventGroupSummaryCard
         event={initialItem}
         visibleItems={filteredEventGroups}
-        {initialItem}>{initialItem.name}</EventGroupSummaryCard
-      >
+        {initialItem}
+      />
     {/if}
     {#each filteredEventGroups as item}
       <EventGroupSummaryCard
-        hasSubGroup={Boolean(item.subGroups.length)}
         event={item}
         visibleItems={filteredEventGroups}
-        {initialItem}>{item.name}</EventGroupSummaryCard
-      >
+        {initialItem}
+      />
       {#if item.subGroups.length}
-        <div class="ml-8 flex flex-col gap-2 w-full">
+        <div class="ml-8 flex w-full flex-col gap-2">
           {#each item.subGroups as group}
             <EventGroupSummaryCard
               isSubGroup
               event={group}
               visibleItems={filteredEventGroups}
-              {initialItem}>{group.name}</EventGroupSummaryCard
-            >
+              {initialItem}
+            />
           {/each}
         </div>
       {/if}

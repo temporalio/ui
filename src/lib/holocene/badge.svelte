@@ -23,7 +23,7 @@
 </script>
 
 <div
-  class="{type} flex flex-row w-fit items-center justify-center break-all rounded-sm p-0 text-sm font-medium transition-colors {$$props.class}"
+  class="{type} flex w-fit flex-row items-center justify-center break-all rounded-sm p-1 text-sm font-medium transition-colors {$$props.class}"
 >
   <slot />
 </div>

@@ -8,7 +8,7 @@
 
 <style lang="postcss">
   .card {
-    @apply relative rounded-xl border-3 border-gray-900 p-0 select-none;
+    @apply relative select-none rounded-xl border-3 border-gray-900 p-0;
   }
 
   .shadow {

@@ -9,17 +9,12 @@
   import { eventHistory } from '$lib/stores/events';
   import { authUser } from '$lib/stores/auth-user';
 
-  import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
-  import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
-  import EventEmptyRow from '../event/event-empty-row.svelte';
-  import { groupEvents } from '$lib/models/event-groups';
-  import Pagination from '$lib/holocene/pagination.svelte';
+  import { groupEvents, isEventGroup } from '$lib/models/event-groups';
   import { fetchAllEvents } from '$lib/services/events-service';
-  import Card from '$lib/holocene/card.svelte';
-  import EventSummaryCard from './event-group-summary-card.svelte';
   import EventGroupSummaryCard from './event-group-summary-card.svelte';
+  import SingleEventCard from './single-event-card.svelte';
 
-  export let compact = false;
+  export let compact = true;
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
 
@@ -83,23 +78,18 @@
 </script>
 
 <div class="flex gap-4">
-  <div class="flex flex-col gap-0 w-full">
+  <div class="flex w-full flex-col gap-0">
     {#if initialItem}
-      <EventGroupSummaryCard
+      <SingleEventCard
         event={initialItem}
         visibleItems={currentEvents}
         {initialItem}
       />
     {/if}
     {#each items as item}
-      <EventGroupSummaryCard
-        hasSubGroup={Boolean(item.subGroups.length)}
-        event={item}
-        visibleItems={items}
-        {initialItem}
-      />
-      {#if item?.subGroups?.length}
-        <div class="pl-12 flex flex-col w-full">
+      <EventGroupSummaryCard event={item} visibleItems={items} {initialItem} />
+      {#if isEventGroup(item) && item?.subGroups?.length}
+        <div class="flex w-full flex-col pl-12">
           {#each item?.subGroups as group}
             <EventGroupSummaryCard
               isSubGroup
@@ -112,7 +102,7 @@
       {/if}
     {/each}
     {#if finalItem}
-      <EventGroupSummaryCard
+      <SingleEventCard
         event={finalItem}
         visibleItems={currentEvents}
         {initialItem}
