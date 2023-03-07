@@ -31,7 +31,6 @@
     getStackTrace,
   } from '$lib/utilities/get-single-attribute-for-event';
   import { getAttributePayloads } from './event-detail-keys';
-  import EventTimelineDotLine from './event-timeline-dot-line.svelte';
   import EventGroupTimestamp from './event-group-timestamp.svelte';
 
   export let event: IterableEvent;
@@ -93,12 +92,9 @@
   };
 </script>
 
-<div class="flex gap-4">
-  <div class="flex h-full w-[120px] items-center justify-center">
-    <EventGroupTimestamp {event} {initialItem} {visibleItems} />
-    <EventTimelineDotLine {event} isSubGroup />
-  </div>
-  <div class="h-full grow py-2">
+<div class="flex gap-2">
+  <EventGroupTimestamp {event} {initialItem} {visibleItems} {isSubGroup} />
+  <div class="h-full grow pt-2">
     <EventCard thick={hasGroupEvents}>
       <div
         class="row"
@@ -183,7 +179,7 @@
   }
 
   .secondary {
-    @apply mt-4 flex flex-col gap-2;
+    @apply mt-2 flex flex-col gap-2;
   }
 
   .expanded.row {

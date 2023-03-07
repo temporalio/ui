@@ -13,6 +13,7 @@
     open?: boolean;
     disabled?: boolean;
     readOnly?: boolean;
+    stackSummary?: boolean;
     error?: string;
     onToggle?: () => void;
     'data-testid'?: String;
@@ -25,6 +26,7 @@
   export let open = false;
   export let disabled = false;
   export let readOnly = false;
+  export let stackSummary = false;
   export let error = '';
   export let onToggle = () => {};
 
@@ -54,9 +56,14 @@
     on:click={toggleAccordion}
   >
     <div class="space-between flex w-full flex-row items-center">
-      <h2 class="flex w-full items-center gap-2 text-lg font-medium">
-        {#if icon}<Icon name={icon} />{/if}
-        {title}
+      <h2
+        class="w-full flex flex-row items-start gap-2"
+        class:stack-summary={stackSummary}
+      >
+        <div class="flex items-center gap-2 text-lg font-medium">
+          {#if icon}<Icon name={icon} />{/if}
+          {title}
+        </div>
         <slot name="summary" />
       </h2>
       <div class="mr-1" on:click|stopPropagation on:keyup|stopPropagation>
@@ -87,3 +94,9 @@
     <slot />
   </div>
 </div>
+
+<style lang="postcss">
+  .stack-summary {
+    @apply flex-col;
+  }
+</style>

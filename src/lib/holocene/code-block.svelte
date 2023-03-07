@@ -5,11 +5,15 @@
     parseWithBigInt,
     stringifyWithBigInt,
   } from '$lib/utilities/parse-with-big-int';
+  import type { IconName } from './icon/paths';
 
   export let content: Parameters<typeof JSON.stringify>[0];
   export let inline = false;
   export let language = 'json';
   export let copyable = true;
+  export let title = '';
+  export let icon: IconName | undefined = undefined;
+  export let unroundTitle = false;
 
   let root: HTMLElement;
   $: isJSON = language === 'json';
@@ -48,10 +52,20 @@
 </script>
 
 {#if parsedContent || parsedContent === null}
+  {#if title}
+    <p
+      class="flex items-center gap-2 bg-gray-900 rounded-t-lg -mb-2 text-sm text-white py-2 px-4"
+      class:unround-title={unroundTitle}
+    >
+      {#if icon}<Icon name={icon} />{/if}
+      {title}
+    </p>
+  {/if}
   <div
     class="w-full rounded-lg {inline
       ? 'h-auto overflow-auto'
       : 'h-full'} {$$props.class}"
+    class:title
     data-testid={$$props.testId}
   >
     <div class="relative h-full">
@@ -59,7 +73,8 @@
       line breaks so we have this peculiar formatting to preserve this components output -->
       <pre
         class="w-full overflow-x-scroll rounded-lg p-4"
-        class:h-full={!inline}><code
+        class:h-full={!inline}
+        class:title><code
           bind:this={root}
           class="language-{language}"
           data-testid={$$props['data-testid']}
@@ -83,5 +98,13 @@
 <style lang="postcss">
   .inline {
     @apply top-5 right-2;
+  }
+
+  .title {
+    @apply rounded-t-none;
+  }
+
+  .unround-title {
+    @apply rounded-t-none;
   }
 </style>

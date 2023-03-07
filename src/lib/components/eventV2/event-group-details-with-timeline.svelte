@@ -11,7 +11,6 @@
   } from '$lib/utilities/get-single-attribute-for-event';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import EventDetailRowItem from './event-detail-row-item.svelte';
-  import { format } from '$lib/utilities/format-camel-case';
 
   export let event: WorkflowEvent;
   export let compact = true;
@@ -31,21 +30,17 @@
     return !denyKeys.includes(key);
   });
   let expanded = false;
-
-  $: singleAttribute = getSingleAttributeForEvent(event);
-  $: codeBlockValue = getCodeBlockValue(singleAttribute.value);
-  $: stackTrace = getStackTrace(codeBlockValue);
 </script>
 
 <div
-  class="flex w-full cursor-pointer flex-col justify-between border-b-3 border-gray-900 p-2 lg:flex-row"
+  class="flex w-full cursor-pointer flex-col justify-between px-2 lg:flex-row"
   on:click|preventDefault|stopPropagation={() => (expanded = !expanded)}
 >
   <div class="flex w-full gap-4">
-    <div class="flex w-auto min-w-[200px] flex-col truncate">
+    <div class="flex w-auto min-w-[300px] flex-col justify-center truncate">
       <div class="flex items-center gap-4">
         <p>{event.id}</p>
-        <p>{event?.classification ?? event?.name}</p>
+        <p>{event?.name ?? event?.name}</p>
       </div>
       <div>
         <p class="text-[11px]">{formatDate(event?.eventTime, $timeFormat)}</p>
