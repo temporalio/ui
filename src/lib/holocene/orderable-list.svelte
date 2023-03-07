@@ -1,6 +1,4 @@
 <script lang="ts">
-  import type { HTMLOlAttributes } from 'svelte/elements';
-  import { noop } from 'svelte/internal';
   import IconButton from './icon-button.svelte';
   import Icon from './icon/icon.svelte';
 
@@ -14,26 +12,32 @@
     locked?: boolean;
   }
 
-  interface $$Props extends HTMLOlAttributes {
+  interface $$Props {
     items: OrderableItem[];
-    readonly?: boolean;
-    removeItem?: (index: number) => void;
-    addItem?: (index: number) => void;
+    availableItems?: OrderableItem[];
   }
 
-  let className: string = undefined;
-  export { className as class };
   export let items: OrderableItem[];
-  export let readonly: boolean = false;
-  export let removeItem: (index: number) => void = noop;
-  export let addItem: (index: number) => void = noop;
+  export let availableItems: OrderableItem[] = [];
+
+  const addItem = (index: number) => {
+    let tempAvailableItems = [...availableItems];
+    items = [...items, ...tempAvailableItems.splice(index, 1)];
+    availableItems = tempAvailableItems;
+  };
+
+  const removeItem = (index: number) => {
+    let tempItems = [...items];
+    availableItems = [...tempItems.splice(index, 1), ...availableItems];
+    items = tempItems;
+  };
 
   const handleDragStart = (
     event: ExtendedDragEvent,
     index: number,
     locked: boolean,
   ) => {
-    if (readonly || locked) {
+    if (locked) {
       return false;
     }
     event.dataTransfer.setData('text/plain', index.toString());
@@ -54,44 +58,73 @@
     event.currentTarget.classList.remove('dragging-over');
 </script>
 
-<ol class="orderable-list {className}" {...$$restProps}>
-  {#each items as item, index (item.key)}
-    {@const { label, locked } = item}
-    <li
-      draggable={!readonly && !locked}
-      class:locked
-      class="orderable-item"
-      on:dragstart={(e) => handleDragStart(e, index, locked)}
-      on:drop|preventDefault={(e) => handleDrop(e, index)}
-      on:dragenter|preventDefault|stopPropagation={handleDragEnter}
-      on:dragleave|preventDefault|stopPropagation={handleDragLeave}
-      on:dragover|preventDefault|stopPropagation
-    >
-      <div class="flex flex-row gap-2 items-center">
-        {#if locked}
-          <Icon name="lock" />
-        {:else if readonly}
-          <span class="w-6" />
-        {:else}
-          <Icon name="chevron-selector-vertical" />
-        {/if}
-        {label}
-      </div>
-      {#if !locked}
-        {#if readonly}
-          <IconButton icon="add" on:click={() => addItem(index)} />
-        {:else}
-          <IconButton icon="hyphen" on:click={() => removeItem(index)} />
-        {/if}
-      {/if}
-    </li>
-    <hr />
-  {/each}
-</ol>
+<div class="flex flex-col gap-4">
+  <div class="orderable-section">
+    <h4 class="orderable-heading">
+      <slot name="main-heading">Items</slot>
+    </h4>
+    <ol class="orderable-list">
+      {#each items as item, index (item.key)}
+        {@const { label, locked } = item}
+        <li
+          draggable={!locked}
+          class:locked
+          class="orderable-item"
+          on:dragstart={(e) => handleDragStart(e, index, locked)}
+          on:drop|preventDefault={(e) => handleDrop(e, index)}
+          on:dragenter|preventDefault|stopPropagation={handleDragEnter}
+          on:dragleave|preventDefault|stopPropagation={handleDragLeave}
+          on:dragover|preventDefault|stopPropagation
+        >
+          <div class="flex flex-row gap-2 items-center">
+            {#if locked}
+              <Icon name="lock" />
+            {:else}
+              <Icon name="chevron-selector-vertical" />
+            {/if}
+            {label}
+          </div>
+          {#if !locked}
+            <IconButton icon="hyphen" on:click={() => removeItem(index)} />
+          {/if}
+        </li>
+        <hr />
+      {/each}
+    </ol>
+  </div>
+  {#if availableItems && availableItems.length > 0}
+    <div class="orderable-section">
+      <h4 class="orderable-heading">
+        <slot name="bank-heading">Available Items</slot>
+      </h4>
+      <ol class="orderable-list">
+        {#each availableItems as item, index (item.key)}
+          {@const { label } = item}
+          <li class="orderable-item">
+            <div class="flex flex-row gap-2 items-center">
+              <span class="w-6" />
+              {label}
+            </div>
+            <IconButton icon="add" on:click={() => addItem(index)} />
+          </li>
+          <hr />
+        {/each}
+      </ol>
+    </div>
+  {/if}
+</div>
 
 <style lang="postcss">
+  .orderable-section {
+    @apply flex flex-col gap-2;
+  }
+
+  .orderable-heading {
+    @apply text-sm font-medium;
+  }
+
   .orderable-list {
-    @apply border-3 border-primary rounded-lg;
+    @apply bg-white border-3 border-primary rounded-lg;
   }
 
   .orderable-item {
@@ -110,7 +143,7 @@
     @apply pointer-events-none border-primary last-of-type:hidden;
   }
 
-  .orderable-item.dragging-over:not(.locked) {
+  :global(.orderable-item.dragging-over:not(.locked)) {
     @apply bg-gradient-to-br from-blue-100 to-purple-100;
 
     &:last-of-type {

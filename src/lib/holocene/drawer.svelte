@@ -87,6 +87,6 @@
   }
 
   .content {
-    @apply whitespace-normal p-4;
+    @apply whitespace-normal px-4;
   }
 </style>

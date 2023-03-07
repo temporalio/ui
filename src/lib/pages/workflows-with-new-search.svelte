@@ -230,18 +230,6 @@
     customizationDrawerOpen = false;
   };
 
-  const addColumn = (index: number) => {
-    let tempAvailableColumns = [...availableColumns];
-    columns = [...columns, ...tempAvailableColumns.splice(index, 1)];
-    availableColumns = tempAvailableColumns;
-  };
-
-  const removeColumn = (index: number) => {
-    let tempColumns = [...columns];
-    availableColumns = [...tempColumns.splice(index, 1), ...availableColumns];
-    columns = tempColumns;
-  };
-
   $: batchOperationQuery = !$workflowsQuery
     ? 'ExecutionStatus="Running"'
     : $workflowsQuery;
@@ -402,20 +390,12 @@
       >), Workflow<br />Headings to personalize the Workflow List Table.</span
     >
   </svelte:fragment>
-  <div class="flex flex-col gap-2">
-    <h4 class="text-sm">
-      <span class="font-medium">Workflow Headings</span> (in view)
-    </h4>
-    <OrderableList
-      class="mb-4"
-      bind:items={columns}
-      removeItem={removeColumn}
-    />
-    {#if availableColumns.length > 0}
-      <h4 class="text-sm">
-        <span class="font-medium">Available Headings</span> (not in view)
-      </h4>
-      <OrderableList readonly items={availableColumns} addItem={addColumn} />
-    {/if}
-  </div>
+  <OrderableList bind:items={columns} bind:availableItems={availableColumns}>
+    <svelte:fragment slot="main-heading">
+      Workflow Headings <span class="font-normal">(in view)</span>
+    </svelte:fragment>
+    <svelte:fragment slot="bank-heading">
+      Available Headings <span class="font-normal">(not in view)</span>
+    </svelte:fragment>
+  </OrderableList>
 </Drawer>
