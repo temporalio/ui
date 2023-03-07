@@ -20,6 +20,10 @@
   import { getPollers } from '$lib/services/pollers-service';
   import { toDecodedPendingActivities } from '$lib/models/pending-activities';
   import { fetchStartAndEndEvents } from '$lib/services/events-service';
+  import WorkflowHistoryLayoutV2 from './workflow-history-layout-v2.svelte';
+  import WorkflowHeaderV2 from './workflow-header-v2.svelte';
+  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
+  import { featureFlags } from '$lib/stores/feature-flags';
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
 
@@ -71,8 +75,37 @@
 <div class="flex h-full flex-col gap-6">
   {#if !$workflowRun.workflow}
     <Loading />
+  {:else if $featureFlags.eventHistoryV2}
+    <WorkflowHeaderV2 namespace={$page.params.namespace}>
+      <label
+        slot="feature-flag"
+        for="new-ui"
+        class="mt-2 flex items-center gap-4 font-secondary text-sm"
+        >v2 UI
+        <ToggleSwitch
+          id="new-ui"
+          checked={$featureFlags.eventHistoryV2}
+          on:change={() =>
+            ($featureFlags.eventHistoryV2 = !$featureFlags.eventHistoryV2)}
+        />
+      </label>
+    </WorkflowHeaderV2>
+    <WorkflowHistoryLayoutV2 />
   {:else}
-    <Header namespace={$page.params.namespace} />
+    <Header namespace={$page.params.namespace}>
+      <label
+        slot="feature-flag"
+        for="new-ui"
+        class="mt-2 flex items-center gap-4 font-secondary text-sm"
+        >v2 UI
+        <ToggleSwitch
+          id="new-ui"
+          checked={$featureFlags.eventHistoryV2}
+          on:change={() =>
+            ($featureFlags.eventHistoryV2 = !$featureFlags.eventHistoryV2)}
+        />
+      </label>
+    </Header>
     <slot />
   {/if}
 </div>

@@ -89,6 +89,15 @@ export const requestFromAPI = async <T>(
 
     const { status, statusText } = response;
 
+    // if (throwError) {
+    //   throw {
+    //     statusCode: 400,
+    //     statusText: 'Bad error',
+    //     response: '',
+    //     message: 'Cannot fetch',
+    //   } as NetworkError;
+    // }
+
     if (!response.ok) {
       if (onError && isFunction(onError)) {
         onError({ status, statusText, body });

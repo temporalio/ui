@@ -16,6 +16,7 @@ interface EventGroup
   isFailureOrTimedOut: boolean;
   isCanceled: boolean;
   isTerminated: boolean;
+  isCompleted: boolean;
 }
 
 type EventGroups = EventGroup[];

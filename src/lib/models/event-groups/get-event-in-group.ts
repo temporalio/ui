@@ -14,6 +14,10 @@ import {
   isWorkflowExecutionTimedOutEvent,
   isWorkflowTaskTimedOutEvent,
   isWorkflowTaskFailedEvent,
+  isActivityTaskCompletedEvent,
+  isWorkflowExecutionCompletedEvent,
+  isWorkflowTaskCompletedEvent,
+  isChildWorkflowExecutionCompletedEvent,
 } from '$lib/utilities/is-event-type';
 import { isEventGroup } from '$lib/models/event-groups';
 
@@ -62,4 +66,18 @@ export const eventIsTerminated = (event: WorkflowEvent): boolean => {
 export const eventOrGroupIsTerminated = (event: IterableEvent): boolean => {
   if (isEventGroup(event)) return event.isTerminated;
   return eventIsTerminated(event as WorkflowEvent);
+};
+
+export const eventOrGroupIsCompleted = (event: IterableEvent): boolean => {
+  if (isEventGroup(event)) return event.isCompleted;
+  return eventIsCompleted(event as WorkflowEvent);
+};
+
+export const eventIsCompleted = (event: WorkflowEvent): boolean => {
+  return (
+    isActivityTaskCompletedEvent(event) ||
+    isWorkflowExecutionCompletedEvent(event) ||
+    isWorkflowTaskCompletedEvent(event) ||
+    isChildWorkflowExecutionCompletedEvent(event)
+  );
 };
