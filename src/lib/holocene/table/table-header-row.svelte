@@ -1,5 +1,7 @@
 <tr class={$$props.class}>
   <th />
   <slot />
-  <th />
+  <slot name="trailing-th">
+    <th />
+  </slot>
 </tr>

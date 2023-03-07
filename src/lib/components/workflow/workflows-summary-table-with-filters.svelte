@@ -16,6 +16,7 @@
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
   import { supportsAdvancedVisibilityWithOrderBy } from '$lib/stores/bulk-actions';
+  import IconButton from '$lib/holocene/icon-button.svelte';
 
   const dispatch = createEventDispatcher<{
     terminateWorkflows: undefined;
@@ -31,6 +32,7 @@
   export let allSelected: boolean;
   export let pageSelected: boolean;
   export let filteredWorkflowCount: string;
+  export let openCustomizationDrawer: () => void;
 
   $: terminateEnabled = workflowTerminateEnabled($page.data.settings);
   $: cancelEnabled = workflowCancelEnabled($page.data.settings);
@@ -171,6 +173,13 @@
           </div>
         </th>
       {/if}
+      <th slot="trailing-th" style="width: 2.5rem;">
+        <IconButton
+          class="text-white"
+          icon="vertical-ellipsis"
+          on:click={openCustomizationDrawer}
+        />
+      </th>
     </TableHeaderRow>
     <slot />
   </Table>

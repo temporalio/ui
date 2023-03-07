@@ -37,7 +37,9 @@
     <div class="title-wrapper {position}">
       <h1>{title}</h1>
       {#if $$slots['subtitle']}
-        <h3 class="text-xs font-normal"><slot name="subtitle" /></h3>
+        <h3 class="text-xs font-normal font-primary">
+          <slot name="subtitle" />
+        </h3>
       {/if}
     </div>
 
@@ -56,7 +58,7 @@
     }
 
     &.right {
-      @apply right-0 top-0 bottom-0 h-full;
+      @apply right-0 top-0 bottom-0 h-full px-2 py-32;
     }
 
     &.dark {
@@ -81,7 +83,7 @@
   }
 
   .title-wrapper h1 {
-    @apply text-base font-medium mb-2;
+    @apply text-base font-medium font-primary mb-2;
   }
 
   .content {

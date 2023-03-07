@@ -36,6 +36,9 @@
   import { bulkActionsEnabled as workflowBulkActionsEnabled } from '$lib/utilities/bulk-actions-enabled';
   import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
   import { toaster } from '$lib/stores/toaster';
+  import Drawer from '$lib/holocene/drawer.svelte';
+  import OrderableList from '$lib/holocene/orderable-list/orderable-list.svelte';
+  import OrderableListBank from '$lib/holocene/orderable-list/orderable-list-bank.svelte';
 
   $: bulkActionsEnabled = workflowBulkActionsEnabled(
     $page.data.settings,
@@ -47,6 +50,28 @@
   let batchCancelConfirmationModal: BatchOperationConfirmationModal;
   let allSelected: boolean = false;
   let pageSelected: boolean = false;
+  let customizationDrawerOpen: boolean = false;
+  let columns: {
+    label: string;
+    key: string;
+    locked?: boolean;
+  }[] = [
+    { label: 'Status', key: 'status', locked: true },
+    { label: 'Workflow ID', key: 'id', locked: true },
+    { label: 'Run ID', key: 'runId' },
+    { label: 'Type', key: 'name' },
+    { label: 'Start', key: 'startTime' },
+    { label: 'End', key: 'endTime' },
+  ];
+
+  let availableColumns = [
+    { label: 'Custom Search Attributes', key: 'customSearchAttributes' },
+    { label: 'Execution Time', key: 'executionTime' },
+    { label: 'History Length', key: 'historyLength' },
+    { label: 'History Size', key: 'historySize' },
+    { label: 'Memo Custom Key', key: 'memoCustomKey' },
+    { label: 'State Transitions', key: 'stateTransitions' },
+  ];
 
   $: query = $page.url.searchParams.get('query');
 
@@ -198,6 +223,26 @@
     }
   };
 
+  const openCustomizationDrawer = () => {
+    customizationDrawerOpen = true;
+  };
+
+  const closeCustomizationDrawer = () => {
+    customizationDrawerOpen = false;
+  };
+
+  const addColumn = (index: number) => {
+    let tempAvailableColumns = [...availableColumns];
+    columns = [...columns, ...tempAvailableColumns.splice(index, 1)];
+    availableColumns = tempAvailableColumns;
+  };
+
+  const removeColumn = (index: number) => {
+    let tempColumns = [...columns];
+    availableColumns = [...tempColumns.splice(index, 1), ...availableColumns];
+    columns = tempColumns;
+  };
+
   $: batchOperationQuery = !$workflowsQuery
     ? 'ExecutionStatus="Running"'
     : $workflowsQuery;
@@ -301,6 +346,7 @@
     on:cancelWorkflows={() => batchCancelConfirmationModal.open()}
     on:toggleAll={handleToggleAll}
     on:togglePage={handleTogglePage}
+    {openCustomizationDrawer}
   >
     {#each visibleItems as event}
       <WorkflowsSummaryRowWithFilters
@@ -340,3 +386,37 @@
     {/each}
   </WorkflowsSummaryTableWithFilters>
 </Pagination>
+
+<Drawer
+  open={customizationDrawerOpen}
+  onClick={closeCustomizationDrawer}
+  position="right"
+  dark={false}
+  title="Configure Workflow List"
+>
+  <svelte:fragment slot="subtitle">
+    <span>Add (</span><Icon class="inline" name="add" /><span
+      >), re-arrange (</span
+    ><Icon class="inline" name="chevron-selector-vertical" /><span
+      >), and remove (</span
+    ><Icon class="inline" name="hyphen" /><span
+      >), Workflow<br />Headings to personalize the Workflow List Table.</span
+    >
+  </svelte:fragment>
+  <div class="flex flex-col gap-2">
+    <h4 class="text-sm">
+      <span class="font-medium">Workflow Headings</span> (in view)
+    </h4>
+    <OrderableList
+      class="mb-4"
+      bind:items={columns}
+      removeItem={removeColumn}
+    />
+    {#if availableColumns.length > 0}
+      <h4 class="text-sm">
+        <span class="font-medium">Available Headings</span> (not in view)
+      </h4>
+      <OrderableListBank items={availableColumns} addItem={addColumn} />
+    {/if}
+  </div>
+</Drawer>
