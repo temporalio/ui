@@ -41,9 +41,9 @@ jobs:
       - name: Sync
         run: |
           rm -rf ui-server/*
+          rm -rf server/proto/dependencies/api
           cp -r server/* ui-server
           cd ui-server
-          rm -rf proto/dependencies/api
           git config --local user.name 'Temporal Data (cicd)'
           git config --local user.email 'commander-data@temporal.io'
           git add .
