@@ -6,9 +6,10 @@
   import WorkflowHistoryFeed from '$lib/pages/workflow-history-feed.svelte';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
   import WorkflowHistoryCompact from '$lib/pages/workflow-history-compact.svelte';
-  import WorkflowHistoryCompactV2 from '$lib/pages/workflow-history-compact-v2.svelte';
+  import WorkflowHistoryCompactV2 from '$lib/layouts/workflow-history-layout-v2.svelte';
 
   import PageTitle from '$lib/components/page-title.svelte';
+  import WorkflowHistoryLayoutV2 from '$lib/layouts/workflow-history-layout-v2.svelte';
   const workflow = $page.params.workflow;
 
   const views = {
@@ -21,9 +22,9 @@
 </script>
 
 <PageTitle title={`Workflow History | ${workflow}`} url={$page.url.href} />
-<WorkflowHistoryLayout>
+<WorkflowHistoryLayoutV2>
   <!-- <svelte:fragment slot="timeline">
     <EventHistoryTimelineContainer />
     </svelte:fragment> -->
   <svelte:component this={view} />
-</WorkflowHistoryLayout>
+</WorkflowHistoryLayoutV2>

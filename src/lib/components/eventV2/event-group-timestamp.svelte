@@ -5,10 +5,20 @@
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
   import { isEventGroup } from '$lib/models/event-groups';
+  import {
+    eventOrGroupIsCanceled,
+    eventOrGroupIsFailureOrTimedOut,
+    eventOrGroupIsTerminated,
+  } from '$lib/models/event-groups/get-event-in-group';
 
   export let event: IterableEvent;
   export let visibleItems: IterableEvent[];
   export let initialItem: IterableEvent | undefined;
+  export let isSubGroup = false;
+
+  const failure = eventOrGroupIsFailureOrTimedOut(event);
+  const canceled = eventOrGroupIsCanceled(event);
+  const terminated = eventOrGroupIsTerminated(event);
 
   $: initialEvent = isEventGroup(event) ? event.initialEvent : event;
   $: lastEvent = isEventGroup(event) ? event.lastEvent : event;
@@ -33,19 +43,41 @@
   }
 </script>
 
-<p
-  class="break-word leading-0 w-[100px] truncate text-center md:whitespace-normal md:text-[11px]"
->
-  {#if showElapsedTimeDiff}
-    {formatDistanceAbbreviated({
-      start: initialItem.eventTime,
-      end: initialEvent.eventTime,
-    })}
-    {timeDiffChange}
-  {:else}
-    {formatDate(initialEvent?.eventTime, $timeFormat)}
-  {/if}
-</p>
+<div class="flex h-full w-[120px] items-center justify-center">
+  <p
+    class="break-word leading-0 w-[100px] truncate text-center md:whitespace-normal md:text-[11px]"
+  >
+    {#if showElapsedTimeDiff}
+      {formatDistanceAbbreviated({
+        start: initialItem.eventTime,
+        end: initialEvent.eventTime,
+      })}
+      {timeDiffChange}
+    {:else}
+      {formatDate(initialEvent?.eventTime, $timeFormat)}
+    {/if}
+  </p>
+  <div class="flex h-full w-[20px] flex-col items-center justify-center">
+    <div class="flex h-1/2 w-[10x] gap-0">
+      <div class="w-[4px]" />
+      <div class="w-[2px] bg-gray-900" />
+      <div class="w-[4px]" />
+    </div>
+    <div
+      class="grow"
+      class:dot={!isSubGroup}
+      class:subgroup-dot={isSubGroup}
+      class:failure
+      class:canceled
+      class:terminated
+    />
+    <div class="flex h-1/2 w-[10x] gap-0">
+      <div class="w-[4px]" />
+      <div class="w-[2px] bg-gray-900" />
+      <div class="w-[4px]" />
+    </div>
+  </div>
+</div>
 
 <style lang="postcss">
   .row {

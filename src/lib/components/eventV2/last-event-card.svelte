@@ -2,14 +2,12 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
 
   import { eventShowElapsed, eventFilterSort } from '$lib/stores/event-view';
-  import { timeFormat } from '$lib/stores/time-format';
 
   import {
     eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsCanceled,
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
-  import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
   import { noop } from 'svelte/internal';
@@ -23,7 +21,6 @@
   import { getStackTrace } from '$lib/utilities/get-single-attribute-for-event';
   import { eventHistory } from '$lib/stores/events';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
-  import EventTimelineDotLine from './event-timeline-dot-line.svelte';
   import EventGroupTimestamp from './event-group-timestamp.svelte';
 
   export let event: IterableEvent;
@@ -34,30 +31,10 @@
   export let typedError = false;
   export let active = false;
   export let onRowClick: () => void = noop;
+  export let results: string = '';
+  export let stackTrace: string = '';
 
   $: expanded = expandAll || active;
-
-  $: initialEvent = isEventGroup(event) ? event.initialEvent : event;
-  $: lastEvent = isEventGroup(event) ? event.lastEvent : event;
-  $: descending = $eventFilterSort === 'descending';
-  $: showElapsed = $eventShowElapsed === 'true';
-  $: showElapsedTimeDiff =
-    showElapsed && initialItem && event.id !== initialItem.id;
-
-  $: timeDiffChange = '';
-  $: {
-    const currentIndex = visibleItems.indexOf(event);
-    const previousItem = visibleItems[currentIndex - 1];
-    if (previousItem) {
-      const timeDiff = formatDistanceAbbreviated({
-        start: isEventGroup(previousItem)
-          ? previousItem?.initialEvent?.eventTime
-          : previousItem?.eventTime,
-        end: lastEvent?.eventTime,
-      });
-      timeDiffChange = timeDiff ? `(${descending ? '-' : '+'}${timeDiff})` : '';
-    }
-  }
 
   const onLinkClick = () => {
     expanded = !expanded;
@@ -67,27 +44,15 @@
   const failure = eventOrGroupIsFailureOrTimedOut(event);
   const canceled = eventOrGroupIsCanceled(event);
   const terminated = eventOrGroupIsTerminated(event);
-
-  $: ({ input, results } =
-    getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory));
-  $: isInitialEvent = event.id === $eventHistory.start[0]?.id;
-  $: codeBlockContent = isInitialEvent ? input : results;
-  $: stackTrace =
-    isInitialEvent &&
-    codeBlockContent &&
-    getStackTrace(parseWithBigInt(codeBlockContent));
 </script>
 
 <div class="flex gap-4">
-  <div class="flex h-full w-[120px] items-center justify-center">
-    <EventGroupTimestamp {event} {initialItem} {visibleItems} />
-    <EventTimelineDotLine {event} isSubGroup />
-  </div>
-  <div class="h-full grow py-2">
-    <EventCard>
+  <EventGroupTimestamp {event} {initialItem} {visibleItems} {isSubGroup} />
+  <div class="h-full grow pt-2">
+    <EventCard bottom>
       <div
         class="row"
-        id={lastEvent.id}
+        id={event.id}
         class:expanded={expanded && !expandAll}
         aria-expanded={expanded || expandAll}
         class:active
@@ -98,7 +63,7 @@
       >
         <div class="primary flex w-full cursor-pointer justify-between">
           <div class="flex items-center gap-4">
-            <p>{lastEvent.id}</p>
+            <p>{event.id}</p>
             <div
               class="flex items-center"
               class:failure
@@ -118,34 +83,42 @@
             <Icon name={expanded ? 'chevron-up' : 'chevron-down'} class="w-4" />
           </div>
         </div>
-        <div class="p-2">
-          <div class:code-with-stack-trace={stackTrace}>
-            <div class="flex flex-col {stackTrace ? 'lg:w-1/2' : ''}">
-              <CodeBlock
-                content={codeBlockContent}
-                class="h-auto {stackTrace ? 'mb-2' : ''}"
-              />
-            </div>
-            {#if stackTrace}
-              <div class="flex flex-col lg:w-1/2">
-                <p class="text-sm">Stack trace</p>
-                <CodeBlock
-                  content={stackTrace}
-                  class="mb-2 h-full lg:pr-2"
-                  language="text"
-                />
-              </div>
-            {/if}
-          </div>
-        </div>
         {#if expanded}
           <p>Full Event Details</p>
           <div class="h-80">
-            <CodeBlock content={stringifyWithBigInt(lastEvent)} />
+            <CodeBlock content={stringifyWithBigInt(event)} />
           </div>
         {/if}
       </div>
     </EventCard>
+  </div>
+</div>
+<div class="flex gap-4">
+  <div class="w-[120px]" />
+  <div class="flex flex-col grow">
+    <div class:code-with-stack-trace={stackTrace}>
+      <div class="flex flex-col {stackTrace ? 'lg:w-1/2' : ''}">
+        <CodeBlock
+          content={results}
+          title="Results"
+          unroundTitle
+          icon="json"
+          class="h-auto {stackTrace ? 'mb-2' : ''}"
+        />
+      </div>
+      {#if stackTrace}
+        <div class="flex flex-col lg:w-1/2">
+          <p class="text-sm">Stack trace</p>
+          <CodeBlock
+            content={stackTrace}
+            title="Stack Trace"
+            unroundTitle
+            class="mb-2 h-full lg:pr-2"
+            language="text"
+          />
+        </div>
+      {/if}
+    </div>
   </div>
 </div>
 

@@ -12,7 +12,11 @@
   import { groupEvents, isEventGroup } from '$lib/models/event-groups';
   import { fetchAllEvents } from '$lib/services/events-service';
   import EventGroupSummaryCard from './event-group-summary-card.svelte';
-  import SingleEventCard from './single-event-card.svelte';
+  import InitialEventCard from './initial-event-card.svelte';
+  import LastEventCard from './last-event-card.svelte';
+  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
+  import { getStackTrace } from '$lib/utilities/get-single-attribute-for-event';
+  import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   export let compact = true;
 
@@ -75,13 +79,18 @@
     $eventFilterSort === 'descending'
       ? currentEvents?.[0]
       : currentEvents?.[currentEvents?.length - 1];
+
+  $: ({ input, results } =
+    getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory));
+  $: stackTrace = results && getStackTrace(parseWithBigInt(results));
 </script>
 
 <div class="flex gap-4">
   <div class="flex w-full flex-col gap-0">
     {#if initialItem}
-      <SingleEventCard
+      <InitialEventCard
         event={initialItem}
+        {input}
         visibleItems={currentEvents}
         {initialItem}
       />
@@ -102,8 +111,10 @@
       {/if}
     {/each}
     {#if finalItem}
-      <SingleEventCard
+      <LastEventCard
         event={finalItem}
+        {results}
+        {stackTrace}
         visibleItems={currentEvents}
         {initialItem}
       />
