@@ -37,8 +37,7 @@
   import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
   import { toaster } from '$lib/stores/toaster';
   import Drawer from '$lib/holocene/drawer.svelte';
-  import OrderableList from '$lib/holocene/orderable-list/orderable-list.svelte';
-  import OrderableListBank from '$lib/holocene/orderable-list/orderable-list-bank.svelte';
+  import OrderableList from '$lib/holocene/orderable-list.svelte';
 
   $: bulkActionsEnabled = workflowBulkActionsEnabled(
     $page.data.settings,
@@ -416,7 +415,7 @@
       <h4 class="text-sm">
         <span class="font-medium">Available Headings</span> (not in view)
       </h4>
-      <OrderableListBank items={availableColumns} addItem={addColumn} />
+      <OrderableList readonly items={availableColumns} addItem={addColumn} />
     {/if}
   </div>
 </Drawer>
