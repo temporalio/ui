@@ -52,48 +52,43 @@
   };
 </script>
 
-<section>
-  <Accordion title="Stack Trace">
-    {#if workflow?.isRunning && workers?.pollers?.length > 0}
-      {#await stackTrace}
-        <div class="text-center">
-          <Loading />
-          <p>(This will fail if you have no workers running.)</p>
-        </div>
-      {:then result}
-        <div class="flex items-center gap-4">
-          <Button on:click={refreshStackTrace} icon="retry" loading={isLoading}>
-            Refresh
-          </Button>
-          <p>Stack Trace at {currentdate.toLocaleTimeString()}</p>
-        </div>
-        <div class="flex items-start h-full">
-          <CodeBlock
-            content={result}
-            language="text"
-            testId="query-stack-trace"
-          />
-        </div>
-      {:catch _error}
-        <EmptyState
-          title="An Error Occured"
-          content="Please make sure you have at least one worker running."
+<Accordion title="Stack Trace">
+  {#if workflow?.isRunning && workers?.pollers?.length > 0}
+    {#await stackTrace}
+      <div class="text-center">
+        <Loading />
+        <p>(This will fail if you have no workers running.)</p>
+      </div>
+    {:then result}
+      <div class="flex items-center gap-4">
+        <Button on:click={refreshStackTrace} icon="retry" loading={isLoading}>
+          Refresh
+        </Button>
+        <p>Stack Trace at {currentdate.toLocaleTimeString()}</p>
+      </div>
+      <div class="flex items-start h-full">
+        <CodeBlock
+          content={result}
+          language="text"
+          testId="query-stack-trace"
         />
-      {/await}
-    {:else}
+      </div>
+    {:catch _error}
       <EmptyState
-        title="No Stack Traces Found"
-        testId="query-stack-trace-empty"
-      >
-        {#if workflow?.isRunning && workers?.pollers?.length === 0}
-          <p>
-            To enable <Link
-              href="https://docs.temporal.io/workflows#stack-trace-query"
-              >stack traces</Link
-            >, run a Worker on the {workflow?.taskQueue} Task Queue.
-          </p>
-        {/if}
-      </EmptyState>
-    {/if}
-  </Accordion>
-</section>
+        title="An Error Occured"
+        content="Please make sure you have at least one worker running."
+      />
+    {/await}
+  {:else}
+    <EmptyState title="No Stack Traces Found" testId="query-stack-trace-empty">
+      {#if workflow?.isRunning && workers?.pollers?.length === 0}
+        <p>
+          To enable <Link
+            href="https://docs.temporal.io/workflows#stack-trace-query"
+            >stack traces</Link
+          >, run a Worker on the {workflow?.taskQueue} Task Queue.
+        </p>
+      {/if}
+    </EmptyState>
+  {/if}
+</Accordion>

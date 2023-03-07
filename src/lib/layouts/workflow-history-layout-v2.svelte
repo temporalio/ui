@@ -9,6 +9,7 @@
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
   import WorkflowWorkersV2 from '$lib/components/eventV2/workflow-workers-v2.svelte';
   import WorkflowStackTraceV2 from '$lib/components/eventV2/workflow-stack-trace-v2.svelte';
+  import WorkflowQueryV2 from '$lib/components/eventV2/workflow-query-v2.svelte';
 
   $: ({ workflow } = $workflowRun);
   $: workflowRelationships = getWorkflowRelationships(workflow, $eventHistory);
@@ -20,6 +21,7 @@
     <WorkflowRelationshipsV2 {...workflowRelationships} />
     <WorkflowWorkersV2 taskQueue={workflow.taskQueue} />
     <WorkflowStackTraceV2 />
+    <WorkflowQueryV2 />
   </div>
   <div class="w-full xl:w-2/3">
     <EventSummaryV2 />
