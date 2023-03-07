@@ -3,7 +3,7 @@
   import { fly } from 'svelte/transition';
 
   import { autoRefreshWorkflow } from '$lib/stores/event-view';
-  import { workflowsSearchParams } from '$lib/stores/workflows';
+  import { workflowsQuery, workflowsSearch } from '$lib/stores/workflows';
   import { refresh, workflowRun } from '$lib/stores/workflow-run';
   import { eventHistory } from '$lib/stores/events';
 
@@ -13,8 +13,9 @@
     routeForStackTrace,
     routeForWorkers,
     routeForWorkflowQuery,
-    routeForWorkflows,
+    routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
+  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/components/copyable.svelte';
@@ -46,6 +47,9 @@
     run: workflow?.runId,
   };
 
+  const { parameters, searchType } = $workflowsSearch;
+  const query = toListWorkflowQuery(parameters);
+
   $: isRunning = $workflowRun?.workflow?.isRunning;
   $: activitiesCanceled = ['Terminated', 'TimedOut', 'Canceled'].includes(
     $workflowRun.workflow?.status,
@@ -61,7 +65,7 @@
 
   $: {
     if (!isRunning) {
-      // Stop refresh if workflow is no longer running
+      // Stop refresh if worfklow is no longer running
       clearInterval(refreshInterval);
     }
   }
@@ -93,9 +97,11 @@
 <header class="mb-4 flex flex-col gap-1">
   <div class="mb-4 block flex justify-between">
     <a
-      href={`${routeForWorkflows({
+      href={routeForWorkflowsWithQuery({
         namespace,
-      })}?${$workflowsSearchParams}`}
+        query: $workflowsQuery || query,
+        search: searchType,
+      })}
       data-testid="back-to-workflows"
       class="back-to-workflows"
     >
@@ -104,7 +110,7 @@
     <slot name="feature-flag" />
   </div>
   <div
-    class="mb-8 flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
+    class="flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
   >
     <div
       class="flex w-full items-center justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
@@ -166,64 +172,6 @@
       </Alert>
     </div>
   {/if}
-  <nav class="flex flex-wrap gap-6" aria-label="workflow detail">
-    <Tab
-      label="History"
-      href={routeForEventHistory({
-        ...routeParameters,
-      })}
-      testId="history-tab"
-      active={pathMatches(
-        $page.url.pathname,
-        routeForEventHistory({
-          ...routeParameters,
-        }),
-      )}
-    >
-      <Badge type="blue" class="px-2 py-0">{workflow.historyEvents}</Badge>
-    </Tab>
-    <Tab
-      label="Workers"
-      href={routeForWorkers(routeParameters)}
-      testId="workers-tab"
-      active={pathMatches($page.url.pathname, routeForWorkers(routeParameters))}
-    >
-      <Badge type="blue" class="px-2 py-0">{workers?.pollers?.length}</Badge>
-    </Tab>
-    <Tab
-      label="Pending Activities"
-      href={routeForPendingActivities(routeParameters)}
-      testId="pending-activities-tab"
-      active={pathMatches(
-        $page.url.pathname,
-        routeForPendingActivities(routeParameters),
-      )}
-    >
-      <Badge type={activitiesCanceled ? 'warning' : 'blue'} class="px-2 py-0">
-        {#if activitiesCanceled}<Icon name="canceled" width={20} height={20} />
-        {/if}
-        {workflow.pendingActivities?.length}
-      </Badge>
-    </Tab>
-    <Tab
-      label="Stack Trace"
-      href={routeForStackTrace(routeParameters)}
-      testId="stack-trace-tab"
-      active={pathMatches(
-        $page.url.pathname,
-        routeForStackTrace(routeParameters),
-      )}
-    />
-    <Tab
-      label="Queries"
-      href={routeForWorkflowQuery(routeParameters)}
-      testId="queries-tab"
-      active={pathMatches(
-        $page.url.pathname,
-        routeForWorkflowQuery(routeParameters),
-      )}
-    />
-  </nav>
 </header>
 
 <style lang="postcss">

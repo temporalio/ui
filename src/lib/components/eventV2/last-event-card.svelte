@@ -1,31 +1,19 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  import { eventShowElapsed, eventFilterSort } from '$lib/stores/event-view';
-
   import {
     eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsCanceled,
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
-  import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
   import { noop } from 'svelte/internal';
-  import { isEventGroup } from '$lib/models/event-groups';
   import EventCard from './event-card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import {
-    parseWithBigInt,
-    stringifyWithBigInt,
-  } from '$lib/utilities/parse-with-big-int';
-  import { getStackTrace } from '$lib/utilities/get-single-attribute-for-event';
-  import { eventHistory } from '$lib/stores/events';
-  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
+  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import EventGroupTimestamp from './event-group-timestamp.svelte';
 
   export let event: IterableEvent;
-  export let visibleItems: IterableEvent[];
-  export let initialItem: IterableEvent | undefined;
   export let isSubGroup = false;
   export let expandAll = false;
   export let typedError = false;
@@ -47,7 +35,7 @@
 </script>
 
 <div class="flex gap-4">
-  <EventGroupTimestamp {event} {initialItem} {visibleItems} {isSubGroup} />
+  <EventGroupTimestamp {event} {isSubGroup} />
   <div class="h-full grow pt-2">
     <EventCard bottom>
       <div
@@ -94,7 +82,7 @@
   </div>
 </div>
 <div class="flex gap-4">
-  <div class="w-[120px]" />
+  <div class="w-[20px]" />
   <div class="flex flex-col grow">
     <div class:code-with-stack-trace={stackTrace}>
       <div class="flex flex-col {stackTrace ? 'lg:w-1/2' : ''}">

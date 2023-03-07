@@ -12,6 +12,7 @@ import {
   eventIsFailureOrTimedOut,
   eventIsCanceled,
   eventIsTerminated,
+  eventIsCompleted,
 } from './get-event-in-group';
 
 import { getGroupId } from './get-group-id';
@@ -74,6 +75,9 @@ const createGroupFor = <K extends keyof StartingEvents>(
     },
     get isTerminated() {
       return Boolean(this.eventList.find(eventIsTerminated));
+    },
+    get isCompleted() {
+      return Boolean(this.eventList.find(eventIsCompleted));
     },
   };
 };

@@ -12,34 +12,34 @@ import {
 export const getEventGroupName = (event: CommonHistoryEvent): string => {
   if (!event) return;
 
+  if (isActivityTaskScheduledEvent(event)) {
+    return event.activityTaskScheduledEventAttributes?.activityType?.name;
+  }
+
   if (isWorkflowTaskScheduledEvent(event)) {
     return 'Workflow Task';
   }
 
-  if (isActivityTaskScheduledEvent(event)) {
-    return `Activity Task: ${event.activityTaskScheduledEventAttributes?.activityType?.name}`;
-  }
-
   if (isTimerStartedEvent(event)) {
-    return `Timer Started`;
+    return `Timer ${event.timerStartedEventAttributes?.timerId} (${event.timerStartedEventAttributes?.startToFireTimeout})`;
   }
 
   if (isSignalExternalWorkflowExecutionInitiatedEvent(event)) {
-    return `Signal initiated`;
+    return `Signal: ${event.signalExternalWorkflowExecutionInitiatedEventAttributes?.signalName}`;
   }
 
   if (isWorkflowExecutionSignaledEvent(event)) {
-    return `Signal received`;
+    return `Signal received: ${event.workflowExecutionSignaledEventAttributes?.signalName}`;
   }
 
   if (isMarkerRecordedEvent(event)) {
     if (isLocalActivityMarkerEvent(event)) {
       return 'Local Activity';
     }
-    return `Marker`;
+    return `Marker: ${event.markerRecordedEventAttributes?.markerName}`;
   }
 
   if (isStartChildWorkflowExecutionInitiatedEvent(event)) {
-    return `Child Workflow`;
+    return `Child Workflow: ${event.startChildWorkflowExecutionInitiatedEventAttributes?.workflowType?.name}`;
   }
 };

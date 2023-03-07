@@ -22,7 +22,6 @@
   import { noop } from 'svelte/internal';
   import { isEventGroup } from '$lib/models/event-groups';
   import EventCard from './event-card.svelte';
-  import EventGroupDetailsWithTimeline from './event-group-details-with-timeline.svelte';
   import PrimaryEventGroupDetails from './primary-event-group-details.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
@@ -36,13 +35,13 @@
   export let event: IterableEvent;
   export let visibleItems: IterableEvent[];
   export let initialItem: IterableEvent | undefined;
-  export let compact = true;
   export let isSubGroup = false;
   export let expandAll = false;
   export let typedError = false;
   export let active = false;
   export let onRowClick: () => void = noop;
 
+  let showFullDetails = false;
   $: expanded = expandAll || active;
 
   $: initialEvent = isEventGroup(event) ? event.initialEvent : event;
@@ -93,9 +92,9 @@
 </script>
 
 <div class="flex gap-2">
-  <EventGroupTimestamp {event} {initialItem} {visibleItems} {isSubGroup} />
+  <EventGroupTimestamp {event} {isSubGroup} />
   <div class="h-full grow pt-2">
-    <EventCard thick={hasGroupEvents}>
+    <EventCard thick={hasGroupEvents} {expanded}>
       <div
         class="row"
         id={lastEvent.id}
@@ -104,7 +103,7 @@
         class:active
         class:typedError
         data-testid="event-summary-row"
-        on:click={onLinkClick}
+        on:click|stopPropagation={onLinkClick}
         on:keydown={onLinkClick}
       >
         <div class="primary flex w-full cursor-pointer justify-between">
@@ -124,16 +123,29 @@
                 {getEventGroupName(event)}
               </p>
             </div>
-            <PrimaryEventGroupDetails event={lastEvent} />
+            <PrimaryEventGroupDetails event={lastEvent} primary />
           </div>
           <div class="flex">
             <Icon name={expanded ? 'chevron-up' : 'chevron-down'} class="w-4" />
           </div>
         </div>
+        <p
+          class="break-word leading-0 truncate text-left md:whitespace-normal md:text-[12px]"
+        >
+          {#if showElapsedTimeDiff}
+            {formatDistanceAbbreviated({
+              start: initialItem.eventTime,
+              end: initialEvent.eventTime,
+            })}
+            {timeDiffChange}
+          {:else}
+            {formatDate(lastEvent?.eventTime, $timeFormat)}
+          {/if}
+        </p>
         {#if expanded && hasGroupEvents}
           <div class="secondary">
             {#each event?.eventList.reverse() ?? [] as event}
-              <EventGroupDetailsWithTimeline {event} {compact} />
+              <svelte:self {event} {visibleItems} {initialItem} />
             {/each}
           </div>
         {/if}
@@ -163,6 +175,11 @@
               {/if}
             </div>
           {/each}
+          <PrimaryEventGroupDetails event={lastEvent} />
+        </div>
+      {/if}
+      {#if showFullDetails && !hasGroupEvents}
+        <div class="p-2">
           <p>Full Event Details</p>
           <div class="h-80">
             <CodeBlock content={stringifyWithBigInt(lastEvent)} />
@@ -179,39 +196,15 @@
   }
 
   .secondary {
-    @apply mt-2 flex flex-col gap-2;
-  }
-
-  .expanded.row {
-    @apply bg-gray-50;
-  }
-
-  .dot {
-    @apply h-4 w-4 rounded-full border-3 border-gray-900 bg-white;
-  }
-
-  .subgroup-dot {
-    @apply h-3 w-3 rounded-full border-2 border-gray-900 bg-white;
-  }
-
-  .dot.failure {
-    @apply bg-red-500;
+    @apply mt-2 flex flex-col;
   }
 
   .failure p {
     @apply text-red-700;
   }
 
-  .dot.canceled {
-    @apply bg-yellow-300;
-  }
-
   .canceled p {
     @apply text-yellow-700;
-  }
-
-  .dot.terminated {
-    @apply bg-pink-500;
   }
 
   .terminated p {
