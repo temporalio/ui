@@ -4,6 +4,10 @@
   import IconButton from './icon-button.svelte';
   import Icon from './icon/icon.svelte';
 
+  type ExtendedDragEvent = DragEvent & {
+    currentTarget: EventTarget & HTMLLIElement;
+  };
+
   interface OrderableItem {
     label: string;
     key: string;
@@ -25,7 +29,7 @@
   export let addItem: (index: number) => void = noop;
 
   const handleDragStart = (
-    event: DragEvent,
+    event: ExtendedDragEvent,
     index: number,
     locked: boolean,
   ) => {
@@ -36,17 +40,18 @@
     event.dataTransfer.dropEffect = 'move';
   };
 
-  const handleDrop = (event: DragEvent, to: number) => {
+  const handleDrop = (event: ExtendedDragEvent, to: number) => {
+    event.currentTarget.classList.remove('dragging-over');
     const from = parseInt(event.dataTransfer.getData('text/plain'));
     const tempItems = [...items];
     tempItems.splice(to, 0, tempItems.splice(from, 1)[0]);
     items = tempItems;
   };
 
-  const handleDragEnter = (event: DragEvent) =>
-    (event.target as HTMLLIElement).classList.add('dragging-over');
-  const handleDragLeave = (event: DragEvent) =>
-    (event.target as HTMLLIElement).classList.remove('dragging-over');
+  const handleDragEnter = (event: ExtendedDragEvent) =>
+    event.currentTarget.classList.add('dragging-over');
+  const handleDragLeave = (event: ExtendedDragEvent) =>
+    event.currentTarget.classList.remove('dragging-over');
 </script>
 
 <ol class="orderable-list {className}" {...$$restProps}>
@@ -55,13 +60,12 @@
     <li
       draggable={!readonly && !locked}
       class:locked
+      class="orderable-item"
       on:dragstart={(e) => handleDragStart(e, index, locked)}
       on:drop|preventDefault={(e) => handleDrop(e, index)}
       on:dragenter|preventDefault|stopPropagation={handleDragEnter}
       on:dragleave|preventDefault|stopPropagation={handleDragLeave}
       on:dragover|preventDefault|stopPropagation
-      class="orderable-item"
-      {...$$restProps}
     >
       <div class="flex flex-row gap-2 items-center">
         {#if locked}
