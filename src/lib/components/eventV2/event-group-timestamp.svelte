@@ -47,18 +47,18 @@
   }
 
   .dot.completed {
-    @apply bg-green-400 border-green-400;
+    @apply border-green-400 bg-green-400;
   }
 
   .dot.failure {
-    @apply bg-red-500 border-red-500;
+    @apply border-red-500 bg-red-500;
   }
 
   .dot.canceled {
-    @apply bg-yellow-300 border-yellow-300;
+    @apply border-yellow-300 bg-yellow-300;
   }
 
   .dot.terminated {
-    @apply bg-pink-500 border-pink-500;
+    @apply border-pink-500 bg-pink-500;
   }
 </style>

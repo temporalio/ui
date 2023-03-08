@@ -57,7 +57,7 @@
   >
     <div class="space-between flex w-full flex-row items-center">
       <h2
-        class="w-full flex flex-row items-start gap-2"
+        class="flex w-full flex-row items-center gap-2"
         class:stack-summary={stackSummary}
       >
         <div class="flex items-center gap-2 text-lg font-medium">
@@ -97,6 +97,6 @@
 
 <style lang="postcss">
   .stack-summary {
-    @apply flex-col;
+    @apply flex-col items-start;
   }
 </style>

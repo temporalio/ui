@@ -54,7 +54,7 @@
 {#if parsedContent || parsedContent === null}
   {#if title}
     <p
-      class="flex items-center gap-2 bg-gray-900 rounded-t-lg -mb-2 text-sm text-white py-2 px-4"
+      class="-mb-2 flex items-center gap-2 rounded-t-lg bg-gray-900 py-2 px-4 text-sm text-white"
       class:unround-title={unroundTitle}
     >
       {#if icon}<Icon name={icon} />{/if}

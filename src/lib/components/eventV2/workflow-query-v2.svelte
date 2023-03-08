@@ -26,7 +26,8 @@
     namespace,
     workflow: params,
   }).then((queryTypes) => {
-    queryType = queryType || queryTypes[0];
+    queryType =
+      queryType || queryTypes.length > 1 ? queryTypes[1] : queryTypes[0];
     return queryTypes;
   });
 
@@ -58,7 +59,7 @@
       <p>(This will fail if you have no workers running.)</p>
     </div>
   {:then types}
-    <div class="h-[200px] overflow-auto">
+    <div class="h-auto overflow-auto">
       <div class="flex flex-row justify-between">
         <div class="flex items-center gap-4">
           <Select
@@ -92,7 +93,7 @@
           </label>
         </div>
       </div>
-      <div class="flex items-start h-full">
+      <div class="flex items-start h-auto">
         {#await queryResult then result}
           <CodeBlock
             content={result}

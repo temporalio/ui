@@ -82,17 +82,15 @@
 
   const getEventGroupName = (event: IterableEvent) => {
     if (isEventGroup(event)) {
-      if (isActivityTaskScheduledEvent(event.initialEvent)) {
-        return `${event.lastEvent.name}: ${event.initialEvent.activityTaskScheduledEventAttributes?.activityType?.name}`;
-      }
+      // if (isActivityTaskScheduledEvent(event.initialEvent)) {
+      //   return `${event.lastEvent.name}: ${event.initialEvent.activityTaskScheduledEventAttributes?.activityType?.name}`;
+      // }
       if (isLocalActivityMarkerEvent(event.lastEvent)) return 'LocalActivity';
       return event.lastEvent.name;
     } else {
       return event.name;
     }
   };
-
-  console.log('SUMMARY CARD RENDERED: ', event.id);
 </script>
 
 <div class="flex gap-2">
@@ -113,7 +111,9 @@
         on:click|stopPropagation={onLinkClick}
         on:keydown={onLinkClick}
       >
-        <div class="primary flex w-full cursor-pointer justify-between">
+        <div
+          class="flex w-full cursor-pointer flex-col justify-between xl:flex-row"
+        >
           <div class="flex items-center gap-4">
             <p>{lastEvent.id}</p>
             <div
@@ -202,7 +202,7 @@
 
 <style lang="postcss">
   .row {
-    @apply w-full flex-wrap items-center rounded-xl border-gray-900 pl-8 pr-2 text-sm no-underline py-2 xl:text-base;
+    @apply w-full flex-wrap items-center rounded-xl border-gray-900 py-2 pl-8 pr-2 text-sm no-underline xl:text-base;
   }
 
   .secondary {

@@ -10,6 +10,7 @@
   import WorkflowQueryV2 from '$lib/components/eventV2/workflow-query-v2.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
   import { page } from '$app/stores';
+  import ScrollToBottom from '$lib/holocene/scroll-to-bottom.svelte';
 
   $: ({ workflow } = $workflowRun);
   $: workflowRelationships = getWorkflowRelationships(workflow, $eventHistory);
@@ -19,8 +20,8 @@
   title={`Workflow History | ${workflow.runId}`}
   url={$page.url.href}
 />
-<div class="flex flex-col xl:flex-row-reverse gap-2">
-  <div class="w-full xl:w-1/3 flex flex-col gap-2">
+<div class="flex flex-col gap-2 xl:flex-row-reverse">
+  <div class="flex w-full flex-col gap-2 xl:w-1/3">
     <WorkflowSummaryV2 />
     <WorkflowRelationshipsV2 {...workflowRelationships} />
     <WorkflowWorkersV2 taskQueue={workflow.taskQueue} />
