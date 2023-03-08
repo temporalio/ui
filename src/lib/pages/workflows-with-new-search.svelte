@@ -39,7 +39,7 @@
   import { toaster } from '$lib/stores/toaster';
   import Drawer from '$lib/holocene/drawer.svelte';
   import OrderableList, {
-    OrderableItem,
+    type OrderableItem,
   } from '$lib/holocene/orderable-list.svelte';
 
   $: bulkActionsEnabled = workflowBulkActionsEnabled(

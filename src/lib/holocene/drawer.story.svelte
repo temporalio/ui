@@ -1,9 +1,7 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
-  import { noop } from 'svelte/internal';
   import Button from './button.svelte';
   import Drawer from './drawer.svelte';
-  import Icon from './icon/icon.svelte';
 
   export let Hst: HST;
 
