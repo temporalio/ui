@@ -36,7 +36,6 @@ export function formatDuration(
 ): string {
   if (duration === null || !duration) return '';
   if (typeof duration === 'string') duration = fromSeconds(duration);
-  // if (typeof duration === 'string') duration = fromMilliseconds(duration);
   return durationToString(duration, { delimiter });
 }
 
