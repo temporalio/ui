@@ -26,7 +26,7 @@
     role="region"
     on:click-outside={onClick}
   >
-    <div class="close-button-wrapper">
+    <div class="close-button-wrapper {position}">
       <IconButton
         icon="close"
         aria-expanded={open}
@@ -43,7 +43,7 @@
       {/if}
     </div>
 
-    <div class="content">
+    <div class="content {position}">
       <slot />
     </div>
   </div>
@@ -58,7 +58,7 @@
     }
 
     &.right {
-      @apply right-0 top-0 bottom-0 h-full px-2 py-32;
+      @apply right-0 top-0 bottom-0 h-full;
     }
 
     &.dark {
@@ -67,14 +67,18 @@
   }
 
   .close-button-wrapper {
-    @apply p-4 pb-0 flex w-full justify-end;
+    @apply p-2 flex w-full justify-end;
+
+    &.right {
+      @apply pb-20;
+    }
   }
 
   .title-wrapper {
-    @apply p-4 pt-0 flex flex-col justify-center;
+    @apply py-4 px-8 flex flex-col justify-center gap-2;
 
     &.bottom {
-      @apply items-center;
+      @apply items-center p-0;
     }
 
     &.right {
@@ -83,10 +87,18 @@
   }
 
   .title-wrapper h1 {
-    @apply text-base font-medium font-primary mb-2;
+    @apply text-base font-medium font-primary;
   }
 
   .content {
-    @apply whitespace-normal px-4;
+    @apply whitespace-normal px-8;
+
+    &.right {
+      @apply py-4;
+    }
+
+    &.bottom {
+      @apply py-8;
+    }
   }
 </style>

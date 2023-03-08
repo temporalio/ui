@@ -21,14 +21,16 @@
   export let availableItems: OrderableItem[] = [];
 
   const addItem = (index: number) => {
-    let tempAvailableItems = [...availableItems];
-    items = [...items, ...tempAvailableItems.splice(index, 1)];
+    const tempAvailableItems = [...availableItems];
+    const [removedItem] = tempAvailableItems.splice(index, 1);
+    items = [...items, removedItem];
     availableItems = tempAvailableItems;
   };
 
   const removeItem = (index: number) => {
-    let tempItems = [...items];
-    availableItems = [...tempItems.splice(index, 1), ...availableItems];
+    const tempItems = [...items];
+    const [removedItem] = tempItems.splice(index, 1);
+    availableItems = [removedItem, ...availableItems];
     items = tempItems;
   };
 
