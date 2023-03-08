@@ -22,7 +22,6 @@
   export let input: string = '';
 
   $: expanded = expandAll || active;
-  let showFullDetails = false;
 
   const onLinkClick = () => {
     expanded = !expanded;
@@ -89,7 +88,7 @@
 
 <style lang="postcss">
   .row {
-    @apply w-full flex-wrap items-center rounded-xl border-gray-900 pl-8 pr-2 text-sm no-underline xl:py-3 xl:text-base;
+    @apply w-full flex-wrap items-center rounded-xl border-gray-900 pl-8 pr-2 text-sm no-underline py-2 xl:text-base;
   }
 
   .failure p {

@@ -10,10 +10,10 @@
   import { noop } from 'svelte/internal';
   import EventCard from './event-card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import EventGroupTimestamp from './event-group-timestamp.svelte';
+  import EventGroupDetails from './event-group-details.svelte';
 
-  export let event: IterableEvent;
+  export let event: WorkflowEvent;
   export let isSubGroup = false;
   export let expandAll = false;
   export let typedError = false;
@@ -34,7 +34,7 @@
   const terminated = eventOrGroupIsTerminated(event);
 </script>
 
-<div class="flex gap-4">
+<div class="flex gap-2">
   <EventGroupTimestamp {event} {isSubGroup} />
   <div class="h-full grow pt-2">
     <EventCard bottom>
@@ -72,16 +72,15 @@
           </div>
         </div>
         {#if expanded}
-          <p>Full Event Details</p>
-          <div class="h-80">
-            <CodeBlock content={stringifyWithBigInt(event)} />
+          <div class="p-2">
+            <EventGroupDetails {event} />
           </div>
         {/if}
       </div>
     </EventCard>
   </div>
 </div>
-<div class="flex gap-4">
+<div class="flex gap-2">
   <div class="w-[20px]" />
   <div class="flex flex-col grow">
     <div class:code-with-stack-trace={stackTrace}>
@@ -112,7 +111,7 @@
 
 <style lang="postcss">
   .row {
-    @apply w-full flex-wrap items-center rounded-xl border-gray-900 pl-8 pr-2 text-sm no-underline xl:py-3 xl:text-base;
+    @apply w-full flex-wrap items-center rounded-xl border-gray-900 pl-8 pr-2 text-sm no-underline py-2 xl:text-base;
   }
 
   .dot {

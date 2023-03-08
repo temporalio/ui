@@ -70,6 +70,7 @@ export const fetchAllEvents = async ({
       return requestFromAPI<GetWorkflowExecutionHistoryResponse>(route, {
         token,
         request: fetch,
+        params: { waitNewEvent: 'true' },
       });
     },
     { onStart, onUpdate, onComplete },
