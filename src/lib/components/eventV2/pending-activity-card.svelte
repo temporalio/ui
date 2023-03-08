@@ -5,7 +5,6 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
 
-  import { timeFormat } from '$lib/stores/time-format';
   import { workflowRun } from '$lib/stores/workflow-run';
 
   import { formatDate } from '$lib/utilities/format-date';
@@ -59,17 +58,18 @@
           </div>
         </div>
         <div class="flex gap-2">
-          <Badge type={failed ? 'error' : 'default'}>
-            {#if failed}
-              <Icon name="retry" />
-            {/if}
-            {event.attempt}
-          </Badge>
           {#if canceled}
             <Tooltip bottom text="Pending activities have been canceled.">
               <Badge type="warning" class="py-0"><Icon name="canceled" /></Badge
               >
             </Tooltip>
+          {:else}
+            <Badge type={failed ? 'error' : 'default'}>
+              {#if failed}
+                <Icon name="retry" />
+              {/if}
+              {event.attempt}
+            </Badge>
           {/if}
           <Icon name={expanded ? 'chevron-up' : 'chevron-down'} class="w-4" />
         </div>

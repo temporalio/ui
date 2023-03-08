@@ -11,6 +11,7 @@
   import PageTitle from '$lib/components/page-title.svelte';
   import { page } from '$app/stores';
   import ScrollToBottom from '$lib/holocene/scroll-to-bottom.svelte';
+  import WorkflowOptionsV2 from '$lib/components/eventV2/workflow-options-v2.svelte';
 
   $: ({ workflow } = $workflowRun);
   $: workflowRelationships = getWorkflowRelationships(workflow, $eventHistory);
@@ -27,6 +28,7 @@
     <WorkflowWorkersV2 taskQueue={workflow.taskQueue} />
     <WorkflowStackTraceV2 />
     <WorkflowQueryV2 />
+    <WorkflowOptionsV2 />
   </div>
   <div class="w-full xl:w-2/3">
     <EventSummaryV2 />

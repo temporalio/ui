@@ -42,12 +42,10 @@
   export let active = false;
   export let onRowClick: () => void = noop;
 
-  let showFullDetails = false;
   $: expanded = expandAll || active;
 
   $: initialEvent = isEventGroup(event) ? event.initialEvent : event;
   $: lastEvent = isEventGroup(event) ? event.lastEvent : event;
-  $: descending = $eventFilterSort === 'descending';
   $: showElapsed = $eventShowElapsed === 'true';
   $: showElapsedTimeDiff =
     showElapsed && initialItem && event.id !== initialItem.id;
@@ -63,7 +61,7 @@
           : previousItem?.eventTime,
         end: lastEvent?.eventTime,
       });
-      timeDiffChange = timeDiff ? `(${descending ? '-' : '+'}${timeDiff})` : '';
+      timeDiffChange = timeDiff ? `(+${timeDiff})` : '';
     }
   }
 
@@ -82,9 +80,9 @@
 
   const getEventGroupName = (event: IterableEvent) => {
     if (isEventGroup(event)) {
-      // if (isActivityTaskScheduledEvent(event.initialEvent)) {
-      //   return `${event.lastEvent.name}: ${event.initialEvent.activityTaskScheduledEventAttributes?.activityType?.name}`;
-      // }
+      if (isActivityTaskScheduledEvent(event.initialEvent)) {
+        return `${event.lastEvent.name}: ${event.initialEvent.activityTaskScheduledEventAttributes?.activityType?.name}`;
+      }
       if (isLocalActivityMarkerEvent(event.lastEvent)) return 'LocalActivity';
       return event.lastEvent.name;
     } else {
@@ -94,7 +92,7 @@
 </script>
 
 <div class="flex gap-2">
-  <EventGroupTimestamp {event} {isSubGroup} />
+  <EventGroupTimestamp {event} />
   <div class="h-full grow pt-2">
     {#if pendingActivity}
       <PendingActivityCard event={pendingActivity} />
@@ -188,15 +186,8 @@
           <EventGroupDetails event={lastEvent} />
         </div>
       {/if}
-      {#if showFullDetails && !hasGroupEvents}
-        <div class="p-2">
-          <p>Full Event Details</p>
-          <div class="h-80">
-            <CodeBlock content={stringifyWithBigInt(lastEvent)} />
-          </div>
-        </div>
-      {/if}
     </EventCard>
+    <slot name="subgroups" />
   </div>
 </div>
 

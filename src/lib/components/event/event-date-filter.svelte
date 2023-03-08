@@ -19,6 +19,7 @@
   import { getDateFilterValue } from '$lib/utilities/event-formatting';
 
   export let compact: boolean;
+  export let hideSort = false;
 
   let sortOptions: EventSortOrderOptions = [
     { label: 'Sort 1-9', option: 'ascending' },
@@ -66,23 +67,24 @@
     <span class="block md:hidden"><Icon name="clock" /></span>
   </svelte:fragment>
   <div class="w-56">
-    {#each sortOptions as { option, label } (option)}
-      <div class="option" class:active={$eventFilterSort === option}>
-        <div class="check active">
-          {#if $eventFilterSort === option}
-            <Icon name="checkmark" />
-          {/if}
+    {#if !hideSort}
+      {#each sortOptions as { option, label } (option)}
+        <div class="option" class:active={$eventFilterSort === option}>
+          <div class="check active">
+            {#if $eventFilterSort === option}
+              <Icon name="checkmark" />
+            {/if}
+          </div>
+          <button on:click={() => onSortOptionClick(option)}>
+            {label}
+          </button>
         </div>
-        <button on:click={() => onSortOptionClick(option)}>
-          {label}
-        </button>
+      {/each}
+      <div class="option pr-4">
+        <div class="check" />
+        <div class="my-2 w-full border-b-2 border-gray-300 pr-2" />
       </div>
-    {/each}
-
-    <div class="option pr-4">
-      <div class="check" />
-      <div class="my-2 w-full border-b-2 border-gray-300 pr-2" />
-    </div>
+    {/if}
     {#each dateOptions as { label, option } (option)}
       <div class="option" class:active={$timeFormat === option}>
         <div class="check active">

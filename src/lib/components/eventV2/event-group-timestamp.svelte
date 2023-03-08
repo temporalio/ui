@@ -7,7 +7,8 @@
   } from '$lib/models/event-groups/get-event-in-group';
 
   export let event: IterableEvent;
-  export let isSubGroup = false;
+  export let first = false;
+  export let last = false;
 
   const failure = eventOrGroupIsFailureOrTimedOut(event);
   const canceled = eventOrGroupIsCanceled(event);
@@ -16,21 +17,19 @@
 </script>
 
 <div class="flex w-[20px] min-w-[20px] flex-col items-center justify-center">
-  <div class="flex h-1/2 w-[10x] gap-0">
+  <div class="flex h-[40px] w-[10x] gap-0" class:first class:last>
     <div class="w-[4px]" />
     <div class="w-[2px] bg-gray-900" />
     <div class="w-[4px]" />
   </div>
   <div
-    class="grow"
-    class:dot={!isSubGroup}
-    class:subgroup-dot={isSubGroup}
+    class="dot"
     class:failure
     class:canceled
     class:terminated
     class:completed
   />
-  <div class="flex h-1/2 w-[10x] gap-0">
+  <div class="flex w-[10x] grow gap-0">
     <div class="w-[4px]" />
     <div class="w-[2px] bg-gray-900" />
     <div class="w-[4px]" />
@@ -42,8 +41,12 @@
     @apply h-3 w-3 rounded-full border-3 border-gray-900 bg-gray-900;
   }
 
-  .subgroup-dot {
-    @apply h-3 w-3 rounded-full border-2 border-gray-900 bg-gray-900;
+  .first {
+    @apply h-[0px];
+  }
+
+  .last {
+    @apply h-full;
   }
 
   .dot.completed {

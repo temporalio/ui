@@ -12,14 +12,15 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import EventGroupTimestamp from './event-group-timestamp.svelte';
   import EventGroupDetails from './event-group-details.svelte';
+  import { formatDate } from '$lib/utilities/format-date';
+  import { timeFormat } from '$lib/stores/time-format';
 
   export let event: WorkflowEvent;
-  export let isSubGroup = false;
   export let expandAll = false;
   export let typedError = false;
   export let active = false;
   export let onRowClick: () => void = noop;
-  export let input: string = '';
+  export let content: string = '';
 
   $: expanded = expandAll || active;
 
@@ -34,14 +35,14 @@
 </script>
 
 <div class="flex gap-2">
-  <div class="w-[20px]" />
-  <div class="flex grow flex-col">
-    <CodeBlock content={input} title="Input" icon="json" class="h-auto" />
+  <div class="w-[20px] min-w-[20px]" />
+  <div class="flex grow flex-col overflow-auto">
+    <CodeBlock {content} title="Input" icon="json" class="h-auto" />
   </div>
 </div>
 <div class="flex gap-2">
-  <EventGroupTimestamp {event} {isSubGroup} />
-  <div class="h-full grow pb-2">
+  <EventGroupTimestamp {event} first />
+  <div class="h-full grow">
     <EventCard top>
       <div
         class="row"
@@ -64,18 +65,22 @@
               class:terminated
             >
               <p
-                class="event-name truncate text-sm font-semibold md:text-base xl:{isSubGroup
-                  ? 'text-base'
-                  : 'text-lg'}"
+                class="event-name truncate text-sm font-semibold md:text-base xl:text-lg"
               >
                 {event.name}
               </p>
             </div>
           </div>
-          <div class="flex">
+          <div class="flex gap-2">
+            <EventGroupDetails {event} primary />
             <Icon name={expanded ? 'chevron-up' : 'chevron-down'} class="w-4" />
           </div>
         </div>
+        <p
+          class="break-word leading-0 truncate text-left md:whitespace-normal md:text-[12px]"
+        >
+          {formatDate(event?.eventTime, $timeFormat)}
+        </p>
       </div>
       {#if expanded}
         <div class="p-2">

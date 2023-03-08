@@ -86,14 +86,17 @@ const createGroupFor = <K extends keyof StartingEvents>(
   };
 };
 
-export const createEventGroup = (event: CommonHistoryEvent): EventGroup => {
+export const createEventGroup = (
+  event: CommonHistoryEvent,
+  includeWorkflowTasks = false,
+): EventGroup => {
   if (isStartChildWorkflowExecutionInitiatedEvent(event))
     return createGroupFor<'ChildWorkflow'>(event);
 
   if (isWorkflowExecutionSignaledEvent(event))
     return createGroupFor<'SignalReceived'>(event);
 
-  if (isWorkflowTaskScheduledEvent(event)) {
+  if (isWorkflowTaskScheduledEvent(event) && includeWorkflowTasks) {
     return createGroupFor<'WorkflowTask'>(event);
   }
 
