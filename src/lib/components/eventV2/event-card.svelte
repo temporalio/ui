@@ -3,6 +3,7 @@
   export let thick = false;
   export let top = false;
   export let bottom = false;
+  export let pending = false;
 </script>
 
 <div
@@ -10,6 +11,7 @@
   class:shadow={thick}
   class:top
   class:bottom
+  class:pending
   class:expanded={thick && expanded}
 >
   <slot />
@@ -17,7 +19,11 @@
 
 <style lang="postcss">
   .card {
-    @apply relative select-none rounded-xl bg-white border-3 border-gray-900 p-0;
+    @apply grow relative select-none rounded-xl bg-white border-3 border-gray-900 p-0;
+  }
+
+  .pending {
+    @apply border-dashed bg-red-100;
   }
 
   .expanded {

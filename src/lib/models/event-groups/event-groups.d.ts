@@ -12,7 +12,9 @@ interface EventGroup
   initialEvent: WorkflowEvent;
   lastEvent: WorkflowEvent;
   eventList: WorkflowEvent[];
-  subGroups: EventGroup[];
+  subGroups: Map<EventId, EventGroup>;
+  subGroupList: EventGroup[];
+  pendingActivity: PendingActivity | undefined;
   isFailureOrTimedOut: boolean;
   isCanceled: boolean;
   isTerminated: boolean;

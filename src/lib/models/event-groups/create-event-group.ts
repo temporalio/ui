@@ -54,7 +54,8 @@ const createGroupFor = <K extends keyof StartingEvents>(
     timestamp,
     category,
     classification,
-    subGroups: [],
+    subGroups: new Map(),
+    pendingActivity: undefined,
     get eventTime() {
       return this.lastEvent?.eventTime;
     },
@@ -63,6 +64,9 @@ const createGroupFor = <K extends keyof StartingEvents>(
     },
     get eventList() {
       return Array.from(this.events, ([_key, value]) => value);
+    },
+    get subGroupList() {
+      return Array.from(this.subGroups, ([_key, value]) => value);
     },
     get lastEvent() {
       return getLastEvent(this);
