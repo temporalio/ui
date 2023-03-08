@@ -35,7 +35,7 @@
 
 <div class="flex gap-2">
   <div class="w-[20px]" />
-  <div class="flex flex-col grow">
+  <div class="flex grow flex-col">
     <CodeBlock content={input} title="Input" icon="json" class="h-auto" />
   </div>
 </div>
@@ -88,7 +88,7 @@
 
 <style lang="postcss">
   .row {
-    @apply w-full flex-wrap items-center rounded-xl border-gray-900 pl-8 pr-2 text-sm no-underline py-2 xl:text-base;
+    @apply w-full flex-wrap items-center rounded-xl border-gray-900 py-2 pl-8 pr-2 text-sm no-underline xl:text-base;
   }
 
   .failure p {

@@ -52,7 +52,12 @@
   };
 </script>
 
-<Accordion title="Stack Trace">
+<Accordion title="Stack Trace" readOnly={!workflow?.isRunning}>
+  <p slot="summary">
+    {#if !workflow?.isRunning}
+      Completed workflow
+    {/if}
+  </p>
   {#if workflow?.isRunning && workers?.pollers?.length > 0}
     {#await stackTrace}
       <div class="text-center">
@@ -66,7 +71,7 @@
         </Button>
         <p>Stack Trace at {currentdate.toLocaleTimeString()}</p>
       </div>
-      <div class="flex items-start h-full">
+      <div class="flex items-start h-auto">
         <CodeBlock
           content={result}
           language="text"
@@ -79,16 +84,14 @@
         content="Please make sure you have at least one worker running."
       />
     {/await}
-  {:else}
+  {:else if workflow?.isRunning && workers?.pollers?.length === 0}
     <EmptyState title="No Stack Traces Found" testId="query-stack-trace-empty">
-      {#if workflow?.isRunning && workers?.pollers?.length === 0}
-        <p>
-          To enable <Link
-            href="https://docs.temporal.io/workflows#stack-trace-query"
-            >stack traces</Link
-          >, run a Worker on the {workflow?.taskQueue} Task Queue.
-        </p>
-      {/if}
+      <p>
+        To enable <Link
+          href="https://docs.temporal.io/workflows#stack-trace-query"
+          >stack traces</Link
+        >, run a Worker on the {workflow?.taskQueue} Task Queue.
+      </p>
     </EmptyState>
   {/if}
 </Accordion>

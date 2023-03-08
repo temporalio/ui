@@ -33,7 +33,7 @@
   $: failed = event.attempt > 1;
 </script>
 
-<div class="flex grow gap-2 w-full mb-2">
+<div class="mb-2 flex w-full grow gap-2">
   <EventCard {expanded} pending>
     <div
       class="row"
@@ -48,7 +48,7 @@
       <div class="primary flex w-full cursor-pointer justify-between">
         <div class="flex items-center gap-4">
           <div
-            class="py-1 px-2 rounded-xl bg-lightBlue border-3 border-gray-900"
+            class="rounded-xl border-3 border-gray-900 bg-lightBlue py-1 px-2"
           >
             In progress
           </div>

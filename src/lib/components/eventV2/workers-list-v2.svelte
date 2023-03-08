@@ -14,7 +14,7 @@
 </script>
 
 <section class="flex flex-col gap-4">
-  <Table class="mb-6 w-full table">
+  <Table class="mb-6 table w-full">
     <TableHeaderRow slot="headers">
       <th class="table-cell">ID</th>
       <th class="table-cell">Last Accessed</th>
