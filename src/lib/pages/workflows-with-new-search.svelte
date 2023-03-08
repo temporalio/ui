@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { noop } from 'svelte/internal';
   import { page } from '$app/stores';
   import { timeFormat } from '$lib/stores/time-format';
   import {
@@ -37,7 +38,9 @@
   import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
   import { toaster } from '$lib/stores/toaster';
   import Drawer from '$lib/holocene/drawer.svelte';
-  import OrderableList from '$lib/holocene/orderable-list.svelte';
+  import OrderableList, {
+    OrderableItem,
+  } from '$lib/holocene/orderable-list.svelte';
 
   $: bulkActionsEnabled = workflowBulkActionsEnabled(
     $page.data.settings,
@@ -49,12 +52,9 @@
   let batchCancelConfirmationModal: BatchOperationConfirmationModal;
   let allSelected: boolean = false;
   let pageSelected: boolean = false;
-  let customizationDrawerOpen: boolean = false;
-  let columns: {
-    label: string;
-    key: string;
-    locked?: boolean;
-  }[] = [
+
+  // let customizationDrawerOpen: boolean = false;
+  let columns: OrderableItem[] = [
     { label: 'Status', key: 'status', locked: true },
     { label: 'Workflow ID', key: 'id', locked: true },
     { label: 'Run ID', key: 'runId' },
@@ -63,7 +63,7 @@
     { label: 'End', key: 'endTime' },
   ];
 
-  let availableColumns = [
+  let availableColumns: OrderableItem[] = [
     { label: 'Custom Search Attributes', key: 'customSearchAttributes' },
     { label: 'Execution Time', key: 'executionTime' },
     { label: 'History Length', key: 'historyLength' },
@@ -222,13 +222,13 @@
     }
   };
 
-  const openCustomizationDrawer = () => {
-    customizationDrawerOpen = true;
-  };
+  // const openCustomizationDrawer = () => {
+  //   customizationDrawerOpen = true;
+  // };
 
-  const closeCustomizationDrawer = () => {
-    customizationDrawerOpen = false;
-  };
+  // const closeCustomizationDrawer = () => {
+  //   customizationDrawerOpen = false;
+  // };
 
   $: batchOperationQuery = !$workflowsQuery
     ? 'ExecutionStatus="Running"'
@@ -333,7 +333,6 @@
     on:cancelWorkflows={() => batchCancelConfirmationModal.open()}
     on:toggleAll={handleToggleAll}
     on:togglePage={handleTogglePage}
-    {openCustomizationDrawer}
   >
     {#each visibleItems as event}
       <WorkflowsSummaryRowWithFilters
@@ -375,8 +374,8 @@
 </Pagination>
 
 <Drawer
-  open={customizationDrawerOpen}
-  onClick={closeCustomizationDrawer}
+  open={false}
+  onClick={noop}
   position="right"
   dark={false}
   title="Configure Workflow List"

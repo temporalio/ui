@@ -1,3 +1,11 @@
+<script lang="ts" context="module">
+  export interface OrderableItem {
+    label: string;
+    key: string;
+    locked?: boolean;
+  }
+</script>
+
 <script lang="ts">
   import IconButton from './icon-button.svelte';
   import Icon from './icon/icon.svelte';
@@ -5,12 +13,6 @@
   type ExtendedDragEvent = DragEvent & {
     currentTarget: EventTarget & HTMLLIElement;
   };
-
-  interface OrderableItem {
-    label: string;
-    key: string;
-    locked?: boolean;
-  }
 
   interface $$Props {
     items: OrderableItem[];
