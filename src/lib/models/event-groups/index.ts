@@ -20,7 +20,7 @@ const addToExistingGroup = (group: EventGroup, event: WorkflowEvent): void => {
 export const groupEvents = (
   events: CommonHistoryEvent[],
   sort: EventSortOrder = 'ascending',
-  pendingActivities: PendingActivity[],
+  pendingActivities: PendingActivity[] = [],
 ): EventGroups => {
   const groupMap: Record<string, EventGroup> = {};
 
@@ -44,7 +44,6 @@ export const groupEvents = (
     );
     if (pendingActivityForGroup) {
       group.pendingActivity = pendingActivityForGroup;
-      console.log('Group with pending activity: ', group);
     }
     const workflowTaskId =
       isSubrowActivity(initialEvent) &&

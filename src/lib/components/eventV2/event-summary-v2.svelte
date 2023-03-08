@@ -9,11 +9,16 @@
   import EventGroupSummaryCard from './event-group-summary-card.svelte';
   import InitialEventCard from './initial-event-card.svelte';
   import LastEventCard from './last-event-card.svelte';
-  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
+  import {
+    getWorkflowStartedCompletedAndTaskFailedEvents,
+    isCompletionEvent,
+  } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { getStackTrace } from '$lib/utilities/get-single-attribute-for-event';
   import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { importEvents } from '$lib/stores/import-events';
   import PendingActivityCard from './pending-activity-card.svelte';
+  import { toEventHistory } from '$lib/models/event-history';
+  import { isWorkflowExecutionCompletedEvent } from '$lib/utilities/is-event-type';
 
   export let importingHistory = false;
 
@@ -23,6 +28,20 @@
 
   const resetFullHistory = () => {
     fullHistory = [];
+  };
+
+  const onUpdate = async ({ history }) => {
+    const { settings } = $page.data;
+    fullHistory = await toEventHistory({
+      response: history.events,
+      namespace,
+      settings,
+      accessToken: $authUser?.accessToken,
+    });
+    const lastEvent = fullHistory[fullHistory.length - 1];
+    if (isCompletionEvent(lastEvent)) {
+      $refresh = Date.now();
+    }
   };
 
   const fetchEvents = async (
@@ -40,11 +59,12 @@
         settings,
         accessToken: $authUser?.accessToken,
         sort: 'ascending',
+        onUpdate,
       });
     }
   };
 
-  $: $refresh, fetchEvents(namespace, workflowId, runId);
+  $: fetchEvents(namespace, workflowId, runId);
 
   const getGroups = (
     events: CommonHistoryEvent[],
@@ -55,13 +75,13 @@
       return groupEvents(
         filteredEvents,
         'ascending',
-        $workflowRun.workflow.pendingActivities,
+        $workflowRun?.workflow?.pendingActivities ?? [],
       );
     }
     return groupEvents(
       events,
       'ascending',
-      $workflowRun.workflow.pendingActivities,
+      $workflowRun?.workflow?.pendingActivities ?? [],
     );
   };
 
@@ -81,6 +101,7 @@
   $: finalItem = currentEvents?.[currentEvents?.length - 1];
   $: uniqueFinalItem =
     finalItem &&
+    finalItem.id !== initialItem.id &&
     !items.find(
       (group) =>
         group.eventList.find((e) => e.id === finalItem.id) ||

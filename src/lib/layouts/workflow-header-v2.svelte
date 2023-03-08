@@ -1,90 +1,34 @@
 <script lang="ts">
-  import { onDestroy, onMount } from 'svelte';
   import { fly } from 'svelte/transition';
 
-  import { autoRefreshWorkflow } from '$lib/stores/event-view';
   import { workflowsQuery, workflowsSearch } from '$lib/stores/workflows';
-  import { refresh, workflowRun } from '$lib/stores/workflow-run';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import { eventHistory } from '$lib/stores/events';
 
   import {
     routeForEventHistory,
-    routeForPendingActivities,
-    routeForStackTrace,
-    routeForWorkers,
-    routeForWorkflowQuery,
     routeForWorkflowsWithQuery,
   } from '$lib/utilities/route-for';
   import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
-  import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/components/copyable.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
-  import Tab from '$lib/holocene/tab.svelte';
-  import { page } from '$app/stores';
-  import { pathMatches } from '$lib/utilities/path-matches';
-  import AutoRefreshWorkflow from '$lib/components/auto-refresh-workflow.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { has } from '$lib/utilities/has';
   import Link from '$lib/holocene/link.svelte';
-  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
-  import { featureFlags } from '$lib/stores/feature-flags';
 
   export let namespace: string;
 
-  $: ({ workflow, workers } = $workflowRun);
-
-  let refreshInterval;
-  const refreshRate = 15000;
-
-  $: routeParameters = {
-    namespace,
-    workflow: workflow?.id,
-    run: workflow?.runId,
-  };
+  $: ({ workflow } = $workflowRun);
 
   const { parameters, searchType } = $workflowsSearch;
   const query = toListWorkflowQuery(parameters);
 
   $: isRunning = $workflowRun?.workflow?.isRunning;
-  $: activitiesCanceled = ['Terminated', 'TimedOut', 'Canceled'].includes(
-    $workflowRun.workflow?.status,
-  );
-
-  onMount(() => {
-    if (isRunning && $autoRefreshWorkflow === 'on') {
-      // Auto-refresh of 15 seconds if turned on
-      clearInterval(refreshInterval);
-      refreshInterval = setInterval(() => ($refresh = Date.now()), refreshRate);
-    }
-  });
-
-  $: {
-    if (!isRunning) {
-      // Stop refresh if worfklow is no longer running
-      clearInterval(refreshInterval);
-    }
-  }
-
-  const onRefreshChange = () => {
-    if ($autoRefreshWorkflow === 'on') {
-      $autoRefreshWorkflow = 'off';
-      clearInterval(refreshInterval);
-    } else {
-      $refresh = Date.now();
-      $autoRefreshWorkflow = 'on';
-      clearInterval(refreshInterval);
-      refreshInterval = setInterval(() => ($refresh = Date.now()), refreshRate);
-    }
-  };
-
-  onDestroy(() => {
-    clearInterval(refreshInterval);
-  });
 
   $: cancelInProgress = isCancelInProgress(
     $workflowRun?.workflow?.status,
@@ -132,7 +76,6 @@
       <div
         class="flex flex-col items-center justify-center gap-4 whitespace-nowrap sm:flex-row lg:justify-end"
       >
-        <AutoRefreshWorkflow onChange={onRefreshChange} />
         <WorkflowActions {cancelInProgress} {workflow} {namespace} />
       </div>
     {/if}

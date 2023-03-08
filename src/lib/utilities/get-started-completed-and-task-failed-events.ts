@@ -35,7 +35,9 @@ const isStartedEvent = (
   return !!event.workflowExecutionStartedEventAttributes;
 };
 
-const isCompletionEvent = (event: WorkflowEvent): event is CompletionEvent => {
+export const isCompletionEvent = (
+  event: WorkflowEvent,
+): event is CompletionEvent => {
   for (const completionType of completedEventTypes) {
     if (event.eventType === completionType) return true;
   }

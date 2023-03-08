@@ -91,6 +91,8 @@
       return event.name;
     }
   };
+
+  console.log('SUMMARY CARD RENDERED: ', event.id);
 </script>
 
 <div class="flex gap-2">
@@ -200,7 +202,7 @@
 
 <style lang="postcss">
   .row {
-    @apply w-full flex-wrap items-center rounded-xl border-gray-900 pl-8 pr-2 text-sm no-underline xl:py-3 xl:text-base;
+    @apply w-full flex-wrap items-center rounded-xl border-gray-900 pl-8 pr-2 text-sm no-underline py-2 xl:text-base;
   }
 
   .secondary {
