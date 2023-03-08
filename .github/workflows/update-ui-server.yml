@@ -15,8 +15,6 @@ jobs:
           submodules: true
       - name: Checkout and Setup Node
         uses: ./.github/actions/checkout-and-setup
-      - name: Build UI
-        run: pnpm build:server
 
       - uses: actions/setup-go@v3
         with:
@@ -28,7 +26,7 @@ jobs:
         with:
           version: '3.x'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build
+      - name: Build GRPC
         run: cd server && make install-utils build-grpc
 
       - name: Checkout UI Server
@@ -38,12 +36,40 @@ jobs:
           path: ui-server
           ref: main
           token: ${{ secrets.COMMANDER_DATA_TOKEN }}
-      - name: Sync
+
+      - name: Build UI
+        run: pnpm build:server
+
+      - name: Sync UI Server
         run: |
           rm -rf ui-server/*
           rm -rf server/proto/dependencies/api
           cp -r server/* ui-server
           cd ui-server
+          git config --local user.name 'Temporal Data (cicd)'
+          git config --local user.email 'commander-data@temporal.io'
+          git add .
+          git commit -m "Update UI Server" && git push || echo "No changes to commit"
+
+      - name: Checkout Cloud UI Server
+        uses: actions/checkout@v3
+        with:
+          repository: temporalio/ui-server
+          path: cloud-ui-server
+          ref: cloud
+          token: ${{ secrets.COMMANDER_DATA_TOKEN }}
+
+      - name: Build Cloud UI
+        env:
+          VITE_TEMPORAL_UI_BUILD_TARGET: cloud
+        run: pnpm build:server
+
+      - name: Sync Cloud UI Server
+        run: |
+          rm -rf cloud-ui-server/*
+          rm -rf server/proto/dependencies/api
+          cp -r server/* cloud-ui-server
+          cd cloud-ui-server
           git config --local user.name 'Temporal Data (cicd)'
           git config --local user.email 'commander-data@temporal.io'
           git add .

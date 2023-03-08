@@ -5,9 +5,6 @@ FROM ${BASE_BUILDER_IMAGE} AS server-builder
 
 WORKDIR /home/server-builder
 
-COPY Makefile ./
-RUN make install-utils
-
 COPY go.mod go.sum ./
 RUN go mod download
 
