@@ -1,11 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import {
-    eventFilterSort,
-    type EventSortOrder,
-    expandAllEvents,
-  } from '$lib/stores/event-view';
-  import { refresh } from '$lib/stores/workflow-run';
+  import { refresh, workflowRun } from '$lib/stores/workflow-run';
   import { eventHistory } from '$lib/stores/events';
   import { authUser } from '$lib/stores/auth-user';
 
@@ -17,71 +12,85 @@
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { getStackTrace } from '$lib/utilities/get-single-attribute-for-event';
   import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
+  import { importEvents } from '$lib/stores/import-events';
+  import PendingActivityCard from './pending-activity-card.svelte';
 
-  export let compact = true;
+  export let importingHistory = false;
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
 
   let fullHistory: CommonHistoryEvent[] = [];
-  let loading: boolean = true;
 
   const resetFullHistory = () => {
     fullHistory = [];
-    loading = true;
   };
 
   const fetchEvents = async (
     namespace: string,
     workflowId: string,
     runId: string,
-    sort: EventSortOrder,
   ) => {
-    const { settings } = $page.data;
-    resetFullHistory();
-    fullHistory = await fetchAllEvents({
-      namespace,
-      workflowId,
-      runId,
-      settings,
-      accessToken: $authUser?.accessToken,
-      sort: compact ? 'ascending' : sort,
-    });
-    loading = false;
-  };
-
-  $: $refresh, fetchEvents(namespace, workflowId, runId, $eventFilterSort);
-
-  const getEventsOrGroups = (
-    items: CommonHistoryEvent[],
-    category: string,
-  ): IterableEvent[] => {
-    if (category) {
-      const filteredItems = items.filter((i) => i.category === category);
-      return compact
-        ? groupEvents(filteredItems, $eventFilterSort)
-        : filteredItems;
+    if (!importingHistory) {
+      const { settings } = $page.data;
+      resetFullHistory();
+      fullHistory = await fetchAllEvents({
+        namespace,
+        workflowId,
+        runId,
+        settings,
+        accessToken: $authUser?.accessToken,
+        sort: 'ascending',
+      });
     }
-    return compact ? groupEvents(items, $eventFilterSort) : items;
   };
 
+  $: $refresh, fetchEvents(namespace, workflowId, runId);
+
+  const getGroups = (
+    events: CommonHistoryEvent[],
+    category: string,
+  ): EventGroups => {
+    if (category) {
+      const filteredEvents = events.filter((i) => i.category === category);
+      return groupEvents(
+        filteredEvents,
+        'ascending',
+        $workflowRun.workflow.pendingActivities,
+      );
+    }
+    return groupEvents(
+      events,
+      'ascending',
+      $workflowRun.workflow.pendingActivities,
+    );
+  };
+
+  // Make into derived store?
+  $: history = importingHistory
+    ? { start: $importEvents, end: $importEvents }
+    : $eventHistory;
   $: category = $page.url.searchParams.get('category');
-  $: intialEvents =
-    $eventFilterSort === 'descending' && !compact
-      ? $eventHistory?.end
-      : $eventHistory?.start;
-  $: currentEvents = fullHistory.length ? fullHistory : intialEvents;
-  $: items = getEventsOrGroups(currentEvents, category);
-  $: initialItem =
-    $eventFilterSort === 'descending'
-      ? currentEvents?.[currentEvents?.length - 1]
-      : currentEvents?.[0];
-  $: finalItem =
-    $eventFilterSort === 'descending'
-      ? currentEvents?.[0]
-      : currentEvents?.[currentEvents?.length - 1];
+  $: intialEvents = history.start;
+  $: currentEvents = importingHistory
+    ? $importEvents
+    : fullHistory.length
+    ? fullHistory
+    : intialEvents;
+  $: items = getGroups(currentEvents, category);
+  $: initialItem = currentEvents?.[0];
+  $: finalItem = currentEvents?.[currentEvents?.length - 1];
+  $: uniqueFinalItem =
+    finalItem &&
+    !items.find(
+      (group) =>
+        group.eventList.find((e) => e.id === finalItem.id) ||
+        group.subGroupList.find((g) =>
+          g.eventList.find((e) => e.id === finalItem.id),
+        ),
+    );
 
   $: ({ input, results } =
-    getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory));
+    getWorkflowStartedCompletedAndTaskFailedEvents(history));
   $: stackTrace = results && getStackTrace(parseWithBigInt(results));
 </script>
 
@@ -97,9 +106,9 @@
     {/if}
     {#each items as item}
       <EventGroupSummaryCard event={item} visibleItems={items} {initialItem} />
-      {#if isEventGroup(item) && item?.subGroups?.length}
+      {#if isEventGroup(item) && item?.subGroupList?.length}
         <div class="flex w-full flex-col pl-12">
-          {#each item?.subGroups as group}
+          {#each item?.subGroupList as group}
             <EventGroupSummaryCard
               isSubGroup
               event={group}
@@ -110,7 +119,7 @@
         </div>
       {/if}
     {/each}
-    {#if finalItem}
+    {#if uniqueFinalItem}
       <LastEventCard
         event={finalItem}
         {results}

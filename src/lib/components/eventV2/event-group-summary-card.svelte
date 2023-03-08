@@ -22,7 +22,7 @@
   import { noop } from 'svelte/internal';
   import { isEventGroup } from '$lib/models/event-groups';
   import EventCard from './event-card.svelte';
-  import PrimaryEventGroupDetails from './primary-event-group-details.svelte';
+  import EventGroupDetails from './event-group-details.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import {
@@ -31,6 +31,7 @@
   } from '$lib/utilities/get-single-attribute-for-event';
   import { getAttributePayloads } from './event-detail-keys';
   import EventGroupTimestamp from './event-group-timestamp.svelte';
+  import PendingActivityCard from './pending-activity-card.svelte';
 
   export let event: IterableEvent;
   export let visibleItems: IterableEvent[];
@@ -77,6 +78,7 @@
 
   $: hasGroupEvents = isEventGroup(event) && event?.eventList?.length > 1;
   $: payloadAttributes = getAttributePayloads(event.attributes);
+  $: pendingActivity = isEventGroup(event) && event?.pendingActivity;
 
   const getEventGroupName = (event: IterableEvent) => {
     if (isEventGroup(event)) {
@@ -94,6 +96,9 @@
 <div class="flex gap-2">
   <EventGroupTimestamp {event} {isSubGroup} />
   <div class="h-full grow pt-2">
+    {#if pendingActivity}
+      <PendingActivityCard event={pendingActivity} />
+    {/if}
     <EventCard thick={hasGroupEvents} {expanded}>
       <div
         class="row"
@@ -123,9 +128,12 @@
                 {getEventGroupName(event)}
               </p>
             </div>
-            <PrimaryEventGroupDetails event={lastEvent} primary />
           </div>
-          <div class="flex">
+          <div class="flex gap-2">
+            <EventGroupDetails event={initialEvent} primary />
+            {#if payloadAttributes.length}
+              <Icon name="terminal" />
+            {/if}
             <Icon name={expanded ? 'chevron-up' : 'chevron-down'} class="w-4" />
           </div>
         </div>
@@ -175,7 +183,7 @@
               {/if}
             </div>
           {/each}
-          <PrimaryEventGroupDetails event={lastEvent} />
+          <EventGroupDetails event={lastEvent} />
         </div>
       {/if}
       {#if showFullDetails && !hasGroupEvents}

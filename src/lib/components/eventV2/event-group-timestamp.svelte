@@ -15,7 +15,7 @@
   const completed = eventOrGroupIsCompleted(event);
 </script>
 
-<div class="flex w-[20px] flex-col items-center justify-center">
+<div class="flex w-[20px] min-w-[20px] flex-col items-center justify-center">
   <div class="flex h-1/2 w-[10x] gap-0">
     <div class="w-[4px]" />
     <div class="w-[2px] bg-gray-900" />
@@ -38,18 +38,6 @@
 </div>
 
 <style lang="postcss">
-  .row {
-    @apply w-full flex-wrap items-center rounded-xl border-gray-900 pl-8 pr-2 text-sm no-underline xl:py-3 xl:text-base;
-  }
-
-  .secondary {
-    @apply mt-4 flex flex-col gap-2;
-  }
-
-  .expanded.row {
-    @apply bg-gray-50;
-  }
-
   .dot {
     @apply h-3 w-3 rounded-full border-3 border-gray-900 bg-gray-900;
   }
@@ -72,25 +60,5 @@
 
   .dot.terminated {
     @apply bg-pink-500 border-pink-500;
-  }
-
-  .expanded-cell {
-    @apply table-cell w-full flex-wrap text-sm no-underline xl:text-base;
-  }
-
-  .typedError .expanded-cell {
-    @apply border-b-0;
-  }
-
-  .row.typedError {
-    @apply rounded-lg;
-
-    &.expanded {
-      @apply rounded-b-none;
-    }
-  }
-
-  .active {
-    @apply z-50 cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
   }
 </style>

@@ -29,7 +29,7 @@
 </script>
 
 {#if typeof value !== 'object'}
-  <div class="flex h-auto items-center gap-1">
+  <div class="flex h-auto items-center justify-between gap-1">
     <p class="text-[12px]">{format(key)}</p>
     <Badge type="alpha">
       {#if shouldDisplayAsExecutionLink(key)}

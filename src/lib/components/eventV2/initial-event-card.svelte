@@ -10,9 +10,8 @@
   import { noop } from 'svelte/internal';
   import EventCard from './event-card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import EventGroupTimestamp from './event-group-timestamp.svelte';
-  import PrimaryEventGroupDetails from './primary-event-group-details.svelte';
+  import EventGroupDetails from './event-group-details.svelte';
 
   export let event: WorkflowEvent;
   export let isSubGroup = false;
@@ -81,13 +80,7 @@
       </div>
       {#if expanded}
         <div class="p-2">
-          <!-- <PrimaryEventGroupDetails {event} /> -->
-        </div>
-      {/if}
-      {#if showFullDetails}
-        <p>Full Event Details</p>
-        <div class="h-80">
-          <CodeBlock content={stringifyWithBigInt(event)} />
+          <EventGroupDetails {event} />
         </div>
       {/if}
     </EventCard>
