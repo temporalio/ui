@@ -38,9 +38,7 @@
   import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
   import { toaster } from '$lib/stores/toaster';
   import Drawer from '$lib/holocene/drawer.svelte';
-  import OrderableList, {
-    type OrderableItem,
-  } from '$lib/holocene/orderable-list.svelte';
+  import OrderableList from '$lib/holocene/orderable-list.svelte';
 
   $: bulkActionsEnabled = workflowBulkActionsEnabled(
     $page.data.settings,
@@ -54,22 +52,22 @@
   let pageSelected: boolean = false;
 
   // let customizationDrawerOpen: boolean = false;
-  let columns: OrderableItem[] = [
-    { label: 'Status', key: 'status', locked: true },
-    { label: 'Workflow ID', key: 'id', locked: true },
-    { label: 'Run ID', key: 'runId' },
-    { label: 'Type', key: 'name' },
-    { label: 'Start', key: 'startTime' },
-    { label: 'End', key: 'endTime' },
+  let columns: string[] = [
+    'Status',
+    'Workflow ID',
+    'Run ID',
+    'Type',
+    'Start',
+    'End',
   ];
 
-  let availableColumns: OrderableItem[] = [
-    { label: 'Custom Search Attributes', key: 'customSearchAttributes' },
-    { label: 'Execution Time', key: 'executionTime' },
-    { label: 'History Length', key: 'historyLength' },
-    { label: 'History Size', key: 'historySize' },
-    { label: 'Memo Custom Key', key: 'memoCustomKey' },
-    { label: 'State Transitions', key: 'stateTransitions' },
+  let availableColumns: string[] = [
+    'Custom Search Attributes',
+    'Execution Time',
+    'History Length',
+    'History Size',
+    'Memo Custom Key',
+    'State Transitions',
   ];
 
   $: query = $page.url.searchParams.get('query');

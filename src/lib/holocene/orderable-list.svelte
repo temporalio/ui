@@ -1,11 +1,3 @@
-<script lang="ts" context="module">
-  export interface OrderableItem {
-    label: string;
-    key: string;
-    locked?: boolean;
-  }
-</script>
-
 <script lang="ts">
   import IconButton from './icon-button.svelte';
   import Icon from './icon/icon.svelte';
@@ -15,12 +7,12 @@
   };
 
   interface $$Props {
-    items: OrderableItem[];
-    availableItems?: OrderableItem[];
+    items: string[];
+    availableItems?: string[];
   }
 
-  export let items: OrderableItem[];
-  export let availableItems: OrderableItem[] = [];
+  export let items: string[];
+  export let availableItems: string[] = [];
 
   const addItem = (index: number) => {
     const tempAvailableItems = [...availableItems];
@@ -36,14 +28,7 @@
     items = tempItems;
   };
 
-  const handleDragStart = (
-    event: ExtendedDragEvent,
-    index: number,
-    locked: boolean,
-  ) => {
-    if (locked) {
-      return false;
-    }
+  const handleDragStart = (event: ExtendedDragEvent, index: number) => {
     event.dataTransfer.setData('text/plain', index.toString());
     event.dataTransfer.dropEffect = 'move';
   };
@@ -51,6 +36,10 @@
   const handleDrop = (event: ExtendedDragEvent, to: number) => {
     event.currentTarget.classList.remove('dragging-over');
     const from = parseInt(event.dataTransfer.getData('text/plain'));
+    move(from, to);
+  };
+
+  const move = (from: number, to: number) => {
     const tempItems = [...items];
     tempItems.splice(to, 0, tempItems.splice(from, 1)[0]);
     items = tempItems;
@@ -68,29 +57,39 @@
       <slot name="main-heading">Items</slot>
     </h4>
     <ol class="orderable-list">
-      {#each items as item, index (item.key)}
-        {@const { label, locked } = item}
+      {#each items as item, index}
         <li
-          draggable={!locked}
-          class:locked
-          class="orderable-item"
-          on:dragstart={(e) => handleDragStart(e, index, locked)}
+          draggable="true"
+          class="orderable-item group"
+          on:dragstart={(e) => handleDragStart(e, index)}
           on:drop|preventDefault={(e) => handleDrop(e, index)}
           on:dragenter|preventDefault|stopPropagation={handleDragEnter}
           on:dragleave|preventDefault|stopPropagation={handleDragLeave}
           on:dragover|preventDefault|stopPropagation
         >
           <div class="flex flex-row gap-2 items-center">
-            {#if locked}
-              <Icon name="lock" />
-            {:else}
-              <Icon name="chevron-selector-vertical" />
+            <div class="flex items-center">
+              <IconButton
+                hoverable
+                icon="chevron-up"
+                on:click={() => move(index, index - 1)}
+              />
+              <IconButton
+                hoverable
+                icon="chevron-down"
+                on:click={() => move(index, index + 1)}
+              />
+            </div>
+            {item}
+            {#if index === 0}
+              <Icon width={16} height={16} name="pin-filled" />
             {/if}
-            {label}
           </div>
-          {#if !locked}
-            <IconButton icon="hyphen" on:click={() => removeItem(index)} />
-          {/if}
+          <IconButton
+            hoverable
+            icon="hyphen"
+            on:click={() => removeItem(index)}
+          />
         </li>
         <hr />
       {/each}
@@ -102,14 +101,12 @@
         <slot name="bank-heading">Available Items</slot>
       </h4>
       <ol class="orderable-list">
-        {#each availableItems as item, index (item.key)}
-          {@const { label } = item}
+        {#each availableItems as item, index}
           <li class="orderable-item">
             <div class="flex flex-row gap-2 items-center">
-              <span class="w-6" />
-              {label}
+              {item}
             </div>
-            <IconButton icon="add" on:click={() => addItem(index)} />
+            <IconButton hoverable icon="add" on:click={() => addItem(index)} />
           </li>
           <hr />
         {/each}
@@ -132,15 +129,11 @@
   }
 
   .orderable-item {
-    @apply select-none flex flex-row items-center justify-between px-4 py-2 list-none font-medium text-sm;
+    @apply select-none flex flex-row items-center justify-between p-2 list-none font-medium text-sm;
   }
 
   .orderable-item[draggable='true'] {
     @apply cursor-move;
-  }
-
-  .orderable-item.locked {
-    @apply pointer-events-none;
   }
 
   hr {
