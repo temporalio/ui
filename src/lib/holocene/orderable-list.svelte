@@ -9,24 +9,16 @@
   interface $$Props {
     items: string[];
     availableItems?: string[];
+    onAddItem: (index: number) => void;
+    onRemoveItem: (index: number) => void;
+    onMoveItem: (from: number, to: number) => void;
   }
 
   export let items: string[];
   export let availableItems: string[] = [];
-
-  const addItem = (index: number) => {
-    const tempAvailableItems = [...availableItems];
-    const [removedItem] = tempAvailableItems.splice(index, 1);
-    items = [...items, removedItem];
-    availableItems = tempAvailableItems;
-  };
-
-  const removeItem = (index: number) => {
-    const tempItems = [...items];
-    const [removedItem] = tempItems.splice(index, 1);
-    availableItems = [removedItem, ...availableItems];
-    items = tempItems;
-  };
+  export let onAddItem: $$Props['onAddItem'];
+  export let onMoveItem: $$Props['onMoveItem'];
+  export let onRemoveItem: $$Props['onRemoveItem'];
 
   const handleDragStart = (event: ExtendedDragEvent, index: number) => {
     event.dataTransfer.setData('text/plain', index.toString());
@@ -36,13 +28,7 @@
   const handleDrop = (event: ExtendedDragEvent, to: number) => {
     event.currentTarget.classList.remove('dragging-over');
     const from = parseInt(event.dataTransfer.getData('text/plain'));
-    move(from, to);
-  };
-
-  const move = (from: number, to: number) => {
-    const tempItems = [...items];
-    tempItems.splice(to, 0, tempItems.splice(from, 1)[0]);
-    items = tempItems;
+    onMoveItem(from, to);
   };
 
   const handleDragEnter = (event: ExtendedDragEvent) =>
@@ -72,12 +58,12 @@
               <IconButton
                 hoverable
                 icon="chevron-up"
-                on:click={() => move(index, index - 1)}
+                on:click={() => onMoveItem(index, index - 1)}
               />
               <IconButton
                 hoverable
                 icon="chevron-down"
-                on:click={() => move(index, index + 1)}
+                on:click={() => onMoveItem(index, index + 1)}
               />
             </div>
             {item}
@@ -88,7 +74,7 @@
           <IconButton
             hoverable
             icon="hyphen"
-            on:click={() => removeItem(index)}
+            on:click={() => onRemoveItem(index)}
           />
         </li>
         <hr />
@@ -106,7 +92,11 @@
             <div class="flex flex-row gap-2 items-center">
               {item}
             </div>
-            <IconButton hoverable icon="add" on:click={() => addItem(index)} />
+            <IconButton
+              hoverable
+              icon="add"
+              on:click={() => onAddItem(index)}
+            />
           </li>
           <hr />
         {/each}

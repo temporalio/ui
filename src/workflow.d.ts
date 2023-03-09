@@ -49,6 +49,7 @@ type WorkflowExecution = {
   status: WorkflowStatus;
   taskQueue?: string;
   historyEvents: Long;
+  historySizeBytes: Long;
   pendingChildren: PendingChildren[];
   pendingActivities: PendingActivity[];
   stateTransitionCount: string;

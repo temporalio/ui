@@ -23,6 +23,7 @@ export const toWorkflowExecution = (
   const status = response.workflowExecutionInfo.status;
   const isRunning = response.workflowExecutionInfo.status === 'Running';
   const historyEvents = response.workflowExecutionInfo.historyLength;
+  const historySizeBytes = response.workflowExecutionInfo.historySizeBytes;
   const url = `/workflows/${id}/${runId}`;
   const taskQueue = response?.executionConfig?.taskQueue?.name;
   const parentNamespaceId = response?.workflowExecutionInfo?.parentNamespaceId;
@@ -45,6 +46,7 @@ export const toWorkflowExecution = (
     endTime,
     status,
     historyEvents,
+    historySizeBytes,
     url,
     taskQueue,
     pendingActivities,

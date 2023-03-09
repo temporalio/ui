@@ -37,6 +37,12 @@
   import { bulkActionsEnabled as workflowBulkActionsEnabled } from '$lib/utilities/bulk-actions-enabled';
   import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
   import { toaster } from '$lib/stores/toaster';
+  import {
+    workflowTableColumns,
+    addColumn,
+    removeColumn,
+    moveColumn,
+  } from '$lib/stores/workflow-table-columns';
   import Drawer from '$lib/holocene/drawer.svelte';
   import OrderableList from '$lib/holocene/orderable-list.svelte';
 
@@ -52,23 +58,6 @@
   let pageSelected: boolean = false;
 
   // let customizationDrawerOpen: boolean = false;
-  let columns: string[] = [
-    'Status',
-    'Workflow ID',
-    'Run ID',
-    'Type',
-    'Start',
-    'End',
-  ];
-
-  let availableColumns: string[] = [
-    'Custom Search Attributes',
-    'Execution Time',
-    'History Length',
-    'History Size',
-    'Memo Custom Key',
-    'State Transitions',
-  ];
 
   $: query = $page.url.searchParams.get('query');
 
@@ -387,7 +376,13 @@
       >), Workflow<br />Headings to personalize the Workflow List Table.</span
     >
   </svelte:fragment>
-  <OrderableList bind:items={columns} bind:availableItems={availableColumns}>
+  <OrderableList
+    items={$workflowTableColumns.columns}
+    availableItems={$workflowTableColumns.availableColumns}
+    onAddItem={addColumn}
+    onRemoveItem={removeColumn}
+    onMoveItem={moveColumn}
+  >
     <svelte:fragment slot="main-heading">
       Workflow Headings <span class="font-normal">(in view)</span>
     </svelte:fragment>
