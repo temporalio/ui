@@ -10,10 +10,10 @@
   export let first = false;
   export let last = false;
 
-  const failure = eventOrGroupIsFailureOrTimedOut(event);
-  const canceled = eventOrGroupIsCanceled(event);
-  const terminated = eventOrGroupIsTerminated(event);
-  const completed = eventOrGroupIsCompleted(event);
+  $: failure = eventOrGroupIsFailureOrTimedOut(event);
+  $: canceled = eventOrGroupIsCanceled(event);
+  $: terminated = eventOrGroupIsTerminated(event);
+  $: completed = eventOrGroupIsCompleted(event);
 </script>
 
 <div class="flex w-[20px] min-w-[20px] flex-col items-center justify-center">

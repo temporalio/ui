@@ -20,8 +20,8 @@
   import { getPollers } from '$lib/services/pollers-service';
   import { toDecodedPendingActivities } from '$lib/models/pending-activities';
   import { fetchStartAndEndEvents } from '$lib/services/events-service';
-  import WorkflowHistoryLayoutV2 from './workflow-history-layout-v2.svelte';
-  import WorkflowHeaderV2 from './workflow-header-v2.svelte';
+  import WorkflowHistoryLayoutV2 from '$lib/components/eventV2/workflow-history-layout-v2.svelte';
+  import WorkflowHeaderV2 from '$lib/components/eventV2/workflow-header-v2.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { featureFlags } from '$lib/stores/feature-flags';
 
