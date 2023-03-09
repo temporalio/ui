@@ -1,5 +1,3 @@
-<svelte:options immutable />
-
 <script lang="ts">
   import Badge from '$lib/holocene/badge.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';

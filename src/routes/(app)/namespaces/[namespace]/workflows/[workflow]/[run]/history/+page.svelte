@@ -6,10 +6,9 @@
   import WorkflowHistoryFeed from '$lib/pages/workflow-history-feed.svelte';
   import WorkflowHistoryJson from '$lib/pages/workflow-history-json.svelte';
   import WorkflowHistoryCompact from '$lib/pages/workflow-history-compact.svelte';
-  import WorkflowHistoryCompactV2 from '$lib/layouts/workflow-history-layout-v2.svelte';
+  import WorkflowHistoryCompactV2 from '$lib/components/eventV2/workflow-history-layout-v2.svelte';
 
   import PageTitle from '$lib/components/page-title.svelte';
-  import WorkflowHistoryLayoutV2 from '$lib/layouts/workflow-history-layout-v2.svelte';
   const workflow = $page.params.workflow;
 
   const views = {
