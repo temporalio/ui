@@ -50,7 +50,7 @@
     if (!importingHistory) {
       const { settings } = $page.data;
       resetFullHistory();
-      fullHistory = await fetchAllEvents({
+      fetchAllEvents({
         namespace,
         workflowId,
         runId,

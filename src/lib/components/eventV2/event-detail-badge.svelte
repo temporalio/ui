@@ -24,13 +24,14 @@
   export let key: string;
   export let value: string | Record<string, unknown>;
   export let attributes: CombinedAttributes;
+  export let primary: boolean = false;
 
   const { workflow, namespace } = $page.params;
 </script>
 
 {#if typeof value !== 'object'}
   <div class="flex h-auto items-center justify-between gap-1">
-    <p class="text-[12px]">{format(key)}</p>
+    {#if !primary}<p class="text-[12px]">{format(key)}</p>{/if}
     <Badge type="alpha">
       {#if shouldDisplayAsExecutionLink(key)}
         <Copyable

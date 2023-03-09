@@ -3,7 +3,7 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  import { eventShowElapsed, eventFilterSort } from '$lib/stores/event-view';
+  import { eventShowElapsed } from '$lib/stores/event-view';
   import { timeFormat } from '$lib/stores/time-format';
   import { format } from '$lib/utilities/format-camel-case';
 
@@ -15,10 +15,7 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
-  import {
-    isActivityTaskScheduledEvent,
-    isLocalActivityMarkerEvent,
-  } from '$lib/utilities/is-event-type';
+  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
   import { noop } from 'svelte/internal';
   import { isEventGroup } from '$lib/models/event-groups';
   import EventCard from './event-card.svelte';
@@ -75,14 +72,15 @@
   const terminated = eventOrGroupIsTerminated(event);
 
   $: hasGroupEvents = isEventGroup(event) && event?.eventList?.length > 1;
+
   $: payloadAttributes = getAttributePayloads(event.attributes);
   $: pendingActivity = isEventGroup(event) && event?.pendingActivity;
 
   const getEventGroupName = (event: IterableEvent) => {
     if (isEventGroup(event)) {
-      if (isActivityTaskScheduledEvent(event.initialEvent)) {
-        return `${event.lastEvent.name}: ${event.initialEvent.activityTaskScheduledEventAttributes?.activityType?.name}`;
-      }
+      // if (isActivityTaskScheduledEvent(event.initialEvent)) {
+      //   return `${event.lastEvent.name}: ${event.initialEvent.activityTaskScheduledEventAttributes?.activityType?.name}`;
+      // }
       if (isLocalActivityMarkerEvent(event.lastEvent)) return 'LocalActivity';
       return event.lastEvent.name;
     } else {
@@ -115,7 +113,7 @@
           <div class="flex items-center gap-4">
             <p>{lastEvent.id}</p>
             <div
-              class="flex items-center"
+              class="flex items-center gap-2"
               class:failure
               class:canceled
               class:terminated
@@ -150,10 +148,10 @@
             {formatDate(lastEvent?.eventTime, $timeFormat)}
           {/if}
         </p>
-        {#if expanded && hasGroupEvents}
+        {#if expanded && isEventGroup(event) && hasGroupEvents}
           <div class="secondary">
-            {#each event?.eventList.reverse() ?? [] as event}
-              <svelte:self {event} {visibleItems} {initialItem} />
+            {#each event?.eventList.reverse() ?? [] as groupEvent}
+              <svelte:self event={groupEvent} {visibleItems} {initialItem} />
             {/each}
           </div>
         {/if}

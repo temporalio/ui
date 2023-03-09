@@ -31,7 +31,7 @@
 <div class="flex flex-col gap-2">
   <div class="grid grid-cols-3 gap-4" class:col-1={primary}>
     {#each events as [key, value] (key)}
-      <EventDetailBadge {key} {value} {attributes} />
+      <EventDetailBadge {key} {value} {attributes} {primary} />
     {/each}
   </div>
 </div>
