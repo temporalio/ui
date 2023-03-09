@@ -93,6 +93,7 @@
       {required}
       {autocomplete}
       bind:value
+      on:click|stopPropagation
       on:input
       on:keydown|stopPropagation
       on:change
