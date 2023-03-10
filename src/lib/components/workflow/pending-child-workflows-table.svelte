@@ -6,34 +6,35 @@
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
 
-  export let children: ChildWorkflowExecutionCompletedEvent[] = [];
+  export let pendingChildren: WorkflowExecution['pendingChildren'] = [];
+  export let namespace: string;
 </script>
 
 <Pagination
-  items={children}
+  items={pendingChildren}
   itemsPerPage={10}
   let:visibleItems
   aria-label="child workflows"
 >
-  <h3 slot="action-top-left">Completed Children</h3>
+  <h3 slot="action-top-left">Pending Children</h3>
   <Table class="w-full">
     <TableHeaderRow slot="headers">
       <th class="md:table-cell">Child Workflow ID</th>
       <th class="md:table-cell">Child Run ID</th>
     </TableHeaderRow>
-    {#each visibleItems as child (child.id)}
+    {#each visibleItems as child (child.runId)}
       <TableRow
         href={routeForEventHistory({
-          namespace: child.attributes.namespace,
-          workflow: child.attributes.workflowExecution.workflowId,
-          run: child.attributes.workflowExecution.runId,
+          namespace,
+          workflow: child.workflowId,
+          run: child.runId,
         })}
       >
         <td>
-          {child.attributes.workflowExecution.workflowId}
+          {child.workflowId}
         </td>
         <td>
-          {child.attributes.workflowExecution.runId}
+          {child.runId}
         </td>
       </TableRow>
     {/each}

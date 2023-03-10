@@ -23,17 +23,17 @@ describe('getWorkflowRelationships', () => {
     end: continuedAsNewEvents,
   };
 
-  it('hasChildren should return true if there are pending children', () => {
+  it('hasPendingChildren should return true if there are pending children', () => {
     expect(
       getWorkflowRelationships(pendingChildrenWorkflow, completedEventHistory)
-        .hasChildren,
+        .hasPendingChildren,
     ).toBe(true);
   });
 
   it('hasRelationships should return false if there are is not a parent, pending children, first, previous, or next', () => {
     expect(
       getWorkflowRelationships(runningWorkflow, completedEventHistory)
-        .hasChildren,
+        .hasPendingChildren,
     ).toBe(false);
   });
 
