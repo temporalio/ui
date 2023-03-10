@@ -19,7 +19,7 @@ export const getWorkflowRelationships = (
   workflow: WorkflowExecution | null,
   eventHistory: StartAndEndEventHistory,
 ) => {
-  const hasChildren = !!workflow?.pendingChildren.length;
+  const hasPendingChildren = !!workflow?.pendingChildren.length;
   const parent = workflow?.parent;
 
   const workflowExecutionStartedEvent = eventHistory.start.find(
@@ -39,7 +39,7 @@ export const getWorkflowRelationships = (
 
   const hasRelationships = !!(
     parent ||
-    hasChildren ||
+    hasPendingChildren ||
     first ||
     previous ||
     newExecutionRunId
@@ -47,7 +47,7 @@ export const getWorkflowRelationships = (
 
   return {
     hasRelationships,
-    hasChildren,
+    hasChildren: hasPendingChildren,
     first,
     previous,
     parent,

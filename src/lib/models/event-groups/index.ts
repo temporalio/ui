@@ -3,8 +3,13 @@ import { createEventGroup } from './create-event-group';
 import { getGroupId } from './get-group-id';
 
 import type { EventSortOrder } from '$lib/stores/event-view';
-import { isWorkflowTaskCompletedEvent } from '$lib/utilities/is-event-type';
 import { isSubrowActivity } from '$lib/utilities/is-subrow-activity';
+import {
+  eventOrGroupIsCanceled,
+  eventOrGroupIsCompleted,
+  eventOrGroupIsFailureOrTimedOut,
+  eventOrGroupIsTerminated,
+} from './get-event-in-group';
 
 export { getGroupForEvent } from './get-group-for-event';
 
@@ -17,9 +22,18 @@ const addToExistingGroup = (group: EventGroup, event: WorkflowEvent): void => {
   group.timestamp = event.timestamp;
 };
 
+const groupIsCanceledFailureTimedOutTerminated = (group: IterableEvent) => {
+  return (
+    eventOrGroupIsCanceled(group) ||
+    eventOrGroupIsFailureOrTimedOut(group) ||
+    eventOrGroupIsTerminated(group)
+  );
+};
+
 type groupEventOptions = {
   createSubGroups: boolean;
   includeWorkflowTasks: boolean;
+  nonCompletedEventsOnly: boolean;
 };
 export const groupEvents = (
   events: CommonHistoryEvent[],
@@ -28,9 +42,11 @@ export const groupEvents = (
   options: groupEventOptions = {
     createSubGroups: false,
     includeWorkflowTasks: false,
+    nonCompletedEventsOnly: false,
   },
 ): EventGroups => {
-  const { createSubGroups, includeWorkflowTasks } = options;
+  const { createSubGroups, includeWorkflowTasks, nonCompletedEventsOnly } =
+    options;
   const groupMap: Record<string, EventGroup> = {};
 
   for (const event of events) {
@@ -68,6 +84,19 @@ export const groupEvents = (
         } else {
           console.error('No task group found!');
         }
+      }
+    }
+  }
+
+  if (nonCompletedEventsOnly) {
+    for (const group of groups) {
+      if (
+        !groupIsCanceledFailureTimedOutTerminated(group) &&
+        group.subGroupList.every(
+          (e) => !groupIsCanceledFailureTimedOutTerminated(e),
+        )
+      ) {
+        groups = groups.filter((g) => g.id !== group.id);
       }
     }
   }

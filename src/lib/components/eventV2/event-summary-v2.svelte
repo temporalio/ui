@@ -1,72 +1,25 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { refresh, workflowRun } from '$lib/stores/workflow-run';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import { eventHistory } from '$lib/stores/events';
-  import { authUser } from '$lib/stores/auth-user';
 
   import { groupEvents, isEventGroup } from '$lib/models/event-groups';
-  import { fetchAllEvents } from '$lib/services/events-service';
   import EventGroupSummaryCard from './event-group-summary-card.svelte';
   import InitialEventCard from './initial-event-card.svelte';
   import LastEventCard from './last-event-card.svelte';
-  import {
-    getWorkflowStartedCompletedAndTaskFailedEvents,
-    isCompletionEvent,
-  } from '$lib/utilities/get-started-completed-and-task-failed-events';
+  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { getStackTrace } from '$lib/utilities/get-single-attribute-for-event';
   import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { importEvents } from '$lib/stores/import-events';
-  import { toEventHistory } from '$lib/models/event-history';
 
-  export let importingHistory = false;
-
-  $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
-
-  let fullHistory: CommonHistoryEvent[] = [];
-
-  const resetFullHistory = () => {
-    fullHistory = [];
-  };
-
-  const onUpdate = async ({ history }) => {
-    const { settings } = $page.data;
-    fullHistory = await toEventHistory({
-      response: history.events,
-      namespace,
-      settings,
-      accessToken: $authUser?.accessToken,
-    });
-    const lastEvent = fullHistory[fullHistory.length - 1];
-    if (isCompletionEvent(lastEvent)) {
-      $refresh = Date.now();
-    }
-  };
-
-  const fetchEvents = async (
-    namespace: string,
-    workflowId: string,
-    runId: string,
-  ) => {
-    if (!importingHistory) {
-      const { settings } = $page.data;
-      resetFullHistory();
-      fetchAllEvents({
-        namespace,
-        workflowId,
-        runId,
-        settings,
-        accessToken: $authUser?.accessToken,
-        sort: 'ascending',
-        onUpdate,
-      });
-    }
-  };
-
-  $: fetchEvents(namespace, workflowId, runId);
+  export let fullHistory: CommonHistoryEvent[] = [];
+  export let importingHistory: boolean = false;
+  export let debugMode = false;
 
   const getGroups = (
     events: CommonHistoryEvent[],
     category: string,
+    debugMode: boolean,
   ): EventGroups => {
     if (category) {
       const filteredEvents = events.filter((i) => i.category === category);
@@ -74,14 +27,22 @@
         filteredEvents,
         'ascending',
         $workflowRun?.workflow?.pendingActivities ?? [],
-        { createSubGroups: true, includeWorkflowTasks: true },
+        {
+          createSubGroups: true,
+          includeWorkflowTasks: true,
+          nonCompletedEventsOnly: debugMode,
+        },
       );
     }
     return groupEvents(
       events,
       'ascending',
       $workflowRun?.workflow?.pendingActivities ?? [],
-      { createSubGroups: true, includeWorkflowTasks: true },
+      {
+        createSubGroups: true,
+        includeWorkflowTasks: true,
+        nonCompletedEventsOnly: debugMode,
+      },
     );
   };
 
@@ -96,7 +57,7 @@
     : fullHistory.length
     ? fullHistory
     : intialEvents;
-  $: items = getGroups(currentEvents, category);
+  $: items = getGroups(currentEvents, category, debugMode);
   $: initialItem = currentEvents?.[0];
   $: finalItem = currentEvents?.[currentEvents?.length - 1];
   $: uniqueFinalItem =
@@ -124,12 +85,13 @@
       <svelte:fragment slot="subgroups">
         {#if isEventGroup(item) && item?.subGroupList?.length}
           <div class="flex w-full flex-col pl-12">
-            {#each item?.subGroupList as group}
+            {#each item?.subGroupList as group, index}
               <EventGroupSummaryCard
                 isSubGroup
                 event={group}
                 visibleItems={items}
                 {initialItem}
+                removeTail={index === item?.subGroupList.length - 1}
               />
             {/each}
           </div>

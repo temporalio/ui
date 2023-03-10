@@ -32,8 +32,9 @@ export const getPrimaryEventDetail = (
 
   if (isWorkflowExecutionCanceledEvent(event)) {
     console.log('WorkflowExecutionCanceledEvent: ', event);
-    return 'Details';
-    // return event.workflowExecutionCanceledEventAttributes?.details ?? 'No details';
+    return (
+      event.workflowExecutionCanceledEventAttributes?.details ?? 'No details'
+    );
   }
 
   if (isWorkflowExecutionFailedEvent(event)) {
@@ -153,8 +154,11 @@ export const getAttributePayloads = (attributes: PotentiallyDecodable) => {
     payloadsKey?: string,
   ) => {
     for (const key of Object.keys(attributes)) {
-      if (key === 'payloads') {
-        payloadAttributes.push({ key: payloadsKey, value: attributes[key] });
+      if (key === 'payloads' || key === 'failure' || key === 'lastFailure') {
+        payloadAttributes.push({
+          key: payloadsKey ?? key,
+          value: attributes[key],
+        });
       } else {
         const next = attributes[key];
         if (isObject(next)) {

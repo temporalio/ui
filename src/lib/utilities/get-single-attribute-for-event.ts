@@ -143,7 +143,10 @@ const preferredSummaryKeys = [
   'parentInitiatedEventId',
   'workflowExecution',
   'workflowType',
+  'identity',
   'taskQueue',
+  'startToFireTimeout',
+  'signalName',
 ] as const;
 
 /**

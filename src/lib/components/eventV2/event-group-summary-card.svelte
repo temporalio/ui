@@ -13,7 +13,10 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
-  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
+  import {
+    isLocalActivityMarkerEvent,
+    isWorkflowTaskCompletedEvent,
+  } from '$lib/utilities/is-event-type';
   import { noop } from 'svelte/internal';
   import { isEventGroup } from '$lib/models/event-groups';
   import EventCard from './event-card.svelte';
@@ -35,6 +38,7 @@
   export let expandAll = false;
   export let typedError = false;
   export let active = false;
+  export let removeTail = false;
   export let onRowClick: () => void = noop;
 
   $: expanded = expandAll || active;
@@ -65,12 +69,10 @@
     onRowClick();
   };
 
-  const failure = eventOrGroupIsFailureOrTimedOut(event);
-  const canceled = eventOrGroupIsCanceled(event);
-  const terminated = eventOrGroupIsTerminated(event);
-
+  $: failure = eventOrGroupIsFailureOrTimedOut(event);
+  $: canceled = eventOrGroupIsCanceled(event);
+  $: terminated = eventOrGroupIsTerminated(event);
   $: hasGroupEvents = isEventGroup(event) && event?.eventList?.length > 1;
-
   $: payloadAttributes = getAttributePayloads(event.attributes);
   $: pendingActivity = isEventGroup(event) && event?.pendingActivity;
 
@@ -88,8 +90,8 @@
 </script>
 
 <div class="flex gap-2">
-  <EventGroupTimestamp {event} />
-  <div class="h-full grow pt-2">
+  <EventGroupTimestamp {event} {removeTail} />
+  <div class="h-full w-full pt-2">
     {#if pendingActivity}
       <PendingActivityCard event={pendingActivity} />
     {/if}
@@ -106,7 +108,7 @@
         on:keydown={onLinkClick}
       >
         <div
-          class="flex w-full cursor-pointer flex-col justify-between xl:flex-row"
+          class="flex w-full cursor-pointer flex-col justify-between gap-2 xl:flex-row"
         >
           <div class="flex items-center gap-4">
             <p>{lastEvent.id}</p>
@@ -148,8 +150,14 @@
         </p>
         {#if expanded && isEventGroup(event) && hasGroupEvents}
           <div class="secondary">
-            {#each event?.eventList.reverse() ?? [] as groupEvent}
-              <svelte:self event={groupEvent} {visibleItems} {initialItem} />
+            {#each event?.eventList.reverse() ?? [] as groupEvent, index}
+              <svelte:self
+                event={groupEvent}
+                {visibleItems}
+                {initialItem}
+                removeTail={index ===
+                  (event?.eventList.reverse() ?? []).length - 1}
+              />
             {/each}
           </div>
         {/if}

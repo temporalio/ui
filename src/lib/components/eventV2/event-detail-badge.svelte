@@ -30,9 +30,12 @@
 </script>
 
 {#if typeof value !== 'object'}
-  <div class="flex h-auto items-center justify-between gap-1">
-    {#if !primary}<p class="text-[12px]">{format(key)}</p>{/if}
-    <Badge type="alpha">
+  <div
+    class="flex h-auto items-center justify-between gap-1"
+    class:cell={!primary}
+  >
+    <p class="text-[12px]">{format(key)}</p>
+    <Badge type={primary ? 'beta' : 'beta'}>
       {#if shouldDisplayAsExecutionLink(key)}
         <Copyable
           content={value}
@@ -92,5 +95,9 @@
 
   .code-with-stack-trace {
     @apply flex flex-col gap-2 lg:flex-row;
+  }
+
+  .cell {
+    @apply border-b-3 border-gray-500;
   }
 </style>
