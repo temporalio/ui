@@ -5,10 +5,13 @@
 
   import Accordion from '$lib/holocene/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
-  import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
+  import PendingChildWorkflowsTable from '$lib/components/workflow/pending-child-workflows-table.svelte';
+  import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
 
   export let hasChildren: boolean;
+  export let children: ChildWorkflowExecutionCompletedEvent[];
+  export let hasPendingChildren: boolean;
   export let hasRelationships: boolean;
   export let first: string;
   export let parent: WorkflowIdentifier;
@@ -23,6 +26,9 @@
     <div slot="summary" class="hidden flex-row gap-2 lg:flex">
       <Badge type={parent ? 'purple' : 'gray'}>{parent ? 1 : 0} Parent</Badge>
       <Badge type={hasChildren ? 'purple' : 'gray'}
+        >{children.length} Children</Badge
+      >
+      <Badge type={hasPendingChildren ? 'purple' : 'gray'}
         >{$workflowRun.workflow.pendingChildren.length} Pending Children</Badge
       >
       <Badge type={first ? 'purple' : 'gray'}>{first ? 1 : 0} First</Badge>
@@ -108,11 +114,14 @@
           </div>
         {/if}
       </div>
-      {#if hasChildren}
-        <ChildWorkflowsTable
+      {#if hasPendingChildren}
+        <PendingChildWorkflowsTable
           pendingChildren={$workflowRun.workflow.pendingChildren}
           namespace={$page.params.namespace}
         />
+      {/if}
+      {#if hasChildren}
+        <ChildWorkflowsTable {children} />
       {/if}
     {:else}
       <p>This workflow doesn’t have any relationships</p>

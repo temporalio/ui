@@ -78,9 +78,6 @@
 
   const getEventGroupName = (event: IterableEvent) => {
     if (isEventGroup(event)) {
-      // if (isActivityTaskScheduledEvent(event.initialEvent)) {
-      //   return `${event.lastEvent.name}: ${event.initialEvent.activityTaskScheduledEventAttributes?.activityType?.name}`;
-      // }
       if (isLocalActivityMarkerEvent(event.lastEvent)) return 'LocalActivity';
       return event.lastEvent.name;
     } else {

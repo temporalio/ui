@@ -10,7 +10,7 @@
   <Accordion title="Options" icon="settings" readOnly stackSummary>
     <div slot="summary" class="flex flex-row items-center gap-4">
       <EventDateFilter compact={false} hideSort />
-      <Button variant="secondary" on:click={onDebugClick}>Debug</Button>
+      <Button variant="destructive" on:click={onDebugClick}>Debug</Button>
     </div>
   </Accordion>
 </section>

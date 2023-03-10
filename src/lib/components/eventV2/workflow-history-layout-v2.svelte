@@ -18,7 +18,11 @@
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
   $: ({ workflow } = $workflowRun);
-  $: workflowRelationships = getWorkflowRelationships(workflow, $eventHistory);
+  $: workflowRelationships = getWorkflowRelationships(
+    workflow,
+    $eventHistory,
+    fullHistory,
+  );
 
   let fullHistory: CommonHistoryEvent[] = [];
   let debugMode = false;
@@ -68,7 +72,7 @@
   url={$page.url.href}
 />
 <div class="flex flex-col gap-2 xl:flex-row-reverse">
-  <div class="flex w-full flex-col gap-2 xl:w-1/3">
+  <div class="flex w-full flex-col gap-2 xl:w-[40%]">
     <WorkflowSummaryV2 />
     <WorkflowRelationshipsV2 {...workflowRelationships} />
     <WorkflowWorkersV2 taskQueue={workflow.taskQueue} />
@@ -76,7 +80,7 @@
     <WorkflowQueryV2 />
     <WorkflowOptionsV2 onDebugClick={() => (debugMode = !debugMode)} />
   </div>
-  <div class="w-full xl:w-2/3">
+  <div class="w-full xl:w-[60%]">
     <EventSummaryV2 {fullHistory} {debugMode} />
   </div>
 </div>

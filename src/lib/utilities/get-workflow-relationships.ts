@@ -1,4 +1,7 @@
-import { isWorkflowExecutionStartedEvent } from './is-event-type';
+import {
+  isChildWorkflowExecutionCompletedEvent,
+  isWorkflowExecutionStartedEvent,
+} from './is-event-type';
 import { has } from './has';
 import { isString } from './is';
 
@@ -18,7 +21,13 @@ const getNewExecutionId = (events: WorkflowEvents): string | undefined => {
 export const getWorkflowRelationships = (
   workflow: WorkflowExecution | null,
   eventHistory: StartAndEndEventHistory,
+  fullHistory: WorkflowEvents = [],
 ) => {
+  const children = fullHistory.filter((event) =>
+    isChildWorkflowExecutionCompletedEvent(event),
+  ) as ChildWorkflowExecutionCompletedEvent[];
+  const hasChildren = !!children.length;
+
   const hasPendingChildren = !!workflow?.pendingChildren.length;
   const parent = workflow?.parent;
 
@@ -26,7 +35,9 @@ export const getWorkflowRelationships = (
     isWorkflowExecutionStartedEvent,
   );
 
-  const newExecutionRunId = getNewExecutionId(eventHistory.end);
+  const newExecutionRunId = getNewExecutionId(
+    fullHistory.length ? fullHistory : eventHistory.end,
+  );
 
   const firstExecutionRunId =
     workflowExecutionStartedEvent?.attributes?.firstExecutionRunId;
@@ -39,6 +50,7 @@ export const getWorkflowRelationships = (
 
   const hasRelationships = !!(
     parent ||
+    hasChildren ||
     hasPendingChildren ||
     first ||
     previous ||
@@ -47,7 +59,9 @@ export const getWorkflowRelationships = (
 
   return {
     hasRelationships,
-    hasChildren: hasPendingChildren,
+    hasChildren,
+    children,
+    hasPendingChildren,
     first,
     previous,
     parent,
