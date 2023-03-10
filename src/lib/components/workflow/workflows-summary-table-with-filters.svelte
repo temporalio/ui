@@ -31,6 +31,7 @@
   export let allSelected: boolean;
   export let pageSelected: boolean;
   export let filteredWorkflowCount: string;
+  export let columns: string[];
 
   $: terminateEnabled = workflowTerminateEnabled($page.data.settings);
   $: cancelEnabled = workflowCancelEnabled($page.data.settings);
@@ -92,7 +93,7 @@
     {updating}
   >
     <TableHeaderRow slot="headers">
-      <th style="padding: 0;" class="table-cell w-12">
+      <th style="padding: 0;" class="w-12">
         {#if !updating}
           <Checkbox
             id="select-visible-workflows"
@@ -105,7 +106,7 @@
         {/if}
       </th>
       {#if showBulkActions}
-        <th class="w-32 overflow-visible whitespace-nowrap">
+        <th class="overflow-visible whitespace-nowrap" colspan={columns.length}>
           {#if allSelected}
             <span class="font-semibold"
               >All {filteredWorkflowCount} selected</span
@@ -140,35 +141,21 @@
             {/if}
           </div>
         </th>
-        <th class="table-cell md:w-auto" />
-        <th class="table-cell xl:w-60" />
-        <th class="hidden xl:table-cell xl:w-60" />
-        <th class="hidden xl:table-cell xl:w-60" />
       {:else}
-        <th class="table-cell w-32"
-          ><div class="flex items-center gap-1">
-            <ExecutionStatusDropdownFilter />
-          </div>
+        <th class="w-32">
+          <ExecutionStatusDropdownFilter />
         </th>
-        <th class="table-cell md:w-auto"
-          ><div class="flex items-center gap-1">
-            <WorkflowIdDropdownFilter />
-          </div>
+        <th>
+          <WorkflowIdDropdownFilter />
         </th>
-        <th class="table-cell xl:w-60">
-          <div class="flex items-center gap-1">
-            <WorkflowTypeDropdownFilter />
-          </div>
+        <th class="xl:w-60">
+          <WorkflowTypeDropdownFilter />
         </th>
-        <th class="hidden xl:table-cell xl:w-60">
-          <div class="flex items-center gap-1">
-            <StartTimeDropdownFilter {disabled} />
-          </div>
+        <th class="w-60 max-xl:hidden">
+          <StartTimeDropdownFilter {disabled} />
         </th>
-        <th class="hidden xl:table-cell xl:w-60">
-          <div class="flex items-center gap-1">
-            <EndTimeDropdownFilter {disabled} />
-          </div>
+        <th class="w-60 max-xl:hidden">
+          <EndTimeDropdownFilter {disabled} />
         </th>
       {/if}
     </TableHeaderRow>
@@ -177,30 +164,20 @@
 {:else}
   <Table class="w-full md:table-fixed" {updating}>
     <TableHeaderRow slot="headers">
-      <th class="table-cell w-32"
-        ><div class="flex items-center gap-1">
-          <ExecutionStatusDropdownFilter />
-        </div>
+      <th class="w-32">
+        <ExecutionStatusDropdownFilter />
       </th>
-      <th class="table-cell md:w-auto"
-        ><div class="flex items-center gap-1">
-          <WorkflowIdDropdownFilter />
-        </div>
+      <th>
+        <WorkflowIdDropdownFilter />
       </th>
-      <th class="table-cell xl:w-60">
-        <div class="flex items-center gap-1">
-          <WorkflowTypeDropdownFilter />
-        </div>
+      <th class="xl:w-60">
+        <WorkflowTypeDropdownFilter />
       </th>
-      <th class="hidden xl:table-cell xl:w-60">
-        <div class="flex items-center gap-1">
-          <StartTimeDropdownFilter {disabled} />
-        </div>
+      <th class="w-60 max-xl:hidden">
+        <StartTimeDropdownFilter {disabled} />
       </th>
-      <th class="hidden xl:table-cell xl:w-60">
-        <div class="flex items-center gap-1">
-          <EndTimeDropdownFilter {disabled} />
-        </div>
+      <th class="w-60 max-xl:hidden">
+        <EndTimeDropdownFilter {disabled} />
       </th>
     </TableHeaderRow>
     <slot />
