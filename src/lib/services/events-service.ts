@@ -10,6 +10,7 @@ export type FetchEventsParameters = NamespaceScopedRequest &
   PaginationCallbacks<GetWorkflowExecutionHistoryResponse> & {
     workflowId: string;
     runId: string;
+    params?: { waitNewEvent: string };
     rawPayloads?: boolean;
     sort?: EventSortOrder;
   };
@@ -57,6 +58,7 @@ export const fetchAllEvents = async ({
   workflowId,
   runId,
   sort,
+  params,
   settings,
   accessToken,
   onStart,
@@ -70,7 +72,7 @@ export const fetchAllEvents = async ({
       return requestFromAPI<GetWorkflowExecutionHistoryResponse>(route, {
         token,
         request: fetch,
-        params: { waitNewEvent: 'true' },
+        params: params ?? {},
       });
     },
     { onStart, onUpdate, onComplete },

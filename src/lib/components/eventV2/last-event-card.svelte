@@ -91,6 +91,7 @@
             </div>
           </div>
           <div class="flex">
+            <EventGroupDetails {event} primary />
             <Icon name={expanded ? 'chevron-up' : 'chevron-down'} class="w-4" />
           </div>
         </div>
