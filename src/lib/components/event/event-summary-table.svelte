@@ -25,12 +25,12 @@
 
 <Table {updating} class="dark w-full table-fixed">
   <TableHeaderRow slot="headers">
-    <th class="table-cell w-14 xl:w-10" />
-    <th class="table-cell w-16 md:w-32">
+    <th class="w-14 xl:w-10" />
+    <th class="w-16 md:w-32">
       <EventDateFilter {compact} />
     </th>
-    <th class="table-cell w-44"><EventCategoryFilter {compact} /></th>
-    <th class="table-cell w-auto xl:w-80">
+    <th class="w-44"><EventCategoryFilter {compact} /></th>
+    <th class="w-auto xl:w-80">
       <div class="flex w-full justify-end">
         <button
           class="relative flex w-28 items-center justify-end rounded sm:justify-between"

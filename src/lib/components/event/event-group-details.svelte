@@ -24,10 +24,10 @@
         on:click|preventDefault|stopPropagation={() => onGroupClick(id)}
       >
         <td class="w-1/12" />
-        <td class="table-cell w-24 text-left">
+        <td class="w-24">
           <p class="truncate text-sm text-gray-500 md:text-base">{id}</p>
         </td>
-        <td class="table-cell text-left">
+        <td>
           <p class="event-type truncate text-sm md:text-base">
             {isLocalActivityMarkerEvent(eventInGroup)
               ? 'LocalActivity'
@@ -41,10 +41,6 @@
 </div>
 
 <style lang="postcss">
-  .row {
-    @apply table-row;
-  }
-
   .row:hover {
     @apply cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
   }
