@@ -67,7 +67,7 @@ const WORKFLOW_CELLS: Record<WorkflowHeader, WorkflowCell> = {
   Start: { label: 'Start', path: 'startTime' },
   End: { label: 'End', path: 'endTime' },
   'History Length': { label: 'History Length', path: 'historyEvents' },
-  'History Size': { label: 'History Size', path: 'historySizeBytes' },
+  'History Size': { label: 'History Size', path: 'historyEvents' }, // TODO: add historySizeBytes
   'Execution Time': {
     label: 'Execution Time',
     data: (execution) =>
