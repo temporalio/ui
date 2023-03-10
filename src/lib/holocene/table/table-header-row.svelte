@@ -8,8 +8,9 @@
 </script>
 
 <tr class={$$props.class}>
-  <th class:selectable>
-    {#if selectable}
+  <th />
+  {#if selectable}
+    <th class:selectable>
       <Checkbox
         id="selectable-table-check-all"
         onDark
@@ -18,8 +19,8 @@
         label={checkboxLabel}
         on:change
       />
-    {/if}
-  </th>
+    </th>
+  {/if}
   <slot />
-  <th class:selectable />
+  <th />
 </tr>
