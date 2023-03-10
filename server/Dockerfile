@@ -1,5 +1,5 @@
-ARG BASE_SERVER_IMAGE=temporalio/base-server:1.10.0
 ARG BASE_BUILDER_IMAGE=temporalio/base-builder:1.9.0
+ARG BASE_SERVER_IMAGE=temporalio/base-server:1.10.0
 
 FROM ${BASE_BUILDER_IMAGE} AS server-builder
 
@@ -13,7 +13,11 @@ COPY . ./
 RUN make build-server
 
 ##### UI server #####
+
 FROM ${BASE_SERVER_IMAGE} AS ui-server
+
+ARG TEMPORAL_CLOUD_UI="false"
+
 WORKDIR /home/ui-server
 
 RUN addgroup -g 5000 temporal
@@ -27,3 +31,4 @@ RUN chown temporal:temporal /home/ui-server -R
 
 EXPOSE 8080
 ENTRYPOINT ["./start-ui-server.sh"]
+ENV TEMPORAL_CLOUD_UI=$TEMPORAL_CLOUD_UI
