@@ -74,7 +74,9 @@
       >
         <div slot="trigger">
           <Badge type="purple" class="flex gap-1 pl-2"
-            >{namespace}<Icon name="chevron-down" /></Badge
+            ><Icon name="namespace-switcher" class="scale-75" />{namespace}<Icon
+              name="chevron-down"
+            /></Badge
           >
         </div>
         <div class="w-full" slot="items">
