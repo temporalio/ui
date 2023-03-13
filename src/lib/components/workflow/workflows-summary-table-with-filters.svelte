@@ -106,11 +106,11 @@
         {/if}
       </th>
       {#if showBulkActions}
-        <th class="overflow-visible whitespace-nowrap" colspan={columns.length}>
+        <th class="overflow-visible whitespace-nowrap">
           {#if allSelected}
-            <span class="font-semibold"
-              >All {filteredWorkflowCount} selected</span
-            >
+            <span class="font-semibold">
+              All {filteredWorkflowCount} selected
+            </span>
           {:else}
             <span class="font-semibold">{selectedWorkflowsCount} selected</span>
             <span>
@@ -141,6 +141,13 @@
             {/if}
           </div>
         </th>
+        {#each Array(columns.length - 1) as _, index}
+          {@const className =
+            index === columns.length - 2 || index === columns.length - 3
+              ? 'max-xl:hidden'
+              : ''}
+          <th class={className} />
+        {/each}
       {:else}
         <th class="w-32">
           <ExecutionStatusDropdownFilter />
