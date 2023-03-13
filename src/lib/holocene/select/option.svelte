@@ -27,7 +27,7 @@
 
   type T = $$Generic;
 
-  export let value: T | undefined = undefined;
+  export let value: T;
   export let description: string = '';
   export let dark: boolean = false;
 
