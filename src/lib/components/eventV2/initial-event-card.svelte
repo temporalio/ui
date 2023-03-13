@@ -49,7 +49,6 @@
         id={event.id}
         class:expanded={expanded && !expandAll}
         aria-expanded={expanded || expandAll}
-        class:active
         class:typedError
         data-testid="event-summary-row"
         on:click={onLinkClick}
@@ -110,9 +109,5 @@
 
   .row.typedError {
     @apply rounded-lg;
-  }
-
-  .active {
-    @apply z-50 cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
   }
 </style>

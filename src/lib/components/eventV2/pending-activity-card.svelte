@@ -37,7 +37,6 @@
       id={event.activityId}
       class:expanded={expanded && !expandAll}
       aria-expanded={expanded || expandAll}
-      class:active
       data-testid="event-summary-row"
       on:click|stopPropagation={onLinkClick}
       on:keydown={onLinkClick}
@@ -89,29 +88,5 @@
 <style lang="postcss">
   .row {
     @apply w-full flex-wrap items-center rounded-xl border-gray-900 pl-8 pr-2 text-sm no-underline xl:py-3 xl:text-base;
-  }
-
-  .secondary {
-    @apply mt-2 flex flex-col;
-  }
-
-  .expanded-cell {
-    @apply table-cell w-full flex-wrap text-sm no-underline xl:text-base;
-  }
-
-  .typedError .expanded-cell {
-    @apply border-b-0;
-  }
-
-  .row.typedError {
-    @apply rounded-lg;
-
-    &.expanded {
-      @apply rounded-b-none;
-    }
-  }
-
-  .active {
-    @apply z-50 cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
   }
 </style>

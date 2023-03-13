@@ -1,10 +1,10 @@
 <script lang="ts">
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
-  import { getSingleAttributeForEvent } from '$lib/utilities/get-single-attribute-for-event';
 
   import EventDetailBadge from './event-detail-badge.svelte';
+  import { getPrimaryIterableEventDetails } from './event-detail-keys';
 
-  export let event: WorkflowEvent;
+  export let event: IterableEvent;
   export let compact = true;
   export let primary = false;
 
@@ -26,18 +26,15 @@
     return !denyKeys.includes(key);
   });
 
-  $: primaryEvent = primary && getSingleAttributeForEvent(event);
+  $: primaryEvents = primary && event && getPrimaryIterableEventDetails(event);
   $: secondaryEvents = !primary && filteredDetails;
 </script>
 
-{#if primaryEvent}
-  <div class="flex flex-col gap-2">
-    <EventDetailBadge
-      key={primaryEvent.key}
-      value={primaryEvent.value}
-      {attributes}
-      {primary}
-    />
+{#if primaryEvents.length}
+  <div class="flex flex-row gap-2">
+    {#each primaryEvents as { key, value, badge } (key)}
+      <EventDetailBadge {key} {value} {badge} {attributes} {primary} />
+    {/each}
   </div>
 {:else if secondaryEvents.length}
   <div class="flex flex-col gap-2" class:secondary={!primary}>

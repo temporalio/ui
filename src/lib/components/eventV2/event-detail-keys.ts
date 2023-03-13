@@ -1,3 +1,8 @@
+import { isEventGroup } from '$lib/models/event-groups';
+import {
+  formatSummaryValue,
+  getActivityType,
+} from '$lib/utilities/get-single-attribute-for-event';
 import { isObject } from '$lib/utilities/is';
 import {
   isActivityTaskCanceledEvent,
@@ -19,127 +24,231 @@ import {
   isWorkflowTaskCompletedEvent,
   isWorkflowTaskFailedEvent,
   isWorkflowTaskScheduledEvent,
+  isWorkflowTaskStartedEvent,
   isWorkflowTaskTimedOutEvent,
 } from '$lib/utilities/is-event-type';
 
-export const getPrimaryEventDetail = (
+type BadgeType =
+  | 'alpha'
+  | 'beta'
+  | 'warning'
+  | 'error'
+  | 'default'
+  | 'count'
+  | 'active'
+  | 'available'
+  | 'running'
+  | 'red'
+  | 'yellow'
+  | 'green'
+  | 'blue'
+  | 'purple'
+  | 'gray'
+  | 'white';
+type SummaryAttribute = {
+  key: string;
+  value: string | Record<string, unknown>;
+  badge?: BadgeType;
+};
+
+export const getPrimaryIterableEventDetails = (
+  event: IterableEvent,
+): SummaryAttribute[] => {
+  if (isEventGroup(event)) {
+    return getPrimaryEventGroupDetails(event);
+  }
+  return [getPrimaryEventDetails(event)];
+};
+
+export const getPrimaryEventGroupDetails = (
+  group: EventGroup,
+): SummaryAttribute[] => {
+  // Special case
+  const events = group.eventList;
+  if (events.find((event) => isWorkflowTaskScheduledEvent(event))) {
+    const scheduled = events.find((event) =>
+      isWorkflowTaskScheduledEvent(event),
+    );
+    const scheduledDetails = getPrimaryEventDetails(scheduled);
+    const started = events.find((event) => isWorkflowTaskStartedEvent(event));
+    if (started) {
+      const startedDetails = getPrimaryEventDetails(started);
+      return [
+        { ...startedDetails, badge: 'alpha' },
+        { ...scheduledDetails, badge: 'alpha' },
+      ];
+    } else {
+      return [{ ...scheduledDetails, badge: 'alpha' }];
+    }
+  }
+
+  return [getPrimaryEventDetails(group.initialEvent)];
+};
+
+export const getPrimaryEventDetails = (
   event: WorkflowEvent,
-): string | number => {
+): SummaryAttribute => {
   if (isWorkflowExecutionStartedEvent(event)) {
-    console.log('WorkflowExecutionStartedEvent: ', event);
-    return event.workflowExecutionStartedEventAttributes.attempt;
+    return formatSummaryValue(
+      'Attempt',
+      event.workflowExecutionStartedEventAttributes.attempt,
+    );
   }
 
   if (isWorkflowExecutionCanceledEvent(event)) {
-    console.log('WorkflowExecutionCanceledEvent: ', event);
-    return (
-      event.workflowExecutionCanceledEventAttributes?.details ?? 'No details'
+    return formatSummaryValue(
+      'Details',
+      event.workflowExecutionCanceledEventAttributes?.details ?? 'No details',
     );
   }
 
   if (isWorkflowExecutionFailedEvent(event)) {
-    console.log('WorkflowExecutionFailedEvent: ', event);
-    return (
+    const message =
       event.workflowExecutionFailedEventAttributes.failure.cause?.cause
         ?.message ??
-      event.workflowExecutionFailedEventAttributes.failure?.message
-    );
+      event.workflowExecutionFailedEventAttributes.failure?.message;
+    return formatSummaryValue('Message', message);
   }
 
   if (isWorkflowExecutionTerminatedEvent(event)) {
-    console.log('WorkflowExecutionTerminatedEvent: ', event);
-    return event.workflowExecutionTerminatedEventAttributes.reason;
-  }
-
-  if (isStartChildWorkflowExecutionInitiatedEvent(event)) {
-    console.log('StartChildWorkflowExecutionInitiatedEvent: ', event);
-    return event.startChildWorkflowExecutionInitiatedEventAttributes
-      ?.workflowType?.name;
-  }
-
-  if (isChildWorkflowExecutionStartedEvent(event)) {
-    console.log('ChildWorkflowExecutionStartedEvent: ', event);
-    return event.childWorkflowExecutionStartedEventAttributes?.workflowType
-      ?.name;
-  }
-
-  if (isChildWorkflowExecutionCompletedEvent(event)) {
-    console.log('ChildWorkflowExecutionCompletedEvent: ', event);
-    return event.childWorkflowExecutionCompletedEventAttributes?.workflowType
-      ?.name;
-  }
-
-  if (isWorkflowTaskCompletedEvent(event)) {
-    console.log('WorkflowTaskCompletedEvent: ', event);
-    return event.workflowTaskCompletedEventAttributes.identity;
-  }
-
-  if (isWorkflowExecutionSignaledEvent(event)) {
-    console.log('WorkflowExecutionSignaledEvent: ', event);
-    return event.workflowExecutionSignaledEventAttributes?.signalName;
-  }
-
-  if (isWorkflowTaskScheduledEvent(event)) {
-    console.log('WorkflowTaskScheduledEvent: ', event);
-    return event.workflowTaskScheduledEventAttributes?.taskQueue?.name;
-  }
-
-  if (isWorkflowTaskFailedEvent(event)) {
-    console.log('WorkflowTaskFailedEvent: ', event);
-    return event.workflowTaskFailedEventAttributes?.cause;
-  }
-
-  if (isWorkflowTaskTimedOutEvent(event)) {
-    console.log('WorkflowTaskTimedOutEvent: ', event);
-    return event.workflowTaskTimedOutEventAttributes?.timeoutType;
-  }
-
-  if (isActivityTaskCompletedEvent(event)) {
-    console.log('ActivityTaskCompletedEvent: ', event);
-    return event.activityTaskCompletedEventAttributes?.identity;
-  }
-
-  if (isActivityTaskFailedEvent(event)) {
-    console.log('ActivityTaskFailedEvent: ', event);
-    return (
-      event.activityTaskFailedEventAttributes?.failure.cause?.cause?.message ??
-      event.activityTaskFailedEventAttributes.failure?.message
+    return formatSummaryValue(
+      'Reason',
+      event.workflowExecutionTerminatedEventAttributes.reason,
     );
   }
 
+  if (isStartChildWorkflowExecutionInitiatedEvent(event)) {
+    return formatSummaryValue(
+      'WorkflowType',
+      event.startChildWorkflowExecutionInitiatedEventAttributes?.workflowType
+        ?.name,
+    );
+  }
+
+  if (isChildWorkflowExecutionStartedEvent(event)) {
+    return formatSummaryValue(
+      'WorkflowType',
+      event.childWorkflowExecutionStartedEventAttributes?.workflowType?.name,
+    );
+  }
+
+  if (isChildWorkflowExecutionCompletedEvent(event)) {
+    return formatSummaryValue(
+      'WorkflowType',
+      event.childWorkflowExecutionCompletedEventAttributes?.workflowType?.name,
+    );
+  }
+
+  if (isWorkflowTaskScheduledEvent(event)) {
+    return formatSummaryValue(
+      'TaskQueueKind',
+      event.workflowTaskScheduledEventAttributes.taskQueue.kind,
+    );
+  }
+
+  if (isWorkflowTaskStartedEvent(event)) {
+    return formatSummaryValue(
+      'Identity',
+      event.workflowTaskStartedEventAttributes.identity,
+    );
+  }
+
+  if (isWorkflowTaskCompletedEvent(event)) {
+    return formatSummaryValue(
+      'Identity',
+      event.workflowTaskCompletedEventAttributes.identity,
+    );
+  }
+
+  if (isWorkflowExecutionSignaledEvent(event)) {
+    return formatSummaryValue(
+      'SignalName',
+      event.workflowExecutionSignaledEventAttributes?.signalName,
+    );
+  }
+
+  if (isWorkflowTaskScheduledEvent(event)) {
+    return formatSummaryValue(
+      'TaskQueue',
+      event.workflowTaskScheduledEventAttributes?.taskQueue?.name,
+    );
+  }
+
+  if (isWorkflowTaskFailedEvent(event)) {
+    return formatSummaryValue(
+      'Cause',
+      event.workflowTaskFailedEventAttributes?.cause,
+    );
+  }
+
+  if (isWorkflowTaskTimedOutEvent(event)) {
+    return formatSummaryValue(
+      'TimeoutType',
+      event.workflowTaskTimedOutEventAttributes?.timeoutType,
+    );
+  }
+
+  if (isActivityTaskCompletedEvent(event)) {
+    return formatSummaryValue(
+      'Identity',
+      event.activityTaskCompletedEventAttributes?.identity,
+    );
+  }
+
+  if (isActivityTaskFailedEvent(event)) {
+    const message =
+      event.activityTaskFailedEventAttributes?.failure.cause?.cause?.message ??
+      event.activityTaskFailedEventAttributes.failure?.message;
+    return formatSummaryValue('Message', message);
+  }
+
   if (isActivityTaskCanceledEvent(event)) {
-    console.log('ActivityTaskCanceledEvent: ', event);
-    return 'Task Canceled...';
-    // return event.activityTaskCanceledEventAttributes.details;
+    return formatSummaryValue(
+      'Details',
+      event.activityTaskCanceledEventAttributes.details,
+    );
   }
 
   if (isActivityTaskScheduledEvent(event)) {
-    console.log('ActivityTaskScheduledEvent: ', event);
-    return event.activityTaskScheduledEventAttributes?.activityType?.name;
+    return formatSummaryValue(
+      'ActivityType',
+      event.activityTaskScheduledEventAttributes?.activityType?.name,
+    );
   }
 
   if (isMarkerRecordedEvent(event)) {
     if (isLocalActivityMarkerEvent(event)) {
-      console.log('LocalActivityMarkerEvent: ', event);
-      return event.eventType;
+      const payload =
+        event.markerRecordedEventAttributes?.details?.data?.payloads?.[0];
+
+      const activityType = getActivityType(payload);
+
+      if (activityType) {
+        return formatSummaryValue('ActivityType', activityType);
+      }
+      return formatSummaryValue('ActivityType', event.eventType);
     }
-    console.log('MarkerRecordedEvent: ', event);
-    return event.markerRecordedEventAttributes.markerName;
+    return formatSummaryValue(
+      'MarkerName',
+      event.markerRecordedEventAttributes.markerName,
+    );
   }
 
   if (isTimerStartedEvent(event)) {
-    console.log('TimerStartedEvent: ', event);
-    return event.timerStartedEventAttributes?.startToFireTimeout;
-    // return event.timerStartedEventAttributes?.timerId;
+    return formatSummaryValue(
+      'StartToFireTimeout',
+      event.timerStartedEventAttributes?.startToFireTimeout,
+    );
   }
 
   if (isSignalExternalWorkflowExecutionInitiatedEvent(event)) {
-    console.log('SignalExternalWorkflowExecutionInitiatedEvent: ', event);
-    return event.signalExternalWorkflowExecutionInitiatedEventAttributes;
+    return formatSummaryValue(
+      'SignalName',
+      event.signalExternalWorkflowExecutionInitiatedEventAttributes?.signalName,
+    );
   }
 
-  console.log('Missing Label Event: ', event);
-  return 'Missing Label';
+  return formatSummaryValue('', '');
 };
 
 type PotentiallyDecodable =

@@ -124,7 +124,10 @@ export const shouldDisplayChildWorkflowLink = (
   return false;
 };
 
-const formatSummaryValue = (key: string, value: unknown): SummaryAttribute => {
+export const formatSummaryValue = (
+  key: string,
+  value: unknown,
+): SummaryAttribute => {
   if (typeof value === 'object') {
     const [firstKey] = Object.keys(value);
     return { key: key + capitalize(firstKey), value: value[firstKey] };
@@ -143,10 +146,9 @@ const preferredSummaryKeys = [
   'parentInitiatedEventId',
   'workflowExecution',
   'workflowType',
-  'identity',
   'taskQueue',
+  'identity',
   'startToFireTimeout',
-  'signalName',
 ] as const;
 
 /**
@@ -162,7 +164,7 @@ const getFirstDisplayAttribute = ({
   }
 };
 
-const getActivityType = (payload: Payload) => {
+export const getActivityType = (payload: Payload) => {
   if (has(payload, 'ActivityType')) return payload.ActivityType;
   if (has(payload, 'activity_type')) return payload.activity_type;
 };

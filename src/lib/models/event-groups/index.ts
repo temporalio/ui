@@ -6,7 +6,6 @@ import type { EventSortOrder } from '$lib/stores/event-view';
 import { isSubrowActivity } from '$lib/utilities/is-subrow-activity';
 import {
   eventOrGroupIsCanceled,
-  eventOrGroupIsCompleted,
   eventOrGroupIsFailureOrTimedOut,
   eventOrGroupIsTerminated,
 } from './get-event-in-group';
@@ -35,6 +34,53 @@ type groupEventOptions = {
   includeWorkflowTasks: boolean;
   nonCompletedEventsOnly: boolean;
 };
+
+const addPendingActivity = (
+  group: EventGroup,
+  pendingActivities: PendingActivity[],
+) => {
+  const pendingActivityForGroup = pendingActivities.find((pending) =>
+    group.eventList.find((e) => e.id === pending.activityId),
+  );
+  if (pendingActivityForGroup) group.pendingActivity = pendingActivityForGroup;
+};
+
+const generateSubGroups = (
+  groups: EventGroup[],
+  pendingActivities: PendingActivity[],
+) => {
+  for (const group of groups) {
+    addPendingActivity(group, pendingActivities);
+
+    if (isSubrowActivity(group.initialEvent)) {
+      const workflowTaskId =
+        group.initialEvent.attributes?.workflowTaskCompletedEventId;
+      const workflowTaskGroup = groups.find(
+        (g) => g.lastEvent?.eventId === workflowTaskId,
+      );
+      if (workflowTaskGroup) {
+        workflowTaskGroup.subGroups.set(group.id, group);
+        groups = groups.filter((g) => g.id !== group.id);
+      } else {
+        console.error('No task group found!');
+      }
+    }
+  }
+};
+
+const filterOutCompletedEvents = (groups: EventGroup[]) => {
+  for (const group of groups) {
+    if (
+      !groupIsCanceledFailureTimedOutTerminated(group) &&
+      group.subGroupList.every(
+        (e) => !groupIsCanceledFailureTimedOutTerminated(e),
+      )
+    ) {
+      groups = groups.filter((g) => g.id !== group.id);
+    }
+  }
+};
+
 export const groupEvents = (
   events: CommonHistoryEvent[],
   sort: EventSortOrder = 'ascending',
@@ -60,46 +106,10 @@ export const groupEvents = (
     }
   }
 
-  let groups = Object.values(groupMap);
+  const groups = Object.values(groupMap);
 
-  if (createSubGroups) {
-    for (const group of groups) {
-      const initialEvent = group.initialEvent;
-      const pendingActivityForGroup = pendingActivities.find((pending) =>
-        group.eventList.find((e) => e.id === pending.activityId),
-      );
-      if (pendingActivityForGroup) {
-        group.pendingActivity = pendingActivityForGroup;
-      }
-      const workflowTaskId =
-        isSubrowActivity(initialEvent) &&
-        initialEvent.attributes?.workflowTaskCompletedEventId;
-      if (workflowTaskId) {
-        const workflowTaskGroup = groups.find(
-          (g) => g.lastEvent?.eventId === workflowTaskId,
-        );
-        if (workflowTaskGroup) {
-          workflowTaskGroup.subGroups.set(group.id, group);
-          groups = groups.filter((g) => g.id !== group.id);
-        } else {
-          console.error('No task group found!');
-        }
-      }
-    }
-  }
-
-  if (nonCompletedEventsOnly) {
-    for (const group of groups) {
-      if (
-        !groupIsCanceledFailureTimedOutTerminated(group) &&
-        group.subGroupList.every(
-          (e) => !groupIsCanceledFailureTimedOutTerminated(e),
-        )
-      ) {
-        groups = groups.filter((g) => g.id !== group.id);
-      }
-    }
-  }
+  if (createSubGroups) generateSubGroups(groups, pendingActivities);
+  if (nonCompletedEventsOnly) filterOutCompletedEvents(groups);
 
   return sort === 'descending'
     ? Object.values(groups).reverse()

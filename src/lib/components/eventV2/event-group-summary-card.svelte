@@ -13,16 +13,12 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
-  import {
-    isLocalActivityMarkerEvent,
-    isWorkflowTaskCompletedEvent,
-  } from '$lib/utilities/is-event-type';
+  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
   import { noop } from 'svelte/internal';
   import { isEventGroup } from '$lib/models/event-groups';
   import EventCard from './event-card.svelte';
   import EventGroupDetails from './event-group-details.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
   import {
     getCodeBlockValue,
     getStackTrace,
@@ -87,7 +83,11 @@
 </script>
 
 <div class="flex gap-2">
-  <EventGroupTimestamp {event} {removeTail} />
+  <EventGroupTimestamp
+    {event}
+    {removeTail}
+    pending={Boolean(pendingActivity)}
+  />
   <div class="h-full w-full pt-2">
     {#if pendingActivity}
       <PendingActivityCard event={pendingActivity} />
@@ -98,7 +98,6 @@
         id={lastEvent.id}
         class:expanded={expanded && !expandAll}
         aria-expanded={expanded || expandAll}
-        class:active
         class:typedError
         data-testid="event-summary-row"
         on:click|stopPropagation={onLinkClick}
@@ -125,7 +124,7 @@
             </div>
           </div>
           <div class="flex gap-2">
-            <EventGroupDetails event={initialEvent} primary />
+            <EventGroupDetails {event} primary />
             {#if payloadAttributes.length}
               <Icon name="terminal" />
             {/if}
@@ -213,23 +212,11 @@
     @apply text-pink-700;
   }
 
-  .expanded-cell {
-    @apply table-cell w-full flex-wrap text-sm no-underline xl:text-base;
-  }
-
-  .typedError .expanded-cell {
-    @apply border-b-0;
-  }
-
   .row.typedError {
     @apply rounded-lg;
 
     &.expanded {
       @apply rounded-b-none;
     }
-  }
-
-  .active {
-    @apply z-50 cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
   }
 </style>

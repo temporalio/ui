@@ -9,7 +9,6 @@
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import type { GetPollersResponse } from '$lib/services/pollers-service';
 
-  export let taskQueue: string;
   export let workers: GetPollersResponse;
 </script>
 
