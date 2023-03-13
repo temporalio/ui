@@ -61,6 +61,8 @@ import summary from './svg/summary.svelte';
 import support from './svg/support.svelte';
 import terminal from './svg/terminal.svelte';
 import timeline from './svg/timeline.svelte';
+import transcoderOn from './svg/transcoder-on.svelte';
+import transcoderOff from './svg/transcoder-off.svelte';
 import trash from './svg/trash.svelte';
 import tutorial from './svg/tutorial.svelte';
 import upload from './svg/upload.svelte';
@@ -135,6 +137,8 @@ export const icons = {
   'spinner-solid': spinnerSolid,
   terminal,
   timeline,
+  'transcoder-on': transcoderOn,
+  'transcoder-off': transcoderOff,
   trash,
   tutorial,
   upload,

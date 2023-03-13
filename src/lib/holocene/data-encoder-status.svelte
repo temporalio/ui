@@ -21,8 +21,7 @@
         on:click={onIconClick}
       >
         <div class="mr-2 ml-1 flex items-center">
-          <Icon name="converter-down" class="text-blue-200" />
-          <Icon name="converter-up" class="absolute left-3 text-blue-200" />
+          <Icon name="transcoder-on" status="configured" />
         </div>
         <slot />
       </button>
@@ -38,8 +37,7 @@
         on:click={onIconClick}
       >
         <div class="mr-2 ml-1 flex items-center">
-          <Icon name="converter-down" class="text-red-400" />
-          <Icon name="converter-up" class="absolute left-3 text-red-400" />
+          <Icon name="transcoder-on" status="error" />
         </div>
         <slot />
       </button>
@@ -52,8 +50,7 @@
         on:click={onIconClick}
       >
         <div class="mr-2 ml-1 flex items-center">
-          <Icon name="converter-down" class="text-green-400" />
-          <Icon name="converter-up" class="absolute left-3 text-green-400" />
+          <Icon name="transcoder-on" status="success" />
         </div>
         <slot />
       </button>
@@ -67,8 +64,7 @@
       on:click={onIconClick}
     >
       <div class="mr-2 ml-1 flex items-center">
-        <Icon name="converter-down" class="text-gray-400" />
-        <Icon name="converter-up" class="absolute left-3 text-gray-400" />
+        <Icon name="transcoder-off" />
       </div>
       <slot />
     </button>
