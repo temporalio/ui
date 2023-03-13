@@ -7,8 +7,6 @@
     routeForTaskQueue,
   } from '$lib/utilities/route-for';
   import {
-    getCodeBlockValue,
-    getStackTrace,
     shouldDisplayAsExecutionLink,
     shouldDisplayAsTaskQueueLink,
     shouldDisplayAsPlainText,
@@ -18,24 +16,24 @@
   import Link from '$lib/holocene/link.svelte';
   import Copyable from '../copyable.svelte';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
-  import Tooltip from '$lib/holocene/tooltip.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
+  import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
 
   export let key: string;
   export let value: string | Record<string, unknown>;
+  export let badge: BadgeType | undefined = undefined;
   export let attributes: CombinedAttributes;
   export let primary: boolean = false;
 
   const { workflow, namespace } = $page.params;
 </script>
 
-{#if typeof value !== 'object'}
+{#if typeof value !== 'object' && value}
   <div
     class="flex h-auto items-center justify-between gap-1"
     class:cell={!primary}
   >
-    <p class="text-[12px]">{format(key)}</p>
-    <Badge type={primary ? 'beta' : 'beta'}>
+    {#if !primary}<p class="text-[12px]">{format(key)}</p>{/if}
+    <Badge type={badge ?? 'beta'}>
       {#if shouldDisplayAsExecutionLink(key)}
         <Copyable
           content={value}
@@ -81,22 +79,6 @@
 {/if}
 
 <style lang="postcss">
-  .row {
-    @apply flex px-4 first:pt-0;
-  }
-
-  .content {
-    @apply block w-full border-b-2 border-gray-200 py-2 text-left;
-  }
-
-  .code-block-row {
-    @apply block w-full py-2 text-left;
-  }
-
-  .code-with-stack-trace {
-    @apply flex flex-col gap-2 lg:flex-row;
-  }
-
   .cell {
     @apply border-b-3 border-gray-500;
   }

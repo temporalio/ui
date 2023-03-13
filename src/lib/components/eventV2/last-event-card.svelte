@@ -66,7 +66,6 @@
         id={event.id}
         class:expanded={expanded && !expandAll}
         aria-expanded={expanded || expandAll}
-        class:active
         class:typedError
         data-testid="event-summary-row"
         on:click={onLinkClick}
@@ -151,32 +150,12 @@
     @apply w-full flex-wrap items-center rounded-xl border-gray-900 py-2 pl-8 pr-2 text-sm no-underline xl:text-base;
   }
 
-  .dot {
-    @apply h-4 w-4 rounded-full border-3 border-gray-900 bg-white;
-  }
-
-  .subgroup-dot {
-    @apply h-3 w-3 rounded-full border-2 border-gray-900 bg-white;
-  }
-
-  .dot.failure {
-    @apply bg-red-500;
-  }
-
   .failure p {
     @apply text-red-700;
   }
 
-  .dot.canceled {
-    @apply bg-yellow-300;
-  }
-
   .canceled p {
     @apply text-yellow-700;
-  }
-
-  .dot.terminated {
-    @apply bg-pink-500;
   }
 
   .terminated p {
@@ -185,9 +164,5 @@
 
   .row.typedError {
     @apply rounded-lg;
-  }
-
-  .active {
-    @apply z-50 cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
   }
 </style>

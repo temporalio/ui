@@ -11,6 +11,7 @@
   import { getStackTrace } from '$lib/utilities/get-single-attribute-for-event';
   import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { importEvents } from '$lib/stores/import-events';
+  import RunningCard from './running-card.svelte';
 
   export let fullHistory: CommonHistoryEvent[] = [];
   export let importingHistory: boolean = false;
@@ -107,5 +108,8 @@
       {initialItem}
       visibleItems={currentEvents}
     />
+  {/if}
+  {#if $workflowRun?.workflow.isRunning}
+    <RunningCard />
   {/if}
 </div>

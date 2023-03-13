@@ -69,8 +69,4 @@
   .cell {
     @apply flex h-auto items-center justify-start gap-1;
   }
-
-  .col-1 {
-    @apply grid-cols-1;
-  }
 </style>

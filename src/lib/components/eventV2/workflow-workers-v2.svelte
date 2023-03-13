@@ -16,6 +16,6 @@
       <Badge type="green">{workers?.pollers?.length}</Badge>
       <Badge type="alpha">{taskQueue}</Badge>
     </div>
-    <WorkersListV2 taskQueue={workflow.taskQueue} {workers} />
+    <WorkersListV2 {workers} />
   </Accordion>
 </section>
