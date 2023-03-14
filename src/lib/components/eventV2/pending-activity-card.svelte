@@ -8,6 +8,7 @@
   import { formatDate } from '$lib/utilities/format-date';
   import { noop } from 'svelte/internal';
   import EventCard from './event-card.svelte';
+  import EventGroupTimestamp from './event-group-timestamp.svelte';
   import PendingActivityDetails from './pending-activity-details.svelte';
 
   export let event: PendingActivity;
@@ -30,59 +31,63 @@
   $: failed = event.attempt > 1;
 </script>
 
-<div class="mb-2 flex w-full grow gap-2">
-  <EventCard {expanded} pending>
-    <div
-      class="row"
-      id={event.activityId}
-      class:expanded={expanded && !expandAll}
-      aria-expanded={expanded || expandAll}
-      data-testid="event-summary-row"
-      on:click|stopPropagation={onLinkClick}
-      on:keydown={onLinkClick}
-    >
-      <div class="primary flex w-full cursor-pointer justify-between">
-        <div class="flex items-center gap-4">
-          <div
-            class="rounded-xl border-3 border-gray-900 bg-lightBlue py-1 px-2"
-          >
-            In progress
-          </div>
-          <div class="flex items-center">
-            <p class="event-name truncate text-sm font-semibold md:text-base">
-              {event.activityType}
-            </p>
-          </div>
-        </div>
-        <div class="flex gap-2">
-          {#if canceled}
-            <Tooltip bottom text="Pending activities have been canceled.">
-              <Badge type="warning" class="py-0"><Icon name="canceled" /></Badge
-              >
-            </Tooltip>
-          {:else}
-            <Badge type={failed ? 'error' : 'default'}>
-              {#if failed}
-                <Icon name="retry" />
-              {/if}
-              {event.attempt}
-            </Badge>
-          {/if}
-          <Icon name={expanded ? 'chevron-up' : 'chevron-down'} class="w-4" />
-        </div>
-      </div>
-      <p
-        class="break-word leading-0 truncate text-left md:whitespace-normal md:text-[12px]"
+<div class="flex gap-2">
+  <EventGroupTimestamp {event} pending />
+  <div class="h-full w-full pt-2">
+    <EventCard {expanded} pending>
+      <div
+        class="row"
+        id={event.activityId}
+        class:expanded={expanded && !expandAll}
+        aria-expanded={expanded || expandAll}
+        data-testid="event-summary-row"
+        on:click|stopPropagation={onLinkClick}
+        on:keydown={onLinkClick}
       >
-        {formatDate(event.lastHeartbeatTime, 'relative')}
-      </p>
-    </div>
-    {#if expanded}
-      <div class="p-2">
-        <PendingActivityDetails {event} />
+        <div class="primary flex w-full cursor-pointer justify-between">
+          <div class="flex items-center gap-4">
+            <div
+              class="rounded-xl border-3 border-gray-900 bg-lightBlue py-1 px-2"
+            >
+              In progress
+            </div>
+            <div class="flex items-center">
+              <p class="event-name truncate text-sm font-semibold md:text-base">
+                {event.activityType}
+              </p>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            {#if canceled}
+              <Tooltip bottom text="Pending activities have been canceled.">
+                <Badge type="warning" class="py-0"
+                  ><Icon name="canceled" /></Badge
+                >
+              </Tooltip>
+            {:else}
+              <Badge type={failed ? 'error' : 'default'}>
+                {#if failed}
+                  <Icon name="retry" />
+                {/if}
+                {event.attempt}
+              </Badge>
+            {/if}
+            <Icon name={expanded ? 'chevron-up' : 'chevron-down'} class="w-4" />
+          </div>
+        </div>
+        <p
+          class="break-word leading-0 truncate text-left md:whitespace-normal md:text-[12px]"
+        >
+          {formatDate(event.lastHeartbeatTime, 'relative')}
+        </p>
       </div>
-    {/if}
-  </EventCard>
+      {#if expanded}
+        <div class="p-2">
+          <PendingActivityDetails {event} />
+        </div>
+      {/if}
+    </EventCard>
+  </div>
 </div>
 
 <style lang="postcss">
