@@ -29,9 +29,8 @@ const groupIsCanceledFailureTimedOutTerminated = (group: IterableEvent) => {
   );
 };
 
-type groupEventOptions = {
-  createSubGroups: boolean;
-  includeWorkflowTasks: boolean;
+type GroupEventOptions = {
+  createWorkflowTaskGroups: boolean;
   nonCompletedEventsOnly: boolean;
 };
 
@@ -49,19 +48,17 @@ export const groupEvents = (
   events: CommonHistoryEvent[],
   sort: EventSortOrder = 'ascending',
   pendingActivities: PendingActivity[] = [],
-  options: groupEventOptions = {
-    createSubGroups: false,
-    includeWorkflowTasks: false,
+  options: GroupEventOptions = {
+    createWorkflowTaskGroups: false,
     nonCompletedEventsOnly: false,
   },
 ): EventGroups => {
-  const { createSubGroups, includeWorkflowTasks, nonCompletedEventsOnly } =
-    options;
+  const { createWorkflowTaskGroups, nonCompletedEventsOnly } = options;
   const groupMap: Record<string, EventGroup> = {};
 
   for (const event of events) {
     const id = getGroupId(event);
-    const group = createEventGroup(event, includeWorkflowTasks);
+    const group = createEventGroup(event, createWorkflowTaskGroups);
 
     if (group) {
       groupMap[group.id] = group;
@@ -71,22 +68,20 @@ export const groupEvents = (
   }
 
   let groups = Object.values(groupMap);
-  if (createSubGroups) {
-    for (const group of groups) {
-      addPendingActivity(group, pendingActivities);
+  for (const group of groups) {
+    addPendingActivity(group, pendingActivities);
 
-      if (isSubrowActivity(group.initialEvent)) {
-        const workflowTaskId =
-          group.initialEvent.attributes?.workflowTaskCompletedEventId;
-        const workflowTaskGroup = groups.find(
-          (g) => g.lastEvent?.eventId === workflowTaskId,
-        );
-        if (workflowTaskGroup) {
-          workflowTaskGroup.subGroups.set(group.id, group);
-          groups = groups.filter((g) => g.id !== group.id);
-        } else {
-          console.error('No task group found!');
-        }
+    if (createWorkflowTaskGroups && isSubrowActivity(group.initialEvent)) {
+      const workflowTaskId =
+        group.initialEvent.attributes?.workflowTaskCompletedEventId;
+      const workflowTaskGroup = groups.find(
+        (g) => g.lastEvent?.eventId === workflowTaskId,
+      );
+      if (workflowTaskGroup) {
+        workflowTaskGroup.subGroups.set(group.id, group);
+        groups = groups.filter((g) => g.id !== group.id);
+      } else {
+        console.error('No task group found!');
       }
     }
   }

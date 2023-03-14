@@ -14,6 +14,7 @@
   import EventGroupDetails from './event-group-details.svelte';
   import { formatDate } from '$lib/utilities/format-date';
   import { timeFormat } from '$lib/stores/time-format';
+  import { eventGroupDisplayName } from './event-detail-keys';
 
   export let event: WorkflowEvent;
   export let expandAll = false;
@@ -29,9 +30,9 @@
     onRowClick();
   };
 
-  const failure = eventOrGroupIsFailureOrTimedOut(event);
-  const canceled = eventOrGroupIsCanceled(event);
-  const terminated = eventOrGroupIsTerminated(event);
+  $: failure = eventOrGroupIsFailureOrTimedOut(event);
+  $: canceled = eventOrGroupIsCanceled(event);
+  $: terminated = eventOrGroupIsTerminated(event);
 </script>
 
 <div class="flex gap-2">
@@ -55,20 +56,16 @@
         on:keydown={onLinkClick}
       >
         <div class="primary flex w-full cursor-pointer justify-between">
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2">
             <p>{event.id}</p>
-            <div
-              class="flex items-center"
+            <p
+              class="event-name truncate text-sm font-semibold md:text-base xl:text-lg"
               class:failure
               class:canceled
               class:terminated
             >
-              <p
-                class="event-name truncate text-sm font-semibold md:text-base xl:text-lg"
-              >
-                {event.name}
-              </p>
-            </div>
+              {eventGroupDisplayName(event)}
+            </p>
           </div>
           <div class="flex gap-2">
             <EventGroupDetails {event} primary />

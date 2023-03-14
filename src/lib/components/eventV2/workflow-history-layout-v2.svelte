@@ -25,12 +25,10 @@
     fullHistory,
   );
 
+  let fetchHistory: Promise<CommonHistoryEvent[]>;
   let fullHistory: CommonHistoryEvent[] = [];
   let debugMode = false;
-
-  const resetFullHistory = () => {
-    fullHistory = [];
-  };
+  let advancedMode = false;
 
   const onUpdate = async ({ history }) => {
     const { settings } = $page.data;
@@ -52,8 +50,7 @@
     runId: string,
   ) => {
     const { settings } = $page.data;
-    resetFullHistory();
-    fetchAllEvents({
+    fetchHistory = fetchAllEvents({
       namespace,
       workflowId,
       runId,
@@ -74,7 +71,10 @@
 />
 <div class="flex flex-col gap-2 xl:flex-row-reverse">
   <div class="flex w-full flex-col gap-2 xl:w-[40%]">
-    <WorkflowOptionsV2 onDebugClick={() => (debugMode = !debugMode)} />
+    <WorkflowOptionsV2
+      onDebugClick={() => (debugMode = !debugMode)}
+      onAdvancedClick={() => (advancedMode = !advancedMode)}
+    />
     <WorkflowSummaryV2 />
     <WorkflowRelationshipsV2 {...workflowRelationships} />
     <WorkflowWorkersV2 taskQueue={workflow.taskQueue} />
@@ -86,6 +86,6 @@
     </Accordion>
   </div>
   <div class="w-full xl:w-[60%]">
-    <EventSummaryV2 {fullHistory} {debugMode} />
+    <EventSummaryV2 {fullHistory} {debugMode} {advancedMode} />
   </div>
 </div>

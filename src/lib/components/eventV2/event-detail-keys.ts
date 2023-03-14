@@ -52,15 +52,41 @@ type SummaryAttribute = {
 };
 
 export const eventGroupDisplayName = (event: IterableEvent) => {
-  const _event = isEventGroup(event) ? event.initialEvent : event;
+  const hasGroupEvents = isEventGroup(event) && event.eventList.length > 1;
 
-  if (isLocalActivityMarkerEvent(_event)) return 'LocalActivity';
-  if (isSignalExternalWorkflowExecutionInitiatedEvent(_event))
-    return 'Signal sent';
-  if (isWorkflowExecutionSignaledEvent(_event)) return 'Signal received';
-  if (isChildWorkflowExecutionCompletedEvent(_event)) return 'Child workflow';
+  if (hasGroupEvents) {
+    if (isLocalActivityMarkerEvent(event.initialEvent)) return 'Local Activity';
+    if (isSignalExternalWorkflowExecutionInitiatedEvent(event.initialEvent))
+      return 'Signal Sent';
+    if (isWorkflowTaskScheduledEvent(event.initialEvent))
+      return 'Workflow Task';
+    if (isWorkflowExecutionSignaledEvent(event.initialEvent))
+      return 'Signal Received';
+    if (isSignalExternalWorkflowExecutionInitiatedEvent(event.initialEvent))
+      return 'Signal Sent';
+    if (isStartChildWorkflowExecutionInitiatedEvent(event.initialEvent))
+      return 'Child Workflow';
+    if (isActivityTaskScheduledEvent(event.initialEvent))
+      return 'Activity Task';
+    if (isTimerStartedEvent(event.initialEvent)) return 'Timer Started';
+  }
 
-  return _event.name;
+  const singleEvent = isEventGroup(event) ? event.initialEvent : event;
+  if (isWorkflowExecutionStartedEvent(singleEvent)) return 'Workflow Started';
+  if (isMarkerRecordedEvent(singleEvent)) return 'Marker Recorded';
+  if (isWorkflowExecutionSignaledEvent(singleEvent)) return 'Signal Received';
+  if (isSignalExternalWorkflowExecutionInitiatedEvent(singleEvent))
+    return 'Signal Sent';
+  if (isTimerStartedEvent(singleEvent)) return 'Timer Started';
+  if (
+    isWorkflowExecutionCanceledEvent(singleEvent) ||
+    isWorkflowExecutionFailedEvent(singleEvent) ||
+    isWorkflowExecutionTerminatedEvent(singleEvent)
+  )
+    return 'Workflow Ended';
+
+  // return singleEvent?.classification ?? singleEvent?.name;
+  return singleEvent?.name;
 };
 
 export const getPrimaryIterableEventDetails = (
@@ -267,7 +293,12 @@ type PotentiallyDecodable =
   | Record<string | number | symbol, unknown>
   | EventAttribute;
 
-const payloadAttributeFields = ['payloads', 'failure', 'lastFailure'];
+const payloadAttributeFields = [
+  'payloads',
+  'failure',
+  'lastFailure',
+  'searchAttributes',
+];
 export const getAttributePayloads = (attributes: PotentiallyDecodable) => {
   const payloadAttributes = [];
 
