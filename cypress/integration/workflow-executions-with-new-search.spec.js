@@ -200,7 +200,7 @@ describe('Workflow Executions List With Search', () => {
           encodeURIComponent(`ExecutionStatus="Running"`),
         );
 
-        cy.get('.workflow-summary-row').first().click();
+        cy.get('.workflow-summary-row > .time-cell').first().click();
 
         cy.wait('@workflow-api');
         cy.wait('@event-history-api');
@@ -416,7 +416,7 @@ describe('Workflow Executions List With Search using only MySql on 1.20', () => 
           encodeURIComponent(`ExecutionStatus="Running"`),
         );
 
-        cy.get('.workflow-summary-row').first().click();
+        cy.get('.workflow-summary-row > .time-cell').first().click();
 
         cy.wait('@workflow-api');
         cy.wait('@event-history-api');

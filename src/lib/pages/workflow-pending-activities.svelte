@@ -8,6 +8,7 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
+  import TableRow from '$lib/holocene/table/table-row.svelte';
   import { formatDate } from '$lib/utilities/format-date';
   import { getDuration, formatDuration } from '$lib/utilities/format-time';
   import {
@@ -24,21 +25,18 @@
 {#if pendingActivities.length}
   <Table class="mb-6 w-full min-w-[600px] table-fixed">
     <TableHeaderRow slot="headers">
-      <th class="table-cell w-44">Activity Id</th>
-      <th class="table-cell w-auto">Details</th>
+      <th class="w-44">Activity Id</th>
+      <th>Details</th>
     </TableHeaderRow>
     {#each pendingActivities as { id, activityId, ...details } (id)}
       {@const failed = details.attempt > 1}
-      <tr class="event-table-body">
-        <td />
-        <td
-          class="table-cell w-44 items-start break-all py-5 pl-5 pr-2 align-top"
-        >
+      <TableRow>
+        <td class="w-44 items-start break-all py-5 pl-5 pr-2 align-top">
           <div class="pt-1">
             <Link href="#{id}">{activityId}</Link>
           </div>
         </td>
-        <td class="table-cell py-4 px-5">
+        <td class="py-4 px-5">
           <ul>
             <li class="event-table-row">
               <h4 class="font-semibold">Activity Type</h4>
@@ -139,8 +137,7 @@
             {/if}
           </ul>
         </td>
-        <td />
-      </tr>
+      </TableRow>
     {/each}
   </Table>
 {:else}
@@ -148,14 +145,6 @@
 {/if}
 
 <style lang="postcss">
-  .event-table-header {
-    @apply grid grid-cols-2 rounded-t-lg border-2 border-gray-300 bg-gray-900 p-3 text-white;
-  }
-
-  .event-table-body {
-    @apply table-row w-full border-2 border-t-0 border-gray-300;
-  }
-
   .event-table-row {
     @apply grid grid-cols-2 border-b border-gray-300 py-1;
   }

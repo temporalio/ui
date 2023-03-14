@@ -113,7 +113,7 @@
   }
 
   .time-cell {
-    @apply hidden xl:table-cell;
+    @apply max-xl:hidden;
   }
 
   .inline-time-cell {

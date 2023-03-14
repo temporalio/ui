@@ -8,12 +8,12 @@
 <article class="flex w-full flex-col lg:w-1/2" {...$$restProps}>
   <h3 class="text-lg">{title}</h3>
   {#if content}
-    <CodeBlock {content} class="mb-2 max-h-96" />
+    <CodeBlock {content} class="mb-2 lg:max-h-96" />
   {:else}
     <CodeBlock
       content="Results will appear upon completion."
       language="text"
-      class="mb-2 max-h-96"
+      class="mb-2 lg:max-h-96"
       copyable={false}
     />
   {/if}

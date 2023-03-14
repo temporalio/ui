@@ -50,10 +50,10 @@
       <ScheduleFrequency {calendar} {interval} class="text-sm" />
     </p>
   </td>
-  <td class="cell hidden whitespace-pre-line break-words md:table-cell">
+  <td class="cell whitespace-pre-line break-words max-md:hidden">
     {schedule?.info?.workflowType?.name ?? ''}
   </td>
-  <td class="cell links hidden truncate xl:table-cell">
+  <td class="cell links truncate max-xl:hidden">
     {#each sortRecentActions(schedule?.info?.recentActions) as run}
       <p>
         <Link
@@ -66,7 +66,7 @@
       </p>
     {/each}
   </td>
-  <td class="cell hidden truncate xl:table-cell">
+  <td class="cell truncate max-xl:hidden">
     {#each schedule?.info?.futureActionTimes?.slice(0, 5) ?? [] as run}
       <div>{formatDate(run, $timeFormat, 'from now')}</div>
     {/each}

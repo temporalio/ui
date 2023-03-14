@@ -6,7 +6,7 @@
 </script>
 
 <tr class="row">
-  <td class="table-cell" colspan="6">
+  <td colspan="6">
     {#if loading}
       <Loading />
     {:else}

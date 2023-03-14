@@ -22,6 +22,8 @@
   import Loading from '$lib/holocene/loading.svelte';
   import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
 
+  export let columns: string[];
+
   let searchType: 'basic' | 'advanced' = getSearchType($page.url);
 
   const errorMessage =
@@ -77,7 +79,7 @@
       />
     {:else}
       <tr>
-        <td colspan="5" class="xl:hidden">
+        <td colspan={columns.length} class="xl:hidden">
           {#if $loading}
             <Loading />
           {:else}
@@ -88,7 +90,7 @@
             />
           {/if}
         </td>
-        <td colspan="7" class="hidden xl:table-cell">
+        <td colspan={columns.length + 2} class="hidden xl:table-cell">
           {#if $loading}
             <Loading />
           {:else}
