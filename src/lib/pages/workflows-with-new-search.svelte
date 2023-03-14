@@ -51,8 +51,6 @@
     $supportsAdvancedVisibility,
   );
 
-  export let columns: string[];
-
   let selectedWorkflows: { [index: string]: boolean } = {};
   let batchTerminateConfirmationModal: BatchOperationConfirmationModal;
   let batchCancelConfirmationModal: BatchOperationConfirmationModal;
@@ -248,6 +246,14 @@
       resetSelection();
     }
   }
+
+  const columns = [
+    'status',
+    'workflowId',
+    'workflowType',
+    'startTime',
+    'endTime',
+  ];
 </script>
 
 <BatchOperationConfirmationModal
