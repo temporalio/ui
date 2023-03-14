@@ -88,7 +88,7 @@
       ><p class="truncate">{event.id}</p></a
     >
   </td>
-  <td class="flex text-left">
+  <td class="text-left">
     <p class="break-word truncate text-sm md:whitespace-normal md:text-base">
       {#if showElapsedTimeDiff}
         {formatDistanceAbbreviated({
