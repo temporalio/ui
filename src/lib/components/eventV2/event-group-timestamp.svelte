@@ -47,7 +47,7 @@
 
 <style lang="postcss">
   .dot {
-    @apply h-3 w-3 rounded-full border-3 border-gray-700 bg-gray-900;
+    @apply h-3 w-3 rounded-full border-2 border-gray-700 bg-gray-900;
   }
 
   .line {

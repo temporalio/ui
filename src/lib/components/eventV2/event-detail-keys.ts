@@ -52,12 +52,13 @@ type SummaryAttribute = {
 };
 
 export const eventGroupDisplayName = (event: IterableEvent) => {
-  const _event = isEventGroup(event) ? event.lastEvent : event;
+  const _event = isEventGroup(event) ? event.initialEvent : event;
 
-  // if (isLocalActivityMarkerEvent(_event)) return 'LocalActivity';
-  // if (isSignalExternalWorkflowExecutionInitiatedEvent(_event)) return 'Signal sent'
-  // if (isWorkflowExecutionSignaledEvent(_event)) return 'Signal received'
-  // if (isChildWorkflowExecutionCompletedEvent(_event)) return 'Child workflow'
+  if (isLocalActivityMarkerEvent(_event)) return 'LocalActivity';
+  if (isSignalExternalWorkflowExecutionInitiatedEvent(_event))
+    return 'Signal sent';
+  if (isWorkflowExecutionSignaledEvent(_event)) return 'Signal received';
+  if (isChildWorkflowExecutionCompletedEvent(_event)) return 'Child workflow';
 
   return _event.name;
 };

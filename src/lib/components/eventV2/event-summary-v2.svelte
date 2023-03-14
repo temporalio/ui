@@ -29,7 +29,7 @@
         'ascending',
         $workflowRun?.workflow?.pendingActivities ?? [],
         {
-          createSubGroups: true,
+          createSubGroups: false,
           includeWorkflowTasks: true,
           nonCompletedEventsOnly: debugMode,
         },
@@ -40,7 +40,7 @@
       'ascending',
       $workflowRun?.workflow?.pendingActivities ?? [],
       {
-        createSubGroups: true,
+        createSubGroups: false,
         includeWorkflowTasks: true,
         nonCompletedEventsOnly: debugMode,
       },

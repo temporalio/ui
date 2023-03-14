@@ -85,7 +85,7 @@
     <EventCard thick={hasGroupEvents} {expanded}>
       <div
         class="row"
-        id={lastEvent.id}
+        id={initialEvent.id}
         class:expanded={expanded && !expandAll}
         aria-expanded={expanded || expandAll}
         class:typedError
@@ -97,7 +97,7 @@
           class="flex w-full cursor-pointer flex-col justify-between gap-2 md:flex-row"
         >
           <div class="flex items-center gap-4">
-            <p>{lastEvent.id}</p>
+            <p>{initialEvent.id}</p>
             <div
               class="flex items-center gap-2"
               class:failure
