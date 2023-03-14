@@ -17,7 +17,7 @@
 </script>
 
 {#if open}
-  <div
+  <aside
     class="drawer {position}"
     class:dark
     transition:fly={flyParams}
@@ -46,7 +46,7 @@
     <div class="content {position}">
       <slot />
     </div>
-  </div>
+  </aside>
 {/if}
 
 <style lang="postcss">
