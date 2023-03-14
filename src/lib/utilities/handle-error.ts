@@ -36,6 +36,7 @@ export const handleError = (
     });
     // Re-throw error to prevent other code from attempting to render
     errors.set(error);
+    (error as any).report = false;
     throw error;
   }
 };
