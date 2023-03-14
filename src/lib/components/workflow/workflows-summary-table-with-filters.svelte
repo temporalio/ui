@@ -165,13 +165,6 @@
           <EndTimeDropdownFilter {disabled} />
         </th>
       {/if}
-      <!-- <th slot="trailing-th" style="width: 2.5rem;">
-        <IconButton
-          class="text-white"
-          icon="vertical-ellipsis"
-          on:click={openCustomizationDrawer}
-        />
-      </th> -->
     </TableHeaderRow>
     <slot />
   </Table>
