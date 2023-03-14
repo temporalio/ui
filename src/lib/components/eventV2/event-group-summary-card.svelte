@@ -104,7 +104,7 @@
         on:keydown={onLinkClick}
       >
         <div
-          class="flex w-full cursor-pointer flex-col justify-between gap-2 xl:flex-row"
+          class="flex w-full cursor-pointer flex-col justify-between gap-2 md:flex-row"
         >
           <div class="flex items-center gap-4">
             <p>{lastEvent.id}</p>
@@ -124,15 +124,15 @@
             </div>
           </div>
           <div class="flex gap-2">
-            <EventGroupDetails {event} primary />
             {#if payloadAttributes.length}
-              <Icon name="terminal" />
+              <Icon name="json" class="rounded bg-gray-900 px-1 text-white" />
             {/if}
+            <EventGroupDetails {event} primary />
             <Icon name={expanded ? 'chevron-up' : 'chevron-down'} class="w-4" />
           </div>
         </div>
         <p
-          class="break-word leading-0 truncate text-left md:whitespace-normal md:text-[12px]"
+          class="break-word leading-0 truncate text-left text-sm text-gray-700 md:whitespace-normal"
         >
           {#if showElapsedTimeDiff}
             {formatDistanceAbbreviated({

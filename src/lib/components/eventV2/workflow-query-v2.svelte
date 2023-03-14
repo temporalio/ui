@@ -52,61 +52,59 @@
   let jsonFormatting = true;
 </script>
 
-<Accordion title="Query">
-  {#await queryTypes}
-    <div class="text-center">
-      <Loading />
-      <p>(This will fail if you have no workers running.)</p>
-    </div>
-  {:then types}
-    <div class="h-auto overflow-auto">
-      <div class="flex flex-row justify-between">
-        <div class="flex items-center gap-4">
-          <Select
-            id="query-select"
-            label="Query Type"
-            bind:value={queryType}
-            testId="query-select"
-          >
-            {#each types as value}
-              <Option {value}>{value}</Option>
-            {/each}
-          </Select>
-          <Button
-            on:click={() => query(queryType)}
-            icon="retry"
-            loading={isLoading}
-          >
-            Refresh
-          </Button>
-        </div>
-        <div class="flex flex-col">
-          <label
-            for="json-formatting"
-            class="flex text-center items-center gap-2 font-secondary text-sm"
-            >JSON Formatting
-            <ToggleSwitch
-              id="json-formatting"
-              checked={jsonFormatting}
-              on:change={() => (jsonFormatting = !jsonFormatting)}
-            />
-          </label>
-        </div>
+{#await queryTypes}
+  <div class="text-center">
+    <Loading />
+    <p>(This will fail if you have no workers running.)</p>
+  </div>
+{:then types}
+  <div class="h-auto overflow-auto">
+    <div class="flex flex-row justify-between">
+      <div class="flex items-center gap-4">
+        <Select
+          id="query-select"
+          label="Query Type"
+          bind:value={queryType}
+          testId="query-select"
+        >
+          {#each types as value}
+            <Option {value}>{value}</Option>
+          {/each}
+        </Select>
+        <Button
+          on:click={() => query(queryType)}
+          icon="retry"
+          loading={isLoading}
+        >
+          Refresh
+        </Button>
       </div>
-      <div class="flex items-start h-auto">
-        {#await queryResult then result}
-          <CodeBlock
-            content={result}
-            language={jsonFormatting ? 'json' : 'text'}
+      <div class="flex flex-col">
+        <label
+          for="json-formatting"
+          class="flex text-center items-center gap-2 font-secondary text-sm"
+          >JSON Formatting
+          <ToggleSwitch
+            id="json-formatting"
+            checked={jsonFormatting}
+            on:change={() => (jsonFormatting = !jsonFormatting)}
           />
-        {/await}
+        </label>
       </div>
     </div>
-  {:catch _error}
-    <EmptyState
-      title="An Error Occurred"
-      content="Please make sure you have at least one worker running."
-      error={_error?.message}
-    />
-  {/await}
-</Accordion>
+    <div class="flex items-start h-auto">
+      {#await queryResult then result}
+        <CodeBlock
+          content={result}
+          language={jsonFormatting ? 'json' : 'text'}
+        />
+      {/await}
+    </div>
+  </div>
+{:catch _error}
+  <EmptyState
+    title="An Error Occurred"
+    content="Please make sure you have at least one worker running."
+    error={_error?.message}
+  />
+{/await}

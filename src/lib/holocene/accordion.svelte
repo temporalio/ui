@@ -97,7 +97,7 @@
     class="mt-8 block w-full"
     class:hidden={!open}
   >
-    <slot />
+    <slot {open} />
   </div>
 </div>
 

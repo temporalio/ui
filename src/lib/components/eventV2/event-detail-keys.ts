@@ -255,6 +255,7 @@ type PotentiallyDecodable =
   | Record<string | number | symbol, unknown>
   | EventAttribute;
 
+const payloadAttributeFields = ['payloads', 'failure', 'lastFailure'];
 export const getAttributePayloads = (attributes: PotentiallyDecodable) => {
   const payloadAttributes = [];
 
@@ -263,7 +264,8 @@ export const getAttributePayloads = (attributes: PotentiallyDecodable) => {
     payloadsKey?: string,
   ) => {
     for (const key of Object.keys(attributes)) {
-      if (key === 'payloads' || key === 'failure' || key === 'lastFailure') {
+      const value = !!attributes[key];
+      if (payloadAttributeFields.includes(key) && value) {
         payloadAttributes.push({
           key: payloadsKey ?? key,
           value: attributes[key],

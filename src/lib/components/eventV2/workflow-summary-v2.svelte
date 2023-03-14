@@ -10,6 +10,7 @@
 
   import Accordion from '$lib/holocene/accordion.svelte';
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
+  import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
   $: ({ workflow } = $workflowRun);
 </script>
@@ -54,10 +55,19 @@
           title="Start Time"
           content={formatDate(workflow?.startTime, $timeFormat)}
         />
-        <WorkflowDetail
-          title="Close Time"
-          content={formatDate(workflow?.endTime, $timeFormat)}
-        />
+        {#if !workflow?.isRunning}
+          <WorkflowDetail
+            title="Close Time"
+            content={formatDate(workflow?.endTime, $timeFormat)}
+          />
+          <WorkflowDetail
+            title="Duration"
+            content={formatDistanceAbbreviated({
+              start: workflow?.startTime,
+              end: workflow?.endTime,
+            })}
+          />
+        {/if}
       </div>
     </div>
   </Accordion>
