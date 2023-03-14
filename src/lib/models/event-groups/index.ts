@@ -45,42 +45,6 @@ const addPendingActivity = (
   if (pendingActivityForGroup) group.pendingActivity = pendingActivityForGroup;
 };
 
-const generateSubGroups = (
-  groups: EventGroup[],
-  pendingActivities: PendingActivity[],
-) => {
-  for (const group of groups) {
-    addPendingActivity(group, pendingActivities);
-
-    if (isSubrowActivity(group.initialEvent)) {
-      const workflowTaskId =
-        group.initialEvent.attributes?.workflowTaskCompletedEventId;
-      const workflowTaskGroup = groups.find(
-        (g) => g.lastEvent?.eventId === workflowTaskId,
-      );
-      if (workflowTaskGroup) {
-        workflowTaskGroup.subGroups.set(group.id, group);
-        groups = groups.filter((g) => g.id !== group.id);
-      } else {
-        console.error('No task group found!');
-      }
-    }
-  }
-};
-
-const filterOutCompletedEvents = (groups: EventGroup[]) => {
-  for (const group of groups) {
-    if (
-      !groupIsCanceledFailureTimedOutTerminated(group) &&
-      group.subGroupList.every(
-        (e) => !groupIsCanceledFailureTimedOutTerminated(e),
-      )
-    ) {
-      groups = groups.filter((g) => g.id !== group.id);
-    }
-  }
-};
-
 export const groupEvents = (
   events: CommonHistoryEvent[],
   sort: EventSortOrder = 'ascending',
@@ -106,10 +70,39 @@ export const groupEvents = (
     }
   }
 
-  const groups = Object.values(groupMap);
+  let groups = Object.values(groupMap);
+  if (createSubGroups) {
+    for (const group of groups) {
+      addPendingActivity(group, pendingActivities);
 
-  if (createSubGroups) generateSubGroups(groups, pendingActivities);
-  if (nonCompletedEventsOnly) filterOutCompletedEvents(groups);
+      if (isSubrowActivity(group.initialEvent)) {
+        const workflowTaskId =
+          group.initialEvent.attributes?.workflowTaskCompletedEventId;
+        const workflowTaskGroup = groups.find(
+          (g) => g.lastEvent?.eventId === workflowTaskId,
+        );
+        if (workflowTaskGroup) {
+          workflowTaskGroup.subGroups.set(group.id, group);
+          groups = groups.filter((g) => g.id !== group.id);
+        } else {
+          console.error('No task group found!');
+        }
+      }
+    }
+  }
+
+  if (nonCompletedEventsOnly) {
+    for (const group of groups) {
+      if (
+        !groupIsCanceledFailureTimedOutTerminated(group) &&
+        group.subGroupList.every(
+          (e) => !groupIsCanceledFailureTimedOutTerminated(e),
+        )
+      ) {
+        groups = groups.filter((g) => g.id !== group.id);
+      }
+    }
+  }
 
   return sort === 'descending'
     ? Object.values(groups).reverse()

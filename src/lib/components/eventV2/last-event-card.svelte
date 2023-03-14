@@ -95,7 +95,7 @@
           </div>
         </div>
         <p
-          class="break-word leading-0 truncate text-left md:whitespace-normal md:text-[12px]"
+          class="break-word leading-0 truncate text-left text-sm text-gray-700 md:whitespace-normal"
         >
           {#if showElapsedTimeDiff}
             {formatDistanceAbbreviated({

@@ -15,6 +15,7 @@
   import { isCompletionEvent } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { authUser } from '$lib/stores/auth-user';
   import { fetchAllEvents } from '$lib/services/events-service';
+  import Accordion from '$lib/holocene/accordion.svelte';
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
   $: ({ workflow } = $workflowRun);
@@ -77,7 +78,11 @@
     <WorkflowRelationshipsV2 {...workflowRelationships} />
     <WorkflowWorkersV2 taskQueue={workflow.taskQueue} />
     <WorkflowStackTraceV2 />
-    <WorkflowQueryV2 />
+    <Accordion title="Query" let:open>
+      {#if open}
+        <WorkflowQueryV2 />
+      {/if}
+    </Accordion>
     <WorkflowOptionsV2 onDebugClick={() => (debugMode = !debugMode)} />
   </div>
   <div class="w-full xl:w-[60%]">

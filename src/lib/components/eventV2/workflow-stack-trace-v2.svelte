@@ -13,7 +13,6 @@
   import { authUser } from '$lib/stores/auth-user';
 
   import Accordion from '$lib/holocene/accordion.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
 
   $: ({ namespace } = $page.params);
   $: ({ workflow, workers } = $workflowRun);
