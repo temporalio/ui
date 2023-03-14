@@ -23,7 +23,10 @@
     getCodeBlockValue,
     getStackTrace,
   } from '$lib/utilities/get-single-attribute-for-event';
-  import { getAttributePayloads } from './event-detail-keys';
+  import {
+    eventGroupDisplayName,
+    getAttributePayloads,
+  } from './event-detail-keys';
   import EventGroupTimestamp from './event-group-timestamp.svelte';
   import PendingActivityCard from './pending-activity-card.svelte';
 
@@ -71,27 +74,14 @@
   $: hasGroupEvents = isEventGroup(event) && event?.eventList?.length > 1;
   $: payloadAttributes = getAttributePayloads(event.attributes);
   $: pendingActivity = isEventGroup(event) && event?.pendingActivity;
-
-  const getEventGroupName = (event: IterableEvent) => {
-    if (isEventGroup(event)) {
-      if (isLocalActivityMarkerEvent(event.lastEvent)) return 'LocalActivity';
-      return event.lastEvent.name;
-    } else {
-      return event.name;
-    }
-  };
 </script>
 
+{#if pendingActivity}
+  <PendingActivityCard event={pendingActivity} />
+{/if}
 <div class="flex gap-2">
-  <EventGroupTimestamp
-    {event}
-    {removeTail}
-    pending={Boolean(pendingActivity)}
-  />
+  <EventGroupTimestamp {event} {removeTail} />
   <div class="h-full w-full pt-2">
-    {#if pendingActivity}
-      <PendingActivityCard event={pendingActivity} />
-    {/if}
     <EventCard thick={hasGroupEvents} {expanded}>
       <div
         class="row"
@@ -119,7 +109,7 @@
                   ? 'text-base'
                   : 'text-lg'}"
               >
-                {getEventGroupName(event)}
+                {eventGroupDisplayName(event)}
               </p>
             </div>
           </div>
@@ -131,7 +121,7 @@
             <Icon name={expanded ? 'chevron-up' : 'chevron-down'} class="w-4" />
           </div>
         </div>
-        <p
+        <div
           class="break-word leading-0 truncate text-left text-sm text-gray-700 md:whitespace-normal"
         >
           {#if showElapsedTimeDiff}
@@ -143,7 +133,7 @@
           {:else}
             {formatDate(lastEvent?.eventTime, $timeFormat)}
           {/if}
-        </p>
+        </div>
         {#if expanded && isEventGroup(event) && hasGroupEvents}
           <div class="secondary">
             {#each event?.eventList.reverse() ?? [] as groupEvent, index}

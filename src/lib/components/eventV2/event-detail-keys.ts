@@ -51,6 +51,17 @@ type SummaryAttribute = {
   badge?: BadgeType;
 };
 
+export const eventGroupDisplayName = (event: IterableEvent) => {
+  const _event = isEventGroup(event) ? event.lastEvent : event;
+
+  // if (isLocalActivityMarkerEvent(_event)) return 'LocalActivity';
+  // if (isSignalExternalWorkflowExecutionInitiatedEvent(_event)) return 'Signal sent'
+  // if (isWorkflowExecutionSignaledEvent(_event)) return 'Signal received'
+  // if (isChildWorkflowExecutionCompletedEvent(_event)) return 'Child workflow'
+
+  return _event.name;
+};
+
 export const getPrimaryIterableEventDetails = (
   event: IterableEvent,
 ): SummaryAttribute[] => {

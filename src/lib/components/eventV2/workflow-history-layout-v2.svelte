@@ -74,6 +74,7 @@
 />
 <div class="flex flex-col gap-2 xl:flex-row-reverse">
   <div class="flex w-full flex-col gap-2 xl:w-[40%]">
+    <WorkflowOptionsV2 onDebugClick={() => (debugMode = !debugMode)} />
     <WorkflowSummaryV2 />
     <WorkflowRelationshipsV2 {...workflowRelationships} />
     <WorkflowWorkersV2 taskQueue={workflow.taskQueue} />
@@ -83,7 +84,6 @@
         <WorkflowQueryV2 />
       {/if}
     </Accordion>
-    <WorkflowOptionsV2 onDebugClick={() => (debugMode = !debugMode)} />
   </div>
   <div class="w-full xl:w-[60%]">
     <EventSummaryV2 {fullHistory} {debugMode} />

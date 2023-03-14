@@ -20,9 +20,9 @@
 </script>
 
 <div class="flex w-[20px] min-w-[20px] flex-col items-center justify-center">
-  <div class="flex h-[40px] w-[10x] gap-0" class:first class:pending>
+  <div class="flex h-[40px] w-[10x] gap-0" class:first>
     <div class="w-[4px]" />
-    <div class="w-[2px]" class:line={!first} class:dashed={running} />
+    <div class="line" class:no-line={first} class:dashed={running || pending} />
     <div class="w-[4px]" />
   </div>
   <div
@@ -32,10 +32,15 @@
     class:terminated
     class:completed
     class:running
+    class:pending
   />
   <div class="flex w-[10x] grow gap-0">
     <div class="w-[4px]" />
-    <div class="w-[2px]" class:line={!removeTail && !last} />
+    <div
+      class="line"
+      class:no-line={removeTail || last}
+      class:dashed={pending}
+    />
     <div class="w-[4px]" />
   </div>
 </div>
@@ -46,19 +51,19 @@
   }
 
   .line {
-    @apply bg-gray-900;
+    @apply w-[2px] border-2 border-gray-900;
+  }
+
+  .no-line {
+    @apply border-none;
   }
 
   .dashed {
-    @apply bg-gradient-to-b from-gray-900 to-gray-400;
+    @apply border-dashed;
   }
 
   .first {
     @apply h-[30px];
-  }
-
-  .pending {
-    @apply h-[110px];
   }
 
   .dot.completed {
@@ -79,5 +84,9 @@
 
   .dot.running {
     @apply border-gray-400 bg-gray-500;
+  }
+
+  .dot.pending {
+    @apply bg-white;
   }
 </style>
