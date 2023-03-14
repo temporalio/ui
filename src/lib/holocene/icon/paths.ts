@@ -13,6 +13,7 @@ import chevronDown from './svg/chevron-down.svelte';
 import chevronLeft from './svg/chevron-left.svelte';
 import chevronRight from './svg/chevron-right.svelte';
 import chevronUp from './svg/chevron-up.svelte';
+import chevronSelectorVertical from './svg/chevron-selector-vertical.svelte';
 import clock from './svg/clock.svelte';
 import close from './svg/close.svelte';
 import cometSolid from './svg/comet-solid.svelte';
@@ -44,6 +45,7 @@ import lock from './svg/lock.svelte';
 import logout from './svg/logout.svelte';
 import namespaceSwitcher from './svg/namespace-switcher.svelte';
 import namespace from './svg/namespace.svelte';
+import pinFilled from './svg/pin-filled.svelte';
 import regions from './svg/regions.svelte';
 import relationship from './svg/relationship.svelte';
 import retention from './svg/retention.svelte';
@@ -86,6 +88,7 @@ export const icons = {
   'chevron-left': chevronLeft,
   'chevron-right': chevronRight,
   'chevron-up': chevronUp,
+  'chevron-selector-vertical': chevronSelectorVertical,
   clock,
   close,
   'comet-solid': cometSolid,
@@ -117,6 +120,7 @@ export const icons = {
   logout,
   'namespace-switcher': namespaceSwitcher,
   namespace,
+  'pin-filled': pinFilled,
   regions,
   relationship,
   retention,

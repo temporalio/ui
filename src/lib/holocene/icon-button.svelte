@@ -8,15 +8,18 @@
     icon?: IconName;
     classes?: string;
     'data-testid'?: string;
+    hoverable?: boolean;
   }
 
   export let icon: IconName = null;
   export let classes: string = '';
+  export let hoverable: boolean = false;
 </script>
 
 <button
   type="button"
   class="icon-button"
+  class:hoverable
   on:click
   data-testid={$$props['data-testid']}
   {...$$restProps}
@@ -33,6 +36,10 @@
 
 <style lang="postcss">
   .icon-button {
-    @apply inline-block w-auto text-sm;
+    @apply inline-block w-auto text-sm rounded-full;
+
+    &.hoverable {
+      @apply hover:bg-gray-300;
+    }
   }
 </style>
