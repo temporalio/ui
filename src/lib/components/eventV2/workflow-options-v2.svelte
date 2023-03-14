@@ -7,6 +7,7 @@
   import EventDateFilter from '../event/event-date-filter.svelte';
 
   export let onDebugClick: () => void;
+  export let onAdvancedClick: () => void;
 </script>
 
 <section>
@@ -25,7 +26,7 @@
             runId: $workflowRun.workflow?.runId,
           })}>Download</Button
       >
-
+      <Button variant="success" on:click={onAdvancedClick}>Advanced</Button>
       <Button variant="destructive" on:click={onDebugClick}>Debug</Button>
     </div>
   </Accordion>

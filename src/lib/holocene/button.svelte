@@ -9,6 +9,7 @@
     | 'secondary'
     | 'destructive'
     | 'login'
+    | 'success'
     | 'link' = 'primary';
 
   export let thin: boolean = false;
@@ -88,6 +89,7 @@
   .primary,
   .secondary,
   .destructive,
+  .success,
   .login {
     @apply border-3 py-2 px-4 transition-colors;
   }
@@ -107,6 +109,10 @@
   .primary,
   .login {
     @apply border-primary bg-primary bg-gradient-to-br text-white hover:from-blue-100 hover:to-purple-100 hover:text-primary;
+  }
+
+  .success {
+    @apply bg-green-400 border-green-500;
   }
 
   .primary:disabled,

@@ -7,6 +7,7 @@ import {
 } from '$lib/utilities/get-single-attribute-for-event';
 import { capitalize } from '$lib/utilities/format-camel-case';
 import { formatDate } from '$lib/utilities/format-date';
+import { isUpsertWorkflowSearchAttributesEvent } from './is-event-type';
 
 export type CombinedAttributes = EventAttribute & {
   eventTime?: string;

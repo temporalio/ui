@@ -16,6 +16,8 @@
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
   import { eventShowElapsed } from '$lib/stores/event-view';
   import { timeFormat } from '$lib/stores/time-format';
+  import { workflowRun } from '$lib/stores/workflow-run';
+  import { eventGroupDisplayName } from './event-detail-keys';
 
   export let event: WorkflowEvent;
   export let initialItem: WorkflowEvent;
@@ -52,13 +54,17 @@
     onRowClick();
   };
 
-  const failure = eventOrGroupIsFailureOrTimedOut(event);
-  const canceled = eventOrGroupIsCanceled(event);
-  const terminated = eventOrGroupIsTerminated(event);
+  $: failure = eventOrGroupIsFailureOrTimedOut(event);
+  $: canceled = eventOrGroupIsCanceled(event);
+  $: terminated = eventOrGroupIsTerminated(event);
+
+  $: {
+    console.log('is terminted: ', terminated);
+  }
 </script>
 
 <div class="flex gap-2">
-  <EventGroupTimestamp {event} last />
+  <EventGroupTimestamp {event} last={!$workflowRun?.workflow?.isRunning} />
   <div class="h-full grow pt-2">
     <EventCard bottom>
       <div
@@ -72,22 +78,23 @@
         on:keydown={onLinkClick}
       >
         <div class="primary flex w-full cursor-pointer justify-between">
-          <div class="flex items-center gap-4">
+          <div
+            class="flex items-center gap-2"
+            class:failure
+            class:canceled
+            class:terminated
+          >
             <p>{event.id}</p>
-            <div
-              class="flex items-center"
-              class:failure
-              class:canceled
-              class:terminated
+            <p
+              class="event-name truncate text-sm font-semibold md:text-base xl:{isSubGroup
+                ? 'text-base'
+                : 'text-lg'}"
             >
-              <p
-                class="event-name truncate text-sm font-semibold md:text-base xl:{isSubGroup
-                  ? 'text-base'
-                  : 'text-lg'}"
-              >
-                {event.name}
-              </p>
-            </div>
+              {eventGroupDisplayName(event)}
+            </p>
+            <p class="text-sm">
+              {event.classification}
+            </p>
           </div>
           <div class="flex">
             <EventGroupDetails {event} primary />

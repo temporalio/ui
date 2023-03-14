@@ -1,5 +1,6 @@
 <script lang="ts">
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
+  import { isUpsertWorkflowSearchAttributesEvent } from '$lib/utilities/is-event-type';
 
   import EventDetailBadge from './event-detail-badge.svelte';
   import { getPrimaryIterableEventDetails } from './event-detail-keys';

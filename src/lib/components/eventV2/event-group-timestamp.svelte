@@ -20,7 +20,7 @@
 </script>
 
 <div class="flex w-[20px] min-w-[20px] flex-col items-center justify-center">
-  <div class="flex h-[40px] w-[10x] gap-0" class:first>
+  <div class="flex h-[36px] w-[10x] gap-0" class:first>
     <div class="w-[4px]" />
     <div class="line" class:no-line={first} class:dashed={running || pending} />
     <div class="w-[4px]" />

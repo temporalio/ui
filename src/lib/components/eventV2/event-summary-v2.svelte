@@ -16,11 +16,13 @@
   export let fullHistory: CommonHistoryEvent[] = [];
   export let importingHistory: boolean = false;
   export let debugMode = false;
+  export let advancedMode = false;
 
   const getGroups = (
     events: CommonHistoryEvent[],
     category: string,
     debugMode: boolean,
+    advancedMode: boolean,
   ): EventGroups => {
     if (category) {
       const filteredEvents = events.filter((i) => i.category === category);
@@ -29,8 +31,7 @@
         'ascending',
         $workflowRun?.workflow?.pendingActivities ?? [],
         {
-          createSubGroups: false,
-          includeWorkflowTasks: true,
+          createWorkflowTaskGroups: advancedMode,
           nonCompletedEventsOnly: debugMode,
         },
       );
@@ -40,8 +41,7 @@
       'ascending',
       $workflowRun?.workflow?.pendingActivities ?? [],
       {
-        createSubGroups: false,
-        includeWorkflowTasks: true,
+        createWorkflowTaskGroups: advancedMode,
         nonCompletedEventsOnly: debugMode,
       },
     );
@@ -58,7 +58,7 @@
     : fullHistory.length
     ? fullHistory
     : intialEvents;
-  $: items = getGroups(currentEvents, category, debugMode);
+  $: items = getGroups(currentEvents, category, debugMode, advancedMode);
   $: initialItem = currentEvents?.[0];
   $: finalItem = currentEvents?.[currentEvents?.length - 1];
   $: uniqueFinalItem =
@@ -109,7 +109,7 @@
       visibleItems={currentEvents}
     />
   {/if}
-  {#if $workflowRun?.workflow.isRunning}
+  {#if $workflowRun?.workflow?.isRunning}
     <RunningCard />
   {/if}
 </div>

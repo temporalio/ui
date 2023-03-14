@@ -29,6 +29,7 @@
   } from './event-detail-keys';
   import EventGroupTimestamp from './event-group-timestamp.svelte';
   import PendingActivityCard from './pending-activity-card.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
 
   export let event: IterableEvent;
   export let visibleItems: IterableEvent[];
@@ -74,6 +75,7 @@
   $: hasGroupEvents = isEventGroup(event) && event?.eventList?.length > 1;
   $: payloadAttributes = getAttributePayloads(event.attributes);
   $: pendingActivity = isEventGroup(event) && event?.pendingActivity;
+  $: showClassification = hasGroupEvents && lastEvent?.classification;
 </script>
 
 {#if pendingActivity}
@@ -96,22 +98,23 @@
         <div
           class="flex w-full cursor-pointer flex-col justify-between gap-2 md:flex-row"
         >
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2">
             <p>{initialEvent.id}</p>
-            <div
-              class="flex items-center gap-2"
+            <p
+              class="event-name truncate text-sm font-semibold md:text-base xl:{isSubGroup
+                ? 'text-base'
+                : 'text-lg'}"
               class:failure
               class:canceled
               class:terminated
             >
-              <p
-                class="event-name truncate text-sm font-semibold md:text-base xl:{isSubGroup
-                  ? 'text-base'
-                  : 'text-lg'}"
-              >
-                {eventGroupDisplayName(event)}
+              {eventGroupDisplayName(event)}
+            </p>
+            {#if showClassification}
+              <p class="text-sm" class:failure class:canceled class:terminated>
+                {lastEvent.classification}
               </p>
-            </div>
+            {/if}
           </div>
           <div class="flex gap-2">
             {#if payloadAttributes.length}
@@ -131,18 +134,17 @@
             })}
             {timeDiffChange}
           {:else}
-            {formatDate(lastEvent?.eventTime, $timeFormat)}
+            {formatDate(initialEvent?.eventTime, $timeFormat)}
           {/if}
         </div>
         {#if expanded && isEventGroup(event) && hasGroupEvents}
           <div class="secondary">
-            {#each event?.eventList.reverse() ?? [] as groupEvent, index}
+            {#each event?.eventList ?? [] as groupEvent, index}
               <svelte:self
                 event={groupEvent}
                 {visibleItems}
                 {initialItem}
-                removeTail={index ===
-                  (event?.eventList.reverse() ?? []).length - 1}
+                removeTail={index === (event?.eventList ?? []).length - 1}
               />
             {/each}
           </div>

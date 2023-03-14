@@ -7,6 +7,7 @@ import {
   isWorkflowExecutionSignaledEvent,
   isTimerStartedEvent,
   isWorkflowTaskScheduledEvent,
+  isUpsertWorkflowSearchAttributesEvent,
 } from '$lib/utilities/is-event-type';
 import {
   eventIsFailureOrTimedOut,
@@ -28,6 +29,7 @@ type StartingEvents = {
   LocalActivity: MarkerRecordedEvent;
   Marker: MarkerRecordedEvent;
   WorkflowTask: WorkflowTaskScheduledEvent;
+  SearchAttribute: UpsertWorkflowSearchAttributesEvent;
 };
 
 const createGroupFor = <K extends keyof StartingEvents>(
@@ -88,7 +90,7 @@ const createGroupFor = <K extends keyof StartingEvents>(
 
 export const createEventGroup = (
   event: CommonHistoryEvent,
-  includeWorkflowTasks = false,
+  createWorkflowTaskGroups = false,
 ): EventGroup => {
   if (isStartChildWorkflowExecutionInitiatedEvent(event))
     return createGroupFor<'ChildWorkflow'>(event);
@@ -96,8 +98,12 @@ export const createEventGroup = (
   if (isWorkflowExecutionSignaledEvent(event))
     return createGroupFor<'SignalReceived'>(event);
 
-  if (isWorkflowTaskScheduledEvent(event) && includeWorkflowTasks) {
+  if (isWorkflowTaskScheduledEvent(event) && createWorkflowTaskGroups) {
     return createGroupFor<'WorkflowTask'>(event);
+  }
+
+  if (isUpsertWorkflowSearchAttributesEvent(event)) {
+    return createGroupFor<'SearchAttribute'>(event);
   }
 
   if (isActivityTaskScheduledEvent(event)) {
