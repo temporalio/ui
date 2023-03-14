@@ -42,6 +42,8 @@
     $supportsAdvancedVisibility,
   );
 
+  export let columns: string[];
+
   let selectedWorkflows: { [index: string]: boolean } = {};
   let batchTerminateConfirmationModal: BatchOperationConfirmationModal;
   let batchCancelConfirmationModal: BatchOperationConfirmationModal;
@@ -301,6 +303,7 @@
     on:cancelWorkflows={() => batchCancelConfirmationModal.open()}
     on:toggleAll={handleToggleAll}
     on:togglePage={handleTogglePage}
+    {columns}
   >
     {#each visibleItems as event}
       <WorkflowsSummaryRowWithFilters
@@ -314,7 +317,10 @@
       />
     {:else}
       <tr>
-        <td colspan={bulkActionsEnabled ? 6 : 5} class="xl:hidden">
+        <td
+          colspan={bulkActionsEnabled ? columns.length + 1 : columns.length}
+          class="xl:hidden"
+        >
           {#if $loading}
             <Loading />
           {:else}
@@ -325,7 +331,10 @@
             />
           {/if}
         </td>
-        <td colspan={bulkActionsEnabled ? 8 : 7} class="hidden xl:table-cell">
+        <td
+          colspan={bulkActionsEnabled ? columns.length + 3 : columns.length + 2}
+          class="max-xl:hidden"
+        >
           {#if $loading}
             <Loading />
           {:else}

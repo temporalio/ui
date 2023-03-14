@@ -6,6 +6,14 @@
 
   import AdvancedVisibilityGuard from '$lib/components/advanced-visibility-guard.svelte';
   import WorkflowsWithNewSearch from '$lib/pages/workflows-with-new-search.svelte';
+
+  const columns = [
+    'status',
+    'workflowId',
+    'workflowType',
+    'startTime',
+    'endTime',
+  ];
 </script>
 
 <PageTitle
@@ -14,6 +22,6 @@
 />
 
 <AdvancedVisibilityGuard>
-  <WorkflowsWithNewSearch />
-  <Workflows slot="fallback" />
+  <WorkflowsWithNewSearch {columns} />
+  <Workflows {columns} slot="fallback" />
 </AdvancedVisibilityGuard>
