@@ -15,34 +15,21 @@
 
   export let fullHistory: CommonHistoryEvent[] = [];
   export let importingHistory: boolean = false;
-  export let debugMode = false;
-  export let advancedMode = false;
+  export let showNonCompleted = false;
+  export let showWorkflowTasks = false;
 
   const getGroups = (
     events: CommonHistoryEvent[],
-    category: string,
-    debugMode: boolean,
-    advancedMode: boolean,
+    showNonCompleted: boolean,
+    showWorkflowTasks: boolean,
   ): EventGroups => {
-    if (category) {
-      const filteredEvents = events.filter((i) => i.category === category);
-      return groupEvents(
-        filteredEvents,
-        'ascending',
-        $workflowRun?.workflow?.pendingActivities ?? [],
-        {
-          createWorkflowTaskGroups: advancedMode,
-          nonCompletedEventsOnly: debugMode,
-        },
-      );
-    }
     return groupEvents(
       events,
       'ascending',
       $workflowRun?.workflow?.pendingActivities ?? [],
       {
-        createWorkflowTaskGroups: advancedMode,
-        nonCompletedEventsOnly: debugMode,
+        createWorkflowTaskGroups: showWorkflowTasks,
+        nonCompletedEventsOnly: showNonCompleted,
       },
     );
   };
@@ -58,7 +45,7 @@
     : fullHistory.length
     ? fullHistory
     : intialEvents;
-  $: groups = getGroups(currentEvents, category, debugMode, advancedMode);
+  $: groups = getGroups(currentEvents, showNonCompleted, showWorkflowTasks);
   $: firstEvent = currentEvents?.[0];
   $: lastEvent = currentEvents?.[currentEvents?.length - 1];
   $: uniqueLastEvent =
