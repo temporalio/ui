@@ -16,6 +16,7 @@ import {
   isSignalExternalWorkflowExecutionInitiatedEvent,
   isStartChildWorkflowExecutionInitiatedEvent,
   isTimerStartedEvent,
+  isUpsertWorkflowSearchAttributesEvent,
   isWorkflowExecutionCanceledEvent,
   isWorkflowExecutionFailedEvent,
   isWorkflowExecutionSignaledEvent,
@@ -68,7 +69,7 @@ export const eventGroupDisplayName = (event: IterableEvent) => {
       return 'Child Workflow';
     if (isActivityTaskScheduledEvent(event.initialEvent))
       return 'Activity Task';
-    if (isTimerStartedEvent(event.initialEvent)) return 'Timer Started';
+    if (isTimerStartedEvent(event.initialEvent)) return 'Timer';
   }
 
   const singleEvent = isEventGroup(event) ? event.initialEvent : event;
@@ -77,16 +78,17 @@ export const eventGroupDisplayName = (event: IterableEvent) => {
   if (isWorkflowExecutionSignaledEvent(singleEvent)) return 'Signal Received';
   if (isSignalExternalWorkflowExecutionInitiatedEvent(singleEvent))
     return 'Signal Sent';
-  if (isTimerStartedEvent(singleEvent)) return 'Timer Started';
+  if (isUpsertWorkflowSearchAttributesEvent(singleEvent))
+    return 'Search Attributes';
   if (
     isWorkflowExecutionCanceledEvent(singleEvent) ||
     isWorkflowExecutionFailedEvent(singleEvent) ||
     isWorkflowExecutionTerminatedEvent(singleEvent)
   )
     return 'Workflow Ended';
+  if (isTimerStartedEvent(singleEvent)) return 'Timer Started';
 
-  // return singleEvent?.classification ?? singleEvent?.name;
-  return singleEvent?.name;
+  return singleEvent?.classification ?? singleEvent?.name;
 };
 
 export const getPrimaryIterableEventDetails = (

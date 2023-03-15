@@ -113,16 +113,16 @@
             />
           </div>
         {/if}
+        {#if hasPendingChildren}
+          <PendingChildWorkflowsTable
+            pendingChildren={$workflowRun.workflow.pendingChildren}
+            namespace={$page.params.namespace}
+          />
+        {/if}
+        {#if hasChildren}
+          <ChildWorkflowsTable {children} />
+        {/if}
       </div>
-      {#if hasPendingChildren}
-        <PendingChildWorkflowsTable
-          pendingChildren={$workflowRun.workflow.pendingChildren}
-          namespace={$page.params.namespace}
-        />
-      {/if}
-      {#if hasChildren}
-        <ChildWorkflowsTable {children} />
-      {/if}
     {:else}
       <p>This workflow doesn’t have any relationships</p>
     {/if}

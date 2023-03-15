@@ -112,7 +112,7 @@
   }
 
   .success {
-    @apply bg-green-400 border-green-500;
+    @apply border-green-500 bg-green-400;
   }
 
   .primary:disabled,
