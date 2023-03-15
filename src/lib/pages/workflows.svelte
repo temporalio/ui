@@ -77,7 +77,7 @@
       />
     {:else}
       <tr>
-        <td colspan={5} class="xl:hidden">
+        <td colspan="5" class="xl:hidden">
           {#if $loading}
             <Loading />
           {:else}
@@ -88,7 +88,7 @@
             />
           {/if}
         </td>
-        <td colspan={7} class="hidden xl:table-cell">
+        <td colspan="7" class="hidden xl:table-cell">
           {#if $loading}
             <Loading />
           {:else}

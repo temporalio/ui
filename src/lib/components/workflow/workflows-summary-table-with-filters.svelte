@@ -1,7 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { page } from '$app/stores';
-
   import { workflowCount } from '$lib/stores/workflows';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
@@ -16,14 +15,12 @@
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
   import { supportsAdvancedVisibilityWithOrderBy } from '$lib/stores/bulk-actions';
-
   const dispatch = createEventDispatcher<{
     terminateWorkflows: undefined;
     cancelWorkflows: undefined;
     toggleAll: { checked: boolean };
     togglePage: { checked: boolean; visibleWorkflows: WorkflowExecution[] };
   }>();
-
   export let bulkActionsEnabled: boolean = false;
   export let updating: boolean = false;
   export let visibleWorkflows: WorkflowExecution[];
@@ -31,24 +28,19 @@
   export let allSelected: boolean;
   export let pageSelected: boolean;
   export let filteredWorkflowCount: string;
-  export let columns: string[];
 
   $: terminateEnabled = workflowTerminateEnabled($page.data.settings);
   $: cancelEnabled = workflowCancelEnabled($page.data.settings);
-
   // Disable sort with workflows over 1M or if order by not supported
   $: disabled =
     $workflowCount?.totalCount >= 1000000 ||
     !$supportsAdvancedVisibilityWithOrderBy;
-
   const handleBulkTerminate = () => {
     dispatch('terminateWorkflows');
   };
-
   const handleBulkCancel = () => {
     dispatch('cancelWorkflows');
   };
-
   const handleSelectAll = (event: MouseEvent | KeyboardEvent) => {
     if (
       event instanceof MouseEvent ||
@@ -57,7 +49,6 @@
       dispatch('toggleAll', { checked: true });
     }
   };
-
   const handleCheckboxChange = (event: CustomEvent<{ checked: boolean }>) => {
     const { checked } = event.detail;
     if (checked) {
@@ -66,21 +57,16 @@
       dispatch('toggleAll', { checked: false });
     }
   };
-
   let coreUser = coreUserStore();
-
   $: namespaceWriteDisabled = $coreUser.namespaceWriteDisabled(
     $page.params.namespace,
   );
-
   $: checked =
     allSelected ||
     pageSelected ||
     (selectedWorkflowsCount === visibleWorkflows.length &&
       selectedWorkflowsCount !== 0);
-
   $: showBulkActions = selectedWorkflowsCount > 0 || allSelected;
-
   $: indeterminate =
     selectedWorkflowsCount > 0 &&
     selectedWorkflowsCount < visibleWorkflows.length;
@@ -141,13 +127,10 @@
             {/if}
           </div>
         </th>
-        {#each Array(columns.length - 1) as _, index}
-          {@const className =
-            index === columns.length - 2 || index === columns.length - 3
-              ? 'max-xl:hidden'
-              : ''}
-          <th class={className} />
-        {/each}
+        <th />
+        <th />
+        <th class="max-xl:hidden" />
+        <th class="max-xl:hidden" />
       {:else}
         <th class="w-32">
           <ExecutionStatusDropdownFilter />

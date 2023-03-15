@@ -6,9 +6,8 @@
   export let updating = false;
   export let id: string = null;
   export let columns: Array<{
-    path: string;
+    label: string;
     width?: number;
-    resize?: boolean;
   }> = [];
 
   let className = '';
@@ -69,8 +68,8 @@
     const tableHeaderCells = table.querySelectorAll('th');
     tableHeaderCells.forEach((header: HTMLTableCellElement, i: number) => {
       const width = columns[i]?.width;
-      const resize = columns[i]?.resize ?? true;
-      if (resize && i !== tableHeaderCells?.length - 1) {
+      const isNonResizable = header.classList.contains('non-resizable');
+      if (!isNonResizable) {
         const resizer = document.createElement('span');
         resizer.className = 'resizer';
         resizer.addEventListener('mousedown', initializeResize);

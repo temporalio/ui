@@ -4,7 +4,7 @@
 
 <style lang="postcss">
   tr {
-    th {
+    :global(th) {
       @apply flex items-center;
     }
   }

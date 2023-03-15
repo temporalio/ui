@@ -49,7 +49,7 @@
     dispatch('change', { checked: event.currentTarget.checked, value });
   };
 
-  checked = group !== undefined ? group.includes(value) : checked;
+  $: checked = group !== undefined ? group.includes(value) : checked;
 </script>
 
 <div
@@ -98,7 +98,7 @@
 
 <style lang="postcss">
   .checkbox {
-    @apply block cursor-pointer select-none h-[18px] w-[18px] leading-[18px] text-sm text-primary;
+    @apply block h-[18px] w-[18px] cursor-pointer select-none text-sm leading-[18px] text-primary;
   }
 
   .checkbox.hoverable {
@@ -110,7 +110,7 @@
   }
 
   .label {
-    @apply ml-6 h-full whitespace-nowrap flex items-center;
+    @apply ml-6 flex h-full items-center whitespace-nowrap;
   }
 
   .label.hoverable {

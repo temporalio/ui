@@ -14,9 +14,7 @@
   } from '$lib/stores/workflows';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
-
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
-
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
   import WorkflowsSummaryTableWithFilters from '$lib/components/workflow/workflows-summary-table-with-filters.svelte';
@@ -45,7 +43,6 @@
   } from '$lib/stores/workflow-table-columns';
   import Drawer from '$lib/holocene/drawer.svelte';
   import OrderableList from '$lib/holocene/orderable-list.svelte';
-
   $: bulkActionsEnabled = workflowBulkActionsEnabled(
     $page.data.settings,
     $supportsAdvancedVisibility,
@@ -56,24 +53,19 @@
   let batchCancelConfirmationModal: BatchOperationConfirmationModal;
   let allSelected: boolean = false;
   let pageSelected: boolean = false;
-
   // let customizationDrawerOpen: boolean = false;
-
   $: query = $page.url.searchParams.get('query');
-
   $: {
     // For returning to page from 'Back to Workflows' with previous search
     if (query) {
       $workflowsQuery = query;
     }
   }
-
   $: {
     if (!$workflowFilters.length && !$workflowSorts.length) {
       $workflowsQuery = '';
     }
   }
-
   onMount(() => {
     $lastUsedNamespace = $page.params.namespace;
     if (query) {
@@ -83,22 +75,18 @@
       $workflowFilters = [];
     }
   });
-
   const resetSelection = () => {
     allSelected = false;
     pageSelected = false;
     selectedWorkflows = {};
     selectedWorkflowsCount = 0;
   };
-
   const errorMessage =
     'If you have filters applied, try adjusting them. Otherwise please check your syntax and try again.';
-
   const refreshWorkflows = () => {
     resetSelection();
     $refresh = Date.now();
   };
-
   const resetPageToDefaultState = () => {
     $workflowFilters = [];
     $workflowSorts = [];
@@ -110,14 +98,12 @@
     });
     refreshWorkflows();
   };
-
   const handleSelectWorkflow = (
     event: CustomEvent<{ checked: boolean; workflowRunId: string }>,
   ) => {
     const { checked, workflowRunId } = event.detail;
     selectedWorkflows[workflowRunId] = checked;
   };
-
   const handleToggleAll = (event: CustomEvent<{ checked: boolean }>) => {
     const { checked } = event.detail;
     allSelected = checked;
@@ -125,7 +111,6 @@
       (workflow) => (selectedWorkflows[workflow.runId] = checked),
     );
   };
-
   const handleTogglePage = (
     event: CustomEvent<{
       checked: boolean;
@@ -138,7 +123,6 @@
       (workflow) => (selectedWorkflows[workflow.runId] = checked),
     );
   };
-
   const terminateWorkflows = async (event: CustomEvent<{ reason: string }>) => {
     const options = {
       namespace: $page.params.namespace,
@@ -173,13 +157,11 @@
       );
     }
   };
-
   const cancelWorkflows = async (event: CustomEvent<{ reason: string }>) => {
     const options = {
       namespace: $page.params.namespace,
       reason: event.detail.reason,
     };
-
     try {
       if (allSelected) {
         await batchCancelByQuery({
@@ -208,52 +190,35 @@
       );
     }
   };
-
   // const openCustomizationDrawer = () => {
   //   customizationDrawerOpen = true;
   // };
-
   // const closeCustomizationDrawer = () => {
   //   customizationDrawerOpen = false;
   // };
-
   $: batchOperationQuery = !$workflowsQuery
     ? 'ExecutionStatus="Running"'
     : $workflowsQuery;
-
   $: terminableWorkflows = $workflows.filter(
     (workflow) => selectedWorkflows[workflow.runId] && workflow.canBeTerminated,
   );
-
   $: cancelableWorkflows = $workflows.filter(
     (workflow) =>
       selectedWorkflows[workflow.runId] && workflow.status === 'Running',
   );
-
   $: totalWorkflowCount = new Intl.NumberFormat('en-US').format(
     $workflowCount?.totalCount ?? 0,
   );
-
   $: filteredWorkflowCount = new Intl.NumberFormat('en-US').format(
     $workflowCount?.count ?? 0,
   );
-
   $: selectedWorkflowsCount =
     Object.values(selectedWorkflows).filter(Boolean).length;
-
   $: {
     if ($workflowFilters) {
       resetSelection();
     }
   }
-
-  const columns = [
-    'status',
-    'workflowId',
-    'workflowType',
-    'startTime',
-    'endTime',
-  ];
 </script>
 
 <BatchOperationConfirmationModal
@@ -272,7 +237,6 @@
   query={batchOperationQuery}
   on:confirm={cancelWorkflows}
 />
-
 <header class="mb-2 flex justify-between">
   <div>
     <h1 class="text-2xl" data-testid="namespace-title">
@@ -328,7 +292,6 @@
     on:cancelWorkflows={() => batchCancelConfirmationModal.open()}
     on:toggleAll={handleToggleAll}
     on:togglePage={handleTogglePage}
-    {columns}
   >
     {#each visibleItems as event}
       <WorkflowsSummaryRowWithFilters
@@ -342,10 +305,7 @@
       />
     {:else}
       <tr>
-        <td
-          colspan={bulkActionsEnabled ? columns.length + 1 : columns.length}
-          class="xl:hidden"
-        >
+        <td colspan={bulkActionsEnabled ? 6 : 5} class="xl:hidden">
           {#if $loading}
             <Loading />
           {:else}
@@ -356,10 +316,7 @@
             />
           {/if}
         </td>
-        <td
-          colspan={bulkActionsEnabled ? columns.length + 3 : columns.length + 2}
-          class="max-xl:hidden"
-        >
+        <td colspan={bulkActionsEnabled ? 8 : 7} class="max-xl:hidden">
           {#if $loading}
             <Loading />
           {:else}
@@ -374,7 +331,6 @@
     {/each}
   </WorkflowsSummaryTableWithFilters>
 </Pagination>
-
 <Drawer
   open={false}
   onClick={noop}

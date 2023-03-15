@@ -110,7 +110,9 @@
     {#if bulkActionsEnabled && showBulkActions}
       <th
         class="overflow-visible whitespace-nowrap"
-        style="grid-column: span {columns.length - 1} / span {columns.length - 1};"
+        style="grid-column:
+              span {columns.length - 1} / span {columns.length -
+              1};"
       >
         {#if allSelected}
           <span class="font-semibold">

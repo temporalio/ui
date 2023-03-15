@@ -32,7 +32,7 @@ export function decodePayload(
   payload: Payload,
   // This could decode to any object. So we either use the payload object passed in or decode it
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): Payload | Record<any, any> | string {
+): DecodedPayload {
   if (payload === null) {
     return payload;
   }
@@ -56,50 +56,54 @@ export function decodePayload(
   return payload;
 }
 
-export const decodePayloadAttributes = (
-  eventAttribute: EventAttribute,
-): EventAttribute => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const anyAttributes = eventAttribute as any;
-
+export const decodePayloadAttributes = <T extends Optional<Decodable>>(
+  encoded: T,
+): Replace<T, Optional<Decoded>> => {
+  const decoded: Optional<Decoded> = {};
   // Decode Search Attributes
-  if (anyAttributes?.searchAttributes?.indexedFields) {
-    const searchAttributes = anyAttributes?.searchAttributes?.indexedFields;
+  if (encoded?.searchAttributes?.indexedFields) {
+    const searchAttributes = encoded?.searchAttributes?.indexedFields ?? {};
+    decoded.searchAttributes = { indexedFields: {} };
 
     Object.entries(searchAttributes).forEach(([key, value]) => {
-      searchAttributes[key] = decodePayload(value);
+      decoded.searchAttributes.indexedFields[key] = decodePayload(value);
     });
   }
 
   // Decode Memo
-  if (anyAttributes?.memo?.fields) {
-    const memo = anyAttributes?.memo?.fields;
+  if (encoded?.memo?.fields) {
+    const memo = encoded?.memo?.fields;
+    decoded.memo = { fields: {} };
 
     Object.entries(memo).forEach(([key, value]) => {
-      memo[key] = decodePayload(value);
+      decoded.memo.fields[key] = decodePayload(value);
     });
   }
 
   // Decode Header
-  if (anyAttributes?.header?.fields) {
-    const header = anyAttributes?.header?.fields;
+  if (encoded?.header?.fields) {
+    const header = encoded?.header?.fields;
+    decoded.header = { fields: {} };
 
     Object.entries(header).forEach(([key, value]) => {
-      header[key] = decodePayload(value);
+      decoded.header.fields[key] = decodePayload(value);
     });
   }
 
   // Decode Query Result
   // This one is a best guess from the previous codebase and needs verified
-  if (anyAttributes?.queryResult) {
-    const queryResult = anyAttributes?.queryResult;
-
-    Object.entries(queryResult).forEach(([key, value]) => {
-      queryResult[key] = decodePayload(value);
+  if (encoded?.queryResult) {
+    const payloads = encoded?.queryResult.answer.payloads;
+    decoded.queryResult = { answer: [] };
+    payloads.forEach((payload) => {
+      decoded.queryResult.answer.push(decodePayload(payload));
     });
   }
 
-  return anyAttributes;
+  return {
+    ...encoded,
+    ...decoded,
+  };
 };
 
 export const decodeAllPotentialPayloadsWithCodec = async (
