@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { noop } from 'svelte/internal';
   import { page } from '$app/stores';
   import { timeFormat } from '$lib/stores/time-format';
   import {
@@ -35,17 +36,29 @@
   import { bulkActionsEnabled as workflowBulkActionsEnabled } from '$lib/utilities/bulk-actions-enabled';
   import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
   import { toaster } from '$lib/stores/toaster';
+  import {
+    workflowTableColumns,
+    addColumn,
+    removeColumn,
+    moveColumn,
+  } from '$lib/stores/workflow-table-columns';
+  import Drawer from '$lib/holocene/drawer.svelte';
+  import OrderableList from '$lib/holocene/orderable-list.svelte';
 
   $: bulkActionsEnabled = workflowBulkActionsEnabled(
     $page.data.settings,
     $supportsAdvancedVisibility,
   );
 
+  export let columns: string[];
+
   let selectedWorkflows: { [index: string]: boolean } = {};
   let batchTerminateConfirmationModal: BatchOperationConfirmationModal;
   let batchCancelConfirmationModal: BatchOperationConfirmationModal;
   let allSelected: boolean = false;
   let pageSelected: boolean = false;
+
+  // let customizationDrawerOpen: boolean = false;
 
   $: query = $page.url.searchParams.get('query');
 
@@ -197,6 +210,14 @@
     }
   };
 
+  // const openCustomizationDrawer = () => {
+  //   customizationDrawerOpen = true;
+  // };
+
+  // const closeCustomizationDrawer = () => {
+  //   customizationDrawerOpen = false;
+  // };
+
   $: batchOperationQuery = !$workflowsQuery
     ? 'ExecutionStatus="Running"'
     : $workflowsQuery;
@@ -297,6 +318,7 @@
     on:cancelWorkflows={() => batchCancelConfirmationModal.open()}
     on:toggleAll={handleToggleAll}
     on:togglePage={handleTogglePage}
+    {columns}
   >
     {#each visibleItems as event}
       <WorkflowsSummaryRowWithFilters
@@ -310,7 +332,10 @@
       />
     {:else}
       <tr>
-        <td colspan={bulkActionsEnabled ? 6 : 5} class="xl:hidden">
+        <td
+          colspan={bulkActionsEnabled ? columns.length + 1 : columns.length}
+          class="xl:hidden"
+        >
           {#if $loading}
             <Loading />
           {:else}
@@ -321,7 +346,10 @@
             />
           {/if}
         </td>
-        <td colspan={bulkActionsEnabled ? 8 : 7} class="hidden xl:table-cell">
+        <td
+          colspan={bulkActionsEnabled ? columns.length + 3 : columns.length + 2}
+          class="max-xl:hidden"
+        >
           {#if $loading}
             <Loading />
           {:else}
@@ -336,3 +364,35 @@
     {/each}
   </WorkflowsSummaryTableWithFilters>
 </Pagination>
+
+<Drawer
+  open={false}
+  onClick={noop}
+  position="right"
+  dark={false}
+  title="Configure Workflow List"
+>
+  <svelte:fragment slot="subtitle">
+    <span>Add (</span><Icon class="inline" name="add" /><span
+      >), re-arrange (</span
+    ><Icon class="inline" name="chevron-selector-vertical" /><span
+      >), and remove (</span
+    ><Icon class="inline" name="hyphen" /><span
+      >), Workflow<br />Headings to personalize the Workflow List Table.</span
+    >
+  </svelte:fragment>
+  <OrderableList
+    items={$workflowTableColumns.columns}
+    availableItems={$workflowTableColumns.availableColumns}
+    onAddItem={addColumn}
+    onRemoveItem={removeColumn}
+    onMoveItem={moveColumn}
+  >
+    <svelte:fragment slot="main-heading">
+      Workflow Headings <span class="font-normal">(in view)</span>
+    </svelte:fragment>
+    <svelte:fragment slot="bank-heading">
+      Available Headings <span class="font-normal">(not in view)</span>
+    </svelte:fragment>
+  </OrderableList>
+</Drawer>

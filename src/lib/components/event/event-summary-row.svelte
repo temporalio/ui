@@ -83,12 +83,12 @@
   on:click|stopPropagation={onLinkClick}
 >
   <td />
-  <td class="table-cell w-24 text-left">
+  <td class="w-24 text-left">
     <a class="text-sm text-gray-500 md:text-base" href="#{event.id}"
       ><p class="truncate">{event.id}</p></a
     >
   </td>
-  <td class="flex table-cell text-left">
+  <td class="text-left">
     <p class="break-word truncate text-sm md:whitespace-normal md:text-base">
       {#if showElapsedTimeDiff}
         {formatDistanceAbbreviated({
@@ -101,7 +101,7 @@
       {/if}
     </p>
   </td>
-  <td class="table-cell text-right text-sm font-normal xl:text-left">
+  <td class="text-right text-sm font-normal xl:text-left">
     <div class="flex">
       {#if compact && failure}
         <Icon class="mr-1.5 inline text-red-700" name="clock" />
@@ -117,7 +117,7 @@
       </p>
     </div>
   </td>
-  <td class="table-cell overflow-hidden">
+  <td class="overflow-hidden">
     <div class="flex w-full items-center justify-between">
       <div class="grow truncate">
         {#if !expanded}
@@ -135,10 +135,10 @@
     </div>
   </td>
 
-  <td class="table-cell" />
+  <td />
 </tr>
 {#if expanded}
-  <tr in:fade|local class="table-row" class:typedError>
+  <tr in:fade|local class:typedError>
     <td class="expanded-cell" colspan="6">
       <EventDetailsFull {event} {currentEvent} {compact} bind:selectedId />
     </td>
@@ -147,7 +147,7 @@
 
 <style lang="postcss">
   .row {
-    @apply table-row flex-wrap items-center border-gray-900 text-sm no-underline xl:py-3 xl:text-base;
+    @apply flex-wrap items-center border-gray-900 text-sm no-underline xl:py-3 xl:text-base;
   }
 
   .row:hover {
@@ -183,7 +183,7 @@
   }
 
   .expanded-cell {
-    @apply table-cell w-full flex-wrap text-sm no-underline xl:text-base;
+    @apply w-full flex-wrap text-sm no-underline xl:text-base;
   }
 
   .typedError .expanded-cell {

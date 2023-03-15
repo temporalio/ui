@@ -2,54 +2,103 @@
   import { fly } from 'svelte/transition';
   import { clickOutside } from '$lib/holocene/outside-click';
 
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  import IconButton from './icon-button.svelte';
 
   export let open = false;
   export let title: string;
+  export let position: 'bottom' | 'right' = 'bottom';
+  export let dark: boolean = true;
   export let onClick: () => void;
+
+  const flyParams = {
+    duration: 500,
+    ...(position === 'bottom' ? { y: 200 } : { x: 200 }),
+  };
 </script>
 
 {#if open}
-  <div
-    class="drawer"
-    transition:fly={{ y: 200, duration: 500 }}
+  <aside
+    class="drawer {position}"
+    class:dark
+    transition:fly={flyParams}
     use:clickOutside
     id="navigation-drawer"
     role="region"
     on:click-outside={onClick}
   >
-    <div class="title">
-      <div />
-      <h1>{title}</h1>
-      <button
+    <div class="close-button-wrapper {position}">
+      <IconButton
+        icon="close"
         aria-expanded={open}
         aria-controls="navigation-drawer"
-        class="mx-4 cursor-pointer"
         on:click={onClick}
-      >
-        <Icon name="close" />
-      </button>
+      />
     </div>
-    <div class="content">
+    <div class="title-wrapper {position}">
+      <h1>{title}</h1>
+      {#if $$slots['subtitle']}
+        <h3 class="text-xs font-normal font-primary">
+          <slot name="subtitle" />
+        </h3>
+      {/if}
+    </div>
+
+    <div class="content {position}">
       <slot />
     </div>
-  </div>
+  </aside>
 {/if}
 
 <style lang="postcss">
   .drawer {
-    @apply fixed bottom-0 left-0 right-0 z-[55] h-auto rounded-t-lg bg-gray-900 text-gray-100 shadow-xl;
+    @apply fixed z-[55] h-auto rounded-t-lg bg-white text-primary shadow-xl;
+
+    &.bottom {
+      @apply bottom-0 left-0 right-0;
+    }
+
+    &.right {
+      @apply right-0 top-0 bottom-0 h-full;
+    }
+
+    &.dark {
+      @apply bg-gray-900 text-gray-100;
+    }
   }
 
-  .title {
-    @apply flex items-center justify-between py-4;
+  .close-button-wrapper {
+    @apply p-2 flex w-full justify-end;
+
+    &.right {
+      @apply pb-20;
+    }
   }
 
-  .title h1 {
-    @apply text-2xl;
+  .title-wrapper {
+    @apply py-4 px-8 flex flex-col justify-center gap-2;
+
+    &.bottom {
+      @apply items-center p-0;
+    }
+
+    &.right {
+      @apply items-start;
+    }
+  }
+
+  .title-wrapper h1 {
+    @apply text-base font-medium font-primary;
   }
 
   .content {
-    @apply whitespace-normal p-8;
+    @apply whitespace-normal px-8;
+
+    &.right {
+      @apply py-4;
+    }
+
+    &.bottom {
+      @apply py-8;
+    }
   }
 </style>

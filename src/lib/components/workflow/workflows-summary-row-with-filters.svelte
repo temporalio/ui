@@ -157,10 +157,10 @@
   }
 
   .time-cell {
-    @apply hidden xl:table-cell;
+    @apply max-xl:hidden;
   }
 
   .inline-time-cell {
-    @apply hidden md:block xl:hidden;
+    @apply xl:hidden;
   }
 </style>
