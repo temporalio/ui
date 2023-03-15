@@ -12,7 +12,7 @@
   <MenuButton controls={id} bind:show>
     <slot name="trigger" />
   </MenuButton>
-  <Menu {position} class="min-w-fit {$$props.class}" {show} {id}>
+  <Menu {position} class="min-w-fit {$$restProps.class}" {show} {id}>
     <slot name="items" />
   </Menu>
 </MenuContainer>

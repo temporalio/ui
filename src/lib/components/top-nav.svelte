@@ -55,14 +55,10 @@
   function fixImage() {
     showProfilePic = false;
   }
-
-  let scrollY;
 </script>
 
-<svelte:window bind:scrollY />
 <div
-  class="sticky top-0 z-30 flex h-10 w-full items-center justify-between bg-gray-100 p-1 px-10"
-  class:border={scrollY >= 20}
+  class="flex items-center justify-between sticky top-0 w-full z-30 h-10 bg-gray-100 p-1 px-10 border-b-2"
 >
   <div class="flex items-center gap-2" />
   <div class="flex items-center gap-2">
@@ -119,9 +115,3 @@
     {/if}
   </div>
 </div>
-
-<style lang="postcss">
-  .border {
-    @apply border-b-2;
-  }
-</style>

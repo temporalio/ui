@@ -4,37 +4,55 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
 
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import { createEventDispatcher } from 'svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
 
   export let namespaceList: NamespaceItem[] = [];
-
-  const dispatch = createEventDispatcher();
-
-  /** When a user presses escape close the namespace switcher  */
-  export function rootDocumentHandler(node: Element): { destroy: () => void } {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (node && !event.defaultPrevented) {
-        if (event.key === 'Escape') {
-          dispatch('closeNamespaceList');
-        }
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown, true);
-
-    return {
-      destroy() {
-        document.removeEventListener('keydown', handleKeyDown, true);
-      },
-    };
-  }
-
   $: searchValue = '';
+
+  let divElement: HTMLDivElement;
+  let inputElement;
+
+  const handleKeyboardNavigation = (event: KeyboardEvent) => {
+    const focusable = Array.from(
+      divElement.querySelectorAll<
+        HTMLButtonElement | HTMLInputElement | HTMLDivElement
+      >('button, input, div[contenteditable="true"]'),
+    ).filter((element) => {
+      if (element instanceof HTMLDivElement) return element.isContentEditable;
+      return !element.disabled;
+    });
+    const firstFocusable = focusable[0];
+    const lastFocusable = focusable[focusable.length - 1];
+    if (event.key === 'Tab') {
+      if (event.shiftKey) {
+        if (document.activeElement === firstFocusable) {
+          lastFocusable.focus();
+          event.preventDefault();
+        }
+      } else if (document.activeElement === lastFocusable) {
+        firstFocusable.focus();
+        event.preventDefault();
+      }
+    }
+  };
+
+  // const handleClick = (event: MouseEvent) => {
+  //   if (event.target === divElement) handleCancel();
+  // };
+
+  $: {
+    if (divElement) {
+      divElement?.focus();
+    }
+  }
 </script>
 
-<div class="h-[400px] w-[500px] overflow-auto py-4 px-12">
+<svelte:window on:keydown|stopPropagation={handleKeyboardNavigation} />
+<div
+  class="h-[400px] w-[500px] overflow-auto py-4 px-12"
+  bind:this={divElement}
+>
   <div class="prose my-4">
     <h2 class="text-2xl" data-cy="namespace-select-header">
       Select a Namespace
@@ -42,9 +60,9 @@
   </div>
   <div class="mb-4">
     <Input
+      autoFocus
       id="namespace-search"
       bind:value={searchValue}
-      autoFocus
       icon="search"
       placeholder="Search"
     />
