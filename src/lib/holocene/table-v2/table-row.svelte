@@ -22,7 +22,8 @@
 {/if}
 
 <style lang="postcss">
-  .row {
+  .row,
+  tr {
     @apply table-row;
 
     :global(td) {
