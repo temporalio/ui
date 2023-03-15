@@ -7,6 +7,10 @@ import { has } from './has';
 
 import type { APIErrorResponse, TemporalAPIError } from './request-from-api';
 
+interface NetworkErrorWithReport extends NetworkError {
+  report?: boolean;
+}
+
 export const handleError = (
   error: unknown,
   toasts = toaster,
@@ -36,6 +40,7 @@ export const handleError = (
     });
     // Re-throw error to prevent other code from attempting to render
     errors.set(error);
+    (error as NetworkErrorWithReport).report = false;
     throw error;
   }
 };
