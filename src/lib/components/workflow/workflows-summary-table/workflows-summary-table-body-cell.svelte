@@ -59,12 +59,6 @@
   <td>
     <WorkflowStatus status={workflow.status} />
   </td>
-{:else if column === 'Search Attributes' || column === 'Custom Search Attributes'}
-  <td>
-    <Badge type="default">
-      {cellContent}
-    </Badge>
-  </td>
 {:else if column === 'Type' || column === 'Workflow ID'}
   <td
     class="relative"
@@ -83,9 +77,11 @@
       )}
     />
   </td>
-{:else if column === 'Memo' || column === 'Memo Custom Key'}
+{:else if column === 'Memo'}
   <td>
-    <CodeBlock content={cellContent} inline copyable={false} />
+    {#if cellContent}
+      <CodeBlock content={cellContent} inline copyable={false} />
+    {/if}
   </td>
 {:else}
   <td>{cellContent}</td>
