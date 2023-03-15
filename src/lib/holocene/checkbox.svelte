@@ -49,7 +49,7 @@
     dispatch('change', { checked: event.currentTarget.checked, value });
   };
 
-  checked = group !== undefined ? group.includes(value) : checked;
+  $: checked = group !== undefined ? group.includes(value) : checked;
 </script>
 
 <div

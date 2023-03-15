@@ -1,7 +1,8 @@
-import { formatDistance } from 'date-fns';
+import { formatDate } from '$lib/utilities/format-date';
+import { formatDistance } from '$lib/utilities/format-time';
 import { persistStore } from './persist-store';
 
-type WorkflowHeader =
+export type WorkflowHeader =
   | 'Status'
   | 'Workflow ID'
   | 'Run ID'
@@ -20,11 +21,31 @@ type WorkflowHeader =
   | 'Memo'
   | 'Memo Custom Key';
 
-type WorkflowCell =
-  | ({
-      label: WorkflowHeader;
-    } & { path: keyof WorkflowExecution })
-  | { data: (wf: WorkflowExecution) => string };
+interface BaseWorkflowCell {
+  label: WorkflowHeader;
+  width?: number;
+}
+
+interface PathCell extends BaseWorkflowCell {
+  path: keyof WorkflowExecution;
+  data?: never;
+}
+
+interface DataCell extends BaseWorkflowCell {
+  data: (
+    workflow: WorkflowExecution,
+    timeFormat: TimeFormat | string,
+  ) => string;
+  path?: never;
+}
+
+type WorkflowCell = PathCell | DataCell;
+
+export const isPathCell = (cell: WorkflowCell): cell is PathCell =>
+  !!cell?.path;
+
+export const isDataCell = (cell: WorkflowCell): cell is DataCell =>
+  !!cell?.data;
 
 type State = {
   columns: WorkflowHeader[];
@@ -59,22 +80,31 @@ const DEFAULT_AVAILABLE_COLUMNS: WorkflowHeader[] = [
   'Memo Custom Key',
 ];
 
-const WORKFLOW_CELLS: Record<WorkflowHeader, WorkflowCell> = {
-  Status: { label: 'Status', path: 'status' },
+export const WORKFLOW_CELLS: Record<WorkflowHeader, WorkflowCell> = {
+  Status: { label: 'Status', path: 'status', width: 150 },
   'Workflow ID': { label: 'Workflow ID', path: 'id' },
   'Run ID': { label: 'Run ID', path: 'runId' },
   Type: { label: 'Type', path: 'name' },
-  Start: { label: 'Start', path: 'startTime' },
-  End: { label: 'End', path: 'endTime' },
+  Start: {
+    label: 'Start',
+    data: ({ startTime }: WorkflowExecution, format: TimeFormat | string) =>
+      formatDate(startTime, format),
+  },
+  End: {
+    label: 'End',
+    data: ({ endTime }: WorkflowExecution, format: TimeFormat | string) =>
+      endTime ? formatDate(endTime, format) : '',
+  },
   'History Length': { label: 'History Length', path: 'historyEvents' },
-  'History Size': { label: 'History Size', path: 'historyEvents' }, // TODO: add historySizeBytes
+  'History Size': {
+    label: 'History Size',
+    data: ({ historySizeBytes }: WorkflowExecution) =>
+      historySizeBytes ? `${historySizeBytes} Bytes` : '',
+  },
   'Execution Time': {
     label: 'Execution Time',
-    data: (execution) =>
-      formatDistance(
-        new Date(execution.endTime),
-        new Date(execution.startTime),
-      ),
+    data: ({ startTime, endTime }: WorkflowExecution) =>
+      formatDistance({ start: startTime, end: endTime }),
   },
   'State Transitions': {
     label: 'State Transitions',
@@ -83,12 +113,21 @@ const WORKFLOW_CELLS: Record<WorkflowHeader, WorkflowCell> = {
   'Parent Namespace': { label: 'Parent Namespace', path: 'parentNamespaceId' },
   'Parent Workflow ID': { label: 'Parent Workflow ID', path: 'parent' },
   'Task Queue': { label: 'Task Queue', path: 'taskQueue' },
-  'Search Attributes': { label: 'Search Attributes', data: () => 'TBD' },
+  'Search Attributes': {
+    label: 'Search Attributes',
+    data: ({ searchAttributes }: WorkflowExecution) =>
+      `${
+        searchAttributes ? Object.entries(searchAttributes).length : 0
+      } Search Attributes`,
+  },
   'Custom Search Attributes': {
     label: 'Custom Search Attributes',
     data: () => 'TBD',
   },
-  Memo: { label: 'Memo', data: () => 'TBD' },
+  Memo: {
+    label: 'Memo',
+    data: ({ memo }: WorkflowExecution) => JSON.stringify(memo.fields),
+  },
   'Memo Custom Key': { label: 'Memo', data: () => 'TBD' },
 };
 
