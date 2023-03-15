@@ -8,42 +8,76 @@
   import { lastUsedNamespace } from '$lib/stores/namespaces';
 
   export let namespaceList: NamespaceItem[] = [];
-  $: searchValue = '';
+  export let show: boolean;
+
+  let searchValue = '';
+  let focusedIndex = 0;
 
   let divElement: HTMLDivElement;
-  let inputElement;
+
+  const getFocusableElements = () => {
+    if (show) {
+      return Array.from(
+        divElement.querySelectorAll<
+          HTMLButtonElement | HTMLInputElement | HTMLDivElement
+        >('input, a'),
+      ).filter((element) => {
+        if (element instanceof HTMLDivElement) return element.isContentEditable;
+        return !element.disabled;
+      });
+    }
+    return [];
+  };
 
   const handleKeyboardNavigation = (event: KeyboardEvent) => {
-    const focusable = Array.from(
-      divElement.querySelectorAll<
-        HTMLButtonElement | HTMLInputElement | HTMLDivElement
-      >('button, input, div[contenteditable="true"]'),
-    ).filter((element) => {
-      if (element instanceof HTMLDivElement) return element.isContentEditable;
-      return !element.disabled;
-    });
+    if (!show) {
+      return;
+    }
+
+    const focusable = getFocusableElements();
     const firstFocusable = focusable[0];
     const lastFocusable = focusable[focusable.length - 1];
+
     if (event.key === 'Tab') {
       if (event.shiftKey) {
         if (document.activeElement === firstFocusable) {
           lastFocusable.focus();
-          event.preventDefault();
+          focusedIndex = focusable.length - 1;
+        } else {
+          focusedIndex = focusedIndex - 1;
         }
-      } else if (document.activeElement === lastFocusable) {
-        firstFocusable.focus();
+        event.preventDefault();
+      } else {
+        if (document.activeElement === lastFocusable) {
+          firstFocusable.focus();
+          focusedIndex = 0;
+        } else {
+          focusedIndex = focusedIndex + 1;
+        }
         event.preventDefault();
       }
     }
+
+    if (event.key === 'ArrowUp') {
+      const next = focusable[focusedIndex - 1];
+      next.focus();
+      focusedIndex = focusedIndex - 1;
+      event.preventDefault();
+    } else if (event.key === 'ArrowDown') {
+      const next = focusable[focusedIndex + 1];
+      if (next) {
+        next.focus();
+        focusedIndex = focusedIndex + 1;
+      }
+      event.preventDefault();
+    }
   };
 
-  // const handleClick = (event: MouseEvent) => {
-  //   if (event.target === divElement) handleCancel();
-  // };
-
   $: {
-    if (divElement) {
-      divElement?.focus();
+    if (show) {
+      const focusable = getFocusableElements();
+      const firstFocusable = focusable[0];
+      firstFocusable.focus();
     }
   }
 </script>

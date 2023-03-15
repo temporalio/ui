@@ -58,7 +58,7 @@
 </script>
 
 <div
-  class="flex items-center justify-between sticky top-0 w-full z-30 h-10 bg-gray-100 p-1 px-10 border-b-2"
+  class="sticky top-0 z-30 flex h-10 w-full items-center justify-between border-b-2 bg-gray-100 p-1 px-10"
 >
   <div class="flex items-center gap-2" />
   <div class="flex items-center gap-2">
@@ -75,8 +75,8 @@
             /></Badge
           >
         </div>
-        <div class="w-full" slot="items">
-          <NamespaceList {namespaceList} />
+        <div class="w-full" slot="items" let:show>
+          <NamespaceList {namespaceList} {show} />
         </div>
       </DropdownMenu>
     {/if}

@@ -37,7 +37,7 @@
     <div class="title-wrapper {position}">
       <h1>{title}</h1>
       {#if $$slots['subtitle']}
-        <h3 class="text-xs font-normal font-primary">
+        <h3 class="font-primary text-xs font-normal">
           <slot name="subtitle" />
         </h3>
       {/if}
@@ -67,7 +67,7 @@
   }
 
   .close-button-wrapper {
-    @apply p-2 flex w-full justify-end;
+    @apply flex w-full justify-end p-2;
 
     &.right {
       @apply pb-20;
@@ -75,7 +75,7 @@
   }
 
   .title-wrapper {
-    @apply py-4 px-8 flex flex-col justify-center gap-2;
+    @apply flex flex-col justify-center gap-2 py-4 px-8;
 
     &.bottom {
       @apply items-center p-0;
@@ -87,7 +87,7 @@
   }
 
   .title-wrapper h1 {
-    @apply text-base font-medium font-primary;
+    @apply font-primary text-base font-medium;
   }
 
   .content {

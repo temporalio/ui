@@ -53,7 +53,7 @@
           on:dragleave|preventDefault|stopPropagation={handleDragLeave}
           on:dragover|preventDefault|stopPropagation
         >
-          <div class="flex flex-row gap-2 items-center">
+          <div class="flex flex-row items-center gap-2">
             <div class="flex items-center">
               <IconButton
                 hoverable
@@ -89,7 +89,7 @@
       <ol class="orderable-list">
         {#each availableItems as item, index}
           <li class="orderable-item">
-            <div class="flex flex-row gap-2 items-center">
+            <div class="flex flex-row items-center gap-2">
               {item}
             </div>
             <IconButton
@@ -115,14 +115,14 @@
   }
 
   .orderable-list {
-    @apply bg-white border-3 border-primary rounded-lg;
+    @apply rounded-lg border-3 border-primary bg-white;
   }
 
   .orderable-item {
-    @apply select-none flex flex-row items-center justify-between p-2 list-none font-medium text-sm;
+    @apply flex select-none list-none flex-row items-center justify-between p-2 text-sm font-medium;
   }
 
-  .orderable-item[draggable='true'] {
+  .orderable-item[draggable="true"] {
     @apply cursor-move;
   }
 

@@ -38,7 +38,7 @@
   <main id="content" class="h-screen w-max flex-auto overflow-auto bg-gray-100">
     <TopNavigation {logout} />
     <Banners {uiVersionInfo} />
-    <div class="z-10 w-full -mt-4 flex flex-col gap-4 px-10 pb-10 pt-8">
+    <div class="z-10 -mt-4 flex w-full flex-col gap-4 px-10 pb-10 pt-8">
       <ErrorBoundary onError={() => {}}>
         <slot />
       </ErrorBoundary>

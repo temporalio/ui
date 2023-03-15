@@ -13,6 +13,6 @@
     <slot name="trigger" />
   </MenuButton>
   <Menu {position} class="min-w-fit {$$restProps.class}" {show} {id}>
-    <slot name="items" />
+    <slot name="items" {show} />
   </Menu>
 </MenuContainer>
