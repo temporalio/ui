@@ -1,5 +1,6 @@
 import { formatDate } from '$lib/utilities/format-date';
 import { formatDistance } from '$lib/utilities/format-time';
+import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { persistStore } from './persist-store';
 
 type WorkflowHeaderLabels =
@@ -16,10 +17,11 @@ type WorkflowHeaderLabels =
   | 'Parent Namespace'
   | 'Parent Workflow ID'
   | 'Task Queue'
-  | 'Search Attributes'
-  | 'Custom Search Attributes'
-  | 'Memo'
-  | 'Memo Custom Key';
+  | 'Memo';
+// ToDo: Support this columns
+// | 'Search Attributes'
+// | 'Custom Search Attributes'
+// | 'Memo Custom Key';
 
 export type WorkflowHeader = { label: WorkflowHeaderLabels; width?: number };
 
@@ -76,10 +78,10 @@ const DEFAULT_AVAILABLE_COLUMNS: WorkflowHeader[] = [
   { label: 'Parent Namespace' },
   { label: 'Parent Workflow ID' },
   { label: 'Task Queue' },
-  { label: 'Search Attributes' },
-  { label: 'Custom Search Attributes' },
   { label: 'Memo' },
-  { label: 'Memo Custom Key' },
+  // { label: 'Search Attributes' },
+  // { label: 'Custom Search Attributes' },
+  // { label: 'Memo Custom Key' },
 ];
 
 export const WORKFLOW_CELLS: Record<WorkflowHeaderLabels, WorkflowCell> = {
@@ -115,22 +117,11 @@ export const WORKFLOW_CELLS: Record<WorkflowHeaderLabels, WorkflowCell> = {
   'Parent Namespace': { label: 'Parent Namespace', path: 'parentNamespaceId' },
   'Parent Workflow ID': { label: 'Parent Workflow ID', path: 'parent' },
   'Task Queue': { label: 'Task Queue', path: 'taskQueue' },
-  'Search Attributes': {
-    label: 'Search Attributes',
-    data: ({ searchAttributes }: WorkflowExecution) =>
-      `${
-        searchAttributes ? Object.entries(searchAttributes).length : 0
-      } Search Attributes`,
-  },
-  'Custom Search Attributes': {
-    label: 'Custom Search Attributes',
-    data: () => 'TBD',
-  },
   Memo: {
     label: 'Memo',
-    data: ({ memo }: WorkflowExecution) => JSON.stringify(memo.fields),
+    data: ({ memo }: WorkflowExecution) =>
+      memo.fields ? stringifyWithBigInt(memo.fields) : '',
   },
-  'Memo Custom Key': { label: 'Memo', data: () => 'TBD' },
 };
 
 const initialState: State = {
