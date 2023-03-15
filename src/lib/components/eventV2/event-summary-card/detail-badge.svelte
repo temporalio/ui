@@ -14,7 +14,7 @@
   } from '$lib/utilities/get-single-attribute-for-event';
 
   import Link from '$lib/holocene/link.svelte';
-  import Copyable from '../copyable.svelte';
+  import Copyable from '$lib/components/copyable.svelte';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
   import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
 

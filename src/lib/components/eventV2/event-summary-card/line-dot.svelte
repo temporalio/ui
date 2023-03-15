@@ -7,8 +7,7 @@
   } from '$lib/models/event-groups/get-event-in-group';
 
   export let event: IterableEvent | undefined;
-  export let first = false;
-  export let last = false;
+  export let removeHead = false;
   export let removeTail = false;
   export let pending = false;
 
@@ -20,9 +19,13 @@
 </script>
 
 <div class="flex w-[20px] min-w-[20px] flex-col items-center justify-center">
-  <div class="flex h-[36px] w-[10x] gap-0" class:first>
+  <div class="flex h-[30px] w-[10x] gap-0">
     <div class="w-[4px]" />
-    <div class="line" class:no-line={first} class:dashed={running || pending} />
+    <div
+      class="line"
+      class:no-line={removeHead}
+      class:dashed={running || pending}
+    />
     <div class="w-[4px]" />
   </div>
   <div
@@ -36,22 +39,18 @@
   />
   <div class="flex w-[10x] grow gap-0">
     <div class="w-[4px]" />
-    <div
-      class="line"
-      class:no-line={removeTail || last}
-      class:dashed={pending}
-    />
+    <div class="line" class:no-line={removeTail} class:dashed={pending} />
     <div class="w-[4px]" />
   </div>
 </div>
 
 <style lang="postcss">
   .dot {
-    @apply h-3 w-3 rounded-full border-2 border-gray-700 bg-gray-900;
+    @apply h-2 w-2 rounded-full border-2 border-gray-700 bg-gray-900;
   }
 
   .line {
-    @apply w-[2px] border-2 border-gray-900;
+    @apply w-[1px] border border-gray-900;
   }
 
   .no-line {
@@ -60,10 +59,6 @@
 
   .dashed {
     @apply border-dashed;
-  }
-
-  .first {
-    @apply h-[30px];
   }
 
   .dot.completed {

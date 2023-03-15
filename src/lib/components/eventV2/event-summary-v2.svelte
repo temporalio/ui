@@ -6,12 +6,12 @@
   import { groupEvents, isEventGroup } from '$lib/models/event-groups';
   import EventGroupSummaryCard from './event-group-summary-card.svelte';
   import InitialEventCard from './initial-event-card.svelte';
-  import LastEventCard from './last-event-card.svelte';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { getStackTrace } from '$lib/utilities/get-single-attribute-for-event';
   import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { importEvents } from '$lib/stores/import-events';
   import RunningCard from './running-card.svelte';
+  import FinalEventCard from './final-event-card.svelte';
 
   export let fullHistory: CommonHistoryEvent[] = [];
   export let importingHistory: boolean = false;
@@ -58,17 +58,17 @@
     : fullHistory.length
     ? fullHistory
     : intialEvents;
-  $: items = getGroups(currentEvents, category, debugMode, advancedMode);
-  $: initialItem = currentEvents?.[0];
-  $: finalItem = currentEvents?.[currentEvents?.length - 1];
-  $: uniqueFinalItem =
-    finalItem &&
-    finalItem.id !== initialItem.id &&
-    !items.find(
+  $: groups = getGroups(currentEvents, category, debugMode, advancedMode);
+  $: firstEvent = currentEvents?.[0];
+  $: lastEvent = currentEvents?.[currentEvents?.length - 1];
+  $: uniqueLastEvent =
+    lastEvent &&
+    lastEvent.id !== firstEvent.id &&
+    !groups.find(
       (group) =>
-        group.eventList.find((e) => e.id === finalItem.id) ||
+        group.eventList.find((e) => e.id === lastEvent.id) ||
         group.subGroupList.find((g) =>
-          g.eventList.find((e) => e.id === finalItem.id),
+          g.eventList.find((e) => e.id === lastEvent.id),
         ),
     );
 
@@ -78,35 +78,23 @@
 </script>
 
 <div class="flex w-full flex-col gap-0">
-  {#if initialItem}
-    <InitialEventCard event={initialItem} content={input} />
+  {#if firstEvent}
+    <InitialEventCard
+      event={firstEvent}
+      events={currentEvents}
+      content={input}
+    />
   {/if}
-  {#each items as item}
-    <EventGroupSummaryCard event={item} visibleItems={items} {initialItem}>
-      <svelte:fragment slot="subgroups">
-        {#if isEventGroup(item) && item?.subGroupList?.length}
-          <div class="flex w-full flex-col pl-12">
-            {#each item?.subGroupList as group, index}
-              <EventGroupSummaryCard
-                isSubGroup
-                event={group}
-                visibleItems={items}
-                {initialItem}
-                removeTail={index === item?.subGroupList.length - 1}
-              />
-            {/each}
-          </div>
-        {/if}
-      </svelte:fragment>
-    </EventGroupSummaryCard>
+  {#each groups as event}
+    <EventGroupSummaryCard {event} events={groups} {firstEvent} />
   {/each}
-  {#if uniqueFinalItem}
-    <LastEventCard
-      event={finalItem}
+  {#if uniqueLastEvent}
+    <FinalEventCard
+      event={lastEvent}
+      events={currentEvents}
       content={results}
       {stackTrace}
-      {initialItem}
-      visibleItems={currentEvents}
+      {firstEvent}
     />
   {/if}
   {#if $workflowRun?.workflow?.isRunning}
