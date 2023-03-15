@@ -13,6 +13,7 @@ export type FetchEventsParameters = NamespaceScopedRequest &
     params?: { waitNewEvent: string };
     rawPayloads?: boolean;
     sort?: EventSortOrder;
+    signal?: AbortSignal;
   };
 
 export type FetchEventsParametersWithSettings = FetchEventsParameters & {
@@ -64,6 +65,7 @@ export const fetchAllEvents = async ({
   onStart,
   onUpdate,
   onComplete,
+  signal,
 }: FetchEventsParametersWithSettings): Promise<CommonHistoryEvent[]> => {
   const endpoint = getEndpointForSortOrder(sort);
   const route = routeForApi(endpoint, { namespace, workflowId, runId });
@@ -73,6 +75,7 @@ export const fetchAllEvents = async ({
         token,
         request: fetch,
         params: params ?? {},
+        signal,
       });
     },
     { onStart, onUpdate, onComplete },

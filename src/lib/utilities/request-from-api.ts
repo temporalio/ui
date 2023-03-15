@@ -36,6 +36,7 @@ type RequestFromAPIOptions = {
   shouldRetry?: boolean;
   retryInterval?: number;
   isBrowser?: boolean;
+  signal?: AbortSignal;
 };
 
 export const isTemporalAPIError = (obj: unknown): obj is TemporalAPIError =>
@@ -70,6 +71,7 @@ export const requestFromAPI = async <T>(
     onError,
     retryInterval = 5000,
     isBrowser = browser,
+    signal,
   } = init;
   let { options } = init;
 
@@ -83,6 +85,7 @@ export const requestFromAPI = async <T>(
   try {
     options = withSecurityOptions(options, isBrowser);
     options = await withAuth(options, isBrowser);
+    options = signal ? { ...options, signal } : options;
 
     const response = await request(url, options);
     const body = await response.json();

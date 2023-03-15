@@ -19,10 +19,6 @@
   export let previous: string;
 
   $: ({ workflow, namespace } = $page.params);
-
-  $: {
-    console.log('hasChildren: ', hasChildren);
-  }
 </script>
 
 <section>

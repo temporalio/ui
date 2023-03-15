@@ -16,6 +16,9 @@
   import { authUser } from '$lib/stores/auth-user';
   import { fetchAllEvents } from '$lib/services/events-service';
   import Accordion from '$lib/holocene/accordion.svelte';
+  import { onDestroy } from 'svelte';
+
+  let controller;
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
   $: ({ workflow } = $workflowRun);
@@ -27,8 +30,8 @@
 
   let fetchHistory: Promise<CommonHistoryEvent[]>;
   let fullHistory: CommonHistoryEvent[] = [];
-  let debugMode = false;
-  let advancedMode = false;
+  let showNonCompleted = false;
+  let showWorkflowTasks = false;
 
   const onUpdate = async ({ history }) => {
     const { settings } = $page.data;
@@ -49,6 +52,8 @@
     workflowId: string,
     runId: string,
   ) => {
+    controller = new AbortController();
+    const signal = controller.signal;
     const { settings } = $page.data;
     fetchHistory = fetchAllEvents({
       namespace,
@@ -59,10 +64,16 @@
       accessToken: $authUser?.accessToken,
       sort: 'ascending',
       onUpdate,
+      signal,
     });
   };
 
   $: fetchEvents(namespace, workflowId, runId);
+
+  onDestroy(() => {
+    controller.abort();
+    console.log('Polling events aborted');
+  });
 </script>
 
 <PageTitle
@@ -71,10 +82,6 @@
 />
 <div class="flex flex-col gap-2 xl:flex-row-reverse">
   <div class="flex w-full flex-col gap-2 xl:w-[40%]">
-    <WorkflowOptionsV2
-      onDebugClick={() => (debugMode = !debugMode)}
-      onAdvancedClick={() => (advancedMode = !advancedMode)}
-    />
     <WorkflowSummaryV2 />
     <WorkflowRelationshipsV2 {...workflowRelationships} />
     <WorkflowWorkersV2 taskQueue={workflow.taskQueue} />
@@ -84,8 +91,14 @@
         <WorkflowQueryV2 />
       {/if}
     </Accordion>
+    <WorkflowOptionsV2
+      {showWorkflowTasks}
+      {showNonCompleted}
+      onDebugClick={() => (showNonCompleted = !showNonCompleted)}
+      onAdvancedClick={() => (showWorkflowTasks = !showWorkflowTasks)}
+    />
   </div>
   <div class="w-full xl:w-[60%]">
-    <EventSummaryV2 {fullHistory} {debugMode} {advancedMode} />
+    <EventSummaryV2 {fullHistory} {showNonCompleted} {showWorkflowTasks} />
   </div>
 </div>

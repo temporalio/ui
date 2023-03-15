@@ -1,5 +1,6 @@
 <script lang="ts">
   import CodeBlock from '$lib/holocene/code-block.svelte';
+  import { workflowRun } from '$lib/stores/workflow-run';
   import Card from './event-summary-card/card.svelte';
   import Collapsed from './event-summary-card/collapsed.svelte';
   import Expanded from './event-summary-card/expanded.svelte';
@@ -12,7 +13,13 @@
   export let stackTrace: string = '';
 </script>
 
-<Card {event} {events} {firstEvent} final let:expanded>
+<Card
+  {event}
+  {events}
+  {firstEvent}
+  final={!$workflowRun?.workflow?.isRunning}
+  let:expanded
+>
   <Collapsed {event} {events} {firstEvent} {expanded} showClassification />
   {#if expanded}
     <Expanded {event} {events} {firstEvent} />
