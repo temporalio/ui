@@ -62,7 +62,7 @@ func buildUIIndexHandler(publicPath string, assets fs.FS) (echo.HandlerFunc, err
 	}
 	if publicPath != "" {
 		indexHTML := string(indexHTMLBytes)
-		indexHTML = strings.Replace(indexHTML, "base: \"\"", fmt.Sprintf("base: \"%s\"", publicPath))
+		indexHTML = strings.ReplaceAll(indexHTML, "base: \"\"", fmt.Sprintf("base: \"%s\"", publicPath))
 		indexHTML = strings.ReplaceAll(indexHTML, "\"/_app/", fmt.Sprintf("\"%s/_app/", publicPath))
 		indexHTMLBytes = []byte(indexHTML)
 	}
