@@ -64,7 +64,8 @@
       <DropdownMenu
         id="namespace"
         position="right"
-        class="border-3 bg-purple-200"
+        menuClass="border-3 bg-purple-200"
+        buttonClass="border border-purple-700 rounded-sm"
       >
         <div slot="trigger">
           <Badge type="purple" class="flex gap-1 pl-2"
@@ -104,7 +105,7 @@
           {/if}
         </div>
         <div class="h-auto w-[400px]" slot="items">
-          <MenuItem class="cursor-normal rounded-t-xl"
+          <MenuItem class="rounded-t-xl" cursorDefault
             >{$authUser.email}</MenuItem
           >
           <MenuItem class="rounded-b-xl" on:click={logout}>Log out</MenuItem>

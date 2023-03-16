@@ -106,7 +106,7 @@
 
 <svelte:window on:keydown|stopPropagation={handleKeyboardNavigation} />
 <div
-  class="h-[400px] w-[300px] md:w-[500px] overflow-auto py-4 px-12"
+  class="h-[400px] w-[300px] overflow-auto py-4 px-12 md:w-[500px]"
   bind:this={divElement}
 >
   <div class="prose my-4">
