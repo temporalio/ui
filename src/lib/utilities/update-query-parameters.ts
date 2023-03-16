@@ -12,7 +12,6 @@ type UpdateQueryParams = {
 };
 
 export const gotoOptions = {
-  replaceState: true,
   keepFocus: true,
   noScroll: true,
 };
