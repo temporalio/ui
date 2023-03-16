@@ -33,14 +33,11 @@ describe('Batch and Bulk Workflow Actions', () => {
       cy.wait('@workflows-api');
     });
 
-    it('allows running workflows to be terminated by ID', () => {
+    it('allows running workflows to be terminated by ID without a reason', () => {
       cy.get('#workflows-table-with-bulk-actions').should('exist');
 
       cy.get('#select-visible-workflows').click({ force: true });
       cy.get('[data-testid="bulk-terminate-button"]').click();
-      cy.get(
-        '[data-testid="batch-Terminate-confirmation"] #bulk-action-reason',
-      ).type('Sarah Connor');
       cy.get(
         '[data-testid="batch-Terminate-confirmation"] button.destructive',
       ).click();
@@ -65,14 +62,11 @@ describe('Batch and Bulk Workflow Actions', () => {
       cy.get('#batch-terminate-success-toast');
     });
 
-    it('allows running workflows to be cancelled by ID', () => {
+    it('allows running workflows to be cancelled by ID without a reason', () => {
       cy.get('#workflows-table-with-bulk-actions').should('exist');
 
       cy.get('#select-visible-workflows').click({ force: true });
       cy.get('[data-testid="bulk-cancel-button"]').click();
-      cy.get(
-        '[data-testid="batch-Cancel-confirmation"] #bulk-action-reason',
-      ).type('Sarah Connor');
       cy.get(
         '[data-testid="batch-Cancel-confirmation"] button.destructive',
       ).click();
