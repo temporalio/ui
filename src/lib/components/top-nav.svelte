@@ -22,7 +22,7 @@
 </script>
 
 <div
-  class="sticky top-0 z-30 flex h-10 w-full items-center justify-between border-b-2 bg-gray-100 p-1 px-10"
+  class="sticky top-0 z-30 flex h-10 w-full items-center justify-between border-b-2 bg-gray-100 p-1 px-4 md:px-10"
   data-testid="top-nav"
 >
   <div class="flex items-center gap-2" />
@@ -35,14 +35,14 @@
         buttonClass="border border-purple-700 rounded-sm"
       >
         <div slot="trigger" data-testid="namespace-select-button">
-          <Badge type="purple" class="flex gap-1 pl-2"
-            ><Icon name="namespace-switcher" class="scale-75" />{namespace}<Icon
-              name="chevron-down"
-            /></Badge
+          <Badge type="purple" class="leading-0 flex gap-1 truncate pl-2"
+            ><Icon name="namespace-switcher" class="scale-75" /><span
+              class="max-w-[160px] truncate md:max-w-none">{namespace}</span
+            ><Icon name="chevron-down" /></Badge
           >
         </div>
         <div
-          class="w-full"
+          class="h-auto max-h-[400px] max-w-[220px] overflow-auto md:max-w-[300px] lg:max-w-[500px]"
           slot="items"
           let:show
           data-testid="namespace-select-list"
@@ -76,8 +76,8 @@
             <Icon name="chevron-down" class="mt-1" />
           {/if}
         </div>
-        <div class="h-auto w-[400px]" slot="items">
-          <MenuItem class="rounded-t-xl" cursorDefault
+        <div class="h-auto w-[300px]" slot="items">
+          <MenuItem class="truncate rounded-t-xl" cursorDefault
             >{$authUser.email}</MenuItem
           >
           <MenuItem class="rounded-b-xl" on:click={logout}>Log out</MenuItem>

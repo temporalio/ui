@@ -105,12 +105,9 @@
 </script>
 
 <svelte:window on:keydown|stopPropagation={handleKeyboardNavigation} />
-<div
-  class="h-[400px] w-[300px] overflow-auto py-4 px-12 md:w-[500px]"
-  bind:this={divElement}
->
+<div class="w-full py-4 px-2 md:px-8 lg:px-12" bind:this={divElement}>
   <div class="prose my-4">
-    <h2 class="text-2xl" data-testid="namespace-select-header">
+    <h2 class="text:xl md:text-2xl" data-testid="namespace-select-header">
       Select a Namespace
     </h2>
   </div>

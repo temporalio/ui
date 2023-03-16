@@ -69,7 +69,10 @@
   <div class="sticky top-0 z-20 h-screen w-auto">
     <SideNavigation />
   </div>
-  <main id="content" class="h-screen w-max flex-auto overflow-auto bg-gray-100">
+  <main
+    id="content"
+    class="relative h-screen w-max flex-auto overflow-auto bg-gray-100"
+  >
     <TopNavigation {logout} {namespaceList} />
     <Banners {uiVersionInfo} />
     <div class="z-10 -mt-4 flex w-full flex-col gap-4 px-10 pb-10 pt-8">
