@@ -110,7 +110,7 @@
   bind:this={divElement}
 >
   <div class="prose my-4">
-    <h2 class="text-2xl" data-cy="namespace-select-header">
+    <h2 class="text-2xl" data-testid="namespace-select-header">
       Select a Namespace
     </h2>
   </div>
@@ -124,9 +124,9 @@
     />
   </div>
 
-  <ul data-cy="namespace-list">
+  <ul data-test="namespace-list">
     {#each namespaceList.filter( ({ namespace }) => namespace.includes(searchValue), ) as namespace}
-      <li class="item">
+      <li class="item" data-testid="namespace-list-item">
         <a
           on:click={() => ($lastUsedNamespace = namespace.namespace)}
           href={namespace.href(namespace.namespace)}

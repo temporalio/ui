@@ -48,10 +48,7 @@
 
 <header class="mb-2 flex justify-between">
   <div>
-    <h1 class="text-2xl" data-testid="namespace-title">
-      Recent Workflows
-      <NamespaceSelector />
-    </h1>
+    <h1 class="text-2xl" data-testid="namespace-title">Recent Workflows</h1>
     <div class="flex items-center gap-2 text-sm">
       <p data-testid="namespace-name">
         {$page.params.namespace}

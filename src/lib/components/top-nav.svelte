@@ -57,6 +57,7 @@
 
 <div
   class="sticky top-0 z-30 flex h-10 w-full items-center justify-between border-b-2 bg-gray-100 p-1 px-10"
+  data-testid="top-nav"
 >
   <div class="flex items-center gap-2" />
   <div class="flex items-center gap-2">
@@ -67,14 +68,19 @@
         menuClass="border-3 bg-purple-200"
         buttonClass="border border-purple-700 rounded-sm"
       >
-        <div slot="trigger">
+        <div slot="trigger" data-testid="namespace-select-button">
           <Badge type="purple" class="flex gap-1 pl-2"
             ><Icon name="namespace-switcher" class="scale-75" />{namespace}<Icon
               name="chevron-down"
             /></Badge
           >
         </div>
-        <div class="w-full" slot="items" let:show>
+        <div
+          class="w-full"
+          slot="items"
+          let:show
+          data-testid="namespace-select-list"
+        >
           <NamespaceList {namespaceList} {show} />
         </div>
       </DropdownMenu>

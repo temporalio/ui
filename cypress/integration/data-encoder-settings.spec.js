@@ -17,7 +17,7 @@ describe('Set Data Encoder Settings', () => {
       cy.wait('@workflows-api');
       cy.wait('@namespaces-api');
 
-      cy.get('[data-testid="navigation-header"]').as('header');
+      cy.get('[data-testid="top-nav"]').as('header');
     });
 
     it('Enter invalid endpoint to show error and enter valid enpoint with confirm', () => {
@@ -171,7 +171,7 @@ describe('Set Data Encoder Settings', () => {
       cy.wait('@workflows-api');
       cy.wait('@namespaces-api');
 
-      cy.get('[data-testid="navigation-header"]').as('header');
+      cy.get('[data-testid="top-nav"]').as('header');
     });
 
     it('Enter invalid endpoint to show error and enter valid enpoint with confirm', () => {
