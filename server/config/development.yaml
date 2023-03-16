@@ -1,4 +1,4 @@
-publicPath:
+publicPath: /test
 port: 8081
 enableUi: true
 enableOpenApi: true
