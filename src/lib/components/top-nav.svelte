@@ -22,11 +22,9 @@
   $: isCloud = $page.data?.settings?.runtimeEnvironment?.isCloud;
 
   $: namespace = $page.params.namespace;
-
-  export let namespaceNames = isCloud
+  $: namespaceNames = isCloud
     ? [$page.params.namespace]
     : $namespaces.map((namespace: Namespace) => namespace?.namespaceInfo?.name);
-
   $: namespaceList = namespaceNames.map((namespace: string) => {
     const getHref = (namespace) =>
       isCloud ? routeForWorkflows({ namespace }) : getCurrentHref(namespace);

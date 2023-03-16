@@ -16,7 +16,7 @@
   let divElement: HTMLDivElement;
 
   const getFocusableElements = () => {
-    if (show) {
+    if (show && divElement) {
       return Array.from(
         divElement.querySelectorAll<
           HTMLButtonElement | HTMLInputElement | HTMLDivElement
@@ -29,55 +29,77 @@
     return [];
   };
 
-  const handleKeyboardNavigation = (event: KeyboardEvent) => {
-    if (!show) {
-      return;
-    }
-
+  const handleTabKey = (event: KeyboardEvent) => {
     const focusable = getFocusableElements();
-    const firstFocusable = focusable[0];
-    const lastFocusable = focusable[focusable.length - 1];
-
+    const inputElement = focusable[0];
+    const lastListItemElement = focusable[focusable.length - 1];
     if (event.key === 'Tab') {
       if (event.shiftKey) {
-        if (document.activeElement === firstFocusable) {
-          lastFocusable.focus();
+        if (document.activeElement === inputElement) {
+          lastListItemElement.focus();
           focusedIndex = focusable.length - 1;
+          event.preventDefault();
         } else {
           focusedIndex = focusedIndex - 1;
         }
-        event.preventDefault();
       } else {
-        if (document.activeElement === lastFocusable) {
-          firstFocusable.focus();
+        if (document.activeElement === lastListItemElement) {
+          inputElement.focus();
           focusedIndex = 0;
+          event.preventDefault();
         } else {
           focusedIndex = focusedIndex + 1;
         }
-        event.preventDefault();
       }
+    }
+  };
+
+  const handleArrowKey = (event: KeyboardEvent) => {
+    const focusable = getFocusableElements();
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      if (focusedIndex === 1) return;
+      else {
+        const next = focusable[focusedIndex - 1];
+        if (next) {
+          next.focus();
+          focusedIndex = focusedIndex - 1;
+        }
+      }
+    } else if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      if (focusedIndex === 0) {
+        // Input tab prevents updating focusedIndex
+        const next = focusable[2];
+        if (next) {
+          next.focus();
+          focusedIndex = focusedIndex + 2;
+        }
+      } else {
+        const next = focusable[focusedIndex + 1];
+        if (next) {
+          next.focus();
+          focusedIndex = focusedIndex + 1;
+        }
+      }
+    }
+  };
+
+  const handleKeyboardNavigation = (event: KeyboardEvent) => {
+    const focusable = getFocusableElements();
+    if (!show || !focusable.length || focusable.length === 1) {
+      return;
     }
 
-    if (event.key === 'ArrowUp') {
-      const next = focusable[focusedIndex - 1];
-      next.focus();
-      focusedIndex = focusedIndex - 1;
-      event.preventDefault();
-    } else if (event.key === 'ArrowDown') {
-      const next = focusable[focusedIndex + 1];
-      if (next) {
-        next.focus();
-        focusedIndex = focusedIndex + 1;
-      }
-      event.preventDefault();
-    }
+    handleTabKey(event);
+    handleArrowKey(event);
   };
 
   $: {
     if (show) {
       const focusable = getFocusableElements();
-      const firstFocusable = focusable[0];
-      firstFocusable.focus();
+      const inputElement = focusable[0];
+      inputElement.focus();
     }
   }
 </script>
@@ -104,9 +126,7 @@
 
   <ul data-cy="namespace-list">
     {#each namespaceList.filter( ({ namespace }) => namespace.includes(searchValue), ) as namespace}
-      <li
-        class="flex border-collapse cursor-pointer gap-2 border-b border-l-3 border-r-3 border-gray-900 bg-white from-blue-100 to-purple-100 first:rounded-t-xl first:border-t-3 last:rounded-b-xl last:border-b-3 hover:bg-gradient-to-br"
-      >
+      <li class="item">
         <a
           on:click={() => ($lastUsedNamespace = namespace.namespace)}
           href={namespace.href(namespace.namespace)}
@@ -128,6 +148,10 @@
 </div>
 
 <style lang="postcss">
+  .item {
+    @apply flex border-collapse cursor-pointer gap-2 border-b border-l-3 border-r-3 border-gray-900 bg-white from-blue-100 to-purple-100 first:rounded-t-xl first:border-t-3 last:rounded-b-xl last:border-b-3 hover:bg-gradient-to-br focus:bg-gradient-to-br;
+  }
+
   .link {
     @apply ml-2 truncate text-gray-900;
   }
