@@ -15,12 +15,13 @@ type RouteParameters = {
   schedule: string;
   query?: string;
   search?: string;
+  page?: string;
 };
 
 export type NamespaceParameter = Pick<RouteParameters, 'namespace'>;
 export type WorkflowsParameter = Pick<
   RouteParameters,
-  'namespace' | 'query' | 'search'
+  'namespace' | 'query' | 'search' | 'page'
 >;
 export type TaskQueueParameters = Pick<RouteParameters, 'namespace' | 'queue'>;
 export type WorkflowParameters = Pick<
@@ -67,12 +68,17 @@ export const routeForWorkflowsWithQuery = ({
   namespace,
   query,
   search,
+  page,
 }: WorkflowsParameter): string | undefined => {
   if (!browser) {
     return undefined;
   }
 
-  return toURL(routeForWorkflows({ namespace }), { query, search });
+  return toURL(routeForWorkflows({ namespace }), {
+    query,
+    search,
+    ...(page && { page }),
+  });
 };
 
 export const routeForArchivalWorkfows = (

@@ -70,3 +70,4 @@ export const workflowCount = writable({ count: 0, totalCount: 0 });
 export const workflowError = writable('');
 export const workflows = readable<WorkflowExecution[]>([], updateWorkflows);
 export const workflowsQuery = writable<string>('');
+export const workflowsPage = writable<string>('');

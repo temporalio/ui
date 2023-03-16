@@ -11,6 +11,7 @@
     workflowError,
     workflowCount,
     workflowsQuery,
+    workflowsPage,
   } from '$lib/stores/workflows';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
@@ -62,13 +63,11 @@
   // let customizationDrawerOpen: boolean = false;
 
   $: query = $page.url.searchParams.get('query');
+  $: currentPage = $page.url.searchParams.get('page');
 
-  $: {
-    // For returning to page from 'Back to Workflows' with previous search
-    if (query) {
-      $workflowsQuery = query;
-    }
-  }
+  // For returning to page from 'Back to Workflows' with previous search
+  $: query && ($workflowsQuery = query);
+  $: currentPage && ($workflowsPage = currentPage);
 
   $: {
     if (!$workflowFilters.length && !$workflowSorts.length) {

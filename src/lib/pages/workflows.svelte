@@ -2,7 +2,7 @@
   import { onDestroy, onMount } from 'svelte';
   import { page } from '$app/stores';
   import { timeFormat } from '$lib/stores/time-format';
-  import { workflowsSearch } from '$lib/stores/workflows';
+  import { workflowsSearch, workflowsPage } from '$lib/stores/workflows';
   import {
     refresh,
     workflows,
@@ -43,6 +43,11 @@
     const query = $page.url.searchParams.get('query');
     const parameters = query ? toListWorkflowParameters(query) : {};
     $workflowsSearch = { parameters, searchType };
+
+    const currentPage = $page.url.searchParams.get('page');
+    if (currentPage) {
+      $workflowsPage = currentPage;
+    }
   });
 </script>
 

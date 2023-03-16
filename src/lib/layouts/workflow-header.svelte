@@ -3,7 +3,11 @@
   import { fly } from 'svelte/transition';
 
   import { autoRefreshWorkflow } from '$lib/stores/event-view';
-  import { workflowsQuery, workflowsSearch } from '$lib/stores/workflows';
+  import {
+    workflowsQuery,
+    workflowsSearch,
+    workflowsPage,
+  } from '$lib/stores/workflows';
   import { refresh, workflowRun } from '$lib/stores/workflow-run';
   import { eventHistory } from '$lib/stores/events';
 
@@ -63,7 +67,7 @@
 
   $: {
     if (!isRunning) {
-      // Stop refresh if worfklow is no longer running
+      // Stop refresh if workflow is no longer running
       clearInterval(refreshInterval);
     }
   }
@@ -99,6 +103,7 @@
         namespace,
         query: $workflowsQuery || query,
         search: searchType,
+        page: $workflowsPage,
       })}
       data-testid="back-to-workflows"
       class="back-to-workflows"
