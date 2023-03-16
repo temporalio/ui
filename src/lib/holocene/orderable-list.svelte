@@ -1,21 +1,22 @@
 <script lang="ts">
   import IconButton from './icon-button.svelte';
   import Icon from './icon/icon.svelte';
+  import type { WorkflowHeader } from '$lib/stores/workflow-table-columns';
 
   type ExtendedDragEvent = DragEvent & {
     currentTarget: EventTarget & HTMLLIElement;
   };
 
   interface $$Props {
-    items: string[];
-    availableItems?: string[];
+    items: WorkflowHeader[];
+    availableItems?: WorkflowHeader[];
     onAddItem: (index: number) => void;
     onRemoveItem: (index: number) => void;
     onMoveItem: (from: number, to: number) => void;
   }
 
-  export let items: string[];
-  export let availableItems: string[] = [];
+  export let items: WorkflowHeader[];
+  export let availableItems: WorkflowHeader[] = [];
   export let onAddItem: $$Props['onAddItem'];
   export let onMoveItem: $$Props['onMoveItem'];
   export let onRemoveItem: $$Props['onRemoveItem'];
@@ -53,7 +54,7 @@
           on:dragleave|preventDefault|stopPropagation={handleDragLeave}
           on:dragover|preventDefault|stopPropagation
         >
-          <div class="flex flex-row gap-2 items-center">
+          <div class="flex flex-row items-center gap-2">
             <div class="flex items-center">
               <IconButton
                 hoverable
@@ -66,7 +67,7 @@
                 on:click={() => onMoveItem(index, index + 1)}
               />
             </div>
-            {item}
+            {item.label}
             {#if index === 0}
               <Icon width={16} height={16} name="pin-filled" />
             {/if}
@@ -89,8 +90,8 @@
       <ol class="orderable-list">
         {#each availableItems as item, index}
           <li class="orderable-item">
-            <div class="flex flex-row gap-2 items-center">
-              {item}
+            <div class="flex flex-row items-center gap-2">
+              {item.label}
             </div>
             <IconButton
               hoverable
@@ -115,14 +116,14 @@
   }
 
   .orderable-list {
-    @apply bg-white border-3 border-primary rounded-lg;
+    @apply rounded-lg border-3 border-primary bg-white;
   }
 
   .orderable-item {
-    @apply select-none flex flex-row items-center justify-between p-2 list-none font-medium text-sm;
+    @apply flex select-none list-none flex-row items-center justify-between p-2 text-sm font-medium;
   }
 
-  .orderable-item[draggable='true'] {
+  .orderable-item[draggable="true"] {
     @apply cursor-move;
   }
 

@@ -1,10 +1,9 @@
 import { formatDate } from '$lib/utilities/format-date';
 import { formatDistance } from '$lib/utilities/format-time';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
-import { is_empty } from 'svelte/internal';
 import { persistStore } from './persist-store';
 
-export type WorkflowHeader =
+type WorkflowHeaderLabels =
   | 'Status'
   | 'Workflow ID'
   | 'Run ID'
@@ -23,6 +22,8 @@ export type WorkflowHeader =
 // | 'Search Attributes'
 // | 'Custom Search Attributes'
 // | 'Memo Custom Key';
+
+export type WorkflowHeader = { label: WorkflowHeaderLabels; width?: number };
 
 interface BaseWorkflowCell {
   label: WorkflowHeader;
@@ -61,30 +62,30 @@ type Action =
   | { type: 'WORKFLOW_COLUMN.MOVE'; payload: { from: number; to: number } };
 
 const DEFAULT_COLUMNS: WorkflowHeader[] = [
-  'Status',
-  'Workflow ID',
-  'Run ID',
-  'Type',
-  'Start',
-  'End',
+  { label: 'Status', width: 128 },
+  { label: 'Workflow ID' },
+  // {label: 'Run ID'},
+  { label: 'Type', width: 240 },
+  { label: 'Start', width: 240 },
+  { label: 'End', width: 240 },
 ];
 
 const DEFAULT_AVAILABLE_COLUMNS: WorkflowHeader[] = [
-  'History Size',
-  'History Length',
-  'Execution Time',
-  'State Transitions',
-  'Parent Namespace',
-  'Parent Workflow ID',
-  'Task Queue',
-  'Memo',
-  // 'Search Attributes',
-  // 'Custom Search Attributes',
-  // 'Memo Custom Key',
+  { label: 'History Size' },
+  { label: 'History Length' },
+  { label: 'Execution Time' },
+  { label: 'State Transitions' },
+  { label: 'Parent Namespace' },
+  { label: 'Parent Workflow ID' },
+  { label: 'Task Queue' },
+  { label: 'Memo' },
+  // { label: 'Search Attributes' },
+  // { label: 'Custom Search Attributes' },
+  // { label: 'Memo Custom Key' },
 ];
 
-export const WORKFLOW_CELLS: Record<WorkflowHeader, WorkflowCell> = {
-  Status: { label: 'Status', path: 'status', width: 150 },
+export const WORKFLOW_CELLS: Record<WorkflowHeaderLabels, WorkflowCell> = {
+  Status: { label: 'Status', path: 'status' },
   'Workflow ID': { label: 'Workflow ID', path: 'id' },
   'Run ID': { label: 'Run ID', path: 'runId' },
   Type: { label: 'Type', path: 'name' },

@@ -36,7 +36,7 @@
 
 <style lang="postcss">
   .icon-button {
-    @apply inline-block w-auto text-sm rounded-full;
+    @apply inline-block w-auto rounded-full text-sm;
 
     &.hoverable {
       @apply hover:bg-gray-300;

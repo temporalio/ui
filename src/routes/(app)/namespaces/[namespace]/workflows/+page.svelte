@@ -5,7 +5,9 @@
   import PageTitle from '$lib/components/page-title.svelte';
 
   import AdvancedVisibilityGuard from '$lib/components/advanced-visibility-guard.svelte';
-  import WorkflowsWithNewSearch from '$lib/pages/workflows-with-new-search.svelte';
+  // import WorkflowsWithNewSearch from '$lib/pages/workflows-with-new-search.svelte';
+  // [WIP] DO NOT MERGE
+  import WorkflowsWithNewSearch from '$lib/pages/workflows-with-new-search-v2.svelte';
 </script>
 
 <PageTitle

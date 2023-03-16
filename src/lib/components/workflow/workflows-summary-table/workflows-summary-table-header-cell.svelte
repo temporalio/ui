@@ -8,28 +8,30 @@
 
   export let column: WorkflowHeader;
   export let sortDisabled: boolean;
+
+  $: ({ label } = column);
 </script>
 
-{#if column === 'Status'}
-  <th class="w-32">
+{#if label === 'Status'}
+  <th>
     <ExecutionStatusDropdownFilter />
   </th>
-{:else if column === 'Workflow ID'}
+{:else if label === 'Workflow ID'}
   <th>
     <WorkflowIdDropdownFilter />
   </th>
-{:else if column === 'Type'}
-  <th class="xl:w-60">
+{:else if label === 'Type'}
+  <th>
     <WorkflowTypeDropdownFilter />
   </th>
-{:else if column === 'Start'}
-  <th class="w-60 max-xl:hidden">
+{:else if label === 'Start'}
+  <th>
     <StartTimeDropdownFilter disabled={sortDisabled} />
   </th>
-{:else if column === 'End'}
-  <th class="w-60 max-xl:hidden">
+{:else if label === 'End'}
+  <th>
     <EndTimeDropdownFilter disabled={sortDisabled} />
   </th>
 {:else}
-  <th>{column}</th>
+  <th>{label}</th>
 {/if}

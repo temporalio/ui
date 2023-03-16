@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Table from '$lib/holocene/table/table.svelte';
-  import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
-  import TableRow from '$lib/holocene/table/table-row.svelte';
+  import Table from '$lib/holocene/table-v2/table.svelte';
+  import TableHeaderRow from '$lib/holocene/table-v2/table-header-row.svelte';
+  import TableRow from '$lib/holocene/table-v2/table-row.svelte';
   import { page } from '$app/stores';
   import {
     workflowTableColumns,
@@ -209,10 +209,18 @@
   id={bulkActionsEnabled
     ? 'workflows-table-with-bulk-actions'
     : 'workflows-table'}
+  columns={[
+    { label: 'Select', width: 48 },
+    ...visibleColumns,
+    { label: 'Orderable List', width: 32 },
+  ]}
 >
   <TableHeaderRow slot="headers">
     {#if bulkActionsEnabled}
-      <th class="w-12" style="padding:0;">
+      <th
+        style="padding: 0 0.75rem;"
+        class="non-resizable !sticky left-0 z-20 bg-white"
+      >
         <Checkbox
           id="select-visible-workflows"
           onDark
@@ -223,8 +231,11 @@
         />
       </th>
     {/if}
-    {#if showBulkActions}
-      <th colspan={visibleColumns.length}>
+    {#if bulkActionsEnabled && showBulkActions}
+      <th
+        class="overflow-visible whitespace-nowrap"
+        style="grid-column: span {visibleColumns.length} / span {visibleColumns.length};"
+      >
         {#if allSelected}
           <span class="font-semibold">
             All {currentWorkflowBatchCount} selected
@@ -265,7 +276,7 @@
         <WorkflowsSummaryTableHeaderCell {column} {sortDisabled} />
       {/each}
     {/if}
-    <th class="w-6">
+    <th class="non-resizable !sticky right-0 z-20 bg-white">
       <IconButton icon="vertical-ellipsis" on:click={openCustomizationDrawer} />
     </th>
   </TableHeaderRow>
@@ -277,7 +288,7 @@
     })}
     <TableRow {href} class="workflow-summary-row">
       {#if bulkActionsEnabled}
-        <td style="padding:0;">
+        <td style="padding: 0 0.75rem;" class="!sticky left-0 z-20 bg-white">
           <Checkbox
             hoverable
             bind:group={selectedWorkflows}
@@ -289,11 +300,14 @@
       {#each visibleColumns as column}
         <WorkflowsSummaryTableBodyCell {column} {workflow} />
       {/each}
-      <td />
+      <td class="!sticky right-0 z-20 bg-white" />
     </TableRow>
   {:else}
     <tr>
-      <td colspan={visibleColumns.length + (bulkActionsEnabled ? 4 : 3)}>
+      <td
+        class="flex justify-center"
+        style="grid-column: span {visibleColumns.length} / span {visibleColumns.length};"
+      >
         {#if $loading}
           <Loading />
         {:else}
@@ -359,7 +373,7 @@
 />
 
 <style lang="postcss">
-  :global(.workflow-summary-row:hover) {
+  :global(.workflow-summary-row:hover > td) {
     @apply bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
 
     :global(.table-link) {

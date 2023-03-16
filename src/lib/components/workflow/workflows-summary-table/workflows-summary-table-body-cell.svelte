@@ -17,6 +17,8 @@
   export let column: WorkflowHeader;
   export let workflow: WorkflowExecution;
 
+  $: ({ label } = column);
+
   let cellContent: string;
   let filterOrCopyButtonsVisible: boolean = false;
 
@@ -24,7 +26,8 @@
   const hideFilterOrCopy = () => (filterOrCopyButtonsVisible = false);
 
   const onRowFilterClick = (header: WorkflowHeader, value: string) => {
-    const attribute = header === 'Workflow ID' ? 'WorkflowId' : 'WorkflowType';
+    const attribute =
+      header.label === 'Workflow ID' ? 'WorkflowId' : 'WorkflowType';
     const filter = $workflowFilters.find((f) => f.attribute === attribute);
     const getOtherFilters = () =>
       $workflowFilters.filter((f) => f.attribute !== attribute);
@@ -45,7 +48,7 @@
     updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
   };
 
-  $: cell = WORKFLOW_CELLS[column];
+  $: cell = WORKFLOW_CELLS[label];
   $: {
     if (isPathCell(cell)) {
       cellContent = workflow[cell.path] ?? '';
@@ -55,11 +58,11 @@
   }
 </script>
 
-{#if column === 'Status'}
+{#if label === 'Status'}
   <td>
     <WorkflowStatus status={workflow.status} />
   </td>
-{:else if column === 'Type' || column === 'Workflow ID'}
+{:else if label === 'Type' || label === 'Workflow ID'}
   <td
     class="relative"
     on:mouseover={showFilterOrCopy}
@@ -73,11 +76,11 @@
       content={cellContent}
       onFilter={() => onRowFilterClick(column, cellContent)}
       filtered={$workflowFilters.some(
-        (filter) => filter.attribute === column && filter.value === cellContent,
+        (filter) => filter.attribute === label && filter.value === cellContent,
       )}
     />
   </td>
-{:else if column === 'Memo'}
+{:else if label === 'Memo'}
   <td>
     {#if cellContent}
       <CodeBlock content={cellContent} inline copyable={false} />
