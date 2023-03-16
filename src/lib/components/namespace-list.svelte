@@ -7,7 +7,7 @@
   import Input from '$lib/holocene/input/input.svelte';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
 
-  export let namespaceList: NamespaceItem[] = [];
+  export let namespaceList: NamespaceListItem[] = [];
   export let show: boolean;
 
   let searchValue = '';
