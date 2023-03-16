@@ -31,7 +31,6 @@
   export let allSelected: boolean;
   export let pageSelected: boolean;
   export let filteredWorkflowCount: string;
-  export let columns: string[];
 
   $: terminateEnabled = workflowTerminateEnabled($page.data.settings);
   $: cancelEnabled = workflowCancelEnabled($page.data.settings);
@@ -141,13 +140,10 @@
             {/if}
           </div>
         </th>
-        {#each Array(columns.length - 1) as _, index}
-          {@const className =
-            index === columns.length - 2 || index === columns.length - 3
-              ? 'max-xl:hidden'
-              : ''}
-          <th class={className} />
-        {/each}
+        <th />
+        <th />
+        <th class="max-xl:hidden" />
+        <th class="max-xl:hidden" />
       {:else}
         <th class="w-32">
           <ExecutionStatusDropdownFilter />
