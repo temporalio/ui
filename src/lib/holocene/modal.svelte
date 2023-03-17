@@ -13,6 +13,7 @@
     large?: boolean;
     loading?: boolean;
     'data-testid'?: string;
+    hightlightNav?: boolean;
   }
 
   export let hideConfirm: boolean = false;
