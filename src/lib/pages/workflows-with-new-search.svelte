@@ -95,9 +95,9 @@
     batchTerminateConfirmationModal.open();
   };
 
-  const handleToggleAll = (event: CustomEvent<{ checked: boolean }>) => {
-    const { checked } = event.detail;
-    allSelected = checked;
+  const handleSelectAll = (workflows: WorkflowExecution[]) => {
+    allSelected = true;
+    selectedWorkflows = [...workflows];
   };
 
   const handleTogglePage = (
@@ -278,7 +278,7 @@
       bind:selectedWorkflows
       workflows={visibleItems}
       filteredWorkflowCount={query ? filteredWorkflowCount : totalWorkflowCount}
-      on:toggleAll={handleToggleAll}
+      on:selectAll={() => handleSelectAll(visibleItems)}
       on:togglePage={handleTogglePage}
       on:cancelWorkflows={openBatchCancelConfirmationModal}
       on:terminateWorkflows={openBatchTerminateConfirmationModal}
@@ -290,7 +290,7 @@
       bind:selectedWorkflows
       workflows={visibleItems}
       filteredWorkflowCount={query ? filteredWorkflowCount : totalWorkflowCount}
-      on:toggleAll={handleToggleAll}
+      on:selectAll={() => handleSelectAll(visibleItems)}
       on:togglePage={handleTogglePage}
       on:cancelWorkflows={openBatchCancelConfirmationModal}
       on:terminateWorkflows={openBatchTerminateConfirmationModal}

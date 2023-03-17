@@ -39,8 +39,10 @@
   const dispatch = createEventDispatcher<{
     terminateWorkflows: undefined;
     cancelWorkflows: undefined;
-    toggleAll: { checked: boolean };
-    togglePage: { checked: boolean; workflows: WorkflowExecution[] };
+    selectAll: { checked: boolean };
+    togglePage:
+      | { checked: true; workflows: WorkflowExecution[] }
+      | { checked: false };
   }>();
 
   export let workflows: WorkflowExecution[];
@@ -94,17 +96,13 @@
       event instanceof MouseEvent ||
       (event instanceof KeyboardEvent && event.key === 'Enter')
     ) {
-      dispatch('toggleAll', { checked: true });
+      dispatch('selectAll');
     }
   };
 
   const handleCheckboxChange = (event: CustomEvent<{ checked: boolean }>) => {
     const { checked } = event.detail;
-    if (checked) {
-      dispatch('togglePage', { checked: true, workflows });
-    } else {
-      dispatch('toggleAll', { checked: false });
-    }
+    dispatch('togglePage', { checked, ...(checked && { workflows }) });
   };
 </script>
 
@@ -114,7 +112,7 @@
     ? 'workflows-table-with-bulk-actions'
     : 'workflows-table'}
   columns={[
-    { label: 'Select', width: 48 },
+    { label: 'Select', width: 40 },
     ...visibleColumns,
     { label: 'Orderable List', width: 32 },
   ]}
@@ -122,7 +120,7 @@
   <TableHeaderRow slot="headers">
     {#if bulkActionsEnabled}
       <th
-        style="padding: 0 0.75rem;"
+        style="padding: 0;"
         class="non-resizable !sticky left-0 z-20 bg-white"
       >
         <Checkbox
@@ -192,7 +190,7 @@
     })}
     <TableRow {href} class="workflow-summary-row">
       {#if bulkActionsEnabled}
-        <td style="padding: 0 0.75rem;" class="!sticky left-0 z-20 bg-white">
+        <td style="padding: 0;" class="!sticky left-0 z-20 bg-white">
           <Checkbox
             hoverable
             bind:group={selectedWorkflows}

@@ -19,8 +19,10 @@
   const dispatch = createEventDispatcher<{
     terminateWorkflows: undefined;
     cancelWorkflows: undefined;
-    toggleAll: { checked: boolean };
-    togglePage: { checked: boolean; workflows: WorkflowExecution[] };
+    selectAll: undefined;
+    togglePage:
+      | { checked: true; workflows: WorkflowExecution[] }
+      | { checked: false };
   }>();
 
   export let bulkActionsEnabled: boolean = false;
@@ -51,7 +53,7 @@
       event instanceof MouseEvent ||
       (event instanceof KeyboardEvent && event.key === 'Enter')
     ) {
-      dispatch('toggleAll', { checked: true });
+      dispatch('selectAll');
     }
   };
 
@@ -60,7 +62,7 @@
     if (checked) {
       dispatch('togglePage', { checked: true, workflows });
     } else {
-      dispatch('toggleAll', { checked: false });
+      dispatch('togglePage', { checked: false });
     }
   };
 

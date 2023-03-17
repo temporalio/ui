@@ -34,7 +34,7 @@
   {pageSelected}
   on:terminateWorkflows
   on:cancelWorkflows
-  on:toggleAll
+  on:selectAll
   on:togglePage
 >
   {#each workflows as event}
