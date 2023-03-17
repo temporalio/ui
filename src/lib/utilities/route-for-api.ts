@@ -1,7 +1,7 @@
 import { page } from '$app/stores';
 import { get } from 'svelte/store';
 import { getApiOrigin } from './get-api-origin';
-import { publicPath } from './get-public-path';
+import { base as basePath } from '$app/paths';
 
 const replaceNamespaceInApiUrl = (
   apiUrl: string,
@@ -31,7 +31,7 @@ const base = (namespace?: string): string => {
 
   if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
 
-  baseUrl = `${baseUrl}${publicPath}`;
+  baseUrl = `${baseUrl}${basePath}`;
   return baseUrl;
 };
 
