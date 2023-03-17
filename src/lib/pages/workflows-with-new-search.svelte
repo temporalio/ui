@@ -1,29 +1,22 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { noop } from 'svelte/internal';
   import { page } from '$app/stores';
-  import { timeFormat } from '$lib/stores/time-format';
   import {
     refresh,
     workflows,
     loading,
     updating,
-    workflowError,
     workflowCount,
     workflowsQuery,
   } from '$lib/stores/workflows';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
-  import EmptyState from '$lib/holocene/empty-state.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
-  import WorkflowsSummaryTableWithFilters from '$lib/components/workflow/workflows-summary-table-with-filters.svelte';
-  import WorkflowsSummaryRowWithFilters from '$lib/components/workflow/workflows-summary-row-with-filters.svelte';
   import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import WorkflowDateTimeFilter from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
-  import Loading from '$lib/holocene/loading.svelte';
   import {
     batchCancelByQuery,
     batchTerminateByQuery,
@@ -32,40 +25,35 @@
   } from '$lib/services/batch-service';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
-  import { bulkActionsEnabled as workflowBulkActionsEnabled } from '$lib/utilities/bulk-actions-enabled';
   import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
   import { toaster } from '$lib/stores/toaster';
-  import {
-    workflowTableColumns,
-    addColumn,
-    removeColumn,
-    moveColumn,
-  } from '$lib/stores/workflow-table-columns';
-  import Drawer from '$lib/holocene/drawer.svelte';
-  import OrderableList from '$lib/holocene/orderable-list.svelte';
-  $: bulkActionsEnabled = workflowBulkActionsEnabled(
-    $page.data.settings,
-    $supportsAdvancedVisibility,
-  );
+  import FeatureGuard from '$lib/components/feature-guard.svelte';
+  import WorkflowsSummaryNonConfigurableTable from '$lib/components/workflow/workflows-summary-non-configurable-table/workflows-summary-non-configurable-table.svelte';
+  import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table/workflows-summary-configurable-table.svelte';
 
-  let selectedWorkflows: { [index: string]: boolean } = {};
+  // TODO: Make me a feature flag
+  export let workflowTableCustomizationEnabled: boolean = true;
+
+  let selectedWorkflows: WorkflowExecution[] = [];
   let batchTerminateConfirmationModal: BatchOperationConfirmationModal;
   let batchCancelConfirmationModal: BatchOperationConfirmationModal;
   let allSelected: boolean = false;
   let pageSelected: boolean = false;
-  // let customizationDrawerOpen: boolean = false;
   $: query = $page.url.searchParams.get('query');
+
   $: {
     // For returning to page from 'Back to Workflows' with previous search
     if (query) {
       $workflowsQuery = query;
     }
   }
+
   $: {
     if (!$workflowFilters.length && !$workflowSorts.length) {
       $workflowsQuery = '';
     }
   }
+
   onMount(() => {
     $lastUsedNamespace = $page.params.namespace;
     if (query) {
@@ -75,18 +63,18 @@
       $workflowFilters = [];
     }
   });
+
   const resetSelection = () => {
     allSelected = false;
     pageSelected = false;
-    selectedWorkflows = {};
-    selectedWorkflowsCount = 0;
+    selectedWorkflows = [];
   };
-  const errorMessage =
-    'If you have filters applied, try adjusting them. Otherwise please check your syntax and try again.';
+
   const refreshWorkflows = () => {
     resetSelection();
     $refresh = Date.now();
   };
+
   const resetPageToDefaultState = () => {
     $workflowFilters = [];
     $workflowSorts = [];
@@ -98,31 +86,36 @@
     });
     refreshWorkflows();
   };
-  const handleSelectWorkflow = (
-    event: CustomEvent<{ checked: boolean; workflowRunId: string }>,
-  ) => {
-    const { checked, workflowRunId } = event.detail;
-    selectedWorkflows[workflowRunId] = checked;
+
+  const openBatchCancelConfirmationModal = () => {
+    batchCancelConfirmationModal.open();
   };
+
+  const openBatchTerminateConfirmationModal = () => {
+    batchTerminateConfirmationModal.open();
+  };
+
   const handleToggleAll = (event: CustomEvent<{ checked: boolean }>) => {
     const { checked } = event.detail;
     allSelected = checked;
-    $workflows.forEach(
-      (workflow) => (selectedWorkflows[workflow.runId] = checked),
-    );
   };
+
   const handleTogglePage = (
     event: CustomEvent<{
       checked: boolean;
-      visibleWorkflows: WorkflowExecution[];
+      workflows: WorkflowExecution[];
     }>,
   ) => {
-    const { checked, visibleWorkflows } = event.detail;
+    const { checked, workflows } = event.detail;
     pageSelected = checked;
-    visibleWorkflows.forEach(
-      (workflow) => (selectedWorkflows[workflow.runId] = checked),
-    );
+    if (allSelected) allSelected = false;
+    if (checked) {
+      selectedWorkflows = [...workflows];
+    } else {
+      selectedWorkflows = [];
+    }
   };
+
   const terminateWorkflows = async (event: CustomEvent<{ reason: string }>) => {
     const options = {
       namespace: $page.params.namespace,
@@ -157,6 +150,7 @@
       );
     }
   };
+
   const cancelWorkflows = async (event: CustomEvent<{ reason: string }>) => {
     const options = {
       namespace: $page.params.namespace,
@@ -190,30 +184,27 @@
       );
     }
   };
-  // const openCustomizationDrawer = () => {
-  //   customizationDrawerOpen = true;
-  // };
-  // const closeCustomizationDrawer = () => {
-  //   customizationDrawerOpen = false;
-  // };
+
   $: batchOperationQuery = !$workflowsQuery
     ? 'ExecutionStatus="Running"'
     : $workflowsQuery;
-  $: terminableWorkflows = $workflows.filter(
-    (workflow) => selectedWorkflows[workflow.runId] && workflow.canBeTerminated,
+
+  $: terminableWorkflows = selectedWorkflows.filter(
+    (workflow) => workflow.canBeTerminated,
   );
-  $: cancelableWorkflows = $workflows.filter(
-    (workflow) =>
-      selectedWorkflows[workflow.runId] && workflow.status === 'Running',
+
+  $: cancelableWorkflows = selectedWorkflows.filter(
+    (workflow) => workflow.status === 'Running',
   );
+
   $: totalWorkflowCount = new Intl.NumberFormat('en-US').format(
     $workflowCount?.totalCount ?? 0,
   );
+
   $: filteredWorkflowCount = new Intl.NumberFormat('en-US').format(
     $workflowCount?.count ?? 0,
   );
-  $: selectedWorkflowsCount =
-    Object.values(selectedWorkflows).filter(Boolean).length;
+
   $: {
     if ($workflowFilters) {
       resetSelection();
@@ -280,85 +271,29 @@
   <svelte:fragment slot="action-top-center">
     <WorkflowDateTimeFilter />
   </svelte:fragment>
-  <WorkflowsSummaryTableWithFilters
-    {bulkActionsEnabled}
-    updating={$updating}
-    visibleWorkflows={visibleItems}
-    {selectedWorkflowsCount}
-    filteredWorkflowCount={query ? filteredWorkflowCount : totalWorkflowCount}
-    {allSelected}
-    {pageSelected}
-    on:terminateWorkflows={() => batchTerminateConfirmationModal.open()}
-    on:cancelWorkflows={() => batchCancelConfirmationModal.open()}
-    on:toggleAll={handleToggleAll}
-    on:togglePage={handleTogglePage}
-  >
-    {#each visibleItems as event}
-      <WorkflowsSummaryRowWithFilters
-        {bulkActionsEnabled}
-        workflow={event}
-        namespace={$page.params.namespace}
-        timeFormat={$timeFormat}
-        checkboxDisabled={allSelected}
-        selected={selectedWorkflows[event.runId]}
-        on:toggleWorkflow={handleSelectWorkflow}
-      />
-    {:else}
-      <tr>
-        <td colspan={bulkActionsEnabled ? 6 : 5} class="xl:hidden">
-          {#if $loading}
-            <Loading />
-          {:else}
-            <EmptyState
-              title="No Workflows Found"
-              content={errorMessage}
-              error={$workflowError}
-            />
-          {/if}
-        </td>
-        <td colspan={bulkActionsEnabled ? 8 : 7} class="max-xl:hidden">
-          {#if $loading}
-            <Loading />
-          {:else}
-            <EmptyState
-              title="No Workflows Found"
-              content={errorMessage}
-              error={$workflowError}
-            />
-          {/if}
-        </td>
-      </tr>
-    {/each}
-  </WorkflowsSummaryTableWithFilters>
+  <FeatureGuard enabled={workflowTableCustomizationEnabled}>
+    <WorkflowsSummaryConfigurableTable
+      {allSelected}
+      {pageSelected}
+      bind:selectedWorkflows
+      workflows={visibleItems}
+      filteredWorkflowCount={query ? filteredWorkflowCount : totalWorkflowCount}
+      on:toggleAll={handleToggleAll}
+      on:togglePage={handleTogglePage}
+      on:cancelWorkflows={openBatchCancelConfirmationModal}
+      on:terminateWorkflows={openBatchTerminateConfirmationModal}
+    />
+    <WorkflowsSummaryNonConfigurableTable
+      slot="fallback"
+      {allSelected}
+      {pageSelected}
+      bind:selectedWorkflows
+      workflows={visibleItems}
+      filteredWorkflowCount={query ? filteredWorkflowCount : totalWorkflowCount}
+      on:toggleAll={handleToggleAll}
+      on:togglePage={handleTogglePage}
+      on:cancelWorkflows={openBatchCancelConfirmationModal}
+      on:terminateWorkflows={openBatchTerminateConfirmationModal}
+    />
+  </FeatureGuard>
 </Pagination>
-<Drawer
-  open={false}
-  onClick={noop}
-  position="right"
-  dark={false}
-  title="Configure Workflow List"
->
-  <svelte:fragment slot="subtitle">
-    <span>Add (</span><Icon class="inline" name="add" /><span
-      >), re-arrange (</span
-    ><Icon class="inline" name="chevron-selector-vertical" /><span
-      >), and remove (</span
-    ><Icon class="inline" name="hyphen" /><span
-      >), Workflow<br />Headings to personalize the Workflow List Table.</span
-    >
-  </svelte:fragment>
-  <OrderableList
-    items={$workflowTableColumns.columns}
-    availableItems={$workflowTableColumns.availableColumns}
-    onAddItem={addColumn}
-    onRemoveItem={removeColumn}
-    onMoveItem={moveColumn}
-  >
-    <svelte:fragment slot="main-heading">
-      Workflow Headings <span class="font-normal">(in view)</span>
-    </svelte:fragment>
-    <svelte:fragment slot="bank-heading">
-      Available Headings <span class="font-normal">(not in view)</span>
-    </svelte:fragment>
-  </OrderableList>
-</Drawer>

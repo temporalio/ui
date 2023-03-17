@@ -1,18 +1,10 @@
 <script lang="ts">
+  import { createEventDispatcher } from 'svelte';
   import Table from '$lib/holocene/table-v2/table.svelte';
   import TableHeaderRow from '$lib/holocene/table-v2/table-header-row.svelte';
   import TableRow from '$lib/holocene/table-v2/table-row.svelte';
   import { page } from '$app/stores';
-  import {
-    workflowTableColumns,
-    addColumn,
-    removeColumn,
-    moveColumn,
-  } from '$lib/stores/workflow-table-columns';
   import IconButton from '$lib/holocene/icon-button.svelte';
-  import Drawer from '$lib/holocene/drawer.svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import OrderableList from '$lib/holocene/orderable-list.svelte';
   import { routeForEventHistory } from '$lib/utilities/route-for';
   import {
     supportsAdvancedVisibility,
@@ -20,150 +12,45 @@
   } from '$lib/stores/bulk-actions';
   import { bulkActionsEnabled as workflowBulkActionsEnabled } from '$lib/utilities/bulk-actions-enabled';
   import Checkbox from '$lib/holocene/checkbox.svelte';
-  import BatchOperationConfirmationModal from '../batch-operation-confirmation-modal.svelte';
   import {
-    workflowsQuery,
+    workflowTableColumns,
+    addColumn,
+    removeColumn,
+    moveColumn,
+  } from '$lib/stores/workflow-table-columns';
+  import Drawer from '$lib/holocene/drawer.svelte';
+  import OrderableList from '$lib/holocene/orderable-list.svelte';
+  import {
     loading,
     updating,
     workflowError,
     workflowCount,
-    refresh,
   } from '$lib/stores/workflows';
   import Loading from '$lib/holocene/loading.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import WorkflowsSummaryTableBodyCell from './workflows-summary-table-body-cell.svelte';
   import WorkflowsSummaryTableHeaderCell from './workflows-summary-table-header-cell.svelte';
-  import {
-    batchCancelByQuery,
-    batchTerminateByQuery,
-    bulkCancelByIDs,
-    bulkTerminateByIDs,
-  } from '$lib/services/batch-service';
-  import { toaster } from '$lib/stores/toaster';
-  import { workflowFilters, workflowSorts } from '$lib/stores/filters';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
   import { coreUserStore } from '$lib/stores/core-user';
   import BulkActionButton from '$lib/holocene/table/bulk-action-button.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+
+  const dispatch = createEventDispatcher<{
+    terminateWorkflows: undefined;
+    cancelWorkflows: undefined;
+    toggleAll: { checked: boolean };
+    togglePage: { checked: boolean; workflows: WorkflowExecution[] };
+  }>();
 
   export let workflows: WorkflowExecution[];
-  export let totalWorkflowCount: string;
   export let filteredWorkflowCount: string;
+  export let selectedWorkflows: WorkflowExecution[];
+  export let allSelected: boolean;
+  export let pageSelected: boolean;
 
-  let customizationDrawerOpen: boolean = false;
-  let selectedWorkflows: WorkflowExecution[] = [];
-  let allSelected: boolean = false;
-  let pageSelected: boolean = false;
-  let batchTerminateConfirmationModal: BatchOperationConfirmationModal;
-  let batchCancelConfirmationModal: BatchOperationConfirmationModal;
   let coreUser = coreUserStore();
-
-  const openCustomizationDrawer = () => {
-    customizationDrawerOpen = true;
-  };
-
-  const closeCustomizationDrawer = () => {
-    customizationDrawerOpen = false;
-  };
-
-  const onSelectAll = () => {
-    allSelected = !allSelected;
-    selectedWorkflows = [...workflows];
-  };
-
-  const handleCheckboxChange = (event: CustomEvent<{ checked: boolean }>) => {
-    const { checked } = event.detail;
-    pageSelected = checked;
-    if (allSelected) allSelected = false;
-    if (checked) {
-      selectedWorkflows = [...workflows];
-    } else {
-      selectedWorkflows = [];
-    }
-  };
-
-  const resetPageToDefaultState = () => {
-    $workflowFilters = [];
-    $workflowSorts = [];
-    updateQueryParameters({
-      url: $page.url,
-      parameter: 'query',
-      value: '',
-      allowEmpty: true,
-    });
-    $refresh = Date.now();
-  };
-
-  const terminateWorkflows = async (event: CustomEvent<{ reason: string }>) => {
-    const options = {
-      namespace: $page.params.namespace,
-      reason: event.detail.reason,
-    };
-    try {
-      if (allSelected) {
-        await batchTerminateByQuery({
-          ...options,
-          query: batchOperationQuery,
-        });
-        toaster.push({
-          message:
-            'The batch terminate request is processing in the background.',
-          id: 'batch-terminate-success-toast',
-        });
-      } else {
-        const workflowsTerminated = await bulkTerminateByIDs({
-          ...options,
-          workflows: terminableWorkflows,
-        });
-        toaster.push({
-          message: `Successfully terminated ${workflowsTerminated} workflows.`,
-          id: 'batch-terminate-success-toast',
-        });
-      }
-      batchTerminateConfirmationModal.close();
-      resetPageToDefaultState();
-    } catch (error) {
-      batchTerminateConfirmationModal.setError(
-        error?.message ?? 'An unknown error occurred.',
-      );
-    }
-  };
-
-  const cancelWorkflows = async (event: CustomEvent<{ reason: string }>) => {
-    const options = {
-      namespace: $page.params.namespace,
-      reason: event.detail.reason,
-    };
-
-    try {
-      if (allSelected) {
-        await batchCancelByQuery({
-          ...options,
-          query: batchOperationQuery,
-        });
-        toaster.push({
-          message: 'The batch cancel request is processing in the background.',
-          id: 'batch-cancel-success-toast',
-        });
-      } else {
-        const workflowsCanceled = await bulkCancelByIDs({
-          ...options,
-          workflows: cancelableWorkflows,
-        });
-        toaster.push({
-          message: `Successfully cancelled ${workflowsCanceled} workflows.`,
-          id: 'batch-cancel-success-toast',
-        });
-      }
-      batchCancelConfirmationModal.close();
-      resetPageToDefaultState();
-    } catch (error) {
-      batchCancelConfirmationModal.setError(
-        error?.message ?? 'An unknown error occurred.',
-      );
-    }
-  };
+  let customizationDrawerOpen: boolean = false;
 
   $: namespace = $page.params.namespace;
   $: selectedWorkflowsCount = selectedWorkflows.length;
@@ -171,21 +58,10 @@
   $: visibleColumns = $workflowTableColumns.columns;
   $: terminateEnabled = workflowTerminateEnabled($page.data.settings);
   $: cancelEnabled = workflowCancelEnabled($page.data.settings);
-  $: currentWorkflowBatchCount = allSelected
-    ? totalWorkflowCount
-    : filteredWorkflowCount;
 
   $: sortDisabled =
     $workflowCount?.totalCount >= 1000000 ||
     !$supportsAdvancedVisibilityWithOrderBy;
-
-  $: terminableWorkflows = selectedWorkflows.filter(
-    (workflow) => workflow.canBeTerminated,
-  );
-
-  $: cancelableWorkflows = selectedWorkflows.filter(
-    (workflow) => workflow.status === 'Running',
-  );
 
   $: indeterminate =
     selectedWorkflows.length > 0 && selectedWorkflows.length < workflows.length;
@@ -199,9 +75,37 @@
     $page.params.namespace,
   );
 
-  $: batchOperationQuery = !$workflowsQuery
-    ? 'ExecutionStatus="Running"'
-    : $workflowsQuery;
+  $: checked =
+    allSelected ||
+    pageSelected ||
+    (selectedWorkflowsCount === workflows.length &&
+      selectedWorkflowsCount !== 0);
+
+  const openCustomizationDrawer = () => {
+    customizationDrawerOpen = true;
+  };
+
+  const closeCustomizationDrawer = () => {
+    customizationDrawerOpen = false;
+  };
+
+  const handleSelectAll = (event: MouseEvent | KeyboardEvent) => {
+    if (
+      event instanceof MouseEvent ||
+      (event instanceof KeyboardEvent && event.key === 'Enter')
+    ) {
+      dispatch('toggleAll', { checked: true });
+    }
+  };
+
+  const handleCheckboxChange = (event: CustomEvent<{ checked: boolean }>) => {
+    const { checked } = event.detail;
+    if (checked) {
+      dispatch('togglePage', { checked: true, workflows });
+    } else {
+      dispatch('toggleAll', { checked: false });
+    }
+  };
 </script>
 
 <Table
@@ -225,9 +129,9 @@
           id="select-visible-workflows"
           onDark
           hoverable
-          bind:checked={pageSelected}
-          on:change={handleCheckboxChange}
+          {checked}
           {indeterminate}
+          on:change={handleCheckboxChange}
         />
       </th>
     {/if}
@@ -238,16 +142,16 @@
       >
         {#if allSelected}
           <span class="font-semibold">
-            All {currentWorkflowBatchCount} selected
+            All {filteredWorkflowCount} selected
           </span>
         {:else}
           <span class="font-semibold">{selectedWorkflowsCount} selected</span>
           <span>
             (or <button
               data-testid="select-all-workflows"
-              on:click={onSelectAll}
+              on:click={handleSelectAll}
               class="cursor-pointer underline"
-              >select all {currentWorkflowBatchCount}</button
+              >select all {filteredWorkflowCount}</button
             >)
           </span>
         {/if}
@@ -256,7 +160,7 @@
             <BulkActionButton
               testId="bulk-cancel-button"
               disabled={namespaceWriteDisabled}
-              on:click={() => batchCancelConfirmationModal.open()}
+              on:click={() => dispatch('cancelWorkflows')}
               >Request Cancellation</BulkActionButton
             >
           {/if}
@@ -265,7 +169,7 @@
               variant="destructive"
               testId="bulk-terminate-button"
               disabled={namespaceWriteDisabled}
-              on:click={() => batchTerminateConfirmationModal.open()}
+              on:click={() => dispatch('terminateWorkflows')}
               >Terminate</BulkActionButton
             >
           {/if}
@@ -306,7 +210,8 @@
     <tr>
       <td
         class="flex justify-center"
-        style="grid-column: span {visibleColumns.length} / span {visibleColumns.length};"
+        style="grid-column: span {visibleColumns.length +
+          2} / span {visibleColumns.length + 2};"
       >
         {#if $loading}
           <Loading />
@@ -353,24 +258,6 @@
     </svelte:fragment>
   </OrderableList>
 </Drawer>
-
-<BatchOperationConfirmationModal
-  action="Terminate"
-  bind:this={batchTerminateConfirmationModal}
-  {allSelected}
-  actionableWorkflowsLength={terminableWorkflows.length}
-  query={batchOperationQuery}
-  on:confirm={terminateWorkflows}
-/>
-
-<BatchOperationConfirmationModal
-  action="Cancel"
-  bind:this={batchCancelConfirmationModal}
-  {allSelected}
-  actionableWorkflowsLength={cancelableWorkflows.length}
-  query={batchOperationQuery}
-  on:confirm={cancelWorkflows}
-/>
 
 <style lang="postcss">
   :global(.workflow-summary-row:hover > td) {

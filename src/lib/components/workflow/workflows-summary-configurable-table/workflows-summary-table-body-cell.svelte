@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import Badge from '$lib/holocene/badge.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import FilterOrCopyButtons from '$lib/holocene/filter-or-copy-buttons.svelte';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';

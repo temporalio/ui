@@ -1,6 +1,5 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { createEventDispatcher } from 'svelte';
   import { formatDate } from '$lib/utilities/format-date';
   import { getMilliseconds } from '$lib/utilities/format-time';
   import { routeForEventHistory } from '$lib/utilities/route-for';
@@ -10,21 +9,22 @@
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import Checkbox from '$lib/holocene/checkbox.svelte';
-  const dispatch = createEventDispatcher<{
-    toggleWorkflow: { workflowRunId: string; checked: boolean };
-  }>();
+
   export let bulkActionsEnabled: boolean = false;
-  export let selected: boolean = false;
   export let namespace: string;
   export let workflow: WorkflowExecution;
+  export let selectedWorkflows: WorkflowExecution[];
   export let timeFormat: TimeFormat | string;
   export let checkboxDisabled: boolean;
+
   $: href = routeForEventHistory({
     namespace,
     workflow: workflow.id,
     run: workflow.runId,
   });
+
   let showFilterCopy = false;
+
   const onRowFilterClick = (
     attribute: 'WorkflowId' | 'WorkflowType',
     value: string,
@@ -46,12 +46,6 @@
     }
     updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
   };
-  const handleCheckboxChange = (event: CustomEvent<{ checked: boolean }>) => {
-    dispatch('toggleWorkflow', {
-      workflowRunId: workflow.runId,
-      checked: event.detail.checked,
-    });
-  };
 </script>
 
 <TableRow {href} class="workflow-summary-row">
@@ -60,8 +54,8 @@
       <Checkbox
         hoverable
         disabled={checkboxDisabled}
-        bind:checked={selected}
-        on:change={handleCheckboxChange}
+        value={workflow}
+        bind:group={selectedWorkflows}
       />
     </td>
   {/if}

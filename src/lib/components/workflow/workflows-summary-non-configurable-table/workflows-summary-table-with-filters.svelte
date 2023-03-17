@@ -4,26 +4,28 @@
   import { workflowCount } from '$lib/stores/workflows';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
-  import ExecutionStatusDropdownFilter from './dropdown-filter/workflow-status.svelte';
-  import WorkflowIdDropdownFilter from './dropdown-filter/workflow-id.svelte';
-  import WorkflowTypeDropdownFilter from './dropdown-filter/workflow-type.svelte';
-  import StartTimeDropdownFilter from './dropdown-filter/start-time.svelte';
-  import EndTimeDropdownFilter from './dropdown-filter/end-time.svelte';
+  import ExecutionStatusDropdownFilter from '../dropdown-filter/workflow-status.svelte';
+  import WorkflowIdDropdownFilter from '../dropdown-filter/workflow-id.svelte';
+  import WorkflowTypeDropdownFilter from '../dropdown-filter/workflow-type.svelte';
+  import StartTimeDropdownFilter from '../dropdown-filter/start-time.svelte';
+  import EndTimeDropdownFilter from '../dropdown-filter/end-time.svelte';
   import BulkActionButton from '$lib/holocene/table/bulk-action-button.svelte';
   import { coreUserStore } from '$lib/stores/core-user';
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
   import { supportsAdvancedVisibilityWithOrderBy } from '$lib/stores/bulk-actions';
+
   const dispatch = createEventDispatcher<{
     terminateWorkflows: undefined;
     cancelWorkflows: undefined;
     toggleAll: { checked: boolean };
-    togglePage: { checked: boolean; visibleWorkflows: WorkflowExecution[] };
+    togglePage: { checked: boolean; workflows: WorkflowExecution[] };
   }>();
+
   export let bulkActionsEnabled: boolean = false;
   export let updating: boolean = false;
-  export let visibleWorkflows: WorkflowExecution[];
+  export let workflows: WorkflowExecution[];
   export let selectedWorkflowsCount: number;
   export let allSelected: boolean;
   export let pageSelected: boolean;
@@ -35,12 +37,15 @@
   $: disabled =
     $workflowCount?.totalCount >= 1000000 ||
     !$supportsAdvancedVisibilityWithOrderBy;
+
   const handleBulkTerminate = () => {
     dispatch('terminateWorkflows');
   };
+
   const handleBulkCancel = () => {
     dispatch('cancelWorkflows');
   };
+
   const handleSelectAll = (event: MouseEvent | KeyboardEvent) => {
     if (
       event instanceof MouseEvent ||
@@ -49,27 +54,32 @@
       dispatch('toggleAll', { checked: true });
     }
   };
+
   const handleCheckboxChange = (event: CustomEvent<{ checked: boolean }>) => {
     const { checked } = event.detail;
     if (checked) {
-      dispatch('togglePage', { checked: true, visibleWorkflows });
+      dispatch('togglePage', { checked: true, workflows });
     } else {
       dispatch('toggleAll', { checked: false });
     }
   };
+
   let coreUser = coreUserStore();
+
   $: namespaceWriteDisabled = $coreUser.namespaceWriteDisabled(
     $page.params.namespace,
   );
+
   $: checked =
     allSelected ||
     pageSelected ||
-    (selectedWorkflowsCount === visibleWorkflows.length &&
+    (selectedWorkflowsCount === workflows.length &&
       selectedWorkflowsCount !== 0);
+
   $: showBulkActions = selectedWorkflowsCount > 0 || allSelected;
+
   $: indeterminate =
-    selectedWorkflowsCount > 0 &&
-    selectedWorkflowsCount < visibleWorkflows.length;
+    selectedWorkflowsCount > 0 && selectedWorkflowsCount < workflows.length;
 </script>
 
 {#if bulkActionsEnabled}
