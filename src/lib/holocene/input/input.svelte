@@ -213,7 +213,7 @@
   }
 
   .hint-text {
-    @apply mt-1 text-xs;
+    @apply inline-block mt-2 text-xs;
   }
 
   .hint-text.error,
@@ -262,7 +262,7 @@
     @apply border-gray-900 bg-gray-900;
   }
 
-  input[type="search"]::-webkit-search-cancel-button {
+  input[type='search']::-webkit-search-cancel-button {
     @apply hidden;
   }
 </style>

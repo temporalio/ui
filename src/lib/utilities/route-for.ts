@@ -1,7 +1,7 @@
 import { browser } from '$app/environment';
 import { toURL } from '$lib/utilities/to-url';
-import { publicPath } from '$lib/utilities/get-public-path';
 import { encodeURIForSvelte } from '$lib/utilities/encode-uri';
+import { base } from '$app/paths';
 
 type RouteParameters = {
   namespace: string;
@@ -46,17 +46,17 @@ export type AuthenticationParameters = {
 };
 
 export const routeForNamespaces = (): string => {
-  return `${publicPath}/namespaces`;
+  return `${base}/namespaces`;
 };
 
 export const routeForNamespace = ({
   namespace,
 }: NamespaceParameter): string => {
-  return `${publicPath}/namespaces/${namespace}`;
+  return `${base}/namespaces/${namespace}`;
 };
 
 export const routeForNamespaceSelector = () => {
-  return `${publicPath}/select-namespace`;
+  return `${base}/select-namespace`;
 };
 
 export const routeForWorkflows = (parameters: NamespaceParameter): string => {
@@ -160,7 +160,7 @@ export const routeForAuthentication = (
 ): string => {
   const { settings, searchParams: currentSearchParams, originUrl } = parameters;
 
-  const login = new URL(`${publicPath}/auth/sso`, settings.baseUrl);
+  const login = new URL(`${base}/auth/sso`, settings.baseUrl);
   let opts = settings.auth.options ?? [];
 
   opts = [...opts, 'returnUrl'];
@@ -182,7 +182,7 @@ export const routeForAuthentication = (
 
 export const routeForLoginPage = (error = '', isBrowser = browser): string => {
   if (isBrowser) {
-    const login = new URL(`${publicPath}/login`, window.location.origin);
+    const login = new URL(`${base}/login`, window.location.origin);
     login.searchParams.set('returnUrl', window.location.href);
     if (error) {
       login.searchParams.set('error', error);
@@ -190,7 +190,7 @@ export const routeForLoginPage = (error = '', isBrowser = browser): string => {
     return login.toString();
   }
 
-  return `${publicPath}/login`;
+  return `${base}/login`;
 };
 
 export const routeForEventHistoryImport = (
@@ -198,9 +198,9 @@ export const routeForEventHistoryImport = (
   view?: EventView,
 ): string => {
   if (namespace && view) {
-    return `${publicPath}/import/events/${namespace}/workflow/run/history/${view}`;
+    return `${base}/import/events/${namespace}/workflow/run/history/${view}`;
   }
-  return `${publicPath}/import/events`;
+  return `${base}/import/events`;
 };
 
 export const hasParameters =
