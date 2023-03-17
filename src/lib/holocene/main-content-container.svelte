@@ -5,8 +5,6 @@
   import { viewedFeatureTags, viewFeature } from '$lib/stores/new-feature-tags';
   import { onMount } from 'svelte';
 
-  export let overlayFeature: string = '';
-
   let overlayModal: Modal;
   let scrollToTopHidden = true;
   let showScrollToTopOn = 150; // pixels
@@ -26,10 +24,10 @@
   }
 
   onMount(() => {
-    const viewed = $viewedFeatureTags?.includes(overlayFeature);
+    const viewed = $viewedFeatureTags?.includes('topNav');
     if (!viewed) {
-      overlayModal.open();
-      viewFeature(overlayFeature);
+      // overlayModal.open();
+      viewFeature('topNav');
     }
   });
 
