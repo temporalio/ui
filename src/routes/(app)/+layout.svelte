@@ -5,26 +5,34 @@
   import { clearAuthUser } from '$lib/stores/auth-user';
   import { goto } from '$app/navigation';
   import {
+    routeForArchivalWorkfows,
+    routeForEventHistoryImport,
     routeForLoginPage,
+    routeForNamespaces,
     routeForSchedules,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
 
-  import SideNavigation from './_side-nav.svelte';
   import Banners from '$lib/components/banner/banners.svelte';
   import { ErrorBoundary } from '$lib/holocene/error-boundary';
-  import ScrollToTop from '$lib/holocene/scroll-to-top.svelte';
   import Toaster from '$lib/holocene/toaster.svelte';
   import { toaster } from '$lib/stores/toaster';
-  import TopNavigation from '$lib/components/top-nav.svelte';
   import { lastUsedNamespace, namespaces } from '$lib/stores/namespaces';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
+  import MainContentContainer from '$lib/holocene/main-content-container.svelte';
+  import SideNavigation from '$lib/holocene/navigation/side-nav.svelte';
+  import TopNavigation from '$lib/holocene/navigation/top-nav.svelte';
 
   export let data: PageData;
 
   $: ({ uiVersionInfo } = data);
 
   $: isCloud = $page.data?.settings?.runtimeEnvironment?.isCloud;
+  $: activeNamespaceName = $page.params?.namespace ?? $lastUsedNamespace;
+  $: activeNamespace = $namespaces.find(
+    (namespace: Namespace) =>
+      namespace?.namespaceInfo?.name === activeNamespaceName,
+  );
   $: namespaceNames = isCloud
     ? [$page.params.namespace]
     : $namespaces.map((namespace: Namespace) => namespace?.namespaceInfo?.name);
@@ -42,6 +50,18 @@
       },
     };
   });
+
+  $: linkList = {
+    home: routeForWorkflows({ namespace: activeNamespaceName }),
+    archive: routeForArchivalWorkfows({ namespace: activeNamespaceName }),
+    namespaces: routeForNamespaces(),
+    schedules: routeForSchedules({ namespace: activeNamespaceName }),
+    workflows: routeForWorkflows({ namespace: activeNamespaceName }),
+    import: routeForEventHistoryImport(),
+    feedback:
+      $page.data?.settings?.feedbackURL ||
+      'https://github.com/temporalio/ui/issues/new/choose',
+  };
 
   function getCurrentHref(namespace: string) {
     const onSchedulesPage = $page.url.pathname.endsWith('schedules');
@@ -67,12 +87,9 @@
 <div class="flex w-screen flex-row">
   <Toaster pop={toaster.pop} toasts={toaster.toasts} />
   <div class="sticky top-0 z-20 h-screen w-auto">
-    <SideNavigation />
+    <SideNavigation {activeNamespace} {linkList} {isCloud} />
   </div>
-  <main
-    id="content"
-    class="relative h-screen w-max flex-auto overflow-auto bg-gray-100"
-  >
+  <MainContentContainer overlayFeature="topNav">
     <TopNavigation {logout} {namespaceList} />
     <Banners {uiVersionInfo} />
     <div class="z-10 -mt-4 flex w-full flex-col gap-4 px-10 pb-10 pt-8">
@@ -80,6 +97,5 @@
         <slot />
       </ErrorBoundary>
     </div>
-    <ScrollToTop />
-  </main>
+  </MainContentContainer>
 </div>

@@ -22,6 +22,7 @@
   export let confirmDisabled: boolean = false;
   export let large: boolean = false;
   export let loading: boolean = false;
+  export let hightlightNav: boolean = false;
 
   let error: string;
 
@@ -109,6 +110,7 @@
   bind:this={modalElement}
   class="body {className}"
   class:large
+  class:hightlightNav
   aria-modal="true"
   aria-labelledby="modal-title"
   data-testid={$$props['data-testid']}
@@ -159,11 +161,15 @@
 
 <style lang="postcss">
   .body {
-    @apply z-50 mx-auto w-full max-w-lg overflow-y-auto rounded-lg bg-white p-0 text-gray-900 shadow-xl md:h-max;
+    @apply z-50  mx-auto w-full max-w-lg overflow-y-auto rounded-lg bg-white p-0 text-gray-900 shadow-xl md:h-max;
   }
 
   .body::backdrop {
-    @apply cursor-pointer bg-gray-900 opacity-50;
+    @apply top-[40px] cursor-pointer bg-gray-900 opacity-50;
+  }
+
+  .body.hightlightNav::backdrop {
+    @apply top-[40px] left-[60px];
   }
 
   .large {

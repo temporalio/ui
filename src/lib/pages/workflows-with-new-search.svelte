@@ -55,6 +55,7 @@
   let batchCancelConfirmationModal: BatchOperationConfirmationModal;
   let allSelected: boolean = false;
   let pageSelected: boolean = false;
+  let scrollY;
 
   // let customizationDrawerOpen: boolean = false;
 
@@ -263,6 +264,8 @@
   query={batchOperationQuery}
   on:confirm={cancelWorkflows}
 />
+
+<svelte:window bind:scrollY />
 
 <header class="mb-2 flex justify-between">
   <div>
