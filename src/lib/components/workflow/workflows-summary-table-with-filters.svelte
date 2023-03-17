@@ -141,9 +141,9 @@
           </div>
         </th>
         <th />
-        <th />
-        <th class="max-xl:hidden" />
-        <th class="max-xl:hidden" />
+        <th class="xl:w-60" />
+        <th class="w-60 max-xl:hidden" />
+        <th class="w-60 max-xl:hidden" />
       {:else}
         <th class="w-32">
           <ExecutionStatusDropdownFilter />
