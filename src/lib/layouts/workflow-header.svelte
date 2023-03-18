@@ -3,11 +3,7 @@
   import { fly } from 'svelte/transition';
 
   import { autoRefreshWorkflow } from '$lib/stores/event-view';
-  import {
-    workflowsQuery,
-    workflowsSearch,
-    workflowsPage,
-  } from '$lib/stores/workflows';
+  import { workflowsSearchParams } from '$lib/stores/workflows';
   import { refresh, workflowRun } from '$lib/stores/workflow-run';
   import { eventHistory } from '$lib/stores/events';
 
@@ -17,9 +13,8 @@
     routeForStackTrace,
     routeForWorkers,
     routeForWorkflowQuery,
-    routeForWorkflowsWithQuery,
+    routeForWorkflows,
   } from '$lib/utilities/route-for';
-  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
   import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/components/copyable.svelte';
@@ -48,9 +43,6 @@
     workflow: workflow?.id,
     run: workflow?.runId,
   };
-
-  const { parameters, searchType } = $workflowsSearch;
-  const query = toListWorkflowQuery(parameters);
 
   $: isRunning = $workflowRun?.workflow?.isRunning;
   $: activitiesCanceled = ['Terminated', 'TimedOut', 'Canceled'].includes(
@@ -99,12 +91,9 @@
 <header class="mb-4 flex flex-col gap-1">
   <div class="mb-4 block">
     <a
-      href={routeForWorkflowsWithQuery({
+      href={`${routeForWorkflows({
         namespace,
-        query: $workflowsQuery || query,
-        search: searchType,
-        page: $workflowsPage,
-      })}
+      })}?${$workflowsSearchParams}`}
       data-testid="back-to-workflows"
       class="back-to-workflows"
     >
