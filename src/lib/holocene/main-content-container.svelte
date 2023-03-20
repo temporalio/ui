@@ -26,7 +26,7 @@
   onMount(() => {
     const viewed = $viewedFeatureTags?.includes('topNav');
     if (!viewed) {
-      // overlayModal.open();
+      overlayModal.open();
       viewFeature('topNav');
     }
   });
@@ -64,7 +64,7 @@
     </div>
     <div class="flex gap-4 text-base">
       <Icon name="transcoder-on" status="configured" />
-      Set your Data Transcoder settings and view it's status.
+      Set your Data Transcoder settings and view its status.
     </div>
   </div>
 </Modal>
