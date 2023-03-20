@@ -28,28 +28,30 @@
   <div class="flex items-center gap-2" />
   <div class="flex items-center gap-2">
     {#if namespace}
-      <DropdownMenu
-        id="namespace"
-        position="right"
-        menuClass="border-3 bg-purple-200"
-        buttonClass="border border-purple-700 rounded-sm"
-      >
-        <div slot="trigger" data-testid="namespace-select-button">
-          <Badge type="purple" class="leading-0 flex gap-1 truncate pl-2"
-            ><Icon name="namespace-switcher" class="scale-75" /><span
-              class="max-w-[160px] truncate md:max-w-none">{namespace}</span
-            ><Icon name="chevron-down" /></Badge
-          >
-        </div>
-        <div
-          class="h-auto max-h-[400px] w-[220px] max-w-[220px] overflow-auto  md:w-[360px] md:max-w-[360px] lg:w-[500px] lg:max-w-[500px]"
-          slot="items"
-          let:show
-          data-testid="namespace-select-list"
+      {#key namespace}
+        <DropdownMenu
+          id="namespace"
+          position="right"
+          menuClass="border-3 bg-purple-200"
+          buttonClass="border border-purple-700 rounded-sm"
         >
-          <NamespaceList {namespaceList} {show} />
-        </div>
-      </DropdownMenu>
+          <div slot="trigger" data-testid="namespace-select-button">
+            <Badge type="purple" class="leading-0 flex gap-1 truncate pl-2"
+              ><Icon name="namespace-switcher" class="scale-75" /><span
+                class="max-w-[160px] truncate md:max-w-none">{namespace}</span
+              ><Icon name="chevron-down" /></Badge
+            >
+          </div>
+          <div
+            class="h-auto max-h-[400px] w-[220px] max-w-[220px] overflow-auto  md:w-[360px] md:max-w-[360px] lg:w-[500px] lg:max-w-[500px]"
+            slot="items"
+            let:show
+            data-testid="namespace-select-list"
+          >
+            <NamespaceList {namespaceList} {show} />
+          </div>
+        </DropdownMenu>
+      {/key}
     {/if}
     <DataEncoderStatus />
     {#if $authUser.accessToken}

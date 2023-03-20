@@ -102,6 +102,14 @@
       inputElement.focus();
     }
   }
+
+  $: sortedAndFilteredList = namespaceList
+    .sort((a, b) => {
+      if (a.namespace > b.namespace) return 1;
+      if (b.namespace > a.namespace) return -1;
+      return 0;
+    })
+    .filter(({ namespace }) => namespace.includes(searchValue));
 </script>
 
 <svelte:window on:keydown|stopPropagation={handleKeyboardNavigation} />
@@ -122,7 +130,7 @@
   </div>
 
   <ul data-test="namespace-list">
-    {#each namespaceList.filter( ({ namespace }) => namespace.includes(searchValue), ) as namespace}
+    {#each sortedAndFilteredList as namespace}
       <li class="item" data-testid="namespace-list-item">
         <a
           on:click={() => ($lastUsedNamespace = namespace.namespace)}

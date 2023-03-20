@@ -21,7 +21,7 @@
         on:click={onIconClick}
       >
         <div class="mr-2 ml-1 flex items-center">
-          <Icon name="transcoder-on" status="configured" />
+          <Icon name="transcoder-on" />
         </div>
         <slot />
       </button>
@@ -34,7 +34,7 @@
         on:click={onIconClick}
       >
         <div class="mr-2 ml-1 flex items-center">
-          <Icon name="transcoder-on" status="error" />
+          <Icon name="transcoder-error" />
         </div>
         <slot />
       </button>
@@ -47,7 +47,7 @@
         on:click={onIconClick}
       >
         <div class="mr-2 ml-1 flex items-center">
-          <Icon name="transcoder-on" status="success" />
+          <Icon name="transcoder-on" />
         </div>
         <slot />
       </button>

@@ -1,55 +1,21 @@
 <script lang="ts">
   import Svg from './svg.svelte';
-
-  export let status: 'configured' | 'error' | 'success' = 'configured';
 </script>
 
 <Svg {...$$props}>
   <path
-    d="M20.5 6.5L12 2.5L3.5 6.5C3.5 17.5 12 21.5 12 21.5C12 21.5 20.5 17.5 20.5 6.5Z"
-    fill={`url(#${status})`}
-  />
-  <path
-    d="M20.5 6.5L12 2.5L3.5 6.5C3.5 17.5 12 21.5 12 21.5C12 21.5 20.5 17.5 20.5 6.5Z"
+    d="M9.5 7L2 11H6.875L9.5 7.5L11 9L9.5 7Z"
+    fill="currentcolor"
     stroke="currentcolor"
   />
   <path
-    d="M12 11.5V15M12 11.5C12.8284 11.5 13.5 10.8284 13.5 10C13.5 9.17157 12.8284 8.5 12 8.5C11.1716 8.5 10.5 9.17157 10.5 10C10.5 10.8284 11.1716 11.5 12 11.5Z"
+    d="M14.5 7L22 11H17.125L14.5 7.5L13 9L14.5 7Z"
     fill="currentcolor"
+    stroke="currentcolor"
   />
-  <defs>
-    <linearGradient
-      id="configured"
-      x1="6.34342"
-      y1="5.0694"
-      x2="19.4814"
-      y2="17.6727"
-      gradientUnits="userSpaceOnUse"
-    >
-      <stop stop-color="#C1F2F9" />
-      <stop offset="1" stop-color="#C9C3FF" />
-    </linearGradient>
-    <linearGradient
-      id="error"
-      x1="6.34342"
-      y1="5.0694"
-      x2="19.4814"
-      y2="17.6727"
-      gradientUnits="userSpaceOnUse"
-    >
-      <stop stop-color="#f87171" />
-      <stop offset="1" stop-color="#dc2626" />
-    </linearGradient>
-    <linearGradient
-      id="success"
-      x1="6.34342"
-      y1="5.0694"
-      x2="19.4814"
-      y2="17.6727"
-      gradientUnits="userSpaceOnUse"
-    >
-      <stop stop-color="#86efac" />
-      <stop offset="1" stop-color="#16a34a" />
-    </linearGradient>
-  </defs>
+  <path d="M22.5 11H11.5L13.5 18H22.5V11Z" fill="#4FD1C5" />
+  <path d="M1.5 11H12.5L10.5 18H1.5V11Z" fill="#C4B5FD" />
+  <path d="M12 11L10.5 15H13.5L12 11Z" fill="currentcolor" />
+  <path d="M2 11.5H11.8371L10.1228 17.5H2V11.5Z" stroke="currentcolor" />
+  <path d="M22 11.5H12.1629L13.8772 17.5H22V11.5Z" stroke="currentcolor" />
 </Svg>
