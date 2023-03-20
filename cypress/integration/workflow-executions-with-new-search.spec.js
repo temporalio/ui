@@ -142,9 +142,6 @@ describe('Workflow Executions List With Search', () => {
       cy.get('[data-testid="workflow-type-filter-button"]').click();
       cy.get('#workflowType').type('ImportantWorkflowType');
 
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(500);
-
       const result =
         'ExecutionStatus%3D%22Running%22+AND+WorkflowId%3D%22002c98_Running%22+AND+WorkflowType%3D%22ImportantWorkflowType%22';
       cy.url().should('contain', result);
