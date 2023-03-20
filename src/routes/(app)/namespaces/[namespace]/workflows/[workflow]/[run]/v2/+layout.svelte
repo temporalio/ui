@@ -76,7 +76,7 @@
   {#if !$workflowRun.workflow}
     <Loading />
   {:else}
-    <Header namespace={$page.params.namespace} />
-    <slot />
+    <WorkflowHeaderV2 namespace={$page.params.namespace} />
+    <WorkflowHistoryLayoutV2 />
   {/if}
 </div>
