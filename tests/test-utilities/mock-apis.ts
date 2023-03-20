@@ -1,8 +1,12 @@
 import { Page } from '@playwright/test';
 
 export const apiUrl = 'http://localhost:8233/api/v1';
-export const workflowsApi = apiUrl + '/namespaces/default/workflows?query=';
+export const workflowsApi = apiUrl + '/namespaces/default/workflows?query=**';
+export const workflowApi =
+  apiUrl + '/api/v1/namespaces/default/workflows/*/runs/*';
 export const settingsApi = apiUrl + '/settings**';
+export const evetHistoryApi =
+  apiUrl + '/api/v1/namespaces/default/workflows/*/runs/*/events/reverse*';
 
 const clusterApi = apiUrl + '/cluster**';
 const clusterInfo = {
@@ -23,9 +27,32 @@ const clusterInfo = {
   persistenceStore: 'sqlite',
   visibilityStore: 'sqlite',
 };
+const clusterInfoWithElasticsearch = {
+  ...clusterInfo,
+  persistenceStore: 'postgres',
+  visibilityStore: 'postgres,elasticsearch',
+};
+const clusterInfoWithMysql = {
+  ...clusterInfo,
+  serverVersion: '1.20.0',
+  persistenceStore: 'mysql',
+  visibilityStore: 'mysql',
+};
 
 export const mockClusterApi = async (page: Page) => {
   await page.route(clusterApi, async (route) => {
     route.fulfill({ json: clusterInfo });
+  });
+};
+
+export const mockClusterApiWithElasticsearch = async (page: Page) => {
+  await page.route(clusterApi, async (route) => {
+    route.fulfill({ json: clusterInfoWithElasticsearch });
+  });
+};
+
+export const mockClusterApiWithMysql = async (page: Page) => {
+  await page.route(clusterApi, async (route) => {
+    route.fulfill({ json: clusterInfoWithMysql });
   });
 };
