@@ -135,12 +135,13 @@ describe('Workflow Executions List With Search', () => {
     it('should combine all three filters', () => {
       cy.get('[data-testid="execution-status-filter-button"]').click();
       cy.get('[data-testid="Running"]').click();
-
+      cy.wait('@workflows-api');
       cy.get('[data-testid="workflow-id-filter-button"]').click();
       cy.get('#workflowId').type('002c98_Running');
-
+      cy.wait('@workflows-api');
       cy.get('[data-testid="workflow-type-filter-button"]').click();
       cy.get('#workflowType').type('ImportantWorkflowType');
+      cy.wait('@workflows-api');
 
       const result =
         'ExecutionStatus%3D%22Running%22+AND+WorkflowId%3D%22002c98_Running%22+AND+WorkflowType%3D%22ImportantWorkflowType%22';
@@ -324,7 +325,9 @@ describe('Workflow Executions List With Search using only MySql on 1.20', () => 
     it('should change url on multiple Execution Status change', () => {
       cy.get('[data-testid="execution-status-filter-button"]').click();
       cy.get('[data-testid="Running"]').click();
+      cy.wait('@workflows-api');
       cy.get('[data-testid="Failed"]').click();
+      cy.wait('@workflows-api');
 
       const result =
         '%28ExecutionStatus%3D%22Running%22+OR+ExecutionStatus%3D%22Failed%22%29';
@@ -338,25 +341,29 @@ describe('Workflow Executions List With Search using only MySql on 1.20', () => 
     it('should clear Execution Status on All', () => {
       cy.get('[data-testid="execution-status-filter-button"]').click();
       cy.get('[data-testid="Running"]').click();
+      cy.wait('@workflows-api');
       cy.get('[data-testid="Failed"]').click();
+      cy.wait('@workflows-api');
 
       const result =
         '%28ExecutionStatus%3D%22Running%22+OR+ExecutionStatus%3D%22Failed%22%29';
       cy.url().should('contain', result);
 
       cy.get('[data-testid="All"]').click();
+      cy.wait('@workflows-api');
       cy.url().should('contain.not', result);
     });
 
     it('should combine all three filters', () => {
       cy.get('[data-testid="execution-status-filter-button"]').click();
       cy.get('[data-testid="Running"]').click();
-
+      cy.wait('@workflows-api');
       cy.get('[data-testid="workflow-id-filter-button"]').click();
       cy.get('#workflowId').type('002c98_Running');
-
+      cy.wait('@workflows-api');
       cy.get('[data-testid="workflow-type-filter-button"]').click();
       cy.get('#workflowType').type('ImportantWorkflowType');
+      cy.wait('@workflows-api');
 
       const result =
         'ExecutionStatus%3D%22Running%22+AND+WorkflowId%3D%22002c98_Running%22+AND+WorkflowType%3D%22ImportantWorkflowType%22';
@@ -381,7 +388,9 @@ describe('Workflow Executions List With Search using only MySql on 1.20', () => 
     it('should send the correct query for CloseTime', () => {
       cy.get('#time-range-filter').click();
       cy.contains('3 hours').click();
+      cy.wait('@workflows-api');
       cy.contains('End Time').click();
+      cy.wait('@workflows-api');
 
       cy.url().should('contain', 'CloseTime+%3E');
       cy.get('[data-testid="workflow-count"]').should(
