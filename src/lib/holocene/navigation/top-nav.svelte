@@ -32,7 +32,7 @@
         <DropdownMenu
           id="namespace"
           position="right"
-          menuClass="border-3 bg-purple-200"
+          menuClass="border-2 bg-purple-200"
           buttonClass="border border-purple-700 rounded-sm"
         >
           <div slot="trigger" data-testid="namespace-select-button">

@@ -115,14 +115,14 @@
   }
 
   .orderable-list {
-    @apply rounded-lg border-3 border-primary bg-white;
+    @apply rounded-lg border-2 border-primary bg-white;
   }
 
   .orderable-item {
     @apply flex select-none list-none flex-row items-center justify-between p-2 text-sm font-medium;
   }
 
-  .orderable-item[draggable="true"] {
+  .orderable-item[draggable='true'] {
     @apply cursor-move;
   }
 

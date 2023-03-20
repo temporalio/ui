@@ -154,7 +154,7 @@
 
 <style lang="postcss">
   .item {
-    @apply flex border-collapse cursor-pointer gap-2 border-b border-l-3 border-r-3 border-gray-900 bg-white from-blue-100 to-purple-100 first:rounded-t-xl first:border-t-3 last:rounded-b-xl last:border-b-3 hover:bg-gradient-to-br focus:bg-gradient-to-br;
+    @apply flex border-collapse cursor-pointer gap-2 border-b border-l-2 border-r-2 border-gray-900 bg-white from-blue-100 to-purple-100 first:rounded-t-xl first:border-t-2 last:rounded-b-xl last:border-b-2 hover:bg-gradient-to-br focus:bg-gradient-to-br;
   }
 
   .link {

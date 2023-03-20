@@ -149,7 +149,7 @@
   }
 
   .input-container {
-    @apply relative box-border inline-flex h-10 w-full items-center rounded border-3 border-gray-900 text-sm focus-within:border-blue-700;
+    @apply relative box-border inline-flex h-10 w-full items-center rounded border-2 border-gray-900 text-sm focus-within:border-blue-700;
   }
 
   .input-container.error {
@@ -262,7 +262,7 @@
     @apply border-gray-900 bg-gray-900;
   }
 
-  input[type="search"]::-webkit-search-cancel-button {
+  input[type='search']::-webkit-search-cancel-button {
     @apply hidden;
   }
 </style>
