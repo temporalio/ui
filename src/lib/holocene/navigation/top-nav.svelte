@@ -13,6 +13,12 @@
   export let namespaceList: NamespaceListItem[] = [];
 
   $: namespace = $page.params.namespace;
+  $: pathNameSplit = $page.url.pathname.split('/');
+  $: showNamespaceSelect =
+    namespace &&
+    (pathNameSplit.includes('workflows') ||
+      pathNameSplit.includes('schedules') ||
+      pathNameSplit.includes('task-queues'));
 
   let showProfilePic = true;
 
@@ -27,7 +33,7 @@
 >
   <div class="flex items-center gap-2" />
   <div class="flex items-center gap-2">
-    {#if namespace}
+    {#if showNamespaceSelect}
       {#key namespace}
         <DropdownMenu
           id="namespace"
