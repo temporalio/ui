@@ -3,7 +3,7 @@ import { formatDistance } from '$lib/utilities/format-time';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { persistStore } from './persist-store';
 
-type WorkflowHeaderLabels =
+type WorkflowHeaderLabel =
   | 'Status'
   | 'Workflow ID'
   | 'Run ID'
@@ -23,11 +23,14 @@ type WorkflowHeaderLabels =
 // | 'Custom Search Attributes'
 // | 'Memo Custom Key';
 
-export type WorkflowHeader = { label: WorkflowHeaderLabels; width?: number };
+export type WorkflowHeader = {
+  label: WorkflowHeaderLabel;
+  width?: number;
+  pinned?: boolean;
+};
 
 interface BaseWorkflowCell {
-  label: WorkflowHeader;
-  width?: number;
+  label: WorkflowHeaderLabel;
 }
 
 interface PathCell extends BaseWorkflowCell {
@@ -59,12 +62,13 @@ type State = {
 type Action =
   | { type: 'WORKFLOW_COLUMN.ADD'; payload: { index: number } }
   | { type: 'WORKFLOW_COLUMN.REMOVE'; payload: { index: number } }
+  | { type: 'WORKFLOW_COLUMN.PIN'; payload: { index: number } }
   | { type: 'WORKFLOW_COLUMN.MOVE'; payload: { from: number; to: number } };
 
 const DEFAULT_COLUMNS: WorkflowHeader[] = [
-  { label: 'Status', width: 128 },
-  { label: 'Workflow ID' },
-  // {label: 'Run ID'},
+  { label: 'Status', width: 128, pinned: true },
+  { label: 'Workflow ID', pinned: true },
+  { label: 'Run ID', width: 480 },
   { label: 'Type', width: 240 },
   { label: 'Start', width: 240 },
   { label: 'End', width: 240 },
@@ -84,7 +88,7 @@ const DEFAULT_AVAILABLE_COLUMNS: WorkflowHeader[] = [
   // { label: 'Memo Custom Key' },
 ];
 
-export const WORKFLOW_CELLS: Record<WorkflowHeaderLabels, WorkflowCell> = {
+export const WORKFLOW_CELLS: Record<WorkflowHeaderLabel, WorkflowCell> = {
   Status: { label: 'Status', path: 'status' },
   'Workflow ID': { label: 'Workflow ID', path: 'id' },
   'Run ID': { label: 'Run ID', path: 'runId' },
@@ -159,6 +163,17 @@ const reducer = (action: Action, state: State): State => {
         availableColumns: [removedColumn, ...availableColumns],
       };
     }
+    case 'WORKFLOW_COLUMN.PIN': {
+      const { columns } = state;
+      const { index } = action.payload;
+      const newColumns = columns.map((column, idx) =>
+        idx === index ? { ...column, pinned: !column.pinned } : column,
+      );
+      return {
+        ...state,
+        columns: newColumns,
+      };
+    }
     case 'WORKFLOW_COLUMN.MOVE': {
       const { columns } = state;
       const { from, to } = action.payload;
@@ -193,4 +208,8 @@ const moveColumn = (from: number, to: number) => {
   dispatch({ type: 'WORKFLOW_COLUMN.MOVE', payload: { from, to } });
 };
 
-export { workflowTableColumns, addColumn, removeColumn, moveColumn };
+const pinColumn = (index: number) => {
+  dispatch({ type: 'WORKFLOW_COLUMN.PIN', payload: { index } });
+};
+
+export { workflowTableColumns, addColumn, removeColumn, moveColumn, pinColumn };

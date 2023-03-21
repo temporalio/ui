@@ -17,6 +17,7 @@
     addColumn,
     removeColumn,
     moveColumn,
+    pinColumn,
   } from '$lib/stores/workflow-table-columns';
   import Drawer from '$lib/holocene/drawer.svelte';
   import OrderableList from '$lib/holocene/orderable-list.svelte';
@@ -83,6 +84,13 @@
     (selectedWorkflowsCount === workflows.length &&
       selectedWorkflowsCount !== 0);
 
+  $: pinnedColumns = $workflowTableColumns.columns.filter(
+    (column) => column.pinned,
+  );
+  $: otherColumns = $workflowTableColumns.columns.filter(
+    (column) => !column.pinned,
+  );
+
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
   };
@@ -106,7 +114,7 @@
   };
 </script>
 
-<Table
+<!-- <Table
   updating={$updating}
   id={bulkActionsEnabled
     ? 'workflows-table-with-bulk-actions'
@@ -223,7 +231,73 @@
       </td>
     </tr>
   {/each}
-</Table>
+</Table> -->
+
+<div class="relative flex flex-row w-full rounded-xl border-3 border-primary">
+  <table class="workflow-summary-table pinned">
+    <thead>
+      <tr class="bg-primary text-white h-10">
+        <th class="rounded-tl">
+          <Checkbox
+            id="select-visible-workflows"
+            onDark
+            hoverable
+            {checked}
+            {indeterminate}
+            on:change={handleCheckboxChange}
+          />
+        </th>
+        {#each pinnedColumns as column}
+          <WorkflowsSummaryTableHeaderCell {column} {sortDisabled} />
+        {/each}
+      </tr>
+    </thead>
+    <tbody class="bg-white">
+      {#each workflows as workflow}
+        <tr class="workflow-summary-row pinned">
+          <td>
+            <Checkbox
+              hoverable
+              bind:group={selectedWorkflows}
+              value={workflow}
+              disabled={allSelected}
+            />
+          </td>
+          {#each pinnedColumns as column}
+            <WorkflowsSummaryTableBodyCell {column} {workflow} />
+          {/each}
+        </tr>
+      {/each}
+    </tbody>
+  </table>
+  <div class="flex overflow-x-scroll rounded-r">
+    <table class="workflow-summary-table">
+      <thead>
+        <tr class="bg-primary text-white h-10">
+          {#each otherColumns as column}
+            <WorkflowsSummaryTableHeaderCell {column} {sortDisabled} />
+          {/each}
+          <th class="rounded-tr px-2 h-10 w-12">
+            <IconButton
+              icon="vertical-ellipsis"
+              on:click={openCustomizationDrawer}
+            />
+          </th>
+        </tr>
+      </thead>
+      <tbody class="bg-white">
+        {#each workflows as workflow}
+          <tr class="workflow-summary-row">
+            {#each otherColumns as column}
+              <WorkflowsSummaryTableBodyCell {column} {workflow} />
+            {/each}
+            <td />
+          </tr>
+        {/each}
+      </tbody>
+    </table>
+  </div>
+</div>
 
 <Drawer
   open={customizationDrawerOpen}
@@ -247,6 +321,7 @@
     onAddItem={addColumn}
     onRemoveItem={removeColumn}
     onMoveItem={moveColumn}
+    onPinItem={pinColumn}
   >
     <svelte:fragment slot="main-heading">
       Workflow Headings <span class="font-normal">(in view)</span>
@@ -258,6 +333,28 @@
 </Drawer>
 
 <style lang="postcss">
+  .workflow-summary-table {
+    &.pinned {
+      @apply border-primary border-r-3 rounded-l-lg;
+    }
+
+    &:not(.pinned) {
+      @apply rounded-r-lg table-fixed w-full;
+    }
+  }
+
+  .workflow-summary-row {
+    @apply border-b border-primary last:border-b-0;
+
+    &.pinned {
+      @apply rounded-bl;
+    }
+
+    &:not(.pinned) {
+      @apply rounded-br;
+    }
+  }
+
   :global(.workflow-summary-row:hover > td) {
     @apply bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
 

@@ -8,12 +8,14 @@
     icon?: IconName;
     classes?: string;
     'data-testid'?: string;
+    iconSize?: number;
     hoverable?: boolean;
   }
 
   export let icon: IconName = null;
   export let classes: string = '';
   export let hoverable: boolean = false;
+  export let iconSize: number = 24;
 </script>
 
 <button
@@ -26,7 +28,7 @@
 >
   {#if icon}
     <div class="flex items-center justify-center gap-2 {classes}">
-      <Icon name={icon} />
+      <Icon name={icon} width={iconSize} height={iconSize} />
       <slot />
     </div>
   {:else}

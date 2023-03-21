@@ -1,25 +1,34 @@
+<script lang="ts" context="module">
+  export type OrderableItem = {
+    label: string;
+    pinned?: boolean;
+  };
+</script>
+
 <script lang="ts">
   import IconButton from './icon-button.svelte';
-  import Icon from './icon/icon.svelte';
-  import type { WorkflowHeader } from '$lib/stores/workflow-table-columns';
 
   type ExtendedDragEvent = DragEvent & {
     currentTarget: EventTarget & HTMLLIElement;
   };
 
   interface $$Props {
-    items: WorkflowHeader[];
-    availableItems?: WorkflowHeader[];
+    items: OrderableItem[];
+    maxPinnedItems?: number;
+    availableItems?: OrderableItem[];
     onAddItem: (index: number) => void;
     onRemoveItem: (index: number) => void;
     onMoveItem: (from: number, to: number) => void;
+    onPinItem: (index: number) => void;
   }
 
-  export let items: WorkflowHeader[];
-  export let availableItems: WorkflowHeader[] = [];
+  export let items: OrderableItem[];
+  export let maxPinnedItems: number = 2;
+  export let availableItems: OrderableItem[] = [];
   export let onAddItem: $$Props['onAddItem'];
   export let onMoveItem: $$Props['onMoveItem'];
   export let onRemoveItem: $$Props['onRemoveItem'];
+  export let onPinItem: $$Props['onPinItem'];
 
   const handleDragStart = (event: ExtendedDragEvent, index: number) => {
     event.dataTransfer.setData('text/plain', index.toString());
@@ -68,8 +77,22 @@
               />
             </div>
             {item.label}
-            {#if index === 0}
-              <Icon width={16} height={16} name="pin-filled" />
+            {#if index <= maxPinnedItems - 1}
+              {#if item.pinned}
+                <IconButton
+                  hoverable
+                  icon="pin-filled"
+                  iconSize={16}
+                  on:click={() => onPinItem(index)}
+                />
+              {:else}
+                <IconButton
+                  hoverable
+                  icon="pin"
+                  iconSize={16}
+                  on:click={() => onPinItem(index)}
+                />
+              {/if}
             {/if}
           </div>
           <IconButton
@@ -123,7 +146,7 @@
     @apply flex select-none list-none flex-row items-center justify-between p-2 text-sm font-medium;
   }
 
-  .orderable-item[draggable="true"] {
+  .orderable-item[draggable='true'] {
     @apply cursor-move;
   }
 

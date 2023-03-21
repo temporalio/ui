@@ -9,29 +9,37 @@
   export let column: WorkflowHeader;
   export let sortDisabled: boolean;
 
-  $: ({ label } = column);
+  $: ({ label, width = 240 } = column);
 </script>
 
 {#if label === 'Status'}
-  <th>
+  <th class="workflows-summary-table-header-cell w-32">
     <ExecutionStatusDropdownFilter />
   </th>
 {:else if label === 'Workflow ID'}
-  <th>
+  <th class="workflows-summary-table-header-cell w-auto">
     <WorkflowIdDropdownFilter />
   </th>
 {:else if label === 'Type'}
-  <th>
+  <th class="workflows-summary-table-header-cell w-48">
     <WorkflowTypeDropdownFilter />
   </th>
 {:else if label === 'Start'}
-  <th>
+  <th class="workflows-summary-table-header-cell w-60">
     <StartTimeDropdownFilter disabled={sortDisabled} />
   </th>
 {:else if label === 'End'}
-  <th>
+  <th class="workflows-summary-table-header-cell w-60">
     <EndTimeDropdownFilter disabled={sortDisabled} />
   </th>
 {:else}
-  <th>{label}</th>
+  <th class="workflows-summary-table-header-cell" style="width:{width}px;"
+    >{label}</th
+  >
 {/if}
+
+<style lang="postcss">
+  .workflows-summary-table-header-cell {
+    @apply whitespace-nowrap px-2 text-left font-secondary text-sm font-medium;
+  }
+</style>

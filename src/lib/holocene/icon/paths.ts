@@ -46,6 +46,7 @@ import logout from './svg/logout.svelte';
 import namespaceSwitcher from './svg/namespace-switcher.svelte';
 import namespace from './svg/namespace.svelte';
 import pinFilled from './svg/pin-filled.svelte';
+import pin from './svg/pin.svelte';
 import regions from './svg/regions.svelte';
 import relationship from './svg/relationship.svelte';
 import retention from './svg/retention.svelte';
@@ -121,6 +122,7 @@ export const icons = {
   'namespace-switcher': namespaceSwitcher,
   namespace,
   'pin-filled': pinFilled,
+  pin,
   regions,
   relationship,
   retention,

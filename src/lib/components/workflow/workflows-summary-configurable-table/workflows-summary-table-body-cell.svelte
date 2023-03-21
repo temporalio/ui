@@ -58,12 +58,12 @@
 </script>
 
 {#if label === 'Status'}
-  <td>
+  <td class="workflows-summary-table-body-cell">
     <WorkflowStatus status={workflow.status} />
   </td>
 {:else if label === 'Type' || label === 'Workflow ID'}
   <td
-    class="relative"
+    class="workflows-summary-table-body-cell relative"
     on:mouseover={showFilterOrCopy}
     on:focus={showFilterOrCopy}
     on:mouseleave={hideFilterOrCopy}
@@ -80,11 +80,17 @@
     />
   </td>
 {:else if label === 'Memo'}
-  <td>
+  <td class="workflows-summary-table-body-cell">
     {#if cellContent}
       <CodeBlock content={cellContent} inline copyable={false} />
     {/if}
   </td>
 {:else}
-  <td>{cellContent}</td>
+  <td class="workflows-summary-table-body-cell">{cellContent}</td>
 {/if}
+
+<style lang="postcss">
+  .workflows-summary-table-body-cell {
+    @apply whitespace-nowrap px-2 h-10;
+  }
+</style>
