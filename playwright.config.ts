@@ -20,6 +20,7 @@ export default defineConfig({
     baseURL: 'http://localhost:3333',
     trace: 'on-first-retry',
     timezoneId: 'America/Denver',
+    video: 'on',
   },
   projects: [
     {

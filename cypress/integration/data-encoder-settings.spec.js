@@ -1,5 +1,5 @@
-describe('Set Data Encoder Settings', () => {
-  describe('Data Encoder without site setting codec endpoint', () => {
+describe('Set Data Transcoder Settings', () => {
+  describe('Data Transcoder without site setting codec endpoint', () => {
     beforeEach(() => {
       cy.interceptApi();
       cy.clearLocalStorage();
@@ -117,7 +117,7 @@ describe('Set Data Encoder Settings', () => {
 
     it('Enter port with confirm', () => {
       cy.get('@header').find('[data-testid="data-encoder-status"]').click();
-      cy.get('[data-testid="data-encoder-title"]').contains('Data Encoder');
+      cy.get('[data-testid="data-encoder-title"]').contains('Data Transcoder');
       cy.get('[data-testid="data-encoder-endpoint-title"]').contains(
         'Remote Codec Endpoint',
       );
@@ -147,7 +147,7 @@ describe('Set Data Encoder Settings', () => {
     });
   });
 
-  describe('Data Encoder with site setting codec endpoint', () => {
+  describe('Data Transcoder with site setting codec endpoint', () => {
     beforeEach(() => {
       cy.interceptApi();
       cy.clearLocalStorage();
