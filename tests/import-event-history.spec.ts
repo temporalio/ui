@@ -8,9 +8,9 @@ const importEventHistoryUrl =
 const workflowsUrl = '/namespaces/default/workflows';
 
 test.beforeEach(async ({ page }) => {
+  await page.goto(importUrl);
   await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
   await page.reload();
-  await page.goto(importUrl);
   await page.waitForRequest(settingsApi);
 });
 
