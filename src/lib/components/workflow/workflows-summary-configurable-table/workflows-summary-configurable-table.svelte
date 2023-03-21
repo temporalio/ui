@@ -270,7 +270,7 @@
       {/each}
     </tbody>
   </table>
-  <div class="flex overflow-x-scroll rounded-r">
+  <div class="flex overflow-x-scroll flex-grow rounded-r">
     <table class="workflow-summary-table">
       <thead>
         <tr class="bg-primary text-white h-10">
@@ -339,7 +339,7 @@
     }
 
     &:not(.pinned) {
-      @apply rounded-r-lg table-fixed w-full;
+      @apply rounded-r-lg table-auto w-full;
     }
   }
 

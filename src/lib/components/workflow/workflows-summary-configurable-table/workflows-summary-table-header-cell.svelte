@@ -13,23 +13,23 @@
 </script>
 
 {#if label === 'Status'}
-  <th class="workflows-summary-table-header-cell w-32">
+  <th class="workflows-summary-table-header-cell">
     <ExecutionStatusDropdownFilter />
   </th>
 {:else if label === 'Workflow ID'}
-  <th class="workflows-summary-table-header-cell w-auto">
+  <th class="workflows-summary-table-header-cell">
     <WorkflowIdDropdownFilter />
   </th>
 {:else if label === 'Type'}
-  <th class="workflows-summary-table-header-cell w-48">
+  <th class="workflows-summary-table-header-cell">
     <WorkflowTypeDropdownFilter />
   </th>
 {:else if label === 'Start'}
-  <th class="workflows-summary-table-header-cell w-60">
+  <th class="workflows-summary-table-header-cell">
     <StartTimeDropdownFilter disabled={sortDisabled} />
   </th>
 {:else if label === 'End'}
-  <th class="workflows-summary-table-header-cell w-60">
+  <th class="workflows-summary-table-header-cell">
     <EndTimeDropdownFilter disabled={sortDisabled} />
   </th>
 {:else}
