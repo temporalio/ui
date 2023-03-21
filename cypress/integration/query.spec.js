@@ -8,6 +8,7 @@ const { workflowId, runId } =
 describe('Query', () => {
   beforeEach(() => {
     cy.interceptApi();
+    cy.setTopNavFeatureTag();
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +

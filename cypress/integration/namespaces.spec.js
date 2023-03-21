@@ -3,6 +3,7 @@ const namespaces = ['default', 'some-other-namespace'];
 describe('Namespaces page', () => {
   beforeEach(() => {
     cy.interceptApi();
+    cy.setTopNavFeatureTag();
 
     cy.visit('/namespaces');
 
@@ -27,6 +28,7 @@ describe('Namespaces page', () => {
 describe('Namespaces button', () => {
   beforeEach(() => {
     cy.interceptApi();
+    cy.setTopNavFeatureTag();
 
     cy.visit('/namespaces/default/workflows');
 
@@ -55,6 +57,7 @@ describe('Namespaces button', () => {
 describe('Namespace Select', () => {
   beforeEach(() => {
     cy.interceptApi();
+    cy.setTopNavFeatureTag();
 
     cy.visit('/namespaces/default/workflows');
 

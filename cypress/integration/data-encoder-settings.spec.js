@@ -3,6 +3,7 @@ describe('Set Data Encoder Settings', () => {
     beforeEach(() => {
       cy.interceptApi();
       cy.clearLocalStorage();
+      cy.setTopNavFeatureTag();
 
       cy.visit('/namespaces/default/workflows');
 
@@ -150,6 +151,7 @@ describe('Set Data Encoder Settings', () => {
     beforeEach(() => {
       cy.interceptApi();
       cy.clearLocalStorage();
+      cy.setTopNavFeatureTag();
 
       cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/settings*', {
         Auth: { Enabled: false, Options: null },
