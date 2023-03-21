@@ -1,7 +1,6 @@
-import { browser } from '$app/environment';
-import { goto as navigateTo } from '$app/navigation';
-import { invalidate } from '$app/navigation';
 import { get } from 'svelte/store';
+import { browser } from '$app/environment';
+import { goto as navigateTo, invalidate } from '$app/navigation';
 import { page } from '$app/stores';
 
 type UpdateQueryParams = {
@@ -14,7 +13,6 @@ type UpdateQueryParams = {
 };
 
 export const gotoOptions = {
-  replaceState: true,
   keepFocus: true,
   noScroll: true,
 };

@@ -55,14 +55,7 @@ const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
 };
 
 export type ParsedParameters = FilterParameters & { timeRange?: string };
-type WorkflowsSearch = {
-  parameters: ParsedParameters;
-  searchType: 'basic' | 'advanced';
-};
-export const workflowsSearch = writable<WorkflowsSearch>({
-  parameters: {},
-  searchType: 'basic',
-});
+export const workflowsSearchParams = writable<string>('');
 
 export const updating = writable(true);
 export const loading = writable(true);
