@@ -15,6 +15,7 @@ export const gotoOptions = {
   replaceState: true,
   keepFocus: true,
   noScroll: true,
+  invalidateAll: true,
 };
 
 export const updateQueryParameters = async ({
