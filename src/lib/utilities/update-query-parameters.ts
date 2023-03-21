@@ -39,7 +39,9 @@ export const updateQueryParameters = async ({
   if (browser && url.href !== window.location.href) {
     const namespace = get(page)?.params?.namespace;
     if (url.pathname === `/namespaces/${namespace}/workflows`) {
-      await invalidate(() => true);
+      await invalidate(
+        (url) => url.pathname === `/namespaces/${namespace}/workflows`,
+      );
     }
     goto(url, gotoOptions);
   }
