@@ -37,7 +37,7 @@
     ? [$page.params.namespace]
     : $namespaces.map((namespace: Namespace) => namespace?.namespaceInfo?.name);
   $: namespaceList = namespaceNames.map((namespace: string) => {
-    const getHref = (namespace) =>
+    const getHref = (namespace: string) =>
       isCloud ? routeForWorkflows({ namespace }) : getCurrentHref(namespace);
     return {
       namespace,
