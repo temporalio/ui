@@ -10,7 +10,6 @@
   export let href = '';
   export let testId: string = null;
   export let tooltipProps: ComponentProps<Tooltip> = {};
-  export let cursorDefault = false;
 
   const dispatch = createEventDispatcher<{ click: undefined }>();
 
@@ -51,8 +50,6 @@
         class:disabled
         data-testid={testId}
         class="menu-item {$$props.class}"
-        class:cursor-pointer={!cursorDefault}
-        class:cursor-default={cursorDefault}
       >
         <slot />
       </li>
@@ -66,7 +63,7 @@
   }
 
   .menu-item {
-    @apply w-full list-none bg-white p-4 font-secondary text-sm font-medium text-primary focus-within:bg-gray-50 focus-within:outline-none hover:bg-gray-50;
+    @apply w-full cursor-pointer list-none bg-white p-4 font-secondary text-sm font-medium text-primary focus-within:bg-gray-50 focus-within:outline-none hover:bg-gray-50;
   }
 
   .dark {

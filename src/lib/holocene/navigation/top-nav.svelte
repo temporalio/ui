@@ -85,7 +85,7 @@
           {/if}
         </div>
         <div class="h-auto w-[300px]" slot="items">
-          <MenuItem class="truncate rounded-t-xl" cursorDefault
+          <MenuItem class="truncate rounded-t-xl" disabled
             >{$authUser.email}</MenuItem
           >
           <MenuItem class="rounded-b-xl" on:click={logout}>Log out</MenuItem>
