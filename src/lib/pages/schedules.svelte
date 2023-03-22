@@ -12,7 +12,6 @@
   import { routeForScheduleCreate } from '$lib/utilities/route-for';
   import { fetchAllSchedules } from '$lib/services/schedule-service';
   import type { ScheduleListEntry } from '$types';
-  import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
   import SchedulesTable from '$lib/components/schedule/schedules-table.svelte';
   import SchedulesTableRow from '$lib/components/schedule/schedules-table-row.svelte';
   import { timeFormat } from '$lib/stores/time-format';
@@ -45,7 +44,6 @@
   <div>
     <h1 class="flex items-center gap-2 text-2xl">
       Schedules<Badge type="beta">Beta</Badge>
-      <NamespaceSelector />
     </h1>
     <p class="text-sm text-gray-600" data-testid="namespace-name">
       {namespace}

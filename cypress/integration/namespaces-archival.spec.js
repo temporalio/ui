@@ -1,6 +1,7 @@
 describe('Archival disabled page', () => {
   beforeEach(() => {
     cy.interceptApi();
+    cy.setTopNavFeatureTag();
 
     cy.visit('/namespaces/default/archival');
 
@@ -18,6 +19,7 @@ describe('Archival disabled page', () => {
 describe('Archival enabled page', () => {
   beforeEach(() => {
     cy.interceptApi({ archived: true });
+    cy.setTopNavFeatureTag();
 
     cy.visit('/namespaces/some-other-namespace/archival');
 

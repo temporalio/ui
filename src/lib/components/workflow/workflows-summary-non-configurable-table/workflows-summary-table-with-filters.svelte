@@ -91,7 +91,7 @@
     {updating}
   >
     <TableHeaderRow slot="headers">
-      <th style="padding: 0;" class="w-12">
+      <th style="padding: 0;" class="w-12 h-10">
         {#if !updating}
           <Checkbox
             id="select-visible-workflows"
@@ -104,7 +104,7 @@
         {/if}
       </th>
       {#if showBulkActions}
-        <th class="overflow-visible whitespace-nowrap">
+        <th class="w-32 overflow-visible whitespace-nowrap">
           {#if allSelected}
             <span class="font-semibold">
               All {filteredWorkflowCount} selected
@@ -140,9 +140,9 @@
           </div>
         </th>
         <th />
-        <th />
-        <th class="max-xl:hidden" />
-        <th class="max-xl:hidden" />
+        <th class="xl:w-60" />
+        <th class="w-60 max-xl:hidden" />
+        <th class="w-60 max-xl:hidden" />
       {:else}
         <th class="w-32">
           <ExecutionStatusDropdownFilter />

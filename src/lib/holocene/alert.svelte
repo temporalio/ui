@@ -47,7 +47,7 @@
   }
 
   .alert.bold {
-    @apply rounded-xl border-3;
+    @apply rounded-xl border-2;
   }
 
   .alert.success {

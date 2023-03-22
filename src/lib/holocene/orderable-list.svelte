@@ -139,7 +139,7 @@
   }
 
   .orderable-list {
-    @apply rounded-lg border-3 border-primary bg-white;
+    @apply rounded-lg border-2 border-primary bg-white;
   }
 
   .orderable-item {

@@ -33,7 +33,7 @@
 
   function handleShowInput(event: CustomEvent) {
     const show = event.detail.show;
-    if (show && typeFilter && !value) {
+    if (show && typeFilter) {
       value = typeFilter.value;
     } else if (show && !typeFilter && value) {
       value = '';

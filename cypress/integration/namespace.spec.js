@@ -1,6 +1,7 @@
 describe('Namespace page', () => {
   beforeEach(() => {
     cy.interceptApi();
+    cy.setTopNavFeatureTag();
 
     cy.visit('/namespaces/default');
 

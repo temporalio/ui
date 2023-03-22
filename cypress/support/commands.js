@@ -223,3 +223,12 @@ Cypress.Commands.add(
     cy.interceptResetWorkflowApi();
   },
 );
+
+Cypress.Commands.add('setTopNavFeatureTag', () => {
+  cy.window().then((window) => {
+    window.localStorage.setItem(
+      'viewedFeatureTags',
+      JSON.stringify(['topNav']),
+    );
+  });
+});

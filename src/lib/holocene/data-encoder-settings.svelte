@@ -15,6 +15,8 @@
   import Modal from '$lib/holocene/modal.svelte';
   import CodecEndpointSettings from './codec-endpoint-settings.svelte';
   import DataConverterPortSettings from './data-converter-port-settings.svelte';
+  import { page } from '$app/stores';
+  import { refresh } from '$lib/stores/workflow-run';
 
   let endpoint = $codecEndpoint ?? '';
   let port = $dataConverterPort ?? '';
@@ -45,6 +47,10 @@
     $passAccessToken = passToken;
     $dataConverterPort = port;
     $dataEncoderSettings.close();
+
+    if ($page.url.pathname.endsWith('history')) {
+      $refresh = Date.now();
+    }
   };
 </script>
 
@@ -55,7 +61,7 @@
   cancelText="Cancel"
   confirmDisabled={Boolean(error)}
 >
-  <h3 slot="title" data-testid="data-encoder-title">Data Encoder</h3>
+  <h3 slot="title" data-testid="data-encoder-title">Codec Server</h3>
   <div slot="content">
     <CodecEndpointSettings bind:endpoint bind:passToken {error} />
     <DataConverterPortSettings bind:port />

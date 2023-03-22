@@ -65,7 +65,7 @@
 
 <style lang="postcss">
   .nav-header {
-    @apply relative z-0 flex h-screen border-r-2 border-gray-200;
+    @apply relative z-0 flex h-screen;
   }
 
   .nav-wrapper {
