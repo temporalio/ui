@@ -8,7 +8,7 @@ import {
 import { withLoading } from '$lib/utilities/stores/with-loading';
 
 import type { StartStopNotifier } from 'svelte/store';
-import { supportsAdvancedVisibility } from './bulk-actions';
+import { supportsAdvancedVisibility } from './advanced-visibility';
 
 export const refresh = writable(0);
 
