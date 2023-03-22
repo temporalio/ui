@@ -66,7 +66,7 @@
     </div>
     <div class="flex gap-4 text-base">
       <Icon name="transcoder-on" status="configured" />
-      Set your Coder Server settings and view its status.
+      Set your Codec Server settings and view its status.
     </div>
   </div>
 </Modal>
