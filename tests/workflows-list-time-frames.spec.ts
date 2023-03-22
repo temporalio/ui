@@ -11,7 +11,6 @@ test.beforeEach(async ({ page }) => {
   await mockClusterApi(page);
   await page.goto(workflowsUrl);
   await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
-  await page.reload();
 });
 
 const timeFrames = [

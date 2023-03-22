@@ -6,7 +6,6 @@ const address = process.env.E2E_UI_ADDRESS ?? 'http://localhost:8233';
 test.beforeEach(async ({ page }) => {
   await page.goto(address);
   await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
-  await page.reload();
 });
 
 test.describe('Workflows list', () => {

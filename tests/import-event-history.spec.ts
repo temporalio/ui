@@ -11,7 +11,6 @@ test.beforeEach(async ({ page }) => {
   await page.goto(importUrl);
   await page.waitForRequest(settingsApi);
   await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
-  await page.reload();
 });
 
 test('Navigate to import page from nav', async ({ page }) => {

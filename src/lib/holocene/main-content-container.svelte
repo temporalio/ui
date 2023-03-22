@@ -55,11 +55,13 @@
   large
   hightlightNav
 >
-  <h1 slot="title">Check out the new Top Navigation!</h1>
+  <h1 slot="title" data-testid="overlay-title">
+    Check out the new top navigation!
+  </h1>
   <div slot="content" class="flex flex-col gap-4">
     <div class="flex gap-4 text-base">
       <div><Icon name="namespace-switcher" class="scale-100" /></div>
-      Easily switch between namespaces and know which namespace you are currently
+      Easily switch between Namespaces and know which Namespace you are currently
       on.
     </div>
     <div class="flex gap-4 text-base">

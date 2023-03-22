@@ -7,4 +7,5 @@ export const setLocalStorage = async (key: string, value: any, page: Page) => {
     },
     { key, value },
   );
+  await page.reload();
 };

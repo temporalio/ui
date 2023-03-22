@@ -6,7 +6,6 @@ const workflowsUrl = '/namespaces/default/workflows';
 test.beforeEach(async ({ page }) => {
   await mockClusterApi(page);
   await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
-  await page.reload();
 });
 
 test('requests workflows', async ({ page }) => {
