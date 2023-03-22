@@ -3,6 +3,8 @@ import { formatDistance } from '$lib/utilities/format-time';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { persistStore } from './persist-store';
 
+export const MAX_PINNED_COLUMNS = 2;
+
 type WorkflowHeaderLabel =
   | 'Status'
   | 'Workflow ID'
@@ -25,8 +27,7 @@ type WorkflowHeaderLabel =
 
 export type WorkflowHeader = {
   label: WorkflowHeaderLabel;
-  width?: number;
-  pinned?: boolean;
+  pinned: boolean;
 };
 
 interface BaseWorkflowCell {
@@ -66,23 +67,23 @@ type Action =
   | { type: 'WORKFLOW_COLUMN.MOVE'; payload: { from: number; to: number } };
 
 const DEFAULT_COLUMNS: WorkflowHeader[] = [
-  { label: 'Status', width: 128, pinned: true },
+  { label: 'Status', pinned: true },
   { label: 'Workflow ID', pinned: true },
-  { label: 'Run ID', width: 480 },
-  { label: 'Type', width: 240 },
-  { label: 'Start', width: 240 },
-  { label: 'End', width: 240 },
+  { label: 'Run ID', pinned: false },
+  { label: 'Type', pinned: false },
+  { label: 'Start', pinned: false },
+  { label: 'End', pinned: false },
 ];
 
 const DEFAULT_AVAILABLE_COLUMNS: WorkflowHeader[] = [
-  { label: 'History Size' },
-  { label: 'History Length' },
-  { label: 'Execution Time' },
-  { label: 'State Transitions' },
-  { label: 'Parent Namespace' },
-  { label: 'Parent Workflow ID' },
-  { label: 'Task Queue' },
-  { label: 'Memo' },
+  { label: 'History Size', pinned: false },
+  { label: 'History Length', pinned: false },
+  { label: 'Execution Time', pinned: false },
+  { label: 'State Transitions', pinned: false },
+  { label: 'Parent Namespace', pinned: false },
+  { label: 'Parent Workflow ID', pinned: false },
+  { label: 'Task Queue', pinned: false },
+  { label: 'Memo', pinned: false },
   // { label: 'Search Attributes' },
   // { label: 'Custom Search Attributes' },
   // { label: 'Memo Custom Key' },
@@ -157,6 +158,7 @@ const reducer = (action: Action, state: State): State => {
       const { index } = action.payload;
       const tempColumns = [...columns];
       const [removedColumn] = tempColumns.splice(index, 1);
+      removedColumn.pinned = false;
 
       return {
         columns: tempColumns,
@@ -166,23 +168,57 @@ const reducer = (action: Action, state: State): State => {
     case 'WORKFLOW_COLUMN.PIN': {
       const { columns } = state;
       const { index } = action.payload;
-      const newColumns = columns.map((column, idx) =>
-        idx === index ? { ...column, pinned: !column.pinned } : column,
-      );
+
+      const isPinned = columns[index].pinned;
+
+      let lastPinned = -1;
+      for (let i = columns.length - 1; i >= 0; i--) {
+        if (columns[i].pinned) {
+          lastPinned = i;
+          break;
+        }
+      }
+
+      const tempColumns = [...columns];
+      tempColumns[index].pinned = !isPinned;
+
+      if (index > lastPinned && !isPinned) {
+        tempColumns.splice(lastPinned + 1, 0, tempColumns.splice(index, 1)[0]);
+      } else if (index < lastPinned && isPinned) {
+        tempColumns.splice(lastPinned, 0, tempColumns.splice(index, 1)[0]);
+      }
+
       return {
         ...state,
-        columns: newColumns,
+        columns: tempColumns,
       };
     }
     case 'WORKFLOW_COLUMN.MOVE': {
       const { columns } = state;
       const { from, to } = action.payload;
+      const isPinned = columns[from].pinned;
+
+      let lastPinned = 0;
+      for (let i = columns.length - 1; i >= 0; i--) {
+        if (columns[i].pinned) {
+          lastPinned = i;
+          break;
+        }
+      }
 
       const tempColumns = [...columns];
+      if (to < lastPinned && !isPinned) {
+        tempColumns[from].pinned = true;
+      } else if (to > lastPinned && isPinned) {
+        tempColumns[from].pinned = false;
+      }
+
       tempColumns.splice(to, 0, tempColumns.splice(from, 1)[0]);
       return {
         ...state,
-        columns: tempColumns,
+        columns: tempColumns.map((c, idx) =>
+          idx > MAX_PINNED_COLUMNS - 1 ? { ...c, pinned: false } : c,
+        ),
       };
     }
     default:

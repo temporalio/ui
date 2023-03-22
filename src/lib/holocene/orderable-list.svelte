@@ -14,7 +14,7 @@
 
   interface $$Props {
     items: OrderableItem[];
-    maxPinnedItems?: number;
+    maxPinnedItems: number;
     availableItems?: OrderableItem[];
     onAddItem: (index: number) => void;
     onRemoveItem: (index: number) => void;
@@ -23,7 +23,7 @@
   }
 
   export let items: OrderableItem[];
-  export let maxPinnedItems: number = 2;
+  export let maxPinnedItems: number;
   export let availableItems: OrderableItem[] = [];
   export let onAddItem: $$Props['onAddItem'];
   export let onMoveItem: $$Props['onMoveItem'];
@@ -102,6 +102,8 @@
           />
         </li>
         <hr />
+      {:else}
+        <li class="orderable-item empty">No workflow headings in view</li>
       {/each}
     </ol>
   </div>
@@ -143,7 +145,11 @@
   }
 
   .orderable-item {
-    @apply flex select-none list-none flex-row items-center justify-between p-2 text-sm font-medium;
+    @apply flex select-none list-none flex-row items-center justify-between p-2 text-sm font-medium first:rounded-tl first:rounded-tr last:rounded-bl last:rounded-br;
+  }
+
+  .orderable-item.empty {
+    @apply bg-gray-200;
   }
 
   .orderable-item[draggable='true'] {
