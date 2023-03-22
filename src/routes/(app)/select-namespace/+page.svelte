@@ -86,7 +86,7 @@
   }
 
   .link-item {
-    @apply flex border-collapse cursor-pointer gap-2 truncate border border-x-3 border-gray-900 bg-white from-blue-100 to-purple-100 hover:bg-gradient-to-br;
+    @apply flex border-collapse cursor-pointer gap-2 truncate border border-x-2 border-gray-900 bg-white from-blue-100 to-purple-100 hover:bg-gradient-to-br;
   }
 
   .link-item.first {
