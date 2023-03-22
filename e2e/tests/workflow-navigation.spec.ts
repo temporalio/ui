@@ -38,6 +38,10 @@ test('Top Navigation current namespace is present and has other namespaces to se
   await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
 
   await expect(page.getByTestId('namespace-select-button')).toBeVisible();
+  await expect(
+    page.getByTestId('data-encoder-status-configured'),
+  ).toBeVisible();
+
   await page.getByTestId('namespace-select-button').click();
   await expect(page.getByPlaceholder('Search')).toBeFocused();
   await expect(page.getByRole('link', { name: 'default' })).toBeVisible();

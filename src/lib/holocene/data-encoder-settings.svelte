@@ -61,7 +61,7 @@
   cancelText="Cancel"
   confirmDisabled={Boolean(error)}
 >
-  <h3 slot="title" data-testid="data-encoder-title">Data Transcoder</h3>
+  <h3 slot="title" data-testid="data-encoder-title">Codec Server</h3>
   <div slot="content">
     <CodecEndpointSettings bind:endpoint bind:passToken {error} />
     <DataConverterPortSettings bind:port />

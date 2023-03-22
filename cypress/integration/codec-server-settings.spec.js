@@ -1,5 +1,5 @@
-describe('Set Data Transcoder Settings', () => {
-  describe('Data Transcoder without site setting codec endpoint', () => {
+describe('Set Coder Server Settings', () => {
+  describe('Coder Server without site setting codec endpoint', () => {
     beforeEach(() => {
       cy.interceptApi();
       cy.clearLocalStorage();
@@ -23,7 +23,7 @@ describe('Set Data Transcoder Settings', () => {
 
     it('Enter invalid endpoint to show error and enter valid enpoint with confirm', () => {
       cy.get('@header').find('[data-testid="data-encoder-status"]').click();
-      cy.get('[data-testid="data-encoder-title"]').contains('Data Transcoder');
+      cy.get('[data-testid="data-encoder-title"]').contains('Coder Server');
       cy.get('[data-testid="data-encoder-endpoint-title"]').contains(
         'Remote Codec Endpoint',
       );
@@ -67,7 +67,7 @@ describe('Set Data Transcoder Settings', () => {
 
     it('Check pass access token and enter invalid endpoint to show error and enter valid enpoint with confirm', () => {
       cy.get('@header').find('[data-testid="data-encoder-status"]').click();
-      cy.get('[data-testid="data-encoder-title"]').contains('Data Transcoder');
+      cy.get('[data-testid="data-encoder-title"]').contains('Coder Server');
       cy.get('[data-testid="data-encoder-endpoint-title"]').contains(
         'Remote Codec Endpoint',
       );
@@ -117,7 +117,7 @@ describe('Set Data Transcoder Settings', () => {
 
     it('Enter port with confirm', () => {
       cy.get('@header').find('[data-testid="data-encoder-status"]').click();
-      cy.get('[data-testid="data-encoder-title"]').contains('Data Transcoder');
+      cy.get('[data-testid="data-encoder-title"]').contains('Coder Server');
       cy.get('[data-testid="data-encoder-endpoint-title"]').contains(
         'Remote Codec Endpoint',
       );
@@ -147,7 +147,7 @@ describe('Set Data Transcoder Settings', () => {
     });
   });
 
-  describe('Data Transcoder with site setting codec endpoint', () => {
+  describe('Coder Server with site setting codec endpoint', () => {
     beforeEach(() => {
       cy.interceptApi();
       cy.clearLocalStorage();
@@ -180,7 +180,7 @@ describe('Set Data Transcoder Settings', () => {
       cy.get('@header')
         .find('[data-testid="data-encoder-status-configured"]')
         .click();
-      cy.get('[data-testid="data-encoder-title"]').contains('Data Transcoder');
+      cy.get('[data-testid="data-encoder-title"]').contains('Coder Server');
       cy.get('[data-testid="data-encoder-endpoint-title"]').contains(
         'Remote Codec Endpoint',
       );

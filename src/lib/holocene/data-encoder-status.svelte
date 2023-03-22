@@ -14,7 +14,7 @@
 <DataEncoderSettings />
 {#if $dataEncoder?.hasEndpointOrPortConfigured}
   {#if $dataEncoder?.hasNotRequested}
-    <Tooltip bottomRight text={'Data transcoder is configured'}>
+    <Tooltip bottomRight text={'Codec Server is configured'}>
       <button
         class="relative flex items-center"
         data-testid="data-encoder-status-configured"
@@ -27,7 +27,7 @@
       </button>
     </Tooltip>
   {:else if $dataEncoder.hasError}
-    <Tooltip bottomRight text={`Data transcoder couldn't connect`}>
+    <Tooltip bottomRight text={`Codec Server could not connect`}>
       <button
         class="relative flex items-center"
         data-testid="data-encoder-status-error"
@@ -40,7 +40,7 @@
       </button>
     </Tooltip>
   {:else if $dataEncoder.hasSuccess}
-    <Tooltip bottomRight text={'Data transcoder succesfully converted content'}>
+    <Tooltip bottomRight text={'Codec Server succesfully converted content'}>
       <button
         class="relative flex items-center"
         data-testid="data-encoder-status-success"
@@ -54,7 +54,7 @@
     </Tooltip>
   {/if}
 {:else}
-  <Tooltip bottomRight text={'Configure data transcoder'}>
+  <Tooltip bottomRight text={'Configure Codec Server'}>
     <button
       class="relative flex items-center"
       data-testid="data-encoder-status"
