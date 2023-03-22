@@ -166,7 +166,7 @@
   }
 
   .body::backdrop {
-    @apply top-[40px] cursor-pointer bg-gray-900 opacity-70;
+    @apply cursor-pointer bg-gray-900 opacity-70;
   }
 
   .body.hightlightNav::backdrop {
