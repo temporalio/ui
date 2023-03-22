@@ -82,7 +82,7 @@
 
 <style lang="postcss">
   .search {
-    @apply mb-5 flex rounded-full border-3 border-gray-900 bg-white p-1 pr-4;
+    @apply mb-5 flex rounded-full border-2 border-gray-900 bg-white p-1 pr-4;
   }
 
   .link-item {
@@ -90,10 +90,10 @@
   }
 
   .link-item.first {
-    @apply rounded-t-lg border-t-3;
+    @apply rounded-t-lg border-t-2;
   }
 
   .link-item.last {
-    @apply rounded-b-lg border-b-3;
+    @apply rounded-b-lg border-b-2;
   }
 </style>

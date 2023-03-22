@@ -60,8 +60,12 @@ import spinnerSolid from './svg/spinner-solid.svelte';
 import starEmpty from './svg/star-empty.svelte';
 import starFilled from './svg/star-filled.svelte';
 import summary from './svg/summary.svelte';
+import support from './svg/support.svelte';
 import terminal from './svg/terminal.svelte';
 import timeline from './svg/timeline.svelte';
+import transcoderError from './svg/transcoder-error.svelte';
+import transcoderOn from './svg/transcoder-on.svelte';
+import transcoderOff from './svg/transcoder-off.svelte';
 import trash from './svg/trash.svelte';
 import tutorial from './svg/tutorial.svelte';
 import upload from './svg/upload.svelte';
@@ -134,9 +138,13 @@ export const icons = {
   'star-empty': starEmpty,
   'star-filled': starFilled,
   summary,
+  support,
   'spinner-solid': spinnerSolid,
   terminal,
   timeline,
+  'transcoder-error': transcoderError,
+  'transcoder-on': transcoderOn,
+  'transcoder-off': transcoderOff,
   trash,
   tutorial,
   upload,

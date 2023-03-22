@@ -9,6 +9,7 @@ describe('Stack Trace With Completed Workflow', () => {
 
   beforeEach(() => {
     cy.interceptApi();
+    cy.setTopNavFeatureTag();
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
@@ -58,6 +59,7 @@ describe('Stack Trace With Completed Workflow', () => {
 
     beforeEach(() => {
       cy.interceptApi();
+      cy.setTopNavFeatureTag();
 
       cy.intercept(
         Cypress.env('VITE_API_HOST') +

@@ -8,6 +8,7 @@ const { workflowId, runId } =
 describe('Workflow Actions', () => {
   beforeEach(() => {
     cy.interceptApi();
+    cy.setTopNavFeatureTag();
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
@@ -150,6 +151,7 @@ describe('Workflow Actions', () => {
 describe('Write Actions Disabled', () => {
   beforeEach(() => {
     cy.interceptApi();
+    cy.setTopNavFeatureTag();
     cy.intercept(Cypress.env('VITE_API_HOST') + `/api/v1/settings?`, {
       fixture: 'settings.write-actions-disabled.json',
     }).as('settings-api');

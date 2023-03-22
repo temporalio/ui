@@ -93,6 +93,7 @@
       {required}
       {autocomplete}
       bind:value
+      on:click|stopPropagation
       on:input
       on:keydown|stopPropagation
       on:change
@@ -148,7 +149,7 @@
   }
 
   .input-container {
-    @apply relative box-border inline-flex h-10 w-full items-center rounded border border-gray-900 text-sm focus-within:border-blue-700;
+    @apply relative box-border inline-flex h-10 w-full items-center rounded border-2 border-gray-900 text-sm focus-within:border-blue-700;
   }
 
   .input-container.error {
@@ -212,7 +213,7 @@
   }
 
   .hint-text {
-    @apply inline-block mt-2 text-xs;
+    @apply mt-2 inline-block text-xs;
   }
 
   .hint-text.error,

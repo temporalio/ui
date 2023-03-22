@@ -3,6 +3,7 @@ const namespaces = ['default', 'some-other-namespace'];
 describe('Namespaces page', () => {
   beforeEach(() => {
     cy.interceptApi();
+    cy.setTopNavFeatureTag();
 
     cy.visit('/namespaces');
 
@@ -27,6 +28,7 @@ describe('Namespaces page', () => {
 describe('Namespaces button', () => {
   beforeEach(() => {
     cy.interceptApi();
+    cy.setTopNavFeatureTag();
 
     cy.visit('/namespaces/default/workflows');
 
@@ -55,6 +57,7 @@ describe('Namespaces button', () => {
 describe('Namespace Select', () => {
   beforeEach(() => {
     cy.interceptApi();
+    cy.setTopNavFeatureTag();
 
     cy.visit('/namespaces/default/workflows');
 
@@ -75,18 +78,16 @@ describe('Namespace Select', () => {
   });
 
   it('have the correct namespaces in the dropdown when using navigation header', () => {
-    cy.get('@namespace-select-button').click({ wait: 1000 });
-    cy.get('[data-testid="namespace-select-header"]').contains(
-      'Select a Namespace',
-    );
+    cy.get('@namespace-select-button').contains(namespaces[0]);
+    cy.get('@namespace-select-button').click();
+    cy.get('[data-testid="namespace-select-list"]').contains(namespaces[0]);
+    cy.get('[data-testid="namespace-select-list"]').contains(namespaces[1]);
   });
 
   it('navigates to the correct namespaces in the dropdown when using navigation header', () => {
-    cy.get('@namespace-select-button').click({ wait: 1000 });
-    cy.get('[data-testid="namespace-select-header"]').contains(
-      'Select a Namespace',
-    );
-    cy.get('[data-testid="namespace-list"] > :nth-child(2)').click();
-    cy.get('[data-testid="namespace-name"]').contains(namespaces[1]);
+    cy.get('@namespace-select-button').click();
+    cy.get('[data-testid="namespace-select-list"]').contains(namespaces[0]);
+    cy.get('[data-test="namespace-list"] > :nth-child(2)').click();
+    cy.get('@namespace-select-button').contains(namespaces[1]);
   });
 });

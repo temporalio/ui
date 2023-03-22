@@ -3,99 +3,160 @@
 
   import Icon from '$lib/holocene/icon/icon.svelte';
 
-  import { onMount } from 'svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import { createEventDispatcher } from 'svelte';
+  import Input from '$lib/holocene/input/input.svelte';
+  import { lastUsedNamespace } from '$lib/stores/namespaces';
 
-  export let getNamespaceList: () => Promise<NamespaceItem[]> = null;
+  export let namespaceList: NamespaceListItem[] = [];
+  export let show: boolean;
 
-  let namespaceList = null;
-  let searchField: HTMLInputElement = null;
+  let searchValue = '';
+  let focusedIndex = 0;
 
-  onMount(() => {
-    namespaceList = getNamespaceList();
-    searchField.focus();
-  });
-  const dispatch = createEventDispatcher();
+  let divElement: HTMLDivElement;
 
-  /** When a user presses escape close the namespace switcher  */
-  export function rootDocumentHandler(node: Element): { destroy: () => void } {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (node && !event.defaultPrevented) {
-        if (event.key === 'Escape') {
-          dispatch('closeNamespaceList');
+  const getFocusableElements = () => {
+    if (show && divElement) {
+      return Array.from(
+        divElement.querySelectorAll<
+          HTMLButtonElement | HTMLInputElement | HTMLDivElement
+        >('input, a'),
+      ).filter((element) => {
+        if (element instanceof HTMLDivElement) return element.isContentEditable;
+        return !element.disabled;
+      });
+    }
+    return [];
+  };
+
+  const handleTabKey = (event: KeyboardEvent) => {
+    const focusable = getFocusableElements();
+    const inputElement = focusable[0];
+    const lastListItemElement = focusable[focusable.length - 1];
+    if (event.key === 'Tab') {
+      if (event.shiftKey) {
+        if (document.activeElement === inputElement) {
+          lastListItemElement.focus();
+          focusedIndex = focusable.length - 1;
+          event.preventDefault();
+        } else {
+          focusedIndex = focusedIndex - 1;
+        }
+      } else {
+        if (document.activeElement === lastListItemElement) {
+          inputElement.focus();
+          focusedIndex = 0;
+          event.preventDefault();
+        } else {
+          focusedIndex = focusedIndex + 1;
         }
       }
-    };
+    }
+  };
 
-    document.addEventListener('keydown', handleKeyDown, true);
+  const handleArrowKey = (event: KeyboardEvent) => {
+    const focusable = getFocusableElements();
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      if (focusedIndex === 1) return;
+      else {
+        const next = focusable[focusedIndex - 1];
+        if (next) {
+          next.focus();
+          focusedIndex = focusedIndex - 1;
+        }
+      }
+    } else if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      if (focusedIndex === 0) {
+        // Input tab prevents updating focusedIndex
+        const next = focusable[2];
+        if (next) {
+          next.focus();
+          focusedIndex = focusedIndex + 2;
+        }
+      } else {
+        const next = focusable[focusedIndex + 1];
+        if (next) {
+          next.focus();
+          focusedIndex = focusedIndex + 1;
+        }
+      }
+    }
+  };
 
-    return {
-      destroy() {
-        document.removeEventListener('keydown', handleKeyDown, true);
-      },
-    };
+  const handleKeyboardNavigation = (event: KeyboardEvent) => {
+    const focusable = getFocusableElements();
+    if (!show || !focusable.length || focusable.length === 1) {
+      return;
+    }
+
+    handleTabKey(event);
+    handleArrowKey(event);
+  };
+
+  $: {
+    if (show) {
+      const focusable = getFocusableElements();
+      const inputElement = focusable[0];
+      inputElement.focus();
+    }
   }
 
-  $: searchValue = '';
+  $: sortedAndFilteredList = namespaceList
+    .sort((a, b) => {
+      if (a.namespace > b.namespace) return 1;
+      if (b.namespace > a.namespace) return -1;
+      return 0;
+    })
+    .filter(({ namespace }) => namespace.includes(searchValue));
 </script>
 
-<div class="prose mt-16 mb-8">
-  <h2 class="text-2xl" data-testid="namespace-select-header">
-    Select a Namespace
-  </h2>
-  {#if $page.params?.namespace}
-    <p>You are currently viewing {$page.params.namespace}</p>
-  {/if}
-</div>
-
-<div class="mb-5 flex rounded-md border border-gray-900 p-1 pr-4" role="search">
-  <div class="ml-4 mr-2">
-    <Icon name="search" />
+<svelte:window on:keydown|stopPropagation={handleKeyboardNavigation} />
+<div class="w-full py-4 px-2 md:px-8 lg:px-12" bind:this={divElement}>
+  <div class="prose my-4">
+    <h2 class="text:xl md:text-2xl" data-testid="namespace-select-header">
+      Select a Namespace
+    </h2>
   </div>
-  <input
-    class="w-full"
-    type="search"
-    placeholder="Search"
-    use:rootDocumentHandler
-    on:keydown|stopPropagation
-    bind:value={searchValue}
-    bind:this={searchField}
-  />
-</div>
+  <div class="mb-4">
+    <Input
+      autoFocus
+      id="namespace-search"
+      bind:value={searchValue}
+      icon="search"
+      placeholder="Search"
+    />
+  </div>
 
-<ul data-testid="namespace-list">
-  {#await namespaceList}
-    Loading ...
-  {:then namespacesResult}
-    {#if namespacesResult}
-      {#each namespacesResult.filter( ({ namespace }) => namespace.includes(searchValue), ) as namespace}
-        <li
-          class="first:rounded-t-xl first:border-t-3 last:rounded-b-xl last:border-b-3 border-b border-l-3 border-r-3 border-gray-900 flex border-collapse gap-2 hover:bg-gradient-to-br from-blue-100 to-purple-100 cursor-pointer"
+  <ul data-test="namespace-list">
+    {#each sortedAndFilteredList as namespace}
+      <li class="item" data-testid="namespace-list-item">
+        <a
+          on:click={() => ($lastUsedNamespace = namespace.namespace)}
+          href={namespace.href(namespace.namespace)}
+          class="flex w-full p-3"
+          class:active={namespace.namespace === $page.params?.namespace}
         >
-          <a
-            href={namespace.href(namespace.namespace)}
-            class="w-full flex p-3"
-            class:active={namespace.namespace === $page.params?.namespace}
-          >
-            <div class="w-6 h-6 active">
-              {#if namespace.namespace === $page.params?.namespace}
-                <Icon name="checkmark" />
-              {/if}
-            </div>
-            <p class="link">{namespace.namespace}</p>
-          </a>
-        </li>
-      {:else}
-        <EmptyState title="No Namespaces" />
-      {/each}
+          <div class="active h-6 w-6">
+            {#if namespace.namespace === $page.params?.namespace}
+              <Icon name="checkmark" />
+            {/if}
+          </div>
+          <p class="link">{namespace.namespace}</p>
+        </a>
+      </li>
     {:else}
-      <EmptyState title="Could not list Namespaces" />
-    {/if}
-  {/await}
-</ul>
+      <EmptyState title="No Namespaces" />
+    {/each}
+  </ul>
+</div>
 
 <style lang="postcss">
+  .item {
+    @apply flex border-collapse cursor-pointer gap-2 border-b border-l-2 border-r-2 border-gray-900 bg-white from-blue-100 to-purple-100 first:rounded-t-xl first:border-t-2 last:rounded-b-xl last:border-b-2 hover:bg-gradient-to-br focus:bg-gradient-to-br;
+  }
+
   .link {
     @apply ml-2 truncate text-gray-900;
   }
