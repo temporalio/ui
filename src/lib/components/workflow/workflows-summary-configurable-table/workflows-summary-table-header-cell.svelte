@@ -9,7 +9,7 @@
   export let column: WorkflowHeader;
   export let sortDisabled: boolean;
 
-  $: ({ label, width = 240 } = column);
+  $: ({ label } = column);
 </script>
 
 {#if label === 'Status'}
@@ -33,13 +33,11 @@
     <EndTimeDropdownFilter disabled={sortDisabled} />
   </th>
 {:else}
-  <th class="workflows-summary-table-header-cell" style="width:{width}px;"
-    >{label}</th
-  >
+  <th class="workflows-summary-table-header-cell">{label}</th>
 {/if}
 
 <style lang="postcss">
   .workflows-summary-table-header-cell {
-    @apply whitespace-nowrap px-2 text-left font-secondary text-sm font-medium;
+    @apply whitespace-nowrap px-2 text-left font-secondary text-sm font-medium h-10;
   }
 </style>

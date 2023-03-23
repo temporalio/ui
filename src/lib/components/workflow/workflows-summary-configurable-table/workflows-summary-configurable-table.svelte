@@ -149,7 +149,7 @@
   on:mousemove|stopPropagation={handleMouseMove}
   on:mouseup|stopPropagation={handleMouseUp}
 />
-<div class="relative flex flex-row w-full rounded-xl border-2 border-primary">
+<div class="relative flex flex-row w-full rounded-lg">
   <div
     class="workflow-summary-table-wrapper pinned"
     bind:this={resizableContainer}
@@ -157,17 +157,19 @@
   >
     <table class="workflow-summary-table pinned">
       <thead>
-        <tr class="bg-primary text-white h-10">
-          <th class="rounded-tl">
-            <Checkbox
-              id="select-visible-workflows"
-              onDark
-              hoverable
-              {checked}
-              {indeterminate}
-              on:change={handleCheckboxChange}
-            />
-          </th>
+        <tr class="workflow-summary-header-row pinned">
+          {#if bulkActionsEnabled}
+            <th>
+              <Checkbox
+                id="select-visible-workflows"
+                onDark
+                hoverable
+                {checked}
+                {indeterminate}
+                on:change={handleCheckboxChange}
+              />
+            </th>
+          {/if}
           {#if bulkActionsEnabled && showBulkActions}
             <th
               class="text-left text-sm font-medium overflow-visible whitespace-nowrap font-secondary px-2"
@@ -226,14 +228,16 @@
             class="workflow-summary-row pinned"
             on:click={() => goToWorkflow(workflow)}
           >
-            <td class="first-of-type:rounded-bl-lg h-10">
-              <Checkbox
-                hoverable
-                bind:group={selectedWorkflows}
-                value={workflow}
-                disabled={allSelected}
-              />
-            </td>
+            {#if bulkActionsEnabled}
+              <td>
+                <Checkbox
+                  hoverable
+                  bind:group={selectedWorkflows}
+                  value={workflow}
+                  disabled={allSelected}
+                />
+              </td>
+            {/if}
             {#each pinnedColumns as column}
               <WorkflowsSummaryTableBodyCell {column} {workflow} />
             {/each}
@@ -245,11 +249,11 @@
   <div class="workflow-summary-table-wrapper">
     <table class="workflow-summary-table">
       <thead>
-        <tr class="bg-primary text-white h-10">
+        <tr class="workflow-summary-header-row">
           {#each otherColumns as column}
             <WorkflowsSummaryTableHeaderCell {column} {sortDisabled} />
           {/each}
-          <th class="rounded-tr px-2 h-10 w-12 text-right">
+          <th class="px-2 h-10 w-12 text-right">
             <IconButton
               icon="vertical-ellipsis"
               on:click={openCustomizationDrawer}
@@ -269,7 +273,7 @@
             {#each otherColumns as column}
               <WorkflowsSummaryTableBodyCell {column} {workflow} />
             {/each}
-            <td class="last-of-type:rounded-br-lg h-10" />
+            <td />
           </tr>
         {:else}
           <tr>
@@ -362,11 +366,11 @@
 
 <style lang="postcss">
   .workflow-summary-table-wrapper {
-    @apply relative flex bg-white;
+    @apply relative flex bg-white border-primary border-y-2;
 
     &.pinned {
       /* 40px is width of checkbox column */
-      @apply rounded-l-lg min-w-[40px] max-w-fit;
+      @apply rounded-l-lg min-w-[40px] max-w-fit border-l-2;
 
       &::after {
         @apply absolute right-0 content-[''] bg-primary w-[3px] h-full cursor-ew-resize;
@@ -374,29 +378,45 @@
     }
 
     &:not(.pinned) {
-      @apply overflow-x-scroll flex-grow rounded-r-lg;
+      @apply overflow-x-scroll flex-grow rounded-r-lg border-r-2;
     }
   }
 
   .workflow-summary-table {
     &.pinned {
-      @apply rounded-l-lg resize-x last-of-type:rounded-bl;
+      @apply rounded-l-lg;
     }
 
     &:not(.pinned) {
-      @apply rounded-r-lg table-auto w-full last-of-type:rounded-br;
+      @apply rounded-r-lg table-auto w-full;
+    }
+  }
+
+  .workflow-summary-header-row {
+    @apply bg-primary text-white h-10;
+
+    &.pinned {
+      :global(th) {
+        @apply first:rounded-tl;
+      }
+    }
+
+    &:not(.pinned) {
+      :global(th) {
+        @apply last:rounded-tr;
+      }
     }
   }
 
   .workflow-summary-row {
-    @apply border-b border-primary last:border-b-0 cursor-pointer;
+    @apply border-b border-primary cursor-pointer;
 
-    &.pinned {
-      @apply rounded-bl;
-    }
+    &:last-of-type {
+      @apply border-b-0;
 
-    &:not(.pinned) {
-      @apply rounded-br;
+      :global(td) {
+        @apply first:rounded-bl-lg last:rounded-br-lg;
+      }
     }
   }
 
