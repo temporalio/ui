@@ -82,16 +82,10 @@
         <IconButton
           hoverable
           icon="pin-filled"
-          iconSize={16}
           on:click={() => dispatch('pinItem')}
         />
       {:else}
-        <IconButton
-          hoverable
-          icon="pin"
-          iconSize={16}
-          on:click={() => dispatch('pinItem')}
-        />
+        <IconButton hoverable icon="pin" on:click={() => dispatch('pinItem')} />
       {/if}
     {/if}
   </div>
