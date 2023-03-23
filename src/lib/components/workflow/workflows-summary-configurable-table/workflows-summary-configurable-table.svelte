@@ -57,6 +57,8 @@
 
   let coreUser = coreUserStore();
   let customizationDrawerOpen: boolean = false;
+  let resizableContainer: HTMLDivElement;
+  let resizing: boolean = false;
 
   $: namespace = $page.params.namespace;
   $: selectedWorkflowsCount = selectedWorkflows.length;
@@ -121,10 +123,38 @@
       }),
     );
   };
+
+  const handleMouseDown = (event: MouseEvent) => {
+    if (resizableContainer.clientWidth - event.x < 3) {
+      resizing = true;
+    }
+    return false;
+  };
+
+  const handleMouseUp = () => {
+    if (resizing) resizing = false;
+  };
+
+  const handleMouseMove = (event: MouseEvent) => {
+    if (!resizing) return false;
+    requestAnimationFrame(() => {
+      resizableContainer.style.width =
+        resizableContainer.clientWidth + event.movementX + 'px';
+    });
+    return false;
+  };
 </script>
 
+<svelte:window
+  on:mousemove|stopPropagation={handleMouseMove}
+  on:mouseup|stopPropagation={handleMouseUp}
+/>
 <div class="relative flex flex-row w-full rounded-xl border-2 border-primary">
-  <div class="workflow-summary-table-wrapper pinned">
+  <div
+    class="workflow-summary-table-wrapper pinned"
+    bind:this={resizableContainer}
+    on:mousedown|stopPropagation|preventDefault={handleMouseDown}
+  >
     <table class="workflow-summary-table pinned">
       <thead>
         <tr class="bg-primary text-white h-10">
@@ -335,10 +365,11 @@
     @apply relative flex bg-white;
 
     &.pinned {
-      @apply rounded-l-lg;
+      /* 40px is width of checkbox column */
+      @apply rounded-l-lg min-w-[40px] max-w-fit;
 
       &::after {
-        @apply absolute right-0 content-[''] bg-primary w-[3px] h-full;
+        @apply absolute right-0 content-[''] bg-primary w-[3px] h-full cursor-ew-resize;
       }
     }
 
