@@ -20,6 +20,16 @@
 </ul>
 
 <style lang="postcss">
+  :global(.menu-item) {
+    &:first-child {
+      @apply rounded-t;
+    }
+
+    &:last-child {
+      @apply rounded-b;
+    }
+  }
+
   .left {
     @apply left-0 origin-top-left;
   }
