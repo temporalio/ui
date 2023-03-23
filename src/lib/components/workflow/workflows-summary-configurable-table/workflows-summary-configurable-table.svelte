@@ -11,6 +11,8 @@
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import {
     workflowTableColumns,
+    availableWorkflowColumns,
+    availableSearchAttributes,
     addColumn,
     removeColumn,
     moveColumn,
@@ -18,7 +20,8 @@
     MAX_PINNED_COLUMNS,
   } from '$lib/stores/workflow-table-columns';
   import Drawer from '$lib/holocene/drawer.svelte';
-  import OrderableList from '$lib/holocene/orderable-list.svelte';
+  import OrderableList from '$lib/holocene/orderable-list/orderable-list.svelte';
+  import OrderableListItem from '$lib/holocene/orderable-list/orderable-list-item.svelte';
   import {
     loading,
     updating,
@@ -83,13 +86,9 @@
     (selectedWorkflowsCount === workflows.length &&
       selectedWorkflowsCount !== 0);
 
-  $: pinnedColumns = $workflowTableColumns.columns.filter(
-    (column) => column.pinned,
-  );
+  $: pinnedColumns = $workflowTableColumns.filter((column) => column.pinned);
 
-  $: otherColumns = $workflowTableColumns.columns.filter(
-    (column) => !column.pinned,
-  );
+  $: otherColumns = $workflowTableColumns.filter((column) => !column.pinned);
 
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
@@ -278,22 +277,57 @@
       >), Workflow<br />Headings to personalize the Workflow List Table.</span
     >
   </svelte:fragment>
-  <OrderableList
-    items={$workflowTableColumns.columns}
-    availableItems={$workflowTableColumns.availableColumns}
-    maxPinnedItems={MAX_PINNED_COLUMNS}
-    onAddItem={addColumn}
-    onRemoveItem={removeColumn}
-    onMoveItem={moveColumn}
-    onPinItem={pinColumn}
-  >
-    <svelte:fragment slot="main-heading">
-      Workflow Headings <span class="font-normal">(in view)</span>
-    </svelte:fragment>
-    <svelte:fragment slot="bank-heading">
-      Available Headings <span class="font-normal">(not in view)</span>
-    </svelte:fragment>
-  </OrderableList>
+  <div class="flex flex-col gap-4">
+    <OrderableList>
+      <svelte:fragment slot="heading">
+        Workflow Headings <span class="font-normal">(in view)</span>
+      </svelte:fragment>
+      {#each $workflowTableColumns as { label, pinned }, index (label)}
+        <OrderableListItem
+          {index}
+          {pinned}
+          totalItems={$workflowTableColumns.length}
+          maxPinnedItems={MAX_PINNED_COLUMNS}
+          on:moveItem={(event) =>
+            moveColumn(event.detail.from, event.detail.to)}
+          on:pinItem={() => pinColumn(label)}
+          on:removeItem={() => removeColumn(label)}
+        >
+          {label}
+        </OrderableListItem>
+      {/each}
+    </OrderableList>
+    <OrderableList>
+      <svelte:fragment slot="heading">
+        Available Headings <span class="font-normal">(not in view)</span>
+      </svelte:fragment>
+      {#each $availableWorkflowColumns as column, index}
+        <OrderableListItem static {index} on:addItem={() => addColumn(column)}>
+          {column}
+        </OrderableListItem>
+      {:else}
+        <OrderableListItem readonly>No Available Headings</OrderableListItem>
+      {/each}
+    </OrderableList>
+    <OrderableList>
+      <svelte:fragment slot="heading">
+        Custom Search Attributes <span class="font-normal">(not in view)</span>
+      </svelte:fragment>
+      {#each $availableSearchAttributes as searchAttribute, index}
+        <OrderableListItem
+          static
+          {index}
+          on:addItem={() => addColumn(searchAttribute)}
+        >
+          {searchAttribute}
+        </OrderableListItem>
+      {:else}
+        <OrderableListItem readonly
+          >No Custom Search Attributes</OrderableListItem
+        >
+      {/each}
+    </OrderableList>
+  </div>
 </Drawer>
 
 <style lang="postcss">

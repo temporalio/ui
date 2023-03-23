@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
-  import CodeBlock from '$lib/holocene/code-block.svelte';
   import FilterOrCopyButtons from '$lib/holocene/filter-or-copy-buttons.svelte';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import { timeFormat } from '$lib/stores/time-format';
@@ -47,7 +46,8 @@
     updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
   };
 
-  $: cell = WORKFLOW_CELLS[label];
+  $: cell =
+    label in WORKFLOW_CELLS ? WORKFLOW_CELLS[label] : { label, path: label };
   $: {
     if (isPathCell(cell)) {
       cellContent = workflow[cell.path] ?? '';
@@ -78,12 +78,6 @@
         (filter) => filter.attribute === label && filter.value === cellContent,
       )}
     />
-  </td>
-{:else if label === 'Memo'}
-  <td class="workflows-summary-table-body-cell">
-    {#if cellContent}
-      <CodeBlock content={cellContent} inline copyable={false} />
-    {/if}
   </td>
 {:else}
   <td class="workflows-summary-table-body-cell">{cellContent}</td>

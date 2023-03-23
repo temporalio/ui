@@ -1,7 +1,9 @@
+import { formatBytes } from '$lib/utilities/format-bytes';
 import { formatDate } from '$lib/utilities/format-date';
 import { formatDistance } from '$lib/utilities/format-time';
-import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+import { derived } from 'svelte/store';
 import { persistStore } from './persist-store';
+import { customSearchAttributes } from './search-attributes';
 
 export const MAX_PINNED_COLUMNS = 2;
 
@@ -18,15 +20,10 @@ type WorkflowHeaderLabel =
   | 'State Transitions'
   | 'Parent Namespace'
   | 'Parent Workflow ID'
-  | 'Task Queue'
-  | 'Memo';
-// ToDo: Support this columns
-// | 'Search Attributes'
-// | 'Custom Search Attributes'
-// | 'Memo Custom Key';
+  | 'Task Queue';
 
 export type WorkflowHeader = {
-  label: WorkflowHeaderLabel;
+  label: WorkflowHeaderLabel | string;
   pinned: boolean;
 };
 
@@ -55,15 +52,21 @@ export const isPathCell = (cell: WorkflowCell): cell is PathCell =>
 export const isDataCell = (cell: WorkflowCell): cell is DataCell =>
   !!cell?.data;
 
-type State = {
-  columns: WorkflowHeader[];
-  availableColumns: WorkflowHeader[];
-};
+type State = WorkflowHeader[];
 
 type Action =
-  | { type: 'WORKFLOW_COLUMN.ADD'; payload: { index: number } }
-  | { type: 'WORKFLOW_COLUMN.REMOVE'; payload: { index: number } }
-  | { type: 'WORKFLOW_COLUMN.PIN'; payload: { index: number } }
+  | {
+      type: 'WORKFLOW_COLUMN.ADD';
+      payload: { label: WorkflowHeaderLabel | string };
+    }
+  | {
+      type: 'WORKFLOW_COLUMN.REMOVE';
+      payload: { label: WorkflowHeaderLabel | string };
+    }
+  | {
+      type: 'WORKFLOW_COLUMN.PIN';
+      payload: { label: WorkflowHeaderLabel | string };
+    }
   | { type: 'WORKFLOW_COLUMN.MOVE'; payload: { from: number; to: number } };
 
 const DEFAULT_COLUMNS: WorkflowHeader[] = [
@@ -75,18 +78,14 @@ const DEFAULT_COLUMNS: WorkflowHeader[] = [
   { label: 'End', pinned: false },
 ];
 
-const DEFAULT_AVAILABLE_COLUMNS: WorkflowHeader[] = [
-  { label: 'History Size', pinned: false },
-  { label: 'History Length', pinned: false },
-  { label: 'Execution Time', pinned: false },
-  { label: 'State Transitions', pinned: false },
-  { label: 'Parent Namespace', pinned: false },
-  { label: 'Parent Workflow ID', pinned: false },
-  { label: 'Task Queue', pinned: false },
-  { label: 'Memo', pinned: false },
-  // { label: 'Search Attributes' },
-  // { label: 'Custom Search Attributes' },
-  // { label: 'Memo Custom Key' },
+const DEFAULT_AVAILABLE_COLUMNS: WorkflowHeaderLabel[] = [
+  'History Size',
+  'History Length',
+  'Execution Time',
+  'State Transitions',
+  'Parent Namespace',
+  'Parent Workflow ID',
+  'Task Queue',
 ];
 
 export const WORKFLOW_CELLS: Record<WorkflowHeaderLabel, WorkflowCell> = {
@@ -108,7 +107,7 @@ export const WORKFLOW_CELLS: Record<WorkflowHeaderLabel, WorkflowCell> = {
   'History Size': {
     label: 'History Size',
     data: ({ historySizeBytes }: WorkflowExecution) =>
-      historySizeBytes ? `${historySizeBytes} Bytes` : '',
+      formatBytes(parseInt(historySizeBytes, 10)),
   },
   'Execution Time': {
     label: 'Execution Time',
@@ -122,91 +121,83 @@ export const WORKFLOW_CELLS: Record<WorkflowHeaderLabel, WorkflowCell> = {
   'Parent Namespace': { label: 'Parent Namespace', path: 'parentNamespaceId' },
   'Parent Workflow ID': { label: 'Parent Workflow ID', path: 'parent' },
   'Task Queue': { label: 'Task Queue', path: 'taskQueue' },
-  Memo: {
-    label: 'Memo',
-    data: ({ memo }: WorkflowExecution) =>
-      memo.fields ? stringifyWithBigInt(memo.fields) : '',
-  },
-};
-
-const initialState: State = {
-  columns: DEFAULT_COLUMNS,
-  availableColumns: DEFAULT_AVAILABLE_COLUMNS,
 };
 
 const workflowTableColumns = persistStore(
   'workflow-table-columns',
-  initialState,
+  DEFAULT_COLUMNS,
+);
+
+const availableWorkflowColumns = derived(
+  [workflowTableColumns],
+  ([$workflowTableColumns]) =>
+    DEFAULT_AVAILABLE_COLUMNS.filter(
+      (header) =>
+        !$workflowTableColumns.some((column) => column.label === header),
+    ),
+);
+
+const availableSearchAttributes = derived(
+  [customSearchAttributes, workflowTableColumns],
+  ([$customSearchAttributes, $workflowTableColumns]) =>
+    Object.keys($customSearchAttributes).filter(
+      (searchAttribute) =>
+        !$workflowTableColumns.some(
+          (column) => column.label === searchAttribute,
+        ),
+    ),
 );
 
 const reducer = (action: Action, state: State): State => {
   switch (action.type) {
     case 'WORKFLOW_COLUMN.ADD': {
-      const { columns, availableColumns } = state;
-      const { index } = action.payload;
+      const { label } = action.payload;
 
-      const tempAvailableColumns = [...availableColumns];
-      const [addedColumn] = tempAvailableColumns.splice(index, 1);
-
-      return {
-        columns: [...columns, addedColumn],
-        availableColumns: tempAvailableColumns,
-      };
+      return [...state, { label, pinned: false }];
     }
     case 'WORKFLOW_COLUMN.REMOVE': {
-      const { columns, availableColumns } = state;
-      const { index } = action.payload;
-      const tempColumns = [...columns];
-      const [removedColumn] = tempColumns.splice(index, 1);
-      removedColumn.pinned = false;
+      const { label: labelToRemove } = action.payload;
 
-      return {
-        columns: tempColumns,
-        availableColumns: [removedColumn, ...availableColumns],
-      };
+      return state.filter(({ label }) => label !== labelToRemove);
     }
     case 'WORKFLOW_COLUMN.PIN': {
-      const { columns } = state;
-      const { index } = action.payload;
+      const { label: labelToPin } = action.payload;
+      const index = state.findIndex(({ label }) => label === labelToPin);
 
-      const isPinned = columns[index].pinned;
+      const isPinned = state[index].pinned;
 
       let lastPinned = -1;
-      for (let i = columns.length - 1; i >= 0; i--) {
-        if (columns[i].pinned) {
+      for (let i = state.length - 1; i >= 0; i--) {
+        if (state[i].pinned) {
           lastPinned = i;
           break;
         }
       }
 
-      const tempColumns = [...columns];
-      tempColumns[index].pinned = !isPinned;
+      const newColumns = [...state];
+      newColumns[index].pinned = !isPinned;
 
       if (index > lastPinned && !isPinned) {
-        tempColumns.splice(lastPinned + 1, 0, tempColumns.splice(index, 1)[0]);
+        newColumns.splice(lastPinned + 1, 0, newColumns.splice(index, 1)[0]);
       } else if (index < lastPinned && isPinned) {
-        tempColumns.splice(lastPinned, 0, tempColumns.splice(index, 1)[0]);
+        newColumns.splice(lastPinned, 0, newColumns.splice(index, 1)[0]);
       }
 
-      return {
-        ...state,
-        columns: tempColumns,
-      };
+      return newColumns;
     }
     case 'WORKFLOW_COLUMN.MOVE': {
-      const { columns } = state;
       const { from, to } = action.payload;
-      const isPinned = columns[from].pinned;
+      const isPinned = state[from].pinned;
 
       let lastPinned = 0;
-      for (let i = columns.length - 1; i >= 0; i--) {
-        if (columns[i].pinned) {
+      for (let i = state.length - 1; i >= 0; i--) {
+        if (state[i].pinned) {
           lastPinned = i;
           break;
         }
       }
 
-      const tempColumns = [...columns];
+      const tempColumns = [...state];
       if (to < lastPinned && !isPinned) {
         tempColumns[from].pinned = true;
       } else if (to > lastPinned && isPinned) {
@@ -214,12 +205,10 @@ const reducer = (action: Action, state: State): State => {
       }
 
       tempColumns.splice(to, 0, tempColumns.splice(from, 1)[0]);
-      return {
-        ...state,
-        columns: tempColumns.map((c, idx) =>
-          idx > MAX_PINNED_COLUMNS - 1 ? { ...c, pinned: false } : c,
-        ),
-      };
+
+      return tempColumns.map((c, idx) =>
+        idx > MAX_PINNED_COLUMNS - 1 ? { ...c, pinned: false } : c,
+      );
     }
     default:
       return state;
@@ -232,20 +221,28 @@ const dispatch = (action: Action) => {
   );
 };
 
-const addColumn = (index: number) => {
-  dispatch({ type: 'WORKFLOW_COLUMN.ADD', payload: { index } });
+const addColumn = (label: WorkflowHeaderLabel | string) => {
+  dispatch({ type: 'WORKFLOW_COLUMN.ADD', payload: { label } });
 };
 
-const removeColumn = (index: number) => {
-  dispatch({ type: 'WORKFLOW_COLUMN.REMOVE', payload: { index } });
+const removeColumn = (label: WorkflowHeaderLabel | string) => {
+  dispatch({ type: 'WORKFLOW_COLUMN.REMOVE', payload: { label } });
 };
 
 const moveColumn = (from: number, to: number) => {
   dispatch({ type: 'WORKFLOW_COLUMN.MOVE', payload: { from, to } });
 };
 
-const pinColumn = (index: number) => {
-  dispatch({ type: 'WORKFLOW_COLUMN.PIN', payload: { index } });
+const pinColumn = (label: WorkflowHeaderLabel | string) => {
+  dispatch({ type: 'WORKFLOW_COLUMN.PIN', payload: { label } });
 };
 
-export { workflowTableColumns, addColumn, removeColumn, moveColumn, pinColumn };
+export {
+  workflowTableColumns,
+  availableSearchAttributes,
+  availableWorkflowColumns,
+  addColumn,
+  removeColumn,
+  moveColumn,
+  pinColumn,
+};
