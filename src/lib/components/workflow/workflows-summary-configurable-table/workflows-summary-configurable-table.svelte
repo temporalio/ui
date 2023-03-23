@@ -137,10 +137,9 @@
 
   const handleMouseMove = (event: MouseEvent) => {
     if (!resizing) return false;
-    requestAnimationFrame(() => {
-      resizableContainer.style.width =
-        resizableContainer.clientWidth + event.movementX + 'px';
-    });
+    const rect = resizableContainer.getBoundingClientRect();
+    const width = event.x - rect.x;
+    resizableContainer.style.width = `${width}px`;
     return false;
   };
 </script>
@@ -414,8 +413,16 @@
     &:last-of-type {
       @apply border-b-0;
 
-      :global(td) {
-        @apply first:rounded-bl-lg last:rounded-br-lg;
+      &.pinned {
+        :global(td) {
+          @apply first:rounded-bl-lg;
+        }
+      }
+
+      &:not(.pinned) {
+        :global(td) {
+          @apply last:rounded-br-lg;
+        }
       }
     }
   }
