@@ -156,6 +156,31 @@ export const fetchAllWorkflows = async (
   };
 };
 
+export const fetchWorkflowForRunId = async (
+  parameters: { namespace: string; workflowId: string },
+  request = fetch,
+): Promise<{ runId: string }> => {
+  const { namespace, workflowId } = parameters;
+  const endpoint: ValidWorkflowEndpoints = 'workflows';
+
+  const route = routeForApi(endpoint, { namespace });
+  const { executions } = (await requestFromAPI<ListWorkflowExecutionsResponse>(
+    route,
+    {
+      params: {
+        query: `WorkflowId="${workflowId}"`,
+        pageSize: '1',
+      },
+      request,
+    },
+  )) ?? { executions: [] };
+  const latestExecution = toWorkflowExecutions({ executions })?.[0];
+
+  return {
+    runId: latestExecution?.runId,
+  };
+};
+
 export const fetchWorkflowForAuthorization = async (
   namespace: string,
   request = fetch,
