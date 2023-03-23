@@ -1,15 +1,14 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
 
-  import { workflowsQuery, workflowsSearch } from '$lib/stores/workflows';
+  import { workflowsSearchParams } from '$lib/stores/workflows';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { eventHistory } from '$lib/stores/events';
 
   import {
     routeForEventHistory,
-    routeForWorkflowsWithQuery,
+    routeForWorkflows,
   } from '$lib/utilities/route-for';
-  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
   import Copyable from '$lib/components/copyable.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -25,9 +24,6 @@
 
   $: ({ workflow } = $workflowRun);
 
-  const { parameters, searchType } = $workflowsSearch;
-  const query = toListWorkflowQuery(parameters);
-
   $: isRunning = $workflowRun?.workflow?.isRunning;
 
   $: cancelInProgress = isCancelInProgress(
@@ -41,17 +37,25 @@
 <header class="mb-4 flex flex-col gap-1">
   <div class="mb-4 block flex justify-between">
     <a
-      href={routeForWorkflowsWithQuery({
+      href={`${routeForWorkflows({
         namespace,
-        query: $workflowsQuery || query,
-        search: searchType,
-      })}
+      })}?${$workflowsSearchParams}`}
       data-testid="back-to-workflows"
       class="back-to-workflows"
     >
       <Icon name="chevron-left" class="inline" />Back to Workflows
     </a>
-    <slot name="feature-flag" />
+    <a
+      href={`${routeForEventHistory({
+        namespace,
+        workflow: workflow.id,
+        run: workflow.runId,
+      })}?${$workflowsSearchParams}`}
+      data-testid="history-v2"
+      class="back-to-workflows"
+    >
+      Switch to v1 Workflow UI
+    </a>
   </div>
   <div
     class="flex w-full flex-col items-center justify-between gap-4 lg:flex-row"

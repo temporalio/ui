@@ -63,7 +63,7 @@
 
 <style lang="postcss">
   .card {
-    @apply relative grow select-none rounded-xl border-3 border-gray-900 bg-white p-0;
+    @apply relative grow select-none rounded-xl border-2 border-gray-900 bg-white p-0;
   }
 
   .row {
