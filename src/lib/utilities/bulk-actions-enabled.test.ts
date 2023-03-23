@@ -2,64 +2,43 @@ import { expect, describe, test } from 'vitest';
 import { bulkActionsEnabled } from './bulk-actions-enabled';
 
 describe('bulkActionsEnabled', () => {
-  test("returns true when the temporal version and cluster support bulk actions, we're not in cloud, and when at least 1 write actions is enabled", () => {
+  test('returns true when all settings flags are false', () => {
     expect(
-      bulkActionsEnabled(
-        {
-          disableWriteActions: false,
-          disableBulkActions: false,
-          workflowTerminateDisabled: false,
-          workflowCancelDisabled: false,
-        },
-        true,
-      ),
+      bulkActionsEnabled({
+        disableWriteActions: false,
+        batchActionsDisabled: false,
+        workflowTerminateDisabled: false,
+        workflowCancelDisabled: false,
+      }),
     ).toBe(true);
   });
 
   describe('returns false', () => {
-    test('when the bulk actions are not supported by either the temporal version or cluster', () => {
-      expect(bulkActionsEnabled({}, false)).toBe(false);
-    });
-
-    test('when write actions are disabled', () => {
+    test('when `disableWriteActions` is `true`', () => {
       expect(
-        bulkActionsEnabled(
-          {
-            disableWriteActions: true,
-            batchActionsDisabled: false,
-            workflowCancelDisabled: false,
-            workflowTerminateDisabled: false,
-          },
-          true,
-        ),
+        bulkActionsEnabled({
+          disableWriteActions: true,
+        }),
       ).toBe(false);
     });
 
-    test('when bulk actions are disabled', () => {
+    test('when `disableWriteActions` is `false`, but `batchActionsDisabled` is `true`', () => {
       expect(
-        bulkActionsEnabled(
-          {
-            disableWriteActions: false,
-            batchActionsDisabled: true,
-            workflowCancelDisabled: false,
-            workflowTerminateDisabled: false,
-          },
-          true,
-        ),
+        bulkActionsEnabled({
+          disableWriteActions: false,
+          batchActionsDisabled: true,
+        }),
       ).toBe(false);
     });
 
-    test('when neither terminate or cancel are enabled', () => {
+    test('when `disableWriteActions` and `batchActionsDisabled` are both `false`, but `worklowCancelDisabled` and `workflowTerminateDisabled` are both true', () => {
       expect(
-        bulkActionsEnabled(
-          {
-            disableWriteActions: false,
-            batchActionsDisabled: false,
-            workflowCancelDisabled: true,
-            workflowTerminateDisabled: true,
-          },
-          true,
-        ),
+        bulkActionsEnabled({
+          disableWriteActions: false,
+          batchActionsDisabled: false,
+          workflowCancelDisabled: true,
+          workflowTerminateDisabled: true,
+        }),
       ).toBe(false);
     });
   });
