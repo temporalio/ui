@@ -116,8 +116,18 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 			if err != nil {
 				panic(err)
 			}
+
+			dir := "local"
+			if cfg.CloudUI {
+				dir = "cloud"
+			}
+
+			assets, err = fs.Sub(assets, dir)
+			if err != nil {
+				panic(err)
+			}
 		}
-		route.SetUIRoutes(e, assets)
+		route.SetUIRoutes(e, cfg.PublicPath, assets)
 	}
 
 	s := &Server{

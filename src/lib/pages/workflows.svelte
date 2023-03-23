@@ -2,7 +2,7 @@
   import { onDestroy, onMount } from 'svelte';
   import { page } from '$app/stores';
   import { timeFormat } from '$lib/stores/time-format';
-  import { workflowsSearch } from '$lib/stores/workflows';
+  import { workflowsSearchParams } from '$lib/stores/workflows';
   import {
     refresh,
     workflows,
@@ -18,7 +18,6 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import WorkflowFilters from '$lib/components/workflow/workflow-filters.svelte';
   import { getSearchType } from '$lib/utilities/search-type-parameter';
-  import { toListWorkflowParameters } from '$lib/utilities/query/to-list-workflow-parameters';
   import Loading from '$lib/holocene/loading.svelte';
   import WorkflowsSummaryTable from '$lib/components/workflow/workflows-summary-table.svelte';
 
@@ -38,18 +37,13 @@
   };
 
   onDestroy(() => {
-    const query = $page.url.searchParams.get('query');
-    const parameters = query ? toListWorkflowParameters(query) : {};
-    $workflowsSearch = { parameters, searchType };
+    $workflowsSearchParams = $page.url.searchParams.toString();
   });
 </script>
 
 <header class="mb-2 flex justify-between">
   <div>
-    <h1 class="text-2xl" data-testid="namespace-title">
-      Recent Workflows
-      <NamespaceSelector />
-    </h1>
+    <h1 class="text-2xl" data-testid="namespace-title">Recent Workflows</h1>
     <div class="flex items-center gap-2 text-sm">
       <p data-testid="namespace-name">
         {$page.params.namespace}

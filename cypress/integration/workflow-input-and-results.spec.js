@@ -15,6 +15,7 @@ const { workflowId, runId } = workflow.execution;
 describe('Workflow Input and Results', () => {
   beforeEach(() => {
     cy.interceptApi();
+    cy.setTopNavFeatureTag();
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +

@@ -16,5 +16,6 @@
     {height}
     {title}
     class={$$props.class}
+    {...$$restProps}
   />
 {/if}

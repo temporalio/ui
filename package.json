@@ -1,6 +1,6 @@
 {
   "name": "@temporalio/ui",
-  "version": "2.11.0",
+  "version": "2.12.0",
   "type": "module",
   "description": "Temporal.io UI",
   "keywords": [
@@ -27,7 +27,7 @@
     "build:local": "vite build",
     "build:docker": "VITE_API=http://localhost:8080 vite build",
     "build:cloud": "VITE_TEMPORAL_UI_BUILD_TARGET=cloud vite build",
-    "build:server": "VITE_API= BUILD_PATH=server/ui/assets vite build",
+    "build:server": "VITE_API= BUILD_PATH=server/ui/assets/local vite build && VITE_API= VITE_TEMPORAL_UI_BUILD_TARGET=cloud BUILD_PATH=server/ui/assets/cloud vite build",
     "test": "TZ=UTC vitest",
     "test:ui": "TZ=UTC vitest --ui",
     "test:coverage": "TZ=UTC vitest run --coverage",
@@ -81,7 +81,7 @@
     "@playwright/test": "^1.30.0",
     "@sveltejs/adapter-static": "^1.0.5",
     "@sveltejs/adapter-vercel": "^1.0.5",
-    "@sveltejs/kit": "1.0.1",
+    "@sveltejs/kit": "1.11.0",
     "@sveltejs/vite-plugin-svelte": "^2.0.2",
     "@temporalio/proto": "^1.6.0",
     "@temporalio/testing": "^1.6.0",

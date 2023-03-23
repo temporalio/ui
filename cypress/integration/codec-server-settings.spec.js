@@ -1,8 +1,9 @@
-describe('Set Data Encoder Settings', () => {
-  describe('Data Encoder without site setting codec endpoint', () => {
+describe('Set Codec Server Settings', () => {
+  describe('Codec Server without site setting codec endpoint', () => {
     beforeEach(() => {
       cy.interceptApi();
       cy.clearLocalStorage();
+      cy.setTopNavFeatureTag();
 
       cy.visit('/namespaces/default/workflows');
 
@@ -17,12 +18,12 @@ describe('Set Data Encoder Settings', () => {
       cy.wait('@workflows-api');
       cy.wait('@namespaces-api');
 
-      cy.get('[data-testid="navigation-header"]').as('header');
+      cy.get('[data-testid="top-nav"]').as('header');
     });
 
     it('Enter invalid endpoint to show error and enter valid enpoint with confirm', () => {
       cy.get('@header').find('[data-testid="data-encoder-status"]').click();
-      cy.get('[data-testid="data-encoder-title"]').contains('Data Encoder');
+      cy.get('[data-testid="data-encoder-title"]').contains('Codec Server');
       cy.get('[data-testid="data-encoder-endpoint-title"]').contains(
         'Remote Codec Endpoint',
       );
@@ -66,7 +67,7 @@ describe('Set Data Encoder Settings', () => {
 
     it('Check pass access token and enter invalid endpoint to show error and enter valid enpoint with confirm', () => {
       cy.get('@header').find('[data-testid="data-encoder-status"]').click();
-      cy.get('[data-testid="data-encoder-title"]').contains('Data Encoder');
+      cy.get('[data-testid="data-encoder-title"]').contains('Codec Server');
       cy.get('[data-testid="data-encoder-endpoint-title"]').contains(
         'Remote Codec Endpoint',
       );
@@ -116,7 +117,7 @@ describe('Set Data Encoder Settings', () => {
 
     it('Enter port with confirm', () => {
       cy.get('@header').find('[data-testid="data-encoder-status"]').click();
-      cy.get('[data-testid="data-encoder-title"]').contains('Data Encoder');
+      cy.get('[data-testid="data-encoder-title"]').contains('Codec Server');
       cy.get('[data-testid="data-encoder-endpoint-title"]').contains(
         'Remote Codec Endpoint',
       );
@@ -146,10 +147,11 @@ describe('Set Data Encoder Settings', () => {
     });
   });
 
-  describe('Data Encoder with site setting codec endpoint', () => {
+  describe('Codec Server with site setting codec endpoint', () => {
     beforeEach(() => {
       cy.interceptApi();
       cy.clearLocalStorage();
+      cy.setTopNavFeatureTag();
 
       cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/settings*', {
         Auth: { Enabled: false, Options: null },
@@ -171,14 +173,14 @@ describe('Set Data Encoder Settings', () => {
       cy.wait('@workflows-api');
       cy.wait('@namespaces-api');
 
-      cy.get('[data-testid="navigation-header"]').as('header');
+      cy.get('[data-testid="top-nav"]').as('header');
     });
 
     it('Enter invalid endpoint to show error and enter valid enpoint with confirm', () => {
       cy.get('@header')
         .find('[data-testid="data-encoder-status-configured"]')
         .click();
-      cy.get('[data-testid="data-encoder-title"]').contains('Data Encoder');
+      cy.get('[data-testid="data-encoder-title"]').contains('Codec Server');
       cy.get('[data-testid="data-encoder-endpoint-title"]').contains(
         'Remote Codec Endpoint',
       );

@@ -9,10 +9,10 @@
 </script>
 
 <MenuContainer>
-  <MenuButton controls={id} bind:show>
+  <MenuButton controls={id} bind:show class={$$restProps.buttonClass}>
     <slot name="trigger" />
   </MenuButton>
-  <Menu {position} class="min-w-fit" {show} {id}>
-    <slot name="items" />
+  <Menu {position} class="min-w-fit {$$restProps.menuClass}" {show} {id}>
+    <slot name="items" {show} />
   </Menu>
 </MenuContainer>

@@ -24,14 +24,16 @@ package route
 
 import (
 	"bytes"
+	"fmt"
 	"io/fs"
 	"net/http"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 )
 
 // SetUIRoutes sets UI routes
-func SetUIRoutes(e *echo.Echo, assets fs.FS) error {
+func SetUIRoutes(e *echo.Echo, publicPath string, assets fs.FS) error {
 	assetsHandler := buildUIAssetsHandler(assets)
 	e.GET("/_app/*", assetsHandler)
 	e.GET("/css/*", assetsHandler)
@@ -43,7 +45,7 @@ func SetUIRoutes(e *echo.Echo, assets fs.FS) error {
 	e.GET("/logo*", assetsHandler)
 	e.GET("/Temporal_Logo_Animation.gif", assetsHandler)
 	e.GET("/site.webmanifest", assetsHandler)
-	indexHandler, err := buildUIIndexHandler(assets)
+	indexHandler, err := buildUIIndexHandler(publicPath, assets)
 	if err != nil {
 		return err
 	}
@@ -53,14 +55,20 @@ func SetUIRoutes(e *echo.Echo, assets fs.FS) error {
 	return nil
 }
 
-func buildUIIndexHandler(assets fs.FS) (echo.HandlerFunc, error) {
-	indexHTML, err := fs.ReadFile(assets, "index.html")
+func buildUIIndexHandler(publicPath string, assets fs.FS) (echo.HandlerFunc, error) {
+	indexHTMLBytes, err := fs.ReadFile(assets, "index.html")
 	if err != nil {
 		return nil, err
 	}
+	if publicPath != "" {
+		indexHTML := string(indexHTMLBytes)
+		indexHTML = strings.ReplaceAll(indexHTML, "base: \"\"", fmt.Sprintf("base: \"%s\"", publicPath))
+		indexHTML = strings.ReplaceAll(indexHTML, "\"/_app/", fmt.Sprintf("\"%s/_app/", publicPath))
+		indexHTMLBytes = []byte(indexHTML)
+	}
 
 	return func(c echo.Context) (err error) {
-		return c.Stream(200, "text/html", bytes.NewBuffer(indexHTML))
+		return c.Stream(200, "text/html", bytes.NewBuffer(indexHTMLBytes))
 	}, nil
 }
 

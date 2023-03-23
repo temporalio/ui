@@ -18,8 +18,8 @@
   <h3 slot="action-top-left">Completed Children</h3>
   <Table class="w-full">
     <TableHeaderRow slot="headers">
-      <th class="md:table-cell">Child Workflow ID</th>
-      <th class="md:table-cell">Child Run ID</th>
+      <th>Child Workflow ID</th>
+      <th>Child Run ID</th>
     </TableHeaderRow>
     {#each visibleItems as child (child.id)}
       <TableRow

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { noop } from 'svelte/internal';
   import { page } from '$app/stores';
   import { timeFormat } from '$lib/stores/time-format';
   import {
@@ -10,6 +11,7 @@
     workflowError,
     workflowCount,
     workflowsQuery,
+    workflowsSearchParams,
   } from '$lib/stores/workflows';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
@@ -20,7 +22,6 @@
   import Pagination from '$lib/holocene/pagination.svelte';
   import WorkflowsSummaryTableWithFilters from '$lib/components/workflow/workflows-summary-table-with-filters.svelte';
   import WorkflowsSummaryRowWithFilters from '$lib/components/workflow/workflows-summary-row-with-filters.svelte';
-  import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import WorkflowDateTimeFilter from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
@@ -36,6 +37,14 @@
   import { bulkActionsEnabled as workflowBulkActionsEnabled } from '$lib/utilities/bulk-actions-enabled';
   import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
   import { toaster } from '$lib/stores/toaster';
+  import {
+    workflowTableColumns,
+    addColumn,
+    removeColumn,
+    moveColumn,
+  } from '$lib/stores/workflow-table-columns';
+  import Drawer from '$lib/holocene/drawer.svelte';
+  import OrderableList from '$lib/holocene/orderable-list.svelte';
 
   $: bulkActionsEnabled = workflowBulkActionsEnabled(
     $page.data.settings,
@@ -48,14 +57,14 @@
   let allSelected: boolean = false;
   let pageSelected: boolean = false;
 
-  $: query = $page.url.searchParams.get('query');
+  // let customizationDrawerOpen: boolean = false;
 
-  $: {
-    // For returning to page from 'Back to Workflows' with previous search
-    if (query) {
-      $workflowsQuery = query;
-    }
-  }
+  $: query = $page.url.searchParams.get('query');
+  $: query && ($workflowsQuery = query);
+
+  // For returning to page from 'Back to Workflows' with previous search
+  $: searchParams = $page.url.searchParams.toString();
+  $: searchParams, ($workflowsSearchParams = searchParams);
 
   $: {
     if (!$workflowFilters.length && !$workflowSorts.length) {
@@ -198,6 +207,14 @@
     }
   };
 
+  // const openCustomizationDrawer = () => {
+  //   customizationDrawerOpen = true;
+  // };
+
+  // const closeCustomizationDrawer = () => {
+  //   customizationDrawerOpen = false;
+  // };
+
   $: batchOperationQuery = !$workflowsQuery
     ? 'ExecutionStatus="Running"'
     : $workflowsQuery;
@@ -248,10 +265,7 @@
 
 <header class="mb-2 flex justify-between">
   <div>
-    <h1 class="text-2xl" data-testid="namespace-title">
-      Recent Workflows
-      <NamespaceSelector />
-    </h1>
+    <h1 class="text-2xl" data-cy="namespace-title">Recent Workflows</h1>
     <div class="flex items-center gap-2 text-sm">
       <p data-testid="namespace-name">
         {$page.params.namespace}
@@ -325,7 +339,7 @@
             />
           {/if}
         </td>
-        <td colspan={bulkActionsEnabled ? 8 : 7} class="hidden xl:table-cell">
+        <td colspan={bulkActionsEnabled ? 8 : 7} class="max-xl:hidden">
           {#if $loading}
             <Loading />
           {:else}
@@ -340,3 +354,35 @@
     {/each}
   </WorkflowsSummaryTableWithFilters>
 </Pagination>
+
+<Drawer
+  open={false}
+  onClick={noop}
+  position="right"
+  dark={false}
+  title="Configure Workflow List"
+>
+  <svelte:fragment slot="subtitle">
+    <span>Add (</span><Icon class="inline" name="add" /><span
+      >), re-arrange (</span
+    ><Icon class="inline" name="chevron-selector-vertical" /><span
+      >), and remove (</span
+    ><Icon class="inline" name="hyphen" /><span
+      >), Workflow<br />Headings to personalize the Workflow List Table.</span
+    >
+  </svelte:fragment>
+  <OrderableList
+    items={$workflowTableColumns.columns}
+    availableItems={$workflowTableColumns.availableColumns}
+    onAddItem={addColumn}
+    onRemoveItem={removeColumn}
+    onMoveItem={moveColumn}
+  >
+    <svelte:fragment slot="main-heading">
+      Workflow Headings <span class="font-normal">(in view)</span>
+    </svelte:fragment>
+    <svelte:fragment slot="bank-heading">
+      Available Headings <span class="font-normal">(not in view)</span>
+    </svelte:fragment>
+  </OrderableList>
+</Drawer>

@@ -15,8 +15,6 @@ jobs:
           submodules: true
       - name: Checkout and Setup Node
         uses: ./.github/actions/checkout-and-setup
-      - name: Build UI
-        run: pnpm build:server
 
       - uses: actions/setup-go@v3
         with:
@@ -28,7 +26,7 @@ jobs:
         with:
           version: '3.x'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build
+      - name: Build GRPC
         run: cd server && make install-utils build-grpc
 
       - name: Checkout UI Server
@@ -38,12 +36,16 @@ jobs:
           path: ui-server
           ref: main
           token: ${{ secrets.COMMANDER_DATA_TOKEN }}
-      - name: Sync
+
+      - name: Build UI
+        run: pnpm build:server
+
+      - name: Sync UI Server
         run: |
           rm -rf ui-server/*
+          rm -rf server/proto/dependencies/api
           cp -r server/* ui-server
           cd ui-server
-          rm -rf server/proto/dependencies/api/.git
           git config --local user.name 'Temporal Data (cicd)'
           git config --local user.email 'commander-data@temporal.io'
           git add .

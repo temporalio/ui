@@ -91,7 +91,7 @@
   .destructive,
   .success,
   .login {
-    @apply border-3 py-2 px-4 transition-colors;
+    @apply border-2 py-2 px-4 transition-colors;
   }
 
   .button:disabled {

@@ -1,9 +1,11 @@
 import { test, expect } from '@playwright/test';
 import { workflowsApi, mockClusterApi } from '$utilities/mock-apis.js';
+import { setLocalStorage } from '$utilities/mock-local-storage';
 const workflowsUrl = '/namespaces/default/workflows';
 
 test.beforeEach(async ({ page }) => {
   await mockClusterApi(page);
+  await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
 });
 
 test('requests workflows', async ({ page }) => {

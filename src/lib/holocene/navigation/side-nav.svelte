@@ -11,38 +11,18 @@
   import type { SvelteComponent } from 'svelte';
   import type { DescribeNamespaceResponse as Namespace } from '$types';
 
-  import { namespaceSelectorOpen } from '$lib/stores/nav-open';
-
   import NavContainer from '$lib/holocene/navigation/nav-container.svelte';
   import NavRow from '$lib/holocene/navigation/nav-row.svelte';
-  import NamespaceList from '$lib/components/namespace-list.svelte';
-  import Drawer from '$lib/holocene/navigation/drawer.svelte';
   import NavTooltip from '$lib/holocene/nav-tooltip.svelte';
   import IsCloudGuard from '$lib/components/is-cloud-guard.svelte';
 
-  import { afterNavigate } from '$app/navigation';
   import FeatureGuard from '$lib/components/feature-guard.svelte';
   import IsLegacyCloudGuard from '$lib/components/is-legacy-cloud-guard.svelte';
 
   export let isCloud = false;
   export let activeNamespace: Namespace;
-  export let getNamespaceList: () => Promise<NamespaceItem[]>;
   export let linkList: Partial<Record<string, string>>;
-  export let user: Promise<User> | undefined;
-  export let logout: () => void;
   export let extras: ExtraIcon[] | null = null;
-
-  let showProfilePic = true;
-
-  function fixImage() {
-    showProfilePic = false;
-  }
-
-  afterNavigate(() => {
-    if ($namespaceSelectorOpen) {
-      $namespaceSelectorOpen = false;
-    }
-  });
 </script>
 
 <NavContainer {isCloud} {linkList}>
@@ -136,73 +116,6 @@
       </NavRow>
     </slot>
     <slot name="settings" />
-    {#await user}
-      <NavRow {isCloud}>
-        <div class="motion-safe:animate-pulse" style="margin-left: 1rem;">
-          <div class="rounded-full bg-blueGray-200 h-full aspect-square" />
-        </div>
-        <div class="nav-title">
-          <div class="h-2 bg-blueGray-50 rounded mt-1" />
-        </div>
-      </NavRow>
-    {:then user}
-      {#if user?.accessToken}
-        <NavRow class="cursor-pointer" handleClick={logout} {isCloud}>
-          <NavTooltip right text="Logout">
-            <div class="nav-icon">
-              <Icon name="logout" />
-            </div>
-          </NavTooltip>
-          <div class="nav-title">Logout</div>
-        </NavRow>
-        <li class="profile-row">
-          <div>
-            {#if user?.picture}
-              <img
-                src={user?.picture}
-                alt={user?.profile ?? 'user profile'}
-                class="rounded-md p-1 w-8 h-8"
-                on:error={fixImage}
-                class:hidden={!showProfilePic}
-              />
-              <div
-                class="rounded-full p-0.5 bg-blue-200 h-full aspect-square"
-                class:hidden={showProfilePic}
-              >
-                {#if user?.name}
-                  <div class="text-black text-center ">
-                    {user?.name.trim().charAt(0)}
-                  </div>
-                {/if}
-              </div>
-            {/if}
-          </div>
-          <div class="nav-title truncate">
-            {#if user?.name}
-              {user?.name}
-            {/if}
-          </div>
-        </li>
-      {/if}
-    {/await}
-  </svelte:fragment>
-  <svelte:fragment slot="drawer">
-    <Drawer
-      flyin={$namespaceSelectorOpen === true}
-      flyout={$namespaceSelectorOpen === false}
-      onClose={() => {
-        if ($namespaceSelectorOpen === true) $namespaceSelectorOpen = false;
-      }}
-    >
-      {#if $namespaceSelectorOpen}
-        <NamespaceList
-          {getNamespaceList}
-          on:closeNamespaceList={() => {
-            $namespaceSelectorOpen = false;
-          }}
-        />
-      {/if}
-    </Drawer>
   </svelte:fragment>
 </NavContainer>
 
@@ -211,17 +124,9 @@
     @apply ml-2 mr-2 mt-0 h-6 cursor-pointer;
   }
 
-  .cursor {
-    @apply cursor-pointer;
-  }
-
   .nav-title {
     width: 100px;
     overflow: hidden;
     transition: width 0.15s linear;
-  }
-
-  .profile-row {
-    @apply ml-1 flex flex-row items-center rounded-lg py-1 text-sm font-medium;
   }
 </style>

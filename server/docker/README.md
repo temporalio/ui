@@ -45,7 +45,7 @@ Build the image
 
 ``` bash
 make install-submodules
-docker build --build-arg UI_PUBLIC_PATH=/custom-path -t temporal-ui .
+docker build -t temporal-ui .
 ```
 
 Run the image

@@ -13,6 +13,7 @@ const {
 describe('Schedules List', () => {
   beforeEach(() => {
     cy.interceptApi();
+    cy.setTopNavFeatureTag();
 
     cy.visit('/namespaces/default/schedules');
 
@@ -29,6 +30,7 @@ describe('Schedules List', () => {
 describe('Schedules View', () => {
   beforeEach(() => {
     cy.interceptApi();
+    cy.setTopNavFeatureTag();
 
     cy.visit('/namespaces/default/schedules');
 
@@ -56,6 +58,7 @@ describe('Schedules View', () => {
 describe('Schedules Edit', () => {
   beforeEach(() => {
     cy.interceptApi();
+    cy.setTopNavFeatureTag();
 
     cy.visit('/namespaces/default/schedules');
 
@@ -88,6 +91,7 @@ describe('Schedules Edit', () => {
 describe('Schedules Create', () => {
   beforeEach(() => {
     cy.interceptApi();
+    cy.setTopNavFeatureTag();
 
     cy.visit('/namespaces/default/schedules');
 
