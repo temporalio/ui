@@ -9,6 +9,7 @@
 
   import {
     routeForEventHistory,
+    routeForEventHistoryV2,
     routeForPendingActivities,
     routeForStackTrace,
     routeForWorkers,
@@ -101,7 +102,17 @@
     >
       <Icon name="chevron-left" class="inline" />Back to Workflows
     </a>
-    <slot name="feature-flag" />
+    <a
+      href={`${routeForEventHistoryV2({
+        namespace,
+        workflow: workflow.id,
+        run: workflow.runId,
+      })}?${$workflowsSearchParams}`}
+      data-testid="history-v2"
+      class="back-to-workflows"
+    >
+      Switch to v2 Workflow UI
+    </a>
   </div>
   <div
     class="mb-8 flex w-full flex-col items-center justify-between gap-4 lg:flex-row"

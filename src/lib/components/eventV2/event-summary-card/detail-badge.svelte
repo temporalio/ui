@@ -80,6 +80,6 @@
 
 <style lang="postcss">
   .cell {
-    @apply border-b-3 border-gray-500;
+    @apply border-b-2 border-gray-500;
   }
 </style>

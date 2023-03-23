@@ -22,7 +22,7 @@
 <Card {event} events={[]} pending let:expanded>
   <div class="primary flex w-full cursor-pointer justify-between">
     <div class="flex items-center gap-4">
-      <div class="rounded-xl border-3 border-gray-900 bg-lightBlue py-1 px-2">
+      <div class="rounded-xl border-2 border-gray-900 bg-lightBlue py-1 px-2">
         In progress
       </div>
       <div class="flex items-center">
