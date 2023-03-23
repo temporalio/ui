@@ -39,7 +39,6 @@
   let batchCancelConfirmationModal: BatchOperationConfirmationModal;
   let allSelected: boolean = false;
   let pageSelected: boolean = false;
-  let scrollY;
 
   $: query = $page.url.searchParams.get('query');
   $: query && ($workflowsQuery = query);
@@ -228,8 +227,6 @@
   query={batchOperationQuery}
   on:confirm={cancelWorkflows}
 />
-
-<svelte:window bind:scrollY />
 
 <header class="mb-2 flex justify-between">
   <div>
