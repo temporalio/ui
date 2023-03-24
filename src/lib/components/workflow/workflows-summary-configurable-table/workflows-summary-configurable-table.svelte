@@ -391,7 +391,7 @@
       /* when the user has no pinned columns, hard code the wrapper to the width of the checkbox column, or 0 */
       &.no-columns-pinned {
         &.batch-actions-enabled {
-          @apply !w-[43px];
+          @apply !w-[40px];
         }
 
         &:not(.batch-actions-enabled) {
