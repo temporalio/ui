@@ -65,9 +65,9 @@
   $: terminateEnabled = workflowTerminateEnabled($page.data.settings);
   $: cancelEnabled = workflowCancelEnabled($page.data.settings);
 
-  $: sortDisabled = false;
-  // $workflowCount?.totalCount >= 1000000 ||
-  // !$supportsAdvancedVisibilityWithOrderBy;
+  $: sortDisabled =
+    $workflowCount?.totalCount >= 1000000 ||
+    !$supportsAdvancedVisibilityWithOrderBy;
 
   $: indeterminate =
     selectedWorkflows.length > 0 && selectedWorkflows.length < workflows.length;
