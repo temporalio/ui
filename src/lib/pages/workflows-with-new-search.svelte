@@ -25,7 +25,7 @@
   } from '$lib/services/batch-service';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
-  import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
+  import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { toaster } from '$lib/stores/toaster';
   import FeatureGuard from '$lib/components/feature-guard.svelte';
   import WorkflowsSummaryNonConfigurableTable from '$lib/components/workflow/workflows-summary-non-configurable-table/workflows-summary-non-configurable-table.svelte';

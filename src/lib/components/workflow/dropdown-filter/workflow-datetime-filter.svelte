@@ -23,7 +23,7 @@
   import { page } from '$app/stores';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
-  import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
+  import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
 
   let custom = false;
   let show = false;
