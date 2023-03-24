@@ -3,11 +3,8 @@
   import { page } from '$app/stores';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import { routeForEventHistory } from '$lib/utilities/route-for';
-  import {
-    supportsAdvancedVisibility,
-    supportsAdvancedVisibilityWithOrderBy,
-  } from '$lib/stores/bulk-actions';
-  import { bulkActionsEnabled as workflowBulkActionsEnabled } from '$lib/utilities/bulk-actions-enabled';
+  import { supportsAdvancedVisibilityWithOrderBy } from '$lib/stores/advanced-visibility';
+  import { supportsBulkActions } from '$lib/stores/bulk-actions';
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import {
     workflowTableColumns,
@@ -74,11 +71,6 @@
 
   $: indeterminate =
     selectedWorkflows.length > 0 && selectedWorkflows.length < workflows.length;
-
-  $: bulkActionsEnabled = workflowBulkActionsEnabled(
-    $page.data.settings,
-    $supportsAdvancedVisibility,
-  );
 
   $: namespaceWriteDisabled = $coreUser.namespaceWriteDisabled(
     $page.params.namespace,
@@ -160,7 +152,7 @@
     <table class="workflow-summary-table pinned">
       <thead>
         <tr class="workflow-summary-header-row pinned">
-          {#if bulkActionsEnabled}
+          {#if $supportsBulkActions}
             <th>
               <Checkbox
                 id="select-visible-workflows"
@@ -172,7 +164,7 @@
               />
             </th>
           {/if}
-          {#if bulkActionsEnabled && showBulkActions}
+          {#if $supportsBulkActions && showBulkActions}
             <th
               class="text-left text-sm font-medium overflow-visible whitespace-nowrap font-secondary px-2"
               colspan={pinnedColumns.length}
@@ -230,7 +222,7 @@
             class="workflow-summary-row pinned"
             on:click={() => goToWorkflow(workflow)}
           >
-            {#if bulkActionsEnabled}
+            {#if $supportsBulkActions}
               <td>
                 <Checkbox
                   hoverable

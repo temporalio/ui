@@ -3,8 +3,7 @@
 
   import WorkflowsSummaryRowWithFilters from './workflows-summary-row-with-filters.svelte';
   import WorkflowsSummaryTableWithFilters from './workflows-summary-table-with-filters.svelte';
-  import { bulkActionsEnabled as workflowBulkActionsEnabled } from '$lib/utilities/bulk-actions-enabled';
-  import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
+  import { supportsBulkActions } from '$lib/stores/bulk-actions';
   import { updating, loading, workflowError } from '$lib/stores/workflows';
   import { timeFormat } from '$lib/stores/time-format';
   import Loading from '$lib/holocene/loading.svelte';
@@ -16,17 +15,12 @@
   export let allSelected: boolean;
   export let pageSelected: boolean;
 
-  $: bulkActionsEnabled = workflowBulkActionsEnabled(
-    $page.data.settings,
-    $supportsAdvancedVisibility,
-  );
-
   $: selectedWorkflowsCount = selectedWorkflows.length;
 </script>
 
 <WorkflowsSummaryTableWithFilters
   updating={$updating}
-  {bulkActionsEnabled}
+  bulkActionsEnabled={$supportsBulkActions}
   {workflows}
   {selectedWorkflowsCount}
   {filteredWorkflowCount}
@@ -39,7 +33,7 @@
 >
   {#each workflows as event}
     <WorkflowsSummaryRowWithFilters
-      {bulkActionsEnabled}
+      bulkActionsEnabled={$supportsBulkActions}
       workflow={event}
       namespace={$page.params.namespace}
       timeFormat={$timeFormat}
@@ -48,7 +42,7 @@
     />
   {:else}
     <tr>
-      <td colspan={bulkActionsEnabled ? 6 : 5} class="xl:hidden">
+      <td colspan={$supportsBulkActions ? 6 : 5} class="xl:hidden">
         {#if $loading}
           <Loading />
         {:else}
@@ -59,7 +53,7 @@
           />
         {/if}
       </td>
-      <td colspan={bulkActionsEnabled ? 8 : 7} class="max-xl:hidden">
+      <td colspan={$supportsBulkActions ? 8 : 7} class="max-xl:hidden">
         {#if $loading}
           <Loading />
         {:else}
