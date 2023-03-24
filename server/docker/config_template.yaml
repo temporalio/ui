@@ -17,6 +17,7 @@ workflowSignalDisabled: {{ default .Env.TEMPORAL_WORKFLOW_SIGNAL_DISABLED "false
 workflowResetDisabled: {{ default .Env.TEMPORAL_WORKFLOW_RESET_DISABLED "false" }}
 batchActionsDisabled: {{ default .Env.TEMPORAL_BATCH_ACTIONS_DISABLED "false" }}
 cors:
+  cookieInsecure: {{ default .Env.TEMPORAL_CSRF_COOKIE_INSECURE "false" }}
   allowOrigins:
     # override framework's default that allows all origins "*"
     - {{ default .Env.TEMPORAL_CORS_ORIGINS "http://localhost:8080" }}
