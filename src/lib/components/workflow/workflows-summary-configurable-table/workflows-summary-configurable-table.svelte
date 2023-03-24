@@ -151,7 +151,10 @@
   >
     <table class="workflow-summary-table pinned">
       <thead>
-        <tr class="workflow-summary-header-row pinned">
+        <tr
+          class="workflow-summary-header-row pinned"
+          class:batch-actions-visible={showBulkActions}
+        >
           {#if $supportsBulkActions}
             <th>
               <Checkbox
@@ -167,7 +170,7 @@
           {#if $supportsBulkActions && showBulkActions}
             <th
               class="text-left text-sm font-medium overflow-visible whitespace-nowrap font-secondary px-2"
-              colspan={pinnedColumns.length}
+              colspan={pinnedColumns.length || 1}
             >
               {#if allSelected}
                 <span class="font-semibold">
@@ -363,8 +366,8 @@
     @apply relative flex bg-white border-primary border-y-2 overflow-y-visible;
 
     &.pinned {
-      /* 40px is width of checkbox column */
-      @apply overflow-x-hidden rounded-l-lg min-w-[40px] max-w-fit border-l-2;
+      /** 40px is the width of the checkbox column + 3px of ::after width */
+      @apply rounded-l-lg min-w-[43px] max-w-fit border-l-2;
 
       &::after {
         @apply absolute right-0 content-[''] bg-primary w-[3px] h-full cursor-ew-resize;
@@ -390,6 +393,10 @@
     @apply bg-primary text-white h-10;
 
     &.pinned {
+      &.batch-actions-visible {
+        @apply relative z-10;
+      }
+
       :global(th) {
         @apply first:rounded-tl;
       }
