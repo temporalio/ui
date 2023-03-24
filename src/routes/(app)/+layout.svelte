@@ -22,6 +22,8 @@
   import MainContentContainer from '$lib/holocene/main-content-container.svelte';
   import SideNavigation from '$lib/holocene/navigation/side-nav.svelte';
   import TopNavigation from '$lib/holocene/navigation/top-nav.svelte';
+  import { onMount } from 'svelte';
+  import { browser } from '$lib/svelte-mocks/app/environment';
 
   export let data: PageData;
 
@@ -80,6 +82,17 @@
     if (value) {
       // Hard refresh when version does not match
       window.location.reload();
+    }
+  });
+
+  onMount(async () => {
+    if (browser) {
+      try {
+        const codecServerHeaderOptionScript = await import(
+          '$lib/vendor/codec-server-header-options.js'
+        );
+        codecServerHeaderOptionScript.default();
+      } catch (e) {}
     }
   });
 </script>

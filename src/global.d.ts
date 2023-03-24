@@ -3,6 +3,11 @@
 declare module '@crownframework/svelte-error-boundary';
 declare module '@sveltejs/svelte-virtual-list';
 
+declare global {
+  const AccessToken: string | undefined;
+  const CodecServerHeaderOptions: Record<string, string> | undefined;
+}
+
 type NamespaceListItem = {
   namespace: string;
   href: (namspace: string) => string;
