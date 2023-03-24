@@ -31,9 +31,7 @@
   import WorkflowsSummaryNonConfigurableTable from '$lib/components/workflow/workflows-summary-non-configurable-table/workflows-summary-non-configurable-table.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table/workflows-summary-configurable-table.svelte';
 
-  // TODO: Make me a feature flag
-  export let workflowTableCustomizationEnabled: boolean = false;
-
+  export let workflowTableCustomizationEnabled: boolean = true;
   let selectedWorkflows: WorkflowExecution[] = [];
   let batchTerminateConfirmationModal: BatchOperationConfirmationModal;
   let batchCancelConfirmationModal: BatchOperationConfirmationModal;

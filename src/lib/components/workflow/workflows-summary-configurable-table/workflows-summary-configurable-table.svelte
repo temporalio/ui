@@ -65,9 +65,9 @@
   $: terminateEnabled = workflowTerminateEnabled($page.data.settings);
   $: cancelEnabled = workflowCancelEnabled($page.data.settings);
 
-  $: sortDisabled =
-    $workflowCount?.totalCount >= 1000000 ||
-    !$supportsAdvancedVisibilityWithOrderBy;
+  $: sortDisabled = false;
+  // $workflowCount?.totalCount >= 1000000 ||
+  // !$supportsAdvancedVisibilityWithOrderBy;
 
   $: indeterminate =
     selectedWorkflows.length > 0 && selectedWorkflows.length < workflows.length;
@@ -142,7 +142,7 @@
   on:mousemove|stopPropagation={handleMouseMove}
   on:mouseup|stopPropagation={handleMouseUp}
 />
-<div class="relative flex flex-row w-full rounded-lg">
+<div class="relative flex flex-row w-full rounded-lg overflow-auto">
   <div
     class="workflow-summary-table-wrapper pinned"
     bind:this={resizableContainer}
@@ -360,11 +360,11 @@
 
 <style lang="postcss">
   .workflow-summary-table-wrapper {
-    @apply relative flex bg-white border-primary border-y-2;
+    @apply relative flex bg-white border-primary border-y-2 overflow-y-visible;
 
     &.pinned {
       /* 40px is width of checkbox column */
-      @apply rounded-l-lg min-w-[40px] max-w-fit border-l-2;
+      @apply overflow-x-hidden rounded-l-lg min-w-[40px] max-w-fit border-l-2;
 
       &::after {
         @apply absolute right-0 content-[''] bg-primary w-[3px] h-full cursor-ew-resize;

@@ -9,14 +9,13 @@
 
   export let value: string | undefined;
   export let icon: IconName | undefined = undefined;
-  export let left = false;
   export let right = false;
   export let keepOpen = false;
   export let disabled = false;
   export let disabledText = 'Disabled';
 
   let show: boolean = false;
-  let menu: any = null;
+  let menu: HTMLDivElement = null;
 
   $: {
     // Close the menu any time the value changes
@@ -25,9 +24,11 @@
     }
   }
 
+  $: style = right ? `margin-left:-${menu?.offsetWidth}px` : '';
+
   onMount(() => {
     const handleOutsideClick = (event: Event) => {
-      if (show && !menu.contains(event.target)) {
+      if (show && !menu.contains(event.target as Node)) {
         show = false;
       }
     };
@@ -76,8 +77,7 @@
       <div
         in:scale={{ duration: 200, start: 0.65 }}
         out:scale={{ duration: 100, start: 0.65 }}
-        class:left
-        class:right
+        {style}
         class="dropdown-menu"
       >
         <div class="block gap-4">
@@ -93,16 +93,8 @@
 
 <style lang="postcss">
   .dropdown-menu {
-    @apply absolute z-50 mt-1 w-auto
+    @apply fixed z-50 mt-1 w-auto
       rounded border border-gray-900 bg-white py-2 text-gray-900 shadow-md;
-  }
-
-  .dropdown-menu.left {
-    @apply absolute left-0 origin-top-left;
-  }
-
-  .dropdown-menu.right {
-    @apply absolute right-0 origin-top-right;
   }
 
   .dot {
