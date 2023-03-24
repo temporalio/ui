@@ -142,9 +142,12 @@
   on:mousemove|stopPropagation={handleMouseMove}
   on:mouseup|stopPropagation={handleMouseUp}
 />
-<div class="relative flex flex-row w-full rounded-lg overflow-auto">
+<div class="workflow-summary-tables-wrapper">
   <div
     class="workflow-summary-table-wrapper pinned"
+    class:batch-actions-enabled={$supportsBulkActions}
+    class:batch-actions-visible={showBulkActions}
+    class:no-columns-pinned={pinnedColumns.length === 0}
     bind:this={resizableContainer}
     style="width:{resizableContainerWidth}px;"
     on:mousedown|stopPropagation|preventDefault={handleMouseDown}
@@ -362,20 +365,47 @@
 </Drawer>
 
 <style lang="postcss">
+  .workflow-summary-tables-wrapper {
+    @apply relative flex flex-row w-full rounded-lg overflow-auto border-primary border-2;
+  }
+
   .workflow-summary-table-wrapper {
-    @apply relative flex bg-white border-primary border-y-2 overflow-y-visible;
+    @apply relative flex bg-white overflow-y-visible;
 
     &.pinned {
-      /** 40px is the width of the checkbox column + 3px of ::after width */
-      @apply rounded-l-lg min-w-[43px] max-w-fit border-l-2;
+      /* 40px is the width of the checkbox column */
+      @apply rounded-l-lg min-w-[40px] max-w-fit;
 
       &::after {
-        @apply absolute right-0 content-[''] bg-primary w-[3px] h-full cursor-ew-resize;
+        @apply absolute right-0 content-[''] border-0 bg-primary w-[3px] h-full cursor-ew-resize;
+      }
+
+      &.batch-actions-visible {
+        @apply !w-full;
+
+        &::after {
+          @apply pointer-events-none;
+        }
+      }
+
+      /* when the user has no pinned columns, hard code the wrapper to the width of the checkbox column, or 0 */
+      &.no-columns-pinned {
+        &.batch-actions-enabled {
+          @apply !w-[43px];
+        }
+
+        &:not(.batch-actions-enabled) {
+          @apply hidden;
+        }
+
+        &::after {
+          @apply pointer-events-none;
+        }
       }
     }
 
     &:not(.pinned) {
-      @apply overflow-x-scroll flex-grow rounded-r-lg border-r-2;
+      @apply overflow-x-scroll flex-grow rounded-r;
     }
   }
 
