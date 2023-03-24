@@ -6,11 +6,7 @@ const ALLOWED_BULK_ACTIONS: (keyof Pick<
   | 'workflowTerminateDisabled'
 >)[] = ['workflowCancelDisabled', 'workflowTerminateDisabled'];
 
-export const bulkActionsEnabled = (
-  settings: Settings,
-  supportsAdvancedVisibility: boolean,
-) => {
-  if (!supportsAdvancedVisibility) return false;
+export const bulkActionsEnabled = (settings: Settings) => {
   if (settings.disableWriteActions) return false;
   if (settings.batchActionsDisabled) return false;
 

@@ -3,7 +3,7 @@ import type {
   WorkflowSort,
 } from '$lib/models/workflow-filters';
 import { isDuration, isDurationString, toDate, tomorrow } from '../to-duration';
-import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
+import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
 import { get } from 'svelte/store';
 
 export type QueryKey =
