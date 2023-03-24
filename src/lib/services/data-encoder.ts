@@ -19,7 +19,6 @@ export function setCodecServerHeaders(
   const headers = {
     'Content-Type': 'application/json',
     'X-Namespace': namespace,
-    credentials: 'same-origin',
   };
 
   if (globalThis?.CodecServerHeaderOptions) {

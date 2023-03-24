@@ -39,8 +39,7 @@ describe('setCodecServerHeaders', () => {
     );
     expect(headers['Content-Type']).toBe('application/json');
     expect(headers['X-Namespace']).toBe('default');
-    expect(headers['credentials']).toBe('same-origin');
-    expect(Object.keys(headers).length).toBe(3);
+    expect(Object.keys(headers).length).toBe(2);
     expect(validationFailed).toBe(false);
   });
 
@@ -56,9 +55,8 @@ describe('setCodecServerHeaders', () => {
     );
     expect(headers['Content-Type']).toBe('application/json');
     expect(headers['X-Namespace']).toBe('default');
-    expect(headers['credentials']).toBe('same-origin');
     expect(headers['Authorization']).toBe('Bearer abcdefg');
-    expect(Object.keys(headers).length).toBe(4);
+    expect(Object.keys(headers).length).toBe(3);
     expect(validationFailed).toBe(false);
   });
 
@@ -74,8 +72,7 @@ describe('setCodecServerHeaders', () => {
     );
     expect(headers['Content-Type']).toBe('application/json');
     expect(headers['X-Namespace']).toBe('default');
-    expect(headers['credentials']).toBe('same-origin');
-    expect(Object.keys(headers).length).toBe(3);
+    expect(Object.keys(headers).length).toBe(2);
     expect(validationFailed).toBe(true);
   });
 
