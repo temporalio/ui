@@ -237,10 +237,15 @@ const pinColumn = (label: WorkflowHeaderLabel | string) => {
   dispatch({ type: 'WORKFLOW_COLUMN.PIN', payload: { label } });
 };
 
+const workflowPinnedColumnsWidth = persistStore<number>(
+  'worfklow-pinned-columns-width',
+);
+
 export {
   workflowTableColumns,
   availableSearchAttributes,
   availableWorkflowColumns,
+  workflowPinnedColumnsWidth,
   addColumn,
   removeColumn,
   moveColumn,

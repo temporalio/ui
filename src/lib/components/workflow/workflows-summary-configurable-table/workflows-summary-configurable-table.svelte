@@ -18,6 +18,7 @@
     moveColumn,
     pinColumn,
     MAX_PINNED_COLUMNS,
+    workflowPinnedColumnsWidth,
   } from '$lib/stores/workflow-table-columns';
   import Drawer from '$lib/holocene/drawer.svelte';
   import OrderableList from '$lib/holocene/orderable-list/orderable-list.svelte';
@@ -58,6 +59,7 @@
   let coreUser = coreUserStore();
   let customizationDrawerOpen: boolean = false;
   let resizableContainer: HTMLDivElement;
+  let resizableContainerWidth: number = $workflowPinnedColumnsWidth;
   let resizing: boolean = false;
 
   $: namespace = $page.params.namespace;
@@ -133,13 +135,13 @@
 
   const handleMouseUp = () => {
     if (resizing) resizing = false;
+    $workflowPinnedColumnsWidth = resizableContainerWidth;
   };
 
   const handleMouseMove = (event: MouseEvent) => {
     if (!resizing) return false;
     const rect = resizableContainer.getBoundingClientRect();
-    const width = event.x - rect.x;
-    resizableContainer.style.width = `${width}px`;
+    resizableContainerWidth = event.x - rect.x;
     return false;
   };
 </script>
@@ -152,6 +154,7 @@
   <div
     class="workflow-summary-table-wrapper pinned"
     bind:this={resizableContainer}
+    style="width:{resizableContainerWidth}px;"
     on:mousedown|stopPropagation|preventDefault={handleMouseDown}
   >
     <table class="workflow-summary-table pinned">
