@@ -20,11 +20,16 @@ export async function convertPayloadsWithCodec({
 }): Promise<Payloads> {
   const endpoint = settings?.codec?.endpoint;
   const passAccessToken = settings?.codec?.passAccessToken;
+  const includeCredentials = settings?.codec?.includeCredentials;
 
   const headers = {
     'Content-Type': 'application/json',
     'X-Namespace': namespace,
   };
+
+  if (includeCredentials) {
+    headers['credentials'] = 'include';
+  }
 
   if (passAccessToken) {
     if (validateHttps(endpoint)) {

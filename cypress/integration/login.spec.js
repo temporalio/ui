@@ -8,7 +8,11 @@ describe('Login page', () => {
       ShowTemporalSystemNamespace: false,
       FeedbackURL: '',
       NotifyOnNewVersion: true,
-      Codec: { Endpoint: '', PassAccessToken: false },
+      Codec: {
+        Endpoint: '',
+        PassAccessToken: false,
+        IncludeCredentials: false,
+      },
     }).as('settings-api');
   });
 
