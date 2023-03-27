@@ -51,8 +51,8 @@
     </label>
     {#if includeCreds}
       <small data-testid="data-encoder-cross-origin-credentials"
-        >Warning: Pre-flight checks will be done if checked and could result in
-        failures to decode if uncorrectly configured.</small
+        >Warning: Pre-flight checks will be done and could result in failure to
+        decode if incorrectly configured.</small
       >
     {/if}
     {#if $dataEncoder.settingsEndpoint}
