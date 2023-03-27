@@ -290,6 +290,69 @@ describe('convertPayloadToJsonWithCodec', () => {
     const dataConverterStatus = get(lastDataEncoderStatus);
     expect(dataConverterStatus).toEqual('notRequested');
   });
+  it('Should include credentials with the request for cookie based authentication of data converters when includeCredentials is true', async () => {
+    const mockFetch = vi.fn(async () => {
+      return {
+        json: () => Promise.resolve({ payloads: [JsonPlainEncoded] }),
+      };
+    });
+
+    vi.stubGlobal('fetch', mockFetch);
+
+    const endpoint = 'http://localhost:1337';
+    await convertPayloadToJsonWithCodec({
+      attributes: parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
+      namespace: 'default',
+      settings: {
+        codec: {
+          endpoint,
+          includeCredentials: true,
+        },
+      },
+    });
+
+    expect(mockFetch).toBeCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Namespace': 'default',
+          credentials: 'include',
+        },
+      }),
+    );
+  });
+  it('Should not include credentials with the request for cookie based authentication of data converters when includeCredentials is false', async () => {
+    const mockFetch = vi.fn(async () => {
+      return {
+        json: () => Promise.resolve({ payloads: [JsonPlainEncoded] }),
+      };
+    });
+
+    vi.stubGlobal('fetch', mockFetch);
+
+    const endpoint = 'http://localhost:1337';
+    await convertPayloadToJsonWithCodec({
+      attributes: parseWithBigInt(stringifyWithBigInt(workflowStartedEvent)),
+      namespace: 'default',
+      settings: {
+        codec: {
+          endpoint,
+          includeCredentials: false,
+        },
+      },
+    });
+
+    expect(mockFetch).toBeCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Namespace': 'default',
+        },
+      }),
+    );
+  });
 });
 
 // Integration test
