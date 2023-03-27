@@ -254,7 +254,7 @@
             <WorkflowsSummaryTableHeaderCell {column} {sortDisabled} />
           {/each}
           <th
-            class="px-2 h-10 w-12 text-right sticky right-0 flex items-center justify-center bg-primary"
+            class="h-10 leading-[48px] text-right sticky right-0 block w-auto bg-primary"
           >
             <IconButton
               icon="vertical-ellipsis"
@@ -442,7 +442,7 @@
   }
 
   .workflow-summary-row {
-    @apply border-b border-primary cursor-pointer;
+    @apply border-b border-primary cursor-pointer h-10;
 
     &:last-of-type {
       @apply border-b-0;
