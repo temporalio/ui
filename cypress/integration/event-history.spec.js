@@ -119,6 +119,36 @@ describe('Workflow Events', () => {
     cy.get('table').contains(firstEventInDescendingOrder.eventId);
   });
 
+  it('should render events based on an event category', () => {
+    cy.visit(
+      `/namespaces/default/workflows/${workflowId}/${runId}/history?category=workflow`,
+    );
+
+    cy.wait('@workflow-api');
+    cy.wait('@event-history-start');
+    cy.wait('@event-history-end');
+    cy.wait('@event-history-descending');
+
+    cy.get('[data-testid="event-summary-row"]').should('have.length', 8);
+
+    cy.get('[data-testid="event-category-filter"]').click();
+    cy.get('[data-testid="event-category-option"]')
+      .contains('Activity')
+      .click();
+
+    cy.url().should('contain', 'category=activity');
+    cy.get('[data-testid="event-summary-row"]').should('have.length', 3);
+
+    cy.get('[data-testid="event-category-filter"]').click();
+    cy.get('[data-testid="event-category-option"]').contains('All').click();
+
+    cy.url().should('not.contain', 'category');
+    cy.get('[data-testid="event-summary-row"]').should(
+      'have.length',
+      eventsFixtureDescending.history.events.length,
+    );
+  });
+
   it('should render event time in various formats', () => {
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}/history`);
 
