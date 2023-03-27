@@ -7,7 +7,7 @@
 
 <Hst.Story>
   <Hst.Variant title="An Information Alert">
-    <Alert intent="info" title="Alert Title" icon="info">
+    <Alert intent="info" title="Alert Title" icon="info" role="status">
       <p>
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut cupiditate
         exercitationem quia quibusdam excepturi rem saepe dolore quas, odit vero

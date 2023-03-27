@@ -11,3 +11,4 @@ server/**
 pnpm-lock.yaml
 .histoire/**
 README.md
+playwright-report

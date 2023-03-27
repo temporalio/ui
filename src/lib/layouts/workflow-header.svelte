@@ -3,7 +3,7 @@
   import { fly } from 'svelte/transition';
 
   import { autoRefreshWorkflow } from '$lib/stores/event-view';
-  import { workflowsQuery, workflowsSearch } from '$lib/stores/workflows';
+  import { workflowsSearchParams } from '$lib/stores/workflows';
   import { refresh, workflowRun } from '$lib/stores/workflow-run';
   import { eventHistory } from '$lib/stores/events';
 
@@ -13,11 +13,11 @@
     routeForStackTrace,
     routeForWorkers,
     routeForWorkflowQuery,
-    routeForWorkflowsWithQuery,
+    routeForWorkflows,
   } from '$lib/utilities/route-for';
-  import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 
   import Badge from '$lib/holocene/badge.svelte';
+  import Copyable from '$lib/components/copyable.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
@@ -44,9 +44,6 @@
     run: workflow?.runId,
   };
 
-  const { parameters, searchType } = $workflowsSearch;
-  const query = toListWorkflowQuery(parameters);
-
   $: isRunning = $workflowRun?.workflow?.isRunning;
   $: activitiesCanceled = ['Terminated', 'TimedOut', 'Canceled'].includes(
     $workflowRun.workflow?.status,
@@ -62,7 +59,7 @@
 
   $: {
     if (!isRunning) {
-      // Stop refresh if worfklow is no longer running
+      // Stop refresh if workflow is no longer running
       clearInterval(refreshInterval);
     }
   }
@@ -92,13 +89,11 @@
 </script>
 
 <header class="mb-4 flex flex-col gap-1">
-  <div class="-mt-3 -ml-2 mb-4 block">
+  <div class="mb-4 block">
     <a
-      href={routeForWorkflowsWithQuery({
+      href={`${routeForWorkflows({
         namespace,
-        query: $workflowsQuery || query,
-        search: searchType,
-      })}
+      })}?${$workflowsSearchParams}`}
       data-testid="back-to-workflows"
       class="back-to-workflows"
     >
@@ -114,9 +109,14 @@
       <WorkflowStatus status={workflow?.status} />
       <h1
         data-testid="workflow-id-heading"
-        class="select-all overflow-hidden text-ellipsis text-2xl font-medium"
+        class="overflow-hidden text-2xl font-medium"
       >
-        {workflow?.id}
+        <Copyable
+          content={workflow?.id}
+          clickAllToCopy
+          container-class="w-full"
+          class="overflow-hidden text-ellipsis"
+        />
       </h1>
     </div>
     {#if isRunning}
@@ -130,7 +130,13 @@
   </div>
   {#if cancelInProgress}
     <div class="mb-4" in:fly={{ duration: 200, delay: 100 }}>
-      <Alert bold icon="info" intent="info" title="Cancel Request Sent">
+      <Alert
+        bold
+        icon="info"
+        intent="info"
+        title="Cancel Request Sent"
+        role="status"
+      >
         The request to cancel this Workflow Execution has been sent. If the
         Workflow uses the cancellation API, it'll cancel at the next available
         opportunity.
@@ -143,8 +149,9 @@
         bold
         icon="info"
         intent="info"
-        testId="workflow-reset-alert"
+        data-testid="workflow-reset-alert"
         title="This Workflow has been reset"
+        role="status"
       >
         You can find the resulting Workflow Execution <Link
           href={routeForEventHistory({

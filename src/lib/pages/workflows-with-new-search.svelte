@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { noop } from 'svelte/internal';
   import { page } from '$app/stores';
   import { timeFormat } from '$lib/stores/time-format';
   import {
@@ -10,6 +11,7 @@
     workflowError,
     workflowCount,
     workflowsQuery,
+    workflowsSearchParams,
   } from '$lib/stores/workflows';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
@@ -20,7 +22,6 @@
   import Pagination from '$lib/holocene/pagination.svelte';
   import WorkflowsSummaryTableWithFilters from '$lib/components/workflow/workflows-summary-table-with-filters.svelte';
   import WorkflowsSummaryRowWithFilters from '$lib/components/workflow/workflows-summary-row-with-filters.svelte';
-  import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import WorkflowDateTimeFilter from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
@@ -30,34 +31,35 @@
     batchTerminateByQuery,
     bulkCancelByIDs,
     bulkTerminateByIDs,
-    pollBatchOperation,
   } from '$lib/services/batch-service';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  import { toaster } from '$lib/stores/toaster';
   import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
-  import { bulkActionsEnabled as workflowBulkActionsEnabled } from '$lib/utilities/bulk-actions-enabled';
-  import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
-
-  $: bulkActionsEnabled = workflowBulkActionsEnabled(
-    $page.data.settings,
-    $supportsAdvancedVisibility,
-  );
+  import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
+  import { supportsBulkActions } from '$lib/stores/bulk-actions';
+  import { toaster } from '$lib/stores/toaster';
+  import {
+    workflowTableColumns,
+    addColumn,
+    removeColumn,
+    moveColumn,
+  } from '$lib/stores/workflow-table-columns';
+  import Drawer from '$lib/holocene/drawer.svelte';
+  import OrderableList from '$lib/holocene/orderable-list.svelte';
 
   let selectedWorkflows: { [index: string]: boolean } = {};
-  let showBatchTerminateConfirmationModal: boolean = false;
-  let showBatchCancelConfirmationModal: boolean = false;
+  let batchTerminateConfirmationModal: BatchOperationConfirmationModal;
+  let batchCancelConfirmationModal: BatchOperationConfirmationModal;
   let allSelected: boolean = false;
   let pageSelected: boolean = false;
-  let terminating: boolean = false;
+
+  // let customizationDrawerOpen: boolean = false;
 
   $: query = $page.url.searchParams.get('query');
+  $: query && ($workflowsQuery = query);
 
-  $: {
-    // For returning to page from 'Back to Workflows' with previous search
-    if (query) {
-      $workflowsQuery = query;
-    }
-  }
+  // For returning to page from 'Back to Workflows' with previous search
+  $: searchParams = $page.url.searchParams.toString();
+  $: searchParams, ($workflowsSearchParams = searchParams);
 
   $: {
     if (!$workflowFilters.length && !$workflowSorts.length) {
@@ -90,17 +92,7 @@
     $refresh = Date.now();
   };
 
-  const handleBatchTerminate = () => {
-    showBatchTerminateConfirmationModal = true;
-  };
-
-  const handleBatchCancel = () => {
-    showBatchCancelConfirmationModal = true;
-  };
-
   const resetPageToDefaultState = () => {
-    terminating = false;
-
     $workflowFilters = [];
     $workflowSorts = [];
     updateQueryParameters({
@@ -141,86 +133,82 @@
   };
 
   const terminateWorkflows = async (event: CustomEvent<{ reason: string }>) => {
-    const { namespace } = $page.params;
-    const { reason } = event.detail;
-
-    if (allSelected) {
-      // Idea: persist the job ID and display a progress indicator for large jobs
-      await batchTerminateByQuery({
-        namespace,
-        reason,
-        query: batchOperationQuery,
-      });
-      toaster.push({
-        message: 'The batch terminate request is processing in the background.',
-        id: 'batch-terminate-success-toast',
-      });
-    } else {
-      terminating = true;
-      try {
-        const jobId = await bulkTerminateByIDs({
-          namespace,
-          reason,
-          workflows: terminableWorkflows,
+    const options = {
+      namespace: $page.params.namespace,
+      reason: event.detail.reason,
+    };
+    try {
+      if (allSelected) {
+        await batchTerminateByQuery({
+          ...options,
+          query: batchOperationQuery,
         });
-        const workflowsTerminated = await pollBatchOperation({
-          namespace,
-          jobId,
+        toaster.push({
+          message:
+            'The batch terminate request is processing in the background.',
+          id: 'batch-terminate-success-toast',
+        });
+      } else {
+        const workflowsTerminated = await bulkTerminateByIDs({
+          ...options,
+          workflows: terminableWorkflows,
         });
         toaster.push({
           message: `Successfully terminated ${workflowsTerminated} workflows.`,
           id: 'batch-terminate-success-toast',
         });
-      } catch (error) {
-        toaster.push({
-          variant: 'error',
-          message: 'Unable to terminate workflows.',
-        });
       }
+      batchTerminateConfirmationModal.close();
+      resetPageToDefaultState();
+    } catch (error) {
+      batchTerminateConfirmationModal.setError(
+        error?.message ?? 'An unknown error occurred.',
+      );
     }
-    showBatchTerminateConfirmationModal = false;
-    resetPageToDefaultState();
   };
 
   const cancelWorkflows = async (event: CustomEvent<{ reason: string }>) => {
-    const { namespace } = $page.params;
-    const { reason } = event.detail;
+    const options = {
+      namespace: $page.params.namespace,
+      reason: event.detail.reason,
+    };
 
-    if (allSelected) {
-      await batchCancelByQuery({
-        namespace,
-        reason,
-        query: batchOperationQuery,
-      });
-      toaster.push({
-        message: 'The batch cancel request is processing in the background.',
-        id: 'batch-cancel-success-toast',
-      });
-    } else {
-      try {
-        const jobId = await bulkCancelByIDs({
-          namespace,
-          reason,
-          workflows: cancelableWorkflows,
-        });
-        const workflowsCancelled = await pollBatchOperation({
-          namespace,
-          jobId,
+    try {
+      if (allSelected) {
+        await batchCancelByQuery({
+          ...options,
+          query: batchOperationQuery,
         });
         toaster.push({
-          message: `Successfully cancelled ${workflowsCancelled} workflows.`,
+          message: 'The batch cancel request is processing in the background.',
           id: 'batch-cancel-success-toast',
         });
-      } catch {
+      } else {
+        const workflowsCanceled = await bulkCancelByIDs({
+          ...options,
+          workflows: cancelableWorkflows,
+        });
         toaster.push({
-          variant: 'error',
-          message: 'Unable to cancel workflows.',
+          message: `Successfully cancelled ${workflowsCanceled} workflows.`,
+          id: 'batch-cancel-success-toast',
         });
       }
+      batchCancelConfirmationModal.close();
+      resetPageToDefaultState();
+    } catch (error) {
+      batchCancelConfirmationModal.setError(
+        error?.message ?? 'An unknown error occurred.',
+      );
     }
-    showBatchCancelConfirmationModal = false;
-    resetPageToDefaultState();
   };
+
+  // const openCustomizationDrawer = () => {
+  //   customizationDrawerOpen = true;
+  // };
+
+  // const closeCustomizationDrawer = () => {
+  //   customizationDrawerOpen = false;
+  // };
 
   $: batchOperationQuery = !$workflowsQuery
     ? 'ExecutionStatus="Running"'
@@ -255,8 +243,7 @@
 
 <BatchOperationConfirmationModal
   action="Terminate"
-  bind:open={showBatchTerminateConfirmationModal}
-  loading={terminating}
+  bind:this={batchTerminateConfirmationModal}
   {allSelected}
   actionableWorkflowsLength={terminableWorkflows.length}
   query={batchOperationQuery}
@@ -264,25 +251,21 @@
 />
 <BatchOperationConfirmationModal
   action="Cancel"
-  bind:open={showBatchCancelConfirmationModal}
-  loading={false}
+  bind:this={batchCancelConfirmationModal}
   {allSelected}
   actionableWorkflowsLength={cancelableWorkflows.length}
   query={batchOperationQuery}
   on:confirm={cancelWorkflows}
 />
 
-<div class="mb-2 flex justify-between">
+<header class="mb-2 flex justify-between">
   <div>
-    <h1 class="text-2xl" data-testid="namespace-title">
-      Recent Workflows
-      <NamespaceSelector />
-    </h1>
+    <h1 class="text-2xl" data-cy="namespace-title">Recent Workflows</h1>
     <div class="flex items-center gap-2 text-sm">
       <p data-testid="namespace-name">
         {$page.params.namespace}
       </p>
-      {#if $workflowCount?.totalCount >= 0}
+      {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility}
         <div class="h-1 w-1 rounded-full bg-gray-400" />
         <p data-testid="workflow-count">
           {#if $loading}
@@ -307,7 +290,7 @@
       <Icon name="retry" class="h-8 w-8" />
     </button>
   </div>
-</div>
+</header>
 <Pagination items={$workflows} let:visibleItems aria-label="recent workflows">
   <svelte:fragment slot="action-top-left">
     <WorkflowAdvancedSearch />
@@ -316,21 +299,21 @@
     <WorkflowDateTimeFilter />
   </svelte:fragment>
   <WorkflowsSummaryTableWithFilters
-    {bulkActionsEnabled}
+    bulkActionsEnabled={$supportsBulkActions}
     updating={$updating}
     visibleWorkflows={visibleItems}
     {selectedWorkflowsCount}
     filteredWorkflowCount={query ? filteredWorkflowCount : totalWorkflowCount}
     {allSelected}
     {pageSelected}
-    on:terminateWorkflows={handleBatchTerminate}
-    on:cancelWorkflows={handleBatchCancel}
+    on:terminateWorkflows={() => batchTerminateConfirmationModal.open()}
+    on:cancelWorkflows={() => batchCancelConfirmationModal.open()}
     on:toggleAll={handleToggleAll}
     on:togglePage={handleTogglePage}
   >
     {#each visibleItems as event}
       <WorkflowsSummaryRowWithFilters
-        {bulkActionsEnabled}
+        bulkActionsEnabled={$supportsBulkActions}
         workflow={event}
         namespace={$page.params.namespace}
         timeFormat={$timeFormat}
@@ -340,7 +323,7 @@
       />
     {:else}
       <tr>
-        <td colspan={bulkActionsEnabled ? 6 : 5} class="xl:hidden">
+        <td colspan={$supportsBulkActions ? 6 : 5} class="xl:hidden">
           {#if $loading}
             <Loading />
           {:else}
@@ -351,7 +334,7 @@
             />
           {/if}
         </td>
-        <td colspan={bulkActionsEnabled ? 8 : 7} class="hidden xl:table-cell">
+        <td colspan={$supportsBulkActions ? 8 : 7} class="max-xl:hidden">
           {#if $loading}
             <Loading />
           {:else}
@@ -366,3 +349,35 @@
     {/each}
   </WorkflowsSummaryTableWithFilters>
 </Pagination>
+
+<Drawer
+  open={false}
+  onClick={noop}
+  position="right"
+  dark={false}
+  title="Configure Workflow List"
+>
+  <svelte:fragment slot="subtitle">
+    <span>Add (</span><Icon class="inline" name="add" /><span
+      >), re-arrange (</span
+    ><Icon class="inline" name="chevron-selector-vertical" /><span
+      >), and remove (</span
+    ><Icon class="inline" name="hyphen" /><span
+      >), Workflow<br />Headings to personalize the Workflow List Table.</span
+    >
+  </svelte:fragment>
+  <OrderableList
+    items={$workflowTableColumns.columns}
+    availableItems={$workflowTableColumns.availableColumns}
+    onAddItem={addColumn}
+    onRemoveItem={removeColumn}
+    onMoveItem={moveColumn}
+  >
+    <svelte:fragment slot="main-heading">
+      Workflow Headings <span class="font-normal">(in view)</span>
+    </svelte:fragment>
+    <svelte:fragment slot="bank-heading">
+      Available Headings <span class="font-normal">(not in view)</span>
+    </svelte:fragment>
+  </OrderableList>
+</Drawer>

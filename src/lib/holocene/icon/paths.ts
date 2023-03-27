@@ -13,6 +13,7 @@ import chevronDown from './svg/chevron-down.svelte';
 import chevronLeft from './svg/chevron-left.svelte';
 import chevronRight from './svg/chevron-right.svelte';
 import chevronUp from './svg/chevron-up.svelte';
+import chevronSelectorVertical from './svg/chevron-selector-vertical.svelte';
 import clock from './svg/clock.svelte';
 import close from './svg/close.svelte';
 import cometSolid from './svg/comet-solid.svelte';
@@ -36,6 +37,7 @@ import filter from './svg/filter.svelte';
 import filterSolid from './svg/filter-solid.svelte';
 import graph from './svg/graph.svelte';
 import hyphen from './svg/hyphen.svelte';
+import importIcon from './svg/import.svelte';
 import info from './svg/info.svelte';
 import invertedCheckmark from './svg/inverted-checkmark.svelte';
 import json from './svg/json.svelte';
@@ -43,6 +45,7 @@ import lock from './svg/lock.svelte';
 import logout from './svg/logout.svelte';
 import namespaceSwitcher from './svg/namespace-switcher.svelte';
 import namespace from './svg/namespace.svelte';
+import pinFilled from './svg/pin-filled.svelte';
 import regions from './svg/regions.svelte';
 import relationship from './svg/relationship.svelte';
 import retention from './svg/retention.svelte';
@@ -57,8 +60,12 @@ import spinnerSolid from './svg/spinner-solid.svelte';
 import starEmpty from './svg/star-empty.svelte';
 import starFilled from './svg/star-filled.svelte';
 import summary from './svg/summary.svelte';
+import support from './svg/support.svelte';
 import terminal from './svg/terminal.svelte';
 import timeline from './svg/timeline.svelte';
+import transcoderError from './svg/transcoder-error.svelte';
+import transcoderOn from './svg/transcoder-on.svelte';
+import transcoderOff from './svg/transcoder-off.svelte';
 import trash from './svg/trash.svelte';
 import tutorial from './svg/tutorial.svelte';
 import upload from './svg/upload.svelte';
@@ -85,6 +92,7 @@ export const icons = {
   'chevron-left': chevronLeft,
   'chevron-right': chevronRight,
   'chevron-up': chevronUp,
+  'chevron-selector-vertical': chevronSelectorVertical,
   clock,
   close,
   'comet-solid': cometSolid,
@@ -108,6 +116,7 @@ export const icons = {
   'filter-solid': filterSolid,
   graph,
   hyphen,
+  import: importIcon,
   info,
   'inverted-checkmark': invertedCheckmark,
   json,
@@ -115,6 +124,7 @@ export const icons = {
   logout,
   'namespace-switcher': namespaceSwitcher,
   namespace,
+  'pin-filled': pinFilled,
   regions,
   relationship,
   retention,
@@ -128,9 +138,13 @@ export const icons = {
   'star-empty': starEmpty,
   'star-filled': starFilled,
   summary,
+  support,
   'spinner-solid': spinnerSolid,
   terminal,
   timeline,
+  'transcoder-error': transcoderError,
+  'transcoder-on': transcoderOn,
+  'transcoder-off': transcoderOff,
   trash,
   tutorial,
   upload,

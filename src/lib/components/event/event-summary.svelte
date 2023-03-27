@@ -77,30 +77,28 @@
   $: updating = currentEvents.length && !fullHistory.length;
 </script>
 
-{#key [$eventFilterSort, category]}
-  <Pagination
-    floatId="event-view-toggle"
-    {items}
-    {updating}
-    let:visibleItems
-    let:activeRowIndex
-    let:setActiveRowIndex
-    aria-label="recent events"
-  >
-    <EventSummaryTable {updating} {compact} on:expandAll={handleExpandChange}>
-      {#each visibleItems as event, index (`${event.id}-${event.timestamp}`)}
-        <EventSummaryRow
-          {event}
-          {compact}
-          {visibleItems}
-          expandAll={$expandAllEvents === 'true'}
-          {initialItem}
-          active={activeRowIndex === index}
-          onRowClick={() => setActiveRowIndex(index)}
-        />
-      {:else}
-        <EventEmptyRow {loading} />
-      {/each}
-    </EventSummaryTable>
-  </Pagination>
-{/key}
+<Pagination
+  floatId="event-view-toggle"
+  {items}
+  {updating}
+  let:visibleItems
+  let:activeRowIndex
+  let:setActiveRowIndex
+  aria-label="recent events"
+>
+  <EventSummaryTable {updating} {compact} on:expandAll={handleExpandChange}>
+    {#each visibleItems as event, index (`${event.id}-${event.timestamp}`)}
+      <EventSummaryRow
+        {event}
+        {compact}
+        {visibleItems}
+        expandAll={$expandAllEvents === 'true'}
+        {initialItem}
+        active={activeRowIndex === index}
+        onRowClick={() => setActiveRowIndex(index)}
+      />
+    {:else}
+      <EventEmptyRow {loading} />
+    {/each}
+  </EventSummaryTable>
+</Pagination>

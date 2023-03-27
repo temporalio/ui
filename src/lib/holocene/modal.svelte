@@ -1,27 +1,67 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
-  import { createEventDispatcher } from 'svelte';
+  import type { HTMLAttributes } from 'svelte/elements';
+  import { createEventDispatcher, type ComponentProps } from 'svelte';
   import Button from '$lib/holocene/button.svelte';
-  import { noop } from 'svelte/internal';
+  import IconButton from './icon-button.svelte';
 
-  export let open: boolean = false;
+  interface $$Props extends HTMLAttributes<HTMLDialogElement> {
+    hideConfirm?: boolean;
+    confirmText?: string;
+    cancelText?: string;
+    confirmType?: ComponentProps<Button>['variant'];
+    confirmDisabled?: boolean;
+    large?: boolean;
+    loading?: boolean;
+    'data-testid'?: string;
+    hightlightNav?: boolean;
+  }
+
   export let hideConfirm: boolean = false;
   export let confirmText: string = 'Confirm';
   export let cancelText: string = 'Cancel';
-  export let confirmType: 'destructive' | 'primary' = 'primary';
+  export let confirmType: ComponentProps<Button>['variant'] = 'primary';
   export let confirmDisabled: boolean = false;
   export let large: boolean = false;
   export let loading: boolean = false;
+  export let hightlightNav: boolean = false;
 
-  let modalElement: HTMLDivElement;
+  let error: string;
+
+  export const open = () => modalElement.showModal();
+
+  export const close = () => {
+    error = '';
+    modalElement.close();
+  };
+
+  export const setError = (err: string) => {
+    error = err;
+  };
+
+  let className: string = '';
+  export { className as class };
+
+  let modalElement: HTMLDialogElement;
+  let hasInput: boolean = false;
+  $: {
+    if (modalElement) {
+      hasInput = modalElement.querySelector('input') !== null;
+    }
+  }
 
   const dispatch = createEventDispatcher<{
     cancelModal: undefined;
     confirmModal: undefined;
   }>();
 
-  const cancelModal = () => {
+  const handleCancel = () => {
+    close();
     dispatch('cancelModal');
+  };
+
+  const confirmModal = () => {
+    error = '';
+    dispatch('confirmModal');
   };
 
   const handleKeyboardNavigation = (event: KeyboardEvent) => {
@@ -29,12 +69,14 @@
       return;
     }
 
-    if (event.key === 'Escape') {
-      cancelModal();
-      return;
-    }
-
-    const focusable = modalElement.querySelectorAll('button');
+    const focusable = Array.from(
+      modalElement.querySelectorAll<
+        HTMLButtonElement | HTMLInputElement | HTMLDivElement
+      >('button, input, div[contenteditable="true"]'),
+    ).filter((element) => {
+      if (element instanceof HTMLDivElement) return element.isContentEditable;
+      return !element.disabled;
+    });
     const firstFocusable = focusable[0];
     const lastFocusable = focusable[focusable.length - 1];
     if (event.key === 'Tab') {
@@ -50,6 +92,10 @@
     }
   };
 
+  const handleClick = (event: MouseEvent) => {
+    if (event.target === modalElement) handleCancel();
+  };
+
   $: {
     if (open && modalElement) {
       modalElement.focus();
@@ -57,78 +103,74 @@
   }
 </script>
 
-<svelte:window on:keydown|stopPropagation={handleKeyboardNavigation} />
-{#if open}
-  <div class="modal">
-    <div
-      on:keyup|stopPropagation={noop}
-      on:click|stopPropagation={cancelModal}
-      class="overlay"
+<svelte:window
+  on:click={handleClick}
+  on:keydown|stopPropagation={handleKeyboardNavigation}
+/>
+<dialog
+  bind:this={modalElement}
+  class="body {className}"
+  class:large
+  class:hightlightNav
+  aria-modal="true"
+  aria-labelledby="modal-title"
+  data-testid={$$props['data-testid']}
+  {...$$restProps}
+>
+  {#if !loading}
+    <IconButton
+      aria-label={cancelText}
+      icon="close"
+      class="float-right m-4"
+      on:click={handleCancel}
     />
-    <div
-      bind:this={modalElement}
-      class="body"
-      class:large
-      tabindex="-1"
-      role="alertdialog"
-      aria-labelledby="modal-title"
-      aria-describedby="modal-description"
-    >
-      {#if !loading}
-        <button
-          aria-label={cancelText}
-          class="float-right m-4"
-          on:click|stopPropagation={cancelModal}
-        >
-          <Icon
-            name="close"
-            class="cursor-pointer rounded-full hover:bg-gray-900 hover:text-white"
-          />
-        </button>
+  {/if}
+  <div id="modal-title" class="title">
+    <slot name="title">
+      <h3>Title</h3>
+    </slot>
+  </div>
+  <form on:submit|preventDefault={confirmModal} method="dialog">
+    <div id="modal-content" class="content">
+      <slot name="content">
+        <span>Content</span>
+      </slot>
+      {#if error}
+        <p class="mt-2 text-sm font-normal text-danger">{error}</p>
       {/if}
-      <div id="modal-title" class="title">
-        <slot name="title">
-          <h3>Title</h3>
-        </slot>
-      </div>
-      <div id="modal-content" class="content">
-        <slot name="content">
-          <span>Content</span>
-        </slot>
-      </div>
-      <div class="flex items-center justify-end space-x-2 p-6">
+    </div>
+    <div class="flex items-center justify-end space-x-2 p-6">
+      <Button
+        thin
+        variant="secondary"
+        disabled={loading}
+        on:click={handleCancel}>{cancelText}</Button
+      >
+      {#if !hideConfirm}
         <Button
           thin
-          variant="secondary"
-          disabled={loading}
-          on:click={cancelModal}>{cancelText}</Button
+          variant={confirmType}
+          {loading}
+          disabled={confirmDisabled || loading}
+          testId="confirm-modal-button"
+          type="submit">{confirmText}</Button
         >
-        {#if !hideConfirm}
-          <Button
-            thin
-            variant={confirmType}
-            {loading}
-            disabled={confirmDisabled || loading}
-            testId="confirm-modal-button"
-            on:click={() => dispatch('confirmModal')}>{confirmText}</Button
-          >
-        {/if}
-      </div>
+      {/if}
     </div>
-  </div>
-{/if}
+  </form>
+</dialog>
 
 <style lang="postcss">
-  .modal {
-    @apply fixed top-0 left-0 z-50 flex h-full w-full cursor-default items-center justify-center p-8 lg:p-0;
-  }
-
-  .overlay {
-    @apply fixed h-full w-full bg-gray-900 opacity-50;
-  }
-
   .body {
-    @apply z-50 mx-auto w-full max-w-lg overflow-y-auto rounded-lg bg-white text-gray-900 shadow-xl md:h-max;
+    @apply z-50  w-full max-w-lg overflow-y-auto rounded-lg bg-white p-0 text-gray-900 shadow-xl md:h-max;
+  }
+
+  .body::backdrop {
+    @apply cursor-pointer bg-gray-900 opacity-70;
+  }
+
+  .body.hightlightNav::backdrop {
+    @apply top-[40px] left-[60px];
   }
 
   .large {

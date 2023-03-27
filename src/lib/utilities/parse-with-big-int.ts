@@ -5,8 +5,13 @@ const JSONBigNative = JSONbig({
   constructorAction: 'preserve',
 });
 
-export const parseWithBigInt = (content: string) =>
-  JSONBigNative.parse(content);
+export const parseWithBigInt = (content: string) => {
+  try {
+    return JSONBigNative.parse(content);
+  } catch (e) {
+    return JSON.parse(content);
+  }
+};
 
 export const stringifyWithBigInt = <T = unknown>(
   value: T,

@@ -16,7 +16,7 @@ export const getCodecPassAccessToken = (
   settings: Settings,
   passToken = passAccessToken,
 ): boolean => {
-  return get(passToken) || settings?.codec?.passAccessToken;
+  return !!get(passToken) || !!settings?.codec?.passAccessToken;
 };
 
 export const getCodecPassCredentials = (

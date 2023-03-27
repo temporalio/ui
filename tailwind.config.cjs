@@ -148,9 +148,6 @@ const config = {
       animation: {
         'spin-slow': 'spin 3s linear infinite',
       },
-      borderWidth: {
-        3: '3px',
-      },
     },
   },
   plugins: [],

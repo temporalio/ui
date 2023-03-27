@@ -3,7 +3,7 @@
 declare module '@crownframework/svelte-error-boundary';
 declare module '@sveltejs/svelte-virtual-list';
 
-type NamespaceItem = {
+type NamespaceListItem = {
   namespace: string;
   href: (namspace: string) => string;
   onClick: (namspace: string) => void;

@@ -43,8 +43,8 @@
 
   let scheduleFetch = fetchSchedule(parameters);
 
-  let showPauseConfirmation = false;
-  let showDeleteConfirmation = false;
+  let pauseConfirmationModal: Modal;
+  let deleteConfirmationModal: Modal;
   let reason = '';
 
   let coreUser = coreUserStore();
@@ -54,15 +54,13 @@
     try {
       $loading = true;
       await deleteSchedule({ namespace, scheduleId });
+      deleteConfirmationModal.close();
       setTimeout(() => {
         $loading = false;
         goto(routeForSchedules({ namespace }));
       }, 2000);
     } catch (e) {
-      toaster.push({
-        message: `Cannot delete schedule. ${e?.message}`,
-        variant: 'error',
-      });
+      deleteConfirmationModal.setError(`Cannot delete schedule. ${e?.message}`);
       $loading = false;
     }
   };
@@ -80,7 +78,7 @@
           reason,
         });
     scheduleFetch = fetchSchedule(parameters, fetch);
-    showPauseConfirmation = false;
+    pauseConfirmationModal.close();
     reason = '';
   };
 
@@ -92,7 +90,7 @@
     },
     {
       label: 'Delete Schedule',
-      onClick: () => (showDeleteConfirmation = true),
+      onClick: () => deleteConfirmationModal.open(),
       class: 'text-red-500 terminate',
     },
   ];
@@ -109,7 +107,7 @@
         <a
           href={routeForSchedules({ namespace })}
           class="absolute top-0 back-to-schedules"
-          style="left: -.5rem"
+          style="left: -0.5rem;"
         >
           <Icon name="chevron-left" class="inline" />Back to Schedules
         </a>
@@ -153,7 +151,7 @@
         label={schedule?.schedule?.state?.paused ? 'Unpause' : 'Pause'}
         id="schedule-actions"
         disabled={editDisabled}
-        on:click={() => (showPauseConfirmation = !showPauseConfirmation)}
+        on:click={() => pauseConfirmationModal.open()}
       >
         {#each options as option}
           <button
@@ -202,11 +200,10 @@
       </div>
     </div>
     <Modal
-      open={showPauseConfirmation}
+      bind:this={pauseConfirmationModal}
       confirmType="primary"
       confirmText={schedule.schedule.state.paused ? 'Unpause' : 'Pause'}
       confirmDisabled={!reason}
-      on:cancelModal={() => (showPauseConfirmation = false)}
       on:confirmModal={() => handlePause(schedule)}
     >
       <h3 slot="title">
@@ -233,11 +230,10 @@
       </div>
     </Modal>
     <Modal
-      open={showDeleteConfirmation}
+      bind:this={deleteConfirmationModal}
       confirmType="destructive"
       confirmText={'Delete'}
-      on:cancelModal={() => (showDeleteConfirmation = false)}
-      on:confirmModal={() => handleDelete()}
+      on:confirmModal={handleDelete}
     >
       <h3 slot="title">Delete Schedule?</h3>
       <div slot="content">

@@ -1,7 +1,9 @@
 publicPath:
+port: 8081
 enableUi: true
 enableOpenApi: true
 cors:
+  cookieInsecure: false
   allowOrigins:
     - http://localhost:3000 # used at development by https://github.com/temporalio/ui
 refreshInterval: 1m

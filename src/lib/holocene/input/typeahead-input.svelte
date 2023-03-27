@@ -36,7 +36,8 @@
   }
 
   const context = writable<SelectContext<string>>({
-    selectValue: value,
+    value: value,
+    label: value,
     onChange: () => {
       onChange(value);
       showMenu = false;
@@ -44,7 +45,7 @@
   });
 
   const unsubscribe = context.subscribe((ctx) => {
-    value = ctx.selectValue;
+    value = ctx.value;
   });
 
   onDestroy(() => {
@@ -53,7 +54,7 @@
 
   $: {
     if (value) {
-      context.update((previous) => ({ ...previous, selectValue: value }));
+      context.update((previous) => ({ ...previous, value: value }));
     }
 
     setContext('select-value', context);
@@ -81,7 +82,7 @@
       {#each filterOptions as { label, value }}
         <Option {value}>{label}</Option>
       {:else}
-        <Option>No Results</Option>
+        <Option value={null}>No Results</Option>
       {/each}
     </Menu>
   </MenuContainer>

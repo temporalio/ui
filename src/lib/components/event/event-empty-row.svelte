@@ -6,7 +6,7 @@
 </script>
 
 <tr class="row">
-  <td class="table-cell" colspan="6">
+  <td colspan="6">
     {#if loading}
       <Loading />
     {:else}
@@ -20,6 +20,6 @@
 
 <style lang="postcss">
   .row {
-    @apply border-3 border-gray-900 p-2 text-center text-sm;
+    @apply border-2 border-gray-900 p-2 text-center text-sm;
   }
 </style>

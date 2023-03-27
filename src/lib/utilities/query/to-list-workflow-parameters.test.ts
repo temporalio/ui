@@ -10,8 +10,7 @@ const executionStatusQuery = 'ExecutionStatus="Completed"';
 const workflowIdQuery = 'WorkflowId="Hello"';
 const workflowTypeQuery = 'WorkflowType="World"';
 const workflowQuery = 'WorkflowId="Hello" and WorkflowType="World"';
-const startTimeQuery =
-  'StartTime BETWEEN "2022-04-18T17:45:18-06:00" AND "2022-04-20T17:45:18-06:00"';
+const startTimeQuery = 'StartTime > "2022-04-18T17:45:18-06:00"';
 
 const defaultParameters = {
   workflowId: '',

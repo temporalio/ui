@@ -3,6 +3,8 @@
   import Input from './input.svelte';
   import NumberInput from './number-input.svelte';
   import RangeInput from './range-input.svelte';
+  import ChipInput from './chip-input.svelte';
+  import { isEmail } from '../../utilities/is-email';
 
   export let Hst: HST;
 
@@ -16,6 +18,7 @@
   let clearable = false;
   let min = 0;
   let max = 100;
+  let emails = [];
 </script>
 
 <Hst.Story>
@@ -35,7 +38,13 @@
   </Hst.Variant>
 
   <Hst.Variant title="A Text Input with an Icon">
-    <Input id="input-2" bind:value placeholder="Search" icon="search" />
+    <Input
+      id="input-2"
+      bind:value
+      placeholder="Search"
+      icon="search"
+      type="search"
+    />
   </Hst.Variant>
 
   <Hst.Variant title="A Copyable Input">
@@ -68,6 +77,17 @@
       {min}
       {max}
       bind:value={numberValue}
+    />
+  </Hst.Variant>
+
+  <Hst.Variant title="A Chip Input with validation">
+    <ChipInput
+      id="email-input"
+      bind:chips={emails}
+      label="Email Address(es)"
+      placeholder="Type or paste in email addresses"
+      hintText="Please enter a properly formatted email address."
+      validator={isEmail}
     />
   </Hst.Variant>
 

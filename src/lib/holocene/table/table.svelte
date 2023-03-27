@@ -32,24 +32,16 @@
   }
 
   table.fancy {
-    @apply border-separate border-spacing-0 rounded-xl border-3 border-gray-900 bg-white;
+    @apply border-separate border-spacing-0 rounded-xl border-[3px] border-gray-900 bg-white;
 
     thead {
       @apply bg-gray-900 text-gray-100;
-
-      :global(th.selectable) {
-        @apply w-12 min-w-[36px] px-3;
-      }
 
       :global(th) {
         @apply border-t border-gray-900 px-1 py-2;
 
         &:first-child {
-          @apply rounded-tl-lg border-l border-gray-900;
-        }
-
-        &:first-child:not(.selectable) {
-          @apply w-[1px];
+          @apply w-[1px] rounded-tl-lg border-l border-gray-900;
         }
 
         &:last-child {
@@ -59,19 +51,11 @@
     }
 
     tbody :global {
-      td.selectable {
-        @apply w-12 px-3;
-      }
-
       td {
         @apply border-t border-gray-900 px-1 py-2 text-sm;
 
         &:first-child {
-          @apply border-l border-gray-900;
-        }
-
-        &:first-child:not(.selectable) {
-          @apply px-1;
+          @apply border-l border-gray-900 px-1;
         }
 
         &:first-child:is(.expanded-cell) {

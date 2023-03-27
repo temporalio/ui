@@ -3,39 +3,50 @@
   import Modal from '$lib/holocene/modal.svelte';
   import { pluralize } from '$lib/utilities/pluralize';
   import Input from '$lib/holocene/input/input.svelte';
-  export let open: boolean;
-  export let action: 'Terminate' | 'Cancel';
-  export let loading: boolean;
+  import { authUser } from '$lib/stores/auth-user';
+
+  type Action = 'Terminate' | 'Cancel';
+
+  export let action: Action;
   export let allSelected: boolean;
   export let actionableWorkflowsLength: number;
   export let query: string;
+
+  let modal: Modal;
+  export const open = () => modal.open();
+  export const close = () => modal.close();
+  export const setError = (error: string) => modal.setError(error);
 
   const dispatch = createEventDispatcher<{
     confirm: { reason: string };
   }>();
 
-  let reason: string;
+  $: confirmText = action === 'Cancel' ? 'Confirm' : action;
+  $: placeholder = `${pastTense(action)} from Web UI${
+    $authUser?.email ? ` by ${$authUser.email}` : ''
+  }`;
+
+  let reason: string = '';
+
+  const pastTense = (action: Action) => {
+    if (action === 'Cancel') return 'Canceled';
+    return 'Terminated';
+  };
 
   const handleConfirmModal = () => {
-    dispatch('confirm', { reason });
-    open = false;
-    reason = '';
+    dispatch('confirm', { reason: [reason.trim(), placeholder].join(' ') });
   };
 
   const handleCancelModal = () => {
-    open = false;
     reason = '';
   };
-
-  $: confirmText = action === 'Cancel' ? 'Confirm' : action;
 </script>
 
 <Modal
-  {open}
+  bind:this={modal}
+  data-testid="batch-{action}-confirmation"
   confirmType="destructive"
-  confirmDisabled={reason === ''}
   {confirmText}
-  {loading}
   on:cancelModal={handleCancelModal}
   on:confirmModal={handleConfirmModal}
 >
@@ -60,7 +71,7 @@
           clicking "{confirmText}".</span
         >
       {:else}
-        <p class="mb-4">
+        <p>
           Are you sure you want to {action.toLowerCase()}
           <strong
             >{actionableWorkflowsLength} running {pluralize(
@@ -72,9 +83,11 @@
       {/if}
     </div>
     <Input
+      label="Reason"
       id="bulk-action-reason"
       bind:value={reason}
-      placeholder="Enter a reason"
+      {placeholder}
+      hintText={`If you supply a custom reason, "${placeholder}" will be appended to it.`}
     />
   </svelte:fragment>
 </Modal>

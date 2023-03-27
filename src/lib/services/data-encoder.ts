@@ -34,7 +34,6 @@ export async function convertPayloadsWithCodec({
       headers['Authorization'] = `Bearer ${accessToken}`;
     } else {
       setLastDataEncoderFailure();
-
       return payloads;
     }
   }

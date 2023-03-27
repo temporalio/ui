@@ -15,6 +15,7 @@
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
+  import { supportsAdvancedVisibilityWithOrderBy } from '$lib/stores/advanced-visibility';
 
   const dispatch = createEventDispatcher<{
     terminateWorkflows: undefined;
@@ -34,8 +35,10 @@
   $: terminateEnabled = workflowTerminateEnabled($page.data.settings);
   $: cancelEnabled = workflowCancelEnabled($page.data.settings);
 
-  // Disable sort with workflows over 1M
-  $: disabled = $workflowCount?.totalCount >= 1000000;
+  // Disable sort with workflows over 1M or if order by not supported
+  $: disabled =
+    $workflowCount?.totalCount >= 1000000 ||
+    !$supportsAdvancedVisibilityWithOrderBy;
 
   const handleBulkTerminate = () => {
     dispatch('terminateWorkflows');
@@ -89,25 +92,24 @@
     {updating}
   >
     <TableHeaderRow slot="headers">
-      <th class="table-cell h-10 w-12">
-        <div class="w-12">
-          {#if !updating}
-            <Checkbox
-              id="select-visible-workflows"
-              onDark
-              {checked}
-              {indeterminate}
-              on:change={handleCheckboxChange}
-            />
-          {/if}
-        </div>
+      <th style="padding: 0;" class="w-12 h-10">
+        {#if !updating}
+          <Checkbox
+            id="select-visible-workflows"
+            onDark
+            hoverable
+            {checked}
+            {indeterminate}
+            on:change={handleCheckboxChange}
+          />
+        {/if}
       </th>
       {#if showBulkActions}
         <th class="w-32 overflow-visible whitespace-nowrap">
           {#if allSelected}
-            <span class="font-semibold"
-              >All {filteredWorkflowCount} selected</span
-            >
+            <span class="font-semibold">
+              All {filteredWorkflowCount} selected
+            </span>
           {:else}
             <span class="font-semibold">{selectedWorkflowsCount} selected</span>
             <span>
@@ -138,35 +140,25 @@
             {/if}
           </div>
         </th>
-        <th class="table-cell md:w-auto" />
-        <th class="table-cell xl:w-60" />
-        <th class="hidden xl:table-cell xl:w-60" />
-        <th class="hidden xl:table-cell xl:w-60" />
+        <th />
+        <th class="xl:w-60" />
+        <th class="w-60 max-xl:hidden" />
+        <th class="w-60 max-xl:hidden" />
       {:else}
-        <th class="table-cell w-32"
-          ><div class="flex items-center gap-1">
-            <ExecutionStatusDropdownFilter />
-          </div>
+        <th class="w-32">
+          <ExecutionStatusDropdownFilter />
         </th>
-        <th class="table-cell md:w-auto"
-          ><div class="flex items-center gap-1">
-            <WorkflowIdDropdownFilter />
-          </div>
+        <th>
+          <WorkflowIdDropdownFilter />
         </th>
-        <th class="table-cell xl:w-60">
-          <div class="flex items-center gap-1">
-            <WorkflowTypeDropdownFilter />
-          </div>
+        <th class="xl:w-60">
+          <WorkflowTypeDropdownFilter />
         </th>
-        <th class="hidden xl:table-cell xl:w-60">
-          <div class="flex items-center gap-1">
-            <StartTimeDropdownFilter {disabled} />
-          </div>
+        <th class="w-60 max-xl:hidden">
+          <StartTimeDropdownFilter {disabled} />
         </th>
-        <th class="hidden xl:table-cell xl:w-60">
-          <div class="flex items-center gap-1">
-            <EndTimeDropdownFilter {disabled} />
-          </div>
+        <th class="w-60 max-xl:hidden">
+          <EndTimeDropdownFilter {disabled} />
         </th>
       {/if}
     </TableHeaderRow>
@@ -175,30 +167,20 @@
 {:else}
   <Table class="w-full md:table-fixed" {updating}>
     <TableHeaderRow slot="headers">
-      <th class="table-cell w-32"
-        ><div class="flex items-center gap-1">
-          <ExecutionStatusDropdownFilter />
-        </div>
+      <th class="w-32">
+        <ExecutionStatusDropdownFilter />
       </th>
-      <th class="table-cell md:w-auto"
-        ><div class="flex items-center gap-1">
-          <WorkflowIdDropdownFilter />
-        </div>
+      <th>
+        <WorkflowIdDropdownFilter />
       </th>
-      <th class="table-cell xl:w-60">
-        <div class="flex items-center gap-1">
-          <WorkflowTypeDropdownFilter />
-        </div>
+      <th class="xl:w-60">
+        <WorkflowTypeDropdownFilter />
       </th>
-      <th class="hidden xl:table-cell xl:w-60">
-        <div class="flex items-center gap-1">
-          <StartTimeDropdownFilter {disabled} />
-        </div>
+      <th class="w-60 max-xl:hidden">
+        <StartTimeDropdownFilter {disabled} />
       </th>
-      <th class="hidden xl:table-cell xl:w-60">
-        <div class="flex items-center gap-1">
-          <EndTimeDropdownFilter {disabled} />
-        </div>
+      <th class="w-60 max-xl:hidden">
+        <EndTimeDropdownFilter {disabled} />
       </th>
     </TableHeaderRow>
     <slot />

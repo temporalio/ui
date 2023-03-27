@@ -15,12 +15,7 @@ type WorkflowAPIRoutePath =
 
 type WorkflowActivitiesAPIRoutePath = 'activity.complete' | 'activity.fail';
 
-type BatchAPIRoutePath =
-  | 'batch-operations'
-  | 'batch-operation.describe'
-  // TODO: Remove when new batch APIs are deployed
-  | 'workflows.batch.terminate'
-  | 'workflows.batch.describe';
+type BatchAPIRoutePath = 'batch-operations' | 'batch-operation.describe';
 
 type NamespaceAPIRoutePath = 'namespace';
 

@@ -42,9 +42,10 @@
   });
 
   const handleKeydown = (e: KeyboardEvent) => {
-    if ((e.key === ',' || e.key === 'Enter') && displayValue !== '') {
+    const value = displayValue.trim();
+    if ((e.key === ',' || e.key === 'Enter') && value !== '') {
       e.preventDefault();
-      values.update((previous) => [...previous, displayValue]);
+      values.update((previous) => [...previous, value]);
       displayValue = '';
     }
 
@@ -62,12 +63,16 @@
   const handlePaste = (e: ClipboardEvent) => {
     e.preventDefault();
     const clipboardContents = e.clipboardData.getData('text/plain');
-    values.update((previous) => [...previous, ...clipboardContents.split(',')]);
+    values.update((previous) => [
+      ...previous,
+      ...clipboardContents.split(',').map((content) => content.trim()),
+    ]);
   };
 
   const handleBlur = () => {
-    if (displayValue !== '') {
-      values.update((previous) => [...previous, displayValue]);
+    const value = displayValue.trim();
+    if (value !== '') {
+      values.update((previous) => [...previous, value]);
       displayValue = '';
     }
   };
@@ -123,7 +128,7 @@
   }
 
   label.required {
-    @apply after:content-['*'];
+    @apply after:content-["*"];
   }
 
   .input-container {

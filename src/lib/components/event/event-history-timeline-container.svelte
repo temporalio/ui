@@ -102,7 +102,7 @@
           >
             <div
               class="mx-2 flex h-6 w-6 items-center rounded-full"
-              style="background: {type.color}"
+              style="background: {type.color};"
             >
               {#if eventGroupFilters.includes(type.option)}
                 <Icon name="checkmark" class="text-white" />
@@ -136,6 +136,7 @@
         <div class="w-full lg:w-1/4">
           <Autocomplete
             id="eventType"
+            type="search"
             placeholder="Event Type"
             icon="search"
             bind:value={eventTypeValue}

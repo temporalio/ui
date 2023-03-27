@@ -9,9 +9,10 @@
   export let content: Parameters<typeof JSON.stringify>[0];
   export let inline = false;
   export let language = 'json';
+  export let copyable = true;
 
   let root: HTMLElement;
-  let isJSON = language === 'json';
+  $: isJSON = language === 'json';
 
   const formatJSON = (jsonData: string): string => {
     if (!jsonData) return;
@@ -64,15 +65,17 @@
           data-testid={$$props['data-testid']}
         /></pre>
 
-      <button
-        on:click={(e) => copy(e, parsedContent)}
-        class="absolute top-2.5 right-2.5 rounded-md bg-gray-900 opacity-90 hover:bg-white"
-      >
-        <Icon
-          name={$copied ? 'checkmark' : 'copy'}
-          class="text-white hover:text-gray-900"
-        />
-      </button>
+      {#if copyable}
+        <button
+          on:click={(e) => copy(e, parsedContent)}
+          class="absolute top-2.5 right-2.5 rounded-md bg-gray-900 opacity-90 hover:bg-white"
+        >
+          <Icon
+            name={$copied ? 'checkmark' : 'copy'}
+            class="text-white hover:text-gray-900"
+          />
+        </button>
+      {/if}
     </div>
   </div>
 {/if}

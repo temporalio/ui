@@ -8,6 +8,7 @@ import atq from '../fixtures/activity-task-queues.json';
 describe('Task Queues Page', () => {
   beforeEach(() => {
     cy.interceptApi();
+    cy.setTopNavFeatureTag();
 
     cy.visit(`/namespaces/default/task-queues/a-task-queue`);
 
@@ -19,7 +20,9 @@ describe('Task Queues Page', () => {
     cy.wait('@activity-task-queues-api');
 
     cy.get('[data-testid="pollers-title"]').contains('Pollers');
-    cy.get('.text-lg').contains('Task Queue: a-task-queue');
+    cy.get('[data-testid="task-queue-name"]').contains(
+      'Task Queue: a-task-queue',
+    );
     cy.get('[data-testid=worker-row]').should('have.length', 1);
     cy.get('[data-testid=worker-identity]').contains(wtq.pollers[0].identity);
     cy.get('[data-testid=worker-last-access-time]').contains(

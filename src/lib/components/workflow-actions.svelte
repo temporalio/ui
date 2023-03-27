@@ -37,10 +37,10 @@
   let reason = '';
   let signalInput = '';
   let signalName = '';
-  let showTerminationConfirmation = false;
-  let showCancellationConfirmation = false;
-  let showSignalConfirmation = false;
-  let showResetConfirmation = false;
+  let cancelConfirmationModal: Modal;
+  let terminateConfirmationModal: Modal;
+  let resetConfirmationModal: Modal;
+  let signalConfirmationModal: Modal;
   let resetType: ResetType = ResetType.FirstWorkflowTask;
   let resetId: string | undefined = undefined;
   let resetReason: string | undefined = undefined;
@@ -52,39 +52,16 @@
   $: terminateEnabled = workflowTerminateEnabled($page.data.settings);
   $: resetEnabled = workflowResetEnabled($page.data.settings);
 
-  const showTerminationModal = () => {
-    showTerminationConfirmation = true;
-  };
-
   const hideTerminationModal = () => {
-    showTerminationConfirmation = false;
     reason = '';
   };
 
-  const showCancellationModal = () => {
-    showCancellationConfirmation = true;
-  };
-
-  const hideCancellationModal = () => {
-    showCancellationConfirmation = false;
-  };
-
-  const showSignalModal = () => {
-    showSignalConfirmation = true;
-  };
-
   const hideSignalModal = () => {
-    showSignalConfirmation = false;
     signalInput = '';
     signalName = '';
   };
 
-  const showResetModal = () => {
-    showResetConfirmation = true;
-  };
-
   const hideResetModal = () => {
-    showResetConfirmation = false;
     resetType = ResetType.FirstWorkflowTask;
     resetId = undefined;
     resetReason = undefined;
@@ -92,7 +69,7 @@
   };
 
   const handleSuccessfulTermination = async () => {
-    hideTerminationModal();
+    terminateConfirmationModal.close();
     $refresh = Date.now();
     toaster.push({
       id: 'workflow-termination-success-toast',
@@ -100,10 +77,11 @@
     });
   };
 
-  const handleTerminationError = () => {
-    showTerminationConfirmation = false;
+  const handleTerminationError = (error: NetworkError) => {
     reason = '';
-    toaster.push({ message: 'Cannot terminate workflow.', variant: 'error' });
+    terminateConfirmationModal.setError(
+      error?.message ?? 'An unknown error occurred.',
+    );
   };
 
   const terminate = () => {
@@ -125,19 +103,18 @@
         workflowId: workflow.id,
         runId: workflow.runId,
       });
+      cancelConfirmationModal.close();
       loading = false;
       $refresh = Date.now();
       toaster.push({
         id: 'workflow-cancelation-success-toast',
         message: 'Workflow canceled.',
       });
-    } catch {
-      toaster.push({
-        variant: 'error',
-        message: 'Unable to cancel workflow.',
-      });
+    } catch (error) {
+      cancelConfirmationModal.setError(
+        error?.message ?? 'An unknown error occurred.',
+      );
     }
-    hideCancellationModal();
   };
 
   const handleSignalInputChange = (event: CustomEvent<string>) => {
@@ -153,17 +130,18 @@
         signalInput,
         signalName,
       });
+      signalConfirmationModal.close();
       $refresh = Date.now();
       toaster.push({
         message: 'Workflow signaled.',
         id: 'workflow-signal-success-toast',
       });
     } catch (error) {
-      toaster.push({
-        variant: 'error',
-        message: 'Error signaling workflow.',
-      });
+      signalConfirmationModal.setError(
+        error?.message ?? 'An unknown error occurred.',
+      );
     }
+
     hideSignalModal();
   };
 
@@ -193,9 +171,12 @@
           [workflow.runId]: response.runId,
         }));
       }
+      resetConfirmationModal.close();
       $refresh = Date.now();
     } catch (error) {
-      toaster.push({ message: 'Error resetting workflow.', variant: 'error' });
+      resetConfirmationModal.setError(
+        error?.message ?? 'An unknown error occurred.',
+      );
     }
     hideResetModal();
   };
@@ -219,14 +200,14 @@
   $: workflowActions = [
     {
       label: 'Reset',
-      onClick: showResetModal,
+      onClick: () => resetConfirmationModal.open(),
       testId: 'reset-button',
       allowed: resetEnabled && workflow?.pendingChildren?.length === 0,
       tooltip: resetTooltipText(),
     },
     {
       label: 'Send a Signal',
-      onClick: showSignalModal,
+      onClick: () => signalConfirmationModal.open(),
       testId: 'signal-button',
       allowed: signalEnabled,
       tooltip: signalEnabled
@@ -235,7 +216,7 @@
     },
     {
       label: 'Terminate',
-      onClick: showTerminationModal,
+      onClick: () => terminateConfirmationModal.open(),
       testId: 'terminate-button',
       allowed: terminateEnabled,
       destructive: true,
@@ -257,7 +238,7 @@
   position="right"
   disabled={actionsDisabled}
   primaryActionDisabled={!cancelEnabled || cancelInProgress}
-  on:click={showCancellationModal}
+  on:click={() => cancelConfirmationModal.open()}
   label="Request Cancellation"
 >
   {#each workflowActions as { onClick, destructive, label, allowed, testId, tooltip }}
@@ -277,7 +258,8 @@
 </SplitButton>
 
 <Modal
-  open={showResetConfirmation}
+  data-testid="reset-confirmation-modal"
+  bind:this={resetConfirmationModal}
   on:confirmModal={reset}
   on:cancelModal={hideResetModal}
   confirmDisabled={resetType === ResetType.EventId && !eventIdValid}
@@ -294,10 +276,10 @@
   </svelte:fragment>
 </Modal>
 <Modal
-  open={showCancellationConfirmation}
+  data-testid="cancel-confirmation-modal"
+  bind:this={cancelConfirmationModal}
   {loading}
   confirmType="destructive"
-  on:cancelModal={hideCancellationModal}
   on:confirmModal={cancel}
 >
   <h3 slot="title">Cancel Workflow</h3>
@@ -309,7 +291,8 @@
   </svelte:fragment>
 </Modal>
 <Modal
-  open={showTerminationConfirmation}
+  data-testid="terminate-confirmation-modal"
+  bind:this={terminateConfirmationModal}
   confirmText="Terminate"
   confirmType="destructive"
   on:cancelModal={hideTerminationModal}
@@ -330,7 +313,8 @@
   </div>
 </Modal>
 <Modal
-  open={showSignalConfirmation}
+  data-testid="signal-confirmation-modal"
+  bind:this={signalConfirmationModal}
   confirmText="Submit"
   confirmDisabled={!signalName}
   on:cancelModal={hideSignalModal}

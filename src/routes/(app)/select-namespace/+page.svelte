@@ -44,17 +44,18 @@
 <div class="w-full p-8 xl:w-1/2">
   <h1 class="my-4 text-3xl">Welcome to Temporal</h1>
   <p class="mb-8">Select a Namespace to get started.</p>
-  <div class="search">
+  <form class="search" role="search">
     <div class="ml-4 mr-2">
       <Icon name="search" />
     </div>
     <input
       class="w-full"
       placeholder="Search"
+      type="search"
       on:keydown|stopPropagation
       bind:value={searchValue}
     />
-  </div>
+  </form>
   <ul class="h-screen w-full" aria-label="namespaces">
     {#if namespaceList.length}
       {#if filteredList.length}
@@ -81,18 +82,18 @@
 
 <style lang="postcss">
   .search {
-    @apply mb-5 flex rounded-full border-3 border-gray-900 bg-white p-1 pr-4;
+    @apply mb-5 flex rounded-full border-2 border-gray-900 bg-white p-1 pr-4;
   }
 
   .link-item {
-    @apply flex border-collapse cursor-pointer gap-2 truncate border border-x-3 border-gray-900 bg-white from-blue-100 to-purple-100 hover:bg-gradient-to-br;
+    @apply flex border-collapse cursor-pointer gap-2 truncate border border-x-2 border-gray-900 bg-white from-blue-100 to-purple-100 hover:bg-gradient-to-br;
   }
 
   .link-item.first {
-    @apply rounded-t-lg border-t-3;
+    @apply rounded-t-lg border-t-2;
   }
 
   .link-item.last {
-    @apply rounded-b-lg border-b-3;
+    @apply rounded-b-lg border-b-2;
   }
 </style>

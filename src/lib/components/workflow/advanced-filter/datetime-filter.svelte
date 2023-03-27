@@ -19,15 +19,7 @@
       <Option {value}>{label}</Option>
     {/each}
   </Select>
-  <Select
-    id="time-range"
-    bind:value
-    class="w-44"
-    displayValue={(value) => {
-      if (!value) return 'All';
-      return value;
-    }}
-  >
+  <Select id="time-range" bind:value class="w-44">
     {#each durations as value}
       <Option {value}>{value}</Option>
     {/each}

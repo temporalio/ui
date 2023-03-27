@@ -31,7 +31,7 @@
 </script>
 
 {#if pendingActivities.length}
-  <section class="rounded-xl border-3 border-gray-900 bg-white p-4">
+  <section class="rounded-xl border-2 border-gray-900 bg-white p-4">
     <h3 class="mb-2 flex gap-2 text-lg font-medium">
       Pending Activities
       {#if canceled}
@@ -40,7 +40,7 @@
         </Tooltip>
       {/if}
     </h3>
-    <section>
+    <div>
       {#each pendingActivities as { id, ...pendingActivity } (id)}
         {@const failed = pendingActivity.attempt > 1}
         <div class="pending-activity-row-container">
@@ -133,7 +133,7 @@
           </div>
         </div>
       {/each}
-    </section>
+    </div>
     <div class="text-right">
       <Link {href}>Show all</Link>
     </div>

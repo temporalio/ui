@@ -1,6 +1,7 @@
+import { get } from 'svelte/store';
 import { browser } from '$app/environment';
-import { goto as navigateTo } from '$app/navigation';
-import type { invalidate } from '$app/navigation';
+import { goto as navigateTo, invalidate } from '$app/navigation';
+import { page } from '$app/stores';
 
 type UpdateQueryParams = {
   parameter: string;
@@ -12,7 +13,6 @@ type UpdateQueryParams = {
 };
 
 export const gotoOptions = {
-  replaceState: true,
   keepFocus: true,
   noScroll: true,
 };
@@ -35,6 +35,12 @@ export const updateQueryParameters = async ({
   }
 
   if (browser && url.href !== window.location.href) {
+    const namespace = get(page)?.params?.namespace;
+    if (url.pathname === `/namespaces/${namespace}/workflows`) {
+      await invalidate(
+        (url) => url.pathname === `/namespaces/${namespace}/workflows`,
+      );
+    }
     goto(url, gotoOptions);
   }
 

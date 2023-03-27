@@ -2,70 +2,66 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
 
   import { dataEncoder } from '$lib/stores/data-encoder';
-  import { showDataEncoderSettings } from '$lib/stores/show-data-encoder';
 
   import Tooltip from '$lib/holocene/tooltip.svelte';
-  import DataEncoderSettings from './data-encoder-settings.svelte';
+  import DataEncoderSettings, {
+    dataEncoderSettings,
+  } from './data-encoder-settings.svelte';
 
-  const onIconClick = () => ($showDataEncoderSettings = true);
-  const onClose = () => ($showDataEncoderSettings = false);
+  const onIconClick = () => $dataEncoderSettings.open();
 </script>
 
-<DataEncoderSettings showSettings={$showDataEncoderSettings} {onClose} />
+<DataEncoderSettings />
 {#if $dataEncoder?.hasEndpointOrPortConfigured}
   {#if $dataEncoder?.hasNotRequested}
-    <Tooltip right text={'Data encoder is configured'}>
+    <Tooltip bottomRight text={'Codec Server is configured'}>
       <button
         class="relative flex items-center"
         data-testid="data-encoder-status-configured"
         on:click={onIconClick}
       >
         <div class="mr-2 ml-1 flex items-center">
-          <Icon name="converter-down" class="text-blue-200" />
-          <Icon name="converter-up" class="absolute left-3 text-blue-200" />
+          <Icon name="transcoder-on" />
         </div>
         <slot />
       </button>
     </Tooltip>
   {:else if $dataEncoder.hasError}
-    <Tooltip right text={`Data encoder couldn't connect to the remote encoder`}>
+    <Tooltip bottomRight text={`Codec Server could not connect`}>
       <button
         class="relative flex items-center"
         data-testid="data-encoder-status-error"
         on:click={onIconClick}
       >
         <div class="mr-2 ml-1 flex items-center">
-          <Icon name="converter-down" class="text-red-400" />
-          <Icon name="converter-up" class="absolute left-3 text-red-400" />
+          <Icon name="transcoder-error" />
         </div>
         <slot />
       </button>
     </Tooltip>
   {:else if $dataEncoder.hasSuccess}
-    <Tooltip right text={'Data encoder succesfully converted content'}>
+    <Tooltip bottomRight text={'Codec Server succesfully converted content'}>
       <button
         class="relative flex items-center"
         data-testid="data-encoder-status-success"
         on:click={onIconClick}
       >
         <div class="mr-2 ml-1 flex items-center">
-          <Icon name="converter-down" class="text-green-400" />
-          <Icon name="converter-up" class="absolute left-3 text-green-400" />
+          <Icon name="transcoder-on" />
         </div>
         <slot />
       </button>
     </Tooltip>
   {/if}
 {:else}
-  <Tooltip right text={'Configure data encoder'}>
+  <Tooltip bottomRight text={'Configure Codec Server'}>
     <button
       class="relative flex items-center"
       data-testid="data-encoder-status"
       on:click={onIconClick}
     >
       <div class="mr-2 ml-1 flex items-center">
-        <Icon name="converter-down" class="text-gray-400" />
-        <Icon name="converter-up" class="absolute left-3 text-gray-400" />
+        <Icon name="transcoder-off" />
       </div>
       <slot />
     </button>
