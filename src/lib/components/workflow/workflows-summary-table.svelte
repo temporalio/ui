@@ -5,7 +5,7 @@
   export let updating: boolean = false;
 </script>
 
-<Table class="w-full md:table-fixed" {updating}>
+<Table class="w-full md:table-fixed" {updating} data-testid="workflows-table">
   <TableHeaderRow slot="headers">
     <th class="w-32 max-md:hidden">Status</th>
     <th class="max-md:hidden md:w-auto">Workflow ID</th>
