@@ -36,7 +36,7 @@
   };
 </script>
 
-<DropdownMenu value={_value} left icon="filter">
+<DropdownMenu value={_value} left icon="filter" testId="event-category-filter">
   <svelte:fragment slot="label">
     {label}
   </svelte:fragment>
@@ -48,7 +48,10 @@
             <Icon name="checkmark" />
           {/if}
         </div>
-        <button on:click={() => onOptionClick(option)}>
+        <button
+          data-testid="event-category-option"
+          on:click={() => onOptionClick(option)}
+        >
           {label}
         </button>
       </div>
