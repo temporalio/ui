@@ -10,7 +10,7 @@
     >
   </h3>
   <input
-    class="block w-24 rounded border-3 border-gray-900 p-2"
+    class="block w-24 rounded border-2 border-gray-900 p-2"
     placeholder="Port"
     data-testid="data-encoder-port-input"
     bind:value={port}

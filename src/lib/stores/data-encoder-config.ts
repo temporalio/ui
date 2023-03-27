@@ -9,8 +9,8 @@ export const passAccessToken = persistStore<boolean>(
   true,
 );
 
-export const passCredentials = persistStore<boolean>(
-  'passCredentials',
+export const includeCredentials = persistStore<boolean>(
+  'includeCredentials',
   false,
   true,
 );

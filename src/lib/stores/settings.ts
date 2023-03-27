@@ -9,7 +9,7 @@ export const settings = writable<Settings>({
   codec: {
     endpoint: '',
     passAccessToken: false,
-    passCredentials: false,
+    includeCredentials: false,
   },
   defaultNamespace: null,
   disableWriteActions: false,

@@ -165,7 +165,7 @@ export type SettingsResponse = {
   Codec: {
     Endpoint: string;
     PassAccessToken?: boolean;
-    PassCredentials?: boolean;
+    IncludeCredentials?: boolean;
   };
   DefaultNamespace: string;
   DisableWriteActions: boolean;

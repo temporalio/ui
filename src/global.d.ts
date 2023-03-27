@@ -59,7 +59,7 @@ type Settings = {
   codec: {
     endpoint?: string;
     passAccessToken?: boolean;
-    passCredentials?: boolean;
+    includeCredentials?: boolean;
   };
   defaultNamespace: string;
   disableWriteActions: boolean;

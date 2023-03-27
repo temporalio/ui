@@ -9,7 +9,7 @@
   import {
     codecEndpoint,
     passAccessToken,
-    passCredentials,
+    includeCredentials,
   } from '$lib/stores/data-encoder-config';
   import { validateHttpOrHttps, validateHttps } from '$lib/utilities/is-http';
 
@@ -22,7 +22,7 @@
   let endpoint = $codecEndpoint ?? '';
   let port = $dataConverterPort ?? '';
   let passToken = $passAccessToken ?? false;
-  let passCreds = $passCredentials ?? false;
+  let includeCreds = $includeCredentials ?? false;
 
   $: error = '';
 
@@ -40,7 +40,7 @@
     endpoint = $codecEndpoint ?? '';
     port = $dataConverterPort ?? '';
     passToken = $passAccessToken ?? false;
-    passCreds = $passCredentials ?? false;
+    includeCreds = $includeCredentials ?? false;
     $dataEncoderSettings.close();
   };
 
@@ -48,7 +48,7 @@
     error = '';
     $codecEndpoint = endpoint;
     $passAccessToken = passToken;
-    $passCredentials = passCreds;
+    $includeCredentials = includeCreds;
     $dataConverterPort = port;
     $dataEncoderSettings.close();
 
@@ -70,7 +70,7 @@
     <CodecEndpointSettings
       bind:endpoint
       bind:passToken
-      bind:passCreds
+      bind:includeCreds
       {error}
     />
     <DataConverterPortSettings bind:port />

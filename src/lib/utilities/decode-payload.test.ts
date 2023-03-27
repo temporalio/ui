@@ -290,7 +290,7 @@ describe('convertPayloadToJsonWithCodec', () => {
     const dataConverterStatus = get(lastDataEncoderStatus);
     expect(dataConverterStatus).toEqual('notRequested');
   });
-  it('Should include same-origin credentials with the request for cookie based authentication of data converters by default', async () => {
+  it('Should not include credentials with the request for cookie based authentication of data converters by default', async () => {
     const mockFetch = vi.fn(async () => {
       return {
         json: () => Promise.resolve({ payloads: [JsonPlainEncoded] }),
@@ -312,10 +312,10 @@ describe('convertPayloadToJsonWithCodec', () => {
 
     expect(mockFetch).toBeCalledWith(
       expect.any(String),
-      expect.objectContaining({ credentials: 'same-origin' }),
+      expect.not.objectContaining({ credentials: 'same-origin' }),
     );
   });
-  it('Should include cross-origin credentials with the request for cookie based authentication of data converters when passCredentials is set', async () => {
+  it('Should include cross-origin credentials with the request for cookie based authentication of data converters when includeCredentials is set', async () => {
     const mockFetch = vi.fn(async () => {
       return {
         json: () => Promise.resolve({ payloads: [JsonPlainEncoded] }),
@@ -331,7 +331,7 @@ describe('convertPayloadToJsonWithCodec', () => {
       settings: {
         codec: {
           endpoint,
-          passCredentials: true,
+          includeCredentials: true,
         },
       },
     });

@@ -2,7 +2,7 @@ import { get } from 'svelte/store';
 import {
   codecEndpoint,
   passAccessToken,
-  passCredentials,
+  includeCredentials,
 } from '$lib/stores/data-encoder-config';
 
 export const getCodecEndpoint = (
@@ -19,9 +19,9 @@ export const getCodecPassAccessToken = (
   return !!get(passToken) || !!settings?.codec?.passAccessToken;
 };
 
-export const getCodecPassCredentials = (
+export const getCodecIncludeCredentials = (
   settings: Settings,
-  passCreds = passCredentials,
+  includeCreds = includeCredentials,
 ): boolean => {
-  return get(passCreds) || settings?.codec?.passCredentials;
+  return get(includeCreds) || settings?.codec?.includeCredentials;
 };

@@ -6,7 +6,7 @@
 
   export let endpoint = '';
   export let passToken = false;
-  export let passCreds = false;
+  export let includeCreds = false;
   export let error = '';
 </script>
 
@@ -24,7 +24,7 @@
       >
     {/if}
     <textarea
-      class="block w-full rounded-md border-3 border-gray-900 p-2"
+      class="block w-full rounded-md border-2 border-gray-900 p-2"
       rows={5}
       placeholder="Paste your endpoint here"
       data-testid="data-encoder-endpoint-input"
@@ -45,10 +45,16 @@
       class="flex items-center gap-4 font-secondary text-sm"
       ><ToggleSwitch
         id="pass-access-credentials"
-        bind:checked={passCreds}
+        bind:checked={includeCreds}
         data-testid="data-encoder-pass-credentials"
       />Pass cross-origin credentials.
     </label>
+    {#if includeCreds}
+      <small data-testid="data-encoder-cross-origin-credentials"
+        >Warning: Pre-flight checks will be done if checked and could result in
+        failures to decode if uncorrectly configured.</small
+      >
+    {/if}
     {#if $dataEncoder.settingsEndpoint}
       <div class="flex items-center justify-between">
         <p data-testid="data-encoder-site-endpoint">

@@ -1,7 +1,7 @@
 import {
   codecEndpoint,
   passAccessToken,
-  passCredentials,
+  includeCredentials,
 } from '$lib/stores/data-encoder-config';
 import {
   convertPayloadToJsonWithCodec,
@@ -15,7 +15,7 @@ import { findAttributesAndKey } from '$lib/utilities/is-event-type';
 import {
   getCodecEndpoint,
   getCodecPassAccessToken,
-  getCodecPassCredentials,
+  getCodecIncludeCredentials,
 } from '$lib/utilities/get-codec';
 
 import { getEventCategory } from './get-event-categorization';
@@ -30,7 +30,7 @@ export async function getEventAttributes(
     decodeAttributes = decodePayloadAttributes,
     encoderEndpoint = codecEndpoint,
     codecPassAccessToken = passAccessToken,
-    codecPassCredentials = passCredentials,
+    codecIncludeCredentials = includeCredentials,
   }: DecodeFunctions = {},
 ): Promise<EventAttributesWithType> {
   const { key, attributes } = findAttributesAndKey(historyEvent);
@@ -40,13 +40,18 @@ export async function getEventAttributes(
     settings,
     codecPassAccessToken,
   );
-  const passCredentials = getCodecPassCredentials(
+  const includeCredentials = getCodecIncludeCredentials(
     settings,
-    codecPassCredentials,
+    codecIncludeCredentials,
   );
   const _settings = {
     ...settings,
-    codec: { ...settings?.codec, endpoint, passAccessToken, passCredentials },
+    codec: {
+      ...settings?.codec,
+      endpoint,
+      passAccessToken,
+      includeCredentials,
+    },
   };
 
   const convertedAttributes = endpoint

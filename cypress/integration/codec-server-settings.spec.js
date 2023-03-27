@@ -119,7 +119,7 @@ describe('Set Codec Server Settings', () => {
 
     it('Check pass credentials', () => {
       cy.get('@header').find('[data-testid="data-encoder-status"]').click();
-      cy.get('[data-testid="data-encoder-title"]').contains('Data Encoder');
+      cy.get('[data-testid="data-encoder-title"]').contains('Codec Server');
       cy.get('[data-testid="data-encoder-endpoint-title"]').contains(
         'Remote codec endpoint',
       );
