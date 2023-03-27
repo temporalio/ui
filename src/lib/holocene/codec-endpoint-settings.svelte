@@ -46,8 +46,8 @@
       ><ToggleSwitch
         id="pass-access-credentials"
         bind:checked={includeCreds}
-        data-testid="data-encoder-pass-credentials"
-      />Pass cross-origin credentials.
+        data-testid="data-encoder-include-credentials"
+      />Include cross-origin credentials.
     </label>
     {#if includeCreds}
       <small data-testid="data-encoder-cross-origin-credentials"
