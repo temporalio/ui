@@ -10,7 +10,7 @@ test.beforeEach(async ({ page }) => {
 
 test.describe('Workflows list', () => {
   test('should render decoded Payloads', async ({ page }) => {
-    await page.getByText('e2e-workflow-1').click();
+    await page.getByText('e2e-workflow-1').click({ position: { x: 0, y: 0 } });
 
     let region: Locator;
     let toggle: Locator;
@@ -64,7 +64,7 @@ test.describe('Workflows list', () => {
   });
 
   test('should render decoded stack trace', async ({ page }) => {
-    await page.getByText('e2e-workflow-2').click();
+    await page.getByText('e2e-workflow-2').click({ position: { x: 0, y: 0 } });
 
     await page.getByText('Stack Trace').click();
 
@@ -76,7 +76,7 @@ test.describe('Workflows list', () => {
   });
 
   test('should render decoded query results', async ({ page }) => {
-    await page.getByText('e2e-workflow-2').click();
+    await page.getByText('e2e-workflow-2').click({ position: { x: 0, y: 0 } });
 
     await page.getByText('Queries').click();
     await page.getByLabel('Query Type').selectOption('current_result');
