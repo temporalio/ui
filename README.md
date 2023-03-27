@@ -107,7 +107,7 @@ Set these environment variables if you want to change their defaults
 
 ## Releases
 
-Our `ui` repo releases page (https://github.com/temporalio/ui/releases) is for managing our npm package. The package includes a copy of /lib directory with types.
+Our `ui` repo releases page (https://github.com/temporalio/ui/releases) is for managing our [npm package](https://www.npmjs.com/package/@temporalio/ui). The package includes a copy of `/lib` directory with types.
 Our `ui-server` repo releases page (https://github.com/temporalio/ui-server/releases) is for managing docker images for the entire front-end app.
 
 ## Developing with Canary
