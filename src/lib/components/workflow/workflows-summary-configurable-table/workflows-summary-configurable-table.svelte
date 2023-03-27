@@ -366,18 +366,18 @@
 
 <style lang="postcss">
   .workflow-summary-tables-wrapper {
-    @apply relative flex flex-row w-full rounded-lg overflow-auto border-primary border-2;
+    @apply relative flex flex-row w-full rounded-lg border-primary border-2;
   }
 
   .workflow-summary-table-wrapper {
-    @apply relative flex bg-white overflow-y-visible;
+    @apply relative flex bg-white;
 
     &.pinned {
       /* 40px is the width of the checkbox column */
       @apply rounded-l-lg min-w-[40px] max-w-fit;
 
       &::after {
-        @apply absolute right-0 content-[''] border-0 bg-primary w-[3px] h-full cursor-ew-resize;
+        @apply absolute right-0 content-[''] bg-primary w-[3px] h-full cursor-ew-resize;
       }
 
       &.batch-actions-visible {

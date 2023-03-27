@@ -49,6 +49,7 @@
 <DropdownMenu
   value={idFilter ? idFilter.value : idSort ? idSort.value : ''}
   keepOpen
+  left
   icon="filter"
   testId="workflow-id-filter-button"
   on:showmenu={handleShowInput}
