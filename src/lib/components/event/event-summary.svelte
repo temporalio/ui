@@ -67,7 +67,7 @@
     return compact ? groupEvents(items, $eventFilterSort) : items;
   };
 
-  $: category = $eventCategoryFilter;
+  $: category = $eventCategoryFilter as EventTypeCategory;
   $: intialEvents =
     $eventFilterSort === 'descending' && !compact
       ? $eventHistory?.end
