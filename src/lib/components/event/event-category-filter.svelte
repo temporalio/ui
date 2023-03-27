@@ -9,6 +9,7 @@
     compactEventTypeOptions,
   } from '$lib/models/event-history/get-event-categorization';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import { eventCategoryFilter } from '$lib/stores/filters';
 
   export let compact: boolean = false;
 
@@ -17,14 +18,17 @@
   let parameter = 'category';
   let options = compact ? compactEventTypeOptions : allEventTypeOptions;
 
-  $: _value = $page.url?.searchParams?.get(parameter) ?? undefined;
+  $: _value = $page.url?.searchParams?.get(parameter);
 
   $: {
     updateQueryParameters({
       parameter: parameter,
       value: _value,
       url: $page.url,
-    }).then((v) => (_value = v?.toString()));
+    }).then((v) => {
+      _value = v?.toString() ?? null;
+      $eventCategoryFilter = _value;
+    });
   }
 
   const onOptionClick = (option: string) => {

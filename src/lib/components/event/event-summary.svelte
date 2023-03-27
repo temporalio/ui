@@ -7,6 +7,7 @@
   } from '$lib/stores/event-view';
   import { refresh } from '$lib/stores/workflow-run';
   import { eventHistory } from '$lib/stores/events';
+  import { eventCategoryFilter } from '$lib/stores/filters';
   import { authUser } from '$lib/stores/auth-user';
 
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
@@ -66,7 +67,7 @@
     return compact ? groupEvents(items, $eventFilterSort) : items;
   };
 
-  $: category = $page.url.searchParams.get('category');
+  $: category = $eventCategoryFilter;
   $: intialEvents =
     $eventFilterSort === 'descending' && !compact
       ? $eventHistory?.end
