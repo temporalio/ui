@@ -253,7 +253,9 @@
           {#each otherColumns as column}
             <WorkflowsSummaryTableHeaderCell {column} {sortDisabled} />
           {/each}
-          <th class="px-2 h-10 w-12 text-right">
+          <th
+            class="px-2 h-10 w-12 text-right sticky right-0 flex items-center justify-center bg-primary"
+          >
             <IconButton
               icon="vertical-ellipsis"
               on:click={openCustomizationDrawer}
