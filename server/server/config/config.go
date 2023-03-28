@@ -64,8 +64,11 @@ type (
 	}
 
 	CORS struct {
-		AllowOrigins   []string `yaml:"allowOrigins"`
-		CookieInsecure bool     `yaml:"cookieInsecure"`
+		AllowOrigins []string `yaml:"allowOrigins"`
+		// CookieInsecure allows CSRF cookie to be sent to servers that the browser considers
+		// unsecured. Useful for cases where the connection is secured via VPN rather than
+		// HTTPS directly.
+		CookieInsecure bool `yaml:"cookieInsecure"`
 	}
 
 	TLS struct {
