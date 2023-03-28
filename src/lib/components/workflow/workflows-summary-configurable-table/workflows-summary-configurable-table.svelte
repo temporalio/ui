@@ -15,7 +15,6 @@
     moveColumn,
     pinColumn,
     MAX_PINNED_COLUMNS,
-    workflowPinnedColumnsWidth,
   } from '$lib/stores/workflow-table-columns';
   import Drawer from '$lib/holocene/drawer.svelte';
   import OrderableList from '$lib/holocene/orderable-list/orderable-list.svelte';
@@ -311,9 +310,9 @@
       <svelte:fragment slot="heading">
         Available Headings <span class="font-normal">(not in view)</span>
       </svelte:fragment>
-      {#each $availableWorkflowColumns as column, index}
-        <OrderableListItem static {index} on:addItem={() => addColumn(column)}>
-          {column}
+      {#each $availableWorkflowColumns as { label }, index}
+        <OrderableListItem static {index} on:addItem={() => addColumn(label)}>
+          {label}
         </OrderableListItem>
       {:else}
         <OrderableListItem readonly>No Available Headings</OrderableListItem>

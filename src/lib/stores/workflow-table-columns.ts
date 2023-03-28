@@ -78,14 +78,14 @@ const DEFAULT_COLUMNS: WorkflowHeader[] = [
   { label: 'End', pinned: false },
 ];
 
-const DEFAULT_AVAILABLE_COLUMNS: WorkflowHeaderLabel[] = [
-  'History Size',
-  'History Length',
-  'Execution Time',
-  'State Transitions',
-  'Parent Namespace',
-  'Parent Workflow ID',
-  'Task Queue',
+const DEFAULT_AVAILABLE_COLUMNS: WorkflowHeader[] = [
+  { label: 'History Size', pinned: false },
+  { label: 'History Length', pinned: false },
+  { label: 'Execution Time', pinned: false },
+  { label: 'State Transitions', pinned: false },
+  { label: 'Parent Namespace', pinned: false },
+  { label: 'Parent Workflow ID', pinned: false },
+  { label: 'Task Queue', pinned: false },
 ];
 
 export const WORKFLOW_CELLS: Record<WorkflowHeaderLabel, WorkflowCell> = {
@@ -131,9 +131,9 @@ const workflowTableColumns = persistStore(
 const availableWorkflowColumns = derived(
   [workflowTableColumns],
   ([$workflowTableColumns]) =>
-    DEFAULT_AVAILABLE_COLUMNS.filter(
+    [...DEFAULT_COLUMNS, ...DEFAULT_AVAILABLE_COLUMNS].filter(
       (header) =>
-        !$workflowTableColumns.some((column) => column.label === header),
+        !$workflowTableColumns.some((column) => column.label === header.label),
     ),
 );
 
@@ -237,15 +237,10 @@ const pinColumn = (label: WorkflowHeaderLabel | string) => {
   dispatch({ type: 'WORKFLOW_COLUMN.PIN', payload: { label } });
 };
 
-const workflowPinnedColumnsWidth = persistStore<number>(
-  'worfklow-pinned-columns-width',
-);
-
 export {
   workflowTableColumns,
   availableSearchAttributes,
   availableWorkflowColumns,
-  workflowPinnedColumnsWidth,
   addColumn,
   removeColumn,
   moveColumn,
