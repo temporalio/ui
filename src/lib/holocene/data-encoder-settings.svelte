@@ -9,6 +9,7 @@
   import {
     codecEndpoint,
     passAccessToken,
+    includeCredentials,
   } from '$lib/stores/data-encoder-config';
   import { validateHttpOrHttps, validateHttps } from '$lib/utilities/is-http';
 
@@ -21,6 +22,7 @@
   let endpoint = $codecEndpoint ?? '';
   let port = $dataConverterPort ?? '';
   let passToken = $passAccessToken ?? false;
+  let includeCreds = $includeCredentials ?? false;
 
   $: error = '';
 
@@ -38,6 +40,7 @@
     endpoint = $codecEndpoint ?? '';
     port = $dataConverterPort ?? '';
     passToken = $passAccessToken ?? false;
+    includeCreds = $includeCredentials ?? false;
     $dataEncoderSettings.close();
   };
 
@@ -45,6 +48,7 @@
     error = '';
     $codecEndpoint = endpoint;
     $passAccessToken = passToken;
+    $includeCredentials = includeCreds;
     $dataConverterPort = port;
     $dataEncoderSettings.close();
 
@@ -63,10 +67,15 @@
 >
   <h3 slot="title" data-testid="data-encoder-title">Codec Server</h3>
   <div slot="content">
-    <CodecEndpointSettings bind:endpoint bind:passToken {error} />
+    <CodecEndpointSettings
+      bind:endpoint
+      bind:passToken
+      bind:includeCreds
+      {error}
+    />
     <DataConverterPortSettings bind:port />
-    <small data-testid="data-encoder-info"
-      >If both are set, the Remote Codec Endpoint will be used.</small
-    >
+    <p data-testid="data-encoder-info">
+      *If both are set, the remote codec endpoint will be used.
+    </p>
   </div>
 </Modal>

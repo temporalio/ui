@@ -35,11 +35,23 @@ export async function convertPayloadsWithCodec({
     }
   }
 
-  const encoderResponse: Promise<Payloads> = fetch(endpoint + '/decode', {
-    headers,
-    method: 'POST',
-    body: stringifyWithBigInt(payloads),
-  })
+  const requestOptions = settings?.codec?.includeCredentials
+    ? {
+        headers,
+        credentials: 'include' as RequestCredentials,
+        method: 'POST',
+        body: stringifyWithBigInt(payloads),
+      }
+    : {
+        headers,
+        method: 'POST',
+        body: stringifyWithBigInt(payloads),
+      };
+
+  const encoderResponse: Promise<Payloads> = fetch(
+    endpoint + '/decode',
+    requestOptions,
+  )
     .then((r) => r.json())
     .then((response) => {
       setLastDataEncoderSuccess();

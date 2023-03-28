@@ -9,6 +9,12 @@ export const passAccessToken = persistStore<boolean>(
   true,
 );
 
+export const includeCredentials = persistStore<boolean>(
+  'includeCredentials',
+  false,
+  true,
+);
+
 export const lastDataEncoderStatus =
   writable<DataEncoderStatus>('notRequested');
 
