@@ -46,7 +46,7 @@
 
 <style lang="postcss">
   .dot {
-    @apply h-2 w-2 rounded-full border-2 border-gray-700 bg-gray-900;
+    @apply h-3 w-3 rounded-full border-2 border-gray-700 bg-gray-900;
   }
 
   .line {
@@ -62,23 +62,23 @@
   }
 
   .dot.completed {
-    @apply border-green-300 bg-green-400;
+    @apply border-green-700 bg-green-400;
   }
 
   .dot.failure {
-    @apply border-red-400 bg-red-500;
+    @apply border-red-700 bg-red-500;
   }
 
   .dot.canceled {
-    @apply border-yellow-200 bg-yellow-300;
+    @apply border-yellow-700 bg-yellow-300;
   }
 
   .dot.terminated {
-    @apply border-pink-400 bg-pink-500;
+    @apply border-pink-700 bg-pink-500;
   }
 
   .dot.running {
-    @apply border-gray-400 bg-gray-500;
+    @apply border-gray-700 bg-gray-500;
   }
 
   .dot.pending {
