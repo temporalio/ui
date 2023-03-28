@@ -348,8 +348,7 @@
     @apply relative flex bg-white;
 
     &.pinned {
-      /* 40px is the width of the checkbox column */
-      @apply rounded-l-lg min-w-[40px] max-w-fit;
+      @apply rounded-l-lg;
 
       &::after {
         @apply absolute right-0 content-[''] bg-primary w-[3px] h-full;
