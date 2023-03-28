@@ -37,6 +37,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { goto } from '$app/navigation';
   import ProgressBar from '$lib/holocene/progress-bar.svelte';
+  import es from 'date-fns/locale/es';
 
   const dispatch = createEventDispatcher<{
     terminateWorkflows: undefined;
@@ -302,6 +303,8 @@
         >
           {label}
         </OrderableListItem>
+      {:else}
+        <OrderableListItem readonly>No Headings in View</OrderableListItem>
       {/each}
     </OrderableList>
     <OrderableList>
