@@ -1,45 +1,33 @@
 <script lang="ts">
   import CodeBlock from '$lib/holocene/code-block.svelte';
-  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
 
   export let content: string;
   export let title: string;
 
-  let parsedContent = [];
-  let showIndividually = false;
+  $: parsedContent = parseContent(content);
+  $: showParsedContent = parsedContent.length > 0;
+  $: showParsedContentCount = parsedContent.length > 1;
 
-  const parseContent = () => {
+  const parseContent = (c: string): string[] => {
     try {
-      const result = JSON.parse(content);
-      if (Array.isArray(result)) {
-        parsedContent = result;
-      }
+      const result = JSON.parse(c);
+      return Array.isArray(result) ? result : [];
     } catch {
-      // do nothing
+      return [];
     }
   };
-
-  $: content && parseContent();
 </script>
 
 <article class="flex w-full flex-col lg:w-1/2" {...$$restProps}>
-  <div class="flex flex-col sm:flex-row justify-between min-h-[32px] mb-2">
-    <h3 class="text-lg">{title}</h3>
-    {#if parsedContent.length > 0}
-      <label
-        for="{title}-show-individually"
-        class="flex items-center gap-4 font-secondary text-sm"
-        data-testid="{title}-show-individually"
-        >Show individually
-        <ToggleSwitch
-          id="{title}-show-individually"
-          bind:checked={showIndividually}
-        />
-      </label>
+  <h3 class="text-lg flex items-center gap-2 mb-2">
+    {title}
+    {#if showParsedContentCount}
+      <Badge type="count" class="rounded-sm">{parsedContent.length}</Badge>
     {/if}
-  </div>
+  </h3>
   {#if content}
-    {#if showIndividually}
+    {#if showParsedContent}
       <div class="flex flex-col h-full lg:max-h-[24rem] overflow-scroll">
         {#each parsedContent as content}
           <CodeBlock content={JSON.stringify(content)} class="mb-2" />
