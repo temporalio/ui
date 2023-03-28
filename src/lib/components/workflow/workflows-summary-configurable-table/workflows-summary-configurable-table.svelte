@@ -55,9 +55,6 @@
 
   let coreUser = coreUserStore();
   let customizationDrawerOpen: boolean = false;
-  let resizableContainer: HTMLDivElement;
-  let resizableContainerWidth: number = $workflowPinnedColumnsWidth;
-  let resizing: boolean = false;
 
   $: namespace = $page.params.namespace;
   $: selectedWorkflowsCount = selectedWorkflows.length;
@@ -117,40 +114,14 @@
       }),
     );
   };
-
-  const handleMouseDown = (event: MouseEvent) => {
-    if (resizableContainer.clientWidth - event.x < 3) {
-      resizing = true;
-    }
-    return false;
-  };
-
-  const handleMouseUp = () => {
-    if (resizing) resizing = false;
-    $workflowPinnedColumnsWidth = resizableContainerWidth;
-  };
-
-  const handleMouseMove = (event: MouseEvent) => {
-    if (!resizing) return false;
-    const rect = resizableContainer.getBoundingClientRect();
-    resizableContainerWidth = event.x - rect.x;
-    return false;
-  };
 </script>
 
-<svelte:window
-  on:mousemove|stopPropagation={handleMouseMove}
-  on:mouseup|stopPropagation={handleMouseUp}
-/>
 <div class="workflow-summary-tables-wrapper">
   <div
     class="workflow-summary-table-wrapper pinned"
     class:batch-actions-enabled={$supportsBulkActions}
     class:batch-actions-visible={showBulkActions}
     class:no-columns-pinned={pinnedColumns.length === 0}
-    bind:this={resizableContainer}
-    style="width:{resizableContainerWidth}px;"
-    on:mousedown|stopPropagation|preventDefault={handleMouseDown}
   >
     <table class="workflow-summary-table pinned">
       <thead>
@@ -225,7 +196,7 @@
       <tbody>
         {#each workflows as workflow}
           <tr
-            class="workflow-summary-row pinned"
+            class="workflow-summary-configurable-row pinned"
             on:click={() => goToWorkflow(workflow)}
           >
             {#if $supportsBulkActions}
@@ -269,7 +240,7 @@
       <tbody>
         {#each workflows as workflow}
           <tr
-            class="workflow-summary-row"
+            class="workflow-summary-configurable-row"
             on:click={() => goToWorkflow(workflow)}
           >
             {#each otherColumns as column}
@@ -368,7 +339,7 @@
 
 <style lang="postcss">
   .workflow-summary-tables-wrapper {
-    @apply relative flex flex-row w-full rounded-lg border-primary border-2;
+    @apply relative flex flex-row w-full rounded-lg border-primary border-2 overflow-hidden;
   }
 
   .workflow-summary-table-wrapper {
@@ -379,7 +350,7 @@
       @apply rounded-l-lg min-w-[40px] max-w-fit;
 
       &::after {
-        @apply absolute right-0 content-[''] bg-primary w-[3px] h-full cursor-ew-resize;
+        @apply absolute right-0 content-[''] bg-primary w-[3px] h-full;
       }
 
       &.batch-actions-visible {
@@ -441,7 +412,7 @@
     }
   }
 
-  .workflow-summary-row {
+  .workflow-summary-configurable-row {
     @apply border-b border-primary cursor-pointer h-10;
 
     &:last-of-type {
@@ -461,7 +432,7 @@
     }
   }
 
-  :global(.workflow-summary-row:hover > td) {
+  .workflow-summary-configurable-row:hover {
     @apply bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
 
     :global(.table-link) {
