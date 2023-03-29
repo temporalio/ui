@@ -1,4 +1,4 @@
-import type { google, temporal } from '@temporalio/proto';
+import { google, temporal } from '@temporalio/proto';
 
 // api.workflowservice
 
@@ -27,6 +27,10 @@ export type PatchScheduleRequest =
   temporal.api.workflowservice.v1.IPatchScheduleRequest;
 export type UpdateScheduleRequest =
   temporal.api.workflowservice.v1.IUpdateScheduleRequest;
+export type StartBatchOperationRequest =
+  temporal.api.workflowservice.v1.IStartBatchOperationRequest;
+export type ResetWorkflowRequest =
+  temporal.api.workflowservice.v1.IResetWorkflowExecutionRequest;
 
 // api.history
 
@@ -112,8 +116,6 @@ export type ExternalWorkflowExecutionSignaledEventAttributes =
   temporal.api.history.v1.IExternalWorkflowExecutionSignaledEventAttributes;
 export type UpsertWorkflowSearchAttributesEventAttributes =
   temporal.api.history.v1.IUpsertWorkflowSearchAttributesEventAttributes;
-export type StartBatchOperationRequest =
-  temporal.api.workflowservice.v1.IStartBatchOperationRequest;
 
 // api.enums
 
@@ -123,6 +125,14 @@ export type Severity = temporal.api.enums.v1.Severity;
 export type WorkflowTaskFailedCause =
   temporal.api.enums.v1.WorkflowTaskFailedCause;
 export type ArchivalState = temporal.api.enums.v1.ArchivalState;
+export type ResetReapplyType = temporal.api.enums.v1.ResetReapplyType;
+export const {
+  api: {
+    enums: {
+      v1: { ResetReapplyType },
+    },
+  },
+} = temporal;
 
 // api.workflow
 
