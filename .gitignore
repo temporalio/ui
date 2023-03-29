@@ -1,7 +1,7 @@
 .DS_Store
 node_modules
 /.svelte-kit
-/package
+/dist
 /cypress/screenshots
 /cypress/videos
 /coverage
