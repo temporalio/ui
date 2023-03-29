@@ -366,18 +366,15 @@
 
 <style lang="postcss">
   .workflow-summary-tables-wrapper {
-    @apply relative flex flex-row w-full rounded-lg border-primary border-2 overflow-scroll;
+    @apply relative flex flex-row w-full rounded-lg border-primary border-2 overflow-scroll bg-white;
   }
 
   .workflow-summary-table-wrapper {
-    @apply relative flex bg-white;
+    @apply relative flex;
 
     &.pinned {
-      @apply rounded-l-lg;
-
-      &::after {
-        @apply absolute right-0 content-[''] bg-primary w-[3px] h-full;
-      }
+      /* higher z-index ensures the box shadow displays over the background gradient on the table rows */
+      @apply rounded-l-lg border-primary border-r-[3px] shadow-primary shadow-md z-10;
 
       &.batch-actions-visible {
         @apply !w-full;
@@ -459,7 +456,7 @@
   }
 
   .workflow-summary-configurable-row:hover {
-    @apply bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
+    @apply bg-gradient-to-br from-blue-100 to-purple-100;
 
     :global(.table-link) {
       @apply text-blue-700 underline decoration-blue-700;
