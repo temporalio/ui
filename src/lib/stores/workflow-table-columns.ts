@@ -198,7 +198,7 @@ const reducer = (action: Action, state: State): State => {
       }
 
       const tempColumns = [...state];
-      if (to < lastPinned && !isPinned) {
+      if (to <= lastPinned && !isPinned) {
         tempColumns[from].pinned = true;
       } else if (to > lastPinned && isPinned) {
         tempColumns[from].pinned = false;

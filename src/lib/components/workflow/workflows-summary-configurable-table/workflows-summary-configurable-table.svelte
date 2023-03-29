@@ -36,7 +36,6 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { goto } from '$app/navigation';
   import ProgressBar from '$lib/holocene/progress-bar.svelte';
-  import es from 'date-fns/locale/es';
 
   const dispatch = createEventDispatcher<{
     terminateWorkflows: undefined;
@@ -194,26 +193,30 @@
         {/if}
       </thead>
       <tbody>
-        {#each workflows as workflow}
-          <tr
-            class="workflow-summary-configurable-row pinned"
-            on:click={() => goToWorkflow(workflow)}
-          >
-            {#if $supportsBulkActions}
-              <td>
-                <Checkbox
-                  hoverable
-                  bind:group={selectedWorkflows}
-                  value={workflow}
-                  disabled={allSelected}
-                />
-              </td>
-            {/if}
-            {#each pinnedColumns as column}
-              <WorkflowsSummaryTableBodyCell {column} {workflow} />
-            {/each}
-          </tr>
-        {/each}
+        {#if $workflowTableColumns.length > 0}
+          {#each workflows as workflow}
+            <tr
+              class="workflow-summary-configurable-row pinned"
+              on:click={() => goToWorkflow(workflow)}
+            >
+              {#if $supportsBulkActions}
+                <td>
+                  <Checkbox
+                    hoverable
+                    bind:group={selectedWorkflows}
+                    value={workflow}
+                    disabled={allSelected}
+                  />
+                </td>
+              {/if}
+              {#each pinnedColumns as column}
+                <WorkflowsSummaryTableBodyCell {column} {workflow} />
+              {/each}
+            </tr>
+          {/each}
+        {:else}
+          <tr />
+        {/if}
       </tbody>
     </table>
   </div>
@@ -238,31 +241,51 @@
         {/if}
       </thead>
       <tbody>
-        {#each workflows as workflow}
-          <tr
-            class="workflow-summary-configurable-row"
-            on:click={() => goToWorkflow(workflow)}
-          >
-            {#each otherColumns as column}
-              <WorkflowsSummaryTableBodyCell {column} {workflow} />
-            {/each}
-            <td />
-          </tr>
+        {#if $workflowTableColumns.length > 0}
+          {#each workflows as workflow}
+            <tr
+              class="workflow-summary-configurable-row"
+              on:click={() => goToWorkflow(workflow)}
+            >
+              {#each otherColumns as column}
+                <WorkflowsSummaryTableBodyCell {column} {workflow} />
+              {/each}
+              <td />
+            </tr>
+          {:else}
+            <tr>
+              <td colspan={otherColumns.length + 1}>
+                {#if $loading}
+                  <Loading />
+                {:else}
+                  <EmptyState
+                    title="No Workflows Found"
+                    content="If you have filters applied, try adjusting them. Otherwise please check your syntax and try again."
+                    error={$workflowError}
+                  />
+                {/if}
+              </td>
+            </tr>
+          {/each}
         {:else}
           <tr>
-            <td colspan={otherColumns.length + 1}>
-              {#if $loading}
-                <Loading />
-              {:else}
-                <EmptyState
-                  title="No Workflows Found"
-                  content="If you have filters applied, try adjusting them. Otherwise please check your syntax and try again."
-                  error={$workflowError}
-                />
-              {/if}
+            <td>
+              <EmptyState title="No column headers are in view">
+                <p class="text-center">
+                  <span
+                    >At least one column heading is required to display
+                    workflows. Click the (</span
+                  ><Icon class="inline" name="vertical-ellipsis" /><span>
+                    ) in the top right corner of the Workflow List to reveal the
+                    Configure Workflow List panel. Click the (</span
+                  ><Icon class="inline" name="add" /><span
+                    >) to add column headings.</span
+                  >
+                </p>
+              </EmptyState>
             </td>
           </tr>
-        {/each}
+        {/if}
       </tbody>
     </table>
   </div>
@@ -303,7 +326,7 @@
           {label}
         </OrderableListItem>
       {:else}
-        <OrderableListItem readonly>No Headings in View</OrderableListItem>
+        <OrderableListItem readonly>No headings in view</OrderableListItem>
       {/each}
     </OrderableList>
     <OrderableList>
@@ -315,7 +338,9 @@
           {label}
         </OrderableListItem>
       {:else}
-        <OrderableListItem readonly>No Available Headings</OrderableListItem>
+        <OrderableListItem readonly
+          >All available headings are in view</OrderableListItem
+        >
       {/each}
     </OrderableList>
     <OrderableList>
@@ -379,7 +404,7 @@
     }
 
     &:not(.pinned) {
-      @apply overflow-x-scroll flex-grow rounded-r;
+      @apply overflow-x-scroll overscroll-contain flex-grow rounded-r;
     }
   }
 

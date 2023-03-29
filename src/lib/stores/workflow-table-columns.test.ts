@@ -35,7 +35,7 @@ describe('Workflow Table Columns store', () => {
       ]);
       moveColumn(1, 0);
       expect(get(workflowTableColumns)).toEqual([
-        { label: 'Start', pinned: false },
+        { label: 'Start', pinned: true },
         { label: 'End', pinned: false },
       ]);
     });
