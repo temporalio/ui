@@ -366,7 +366,7 @@
 
 <style lang="postcss">
   .workflow-summary-tables-wrapper {
-    @apply relative flex flex-row w-full rounded-lg border-primary border-2 overflow-hidden;
+    @apply relative flex flex-row w-full rounded-lg border-primary border-2 overflow-scroll;
   }
 
   .workflow-summary-table-wrapper {
