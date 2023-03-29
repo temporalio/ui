@@ -269,18 +269,18 @@
           {/each}
         {:else}
           <tr>
-            <td>
+            <td class="px-8">
               <EmptyState title="No column headers are in view">
                 <p class="text-center">
-                  <span
-                    >At least one column heading is required to display
-                    workflows. Click the (</span
-                  ><Icon class="inline" name="vertical-ellipsis" /><span>
-                    ) in the top right corner of the Workflow List to reveal the
-                    Configure Workflow List panel. Click the (</span
-                  ><Icon class="inline" name="add" /><span
-                    >) to add column headings.</span
+                  At least one column heading is required to display workflows.
+                  Click the <span class="whitespace-nowrap"
+                    >(<Icon class="inline" name="vertical-ellipsis" />)</span
                   >
+                  in the top right corner of the Workflow List to reveal the Configure
+                  Workflow List panel. Click the
+                  <span class="whitespace-nowrap"
+                    >(<Icon class="inline" name="add" />)</span
+                  > to add column headings.
                 </p>
               </EmptyState>
             </td>
