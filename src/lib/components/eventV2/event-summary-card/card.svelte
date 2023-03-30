@@ -23,9 +23,18 @@
   $: hasGroupEvents = isEventGroup(event) && event?.eventList?.length > 1;
 </script>
 
-<div class="flex gap-2">
-  <LineDot {event} removeTail={last || final} removeHead={initial} />
-  <div class="h-full w-full pt-2" class:pt-0={initial}>
+<div class="flex gap-1">
+  <LineDot
+    {event}
+    {firstEvent}
+    {events}
+    removeTail={last || final}
+    removeHead={initial}
+  />
+  <div
+    class="h-full w-full {hasGroupEvents ? 'pb-2' : 'pb-1'}"
+    class:pb-0={last}
+  >
     <div
       class="card {$$props.class}"
       class:shadow={thick}
@@ -47,7 +56,7 @@
       </div>
     </div>
     {#if isEventGroup(event) && event?.subGroupList?.length}
-      <div class="flex w-full flex-col pl-12">
+      <div class="flex w-full flex-col mt-2">
         {#each event.subGroupList as group, index}
           <EventGroupSummaryCard
             event={group}

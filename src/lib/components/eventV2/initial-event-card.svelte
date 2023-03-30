@@ -10,7 +10,7 @@
 </script>
 
 <div class="flex gap-2">
-  <div class="w-[20px] min-w-[20px]" />
+  <div class="w-[160px] min-w-[160px]" />
   <div class="flex grow flex-col overflow-auto">
     <CodeBlock {content} title="Input" icon="json" class="h-auto" />
   </div>

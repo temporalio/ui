@@ -36,7 +36,7 @@
     {/each}
   </div>
 {:else if secondaryEvents.length}
-  <div class="flex flex-col gap-2" class:secondary={!primary}>
+  <div class="flex flex-col gap-1" class:secondary={!primary}>
     <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
       {#each secondaryEvents as [key, value] (key)}
         <DetailBadge {key} {value} {attributes} {primary} />
@@ -47,6 +47,6 @@
 
 <style lang="postcss">
   .secondary {
-    @apply my-4;
+    @apply my-1;
   }
 </style>

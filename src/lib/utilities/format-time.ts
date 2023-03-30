@@ -111,8 +111,15 @@ export function formatDistanceAbbreviated({
   end: ValidTime | undefined | null;
 }): string {
   const duration = getDuration({ start, end });
-  const distance = formatDuration(duration, ' ');
-  return formatDistanceToSingleLetters(distance);
+  const noDuration = Object.values(duration).every((value) => value === 0);
+  if (noDuration) {
+    const startMilliseconds = getMilliseconds(start);
+    const endMilliseconds = getMilliseconds(end);
+    return (endMilliseconds - startMilliseconds).toString() + 'ms';
+  } else {
+    const distance = formatDuration(duration, ' ');
+    return formatDistanceToSingleLetters(distance);
+  }
 }
 
 export function getMilliseconds(date: ValidTime | undefined | null): number {
