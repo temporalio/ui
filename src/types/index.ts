@@ -1,4 +1,8 @@
-import { google, temporal } from '@temporalio/proto';
+import {
+  type google,
+  type temporal,
+  temporal as Temporal,
+} from '@temporalio/proto';
 
 // api.workflowservice
 
@@ -132,7 +136,7 @@ export const {
       v1: { ResetReapplyType },
     },
   },
-} = temporal;
+} = Temporal;
 
 // api.workflow
 
