@@ -79,7 +79,6 @@
       selectedWorkflowsCount !== 0);
 
   $: pinnedColumns = $workflowTableColumns.filter((column) => column.pinned);
-
   $: otherColumns = $workflowTableColumns.filter((column) => !column.pinned);
 
   const openCustomizationDrawer = () => {
@@ -129,15 +128,17 @@
           class:batch-actions-visible={showBulkActions}
         >
           {#if $supportsBulkActions}
-            <th>
-              <Checkbox
-                id="select-visible-workflows"
-                onDark
-                hoverable
-                {checked}
-                {indeterminate}
-                on:change={handleCheckboxChange}
-              />
+            <th class="w-10">
+              {#if $workflowTableColumns.length > 0}
+                <Checkbox
+                  id="select-visible-workflows"
+                  onDark
+                  hoverable
+                  {checked}
+                  {indeterminate}
+                  on:change={handleCheckboxChange}
+                />
+              {/if}
             </th>
           {/if}
           {#if $supportsBulkActions && showBulkActions}
@@ -376,14 +377,6 @@
       /* higher z-index ensures the box shadow displays over the background gradient on the table rows */
       @apply rounded-l-lg border-primary border-r-[3px] shadow-primary shadow-md z-10;
 
-      &.batch-actions-visible {
-        @apply !w-full;
-
-        &::after {
-          @apply pointer-events-none;
-        }
-      }
-
       /* when the user has no pinned columns, hard code the wrapper to the width of the checkbox column, or 0 */
       &.no-columns-pinned {
         &.batch-actions-enabled {
@@ -392,10 +385,6 @@
 
         &:not(.batch-actions-enabled) {
           @apply hidden;
-        }
-
-        &::after {
-          @apply pointer-events-none;
         }
       }
     }
@@ -456,7 +445,8 @@
   }
 
   .workflow-summary-configurable-row:hover {
-    @apply bg-gradient-to-br from-blue-100 to-purple-100;
+    /* bg-fixed solves an issue with safari applying the gradient on each td instead of across the entire row */
+    @apply bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
 
     :global(.table-link) {
       @apply text-blue-700 underline decoration-blue-700;
