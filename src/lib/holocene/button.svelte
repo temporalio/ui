@@ -23,7 +23,7 @@
   export let classes: string = $$props.class;
   export let testId: string = $$props.testId;
   export let count: number = 0;
-  export let type: string = 'button';
+  export let type: 'button' | 'submit' | 'reset' = 'button';
   export let unround: boolean = false;
   export let unroundRight: boolean = false;
   export let unroundLeft: boolean = false;

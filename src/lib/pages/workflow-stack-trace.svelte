@@ -11,6 +11,7 @@
   import Loading from '$lib/holocene/loading.svelte';
   import Link from '$lib/holocene/link.svelte';
   import { authUser } from '$lib/stores/auth-user';
+  import type { Eventual } from 'src/more-global';
 
   const { namespace } = $page.params;
   $: ({ workflow, workers } = $workflowRun);

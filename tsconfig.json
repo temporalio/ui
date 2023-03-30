@@ -46,6 +46,7 @@
     "src/lib/stores/**/*.test.ts",
     // Until there is better TS support for Histoire
     "src/histoire.setup.ts",
-    "src/lib/holocene/**/*.story.svelte"
+    "src/lib/holocene/**/*.story.svelte",
+    "src/lib/vendor/**/*"
   ]
 }

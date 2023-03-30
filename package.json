@@ -9,23 +9,12 @@
   ],
   "exports": {
     ".": null,
-    "./services/workflow-service-v2": {
-      "import": "./dist/services/workflow-service.js",
-      "types": "./dist/services/workflow-service.d.ts"
-    },
-    "./*.svelte": "./dist/*.svelte",
-    "./*": "./dist/*.ts"
-  },
-  "typesVersions": {
-    ">4.0": {
-      "*": [
-        "./dist/*"
-      ]
+    "./*": {
+      "svelte": "./dist/*.svelte",
+      "import": "./dist/*.js",
+      "types": "./dist/*.d.ts"
     }
   },
-  "files": [
-    "./"
-  ],
   "license": "MIT",
   "homepage": "https://github.com/temporalio/ui/tree/main",
   "scripts": {
