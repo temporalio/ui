@@ -60,7 +60,7 @@
   {displayedTime}
 </div>
 <div class="flex w-[20px] min-w-[20px] flex-col items-center justify-center">
-  <div class="flex h-[20px] w-[10x] gap-0">
+  <div class="flex h-[20px] w-[10x] gap-0" class:running-line={running}>
     <div class="w-[4px]" />
     <div
       class="line"
@@ -100,6 +100,10 @@
 
   .relative-time {
     @apply pt-[16px];
+  }
+
+  .running-line {
+    @apply h-[40px];
   }
 
   .dashed {
