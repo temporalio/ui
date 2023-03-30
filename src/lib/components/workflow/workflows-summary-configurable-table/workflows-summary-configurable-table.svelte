@@ -376,14 +376,6 @@
       /* higher z-index ensures the box shadow displays over the background gradient on the table rows */
       @apply rounded-l-lg border-primary border-r-[3px] shadow-primary shadow-md z-10;
 
-      &.batch-actions-visible {
-        @apply !w-full;
-
-        &::after {
-          @apply pointer-events-none;
-        }
-      }
-
       /* when the user has no pinned columns, hard code the wrapper to the width of the checkbox column, or 0 */
       &.no-columns-pinned {
         &.batch-actions-enabled {
@@ -392,10 +384,6 @@
 
         &:not(.batch-actions-enabled) {
           @apply hidden;
-        }
-
-        &::after {
-          @apply pointer-events-none;
         }
       }
     }
