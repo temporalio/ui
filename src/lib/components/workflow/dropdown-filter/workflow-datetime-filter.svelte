@@ -173,7 +173,7 @@
     {onChange}
   >
     <div
-      class="flex {custom
+      class="flex rounded {custom
         ? 'h-[500px]'
         : 'h-[340px]'} w-[400px] flex-col gap-8 bg-white p-4"
     >

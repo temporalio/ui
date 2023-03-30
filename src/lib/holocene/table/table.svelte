@@ -1,12 +1,21 @@
 <script lang="ts">
   import ProgressBar from '$lib/holocene/progress-bar.svelte';
+  import type { HTMLTableAttributes } from 'svelte/elements';
 
+  interface $$Props extends HTMLTableAttributes {
+    variant?: 'simple' | 'fancy';
+    updating?: boolean;
+    class?: string;
+    'data-testid'?: string;
+  }
+
+  let className: string = '';
+  export { className as class };
   export let variant: 'simple' | 'fancy' = 'fancy';
   export let updating = false;
-  export let id: string = null;
 </script>
 
-<table class="{variant} {$$props.class}" {id}>
+<table class="{variant} {className}" {...$$restProps}>
   <thead>
     <slot name="headers" />
     {#if updating}

@@ -1,12 +1,55 @@
 type WorkflowExecutionStatus = import('$types').WorkflowExecutionStatus;
 type WorkflowTaskFailedCause = import('$types').WorkflowTaskFailedCause;
-type ListWorkflowExecutionsResponse =
-  import('$types').ListWorkflowExecutionsResponse;
-
-type WorkflowExecutionAPIResponse = Optional<
-  DescribeWorkflowExecutionResponse,
-  'executionConfig' | 'pendingActivities' | 'pendingChildren'
+/**
+ * Replace Longs, ITimestamps, etc. with their corresponding http values
+ */
+type WorkflowExecutionInfo = Replace<
+  import('$types').WorkflowExecutionInfo,
+  {
+    status: WorkflowStatus;
+    stateTransitionCount: string;
+    startTime: string;
+    closeTime: string;
+    historySizeBytes: string;
+    historyLength: string;
+  }
 >;
+
+type ListWorkflowExecutionsResponse = Replace<
+  import('$types').ListWorkflowExecutionsResponse,
+  Optional<{ executions: WorkflowExecutionInfo[] }>
+>;
+
+type WorkflowExecutionConfig = Replace<
+  import('$types').WorkflowExecutionConfig,
+  { defaultWorkflowTaskTimeout: Duration }
+>;
+
+type WorkflowExecutionAPIResponse = Optional<{
+  workflowExecutionInfo: WorkflowExecutionInfo;
+  pendingActivities: PendingActivityInfo[];
+  pendingChildren: PendingChildren[];
+  executionConfig: WorkflowExecutionConfig;
+}>;
+
+type Decodable = {
+  searchAttributes: import('$types').WorkflowSearchAttributes;
+  memo: import('$types').Memo;
+  header: import('$types').Header;
+  queryResult: import('$types').QueryResult;
+};
+
+type DecodedPayload = import('$types').Payload | Record<any, any> | string;
+
+type Decoded = {
+  searchAttributes: { indexedFields: Record<string, DecodedPayload> };
+  memo: { fields: Record<string, DecodedPayload> };
+  header: { fields: Record<string, DecodedPayload> };
+  queryResult: Replace<
+    import('$types').QueryResult,
+    { answer: Array<DecodedPayload> }
+  >;
+};
 
 type WorkflowStatus =
   | 'Running'
@@ -48,7 +91,10 @@ type WorkflowExecution = {
   endTime: string;
   status: WorkflowStatus;
   taskQueue?: string;
-  historyEvents: Long;
+  historyEvents: string;
+  historySizeBytes: string;
+  searchAttributes?: { indexedFields: Record<string, DecodedPayload> };
+  memo?: { fields: Record<string, DecodedPayload> };
   pendingChildren: PendingChildren[];
   pendingActivities: PendingActivity[];
   stateTransitionCount: string;

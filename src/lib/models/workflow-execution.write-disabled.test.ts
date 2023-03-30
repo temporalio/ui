@@ -30,7 +30,7 @@ const workflows = [
 describe('toWorkflowExecution', () => {
   for (const workflow of workflows) {
     it(`should match the snapshot for ${workflow.workflowExecutionInfo.status} workflows`, () => {
-      expect(toWorkflowExecution(workflow)).toMatchSnapshot();
+      expect(toWorkflowExecution(workflow as any)).toMatchSnapshot();
     });
   }
 });

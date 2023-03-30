@@ -93,7 +93,7 @@
 
 <style lang="postcss">
   .dropdown-menu {
-    @apply absolute z-50 mt-1 w-auto
+    @apply clear-both absolute z-50 mt-1 w-auto
       rounded border border-gray-900 bg-white py-2 text-gray-900 shadow-md;
   }
 

@@ -11,7 +11,7 @@ describe('Batch and Bulk Workflow Actions', () => {
       cy.wait('@cluster-api');
       cy.wait('@workflows-api');
 
-      cy.get('#workflows-table-with-bulk-actions').should('not.exist');
+      cy.get('[data-testid=workflows-table]').should('exist');
     });
   });
 
@@ -33,11 +33,10 @@ describe('Batch and Bulk Workflow Actions', () => {
 
       cy.wait('@cluster-api-elasticsearch');
       cy.wait('@workflows-api');
+      cy.wait('@workflows-count-api');
     });
 
     it('allows running workflows to be terminated by ID without a reason', () => {
-      cy.get('#workflows-table-with-bulk-actions').should('exist');
-
       cy.get('#select-visible-workflows').click({ force: true });
       cy.get('[data-testid="bulk-terminate-button"]').click();
       cy.get(
@@ -47,8 +46,6 @@ describe('Batch and Bulk Workflow Actions', () => {
     });
 
     it('allows running workflows to be terminated by a query', () => {
-      cy.get('#workflows-table-with-bulk-actions').should('exist');
-
       cy.get('#select-visible-workflows').click({ force: true });
       cy.get('[data-testid="select-all-workflows"]').click();
       cy.get('[data-testid="bulk-terminate-button"]').click();
@@ -65,8 +62,6 @@ describe('Batch and Bulk Workflow Actions', () => {
     });
 
     it('allows running workflows to be cancelled by ID without a reason', () => {
-      cy.get('#workflows-table-with-bulk-actions').should('exist');
-
       cy.get('#select-visible-workflows').click({ force: true });
       cy.get('[data-testid="bulk-cancel-button"]').click();
       cy.get(
@@ -76,8 +71,6 @@ describe('Batch and Bulk Workflow Actions', () => {
     });
 
     it('allows running workflows to be cancelled by a query', () => {
-      cy.get('#workflows-table-with-bulk-actions').should('exist');
-
       cy.get('#select-visible-workflows').click({ force: true });
       cy.get('[data-testid="select-all-workflows"]').click();
       cy.get('[data-testid="bulk-cancel-button"]').click();

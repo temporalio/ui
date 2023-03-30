@@ -6,8 +6,12 @@ exports[`toWorkflowExecution > should match the snapshot for Canceled workflows 
   "defaultWorkflowTaskTimeout": "20s",
   "endTime": "2022-07-01T20:20:50.181506253Z",
   "historyEvents": "13",
+  "historySizeBytes": undefined,
   "id": "temporal.fixture.cancelled.workflow.id",
   "isRunning": false,
+  "memo": {
+    "fields": {},
+  },
   "name": "workflow.cancellation",
   "parent": {
     "runId": "b142fc85-8e13-42e5-a824-0f2fafdeabaf",
@@ -17,6 +21,17 @@ exports[`toWorkflowExecution > should match the snapshot for Canceled workflows 
   "pendingActivities": [],
   "pendingChildren": [],
   "runId": "346e7a24-c660-4f91-a777-ffe3274d8144",
+  "searchAttributes": {
+    "indexedFields": {
+      "BinaryChecksums": [
+        "e56c0141e58df0bd405138565d0526f9",
+      ],
+      "CustomKeywordField": "childWorkflowValue",
+      "TemporalChangeVersion": [
+        "initial version-3",
+      ],
+    },
+  },
   "startTime": "2022-07-01T20:20:50.157120545Z",
   "stateTransitionCount": "6",
   "status": "Canceled",
@@ -31,8 +46,12 @@ exports[`toWorkflowExecution > should match the snapshot for Completed workflows
   "defaultWorkflowTaskTimeout": "20s",
   "endTime": "2022-07-01T20:28:52.916373379Z",
   "historyEvents": "18",
+  "historySizeBytes": undefined,
   "id": "temporal.fixture.completed.workflow.id",
   "isRunning": false,
+  "memo": {
+    "fields": {},
+  },
   "name": "workflow.completion",
   "parent": {
     "runId": "971e2165-c4f8-4f78-87ca-b652a06eb234",
@@ -42,6 +61,17 @@ exports[`toWorkflowExecution > should match the snapshot for Completed workflows
   "pendingActivities": [],
   "pendingChildren": [],
   "runId": "202dcff6-7f35-4c65-995c-bcadce524fb1",
+  "searchAttributes": {
+    "indexedFields": {
+      "BinaryChecksums": [
+        "e56c0141e58df0bd405138565d0526f9",
+      ],
+      "CustomKeywordField": "childWorkflowValue",
+      "TemporalChangeVersion": [
+        "initial version-3",
+      ],
+    },
+  },
   "startTime": "2022-07-01T20:28:48.796369169Z",
   "stateTransitionCount": "11",
   "status": "Completed",
@@ -56,14 +86,25 @@ exports[`toWorkflowExecution > should match the snapshot for Failed workflows 1`
   "defaultWorkflowTaskTimeout": "20s",
   "endTime": "2022-07-01T20:22:50.027441003Z",
   "historyEvents": "7",
+  "historySizeBytes": undefined,
   "id": "temporal.fixture.failed.workflow.id",
   "isRunning": false,
+  "memo": {
+    "fields": {},
+  },
   "name": "workflow.retry-workflow.ext",
   "parent": null,
   "parentNamespaceId": "",
   "pendingActivities": [],
   "pendingChildren": [],
   "runId": "7e00b341-c579-4bb5-9e28-810d34ef4329",
+  "searchAttributes": {
+    "indexedFields": {
+      "TemporalChangeVersion": [
+        "initial version-3",
+      ],
+    },
+  },
   "startTime": "2022-07-01T20:22:49.015107253Z",
   "stateTransitionCount": "4",
   "status": "Failed",
@@ -76,10 +117,14 @@ exports[`toWorkflowExecution > should match the snapshot for Running workflows 1
 {
   "canBeTerminated": false,
   "defaultWorkflowTaskTimeout": "20s",
-  "endTime": "null",
+  "endTime": null,
   "historyEvents": "13",
+  "historySizeBytes": undefined,
   "id": "temporal.fixture.running.workflow.id",
   "isRunning": true,
+  "memo": {
+    "fields": {},
+  },
   "name": "workflow.advanced-visibility",
   "parent": {
     "runId": "8f00d989-6bc2-4826-b9f9-7c18ed90c9cc",
@@ -115,6 +160,17 @@ exports[`toWorkflowExecution > should match the snapshot for Running workflows 1
   ],
   "pendingChildren": [],
   "runId": "2a7ba421-f74b-4b8b-b9d8-e6e30e4caac7",
+  "searchAttributes": {
+    "indexedFields": {
+      "BinaryChecksums": [
+        "e56c0141e58df0bd405138565d0526f9",
+      ],
+      "CustomKeywordField": "canaryTest",
+      "TemporalChangeVersion": [
+        "initial version-3",
+      ],
+    },
+  },
   "startTime": "2022-07-01T20:23:49.104303753Z",
   "stateTransitionCount": "21",
   "status": "Running",
@@ -129,8 +185,12 @@ exports[`toWorkflowExecution > should match the snapshot for Terminated workflow
   "defaultWorkflowTaskTimeout": "20s",
   "endTime": "2022-07-01T20:14:51.002030504Z",
   "historyEvents": "30",
+  "historySizeBytes": undefined,
   "id": "temporal.fixture.completed.workflow.id",
   "isRunning": false,
+  "memo": {
+    "fields": {},
+  },
   "name": "workflow.reset.base",
   "parent": {
     "runId": "3cbbf515-36da-43b9-a1f3-18a7ec031ddd",
@@ -171,6 +231,17 @@ exports[`toWorkflowExecution > should match the snapshot for Terminated workflow
   ],
   "pendingChildren": [],
   "runId": "16c5fbe5-f82d-43c1-acbc-18c65c449ace",
+  "searchAttributes": {
+    "indexedFields": {
+      "BinaryChecksums": [
+        "e56c0141e58df0bd405138565d0526f9",
+      ],
+      "CustomKeywordField": "childWorkflowValue",
+      "TemporalChangeVersion": [
+        "initial version-3",
+      ],
+    },
+  },
   "startTime": "2022-07-01T20:14:48.911627544Z",
   "stateTransitionCount": "21",
   "status": "Terminated",
@@ -185,8 +256,12 @@ exports[`toWorkflowExecution > should match the snapshot for TimedOut workflows 
   "defaultWorkflowTaskTimeout": "20s",
   "endTime": "2022-07-01T14:16:18.804308503Z",
   "historyEvents": "18",
+  "historySizeBytes": undefined,
   "id": "temporal.fixture.timed-out.workflow.id/workflow.advanced-visibility",
   "isRunning": false,
+  "memo": {
+    "fields": {},
+  },
   "name": "workflow.advanced-visibility",
   "parent": {
     "runId": "78cba607-189e-41fe-a31b-a2b6061babaa",
@@ -196,6 +271,17 @@ exports[`toWorkflowExecution > should match the snapshot for TimedOut workflows 
   "pendingActivities": [],
   "pendingChildren": [],
   "runId": "445a17cb-6cb4-4508-bc59-187d08c6c6e2",
+  "searchAttributes": {
+    "indexedFields": {
+      "BinaryChecksums": [
+        "e56c0141e58df0bd405138565d0526f9",
+      ],
+      "CustomKeywordField": "canaryTest",
+      "TemporalChangeVersion": [
+        "initial version-3",
+      ],
+    },
+  },
   "startTime": "2022-07-01T13:56:18.803016378Z",
   "stateTransitionCount": "16",
   "status": "TimedOut",
@@ -211,18 +297,33 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "defaultWorkflowTaskTimeout": undefined,
     "endTime": "2022-07-01T20:20:50.181506253Z",
     "historyEvents": "13",
+    "historySizeBytes": undefined,
     "id": "temporal.fixture.cancelled.workflow.id",
     "isRunning": false,
+    "memo": {
+      "fields": {},
+    },
     "name": "workflow.cancellation",
     "parent": null,
     "parentNamespaceId": "",
     "pendingActivities": [],
     "pendingChildren": [],
     "runId": "346e7a24-c660-4f91-a777-ffe3274d8144",
+    "searchAttributes": {
+      "indexedFields": {
+        "BinaryChecksums": [
+          "e56c0141e58df0bd405138565d0526f9",
+        ],
+        "CustomKeywordField": "childWorkflowValue",
+        "TemporalChangeVersion": [
+          "initial version-3",
+        ],
+      },
+    },
     "startTime": "2022-07-01T20:20:50.157120545Z",
     "stateTransitionCount": "6",
     "status": "Canceled",
-    "taskQueue": undefined,
+    "taskQueue": "canary-task-queue",
     "url": "/workflows/temporal.fixture.cancelled.workflow.id/346e7a24-c660-4f91-a777-ffe3274d8144",
   },
   {
@@ -230,18 +331,33 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "defaultWorkflowTaskTimeout": undefined,
     "endTime": "2022-07-01T20:28:52.916373379Z",
     "historyEvents": "18",
+    "historySizeBytes": undefined,
     "id": "temporal.fixture.completed.workflow.id",
     "isRunning": false,
+    "memo": {
+      "fields": {},
+    },
     "name": "workflow.completion",
     "parent": null,
     "parentNamespaceId": "",
     "pendingActivities": [],
     "pendingChildren": [],
     "runId": "202dcff6-7f35-4c65-995c-bcadce524fb1",
+    "searchAttributes": {
+      "indexedFields": {
+        "BinaryChecksums": [
+          "e56c0141e58df0bd405138565d0526f9",
+        ],
+        "CustomKeywordField": "childWorkflowValue",
+        "TemporalChangeVersion": [
+          "initial version-3",
+        ],
+      },
+    },
     "startTime": "2022-07-01T20:28:48.796369169Z",
     "stateTransitionCount": "11",
     "status": "Completed",
-    "taskQueue": undefined,
+    "taskQueue": "canary-task-queue",
     "url": "/workflows/temporal.fixture.completed.workflow.id/202dcff6-7f35-4c65-995c-bcadce524fb1",
   },
   {
@@ -249,37 +365,63 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "defaultWorkflowTaskTimeout": undefined,
     "endTime": "2022-07-01T20:22:50.027441003Z",
     "historyEvents": "7",
+    "historySizeBytes": undefined,
     "id": "temporal.fixture.failed.workflow.id",
     "isRunning": false,
+    "memo": {
+      "fields": {},
+    },
     "name": "workflow.retry-workflow.ext",
     "parent": null,
     "parentNamespaceId": "",
     "pendingActivities": [],
     "pendingChildren": [],
     "runId": "7e00b341-c579-4bb5-9e28-810d34ef4329",
+    "searchAttributes": {
+      "indexedFields": {
+        "TemporalChangeVersion": [
+          "initial version-3",
+        ],
+      },
+    },
     "startTime": "2022-07-01T20:22:49.015107253Z",
     "stateTransitionCount": "4",
     "status": "Failed",
-    "taskQueue": undefined,
+    "taskQueue": "canary-task-queue",
     "url": "/workflows/temporal.fixture.failed.workflow.id/7e00b341-c579-4bb5-9e28-810d34ef4329",
   },
   {
     "canBeTerminated": false,
     "defaultWorkflowTaskTimeout": undefined,
-    "endTime": "null",
+    "endTime": null,
     "historyEvents": "19",
+    "historySizeBytes": undefined,
     "id": "temporal.fixture.running.workflow.id",
     "isRunning": true,
+    "memo": {
+      "fields": {},
+    },
     "name": "workflow.advanced-visibility",
     "parent": null,
     "parentNamespaceId": "",
     "pendingActivities": [],
     "pendingChildren": [],
     "runId": "2a7ba421-f74b-4b8b-b9d8-e6e30e4caac7",
+    "searchAttributes": {
+      "indexedFields": {
+        "BinaryChecksums": [
+          "e56c0141e58df0bd405138565d0526f9",
+        ],
+        "CustomKeywordField": "canaryTest",
+        "TemporalChangeVersion": [
+          "initial version-3",
+        ],
+      },
+    },
     "startTime": "2022-07-01T20:23:49.104303753Z",
     "stateTransitionCount": "27",
     "status": "Running",
-    "taskQueue": undefined,
+    "taskQueue": "canary-task-queue",
     "url": "/workflows/temporal.fixture.running.workflow.id/2a7ba421-f74b-4b8b-b9d8-e6e30e4caac7",
   },
   {
@@ -287,18 +429,33 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "defaultWorkflowTaskTimeout": undefined,
     "endTime": "2022-07-01T20:14:51.073853795Z",
     "historyEvents": "42",
+    "historySizeBytes": undefined,
     "id": "temporal.fixture.completed.workflow.id",
     "isRunning": false,
+    "memo": {
+      "fields": {},
+    },
     "name": "workflow.reset.base",
     "parent": null,
     "parentNamespaceId": "",
     "pendingActivities": [],
     "pendingChildren": [],
     "runId": "dfd4039d-4bc0-4864-9a24-85d136814977",
+    "searchAttributes": {
+      "indexedFields": {
+        "BinaryChecksums": [
+          "e56c0141e58df0bd405138565d0526f9",
+        ],
+        "CustomKeywordField": "childWorkflowValue",
+        "TemporalChangeVersion": [
+          "initial version-3",
+        ],
+      },
+    },
     "startTime": "2022-07-01T20:14:51.002662504Z",
     "stateTransitionCount": "13",
     "status": "Completed",
-    "taskQueue": undefined,
+    "taskQueue": "canary-task-queue",
     "url": "/workflows/temporal.fixture.completed.workflow.id/dfd4039d-4bc0-4864-9a24-85d136814977",
   },
   {
@@ -306,18 +463,33 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "defaultWorkflowTaskTimeout": undefined,
     "endTime": "2022-07-01T20:14:51.002030504Z",
     "historyEvents": "30",
+    "historySizeBytes": undefined,
     "id": "temporal.fixture.terminated.workflow.id",
     "isRunning": false,
+    "memo": {
+      "fields": {},
+    },
     "name": "workflow.reset.base",
     "parent": null,
     "parentNamespaceId": "",
     "pendingActivities": [],
     "pendingChildren": [],
     "runId": "16c5fbe5-f82d-43c1-acbc-18c65c449ace",
+    "searchAttributes": {
+      "indexedFields": {
+        "BinaryChecksums": [
+          "e56c0141e58df0bd405138565d0526f9",
+        ],
+        "CustomKeywordField": "childWorkflowValue",
+        "TemporalChangeVersion": [
+          "initial version-3",
+        ],
+      },
+    },
     "startTime": "2022-07-01T20:14:48.911627544Z",
     "stateTransitionCount": "21",
     "status": "Terminated",
-    "taskQueue": undefined,
+    "taskQueue": "canary-task-queue",
     "url": "/workflows/temporal.fixture.terminated.workflow.id/16c5fbe5-f82d-43c1-acbc-18c65c449ace",
   },
   {
@@ -325,18 +497,33 @@ exports[`toWorkflowExecutions > should match the snapshot 1`] = `
     "defaultWorkflowTaskTimeout": undefined,
     "endTime": "2022-07-01T14:16:18.804308503Z",
     "historyEvents": "18",
+    "historySizeBytes": undefined,
     "id": "temporal.fixture.timed-out.workflow.id",
     "isRunning": false,
+    "memo": {
+      "fields": {},
+    },
     "name": "workflow.advanced-visibility",
     "parent": null,
     "parentNamespaceId": "",
     "pendingActivities": [],
     "pendingChildren": [],
     "runId": "445a17cb-6cb4-4508-bc59-187d08c6c6e2",
+    "searchAttributes": {
+      "indexedFields": {
+        "BinaryChecksums": [
+          "e56c0141e58df0bd405138565d0526f9",
+        ],
+        "CustomKeywordField": "canaryTest",
+        "TemporalChangeVersion": [
+          "initial version-3",
+        ],
+      },
+    },
     "startTime": "2022-07-01T13:56:18.803016378Z",
     "stateTransitionCount": "16",
     "status": "TimedOut",
-    "taskQueue": undefined,
+    "taskQueue": "canary-task-queue",
     "url": "/workflows/temporal.fixture.timed-out.workflow.id/445a17cb-6cb4-4508-bc59-187d08c6c6e2",
   },
 ]

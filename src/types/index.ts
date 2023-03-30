@@ -129,7 +129,8 @@ export type ArchivalState = temporal.api.enums.v1.ArchivalState;
 export type PendingActivityInfo = temporal.api.workflow.v1.IPendingActivityInfo;
 export type PendingChildrenInfo =
   temporal.api.workflow.v1.IPendingChildExecutionInfo;
-
+export type WorkflowExecutionConfig =
+  temporal.api.workflow.v1.IWorkflowExecutionConfig;
 export type WorkflowExecutionInfo =
   temporal.api.workflow.v1.IWorkflowExecutionInfo;
 
@@ -137,6 +138,9 @@ export type WorkflowExecutionInfo =
 export type Payload = temporal.api.common.v1.IPayload;
 export type Payloads = temporal.api.common.v1.IPayloads;
 export type WorkflowExecutionInput = temporal.api.common.v1.IWorkflowExecution;
+export type WorkflowSearchAttributes = temporal.api.common.v1.ISearchAttributes;
+export type Memo = temporal.api.common.v1.IMemo;
+export type Header = temporal.api.common.v1.IHeader;
 
 // api.taskqueue
 
@@ -154,6 +158,9 @@ export type CalendarSpec = temporal.api.schedule.v1.ICalendarSpec;
 export type IntervalSpec = temporal.api.schedule.v1.IIntervalSpec;
 export type ScheduleActionResult =
   temporal.api.schedule.v1.IScheduleActionResult;
+
+// api.query
+export type QueryResult = temporal.api.query.v1.IWorkflowQueryResult;
 
 // google
 
