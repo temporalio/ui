@@ -54,7 +54,7 @@
 </script>
 
 <div
-  class="flex w-[140px] min-w-[140px] pt-[10px] flex-col items-end break-word leading-0 truncate text-right text-[12px] text-gray-700 md:whitespace-normal"
+  class="flex w-[140px] min-w-[140px] pt-[4px] flex-col items-end break-word leading-0 truncate text-right text-[14px] text-gray-700 md:whitespace-normal"
   class:relative-time={$timeFormat === 'relative' || showElapsedTimeDiff}
 >
   {displayedTime}
