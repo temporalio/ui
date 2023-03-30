@@ -1,43 +1,34 @@
-/// <reference types="@sveltejs/kit" />
-
-declare module '@crownframework/svelte-error-boundary';
-declare module '@sveltejs/svelte-virtual-list';
-
-export type NamespaceListItem = {
+type NamespaceListItem = {
   namespace: string;
   href: (namspace: string) => string;
   onClick: (namspace: string) => void;
 };
 
-export type Optional<T, K extends keyof T = keyof T> = Omit<T, K> &
+type Optional<T, K extends keyof T = keyof T> = Omit<T, K> &
   Partial<Pick<T, K>>;
 
-export type Replace<T, U extends { [key: string]: unknown }> = Omit<
-  T,
-  keyof U
-> &
-  U;
+type Replace<T, U extends { [key: string]: unknown }> = Omit<T, keyof U> & U;
 
-export interface Window {
+interface Window {
   Prism: {
     highlightAll: () => void;
     highlightElement: (element: Element) => void;
   };
 }
 
-export type Eventual<T> = T | PromiseLike<T>;
+type Eventual<T> = T | PromiseLike<T>;
 
-export type NamespaceScopedRequest = { namespace: string };
+type NamespaceScopedRequest = { namespace: string };
 
-export type NextPageToken = Uint8Array | string;
-export type WithNextPageToken = { nextPageToken?: NextPageToken };
-export type WithoutNextPageToken<T> = Omit<T, keyof WithNextPageToken>;
-export type NextPageTokens = {
+type NextPageToken = Uint8Array | string;
+type WithNextPageToken = { nextPageToken?: NextPageToken };
+type WithoutNextPageToken<T> = Omit<T, keyof WithNextPageToken>;
+type NextPageTokens = {
   open: NextPageToken;
   closed: NextPageToken;
 };
 
-export type PaginationCallbacks<T> = {
+type PaginationCallbacks<T> = {
   onStart?: () => void;
   onUpdate?: (
     full: WithoutNextPageToken<T>,
@@ -47,14 +38,14 @@ export type PaginationCallbacks<T> = {
   onError?: (error: unknown) => void;
 };
 
-export interface NetworkError {
+interface NetworkError {
   statusCode: number;
   statusText: string;
   response: Response;
   message?: string;
 }
 
-export type Settings = {
+type Settings = {
   auth: {
     enabled: boolean;
     options: string[];
@@ -83,7 +74,7 @@ export type Settings = {
   version: string;
 };
 
-export type User = {
+type User = {
   accessToken?: string;
   idToken?: string;
   name?: string;
@@ -109,27 +100,27 @@ export type User = {
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 };
-export type ClusterInformation = import('$types').GetClusterInfoResponse;
+type ClusterInformation = import('$types').GetClusterInfoResponse;
 
-export type TimeFormat = 'UTC' | 'relative' | 'local';
+type TimeFormat = 'UTC' | 'relative' | 'local';
 
-export type SelectOptionValue = number | string | boolean;
+type SelectOptionValue = number | string | boolean;
 
-export type BooleanString = 'true' | 'false';
+type BooleanString = 'true' | 'false';
 
-export type OptionLabel = {
+type OptionLabel = {
   label: string;
   option?: string;
 };
 
-export type UiVersionInfo = {
+type UiVersionInfo = {
   current: string;
   recommended: string;
 };
 
-export type DataEncoderStatus = 'notRequested' | 'success' | 'error';
+type DataEncoderStatus = 'notRequested' | 'success' | 'error';
 
-export type Color =
+type Color =
   | 'blue'
   | 'lightBlue'
   | 'blueGray'
