@@ -33,7 +33,8 @@
   let fullHistory: CommonHistoryEvent[] = [];
   let showNonCompleted = false;
   let showWorkflowTasks = false;
-  let stackTrace;
+  let showStackTrace = false;
+  let stackTrace = '';
 
   const onUpdate = async ({ history }) => {
     const { settings } = $page.data;
@@ -75,10 +76,20 @@
     );
   };
 
-  $: fetchEvents(namespace, workflowId, runId);
+  const fetchStackTrace = async () => {
+    const { settings } = $page.data;
+    stackTrace = await getWorkflowEnhancedStackTrace(
+      { namespace, workflow },
+      settings,
+      $authUser?.accessToken,
+    );
+  };
 
+  $: fetchEvents(namespace, workflowId, runId);
   $: {
-    console.log('stackTrace: ', stackTrace);
+    if (showStackTrace) {
+      fetchStackTrace();
+    }
   }
 
   onDestroy(() => {
@@ -96,7 +107,9 @@
     <WorkflowOptionsV2
       {showWorkflowTasks}
       {showNonCompleted}
+      {showStackTrace}
       onDebugClick={() => (showNonCompleted = !showNonCompleted)}
+      onShowStackTrace={() => (showStackTrace = !showStackTrace)}
       onAdvancedClick={() => (showWorkflowTasks = !showWorkflowTasks)}
     />
     <WorkflowSummaryV2 />
@@ -110,6 +123,12 @@
     </Accordion>
   </div>
   <div class="w-full xl:w-[60%]">
-    <EventSummaryV2 {fullHistory} {showNonCompleted} {showWorkflowTasks} />
+    <EventSummaryV2
+      {fullHistory}
+      {showNonCompleted}
+      {showWorkflowTasks}
+      {showStackTrace}
+      {stackTrace}
+    />
   </div>
 </div>

@@ -48,6 +48,3 @@
     <Icon name={expanded ? 'chevron-up' : 'chevron-down'} class="w-4" />
   </div>
 </div>
-{#if event.category === 'timer'}
-  <EnhancedStackTrace />
-{/if}

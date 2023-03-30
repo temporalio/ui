@@ -3,7 +3,7 @@
   import { workflowRun } from '$lib/stores/workflow-run';
   import { eventHistory } from '$lib/stores/events';
 
-  import { groupEvents, isEventGroup } from '$lib/models/event-groups';
+  import { groupEvents } from '$lib/models/event-groups';
   import EventGroupSummaryCard from './event-group-summary-card.svelte';
   import InitialEventCard from './initial-event-card.svelte';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
@@ -17,6 +17,8 @@
   export let importingHistory: boolean = false;
   export let showNonCompleted = false;
   export let showWorkflowTasks = false;
+  export let showStackTrace = false;
+  export let stackTrace;
 
   const getGroups = (
     events: CommonHistoryEvent[],
@@ -61,7 +63,7 @@
 
   $: ({ input, results } =
     getWorkflowStartedCompletedAndTaskFailedEvents(history));
-  $: stackTrace = results && getStackTrace(parseWithBigInt(results));
+  $: resultStackTrace = results && getStackTrace(parseWithBigInt(results));
 </script>
 
 <div class="flex w-full flex-col gap-0">
@@ -69,7 +71,8 @@
     <InitialEventCard
       event={firstEvent}
       events={currentEvents}
-      content={input}
+      content={showStackTrace ? stackTrace : input}
+      {showStackTrace}
     />
   {/if}
   {#each groups as event}
@@ -80,7 +83,7 @@
       event={lastEvent}
       events={currentEvents}
       content={results}
-      {stackTrace}
+      stackTrace={resultStackTrace}
       {firstEvent}
     />
   {/if}
