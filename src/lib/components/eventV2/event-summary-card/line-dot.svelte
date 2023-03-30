@@ -91,7 +91,7 @@
   }
 
   .line {
-    @apply w-[1px] border border-gray-900;
+    @apply w-[1px] border-2 border-gray-900;
   }
 
   .no-line {
