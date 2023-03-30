@@ -2,7 +2,7 @@
   "name": "@temporalio/ui",
   "version": "2.13.1",
   "type": "module",
-  "description": "Temporal.io UI",
+  "description": "Temporal.io UI test",
   "keywords": [
     "temporal",
     "ui"
