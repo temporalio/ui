@@ -445,7 +445,8 @@
   }
 
   .workflow-summary-configurable-row:hover {
-    @apply bg-gradient-to-br from-blue-100 to-purple-100;
+    /* bg-fixed solves an issue with safari applying the gradient on each td instead of across the entire row */
+    @apply bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
 
     :global(.table-link) {
       @apply text-blue-700 underline decoration-blue-700;
