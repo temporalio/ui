@@ -1,8 +1,4 @@
-import {
-  type google,
-  type temporal,
-  temporal as Temporal,
-} from '@temporalio/proto';
+import type { google, temporal } from '@temporalio/proto';
 
 // api.workflowservice
 
@@ -129,14 +125,6 @@ export type Severity = temporal.api.enums.v1.Severity;
 export type WorkflowTaskFailedCause =
   temporal.api.enums.v1.WorkflowTaskFailedCause;
 export type ArchivalState = temporal.api.enums.v1.ArchivalState;
-export type ResetReapplyType = temporal.api.enums.v1.ResetReapplyType;
-export const {
-  api: {
-    enums: {
-      v1: { ResetReapplyType },
-    },
-  },
-} = Temporal;
 
 // api.workflow
 

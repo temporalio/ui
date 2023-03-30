@@ -1,3 +1,4 @@
+import { v4 } from 'uuid';
 import type { ErrorCallback } from '$lib/utilities/request-from-api';
 
 import {
@@ -16,8 +17,8 @@ import {
 import { noop } from 'svelte/internal';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { btoa } from '$lib/utilities/btoa';
-import { v4 } from 'uuid';
-import type { ResetReapplyType, ResetWorkflowRequest } from '$types';
+import type { ResetReapplyType } from '$lib/models/workflow-actions';
+import type { ResetWorkflowRequest } from '$types';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;
@@ -316,7 +317,7 @@ export async function resetWorkflow({
 
   const body: Replace<
     ResetWorkflowRequest,
-    { workflowTaskFinishEventId: string }
+    { workflowTaskFinishEventId: string; resetReapplyType: ResetReapplyType }
   > = {
     workflowExecution: {
       workflowId,

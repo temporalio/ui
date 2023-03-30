@@ -5,10 +5,9 @@
     signalWorkflow,
     terminateWorkflow,
   } from '$lib/services/workflow-service';
-  import { ResetReapplyType } from '$types';
 
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
-  import { ResetType } from '$lib/models/workflow-actions';
+  import { ResetType, ResetReapplyType } from '$lib/models/workflow-actions';
 
   import { refresh } from '$lib/stores/workflow-run';
   import { settings } from '$lib/stores/settings';
@@ -43,8 +42,7 @@
   let resetConfirmationModal: Modal;
   let signalConfirmationModal: Modal;
   let resetType: ResetType = ResetType.FirstWorkflowTask;
-  let resetReapplyType: ResetReapplyType =
-    ResetReapplyType.RESET_REAPPLY_TYPE_UNSPECIFIED;
+  let resetReapplyType: ResetReapplyType = ResetReapplyType.Unspecified;
   let resetId: string | undefined = undefined;
   let resetReason: string | undefined = undefined;
   let eventIdValid: boolean = true;
@@ -66,7 +64,7 @@
 
   const hideResetModal = () => {
     resetType = ResetType.FirstWorkflowTask;
-    resetReapplyType = ResetReapplyType.RESET_REAPPLY_TYPE_UNSPECIFIED;
+    resetReapplyType = ResetReapplyType.Unspecified;
     resetId = undefined;
     resetReason = undefined;
     eventIdValid = true;
