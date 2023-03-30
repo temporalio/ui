@@ -2,7 +2,7 @@ import type {
   WorkflowFilter,
   WorkflowSort,
 } from '$lib/models/workflow-filters';
-import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
+import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
 import { get } from 'svelte/store';
 import { isDuration, isDurationString, toDate, tomorrow } from '../to-duration';
 

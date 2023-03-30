@@ -7,6 +7,7 @@
   } from '$lib/stores/event-view';
   import { refresh } from '$lib/stores/workflow-run';
   import { eventHistory } from '$lib/stores/events';
+  import { eventCategoryFilter } from '$lib/stores/filters';
   import { authUser } from '$lib/stores/auth-user';
 
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
@@ -66,7 +67,7 @@
     return compact ? groupEvents(items, $eventFilterSort) : items;
   };
 
-  $: category = $page.url.searchParams.get('category');
+  $: category = $eventCategoryFilter as EventTypeCategory;
   $: intialEvents =
     $eventFilterSort === 'descending' && !compact
       ? $eventHistory?.end
@@ -77,30 +78,28 @@
   $: updating = currentEvents.length && !fullHistory.length;
 </script>
 
-{#key [$eventFilterSort, category]}
-  <Pagination
-    floatId="event-view-toggle"
-    {items}
-    {updating}
-    let:visibleItems
-    let:activeRowIndex
-    let:setActiveRowIndex
-    aria-label="recent events"
-  >
-    <EventSummaryTable {updating} {compact} on:expandAll={handleExpandChange}>
-      {#each visibleItems as event, index (`${event.id}-${event.timestamp}`)}
-        <EventSummaryRow
-          {event}
-          {compact}
-          {visibleItems}
-          expandAll={$expandAllEvents === 'true'}
-          {initialItem}
-          active={activeRowIndex === index}
-          onRowClick={() => setActiveRowIndex(index)}
-        />
-      {:else}
-        <EventEmptyRow {loading} />
-      {/each}
-    </EventSummaryTable>
-  </Pagination>
-{/key}
+<Pagination
+  floatId="event-view-toggle"
+  {items}
+  {updating}
+  let:visibleItems
+  let:activeRowIndex
+  let:setActiveRowIndex
+  aria-label="recent events"
+>
+  <EventSummaryTable {updating} {compact} on:expandAll={handleExpandChange}>
+    {#each visibleItems as event, index (`${event.id}-${event.timestamp}`)}
+      <EventSummaryRow
+        {event}
+        {compact}
+        {visibleItems}
+        expandAll={$expandAllEvents === 'true'}
+        {initialItem}
+        active={activeRowIndex === index}
+        onRowClick={() => setActiveRowIndex(index)}
+      />
+    {:else}
+      <EventEmptyRow {loading} />
+    {/each}
+  </EventSummaryTable>
+</Pagination>

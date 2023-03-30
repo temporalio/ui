@@ -4,7 +4,14 @@
 </script>
 
 <label for={id} class="switch">
-  <input on:change {id} bind:checked type="checkbox" class="hidden" />
+  <input
+    on:change
+    {id}
+    bind:checked
+    type="checkbox"
+    class="hidden"
+    data-testid={$$props['data-testid']}
+  />
   <span class="slider" />
 </label>
 

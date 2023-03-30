@@ -34,8 +34,8 @@
   } from '$lib/services/batch-service';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
-  import { bulkActionsEnabled as workflowBulkActionsEnabled } from '$lib/utilities/bulk-actions-enabled';
-  import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
+  import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
+  import { supportsBulkActions } from '$lib/stores/bulk-actions';
   import { toaster } from '$lib/stores/toaster';
   import {
     workflowTableColumns,
@@ -45,11 +45,6 @@
   } from '$lib/stores/workflow-table-columns';
   import Drawer from '$lib/holocene/drawer.svelte';
   import OrderableList from '$lib/holocene/orderable-list.svelte';
-
-  $: bulkActionsEnabled = workflowBulkActionsEnabled(
-    $page.data.settings,
-    $supportsAdvancedVisibility,
-  );
 
   let selectedWorkflows: { [index: string]: boolean } = {};
   let batchTerminateConfirmationModal: BatchOperationConfirmationModal;
@@ -304,7 +299,7 @@
     <WorkflowDateTimeFilter />
   </svelte:fragment>
   <WorkflowsSummaryTableWithFilters
-    {bulkActionsEnabled}
+    bulkActionsEnabled={$supportsBulkActions}
     updating={$updating}
     visibleWorkflows={visibleItems}
     {selectedWorkflowsCount}
@@ -318,7 +313,7 @@
   >
     {#each visibleItems as event}
       <WorkflowsSummaryRowWithFilters
-        {bulkActionsEnabled}
+        bulkActionsEnabled={$supportsBulkActions}
         workflow={event}
         namespace={$page.params.namespace}
         timeFormat={$timeFormat}
@@ -328,7 +323,7 @@
       />
     {:else}
       <tr>
-        <td colspan={bulkActionsEnabled ? 6 : 5} class="xl:hidden">
+        <td colspan={$supportsBulkActions ? 6 : 5} class="xl:hidden">
           {#if $loading}
             <Loading />
           {:else}
@@ -339,7 +334,7 @@
             />
           {/if}
         </td>
-        <td colspan={bulkActionsEnabled ? 8 : 7} class="max-xl:hidden">
+        <td colspan={$supportsBulkActions ? 8 : 7} class="max-xl:hidden">
           {#if $loading}
             <Loading />
           {:else}

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
+  import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
 </script>
 
 {#if $supportsAdvancedVisibility}

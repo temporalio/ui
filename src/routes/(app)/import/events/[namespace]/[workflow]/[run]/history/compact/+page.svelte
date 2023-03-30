@@ -7,8 +7,9 @@
   import Pagination from '$lib/holocene/pagination.svelte';
   import EventEmptyRow from '$lib/components/event/event-empty-row.svelte';
   import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
+  import { eventCategoryFilter } from '$lib/stores/filters';
 
-  $: category = $page.url.searchParams.get('category') as EventTypeCategory;
+  $: category = $eventCategoryFilter as EventTypeCategory;
   $: sortedEvents =
     $eventFilterSort === 'descending'
       ? [...$importEventGroups].reverse()
