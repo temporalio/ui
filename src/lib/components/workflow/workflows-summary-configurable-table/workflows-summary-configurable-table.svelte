@@ -79,7 +79,6 @@
       selectedWorkflowsCount !== 0);
 
   $: pinnedColumns = $workflowTableColumns.filter((column) => column.pinned);
-
   $: otherColumns = $workflowTableColumns.filter((column) => !column.pinned);
 
   const openCustomizationDrawer = () => {
@@ -129,15 +128,17 @@
           class:batch-actions-visible={showBulkActions}
         >
           {#if $supportsBulkActions}
-            <th>
-              <Checkbox
-                id="select-visible-workflows"
-                onDark
-                hoverable
-                {checked}
-                {indeterminate}
-                on:change={handleCheckboxChange}
-              />
+            <th class="w-10">
+              {#if $workflowTableColumns.length > 0}
+                <Checkbox
+                  id="select-visible-workflows"
+                  onDark
+                  hoverable
+                  {checked}
+                  {indeterminate}
+                  on:change={handleCheckboxChange}
+                />
+              {/if}
             </th>
           {/if}
           {#if $supportsBulkActions && showBulkActions}
