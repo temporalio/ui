@@ -11,6 +11,7 @@
     getAttributePayloads,
   } from '../event-detail-keys';
   import EventClassification from './event-classification.svelte';
+  import EnhancedStackTrace from './enhanced-stack-trace.svelte';
 
   export let event: IterableEvent;
   export let events: IterableEvent[];
@@ -47,3 +48,6 @@
     <Icon name={expanded ? 'chevron-up' : 'chevron-down'} class="w-4" />
   </div>
 </div>
+{#if event.category === 'timer'}
+  <EnhancedStackTrace />
+{/if}

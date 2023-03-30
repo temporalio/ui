@@ -17,6 +17,7 @@
   import { fetchAllEvents } from '$lib/services/events-service';
   import Accordion from '$lib/holocene/accordion.svelte';
   import { onDestroy } from 'svelte';
+  import { getWorkflowEnhancedStackTrace } from '$lib/services/query-service';
 
   let controller;
 
@@ -32,6 +33,7 @@
   let fullHistory: CommonHistoryEvent[] = [];
   let showNonCompleted = false;
   let showWorkflowTasks = false;
+  let stackTrace;
 
   const onUpdate = async ({ history }) => {
     const { settings } = $page.data;
@@ -66,9 +68,18 @@
       onUpdate,
       signal,
     });
+    stackTrace = await getWorkflowEnhancedStackTrace(
+      { namespace, workflow },
+      settings,
+      $authUser?.accessToken,
+    );
   };
 
   $: fetchEvents(namespace, workflowId, runId);
+
+  $: {
+    console.log('stackTrace: ', stackTrace);
+  }
 
   onDestroy(() => {
     controller.abort();
