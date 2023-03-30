@@ -1,7 +1,5 @@
 <script lang="ts">
   import { eventShowElapsed } from '$lib/stores/event-view';
-  import { timeFormat } from '$lib/stores/time-format';
-  import { formatDate } from '$lib/utilities/format-date';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
 
   import { isEventGroup } from '$lib/models/event-groups';
@@ -22,25 +20,6 @@
 
   $: initialEvent = isEventGroup(event) ? event.initialEvent : event;
   $: lastEvent = isEventGroup(event) ? event.lastEvent : event;
-  $: showElapsed = $eventShowElapsed === 'true';
-  $: showElapsedTimeDiff =
-    showElapsed && firstEvent && event.id !== firstEvent.id;
-
-  $: timeDiffChange = '';
-  $: {
-    const currentIndex = events.indexOf(event);
-    const previousItem = events[currentIndex - 1];
-    if (previousItem) {
-      const timeDiff = formatDistanceAbbreviated({
-        start: isEventGroup(previousItem)
-          ? previousItem?.initialEvent?.eventTime
-          : previousItem?.eventTime,
-        end: lastEvent?.eventTime,
-      });
-      timeDiffChange = timeDiff ? `(+${timeDiff})` : '';
-    }
-  }
-
   $: payloadAttributes = getAttributePayloads(event.attributes);
 </script>
 
@@ -67,17 +46,4 @@
     <Details {event} primary />
     <Icon name={expanded ? 'chevron-up' : 'chevron-down'} class="w-4" />
   </div>
-</div>
-<div
-  class="break-word leading-0 truncate text-left text-sm text-gray-700 md:whitespace-normal"
->
-  {#if showElapsedTimeDiff}
-    {formatDistanceAbbreviated({
-      start: firstEvent.eventTime,
-      end: initialEvent.eventTime,
-    })}
-    {timeDiffChange}
-  {:else}
-    {formatDate(initialEvent?.eventTime, $timeFormat)}
-  {/if}
 </div>
