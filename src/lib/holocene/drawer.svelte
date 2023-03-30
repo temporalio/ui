@@ -51,7 +51,7 @@
 
 <style lang="postcss">
   .drawer {
-    @apply fixed z-[55] h-auto rounded-t-lg bg-white text-primary shadow-xl;
+    @apply fixed z-[55] h-auto rounded-t-lg bg-white text-primary shadow-xl overflow-y-auto;
 
     &.bottom {
       @apply bottom-0 left-0 right-0;

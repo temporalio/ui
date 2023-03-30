@@ -14,6 +14,6 @@
 />
 
 <AdvancedVisibilityGuard>
-  <WorkflowsWithNewSearch />
+  <WorkflowsWithNewSearch workflowTableCustomizationEnabled />
   <Workflows slot="fallback" />
 </AdvancedVisibilityGuard>
