@@ -14,6 +14,8 @@
   export let title = '';
   export let icon: IconName | undefined = undefined;
   export let unroundTitle = false;
+  export let highlightLine: number = 0;
+  export let lineStart: number = 1;
 
   let root: HTMLElement;
   $: isJSON = language === 'json';
@@ -71,14 +73,31 @@
     <div class="relative h-full">
       <!-- The spacing for this if statement is like this because PRE's honor all whitespace and
       line breaks so we have this peculiar formatting to preserve this components output -->
-      <pre
-        class="w-full overflow-x-scroll rounded-lg p-4"
-        class:h-full={!inline}
-        class:title><code
-          bind:this={root}
-          class="language-{language}"
-          data-testid={$$props['data-testid']}
-        /></pre>
+      {#if highlightLine}
+        {#key lineStart}
+          <pre
+            class="w-full overflow-x-scroll rounded-lg p-4 line-numbers"
+            data-start={lineStart}
+            data-line={highlightLine}
+            class:h-full={!inline}
+            class:title><code
+              bind:this={root}
+              class="language-{language}"
+              data-testid={$$props['data-testid']}
+            /></pre>
+        {/key}
+      {:else}
+        <pre
+          class="w-full overflow-x-scroll rounded-lg p-4"
+          class:h-full={!inline}
+          class:title><code
+            bind:this={root}
+            class="language-{language}"
+            data-testid={$$props['data-testid']}
+          /></pre>
+      {/if}
+
+      <slot name="action" />
 
       {#if copyable}
         <button
