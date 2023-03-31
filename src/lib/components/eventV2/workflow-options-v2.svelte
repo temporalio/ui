@@ -11,7 +11,6 @@
   export let showWorkflowTasks = false;
   export let showNonCompleted = false;
   export let showStackTrace = false;
-  export let stackTrace: string;
   export let timeTravelPosition = 1;
   export let maxTimeTravel = 1;
   export let onDebugClick: () => void;
@@ -68,15 +67,6 @@
             on:change={onAdvancedClick}
           />Workflow Task Mode
         </label>
-        {#if showStackTrace}
-          <RangeInput
-            id="time-travel-range"
-            min={1}
-            max={maxTimeTravel}
-            bind:value={timeTravelPosition}
-            showInput={false}
-          />
-        {/if}
       </div>
     </div>
   </Accordion>

@@ -12,12 +12,13 @@
   import { importEvents } from '$lib/stores/import-events';
   import RunningCard from './running-card.svelte';
   import FinalEventCard from './final-event-card.svelte';
+  import CodeBlock from '$lib/holocene/code-block.svelte';
 
   export let fullHistory: CommonHistoryEvent[] = [];
   export let importingHistory: boolean = false;
   export let showNonCompleted = false;
   export let showWorkflowTasks = false;
-  export let showStackTrace = false;
+  export let stacks = {};
   export let timeTravelPosition = 1;
 
   const getGroups = (
@@ -50,43 +51,22 @@
   $: groups = getGroups(currentEvents, showNonCompleted, showWorkflowTasks);
   $: firstEvent = currentEvents?.[0];
   $: lastEvent = currentEvents?.[currentEvents?.length - 1];
-  $: uniqueLastEvent =
-    lastEvent &&
-    lastEvent.id !== firstEvent.id &&
-    !groups.find(
-      (group) =>
-        group.eventList.find((e) => e.id === lastEvent.id) ||
-        group.subGroupList.find((g) =>
-          g.eventList.find((e) => e.id === lastEvent.id),
-        ),
-    );
+  $: currentStacks = Object.values(stacks)[timeTravelPosition - 1];
 
-  $: ({ input, results } =
-    getWorkflowStartedCompletedAndTaskFailedEvents(history));
-  $: resultStackTrace = results && getStackTrace(parseWithBigInt(results));
+  $: {
+    console.log('Stacks: ', stacks);
+    console.log('timeTravelPosition: ', timeTravelPosition);
+    console.log('currentStacks: ', currentStacks);
+  }
 </script>
 
 <div class="flex w-full flex-col gap-0">
-  {#if firstEvent}
-    <InitialEventCard
-      event={firstEvent}
-      events={currentEvents}
-      content={input}
+  {#each currentStacks as stack}
+    <CodeBlock
+      content={stack?.snippet?.[0]}
+      language="text"
+      icon="json"
+      title={stack.filePath}
     />
-  {/if}
-  {#each groups as event}
-    <EventGroupSummaryCard {event} events={groups} {firstEvent} />
   {/each}
-  {#if uniqueLastEvent}
-    <FinalEventCard
-      event={lastEvent}
-      events={currentEvents}
-      content={results}
-      stackTrace={resultStackTrace}
-      {firstEvent}
-    />
-  {/if}
-  {#if $workflowRun?.workflow?.isRunning}
-    <RunningCard />
-  {/if}
 </div>
