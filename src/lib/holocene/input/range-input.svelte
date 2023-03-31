@@ -8,6 +8,7 @@
     label?: string;
     min?: number;
     max?: number;
+    showInput: boolean;
     'data-testid'?: string;
   }
 
@@ -16,6 +17,8 @@
   export let max: number = undefined;
   export let id: string = undefined;
   export let value: number = Math.round((min + max) / 2);
+  export let showInput = true;
+
   let valid: boolean = true;
   let outputElement: HTMLOutputElement;
 
@@ -92,20 +95,22 @@
         {max}
       </span>
     </div>
-    <div class="flex shrink">
-      <input
-        {id}
-        class="numeric-input"
-        class:invalid={!valid}
-        type="number"
-        inputmode="numeric"
-        bind:value
-        on:input={handleInput}
-        {min}
-        {max}
-        step={$$props.step}
-      />
-    </div>
+    {#if showInput}
+      <div class="flex shrink">
+        <input
+          {id}
+          class="numeric-input"
+          class:invalid={!valid}
+          type="number"
+          inputmode="numeric"
+          bind:value
+          on:input={handleInput}
+          {min}
+          {max}
+          step={$$props.step}
+        />
+      </div>
+    {/if}
     {#if label}
       <label class="flex shrink text-sm" for={id}>
         {label}
@@ -143,23 +148,23 @@
     @apply absolute -top-2;
   }
 
-  input[type="range"]::-webkit-slider-thumb {
+  input[type='range']::-webkit-slider-thumb {
     @apply h-4 w-8 appearance-none rounded-full border border-solid border-primary bg-gradient-to-br from-blue-100 to-purple-100;
   }
 
-  input[type="range"]::-moz-range-thumb {
+  input[type='range']::-moz-range-thumb {
     @apply h-4 w-8 rounded-full border border-solid border-primary bg-gradient-to-br from-blue-100 to-purple-100 shadow-none;
   }
 
-  input[type="range"]:focus {
+  input[type='range']:focus {
     @apply outline-none;
   }
 
-  input[type="range"]:focus::-webkit-slider-thumb {
+  input[type='range']:focus::-webkit-slider-thumb {
     @apply border border-primary outline outline-2 outline-blue-700;
   }
 
-  input[type="range"]:focus::-moz-range-thumb {
+  input[type='range']:focus::-moz-range-thumb {
     @apply border border-primary outline outline-2 outline-blue-700;
   }
 </style>

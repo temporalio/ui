@@ -74,7 +74,7 @@
             min={1}
             max={maxTimeTravel}
             bind:value={timeTravelPosition}
-            label="stack traces"
+            showInput={false}
           />
         {/if}
       </div>

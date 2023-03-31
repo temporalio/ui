@@ -93,10 +93,6 @@
     // );
   };
 
-  const setTimeTravelPosition = (e) => {
-    debugger;
-  };
-
   $: fetchEvents(namespace, workflowId, runId);
   $: {
     if (showStackTrace) {

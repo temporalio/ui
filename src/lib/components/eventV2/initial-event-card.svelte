@@ -58,12 +58,6 @@
     return stackContent;
   };
 
-  const getAllStacks = (content) =>
-    getStacks(content).reduce((final, x) => {
-      final = final + '\n' + x.snippet;
-      return final;
-    }, '');
-
   $: stackTraceContent =
     parsedContent && getStacks(parsedContent)[timeTravelPosition - 1]?.snippet;
 </script>
