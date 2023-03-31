@@ -149,7 +149,7 @@
     bind:this={resizableContainer}
     style="width:{resizableContainerWidth
       ? resizableContainerWidth + 'px'
-      : 'auto'};"
+      : '50%'};"
     on:mousedown|stopPropagation|preventDefault={handleMouseDown}
   >
     <table class="workflow-summary-table pinned">
@@ -398,7 +398,7 @@
 
 <style lang="postcss">
   .workflow-summary-tables-wrapper {
-    @apply relative flex flex-row w-full rounded-xl border-primary border-2 bg-white;
+    @apply relative flex flex-row w-full rounded-xl border-primary border-2 bg-white overflow-auto;
   }
 
   .workflow-summary-table-wrapper {
