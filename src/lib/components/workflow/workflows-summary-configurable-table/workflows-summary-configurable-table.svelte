@@ -112,14 +112,43 @@
       }),
     );
   };
+
+  let resizableContainer: HTMLDivElement;
+  let resizableContainerWidth: number;
+  let resizing: boolean = false;
+
+  const handleMouseDown = (event: MouseEvent) => {
+    if (resizableContainer.clientWidth - event.x < 3) {
+      resizing = true;
+    }
+    return false;
+  };
+
+  const handleMouseUp = () => {
+    if (resizing) resizing = false;
+  };
+
+  const handleMouseMove = (event: MouseEvent) => {
+    if (!resizing) return false;
+    const rect = resizableContainer.getBoundingClientRect();
+    resizableContainerWidth = event.x - rect.x;
+    return false;
+  };
 </script>
 
+<svelte:window
+  on:mousemove|stopPropagation={handleMouseMove}
+  on:mouseup|stopPropagation={handleMouseUp}
+/>
 <div class="workflow-summary-tables-wrapper">
   <div
     class="workflow-summary-table-wrapper pinned"
     class:batch-actions-enabled={$supportsBulkActions}
     class:batch-actions-visible={showBulkActions}
     class:no-columns-pinned={pinnedColumns.length === 0}
+    bind:this={resizableContainer}
+    style="width:{resizableContainerWidth}px;"
+    on:mousedown|stopPropagation|preventDefault={handleMouseDown}
   >
     <table class="workflow-summary-table pinned">
       <thead>
@@ -129,7 +158,7 @@
         >
           {#if $supportsBulkActions}
             <th class="w-10">
-              {#if $workflowTableColumns.length > 0}
+              {#if workflows.length > 0 && $workflowTableColumns.length > 0}
                 <Checkbox
                   id="select-visible-workflows"
                   onDark
@@ -367,81 +396,58 @@
 
 <style lang="postcss">
   .workflow-summary-tables-wrapper {
-    @apply relative flex flex-row w-full rounded-lg border-primary border-2 overflow-scroll bg-white;
+    @apply relative flex flex-row w-full rounded-xl border-primary border-2 bg-white;
   }
 
   .workflow-summary-table-wrapper {
-    @apply relative flex;
+    @apply relative flex overflow-y-visible;
+  }
 
-    &.pinned {
-      /* higher z-index ensures the box shadow displays over the background gradient on the table rows */
-      @apply rounded-l-lg border-primary border-r-[3px] shadow-primary shadow-md z-10;
+  .workflow-summary-table-wrapper.pinned {
+    /* higher z-index ensures the box shadow displays over the background gradient on the table rows */
+    @apply overflow-x-hidden rounded-l-lg max-w-fit min-w-[40px] z-10;
 
-      /* when the user has no pinned columns, hard code the wrapper to the width of the checkbox column, or 0 */
-      &.no-columns-pinned {
-        &.batch-actions-enabled {
-          @apply !w-[40px];
-        }
+    box-shadow: 2px 0 4px rgb(0 0 0 / 25%);
 
-        &:not(.batch-actions-enabled) {
-          @apply hidden;
-        }
-      }
-    }
-
-    &:not(.pinned) {
-      @apply overflow-x-scroll overscroll-contain flex-grow rounded-r;
+    &::after {
+      @apply absolute right-0 h-full bg-primary content-[''] w-[3px] cursor-col-resize;
     }
   }
 
-  .workflow-summary-table {
-    &.pinned {
-      @apply rounded-l-lg;
-    }
+  .workflow-summary-table-wrapper.pinned.batch-actions-visible {
+    @apply !w-full after:pointer-events-none;
+  }
 
-    &:not(.pinned) {
-      @apply rounded-r-lg table-auto w-full;
-    }
+  .workflow-summary-table-wrapper.pinned.no-columns-pinned.batch-actions-enabled {
+    @apply !w-[43px] overflow-visible;
+  }
+
+  .workflow-summary-table-wrapper:not(.pinned) {
+    @apply overflow-x-scroll overscroll-x-contain flex-grow rounded-r-lg;
+  }
+
+  .workflow-summary-table-wrapper.pinned.no-columns-pinned {
+    @apply after:pointer-events-none;
+  }
+
+  .workflow-summary-table-wrapper.pinned.no-columns-pinned.batch-actions-visible {
+    @apply !w-[40px];
+  }
+
+  .workflow-summary-table:not(.pinned) {
+    @apply table-auto w-full;
   }
 
   .workflow-summary-header-row {
     @apply bg-primary text-white h-10;
+  }
 
-    &.pinned {
-      &.batch-actions-visible {
-        @apply relative z-10;
-      }
-
-      :global(th) {
-        @apply first:rounded-tl;
-      }
-    }
-
-    &:not(.pinned) {
-      :global(th) {
-        @apply last:rounded-tr;
-      }
-    }
+  .workflow-summary-header-row.pinned.batch-actions-visible {
+    @apply z-20 relative;
   }
 
   .workflow-summary-configurable-row {
-    @apply border-b border-primary cursor-pointer h-10;
-
-    &:last-of-type {
-      @apply border-b-0;
-
-      &.pinned {
-        :global(td) {
-          @apply first:rounded-bl-lg;
-        }
-      }
-
-      &:not(.pinned) {
-        :global(td) {
-          @apply last:rounded-br-lg;
-        }
-      }
-    }
+    @apply border-b border-primary cursor-pointer h-10 last-of-type:border-b-0;
   }
 
   .workflow-summary-configurable-row:hover {

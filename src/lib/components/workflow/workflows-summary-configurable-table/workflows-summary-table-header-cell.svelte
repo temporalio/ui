@@ -12,29 +12,21 @@
   $: ({ label } = column);
 </script>
 
-{#if label === 'Status'}
-  <th class="workflows-summary-table-header-cell">
+<th class="workflows-summary-table-header-cell">
+  {#if label === 'Status'}
     <ExecutionStatusDropdownFilter />
-  </th>
-{:else if label === 'Workflow ID'}
-  <th class="workflows-summary-table-header-cell">
+  {:else if label === 'Workflow ID'}
     <WorkflowIdDropdownFilter />
-  </th>
-{:else if label === 'Type'}
-  <th class="workflows-summary-table-header-cell">
+  {:else if label === 'Type'}
     <WorkflowTypeDropdownFilter />
-  </th>
-{:else if label === 'Start'}
-  <th class="workflows-summary-table-header-cell">
+  {:else if label === 'Start'}
     <StartTimeDropdownFilter disabled={sortDisabled} />
-  </th>
-{:else if label === 'End'}
-  <th class="workflows-summary-table-header-cell">
+  {:else if label === 'End'}
     <EndTimeDropdownFilter disabled={sortDisabled} />
-  </th>
-{:else}
-  <th class="workflows-summary-table-header-cell">{label}</th>
-{/if}
+  {:else}
+    {label}
+  {/if}
+</th>
 
 <style lang="postcss">
   .workflows-summary-table-header-cell {
