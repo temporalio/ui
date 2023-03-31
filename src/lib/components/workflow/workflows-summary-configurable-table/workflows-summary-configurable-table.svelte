@@ -157,7 +157,7 @@
           class:batch-actions-visible={showBulkActions}
         >
           {#if $supportsBulkActions}
-            <th class="w-10">
+            <th class="w-10 rounded-tl-lg">
               {#if workflows.length > 0 && $workflowTableColumns.length > 0}
                 <Checkbox
                   id="select-visible-workflows"
