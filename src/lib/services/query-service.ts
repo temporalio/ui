@@ -173,7 +173,7 @@ export async function getWorkflowEnhancedStackTrace(
   request = fetch,
 ): Promise<ParsedQuery> {
   return getQuery(
-    { ...options, queryType: '__enhanced_stack_trace' },
+    { ...options, queryType: '__time_travel_stack_trace' },
     settings,
     accessToken,
     request,

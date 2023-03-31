@@ -41,7 +41,7 @@
   let fullHistory: CommonHistoryEvent[] = [];
   let showNonCompleted = false;
   let showWorkflowTasks = false;
-  let showStackTrace = false;
+  let showStackTrace = true;
   let stacks = {};
 
   const onUpdate = async ({ history }) => {
@@ -97,7 +97,6 @@
 
   const getStacks = (stackTrace) => {
     const { sources, stacks } = stackTrace;
-    let stackContent = [];
     Object.entries(stacks).map(([key, traces]) => {
       const stackTraces = [];
       traces.forEach((trace) => {
@@ -124,13 +123,14 @@
 
   const fetchStackTrace = async () => {
     const { settings } = $page.data;
-    stacks = getStacks(timeTravelEnhancedStackTrace);
-    maxTimeTravel = Object.keys(stacks).length;
-    // stackTrace = await getWorkflowEnhancedStackTrace(
+    // const stackTrace = await getWorkflowEnhancedStackTrace(
     //   { namespace, workflow },
     //   settings,
     //   $authUser?.accessToken,
     // );
+    // stacks = getStacks(JSON.parse(stackTrace));
+    stacks = getStacks(timeTravelEnhancedStackTrace);
+    maxTimeTravel = Object.keys(stacks).length;
   };
 
   $: fetchEvents(namespace, workflowId, runId);

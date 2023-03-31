@@ -15,6 +15,7 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import EnhancedStackTrace from './event-summary-card/enhanced-stack-trace.svelte';
   import EnhancedStackTraceCard from './enhanced-stack-trace-card.svelte';
+  import Loading from '$lib/holocene/loading.svelte';
 
   export let fullHistory: CommonHistoryEvent[] = [];
   export let importingHistory: boolean = false;
@@ -56,21 +57,27 @@
   $: currentStacks = Object.values(stacks)[timeTravelPosition - 1];
 </script>
 
-<div class="flex flex-row gap-0 pt-4">
-  <div class="flex w-full flex-col gap-2 xl:w-[50%]">
-    {#each currentStacks as stack}
-      <EnhancedStackTrace {...stack} />
-    {/each}
-  </div>
-  <div class="flex w-full flex-col gap-2 xl:w-[50%]">
-    {#each currentStacks as stack}
-      {#each stack.eventIds as id}
-        <EnhancedStackTraceCard
-          event={currentEvents.find((event) => event.eventId === id.toString())}
-          events={currentEvents}
-          {firstEvent}
-        />
+{#if currentStacks}
+  <div class="flex flex-row gap-0 pt-4">
+    <div class="flex w-full flex-col gap-2 xl:w-[50%]">
+      {#each currentStacks as stack}
+        <EnhancedStackTrace {...stack} />
       {/each}
-    {/each}
+    </div>
+    <div class="flex w-full flex-col gap-2 xl:w-[50%]">
+      {#each currentStacks as stack}
+        {#each stack.eventIds as id}
+          <EnhancedStackTraceCard
+            event={currentEvents.find(
+              (event) => event.eventId === id.toString(),
+            )}
+            events={currentEvents}
+            {firstEvent}
+          />
+        {/each}
+      {/each}
+    </div>
   </div>
-</div>
+{:else}
+  <Loading />
+{/if}

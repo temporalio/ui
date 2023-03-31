@@ -17,8 +17,6 @@
   export let importingHistory: boolean = false;
   export let showNonCompleted = false;
   export let showWorkflowTasks = false;
-  export let showStackTrace = false;
-  export let timeTravelPosition = 1;
 
   const getGroups = (
     events: CommonHistoryEvent[],

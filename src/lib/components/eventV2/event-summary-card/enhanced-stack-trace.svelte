@@ -25,7 +25,7 @@
 </h5>
 <div class="max-h-96 overflow-scroll">
   <CodeBlock
-    content={showSnippet ? snippet : source}
+    content={showSnippet ? snippet[0] : source}
     language="ts"
     highlightLine={line}
     copyable={false}
