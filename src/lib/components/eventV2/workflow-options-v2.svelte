@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
   import Accordion from '$lib/holocene/accordion.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import RangeInput from '$lib/holocene/input/range-input.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { exportHistory } from '$lib/utilities/export-history';
@@ -10,6 +11,9 @@
   export let showWorkflowTasks = false;
   export let showNonCompleted = false;
   export let showStackTrace = false;
+  export let stackTrace: string;
+  export let timeTravelPosition = 1;
+  export let maxTimeTravel = 1;
   export let onDebugClick: () => void;
   export let onAdvancedClick: () => void;
   export let onShowStackTrace: () => void;
@@ -17,7 +21,7 @@
 
 <section>
   <Accordion title="Options" icon="settings" readOnly stackSummary>
-    <div slot="summary" class="flex flex-col gap-4">
+    <div slot="summary" class="flex flex-col gap-4 w-full">
       <div class="flex flex-row items-center gap-4">
         <Button variant="secondary">
           <EventDateFilter compact={false} hideSort />
@@ -64,6 +68,15 @@
             on:change={onAdvancedClick}
           />Workflow Task Mode
         </label>
+        {#if showStackTrace}
+          <RangeInput
+            id="time-travel-range"
+            min={1}
+            max={maxTimeTravel}
+            bind:value={timeTravelPosition}
+            label="stack traces"
+          />
+        {/if}
       </div>
     </div>
   </Accordion>

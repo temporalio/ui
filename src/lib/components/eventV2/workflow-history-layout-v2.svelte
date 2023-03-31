@@ -18,8 +18,13 @@
   import Accordion from '$lib/holocene/accordion.svelte';
   import { onDestroy } from 'svelte';
   import { getWorkflowEnhancedStackTrace } from '$lib/services/query-service';
+  import { timeTravelEnhancedStackTrace } from './mocks/stack-traces';
 
   let controller;
+  let maxTimeTravel = 1;
+  let timeTravelPosition = 1;
+
+  $: maxTimeTravel, (timeTravelPosition = maxTimeTravel);
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
   $: ({ workflow } = $workflowRun);
@@ -78,11 +83,18 @@
 
   const fetchStackTrace = async () => {
     const { settings } = $page.data;
-    stackTrace = await getWorkflowEnhancedStackTrace(
-      { namespace, workflow },
-      settings,
-      $authUser?.accessToken,
-    );
+    stackTrace = JSON.stringify(timeTravelEnhancedStackTrace);
+    maxTimeTravel = Object.keys(timeTravelEnhancedStackTrace.stacks).length;
+
+    // stackTrace = await getWorkflowEnhancedStackTrace(
+    //   { namespace, workflow },
+    //   settings,
+    //   $authUser?.accessToken,
+    // );
+  };
+
+  const setTimeTravelPosition = (e) => {
+    debugger;
   };
 
   $: fetchEvents(namespace, workflowId, runId);
@@ -108,6 +120,9 @@
       {showWorkflowTasks}
       {showNonCompleted}
       {showStackTrace}
+      {stackTrace}
+      {maxTimeTravel}
+      bind:timeTravelPosition
       onDebugClick={() => (showNonCompleted = !showNonCompleted)}
       onShowStackTrace={() => (showStackTrace = !showStackTrace)}
       onAdvancedClick={() => (showWorkflowTasks = !showWorkflowTasks)}
@@ -129,6 +144,7 @@
       {showWorkflowTasks}
       {showStackTrace}
       {stackTrace}
+      {timeTravelPosition}
     />
   </div>
 </div>

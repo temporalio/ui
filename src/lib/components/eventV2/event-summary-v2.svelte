@@ -19,6 +19,7 @@
   export let showWorkflowTasks = false;
   export let showStackTrace = false;
   export let stackTrace;
+  export let timeTravelPosition = 1;
 
   const getGroups = (
     events: CommonHistoryEvent[],
@@ -73,6 +74,7 @@
       events={currentEvents}
       content={showStackTrace ? stackTrace : input}
       {showStackTrace}
+      {timeTravelPosition}
     />
   {/if}
   {#each groups as event}

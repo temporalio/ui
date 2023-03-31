@@ -3,20 +3,69 @@
   import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
   import Card from './event-summary-card/card.svelte';
   import Collapsed from './event-summary-card/collapsed.svelte';
-  import EnhancedStackTrace from './event-summary-card/enhanced-stack-trace.svelte';
   import Expanded from './event-summary-card/expanded.svelte';
 
   export let event: WorkflowEvent;
   export let events: IterableEvent[];
   export let content: string = '';
   export let showStackTrace = false;
+  export let timeTravelPosition = 1;
 
   $: parsedContent = showStackTrace && parseWithBigInt(content);
+
+  $: {
+    if (parsedContent) {
+      console.log('parsedContent: ', getStacks(parsedContent));
+    }
+  }
+
+  const getSnippet = (line: number, sourceText: string): [string, number] => {
+    const sliceSize = 10;
+    const snippetBeginning = Math.max(0, line - Math.floor(sliceSize / 2));
+    const snippetEnd = Math.min(
+      sourceText.length,
+      Math.max(10, line + Math.floor(sliceSize / 2)),
+    );
+    const sourceSlice = sourceText
+      .split('\n')
+      .slice(snippetBeginning, snippetEnd)
+      .join('\n');
+    const lineInSlice =
+      line <= Math.floor(sliceSize / 2) ? line : line - snippetBeginning;
+    return [sourceSlice, lineInSlice];
+  };
+
+  const getStacks = (stackTrace) => {
+    const { sources, stacks } = stackTrace;
+    let stackContent = [];
+    Object.entries(stacks).map(([key, traces]) => {
+      traces.forEach((trace) => {
+        const location = trace.locations[0];
+        const eventIds = trace.correlatingEventIds;
+        const source = sources[location.filePath][0]?.content;
+        const { line, column, functionName } = location;
+        const snippet = getSnippet(line, source);
+        stackContent.push({
+          eventIds,
+          source,
+          snippet,
+          line: location.line,
+          column: location.column,
+          functionName: location.functionName,
+        });
+      });
+    });
+    return stackContent;
+  };
+
+  const getAllStacks = (content) =>
+    getStacks(content).reduce((final, x) => {
+      final = final + '\n' + x.snippet;
+      return final;
+    }, '');
+
   $: stackTraceContent =
-    showStackTrace &&
-    parsedContent?.sources[
-      parsedContent?.stacks[0]?.locations[0]?.filePath
-    ]?.[0].content;
+    parsedContent && getStacks(parsedContent)[timeTravelPosition - 1]?.snippet;
 </script>
 
 <div class="flex gap-2">
