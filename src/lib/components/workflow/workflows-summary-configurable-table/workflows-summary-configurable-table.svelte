@@ -125,7 +125,7 @@
   };
 
   const handleMouseUp = () => {
-    if (resizing) resizing = false;
+    resizing = false;
   };
 
   const handleMouseMove = (event: MouseEvent) => {
@@ -147,7 +147,9 @@
     class:batch-actions-visible={showBulkActions}
     class:no-columns-pinned={pinnedColumns.length === 0}
     bind:this={resizableContainer}
-    style="width:{resizableContainerWidth}px;"
+    style="width:{resizableContainerWidth
+      ? resizableContainerWidth + 'px'
+      : 'auto'};"
     on:mousedown|stopPropagation|preventDefault={handleMouseDown}
   >
     <table class="workflow-summary-table pinned">
@@ -405,7 +407,7 @@
 
   .workflow-summary-table-wrapper.pinned {
     /* higher z-index ensures the box shadow displays over the background gradient on the table rows */
-    @apply overflow-x-hidden rounded-l-lg max-w-fit min-w-[40px] z-10;
+    @apply shrink-0 overflow-x-hidden rounded-l-lg max-w-fit min-w-[40px] z-10;
 
     box-shadow: 2px 0 4px rgb(0 0 0 / 25%);
 
