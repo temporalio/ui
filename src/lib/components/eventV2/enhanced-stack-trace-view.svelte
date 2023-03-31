@@ -14,6 +14,7 @@
   import FinalEventCard from './final-event-card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import EnhancedStackTrace from './event-summary-card/enhanced-stack-trace.svelte';
+  import EnhancedStackTraceCard from './enhanced-stack-trace-card.svelte';
 
   export let fullHistory: CommonHistoryEvent[] = [];
   export let importingHistory: boolean = false;
@@ -64,7 +65,7 @@
   <div class="flex w-full flex-col gap-2 xl:w-[50%]">
     {#each currentStacks as stack}
       {#each stack.eventIds as id}
-        <EventGroupSummaryCard
+        <EnhancedStackTraceCard
           event={currentEvents.find((event) => event.eventId === id.toString())}
           events={currentEvents}
           {firstEvent}

@@ -41,7 +41,7 @@
   let fullHistory: CommonHistoryEvent[] = [];
   let showNonCompleted = false;
   let showWorkflowTasks = false;
-  let showStackTrace = true;
+  let showStackTrace = false;
   let stacks = {};
 
   const onUpdate = async ({ history }) => {
