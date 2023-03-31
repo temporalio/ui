@@ -15,35 +15,37 @@
   $: lineStart = showSnippet ? line - 4 : 1;
 </script>
 
-<h5 class="file-name">
-  <Copyable
-    content={filePath}
-    clickAllToCopy
-    container-class="w-full"
-    class="truncate"
-  />
-</h5>
-<div class="max-h-96 overflow-scroll">
-  <CodeBlock
-    content={showSnippet ? snippet[0] : source}
-    language="ts"
-    highlightLine={line}
-    copyable={false}
-    {lineStart}
-  >
-    <button
-      slot="action"
-      on:click={() => {
-        showSnippet = !showSnippet;
-      }}
-      class="absolute top-2.5 right-2.5 rounded-md bg-gray-900 opacity-90 hover:bg-white"
-    >
-      <Icon
-        name={showSnippet ? 'chevron-selector-vertical' : 'chevron-up'}
-        class="text-white hover:text-gray-900"
+<div class="relative">
+  <h5 class="file-name">
+    <Copyable
+      content={filePath}
+      clickAllToCopy
+      container-class="w-full"
+      class="truncate"
+    />
+  </h5>
+  <div class="max-h-96 overflow-scroll">
+    {#key line}
+      <CodeBlock
+        content={showSnippet ? snippet : source}
+        language="ts"
+        highlightLine={line}
+        copyable={false}
+        {lineStart}
       />
-    </button></CodeBlock
+    {/key}
+  </div>
+  <button
+    on:click={() => {
+      showSnippet = !showSnippet;
+    }}
+    class="absolute top-14 right-4 rounded-md bg-gray-900 opacity-90 hover:bg-white"
   >
+    <Icon
+      name={showSnippet ? 'chevron-selector-vertical' : 'chevron-up'}
+      class="text-white hover:text-gray-900"
+    />
+  </button>
 </div>
 
 <style lang="postcss">

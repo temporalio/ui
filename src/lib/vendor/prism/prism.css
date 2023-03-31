@@ -37,14 +37,14 @@ pre[class*='language-'] {
   border-radius: 0.3em;
 }
 
-:not(pre)>code[class*='language-'],
+:not(pre) > code[class*='language-'],
 pre[class*='language-'] {
   /* gray-900 */
   background: #18181b;
 }
 
 /* Inline code */
-:not(pre)>code[class*='language-'] {
+:not(pre) > code[class*='language-'] {
   padding: 0.1em;
   border-radius: 0.3em;
   white-space: normal;
@@ -196,11 +196,11 @@ pre[id].linkable-line-numbers span.line-numbers-rows {
   pointer-events: all;
 }
 
-pre[id].linkable-line-numbers span.line-numbers-rows>span:before {
+pre[id].linkable-line-numbers span.line-numbers-rows > span:before {
   cursor: pointer;
 }
 
-pre[id].linkable-line-numbers span.line-numbers-rows>span:hover:before {
+pre[id].linkable-line-numbers span.line-numbers-rows > span:hover:before {
   background-color: rgba(128, 128, 128, 0.2);
 }
 
@@ -210,7 +210,7 @@ pre[class*='language-'].line-numbers {
   counter-reset: linenumber;
 }
 
-pre[class*='language-'].line-numbers>code {
+pre[class*='language-'].line-numbers > code {
   position: relative;
   white-space: inherit;
 }
@@ -232,12 +232,12 @@ pre[class*='language-'].line-numbers>code {
   user-select: none;
 }
 
-.line-numbers-rows>span {
+.line-numbers-rows > span {
   display: block;
   counter-increment: linenumber;
 }
 
-.line-numbers-rows>span:before {
+.line-numbers-rows > span:before {
   content: counter(linenumber);
   color: #999;
   display: block;

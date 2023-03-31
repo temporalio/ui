@@ -78,6 +78,7 @@
           <pre
             class="w-full overflow-x-scroll rounded-lg p-4 line-numbers"
             data-start={lineStart}
+            data-line-offset={lineStart}
             data-line={highlightLine}
             class:h-full={!inline}
             class:title><code
@@ -96,8 +97,6 @@
             data-testid={$$props['data-testid']}
           /></pre>
       {/if}
-
-      <slot name="action" />
 
       {#if copyable}
         <button
