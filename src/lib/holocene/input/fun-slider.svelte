@@ -8,13 +8,12 @@
     label?: string;
     min?: number;
     max?: number;
+    showInput: boolean;
     'data-testid'?: string;
   }
 
-  export let label: string = undefined;
   export let min: number = undefined;
   export let max: number = undefined;
-  export let id: string = undefined;
   export let value: number = Math.round((min + max) / 2);
 
   let valid: boolean = true;
@@ -66,17 +65,7 @@
 <div class="w-full px-1 py-4 {$$props.class}">
   <div class="range-input-container">
     <div class="relative w-auto grow">
-      <span class="absolute -bottom-6 left-0 text-xs font-normal">
-        {min}
-      </span>
       <div class="relative flex items-center">
-        <output
-          bind:this={outputElement}
-          class:hidden={!valid}
-          class="absolute -top-6 text-center text-xs font-normal"
-          style="left: calc({outputXPos}% - ({outputXPosOffset}px));"
-          for="range">{value ?? ''}</output
-        >
         <input
           name="range"
           type="range"
@@ -89,29 +78,7 @@
           {...omit($$restProps, 'class')}
         />
       </div>
-      <span class="absolute -bottom-6 right-0 text-xs font-normal">
-        {max}
-      </span>
     </div>
-    <div class="flex shrink">
-      <input
-        {id}
-        class="numeric-input"
-        class:invalid={!valid}
-        type="number"
-        inputmode="numeric"
-        bind:value
-        on:input={handleInput}
-        {min}
-        {max}
-        step={$$props.step}
-      />
-    </div>
-    {#if label}
-      <label class="flex shrink text-sm" for={id}>
-        {label}
-      </label>
-    {/if}
   </div>
 </div>
 
@@ -145,11 +112,11 @@
   }
 
   input[type='range']::-webkit-slider-thumb {
-    @apply h-4 w-8 appearance-none rounded-full border border-solid border-primary bg-gradient-to-br from-blue-100 to-purple-100;
+    @apply h-8 w-8 appearance-none rounded-full border-2 border-solid border-primary bg-gradient-to-br from-blue-100 to-purple-100;
   }
 
   input[type='range']::-moz-range-thumb {
-    @apply h-4 w-8 rounded-full border border-solid border-primary bg-gradient-to-br from-blue-100 to-purple-100 shadow-none;
+    @apply h-8 w-8 rounded-full border-2 border-solid border-primary bg-gradient-to-br from-blue-100 to-purple-100 shadow-none;
   }
 
   input[type='range']:focus {

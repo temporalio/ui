@@ -21,6 +21,7 @@
   import { timeTravelEnhancedStackTrace } from './mocks/stack-traces';
   import RangeInput from '$lib/holocene/input/range-input.svelte';
   import EnhancedStackTraceView from './enhanced-stack-trace-view.svelte';
+  import FunSlider from '$lib/holocene/input/fun-slider.svelte';
 
   let controller;
   let maxTimeTravel = 1;
@@ -154,23 +155,20 @@
     class="flex flex-col gap-2 xl:flex-row-reverse bg-white rounded-xl border-2 p-4"
   >
     <div class="w-full">
-      <RangeInput
+      <FunSlider
         id="time-travel-range"
         min={1}
         max={maxTimeTravel}
         bind:value={timeTravelPosition}
         showInput={false}
       />
-      <div class="flex w-full flex-col gap-2 xl:w-[50%]">
-        <EnhancedStackTraceView
-          {fullHistory}
-          {showNonCompleted}
-          {showWorkflowTasks}
-          {stacks}
-          {timeTravelPosition}
-        />
-      </div>
-      <div class="flex w-full flex-col gap-2 xl:w-[50%]" />
+      <EnhancedStackTraceView
+        {fullHistory}
+        {showNonCompleted}
+        {showWorkflowTasks}
+        {stacks}
+        {timeTravelPosition}
+      />
     </div>
   </div>
 {:else}

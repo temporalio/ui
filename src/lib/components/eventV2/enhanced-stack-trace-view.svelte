@@ -13,6 +13,7 @@
   import RunningCard from './running-card.svelte';
   import FinalEventCard from './final-event-card.svelte';
   import CodeBlock from '$lib/holocene/code-block.svelte';
+  import EnhancedStackTrace from './event-summary-card/enhanced-stack-trace.svelte';
 
   export let fullHistory: CommonHistoryEvent[] = [];
   export let importingHistory: boolean = false;
@@ -52,21 +53,23 @@
   $: firstEvent = currentEvents?.[0];
   $: lastEvent = currentEvents?.[currentEvents?.length - 1];
   $: currentStacks = Object.values(stacks)[timeTravelPosition - 1];
-
-  $: {
-    console.log('Stacks: ', stacks);
-    console.log('timeTravelPosition: ', timeTravelPosition);
-    console.log('currentStacks: ', currentStacks);
-  }
 </script>
 
-<div class="flex w-full flex-col gap-0">
-  {#each currentStacks as stack}
-    <CodeBlock
-      content={stack?.snippet?.[0]}
-      language="text"
-      icon="json"
-      title={stack.filePath}
-    />
-  {/each}
+<div class="flex flex-row gap-0 pt-4">
+  <div class="flex w-full flex-col gap-2 xl:w-[50%]">
+    {#each currentStacks as stack}
+      <EnhancedStackTrace {...stack} />
+    {/each}
+  </div>
+  <div class="flex w-full flex-col gap-2 xl:w-[50%]">
+    {#each currentStacks as stack}
+      {#each stack.eventIds as id}
+        <EventGroupSummaryCard
+          event={currentEvents.find((event) => event.eventId === id.toString())}
+          events={currentEvents}
+          {firstEvent}
+        />
+      {/each}
+    {/each}
+  </div>
 </div>
