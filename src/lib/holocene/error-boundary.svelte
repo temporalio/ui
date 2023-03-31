@@ -1,5 +1,6 @@
 <script lang="ts">
   import { networkError } from '$lib/stores/error';
+  import type { NetworkError } from 'src/types/global';
   import Error from './error.svelte';
 
   export let error = null;

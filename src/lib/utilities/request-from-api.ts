@@ -1,5 +1,6 @@
 import { browser } from '$app/environment';
 import { getAuthUser } from '$lib/stores/auth-user';
+import type { NetworkError } from 'src/types/global';
 import { noop } from 'svelte/internal';
 import { handleError as handleRequestError } from './handle-error';
 import { isFunction } from './is-function';

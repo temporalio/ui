@@ -7,6 +7,11 @@ import {
 } from '$lib/utilities/get-single-attribute-for-event';
 import { capitalize } from '$lib/utilities/format-camel-case';
 import { formatDate } from '$lib/utilities/format-date';
+import type {
+  EventAttribute,
+  IterableEvent,
+  EventAttributeKey,
+} from 'src/types/events';
 
 export type CombinedAttributes = EventAttribute & {
   eventTime?: string;

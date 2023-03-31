@@ -11,6 +11,7 @@ import { eventFilterSort } from './event-view';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { refresh } from '$lib/stores/workflow-run';
 import { authUser } from '$lib/stores/auth-user';
+import type { WorkflowEvents } from 'src/types/events';
 
 const namespace = derived([page], ([$page]) => {
   if ($page.params.namespace) {

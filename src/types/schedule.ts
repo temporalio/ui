@@ -1,28 +1,29 @@
-type DescribeSchedule = import('$types').DescribeScheduleResponse;
-type CalendarSpec = import('types').ICalendarSpec;
-type StructuredCalendarSpec = import('types').IStructuredCalendarSpec;
+import type { DescribeScheduleResponse, Schedule } from '$types';
 
-type DescribeFullSchedule = DescribeScheduleResponse & {
+export type DescribeSchedule = import('$types').DescribeScheduleResponse;
+export type CalendarSpec = import('$types').CalendarSpec;
+
+export type DescribeFullSchedule = DescribeScheduleResponse & {
   schedule_id: string;
   schedule?: FullScheduleSpec;
 };
 
-type FullScheduleSpec = Schedule & {
+export type FullScheduleSpec = Schedule & {
   calendar: FullCalendarSpec;
 };
 
-type FullCalendarSpec = CalendarSpec & {
+export type FullCalendarSpec = CalendarSpec & {
   cronString?: string[];
   structuredCalendar?: StructuredCalendarSpec[];
 };
 
-type StartEndInterval = {
+export type StartEndInterval = {
   start?: number;
   end?: number;
   step?: number;
 };
 
-type StructuredCalendar = {
+export type StructuredCalendar = {
   second?: StartEndInterval[];
   minute?: StartEndInterval[];
   hour?: StartEndInterval[];
@@ -33,11 +34,16 @@ type StructuredCalendar = {
   comment?: string;
 };
 
-type SchedulePreset = 'existing' | 'interval' | 'week' | 'month' | 'string';
+export type SchedulePreset =
+  | 'existing'
+  | 'interval'
+  | 'week'
+  | 'month'
+  | 'string';
 
-type ScheduleOffsetUnit = 'days' | 'hrs' | 'min' | 'sec';
+export type ScheduleOffsetUnit = 'days' | 'hrs' | 'min' | 'sec';
 
-type ScheduleActionParameters = {
+export type ScheduleActionParameters = {
   namespace: string;
   name: string;
   workflowType: string;
@@ -45,7 +51,7 @@ type ScheduleActionParameters = {
   taskQueue: string;
 };
 
-type ScheduleSpecParameters = {
+export type ScheduleSpecParameters = {
   dayOfWeek: string;
   dayOfMonth: string;
   month: string;
@@ -57,14 +63,10 @@ type ScheduleSpecParameters = {
 };
 
 // For UI Only
-type SchedulePresetsParameters = {
+export type SchedulePresetsParameters = {
   preset: SchedulePreset;
   days: string;
   daysOfWeek: string[];
   daysOfMonth: number[];
   months: string[];
 };
-
-type ScheduleParameters = ScheduleRequiredParameters &
-  ScheduleSpecParameters &
-  ScheduleUISpecParameters;

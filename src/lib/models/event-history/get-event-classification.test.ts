@@ -1,3 +1,4 @@
+import type { EventType } from 'src/types/events';
 import { describe, expect, it } from 'vitest';
 import {
   eventClassifications,

@@ -6,6 +6,7 @@
   import Input from '$lib/holocene/input/input.svelte';
   import { page } from '$app/stores';
   import ScheduleFrequency from './schedule-frequency.svelte';
+  import type { FullScheduleSpec, SchedulePreset } from 'src/types/schedule';
 
   let scheduleId = $page.params.schedule;
 

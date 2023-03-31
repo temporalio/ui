@@ -5,6 +5,10 @@ import {
 } from '$lib/services/workflow-service';
 import { fetchNamespace } from '$lib/services/namespaces-service';
 import type { DescribeNamespaceResponse } from '$types';
+import type {
+  WorkflowStatus,
+  ArchiveFilterParameters,
+} from 'src/types/workflow';
 
 export const load: PageLoad = async function ({ params, url }) {
   const { searchParams } = url;

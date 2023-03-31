@@ -1,4 +1,5 @@
 import type { StartAndEndEventHistory } from '$lib/stores/events';
+import type { WorkflowStatus } from 'src/types/workflow';
 
 export const isCancelInProgress = (
   status: WorkflowStatus,

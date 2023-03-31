@@ -6,7 +6,7 @@
     expandAllEvents,
   } from '$lib/stores/event-view';
   import { refresh } from '$lib/stores/workflow-run';
-  import { eventHistory } from '$lib/stores/events';
+  import { eventHistory, StartAndEndEventHistory } from '$lib/stores/events';
   import { eventCategoryFilter } from '$lib/stores/filters';
   import { authUser } from '$lib/stores/auth-user';
 
@@ -16,6 +16,11 @@
   import { groupEvents } from '$lib/models/event-groups';
   import Pagination from '$lib/holocene/pagination.svelte';
   import { fetchAllEvents } from '$lib/services/events-service';
+  import type {
+    CommonHistoryEvent,
+    EventTypeCategory,
+    IterableEvent,
+  } from 'src/types/events';
 
   export let compact = false;
 
@@ -68,6 +73,8 @@
   };
 
   $: category = $eventCategoryFilter as EventTypeCategory;
+  // Types weren't happy when I used this in the getEventsOrGroups function
+  // let intialEvents: StartAndEndEventHistory[];
   $: intialEvents =
     $eventFilterSort === 'descending' && !compact
       ? $eventHistory?.end

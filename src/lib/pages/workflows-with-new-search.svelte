@@ -45,6 +45,7 @@
   } from '$lib/stores/workflow-table-columns';
   import Drawer from '$lib/holocene/drawer.svelte';
   import OrderableList from '$lib/holocene/orderable-list.svelte';
+  import type { WorkflowExecution } from 'src/types/workflow';
 
   let selectedWorkflows: { [index: string]: boolean } = {};
   let batchTerminateConfirmationModal: BatchOperationConfirmationModal;

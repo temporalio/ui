@@ -1,3 +1,9 @@
+import type {
+  NextPageToken,
+  PaginationCallbacks,
+  WithNextPageToken,
+  WithoutNextPageToken,
+} from 'src/types/global';
 import { handleError } from './handle-error';
 import { isFunction } from './is-function';
 import { merge } from './merge';

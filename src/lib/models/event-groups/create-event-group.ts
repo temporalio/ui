@@ -7,6 +7,15 @@ import {
   isWorkflowExecutionSignaledEvent,
   isTimerStartedEvent,
 } from '$lib/utilities/is-event-type';
+import type {
+  ActivityTaskScheduledEvent,
+  StartChildWorkflowExecutionInitiatedEvent,
+  TimerStartedEvent,
+  SignalExternalWorkflowExecutionInitiatedEvent,
+  WorkflowExecutionSignaledEvent,
+  MarkerRecordedEvent,
+  CommonHistoryEvent,
+} from 'src/types/events';
 import {
   eventIsFailureOrTimedOut,
   eventIsCanceled,

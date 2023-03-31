@@ -1,4 +1,5 @@
 import { formatDuration } from 'date-fns';
+import type { FilterParameters } from 'src/types/workflow';
 import { isExecutionStatus } from '../is';
 import { durationKeys, fromDate } from '../to-duration';
 import { tokenize } from './tokenize';
@@ -48,6 +49,7 @@ export const toListWorkflowParameters = (query: string): ParsedParameters => {
 
     if (isExecutionStatusStatement(token)) {
       const value = getTwoAhead(tokens, index);
+      // This used to be never and now it's string making this a REAL ERROR
       if (isExecutionStatus(value)) parameters.executionStatus = value;
     }
 

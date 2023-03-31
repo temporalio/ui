@@ -16,6 +16,7 @@
     eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
+  import type { WorkflowEvents } from 'src/types/events';
 
   export let events: WorkflowEvents;
   export let eventGroups: EventGroups;
@@ -103,8 +104,7 @@
       bind:this={canvas}
       class="relative"
       style="height:
-            {blockHeight * eventGroups.length +
-            yBuffer}px; width: {width}px;"
+            {blockHeight * eventGroups.length + yBuffer}px; width: {width}px;"
     >
       <VirtualList
         items={eventGroups}
@@ -126,10 +126,8 @@
           class="event-group"
           style="top:
                 {top +
-                blockHeight /
-                4}px; left: {left}px; width: {width}px; height:
-                {height -
-                1}px; background: {color};"
+            blockHeight / 4}px; left: {left}px; width: {width}px; height:
+                {height - 1}px; background: {color};"
         />
         <button
           class="absolute truncate border-r border-gray-900 pl-2 text-left text-sm font-medium hover:bg-blueGray-200"
@@ -158,7 +156,7 @@
         class="absolute top-0 bg-blueGray-400"
         style="height:
               {blockHeight * eventGroups.length +
-              yBuffer}px;left: {mouseX}px; width: 1px;"
+          yBuffer}px;left: {mouseX}px; width: 1px;"
       />
     </div>
   </div>

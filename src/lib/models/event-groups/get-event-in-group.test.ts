@@ -1,3 +1,8 @@
+import type {
+  StartChildWorkflowExecutionInitiatedEvent,
+  ActivityTaskScheduledEvent,
+  WorkflowEvent,
+} from 'src/types/events';
 import { describe, expect, it } from 'vitest';
 import { groupEvents } from '.';
 import {

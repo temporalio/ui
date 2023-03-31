@@ -1,3 +1,9 @@
+import type {
+  EventType,
+  WorkflowEvents,
+  IterableEvent,
+} from 'src/types/events';
+
 export const eventTypeCategorizations: Readonly<
   Record<EventType, EventTypeCategory>
 > = {
@@ -50,7 +56,7 @@ export const eventTypeCategorizations: Readonly<
 };
 
 export type EventTypeCategory = (typeof categories)[number];
-const categories = [
+export const categories = [
   'activity',
   'child-workflow',
   'command',

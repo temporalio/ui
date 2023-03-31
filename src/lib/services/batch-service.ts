@@ -9,6 +9,7 @@ import type {
 } from 'src/types';
 import { isVersionNewer } from '$lib/utilities/version-check';
 import { temporalVersion } from '$lib/stores/versions';
+import type { WorkflowExecution, BatchOperationInfo } from 'src/types/workflow';
 
 type CreateBatchOperationOptions = {
   namespace: string;

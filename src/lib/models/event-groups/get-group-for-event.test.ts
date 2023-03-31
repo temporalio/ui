@@ -1,3 +1,8 @@
+import type {
+  ActivityTaskScheduledEvent,
+  ActivityTaskStartedEvent,
+  ActivityTaskCompletedEvent,
+} from 'src/types/events';
 import { describe, expect, it } from 'vitest';
 import { groupEvents, getGroupForEvent } from '.';
 

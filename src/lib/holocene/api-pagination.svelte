@@ -5,6 +5,7 @@
 
   import { createPaginationStore } from '$lib/stores/api-pagination';
   import { options } from '$lib/stores/pagination';
+  import type { NextPageToken } from 'src/types/global';
   import { onMount } from 'svelte';
 
   import type { HTMLAttributes } from 'svelte/elements';

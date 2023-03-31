@@ -3,6 +3,8 @@ import { has } from './has';
 import { isString } from './is';
 
 import type { StartAndEndEventHistory } from '../stores/events';
+import type { WorkflowEvents } from 'src/types/events';
+import type { WorkflowExecution } from 'src/types/workflow';
 
 const getNewExecutionId = (events: WorkflowEvents): string | undefined => {
   for (const event of events) {

@@ -12,11 +12,13 @@
 
   import ScheduleFrequency from './schedule-frequency.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
+  import type { FullCalendarSpec, FullScheduleSpec } from 'src/types/schedule';
 
   let { namespace } = $page.params;
 
   export let schedule: ScheduleListEntry;
 
+  // Actually borked
   const spec: FullScheduleSpec = schedule?.info?.spec;
   const calendar: FullCalendarSpec = spec?.structuredCalendar?.[0];
   const interval = spec?.interval?.[0];

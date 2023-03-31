@@ -10,6 +10,11 @@ import {
   convertDaysAndMonths,
   timeToInterval,
 } from '$lib/utilities/schedule-data-formatting';
+import type {
+  DescribeFullSchedule,
+  ScheduleSpecParameters,
+  SchedulePresetsParameters,
+} from 'src/types/schedule';
 
 // TODO: Post Beta, add support of additional fields.
 // "startTime": "2022-07-04T03:18:59.668Z",
@@ -33,6 +38,7 @@ const setBodySpec = (
     body.schedule.spec.interval = [];
   } else if (preset === 'interval') {
     const interval = timeToInterval(days, hour, minute, second);
+    // Borked
     body.schedule.spec.interval = [{ interval, phase: phase || '0s' }];
     body.schedule.spec.cronString = [];
     body.schedule.spec.calendar = [];
@@ -76,6 +82,7 @@ export const submitCreateSchedule = async ({
   const { namespace, name, workflowId, workflowType, taskQueue } = action;
   const body: DescribeFullSchedule = {
     schedule_id: name,
+    // Borked
     schedule: {
       spec: {
         calendar: [],
@@ -122,6 +129,7 @@ export const submitEditSchedule = async (
   const { preset } = presets;
 
   const body: DescribeFullSchedule = {
+    // Borked
     schedule: {
       ...schedule,
       action: {

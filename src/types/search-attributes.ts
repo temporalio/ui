@@ -1,4 +1,4 @@
-type SearchAttributesValue =
+export type SearchAttributesValue =
   | 'Bool'
   | 'Datetime'
   | 'Double'
@@ -6,10 +6,10 @@ type SearchAttributesValue =
   | 'Keyword'
   | 'Text';
 
-type SearchAttributes = {
+export type SearchAttributes = {
   [k: string]: SearchAttributesValue;
 };
 
-type SearchAttributesResponse = {
+export type SearchAttributesResponse = {
   keys: SearchAttributes;
 };

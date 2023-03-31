@@ -11,7 +11,7 @@ import {
 } from '$lib/utilities/decode-payload';
 import { formatDate } from '$lib/utilities/format-date';
 import { has } from '$lib/utilities/has';
-import { findAttributesAndKey } from '$lib/utilities/is-event-type';
+import { EventType, findAttributesAndKey } from '$lib/utilities/is-event-type';
 import {
   getCodecEndpoint,
   getCodecPassAccessToken,
@@ -21,6 +21,12 @@ import {
 import { getEventCategory } from './get-event-categorization';
 import { getEventClassification } from './get-event-classification';
 import { simplifyAttributes } from './simplify-attributes';
+import type {
+  EventsWithMetadata,
+  EventWithMetadata,
+  WorkflowEvent,
+  WorkflowEvents,
+} from 'src/types/events';
 
 export async function getEventAttributes(
   { historyEvent, namespace, settings, accessToken }: EventWithMetadata,
@@ -33,6 +39,7 @@ export async function getEventAttributes(
     codecIncludeCredentials = includeCredentials,
   }: DecodeFunctions = {},
 ): Promise<EventAttributesWithType> {
+  // borked
   const { key, attributes } = findAttributesAndKey(historyEvent);
   // Use locally set endpoint over settings endpoint for testing purposes
   const endpoint = getCodecEndpoint(settings, encoderEndpoint);

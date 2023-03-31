@@ -4,6 +4,12 @@
   import { submitCreateSchedule } from '$lib/stores/schedules';
 
   import ScheduleFormView from '$lib/components/schedule/schedule-form-view.svelte';
+  import type {
+    ScheduleActionParameters,
+    SchedulePreset,
+    SchedulePresetsParameters,
+    ScheduleSpecParameters,
+  } from 'src/types/schedule';
 
   let { namespace } = $page.params;
 

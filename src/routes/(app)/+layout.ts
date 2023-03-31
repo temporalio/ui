@@ -19,6 +19,7 @@ import {
   getAuthUserCookie,
   cleanAuthUserCookie,
 } from '$lib/utilities/auth-user-cookie';
+import type { Settings, UiVersionInfo } from 'src/types/global';
 
 export const load: LayoutLoad = async function ({ fetch }) {
   const settings: Settings = await fetchSettings(fetch);

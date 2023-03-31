@@ -5,6 +5,7 @@ import { getEnvironment } from '$lib/utilities/get-environment';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 import type { SettingsResponse } from '$types';
+import type { Settings } from 'src/types/global';
 
 export const isCloudMatch = /(tmprl\.cloud|tmprl-test\.cloud)$/;
 

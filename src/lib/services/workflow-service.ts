@@ -17,6 +17,16 @@ import { noop } from 'svelte/internal';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { btoa } from '$lib/utilities/btoa';
 import { v4 } from 'uuid';
+import type { NamespaceScopedRequest } from 'src/types/global';
+import type { ListWorkflowExecutionsResponse } from '$types';
+import type {
+  ValidWorkflowParameters,
+  ValidWorkflowEndpoints,
+} from 'src/types/api';
+import type {
+  WorkflowExecution,
+  ArchiveFilterParameters,
+} from 'src/types/workflow';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;

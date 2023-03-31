@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { WorkflowExecutionStatus } from 'src/types/workflow';
   import HeartBeat from './heart-beat-indicator.svelte';
 
   export let status: WorkflowExecutionStatus | string = 'Running';

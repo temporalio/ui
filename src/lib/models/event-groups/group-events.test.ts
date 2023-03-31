@@ -1,3 +1,4 @@
+import type { WorkflowEvents, CommonHistoryEvent } from 'src/types/events';
 import { describe, expect, it } from 'vitest';
 import { groupEvents } from './';
 import { getEventGroupName } from './get-group-name';

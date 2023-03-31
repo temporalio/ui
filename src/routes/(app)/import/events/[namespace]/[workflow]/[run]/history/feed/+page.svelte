@@ -8,8 +8,15 @@
   import EventEmptyRow from '$lib/components/event/event-empty-row.svelte';
   import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
   import { eventCategoryFilter } from '$lib/stores/filters';
+  import type {
+    WorkflowEvent,
+    EventTypeCategory,
+    WorkflowEvents,
+  } from 'src/types/events';
 
   $: category = $eventCategoryFilter as EventTypeCategory;
+
+  let sortedEvents: WorkflowEvents;
   $: sortedEvents =
     $eventFilterSort === 'descending'
       ? [...$importEvents].reverse()

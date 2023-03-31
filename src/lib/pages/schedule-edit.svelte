@@ -8,6 +8,12 @@
 
   import ScheduleFormView from '$lib/components/schedule/schedule-form-view.svelte';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
+  import type {
+    ScheduleActionParameters,
+    SchedulePreset,
+    SchedulePresetsParameters,
+    ScheduleSpecParameters,
+  } from 'src/types/schedule';
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;

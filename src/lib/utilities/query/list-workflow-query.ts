@@ -5,6 +5,11 @@ import type {
 import { isDuration, isDurationString, toDate, tomorrow } from '../to-duration';
 import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
 import { get } from 'svelte/store';
+import type { SearchAttributes } from 'src/types/search-attributes';
+import type {
+  FilterParameters,
+  ArchiveFilterParameters,
+} from 'src/types/workflow';
 
 export type QueryKey =
   | 'WorkflowId'

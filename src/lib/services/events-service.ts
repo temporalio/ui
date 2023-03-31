@@ -5,6 +5,15 @@ import { toEventHistory } from '$lib/models/event-history';
 import { isSortOrder } from '$lib/utilities/is';
 
 import type { EventSortOrder } from '$lib/stores/event-view';
+import type { GetWorkflowExecutionHistoryResponse, HistoryEvent } from '$types';
+import type { WorkflowAPIRoutePath } from 'src/types/api';
+import type { CommonHistoryEvent, WorkflowEvents } from 'src/types/events';
+import type {
+  NamespaceScopedRequest,
+  PaginationCallbacks,
+  NextPageToken,
+  Settings,
+} from 'src/types/global';
 
 export type FetchEventsParameters = NamespaceScopedRequest &
   PaginationCallbacks<GetWorkflowExecutionHistoryResponse> & {
@@ -76,6 +85,7 @@ export const fetchAllEvents = async ({
   );
 
   const allEvents = await toEventHistory({
+    // Borked
     response: response.history.events,
     namespace,
     settings,

@@ -6,6 +6,7 @@ import { validateHttps } from '$lib/utilities/is-http';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
 import type { Payloads } from '$types';
+import type { Settings } from 'src/types/global';
 
 export async function convertPayloadsWithCodec({
   payloads,

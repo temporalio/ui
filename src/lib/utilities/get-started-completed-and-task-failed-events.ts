@@ -1,4 +1,16 @@
 import type { StartAndEndEventHistory } from '$lib/stores/events';
+import type {
+  WorkflowTaskFailedEvent,
+  WorkflowExecutionFailedEvent,
+  WorkflowExecutionCompletedEvent,
+  WorkflowExecutionContinuedAsNewEvent,
+  WorkflowExecutionTimedOutEvent,
+  WorkflowExecutionCanceledEvent,
+  WorkflowExecutionTerminatedEvent,
+  WorkflowEvent,
+  WorkflowExecutionStartedEvent,
+  WorkflowTaskCompletedEvent,
+} from 'src/types/events';
 import {
   isWorkflowExecutionCompletedEvent,
   isWorkflowExecutionContinuedAsNewEvent,
@@ -60,10 +72,12 @@ const getEventResult = (event: CompletionEvent) => {
   }
 
   if (isWorkflowExecutionCompletedEvent(event)) {
+    // Actually Borked
     if (event.attributes.result === null) return null;
     return event.attributes.result.payloads;
   }
 
+  // Actually Borked
   return event.attributes;
 };
 

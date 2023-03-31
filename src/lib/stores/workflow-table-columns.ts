@@ -1,4 +1,5 @@
 import { formatDistance } from 'date-fns';
+import type { WorkflowExecution } from 'src/types/workflow';
 import { persistStore } from './persist-store';
 
 type WorkflowHeader =

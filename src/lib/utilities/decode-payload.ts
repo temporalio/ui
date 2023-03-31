@@ -14,6 +14,8 @@ import type {
 
 import { atob } from './atob';
 import { parseWithBigInt } from './parse-with-big-int';
+import type { EventAttribute, EventRequestMetadata } from 'src/types/events';
+import type { Settings } from 'src/types/global';
 
 export type Decode = {
   convertPayloadToJsonWithCodec: typeof convertPayloadToJsonWithCodec;

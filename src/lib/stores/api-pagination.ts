@@ -8,6 +8,7 @@ import {
 } from './pagination';
 
 import type { Readable } from 'svelte/store';
+import type { NextPageToken } from 'src/types/global';
 
 type PaginationMethods = {
   nextPageWithItems: (t: NextPageToken, items: any[]) => void;

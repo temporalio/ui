@@ -5,6 +5,7 @@ import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
 import type { DescribeNamespaceResponse, ListNamespacesResponse } from '$types';
+import type { Settings } from 'src/types/global';
 
 const emptyNamespace = {
   namespaces: [],

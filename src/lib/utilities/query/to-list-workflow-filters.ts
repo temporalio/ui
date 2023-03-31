@@ -11,6 +11,8 @@ import { isConditional, isJoin, isParenthesis, isBetween } from '../is';
 import { durationKeys, fromDate } from '../to-duration';
 import { tokenize } from './tokenize';
 import { updateQueryParameters } from '../update-query-parameters';
+import type { SearchAttributes } from 'src/types/search-attributes';
+import type { FilterParameters } from 'src/types/workflow';
 
 type Tokens = string[];
 export type ParsedParameters = FilterParameters & { timeRange?: string };

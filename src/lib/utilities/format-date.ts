@@ -1,5 +1,6 @@
 import { formatDistanceToNow, parseJSON } from 'date-fns';
 import * as dateTz from 'date-fns-tz'; // `build` script fails on importing some of named CommonJS modules
+import type { TimeFormat } from 'src/types/global';
 
 import { isTimestamp, timestampToDate, type ValidTime } from './format-time';
 

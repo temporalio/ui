@@ -1,3 +1,4 @@
+import type { NetworkError } from 'src/types/global';
 import { has } from './has';
 
 export function isNetworkError(

@@ -8,6 +8,7 @@
   import EventEmptyRow from '$lib/components/event/event-empty-row.svelte';
   import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
   import { eventCategoryFilter } from '$lib/stores/filters';
+  import type { EventTypeCategory } from '$lib/models/event-history/get-event-categorization';
 
   $: category = $eventCategoryFilter as EventTypeCategory;
   $: sortedEvents =

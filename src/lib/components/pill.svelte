@@ -2,6 +2,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
 
   import type { IconName } from '$lib/holocene/icon/paths';
+  import type { Color } from 'src/types/global';
 
   export let disabled: boolean = false;
   export let loading: boolean = false;

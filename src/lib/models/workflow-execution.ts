@@ -1,4 +1,10 @@
 import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
+import type {
+  PendingActivityInfo,
+  ListWorkflowExecutionsResponse,
+} from '$types';
+import type { PendingChildren } from 'src/types/events';
+import type { WorkflowExecution } from 'src/types/workflow';
 import { simplifyAttributes } from './event-history/simplify-attributes';
 
 const toPendingActivities = (

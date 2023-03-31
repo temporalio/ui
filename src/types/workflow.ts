@@ -1,14 +1,11 @@
-type WorkflowExecutionStatus = import('$types').WorkflowExecutionStatus;
-type WorkflowTaskFailedCause = import('$types').WorkflowTaskFailedCause;
-type ListWorkflowExecutionsResponse =
+import type { PendingChildren } from './events';
+
+export type WorkflowExecutionStatus = import('$types').WorkflowExecutionStatus;
+export type WorkflowTaskFailedCause = import('$types').WorkflowTaskFailedCause;
+export type ListWorkflowExecutionsResponse =
   import('$types').ListWorkflowExecutionsResponse;
 
-type WorkflowExecutionAPIResponse = Optional<
-  DescribeWorkflowExecutionResponse,
-  'executionConfig' | 'pendingActivities' | 'pendingChildren'
->;
-
-type WorkflowStatus =
+export type WorkflowStatus =
   | 'Running'
   | 'TimedOut'
   | 'Completed'
@@ -19,14 +16,14 @@ type WorkflowStatus =
   | 'Terminated'
   | null;
 
-type WorkflowType = string | null;
+export type WorkflowType = string | null;
 
-type WorkflowExecutionFilters = {
+export type WorkflowExecutionFilters = {
   type: WorkflowType;
   status: WorkflowStatus;
 };
 
-type FilterParameters = {
+export type FilterParameters = {
   workflowId?: string;
   workflowType?: string;
   executionStatus?: WorkflowStatus;
@@ -34,13 +31,11 @@ type FilterParameters = {
   query?: string;
 };
 
-type ArchiveFilterParameters = Omit<FilterParameters, 'timeRange'> & {
+export type ArchiveFilterParameters = Omit<FilterParameters, 'timeRange'> & {
   closeTime?: Duration | string;
 };
 
-type WorkflowIdentifier = IWorkflowExecution;
-
-type WorkflowExecution = {
+export type WorkflowExecution = {
   name: string;
   id: string;
   runId: string;
@@ -48,7 +43,7 @@ type WorkflowExecution = {
   endTime: string;
   status: WorkflowStatus;
   taskQueue?: string;
-  historyEvents: Long;
+  historyEvents: number;
   pendingChildren: PendingChildren[];
   pendingActivities: PendingActivity[];
   stateTransitionCount: string;
@@ -60,10 +55,14 @@ type WorkflowExecution = {
   canBeTerminated: boolean;
 };
 
-type BatchOperationType = 'Terminate' | 'Cancel' | 'Signal';
-type BatchOperationStatus = 'Running' | 'Complete' | 'Failed' | 'Unspecified';
+export type BatchOperationType = 'Terminate' | 'Cancel' | 'Signal';
+export type BatchOperationStatus =
+  | 'Running'
+  | 'Complete'
+  | 'Failed'
+  | 'Unspecified';
 
-type BatchOperationInfo = {
+export type BatchOperationInfo = {
   operationType: BatchOperationType;
   jobId: string;
   state: BatchOperationStatus;

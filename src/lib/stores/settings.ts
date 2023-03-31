@@ -1,3 +1,4 @@
+import type { Settings } from 'src/types/global';
 import { writable } from 'svelte/store';
 
 export const settings = writable<Settings>({

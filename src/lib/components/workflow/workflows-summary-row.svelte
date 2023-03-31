@@ -11,6 +11,8 @@
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import FilterOrCopyButtons from '$lib/holocene/filter-or-copy-buttons.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
+  import type { WorkflowExecution } from 'src/types/workflow';
+  import type { TimeFormat } from 'src/types/global';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;

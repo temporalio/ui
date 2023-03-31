@@ -3,6 +3,7 @@ import type {
   WorkflowSort,
 } from '$lib/models/workflow-filters';
 import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
+import type { SearchAttributes } from 'src/types/search-attributes';
 import { get } from 'svelte/store';
 import { isDuration, isDurationString, toDate, tomorrow } from '../to-duration';
 

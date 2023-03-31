@@ -4,11 +4,13 @@ import {
   allEventTypeOptions,
   compactEventTypeOptions,
   eventTypeCategorizations,
+  EventTypeCategory,
   getEventCategory,
   getEventsInCategory,
   isCategoryType,
   timelineEventTypeOptions,
 } from './get-event-categorization';
+import type { EventType, WorkflowEvents } from 'src/types/events';
 
 describe('Event Category Data Structures', () => {
   it('should match the eventTypeCategorizations to the last snapshot', () => {

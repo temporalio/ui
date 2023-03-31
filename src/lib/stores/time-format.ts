@@ -1,4 +1,5 @@
 import { persistStore } from '$lib/stores/persist-store';
+import type { TimeFormat } from 'src/types/global';
 
 export const timeFormat = persistStore('timeFormat', 'UTC');
 

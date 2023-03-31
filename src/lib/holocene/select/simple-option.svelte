@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { SelectOptionValue } from 'src/types/global';
+
   export let value: SelectOptionValue = null;
 </script>
 

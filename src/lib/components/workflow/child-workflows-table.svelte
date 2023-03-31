@@ -5,6 +5,7 @@
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
+  import type { WorkflowExecution } from 'src/types/workflow';
 
   export let pendingChildren: WorkflowExecution['pendingChildren'] = [];
   export let namespace: string;

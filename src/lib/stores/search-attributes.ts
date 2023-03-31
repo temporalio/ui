@@ -1,3 +1,4 @@
+import type { SearchAttributes } from 'src/types/search-attributes';
 import { writable, get } from 'svelte/store';
 
 export const searchAttributes = writable<SearchAttributes>();

@@ -1,3 +1,4 @@
+import type { Settings } from 'src/types/global';
 import { readable } from 'svelte/store';
 
 interface Page<Params extends Record<string, string> = Record<string, string>> {

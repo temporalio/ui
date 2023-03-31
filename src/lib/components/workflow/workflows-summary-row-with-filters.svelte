@@ -12,6 +12,8 @@
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import Checkbox from '$lib/holocene/checkbox.svelte';
+  import type { WorkflowExecution } from 'src/types/workflow';
+  import type { TimeFormat } from 'src/types/global';
 
   const dispatch = createEventDispatcher<{
     toggleWorkflow: { workflowRunId: string; checked: boolean };
