@@ -28,6 +28,7 @@
   export let unround: boolean = false;
   export let unroundRight: boolean = false;
   export let unroundLeft: boolean = false;
+  export let full: boolean = false;
   export let id: string = null;
 </script>
 
@@ -41,6 +42,7 @@
     class:unround
     class:unroundRight
     class:unroundLeft
+    class:full
     data-testid={testId}
     {type}
     {disabled}
@@ -68,6 +70,7 @@
     class:large
     class:disabled
     class:thin
+    class:full
     data-testid={testId}
     {target}
     {id}
@@ -84,6 +87,10 @@
 <style lang="postcss">
   .button {
     @apply relative flex w-fit items-center justify-center gap-2 rounded font-secondary text-sm;
+  }
+
+  .full {
+    @apply w-full;
   }
 
   .primary,

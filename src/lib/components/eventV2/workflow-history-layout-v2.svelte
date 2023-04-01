@@ -22,6 +22,8 @@
   import RangeInput from '$lib/holocene/input/range-input.svelte';
   import EnhancedStackTraceView from './enhanced-stack-trace-view.svelte';
   import FunSlider from '$lib/holocene/input/fun-slider.svelte';
+  import Button from '$lib/holocene/button.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
   let controller;
   let maxTimeTravel = 1;
@@ -71,7 +73,7 @@
       workflowId,
       runId,
       settings,
-      params: { waitNewEvent: 'true' },
+      // params: { waitNewEvent: 'true' },
       accessToken: $authUser?.accessToken,
       sort: 'ascending',
       onUpdate,
@@ -95,6 +97,10 @@
     return [sourceSlice, lineInSlice];
   };
 
+  const findSameLineInFilePath = (a, b) => {
+    return a.line === b.line && a.filePath === b.filePath;
+  };
+
   const getStacks = (stackTrace) => {
     const { sources, stacks } = stackTrace;
     Object.entries(stacks).map(([key, traces]) => {
@@ -105,7 +111,7 @@
         const source = sources[location.filePath][0]?.content;
         const { line, column, functionName, filePath } = location;
         const snippet = getSnippet(line, source)[0];
-        stackTraces.push({
+        const formattedTrace = {
           eventIds,
           source,
           snippet,
@@ -113,8 +119,20 @@
           column,
           functionName,
           filePath,
-        });
-        stacks[key] = stackTraces;
+        };
+        // const inPreviousStackTraceKey = Object.entries(stacks).find(
+        //   ([key, traces]) =>
+        //     traces.find((s) => findSameLineInFilePath(s, formattedTrace)),
+        // );
+        if (false) {
+          stacks[inPreviousStackTraceKey[0]][0].eventIds = [
+            ...stacks[inPreviousStackTraceKey[0]][0].eventIds,
+            ...formattedTrace.eventIds,
+          ];
+        } else {
+          stackTraces.push(formattedTrace);
+          stacks[key] = stackTraces;
+        }
       });
       if (!traces.length) delete stacks[key];
     });
@@ -152,16 +170,42 @@
 />
 {#if showStackTrace}
   <div
-    class="flex flex-col gap-2 xl:flex-row-reverse bg-white rounded-xl border-2 p-4"
+    class="flex flex-col gap-2 xl:flex-row-reverse bg-white rounded-xl border-2 border-gray-900 p-4"
   >
     <div class="w-full">
-      <FunSlider
+      <div class="w-full flex gap-4">
+        <Button
+          full
+          on:click={() =>
+            timeTravelPosition > 1
+              ? (timeTravelPosition = timeTravelPosition - 1)
+              : (timeTravelPosition = 1)}
+          disabled={timeTravelPosition <= 1}
+          ><Icon name="chevron-left" class="scale-125" /><Icon
+            name="chevron-left"
+            class="scale-125"
+          /><Icon name="chevron-left" class="scale-125" /></Button
+        >
+        <Button
+          full
+          on:click={() =>
+            timeTravelPosition < maxTimeTravel
+              ? (timeTravelPosition = timeTravelPosition + 1)
+              : (timeTravelPosition = maxTimeTravel)}
+          disabled={timeTravelPosition === maxTimeTravel}
+          ><Icon name="chevron-right" class="scale-125" /><Icon
+            name="chevron-right"
+            class="scale-125"
+          /><Icon name="chevron-right" class="scale-125" /></Button
+        >
+      </div>
+      <!-- <FunSlider
         id="time-travel-range"
         min={1}
         max={maxTimeTravel}
         bind:value={timeTravelPosition}
         showInput={false}
-      />
+      /> -->
       <EnhancedStackTraceView
         {fullHistory}
         {showNonCompleted}
