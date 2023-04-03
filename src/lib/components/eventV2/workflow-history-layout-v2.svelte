@@ -148,14 +148,14 @@
     return finalStacks;
   };
 
-  const fetchStackTrace = () => {
+  const fetchStackTrace = async () => {
     // const { settings } = $page.data;
     // const stackTrace = await getWorkflowEnhancedStackTrace(
     //   { namespace, workflow },
     //   settings,
     //   $authUser?.accessToken,
     // );
-    // stacks = getStacks(JSON.parse(stackTrace));
+    // formattedStacks = getStacks(JSON.parse(stackTrace));
     formattedStacks = getStacks(timeTravelEnhancedStackTrace);
     maxTimeTravel = Object.values(formattedStacks).length;
   };
