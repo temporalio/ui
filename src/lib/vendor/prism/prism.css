@@ -105,7 +105,8 @@ pre[class*='language-'] {
 .token.attr-value,
 .token.function,
 .token.class-name {
-  color: #e6db74;
+  /* yellow-200 */
+  color: #fef08a;
 }
 
 .token.keyword {

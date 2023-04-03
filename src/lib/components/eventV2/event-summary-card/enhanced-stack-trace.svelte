@@ -9,10 +9,15 @@
   export let line: number;
   export let snippet: string;
   export let source: string;
+  export let showSnippet = true;
 
-  let showSnippet = true;
+  let codeBlock: HTMLDivElement;
 
   $: lineStart = showSnippet ? line - 4 : 1;
+
+  const toggleShowSnippet = () => {
+    showSnippet = !showSnippet;
+  };
 </script>
 
 <div class="relative">
@@ -24,7 +29,23 @@
       class="truncate"
     />
   </h5>
-  <div class="max-h-96 overflow-scroll">
+  <span class="details">
+    <span class="text-yellow-200">{functionName}</span>
+    <Icon name="chevron-right" class="text-white " />
+    <svelte:element
+      this={showSnippet ? 'span' : 'button'}
+      class="text-[#66d9ef]"
+      class:line-button={!showSnippet}
+      on:click={() => {
+        codeBlock
+          .querySelector('.line-highlight')
+          .scrollIntoView({ block: 'center' });
+      }}>line {line}</svelte:element
+    >
+    <Icon name="chevron-right" class="text-white " />
+    <span class="text-purple-200">column {column}</span>
+  </span>
+  <div class="relative max-h-96 overflow-scroll" bind:this={codeBlock}>
     {#key line}
       <CodeBlock
         content={showSnippet ? snippet : source}
@@ -36,9 +57,7 @@
     {/key}
   </div>
   <button
-    on:click={() => {
-      showSnippet = !showSnippet;
-    }}
+    on:click={toggleShowSnippet}
     class="absolute top-14 right-4 rounded-md bg-gray-900 opacity-90 hover:bg-white"
   >
     <Icon
@@ -51,5 +70,13 @@
 <style lang="postcss">
   .file-name {
     @apply rounded-tl-xl rounded-tr-xl border-2 border-b-0 border-gray-900 bg-white p-2 pb-4 -mb-4;
+  }
+
+  .details {
+    @apply absolute left-0 bottom-0 bg-gray-900 w-full z-10 flex flex-row p-2;
+  }
+
+  .line-button {
+    @apply hover:text-[#3cafc6];
   }
 </style>

@@ -104,7 +104,7 @@
         const eventIds = trace.correlatingEventIds;
         const source = sources[location.filePath][0]?.content;
         const { line, column, functionName, filePath } = location;
-        const snippet = getSnippet(line, source);
+        const snippet = getSnippet(line, source)[0];
         stackTraces.push({
           eventIds,
           source,
