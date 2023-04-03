@@ -45,17 +45,6 @@
     >
       <Icon name="chevron-left" class="inline" />Back to Workflows
     </a>
-    <a
-      href={`${routeForEventHistory({
-        namespace,
-        workflow: workflow.id,
-        run: workflow.runId,
-      })}?${$workflowsSearchParams}`}
-      data-testid="history-v2"
-      class="back-to-workflows"
-    >
-      Switch to v1 Workflow UI
-    </a>
   </div>
   <div
     class="flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
