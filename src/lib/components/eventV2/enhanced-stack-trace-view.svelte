@@ -4,15 +4,7 @@
   import { eventHistory } from '$lib/stores/events';
 
   import { groupEvents } from '$lib/models/event-groups';
-  import EventGroupSummaryCard from './event-group-summary-card.svelte';
-  import InitialEventCard from './initial-event-card.svelte';
-  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
-  import { getStackTrace } from '$lib/utilities/get-single-attribute-for-event';
-  import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { importEvents } from '$lib/stores/import-events';
-  import RunningCard from './running-card.svelte';
-  import FinalEventCard from './final-event-card.svelte';
-  import CodeBlock from '$lib/holocene/code-block.svelte';
   import EnhancedStackTrace from './event-summary-card/enhanced-stack-trace.svelte';
   import EnhancedStackTraceCard from './enhanced-stack-trace-card.svelte';
   import Loading from '$lib/holocene/loading.svelte';

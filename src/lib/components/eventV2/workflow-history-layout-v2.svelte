@@ -32,7 +32,7 @@
   $: maxTimeTravel, (timeTravelPosition = maxTimeTravel);
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
-  $: ({ workflow } = $workflowRun);
+  $: ({ workflow, workers } = $workflowRun);
   $: workflowRelationships = getWorkflowRelationships(
     workflow,
     $eventHistory,
@@ -182,9 +182,22 @@
   {showWorkflowTasks}
   {showNonCompleted}
   {showStackTrace}
-  onDebugClick={() => (showNonCompleted = !showNonCompleted)}
-  onShowStackTrace={() => (showStackTrace = !showStackTrace)}
-  onAdvancedClick={() => (showWorkflowTasks = !showWorkflowTasks)}
+  isRunning={!workflow.isRunning}
+  onDebugClick={() => {
+    showStackTrace = false;
+    showWorkflowTasks = false;
+    showNonCompleted = !showNonCompleted;
+  }}
+  onShowStackTrace={() => {
+    showWorkflowTasks = false;
+    showNonCompleted = false;
+    showStackTrace = !showStackTrace;
+  }}
+  onAdvancedClick={() => {
+    showNonCompleted = false;
+    showStackTrace = false;
+    showWorkflowTasks = !showWorkflowTasks;
+  }}
 />
 {#if showStackTrace}
   <div
@@ -233,7 +246,6 @@
       <WorkflowSummaryV2 />
       <WorkflowRelationshipsV2 {...workflowRelationships} />
       <WorkflowWorkersV2 taskQueue={workflow.taskQueue} />
-      <WorkflowStackTraceV2 />
       <Accordion title="Query" let:open>
         {#if open}
           <WorkflowQueryV2 />

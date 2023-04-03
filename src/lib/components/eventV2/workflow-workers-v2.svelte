@@ -7,7 +7,7 @@
 
   export let taskQueue: string;
 
-  $: ({ workers, workflow } = $workflowRun);
+  $: ({ workers } = $workflowRun);
 </script>
 
 <section>

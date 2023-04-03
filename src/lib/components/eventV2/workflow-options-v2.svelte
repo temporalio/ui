@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
   import Accordion from '$lib/holocene/accordion.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Card from '$lib/holocene/card.svelte';
   import RangeInput from '$lib/holocene/input/range-input.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -11,8 +12,7 @@
   export let showWorkflowTasks = false;
   export let showNonCompleted = false;
   export let showStackTrace = false;
-  export let timeTravelPosition = 1;
-  export let maxTimeTravel = 1;
+  export let isRunning = false;
   export let onDebugClick: () => void;
   export let onAdvancedClick: () => void;
   export let onShowStackTrace: () => void;
@@ -35,6 +35,7 @@
   >
     <ToggleSwitch
       id="stack-trace"
+      disabled={isRunning}
       checked={showStackTrace}
       on:change={onShowStackTrace}
     />Stack Trace Mode
