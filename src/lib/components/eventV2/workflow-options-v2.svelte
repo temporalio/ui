@@ -18,56 +18,48 @@
   export let onShowStackTrace: () => void;
 </script>
 
-<section>
-  <Accordion title="Options" icon="settings" readOnly stackSummary>
-    <div slot="summary" class="flex flex-col gap-4 w-full">
-      <div class="flex flex-row items-center gap-4">
-        <Button variant="secondary">
-          <EventDateFilter compact={false} hideSort />
-        </Button>
-        <Button
-          icon="download"
-          data-testid="download"
-          on:click={() =>
-            exportHistory({
-              namespace: $page.params.namespace,
-              workflowId: $workflowRun.workflow?.id,
-              runId: $workflowRun.workflow?.runId,
-            })}>Download</Button
-        >
-      </div>
-      <div class="flex flex-col items-start gap-4">
-        <label
-          for="non-completed-tasks"
-          class="flex items-center gap-2 text-center font-secondary text-sm"
-        >
-          <ToggleSwitch
-            id="non-completed-tasks"
-            checked={showNonCompleted}
-            on:change={onDebugClick}
-          />Debug Mode
-        </label>
-        <label
-          for="stack-trace"
-          class="flex items-center gap-2 text-center font-secondary text-sm"
-        >
-          <ToggleSwitch
-            id="stack-trace"
-            checked={showStackTrace}
-            on:change={onShowStackTrace}
-          />Stack Trace Mode
-        </label>
-        <label
-          for="workflow-tasks"
-          class="flex items-center gap-2 text-center font-secondary text-sm"
-        >
-          <ToggleSwitch
-            id="workflow-tasks"
-            checked={showWorkflowTasks}
-            on:change={onAdvancedClick}
-          />Workflow Task Mode
-        </label>
-      </div>
-    </div>
-  </Accordion>
-</section>
+<div class="flex flex-col md:flex-row items-center justify-start gap-4">
+  <label
+    for="non-completed-tasks"
+    class="flex items-center gap-2 text-center font-secondary text-sm"
+  >
+    <ToggleSwitch
+      id="non-completed-tasks"
+      checked={showNonCompleted}
+      on:change={onDebugClick}
+    />Debug Mode
+  </label>
+  <label
+    for="stack-trace"
+    class="flex items-center gap-2 text-center font-secondary text-sm"
+  >
+    <ToggleSwitch
+      id="stack-trace"
+      checked={showStackTrace}
+      on:change={onShowStackTrace}
+    />Stack Trace Mode
+  </label>
+  <label
+    for="workflow-tasks"
+    class="flex items-center gap-2 text-center font-secondary text-sm"
+  >
+    <ToggleSwitch
+      id="workflow-tasks"
+      checked={showWorkflowTasks}
+      on:change={onAdvancedClick}
+    />Workflow Task Mode
+  </label>
+  <Button variant="secondary">
+    <EventDateFilter compact={false} hideSort />
+  </Button>
+  <!-- <Button
+    icon="download"
+    data-testid="download"
+    on:click={() =>
+      exportHistory({
+        namespace: $page.params.namespace,
+        workflowId: $workflowRun.workflow?.id,
+        runId: $workflowRun.workflow?.runId,
+      })}>Download</Button
+  > -->
+</div>

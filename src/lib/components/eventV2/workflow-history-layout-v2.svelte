@@ -43,7 +43,7 @@
   let fullHistory: CommonHistoryEvent[] = [];
   let showNonCompleted = false;
   let showWorkflowTasks = false;
-  let showStackTrace = true;
+  let showStackTrace = false;
   let stacks = {};
 
   const onUpdate = async ({ history }) => {
@@ -103,6 +103,7 @@
 
   const getStacks = (stackTrace) => {
     const { sources, stacks } = stackTrace;
+    debugger;
     Object.entries(stacks).map(([key, traces]) => {
       const stackTraces = [];
       traces.forEach((trace) => {
@@ -141,13 +142,13 @@
 
   const fetchStackTrace = async () => {
     const { settings } = $page.data;
-    // const stackTrace = await getWorkflowEnhancedStackTrace(
-    //   { namespace, workflow },
-    //   settings,
-    //   $authUser?.accessToken,
-    // );
-    // stacks = getStacks(JSON.parse(stackTrace));
-    stacks = getStacks(timeTravelEnhancedStackTrace);
+    const stackTrace = await getWorkflowEnhancedStackTrace(
+      { namespace, workflow },
+      settings,
+      $authUser?.accessToken,
+    );
+    stacks = getStacks(JSON.parse(stackTrace));
+    // stacks = getStacks(timeTravelEnhancedStackTrace);
     maxTimeTravel = Object.keys(stacks).length;
   };
 
@@ -168,6 +169,14 @@
   title={`Workflow History | ${workflow.runId}`}
   url={$page.url.href}
 />
+<WorkflowOptionsV2
+  {showWorkflowTasks}
+  {showNonCompleted}
+  {showStackTrace}
+  onDebugClick={() => (showNonCompleted = !showNonCompleted)}
+  onShowStackTrace={() => (showStackTrace = !showStackTrace)}
+  onAdvancedClick={() => (showWorkflowTasks = !showWorkflowTasks)}
+/>
 {#if showStackTrace}
   <div
     class="flex flex-col gap-2 xl:flex-row-reverse bg-white rounded-xl border-2 border-gray-900 p-4"
@@ -181,10 +190,7 @@
               ? (timeTravelPosition = timeTravelPosition - 1)
               : (timeTravelPosition = 1)}
           disabled={timeTravelPosition <= 1}
-          ><Icon name="chevron-left" class="scale-125" /><Icon
-            name="chevron-left"
-            class="scale-125"
-          /><Icon name="chevron-left" class="scale-125" /></Button
+          ><Icon name="chevron-left" class="scale-125" />Previous</Button
         >
         <Button
           full
@@ -193,10 +199,7 @@
               ? (timeTravelPosition = timeTravelPosition + 1)
               : (timeTravelPosition = maxTimeTravel)}
           disabled={timeTravelPosition === maxTimeTravel}
-          ><Icon name="chevron-right" class="scale-125" /><Icon
-            name="chevron-right"
-            class="scale-125"
-          /><Icon name="chevron-right" class="scale-125" /></Button
+          >Next<Icon name="chevron-right" class="scale-125" /></Button
         >
       </div>
       <!-- <FunSlider
@@ -218,14 +221,6 @@
 {:else}
   <div class="flex flex-col gap-2 xl:flex-row-reverse">
     <div class="flex w-full flex-col gap-2 xl:w-[40%]">
-      <WorkflowOptionsV2
-        {showWorkflowTasks}
-        {showNonCompleted}
-        {showStackTrace}
-        onDebugClick={() => (showNonCompleted = !showNonCompleted)}
-        onShowStackTrace={() => (showStackTrace = !showStackTrace)}
-        onAdvancedClick={() => (showWorkflowTasks = !showWorkflowTasks)}
-      />
       <WorkflowSummaryV2 />
       <WorkflowRelationshipsV2 {...workflowRelationships} />
       <WorkflowWorkersV2 taskQueue={workflow.taskQueue} />
