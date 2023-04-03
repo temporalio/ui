@@ -11,7 +11,6 @@
   export let last = false;
 
   $: hasGroupEvents = isEventGroup(event) && event?.eventList?.length > 1;
-  $: pendingActivity = isEventGroup(event) && event?.pendingActivity;
   $: showClassification =
     isEventGroup(event) && hasGroupEvents && event.lastEvent?.classification;
 

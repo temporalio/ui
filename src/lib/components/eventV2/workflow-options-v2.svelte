@@ -18,7 +18,7 @@
   export let onShowStackTrace: () => void;
 </script>
 
-<div class="flex flex-col md:flex-row items-center justify-start gap-4">
+<div class="flex flex-col md:flex-row items-center justify-center gap-4">
   <label
     for="non-completed-tasks"
     class="flex items-center gap-2 text-center font-secondary text-sm"

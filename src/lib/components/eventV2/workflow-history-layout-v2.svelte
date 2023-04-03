@@ -44,7 +44,7 @@
   let showNonCompleted = false;
   let showWorkflowTasks = false;
   let showStackTrace = false;
-  let stacks = {};
+  let formattedStacks = {};
 
   const onUpdate = async ({ history }) => {
     const { settings } = $page.data;
@@ -103,10 +103,10 @@
 
   const getStacks = (stackTrace) => {
     const { sources, stacks } = stackTrace;
-    debugger;
-    Object.entries(stacks).map(([key, traces]) => {
-      const stackTraces = [];
-      traces.forEach((trace) => {
+    const _stacks = { ...stacks };
+    const uniqueStacks = [];
+    Object.entries(_stacks).forEach(([key, traces]) => {
+      traces.reverse().forEach((trace, index) => {
         const location = trace.locations.reverse()[0];
         const eventIds = trace.correlatingEventIds;
         const source = sources[location.filePath][0]?.content;
@@ -121,35 +121,43 @@
           functionName,
           filePath,
         };
-        // const inPreviousStackTraceKey = Object.entries(stacks).find(
-        //   ([key, traces]) =>
-        //     traces.find((s) => findSameLineInFilePath(s, formattedTrace)),
-        // );
-        if (false) {
-          stacks[inPreviousStackTraceKey[0]][0].eventIds = [
-            ...stacks[inPreviousStackTraceKey[0]][0].eventIds,
-            ...formattedTrace.eventIds,
-          ];
+        const foundSameLine = uniqueStacks.find((s) =>
+          findSameLineInFilePath(s, formattedTrace),
+        );
+        if (!foundSameLine) {
+          uniqueStacks.push(formattedTrace);
         } else {
-          stackTraces.push(formattedTrace);
-          stacks[key] = stackTraces;
+          const ids = [...foundSameLine.eventIds, ...formattedTrace.eventIds];
+          foundSameLine.eventIds = [...new Set(ids)];
         }
       });
-      if (!traces.length) delete stacks[key];
     });
-    return stacks;
+
+    const finalStacks = {};
+    uniqueStacks.forEach((stack) => {
+      const stackKey = !stack.eventIds.length
+        ? 'none'
+        : stack.eventIds.join('.');
+      if (!finalStacks[stackKey]) {
+        finalStacks[stackKey] = [stack];
+      } else {
+        finalStacks[stackKey] = [...finalStacks[stackKey], stack];
+      }
+    });
+
+    return finalStacks;
   };
 
-  const fetchStackTrace = async () => {
-    const { settings } = $page.data;
-    const stackTrace = await getWorkflowEnhancedStackTrace(
-      { namespace, workflow },
-      settings,
-      $authUser?.accessToken,
-    );
-    stacks = getStacks(JSON.parse(stackTrace));
-    // stacks = getStacks(timeTravelEnhancedStackTrace);
-    maxTimeTravel = Object.keys(stacks).length;
+  const fetchStackTrace = () => {
+    // const { settings } = $page.data;
+    // const stackTrace = await getWorkflowEnhancedStackTrace(
+    //   { namespace, workflow },
+    //   settings,
+    //   $authUser?.accessToken,
+    // );
+    // stacks = getStacks(JSON.parse(stackTrace));
+    formattedStacks = getStacks(timeTravelEnhancedStackTrace);
+    maxTimeTravel = Object.values(formattedStacks).length;
   };
 
   $: fetchEvents(namespace, workflowId, runId);
@@ -162,6 +170,7 @@
   onDestroy(() => {
     controller.abort();
     console.log('Polling events aborted');
+    formattedStacks = [];
   });
 </script>
 
@@ -213,7 +222,7 @@
         {fullHistory}
         {showNonCompleted}
         {showWorkflowTasks}
-        {stacks}
+        stacks={formattedStacks}
         {timeTravelPosition}
       />
     </div>
@@ -232,13 +241,7 @@
       </Accordion>
     </div>
     <div class="w-full xl:w-[60%]">
-      <EventSummaryV2
-        {fullHistory}
-        {showNonCompleted}
-        {showWorkflowTasks}
-        {showStackTrace}
-        {timeTravelPosition}
-      />
+      <EventSummaryV2 {fullHistory} {showNonCompleted} {showWorkflowTasks} />
     </div>
   </div>
 {/if}
