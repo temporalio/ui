@@ -40,7 +40,7 @@
         <p class="text-sm">{format(key)}</p>
         <CodeBlock
           content={codeBlockValue}
-          class="h-auto {stackTrace ? 'mb-2' : ''}"
+          class="h-auto {stackTrace ? 'mb-2' : ''} max-h-96 overflow-auto"
           {inline}
         />
       </div>
