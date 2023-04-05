@@ -159,7 +159,7 @@
           class:batch-actions-visible={showBulkActions}
         >
           {#if $supportsBulkActions}
-            <th class="w-10 rounded-tl-lg">
+            <th class="min-w-[40px] rounded-tl-lg">
               {#if workflows.length > 0 && $workflowTableColumns.length > 0}
                 <Checkbox
                   id="select-visible-workflows"
@@ -407,7 +407,7 @@
 
   .workflow-summary-table-wrapper.pinned {
     /* higher z-index ensures the box shadow displays over the background gradient on the table rows */
-    @apply shrink-0 overflow-x-hidden rounded-l-lg max-w-fit min-w-[40px] z-10;
+    @apply shrink-0 overflow-x-hidden rounded-l-lg max-md:max-w-[50%] max-md:overflow-x-scroll max-w-fit min-w-[40px] z-10;
 
     box-shadow: 2px 0 4px rgb(0 0 0 / 25%);
 
@@ -421,7 +421,7 @@
   }
 
   .workflow-summary-table-wrapper.pinned.no-columns-pinned.batch-actions-enabled {
-    @apply !w-[43px] overflow-visible;
+    @apply !w-[40px] overflow-visible;
   }
 
   .workflow-summary-table-wrapper:not(.pinned) {
