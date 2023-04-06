@@ -173,9 +173,16 @@ export const isWorkflowTaskTimedOutEvent =
     'workflowTaskTimedOutEventAttributes',
   );
 
-export const isWorkflowTaskFailedEvent = hasAttributes<WorkflowTaskFailedEvent>(
-  'workflowTaskFailedEventAttributes',
-);
+export const isPureWorkflowTaskFailedEvent =
+  hasAttributes<WorkflowTaskFailedEvent>('workflowTaskFailedEventAttributes');
+
+export const isWorkflowTaskFailedEvent = (event: WorkflowEvent) => {
+  return (
+    isPureWorkflowTaskFailedEvent(event) &&
+    event.workflowTaskFailedEventAttributes?.failure?.message !==
+      'UnhandledCommand'
+  );
+};
 
 export const isActivityTaskScheduledEvent =
   hasAttributes<ActivityTaskScheduledEvent>(
