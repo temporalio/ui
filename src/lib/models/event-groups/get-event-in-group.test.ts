@@ -69,6 +69,15 @@ describe('eventIsFailureOrTimedOut', () => {
     expect(eventIsFailureOrTimedOut(event)).toBe(true);
   });
 
+  it('should return false if provided an event with workflowTaskFailedEventAttributes and has UnhandledCommand message', () => {
+    const event = {
+      workflowTaskFailedEventAttributes: {
+        failure: { message: 'UnhandledCommand' },
+      },
+    } as unknown as WorkflowEvent;
+    expect(eventIsFailureOrTimedOut(event)).toBe(false);
+  });
+
   it('should return true if provided an event with childWorkflowExecutionFailedEventAttributes', () => {
     const event = {
       childWorkflowExecutionFailedEventAttributes: {},
