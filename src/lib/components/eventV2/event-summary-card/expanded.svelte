@@ -64,6 +64,10 @@
     @apply w-full flex-wrap items-center rounded-xl border-gray-900 py-2 pl-8 pr-2 text-sm no-underline xl:text-base;
   }
 
+  .code-with-stack-trace {
+    @apply flex flex-col gap-2 lg:flex-row;
+  }
+
   .secondary {
     @apply mt-2 flex flex-col;
   }
