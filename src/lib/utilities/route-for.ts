@@ -129,7 +129,7 @@ export const routeForEventHistory = ({
   queryParams,
   ...parameters
 }: EventHistoryParameters): string => {
-  const eventHistoryPath = `${routeForWorkflow(parameters)}/v2`;
+  const eventHistoryPath = `${routeForWorkflow(parameters)}/history`;
   return toURL(`${eventHistoryPath}`, queryParams);
 };
 

@@ -47,6 +47,10 @@
     }
   };
 
+  const onError = () => {
+    console.error('Request aborted');
+  };
+
   const fetchEvents = async (
     namespace: string,
     workflowId: string,
@@ -63,6 +67,7 @@
       params: { waitNewEvent: 'true' },
       accessToken: $authUser?.accessToken,
       sort: 'ascending',
+      onError,
       onUpdate,
       signal,
     });
@@ -72,7 +77,6 @@
 
   onDestroy(() => {
     controller.abort();
-    console.log('Polling events aborted');
   });
 </script>
 

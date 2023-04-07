@@ -44,6 +44,7 @@ export async function getEventAttributes(
     settings,
     codecIncludeCredentials,
   );
+
   const _settings = {
     ...settings,
     codec: {

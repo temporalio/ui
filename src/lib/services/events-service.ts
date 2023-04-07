@@ -63,6 +63,7 @@ export const fetchAllEvents = async ({
   params,
   settings,
   accessToken,
+  onError,
   onStart,
   onUpdate,
   onComplete,
@@ -77,6 +78,7 @@ export const fetchAllEvents = async ({
         request: fetch,
         params: params ?? {},
         signal,
+        onError,
       });
     },
     { onStart, onUpdate, onComplete },

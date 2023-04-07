@@ -2,7 +2,8 @@
   import { page } from '$app/stores';
   import { formatDate } from '$lib/utilities/format-date';
   import { getMilliseconds } from '$lib/utilities/format-time';
-  import { routeForEventHistory } from '$lib/utilities/route-for';
+  import { routeForEventHistoryV2 } from '$lib/utilities/route-for';
+
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import FilterOrCopyButtons from '$lib/holocene/filter-or-copy-buttons.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
@@ -17,7 +18,7 @@
   export let timeFormat: TimeFormat | string;
   export let checkboxDisabled: boolean;
 
-  $: href = routeForEventHistory({
+  $: href = routeForEventHistoryV2({
     namespace,
     workflow: workflow.id,
     run: workflow.runId,

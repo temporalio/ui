@@ -127,7 +127,7 @@
   }
 
   .dot.running {
-    @apply border-gray-700 bg-gray-500;
+    @apply border-gray-700 bg-gray-100;
   }
 
   .dot.pending {
