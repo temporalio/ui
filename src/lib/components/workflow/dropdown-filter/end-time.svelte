@@ -13,6 +13,7 @@
   disabledText="Sort disabled"
   value={typeSort?.value ?? ''}
   keepOpen
+  right
 >
   <svelte:fragment slot="label">End Time</svelte:fragment>
   <div class="flex w-44 flex-col gap-2 p-2">
