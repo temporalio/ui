@@ -21,7 +21,7 @@
   $: value = $timeFormat === 'UTC' ? undefined : `${$timeFormat}`;
 </script>
 
-<DropdownMenu {value} right testId="date-time-format-filter">
+<DropdownMenu {value} testId="date-time-format-filter">
   <div class="w-56">
     {#each dateOptions as { label, option } (option)}
       <div class="option" class:active={$timeFormat === option}>
