@@ -26,7 +26,7 @@
   {/if}
 </Card>
 <div class="flex gap-2">
-  <div class="w-[160px] min-w-[160px]" />
+  <div class="w-[120px] min-w-[120px]" />
   <div class="flex grow flex-col overflow-auto">
     <div class:code-with-stack-trace={stackTrace}>
       <div class="flex flex-col {stackTrace ? 'lg:w-1/2' : ''}">

@@ -54,7 +54,7 @@
 </script>
 
 <div
-  class="flex w-[140px] min-w-[140px] pt-[4px] flex-col items-end break-word leading-0 truncate text-right text-[14px] text-gray-700 md:whitespace-normal"
+  class="flex w-[100px] min-w-[100px] pt-[4px] flex-col items-end break-word leading-0 truncate text-right text-[12px] text-gray-700 md:whitespace-normal"
   class:relative-time={$timeFormat === 'relative' || showElapsedTimeDiff}
 >
   {displayedTime}
@@ -87,7 +87,7 @@
 
 <style lang="postcss">
   .dot {
-    @apply h-3 w-3 rounded-full border-2 border-gray-700 bg-gray-900;
+    @apply h-3 w-3 rounded-full border-2 border-gray-700 bg-white;
   }
 
   .line {
@@ -110,7 +110,7 @@
     @apply border-dashed;
   }
 
-  .dot.completed {
+  /* .dot.completed {
     @apply border-green-700 bg-green-400;
   }
 
@@ -132,5 +132,5 @@
 
   .dot.pending {
     @apply bg-white;
-  }
+  } */
 </style>

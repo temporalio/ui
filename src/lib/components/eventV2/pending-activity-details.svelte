@@ -8,6 +8,7 @@
   import { getDuration } from '$lib/utilities/format-time';
   import { toTimeDifference } from '$lib/utilities/to-time-difference';
   import { formatDuration } from 'date-fns';
+  import FailureMessage from './event-summary-card/failure-message.svelte';
 
   export let event: PendingActivity;
 
@@ -24,8 +25,7 @@
     {/if}
     {#if event?.lastFailure}
       <div class="w-1/2 grow">
-        <p class="text-[12px]">Last Failure</p>
-        <CodeBlock class="max-h-32" content={event.lastFailure} />
+        <FailureMessage title="Last Failure" failure={event?.lastFailure} />
       </div>
     {/if}
   </div>

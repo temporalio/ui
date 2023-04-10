@@ -32,6 +32,7 @@
     {events}
     removeTail={last || final}
     removeHead={initial}
+    {pending}
   />
   <div class="h-full w-full overflow-hidden flex flex-col gap-0">
     <div class="h-full w-full">
@@ -82,7 +83,7 @@
   }
 
   .pending {
-    @apply border-dashed bg-red-100;
+    @apply border-dashed;
   }
 
   .expanded {

@@ -31,6 +31,8 @@
               runId: $workflowRun.workflow?.runId,
             })}>Download</Button
         >
+      </div>
+      <div class="flex flex-row items-center gap-4">
         <label
           for="workflow-tasks"
           class="flex items-center gap-2 text-center font-secondary text-sm"
@@ -51,8 +53,7 @@
             on:change={onExpandClick}
           />
         </label>
-      </div>
-      <div class="flex flex-row items-center gap-4">
+
         <!-- <label
           for="non-completed-tasks"
           class="flex items-center gap-2 text-center font-secondary text-sm"

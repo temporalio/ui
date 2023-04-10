@@ -5,17 +5,13 @@
   import type { ProtoFailure } from '$types';
 
   export let failure: ProtoFailure;
+  export let title = 'Failure';
+  export let intent: 'warning' | 'error' | 'success' | 'info' = 'error';
 
   let stackTrace = getStackTrace(failure);
 </script>
 
-<Alert
-  icon="warning"
-  intent="error"
-  title="Failure"
-  role="status"
-  regular={false}
->
+<Alert icon="warning" {intent} {title} role="status" regular={false}>
   <div>
     {failure?.cause?.cause?.message ??
       failure?.cause?.message ??
