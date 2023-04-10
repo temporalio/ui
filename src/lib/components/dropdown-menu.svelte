@@ -62,7 +62,7 @@
       on:click={disabled ? noop : onClick}
       data-testid="{$$props.testId}-button"
     >
-      <div class="flex items-center gap-1 truncate" class:disabled>
+      <div class="inline flex items-center gap-1 truncate" class:disabled>
         <slot name="label" />
         <Icon
           name={icon ? icon : show ? 'chevron-up' : 'chevron-down'}
@@ -93,8 +93,16 @@
 
 <style lang="postcss">
   .dropdown-menu {
-    @apply fixed z-50 mt-1 w-auto
+    @apply clear-both absolute z-50 mt-1 w-auto
       rounded border border-gray-900 bg-white py-2 text-gray-900 shadow-md;
+  }
+
+  .dropdown-menu.left {
+    @apply absolute left-0 origin-top-left;
+  }
+
+  .dropdown-menu.right {
+    @apply absolute right-0 origin-top-right;
   }
 
   .dot {
