@@ -83,7 +83,7 @@
       {#if copyable}
         <button
           on:click={(e) => copy(e, parsedContent)}
-          class="absolute top-2.5 right-2.5 rounded-md bg-gray-900 opacity-90 hover:bg-white"
+          class="absolute top-0 right-2.5 rounded-md bg-gray-900 opacity-90 hover:bg-white"
         >
           <Icon
             name={$copied ? 'checkmark' : 'copy'}

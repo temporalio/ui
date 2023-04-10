@@ -53,6 +53,21 @@ export const shouldDisplayNestedAttribute = (value: unknown): boolean => {
   return true;
 };
 
+const getPayloadValue = (payloads: Payload[]): Payload[] | string => {
+  const nonNullPayloads = payloads.filter((payload) => {
+    return payload?.data !== null;
+  });
+  return nonNullPayloads.length ? nonNullPayloads : '';
+};
+
+export const getCodeBlockValueWithoutNullPayloads: Parameters<
+  typeof JSON.stringify
+>[0] = (value: string | Record<string, unknown>) => {
+  if (typeof value === 'string') return value;
+  if (value?.payloads) return getPayloadValue(value.payloads as Payload[]);
+  return value?.indexedFields ?? value?.points ?? value;
+};
+
 export const getCodeBlockValue: Parameters<typeof JSON.stringify>[0] = (
   value: string | Record<string, unknown>,
 ) => {

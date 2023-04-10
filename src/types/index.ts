@@ -187,3 +187,6 @@ export type SettingsResponse = {
   FeedbackURL: string;
   Version: string;
 };
+
+// Failure proto
+export type ProtoFailure = temporal.api.failure.v1.IFailure;

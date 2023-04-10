@@ -8,12 +8,14 @@
     title: string;
     icon?: IconName;
     bold?: boolean;
+    regular?: boolean;
     'data-testid'?: string;
   }
 
   export let intent: 'warning' | 'error' | 'success' | 'info';
   export let title: string;
   export let icon: IconName = null;
+  export let regular = true;
   export let bold = false;
 
   let className = '';
@@ -22,6 +24,7 @@
 
 <div
   class="alert {intent} {className}"
+  class:regular
   class:bold
   role="alert"
   {...$$restProps}
@@ -43,7 +46,11 @@
 
 <style lang="postcss">
   .alert {
-    @apply flex rounded-md border p-5 font-secondary text-sm;
+    @apply flex border p-5 font-secondary text-sm;
+  }
+
+  .alert.regular {
+    @apply rounded-md;
   }
 
   .alert.bold {

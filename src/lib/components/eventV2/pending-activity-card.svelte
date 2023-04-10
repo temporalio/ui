@@ -13,7 +13,7 @@
 
   $: ({ workflow } = $workflowRun);
 
-  $: canceled = ['Terminated', 'TimedOut', 'Canceled'].includes(
+  $: canceled = ['Terminated', 'TimedOut', 'Canceled', 'Completed'].includes(
     workflow?.status,
   );
   $: failed = event.attempt > 1;

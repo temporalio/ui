@@ -1,12 +1,5 @@
 <script lang="ts">
-  import { format } from '$lib/utilities/format-camel-case';
-  import {
-    getCodeBlockValue,
-    getStackTrace,
-  } from '$lib/utilities/get-single-attribute-for-event';
-
   import { isEventGroup } from '$lib/models/event-groups';
-  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Details from './details.svelte';
   import { getAttributePayloads } from '../event-detail-keys';
   import EventGroupSummaryCard from '../event-group-summary-card.svelte';
@@ -33,30 +26,7 @@
   </div>
 {/if}
 {#if !hasGroupEvents}
-  {#each payloadAttributes as attribute}
-    {@const codeBlockValue = getCodeBlockValue(attribute.value)}
-    {@const stackTrace = getStackTrace(codeBlockValue)}
-    <div class="mt-4" class:code-with-stack-trace={stackTrace}>
-      <div class="flex flex-col {stackTrace ? 'lg:w-1/2' : ''}">
-        <p class="text-sm">{format(attribute.key)}</p>
-        <CodeBlock
-          content={codeBlockValue}
-          class="h-auto {stackTrace ? 'mb-2' : ''}"
-        />
-      </div>
-      {#if stackTrace}
-        <div class="flex flex-col lg:w-1/2">
-          <p class="text-sm">Stack trace</p>
-          <CodeBlock
-            content={stackTrace}
-            class="mb-2 h-full lg:pr-2"
-            language="text"
-          />
-        </div>
-      {/if}
-    </div>
-  {/each}
-  <Details event={initialEvent} />
+  <Details event={initialEvent} expanded />
 {/if}
 
 <style lang="postcss">

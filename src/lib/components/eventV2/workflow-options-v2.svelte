@@ -8,8 +8,9 @@
   import EventDateFilter from '../event/event-date-filter.svelte';
 
   export let showWorkflowTasks = false;
+  export let expandAll = false;
   export let showNonCompleted = false;
-  export let onDebugClick: () => void;
+  export let onExpandClick: () => void;
   export let onAdvancedClick: () => void;
 </script>
 
@@ -33,11 +34,21 @@
         <label
           for="workflow-tasks"
           class="flex items-center gap-2 text-center font-secondary text-sm"
-          >Show Workflow Tasks
+          >Show All Events
           <ToggleSwitch
             id="workflow-tasks"
             checked={showWorkflowTasks}
             on:change={onAdvancedClick}
+          />
+        </label>
+        <label
+          for="expand-all"
+          class="flex items-center gap-2 text-center font-secondary text-sm"
+          >Expand All
+          <ToggleSwitch
+            id="expand-all"
+            checked={expandAll}
+            on:change={onExpandClick}
           />
         </label>
       </div>

@@ -34,20 +34,9 @@ type GroupEventOptions = {
   nonCompletedEventsOnly: boolean;
 };
 
-const addPendingActivity = (
-  group: EventGroup,
-  pendingActivities: PendingActivity[],
-) => {
-  const pendingActivityForGroup = pendingActivities.find((pending) =>
-    group.eventList.find((e) => e.id === pending.activityId),
-  );
-  if (pendingActivityForGroup) group.pendingActivity = pendingActivityForGroup;
-};
-
 export const groupEvents = (
   events: CommonHistoryEvent[],
   sort: EventSortOrder = 'ascending',
-  pendingActivities: PendingActivity[] = [],
   options: GroupEventOptions = {
     createWorkflowTaskGroups: false,
     nonCompletedEventsOnly: false,
@@ -69,8 +58,6 @@ export const groupEvents = (
 
   let groups = Object.values(groupMap);
   for (const group of groups) {
-    addPendingActivity(group, pendingActivities);
-
     if (createWorkflowTaskGroups && isSubrowActivity(group.initialEvent)) {
       const workflowTaskId =
         group.initialEvent.attributes?.workflowTaskCompletedEventId;

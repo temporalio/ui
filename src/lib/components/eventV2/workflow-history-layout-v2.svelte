@@ -31,6 +31,7 @@
   let fetchHistory: Promise<CommonHistoryEvent[]>;
   let fullHistory: CommonHistoryEvent[] = [];
   let showNonCompleted = false;
+  let expandAll = false;
   let showWorkflowTasks = false;
 
   const onUpdate = async ({ history }) => {
@@ -89,7 +90,8 @@
     <WorkflowOptionsV2
       {showWorkflowTasks}
       {showNonCompleted}
-      onDebugClick={() => (showNonCompleted = !showNonCompleted)}
+      {expandAll}
+      onExpandClick={() => (expandAll = !expandAll)}
       onAdvancedClick={() => (showWorkflowTasks = !showWorkflowTasks)}
     />
     <WorkflowSummaryV2 />
@@ -103,6 +105,11 @@
     </Accordion>
   </div>
   <div class="w-full xl:w-[60%]">
-    <EventSummaryV2 {fullHistory} {showNonCompleted} {showWorkflowTasks} />
+    <EventSummaryV2
+      {fullHistory}
+      {showNonCompleted}
+      {expandAll}
+      {showWorkflowTasks}
+    />
   </div>
 </div>

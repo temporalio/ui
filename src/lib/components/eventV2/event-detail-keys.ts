@@ -18,10 +18,12 @@ import {
   isTimerStartedEvent,
   isUpsertWorkflowSearchAttributesEvent,
   isWorkflowExecutionCanceledEvent,
+  isWorkflowExecutionCompletedEvent,
   isWorkflowExecutionFailedEvent,
   isWorkflowExecutionSignaledEvent,
   isWorkflowExecutionStartedEvent,
   isWorkflowExecutionTerminatedEvent,
+  isWorkflowExecutionTimedOutEvent,
   isWorkflowTaskCompletedEvent,
   isWorkflowTaskFailedEvent,
   isWorkflowTaskScheduledEvent,
@@ -83,9 +85,12 @@ export const eventGroupDisplayName = (event: IterableEvent) => {
   if (
     isWorkflowExecutionCanceledEvent(singleEvent) ||
     isWorkflowExecutionFailedEvent(singleEvent) ||
-    isWorkflowExecutionTerminatedEvent(singleEvent)
+    isWorkflowExecutionTimedOutEvent(singleEvent) ||
+    isWorkflowExecutionTerminatedEvent(singleEvent) ||
+    isWorkflowExecutionCompletedEvent(singleEvent)
   )
-    return 'Workflow Ended';
+    return 'Workflow';
+
   if (isTimerStartedEvent(singleEvent)) return 'Timer Started';
 
   return singleEvent?.classification ?? singleEvent?.name;
@@ -138,7 +143,7 @@ export const getPrimaryEventDetails = (
   if (isWorkflowExecutionCanceledEvent(event)) {
     return formatSummaryValue(
       'Details',
-      event.workflowExecutionCanceledEventAttributes?.details ?? 'No details',
+      event.workflowExecutionCanceledEventAttributes?.details ?? '',
     );
   }
 
@@ -296,7 +301,7 @@ type PotentiallyDecodable =
   | EventAttribute;
 
 const payloadAttributeFields = [
-  'payloads',
+  'input',
   'failure',
   'lastFailure',
   'searchAttributes',
@@ -324,7 +329,7 @@ export const getAttributePayloads = (attributes: PotentiallyDecodable) => {
     }
   };
 
-  findPayloadAttributes(attributes);
+  if (attributes) findPayloadAttributes(attributes);
 
   return payloadAttributes;
 };

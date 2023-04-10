@@ -1,4 +1,8 @@
-import { formatDistanceToNow, parseJSON } from 'date-fns';
+import {
+  formatDistanceToNow,
+  formatDistanceToNowStrict,
+  parseJSON,
+} from 'date-fns';
 import * as dateTz from 'date-fns-tz'; // `build` script fails on importing some of named CommonJS modules
 
 import { isTimestamp, timestampToDate, type ValidTime } from './format-time';
@@ -10,6 +14,7 @@ export function formatDate(
   date: ValidTime | undefined | null,
   timeFormat: TimeFormat | string = 'UTC',
   relativeLabel = 'ago',
+  strict = false,
 ): string {
   if (!date) return '';
 
@@ -21,8 +26,12 @@ export function formatDate(
     const parsed = parseJSON(date);
 
     if (timeFormat === 'local') return dateTz.format(parsed, dateFirst);
-    if (timeFormat === 'relative')
+    if (timeFormat === 'relative') {
+      if (strict) {
+        return formatDistanceToNowStrict(parsed) + ` ${relativeLabel}`;
+      }
       return formatDistanceToNow(parsed) + ` ${relativeLabel}`;
+    }
 
     return dateTz.formatInTimeZone(parsed, 'UTC', dateFirst);
   } catch {

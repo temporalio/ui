@@ -9,19 +9,28 @@
   export let events: IterableEvent[];
   export let firstEvent: IterableEvent | undefined;
   export let last = false;
+  export let expandAll: boolean;
+
+  $: {
+    console.log('Expand all: ', expandAll);
+  }
 
   $: hasGroupEvents = isEventGroup(event) && event?.eventList?.length > 1;
-  $: pendingActivity = isEventGroup(event) && event?.pendingActivity;
   $: showClassification =
     isEventGroup(event) && hasGroupEvents && event.lastEvent?.classification;
 </script>
 
-{#if pendingActivity}
-  <PendingActivityCard event={pendingActivity} />
-{/if}
-<Card {event} {events} {firstEvent} {last} thick={hasGroupEvents} let:expanded>
-  <Collapsed {event} {events} {firstEvent} {expanded} {showClassification} />
-  {#if expanded}
+<Card
+  {event}
+  {events}
+  {firstEvent}
+  {last}
+  thick={hasGroupEvents}
+  let:expanded
+  {expandAll}
+>
+  <Collapsed {event} expanded={expandAll || expanded} {showClassification} />
+  {#if expandAll || expanded}
     <Expanded {event} {events} {firstEvent} />
   {/if}
 </Card>

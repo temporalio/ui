@@ -5,17 +5,18 @@
 
   import { groupEvents, isEventGroup } from '$lib/models/event-groups';
   import EventGroupSummaryCard from './event-group-summary-card.svelte';
-  import InitialEventCard from './initial-event-card.svelte';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { getStackTrace } from '$lib/utilities/get-single-attribute-for-event';
   import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { importEvents } from '$lib/stores/import-events';
   import RunningCard from './running-card.svelte';
   import FinalEventCard from './final-event-card.svelte';
+  import PendingActivityCard from './pending-activity-card.svelte';
 
   export let fullHistory: CommonHistoryEvent[] = [];
   export let importingHistory: boolean = false;
   export let showNonCompleted = false;
+  export let expandAll = false;
   export let showWorkflowTasks = false;
 
   const getGroups = (
@@ -23,22 +24,16 @@
     showNonCompleted: boolean,
     showWorkflowTasks: boolean,
   ): EventGroups => {
-    return groupEvents(
-      events,
-      'ascending',
-      $workflowRun?.workflow?.pendingActivities ?? [],
-      {
-        createWorkflowTaskGroups: showWorkflowTasks,
-        nonCompletedEventsOnly: showNonCompleted,
-      },
-    );
+    return groupEvents(events, 'ascending', {
+      createWorkflowTaskGroups: showWorkflowTasks,
+      nonCompletedEventsOnly: showNonCompleted,
+    });
   };
 
   // Make into derived store?
   $: history = importingHistory
     ? { start: $importEvents, end: $importEvents }
     : $eventHistory;
-  $: category = $page.url.searchParams.get('category');
   $: intialEvents = history.start;
   $: currentEvents = importingHistory
     ? $importEvents
@@ -59,21 +54,21 @@
         ),
     );
 
-  $: ({ input, results } =
-    getWorkflowStartedCompletedAndTaskFailedEvents(history));
+  $: ({ results } = getWorkflowStartedCompletedAndTaskFailedEvents(history));
   $: stackTrace = results && getStackTrace(parseWithBigInt(results));
 </script>
 
 <div class="flex w-full flex-col gap-0">
   {#if firstEvent}
-    <InitialEventCard
+    <EventGroupSummaryCard
       event={firstEvent}
       events={currentEvents}
-      content={input}
+      {firstEvent}
+      {expandAll}
     />
   {/if}
   {#each groups as event}
-    <EventGroupSummaryCard {event} events={groups} {firstEvent} />
+    <EventGroupSummaryCard {event} events={groups} {firstEvent} {expandAll} />
   {/each}
   {#if uniqueLastEvent}
     <FinalEventCard
@@ -84,6 +79,9 @@
       {firstEvent}
     />
   {/if}
+  {#each $workflowRun?.workflow?.pendingActivities ?? [] as activity}
+    <PendingActivityCard event={activity} />
+  {/each}
   {#if $workflowRun?.workflow?.isRunning}
     <RunningCard />
   {/if}

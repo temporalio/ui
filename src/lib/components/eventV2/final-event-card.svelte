@@ -20,12 +20,12 @@
   final={!$workflowRun?.workflow?.isRunning}
   let:expanded
 >
-  <Collapsed {event} {events} {firstEvent} {expanded} showClassification />
+  <Collapsed {event} {expanded} showClassification />
   {#if expanded}
     <Expanded {event} {events} {firstEvent} />
   {/if}
 </Card>
-<div class="flex gap-2 -mt-2">
+<div class="flex gap-2">
   <div class="w-[160px] min-w-[160px]" />
   <div class="flex grow flex-col overflow-auto">
     <div class:code-with-stack-trace={stackTrace}>
@@ -34,7 +34,6 @@
           {content}
           title="Results"
           unroundTitle
-          icon="json"
           class="h-auto {stackTrace ? 'mb-2' : ''}"
         />
       </div>

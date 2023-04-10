@@ -50,7 +50,7 @@
         start: firstEvent.eventTime,
         end: initialEvent.eventTime,
       }) + timeDiffChange
-    : formatDate(initialEvent?.eventTime, $timeFormat);
+    : formatDate(initialEvent?.eventTime, $timeFormat, 'ago', true);
 </script>
 
 <div

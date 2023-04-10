@@ -8,6 +8,9 @@ import {
   isTimerStartedEvent,
   isWorkflowTaskScheduledEvent,
   isUpsertWorkflowSearchAttributesEvent,
+  isWorkflowExecutionCancelRequestedEvent,
+  isWorkflowExecutionTerminatedEvent,
+  isWorkflowExecutionTimedOutEvent,
 } from '$lib/utilities/is-event-type';
 import {
   eventIsFailureOrTimedOut,
@@ -30,6 +33,7 @@ type StartingEvents = {
   Marker: MarkerRecordedEvent;
   WorkflowTask: WorkflowTaskScheduledEvent;
   SearchAttribute: UpsertWorkflowSearchAttributesEvent;
+  CancelRequested: WorkflowExecutionCancelRequestedEvent;
 };
 
 const createGroupFor = <K extends keyof StartingEvents>(
@@ -57,7 +61,6 @@ const createGroupFor = <K extends keyof StartingEvents>(
     category,
     classification,
     subGroups: new Map(),
-    pendingActivity: undefined,
     get eventTime() {
       return this.lastEvent?.eventTime;
     },
@@ -102,7 +105,10 @@ export const createEventGroup = (
     return createGroupFor<'WorkflowTask'>(event);
   }
 
-  if (isUpsertWorkflowSearchAttributesEvent(event)) {
+  if (
+    isUpsertWorkflowSearchAttributesEvent(event) &&
+    createWorkflowTaskGroups
+  ) {
     return createGroupFor<'SearchAttribute'>(event);
   }
 
@@ -110,11 +116,19 @@ export const createEventGroup = (
     return createGroupFor<'Activity'>(event);
   }
 
+  if (
+    isWorkflowExecutionCancelRequestedEvent(event) &&
+    createWorkflowTaskGroups
+  ) {
+    return createGroupFor<'CancelRequested'>(event);
+  }
+
   if (isMarkerRecordedEvent(event)) {
     if (isLocalActivityMarkerEvent(event)) {
       return createGroupFor<'LocalActivity'>(event);
+    } else if (createWorkflowTaskGroups) {
+      return createGroupFor<'Marker'>(event);
     }
-    return createGroupFor<'Marker'>(event);
   }
 
   if (isTimerStartedEvent(event)) return createGroupFor<'Timer'>(event);
