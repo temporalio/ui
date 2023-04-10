@@ -1,5 +1,3 @@
-import { derived } from 'svelte/store';
-import { page } from '$app/stores';
 import { persistStore } from '$lib/stores/persist-store';
 
 export type EventSortOrder = 'ascending' | 'descending';
@@ -25,8 +23,4 @@ export const eventFilterSort = persistStore<EventSortOrder>(
 export const eventShowElapsed = persistStore<BooleanString>(
   'eventShowElapsed',
   'false',
-);
-
-export const eventCategoryParam = derived([page], ([$page]) =>
-  $page.url.searchParams.get('category'),
 );

@@ -1,5 +1,5 @@
-ARG BASE_SERVER_IMAGE=temporalio/base-server:1.10.0
-ARG BASE_BUILDER_IMAGE=temporalio/base-builder:1.9.0
+ARG BASE_SERVER_IMAGE=temporalio/base-server:1.14.0
+ARG BASE_BUILDER_IMAGE=temporalio/base-builder:1.13.0
 
 ##### UI builder #####
 FROM ${BASE_BUILDER_IMAGE} AS ui-builder
@@ -10,8 +10,10 @@ RUN apk add --update --no-cache npm
 RUN npm install -g pnpm
 
 COPY package.json pnpm-lock.yaml ./
+COPY scripts scripts
 RUN pnpm install
 
+COPY plugins plugins
 COPY .babelrc .npmrc *.json *.yaml *.cjs *.js *.ts ./
 COPY src src
 

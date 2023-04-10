@@ -13,6 +13,7 @@
     large?: boolean;
     loading?: boolean;
     'data-testid'?: string;
+    hightlightNav?: boolean;
   }
 
   export let hideConfirm: boolean = false;
@@ -22,9 +23,20 @@
   export let confirmDisabled: boolean = false;
   export let large: boolean = false;
   export let loading: boolean = false;
+  export let hightlightNav: boolean = false;
+
+  let error: string;
 
   export const open = () => modalElement.showModal();
-  export const close = () => modalElement.close();
+
+  export const close = () => {
+    error = '';
+    modalElement.close();
+  };
+
+  export const setError = (err: string) => {
+    error = err;
+  };
 
   let className: string = '';
   export { className as class };
@@ -43,11 +55,12 @@
   }>();
 
   const handleCancel = () => {
-    modalElement.close();
+    close();
     dispatch('cancelModal');
   };
 
   const confirmModal = () => {
+    error = '';
     dispatch('confirmModal');
   };
 
@@ -98,6 +111,7 @@
   bind:this={modalElement}
   class="body {className}"
   class:large
+  class:hightlightNav
   aria-modal="true"
   aria-labelledby="modal-title"
   data-testid={$$props['data-testid']}
@@ -116,11 +130,14 @@
       <h3>Title</h3>
     </slot>
   </div>
-  <form on:submit={confirmModal} method="dialog">
+  <form on:submit|preventDefault={confirmModal} method="dialog">
     <div id="modal-content" class="content">
       <slot name="content">
         <span>Content</span>
       </slot>
+      {#if error}
+        <p class="mt-2 text-sm font-normal text-danger">{error}</p>
+      {/if}
     </div>
     <div class="flex items-center justify-end space-x-2 p-6">
       <Button
@@ -145,11 +162,15 @@
 
 <style lang="postcss">
   .body {
-    @apply z-50 mx-auto w-full max-w-lg overflow-y-auto rounded-lg bg-white p-0 text-gray-900 shadow-xl md:h-max;
+    @apply z-50  w-full max-w-lg overflow-y-auto rounded-lg bg-white p-0 text-gray-900 shadow-xl md:h-max;
   }
 
   .body::backdrop {
-    @apply cursor-pointer bg-gray-900 opacity-50;
+    @apply cursor-pointer bg-gray-900 opacity-70;
+  }
+
+  .body.hightlightNav::backdrop {
+    @apply top-[40px] left-[60px];
   }
 
   .large {

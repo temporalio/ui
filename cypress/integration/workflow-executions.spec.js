@@ -18,7 +18,7 @@ const statuses = [
 describe('Workflow Executions List', () => {
   beforeEach(() => {
     cy.interceptApi();
-
+    cy.setTopNavFeatureTag();
     cy.visit('/namespaces/default/workflows');
 
     cy.wait('@workflows-api');
@@ -105,7 +105,7 @@ describe('Workflow Executions List', () => {
           encodeURIComponent(`ExecutionStatus="Running"`),
         );
 
-        cy.get('.workflow-summary-row').first().click();
+        cy.get('.workflow-summary-row > .time-cell').first().click();
 
         cy.wait('@workflow-api');
         cy.wait('@event-history-api');

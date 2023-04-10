@@ -7,6 +7,7 @@ const { workflowId, runId } = workflow.execution;
 
 describe('Fallback to Ascending Ordering of Event History on Older Versions of Temporal Server', () => {
   beforeEach(() => {
+    cy.setTopNavFeatureTag();
     cy.interceptNamespacesApi();
     cy.interceptGithubReleasesApi();
     cy.interceptQueryApi();

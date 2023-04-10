@@ -102,7 +102,7 @@
           >
             <div
               class="mx-2 flex h-6 w-6 items-center rounded-full"
-              style="background: {type.color}"
+              style="background: {type.color};"
             >
               {#if eventGroupFilters.includes(type.option)}
                 <Icon name="checkmark" class="text-white" />

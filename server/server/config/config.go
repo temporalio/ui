@@ -39,6 +39,7 @@ type (
 		TLS                 TLS    `yaml:"tls"`
 		Auth                Auth   `yaml:"auth"`
 		EnableUI            bool   `yaml:"enableUi"`
+		CloudUI             bool   `yaml:"cloudUi"`
 		UIAssetPath         string `yaml:"uiAssetPath"`
 		EnableOpenAPI       bool   `yaml:"enableOpenApi"`
 		CORS                CORS   `yaml:"cors"`
@@ -63,8 +64,11 @@ type (
 	}
 
 	CORS struct {
-		AllowOrigins   []string `yaml:"allowOrigins"`
-		CookieInsecure bool     `yaml:"cookieInsecure"`
+		AllowOrigins []string `yaml:"allowOrigins"`
+		// CookieInsecure allows CSRF cookie to be sent to servers that the browser considers
+		// unsecured. Useful for cases where the connection is secured via VPN rather than
+		// HTTPS directly.
+		CookieInsecure bool `yaml:"cookieInsecure"`
 	}
 
 	TLS struct {

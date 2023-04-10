@@ -3,7 +3,7 @@
 declare module '@crownframework/svelte-error-boundary';
 declare module '@sveltejs/svelte-virtual-list';
 
-type NamespaceItem = {
+type NamespaceListItem = {
   namespace: string;
   href: (namspace: string) => string;
   onClick: (namspace: string) => void;
@@ -59,6 +59,7 @@ type Settings = {
   codec: {
     endpoint?: string;
     passAccessToken?: boolean;
+    includeCredentials?: boolean;
   };
   defaultNamespace: string;
   disableWriteActions: boolean;

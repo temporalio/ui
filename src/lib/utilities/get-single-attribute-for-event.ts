@@ -2,6 +2,7 @@ import { isEventGroup } from '$lib/models/event-groups';
 import { capitalize } from '$lib/utilities/format-camel-case';
 import { has } from './has';
 import { isLocalActivityMarkerEvent } from './is-event-type';
+import { isObject } from './is';
 
 import type { Payload } from '$types';
 import type { CombinedAttributes } from './format-event-attributes';
@@ -57,6 +58,17 @@ export const getCodeBlockValue: Parameters<typeof JSON.stringify>[0] = (
 ) => {
   if (typeof value === 'string') return value;
   return value?.payloads ?? value?.indexedFields ?? value?.points ?? value;
+};
+
+export const getStackTrace = (value: unknown) => {
+  if (!isObject(value)) return undefined;
+  if (has(value, 'stackTrace') && value.stackTrace) return value.stackTrace;
+
+  for (const key in value) {
+    if (isObject(value[key])) {
+      return getStackTrace(value[key]);
+    }
+  }
 };
 
 const keysWithExecutionLinks = [

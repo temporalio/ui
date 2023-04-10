@@ -114,9 +114,14 @@ export const fetchAllWorkflows = async (
   request = fetch,
   archived = false,
 ): Promise<CombinedWorkflowExecutionsResponse> => {
-  const query = decodeURIComponent(
-    parameters.query || toListWorkflowQuery(parameters, archived),
-  );
+  const rawQuery =
+    parameters.query || toListWorkflowQuery(parameters, archived);
+  let query: string;
+  try {
+    query = decodeURIComponent(rawQuery);
+  } catch {
+    query = rawQuery;
+  }
 
   const endpoint: ValidWorkflowEndpoints = archived
     ? 'workflows.archived'
@@ -148,6 +153,31 @@ export const fetchAllWorkflows = async (
     workflows: toWorkflowExecutions({ executions }),
     nextPageToken: String(nextPageToken),
     error,
+  };
+};
+
+export const fetchWorkflowForRunId = async (
+  parameters: { namespace: string; workflowId: string },
+  request = fetch,
+): Promise<{ runId: string }> => {
+  const { namespace, workflowId } = parameters;
+  const endpoint: ValidWorkflowEndpoints = 'workflows';
+
+  const route = routeForApi(endpoint, { namespace });
+  const { executions } = (await requestFromAPI<ListWorkflowExecutionsResponse>(
+    route,
+    {
+      params: {
+        query: `WorkflowId="${workflowId}"`,
+        pageSize: '1',
+      },
+      request,
+    },
+  )) ?? { executions: [] };
+  const latestExecution = toWorkflowExecutions({ executions })?.[0];
+
+  return {
+    runId: latestExecution?.runId,
   };
 };
 
@@ -258,7 +288,7 @@ export async function signalWorkflow({
                   metadata: {
                     encoding: btoa('json/plain'),
                   },
-                  data: btoa(stringifyWithBigInt(signalInput)),
+                  data: btoa(signalInput),
                 },
               ]
             : null,

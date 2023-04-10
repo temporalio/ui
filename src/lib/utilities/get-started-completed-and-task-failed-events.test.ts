@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { getWorkflowStartedCompletedAndTaskFailedEvents } from './get-started-completed-and-task-failed-events';
 
 import completedEventHistory from '$fixtures/events.completed.json';
+import continuedAsNewEventHistory from '$fixtures/events.continued-as-new.json';
 import canceledEventHistory from '$fixtures/events.canceled.json';
 import failedEventHistory from '$fixtures/events.failed.json';
 import runningEventHistory from '$fixtures/events.running.json';
@@ -224,6 +225,38 @@ describe('getWorkflowStartedCompletedAndTaskFailedEvents', () => {
     expect(results).toMatchInlineSnapshot(
       '"{\\"type\\":\\"workflowExecutionTimedOutEventAttributes\\",\\"retryState\\":\\"RetryPolicyNotSet\\",\\"newExecutionRunId\\":\\"\\"}"',
     );
+  });
+
+  it('should set contAsNew to false for a non continuedAsNew event history', () => {
+    const { contAsNew } = getWorkflowStartedCompletedAndTaskFailedEvents({
+      start: timedOutEventHistory,
+      end: timedOutEventHistory,
+    });
+    expect(contAsNew).toBe(false);
+  });
+
+  it('should get the correct input for a continuedAsNew event history', () => {
+    const { input } = getWorkflowStartedCompletedAndTaskFailedEvents({
+      start: continuedAsNewEventHistory,
+      end: continuedAsNewEventHistory,
+    });
+    expect(input).toMatchInlineSnapshot('"[3,2]"');
+  });
+
+  it('should get the correct result for a continuedAsNew event history', () => {
+    const { results } = getWorkflowStartedCompletedAndTaskFailedEvents({
+      start: continuedAsNewEventHistory,
+      end: continuedAsNewEventHistory,
+    });
+    expect(results).toMatchInlineSnapshot('"[4,1]"');
+  });
+
+  it('should set contAsNew to true for a continuedAsNew event history', () => {
+    const { contAsNew } = getWorkflowStartedCompletedAndTaskFailedEvents({
+      start: continuedAsNewEventHistory,
+      end: continuedAsNewEventHistory,
+    });
+    expect(contAsNew).toBe(true);
   });
 
   it('should work as expected with a WorkflowCompletedEvent with a null result', () => {

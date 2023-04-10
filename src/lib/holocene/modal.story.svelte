@@ -3,6 +3,7 @@
   import { logEvent } from 'histoire/client';
 
   import Button from './button.svelte';
+  import Checkbox from './checkbox.svelte';
   import Input from './input/input.svelte';
 
   import Modal from './modal.svelte';
@@ -10,7 +11,11 @@
   export let Hst: HST;
   let deleteConfirm: string;
   let modal: Modal;
+  let loading: boolean = false;
 
+  let shouldError: boolean = false;
+  let errorText: string =
+    'Quo sint nisi nostrum quis nesciunt est. Delectus adipisci reiciendis nihil fuga libero exercitationem. Distinctio nihil sit et consequatur sit quia. Quia aut et temporibus doloremque veritatis corporis.';
   const openModal = () => {
     modal.open();
   };
@@ -21,6 +26,24 @@
 
   const handleCancel = () => {
     logEvent('Cancel', {});
+  };
+
+  const makeFakeApiRequest = async () => {
+    try {
+      loading = true;
+      await new Promise<void>((resolve, reject) => {
+        if (shouldError) {
+          setTimeout(reject, 250);
+        } else {
+          setTimeout(resolve, 250);
+        }
+      });
+      modal.close();
+    } catch {
+      modal.setError(errorText);
+    } finally {
+      loading = false;
+    }
   };
 </script>
 
@@ -46,8 +69,9 @@
       bind:this={modal}
       confirmType="destructive"
       confirmText="Delete"
+      {loading}
       on:cancelModal={handleCancel}
-      on:confirmModal={handleConfirm}
+      on:confirmModal={makeFakeApiRequest}
     >
       <h3 slot="title">Delete Namespace</h3>
       <div slot="content" class="flex flex-col gap-2">
@@ -60,4 +84,9 @@
       </div>
     </Modal>
   </Hst.Variant>
+
+  <svelte:fragment slot="controls">
+    <Hst.Checkbox bind:value={shouldError} title="Should Error: " />
+    <Hst.Text bind:value={errorText} title="Error Text: " />
+  </svelte:fragment>
 </Hst.Story>

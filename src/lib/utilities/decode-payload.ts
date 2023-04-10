@@ -7,6 +7,7 @@ import { convertPayloadsWithCodec } from '$lib/services/data-encoder';
 import type {
   codecEndpoint,
   passAccessToken,
+  includeCredentials,
 } from '$lib/stores/data-encoder-config';
 
 import { atob } from './atob';
@@ -30,6 +31,7 @@ export type DecodeFunctions = {
   decodeAttributes?: Decode['decodePayloadAttributes'];
   encoderEndpoint?: typeof codecEndpoint;
   codecPassAccessToken?: typeof passAccessToken;
+  codecIncludeCredentials?: typeof includeCredentials;
 };
 
 const toArray = (payloads: Payload | Payload[]): Payload[] => {

@@ -104,6 +104,12 @@ Set these environment variables if you want to change their defaults
 | VITE_API  | Temporal HTTP API address. Set to empty `` to use relative paths | http://localhost:8322 | Build |
 | VITE_MODE | Build target                                                     | development           | Build |
 
+
+## Releases
+
+Our `ui` repo releases page (https://github.com/temporalio/ui/releases) is for managing our [npm package](https://www.npmjs.com/package/@temporalio/ui). The package includes a copy of `/lib` directory with types.
+Our `ui-server` repo releases page (https://github.com/temporalio/ui-server/releases) is for managing docker images for the entire front-end app.
+
 ## Developing with Canary
 
 To get a better representation of production data, you can run our UI with the [canary-go](https://github.com/temporalio/canary-go) repo. You will need Go installed on your machine.

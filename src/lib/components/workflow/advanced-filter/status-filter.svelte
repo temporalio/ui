@@ -21,15 +21,7 @@
 
 <div class="flex gap-2">
   <KeywordConditionals bind:conditional />
-  <Select
-    id="workflow-status"
-    bind:value
-    class="w-44"
-    displayValue={(value) => {
-      if (!value) return 'All';
-      return value;
-    }}
-  >
+  <Select id="workflow-status" bind:value class="w-44">
     {#each Object.entries(statuses) as [label, value] (label)}
       <Option value={label}>
         {#if value !== 'All'}

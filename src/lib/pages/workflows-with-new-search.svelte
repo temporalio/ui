@@ -1,63 +1,49 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
-  import { timeFormat } from '$lib/stores/time-format';
   import {
     refresh,
     workflows,
     loading,
     updating,
-    workflowError,
     workflowCount,
     workflowsQuery,
+    workflowsSearchParams,
   } from '$lib/stores/workflows';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
-
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
-
-  import EmptyState from '$lib/holocene/empty-state.svelte';
   import Pagination from '$lib/holocene/pagination.svelte';
-  import WorkflowsSummaryTableWithFilters from '$lib/components/workflow/workflows-summary-table-with-filters.svelte';
-  import WorkflowsSummaryRowWithFilters from '$lib/components/workflow/workflows-summary-row-with-filters.svelte';
-  import NamespaceSelector from '$lib/holocene/namespace-selector.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import WorkflowAdvancedSearch from '$lib/components/workflow/workflow-advanced-search.svelte';
   import WorkflowDateTimeFilter from '$lib/components/workflow/dropdown-filter/workflow-datetime-filter.svelte';
-  import Loading from '$lib/holocene/loading.svelte';
   import {
     batchCancelByQuery,
     batchTerminateByQuery,
     bulkCancelByIDs,
     bulkTerminateByIDs,
-    pollBatchOperation,
   } from '$lib/services/batch-service';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  import { toaster } from '$lib/stores/toaster';
   import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
-  import { bulkActionsEnabled as workflowBulkActionsEnabled } from '$lib/utilities/bulk-actions-enabled';
-  import { supportsAdvancedVisibility } from '$lib/stores/bulk-actions';
+  import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
+  import { toaster } from '$lib/stores/toaster';
+  import FeatureGuard from '$lib/components/feature-guard.svelte';
+  import WorkflowsSummaryNonConfigurableTable from '$lib/components/workflow/workflows-summary-non-configurable-table/workflows-summary-non-configurable-table.svelte';
+  import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table/workflows-summary-configurable-table.svelte';
 
-  $: bulkActionsEnabled = workflowBulkActionsEnabled(
-    $page.data.settings,
-    $supportsAdvancedVisibility,
-  );
-
-  let selectedWorkflows: { [index: string]: boolean } = {};
+  export let workflowTableCustomizationEnabled: boolean = false;
+  let selectedWorkflows: WorkflowExecution[] = [];
   let batchTerminateConfirmationModal: BatchOperationConfirmationModal;
   let batchCancelConfirmationModal: BatchOperationConfirmationModal;
   let allSelected: boolean = false;
   let pageSelected: boolean = false;
-  let terminating: boolean = false;
 
   $: query = $page.url.searchParams.get('query');
+  $: query && ($workflowsQuery = query);
 
-  $: {
-    // For returning to page from 'Back to Workflows' with previous search
-    if (query) {
-      $workflowsQuery = query;
-    }
-  }
+  // For returning to page from 'Back to Workflows' with previous search
+  $: searchParams = $page.url.searchParams.toString();
+  $: searchParams, ($workflowsSearchParams = searchParams);
 
   $: {
     if (!$workflowFilters.length && !$workflowSorts.length) {
@@ -78,12 +64,8 @@
   const resetSelection = () => {
     allSelected = false;
     pageSelected = false;
-    selectedWorkflows = {};
-    selectedWorkflowsCount = 0;
+    selectedWorkflows = [];
   };
-
-  const errorMessage =
-    'If you have filters applied, try adjusting them. Otherwise please check your syntax and try again.';
 
   const refreshWorkflows = () => {
     resetSelection();
@@ -91,8 +73,6 @@
   };
 
   const resetPageToDefaultState = () => {
-    terminating = false;
-
     $workflowFilters = [];
     $workflowSorts = [];
     updateQueryParameters({
@@ -104,125 +84,114 @@
     refreshWorkflows();
   };
 
-  const handleSelectWorkflow = (
-    event: CustomEvent<{ checked: boolean; workflowRunId: string }>,
-  ) => {
-    const { checked, workflowRunId } = event.detail;
-    selectedWorkflows[workflowRunId] = checked;
+  const openBatchCancelConfirmationModal = () => {
+    batchCancelConfirmationModal.open();
   };
 
-  const handleToggleAll = (event: CustomEvent<{ checked: boolean }>) => {
-    const { checked } = event.detail;
-    allSelected = checked;
-    $workflows.forEach(
-      (workflow) => (selectedWorkflows[workflow.runId] = checked),
-    );
+  const openBatchTerminateConfirmationModal = () => {
+    batchTerminateConfirmationModal.open();
+  };
+
+  const handleSelectAll = (workflows: WorkflowExecution[]) => {
+    allSelected = true;
+    selectedWorkflows = [...workflows];
   };
 
   const handleTogglePage = (
     event: CustomEvent<{
       checked: boolean;
-      visibleWorkflows: WorkflowExecution[];
+      workflows: WorkflowExecution[];
     }>,
   ) => {
-    const { checked, visibleWorkflows } = event.detail;
+    const { checked, workflows } = event.detail;
     pageSelected = checked;
-    visibleWorkflows.forEach(
-      (workflow) => (selectedWorkflows[workflow.runId] = checked),
-    );
+    if (allSelected) allSelected = false;
+    if (checked) {
+      selectedWorkflows = [...workflows];
+    } else {
+      selectedWorkflows = [];
+    }
   };
 
   const terminateWorkflows = async (event: CustomEvent<{ reason: string }>) => {
-    const { namespace } = $page.params;
-    const { reason } = event.detail;
-
-    if (allSelected) {
-      // Idea: persist the job ID and display a progress indicator for large jobs
-      await batchTerminateByQuery({
-        namespace,
-        reason,
-        query: batchOperationQuery,
-      });
-      toaster.push({
-        message: 'The batch terminate request is processing in the background.',
-        id: 'batch-terminate-success-toast',
-      });
-    } else {
-      terminating = true;
-      try {
-        const jobId = await bulkTerminateByIDs({
-          namespace,
-          reason,
-          workflows: terminableWorkflows,
+    const options = {
+      namespace: $page.params.namespace,
+      reason: event.detail.reason,
+    };
+    try {
+      if (allSelected) {
+        await batchTerminateByQuery({
+          ...options,
+          query: batchOperationQuery,
         });
-        const workflowsTerminated = await pollBatchOperation({
-          namespace,
-          jobId,
+        toaster.push({
+          message:
+            'The batch terminate request is processing in the background.',
+          id: 'batch-terminate-success-toast',
+        });
+      } else {
+        const workflowsTerminated = await bulkTerminateByIDs({
+          ...options,
+          workflows: terminableWorkflows,
         });
         toaster.push({
           message: `Successfully terminated ${workflowsTerminated} workflows.`,
           id: 'batch-terminate-success-toast',
         });
-      } catch (error) {
-        toaster.push({
-          variant: 'error',
-          message: 'Unable to terminate workflows.',
-        });
       }
+      batchTerminateConfirmationModal.close();
+      resetPageToDefaultState();
+    } catch (error) {
+      batchTerminateConfirmationModal.setError(
+        error?.message ?? 'An unknown error occurred.',
+      );
     }
-    resetPageToDefaultState();
   };
 
   const cancelWorkflows = async (event: CustomEvent<{ reason: string }>) => {
-    const { namespace } = $page.params;
-    const { reason } = event.detail;
-
-    if (allSelected) {
-      await batchCancelByQuery({
-        namespace,
-        reason,
-        query: batchOperationQuery,
-      });
-      toaster.push({
-        message: 'The batch cancel request is processing in the background.',
-        id: 'batch-cancel-success-toast',
-      });
-    } else {
-      try {
-        const jobId = await bulkCancelByIDs({
-          namespace,
-          reason,
-          workflows: cancelableWorkflows,
-        });
-        const workflowsCancelled = await pollBatchOperation({
-          namespace,
-          jobId,
+    const options = {
+      namespace: $page.params.namespace,
+      reason: event.detail.reason,
+    };
+    try {
+      if (allSelected) {
+        await batchCancelByQuery({
+          ...options,
+          query: batchOperationQuery,
         });
         toaster.push({
-          message: `Successfully cancelled ${workflowsCancelled} workflows.`,
+          message: 'The batch cancel request is processing in the background.',
           id: 'batch-cancel-success-toast',
         });
-      } catch {
+      } else {
+        const workflowsCanceled = await bulkCancelByIDs({
+          ...options,
+          workflows: cancelableWorkflows,
+        });
         toaster.push({
-          variant: 'error',
-          message: 'Unable to cancel workflows.',
+          message: `Successfully cancelled ${workflowsCanceled} workflows.`,
+          id: 'batch-cancel-success-toast',
         });
       }
+      batchCancelConfirmationModal.close();
+      resetPageToDefaultState();
+    } catch (error) {
+      batchCancelConfirmationModal.setError(
+        error?.message ?? 'An unknown error occurred.',
+      );
     }
-    resetPageToDefaultState();
   };
 
   $: batchOperationQuery = !$workflowsQuery
     ? 'ExecutionStatus="Running"'
     : $workflowsQuery;
 
-  $: terminableWorkflows = $workflows.filter(
-    (workflow) => selectedWorkflows[workflow.runId] && workflow.canBeTerminated,
+  $: terminableWorkflows = selectedWorkflows.filter(
+    (workflow) => workflow.canBeTerminated,
   );
 
-  $: cancelableWorkflows = $workflows.filter(
-    (workflow) =>
-      selectedWorkflows[workflow.runId] && workflow.status === 'Running',
+  $: cancelableWorkflows = selectedWorkflows.filter(
+    (workflow) => workflow.status === 'Running',
   );
 
   $: totalWorkflowCount = new Intl.NumberFormat('en-US').format(
@@ -232,9 +201,6 @@
   $: filteredWorkflowCount = new Intl.NumberFormat('en-US').format(
     $workflowCount?.count ?? 0,
   );
-
-  $: selectedWorkflowsCount =
-    Object.values(selectedWorkflows).filter(Boolean).length;
 
   $: {
     if ($workflowFilters) {
@@ -246,7 +212,6 @@
 <BatchOperationConfirmationModal
   action="Terminate"
   bind:this={batchTerminateConfirmationModal}
-  loading={terminating}
   {allSelected}
   actionableWorkflowsLength={terminableWorkflows.length}
   query={batchOperationQuery}
@@ -255,7 +220,6 @@
 <BatchOperationConfirmationModal
   action="Cancel"
   bind:this={batchCancelConfirmationModal}
-  loading={false}
   {allSelected}
   actionableWorkflowsLength={cancelableWorkflows.length}
   query={batchOperationQuery}
@@ -264,15 +228,12 @@
 
 <header class="mb-2 flex justify-between">
   <div>
-    <h1 class="text-2xl" data-testid="namespace-title">
-      Recent Workflows
-      <NamespaceSelector />
-    </h1>
+    <h1 class="text-2xl" data-cy="namespace-title">Recent Workflows</h1>
     <div class="flex items-center gap-2 text-sm">
       <p data-testid="namespace-name">
         {$page.params.namespace}
       </p>
-      {#if $workflowCount?.totalCount >= 0}
+      {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility}
         <div class="h-1 w-1 rounded-full bg-gray-400" />
         <p data-testid="workflow-count">
           {#if $loading}
@@ -305,54 +266,29 @@
   <svelte:fragment slot="action-top-center">
     <WorkflowDateTimeFilter />
   </svelte:fragment>
-  <WorkflowsSummaryTableWithFilters
-    {bulkActionsEnabled}
-    updating={$updating}
-    visibleWorkflows={visibleItems}
-    {selectedWorkflowsCount}
-    filteredWorkflowCount={query ? filteredWorkflowCount : totalWorkflowCount}
-    {allSelected}
-    {pageSelected}
-    on:terminateWorkflows={() => batchTerminateConfirmationModal.open()}
-    on:cancelWorkflows={() => batchCancelConfirmationModal.open()}
-    on:toggleAll={handleToggleAll}
-    on:togglePage={handleTogglePage}
-  >
-    {#each visibleItems as event}
-      <WorkflowsSummaryRowWithFilters
-        {bulkActionsEnabled}
-        workflow={event}
-        namespace={$page.params.namespace}
-        timeFormat={$timeFormat}
-        checkboxDisabled={allSelected}
-        selected={selectedWorkflows[event.runId]}
-        on:toggleWorkflow={handleSelectWorkflow}
-      />
-    {:else}
-      <tr>
-        <td colspan={bulkActionsEnabled ? 6 : 5} class="xl:hidden">
-          {#if $loading}
-            <Loading />
-          {:else}
-            <EmptyState
-              title="No Workflows Found"
-              content={errorMessage}
-              error={$workflowError}
-            />
-          {/if}
-        </td>
-        <td colspan={bulkActionsEnabled ? 8 : 7} class="hidden xl:table-cell">
-          {#if $loading}
-            <Loading />
-          {:else}
-            <EmptyState
-              title="No Workflows Found"
-              content={errorMessage}
-              error={$workflowError}
-            />
-          {/if}
-        </td>
-      </tr>
-    {/each}
-  </WorkflowsSummaryTableWithFilters>
+  <FeatureGuard enabled={workflowTableCustomizationEnabled}>
+    <WorkflowsSummaryConfigurableTable
+      {allSelected}
+      {pageSelected}
+      bind:selectedWorkflows
+      workflows={visibleItems}
+      filteredWorkflowCount={query ? filteredWorkflowCount : totalWorkflowCount}
+      on:selectAll={() => handleSelectAll(visibleItems)}
+      on:togglePage={handleTogglePage}
+      on:cancelWorkflows={openBatchCancelConfirmationModal}
+      on:terminateWorkflows={openBatchTerminateConfirmationModal}
+    />
+    <WorkflowsSummaryNonConfigurableTable
+      slot="fallback"
+      {allSelected}
+      {pageSelected}
+      bind:selectedWorkflows
+      workflows={visibleItems}
+      filteredWorkflowCount={query ? filteredWorkflowCount : totalWorkflowCount}
+      on:selectAll={() => handleSelectAll(visibleItems)}
+      on:togglePage={handleTogglePage}
+      on:cancelWorkflows={openBatchCancelConfirmationModal}
+      on:terminateWorkflows={openBatchTerminateConfirmationModal}
+    />
+  </FeatureGuard>
 </Pagination>
