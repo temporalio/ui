@@ -36,6 +36,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { goto } from '$app/navigation';
   import ProgressBar from '$lib/holocene/progress-bar.svelte';
+  import { resize, resizableContainerWidth } from '$lib/holocene/resize';
 
   const dispatch = createEventDispatcher<{
     terminateWorkflows: undefined;
@@ -112,45 +113,18 @@
       }),
     );
   };
-
-  let resizableContainer: HTMLDivElement;
-  let resizableContainerWidth: number;
-  let resizing: boolean = false;
-
-  const handleMouseDown = (event: MouseEvent) => {
-    if (resizableContainer.clientWidth - event.x < 3) {
-      resizing = true;
-    }
-    return false;
-  };
-
-  const handleMouseUp = () => {
-    resizing = false;
-  };
-
-  const handleMouseMove = (event: MouseEvent) => {
-    if (!resizing) return false;
-    const rect = resizableContainer.getBoundingClientRect();
-    resizableContainerWidth = event.x - rect.x;
-    return false;
-  };
 </script>
 
-<svelte:window
-  on:mousemove|stopPropagation={handleMouseMove}
-  on:mouseup|stopPropagation={handleMouseUp}
-/>
 <div class="workflow-summary-tables-wrapper">
   <div
     class="workflow-summary-table-wrapper pinned"
     class:batch-actions-enabled={$supportsBulkActions}
     class:batch-actions-visible={showBulkActions}
     class:no-columns-pinned={pinnedColumns.length === 0}
-    bind:this={resizableContainer}
-    style="width:{resizableContainerWidth
-      ? resizableContainerWidth + 'px'
+    use:resize
+    style="width:{$resizableContainerWidth
+      ? $resizableContainerWidth + 'px'
       : '50%'};"
-    on:mousedown|stopPropagation|preventDefault={handleMouseDown}
   >
     <table class="workflow-summary-table pinned">
       <thead>
