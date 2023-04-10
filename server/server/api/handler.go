@@ -45,8 +45,9 @@ type Auth struct {
 }
 
 type CodecResponse struct {
-	Endpoint        string
-	PassAccessToken bool
+	Endpoint           string
+	PassAccessToken    bool
+	IncludeCredentials bool
 }
 
 type SettingsResponse struct {
@@ -119,8 +120,9 @@ func GetSettings(cfgProvier *config.ConfigProviderWithRefresh) func(echo.Context
 			FeedbackURL:                 cfg.FeedbackURL,
 			NotifyOnNewVersion:          cfg.NotifyOnNewVersion,
 			Codec: &CodecResponse{
-				Endpoint:        cfg.Codec.Endpoint,
-				PassAccessToken: cfg.Codec.PassAccessToken,
+				Endpoint:           cfg.Codec.Endpoint,
+				PassAccessToken:    cfg.Codec.PassAccessToken,
+				IncludeCredentials: cfg.Codec.IncludeCredentials,
 			},
 			Version:                   version.UIVersion,
 			DisableWriteActions:       cfg.DisableWriteActions,

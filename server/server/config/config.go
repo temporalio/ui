@@ -109,8 +109,9 @@ type (
 	}
 
 	Codec struct {
-		Endpoint        string `yaml:"endpoint"`
-		PassAccessToken bool   `yaml:"passAccessToken"`
+		Endpoint           string `yaml:"endpoint"`
+		PassAccessToken    bool   `yaml:"passAccessToken"`
+		IncludeCredentials bool   `yaml:"includeCredentials"`
 	}
 
 	Filesystem struct {
