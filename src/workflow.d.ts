@@ -39,7 +39,7 @@ type Decodable = {
   queryResult: import('$types').QueryResult;
 };
 
-type DecodedPayload = import('$types').Payload | Record<any, any> | string;
+type DecodedPayload = Record<any, any> | string;
 
 type Decoded = {
   searchAttributes: { indexedFields: Record<string, DecodedPayload> };
