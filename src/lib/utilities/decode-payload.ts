@@ -69,9 +69,11 @@ export function decodePayload(
   return payload;
 }
 
-export const decodePayloadAttributes = (
-  eventAttribute: EventAttribute,
-): EventAttribute => {
+export const decodePayloadAttributes = <
+  T extends Optional<PotentiallyDecodable>,
+>(
+  eventAttribute: T,
+): Replace<T, Optional<PotentiallyDecodable>> => {
   // Decode Search Attributes
   if (
     has(eventAttribute, 'searchAttributes') &&
