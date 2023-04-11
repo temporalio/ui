@@ -5,7 +5,7 @@ import {
 import { validateHttps } from '$lib/utilities/is-http';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
-import type { Payloads } from '$types';
+type PotentialPayloads = { payloads: unknown[] };
 
 export async function convertPayloadsWithCodec({
   payloads,
@@ -13,11 +13,11 @@ export async function convertPayloadsWithCodec({
   settings,
   accessToken,
 }: {
-  payloads: Payloads;
+  payloads: PotentialPayloads;
   namespace: string;
   settings: Settings;
   accessToken: string;
-}): Promise<Payloads> {
+}): Promise<PotentialPayloads> {
   const endpoint = settings?.codec?.endpoint;
   const passAccessToken = settings?.codec?.passAccessToken;
 
@@ -48,7 +48,7 @@ export async function convertPayloadsWithCodec({
         body: stringifyWithBigInt(payloads),
       };
 
-  const encoderResponse: Promise<Payloads> = fetch(
+  const encoderResponse: Promise<PotentialPayloads> = fetch(
     endpoint + '/decode',
     requestOptions,
   )

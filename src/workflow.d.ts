@@ -39,7 +39,7 @@ type Decodable = {
   queryResult: import('$types').QueryResult;
 };
 
-type DecodedPayload = Record<any, any> | string;
+type DecodedPayload = Record<string, string> | string;
 
 type Decoded = {
   searchAttributes: { indexedFields: Record<string, DecodedPayload> };
@@ -47,7 +47,7 @@ type Decoded = {
   header: { fields: Record<string, DecodedPayload> };
   queryResult: Replace<
     import('$types').QueryResult,
-    { answer: Array<DecodedPayload> }
+    { answer: DecodedPayload[] }
   >;
 };
 
@@ -93,8 +93,8 @@ type WorkflowExecution = {
   taskQueue?: string;
   historyEvents: string;
   historySizeBytes: string;
-  searchAttributes?: { indexedFields: Record<string, DecodedPayload> };
-  memo?: { fields: Record<string, DecodedPayload> };
+  searchAttributes?: { indexedFields?: Record<string, DecodedPayload> };
+  memo?: { fields?: Record<string, DecodedPayload> };
   pendingChildren: PendingChildren[];
   pendingActivities: PendingActivity[];
   stateTransitionCount: string;

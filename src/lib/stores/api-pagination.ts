@@ -9,8 +9,8 @@ import {
 
 import type { Readable } from 'svelte/store';
 
-type PaginationMethods = {
-  nextPageWithItems: (t: NextPageToken, items: any[]) => void;
+type PaginationMethods<T> = {
+  nextPageWithItems: (t: NextPageToken, items: T[]) => void;
   nextPage: () => void;
   previousPage: () => void;
   setUpdating: () => void;
@@ -21,7 +21,7 @@ type PaginationMethods = {
   setActiveIndex: (activeIndex: number) => void;
 };
 
-type PaginationItems = {
+type PaginationItems<T> = {
   key: string;
   loading: boolean;
   updating: boolean;
@@ -32,16 +32,16 @@ type PaginationItems = {
   pageSize: number;
   indexData: Record<
     number,
-    { nextToken: string; start: number; end: number; items: any[] }
+    { nextToken: string; start: number; end: number; items: T[] }
   >;
-  visibleItems: any[];
+  visibleItems: T[];
   hasNextIndexData: boolean;
   indexStart: number;
   indexEnd: number;
   activeIndex: number;
 };
 
-const defaultStore: PaginationItems = {
+const defaultStore = {
   key: perPageKey,
   loading: true,
   updating: false,
@@ -58,7 +58,8 @@ const defaultStore: PaginationItems = {
   activeIndex: 0,
 };
 
-export type PaginationStore = PaginationMethods & Readable<PaginationItems>;
+export type PaginationStore<T> = PaginationMethods<T> &
+  Readable<PaginationItems<T>>;
 
 const setFirstOption = (options: string[] | number[]) => {
   const defaultOption = options[0];
@@ -81,10 +82,10 @@ export const getInitialPageSize = (
   }
 };
 
-export function createPaginationStore(
+export function createPaginationStore<T>(
   pageSizeOptions: string[] | number[] = options,
   defaultPageSize: string | number | undefined = undefined,
-): PaginationStore {
+): PaginationStore<T> {
   const initialPageSize = getInitialPageSize(pageSizeOptions, defaultPageSize);
   const paginationStore = writable({
     ...defaultStore,
@@ -120,10 +121,10 @@ export function createPaginationStore(
     },
   );
 
-  const setNextPageWithItems = (
+  const setNextPageWithItems = <T>(
     nextToken: string,
-    items: any[],
-    _store: PaginationItems,
+    items: T[],
+    _store: PaginationItems<T>,
   ) => {
     const currentIndex = _store.index;
     const store = {
@@ -158,7 +159,7 @@ export function createPaginationStore(
     return store;
   };
 
-  const setNextPage = (_store: PaginationItems) => {
+  const setNextPage = <T>(_store: PaginationItems<T>) => {
     const store = {
       ..._store,
       index: _store.index + 1,
@@ -174,7 +175,7 @@ export function createPaginationStore(
     return store;
   };
 
-  const setPreviousPage = (_store: PaginationItems) => {
+  const setPreviousPage = <T>(_store: PaginationItems<T>) => {
     const store = {
       ..._store,
       hasNext: true,
@@ -190,7 +191,7 @@ export function createPaginationStore(
     return store;
   };
 
-  const setNextRow = (_store: PaginationItems) => {
+  const setNextRow = <T>(_store: PaginationItems<T>) => {
     const store = { ..._store };
     const indexLength = store.indexData[store.index]?.items?.length ?? 0;
 
@@ -201,7 +202,7 @@ export function createPaginationStore(
     return store;
   };
 
-  const setPreviousRow = (_store: PaginationItems) => {
+  const setPreviousRow = <T>(_store: PaginationItems<T>) => {
     const store = { ..._store };
     const activeIndex = store.activeIndex >= 1 ? store.activeIndex - 1 : 0;
 
@@ -210,11 +211,14 @@ export function createPaginationStore(
     return store;
   };
 
-  const setActiveIndex = (_store: PaginationItems, activeIndex: number) => {
+  const setActiveIndex = <T>(
+    _store: PaginationItems<T>,
+    activeIndex: number,
+  ) => {
     return { ..._store, activeIndex };
   };
 
-  const resetPageSize = (_store: PaginationItems, pageSize) => {
+  const resetPageSize = <T>(_store: PaginationItems<T>, pageSize) => {
     return {
       ..._store,
       pageSize,
@@ -228,7 +232,7 @@ export function createPaginationStore(
 
   return {
     subscribe,
-    nextPageWithItems: (token: string, items: any[]) =>
+    nextPageWithItems: (token: string, items: T[]) =>
       update((store) => setNextPageWithItems(token, items, store)),
     nextPage: () => update((store) => setNextPage(store)),
     previousPage: () => update((store) => setPreviousPage(store)),
