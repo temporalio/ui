@@ -379,13 +379,9 @@
       <svelte:fragment slot="heading">
         Custom Search Attributes <span class="font-normal">(not in view)</span>
       </svelte:fragment>
-      {#each $availableSearchAttributes as searchAttribute, index}
-        <OrderableListItem
-          static
-          {index}
-          on:addItem={() => addColumn(searchAttribute)}
-        >
-          {searchAttribute}
+      {#each $availableSearchAttributes as { label }, index}
+        <OrderableListItem static {index} on:addItem={() => addColumn(label)}>
+          {label}
         </OrderableListItem>
       {:else}
         <OrderableListItem readonly
@@ -407,7 +403,7 @@
 
   .workflow-summary-table-wrapper.pinned {
     /* higher z-index ensures the box shadow displays over the background gradient on the table rows */
-    @apply shrink-0 overflow-x-hidden rounded-l-lg max-sm:max-w-[50%] max-md:max-w-[66%] max-2xl:max-w-[75%] max-md:overflow-x-scroll max-w-fit min-w-[40px] z-10;
+    @apply shrink-0 overflow-x-hidden rounded-l-lg max-md:max-w-[50%] max-md:overflow-x-scroll max-w-fit min-w-[40px] z-10;
 
     box-shadow: 2px 0 4px rgb(0 0 0 / 25%);
 
@@ -449,7 +445,7 @@
   }
 
   .workflow-summary-configurable-row {
-    @apply border-b border-primary cursor-pointer h-10 last-of-type:border-b-0;
+    @apply border-b border-primary cursor-pointer h-11 last-of-type:border-b-0;
   }
 
   .workflow-summary-configurable-row:hover {

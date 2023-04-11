@@ -1,13 +1,13 @@
 import { formatBytes } from '$lib/utilities/format-bytes';
 import { formatDate } from '$lib/utilities/format-date';
 import { formatDistance } from '$lib/utilities/format-time';
-import { derived } from 'svelte/store';
+import { derived, type Readable } from 'svelte/store';
 import { persistStore } from './persist-store';
 import { customSearchAttributes } from './search-attributes';
 
 export const MAX_PINNED_COLUMNS = 2;
 
-type WorkflowHeaderLabel =
+export type WorkflowHeaderLabel =
   | 'Status'
   | 'Workflow ID'
   | 'Run ID'
@@ -103,11 +103,17 @@ export const WORKFLOW_CELLS: Record<WorkflowHeaderLabel, WorkflowCell> = {
     data: ({ endTime }: WorkflowExecution, format: TimeFormat | string) =>
       endTime ? formatDate(endTime, format) : '',
   },
-  'History Length': { label: 'History Length', path: 'historyEvents' },
+  'History Length': {
+    label: 'History Length',
+    data: ({ historyEvents }) =>
+      parseInt(historyEvents) > 0 ? historyEvents : '',
+  },
   'History Size': {
     label: 'History Size',
     data: ({ historySizeBytes }: WorkflowExecution) =>
-      formatBytes(parseInt(historySizeBytes, 10)),
+      parseInt(historySizeBytes) > 0
+        ? formatBytes(parseInt(historySizeBytes, 10))
+        : '',
   },
   'Execution Time': {
     label: 'Execution Time',
@@ -116,7 +122,8 @@ export const WORKFLOW_CELLS: Record<WorkflowHeaderLabel, WorkflowCell> = {
   },
   'State Transitions': {
     label: 'State Transitions',
-    path: 'stateTransitionCount',
+    data: ({ stateTransitionCount }) =>
+      stateTransitionCount > 0 ? stateTransitionCount : '',
   },
   'Parent Namespace': { label: 'Parent Namespace', path: 'parentNamespaceId' },
   'Parent Workflow ID': { label: 'Parent Workflow ID', path: 'parent' },
@@ -128,7 +135,7 @@ const workflowTableColumns = persistStore(
   DEFAULT_COLUMNS,
 );
 
-const availableWorkflowColumns = derived(
+const availableWorkflowColumns: Readable<WorkflowHeader[]> = derived(
   [workflowTableColumns],
   ([$workflowTableColumns]) =>
     [...DEFAULT_COLUMNS, ...DEFAULT_AVAILABLE_COLUMNS].filter(
@@ -137,15 +144,20 @@ const availableWorkflowColumns = derived(
     ),
 );
 
-const availableSearchAttributes = derived(
+const availableSearchAttributes: Readable<WorkflowHeader[]> = derived(
   [customSearchAttributes, workflowTableColumns],
   ([$customSearchAttributes, $workflowTableColumns]) =>
-    Object.keys($customSearchAttributes).filter(
-      (searchAttribute) =>
-        !$workflowTableColumns.some(
-          (column) => column.label === searchAttribute,
-        ),
-    ),
+    Object.keys($customSearchAttributes)
+      .filter(
+        (searchAttribute) =>
+          !$workflowTableColumns.some(
+            (column) => column.label === searchAttribute,
+          ),
+      )
+      .map((key) => ({
+        label: key,
+        pinned: false,
+      })),
 );
 
 const reducer = (action: Action, state: State): State => {
