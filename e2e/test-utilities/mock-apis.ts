@@ -3,7 +3,6 @@ import { Page } from '@playwright/test';
 export const apiUrl = 'http://localhost:8233/api/v1';
 export const namespacesApi = apiUrl + '/namespaces**';
 
-const clusterApi = apiUrl + '/cluster**';
 const namespacesInfo = {
   namespaces: [
     {

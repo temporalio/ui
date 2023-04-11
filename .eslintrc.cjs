@@ -43,5 +43,13 @@ module.exports = {
         varsIgnorePattern: '^_',
       },
     ],
+    '@typescript-eslint/no-explicit-any': 'error',
+    '@typescript-eslint/array-type': 'error',
+    '@typescript-eslint/class-literal-property-style': 'error',
+    '@typescript-eslint/consistent-generic-constructors': 'error',
+    '@typescript-eslint/consistent-type-assertions': [
+      'error',
+      { assertionStyle: 'as' },
+    ],
   },
 };
