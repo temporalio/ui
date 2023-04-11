@@ -93,8 +93,8 @@ type WorkflowExecution = {
   taskQueue?: string;
   historyEvents: string;
   historySizeBytes: string;
-  searchAttributes?: { indexedFields: Record<string, DecodedPayload> };
-  memo?: { fields: Record<string, DecodedPayload> };
+  searchAttributes?: { indexedFields?: Record<string, DecodedPayload> };
+  memo?: { fields?: Record<string, DecodedPayload> };
   pendingChildren: PendingChildren[];
   pendingActivities: PendingActivity[];
   stateTransitionCount: string;
