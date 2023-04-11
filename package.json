@@ -81,7 +81,7 @@
     "@playwright/test": "^1.30.0",
     "@sveltejs/adapter-static": "^1.0.5",
     "@sveltejs/adapter-vercel": "^1.0.5",
-    "@sveltejs/kit": "1.15.1",
+    "@sveltejs/kit": "1.15.4",
     "@sveltejs/vite-plugin-svelte": "^2.0.2",
     "@temporalio/proto": "^1.6.0",
     "@temporalio/testing": "^1.6.0",
