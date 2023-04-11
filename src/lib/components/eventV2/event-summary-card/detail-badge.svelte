@@ -16,11 +16,10 @@
   import Link from '$lib/holocene/link.svelte';
   import Copyable from '$lib/components/copyable.svelte';
   import type { CombinedAttributes } from '$lib/utilities/format-event-attributes';
-  import Badge, { type BadgeType } from '$lib/holocene/badge.svelte';
+  import InfoPill from '$lib/holocene/info-pill.svelte';
 
   export let key: string;
   export let value: string | Record<string, unknown>;
-  export let badge: BadgeType | undefined = undefined;
   export let attributes: CombinedAttributes;
   export let primary: boolean = false;
 
@@ -32,8 +31,7 @@
     class="flex h-auto items-center justify-between gap-1"
     class:cell={!primary}
   >
-    {#if !primary}<p class="text-[12px]">{format(key)}</p>{/if}
-    <Badge type={badge ?? 'beta'}>
+    <InfoPill label={format(key)}>
       {#if shouldDisplayAsExecutionLink(key)}
         <Copyable
           content={value}
@@ -74,12 +72,6 @@
           {value}
         </p>
       {/if}
-    </Badge>
+    </InfoPill>
   </div>
 {/if}
-
-<style lang="postcss">
-  .cell {
-    @apply border-b-2 border-gray-500;
-  }
-</style>

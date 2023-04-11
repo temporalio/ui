@@ -91,7 +91,7 @@ export const eventGroupDisplayName = (event: IterableEvent) => {
   )
     return 'Workflow';
 
-  if (isTimerStartedEvent(singleEvent)) return 'Timer Started';
+  if (isTimerStartedEvent(singleEvent)) return 'Started';
 
   return singleEvent?.classification ?? singleEvent?.name;
 };
@@ -119,11 +119,11 @@ export const getPrimaryEventGroupDetails = (
     if (started) {
       const startedDetails = getPrimaryEventDetails(started);
       return [
-        { ...startedDetails, badge: 'alpha' },
-        { ...scheduledDetails, badge: 'alpha' },
+        { ...startedDetails, badge: 'gray' },
+        { ...scheduledDetails, badge: 'gray' },
       ];
     } else {
-      return [{ ...scheduledDetails, badge: 'alpha' }];
+      return [{ ...scheduledDetails, badge: 'gray' }];
     }
   }
 

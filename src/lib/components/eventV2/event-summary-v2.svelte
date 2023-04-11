@@ -61,6 +61,7 @@
 <div class="flex w-full flex-col gap-0">
   {#if firstEvent}
     <EventGroupSummaryCard
+      initial
       event={firstEvent}
       events={currentEvents}
       {firstEvent}

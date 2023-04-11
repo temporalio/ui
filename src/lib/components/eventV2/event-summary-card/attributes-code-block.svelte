@@ -9,7 +9,7 @@
   $: payloadAttributes = getAttributePayloads(event.attributes);
 </script>
 
-<div class="overflow-x-hidden bg-gray-900">
+<div class="overflow-x-hidden bg-gray-900 rounded-bxl">
   {#each payloadAttributes as attribute}
     {@const isFailure = attribute.key === 'failure'}
     <div class="my-0">

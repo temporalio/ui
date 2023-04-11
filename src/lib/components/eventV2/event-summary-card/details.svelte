@@ -36,7 +36,7 @@
     {/each}
   </div>
 {:else if secondaryEvents.length}
-  <div class="flex flex-col gap-1" class:secondary={!primary}>
+  <div class="flex flex-row flex-wrap gap-4" class:secondary={!primary}>
     {#each secondaryEvents as [key, value] (key)}
       <DetailBadge {key} {value} {attributes} {primary} />
     {/each}

@@ -9,6 +9,7 @@
   export let event: IterableEvent;
   export let expanded = false;
   export let showClassification = false;
+  export let hasGroupEvents = false;
 
   $: initialEvent = isEventGroup(event) ? event.initialEvent : event;
   $: lastEvent = isEventGroup(event) ? event.lastEvent : event;
@@ -26,9 +27,12 @@
       {#if showClassification}
         <EventClassification classification={lastEvent.classification} />
       {/if}
+      {#if hasGroupEvents}
+        <Icon name="relationship" class="scale-75" />
+      {/if}
     </div>
   </div>
   <div class="flex items-center justify-end gap-2 md:justify-start">
-    <Details {event} primary {expanded} />
+    <Details {event} {expanded} primary />
   </div>
 </div>

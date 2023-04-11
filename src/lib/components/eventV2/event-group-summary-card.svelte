@@ -11,10 +11,6 @@
   export let last = false;
   export let expandAll: boolean;
 
-  $: {
-    console.log('Expand all: ', expandAll);
-  }
-
   $: hasGroupEvents = isEventGroup(event) && event?.eventList?.length > 1;
   $: showClassification =
     isEventGroup(event) && hasGroupEvents && event.lastEvent?.classification;
@@ -29,7 +25,12 @@
   let:expanded
   {expandAll}
 >
-  <Collapsed {event} expanded={expandAll || expanded} {showClassification} />
+  <Collapsed
+    {event}
+    expanded={expandAll || expanded}
+    {showClassification}
+    {hasGroupEvents}
+  />
   {#if expandAll || expanded}
     <Expanded {event} {events} {firstEvent} />
   {/if}

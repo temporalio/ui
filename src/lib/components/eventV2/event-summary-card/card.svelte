@@ -14,8 +14,10 @@
   export let final = false;
   export let pending = false;
   export let expandAll = false;
+  export let subGroup = false;
 
   $: expanded = expandAll || false;
+  $: hasSubGroup = isEventGroup(event) && event?.subGroupList?.length;
 
   const onLinkClick = () => {
     expanded = !expanded;
@@ -34,7 +36,11 @@
     removeHead={initial}
     {pending}
   />
-  <div class="h-full w-full overflow-hidden flex flex-col gap-0">
+  <div
+    class="h-full w-full overflow-hidden flex flex-col"
+    class:mb-1={hasSubGroup || initial}
+    class:mt-1={!hasSubGroup}
+  >
     <div class="h-full w-full">
       <div
         class="card {$$props.class}"
@@ -56,7 +62,7 @@
         </div>
       </div>
       {#if isEventGroup(event) && event?.subGroupList?.length}
-        <div class="flex w-full flex-col">
+        <div class="flex w-full flex-col pb-2">
           {#each event.subGroupList as group, index}
             <EventGroupSummaryCard
               event={group}
@@ -75,27 +81,19 @@
 
 <style lang="postcss">
   .card {
-    @apply relative grow select-none border-2 border-gray-900 bg-white p-0;
+    @apply relative grow select-none bg-white p-0 border-2 border-gray-900;
   }
 
   .row {
-    @apply flex-wrap items-center rounded-xl border-gray-900 px-4 py-2 text-sm no-underline xl:text-base;
+    @apply flex-wrap items-center px-4 py-2 text-sm no-underline xl:text-base;
   }
 
   .pending {
     @apply border-dashed;
   }
 
-  .expanded {
-    @apply bg-blue-50;
-  }
-
   .unround-top {
-    @apply rounded-t-none pt-0;
-  }
-
-  .unround-bottom {
-    @apply rounded-b-none;
+    @apply pt-0;
   }
 
   .shadow {
