@@ -25,12 +25,12 @@ const workflows = [
   runningWorkflow,
   terminatedWorkflow,
   timedOutWorkflow,
-];
+] as unknown as WorkflowExecutionAPIResponse[];
 
 describe('toWorkflowExecution', () => {
   for (const workflow of workflows) {
     it(`should match the snapshot for ${workflow.workflowExecutionInfo.status} workflows`, () => {
-      expect(toWorkflowExecution(workflow as any)).toMatchSnapshot();
+      expect(toWorkflowExecution(workflow)).toMatchSnapshot();
     });
   }
 });
