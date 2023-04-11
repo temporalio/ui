@@ -5,13 +5,13 @@
   import Menu from '$lib/holocene/primitives/menu/menu.svelte';
   import type { IconName } from './icon/paths';
 
-  export let label: string = '';
+  export let label = '';
   export let icon: IconName | undefined = undefined;
   export let id: string;
-  export let disabled: boolean = false;
+  export let disabled = false;
   export let position: 'left' | 'right' = 'left';
 
-  let show: boolean = false;
+  let show = false;
 </script>
 
 <MenuContainer class={$$props.class}>

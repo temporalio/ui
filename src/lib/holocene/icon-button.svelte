@@ -12,8 +12,8 @@
   }
 
   export let icon: IconName = null;
-  export let classes: string = '';
-  export let hoverable: boolean = false;
+  export let classes = '';
+  export let hoverable = false;
 </script>
 
 <button

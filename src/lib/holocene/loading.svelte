@@ -1,7 +1,7 @@
 <script lang="ts">
   import Logo from '$lib/vendor/Temporal_Logo_Animation.gif';
 
-  export let title: string = 'Loading…';
+  export let title = 'Loading…';
 </script>
 
 <div class="my-12 flex flex-col items-center justify-start {$$props.class}">

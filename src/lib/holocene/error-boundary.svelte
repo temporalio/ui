@@ -5,7 +5,7 @@
   export let error = null;
   export let onError = null;
 
-  let theError: NetworkError | any;
+  let theError: NetworkError | unknown;
 
   $: {
     if (error && $error) {

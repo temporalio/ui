@@ -6,7 +6,7 @@
   import Button from './button.svelte';
   import type { IconName } from './icon/paths';
 
-  export let label: string = '';
+  export let label = '';
   export let icon: IconName | undefined = undefined;
   export let id: string;
   export let variant:
@@ -16,12 +16,12 @@
     | 'login'
     | 'link' = 'primary';
   export let thin = false;
-  export let disabled: boolean = false;
+  export let disabled = false;
   export let position: 'left' | 'right' = 'left';
   export let href = '';
-  export let primaryActionDisabled: boolean = false;
+  export let primaryActionDisabled = false;
 
-  let show: boolean = false;
+  let show = false;
 </script>
 
 <MenuContainer class={$$props.class}>

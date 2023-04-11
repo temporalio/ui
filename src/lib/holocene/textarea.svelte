@@ -1,9 +1,9 @@
 <script lang="ts">
-  export let disabled: boolean = false;
-  export let error: string = '';
-  export let isValid: boolean = true;
-  export let placeholder: string = '';
-  export let rows: number = 5;
+  export let disabled = false;
+  export let error = '';
+  export let isValid = true;
+  export let placeholder = '';
+  export let rows = 5;
   export let spellcheck: boolean = null;
   export let value: string;
 </script>
