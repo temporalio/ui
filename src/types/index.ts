@@ -138,7 +138,6 @@ export type WorkflowExecutionInfo =
 export type Payload = temporal.api.common.v1.IPayload;
 export type Payloads = temporal.api.common.v1.IPayloads;
 export type WorkflowExecutionInput = temporal.api.common.v1.IWorkflowExecution;
-export type WorkflowSearchAttributes = temporal.api.common.v1.ISearchAttributes;
 export type Memo = temporal.api.common.v1.IMemo;
 export type Header = temporal.api.common.v1.IHeader;
 

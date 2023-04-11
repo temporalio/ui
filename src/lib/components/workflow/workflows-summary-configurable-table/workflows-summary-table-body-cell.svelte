@@ -89,7 +89,7 @@
 {:else if isCustomSearchAttribute(label) && workflowIncludesSearchAttribute(workflow, label)}
   {@const content = workflow.searchAttributes.indexedFields[label]}
   <td class="workflows-summary-table-body-cell">
-    {#if $customSearchAttributes[label] === 'Datetime'}
+    {#if $customSearchAttributes[label] === 'Datetime' && typeof content === 'string'}
       {formatDate(content, $timeFormat)}
     {:else if $customSearchAttributes[label] === 'Bool'}
       <Badge>{content}</Badge>
