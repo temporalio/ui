@@ -5,14 +5,14 @@
   export let error = null;
   export let onError = null;
 
-  let theError: NetworkError | unknown;
+  let theError: NetworkError;
 
   $: {
     if (error && $error) {
       theError = error;
     }
     if (networkError && $networkError) {
-      theError = networkError;
+      theError = $networkError;
     }
 
     if (onError && theError) {
@@ -27,8 +27,8 @@
   }
 </script>
 
-{#if theError && $theError}
-  <Error on:clearError={clearError} error={$theError} />
+{#if theError}
+  <Error on:clearError={clearError} error={theError} />
 {:else}
   <slot />
 {/if}
