@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let width: string = '100%';
+  export let width = '100%';
 </script>
 
 <div class="meter">

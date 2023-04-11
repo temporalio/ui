@@ -3,7 +3,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
 
-  export let text: string = '';
+  export let text = '';
   export let icon: IconName = null;
   /** bottom center of the tooltip aligned to the top center of the wrapper */
   export let top = false;

@@ -3,7 +3,7 @@
   import type { IconName } from '$lib/holocene/icon/paths';
   import Badge from '$lib/holocene/badge.svelte';
 
-  export let disabled: boolean = false;
+  export let disabled = false;
   export let variant:
     | 'primary'
     | 'secondary'
@@ -11,22 +11,22 @@
     | 'login'
     | 'link' = 'primary';
 
-  export let thin: boolean = false;
-  export let loading: boolean = false;
+  export let thin = false;
+  export let loading = false;
   export let href: string = null;
   export let target: '_self' | '_external' = '_self';
-  export let active: boolean = false;
-  export let large: boolean = false;
+  export let active = false;
+  export let large = false;
   export let as: 'button' | 'anchor' = href ? 'anchor' : 'button';
   export let icon: IconName = null;
   export let iconClass: string = null;
   export let classes: string = $$props.class;
   export let testId: string = $$props.testId;
-  export let count: number = 0;
-  export let type: string = 'button';
-  export let unround: boolean = false;
-  export let unroundRight: boolean = false;
-  export let unroundLeft: boolean = false;
+  export let count = 0;
+  export let type = 'button';
+  export let unround = false;
+  export let unroundRight = false;
+  export let unroundLeft = false;
   export let id: string = null;
 </script>
 

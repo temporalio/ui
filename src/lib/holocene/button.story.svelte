@@ -3,9 +3,9 @@
   import { logEvent } from 'histoire/client';
   import Button from './button.svelte';
 
-  let disabled: boolean = false;
-  let thin: boolean = false;
-  let loading: boolean = false;
+  let disabled = false;
+  let thin = false;
+  let loading = false;
 
   export let Hst: HST;
 </script>

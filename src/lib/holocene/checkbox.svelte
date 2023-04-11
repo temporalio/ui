@@ -16,13 +16,13 @@
     'data-testid'?: string;
   }
 
-  export let id: string = '';
+  export let id = '';
   export let checked = false;
-  export let label: string = '';
+  export let label = '';
   export let onDark = false;
   export let indeterminate = false;
   export let disabled = false;
-  export let hoverable: boolean = false;
+  export let hoverable = false;
   export let value: T = undefined;
   export let group: T[] = undefined;
 

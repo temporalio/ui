@@ -16,14 +16,14 @@
     hightlightNav?: boolean;
   }
 
-  export let hideConfirm: boolean = false;
-  export let confirmText: string = 'Confirm';
-  export let cancelText: string = 'Cancel';
+  export let hideConfirm = false;
+  export let confirmText = 'Confirm';
+  export let cancelText = 'Cancel';
   export let confirmType: ComponentProps<Button>['variant'] = 'primary';
-  export let confirmDisabled: boolean = false;
-  export let large: boolean = false;
-  export let loading: boolean = false;
-  export let hightlightNav: boolean = false;
+  export let confirmDisabled = false;
+  export let large = false;
+  export let loading = false;
+  export let hightlightNav = false;
 
   let error: string;
 
@@ -38,11 +38,11 @@
     error = err;
   };
 
-  let className: string = '';
+  let className = '';
   export { className as class };
 
   let modalElement: HTMLDialogElement;
-  let hasInput: boolean = false;
+  let hasInput = false;
   $: {
     if (modalElement) {
       hasInput = modalElement.querySelector('input') !== null;

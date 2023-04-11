@@ -24,7 +24,7 @@
   export let label = '';
   export let placeholder = '';
   export let icon: IconName = null;
-  export let copyable: boolean = false;
+  export let copyable = false;
   export let theme: 'dark' | 'light' = 'light';
   export let options: string[];
   export let onOptionClick: (option: string) => void;
