@@ -9,12 +9,19 @@ module.exports = {
   plugins: ['svelte3', '@typescript-eslint', 'vitest'],
   ignorePatterns: ['*.cjs', 'prism.js', '/server'],
   overrides: [
-    // This was previously being overwritten by a duplicate and will cause the build to fail.
     {
+      /**
+       * Right now, we only lint Holocene components due to a previous
+       * configuration issue where we *weren't* linting Svelte components.
+       * Currently, if you try to lint all components, the build *will* fail.
+       * So, we're selectively adding to this list until we get all
+       * components to pass linting.
+       */
       files: ['src/lib/holocene/*.svelte'],
       processor: 'svelte3/svelte3',
       /**
        * Temporary fix, see the following:
+       *
        * - https://github.com/sveltejs/kit/issues/5125
        * - https://stackoverflow.com/questions/75578842/eslint-complains-that-sveltekits-app-namespace-is-not-defined
        */
