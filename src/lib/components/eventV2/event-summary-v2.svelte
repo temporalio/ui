@@ -1,16 +1,14 @@
 <script lang="ts">
-  import { page } from '$app/stores';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { eventHistory } from '$lib/stores/events';
 
-  import { groupEvents, isEventGroup } from '$lib/models/event-groups';
-  import EventGroupSummaryCard from './event-group-summary-card.svelte';
+  import { groupEvents } from '$lib/models/event-groups';
+  import EventGroupSummaryCard from './event-summary-card/card.svelte';
   import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { getStackTrace } from '$lib/utilities/get-single-attribute-for-event';
   import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { importEvents } from '$lib/stores/import-events';
   import RunningCard from './running-card.svelte';
-  import FinalEventCard from './final-event-card.svelte';
   import PendingActivityCard from './pending-activity-card.svelte';
 
   export let fullHistory: CommonHistoryEvent[] = [];
@@ -72,12 +70,11 @@
     <EventGroupSummaryCard {event} events={groups} {firstEvent} {expandAll} />
   {/each}
   {#if uniqueLastEvent}
-    <FinalEventCard
+    <EventGroupSummaryCard
       event={lastEvent}
       events={currentEvents}
-      content={results}
-      {stackTrace}
       {firstEvent}
+      {expandAll}
     />
   {/if}
   {#each $workflowRun?.workflow?.pendingActivities ?? [] as activity}

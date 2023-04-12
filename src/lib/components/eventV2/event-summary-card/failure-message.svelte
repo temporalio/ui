@@ -11,7 +11,14 @@
   let stackTrace = getStackTrace(failure);
 </script>
 
-<Alert icon="warning" {intent} {title} role="status" regular={false}>
+<Alert
+  icon="warning"
+  {intent}
+  {title}
+  role="status"
+  regular={false}
+  class="w-full"
+>
   <div>
     {failure?.cause?.cause?.message ??
       failure?.cause?.message ??

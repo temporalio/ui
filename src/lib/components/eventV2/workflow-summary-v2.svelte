@@ -11,64 +11,78 @@
   import Accordion from '$lib/holocene/accordion.svelte';
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
   import { formatDistanceAbbreviated } from '$lib/utilities/format-time';
+  import Card from '$lib/holocene/card.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
-  $: ({ workflow } = $workflowRun);
+  $: ({ workflow, workers } = $workflowRun);
 </script>
 
-<section>
-  <Accordion
-    title="Summary"
-    icon="summary"
-    open={$workflowSummaryViewOpen}
-    onToggle={() => {
-      $workflowSummaryViewOpen = !$workflowSummaryViewOpen;
-    }}
-  >
-    <div class="flex flex-col gap-4">
-      <div class="col-span-1 md:col-span-2">
-        <h3 class="font-medium">Workflow Type</h3>
-        <div class="h-0.5 rounded-full bg-gray-900" />
-        <WorkflowDetail content={workflow?.name} copyable />
-        <WorkflowDetail title="Run ID" content={workflow?.runId} copyable />
-      </div>
-      <div class="col-span-1">
-        <h3 class="font-medium">Task Queue</h3>
-        <div class="h-0.5 rounded-full bg-gray-900" />
-        <WorkflowDetail
-          content={workflow?.taskQueue}
-          href={routeForWorkers({
-            namespace: $page.params.namespace,
-            workflow: workflow?.id,
-            run: workflow?.runId,
+<Card class="flex flex-col gap-2 w-full">
+  <h1 class="flex gap-1 items-center text-xl">
+    <Icon name="summary" />Summary
+  </h1>
+  <div class="grid grid-cols-5 gap-2">
+    <Card
+      class="bg-gray-900 text-white flex flex-col gap-0 justify-end items-end text-right"
+    >
+      <h3 class="text-purple-300 text-base">{workflow.id}</h3>
+      <p>Execution Id</p>
+    </Card>
+    <Card
+      class="bg-gray-900 text-white flex flex-col gap-0 justify-end items-end text-right"
+    >
+      <h3 class="text-purple-300 text-base">{workflow.runId}</h3>
+      <p>Run Id</p>
+    </Card>
+
+    <Card
+      class="bg-gray-900 text-white flex flex-col gap-0 justify-end items-end text-right"
+    >
+      <h3 class="text-purple-300 text-4xl">{workers.pollers.length}</h3>
+      <p>Workers</p>
+    </Card>
+    <Card
+      class="bg-gray-900 text-white flex flex-col gap-0 justify-end items-end text-right"
+    >
+      <h3 class="text-purple-300 text-xl">{workflow?.taskQueue}</h3>
+      <p>Task Queue</p>
+    </Card>
+    <Card
+      class="bg-gray-900 text-white flex flex-col gap-0 justify-end items-end text-right"
+    >
+      <h3 class="text-purple-300 text-4xl">{workflow?.stateTransitionCount}</h3>
+      <p>State Transitions</p>
+    </Card>
+  </div>
+  <div class="grid grid-cols-5 gap-2">
+    <Card
+      class="bg-gray-900 text-white flex flex-col gap-0 justify-end items-end text-right"
+    >
+      <h3 class="text-purple-300 text-xl">
+        {formatDate(workflow?.startTime, $timeFormat)}
+      </h3>
+      <p>Start Time</p>
+    </Card>
+    {#if !workflow?.isRunning}
+      <Card
+        class="bg-gray-900 text-white flex flex-col gap-0 justify-end items-end text-right"
+      >
+        <h3 class="text-purple-300 text-xl">
+          {formatDate(workflow?.endTime, $timeFormat)}
+        </h3>
+        <p>Close Time</p>
+      </Card>
+      <Card
+        class="bg-gray-900 text-white flex flex-col gap-0 justify-end items-end"
+      >
+        <h3 class="text-purple-300 text-xl">
+          {formatDistanceAbbreviated({
+            start: workflow?.startTime,
+            end: workflow?.endTime,
           })}
-          copyable
-        />
-        <WorkflowDetail
-          title="State Transitions"
-          content={workflow?.stateTransitionCount}
-        />
-      </div>
-      <div class="col-span-1">
-        <h3 class="font-medium">Start & Close Time</h3>
-        <div class="h-0.5 rounded-full bg-gray-900" />
-        <WorkflowDetail
-          title="Start Time"
-          content={formatDate(workflow?.startTime, $timeFormat)}
-        />
-        {#if !workflow?.isRunning}
-          <WorkflowDetail
-            title="Close Time"
-            content={formatDate(workflow?.endTime, $timeFormat)}
-          />
-          <WorkflowDetail
-            title="Duration"
-            content={formatDistanceAbbreviated({
-              start: workflow?.startTime,
-              end: workflow?.endTime,
-            })}
-          />
-        {/if}
-      </div>
-    </div>
-  </Accordion>
-</section>
+        </h3>
+        <p>Duration</p>
+      </Card>
+    {/if}
+  </div>
+</Card>

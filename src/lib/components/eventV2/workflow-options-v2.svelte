@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
   import Accordion from '$lib/holocene/accordion.svelte';
   import Button from '$lib/holocene/button.svelte';
+  import Card from '$lib/holocene/card.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { exportHistory } from '$lib/utilities/export-history';
@@ -14,47 +15,47 @@
   export let onAdvancedClick: () => void;
 </script>
 
-<section>
-  <Accordion title="Options" icon="settings" readOnly stackSummary>
-    <div slot="summary" class="flex flex-col gap-4">
-      <div class="flex flex-row items-center gap-4">
-        <Button variant="secondary">
-          <EventDateFilter compact={false} hideSort />
-        </Button>
-        <Button
-          icon="download"
-          data-testid="download"
-          on:click={() =>
-            exportHistory({
-              namespace: $page.params.namespace,
-              workflowId: $workflowRun.workflow?.id,
-              runId: $workflowRun.workflow?.runId,
-            })}>Download</Button
-        >
-      </div>
-      <div class="flex flex-row items-center gap-4">
-        <label
-          for="workflow-tasks"
-          class="flex items-center gap-2 text-center font-secondary text-sm"
-          >Show All Events
-          <ToggleSwitch
-            id="workflow-tasks"
-            checked={showWorkflowTasks}
-            on:change={onAdvancedClick}
-          />
-        </label>
-        <label
-          for="expand-all"
-          class="flex items-center gap-2 text-center font-secondary text-sm"
-          >Expand All
-          <ToggleSwitch
-            id="expand-all"
-            checked={expandAll}
-            on:change={onExpandClick}
-          />
-        </label>
+<Card>
+  <div class="flex flex-col gap-8 items-center justify-center">
+    <h1>Options</h1>
+    <div class="flex flex-row items-center gap-4">
+      <Button variant="secondary">
+        <EventDateFilter compact={false} hideSort />
+      </Button>
+      <Button
+        icon="download"
+        data-testid="download"
+        on:click={() =>
+          exportHistory({
+            namespace: $page.params.namespace,
+            workflowId: $workflowRun.workflow?.id,
+            runId: $workflowRun.workflow?.runId,
+          })}>Download</Button
+      >
+    </div>
+    <div class="flex flex-row items-center gap-4">
+      <label
+        for="workflow-tasks"
+        class="flex items-center gap-2 text-center font-secondary text-sm"
+        >Show All Events
+        <ToggleSwitch
+          id="workflow-tasks"
+          checked={showWorkflowTasks}
+          on:change={onAdvancedClick}
+        />
+      </label>
+      <label
+        for="expand-all"
+        class="flex items-center gap-2 text-center font-secondary text-sm"
+        >Expand All
+        <ToggleSwitch
+          id="expand-all"
+          checked={expandAll}
+          on:change={onExpandClick}
+        />
+      </label>
 
-        <!-- <label
+      <!-- <label
           for="non-completed-tasks"
           class="flex items-center gap-2 text-center font-secondary text-sm"
           >Show non-completed events only
@@ -64,7 +65,6 @@
             on:change={onDebugClick}
           />
         </label> -->
-      </div>
     </div>
-  </Accordion>
-</section>
+  </div>
+</Card>

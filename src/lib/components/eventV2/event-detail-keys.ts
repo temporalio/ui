@@ -91,9 +91,9 @@ export const eventGroupDisplayName = (event: IterableEvent) => {
   )
     return 'Workflow';
 
-  if (isTimerStartedEvent(singleEvent)) return 'Started';
+  // if (isTimerStartedEvent(singleEvent)) return 'Started';
 
-  return singleEvent?.classification ?? singleEvent?.name;
+  return singleEvent?.name;
 };
 
 export const getPrimaryIterableEventDetails = (

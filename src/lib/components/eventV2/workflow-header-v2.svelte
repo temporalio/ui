@@ -1,30 +1,87 @@
 <script lang="ts">
+  import { onDestroy, onMount } from 'svelte';
   import { fly } from 'svelte/transition';
 
+  import { autoRefreshWorkflow } from '$lib/stores/event-view';
   import { workflowsSearchParams } from '$lib/stores/workflows';
-  import { workflowRun } from '$lib/stores/workflow-run';
+  import { refresh, workflowRun } from '$lib/stores/workflow-run';
   import { eventHistory } from '$lib/stores/events';
 
   import {
     routeForEventHistory,
+    routeForEventHistoryV2,
+    routeForPendingActivities,
+    routeForStackTrace,
+    routeForWorkers,
+    routeForWorkflowQuery,
     routeForWorkflows,
   } from '$lib/utilities/route-for';
 
+  import Badge from '$lib/holocene/badge.svelte';
   import Copyable from '$lib/components/copyable.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import WorkflowActions from '$lib/components/workflow-actions.svelte';
+  import Tab from '$lib/holocene/tab.svelte';
+  import { page } from '$app/stores';
+  import { pathMatches } from '$lib/utilities/path-matches';
+  import AutoRefreshWorkflow from '$lib/components/auto-refresh-workflow.svelte';
   import Alert from '$lib/holocene/alert.svelte';
   import { isCancelInProgress } from '$lib/utilities/cancel-in-progress';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { has } from '$lib/utilities/has';
   import Link from '$lib/holocene/link.svelte';
+  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
+  import { featureFlags } from '$lib/stores/feature-flags';
 
   export let namespace: string;
 
-  $: ({ workflow } = $workflowRun);
+  $: ({ workflow, workers } = $workflowRun);
+
+  let refreshInterval;
+  const refreshRate = 15000;
+
+  $: routeParameters = {
+    namespace,
+    workflow: workflow?.id,
+    run: workflow?.runId,
+  };
 
   $: isRunning = $workflowRun?.workflow?.isRunning;
+  $: activitiesCanceled = ['Terminated', 'TimedOut', 'Canceled'].includes(
+    $workflowRun.workflow?.status,
+  );
+
+  onMount(() => {
+    if (isRunning && $autoRefreshWorkflow === 'on') {
+      // Auto-refresh of 15 seconds if turned on
+      clearInterval(refreshInterval);
+      refreshInterval = setInterval(() => ($refresh = Date.now()), refreshRate);
+    }
+  });
+
+  $: {
+    if (!isRunning) {
+      // Stop refresh if workflow is no longer running
+      clearInterval(refreshInterval);
+    }
+  }
+
+  const onRefreshChange = () => {
+    if ($autoRefreshWorkflow === 'on') {
+      $autoRefreshWorkflow = 'off';
+      clearInterval(refreshInterval);
+    } else {
+      $refresh = Date.now();
+      $autoRefreshWorkflow = 'on';
+      clearInterval(refreshInterval);
+      refreshInterval = setInterval(() => ($refresh = Date.now()), refreshRate);
+    }
+  };
+
+  onDestroy(() => {
+    clearInterval(refreshInterval);
+  });
 
   $: cancelInProgress = isCancelInProgress(
     $workflowRun?.workflow?.status,
@@ -46,7 +103,7 @@
       <Icon name="chevron-left" class="inline" />Back to Workflows
     </a>
     <a
-      href={`${routeForEventHistory({
+      href={`${routeForEventHistoryV2({
         namespace,
         workflow: workflow.id,
         run: workflow.runId,
@@ -54,11 +111,11 @@
       data-testid="history-v2"
       class="back-to-workflows"
     >
-      Switch to v1 Workflow UI
+      Switch to v2 Workflow UI
     </a>
   </div>
   <div
-    class="flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
+    class="mb-8 flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
   >
     <div
       class="flex w-full items-center justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
@@ -80,6 +137,7 @@
       <div
         class="flex flex-col items-center justify-center gap-4 whitespace-nowrap sm:flex-row lg:justify-end"
       >
+        <AutoRefreshWorkflow onChange={onRefreshChange} />
         <WorkflowActions {cancelInProgress} {workflow} {namespace} />
       </div>
     {/if}
@@ -119,6 +177,64 @@
       </Alert>
     </div>
   {/if}
+  <nav class="flex flex-wrap gap-6" aria-label="workflow detail">
+    <Tab
+      label="History"
+      href={routeForEventHistoryV2({
+        ...routeParameters,
+      })}
+      testId="history-tab"
+      active={pathMatches(
+        $page.url.pathname,
+        routeForEventHistoryV2({
+          ...routeParameters,
+        }),
+      )}
+    >
+      <Badge type="blue" class="px-2 py-0">{workflow.historyEvents}</Badge>
+    </Tab>
+    <Tab
+      label="Workers"
+      href={routeForWorkers(routeParameters)}
+      testId="workers-tab"
+      active={pathMatches($page.url.pathname, routeForWorkers(routeParameters))}
+    >
+      <Badge type="blue" class="px-2 py-0">{workers?.pollers?.length}</Badge>
+    </Tab>
+    <Tab
+      label="Pending Activities"
+      href={routeForPendingActivities(routeParameters)}
+      testId="pending-activities-tab"
+      active={pathMatches(
+        $page.url.pathname,
+        routeForPendingActivities(routeParameters),
+      )}
+    >
+      <Badge type={activitiesCanceled ? 'warning' : 'blue'} class="px-2 py-0">
+        {#if activitiesCanceled}<Icon name="canceled" width={20} height={20} />
+        {/if}
+        {workflow.pendingActivities?.length}
+      </Badge>
+    </Tab>
+    <Tab
+      label="Stack Trace"
+      href={routeForStackTrace(routeParameters)}
+      testId="stack-trace-tab"
+      active={pathMatches(
+        $page.url.pathname,
+        routeForStackTrace(routeParameters),
+      )}
+    />
+    <Tab
+      label="Queries"
+      href={routeForWorkflowQuery(routeParameters)}
+      testId="queries-tab"
+      active={pathMatches(
+        $page.url.pathname,
+        routeForWorkflowQuery(routeParameters),
+      )}
+    />
+  </nav>
 </header>
 
 <style lang="postcss">

@@ -9,27 +9,27 @@
   $: payloadAttributes = getAttributePayloads(event.attributes);
 </script>
 
-<div class="overflow-x-hidden bg-gray-900 rounded-bxl">
+<div
+  class="overflow-x-hidden w-1/2 bg-gray-900 rounded-bxl flex flex-row gap-2"
+>
   {#each payloadAttributes as attribute}
     {@const isFailure = attribute.key === 'failure'}
-    <div class="my-0">
-      {#if isFailure}
-        <FailureMessage failure={attribute.value} />
-      {:else}
-        {@const codeBlockValue = getCodeBlockValueWithoutNullPayloads(
-          attribute.value,
-        )}
-        {#if codeBlockValue}
-          <div class="flex flex-col">
-            <CodeBlock
-              inline
-              title={format(attribute.key)}
-              content={codeBlockValue}
-            />
-          </div>
-        {/if}
+    {#if isFailure}
+      <FailureMessage failure={attribute.value} />
+    {:else}
+      {@const codeBlockValue = getCodeBlockValueWithoutNullPayloads(
+        attribute.value,
+      )}
+      {#if codeBlockValue}
+        <div class="grow overflow-auto">
+          <CodeBlock
+            inline
+            title={format(attribute.key)}
+            content={codeBlockValue}
+          />
+        </div>
       {/if}
-    </div>
+    {/if}
   {/each}
 </div>
 

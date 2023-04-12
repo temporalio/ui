@@ -1,7 +1,7 @@
 <script lang="ts">
   import { isEventGroup } from '$lib/models/event-groups';
   import Details from './details.svelte';
-  import EventGroupSummaryCard from '../event-group-summary-card.svelte';
+  import EventGroupSummaryCard from './card.svelte';
 
   export let event: IterableEvent;
   export let events: IterableEvent[];

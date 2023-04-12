@@ -31,8 +31,6 @@
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { has } from '$lib/utilities/has';
   import Link from '$lib/holocene/link.svelte';
-  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
-  import { featureFlags } from '$lib/stores/feature-flags';
 
   export let namespace: string;
 

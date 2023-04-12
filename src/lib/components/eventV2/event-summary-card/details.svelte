@@ -1,5 +1,6 @@
 <script lang="ts">
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
+  import { fade, fly } from 'svelte/transition';
 
   import DetailBadge from './detail-badge.svelte';
   import { getPrimaryIterableEventDetails } from '../event-detail-keys';
@@ -36,7 +37,11 @@
     {/each}
   </div>
 {:else if secondaryEvents.length}
-  <div class="flex flex-row flex-wrap gap-4" class:secondary={!primary}>
+  <div
+    class="grid grid-cols-2 gap-1 bg-white border border-gray-900 p-4"
+    class:secondary={!primary}
+    in:fly={{ x: -100, duration: 200 }}
+  >
     {#each secondaryEvents as [key, value] (key)}
       <DetailBadge {key} {value} {attributes} {primary} />
     {/each}

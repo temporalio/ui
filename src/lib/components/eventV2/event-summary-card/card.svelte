@@ -1,20 +1,19 @@
 <script lang="ts">
   import { isEventGroup } from '$lib/models/event-groups';
-  import EventGroupSummaryCard from '../event-group-summary-card.svelte';
   import LineDot from './line-dot.svelte';
   import AttributesCodeBlock from './attributes-code-block.svelte';
+  import Expanded from './expanded.svelte';
+  import Collapsed from './collapsed.svelte';
 
   export let event: IterableEvent;
   export let events: IterableEvent[];
   export let firstEvent: IterableEvent | undefined = undefined;
 
-  export let thick = false;
   export let initial = false;
   export let last = false;
   export let final = false;
   export let pending = false;
   export let expandAll = false;
-  export let subGroup = false;
 
   $: expanded = expandAll || false;
   $: hasSubGroup = isEventGroup(event) && event?.subGroupList?.length;
@@ -25,9 +24,11 @@
 
   $: initialEvent = isEventGroup(event) ? event.initialEvent : event;
   $: hasGroupEvents = isEventGroup(event) && event?.eventList?.length > 1;
+  $: showClassification =
+    isEventGroup(event) && hasGroupEvents && event.lastEvent?.classification;
 </script>
 
-<div class="flex gap-1">
+<div class="flex gap-0">
   <LineDot
     {event}
     {firstEvent}
@@ -36,18 +37,14 @@
     removeHead={initial}
     {pending}
   />
-  <div
-    class="h-full w-full overflow-hidden flex flex-col"
-    class:mb-1={hasSubGroup || initial}
-    class:mt-1={!hasSubGroup}
-  >
-    <div class="h-full w-full">
+  <div class="w-full overflow-hidden">
+    <div class="flex gap-0 my-[2px]">
       <div
         class="card {$$props.class}"
         class:unround-top={initial}
         class:unround-bottom={final}
         class:pending
-        class:expanded={thick && expanded}
+        class:expanded={hasSubGroup && expanded}
       >
         <div
           class="row"
@@ -58,30 +55,38 @@
           on:click|stopPropagation={onLinkClick}
           on:keydown={onLinkClick}
         >
-          <slot {expanded} />
+          <Collapsed
+            {event}
+            expanded={expandAll || expanded}
+            {showClassification}
+            {hasGroupEvents}
+          />
         </div>
       </div>
-      {#if isEventGroup(event) && event?.subGroupList?.length}
-        <div class="flex w-full flex-col pb-2">
-          {#each event.subGroupList as group, index}
-            <EventGroupSummaryCard
-              event={group}
-              {events}
-              {firstEvent}
-              {expandAll}
-              last={index === event.subGroupList.length - 1}
-            />
-          {/each}
-        </div>
-      {/if}
+      <AttributesCodeBlock event={initialEvent} />
     </div>
-    <AttributesCodeBlock event={initialEvent} />
+    {#if expandAll || expanded}
+      <Expanded {event} {events} {firstEvent} />
+    {/if}
   </div>
 </div>
+{#if isEventGroup(event) && event?.subGroupList?.length}
+  <div class="flex w-full flex-col pl-24">
+    {#each event.subGroupList as group, index}
+      <svelte:self
+        event={group}
+        {events}
+        {firstEvent}
+        {expandAll}
+        last={index === event.subGroupList.length - 1}
+      />
+    {/each}
+  </div>
+{/if}
 
 <style lang="postcss">
   .card {
-    @apply relative grow select-none bg-white p-0 border-2 border-gray-900;
+    @apply relative w-1/2 select-none bg-white border border-gray-900;
   }
 
   .row {

@@ -85,31 +85,22 @@
   title={`Workflow History | ${workflow.runId}`}
   url={$page.url.href}
 />
-<div class="flex flex-col gap-2 xl:flex-row-reverse">
-  <div class="flex w-full flex-col gap-2 xl:w-[40%]">
-    <WorkflowOptionsV2
-      {showWorkflowTasks}
-      {showNonCompleted}
-      {expandAll}
-      onExpandClick={() => (expandAll = !expandAll)}
-      onAdvancedClick={() => (showWorkflowTasks = !showWorkflowTasks)}
-    />
-    <WorkflowSummaryV2 />
-    <WorkflowRelationshipsV2 {...workflowRelationships} />
-    <WorkflowWorkersV2 taskQueue={workflow.taskQueue} />
-    <WorkflowStackTraceV2 />
-    <Accordion title="Query" let:open>
-      {#if open}
-        <WorkflowQueryV2 />
-      {/if}
-    </Accordion>
-  </div>
-  <div class="w-full xl:w-[60%]">
-    <EventSummaryV2
-      {fullHistory}
-      {showNonCompleted}
-      {expandAll}
-      {showWorkflowTasks}
-    />
-  </div>
+<div class="flex gap-2">
+  <WorkflowSummaryV2 />
+  <WorkflowOptionsV2
+    {showWorkflowTasks}
+    {showNonCompleted}
+    {expandAll}
+    onExpandClick={() => (expandAll = !expandAll)}
+    onAdvancedClick={() => (showWorkflowTasks = !showWorkflowTasks)}
+  />
+</div>
+<WorkflowRelationshipsV2 {...workflowRelationships} />
+<div class="w-full">
+  <EventSummaryV2
+    {fullHistory}
+    {showNonCompleted}
+    {expandAll}
+    {showWorkflowTasks}
+  />
 </div>
