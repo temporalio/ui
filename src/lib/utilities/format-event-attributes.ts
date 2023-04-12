@@ -99,10 +99,12 @@ export const formatAttributes = (
   if (compact)
     attributes.eventTime = formatDate(event.eventTime, get(timeFormat));
 
-  for (const [key, value] of Object.entries(event.attributes)) {
-    const shouldDisplay = shouldDisplayAttribute(key, value);
-    if (!keysToOmit.has(key) && shouldDisplay) attributes[key] = value;
-    formatNestedAttributes(attributes, key);
+  if (event.attributes) {
+    for (const [key, value] of Object.entries(event.attributes)) {
+      const shouldDisplay = shouldDisplayAttribute(key, value);
+      if (!keysToOmit.has(key) && shouldDisplay) attributes[key] = value;
+      formatNestedAttributes(attributes, key);
+    }
   }
 
   return attributes;

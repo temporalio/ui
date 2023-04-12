@@ -17,10 +17,8 @@
   $: ({ workflow, workers } = $workflowRun);
 </script>
 
-<Card class="flex flex-col gap-2 w-full">
-  <h1 class="flex gap-1 items-center text-xl">
-    <Icon name="summary" />Summary
-  </h1>
+<div class="flex flex-col gap-2">
+  <h1 class="flex gap-1 items-center text-xl">At-a-glance</h1>
   <div class="grid grid-cols-5 gap-2">
     <Card
       class="bg-gray-900 text-white flex flex-col gap-0 justify-end items-end text-right"
@@ -85,4 +83,4 @@
       </Card>
     {/if}
   </div>
-</Card>
+</div>

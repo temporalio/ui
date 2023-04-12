@@ -10,7 +10,7 @@
 </script>
 
 <div
-  class="overflow-x-hidden w-1/2 bg-gray-900 rounded-bxl flex flex-row gap-2"
+  class="overflow-x-hidden w-1/2 bg-gray-900 rounded-bxl flex flex-row gap-2 rounded-tr-xl rounded-br-xl"
 >
   {#each payloadAttributes as attribute}
     {@const isFailure = attribute.key === 'failure'}
@@ -24,6 +24,7 @@
         <div class="grow overflow-auto">
           <CodeBlock
             inline
+            icon="json"
             title={format(attribute.key)}
             content={codeBlockValue}
           />

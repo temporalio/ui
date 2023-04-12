@@ -16,7 +16,7 @@
 </script>
 
 <div class="flex cursor-pointer flex-col justify-between gap-2 md:flex-row">
-  <div class="flex items-center gap-4">
+  <div class="flex items-center justify-between gap-4">
     <p>{initialEvent.id}</p>
     <div class="flex items-center gap-2">
       <p

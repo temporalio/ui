@@ -86,11 +86,11 @@
 
 <style lang="postcss">
   .card {
-    @apply relative w-1/2 select-none bg-white border border-gray-900;
+    @apply relative w-1/2 flex items-center rounded-tl-xl rounded-bl-xl select-none bg-white border border-gray-900;
   }
 
   .row {
-    @apply flex-wrap items-center px-4 py-2 text-sm no-underline xl:text-base;
+    @apply w-full px-4 py-2 text-sm no-underline xl:text-base;
   }
 
   .pending {
