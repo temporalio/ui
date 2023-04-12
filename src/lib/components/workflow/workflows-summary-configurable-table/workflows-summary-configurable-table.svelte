@@ -117,10 +117,8 @@
   let resizableContainerWidth: number;
   let resizing: boolean = false;
 
-  const handleMouseDown = (event: MouseEvent) => {
-    if (resizableContainer.clientWidth - event.x < 3) {
-      resizing = true;
-    }
+  const handleMouseDown = () => {
+    resizing = true;
     return false;
   };
 
@@ -150,7 +148,6 @@
     style="width:{resizableContainerWidth
       ? resizableContainerWidth + 'px'
       : '50%'};"
-    on:mousedown|stopPropagation|preventDefault={handleMouseDown}
   >
     <table class="workflow-summary-table pinned">
       <thead>
@@ -252,6 +249,10 @@
       </tbody>
     </table>
   </div>
+  <div
+    class="resizer"
+    on:mousedown|stopPropagation|preventDefault={handleMouseDown}
+  />
   <div class="workflow-summary-table-wrapper">
     <table class="workflow-summary-table">
       <thead>
@@ -394,22 +395,21 @@
 
 <style lang="postcss">
   .workflow-summary-tables-wrapper {
-    @apply relative flex flex-row w-full rounded-xl border-primary border-2 bg-white overflow-auto;
+    @apply flex flex-row w-full rounded-xl border-primary border-2 bg-white overflow-auto;
   }
 
   .workflow-summary-table-wrapper {
-    @apply relative flex overflow-y-visible;
+    @apply flex overflow-y-visible;
   }
 
   .workflow-summary-table-wrapper.pinned {
-    /* higher z-index ensures the box shadow displays over the background gradient on the table rows */
-    @apply shrink-0 overflow-x-hidden rounded-l-lg max-md:max-w-[50%] max-md:overflow-x-scroll max-w-fit min-w-[40px] z-10;
+    @apply shrink-0 overflow-x-hidden rounded-l-lg max-md:max-w-[50%] max-md:overflow-x-scroll max-w-fit min-w-[40px];
+  }
 
+  .resizer {
     box-shadow: 2px 0 4px rgb(0 0 0 / 25%);
 
-    &::after {
-      @apply absolute right-0 h-full bg-primary content-[''] w-[3px] cursor-col-resize;
-    }
+    @apply z-10 bg-primary w-0 border-r-[3px] border-primary cursor-col-resize;
   }
 
   .workflow-summary-table-wrapper.pinned.batch-actions-visible {
@@ -447,7 +447,7 @@
   }
 
   .workflow-summary-header-row.pinned.batch-actions-visible {
-    @apply z-20 relative;
+    @apply z-20;
   }
 
   .workflow-summary-configurable-row {

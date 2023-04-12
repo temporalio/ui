@@ -49,7 +49,6 @@
 <DropdownMenu
   value={typeFilter ? typeFilter.value : typeSort ? typeSort.value : ''}
   keepOpen
-  left
   icon="filter"
   testId="workflow-type-filter-button"
   on:showmenu={handleShowInput}

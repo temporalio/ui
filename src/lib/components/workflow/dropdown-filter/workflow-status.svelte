@@ -90,7 +90,6 @@
     : statusSort?.value ?? ''}
   testId="execution-status-filter"
   keepOpen
-  left
   icon="filter"
 >
   <svelte:fragment slot="label">Status</svelte:fragment>
