@@ -1,4 +1,5 @@
 import type { EventSortOrder } from '$lib/stores/event-view';
+import { has } from './has';
 
 type Space = ' ';
 type Quote = "'" | '"';
@@ -148,4 +149,8 @@ export const isSortOrder = (
   if (sortOrder === 'ascending') return true;
   if (sortOrder === 'descending') return true;
   return false;
+};
+
+export const isError = (e: unknown): e is Error => {
+  return has(e, 'name', 'message');
 };

@@ -7,7 +7,7 @@
   export let open = false;
   export let title: string;
   export let position: 'bottom' | 'right' = 'bottom';
-  export let dark: boolean = true;
+  export let dark = true;
   export let onClick: () => void;
 
   const flyParams = {

@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let port: string = '';
+  export let port = '';
 </script>
 
 <div class="my-4">

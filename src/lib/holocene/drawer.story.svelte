@@ -5,7 +5,7 @@
 
   export let Hst: HST;
 
-  let open: boolean = false;
+  let open = false;
 
   const handleDrawerClick = () => {
     open = false;

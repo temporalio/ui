@@ -5,13 +5,14 @@
 
   import { createPaginationStore } from '$lib/stores/api-pagination';
   import { options } from '$lib/stores/pagination';
+  import { isError } from '$lib/utilities/is';
   import { onMount } from 'svelte';
 
   import type { HTMLAttributes } from 'svelte/elements';
 
   interface $$Props extends HTMLAttributes<HTMLDivElement> {
-    onError?: (error: any) => void | undefined;
-    onFetch: () => Promise<PaginatedRequest>;
+    onError?: (error: Error | unknown) => void | undefined;
+    onFetch: <T>() => Promise<PaginatedRequest<T>>;
     onShiftUp?: (event: KeyboardEvent) => void | undefined;
     onShiftDown?: (event: KeyboardEvent) => void | undefined;
     onSpace?: (event: KeyboardEvent) => void | undefined;
@@ -19,13 +20,13 @@
     defaultPageSize?: string | number | undefined;
     total?: string | number;
   }
-  type PaginatedRequest = (
+  type PaginatedRequest<T> = (
     size: number,
     token: NextPageToken,
-  ) => Promise<{ items: any[]; nextPageToken: NextPageToken }>;
+  ) => Promise<{ items: T[]; nextPageToken: NextPageToken }>;
 
-  export let onError: (error: any) => void | undefined = undefined;
-  export let onFetch: () => Promise<PaginatedRequest>;
+  export let onError: (error: Error) => void | undefined = undefined;
+  export let onFetch: <T>() => Promise<PaginatedRequest<T>>;
   export let onShiftUp: (event: KeyboardEvent) => void | undefined = undefined;
   export let onShiftDown: (event: KeyboardEvent) => void | undefined =
     undefined;
@@ -36,7 +37,7 @@
   export let total: string | number = '';
 
   let store = createPaginationStore(pageSizeOptions, defaultPageSize);
-  let error: any;
+  let error: Error;
 
   function clearError() {
     if (error) error = undefined;
@@ -57,8 +58,8 @@
     }
   }
 
-  async function initalDataFetch() {
-    const fetchData: PaginatedRequest = await onFetch();
+  async function initalDataFetch<T>() {
+    const fetchData = await onFetch<T>();
     try {
       const response = await fetchData($store.pageSize, '');
       const { items, nextPageToken } = response;
@@ -69,21 +70,22 @@
     }
   }
 
-  async function fetchIndexData() {
+  async function fetchIndexData<T>() {
     clearError();
     store.setUpdating();
     if (!$store.hasNextIndexData) {
       try {
-        const fetchData: PaginatedRequest = await onFetch();
+        const fetchData = await onFetch<T>();
         const response = await fetchData(
           $store.pageSize,
           $store.indexData[$store.index].nextToken,
         );
         const { items, nextPageToken } = response;
         store.nextPageWithItems(nextPageToken, items);
-      } catch (err: any) {
-        error = err;
-        if (onError) onError(error);
+      } catch (error) {
+        if (isError(error) && onError) {
+          onError(error);
+        }
       }
     } else {
       store.nextPage();

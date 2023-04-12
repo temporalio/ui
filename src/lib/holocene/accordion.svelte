@@ -1,9 +1,11 @@
 <script lang="ts">
+  import { v4 } from 'uuid';
+  import { noop } from 'svelte/internal';
+  import type { IconName } from './icon/paths';
+
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Badge from '$lib/holocene/badge.svelte';
-  import type { IconName } from './icon/paths';
   import type { HTMLAttributes } from 'svelte/elements';
-  import { v4 } from 'uuid';
 
   interface $$Props extends HTMLAttributes<HTMLDivElement> {
     title: string;
@@ -15,7 +17,7 @@
     readOnly?: boolean;
     error?: string;
     onToggle?: () => void;
-    'data-testid'?: String;
+    'data-testid'?: string;
   }
 
   export let title: string;
@@ -26,7 +28,7 @@
   export let disabled = false;
   export let readOnly = false;
   export let error = '';
-  export let onToggle = () => {};
+  export let onToggle = noop;
 
   let className = '';
   export { className as class };

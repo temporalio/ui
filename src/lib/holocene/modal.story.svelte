@@ -3,7 +3,6 @@
   import { logEvent } from 'histoire/client';
 
   import Button from './button.svelte';
-  import Checkbox from './checkbox.svelte';
   import Input from './input/input.svelte';
 
   import Modal from './modal.svelte';
@@ -11,10 +10,10 @@
   export let Hst: HST;
   let deleteConfirm: string;
   let modal: Modal;
-  let loading: boolean = false;
+  let loading = false;
 
-  let shouldError: boolean = false;
-  let errorText: string =
+  let shouldError = false;
+  let errorText =
     'Quo sint nisi nostrum quis nesciunt est. Delectus adipisci reiciendis nihil fuga libero exercitationem. Distinctio nihil sit et consequatur sit quia. Quia aut et temporibus doloremque veritatis corporis.';
   const openModal = () => {
     modal.open();

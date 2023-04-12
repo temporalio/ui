@@ -29,9 +29,9 @@
   export let items: T[];
   export let floatId: string | undefined = undefined;
   export let startingIndex: string | number = 0;
-  export let currentPageKey: string = 'page';
+  export let currentPageKey = 'page';
   export let itemsPerPage: number | null = null;
-  export let updating: boolean = false;
+  export let updating = false;
 
   $: perPage =
     itemsPerPage !== null

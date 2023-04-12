@@ -3,8 +3,8 @@
   import type { IconName } from '$lib/holocene/icon/paths';
 
   export let title: string;
-  export let content: string = '';
-  export let error: string = '';
+  export let content = '';
+  export let error = '';
   export let icon: IconName = 'comet';
 </script>
 
