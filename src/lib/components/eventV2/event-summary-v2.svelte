@@ -78,7 +78,12 @@
     />
   {/if}
   {#each $workflowRun?.workflow?.pendingActivities ?? [] as activity}
-    <PendingActivityCard event={activity} />
+    <EventGroupSummaryCard
+      event={activity}
+      events={currentEvents}
+      {expandAll}
+      pending
+    />
   {/each}
   {#if $workflowRun?.workflow?.isRunning}
     <RunningCard />

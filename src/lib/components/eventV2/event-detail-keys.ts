@@ -54,8 +54,16 @@ type SummaryAttribute = {
   badge?: BadgeType;
 };
 
-export const eventGroupDisplayName = (event: IterableEvent) => {
+export const eventGroupDisplayName = (
+  event: IterableEvent,
+  inSubGroup: boolean,
+) => {
   const hasGroupEvents = isEventGroup(event) && event.eventList.length > 1;
+  const singleEvent = isEventGroup(event) ? event.initialEvent : event;
+
+  if (inSubGroup) {
+    return singleEvent?.classification ?? singleEvent?.name;
+  }
 
   if (hasGroupEvents) {
     if (isLocalActivityMarkerEvent(event.initialEvent)) return 'Local Activity';
@@ -74,7 +82,6 @@ export const eventGroupDisplayName = (event: IterableEvent) => {
     if (isTimerStartedEvent(event.initialEvent)) return 'Timer';
   }
 
-  const singleEvent = isEventGroup(event) ? event.initialEvent : event;
   if (isWorkflowExecutionStartedEvent(singleEvent)) return 'Workflow Started';
   if (isMarkerRecordedEvent(singleEvent)) return 'Marker Recorded';
   if (isWorkflowExecutionSignaledEvent(singleEvent)) return 'Signal Received';
@@ -82,14 +89,14 @@ export const eventGroupDisplayName = (event: IterableEvent) => {
     return 'Signal Sent';
   if (isUpsertWorkflowSearchAttributesEvent(singleEvent))
     return 'Search Attributes';
-  if (
-    isWorkflowExecutionCanceledEvent(singleEvent) ||
-    isWorkflowExecutionFailedEvent(singleEvent) ||
-    isWorkflowExecutionTimedOutEvent(singleEvent) ||
-    isWorkflowExecutionTerminatedEvent(singleEvent) ||
-    isWorkflowExecutionCompletedEvent(singleEvent)
-  )
-    return 'Workflow';
+  // if (
+  //   isWorkflowExecutionCanceledEvent(singleEvent) ||
+  //   isWorkflowExecutionFailedEvent(singleEvent) ||
+  //   isWorkflowExecutionTimedOutEvent(singleEvent) ||
+  //   isWorkflowExecutionTerminatedEvent(singleEvent) ||
+  //   isWorkflowExecutionCompletedEvent(singleEvent)
+  // )
+  //   return 'Workflow';
 
   // if (isTimerStartedEvent(singleEvent)) return 'Started';
 

@@ -15,7 +15,7 @@
   $: failed = event.attempt > 1;
 </script>
 
-<div class="flex flex-col gap-4">
+<div class="grid grid-cols-2 gap-1 bg-white border border-gray-900 p-4">
   <div class="flex w-full flex-row gap-4">
     {#if event?.heartbeatDetails}
       <div class="w-1/2 grow">

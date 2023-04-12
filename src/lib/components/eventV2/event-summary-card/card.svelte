@@ -4,6 +4,7 @@
   import AttributesCodeBlock from './attributes-code-block.svelte';
   import Expanded from './expanded.svelte';
   import Collapsed from './collapsed.svelte';
+  import PendingActivityDetails from '../pending-activity-details.svelte';
 
   export let event: IterableEvent;
   export let events: IterableEvent[];
@@ -14,6 +15,7 @@
   export let final = false;
   export let pending = false;
   export let expandAll = false;
+  export let inSubGroup = false;
 
   $: expanded = expandAll || false;
   $: hasSubGroup = isEventGroup(event) && event?.subGroupList?.length;
@@ -28,7 +30,7 @@
     isEventGroup(event) && hasGroupEvents && event.lastEvent?.classification;
 </script>
 
-<div class="flex gap-0">
+<div class="flex">
   <LineDot
     {event}
     {firstEvent}
@@ -38,7 +40,7 @@
     {pending}
   />
   <div class="w-full overflow-hidden">
-    <div class="flex gap-0 my-[2px]">
+    <div class="flex my-[2px]">
       <div
         class="card {$$props.class}"
         class:unround-top={initial}
@@ -57,16 +59,22 @@
         >
           <Collapsed
             {event}
+            {pending}
             expanded={expandAll || expanded}
             {showClassification}
             {hasGroupEvents}
+            {inSubGroup}
           />
         </div>
       </div>
       <AttributesCodeBlock event={initialEvent} />
     </div>
     {#if expandAll || expanded}
-      <Expanded {event} {events} {firstEvent} />
+      {#if pending}
+        <PendingActivityDetails {event} />
+      {:else}
+        <Expanded {event} {events} {firstEvent} />
+      {/if}
     {/if}
   </div>
 </div>
@@ -78,6 +86,7 @@
         {events}
         {firstEvent}
         {expandAll}
+        inSubGroup
         last={index === event.subGroupList.length - 1}
       />
     {/each}

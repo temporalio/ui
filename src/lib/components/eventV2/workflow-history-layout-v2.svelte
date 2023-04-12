@@ -85,8 +85,12 @@
   title={`Workflow History | ${workflow.runId}`}
   url={$page.url.href}
 />
-<div class="flex gap-2">
+<div class="flex flex-col gap-2">
   <WorkflowSummaryV2 />
+
+  <WorkflowRelationshipsV2 {...workflowRelationships} />
+</div>
+<div class="w-full">
   <WorkflowOptionsV2
     {showWorkflowTasks}
     {showNonCompleted}
@@ -94,9 +98,6 @@
     onExpandClick={() => (expandAll = !expandAll)}
     onAdvancedClick={() => (showWorkflowTasks = !showWorkflowTasks)}
   />
-</div>
-<WorkflowRelationshipsV2 {...workflowRelationships} />
-<div class="w-full">
   <EventSummaryV2
     {fullHistory}
     {showNonCompleted}

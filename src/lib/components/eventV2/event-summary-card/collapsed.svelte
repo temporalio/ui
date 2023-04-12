@@ -8,8 +8,10 @@
 
   export let event: IterableEvent;
   export let expanded = false;
+  export let pending = false;
   export let showClassification = false;
   export let hasGroupEvents = false;
+  export let inSubGroup = false;
 
   $: initialEvent = isEventGroup(event) ? event.initialEvent : event;
   $: lastEvent = isEventGroup(event) ? event.lastEvent : event;
@@ -22,7 +24,7 @@
       <p
         class="event-name truncate text-sm font-semibold md:text-base xl:text-lg"
       >
-        {eventGroupDisplayName(event)}
+        {pending ? 'Pending' : eventGroupDisplayName(event, inSubGroup)}
       </p>
       {#if showClassification}
         <EventClassification classification={lastEvent.classification} />

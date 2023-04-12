@@ -19,67 +19,53 @@
 
 <div class="flex flex-col gap-2">
   <h1 class="flex gap-1 items-center text-xl">At-a-glance</h1>
-  <div class="grid grid-cols-5 gap-2">
-    <Card
-      class="bg-gray-900 text-white flex flex-col gap-0 justify-end items-end text-right"
+  <div class="grid grid-cols-8 gap-4">
+    <!-- <Card
+      class="flex flex-col gap-0 justify-end items-end text-right"
     >
-      <h3 class="text-purple-300 text-base">{workflow.id}</h3>
+      <h3 class="text-purple-600 text-base">{workflow.id}</h3>
       <p>Execution Id</p>
     </Card>
     <Card
-      class="bg-gray-900 text-white flex flex-col gap-0 justify-end items-end text-right"
+      class="flex flex-col gap-0 justify-end items-end text-right"
     >
-      <h3 class="text-purple-300 text-base">{workflow.runId}</h3>
+      <h3 class="text-purple-600 text-base">{workflow.runId}</h3>
       <p>Run Id</p>
-    </Card>
+    </Card> -->
 
-    <Card
-      class="bg-gray-900 text-white flex flex-col gap-0 justify-end items-end text-right"
-    >
-      <h3 class="text-purple-300 text-4xl">{workers.pollers.length}</h3>
+    <Card class="flex flex-col gap-0 justify-between items-end text-right">
       <p>Workers</p>
+      <h3 class="text-purple-600 text-4xl">{workers.pollers.length}</h3>
     </Card>
-    <Card
-      class="bg-gray-900 text-white flex flex-col gap-0 justify-end items-end text-right"
-    >
-      <h3 class="text-purple-300 text-xl">{workflow?.taskQueue}</h3>
+    <Card class="flex flex-col gap-0 justify-between items-end text-right">
       <p>Task Queue</p>
+      <h3 class="text-purple-600 text-lg">{workflow?.taskQueue}</h3>
     </Card>
-    <Card
-      class="bg-gray-900 text-white flex flex-col gap-0 justify-end items-end text-right"
-    >
-      <h3 class="text-purple-300 text-4xl">{workflow?.stateTransitionCount}</h3>
+    <Card class="flex flex-col gap-0 justify-between items-end text-right">
       <p>State Transitions</p>
+      <h3 class="text-purple-600 text-4xl">{workflow?.stateTransitionCount}</h3>
     </Card>
-  </div>
-  <div class="grid grid-cols-5 gap-2">
-    <Card
-      class="bg-gray-900 text-white flex flex-col gap-0 justify-end items-end text-right"
-    >
-      <h3 class="text-purple-300 text-xl">
+    <Card class="flex flex-col gap-0 justify-between items-end text-right">
+      <p>Start Time</p>
+      <h3 class="text-purple-600 text-xl">
         {formatDate(workflow?.startTime, $timeFormat)}
       </h3>
-      <p>Start Time</p>
     </Card>
     {#if !workflow?.isRunning}
-      <Card
-        class="bg-gray-900 text-white flex flex-col gap-0 justify-end items-end text-right"
-      >
-        <h3 class="text-purple-300 text-xl">
+      <Card class="flex flex-col gap-0 justify-between items-end text-right">
+        <p>Close Time</p>
+        <h3 class="text-purple-600 text-xl">
           {formatDate(workflow?.endTime, $timeFormat)}
         </h3>
-        <p>Close Time</p>
       </Card>
-      <Card
-        class="bg-gray-900 text-white flex flex-col gap-0 justify-end items-end"
-      >
-        <h3 class="text-purple-300 text-xl">
+      <Card class="flex flex-col gap-0 justify-between items-end">
+        <p>Duration</p>
+        <h3 class="text-purple-600 text-xl">
           {formatDistanceAbbreviated({
             start: workflow?.startTime,
             end: workflow?.endTime,
           })}
         </h3>
-        <p>Duration</p>
       </Card>
     {/if}
   </div>

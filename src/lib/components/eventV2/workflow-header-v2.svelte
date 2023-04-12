@@ -137,7 +137,6 @@
       <div
         class="flex flex-col items-center justify-center gap-4 whitespace-nowrap sm:flex-row lg:justify-end"
       >
-        <AutoRefreshWorkflow onChange={onRefreshChange} />
         <WorkflowActions {cancelInProgress} {workflow} {namespace} />
       </div>
     {/if}

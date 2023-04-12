@@ -10,6 +10,9 @@
   import PendingActivityDetails from './pending-activity-details.svelte';
 
   export let event: PendingActivity;
+  export let expandAll = false;
+
+  $: expanded = expandAll || false;
 
   $: ({ workflow } = $workflowRun);
 
@@ -19,7 +22,7 @@
   $: failed = event.attempt > 1;
 </script>
 
-<Card {event} events={[]} pending let:expanded>
+<Card {event} events={[]} pending>
   <div class="primary flex w-full cursor-pointer justify-between">
     <div class="flex items-center gap-4">
       <div class="rounded-xl border-2 border-gray-900 bg-lightBlue py-1 px-2">
@@ -52,9 +55,5 @@
   >
     {formatDate(event.lastHeartbeatTime, 'relative')}
   </p>
-  {#if expanded}
-    <div class="p-2">
-      <PendingActivityDetails {event} />
-    </div>
-  {/if}
+  <PendingActivityDetails {event} />
 </Card>
