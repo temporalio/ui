@@ -420,6 +420,12 @@
     @apply !w-[40px] overflow-visible;
   }
 
+  .workflow-summary-table-wrapper.pinned.no-columns-pinned:not(
+      .batch-actions-enabled
+    ) {
+    @apply !w-0 !min-w-0;
+  }
+
   .workflow-summary-table-wrapper:not(.pinned) {
     @apply overflow-x-scroll overscroll-x-contain flex-grow rounded-r-lg;
   }
