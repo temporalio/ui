@@ -1,7 +1,8 @@
 type WorkflowExecutionStatus = import('$types').WorkflowExecutionStatus;
 type WorkflowTaskFailedCause = import('$types').WorkflowTaskFailedCause;
+
 /**
- * Replace Longs, ITimestamps, etc. with their corresponding http values
+ * Replace Longs, ITimestamps, UInt8Array's etc. with their corresponding http values
  */
 type WorkflowExecutionInfo = Replace<
   import('$types').WorkflowExecutionInfo,
@@ -12,6 +13,7 @@ type WorkflowExecutionInfo = Replace<
     closeTime: string;
     historySizeBytes: string;
     historyLength: string;
+    searchAttributes?: WorkflowSearchAttributes;
   }
 >;
 
@@ -31,28 +33,6 @@ type WorkflowExecutionAPIResponse = Optional<{
   pendingChildren: PendingChildren[];
   executionConfig: WorkflowExecutionConfig;
 }>;
-
-type Decodable = {
-  searchAttributes: import('$types').WorkflowSearchAttributes;
-  memo: import('$types').Memo;
-  header: import('$types').Header;
-  queryResult: import('$types').QueryResult;
-};
-
-type DecodedPayload =
-  | import('$types').Payload
-  | Record<string, string>
-  | string;
-
-type Decoded = {
-  searchAttributes: { indexedFields: Record<string, DecodedPayload> };
-  memo: { fields: Record<string, DecodedPayload> };
-  header: { fields: Record<string, DecodedPayload> };
-  queryResult: Replace<
-    import('$types').QueryResult,
-    { answer: DecodedPayload[] }
-  >;
-};
 
 type WorkflowStatus =
   | 'Running'
@@ -86,6 +66,14 @@ type ArchiveFilterParameters = Omit<FilterParameters, 'timeRange'> & {
 
 type WorkflowIdentifier = IWorkflowExecution;
 
+type WorkflowSearchAttributes = {
+  indexedFields?: Record<string, Payload>;
+};
+
+type DecodedWorkflowSearchAttributes = {
+  indexedFields?: Record<string, string | Payload>;
+};
+
 type WorkflowExecution = {
   name: string;
   id: string;
@@ -96,8 +84,7 @@ type WorkflowExecution = {
   taskQueue?: string;
   historyEvents: string;
   historySizeBytes: string;
-  searchAttributes?: { indexedFields?: Record<string, DecodedPayload> };
-  memo?: { fields?: Record<string, DecodedPayload> };
+  searchAttributes?: DecodedWorkflowSearchAttributes;
   pendingChildren: PendingChildren[];
   pendingActivities: PendingActivity[];
   stateTransitionCount: string;

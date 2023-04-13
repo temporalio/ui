@@ -112,14 +112,42 @@
       }),
     );
   };
+
+  let resizableContainer: HTMLDivElement;
+  let resizableContainerWidth: number;
+  let resizing: boolean = false;
+
+  const handleMouseDown = () => {
+    resizing = true;
+    return false;
+  };
+
+  const handleMouseUp = () => {
+    resizing = false;
+  };
+
+  const handleMouseMove = (event: MouseEvent) => {
+    if (!resizing) return false;
+    const rect = resizableContainer.getBoundingClientRect();
+    resizableContainerWidth = event.x - rect.x;
+    return false;
+  };
 </script>
 
+<svelte:window
+  on:mousemove|stopPropagation={handleMouseMove}
+  on:mouseup|stopPropagation={handleMouseUp}
+/>
 <div class="workflow-summary-tables-wrapper">
   <div
     class="workflow-summary-table-wrapper pinned"
     class:batch-actions-enabled={$supportsBulkActions}
     class:batch-actions-visible={showBulkActions}
     class:no-columns-pinned={pinnedColumns.length === 0}
+    bind:this={resizableContainer}
+    style="width:{resizableContainerWidth
+      ? resizableContainerWidth + 'px'
+      : '50%'};"
   >
     <table class="workflow-summary-table pinned">
       <thead>
@@ -128,8 +156,8 @@
           class:batch-actions-visible={showBulkActions}
         >
           {#if $supportsBulkActions}
-            <th class="w-10">
-              {#if $workflowTableColumns.length > 0}
+            <th class="min-w-[40px] rounded-tl-lg">
+              {#if workflows.length > 0 && $workflowTableColumns.length > 0}
                 <Checkbox
                   id="select-visible-workflows"
                   onDark
@@ -221,6 +249,10 @@
       </tbody>
     </table>
   </div>
+  <div
+    class="resizer"
+    on:mousedown|stopPropagation|preventDefault={handleMouseDown}
+  />
   <div class="workflow-summary-table-wrapper">
     <table class="workflow-summary-table">
       <thead>
@@ -348,13 +380,9 @@
       <svelte:fragment slot="heading">
         Custom Search Attributes <span class="font-normal">(not in view)</span>
       </svelte:fragment>
-      {#each $availableSearchAttributes as searchAttribute, index}
-        <OrderableListItem
-          static
-          {index}
-          on:addItem={() => addColumn(searchAttribute)}
-        >
-          {searchAttribute}
+      {#each $availableSearchAttributes as { label }, index}
+        <OrderableListItem static {index} on:addItem={() => addColumn(label)}>
+          {label}
         </OrderableListItem>
       {:else}
         <OrderableListItem readonly
@@ -367,81 +395,63 @@
 
 <style lang="postcss">
   .workflow-summary-tables-wrapper {
-    @apply relative flex flex-row w-full rounded-lg border-primary border-2 overflow-scroll bg-white;
+    @apply flex flex-row w-full rounded-xl border-primary border-2 bg-white overflow-auto;
   }
 
   .workflow-summary-table-wrapper {
-    @apply relative flex;
-
-    &.pinned {
-      /* higher z-index ensures the box shadow displays over the background gradient on the table rows */
-      @apply rounded-l-lg border-primary border-r-[3px] shadow-primary shadow-md z-10;
-
-      /* when the user has no pinned columns, hard code the wrapper to the width of the checkbox column, or 0 */
-      &.no-columns-pinned {
-        &.batch-actions-enabled {
-          @apply !w-[40px];
-        }
-
-        &:not(.batch-actions-enabled) {
-          @apply hidden;
-        }
-      }
-    }
-
-    &:not(.pinned) {
-      @apply overflow-x-scroll overscroll-contain flex-grow rounded-r;
-    }
+    @apply flex overflow-y-visible;
   }
 
-  .workflow-summary-table {
-    &.pinned {
-      @apply rounded-l-lg;
-    }
+  .workflow-summary-table-wrapper.pinned {
+    @apply shrink-0 overflow-x-hidden rounded-l-lg max-md:max-w-[50%] max-md:overflow-x-scroll max-w-fit min-w-[40px];
+  }
 
-    &:not(.pinned) {
-      @apply rounded-r-lg table-auto w-full;
-    }
+  .resizer {
+    box-shadow: 2px 0 4px rgb(0 0 0 / 25%);
+
+    @apply z-10 bg-primary w-0 border-r-[3px] border-primary cursor-col-resize;
+  }
+
+  .workflow-summary-table-wrapper.pinned.batch-actions-visible {
+    @apply !w-full after:pointer-events-none;
+  }
+
+  .workflow-summary-table-wrapper.pinned.no-columns-pinned.batch-actions-enabled {
+    @apply !w-[40px] overflow-visible;
+  }
+
+  .workflow-summary-table-wrapper.pinned.no-columns-pinned:not(
+      .batch-actions-enabled
+    ) {
+    @apply !w-0 !min-w-0;
+  }
+
+  .workflow-summary-table-wrapper:not(.pinned) {
+    @apply overflow-x-scroll overscroll-x-contain flex-grow rounded-r-lg;
+  }
+
+  .workflow-summary-table-wrapper.pinned.no-columns-pinned {
+    @apply after:pointer-events-none;
+  }
+
+  .workflow-summary-table-wrapper.pinned.no-columns-pinned.batch-actions-visible {
+    @apply !w-[40px];
+  }
+
+  .workflow-summary-table:not(.pinned) {
+    @apply table-auto w-full;
   }
 
   .workflow-summary-header-row {
     @apply bg-primary text-white h-10;
+  }
 
-    &.pinned {
-      &.batch-actions-visible {
-        @apply relative z-10;
-      }
-
-      :global(th) {
-        @apply first:rounded-tl;
-      }
-    }
-
-    &:not(.pinned) {
-      :global(th) {
-        @apply last:rounded-tr;
-      }
-    }
+  .workflow-summary-header-row.pinned.batch-actions-visible {
+    @apply z-20;
   }
 
   .workflow-summary-configurable-row {
-    @apply border-b border-primary cursor-pointer h-10;
-
-    &:last-of-type {
-      @apply border-b-0;
-
-      &.pinned {
-        :global(td) {
-          @apply first:rounded-bl-lg;
-        }
-      }
-
-      &:not(.pinned) {
-        :global(td) {
-          @apply last:rounded-br-lg;
-        }
-      }
-    }
+    @apply border-b border-primary cursor-pointer h-11 last-of-type:border-b-0;
   }
 
   .workflow-summary-configurable-row:hover {

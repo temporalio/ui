@@ -62,7 +62,7 @@ describe('Workflow Executions List With Search', () => {
 
       cy.get(
         '.px-2 > .input-container > [data-testid="clear-input"] > .icon-button',
-      ).click();
+      ).click({ force: true });
 
       cy.url().should('not.contain', result);
     });
@@ -85,7 +85,7 @@ describe('Workflow Executions List With Search', () => {
 
       cy.get(
         '.px-2 > .input-container > [data-testid="clear-input"] > .icon-button',
-      ).click();
+      ).click({ force: true });
 
       cy.url().should('not.contain', result);
     });
@@ -280,7 +280,7 @@ describe('Workflow Executions List With Search using only MySql on 1.20', () => 
 
       cy.get(
         '.px-2 > .input-container > [data-testid="clear-input"] > .icon-button',
-      ).click();
+      ).click({ force: true });
 
       cy.url().should('not.contain', result);
     });
@@ -303,7 +303,7 @@ describe('Workflow Executions List With Search using only MySql on 1.20', () => 
 
       cy.get(
         '.px-2 > .input-container > [data-testid="clear-input"] > .icon-button',
-      ).click();
+      ).click({ force: true });
 
       cy.url().should('not.contain', result);
     });

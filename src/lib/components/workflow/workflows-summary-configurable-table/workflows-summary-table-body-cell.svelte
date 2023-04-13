@@ -1,8 +1,14 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
+  import Badge from '$lib/holocene/badge.svelte';
   import FilterOrCopyButtons from '$lib/holocene/filter-or-copy-buttons.svelte';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
+  import {
+    customSearchAttributes,
+    isCustomSearchAttribute,
+    workflowIncludesSearchAttribute,
+  } from '$lib/stores/search-attributes';
   import { timeFormat } from '$lib/stores/time-format';
   import {
     isDataCell,
@@ -10,6 +16,7 @@
     type WorkflowHeader,
     WORKFLOW_CELLS,
   } from '$lib/stores/workflow-table-columns';
+  import { formatDate } from '$lib/utilities/format-date';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   export let column: WorkflowHeader;
@@ -79,12 +86,23 @@
       )}
     />
   </td>
+{:else if isCustomSearchAttribute(label) && workflowIncludesSearchAttribute(workflow, label)}
+  {@const content = workflow.searchAttributes.indexedFields[label]}
+  <td class="workflows-summary-table-body-cell">
+    {#if $customSearchAttributes[label] === 'Datetime' && typeof content === 'string'}
+      {formatDate(content, $timeFormat)}
+    {:else if $customSearchAttributes[label] === 'Bool'}
+      <Badge>{content}</Badge>
+    {:else}
+      {content}
+    {/if}
+  </td>
 {:else}
   <td class="workflows-summary-table-body-cell">{cellContent}</td>
 {/if}
 
 <style lang="postcss">
   .workflows-summary-table-body-cell {
-    @apply whitespace-nowrap px-2 h-10;
+    @apply whitespace-nowrap px-2 h-10 text-sm;
   }
 </style>

@@ -1,4 +1,5 @@
-import { decodePayloadAttributes } from '$lib/utilities/decode-payload';
+import { decodePayload } from '$lib/utilities/decode-payload';
+import { isNull } from '$lib/utilities/is';
 import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 import { simplifyAttributes } from './event-history/simplify-attributes';
 
@@ -13,11 +14,31 @@ const toPendingActivities = (
   });
 };
 
+const toSearchAttributes = (
+  apiSearchAttributes: WorkflowSearchAttributes,
+): DecodedWorkflowSearchAttributes => {
+  if (isNull(apiSearchAttributes) || isNull(apiSearchAttributes.indexedFields))
+    return {};
+  const decoded = Object.entries(apiSearchAttributes.indexedFields).reduce(
+    (searchAttributes, [searchAttributeName, payload]) => {
+      return {
+        ...searchAttributes,
+        [searchAttributeName]: decodePayload(payload),
+      };
+    },
+    {},
+  );
+
+  return {
+    indexedFields: decoded,
+  };
+};
+
 export const toWorkflowExecution = (
   response?: WorkflowExecutionAPIResponse,
 ): WorkflowExecution => {
-  const { searchAttributes, memo } = decodePayloadAttributes(
-    response?.workflowExecutionInfo,
+  const searchAttributes = toSearchAttributes(
+    response.workflowExecutionInfo.searchAttributes,
   );
   const name = response.workflowExecutionInfo.type.name;
   const id = response.workflowExecutionInfo.execution.workflowId;
@@ -54,7 +75,6 @@ export const toWorkflowExecution = (
     historyEvents,
     historySizeBytes,
     searchAttributes,
-    memo,
     url,
     taskQueue,
     pendingActivities,
