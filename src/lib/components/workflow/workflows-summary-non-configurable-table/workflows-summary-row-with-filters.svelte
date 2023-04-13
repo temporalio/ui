@@ -52,6 +52,7 @@
   {#if bulkActionsEnabled}
     <td style="padding: 0;">
       <Checkbox
+        aria-label="select workflow"
         hoverable
         disabled={checkboxDisabled}
         value={workflow}
