@@ -1,4 +1,4 @@
-import { browser } from '$app/environment';
+import { BROWSER } from 'esm-env';
 
 export function base64DecodeUnicode(str: string): string {
   return decodeURIComponent(
@@ -12,7 +12,7 @@ export function base64DecodeUnicode(str: string): string {
   );
 }
 
-export const atob = (str: string, isBrowser = browser): string => {
+export const atob = (str: string, isBrowser = BROWSER): string => {
   if (!isBrowser) return str;
   return base64DecodeUnicode(str);
 };
