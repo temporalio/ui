@@ -56,7 +56,7 @@
 </script>
 
 <Tooltip text={disabledText} top hide={!disabled}>
-  <div class="inline" bind:this={menu} data-testid={$$props.testId}>
+  <div class="relative inline" bind:this={menu} data-testid={$$props.testId}>
     <IconButton
       on:click={disabled ? noop : onClick}
       data-testid="{$$props.testId}-button"
@@ -71,23 +71,23 @@
         />
       </div>
     </IconButton>
-    {#if show}
-      <div
-        in:scale={{ duration: 200, start: 0.65 }}
-        out:scale={{ duration: 100, start: 0.65 }}
-        class:right
-        class="dropdown-menu"
-      >
-        <div class="block gap-4">
-          <slot />
-        </div>
-      </div>
-    {/if}
     {#if value}
       <span in:scale={{ duration: 200, start: 0.65 }} class="dot" />
     {/if}
   </div>
 </Tooltip>
+{#if show}
+  <div
+    in:scale={{ duration: 200, start: 0.65 }}
+    out:scale={{ duration: 100, start: 0.65 }}
+    class:right
+    class="dropdown-menu"
+  >
+    <div class="block gap-4">
+      <slot />
+    </div>
+  </div>
+{/if}
 
 <style lang="postcss">
   .dropdown-menu {
@@ -100,7 +100,7 @@
   }
 
   .dot {
-    @apply pointer-events-none absolute h-2 w-2 rounded-full bg-blue-300;
+    @apply absolute top-0 -right-1 pointer-events-none h-2 w-2 rounded-full bg-blue-300;
   }
 
   .disabled {
