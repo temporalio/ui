@@ -9,7 +9,7 @@ import {
   advancedVisibilityEnabledWithOrderBy,
 } from '$lib/utilities/advanced-visibility-enabled';
 
-const isCloud = derived(
+export const isCloud = derived(
   [page],
   ([$page]) => $page.data?.settings?.runtimeEnvironment?.isCloud,
 );
