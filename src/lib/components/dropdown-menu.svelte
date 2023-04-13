@@ -56,38 +56,40 @@
 </script>
 
 <Tooltip text={disabledText} top hide={!disabled}>
-  <div class="relative inline" bind:this={menu} data-testid={$$props.testId}>
-    <IconButton
-      on:click={disabled ? noop : onClick}
-      data-testid="{$$props.testId}-button"
-    >
-      <div class="flex items-center gap-1 truncate" class:disabled>
-        <slot name="label" />
-        <Icon
-          name={icon ? icon : show ? 'chevron-up' : 'chevron-down'}
-          class="pointer-events-none"
-          width={20}
-          height={20}
-        />
+  <div bind:this={menu}>
+    <div class="relative inline" data-testid={$$props.testId}>
+      <IconButton
+        on:click={disabled ? noop : onClick}
+        data-testid="{$$props.testId}-button"
+      >
+        <div class="flex items-center gap-1 truncate" class:disabled>
+          <slot name="label" />
+          <Icon
+            name={icon ? icon : show ? 'chevron-up' : 'chevron-down'}
+            class="pointer-events-none"
+            width={20}
+            height={20}
+          />
+        </div>
+      </IconButton>
+      {#if value}
+        <span in:scale={{ duration: 200, start: 0.65 }} class="dot" />
+      {/if}
+    </div>
+    {#if show}
+      <div
+        in:scale={{ duration: 200, start: 0.65 }}
+        out:scale={{ duration: 100, start: 0.65 }}
+        class:right
+        class="dropdown-menu"
+      >
+        <div class="block gap-4">
+          <slot />
+        </div>
       </div>
-    </IconButton>
-    {#if value}
-      <span in:scale={{ duration: 200, start: 0.65 }} class="dot" />
     {/if}
   </div>
 </Tooltip>
-{#if show}
-  <div
-    in:scale={{ duration: 200, start: 0.65 }}
-    out:scale={{ duration: 100, start: 0.65 }}
-    class:right
-    class="dropdown-menu"
-  >
-    <div class="block gap-4">
-      <slot />
-    </div>
-  </div>
-{/if}
 
 <style lang="postcss">
   .dropdown-menu {
