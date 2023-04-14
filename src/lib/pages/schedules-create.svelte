@@ -5,6 +5,14 @@
 
   import ScheduleFormView from '$lib/components/schedule/schedule-form-view.svelte';
 
+  import type {
+    SchedulePreset,
+    ScheduleParameters,
+    ScheduleActionParameters,
+    SchedulePresetsParameters,
+    ScheduleSpecParameters,
+  } from 'src/types/schedule';
+
   let { namespace } = $page.params;
 
   const handleCreate = (preset: SchedulePreset, args: ScheduleParameters) => {

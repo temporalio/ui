@@ -11,6 +11,8 @@ import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
+import type { DescribeFullSchedule } from 'src/types/schedule';
+
 type ScheduleParameters = {
   namespace: string;
   scheduleId: string;

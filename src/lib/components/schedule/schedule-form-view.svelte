@@ -13,6 +13,12 @@
     routeForSchedules,
   } from '$lib/utilities/route-for';
 
+  import type {
+    FullScheduleSpec,
+    SchedulePreset,
+    ScheduleParameters,
+  } from 'src/types/schedule';
+
   export let schedule: FullScheduleSpec | null = null;
   export let onConfirm: (
     preset: SchedulePreset,

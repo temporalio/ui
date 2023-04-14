@@ -9,9 +9,10 @@
   } from '$lib/utilities/route-for';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Link from '$lib/holocene/link.svelte';
-
   import ScheduleFrequency from './schedule-frequency.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
+
+  import type { FullScheduleSpec, FullCalendarSpec } from 'src/types/schedule';
 
   let { namespace } = $page.params;
 

@@ -2,6 +2,8 @@
   import Input from '$lib/holocene/input/input.svelte';
   import SimpleSplitButton from '$lib/holocene/simple-split-button.svelte';
 
+  import type { ScheduleOffsetUnit } from 'src/types/schedule';
+
   export let days = '';
   export let hour = '';
   export let minute = '';

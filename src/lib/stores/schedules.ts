@@ -1,6 +1,12 @@
 import { goto } from '$app/navigation';
 import { writable } from 'svelte/store';
 import type { Schedule } from '$types';
+import type {
+  DescribeFullSchedule,
+  ScheduleSpecParameters,
+  SchedulePresetsParameters,
+  ScheduleActionParameters,
+} from 'src/types/schedule';
 
 import { routeForSchedule, routeForSchedules } from '$lib/utilities/route-for';
 
@@ -11,6 +17,12 @@ import {
   timeToInterval,
 } from '$lib/utilities/schedule-data-formatting';
 
+type ScheduleParameterArgs = {
+  action: ScheduleActionParameters;
+  spec: Partial<ScheduleSpecParameters>;
+  presets: SchedulePresetsParameters;
+};
+
 // TODO: Post Beta, add support of additional fields.
 // "startTime": "2022-07-04T03:18:59.668Z",
 // "endTime": "2022-07-04T03:18:59.668Z",
@@ -20,7 +32,7 @@ import {
 
 const setBodySpec = (
   body: DescribeFullSchedule,
-  spec: ScheduleSpecParameters,
+  spec: Partial<ScheduleSpecParameters>,
   presets: SchedulePresetsParameters,
 ) => {
   const { hour, minute, second, phase, cronString } = spec;
@@ -72,7 +84,7 @@ export const submitCreateSchedule = async ({
   action,
   spec,
   presets,
-}: ScheduleParameters): Promise<void> => {
+}: ScheduleParameterArgs): Promise<void> => {
   const { namespace, name, workflowId, workflowType, taskQueue } = action;
   const body: DescribeFullSchedule = {
     schedule_id: name,
@@ -114,7 +126,7 @@ export const submitCreateSchedule = async ({
 };
 
 export const submitEditSchedule = async (
-  { action, spec, presets }: ScheduleParameters,
+  { action, spec, presets }: ScheduleParameterArgs,
   schedule: Schedule,
   scheduleId: string,
 ): Promise<void> => {
