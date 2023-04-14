@@ -23,6 +23,10 @@ import type {
   ListWorkflowExecutionsResponse,
   ArchiveFilterParameters,
 } from 'src/types/workflows';
+import type {
+  ValidWorkflowEndpoints,
+  ValidWorkflowParameters,
+} from 'src/types/api';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;

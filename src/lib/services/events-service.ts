@@ -17,6 +17,7 @@ import type {
   GetWorkflowExecutionHistoryResponse,
   WorkflowEvents,
 } from 'src/types/events';
+import type { WorkflowAPIRoutePath } from 'src/types/api';
 
 export type FetchEventsParameters = NamespaceScopedRequest &
   PaginationCallbacks<GetWorkflowExecutionHistoryResponse> & {

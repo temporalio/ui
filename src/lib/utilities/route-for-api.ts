@@ -2,6 +2,28 @@ import { page } from '$app/stores';
 import { get } from 'svelte/store';
 import { getApiOrigin } from './get-api-origin';
 import { base as basePath } from '$app/paths';
+import type {
+  APIRoutePath,
+  APIRouteParameters,
+  WorkflowListRouteParameters,
+  NamespaceAPIRoutePath,
+  NamespaceRouteParameters,
+  TaskQueueAPIRoutePath,
+  ScheduleRouteParameters,
+  ParameterlessAPIRoutePath,
+  SearchAttributesRoutePath,
+  TaskQueueRouteParameters,
+  BatchAPIRoutePath,
+  BatchRouteParameters,
+  ScheduleAPIRoutePath,
+  SchedulesAPIRoutePath,
+  ScheduleListRouteParameters,
+  WorkflowsAPIRoutePath,
+  WorkflowActivitiesAPIRoutePath,
+  WorkflowAPIRoutePath,
+  WorkflowRouteParameters,
+  WorkflowActivitiesRouteParameters,
+} from 'src/types/api';
 
 const replaceNamespaceInApiUrl = (
   apiUrl: string,

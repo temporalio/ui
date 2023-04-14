@@ -19,6 +19,7 @@ import {
 import { has } from '$lib/utilities/has';
 import { passAccessToken as codecPassAccessToken } from '$lib/stores/data-encoder-config';
 import type { Eventual, Settings } from 'src/types/global';
+import type { WorkflowRouteParameters } from 'src/types/api';
 
 type QueryRequestParameters = {
   workflow: Eventual<{ id: string; runId: string }>;
