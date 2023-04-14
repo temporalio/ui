@@ -1,3 +1,6 @@
+import type { EventType } from '$lib/utilities/is-event-type';
+import type { WorkflowEvent } from 'src/types/events';
+
 type EventId = EventType['id'];
 
 interface EventGroup

@@ -4,6 +4,7 @@ import { getGroupId } from './get-group-id';
 
 import type { EventSortOrder } from '$lib/stores/event-view';
 import type { CommonHistoryEvent, WorkflowEvent } from 'src/types/events';
+import type { EventGroup, EventGroups } from './event-groups';
 
 export { getGroupForEvent } from './get-group-for-event';
 

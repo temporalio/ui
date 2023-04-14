@@ -25,6 +25,7 @@ import type {
   MarkerRecordedEvent,
   CommonHistoryEvent,
 } from 'src/types/events';
+import type { EventGroup } from './event-groups';
 
 type StartingEvents = {
   Activity: ActivityTaskScheduledEvent;
