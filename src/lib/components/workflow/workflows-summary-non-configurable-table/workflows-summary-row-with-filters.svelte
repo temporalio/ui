@@ -11,6 +11,7 @@
   import Checkbox from '$lib/holocene/checkbox.svelte';
 
   import type { TimeFormat } from 'src/types/global';
+  import type { WorkflowExecution } from 'src/types/workflows';
 
   export let bulkActionsEnabled: boolean = false;
   export let namespace: string;

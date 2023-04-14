@@ -37,6 +37,8 @@
   import { goto } from '$app/navigation';
   import ProgressBar from '$lib/holocene/progress-bar.svelte';
 
+  import type { WorkflowExecution } from 'src/types/workflows';
+
   const dispatch = createEventDispatcher<{
     terminateWorkflows: undefined;
     cancelWorkflows: undefined;

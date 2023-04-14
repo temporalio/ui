@@ -6,6 +6,7 @@ import { persistStore } from './persist-store';
 import { customSearchAttributes } from './search-attributes';
 
 import type { TimeFormat } from 'src/types/global';
+import type { WorkflowExecution } from 'src/types/workflows';
 
 export const MAX_PINNED_COLUMNS = 2;
 

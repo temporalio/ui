@@ -2,6 +2,7 @@ import { writable } from 'svelte/store';
 import { persistStore } from '$lib/stores/persist-store';
 
 import type { GetPollersResponse } from '$lib/services/pollers-service';
+import type { WorkflowExecution } from 'src/types/workflows';
 
 export const refresh = writable(0);
 

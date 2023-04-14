@@ -12,6 +12,11 @@ import terminatedWorkflow from '$fixtures/workflow.terminated.json';
 import timedOutWorkflow from '$fixtures/workflow.timed-out.json';
 import listWorkflowsResponse from '$fixtures/list-workflows.json';
 
+import type {
+  ListWorkflowExecutionsResponse,
+  WorkflowExecutionAPIResponse,
+} from 'src/types/workflows';
+
 vi.mock('$lib/utilities/write-actions-are-allowed', () => {
   return {
     writeActionsAreAllowed: () => false,

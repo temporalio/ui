@@ -18,6 +18,11 @@ import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { btoa } from '$lib/utilities/btoa';
 import { v4 } from 'uuid';
 import type { NamespaceScopedRequest } from 'src/types/global';
+import type {
+  WorkflowExecution,
+  ListWorkflowExecutionsResponse,
+  ArchiveFilterParameters,
+} from 'src/types/workflows';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;

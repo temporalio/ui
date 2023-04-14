@@ -17,6 +17,7 @@ import type {
   PendingActivity,
   PendingActivityWithMetadata,
 } from 'src/types/events';
+import type { WorkflowExecution } from 'src/types/workflows';
 
 export async function getActivityAttributes(
   { activity, namespace, settings, accessToken }: PendingActivityWithMetadata,

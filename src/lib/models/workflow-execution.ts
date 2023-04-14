@@ -7,6 +7,13 @@ import type {
   PendingActivity,
   PendingChildren,
 } from 'src/types/events';
+import type {
+  WorkflowExecution,
+  ListWorkflowExecutionsResponse,
+  WorkflowSearchAttributes,
+  DecodedWorkflowSearchAttributes,
+  WorkflowExecutionAPIResponse,
+} from 'src/types/workflows';
 
 const toPendingActivities = (
   pendingActivity: PendingActivityInfo[] = [],

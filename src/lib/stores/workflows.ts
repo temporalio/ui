@@ -7,8 +7,9 @@ import {
 } from '$lib/services/workflow-service';
 import { withLoading } from '$lib/utilities/stores/with-loading';
 
-import type { StartStopNotifier } from 'svelte/store';
 import { supportsAdvancedVisibility } from './advanced-visibility';
+import type { StartStopNotifier } from 'svelte/store';
+import type { FilterParameters, WorkflowExecution } from 'src/types/workflows';
 
 export const refresh = writable(0);
 

@@ -5,6 +5,8 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
+  import type { WorkflowTaskFailedCause } from 'src/types/workflows';
+  import type { WorkflowTaskFailedEvent } from 'src/types/events';
 
   const WORKFLOW_TASK_FAILED_ERROR_COPY = {
     Unspecified: {
@@ -190,7 +192,7 @@
         <TableHeaderRow slot="headers">
           <th class="w-14 xl:w-10" />
           <th class="w-16 md:w-32">
-            <span class="max-md:hidden ">Date & Time</span>
+            <span class="max-md:hidden">Date & Time</span>
             <span class="md:hidden"><Icon name="clock" /></span>
           </th>
           <th class="w-44">Event</th>

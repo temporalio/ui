@@ -13,6 +13,7 @@
   import TableRow from '$lib/holocene/table/table-row.svelte';
 
   import type { TimeFormat } from 'src/types/global';
+  import type { WorkflowExecution } from 'src/types/workflows';
 
   export let namespace: string;
   export let workflow: WorkflowExecution;

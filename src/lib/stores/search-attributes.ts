@@ -1,5 +1,6 @@
 import { omit } from '$lib/utilities/omit';
 import { writable, get, derived, type Readable } from 'svelte/store';
+import type { WorkflowExecution } from 'src/types/workflows';
 
 export const searchAttributes = writable<SearchAttributes>({});
 
