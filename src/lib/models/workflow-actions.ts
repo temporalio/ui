@@ -1,15 +1,11 @@
-import { temporal } from '@temporalio/proto';
-
 export enum ResetType {
   FirstWorkflowTask = 0,
   LastWorkflowTask = 1,
   EventId = 2,
 }
 
-export const {
-  api: {
-    enums: {
-      v1: { ResetReapplyType },
-    },
-  },
-} = temporal;
+export enum ResetReapplyType {
+  Unspecified = 0,
+  Signal = 1,
+  None = 2,
+}

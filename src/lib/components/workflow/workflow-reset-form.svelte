@@ -8,7 +8,7 @@
     'Only Workflow Events of type WorkflowTaskCompleted, WorkflowTaskFailed, or WorkflowTaskTimeout are supported.';
 
   export let resetType: ResetType;
-  export let resetReapplyType = ResetReapplyType.RESET_REAPPLY_TYPE_UNSPECIFIED;
+  export let resetReapplyType: ResetReapplyType = ResetReapplyType.Unspecified;
   export let eventIdValid: boolean;
   export let reason: string | undefined;
   export let lastEvent: WorkflowEvent | undefined;
@@ -33,15 +33,15 @@
 
   const resetReapplyTypes = [
     {
-      value: ResetReapplyType.RESET_REAPPLY_TYPE_UNSPECIFIED,
+      value: ResetReapplyType.Unspecified,
       label: 'All Events',
     },
     {
-      value: ResetReapplyType.RESET_REAPPLY_TYPE_SIGNAL,
+      value: ResetReapplyType.Signal,
       label: 'Signals Only',
     },
     {
-      value: ResetReapplyType.RESET_REAPPLY_TYPE_NONE,
+      value: ResetReapplyType.None,
       label: 'None',
     },
   ];
