@@ -5,6 +5,7 @@ import type { PendingActivityInfo } from '$types';
 import type {
   EventAttributeKey,
   EventAttributesWithType,
+  PendingActivity,
 } from 'src/types/events';
 
 const keysToBeFormattedAsTime = [
@@ -93,7 +94,7 @@ export function simplifyAttributes(
 export function simplifyAttributes(
   attributes: PendingActivityInfo,
   preserveTimestamps?: boolean,
-): PendingActivityInfo;
+): PendingActivity;
 export function simplifyAttributes<
   T = EventAttributesWithType<EventAttributeKey> | PendingActivityInfo,
 >(attributes: T, preserveTimestamps = false): T {
