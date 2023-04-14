@@ -12,7 +12,7 @@
 
 <div class="mb-8 flex flex-col gap-8">
   <p class="text-base">
-    Enter your remote codec endpoint to encrypt your payloads.
+    Enter your remote codec endpoint to decrypt your payloads.
   </p>
   <div class="flex flex-col gap-2">
     <h3 class="text-lg" data-testid="data-encoder-endpoint-title">
