@@ -11,6 +11,12 @@ import type {
   PaginationCallbacks,
   Settings,
 } from 'src/types/global';
+import type {
+  CommonHistoryEvent,
+  HistoryEvent,
+  GetWorkflowExecutionHistoryResponse,
+  WorkflowEvents,
+} from 'src/types/events';
 
 export type FetchEventsParameters = NamespaceScopedRequest &
   PaginationCallbacks<GetWorkflowExecutionHistoryResponse> & {

@@ -1,5 +1,10 @@
 import { get } from 'svelte/store';
 import { timeFormat } from '$lib/stores/time-format';
+import type {
+  EventAttribute,
+  EventAttributeKey,
+  IterableEvent,
+} from 'src/types/events';
 
 import {
   shouldDisplayAttribute,

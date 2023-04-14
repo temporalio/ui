@@ -21,6 +21,14 @@ import {
 import { getEventCategory } from './get-event-categorization';
 import { getEventClassification } from './get-event-classification';
 import { simplifyAttributes } from './simplify-attributes';
+import type {
+  EventWithMetadata,
+  EventsWithMetadata,
+  EventAttributesWithType,
+  EventType,
+  WorkflowEvents,
+  WorkflowEvent,
+} from 'src/types/events';
 
 export async function getEventAttributes(
   { historyEvent, namespace, settings, accessToken }: EventWithMetadata,

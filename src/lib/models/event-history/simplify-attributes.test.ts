@@ -4,6 +4,7 @@ import {
   getValueForFirstKey,
   simplifyAttributes,
 } from './simplify-attributes';
+import type { EventAttributesWithType } from 'src/types/events';
 
 const attributes = {
   workflowType: {

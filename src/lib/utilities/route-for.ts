@@ -3,6 +3,7 @@ import { toURL } from '$lib/utilities/to-url';
 import { encodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { base } from '$app/paths';
 import type { Settings } from 'src/types/global';
+import type { EventView } from 'src/types/events';
 
 type RouteParameters = {
   namespace: string;

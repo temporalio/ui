@@ -1,35 +1,32 @@
-type EventHistory = Replace<
+import type { Replace, Settings } from './global';
+
+export type EventHistory = Replace<
   import('$types').History,
   { events: HistoryEvent[] }
 >;
 
-type HistoryEvent = Replace<
+export type HistoryEvent = Replace<
   import('$types').HistoryEvent,
   { eventType: EventType }
 >;
 
-type GetWorkflowExecutionHistoryResponse = Replace<
+export type GetWorkflowExecutionHistoryResponse = Replace<
   import('$types').GetWorkflowExecutionHistoryResponse,
   { history: EventHistory }
 >;
 
-type PendingActivityInfo = Replace<
+export type PendingActivityInfo = Replace<
   import('$types').PendingActivityInfo,
   { activityId: string }
 >;
 
-type Payload = {
+export type Payload = {
   metadata?: { [k: string]: string };
   data?: string;
 };
 
-type Payloads = {
-  payloads: Payload[];
-};
-
-type PendingActivity = Replace<
+export type PendingActivity = Replace<
   PendingActivityInfo,
-  'activityId',
   {
     id: string;
     state: PendingActivityState;
@@ -37,43 +34,37 @@ type PendingActivity = Replace<
   }
 >;
 
-type PendingActivityState =
+export type PendingActivityState =
   | 'Unspecified'
   | 'Scheduled'
   | 'Started'
   | 'CancelRequested';
 
-type PendingChildren = import('$types').PendingChildrenInfo;
+export type PendingChildren = import('$types').PendingChildrenInfo;
 
-type EventRequestMetadata = {
+export type EventRequestMetadata = {
   namespace: string;
   settings: Settings;
   accessToken: string;
 };
 
-type EventWithMetadata = {
+export type EventWithMetadata = {
   historyEvent: HistoryEvent;
 } & EventRequestMetadata;
 
-type EventsWithMetadata = {
+export type EventsWithMetadata = {
   response: HistoryEvent[];
 } & EventRequestMetadata;
 
-type EventType = import('$lib/utilities/is-event-type').EventType;
+export type EventType = import('$lib/utilities/is-event-type').EventType;
 
-type ActivityType = import('$lib/utilities/is-event-type').ActivityType;
-type TimerType = import('$lib/utilities/is-event-type').TimerType;
-type SignalType = import('$lib/utilities/is-event-type').SignalType;
-type MarkerType = import('$lib/utilities/is-event-type').MarkerType;
-type ChildType = import('$lib/utilities/is-event-type').ChildType;
-
-type EventTypeCategory =
+export type EventTypeCategory =
   import('$lib/models/event-history/get-event-categorization').EventTypeCategory;
 
-type EventClassification =
-  import('$lib/utilities/get-event-classiciation').EventClassification;
+export type EventClassification =
+  import('$lib/models/event-history/get-event-classification').EventClassification;
 
-interface WorkflowEvent extends HistoryEvent {
+export interface WorkflowEvent extends HistoryEvent {
   id: string;
   attributes: EventAttribute;
   timestamp: string;
@@ -82,13 +73,13 @@ interface WorkflowEvent extends HistoryEvent {
   name: EventType;
 }
 
-type WorkflowEvents = WorkflowEvent[];
+export type WorkflowEvents = WorkflowEvent[];
 
-type PendingActivityWithMetadata = {
+export type PendingActivityWithMetadata = {
   activity: PendingActivity;
 } & EventRequestMetadata;
 
-type CommonEventKey =
+export type CommonEventKey =
   | 'id'
   | 'eventType'
   | 'attributes'
@@ -102,18 +93,20 @@ type CommonEventKey =
   | 'workerMayIgnore'
   | 'name';
 
-type CommonHistoryEvent = Pick<WorkflowEvent, CommonEventKey>;
+export type CommonHistoryEvent = Pick<WorkflowEvent, CommonEventKey>;
 
-type EventAttributeKey = keyof Omit<HistoryEvent, CommonEventKey>;
-type EventAttribute = HistoryEvent[EventAttributeKey];
-type EventAttributesWithType<K = EventAttributeKey> = HistoryEvent[K] & {
-  type: K;
-};
+export type EventAttributeKey = keyof Omit<HistoryEvent, CommonEventKey>;
+export type EventAttribute = HistoryEvent[EventAttributeKey];
+export type EventAttributesWithType<K = EventAttributeKey> =
+  HistoryEvent[EventAttributeKey] & {
+    type: K;
+  };
 
-type EventWithAttributes<A extends EventAttributeKey> = CommonHistoryEvent &
-  Pick<WorkflowEvent, A> & { attributes: EventAttributesWithType<A> };
+export type EventWithAttributes<A extends EventAttributeKey> =
+  CommonHistoryEvent &
+    Pick<WorkflowEvent, A> & { attributes: EventAttributesWithType<A> };
 
-type ActivityEvent = ActivityTaskScheduledEvent &
+export type ActivityEvent = ActivityTaskScheduledEvent &
   ActivityTaskStartedEvent &
   ActivityTaskCompletedEvent &
   ActivityTaskFailedEvent &
@@ -121,15 +114,17 @@ type ActivityEvent = ActivityTaskScheduledEvent &
   ActivityTaskCancelRequestedEvent &
   ActivityTaskCanceledEvent;
 
-type TimerEvent = TimerCanceledEvent & TimerStartedEvent & TimerFiredEvent;
+export type TimerEvent = TimerCanceledEvent &
+  TimerStartedEvent &
+  TimerFiredEvent;
 
-type SignalEvent = SignalExternalWorkflowExecutionInitiatedEvent &
+export type SignalEvent = SignalExternalWorkflowExecutionInitiatedEvent &
   SignalExternalWorkflowExecutionFailedEvent &
   WorkflowExecutionSignaledEvent;
 
-type MarkerEvent = MarkerRecordedEvent;
+export type MarkerEvent = MarkerRecordedEvent;
 
-type ChildEvent = StartChildWorkflowExecutionInitiatedEvent &
+export type ChildEvent = StartChildWorkflowExecutionInitiatedEvent &
   StartChildWorkflowExecutionFailedEvent &
   ChildWorkflowExecutionStartedEvent &
   ChildWorkflowExecutionCompletedEvent &
@@ -138,98 +133,95 @@ type ChildEvent = StartChildWorkflowExecutionInitiatedEvent &
   ChildWorkflowExecutionTimedOutEvent &
   ChildWorkflowExecutionTerminatedEvent;
 
-type EventView = 'feed' | 'compact' | 'json';
+export type EventView = 'feed' | 'compact' | 'json';
 
-type FetchEventsResponse = {
-  events: WorkflowEvents;
-  eventGroups: EventGroups;
-};
+export type IterableEvent = WorkflowEvent | EventGroup;
 
-type IterableEvent = WorkflowEvent | EventGroup;
-type IterableEvents = IterableEvent[];
-
-type WorkflowExecutionStartedEvent =
+export type WorkflowExecutionStartedEvent =
   EventWithAttributes<'workflowExecutionStartedEventAttributes'>;
-type WorkflowExecutionCompletedEvent =
+export type WorkflowExecutionCompletedEvent =
   EventWithAttributes<'workflowExecutionCompletedEventAttributes'>;
-type WorkflowExecutionFailedEvent =
+export type WorkflowExecutionFailedEvent =
   EventWithAttributes<'workflowExecutionFailedEventAttributes'>;
-type WorkflowExecutionTimedOutEvent =
+export type WorkflowExecutionTimedOutEvent =
   EventWithAttributes<'workflowExecutionTimedOutEventAttributes'>;
-type WorkflowTaskScheduledEvent =
+export type WorkflowTaskScheduledEvent =
   EventWithAttributes<'workflowTaskScheduledEventAttributes'>;
-type WorkflowTaskStartedEvent =
+export type WorkflowTaskStartedEvent =
   EventWithAttributes<'workflowTaskStartedEventAttributes'>;
-type WorkflowTaskCompletedEvent =
+export type WorkflowTaskCompletedEvent =
   EventWithAttributes<'workflowTaskCompletedEventAttributes'>;
-type WorkflowTaskTimedOutEvent =
+export type WorkflowTaskTimedOutEvent =
   EventWithAttributes<'workflowTaskTimedOutEventAttributes'>;
-type WorkflowTaskFailedEvent =
+export type WorkflowTaskFailedEvent =
   EventWithAttributes<'workflowTaskFailedEventAttributes'>;
-type ActivityTaskScheduledEvent =
+export type ActivityTaskScheduledEvent =
   EventWithAttributes<'activityTaskScheduledEventAttributes'>;
-type ActivityTaskStartedEvent =
+export type ActivityTaskStartedEvent =
   EventWithAttributes<'activityTaskStartedEventAttributes'>;
-type ActivityTaskCompletedEvent =
+export type ActivityTaskCompletedEvent =
   EventWithAttributes<'activityTaskCompletedEventAttributes'>;
-type ActivityTaskFailedEvent =
+export type ActivityTaskFailedEvent =
   EventWithAttributes<'activityTaskFailedEventAttributes'>;
-type ActivityTaskTimedOutEvent =
+export type ActivityTaskTimedOutEvent =
   EventWithAttributes<'activityTaskTimedOutEventAttributes'>;
-type TimerStartedEvent = EventWithAttributes<'timerStartedEventAttributes'>;
-type TimerFiredEvent = EventWithAttributes<'timerFiredEventAttributes'>;
-type ActivityTaskCancelRequestedEvent =
+export type TimerStartedEvent =
+  EventWithAttributes<'timerStartedEventAttributes'>;
+export type TimerFiredEvent = EventWithAttributes<'timerFiredEventAttributes'>;
+export type ActivityTaskCancelRequestedEvent =
   EventWithAttributes<'activityTaskCancelRequestedEventAttributes'>;
-type ActivityTaskCanceledEvent =
+export type ActivityTaskCanceledEvent =
   EventWithAttributes<'activityTaskCanceledEventAttributes'>;
-type TimerCanceledEvent = EventWithAttributes<'timerCanceledEventAttributes'>;
-type MarkerRecordedEvent = EventWithAttributes<'markerRecordedEventAttributes'>;
-type WorkflowExecutionSignaledEvent =
+export type TimerCanceledEvent =
+  EventWithAttributes<'timerCanceledEventAttributes'>;
+export type MarkerRecordedEvent =
+  EventWithAttributes<'markerRecordedEventAttributes'>;
+export type WorkflowExecutionSignaledEvent =
   EventWithAttributes<'workflowExecutionSignaledEventAttributes'>;
-type WorkflowExecutionTerminatedEvent =
+export type WorkflowExecutionTerminatedEvent =
   EventWithAttributes<'workflowExecutionTerminatedEventAttributes'>;
-type WorkflowExecutionCancelRequestedEvent =
+export type WorkflowExecutionCancelRequestedEvent =
   EventWithAttributes<'workflowExecutionCancelRequestedEventAttributes'>;
-type WorkflowExecutionCanceledEvent =
+export type WorkflowExecutionCanceledEvent =
   EventWithAttributes<'workflowExecutionCanceledEventAttributes'>;
-type RequestCancelExternalWorkflowExecutionInitiatedEvent =
+export type RequestCancelExternalWorkflowExecutionInitiatedEvent =
   EventWithAttributes<'requestCancelExternalWorkflowExecutionInitiatedEventAttributes'>;
-type RequestCancelExternalWorkflowExecutionFailedEvent =
+export type RequestCancelExternalWorkflowExecutionFailedEvent =
   EventWithAttributes<'requestCancelExternalWorkflowExecutionFailedEventAttributes'>;
-type ExternalWorkflowExecutionCancelRequestedEvent =
+export type ExternalWorkflowExecutionCancelRequestedEvent =
   EventWithAttributes<'externalWorkflowExecutionCancelRequestedEventAttributes'>;
-type WorkflowExecutionContinuedAsNewEvent =
+export type WorkflowExecutionContinuedAsNewEvent =
   EventWithAttributes<'workflowExecutionContinuedAsNewEventAttributes'>;
-type StartChildWorkflowExecutionInitiatedEvent =
+export type StartChildWorkflowExecutionInitiatedEvent =
   EventWithAttributes<'startChildWorkflowExecutionInitiatedEventAttributes'>;
-type StartChildWorkflowExecutionFailedEvent =
+export type StartChildWorkflowExecutionFailedEvent =
   EventWithAttributes<'startChildWorkflowExecutionFailedEventAttributes'>;
-type ChildWorkflowExecutionStartedEvent =
+export type ChildWorkflowExecutionStartedEvent =
   EventWithAttributes<'childWorkflowExecutionStartedEventAttributes'>;
-type ChildWorkflowExecutionCompletedEvent =
+export type ChildWorkflowExecutionCompletedEvent =
   EventWithAttributes<'childWorkflowExecutionCompletedEventAttributes'>;
-type ChildWorkflowExecutionFailedEvent =
+export type ChildWorkflowExecutionFailedEvent =
   EventWithAttributes<'childWorkflowExecutionFailedEventAttributes'>;
-type ChildWorkflowExecutionCanceledEvent =
+export type ChildWorkflowExecutionCanceledEvent =
   EventWithAttributes<'childWorkflowExecutionCanceledEventAttributes'>;
-type ChildWorkflowExecutionTimedOutEvent =
+export type ChildWorkflowExecutionTimedOutEvent =
   EventWithAttributes<'childWorkflowExecutionTimedOutEventAttributes'>;
-type ChildWorkflowExecutionTerminatedEvent =
+export type ChildWorkflowExecutionTerminatedEvent =
   EventWithAttributes<'childWorkflowExecutionTerminatedEventAttributes'>;
-type SignalExternalWorkflowExecutionInitiatedEvent =
+export type SignalExternalWorkflowExecutionInitiatedEvent =
   EventWithAttributes<'signalExternalWorkflowExecutionInitiatedEventAttributes'>;
-type SignalExternalWorkflowExecutionFailedEvent =
+export type SignalExternalWorkflowExecutionFailedEvent =
   EventWithAttributes<'signalExternalWorkflowExecutionFailedEventAttributes'>;
-type ExternalWorkflowExecutionSignaledEvent =
+export type ExternalWorkflowExecutionSignaledEvent =
   EventWithAttributes<'externalWorkflowExecutionSignaledEventAttributes'>;
-type UpsertWorkflowSearchAttributesEvent =
+export type UpsertWorkflowSearchAttributesEvent =
   EventWithAttributes<'upsertWorkflowSearchAttributesEventAttributes'>;
 
-type FailActivityTaskRequest =
-  import('$types').IRespondActivityTaskFailedByIdRequest;
-type FailActivityTaskResponse =
-  import('$types').IRespondActivityTaskFailedByIdResponse;
-type CompleteActivityTaskRequest =
-  import('$types').IRespondActivityTaskCompletedByIdRequest;
-type CompleteActivityTaskResponse =
-  import('$types').IRespondActivityTaskCompletedByIdResponse;
+export type FailActivityTaskRequest =
+  import('$types').ActivityTaskFailedByIdRequest;
+export type FailActivityTaskResponse =
+  import('$types').ActivityTaskFailedByIdResponse;
+export type CompleteActivityTaskRequest =
+  import('$types').ActivityTaskCompletedByIdRequest;
+export type CompleteActivityTaskResponse =
+  import('$types').ActivityTaskCompletedByIdResponse;

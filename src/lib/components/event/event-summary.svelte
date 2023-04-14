@@ -17,6 +17,12 @@
   import Pagination from '$lib/holocene/pagination.svelte';
   import { fetchAllEvents } from '$lib/services/events-service';
 
+  import type {
+    CommonHistoryEvent,
+    EventTypeCategory,
+    IterableEvent,
+  } from 'src/types/events';
+
   export let compact = false;
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);

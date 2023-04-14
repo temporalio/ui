@@ -1,3 +1,5 @@
+import type { WorkflowEvent } from 'src/types/events';
+
 /**
  *
  * @param events an array of WorkflowEvents to search through

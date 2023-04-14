@@ -6,6 +6,7 @@ import { isObject } from './is';
 
 import type { Payload } from '$types';
 import type { CombinedAttributes } from './format-event-attributes';
+import type { MarkerRecordedEvent, WorkflowEvent } from 'src/types/events';
 
 type SummaryAttribute = {
   key: string;

@@ -1,6 +1,12 @@
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+import type {
+  FailActivityTaskRequest,
+  FailActivityTaskResponse,
+  CompleteActivityTaskRequest,
+  CompleteActivityTaskResponse,
+} from 'src/types/events';
 
 export const failActivityTask = async ({
   namespace,

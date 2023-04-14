@@ -114,6 +114,14 @@ export type UpsertWorkflowSearchAttributesEventAttributes =
   temporal.api.history.v1.IUpsertWorkflowSearchAttributesEventAttributes;
 export type StartBatchOperationRequest =
   temporal.api.workflowservice.v1.IStartBatchOperationRequest;
+export type ActivityTaskFailedByIdRequest =
+  temporal.api.workflowservice.v1.IRespondActivityTaskFailedRequest;
+export type ActivityTaskFailedByIdResponse =
+  temporal.api.workflowservice.v1.IRespondActivityTaskFailedResponse;
+export type ActivityTaskCompletedByIdRequest =
+  temporal.api.workflowservice.v1.IRespondActivityTaskCompletedRequest;
+export type ActivityTaskCompletedByIdResponse =
+  temporal.api.workflowservice.v1.IRespondActivityTaskCompletedResponse;
 
 // api.enums
 

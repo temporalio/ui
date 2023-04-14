@@ -1,3 +1,5 @@
+import type { EventType } from 'src/types/events';
+
 export type EventClassification = (typeof eventClassifications)[number];
 
 export const eventClassifications = [

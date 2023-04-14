@@ -2,6 +2,11 @@ import { decodePayload } from '$lib/utilities/decode-payload';
 import { isNull } from '$lib/utilities/is';
 import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
 import { simplifyAttributes } from './event-history/simplify-attributes';
+import type {
+  PendingActivityInfo,
+  PendingActivity,
+  PendingChildren,
+} from 'src/types/events';
 
 const toPendingActivities = (
   pendingActivity: PendingActivityInfo[] = [],
