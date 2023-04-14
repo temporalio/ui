@@ -8,6 +8,7 @@ import { get } from 'svelte/store';
 import type {
   ArchiveFilterParameters,
   FilterParameters,
+  SearchAttributes,
 } from 'src/types/workflows';
 
 export type QueryKey =

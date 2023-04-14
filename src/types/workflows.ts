@@ -69,6 +69,22 @@ export type ArchiveFilterParameters = Omit<FilterParameters, 'timeRange'> & {
 
 export type WorkflowIdentifier = import('$types').WorkflowExecutionInput;
 
+type SearchAttributesValue =
+  | 'Bool'
+  | 'Datetime'
+  | 'Double'
+  | 'Int'
+  | 'Keyword'
+  | 'Text';
+
+export type SearchAttributes = {
+  [k: string]: SearchAttributesValue;
+};
+
+export type SearchAttributesResponse = {
+  keys: SearchAttributes;
+};
+
 export type WorkflowSearchAttributes = {
   indexedFields?: Record<string, Payload>;
 };
