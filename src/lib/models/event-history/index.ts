@@ -24,6 +24,7 @@ import { simplifyAttributes } from './simplify-attributes';
 import type {
   EventWithMetadata,
   EventsWithMetadata,
+  EventAttributeKey,
   EventAttributesWithType,
   EventType,
   WorkflowEvents,
@@ -40,7 +41,7 @@ export async function getEventAttributes(
     codecPassAccessToken = passAccessToken,
     codecIncludeCredentials = includeCredentials,
   }: DecodeFunctions = {},
-): Promise<EventAttributesWithType> {
+): Promise<EventAttributesWithType<EventAttributeKey>> {
   const { key, attributes } = findAttributesAndKey(historyEvent);
   // Use locally set endpoint over settings endpoint for testing purposes
   const endpoint = getCodecEndpoint(settings, encoderEndpoint);

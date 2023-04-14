@@ -97,8 +97,8 @@ export type CommonHistoryEvent = Pick<WorkflowEvent, CommonEventKey>;
 
 export type EventAttributeKey = keyof Omit<HistoryEvent, CommonEventKey>;
 export type EventAttribute = HistoryEvent[EventAttributeKey];
-export type EventAttributesWithType<K = EventAttributeKey> =
-  HistoryEvent[EventAttributeKey] & {
+export type EventAttributesWithType<K extends keyof HistoryEvent> =
+  HistoryEvent[K] & {
     type: K;
   };
 

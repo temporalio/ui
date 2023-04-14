@@ -2,7 +2,10 @@ import { formatDate } from '$lib/utilities/format-date';
 import { formatDuration } from '$lib/utilities/format-time';
 
 import type { PendingActivityInfo } from '$types';
-import type { EventAttributesWithType } from 'src/types/events';
+import type {
+  EventAttributeKey,
+  EventAttributesWithType,
+} from 'src/types/events';
 
 const keysToBeFormattedAsTime = [
   'closeTime',
@@ -84,15 +87,15 @@ export const getValueForFirstKey = (value: Record<string, string>): string => {
 };
 
 export function simplifyAttributes(
-  attributes: EventAttributesWithType,
+  attributes: EventAttributesWithType<EventAttributeKey>,
   preserveTimestamps?: boolean,
-): EventAttributesWithType;
+): EventAttributesWithType<EventAttributeKey>;
 export function simplifyAttributes(
   attributes: PendingActivityInfo,
   preserveTimestamps?: boolean,
 ): PendingActivityInfo;
 export function simplifyAttributes<
-  T = EventAttributesWithType | PendingActivityInfo,
+  T = EventAttributesWithType<EventAttributeKey> | PendingActivityInfo,
 >(attributes: T, preserveTimestamps = false): T {
   for (const [key, value] of Object.entries(attributes)) {
     if (canBeSimplified(value)) {
