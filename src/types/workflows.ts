@@ -6,9 +6,6 @@ import type {
 } from './events';
 import type { Replace, Optional } from './global';
 
-export type WorkflowExecutionStatus = import('$types').WorkflowExecutionStatus;
-export type WorkflowTaskFailedCause = import('$types').WorkflowTaskFailedCause;
-
 /**
  * Replace Longs, ITimestamps, UInt8Array's etc. with their corresponding http values
  */

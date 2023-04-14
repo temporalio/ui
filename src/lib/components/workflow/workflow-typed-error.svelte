@@ -5,7 +5,7 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
-  import type { WorkflowTaskFailedCause } from 'src/types/workflows';
+  import type { WorkflowTaskFailedCause } from '$types';
   import type { WorkflowTaskFailedEvent } from 'src/types/events';
 
   const WORKFLOW_TASK_FAILED_ERROR_COPY = {
