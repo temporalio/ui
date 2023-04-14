@@ -6,6 +6,8 @@
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
+  import type { WorkflowFilter } from '$lib/models/workflow-filters';
+
   const AllStatuses = {
     All: 'All',
     Running: 'Running',
@@ -22,7 +24,7 @@
   );
   $: statusSort = $workflowSorts.find((s) => s.attribute === 'ExecutionStatus');
 
-  function mapStatusToFilter(value) {
+  function mapStatusToFilter(value: string) {
     return {
       attribute: 'ExecutionStatus',
       value,
@@ -32,7 +34,7 @@
     };
   }
 
-  function mapStatusesToFilters(filters) {
+  function mapStatusesToFilters(filters: WorkflowFilter[]) {
     if (filters.length === 1) {
       return [mapStatusToFilter(filters[0].value)];
     } else {

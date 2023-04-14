@@ -42,12 +42,6 @@
   export { className as class };
 
   let modalElement: HTMLDialogElement;
-  let hasInput = false;
-  $: {
-    if (modalElement) {
-      hasInput = modalElement.querySelector('input') !== null;
-    }
-  }
 
   const dispatch = createEventDispatcher<{
     cancelModal: undefined;

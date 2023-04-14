@@ -35,7 +35,7 @@
 
   $: ({ workflow, workers } = $workflowRun);
 
-  let refreshInterval;
+  let refreshInterval: NodeJS.Timer;
   const refreshRate = 15000;
 
   $: routeParameters = {

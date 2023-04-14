@@ -96,7 +96,7 @@
 
 {#if eventGroups.length}
   <div
-    class="min-h-40 relative max-h-96 w-full cursor-crosshair overflow-auto rounded-lg border border-gray-900 bg-blueGray-50 bg-white"
+    class="min-h-40 relative max-h-96 w-full cursor-crosshair overflow-auto rounded-lg border border-gray-900 bg-white"
     bind:clientWidth={width}
     on:mousemove={handleMouseMove}
   >

@@ -12,7 +12,6 @@
   import { onMount } from 'svelte';
 
   import type { HTMLAttributes } from 'svelte/elements';
-  import type { NextPageToken } from 'src/types/global';
 
   type T = $$Generic;
   interface $$Props extends HTMLAttributes<HTMLDivElement> {
