@@ -1,4 +1,5 @@
 import { temporal } from '@temporalio/proto';
+import type { temporal as Temporal } from '@temporalio/proto';
 
 export enum ResetType {
   FirstWorkflowTask = 0,
@@ -13,3 +14,5 @@ export const {
     },
   },
 } = temporal;
+
+export type TResetReapplyType = Temporal.api.enums.v1.ResetReapplyType;

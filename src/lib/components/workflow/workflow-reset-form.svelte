@@ -2,13 +2,18 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
-  import { ResetReapplyType, ResetType } from '$lib/models/workflow-actions';
+  import {
+    ResetReapplyType,
+    ResetType,
+    type TResetReapplyType,
+  } from '$lib/models/workflow-actions';
 
   const DEFAULT_RESET_ID_HINT_TEXT =
     'Only Workflow Events of type WorkflowTaskCompleted, WorkflowTaskFailed, or WorkflowTaskTimeout are supported.';
 
   export let resetType: ResetType;
-  export let resetReapplyType = ResetReapplyType.RESET_REAPPLY_TYPE_UNSPECIFIED;
+  export let resetReapplyType: TResetReapplyType =
+    ResetReapplyType.RESET_REAPPLY_TYPE_UNSPECIFIED;
   export let eventIdValid: boolean;
   export let reason: string | undefined;
   export let lastEvent: WorkflowEvent | undefined;
