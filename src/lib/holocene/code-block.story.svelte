@@ -30,7 +30,7 @@
 
   <Hst.Variant title="A text code block">
     <CodeBlock
-      content={'tctl --namespace example namespace'}
+      content={'temporal operator namespace list'}
       language="text"
       inline
     />

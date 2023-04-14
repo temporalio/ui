@@ -2,13 +2,14 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
-  import { ResetType } from '$lib/models/workflow-actions';
+  import { ResetReapplyType, ResetType } from '$lib/models/workflow-actions';
   import type { WorkflowEvent } from 'src/types/events';
 
   const DEFAULT_RESET_ID_HINT_TEXT =
     'Only Workflow Events of type WorkflowTaskCompleted, WorkflowTaskFailed, or WorkflowTaskTimeout are supported.';
 
   export let resetType: ResetType;
+  export let resetReapplyType: ResetReapplyType = ResetReapplyType.Unspecified;
   export let eventIdValid: boolean;
   export let reason: string | undefined;
   export let lastEvent: WorkflowEvent | undefined;
@@ -19,15 +20,30 @@
   const resetTypes = [
     {
       value: ResetType.FirstWorkflowTask,
-      label: 'Reset to first workflow task',
+      label: 'First workflow task',
     },
     {
       value: ResetType.LastWorkflowTask,
-      label: 'Reset to last workflow task',
+      label: 'Last workflow task',
     },
     {
       value: ResetType.EventId,
-      label: 'Reset to Event ID',
+      label: 'Event ID',
+    },
+  ];
+
+  const resetReapplyTypes = [
+    {
+      value: ResetReapplyType.Unspecified,
+      label: 'All Events',
+    },
+    {
+      value: ResetReapplyType.Signal,
+      label: 'Signals Only',
+    },
+    {
+      value: ResetReapplyType.None,
+      label: 'None',
     },
   ];
 
@@ -49,12 +65,25 @@
 
 <div class="flex w-full flex-col gap-4">
   <Select
+    label="Reset to"
     id="reset-type-select"
     bind:value={resetType}
     testId="workflow-reset-type-select"
   >
     {#each resetTypes as { value, label }}
-      <Option value={Number(value)}>
+      <Option {value}>
+        {label}
+      </Option>
+    {/each}
+  </Select>
+  <Select
+    label="Reapply Type"
+    id="reset-reapply-type-select"
+    bind:value={resetReapplyType}
+    testId="workflow-reset-reapply-type-select"
+  >
+    {#each resetReapplyTypes as { value, label }}
+      <Option {value}>
         {label}
       </Option>
     {/each}

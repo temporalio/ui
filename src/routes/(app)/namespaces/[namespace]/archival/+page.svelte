@@ -20,6 +20,7 @@
     workflows,
     archivalEnabled,
     visibilityArchivalEnabled,
+    isS3Bucket,
   } = data);
 </script>
 
@@ -28,7 +29,7 @@
   <h1 class="text-2xl" data-testid="archived-enabled-title">
     Archived Workflows
   </h1>
-  <WorkflowFilters />
+  {#if !isS3Bucket}<WorkflowFilters />{/if}
   {#if workflows?.length}
     <Pagination
       items={workflows}
@@ -65,7 +66,7 @@
     >:
   </p>
   <CodeBlock
-    content={`tctl --namespace ${namespaceName} namespace update -vas enabled`}
+    content={`temporal operator namespace update --visibility-archival-state enabled ${namespaceName}`}
     language="text"
     inline
   />
@@ -75,7 +76,7 @@
   </h1>
   <p>Run this command to enable archival visibility for event histories:</p>
   <CodeBlock
-    content={`tctl --namespace ${namespaceName} namespace update --has enabled`}
+    content={`temporal operator namespace update --history-archival-state enabled ${namespaceName}`}
     language="text"
     inline
   />
@@ -89,7 +90,7 @@
       >:
     </p>
     <CodeBlock
-      content={`tctl --namespace ${namespaceName} namespace update -vas enabled`}
+      content={`temporal operator namespace update --visibility-archival-state enabled ${namespaceName}`}
       language="text"
       inline
     />

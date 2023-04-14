@@ -1,4 +1,4 @@
-import type { ErrorCallback } from '$lib/utilities/request-from-api';
+import { v4 } from 'uuid';
 
 import {
   toWorkflowExecution,
@@ -16,8 +16,11 @@ import {
 import { noop } from 'svelte/internal';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { btoa } from '$lib/utilities/btoa';
-import { v4 } from 'uuid';
-import type { NamespaceScopedRequest } from 'src/types/global';
+
+import type { ErrorCallback } from '$lib/utilities/request-from-api';
+import type { ResetReapplyType } from '$lib/models/workflow-actions';
+import type { ResetWorkflowRequest } from '$types';
+import type { NamespaceScopedRequest, Replace } from 'src/types/global';
 import type {
   WorkflowExecution,
   ListWorkflowExecutionsResponse,
@@ -65,6 +68,7 @@ export type ResetWorkflowOptions = {
   runId: string;
   eventId: string;
   reason: string;
+  resetReapplyType: ResetReapplyType;
 };
 
 export type FetchWorkflow =
@@ -314,6 +318,7 @@ export async function resetWorkflow({
   runId,
   eventId,
   reason,
+  resetReapplyType,
 }: ResetWorkflowOptions): Promise<{ runId: string }> {
   const route = routeForApi('workflow.reset', {
     namespace,
@@ -321,12 +326,16 @@ export async function resetWorkflow({
     runId,
   });
 
-  const body = {
+  const body: Replace<
+    ResetWorkflowRequest,
+    { workflowTaskFinishEventId: string; resetReapplyType: ResetReapplyType }
+  > = {
     workflowExecution: {
       workflowId,
       runId,
     },
     workflowTaskFinishEventId: eventId,
+    resetReapplyType,
     requestId: v4(),
     reason,
   };

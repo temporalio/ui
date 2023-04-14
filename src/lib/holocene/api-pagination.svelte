@@ -3,7 +3,10 @@
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
   import SkeletonTable from '$lib/holocene/skeleton/table.svelte';
 
-  import { createPaginationStore } from '$lib/stores/api-pagination';
+  import {
+    createPaginationStore,
+    type PaginationStore,
+  } from '$lib/stores/api-pagination';
   import { options } from '$lib/stores/pagination';
   import { isError } from '$lib/utilities/is';
   import { onMount } from 'svelte';
@@ -11,9 +14,10 @@
   import type { HTMLAttributes } from 'svelte/elements';
   import type { NextPageToken } from 'src/types/global';
 
+  type T = $$Generic;
   interface $$Props extends HTMLAttributes<HTMLDivElement> {
     onError?: (error: Error | unknown) => void | undefined;
-    onFetch: <T>() => Promise<PaginatedRequest<T>>;
+    onFetch: () => Promise<PaginatedRequest<T>>;
     onShiftUp?: (event: KeyboardEvent) => void | undefined;
     onShiftDown?: (event: KeyboardEvent) => void | undefined;
     onSpace?: (event: KeyboardEvent) => void | undefined;
@@ -21,13 +25,14 @@
     defaultPageSize?: string | number | undefined;
     total?: string | number;
   }
+
   type PaginatedRequest<T> = (
     size: number,
-    token: NextPageToken,
-  ) => Promise<{ items: T[]; nextPageToken: NextPageToken }>;
+    token: string,
+  ) => Promise<{ items: T[]; nextPageToken: string }>;
 
   export let onError: (error: Error) => void | undefined = undefined;
-  export let onFetch: <T>() => Promise<PaginatedRequest<T>>;
+  export let onFetch: () => Promise<PaginatedRequest<T>>;
   export let onShiftUp: (event: KeyboardEvent) => void | undefined = undefined;
   export let onShiftDown: (event: KeyboardEvent) => void | undefined =
     undefined;
@@ -37,7 +42,11 @@
   export let defaultPageSize: string | number | undefined = undefined;
   export let total: string | number = '';
 
-  let store = createPaginationStore(pageSizeOptions, defaultPageSize);
+  let store: PaginationStore<T> = createPaginationStore(
+    pageSizeOptions,
+    defaultPageSize,
+  );
+
   let error: Error;
 
   function clearError() {
@@ -59,8 +68,8 @@
     }
   }
 
-  async function initalDataFetch<T>() {
-    const fetchData = await onFetch<T>();
+  async function initalDataFetch() {
+    const fetchData = await onFetch();
     try {
       const response = await fetchData($store.pageSize, '');
       const { items, nextPageToken } = response;
@@ -71,12 +80,12 @@
     }
   }
 
-  async function fetchIndexData<T>() {
+  async function fetchIndexData() {
     clearError();
     store.setUpdating();
     if (!$store.hasNextIndexData) {
       try {
-        const fetchData = await onFetch<T>();
+        const fetchData = await onFetch();
         const response = await fetchData(
           $store.pageSize,
           $store.indexData[$store.index].nextToken,

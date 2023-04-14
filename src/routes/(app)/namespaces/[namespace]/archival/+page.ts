@@ -20,16 +20,20 @@ export const load: PageLoad = async function ({ params, url }) {
   const timeRange = searchParams.get('time-range');
   const executionStatus = searchParams.get('status') as WorkflowStatus;
 
-  const parameters: ArchiveFilterParameters = {
-    workflowId,
-    workflowType,
-    closeTime: timeRange,
-    executionStatus,
-  };
-
   const namespace: DescribeNamespaceResponse = await fetchNamespace(
     params.namespace,
   );
+  const isS3Bucket = namespace.config?.historyArchivalUri
+    ?.toLowerCase()
+    ?.startsWith('s3://');
+  const parameters: ArchiveFilterParameters = isS3Bucket
+    ? {}
+    : {
+        workflowId,
+        workflowType,
+        closeTime: timeRange,
+        executionStatus,
+      };
 
   // These are incorrectly typed as enums and need to be coerced to strings
   const archivalEnabled =
@@ -50,5 +54,6 @@ export const load: PageLoad = async function ({ params, url }) {
     namespace,
     archivalEnabled,
     visibilityArchivalEnabled,
+    isS3Bucket,
   };
 };

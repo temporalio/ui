@@ -96,6 +96,7 @@
         {#if !updating}
           <Checkbox
             id="select-visible-workflows"
+            aria-label="select all workflows"
             onDark
             hoverable
             {checked}

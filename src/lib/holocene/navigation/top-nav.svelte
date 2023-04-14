@@ -64,26 +64,24 @@
     {#if $authUser.accessToken}
       <DropdownMenu id="namespace" position="right">
         <div slot="trigger" class="flex items-center gap-1">
-          {#if $authUser?.picture}
-            <img
-              src={$authUser?.picture}
-              alt={$authUser?.profile ?? 'user profile'}
-              class="mt-2 h-[24px] w-[24px] cursor-pointer rounded-md"
-              on:error={fixImage}
-              class:hidden={!showProfilePic}
-            />
-            <div
-              class="aspect-square h-[24px] h-full w-[24px] rounded-full bg-blue-200 p-0.5"
-              class:hidden={showProfilePic}
-            >
-              {#if $authUser?.name}
-                <div class="text-center text-sm text-black">
-                  {$authUser?.name.trim().charAt(0)}
-                </div>
-              {/if}
-            </div>
-            <Icon name="chevron-down" class="mt-1" />
-          {/if}
+          <img
+            src={$authUser?.picture}
+            alt={$authUser?.profile ?? 'user profile'}
+            class="mt-2 h-[24px] w-[24px] cursor-pointer rounded-md"
+            on:error={fixImage}
+            class:hidden={!showProfilePic}
+          />
+          <div
+            class="aspect-square h-[24px] h-full w-[24px] rounded-md bg-blue-200 p-0.5"
+            class:hidden={showProfilePic}
+          >
+            {#if $authUser?.name}
+              <div class="text-center text-sm text-black">
+                {$authUser?.name.trim().charAt(0)}
+              </div>
+            {/if}
+          </div>
+          <Icon name="chevron-down" class="mt-1" />
         </div>
         <div class="h-auto w-[300px]" slot="items">
           <MenuItem class="truncate rounded-t-xl" disabled
