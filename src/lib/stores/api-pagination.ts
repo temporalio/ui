@@ -10,7 +10,7 @@ import {
 import type { Readable } from 'svelte/store';
 
 type PaginationMethods<T> = {
-  nextPageWithItems: (t: NextPageToken, items: T[]) => void;
+  nextPageWithItems: (t: string, items: T[]) => void;
   nextPage: () => void;
   previousPage: () => void;
   setUpdating: () => void;
