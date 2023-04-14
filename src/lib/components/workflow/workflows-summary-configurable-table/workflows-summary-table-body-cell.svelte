@@ -58,7 +58,7 @@
     label in WORKFLOW_CELLS ? WORKFLOW_CELLS[label] : { label, path: label };
   $: {
     if (isPathCell(cell)) {
-      cellContent = workflow[cell.path] ?? '';
+      cellContent = String(workflow[cell.path]) ?? '';
     } else if (isDataCell(cell)) {
       cellContent = cell.data(workflow, $timeFormat) ?? '';
     }
