@@ -4,6 +4,7 @@ import {
   passAccessToken,
   includeCredentials,
 } from '$lib/stores/data-encoder-config';
+import type { Settings } from 'src/types/global';
 
 export const getCodecEndpoint = (
   settings: Settings,

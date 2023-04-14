@@ -5,6 +5,7 @@
   import { page } from '$app/stores';
 
   import { isNetworkError } from '$lib/utilities/is-network-error';
+  import type { NetworkError } from 'src/types/global';
 
   import Link from '$lib/holocene/link.svelte';
 
@@ -30,7 +31,7 @@
   class="mt-32 text-center align-middle"
   role="alert"
 >
-  <h1 class="text-[12rem] font-semibold ">{status}</h1>
+  <h1 class="text-[12rem] font-semibold">{status}</h1>
   <p class="-mt-6 mb-5 text-lg">Uh oh. There's an error.</p>
   <p class="my-4 w-auto text-2xl font-extrabold text-red-700">
     {message}

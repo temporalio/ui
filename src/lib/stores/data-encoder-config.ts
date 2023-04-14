@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store';
 import { persistStore } from '$lib/stores/persist-store';
+import type { DataEncoderStatus } from 'src/types/global';
 
 export const codecEndpoint = persistStore('endpoint', null, true);
 

@@ -5,6 +5,8 @@ import { derived, type Readable } from 'svelte/store';
 import { persistStore } from './persist-store';
 import { customSearchAttributes } from './search-attributes';
 
+import type { TimeFormat } from 'src/types/global';
+
 export const MAX_PINNED_COLUMNS = 2;
 
 export type WorkflowHeaderLabel =

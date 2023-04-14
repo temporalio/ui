@@ -5,6 +5,12 @@ import { toEventHistory } from '$lib/models/event-history';
 import { isSortOrder } from '$lib/utilities/is';
 
 import type { EventSortOrder } from '$lib/stores/event-view';
+import type {
+  NamespaceScopedRequest,
+  NextPageToken,
+  PaginationCallbacks,
+  Settings,
+} from 'src/types/global';
 
 export type FetchEventsParameters = NamespaceScopedRequest &
   PaginationCallbacks<GetWorkflowExecutionHistoryResponse> & {

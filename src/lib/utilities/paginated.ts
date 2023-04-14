@@ -1,6 +1,12 @@
 import { handleError } from './handle-error';
 import { isFunction } from './is-function';
 import { merge } from './merge';
+import type {
+  NextPageToken,
+  WithNextPageToken,
+  WithoutNextPageToken,
+  PaginationCallbacks,
+} from 'src/types/global';
 
 type PaginatedOptions<T> = PaginationCallbacks<T> & {
   token?: NextPageToken;

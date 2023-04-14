@@ -12,6 +12,7 @@ import {
   getCodecEndpoint,
   getCodecPassAccessToken,
 } from '$lib/utilities/get-codec';
+import type { Settings } from 'src/types/global';
 
 export async function getActivityAttributes(
   { activity, namespace, settings, accessToken }: PendingActivityWithMetadata,

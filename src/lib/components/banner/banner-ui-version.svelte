@@ -3,6 +3,8 @@
   import type { BannersState } from '$lib/models/banner-state';
   import Banner from './banner.svelte';
 
+  import type { UiVersionInfo } from 'src/types/global';
+
   export let shownBanner: BannersState;
   export let uiVersionInfo: UiVersionInfo;
 

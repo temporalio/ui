@@ -8,6 +8,7 @@
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import DataEncoderStatus from '$lib/holocene/data-encoder-status.svelte';
   import { authUser } from '$lib/stores/auth-user';
+  import type { NamespaceListItem } from 'src/types/global';
 
   export let logout: () => void;
   export let namespaceList: NamespaceListItem[] = [];
@@ -49,7 +50,7 @@
             >
           </div>
           <div
-            class="h-auto max-h-[400px] w-[220px] max-w-[220px] overflow-auto  md:w-[360px] md:max-w-[360px] lg:w-[500px] lg:max-w-[500px]"
+            class="h-auto max-h-[400px] w-[220px] max-w-[220px] overflow-auto md:w-[360px] md:max-w-[360px] lg:w-[500px] lg:max-w-[500px]"
             slot="items"
             let:show
             data-testid="namespace-select-list"

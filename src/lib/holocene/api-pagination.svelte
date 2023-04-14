@@ -9,6 +9,7 @@
   import { onMount } from 'svelte';
 
   import type { HTMLAttributes } from 'svelte/elements';
+  import type { NextPageToken } from 'src/types/global';
 
   interface $$Props extends HTMLAttributes<HTMLDivElement> {
     onError?: (error: Error | unknown) => void | undefined;

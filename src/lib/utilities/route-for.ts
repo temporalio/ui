@@ -2,6 +2,7 @@ import { browser } from '$app/environment';
 import { toURL } from '$lib/utilities/to-url';
 import { encodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { base } from '$app/paths';
+import type { Settings } from 'src/types/global';
 
 type RouteParameters = {
   namespace: string;

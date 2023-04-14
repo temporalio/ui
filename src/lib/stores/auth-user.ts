@@ -1,5 +1,6 @@
 import { get } from 'svelte/store';
 import { persistStore } from '$lib/stores/persist-store';
+import type { User } from 'src/types/global';
 
 export const authUser = persistStore<User>('AuthUser', {});
 

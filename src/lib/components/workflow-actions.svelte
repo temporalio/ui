@@ -29,6 +29,7 @@
   import { workflowSignalEnabled } from '$lib/utilities/workflow-signal-enabled';
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
   import { workflowResetEnabled } from '$lib/utilities/workflow-reset-enabled';
+  import type { NetworkError } from 'src/types/global';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;

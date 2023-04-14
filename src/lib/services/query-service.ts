@@ -18,6 +18,7 @@ import {
 } from '$lib/utilities/parse-with-big-int';
 import { has } from '$lib/utilities/has';
 import { passAccessToken as codecPassAccessToken } from '$lib/stores/data-encoder-config';
+import type { Eventual, Settings } from 'src/types/global';
 
 type QueryRequestParameters = {
   workflow: Eventual<{ id: string; runId: string }>;

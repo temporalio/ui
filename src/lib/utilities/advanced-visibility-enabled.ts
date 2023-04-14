@@ -1,4 +1,5 @@
 import { isVersionNewer } from './version-check';
+import type { ClusterInformation } from 'src/types/global';
 
 export const advancedVisibilityEnabled = (
   cluster: ClusterInformation,
