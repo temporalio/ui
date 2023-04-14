@@ -121,21 +121,13 @@ make bins
 ./temporal-canary start
 ```
 
-### `temporal`
+### `temporal` CLI
 
 ```bash
-make bins
-TEMPORAL_ENVIRONMENT=development_sqlite make start
-```
-
-### `tctl`
-
-```bash
-make build
-./tctl config set version next
-./tctl -n canary namespace register
-./tctl -n default namespace register
-./tctl cluster add-search-attributes -y \
+brew install temporal
+temporal server start-dev
+temporal operator namespace create canary
+temporal operator search-attribute create \
  	--name CustomKeywordField --type Keyword \
  	--name CustomStringField --type Text \
  	--name CustomTextField --type Text \

@@ -65,7 +65,7 @@
     >:
   </p>
   <CodeBlock
-    content={`tctl --namespace ${namespaceName} namespace update -vas enabled`}
+    content={`temporal operator namespace update --visibility-archival-state enabled ${namespaceName}`}
     language="text"
     inline
   />
@@ -75,7 +75,7 @@
   </h1>
   <p>Run this command to enable archival visibility for event histories:</p>
   <CodeBlock
-    content={`tctl --namespace ${namespaceName} namespace update --has enabled`}
+    content={`temporal operator namespace update --history-archival-state enabled ${namespaceName}`}
     language="text"
     inline
   />
@@ -89,7 +89,7 @@
       >:
     </p>
     <CodeBlock
-      content={`tctl --namespace ${namespaceName} namespace update -vas enabled`}
+      content={`temporal operator namespace update --visibility-archival-state enabled ${namespaceName}`}
       language="text"
       inline
     />
