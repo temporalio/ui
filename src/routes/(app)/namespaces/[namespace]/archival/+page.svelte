@@ -20,6 +20,7 @@
     workflows,
     archivalEnabled,
     visibilityArchivalEnabled,
+    isS3Bucket,
   } = data);
 </script>
 
@@ -28,7 +29,7 @@
   <h1 class="text-2xl" data-testid="archived-enabled-title">
     Archived Workflows
   </h1>
-  <WorkflowFilters />
+  {#if !isS3Bucket}<WorkflowFilters />{/if}
   {#if workflows?.length}
     <Pagination
       items={workflows}
