@@ -160,6 +160,7 @@
               {#if workflows.length > 0 && $workflowTableColumns.length > 0}
                 <Checkbox
                   id="select-visible-workflows"
+                  aria-label="select all workflows"
                   onDark
                   hoverable
                   {checked}
@@ -235,6 +236,7 @@
                     bind:group={selectedWorkflows}
                     value={workflow}
                     disabled={allSelected}
+                    aria-label="select workflow"
                   />
                 </td>
               {/if}
