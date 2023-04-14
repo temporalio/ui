@@ -49,7 +49,7 @@
             >
           </div>
           <div
-            class="h-auto max-h-[400px] w-[220px] max-w-[220px] overflow-auto  md:w-[360px] md:max-w-[360px] lg:w-[500px] lg:max-w-[500px]"
+            class="h-auto max-h-[400px] w-[220px] max-w-[220px] overflow-auto md:w-[360px] md:max-w-[360px] lg:w-[500px] lg:max-w-[500px]"
             slot="items"
             let:show
             data-testid="namespace-select-list"
@@ -63,7 +63,7 @@
     {#if $authUser.accessToken}
       <DropdownMenu id="namespace" position="right">
         <div slot="trigger" class="flex items-center gap-1">
-          {#if $authUser?.picture}
+          {#if false}
             <img
               src={$authUser?.picture}
               alt={$authUser?.profile ?? 'user profile'}
@@ -81,8 +81,8 @@
                 </div>
               {/if}
             </div>
-            <Icon name="chevron-down" class="mt-1" />
           {/if}
+          <Icon name="chevron-down" class="mt-1" />
         </div>
         <div class="h-auto w-[300px]" slot="items">
           <MenuItem class="truncate rounded-t-xl" disabled
