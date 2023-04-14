@@ -37,7 +37,7 @@
       : schedules;
 
   const errorMessage =
-    'Create scheduled actions using our Public API or TCTL (CLI).';
+    'Create scheduled actions using our Public API or Temporal CLI.';
 </script>
 
 <header class="flex flex-col justify-between gap-2 md:flex-row">
