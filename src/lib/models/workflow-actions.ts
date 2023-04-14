@@ -3,3 +3,9 @@ export enum ResetType {
   LastWorkflowTask = 1,
   EventId = 2,
 }
+
+export enum ResetReapplyType {
+  Unspecified = 0,
+  Signal = 1,
+  None = 2,
+}
