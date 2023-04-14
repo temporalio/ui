@@ -17,7 +17,7 @@ import {
 import { noop } from 'svelte/internal';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { btoa } from '$lib/utilities/btoa';
-import type { TResetReapplyType } from '$lib/models/workflow-actions';
+import type { ResetReapplyType } from '$lib/models/workflow-actions';
 import type { ResetWorkflowRequest } from '$types';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
@@ -57,7 +57,7 @@ export type ResetWorkflowOptions = {
   runId: string;
   eventId: string;
   reason: string;
-  resetReapplyType: TResetReapplyType;
+  resetReapplyType: ResetReapplyType;
 };
 
 export type FetchWorkflow =
@@ -317,7 +317,7 @@ export async function resetWorkflow({
 
   const body: Replace<
     ResetWorkflowRequest,
-    { workflowTaskFinishEventId: string; resetReapplyType: TResetReapplyType }
+    { workflowTaskFinishEventId: string; resetReapplyType: ResetReapplyType }
   > = {
     workflowExecution: {
       workflowId,
