@@ -1,134 +1,139 @@
 import type { google, temporal } from '@temporalio/proto';
-type DescribeNamespaceResponse =
+export type DescribeNamespaceResponse =
   temporal.api.workflowservice.v1.IDescribeNamespaceResponse;
-type DescribeWorkflowExecutionResponse =
+export type DescribeWorkflowExecutionResponse =
   temporal.api.workflowservice.v1.IDescribeWorkflowExecutionResponse;
-type ListNamespacesResponse =
+export type ListNamespacesResponse =
   temporal.api.workflowservice.v1.IListNamespacesResponse;
-type GetClusterInfoResponse =
+export type GetClusterInfoResponse =
   temporal.api.workflowservice.v1.IGetClusterInfoResponse;
-type GetWorkflowExecutionHistoryResponse =
+export type GetWorkflowExecutionHistoryResponse =
   temporal.api.workflowservice.v1.IGetWorkflowExecutionHistoryResponse;
-type GetSearchAttributesResponse =
+export type GetSearchAttributesResponse =
   temporal.api.workflowservice.v1.IGetSearchAttributesResponse;
-type ListWorkflowExecutionsResponse =
+export type ListWorkflowExecutionsResponse =
   temporal.api.workflowservice.v1.IListWorkflowExecutionsResponse;
-type ListScheduleResponse =
+export type ListScheduleResponse =
   temporal.api.workflowservice.v1.IListSchedulesResponse;
-type DescribeScheduleResponse =
+export type DescribeScheduleResponse =
   temporal.api.workflowservice.v1.IDescribeScheduleResponse;
-type Schedule = temporal.api.schedule.v1.ISchedule;
-type CreateScheduleRequest =
+export type Schedule = temporal.api.schedule.v1.ISchedule;
+export type CreateScheduleRequest =
   temporal.api.workflowservice.v1.ICreateScheduleRequest;
-type PatchScheduleRequest =
+export type PatchScheduleRequest =
   temporal.api.workflowservice.v1.IPatchScheduleRequest;
-type UpdateScheduleRequest =
+export type UpdateScheduleRequest =
   temporal.api.workflowservice.v1.IUpdateScheduleRequest;
-type History = temporal.api.history.v1.IHistory;
-type HistoryEvent = temporal.api.history.v1.IHistoryEvent;
-type WorkflowExecutionStartedEventAttributes =
+export type History = temporal.api.history.v1.IHistory;
+export type HistoryEvent = temporal.api.history.v1.IHistoryEvent;
+export type WorkflowExecutionStartedEventAttributes =
   temporal.api.history.v1.IWorkflowExecutionStartedEventAttributes;
-type WorkflowExecutionCompletedEventAttributes =
+export type WorkflowExecutionCompletedEventAttributes =
   temporal.api.history.v1.IWorkflowExecutionCompletedEventAttributes;
-type WorkflowExecutionFailedEventAttributes =
+export type WorkflowExecutionFailedEventAttributes =
   temporal.api.history.v1.IWorkflowExecutionFailedEventAttributes;
-type WorkflowExecutionTimedOutEventAttributes =
+export type WorkflowExecutionTimedOutEventAttributes =
   temporal.api.history.v1.IWorkflowExecutionTimedOutEventAttributes;
-type WorkflowTaskScheduledEventAttributes =
+export type WorkflowTaskScheduledEventAttributes =
   temporal.api.history.v1.IWorkflowTaskScheduledEventAttributes;
-type WorkflowTaskStartedEventAttributes =
+export type WorkflowTaskStartedEventAttributes =
   temporal.api.history.v1.IWorkflowTaskStartedEventAttributes;
-type WorkflowTaskCompletedEventAttributes =
+export type WorkflowTaskCompletedEventAttributes =
   temporal.api.history.v1.IWorkflowTaskCompletedEventAttributes;
-type WorkflowTaskTimedOutEventAttributes =
+export type WorkflowTaskTimedOutEventAttributes =
   temporal.api.history.v1.IWorkflowTaskTimedOutEventAttributes;
-type WorkflowTaskFailedEventAttributes =
+export type WorkflowTaskFailedEventAttributes =
   temporal.api.history.v1.IWorkflowTaskFailedEventAttributes;
-type ActivityTaskScheduledEventAttributes =
+export type ActivityTaskScheduledEventAttributes =
   temporal.api.history.v1.IActivityTaskScheduledEventAttributes;
-type ActivityTaskStartedEventAttributes =
+export type ActivityTaskStartedEventAttributes =
   temporal.api.history.v1.IActivityTaskStartedEventAttributes;
-type ActivityTaskCompletedEventAttributes =
+export type ActivityTaskCompletedEventAttributes =
   temporal.api.history.v1.IActivityTaskCompletedEventAttributes;
-type ActivityTaskFailedEventAttributes =
+export type ActivityTaskFailedEventAttributes =
   temporal.api.history.v1.IActivityTaskFailedEventAttributes;
-type ActivityTaskTimedOutEventAttributes =
+export type ActivityTaskTimedOutEventAttributes =
   temporal.api.history.v1.IActivityTaskTimedOutEventAttributes;
-type TimerStartedEventAttributes =
+export type TimerStartedEventAttributes =
   temporal.api.history.v1.ITimerStartedEventAttributes;
-type TimerFiredEventAttributes =
+export type TimerFiredEventAttributes =
   temporal.api.history.v1.ITimerFiredEventAttributes;
-type ActivityTaskCancelRequestedEventAttributes =
+export type ActivityTaskCancelRequestedEventAttributes =
   temporal.api.history.v1.IActivityTaskCancelRequestedEventAttributes;
-type ActivityTaskCanceledEventAttributes =
+export type ActivityTaskCanceledEventAttributes =
   temporal.api.history.v1.IActivityTaskCanceledEventAttributes;
-type TimerCanceledEventAttributes =
+export type TimerCanceledEventAttributes =
   temporal.api.history.v1.ITimerCanceledEventAttributes;
-type MarkerRecordedEventAttributes =
+export type MarkerRecordedEventAttributes =
   temporal.api.history.v1.IMarkerRecordedEventAttributes;
-type WorkflowExecutionSignaledEventAttributes =
+export type WorkflowExecutionSignaledEventAttributes =
   temporal.api.history.v1.IWorkflowExecutionSignaledEventAttributes;
-type WorkflowExecutionTerminatedEventAttributes =
+export type WorkflowExecutionTerminatedEventAttributes =
   temporal.api.history.v1.IWorkflowExecutionTerminatedEventAttributes;
-type WorkflowExecutionCancelRequestedEventAttributes =
+export type WorkflowExecutionCancelRequestedEventAttributes =
   temporal.api.history.v1.IWorkflowExecutionCancelRequestedEventAttributes;
-type WorkflowExecutionCanceledEventAttributes =
+export type WorkflowExecutionCanceledEventAttributes =
   temporal.api.history.v1.IWorkflowExecutionCanceledEventAttributes;
-type RequestCancelExternalWorkflowExecutionInitiatedEventAttributes =
+export type RequestCancelExternalWorkflowExecutionInitiatedEventAttributes =
   temporal.api.history.v1.IRequestCancelExternalWorkflowExecutionInitiatedEventAttributes;
-type RequestCancelExternalWorkflowExecutionFailedEventAttributes =
+export type RequestCancelExternalWorkflowExecutionFailedEventAttributes =
   temporal.api.history.v1.IRequestCancelExternalWorkflowExecutionFailedEventAttributes;
-type ExternalWorkflowExecutionCancelRequestedEventAttributes =
+export type ExternalWorkflowExecutionCancelRequestedEventAttributes =
   temporal.api.history.v1.IExternalWorkflowExecutionCancelRequestedEventAttributes;
-type WorkflowExecutionContinuedAsNewEventAttributes =
+export type WorkflowExecutionContinuedAsNewEventAttributes =
   temporal.api.history.v1.IWorkflowExecutionContinuedAsNewEventAttributes;
-type StartChildWorkflowExecutionInitiatedEventAttributes =
+export type StartChildWorkflowExecutionInitiatedEventAttributes =
   temporal.api.history.v1.IStartChildWorkflowExecutionInitiatedEventAttributes;
-type StartChildWorkflowExecutionFailedEventAttributes =
+export type StartChildWorkflowExecutionFailedEventAttributes =
   temporal.api.history.v1.IStartChildWorkflowExecutionFailedEventAttributes;
-type ChildWorkflowExecutionStartedEventAttributes =
+export type ChildWorkflowExecutionStartedEventAttributes =
   temporal.api.history.v1.IChildWorkflowExecutionStartedEventAttributes;
-type ChildWorkflowExecutionCompletedEventAttributes =
+export type ChildWorkflowExecutionCompletedEventAttributes =
   temporal.api.history.v1.IChildWorkflowExecutionCompletedEventAttributes;
-type ChildWorkflowExecutionFailedEventAttributes =
+export type ChildWorkflowExecutionFailedEventAttributes =
   temporal.api.history.v1.IChildWorkflowExecutionFailedEventAttributes;
-type ChildWorkflowExecutionCanceledEventAttributes =
+export type ChildWorkflowExecutionCanceledEventAttributes =
   temporal.api.history.v1.IChildWorkflowExecutionCanceledEventAttributes;
-type ChildWorkflowExecutionTimedOutEventAttributes =
+export type ChildWorkflowExecutionTimedOutEventAttributes =
   temporal.api.history.v1.IChildWorkflowExecutionTimedOutEventAttributes;
-type ChildWorkflowExecutionTerminatedEventAttributes =
+export type ChildWorkflowExecutionTerminatedEventAttributes =
   temporal.api.history.v1.IChildWorkflowExecutionTerminatedEventAttributes;
-type SignalExternalWorkflowExecutionInitiatedEventAttributes =
+export type SignalExternalWorkflowExecutionInitiatedEventAttributes =
   temporal.api.history.v1.ISignalExternalWorkflowExecutionInitiatedEventAttributes;
-type SignalExternalWorkflowExecutionFailedEventAttributes =
+export type SignalExternalWorkflowExecutionFailedEventAttributes =
   temporal.api.history.v1.ISignalExternalWorkflowExecutionFailedEventAttributes;
-type ExternalWorkflowExecutionSignaledEventAttributes =
+export type ExternalWorkflowExecutionSignaledEventAttributes =
   temporal.api.history.v1.IExternalWorkflowExecutionSignaledEventAttributes;
-type UpsertWorkflowSearchAttributesEventAttributes =
+export type UpsertWorkflowSearchAttributesEventAttributes =
   temporal.api.history.v1.IUpsertWorkflowSearchAttributesEventAttributes;
-type StartBatchOperationRequest =
+export type StartBatchOperationRequest =
   temporal.api.workflowservice.v1.IStartBatchOperationRequest;
-type WorkflowExecutionStatus = temporal.api.enums.v1.WorkflowExecutionStatus;
-type Severity = temporal.api.enums.v1.Severity;
-type WorkflowTaskFailedCause = temporal.api.enums.v1.WorkflowTaskFailedCause;
-type ArchivalState = temporal.api.enums.v1.ArchivalState;
-type PendingActivityInfo = temporal.api.workflow.v1.IPendingActivityInfo;
-type PendingChildrenInfo = temporal.api.workflow.v1.IPendingChildExecutionInfo;
-type WorkflowExecutionInfo = temporal.api.workflow.v1.IWorkflowExecutionInfo;
-type Payload = temporal.api.common.v1.IPayload;
-type Payloads = temporal.api.common.v1.IPayloads;
-type WorkflowExecutionInput = temporal.api.common.v1.IWorkflowExecution;
-type PollerInfo = temporal.api.taskqueue.v1.IPollerInfo;
-type TaskQueueStatus = temporal.api.taskqueue.v1.ITaskQueueStatus;
-type ScheduleListEntry = temporal.api.schedule.v1.IScheduleListEntry;
-type ScheduleSpec = temporal.api.schedule.v1.IScheduleSpec;
-type ScheduleState = temporal.api.schedule.v1.IScheduleState;
-type SchedulePolicies = temporal.api.schedule.v1.ISchedulePolicies;
-type CalendarSpec = temporal.api.schedule.v1.ICalendarSpec;
-type IntervalSpec = temporal.api.schedule.v1.IIntervalSpec;
-type ScheduleActionResult = temporal.api.schedule.v1.IScheduleActionResult;
-type Timestamp = google.protobuf.ITimestamp;
-type SettingsResponse = {
+export type WorkflowExecutionStatus =
+  temporal.api.enums.v1.WorkflowExecutionStatus;
+export type Severity = temporal.api.enums.v1.Severity;
+export type WorkflowTaskFailedCause =
+  temporal.api.enums.v1.WorkflowTaskFailedCause;
+export type ArchivalState = temporal.api.enums.v1.ArchivalState;
+export type PendingActivityInfo = temporal.api.workflow.v1.IPendingActivityInfo;
+export type PendingChildrenInfo =
+  temporal.api.workflow.v1.IPendingChildExecutionInfo;
+export type WorkflowExecutionInfo =
+  temporal.api.workflow.v1.IWorkflowExecutionInfo;
+export type Payload = temporal.api.common.v1.IPayload;
+export type Payloads = temporal.api.common.v1.IPayloads;
+export type WorkflowExecutionInput = temporal.api.common.v1.IWorkflowExecution;
+export type PollerInfo = temporal.api.taskqueue.v1.IPollerInfo;
+export type TaskQueueStatus = temporal.api.taskqueue.v1.ITaskQueueStatus;
+export type ScheduleListEntry = temporal.api.schedule.v1.IScheduleListEntry;
+export type ScheduleSpec = temporal.api.schedule.v1.IScheduleSpec;
+export type ScheduleState = temporal.api.schedule.v1.IScheduleState;
+export type SchedulePolicies = temporal.api.schedule.v1.ISchedulePolicies;
+export type CalendarSpec = temporal.api.schedule.v1.ICalendarSpec;
+export type IntervalSpec = temporal.api.schedule.v1.IIntervalSpec;
+export type ScheduleActionResult =
+  temporal.api.schedule.v1.IScheduleActionResult;
+export type Timestamp = google.protobuf.ITimestamp;
+export type SettingsResponse = {
   Auth: {
     Enabled: boolean;
     Options: string[];

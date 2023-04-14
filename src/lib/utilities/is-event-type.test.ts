@@ -1,9 +1,13 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="../../events.d.ts" />
 
 import { expect } from 'vitest';
 import { describe, it } from 'vitest';
-import { isLocalActivityMarkerEvent } from './is-event-type';
+import {
+  isLocalActivityMarkerEvent,
+  isUpsertWorkflowSearchAttributesEvent,
+  // isUpsertWorkflowSearchAttributesEvent,
+} from './is-event-type';
+import type { UpsertWorkflowSearchAttributesEvent } from '../../types/events';
 import { toEvent } from '../models/event-history';
 
 import type { EventType } from './is-event-type';
@@ -33,6 +37,11 @@ describe('isLocalActivityMarkerEvent', () => {
       settings: {},
       accessToken: '',
     });
+
+    if (isUpsertWorkflowSearchAttributesEvent(event)) {
+      // type stuff =  typeof event;
+      //=== UpsertWorkflowSearchAttributesEvent;
+    }
 
     expect(isLocalActivityMarkerEvent(event)).toBe(false);
   });
