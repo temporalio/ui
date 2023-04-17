@@ -17,6 +17,7 @@ import {
   workflowStartedEvent,
   workflowStartedHistoryEvent,
   getTestPayloadEvent,
+  getTestPayloadEventWithNullEncodedAttributes,
 } from './decode-payload-test-fixtures';
 import WS from 'jest-websocket-mock';
 import {
@@ -134,6 +135,18 @@ describe('decode all potential payloads', () => {
     expect(event.encodedAttributes).toEqual('a test attribute');
     expect(event.details.detail1).toEqual({ payloads: [{ test: 'detail' }] });
   });
+  it.only('Should not decode a null payload with codec endpoint with encoding json/plain`', async () => {
+    const event = await decodeAllPotentialPayloadsWithCodec(
+      getTestPayloadEventWithNullEncodedAttributes(),
+      'default',
+      {},
+      '',
+    );
+    expect(event.input).toEqual({ payloads: ['test@test.com'] });
+    expect(event.encodedAttributes).toEqual(null);
+    expect(event.details.detail1).toEqual({ payloads: [{ test: 'detail' }] });
+  });
+
   it('Should decode a payload with websockets with encoding json/plain`', async () => {
     const event = await decodeAllPotentialPayloadsWithWebsockets(
       getTestPayloadEvent(),
