@@ -10,6 +10,7 @@
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 
   import type {
+    FullSchedule,
     SchedulePreset,
     ScheduleParameters,
     ScheduleActionParameters,
@@ -28,8 +29,8 @@
 
   const handleEdit = (
     preset: SchedulePreset,
-    args: ScheduleParameters,
-    schedule,
+    args: Partial<ScheduleParameters>,
+    schedule: FullSchedule,
   ) => {
     const {
       name,

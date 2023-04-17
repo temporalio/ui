@@ -6,6 +6,7 @@ import type {
   ScheduleSpecParameters,
   SchedulePresetsParameters,
   ScheduleActionParameters,
+  ScheduleInterval,
 } from 'src/types/schedule';
 
 import { routeForSchedule, routeForSchedules } from '$lib/utilities/route-for';
@@ -45,7 +46,10 @@ const setBodySpec = (
     body.schedule.spec.interval = [];
   } else if (preset === 'interval') {
     const interval = timeToInterval(days, hour, minute, second);
-    body.schedule.spec.interval = [{ interval, phase: phase || '0s' }];
+    // The Schedule IntervalSpec implements IIntervalSpec which encodes/decodes string to Interval
+    body.schedule.spec.interval = [
+      { interval, phase: phase || '0s' },
+    ] as ScheduleInterval[];
     body.schedule.spec.cronString = [];
     body.schedule.spec.calendar = [];
   } else {
@@ -134,6 +138,7 @@ export const submitEditSchedule = async (
   const { preset } = presets;
 
   const body: DescribeFullSchedule = {
+    schedule_id: scheduleId,
     schedule: {
       ...schedule,
       action: {

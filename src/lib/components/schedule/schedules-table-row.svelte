@@ -12,14 +12,17 @@
   import ScheduleFrequency from './schedule-frequency.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
 
-  import type { FullScheduleSpec, FullCalendarSpec } from 'src/types/schedule';
+  import type {
+    FullScheduleSpec,
+    StructuredCalendar,
+  } from 'src/types/schedule';
 
   let { namespace } = $page.params;
 
   export let schedule: ScheduleListEntry;
 
   const spec: FullScheduleSpec = schedule?.info?.spec;
-  const calendar: FullCalendarSpec = spec?.structuredCalendar?.[0];
+  const calendar: StructuredCalendar = spec?.structuredCalendar?.[0];
   const interval = spec?.interval?.[0];
 
   const sortRecentActions = (recentActions: ScheduleActionResult[]) => {

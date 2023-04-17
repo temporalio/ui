@@ -6,13 +6,13 @@
   import Input from '$lib/holocene/input/input.svelte';
   import { page } from '$app/stores';
   import ScheduleFrequency from './schedule-frequency.svelte';
-  import type { FullScheduleSpec, SchedulePreset } from 'src/types/schedule';
+  import type { FullSchedule, SchedulePreset } from 'src/types/schedule';
 
   let scheduleId = $page.params.schedule;
 
   let preset: SchedulePreset = scheduleId ? 'existing' : 'interval';
 
-  export let schedule: FullScheduleSpec | null = null;
+  export let schedule: FullSchedule | null = null;
   export let daysOfWeek: string[];
   export let daysOfMonth: number[];
   export let months: string[];

@@ -15,7 +15,10 @@
 
   let { namespace } = $page.params;
 
-  const handleCreate = (preset: SchedulePreset, args: ScheduleParameters) => {
+  const handleCreate = (
+    preset: SchedulePreset,
+    args: Partial<ScheduleParameters>,
+  ) => {
     const {
       name,
       workflowType,

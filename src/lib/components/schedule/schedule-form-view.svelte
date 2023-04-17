@@ -14,15 +14,15 @@
   } from '$lib/utilities/route-for';
 
   import type {
-    FullScheduleSpec,
+    FullSchedule,
     SchedulePreset,
     ScheduleParameters,
   } from 'src/types/schedule';
 
-  export let schedule: FullScheduleSpec | null = null;
+  export let schedule: FullSchedule | null = null;
   export let onConfirm: (
     preset: SchedulePreset,
-    args: ScheduleParameters,
+    args: Partial<ScheduleParameters>,
     schedule?: Schedule,
   ) => void;
 
@@ -53,7 +53,7 @@
   let cronString = '';
 
   const handleConfirm = (preset: SchedulePreset, schedule?: Schedule) => {
-    const args: ScheduleParameters = {
+    const args: Partial<ScheduleParameters> = {
       name,
       workflowType,
       workflowId,

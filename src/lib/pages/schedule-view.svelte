@@ -51,9 +51,9 @@
 
   const handleDelete = async () => {
     try {
+      deleteConfirmationModal.close();
       $loading = true;
       await deleteSchedule({ namespace, scheduleId });
-      deleteConfirmationModal.close();
       setTimeout(() => {
         $loading = false;
         goto(routeForSchedules({ namespace }));

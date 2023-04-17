@@ -1,23 +1,23 @@
 import type {
-  CalendarSpec,
   DescribeScheduleResponse,
   Schedule,
+  ScheduleSpec,
+  CalendarSpec,
   StructuredCalendarSpec,
+  IntervalSpec,
 } from '$types';
 
 export type DescribeFullSchedule = DescribeScheduleResponse & {
   schedule_id: string;
-  schedule?: FullScheduleSpec;
+  schedule?: Schedule;
 };
 
-export type FullScheduleSpec = Schedule & {
-  calendar: FullCalendarSpec;
-};
-
-export type FullCalendarSpec = CalendarSpec & {
-  cronString?: string[];
-  structuredCalendar?: StructuredCalendarSpec[];
-};
+export type FullSchedule = Schedule;
+export type FullScheduleSpec = ScheduleSpec;
+export type FullCalendarSpec = CalendarSpec;
+export type StructuredCalendars = StructuredCalendarSpec[];
+export type StructuredCalendar = StructuredCalendarSpec;
+export type ScheduleInterval = IntervalSpec;
 
 export type SchedulePreset =
   | 'existing'
