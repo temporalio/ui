@@ -14,6 +14,7 @@
     removeColumn,
     moveColumn,
     pinColumn,
+    pinnedColumnsWidth,
     MAX_PINNED_COLUMNS,
   } from '$lib/stores/workflow-table-columns';
   import Drawer from '$lib/holocene/drawer.svelte';
@@ -114,7 +115,7 @@
   };
 
   let resizableContainer: HTMLDivElement;
-  let resizableContainerWidth: number;
+  let resizableContainerWidth: number = $pinnedColumnsWidth;
   let resizing: boolean = false;
 
   const handleMouseDown = () => {
@@ -124,6 +125,7 @@
 
   const handleMouseUp = () => {
     resizing = false;
+    $pinnedColumnsWidth = resizableContainerWidth;
   };
 
   const handleMouseMove = (event: MouseEvent) => {
