@@ -43,9 +43,7 @@ describe('Query', () => {
     cy.wait('@workflow-api');
     cy.wait('@event-history-api');
 
-    cy.get(
-      `[href="/namespaces/default/workflows/${workflowId}/${runId}/query"]`,
-    ).click();
+    cy.get('[data-testid=queries-tab]').click();
 
     cy.wait('@query-unknown-type-api');
 
