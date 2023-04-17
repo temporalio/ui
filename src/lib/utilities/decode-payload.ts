@@ -128,7 +128,7 @@ const decodePayloadWithCodec =
         settings,
         accessToken,
       });
-      return awaitData.payloads.map(decodePayload);
+      return (awaitData?.payloads ?? []).map(decodePayload);
     } else {
       return payloads.map(decodePayload);
     }
