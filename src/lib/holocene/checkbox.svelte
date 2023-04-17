@@ -138,6 +138,10 @@
     @apply bg-primary text-white;
   }
 
+  input:focus-visible + .checkmark {
+    @apply outline outline-blue-700;
+  }
+
   .checkbox.disabled,
   .checkbox.disabled .checkmark {
     @apply cursor-default;
