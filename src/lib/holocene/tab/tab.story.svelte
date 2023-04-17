@@ -9,7 +9,7 @@
 </script>
 
 <Hst.Story title="tab">
-  <!-- <Tabs>
+  <Tabs>
     <TabList label="Tabs">
       <Tab id="tab-a" panelId="tab-panel-a" label="Tab A" />
       <Tab id="tab-b" panelId="tab-panel-b" label="Tab B" />
@@ -18,5 +18,5 @@
     <TabPanel id="tab-panel-a" tabId="tab-a">Tab A Content</TabPanel>
     <TabPanel id="tab-panel-b" tabId="tab-b">Tab B Content</TabPanel>
     <TabPanel id="tab-panel-c" tabId="tab-c">Tab C Content</TabPanel>
-  </Tabs> -->
+  </Tabs>
 </Hst.Story>
