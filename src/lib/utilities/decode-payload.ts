@@ -9,6 +9,12 @@ import type {
   passAccessToken,
   includeCredentials,
 } from '$lib/stores/data-encoder-config';
+import type { Optional, Replace, Settings } from 'src/types/global';
+import type {
+  EventAttribute,
+  EventRequestMetadata,
+  Payload,
+} from 'src/types/events';
 
 import { atob } from './atob';
 import { parseWithBigInt } from './parse-with-big-int';
@@ -128,7 +134,7 @@ const decodePayloadWithCodec =
         settings,
         accessToken,
       });
-      return awaitData.payloads.map(decodePayload);
+      return (awaitData?.payloads ?? []).map(decodePayload);
     } else {
       return payloads.map(decodePayload);
     }
