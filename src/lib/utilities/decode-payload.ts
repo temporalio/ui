@@ -134,7 +134,7 @@ const decodePayloadWithCodec =
         settings,
         accessToken,
       });
-      return awaitData.payloads.map(decodePayload);
+      return (awaitData?.payloads ?? []).map(decodePayload);
     } else {
       return payloads.map(decodePayload);
     }
@@ -156,7 +156,7 @@ export const decodeAllPotentialPayloadsWithCodec = async (
   const decode = decodePayloadWithCodec(namespace, settings, accessToken);
   if (anyAttributes) {
     for (const key of Object.keys(anyAttributes)) {
-      if (keyIs(key, 'payloads', 'encodedAttributes')) {
+      if (keyIs(key, 'payloads', 'encodedAttributes') && anyAttributes[key]) {
         const data = toArray(anyAttributes[key]);
         const decoded = await decode(data);
         anyAttributes[key] = keyIs(key, 'encodedAttributes')
