@@ -103,7 +103,7 @@
   }
 
   .pending {
-    @apply border-dashed;
+    @apply border-dashed bg-green-100;
   }
 
   .unround-top {

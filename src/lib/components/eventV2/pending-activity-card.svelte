@@ -24,16 +24,7 @@
 
 <Card {event} events={[]} pending>
   <div class="primary flex w-full cursor-pointer justify-between">
-    <div class="flex items-center gap-4">
-      <div class="rounded-xl border-2 border-gray-900 bg-lightBlue py-1 px-2">
-        In progress
-      </div>
-      <div class="flex items-center">
-        <p class="event-name truncate text-sm font-semibold md:text-base">
-          {event.activityType}
-        </p>
-      </div>
-    </div>
+    <div class="flex items-center gap-4" />
     <div class="flex gap-2">
       {#if canceled}
         <Tooltip bottom text="Pending activities have been canceled.">

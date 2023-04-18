@@ -15,17 +15,36 @@
 
   $: initialEvent = isEventGroup(event) ? event.initialEvent : event;
   $: lastEvent = isEventGroup(event) ? event.lastEvent : event;
+
+  $: if (pending) {
+    console.log('pending event: ', event);
+  }
 </script>
 
 <div class="flex cursor-pointer flex-col justify-between gap-2 md:flex-row">
   <div class="flex items-center justify-between gap-4">
     <p>{initialEvent.id}</p>
     <div class="flex items-center gap-2">
-      <p
-        class="event-name truncate text-sm font-semibold md:text-sm xl:text-md"
-      >
-        {pending ? 'Pending' : eventGroupDisplayName(event, inSubGroup)}
-      </p>
+      {#if pending}
+        <div class="flex gap-2 items-center md:text-sm xl:text-md">
+          Activity
+          <div
+            class="rounded-xl border-2 border-gray-900 bg-green-50 py-1 px-2"
+          >
+            In progress
+          </div>
+          <p class="event-name truncate text-sm font-semibold">
+            {event.activityType}
+          </p>
+        </div>
+      {:else}
+        <p
+          class="event-name truncate text-sm font-semibold md:text-sm xl:text-md"
+        >
+          {eventGroupDisplayName(event, inSubGroup)}
+        </p>
+      {/if}
+
       {#if showClassification}
         <EventClassification classification={lastEvent.classification} />
       {/if}
