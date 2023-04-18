@@ -6,7 +6,7 @@ import type {
   WithNextPageToken,
   WithoutNextPageToken,
   PaginationCallbacks,
-} from 'src/types/global';
+} from '$lib/types/global';
 
 type PaginatedOptions<T> = PaginationCallbacks<T> & {
   token?: NextPageToken;

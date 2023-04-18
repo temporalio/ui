@@ -1,4 +1,4 @@
-import type { ScheduleParameters } from 'src/types/schedule';
+import type { ScheduleParameters } from '$lib/types/schedule';
 
 const parseTime = (time: string) => (time ? parseInt(time) : 0);
 

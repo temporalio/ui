@@ -19,17 +19,17 @@ import { btoa } from '$lib/utilities/btoa';
 
 import type { ErrorCallback } from '$lib/utilities/request-from-api';
 import type { ResetReapplyType } from '$lib/models/workflow-actions';
-import type { ResetWorkflowRequest } from '$types';
-import type { NamespaceScopedRequest, Replace } from 'src/types/global';
+import type { ResetWorkflowRequest } from '$lib/types';
+import type { NamespaceScopedRequest, Replace } from '$lib/types/global';
 import type {
   WorkflowExecution,
   ListWorkflowExecutionsResponse,
   ArchiveFilterParameters,
-} from 'src/types/workflows';
+} from '$lib/types/workflows';
 import type {
   ValidWorkflowEndpoints,
   ValidWorkflowParameters,
-} from 'src/types/api';
+} from '$lib/types/api';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;

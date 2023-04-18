@@ -9,7 +9,7 @@ import { withLoading } from '$lib/utilities/stores/with-loading';
 
 import { supportsAdvancedVisibility } from './advanced-visibility';
 import type { StartStopNotifier } from 'svelte/store';
-import type { FilterParameters, WorkflowExecution } from 'src/types/workflows';
+import type { FilterParameters, WorkflowExecution } from '$lib/types/workflows';
 
 export const refresh = writable(0);
 

@@ -1,6 +1,6 @@
 import { persistStore } from '$lib/stores/persist-store';
-import type { BooleanString } from 'src/types/global';
-import type { EventView } from 'src/types/events';
+import type { BooleanString } from '$lib/types/global';
+import type { EventView } from '$lib/types/events';
 
 export type EventSortOrder = 'ascending' | 'descending';
 export type EventSortOrderOptions = {

@@ -6,7 +6,7 @@ import type {
   FailActivityTaskResponse,
   CompleteActivityTaskRequest,
   CompleteActivityTaskResponse,
-} from 'src/types/events';
+} from '$lib/types/events';
 
 type WorkflowInformation = {
   workflowId: string;

@@ -93,7 +93,7 @@ export type User = {
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 };
-export type ClusterInformation = import('$types').GetClusterInfoResponse;
+export type ClusterInformation = import('$lib/types').GetClusterInfoResponse;
 
 export type TimeFormat = 'UTC' | 'relative' | 'local';
 

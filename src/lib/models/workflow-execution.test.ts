@@ -15,7 +15,7 @@ import listWorkflowsResponse from '$fixtures/list-workflows.json';
 import type {
   ListWorkflowExecutionsResponse,
   WorkflowExecutionAPIResponse,
-} from 'src/types/workflows';
+} from '$lib/types/workflows';
 
 const workflows = [
   canceledWorkflow,

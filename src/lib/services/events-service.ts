@@ -10,14 +10,14 @@ import type {
   NextPageToken,
   PaginationCallbacks,
   Settings,
-} from 'src/types/global';
+} from '$lib/types/global';
 import type {
   CommonHistoryEvent,
   HistoryEvent,
   GetWorkflowExecutionHistoryResponse,
   WorkflowEvents,
-} from 'src/types/events';
-import type { WorkflowAPIRoutePath } from 'src/types/api';
+} from '$lib/types/events';
+import type { WorkflowAPIRoutePath } from '$lib/types/api';
 
 export type FetchEventsParameters = NamespaceScopedRequest &
   PaginationCallbacks<GetWorkflowExecutionHistoryResponse> & {

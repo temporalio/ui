@@ -3,7 +3,7 @@ import { isExecutionStatus } from '../is';
 import { durationKeys, fromDate } from '../to-duration';
 import { tokenize } from './tokenize';
 
-import type { FilterParameters } from 'src/types/workflows';
+import type { FilterParameters } from '$lib/types/workflows';
 
 type Tokens = string[];
 export type ParsedParameters = FilterParameters & { timeRange?: string };

@@ -5,7 +5,7 @@ import {
   getMilliseconds as getSecondAsMilliseconds,
 } from 'date-fns';
 
-import type { Timestamp } from '$types';
+import type { Timestamp } from '$lib/types';
 import { fromSeconds } from './to-duration';
 import { has } from './has';
 

@@ -7,7 +7,7 @@ import {
   isTimerStartedEvent,
   isLocalActivityMarkerEvent,
 } from '$lib/utilities/is-event-type';
-import type { CommonHistoryEvent } from 'src/types/events';
+import type { CommonHistoryEvent } from '$lib/types/events';
 
 export const getEventGroupName = (event: CommonHistoryEvent): string => {
   if (!event) return;

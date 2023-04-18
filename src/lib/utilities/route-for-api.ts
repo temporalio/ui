@@ -23,7 +23,7 @@ import type {
   WorkflowAPIRoutePath,
   WorkflowRouteParameters,
   WorkflowActivitiesRouteParameters,
-} from 'src/types/api';
+} from '$lib/types/api';
 
 const replaceNamespaceInApiUrl = (
   apiUrl: string,

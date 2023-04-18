@@ -6,7 +6,7 @@ import type {
   FetchEventsParameters,
   FetchEventsParametersWithSettings,
 } from '$lib/services/events-service';
-import type { WorkflowEvents } from 'src/types/events';
+import type { WorkflowEvents } from '$lib/types/events';
 
 import { eventFilterSort } from './event-view';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';

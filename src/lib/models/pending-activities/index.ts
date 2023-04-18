@@ -12,12 +12,12 @@ import {
   getCodecEndpoint,
   getCodecPassAccessToken,
 } from '$lib/utilities/get-codec';
-import type { Settings } from 'src/types/global';
+import type { Settings } from '$lib/types/global';
 import type {
   PendingActivity,
   PendingActivityWithMetadata,
-} from 'src/types/events';
-import type { WorkflowExecution } from 'src/types/workflows';
+} from '$lib/types/events';
+import type { WorkflowExecution } from '$lib/types/workflows';
 
 export async function getActivityAttributes(
   { activity, namespace, settings, accessToken }: PendingActivityWithMetadata,

@@ -9,7 +9,7 @@ import type {
   ArchiveFilterParameters,
   FilterParameters,
   SearchAttributes,
-} from 'src/types/workflows';
+} from '$lib/types/workflows';
 
 export type QueryKey =
   | 'WorkflowId'

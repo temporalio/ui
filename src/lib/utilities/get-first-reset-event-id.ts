@@ -1,4 +1,4 @@
-import type { WorkflowEvent } from 'src/types/events';
+import type { WorkflowEvent } from '$lib/types/events';
 
 /**
  *

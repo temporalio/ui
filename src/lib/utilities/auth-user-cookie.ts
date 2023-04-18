@@ -1,7 +1,7 @@
 import { browser } from '$app/environment';
 import { parseWithBigInt } from './parse-with-big-int';
 import { atob } from '$lib/utilities/atob';
-import type { User } from 'src/types/global';
+import type { User } from '$lib/types/global';
 
 type UserResponse = {
   AccessToken: string;

@@ -4,7 +4,7 @@ import type {
   ActivityTaskCompletedEvent,
   ActivityTaskScheduledEvent,
   WorkflowEvent,
-} from 'src/types/events';
+} from '$lib/types/events';
 
 const scheduledEvent = {
   id: '5',

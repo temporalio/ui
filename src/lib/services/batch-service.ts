@@ -9,11 +9,11 @@ import { temporalVersion } from '$lib/stores/versions';
 import type {
   StartBatchOperationRequest,
   WorkflowExecutionInput,
-} from 'src/types';
+} from '$lib/types';
 import type {
   BatchOperationInfo,
   WorkflowExecution,
-} from 'src/types/workflows';
+} from '$lib/types/workflows';
 
 type CreateBatchOperationOptions = {
   namespace: string;

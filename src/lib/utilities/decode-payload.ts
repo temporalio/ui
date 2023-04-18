@@ -9,12 +9,12 @@ import type {
   passAccessToken,
   includeCredentials,
 } from '$lib/stores/data-encoder-config';
-import type { Optional, Replace, Settings } from 'src/types/global';
+import type { Optional, Replace, Settings } from '$lib/types/global';
 import type {
   EventAttribute,
   EventRequestMetadata,
   Payload,
-} from 'src/types/events';
+} from '$lib/types/events';
 
 import { atob } from './atob';
 import { parseWithBigInt } from './parse-with-big-int';

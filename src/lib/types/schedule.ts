@@ -5,7 +5,7 @@ import type {
   CalendarSpec,
   StructuredCalendarSpec,
   IntervalSpec,
-} from '$types';
+} from '$lib/types';
 
 export type DescribeFullSchedule = DescribeScheduleResponse & {
   schedule_id: string;

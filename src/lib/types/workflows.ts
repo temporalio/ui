@@ -10,7 +10,7 @@ import type { Replace, Optional } from './global';
  * Replace Longs, ITimestamps, UInt8Array's etc. with their corresponding http values
  */
 export type WorkflowExecutionInfo = Replace<
-  import('$types').WorkflowExecutionInfo,
+  import('$lib/types').WorkflowExecutionInfo,
   {
     status: WorkflowStatus;
     stateTransitionCount: string;
@@ -23,12 +23,12 @@ export type WorkflowExecutionInfo = Replace<
 >;
 
 export type ListWorkflowExecutionsResponse = Replace<
-  import('$types').ListWorkflowExecutionsResponse,
+  import('$lib/types').ListWorkflowExecutionsResponse,
   Optional<{ executions: WorkflowExecutionInfo[] }>
 >;
 
 export type WorkflowExecutionConfig = Replace<
-  import('$types').WorkflowExecutionConfig,
+  import('$lib/types').WorkflowExecutionConfig,
   { defaultWorkflowTaskTimeout: Duration }
 >;
 
@@ -64,7 +64,7 @@ export type ArchiveFilterParameters = Omit<FilterParameters, 'timeRange'> & {
   closeTime?: Duration | string;
 };
 
-export type WorkflowIdentifier = import('$types').WorkflowExecutionInput;
+export type WorkflowIdentifier = import('$lib/types').WorkflowExecutionInput;
 
 type SearchAttributesValue =
   | 'Bool'

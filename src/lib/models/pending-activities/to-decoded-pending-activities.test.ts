@@ -4,8 +4,8 @@ import settingsFixture from '$fixtures/settings.json';
 import pendingActivityWorkflow from '$fixtures/workflow.pending-activities.json';
 import { toDecodedPendingActivities } from './index';
 
-import type { Settings } from 'src/types/global';
-import type { WorkflowExecution } from 'src/types/workflows';
+import type { Settings } from '$lib/types/global';
+import type { WorkflowExecution } from '$lib/types/workflows';
 
 const namespace = 'unit-tests';
 const settings = settingsFixture as unknown as Settings;

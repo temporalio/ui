@@ -4,7 +4,7 @@ import type {
   EventAttribute,
   EventAttributeKey,
   IterableEvent,
-} from 'src/types/events';
+} from '$lib/types/events';
 
 import {
   shouldDisplayAttribute,

@@ -1,5 +1,5 @@
 import type { EventSortOrder } from '$lib/stores/event-view';
-import type { BooleanString } from 'src/types/global';
+import type { BooleanString } from '$lib/types/global';
 
 type DateFilterOptions = {
   compact: boolean;

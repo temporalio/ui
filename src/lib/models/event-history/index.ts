@@ -29,7 +29,7 @@ import type {
   EventType,
   WorkflowEvents,
   WorkflowEvent,
-} from 'src/types/events';
+} from '$lib/types/events';
 
 export async function getEventAttributes(
   { historyEvent, namespace, settings, accessToken }: EventWithMetadata,

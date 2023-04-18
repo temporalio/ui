@@ -4,7 +4,7 @@ import type {
   ActivityTaskStartedEvent,
   ActivityTaskScheduledEvent,
   ActivityTaskCompletedEvent,
-} from 'src/types/events';
+} from '$lib/types/events';
 
 const eventHistory = [
   {

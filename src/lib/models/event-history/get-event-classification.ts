@@ -1,4 +1,4 @@
-import type { EventType } from 'src/types/events';
+import type { EventType } from '$lib/types/events';
 
 export type EventClassification = (typeof eventClassifications)[number];
 

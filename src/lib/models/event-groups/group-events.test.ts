@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { groupEvents } from './';
 import { getEventGroupName } from './get-group-name';
-import type { CommonHistoryEvent, WorkflowEvents } from 'src/types/events';
+import type { CommonHistoryEvent, WorkflowEvents } from '$lib/types/events';
 
 const scheduledEvent = {
   id: '5',

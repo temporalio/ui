@@ -2,8 +2,8 @@ import { browser } from '$app/environment';
 import { toURL } from '$lib/utilities/to-url';
 import { encodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { base } from '$app/paths';
-import type { Settings } from 'src/types/global';
-import type { EventView } from 'src/types/events';
+import type { Settings } from '$lib/types/global';
+import type { EventView } from '$lib/types/events';
 
 type RouteParameters = {
   namespace: string;

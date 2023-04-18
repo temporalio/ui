@@ -5,8 +5,8 @@ import { derived, type Readable } from 'svelte/store';
 import { persistStore } from './persist-store';
 import { customSearchAttributes } from './search-attributes';
 
-import type { TimeFormat } from 'src/types/global';
-import type { WorkflowExecution } from 'src/types/workflows';
+import type { TimeFormat } from '$lib/types/global';
+import type { WorkflowExecution } from '$lib/types/workflows';
 
 export const MAX_PINNED_COLUMNS = 2;
 

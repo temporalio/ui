@@ -1,7 +1,7 @@
 import type { EventSortOrder } from '$lib/stores/event-view';
 import { has } from './has';
-import type { WorkflowStatus } from 'src/types/workflows';
-import type { WorkflowExecutionStatus } from '$types';
+import type { WorkflowStatus } from '$lib/types/workflows';
+import type { WorkflowExecutionStatus } from '$lib/types';
 
 type Space = ' ';
 type Quote = "'" | '"';

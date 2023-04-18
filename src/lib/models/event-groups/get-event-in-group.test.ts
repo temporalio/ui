@@ -12,7 +12,7 @@ import type {
   ActivityTaskScheduledEvent,
   StartChildWorkflowExecutionInitiatedEvent,
   WorkflowEvent,
-} from 'src/types/events';
+} from '$lib/types/events';
 
 const startChildWorkflow = {
   id: '42',

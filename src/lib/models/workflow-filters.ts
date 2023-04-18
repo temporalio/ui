@@ -1,4 +1,4 @@
-import type { SearchAttributes } from 'src/types/workflows';
+import type { SearchAttributes } from '$lib/types/workflows';
 
 export type WorkflowFilter = {
   attribute: keyof SearchAttributes;

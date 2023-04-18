@@ -46,7 +46,7 @@ import type {
   WorkflowTaskTimedOutEvent,
   WorkflowExecutionCancelRequestedEvent,
   StartChildWorkflowExecutionInitiatedEvent,
-} from 'src/types/events';
+} from '$lib/types/events';
 
 export type ActivityType = (typeof activityEvents)[number];
 export const activityEvents = [

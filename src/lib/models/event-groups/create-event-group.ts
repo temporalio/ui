@@ -24,7 +24,7 @@ import type {
   WorkflowExecutionSignaledEvent,
   MarkerRecordedEvent,
   CommonHistoryEvent,
-} from 'src/types/events';
+} from '$lib/types/events';
 import type { EventGroup } from './event-groups';
 
 type StartingEvents = {

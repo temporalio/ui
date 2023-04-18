@@ -2,22 +2,22 @@ import type { EventGroup } from '$lib/models/event-groups/event-groups';
 import type { Replace, Settings } from './global';
 
 export type EventHistory = Replace<
-  import('$types').History,
+  import('$lib/types').History,
   { events: HistoryEvent[] }
 >;
 
 export type HistoryEvent = Replace<
-  import('$types').HistoryEvent,
+  import('$lib/types').HistoryEvent,
   { eventType: EventType }
 >;
 
 export type GetWorkflowExecutionHistoryResponse = Replace<
-  import('$types').GetWorkflowExecutionHistoryResponse,
+  import('$lib/types').GetWorkflowExecutionHistoryResponse,
   { history: EventHistory }
 >;
 
 export type PendingActivityInfo = Replace<
-  import('$types').PendingActivityInfo,
+  import('$lib/types').PendingActivityInfo,
   { activityId: string }
 >;
 
@@ -41,7 +41,7 @@ export type PendingActivityState =
   | 'Started'
   | 'CancelRequested';
 
-export type PendingChildren = import('$types').PendingChildrenInfo;
+export type PendingChildren = import('$lib/types').PendingChildrenInfo;
 
 export type EventRequestMetadata = {
   namespace: string;
@@ -219,10 +219,10 @@ export type UpsertWorkflowSearchAttributesEvent =
   EventWithAttributes<'upsertWorkflowSearchAttributesEventAttributes'>;
 
 export type FailActivityTaskRequest =
-  import('$types').ActivityTaskFailedByIdRequest;
+  import('$lib/types').ActivityTaskFailedByIdRequest;
 export type FailActivityTaskResponse =
-  import('$types').ActivityTaskFailedByIdResponse;
+  import('$lib/types').ActivityTaskFailedByIdResponse;
 export type CompleteActivityTaskRequest =
-  import('$types').ActivityTaskCompletedByIdRequest;
+  import('$lib/types').ActivityTaskCompletedByIdRequest;
 export type CompleteActivityTaskResponse =
-  import('$types').ActivityTaskCompletedByIdResponse;
+  import('$lib/types').ActivityTaskCompletedByIdResponse;

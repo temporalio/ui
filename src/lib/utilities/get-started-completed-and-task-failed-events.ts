@@ -15,7 +15,7 @@ import type {
   WorkflowTaskCompletedEvent,
   WorkflowEvent,
   WorkflowTaskFailedEvent,
-} from 'src/types/events';
+} from '$lib/types/events';
 
 type WorkflowInputAndResults = {
   input: string;

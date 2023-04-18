@@ -1,13 +1,13 @@
 import { goto } from '$app/navigation';
 import { writable } from 'svelte/store';
-import type { Schedule } from '$types';
+import type { Schedule } from '$lib/types';
 import type {
   DescribeFullSchedule,
   ScheduleSpecParameters,
   SchedulePresetsParameters,
   ScheduleActionParameters,
   ScheduleInterval,
-} from 'src/types/schedule';
+} from '$lib/types/schedule';
 
 import { routeForSchedule, routeForSchedules } from '$lib/utilities/route-for';
 
