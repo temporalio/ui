@@ -1,7 +1,7 @@
 <script lang="ts">
   import { intervalToComment } from '$lib/utilities/schedule-comment-formatting';
   import type { IntervalSpec } from '$types';
-  import type { StructuredCalendar } from 'src/types/schedule';
+  import type { StructuredCalendar } from '$lib/types/schedule';
 
   export let calendar: StructuredCalendar | undefined = undefined;
   export let interval: IntervalSpec | undefined = undefined;

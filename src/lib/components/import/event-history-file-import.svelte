@@ -12,7 +12,7 @@
   import { authUser } from '$lib/stores/auth-user';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
 
-  import type { HistoryEvent } from 'src/types/events';
+  import type { HistoryEvent } from '$lib/types/events';
 
   let rawEvents: HistoryEvent[] | { events: HistoryEvent[] };
   let fileLoaded = false;

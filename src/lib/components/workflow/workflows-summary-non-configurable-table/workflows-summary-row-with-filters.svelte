@@ -10,8 +10,8 @@
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import Checkbox from '$lib/holocene/checkbox.svelte';
 
-  import type { TimeFormat } from 'src/types/global';
-  import type { WorkflowExecution } from 'src/types/workflows';
+  import type { TimeFormat } from '$lib/types/global';
+  import type { WorkflowExecution } from '$lib/types/workflows';
 
   export let bulkActionsEnabled: boolean = false;
   export let namespace: string;

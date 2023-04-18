@@ -8,7 +8,7 @@
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import DataEncoderStatus from '$lib/holocene/data-encoder-status.svelte';
   import { authUser } from '$lib/stores/auth-user';
-  import type { NamespaceListItem } from 'src/types/global';
+  import type { NamespaceListItem } from '$lib/types/global';
 
   export let logout: () => void;
   export let namespaceList: NamespaceListItem[] = [];

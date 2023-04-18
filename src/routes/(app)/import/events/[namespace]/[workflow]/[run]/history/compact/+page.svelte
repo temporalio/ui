@@ -7,7 +7,7 @@
   import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
   import { eventCategoryFilter } from '$lib/stores/filters';
 
-  import type { EventTypeCategory } from 'src/types/events';
+  import type { EventTypeCategory } from '$lib/types/events';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
 
   $: category = $eventCategoryFilter as EventTypeCategory;

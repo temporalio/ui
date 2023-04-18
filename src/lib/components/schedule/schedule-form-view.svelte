@@ -17,7 +17,7 @@
     FullSchedule,
     SchedulePreset,
     ScheduleParameters,
-  } from 'src/types/schedule';
+  } from '$lib/types/schedule';
 
   export let schedule: FullSchedule | null = null;
   export let onConfirm: (

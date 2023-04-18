@@ -8,7 +8,7 @@
   import { timeFormat } from '$lib/stores/time-format';
   import Loading from '$lib/holocene/loading.svelte';
   import EmptyState from '$lib/holocene/empty-state.svelte';
-  import type { WorkflowExecution } from 'src/types/workflows';
+  import type { WorkflowExecution } from '$lib/types/workflows';
 
   export let workflows: WorkflowExecution[];
   export let selectedWorkflows: WorkflowExecution[];

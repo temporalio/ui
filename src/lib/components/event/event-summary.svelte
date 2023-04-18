@@ -21,7 +21,7 @@
     CommonHistoryEvent,
     EventTypeCategory,
     IterableEvent,
-  } from 'src/types/events';
+  } from '$lib/types/events';
 
   export let compact = false;
 

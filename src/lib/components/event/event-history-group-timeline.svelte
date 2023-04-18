@@ -16,7 +16,7 @@
     eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
-  import type { WorkflowEvents } from 'src/types/events';
+  import type { WorkflowEvents } from '$lib/types/events';
   import type {
     EventGroup,
     EventGroups,

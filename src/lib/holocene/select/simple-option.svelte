@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { SelectOptionValue } from 'src/types/global';
+  import type { SelectOptionValue } from '$lib/types/global';
 
   export let value: SelectOptionValue = null;
 </script>

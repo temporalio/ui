@@ -15,7 +15,7 @@
   import type {
     FullScheduleSpec,
     StructuredCalendar,
-  } from 'src/types/schedule';
+  } from '$lib/types/schedule';
 
   let { namespace } = $page.params;
 

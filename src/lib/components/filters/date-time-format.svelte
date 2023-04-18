@@ -7,7 +7,7 @@
     setTimeFormat,
     type TimeFormatOptions,
   } from '$lib/stores/time-format';
-  import type { TimeFormat } from 'src/types/global';
+  import type { TimeFormat } from '$lib/types/global';
 
   let dateOptions: TimeFormatOptions = [
     { label: 'UTC Time', option: 'UTC' },

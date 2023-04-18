@@ -18,7 +18,7 @@
   } from '$lib/stores/workflow-table-columns';
   import { formatDate } from '$lib/utilities/format-date';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
-  import type { WorkflowExecution } from 'src/types/workflows';
+  import type { WorkflowExecution } from '$lib/types/workflows';
 
   export let column: WorkflowHeader;
   export let workflow: WorkflowExecution;

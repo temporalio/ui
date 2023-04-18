@@ -4,7 +4,7 @@
 
   import { getWorkflowStackTrace } from '$lib/services/query-service';
   import type { ParsedQuery } from '$lib/services/query-service';
-  import type { Eventual } from 'src/types/global';
+  import type { Eventual } from '$lib/types/global';
 
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import Button from '$lib/holocene/button.svelte';

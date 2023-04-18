@@ -7,7 +7,7 @@
   import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
   import { eventCategoryFilter } from '$lib/stores/filters';
 
-  import type { EventTypeCategory, WorkflowEvent } from 'src/types/events';
+  import type { EventTypeCategory, WorkflowEvent } from '$lib/types/events';
 
   $: category = $eventCategoryFilter as EventTypeCategory;
   $: sortedEvents =

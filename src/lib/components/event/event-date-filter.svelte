@@ -17,7 +17,7 @@
   import { page } from '$app/stores';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { getDateFilterValue } from '$lib/utilities/event-formatting';
-  import type { TimeFormat } from 'src/types/global';
+  import type { TimeFormat } from '$lib/types/global';
 
   export let compact: boolean;
 

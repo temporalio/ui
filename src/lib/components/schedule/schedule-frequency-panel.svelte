@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { IntervalSpec } from '$types';
-  import type { StructuredCalendar } from 'src/types/schedule';
+  import type { StructuredCalendar } from '$lib/types/schedule';
 
   import Panel from '$lib/components/panel.svelte';
   import ScheduleFrequency from './schedule-frequency.svelte';

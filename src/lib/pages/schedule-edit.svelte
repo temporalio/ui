@@ -16,7 +16,7 @@
     ScheduleActionParameters,
     SchedulePresetsParameters,
     ScheduleSpecParameters,
-  } from 'src/types/schedule';
+  } from '$lib/types/schedule';
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;

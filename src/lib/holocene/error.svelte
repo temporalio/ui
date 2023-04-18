@@ -5,7 +5,7 @@
   import { page } from '$app/stores';
 
   import { isNetworkError } from '$lib/utilities/is-network-error';
-  import type { NetworkError } from 'src/types/global';
+  import type { NetworkError } from '$lib/types/global';
 
   import Link from '$lib/holocene/link.svelte';
 
