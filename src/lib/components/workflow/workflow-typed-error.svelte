@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { page } from '$app/stores';
+
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
@@ -168,13 +170,14 @@
     link = '',
     contactSupport = false,
   } = errorCopy);
+  $: isCloud = $page.data?.settings?.runtimeEnvironment?.isCloud;
 </script>
 
 {#if title || copy}
   <Alert bold icon="warning" intent="warning" {title} role="status">
     <p>
       {copy}
-      {#if contactSupport}
+      {#if contactSupport && isCloud}
         Please <Link newTab href="http://support.temporal.io/"
           >contact support</Link
         >.
@@ -190,7 +193,7 @@
         <TableHeaderRow slot="headers">
           <th class="w-14 xl:w-10" />
           <th class="w-16 md:w-32">
-            <span class="max-md:hidden ">Date & Time</span>
+            <span class="max-md:hidden">Date & Time</span>
             <span class="md:hidden"><Icon name="clock" /></span>
           </th>
           <th class="w-44">Event</th>
