@@ -14,6 +14,7 @@
   export let title = '';
   export let icon: IconName | undefined = undefined;
   export let unroundTitle = false;
+  export let titleColor = 'text-white';
 
   let root: HTMLElement;
   $: isJSON = language === 'json';
@@ -54,7 +55,7 @@
 {#if parsedContent || parsedContent === null}
   {#if title}
     <p
-      class="-mb-2 flex items-center gap-2 rounded-t-lg bg-gray-900 py-2 px-4 text-sm text-white"
+      class="-mb-2 flex items-center gap-2 rounded-t-lg py-2 px-4 text-sm {titleColor}"
       class:unround-title={unroundTitle}
     >
       {#if icon}<Icon name={icon} />{/if}

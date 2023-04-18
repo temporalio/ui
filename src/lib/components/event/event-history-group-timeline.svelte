@@ -95,15 +95,17 @@
 
 {#if eventGroups.length}
   <div
-    class="min-h-40 relative max-h-96 w-full cursor-crosshair overflow-auto rounded-lg border border-gray-900 bg-blueGray-50 bg-white"
+    class="relative h-full overflow-auto rounded-lg border border-gray-900 bg-gray-900 text-white"
     bind:clientWidth={width}
     on:mousemove={handleMouseMove}
   >
     <div
       bind:this={canvas}
       class="relative"
-      style="height: {blockHeight * eventGroups.length + yBuffer}px; width: {width}px;"
+      style="height: {blockHeight * eventGroups.length +
+        yBuffer}px; width: {width}px;"
     >
+      <h3 class="flex gap-2 p-4"><Icon name="graph" />Activities</h3>
       <VirtualList
         items={eventGroups}
         let:item
@@ -124,10 +126,12 @@
           class="event-group"
           style="top:
                 {top +
-                blockHeight / 4}px; left: {left}px; width: {width}px; height: {height - 1}px; background: {color};"
+            blockHeight /
+              4}px; left: {left}px; width: {width}px; height: {height -
+            1}px; background: {color};"
         />
         <button
-          class="absolute truncate border-r border-gray-900 pl-2 text-left text-sm font-medium hover:bg-blueGray-200"
+          class="absolute truncate border-r border-gray-900 px-4 text-left text-sm font-medium hover:bg-gray-700"
           class:event-group-active={$timelineEvents?.length &&
             activeGroup === item.id}
           class:failure
@@ -149,34 +153,18 @@
           {item.name}
         </button>
       </VirtualList>
-      <div
+      <!-- <div
         class="absolute top-0 bg-blueGray-400"
         style="height:
               {blockHeight * eventGroups.length +
-              yBuffer}px;left: {mouseX}px; width: 1px;"
-      />
+          yBuffer}px;left: {mouseX}px; width: 1px;"
+      /> -->
     </div>
+    <!-- <div class="flex justify-start md:text-md font-base text-sm">
+      <pre class="text-right">Start: {formatDate(startDate, $timeFormat)}</pre>
+    </div> -->
   </div>
-{:else}
-  <EmptyState title="No events" />
 {/if}
-<div class="md:text-md font-base text-sm">
-  <div class="flex justify-end">
-    <pre class="text-right">Start: {formatDate(startDate, $timeFormat)}</pre>
-  </div>
-  <div class="flex justify-end">
-    <pre class="text-right">Current: {formatDate(
-        currentDate,
-        $timeFormat,
-      )}</pre>
-  </div>
-  <div class="flex justify-end">
-    <pre class="text-right">{isRunning ? 'Last' : 'End'}: {formatDate(
-        endDate,
-        $timeFormat,
-      )}</pre>
-  </div>
-</div>
 
 <style lang="postcss">
   .event-group {
@@ -184,7 +172,7 @@
   }
 
   .event-group-active {
-    @apply bg-blueGray-200;
+    @apply bg-gray-700;
   }
 
   .failure {

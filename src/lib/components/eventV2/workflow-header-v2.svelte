@@ -36,9 +36,6 @@
 
   $: ({ workflow, workers } = $workflowRun);
 
-  let refreshInterval;
-  const refreshRate = 15000;
-
   $: routeParameters = {
     namespace,
     workflow: workflow?.id,
@@ -49,37 +46,6 @@
   $: activitiesCanceled = ['Terminated', 'TimedOut', 'Canceled'].includes(
     $workflowRun.workflow?.status,
   );
-
-  onMount(() => {
-    if (isRunning && $autoRefreshWorkflow === 'on') {
-      // Auto-refresh of 15 seconds if turned on
-      clearInterval(refreshInterval);
-      refreshInterval = setInterval(() => ($refresh = Date.now()), refreshRate);
-    }
-  });
-
-  $: {
-    if (!isRunning) {
-      // Stop refresh if workflow is no longer running
-      clearInterval(refreshInterval);
-    }
-  }
-
-  const onRefreshChange = () => {
-    if ($autoRefreshWorkflow === 'on') {
-      $autoRefreshWorkflow = 'off';
-      clearInterval(refreshInterval);
-    } else {
-      $refresh = Date.now();
-      $autoRefreshWorkflow = 'on';
-      clearInterval(refreshInterval);
-      refreshInterval = setInterval(() => ($refresh = Date.now()), refreshRate);
-    }
-  };
-
-  onDestroy(() => {
-    clearInterval(refreshInterval);
-  });
 
   $: cancelInProgress = isCancelInProgress(
     $workflowRun?.workflow?.status,
@@ -170,11 +136,11 @@
     class="mb-4 flex w-full items-center justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
   >
     <WorkflowStatus status={workflow?.status} />
-    <Badge type="green" class="p-0"
-      ><Icon name="chart" />{workflow.taskQueue}</Badge
+    <Badge type="green" class="flex gap-1 py-0"
+      ><Icon name="task-queue" />{workflow.taskQueue}</Badge
     >
-    <Badge type="green" class="p-0"
-      ><Icon name="chart" />1.2.1 main version</Badge
+    <Badge type="green" class="flex gap-1 py-0"
+      ><Icon name="versioning" />1.2.1 main version</Badge
     >
   </div>
 

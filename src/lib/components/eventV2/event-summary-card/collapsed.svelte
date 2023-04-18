@@ -22,7 +22,7 @@
     <p>{initialEvent.id}</p>
     <div class="flex items-center gap-2">
       <p
-        class="event-name truncate text-sm font-semibold md:text-base xl:text-lg"
+        class="event-name truncate text-sm font-semibold md:text-sm xl:text-md"
       >
         {pending ? 'Pending' : eventGroupDisplayName(event, inSubGroup)}
       </p>

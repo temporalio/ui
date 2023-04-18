@@ -33,14 +33,14 @@ pre[class*='language-'] {
   overflow: auto;
 }
 
-:not(pre)>code[class*='language-'],
+:not(pre) > code[class*='language-'],
 pre[class*='language-'] {
   /* gray-900 */
   background: #18181b;
 }
 
 /* Inline code */
-:not(pre)>code[class*='language-'] {
+:not(pre) > code[class*='language-'] {
   padding: 0.1em;
   border-radius: 0.3em;
   white-space: normal;

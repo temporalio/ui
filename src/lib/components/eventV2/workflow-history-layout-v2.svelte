@@ -15,10 +15,10 @@
   import { isCompletionEvent } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { authUser } from '$lib/stores/auth-user';
   import { fetchAllEvents } from '$lib/services/events-service';
-  import Accordion from '$lib/holocene/accordion.svelte';
   import { onDestroy } from 'svelte';
   import WorkflowTimeMotion from './workflow-time-motion.svelte';
   import WorkflowDistributedTrace from './workflow-distributed-trace.svelte';
+  import EventHistoryTimelineContainer from '../event/event-history-timeline-container.svelte';
 
   let controller;
 
@@ -89,9 +89,9 @@
 />
 <div class="flex flex-col gap-2">
   <WorkflowSummaryV2 {...workflowRelationships} />
-  <div class="flex gap-2">
+  <div class="flex flex-col md:flex-row gap-2 h-auto max-h-[200px]">
     <WorkflowTimeMotion />
-    <WorkflowDistributedTrace />
+    <EventHistoryTimelineContainer {fullHistory} />
   </div>
   <WorkflowRelationshipsV2 {...workflowRelationships} />
 </div>

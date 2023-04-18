@@ -9,7 +9,7 @@
   <div class="flex items-center h-full p-4">
     <div class="duration">
       <h3 class="text-white flex gap-2">
-        <Icon name="graph" />Distrubted Trace
+        <Icon name="graph" />Distributed Trace
       </h3>
       <div class="w-full flex flex-col gap-2 items-center justify-center">
         <div class="w-2/12 h-3 bg-pink-200 rounded-xl" />

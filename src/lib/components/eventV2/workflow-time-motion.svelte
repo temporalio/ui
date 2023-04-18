@@ -9,10 +9,12 @@
   $: ({ workflow } = $workflowRun);
 
   $: timeDiff = timeDiffStore(workflow.startTime, workflow.endTime);
+
+  // let fetchWorkflowTypeAverge =
 </script>
 
 <div class="relative h-auto bg-gray-900 w-full md:w-1/2 rounded-xl">
-  <div class="flex items-center h-full p-4">
+  <div class="flex items-center h-full p-4 px-8">
     <div class="duration">
       <h3 class="text-white flex gap-2"><Icon name="graph" />Duration</h3>
       <svg
@@ -38,7 +40,7 @@
             attributeName="x"
             from="0"
             to="-600"
-            dur="4s"
+            dur={workflow.isRunning ? '4s' : 0}
             repeatCount="indefinite"
           />
         </use>
@@ -47,22 +49,38 @@
             attributeName="x"
             from="600"
             to="0"
-            dur="4s"
+            dur={workflow.isRunning ? '4s' : 0}
             repeatCount="indefinite"
           />
         </use>
       </svg>
-      <p class="text-white text-base">{formatElasped($timeDiff)}</p>
-      <div class="w-full text-white text-sm flex gap-2">
-        <p>
-          Start: {formatDate(workflow.startTime, $timeFormat)}
-        </p>
-        {#if workflow.endTime}
+      <p class="text-white text-base time">{formatElasped($timeDiff)}</p>
+      <div class="w-full text-white text-left text-[12px] flex flex-col gap-0">
+        {#if workflow.endTime && workflow.endTime !== 'null'}
           <p>
-            End: {formatDate(workflow.endTime, $timeFormat)}
+            <span class="inline-block w-10">End:</span>{formatDate(
+              workflow.endTime,
+              $timeFormat,
+            )}
           </p>
         {/if}
+        <p>
+          <span class="inline-block w-10">Start:</span>{formatDate(
+            workflow.startTime,
+            $timeFormat,
+          )}
+        </p>
       </div>
+    </div>
+    <div class="median">
+      <p class="text-white text-base">(μ)</p>
+      <div class="w-1 bg-blue-300 h-full" />
+      <p class="text-white text-base time">{formatElasped(125)}</p>
+    </div>
+    <div class="max">
+      <p class="text-white text-base">99%</p>
+      <div class="w-1 bg-red-300 h-full" />
+      <p class="text-white text-base time">{formatElasped(210)}</p>
     </div>
   </div>
 </div>
@@ -70,16 +88,19 @@
 <style lang="postcss">
   .duration {
     @apply flex flex-col h-full w-1/2 justify-center items-start gap-0;
-<<<<<<< HEAD
+
     touch-action: none;
   }
 
-  .wave path {
-    stroke-width: 4px;
-=======
+  .median,
+  .max {
+    @apply flex flex-col h-full w-1/4 justify-center items-center gap-1;
 
     touch-action: none;
->>>>>>> 988cb1bf (Show elapsed time with duration animation and distruputed trace placeholder)
+  }
+
+  .max {
+    @apply justify-end items-end;
   }
 
   .wave path {

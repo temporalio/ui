@@ -62,6 +62,7 @@ import starEmpty from './svg/star-empty.svelte';
 import starFilled from './svg/star-filled.svelte';
 import summary from './svg/summary.svelte';
 import support from './svg/support.svelte';
+import taskQueue from './svg/task-queue.svelte';
 import terminal from './svg/terminal.svelte';
 import timeline from './svg/timeline.svelte';
 import transcoderError from './svg/transcoder-error.svelte';
@@ -71,7 +72,9 @@ import trash from './svg/trash.svelte';
 import tutorial from './svg/tutorial.svelte';
 import upload from './svg/upload.svelte';
 import usage from './svg/usage.svelte';
+import versioning from './svg/versioning.svelte';
 import verticalEllipsis from './svg/vertical-ellipsis.svelte';
+
 import warning from './svg/warning.svelte';
 import workflow from './svg/workflow.svelte';
 
@@ -142,6 +145,7 @@ export const icons = {
   summary,
   support,
   'spinner-solid': spinnerSolid,
+  'task-queue': taskQueue,
   terminal,
   timeline,
   'transcoder-error': transcoderError,
@@ -151,6 +155,7 @@ export const icons = {
   tutorial,
   upload,
   usage,
+  versioning,
   'vertical-ellipsis': verticalEllipsis,
   warning,
   workflow,

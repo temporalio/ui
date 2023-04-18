@@ -22,7 +22,7 @@
 </script>
 
 <section>
-  <Accordion title="Relationships" icon="relationship" stackSummary>
+  <Accordion title="Relationships" icon="relationship">
     <div slot="summary" class="hidden flex-row gap-2 lg:flex">
       <Badge type={parent ? 'purple' : 'gray'}>{parent ? 1 : 0} Parent</Badge>
       <Badge type={hasChildren ? 'purple' : 'gray'}
