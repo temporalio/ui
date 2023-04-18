@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
   import { getContext } from 'svelte';
-  import type { HTMLButtonAttributes } from 'svelte/elements';
+  import type { HTMLButtonAttributes, HTMLAttributes } from 'svelte/elements';
+  import { isNull } from '$lib/utilities/is';
   import { type TabContext, TABS } from './tabs.svelte';
 
-  interface $$Props extends HTMLButtonAttributes {
+  type OwnProps = {
     label: string;
     id: string;
     'data-testid'?: string;
@@ -12,34 +12,39 @@
     panelId?: string;
     disabled?: boolean;
     active?: boolean;
-  }
+  };
+
+  type $$Props =
+    | (OwnProps & HTMLButtonAttributes)
+    | (OwnProps & HTMLAttributes<HTMLAnchorElement>);
 
   export let label: string;
   export let id: string;
-  export let href = '';
-  export let panelId = null;
+  export let href: string = null;
+  export let panelId: string = null;
   export let disabled = false;
-  export let active = false;
+  export let active: boolean = null;
 
   const { registerTab, selectTab, activeTab } = getContext<TabContext>(TABS);
 
   registerTab(id);
 
-  $: isActive = href ? active : $activeTab === id;
+  $: isActive = isNull(active) ? $activeTab === id : active;
 
   const handleClick = () => {
     selectTab(id);
-    if (href) goto(href);
   };
 </script>
 
-<button
+<svelte:element
+  this={href ? 'a' : 'button'}
   role="tab"
   class="tab"
   aria-selected={isActive}
   aria-controls={panelId}
   tabindex={isActive ? 0 : -1}
   {id}
+  {href}
   class:active={isActive}
   class:disabled
   data-testid={id ?? $$props['data-testid']}
@@ -48,7 +53,7 @@
 >
   {label}
   <slot />
-</button>
+</svelte:element>
 
 <style lang="postcss">
   .tab {
@@ -57,15 +62,15 @@
     border-color: transparent;
   }
 
-  button.active {
+  .tab.active {
     @apply border-b-2 border-blue-700 font-medium text-blue-700;
   }
 
-  button.disabled {
+  .tab.disabled {
     @apply cursor-not-allowed text-gray-800 opacity-50;
   }
 
-  button.disabled:hover {
+  .tab.disabled:hover {
     border-color: transparent;
   }
 </style>
