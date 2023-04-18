@@ -5,7 +5,8 @@
   "description": "Temporal.io UI",
   "keywords": [
     "temporal",
-    "ui"
+    "ui",
+    ""
   ],
   "exports": {
     "./*.svelte": {
