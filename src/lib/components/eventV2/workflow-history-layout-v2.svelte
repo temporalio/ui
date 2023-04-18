@@ -17,6 +17,7 @@
   import { fetchAllEvents } from '$lib/services/events-service';
   import Accordion from '$lib/holocene/accordion.svelte';
   import { onDestroy } from 'svelte';
+  import WorkflowTimeMotion from './workflow-time-motion.svelte';
 
   let controller;
 
@@ -87,7 +88,9 @@
 />
 <div class="flex flex-col gap-2">
   <WorkflowSummaryV2 />
-
+  <div class="relative h-96 w-full md:w-1/2 rounded-xl border-4">
+    <WorkflowTimeMotion />
+  </div>
   <WorkflowRelationshipsV2 {...workflowRelationships} />
 </div>
 <div class="w-full">
