@@ -14,6 +14,7 @@
     removeColumn,
     moveColumn,
     pinColumn,
+    pinnedColumnsWidth,
     MAX_PINNED_COLUMNS,
   } from '$lib/stores/workflow-table-columns';
   import Drawer from '$lib/holocene/drawer.svelte';
@@ -114,7 +115,7 @@
   };
 
   let resizableContainer: HTMLDivElement;
-  let resizableContainerWidth: number;
+  let resizableContainerWidth: number = $pinnedColumnsWidth;
   let resizing: boolean = false;
 
   const handleMouseDown = () => {
@@ -124,6 +125,7 @@
 
   const handleMouseUp = () => {
     resizing = false;
+    $pinnedColumnsWidth = resizableContainerWidth;
   };
 
   const handleMouseMove = (event: MouseEvent) => {
@@ -253,6 +255,8 @@
   </div>
   <div
     class="resizer"
+    class:no-columns-pinned={pinnedColumns.length === 0}
+    class:batch-actions-visible={showBulkActions}
     on:mousedown|stopPropagation|preventDefault={handleMouseDown}
   />
   <div class="workflow-summary-table-wrapper">
@@ -414,8 +418,13 @@
     @apply z-10 bg-primary w-0 border-r-[3px] border-primary cursor-col-resize;
   }
 
+  .resizer.no-columns-pinned,
+  .resizer.batch-actions-visible {
+    @apply pointer-events-none;
+  }
+
   .workflow-summary-table-wrapper.pinned.batch-actions-visible {
-    @apply !w-full after:pointer-events-none;
+    @apply !w-full;
   }
 
   .workflow-summary-table-wrapper.pinned.no-columns-pinned.batch-actions-enabled {
@@ -430,10 +439,6 @@
 
   .workflow-summary-table-wrapper:not(.pinned) {
     @apply overflow-x-scroll overscroll-x-contain flex-grow rounded-r-lg;
-  }
-
-  .workflow-summary-table-wrapper.pinned.no-columns-pinned {
-    @apply after:pointer-events-none;
   }
 
   .workflow-summary-table-wrapper.pinned.no-columns-pinned.batch-actions-visible {

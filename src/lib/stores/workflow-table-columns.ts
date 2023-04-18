@@ -135,6 +135,10 @@ const workflowTableColumns = persistStore(
   DEFAULT_COLUMNS,
 );
 
+const pinnedColumnsWidth = persistStore<number>(
+  'workflow-table-pinned-columns-width',
+);
+
 const availableWorkflowColumns: Readable<WorkflowHeader[]> = derived(
   [workflowTableColumns],
   ([$workflowTableColumns]) =>
@@ -253,6 +257,7 @@ export {
   workflowTableColumns,
   availableSearchAttributes,
   availableWorkflowColumns,
+  pinnedColumnsWidth,
   addColumn,
   removeColumn,
   moveColumn,
