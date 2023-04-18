@@ -11,9 +11,9 @@ specifiers:
   '@codemirror/view': ^6.7.0
   '@crownframework/svelte-error-boundary': ^1.0.3
   '@grpc/grpc-js': ^1.3.7
-  '@histoire/controls': ^0.14.2
-  '@histoire/plugin-svelte': ^0.14.2
-  '@histoire/shared': ^0.14.2
+  '@histoire/controls': ^0.16.1
+  '@histoire/plugin-svelte': ^0.16.1
+  '@histoire/shared': ^0.16.1
   '@lezer/highlight': ^1.1.3
   '@playwright/test': ^1.30.0
   '@sveltejs/adapter-static': ^1.0.5
@@ -56,7 +56,7 @@ specifiers:
   esm-env: ^1.0.0
   esno: ^0.16.3
   google-protobuf: ^3.17.3
-  histoire: ^0.14.2
+  histoire: ^0.16.1
   husky: ^8.0.1
   jest-websocket-mock: ^2.2.1
   jsdom: ^20.0.0
@@ -128,9 +128,9 @@ devDependencies:
   '@babel/preset-typescript': 7.18.6_@babel+core@7.20.12
   '@crownframework/svelte-error-boundary': 1.0.3
   '@grpc/grpc-js': 1.8.3
-  '@histoire/controls': 0.14.2
-  '@histoire/plugin-svelte': 0.14.2_3tr3yz44hcblubfagpxvwgnnsq
-  '@histoire/shared': 0.14.2_vite@4.0.4
+  '@histoire/controls': 0.16.1_vite@4.0.4
+  '@histoire/plugin-svelte': 0.16.1_s7igbrc34djjvfefqk25fhlcwu
+  '@histoire/shared': 0.16.1_vite@4.0.4
   '@playwright/test': 1.30.0
   '@sveltejs/adapter-static': 1.0.5_@sveltejs+kit@1.15.4
   '@sveltejs/adapter-vercel': 1.0.5_@sveltejs+kit@1.15.4
@@ -167,7 +167,7 @@ devDependencies:
   eslint-plugin-vitest: 0.0.34_7kw3g6rralp5ps6mg3uyzz6azm
   esno: 0.16.3
   google-protobuf: 3.21.2
-  histoire: 0.14.2_5uw3d2dd4sqml7zu2gkztj47im
+  histoire: 0.16.1_5uw3d2dd4sqml7zu2gkztj47im
   husky: 8.0.3
   jest-websocket-mock: 2.4.0
   jsdom: 20.0.3
@@ -207,6 +207,11 @@ devDependencies:
   zx: 7.1.1
 
 packages:
+
+  /@akryum/tinypool/0.3.1:
+    resolution: {integrity: sha512-nznEC1ZA/m3hQDEnrGQ4c5gkaa9pcaVnw4LFJyzBAaR7E3nfiAPEHS3otnSafpZouVnoKeITl5D+2LsnwlnK8g==}
+    engines: {node: '>=14.0.0'}
+    dev: true
 
   /@ampproject/remapping/2.2.0:
     resolution: {integrity: sha512-qRmjj8nj9qmLTQXXmaR1cck3UXSRMPrbsLJAasZpF+t3riI71BXed5ebIOYwQntykeZuhjsdweEc9BxH5Jc26w==}
@@ -1156,12 +1161,12 @@ packages:
       yargs: 16.2.0
     dev: true
 
-  /@histoire/app/0.14.2_vite@4.0.4:
-    resolution: {integrity: sha512-mY91jH8UPFWYGLnTLbv5ntmly+Yd5etHDKV0+l+q/bRHaKrhGLOtJjr60wyqfxbZ6rDN2sjJAwNDEc6dozFqFw==}
+  /@histoire/app/0.16.1_vite@4.0.4:
+    resolution: {integrity: sha512-13komnhVk1Pk0wMmkJKDPWT8RKpA5HfAbeeXSHAq29pvFP9Faq+dAa62g1wqOpoyJD5C7SkI0OPI3eJwJHgTiQ==}
     dependencies:
-      '@histoire/controls': 0.14.2
-      '@histoire/shared': 0.14.2_vite@4.0.4
-      '@histoire/vendors': 0.14.2
+      '@histoire/controls': 0.16.1_vite@4.0.4
+      '@histoire/shared': 0.16.1_vite@4.0.4
+      '@histoire/vendors': 0.16.0
       '@types/flexsearch': 0.7.3
       flexsearch: 0.7.21
       shiki-es: 0.2.0
@@ -1169,8 +1174,8 @@ packages:
       - vite
     dev: true
 
-  /@histoire/controls/0.14.2:
-    resolution: {integrity: sha512-6pVyjwVxFLqsUb4stvXJ6BmXjr82tfWA4Gv0oipZcDB8zDxDhhx6ckuy+9l94W3BsQfH2ZaRruCv6dJUtqiFZQ==}
+  /@histoire/controls/0.16.1_vite@4.0.4:
+    resolution: {integrity: sha512-Ot/J/LPzUexn+fLrJrWu3jUakx9aVSJWKnriiJSmEodAxJq+4mrprX3xS0bnzieud19pJc3mzC/MSD94urTbHA==}
     dependencies:
       '@codemirror/commands': 6.1.3
       '@codemirror/lang-json': 6.0.1
@@ -1179,20 +1184,23 @@ packages:
       '@codemirror/state': 6.2.0
       '@codemirror/theme-one-dark': 6.1.0
       '@codemirror/view': 6.7.2
-      '@histoire/vendors': 0.14.2
+      '@histoire/shared': 0.16.1_vite@4.0.4
+      '@histoire/vendors': 0.16.0
+    transitivePeerDependencies:
+      - vite
     dev: true
 
-  /@histoire/plugin-svelte/0.14.2_3tr3yz44hcblubfagpxvwgnnsq:
-    resolution: {integrity: sha512-ahbKMjybhMIlPZEB89IUx70h42RTcUcfJEZTZ809fdGAqsJvFjAh0/UNvCNtmBS1bPgd4XRfWXW/C0bG6W/rsQ==}
+  /@histoire/plugin-svelte/0.16.1_s7igbrc34djjvfefqk25fhlcwu:
+    resolution: {integrity: sha512-jzGKEEPIKRiqbWfSYyaudh54IETsZoYKcSaI4cldDFTYs+6Qc//kKK8gcy3sWQrhjz5O5Cq/NrE37NVbduTdHw==}
     peerDependencies:
-      histoire: ^0.14.2
+      histoire: ^0.16.1
       svelte: ^3.0.0
     dependencies:
-      '@histoire/controls': 0.14.2
-      '@histoire/shared': 0.14.2_vite@4.0.4
-      '@histoire/vendors': 0.14.2
+      '@histoire/controls': 0.16.1_vite@4.0.4
+      '@histoire/shared': 0.16.1_vite@4.0.4
+      '@histoire/vendors': 0.16.0
       change-case: 4.1.2
-      histoire: 0.14.2_5uw3d2dd4sqml7zu2gkztj47im
+      histoire: 0.16.1_5uw3d2dd4sqml7zu2gkztj47im
       launch-editor: 2.6.0
       pathe: 0.2.0
       svelte: 3.55.1
@@ -1200,12 +1208,12 @@ packages:
       - vite
     dev: true
 
-  /@histoire/shared/0.14.2_vite@4.0.4:
-    resolution: {integrity: sha512-Q7g8Yr8F2lb+/fnQExJYn5fLEqHgHtK47QqsiAWf6xX+v10r/JYLZUnI28jwEga5tLQTVTl6HEJ+yHqvJNFIiw==}
+  /@histoire/shared/0.16.1_vite@4.0.4:
+    resolution: {integrity: sha512-bcySHGC6kcZ1U9OZUcBQCROTBygTZ9T9MlqfeGtBtJWXGdmHPZ/64elZOY36O8gUAMF89Q08EIVe5cIQ0SJ3Uw==}
     peerDependencies:
       vite: ^2.9.0 || ^3.0.0 || ^4.0.0
     dependencies:
-      '@histoire/vendors': 0.14.2
+      '@histoire/vendors': 0.16.0
       '@types/fs-extra': 9.0.13
       '@types/markdown-it': 12.2.3
       chokidar: 3.5.3
@@ -1214,8 +1222,8 @@ packages:
       vite: 4.0.4_@types+node@16.18.11
     dev: true
 
-  /@histoire/vendors/0.14.2:
-    resolution: {integrity: sha512-x8B8KxHXSC8YdMAHJtJBBGQYXHP0jcxDxnytwrZOxoCtzwOYghHJNJ8wPfwboKNE0E3ot6vJSilZahwGVLX+nw==}
+  /@histoire/vendors/0.16.0:
+    resolution: {integrity: sha512-MVr3P2q5Q9UiLJJT99b+j2ABCSerQG4VnUeCr5+eOxyEmoIFz1a0KGJimzqQM0EoVnMQmiaNN3WhuUYG+DWh/w==}
     dev: true
 
   /@humanwhocodes/config-array/0.11.8:
@@ -5074,16 +5082,17 @@ packages:
     engines: {node: '>=12.0.0'}
     dev: true
 
-  /histoire/0.14.2_5uw3d2dd4sqml7zu2gkztj47im:
-    resolution: {integrity: sha512-nY9O5sIbtlUsGsLQqMGi601I09OKH7aZamYPcDlW7g1fmkf7IMb15xiREboMunQEIpDrpAH+9aWBxGIN+iQ5eA==}
+  /histoire/0.16.1_5uw3d2dd4sqml7zu2gkztj47im:
+    resolution: {integrity: sha512-TIzJ0Wqe8epfTYMd7yuS0Zcuy86ysJ5t4p6qt0zjHAinoNgEH2M9biHtuKQzd96/QuUy3oc2dcXiFLFSZGdSyw==}
     hasBin: true
     peerDependencies:
       vite: ^2.9.0 || ^3.0.0 || ^4.0.0
     dependencies:
-      '@histoire/app': 0.14.2_vite@4.0.4
-      '@histoire/controls': 0.14.2
-      '@histoire/shared': 0.14.2_vite@4.0.4
-      '@histoire/vendors': 0.14.2
+      '@akryum/tinypool': 0.3.1
+      '@histoire/app': 0.16.1_vite@4.0.4
+      '@histoire/controls': 0.16.1_vite@4.0.4
+      '@histoire/shared': 0.16.1_vite@4.0.4
+      '@histoire/vendors': 0.16.0
       '@types/flexsearch': 0.7.3
       '@types/markdown-it': 12.2.3
       birpc: 0.1.1
@@ -5096,7 +5105,7 @@ packages:
       fs-extra: 10.1.0
       globby: 13.1.3
       gray-matter: 4.0.3
-      jiti: 1.16.2
+      jiti: 1.18.2
       jsdom: 20.0.3
       markdown-it: 12.3.2
       markdown-it-anchor: 8.6.6_2zb4u3vubltivolgu556vv4aom
@@ -5109,7 +5118,6 @@ packages:
       sade: 1.8.1
       shiki-es: 0.2.0
       sirv: 2.0.2
-      tinypool: 0.1.3
       vite: 4.0.4_@types+node@16.18.11
       vite-node: 0.28.4_@types+node@16.18.11
     transitivePeerDependencies:
@@ -5509,8 +5517,8 @@ packages:
       supports-color: 8.1.1
     dev: true
 
-  /jiti/1.16.2:
-    resolution: {integrity: sha512-OKBOVWmU3FxDt/UH4zSwiKPuc1nihFZiOD722FuJlngvLz2glX1v2/TJIgoA4+mrpnXxHV6dSAoCvPcYQtoG5A==}
+  /jiti/1.18.2:
+    resolution: {integrity: sha512-QAdOptna2NYiSSpv0O/BwoHBSmz4YhpzJHyi+fnMRTXFjp7B8i/YG5Z8IfusxB1ufjcD2Sre1F3R+nX3fvy7gg==}
     hasBin: true
     dev: true
 
@@ -8423,11 +8431,6 @@ packages:
 
   /tinybench/2.3.1:
     resolution: {integrity: sha512-hGYWYBMPr7p4g5IarQE7XhlyWveh1EKhy4wUBS1LrHXCKYgvz+4/jCqgmJqZxxldesn05vccrtME2RLLZNW7iA==}
-    dev: true
-
-  /tinypool/0.1.3:
-    resolution: {integrity: sha512-2IfcQh7CP46XGWGGbdyO4pjcKqsmVqFAPcXfPxcPXmOWt9cYkTP9HcDmGgsfijYoAEc4z9qcpM/BaBz46Y9/CQ==}
-    engines: {node: '>=14.0.0'}
     dev: true
 
   /tinypool/0.3.1:

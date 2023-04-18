@@ -5,7 +5,7 @@ import { HstSvelte as histoire } from '@histoire/plugin-svelte';
 export default defineConfig({
   plugins: [histoire()],
   setupFile: './src/histoire.setup.ts',
-  storyIgnored: ['node_modules/**', 'dist/**', 'package/**', '.vercel/**'],
+  storyMatch: ['src/**/*.story.svelte'],
   theme: {
     title: 'Holocene',
     favicon: './src/lib/vendor/favicon.ico',
