@@ -7,7 +7,7 @@ import {
   isTimerStartedEvent,
   isLocalActivityMarkerEvent,
 } from '$lib/utilities/is-event-type';
-import { formatDuration } from '$lib/utilities/format-time';
+import { formatDurationAbbreviated } from '$lib/utilities/format-time';
 
 export const getEventGroupName = (event: CommonHistoryEvent): string => {
   if (!event) return;
@@ -19,7 +19,7 @@ export const getEventGroupName = (event: CommonHistoryEvent): string => {
   if (isTimerStartedEvent(event)) {
     return `Timer ${
       event.timerStartedEventAttributes?.timerId
-    } (${formatDuration(
+    } (${formatDurationAbbreviated(
       event.timerStartedEventAttributes
         ?.startToFireTimeout as unknown as Duration,
     )})`;
