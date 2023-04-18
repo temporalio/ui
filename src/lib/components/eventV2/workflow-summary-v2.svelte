@@ -15,58 +15,45 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
 
   $: ({ workflow, workers } = $workflowRun);
+
+  export let hasChildren: boolean;
+  export let children: ChildWorkflowExecutionCompletedEvent[];
+  export let hasPendingChildren: boolean;
+  export let hasRelationships: boolean;
+  export let first: string;
+  export let parent: WorkflowIdentifier;
+  export let next: string;
+  export let previous: string;
 </script>
 
 <div class="flex flex-col gap-2">
   <h1 class="flex gap-1 items-center text-xl">At-a-glance</h1>
-  <div class="grid grid-cols-8 gap-4">
-    <!-- <Card
-      class="flex flex-col gap-0 justify-end items-end text-right"
-    >
-      <h3 class="text-purple-600 text-base">{workflow.id}</h3>
-      <p>Execution Id</p>
-    </Card>
-    <Card
-      class="flex flex-col gap-0 justify-end items-end text-right"
-    >
-      <h3 class="text-purple-600 text-base">{workflow.runId}</h3>
-      <p>Run Id</p>
-    </Card> -->
-
-    <Card class="flex flex-col gap-0 justify-between items-end text-right">
+  <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+    <Card class="flex flex-col gap-0 text-right">
       <p>Workers</p>
-      <h3 class="text-purple-600 text-4xl">{workers.pollers.length}</h3>
+      <h3 class="font-bold">{workers.pollers.length}</h3>
     </Card>
-    <Card class="flex flex-col gap-0 justify-between items-end text-right">
-      <p>Task Queue</p>
-      <h3 class="text-purple-600 text-lg">{workflow?.taskQueue}</h3>
+    <Card class="flex flex-col gap-0 text-right">
+      <p>Latency</p>
+      <h3 class="font-bold">12 kb/s</h3>
     </Card>
-    <Card class="flex flex-col gap-0 justify-between items-end text-right">
-      <p>State Transitions</p>
-      <h3 class="text-purple-600 text-4xl">{workflow?.stateTransitionCount}</h3>
-    </Card>
-    <Card class="flex flex-col gap-0 justify-between items-end text-right">
-      <p>Start Time</p>
-      <h3 class="text-purple-600 text-xl">
-        {formatDate(workflow?.startTime, $timeFormat)}
+    <Card class="flex flex-col gap-0 text-right">
+      <p>Children</p>
+      <h3 class="font-bold">
+        {workflow?.pendingChildren.length + children.length}
       </h3>
     </Card>
-    {#if !workflow?.isRunning}
-      <Card class="flex flex-col gap-0 justify-between items-end text-right">
-        <p>Close Time</p>
-        <h3 class="text-purple-600 text-xl">
-          {formatDate(workflow?.endTime, $timeFormat)}
-        </h3>
-      </Card>
-      <Card class="flex flex-col gap-0 justify-between items-end">
-        <p>Duration</p>
-        <h3 class="text-purple-600 text-xl">
-          {formatDistanceAbbreviated({
-            start: workflow?.startTime,
-            end: workflow?.endTime,
-          })}
-        </h3>
-      </Card>
-    {/if}
+    <Card class="flex flex-col gap-0 text-right">
+      <p>Metric</p>
+      <h3 class="font-bold">X</h3>
+    </Card>
+    <Card class="flex flex-col gap-0 text-right">
+      <p>Size</p>
+      <h3 class="font-bold">{Math.round(parseInt(workflow.size) / 1000)} kb</h3>
+    </Card>
+    <Card class="flex flex-col gap-0 text-right">
+      <p>State Transitions</p>
+      <h3 class="font-bold">{workflow?.stateTransitionCount}</h3>
+    </Card>
   </div>
 </div>

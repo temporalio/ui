@@ -172,3 +172,15 @@ export const getTimestampDifference = (
   const parse2 = Date.parse(date2);
   return Math.abs(parse1 - parse2);
 };
+
+export const formatElasped = (diff: number): string => {
+  const seconds = (diff % 60).toString().padStart(2, '0');
+  const minutes = Math.round(diff / 60)
+    .toString()
+    .padStart(2, '0');
+  const hours = Math.round(diff / 3600)
+    .toString()
+    .padStart(2, '0');
+
+  return `${hours}:${minutes}:${seconds}`;
+};

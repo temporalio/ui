@@ -31,8 +31,6 @@
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import { has } from '$lib/utilities/has';
   import Link from '$lib/holocene/link.svelte';
-  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
-  import { featureFlags } from '$lib/stores/feature-flags';
 
   export let namespace: string;
 
@@ -91,7 +89,7 @@
   $: workflowHasBeenReset = has($resetWorkflows, $workflowRun?.workflow.runId);
 </script>
 
-<header class="mb-4 flex flex-col gap-1">
+<header class="flex flex-col gap-1">
   <div class="mb-4 block flex justify-between">
     <a
       href={`${routeForWorkflows({
@@ -115,18 +113,17 @@
     </a>
   </div>
   <div
-    class="mb-8 flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
+    class="flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
   >
     <div
       class="flex w-full items-center justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
     >
-      <WorkflowStatus status={workflow?.status} />
       <h1
         data-testid="workflow-id-heading"
         class="overflow-hidden text-2xl font-medium"
       >
         <Copyable
-          content={workflow?.id}
+          content={workflow?.type}
           clickAllToCopy
           container-class="w-full"
           class="overflow-hidden text-ellipsis"
@@ -141,6 +138,46 @@
       </div>
     {/if}
   </div>
+  <div
+    class="flex w-full items-center justify-start gap-2 overflow-hidden whitespace-nowrap"
+  >
+    <h3
+      data-testid="workflow-id-heading"
+      class="overflow-hidden text-sm flex gap-2 items-center"
+    >
+      Workflow Id:
+      <Copyable
+        content={workflow?.id}
+        clickAllToCopy
+        container-class="w-full"
+        class="overflow-hidden text-ellipsis"
+      />
+    </h3>
+    <h3
+      data-testid="workflow-run-id-heading"
+      class="overflow-hidden text-sm flex gap-2 items-center"
+    >
+      Run Id:
+      <Copyable
+        content={workflow?.runId}
+        clickAllToCopy
+        container-class="w-full"
+        class="overflow-hidden text-ellipsis"
+      />
+    </h3>
+  </div>
+  <div
+    class="mb-4 flex w-full items-center justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
+  >
+    <WorkflowStatus status={workflow?.status} />
+    <Badge type="green" class="p-0"
+      ><Icon name="chart" />{workflow.taskQueue}</Badge
+    >
+    <Badge type="green" class="p-0"
+      ><Icon name="chart" />1.2.1 main version</Badge
+    >
+  </div>
+
   {#if cancelInProgress}
     <div class="mb-4" in:fly={{ duration: 200, delay: 100 }}>
       <Alert
@@ -176,7 +213,7 @@
       </Alert>
     </div>
   {/if}
-  <nav class="flex flex-wrap gap-6" aria-label="workflow detail">
+  <!-- <nav class="flex flex-wrap gap-6" aria-label="workflow detail">
     <Tab
       label="History"
       href={routeForEventHistoryV2({
@@ -233,7 +270,7 @@
         routeForWorkflowQuery(routeParameters),
       )}
     />
-  </nav>
+  </nav> -->
 </header>
 
 <style lang="postcss">

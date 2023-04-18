@@ -70,7 +70,16 @@
 <style lang="postcss">
   .duration {
     @apply flex flex-col h-full w-1/2 justify-center items-start gap-0;
+<<<<<<< HEAD
     touch-action: none;
+  }
+
+  .wave path {
+    stroke-width: 4px;
+=======
+
+    touch-action: none;
+>>>>>>> 988cb1bf (Show elapsed time with duration animation and distruputed trace placeholder)
   }
 
   .wave path {

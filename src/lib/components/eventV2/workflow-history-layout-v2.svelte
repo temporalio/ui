@@ -18,6 +18,7 @@
   import Accordion from '$lib/holocene/accordion.svelte';
   import { onDestroy } from 'svelte';
   import WorkflowTimeMotion from './workflow-time-motion.svelte';
+  import WorkflowDistributedTrace from './workflow-distributed-trace.svelte';
 
   let controller;
 
@@ -87,9 +88,10 @@
   url={$page.url.href}
 />
 <div class="flex flex-col gap-2">
-  <WorkflowSummaryV2 />
-  <div class="relative h-96 w-full md:w-1/2 rounded-xl border-4">
+  <WorkflowSummaryV2 {...workflowRelationships} />
+  <div class="flex gap-2">
     <WorkflowTimeMotion />
+    <WorkflowDistributedTrace />
   </div>
   <WorkflowRelationshipsV2 {...workflowRelationships} />
 </div>

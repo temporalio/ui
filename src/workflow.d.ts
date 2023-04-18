@@ -78,6 +78,8 @@ type WorkflowExecution = {
   name: string;
   id: string;
   runId: string;
+  type: string;
+  size: string;
   startTime: string;
   endTime: string;
   status: WorkflowStatus;

@@ -113,6 +113,8 @@
             />
           </div>
         {/if}
+      </div>
+      <div class="flex w-full">
         {#if hasPendingChildren}
           <PendingChildWorkflowsTable
             pendingChildren={$workflowRun.workflow.pendingChildren}
