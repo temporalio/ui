@@ -1,4 +1,4 @@
-import { browser } from '$app/environment';
+import { BROWSER } from 'esm-env';
 import { settings } from '$lib/stores/settings';
 import { getApiOrigin } from '$lib/utilities/get-api-origin';
 import { getEnvironment } from '$lib/utilities/get-environment';
@@ -43,14 +43,14 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
           return EnvironmentOverride === 'cloud';
         }
 
-        return isCloudMatch.test(browser ? window.location.hostname : '');
+        return isCloudMatch.test(BROWSER ? window.location.hostname : '');
       },
       get isLocal() {
         if (EnvironmentOverride) {
           return EnvironmentOverride === 'local';
         }
 
-        return isCloudMatch.test(browser ? window.location.hostname : '');
+        return isCloudMatch.test(BROWSER ? window.location.hostname : '');
       },
       envOverride: Boolean(EnvironmentOverride),
     },

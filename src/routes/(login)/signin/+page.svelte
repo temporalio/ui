@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { PageData } from './$types';
   import { page } from '$app/stores';
-  import { browser } from '$app/environment';
+  import { BROWSER } from 'esm-env';
 
   import PageTitle from '$lib/components/page-title.svelte';
   import Button from '$lib/holocene/button.svelte';
@@ -33,7 +33,7 @@
       variant="login"
       icon="lock"
       on:click={() => {
-        if (browser) {
+        if (BROWSER) {
           window.location.assign(
             routeForAuthentication({
               settings,

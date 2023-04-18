@@ -1,4 +1,4 @@
-import { browser } from '$app/environment';
+import { BROWSER } from 'esm-env';
 
 export const base64EncodeUnicode = (str: string) => {
   return window.btoa(
@@ -8,7 +8,7 @@ export const base64EncodeUnicode = (str: string) => {
   );
 };
 
-export const btoa = (str: string, isBrowser = browser): string => {
+export const btoa = (str: string, isBrowser = BROWSER): string => {
   if (!isBrowser) return str;
   return base64EncodeUnicode(str);
 };

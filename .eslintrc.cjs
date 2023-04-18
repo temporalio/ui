@@ -68,5 +68,16 @@ module.exports = {
       'error',
       { assertionStyle: 'as' },
     ],
+    '@typescript-eslint/no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '$app/environment',
+            message: 'Please use esm-env instead.',
+          },
+        ],
+      },
+    ],
   },
 };

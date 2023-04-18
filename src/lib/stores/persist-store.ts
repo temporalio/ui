@@ -1,4 +1,4 @@
-import { browser } from '$app/environment';
+import { BROWSER } from 'esm-env';
 import { writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 import { isFunction } from '$lib/utilities/is-function';
@@ -17,7 +17,7 @@ export function persistStore<T>(
     : initialValue;
   let broadcaster: null | BroadcastChannel;
 
-  if (browser) {
+  if (BROWSER) {
     try {
       if (window?.localStorage?.getItem(name)) {
         initialStoreValue = parseWithBigInt(
@@ -31,7 +31,7 @@ export function persistStore<T>(
 
   const { subscribe, set, update } = writable<T>(initialStoreValue);
 
-  if (browser && broadcastToAll) {
+  if (BROWSER && broadcastToAll) {
     try {
       broadcaster = new BroadcastChannel(`persist-store-${name}`);
       broadcaster?.addEventListener('message', (event) => {
@@ -45,7 +45,7 @@ export function persistStore<T>(
   return {
     subscribe,
     set: (x: T) => {
-      if (browser) {
+      if (BROWSER) {
         if (broadcaster) broadcaster.postMessage(x);
         if (x === null) {
           window?.localStorage?.removeItem(name);
@@ -56,7 +56,7 @@ export function persistStore<T>(
       set(x);
     },
     update: (updater: (x: T) => T) => {
-      if (browser) {
+      if (BROWSER) {
         window?.localStorage?.removeItem(name);
         update((previousValue) => {
           const updatedValue = updater(previousValue);

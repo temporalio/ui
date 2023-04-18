@@ -7,3 +7,8 @@ const BroadcastChannelMock = vi.fn(() => ({
 }));
 
 vi.stubGlobal('BroadcastChannel', BroadcastChannelMock);
+
+vi.mock('esm-env', () => {
+  const BROWSER = true;
+  return { BROWSER };
+});
