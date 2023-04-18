@@ -25,9 +25,11 @@
   };
 
   $: initialEvent = isEventGroup(event) ? event.initialEvent : event;
+  $: lastEvent = isEventGroup(event) ? event.lastEvent : event;
   $: hasGroupEvents = isEventGroup(event) && event?.eventList?.length > 1;
-  $: showClassification =
-    isEventGroup(event) && hasGroupEvents && event.lastEvent?.classification;
+  $: showClassification = isEventGroup(event)
+    ? lastEvent?.classification
+    : event?.classification;
 </script>
 
 <div class="flex">

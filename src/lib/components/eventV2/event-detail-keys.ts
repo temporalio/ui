@@ -82,21 +82,21 @@ export const eventGroupDisplayName = (
     if (isTimerStartedEvent(event.initialEvent)) return 'Timer';
   }
 
-  if (isWorkflowExecutionStartedEvent(singleEvent)) return 'Workflow Started';
-  if (isMarkerRecordedEvent(singleEvent)) return 'Marker Recorded';
+  if (isMarkerRecordedEvent(singleEvent)) return 'Marker';
   if (isWorkflowExecutionSignaledEvent(singleEvent)) return 'Signal Received';
   if (isSignalExternalWorkflowExecutionInitiatedEvent(singleEvent))
     return 'Signal Sent';
   if (isUpsertWorkflowSearchAttributesEvent(singleEvent))
     return 'Search Attributes';
-  // if (
-  //   isWorkflowExecutionCanceledEvent(singleEvent) ||
-  //   isWorkflowExecutionFailedEvent(singleEvent) ||
-  //   isWorkflowExecutionTimedOutEvent(singleEvent) ||
-  //   isWorkflowExecutionTerminatedEvent(singleEvent) ||
-  //   isWorkflowExecutionCompletedEvent(singleEvent)
-  // )
-  //   return 'Workflow';
+  if (
+    isWorkflowExecutionStartedEvent(singleEvent) ||
+    isWorkflowExecutionCanceledEvent(singleEvent) ||
+    isWorkflowExecutionFailedEvent(singleEvent) ||
+    isWorkflowExecutionTimedOutEvent(singleEvent) ||
+    isWorkflowExecutionTerminatedEvent(singleEvent) ||
+    isWorkflowExecutionCompletedEvent(singleEvent)
+  )
+    return 'Workflow';
 
   // if (isTimerStartedEvent(singleEvent)) return 'Started';
 
