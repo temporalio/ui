@@ -3,7 +3,7 @@ import type { LayoutLoad } from './$types';
 import type { GetClusterInfoResponse } from '$types';
 
 import '$lib/vendor/prism/prism.css';
-import '$lib/vendor/prism/prism.js';
+import '$lib/vendor/prism/prism.cjs';
 
 import '../../app.css';
 
