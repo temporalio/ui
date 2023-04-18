@@ -1,4 +1,4 @@
-import { browser } from '$app/environment';
+import { BROWSER } from 'esm-env';
 import { toURL } from '$lib/utilities/to-url';
 import { encodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { base } from '$app/paths';
@@ -70,7 +70,7 @@ export const routeForWorkflowsWithQuery = ({
   search,
   page,
 }: WorkflowsParameter): string | undefined => {
-  if (!browser) {
+  if (!BROWSER) {
     return undefined;
   }
 
@@ -186,7 +186,7 @@ export const routeForAuthentication = (
   return login.toString();
 };
 
-export const routeForLoginPage = (error = '', isBrowser = browser): string => {
+export const routeForLoginPage = (error = '', isBrowser = BROWSER): string => {
   if (isBrowser) {
     const login = new URL(`${base}/login`, window.location.origin);
     login.searchParams.set('returnUrl', window.location.href);

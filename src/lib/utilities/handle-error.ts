@@ -1,4 +1,4 @@
-import { browser } from '$app/environment';
+import { BROWSER } from 'esm-env';
 import { networkError } from '$lib/stores/error';
 import { toaster } from '$lib/stores/toaster';
 import { isNetworkError } from './is-network-error';
@@ -15,7 +15,7 @@ export const handleError = (
   error: unknown,
   toasts = toaster,
   errors = networkError,
-  isBrowser = browser,
+  isBrowser = BROWSER,
 ): void => {
   if (typeof error === 'string') {
     return toasts.push({ variant: 'error', message: error });
@@ -47,7 +47,7 @@ export const handleError = (
 
 export const handleUnauthorizedOrForbiddenError = (
   error: APIErrorResponse,
-  isBrowser = browser,
+  isBrowser = BROWSER,
 ): void => {
   const msg = `${error?.status} ${error?.body?.message}`;
 
