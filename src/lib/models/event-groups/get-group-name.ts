@@ -8,6 +8,7 @@ import {
   isLocalActivityMarkerEvent,
 } from '$lib/utilities/is-event-type';
 import { formatDurationAbbreviated } from '$lib/utilities/format-time';
+import type { CommonHistoryEvent } from '$lib/types/events';
 
 export const getEventGroupName = (event: CommonHistoryEvent): string => {
   if (!event) return;

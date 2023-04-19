@@ -21,6 +21,7 @@
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
   import { noop } from 'svelte/internal';
   import { isEventGroup } from '$lib/models/event-groups';
+  import type { IterableEvent } from '$lib/types/events';
 
   export let event: IterableEvent;
   export let visibleItems: IterableEvent[];

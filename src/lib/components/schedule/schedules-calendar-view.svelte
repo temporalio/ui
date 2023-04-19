@@ -9,12 +9,13 @@
   import { page } from '$app/stores';
   import ScheduleFrequency from './schedule-frequency.svelte';
   import Tabs from '$lib/holocene/tab/tabs.svelte';
+  import type { FullSchedule, SchedulePreset } from '$lib/types/schedule';
 
   let scheduleId = $page.params.schedule;
 
   let preset: SchedulePreset = scheduleId ? 'existing' : 'interval';
 
-  export let schedule: FullScheduleSpec | null = null;
+  export let schedule: FullSchedule | null = null;
   export let daysOfWeek: string[];
   export let daysOfMonth: number[];
   export let months: string[];

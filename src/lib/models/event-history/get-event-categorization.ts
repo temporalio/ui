@@ -1,3 +1,9 @@
+import type {
+  EventType,
+  WorkflowEvents,
+  IterableEvent,
+} from '$lib/types/events';
+
 export const eventTypeCategorizations: Readonly<
   Record<EventType, EventTypeCategory>
 > = {

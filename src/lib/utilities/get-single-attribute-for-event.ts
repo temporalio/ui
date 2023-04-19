@@ -4,8 +4,10 @@ import { has } from './has';
 import { isLocalActivityMarkerEvent } from './is-event-type';
 import { isObject } from './is';
 
-import type { Payload } from '$types';
+import type { Payload } from '$lib/types';
 import type { CombinedAttributes } from './format-event-attributes';
+import type { MarkerRecordedEvent, WorkflowEvent } from '$lib/types/events';
+import type { EventGroup } from '$lib/models/event-groups/event-groups';
 
 type SummaryAttribute = {
   key: string;

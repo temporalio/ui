@@ -6,6 +6,7 @@
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
+  import type { NamespaceListItem } from '$lib/types/global';
 
   export let namespaceList: NamespaceListItem[] = [];
   export let show: boolean;

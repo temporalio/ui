@@ -31,7 +31,6 @@
   import Loading from '$lib/holocene/loading.svelte';
   import type { DescribeScheduleResponse } from '$types';
   import { coreUserStore } from '$lib/stores/core-user';
-  import { toaster } from '$lib/stores/toaster';
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
@@ -52,9 +51,9 @@
 
   const handleDelete = async () => {
     try {
+      deleteConfirmationModal.close();
       $loading = true;
       await deleteSchedule({ namespace, scheduleId });
-      deleteConfirmationModal.close();
       setTimeout(() => {
         $loading = false;
         goto(routeForSchedules({ namespace }));

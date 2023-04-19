@@ -3,12 +3,17 @@ import { get } from 'svelte/store';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
+import { isVersionNewer } from '$lib/utilities/version-check';
+import { temporalVersion } from '$lib/stores/versions';
+
 import type {
   StartBatchOperationRequest,
   WorkflowExecutionInput,
-} from 'src/types';
-import { isVersionNewer } from '$lib/utilities/version-check';
-import { temporalVersion } from '$lib/stores/versions';
+} from '$lib/types';
+import type {
+  BatchOperationInfo,
+  WorkflowExecution,
+} from '$lib/types/workflows';
 
 type CreateBatchOperationOptions = {
   namespace: string;

@@ -1,6 +1,18 @@
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+import type {
+  FailActivityTaskRequest,
+  FailActivityTaskResponse,
+  CompleteActivityTaskRequest,
+  CompleteActivityTaskResponse,
+} from '$lib/types/events';
+
+type WorkflowInformation = {
+  workflowId: string;
+  runId: string;
+  activityId: string;
+};
 
 export const failActivityTask = async ({
   namespace,
@@ -10,7 +22,8 @@ export const failActivityTask = async ({
   failure,
   identity,
   lastHeartbeatDetails,
-}: FailActivityTaskRequest): Promise<FailActivityTaskResponse> => {
+}: FailActivityTaskRequest &
+  WorkflowInformation): Promise<FailActivityTaskResponse> => {
   const route = routeForApi('activity.fail', {
     namespace,
     workflowId,
@@ -32,7 +45,8 @@ export const completeActivityTask = async ({
   activityId,
   identity,
   result,
-}: CompleteActivityTaskRequest): Promise<CompleteActivityTaskResponse> => {
+}: CompleteActivityTaskRequest &
+  WorkflowInformation): Promise<CompleteActivityTaskResponse> => {
   const route = routeForApi('activity.complete', {
     namespace,
     workflowId,

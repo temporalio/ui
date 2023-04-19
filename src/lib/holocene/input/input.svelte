@@ -49,7 +49,7 @@
   let className = '';
   export { className as class };
 
-  function callFocus(input) {
+  function callFocus(input: HTMLInputElement) {
     if (autoFocus) input.focus();
   }
 

@@ -15,6 +15,7 @@
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
   import { supportsAdvancedVisibilityWithOrderBy } from '$lib/stores/advanced-visibility';
+  import type { WorkflowExecution } from '$lib/types/workflows';
 
   const dispatch = createEventDispatcher<{
     terminateWorkflows: undefined;

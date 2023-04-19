@@ -21,3 +21,4 @@ server/ui/assets
 /test-results/
 /playwright-report/
 /playwright/.cache/
+/dist

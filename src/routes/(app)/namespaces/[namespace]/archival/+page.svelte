@@ -11,7 +11,7 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
 
-  export let data: PageData;
+  export let data: PageData & { isS3Bucket: boolean };
 
   $: ({
     namespace: {

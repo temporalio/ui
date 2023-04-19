@@ -116,6 +116,14 @@ export type ExternalWorkflowExecutionSignaledEventAttributes =
   temporal.api.history.v1.IExternalWorkflowExecutionSignaledEventAttributes;
 export type UpsertWorkflowSearchAttributesEventAttributes =
   temporal.api.history.v1.IUpsertWorkflowSearchAttributesEventAttributes;
+export type ActivityTaskFailedByIdRequest =
+  temporal.api.workflowservice.v1.IRespondActivityTaskFailedRequest;
+export type ActivityTaskFailedByIdResponse =
+  temporal.api.workflowservice.v1.IRespondActivityTaskFailedResponse;
+export type ActivityTaskCompletedByIdRequest =
+  temporal.api.workflowservice.v1.IRespondActivityTaskCompletedRequest;
+export type ActivityTaskCompletedByIdResponse =
+  temporal.api.workflowservice.v1.IRespondActivityTaskCompletedResponse;
 
 // api.enums
 
@@ -156,6 +164,8 @@ export type ScheduleState = temporal.api.schedule.v1.IScheduleState;
 export type SchedulePolicies = temporal.api.schedule.v1.ISchedulePolicies;
 
 export type CalendarSpec = temporal.api.schedule.v1.ICalendarSpec;
+export type StructuredCalendarSpec =
+  temporal.api.schedule.v1.IStructuredCalendarSpec;
 export type IntervalSpec = temporal.api.schedule.v1.IIntervalSpec;
 export type ScheduleActionResult =
   temporal.api.schedule.v1.IScheduleActionResult;

@@ -1,3 +1,6 @@
+import type { WorkflowEvent } from '$lib/types/events';
+import type { EventGroup } from './event-groups';
+
 export const getLastEvent = ({ events }: EventGroup): WorkflowEvent => {
   let latestEventKey = 0;
   let result: WorkflowEvent;

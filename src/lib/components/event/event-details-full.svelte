@@ -8,6 +8,7 @@
   import EventDetailPills from './event-detail-pills.svelte';
   import EventGroupDetails from './event-group-details.svelte';
   import { isEventGroup } from '$lib/models/event-groups';
+  import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
 
   export let event: IterableEvent;
   export let currentEvent: WorkflowEvent;

@@ -1,3 +1,5 @@
+import type { Settings } from '$lib/types/global';
+
 const ALLOWED_BULK_ACTIONS: (keyof Pick<
   Settings,
   | 'workflowSignalDisabled'

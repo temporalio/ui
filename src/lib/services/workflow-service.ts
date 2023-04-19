@@ -1,5 +1,4 @@
 import { v4 } from 'uuid';
-import type { ErrorCallback } from '$lib/utilities/request-from-api';
 
 import {
   toWorkflowExecution,
@@ -17,8 +16,20 @@ import {
 import { noop } from 'svelte/internal';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 import { btoa } from '$lib/utilities/btoa';
+
+import type { ErrorCallback } from '$lib/utilities/request-from-api';
 import type { ResetReapplyType } from '$lib/models/workflow-actions';
-import type { ResetWorkflowRequest } from '$types';
+import type { ResetWorkflowRequest } from '$lib/types';
+import type { NamespaceScopedRequest, Replace } from '$lib/types/global';
+import type {
+  WorkflowExecution,
+  ListWorkflowExecutionsResponse,
+  ArchiveFilterParameters,
+} from '$lib/types/workflows';
+import type {
+  ValidWorkflowEndpoints,
+  ValidWorkflowParameters,
+} from '$lib/types/api';
 
 export type GetWorkflowExecutionRequest = NamespaceScopedRequest & {
   workflowId: string;

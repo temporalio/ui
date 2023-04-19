@@ -4,7 +4,11 @@ import { paginated } from '$lib/utilities/paginated';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 
-import type { DescribeNamespaceResponse, ListNamespacesResponse } from '$types';
+import type {
+  DescribeNamespaceResponse,
+  ListNamespacesResponse,
+} from '$lib/types';
+import type { Settings } from '$lib/types/global';
 
 const emptyNamespace = {
   namespaces: [],

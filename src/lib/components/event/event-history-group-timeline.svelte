@@ -16,6 +16,11 @@
     eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
+  import type { WorkflowEvents } from '$lib/types/events';
+  import type {
+    EventGroup,
+    EventGroups,
+  } from '$lib/models/event-groups/event-groups';
 
   export let events: WorkflowEvents;
   export let eventGroups: EventGroups;
@@ -95,7 +100,7 @@
 
 {#if eventGroups.length}
   <div
-    class="min-h-40 relative max-h-96 w-full cursor-crosshair overflow-auto rounded-lg border border-gray-900 bg-blueGray-50 bg-white"
+    class="min-h-40 relative max-h-96 w-full cursor-crosshair overflow-auto rounded-lg border border-gray-900 bg-white"
     bind:clientWidth={width}
     on:mousemove={handleMouseMove}
   >
@@ -103,8 +108,7 @@
       bind:this={canvas}
       class="relative"
       style="height:
-            {blockHeight * eventGroups.length +
-            yBuffer}px; width: {width}px;"
+            {blockHeight * eventGroups.length + yBuffer}px; width: {width}px;"
     >
       <VirtualList
         items={eventGroups}
@@ -126,10 +130,8 @@
           class="event-group"
           style="top:
                 {top +
-                blockHeight /
-                4}px; left: {left}px; width: {width}px; height:
-                {height -
-                1}px; background: {color};"
+            blockHeight / 4}px; left: {left}px; width: {width}px; height:
+                {height - 1}px; background: {color};"
         />
         <button
           class="absolute truncate border-r border-gray-900 pl-2 text-left text-sm font-medium hover:bg-blueGray-200"
@@ -158,7 +160,7 @@
         class="absolute top-0 bg-blueGray-400"
         style="height:
               {blockHeight * eventGroups.length +
-              yBuffer}px;left: {mouseX}px; width: 1px;"
+          yBuffer}px;left: {mouseX}px; width: 1px;"
       />
     </div>
   </div>

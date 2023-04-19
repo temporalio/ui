@@ -8,6 +8,11 @@ import {
   eventOrGroupIsFailureOrTimedOut,
   eventOrGroupIsTerminated,
 } from './get-event-in-group';
+import type {
+  ActivityTaskScheduledEvent,
+  StartChildWorkflowExecutionInitiatedEvent,
+  WorkflowEvent,
+} from '$lib/types/events';
 
 const startChildWorkflow = {
   id: '42',

@@ -18,6 +18,8 @@
   import Accordion from '$lib/holocene/accordion.svelte';
   import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
 
+  import type { EventView } from '$lib/types/events';
+
   let showShortcuts = false;
 
   $: workflowEvents =

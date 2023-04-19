@@ -94,19 +94,22 @@
     }
   };
 
-  const onStartDateChange = (d) => {
+  const onStartDateChange = (d: CustomEvent) => {
     startDate = startOfDay(d.detail);
   };
 
-  const onEndDateChange = (d) => {
+  const onEndDateChange = (d: CustomEvent) => {
     endDate = startOfDay(d.detail);
   };
 
-  const applyTimeChanges = (date: Date, time) => {
+  const applyTimeChanges = (
+    date: Date,
+    time: { hour?: string; minute?: string; second?: string },
+  ) => {
     let _date = new Date(date);
-    if (time.hour) _date = addHours(_date, time.hour);
-    if (time.minute) _date = addMinutes(_date, time.minute);
-    if (time.second) _date = addSeconds(_date, time.second);
+    if (time.hour) _date = addHours(_date, parseInt(time.hour));
+    if (time.minute) _date = addMinutes(_date, parseInt(time.minute));
+    if (time.second) _date = addSeconds(_date, parseInt(time.second));
 
     return _date;
   };
@@ -172,11 +175,7 @@
     {value}
     {onChange}
   >
-    <div
-      class="flex rounded {custom
-        ? 'h-[500px]'
-        : 'h-[340px]'} w-[400px] flex-col gap-8 bg-white p-4"
-    >
+    <div class="flex rounded h-auto w-[400px] flex-col gap-8 bg-white p-4">
       {#if custom}
         <div class="flex flex-col">
           <p class="text-sm">Start</p>

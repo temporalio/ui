@@ -21,6 +21,15 @@ import {
 import { getEventCategory } from './get-event-categorization';
 import { getEventClassification } from './get-event-classification';
 import { simplifyAttributes } from './simplify-attributes';
+import type {
+  EventWithMetadata,
+  EventsWithMetadata,
+  EventAttributeKey,
+  EventAttributesWithType,
+  EventType,
+  WorkflowEvents,
+  WorkflowEvent,
+} from '$lib/types/events';
 
 export async function getEventAttributes(
   { historyEvent, namespace, settings, accessToken }: EventWithMetadata,
@@ -32,7 +41,7 @@ export async function getEventAttributes(
     codecPassAccessToken = passAccessToken,
     codecIncludeCredentials = includeCredentials,
   }: DecodeFunctions = {},
-): Promise<EventAttributesWithType> {
+): Promise<EventAttributesWithType<EventAttributeKey>> {
   const { key, attributes } = findAttributesAndKey(historyEvent);
   // Use locally set endpoint over settings endpoint for testing purposes
   const endpoint = getCodecEndpoint(settings, encoderEndpoint);

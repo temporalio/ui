@@ -5,9 +5,20 @@
 
   import ScheduleFormView from '$lib/components/schedule/schedule-form-view.svelte';
 
+  import type {
+    SchedulePreset,
+    ScheduleParameters,
+    ScheduleActionParameters,
+    SchedulePresetsParameters,
+    ScheduleSpecParameters,
+  } from '$lib/types/schedule';
+
   let { namespace } = $page.params;
 
-  const handleCreate = (preset: SchedulePreset, args: ScheduleParameters) => {
+  const handleCreate = (
+    preset: SchedulePreset,
+    args: Partial<ScheduleParameters>,
+  ) => {
     const {
       name,
       workflowType,

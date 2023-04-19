@@ -8,6 +8,8 @@
   import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
 
+  import type { WorkflowIdentifier } from '$lib/types/workflows';
+
   export let hasChildren: boolean;
   export let hasRelationships: boolean;
   export let first: string;

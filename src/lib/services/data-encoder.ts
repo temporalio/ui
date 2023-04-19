@@ -4,6 +4,7 @@ import {
 } from '$lib/stores/data-encoder-config';
 import { validateHttps } from '$lib/utilities/is-http';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
+import type { Settings } from '$lib/types/global';
 
 type PotentialPayloads = { payloads: unknown[] };
 
