@@ -64,7 +64,10 @@ export const getCodeBlockValue: Parameters<typeof JSON.stringify>[0] = (
   value: string | Record<string, unknown>,
 ) => {
   if (typeof value === 'string') return value;
-  return value?.payloads ?? value?.indexedFields ?? value?.points ?? value;
+
+  return [value?.payloads, value?.indexedFields, value?.points, value].find(
+    (v) => v !== undefined,
+  );
 };
 
 export const getStackTrace = (value: unknown) => {
