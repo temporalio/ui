@@ -1,6 +1,6 @@
-import { browser } from '$app/environment';
+import { BROWSER } from 'esm-env';
 
-export function getApiOrigin(isBrowser = browser): string | null {
+export function getApiOrigin(isBrowser = BROWSER): string | null {
   const endpoint = import.meta.env.VITE_API;
   const isRelative = !endpoint.startsWith('http');
 

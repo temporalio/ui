@@ -61,7 +61,11 @@
         {title}
         <slot name="summary" />
       </h2>
-      <div class="mr-1" on:click|stopPropagation on:keyup|stopPropagation>
+      <div
+        class="flex flex-row items-center"
+        on:click|stopPropagation
+        on:keyup|stopPropagation
+      >
         <slot name="action" />
       </div>
       {#if !readOnly}

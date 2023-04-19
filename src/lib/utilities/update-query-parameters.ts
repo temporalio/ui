@@ -1,5 +1,5 @@
 import { get } from 'svelte/store';
-import { browser } from '$app/environment';
+import { BROWSER } from 'esm-env';
 import { goto as navigateTo, invalidate } from '$app/navigation';
 import { page } from '$app/stores';
 
@@ -34,7 +34,7 @@ export const updateQueryParameters = async ({
     url.searchParams.delete(parameter);
   }
 
-  if (browser && url.href !== window.location.href) {
+  if (BROWSER && url.href !== window.location.href) {
     const namespace = get(page)?.params?.namespace;
     const workflowsPath = `/namespaces/${namespace}/workflows`;
 

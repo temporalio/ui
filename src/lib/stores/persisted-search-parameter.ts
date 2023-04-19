@@ -1,4 +1,4 @@
-import { browser } from '$app/environment';
+import { BROWSER } from 'esm-env';
 import { page } from '$app/stores';
 import { writable, get, Writable } from 'svelte/store';
 
@@ -25,7 +25,7 @@ const saveToSearchParameters = (
   parameter: string,
   value: SearchParameterValue,
 ) => {
-  if (browser) {
+  if (BROWSER) {
     const url = new URL(window?.location?.href);
     url.searchParams.set(parameter, String(value));
 
@@ -37,7 +37,7 @@ const getFromLocalStorage = (
   parameter: string,
   persist: boolean,
 ): string | undefined => {
-  if (browser && persist) {
+  if (BROWSER && persist) {
     const value = window?.localStorage?.getItem(parameter);
     if (value) return value;
   }
@@ -48,7 +48,7 @@ const saveToLocalStorage = (
   value: SearchParameterValue,
   persist: boolean,
 ) => {
-  if (browser && persist) {
+  if (BROWSER && persist) {
     window?.localStorage?.setItem(parameter, String(value));
   }
 };

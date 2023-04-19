@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   getSingleAttributeForEvent,
   shouldDisplayAsExecutionLink,
+  shouldDisplayAttribute,
 } from './get-single-attribute-for-event';
 
 describe('getSingleAttributeForEvent', () => {
@@ -163,5 +164,28 @@ describe('shouldDisplayAsExecutionLink', () => {
     expect(shouldDisplayAsExecutionLink('workflowType.name')).toBe(false);
     expect(shouldDisplayAsExecutionLink('parentInitiatedEventId')).toBe(false);
     expect(shouldDisplayAsExecutionLink('inlineRunIdSample')).toBe(false);
+  });
+});
+
+describe('shouldDisplayAttribute', () => {
+  it('should return false for certain attribute values', () => {
+    expect(shouldDisplayAttribute('', null)).toBe(false);
+    expect(shouldDisplayAttribute('', undefined)).toBe(false);
+    expect(shouldDisplayAttribute('', '')).toBe(false);
+    expect(shouldDisplayAttribute('', '0s')).toBe(false);
+    expect(shouldDisplayAttribute('type', '')).toBe(false);
+    expect(shouldDisplayAttribute('suggestContinueAsNew', false)).toBe(false);
+    expect(shouldDisplayAttribute('historySizeBytes', '0')).toBe(false);
+  });
+
+  it('should return false for certain attributes', () => {
+    expect(shouldDisplayAttribute('type', '')).toBe(false);
+  });
+
+  it('should return false for certain atrributes with unpopulated values', () => {
+    expect(shouldDisplayAttribute('suggestContinueAsNew', true)).toBe(true);
+    expect(shouldDisplayAttribute('suggestContinueAsNew', false)).toBe(false);
+    expect(shouldDisplayAttribute('historySizeBytes', '256')).toBe(true);
+    expect(shouldDisplayAttribute('historySizeBytes', '0')).toBe(false);
   });
 });

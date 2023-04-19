@@ -34,6 +34,11 @@ export const shouldDisplayAsPlainText = (key: string): boolean => {
   return keysForPlainText.has(key);
 };
 
+const keysToOmitIfNoValue: Readonly<Set<string>> = new Set([
+  'suggestContinueAsNew',
+  'historySizeBytes',
+]);
+
 export const shouldDisplayAttribute = (
   key: string,
   value: unknown,
@@ -43,6 +48,8 @@ export const shouldDisplayAttribute = (
   if (value === '') return false;
   if (value === '0s') return false;
   if (key === 'type') return false;
+  if ((!value || value === '0') && keysToOmitIfNoValue.has(key)) return false;
+
   return true;
 };
 

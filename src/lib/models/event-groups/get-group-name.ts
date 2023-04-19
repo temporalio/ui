@@ -7,6 +7,7 @@ import {
   isTimerStartedEvent,
   isLocalActivityMarkerEvent,
 } from '$lib/utilities/is-event-type';
+import { formatDurationAbbreviated } from '$lib/utilities/format-time';
 import type { CommonHistoryEvent } from '$lib/types/events';
 
 export const getEventGroupName = (event: CommonHistoryEvent): string => {
@@ -17,7 +18,12 @@ export const getEventGroupName = (event: CommonHistoryEvent): string => {
   }
 
   if (isTimerStartedEvent(event)) {
-    return `Timer ${event.timerStartedEventAttributes?.timerId} (${event.timerStartedEventAttributes?.startToFireTimeout})`;
+    return `Timer ${
+      event.timerStartedEventAttributes?.timerId
+    } (${formatDurationAbbreviated(
+      event.timerStartedEventAttributes
+        ?.startToFireTimeout as unknown as Duration,
+    )})`;
   }
 
   if (isSignalExternalWorkflowExecutionInitiatedEvent(event)) {

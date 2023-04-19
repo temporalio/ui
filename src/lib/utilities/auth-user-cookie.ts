@@ -1,4 +1,4 @@
-import { browser } from '$app/environment';
+import { BROWSER } from 'esm-env';
 import { parseWithBigInt } from './parse-with-big-int';
 import { atob } from '$lib/utilities/atob';
 import type { User } from '$lib/types/global';
@@ -13,7 +13,7 @@ type UserResponse = {
 
 const cookieName = 'user';
 
-export const getAuthUserCookie = (isBrowser = browser): User => {
+export const getAuthUserCookie = (isBrowser = BROWSER): User => {
   if (!isBrowser) return {};
 
   const cookies = document.cookie.split(';');
@@ -49,7 +49,7 @@ export const getAuthUserCookie = (isBrowser = browser): User => {
   return {};
 };
 
-export const cleanAuthUserCookie = (isBrowser = browser) => {
+export const cleanAuthUserCookie = (isBrowser = BROWSER) => {
   if (!isBrowser) return;
 
   const cookies = document.cookie.split(';');

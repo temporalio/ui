@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { beforeNavigate } from '$app/navigation';
-  import { browser } from '$app/environment';
+  import { BROWSER } from 'esm-env';
   import { page } from '$app/stores';
 
   import { isNetworkError } from '$lib/utilities/is-network-error';
@@ -41,7 +41,7 @@
     <Link
       href={currentLocation}
       on:click={() => {
-        if (browser) {
+        if (BROWSER) {
           window.location.reload();
         }
       }}

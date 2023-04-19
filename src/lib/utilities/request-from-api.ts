@@ -1,4 +1,4 @@
-import { browser } from '$app/environment';
+import { BROWSER } from 'esm-env';
 import { getAuthUser } from '$lib/stores/auth-user';
 import { noop } from 'svelte/internal';
 import { handleError as handleRequestError } from './handle-error';
@@ -70,7 +70,7 @@ export const requestFromAPI = async <T>(
     onRetry = noop,
     onError,
     retryInterval = 5000,
-    isBrowser = browser,
+    isBrowser = BROWSER,
   } = init;
   let { options } = init;
 
@@ -125,7 +125,7 @@ export const requestFromAPI = async <T>(
 
 const withSecurityOptions = (
   options: RequestInit,
-  isBrowser = browser,
+  isBrowser = BROWSER,
 ): RequestInit => {
   const opts: RequestInit = { credentials: 'include', ...options };
   opts.headers = withCsrf(options?.headers, isBrowser);
@@ -134,7 +134,7 @@ const withSecurityOptions = (
 
 const withAuth = async (
   options: RequestInit,
-  isBrowser = browser,
+  isBrowser = BROWSER,
 ): Promise<RequestInit> => {
   if (getAuthUser().accessToken) {
     options.headers = await withBearerToken(
@@ -161,7 +161,7 @@ const withAuth = async (
 const withBearerToken = async (
   headers: HeadersInit,
   accessToken: () => Promise<string>,
-  isBrowser = browser,
+  isBrowser = BROWSER,
 ): Promise<HeadersInit> => {
   // At this point in the code path, headers will always be set.
   /* c8 ignore next */
@@ -184,7 +184,7 @@ const withBearerToken = async (
 const withIdToken = (
   headers: HeadersInit = {},
   idToken: string,
-  isBrowser = browser,
+  isBrowser = BROWSER,
 ): HeadersInit => {
   if (!isBrowser) return headers;
 
@@ -195,7 +195,7 @@ const withIdToken = (
   return headers;
 };
 
-const withCsrf = (headers: HeadersInit, isBrowser = browser): HeadersInit => {
+const withCsrf = (headers: HeadersInit, isBrowser = BROWSER): HeadersInit => {
   if (!headers) headers = {};
   if (!isBrowser) return headers;
 
