@@ -30,7 +30,7 @@
         <h3 class="font-medium">Workflow Type</h3>
         <div class="h-0.5 rounded-full bg-gray-900" />
         <WorkflowDetail content={workflow?.name} copyable />
-        <WorkflowDetail title="Run ID" content={workflow?.runId} copyable />
+        <WorkflowDetail content={workflow?.runId} copyable />
       </div>
       <div class="col-span-1">
         <h3 class="font-medium">Task Queue</h3>
