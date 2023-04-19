@@ -39,6 +39,13 @@ export function formatDuration(
   return durationToString(duration, { delimiter });
 }
 
+export function formatDurationAbbreviated(
+  duration: Duration | string,
+  delimiter?: string,
+): string {
+  return formatDistanceToSingleLetters(formatDuration(duration, delimiter));
+}
+
 function formatDistanceToSingleLetters(distance: string) {
   if (!distance) return '';
   distance = distance
