@@ -1,6 +1,7 @@
 import { BROWSER } from 'esm-env';
 import { parseWithBigInt } from './parse-with-big-int';
 import { atob } from '$lib/utilities/atob';
+import type { User } from '$lib/types/global';
 
 type UserResponse = {
   AccessToken: string;

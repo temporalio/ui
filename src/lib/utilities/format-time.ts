@@ -5,7 +5,7 @@ import {
   getMilliseconds as getSecondAsMilliseconds,
 } from 'date-fns';
 
-import type { Timestamp } from '$types';
+import type { Timestamp } from '$lib/types';
 import { fromSeconds } from './to-duration';
 import { has } from './has';
 
@@ -37,6 +37,13 @@ export function formatDuration(
   if (duration === null || !duration) return '';
   if (typeof duration === 'string') duration = fromSeconds(duration);
   return durationToString(duration, { delimiter });
+}
+
+export function formatDurationAbbreviated(
+  duration: Duration | string,
+  delimiter?: string,
+): string {
+  return formatDistanceToSingleLetters(formatDuration(duration, delimiter));
 }
 
 function formatDistanceToSingleLetters(distance: string) {

@@ -22,6 +22,16 @@ import {
 import { getGroupId } from './get-group-id';
 import { getEventGroupName } from './get-group-name';
 import { getLastEvent } from './get-last-event';
+import type {
+  ActivityTaskScheduledEvent,
+  StartChildWorkflowExecutionInitiatedEvent,
+  TimerStartedEvent,
+  SignalExternalWorkflowExecutionInitiatedEvent,
+  WorkflowExecutionSignaledEvent,
+  MarkerRecordedEvent,
+  CommonHistoryEvent,
+} from '$lib/types/events';
+import type { EventGroup } from './event-groups';
 
 type StartingEvents = {
   Activity: ActivityTaskScheduledEvent;

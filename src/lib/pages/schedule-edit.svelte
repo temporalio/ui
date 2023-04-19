@@ -9,6 +9,15 @@
   import ScheduleFormView from '$lib/components/schedule/schedule-form-view.svelte';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 
+  import type {
+    FullSchedule,
+    SchedulePreset,
+    ScheduleParameters,
+    ScheduleActionParameters,
+    SchedulePresetsParameters,
+    ScheduleSpecParameters,
+  } from '$lib/types/schedule';
+
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
 
@@ -20,8 +29,8 @@
 
   const handleEdit = (
     preset: SchedulePreset,
-    args: ScheduleParameters,
-    schedule,
+    args: Partial<ScheduleParameters>,
+    schedule: FullSchedule,
   ) => {
     const {
       name,

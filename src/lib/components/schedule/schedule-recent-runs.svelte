@@ -24,7 +24,6 @@
         </div>
         <div class="w-auto break-words mx-2">
           <Link
-            sveltekit:prefetch
             href={routeForEventHistory({
               workflow: run.startWorkflowResult.workflowId,
               run: run.startWorkflowResult.runId,

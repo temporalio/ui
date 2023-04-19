@@ -4,6 +4,8 @@ import { getEventAttributes, toEventHistory } from '.';
 
 import settingsFixture from '$fixtures/settings.json';
 import eventsFixture from '$fixtures/raw-events.descending.completed.json';
+import type { Settings } from '$lib/types/global';
+import type { HistoryEvent } from '$lib/types/events';
 
 const historyEvent = {
   eventId: '1',

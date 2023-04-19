@@ -5,6 +5,8 @@
   import Select from './simple-select.svelte';
   import Option from './simple-option.svelte';
 
+  import type { SelectOptionValue } from '$lib/types/global';
+
   export let label: string = null;
   export let value: SelectOptionValue;
   export let options: SelectOptionValue[] = [];

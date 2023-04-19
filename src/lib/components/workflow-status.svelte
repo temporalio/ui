@@ -1,5 +1,6 @@
 <script lang="ts">
   import HeartBeat from './heart-beat-indicator.svelte';
+  import type { WorkflowExecutionStatus } from '$types';
 
   export let status: WorkflowExecutionStatus | string = 'Running';
   export let delay: number = 0;

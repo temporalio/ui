@@ -9,6 +9,8 @@ import {
   eventOrGroupIsFailureOrTimedOut,
   eventOrGroupIsTerminated,
 } from './get-event-in-group';
+import type { CommonHistoryEvent, WorkflowEvent } from '$lib/types/events';
+import type { EventGroup, EventGroups } from './event-groups';
 
 export { getGroupForEvent } from './get-group-for-event';
 

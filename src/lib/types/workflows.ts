@@ -1,11 +1,16 @@
-type WorkflowExecutionStatus = import('$types').WorkflowExecutionStatus;
-type WorkflowTaskFailedCause = import('$types').WorkflowTaskFailedCause;
+import type {
+  PendingChildren,
+  PendingActivityInfo,
+  PendingActivity,
+  Payload,
+} from './events';
+import type { Replace, Optional } from './global';
 
 /**
  * Replace Longs, ITimestamps, UInt8Array's etc. with their corresponding http values
  */
-type WorkflowExecutionInfo = Replace<
-  import('$types').WorkflowExecutionInfo,
+export type WorkflowExecutionInfo = Replace<
+  import('$lib/types').WorkflowExecutionInfo,
   {
     status: WorkflowStatus;
     stateTransitionCount: string;
@@ -17,24 +22,24 @@ type WorkflowExecutionInfo = Replace<
   }
 >;
 
-type ListWorkflowExecutionsResponse = Replace<
-  import('$types').ListWorkflowExecutionsResponse,
+export type ListWorkflowExecutionsResponse = Replace<
+  import('$lib/types').ListWorkflowExecutionsResponse,
   Optional<{ executions: WorkflowExecutionInfo[] }>
 >;
 
-type WorkflowExecutionConfig = Replace<
-  import('$types').WorkflowExecutionConfig,
+export type WorkflowExecutionConfig = Replace<
+  import('$lib/types').WorkflowExecutionConfig,
   { defaultWorkflowTaskTimeout: Duration }
 >;
 
-type WorkflowExecutionAPIResponse = Optional<{
+export type WorkflowExecutionAPIResponse = Optional<{
   workflowExecutionInfo: WorkflowExecutionInfo;
   pendingActivities: PendingActivityInfo[];
   pendingChildren: PendingChildren[];
   executionConfig: WorkflowExecutionConfig;
 }>;
 
-type WorkflowStatus =
+export type WorkflowStatus =
   | 'Running'
   | 'TimedOut'
   | 'Completed'
@@ -45,14 +50,9 @@ type WorkflowStatus =
   | 'Terminated'
   | null;
 
-type WorkflowType = string | null;
+export type WorkflowType = string | null;
 
-type WorkflowExecutionFilters = {
-  type: WorkflowType;
-  status: WorkflowStatus;
-};
-
-type FilterParameters = {
+export type FilterParameters = {
   workflowId?: string;
   workflowType?: string;
   executionStatus?: WorkflowStatus;
@@ -60,21 +60,37 @@ type FilterParameters = {
   query?: string;
 };
 
-type ArchiveFilterParameters = Omit<FilterParameters, 'timeRange'> & {
+export type ArchiveFilterParameters = Omit<FilterParameters, 'timeRange'> & {
   closeTime?: Duration | string;
 };
 
-type WorkflowIdentifier = IWorkflowExecution;
+export type WorkflowIdentifier = import('$lib/types').WorkflowExecutionInput;
 
-type WorkflowSearchAttributes = {
+type SearchAttributesValue =
+  | 'Bool'
+  | 'Datetime'
+  | 'Double'
+  | 'Int'
+  | 'Keyword'
+  | 'Text';
+
+export type SearchAttributes = {
+  [k: string]: SearchAttributesValue;
+};
+
+export type SearchAttributesResponse = {
+  keys: SearchAttributes;
+};
+
+export type WorkflowSearchAttributes = {
   indexedFields?: Record<string, Payload>;
 };
 
-type DecodedWorkflowSearchAttributes = {
+export type DecodedWorkflowSearchAttributes = {
   indexedFields?: Record<string, string | Payload>;
 };
 
-type WorkflowExecution = {
+export type WorkflowExecution = {
   name: string;
   id: string;
   runId: string;
@@ -98,10 +114,14 @@ type WorkflowExecution = {
   canBeTerminated: boolean;
 };
 
-type BatchOperationType = 'Terminate' | 'Cancel' | 'Signal';
-type BatchOperationStatus = 'Running' | 'Complete' | 'Failed' | 'Unspecified';
+export type BatchOperationType = 'Terminate' | 'Cancel' | 'Signal';
+export type BatchOperationStatus =
+  | 'Running'
+  | 'Complete'
+  | 'Failed'
+  | 'Unspecified';
 
-type BatchOperationInfo = {
+export type BatchOperationInfo = {
   operationType: BatchOperationType;
   jobId: string;
   state: BatchOperationStatus;

@@ -15,7 +15,7 @@
 
   $: query = $page.url.searchParams.get('query');
 
-  function setManualString(query) {
+  function setManualString(query: string) {
     manualSearchString = query;
   }
 

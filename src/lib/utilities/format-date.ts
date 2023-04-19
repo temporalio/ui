@@ -6,6 +6,7 @@ import {
 import * as dateTz from 'date-fns-tz'; // `build` script fails on importing some of named CommonJS modules
 
 import { isTimestamp, timestampToDate, type ValidTime } from './format-time';
+import type { TimeFormat } from '$lib/types/global';
 
 const dateFirst = 'yyyy-MM-dd z HH:mm:ss.SS';
 const timeFirst = 'HH:mm:ss.SS z yyyy-MM-dd';

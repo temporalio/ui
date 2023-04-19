@@ -1,3 +1,5 @@
+import type { ScheduleParameters } from '$lib/types/schedule';
+
 const parseTime = (time: string) => (time ? parseInt(time) : 0);
 
 export const timeToInterval = (

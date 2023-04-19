@@ -16,7 +16,6 @@ jobs:
         run: pnpm package
       - name: Publish package to npm
         run: npm publish
-        working-directory: ./package
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   create_release:

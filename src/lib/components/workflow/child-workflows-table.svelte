@@ -7,6 +7,7 @@
   import Table from '$lib/holocene/table/table.svelte';
 
   export let children: ChildWorkflowExecutionCompletedEvent[] = [];
+  import type { WorkflowExecution } from '$lib/types/workflows';
 </script>
 
 <Pagination

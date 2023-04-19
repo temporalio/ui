@@ -96,7 +96,12 @@
         <Icon name="lock" class="text-gray-500" />
       {/if}
     </MenuButton>
-    <Menu id="{id}-menu" class="h-auto max-h-96 min-w-fit" {show} {dark}>
+    <Menu
+      id="{id}-menu"
+      class="h-auto max-h-96 overflow-y-scroll min-w-fit"
+      {show}
+      {dark}
+    >
       <slot />
     </Menu>
   </MenuContainer>

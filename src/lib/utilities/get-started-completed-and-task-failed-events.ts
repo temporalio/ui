@@ -4,6 +4,18 @@ import {
   isWorkflowExecutionContinuedAsNewEvent,
 } from './is-event-type';
 import { stringifyWithBigInt } from './parse-with-big-int';
+import type {
+  WorkflowExecutionFailedEvent,
+  WorkflowExecutionCompletedEvent,
+  WorkflowExecutionContinuedAsNewEvent,
+  WorkflowExecutionTimedOutEvent,
+  WorkflowExecutionCanceledEvent,
+  WorkflowExecutionTerminatedEvent,
+  WorkflowExecutionStartedEvent,
+  WorkflowTaskCompletedEvent,
+  WorkflowEvent,
+  WorkflowTaskFailedEvent,
+} from '$lib/types/events';
 
 type WorkflowInputAndResults = {
   input: string;

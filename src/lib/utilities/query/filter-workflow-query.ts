@@ -5,6 +5,7 @@ import type {
 import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
 import { get } from 'svelte/store';
 import { isDuration, isDurationString, toDate, tomorrow } from '../to-duration';
+import type { SearchAttributes } from '$lib/types/workflows';
 
 export type QueryKey =
   | 'WorkflowId'

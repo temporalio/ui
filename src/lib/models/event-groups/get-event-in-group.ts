@@ -20,6 +20,7 @@ import {
   isChildWorkflowExecutionCompletedEvent,
 } from '$lib/utilities/is-event-type';
 import { isEventGroup } from '$lib/models/event-groups';
+import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
 
 export const eventIsFailureOrTimedOut = (event: WorkflowEvent): boolean => {
   return (

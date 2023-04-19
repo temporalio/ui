@@ -263,7 +263,7 @@
       },
       "parentInitiatedEventId": "11",
       "taskQueue": { "name": "canary-task-queue", "kind": "Normal" },
-      "input": { "payloads": [1656683778738403300, "canary"] },
+      "input": { "payloads": ["1656683778738403300", "canary"] },
       "workflowExecutionTimeout": "0s",
       "workflowRunTimeout": "1200s",
       "workflowTaskTimeout": "20s",
@@ -297,7 +297,7 @@
       },
       "parentInitiatedEventId": "11",
       "taskQueue": { "name": "canary-task-queue", "kind": "Normal" },
-      "input": { "payloads": [1656683778738403300, "canary"] },
+      "input": { "payloads": ["1656683778738403300", "canary"] },
       "workflowExecutionTimeout": "",
       "workflowRunTimeout": "20 minutes",
       "workflowTaskTimeout": "20 seconds",
@@ -415,7 +415,7 @@
       "header": { "fields": {} },
       "input": {
         "payloads": [
-          1656683782883152600,
+          "1656683782883152600",
           {
             "ID": "temporal.fixture.timed-out.workflow.id/workflow.advanced-visibility",
             "RunID": "445a17cb-6cb4-4508-bc59-187d08c6c6e2"
@@ -443,7 +443,7 @@
       "header": { "fields": {} },
       "input": {
         "payloads": [
-          1656683782883152600,
+          "1656683782883152600",
           {
             "ID": "temporal.fixture.timed-out.workflow.id/workflow.advanced-visibility",
             "RunID": "445a17cb-6cb4-4508-bc59-187d08c6c6e2"

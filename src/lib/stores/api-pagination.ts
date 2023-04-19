@@ -218,7 +218,7 @@ export function createPaginationStore<T>(
     return { ..._store, activeIndex };
   };
 
-  const resetPageSize = <T>(_store: PaginationItems<T>, pageSize) => {
+  const resetPageSize = <T>(_store: PaginationItems<T>, pageSize: number) => {
     return {
       ..._store,
       pageSize,

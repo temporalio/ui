@@ -1,17 +1,21 @@
 <script lang="ts">
-  import Tab from '$lib/holocene/tab.svelte';
+  import Tab from '$lib/holocene/tab/tab.svelte';
+  import TabList from '$lib/holocene/tab/tab-list.svelte';
+  import TabPanel from '$lib/holocene/tab/tab-panel.svelte';
   import SchedulesIntervalView from './schedules-interval-view.svelte';
   import ScheduleDayOfWeekView from './schedule-day-of-week-view.svelte';
   import ScheduleDayOfMonthView from './schedule-day-of-month-view.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import { page } from '$app/stores';
   import ScheduleFrequency from './schedule-frequency.svelte';
+  import Tabs from '$lib/holocene/tab/tabs.svelte';
+  import type { FullSchedule, SchedulePreset } from '$lib/types/schedule';
 
   let scheduleId = $page.params.schedule;
 
   let preset: SchedulePreset = scheduleId ? 'existing' : 'interval';
 
-  export let schedule: FullScheduleSpec | null = null;
+  export let schedule: FullSchedule | null = null;
   export let daysOfWeek: string[];
   export let daysOfMonth: number[];
   export let months: string[];
@@ -34,58 +38,31 @@
     cronString = '';
   };
 
-  $: preset, clearSchedule();
+  $: clearSchedule();
 </script>
 
-<div class="mt-8 w-full">
+<Tabs class="mt-8 w-full">
   <h2 class="mb-4 text-2xl">Frequency</h2>
-  <div class="flex flex-wrap gap-6">
+  <TabList label="Schedule Tabs" class="flex flex-wrap gap-6">
     {#if schedule}
-      <Tab
-        label="Existing"
-        testId="interval-tab"
-        active={preset === 'existing'}
-        on:click={() => (preset = 'existing')}
-        on:keypress={() => (preset = 'existing')}
-      />
+      <Tab label="Existing" id="existing-tab" panelId="existing-panel" />
     {/if}
-    <Tab
-      label="Interval"
-      testId="interval-tab"
-      active={preset === 'interval'}
-      on:click={() => (preset = 'interval')}
-      on:keypress={() => (preset = 'interval')}
-    />
-    <Tab
-      label="Days of the Week"
-      testId="daily-tab"
-      active={preset === 'week'}
-      on:click={() => (preset = 'week')}
-      on:keypress={() => (preset = 'week')}
-    />
-    <Tab
-      label="Days of the Month"
-      testId="monthly-tab"
-      active={preset === 'month'}
-      on:click={() => (preset = 'month')}
-      on:keypress={() => (preset = 'month')}
-    />
-    <Tab
-      label="String"
-      testId="string-tab"
-      active={preset === 'string'}
-      on:click={() => (preset = 'string')}
-      on:keypress={() => (preset = 'string')}
-    />
-  </div>
+    <Tab label="Interval" id="interval-tab" panelId="interval-panel" />
+    <Tab label="Days of the Week" id="daily-tab" panelId="daily-panel" />
+    <Tab label="Days of the Month" id="monthly-tab" panelId="monthly-panel" />
+    <Tab label="String" id="string-tab" panelId="string-panel" />
+  </TabList>
   <div class="mt-4 flex w-full flex-wrap gap-6">
-    {#if preset === 'existing'}
-      <ScheduleFrequency
-        calendar={schedule?.spec?.structuredCalendar?.[0]}
-        interval={schedule?.spec?.interval?.[0]}
-        class="text-base"
-      />
-    {:else if preset === 'interval'}
+    {#if schedule}
+      <TabPanel id="existing-panel" tabId="existing-tab">
+        <ScheduleFrequency
+          calendar={schedule?.spec?.structuredCalendar?.[0]}
+          interval={schedule?.spec?.interval?.[0]}
+          class="text-base"
+        />
+      </TabPanel>
+    {/if}
+    <TabPanel id="interval-panel" tabId="interval-tab">
       <SchedulesIntervalView
         bind:days
         bind:hour
@@ -93,16 +70,19 @@
         bind:second
         bind:phase
       />
-    {:else if preset === 'week'}
+    </TabPanel>
+    <TabPanel id="daily-panel" tabId="daily-tab">
       <ScheduleDayOfWeekView bind:daysOfWeek bind:hour bind:minute />
-    {:else if preset === 'month'}
+    </TabPanel>
+    <TabPanel id="monthly-panel" tabId="monthly-tab">
       <ScheduleDayOfMonthView
         bind:daysOfMonth
         bind:months
         bind:hour
         bind:minute
       />
-    {:else if preset === 'string'}
+    </TabPanel>
+    <TabPanel id="string-panel" tabId="string-tab">
       <div class="my-2 flex w-full flex-col gap-4">
         <h3 class="text-lg font-medium">String</h3>
         <p>Write or paste in a cron string to generate a schedule.</p>
@@ -112,7 +92,7 @@
           placeholder="* * * * *"
         />
       </div>
-    {/if}
+    </TabPanel>
   </div>
   <slot {preset} />
-</div>
+</Tabs>

@@ -6,6 +6,7 @@ import { routeForLoginPage } from './route-for';
 import { has } from './has';
 
 import type { APIErrorResponse, TemporalAPIError } from './request-from-api';
+import type { NetworkError } from '$lib/types/global';
 
 interface NetworkErrorWithReport extends NetworkError {
   report?: boolean;

@@ -15,6 +15,7 @@ import {
   isWorkflowTaskStartedEvent,
   isWorkflowTaskTimedOutEvent,
 } from '$lib/utilities/is-event-type';
+import type { CommonHistoryEvent } from '$lib/types/events';
 
 export const getGroupId = (event: CommonHistoryEvent): string => {
   if (isWorkflowTaskCompletedEvent(event))

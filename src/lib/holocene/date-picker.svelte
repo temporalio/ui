@@ -60,7 +60,7 @@
     month -= 1;
   };
 
-  const onDateChange = (d) => {
+  const onDateChange = (d: CustomEvent) => {
     showDatePicker = false;
     dispatch('datechange', d.detail);
   };

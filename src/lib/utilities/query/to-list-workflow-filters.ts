@@ -12,6 +12,8 @@ import { durationKeys, fromDate } from '../to-duration';
 import { tokenize } from './tokenize';
 import { updateQueryParameters } from '../update-query-parameters';
 
+import type { FilterParameters, SearchAttributes } from '$lib/types/workflows';
+
 type Tokens = string[];
 export type ParsedParameters = FilterParameters & { timeRange?: string };
 

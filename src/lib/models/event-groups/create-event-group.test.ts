@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { createEventGroup } from './create-event-group';
+import type {
+  ActivityTaskCompletedEvent,
+  ActivityTaskScheduledEvent,
+  WorkflowEvent,
+} from '$lib/types/events';
 
 const scheduledEvent = {
   id: '5',

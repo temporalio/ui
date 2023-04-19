@@ -4,6 +4,7 @@ import { noop } from 'svelte/internal';
 import { handleError as handleRequestError } from './handle-error';
 import { isFunction } from './is-function';
 import { toURL } from './to-url';
+import type { NetworkError } from '$lib/types/global';
 
 export type TemporalAPIError = {
   code: number;

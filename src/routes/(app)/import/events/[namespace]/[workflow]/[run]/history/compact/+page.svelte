@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
   import { importEventGroups } from '$lib/stores/import-events';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
@@ -8,6 +6,9 @@
   import EventEmptyRow from '$lib/components/event/event-empty-row.svelte';
   import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
   import { eventCategoryFilter } from '$lib/stores/filters';
+
+  import type { EventTypeCategory } from '$lib/types/events';
+  import type { EventGroup } from '$lib/models/event-groups/event-groups';
 
   $: category = $eventCategoryFilter as EventTypeCategory;
   $: sortedEvents =

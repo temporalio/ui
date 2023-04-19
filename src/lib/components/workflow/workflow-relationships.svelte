@@ -9,6 +9,8 @@
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
   import ChildWorkflowsTable from './child-workflows-table.svelte';
 
+  import type { WorkflowIdentifier } from '$lib/types/workflows';
+
   export let hasChildren: boolean;
   export let children: ChildWorkflowExecutionCompletedEvent[];
   export let hasPendingChildren: boolean;

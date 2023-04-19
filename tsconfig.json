@@ -27,7 +27,7 @@
     "paths": {
       "$lib": ["src/lib"],
       "$lib/*": ["src/lib/*"],
-      "$types": ["src/types"],
+      "$types": ["src/lib/types"],
       "$components/*": ["src/components/*"],
       "$fixtures/*": ["src/fixtures/*"]
     }

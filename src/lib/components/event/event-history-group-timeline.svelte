@@ -16,6 +16,11 @@
     eventOrGroupIsFailureOrTimedOut,
     eventOrGroupIsTerminated,
   } from '$lib/models/event-groups/get-event-in-group';
+  import type { WorkflowEvents } from '$lib/types/events';
+  import type {
+    EventGroup,
+    EventGroups,
+  } from '$lib/models/event-groups/event-groups';
 
   export let events: WorkflowEvents;
   export let eventGroups: EventGroups;

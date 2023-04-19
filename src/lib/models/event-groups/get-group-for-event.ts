@@ -1,3 +1,6 @@
+import type { WorkflowEvent } from '$lib/types/events';
+import type { EventGroup, EventGroups } from './event-groups';
+
 export const getGroupForEvent = (
   event: WorkflowEvent,
   groups: EventGroups,

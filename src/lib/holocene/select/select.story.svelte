@@ -108,6 +108,14 @@
     </SimpleSelect>
   </Hst.Variant>
 
+  <Hst.Variant title="A Select with a lot of Options">
+    <Select placeholder="Select an option" {value} id="select-5">
+      {#each new Array(100).fill(0).map((_, idx) => idx) as idx}
+        <Option value={idx}>Option {idx}</Option>
+      {/each}
+    </Select>
+  </Hst.Variant>
+
   <svelte:fragment slot="controls">
     <Hst.Checkbox title="Dark: " bind:value={dark} />
     <Hst.Checkbox title="Disabled: " bind:value={disabled} />

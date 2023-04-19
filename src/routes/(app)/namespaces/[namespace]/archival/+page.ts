@@ -4,7 +4,11 @@ import {
   type CombinedWorkflowExecutionsResponse,
 } from '$lib/services/workflow-service';
 import { fetchNamespace } from '$lib/services/namespaces-service';
-import type { DescribeNamespaceResponse } from '$types';
+import type { DescribeNamespaceResponse } from '$lib/types';
+import type {
+  ArchiveFilterParameters,
+  WorkflowStatus,
+} from '$lib/types/workflows';
 
 export const load: PageLoad = async function ({ params, url }) {
   const { searchParams } = url;
