@@ -98,7 +98,7 @@
     </MenuButton>
     <Menu
       id="{id}-menu"
-      class="h-auto max-h-96 overflow-scroll min-w-fit"
+      class="h-auto max-h-96 overflow-y-scroll min-w-fit"
       {show}
       {dark}
     >
