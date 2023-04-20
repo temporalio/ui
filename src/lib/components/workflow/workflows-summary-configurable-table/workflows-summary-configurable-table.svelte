@@ -257,6 +257,7 @@
   </div>
   <div
     class="resizer"
+    class:batch-actions-enabled={$supportsBulkActions}
     class:no-columns-pinned={pinnedColumns.length === 0}
     class:batch-actions-visible={showBulkActions}
     on:mousedown|stopPropagation|preventDefault={handleMouseDown}
@@ -420,6 +421,10 @@
     @apply z-10 bg-primary w-0 border-r-[3px] border-primary cursor-col-resize;
   }
 
+  .resizer.no-columns-pinned:not(.batch-actions-enabled) {
+    @apply hidden;
+  }
+
   .resizer.no-columns-pinned,
   .resizer.batch-actions-visible {
     @apply pointer-events-none;
@@ -444,7 +449,7 @@
   }
 
   .workflow-summary-table-wrapper.pinned.no-columns-pinned.batch-actions-visible {
-    @apply !w-[40px];
+    @apply !w-[40px] z-50;
   }
 
   .workflow-summary-table:not(.pinned) {
@@ -453,10 +458,6 @@
 
   .workflow-summary-header-row {
     @apply bg-primary text-white h-10;
-  }
-
-  .workflow-summary-header-row.pinned.batch-actions-visible {
-    @apply z-20;
   }
 
   .workflow-summary-configurable-row {
