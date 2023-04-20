@@ -66,6 +66,10 @@ export function decodePayload(
     }
   }
 
+  if (encoding === 'binary/null') {
+    return null;
+  }
+
   return payload;
 }
 

@@ -50,12 +50,7 @@ export const workflowStartedEvent = {
   prevAutoResetPoints: null,
   header: {
     fields: {
-      encryption: {
-        metadata: {
-          encoding: 'YmluYXJ5L251bGw=',
-        },
-        data: null,
-      },
+      encryption: null,
     },
   },
 };
@@ -88,13 +83,7 @@ export const dataConvertedWorkflowStartedEvent = {
   prevAutoResetPoints: null,
   header: {
     fields: {
-      encryption: {
-        metadata: {
-          encoding: 'YmluYXJ5L251bGw=',
-          encodingDecoded: 'binary/null',
-        },
-        data: null,
-      },
+      encryption: null,
     },
   },
 };
@@ -136,13 +125,7 @@ export const dataConvertedFailureWorkflowStartedEvent = {
   prevAutoResetPoints: null,
   header: {
     fields: {
-      encryption: {
-        metadata: {
-          encoding: 'YmluYXJ5L251bGw=',
-          encodingDecoded: 'binary/null',
-        },
-        data: null,
-      },
+      encryption: null,
     },
   },
 };
@@ -175,13 +158,7 @@ export const noRemoteDataConverterWorkflowStartedEvent = {
   prevAutoResetPoints: null,
   header: {
     fields: {
-      encryption: {
-        metadata: {
-          encoding: 'YmluYXJ5L251bGw=',
-          encodingDecoded: 'binary/null',
-        },
-        data: null,
-      },
+      encryption: null,
     },
   },
 };
@@ -239,12 +216,7 @@ export const workflowStartedHistoryEvent = {
     prevAutoResetPoints: null,
     header: {
       fields: {
-        encryption: {
-          metadata: {
-            encoding: 'YmluYXJ5L251bGw=',
-          },
-          data: null,
-        },
+        encryption: null,
       },
     },
   },
