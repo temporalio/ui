@@ -50,7 +50,6 @@
     <div class="w-24">
       <Input
         id="minute"
-        required
         bind:value={minute}
         placeholder="00"
         suffix="min"

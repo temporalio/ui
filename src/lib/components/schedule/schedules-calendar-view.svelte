@@ -45,12 +45,37 @@
   <h2 class="mb-4 text-2xl">Frequency</h2>
   <TabList label="Schedule Tabs" class="flex flex-wrap gap-6">
     {#if schedule}
-      <Tab label="Existing" id="existing-tab" panelId="existing-panel" />
+      <Tab
+        label="Existing"
+        id="existing-tab"
+        panelId="existing-panel"
+        onClick={() => (preset = 'existing')}
+      />
     {/if}
-    <Tab label="Interval" id="interval-tab" panelId="interval-panel" />
-    <Tab label="Days of the Week" id="daily-tab" panelId="daily-panel" />
-    <Tab label="Days of the Month" id="monthly-tab" panelId="monthly-panel" />
-    <Tab label="String" id="string-tab" panelId="string-panel" />
+    <Tab
+      label="Interval"
+      id="interval-tab"
+      panelId="interval-panel"
+      onClick={() => (preset = 'interval')}
+    />
+    <Tab
+      label="Days of the Week"
+      id="daily-tab"
+      panelId="daily-panel"
+      onClick={() => (preset = 'week')}
+    />
+    <Tab
+      label="Days of the Month"
+      id="monthly-tab"
+      panelId="monthly-panel"
+      onClick={() => (preset = 'month')}
+    />
+    <Tab
+      label="String"
+      id="string-tab"
+      panelId="string-panel"
+      onClick={() => (preset = 'string')}
+    />
   </TabList>
   <div class="mt-4 flex w-full flex-wrap gap-6">
     {#if schedule}
