@@ -12,11 +12,23 @@
 
   export let recentRuns: ScheduleActionResult[] = [];
   export let namespace: string;
+
+  const sortRecentRuns = (recentRuns: ScheduleActionResult[]) => {
+    return (
+      recentRuns
+        ?.sort(
+          (a, b) =>
+            new Date(b.actualTime as string).getTime() -
+            new Date(a.actualTime as string).getTime(),
+        )
+        ?.slice(0, 5) ?? []
+    );
+  };
 </script>
 
 <Panel>
   <h2 class="mb-4 text-2xl">Recent Runs</h2>
-  {#each recentRuns.slice(0, 5) as run (run?.startWorkflowResult?.workflowId)}
+  {#each sortRecentRuns(recentRuns) as run (run?.startWorkflowResult?.workflowId)}
     {#await fetchWorkflowForSchedule({ namespace, workflowId: decodeURIForSvelte(run.startWorkflowResult.workflowId), runId: run.startWorkflowResult.runId }, fetch) then workflow}
       <div class="row">
         <div class="w-28">
