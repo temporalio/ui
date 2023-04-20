@@ -129,7 +129,11 @@ export const WORKFLOW_CELLS: Record<WorkflowHeaderLabel, WorkflowCell> = {
       stateTransitionCount > 0 ? stateTransitionCount : '',
   },
   'Parent Namespace': { label: 'Parent Namespace', path: 'parentNamespaceId' },
-  'Parent Workflow ID': { label: 'Parent Workflow ID', path: 'parent' },
+  'Parent Workflow ID': {
+    label: 'Parent Workflow ID',
+    data: (workflowExecution: WorkflowExecution) =>
+      workflowExecution?.parent ? workflowExecution.parent.workflowId : '',
+  },
   'Task Queue': { label: 'Task Queue', path: 'taskQueue' },
 };
 
