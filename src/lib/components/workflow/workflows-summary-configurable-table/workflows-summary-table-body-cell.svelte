@@ -54,13 +54,14 @@
     updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
   };
 
-  $: cell =
-    label in WORKFLOW_CELLS ? WORKFLOW_CELLS[label] : { label, path: label };
+  $: cell = label in WORKFLOW_CELLS && WORKFLOW_CELLS[label];
   $: {
     if (isPathCell(cell)) {
       cellContent = String(workflow[cell.path]) ?? '';
     } else if (isDataCell(cell)) {
       cellContent = cell.data(workflow, $timeFormat) ?? '';
+    } else {
+      cellContent = '';
     }
   }
 </script>
