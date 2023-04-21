@@ -123,12 +123,10 @@
         <p>
           Go to <Link
             target="_external"
-            href="https://docs.temporal.io/workflows/#schedule"
-            class="truncate">docs</Link
+            href="https://docs.temporal.io/workflows/#schedule">docs</Link
           > or get started with <Link
             target="_external"
-            href="https://docs.temporal.io/cli/schedule"
-            class="truncate">Temporal CLI</Link
+            href="https://docs.temporal.io/cli/schedule">Temporal CLI</Link
           >.
         </p>
         <Button
