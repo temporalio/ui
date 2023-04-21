@@ -43,4 +43,11 @@ describe('getApiOrigin', () => {
     const url = getApiOrigin(false);
     expect(url).toBe('');
   });
+
+  it('should use VITE_APP_API_URL instead if it exists', () => {
+    import.meta.env.VITE_APP_API_URL = 'http://localhost:8080';
+
+    const url = getApiOrigin();
+    expect(url).toEqual('http://localhost:8080');
+  });
 });
