@@ -84,6 +84,17 @@
   $: pinnedColumns = $workflowTableColumns.filter((column) => column.pinned);
   $: otherColumns = $workflowTableColumns.filter((column) => !column.pinned);
 
+  const goToEventHistory = (event: MouseEvent, workflow: WorkflowExecution) => {
+    if (event.target instanceof HTMLAnchorElement) return;
+    goto(
+      routeForEventHistory({
+        namespace,
+        workflow: workflow.id,
+        run: workflow.runId,
+      }),
+    );
+  };
+
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
   };
@@ -104,16 +115,6 @@
   const handleCheckboxChange = (event: CustomEvent<{ checked: boolean }>) => {
     const { checked } = event.detail;
     dispatch('togglePage', { checked, ...(checked && { workflows }) });
-  };
-
-  const goToWorkflow = (workflow: WorkflowExecution) => {
-    goto(
-      routeForEventHistory({
-        namespace,
-        workflow: workflow.id,
-        run: workflow.runId,
-      }),
-    );
   };
 
   let resizableContainer: HTMLDivElement;
@@ -231,7 +232,7 @@
           {#each workflows as workflow}
             <tr
               class="workflow-summary-configurable-row pinned"
-              on:click={() => goToWorkflow(workflow)}
+              on:click={(e) => goToEventHistory(e, workflow)}
             >
               {#if $supportsBulkActions}
                 <td>
@@ -245,7 +246,15 @@
                 </td>
               {/if}
               {#each pinnedColumns as column}
-                <WorkflowsSummaryTableBodyCell {column} {workflow} />
+                <WorkflowsSummaryTableBodyCell
+                  href={routeForEventHistory({
+                    namespace,
+                    workflow: workflow.id,
+                    run: workflow.runId,
+                  })}
+                  {column}
+                  {workflow}
+                />
               {/each}
             </tr>
           {/each}
@@ -287,10 +296,18 @@
           {#each workflows as workflow}
             <tr
               class="workflow-summary-configurable-row"
-              on:click={() => goToWorkflow(workflow)}
+              on:click={(e) => goToEventHistory(e, workflow)}
             >
               {#each otherColumns as column}
-                <WorkflowsSummaryTableBodyCell {column} {workflow} />
+                <WorkflowsSummaryTableBodyCell
+                  href={routeForEventHistory({
+                    namespace,
+                    workflow: workflow.id,
+                    run: workflow.runId,
+                  })}
+                  {column}
+                  {workflow}
+                />
               {/each}
               <td />
             </tr>
