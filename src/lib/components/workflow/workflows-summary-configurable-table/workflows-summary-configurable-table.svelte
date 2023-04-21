@@ -84,6 +84,17 @@
   $: pinnedColumns = $workflowTableColumns.filter((column) => column.pinned);
   $: otherColumns = $workflowTableColumns.filter((column) => !column.pinned);
 
+  const goToEventHistory = (event: MouseEvent, workflow: WorkflowExecution) => {
+    if (event.target instanceof HTMLAnchorElement) return;
+    goto(
+      routeForEventHistory({
+        namespace,
+        workflow: workflow.id,
+        run: workflow.runId,
+      }),
+    );
+  };
+
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
   };
@@ -219,14 +230,9 @@
       <tbody>
         {#if $workflowTableColumns.length > 0}
           {#each workflows as workflow}
-            {@const href = routeForEventHistory({
-              namespace,
-              workflow: workflow.id,
-              run: workflow.runId,
-            })}
             <tr
               class="workflow-summary-configurable-row pinned"
-              on:click={() => goto(href)}
+              on:click={(e) => goToEventHistory(e, workflow)}
             >
               {#if $supportsBulkActions}
                 <td>
@@ -240,7 +246,15 @@
                 </td>
               {/if}
               {#each pinnedColumns as column}
-                <WorkflowsSummaryTableBodyCell {href} {column} {workflow} />
+                <WorkflowsSummaryTableBodyCell
+                  href={routeForEventHistory({
+                    namespace,
+                    workflow: workflow.id,
+                    run: workflow.runId,
+                  })}
+                  {column}
+                  {workflow}
+                />
               {/each}
             </tr>
           {/each}
@@ -280,17 +294,20 @@
       <tbody>
         {#if $workflowTableColumns.length > 0}
           {#each workflows as workflow}
-            {@const href = routeForEventHistory({
-              namespace,
-              workflow: workflow.id,
-              run: workflow.runId,
-            })}
             <tr
               class="workflow-summary-configurable-row"
-              on:click={() => goto(href)}
+              on:click={(e) => goToEventHistory(e, workflow)}
             >
               {#each otherColumns as column}
-                <WorkflowsSummaryTableBodyCell {href} {column} {workflow} />
+                <WorkflowsSummaryTableBodyCell
+                  href={routeForEventHistory({
+                    namespace,
+                    workflow: workflow.id,
+                    run: workflow.runId,
+                  })}
+                  {column}
+                  {workflow}
+                />
               {/each}
               <td />
             </tr>
