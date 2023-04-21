@@ -106,16 +106,6 @@
     dispatch('togglePage', { checked, ...(checked && { workflows }) });
   };
 
-  const goToWorkflow = (workflow: WorkflowExecution) => {
-    goto(
-      routeForEventHistory({
-        namespace,
-        workflow: workflow.id,
-        run: workflow.runId,
-      }),
-    );
-  };
-
   let resizableContainer: HTMLDivElement;
   let resizableContainerWidth: number = $pinnedColumnsWidth;
   let resizing: boolean = false;
@@ -229,9 +219,14 @@
       <tbody>
         {#if $workflowTableColumns.length > 0}
           {#each workflows as workflow}
+            {@const href = routeForEventHistory({
+              namespace,
+              workflow: workflow.id,
+              run: workflow.runId,
+            })}
             <tr
               class="workflow-summary-configurable-row pinned"
-              on:click={() => goToWorkflow(workflow)}
+              on:click={() => goto(href)}
             >
               {#if $supportsBulkActions}
                 <td>
@@ -245,7 +240,7 @@
                 </td>
               {/if}
               {#each pinnedColumns as column}
-                <WorkflowsSummaryTableBodyCell {column} {workflow} />
+                <WorkflowsSummaryTableBodyCell {href} {column} {workflow} />
               {/each}
             </tr>
           {/each}
@@ -285,12 +280,17 @@
       <tbody>
         {#if $workflowTableColumns.length > 0}
           {#each workflows as workflow}
+            {@const href = routeForEventHistory({
+              namespace,
+              workflow: workflow.id,
+              run: workflow.runId,
+            })}
             <tr
               class="workflow-summary-configurable-row"
-              on:click={() => goToWorkflow(workflow)}
+              on:click={() => goto(href)}
             >
               {#each otherColumns as column}
-                <WorkflowsSummaryTableBodyCell {column} {workflow} />
+                <WorkflowsSummaryTableBodyCell {href} {column} {workflow} />
               {/each}
               <td />
             </tr>

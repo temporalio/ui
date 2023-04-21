@@ -22,6 +22,7 @@
 
   export let column: WorkflowHeader;
   export let workflow: WorkflowExecution;
+  export let href: string;
 
   $: ({ label } = column);
 
@@ -78,7 +79,7 @@
     on:mouseleave={hideFilterOrCopy}
     on:blur={hideFilterOrCopy}
   >
-    <span class="table-link">{cellContent}</span>
+    <a on:click|stopPropagation {href} class="table-link">{cellContent}</a>
     <FilterOrCopyButtons
       show={filterOrCopyButtonsVisible}
       content={cellContent}
