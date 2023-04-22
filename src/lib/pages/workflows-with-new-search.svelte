@@ -11,7 +11,12 @@
     workflowsSearchParams,
   } from '$lib/stores/workflows';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import { workflowFilters, workflowSorts } from '$lib/stores/filters';
+  import {
+    persistedTimeFilter,
+    workflowFilters,
+    workflowSorts,
+  } from '$lib/stores/filters';
+  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import Pagination from '$lib/holocene/pagination.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -50,13 +55,20 @@
     }
   }
 
+  const persistTimeFilter = () => {
+    if (!query && !$workflowFilters.length && $persistedTimeFilter) {
+      $workflowFilters = [$persistedTimeFilter];
+      updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
+    }
+  };
+
+  $: $page.params.namespace, persistTimeFilter();
+
   onMount(() => {
     $lastUsedNamespace = $page.params.namespace;
     if (query) {
       // Set filters from inital page load query if it exists
       $workflowFilters = toListWorkflowFilters(query);
-    } else {
-      $workflowFilters = [];
     }
   });
 
