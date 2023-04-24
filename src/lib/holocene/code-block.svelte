@@ -10,7 +10,7 @@
   export let inline = false;
   export let language = 'json';
   export let copyable = true;
-  export let async: boolean = true;
+  export let async = true;
 
   let root: HTMLElement;
   $: isJSON = language === 'json';
