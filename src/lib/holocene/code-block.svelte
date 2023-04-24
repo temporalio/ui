@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { dev } from '$app/environment';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { copyToClipboard } from '$lib/utilities/copy-to-clipboard';
   import {
@@ -10,7 +11,7 @@
   export let inline = false;
   export let language = 'json';
   export let copyable = true;
-  export let async = true;
+  export let async = dev ? false : true;
 
   let root: HTMLElement;
   $: isJSON = language === 'json';
