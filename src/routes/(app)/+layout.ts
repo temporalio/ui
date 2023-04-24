@@ -2,9 +2,6 @@ import { redirect } from '@sveltejs/kit';
 import type { LayoutLoad } from './$types';
 import type { GetClusterInfoResponse } from '$lib/types';
 
-import '$lib/vendor/prism/prism.css';
-import '$lib/vendor/prism/prism.cjs';
-
 import '../../app.css';
 
 import { fetchSettings } from '$lib/services/settings-service';

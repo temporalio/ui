@@ -38,7 +38,8 @@
     "src/**/*.ts",
     "src/**/*.svelte",
     "src/lib/models/**/*.test.ts",
-    "cypress/**/*.ts"
+    "cypress/**/*.ts",
+    "src/lib/vendor/prism/prism.cjs"
   ],
   "exclude": [
     "src/lib/services/**/*.test.ts",
