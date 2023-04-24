@@ -94,7 +94,7 @@ describe('Workflow Executions List', () => {
         ).as('workflow-api');
       });
 
-      it('should keep single workflow filter after navigating away and back to workflow list', () => {
+      it('should keep single workflow filter after navigating to workflow history and back to workflow list', () => {
         cy.get('#execution-status-filter')
           .find('option:selected')
           .should('have.value', 'null');
