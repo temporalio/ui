@@ -99,10 +99,8 @@ describe('decodePayload', () => {
   it('Should not decode a payload with encoding binary/encrypted', () => {
     expect(decodePayload(WebDecodePayload)).toEqual(WebDecodePayload);
   });
-  it('Should not decode a payload with encoding binary/encrypted', () => {
-    expect(decodePayload(BinaryNullEncodedNoData)).toEqual(
-      BinaryNullEncodedNoData,
-    );
+  it('Should not decode a payload with encoding binary/null', () => {
+    expect(decodePayload(BinaryNullEncodedNoData)).toEqual(null);
   });
   it('Should decode a payload with encoding json/plain', () => {
     expect(decodePayload(JsonPlainEncoded)).toEqual(Base64Decoded);
