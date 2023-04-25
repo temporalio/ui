@@ -5,14 +5,14 @@ import { toWorkflowExecutions } from '$lib/models/workflow-execution';
 
 export const t = initTRPC.context<Context>().create();
 
+const temporalClient = new WorkflowClient();
+
 export const router = t.router({
   getClusterInfo: t.procedure.query(async ({ ctx }) => {
-    const temporalClient = new WorkflowClient();
     const clusterInfo = await temporalClient.workflowService.getClusterInfo({});
     return clusterInfo.toJSON();
   }),
   getWorkflows: t.procedure.query(async ({ ctx }) => {
-    const temporalClient = new WorkflowClient();
     const response =
       await temporalClient.workflowService.listWorkflowExecutions({
         namespace: ctx.params.namespace,
