@@ -6,6 +6,10 @@
 
   import AdvancedVisibilityGuard from '$lib/components/advanced-visibility-guard.svelte';
   import WorkflowsWithNewSearch from '$lib/pages/workflows-with-new-search.svelte';
+
+  import type { PageServerData } from './$types';
+
+  export let data: PageServerData;
 </script>
 
 <PageTitle
@@ -14,6 +18,6 @@
 />
 
 <AdvancedVisibilityGuard>
-  <WorkflowsWithNewSearch />
+  <WorkflowsWithNewSearch workflows={data.workflows.workflows} />
   <Workflows slot="fallback" />
 </AdvancedVisibilityGuard>

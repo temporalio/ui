@@ -3,7 +3,6 @@
   import { page } from '$app/stores';
   import {
     refresh,
-    workflows,
     loading,
     updating,
     workflowCount,
@@ -30,6 +29,8 @@
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table/workflows-summary-configurable-table.svelte';
 
   import type { WorkflowExecution } from '$lib/types/workflows';
+
+  export let workflows: WorkflowExecution[];
 
   let selectedWorkflows: WorkflowExecution[] = [];
   let batchTerminateConfirmationModal: BatchOperationConfirmationModal;
@@ -258,7 +259,7 @@
     </button>
   </div>
 </header>
-<Pagination items={$workflows} let:visibleItems aria-label="recent workflows">
+<Pagination items={workflows} let:visibleItems aria-label="recent workflows">
   <svelte:fragment slot="action-top-left">
     <WorkflowAdvancedSearch />
   </svelte:fragment>

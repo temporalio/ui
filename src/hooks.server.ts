@@ -1,7 +1,6 @@
+import { createContext } from '$lib/trpc/context';
+import { router } from '$lib/trpc/router';
 import type { Handle } from '@sveltejs/kit';
+import { createTRPCHandle } from 'trpc-sveltekit';
 
-export const handle: Handle = async ({ event, resolve }) => {
-  const response = await resolve(event, {});
-
-  return response;
-};
+export const handle: Handle = createTRPCHandle({ router, createContext });

@@ -14,6 +14,7 @@ import type {
   DecodedWorkflowSearchAttributes,
   WorkflowExecutionAPIResponse,
 } from '$lib/types/workflows';
+import type { WorkflowExecutionStatus } from '$lib/types';
 
 const toPendingActivities = (
   pendingActivity: PendingActivityInfo[] = [],
@@ -46,18 +47,32 @@ const toSearchAttributes = (
   };
 };
 
+const mapStatusToFriendlyStatus = (status: WorkflowExecutionStatus): string => {
+  const map = {
+    WORKFLOW_EXECUTION_STATUS_UNSPECIFIED: '',
+    WORKFLOW_EXECUTION_STATUS_RUNNING: 'Running',
+    WORKFLOW_EXECUTION_STATUS_COMPLETED: 'Completed',
+    WORKFLOW_EXECUTION_STATUS_FAILED: 'Failed',
+    WORKFLOW_EXECUTION_STATUS_CANCELED: 'Canceled',
+    WORKFLOW_EXECUTION_STATUS_TERMINATED: 'Terminated',
+    WORKFLOW_EXECUTION_STATUS_CONTINUED_AS_NEW: "Cont'd as New",
+    WORKFLOW_EXECUTION_STATUS_TIMED_OUT: 'TimedOut',
+  };
+
+  return map[status] ?? status;
+};
+
 export const toWorkflowExecution = (
   response?: WorkflowExecutionAPIResponse,
 ): WorkflowExecution => {
-  const searchAttributes = toSearchAttributes(
-    response.workflowExecutionInfo.searchAttributes,
-  );
   const name = response.workflowExecutionInfo.type.name;
   const id = response.workflowExecutionInfo.execution.workflowId;
   const runId = response.workflowExecutionInfo.execution.runId;
   const startTime = response.workflowExecutionInfo.startTime;
   const endTime = response.workflowExecutionInfo.closeTime;
-  const status = response.workflowExecutionInfo.status;
+  const status = mapStatusToFriendlyStatus(
+    response.workflowExecutionInfo.status,
+  );
   const isRunning = response.workflowExecutionInfo.status === 'Running';
   const historyEvents = response.workflowExecutionInfo.historyLength;
   const historySizeBytes = response.workflowExecutionInfo.historySizeBytes;
@@ -76,6 +91,9 @@ export const toWorkflowExecution = (
     response.pendingActivities,
   );
   const pendingChildren: PendingChildren[] = response?.pendingChildren ?? [];
+  const searchAttributes = toSearchAttributes(
+    response.workflowExecutionInfo?.searchAttributes ?? null,
+  );
 
   return {
     name,

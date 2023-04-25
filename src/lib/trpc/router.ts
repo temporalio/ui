@@ -1,0 +1,26 @@
+import type { Context } from '$lib/trpc/context';
+import { initTRPC } from '@trpc/server';
+import { WorkflowClient } from '@temporalio/client';
+import { toWorkflowExecutions } from '$lib/models/workflow-execution';
+
+export const t = initTRPC.context<Context>().create();
+
+export const router = t.router({
+  getClusterInfo: t.procedure.query(async ({ ctx }) => {
+    const temporalClient = new WorkflowClient();
+    const clusterInfo = await temporalClient.workflowService.getClusterInfo({});
+    return clusterInfo.toJSON();
+  }),
+  getWorkflows: t.procedure.query(async ({ ctx }) => {
+    const temporalClient = new WorkflowClient();
+    const response =
+      await temporalClient.workflowService.listWorkflowExecutions({
+        namespace: ctx.params.namespace,
+      });
+    const { executions, nextPageToken } = response.toJSON();
+    return {
+      workflows: toWorkflowExecutions({ executions }),
+      nextPageToken: String(nextPageToken),
+    };
+  }),
+});
