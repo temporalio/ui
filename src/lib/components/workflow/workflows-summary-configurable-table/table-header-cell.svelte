@@ -1,13 +1,18 @@
 <script lang="ts">
   import type { WorkflowHeader } from '$lib/stores/workflow-table-columns';
-  import ExecutionStatusDropdownFilter from '../dropdown-filter/workflow-status.svelte';
-  import WorkflowIdDropdownFilter from '../dropdown-filter/workflow-id.svelte';
-  import WorkflowTypeDropdownFilter from '../dropdown-filter/workflow-type.svelte';
-  import StartTimeDropdownFilter from '../dropdown-filter/start-time.svelte';
-  import EndTimeDropdownFilter from '../dropdown-filter/end-time.svelte';
+  import { workflowCount } from '$lib/stores/workflows';
+  import { supportsAdvancedVisibilityWithOrderBy } from '$lib/stores/advanced-visibility';
+
+  import ExecutionStatusDropdownFilter from '$lib/components/workflow/dropdown-filter/workflow-status.svelte';
+  import WorkflowIdDropdownFilter from '$lib/components/workflow/dropdown-filter/workflow-id.svelte';
+  import WorkflowTypeDropdownFilter from '$lib/components/workflow/dropdown-filter/workflow-type.svelte';
+  import StartTimeDropdownFilter from '$lib/components/workflow/dropdown-filter/start-time.svelte';
+  import EndTimeDropdownFilter from '$lib/components/workflow/dropdown-filter/end-time.svelte';
 
   export let column: WorkflowHeader;
-  export let sortDisabled: boolean;
+  $: sortDisabled =
+    $workflowCount?.totalCount >= 1000000 ||
+    !$supportsAdvancedVisibilityWithOrderBy;
 
   $: ({ label } = column);
 </script>

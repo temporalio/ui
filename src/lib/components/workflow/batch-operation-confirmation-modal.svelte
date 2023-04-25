@@ -1,14 +1,19 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, getContext } from 'svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { pluralize } from '$lib/utilities/pluralize';
   import Input from '$lib/holocene/input/input.svelte';
   import { authUser } from '$lib/stores/auth-user';
+  import {
+    BATCH_ACTION_CONTEXT,
+    type BatchActionContext,
+  } from '$lib/pages/workflows-with-new-search.svelte';
+
+  const { allSelected } = getContext<BatchActionContext>(BATCH_ACTION_CONTEXT);
 
   type Action = 'Terminate' | 'Cancel';
 
   export let action: Action;
-  export let allSelected: boolean;
   export let actionableWorkflowsLength: number;
   export let query: string;
 
@@ -53,7 +58,7 @@
   <h3 slot="title">{action} Workflows</h3>
   <svelte:fragment slot="content">
     <div class="mb-4 flex flex-col">
-      {#if allSelected}
+      {#if $allSelected}
         <p class="mb-2">
           Are you sure you want to {action.toLowerCase()} all worklfows matching
           the following query? This action cannot be undone.
