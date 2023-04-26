@@ -171,13 +171,13 @@ export const fetchAllWorkflows = async (
 };
 
 export const fetchWorkflowForRunId = async (
-  parameters: { namespace: string; workflowId: string },
+  parameters: { namespace: string; workflowId: string; webUrl?: string },
   request = fetch,
 ): Promise<{ runId: string }> => {
-  const { namespace, workflowId } = parameters;
+  const { namespace, workflowId, webUrl } = parameters;
   const endpoint: ValidWorkflowEndpoints = 'workflows';
 
-  const route = routeForApi(endpoint, { namespace });
+  const route = routeForApi(endpoint, { namespace }, true, webUrl);
   const { executions } = (await requestFromAPI<ListWorkflowExecutionsResponse>(
     route,
     {
