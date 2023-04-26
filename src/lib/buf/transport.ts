@@ -33,9 +33,14 @@ const Authenticator: Interceptor = (next) => async (req) => {
 //   interceptors: [logger, Authenticator],
 // });
 
-const transport = createConnectTransport({
+// export const webTransport = createGrpcWebTransport({
+//   baseUrl: 'http://localhost:7233/',
+//   interceptors: [logger]
+// });
+
+export const uiServerTransport = createConnectTransport({
   // Requests will be made to <baseUrl>/<package>.<service>/method
-  baseUrl: 'https://demo.connect.build',
+  baseUrl: 'http://localhost:8233',
 
   // By default, this transport uses the JSON format.
   // Set this option to true to use the binary format.
@@ -49,8 +54,6 @@ const transport = createConnectTransport({
   // Interceptors apply to all calls running through this transport.
   interceptors: [logger, Authenticator],
 });
-
-export const UIServiceClient = createPromiseClient(WorkflowService, transport);
 
 // export function typedArrayToBuffer(array: Uint8Array): ArrayBuffer {
 //   return array.buffer.slice(

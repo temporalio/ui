@@ -3,6 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@babel/core': ^7.17.9
   '@babel/preset-typescript': ^7.16.7
+  '@buf/temporal_frontend-api.bufbuild_connect-es': 0.8.6-20230419173345-51b578d926d9.1
   '@bufbuild/connect': ^0.8.6
   '@bufbuild/connect-web': ^0.8.6
   '@bufbuild/protobuf': ^1.2.0
@@ -113,6 +114,7 @@ specifiers:
   zx: ^7.1.1
 
 dependencies:
+  '@buf/temporal_frontend-api.bufbuild_connect-es': 0.8.6-20230419173345-51b578d926d9.1_hbyqbbpxpwwmlg2mga2szighpq
   '@bufbuild/connect': 0.8.6_@bufbuild+protobuf@1.2.0
   '@bufbuild/connect-web': 0.8.6_@bufbuild+protobuf@1.2.0
   '@bufbuild/protobuf': 1.2.0
@@ -549,6 +551,25 @@ packages:
   /@bcoe/v8-coverage/0.2.3:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
     dev: true
+
+  /@buf/temporal_frontend-api.bufbuild_connect-es/0.8.6-20230419173345-51b578d926d9.1_hbyqbbpxpwwmlg2mga2szighpq:
+    resolution: {registry: https://buf.build/gen/npm/v1/, tarball: https://buf.build/gen/npm/v1/@buf/temporal_frontend-api.bufbuild_connect-es/-/temporal_frontend-api.bufbuild_connect-es-0.8.6-20230419173345-51b578d926d9.1.tgz}
+    peerDependencies:
+      '@bufbuild/connect': ^0.8.6
+    dependencies:
+      '@buf/temporal_frontend-api.bufbuild_es': 1.2.0-20230419173345-51b578d926d9.1_@bufbuild+protobuf@1.2.0
+      '@bufbuild/connect': 0.8.6_@bufbuild+protobuf@1.2.0
+    transitivePeerDependencies:
+      - '@bufbuild/protobuf'
+    dev: false
+
+  /@buf/temporal_frontend-api.bufbuild_es/1.2.0-20230419173345-51b578d926d9.1_@bufbuild+protobuf@1.2.0:
+    resolution: {registry: https://buf.build/gen/npm/v1/, tarball: https://buf.build/gen/npm/v1/@buf/temporal_frontend-api.bufbuild_es/-/temporal_frontend-api.bufbuild_es-1.2.0-20230419173345-51b578d926d9.1.tgz}
+    peerDependencies:
+      '@bufbuild/protobuf': ^1.2.0
+    dependencies:
+      '@bufbuild/protobuf': 1.2.0
+    dev: false
 
   /@bufbuild/connect-web/0.8.6_@bufbuild+protobuf@1.2.0:
     resolution: {integrity: sha512-+ZI7Ercc0X1vlQr1iHa35EymtFjq1x4rByE+ToNyw05mwB7yxk4nw4iUa/Z7PfHYba1dAcgnnrvRDI2K7TBPBQ==}

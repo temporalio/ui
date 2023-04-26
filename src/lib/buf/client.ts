@@ -1,6 +1,8 @@
-import { AccountService } from '@buf/temporal_ocld-protos.bufbuild_connect-es/api/accountservice/v1/service_connect.js';
-
 import { createPromiseClient } from '@bufbuild/connect';
-import { grpcTransport } from './transport';
+import { uiServerTransport } from './transport';
+import { WorkflowService } from '@buf/temporal_frontend-api.bufbuild_connect-es/temporal/api/workflowservice/v1/service_connect';
 
-export const accountClient = createPromiseClient(AccountService, grpcTransport);
+export const UIServiceClient = createPromiseClient(
+  WorkflowService,
+  uiServerTransport,
+);
