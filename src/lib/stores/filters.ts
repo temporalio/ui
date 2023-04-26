@@ -2,6 +2,7 @@ import type {
   WorkflowFilter,
   WorkflowSort,
 } from '$lib/models/workflow-filters';
+import { persistStore } from '$lib/stores/persist-store';
 import { writable, derived, get } from 'svelte/store';
 import { page } from '$app/stores';
 import type { StartStopNotifier } from 'svelte/store';
@@ -36,10 +37,17 @@ const updateSorts: StartStopNotifier<WorkflowSort[]> = (set) => {
   });
 };
 
+export const persistedTimeFilter = persistStore<WorkflowFilter>(
+  'workflowDateTimeFilter',
+  undefined,
+  true,
+);
+
 export const workflowFilters = writable<WorkflowFilter[]>(
   [],
   updateWorkflowFilters,
 );
+
 export const workflowSorts = writable<WorkflowSort[]>([], updateSorts);
 
 const updateEventCategoryFilter: StartStopNotifier<string | null> = (set) => {
