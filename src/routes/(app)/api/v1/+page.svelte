@@ -12,6 +12,6 @@
   </div>
   <div class="w-1/2">
     <h6>Workflows loaded with<br /><code>trpc</code></h6>
-    <CodeBlock content={data.workflowsTrpc} />
+    <!-- <CodeBlock content={data.workflowsTrpc} /> -->
   </div>
 </div>

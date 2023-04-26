@@ -4,6 +4,7 @@ specifiers:
   '@babel/core': ^7.17.9
   '@babel/preset-typescript': ^7.16.7
   '@buf/temporal_frontend-api.bufbuild_connect-es': 0.8.6-20230419173345-51b578d926d9.1
+  '@buf/temporal_frontend-api.bufbuild_es': 1.2.0-20230419173345-51b578d926d9.1
   '@bufbuild/connect': ^0.8.6
   '@bufbuild/connect-web': ^0.8.6
   '@bufbuild/protobuf': ^1.2.0
@@ -115,6 +116,7 @@ specifiers:
 
 dependencies:
   '@buf/temporal_frontend-api.bufbuild_connect-es': 0.8.6-20230419173345-51b578d926d9.1_hbyqbbpxpwwmlg2mga2szighpq
+  '@buf/temporal_frontend-api.bufbuild_es': 1.2.0-20230419173345-51b578d926d9.1_@bufbuild+protobuf@1.2.0
   '@bufbuild/connect': 0.8.6_@bufbuild+protobuf@1.2.0
   '@bufbuild/connect-web': 0.8.6_@bufbuild+protobuf@1.2.0
   '@bufbuild/protobuf': 1.2.0

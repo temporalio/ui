@@ -37,7 +37,7 @@ const Authenticator: Interceptor = (next) => async (req) => {
 
 export const uiServerTransport = createConnectTransport({
   // Requests will be made to <baseUrl>/<package>.<service>/method
-  baseUrl: 'http://localhost:7233',
+  baseUrl: 'https://web.saas-api.tmprl.cloud',
 
   // By default, this transport uses the JSON format.
   // Set this option to true to use the binary format.

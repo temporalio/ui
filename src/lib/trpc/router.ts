@@ -15,7 +15,7 @@ export const router = t.router({
   getWorkflows: t.procedure.query(async ({ ctx }) => {
     const response =
       await temporalClient.workflowService.listWorkflowExecutions({
-        namespace: ctx.params.namespace,
+        namespace: ctx?.params?.namespace ?? 'canary',
       });
     const { executions, nextPageToken } = response.toJSON();
     return {
