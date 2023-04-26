@@ -57,17 +57,9 @@ const base = (namespace?: string): string => {
   return baseUrl;
 };
 
-const withBase = ({
-  endpoint,
-  namespace,
-  webUrl,
-}: {
-  endpoint: string;
-  namespace?: string;
-  webUrl?: string;
-}): string => {
+const withBase = (endpoint: string, namespace?: string): string => {
   if (endpoint.startsWith('/')) endpoint = endpoint.slice(1);
-  const baseUrl = webUrl ?? base(namespace);
+  const baseUrl = base(namespace);
   return `${baseUrl}/api/v1/${endpoint}`;
 };
 
@@ -92,7 +84,6 @@ export function routeForApi(
   route: WorkflowsAPIRoutePath,
   parameters: WorkflowListRouteParameters,
   shouldEncode?: boolean,
-  webUrl?: string,
 ): string;
 export function routeForApi(
   route: NamespaceAPIRoutePath,
@@ -135,7 +126,6 @@ export function routeForApi(
   route: APIRoutePath,
   parameters?: APIRouteParameters,
   shouldEncode = true,
-  webUrl?: string,
 ): string {
   if (shouldEncode) parameters = encode(parameters);
 
@@ -167,9 +157,5 @@ export function routeForApi(
     'batch-operation.describe': `/namespaces/${parameters.namespace}/batch-operations/describe`,
   };
 
-  return withBase({
-    endpoint: routes[route],
-    namespace: parameters?.namespace,
-    webUrl,
-  });
+  return withBase(routes[route], parameters?.namespace);
 }
