@@ -5,5 +5,13 @@
   export let data: PageServerData;
 </script>
 
-<h6>Workflows loaded in<br /><code>+page.ts</code></h6>
-<CodeBlock content={data.workflows} />
+<div class="flex gap-2">
+  <div class="w-1/2">
+    <h6>Workflows loaded with<br /><code>buf</code></h6>
+    <CodeBlock content={data.workflowsBuf} />
+  </div>
+  <div class="w-1/2">
+    <h6>Workflows loaded with<br /><code>trpc</code></h6>
+    <CodeBlock content={data.workflowsTrpc} />
+  </div>
+</div>

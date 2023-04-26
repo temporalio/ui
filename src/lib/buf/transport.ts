@@ -1,7 +1,4 @@
-import {
-  createGrpcWebTransport,
-  createConnectTransport,
-} from '@bufbuild/connect-web';
+import { createConnectTransport } from '@bufbuild/connect-web';
 import type { Interceptor } from '@bufbuild/connect';
 
 const logger: Interceptor = (next) => async (req) => {
@@ -40,7 +37,7 @@ const Authenticator: Interceptor = (next) => async (req) => {
 
 export const uiServerTransport = createConnectTransport({
   // Requests will be made to <baseUrl>/<package>.<service>/method
-  baseUrl: 'http://localhost:8233',
+  baseUrl: 'http://localhost:7233',
 
   // By default, this transport uses the JSON format.
   // Set this option to true to use the binary format.
