@@ -27,6 +27,7 @@ package server_options
 import (
 	"github.com/temporalio/ui-server/v2/server/api"
 	"github.com/temporalio/ui-server/v2/server/config"
+	"github.com/temporalio/ui-server/v2/server/log"
 )
 
 type (
@@ -46,5 +47,12 @@ func WithConfigProvider(cfgProvider config.ConfigProvider) ServerOption {
 func WithAPIMiddleware(middleware []api.Middleware) ServerOption {
 	return newApplyFuncContainer(func(s *ServerOptions) {
 		s.APIMiddleware = append(s.APIMiddleware, middleware...)
+	})
+}
+
+// WithLogger supplies the logger for the UI server
+func WithLogger(logger log.Logger) ServerOption {
+	return newApplyFuncContainer(func(s *ServerOptions) {
+		s.Logger = logger
 	})
 }

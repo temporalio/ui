@@ -31,15 +31,15 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
+	"github.com/temporalio/ui-server/v2/openapi"
 	"github.com/temporalio/ui-server/v2/server/api"
 	"github.com/temporalio/ui-server/v2/server/auth"
 	"github.com/temporalio/ui-server/v2/server/config"
 	"github.com/temporalio/ui-server/v2/server/csrf"
 	"github.com/temporalio/ui-server/v2/server/headers"
+	"github.com/temporalio/ui-server/v2/server/log/tag"
 	"github.com/temporalio/ui-server/v2/server/route"
 	"github.com/temporalio/ui-server/v2/server/server_options"
-
-	"github.com/temporalio/ui-server/v2/openapi"
 	"github.com/temporalio/ui-server/v2/ui"
 )
 
@@ -77,7 +77,25 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 	e := echo.New()
 
 	// Middleware
-	e.Use(middleware.Logger())
+
+	if serverOpts.Logger != nil {
+		logger := serverOpts.Logger
+		e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+			LogURI:    true,
+			LogStatus: true,
+			LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
+				logger.Info("request", tag.RequestEvent,
+					tag.NewStringTag("URI", v.URI),
+					tag.NewInt("status", v.Status),
+				)
+
+				return nil
+			},
+		}))
+	} else {
+		e.Use(middleware.Logger())
+	}
+
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: cfg.CORS.AllowOrigins,
