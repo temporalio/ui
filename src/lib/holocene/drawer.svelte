@@ -28,6 +28,7 @@
   >
     <div class="close-button-wrapper {position}">
       <IconButton
+        data-testid="drawer-close-button"
         icon="close"
         aria-expanded={open}
         aria-controls="navigation-drawer"

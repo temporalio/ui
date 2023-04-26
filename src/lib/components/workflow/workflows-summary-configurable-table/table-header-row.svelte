@@ -35,7 +35,7 @@
     $selectedWorkflows.length < workflows.length;
 </script>
 
-<tr class="workflows-summary-configurable-table-header-row">
+<tr class="workflows-summary-configurable-table-header-row" class:pinned>
   {#if pinned && $batchActionsEnabled}
     <th class="batch-actions-checkbox-table-cell">
       {#if !empty}
@@ -60,7 +60,11 @@
   {/if}
   {#if !pinned}
     <th class="configuration-button-table-cell">
-      <IconButton icon="vertical-ellipsis" on:click={onClickConfigure} />
+      <IconButton
+        data-testid="workflows-summary-table-configuration-button"
+        icon="vertical-ellipsis"
+        on:click={onClickConfigure}
+      />
     </th>
   {/if}
 </tr>

@@ -19,11 +19,15 @@
     {/if}
   </thead>
   <tbody>
-    {#if $loading}
-      <Loading />
+    {#if !pinned && $loading}
+      <tr>
+        <td colspan={columns.length + 1}>
+          <Loading />
+        </td>
+      </tr>
     {:else if !pinned && empty}
       <tr>
-        <td colspan={columns.length}>
+        <td colspan={columns.length + 1}>
           <EmptyState
             title="No Workflows Found"
             content="If you have filters applied, try adjusting them. Otherwise please check your syntax and try again."
@@ -33,7 +37,7 @@
       </tr>
     {:else if !pinned && columns.length === 0}
       <tr>
-        <td colspan={columns.length}>
+        <td colspan={columns.length + 1}>
           <EmptyState title="No column headers are in view">
             <p class="text-center">
               At least one column heading is required to display workflows.

@@ -16,7 +16,10 @@
   $: ({ label } = column);
 </script>
 
-<th class="workflows-summary-table-header-cell">
+<th
+  class="workflows-summary-table-header-cell"
+  data-testid="workflows-summary-table-header-cell-{label}"
+>
   {#if label === 'Status'}
     <ExecutionStatusDropdownFilter />
   {:else if label === 'Workflow ID'}

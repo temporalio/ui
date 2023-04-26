@@ -22,43 +22,35 @@
       <OrderableListItem
         {index}
         {pinned}
+        {label}
         totalItems={$workflowTableColumns.length}
         maxPinnedItems={MAX_PINNED_COLUMNS}
         on:moveItem={(event) => moveColumn(event.detail.from, event.detail.to)}
         on:pinItem={() => pinColumn(label)}
         on:removeItem={() => removeColumn(label)}
-      >
-        {label}
-      </OrderableListItem>
+      />
     {:else}
-      <OrderableListItem readonly>No headings in view</OrderableListItem>
+      <OrderableListItem readonly label="No headings in view" />
     {/each}
   </OrderableList>
   <OrderableList>
     <svelte:fragment slot="heading">
       Available Headings <span class="font-normal">(not in view)</span>
     </svelte:fragment>
-    {#each $availableWorkflowColumns as { label }, index}
-      <OrderableListItem static {index} on:addItem={() => addColumn(label)}>
-        {label}
-      </OrderableListItem>
+    {#each $availableWorkflowColumns as { label }}
+      <OrderableListItem static on:addItem={() => addColumn(label)} {label} />
     {:else}
-      <OrderableListItem readonly
-        >All available headings are in view</OrderableListItem
-      >
+      <OrderableListItem label="All available headings are in view" />
     {/each}
   </OrderableList>
   <OrderableList>
     <svelte:fragment slot="heading">
       Custom Search Attributes <span class="font-normal">(not in view)</span>
     </svelte:fragment>
-    {#each $availableSearchAttributeColumns as { label }, index}
-      <OrderableListItem static {index} on:addItem={() => addColumn(label)}>
-        {label}
-      </OrderableListItem>
+    {#each $availableSearchAttributeColumns as { label }}
+      <OrderableListItem static on:addItem={() => addColumn(label)} {label} />
     {:else}
-      <OrderableListItem readonly>No Custom Search Attributes</OrderableListItem
-      >
+      <OrderableListItem readonly label="No Custom Search Attributes" />
     {/each}
   </OrderableList>
 </div>

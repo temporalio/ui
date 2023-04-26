@@ -54,7 +54,10 @@
   on:mousedown={handleMouseDown}
 />
 
-<div class="workflows-summary-table-wrapper">
+<div
+  class="workflows-summary-table-wrapper"
+  data-testid="unpinned-table-columns-wrapper"
+>
   <slot name="unpinned-columns" />
 </div>
 

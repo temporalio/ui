@@ -54,8 +54,7 @@ Cypress.Commands.add('interceptWorkflowsApi', () => {
 
 Cypress.Commands.add('interceptWorkflowsCountApi', () => {
   cy.intercept(
-    Cypress.env('VITE_API_HOST') +
-      `/api/v1/namespaces/*/workflows/count?query=*`,
+    Cypress.env('VITE_API_HOST') + `/api/v1/namespaces/*/workflows/count?*`,
     { fixture: 'workflows-count.json' },
   ).as('workflows-count-api');
 });
