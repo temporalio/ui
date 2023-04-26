@@ -4,10 +4,9 @@
   import { supportsAdvancedVisibilityWithOrderBy } from '$lib/stores/advanced-visibility';
 
   import ExecutionStatusDropdownFilter from '$lib/components/workflow/dropdown-filter/workflow-status.svelte';
-  import WorkflowIdDropdownFilter from '$lib/components/workflow/dropdown-filter/workflow-id.svelte';
-  import WorkflowTypeDropdownFilter from '$lib/components/workflow/dropdown-filter/workflow-type.svelte';
   import StartTimeDropdownFilter from '$lib/components/workflow/dropdown-filter/start-time.svelte';
   import EndTimeDropdownFilter from '$lib/components/workflow/dropdown-filter/end-time.svelte';
+  import TextFilter from '$lib/components/workflow/dropdown-filter/text-filter.svelte';
 
   export let column: WorkflowHeader;
   $: sortDisabled =
@@ -21,9 +20,11 @@
   {#if label === 'Status'}
     <ExecutionStatusDropdownFilter />
   {:else if label === 'Workflow ID'}
-    <WorkflowIdDropdownFilter />
+    <TextFilter attribute="WorkflowId" />
+  {:else if label === 'Run ID'}
+    <TextFilter attribute="RunId" />
   {:else if label === 'Type'}
-    <WorkflowTypeDropdownFilter />
+    <TextFilter attribute="WorkflowType" />
   {:else if label === 'Start'}
     <StartTimeDropdownFilter disabled={sortDisabled} />
   {:else if label === 'End'}

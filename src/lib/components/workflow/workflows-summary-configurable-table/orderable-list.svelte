@@ -2,7 +2,7 @@
   import {
     workflowTableColumns,
     availableWorkflowColumns,
-    availableSearchAttributes,
+    availableSearchAttributeColumns,
     addColumn,
     removeColumn,
     moveColumn,
@@ -52,7 +52,7 @@
     <svelte:fragment slot="heading">
       Custom Search Attributes <span class="font-normal">(not in view)</span>
     </svelte:fragment>
-    {#each $availableSearchAttributes as { label }, index}
+    {#each $availableSearchAttributeColumns as { label }, index}
       <OrderableListItem static {index} on:addItem={() => addColumn(label)}>
         {label}
       </OrderableListItem>

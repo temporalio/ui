@@ -1,83 +1,30 @@
 <script lang="ts">
-  import { page } from '$app/stores';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import Badge from '$lib/holocene/badge.svelte';
-  import FilterOrCopyButtons from '$lib/holocene/filter-or-copy-buttons.svelte';
-  import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import {
     customSearchAttributes,
     isCustomSearchAttribute,
     workflowIncludesSearchAttribute,
   } from '$lib/stores/search-attributes';
   import { timeFormat } from '$lib/stores/time-format';
-  import {
-    isDataCell,
-    isPathCell,
-    type WorkflowHeader,
-    WORKFLOW_CELLS,
-  } from '$lib/stores/workflow-table-columns';
+  import type { WorkflowHeader } from '$lib/stores/workflow-table-columns';
   import { formatDate } from '$lib/utilities/format-date';
-  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import type { WorkflowExecution } from '$lib/types/workflows';
-  import { routeForEventHistory } from '$lib/utilities/route-for';
+  import FilterableTableCell from './filterable-table-cell.svelte';
+  import { formatBytes } from '$lib/utilities/format-bytes';
+  import { formatDistance } from '$lib/utilities/format-time';
 
   export let column: WorkflowHeader;
   export let workflow: WorkflowExecution;
 
   $: ({ label } = column);
-  $: namespace = $page.params.namespace;
-  $: href = routeForEventHistory({
-    namespace,
-    workflow: workflow.id,
-    run: workflow.runId,
-  });
 
-  let cellContent: string;
-  let filterOrCopyButtonsVisible: boolean = false;
-
+  let filterOrCopyButtonsVisible = false;
   const showFilterOrCopy = () => (filterOrCopyButtonsVisible = true);
   const hideFilterOrCopy = () => (filterOrCopyButtonsVisible = false);
-
-  const onRowFilterClick = (header: WorkflowHeader, value: string) => {
-    const attribute =
-      header.label === 'Workflow ID' ? 'WorkflowId' : 'WorkflowType';
-    const filter = $workflowFilters.find((f) => f.attribute === attribute);
-    const getOtherFilters = () =>
-      $workflowFilters.filter((f) => f.attribute !== attribute);
-
-    if (!filter) {
-      const newFilter = {
-        attribute,
-        value,
-        conditional: '=',
-        operator: '',
-        parenthesis: '',
-      };
-      $workflowFilters = [...getOtherFilters(), newFilter];
-    } else {
-      $workflowFilters = [...getOtherFilters()];
-    }
-
-    updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
-  };
-
-  $: cell = label in WORKFLOW_CELLS && WORKFLOW_CELLS[label];
-  $: {
-    if (isPathCell(cell)) {
-      cellContent = String(workflow[cell.path]) ?? '';
-    } else if (isDataCell(cell)) {
-      cellContent = cell.data(workflow, $timeFormat) ?? '';
-    } else {
-      cellContent = '';
-    }
-  }
 </script>
 
-{#if label === 'Status'}
-  <td class="workflows-summary-table-body-cell">
-    <WorkflowStatus status={workflow.status} />
-  </td>
-{:else if label === 'Type' || label === 'Workflow ID'}
+{#if label === 'Run ID' || label === 'Workflow ID' || label === 'Type'}
   <td
     class="workflows-summary-table-body-cell filterable"
     on:mouseover={showFilterOrCopy}
@@ -85,29 +32,61 @@
     on:mouseleave={hideFilterOrCopy}
     on:blur={hideFilterOrCopy}
   >
-    <a {href} class="table-link">{cellContent}</a>
-    <FilterOrCopyButtons
-      show={filterOrCopyButtonsVisible}
-      content={cellContent}
-      onFilter={() => onRowFilterClick(column, cellContent)}
-      filtered={$workflowFilters.some(
-        (filter) => filter.attribute === label && filter.value === cellContent,
-      )}
-    />
-  </td>
-{:else if isCustomSearchAttribute(label) && workflowIncludesSearchAttribute(workflow, label)}
-  {@const content = workflow.searchAttributes.indexedFields[label]}
-  <td class="workflows-summary-table-body-cell">
-    {#if $customSearchAttributes[label] === 'Datetime' && typeof content === 'string'}
-      {formatDate(content, $timeFormat)}
-    {:else if $customSearchAttributes[label] === 'Bool'}
-      <Badge>{content}</Badge>
-    {:else}
-      {content}
+    {#if label === 'Type'}
+      <FilterableTableCell
+        {filterOrCopyButtonsVisible}
+        attribute="WorkflowType"
+        {workflow}
+      />
+    {:else if label === 'Workflow ID'}
+      <FilterableTableCell
+        {filterOrCopyButtonsVisible}
+        attribute="WorkflowId"
+        {workflow}
+      />
+    {:else if label === 'Run ID'}
+      <FilterableTableCell
+        {filterOrCopyButtonsVisible}
+        attribute="RunId"
+        {workflow}
+      />
     {/if}
   </td>
 {:else}
-  <td class="workflows-summary-table-body-cell">{cellContent}</td>
+  <td class="workflows-summary-table-body-cell">
+    {#if label === 'Status'}
+      <WorkflowStatus status={workflow.status} />
+    {:else if label === 'End'}
+      {formatDate(workflow.endTime, $timeFormat)}
+    {:else if label === 'Start'}
+      {formatDate(workflow.startTime, $timeFormat)}
+    {:else if label === 'Task Queue'}
+      {workflow.taskQueue}
+    {:else if label === 'Parent Namespace'}
+      {workflow.parentNamespaceId}
+    {:else if label === 'Parent Workflow ID'}
+      {workflow.parent ? workflow.parent.workflowId : ''}
+    {:else if label === 'History Size'}
+      {formatBytes(parseInt(workflow.historySizeBytes, 10))}
+    {:else if label === 'State Transitions'}
+      {parseInt(workflow.stateTransitionCount, 10) > 0
+        ? workflow.stateTransitionCount
+        : ''}
+    {:else if label === 'Execution Time'}
+      {formatDistance({ start: workflow.startTime, end: workflow.endTime })}
+    {:else if label === 'History Length'}
+      {parseInt(workflow.historyEvents, 10) > 0 ? workflow.historyEvents : ''}
+    {:else if isCustomSearchAttribute(label) && workflowIncludesSearchAttribute(workflow, label)}
+      {@const content = workflow.searchAttributes.indexedFields[label]}
+      {#if $customSearchAttributes[label] === 'Datetime' && typeof content === 'string'}
+        {formatDate(content, $timeFormat)}
+      {:else if $customSearchAttributes[label] === 'Bool'}
+        <Badge>{content}</Badge>
+      {:else}
+        {content}
+      {/if}
+    {/if}
+  </td>
 {/if}
 
 <style lang="postcss">
