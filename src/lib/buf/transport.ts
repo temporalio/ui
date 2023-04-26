@@ -1,13 +1,8 @@
-import { asyncOnAuth } from '$lib/stores/auth-store';
-import { AppConfig } from '$lib/stores/app-config';
-import { createGrpcWebTransport } from '@bufbuild/connect-web';
-import type { Interceptor } from '@bufbuild/connect';
 import {
-  decodeOcldArrayResponse,
-  decodeOcldResponse,
-} from '$lib/utilities/decode-response';
-import type { NetworkMessage } from './util/debuggerTypes';
-// import type { NetworkMessage } from './util/debuggerTypes';
+  createGrpcWebTransport,
+  createConnectTransport,
+} from '@bufbuild/connect-web';
+import type { Interceptor } from '@bufbuild/connect';
 
 const logger: Interceptor = (next) => async (req) => {
   try {
@@ -22,25 +17,44 @@ const logger: Interceptor = (next) => async (req) => {
 };
 
 const Authenticator: Interceptor = (next) => async (req) => {
-  const accessToken = await asyncOnAuth();
-  req.header.append('Authorization', `Bearer ${accessToken}`);
+  // const accessToken = await asyncOnAuth();
+  // req.header.append('Authorization', `Bearer ${accessToken}`);
 
   return await next(req);
 };
 
-export const supportGrpcTransport = createGrpcWebTransport({
-  baseUrl: AppConfig.gRPC.ocld,
+// export const supportGrpcTransport = createGrpcWebTransport({
+//   baseUrl: AppConfig.gRPC.ocld,
+//   interceptors: [logger, Authenticator],
+// });
+
+// export const grpcTransport = createGrpcWebTransport({
+//   baseUrl: AppConfig.gRPC.hostname,
+//   interceptors: [logger, Authenticator],
+// });
+
+const transport = createConnectTransport({
+  // Requests will be made to <baseUrl>/<package>.<service>/method
+  baseUrl: 'https://demo.connect.build',
+
+  // By default, this transport uses the JSON format.
+  // Set this option to true to use the binary format.
+  useBinaryFormat: false,
+
+  // Controls what the fetch client will do with credentials, such as
+  // Cookies. The default value is "same-origin", which will not
+  // transmit Cookies in cross-origin requests.
+  credentials: 'same-origin',
+
+  // Interceptors apply to all calls running through this transport.
   interceptors: [logger, Authenticator],
 });
 
-export const grpcTransport = createGrpcWebTransport({
-  baseUrl: AppConfig.gRPC.hostname,
-  interceptors: [logger, Authenticator],
-});
+export const UIServiceClient = createPromiseClient(WorkflowService, transport);
 
-export function typedArrayToBuffer(array: Uint8Array): ArrayBuffer {
-  return array.buffer.slice(
-    array.byteOffset,
-    array.byteLength + array.byteOffset,
-  );
-}
+// export function typedArrayToBuffer(array: Uint8Array): ArrayBuffer {
+//   return array.buffer.slice(
+//     array.byteOffset,
+//     array.byteLength + array.byteOffset,
+//   );
+// }
