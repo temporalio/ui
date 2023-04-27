@@ -3,10 +3,10 @@
 /* PrismJS 1.25.0
 https://prismjs.com/download.html#themes=prism-tomorrow&languages=json */
 var _self =
-    'undefined' != typeof window
-      ? window
-      : 'undefined' != typeof WorkerGlobalScope &&
-        self instanceof WorkerGlobalScope
+  'undefined' != typeof window
+    ? window
+    : 'undefined' != typeof WorkerGlobalScope &&
+      self instanceof WorkerGlobalScope
       ? self
       : {},
   Prism = (function (u) {
@@ -22,8 +22,8 @@ var _self =
             return n instanceof W
               ? new W(n.type, e(n.content), n.alias)
               : Array.isArray(n)
-              ? n.map(e)
-              : n
+                ? n.map(e)
+                : n
                   .replace(/&/g, '&amp;')
                   .replace(/</g, '&lt;')
                   .replace(/\u00a0/g, ' ');
@@ -61,7 +61,7 @@ var _self =
             }
           },
           getLanguage: function (e) {
-            for (; e && !c.test(e.className); ) e = e.parentElement;
+            for (; e && !c.test(e.className);) e = e.parentElement;
             return e
               ? (e.className.match(c) || [, 'none'])[1].toLowerCase()
               : 'none';
@@ -82,7 +82,7 @@ var _self =
             }
           },
           isActive: function (e, n, t) {
-            for (var r = 'no-' + n; e; ) {
+            for (var r = 'no-' + n; e;) {
               var a = e.classList;
               if (a.contains(n)) return !0;
               if (a.contains(r)) return !1;
@@ -149,7 +149,7 @@ var _self =
               r.container.querySelectorAll(r.selector),
             )),
             M.hooks.run('before-all-elements-highlight', r);
-          for (var a, i = 0; (a = r.elements[i++]); )
+          for (var a, i = 0; (a = r.elements[i++]);)
             M.highlightElement(a, !0 === n, r.callback);
         },
         highlightElement: function (e, n, t) {
@@ -175,16 +175,17 @@ var _self =
           }
           if (
             (M.hooks.run('before-sanity-check', l),
-            (i = l.element.parentElement) &&
+              (i = l.element.parentElement) &&
               'pre' === i.nodeName.toLowerCase() &&
               !i.hasAttribute('tabindex') &&
               i.setAttribute('tabindex', '0'),
-            !l.code)
+              !l.code)
           )
             return M.hooks.run('complete', l), void (t && t.call(l.element));
           if ((M.hooks.run('before-highlight', l), l.grammar))
             if (n && u.Worker) {
-              var s = new Worker(M.filename);
+              const filename = `${window.location.origin}/src/lib/vendor/prism/prism.cjs`
+              var s = new Worker(filename);
               (s.onmessage = function (e) {
                 o(e.data);
               }),
@@ -247,12 +248,12 @@ var _self =
                           var w = k.index,
                             A = k.index + k[0].length,
                             P = y;
-                          for (P += m.value.length; P <= w; )
+                          for (P += m.value.length; P <= w;)
                             (m = m.next), (P += m.value.length);
                           if (
                             ((P -= m.value.length),
-                            (y = P),
-                            m.value instanceof W)
+                              (y = P),
+                              m.value instanceof W)
                           )
                             continue;
                           for (
@@ -286,7 +287,7 @@ var _self =
             (function (e) {
               var n = [],
                 t = e.head.next;
-              for (; t !== e.tail; ) n.push(t.value), (t = t.next);
+              for (; t !== e.tail;) n.push(t.value), (t = t.next);
               return n;
             })(a)
           );
@@ -299,7 +300,7 @@ var _self =
           },
           run: function (e, n) {
             var t = M.hooks.all[e];
-            if (t && t.length) for (var r, a = 0; (r = t[a++]); ) r(n);
+            if (t && t.length) for (var r, a = 0; (r = t[a++]);) r(n);
           },
         },
         Token: W,
@@ -335,18 +336,18 @@ var _self =
     }
     if (
       ((u.Prism = M),
-      (W.stringify = function n(e, t) {
-        if ('string' == typeof e) return e;
-        if (Array.isArray(e)) {
-          var r = '';
-          return (
-            e.forEach(function (e) {
-              r += n(e, t);
-            }),
-            r
-          );
-        }
-        var a = {
+        (W.stringify = function n(e, t) {
+          if ('string' == typeof e) return e;
+          if (Array.isArray(e)) {
+            var r = '';
+            return (
+              e.forEach(function (e) {
+                r += n(e, t);
+              }),
+              r
+            );
+          }
+          var a = {
             type: e.type,
             content: n(e.content, t),
             tag: 'span',
@@ -354,51 +355,51 @@ var _self =
             attributes: {},
             language: t,
           },
-          i = e.alias;
-        i &&
-          (Array.isArray(i)
-            ? Array.prototype.push.apply(a.classes, i)
-            : a.classes.push(i)),
-          M.hooks.run('wrap', a);
-        var l = '';
-        for (var o in a.attributes)
-          l +=
-            ' ' +
-            o +
-            '="' +
-            (a.attributes[o] || '').replace(/"/g, '&quot;') +
-            '"';
-        return (
-          '<' +
-          a.tag +
-          ' class="' +
-          a.classes.join(' ') +
-          '"' +
-          l +
-          '>' +
-          a.content +
-          '</' +
-          a.tag +
-          '>'
-        );
-      }),
-      !u.document)
+            i = e.alias;
+          i &&
+            (Array.isArray(i)
+              ? Array.prototype.push.apply(a.classes, i)
+              : a.classes.push(i)),
+            M.hooks.run('wrap', a);
+          var l = '';
+          for (var o in a.attributes)
+            l +=
+              ' ' +
+              o +
+              '="' +
+              (a.attributes[o] || '').replace(/"/g, '&quot;') +
+              '"';
+          return (
+            '<' +
+            a.tag +
+            ' class="' +
+            a.classes.join(' ') +
+            '"' +
+            l +
+            '>' +
+            a.content +
+            '</' +
+            a.tag +
+            '>'
+          );
+        }),
+        !u.document)
     )
       return (
         u.addEventListener &&
-          (M.disableWorkerMessageHandler ||
-            u.addEventListener(
-              'message',
-              function (e) {
-                var n = JSON.parse(e.data),
-                  t = n.language,
-                  r = n.code,
-                  a = n.immediateClose;
-                u.postMessage(M.highlight(r, M.languages[t], t)),
-                  a && u.close();
-              },
-              !1,
-            )),
+        (M.disableWorkerMessageHandler ||
+          u.addEventListener(
+            'message',
+            function (e) {
+              var n = JSON.parse(e.data),
+                t = n.language,
+                r = n.code,
+                a = n.immediateClose;
+              u.postMessage(M.highlight(r, M.languages[t], t)),
+                a && u.close();
+            },
+            !1,
+          )),
         M
       );
     var t = M.util.currentScript();
@@ -408,15 +409,15 @@ var _self =
     if (
       (t &&
         ((M.filename = t.src),
-        t.hasAttribute('data-manual') && (M.manual = !0)),
-      !M.manual)
+          t.hasAttribute('data-manual') && (M.manual = !0)),
+        !M.manual)
     ) {
       var a = document.readyState;
       'loading' === a || ('interactive' === a && t && t.defer)
         ? document.addEventListener('DOMContentLoaded', r)
         : window.requestAnimationFrame
-        ? window.requestAnimationFrame(r)
-        : window.setTimeout(r, 16);
+          ? window.requestAnimationFrame(r)
+          : window.setTimeout(r, 16);
     }
     return M;
   })(_self);
