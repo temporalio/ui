@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, test } from 'vitest';
+import { afterEach, beforeEach, describe, test, expect } from 'vitest';
 
 import TableBodyCell from '../table-body-cell.svelte';
 import { WorkflowHeaderLabels } from '$lib/stores/workflow-table-columns';
