@@ -27,6 +27,7 @@
 {#if label === 'Run ID' || label === 'Workflow ID' || label === 'Type'}
   <td
     class="workflows-summary-table-body-cell filterable"
+    data-testid="workflows-summary-table-body-cell"
     on:mouseover={showFilterOrCopy}
     on:focus={showFilterOrCopy}
     on:mouseleave={hideFilterOrCopy}
@@ -53,7 +54,10 @@
     {/if}
   </td>
 {:else}
-  <td class="workflows-summary-table-body-cell">
+  <td
+    class="workflows-summary-table-body-cell"
+    data-testid="workflows-summary-table-body-cell"
+  >
     {#if label === 'Status'}
       <WorkflowStatus status={workflow.status} />
     {:else if label === 'End'}

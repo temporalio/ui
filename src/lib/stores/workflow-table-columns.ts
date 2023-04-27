@@ -4,7 +4,7 @@ import { customSearchAttributes } from './search-attributes';
 
 export const MAX_PINNED_COLUMNS = 2;
 
-const WorkflowHeaderLabels = [
+export const WorkflowHeaderLabels = [
   'Status',
   'Workflow ID',
   'Run ID',
