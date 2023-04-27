@@ -8,7 +8,7 @@ export type TextFilterKeys = Extract<
 
 export const attributeToHumanReadable: Record<TextFilterAttributes, string> = {
   WorkflowId: 'Workflow ID',
-  WorkflowType: 'Workflow Type',
+  WorkflowType: 'Type',
   RunId: 'Run ID',
 };
 

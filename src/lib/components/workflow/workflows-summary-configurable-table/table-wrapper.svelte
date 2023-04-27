@@ -48,6 +48,7 @@
 
 <div
   class="resizer"
+  data-testid="workflows-summary-table-resize-handle"
   class:batch-actions-enabled={$batchActionsEnabled}
   class:batch-actions-visible={$batchActionsVisible}
   class:no-columns-pinned={noPinnedColumns}
