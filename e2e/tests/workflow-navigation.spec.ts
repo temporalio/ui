@@ -61,6 +61,34 @@ test('Top Navigation current namespace is present and has other namespaces to se
   );
 });
 
+test('Top Navigation current namespace is present and has other namespaces to search and stays open with space press', async ({
+  page,
+}) => {
+  await mockNamespacesApi(page);
+  await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
+
+  await expect(page.getByTestId('namespace-select-button')).toBeVisible();
+  await expect(
+    page.getByTestId('data-encoder-status-configured'),
+  ).toBeVisible();
+
+  await page.getByTestId('namespace-select-button').click();
+  await expect(page.getByPlaceholder('Search')).toBeFocused();
+  await expect(page.getByRole('link', { name: 'default' })).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'some-other-namespace' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'temporal-system' }),
+  ).not.toBeVisible();
+
+  await page.getByPlaceholder('Search').type('some other namespace');
+  await expect(page.getByRole('link', { name: 'default' })).not.toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'some-other-namespace' }),
+  ).not.toBeVisible();
+});
+
 test('Top Navigation current namespace is not present on non-namespace specific pages', async ({
   page,
 }) => {
