@@ -13,9 +13,9 @@ export const attributeToHumanReadable: Record<TextFilterAttributes, string> = {
 };
 
 export const attributeToId: Record<TextFilterAttributes, string> = {
-  WorkflowId: 'workflowId',
-  WorkflowType: 'workflowType',
-  RunId: 'runId',
+  WorkflowId: 'workflow-id',
+  WorkflowType: 'workflow-type',
+  RunId: 'run-id',
 };
 
 export const searchAttributeToWorkflowKey: Record<
