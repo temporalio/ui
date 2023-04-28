@@ -77,6 +77,8 @@
         ? workflow.stateTransitionCount
         : ''}
     {:else if label === 'Execution Time'}
+      {formatDate(workflow.executionTime, $timeFormat)}
+    {:else if label === 'Execution Duration'}
       {formatDistance({ start: workflow.startTime, end: workflow.endTime })}
     {:else if label === 'History Length'}
       {parseInt(workflow.historyEvents, 10) > 0 ? workflow.historyEvents : ''}

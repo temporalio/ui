@@ -2,7 +2,9 @@
 
 exports[`Table_body_cell$ > End renders 1`] = `"<td class=\\"workflows-summary-table-body-cell svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\">2023-04-28 UTC 00:00:00.00</td>"`;
 
-exports[`Table_body_cell$ > Execution Time renders 1`] = `"<td class=\\"workflows-summary-table-body-cell svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\">1 day</td>"`;
+exports[`Table_body_cell$ > Execution Duration renders 1`] = `"<td class=\\"workflows-summary-table-body-cell svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\">1 day</td>"`;
+
+exports[`Table_body_cell$ > Execution Time renders 1`] = `"<td class=\\"workflows-summary-table-body-cell svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\">2023-04-27 UTC 01:00:00.00</td>"`;
 
 exports[`Table_body_cell$ > History Length renders 1`] = `"<td class=\\"workflows-summary-table-body-cell svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\">42</td>"`;
 

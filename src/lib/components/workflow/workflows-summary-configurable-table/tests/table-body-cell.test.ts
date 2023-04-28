@@ -10,6 +10,7 @@ const workflow: WorkflowExecution = {
   runId: 'def-456',
   startTime: '2023-04-27T00:00:00.000000000Z',
   endTime: '2023-04-28T00:00:00.000000000Z',
+  executionTime: '2023-04-27T01:00:00.000000000Z',
   status: 'Running',
   taskQueue: 'task-queue',
   historyEvents: '42',
