@@ -19,6 +19,7 @@
         {events}
         {firstEvent}
         expandAll={false}
+        inEventGroup
         last={index === event.eventList.length - 1}
       />
     {/each}

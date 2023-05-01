@@ -15,6 +15,7 @@
   export let final = false;
   export let pending = false;
   export let expandAll = false;
+  export let inEventGroup = false;
   export let inSubGroup = false;
 
   $: expanded = expandAll || false;
@@ -65,6 +66,7 @@
             expanded={expandAll || expanded}
             {showClassification}
             {hasGroupEvents}
+            {inEventGroup}
             {inSubGroup}
           />
         </div>

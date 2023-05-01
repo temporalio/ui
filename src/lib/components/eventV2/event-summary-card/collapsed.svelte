@@ -5,20 +5,18 @@
   import Details from './details.svelte';
   import { eventGroupDisplayName } from '../event-detail-keys';
   import EventClassification from './event-classification.svelte';
+  import type { IterableEvent } from '$lib/types/events';
 
   export let event: IterableEvent;
   export let expanded = false;
   export let pending = false;
   export let showClassification = false;
   export let hasGroupEvents = false;
+  export let inEventGroup = false;
   export let inSubGroup = false;
 
   $: initialEvent = isEventGroup(event) ? event.initialEvent : event;
   $: lastEvent = isEventGroup(event) ? event.lastEvent : event;
-
-  $: if (pending) {
-    console.log('pending event: ', event);
-  }
 </script>
 
 <div class="flex cursor-pointer flex-col justify-between gap-2 md:flex-row">
@@ -37,7 +35,7 @@
             {event.activityType}
           </p>
         </div>
-      {:else}
+      {:else if !inEventGroup}
         <p
           class="event-name truncate text-sm font-semibold md:text-sm xl:text-md"
         >

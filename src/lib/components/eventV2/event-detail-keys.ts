@@ -30,6 +30,7 @@ import {
   isWorkflowTaskStartedEvent,
   isWorkflowTaskTimedOutEvent,
 } from '$lib/utilities/is-event-type';
+import type { IterableEvent } from '$lib/types/events';
 
 type BadgeType =
   | 'alpha'
