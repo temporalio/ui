@@ -38,11 +38,7 @@
       root.classList.add(`language-${language}`);
     }
 
-    try {
-      window.Prism.highlightElement(root, async);
-    } catch (e) {
-      console.error('Could not find Prism file to highlight');
-    }
+    window.Prism.highlightElement(root, async);
   }
 
   $: {

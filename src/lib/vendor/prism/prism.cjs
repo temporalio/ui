@@ -188,6 +188,11 @@ var _self =
                 M.filename ??
                 `${window.location.origin}/src/lib/vendor/prism/prism.cjs`;
               var s = new Worker(filename);
+
+              s.onerror = function () {
+                o(M.highlight(l.code, l.grammar, l.language));
+              };
+
               (s.onmessage = function (e) {
                 o(e.data);
               }),
