@@ -7,13 +7,28 @@
   import Table from '$lib/holocene/table/table.svelte';
 
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import type { ChildWorkflowExecutionCompletedEvent } from '$lib/types/events';
 
+  export let children: ChildWorkflowExecutionCompletedEvent[] = [];
   export let pendingChildren: WorkflowExecution['pendingChildren'] = [];
   export let namespace: string;
+
+  $: formattedPending = pendingChildren.map((c) => {
+    return { runId: c.runId, workflowId: c.workflowId, status: 'Pending' };
+  });
+  $: formattedCompleted = children.map((c) => {
+    return {
+      runId: c.attributes.workflowExecution.runId,
+      workflowId: c.attributes.workflowExecution.workflowId,
+      status: c.classification,
+    };
+  });
+
+  $: formattedAll = [...formattedPending, ...formattedCompleted];
 </script>
 
 <Pagination
-  items={pendingChildren}
+  items={formattedAll}
   itemsPerPage={10}
   let:visibleItems
   aria-label="child workflows"
@@ -22,6 +37,7 @@
     <TableHeaderRow slot="headers">
       <th>Child Workflow ID</th>
       <th>Child Run ID</th>
+      <th class="hidden md:block">Status</th>
     </TableHeaderRow>
     {#each visibleItems as child (child.runId)}
       <TableRow
@@ -36,6 +52,9 @@
         </td>
         <td>
           {child.runId}
+        </td>
+        <td class="hidden md:block">
+          {child.status}
         </td>
       </TableRow>
     {/each}

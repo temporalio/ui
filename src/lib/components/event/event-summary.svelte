@@ -6,7 +6,7 @@
     expandAllEvents,
   } from '$lib/stores/event-view';
   import { refresh } from '$lib/stores/workflow-run';
-  import { eventHistory } from '$lib/stores/events';
+  import { eventHistory, fullEventHistory } from '$lib/stores/events';
   import { eventCategoryFilter } from '$lib/stores/filters';
   import { authUser } from '$lib/stores/auth-user';
 
@@ -27,11 +27,10 @@
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
 
-  let fullHistory: CommonHistoryEvent[] = [];
   let loading: boolean = true;
 
   const resetFullHistory = () => {
-    fullHistory = [];
+    $fullEventHistory = [];
     loading = true;
   };
 
@@ -43,7 +42,7 @@
   ) => {
     const { settings } = $page.data;
     resetFullHistory();
-    fullHistory = await fetchAllEvents({
+    $fullEventHistory = await fetchAllEvents({
       namespace,
       workflowId,
       runId,
@@ -78,10 +77,12 @@
     $eventFilterSort === 'descending' && !compact
       ? $eventHistory?.end
       : $eventHistory?.start;
-  $: currentEvents = fullHistory.length ? fullHistory : intialEvents;
+  $: currentEvents = $fullEventHistory.length
+    ? $fullEventHistory
+    : intialEvents;
   $: initialItem = currentEvents?.[0];
   $: items = getEventsOrGroups(currentEvents, category);
-  $: updating = currentEvents.length && !fullHistory.length;
+  $: updating = currentEvents.length && !$fullEventHistory.length;
 </script>
 
 <Pagination

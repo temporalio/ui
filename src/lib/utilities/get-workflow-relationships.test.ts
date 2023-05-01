@@ -5,6 +5,7 @@ import completedEvents from '$fixtures/events.completed.json';
 import continuedAsNewEvents from '$fixtures/events.continued-as-new.json';
 import failedEvents from '$fixtures/events.failed.json';
 import timedOutEvents from '$fixtures/events.timed-out.json';
+import childEvents from '$fixtures/events.children.json';
 
 import completedWorkflow from '$fixtures/workflow.completed.json';
 import continuedAsNewWorkflow from '$fixtures/workflow.continued-as-new.json';
@@ -25,15 +26,55 @@ describe('getWorkflowRelationships', () => {
 
   it('hasChildren should return true if there are pending children', () => {
     expect(
-      getWorkflowRelationships(pendingChildrenWorkflow, completedEventHistory)
-        .hasChildren,
+      getWorkflowRelationships(
+        pendingChildrenWorkflow,
+        completedEventHistory,
+        completedEvents,
+      ).hasChildren,
     ).toBe(true);
+  });
+
+  it('hasChildren should return true if there are pending children and non-pending children', () => {
+    expect(
+      getWorkflowRelationships(
+        pendingChildrenWorkflow,
+        completedEventHistory,
+        childEvents,
+      ).hasChildren,
+    ).toBe(true);
+    expect(
+      getWorkflowRelationships(
+        pendingChildrenWorkflow,
+        completedEventHistory,
+        childEvents,
+      ).children.length,
+    ).toBe(15);
+  });
+
+  it('hasChildren should return true if there are no pending children and non-pending children', () => {
+    expect(
+      getWorkflowRelationships(
+        runningWorkflow,
+        completedEventHistory,
+        childEvents,
+      ).hasChildren,
+    ).toBe(true);
+    expect(
+      getWorkflowRelationships(
+        runningWorkflow,
+        completedEventHistory,
+        childEvents,
+      ).children.length,
+    ).toBe(15);
   });
 
   it('hasRelationships should return false if there are is not a parent, pending children, first, previous, or next', () => {
     expect(
-      getWorkflowRelationships(runningWorkflow, completedEventHistory)
-        .hasChildren,
+      getWorkflowRelationships(
+        runningWorkflow,
+        completedEventHistory,
+        completedEvents,
+      ).hasChildren,
     ).toBe(false);
   });
 
@@ -48,6 +89,7 @@ describe('getWorkflowRelationships', () => {
       getWorkflowRelationships(
         continuedAsNewWorkflow,
         continuedAsNewEventHistory,
+        completedEvents,
       ).first,
     ).toBe(firstExecutionRunId);
   });
@@ -65,6 +107,7 @@ describe('getWorkflowRelationships', () => {
       getWorkflowRelationships(
         continuedAsNewWorkflowCopy,
         continuedAsNewEventHistory,
+        completedEvents,
       ).first,
     ).toBe(firstExecutionRunId);
 
@@ -74,6 +117,7 @@ describe('getWorkflowRelationships', () => {
       getWorkflowRelationships(
         continuedAsNewWorkflowCopy,
         continuedAsNewEventHistory,
+        completedEvents,
       ).first,
     ).toBe(undefined);
   });
@@ -88,6 +132,7 @@ describe('getWorkflowRelationships', () => {
       getWorkflowRelationships(
         continuedAsNewWorkflow,
         continuedAsNewEventHistory,
+        completedEvents,
       ).previous,
     ).toBe(continuedExecutionRunId);
   });
@@ -103,6 +148,7 @@ describe('getWorkflowRelationships', () => {
       getWorkflowRelationships(
         continuedAsNewWorkflow,
         continuedAsNewEventHistory,
+        completedEvents,
       ).next,
     ).toBe(newExecutionRunId);
   });
@@ -115,7 +161,11 @@ describe('getWorkflowRelationships', () => {
       workflowExecutionCompletedEvent?.attributes?.newExecutionRunId;
 
     expect(
-      getWorkflowRelationships(completedWorkflow, completedEventHistory).next,
+      getWorkflowRelationships(
+        completedWorkflow,
+        completedEventHistory,
+        completedEvents,
+      ).next,
     ).toBe(newExecutionRunId);
   });
 
@@ -127,10 +177,14 @@ describe('getWorkflowRelationships', () => {
       workflowExecutionCompletedEvent?.attributes?.newExecutionRunId;
 
     expect(
-      getWorkflowRelationships(timedOutWorkflow, {
-        start: timedOutEvents,
-        end: timedOutEvents,
-      }).next,
+      getWorkflowRelationships(
+        timedOutWorkflow,
+        {
+          start: timedOutEvents,
+          end: timedOutEvents,
+        },
+        completedEvents,
+      ).next,
     ).toBe(newExecutionRunId);
   });
 
@@ -142,10 +196,14 @@ describe('getWorkflowRelationships', () => {
       workflowExecutionCompletedEvent?.attributes?.newExecutionRunId;
 
     expect(
-      getWorkflowRelationships(failedWorkflow, {
-        start: failedEvents,
-        end: failedEvents,
-      }).next,
+      getWorkflowRelationships(
+        failedWorkflow,
+        {
+          start: failedEvents,
+          end: failedEvents,
+        },
+        completedEvents,
+      ).next,
     ).toBe(newExecutionRunId);
   });
 });

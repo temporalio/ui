@@ -9,11 +9,13 @@
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
 
   import type { WorkflowIdentifier } from '$lib/types/workflows';
+  import type { WorkflowEvent } from '$lib/types/events';
 
   export let hasChildren: boolean;
   export let hasRelationships: boolean;
   export let first: string;
   export let parent: WorkflowIdentifier;
+  export let children: WorkflowEvent[];
   export let next: string;
   export let previous: string;
 
@@ -26,6 +28,9 @@
       <Badge type={parent ? 'purple' : 'gray'}>{parent ? 1 : 0} Parent</Badge>
       <Badge type={hasChildren ? 'purple' : 'gray'}
         >{$workflowRun.workflow.pendingChildren.length} Pending Children</Badge
+      >
+      <Badge type={children.length ? 'purple' : 'gray'}
+        >{children.length} Children</Badge
       >
       <Badge type={first ? 'purple' : 'gray'}>{first ? 1 : 0} First</Badge>
       <Badge type={previous ? 'purple' : 'gray'}>
@@ -112,6 +117,7 @@
       </div>
       {#if hasChildren}
         <ChildWorkflowsTable
+          {children}
           pendingChildren={$workflowRun.workflow.pendingChildren}
           namespace={$page.params.namespace}
         />
