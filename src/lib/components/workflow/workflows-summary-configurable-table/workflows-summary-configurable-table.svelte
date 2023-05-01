@@ -84,6 +84,17 @@
   $: pinnedColumns = $workflowTableColumns.filter((column) => column.pinned);
   $: otherColumns = $workflowTableColumns.filter((column) => !column.pinned);
 
+  const goToEventHistory = (event: MouseEvent, workflow: WorkflowExecution) => {
+    if (event.target instanceof HTMLAnchorElement) return;
+    goto(
+      routeForEventHistory({
+        namespace,
+        workflow: workflow.id,
+        run: workflow.runId,
+      }),
+    );
+  };
+
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
   };
@@ -104,16 +115,6 @@
   const handleCheckboxChange = (event: CustomEvent<{ checked: boolean }>) => {
     const { checked } = event.detail;
     dispatch('togglePage', { checked, ...(checked && { workflows }) });
-  };
-
-  const goToWorkflow = (workflow: WorkflowExecution) => {
-    goto(
-      routeForEventHistory({
-        namespace,
-        workflow: workflow.id,
-        run: workflow.runId,
-      }),
-    );
   };
 
   let resizableContainer: HTMLDivElement;
@@ -231,7 +232,7 @@
           {#each workflows as workflow}
             <tr
               class="workflow-summary-configurable-row pinned"
-              on:click={() => goToWorkflow(workflow)}
+              on:click={(e) => goToEventHistory(e, workflow)}
             >
               {#if $supportsBulkActions}
                 <td>
@@ -245,7 +246,15 @@
                 </td>
               {/if}
               {#each pinnedColumns as column}
-                <WorkflowsSummaryTableBodyCell {column} {workflow} />
+                <WorkflowsSummaryTableBodyCell
+                  href={routeForEventHistory({
+                    namespace,
+                    workflow: workflow.id,
+                    run: workflow.runId,
+                  })}
+                  {column}
+                  {workflow}
+                />
               {/each}
             </tr>
           {/each}
@@ -257,6 +266,7 @@
   </div>
   <div
     class="resizer"
+    class:batch-actions-enabled={$supportsBulkActions}
     class:no-columns-pinned={pinnedColumns.length === 0}
     class:batch-actions-visible={showBulkActions}
     on:mousedown|stopPropagation|preventDefault={handleMouseDown}
@@ -286,10 +296,18 @@
           {#each workflows as workflow}
             <tr
               class="workflow-summary-configurable-row"
-              on:click={() => goToWorkflow(workflow)}
+              on:click={(e) => goToEventHistory(e, workflow)}
             >
               {#each otherColumns as column}
-                <WorkflowsSummaryTableBodyCell {column} {workflow} />
+                <WorkflowsSummaryTableBodyCell
+                  href={routeForEventHistory({
+                    namespace,
+                    workflow: workflow.id,
+                    run: workflow.runId,
+                  })}
+                  {column}
+                  {workflow}
+                />
               {/each}
               <td />
             </tr>
@@ -420,6 +438,10 @@
     @apply z-10 bg-primary w-0 border-r-[3px] border-primary cursor-col-resize;
   }
 
+  .resizer.no-columns-pinned:not(.batch-actions-enabled) {
+    @apply hidden;
+  }
+
   .resizer.no-columns-pinned,
   .resizer.batch-actions-visible {
     @apply pointer-events-none;
@@ -444,7 +466,7 @@
   }
 
   .workflow-summary-table-wrapper.pinned.no-columns-pinned.batch-actions-visible {
-    @apply !w-[40px];
+    @apply !w-[40px] z-50;
   }
 
   .workflow-summary-table:not(.pinned) {
@@ -453,10 +475,6 @@
 
   .workflow-summary-header-row {
     @apply bg-primary text-white h-10;
-  }
-
-  .workflow-summary-header-row.pinned.batch-actions-visible {
-    @apply z-20;
   }
 
   .workflow-summary-configurable-row {

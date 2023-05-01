@@ -58,6 +58,17 @@ describe('routeForApi', () => {
       'http://localhost:8233/api/v1/namespaces/namespace/workflows/workflow/runs/run/terminate',
     );
   });
+
+  it('should return a route for workflows with the base url passed in', () => {
+    let route = routeForApi('workflows', parameters);
+    expect(route).toBe(
+      'http://localhost:8233/api/v1/namespaces/namespace/workflows',
+    );
+    route = routeForApi('workflows', parameters, true, 'http://localhost:8000');
+    expect(route).toBe(
+      'http://localhost:8000/api/v1/namespaces/namespace/workflows',
+    );
+  });
 });
 
 describe('API Request Encoding', () => {

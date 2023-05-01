@@ -16,9 +16,7 @@
         "name": "Launch Browser",
         "killOnServerStop": false
       },
-      "env": {
-        "VITE_PUBLIC_PATH": ""
-      }
+      "env": {}
     },
     {
       "name": "Debug Go server",

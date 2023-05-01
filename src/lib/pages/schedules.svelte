@@ -20,10 +20,17 @@
   import { coreUserStore } from '$lib/stores/core-user';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
+  import Link from '$lib/holocene/link.svelte';
 
   $: namespace = $page.params.namespace;
 
-  $: fetchSchedules = fetchAllSchedules(namespace);
+  let hasSchedules = true;
+
+  $: fetchSchedules = fetchAllSchedules(namespace).then((res) => {
+    const { schedules } = res;
+    hasSchedules = Boolean(schedules?.length);
+    return res;
+  });
 
   let coreUser = coreUserStore();
   $: createDisabled = $coreUser.namespaceWriteDisabled(namespace);
@@ -35,9 +42,6 @@
           schedule.scheduleId.toLowerCase().includes(search.toLowerCase()),
         )
       : schedules;
-
-  const errorMessage =
-    'Create scheduled actions using our Public API or Temporal CLI.';
 </script>
 
 <header class="flex flex-col justify-between gap-2 md:flex-row">
@@ -49,13 +53,16 @@
       {namespace}
     </p>
   </div>
-  <Button
-    class="h-10"
-    testId="create-schedule"
-    disabled={createDisabled}
-    on:click={() => goto(routeForScheduleCreate({ namespace }))}
-    >Create Schedule</Button
-  >
+  {#if hasSchedules}
+    <Button
+      class="h-10"
+      testId="create-schedule"
+      disabled={createDisabled}
+      on:click={() => goto(routeForScheduleCreate({ namespace }))}
+    >
+      Create Schedule
+    </Button>
+  {/if}
 </header>
 
 {#await fetchSchedules}
@@ -112,13 +119,25 @@
     </Pagination>
   {:else}
     <div class="my-12 flex flex-col items-center justify-start gap-2">
-      <EmptyState title={'No Schedules Found'} content={errorMessage} {error} />
-      <Button
-        as="anchor"
-        target="_external"
-        href="https://docs.temporal.io/workflows/#schedule"
-        >Get Started With Docs</Button
-      >
+      <EmptyState title={'No Schedules Found'} {error}>
+        <p>
+          Go to <Link
+            target="_external"
+            href="https://docs.temporal.io/workflows/#schedule">docs</Link
+          > or get started with <Link
+            target="_external"
+            href="https://docs.temporal.io/cli/schedule">Temporal CLI</Link
+          >.
+        </p>
+        <Button
+          class="mt-4"
+          testId="create-schedule"
+          disabled={createDisabled}
+          on:click={() => goto(routeForScheduleCreate({ namespace }))}
+        >
+          Create Schedule
+        </Button>
+      </EmptyState>
     </div>
   {/if}
 {/await}

@@ -15,7 +15,11 @@
   import Select from '$lib/holocene/select/select.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import SimpleSplitButton from '$lib/holocene/simple-split-button.svelte';
-  import { workflowFilters, workflowSorts } from '$lib/stores/filters';
+  import {
+    persistedTimeFilter,
+    workflowFilters,
+    workflowSorts,
+  } from '$lib/stores/filters';
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Button from '$lib/holocene/button.svelte';
   import TimePicker from '$lib/holocene/time-picker.svelte';
@@ -53,9 +57,18 @@
       value = 'All Time';
       timeField = 'StartTime';
     } else {
-      value = custom ? 'Custom' : timeFilter.value;
+      value =
+        custom || !columnOrderedDurations.includes(timeFilter?.value)
+          ? 'Custom'
+          : timeFilter.value;
       timeField = timeFilter.attribute as string;
     }
+
+    const shouldUpdateTimeFilter =
+      !timeFilter ||
+      columnOrderedDurations.includes(timeFilter?.value) ||
+      timeFilter?.customDate;
+    if (shouldUpdateTimeFilter) $persistedTimeFilter = timeFilter;
   };
 
   $: timeFilter, setTimeValues();

@@ -22,6 +22,7 @@
 
   export let column: WorkflowHeader;
   export let workflow: WorkflowExecution;
+  export let href: string;
 
   $: ({ label } = column);
 
@@ -54,13 +55,14 @@
     updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
   };
 
-  $: cell =
-    label in WORKFLOW_CELLS ? WORKFLOW_CELLS[label] : { label, path: label };
+  $: cell = label in WORKFLOW_CELLS && WORKFLOW_CELLS[label];
   $: {
     if (isPathCell(cell)) {
       cellContent = String(workflow[cell.path]) ?? '';
     } else if (isDataCell(cell)) {
       cellContent = cell.data(workflow, $timeFormat) ?? '';
+    } else {
+      cellContent = '';
     }
   }
 </script>
@@ -71,13 +73,13 @@
   </td>
 {:else if label === 'Type' || label === 'Workflow ID'}
   <td
-    class="workflows-summary-table-body-cell relative"
+    class="workflows-summary-table-body-cell filterable"
     on:mouseover={showFilterOrCopy}
     on:focus={showFilterOrCopy}
     on:mouseleave={hideFilterOrCopy}
     on:blur={hideFilterOrCopy}
   >
-    <span class="table-link">{cellContent}</span>
+    <a {href} class="table-link">{cellContent}</a>
     <FilterOrCopyButtons
       show={filterOrCopyButtonsVisible}
       content={cellContent}
@@ -105,5 +107,9 @@
 <style lang="postcss">
   .workflows-summary-table-body-cell {
     @apply whitespace-nowrap px-2 h-10 text-sm;
+
+    &.filterable {
+      @apply relative pr-24;
+    }
   }
 </style>

@@ -3,6 +3,7 @@
   import type { HTMLButtonAttributes, HTMLAttributes } from 'svelte/elements';
   import { isNull } from '$lib/utilities/is';
   import { type TabContext, TABS } from './tabs.svelte';
+  import { noop } from 'svelte/internal';
 
   type OwnProps = {
     label: string;
@@ -12,6 +13,7 @@
     panelId?: string;
     disabled?: boolean;
     active?: boolean;
+    onClick?: () => void;
   };
 
   type $$Props =
@@ -24,6 +26,7 @@
   export let panelId: string = null;
   export let disabled = false;
   export let active: boolean = null;
+  export let onClick: () => void = noop;
 
   const { registerTab, selectTab, activeTab } = getContext<TabContext>(TABS);
 
@@ -33,6 +36,7 @@
 
   const handleClick = () => {
     selectTab(id);
+    onClick && onClick();
   };
 </script>
 

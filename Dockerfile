@@ -17,9 +17,7 @@ COPY plugins plugins
 COPY .babelrc .npmrc *.json *.yaml *.cjs *.js *.ts ./
 COPY src src
 
-ARG UI_PUBLIC_PATH
 ARG UI_TARGET=local
-ENV VITE_PUBLIC_PATH=$UI_PUBLIC_PATH
 ENV VITE_TEMPORAL_UI_BUILD_TARGET=$UI_TARGET
 RUN pnpm build:server
 

@@ -3,6 +3,7 @@ import {
   getSingleAttributeForEvent,
   shouldDisplayAsExecutionLink,
   shouldDisplayAttribute,
+  getCodeBlockValue,
 } from './get-single-attribute-for-event';
 
 describe('getSingleAttributeForEvent', () => {
@@ -187,5 +188,34 @@ describe('shouldDisplayAttribute', () => {
     expect(shouldDisplayAttribute('suggestContinueAsNew', false)).toBe(false);
     expect(shouldDisplayAttribute('historySizeBytes', '256')).toBe(true);
     expect(shouldDisplayAttribute('historySizeBytes', '0')).toBe(false);
+  });
+});
+
+describe('getCodeBlockValue', () => {
+  it('should return value if value is a string', () => {
+    expect(getCodeBlockValue('test')).toBe('test');
+  });
+
+  it('should return payloads if they exist', () => {
+    expect(getCodeBlockValue({ payloads: [1, 2, 3] })).toEqual([1, 2, 3]);
+    expect(getCodeBlockValue({ payloads: null })).toBe(null);
+  });
+
+  it('should return indexedFields if they exist', () => {
+    expect(getCodeBlockValue({ indexedFields: [1, 2, 3] })).toEqual([1, 2, 3]);
+    expect(getCodeBlockValue({ indexedFields: null })).toBe(null);
+  });
+
+  it('should return points if they exist', () => {
+    expect(getCodeBlockValue({ points: [1, 2, 3] })).toEqual([1, 2, 3]);
+    expect(getCodeBlockValue({ points: null })).toBe(null);
+  });
+
+  it("should return the value if it is not a string and payloads, indexedFields, or points don't exist", () => {
+    expect(getCodeBlockValue({ test: [1, 2, 3] })).toEqual({ test: [1, 2, 3] });
+    expect(getCodeBlockValue(0)).toBe(0);
+    expect(getCodeBlockValue(1)).toBe(1);
+    expect(getCodeBlockValue(null)).toBe(null);
+    expect(getCodeBlockValue([1, 2, 3])).toEqual([1, 2, 3]);
   });
 });

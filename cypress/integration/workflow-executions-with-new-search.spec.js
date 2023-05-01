@@ -190,9 +190,19 @@ describe('Workflow Executions List With Search', () => {
             `/api/v1/namespaces/default/workflows/${workflowId}/runs/${runId}?`,
           { fixture: 'workflow-completed.json' },
         ).as('workflow-api');
+
+        cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/cluster*', {
+          fixture: 'cluster-with-elasticsearch.json',
+        }).as('cluster-api-elasticsearch');
+
+        cy.get('[data-testid="namespaces-button"]').as('namespaces-button');
+        cy.get('[data-testid="workflows-button"]').as('workflows-button');
+        cy.get('[data-testid="namespace-select-button"').as(
+          'namespace-select-button',
+        );
       });
 
-      it('should keep single workflow filter after navigating away and back to workflow list', () => {
+      it('should keep single workflow filter after navigating to workflow history and back to workflow list', () => {
         cy.get('[data-testid="execution-status-filter-button"]').click();
         cy.get('[data-testid="Running"]').click();
         cy.get('body').click(0, 0); // close the Workflow Status filter dropdown
@@ -218,6 +228,144 @@ describe('Workflow Executions List With Search', () => {
           'have.text',
           'Results 15 of 15 workflows',
         );
+      });
+
+      it('should keep workflow datetime filter after navigating away and back to workflow list', () => {
+        cy.get('#time-range-filter').click();
+        cy.contains('3 hours').click();
+        cy.contains('End Time').click();
+
+        cy.url().should('contain', 'CloseTime+%3E');
+        cy.get('#time-range-filter').should('have.text', '3 hours');
+        cy.get('#manual-search').should('contain.value', 'CloseTime > ');
+
+        cy.get('@namespaces-button').click();
+
+        cy.url().should('contain', '/namespaces');
+
+        cy.get('@workflows-button').click();
+
+        cy.url().should('contain', 'CloseTime+%3E');
+        cy.get('#time-range-filter').should('have.text', '3 hours');
+        cy.get('#manual-search').should('contain.value', 'CloseTime > ');
+      });
+
+      it('should keep only the workflow datetime filter after navigating away and back to workflow list', () => {
+        cy.get('#time-range-filter').click();
+        cy.contains('3 hours').click();
+        cy.contains('End Time').click();
+        cy.get('[data-testid="execution-status-filter-button"]').click();
+        cy.get('[data-testid="Running"]').click();
+
+        cy.url().should(
+          'contain',
+          encodeURIComponent(`ExecutionStatus="Running"`),
+        );
+        cy.url().should('contain', 'CloseTime+%3E');
+
+        cy.get('@namespaces-button').click();
+
+        cy.url().should('contain', '/namespaces');
+
+        cy.get('@workflows-button').click();
+
+        cy.url().should('contain', 'CloseTime+%3E');
+        cy.url().should(
+          'not.contain',
+          encodeURIComponent(`ExecutionStatus="Running"`),
+        );
+      });
+
+      it('should not keep workflow datetime filter after navigating to a workflow url with a query', () => {
+        cy.get('#time-range-filter').click();
+        cy.contains('3 hours').click();
+        cy.contains('End Time').click();
+
+        cy.url().should('contain', 'CloseTime+%3E');
+        cy.get('#time-range-filter').should('have.text', '3 hours');
+        cy.get('#manual-search').should('contain.value', 'CloseTime > ');
+
+        cy.visit(
+          '/namespaces/default/workflows/?query=ExecutionStatus%3D%22Running%22',
+        );
+
+        cy.wait('@cluster-api-elasticsearch');
+        cy.wait('@namespaces-api');
+        cy.wait('@workflows-api');
+
+        cy.url().should('contain', 'Running');
+        cy.url().should('not.contain', 'CloseTime+%3E');
+        cy.get('#time-range-filter').should('have.text', 'All Time');
+        cy.get('#manual-search').should('not.contain.value', 'CloseTime > ');
+        cy.get('#manual-search').should(
+          'contain.value',
+          'ExecutionStatus="Running"',
+        );
+      });
+
+      it('should not keep workflow datetime filter after clearing and entering a query into search', () => {
+        cy.get('#time-range-filter').click();
+        cy.contains('3 hours').click();
+        cy.contains('End Time').click();
+
+        cy.url().should('contain', 'CloseTime+%3E');
+        cy.get('#time-range-filter').should('have.text', '3 hours');
+        cy.get('#manual-search').should('contain.value', 'CloseTime > ');
+
+        cy.get('[data-testid="clear-input"]').click();
+        cy.get('#manual-search').type('ExecutionStatus="Running"');
+        cy.get('[data-testid="manual-search-button"]').click();
+
+        cy.url().should('contain', 'Running');
+        cy.url().should('not.contain', 'CloseTime+%3E');
+        cy.get('#time-range-filter').should('have.text', 'All Time');
+        cy.get('#manual-search').should('not.contain.value', 'CloseTime > ');
+        cy.get('#manual-search').should(
+          'contain.value',
+          'ExecutionStatus="Running"',
+        );
+      });
+
+      it('should keep only the workflow datetime filter after navigating to a different namespace', () => {
+        cy.get('#time-range-filter').click();
+        cy.contains('1 hour').click();
+        cy.contains('End Time').click();
+        cy.get('[data-testid="execution-status-filter-button"]').click();
+        cy.get('[data-testid="Running"]').click();
+
+        cy.url().should(
+          'contain',
+          encodeURIComponent(`ExecutionStatus="Running"`),
+        );
+        cy.url().should('contain', 'CloseTime+%3E');
+        cy.get('#time-range-filter').should('have.text', '1 hour');
+        cy.get('#manual-search').should('contain.value', 'CloseTime > ');
+
+        const namespaces = ['default', 'some-other-namespace'];
+        cy.get('@namespace-select-button').click();
+        cy.get('[data-testid="namespace-select-list"]').contains(namespaces[0]);
+        cy.get('[data-test="namespace-list"] > :nth-child(2)').click();
+        cy.get('@namespace-select-button').contains(namespaces[1]);
+
+        cy.url().should(
+          'not.contain',
+          encodeURIComponent(`ExecutionStatus="Running"`),
+        );
+        cy.url().should('contain', 'CloseTime+%3E');
+        cy.get('#time-range-filter').should('have.text', '1 hour');
+        cy.get('#manual-search').should('contain.value', 'CloseTime > ');
+
+        cy.get('@namespace-select-button').click();
+        cy.get('[data-test="namespace-list"] > :nth-child(1)').click();
+        cy.get('@namespace-select-button').contains(namespaces[0]);
+
+        cy.url().should(
+          'not.contain',
+          encodeURIComponent(`ExecutionStatus="Running"`),
+        );
+        cy.url().should('contain', 'CloseTime+%3E');
+        cy.get('#time-range-filter').should('have.text', '1 hour');
+        cy.get('#manual-search').should('contain.value', 'CloseTime > ');
       });
     });
   });

@@ -11,7 +11,12 @@
     workflowsSearchParams,
   } from '$lib/stores/workflows';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import { workflowFilters, workflowSorts } from '$lib/stores/filters';
+  import {
+    persistedTimeFilter,
+    workflowFilters,
+    workflowSorts,
+  } from '$lib/stores/filters';
+  import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import Pagination from '$lib/holocene/pagination.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -27,13 +32,10 @@
   import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { toaster } from '$lib/stores/toaster';
-  import FeatureGuard from '$lib/components/feature-guard.svelte';
-  import WorkflowsSummaryNonConfigurableTable from '$lib/components/workflow/workflows-summary-non-configurable-table/workflows-summary-non-configurable-table.svelte';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table/workflows-summary-configurable-table.svelte';
 
   import type { WorkflowExecution } from '$lib/types/workflows';
 
-  export let workflowTableCustomizationEnabled: boolean = false;
   let selectedWorkflows: WorkflowExecution[] = [];
   let batchTerminateConfirmationModal: BatchOperationConfirmationModal;
   let batchCancelConfirmationModal: BatchOperationConfirmationModal;
@@ -53,13 +55,20 @@
     }
   }
 
+  const persistTimeFilter = () => {
+    if (!query && !$workflowFilters.length && $persistedTimeFilter) {
+      $workflowFilters = [$persistedTimeFilter];
+      updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
+    }
+  };
+
+  $: $page.params.namespace, persistTimeFilter();
+
   onMount(() => {
     $lastUsedNamespace = $page.params.namespace;
     if (query) {
       // Set filters from inital page load query if it exists
       $workflowFilters = toListWorkflowFilters(query);
-    } else {
-      $workflowFilters = [];
     }
   });
 
@@ -268,29 +277,15 @@
   <svelte:fragment slot="action-top-center">
     <WorkflowDateTimeFilter />
   </svelte:fragment>
-  <FeatureGuard enabled={workflowTableCustomizationEnabled}>
-    <WorkflowsSummaryConfigurableTable
-      {allSelected}
-      {pageSelected}
-      bind:selectedWorkflows
-      workflows={visibleItems}
-      filteredWorkflowCount={query ? filteredWorkflowCount : totalWorkflowCount}
-      on:selectAll={() => handleSelectAll(visibleItems)}
-      on:togglePage={handleTogglePage}
-      on:cancelWorkflows={openBatchCancelConfirmationModal}
-      on:terminateWorkflows={openBatchTerminateConfirmationModal}
-    />
-    <WorkflowsSummaryNonConfigurableTable
-      slot="fallback"
-      {allSelected}
-      {pageSelected}
-      bind:selectedWorkflows
-      workflows={visibleItems}
-      filteredWorkflowCount={query ? filteredWorkflowCount : totalWorkflowCount}
-      on:selectAll={() => handleSelectAll(visibleItems)}
-      on:togglePage={handleTogglePage}
-      on:cancelWorkflows={openBatchCancelConfirmationModal}
-      on:terminateWorkflows={openBatchTerminateConfirmationModal}
-    />
-  </FeatureGuard>
+  <WorkflowsSummaryConfigurableTable
+    {allSelected}
+    {pageSelected}
+    bind:selectedWorkflows
+    workflows={visibleItems}
+    filteredWorkflowCount={query ? filteredWorkflowCount : totalWorkflowCount}
+    on:selectAll={() => handleSelectAll(visibleItems)}
+    on:togglePage={handleTogglePage}
+    on:cancelWorkflows={openBatchCancelConfirmationModal}
+    on:terminateWorkflows={openBatchTerminateConfirmationModal}
+  />
 </Pagination>
