@@ -10,6 +10,7 @@
   export let inline = false;
   export let language = 'json';
   export let copyable = true;
+  export let async = true;
 
   let root: HTMLElement;
   $: isJSON = language === 'json';
@@ -37,7 +38,7 @@
       root.classList.add(`language-${language}`);
     }
 
-    window.Prism.highlightElement(root);
+    window.Prism.highlightElement(root, async);
   }
 
   $: {
