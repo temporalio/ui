@@ -9,13 +9,13 @@
   import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
 
   import type { WorkflowIdentifier } from '$lib/types/workflows';
-  import type { WorkflowEvent } from '$lib/types/events';
+  import type { ChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
 
   export let hasChildren: boolean;
   export let hasRelationships: boolean;
   export let first: string;
   export let parent: WorkflowIdentifier;
-  export let children: WorkflowEvent[];
+  export let children: ChildWorkflowClosedEvent[];
   export let next: string;
   export let previous: string;
 

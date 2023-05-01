@@ -7,9 +7,9 @@
   import Table from '$lib/holocene/table/table.svelte';
 
   import type { WorkflowExecution } from '$lib/types/workflows';
-  import type { ChildWorkflowExecutionCompletedEvent } from '$lib/types/events';
+  import type { ChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
 
-  export let children: ChildWorkflowExecutionCompletedEvent[] = [];
+  export let children: ChildWorkflowClosedEvent[] = [];
   export let pendingChildren: WorkflowExecution['pendingChildren'] = [];
   export let namespace: string;
 

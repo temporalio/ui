@@ -10,7 +10,14 @@ import { has } from './has';
 import { isString } from './is';
 
 import type { StartAndEndEventHistory } from '../stores/events';
-import type { WorkflowEvents } from '$lib/types/events';
+import type {
+  ChildWorkflowExecutionCanceledEvent,
+  ChildWorkflowExecutionCompletedEvent,
+  ChildWorkflowExecutionFailedEvent,
+  ChildWorkflowExecutionTerminatedEvent,
+  ChildWorkflowExecutionTimedOutEvent,
+  WorkflowEvents,
+} from '$lib/types/events';
 import type { WorkflowExecution } from '$lib/types/workflows';
 
 const getNewExecutionId = (events: WorkflowEvents): string | undefined => {
@@ -24,7 +31,14 @@ const getNewExecutionId = (events: WorkflowEvents): string | undefined => {
   }
 };
 
-export const isChildWorkflowFinalEvent = (event) => {
+export type ChildWorkflowClosedEvent =
+  | ChildWorkflowExecutionCompletedEvent
+  | ChildWorkflowExecutionFailedEvent
+  | ChildWorkflowExecutionCanceledEvent
+  | ChildWorkflowExecutionTimedOutEvent
+  | ChildWorkflowExecutionTerminatedEvent;
+
+export const isChildWorkflowClosedEvent = (event) => {
   return (
     isChildWorkflowExecutionCompletedEvent(event) ||
     isChildWorkflowExecutionFailedEvent(event) ||
@@ -40,8 +54,8 @@ export const getWorkflowRelationships = (
   fullEventHistory: WorkflowEvents,
 ) => {
   const children = fullEventHistory.filter((event) =>
-    isChildWorkflowFinalEvent(event),
-  );
+    isChildWorkflowClosedEvent(event),
+  ) as ChildWorkflowClosedEvent[];
   const hasChildren = !!workflow?.pendingChildren.length || !!children.length;
   const parent = workflow?.parent;
 
