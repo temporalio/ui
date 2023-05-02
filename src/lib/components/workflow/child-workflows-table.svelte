@@ -41,13 +41,13 @@
   <div slot="pagination-top" />
   <Table class="w-full">
     <TableHeaderRow slot="headers">
-      <th class="hidden md:block">Status</th>
+      <th class="max-md:hidden">Status</th>
       <th>Child Workflow ID</th>
       <th>Child Run ID</th>
     </TableHeaderRow>
     {#each visibleItems as child (child.runId)}
       <TableRow>
-        <td class="hidden md:block">
+        <td class="max-md:hidden">
           <WorkflowStatus status={child.status} />
         </td>
         <td class="hover:text-blue-700 hover:underline">
