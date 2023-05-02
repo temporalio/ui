@@ -1,14 +1,14 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { getContext } from 'svelte';
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import {
-    BATCH_ACTION_CONTEXT,
-    type BatchActionContext,
+    selectedWorkflows,
+    allSelected,
   } from '$lib/pages/workflows-with-new-search.svelte';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { routeForEventHistory } from '$lib/utilities/route-for';
+  import { supportsBulkActions } from '$lib/stores/bulk-actions';
 
   export let workflow: WorkflowExecution;
   export let pinned = false;
@@ -24,19 +24,13 @@
       }),
     );
   };
-
-  let { selectedWorkflows } =
-    getContext<BatchActionContext>(BATCH_ACTION_CONTEXT);
-
-  const { allSelected, batchActionsEnabled } =
-    getContext<BatchActionContext>(BATCH_ACTION_CONTEXT);
 </script>
 
 <tr
   class="workflows-summary-configurable-table-row"
   on:click={goToEventHistory}
 >
-  {#if pinned && batchActionsEnabled}
+  {#if pinned && $supportsBulkActions}
     <td>
       <Checkbox
         hoverable

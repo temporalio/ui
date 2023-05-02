@@ -1,15 +1,9 @@
 <script lang="ts">
-  import {
-    BATCH_ACTION_CONTEXT,
-    type BatchActionContext,
-  } from '$lib/pages/workflows-with-new-search.svelte';
+  import { batchActionsVisible } from '$lib/pages/workflows-with-new-search.svelte';
+  import { supportsBulkActions } from '$lib/stores/bulk-actions';
   import { pinnedColumnsWidth } from '$lib/stores/workflow-table-columns';
-  import { getContext } from 'svelte';
 
   export let noPinnedColumns: boolean = false;
-
-  const { batchActionsEnabled, batchActionsVisible } =
-    getContext<BatchActionContext>(BATCH_ACTION_CONTEXT);
 
   let pinnedWrapperElement: HTMLDivElement;
   let pinnedWrapperWidth = $pinnedColumnsWidth;
@@ -37,7 +31,7 @@
 
 <div
   class="workflows-summary-table-wrapper pinned"
-  class:batch-actions-enabled={$batchActionsEnabled}
+  class:batch-actions-enabled={$supportsBulkActions}
   class:batch-actions-visible={$batchActionsVisible}
   class:no-columns-pinned={noPinnedColumns}
   bind:this={pinnedWrapperElement}
@@ -49,7 +43,7 @@
 <div
   class="resizer"
   data-testid="workflows-summary-table-resize-handle"
-  class:batch-actions-enabled={$batchActionsEnabled}
+  class:batch-actions-enabled={$supportsBulkActions}
   class:batch-actions-visible={$batchActionsVisible}
   class:no-columns-pinned={noPinnedColumns}
   on:mousedown={handleMouseDown}

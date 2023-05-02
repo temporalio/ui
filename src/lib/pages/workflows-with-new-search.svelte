@@ -1,29 +1,53 @@
 <script lang="ts" context="module">
-  export const BATCH_ACTION_CONTEXT = 'BATCH_ACTION_CONTEXT';
-  export type BatchActionContext = {
-    batchActionsEnabled: Readable<boolean>;
-    batchActionsVisible: Readable<boolean>;
-    allSelected: Writable<boolean>;
-    pageSelected: Writable<boolean>;
-    selectedWorkflows: Writable<WorkflowExecution[]>;
-    handleSelectAll: (workflows: WorkflowExecution[]) => void;
-    handleSelectPage: (
-      checked: boolean,
-      workflows: WorkflowExecution[],
-    ) => void;
-    openBatchCancelConfirmationModal: () => void;
-    openBatchTerminateConfirmationModal: () => void;
+  let batchTerminateConfirmationModal: BatchOperationConfirmationModal;
+  let batchCancelConfirmationModal: BatchOperationConfirmationModal;
+  export const allSelected = writable<boolean>(false);
+  export const pageSelected = writable<boolean>(false);
+  export const selectedWorkflows = writable<WorkflowExecution[]>([]);
+
+  export const batchActionsVisible = derived(
+    selectedWorkflows,
+    (workflows) => workflows.length > 0,
+  );
+
+  export const terminableWorkflows = derived(selectedWorkflows, (workflows) =>
+    workflows.filter((workflow) => workflow.canBeTerminated),
+  );
+
+  export const cancelableWorkflows = derived(selectedWorkflows, (workflows) =>
+    workflows.filter((workflow) => workflow.status === 'Running'),
+  );
+
+  export const openBatchCancelConfirmationModal = () => {
+    batchCancelConfirmationModal.open();
+  };
+
+  export const openBatchTerminateConfirmationModal = () => {
+    batchTerminateConfirmationModal.open();
+  };
+
+  export const handleSelectAll = (workflows: WorkflowExecution[]) => {
+    allSelected.set(true);
+    selectedWorkflows.set([...workflows]);
+  };
+
+  export const handleSelectPage = (
+    checked: boolean,
+    workflows: WorkflowExecution[],
+  ) => {
+    pageSelected.set(checked);
+    if (allSelected) allSelected.set(false);
+    if (checked) {
+      selectedWorkflows.set([...workflows]);
+    } else {
+      selectedWorkflows.set([]);
+    }
   };
 </script>
 
 <script lang="ts">
-  import { onMount, setContext } from 'svelte';
-  import {
-    type Writable,
-    type Readable,
-    writable,
-    derived,
-  } from 'svelte/store';
+  import { onMount } from 'svelte';
+  import { writable, derived } from 'svelte/store';
   import { page } from '$app/stores';
   import {
     refresh,
@@ -50,27 +74,9 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
-  import { supportsBulkActions } from '$lib/stores/bulk-actions';
   import { toaster } from '$lib/stores/toaster';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
   import type { WorkflowExecution } from '$lib/types/workflows';
-
-  let batchTerminateConfirmationModal: BatchOperationConfirmationModal;
-  let batchCancelConfirmationModal: BatchOperationConfirmationModal;
-
-  const allSelected = writable<boolean>(false);
-  const pageSelected = writable<boolean>(false);
-  const selectedWorkflows = writable<WorkflowExecution[]>([]);
-  const batchActionsVisible = derived(
-    selectedWorkflows,
-    (workflows) => workflows.length > 0,
-  );
-  const terminableWorkflows = derived(selectedWorkflows, (workflows) =>
-    workflows.filter((workflow) => workflow.canBeTerminated),
-  );
-  const cancelableWorkflows = derived(selectedWorkflows, (workflows) =>
-    workflows.filter((workflow) => workflow.status === 'Running'),
-  );
 
   $: query = $page.url.searchParams.get('query');
   $: query && ($workflowsQuery = query);
@@ -116,32 +122,6 @@
       allowEmpty: true,
     });
     refreshWorkflows();
-  };
-
-  const openBatchCancelConfirmationModal = () => {
-    batchCancelConfirmationModal.open();
-  };
-
-  const openBatchTerminateConfirmationModal = () => {
-    batchTerminateConfirmationModal.open();
-  };
-
-  const handleSelectAll = (workflows: WorkflowExecution[]) => {
-    $allSelected = true;
-    $selectedWorkflows = [...workflows];
-  };
-
-  const handleSelectPage = (
-    checked: boolean,
-    workflows: WorkflowExecution[],
-  ) => {
-    $pageSelected = checked;
-    if (allSelected) $allSelected = false;
-    if (checked) {
-      $selectedWorkflows = [...workflows];
-    } else {
-      $selectedWorkflows = [];
-    }
   };
 
   const terminateWorkflows = async (event: CustomEvent<{ reason: string }>) => {
@@ -230,18 +210,6 @@
       resetSelection();
     }
   }
-
-  setContext<BatchActionContext>(BATCH_ACTION_CONTEXT, {
-    allSelected,
-    pageSelected,
-    selectedWorkflows,
-    batchActionsEnabled: supportsBulkActions,
-    batchActionsVisible,
-    handleSelectAll,
-    handleSelectPage,
-    openBatchCancelConfirmationModal,
-    openBatchTerminateConfirmationModal,
-  });
 </script>
 
 <BatchOperationConfirmationModal

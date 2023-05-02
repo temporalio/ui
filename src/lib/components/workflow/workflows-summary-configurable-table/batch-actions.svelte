@@ -1,14 +1,16 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { getContext } from 'svelte';
   import BulkActionButton from '$lib/holocene/table/bulk-action-button.svelte';
   import { coreUserStore } from '$lib/stores/core-user';
   import { workflowCount, workflowsQuery } from '$lib/stores/workflows';
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
   import { workflowTerminateEnabled } from '$lib/utilities/workflow-terminate-enabled';
   import {
-    type BatchActionContext,
-    BATCH_ACTION_CONTEXT,
+    allSelected,
+    selectedWorkflows,
+    handleSelectAll,
+    openBatchCancelConfirmationModal,
+    openBatchTerminateConfirmationModal,
   } from '$lib/pages/workflows-with-new-search.svelte';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { derived } from 'svelte/store';
@@ -29,14 +31,6 @@
   $: namespaceWriteDisabled = $coreUser.namespaceWriteDisabled(
     $page.params.namespace,
   );
-
-  const {
-    allSelected,
-    selectedWorkflows,
-    handleSelectAll,
-    openBatchCancelConfirmationModal,
-    openBatchTerminateConfirmationModal,
-  } = getContext<BatchActionContext>(BATCH_ACTION_CONTEXT);
 </script>
 
 {#if $allSelected}

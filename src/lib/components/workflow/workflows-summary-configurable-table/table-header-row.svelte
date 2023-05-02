@@ -1,29 +1,23 @@
 <script lang="ts">
   import Checkbox from '$lib/holocene/checkbox.svelte';
   import type { WorkflowHeader } from '$lib/stores/workflow-table-columns';
-  import { getContext } from 'svelte';
   import BatchActions from './batch-actions.svelte';
   import {
-    type BatchActionContext,
-    BATCH_ACTION_CONTEXT,
+    pageSelected,
+    handleSelectPage,
+    selectedWorkflows,
+    batchActionsVisible,
   } from '$lib/pages/workflows-with-new-search.svelte';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import IconButton from '$lib/holocene/icon-button.svelte';
   import { noop } from 'svelte/internal';
+  import { supportsBulkActions } from '$lib/stores/bulk-actions';
 
   export let pinned = false;
   export let workflows: WorkflowExecution[];
   export let pinnedColumns: WorkflowHeader[];
   export let empty: boolean;
   export let onClickConfigure: () => void = noop;
-
-  let { pageSelected } = getContext<BatchActionContext>(BATCH_ACTION_CONTEXT);
-  const {
-    handleSelectPage,
-    selectedWorkflows,
-    batchActionsEnabled,
-    batchActionsVisible,
-  } = getContext<BatchActionContext>(BATCH_ACTION_CONTEXT);
 
   const handleCheckboxChange = (event: CustomEvent<{ checked: boolean }>) => {
     const { checked } = event.detail;
@@ -36,7 +30,7 @@
 </script>
 
 <tr class="workflows-summary-configurable-table-header-row" class:pinned>
-  {#if pinned && $batchActionsEnabled}
+  {#if pinned && $supportsBulkActions}
     <th class="batch-actions-checkbox-table-cell">
       {#if !empty}
         <Checkbox
@@ -51,7 +45,7 @@
       {/if}
     </th>
   {/if}
-  {#if pinned && $batchActionsEnabled && $batchActionsVisible}
+  {#if pinned && $supportsBulkActions && $batchActionsVisible}
     <th class="batch-actions-table-cell" colspan={pinnedColumns.length || 1}>
       <BatchActions {workflows} />
     </th>

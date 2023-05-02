@@ -1,15 +1,10 @@
 <script lang="ts">
-  import { createEventDispatcher, getContext } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
   import Modal from '$lib/holocene/modal.svelte';
   import { pluralize } from '$lib/utilities/pluralize';
   import Input from '$lib/holocene/input/input.svelte';
   import { authUser } from '$lib/stores/auth-user';
-  import {
-    BATCH_ACTION_CONTEXT,
-    type BatchActionContext,
-  } from '$lib/pages/workflows-with-new-search.svelte';
-
-  const { allSelected } = getContext<BatchActionContext>(BATCH_ACTION_CONTEXT);
+  import { allSelected } from '$lib/pages/workflows-with-new-search.svelte';
 
   type Action = 'Terminate' | 'Cancel';
 
