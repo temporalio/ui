@@ -5,9 +5,8 @@
   import TableRow from '$lib/holocene/table/table-row.svelte';
   import Table from '$lib/holocene/table/table.svelte';
 
-  import type { WorkflowIdentifier } from '$lib/types/workflows';
   import Copyable from '../copyable.svelte';
-  import { isFilterKey } from '$lib/utilities/query/list-workflow-query';
+  import Link from '$lib/holocene/link.svelte';
 
   export let workflow: string;
   export let namespace: string;
@@ -24,9 +23,9 @@
     <th>Next Execution</th>
   </TableHeaderRow>
   <TableRow>
-    <td class="hover:text-blue-700 hover:underline w-1/3">
+    <td class="w-1/3">
       {#if first}
-        <a
+        <Link
           href={routeForEventHistory({
             namespace,
             workflow: workflow,
@@ -34,12 +33,12 @@
           })}
         >
           <Copyable content={first} visible />
-        </a>
+        </Link>
       {/if}
     </td>
-    <td class="hover:text-blue-700 hover:underline w-1/3">
+    <td class="w-1/3">
       {#if previous}
-        <a
+        <Link
           href={routeForEventHistory({
             namespace,
             workflow: workflow,
@@ -47,12 +46,12 @@
           })}
         >
           <Copyable content={previous} visible />
-        </a>
+        </Link>
       {/if}
     </td>
-    <td class="hover:text-blue-700 hover:underline w-1/3">
+    <td class="w-1/3">
       {#if next}
-        <a
+        <Link
           href={routeForEventHistory({
             namespace,
             workflow: workflow,
@@ -60,7 +59,7 @@
           })}
         >
           <Copyable content={next} visible />
-        </a>
+        </Link>
       {/if}
     </td>
   </TableRow>

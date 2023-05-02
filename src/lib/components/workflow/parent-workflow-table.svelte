@@ -6,9 +6,9 @@
   import Table from '$lib/holocene/table/table.svelte';
 
   import type { WorkflowIdentifier } from '$lib/types/workflows';
-  import WorkflowStatus from '../workflow-status.svelte';
-  import type { WorkflowExecutionStatus } from '$lib/types';
   import Copyable from '../copyable.svelte';
+  import { goto } from '$app/navigation';
+  import Link from '$lib/holocene/link.svelte';
 
   export let parent: WorkflowIdentifier;
   export let namespace: string;
@@ -19,19 +19,28 @@
     <th>Parent Workflow ID</th>
     <th>Parent Run ID</th>
   </TableHeaderRow>
-  <TableRow
-    class="hover:text-blue-700 hover:underline"
-    href={routeForEventHistory({
-      namespace,
-      workflow: parent.workflowId,
-      run: parent.runId,
-    })}
-  >
+  <TableRow class="hover:text-blue-700 hover:underline">
     <td>
-      <Copyable content={parent.workflowId} visible />
+      <Link
+        href={routeForEventHistory({
+          namespace,
+          workflow: parent.workflowId,
+          run: parent.runId,
+        })}
+      >
+        <Copyable content={parent.workflowId} visible />
+      </Link>
     </td>
     <td>
-      <Copyable content={parent.runId} visible />
+      <Link
+        href={routeForEventHistory({
+          namespace,
+          workflow: parent.workflowId,
+          run: parent.runId,
+        })}
+      >
+        <Copyable content={parent.runId} visible />
+      </Link>
     </td>
   </TableRow>
 </Table>

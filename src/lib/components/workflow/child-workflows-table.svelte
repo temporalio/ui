@@ -10,16 +10,12 @@
   import type { ChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
   import WorkflowStatus from '../workflow-status.svelte';
   import type { WorkflowExecutionStatus } from '$lib/types';
+  import { goto } from '$app/navigation';
+  import Link from '$lib/holocene/link.svelte';
 
   export let children: ChildWorkflowClosedEvent[] = [];
   export let pendingChildren: WorkflowExecution['pendingChildren'] = [];
   export let namespace: string;
-
-  type ChildWorkflowTableItem = {
-    runId: string;
-    workflowId: string;
-    status: WorkflowExecutionStatus | string;
-  };
 
   $: formattedPending = pendingChildren.map((c) => {
     return { runId: c.runId, workflowId: c.workflowId, status: 'Running' };
@@ -50,23 +46,39 @@
       <th>Child Run ID</th>
     </TableHeaderRow>
     {#each visibleItems as child (child.runId)}
-      <TableRow
-        class="hover:text-blue-700 hover:underline"
-        href={routeForEventHistory({
-          namespace,
-          workflow: child.workflowId,
-          run: child.runId,
-        })}
-      >
+      <TableRow class="hover:text-blue-700 hover:underline">
         <td class="hidden md:block">
-          <WorkflowStatus status={child.status} />
+          <Link
+            href={routeForEventHistory({
+              namespace,
+              workflow: child.workflowId,
+              run: child.runId,
+            })}
+          >
+            <WorkflowStatus status={child.status} />
+          </Link>
         </td>
-
         <td>
-          {child.workflowId}
+          <Link
+            href={routeForEventHistory({
+              namespace,
+              workflow: child.workflowId,
+              run: child.runId,
+            })}
+          >
+            {child.workflowId}
+          </Link>
         </td>
         <td>
-          {child.runId}
+          <Link
+            href={routeForEventHistory({
+              namespace,
+              workflow: child.workflowId,
+              run: child.runId,
+            })}
+          >
+            {child.runId}
+          </Link>
         </td>
       </TableRow>
     {/each}

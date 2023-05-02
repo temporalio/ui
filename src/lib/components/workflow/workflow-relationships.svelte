@@ -45,6 +45,16 @@
       <div class="flex w-full flex-wrap gap-4">
         {#if parent}
           <ParentWorkflowTable {parent} {namespace} />
+          <!-- <WorkflowDetail
+            title="Parent"
+            content={parent.runId}
+            copyable
+            href={routeForEventHistory({
+              namespace,
+              workflow: parent.workflowId,
+              run: parent.runId,
+            })}
+          /> -->
         {/if}
         {#if first || previous || next}
           <FirstPreviousNextWorkflowTable
