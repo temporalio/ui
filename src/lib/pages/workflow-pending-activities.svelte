@@ -64,7 +64,7 @@
                 <li class="event-table-row">
                   <h4>Next Retry</h4>
                   <Badge type="error">
-                    {toTimeDifference(details.scheduledTime)}
+                    {toTimeDifference(details.scheduledTime) || 'None'}
                   </Badge>
                 </li>
               {/if}
