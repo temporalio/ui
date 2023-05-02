@@ -40,7 +40,7 @@
     {#each $availableWorkflowColumns as { label }}
       <OrderableListItem static on:addItem={() => addColumn(label)} {label} />
     {:else}
-      <OrderableListItem label="All available headings are in view" />
+      <OrderableListItem readonly label="All available headings are in view" />
     {/each}
   </OrderableList>
   <OrderableList>
