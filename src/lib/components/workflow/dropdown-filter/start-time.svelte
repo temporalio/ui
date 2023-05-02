@@ -15,7 +15,7 @@
   keepOpen
   right
 >
-  <svelte:fragment slot="label">Start Time</svelte:fragment>
+  <svelte:fragment slot="label">Start</svelte:fragment>
   <div class="flex w-44 flex-col gap-2 p-2">
     <Sort type="StartTime" />
   </div>

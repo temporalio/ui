@@ -16,6 +16,7 @@ export type WorkflowExecutionInfo = Replace<
     stateTransitionCount: string;
     startTime: string;
     closeTime: string;
+    executionTime: string;
     historySizeBytes: string;
     historyLength: string;
     searchAttributes?: WorkflowSearchAttributes;
@@ -96,6 +97,7 @@ export type WorkflowExecution = {
   runId: string;
   startTime: string;
   endTime: string;
+  executionTime: string;
   status: WorkflowStatus;
   taskQueue?: string;
   historyEvents: string;

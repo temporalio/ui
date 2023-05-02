@@ -1,74 +1,52 @@
-import { formatBytes } from '$lib/utilities/format-bytes';
-import { formatDate } from '$lib/utilities/format-date';
-import { formatDistance } from '$lib/utilities/format-time';
 import { derived, type Readable } from 'svelte/store';
 import { persistStore } from './persist-store';
 import { customSearchAttributes } from './search-attributes';
 
-import type { TimeFormat } from '$lib/types/global';
-import type { WorkflowExecution } from '$lib/types/workflows';
-
 export const MAX_PINNED_COLUMNS = 2;
 
-export type WorkflowHeaderLabel =
-  | 'Status'
-  | 'Workflow ID'
-  | 'Run ID'
-  | 'Type'
-  | 'Start'
-  | 'End'
-  | 'History Size'
-  | 'History Length'
-  | 'Execution Time'
-  | 'State Transitions'
-  | 'Parent Namespace'
-  | 'Parent Workflow ID'
-  | 'Task Queue';
+export const WorkflowHeaderLabels = [
+  'Status',
+  'Workflow ID',
+  'Run ID',
+  'Type',
+  'Start',
+  'End',
+  'History Size',
+  'History Length',
+  'Execution Time',
+  'Execution Duration',
+  'State Transitions',
+  'Parent Namespace',
+  'Parent Workflow ID',
+  'Task Queue',
+] as const;
+
+export type WorkflowHeaderLabel = (typeof WorkflowHeaderLabels)[number];
+
+// https://github.com/microsoft/TypeScript/issues/29729
+// https://stackoverflow.com/a/61048124
+// eslint-disable-next-line @typescript-eslint/ban-types
+type AnyWorkflowHeaderLabel = WorkflowHeaderLabel | (string & {});
 
 export type WorkflowHeader = {
-  label: WorkflowHeaderLabel | string;
+  label: AnyWorkflowHeaderLabel;
   pinned: boolean;
 };
-
-interface BaseWorkflowCell {
-  label: WorkflowHeaderLabel;
-}
-
-interface PathCell extends BaseWorkflowCell {
-  path: keyof WorkflowExecution;
-  data?: never;
-}
-
-interface DataCell extends BaseWorkflowCell {
-  data: (
-    workflow: WorkflowExecution,
-    timeFormat: TimeFormat | string,
-  ) => string;
-  path?: never;
-}
-
-type WorkflowCell = PathCell | DataCell;
-
-export const isPathCell = (cell: WorkflowCell): cell is PathCell =>
-  !!cell?.path;
-
-export const isDataCell = (cell: WorkflowCell): cell is DataCell =>
-  !!cell?.data;
 
 type State = WorkflowHeader[];
 
 type Action =
   | {
       type: 'WORKFLOW_COLUMN.ADD';
-      payload: { label: WorkflowHeaderLabel | string };
+      payload: { label: AnyWorkflowHeaderLabel };
     }
   | {
       type: 'WORKFLOW_COLUMN.REMOVE';
-      payload: { label: WorkflowHeaderLabel | string };
+      payload: { label: AnyWorkflowHeaderLabel };
     }
   | {
       type: 'WORKFLOW_COLUMN.PIN';
-      payload: { label: WorkflowHeaderLabel | string };
+      payload: { label: AnyWorkflowHeaderLabel };
     }
   | { type: 'WORKFLOW_COLUMN.MOVE'; payload: { from: number; to: number } };
 
@@ -85,59 +63,14 @@ const DEFAULT_AVAILABLE_COLUMNS: WorkflowHeader[] = [
   { label: 'History Size', pinned: false },
   { label: 'History Length', pinned: false },
   { label: 'Execution Time', pinned: false },
+  { label: 'Execution Duration', pinned: false },
   { label: 'State Transitions', pinned: false },
   { label: 'Parent Namespace', pinned: false },
   { label: 'Parent Workflow ID', pinned: false },
   { label: 'Task Queue', pinned: false },
 ];
 
-export const WORKFLOW_CELLS: Record<WorkflowHeaderLabel, WorkflowCell> = {
-  Status: { label: 'Status', path: 'status' },
-  'Workflow ID': { label: 'Workflow ID', path: 'id' },
-  'Run ID': { label: 'Run ID', path: 'runId' },
-  Type: { label: 'Type', path: 'name' },
-  Start: {
-    label: 'Start',
-    data: ({ startTime }: WorkflowExecution, format: TimeFormat | string) =>
-      formatDate(startTime, format),
-  },
-  End: {
-    label: 'End',
-    data: ({ endTime }: WorkflowExecution, format: TimeFormat | string) =>
-      endTime ? formatDate(endTime, format) : '',
-  },
-  'History Length': {
-    label: 'History Length',
-    data: ({ historyEvents }) =>
-      parseInt(historyEvents) > 0 ? historyEvents : '',
-  },
-  'History Size': {
-    label: 'History Size',
-    data: ({ historySizeBytes }: WorkflowExecution) =>
-      parseInt(historySizeBytes) > 0
-        ? formatBytes(parseInt(historySizeBytes, 10))
-        : '',
-  },
-  'Execution Time': {
-    label: 'Execution Time',
-    data: ({ startTime, endTime }: WorkflowExecution) =>
-      formatDistance({ start: startTime, end: endTime }),
-  },
-  'State Transitions': {
-    label: 'State Transitions',
-    data: ({ stateTransitionCount }) =>
-      stateTransitionCount > 0 ? stateTransitionCount : '',
-  },
-  'Parent Namespace': { label: 'Parent Namespace', path: 'parentNamespaceId' },
-  'Parent Workflow ID': {
-    label: 'Parent Workflow ID',
-    data: (workflowExecution: WorkflowExecution) =>
-      workflowExecution?.parent ? workflowExecution.parent.workflowId : '',
-  },
-  'Task Queue': { label: 'Task Queue', path: 'taskQueue' },
-};
-
-const workflowTableColumns = persistStore(
+const workflowTableColumns = persistStore<WorkflowHeader[]>(
   'workflow-table-columns',
   DEFAULT_COLUMNS,
 );
@@ -155,7 +88,7 @@ const availableWorkflowColumns: Readable<WorkflowHeader[]> = derived(
     ),
 );
 
-const availableSearchAttributes: Readable<WorkflowHeader[]> = derived(
+const availableSearchAttributeColumns: Readable<WorkflowHeader[]> = derived(
   [customSearchAttributes, workflowTableColumns],
   ([$customSearchAttributes, $workflowTableColumns]) =>
     Object.keys($customSearchAttributes)
@@ -244,11 +177,11 @@ const dispatch = (action: Action) => {
   );
 };
 
-const addColumn = (label: WorkflowHeaderLabel | string) => {
+const addColumn = (label: AnyWorkflowHeaderLabel) => {
   dispatch({ type: 'WORKFLOW_COLUMN.ADD', payload: { label } });
 };
 
-const removeColumn = (label: WorkflowHeaderLabel | string) => {
+const removeColumn = (label: AnyWorkflowHeaderLabel) => {
   dispatch({ type: 'WORKFLOW_COLUMN.REMOVE', payload: { label } });
 };
 
@@ -256,13 +189,13 @@ const moveColumn = (from: number, to: number) => {
   dispatch({ type: 'WORKFLOW_COLUMN.MOVE', payload: { from, to } });
 };
 
-const pinColumn = (label: WorkflowHeaderLabel | string) => {
+const pinColumn = (label: AnyWorkflowHeaderLabel) => {
   dispatch({ type: 'WORKFLOW_COLUMN.PIN', payload: { label } });
 };
 
 export {
   workflowTableColumns,
-  availableSearchAttributes,
+  availableSearchAttributeColumns,
   availableWorkflowColumns,
   pinnedColumnsWidth,
   addColumn,

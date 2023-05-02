@@ -57,6 +57,7 @@ export const toWorkflowExecution = (
   const runId = response.workflowExecutionInfo.execution.runId;
   const startTime = response.workflowExecutionInfo.startTime;
   const endTime = response.workflowExecutionInfo.closeTime;
+  const executionTime = response.workflowExecutionInfo.executionTime;
   const status = response.workflowExecutionInfo.status;
   const isRunning = response.workflowExecutionInfo.status === 'Running';
   const historyEvents = response.workflowExecutionInfo.historyLength;
@@ -83,6 +84,7 @@ export const toWorkflowExecution = (
     runId,
     startTime,
     endTime,
+    executionTime,
     status,
     historyEvents,
     historySizeBytes,

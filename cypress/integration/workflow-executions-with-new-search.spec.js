@@ -33,7 +33,7 @@ describe('Workflow Executions List With Search', () => {
       cy.url().should('contain', result);
 
       cy.get('[data-testid="workflow-type-filter-button"]').click();
-      cy.get('#workflowType').should('have.value', 'ImportantWorkflowType');
+      cy.get('#workflow-type').should('have.value', 'ImportantWorkflowType');
 
       cy.get('[data-testid="workflow-count"]').should(
         'have.text',
@@ -46,7 +46,7 @@ describe('Workflow Executions List With Search', () => {
     it('should send the correct query for Workflow Type, autocomplete manual search and be clearable', () => {
       cy.get('[data-testid="workflow-type-filter-button"]').click();
 
-      cy.get('#workflowType').type('ImportantWorkflowType');
+      cy.get('#workflow-type').type('ImportantWorkflowType');
 
       const result = encodeURIComponent('WorkflowType="ImportantWorkflowType"');
       cy.url().should('contain', result);
@@ -70,7 +70,7 @@ describe('Workflow Executions List With Search', () => {
     it('should send the correct query for Workflow ID, autocomplete manual search and be clearable', () => {
       cy.get('[data-testid="workflow-id-filter-button"]').click();
 
-      cy.get('#workflowId').type('002c98_Running');
+      cy.get('#workflow-id').type('002c98_Running');
 
       const result = encodeURIComponent('WorkflowId="002c98_Running"');
       cy.url().should('contain', result);
@@ -138,10 +138,10 @@ describe('Workflow Executions List With Search', () => {
       cy.get('[data-testid="Running"]').click();
 
       cy.get('[data-testid="workflow-id-filter-button"]').click();
-      cy.get('#workflowId').type('002c98_Running');
+      cy.get('#workflow-id').type('002c98_Running');
 
       cy.get('[data-testid="workflow-type-filter-button"]').click();
-      cy.get('#workflowType').type('ImportantWorkflowType');
+      cy.get('#workflow-type').type('ImportantWorkflowType');
 
       const result =
         'ExecutionStatus%3D%22Running%22+AND+WorkflowId%3D%22002c98_Running%22+AND+WorkflowType%3D%22ImportantWorkflowType%22';
@@ -212,7 +212,7 @@ describe('Workflow Executions List With Search', () => {
           encodeURIComponent(`ExecutionStatus="Running"`),
         );
 
-        cy.get('.workflow-summary-configurable-row').first().click();
+        cy.get('.workflows-summary-configurable-table-row').first().click();
 
         cy.wait('@workflow-api');
         cy.wait('@event-history-api');
@@ -399,7 +399,7 @@ describe('Workflow Executions List With Search using only MySql on 1.20', () => 
       cy.url().should('contain', result);
 
       cy.get('[data-testid="workflow-type-filter-button"]').click();
-      cy.get('#workflowType').should('have.value', 'ImportantWorkflowType');
+      cy.get('#workflow-type').should('have.value', 'ImportantWorkflowType');
 
       cy.get('[data-testid="workflow-count"]').should(
         'have.text',
@@ -412,7 +412,7 @@ describe('Workflow Executions List With Search using only MySql on 1.20', () => 
     it('should send the correct query for Workflow Type, autocomplete manual search and be clearable', () => {
       cy.get('[data-testid="workflow-type-filter-button"]').click();
 
-      cy.get('#workflowType').type('ImportantWorkflowType');
+      cy.get('#workflow-type').type('ImportantWorkflowType');
 
       const result = encodeURIComponent('WorkflowType="ImportantWorkflowType"');
       cy.url().should('contain', result);
@@ -436,7 +436,7 @@ describe('Workflow Executions List With Search using only MySql on 1.20', () => 
     it('should send the correct query for Workflow ID, autocomplete manual search and be clearable', () => {
       cy.get('[data-testid="workflow-id-filter-button"]').click();
 
-      cy.get('#workflowId').type('002c98_Running');
+      cy.get('#workflow-id').type('002c98_Running');
 
       const result = encodeURIComponent('WorkflowId="002c98_Running"');
       cy.url().should('contain', result);
@@ -504,10 +504,10 @@ describe('Workflow Executions List With Search using only MySql on 1.20', () => 
       cy.get('[data-testid="Running"]').click();
 
       cy.get('[data-testid="workflow-id-filter-button"]').click();
-      cy.get('#workflowId').type('002c98_Running');
+      cy.get('#workflow-id').type('002c98_Running');
 
       cy.get('[data-testid="workflow-type-filter-button"]').click();
-      cy.get('#workflowType').type('ImportantWorkflowType');
+      cy.get('#workflow-type').type('ImportantWorkflowType');
 
       const result =
         'ExecutionStatus%3D%22Running%22+AND+WorkflowId%3D%22002c98_Running%22+AND+WorkflowType%3D%22ImportantWorkflowType%22';
@@ -568,7 +568,7 @@ describe('Workflow Executions List With Search using only MySql on 1.20', () => 
           encodeURIComponent(`ExecutionStatus="Running"`),
         );
 
-        cy.get('.workflow-summary-configurable-row').first().click();
+        cy.get('.workflows-summary-configurable-table-row').first().click();
 
         cy.wait('@workflow-api');
         cy.wait('@event-history-api');

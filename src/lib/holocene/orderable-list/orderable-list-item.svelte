@@ -14,6 +14,7 @@
   };
 
   interface $$Props {
+    label: string;
     index?: number;
     totalItems?: number;
     pinned?: boolean;
@@ -24,6 +25,7 @@
 
   let isStatic: boolean = false;
   export { isStatic as static };
+  export let label: string;
   export let maxPinnedItems: number = undefined;
   export let pinned: boolean = false;
   export let readonly: boolean = false;
@@ -51,13 +53,13 @@
 <li
   draggable={!isStatic && !readonly}
   class="orderable-item group"
-  class:static={isStatic}
   class:readonly
   on:dragstart={(e) => handleDragStart(e, index)}
   on:drop|preventDefault={(e) => handleDrop(e, index)}
   on:dragenter|preventDefault|stopPropagation={handleDragEnter}
   on:dragleave|preventDefault|stopPropagation={handleDragLeave}
   on:dragover|preventDefault|stopPropagation
+  data-testid="orderable-list-item-{label}"
 >
   <div class="flex flex-row items-center gap-2">
     {#if !isStatic && !readonly}
@@ -66,36 +68,50 @@
           disabled={index === 0}
           hoverable
           icon="chevron-up"
+          data-testid="orderable-list-item-{label}-move-up-button"
           on:click={() => dispatch('moveItem', { from: index, to: index - 1 })}
         />
         <IconButton
           disabled={index === totalItems - 1}
           hoverable
           icon="chevron-down"
+          data-testid="orderable-list-item-{label}-move-down-button"
           on:click={() => dispatch('moveItem', { from: index, to: index + 1 })}
         />
       </div>
     {/if}
-    <slot />
+    {label}
     {#if !isStatic && !readonly && index <= maxPinnedItems - 1}
       {#if pinned}
         <IconButton
           hoverable
           icon="pin-filled"
+          data-testid="orderable-list-item-{label}-unpin-button"
           on:click={() => dispatch('pinItem')}
         />
       {:else}
-        <IconButton hoverable icon="pin" on:click={() => dispatch('pinItem')} />
+        <IconButton
+          hoverable
+          icon="pin"
+          data-testid="orderable-list-item-{label}-pin-button"
+          on:click={() => dispatch('pinItem')}
+        />
       {/if}
     {/if}
   </div>
   {#if !readonly}
     {#if isStatic}
-      <IconButton hoverable icon="add" on:click={() => dispatch('addItem')} />
+      <IconButton
+        hoverable
+        icon="add"
+        data-testid="orderable-list-item-{label}-add-button"
+        on:click={() => dispatch('addItem')}
+      />
     {:else}
       <IconButton
         hoverable
         icon="hyphen"
+        data-testid="orderable-list-item-{label}-remove-button"
         on:click={() => dispatch('removeItem')}
       />
     {/if}
