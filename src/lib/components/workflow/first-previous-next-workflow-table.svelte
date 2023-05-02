@@ -23,9 +23,10 @@
     <th>Next Execution</th>
   </TableHeaderRow>
   <TableRow>
-    <td class="w-1/3">
+    <td class="w-1/3 hover:text-blue-700 hover:underline">
       {#if first}
         <Link
+          newTab
           href={routeForEventHistory({
             namespace,
             workflow: workflow,
@@ -36,9 +37,10 @@
         </Link>
       {/if}
     </td>
-    <td class="w-1/3">
+    <td class="w-1/3 hover:text-blue-700 hover:underline">
       {#if previous}
         <Link
+          newTab
           href={routeForEventHistory({
             namespace,
             workflow: workflow,
@@ -49,9 +51,10 @@
         </Link>
       {/if}
     </td>
-    <td class="w-1/3">
+    <td class="w-1/3 hover:text-blue-700 hover:underline">
       {#if next}
         <Link
+          newTab
           href={routeForEventHistory({
             namespace,
             workflow: workflow,

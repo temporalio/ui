@@ -46,20 +46,13 @@
       <th>Child Run ID</th>
     </TableHeaderRow>
     {#each visibleItems as child (child.runId)}
-      <TableRow class="hover:text-blue-700 hover:underline">
+      <TableRow>
         <td class="hidden md:block">
-          <Link
-            href={routeForEventHistory({
-              namespace,
-              workflow: child.workflowId,
-              run: child.runId,
-            })}
-          >
-            <WorkflowStatus status={child.status} />
-          </Link>
+          <WorkflowStatus status={child.status} />
         </td>
-        <td>
+        <td class="hover:text-blue-700 hover:underline">
           <Link
+            newTab
             href={routeForEventHistory({
               namespace,
               workflow: child.workflowId,
@@ -69,8 +62,9 @@
             {child.workflowId}
           </Link>
         </td>
-        <td>
+        <td class="hover:text-blue-700 hover:underline">
           <Link
+            newTab
             href={routeForEventHistory({
               namespace,
               workflow: child.workflowId,
