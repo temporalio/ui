@@ -1,12 +1,23 @@
 import {
+  isChildWorkflowExecutionCanceledEvent,
   isChildWorkflowExecutionCompletedEvent,
+  isChildWorkflowExecutionFailedEvent,
+  isChildWorkflowExecutionTerminatedEvent,
+  isChildWorkflowExecutionTimedOutEvent,
   isWorkflowExecutionStartedEvent,
 } from './is-event-type';
 import { has } from './has';
 import { isString } from './is';
 
 import type { StartAndEndEventHistory } from '../stores/events';
-import type { WorkflowEvents } from '$lib/types/events';
+import type {
+  ChildWorkflowExecutionCanceledEvent,
+  ChildWorkflowExecutionCompletedEvent,
+  ChildWorkflowExecutionFailedEvent,
+  ChildWorkflowExecutionTerminatedEvent,
+  ChildWorkflowExecutionTimedOutEvent,
+  WorkflowEvents,
+} from '$lib/types/events';
 import type { WorkflowExecution } from '$lib/types/workflows';
 
 const getNewExecutionId = (events: WorkflowEvents): string | undefined => {
@@ -20,17 +31,32 @@ const getNewExecutionId = (events: WorkflowEvents): string | undefined => {
   }
 };
 
+export type ChildWorkflowClosedEvent =
+  | ChildWorkflowExecutionCompletedEvent
+  | ChildWorkflowExecutionFailedEvent
+  | ChildWorkflowExecutionCanceledEvent
+  | ChildWorkflowExecutionTimedOutEvent
+  | ChildWorkflowExecutionTerminatedEvent;
+
+export const isChildWorkflowClosedEvent = (event) => {
+  return (
+    isChildWorkflowExecutionCompletedEvent(event) ||
+    isChildWorkflowExecutionFailedEvent(event) ||
+    isChildWorkflowExecutionCanceledEvent(event) ||
+    isChildWorkflowExecutionTimedOutEvent(event) ||
+    isChildWorkflowExecutionTerminatedEvent(event)
+  );
+};
+
 export const getWorkflowRelationships = (
   workflow: WorkflowExecution | null,
   eventHistory: StartAndEndEventHistory,
-  fullHistory: WorkflowEvents = [],
+  fullEventHistory: WorkflowEvents,
 ) => {
-  const children = fullHistory.filter((event) =>
-    isChildWorkflowExecutionCompletedEvent(event),
-  ) as ChildWorkflowExecutionCompletedEvent[];
-  const hasChildren = !!children.length;
-
-  const hasPendingChildren = !!workflow?.pendingChildren.length;
+  const children = fullEventHistory.filter((event) =>
+    isChildWorkflowClosedEvent(event),
+  ) as ChildWorkflowClosedEvent[];
+  const hasChildren = !!workflow?.pendingChildren.length || !!children.length;
   const parent = workflow?.parent;
 
   const workflowExecutionStartedEvent = eventHistory.start.find(
@@ -38,7 +64,7 @@ export const getWorkflowRelationships = (
   );
 
   const newExecutionRunId = getNewExecutionId(
-    fullHistory.length ? fullHistory : eventHistory.end,
+    fullEventHistory.length ? fullEventHistory : eventHistory.end,
   );
 
   const firstExecutionRunId =
@@ -53,7 +79,6 @@ export const getWorkflowRelationships = (
   const hasRelationships = !!(
     parent ||
     hasChildren ||
-    hasPendingChildren ||
     first ||
     previous ||
     newExecutionRunId
@@ -63,7 +88,6 @@ export const getWorkflowRelationships = (
     hasRelationships,
     hasChildren,
     children,
-    hasPendingChildren,
     first,
     previous,
     parent,

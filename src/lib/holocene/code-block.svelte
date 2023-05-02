@@ -15,6 +15,7 @@
   export let icon: IconName | undefined = undefined;
   export let unroundTitle = false;
   export let titleColor = 'text-white';
+  export let async = true;
 
   let root: HTMLElement;
   $: isJSON = language === 'json';
@@ -42,7 +43,7 @@
       root.classList.add(`language-${language}`);
     }
 
-    window.Prism.highlightElement(root);
+    window.Prism.highlightElement(root, async);
   }
 
   $: {

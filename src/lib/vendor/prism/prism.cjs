@@ -184,7 +184,15 @@ var _self =
             return M.hooks.run('complete', l), void (t && t.call(l.element));
           if ((M.hooks.run('before-highlight', l), l.grammar))
             if (n && u.Worker) {
-              var s = new Worker(M.filename);
+              const filename =
+                M.filename ??
+                `${window.location.origin}/src/lib/vendor/prism/prism.cjs`;
+              var s = new Worker(filename);
+
+              s.onerror = function () {
+                o(M.highlight(l.code, l.grammar, l.language));
+              };
+
               (s.onmessage = function (e) {
                 o(e.data);
               }),

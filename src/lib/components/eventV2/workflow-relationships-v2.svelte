@@ -1,20 +1,21 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { routeForEventHistory } from '$lib/utilities/route-for';
   import { workflowRun } from '$lib/stores/workflow-run';
 
   import Accordion from '$lib/holocene/accordion.svelte';
   import Badge from '$lib/holocene/badge.svelte';
-  import WorkflowDetail from '$lib/components/workflow/workflow-detail.svelte';
-  import PendingChildWorkflowsTable from '$lib/components/workflow/pending-child-workflows-table.svelte';
-  import ChildWorkflowsTable from '$lib/components/workflow/child-workflows-table.svelte';
+
+  import type { WorkflowIdentifier } from '$lib/types/workflows';
+  import type { ChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
+  import ParentWorkflowTable from '../workflow/parent-workflow-table.svelte';
+  import FirstPreviousNextWorkflowTable from '../workflow/first-previous-next-workflow-table.svelte';
+  import ChildWorkflowsTable from '../workflow/child-workflows-table.svelte';
 
   export let hasChildren: boolean;
-  export let children: ChildWorkflowExecutionCompletedEvent[];
-  export let hasPendingChildren: boolean;
   export let hasRelationships: boolean;
   export let first: string;
   export let parent: WorkflowIdentifier;
+  export let children: ChildWorkflowClosedEvent[];
   export let next: string;
   export let previous: string;
 
@@ -25,11 +26,12 @@
   <Accordion title="Relationships" icon="relationship">
     <div slot="summary" class="hidden flex-row gap-2 lg:flex">
       <Badge type={parent ? 'purple' : 'gray'}>{parent ? 1 : 0} Parent</Badge>
-      <Badge type={hasChildren ? 'purple' : 'gray'}
-        >{children.length} Children</Badge
-      >
-      <Badge type={hasPendingChildren ? 'purple' : 'gray'}
+      <Badge
+        type={$workflowRun.workflow.pendingChildren.length ? 'purple' : 'gray'}
         >{$workflowRun.workflow.pendingChildren.length} Pending Children</Badge
+      >
+      <Badge type={children.length ? 'purple' : 'gray'}
+        >{children.length} Children</Badge
       >
       <Badge type={first ? 'purple' : 'gray'}>{first ? 1 : 0} First</Badge>
       <Badge type={previous ? 'purple' : 'gray'}>
@@ -40,91 +42,25 @@
     {#if hasRelationships}
       <div class="flex w-full flex-wrap gap-4">
         {#if parent}
-          <div class="w-full">
-            <h3 class="font-medium">Parent</h3>
-            <div class="h-0.5 w-full rounded-full bg-gray-900" />
-            <WorkflowDetail
-              title="Workflow ID"
-              content={parent.workflowId}
-              copyable
-              href={routeForEventHistory({
-                namespace,
-                workflow: parent.workflowId,
-                run: parent.runId,
-              })}
-            />
-            <WorkflowDetail
-              title="Run ID"
-              content={parent.runId}
-              copyable
-              href={routeForEventHistory({
-                namespace,
-                workflow: parent.workflowId,
-                run: parent.runId,
-              })}
-            />
-          </div>
+          <ParentWorkflowTable {parent} {namespace} />
         {/if}
-        {#if first}
-          <div class="w-full">
-            <h3 class="font-medium">First</h3>
-            <div class="h-0.5 w-full rounded-full bg-gray-900" />
-            <WorkflowDetail
-              title="First Execution Run ID"
-              content={first}
-              copyable
-              href={routeForEventHistory({
-                namespace,
-                workflow,
-                run: first,
-              })}
-            />
-          </div>
-        {/if}
-        {#if previous}
-          <div class="w-full">
-            <h3 class="font-medium">Previous</h3>
-            <div class="h-0.5 w-full rounded-full bg-gray-900" />
-            <WorkflowDetail
-              title="Continued Execution Run ID"
-              content={previous}
-              copyable
-              href={routeForEventHistory({
-                namespace,
-                workflow,
-                run: previous,
-              })}
-            />
-          </div>
-        {/if}
-        {#if next}
-          <div class="w-full">
-            <h3 class="font-medium">Next</h3>
-            <div class="h-0.5 w-full rounded-full bg-gray-900" />
-            <WorkflowDetail
-              title="New Execution Run ID"
-              content={next}
-              copyable
-              href={routeForEventHistory({
-                namespace,
-                workflow,
-                run: next,
-              })}
-            />
-          </div>
-        {/if}
-      </div>
-      <div class="flex w-full">
-        {#if hasPendingChildren}
-          <PendingChildWorkflowsTable
-            pendingChildren={$workflowRun.workflow.pendingChildren}
-            namespace={$page.params.namespace}
+        {#if first || previous || next}
+          <FirstPreviousNextWorkflowTable
+            {first}
+            {previous}
+            {next}
+            {workflow}
+            {namespace}
           />
         {/if}
-        {#if hasChildren}
-          <ChildWorkflowsTable {children} />
-        {/if}
       </div>
+      {#if hasChildren}
+        <ChildWorkflowsTable
+          {children}
+          pendingChildren={$workflowRun.workflow?.pendingChildren}
+          {namespace}
+        />
+      {/if}
     {:else}
       <p>This workflow doesn’t have any relationships</p>
     {/if}

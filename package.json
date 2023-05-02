@@ -1,6 +1,6 @@
 {
   "name": "@temporalio/ui",
-  "version": "2.13.1-north-star.7",
+  "version": "2.13.1-north-star.8",
   "type": "module",
   "description": "Temporal.io UI",
   "keywords": [

@@ -1,0 +1,2519 @@
+[
+  {
+    "eventId": "1",
+    "eventTime": "2023-05-01T20:47:07.784152Z",
+    "eventType": "WorkflowExecutionStarted",
+    "version": "0",
+    "taskId": "2037127",
+    "workerMayIgnore": false,
+    "workflowExecutionStartedEventAttributes": {
+      "workflowType": {
+        "name": "workflow.sanity"
+      },
+      "parentWorkflowNamespace": "",
+      "parentWorkflowNamespaceId": "",
+      "parentWorkflowExecution": null,
+      "parentInitiatedEventId": "0",
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "input": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "MTY4Mjk3NDAyNzc4MzE1ODAwMA=="
+          },
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "ImNhbmFyeSI="
+          }
+        ]
+      },
+      "workflowExecutionTimeout": "0s",
+      "workflowRunTimeout": "1320s",
+      "workflowTaskTimeout": "20s",
+      "continuedExecutionRunId": "",
+      "initiator": "Unspecified",
+      "continuedFailure": null,
+      "lastCompletionResult": null,
+      "originalExecutionRunId": "0f7fe2ea-4089-47c8-a53a-893bc0524cc2",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "firstExecutionRunId": "0f7fe2ea-4089-47c8-a53a-893bc0524cc2",
+      "retryPolicy": null,
+      "attempt": 1,
+      "workflowExecutionExpirationTime": null,
+      "cronSchedule": "",
+      "firstWorkflowTaskBackoff": "0s",
+      "memo": null,
+      "searchAttributes": null,
+      "prevAutoResetPoints": null,
+      "header": {
+        "fields": {}
+      },
+      "parentInitiatedEventVersion": "0"
+    }
+  },
+  {
+    "eventId": "2",
+    "eventTime": "2023-05-01T20:47:07.784195Z",
+    "eventType": "WorkflowTaskScheduled",
+    "version": "0",
+    "taskId": "2037128",
+    "workerMayIgnore": false,
+    "workflowTaskScheduledEventAttributes": {
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "startToCloseTimeout": "20s",
+      "attempt": 1
+    }
+  },
+  {
+    "eventId": "3",
+    "eventTime": "2023-05-01T20:47:07.788344Z",
+    "eventType": "WorkflowTaskStarted",
+    "version": "0",
+    "taskId": "2037134",
+    "workerMayIgnore": false,
+    "workflowTaskStartedEventAttributes": {
+      "scheduledEventId": "2",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "requestId": "f490d375-3e01-48c4-8214-2480ce4c5aaa",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "339"
+    }
+  },
+  {
+    "eventId": "4",
+    "eventTime": "2023-05-01T20:47:07.790409Z",
+    "eventType": "WorkflowTaskCompleted",
+    "version": "0",
+    "taskId": "2037150",
+    "workerMayIgnore": false,
+    "workflowTaskCompletedEventAttributes": {
+      "scheduledEventId": "2",
+      "startedEventId": "3",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "binaryChecksum": "4c66ce02b6e876e584dcecdd9dbc34c0",
+      "workerVersioningId": null,
+      "sdkMetadata": null,
+      "meteringMetadata": null
+    }
+  },
+  {
+    "eventId": "5",
+    "eventTime": "2023-05-01T20:47:07.790423Z",
+    "eventType": "MarkerRecorded",
+    "version": "0",
+    "taskId": "2037151",
+    "workerMayIgnore": false,
+    "markerRecordedEventAttributes": {
+      "markerName": "Version",
+      "details": {
+        "change-id": {
+          "payloads": [
+            {
+              "metadata": {
+                "encoding": "anNvbi9wbGFpbg=="
+              },
+              "data": "ImluaXRpYWwgdmVyc2lvbiI="
+            }
+          ]
+        },
+        "version": {
+          "payloads": [
+            {
+              "metadata": {
+                "encoding": "anNvbi9wbGFpbg=="
+              },
+              "data": "NA=="
+            }
+          ]
+        }
+      },
+      "workflowTaskCompletedEventId": "4",
+      "header": null,
+      "failure": null
+    }
+  },
+  {
+    "eventId": "6",
+    "eventTime": "2023-05-01T20:47:07.790581Z",
+    "eventType": "UpsertWorkflowSearchAttributes",
+    "version": "0",
+    "taskId": "2037152",
+    "workerMayIgnore": false,
+    "upsertWorkflowSearchAttributesEventAttributes": {
+      "workflowTaskCompletedEventId": "4",
+      "searchAttributes": {
+        "indexedFields": {
+          "TemporalChangeVersion": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZExpc3Q="
+            },
+            "data": "WyJpbml0aWFsIHZlcnNpb24tNCJd"
+          }
+        }
+      }
+    }
+  },
+  {
+    "eventId": "7",
+    "eventTime": "2023-05-01T20:47:07.790585Z",
+    "eventType": "MarkerRecorded",
+    "version": "0",
+    "taskId": "2037153",
+    "workerMayIgnore": false,
+    "markerRecordedEventAttributes": {
+      "markerName": "SideEffect",
+      "details": {
+        "data": {
+          "payloads": [
+            {
+              "metadata": {
+                "encoding": "anNvbi9wbGFpbg=="
+              },
+              "data": "WyJ3b3JrZmxvdy5lY2hvIiwid29ya2Zsb3cuc2lnbmFsIiwid29ya2Zsb3cuc3RhbmRhcmQtdmlzaWJpbGl0eSIsIndvcmtmbG93LmFkdmFuY2VkLXZpc2liaWxpdHkiLCJ3b3JrZmxvdy5hZHZhbmNlZC12aXNpYmlsaXR5LnNjYW4iLCJ3b3JrZmxvdy5jb25jdXJyZW50LWV4ZWN1dGlvbiIsIndvcmtmbG93LnF1ZXJ5Iiwid29ya2Zsb3cudGltZW91dCIsIndvcmtmbG93LmxvY2FsYWN0aXZpdHkiLCJ3b3JrZmxvdy5jYW5jZWxsYXRpb24iLCJ3b3JrZmxvdy5yZXRyeS1hY3Rpdml0eSIsIndvcmtmbG93LnJldHJ5LXdvcmtmbG93Iiwid29ya2Zsb3cucmVzZXQiLCJ3b3JrZmxvdy5jb25uZWN0aXZpdHkiLCJ3b3JrZmxvdy5zY2hlZHVsZSJd"
+            }
+          ]
+        },
+        "side-effect-id": {
+          "payloads": [
+            {
+              "metadata": {
+                "encoding": "anNvbi9wbGFpbg=="
+              },
+              "data": "MQ=="
+            }
+          ]
+        }
+      },
+      "workflowTaskCompletedEventId": "4",
+      "header": null,
+      "failure": null
+    }
+  },
+  {
+    "eventId": "8",
+    "eventTime": "2023-05-01T20:47:07.790765Z",
+    "eventType": "StartChildWorkflowExecutionInitiated",
+    "version": "0",
+    "taskId": "2037154",
+    "workerMayIgnore": false,
+    "startChildWorkflowExecutionInitiatedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.echo",
+      "workflowType": {
+        "name": "workflow.echo"
+      },
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "input": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "MTY4Mjk3NDAyNzc4ODM0NDAwMA=="
+          },
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "ImNhbmFyeSI="
+          }
+        ]
+      },
+      "workflowExecutionTimeout": "0s",
+      "workflowRunTimeout": "1200s",
+      "workflowTaskTimeout": "20s",
+      "parentClosePolicy": "Terminate",
+      "control": "",
+      "workflowTaskCompletedEventId": "4",
+      "workflowIdReusePolicy": "AllowDuplicate",
+      "retryPolicy": null,
+      "cronSchedule": "",
+      "header": {
+        "fields": {}
+      },
+      "memo": null,
+      "searchAttributes": {
+        "indexedFields": {
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "ImNoaWxkV29ya2Zsb3dWYWx1ZSI="
+          }
+        }
+      }
+    }
+  },
+  {
+    "eventId": "9",
+    "eventTime": "2023-05-01T20:47:07.790825Z",
+    "eventType": "StartChildWorkflowExecutionInitiated",
+    "version": "0",
+    "taskId": "2037155",
+    "workerMayIgnore": false,
+    "startChildWorkflowExecutionInitiatedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.signal",
+      "workflowType": {
+        "name": "workflow.signal"
+      },
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "input": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "MTY4Mjk3NDAyNzc4ODM0NDAwMA=="
+          },
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "ImNhbmFyeSI="
+          }
+        ]
+      },
+      "workflowExecutionTimeout": "0s",
+      "workflowRunTimeout": "1200s",
+      "workflowTaskTimeout": "20s",
+      "parentClosePolicy": "Terminate",
+      "control": "",
+      "workflowTaskCompletedEventId": "4",
+      "workflowIdReusePolicy": "AllowDuplicate",
+      "retryPolicy": null,
+      "cronSchedule": "",
+      "header": {
+        "fields": {}
+      },
+      "memo": null,
+      "searchAttributes": {
+        "indexedFields": {
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "ImNoaWxkV29ya2Zsb3dWYWx1ZSI="
+          }
+        }
+      }
+    }
+  },
+  {
+    "eventId": "10",
+    "eventTime": "2023-05-01T20:47:07.790878Z",
+    "eventType": "StartChildWorkflowExecutionInitiated",
+    "version": "0",
+    "taskId": "2037156",
+    "workerMayIgnore": false,
+    "startChildWorkflowExecutionInitiatedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.standard-visibility",
+      "workflowType": {
+        "name": "workflow.standard-visibility"
+      },
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "input": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "MTY4Mjk3NDAyNzc4ODM0NDAwMA=="
+          },
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "ImNhbmFyeSI="
+          }
+        ]
+      },
+      "workflowExecutionTimeout": "0s",
+      "workflowRunTimeout": "1200s",
+      "workflowTaskTimeout": "20s",
+      "parentClosePolicy": "Terminate",
+      "control": "",
+      "workflowTaskCompletedEventId": "4",
+      "workflowIdReusePolicy": "AllowDuplicate",
+      "retryPolicy": null,
+      "cronSchedule": "",
+      "header": {
+        "fields": {}
+      },
+      "memo": null,
+      "searchAttributes": {
+        "indexedFields": {
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "ImNoaWxkV29ya2Zsb3dWYWx1ZSI="
+          }
+        }
+      }
+    }
+  },
+  {
+    "eventId": "11",
+    "eventTime": "2023-05-01T20:47:07.790935Z",
+    "eventType": "StartChildWorkflowExecutionInitiated",
+    "version": "0",
+    "taskId": "2037157",
+    "workerMayIgnore": false,
+    "startChildWorkflowExecutionInitiatedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.advanced-visibility",
+      "workflowType": {
+        "name": "workflow.advanced-visibility"
+      },
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "input": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "MTY4Mjk3NDAyNzc4ODM0NDAwMA=="
+          },
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "ImNhbmFyeSI="
+          }
+        ]
+      },
+      "workflowExecutionTimeout": "0s",
+      "workflowRunTimeout": "1200s",
+      "workflowTaskTimeout": "20s",
+      "parentClosePolicy": "Terminate",
+      "control": "",
+      "workflowTaskCompletedEventId": "4",
+      "workflowIdReusePolicy": "AllowDuplicate",
+      "retryPolicy": null,
+      "cronSchedule": "",
+      "header": {
+        "fields": {}
+      },
+      "memo": null,
+      "searchAttributes": {
+        "indexedFields": {
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "ImNoaWxkV29ya2Zsb3dWYWx1ZSI="
+          }
+        }
+      }
+    }
+  },
+  {
+    "eventId": "12",
+    "eventTime": "2023-05-01T20:47:07.790984Z",
+    "eventType": "StartChildWorkflowExecutionInitiated",
+    "version": "0",
+    "taskId": "2037158",
+    "workerMayIgnore": false,
+    "startChildWorkflowExecutionInitiatedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.advanced-visibility.scan",
+      "workflowType": {
+        "name": "workflow.advanced-visibility.scan"
+      },
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "input": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "MTY4Mjk3NDAyNzc4ODM0NDAwMA=="
+          },
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "ImNhbmFyeSI="
+          }
+        ]
+      },
+      "workflowExecutionTimeout": "0s",
+      "workflowRunTimeout": "1200s",
+      "workflowTaskTimeout": "20s",
+      "parentClosePolicy": "Terminate",
+      "control": "",
+      "workflowTaskCompletedEventId": "4",
+      "workflowIdReusePolicy": "AllowDuplicate",
+      "retryPolicy": null,
+      "cronSchedule": "",
+      "header": {
+        "fields": {}
+      },
+      "memo": null,
+      "searchAttributes": {
+        "indexedFields": {
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "ImNoaWxkV29ya2Zsb3dWYWx1ZSI="
+          }
+        }
+      }
+    }
+  },
+  {
+    "eventId": "13",
+    "eventTime": "2023-05-01T20:47:07.791034Z",
+    "eventType": "StartChildWorkflowExecutionInitiated",
+    "version": "0",
+    "taskId": "2037159",
+    "workerMayIgnore": false,
+    "startChildWorkflowExecutionInitiatedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.concurrent-execution",
+      "workflowType": {
+        "name": "workflow.concurrent-execution"
+      },
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "input": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "MTY4Mjk3NDAyNzc4ODM0NDAwMA=="
+          },
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "ImNhbmFyeSI="
+          }
+        ]
+      },
+      "workflowExecutionTimeout": "0s",
+      "workflowRunTimeout": "1200s",
+      "workflowTaskTimeout": "20s",
+      "parentClosePolicy": "Terminate",
+      "control": "",
+      "workflowTaskCompletedEventId": "4",
+      "workflowIdReusePolicy": "AllowDuplicate",
+      "retryPolicy": null,
+      "cronSchedule": "",
+      "header": {
+        "fields": {}
+      },
+      "memo": null,
+      "searchAttributes": {
+        "indexedFields": {
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "ImNoaWxkV29ya2Zsb3dWYWx1ZSI="
+          }
+        }
+      }
+    }
+  },
+  {
+    "eventId": "14",
+    "eventTime": "2023-05-01T20:47:07.791082Z",
+    "eventType": "StartChildWorkflowExecutionInitiated",
+    "version": "0",
+    "taskId": "2037160",
+    "workerMayIgnore": false,
+    "startChildWorkflowExecutionInitiatedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.query",
+      "workflowType": {
+        "name": "workflow.query"
+      },
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "input": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "MTY4Mjk3NDAyNzc4ODM0NDAwMA=="
+          },
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "ImNhbmFyeSI="
+          }
+        ]
+      },
+      "workflowExecutionTimeout": "0s",
+      "workflowRunTimeout": "1200s",
+      "workflowTaskTimeout": "20s",
+      "parentClosePolicy": "Terminate",
+      "control": "",
+      "workflowTaskCompletedEventId": "4",
+      "workflowIdReusePolicy": "AllowDuplicate",
+      "retryPolicy": null,
+      "cronSchedule": "",
+      "header": {
+        "fields": {}
+      },
+      "memo": null,
+      "searchAttributes": {
+        "indexedFields": {
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "ImNoaWxkV29ya2Zsb3dWYWx1ZSI="
+          }
+        }
+      }
+    }
+  },
+  {
+    "eventId": "15",
+    "eventTime": "2023-05-01T20:47:07.791134Z",
+    "eventType": "StartChildWorkflowExecutionInitiated",
+    "version": "0",
+    "taskId": "2037161",
+    "workerMayIgnore": false,
+    "startChildWorkflowExecutionInitiatedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.timeout",
+      "workflowType": {
+        "name": "workflow.timeout"
+      },
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "input": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "MTY4Mjk3NDAyNzc4ODM0NDAwMA=="
+          },
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "ImNhbmFyeSI="
+          }
+        ]
+      },
+      "workflowExecutionTimeout": "0s",
+      "workflowRunTimeout": "1200s",
+      "workflowTaskTimeout": "20s",
+      "parentClosePolicy": "Terminate",
+      "control": "",
+      "workflowTaskCompletedEventId": "4",
+      "workflowIdReusePolicy": "AllowDuplicate",
+      "retryPolicy": null,
+      "cronSchedule": "",
+      "header": {
+        "fields": {}
+      },
+      "memo": null,
+      "searchAttributes": {
+        "indexedFields": {
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "ImNoaWxkV29ya2Zsb3dWYWx1ZSI="
+          }
+        }
+      }
+    }
+  },
+  {
+    "eventId": "16",
+    "eventTime": "2023-05-01T20:47:07.791214Z",
+    "eventType": "StartChildWorkflowExecutionInitiated",
+    "version": "0",
+    "taskId": "2037162",
+    "workerMayIgnore": false,
+    "startChildWorkflowExecutionInitiatedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.localactivity",
+      "workflowType": {
+        "name": "workflow.localactivity"
+      },
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "input": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "MTY4Mjk3NDAyNzc4ODM0NDAwMA=="
+          },
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "ImNhbmFyeSI="
+          }
+        ]
+      },
+      "workflowExecutionTimeout": "0s",
+      "workflowRunTimeout": "1200s",
+      "workflowTaskTimeout": "20s",
+      "parentClosePolicy": "Terminate",
+      "control": "",
+      "workflowTaskCompletedEventId": "4",
+      "workflowIdReusePolicy": "AllowDuplicate",
+      "retryPolicy": null,
+      "cronSchedule": "",
+      "header": {
+        "fields": {}
+      },
+      "memo": null,
+      "searchAttributes": {
+        "indexedFields": {
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "ImNoaWxkV29ya2Zsb3dWYWx1ZSI="
+          }
+        }
+      }
+    }
+  },
+  {
+    "eventId": "17",
+    "eventTime": "2023-05-01T20:47:07.791265Z",
+    "eventType": "StartChildWorkflowExecutionInitiated",
+    "version": "0",
+    "taskId": "2037163",
+    "workerMayIgnore": false,
+    "startChildWorkflowExecutionInitiatedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.cancellation",
+      "workflowType": {
+        "name": "workflow.cancellation"
+      },
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "input": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "MTY4Mjk3NDAyNzc4ODM0NDAwMA=="
+          },
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "ImNhbmFyeSI="
+          }
+        ]
+      },
+      "workflowExecutionTimeout": "0s",
+      "workflowRunTimeout": "1200s",
+      "workflowTaskTimeout": "20s",
+      "parentClosePolicy": "Terminate",
+      "control": "",
+      "workflowTaskCompletedEventId": "4",
+      "workflowIdReusePolicy": "AllowDuplicate",
+      "retryPolicy": null,
+      "cronSchedule": "",
+      "header": {
+        "fields": {}
+      },
+      "memo": null,
+      "searchAttributes": {
+        "indexedFields": {
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "ImNoaWxkV29ya2Zsb3dWYWx1ZSI="
+          }
+        }
+      }
+    }
+  },
+  {
+    "eventId": "18",
+    "eventTime": "2023-05-01T20:47:07.791312Z",
+    "eventType": "StartChildWorkflowExecutionInitiated",
+    "version": "0",
+    "taskId": "2037164",
+    "workerMayIgnore": false,
+    "startChildWorkflowExecutionInitiatedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.retry-activity",
+      "workflowType": {
+        "name": "workflow.retry-activity"
+      },
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "input": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "MTY4Mjk3NDAyNzc4ODM0NDAwMA=="
+          },
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "ImNhbmFyeSI="
+          }
+        ]
+      },
+      "workflowExecutionTimeout": "0s",
+      "workflowRunTimeout": "1200s",
+      "workflowTaskTimeout": "20s",
+      "parentClosePolicy": "Terminate",
+      "control": "",
+      "workflowTaskCompletedEventId": "4",
+      "workflowIdReusePolicy": "AllowDuplicate",
+      "retryPolicy": null,
+      "cronSchedule": "",
+      "header": {
+        "fields": {}
+      },
+      "memo": null,
+      "searchAttributes": {
+        "indexedFields": {
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "ImNoaWxkV29ya2Zsb3dWYWx1ZSI="
+          }
+        }
+      }
+    }
+  },
+  {
+    "eventId": "19",
+    "eventTime": "2023-05-01T20:47:07.791359Z",
+    "eventType": "StartChildWorkflowExecutionInitiated",
+    "version": "0",
+    "taskId": "2037165",
+    "workerMayIgnore": false,
+    "startChildWorkflowExecutionInitiatedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.retry-workflow",
+      "workflowType": {
+        "name": "workflow.retry-workflow"
+      },
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "input": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "MTY4Mjk3NDAyNzc4ODM0NDAwMA=="
+          },
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "ImNhbmFyeSI="
+          }
+        ]
+      },
+      "workflowExecutionTimeout": "0s",
+      "workflowRunTimeout": "1200s",
+      "workflowTaskTimeout": "20s",
+      "parentClosePolicy": "Terminate",
+      "control": "",
+      "workflowTaskCompletedEventId": "4",
+      "workflowIdReusePolicy": "AllowDuplicate",
+      "retryPolicy": null,
+      "cronSchedule": "",
+      "header": {
+        "fields": {}
+      },
+      "memo": null,
+      "searchAttributes": {
+        "indexedFields": {
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "ImNoaWxkV29ya2Zsb3dWYWx1ZSI="
+          }
+        }
+      }
+    }
+  },
+  {
+    "eventId": "20",
+    "eventTime": "2023-05-01T20:47:07.791438Z",
+    "eventType": "StartChildWorkflowExecutionInitiated",
+    "version": "0",
+    "taskId": "2037166",
+    "workerMayIgnore": false,
+    "startChildWorkflowExecutionInitiatedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.reset",
+      "workflowType": {
+        "name": "workflow.reset"
+      },
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "input": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "MTY4Mjk3NDAyNzc4ODM0NDAwMA=="
+          },
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "ImNhbmFyeSI="
+          }
+        ]
+      },
+      "workflowExecutionTimeout": "0s",
+      "workflowRunTimeout": "1200s",
+      "workflowTaskTimeout": "20s",
+      "parentClosePolicy": "Terminate",
+      "control": "",
+      "workflowTaskCompletedEventId": "4",
+      "workflowIdReusePolicy": "AllowDuplicate",
+      "retryPolicy": null,
+      "cronSchedule": "",
+      "header": {
+        "fields": {}
+      },
+      "memo": null,
+      "searchAttributes": {
+        "indexedFields": {
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "ImNoaWxkV29ya2Zsb3dWYWx1ZSI="
+          }
+        }
+      }
+    }
+  },
+  {
+    "eventId": "21",
+    "eventTime": "2023-05-01T20:47:07.791504Z",
+    "eventType": "StartChildWorkflowExecutionInitiated",
+    "version": "0",
+    "taskId": "2037167",
+    "workerMayIgnore": false,
+    "startChildWorkflowExecutionInitiatedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.connectivity",
+      "workflowType": {
+        "name": "workflow.connectivity"
+      },
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "input": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "MTY4Mjk3NDAyNzc4ODM0NDAwMA=="
+          },
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "ImNhbmFyeSI="
+          }
+        ]
+      },
+      "workflowExecutionTimeout": "0s",
+      "workflowRunTimeout": "1200s",
+      "workflowTaskTimeout": "20s",
+      "parentClosePolicy": "Terminate",
+      "control": "",
+      "workflowTaskCompletedEventId": "4",
+      "workflowIdReusePolicy": "AllowDuplicate",
+      "retryPolicy": null,
+      "cronSchedule": "",
+      "header": {
+        "fields": {}
+      },
+      "memo": null,
+      "searchAttributes": {
+        "indexedFields": {
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "ImNoaWxkV29ya2Zsb3dWYWx1ZSI="
+          }
+        }
+      }
+    }
+  },
+  {
+    "eventId": "22",
+    "eventTime": "2023-05-01T20:47:07.791551Z",
+    "eventType": "StartChildWorkflowExecutionInitiated",
+    "version": "0",
+    "taskId": "2037168",
+    "workerMayIgnore": false,
+    "startChildWorkflowExecutionInitiatedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.schedule",
+      "workflowType": {
+        "name": "workflow.schedule"
+      },
+      "taskQueue": {
+        "name": "canary-task-queue",
+        "kind": "Normal"
+      },
+      "input": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "MTY4Mjk3NDAyNzc4ODM0NDAwMA=="
+          },
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "ImNhbmFyeSI="
+          }
+        ]
+      },
+      "workflowExecutionTimeout": "0s",
+      "workflowRunTimeout": "1200s",
+      "workflowTaskTimeout": "20s",
+      "parentClosePolicy": "Terminate",
+      "control": "",
+      "workflowTaskCompletedEventId": "4",
+      "workflowIdReusePolicy": "AllowDuplicate",
+      "retryPolicy": null,
+      "cronSchedule": "",
+      "header": {
+        "fields": {}
+      },
+      "memo": null,
+      "searchAttributes": {
+        "indexedFields": {
+          "CustomKeywordField": {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg==",
+              "type": "S2V5d29yZA=="
+            },
+            "data": "ImNoaWxkV29ya2Zsb3dWYWx1ZSI="
+          }
+        }
+      }
+    }
+  },
+  {
+    "eventId": "23",
+    "eventTime": "2023-05-01T20:47:07.793294Z",
+    "eventType": "ChildWorkflowExecutionStarted",
+    "version": "0",
+    "taskId": "2037191",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionStartedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "22",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.schedule",
+        "runId": "3f169b97-7f96-4ba9-9262-ac14170334db"
+      },
+      "workflowType": {
+        "name": "workflow.schedule"
+      },
+      "header": {
+        "fields": {}
+      }
+    }
+  },
+  {
+    "eventId": "24",
+    "eventTime": "2023-05-01T20:47:07.793301Z",
+    "eventType": "WorkflowTaskScheduled",
+    "version": "0",
+    "taskId": "2037192",
+    "workerMayIgnore": false,
+    "workflowTaskScheduledEventAttributes": {
+      "taskQueue": {
+        "name": "Alexs-MacBook-Pro.local:6b7f8929-6e5e-44e0-ab50-6a5486c49168",
+        "kind": "Sticky"
+      },
+      "startToCloseTimeout": "20s",
+      "attempt": 1
+    }
+  },
+  {
+    "eventId": "25",
+    "eventTime": "2023-05-01T20:47:07.795126Z",
+    "eventType": "ChildWorkflowExecutionStarted",
+    "version": "0",
+    "taskId": "2037205",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionStartedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "14",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.query",
+        "runId": "5ec35484-2698-4e06-a998-e8b808633eb4"
+      },
+      "workflowType": {
+        "name": "workflow.query"
+      },
+      "header": {
+        "fields": {}
+      }
+    }
+  },
+  {
+    "eventId": "26",
+    "eventTime": "2023-05-01T20:47:07.797032Z",
+    "eventType": "ChildWorkflowExecutionStarted",
+    "version": "0",
+    "taskId": "2037224",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionStartedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "8",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.echo",
+        "runId": "00b515ce-a010-4864-bb33-d04deb228ace"
+      },
+      "workflowType": {
+        "name": "workflow.echo"
+      },
+      "header": {
+        "fields": {}
+      }
+    }
+  },
+  {
+    "eventId": "27",
+    "eventTime": "2023-05-01T20:47:07.800310Z",
+    "eventType": "ChildWorkflowExecutionStarted",
+    "version": "0",
+    "taskId": "2037243",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionStartedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "9",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.signal",
+        "runId": "23a01faf-8a86-4acb-940a-a503eb9e14c3"
+      },
+      "workflowType": {
+        "name": "workflow.signal"
+      },
+      "header": {
+        "fields": {}
+      }
+    }
+  },
+  {
+    "eventId": "28",
+    "eventTime": "2023-05-01T20:47:07.806608Z",
+    "eventType": "ChildWorkflowExecutionStarted",
+    "version": "0",
+    "taskId": "2037273",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionStartedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "18",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.retry-activity",
+        "runId": "6398e686-2e21-4758-9c5c-09600ced52b1"
+      },
+      "workflowType": {
+        "name": "workflow.retry-activity"
+      },
+      "header": {
+        "fields": {}
+      }
+    }
+  },
+  {
+    "eventId": "29",
+    "eventTime": "2023-05-01T20:47:07.811553Z",
+    "eventType": "ChildWorkflowExecutionStarted",
+    "version": "0",
+    "taskId": "2037297",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionStartedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "10",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.standard-visibility",
+        "runId": "16c2932f-60fb-48c2-908a-123de68dc3b3"
+      },
+      "workflowType": {
+        "name": "workflow.standard-visibility"
+      },
+      "header": {
+        "fields": {}
+      }
+    }
+  },
+  {
+    "eventId": "30",
+    "eventTime": "2023-05-01T20:47:07.815572Z",
+    "eventType": "ChildWorkflowExecutionStarted",
+    "version": "0",
+    "taskId": "2037344",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionStartedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "15",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.timeout",
+        "runId": "b9c4a071-40ef-4e92-9dd2-69c331a90de4"
+      },
+      "workflowType": {
+        "name": "workflow.timeout"
+      },
+      "header": {
+        "fields": {}
+      }
+    }
+  },
+  {
+    "eventId": "31",
+    "eventTime": "2023-05-01T20:47:07.822029Z",
+    "eventType": "ChildWorkflowExecutionStarted",
+    "version": "0",
+    "taskId": "2037399",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionStartedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "11",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.advanced-visibility",
+        "runId": "d13c6438-be5d-4511-ad5d-cea4585bbab8"
+      },
+      "workflowType": {
+        "name": "workflow.advanced-visibility"
+      },
+      "header": {
+        "fields": {}
+      }
+    }
+  },
+  {
+    "eventId": "32",
+    "eventTime": "2023-05-01T20:47:07.829350Z",
+    "eventType": "ChildWorkflowExecutionStarted",
+    "version": "0",
+    "taskId": "2037443",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionStartedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "16",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.localactivity",
+        "runId": "ec8921e6-192b-4e3e-b843-f04109fbc4dd"
+      },
+      "workflowType": {
+        "name": "workflow.localactivity"
+      },
+      "header": {
+        "fields": {}
+      }
+    }
+  },
+  {
+    "eventId": "33",
+    "eventTime": "2023-05-01T20:47:07.833056Z",
+    "eventType": "ChildWorkflowExecutionStarted",
+    "version": "0",
+    "taskId": "2037460",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionStartedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "12",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.advanced-visibility.scan",
+        "runId": "12dd04c9-ae7f-4749-ae11-d410311062e0"
+      },
+      "workflowType": {
+        "name": "workflow.advanced-visibility.scan"
+      },
+      "header": {
+        "fields": {}
+      }
+    }
+  },
+  {
+    "eventId": "34",
+    "eventTime": "2023-05-01T20:47:07.834195Z",
+    "eventType": "ChildWorkflowExecutionStarted",
+    "version": "0",
+    "taskId": "2037468",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionStartedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "17",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.cancellation",
+        "runId": "875e87a0-677e-47d9-9854-17d6d67c5247"
+      },
+      "workflowType": {
+        "name": "workflow.cancellation"
+      },
+      "header": {
+        "fields": {}
+      }
+    }
+  },
+  {
+    "eventId": "35",
+    "eventTime": "2023-05-01T20:47:07.834843Z",
+    "eventType": "ChildWorkflowExecutionStarted",
+    "version": "0",
+    "taskId": "2037479",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionStartedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "13",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.concurrent-execution",
+        "runId": "ba57ac41-ac33-473a-a01f-6ce7bd533da2"
+      },
+      "workflowType": {
+        "name": "workflow.concurrent-execution"
+      },
+      "header": {
+        "fields": {}
+      }
+    }
+  },
+  {
+    "eventId": "36",
+    "eventTime": "2023-05-01T20:47:07.835574Z",
+    "eventType": "ChildWorkflowExecutionStarted",
+    "version": "0",
+    "taskId": "2037490",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionStartedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "19",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.retry-workflow",
+        "runId": "0b12815b-0dce-477a-96eb-dfdddac1476c"
+      },
+      "workflowType": {
+        "name": "workflow.retry-workflow"
+      },
+      "header": {
+        "fields": {}
+      }
+    }
+  },
+  {
+    "eventId": "37",
+    "eventTime": "2023-05-01T20:47:07.836529Z",
+    "eventType": "ChildWorkflowExecutionStarted",
+    "version": "0",
+    "taskId": "2037501",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionStartedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "20",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.reset",
+        "runId": "7b03c173-51b5-4317-84cf-2101b9c89547"
+      },
+      "workflowType": {
+        "name": "workflow.reset"
+      },
+      "header": {
+        "fields": {}
+      }
+    }
+  },
+  {
+    "eventId": "38",
+    "eventTime": "2023-05-01T20:47:07.837312Z",
+    "eventType": "ChildWorkflowExecutionStarted",
+    "version": "0",
+    "taskId": "2037512",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionStartedEventAttributes": {
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "initiatedEventId": "21",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.connectivity",
+        "runId": "6184621f-3f9f-4bbc-82b3-d6583d9921a3"
+      },
+      "workflowType": {
+        "name": "workflow.connectivity"
+      },
+      "header": {
+        "fields": {}
+      }
+    }
+  },
+  {
+    "eventId": "39",
+    "eventTime": "2023-05-01T20:47:07.837837Z",
+    "eventType": "WorkflowTaskStarted",
+    "version": "0",
+    "taskId": "2037518",
+    "workerMayIgnore": false,
+    "workflowTaskStartedEventAttributes": {
+      "scheduledEventId": "24",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "requestId": "44a84fcf-f1c6-46f0-bddb-6d691b61e23f",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "10509"
+    }
+  },
+  {
+    "eventId": "40",
+    "eventTime": "2023-05-01T20:47:07.839625Z",
+    "eventType": "WorkflowTaskCompleted",
+    "version": "0",
+    "taskId": "2037525",
+    "workerMayIgnore": false,
+    "workflowTaskCompletedEventAttributes": {
+      "scheduledEventId": "24",
+      "startedEventId": "39",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "binaryChecksum": "4c66ce02b6e876e584dcecdd9dbc34c0",
+      "workerVersioningId": null,
+      "sdkMetadata": null,
+      "meteringMetadata": null
+    }
+  },
+  {
+    "eventId": "41",
+    "eventTime": "2023-05-01T20:47:07.867397Z",
+    "eventType": "ChildWorkflowExecutionCompleted",
+    "version": "0",
+    "taskId": "2037527",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionCompletedEventAttributes": {
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.echo",
+        "runId": "00b515ce-a010-4864-bb33-d04deb228ace"
+      },
+      "workflowType": {
+        "name": "workflow.echo"
+      },
+      "initiatedEventId": "8",
+      "startedEventId": "26"
+    }
+  },
+  {
+    "eventId": "42",
+    "eventTime": "2023-05-01T20:47:07.867400Z",
+    "eventType": "WorkflowTaskScheduled",
+    "version": "0",
+    "taskId": "2037528",
+    "workerMayIgnore": false,
+    "workflowTaskScheduledEventAttributes": {
+      "taskQueue": {
+        "name": "Alexs-MacBook-Pro.local:6b7f8929-6e5e-44e0-ab50-6a5486c49168",
+        "kind": "Sticky"
+      },
+      "startToCloseTimeout": "20s",
+      "attempt": 1
+    }
+  },
+  {
+    "eventId": "43",
+    "eventTime": "2023-05-01T20:47:07.918072Z",
+    "eventType": "WorkflowTaskStarted",
+    "version": "0",
+    "taskId": "2037720",
+    "workerMayIgnore": false,
+    "workflowTaskStartedEventAttributes": {
+      "scheduledEventId": "42",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "requestId": "d715e600-8757-4070-97f4-6b7640a28a7b",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "11018"
+    }
+  },
+  {
+    "eventId": "44",
+    "eventTime": "2023-05-01T20:47:07.922396Z",
+    "eventType": "WorkflowTaskCompleted",
+    "version": "0",
+    "taskId": "2037743",
+    "workerMayIgnore": false,
+    "workflowTaskCompletedEventAttributes": {
+      "scheduledEventId": "42",
+      "startedEventId": "43",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "binaryChecksum": "4c66ce02b6e876e584dcecdd9dbc34c0",
+      "workerVersioningId": null,
+      "sdkMetadata": null,
+      "meteringMetadata": null
+    }
+  },
+  {
+    "eventId": "45",
+    "eventTime": "2023-05-01T20:47:07.967762Z",
+    "eventType": "ChildWorkflowExecutionCompleted",
+    "version": "0",
+    "taskId": "2037894",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionCompletedEventAttributes": {
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.query",
+        "runId": "5ec35484-2698-4e06-a998-e8b808633eb4"
+      },
+      "workflowType": {
+        "name": "workflow.query"
+      },
+      "initiatedEventId": "14",
+      "startedEventId": "25"
+    }
+  },
+  {
+    "eventId": "46",
+    "eventTime": "2023-05-01T20:47:07.967765Z",
+    "eventType": "WorkflowTaskScheduled",
+    "version": "0",
+    "taskId": "2037895",
+    "workerMayIgnore": false,
+    "workflowTaskScheduledEventAttributes": {
+      "taskQueue": {
+        "name": "Alexs-MacBook-Pro.local:6b7f8929-6e5e-44e0-ab50-6a5486c49168",
+        "kind": "Sticky"
+      },
+      "startToCloseTimeout": "20s",
+      "attempt": 1
+    }
+  },
+  {
+    "eventId": "47",
+    "eventTime": "2023-05-01T20:47:08.018053Z",
+    "eventType": "WorkflowTaskStarted",
+    "version": "0",
+    "taskId": "2038070",
+    "workerMayIgnore": false,
+    "workflowTaskStartedEventAttributes": {
+      "scheduledEventId": "46",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "requestId": "f38f2f55-037c-4534-9b60-90c1c91cc62e",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "11529"
+    }
+  },
+  {
+    "eventId": "48",
+    "eventTime": "2023-05-01T20:47:08.020225Z",
+    "eventType": "WorkflowTaskCompleted",
+    "version": "0",
+    "taskId": "2038091",
+    "workerMayIgnore": false,
+    "workflowTaskCompletedEventAttributes": {
+      "scheduledEventId": "46",
+      "startedEventId": "47",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "binaryChecksum": "4c66ce02b6e876e584dcecdd9dbc34c0",
+      "workerVersioningId": null,
+      "sdkMetadata": null,
+      "meteringMetadata": null
+    }
+  },
+  {
+    "eventId": "49",
+    "eventTime": "2023-05-01T20:47:08.018658Z",
+    "eventType": "ChildWorkflowExecutionCompleted",
+    "version": "0",
+    "taskId": "2038092",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionCompletedEventAttributes": {
+      "result": {
+        "payloads": [
+          {
+            "metadata": {
+              "encoding": "anNvbi9wbGFpbg=="
+            },
+            "data": "ImRhdGElMiA9PSAwIg=="
+          }
+        ]
+      },
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.localactivity",
+        "runId": "ec8921e6-192b-4e3e-b843-f04109fbc4dd"
+      },
+      "workflowType": {
+        "name": "workflow.localactivity"
+      },
+      "initiatedEventId": "16",
+      "startedEventId": "32"
+    }
+  },
+  {
+    "eventId": "50",
+    "eventTime": "2023-05-01T20:47:08.020231Z",
+    "eventType": "WorkflowTaskScheduled",
+    "version": "0",
+    "taskId": "2038093",
+    "workerMayIgnore": false,
+    "workflowTaskScheduledEventAttributes": {
+      "taskQueue": {
+        "name": "Alexs-MacBook-Pro.local:6b7f8929-6e5e-44e0-ab50-6a5486c49168",
+        "kind": "Sticky"
+      },
+      "startToCloseTimeout": "20s",
+      "attempt": 1
+    }
+  },
+  {
+    "eventId": "51",
+    "eventTime": "2023-05-01T20:47:08.020233Z",
+    "eventType": "WorkflowTaskStarted",
+    "version": "0",
+    "taskId": "2038094",
+    "workerMayIgnore": false,
+    "workflowTaskStartedEventAttributes": {
+      "scheduledEventId": "50",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "requestId": "request-from-RespondWorkflowTaskCompleted",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "11629"
+    }
+  },
+  {
+    "eventId": "52",
+    "eventTime": "2023-05-01T20:47:08.024364Z",
+    "eventType": "WorkflowTaskCompleted",
+    "version": "0",
+    "taskId": "2038129",
+    "workerMayIgnore": false,
+    "workflowTaskCompletedEventAttributes": {
+      "scheduledEventId": "50",
+      "startedEventId": "51",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "binaryChecksum": "4c66ce02b6e876e584dcecdd9dbc34c0",
+      "workerVersioningId": null,
+      "sdkMetadata": null,
+      "meteringMetadata": null
+    }
+  },
+  {
+    "eventId": "53",
+    "eventTime": "2023-05-01T20:47:08.117819Z",
+    "eventType": "ChildWorkflowExecutionCompleted",
+    "version": "0",
+    "taskId": "2038346",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionCompletedEventAttributes": {
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.connectivity",
+        "runId": "6184621f-3f9f-4bbc-82b3-d6583d9921a3"
+      },
+      "workflowType": {
+        "name": "workflow.connectivity"
+      },
+      "initiatedEventId": "21",
+      "startedEventId": "38"
+    }
+  },
+  {
+    "eventId": "54",
+    "eventTime": "2023-05-01T20:47:08.117822Z",
+    "eventType": "WorkflowTaskScheduled",
+    "version": "0",
+    "taskId": "2038347",
+    "workerMayIgnore": false,
+    "workflowTaskScheduledEventAttributes": {
+      "taskQueue": {
+        "name": "Alexs-MacBook-Pro.local:6b7f8929-6e5e-44e0-ab50-6a5486c49168",
+        "kind": "Sticky"
+      },
+      "startToCloseTimeout": "20s",
+      "attempt": 1
+    }
+  },
+  {
+    "eventId": "55",
+    "eventTime": "2023-05-01T20:47:08.168262Z",
+    "eventType": "WorkflowTaskStarted",
+    "version": "0",
+    "taskId": "2038524",
+    "workerMayIgnore": false,
+    "workflowTaskStartedEventAttributes": {
+      "scheduledEventId": "54",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "requestId": "f9b19cd8-ba89-42cd-9419-c02a76915a0c",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "12621"
+    }
+  },
+  {
+    "eventId": "56",
+    "eventTime": "2023-05-01T20:47:08.171373Z",
+    "eventType": "WorkflowTaskCompleted",
+    "version": "0",
+    "taskId": "2038540",
+    "workerMayIgnore": false,
+    "workflowTaskCompletedEventAttributes": {
+      "scheduledEventId": "54",
+      "startedEventId": "55",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "binaryChecksum": "4c66ce02b6e876e584dcecdd9dbc34c0",
+      "workerVersioningId": null,
+      "sdkMetadata": null,
+      "meteringMetadata": null
+    }
+  },
+  {
+    "eventId": "57",
+    "eventTime": "2023-05-01T20:47:08.317723Z",
+    "eventType": "ChildWorkflowExecutionCompleted",
+    "version": "0",
+    "taskId": "2038765",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionCompletedEventAttributes": {
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.concurrent-execution",
+        "runId": "ba57ac41-ac33-473a-a01f-6ce7bd533da2"
+      },
+      "workflowType": {
+        "name": "workflow.concurrent-execution"
+      },
+      "initiatedEventId": "13",
+      "startedEventId": "35"
+    }
+  },
+  {
+    "eventId": "58",
+    "eventTime": "2023-05-01T20:47:08.317726Z",
+    "eventType": "WorkflowTaskScheduled",
+    "version": "0",
+    "taskId": "2038766",
+    "workerMayIgnore": false,
+    "workflowTaskScheduledEventAttributes": {
+      "taskQueue": {
+        "name": "Alexs-MacBook-Pro.local:6b7f8929-6e5e-44e0-ab50-6a5486c49168",
+        "kind": "Sticky"
+      },
+      "startToCloseTimeout": "20s",
+      "attempt": 1
+    }
+  },
+  {
+    "eventId": "59",
+    "eventTime": "2023-05-01T20:47:08.368209Z",
+    "eventType": "WorkflowTaskStarted",
+    "version": "0",
+    "taskId": "2038772",
+    "workerMayIgnore": false,
+    "workflowTaskStartedEventAttributes": {
+      "scheduledEventId": "58",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "requestId": "4f9c6400-8896-4ecd-aca6-5827072f989b",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "13161"
+    }
+  },
+  {
+    "eventId": "60",
+    "eventTime": "2023-05-01T20:47:08.372875Z",
+    "eventType": "WorkflowTaskCompleted",
+    "version": "0",
+    "taskId": "2038780",
+    "workerMayIgnore": false,
+    "workflowTaskCompletedEventAttributes": {
+      "scheduledEventId": "58",
+      "startedEventId": "59",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "binaryChecksum": "4c66ce02b6e876e584dcecdd9dbc34c0",
+      "workerVersioningId": null,
+      "sdkMetadata": null,
+      "meteringMetadata": null
+    }
+  },
+  {
+    "eventId": "61",
+    "eventTime": "2023-05-01T20:47:08.718064Z",
+    "eventType": "ChildWorkflowExecutionCompleted",
+    "version": "0",
+    "taskId": "2038858",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionCompletedEventAttributes": {
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.signal",
+        "runId": "23a01faf-8a86-4acb-940a-a503eb9e14c3"
+      },
+      "workflowType": {
+        "name": "workflow.signal"
+      },
+      "initiatedEventId": "9",
+      "startedEventId": "27"
+    }
+  },
+  {
+    "eventId": "62",
+    "eventTime": "2023-05-01T20:47:08.718082Z",
+    "eventType": "WorkflowTaskScheduled",
+    "version": "0",
+    "taskId": "2038859",
+    "workerMayIgnore": false,
+    "workflowTaskScheduledEventAttributes": {
+      "taskQueue": {
+        "name": "Alexs-MacBook-Pro.local:6b7f8929-6e5e-44e0-ab50-6a5486c49168",
+        "kind": "Sticky"
+      },
+      "startToCloseTimeout": "20s",
+      "attempt": 1
+    }
+  },
+  {
+    "eventId": "63",
+    "eventTime": "2023-05-01T20:47:08.770129Z",
+    "eventType": "WorkflowTaskStarted",
+    "version": "0",
+    "taskId": "2038863",
+    "workerMayIgnore": false,
+    "workflowTaskStartedEventAttributes": {
+      "scheduledEventId": "62",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "requestId": "ed71e4ba-c5bd-42f3-bff6-1f6d0c9c5949",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "13674"
+    }
+  },
+  {
+    "eventId": "64",
+    "eventTime": "2023-05-01T20:47:08.782945Z",
+    "eventType": "WorkflowTaskCompleted",
+    "version": "0",
+    "taskId": "2038867",
+    "workerMayIgnore": false,
+    "workflowTaskCompletedEventAttributes": {
+      "scheduledEventId": "62",
+      "startedEventId": "63",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "binaryChecksum": "4c66ce02b6e876e584dcecdd9dbc34c0",
+      "workerVersioningId": null,
+      "sdkMetadata": null,
+      "meteringMetadata": null
+    }
+  },
+  {
+    "eventId": "65",
+    "eventTime": "2023-05-01T20:47:08.918440Z",
+    "eventType": "ChildWorkflowExecutionCompleted",
+    "version": "0",
+    "taskId": "2038885",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionCompletedEventAttributes": {
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.timeout",
+        "runId": "b9c4a071-40ef-4e92-9dd2-69c331a90de4"
+      },
+      "workflowType": {
+        "name": "workflow.timeout"
+      },
+      "initiatedEventId": "15",
+      "startedEventId": "30"
+    }
+  },
+  {
+    "eventId": "66",
+    "eventTime": "2023-05-01T20:47:08.918450Z",
+    "eventType": "WorkflowTaskScheduled",
+    "version": "0",
+    "taskId": "2038886",
+    "workerMayIgnore": false,
+    "workflowTaskScheduledEventAttributes": {
+      "taskQueue": {
+        "name": "Alexs-MacBook-Pro.local:6b7f8929-6e5e-44e0-ab50-6a5486c49168",
+        "kind": "Sticky"
+      },
+      "startToCloseTimeout": "20s",
+      "attempt": 1
+    }
+  },
+  {
+    "eventId": "67",
+    "eventTime": "2023-05-01T20:47:08.967806Z",
+    "eventType": "WorkflowTaskStarted",
+    "version": "0",
+    "taskId": "2038890",
+    "workerMayIgnore": false,
+    "workflowTaskStartedEventAttributes": {
+      "scheduledEventId": "66",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "requestId": "5c8393db-f765-48e9-ae5b-74b87e14c34f",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "14189"
+    }
+  },
+  {
+    "eventId": "68",
+    "eventTime": "2023-05-01T20:47:08.971090Z",
+    "eventType": "WorkflowTaskCompleted",
+    "version": "0",
+    "taskId": "2038894",
+    "workerMayIgnore": false,
+    "workflowTaskCompletedEventAttributes": {
+      "scheduledEventId": "66",
+      "startedEventId": "67",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "binaryChecksum": "4c66ce02b6e876e584dcecdd9dbc34c0",
+      "workerVersioningId": null,
+      "sdkMetadata": null,
+      "meteringMetadata": null
+    }
+  },
+  {
+    "eventId": "69",
+    "eventTime": "2023-05-01T20:47:10.268997Z",
+    "eventType": "ChildWorkflowExecutionCompleted",
+    "version": "0",
+    "taskId": "2039387",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionCompletedEventAttributes": {
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.retry-workflow",
+        "runId": "0b12815b-0dce-477a-96eb-dfdddac1476c"
+      },
+      "workflowType": {
+        "name": "workflow.retry-workflow"
+      },
+      "initiatedEventId": "19",
+      "startedEventId": "36"
+    }
+  },
+  {
+    "eventId": "70",
+    "eventTime": "2023-05-01T20:47:10.269002Z",
+    "eventType": "WorkflowTaskScheduled",
+    "version": "0",
+    "taskId": "2039388",
+    "workerMayIgnore": false,
+    "workflowTaskScheduledEventAttributes": {
+      "taskQueue": {
+        "name": "Alexs-MacBook-Pro.local:6b7f8929-6e5e-44e0-ab50-6a5486c49168",
+        "kind": "Sticky"
+      },
+      "startToCloseTimeout": "20s",
+      "attempt": 1
+    }
+  },
+  {
+    "eventId": "71",
+    "eventTime": "2023-05-01T20:47:10.319378Z",
+    "eventType": "WorkflowTaskStarted",
+    "version": "0",
+    "taskId": "2039420",
+    "workerMayIgnore": false,
+    "workflowTaskStartedEventAttributes": {
+      "scheduledEventId": "70",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "requestId": "c8f42118-bac8-4e8c-8d7c-25ea39e80b37",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "14718"
+    }
+  },
+  {
+    "eventId": "72",
+    "eventTime": "2023-05-01T20:47:10.336506Z",
+    "eventType": "WorkflowTaskCompleted",
+    "version": "0",
+    "taskId": "2039442",
+    "workerMayIgnore": false,
+    "workflowTaskCompletedEventAttributes": {
+      "scheduledEventId": "70",
+      "startedEventId": "71",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "binaryChecksum": "4c66ce02b6e876e584dcecdd9dbc34c0",
+      "workerVersioningId": null,
+      "sdkMetadata": null,
+      "meteringMetadata": null
+    }
+  },
+  {
+    "eventId": "73",
+    "eventTime": "2023-05-01T20:47:10.570045Z",
+    "eventType": "ChildWorkflowExecutionCompleted",
+    "version": "0",
+    "taskId": "2039541",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionCompletedEventAttributes": {
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.reset",
+        "runId": "7b03c173-51b5-4317-84cf-2101b9c89547"
+      },
+      "workflowType": {
+        "name": "workflow.reset"
+      },
+      "initiatedEventId": "20",
+      "startedEventId": "37"
+    }
+  },
+  {
+    "eventId": "74",
+    "eventTime": "2023-05-01T20:47:10.570059Z",
+    "eventType": "WorkflowTaskScheduled",
+    "version": "0",
+    "taskId": "2039542",
+    "workerMayIgnore": false,
+    "workflowTaskScheduledEventAttributes": {
+      "taskQueue": {
+        "name": "Alexs-MacBook-Pro.local:6b7f8929-6e5e-44e0-ab50-6a5486c49168",
+        "kind": "Sticky"
+      },
+      "startToCloseTimeout": "20s",
+      "attempt": 1
+    }
+  },
+  {
+    "eventId": "75",
+    "eventTime": "2023-05-01T20:47:10.583841Z",
+    "eventType": "ChildWorkflowExecutionCompleted",
+    "version": "0",
+    "taskId": "2039546",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionCompletedEventAttributes": {
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.cancellation",
+        "runId": "875e87a0-677e-47d9-9854-17d6d67c5247"
+      },
+      "workflowType": {
+        "name": "workflow.cancellation"
+      },
+      "initiatedEventId": "17",
+      "startedEventId": "34"
+    }
+  },
+  {
+    "eventId": "76",
+    "eventTime": "2023-05-01T20:47:10.620945Z",
+    "eventType": "WorkflowTaskStarted",
+    "version": "0",
+    "taskId": "2039548",
+    "workerMayIgnore": false,
+    "workflowTaskStartedEventAttributes": {
+      "scheduledEventId": "74",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "requestId": "d07b0abd-30ac-4491-94ad-6b971bf3e799",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "15459"
+    }
+  },
+  {
+    "eventId": "77",
+    "eventTime": "2023-05-01T20:47:10.632230Z",
+    "eventType": "WorkflowTaskCompleted",
+    "version": "0",
+    "taskId": "2039552",
+    "workerMayIgnore": false,
+    "workflowTaskCompletedEventAttributes": {
+      "scheduledEventId": "74",
+      "startedEventId": "76",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "binaryChecksum": "4c66ce02b6e876e584dcecdd9dbc34c0",
+      "workerVersioningId": null,
+      "sdkMetadata": null,
+      "meteringMetadata": null
+    }
+  },
+  {
+    "eventId": "78",
+    "eventTime": "2023-05-01T20:47:11.855745Z",
+    "eventType": "ChildWorkflowExecutionCompleted",
+    "version": "0",
+    "taskId": "2039588",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionCompletedEventAttributes": {
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.standard-visibility",
+        "runId": "16c2932f-60fb-48c2-908a-123de68dc3b3"
+      },
+      "workflowType": {
+        "name": "workflow.standard-visibility"
+      },
+      "initiatedEventId": "10",
+      "startedEventId": "29"
+    }
+  },
+  {
+    "eventId": "79",
+    "eventTime": "2023-05-01T20:47:11.855748Z",
+    "eventType": "WorkflowTaskScheduled",
+    "version": "0",
+    "taskId": "2039589",
+    "workerMayIgnore": false,
+    "workflowTaskScheduledEventAttributes": {
+      "taskQueue": {
+        "name": "Alexs-MacBook-Pro.local:6b7f8929-6e5e-44e0-ab50-6a5486c49168",
+        "kind": "Sticky"
+      },
+      "startToCloseTimeout": "20s",
+      "attempt": 1
+    }
+  },
+  {
+    "eventId": "80",
+    "eventTime": "2023-05-01T20:47:11.857254Z",
+    "eventType": "WorkflowTaskStarted",
+    "version": "0",
+    "taskId": "2039593",
+    "workerMayIgnore": false,
+    "workflowTaskStartedEventAttributes": {
+      "scheduledEventId": "79",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "requestId": "2506a30d-1006-4582-886a-68b413ad8b23",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "15999"
+    }
+  },
+  {
+    "eventId": "81",
+    "eventTime": "2023-05-01T20:47:11.858827Z",
+    "eventType": "WorkflowTaskCompleted",
+    "version": "0",
+    "taskId": "2039597",
+    "workerMayIgnore": false,
+    "workflowTaskCompletedEventAttributes": {
+      "scheduledEventId": "79",
+      "startedEventId": "80",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "binaryChecksum": "4c66ce02b6e876e584dcecdd9dbc34c0",
+      "workerVersioningId": null,
+      "sdkMetadata": null,
+      "meteringMetadata": null
+    }
+  },
+  {
+    "eventId": "82",
+    "eventTime": "2023-05-01T20:47:11.883929Z",
+    "eventType": "ChildWorkflowExecutionCompleted",
+    "version": "0",
+    "taskId": "2039647",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionCompletedEventAttributes": {
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.advanced-visibility",
+        "runId": "d13c6438-be5d-4511-ad5d-cea4585bbab8"
+      },
+      "workflowType": {
+        "name": "workflow.advanced-visibility"
+      },
+      "initiatedEventId": "11",
+      "startedEventId": "31"
+    }
+  },
+  {
+    "eventId": "83",
+    "eventTime": "2023-05-01T20:47:11.883936Z",
+    "eventType": "WorkflowTaskScheduled",
+    "version": "0",
+    "taskId": "2039648",
+    "workerMayIgnore": false,
+    "workflowTaskScheduledEventAttributes": {
+      "taskQueue": {
+        "name": "Alexs-MacBook-Pro.local:6b7f8929-6e5e-44e0-ab50-6a5486c49168",
+        "kind": "Sticky"
+      },
+      "startToCloseTimeout": "20s",
+      "attempt": 1
+    }
+  },
+  {
+    "eventId": "84",
+    "eventTime": "2023-05-01T20:47:11.885515Z",
+    "eventType": "WorkflowTaskStarted",
+    "version": "0",
+    "taskId": "2039652",
+    "workerMayIgnore": false,
+    "workflowTaskStartedEventAttributes": {
+      "scheduledEventId": "83",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "requestId": "118a69e2-ef7e-48e0-90cf-4c784f7a0c5b",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "16539"
+    }
+  },
+  {
+    "eventId": "85",
+    "eventTime": "2023-05-01T20:47:11.887280Z",
+    "eventType": "WorkflowTaskCompleted",
+    "version": "0",
+    "taskId": "2039658",
+    "workerMayIgnore": false,
+    "workflowTaskCompletedEventAttributes": {
+      "scheduledEventId": "83",
+      "startedEventId": "84",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "binaryChecksum": "4c66ce02b6e876e584dcecdd9dbc34c0",
+      "workerVersioningId": null,
+      "sdkMetadata": null,
+      "meteringMetadata": null
+    }
+  },
+  {
+    "eventId": "86",
+    "eventTime": "2023-05-01T20:47:19.280327Z",
+    "eventType": "ChildWorkflowExecutionCompleted",
+    "version": "0",
+    "taskId": "2039963",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionCompletedEventAttributes": {
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.schedule",
+        "runId": "3f169b97-7f96-4ba9-9262-ac14170334db"
+      },
+      "workflowType": {
+        "name": "workflow.schedule"
+      },
+      "initiatedEventId": "22",
+      "startedEventId": "23"
+    }
+  },
+  {
+    "eventId": "87",
+    "eventTime": "2023-05-01T20:47:19.280331Z",
+    "eventType": "WorkflowTaskScheduled",
+    "version": "0",
+    "taskId": "2039964",
+    "workerMayIgnore": false,
+    "workflowTaskScheduledEventAttributes": {
+      "taskQueue": {
+        "name": "Alexs-MacBook-Pro.local:6b7f8929-6e5e-44e0-ab50-6a5486c49168",
+        "kind": "Sticky"
+      },
+      "startToCloseTimeout": "20s",
+      "attempt": 1
+    }
+  },
+  {
+    "eventId": "88",
+    "eventTime": "2023-05-01T20:47:19.282311Z",
+    "eventType": "WorkflowTaskStarted",
+    "version": "0",
+    "taskId": "2039968",
+    "workerMayIgnore": false,
+    "workflowTaskStartedEventAttributes": {
+      "scheduledEventId": "87",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "requestId": "bbf68f5d-ba58-4e05-aa2b-37b1f559b8aa",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "17057"
+    }
+  },
+  {
+    "eventId": "89",
+    "eventTime": "2023-05-01T20:47:19.283871Z",
+    "eventType": "WorkflowTaskCompleted",
+    "version": "0",
+    "taskId": "2039972",
+    "workerMayIgnore": false,
+    "workflowTaskCompletedEventAttributes": {
+      "scheduledEventId": "87",
+      "startedEventId": "88",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "binaryChecksum": "4c66ce02b6e876e584dcecdd9dbc34c0",
+      "workerVersioningId": null,
+      "sdkMetadata": null,
+      "meteringMetadata": null
+    }
+  },
+  {
+    "eventId": "90",
+    "eventTime": "2023-05-01T20:47:45.878719Z",
+    "eventType": "ChildWorkflowExecutionCanceled",
+    "version": "0",
+    "taskId": "2042797",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionCanceledEventAttributes": {
+      "details": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.advanced-visibility.scan",
+        "runId": "12dd04c9-ae7f-4749-ae11-d410311062e0"
+      },
+      "workflowType": {
+        "name": "workflow.advanced-visibility.scan"
+      },
+      "initiatedEventId": "12",
+      "startedEventId": "33"
+    }
+  },
+  {
+    "eventId": "91",
+    "eventTime": "2023-05-01T20:47:45.878725Z",
+    "eventType": "WorkflowTaskScheduled",
+    "version": "0",
+    "taskId": "2042798",
+    "workerMayIgnore": false,
+    "workflowTaskScheduledEventAttributes": {
+      "taskQueue": {
+        "name": "Alexs-MacBook-Pro.local:6b7f8929-6e5e-44e0-ab50-6a5486c49168",
+        "kind": "Sticky"
+      },
+      "startToCloseTimeout": "20s",
+      "attempt": 1
+    }
+  },
+  {
+    "eventId": "92",
+    "eventTime": "2023-05-01T20:47:45.882142Z",
+    "eventType": "WorkflowTaskStarted",
+    "version": "0",
+    "taskId": "2042802",
+    "workerMayIgnore": false,
+    "workflowTaskStartedEventAttributes": {
+      "scheduledEventId": "91",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "requestId": "2e5f3617-43a1-4333-9d36-e755e9f3c46c",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "17608"
+    }
+  },
+  {
+    "eventId": "93",
+    "eventTime": "2023-05-01T20:47:45.883932Z",
+    "eventType": "WorkflowTaskCompleted",
+    "version": "0",
+    "taskId": "2042806",
+    "workerMayIgnore": false,
+    "workflowTaskCompletedEventAttributes": {
+      "scheduledEventId": "91",
+      "startedEventId": "92",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "binaryChecksum": "4c66ce02b6e876e584dcecdd9dbc34c0",
+      "workerVersioningId": null,
+      "sdkMetadata": null,
+      "meteringMetadata": null
+    }
+  },
+  {
+    "eventId": "94",
+    "eventTime": "2023-05-01T20:48:19.938343Z",
+    "eventType": "ChildWorkflowExecutionCompleted",
+    "version": "0",
+    "taskId": "2045924",
+    "workerMayIgnore": false,
+    "childWorkflowExecutionCompletedEventAttributes": {
+      "result": null,
+      "namespace": "canary",
+      "namespaceId": "c9ffdbc7-b2f3-45c5-ba18-82be22e59f1d",
+      "workflowExecution": {
+        "workflowId": "temporal.canary.cron-workflow.sanity-2023-05-01T15:47:07-05:00/workflow.retry-activity",
+        "runId": "6398e686-2e21-4758-9c5c-09600ced52b1"
+      },
+      "workflowType": {
+        "name": "workflow.retry-activity"
+      },
+      "initiatedEventId": "18",
+      "startedEventId": "28"
+    }
+  },
+  {
+    "eventId": "95",
+    "eventTime": "2023-05-01T20:48:19.938349Z",
+    "eventType": "WorkflowTaskScheduled",
+    "version": "0",
+    "taskId": "2045925",
+    "workerMayIgnore": false,
+    "workflowTaskScheduledEventAttributes": {
+      "taskQueue": {
+        "name": "Alexs-MacBook-Pro.local:6b7f8929-6e5e-44e0-ab50-6a5486c49168",
+        "kind": "Sticky"
+      },
+      "startToCloseTimeout": "20s",
+      "attempt": 1
+    }
+  },
+  {
+    "eventId": "96",
+    "eventTime": "2023-05-01T20:48:19.942090Z",
+    "eventType": "WorkflowTaskStarted",
+    "version": "0",
+    "taskId": "2045929",
+    "workerMayIgnore": false,
+    "workflowTaskStartedEventAttributes": {
+      "scheduledEventId": "95",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "requestId": "11a62905-6abd-4d3c-ba9e-9c92ba58a3f0",
+      "suggestContinueAsNew": false,
+      "historySizeBytes": "18138"
+    }
+  },
+  {
+    "eventId": "97",
+    "eventTime": "2023-05-01T20:48:19.945148Z",
+    "eventType": "WorkflowTaskCompleted",
+    "version": "0",
+    "taskId": "2045933",
+    "workerMayIgnore": false,
+    "workflowTaskCompletedEventAttributes": {
+      "scheduledEventId": "95",
+      "startedEventId": "96",
+      "identity": "35932@Alexs-MacBook-Pro.local@",
+      "binaryChecksum": "4c66ce02b6e876e584dcecdd9dbc34c0",
+      "workerVersioningId": null,
+      "sdkMetadata": null,
+      "meteringMetadata": null
+    }
+  },
+  {
+    "eventId": "98",
+    "eventTime": "2023-05-01T20:48:19.945169Z",
+    "eventType": "WorkflowExecutionCanceled",
+    "version": "0",
+    "taskId": "2045934",
+    "workerMayIgnore": false,
+    "workflowExecutionCanceledEventAttributes": {
+      "workflowTaskCompletedEventId": "97",
+      "details": null
+    }
+  }
+]

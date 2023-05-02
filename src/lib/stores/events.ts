@@ -80,3 +80,5 @@ export const initialEventHistory: StartAndEndEventHistory = {
 export const eventHistory =
   writable<StartAndEndEventHistory>(initialEventHistory);
 export const timelineEvents = writable(null);
+
+export const fullEventHistory = writable<WorkflowEvents>([]);

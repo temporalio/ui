@@ -82,69 +82,67 @@
       Switch to v2 Workflow UI
     </a>
   </div>
-  <div class="p-4" class:failure class:canceled class:terminated>
-    <div
-      class="flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
-    >
-      <div
-        class="flex w-full items-center justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
-      >
-        <h1
-          data-testid="workflow-id-heading"
-          class="overflow-hidden text-2xl font-medium"
-        >
-          <Copyable
-            content={workflow?.type}
-            clickAllToCopy
-            container-class="w-full"
-            class="overflow-hidden text-ellipsis"
-          />
-        </h1>
-      </div>
-      {#if isRunning}
-        <div
-          class="flex flex-col items-center justify-center gap-4 whitespace-nowrap sm:flex-row lg:justify-end"
-        >
-          <WorkflowActions {cancelInProgress} {workflow} {namespace} />
-        </div>
-      {/if}
-    </div>
-    <div
-      class="flex w-full items-center justify-start gap-2 overflow-hidden whitespace-nowrap"
-    >
-      <h3
-        data-testid="workflow-id-heading"
-        class="overflow-hidden text-sm flex gap-2 items-center"
-      >
-        Workflow Id:
-        <Copyable
-          content={workflow?.id}
-          clickAllToCopy
-          container-class="w-full"
-          class="overflow-hidden text-ellipsis"
-        />
-      </h3>
-      <h3
-        data-testid="workflow-run-id-heading"
-        class="overflow-hidden text-sm flex gap-2 items-center"
-      >
-        Run Id:
-        <Copyable
-          content={workflow?.runId}
-          clickAllToCopy
-          container-class="w-full"
-          class="overflow-hidden text-ellipsis"
-        />
-      </h3>
-    </div>
+  <div
+    class="flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
+  >
     <div
       class="flex w-full items-center justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
     >
-      <WorkflowStatus status={workflow?.status} />
-      <Badge type="green" class="flex gap-1 py-0"
-        ><Icon name="task-queue" />{workflow.taskQueue}</Badge
+      <h1
+        data-testid="workflow-id-heading"
+        class="overflow-hidden text-2xl font-medium"
       >
+        <Copyable
+          content={workflow?.type}
+          clickAllToCopy
+          container-class="w-full"
+          class="overflow-hidden text-ellipsis"
+        />
+      </h1>
     </div>
+    {#if isRunning}
+      <div
+        class="flex flex-col items-center justify-center gap-4 whitespace-nowrap sm:flex-row lg:justify-end"
+      >
+        <WorkflowActions {cancelInProgress} {workflow} {namespace} />
+      </div>
+    {/if}
+  </div>
+  <div
+    class="flex w-full items-center justify-start gap-2 overflow-hidden whitespace-nowrap"
+  >
+    <h3
+      data-testid="workflow-id-heading"
+      class="overflow-hidden text-sm flex gap-2 items-center"
+    >
+      Workflow Id:
+      <Copyable
+        content={workflow?.id}
+        clickAllToCopy
+        container-class="w-full"
+        class="overflow-hidden text-ellipsis"
+      />
+    </h3>
+    <h3
+      data-testid="workflow-run-id-heading"
+      class="overflow-hidden text-sm flex gap-2 items-center"
+    >
+      Run Id:
+      <Copyable
+        content={workflow?.runId}
+        clickAllToCopy
+        container-class="w-full"
+        class="overflow-hidden text-ellipsis"
+      />
+    </h3>
+  </div>
+  <div
+    class="flex w-full items-center justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
+  >
+    <WorkflowStatus status={workflow?.status} />
+    <Badge type="green" class="flex gap-1 py-0"
+      ><Icon name="task-queue" />{workflow.taskQueue}</Badge
+    >
   </div>
 
   {#if cancelInProgress}
@@ -182,7 +180,7 @@
       </Alert>
     </div>
   {/if}
-  <Tabs>
+  <Tabs class="mt-4">
     <TabList class="flex flex-wrap gap-6" label="workflow detail">
       <Tab
         label="History"
