@@ -8,14 +8,23 @@
 
   import type { WorkflowExecution } from '$lib/types/workflows';
   import type { ChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
+  import WorkflowStatus from '../workflow-status.svelte';
+  import type { WorkflowExecutionStatus } from '$lib/types';
 
   export let children: ChildWorkflowClosedEvent[] = [];
   export let pendingChildren: WorkflowExecution['pendingChildren'] = [];
   export let namespace: string;
 
+  type ChildWorkflowTableItem = {
+    runId: string;
+    workflowId: string;
+    status: WorkflowExecutionStatus | string;
+  };
+
   $: formattedPending = pendingChildren.map((c) => {
-    return { runId: c.runId, workflowId: c.workflowId, status: 'Pending' };
+    return { runId: c.runId, workflowId: c.workflowId, status: 'Running' };
   });
+
   $: formattedCompleted = children.map((c) => {
     return {
       runId: c.attributes.workflowExecution.runId,
@@ -33,28 +42,31 @@
   let:visibleItems
   aria-label="child workflows"
 >
+  <div slot="pagination-top" />
   <Table class="w-full">
     <TableHeaderRow slot="headers">
+      <th class="hidden md:block">Status</th>
       <th>Child Workflow ID</th>
       <th>Child Run ID</th>
-      <th class="hidden md:block">Status</th>
     </TableHeaderRow>
     {#each visibleItems as child (child.runId)}
       <TableRow
+        class="hover:text-blue-700 hover:underline"
         href={routeForEventHistory({
           namespace,
           workflow: child.workflowId,
           run: child.runId,
         })}
       >
+        <td class="hidden md:block">
+          <WorkflowStatus status={child.status} />
+        </td>
+
         <td>
           {child.workflowId}
         </td>
         <td>
           {child.runId}
-        </td>
-        <td class="hidden md:block">
-          {child.status}
         </td>
       </TableRow>
     {/each}
