@@ -13,12 +13,7 @@
 </script>
 
 {#if href}
-  <a
-    data-sveltekit-replacestate
-    class="table-row align-middle {className}"
-    {href}
-    {...$$restProps}
-  >
+  <a class="table-row align-middle {className}" {href} {...$$restProps}>
     <td />
     <slot />
     <td />
