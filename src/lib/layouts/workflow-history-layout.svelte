@@ -5,7 +5,7 @@
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
   import { exportHistory } from '$lib/utilities/export-history';
   import { workflowRun } from '$lib/stores/workflow-run';
-  import { eventHistory } from '$lib/stores/events';
+  import { eventHistory, fullEventHistory } from '$lib/stores/events';
 
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
@@ -25,7 +25,11 @@
   $: workflowEvents =
     getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
   $: ({ workflow } = $workflowRun);
-  $: workflowRelationships = getWorkflowRelationships(workflow, $eventHistory);
+  $: workflowRelationships = getWorkflowRelationships(
+    workflow,
+    $eventHistory,
+    $fullEventHistory,
+  );
 
   const onViewClick = (view: EventView) => {
     if ($page.url.searchParams.get('page')) {

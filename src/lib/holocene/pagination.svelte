@@ -146,44 +146,47 @@
           {options}
         />
       {/if}
-      <div class="flex items-center justify-center gap-3">
-        <button
-          class="caret"
-          disabled={!$store.hasPrevious}
-          on:click={() => {
-            store.previous();
-            handlePageChange();
-          }}
-          aria-label="previous"
-        >
-          <span
-            class="arrow arrow-left"
-            class:arrow-left-disabled={!$store.hasPrevious}
-          />
-        </button>
-        <p>
-          {#if updating}
-            <Skeleton class="block h-5 w-24" />
-          {:else}
-            {$store.length ? $store.startingIndex + 1 : 0}–{$store.endingIndex +
-              1} of {$store.length}
-          {/if}
-        </p>
-        <button
-          class="caret"
-          disabled={!$store.hasNext}
-          on:click={() => {
-            store.next();
-            handlePageChange();
-          }}
-          aria-label="next"
-        >
-          <span
-            class="arrow arrow-right"
-            class:arrow-right-disabled={!$store.hasNext}
-          />
-        </button>
-      </div>
+      <slot name="pagination-top">
+        <div class="flex items-center justify-center gap-3">
+          <button
+            class="caret"
+            disabled={!$store.hasPrevious}
+            on:click={() => {
+              store.previous();
+              handlePageChange();
+            }}
+            aria-label="previous"
+          >
+            <span
+              class="arrow arrow-left"
+              class:arrow-left-disabled={!$store.hasPrevious}
+            />
+          </button>
+          <p>
+            {#if updating}
+              <Skeleton class="block h-5 w-24" />
+            {:else}
+              {$store.length
+                ? $store.startingIndex + 1
+                : 0}–{$store.endingIndex + 1} of {$store.length}
+            {/if}
+          </p>
+          <button
+            class="caret"
+            disabled={!$store.hasNext}
+            on:click={() => {
+              store.next();
+              handlePageChange();
+            }}
+            aria-label="next"
+          >
+            <span
+              class="arrow arrow-right"
+              class:arrow-right-disabled={!$store.hasNext}
+            />
+          </button>
+        </div>
+      </slot>
       <slot name="action-top-right" />
     </nav>
   </div>
