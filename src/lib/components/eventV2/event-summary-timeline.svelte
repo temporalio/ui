@@ -189,7 +189,7 @@
 
   :global(.vis-time-axis .vis-text) {
     font-size: 10px;
-    color: white;
+    color: white !important;
   }
 
   :global(.vis-background, .vis-timeline) {
@@ -216,7 +216,7 @@
   }
 
   .vis-item .vis-item-overflow {
-    overflow: visible;
+    overflow: visible !important;
   }
 
   :global(.vis-item.Completed) {
