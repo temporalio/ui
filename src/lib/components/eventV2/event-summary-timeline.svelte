@@ -4,10 +4,12 @@
   import { Timeline, DataSet, DataView } from 'vis-timeline/standalone';
   import WorkflowStatus from '../workflow-status.svelte';
   import { allEventTypeOptions } from '$lib/models/event-history/get-event-categorization';
+  import Button from '$lib/holocene/button.svelte';
 
   export let fullHistory: CommonHistoryEvent[] = [];
 
   let visualizationRef;
+  let timeline;
 
   $: eventGroups = groupEvents(fullHistory);
 
@@ -54,6 +56,11 @@
         const background = allEventTypeOptions.find(
           (o) => o.option === data.data.category,
         ).color;
+
+        // let component = svelteHTML.createElement('h1', {
+        //   style: `background-color: ${background};`,
+        // });
+        // return component;
         return `<h1 style="background-color: ${background};">${data.data.lastEvent.classification}</h1>`;
       },
     };
@@ -64,11 +71,18 @@
     if (eventGroups.length && visualizationRef) {
       const { groups, items } = createGroupItems(eventGroups);
       const options = createOptions(fullHistory);
-      const timeline = new Timeline(visualizationRef, items, groups, options);
+      timeline = new Timeline(visualizationRef, items, groups, options);
     }
   }
+
+  const resetTimelineView = () => {
+    timeline.fit();
+  };
 </script>
 
+<div class="flex justify-end gap-2">
+  <Button on:click={resetTimelineView}>Reset</Button>
+</div>
 {#key fullHistory}
   <div bind:this={visualizationRef} />
 {/key}
@@ -107,7 +121,7 @@
     color: white;
     border-radius: 0.75rem;
     border-width: 2px;
-    border: 2px solid black;
+    border: 2px solid #18181b;
   }
 
   :global(.vis-content, .vis-group) {
