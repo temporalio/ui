@@ -9,7 +9,6 @@
 </script>
 
 <div class="flex flex-col gap-2">
-  <h1 class="flex gap-1 items-center text-xl">At-a-glance</h1>
   <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
     <Card class="flex flex-col gap-0 text-right">
       <p>Workers</p>
