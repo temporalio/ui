@@ -83,6 +83,10 @@ export const fetchAllEvents = async ({
 }: FetchEventsParametersWithSettings): Promise<CommonHistoryEvent[]> => {
   const endpoint = getEndpointForSortOrder(sort);
   const route = routeForApi(endpoint, { namespace, workflowId, runId });
+
+  const handleAbort = (error) => {
+    return;
+  };
   const response = await paginated(
     async (token: string) => {
       return requestFromAPI<GetWorkflowExecutionHistoryResponse>(route, {
@@ -90,20 +94,26 @@ export const fetchAllEvents = async ({
         request: fetch,
         params: params ?? {},
         signal,
-        onError,
       });
     },
-    { onStart, onUpdate, onComplete },
+    {
+      onStart,
+      onUpdate,
+      onComplete,
+      onError: handleAbort,
+    },
   );
 
-  const allEvents = await toEventHistory({
-    response: response.history.events,
-    namespace,
-    settings,
-    accessToken,
-  });
+  if (response) {
+    const allEvents = await toEventHistory({
+      response: response.history.events,
+      namespace,
+      settings,
+      accessToken,
+    });
 
-  return allEvents;
+    return allEvents;
+  }
 };
 
 export const fetchPartialRawEvents = async ({

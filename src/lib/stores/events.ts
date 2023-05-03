@@ -82,3 +82,5 @@ export const eventHistory =
 export const timelineEvents = writable(null);
 
 export const fullEventHistory = writable<WorkflowEvents>([]);
+
+export const newEvents = writable<WorkflowEvents>([]);

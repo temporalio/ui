@@ -32,21 +32,21 @@ export const getEventGroupName = (event: CommonHistoryEvent): string => {
   }
 
   if (isSignalExternalWorkflowExecutionInitiatedEvent(event)) {
-    return `Signal: ${event.signalExternalWorkflowExecutionInitiatedEventAttributes?.signalName}`;
+    return `${event.signalExternalWorkflowExecutionInitiatedEventAttributes?.signalName}`;
   }
 
   if (isWorkflowExecutionSignaledEvent(event)) {
-    return `Signal received: ${event.workflowExecutionSignaledEventAttributes?.signalName}`;
+    return `${event.workflowExecutionSignaledEventAttributes?.signalName}`;
   }
 
   if (isMarkerRecordedEvent(event)) {
     if (isLocalActivityMarkerEvent(event)) {
       return 'Local Activity';
     }
-    return `Marker: ${event.markerRecordedEventAttributes?.markerName}`;
+    return `${event.markerRecordedEventAttributes?.markerName}`;
   }
 
   if (isStartChildWorkflowExecutionInitiatedEvent(event)) {
-    return `Child Workflow: ${event.startChildWorkflowExecutionInitiatedEventAttributes?.workflowType?.name}`;
+    return `${event.startChildWorkflowExecutionInitiatedEventAttributes?.workflowType?.name}`;
   }
 };

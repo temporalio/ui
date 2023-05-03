@@ -1,13 +1,9 @@
 <script lang="ts">
   import EventSummaryV2 from '$lib/components/eventV2/event-summary-v2.svelte';
   import WorkflowRelationshipsV2 from '$lib/components/eventV2/workflow-relationships-v2.svelte';
-  import WorkflowSummaryV2 from '$lib/components/eventV2/workflow-summary-v2.svelte';
   import { eventHistory } from '$lib/stores/events';
   import { refresh, workflowRun } from '$lib/stores/workflow-run';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
-  import WorkflowWorkersV2 from '$lib/components/eventV2/workflow-workers-v2.svelte';
-  import WorkflowStackTraceV2 from '$lib/components/eventV2/workflow-stack-trace-v2.svelte';
-  import WorkflowQueryV2 from '$lib/components/eventV2/workflow-query-v2.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
   import { page } from '$app/stores';
   import WorkflowOptionsV2 from '$lib/components/eventV2/workflow-options-v2.svelte';
@@ -16,43 +12,54 @@
   import { authUser } from '$lib/stores/auth-user';
   import { fetchAllEvents } from '$lib/services/events-service';
   import { onDestroy } from 'svelte';
-  import WorkflowTimeMotion from './workflow-time-motion.svelte';
-  import WorkflowDistributedTrace from './workflow-distributed-trace.svelte';
-  import EventHistoryTimelineContainer from '../event/event-history-timeline-container.svelte';
   import EventSummaryTimeline from './event-summary-timeline.svelte';
+  import type { CommonHistoryEvent } from '$lib/types/events';
+  import debounce from 'just-debounce';
+  import EventSummaryHierarchy from './event-summary-hierarchy.svelte';
 
   let controller;
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
   $: ({ workflow } = $workflowRun);
+
   $: workflowRelationships = getWorkflowRelationships(
     workflow,
     $eventHistory,
     fullHistory,
   );
 
-  let fetchHistory: Promise<CommonHistoryEvent[]>;
   let fullHistory: CommonHistoryEvent[] = [];
+
   let showNonCompleted = false;
   let expandAll = false;
   let showWorkflowTasks = false;
 
-  const onUpdate = async ({ history }) => {
+  const setFullHistory = async (events) => {
     const { settings } = $page.data;
-    fullHistory = await toEventHistory({
-      response: history.events,
+    const newHistory = await toEventHistory({
+      response: events.slice(fullHistory.length),
       namespace,
       settings,
       accessToken: $authUser?.accessToken,
     });
-    const lastEvent = fullHistory[fullHistory.length - 1];
+    fullHistory = [...fullHistory, ...newHistory];
+    const lastEvent = events[events.length - 1];
     if (isCompletionEvent(lastEvent)) {
       $refresh = Date.now();
     }
   };
 
-  const onError = () => {
-    console.error('Request aborted');
+  const debounceSetFullHistory = debounce(async (events) => {
+    setFullHistory(events);
+  }, 250);
+
+  const onUpdate = async ({ history }) => {
+    const { events } = history;
+    if (!fullHistory.length && events.length) {
+      setFullHistory(events);
+    } else if (events.length > fullHistory.length) {
+      debounceSetFullHistory(events);
+    }
   };
 
   const fetchEvents = async (
@@ -63,7 +70,7 @@
     controller = new AbortController();
     const signal = controller.signal;
     const { settings } = $page.data;
-    fetchHistory = fetchAllEvents({
+    fetchAllEvents({
       namespace,
       workflowId,
       runId,
@@ -71,7 +78,6 @@
       params: { waitNewEvent: 'true' },
       accessToken: $authUser?.accessToken,
       sort: 'ascending',
-      onError,
       onUpdate,
       signal,
     });
@@ -89,14 +95,15 @@
   url={$page.url.href}
 />
 <div class="flex flex-col gap-2">
-  <WorkflowSummaryV2 {...workflowRelationships} />
   <WorkflowRelationshipsV2 {...workflowRelationships} />
-  <EventSummaryTimeline {fullHistory} />
-
-  <!-- <div class="flex flex-col md:flex-row gap-2 h-auto max-h-[200px]">
-    <WorkflowTimeMotion />
-    <EventHistoryTimelineContainer {fullHistory} />
-  </div> -->
+  <div class="flex flex-col xl:flex-row gap-2">
+    <div class="w-full xl:w-2/3">
+      <EventSummaryTimeline {fullHistory} />
+    </div>
+    <div class="w-full xl:w-1/3 grow">
+      <EventSummaryHierarchy {...workflowRelationships} />
+    </div>
+  </div>
 </div>
 <div class="w-full">
   <WorkflowOptionsV2

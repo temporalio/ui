@@ -1,6 +1,6 @@
 {
   "name": "@temporalio/ui",
-  "version": "2.13.1-north-star.8",
+  "version": "2.13.1-north-star.9",
   "type": "module",
   "description": "Temporal.io UI",
   "keywords": [
@@ -83,6 +83,7 @@
     "url-pattern": "^1.0.3",
     "uuid": "^9.0.0",
     "vis-data": "^7.1.6",
+    "vis-network": "^9.1.6",
     "vis-timeline": "^7.7.2",
     "websocket-as-promised": "^2.0.1"
   },

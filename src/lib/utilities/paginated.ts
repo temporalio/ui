@@ -54,6 +54,7 @@ export const paginated = async <T extends WithNextPageToken>(
       onStart,
       onUpdate,
       onComplete,
+      onError,
       token: nextPageToken,
       previousProps: mergedProps,
     });

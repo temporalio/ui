@@ -70,7 +70,7 @@
     >
       <Icon name="chevron-left" class="inline" />Back to Workflows
     </a>
-    <a
+    <!-- <a
       href={`${routeForEventHistoryV2({
         namespace,
         workflow: workflow.id,
@@ -80,8 +80,76 @@
       class="back-to-workflows"
     >
       Switch to v2 Workflow UI
-    </a>
+    </a> -->
   </div>
+  <Tabs class="mb-4">
+    <TabList class="flex flex-wrap gap-6" label="workflow detail">
+      <Tab
+        label="History"
+        href={routeForEventHistoryV2({
+          ...routeParameters,
+        })}
+        id="history-tab"
+        active={pathMatches(
+          $page.url.pathname,
+          routeForEventHistoryV2({
+            ...routeParameters,
+          }),
+        )}
+      >
+        <Badge type="blue" class="px-2 py-0">{workflow.historyEvents}</Badge>
+      </Tab>
+      <Tab
+        label="Workers"
+        href={routeForWorkers(routeParameters)}
+        id="workers-tab"
+        active={pathMatches(
+          $page.url.pathname,
+          routeForWorkers(routeParameters),
+        )}
+      >
+        <Badge type="blue" class="px-2 py-0">{workers?.pollers?.length}</Badge>
+      </Tab>
+      <Tab
+        label="Pending Activities"
+        href={routeForPendingActivities(routeParameters)}
+        id="pending-activities-tab"
+        active={pathMatches(
+          $page.url.pathname,
+          routeForPendingActivities(routeParameters),
+        )}
+      >
+        <Badge type={activitiesCanceled ? 'warning' : 'blue'} class="px-2 py-0">
+          {#if activitiesCanceled}<Icon
+              name="canceled"
+              width={20}
+              height={20}
+            />
+          {/if}
+          {workflow.pendingActivities?.length}
+        </Badge>
+      </Tab>
+      <Tab
+        label="Stack Trace"
+        href={routeForStackTrace(routeParameters)}
+        id="stack-trace-tab"
+        active={pathMatches(
+          $page.url.pathname,
+          routeForStackTrace(routeParameters),
+        )}
+      />
+      <Tab
+        label="Queries"
+        href={routeForWorkflowQuery(routeParameters)}
+        id="queries-tab"
+        active={pathMatches(
+          $page.url.pathname,
+          routeForWorkflowQuery(routeParameters),
+        )}
+      />
+    </TabList>
+  </Tabs>
+
   <div
     class="flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
   >
@@ -180,73 +248,6 @@
       </Alert>
     </div>
   {/if}
-  <Tabs class="mt-4">
-    <TabList class="flex flex-wrap gap-6" label="workflow detail">
-      <Tab
-        label="History"
-        href={routeForEventHistoryV2({
-          ...routeParameters,
-        })}
-        id="history-tab"
-        active={pathMatches(
-          $page.url.pathname,
-          routeForEventHistoryV2({
-            ...routeParameters,
-          }),
-        )}
-      >
-        <Badge type="blue" class="px-2 py-0">{workflow.historyEvents}</Badge>
-      </Tab>
-      <Tab
-        label="Workers"
-        href={routeForWorkers(routeParameters)}
-        id="workers-tab"
-        active={pathMatches(
-          $page.url.pathname,
-          routeForWorkers(routeParameters),
-        )}
-      >
-        <Badge type="blue" class="px-2 py-0">{workers?.pollers?.length}</Badge>
-      </Tab>
-      <Tab
-        label="Pending Activities"
-        href={routeForPendingActivities(routeParameters)}
-        id="pending-activities-tab"
-        active={pathMatches(
-          $page.url.pathname,
-          routeForPendingActivities(routeParameters),
-        )}
-      >
-        <Badge type={activitiesCanceled ? 'warning' : 'blue'} class="px-2 py-0">
-          {#if activitiesCanceled}<Icon
-              name="canceled"
-              width={20}
-              height={20}
-            />
-          {/if}
-          {workflow.pendingActivities?.length}
-        </Badge>
-      </Tab>
-      <Tab
-        label="Stack Trace"
-        href={routeForStackTrace(routeParameters)}
-        id="stack-trace-tab"
-        active={pathMatches(
-          $page.url.pathname,
-          routeForStackTrace(routeParameters),
-        )}
-      />
-      <Tab
-        label="Queries"
-        href={routeForWorkflowQuery(routeParameters)}
-        id="queries-tab"
-        active={pathMatches(
-          $page.url.pathname,
-          routeForWorkflowQuery(routeParameters),
-        )}
-      />
-    </TabList>
-  </Tabs>
 </header>
 
 <style lang="postcss">

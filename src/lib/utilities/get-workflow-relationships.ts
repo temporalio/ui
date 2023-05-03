@@ -56,7 +56,8 @@ export const getWorkflowRelationships = (
   const children = fullEventHistory.filter((event) =>
     isChildWorkflowClosedEvent(event),
   ) as ChildWorkflowClosedEvent[];
-  const hasChildren = !!workflow?.pendingChildren.length || !!children.length;
+  const pendingChildren = workflow?.pendingChildren;
+  const hasChildren = !!pendingChildren.length || !!children.length;
   const parent = workflow?.parent;
 
   const workflowExecutionStartedEvent = eventHistory.start.find(
@@ -88,6 +89,7 @@ export const getWorkflowRelationships = (
     hasRelationships,
     hasChildren,
     children,
+    pendingChildren,
     first,
     previous,
     parent,

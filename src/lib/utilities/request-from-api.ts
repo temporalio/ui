@@ -87,7 +87,6 @@ export const requestFromAPI = async <T>(
     options = withSecurityOptions(options, isBrowser);
     options = await withAuth(options, isBrowser);
     options = signal ? { ...options, signal } : options;
-
     const response = await request(url, options);
     const body = await response.json();
 
@@ -109,6 +108,9 @@ export const requestFromAPI = async <T>(
     return body;
   } catch (error: unknown) {
     if (notifyOnError) {
+      if (error?.message === 'The user aborted a request.') {
+        return;
+      }
       handleError(error);
 
       if (shouldRetry && retryCount > 0) {
