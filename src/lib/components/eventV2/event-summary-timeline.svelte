@@ -26,6 +26,7 @@
         end: lastEvent.eventTime,
         type: 'range',
         data: group,
+        className: group.category,
       });
       groups.push({
         id: group.id,
@@ -61,7 +62,18 @@
         //   style: `background-color: ${background};`,
         // });
         // return component;
-        return `<h1 style="background-color: ${background};">${data.data.lastEvent.classification}</h1>`;
+
+        var component = document.createElement('div');
+        var inner = document.createElement('span');
+        inner.className = 'large';
+        inner.appendChild(
+          document.createTextNode(data.data.lastEvent.classification),
+        );
+        component.appendChild(inner);
+        // component.style.backgroundColor = background;
+
+        return component;
+        // return `<h1 style="background-color: ${background};">${data.data.lastEvent.classification}</h1>`;
       },
     };
     return defaults;
@@ -93,6 +105,10 @@
     background-color: #86efac;
     min-width: 10px;
     font-size: 12px;
+  }
+
+  :global(.vis-item-content) {
+    width: 100%;
   }
 
   :global(.vis-item .vis-range .vis-readonly, .vis-item .vis-item-overflow) {
