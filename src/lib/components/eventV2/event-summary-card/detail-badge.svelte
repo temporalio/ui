@@ -31,7 +31,7 @@
     class="flex h-auto items-center justify-between gap-1"
     class:cell={!primary}
   >
-    <InfoPill label={''}>
+    <InfoPill label={format(key)}>
       {#if shouldDisplayAsExecutionLink(key)}
         <Copyable
           content={value}

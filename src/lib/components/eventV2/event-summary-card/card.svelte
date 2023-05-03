@@ -34,14 +34,14 @@
 </script>
 
 <div class="flex">
-  <LineDot
+  <!-- <LineDot
     {event}
     {firstEvent}
     {events}
     removeTail={last || final}
     removeHead={initial}
     {pending}
-  />
+  /> -->
   <div class="w-full overflow-hidden">
     <div class="flex my-[2px]">
       <div

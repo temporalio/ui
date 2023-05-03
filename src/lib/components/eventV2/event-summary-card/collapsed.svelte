@@ -6,6 +6,8 @@
   import { eventGroupDisplayName } from '../event-detail-keys';
   import EventClassification from './event-classification.svelte';
   import type { IterableEvent } from '$lib/types/events';
+  import { formatDate } from '$lib/utilities/format-date';
+  import { timeFormat } from '$lib/stores/time-format';
 
   export let event: IterableEvent;
   export let expanded = false;
@@ -19,7 +21,7 @@
   $: lastEvent = isEventGroup(event) ? event.lastEvent : event;
 </script>
 
-<div class="flex cursor-pointer flex-col justify-between gap-2 md:flex-row">
+<div class="flex cursor-pointer flex-col justify-between md:flex-row">
   <div class="flex items-center justify-between gap-4">
     <p>{initialEvent.id}</p>
     <div class="flex items-center gap-2">
@@ -55,3 +57,6 @@
     <Details {event} {expanded} primary />
   </div>
 </div>
+<p class="text-[12px] m-0">
+  {formatDate(event?.eventTime, $timeFormat, 'ago', true)}
+</p>

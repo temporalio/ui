@@ -215,7 +215,7 @@
     border-color: #18181b;
   }
 
-  .vis-item .vis-item-overflow {
+  .vis-item-overflow {
     overflow: visible !important;
   }
 
