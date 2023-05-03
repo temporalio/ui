@@ -19,6 +19,7 @@
   import WorkflowTimeMotion from './workflow-time-motion.svelte';
   import WorkflowDistributedTrace from './workflow-distributed-trace.svelte';
   import EventHistoryTimelineContainer from '../event/event-history-timeline-container.svelte';
+  import EventSummaryTimeline from './event-summary-timeline.svelte';
 
   let controller;
 
@@ -87,6 +88,9 @@
   title={`Workflow History | ${workflow.runId}`}
   url={$page.url.href}
 />
+<div class="h-auto w-full">
+  <EventSummaryTimeline {fullHistory} />
+</div>
 <div class="flex flex-col gap-2">
   <WorkflowSummaryV2 {...workflowRelationships} />
   <div class="flex flex-col md:flex-row gap-2 h-auto max-h-[200px]">
