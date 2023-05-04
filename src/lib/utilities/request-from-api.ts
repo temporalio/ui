@@ -1,6 +1,5 @@
 import { BROWSER } from 'esm-env';
 import { getAuthUser } from '$lib/stores/auth-user';
-import { noop } from 'svelte/internal';
 import { handleError as handleRequestError } from './handle-error';
 import { isFunction } from './is-function';
 import { toURL } from './to-url';
@@ -55,7 +54,6 @@ export const isTemporalAPIError = (obj: unknown): obj is TemporalAPIError =>
 export const requestFromAPI = async <T>(
   endpoint: toURLParams[0],
   init: RequestFromAPIOptions = {},
-  retryCount = 10,
 ): Promise<T> => {
   const {
     params = {},
