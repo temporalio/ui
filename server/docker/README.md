@@ -28,7 +28,7 @@ docker run \
     temporalio/ui:latest
 ```
 
-For all env options see [Config template file](./config_template.yaml) or [Configuration Docs](https://docs.temporal.io/references/web-ui-configuration)
+For all env options see [Config template file](./config-template.yaml) or [Configuration Docs](https://docs.temporal.io/references/web-ui-configuration)
 
 ## Serve UI under a sub-path
 
