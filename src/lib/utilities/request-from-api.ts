@@ -30,12 +30,9 @@ type RequestFromAPIOptions = {
   request?: typeof fetch;
   options?: Parameters<typeof fetch>[1];
   token?: string;
-  onRetry?: RetryCallback;
   onError?: ErrorCallback;
   notifyOnError?: boolean;
   handleError?: typeof handleRequestError;
-  shouldRetry?: boolean;
-  retryInterval?: number;
   isBrowser?: boolean;
 };
 
@@ -64,12 +61,9 @@ export const requestFromAPI = async <T>(
     params = {},
     request = fetch,
     token,
-    shouldRetry = false,
     notifyOnError = true,
     handleError = handleRequestError,
-    onRetry = noop,
     onError,
-    retryInterval = 5000,
     isBrowser = BROWSER,
   } = init;
   let { options } = init;
@@ -107,16 +101,6 @@ export const requestFromAPI = async <T>(
   } catch (error: unknown) {
     if (notifyOnError) {
       handleError(error);
-
-      if (shouldRetry && retryCount > 0) {
-        return new Promise((resolve) => {
-          const retriesRemaining = retryCount - 1;
-          onRetry(retriesRemaining);
-          setTimeout(() => {
-            resolve(requestFromAPI(endpoint, init, retriesRemaining));
-          }, retryInterval);
-        });
-      }
     } else {
       throw error;
     }

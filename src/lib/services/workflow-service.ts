@@ -252,7 +252,6 @@ export async function terminateWorkflow({
   });
   return await requestFromAPI<null>(route, {
     options: { method: 'POST', body: stringifyWithBigInt({ reason }) },
-    shouldRetry: false,
     notifyOnError: false,
   });
 }

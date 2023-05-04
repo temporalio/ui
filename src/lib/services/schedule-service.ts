@@ -98,7 +98,6 @@ export async function createSchedule({
           ...body,
         }),
       },
-      shouldRetry: false,
       onError,
     },
   );
@@ -136,7 +135,6 @@ export async function editSchedule({
         ...body,
       }),
     },
-    shouldRetry: false,
     onError,
   });
 
@@ -172,7 +170,6 @@ export async function pauseSchedule({
         request_id: uuidv4(),
       }),
     },
-    shouldRetry: false,
     onError: (error) => console.error(error),
   });
 }
@@ -206,6 +203,5 @@ export async function unpauseSchedule({
         request_id: uuidv4(),
       }),
     },
-    shouldRetry: false,
   });
 }

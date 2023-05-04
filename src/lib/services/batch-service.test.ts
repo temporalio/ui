@@ -57,7 +57,6 @@ describe('Batch Service', () => {
         'http://localhost:8233/api/v1/namespaces/default/batch-operations',
         {
           notifyOnError: false,
-          shouldRetry: false,
           options: {
             method: 'POST',
             body: '{"jobId":"xxx","namespace":"default","reason":"test","terminationOperation":{},"visibilityQuery":"RunId=\\"a\\" OR RunId=\\"b\\" OR RunId=\\"c\\""}',
@@ -78,7 +77,6 @@ describe('Batch Service', () => {
         'http://localhost:8233/api/v1/namespaces/default/batch-operations',
         {
           notifyOnError: false,
-          shouldRetry: false,
           options: {
             method: 'POST',
             body: '{"jobId":"xxx","namespace":"default","reason":"test","cancellationOperation":{},"visibilityQuery":"RunId=\\"a\\" OR RunId=\\"b\\" OR RunId=\\"c\\""}',
@@ -107,7 +105,6 @@ describe('Batch Service', () => {
         'http://localhost:8233/api/v1/namespaces/default/batch-operations',
         {
           notifyOnError: false,
-          shouldRetry: false,
           options: {
             method: 'POST',
             body: '{"jobId":"xxx","namespace":"default","reason":"test","terminationOperation":{},"executions":[{"workflowId":"1","runId":"a"},{"workflowId":"2","runId":"b"},{"workflowId":"3","runId":"c"}]}',
@@ -128,7 +125,6 @@ describe('Batch Service', () => {
         'http://localhost:8233/api/v1/namespaces/default/batch-operations',
         {
           notifyOnError: false,
-          shouldRetry: false,
           options: {
             method: 'POST',
             body: '{"jobId":"xxx","namespace":"default","reason":"test","cancellationOperation":{},"executions":[{"workflowId":"1","runId":"a"},{"workflowId":"2","runId":"b"},{"workflowId":"3","runId":"c"}]}',
