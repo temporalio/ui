@@ -18,10 +18,10 @@ export const handleError = (
   errors = networkError,
   isBrowser = BROWSER,
 ): void => {
-  (error as NetworkErrorWithReport).report = false;
-
   if (typeof error === 'string') {
     toasts.push({ variant: 'error', message: error });
+  } else {
+    (error as NetworkErrorWithReport).report = false;
   }
 
   if (error instanceof Error) {
