@@ -8,6 +8,8 @@
   import { workflowRun } from '$lib/stores/workflow-run';
   import { eventGroupDisplayName } from './event-detail-keys';
   import EventTimelineCard from './event-timeline-card.svelte';
+  import WorkflowStatus from '../workflow-status.svelte';
+  import EventClassification from './event-summary-card/event-classification.svelte';
 
   export let fullHistory: CommonHistoryEvent[] = [];
 
@@ -20,6 +22,21 @@
     return container.innerHTML;
   }
 
+  function renderGroupName(group, classification) {
+    const groupName = eventGroupDisplayName(group, false);
+    const groupStatus = renderComponentToHTML(EventClassification, {
+      classification,
+    });
+    return `<div class="flex gap-2 items-center">${groupStatus}${groupName}</div>`;
+  }
+
+  function renderExecutionName(status) {
+    const groupStatus = renderComponentToHTML(WorkflowStatus, {
+      status,
+    });
+    return `<div class="flex gap-2 items-center">${groupStatus}<p>Workflow Execution<p></div>`;
+  }
+
   const createGroupItems = (eventGroups, isRunning) => {
     const items = new DataSet([]);
     const groups = new DataSet([]);
@@ -28,7 +45,7 @@
     const finalEvent = fullHistory[fullHistory.length - 1];
     groups.add({
       id: 'workflow',
-      content: 'Workflow Execution',
+      content: renderExecutionName($workflowRun.workflow.status),
       order: -1,
     });
     if (isRunning) {
@@ -38,8 +55,7 @@
         start: firstEvent.eventTime,
         end: Date.now(),
         type: 'range',
-        content: 'Running',
-        className: 'Running',
+        className: `${finalEvent.category} ${finalEvent.classification}`,
       });
     } else {
       items.add({
@@ -48,8 +64,7 @@
         start: firstEvent.eventTime,
         end: finalEvent.eventTime,
         type: 'range',
-        content: finalEvent.classification,
-        className: finalEvent.classification,
+        className: `${finalEvent.category} ${finalEvent.classification}`,
       });
     }
     eventGroups.forEach((group, i) => {
@@ -61,7 +76,8 @@
         start: initialEvent.eventTime,
         content: group.name,
         end: lastEvent.eventTime,
-        className: lastEvent.classification,
+        type: group.eventList.length === 1 ? 'point' : 'range',
+        className: `${lastEvent.category} ${lastEvent.classification}`,
       });
       // items.add({
       //   id: `event-box-${initialEvent.id}`,
@@ -85,10 +101,10 @@
       // });
       groups.add({
         id: group.id,
-        content: eventGroupDisplayName(group, false),
+        content: renderGroupName(group, lastEvent.classification),
         order: i,
         nestedGroups: [`${group.id}-nested`],
-        showNested: i === 0,
+        showNested: false,
       });
       groups.add({
         id: `${group.id}-nested`,
@@ -124,7 +140,15 @@
     xss: {
       disabled: true,
       filterOptions: {
-        whiteList: { p: 'class', div: 'class', h1: 'class' },
+        whiteList: {
+          p: 'class',
+          div: 'class',
+          h1: 'class',
+          input: ['class', 'id', 'check'],
+          label: ['class', 'id', 'for'],
+          li: ['class'],
+          ul: ['class'],
+        },
       },
     },
   };
@@ -136,6 +160,12 @@
       new DataSet([]),
       options,
     );
+    timeline.on('click', function (params, callback) {
+      // Need to figure out how to prevent jump on group click
+      params.event.preventDefault();
+      params.event.stopPropagation();
+      return;
+    });
     return () => timeline.destroy();
   });
 
@@ -220,24 +250,83 @@
   }
 
   :global(.vis-item) {
-    background-color: #f4f4f5;
+    background-color: #fff;
     border-color: transparent;
     color: #3f3f46;
     font-size: 12px;
+  }
+
+  :global(.vis-item .vis-dot) {
+    background-color: #18181b;
   }
 
   :global(.vis-item.dot .vis-dot) {
     border-color: #18181b;
   }
 
-  .vis-item-overflow {
+  :global(.vis-item-overflow) {
     overflow: visible !important;
   }
 
-  :global(.vis-item.Completed) {
-    background-color: #bbf7d0;
-    border-color: #15803d;
-    color: #15803d;
+  :global(.vis-item.Card) {
+    width: 100% !important;
+  }
+
+  /* CSS for each activity type block */
+
+  :global(.vis-item.workflow) {
+    background-color: #3f3f46;
+    border-color: #18181b;
+    border-radius: 9999px;
+    border-width: 2px;
+    color: #18181b;
+  }
+
+  :global(.vis-item.child-workflow) {
+    background-color: #e0e7ff;
+    border-color: #312e81;
+    border-radius: 9999px;
+    border-width: 2px;
+    color: #312e81;
+  }
+
+  :global(.vis-item.activity) {
+    background-color: #ddd6fe;
+    border-color: #6d28d9;
+    border-radius: 9999px;
+    border-width: 2px;
+    color: #6d28d9;
+  }
+
+  :global(.vis-item.marker) {
+    background-color: #bfdbfe;
+    border-color: #bfdbfe;
+    border-radius: 9999px;
+    border-width: 2px;
+    color: #1d4ed8;
+  }
+
+  :global(.vis-item.signal) {
+    color: #652b19;
+  }
+
+  :global(.vis-item.vis-point.signal .vis-dot) {
+    background-color: #feebcb;
+    border-color: #feebcb;
+  }
+
+  :global(.vis-item.timer) {
+    background-color: #feebcb;
+    border-color: #652b19;
+    border-radius: 9999px;
+    border-width: 2px;
+    color: #652b19;
+  }
+
+  /* CSS for the classification (status) of each block */
+
+  /* :global(.vis-item.Completed) {
+    border-right-color: #15803d;
   }
 
   :global(
@@ -246,42 +335,31 @@
       .vis-item.Open,
       .vis-item.New,
       .vis-item.Started,
-      .vis-item.Intitiated,) {
-    background-color: #f3e8ff;
-    border-color: #7e22ce;
-    color: #7e22ce;
+      .vis-item.Intitiated,
+
+    ) {
+    border-right-color: #7e22ce;
   }
 
   :global(.vis-item.Fired, .vis-item.TimedOut) {
-    background-color: #ffedd5;
-    border-color: #7c2d12;
-    color: #7c2d12;
+    border-right-color: #7c2d12;
   }
 
   :global(.vis-item.Failed) {
-    background-color: #fee2e2;
-    border-color: #b91c1c;
-    color: #b91c1c;
+    border-right-color: #b91c1c;
   }
 
   :global(.vis-item.Canceled) {
-    background-color: #fef9c3;
-    border-color: #713f12;
-    color: #713f12;
+    border-right-color: #713f12;
   }
 
   :global(.vis-item.Terminated) {
-    background-color: #e4e4e7;
-    border-color: #18181b;
-    color: #18181b;
+    border-right-color: #18181b;
   }
 
   :global(.vis-item.Running) {
-    /* custom colors for selected orange items */
-    background-color: #dbeafe;
-    border-color: #1d4ed8;
-    color: #1d4ed8;
-  }
+    border-right-color: #1d4ed8;
+  } */
 
   :global(.vis-item.vis-selected) {
     /* custom colors for selected orange items */

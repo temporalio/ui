@@ -10,5 +10,5 @@
 
 <div class="flex flex-col gap-2">
   <EventSummaryTimeline fullHistory={$importEvents} />
-  <EventSummaryV2 importingHistory {debugMode} {advancedMode} />
+  <!-- <EventSummaryV2 importingHistory {debugMode} {advancedMode} /> -->
 </div>

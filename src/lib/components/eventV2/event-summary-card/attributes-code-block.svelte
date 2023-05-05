@@ -21,6 +21,7 @@
     {@const codeBlockValue = isFailure
       ? getFailureMessage(attribute.value)
       : getCodeBlockValueWithoutNullPayloads(attribute.value)}
+
     {#if codeBlockValue}
       <div class="grow overflow-auto">
         <CodeBlock

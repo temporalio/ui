@@ -98,7 +98,7 @@
   <WorkflowRelationshipsV2 {...workflowRelationships} />
   <EventSummaryTimeline {fullHistory} />
 </div>
-<!-- <div class="w-full">
+<div class="w-full">
   <WorkflowOptionsV2
     {showWorkflowTasks}
     {showNonCompleted}
@@ -112,4 +112,4 @@
     {expandAll}
     {showWorkflowTasks}
   />
-</div> -->
+</div>

@@ -23,8 +23,6 @@
   onMount(async () => {
     const { settings } = $page.data;
     try {
-      const testEvents = workflowImportEvents.events;
-      debugger;
       const events = await toEventHistory({
         response: workflowImportEvents.events,
         namespace: $lastUsedNamespace,
