@@ -10,9 +10,14 @@
   import EventTimelineCard from './event-timeline-card.svelte';
   import WorkflowStatus from '../workflow-status.svelte';
   import EventClassification from './event-summary-card/event-classification.svelte';
+  import { capitalize } from '$lib/utilities/format-camel-case';
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
   export let fullHistory: CommonHistoryEvent[] = [];
 
+  $: {
+    console.log('pending: ', $workflowRun.workflow.pendingActivities);
+  }
   let visualizationRef;
   let timeline;
 
@@ -23,18 +28,25 @@
   }
 
   function renderGroupName(group, classification) {
-    const groupName = eventGroupDisplayName(group, false);
+    const groupName = capitalize(group.category);
     const groupStatus = renderComponentToHTML(EventClassification, {
       classification,
     });
-    return `<div class="flex gap-2 items-center">${groupStatus}${groupName}</div>`;
+    return `<div class="flex gap-2 items-center">${groupName}${groupStatus}</div>`;
   }
 
   function renderExecutionName(status) {
     const groupStatus = renderComponentToHTML(WorkflowStatus, {
       status,
     });
-    return `<div class="flex gap-2 items-center">${groupStatus}<p>Workflow Execution<p></div>`;
+    return `<div class="flex gap-1 items-center"><p>Workflow Execution<p>${groupStatus}</div>`;
+  }
+
+  function renderPendingAttempts(name, attempt) {
+    const retryIcon = renderComponentToHTML(Icon, {
+      name: 'retry',
+    });
+    return `<div class="flex gap-1 items-center justify-between"><div class="bar-content"><span></span><p>${name}</p></div><div class="flex gap-1 items-center">${retryIcon}${attempt.toString()}</div></div>`;
   }
 
   const createGroupItems = (eventGroups, isRunning) => {
@@ -72,35 +84,41 @@
     eventGroups.forEach((group, i) => {
       const initialEvent = group.initialEvent;
       const lastEvent = group?.lastEvent;
-      items.add({
-        id: `event-range-${initialEvent.id}`,
-        group: group.id,
-        start: initialEvent.eventTime,
-        content: group.name,
-        end: lastEvent.eventTime,
-        type: group.eventList.length === 1 ? 'point' : 'range',
-        className: `${lastEvent.category} ${lastEvent.classification}`,
-      });
-      // items.add({
-      //   id: `event-box-${initialEvent.id}`,
-      //   group: group.id,
-      //   start: lastEvent.eventTime,
-      //   type: 'box',
-      //   title: group.name,
-      //   content: lastEvent?.classification ?? group.name,
-      //   className: lastEvent.classification,
-      // });
-      // group.eventList.forEach((event) => {
-      //   items.add({
-      //     id: `event-${event.id}`,
-      //     start: event.eventTime,
-      //     group: group.id,
-      //     type: 'point',
-      //     style: 'top: -8px; z-index: 10;',
-      //     title: event.classification,
-      //     className: 'dot',
-      //   });
-      // });
+      const groupPendingActivity = $workflowRun.workflow.pendingActivities.find(
+        (activity) => group.eventList.find((e) => e.id === activity.activityId),
+      );
+      const isRunning =
+        !group.isCanceled &&
+        !group.isCompleted &&
+        !group.isFailureOrTimedOut &&
+        !group.isTerminated;
+      if (groupPendingActivity && isRunning) {
+        items.add({
+          id: `pending-${groupPendingActivity.activityId}`,
+          group: group.id,
+          start: initialEvent.eventTime,
+          end: Date.now(),
+          content: renderPendingAttempts(
+            group.name,
+            groupPendingActivity.attempt,
+          ),
+          className: `${lastEvent.category} ${lastEvent.classification}`,
+        });
+      } else {
+        items.add({
+          id: `event-range-${initialEvent.id}`,
+          group: group.id,
+          start: initialEvent.eventTime,
+          content:
+            group.eventList.length === 1
+              ? group.name
+              : `<div class="bar-content"><span></span><p>${group.name}</p></div>`,
+          end: lastEvent.eventTime,
+          type: group.eventList.length === 1 ? 'point' : 'range',
+          className: `${lastEvent.category} ${lastEvent.classification}`,
+        });
+      }
+
       groups.add({
         id: group.id,
         content: renderGroupName(group, lastEvent.classification),
@@ -258,12 +276,8 @@
     font-size: 12px;
   }
 
-  :global(.vis-item .vis-dot) {
+  :global(.vis-item.vis-dot) {
     background-color: #18181b;
-  }
-
-  :global(.vis-item.dot .vis-dot) {
-    border-color: #18181b;
   }
 
   :global(.vis-item-overflow) {
@@ -284,6 +298,11 @@
     color: #18181b;
   }
 
+  :global(.vis-item.vis-point.workflow) {
+    background-color: #18181b;
+    color: #18181b;
+  }
+
   :global(.vis-item.vis-range.child-workflow) {
     background-color: #e0e7ff;
     border-color: #312e81;
@@ -292,11 +311,21 @@
     color: #312e81;
   }
 
+  :global(.vis-item.vis-point.child-workflow) {
+    background-color: #312e81;
+    color: #312e81;
+  }
+
   :global(.vis-item.vis-range.activity) {
-    background-color: #ddd6fe;
+    background-color: #faf5ff;
     border-color: #6d28d9;
     border-radius: 9999px;
     border-width: 2px;
+    color: #6d28d9;
+  }
+
+  :global(.vis-item.vis-dot.activity) {
+    background-color: #6d28d9;
     color: #6d28d9;
   }
 
@@ -308,7 +337,16 @@
     color: #1d4ed8;
   }
 
+  :global(.vis-item.vis-point.marker) {
+    background-color: #1d4ed8;
+    color: #1d4ed8;
+  }
+
   :global(.vis-item.vis-range.signal) {
+    color: #652b19;
+  }
+
+  :global(.vis-item.vis-point.signal) {
     color: #652b19;
   }
 
@@ -325,6 +363,24 @@
     color: #652b19;
   }
 
+  :global(.vis-item.vis-point.timer) {
+    color: #652b19;
+  }
+
+  :global(.bar-content) {
+    display: flex;
+    gap: 2px;
+    align-items: center;
+  }
+
+  :global(.bar-content span) {
+    width: 8px;
+    height: 8px;
+    border: 1px solid black;
+    border-radius: 9999px;
+    background-color: white;
+  }
+
   :global(.vis-item.vis-selected) {
     /* custom colors for selected orange items */
     background-color: #c7d2fe;
@@ -332,8 +388,9 @@
     color: #4338ca;
   }
 
-  :global(.vis-item.dot.vis-selected) {
+  :global(.vis-item.vis-selected, .vis-item.vis-point.vis-selected) {
     background-color: transparent;
+    border-radius: 9999px;
   }
 
   :global(.vis-group-level-unknown-but-gte1) {

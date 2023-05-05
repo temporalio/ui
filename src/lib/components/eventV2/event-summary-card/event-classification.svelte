@@ -29,7 +29,7 @@
   $: label = humanFriendlyNames[classification] ?? classification;
 </script>
 
-<span class="flex text-center text-sm font-medium leading-4">
+<span class="flex text-center text-[12px] font-medium leading-4">
   <h6 class="{color} z-10 flex rounded-sm px-1 py-1">
     <span class="whitespace-nowrap">{label}</span>
   </h6>
