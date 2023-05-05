@@ -55,6 +55,7 @@
         start: firstEvent.eventTime,
         end: Date.now(),
         type: 'range',
+        content: $workflowRun.workflow.runId,
         className: `${finalEvent.category} ${finalEvent.classification}`,
       });
     } else {
@@ -64,6 +65,7 @@
         start: firstEvent.eventTime,
         end: finalEvent.eventTime,
         type: 'range',
+        content: $workflowRun.workflow.runId,
         className: `${finalEvent.category} ${finalEvent.classification}`,
       });
     }
@@ -274,15 +276,15 @@
 
   /* CSS for each activity type block */
 
-  :global(.vis-item.workflow) {
-    background-color: #3f3f46;
+  :global(.vis-item.vis-range.workflow) {
+    background-color: #f4f4f5;
     border-color: #18181b;
     border-radius: 9999px;
     border-width: 2px;
     color: #18181b;
   }
 
-  :global(.vis-item.child-workflow) {
+  :global(.vis-item.vis-range.child-workflow) {
     background-color: #e0e7ff;
     border-color: #312e81;
     border-radius: 9999px;
@@ -290,7 +292,7 @@
     color: #312e81;
   }
 
-  :global(.vis-item.activity) {
+  :global(.vis-item.vis-range.activity) {
     background-color: #ddd6fe;
     border-color: #6d28d9;
     border-radius: 9999px;
@@ -298,7 +300,7 @@
     color: #6d28d9;
   }
 
-  :global(.vis-item.marker) {
+  :global(.vis-item.vis-range.marker) {
     background-color: #bfdbfe;
     border-color: #bfdbfe;
     border-radius: 9999px;
@@ -306,60 +308,22 @@
     color: #1d4ed8;
   }
 
-  :global(.vis-item.signal) {
+  :global(.vis-item.vis-range.signal) {
     color: #652b19;
   }
 
-  :global(.vis-item.vis-point.signal .vis-dot) {
+  :global(.vis-item.vis-range.vis-point.signal .vis-dot) {
     background-color: #feebcb;
     border-color: #feebcb;
   }
 
-  :global(.vis-item.timer) {
+  :global(.vis-item.vis-range.timer) {
     background-color: #feebcb;
     border-color: #652b19;
     border-radius: 9999px;
     border-width: 2px;
     color: #652b19;
   }
-
-  /* CSS for the classification (status) of each block */
-
-  /* :global(.vis-item.Completed) {
-    border-right-color: #15803d;
-  }
-
-  :global(
-      .vis-item.Unspecified,
-      .vis-item.Scheduled,
-      .vis-item.Open,
-      .vis-item.New,
-      .vis-item.Started,
-      .vis-item.Intitiated,
-
-    ) {
-    border-right-color: #7e22ce;
-  }
-
-  :global(.vis-item.Fired, .vis-item.TimedOut) {
-    border-right-color: #7c2d12;
-  }
-
-  :global(.vis-item.Failed) {
-    border-right-color: #b91c1c;
-  }
-
-  :global(.vis-item.Canceled) {
-    border-right-color: #713f12;
-  }
-
-  :global(.vis-item.Terminated) {
-    border-right-color: #18181b;
-  }
-
-  :global(.vis-item.Running) {
-    border-right-color: #1d4ed8;
-  } */
 
   :global(.vis-item.vis-selected) {
     /* custom colors for selected orange items */
