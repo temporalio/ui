@@ -26,8 +26,7 @@ describe('handleError', () => {
       response: null as unknown as Response,
     };
 
-    handleError(error);
-
+    expect(() => handleError(error)).toThrowError();
     expect(window.location.assign).toHaveBeenCalledWith(routeForLoginPage());
   });
 
@@ -38,8 +37,7 @@ describe('handleError', () => {
       response: null as unknown as Response,
     };
 
-    handleError(error);
-
+    expect(() => handleError(error)).toThrowError();
     expect(window.location.assign).toHaveBeenCalledWith(routeForLoginPage());
   });
 
@@ -50,8 +48,7 @@ describe('handleError', () => {
       response: null as unknown as Response,
     };
 
-    handleError(error);
-
+    expect(() => handleError(error)).toThrowError();
     expect(window.location.assign).toHaveBeenCalledWith(routeForLoginPage());
   });
 
@@ -62,8 +59,7 @@ describe('handleError', () => {
       response: null as unknown as Response,
     };
 
-    handleError(error);
-
+    expect(() => handleError(error)).toThrowError();
     expect(window.location.assign).toHaveBeenCalledWith(routeForLoginPage());
   });
 
@@ -73,8 +69,7 @@ describe('handleError', () => {
       response: null as unknown as Response,
     };
 
-    handleError(error);
-
+    expect(() => handleError(error)).toThrowError();
     expect(window.location.assign).not.toHaveBeenCalled();
   });
 
@@ -93,15 +88,12 @@ describe('handleError', () => {
       set: vi.fn(),
     };
 
-    try {
-      handleError(error, toasts, errors);
-    } catch (error) {
-      expect(toasts.push).toHaveBeenCalledWith({
-        variant: 'error',
-        message: '500 Uh oh',
-      });
-      expect(errors.set).toHaveBeenCalledWith({ ...error });
-    }
+    expect(() => handleError(error, toasts, errors)).toThrowError();
+    expect(toasts.push).toHaveBeenCalledWith({
+      variant: 'error',
+      message: '500 Uh oh',
+    });
+    expect(errors.set).toHaveBeenCalledWith({ ...error });
   });
 
   it('should add a toast on a string error', () => {
@@ -109,7 +101,7 @@ describe('handleError', () => {
       push: vi.fn(),
     };
 
-    handleError('lol', toasts);
+    expect(() => handleError(new Error('lol'), toasts)).toThrowError();
     expect(toasts.push).toHaveBeenCalledWith({
       variant: 'error',
       message: 'lol',
@@ -121,7 +113,7 @@ describe('handleError', () => {
       push: vi.fn(),
     };
 
-    handleError(new Error('lol'), toasts);
+    expect(() => handleError(new Error('lol'), toasts)).toThrowError();
     expect(toasts.push).toHaveBeenCalledWith({
       variant: 'error',
       message: 'lol',

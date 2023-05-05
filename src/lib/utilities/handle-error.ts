@@ -19,19 +19,21 @@ export const handleError = (
   isBrowser = BROWSER,
 ): void => {
   if (typeof error === 'string') {
-    return toasts.push({ variant: 'error', message: error });
+    toasts.push({ variant: 'error', message: error });
+  } else {
+    (error as NetworkErrorWithReport).report = false;
   }
 
   if (error instanceof Error) {
-    return toasts.push({ variant: 'error', message: error.message });
+    toasts.push({ variant: 'error', message: error.message });
   }
 
   if (isUnauthorized(error) && isBrowser) {
-    return window.location.assign(routeForLoginPage(error?.message));
+    window.location.assign(routeForLoginPage(error?.message));
   }
 
   if (isForbidden(error) && isBrowser) {
-    return window.location.assign(routeForLoginPage(error?.message));
+    window.location.assign(routeForLoginPage(error?.message));
   }
 
   if (isNetworkError(error)) {
@@ -41,9 +43,9 @@ export const handleError = (
     });
     // Re-throw error to prevent other code from attempting to render
     errors.set(error);
-    (error as NetworkErrorWithReport).report = false;
-    throw error;
   }
+
+  throw error;
 };
 
 export const handleUnauthorizedOrForbiddenError = (

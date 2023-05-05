@@ -138,7 +138,6 @@ async function cancelWorkflows({
       method: 'POST',
       body: stringifyWithBigInt(body),
     },
-    shouldRetry: false,
     notifyOnError: false,
   });
 
@@ -168,7 +167,6 @@ async function terminateWorkflows({
       method: 'POST',
       body: stringifyWithBigInt(body),
     },
-    shouldRetry: false,
     notifyOnError: false,
   });
 
