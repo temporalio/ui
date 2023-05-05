@@ -1,16 +1,24 @@
 <script lang="ts">
   import { groupEvents } from '$lib/models/event-groups';
   import type { CommonHistoryEvent } from '$lib/types/events';
-  import { Timeline, DataSet, DataView } from 'vis-timeline/standalone';
+
+  import { Timeline, DataSet } from 'vis-timeline/standalone';
   import Button from '$lib/holocene/button.svelte';
   import { onMount } from 'svelte';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { eventGroupDisplayName } from './event-detail-keys';
+  import EventTimelineCard from './event-timeline-card.svelte';
 
   export let fullHistory: CommonHistoryEvent[] = [];
 
   let visualizationRef;
   let timeline;
+
+  function renderComponentToHTML(Component, props) {
+    const container = document.createElement('div');
+    new Component({ target: container, props });
+    return container.innerHTML;
+  }
 
   const createGroupItems = (eventGroups, isRunning) => {
     const items = new DataSet([]);
@@ -79,53 +87,61 @@
         id: group.id,
         content: eventGroupDisplayName(group, false),
         order: i,
+        nestedGroups: [`${group.id}-nested`],
+        showNested: i === 0,
+      });
+      groups.add({
+        id: `${group.id}-nested`,
+        content: '',
+      });
+      items.add({
+        id: `${group.id}-info`,
+        group: `${group.id}-nested`,
+        start: firstEvent.eventTime,
+        end: finalEvent.eventTime,
+        content: renderComponentToHTML(EventTimelineCard, {
+          group,
+        }),
+        className: 'Card',
       });
     });
 
     return { items, groups };
   };
 
-  const createOptions = (events) => {
-    const defaults = {
-      stack: false,
-      stackSubgroups: true,
-      maxHeight: 380,
-      horizontalScroll: true,
-      verticalScroll: true,
-      groupHeightMode: 'fixed',
-      zoomKey: 'ctrlKey',
-      start: events[0]?.eventTime ?? Date.now(),
-      end: events[events.length - 1]?.eventTime ?? Date.now() + 60 * 60 * 12,
-      orientation: {
-        axis: 'both',
-        item: 'center',
+  const options = {
+    stack: false,
+    stackSubgroups: true,
+    maxHeight: 800,
+    horizontalScroll: true,
+    verticalScroll: true,
+    groupHeightMode: 'fixed',
+    zoomKey: 'ctrlKey',
+    orientation: {
+      axis: 'both',
+      item: 'center',
+    },
+    xss: {
+      disabled: true,
+      filterOptions: {
+        whiteList: { p: 'class', div: 'class', h1: 'class' },
       },
-      // template: function (item, element, data) {
-      //   var component = document.createElement('div');
-      //   var inner = document.createElement('span');
-      //   inner.className = 'large';
-      //   inner.appendChild(
-      //     document.createTextNode(data.data.lastEvent.classification),
-      //   );
-      //   component.appendChild(inner);
-      //   // component.style.backgroundColor = background;
-
-      //   return component;
-      //   // return `<h1 style="background-color: ${background};">${data.data.lastEvent.classification}</h1>`;
-      // },
-    };
-    return defaults;
+    },
   };
 
   onMount(() => {
-    timeline = new Timeline(visualizationRef, new DataSet([]), new DataSet([]));
+    timeline = new Timeline(
+      visualizationRef,
+      new DataSet([]),
+      new DataSet([]),
+      options,
+    );
     return () => timeline.destroy();
   });
 
-  const setVizItems = (items, groups, options) => {
+  const setVizItems = (items, groups) => {
     timeline.setGroups(groups);
     timeline.setItems(items);
-    timeline.setOptions(options);
     timeline.fit();
   };
 
@@ -134,10 +150,9 @@
       const eventGroups = groupEvents(fullHistory);
       const { groups, items } = createGroupItems(
         eventGroups,
-        $workflowRun.workflow.isRunning,
+        $workflowRun?.workflow?.isRunning,
       );
-      const options = createOptions(fullHistory);
-      setVizItems(items, groups, options);
+      setVizItems(items, groups);
     }
   }
 
@@ -147,7 +162,7 @@
 </script>
 
 <div
-  class="flex flex-col gap-4 bg-white border-2 border-gray-900 rounded-xl p-4"
+  class="flex flex-col gap-4 bg-white border-2 border-gray-900 rounded-xl p-4 w-full"
 >
   <div class="flex justify-between items-center gap-2">
     <h3 class="text-xl">Timeline</h3>
@@ -277,5 +292,9 @@
 
   :global(.vis-item.dot.vis-selected) {
     background-color: transparent;
+  }
+
+  :global(.vis-group-level-unknown-but-gte1) {
+    border: none;
   }
 </style>

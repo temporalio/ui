@@ -17,7 +17,7 @@
       <HistoryImport />
     </div>
   </nav>
-  <nav
+  <!-- <nav
     class="my-4 flex items-end justify-end gap-4"
     aria-label="event history view"
   >
@@ -45,6 +45,6 @@
         >
       </ToggleButtons>
     </div>
-  </nav>
+  </nav> -->
   <slot />
 </section>

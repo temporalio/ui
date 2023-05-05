@@ -96,16 +96,9 @@
 />
 <div class="flex flex-col gap-2">
   <WorkflowRelationshipsV2 {...workflowRelationships} />
-  <div class="flex flex-col xl:flex-row gap-2">
-    <div class="w-full xl:w-2/3">
-      <EventSummaryTimeline {fullHistory} />
-    </div>
-    <div class="w-full xl:w-1/3 grow">
-      <EventSummaryHierarchy {...workflowRelationships} />
-    </div>
-  </div>
+  <EventSummaryTimeline {fullHistory} />
 </div>
-<div class="w-full">
+<!-- <div class="w-full">
   <WorkflowOptionsV2
     {showWorkflowTasks}
     {showNonCompleted}
@@ -119,4 +112,4 @@
     {expandAll}
     {showWorkflowTasks}
   />
-</div>
+</div> -->

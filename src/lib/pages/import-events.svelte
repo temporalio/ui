@@ -32,7 +32,7 @@
       >
     </div>
     <h3 class="mt-8 text-lg font-medium">Expected JSON formats</h3>
-    <div class="h-40 text-center">
+    <div class="flex flex-col gap-4 h-40 text-center">
       <CodeBlock content={format1} inline />
       <CodeBlock content={format2} inline />
     </div>
