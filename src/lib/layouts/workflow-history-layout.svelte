@@ -6,6 +6,7 @@
   import { exportHistory } from '$lib/utilities/export-history';
   import { workflowRun } from '$lib/stores/workflow-run';
   import { eventHistory, fullEventHistory } from '$lib/stores/events';
+  import { namespaces } from '$lib/stores/namespaces';
 
   import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
   import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
@@ -29,6 +30,7 @@
     workflow,
     $eventHistory,
     $fullEventHistory,
+    $namespaces,
   );
 
   const onViewClick = (view: EventView) => {
