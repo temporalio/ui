@@ -14,32 +14,26 @@
 <script lang="ts">
   import { getContext, onDestroy, onMount } from 'svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
-  import type { Writable } from 'svelte/store';
-  import type { SelectContext, SelectOption } from './select.svelte';
-
-  const parentSelectValues =
-    getContext<Writable<SelectContext<T>>>('select-value');
-  const selectOnChange =
-    getContext<(params: SelectOption<T>) => void>('select-change');
-  const optionContext =
-    getContext<Writable<SelectOption<T>[]>>('select-options');
+  import { type SelectContext, SELECT_CONTEXT } from './select.svelte';
 
   type T = $$Generic;
 
+  const { selectValue, handleChange, options } =
+    getContext<SelectContext<T>>(SELECT_CONTEXT);
+
   export let value: T;
   export let description: string = '';
-  export let dark: boolean = false;
 
   let selected: boolean = false;
   let _value: any;
   let slotWrapper: HTMLSpanElement;
+  let optionElement: HTMLLIElement;
   let label: string;
 
   $: {
     if (slotWrapper) {
       _value = value ?? slotWrapper.textContent;
-      selected = $parentSelectValues.value === _value;
+      selected = $selectValue === _value;
       label = slotWrapper.textContent;
     }
   }
@@ -47,35 +41,62 @@
   onMount(() => {
     if (slotWrapper) {
       label = slotWrapper.textContent;
-      $optionContext.push({ value, label });
+      $options.push({ value, label, nativeElement: optionElement });
     }
   });
 
   onDestroy(() => {
     // Remove options from the optionContext if it no longer exists
-    let theIndex = $optionContext.findIndex((option) => option.value === value);
+    let theIndex = $options.findIndex((option) => option.value === value);
     if (theIndex !== undefined) {
-      $optionContext.splice(theIndex, 1);
+      $options.splice(theIndex, 1);
     }
   });
 
   const handleOptionClick = () => {
-    selectOnChange(_value);
+    handleChange(_value);
+  };
+
+  const handleOptionKeydown = (event: KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.stopPropagation();
+      handleOptionClick();
+    }
+
+    if (event.key === 'ArrowDown') {
+      event.stopPropagation();
+      const currentIdx = $options.findIndex((option) => option.value === value);
+      if (currentIdx !== undefined && currentIdx < $options.length - 1) {
+        $options[currentIdx + 1].nativeElement.focus();
+      }
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.stopPropagation();
+      const currentIdx = $options.findIndex((option) => option.value === value);
+      if (currentIdx !== undefined && currentIdx && currentIdx > 0) {
+        $options[currentIdx - 1].nativeElement.focus();
+      }
+    }
   };
 </script>
 
-<MenuItem
-  class="flex flex-row items-start"
-  on:click={handleOptionClick}
-  {selected}
-  {dark}
+<li
+  role="option"
+  aria-selected={selected}
+  tabindex={0}
+  class="select-option"
+  class:selected
+  bind:this={optionElement}
+  on:click|stopPropagation={handleOptionClick}
+  on:keydown|preventDefault={handleOptionKeydown}
 >
   <div class="mr-2 w-6">
     {#if selected}
       <Icon name="checkmark" />
     {/if}
   </div>
-  <div class="flex w-full flex-col">
+  <div class="flex grow flex-col">
     <span bind:this={slotWrapper} class="option-label">
       <slot />
     </span>
@@ -85,11 +106,33 @@
       </span>
     {/if}
   </div>
-</MenuItem>
+</li>
 
 <style lang="postcss">
+  .select-option:first-of-type {
+    @apply rounded-t;
+  }
+
+  .select-option:last-of-type {
+    @apply rounded-b;
+  }
+
+  .select-option {
+    @apply rounded flex flex-row items-start justify-center cursor-pointer list-none bg-white p-4 font-secondary text-sm font-medium text-primary hover:bg-gray-50;
+
+    &:focus {
+      outline: none;
+
+      @apply outline outline-2 -outline-offset-2 outline-blue-700 bg-blue-50;
+    }
+  }
+
+  .select-option.selected {
+    @apply text-blue-700;
+  }
+
   .option-label {
-    @apply flex whitespace-nowrap font-secondary text-sm font-medium;
+    @apply flex whitespace-nowrap font-secondary text-sm font-medium leading-6;
   }
 
   .option-description {
