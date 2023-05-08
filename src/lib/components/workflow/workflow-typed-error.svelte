@@ -140,6 +140,14 @@
       title: 'Pending Request Cancel Limit Exceeded',
       copy: 'The capacity for pending requests to cancel other Workflows has been reached.',
     },
+    BadUpdateWorkflowExecutionMessage: {
+      title: 'Bad Update',
+      copy: '',
+    },
+    UnhandledUpdate: {
+      title: 'Unhandled Update',
+      copy: '',
+    },
   };
 
   function getErrorCause(
