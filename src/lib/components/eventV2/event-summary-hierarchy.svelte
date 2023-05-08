@@ -4,10 +4,8 @@
   import { onMount } from 'svelte';
   import type { WorkflowIdentifier } from '$lib/types/workflows';
   import type { ChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
-  import WorkflowRelationshipsV2 from './workflow-relationships-v2.svelte';
   import { workflowRun } from '$lib/stores/workflow-run';
 
-  export let hasChildren: boolean;
   export let hasRelationships: boolean;
   export let first: string;
   export let parent: WorkflowIdentifier;

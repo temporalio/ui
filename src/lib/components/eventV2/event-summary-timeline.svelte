@@ -6,18 +6,15 @@
   import Button from '$lib/holocene/button.svelte';
   import { onMount } from 'svelte';
   import { workflowRun } from '$lib/stores/workflow-run';
-  import { eventGroupDisplayName } from './event-detail-keys';
   import EventTimelineCard from './event-timeline-card.svelte';
-  import WorkflowStatus from '../workflow-status.svelte';
-  import EventClassification from './event-summary-card/event-classification.svelte';
   import { capitalize } from '$lib/utilities/format-camel-case';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
 
   export let fullHistory: CommonHistoryEvent[] = [];
+  export let showCompleted = false;
+  export let onShowCompletedToggle: () => void;
 
-  $: {
-    console.log('pending: ', $workflowRun.workflow.pendingActivities);
-  }
   let visualizationRef;
   let timeline;
 
@@ -29,27 +26,21 @@
 
   function renderGroupName(group, classification) {
     const groupName = capitalize(group.category);
-    const groupStatus = renderComponentToHTML(EventClassification, {
-      classification,
-    });
-    return `<div class="flex gap-2 items-center">${groupName}${groupStatus}</div>`;
+    return `<div class="flex gap-2 items-center">${groupName}</div>`;
   }
 
   function renderExecutionName(status) {
-    const groupStatus = renderComponentToHTML(WorkflowStatus, {
-      status,
-    });
-    return `<div class="flex gap-1 items-center"><p>Workflow Execution<p>${groupStatus}</div>`;
+    return `<div class="flex gap-1 items-center">Workflow Execution</div>`;
   }
 
   function renderPendingAttempts(name, attempt) {
     const retryIcon = renderComponentToHTML(Icon, {
       name: 'retry',
     });
-    return `<div class="flex gap-1 items-center justify-between"><div class="bar-content"><span></span><p>${name}</p></div><div class="flex gap-1 items-center">${retryIcon}${attempt.toString()}</div></div>`;
+    return `<div class="flex gap-1 items-center justify-between"><div class="bar-content"><p>${name}</p></div><div class="flex gap-1 items-center text-red-700">${retryIcon}${attempt.toString()}</div></div>`;
   }
 
-  const createGroupItems = (eventGroups, isRunning) => {
+  const createGroupItems = (eventGroups, isRunning, showCompleted) => {
     const items = new DataSet([]);
     const groups = new DataSet([]);
 
@@ -68,7 +59,7 @@
         end: Date.now(),
         type: 'range',
         content: $workflowRun.workflow.runId,
-        className: `${finalEvent.category} ${finalEvent.classification}`,
+        className: `${finalEvent.category} Running`,
       });
     } else {
       items.add({
@@ -81,17 +72,28 @@
         className: `${finalEvent.category} ${finalEvent.classification}`,
       });
     }
-    eventGroups.forEach((group, i) => {
+
+    const groupIsRunning = (group) => {
+      return (
+        !group.isCanceled &&
+        !group.isCompleted &&
+        !group.isFailureOrTimedOut &&
+        !group.isTerminated
+      );
+    };
+
+    const visibleGroups = eventGroups.filter((group) => {
+      if (showCompleted) return group;
+      return groupIsRunning(group);
+    });
+
+    visibleGroups.forEach((group, i) => {
       const initialEvent = group.initialEvent;
       const lastEvent = group?.lastEvent;
       const groupPendingActivity = $workflowRun.workflow.pendingActivities.find(
         (activity) => group.eventList.find((e) => e.id === activity.activityId),
       );
-      const isRunning =
-        !group.isCanceled &&
-        !group.isCompleted &&
-        !group.isFailureOrTimedOut &&
-        !group.isTerminated;
+
       if (groupPendingActivity && isRunning) {
         items.add({
           id: `pending-${groupPendingActivity.activityId}`,
@@ -112,7 +114,7 @@
           content:
             group.eventList.length === 1
               ? group.name
-              : `<div class="bar-content"><span></span><p>${group.name}</p></div>`,
+              : `<div class="bar-content">${group.name}</div>`,
           end: lastEvent.eventTime,
           type: group.eventList.length === 1 ? 'point' : 'range',
           className: `${lastEvent.category} ${lastEvent.classification}`,
@@ -201,6 +203,7 @@
       const { groups, items } = createGroupItems(
         eventGroups,
         $workflowRun?.workflow?.isRunning,
+        showCompleted,
       );
       setVizItems(items, groups);
     }
@@ -216,7 +219,18 @@
 >
   <div class="flex justify-between items-center gap-2">
     <h3 class="text-xl">Timeline</h3>
-    <div class="flex gap-1">
+    <div class="flex gap-2">
+      <label
+        for="completed"
+        class="flex items-center gap-2 text-center font-secondary text-sm"
+        >Show Completed
+        <ToggleSwitch
+          id="completed"
+          checked={showCompleted}
+          on:change={onShowCompletedToggle}
+        />
+      </label>
+
       <Button variant="secondary" on:click={() => timeline.zoomIn(1)}
         >Zoom In</Button
       >
@@ -303,7 +317,130 @@
     color: #18181b;
   }
 
-  :global(.vis-item.vis-range.child-workflow) {
+  /* CSS for each classifciation */
+
+  :global(.vis-item.vis-range.Failed) {
+    background-color: #fee2e2;
+    border-color: #b91c1c;
+    border-radius: 9999px;
+    border-width: 2px;
+    color: #b91c1c;
+  }
+
+  :global(.vis-item.vis-point.Failed) {
+    background-color: #b91c1c;
+    color: #b91c1c;
+  }
+
+  :global(.vis-item.vis-range.TimedOut) {
+    background-color: #ffedd5;
+    border-color: #7c2d12;
+    border-radius: 9999px;
+    border-width: 2px;
+    color: #7c2d12;
+  }
+
+  :global(.vis-item.vis-point.TimedOut) {
+    background-color: #7c2d12;
+    color: #7c2d12;
+  }
+
+  :global(.vis-item.vis-range.Canceled, .vis-item.vis-range.Paused) {
+    background-color: #fef9c3;
+    border-color: #713f12;
+    border-radius: 9999px;
+    border-width: 2px;
+    color: #713f12;
+  }
+
+  :global(.vis-item.vis-point.Canceled, .vis-item.vis-point.Paused) {
+    background-color: #713f12;
+    color: #713f12;
+  }
+
+  :global(.vis-item.vis-range.Terminated, .vis-item.vis-range.Fired) {
+    background-color: #e4e4e7;
+    border-color: #18181b;
+    border-radius: 9999px;
+    border-width: 2px;
+    color: #18181b;
+  }
+
+  :global(.vis-item.vis-point.Terminated, .vis-item.vis-point.Fired) {
+    background-color: #18181b;
+    color: #18181b;
+  }
+
+  :global(.vis-item.vis-range.Scheduled) {
+    background-color: #e0e7ff;
+    border-color: #4338ca;
+    border-radius: 9999px;
+    border-width: 2px;
+    color: #4338ca;
+  }
+
+  :global(.vis-item.vis-point.Scheduled) {
+    color: #4338ca;
+  }
+
+  :global(.vis-item.vis-range.ContinuedAsNew) {
+    background-color: #f3e8ff;
+    border-color: #581c87;
+    border-radius: 9999px;
+    border-width: 2px;
+    color: #581c87;
+  }
+
+  :global(.vis-item.vis-point.ContinuedAsNew) {
+    background-color: #581c87;
+    color: #581c87;
+  }
+
+  :global(.vis-item.vis-range.Completed) {
+    background-color: #dcfce7;
+    border-color: #15803d;
+    border-radius: 9999px;
+    border-width: 2px;
+    color: #15803d;
+  }
+
+  :global(.vis-item.vis-point.Completed) {
+    background-color: #15803d;
+    color: #15803d;
+  }
+
+  :global(.vis-item.vis-range.Running, .vis-item.vis-range.Started) {
+    background-color: #dbeafe;
+    border-color: #1d4ed8;
+    border-radius: 9999px;
+    border-width: 2px;
+    color: #1d4ed8;
+  }
+
+  :global(.vis-item.vis-point.Running) {
+    background-color: #1d4ed8;
+    color: #1d4ed8;
+  }
+
+  :global(.vis-item.vis-point.Started) {
+    color: #1d4ed8;
+  }
+
+  /* CSS for each activity type */
+
+  :global(.vis-item.vis-dot.marker) {
+    border-color: #18181b;
+  }
+
+  :global(.vis-item.vis-range.signal) {
+    color: #652b19;
+  }
+
+  :global(.vis-item.vis-point.signal) {
+    color: #652b19;
+  }
+
+  /* :global(.vis-item.vis-range.child-workflow) {
     background-color: #e0e7ff;
     border-color: #312e81;
     border-radius: 9999px;
@@ -329,27 +466,6 @@
     color: #6d28d9;
   }
 
-  :global(.vis-item.vis-range.marker) {
-    background-color: #bfdbfe;
-    border-color: #bfdbfe;
-    border-radius: 9999px;
-    border-width: 2px;
-    color: #1d4ed8;
-  }
-
-  :global(.vis-item.vis-point.marker) {
-    background-color: #1d4ed8;
-    color: #1d4ed8;
-  }
-
-  :global(.vis-item.vis-range.signal) {
-    color: #652b19;
-  }
-
-  :global(.vis-item.vis-point.signal) {
-    color: #652b19;
-  }
-
   :global(.vis-item.vis-range.vis-point.signal .vis-dot) {
     background-color: #feebcb;
     border-color: #feebcb;
@@ -365,7 +481,7 @@
 
   :global(.vis-item.vis-point.timer) {
     color: #652b19;
-  }
+  } */
 
   :global(.bar-content) {
     display: flex;
@@ -373,24 +489,15 @@
     align-items: center;
   }
 
-  :global(.bar-content span) {
-    width: 8px;
-    height: 8px;
-    border: 1px solid black;
-    border-radius: 9999px;
-    background-color: white;
-  }
-
   :global(.vis-item.vis-selected) {
     /* custom colors for selected orange items */
-    background-color: #c7d2fe;
-    border-color: #4338ca;
-    color: #4338ca;
+    background-color: transparent;
+    border-color: transparent;
   }
 
   :global(.vis-item.vis-selected, .vis-item.vis-point.vis-selected) {
     background-color: transparent;
-    border-radius: 9999px;
+    border-color: transparent;
   }
 
   :global(.vis-group-level-unknown-but-gte1) {

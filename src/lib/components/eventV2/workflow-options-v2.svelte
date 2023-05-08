@@ -15,7 +15,7 @@
   export let onAdvancedClick: () => void;
 </script>
 
-<div class="flex flex-row gap-4 items-center justify-end mb-4">
+<div class="flex flex-row gap-4 items-center justify-end">
   <label
     for="workflow-tasks"
     class="flex items-center gap-2 text-center font-secondary text-sm"

@@ -10,6 +10,7 @@
   import ParentWorkflowTable from '../workflow/parent-workflow-table.svelte';
   import FirstPreviousNextWorkflowTable from '../workflow/first-previous-next-workflow-table.svelte';
   import ChildWorkflowsTable from '../workflow/child-workflows-table.svelte';
+  import EventSummaryHierarchy from './event-summary-hierarchy.svelte';
 
   export let hasChildren: boolean;
   export let hasRelationships: boolean;
@@ -64,5 +65,15 @@
     {:else}
       <p>This workflow doesn’t have any relationships</p>
     {/if}
+    <div class="h-96 w-full">
+      <EventSummaryHierarchy
+        {hasRelationships}
+        {children}
+        pendingChildren={$workflowRun.workflow.pendingChildren}
+        {first}
+        {next}
+        {previous}
+      />
+    </div>
   </Accordion>
 </section>

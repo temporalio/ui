@@ -13,9 +13,17 @@
   import { fetchAllEvents } from '$lib/services/events-service';
   import { onDestroy } from 'svelte';
   import EventSummaryTimeline from './event-summary-timeline.svelte';
-  import type { CommonHistoryEvent } from '$lib/types/events';
+  import type { CommonHistoryEvent, EventView } from '$lib/types/events';
   import debounce from 'just-debounce';
   import EventSummaryHierarchy from './event-summary-hierarchy.svelte';
+  import ToggleButtons from '$lib/holocene/toggle-button/toggle-buttons.svelte';
+  import ToggleButton from '$lib/holocene/toggle-button/toggle-button.svelte';
+  import { eventViewType, expandAllEvents } from '$lib/stores/event-view';
+  import Pagination from '$lib/holocene/pagination.svelte';
+  import EventSummaryTable from '../event/event-summary-table.svelte';
+  import EventSummaryRow from '../event/event-summary-row.svelte';
+  import EventEmptyRow from '../event/event-empty-row.svelte';
+  import { namespaces } from '$lib/stores/namespaces';
 
   let controller;
 
@@ -26,6 +34,7 @@
     workflow,
     $eventHistory,
     fullHistory,
+    $namespaces,
   );
 
   let fullHistory: CommonHistoryEvent[] = [];
@@ -88,26 +97,31 @@
   onDestroy(() => {
     controller.abort();
   });
+
+  let showCompleted = false;
 </script>
 
 <PageTitle
   title={`Workflow History | ${workflow.runId}`}
   url={$page.url.href}
 />
-<div class="flex flex-col gap-2">
+<div class="flex flex-col gap-4">
   <WorkflowRelationshipsV2 {...workflowRelationships} />
-  <EventSummaryTimeline {fullHistory} />
-</div>
-<div class="w-full">
-  <WorkflowOptionsV2
+  <EventSummaryTimeline
+    {fullHistory}
+    {showCompleted}
+    onShowCompletedToggle={() => (showCompleted = !showCompleted)}
+  />
+  <!-- <WorkflowOptionsV2
     {showWorkflowTasks}
     {showNonCompleted}
     {expandAll}
     onExpandClick={() => (expandAll = !expandAll)}
     onAdvancedClick={() => (showWorkflowTasks = !showWorkflowTasks)}
-  />
+  /> -->
   <EventSummaryV2
     {fullHistory}
+    {showCompleted}
     {showNonCompleted}
     {expandAll}
     {showWorkflowTasks}

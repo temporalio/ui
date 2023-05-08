@@ -53,6 +53,6 @@
 
 <style lang="postcss">
   .secondary {
-    @apply my-1;
+    @apply my-1 ml-4;
   }
 </style>

@@ -16,8 +16,6 @@
 
   export let group: EventGroup;
 
-  console.log('Group: ', group);
-
   const denyKeys = [
     'activityId',
     'timerId',
@@ -82,7 +80,7 @@
         <Icon name="json" />
         <ul class="tabs">
           <li>
-            <input id="tab1" type="radio" name="tabs" checked />
+            <input id="tab1" type="radio" name="tabs" />
             <label class="flex gap-2" for="tab1">Input</label>
             <div id="tab-panel-input" class="tab-panel">
               {#each getPayloadAttributes(group.initialEvent) as attribute}
@@ -159,6 +157,10 @@
     width: 100%;
     position: absolute;
     left: 0;
+  }
+
+  #tab-panel-input {
+    display: block;
   }
 
   .tabs [id^='tab']:checked + label {

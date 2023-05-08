@@ -31,6 +31,6 @@
 
 <style lang="postcss">
   .secondary {
-    @apply mt-2 flex flex-col;
+    @apply mt-1 ml-8 flex flex-col;
   }
 </style>

@@ -9,10 +9,12 @@
   import { parseWithBigInt } from '$lib/utilities/parse-with-big-int';
   import { importEvents } from '$lib/stores/import-events';
   import RunningCard from './running-card.svelte';
-  import PendingActivityCard from './pending-activity-card.svelte';
+  import type { CommonHistoryEvent } from '$lib/types/events';
+  import type { EventGroups } from '$lib/models/event-groups/event-groups';
 
   export let fullHistory: CommonHistoryEvent[] = [];
   export let importingHistory: boolean = false;
+  export let showCompleted = false;
   export let showNonCompleted = false;
   export let expandAll = false;
   export let showWorkflowTasks = false;
@@ -38,7 +40,7 @@
     : fullHistory.length
     ? fullHistory
     : intialEvents;
-  $: groups = getGroups(currentEvents, showNonCompleted, showWorkflowTasks);
+  $: groups = getGroups(currentEvents, !showCompleted, showWorkflowTasks);
   $: firstEvent = currentEvents?.[0];
   $: lastEvent = currentEvents?.[currentEvents?.length - 1];
   $: uniqueLastEvent =
