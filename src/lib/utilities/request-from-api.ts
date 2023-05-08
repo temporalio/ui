@@ -1,6 +1,5 @@
 import { BROWSER } from 'esm-env';
 import { getAuthUser } from '$lib/stores/auth-user';
-import { noop } from 'svelte/internal';
 import { handleError as handleRequestError } from './handle-error';
 import { isFunction } from './is-function';
 import { toURL } from './to-url';
@@ -30,12 +29,9 @@ type RequestFromAPIOptions = {
   request?: typeof fetch;
   options?: Parameters<typeof fetch>[1];
   token?: string;
-  onRetry?: RetryCallback;
   onError?: ErrorCallback;
   notifyOnError?: boolean;
   handleError?: typeof handleRequestError;
-  shouldRetry?: boolean;
-  retryInterval?: number;
   isBrowser?: boolean;
   signal?: AbortSignal;
 };
@@ -59,18 +55,14 @@ export const isTemporalAPIError = (obj: unknown): obj is TemporalAPIError =>
 export const requestFromAPI = async <T>(
   endpoint: toURLParams[0],
   init: RequestFromAPIOptions = {},
-  retryCount = 10,
 ): Promise<T> => {
   const {
     params = {},
     request = fetch,
     token,
-    shouldRetry = false,
     notifyOnError = true,
     handleError = handleRequestError,
-    onRetry = noop,
     onError,
-    retryInterval = 5000,
     isBrowser = BROWSER,
     signal,
   } = init;
@@ -112,16 +104,6 @@ export const requestFromAPI = async <T>(
         return;
       }
       handleError(error);
-
-      if (shouldRetry && retryCount > 0) {
-        return new Promise((resolve) => {
-          const retriesRemaining = retryCount - 1;
-          onRetry(retriesRemaining);
-          setTimeout(() => {
-            resolve(requestFromAPI(endpoint, init, retriesRemaining));
-          }, retryInterval);
-        });
-      }
     } else {
       throw error;
     }

@@ -1,5 +1,53 @@
+<script lang="ts" context="module">
+  let batchTerminateConfirmationModal: BatchOperationConfirmationModal;
+  let batchCancelConfirmationModal: BatchOperationConfirmationModal;
+  export const allSelected = writable<boolean>(false);
+  export const pageSelected = writable<boolean>(false);
+  export const selectedWorkflows = writable<WorkflowExecution[]>([]);
+
+  export const batchActionsVisible = derived(
+    selectedWorkflows,
+    (workflows) => workflows.length > 0,
+  );
+
+  export const terminableWorkflows = derived(selectedWorkflows, (workflows) =>
+    workflows.filter((workflow) => workflow.canBeTerminated),
+  );
+
+  export const cancelableWorkflows = derived(selectedWorkflows, (workflows) =>
+    workflows.filter((workflow) => workflow.status === 'Running'),
+  );
+
+  export const openBatchCancelConfirmationModal = () => {
+    batchCancelConfirmationModal.open();
+  };
+
+  export const openBatchTerminateConfirmationModal = () => {
+    batchTerminateConfirmationModal.open();
+  };
+
+  export const handleSelectAll = (workflows: WorkflowExecution[]) => {
+    allSelected.set(true);
+    selectedWorkflows.set([...workflows]);
+  };
+
+  export const handleSelectPage = (
+    checked: boolean,
+    workflows: WorkflowExecution[],
+  ) => {
+    pageSelected.set(checked);
+    if (allSelected) allSelected.set(false);
+    if (checked) {
+      selectedWorkflows.set([...workflows]);
+    } else {
+      selectedWorkflows.set([]);
+    }
+  };
+</script>
+
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { writable, derived } from 'svelte/store';
   import { page } from '$app/stores';
   import {
     refresh,
@@ -32,15 +80,8 @@
   import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { toaster } from '$lib/stores/toaster';
-  import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table/workflows-summary-configurable-table.svelte';
-
+  import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
   import type { WorkflowExecution } from '$lib/types/workflows';
-
-  let selectedWorkflows: WorkflowExecution[] = [];
-  let batchTerminateConfirmationModal: BatchOperationConfirmationModal;
-  let batchCancelConfirmationModal: BatchOperationConfirmationModal;
-  let allSelected: boolean = false;
-  let pageSelected: boolean = false;
 
   $: query = $page.url.searchParams.get('query');
   $: query && ($workflowsQuery = query);
@@ -73,9 +114,9 @@
   });
 
   const resetSelection = () => {
-    allSelected = false;
-    pageSelected = false;
-    selectedWorkflows = [];
+    $allSelected = false;
+    $pageSelected = false;
+    $selectedWorkflows = [];
   };
 
   const refreshWorkflows = () => {
@@ -95,42 +136,13 @@
     refreshWorkflows();
   };
 
-  const openBatchCancelConfirmationModal = () => {
-    batchCancelConfirmationModal.open();
-  };
-
-  const openBatchTerminateConfirmationModal = () => {
-    batchTerminateConfirmationModal.open();
-  };
-
-  const handleSelectAll = (workflows: WorkflowExecution[]) => {
-    allSelected = true;
-    selectedWorkflows = [...workflows];
-  };
-
-  const handleTogglePage = (
-    event: CustomEvent<{
-      checked: boolean;
-      workflows: WorkflowExecution[];
-    }>,
-  ) => {
-    const { checked, workflows } = event.detail;
-    pageSelected = checked;
-    if (allSelected) allSelected = false;
-    if (checked) {
-      selectedWorkflows = [...workflows];
-    } else {
-      selectedWorkflows = [];
-    }
-  };
-
   const terminateWorkflows = async (event: CustomEvent<{ reason: string }>) => {
     const options = {
       namespace: $page.params.namespace,
       reason: event.detail.reason,
     };
     try {
-      if (allSelected) {
+      if ($allSelected) {
         await batchTerminateByQuery({
           ...options,
           query: batchOperationQuery,
@@ -143,7 +155,7 @@
       } else {
         const workflowsTerminated = await bulkTerminateByIDs({
           ...options,
-          workflows: terminableWorkflows,
+          workflows: $terminableWorkflows,
         });
         toaster.push({
           message: `Successfully terminated ${workflowsTerminated} workflows.`,
@@ -165,7 +177,7 @@
       reason: event.detail.reason,
     };
     try {
-      if (allSelected) {
+      if ($allSelected) {
         await batchCancelByQuery({
           ...options,
           query: batchOperationQuery,
@@ -177,7 +189,7 @@
       } else {
         const workflowsCanceled = await bulkCancelByIDs({
           ...options,
-          workflows: cancelableWorkflows,
+          workflows: $cancelableWorkflows,
         });
         toaster.push({
           message: `Successfully cancelled ${workflowsCanceled} workflows.`,
@@ -197,14 +209,6 @@
     ? 'ExecutionStatus="Running"'
     : $workflowsQuery;
 
-  $: terminableWorkflows = selectedWorkflows.filter(
-    (workflow) => workflow.canBeTerminated,
-  );
-
-  $: cancelableWorkflows = selectedWorkflows.filter(
-    (workflow) => workflow.status === 'Running',
-  );
-
   $: totalWorkflowCount = new Intl.NumberFormat('en-US').format(
     $workflowCount?.totalCount ?? 0,
   );
@@ -223,16 +227,15 @@
 <BatchOperationConfirmationModal
   action="Terminate"
   bind:this={batchTerminateConfirmationModal}
-  {allSelected}
-  actionableWorkflowsLength={terminableWorkflows.length}
+  actionableWorkflowsLength={$terminableWorkflows.length}
   query={batchOperationQuery}
   on:confirm={terminateWorkflows}
 />
+
 <BatchOperationConfirmationModal
   action="Cancel"
   bind:this={batchCancelConfirmationModal}
-  {allSelected}
-  actionableWorkflowsLength={cancelableWorkflows.length}
+  actionableWorkflowsLength={$cancelableWorkflows.length}
   query={batchOperationQuery}
   on:confirm={cancelWorkflows}
 />
@@ -277,15 +280,5 @@
   <svelte:fragment slot="action-top-center">
     <WorkflowDateTimeFilter />
   </svelte:fragment>
-  <WorkflowsSummaryConfigurableTable
-    {allSelected}
-    {pageSelected}
-    bind:selectedWorkflows
-    workflows={visibleItems}
-    filteredWorkflowCount={query ? filteredWorkflowCount : totalWorkflowCount}
-    on:selectAll={() => handleSelectAll(visibleItems)}
-    on:togglePage={handleTogglePage}
-    on:cancelWorkflows={openBatchCancelConfirmationModal}
-    on:terminateWorkflows={openBatchTerminateConfirmationModal}
-  />
+  <WorkflowsSummaryConfigurableTable workflows={visibleItems} />
 </Pagination>

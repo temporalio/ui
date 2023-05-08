@@ -1,0 +1,29 @@
+// Vitest Snapshot v1
+
+exports[`Table_body_cell$ > End renders 1`] = `"<td class=\\"workflows-summary-table-body-cell svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\">2023-04-28 UTC 00:00:00.00</td>"`;
+
+exports[`Table_body_cell$ > Execution Duration renders 1`] = `"<td class=\\"workflows-summary-table-body-cell svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\">1 day</td>"`;
+
+exports[`Table_body_cell$ > Execution Time renders 1`] = `"<td class=\\"workflows-summary-table-body-cell svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\">2023-04-27 UTC 01:00:00.00</td>"`;
+
+exports[`Table_body_cell$ > History Length renders 1`] = `"<td class=\\"workflows-summary-table-body-cell svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\">42</td>"`;
+
+exports[`Table_body_cell$ > History Size renders 1`] = `"<td class=\\"workflows-summary-table-body-cell svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\">1 KB</td>"`;
+
+exports[`Table_body_cell$ > Parent Namespace renders 1`] = `"<td class=\\"workflows-summary-table-body-cell svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\">parent-namespace-id</td>"`;
+
+exports[`Table_body_cell$ > Parent Workflow ID renders 1`] = `"<td class=\\"workflows-summary-table-body-cell svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\">parent-workflow-id</td>"`;
+
+exports[`Table_body_cell$ > Run ID renders 1`] = `"<td class=\\"workflows-summary-table-body-cell filterable svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\"><a href=\\"/namespaces/default/workflows/abc-123/def-456/history\\" class=\\"table-link\\">def-456</a> </td>"`;
+
+exports[`Table_body_cell$ > Start renders 1`] = `"<td class=\\"workflows-summary-table-body-cell svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\">2023-04-27 UTC 00:00:00.00</td>"`;
+
+exports[`Table_body_cell$ > State Transitions renders 1`] = `"<td class=\\"workflows-summary-table-body-cell svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\">12</td>"`;
+
+exports[`Table_body_cell$ > Status renders 1`] = `"<td class=\\"workflows-summary-table-body-cell svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\"><span class=\\"flex text-center text-sm font-medium leading-4\\"><h6 class=\\"blue flex rounded-sm px-1 py-1 svelte-b7co3f\\"><span class=\\"whitespace-nowrap\\">Running</span> <div class=\\"heart-beat svelte-8dynez\\" style=\\"--animation-delay:0ms;\\"><div class=\\"heart-rate svelte-8dynez\\"><svg version=\\"1.0\\" xmlns=\\"http://www.w3.org/2000/svg\\" xmlns:xlink=\\"http://www.w3.org/1999/xlink\\" x=\\"0px\\" y=\\"0px\\" width=\\"30px\\" height=\\"18px\\" viewBox=\\"0 0 150 73\\" enable-background=\\"new 0 0 150 73\\" xml:space=\\"preserve\\"><polyline fill=\\"none\\" stroke=\\"#1D4ED8\\" stroke-width=\\"3\\" stroke-miterlimit=\\"10\\" points=\\"0,45.486 18.514,45.486 24.595,33.324 32.676,45.486 37.771,45.486 42.838,55.622 51.959,18 56.067,45 60.067,60.729 63.122,45.486 77.297,45.486 83.379,41.419 90.473,45.486 100,45.486\\"></polyline></svg> <div class=\\"fade-in svelte-8dynez\\"></div> <div class=\\"fade-out svelte-8dynez\\"></div></div> </div></h6></span></td>"`;
+
+exports[`Table_body_cell$ > Task Queue renders 1`] = `"<td class=\\"workflows-summary-table-body-cell svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\">task-queue</td>"`;
+
+exports[`Table_body_cell$ > Type renders 1`] = `"<td class=\\"workflows-summary-table-body-cell filterable svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\"><a href=\\"/namespaces/default/workflows/abc-123/def-456/history\\" class=\\"table-link\\">mock-workflow</a> </td>"`;
+
+exports[`Table_body_cell$ > Workflow ID renders 1`] = `"<td class=\\"workflows-summary-table-body-cell filterable svelte-qupenl\\" data-testid=\\"workflows-summary-table-body-cell\\"><a href=\\"/namespaces/default/workflows/abc-123/def-456/history\\" class=\\"table-link\\">abc-123</a> </td>"`;

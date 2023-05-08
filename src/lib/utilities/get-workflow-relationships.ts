@@ -19,6 +19,8 @@ import type {
   WorkflowEvents,
 } from '$lib/types/events';
 import type { WorkflowExecution } from '$lib/types/workflows';
+import type { DescribeNamespaceResponse } from '$lib/types';
+import type { WorkflowIdentifier } from '$lib/types/workflows';
 
 const getNewExecutionId = (events: WorkflowEvents): string | undefined => {
   for (const event of events) {
@@ -48,17 +50,33 @@ export const isChildWorkflowClosedEvent = (event) => {
   );
 };
 
+type WorkflowRelationships = {
+  hasRelationships: boolean;
+  hasChildren: boolean;
+  children: ChildWorkflowClosedEvent[];
+  first: string | undefined;
+  previous: string | undefined;
+  parent: WorkflowIdentifier | undefined;
+  parentNamespaceName: string | undefined;
+  next: string | undefined;
+};
+
 export const getWorkflowRelationships = (
   workflow: WorkflowExecution | null,
   eventHistory: StartAndEndEventHistory,
   fullEventHistory: WorkflowEvents,
-) => {
+  namespaces: DescribeNamespaceResponse[],
+): WorkflowRelationships => {
   const children = fullEventHistory.filter((event) =>
     isChildWorkflowClosedEvent(event),
   ) as ChildWorkflowClosedEvent[];
   const pendingChildren = workflow?.pendingChildren;
   const hasChildren = !!pendingChildren.length || !!children.length;
   const parent = workflow?.parent;
+
+  const parentNamespaceName = namespaces?.find((namespace) => {
+    return namespace.namespaceInfo.id === workflow.parentNamespaceId;
+  })?.namespaceInfo?.name;
 
   const workflowExecutionStartedEvent = eventHistory.start.find(
     isWorkflowExecutionStartedEvent,
@@ -93,6 +111,7 @@ export const getWorkflowRelationships = (
     first,
     previous,
     parent,
+    parentNamespaceName,
     next: newExecutionRunId,
   };
 };

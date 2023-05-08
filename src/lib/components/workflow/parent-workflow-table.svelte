@@ -11,6 +11,7 @@
   import Link from '$lib/holocene/link.svelte';
 
   export let parent: WorkflowIdentifier;
+  export let parentNamespaceName: string | undefined;
   export let namespace: string;
 </script>
 
@@ -24,7 +25,7 @@
       <Link
         newTab
         href={routeForEventHistory({
-          namespace,
+          namespace: parentNamespaceName ?? namespace,
           workflow: parent.workflowId,
           run: parent.runId,
         })}

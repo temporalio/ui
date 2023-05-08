@@ -13,7 +13,8 @@ export type QueryKey =
   | 'StartTime'
   | 'CloseTime'
   | 'ExecutionTime'
-  | 'ExecutionStatus';
+  | 'ExecutionStatus'
+  | 'RunId';
 
 type FilterValue = string | Duration;
 
@@ -23,6 +24,7 @@ const filterKeys: Readonly<Record<string, QueryKey>> = {
   timeRange: 'StartTime',
   executionStatus: 'ExecutionStatus',
   closeTime: 'CloseTime',
+  runId: 'RunId',
 } as const;
 
 const isValid = (value: unknown): boolean => {

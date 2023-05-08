@@ -2,22 +2,28 @@
   import { page } from '$app/stores';
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
   import Input from '$lib/holocene/input/input.svelte';
+  import {
+    type TextFilterAttributes,
+    attributeToHumanReadable,
+    attributeToId,
+  } from '$lib/models/workflow-filters';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   let value = '';
+  export let attribute: TextFilterAttributes;
 
   const getOtherFilters = () =>
-    $workflowFilters.filter((f) => f.attribute !== 'WorkflowId');
+    $workflowFilters.filter((f) => f.attribute !== attribute);
 
-  $: idFilter = $workflowFilters.find((f) => f.attribute === 'WorkflowId');
-  $: idSort = $workflowSorts.find((s) => s.attribute === 'WorkflowId');
+  $: idFilter = $workflowFilters.find((f) => f.attribute === attribute);
+  $: idSort = $workflowSorts.find((s) => s.attribute === attribute);
 
   const onInput = (e: Event) => {
     const { value } = e.target as HTMLInputElement;
     if (value) {
       const filter = {
-        attribute: 'WorkflowId',
+        attribute,
         value,
         conditional: '=',
         operator: '',
@@ -50,16 +56,18 @@
   value={idFilter ? idFilter.value : idSort ? idSort.value : ''}
   keepOpen
   icon="filter"
-  testId="workflow-id-filter-button"
+  testId="{attributeToId[attribute]}-filter-button"
   on:showmenu={handleShowInput}
 >
-  <svelte:fragment slot="label">Workflow ID</svelte:fragment>
+  <svelte:fragment slot="label"
+    >{attributeToHumanReadable[attribute]}</svelte:fragment
+  >
   <div class="flex w-[500px] flex-col gap-2 p-2">
     <Input
       icon="search"
       type="search"
-      id="workflowId"
-      placeholder="Workflow ID"
+      id={attributeToId[attribute]}
+      placeholder={attributeToHumanReadable[attribute]}
       class="flex items-center px-2 transition-all hover:cursor-pointer"
       autoFocus
       clearable

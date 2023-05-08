@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getWorkflowRelationships } from './get-workflow-relationships';
+import { toWorkflowExecution } from '$lib/models/workflow-execution';
 
 import completedEvents from '$fixtures/events.completed.json';
 import continuedAsNewEvents from '$fixtures/events.continued-as-new.json';
@@ -13,6 +14,7 @@ import failedWorkflow from '$fixtures/workflow.failed.json';
 import pendingChildrenWorkflow from '$fixtures/workflow.pending-children.json';
 import runningWorkflow from '$fixtures/workflow.running.json';
 import timedOutWorkflow from '$fixtures/workflow.timed-out.json';
+import namespaces from '$fixtures/namespaces.json';
 
 describe('getWorkflowRelationships', () => {
   const completedEventHistory = {
@@ -27,9 +29,10 @@ describe('getWorkflowRelationships', () => {
   it('hasPendingChildren should return true if there are pending children', () => {
     expect(
       getWorkflowRelationships(
-        pendingChildrenWorkflow,
+        toWorkflowExecution(pendingChildrenWorkflow),
         completedEventHistory,
         completedEvents,
+        namespaces.namespaces,
       ).hasChildren,
     ).toBe(true);
   });
@@ -37,33 +40,48 @@ describe('getWorkflowRelationships', () => {
   it('hasChildren should return true if there are pending children and non-pending children', () => {
     expect(
       getWorkflowRelationships(
-        pendingChildrenWorkflow,
+        toWorkflowExecution(pendingChildrenWorkflow),
         completedEventHistory,
         childEvents,
+        namespaces.namespaces,
       ).hasChildren,
     ).toBe(true);
     expect(
       getWorkflowRelationships(
-        pendingChildrenWorkflow,
+        toWorkflowExecution(pendingChildrenWorkflow),
         completedEventHistory,
         childEvents,
+        namespaces.namespaces,
       ).children.length,
     ).toBe(15);
+  });
+
+  it('parentNamespaceName should return undefined if parentNamespaceId does not match namespaces list', () => {
+    expect(
+      getWorkflowRelationships(
+        toWorkflowExecution(pendingChildrenWorkflow),
+        completedEventHistory,
+        childEvents,
+        namespaces.namespaces,
+      ).parentNamespaceName,
+    ).toBe(undefined);
   });
 
   it('hasChildren should return true if there are no pending children and non-pending children', () => {
     expect(
       getWorkflowRelationships(
-        runningWorkflow,
+        toWorkflowExecution(runningWorkflow),
         completedEventHistory,
         childEvents,
+        namespaces.namespaces,
       ).hasChildren,
     ).toBe(true);
     expect(
       getWorkflowRelationships(
-        runningWorkflow,
+        toWorkflowExecution(runningWorkflow),
         completedEventHistory,
         childEvents,
+        namespaces.namespaces,
       ).children.length,
     ).toBe(15);
   });
@@ -71,11 +89,23 @@ describe('getWorkflowRelationships', () => {
   it('hasRelationships should return false if there are is not a parent, pending children, first, previous, or next', () => {
     expect(
       getWorkflowRelationships(
-        runningWorkflow,
+        toWorkflowExecution(runningWorkflow),
         completedEventHistory,
         completedEvents,
+        namespaces.namespaces,
       ).hasChildren,
     ).toBe(false);
+  });
+
+  it('parentNamespaceName should return namespace name if parentNamespaceId does match namespaces list', () => {
+    expect(
+      getWorkflowRelationships(
+        toWorkflowExecution(runningWorkflow),
+        completedEventHistory,
+        completedEvents,
+        namespaces.namespaces,
+      ).parentNamespaceName,
+    ).toBe('canary');
   });
 
   it('should return the firstExecutionRunId for first on a workflowExecutionStartedEvent', () => {
@@ -87,9 +117,10 @@ describe('getWorkflowRelationships', () => {
 
     expect(
       getWorkflowRelationships(
-        continuedAsNewWorkflow,
+        toWorkflowExecution(continuedAsNewWorkflow),
         continuedAsNewEventHistory,
         completedEvents,
+        namespaces.namespaces,
       ).first,
     ).toBe(firstExecutionRunId);
   });
@@ -105,19 +136,22 @@ describe('getWorkflowRelationships', () => {
     );
     expect(
       getWorkflowRelationships(
-        continuedAsNewWorkflowCopy,
+        toWorkflowExecution(continuedAsNewWorkflowCopy),
         continuedAsNewEventHistory,
         completedEvents,
+        namespaces.namespaces,
       ).first,
     ).toBe(firstExecutionRunId);
 
-    continuedAsNewWorkflowCopy.runId = firstExecutionRunId;
+    continuedAsNewWorkflowCopy.workflowExecutionInfo.execution.runId =
+      firstExecutionRunId;
 
     expect(
       getWorkflowRelationships(
-        continuedAsNewWorkflowCopy,
+        toWorkflowExecution(continuedAsNewWorkflowCopy),
         continuedAsNewEventHistory,
         completedEvents,
+        namespaces.namespaces,
       ).first,
     ).toBe(undefined);
   });
@@ -130,9 +164,10 @@ describe('getWorkflowRelationships', () => {
       workflowExecutionStartedEvent?.attributes?.continuedExecutionRunId;
     expect(
       getWorkflowRelationships(
-        continuedAsNewWorkflow,
+        toWorkflowExecution(continuedAsNewWorkflow),
         continuedAsNewEventHistory,
         completedEvents,
+        namespaces.namespaces,
       ).previous,
     ).toBe(continuedExecutionRunId);
   });
@@ -146,9 +181,10 @@ describe('getWorkflowRelationships', () => {
 
     expect(
       getWorkflowRelationships(
-        continuedAsNewWorkflow,
+        toWorkflowExecution(continuedAsNewWorkflow),
         continuedAsNewEventHistory,
         completedEvents,
+        namespaces.namespaces,
       ).next,
     ).toBe(newExecutionRunId);
   });
@@ -162,9 +198,10 @@ describe('getWorkflowRelationships', () => {
 
     expect(
       getWorkflowRelationships(
-        completedWorkflow,
+        toWorkflowExecution(completedWorkflow),
         completedEventHistory,
         completedEvents,
+        namespaces.namespaces,
       ).next,
     ).toBe(newExecutionRunId);
   });
@@ -178,12 +215,13 @@ describe('getWorkflowRelationships', () => {
 
     expect(
       getWorkflowRelationships(
-        timedOutWorkflow,
+        toWorkflowExecution(timedOutWorkflow),
         {
           start: timedOutEvents,
           end: timedOutEvents,
         },
         completedEvents,
+        namespaces.namespaces,
       ).next,
     ).toBe(newExecutionRunId);
   });
@@ -197,12 +235,13 @@ describe('getWorkflowRelationships', () => {
 
     expect(
       getWorkflowRelationships(
-        failedWorkflow,
+        toWorkflowExecution(failedWorkflow),
         {
           start: failedEvents,
           end: failedEvents,
         },
         completedEvents,
+        namespaces.namespaces,
       ).next,
     ).toBe(newExecutionRunId);
   });

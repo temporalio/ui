@@ -55,6 +55,7 @@ const DefaultAttributes: SearchAttributes = {
   CloseTime: 'Datetime',
   WorkflowId: 'Keyword',
   WorkflowType: 'Keyword',
+  RunId: 'Keyword',
 };
 
 export const toListWorkflowFilters = (
@@ -126,6 +127,7 @@ export const combineDropdownFilters = (filters: WorkflowFilter[]) => {
   const typeFilter = filters.filter(
     (f) => f.attribute === 'WorkflowType' && f.value,
   );
+  const runIdFilter = filters.filter((f) => f.attribute === 'RunId' && f.value);
   const timeFilter = filters.filter(
     (f) =>
       (f.attribute === 'StartTime' || f.attribute === 'CloseTime') && f.value,
@@ -134,6 +136,7 @@ export const combineDropdownFilters = (filters: WorkflowFilter[]) => {
   const activeFilters = [
     statusFilters,
     idFilter,
+    runIdFilter,
     typeFilter,
     timeFilter,
   ].filter((f) => f.length);
@@ -146,7 +149,13 @@ export const combineDropdownFilters = (filters: WorkflowFilter[]) => {
     }
   });
 
-  return [...statusFilters, ...idFilter, ...typeFilter, ...timeFilter];
+  return [
+    ...statusFilters,
+    ...idFilter,
+    ...runIdFilter,
+    ...typeFilter,
+    ...timeFilter,
+  ];
 };
 
 export const updateQueryParamsFromFilter = debounce(
