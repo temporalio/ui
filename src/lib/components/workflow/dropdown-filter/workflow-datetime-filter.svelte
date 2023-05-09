@@ -249,7 +249,7 @@
                   selected={timeField === 'CloseTime'}
                   on:click={() => onTimeFieldChange('CloseTime')}
                 >
-                  Close Time
+                  End Time
                 </MenuItem>
               </div>
             </div>
