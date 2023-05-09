@@ -8,6 +8,7 @@
     options: Writable<ExtendedSelectOption<T>[]>;
     selectLabel: Writable<string>;
     selectValue: Writable<T>;
+    open: Writable<boolean>;
   }
 
   export interface SelectOption<T> {
@@ -32,13 +33,13 @@
   export let unroundRight: boolean = false;
   export let onChange: (value: T) => void = noop;
 
-  let open = false;
   let select: HTMLUListElement;
 
   // We get the "true" value of this further down but before the mount happens we should have some kind of value
   const valueCtx = writable<T>(value);
   const optionsCtx = writable<ExtendedSelectOption<T>[]>([]);
   const labelCtx = writable<string>(value?.toString());
+  const open = writable<boolean>(false);
 
   $: {
     $valueCtx = value;
@@ -60,14 +61,14 @@
   }
 
   const closeOptions = () => {
-    open = false;
+    $open = false;
     select.focus();
   };
 
   const toggleOptions = () => {
-    open = !open;
+    $open = !$open;
     // when the menu is open, focus the selected option if one exists, else focus the first option.
-    if (open) {
+    if ($open) {
       const selectedOption = $optionsCtx.find(
         (option) => option.value === value,
       );
@@ -85,17 +86,15 @@
       event.preventDefault();
       toggleOptions();
     }
-  };
 
-  const handleWindowKeydown = (event: KeyboardEvent) => {
-    if (event.key === 'Escape') {
+    if ($open && event.key === 'Escape') {
       closeOptions();
     }
   };
 
   const handleWindowClick = (event: MouseEvent) => {
     if (
-      !open ||
+      !$open ||
       event.target === select ||
       select.contains(event.target as HTMLElement)
     ) {
@@ -109,6 +108,7 @@
     selectValue: valueCtx,
     selectLabel: labelCtx,
     options: optionsCtx,
+    open,
     handleChange,
   });
 
@@ -118,7 +118,7 @@
   });
 </script>
 
-<svelte:window on:keydown={handleWindowKeydown} on:click={handleWindowClick} />
+<svelte:window on:click={handleWindowClick} />
 <div class="select {$$props.class}">
   {#if label}
     <label for={id}>{label}</label>
@@ -132,7 +132,7 @@
     aria-controls="{id}-options"
     bind:this={select}
     on:click={toggleOptions}
-    on:keydown={handleKeyDown}
+    on:keydown|stopPropagation={handleKeyDown}
     data-testid={$$props.testId}
   >
     <input
@@ -149,14 +149,14 @@
     {:else}
       <Icon
         class="pointer-events-none"
-        name={open ? 'chevron-up' : 'chevron-down'}
+        name={$open ? 'chevron-up' : 'chevron-down'}
       />
     {/if}
     <ul
       id="{id}-options"
       class="select-options"
       role="listbox"
-      class:sr-only={!open}
+      class:sr-only={!$open}
     >
       <slot />
     </ul>

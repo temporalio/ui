@@ -23,7 +23,7 @@
 
   type T = $$Generic;
 
-  const { selectValue, handleChange, options } =
+  const { selectValue, handleChange, options, open } =
     getContext<SelectContext<T>>(SELECT_CONTEXT);
 
   const dispatch = createEventDispatcher<{ click: { value: T } }>();
@@ -66,21 +66,21 @@
   };
 
   const handleOptionKeydown = (event: KeyboardEvent) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.stopPropagation();
-      handleOptionClick();
+    if (event.key === 'Escape' && $open) {
+      $open = false;
+      return;
     }
 
-    if (event.key === 'ArrowDown') {
-      event.stopPropagation();
+    if (!$open) {
+      return;
+    } else if (event.key === 'Enter' || event.key === ' ') {
+      handleOptionClick();
+    } else if (event.key === 'ArrowDown') {
       const currentIdx = $options.findIndex((option) => option.value === value);
       if (currentIdx !== undefined && currentIdx < $options.length - 1) {
         $options[currentIdx + 1].nativeElement.focus();
       }
-    }
-
-    if (event.key === 'ArrowUp') {
-      event.stopPropagation();
+    } else if (event.key === 'ArrowUp') {
       const currentIdx = $options.findIndex((option) => option.value === value);
       if (currentIdx !== undefined && currentIdx && currentIdx > 0) {
         $options[currentIdx - 1].nativeElement.focus();
@@ -97,7 +97,7 @@
   class:selected
   bind:this={optionElement}
   on:click|stopPropagation={handleOptionClick}
-  on:keydown|preventDefault={handleOptionKeydown}
+  on:keydown|stopPropagation|preventDefault={handleOptionKeydown}
 >
   <div class="mr-2 w-6">
     {#if selected}
