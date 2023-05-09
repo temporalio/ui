@@ -1,20 +1,21 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import { triggerMenu } from './trigger-menu';
-  export let show: boolean;
+  import type { IconName } from '$lib/holocene/icon/paths';
+  import { getContext } from 'svelte';
+  import { type MenuContext, MENU_CONTEXT } from './menu-container.svelte';
   export let controls: string;
   export let dark = false;
   export let disabled = false;
   export let hasIndicator = false;
-  export let keepOpen = false;
   export let id: string = null;
+  export let icon: IconName = null;
 
-  const close = () => {
-    !disabled && (show = false);
-  };
+  const { toggleMenu, open } = getContext<MenuContext>(MENU_CONTEXT);
 
-  const toggle = () => {
-    !disabled && (show = !show);
+  const handleClick = () => {
+    if (!disabled) {
+      toggleMenu();
+    }
   };
 </script>
 
@@ -23,23 +24,23 @@
   {id}
   aria-haspopup={!disabled}
   aria-controls={controls}
-  aria-expanded={show}
-  use:triggerMenu={keepOpen}
-  on:close-menu={close}
-  on:toggle-menu={toggle}
-  on:click|preventDefault
+  aria-expanded={$open}
+  on:click|preventDefault={handleClick}
   class={$$props.class}
   class:dark
-  class:show
+  class:show={$open}
   class:hasIndicator
   {disabled}
   data-testid={$$props.testId}
 >
+  {#if icon}
+    <Icon name={icon} />
+  {/if}
   <slot />
   {#if hasIndicator}
     <Icon
       class="pointer-events-none"
-      name={show ? 'chevron-up' : 'chevron-down'}
+      name={$open ? 'chevron-up' : 'chevron-down'}
     />
   {/if}
 </button>

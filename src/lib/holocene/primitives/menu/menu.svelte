@@ -1,18 +1,25 @@
 <script lang="ts">
+  import { getContext } from 'svelte';
   import { fly } from 'svelte/transition';
+  import { MENU_CONTEXT, type MenuContext } from './menu-container.svelte';
 
   export let id: string;
-  export let show = false;
   export let dark = false;
+  export let keepOpen = false;
   export let position: 'left' | 'right' = 'left';
+
+  const { keepOpen: keepOpenCtx, open } = getContext<MenuContext>(MENU_CONTEXT);
+
+  $: $keepOpenCtx = keepOpen;
 </script>
 
 <ul
   in:fly={{ duration: 100 }}
   role="menu"
-  class="absolute z-50 mt-1 w-full list-none rounded border border-gray-900 bg-white text-primary shadow {position} {$$props.class}"
+  tabindex="0"
+  class="absolute z-50 mt-1 w-full list-none rounded border border-gray-900 bg-white text-primary shadow outline-none focus:outline focus:outline-blue-700 -outline-offset-2 {position} {$$props.class}"
   class:dark
-  class:sr-only={!show}
+  class:sr-only={!$open}
   aria-labelledby={id}
   {id}
 >
@@ -20,16 +27,6 @@
 </ul>
 
 <style lang="postcss">
-  :global(.menu-item) {
-    &:first-child {
-      @apply rounded-t;
-    }
-
-    &:last-child {
-      @apply rounded-b;
-    }
-  }
-
   .left {
     @apply left-0 origin-top-left;
   }

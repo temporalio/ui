@@ -10,9 +10,6 @@
   } from 'date-fns';
 
   import { columnOrderedDurations } from '$lib/utilities/to-duration';
-  import { clickOutside } from '$lib/holocene/outside-click';
-
-  import SimpleSplitButton from '$lib/holocene/simple-split-button.svelte';
   import {
     persistedTimeFilter,
     workflowFilters,
@@ -30,7 +27,6 @@
   import Menu from '$lib/holocene/primitives/menu/menu.svelte';
 
   let custom = false;
-  let show = false;
   let value = 'All Time';
   let timeField = 'StartTime';
 
@@ -173,16 +169,10 @@
   };
 </script>
 
-<div
-  class="flex items-center"
-  use:clickOutside
-  on:click-outside={() => (show = false)}
->
+<div class="flex items-center">
   <MenuContainer>
     <MenuButton
       id="time-range-filter"
-      bind:show
-      keepOpen
       hasIndicator
       controls="time-range-filter-menu"
       class="flex flex-row items-center p-2 bg-white border border-r-0 border-primary rounded-l h-10 w-44"
@@ -190,9 +180,9 @@
       {value}
     </MenuButton>
     <Menu
-      {show}
+      keepOpen
       id="time-range-filter-menu"
-      class="flex rounded h-auto w-[400px] flex-col gap-8 bg-white p-4"
+      class="flex rounded h-auto w-[400px] flex-col gap-8 bg-white p-2"
     >
       {#if custom}
         <div class="flex flex-col">
@@ -268,25 +258,20 @@
       {/if}
     </Menu>
   </MenuContainer>
-  <SimpleSplitButton
-    class="rounded-tr rounded-br bg-white"
-    buttonClass="border border-gray-900"
-    id="datetime"
-    label={capitalize($timeFormat)}
-    icon="clock"
-  >
-    <MenuItem on:click={() => ($timeFormat = 'relative')}>Relative</MenuItem>
-    <MenuItem on:click={() => ($timeFormat = 'UTC')}>UTC</MenuItem>
-    <MenuItem on:click={() => ($timeFormat = 'local')}>Local</MenuItem>
-  </SimpleSplitButton>
+  <MenuContainer>
+    <MenuButton
+      class="p-2 bg-white border border-primary rounded-r h-10 w-32"
+      id="datetime"
+      controls="datetime-menu"
+      hasIndicator
+      icon="clock"
+    >
+      {capitalize($timeFormat)}
+    </MenuButton>
+    <Menu id="datetime-menu">
+      <MenuItem on:click={() => ($timeFormat = 'relative')}>Relative</MenuItem>
+      <MenuItem on:click={() => ($timeFormat = 'UTC')}>UTC</MenuItem>
+      <MenuItem on:click={() => ($timeFormat = 'local')}>Local</MenuItem>
+    </Menu>
+  </MenuContainer>
 </div>
-
-<style lang="postcss">
-  .time-label {
-    @apply flex cursor-pointer whitespace-nowrap px-4 py-3 font-secondary text-sm font-medium hover:bg-gray-50;
-  }
-
-  .active {
-    @apply text-blue-700;
-  }
-</style>
