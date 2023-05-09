@@ -52,17 +52,17 @@
           <div
             class="h-auto max-h-[400px] w-[220px] max-w-[220px] overflow-auto md:w-[360px] md:max-w-[360px] lg:w-[500px] lg:max-w-[500px]"
             slot="items"
-            let:show
+            let:open
             data-testid="namespace-select-list"
           >
-            <NamespaceList {namespaceList} {show} />
+            <NamespaceList {namespaceList} {open} />
           </div>
         </DropdownMenu>
       {/key}
     {/if}
     <DataEncoderStatus />
     {#if $authUser.accessToken}
-      <DropdownMenu id="namespace" position="right">
+      <DropdownMenu id="user" position="right">
         <div slot="trigger" class="flex items-center gap-1">
           <img
             src={$authUser?.picture}

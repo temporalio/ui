@@ -7,9 +7,10 @@
   import Input from '$lib/holocene/input/input.svelte';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
   import type { NamespaceListItem } from '$lib/types/global';
+  import type { Writable } from 'svelte/store';
 
   export let namespaceList: NamespaceListItem[] = [];
-  export let show: boolean;
+  export let open: Writable<boolean>;
 
   let searchValue = '';
   let focusedIndex = 0;
@@ -17,7 +18,7 @@
   let divElement: HTMLDivElement;
 
   const getFocusableElements = () => {
-    if (show && divElement) {
+    if ($open && divElement) {
       return Array.from(
         divElement.querySelectorAll<
           HTMLButtonElement | HTMLInputElement | HTMLDivElement
@@ -88,7 +89,7 @@
 
   const handleKeyboardNavigation = (event: KeyboardEvent) => {
     const focusable = getFocusableElements();
-    if (!show || !focusable.length || focusable.length === 1) {
+    if (!$open || !focusable.length || focusable.length === 1) {
       return;
     }
 
@@ -97,7 +98,7 @@
   };
 
   $: {
-    if (show) {
+    if ($open) {
       const focusable = getFocusableElements();
       const inputElement = focusable[0];
       inputElement.focus();
