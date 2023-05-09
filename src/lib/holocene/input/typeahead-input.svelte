@@ -1,10 +1,7 @@
 <script lang="ts">
-  import { writable } from 'svelte/store';
-  import { onDestroy, setContext } from 'svelte';
   import type { IconName } from '$lib/holocene/icon/paths';
   import { clickOutside } from '$lib/holocene/outside-click';
 
-  import type { SelectContext } from '$lib/holocene/select/select.svelte';
   import Input from '$lib/holocene/input/input.svelte';
   import Menu from '$lib/holocene/primitives/menu/menu.svelte';
   import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
@@ -35,30 +32,10 @@
     }
   }
 
-  const context = writable<SelectContext<string>>({
-    value: value,
-    label: value,
-    onChange: () => {
-      onChange(value);
-      showMenu = false;
-    },
-  });
-
-  const unsubscribe = context.subscribe((ctx) => {
-    value = ctx.value;
-  });
-
-  onDestroy(() => {
-    unsubscribe();
-  });
-
-  $: {
-    if (value) {
-      context.update((previous) => ({ ...previous, value: value }));
-    }
-
-    setContext('select-value', context);
-  }
+  const handleOptionClick = (event: CustomEvent<{ value: string }>) => {
+    onChange(event.detail.value);
+    showMenu = false;
+  };
 </script>
 
 <div
@@ -80,7 +57,7 @@
     />
     <Menu show={showMenu} id={`menu-${id}`} class="h-auto max-h-80 w-64">
       {#each filterOptions as { label, value }}
-        <Option {value}>{label}</Option>
+        <Option on:click={handleOptionClick} {value}>{label}</Option>
       {:else}
         <Option value={null}>No Results</Option>
       {/each}

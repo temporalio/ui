@@ -12,7 +12,12 @@
 </script>
 
 <script lang="ts">
-  import { getContext, onDestroy, onMount } from 'svelte';
+  import {
+    getContext,
+    onDestroy,
+    onMount,
+    createEventDispatcher,
+  } from 'svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { type SelectContext, SELECT_CONTEXT } from './select.svelte';
 
@@ -20,6 +25,8 @@
 
   const { selectValue, handleChange, options } =
     getContext<SelectContext<T>>(SELECT_CONTEXT);
+
+  const dispatch = createEventDispatcher<{ click: { value: T } }>();
 
   export let value: T;
   export let description: string = '';
@@ -55,6 +62,7 @@
 
   const handleOptionClick = () => {
     handleChange(_value);
+    dispatch('click', { value: _value });
   };
 
   const handleOptionKeydown = (event: KeyboardEvent) => {
