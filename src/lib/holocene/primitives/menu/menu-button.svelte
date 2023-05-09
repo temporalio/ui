@@ -34,11 +34,7 @@
   {disabled}
   data-testid={$$props.testId}
 >
-  {#if icon}
-    <Icon name={icon} />
-  {/if}
-  <slot />
-  {#if hasIndicator}
+  {#if icon}<Icon name={icon} />{/if}<slot />{#if hasIndicator}
     <Icon
       class="pointer-events-none"
       name={$open ? 'chevron-up' : 'chevron-down'}
