@@ -194,7 +194,7 @@
     @apply bg-gray-50 placeholder:text-gray-600 pointer-events-none;
   }
 
-  .select-options {
+  .select-options:not(.sr-only) {
     @apply absolute z-50 p-2 top-10 left-0 w-full list-none rounded border border-gray-900 bg-white text-primary shadow max-h-80 overflow-y-scroll;
   }
 </style>
