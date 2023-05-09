@@ -100,7 +100,7 @@ describe('Workflow Actions', () => {
       cy.get('#workflow-actions-menu-button').click();
       cy.get('#workflow-actions-menu >> [data-testid="reset-button"]').click();
       cy.get('[data-testid="workflow-reset-type-select"]').click();
-      cy.get('#reset-type-select-options >> li[role="option"]').first().click();
+      cy.get('#reset-type-select-options > li[role="option"]').first().click();
       cy.get('#reset-reason').type('test');
       cy.get(confirmBtn).click();
 
