@@ -184,6 +184,7 @@ export type SettingsResponse = {
     Endpoint: string;
     PassAccessToken?: boolean;
     IncludeCredentials?: boolean;
+    DecodeEventHistoryDownload?: boolean;
   };
   DefaultNamespace: string;
   DisableWriteActions: boolean;

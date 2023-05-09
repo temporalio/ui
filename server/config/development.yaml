@@ -48,5 +48,6 @@ codec:
   endpoint:
   passAccessToken: false
   includeCredentials: false
+  decodeEventHistoryDownload: true
 forwardHeaders: # can be used to pass additional HTTP headers from HTTP requests to Temporal gRPC backend
   - X-Forwarded-For
