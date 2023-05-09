@@ -12,8 +12,6 @@
   import { columnOrderedDurations } from '$lib/utilities/to-duration';
   import { clickOutside } from '$lib/holocene/outside-click';
 
-  import Select from '$lib/holocene/select/select.svelte';
-  import Option from '$lib/holocene/select/option.svelte';
   import SimpleSplitButton from '$lib/holocene/simple-split-button.svelte';
   import {
     persistedTimeFilter,
@@ -25,9 +23,11 @@
   import TimePicker from '$lib/holocene/time-picker.svelte';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { page } from '$app/stores';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
+  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
+  import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
+  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
 
   let custom = false;
   let show = false;
@@ -178,17 +178,22 @@
   use:clickOutside
   on:click-outside={() => (show = false)}
 >
-  <Select
-    class="w-44 rounded"
-    id="time-range-filter"
-    placeholder="All Time"
-    unroundRight
-    bind:show
-    keepOpen={true}
-    {value}
-    {onChange}
-  >
-    <div class="flex rounded h-auto w-[400px] flex-col gap-8 bg-white p-4">
+  <MenuContainer>
+    <MenuButton
+      id="time-range-filter"
+      bind:show
+      keepOpen
+      hasIndicator
+      controls="time-range-filter-menu"
+      class="flex flex-row items-center p-2 bg-white border border-r-0 border-primary rounded-l h-10 w-44"
+    >
+      {value}
+    </MenuButton>
+    <Menu
+      {show}
+      id="time-range-filter-menu"
+      class="flex rounded h-auto w-[400px] flex-col gap-8 bg-white p-4"
+    >
       {#if custom}
         <div class="flex flex-col">
           <p class="text-sm">Start</p>
@@ -227,51 +232,42 @@
         <div>
           <div class="flex w-full flex-wrap">
             <div class="flex w-1/2 flex-col border-b border-gray-300">
-              <Option value={'All Time'}>All Time</Option>
+              <MenuItem on:click={() => onChange('All Time')}>All Time</MenuItem
+              >
             </div>
             <div class="flex w-1/2 flex-col border-b border-gray-300">
-              <Option value={'Custom'}>Custom</Option>
+              <MenuItem on:click={() => onChange('Custom')}>Custom</MenuItem>
             </div>
             {#each columnOrderedDurations as duration}
               <div class="flex w-1/2 flex-col justify-center">
-                <Option value={duration}>{duration}</Option>
+                <MenuItem on:click={() => onChange(duration)}
+                  >{duration}</MenuItem
+                >
               </div>
             {/each}
             <div class="flex w-full flex-wrap">
               <div class="flex w-1/2 flex-col border-t border-gray-300">
-                <button
-                  class="time-label"
-                  class:active={timeField === 'StartTime'}
+                <MenuItem
+                  selected={timeField === 'StartTime'}
                   on:click={() => onTimeFieldChange('StartTime')}
                 >
-                  <div class="mr-2 w-6">
-                    {#if timeField === 'StartTime'}
-                      <Icon name="checkmark" />
-                    {/if}
-                  </div>
                   Start Time
-                </button>
+                </MenuItem>
               </div>
               <div class="flex w-1/2 flex-col border-t border-gray-300">
-                <button
-                  class="time-label"
-                  class:active={timeField === 'CloseTime'}
+                <MenuItem
+                  selected={timeField === 'CloseTime'}
                   on:click={() => onTimeFieldChange('CloseTime')}
                 >
-                  <div class="mr-2 w-6">
-                    {#if timeField === 'CloseTime'}
-                      <Icon name="checkmark" />
-                    {/if}
-                  </div>
-                  End Time
-                </button>
+                  Close Time
+                </MenuItem>
               </div>
             </div>
           </div>
         </div>
       {/if}
-    </div>
-  </Select>
+    </Menu>
+  </MenuContainer>
   <SimpleSplitButton
     class="rounded-tr rounded-br bg-white"
     buttonClass="border border-gray-900"

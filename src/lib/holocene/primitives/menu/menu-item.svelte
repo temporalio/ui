@@ -1,6 +1,7 @@
 <script lang="ts">
   import { type ComponentProps, createEventDispatcher } from 'svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
 
   export let dark = false;
   export let selected = false;
@@ -51,6 +52,9 @@
         data-testid={testId}
         class="menu-item {$$props.class}"
       >
+        {#if selected}
+          <Icon width={18} height={18} name="checkmark" />
+        {/if}
         <slot />
       </li>
     {/if}
@@ -77,7 +81,7 @@
 
   .active,
   .selected {
-    @apply text-blue-700;
+    @apply flex flex-row gap-2 items-center text-blue-700;
   }
 
   .destructive {

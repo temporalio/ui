@@ -31,6 +31,7 @@
   class={$$props.class}
   class:dark
   class:show
+  class:hasIndicator
   {disabled}
   data-testid={$$props.testId}
 >
@@ -44,6 +45,10 @@
 </button>
 
 <style lang="postcss">
+  .hasIndicator {
+    @apply flex flex-row items-center justify-between;
+  }
+
   button.dark,
   button.dark > * {
     @apply bg-primary text-white;
