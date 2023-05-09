@@ -81,6 +81,7 @@ export const allEventTypeOptions: EventTypeOption[] = [
   { label: 'Signal', option: 'signal', color: '#DD6B20' },
   { label: 'Timer', option: 'timer', color: '#1D4ED8' },
   { label: 'Workflow', option: 'workflow', color: '#10B981' },
+  { label: 'Update', option: 'update' },
 ];
 
 const compactEventTypes: (EventTypeCategory | undefined)[] = [
