@@ -10,6 +10,11 @@
   import { capitalize } from '$lib/utilities/format-camel-case';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
+  import {
+    eventOrGroupIsCanceled,
+    eventOrGroupIsFailureOrTimedOut,
+    eventOrGroupIsTerminated,
+  } from '$lib/models/event-groups/get-event-in-group';
 
   export let fullHistory: CommonHistoryEvent[] = [];
   export let showCompleted = false;
@@ -37,7 +42,7 @@
     const retryIcon = renderComponentToHTML(Icon, {
       name: 'retry',
     });
-    return `<div class="flex gap-1 items-center justify-between"><div class="bar-content"><p>${name}</p></div><div class="flex gap-1 items-center text-red-700">${retryIcon}${attempt.toString()}</div></div>`;
+    return `<div class="flex gap-1 items-center justify-between"><div class="bar-content"><p>${name}</p></div><div class="flex gap-1 items-center">${retryIcon}${attempt.toString()}</div></div>`;
   }
 
   const createGroupItems = (eventGroups, isRunning, showCompleted) => {
@@ -73,6 +78,24 @@
       });
     }
 
+    const groupIsCanceledFailureTimedOutTerminated = (group: IterableEvent) => {
+      return (
+        eventOrGroupIsCanceled(group) ||
+        eventOrGroupIsFailureOrTimedOut(group) ||
+        eventOrGroupIsTerminated(group)
+      );
+    };
+
+    const hasPending = (group) =>
+      $workflowRun.workflow.pendingActivities.find((activity) =>
+        group.eventList.find((e) => e.id === activity.activityId),
+      );
+
+    const showNonCompletedGroups = (group) => {
+      if (showCompleted || hasPending(group)) return group;
+      return !groupIsCanceledFailureTimedOutTerminated;
+    };
+
     const groupIsRunning = (group) => {
       return (
         !group.isCanceled &&
@@ -83,8 +106,9 @@
     };
 
     const visibleGroups = eventGroups.filter((group) => {
-      if (showCompleted) return group;
-      return groupIsRunning(group);
+      return showNonCompletedGroups(group);
+      // if (showCompleted) return group;
+      // return groupIsRunning(group);
     });
 
     visibleGroups.forEach((group, i) => {
@@ -409,7 +433,7 @@
     color: #15803d;
   }
 
-  :global(.vis-item.vis-range.Running, .vis-item.vis-range.Started) {
+  :global(.vis-item.vis-range.Running) {
     background-color: #dbeafe;
     border-color: #1d4ed8;
     border-radius: 9999px;
@@ -422,8 +446,16 @@
     color: #1d4ed8;
   }
 
+  :global(.vis-item.vis-range.Started) {
+    background-color: #e4e4e7;
+    border-color: #18181b;
+    border-radius: 9999px;
+    border-width: 2px;
+    color: #18181b;
+  }
+
   :global(.vis-item.vis-point.Started) {
-    color: #1d4ed8;
+    color: #18181b;
   }
 
   /* CSS for each activity type */

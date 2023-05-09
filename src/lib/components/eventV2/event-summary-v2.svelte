@@ -79,15 +79,16 @@
       {expandAll}
     />
   {/if}
-  {#each $workflowRun?.workflow?.pendingActivities ?? [] as activity}
-    <EventGroupSummaryCard
-      event={activity}
-      events={currentEvents}
-      {expandAll}
-      pending
-    />
-  {/each}
   {#if $workflowRun?.workflow?.isRunning}
+    {#each $workflowRun?.workflow?.pendingActivities ?? [] as activity}
+      <EventGroupSummaryCard
+        event={activity}
+        events={currentEvents}
+        {expandAll}
+        pending
+      />
+    {/each}
+
     <RunningCard />
   {/if}
 </div>
