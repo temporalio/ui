@@ -23,9 +23,11 @@ WORKDIR /home/ui-server
 RUN addgroup -g 5000 temporal
 RUN adduser -u 5000 -G temporal -D temporal
 
+RUN mkdir ./config
+
 COPY --from=server-builder /home/server-builder/ui-server ./
 COPY docker/start-ui-server.sh ./start-ui-server.sh
-COPY docker/config_template.yaml ./config/config_template.yaml
+COPY docker/config-template.yaml ./config-template.yaml
 
 RUN chown temporal:temporal /home/ui-server -R
 
