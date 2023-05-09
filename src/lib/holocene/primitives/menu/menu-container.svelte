@@ -51,5 +51,5 @@
   on:click={handleWindowClick}
   on:keydown|stopPropagation={handleWindowKeydown}
 >
-  <slot />
+  <slot {open} />
 </div>
