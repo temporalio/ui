@@ -26,10 +26,11 @@
   aria-controls={controls}
   aria-expanded={$open}
   on:click|preventDefault={handleClick}
-  class={$$props.class}
+  class="text-sm flex flex-row items-center {$$props.class}"
   class:dark
   class:show={$open}
-  class:hasIndicator
+  class:has-indicator={hasIndicator}
+  class:has-icon={!!icon}
   {disabled}
   data-testid={$$props.testId}
 >
@@ -46,8 +47,12 @@
 </button>
 
 <style lang="postcss">
-  .hasIndicator {
-    @apply flex flex-row items-center justify-between;
+  .has-icon {
+    @apply gap-2;
+  }
+
+  .has-indicator {
+    @apply justify-between;
   }
 
   button.dark,

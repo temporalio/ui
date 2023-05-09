@@ -126,13 +126,7 @@
   }
 
   .select-option {
-    @apply rounded flex flex-row items-start justify-center cursor-pointer list-none bg-white p-4 font-secondary text-sm font-medium text-primary hover:bg-gray-50;
-
-    &:focus {
-      outline: none;
-
-      @apply outline outline-2 -outline-offset-2 outline-blue-700 bg-blue-50;
-    }
+    @apply rounded flex flex-row items-start justify-center cursor-pointer list-none bg-white p-4 font-secondary text-sm font-medium text-primary hover:bg-gray-50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-blue-700 focus-visible:bg-blue-50;
   }
 
   .select-option.selected {

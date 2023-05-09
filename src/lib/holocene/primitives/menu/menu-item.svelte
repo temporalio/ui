@@ -80,13 +80,7 @@
   }
 
   .menu-item {
-    @apply w-full cursor-pointer list-none bg-white p-4 font-secondary text-sm font-medium text-primary hover:bg-gray-50 first-of-type:rounded-t last-of-type:rounded-b;
-
-    &:focus {
-      outline: none;
-
-      @apply bg-blue-50 outline-blue-700 outline -outline-offset-2 rounded;
-    }
+    @apply w-full cursor-pointer list-none bg-white p-4 font-secondary text-sm font-medium text-primary hover:bg-gray-50 first-of-type:rounded-t last-of-type:rounded-b focus:outline-none focus-visible:bg-blue-50 focus-visible:outline-blue-700 focus-visible:outline focus-visible:-outline-offset-2;
   }
 
   .dark {
