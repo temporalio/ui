@@ -140,10 +140,17 @@
         disabled={editDisabled}
         on:click={() => pauseConfirmationModal.open()}
       >
-        <MenuItem href={routeForScheduleEdit({ namespace, scheduleId })}>
+        <MenuItem
+          testId="edit-schedule"
+          href={routeForScheduleEdit({ namespace, scheduleId })}
+        >
           Edit
         </MenuItem>
-        <MenuItem destructive on:click={() => deleteConfirmationModal.open()}>
+        <MenuItem
+          testId="delete-schedule"
+          destructive
+          on:click={() => deleteConfirmationModal.open()}
+        >
           Delete Schedule
         </MenuItem>
       </SplitButton>
