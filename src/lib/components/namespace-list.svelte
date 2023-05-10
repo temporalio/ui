@@ -114,8 +114,11 @@
     .filter(({ namespace }) => namespace.includes(searchValue));
 </script>
 
-<svelte:window on:keydown|stopPropagation={handleKeyboardNavigation} />
-<div class="w-full py-4 px-2 md:px-8 lg:px-12" bind:this={divElement}>
+<div
+  on:keydown={handleKeyboardNavigation}
+  class="w-full py-4 px-2 md:px-8 lg:px-12"
+  bind:this={divElement}
+>
   <div class="prose my-4">
     <h2 class="text:xl md:text-2xl" data-testid="namespace-select-header">
       Select a Namespace

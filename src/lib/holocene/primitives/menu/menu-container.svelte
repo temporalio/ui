@@ -1,4 +1,5 @@
 <script lang="ts" context="module">
+  import { clickOutside } from '$lib/holocene/outside-click';
   import { setContext } from 'svelte';
   import { type Writable, writable } from 'svelte/store';
 
@@ -17,13 +18,7 @@
   const open = writable(false);
   const keepOpen = writable(false);
 
-  const handleWindowClick = (event: MouseEvent) => {
-    if (!menuContainer.contains(event.target as Node)) {
-      closeMenu();
-    }
-  };
-
-  const handleWindowKeydown = (event: KeyboardEvent) => {
+  const handleKeydown = (event: KeyboardEvent) => {
     if (event.key === 'Escape') {
       closeMenu();
     }
@@ -40,16 +35,12 @@
   });
 </script>
 
-<svelte:window
-  on:click|stopPropagation={handleWindowClick}
-  on:keydown|stopPropagation={handleWindowKeydown}
-/>
-
 <div
   bind:this={menuContainer}
+  use:clickOutside
+  on:click-outside={() => ($open = false)}
   class="relative inline-block {$$props.class}"
-  on:click={handleWindowClick}
-  on:keydown|stopPropagation={handleWindowKeydown}
+  on:keydown|stopPropagation={handleKeydown}
 >
   <slot {open} />
 </div>
