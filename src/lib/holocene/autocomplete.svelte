@@ -40,7 +40,7 @@
       );
 </script>
 
-<MenuContainer class="relative {className}" let:open>
+<MenuContainer class={className} let:open>
   <Input
     {id}
     bind:value
@@ -55,7 +55,7 @@
     on:focus={() => open.set(true)}
     {...$$restProps}
   />
-  <Menu class="h-auto max-h-80" id="{id}-menu">
+  <Menu class="max-h-80 overflow-y-scroll" id="{id}-menu">
     {#each filteredOptions as option}
       <MenuItem
         on:click={() => {
