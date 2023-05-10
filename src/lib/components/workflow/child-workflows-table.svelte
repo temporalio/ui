@@ -9,8 +9,6 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
   import type { ChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
   import WorkflowStatus from '../workflow-status.svelte';
-  import type { WorkflowExecutionStatus } from '$lib/types';
-  import { goto } from '$app/navigation';
   import Link from '$lib/holocene/link.svelte';
 
   export let children: ChildWorkflowClosedEvent[] = [];
@@ -18,7 +16,12 @@
   export let namespace: string;
 
   $: formattedPending = pendingChildren.map((c) => {
-    return { runId: c.runId, workflowId: c.workflowId, status: 'Running' };
+    return {
+      runId: c.runId,
+      workflowId: c.workflowId,
+      status: 'Running',
+      namespace,
+    };
   });
 
   $: formattedCompleted = children.map((c) => {
@@ -26,6 +29,7 @@
       runId: c.attributes.workflowExecution.runId,
       workflowId: c.attributes.workflowExecution.workflowId,
       status: c.classification,
+      namespace: c.attributes?.namespace || namespace,
     };
   });
 
@@ -54,7 +58,7 @@
           <Link
             newTab
             href={routeForEventHistory({
-              namespace,
+              namespace: child.namespace,
               workflow: child.workflowId,
               run: child.runId,
             })}
