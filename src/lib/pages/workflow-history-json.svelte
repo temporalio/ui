@@ -36,7 +36,7 @@
     <label
       for="decode-event-history"
       class="flex items-center gap-4 font-secondary text-sm"
-      >View Decoded Event History<ToggleSwitch
+      >View decoded event history<ToggleSwitch
         id="decode-event-history"
         bind:checked={decodeEventHistory}
         data-testid="decode-event-history-toggle"
