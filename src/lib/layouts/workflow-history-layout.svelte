@@ -20,6 +20,8 @@
   import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
 
   import type { EventView } from '$lib/types/events';
+  import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
+  import { authUser } from '$lib/stores/auth-user';
 
   let showShortcuts = false;
 
@@ -102,9 +104,11 @@
             data-testid="download"
             on:click={() =>
               exportHistory({
-                namespace: $page.params.namespace,
-                workflowId: $workflowRun.workflow?.id,
-                runId: $workflowRun.workflow?.runId,
+                namespace: decodeURIForSvelte($page.params.namespace),
+                workflowId: decodeURIForSvelte($workflowRun.workflow?.id),
+                runId: decodeURIForSvelte($workflowRun.workflow?.runId),
+                settings: $page.data.settings,
+                accessToken: $authUser?.accessToken,
               })}>Download</ToggleButton
           >
         </ToggleButtons>

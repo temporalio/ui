@@ -46,5 +46,7 @@ codec:
   endpoint: {{ default .Env.TEMPORAL_CODEC_ENDPOINT "" }}
   passAccessToken: {{ default .Env.TEMPORAL_CODEC_PASS_ACCESS_TOKEN "false" }}
   includeCredentials: {{ default .Env.TEMPORAL_CODEC_INCLUDE_CREDENTIALS "false" }}
+  decodeEventHistoryDownload: {{ default .Env.TEMPORAL_CODEC_DECODE_EVENT_HISTORY_DOWNLOAD "false" }}
+
 forwardHeaders: {{ if .Env.TEMPORAL_FORWARD_HEADERS }} {{ range $seed := (split .Env.TEMPORAL_FORWARD_HEADERS ",") }}
   - {{ . }} {{ end }} {{ end }}
