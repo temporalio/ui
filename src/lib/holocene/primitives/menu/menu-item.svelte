@@ -1,6 +1,12 @@
 <script lang="ts">
-  import { type ComponentProps, createEventDispatcher } from 'svelte';
+  import {
+    type ComponentProps,
+    createEventDispatcher,
+    getContext,
+  } from 'svelte';
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { MENU_CONTEXT, type MenuContext } from './menu-container.svelte';
 
   export let dark = false;
   export let selected = false;
@@ -11,12 +17,19 @@
   export let testId: string = null;
   export let tooltipProps: ComponentProps<Tooltip> = {};
 
+  const { keepOpen, closeMenu } = getContext<MenuContext>(MENU_CONTEXT);
+
   const dispatch = createEventDispatcher<{ click: undefined }>();
 
   const handleKeyUp = (event: KeyboardEvent) => {
     if (event.key === ' ' || event.key === 'Enter') {
       dispatch('click');
     }
+  };
+
+  const handleClick = () => {
+    if (!$keepOpen) closeMenu();
+    dispatch('click');
   };
 
   $: ({ text, ...restTooltipProps } = tooltipProps);
@@ -40,9 +53,10 @@
       </a>
     {:else}
       <li
-        on:click|preventDefault
+        on:click|preventDefault|stopPropagation={handleClick}
         on:keyup={handleKeyUp}
         role="menuitem"
+        tabindex="0"
         class:dark
         class:destructive
         class:selected
@@ -51,6 +65,9 @@
         data-testid={testId}
         class="menu-item {$$props.class}"
       >
+        {#if selected}
+          <Icon width={18} height={18} name="checkmark" />
+        {/if}
         <slot />
       </li>
     {/if}
@@ -63,7 +80,7 @@
   }
 
   .menu-item {
-    @apply w-full cursor-pointer list-none bg-white p-4 font-secondary text-sm font-medium text-primary focus-within:bg-gray-50 focus-within:outline-none hover:bg-gray-50;
+    @apply w-full cursor-pointer list-none bg-white p-4 font-secondary text-sm font-medium text-primary hover:bg-gray-50 first-of-type:rounded-t last-of-type:rounded-b focus:outline-none focus-visible:bg-blue-50 focus-visible:outline-blue-700 focus-visible:outline focus-visible:-outline-offset-2;
   }
 
   .dark {
@@ -77,7 +94,7 @@
 
   .active,
   .selected {
-    @apply text-blue-700;
+    @apply flex flex-row gap-2 items-center text-blue-700;
   }
 
   .destructive {

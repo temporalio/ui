@@ -100,7 +100,7 @@ describe('Workflow Actions', () => {
       cy.get('#workflow-actions-menu-button').click();
       cy.get('#workflow-actions-menu >> [data-testid="reset-button"]').click();
       cy.get('[data-testid="workflow-reset-type-select"]').click();
-      cy.get('#reset-type-select-menu >> li[role="menuitem"]').first().click();
+      cy.get('#reset-type-select-options > li[role="option"]').first().click();
       cy.get('#reset-reason').type('test');
       cy.get(confirmBtn).click();
 
@@ -116,7 +116,7 @@ describe('Workflow Actions', () => {
       cy.get('#workflow-actions-menu >> [data-testid="reset-button"]').click();
       cy.get('[data-testid="workflow-reset-type-select"]').click();
       cy.get(
-        '#reset-type-select-menu > div:nth-child(2) > li[role="menuitem"]',
+        '#reset-type-select-options > li[role="option"]:nth-child(2)',
       ).click();
       cy.get('#reset-reason').type('test');
       cy.get(confirmBtn).click();
@@ -133,7 +133,7 @@ describe('Workflow Actions', () => {
       cy.get('#workflow-actions-menu >> [data-testid="reset-button"]').click();
       cy.get('[data-testid="workflow-reset-type-select"]').click();
       cy.get(
-        '#reset-type-select-menu > div:nth-child(3) > li[role="menuitem"]',
+        '#reset-type-select-options > li[role="option"]:nth-child(3)',
       ).click();
       cy.get('#reset-reason').type('test');
       cy.get('#reset-event-id').type('1');
