@@ -112,6 +112,8 @@ export const eventTypes = [
   'RequestCancelExternalWorkflowExecutionFailed',
   'RequestCancelExternalWorkflowExecutionInitiated',
   'UpsertWorkflowSearchAttributes',
+  'WorkflowUpdateAccepted',
+  'WorkflowUpdateCompleted',
 ] as const;
 
 export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
@@ -155,6 +157,8 @@ export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
   'signalExternalWorkflowExecutionFailedEventAttributes',
   'externalWorkflowExecutionSignaledEventAttributes',
   'upsertWorkflowSearchAttributesEventAttributes',
+  'workflowUpdateAcceptedEventAttributes',
+  'workflowUpdateCompletedEventAttributes',
 ] as const;
 
 export const findAttributeKey = (event: HistoryEvent): EventAttributeKey => {
