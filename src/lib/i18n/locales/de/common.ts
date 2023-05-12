@@ -1,4 +1,4 @@
-export const keys = {
+export default {
   'recent-workflows': 'Recent Workflows',
   'workflows-count_one': '{{count}} workflow',
   'workflows-count_other': '{{count}} workflows',

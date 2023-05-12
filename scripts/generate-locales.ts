@@ -29,57 +29,44 @@ filesToTranslate.map(async (source) => {
     logAndExit(`Error parsing source file: ${source}`);
   }
 
-  const exports = checker.getExportsOfModule(sourceFileSymbol!);
+  const defaultExport = checker.tryGetMemberInModuleExports(
+    'default',
+    sourceFileSymbol!,
+  );
 
-  if (!exports) {
-    logAndExit(`No exports defined in ${source}`);
+  if (!defaultExport) {
+    logAndExit(`No default export in source: ${source}`);
   }
 
-  const keysExportSymbol = exports.find((e) => e.escapedName === 'keys')!;
+  const jsObject = {};
 
-  if (!keysExportSymbol) {
-    logAndExit(`No 'keys' export defined in ${source}`);
-  }
+  if (defaultExport?.declarations && defaultExport.declarations[0]) {
+    defaultExport.declarations[0].forEachChild((child) => {
+      if (child.kind === ts.SyntaxKind.ObjectLiteralExpression) {
+        child.forEachChild((grandchild) => {
+          if (grandchild.kind === ts.SyntaxKind.PropertyAssignment) {
+            const [keyNode, valueNode] = [
+              grandchild.getChildAt(0),
+              grandchild.getChildAt(2),
+            ];
 
-  if (
-    !keysExportSymbol.declarations ||
-    !keysExportSymbol.declarations[0] ||
-    !ts.isVariableDeclaration(keysExportSymbol!.declarations![0])
-  ) {
-    logAndExit(`'keys' export in source: ${source} must be defined`);
-  }
-  const keysDeclaration =
-    keysExportSymbol.declarations![0] as ts.VariableDeclaration;
+            if (ts.isStringLiteral(keyNode) && ts.isStringLiteral(valueNode)) {
+              const key = keyNode.text;
+              const value = valueNode.text;
+              jsObject[key] = value;
+            } else if (
+              ts.isIdentifier(keyNode) &&
+              ts.isStringLiteral(valueNode)
+            ) {
+              const key = keyNode.getText();
+              const value = valueNode.text;
 
-  if (
-    keysDeclaration.initializer?.kind !== ts.SyntaxKind.ObjectLiteralExpression
-  ) {
-    logAndExit(`'keys' export in source: ${source} must be an object literal`);
-  }
-
-  const objectLiteral = keysDeclaration.initializer;
-  const jsObject: Record<string, string> = {};
-
-  // jsObject = objectLiteral.getText();
-
-  if (
-    objectLiteral &&
-    objectLiteral.kind === ts.SyntaxKind.ObjectLiteralExpression
-  ) {
-    for (const prop of (objectLiteral as ts.ObjectLiteralExpression)
-      .properties) {
-      if (prop.kind !== ts.SyntaxKind.PropertyAssignment) {
-        logAndExit(
-          `Property ${prop.name?.getText()} must be a property assignment`,
-        );
+              jsObject[key] = value;
+            }
+          }
+        });
       }
-
-      jsObject[(prop as ts.PropertyAssignment).name!.getText()] = (
-        prop as ts.PropertyAssignment
-      ).initializer.getText();
-    }
-  } else {
-    logAndExit(`Unable to parse object at ${source}`);
+    });
   }
 
   const subDir = source.split(SRC_DIR)[1];
@@ -93,6 +80,7 @@ filesToTranslate.map(async (source) => {
   }
 
   try {
+    console.log(jsObject);
     await writeFile(fullPath, JSON.stringify(jsObject));
   } catch (error) {
     logAndExit(`Unable to write file: ${fullPath} with JSON content`);
