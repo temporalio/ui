@@ -143,23 +143,23 @@
     @apply absolute -top-2;
   }
 
-  input[type="range"]::-webkit-slider-thumb {
+  input[type='range']::-webkit-slider-thumb {
     @apply h-4 w-8 appearance-none rounded-full border border-solid border-primary bg-gradient-to-br from-blue-100 to-purple-100;
   }
 
-  input[type="range"]::-moz-range-thumb {
+  input[type='range']::-moz-range-thumb {
     @apply h-4 w-8 rounded-full border border-solid border-primary bg-gradient-to-br from-blue-100 to-purple-100 shadow-none;
   }
 
-  input[type="range"]:focus {
+  input[type='range']:focus {
     @apply outline-none;
   }
 
-  input[type="range"]:focus::-webkit-slider-thumb {
+  input[type='range']:focus::-webkit-slider-thumb {
     @apply border border-primary outline outline-2 outline-blue-700;
   }
 
-  input[type="range"]:focus::-moz-range-thumb {
+  input[type='range']:focus::-moz-range-thumb {
     @apply border border-primary outline outline-2 outline-blue-700;
   }
 </style>
