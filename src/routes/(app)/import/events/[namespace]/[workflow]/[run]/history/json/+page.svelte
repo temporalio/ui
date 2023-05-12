@@ -1,7 +1,7 @@
 <script lang="ts">
-  import CodeBlock from '$lib/holocene/code-block.svelte';
+  import WorkflowJsonNavigator from '$lib/holocene/workflow-json-navigator.svelte';
 
   import { importEvents } from '$lib/stores/import-events';
 </script>
 
-<CodeBlock content={$importEvents} data-testid="event-history-json" />
+<WorkflowJsonNavigator events={$importEvents} />
