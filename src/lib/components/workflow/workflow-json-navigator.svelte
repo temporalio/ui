@@ -35,40 +35,42 @@
 {#if !events.length}
   <Loading />
 {:else}
-  <div class="flex gap-4">
-    <RangeInput
-      id="range-input-event-history"
-      min={1}
-      max={events.length}
-      bind:value={index}
-    />
-    <div class="flex items-center justify-center gap-3">
-      <button
-        class="caret"
-        disabled={index === 1}
-        on:click={() => {
-          index -= 1;
-        }}
-        aria-label="previous"
-      >
-        <span
-          class="arrow arrow-left"
-          class:arrow-left-disabled={index === 1}
-        />
-      </button>
-      <button
-        class="caret"
-        disabled={index === events.length}
-        on:click={() => {
-          index += 1;
-        }}
-        aria-label="next"
-      >
-        <span
-          class="arrow arrow-right"
-          class:arrow-right-disabled={index === events.length}
-        />
-      </button>
+  <div class="flex gap-4 max-sm:flex-col">
+    <div class="flex w-full gap-4">
+      <RangeInput
+        id="range-input-event-history"
+        min={1}
+        max={events.length}
+        bind:value={index}
+      />
+      <div class="flex items-center justify-center gap-3">
+        <button
+          class="caret"
+          disabled={index === 1}
+          on:click={() => {
+            index -= 1;
+          }}
+          aria-label="previous"
+        >
+          <span
+            class="arrow arrow-left"
+            class:arrow-left-disabled={index === 1}
+          />
+        </button>
+        <button
+          class="caret"
+          disabled={index === events.length}
+          on:click={() => {
+            index += 1;
+          }}
+          aria-label="next"
+        >
+          <span
+            class="arrow arrow-right"
+            class:arrow-right-disabled={index === events.length}
+          />
+        </button>
+      </div>
     </div>
     <slot name="decode" />
   </div>
