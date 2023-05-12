@@ -1,6 +1,9 @@
 import { redirect } from '@sveltejs/kit';
-import type { LayoutLoad } from './$types';
+import type { LayoutLoad, LayoutData } from './$types';
 import type { GetClusterInfoResponse } from '$lib/types';
+import i18next from 'i18next';
+import Backend, { type HttpBackendOptions } from 'i18next-http-backend';
+import LanguageDetector from 'i18next-browser-languagedetector';
 
 import '$lib/vendor/prism/prism.css';
 import '$lib/vendor/prism/prism.cjs';
@@ -20,8 +23,34 @@ import {
   cleanAuthUserCookie,
 } from '$lib/utilities/auth-user-cookie';
 import type { Settings, UiVersionInfo } from '$lib/types/global';
+import { createStore } from '$lib/i18n/store';
+import { get } from 'svelte/store';
 
-export const load: LayoutLoad = async function ({ fetch }) {
+export const load: LayoutLoad = async function ({
+  fetch,
+}): Promise<LayoutData> {
+  i18next
+    .use(Backend)
+    .use(LanguageDetector)
+    .init<HttpBackendOptions>({
+      fallbackLng: 'en',
+      debug: true,
+      load: 'languageOnly',
+      ns: 'common',
+      defaultNS: 'common',
+      detection: {
+        order: ['querystring', 'localStorage', 'navigator'],
+        caches: ['localStorage'],
+        lookupQuerystring: 'lng',
+        lookupLocalStorage: 'locale',
+      },
+      backend: {
+        loadPath: '/i18n/{{lng}}/{{ns}}.json',
+      },
+    });
+
+  const { i18n } = createStore(i18next);
+
   const settings: Settings = await fetchSettings(fetch);
 
   const authUser = getAuthUserCookie();
@@ -53,5 +82,6 @@ export const load: LayoutLoad = async function ({ fetch }) {
     uiVersionInfo,
     settings,
     cluster,
+    i18n: () => get(i18n),
   };
 };
