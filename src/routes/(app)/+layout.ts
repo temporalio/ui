@@ -45,7 +45,7 @@ export const load: LayoutLoad = async function ({
         lookupLocalStorage: 'locale',
       },
       backend: {
-        loadPath: '/i18n/{{lng}}/{{ns}}.json',
+        loadPath: '/i18n/locales/{{lng}}/{{ns}}.json',
       },
     });
 

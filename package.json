@@ -58,7 +58,8 @@
     "package:major": "pnpm version major && svelte-package",
     "story:dev": "histoire dev",
     "story:build": "histoire build",
-    "story:preview": "histoire preview"
+    "story:preview": "histoire preview",
+    "generate:locales": "esno scripts/generate-locales.ts"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.3.4",
