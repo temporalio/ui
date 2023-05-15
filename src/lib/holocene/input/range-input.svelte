@@ -19,12 +19,12 @@
   let valid: boolean = true;
   let outputElement: HTMLOutputElement;
 
-  $: outputXPos = getOutputXPos();
-  $: outputXPosOffset = getOutputXPosOffset();
+  $: outputXPos = getOutputXPos({ value, min, max });
+  $: outputXPosOffset = getOutputXPosOffset({ outputElement, outputXPos });
   $: {
     if (value) {
-      outputXPos = getOutputXPos();
-      outputXPosOffset = getOutputXPosOffset();
+      outputXPos = getOutputXPos({ value, min, max });
+      outputXPosOffset = getOutputXPosOffset({ outputElement, outputXPos });
     } else {
       outputXPos = 0;
       outputXPosOffset = 0;
@@ -43,12 +43,12 @@
       event.currentTarget.valueAsNumber <= max;
   };
 
-  const getOutputXPos = () => {
+  const getOutputXPos = ({ value, min, max }) => {
     // calculates the value as a percentage to position the output text
     return ((value - min) * 100) / (max - min);
   };
 
-  const getOutputXPosOffset = () => {
+  const getOutputXPosOffset = ({ outputElement, outputXPos }) => {
     // as the output text moves to the right with the slider thumb, it needs to shift left slightly
     // such that it doesn't overflow the width of the slider track.
     const offset = outputElement?.clientWidth ?? 15;
@@ -56,8 +56,8 @@
   };
 
   const handleWindowResize = () => {
-    outputXPos = getOutputXPos();
-    outputXPosOffset = getOutputXPosOffset();
+    outputXPos = getOutputXPos({ value, min, max });
+    outputXPosOffset = getOutputXPosOffset({ outputElement, outputXPos });
   };
 </script>
 

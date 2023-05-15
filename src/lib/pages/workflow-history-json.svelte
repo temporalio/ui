@@ -36,7 +36,7 @@
   <label
     slot="decode"
     for="decode-event-history"
-    class="flex items-center gap-4 font-secondary text-sm w-96"
+    class="flex items-center gap-4 font-secondary text-sm w-96 min-w-fit sm:justify-end"
     ><ToggleSwitch
       id="decode-event-history"
       bind:checked={decodeEventHistory}
