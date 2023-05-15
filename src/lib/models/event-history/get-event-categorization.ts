@@ -53,6 +53,9 @@ export const eventTypeCategorizations: Readonly<
   RequestCancelExternalWorkflowExecutionInitiated: 'workflow',
 
   UpsertWorkflowSearchAttributes: 'command',
+
+  WorkflowUpdateAccepted: 'update',
+  WorkflowUpdateCompleted: 'update',
 };
 
 export type EventTypeCategory = (typeof categories)[number];
@@ -64,6 +67,7 @@ const categories = [
   'signal',
   'timer',
   'workflow',
+  'update',
 ] as const;
 
 export type EventTypeOption = {
