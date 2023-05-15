@@ -5,7 +5,7 @@
   export let key: I18nKey;
   export let namespace: string = 'common';
   export let count: number = null;
-  export let replace: { [index: string]: string | number } = {};
+  export let replace: { [index: string]: string | number } = null;
 
   const { t } = $page.data.i18n();
 
