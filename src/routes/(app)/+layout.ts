@@ -34,7 +34,6 @@ export const load: LayoutLoad = async function ({
     .use(LanguageDetector)
     .init<HttpBackendOptions>({
       fallbackLng: 'en',
-      debug: true,
       load: 'languageOnly',
       ns: 'common',
       defaultNS: 'common',
