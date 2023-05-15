@@ -48,10 +48,12 @@
     <div class="ml-4 mr-2">
       <Icon name="search" />
     </div>
+    <label class="sr-only" for="search-namespaces">Search Namespaces</label>
     <input
       class="w-full"
       placeholder="Search"
       type="search"
+      id="search-namespaces"
       on:keydown|stopPropagation
       bind:value={searchValue}
     />
