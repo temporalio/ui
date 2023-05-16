@@ -218,7 +218,7 @@
   );
 
   $: {
-    if ($workflowFilters) {
+    if ($updating) {
       resetSelection();
     }
   }
