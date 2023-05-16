@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { clickOutside } from '$lib/holocene/outside-click';
   import { noop } from 'svelte/internal';
   import Input from '$lib/holocene/input/input.svelte';
   import Menu from './primitives/menu/menu.svelte';
   import MenuItem from './primitives/menu/menu-item.svelte';
   import type { HTMLInputAttributes } from 'svelte/elements';
   import type { IconName } from '$lib/holocene/icon/paths';
+  import MenuContainer from './primitives/menu/menu-container.svelte';
 
   interface $$Props extends HTMLInputAttributes {
     id: string;
@@ -33,7 +33,6 @@
   let className = '';
   export { className as class };
 
-  let show = false;
   $: filteredOptions = !value
     ? options
     : options.filter((option) =>
@@ -41,11 +40,7 @@
       );
 </script>
 
-<div
-  class="relative {className}"
-  use:clickOutside
-  on:click-outside={() => (show = false)}
->
+<MenuContainer class={className} let:open>
   <Input
     {id}
     bind:value
@@ -57,23 +52,21 @@
     {disabled}
     on:input
     on:change
-    on:focus={() => (show = true)}
+    on:focus={() => open.set(true)}
     {...$$restProps}
   />
-  {#if show}
-    <Menu class="h-auto max-h-80" {show} id="{id}-menu">
-      {#each filteredOptions as option}
-        <MenuItem
-          on:click={() => {
-            onOptionClick(option);
-            show = false;
-          }}
-        >
-          {option}
-        </MenuItem>
-      {:else}
-        <MenuItem on:click={noop}>No Results</MenuItem>
-      {/each}
-    </Menu>
-  {/if}
-</div>
+  <Menu class="max-h-80 overflow-y-scroll" id="{id}-menu">
+    {#each filteredOptions as option}
+      <MenuItem
+        on:click={() => {
+          onOptionClick(option);
+          open.set(false);
+        }}
+      >
+        {option}
+      </MenuItem>
+    {:else}
+      <MenuItem on:click={noop}>No Results</MenuItem>
+    {/each}
+  </Menu>
+</MenuContainer>

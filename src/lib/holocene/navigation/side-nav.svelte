@@ -1,14 +1,5 @@
-<script lang="ts" context="module">
-  export interface ExtraIcon {
-    component: typeof SvelteComponent;
-    name: string;
-    onClick?: () => void;
-  }
-</script>
-
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import type { SvelteComponent } from 'svelte';
   import type { DescribeNamespaceResponse as Namespace } from '$types';
 
   import NavContainer from '$lib/holocene/navigation/nav-container.svelte';
@@ -22,7 +13,6 @@
   export let isCloud = false;
   export let activeNamespace: Namespace;
   export let linkList: Partial<Record<string, string>>;
-  export let extras: ExtraIcon[] | null = null;
 </script>
 
 <NavContainer {isCloud} {linkList}>
@@ -35,26 +25,37 @@
       </NavTooltip>
       <div class="nav-title">Workflows</div>
     </NavRow>
-    <slot name="schedules">
-      <IsCloudGuard {isCloud}>
-        <FeatureGuard
-          enabled={Boolean(activeNamespace?.namespaceInfo?.supportsSchedules)}
+    <IsCloudGuard {isCloud}>
+      <FeatureGuard
+        enabled={Boolean(activeNamespace?.namespaceInfo?.supportsSchedules)}
+      >
+        <NavRow
+          link={linkList.schedules}
+          {isCloud}
+          data-testid="schedules-button"
         >
-          <NavRow
-            link={linkList.schedules}
-            {isCloud}
-            data-testid="schedules-button"
-          >
-            <NavTooltip right text="Schedules">
-              <div class="nav-icon">
-                <Icon name="schedules" />
-              </div>
-            </NavTooltip>
-            <div class="nav-title">Schedules</div>
-          </NavRow>
-        </FeatureGuard>
-      </IsCloudGuard>
-    </slot>
+          <NavTooltip right text="Schedules">
+            <div class="nav-icon">
+              <Icon name="schedules" />
+            </div>
+          </NavTooltip>
+          <div class="nav-title">Schedules</div>
+        </NavRow>
+      </FeatureGuard>
+    </IsCloudGuard>
+    <slot name="top" />
+    <IsCloudGuard {isCloud}>
+      <NavRow link={linkList.archive} {isCloud} data-testid="archive-button">
+        <NavTooltip right text="Archive">
+          <div class="nav-icon">
+            <Icon name="archives" />
+          </div>
+        </NavTooltip>
+        <div class="nav-title">Archive</div>
+      </NavRow>
+    </IsCloudGuard>
+  </svelte:fragment>
+  <svelte:fragment slot="middle">
     <IsLegacyCloudGuard {isCloud}>
       <NavRow
         link={linkList.namespaces}
@@ -69,30 +70,10 @@
         <div class="nav-title">Namespaces</div>
       </NavRow>
     </IsLegacyCloudGuard>
-    <slot name="usage" />
-    <IsCloudGuard {isCloud}>
-      <NavRow link={linkList.archive} {isCloud} data-testid="archive-button">
-        <NavTooltip right text="Archive">
-          <div class="nav-icon">
-            <Icon name="archives" />
-          </div>
-        </NavTooltip>
-        <div class="nav-title">Archive</div>
-      </NavRow>
-    </IsCloudGuard>
+    <slot name="middle" />
   </svelte:fragment>
   <svelte:fragment slot="bottom">
-    {#if extras}
-      {#each extras as extra}
-        <NavRow {isCloud} noFilter handleClick={extra.onClick}>
-          <svelte:component this={extra.component}>
-            <div class="nav-title">
-              {extra.name}
-            </div>
-          </svelte:component>
-        </NavRow>
-      {/each}
-    {/if}
+    <slot name="bottom" />
     <slot name="import">
       <IsCloudGuard {isCloud}>
         <NavRow link={linkList.import} {isCloud} data-testid="import-button">
@@ -115,7 +96,6 @@
         <div class="nav-title">Feedback</div>
       </NavRow>
     </slot>
-    <slot name="settings" />
   </svelte:fragment>
 </NavContainer>
 

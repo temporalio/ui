@@ -48,6 +48,7 @@ export type Settings = {
     endpoint?: string;
     passAccessToken?: boolean;
     includeCredentials?: boolean;
+    decodeEventHistoryDownload?: boolean;
   };
   defaultNamespace: string;
   disableWriteActions: boolean;

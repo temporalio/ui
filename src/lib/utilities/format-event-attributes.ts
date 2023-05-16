@@ -20,6 +20,7 @@ export type CombinedAttributes = EventAttribute & {
   firstExecutionRunId?: string;
   continuedExecutionRunId?: string;
   newExecutionRunId?: string;
+  namespace?: string;
 };
 
 const keysToOmit: Readonly<Set<string>> = new Set(['header']);

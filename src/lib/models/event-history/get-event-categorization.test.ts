@@ -59,6 +59,8 @@ describe('Event Category Data Structures', () => {
         "WorkflowTaskScheduled": "workflow",
         "WorkflowTaskStarted": "workflow",
         "WorkflowTaskTimedOut": "workflow",
+        "WorkflowUpdateAccepted": "update",
+        "WorkflowUpdateCompleted": "update",
       }
     `);
   });
@@ -193,6 +195,8 @@ const categories: Record<EventTypeCategory, EventType[]> = {
   ],
 
   command: ['UpsertWorkflowSearchAttributes'],
+
+  update: ['WorkflowUpdateAccepted', 'WorkflowUpdateCompleted'],
 };
 
 describe('getEventCategory', () => {

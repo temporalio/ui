@@ -3,16 +3,15 @@
   import MenuContainer from './primitives/menu/menu-container.svelte';
   import Menu from './primitives/menu/menu.svelte';
 
-  let show = false;
   export let id: string;
   export let position: 'right' | 'left' = 'left';
 </script>
 
-<MenuContainer>
-  <MenuButton controls={id} bind:show class={$$restProps.buttonClass}>
+<MenuContainer let:open>
+  <MenuButton controls={id} class={$$restProps.buttonClass}>
     <slot name="trigger" />
   </MenuButton>
-  <Menu {position} class="min-w-fit {$$restProps.menuClass}" {show} {id}>
-    <slot name="items" {show} />
+  <Menu {position} class="min-w-fit {$$restProps.menuClass}" {id}>
+    <slot name="items" {open} />
   </Menu>
 </MenuContainer>

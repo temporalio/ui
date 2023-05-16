@@ -34,6 +34,10 @@ describe('Batch and Bulk Workflow Actions', () => {
       cy.wait('@cluster-api-elasticsearch');
       cy.wait('@workflows-api');
       cy.wait('@workflows-count-api');
+      cy.get('[data-testid="workflow-count"]').should(
+        'contain.text',
+        'workflows',
+      );
     });
 
     it('allows running workflows to be terminated by ID without a reason', () => {

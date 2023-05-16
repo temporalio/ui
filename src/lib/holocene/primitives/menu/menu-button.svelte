@@ -1,20 +1,21 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import { triggerMenu } from './trigger-menu';
-  export let show: boolean;
+  import type { IconName } from '$lib/holocene/icon/paths';
+  import { getContext } from 'svelte';
+  import { type MenuContext, MENU_CONTEXT } from './menu-container.svelte';
   export let controls: string;
   export let dark = false;
   export let disabled = false;
   export let hasIndicator = false;
-  export let keepOpen = false;
   export let id: string = null;
+  export let icon: IconName = null;
 
-  const close = () => {
-    !disabled && (show = false);
-  };
+  const { toggleMenu, open } = getContext<MenuContext>(MENU_CONTEXT);
 
-  const toggle = () => {
-    !disabled && (show = !show);
+  const handleClick = () => {
+    if (!disabled) {
+      toggleMenu();
+    }
   };
 </script>
 
@@ -23,27 +24,33 @@
   {id}
   aria-haspopup={!disabled}
   aria-controls={controls}
-  aria-expanded={show}
-  use:triggerMenu={keepOpen}
-  on:close-menu={close}
-  on:toggle-menu={toggle}
-  on:click|preventDefault
-  class={$$props.class}
+  aria-expanded={$open}
+  on:click|preventDefault={handleClick}
+  class="text-sm flex flex-row items-center {$$props.class}"
   class:dark
-  class:show
+  class:show={$open}
+  class:has-indicator={hasIndicator}
+  class:has-icon={!!icon}
   {disabled}
   data-testid={$$props.testId}
 >
-  <slot />
-  {#if hasIndicator}
+  {#if icon}<Icon name={icon} />{/if}<slot />{#if hasIndicator}
     <Icon
       class="pointer-events-none"
-      name={show ? 'chevron-up' : 'chevron-down'}
+      name={$open ? 'chevron-up' : 'chevron-down'}
     />
   {/if}
 </button>
 
 <style lang="postcss">
+  .has-icon {
+    @apply gap-2;
+  }
+
+  .has-indicator {
+    @apply justify-between;
+  }
+
   button.dark,
   button.dark > * {
     @apply bg-primary text-white;

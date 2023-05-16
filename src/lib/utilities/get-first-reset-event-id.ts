@@ -8,7 +8,7 @@ import type { WorkflowEvent } from '$lib/types/events';
 export const getFirstResetEventID = (
   events: WorkflowEvent[],
 ): string | undefined => {
-  for (let i = 0; i <= events.length; i++) {
+  for (let i = 0; i < events.length; i++) {
     const event = events[i];
     if (event.eventType === 'WorkflowTaskCompleted') {
       return event.id;
