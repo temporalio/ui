@@ -157,6 +157,13 @@ export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
   'upsertWorkflowSearchAttributesEventAttributes',
 ] as const;
 
+export type ResetEventType = (typeof validResetEventTypes)[number];
+export const validResetEventTypes = [
+  'WorkflowTaskCompleted',
+  'WorkflowTaskFailed',
+  'WorkflowTaskTimedOut',
+];
+
 export const findAttributeKey = (event: HistoryEvent): EventAttributeKey => {
   for (const key of eventAttributeKeys) {
     if (key in event) return key;
@@ -381,6 +388,10 @@ export const isUpsertWorkflowSearchAttributesEvent =
   hasAttributes<UpsertWorkflowSearchAttributesEvent>(
     'upsertWorkflowSearchAttributesEventAttributes',
   );
+
+export const isResetEvent = (event: WorkflowEvent): boolean => {
+  return validResetEventTypes.includes(event.eventType);
+};
 
 export const isLocalActivityMarkerEvent = (
   event: IterableEvent | CommonHistoryEvent,

@@ -2,35 +2,18 @@
   import Input from '$lib/holocene/input/input.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import Select from '$lib/holocene/select/select.svelte';
-  import { ResetReapplyType, ResetType } from '$lib/models/workflow-actions';
-  import type { WorkflowEvent } from '$lib/types/events';
+  import { ResetReapplyType } from '$lib/models/workflow-actions';
+  import { resetEvents } from '$lib/stores/events';
 
-  const DEFAULT_RESET_ID_HINT_TEXT =
-    'Only Workflow Events of type WorkflowTaskCompleted, WorkflowTaskFailed, or WorkflowTaskTimeout are supported.';
-
-  export let resetType: ResetType;
   export let resetReapplyType: ResetReapplyType = ResetReapplyType.Unspecified;
-  export let eventIdValid: boolean;
-  export let reason: string | undefined;
-  export let lastEvent: WorkflowEvent | undefined;
-  export let eventId: string | undefined = undefined;
+  export let reason: string = '';
+  export let eventId: string = '';
 
-  let resetIdHintText: string = DEFAULT_RESET_ID_HINT_TEXT;
-
-  const resetTypes = [
-    {
-      value: ResetType.FirstWorkflowTask,
-      label: 'First workflow task',
-    },
-    {
-      value: ResetType.LastWorkflowTask,
-      label: 'Last workflow task',
-    },
-    {
-      value: ResetType.EventId,
-      label: 'Event ID',
-    },
-  ];
+  $: {
+    if ($resetEvents && $resetEvents.length > 0) {
+      eventId = $resetEvents[0].eventId;
+    }
+  }
 
   const resetReapplyTypes = [
     {
@@ -46,36 +29,34 @@
       label: 'None',
     },
   ];
-
-  const handleResetIdInput = (event: InputEvent) => {
-    const eventTarget = event.target as HTMLInputElement;
-    if (eventTarget.value) {
-      const parsed = parseInt(eventTarget.value);
-      const lastEventId = lastEvent?.id;
-      if (parsed < 1 || parsed > parseInt(lastEventId)) {
-        eventIdValid = false;
-        resetIdHintText = `Please enter an Event ID between 1 and ${lastEventId}`;
-      } else {
-        eventIdValid = true;
-        resetIdHintText = DEFAULT_RESET_ID_HINT_TEXT;
-      }
-    }
-  };
 </script>
 
 <div class="flex w-full flex-col gap-4">
-  <Select
-    label="Reset to"
-    id="reset-type-select"
-    bind:value={resetType}
-    testId="workflow-reset-type-select"
-  >
-    {#each resetTypes as { value, label }}
-      <Option {value}>
-        {label}
-      </Option>
+  <ul class="w-full rounded border border-primary max-h-40 overflow-y-scroll">
+    {#each $resetEvents as event}
+      <li
+        class="w-full h-10 border-b border-primary last-of-type:border-none hover:bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed first-of-type:rounded-t last-of-type:rounded-b"
+      >
+        <label
+          class="flex flex-row items-center gap-2 cursor-pointer px-4 py-2 h-full w-full"
+        >
+          <input
+            on:click={() => (eventId = event.eventId)}
+            type="radio"
+            checked={event.id === eventId}
+          />
+          <p class="grid grid-cols-8">
+            <span class="text-gray-500 font-medium col-span-1">
+              {event.eventId}
+            </span>
+            <span class="font-semibold">
+              {event.eventType}
+            </span>
+          </p>
+        </label>
+      </li>
     {/each}
-  </Select>
+  </ul>
   <Select
     label="Reapply Type"
     id="reset-reapply-type-select"
@@ -89,14 +70,4 @@
     {/each}
   </Select>
   <Input id="reset-reason" bind:value={reason} label="Reason" />
-  {#if resetType === ResetType.EventId}
-    <Input
-      label="Event ID"
-      id="reset-event-id"
-      bind:value={eventId}
-      on:input={handleResetIdInput}
-      hintText={resetIdHintText}
-      valid={eventIdValid}
-    />
-  {/if}
 </div>
