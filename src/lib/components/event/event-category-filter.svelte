@@ -9,7 +9,9 @@
     compactEventTypeOptions,
   } from '$lib/models/event-history/get-event-categorization';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  import { isVersionNewer } from '$lib/utilities/version-check';
   import { eventCategoryFilter } from '$lib/stores/filters';
+  import { temporalVersion } from '$lib/stores/versions';
 
   export let compact: boolean = false;
 
@@ -17,6 +19,10 @@
 
   let parameter = 'category';
   let options = compact ? compactEventTypeOptions : allEventTypeOptions;
+
+  if (isVersionNewer('1.21', $temporalVersion)) {
+    options = options.filter(({ option }) => option !== 'update');
+  }
 
   $: _value = $page.url?.searchParams?.get(parameter);
 
