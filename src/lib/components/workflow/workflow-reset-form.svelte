@@ -44,6 +44,8 @@
             on:click={() => (eventId = event.eventId)}
             type="radio"
             checked={event.id === eventId}
+            name="reset-event-id"
+            id="reset-event-{event.id}"
           />
           <p class="grid grid-cols-8">
             <span class="text-gray-500 font-medium col-span-1">
