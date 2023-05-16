@@ -218,7 +218,7 @@
   );
 
   $: {
-    if ($workflowFilters || ($pageSelected && $updating)) {
+    if ($workflowFilters || $updating) {
       resetSelection();
     }
   }
