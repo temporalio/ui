@@ -139,11 +139,11 @@
     },
     BadUpdateWorkflowExecutionMessage: {
       title: 'Bad Update',
-      copy: '',
+      copy: 'A Workflow Execution tried to complete before receiving an Update.',
     },
     UnhandledUpdate: {
       title: 'Unhandled Update',
-      copy: '',
+      copy: 'A Workflow Update was received by the Temporal Server while a Workflow Task was being processed on a Worker.',
     },
   };
 
