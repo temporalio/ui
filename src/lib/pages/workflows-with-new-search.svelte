@@ -82,7 +82,6 @@
   import { toaster } from '$lib/stores/toaster';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
   import type { WorkflowExecution } from '$lib/types/workflows';
-  import Translate from '$lib/i18n/translate.svelte';
 
   $: query = $page.url.searchParams.get('query');
   $: query && ($workflowsQuery = query);
@@ -243,9 +242,7 @@
 
 <header class="mb-2 flex justify-between">
   <div>
-    <h1 class="text-2xl" data-cy="namespace-title">
-      <Translate key="recent-workflows">Recent Workflows</Translate>
-    </h1>
+    <h1 class="text-2xl" data-cy="namespace-title">Recent Workflows</h1>
     <div class="flex items-center gap-2 text-sm">
       <p data-testid="namespace-name">
         {$page.params.namespace}
@@ -258,19 +255,9 @@
           {:else if $updating}
             <span class="text-gray-400">filtering</span>
           {:else if query}
-            <Translate
-              key="filtered-workflows-count"
-              replace={{
-                total: $workflowCount?.totalCount,
-                filtered: $workflowCount?.count,
-              }}
-            >
-              Results {filteredWorkflowCount} of {totalWorkflowCount} workflows
-            </Translate>
+            Results {filteredWorkflowCount} of {totalWorkflowCount} workflows
           {:else}
-            <Translate key="workflows-count" count={$workflowCount?.totalCount}>
-              {totalWorkflowCount} workflows
-            </Translate>
+            {totalWorkflowCount} workflows
           {/if}
         </p>
       {/if}

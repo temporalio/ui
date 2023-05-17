@@ -31,36 +31,39 @@ export const generateLocales = async (
     const sourceFile = program.getSourceFile(source);
     const checker = program.getTypeChecker();
 
-    if (!sourceFile) {
+    if (sourceFile === undefined) {
       logAndExit(
         `Error retrieving source file information for ${source}`,
         logError,
       );
+      return;
     }
 
-    const sourceFileSymbol = checker.getSymbolAtLocation(sourceFile!);
+    const sourceFileSymbol = checker.getSymbolAtLocation(sourceFile);
 
-    if (!sourceFileSymbol) {
+    if (sourceFileSymbol === undefined) {
       logAndExit(`Error parsing source file: ${source}`, logError);
+      return;
     }
 
     const defaultExport = checker.tryGetMemberInModuleExports(
       'default',
-      sourceFileSymbol!,
+      sourceFileSymbol,
     );
 
-    if (!defaultExport) {
+    if (defaultExport === undefined) {
       logAndExit(`No default export in source: ${source}`, logError);
+      return;
     }
 
-    const jsObject: Record<string, string> = {};
-    if (defaultExport?.declarations && defaultExport.declarations[0]) {
+    const i18nStringsMap: Record<string, string> = {};
+    if (defaultExport.declarations && defaultExport.declarations[0]) {
       defaultExport.declarations[0].forEachChild((child) => {
         if (child.kind === ts.SyntaxKind.ObjectLiteralExpression) {
           child.forEachChild((grandchild) => {
             if (grandchild.kind === ts.SyntaxKind.PropertyAssignment) {
-              let key = '';
-              let value = '';
+              let i18nKey = '';
+              let translatedString = '';
               const [keyNode, valueNode] = [
                 grandchild.getChildAt(0),
                 grandchild.getChildAt(2),
@@ -76,17 +79,17 @@ export const generateLocales = async (
                 ts.isStringLiteral(keyNode) &&
                 ts.isStringLiteral(valueNode)
               ) {
-                key = keyNode.text;
-                value = valueNode.text;
+                i18nKey = keyNode.text;
+                translatedString = valueNode.text;
               } else if (
                 ts.isIdentifier(keyNode) &&
                 ts.isStringLiteral(valueNode)
               ) {
-                key = keyNode.getText();
-                value = valueNode.text;
+                i18nKey = keyNode.getText();
+                translatedString = valueNode.text;
               }
 
-              jsObject[key] = value;
+              i18nStringsMap[i18nKey] = translatedString;
             }
           });
         }
@@ -104,11 +107,17 @@ export const generateLocales = async (
     }
 
     try {
-      await writeFile(fullPath, JSON.stringify(jsObject));
-      console.log(chalk.green(`Parsed locale file: ${relativeTo(source)}`));
+      await writeFile(fullPath, JSON.stringify(i18nStringsMap));
+      console.log(
+        chalk.green(
+          `Parsed locale file: ${relativeTo(source)} to ${relativeTo(
+            fullPath,
+          )}`,
+        ),
+      );
     } catch (error) {
       logAndExit(
-        `Unable to write file: ${fullPath} with JSON content`,
+        `Unable to write file: ${relativeTo(fullPath)} with JSON content`,
         logError,
       );
     }
