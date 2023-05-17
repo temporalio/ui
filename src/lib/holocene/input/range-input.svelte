@@ -19,12 +19,12 @@
   let valid: boolean = true;
   let outputElement: HTMLOutputElement;
 
-  $: outputXPos = getOutputXPos();
-  $: outputXPosOffset = getOutputXPosOffset();
+  $: outputXPos = getOutputXPos({ value, min, max });
+  $: outputXPosOffset = getOutputXPosOffset({ outputElement, outputXPos });
   $: {
     if (value) {
-      outputXPos = getOutputXPos();
-      outputXPosOffset = getOutputXPosOffset();
+      outputXPos = getOutputXPos({ value, min, max });
+      outputXPosOffset = getOutputXPosOffset({ outputElement, outputXPos });
     } else {
       outputXPos = 0;
       outputXPosOffset = 0;
@@ -43,12 +43,12 @@
       event.currentTarget.valueAsNumber <= max;
   };
 
-  const getOutputXPos = () => {
+  const getOutputXPos = ({ value, min, max }) => {
     // calculates the value as a percentage to position the output text
     return ((value - min) * 100) / (max - min);
   };
 
-  const getOutputXPosOffset = () => {
+  const getOutputXPosOffset = ({ outputElement, outputXPos }) => {
     // as the output text moves to the right with the slider thumb, it needs to shift left slightly
     // such that it doesn't overflow the width of the slider track.
     const offset = outputElement?.clientWidth ?? 15;
@@ -56,8 +56,8 @@
   };
 
   const handleWindowResize = () => {
-    outputXPos = getOutputXPos();
-    outputXPosOffset = getOutputXPosOffset();
+    outputXPos = getOutputXPos({ value, min, max });
+    outputXPosOffset = getOutputXPosOffset({ outputElement, outputXPos });
   };
 </script>
 
@@ -143,23 +143,23 @@
     @apply absolute -top-2;
   }
 
-  input[type="range"]::-webkit-slider-thumb {
+  input[type='range']::-webkit-slider-thumb {
     @apply h-4 w-8 appearance-none rounded-full border border-solid border-primary bg-gradient-to-br from-blue-100 to-purple-100;
   }
 
-  input[type="range"]::-moz-range-thumb {
+  input[type='range']::-moz-range-thumb {
     @apply h-4 w-8 rounded-full border border-solid border-primary bg-gradient-to-br from-blue-100 to-purple-100 shadow-none;
   }
 
-  input[type="range"]:focus {
+  input[type='range']:focus {
     @apply outline-none;
   }
 
-  input[type="range"]:focus::-webkit-slider-thumb {
+  input[type='range']:focus::-webkit-slider-thumb {
     @apply border border-primary outline outline-2 outline-blue-700;
   }
 
-  input[type="range"]:focus::-moz-range-thumb {
+  input[type='range']:focus::-moz-range-thumb {
     @apply border border-primary outline outline-2 outline-blue-700;
   }
 </style>

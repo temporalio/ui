@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="../../events.d.ts" />
+/// <reference path="../types/events.ts" />
 
 import { expect } from 'vitest';
 import { describe, it } from 'vitest';
