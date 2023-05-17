@@ -99,7 +99,7 @@ describe('Workflow Actions', () => {
     it('to an arbitrary workflow task if the workflow is running, and the action is enabled', () => {
       cy.get('#workflow-actions-menu-button').click();
       cy.get('#workflow-actions-menu >> [data-testid="reset-button"]').click();
-      cy.get('#reset-event-5').click();
+      cy.get('input[name="reset-event-id"').first().click();
       cy.get('#reset-reason').type('test');
       cy.get(confirmBtn).click();
 

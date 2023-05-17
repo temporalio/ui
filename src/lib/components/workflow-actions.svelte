@@ -263,6 +263,7 @@
   bind:this={resetConfirmationModal}
   on:confirmModal={reset}
   on:cancelModal={hideResetModal}
+  confirmDisabled={!resetId}
 >
   <h3 slot="title">Reset Workflow</h3>
   <svelte:fragment slot="content">

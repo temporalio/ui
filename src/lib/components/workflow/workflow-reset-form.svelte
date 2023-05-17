@@ -7,13 +7,7 @@
 
   export let resetReapplyType: ResetReapplyType = ResetReapplyType.Unspecified;
   export let reason: string = '';
-  export let eventId: string = '';
-
-  $: {
-    if ($resetEvents && $resetEvents.length > 0) {
-      eventId = $resetEvents[0].eventId;
-    }
-  }
+  export let eventId: string;
 
   const resetReapplyTypes = [
     {
@@ -39,9 +33,10 @@
       >
         <label
           class="flex flex-row items-center gap-2 cursor-pointer px-4 py-2 h-full w-full"
+          for="reset-event-{event.id}"
         >
           <input
-            on:click={() => (eventId = event.eventId)}
+            on:click={() => (eventId = event.id)}
             type="radio"
             checked={event.id === eventId}
             name="reset-event-id"
