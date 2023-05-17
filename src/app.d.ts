@@ -8,10 +8,11 @@ declare namespace App {
 
   interface Session {}
 
-  interface Stuff {
-    workflow?: WorkflowExecution;
-    settings: Settings;
-    workers?: GetPollersResponse;
-    cluster?: ClusterInformation;
+  interface PageData {
+    workflow?: import('$types').WorkflowExecution;
+    settings?: import('$types').Settings;
+    workers?: import('$types').GetPollersResponse;
+    cluster?: import('$types').ClusterInformation;
+    i18n?: () => import('i18next').i18n;
   }
 }

@@ -1,5 +1,5 @@
 import { redirect } from '@sveltejs/kit';
-import type { LayoutLoad } from './$types';
+import type { LayoutLoad, LayoutData } from './$types';
 import type { GetClusterInfoResponse } from '$lib/types';
 
 import '$lib/vendor/prism/prism.css';
@@ -21,7 +21,9 @@ import {
 } from '$lib/utilities/auth-user-cookie';
 import type { Settings, UiVersionInfo } from '$lib/types/global';
 
-export const load: LayoutLoad = async function ({ fetch }) {
+export const load: LayoutLoad = async function ({
+  fetch,
+}): Promise<LayoutData> {
   const settings: Settings = await fetchSettings(fetch);
 
   const authUser = getAuthUserCookie();
