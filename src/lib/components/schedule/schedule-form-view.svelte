@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte';
   import { loading, error } from '$lib/stores/schedules';
 
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -94,6 +95,8 @@
     if (preset === 'string') return !cronString;
     return false;
   };
+
+  onDestroy(() => ($error = ''));
 </script>
 
 <div class="pb-20">
