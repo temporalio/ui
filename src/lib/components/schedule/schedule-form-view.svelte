@@ -76,6 +76,10 @@
   const onInput = (e: Event) => {
     const { id } = e.target as HTMLInputElement;
     errors[id] = false;
+
+    if ($error) {
+      $error = '';
+    }
   };
 
   const onBlur = (e: Event) => {
