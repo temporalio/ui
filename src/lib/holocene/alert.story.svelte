@@ -63,7 +63,7 @@
     />
   </Hst.Variant>
   <Hst.Variant title="An Alert without a Title">
-    <Alert icon="error" intent="error" title="">
+    <Alert icon="error" intent="error">
       <p>
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut cupiditate
         exercitationem quia quibusdam excepturi rem saepe dolore quas, odit vero
