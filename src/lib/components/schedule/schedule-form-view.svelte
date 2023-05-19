@@ -1,6 +1,8 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte';
   import { loading, error } from '$lib/stores/schedules';
 
+  import Alert from '$lib/holocene/alert.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Button from '$lib/holocene/button.svelte';
   import Loading from '$lib/holocene/loading.svelte';
@@ -75,6 +77,10 @@
   const onInput = (e: Event) => {
     const { id } = e.target as HTMLInputElement;
     errors[id] = false;
+
+    if ($error) {
+      $error = '';
+    }
   };
 
   const onBlur = (e: Event) => {
@@ -94,6 +100,8 @@
     if (preset === 'string') return !cronString;
     return false;
   };
+
+  onDestroy(() => ($error = ''));
 </script>
 
 <div class="pb-20">
@@ -108,11 +116,9 @@
     </header>
     <form class="mb-4 flex w-full flex-col gap-4 md:w-2/3 xl:w-1/2">
       {#if $error}
-        <p
-          class="rounded-md border-2 border-orange-500 bg-orange-100 p-5 text-center"
-        >
+        <Alert intent="error" title="" bold>
           {$error}
-        </p>
+        </Alert>
       {/if}
       <div class="w-full">
         <Input
