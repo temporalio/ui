@@ -22,7 +22,7 @@ You can start a Temporal server in development using the following command:
 temporal server start-dev
 ```
 
-You can access the UI by visiting `http://localhost:8233`.
+You can access the UI by visiting `http://localhost:8233`. OpenAPI is aceessible at `http://localhost:8233/openapi/`
 
 [temporal cli]: https://github.com/temporalio/cli
 [homebrew]: https://brew.sh
