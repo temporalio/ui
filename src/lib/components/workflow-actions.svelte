@@ -70,7 +70,7 @@
   };
 
   const handleSuccessfulTermination = async () => {
-    terminateConfirmationModal.close();
+    terminateConfirmationModal?.close();
     $refresh = Date.now();
     toaster.push({
       id: 'workflow-termination-success-toast',
@@ -80,7 +80,7 @@
 
   const handleTerminationError = (error: NetworkError) => {
     reason = '';
-    terminateConfirmationModal.setError(
+    terminateConfirmationModal?.setError(
       error?.message ?? 'An unknown error occurred.',
     );
   };
@@ -104,7 +104,7 @@
         workflowId: workflow.id,
         runId: workflow.runId,
       });
-      cancelConfirmationModal.close();
+      cancelConfirmationModal?.close();
       loading = false;
       $refresh = Date.now();
       toaster.push({
@@ -112,7 +112,7 @@
         message: 'Workflow canceled.',
       });
     } catch (error) {
-      cancelConfirmationModal.setError(
+      cancelConfirmationModal?.setError(
         error?.message ?? 'An unknown error occurred.',
       );
     }
@@ -131,14 +131,14 @@
         signalInput,
         signalName,
       });
-      signalConfirmationModal.close();
+      signalConfirmationModal?.close();
       $refresh = Date.now();
       toaster.push({
         message: 'Workflow signaled.',
         id: 'workflow-signal-success-toast',
       });
     } catch (error) {
-      signalConfirmationModal.setError(
+      signalConfirmationModal?.setError(
         error?.message ?? 'An unknown error occurred.',
       );
     }
@@ -163,10 +163,10 @@
           [workflow.runId]: response.runId,
         }));
       }
-      resetConfirmationModal.close();
+      resetConfirmationModal?.close();
       $refresh = Date.now();
     } catch (error) {
-      resetConfirmationModal.setError(
+      resetConfirmationModal?.setError(
         error?.message ?? 'An unknown error occurred.',
       );
     }

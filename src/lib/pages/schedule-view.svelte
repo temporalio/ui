@@ -52,15 +52,17 @@
 
   const handleDelete = async () => {
     try {
-      deleteConfirmationModal.close();
       $loading = true;
       await deleteSchedule({ namespace, scheduleId });
+      deleteConfirmationModal?.close();
       setTimeout(() => {
         $loading = false;
         goto(routeForSchedules({ namespace }));
       }, 2000);
     } catch (e) {
-      deleteConfirmationModal.setError(`Cannot delete schedule. ${e?.message}`);
+      deleteConfirmationModal?.setError(
+        `Cannot delete schedule. ${e?.message}`,
+      );
       $loading = false;
     }
   };

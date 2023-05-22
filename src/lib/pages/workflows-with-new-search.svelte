@@ -162,10 +162,10 @@
           id: 'batch-terminate-success-toast',
         });
       }
-      batchTerminateConfirmationModal.close();
+      batchTerminateConfirmationModal?.close();
       resetPageToDefaultState();
     } catch (error) {
-      batchTerminateConfirmationModal.setError(
+      batchTerminateConfirmationModal?.setError(
         error?.message ?? 'An unknown error occurred.',
       );
     }
@@ -196,10 +196,10 @@
           id: 'batch-cancel-success-toast',
         });
       }
-      batchCancelConfirmationModal.close();
+      batchCancelConfirmationModal?.close();
       resetPageToDefaultState();
     } catch (error) {
-      batchCancelConfirmationModal.setError(
+      batchCancelConfirmationModal?.setError(
         error?.message ?? 'An unknown error occurred.',
       );
     }

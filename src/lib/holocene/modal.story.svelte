@@ -37,9 +37,9 @@
           setTimeout(resolve, 250);
         }
       });
-      modal.close();
+      modal?.close();
     } catch {
-      modal.setError(errorText);
+      modal?.setError(errorText);
     } finally {
       loading = false;
     }
