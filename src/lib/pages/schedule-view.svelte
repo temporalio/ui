@@ -78,7 +78,6 @@
           reason,
         });
     scheduleFetch = fetchSchedule(parameters, fetch);
-    pauseConfirmationModal.close();
     reason = '';
   };
 </script>
