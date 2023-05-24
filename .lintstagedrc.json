@@ -1,6 +1,5 @@
 {
   "*.{ts,js}": ["pnpm lint:fix", "prettier --write"],
-  "src/lib/i18n/locales/*/*.ts": "pnpm generate:locales",
   "*.{css,postcss,svelte}": "stylelint --fix",
   "*.{json,md}": "prettier --write"
 }

@@ -1,5 +1,4 @@
 .svelte-kit/**
-static/**
 build/**
 e2e/test-results/**
 e2e/playwright-report/**
@@ -12,3 +11,4 @@ pnpm-lock.yaml
 .histoire/**
 README.md
 playwright-report
+dist/**/*
