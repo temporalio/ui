@@ -5,7 +5,7 @@ export const Strings = {
   'workflows-count_one': '{{count, number}} workflow',
   'workflows-count_other': '{{count, number}} workflows',
   'filtered-workflows-count':
-    'Results {{filtered, number}} of $t(workflows-count, { "count": {{total}} })',
+    'Results {{filtered, number}} of {{total, number}} workflows',
   terminate: 'Terminate',
   cancel: 'Cancel',
   terminated: 'Terminated',
