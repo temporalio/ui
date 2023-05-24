@@ -14,14 +14,14 @@
   } from '$lib/pages/workflows-with-new-search.svelte';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import { derived } from 'svelte/store';
+  import { translate } from '$lib/i18n/translate';
+  import Translate from '$lib/i18n/translate.svelte';
 
   export let workflows: WorkflowExecution[];
 
   const workflowsCount = derived(
     [workflowCount, workflowsQuery],
-    ([{ count, totalCount }, query]) => {
-      return new Intl.NumberFormat('en-US').format(query ? count : totalCount);
-    },
+    ([{ count, totalCount }, query]) => (query ? count : totalCount),
   );
 
   let coreUser = coreUserStore();
@@ -35,15 +35,30 @@
 
 {#if $allSelected}
   <span class="font-semibold">
-    All {$workflowsCount} selected
+    <Translate
+      namespace="workflows"
+      key="all-selected"
+      count={$workflowsCount}
+    />
   </span>
 {:else}
-  <span class="font-semibold">{$selectedWorkflows.length} selected</span>
+  <span class="font-semibold"
+    ><Translate
+      namespace="workflows"
+      key="n-selected"
+      count={$selectedWorkflows.length}
+    /></span
+  >
   <span>
     (or <button
       data-testid="select-all-workflows"
       on:click={() => handleSelectAll(workflows)}
-      class="cursor-pointer underline">select all {$workflowsCount}</button
+      class="cursor-pointer underline"
+      ><Translate
+        namespace="workflows"
+        key="select-all"
+        count={$workflowsCount}
+      /></button
     >)
   </span>
 {/if}
@@ -53,7 +68,7 @@
       testId="bulk-cancel-button"
       disabled={namespaceWriteDisabled}
       on:click={openBatchCancelConfirmationModal}
-      >Request Cancellation</BulkActionButton
+      >{translate('workflows', 'request-cancellation')}</BulkActionButton
     >
   {/if}
   {#if terminateEnabled}
@@ -61,7 +76,8 @@
       variant="destructive"
       testId="bulk-terminate-button"
       disabled={namespaceWriteDisabled}
-      on:click={openBatchTerminateConfirmationModal}>Terminate</BulkActionButton
+      on:click={openBatchTerminateConfirmationModal}
+      >{translate('workflows', 'terminate')}</BulkActionButton
     >
   {/if}
 </div>

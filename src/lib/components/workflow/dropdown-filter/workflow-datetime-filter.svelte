@@ -216,7 +216,7 @@
         <div class="flex gap-2">
           <Button on:click={onApply}>{translate('apply')}</Button>
           <Button variant="secondary" on:click={() => (custom = false)}
-            >Cancel</Button
+            >{translate('cancel')}</Button
           >
         </div>
       {:else}

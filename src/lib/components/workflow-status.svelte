@@ -1,19 +1,20 @@
 <script lang="ts">
   import HeartBeat from './heart-beat-indicator.svelte';
   import type { WorkflowExecutionStatus } from '$types';
+  import { translate } from '$lib/i18n/translate';
 
   export let status: WorkflowExecutionStatus | string = 'Running';
   export let delay: number = 0;
 
   const humanFriendlyNames = {
-    Running: 'Running',
-    TimedOut: 'Timed Out',
-    Completed: 'Completed',
-    Failed: 'Failed',
-    ContinuedAsNew: "Cont'd as New",
-    Canceled: 'Canceled',
-    Terminated: 'Terminated',
-    Paused: 'Paused',
+    Running: translate('workflows', 'running'),
+    TimedOut: translate('workflows', 'timed-out'),
+    Completed: translate('workflows', 'completed'),
+    Failed: translate('workflows', 'failed'),
+    ContinuedAsNew: translate('workflows', 'continued-as-new'),
+    Canceled: translate('workflows', 'canceled'),
+    Terminated: translate('workflows', 'terminated'),
+    Paused: translate('workflows', 'paused'),
   };
 
   const colors = {

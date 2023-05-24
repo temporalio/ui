@@ -7,21 +7,24 @@
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
 
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
+  import Translate from '$lib/i18n/translate.svelte';
+  import { translate } from '$lib/i18n/translate';
 
-  const AllStatuses = {
-    All: 'All',
-    Running: 'Running',
-    'Timed Out': 'TimedOut',
-    Completed: 'Completed',
-    Failed: 'Failed',
-    'Continued as New': 'ContinuedAsNew',
-    Canceled: 'Canceled',
-    Terminated: 'Terminated',
+  export const AllStatuses = {
+    All: translate('all'),
+    Running: translate('workflows', 'running'),
+    'Timed Out': translate('workflows', 'timed-out'),
+    Completed: translate('workflows', 'completed'),
+    Failed: translate('workflows', 'failed'),
+    'Continued as New': translate('workflows', 'continued-as-new'),
+    Canceled: translate('workflows', 'canceled'),
+    Terminated: translate('workflows', 'terminated'),
   };
 
   $: statusFilters = $workflowFilters.filter(
     (f) => f.attribute === 'ExecutionStatus',
   );
+
   $: statusSort = $workflowSorts.find((s) => s.attribute === 'ExecutionStatus');
 
   function mapStatusToFilter(value: string) {
@@ -118,7 +121,7 @@
         </div>
         <div class="flex h-6 items-center text-sm hover:scale-[103%]">
           {#if _value === 'All'}
-            All Statuses
+            <Translate namespace="workflows" key="all-statuses" />
           {:else}
             <WorkflowStatus status={_value} />
           {/if}

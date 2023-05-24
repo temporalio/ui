@@ -1,5 +1,6 @@
 <script lang="ts">
   import DropdownMenu from '$lib/components/dropdown-menu.svelte';
+  import { translate } from '$lib/i18n/translate';
   import { workflowSorts } from '$lib/stores/filters';
   import Sort from './sort.svelte';
 
@@ -15,7 +16,9 @@
   keepOpen
   right
 >
-  <svelte:fragment slot="label">End</svelte:fragment>
+  <svelte:fragment slot="label">
+    {translate('end')}
+  </svelte:fragment>
   <div class="flex w-44 flex-col gap-2 p-2">
     <Sort type="CloseTime" />
   </div>
