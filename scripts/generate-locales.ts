@@ -46,50 +46,54 @@ export const generateLocales = async (
       return;
     }
 
-    const defaultExport = checker.tryGetMemberInModuleExports(
-      'default',
+    const stringsExport = checker.tryGetMemberInModuleExports(
+      'Strings',
       sourceFileSymbol,
     );
 
-    if (defaultExport === undefined) {
-      logAndExit(`No default export in source: ${source}`, logError);
+    if (stringsExport === undefined) {
+      logAndExit(`No "Strings" export in source: ${source}`, logError);
       return;
     }
 
     const i18nStringsMap: Record<string, string> = {};
-    if (defaultExport.declarations && defaultExport.declarations[0]) {
-      defaultExport.declarations[0].forEachChild((child) => {
-        if (child.kind === ts.SyntaxKind.ObjectLiteralExpression) {
+    if (
+      stringsExport.declarations &&
+      stringsExport.declarations[0] &&
+      stringsExport.declarations[0].kind === ts.SyntaxKind.VariableDeclaration
+    ) {
+      stringsExport.declarations[0].forEachChild((child) => {
+        if (child.kind === ts.SyntaxKind.AsExpression) {
           child.forEachChild((grandchild) => {
-            if (grandchild.kind === ts.SyntaxKind.PropertyAssignment) {
-              let i18nKey = '';
-              let translatedString = '';
-              const [keyNode, valueNode] = [
-                grandchild.getChildAt(0),
-                grandchild.getChildAt(2),
-              ];
+            if (grandchild.kind === ts.SyntaxKind.ObjectLiteralExpression) {
+              grandchild.forEachChild((greatGrandChild) => {
+                let i18nKey = '';
+                let translatedString = '';
+                const keyNode = greatGrandChild.getChildAt(0);
+                const valueNode = greatGrandChild.getChildAt(2);
 
-              /**
-               * when an object is defined with strings as keys, i.e. { 'my-key': 'my-value' },
-               * both Nodes will be ts.SyntaxKind.StringLiteral
-               * when an object is defined as identifier as keys, i.e. { myKey: "my-value" },
-               * the key Node will be ts.SyntaxKind.Identifier and the value Node will be ts.SyntaxKind.StringLiteral
-               */
-              if (
-                ts.isStringLiteral(keyNode) &&
-                ts.isStringLiteral(valueNode)
-              ) {
-                i18nKey = keyNode.text;
-                translatedString = valueNode.text;
-              } else if (
-                ts.isIdentifier(keyNode) &&
-                ts.isStringLiteral(valueNode)
-              ) {
-                i18nKey = keyNode.getText();
-                translatedString = valueNode.text;
-              }
+                /**
+                 * when an object is defined with strings as keys, i.e. { 'my-key': 'my-value' },
+                 * both Nodes will be ts.SyntaxKind.StringLiteral
+                 * when an object is defined as identifier as keys, i.e. { myKey: "my-value" },
+                 * the key Node will be ts.SyntaxKind.Identifier and the value Node will be ts.SyntaxKind.StringLiteral
+                 */
+                if (
+                  ts.isStringLiteral(keyNode) &&
+                  ts.isStringLiteral(valueNode)
+                ) {
+                  i18nKey = keyNode.text;
+                  translatedString = valueNode.text;
+                } else if (
+                  ts.isIdentifier(keyNode) &&
+                  ts.isStringLiteral(valueNode)
+                ) {
+                  i18nKey = keyNode.getText();
+                  translatedString = valueNode.text;
+                }
 
-              i18nStringsMap[i18nKey] = translatedString;
+                i18nStringsMap[i18nKey] = translatedString;
+              });
             }
           });
         }

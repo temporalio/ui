@@ -10,6 +10,7 @@
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import { toListWorkflowFilters } from '$lib/utilities/query/to-list-workflow-filters';
   import { refresh, workflowsQuery } from '$lib/stores/workflows';
+  import { translate } from '$lib/i18n/translate';
 
   let manualSearchString = '';
 
@@ -62,7 +63,7 @@
       <Input
         id="manual-search"
         type="search"
-        placeholder="Enter a query"
+        placeholder={translate('search-placeholder')}
         icon="search"
         class="w-3/4"
         clearable

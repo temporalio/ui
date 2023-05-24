@@ -4,6 +4,7 @@ import i18next from 'i18next';
 import Backend, { type HttpBackendOptions } from 'i18next-http-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { createStore } from '$lib/i18n/store';
+import { I18nNamespaces } from '$lib/i18n';
 
 export const ssr = false;
 
@@ -14,7 +15,7 @@ export const load: LayoutLoad = function (): LayoutData {
     .init<HttpBackendOptions>({
       fallbackLng: 'en',
       load: 'languageOnly',
-      ns: 'common',
+      ns: I18nNamespaces,
       defaultNS: 'common',
       detection: {
         order: ['querystring', 'localStorage', 'navigator'],
