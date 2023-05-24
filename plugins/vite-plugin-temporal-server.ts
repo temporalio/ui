@@ -5,18 +5,20 @@ import {
   createTemporalServer,
 } from '../scripts/start-temporal-server';
 import { createUIServer, UIServer } from '../scripts/start-ui-server';
+import { ViteDevServer } from 'vite';
 
 const { cyan, magenta } = chalk;
 
 let temporal: TemporalServer;
 let uiServer: UIServer;
 
-const shouldSkip = (): boolean => {
+const shouldSkip = (server: ViteDevServer): boolean => {
   if (process.env.VERCEL) return true;
   if (process.env.HISTOIRE) return true;
   if (process.env.VITEST) return true;
   if (temporal) return true;
   if (process.platform === 'win32') return true;
+  if (server.config.mode === 'ui-only') return true;
 
   return false;
 };
@@ -56,7 +58,7 @@ export function temporalServer(): Plugin {
     enforce: 'post',
     apply: 'serve',
     async configureServer(server) {
-      if (shouldSkip()) return;
+      if (shouldSkip(server)) return;
 
       const uiPort = getPortFromApiEndpoint(server.config.env.VITE_API);
       if (server.config.mode === 'ui-server') {
