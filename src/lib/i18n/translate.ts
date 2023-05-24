@@ -76,7 +76,7 @@ export function translate<Namespace extends I18nNamespace>(
   }
 
   const options: TOptions = {
-    ...(count && { count }),
+    ...(count !== undefined && { count }),
     ...(replace && { replace }),
   };
 

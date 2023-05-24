@@ -13,7 +13,6 @@
   import { allSelected } from '$lib/pages/workflows-with-new-search.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
-  import type { I18nKey } from '$lib/i18n';
 
   export let action: Action;
   export let actionableWorkflowsLength: number;
@@ -54,7 +53,6 @@
       );
     }
   }
-
   let reason: string = '';
 
   const handleConfirmModal = () => {
@@ -68,7 +66,7 @@
 
 <Modal
   bind:this={modal}
-  data-testid="batch-{action}-confirmation"
+  data-testid="batch-{actionText}-confirmation"
   confirmType="destructive"
   confirmText={actionText}
   on:cancelModal={handleCancelModal}
@@ -109,17 +107,11 @@
         <p>
           <Translate
             namespace="workflows"
-            key="batch-operation-confirmation"
+            key={action === Action.Cancel
+              ? 'batch-cancel-confirmation'
+              : 'batch-terminate-confirmation'}
             count={actionableWorkflowsLength}
-            replace={{ action: actionText }}
           />
-          <!-- Are you sure you want to {confirmText}
-          <strong
-            >{actionableWorkflowsLength} running {pluralize(
-              'workflow',
-              actionableWorkflowsLength,
-            )}</strong
-          >? -->
         </p>
       {/if}
     </div>

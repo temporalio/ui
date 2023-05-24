@@ -2,10 +2,10 @@ export const Namespace = 'workflows' as const;
 
 export const Strings = {
   'recent-workflows': 'Recent Workflows',
-  'workflows-count_one': '{{count}} workflow',
-  'workflows-count_other': '{{count}} workflows',
+  'workflows-count_one': '{{count, number}} workflow',
+  'workflows-count_other': '{{count, number}} workflows',
   'filtered-workflows-count':
-    'Results {{filtered}} of $t(workflows-count, { "count": {{total}} })',
+    'Results {{filtered, number}} of $t(workflows-count, { "count": {{total}} })',
   terminate: 'Terminate',
   cancel: 'Cancel',
   terminated: 'Terminated',
@@ -19,10 +19,14 @@ export const Strings = {
     'Are you sure you want to {{action}} all workflows matching the following query? This action cannot be undone.',
   'batch-operation-count-disclaimer':
     'Note: The actual count of workflows that will be affected is the total number of running workflows matching this query at the time of clicking "{{action}}".',
-  'batch-operation-confirmation_one':
-    'Are you sure you want to {{action}} {{count}} running workflow?',
-  'batch-operation-confirmation_other':
-    'Are you sure you want to {{action}} {{count}} running workflows?',
+  'batch-cancel-confirmation_one':
+    'Are you sure you want to Cancel {{count, number}} running workflow?',
+  'batch-cancel-confirmation_other':
+    'Are you sure you want to Cancel {{count, number}} running workflows?',
+  'batch-terminate-confirmation_one':
+    'Are you sure you want to Terminate {{count, number}} running workflow?',
+  'batch-terminate-confirmation_other':
+    'Are you sure you want to Terminate {{count, number}} running workflows?',
   'batch-operation-confirmation-input-hint':
     'If you supply a custom reason, "{{placeholder}}" will be appended to it.',
   'batch-terminate-all-success':
