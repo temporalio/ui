@@ -13,18 +13,24 @@
     openBatchTerminateConfirmationModal,
   } from '$lib/pages/workflows-with-new-search.svelte';
   import type { WorkflowExecution } from '$lib/types/workflows';
-  import { derived } from 'svelte/store';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
 
   export let workflows: WorkflowExecution[];
 
-  const workflowsCount = derived(
-    [workflowCount, workflowsQuery],
-    ([{ count, totalCount }, query]) => (query ? count : totalCount),
-  );
-
   let coreUser = coreUserStore();
+  let workflowsCount: number;
+  let selectedWorkflowsCount: number;
+
+  $: {
+    workflowsCount = $workflowsQuery
+      ? $workflowCount.count
+      : $workflowCount.totalCount;
+  }
+
+  $: {
+    selectedWorkflowsCount = $selectedWorkflows?.length ?? 0;
+  }
 
   $: terminateEnabled = workflowTerminateEnabled($page.data.settings);
   $: cancelEnabled = workflowCancelEnabled($page.data.settings);
@@ -38,7 +44,7 @@
     <Translate
       namespace="workflows"
       key="all-selected"
-      count={$workflowsCount}
+      count={workflowsCount}
     />
   </span>
 {:else}
@@ -46,7 +52,7 @@
     ><Translate
       namespace="workflows"
       key="n-selected"
-      count={$selectedWorkflows.length}
+      count={selectedWorkflowsCount}
     /></span
   >
   <span>
@@ -57,7 +63,7 @@
       ><Translate
         namespace="workflows"
         key="select-all"
-        count={$workflowsCount}
+        count={workflowsCount}
       /></button
     >)
   </span>

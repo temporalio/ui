@@ -18,13 +18,13 @@ export const Strings = {
   'batch-operation-count-disclaimer':
     'Note: The actual count of workflows that will be affected is the total number of running workflows matching this query at the time of clicking "{{action}}".',
   'batch-cancel-confirmation_one':
-    'Are you sure you want to Cancel {{count, number}} running workflow?',
+    'Are you sure you want to cancel {{count, number}} running workflow?',
   'batch-cancel-confirmation_other':
-    'Are you sure you want to Cancel {{count, number}} running workflows?',
+    'Are you sure you want to cancel {{count, number}} running workflows?',
   'batch-terminate-confirmation_one':
-    'Are you sure you want to Terminate {{count, number}} running workflow?',
+    'Are you sure you want to terminate {{count, number}} running workflow?',
   'batch-terminate-confirmation_other':
-    'Are you sure you want to Terminate {{count, number}} running workflows?',
+    'Are you sure you want to terminate {{count, number}} running workflows?',
   'batch-operation-confirmation-input-hint':
     'If you supply a custom reason, "{{placeholder}}" will be appended to it.',
   'batch-terminate-all-success':
@@ -46,8 +46,8 @@ export const Strings = {
   terminated: 'Terminated',
   canceled: 'Canceled',
   paused: 'Paused',
-  'n-selected': '{{count}} selected',
-  'all-selected': 'All {{count}} selected.',
-  'select-all': 'select all {{count}}',
+  'n-selected': '{{count, number}} selected',
+  'all-selected': 'All {{count, number}} selected.',
+  'select-all': 'select all {{count, number}}',
   'request-cancellation': 'Request Cancellation',
 } as const;
