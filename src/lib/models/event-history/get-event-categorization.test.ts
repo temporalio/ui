@@ -107,6 +107,10 @@ describe('Event Category Data Structures', () => {
           "label": "Workflow",
           "option": "workflow",
         },
+        {
+          "label": "Update",
+          "option": "update",
+        },
       ]
     `);
   });

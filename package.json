@@ -1,6 +1,6 @@
 {
   "name": "@temporalio/ui",
-  "version": "2.15.3",
+  "version": "2.15.4",
   "type": "module",
   "description": "Temporal.io UI",
   "keywords": [
@@ -164,6 +164,7 @@
     "vite": "^4.0.2",
     "vite-node": "^0.23.2",
     "vitest": "^0.28.5",
+    "vitest-localstorage-mock": "^0.0.1",
     "wait-port": "^1.0.4",
     "webpack": "^5.73.0",
     "zx": "^7.1.1"

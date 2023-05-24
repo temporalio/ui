@@ -27,7 +27,7 @@ export default defineConfig({
     },
     exclude: [...configDefaults.exclude, 'e2e', 'tests'],
     environment: 'jsdom',
-    setupFiles: ['./vitest-setup.ts'],
+    setupFiles: ['./vitest-setup.ts', 'vitest-localstorage-mock'],
     deps: {
       inline: ['date-fns'],
     },

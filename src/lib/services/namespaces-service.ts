@@ -1,3 +1,5 @@
+import type { Settings } from '$lib/types/global';
+
 import { toaster } from '$lib/stores/toaster';
 import { namespaces } from '$lib/stores/namespaces';
 import { paginated } from '$lib/utilities/paginated';
@@ -8,7 +10,6 @@ import type {
   DescribeNamespaceResponse,
   ListNamespacesResponse,
 } from '$lib/types';
-import type { Settings } from '$lib/types/global';
 
 const emptyNamespace = {
   namespaces: [],
@@ -18,7 +19,9 @@ export async function fetchNamespaces(
   settings: Settings,
   request = fetch,
 ): Promise<void> {
-  if (settings.runtimeEnvironment.isCloud) {
+  const { showTemporalSystemNamespace, runtimeEnvironment } = settings;
+
+  if (runtimeEnvironment.isCloud) {
     namespaces.set([]);
     return;
   }
@@ -37,7 +40,6 @@ export async function fetchNamespaces(
       }),
     );
 
-    const { showTemporalSystemNamespace } = settings;
     const _namespaces: DescribeNamespaceResponse[] = (
       results?.namespaces ?? []
     ).filter(
@@ -45,6 +47,7 @@ export async function fetchNamespaces(
         showTemporalSystemNamespace ||
         namespace.namespaceInfo.name !== 'temporal-system',
     );
+
     namespaces.set(_namespaces);
   } catch (e) {
     namespaces.set([]);
