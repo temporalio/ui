@@ -43,6 +43,14 @@ describe('translate', () => {
     });
   });
 
+  test('accepts a count of 0', () => {
+    translate('loading', 0);
+
+    expect(i18next.t).toHaveBeenCalledWith('common:loading', {
+      count: 0,
+    });
+  });
+
   test('accepts a key, count, and replace parameters', () => {
     translate('loading', 10, { foo: 'bar' });
 
