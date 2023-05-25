@@ -87,7 +87,7 @@
     $eventHistory,
   );
 
-  $: workflowHasBeenReset = has($resetWorkflows, $workflowRun?.workflow.runId);
+  $: workflowHasBeenReset = has($resetWorkflows, $workflowRun?.workflow?.runId);
 </script>
 
 <header class="mb-4 flex flex-col gap-1">
@@ -180,7 +180,7 @@
           }),
         )}
       >
-        <Badge type="blue" class="px-2 py-0">{workflow.historyEvents}</Badge>
+        <Badge type="blue" class="px-2 py-0">{workflow?.historyEvents}</Badge>
       </Tab>
       <Tab
         label="Workers"
@@ -209,7 +209,7 @@
               height={20}
             />
           {/if}
-          {workflow.pendingActivities?.length}
+          {workflow?.pendingActivities?.length}
         </Badge>
       </Tab>
       <Tab

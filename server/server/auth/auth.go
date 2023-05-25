@@ -85,7 +85,10 @@ func SetUser(c echo.Context, user *User) error {
 	return nil
 }
 
-func ValidateAuth(c echo.Context, cfgProvider *config.ConfigProviderWithRefresh) error {
+// ValidateAuthHeaderExists validates that the autorization header exists if auth is enabled.
+// User autorization should be done in the frontend by claim-mapper and authorizer plugins.
+// See https://docs.temporal.io/security#authentication
+func ValidateAuthHeaderExists(c echo.Context, cfgProvider *config.ConfigProviderWithRefresh) error {
 	cfg, err := cfgProvider.GetConfig()
 	if err != nil {
 		return err

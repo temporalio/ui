@@ -69,7 +69,7 @@ type SettingsResponse struct {
 
 func TemporalAPIHandler(cfgProvider *config.ConfigProviderWithRefresh, apiMiddleware []Middleware) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		err := auth.ValidateAuth(c, cfgProvider)
+		err := auth.ValidateAuthHeaderExists(c, cfgProvider)
 		if err != nil {
 			return err
 		}

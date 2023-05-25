@@ -70,7 +70,7 @@
           <Link
             newTab
             href={routeForEventHistory({
-              namespace,
+              namespace: child.namespace,
               workflow: child.workflowId,
               run: child.runId,
             })}
