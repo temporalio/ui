@@ -17,6 +17,7 @@
   import Pagination from '$lib/holocene/pagination.svelte';
   import { fetchAllEvents } from '$lib/services/events-service';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
+  import { CATEGORIES } from '$lib/models/event-history/get-event-categorization';
 
   import type {
     CommonHistoryEvent,
@@ -66,7 +67,7 @@
   ): IterableEvent[] => {
     if (category) {
       const filteredItems = items.filter((i) => {
-        if (category === 'local-activity') {
+        if (category === CATEGORIES.LOCAL_ACTIVITY) {
           return isLocalActivityMarkerEvent(i);
         }
         return i.category === category;
