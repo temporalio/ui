@@ -93,10 +93,15 @@ test.describe('Workflows Table Configuration', () => {
   test('allows reordering columns in the table via buttons', async ({
     page,
   }) => {
-    initialHeaders.forEach(async (header, i) => {
-      await expect(
-        page.locator('.workflows-summary-table-header-cell').nth(i),
-      ).toContainText(header);
+    const initialThs = await page
+      .locator('.workflows-summary-table-header-cell')
+      .all();
+
+    initialThs.forEach(async (th, idx) => {
+      await expect(th).toHaveAttribute(
+        'data-testid',
+        `workflows-summary-table-header-cell-${initialHeaders[idx]}`,
+      );
     });
 
     await page
@@ -109,11 +114,11 @@ test.describe('Workflows Table Configuration', () => {
         .click();
     }
 
-    const ths = await page
+    const reorderedThs = await page
       .locator('.workflows-summary-table-header-cell')
       .all();
 
-    ths.forEach(async (th, idx) => {
+    reorderedThs.forEach(async (th, idx) => {
       await expect(th).toHaveAttribute(
         'data-testid',
         `workflows-summary-table-header-cell-${reorderedHeaders[idx]}`,
@@ -124,10 +129,15 @@ test.describe('Workflows Table Configuration', () => {
   test('allows reordering columns in the table via drag and drop', async ({
     page,
   }) => {
-    initialHeaders.forEach(async (header, i) => {
-      await expect(
-        page.locator('.workflows-summary-table-header-cell').nth(i),
-      ).toContainText(header);
+    const initialThs = await page
+      .locator('.workflows-summary-table-header-cell')
+      .all();
+
+    initialThs.forEach(async (th, idx) => {
+      await expect(th).toHaveAttribute(
+        'data-testid',
+        `workflows-summary-table-header-cell-${initialHeaders[idx]}`,
+      );
     });
 
     await page
@@ -160,11 +170,11 @@ test.describe('Workflows Table Configuration', () => {
 
     await page.getByTestId('drawer-close-button').click();
 
-    const ths = await page
+    const reorderedThs = await page
       .locator('.workflows-summary-table-header-cell')
       .all();
 
-    ths.forEach(async (th, idx) => {
+    reorderedThs.forEach(async (th, idx) => {
       await expect(th).toHaveAttribute(
         'data-testid',
         `workflows-summary-table-header-cell-${reorderedHeaders[idx]}`,
