@@ -109,10 +109,15 @@ test.describe('Workflows Table Configuration', () => {
         .click();
     }
 
-    reorderedHeaders.forEach(async (header, i) => {
-      await expect(
-        page.locator('.workflows-summary-table-header-cell').nth(i),
-      ).toContainText(header);
+    const ths = await page
+      .locator('.workflows-summary-table-header-cell')
+      .all();
+
+    ths.forEach(async (th, idx) => {
+      await expect(th).toHaveAttribute(
+        'data-testid',
+        `workflows-summary-table-header-cell-${reorderedHeaders[idx]}`,
+      );
     });
   });
 
@@ -155,10 +160,15 @@ test.describe('Workflows Table Configuration', () => {
 
     await page.getByTestId('drawer-close-button').click();
 
-    reorderedHeaders.forEach(async (header, i) => {
-      await expect(
-        page.locator('.workflows-summary-table-header-cell').nth(i),
-      ).toContainText(header);
+    const ths = await page
+      .locator('.workflows-summary-table-header-cell')
+      .all();
+
+    ths.forEach(async (th, idx) => {
+      await expect(th).toHaveAttribute(
+        'data-testid',
+        `workflows-summary-table-header-cell-${reorderedHeaders[idx]}`,
+      );
     });
   });
 });
