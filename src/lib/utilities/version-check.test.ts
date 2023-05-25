@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { isVersionNewer } from './version-check';
 
+const undefinedValue = undefined as unknown as string;
+
 describe('isRecommendedVersionNewer', () => {
   it('should return true when recommended version is higher than current', () => {
     expect(isVersionNewer('2.01.1', '1.01.1')).toBe(true);
@@ -16,9 +18,9 @@ describe('isRecommendedVersionNewer', () => {
     expect(isVersionNewer('1.01.1', '2.01.1')).toBe(false);
     expect(isVersionNewer('1.01.1', '1.02.1')).toBe(false);
     expect(isVersionNewer('1.01.1', '1.01.2')).toBe(false);
-    expect(isVersionNewer(undefined, '1.01.1')).toBe(false);
-    expect(isVersionNewer('1.01.1', undefined)).toBe(false);
-    expect(isVersionNewer(undefined, undefined)).toBe(false);
+    expect(isVersionNewer(undefinedValue, '1.01.1')).toBe(false);
+    expect(isVersionNewer('1.01.1', undefinedValue)).toBe(false);
+    expect(isVersionNewer(undefinedValue, undefinedValue)).toBe(false);
     expect(isVersionNewer('xxx', '1.01.1')).toBe(false);
     expect(isVersionNewer('1.1', '1.01.1')).toBe(false);
     expect(isVersionNewer('1.01', '1.02')).toBe(false);

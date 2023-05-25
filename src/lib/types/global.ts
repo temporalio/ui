@@ -1,3 +1,5 @@
+import type { GetClusterInfoResponse } from '$lib/types';
+
 export type NamespaceListItem = {
   namespace: string;
   href: (namspace: string) => string;
@@ -91,10 +93,33 @@ export type User = {
   address?: string;
   updated_at?: string;
   sub?: string;
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
+  [key: string]: unknown;
 };
-export type ClusterInformation = import('$lib/types').GetClusterInfoResponse;
+
+export type Severity = 'High' | 'Medium' | 'Low';
+
+export type Alert = {
+  message: string;
+  severity: Severity;
+};
+
+type ReleaseInfo = {
+  version: string | null;
+  releaseTime: string;
+  notes?: string | null;
+};
+
+type VersionInfo = {
+  current: ReleaseInfo;
+  recommended: ReleaseInfo;
+  instructions?: string;
+  alerts?: Alert[];
+  lastUpdateTime: string;
+};
+
+export type ClusterInformation = Omit<GetClusterInfoResponse, 'versionInfo'> & {
+  versionInfo: VersionInfo;
+};
 
 export type TimeFormat = 'UTC' | 'relative' | 'local';
 

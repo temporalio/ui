@@ -1,8 +1,10 @@
 <script lang="ts">
   import { closedBanners, close } from '$lib/stores/banner';
-  import type { BannersState } from '$lib/models/banner-state';
+  import type { BannersState } from '$lib/components/banner/banner-state';
+  import type { Severity } from '$lib/types/global';
+
   export let key: string;
-  export let severity: 'high' | 'medium' | 'low';
+  export let severity: Severity;
   export let message: string;
   export let link: string;
   export let shownBanner: BannersState;
