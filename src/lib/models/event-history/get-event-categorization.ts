@@ -63,11 +63,12 @@ const categories = [
   'activity',
   'child-workflow',
   'command',
+  'local-activity',
   'marker',
   'signal',
   'timer',
-  'workflow',
   'update',
+  'workflow',
 ] as const;
 
 export type EventTypeOption = {
@@ -81,16 +82,18 @@ export const allEventTypeOptions: EventTypeOption[] = [
   { label: 'Activity', option: 'activity', color: '#8B5CF6' },
   { label: 'Child Workflow', option: 'child-workflow', color: '#F59E0B' },
   { label: 'Command', option: 'command', color: '#10B981' },
+  { label: 'Local Activity', option: 'local-activity' },
   { label: 'Marker', option: 'marker', color: '#EC4899' },
   { label: 'Signal', option: 'signal', color: '#DD6B20' },
   { label: 'Timer', option: 'timer', color: '#1D4ED8' },
-  { label: 'Workflow', option: 'workflow', color: '#10B981' },
   { label: 'Update', option: 'update' },
+  { label: 'Workflow', option: 'workflow', color: '#10B981' },
 ];
 
 const compactEventTypes: (EventTypeCategory | undefined)[] = [
   undefined,
   'activity',
+  'local-activity',
   'signal',
   'timer',
 ];
