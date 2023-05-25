@@ -132,6 +132,7 @@
     "google-protobuf": "^3.17.3",
     "histoire": "^0.16.1",
     "husky": "^8.0.1",
+    "i18next-fs-backend": "^2.1.2",
     "jest-websocket-mock": "^2.2.1",
     "jsdom": "^20.0.0",
     "lint-staged": "^13.1.0",

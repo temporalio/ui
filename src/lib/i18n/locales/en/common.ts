@@ -16,6 +16,7 @@ export const Strings = {
   cancel: 'Cancel',
   ascending: 'Ascending',
   descending: 'Descending',
+  start: 'Start',
   end: 'End',
   true: 'True',
   false: 'False',
