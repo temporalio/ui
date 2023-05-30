@@ -2,11 +2,14 @@
   import HeartBeat from './heart-beat-indicator.svelte';
   import type { WorkflowStatus } from '$lib/types/workflows';
   import { translate } from '$lib/i18n/translate';
+  import type { EventClassification } from '$lib/types/events';
 
-  export let status: WorkflowStatus = 'Running';
+  type Status = WorkflowStatus | EventClassification | 'Paused';
+
+  export let status: Status = 'Running';
   export let delay: number = 0;
 
-  const humanFriendlyNames = {
+  const humanFriendlyNames: Partial<Record<Status, string>> = {
     Running: translate('workflows', 'running'),
     TimedOut: translate('workflows', 'timed-out'),
     Completed: translate('workflows', 'completed'),
