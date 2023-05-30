@@ -237,7 +237,7 @@
 
 <header class="mb-2 flex justify-between">
   <div>
-    <h1 class="text-2xl" data-cy="namespace-title">
+    <h1 class="text-2xl" data-cy="workflows-title">
       <Translate namespace="workflows" key="recent-workflows" />
     </h1>
     <div class="flex items-center gap-2 text-sm">
