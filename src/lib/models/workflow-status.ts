@@ -14,6 +14,6 @@ export const workflowStatuses: WorkflowStatuses = [
 ] as const;
 
 export const workflowStatusFilters: WorkflowFilters = [
-  ...workflowStatuses,
   'All',
+  ...workflowStatuses,
 ] as const;
