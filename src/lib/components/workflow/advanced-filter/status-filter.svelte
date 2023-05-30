@@ -3,26 +3,16 @@
   import Option from '$lib/holocene/select/option.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import KeywordConditionals from './keyword-conditionals.svelte';
+  import { workflowStatusFilters } from '$lib/models/workflow-status';
 
   export let value = '';
   export let conditional = '';
-
-  const statuses = {
-    All: 'All',
-    Running: 'Running',
-    'Timed Out': 'TimedOut',
-    Completed: 'Completed',
-    Failed: 'Failed',
-    'Continued as New': 'ContinuedAsNew',
-    Canceled: 'Canceled',
-    Terminated: 'Terminated',
-  };
 </script>
 
 <div class="flex gap-2">
   <KeywordConditionals bind:conditional />
   <Select id="workflow-status" bind:value class="w-44">
-    {#each Object.entries(statuses) as [label, value] (label)}
+    {#each Object.entries(workflowStatusFilters) as [value, label] (label)}
       <Option value={label}>
         {#if value !== 'All'}
           <WorkflowStatus status={value} />

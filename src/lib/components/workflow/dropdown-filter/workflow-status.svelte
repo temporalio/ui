@@ -5,20 +5,10 @@
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import { workflowStatusFilters } from '$lib/models/workflow-status';
 
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
   import Translate from '$lib/i18n/translate.svelte';
-
-  const AllStatuses = {
-    All: 'All',
-    Running: 'Running',
-    'Timed Out': 'TimedOut',
-    Completed: 'Completed',
-    Failed: 'Failed',
-    'Continued as New': 'ContinuedAsNew',
-    Canceled: 'Canceled',
-    Terminated: 'Terminated',
-  };
 
   $: statusFilters = $workflowFilters.filter(
     (f) => f.attribute === 'ExecutionStatus',
@@ -98,7 +88,7 @@
 >
   <svelte:fragment slot="label">Status</svelte:fragment>
   <div class="flex w-56 flex-col gap-4 py-2">
-    {#each Object.entries(AllStatuses) as [label, _value] (_value)}
+    {#each Object.entries(workflowStatusFilters) as [_value, label] (_value)}
       <button
         class="flex items-center transition-all hover:cursor-pointer"
         data-testid={label}
