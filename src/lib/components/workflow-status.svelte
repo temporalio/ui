@@ -6,7 +6,7 @@
   export let status: WorkflowStatus = 'Running';
   export let delay: number = 0;
 
-  const humanFriendlyNames: Record<WorkflowStatus | 'Paused', string> = {
+  const humanFriendlyNames = {
     Running: translate('workflows', 'running'),
     TimedOut: translate('workflows', 'timed-out'),
     Completed: translate('workflows', 'completed'),
