@@ -20,8 +20,8 @@
 
 <PageTitle title={`Workflow History | ${workflow}`} url={$page.url.href} />
 <WorkflowHistoryLayout>
-  <!-- <svelte:fragment slot="timeline">
-    <EventHistoryTimelineContainer />
-    </svelte:fragment> -->
+<!--  <svelte:fragment slot="timeline">-->
+<!--    <EventHistoryTimelineContainer />-->
+<!--    </svelte:fragment>-->
   <svelte:component this={view} />
 </WorkflowHistoryLayout>

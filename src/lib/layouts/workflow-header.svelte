@@ -78,6 +78,11 @@
     }
   };
 
+  const onRetrigger = () => {
+    // alert("I was clicked")
+
+  }
+
   onDestroy(() => {
     clearInterval(refreshInterval);
   });
@@ -121,14 +126,17 @@
         />
       </h1>
     </div>
-    {#if isRunning}
-      <div
-        class="flex flex-col items-center justify-center gap-4 whitespace-nowrap sm:flex-row lg:justify-end"
-      >
-        <AutoRefreshWorkflow onChange={onRefreshChange} />
-        <WorkflowActions {cancelInProgress} {workflow} {namespace} />
-      </div>
-    {/if}
+   <div>
+     <button class="bg-green-600 text-offWhite p-2" on:click={onRetrigger}>Re-trigger Workflow</button>
+     {#if isRunning}
+       <div
+               class="flex flex-col items-center justify-center gap-4 whitespace-nowrap sm:flex-row lg:justify-end"
+       >
+         <AutoRefreshWorkflow onChange={onRefreshChange} />
+         <WorkflowActions {cancelInProgress} {workflow} {namespace} />
+       </div>
+     {/if}
+   </div>
   </div>
   {#if cancelInProgress}
     <div class="mb-4" in:fly={{ duration: 200, delay: 100 }}>

@@ -34,7 +34,7 @@
   };
 
   const handleConfirmModal = () => {
-    dispatch('confirm', { reason: [reason.trim(), placeholder].join(' ') });
+    dispatch('confirm', { reason: [reason.trim(), placeholder].join(' ')  });
   };
 
   const handleCancelModal = () => {

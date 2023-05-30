@@ -1,6 +1,7 @@
 <script lang="ts" context="module">
   let batchTerminateConfirmationModal: BatchOperationConfirmationModal;
   let batchCancelConfirmationModal: BatchOperationConfirmationModal;
+  let batchRerunConfirmationModal: BatchOperationConfirmationModel;
   export const allSelected = writable<boolean>(false);
   export const pageSelected = writable<boolean>(false);
   export const selectedWorkflows = writable<WorkflowExecution[]>([]);
@@ -205,6 +206,41 @@
     }
   };
 
+  const rerunWorkflows = async (event: CustomEvent<{ reason: string }>) => {
+    const options = {
+      namespace: $page.params.namespace,
+      reason: event.detail.reason,
+    };
+    try {
+      if ($allSelected) {
+        await batchTerminateByQuery({
+          ...options,
+          query: batchOperationQuery,
+        });
+        toaster.push({
+          message:
+                  'The batch terminate request is processing in the background.',
+          id: 'batch-terminate-success-toast',
+        });
+      } else {
+        const workflowsTerminated = await bulkTerminateByIDs({
+          ...options,
+          workflows: $terminableWorkflows,
+        });
+        toaster.push({
+          message: `Successfully terminated ${workflowsTerminated} workflows.`,
+          id: 'batch-terminate-success-toast',
+        });
+      }
+      batchTerminateConfirmationModal.close();
+      resetPageToDefaultState();
+    } catch (error) {
+      batchTerminateConfirmationModal.setError(
+              error?.message ?? 'An unknown error occurred.',
+      );
+    }
+  };
+
   $: batchOperationQuery = !$workflowsQuery
     ? 'ExecutionStatus="Running"'
     : $workflowsQuery;
@@ -238,6 +274,14 @@
   actionableWorkflowsLength={$cancelableWorkflows.length}
   query={batchOperationQuery}
   on:confirm={cancelWorkflows}
+/>
+
+<BatchOperationConfirmationModal
+        action="Re-run"
+        bind:this={batchRerunConfirmationModal}
+        actionableWorkflowsLength={$cancelableWorkflows.length}
+        query={batchOperationQuery}
+        on:confirm={rerunWorkflows}
 />
 
 <header class="mb-2 flex justify-between">

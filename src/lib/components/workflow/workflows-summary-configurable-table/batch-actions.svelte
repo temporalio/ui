@@ -58,6 +58,13 @@
   {/if}
   {#if terminateEnabled}
     <BulkActionButton
+            testId="bulk-terminate-button"
+            disabled={namespaceWriteDisabled}
+            on:click={openBatchTerminateConfirmationModal}>Re-run</BulkActionButton
+    >
+  {/if}
+  {#if terminateEnabled}
+    <BulkActionButton
       variant="destructive"
       testId="bulk-terminate-button"
       disabled={namespaceWriteDisabled}
