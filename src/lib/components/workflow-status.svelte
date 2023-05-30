@@ -1,12 +1,12 @@
 <script lang="ts">
   import HeartBeat from './heart-beat-indicator.svelte';
-  import type { WorkflowExecutionStatus } from '$types';
+  import type { WorkflowStatus } from '$lib/types/workflows';
   import { translate } from '$lib/i18n/translate';
 
-  export let status: WorkflowExecutionStatus | string = 'Running';
+  export let status: WorkflowStatus = 'Running';
   export let delay: number = 0;
 
-  const humanFriendlyNames = {
+  const humanFriendlyNames: Record<WorkflowStatus | 'Paused', string> = {
     Running: translate('workflows', 'running'),
     TimedOut: translate('workflows', 'timed-out'),
     Completed: translate('workflows', 'completed'),

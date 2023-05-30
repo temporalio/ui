@@ -1,19 +1,19 @@
 import type { WorkflowStatus } from '$lib/types/workflows';
 
-export type WorkflowStatuses = Record<WorkflowStatus, string>;
-export type WorkflowFilters = WorkflowStatuses & { All: 'All' };
+export type WorkflowStatuses = readonly WorkflowStatus[];
+export type WorkflowFilters = readonly (WorkflowStatus | 'All')[];
 
-export const workflowStatuses: WorkflowStatuses = {
-  Running: 'Running',
-  TimedOut: 'Timed Out',
-  Completed: 'Completed',
-  Failed: 'Failed',
-  ContinuedAsNew: 'Continued as New',
-  Canceled: 'Canceled',
-  Terminated: 'Terminated',
-} as const;
+export const workflowStatuses: WorkflowStatuses = [
+  'Running',
+  'TimedOut',
+  'Completed',
+  'Failed',
+  'ContinuedAsNew',
+  'Canceled',
+  'Terminated',
+] as const;
 
-export const workflowStatusFilters: WorkflowFilters = {
+export const workflowStatusFilters: WorkflowFilters = [
   ...workflowStatuses,
-  All: 'All',
-} as const;
+  'All',
+] as const;
