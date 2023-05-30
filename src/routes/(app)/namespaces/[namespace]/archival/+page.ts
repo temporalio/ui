@@ -23,10 +23,16 @@ export const load: PageLoad = async function ({ params, url }) {
   const namespace: DescribeNamespaceResponse = await fetchNamespace(
     params.namespace,
   );
+
   const isS3Bucket = namespace.config?.historyArchivalUri
     ?.toLowerCase()
     ?.startsWith('s3://');
-  const parameters: ArchiveFilterParameters = isS3Bucket
+  const isGSBucket = namespace.config?.historyArchivalUri
+    ?.toLowerCase()
+    ?.startsWith('gs://');
+  const archivalQueryingNotSupported = isS3Bucket || isGSBucket;
+
+  const parameters: ArchiveFilterParameters = archivalQueryingNotSupported
     ? {}
     : {
         workflowId,
@@ -54,6 +60,6 @@ export const load: PageLoad = async function ({ params, url }) {
     namespace,
     archivalEnabled,
     visibilityArchivalEnabled,
-    isS3Bucket,
+    archivalQueryingNotSupported,
   };
 };
