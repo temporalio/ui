@@ -11,7 +11,7 @@
   const WORKFLOW_TASK_FAILED_ERROR_COPY = {
     Unspecified: {
       title: 'Unspecified',
-      copy: 'The Workflow Task failed for an unknown reason. Please examine your Workflow Definition.',
+      copy: 'The Workflow Task failed. See error for details.',
     },
     UnhandledCommand: {
       title: 'Unhandled Command',
