@@ -1,7 +1,7 @@
 import ts from 'typescript';
 import path, { relative } from 'path';
 import { writeFile, mkdir, stat } from 'fs/promises';
-import { glob, chalk } from 'zx';
+import { $, glob, chalk } from 'zx';
 
 const SRC_DIR = path.resolve('./src/lib/i18n/locales');
 const DEST_DIR = path.resolve('./static/i18n/locales');
@@ -112,6 +112,7 @@ export const generateLocales = async (
 
     try {
       await writeFile(fullPath, JSON.stringify(i18nStringsMap));
+      await $`prettier --write --plugin-search-dir=. static/i18n/locales/*/*.json`.quiet();
       console.log(
         chalk.green(
           `Parsed locale file: ${relativeTo(source)} to ${relativeTo(
