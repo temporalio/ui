@@ -3,20 +3,19 @@
   import Option from '$lib/holocene/select/option.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import KeywordConditionals from './keyword-conditionals.svelte';
-  import { translate } from '$lib/i18n/translate';
 
   export let value = '';
   export let conditional = '';
 
   const statuses = {
-    All: translate('all'),
-    Running: translate('workflows', 'running'),
-    'Timed Out': translate('workflows', 'timed-out'),
-    Completed: translate('workflows', 'completed'),
-    Failed: translate('workflows', 'failed'),
-    'Continued as New': translate('workflows', 'continued-as-new'),
-    Canceled: translate('workflows', 'canceled'),
-    Terminated: translate('workflows', 'terminated'),
+    All: 'All',
+    Running: 'Running',
+    'Timed Out': 'TimedOut',
+    Completed: 'Completed',
+    Failed: 'Failed',
+    'Continued as New': 'ContinuedAsNew',
+    Canceled: 'Canceled',
+    Terminated: 'Terminated',
   };
 </script>
 
