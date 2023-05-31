@@ -16,6 +16,8 @@
   import { groupEvents } from '$lib/models/event-groups';
   import Pagination from '$lib/holocene/pagination.svelte';
   import { fetchAllEvents } from '$lib/services/events-service';
+  import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
+  import { CATEGORIES } from '$lib/models/event-history/get-event-categorization';
 
   import type {
     CommonHistoryEvent,
@@ -64,7 +66,12 @@
     category: string,
   ): IterableEvent[] => {
     if (category) {
-      const filteredItems = items.filter((i) => i.category === category);
+      const filteredItems = items.filter((i) => {
+        if (category === CATEGORIES.LOCAL_ACTIVITY) {
+          return isLocalActivityMarkerEvent(i);
+        }
+        return i.category === category;
+      });
       return compact
         ? groupEvents(filteredItems, $eventFilterSort)
         : filteredItems;
