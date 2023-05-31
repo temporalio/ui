@@ -116,6 +116,7 @@
       workflow,
       namespace,
       reason: formatReason({ action: 'terminated', reason }),
+      identity: $authUser.email,
     })
       .then(handleSuccessfulTermination)
       .catch(handleTerminationError);
