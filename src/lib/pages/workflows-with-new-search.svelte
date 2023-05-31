@@ -86,8 +86,11 @@
   import type { WorkflowExecution } from '$lib/types/workflows';
   import Translate from '$lib/i18n/translate.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { toListWorkflowFiltersFromRelativeTime } from '$lib/utilities/query/to-list-workflow-filters-from-relative-time';
 
   $: query = $page.url.searchParams.get('query');
+  $: earliestRelativeDuration = $page.url.searchParams.get('earliestTime');
+  $: latestRelativeDuration = $page.url.searchParams.get('latestTime');
   $: query && ($workflowsQuery = query);
 
   // For returning to page from 'Back to Workflows' with previous search
@@ -114,6 +117,14 @@
     if (query) {
       // Set filters from inital page load query if it exists
       $workflowFilters = toListWorkflowFilters(query);
+    } else if (earliestRelativeDuration) {
+      $workflowFilters = toListWorkflowFiltersFromRelativeTime(
+        earliestRelativeDuration,
+      );
+    } else if (latestRelativeDuration) {
+      $workflowFilters = toListWorkflowFiltersFromRelativeTime(
+        latestRelativeDuration,
+      );
     }
   });
 
