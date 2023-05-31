@@ -19,7 +19,7 @@
     return {
       runId: c.runId,
       workflowId: c.workflowId,
-      status: 'Running',
+      status: 'Running' as const,
       namespace,
     };
   });

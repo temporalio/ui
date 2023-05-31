@@ -20,6 +20,7 @@
   <aside
     class="drawer {position}"
     class:dark
+    class:max-w-[400px]={position === 'right'}
     transition:fly={flyParams}
     use:clickOutside
     id="navigation-drawer"

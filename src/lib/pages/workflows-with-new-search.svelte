@@ -77,11 +77,15 @@
     bulkTerminateByIDs,
   } from '$lib/services/batch-service';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
+  import BatchOperationConfirmationModal, {
+    Action,
+  } from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { toaster } from '$lib/stores/toaster';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import Translate from '$lib/i18n/translate.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   $: query = $page.url.searchParams.get('query');
   $: query && ($workflowsQuery = query);
@@ -148,17 +152,16 @@
           query: batchOperationQuery,
         });
         toaster.push({
-          message:
-            'The batch terminate request is processing in the background.',
+          message: translate('workflows', 'batch-terminate-all-success'),
           id: 'batch-terminate-success-toast',
         });
       } else {
-        const workflowsTerminated = await bulkTerminateByIDs({
+        const count = await bulkTerminateByIDs({
           ...options,
           workflows: $terminableWorkflows,
         });
         toaster.push({
-          message: `Successfully terminated ${workflowsTerminated} workflows.`,
+          message: translate('workflows', 'batch-terminate-success', { count }),
           id: 'batch-terminate-success-toast',
         });
       }
@@ -166,7 +169,7 @@
       resetPageToDefaultState();
     } catch (error) {
       batchTerminateConfirmationModal?.setError(
-        error?.message ?? 'An unknown error occurred.',
+        error?.message ?? translate('unknown-error'),
       );
     }
   };
@@ -183,16 +186,16 @@
           query: batchOperationQuery,
         });
         toaster.push({
-          message: 'The batch cancel request is processing in the background.',
+          message: translate('workflows', 'batch-cancel-all-success'),
           id: 'batch-cancel-success-toast',
         });
       } else {
-        const workflowsCanceled = await bulkCancelByIDs({
+        const count = await bulkCancelByIDs({
           ...options,
           workflows: $cancelableWorkflows,
         });
         toaster.push({
-          message: `Successfully cancelled ${workflowsCanceled} workflows.`,
+          message: translate('workflows', 'batch-cancel-success', { count }),
           id: 'batch-cancel-success-toast',
         });
       }
@@ -200,7 +203,7 @@
       resetPageToDefaultState();
     } catch (error) {
       batchCancelConfirmationModal?.setError(
-        error?.message ?? 'An unknown error occurred.',
+        error?.message ?? translate('unknown-error'),
       );
     }
   };
@@ -208,14 +211,6 @@
   $: batchOperationQuery = !$workflowsQuery
     ? 'ExecutionStatus="Running"'
     : $workflowsQuery;
-
-  $: totalWorkflowCount = new Intl.NumberFormat('en-US').format(
-    $workflowCount?.totalCount ?? 0,
-  );
-
-  $: filteredWorkflowCount = new Intl.NumberFormat('en-US').format(
-    $workflowCount?.count ?? 0,
-  );
 
   $: {
     if ($updating) {
@@ -225,7 +220,7 @@
 </script>
 
 <BatchOperationConfirmationModal
-  action="Terminate"
+  action={Action.Terminate}
   bind:this={batchTerminateConfirmationModal}
   actionableWorkflowsLength={$terminableWorkflows.length}
   query={batchOperationQuery}
@@ -233,7 +228,7 @@
 />
 
 <BatchOperationConfirmationModal
-  action="Cancel"
+  action={Action.Cancel}
   bind:this={batchCancelConfirmationModal}
   actionableWorkflowsLength={$cancelableWorkflows.length}
   query={batchOperationQuery}
@@ -242,7 +237,9 @@
 
 <header class="mb-2 flex justify-between">
   <div>
-    <h1 class="text-2xl" data-cy="namespace-title">Recent Workflows</h1>
+    <h1 class="text-2xl" data-cy="workflows-title">
+      <Translate namespace="workflows" key="recent-workflows" />
+    </h1>
     <div class="flex items-center gap-2 text-sm">
       <p data-testid="namespace-name">
         {$page.params.namespace}
@@ -251,13 +248,28 @@
         <div class="h-1 w-1 rounded-full bg-gray-400" />
         <p data-testid="workflow-count">
           {#if $loading}
-            <span class="text-gray-400">loading</span>
+            <span class="text-gray-400"
+              ><Translate namespace="common" key="loading" /></span
+            >
           {:else if $updating}
-            <span class="text-gray-400">filtering</span>
+            <span class="text-gray-400"
+              ><Translate namespace="common" key="filtering" /></span
+            >
           {:else if query}
-            Results {filteredWorkflowCount} of {totalWorkflowCount} workflows
+            <Translate
+              namespace="workflows"
+              key="filtered-workflows-count"
+              replace={{
+                filtered: $workflowCount.count,
+                total: $workflowCount.totalCount,
+              }}
+            />
           {:else}
-            {totalWorkflowCount} workflows
+            <Translate
+              namespace="workflows"
+              key="workflows-count"
+              count={$workflowCount.totalCount}
+            />
           {/if}
         </p>
       {/if}

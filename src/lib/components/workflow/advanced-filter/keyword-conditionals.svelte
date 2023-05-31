@@ -1,12 +1,13 @@
 <script lang="ts">
   import Select from '$lib/holocene/select/select.svelte';
   import Option from '$lib/holocene/select/option.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   export let conditional = '';
 
   const operations = {
-    '=': 'Is',
-    '!=': 'Is Not',
+    '=': translate('is'),
+    '!=': translate('is-not'),
   };
 </script>
 
