@@ -13,3 +13,11 @@ export const setLocalStorage = async (
   );
   await page.reload();
 };
+
+export const removeLocalStorageItem = async (
+  key: string,
+  page: Page,
+): Promise<void> => {
+  await page.addInitScript((key) => window.localStorage.removeItem(key), key);
+  await page.reload();
+};

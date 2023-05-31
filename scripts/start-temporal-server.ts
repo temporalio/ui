@@ -14,6 +14,7 @@ type TemporalServerOptions = {
   uiPort?: number;
   path?: string;
   logLevel?: string;
+  codecEndpoint?: string;
 };
 
 const warn = (message: Parameters<typeof console.warn>[0]) => {
@@ -52,6 +53,7 @@ export const createTemporalServer = async ({
   uiPort = port + 1000,
   path = localCLIPath,
   logLevel = 'fatal',
+  codecEndpoint,
 }: TemporalServerOptions = {}) => {
   const cliPath = await getCLIPath(path);
 
@@ -60,6 +62,10 @@ export const createTemporalServer = async ({
     `--ui-port=${uiPort}`,
     `--log-level=${logLevel}`,
   ];
+
+  if (codecEndpoint) {
+    flags.push(`--ui-codec-endpoint=${codecEndpoint}`);
+  }
 
   const temporal = $`${cliPath} server start-dev ${flags}`.quiet();
 

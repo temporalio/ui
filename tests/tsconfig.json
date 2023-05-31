@@ -1,8 +1,13 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
+    "module": "ESNext",
+    "target": "ESNext",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
     "paths": {
-      "$utilities/*": ["test-utilities/*"]
+      "$utilities/*": ["utilities/*"],
+      "$temporal-fixtures/*": ["temporal-fixtures/*"]
     }
   }
 }

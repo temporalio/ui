@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test';
-import { setLocalStorage } from '../test-utilities/mock-local-storage';
 
 const initialHeaders = [
   'Status',
@@ -21,11 +20,9 @@ const reorderedHeaders = [
 
 const headersToAdd = ['History Size', 'History Length', 'Execution Time'];
 const headersToRemove = ['Type', 'Start', 'End'];
-const address = process.env.E2E_UI_ADDRESS ?? 'http://localhost:8233';
 
-test.beforeEach(async ({ page }) => {
-  await page.goto(address);
-  await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
+test.beforeEach(async ({ page, baseURL }) => {
+  await page.goto(baseURL);
 });
 
 test.describe('Workflows Table Configuration', () => {
@@ -86,7 +83,7 @@ test.describe('Workflows Table Configuration', () => {
     for (const header of headersToRemove) {
       await expect(
         page.getByTestId(`workflows-summary-table-header-cell-${header}`),
-      ).not.toBeVisible();
+      ).toBeHidden();
     }
   });
 
