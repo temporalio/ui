@@ -1,7 +1,4 @@
 <script lang="ts">
-  import { codecEndpoint } from '$lib/stores/data-encoder-config';
-  import { dataEncoder } from '$lib/stores/data-encoder';
-
   import ToggleSwitch from './toggle-switch.svelte';
 
   export let endpoint = '';
@@ -10,14 +7,14 @@
   export let error = '';
 </script>
 
-<div class="mb-8 flex flex-col gap-8">
-  <p class="text-base">
-    Enter your remote codec endpoint to decrypt your payloads.
-  </p>
+<div class="flex flex-col gap-4">
   <div class="flex flex-col gap-2">
     <h3 class="text-lg" data-testid="data-encoder-endpoint-title">
       Remote codec endpoint
     </h3>
+    <p class="text-base">
+      Enter your remote codec endpoint to decrypt your payloads.
+    </p>
     {#if error}
       <small data-testid="data-encoder-endpoint-error" class="text-red-700"
         >{error}</small
@@ -25,7 +22,7 @@
     {/if}
     <textarea
       class="block w-full rounded-md border-2 border-gray-900 p-2"
-      rows={5}
+      rows={3}
       placeholder="Paste your endpoint here"
       data-testid="data-encoder-endpoint-input"
       bind:value={endpoint}
@@ -54,19 +51,6 @@
         >Warning: Pre-flight checks will be done and could result in failure to
         decode if incorrectly configured.</small
       >
-    {/if}
-    {#if $dataEncoder.settingsEndpoint}
-      <div class="flex items-center justify-between">
-        <p data-testid="data-encoder-site-endpoint">
-          {$dataEncoder.settingsEndpoint}
-        </p>
-        <p data-testid="data-encoder-site-settings">Site setting</p>
-      </div>
-      {#if $codecEndpoint}
-        <small class="text-yellow-900" data-testid="data-encoder-endpoint-info"
-          >Set endpoint overrides site setting endpoint.</small
-        >
-      {/if}
     {/if}
   </div>
 </div>

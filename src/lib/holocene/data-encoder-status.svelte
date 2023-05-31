@@ -5,13 +5,13 @@
 
   import Tooltip from '$lib/holocene/tooltip.svelte';
   import DataEncoderSettings, {
-    dataEncoderSettings,
+    viewDataEncoderSettings,
   } from './data-encoder-settings.svelte';
 
-  const onIconClick = () => $dataEncoderSettings.open();
+  const onIconClick = () =>
+    ($viewDataEncoderSettings = !$viewDataEncoderSettings);
 </script>
 
-<DataEncoderSettings />
 {#if $dataEncoder?.hasEndpointOrPortConfigured}
   {#if $dataEncoder?.hasNotRequested}
     <Tooltip bottomRight text={'Codec Server is configured'}>
