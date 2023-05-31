@@ -307,6 +307,10 @@ describe('timelineEventTypeOptions', () => {
         option: 'command',
       },
       {
+        label: 'Local Activity',
+        option: 'local-activity',
+      },
+      {
         color: '#EC4899',
         label: 'Marker',
         option: 'marker',
@@ -320,6 +324,10 @@ describe('timelineEventTypeOptions', () => {
         color: '#1D4ED8',
         label: 'Timer',
         option: 'timer',
+      },
+      {
+        label: 'Update',
+        option: 'update',
       },
     ]);
   });
