@@ -1,13 +1,11 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "module": "ESNext",
-    "target": "ESNext",
-    "esModuleInterop": true,
-    "moduleResolution": "node",
     "paths": {
-      "$utilities/*": ["utilities/*"],
-      "$temporal-fixtures/*": ["temporal-fixtures/*"]
+      "~*": ["./*"],
+      "$temporal-fixtures/*": ["../temporal-fixtures/*"]
     }
-  }
+  },
+  "include": ["./**/*.ts", "../temporal-fixtures/**/*.ts"]
 }

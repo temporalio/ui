@@ -25,7 +25,7 @@ test.describe('Workflows list', () => {
     await expect(region.getByText('"Plain text input 1"')).toBeVisible();
     await toggle.click();
 
-    toggle = page.getByRole('cell', { name: 'MarkerRecorded' });
+    toggle = page.getByRole('cell', { name: 'MarkerRecorded' }).first();
     await toggle.click();
     await expect(
       region.getByText('"Side effect for Plain text input 1"'),

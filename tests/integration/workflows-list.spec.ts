@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { workflowsApi, mockClusterApi } from '$utilities/mock-apis.js';
-import { setLocalStorage } from '$utilities/mock-local-storage';
+import { workflowsApi, mockClusterApi } from '~/utilities/mock-apis.js';
+import { setLocalStorage } from '~/utilities/mock-local-storage';
 const workflowsUrl = '/namespaces/default/workflows';
 
 test.beforeEach(async ({ page }) => {

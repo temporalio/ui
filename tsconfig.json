@@ -29,7 +29,8 @@
       "$lib/*": ["src/lib/*"],
       "$types": ["src/lib/types"],
       "$components/*": ["src/components/*"],
-      "$fixtures/*": ["src/fixtures/*"]
+      "$fixtures/*": ["src/fixtures/*"],
+      "$temporal-fixtures/*": ["temporal-fixtures/*"]
     }
   },
   "include": [
@@ -38,6 +39,8 @@
     "src/**/*.ts",
     "src/**/*.svelte",
     "src/lib/models/**/*.test.ts",
+    "tests/**/*.ts",
+    "temporal-fixtures/**/*.ts",
     "cypress/**/*.ts"
   ],
   "exclude": [

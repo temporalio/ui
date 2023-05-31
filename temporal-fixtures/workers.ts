@@ -2,7 +2,7 @@ import { createRequire } from 'node:module';
 import { Worker } from '@temporalio/worker';
 import { defaultDataConverter } from '@temporalio/common';
 
-import * as activities from '$temporal-fixtures/activities';
+import * as activities from '$temporal-fixtures/activities/index';
 
 const require = createRequire(import.meta.url);
 
@@ -24,7 +24,6 @@ const createWorker2 = () =>
     dataConverter: defaultDataConverter,
     workflowsPath: require.resolve('./workflows'),
     taskQueue: 'e2e-2',
-    enableNonLocalActivities: false,
   });
 
 export const runWorkers = async (completed: Promise<unknown>[]) => {

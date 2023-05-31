@@ -1,7 +1,7 @@
 import express from 'express';
-import { type Application } from 'express';
+import type { Application } from 'express';
 import cors from 'cors';
-import * as proto from '@temporalio/proto';
+import type * as proto from '@temporalio/proto';
 import { defaultDataConverter } from '@temporalio/common';
 
 type Payload = proto.temporal.api.common.v1.IPayload;
@@ -57,6 +57,7 @@ export async function start() {
     try {
       const { payloads: raw } = req.body as Body;
       const encoded = raw.map(fromJSON);
+      console.log(defaultDataConverter.payloadCodecs);
       const decoded = await defaultDataConverter.payloadCodecs[0].decode(
         encoded,
       );
