@@ -57,7 +57,6 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 	authMiddleware := server_options.WithAPIMiddleware(([]api.Middleware{
 		headers.WithForwardHeaders(
 			[]string{
-				echo.HeaderAuthorization,
 				auth.AuthorizationExtrasHeader,
 			}),
 	}))
