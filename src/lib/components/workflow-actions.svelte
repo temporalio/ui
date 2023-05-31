@@ -5,6 +5,8 @@
     signalWorkflow,
     terminateWorkflow,
   } from '$lib/services/workflow-service';
+  import { authUser } from '$lib/stores/auth-user';
+  import { translate } from '$lib/i18n/translate';
 
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
   import { ResetReapplyType } from '$lib/models/workflow-actions';
@@ -53,6 +55,29 @@
   $: terminateEnabled = workflowTerminateEnabled($page.data.settings);
   $: resetEnabled = workflowResetEnabled($page.data.settings);
 
+  const formatReason = ({
+    action: userAction,
+    reason: userReason,
+  }: {
+    action: 'terminated' | 'reset';
+    reason: string;
+  }) => {
+    const action = translate('workflow', userAction);
+    const { email } = $authUser;
+    const placeholder = email
+      ? translate('workflow', 'workflow-action-placeholder-by-email', {
+          action,
+          email,
+        })
+      : translate('workflow', 'workflow-action-placeholder', {
+          action,
+        });
+
+    return userReason
+      ? [userReason.trim(), placeholder].join(' ')
+      : placeholder;
+  };
+
   const hideTerminationModal = () => {
     reason = '';
   };
@@ -90,7 +115,7 @@
     terminateWorkflow({
       workflow,
       namespace,
-      reason,
+      reason: formatReason({ action: 'terminated', reason }),
     })
       .then(handleSuccessfulTermination)
       .catch(handleTerminationError);
@@ -153,7 +178,7 @@
         workflowId: workflow.id,
         runId: workflow.runId,
         eventId: resetId,
-        reason: resetReason,
+        reason: formatReason({ action: 'reset', reason: resetReason }),
         resetReapplyType,
       });
 

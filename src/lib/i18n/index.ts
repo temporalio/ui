@@ -1,5 +1,6 @@
 import * as Common from './locales/en/common';
 import * as Workflows from './locales/en/workflows';
+import * as Workflow from './locales/en/workflow';
 
 /**
  * https://www.i18next.com/translation-function/plurals#singular-plural
@@ -17,6 +18,7 @@ type WithoutPluralSuffix<T> = T extends
 export const I18nMap = {
   [Common.Namespace]: Common.Strings,
   [Workflows.Namespace]: Workflows.Strings,
+  [Workflow.Namespace]: Workflow.Strings,
 } as const;
 
 export const I18nNamespaces = Object.keys(I18nMap);
