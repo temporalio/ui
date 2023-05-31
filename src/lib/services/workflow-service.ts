@@ -364,3 +364,29 @@ export async function fetchWorkflowForSchedule(
     handleError: onError,
   }).then(toWorkflowExecution);
 }
+
+export async function retriggerWorkflow({
+  namespace,
+  workflowId,
+  runId,
+  reason,
+  eventId,
+}) {
+  const response = await fetch(
+    `http://localhost:8092/api/v1/workflow/${namespace}/${workflowId}/${runId}/retrigger`,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      mode: 'cors',
+      method: 'POST',
+      body: JSON.stringify({
+        reason,
+        namespace,
+        eventId: parseInt(eventId, 10),
+      }),
+    },
+  );
+
+  return response;
+}
