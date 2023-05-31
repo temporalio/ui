@@ -56,7 +56,9 @@
   let reason: string = '';
 
   const handleConfirmModal = () => {
-    dispatch('confirm', { reason: [reason.trim(), placeholder].join(' ') });
+    dispatch('confirm', {
+      reason: reason ? [reason.trim(), placeholder].join(' ') : placeholder,
+    });
   };
 
   const handleCancelModal = () => {
