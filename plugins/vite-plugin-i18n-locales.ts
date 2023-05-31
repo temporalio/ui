@@ -15,9 +15,12 @@ export function i18nPlugin(options: PluginOptions): Plugin {
       await generateLocales(src, dest, this.error);
     },
     async handleHotUpdate(ctx) {
-      if (ctx.file.match(/src\/lib\/i18n\/locales\/\w+\/\w+\.ts/)) {
+      if (ctx.file.match(/src\/lib\/i18n\/locales\/\w+\/\w+\.ts/) !== null) {
         await generateLocales(src, dest, console.error);
+        return [];
       }
+
+      return [];
     },
   };
 }

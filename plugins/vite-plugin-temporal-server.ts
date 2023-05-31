@@ -4,13 +4,11 @@ import {
   type TemporalServer,
   createTemporalServer,
 } from '../scripts/start-temporal-server';
-import { createUIServer, UIServer } from '../scripts/start-ui-server';
 import { ViteDevServer } from 'vite';
 
 const { cyan, magenta } = chalk;
 
 let temporal: TemporalServer;
-let uiServer: UIServer;
 
 const shouldSkip = (server: ViteDevServer): boolean => {
   if (process.env.VERCEL) return true;
@@ -18,7 +16,7 @@ const shouldSkip = (server: ViteDevServer): boolean => {
   if (process.env.VITEST) return true;
   if (temporal) return true;
   if (process.platform === 'win32') return true;
-  if (server.config.mode === 'ui-only') return true;
+  if (server.config.mode !== 'temporal-server') return true;
 
   return false;
 };
@@ -60,32 +58,24 @@ export function temporalServer(): Plugin {
     async configureServer(server) {
       if (shouldSkip(server)) return;
 
+      const port = validatePort(server.config.env.VITE_TEMPORAL_PORT, 7233);
       const uiPort = getPortFromApiEndpoint(server.config.env.VITE_API);
-      if (server.config.mode === 'ui-server') {
-        console.log(magenta(`Starting local UI Server on Port ${uiPort}...`));
-        uiServer = await createUIServer(uiPort);
-        await uiServer.ready();
-        console.log(magenta(`UI Server is running on Port ${uiPort}`));
-      } else {
-        const port = validatePort(server.config.env.VITE_TEMPORAL_PORT, 7233);
 
-        console.log(magenta(`Starting Temporal Server on Port ${port}…`));
-        console.log(cyan(`Starting Temporal UI Server on Port ${uiPort}…`));
+      console.log(magenta(`Starting Temporal Server on Port ${port}…`));
+      console.log(cyan(`Starting Temporal UI Server on Port ${uiPort}…`));
 
-        temporal = await createTemporalServer({
-          port,
-          uiPort,
-        });
+      temporal = await createTemporalServer({
+        port,
+        uiPort,
+      });
 
-        await temporal.ready();
+      await temporal.ready();
 
-        console.log(magenta(`Temporal Server is running on Port ${port}.`));
-        console.log(cyan(`Temporal UI Server is running on Port ${uiPort}.`));
-      }
+      console.log(magenta(`Temporal Server is running on Port ${port}.`));
+      console.log(cyan(`Temporal UI Server is running on Port ${uiPort}.`));
     },
     async closeBundle() {
       await temporal?.shutdown();
-      await uiServer?.shutdown();
     },
   };
 }

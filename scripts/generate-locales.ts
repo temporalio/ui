@@ -1,12 +1,16 @@
 import ts from 'typescript';
-import path, { relative } from 'path';
+import path, { join, relative } from 'path';
 import { writeFile, mkdir, stat } from 'fs/promises';
 import { $, glob, chalk } from 'zx';
 
 const SRC_DIR = path.resolve('./src/lib/i18n/locales');
 const DEST_DIR = path.resolve('./static/i18n/locales');
 
-const logAndExit = (msg: string, logError: (msg: string) => void) => {
+const logAndExit = (
+  msg: string,
+  logError: (msg: string) => void,
+  err?: Error,
+) => {
   logError(chalk.red(msg));
 
   if (logError === console.error) {
@@ -112,7 +116,8 @@ export const generateLocales = async (
 
     try {
       await writeFile(fullPath, JSON.stringify(i18nStringsMap));
-      await $`prettier --write --plugin-search-dir=. static/i18n/locales/*/*.json`.quiet();
+      $.cwd = process.cwd();
+      await $`prettier --write --plugin-search-dir=. --no-error-on-unmatched-pattern ./static/i18n/locales/*/*.json`.quiet();
       console.log(
         chalk.green(
           `Parsed locale file: ${relativeTo(source)} to ${relativeTo(
