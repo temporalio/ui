@@ -110,11 +110,13 @@ export const compactEventTypeOptions: EventTypeOption[] =
 
 const timelineEventTypes: EventTypeCategory[] = [
   CATEGORIES.ACTIVITY,
+  CATEGORIES.LOCAL_ACTIVITY,
   CATEGORIES.CHILD_WORKFLOW,
   CATEGORIES.COMMAND,
   CATEGORIES.MARKER,
   CATEGORIES.SIGNAL,
   CATEGORIES.TIMER,
+  CATEGORIES.UPDATE,
 ];
 export const timelineEventTypeOptions: EventTypeOption[] =
   allEventTypeOptions.filter(({ option }) =>
