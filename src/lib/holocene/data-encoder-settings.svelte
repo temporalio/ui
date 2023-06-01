@@ -22,6 +22,7 @@
   import Button from './button.svelte';
   import { dataEncoder } from '$lib/stores/data-encoder';
   import Icon from './icon/icon.svelte';
+  import Alert from './alert.svelte';
 
   let endpoint = $codecEndpoint ?? '';
   let port = $dataConverterPort ?? '';
@@ -95,10 +96,24 @@
         Namespaces in your current browser.
       </p>
       {#if $dataEncoder.settingsEndpointOverridden}
-        <p class="text-orange-700 flex gap">
-          <Icon name="warning" /> Local settings are overriding all configuration
-          settings. Clear to use configuration settings.
-        </p>
+        <Alert
+          intent="warning"
+          title="Local settings override all configuration settings"
+        >
+          <p>
+            Once applied, local settings will apply to all namespaces regardless
+            of configuration settings. Click <strong>Clear</strong> to use configuration
+            settings.
+          </p>
+          <div class="flex items-center gap-2 mt-4">
+            <p data-testid="data-encoder-site-settings">
+              Configuration endpoint:
+            </p>
+            <p data-testid="data-encoder-site-endpoint">
+              {$dataEncoder.settingsEndpoint}
+            </p>
+          </div>
+        </Alert>
       {/if}
     </div>
     <CodecEndpointSettings
@@ -108,8 +123,5 @@
       {error}
     />
     <DataConverterPortSettings bind:port />
-    <p data-testid="data-encoder-info">
-      *If both are set, the remote codec endpoint will be used.
-    </p>
   </div>
 {/if}

@@ -1,5 +1,5 @@
 describe('Set Codec Server Settings', () => {
-  describe('Codec Server without site setting codec endpoint', () => {
+  describe('Codec Server without configuration setting codec endpoint', () => {
     beforeEach(() => {
       cy.interceptApi();
       cy.clearLocalStorage();
@@ -195,7 +195,7 @@ describe('Set Codec Server Settings', () => {
     });
   });
 
-  describe('Codec Server with site setting codec endpoint', () => {
+  describe('Codec Server with configuration setting codec endpoint', () => {
     beforeEach(() => {
       cy.interceptApi();
       cy.clearLocalStorage();
