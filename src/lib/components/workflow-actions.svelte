@@ -62,14 +62,18 @@
     action: 'terminated' | 'reset';
     reason: string;
   }) => {
-    const action = translate('workflow', userAction);
+    const action = translate('workflows', userAction);
     const { email } = $authUser;
     const placeholder = email
-      ? translate('workflow', 'workflow-action-placeholder-by-email', {
-          action,
-          email,
-        })
-      : translate('workflow', 'workflow-action-placeholder', {
+      ? translate(
+          'workflows',
+          'workflow-action-reason-placeholder-with-email',
+          {
+            action,
+            email,
+          },
+        )
+      : translate('workflows', 'workflow-action-reason-placeholder', {
           action,
         });
 

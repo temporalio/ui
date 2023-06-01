@@ -42,13 +42,13 @@
     if ($authUser.email) {
       placeholder = translate(
         'workflows',
-        'batch-operation-confirmation-placeholder-by-email',
+        'workflow-action-reason-placeholder-with-email',
         { action: pastTenseActionText, email: $authUser.email },
       );
     } else {
       placeholder = translate(
         'workflows',
-        'batch-operation-confirmation-placeholder',
+        'workflow-action-reason-placeholder',
         { action: pastTenseActionText },
       );
     }
