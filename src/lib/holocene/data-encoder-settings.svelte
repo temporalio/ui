@@ -21,7 +21,6 @@
   import { refresh } from '$lib/stores/workflow-run';
   import Button from './button.svelte';
   import { dataEncoder } from '$lib/stores/data-encoder';
-  import Card from './card.svelte';
   import Icon from './icon/icon.svelte';
 
   let endpoint = $codecEndpoint ?? '';
