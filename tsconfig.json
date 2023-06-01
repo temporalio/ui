@@ -29,8 +29,7 @@
       "$lib/*": ["src/lib/*"],
       "$types": ["src/lib/types"],
       "$components/*": ["src/components/*"],
-      "$fixtures/*": ["src/fixtures/*"],
-      "$temporal-fixtures/*": ["temporal-fixtures/*"]
+      "$fixtures/*": ["src/fixtures/*"]
     }
   },
   "include": [
@@ -40,7 +39,8 @@
     "src/**/*.svelte",
     "src/lib/models/**/*.test.ts",
     "tests/**/*.ts",
-    "temporal-fixtures/**/*.ts",
+    "utilities/**/*.ts",
+    "temporal/**/*.ts",
     "cypress/**/*.ts"
   ],
   "exclude": [
@@ -50,8 +50,5 @@
     // Until there is better TS support for Histoire
     "src/histoire.setup.ts",
     "src/lib/holocene/**/*.story.svelte"
-  ],
-  "ts-node": {
-    "esm": true
-  }
+  ]
 }

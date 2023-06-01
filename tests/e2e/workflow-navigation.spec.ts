@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { mockNamespacesApi } from '~/utilities/mock-apis';
-import { setLocalStorage } from '~/utilities/mock-local-storage';
+import { mockNamespacesApi } from '~/test-utilities/mock-apis';
+import { setLocalStorage } from '~/test-utilities/mock-local-storage';
 
 test.beforeEach(async ({ page, baseURL }) => {
   await page.goto(baseURL);

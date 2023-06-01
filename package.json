@@ -37,12 +37,13 @@
     "dev:docker": ". ./.env && VITE_API=http://localhost:8080 vite dev --port 3000",
     "dev:cloud": "VITE_TEMPORAL_UI_BUILD_TARGET=cloud vite dev --port 3000",
     "dev:ui-server": ". ./.env.ui-server && vite dev --mode ui-server --port 3000",
-    "dev:test": ". ./.env && VITE_TEMPORAL_UI_BUILD_TARGET=local VITE_MODE=test vite dev --port 3000",
+    "dev:test": ". ./.env && VITE_TEMPORAL_UI_BUILD_TARGET=local VITE_MODE=test vite dev --mode temporal-server --port 3000",
     "build:local": "vite build",
     "build:docker": "VITE_API=http://localhost:8080 vite build",
     "build:cloud": "VITE_TEMPORAL_UI_BUILD_TARGET=cloud vite build",
     "build:server": "VITE_API= BUILD_PATH=server/ui/assets/local vite build && VITE_API= VITE_TEMPORAL_UI_BUILD_TARGET=cloud BUILD_PATH=server/ui/assets/cloud vite build",
-    "codec-server": "esno temporal-fixtures/codec-server.ts",
+    "temporal-server": "esno scripts/start-temporal-server.ts --codecEndpoint http://127.0.0.1:8888",
+    "codec-server": "esno ./scripts/start-codec-server.ts --port 8888",
     "test": "TZ=UTC vitest",
     "test:ui": "TZ=UTC vitest --ui",
     "test:coverage": "TZ=UTC vitest run --coverage",
@@ -66,7 +67,7 @@
     "story:build": "histoire build",
     "story:preview": "histoire preview",
     "generate:locales": "esno scripts/generate-locales.ts",
-    "temporal-fixtures": "esno temporal-fixtures/starter.ts"
+    "workflows": "esno scripts/workflows.ts"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.3.4",
@@ -100,7 +101,7 @@
     "@histoire/controls": "^0.16.1",
     "@histoire/plugin-svelte": "^0.16.1",
     "@histoire/shared": "^0.16.1",
-    "@playwright/test": "^1.30.0",
+    "@playwright/test": "^1.34.3",
     "@sveltejs/adapter-static": "^1.0.5",
     "@sveltejs/adapter-vercel": "^1.0.5",
     "@sveltejs/kit": "1.15.4",
@@ -122,6 +123,7 @@
     "@types/sanitize-html": "^2.6.1",
     "@types/tar-fs": "^2.0.1",
     "@types/uuid": "^9.0.0",
+    "@types/yargs": "^17.0.24",
     "@typescript-eslint/eslint-plugin": "^5.52.0",
     "@typescript-eslint/parser": "^5.52.0",
     "@vitest/ui": "^0.16.0",
@@ -184,6 +186,7 @@
     "vitest-localstorage-mock": "^0.0.1",
     "wait-port": "^1.0.4",
     "webpack": "^5.73.0",
+    "yargs": "^17.7.2",
     "zx": "^7.1.1"
   },
   "peerDependencies": {

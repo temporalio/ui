@@ -1,5 +1,5 @@
 import * as workflow from '@temporalio/workflow';
-import type * as activities from '$temporal-fixtures/activities';
+import type * as activities from './activities';
 
 const { echo: Activity, sideEffect: SideEffect } = workflow.proxyActivities<
   typeof activities

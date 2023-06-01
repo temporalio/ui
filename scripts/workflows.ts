@@ -1,5 +1,5 @@
-import { connect, startWorkflows } from '$temporal-fixtures/client';
-import { runWorkers } from '$temporal-fixtures/workers';
+import { connect, startWorkflows } from '../temporal/client';
+import { runWorkers } from '../temporal/workers';
 
 async function main() {
   const client = await connect();

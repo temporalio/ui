@@ -1,9 +1,14 @@
 import { FullConfig, chromium } from '@playwright/test';
 
-import { runWorkers } from '$temporal-fixtures/workers';
-import { startWorkflows } from '$temporal-fixtures/client';
-import { connect } from '$temporal-fixtures/client';
-import { setLocalStorage } from '~/utilities/mock-local-storage';
+import {
+  type TemporalServer,
+  createTemporalServer,
+} from '../utilities/temporal-server';
+import { type CodecServer, createCodecServer } from '../temporal/codec-server';
+import { runWorkersUntil } from '../temporal/workers';
+import { startWorkflows } from '../temporal/client';
+import { connect } from '../temporal/client';
+import { setLocalStorage } from '~/test-utilities/mock-local-storage';
 
 async function globalSetup(config: FullConfig) {
   const { mode } = config.metadata;
@@ -17,9 +22,24 @@ async function globalSetup(config: FullConfig) {
   await page.context().storageState({ path: './tests/storageState.json' });
 
   if (mode && mode === 'e2e') {
-    const client = await connect();
-    const wfs = await startWorkflows(client);
-    await runWorkers(wfs.map((wf) => wf.result()));
+    let codecServer: CodecServer;
+    let temporalServer: TemporalServer;
+    try {
+      temporalServer = await createTemporalServer();
+      codecServer = await createCodecServer();
+
+      await temporalServer.ready();
+      await codecServer.start();
+
+      const client = await connect();
+      const result = startWorkflows(client);
+      await runWorkersUntil(result);
+    } catch (error) {
+      console.error(error);
+      await temporalServer.shutdown();
+      await codecServer.stop();
+      return;
+    }
   }
 }
 

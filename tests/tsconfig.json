@@ -3,9 +3,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "~*": ["./*"],
-      "$temporal-fixtures/*": ["../temporal-fixtures/*"]
+      "~*": ["./*"]
     }
   },
-  "include": ["./**/*.ts", "../temporal-fixtures/**/*.ts"]
+  "include": ["**/*.ts", "../temporal/**/*.ts", "../utilities/**/*.ts"]
 }

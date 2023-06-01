@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { settingsApi } from '~/utilities/mock-apis';
-import { setLocalStorage } from '~/utilities/mock-local-storage';
+import { settingsApi } from '~/test-utilities/mock-apis';
+import { setLocalStorage } from '~/test-utilities/mock-local-storage';
 
 const importUrl = '/import/events';
 const importEventHistoryUrl =
