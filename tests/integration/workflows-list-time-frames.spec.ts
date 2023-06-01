@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { mockDate } from '~test-utilities/mock-date';
+import { mockDate } from '~/test-utilities/mock-date';
 import { mockClusterApi } from '~/test-utilities/mock-apis';
 import { setLocalStorage } from '~/test-utilities/mock-local-storage';
 

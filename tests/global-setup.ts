@@ -18,23 +18,18 @@ async function globalSetup(config: FullConfig) {
   await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
   await page.context().storageState({ path: './tests/storageState.json' });
 
-  if (mode && mode === 'e2e') {
-    try {
-      const codecServer = await createCodecServer({ port: 8888 });
-      const temporalServer = await createTemporalServer({
-        codecEndpoint: 'http://127.0.0.1:8888',
-      });
+  const codecServer = await createCodecServer({ port: 8888 });
+  const temporalServer = await createTemporalServer({
+    codecEndpoint: 'http://127.0.0.1:8888',
+  });
 
-      await codecServer.start();
-      await temporalServer.ready();
+  await codecServer.start();
+  await temporalServer.ready();
 
-      const client = await connect();
-      const result = startWorkflows(client);
-      await runWorkersUntil(result);
-    } catch (error) {
-      console.error(error);
-      return;
-    }
+  if (mode === 'e2e') {
+    const client = await connect();
+    const result = startWorkflows(client);
+    await runWorkersUntil(result);
   }
 }
 
