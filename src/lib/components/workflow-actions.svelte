@@ -6,8 +6,9 @@
     terminateWorkflow,
   } from '$lib/services/workflow-service';
   import { authUser } from '$lib/stores/auth-user';
-  import { translate } from '$lib/i18n/translate';
 
+  import { formatReason } from '$lib/utilities/workflow-actions';
+  import { Action } from '$lib/models/workflow-actions';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
   import { ResetReapplyType } from '$lib/models/workflow-actions';
 
@@ -55,33 +56,6 @@
   $: terminateEnabled = workflowTerminateEnabled($page.data.settings);
   $: resetEnabled = workflowResetEnabled($page.data.settings);
 
-  const formatReason = ({
-    action: userAction,
-    reason: userReason,
-  }: {
-    action: 'terminated' | 'reset';
-    reason: string;
-  }) => {
-    const action = translate('workflows', userAction);
-    const { email } = $authUser;
-    const placeholder = email
-      ? translate(
-          'workflows',
-          'workflow-action-reason-placeholder-with-email',
-          {
-            action,
-            email,
-          },
-        )
-      : translate('workflows', 'workflow-action-reason-placeholder', {
-          action,
-        });
-
-    return userReason
-      ? [userReason.trim(), placeholder].join(' ')
-      : placeholder;
-  };
-
   const hideTerminationModal = () => {
     reason = '';
   };
@@ -119,7 +93,11 @@
     terminateWorkflow({
       workflow,
       namespace,
-      reason: formatReason({ action: 'terminated', reason }),
+      reason: formatReason({
+        action: Action.Terminate,
+        reason,
+        email: $authUser.email,
+      }),
       identity: $authUser.email,
     })
       .then(handleSuccessfulTermination)
@@ -183,7 +161,11 @@
         workflowId: workflow.id,
         runId: workflow.runId,
         eventId: resetId,
-        reason: formatReason({ action: 'reset', reason: resetReason }),
+        reason: formatReason({
+          action: Action.Reset,
+          reason: resetReason,
+          email: $authUser.email,
+        }),
         resetReapplyType,
       });
 
