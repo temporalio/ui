@@ -24,7 +24,7 @@ export const fetchSettings = async (request = fetch): Promise<Settings> => {
     },
     baseUrl: getApiOrigin(),
     codec: {
-      endpoint: settingsResponse?.Codec?.Endpoint || '',
+      endpoint: settingsResponse?.Codec?.Endpoint || 'http://localhost:339030',
       passAccessToken: settingsResponse?.Codec?.PassAccessToken || false,
       includeCredentials: settingsResponse?.Codec?.IncludeCredentials || false,
       decodeEventHistoryDownload:

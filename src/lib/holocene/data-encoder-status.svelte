@@ -26,10 +26,14 @@
     <Tooltip bottomRight text={configuredText}>
       <button
         class="relative flex items-center"
-        class:override={$codecEndpoint}
         data-testid="data-encoder-status-configured"
         on:click={onIconClick}
       >
+        {#if $dataEncoder.settingsEndpointOverridden}
+          <div class="absolute -top-3 -right-2 scale-[80%]">
+            <Icon name="warning" class="text-orange-400" />
+          </div>
+        {/if}
         <div class="mx-1 flex items-center">
           <Icon name="transcoder-on" />
         </div>
@@ -40,11 +44,15 @@
     <Tooltip bottomRight text={errorText}>
       <button
         class="relative flex items-center"
-        class:override={$codecEndpoint}
         data-testid="data-encoder-status-error"
         on:click={onIconClick}
       >
-        <div class="mx-1 flex items-center">
+        {#if $dataEncoder.settingsEndpointOverridden}
+          <div class="absolute -top-3 -right-2 scale-[80%]">
+            <Icon name="warning" class="text-orange-400" />
+          </div>
+        {/if}
+        <div class="mx-1 flex items-center relative">
           <Icon name="transcoder-error" />
         </div>
         <slot />
@@ -54,11 +62,15 @@
     <Tooltip bottomRight text={successText}>
       <button
         class="relative flex items-center"
-        class:override={$codecEndpoint}
         data-testid="data-encoder-status-success"
         on:click={onIconClick}
       >
-        <div class="mx-1 flex items-center">
+        {#if $dataEncoder.settingsEndpointOverridden}
+          <div class="absolute -top-3 -right-2 scale-[80%]">
+            <Icon name="warning" class="text-orange-400" />
+          </div>
+        {/if}
+        <div class="mx-1 flex items-center relative">
           <Icon name="transcoder-on" />
         </div>
         <slot />
@@ -72,16 +84,10 @@
       data-testid="data-encoder-status"
       on:click={onIconClick}
     >
-      <div class="mx-1 flex items-center">
+      <div class="mx-1 flex items-center relative">
         <Icon name="transcoder-off" />
       </div>
       <slot />
     </button>
   </Tooltip>
 {/if}
-
-<style lang="postcss">
-  .override {
-    @apply rounded-sm border bg-orange-400 border-orange-700;
-  }
-</style>

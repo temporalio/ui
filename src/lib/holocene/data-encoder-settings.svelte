@@ -87,72 +87,27 @@
         >
       </div>
     </div>
-    <div class="border-2 border-gray-900 bg-white rounded-xl p-2">
-      <div class="flex flex-col gap-2 mb-6">
-        <h3 class="text-lg" data-testid="data-encoder-local-settings-title">
-          Local Settings
-        </h3>
-        <p>
-          Configure the Codec Server settings to be applied globally across all
-          Namespaces in your current browser.
-        </p>
-        <p class="text-orange-700 flex gap">
-          <Icon name="warning" /> Local settings will override all configuration
-          settings below.
-        </p>
-      </div>
-      <CodecEndpointSettings
-        bind:endpoint
-        bind:passToken
-        bind:includeCreds
-        {error}
-      />
-    </div>
-    <div class="flex flex-col gap-4">
-      <h3 class="text-lg" data-testid="data-encoder-endpoint-title">
-        Configuration Settings
+    <div class="flex flex-col gap-2">
+      <h3 class="text-lg" data-testid="data-encoder-local-settings-title">
+        Local Settings
       </h3>
-      <div class="flex flex-col gap-2">
-        <Card>
-          {#if $dataEncoder.settingsEndpoint}
-            <div class="flex flex-col gap-2">
-              <div>
-                <p class="font-medium">Remote codec endpoint</p>
-                <p class="break-all">
-                  {$dataEncoder.settingsEndpoint}
-                </p>
-              </div>
-              <div>
-                <p class="font-medium">
-                  Pass the user access token with your endpoint
-                </p>
-                <Icon
-                  name={$dataEncoder.settingsPassAccessToken
-                    ? 'checkmark'
-                    : 'close'}
-                  class={$dataEncoder.settingsPassAccessToken
-                    ? 'text-blue-700'
-                    : 'text-red-700'}
-                />
-              </div>
-              <div>
-                <p class="font-medium">Include cross-origin credentials</p>
-                <Icon
-                  name={$dataEncoder.settingsIncludeCredentials
-                    ? 'checkmark'
-                    : 'close'}
-                  class={$dataEncoder.settingsIncludeCredentials
-                    ? 'text-blue-700'
-                    : 'text-red-700'}
-                />
-              </div>
-            </div>
-          {:else}
-            <p>None</p>
-          {/if}
-        </Card>
-      </div>
+      <p>
+        Configure the Codec Server settings to be applied globally across all
+        Namespaces in your current browser.
+      </p>
+      {#if $dataEncoder.settingsEndpointOverridden}
+        <p class="text-orange-700 flex gap">
+          <Icon name="warning" /> Local settings are overriding all configuration
+          settings. Clear to use configuration settings.
+        </p>
+      {/if}
     </div>
+    <CodecEndpointSettings
+      bind:endpoint
+      bind:passToken
+      bind:includeCreds
+      {error}
+    />
     <DataConverterPortSettings bind:port />
     <p data-testid="data-encoder-info">
       *If both are set, the remote codec endpoint will be used.

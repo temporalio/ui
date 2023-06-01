@@ -7,6 +7,21 @@ import {
 import { codecEndpoint, lastDataEncoderStatus } from './data-encoder-config';
 import { authUser } from './auth-user';
 
+type DataEncoder = {
+  namespace: string;
+  settingsEndpoint?: string;
+  settingsEndpointOverridden: boolean;
+  settingsPassAccessToken: boolean;
+  settingsIncludeCredentials: boolean;
+  endpoint: string;
+  accessToken?: string;
+  hasNotRequested: boolean;
+  hasError: boolean;
+  hasSuccess: boolean;
+  hasEndpointAndPortConfigured: boolean;
+  hasEndpointOrPortConfigured: boolean;
+};
+
 export const dataEncoder = derived(
   [
     page,
@@ -23,14 +38,18 @@ export const dataEncoder = derived(
     $dataConverterPort,
     $lastDataConverterStatus,
     $authUser,
-  ]) => {
+  ]): DataEncoder => {
     const namespace = $page.params.namespace;
     const settingsEndpoint = $page?.data?.settings?.codec?.endpoint;
-    const settingsPassAccessToken =
-      $page?.data?.settings?.codec?.passAccessToken;
-    const settingsIncludeCredentials =
-      $page?.data?.settings?.codec?.includeCredentials;
+    const settingsPassAccessToken = Boolean(
+      $page?.data?.settings?.codec?.passAccessToken,
+    );
+    const settingsIncludeCredentials = Boolean(
+      $page?.data?.settings?.codec?.includeCredentials,
+    );
     const endpoint = $codecEndpoint || settingsEndpoint;
+    const settingsEndpointOverridden =
+      Boolean($codecEndpoint) && Boolean(settingsEndpoint);
     const accessToken = $authUser?.accessToken;
     const hasNotRequested = endpoint
       ? $lastDataEncoderStatus === 'notRequested'
@@ -47,6 +66,7 @@ export const dataEncoder = derived(
     return {
       namespace,
       settingsEndpoint,
+      settingsEndpointOverridden,
       settingsPassAccessToken,
       settingsIncludeCredentials,
       endpoint,
