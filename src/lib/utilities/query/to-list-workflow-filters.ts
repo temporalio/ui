@@ -80,7 +80,6 @@ export const toListWorkflowFilters = (
           try {
             const duration = fromDate(start);
             const largestUnit = getLargestDurationUnit(duration);
-
             filter.value = formatDuration(largestUnit);
           } catch (error) {
             console.error('Error parsing Datetime field from query', error);

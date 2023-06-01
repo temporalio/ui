@@ -53,7 +53,6 @@ const DefaultAttributes: SearchAttributes = {
 
 export const toListWorkflowFiltersFromRelativeTime = (
   query: string,
-  attributes: SearchAttributes = DefaultAttributes,
 ): WorkflowFilter[] => {
   const tokens = tokenize(query);
   const filters: WorkflowFilter[] = [];
@@ -73,9 +72,9 @@ export const toListWorkflowFiltersFromRelativeTime = (
       durationKeys.find((d) => d === _duration);
 
     if (duration) {
-      filter.attribute = 'startTime';
-      filter.value = formatDuration({ [duration]: amount });
-      console.log('Filter: ', filter);
+      filter.attribute = 'StartTime';
+      filter.conditional = '>';
+      filter.value = `${amount} ${duration}`;
       filters.push(filter);
     }
 

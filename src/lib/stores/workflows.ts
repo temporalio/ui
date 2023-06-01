@@ -10,17 +10,58 @@ import { withLoading } from '$lib/utilities/stores/with-loading';
 import { supportsAdvancedVisibility } from './advanced-visibility';
 import type { StartStopNotifier } from 'svelte/store';
 import type { FilterParameters, WorkflowExecution } from '$lib/types/workflows';
+import { toListWorkflowQueryFromFilters } from '$lib/utilities/query/filter-workflow-query';
+import { toListWorkflowFiltersFromRelativeTime } from '$lib/utilities/query/to-list-workflow-filters-from-relative-time';
 
 export const refresh = writable(0);
 
 const namespace = derived([page], ([$page]) => $page.params.namespace);
-const query = derived([page], ([$page]) => $page.url.searchParams.get('query'));
+const searchQuery = derived([page], ([$page]) =>
+  $page.url.searchParams.get('query'),
+);
+const earliestRelativeDuration = derived([page], ([$page]) =>
+  $page.url.searchParams.get('earliestTime'),
+);
+const latestRelativeDuration = derived([page], ([$page]) =>
+  $page.url.searchParams.get('latestTime'),
+);
+
+const query = derived(
+  [searchQuery, earliestRelativeDuration, latestRelativeDuration],
+  ([$searchQuery, $earliestRelativeDuration, $latestRelativeDuration]) => {
+    if ($latestRelativeDuration || $earliestRelativeDuration) {
+      const filters = toListWorkflowFiltersFromRelativeTime(
+        $latestRelativeDuration || $earliestRelativeDuration,
+      );
+      return toListWorkflowQueryFromFilters(filters, []);
+    } else {
+      return $searchQuery;
+    }
+  },
+);
+
 const parameters = derived(
-  [namespace, query, refresh, supportsAdvancedVisibility],
-  ([$namespace, $query, $refresh, $supportsAdvancedVisibility]) => {
+  [
+    namespace,
+    query,
+    earliestRelativeDuration,
+    latestRelativeDuration,
+    refresh,
+    supportsAdvancedVisibility,
+  ],
+  ([
+    $namespace,
+    $query,
+    $earliestRelativeDuration,
+    $latestRelativeDuration,
+    $refresh,
+    $supportsAdvancedVisibility,
+  ]) => {
     return {
       namespace: $namespace,
       query: $query,
+      earliestRelativeDuration: $earliestRelativeDuration,
+      latestRelativeDuration: $latestRelativeDuration,
       refresh: $refresh,
       supportsAdvancedVisibility: $supportsAdvancedVisibility,
     };

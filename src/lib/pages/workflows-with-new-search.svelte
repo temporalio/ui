@@ -104,7 +104,13 @@
   }
 
   const persistTimeFilter = () => {
-    if (!query && !$workflowFilters.length && $persistedTimeFilter) {
+    if (
+      !query &&
+      !earliestRelativeDuration &&
+      !latestRelativeDuration &&
+      !$workflowFilters.length &&
+      $persistedTimeFilter
+    ) {
       $workflowFilters = [$persistedTimeFilter];
       updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
     }
@@ -117,6 +123,7 @@
     if (query) {
       // Set filters from inital page load query if it exists
       $workflowFilters = toListWorkflowFilters(query);
+      console.log('workflowFilters: ', $workflowFilters);
     } else if (earliestRelativeDuration) {
       $workflowFilters = toListWorkflowFiltersFromRelativeTime(
         earliestRelativeDuration,
@@ -125,6 +132,7 @@
       $workflowFilters = toListWorkflowFiltersFromRelativeTime(
         latestRelativeDuration,
       );
+      console.log('workflowFilters: ', $workflowFilters);
     }
   });
 
@@ -266,7 +274,7 @@
             <span class="text-gray-400"
               ><Translate namespace="common" key="filtering" /></span
             >
-          {:else if query}
+          {:else if $workflowCount.count}
             <Translate
               namespace="workflows"
               key="filtered-workflows-count"
