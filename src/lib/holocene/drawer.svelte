@@ -9,7 +9,7 @@
   export let position: 'bottom' | 'right' = 'bottom';
   export let dark = true;
   export let onClick: () => void;
-  export let id: string = 'navigation-drawer';
+  export let id = 'navigation-drawer';
 
   const flyParams = {
     duration: 500,
