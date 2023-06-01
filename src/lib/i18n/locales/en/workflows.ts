@@ -32,7 +32,7 @@ export const Strings = {
   'batch-cancel-all-success':
     'The batch $t(cancel) request is processing in the background.',
   'batch-terminate-success': 'Successfully $t(terminated) {{count}} workflows.',
-  'batch-cancel-success': 'Successfully $(canceled) {{count}} workflows.',
+  'batch-cancel-success': 'Successfully $t(canceled) {{count}} workflows.',
   'configure-workflows': 'Configure Workflow List',
   'configure-workflows-description':
     'Add (<1></1>), re-arrange (<2></2>), and remove (<3></3>), Workflow Headings to personalize the Workflow List Table.',
