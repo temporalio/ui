@@ -9,6 +9,7 @@
   export let position: 'bottom' | 'right' = 'bottom';
   export let dark = true;
   export let onClick: () => void;
+  export let id: string = 'navigation-drawer';
 
   const flyParams = {
     duration: 500,
@@ -23,7 +24,7 @@
     class:max-w-[400px]={position === 'right'}
     transition:fly={flyParams}
     use:clickOutside
-    id="navigation-drawer"
+    {id}
     role="region"
     on:click-outside={onClick}
   >

@@ -22,7 +22,7 @@ const headersToAdd = ['History Size', 'History Length', 'Execution Time'];
 const headersToRemove = ['Type', 'Start', 'End'];
 
 test.beforeEach(async ({ page, baseURL }) => {
-  await page.goto(baseURL);
+  await page.goto(baseURL!);
 });
 
 test.describe('Workflows Table Configuration', () => {
@@ -105,6 +105,10 @@ test.describe('Workflows Table Configuration', () => {
       .getByTestId('workflows-summary-table-configuration-button')
       .click();
 
+    await expect(
+      page.locator('#workflows-summary-table-configuration-drawer'),
+    ).toBeVisible();
+
     for (let i = 0; i < 3; i++) {
       await page
         .getByTestId('orderable-list-item-Run ID-move-down-button')
@@ -140,6 +144,10 @@ test.describe('Workflows Table Configuration', () => {
     await page
       .getByTestId('workflows-summary-table-configuration-button')
       .click();
+
+    await expect(
+      page.locator('#workflows-summary-table-configuration-drawer'),
+    ).toBeVisible();
 
     const sourceElement = page.getByTestId('orderable-list-item-Run ID');
     const targetElement = page.getByTestId('orderable-list-item-End');

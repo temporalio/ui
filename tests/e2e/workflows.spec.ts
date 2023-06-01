@@ -1,7 +1,7 @@
 import { test, expect, Locator } from '@playwright/test';
 
 test.beforeEach(async ({ page, baseURL }) => {
-  await page.goto(baseURL);
+  await page.goto(baseURL!);
 });
 
 test.describe('Workflows list', () => {

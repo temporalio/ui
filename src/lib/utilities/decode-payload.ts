@@ -52,7 +52,6 @@ export function decodePayload(
   payload: Payload,
   // This could decode to any object. So we either use the payload object passed in or decode it
 ): Payload {
-  console.log(payload);
   if (payload === null) {
     return payload;
   }

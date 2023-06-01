@@ -1,10 +1,7 @@
 import { FullConfig, chromium } from '@playwright/test';
 
-import {
-  type TemporalServer,
-  createTemporalServer,
-} from '../utilities/temporal-server';
-import { type CodecServer, createCodecServer } from '../temporal/codec-server';
+import { createTemporalServer } from '../utilities/temporal-server';
+import { createCodecServer } from '../temporal/codec-server';
 import { runWorkersUntil } from '../temporal/workers';
 import { startWorkflows } from '../temporal/client';
 import { connect } from '../temporal/client';
@@ -23,11 +20,13 @@ async function globalSetup(config: FullConfig) {
 
   if (mode && mode === 'e2e') {
     try {
-      const temporalServer = await createTemporalServer();
-      const codecServer = await createCodecServer();
+      const codecServer = await createCodecServer({ port: 8888 });
+      const temporalServer = await createTemporalServer({
+        codecEndpoint: 'http://127.0.0.1:8888',
+      });
 
-      await temporalServer.ready();
       await codecServer.start();
+      await temporalServer.ready();
 
       const client = await connect();
       const result = startWorkflows(client);
