@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { translate } from '$lib/i18n/translate';
   import type { SortOrder } from '$lib/models/workflow-filters';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
@@ -38,7 +39,7 @@
         height={24}
       />
     </div>
-    <div class="p-1 hover:scale-[103%]">Ascending</div>
+    <div class="p-1 hover:scale-[103%]">{translate('ascending')}</div>
   </button>
   <button class="flex items-center" on:click={() => onSortClick('desc')}>
     <div
@@ -54,7 +55,7 @@
         height={24}
       />
     </div>
-    <div class="p-1 hover:scale-[103%]">Descending</div>
+    <div class="p-1 hover:scale-[103%]">{translate('descending')}</div>
   </button>
 </div>
 

@@ -5,23 +5,15 @@
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
   import { workflowFilters, workflowSorts } from '$lib/stores/filters';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
+  import { workflowStatusFilters } from '$lib/models/workflow-status';
 
   import type { WorkflowFilter } from '$lib/models/workflow-filters';
-
-  const AllStatuses = {
-    All: 'All',
-    Running: 'Running',
-    'Timed Out': 'TimedOut',
-    Completed: 'Completed',
-    Failed: 'Failed',
-    'Continued as New': 'ContinuedAsNew',
-    Canceled: 'Canceled',
-    Terminated: 'Terminated',
-  };
+  import Translate from '$lib/i18n/translate.svelte';
 
   $: statusFilters = $workflowFilters.filter(
     (f) => f.attribute === 'ExecutionStatus',
   );
+
   $: statusSort = $workflowSorts.find((s) => s.attribute === 'ExecutionStatus');
 
   function mapStatusToFilter(value: string) {
@@ -96,18 +88,18 @@
 >
   <svelte:fragment slot="label">Status</svelte:fragment>
   <div class="flex w-56 flex-col gap-4 py-2">
-    {#each Object.entries(AllStatuses) as [label, _value] (_value)}
+    {#each workflowStatusFilters as status (status)}
       <button
         class="flex items-center transition-all hover:cursor-pointer"
-        data-testid={label}
-        on:click={() => onStatusClick(_value)}
+        data-testid={status}
+        on:click={() => onStatusClick(status)}
       >
         <div
           class="ml-4 mr-2 h-4 w-4 rounded-sm ring-1 ring-gray-900"
-          class:active={statusFilters.find((s) => s.value === _value) ||
-            (!statusFilters.length && _value === 'All')}
+          class:active={statusFilters.find((s) => s.value === status) ||
+            (!statusFilters.length && status === 'All')}
         >
-          {#if statusFilters.find((s) => s.value === _value) || (!statusFilters.length && _value === 'All')}
+          {#if statusFilters.find((s) => s.value === status) || (!statusFilters.length && status === 'All')}
             <Icon
               class="pointer-events-none -mt-[1px] -ml-[2px] text-white"
               name="checkmark"
@@ -117,10 +109,10 @@
           {/if}
         </div>
         <div class="flex h-6 items-center text-sm hover:scale-[103%]">
-          {#if _value === 'All'}
-            All Statuses
+          {#if status === 'All'}
+            <Translate namespace="workflows" key="all-statuses" />
           {:else}
-            <WorkflowStatus status={_value} />
+            <WorkflowStatus {status} />
           {/if}
         </div>
       </button>

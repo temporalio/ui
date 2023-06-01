@@ -25,6 +25,7 @@
   import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
   import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
   import Menu from '$lib/holocene/primitives/menu/menu.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   let custom = false;
   let value = 'All Time';
@@ -213,20 +214,23 @@
           </div>
         </div>
         <div class="flex gap-2">
-          <Button on:click={onApply}>Apply</Button>
+          <Button on:click={onApply}>{translate('apply')}</Button>
           <Button variant="secondary" on:click={() => (custom = false)}
-            >Cancel</Button
+            >{translate('cancel')}</Button
           >
         </div>
       {:else}
         <div>
           <div class="flex w-full flex-wrap">
             <div class="flex w-1/2 flex-col border-b border-gray-300">
-              <MenuItem on:click={() => onChange('All Time')}>All Time</MenuItem
+              <MenuItem on:click={() => onChange('All Time')}
+                >{translate('all-time')}</MenuItem
               >
             </div>
             <div class="flex w-1/2 flex-col border-b border-gray-300">
-              <MenuItem on:click={() => onChange('Custom')}>Custom</MenuItem>
+              <MenuItem on:click={() => onChange('Custom')}
+                >{translate('custom')}</MenuItem
+              >
             </div>
             {#each columnOrderedDurations as duration}
               <div class="flex w-1/2 flex-col justify-center">
@@ -241,7 +245,7 @@
                   selected={timeField === 'StartTime'}
                   on:click={() => onTimeFieldChange('StartTime')}
                 >
-                  Start Time
+                  {translate('start-time')}
                 </MenuItem>
               </div>
               <div class="flex w-1/2 flex-col border-t border-gray-300">
@@ -249,7 +253,7 @@
                   selected={timeField === 'CloseTime'}
                   on:click={() => onTimeFieldChange('CloseTime')}
                 >
-                  End Time
+                  {translate('end-time')}
                 </MenuItem>
               </div>
             </div>
@@ -269,9 +273,15 @@
       {capitalize($timeFormat)}
     </MenuButton>
     <Menu id="datetime-menu">
-      <MenuItem on:click={() => ($timeFormat = 'relative')}>Relative</MenuItem>
-      <MenuItem on:click={() => ($timeFormat = 'UTC')}>UTC</MenuItem>
-      <MenuItem on:click={() => ($timeFormat = 'local')}>Local</MenuItem>
+      <MenuItem on:click={() => ($timeFormat = 'relative')}
+        >{translate('relative')}</MenuItem
+      >
+      <MenuItem on:click={() => ($timeFormat = 'UTC')}
+        >{translate('utc')}</MenuItem
+      >
+      <MenuItem on:click={() => ($timeFormat = 'local')}
+        >{translate('local')}</MenuItem
+      >
     </Menu>
   </MenuContainer>
 </div>

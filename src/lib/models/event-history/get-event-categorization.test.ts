@@ -88,6 +88,10 @@ describe('Event Category Data Structures', () => {
           "option": "command",
         },
         {
+          "label": "Local Activity",
+          "option": "local-activity",
+        },
+        {
           "color": "#EC4899",
           "label": "Marker",
           "option": "marker",
@@ -103,13 +107,13 @@ describe('Event Category Data Structures', () => {
           "option": "timer",
         },
         {
+          "label": "Update",
+          "option": "update",
+        },
+        {
           "color": "#10B981",
           "label": "Workflow",
           "option": "workflow",
-        },
-        {
-          "label": "Update",
-          "option": "update",
         },
       ]
     `);
@@ -128,6 +132,10 @@ describe('Event Category Data Structures', () => {
           "option": "activity",
         },
         {
+          "label": "Local Activity",
+          "option": "local-activity",
+        },
+        {
           "color": "#DD6B20",
           "label": "Signal",
           "option": "signal",
@@ -142,7 +150,10 @@ describe('Event Category Data Structures', () => {
   });
 });
 
-const categories: Record<EventTypeCategory, EventType[]> = {
+const categories: Record<
+  Exclude<EventTypeCategory, 'local-activity'>,
+  EventType[]
+> = {
   activity: [
     'ActivityTaskCanceled',
     'ActivityTaskCancelRequested',
@@ -296,6 +307,10 @@ describe('timelineEventTypeOptions', () => {
         option: 'command',
       },
       {
+        label: 'Local Activity',
+        option: 'local-activity',
+      },
+      {
         color: '#EC4899',
         label: 'Marker',
         option: 'marker',
@@ -309,6 +324,10 @@ describe('timelineEventTypeOptions', () => {
         color: '#1D4ED8',
         label: 'Timer',
         option: 'timer',
+      },
+      {
+        label: 'Update',
+        option: 'update',
       },
     ]);
   });

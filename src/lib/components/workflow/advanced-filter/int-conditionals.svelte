@@ -1,15 +1,16 @@
 <script lang="ts">
   import Select from '$lib/holocene/select/select.svelte';
   import Option from '$lib/holocene/select/option.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   export let conditional = '';
 
   const operations = {
-    '=': 'Equals',
-    '>': 'Greater than',
-    '>=': 'Greater than or equal to',
-    '<': 'Less than',
-    '<=': 'Less than or equal to',
+    '=': translate('equals'),
+    '>': translate('greater-than'),
+    '>=': translate('greater-than-or-equal-to'),
+    '<': translate('less-than'),
+    '<=': translate('less-than-or-equal-to'),
   };
 </script>
 

@@ -27,7 +27,7 @@ test('Top Navigation current namespace is present', async ({ page }) => {
 
   await expect(page.getByTestId('namespace-select-button')).toBeVisible();
   await page.getByTestId('namespace-select-button').click();
-  await expect(page.getByPlaceholder('Search')).toBeFocused();
+  await expect(page.locator('#namespace-search')).toBeFocused();
   await expect(page.getByRole('link', { name: 'default' })).toBeVisible();
 });
 
@@ -43,7 +43,7 @@ test('Top Navigation current namespace is present and has other namespaces to se
   ).toBeVisible();
 
   await page.getByTestId('namespace-select-button').click();
-  await expect(page.getByPlaceholder('Search')).toBeFocused();
+  await expect(page.locator('#namespace-search')).toBeFocused();
   await expect(page.getByRole('link', { name: 'default' })).toBeVisible();
   await expect(
     page.getByRole('link', { name: 'some-other-namespace' }),
@@ -52,7 +52,7 @@ test('Top Navigation current namespace is present and has other namespaces to se
     page.getByRole('link', { name: 'temporal-system' }),
   ).not.toBeVisible();
 
-  await page.getByPlaceholder('Search').type('some');
+  await page.locator('#namespace-search').type('some');
   await expect(page.getByRole('link', { name: 'default' })).not.toBeVisible();
 
   await page.getByRole('link', { name: 'some-other-namespace' }).click();
@@ -73,7 +73,7 @@ test('Top Navigation current namespace is present and has other namespaces to se
   ).toBeVisible();
 
   await page.getByTestId('namespace-select-button').click();
-  await expect(page.getByPlaceholder('Search')).toBeFocused();
+  await expect(page.locator('#namespace-search')).toBeFocused();
   await expect(page.getByRole('link', { name: 'default' })).toBeVisible();
   await expect(
     page.getByRole('link', { name: 'some-other-namespace' }),
@@ -82,7 +82,7 @@ test('Top Navigation current namespace is present and has other namespaces to se
     page.getByRole('link', { name: 'temporal-system' }),
   ).not.toBeVisible();
 
-  await page.getByPlaceholder('Search').type('some other namespace');
+  await page.locator('#namespace-search').type('some other namespace');
   await expect(page.getByRole('link', { name: 'default' })).not.toBeVisible();
   await expect(
     page.getByRole('link', { name: 'some-other-namespace' }),

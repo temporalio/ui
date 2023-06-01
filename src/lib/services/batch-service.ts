@@ -79,7 +79,7 @@ const createBatchOperationOptions = ({
 
 export async function bulkTerminateByIDs(
   options: CreateBatchOperationWithIDsOptions,
-): Promise<string> {
+): Promise<number> {
   const fullOptions = createBatchOperationOptions(options);
   const jobId = await terminateWorkflows(fullOptions);
   return pollBatchOperation({
@@ -98,7 +98,7 @@ export function batchTerminateByQuery({
 
 export async function bulkCancelByIDs(
   options: CreateBatchOperationWithIDsOptions,
-): Promise<string> {
+): Promise<number> {
   const fullOptions = createBatchOperationOptions(options);
   const jobId = await cancelWorkflows(fullOptions);
   return pollBatchOperation({
@@ -176,14 +176,14 @@ async function terminateWorkflows({
 export async function pollBatchOperation({
   namespace,
   jobId,
-}: DescribeBatchOperationOptions): Promise<string> {
-  return new Promise<string>((resolve, reject) => {
+}: DescribeBatchOperationOptions): Promise<number> {
+  return new Promise<number>((resolve, reject) => {
     describeBatchOperation({ namespace, jobId }).then(
       ({ state, completeOperationCount }) => {
         if (state === 'Failed') {
           reject();
         } else if (state !== 'Running') {
-          resolve(completeOperationCount);
+          resolve(parseInt(completeOperationCount, 10));
         } else {
           setTimeout(() => {
             try {
