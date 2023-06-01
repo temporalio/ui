@@ -43,14 +43,16 @@ describe('Set Codec Server Settings', () => {
         'Endpoint must start with http:// or https://',
       );
 
-      cy.get('[data-testid="confirm-modal-button"]').should('be.disabled');
+      cy.get('[data-testid="confirm-codec-settings-button"]').should(
+        'be.disabled',
+      );
 
       // Clear endpoint and set valid endpoint
       cy.get('[data-testid="data-encoder-endpoint-input"]').clear();
       cy.get('[data-testid="data-encoder-endpoint-input"]').type(
         'http://test.com',
       );
-      cy.get('[data-testid="confirm-modal-button"]').click();
+      cy.get('[data-testid="confirm-codec-settings-button"]').click();
 
       cy.get('@header')
         .find('[data-testid="data-encoder-status-configured"]')
@@ -92,7 +94,9 @@ describe('Set Codec Server Settings', () => {
       cy.get('[data-testid="data-encoder-endpoint-input"]').type(
         'http://test.com',
       );
-      cy.get('[data-testid="confirm-modal-button"]').should('be.disabled');
+      cy.get('[data-testid="confirm-codec-settings-button"]').should(
+        'be.disabled',
+      );
 
       cy.get('[data-testid="data-encoder-endpoint-error"]').contains(
         'Endpoint must be https:// if passing access token',
@@ -102,7 +106,7 @@ describe('Set Codec Server Settings', () => {
       cy.get('[data-testid="data-encoder-endpoint-input"]').type(
         'https://test.com',
       );
-      cy.get('[data-testid="confirm-modal-button"]').click();
+      cy.get('[data-testid="confirm-codec-settings-button"]').click();
 
       cy.get('@header')
         .find('[data-testid="data-encoder-status-configured"]')
@@ -140,9 +144,11 @@ describe('Set Codec Server Settings', () => {
       cy.get('[data-testid="data-encoder-endpoint-input"]').type(
         'http://test.com',
       );
-      cy.get('[data-testid="confirm-modal-button"]').should('be.enabled');
+      cy.get('[data-testid="confirm-codec-settings-button"]').should(
+        'be.enabled',
+      );
 
-      cy.get('[data-testid="confirm-modal-button"]').click();
+      cy.get('[data-testid="confirm-codec-settings-button"]').click();
 
       cy.get('@header')
         .find('[data-testid="data-encoder-status-configured"]')
@@ -173,7 +179,7 @@ describe('Set Codec Server Settings', () => {
       );
 
       cy.get('[data-testid="data-encoder-port-input"]').type('3456');
-      cy.get('[data-testid="confirm-modal-button"]').click();
+      cy.get('[data-testid="confirm-codec-settings-button"]').click();
 
       cy.get('@header')
         .find('[data-testid="data-encoder-status-configured"]')
@@ -247,14 +253,16 @@ describe('Set Codec Server Settings', () => {
         'Endpoint must start with http:// or https://',
       );
 
-      cy.get('[data-testid="confirm-modal-button"]').should('be.disabled');
+      cy.get('[data-testid="confirm-codec-settings-button"]').should(
+        'be.disabled',
+      );
 
       // Clear endpoint and set valid endpoint
       cy.get('[data-testid="data-encoder-endpoint-input"]').clear();
       cy.get('[data-testid="data-encoder-endpoint-input"]').type(
         'http://test.com',
       );
-      cy.get('[data-testid="confirm-modal-button"]').click();
+      cy.get('[data-testid="confirm-codec-settings-button"]').click();
 
       cy.get('@header')
         .find('[data-testid="data-encoder-status-configured"]')
