@@ -2,7 +2,7 @@ import {
   type TemporalServer,
   type TemporalServerOptions,
   createTemporalServer,
-} from '../temporal/temporal-server';
+} from '../utilities/temporal-server';
 
 import yargs from 'yargs/yargs';
 

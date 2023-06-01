@@ -29,7 +29,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm run dev:local --port=3333 --mode=test',
+    command: 'pnpm dev:playwright',
     port: 3333,
   },
   globalSetup: './tests/global-setup.ts',

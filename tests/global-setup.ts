@@ -8,7 +8,7 @@ import { type CodecServer, createCodecServer } from '../temporal/codec-server';
 import { runWorkersUntil } from '../temporal/workers';
 import { startWorkflows } from '../temporal/client';
 import { connect } from '../temporal/client';
-import { setLocalStorage } from '~/test-utilities/mock-local-storage';
+import { setLocalStorage } from './test-utilities/mock-local-storage';
 
 async function globalSetup(config: FullConfig) {
   const { mode } = config.metadata;
@@ -22,11 +22,9 @@ async function globalSetup(config: FullConfig) {
   await page.context().storageState({ path: './tests/storageState.json' });
 
   if (mode && mode === 'e2e') {
-    let codecServer: CodecServer;
-    let temporalServer: TemporalServer;
     try {
-      temporalServer = await createTemporalServer();
-      codecServer = await createCodecServer();
+      const temporalServer = await createTemporalServer();
+      const codecServer = await createCodecServer();
 
       await temporalServer.ready();
       await codecServer.start();
@@ -36,8 +34,6 @@ async function globalSetup(config: FullConfig) {
       await runWorkersUntil(result);
     } catch (error) {
       console.error(error);
-      await temporalServer.shutdown();
-      await codecServer.stop();
       return;
     }
   }

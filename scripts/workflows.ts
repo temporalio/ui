@@ -1,10 +1,10 @@
 import { connect, startWorkflows } from '../temporal/client';
-import { runWorkers } from '../temporal/workers';
+import { runWorkersUntil } from '../temporal/workers';
 
 async function main() {
   const client = await connect();
-  const wfs = await startWorkflows(client);
-  await runWorkers(wfs.map((wf) => wf.result()));
+  const result = startWorkflows(client);
+  await runWorkersUntil(result);
 }
 
 main().catch((err) => {
