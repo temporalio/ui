@@ -33,7 +33,6 @@ export default defineConfig({
     port: 3333,
   },
   globalSetup: './tests/global-setup.ts',
-  globalTeardown: './tests/global-teardown.ts',
   metadata: {
     mode: process.env.PW_MODE,
   },
