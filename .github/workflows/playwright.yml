@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  playwright-integration:
+  integration-tests:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
@@ -33,15 +33,13 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
-  playwright-e2e:
+  e2e-tests:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Checkout and Setup Node
         uses: ./.github/actions/checkout-and-setup
-      - name: Install Temporal cli
-        run: curl -sSf https://temporal.download/cli.sh | sh
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
       - name: Run E2E tests
