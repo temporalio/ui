@@ -52,7 +52,7 @@
             <Icon name="warning" class="text-orange-400" />
           </div>
         {/if}
-        <div class="mx-1 flex items-center relative">
+        <div class="mx-1 flex items-center">
           <Icon name="transcoder-error" />
         </div>
         <slot />
@@ -70,7 +70,7 @@
             <Icon name="warning" class="text-orange-400" />
           </div>
         {/if}
-        <div class="mx-1 flex items-center relative">
+        <div class="mx-1 flex items-center">
           <Icon name="transcoder-on" />
         </div>
         <slot />
@@ -84,7 +84,7 @@
       data-testid="data-encoder-status"
       on:click={onIconClick}
     >
-      <div class="mx-1 flex items-center relative">
+      <div class="mx-1 flex items-center">
         <Icon name="transcoder-off" />
       </div>
       <slot />
