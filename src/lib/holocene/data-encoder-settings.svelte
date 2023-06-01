@@ -13,6 +13,7 @@
     includeCredentials,
   } from '$lib/stores/data-encoder-config';
   import { validateHttpOrHttps, validateHttps } from '$lib/utilities/is-http';
+  import { clickOutside } from '$lib/holocene/outside-click';
 
   import CodecEndpointSettings from './codec-endpoint-settings.svelte';
   import DataConverterPortSettings from './data-converter-port-settings.svelte';
@@ -20,8 +21,8 @@
   import { refresh } from '$lib/stores/workflow-run';
   import Button from './button.svelte';
   import { dataEncoder } from '$lib/stores/data-encoder';
-  import ToggleSwitch from './toggle-switch.svelte';
-  import Input from './input/input.svelte';
+  import Card from './card.svelte';
+  import Icon from './icon/icon.svelte';
 
   let endpoint = $codecEndpoint ?? '';
   let port = $dataConverterPort ?? '';
@@ -68,6 +69,8 @@
 
 {#if $viewDataEncoderSettings}
   <div
+    use:clickOutside
+    on:click-outside={() => ($viewDataEncoderSettings = false)}
     in:fly={{ y: -50, delay: 0, duration: 500 }}
     class="relative w-full h-auto p-12 bg-blue-50 border-b border-blue-100 flex flex-col gap-6"
   >
@@ -77,7 +80,7 @@
         <Button thin variant="secondary" on:click={onClear}>Clear</Button>
         <Button
           thin
-          disabled={Boolean(error)}
+          disabled={!endpoint || Boolean(error)}
           testId="confirm-codec-settings-button"
           on:click={onConfirm}
           type="submit">Apply</Button
@@ -93,8 +96,8 @@
           Configure the Codec Server settings to be applied globally across all
           Namespaces in your current browser.
         </p>
-        <p class="text-red-700">
-          <strong>Warning!</strong> Local settings will override all configuration
+        <p class="text-orange-700 flex gap">
+          <Icon name="warning" /> Local settings will override all configuration
           settings below.
         </p>
       </div>
@@ -105,47 +108,51 @@
         {error}
       />
     </div>
-    {#if $dataEncoder.settingsEndpoint}
-      <div class="border-2 border-gray-900 bg-white rounded-xl p-2">
-        <div class="flex flex-col gap-4">
-          <h3 class="text-lg" data-testid="data-encoder-endpoint-title">
-            Configuration Settings
-          </h3>
-          <div class="flex flex-col gap-2">
-            <h3 class="text-lg" data-testid="data-encoder-endpoint-title">
-              Remote codec endpoint
-            </h3>
-            <textarea
-              class="block w-full rounded-md border-2 border-gray-900 p-2 cursor-not-allowed"
-              disabled
-              rows={3}
-              data-testid="data-encoder-configuration-endpoint"
-              value={$dataEncoder.settingsEndpoint}
-            />
-            <label
-              for="configuration-pass-access-token"
-              class="flex items-center gap-4 font-secondary text-sm"
-              ><ToggleSwitch
-                id="configuration-pass-access-token"
-                disabled
-                checked={$dataEncoder.settingsPassAccessToken}
-                data-testid="data-encoder-configuration-pass-access-token"
-              />Pass the user access token with your endpoint.
-            </label>
-            <label
-              for="configuration-include-credentials"
-              class="flex items-center gap-4 font-secondary text-sm"
-              ><ToggleSwitch
-                id="configuration-include-credentials"
-                disabled
-                checked={$dataEncoder.settingsIncludeCredentials}
-                data-testid="data-encoder-configuration-include-credentials"
-              />Include cross-origin credentials.
-            </label>
-          </div>
-        </div>
+    <div class="flex flex-col gap-4">
+      <h3 class="text-lg" data-testid="data-encoder-endpoint-title">
+        Configuration Settings
+      </h3>
+      <div class="flex flex-col gap-2">
+        <Card>
+          {#if $dataEncoder.settingsEndpoint}
+            <div class="flex flex-col gap-2">
+              <div>
+                <p class="font-medium">Remote codec endpoint</p>
+                <p class="break-all">
+                  {$dataEncoder.settingsEndpoint}
+                </p>
+              </div>
+              <div>
+                <p class="font-medium">
+                  Pass the user access token with your endpoint
+                </p>
+                <Icon
+                  name={$dataEncoder.settingsPassAccessToken
+                    ? 'checkmark'
+                    : 'close'}
+                  class={$dataEncoder.settingsPassAccessToken
+                    ? 'text-blue-700'
+                    : 'text-red-700'}
+                />
+              </div>
+              <div>
+                <p class="font-medium">Include cross-origin credentials</p>
+                <Icon
+                  name={$dataEncoder.settingsIncludeCredentials
+                    ? 'checkmark'
+                    : 'close'}
+                  class={$dataEncoder.settingsIncludeCredentials
+                    ? 'text-blue-700'
+                    : 'text-red-700'}
+                />
+              </div>
+            </div>
+          {:else}
+            <p>None</p>
+          {/if}
+        </Card>
       </div>
-    {/if}
+    </div>
     <DataConverterPortSettings bind:port />
     <p data-testid="data-encoder-info">
       *If both are set, the remote codec endpoint will be used.

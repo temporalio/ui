@@ -4,49 +4,61 @@
   import { dataEncoder } from '$lib/stores/data-encoder';
 
   import Tooltip from '$lib/holocene/tooltip.svelte';
-  import DataEncoderSettings, {
-    viewDataEncoderSettings,
-  } from './data-encoder-settings.svelte';
+  import { viewDataEncoderSettings } from './data-encoder-settings.svelte';
+  import { codecEndpoint } from '$lib/stores/data-encoder-config';
 
   const onIconClick = () =>
     ($viewDataEncoderSettings = !$viewDataEncoderSettings);
+
+  $: configuredText = $codecEndpoint
+    ? 'Codec Server is configured with local override'
+    : 'Codec Server is configured';
+  $: errorText = $codecEndpoint
+    ? 'Codec Server could not connect with local override'
+    : 'Codec Server could not connect';
+  $: successText = $codecEndpoint
+    ? 'Codec Server succesfully converted content with local override'
+    : 'Codec Server succesfully converted content';
 </script>
 
 {#if $dataEncoder?.hasEndpointOrPortConfigured}
   {#if $dataEncoder?.hasNotRequested}
-    <Tooltip bottomRight text={'Codec Server is configured'}>
+    <Tooltip bottomRight text={configuredText}>
       <button
         class="relative flex items-center"
+        class:override={$codecEndpoint}
         data-testid="data-encoder-status-configured"
         on:click={onIconClick}
       >
-        <div class="mr-2 ml-1 flex items-center">
+        <div class="mx-1 flex items-center">
           <Icon name="transcoder-on" />
         </div>
         <slot />
       </button>
     </Tooltip>
   {:else if $dataEncoder.hasError}
-    <Tooltip bottomRight text={`Codec Server could not connect`}>
+    <Tooltip bottomRight text={errorText}>
       <button
         class="relative flex items-center"
+        class:override={$codecEndpoint}
         data-testid="data-encoder-status-error"
         on:click={onIconClick}
       >
-        <div class="mr-2 ml-1 flex items-center">
+        <div class="mx-1 flex items-center">
           <Icon name="transcoder-error" />
         </div>
         <slot />
       </button>
     </Tooltip>
   {:else if $dataEncoder.hasSuccess}
-    <Tooltip bottomRight text={'Codec Server succesfully converted content'}>
+    <Tooltip bottomRight text={successText}>
       <button
         class="relative flex items-center"
+        class:override={$codecEndpoint}
         data-testid="data-encoder-status-success"
         on:click={onIconClick}
       >
-        <div class="mr-2 ml-1 flex items-center">
+        <div class="mx-1 flex items-center">
           <Icon name="transcoder-on" />
         </div>
         <slot />
@@ -60,10 +72,16 @@
       data-testid="data-encoder-status"
       on:click={onIconClick}
     >
-      <div class="mr-2 ml-1 flex items-center">
+      <div class="mx-1 flex items-center">
         <Icon name="transcoder-off" />
       </div>
       <slot />
     </button>
   </Tooltip>
 {/if}
+
+<style lang="postcss">
+  .override {
+    @apply rounded-sm border bg-orange-400 border-orange-700;
+  }
+</style>

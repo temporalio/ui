@@ -67,7 +67,7 @@
           <img
             src={$authUser?.picture}
             alt={$authUser?.profile ?? 'user profile'}
-            class="mt-2 h-[24px] w-[24px] cursor-pointer rounded-md"
+            class="h-[24px] w-[24px] cursor-pointer rounded-md"
             on:error={fixImage}
             class:hidden={!showProfilePic}
           />
