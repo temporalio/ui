@@ -67,7 +67,9 @@ const withBase = (path: string, namespace?: string): string => {
   return `${baseUrl}${path}`;
 };
 
-const encode = (parameters: APIRouteParameters): APIRouteParameters => {
+const encode = (
+  parameters: Partial<APIRouteParameters>,
+): APIRouteParameters => {
   return Object.keys(parameters ?? {}).reduce(
     (acc, key) => {
       acc[key] = encodeURIComponent(encodeURIComponent(parameters[key]));
@@ -84,7 +86,11 @@ const encode = (parameters: APIRouteParameters): APIRouteParameters => {
   );
 };
 
-export function pathForApi(route, parameters, shouldEncode = true): string {
+export function pathForApi(
+  route: APIRoutePath,
+  parameters?: Partial<APIRouteParameters>,
+  shouldEncode = true,
+): string {
   if (shouldEncode) parameters = encode(parameters);
 
   const routes: { [K in APIRoutePath]: string } = {
