@@ -6,8 +6,8 @@ ls:
 
 ignore:
   - .git
-  - node_modules
-  - build
-  - .vercel
-  - .svelte-kit
   - .histoire
+  - .svelte-kit
+  - .vercel
+  - build
+  - node_modules
