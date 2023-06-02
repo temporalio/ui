@@ -49,6 +49,7 @@
     "test:ui": "TZ=UTC vitest --ui",
     "test:coverage": "TZ=UTC vitest run --coverage",
     "test:e2e": ". ./.env.test.e2e && playwright test tests/e2e",
+    "test:e2e:run": "pnpm test:e2e --ui",
     "test:integration": ". ./.env.test.integration && playwright test tests/integration",
     "lint": "prettier --check --plugin-search-dir=. . && eslint --ignore-path .gitignore . && stylelint \"src/**/*.{css,postcss,svelte}\"",
     "lint:fix": "eslint --ignore-path .gitignore --fix",
