@@ -7,6 +7,8 @@ export const namespacesApi = apiUrl + '/namespaces**';
 export const workflowsApi = apiUrl + '/namespaces/default/workflows?query=';
 export const settingsApi = apiUrl + '/settings**';
 
+const namespaceApi = apiUrl + '/namespaces/**';
+
 const cluster = {
   supportedClients: {
     'temporal-cli': '\u003c2.0.0',
@@ -173,7 +175,7 @@ const archivalNamespace = {
 };
 
 export const mockNamespaceApi = async (page: Page) => {
-  await page.route(namespacesApi, async (route) => {
+  await page.route(namespaceApi, async (route) => {
     route.fulfill({ json: archivalNamespace });
   });
 };

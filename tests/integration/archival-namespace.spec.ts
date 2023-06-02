@@ -1,14 +1,12 @@
 import { test, expect } from '@playwright/test';
-import { mockNamespaceApi } from '$utilities/mock-apis';
+import { mockNamespaceApi } from '~/test-utilities/mock-apis';
 
-import { setLocalStorage } from '$utilities/mock-local-storage';
 const archivalWorkflowsUrl = '/namespaces/default/archival';
 
 const address = process.env.E2E_UI_ADDRESS ?? 'http://localhost:8233';
 
 test.beforeEach(async ({ page }) => {
   await page.goto(address);
-  await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
 });
 
 test.describe('Archival - Archival disabled', () => {

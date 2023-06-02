@@ -8,31 +8,29 @@ const require = createRequire(import.meta.url);
 
 let worker: Worker;
 
-const createWorker = async (): Promise<void> => {
-  if (!worker) {
-    worker = await Worker.create({
-      dataConverter: defaultDataConverter,
-      workflowsPath: require.resolve('./workflows'),
-      activities,
-      taskQueue: 'e2e-1',
-    });
-  }
+const createWorker = async (): Promise<Worker> => {
+  return Worker.create({
+    dataConverter: defaultDataConverter,
+    workflowsPath: require.resolve('./workflows'),
+    activities,
+    taskQueue: 'e2e-1',
+  });
 };
 
 export const runWorker = async () => {
-  await createWorker();
+  worker = await createWorker();
 
   return worker.run();
 };
 
 export const runWorkerUntil = async (completed: Promise<unknown>) => {
-  await createWorker();
+  worker = await createWorker();
 
   return worker.runUntil(completed);
 };
 
 export const stopWorker = async () => {
-  if (worker.getState() === 'RUNNING') {
+  if (worker && worker.getState() === 'RUNNING') {
     worker.shutdown();
   }
 };
