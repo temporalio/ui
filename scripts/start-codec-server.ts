@@ -12,21 +12,11 @@ const options: CodecServerOptions = {
 
 const server = await createCodecServer(options);
 
-server
-  .start()
-  .then((srv) => {
-    const address = srv.address();
-    console.log(
-      `Codec server listening on ${
-        typeof address === 'string' ? address : address?.port
-      }`,
-    );
-  })
-  .catch(async (error) => {
-    console.error(error);
-    await server.stop();
-    process.exit(1);
-  });
+server.start().catch(async (error) => {
+  console.error(error);
+  await server.stop();
+  process.exit(1);
+});
 
 process.on('beforeExit', () => {
   if (server) server.stop();

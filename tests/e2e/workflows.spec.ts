@@ -1,7 +1,7 @@
 import { test, expect, Locator } from '@playwright/test';
 
 test.beforeEach(async ({ page, baseURL }) => {
-  await page.goto(baseURL!);
+  await page.goto(baseURL);
 });
 
 test.describe('Workflows list', () => {
@@ -28,23 +28,16 @@ test.describe('Workflows list', () => {
     toggle = page.getByRole('cell', { name: 'MarkerRecorded' }).first();
     await toggle.click();
     await expect(
-      region.getByText('"Side effect for Plain text input 1"'),
-    ).toBeVisible();
-    await toggle.click();
-
-    toggle = page.getByRole('cell', { name: 'LocalActivity' }).first();
-    await toggle.click();
-    await expect(
       region.getByText('"Received Plain text input 1"'),
     ).toBeVisible();
     await toggle.click();
 
-    toggle = page.getByRole('cell', { name: 'ActivityTaskScheduled' });
+    toggle = page.getByRole('cell', { name: 'ActivityTaskScheduled' }).first();
     await toggle.click();
     await expect(region.getByText('"Plain text input 1"')).toBeVisible();
     await toggle.click();
 
-    toggle = page.getByRole('cell', { name: 'ActivityTaskCompleted' });
+    toggle = page.getByRole('cell', { name: 'ActivityTaskCompleted' }).first();
     await toggle.click();
     await expect(
       region.getByText('"Received Plain text input 1"'),
@@ -65,9 +58,9 @@ test.describe('Workflows list', () => {
     await page.getByText('Stack Trace').click();
 
     await expect(
-      page
-        .getByRole('code')
-        .filter({ hasText: 'github.com/temporalio/ui/e2e.Workflow' }),
+      page.getByRole('code').filter({
+        hasText: 'temporal/workflows.ts',
+      }),
     ).toBeVisible();
   });
 
@@ -75,10 +68,10 @@ test.describe('Workflows list', () => {
     await page.getByText('e2e-workflow-2').click({ position: { x: 0, y: 0 } });
 
     await page.getByText('Queries').click();
-    await page.getByLabel('Query Type').selectOption('current_result');
+    await page.getByLabel('Query Type').selectOption('is-blocked');
 
     await expect(
-      page.getByRole('code').filter({ hasText: 'Received Plain text input 2' }),
+      page.getByRole('code').filter({ hasText: 'true' }),
     ).toBeVisible();
   });
 });

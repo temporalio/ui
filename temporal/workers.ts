@@ -1,43 +1,35 @@
 import { createRequire } from 'node:module';
 import { Worker } from '@temporalio/worker';
 
-import { getDataConverter } from './data-converter';
 import * as activities from './activities/index';
+import { defaultDataConverter } from '@temporalio/common';
 
 const require = createRequire(import.meta.url);
 
-let worker1: Worker;
-let worker2: Worker;
+let worker: Worker;
 
 const createWorker1 = async () =>
   Worker.create({
-    dataConverter: getDataConverter(),
+    dataConverter: defaultDataConverter,
     workflowsPath: require.resolve('./workflows'),
     activities,
     taskQueue: 'e2e-1',
   });
 
-// Second task queue has only the workflow registered.
-// This allows us to ensure there is a pending activity as there are no workers polling for activities on this queue.
-const createWorker2 = async () =>
-  Worker.create({
-    dataConverter: getDataConverter(),
-    workflowsPath: require.resolve('./workflows'),
-    taskQueue: 'e2e-2',
-    enableNonLocalActivities: false,
-  });
+export const runWorker = async () => {
+  worker = await createWorker1();
 
-export const runWorkersUntil = async (completed: Promise<unknown>) => {
-  worker1 = await createWorker1();
-  worker2 = await createWorker2();
-
-  return Promise.all([
-    worker1.runUntil(completed),
-    worker2.runUntil(completed),
-  ]);
+  return worker.run();
 };
 
-export const stopWorkers = async () => {
-  worker1.shutdown();
-  worker2.shutdown();
+export const runWorkerUntil = async (completed: Promise<unknown>) => {
+  worker = await createWorker1();
+
+  return worker.runUntil(completed);
+};
+
+export const stopWorker = async () => {
+  if (worker.getState() === 'RUNNING') {
+    worker.shutdown();
+  }
 };

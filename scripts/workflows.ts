@@ -1,13 +1,13 @@
 import { connect, startWorkflows } from '../temporal/client';
-import { runWorkersUntil } from '../temporal/workers';
+import { runWorkerUntil } from '../temporal/workers';
 
 async function main() {
   const client = await connect();
-  const result = startWorkflows(client);
-  await runWorkersUntil(result);
+  const results = startWorkflows(client);
+  await runWorkerUntil(results);
 }
 
-main().catch((err) => {
-  console.error(err);
+main().catch((error) => {
+  console.error(error);
   process.exit(1);
 });

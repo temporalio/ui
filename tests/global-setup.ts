@@ -2,7 +2,7 @@ import { FullConfig, chromium } from '@playwright/test';
 
 import { createTemporalServer } from '../utilities/temporal-server';
 import { createCodecServer } from '../temporal/codec-server';
-import { runWorkersUntil } from '../temporal/workers';
+import { runWorker } from '../temporal/workers';
 import { startWorkflows } from '../temporal/client';
 import { connect } from '../temporal/client';
 import { setLocalStorage } from './test-utilities/mock-local-storage';
@@ -14,7 +14,7 @@ async function globalSetup(config: FullConfig) {
   const browser = await chromium.launch();
   const page = await browser.newPage();
 
-  await page.goto(baseURL!);
+  await page.goto(baseURL);
   await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
   await page.context().storageState({ path: './tests/storageState.json' });
 
@@ -28,8 +28,8 @@ async function globalSetup(config: FullConfig) {
 
   if (mode === 'e2e') {
     const client = await connect();
-    const result = startWorkflows(client);
-    await runWorkersUntil(result);
+    runWorker();
+    startWorkflows(client);
   }
 }
 
