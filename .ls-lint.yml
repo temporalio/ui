@@ -1,0 +1,13 @@
+ls:
+  .js: regex:[+_]?[a-z0-9\-\.]+
+  .ts: regex:[+_]?[a-z0-9\-\.]+
+  .d.ts: kebab-case
+  .svelte: regex:[+_]?[a-z0-9\-\.]+
+
+ignore:
+  - .git
+  - node_modules
+  - build
+  - .vercel
+  - .svelte-kit
+  - .histoire
