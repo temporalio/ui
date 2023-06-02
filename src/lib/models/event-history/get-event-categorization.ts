@@ -4,71 +4,74 @@ import type {
   IterableEvent,
 } from '$lib/types/events';
 
+type Categories = typeof CATEGORIES;
+export type EventTypeCategory = Categories[keyof Categories];
+
+export const CATEGORIES = {
+  ACTIVITY: 'activity',
+  CHILD_WORKFLOW: 'child-workflow',
+  COMMAND: 'command',
+  LOCAL_ACTIVITY: 'local-activity',
+  MARKER: 'marker',
+  SIGNAL: 'signal',
+  TIMER: 'timer',
+  UPDATE: 'update',
+  WORKFLOW: 'workflow',
+} as const;
+
 export const eventTypeCategorizations: Readonly<
   Record<EventType, EventTypeCategory>
 > = {
-  ActivityTaskCanceled: 'activity',
-  ActivityTaskCancelRequested: 'activity',
-  ActivityTaskCompleted: 'activity',
-  ActivityTaskFailed: 'activity',
-  ActivityTaskScheduled: 'activity',
-  ActivityTaskStarted: 'activity',
-  ActivityTaskTimedOut: 'activity',
+  ActivityTaskCanceled: CATEGORIES.ACTIVITY,
+  ActivityTaskCancelRequested: CATEGORIES.ACTIVITY,
+  ActivityTaskCompleted: CATEGORIES.ACTIVITY,
+  ActivityTaskFailed: CATEGORIES.ACTIVITY,
+  ActivityTaskScheduled: CATEGORIES.ACTIVITY,
+  ActivityTaskStarted: CATEGORIES.ACTIVITY,
+  ActivityTaskTimedOut: CATEGORIES.ACTIVITY,
 
-  ChildWorkflowExecutionCanceled: 'child-workflow',
-  ChildWorkflowExecutionCompleted: 'child-workflow',
-  ChildWorkflowExecutionFailed: 'child-workflow',
-  ChildWorkflowExecutionStarted: 'child-workflow',
-  ChildWorkflowExecutionTerminated: 'child-workflow',
-  ChildWorkflowExecutionTimedOut: 'child-workflow',
-  StartChildWorkflowExecutionFailed: 'child-workflow',
-  StartChildWorkflowExecutionInitiated: 'child-workflow',
+  ChildWorkflowExecutionCanceled: CATEGORIES.CHILD_WORKFLOW,
+  ChildWorkflowExecutionCompleted: CATEGORIES.CHILD_WORKFLOW,
+  ChildWorkflowExecutionFailed: CATEGORIES.CHILD_WORKFLOW,
+  ChildWorkflowExecutionStarted: CATEGORIES.CHILD_WORKFLOW,
+  ChildWorkflowExecutionTerminated: CATEGORIES.CHILD_WORKFLOW,
+  ChildWorkflowExecutionTimedOut: CATEGORIES.CHILD_WORKFLOW,
+  StartChildWorkflowExecutionFailed: CATEGORIES.CHILD_WORKFLOW,
+  StartChildWorkflowExecutionInitiated: CATEGORIES.CHILD_WORKFLOW,
 
-  MarkerRecorded: 'marker',
+  MarkerRecorded: CATEGORIES.MARKER,
 
-  SignalExternalWorkflowExecutionFailed: 'signal',
-  SignalExternalWorkflowExecutionInitiated: 'signal',
-  WorkflowExecutionSignaled: 'signal',
+  SignalExternalWorkflowExecutionFailed: CATEGORIES.SIGNAL,
+  SignalExternalWorkflowExecutionInitiated: CATEGORIES.SIGNAL,
+  WorkflowExecutionSignaled: CATEGORIES.SIGNAL,
 
-  TimerCanceled: 'timer',
-  TimerFired: 'timer',
-  TimerStarted: 'timer',
+  TimerCanceled: CATEGORIES.TIMER,
+  TimerFired: CATEGORIES.TIMER,
+  TimerStarted: CATEGORIES.TIMER,
 
-  WorkflowExecutionCanceled: 'workflow',
-  WorkflowExecutionCancelRequested: 'workflow',
-  WorkflowExecutionCompleted: 'workflow',
-  WorkflowExecutionContinuedAsNew: 'workflow',
-  WorkflowExecutionFailed: 'workflow',
-  WorkflowExecutionStarted: 'workflow',
-  WorkflowExecutionTerminated: 'workflow',
-  WorkflowExecutionTimedOut: 'workflow',
-  WorkflowTaskCompleted: 'workflow',
-  WorkflowTaskFailed: 'workflow',
-  WorkflowTaskScheduled: 'workflow',
-  WorkflowTaskStarted: 'workflow',
-  WorkflowTaskTimedOut: 'workflow',
-  ExternalWorkflowExecutionCancelRequested: 'workflow',
-  ExternalWorkflowExecutionSignaled: 'workflow',
-  RequestCancelExternalWorkflowExecutionFailed: 'workflow',
-  RequestCancelExternalWorkflowExecutionInitiated: 'workflow',
+  WorkflowExecutionCanceled: CATEGORIES.WORKFLOW,
+  WorkflowExecutionCancelRequested: CATEGORIES.WORKFLOW,
+  WorkflowExecutionCompleted: CATEGORIES.WORKFLOW,
+  WorkflowExecutionContinuedAsNew: CATEGORIES.WORKFLOW,
+  WorkflowExecutionFailed: CATEGORIES.WORKFLOW,
+  WorkflowExecutionStarted: CATEGORIES.WORKFLOW,
+  WorkflowExecutionTerminated: CATEGORIES.WORKFLOW,
+  WorkflowExecutionTimedOut: CATEGORIES.WORKFLOW,
+  WorkflowTaskCompleted: CATEGORIES.WORKFLOW,
+  WorkflowTaskFailed: CATEGORIES.WORKFLOW,
+  WorkflowTaskScheduled: CATEGORIES.WORKFLOW,
+  WorkflowTaskStarted: CATEGORIES.WORKFLOW,
+  WorkflowTaskTimedOut: CATEGORIES.WORKFLOW,
+  ExternalWorkflowExecutionCancelRequested: CATEGORIES.WORKFLOW,
+  ExternalWorkflowExecutionSignaled: CATEGORIES.WORKFLOW,
+  RequestCancelExternalWorkflowExecutionFailed: CATEGORIES.WORKFLOW,
+  RequestCancelExternalWorkflowExecutionInitiated: CATEGORIES.WORKFLOW,
 
-  UpsertWorkflowSearchAttributes: 'command',
+  UpsertWorkflowSearchAttributes: CATEGORIES.COMMAND,
 
-  WorkflowUpdateAccepted: 'update',
-  WorkflowUpdateCompleted: 'update',
+  WorkflowUpdateAccepted: CATEGORIES.UPDATE,
+  WorkflowUpdateCompleted: CATEGORIES.UPDATE,
 };
-
-export type EventTypeCategory = (typeof categories)[number];
-const categories = [
-  'activity',
-  'child-workflow',
-  'command',
-  'marker',
-  'signal',
-  'timer',
-  'workflow',
-  'update',
-] as const;
 
 export type EventTypeOption = {
   label: string;
@@ -78,21 +81,27 @@ export type EventTypeOption = {
 
 export const allEventTypeOptions: EventTypeOption[] = [
   { label: 'All', option: undefined },
-  { label: 'Activity', option: 'activity', color: '#8B5CF6' },
-  { label: 'Child Workflow', option: 'child-workflow', color: '#F59E0B' },
-  { label: 'Command', option: 'command', color: '#10B981' },
-  { label: 'Marker', option: 'marker', color: '#EC4899' },
-  { label: 'Signal', option: 'signal', color: '#DD6B20' },
-  { label: 'Timer', option: 'timer', color: '#1D4ED8' },
-  { label: 'Workflow', option: 'workflow', color: '#10B981' },
-  { label: 'Update', option: 'update' },
+  { label: 'Activity', option: CATEGORIES.ACTIVITY, color: '#8B5CF6' },
+  {
+    label: 'Child Workflow',
+    option: CATEGORIES.CHILD_WORKFLOW,
+    color: '#F59E0B',
+  },
+  { label: 'Command', option: CATEGORIES.COMMAND, color: '#10B981' },
+  { label: 'Local Activity', option: CATEGORIES.LOCAL_ACTIVITY },
+  { label: 'Marker', option: CATEGORIES.MARKER, color: '#EC4899' },
+  { label: 'Signal', option: CATEGORIES.SIGNAL, color: '#DD6B20' },
+  { label: 'Timer', option: CATEGORIES.TIMER, color: '#1D4ED8' },
+  { label: 'Update', option: CATEGORIES.UPDATE },
+  { label: 'Workflow', option: CATEGORIES.WORKFLOW, color: '#10B981' },
 ];
 
 const compactEventTypes: (EventTypeCategory | undefined)[] = [
   undefined,
-  'activity',
-  'signal',
-  'timer',
+  CATEGORIES.ACTIVITY,
+  CATEGORIES.LOCAL_ACTIVITY,
+  CATEGORIES.SIGNAL,
+  CATEGORIES.TIMER,
 ];
 export const compactEventTypeOptions: EventTypeOption[] =
   allEventTypeOptions.filter(({ option }) =>
@@ -100,12 +109,14 @@ export const compactEventTypeOptions: EventTypeOption[] =
   );
 
 const timelineEventTypes: EventTypeCategory[] = [
-  'activity',
-  'child-workflow',
-  'command',
-  'marker',
-  'signal',
-  'timer',
+  CATEGORIES.ACTIVITY,
+  CATEGORIES.LOCAL_ACTIVITY,
+  CATEGORIES.CHILD_WORKFLOW,
+  CATEGORIES.COMMAND,
+  CATEGORIES.MARKER,
+  CATEGORIES.SIGNAL,
+  CATEGORIES.TIMER,
+  CATEGORIES.UPDATE,
 ];
 export const timelineEventTypeOptions: EventTypeOption[] =
   allEventTypeOptions.filter(({ option }) =>
@@ -117,8 +128,8 @@ export const getEventCategory = (eventType: EventType): EventTypeCategory => {
 };
 
 export const isCategoryType = (value: string): value is EventTypeCategory => {
-  for (const category of categories) {
-    if (value === category) return true;
+  for (const category in CATEGORIES) {
+    if (value === CATEGORIES[category]) return true;
   }
   return false;
 };

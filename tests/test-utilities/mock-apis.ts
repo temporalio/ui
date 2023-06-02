@@ -139,3 +139,41 @@ export const mockClusterApi = async (page: Page) => {
     route.fulfill({ json: cluster });
   });
 };
+
+const archivalNamespace = {
+  namespaceInfo: {
+    name: 'some-archived-namespace',
+    state: 'Registered',
+    description: '',
+    ownerEmail: '',
+    data: {},
+    id: '5411056f-9bd0-4b4e-90fa-e88e3031a0d0',
+  },
+  config: {
+    workflowExecutionRetentionTtl: '259200s',
+    badBinaries: {
+      binaries: {},
+    },
+    historyArchivalState: 'Enabled',
+    historyArchivalUri: '',
+    visibilityArchivalState: 'Enabled',
+    visibilityArchivalUri: '',
+  },
+  replicationConfig: {
+    activeClusterName: 'active',
+    clusters: [
+      {
+        clusterName: 'active',
+      },
+    ],
+    state: 'Unspecified',
+  },
+  failoverVersion: '0',
+  isGlobalNamespace: false,
+};
+
+export const mockNamespaceApi = async (page: Page) => {
+  await page.route(namespacesApi, async (route) => {
+    route.fulfill({ json: archivalNamespace });
+  });
+};
