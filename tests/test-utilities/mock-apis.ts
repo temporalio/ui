@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test';
+import type { SettingsResponse } from '../../src/lib/types';
 
 export const apiUrl = 'http://localhost:8233/api/v1';
 export const workflowsApi = apiUrl + '/namespaces/default/workflows?query=';
@@ -67,5 +68,38 @@ const archivalNamespace = {
 export const mockNamespaceApi = async (page: Page) => {
   await page.route(namespaceApi, async (route) => {
     route.fulfill({ json: archivalNamespace });
+  });
+};
+
+const defaultSettings = {
+  Auth: {
+    Enabled: false,
+    Options: null,
+  },
+  DefaultNamespace: '',
+  ShowTemporalSystemNamespace: false,
+  FeedbackURL: '',
+  NotifyOnNewVersion: false,
+  Codec: {
+    Endpoint: '',
+    PassAccessToken: false,
+    IncludeCredentials: false,
+    DecodeEventHistoryDownload: false,
+  },
+  Version: '2.15.0',
+  DisableWriteActions: false,
+  WorkflowTerminateDisabled: false,
+  WorkflowCancelDisabled: false,
+  WorkflowSignalDisabled: false,
+  WorkflowResetDisabled: false,
+  BatchActionsDisabled: false,
+};
+
+export const mockSettingsApi = async (
+  page: Page,
+  customSettings: Partial<SettingsResponse> = {},
+) => {
+  await page.route(settingsApi, async (route) => {
+    route.fulfill({ json: { ...defaultSettings, ...customSettings } });
   });
 };

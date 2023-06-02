@@ -81,7 +81,7 @@
         <Button
           thin
           disabled={!endpoint || Boolean(error)}
-          testId="confirm-codec-settings-button"
+          testId="confirm-data-encoder-button"
           on:click={onConfirm}
           type="submit">Apply</Button
         >
