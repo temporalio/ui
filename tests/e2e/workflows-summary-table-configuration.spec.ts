@@ -22,7 +22,7 @@ const headersToAdd = ['History Size', 'History Length', 'Execution Time'];
 const headersToRemove = ['Type', 'Start', 'End'];
 
 test.beforeEach(async ({ page, baseURL }) => {
-  await page.goto(baseURL!);
+  await page.goto(baseURL);
 });
 
 test.describe('Workflows Table Configuration', () => {

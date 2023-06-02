@@ -3,7 +3,7 @@ import { mockNamespacesApi } from '~/test-utilities/mock-apis';
 import { setLocalStorage } from '~/test-utilities/mock-local-storage';
 
 test.beforeEach(async ({ page, baseURL }) => {
-  await page.goto(baseURL!);
+  await page.goto(baseURL);
 });
 
 test('New Top Navigation modal overlay is present', async ({ page }) => {

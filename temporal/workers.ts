@@ -8,22 +8,25 @@ const require = createRequire(import.meta.url);
 
 let worker: Worker;
 
-const createWorker1 = async () =>
-  Worker.create({
-    dataConverter: defaultDataConverter,
-    workflowsPath: require.resolve('./workflows'),
-    activities,
-    taskQueue: 'e2e-1',
-  });
+const createWorker = async (): Promise<void> => {
+  if (!worker) {
+    worker = await Worker.create({
+      dataConverter: defaultDataConverter,
+      workflowsPath: require.resolve('./workflows'),
+      activities,
+      taskQueue: 'e2e-1',
+    });
+  }
+};
 
 export const runWorker = async () => {
-  worker = await createWorker1();
+  await createWorker();
 
   return worker.run();
 };
 
 export const runWorkerUntil = async (completed: Promise<unknown>) => {
-  worker = await createWorker1();
+  await createWorker();
 
   return worker.runUntil(completed);
 };
