@@ -5,7 +5,10 @@
     signalWorkflow,
     terminateWorkflow,
   } from '$lib/services/workflow-service';
+  import { authUser } from '$lib/stores/auth-user';
 
+  import { formatReason } from '$lib/utilities/workflow-actions';
+  import { Action } from '$lib/models/workflow-actions';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
   import { ResetReapplyType } from '$lib/models/workflow-actions';
 
@@ -90,7 +93,12 @@
     terminateWorkflow({
       workflow,
       namespace,
-      reason,
+      reason: formatReason({
+        action: Action.Terminate,
+        reason,
+        email: $authUser.email,
+      }),
+      identity: $authUser.email,
     })
       .then(handleSuccessfulTermination)
       .catch(handleTerminationError);
@@ -153,7 +161,11 @@
         workflowId: workflow.id,
         runId: workflow.runId,
         eventId: resetId,
-        reason: resetReason,
+        reason: formatReason({
+          action: Action.Reset,
+          reason: resetReason,
+          email: $authUser.email,
+        }),
         resetReapplyType,
       });
 

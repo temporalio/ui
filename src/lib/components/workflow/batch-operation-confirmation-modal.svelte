@@ -1,10 +1,3 @@
-<script lang="ts" context="module">
-  export enum Action {
-    Terminate,
-    Cancel,
-  }
-</script>
-
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import Modal from '$lib/holocene/modal.svelte';
@@ -13,6 +6,8 @@
   import { allSelected } from '$lib/pages/workflows-with-new-search.svelte';
   import { translate } from '$lib/i18n/translate';
   import Translate from '$lib/i18n/translate.svelte';
+  import { formatReason, getPlacholder } from '$lib/utilities/workflow-actions';
+  import { Action } from '$lib/models/workflow-actions';
 
   export let action: Action;
   export let actionableWorkflowsLength: number;
@@ -32,31 +27,14 @@
       ? translate('workflows', 'cancel')
       : translate('workflows', 'terminate');
 
-  $: pastTenseActionText =
-    action === Action.Cancel
-      ? translate('workflows', 'canceled')
-      : translate('workflows', 'terminated');
+  $: placeholder = getPlacholder(action, $authUser.email);
 
-  let placeholder: string;
-  $: {
-    if ($authUser.email) {
-      placeholder = translate(
-        'workflows',
-        'batch-operation-confirmation-placeholder-by-email',
-        { action: pastTenseActionText, email: $authUser.email },
-      );
-    } else {
-      placeholder = translate(
-        'workflows',
-        'batch-operation-confirmation-placeholder',
-        { action: pastTenseActionText },
-      );
-    }
-  }
   let reason: string = '';
 
   const handleConfirmModal = () => {
-    dispatch('confirm', { reason: [reason.trim(), placeholder].join(' ') });
+    dispatch('confirm', {
+      reason: formatReason({ action, reason, email: $authUser.email }),
+    });
   };
 
   const handleCancelModal = () => {
