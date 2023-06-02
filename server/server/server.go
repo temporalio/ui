@@ -57,6 +57,7 @@ func NewServer(opts ...server_options.ServerOption) *Server {
 	authMiddleware := server_options.WithAPIMiddleware(([]api.Middleware{
 		headers.WithForwardHeaders(
 			[]string{
+				// NOTE: Authorization header is forwarded by grpc-gateway
 				auth.AuthorizationExtrasHeader,
 			}),
 	}))
