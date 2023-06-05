@@ -76,6 +76,9 @@ dependencies:
     version: 2.0.1
 
 devDependencies:
+  '@axe-core/playwright':
+    specifier: ^4.7.2
+    version: 4.7.2(playwright-core@1.30.0)
   '@babel/core':
     specifier: ^7.17.9
     version: 7.20.12
@@ -336,6 +339,15 @@ packages:
     dependencies:
       '@jridgewell/gen-mapping': 0.1.1
       '@jridgewell/trace-mapping': 0.3.17
+    dev: true
+
+  /@axe-core/playwright@4.7.2(playwright-core@1.30.0):
+    resolution: {integrity: sha512-k5f6KGVkPsZ7wR56XnRZYS4b1Wd8wkVTpjqeScFYZMTJxKVv3FGKoBqQVBoCphWtP0oMWQc41zQgHO6gaYTcQw==}
+    peerDependencies:
+      playwright-core: '>= 1.0.0'
+    dependencies:
+      axe-core: 4.7.2
+      playwright-core: 1.30.0
     dev: true
 
   /@babel/code-frame@7.18.6:
@@ -2743,6 +2755,11 @@ packages:
 
   /aws4@1.12.0:
     resolution: {integrity: sha512-NmWvPnx0F1SfrQbYwOi7OeaNGokp9XhzNioJ/CSBs8Qa4vxug81mhJEAVZwxXuBmYB5KDRfMq/F3RR0BIU7sWg==}
+    dev: true
+
+  /axe-core@4.7.2:
+    resolution: {integrity: sha512-zIURGIS1E1Q4pcrMjp+nnEh+16G56eG/MUllJH8yEvw7asDo7Ac9uhC9KIH5jzpITueEZolfYglnCGIuSBz39g==}
+    engines: {node: '>=4'}
     dev: true
 
   /babel-loader@8.3.0(@babel/core@7.20.12)(webpack@5.75.0):
