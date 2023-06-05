@@ -1,5 +1,6 @@
 {
   "*.{ts,js}": ["pnpm lint:fix", "prettier --write"],
   "*.{css,postcss,svelte}": "stylelint --fix",
-  "*.{json,md}": "prettier --write"
+  "*.{json,md}": "prettier --write",
+  "*": ["pnpm lint:fix", "prettier --write"]
 }
