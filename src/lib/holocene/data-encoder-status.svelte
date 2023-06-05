@@ -9,6 +9,9 @@
 
   const onIconClick = () => {
     $viewDataEncoderSettings = !$viewDataEncoderSettings;
+    if ($viewDataEncoderSettings) {
+      document.getElementById('content')?.scrollTo(0, 0);
+    }
   };
 
   $: configuredText = $codecEndpoint
