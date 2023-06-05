@@ -77,9 +77,8 @@
     bulkTerminateByIDs,
   } from '$lib/services/batch-service';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  import BatchOperationConfirmationModal, {
-    Action,
-  } from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
+  import BatchOperationConfirmationModal from '$lib/components/workflow/batch-operation-confirmation-modal.svelte';
+  import { Action } from '$lib/models/workflow-actions';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
   import { toaster } from '$lib/stores/toaster';
   import WorkflowsSummaryConfigurableTable from '$lib/components/workflow/workflows-summary-configurable-table.svelte';
