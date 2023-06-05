@@ -54,7 +54,7 @@ const toFilterQueryStatement = (
 
   if (isDuration(value) || isDurationString(value)) {
     if (archived || get(supportsAdvancedVisibility)) {
-      return `${queryKey} > "${toDate(value)}"`;
+      return `${queryKey} ${conditional || '>'} "${toDate(value)}"`;
     }
     return `${queryKey} BETWEEN "${toDate(value)}" AND "${tomorrow()}"`;
   }

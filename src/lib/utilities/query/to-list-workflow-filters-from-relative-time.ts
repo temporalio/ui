@@ -1,38 +1,8 @@
 import type { WorkflowFilter } from '$lib/models/workflow-filters';
-import { formatDuration } from 'date-fns';
 
-import { isConditional, isJoin, isParenthesis, isBetween } from '../is';
-import { durationKeys, fromDate } from '../to-duration';
-import { tokenize } from './tokenize';
+import { durationKeys } from '../to-duration';
 
-import type { FilterParameters, SearchAttributes } from '$lib/types/workflows';
-
-type Tokens = string[];
-export type ParsedParameters = FilterParameters & { timeRange?: string };
-
-const is =
-  (identifier: string) =>
-  (token: string): boolean => {
-    if (token.toLowerCase() === identifier.toLowerCase()) return true;
-    return false;
-  };
-
-const getTwoAhead = (tokens: Tokens, index: number): string =>
-  tokens[index + 2];
-
-const getTwoBehind = (tokens: Tokens, index: number): string =>
-  tokens[index - 2];
-
-export const getLargestDurationUnit = (duration: Duration): Duration => {
-  if (!duration) return;
-  for (const key of durationKeys) {
-    if (duration[key]) {
-      return { [key]: duration[key] };
-    }
-  }
-};
-
-const isDatetimeStatement = is('Datetime');
+import { capitalize } from '../format-camel-case';
 
 const emptyFilter = () => ({
   attribute: '',
@@ -42,19 +12,10 @@ const emptyFilter = () => ({
   conditional: '',
 });
 
-const DefaultAttributes: SearchAttributes = {
-  ExecutionStatus: 'Keyword',
-  StartTime: 'Datetime',
-  CloseTime: 'Datetime',
-  WorkflowId: 'Keyword',
-  WorkflowType: 'Keyword',
-  RunId: 'Keyword',
-};
-
 export const toListWorkflowFiltersFromRelativeTime = (
   query: string,
+  condition: 'latest' | 'earliest' = 'latest',
 ): WorkflowFilter[] => {
-  const tokens = tokenize(query);
   const filters: WorkflowFilter[] = [];
   const filter = emptyFilter();
 
@@ -73,7 +34,7 @@ export const toListWorkflowFiltersFromRelativeTime = (
 
     if (duration) {
       filter.attribute = 'StartTime';
-      filter.conditional = '>';
+      filter.conditional = condition === 'latest' ? '<' : '>';
       filter.value = `${amount} ${duration}`;
       filters.push(filter);
     }
@@ -83,6 +44,13 @@ export const toListWorkflowFiltersFromRelativeTime = (
     console.error('Error setting filter parameters: ', e);
     return [];
   }
+};
+
+export const toReadableRelativeTime = (
+  query: string,
+  condition: 'latest' | 'earliest' = 'latest',
+): string => {
+  return `${capitalize(condition)} time ${query}`;
 };
 
 const ShortHandDurations = {

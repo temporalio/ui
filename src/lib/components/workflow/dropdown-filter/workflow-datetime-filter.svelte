@@ -26,6 +26,7 @@
   import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
   import Menu from '$lib/holocene/primitives/menu/menu.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { toReadableRelativeTime } from '$lib/utilities/query/to-list-workflow-filters-from-relative-time';
 
   let custom = false;
   let value = 'All Time';
@@ -48,16 +49,25 @@
     (f) => f.attribute === 'StartTime' || f.attribute === 'CloseTime',
   );
   $: useBetweenDateTimeQuery = custom || !$supportsAdvancedVisibility;
+  $: earliestRelativeDuration = $page.url.searchParams.get('earliestTime');
+  $: latestRelativeDuration = $page.url.searchParams.get('latestTime');
 
   const setTimeValues = () => {
     if (!timeFilter) {
       value = 'All Time';
       timeField = 'StartTime';
     } else {
-      value =
-        custom || !columnOrderedDurations.includes(timeFilter?.value)
-          ? 'Custom'
-          : timeFilter.value;
+      if (latestRelativeDuration || earliestRelativeDuration) {
+        value = toReadableRelativeTime(
+          timeFilter.value,
+          latestRelativeDuration ? 'latest' : 'earliest',
+        );
+      } else {
+        value =
+          custom || !columnOrderedDurations.includes(timeFilter?.value)
+            ? 'Custom'
+            : timeFilter.value;
+      }
       timeField = timeFilter.attribute as string;
     }
 
@@ -176,7 +186,12 @@
       id="time-range-filter"
       hasIndicator
       controls="time-range-filter-menu"
-      class="flex flex-row items-center p-2 bg-white border border-r-0 border-primary rounded-l h-10 w-44"
+      class="flex flex-row items-center p-2 bg-white border border-r-0 border-primary rounded-l h-10 w-44 {Boolean(
+        earliestRelativeDuration || latestRelativeDuration,
+      )
+        ? 'bg-gray-200'
+        : ''}"
+      disabled={Boolean(earliestRelativeDuration || latestRelativeDuration)}
     >
       {value}
     </MenuButton>

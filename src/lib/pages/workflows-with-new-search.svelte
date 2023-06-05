@@ -122,16 +122,11 @@
     if (query) {
       // Set filters from inital page load query if it exists
       $workflowFilters = toListWorkflowFilters(query);
-      console.log('workflowFilters: ', $workflowFilters);
-    } else if (earliestRelativeDuration) {
+    } else if (latestRelativeDuration || earliestRelativeDuration) {
       $workflowFilters = toListWorkflowFiltersFromRelativeTime(
-        earliestRelativeDuration,
+        latestRelativeDuration || earliestRelativeDuration,
+        latestRelativeDuration ? 'latest' : 'earliest',
       );
-    } else if (latestRelativeDuration) {
-      $workflowFilters = toListWorkflowFiltersFromRelativeTime(
-        latestRelativeDuration,
-      );
-      console.log('workflowFilters: ', $workflowFilters);
     }
   });
 

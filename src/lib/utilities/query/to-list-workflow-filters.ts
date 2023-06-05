@@ -159,6 +159,11 @@ export const combineDropdownFilters = (filters: WorkflowFilter[]) => {
 
 export const updateQueryParamsFromFilter = debounce(
   (url: URL, filters: WorkflowFilter[], sorts: WorkflowSort[]) => {
+    const earliestRelativeDuration = url.searchParams.get('earliestTime');
+    const latestRelativeDuration = url.searchParams.get('latestTime');
+    if (earliestRelativeDuration || latestRelativeDuration) {
+      filters = filters.filter((f) => f.attribute !== 'StartTime');
+    }
     const allFilters = combineDropdownFilters(filters);
     const query = toListWorkflowQueryFromFilters(allFilters, sorts);
     updateQueryParameters({

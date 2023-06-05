@@ -32,6 +32,7 @@ const query = derived(
     if ($latestRelativeDuration || $earliestRelativeDuration) {
       const filters = toListWorkflowFiltersFromRelativeTime(
         $latestRelativeDuration || $earliestRelativeDuration,
+        $latestRelativeDuration ? 'latest' : 'earliest',
       );
       return toListWorkflowQueryFromFilters(filters, []);
     } else {
