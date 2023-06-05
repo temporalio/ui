@@ -21,7 +21,6 @@
   import { refresh } from '$lib/stores/workflow-run';
   import Button from './button.svelte';
   import { dataEncoder } from '$lib/stores/data-encoder';
-  import Icon from './icon/icon.svelte';
   import Alert from './alert.svelte';
 
   let endpoint = $codecEndpoint ?? '';
@@ -77,10 +76,15 @@
     <div class="flex items-center justify-between space-x-2">
       <h3 data-testid="data-encoder-title" class="text-xl">Codec Server</h3>
       <div class="flex items-center gap-2">
-        <Button thin variant="secondary" on:click={onClear}>Clear</Button>
         <Button
           thin
-          disabled={!endpoint || Boolean(error)}
+          variant="secondary"
+          testId="clear-data-encoder-button"
+          on:click={onClear}>Clear</Button
+        >
+        <Button
+          thin
+          disabled={(!endpoint && !port) || Boolean(error)}
           testId="confirm-data-encoder-button"
           on:click={onConfirm}
           type="submit">Apply</Button
@@ -99,6 +103,7 @@
         <Alert
           intent="warning"
           title="Local settings override all configuration settings"
+          data-testid="local-override-warning"
         >
           <p>
             Once applied, local settings will apply to all namespaces regardless
@@ -106,10 +111,10 @@
             settings.
           </p>
           <div class="flex items-center gap-2 mt-4">
-            <p data-testid="data-encoder-site-settings">
+            <p data-testid="data-encoder-configuration-settings">
               Configuration endpoint:
             </p>
-            <p data-testid="data-encoder-site-endpoint">
+            <p data-testid="data-encoder-configuration-endpoint">
               {$dataEncoder.settingsEndpoint}
             </p>
           </div>

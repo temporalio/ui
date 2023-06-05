@@ -21,6 +21,7 @@ export async function convertPayloadsWithCodec({
 }): Promise<PotentialPayloads> {
   const endpoint = settings?.codec?.endpoint;
   const passAccessToken = settings?.codec?.passAccessToken;
+  const includeCredentials = settings?.codec?.includeCredentials;
 
   const headers = {
     'Content-Type': 'application/json',
@@ -36,7 +37,7 @@ export async function convertPayloadsWithCodec({
     }
   }
 
-  const requestOptions = settings?.codec?.includeCredentials
+  const requestOptions = includeCredentials
     ? {
         headers,
         credentials: 'include' as RequestCredentials,

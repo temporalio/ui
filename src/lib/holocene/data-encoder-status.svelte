@@ -7,8 +7,9 @@
   import { viewDataEncoderSettings } from './data-encoder-settings.svelte';
   import { codecEndpoint } from '$lib/stores/data-encoder-config';
 
-  const onIconClick = () =>
-    ($viewDataEncoderSettings = !$viewDataEncoderSettings);
+  const onIconClick = () => {
+    $viewDataEncoderSettings = !$viewDataEncoderSettings;
+  };
 
   $: configuredText = $codecEndpoint
     ? 'Codec Server is configured with local override'
@@ -30,8 +31,11 @@
         on:click={onIconClick}
       >
         {#if $dataEncoder.settingsEndpointOverridden}
-          <div class="absolute -top-3 -right-2 scale-[80%]">
-            <Icon name="warning" class="text-orange-400" />
+          <div
+            class="absolute -top-3 -right-2 scale-75 rounded-full bg-orange-400"
+            data-testid="data-encoder-override-icon"
+          >
+            <Icon name="warning" class="text-white" />
           </div>
         {/if}
         <div class="mx-1 flex items-center">
@@ -48,8 +52,11 @@
         on:click={onIconClick}
       >
         {#if $dataEncoder.settingsEndpointOverridden}
-          <div class="absolute -top-3 -right-2 scale-[80%]">
-            <Icon name="warning" class="text-orange-400" />
+          <div
+            class="absolute -top-3 -right-2 scale-75 rounded-full bg-orange-400"
+            data-testid="data-encoder-override-icon"
+          >
+            <Icon name="warning" class="text-white" />
           </div>
         {/if}
         <div class="mx-1 flex items-center">
@@ -66,8 +73,11 @@
         on:click={onIconClick}
       >
         {#if $dataEncoder.settingsEndpointOverridden}
-          <div class="absolute -top-3 -right-2 scale-[80%]">
-            <Icon name="warning" class="text-orange-400" />
+          <div
+            class="absolute -top-3 -right-2 scale-75 rounded-full bg-orange-400"
+            data-testid="data-encoder-override-icon"
+          >
+            <Icon name="warning" class="text-white" />
           </div>
         {/if}
         <div class="mx-1 flex items-center">
