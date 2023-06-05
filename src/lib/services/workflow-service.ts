@@ -373,7 +373,9 @@ export async function retriggerWorkflow({
   eventId,
 }) {
   const response = await fetch(
-    `http://localhost:8092/api/v1/workflow/${namespace}/${workflowId}/${runId}/retrigger`,
+    `${
+      import.meta.env.VITE_FLOW_API
+    }/workflow/${namespace}/${workflowId}/${runId}/retrigger`,
     {
       headers: {
         'Content-Type': 'application/json',
