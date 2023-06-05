@@ -51,6 +51,7 @@
   $: useBetweenDateTimeQuery = custom || !$supportsAdvancedVisibility;
   $: earliestRelativeDuration = $page.url.searchParams.get('earliestTime');
   $: latestRelativeDuration = $page.url.searchParams.get('latestTime');
+  $: disabled = Boolean(earliestRelativeDuration || latestRelativeDuration);
 
   const setTimeValues = () => {
     if (!timeFilter) {
@@ -186,12 +187,10 @@
       id="time-range-filter"
       hasIndicator
       controls="time-range-filter-menu"
-      class="flex flex-row items-center p-2 bg-white border border-r-0 border-primary rounded-l h-10 w-44 {Boolean(
-        earliestRelativeDuration || latestRelativeDuration,
-      )
+      class="flex flex-row items-center p-2 bg-white border border-r-0 border-primary rounded-l h-10 w-44 {disabled}
         ? 'bg-gray-200'
         : ''}"
-      disabled={Boolean(earliestRelativeDuration || latestRelativeDuration)}
+      {disabled}
     >
       {value}
     </MenuButton>
