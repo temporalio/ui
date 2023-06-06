@@ -47,6 +47,7 @@
 
 <Modal
   bind:this={overlayModal}
+  id="overlay-modal"
   data-testid="overlay-modal"
   cancelText="Got it!"
   on:cancelModal={onClose}
