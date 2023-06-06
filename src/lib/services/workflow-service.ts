@@ -60,6 +60,7 @@ type TerminateWorkflowOptions = {
   workflow: WorkflowExecution;
   namespace: string;
   reason: string;
+  identity?: string;
 };
 
 export type ResetWorkflowOptions = {
@@ -244,6 +245,7 @@ export async function terminateWorkflow({
   workflow,
   namespace,
   reason,
+  identity,
 }: TerminateWorkflowOptions): Promise<null> {
   const route = routeForApi('workflow.terminate', {
     namespace,
@@ -251,7 +253,10 @@ export async function terminateWorkflow({
     runId: workflow.runId,
   });
   return await requestFromAPI<null>(route, {
-    options: { method: 'POST', body: stringifyWithBigInt({ reason }) },
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({ reason, ...(identity && { identity }) }),
+    },
     notifyOnError: false,
   });
 }

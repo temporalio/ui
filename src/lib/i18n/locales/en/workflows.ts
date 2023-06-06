@@ -10,8 +10,8 @@ export const Strings = {
   cancel: 'Cancel',
   reason: 'Reason',
   'batch-operation-modal-title': '{{action}} Workflows',
-  'batch-operation-confirmation-placeholder': '{{action}} from the Web UI',
-  'batch-operation-confirmation-placeholder-by-email':
+  'workflow-action-reason-placeholder': '{{action}} from the Web UI',
+  'workflow-action-reason-placeholder-with-email':
     '{{action}} from the Web UI by {{email}}',
   'batch-operation-confirmation-all':
     'Are you sure you want to {{action}} all workflows matching the following query? This action cannot be undone.',
@@ -32,7 +32,7 @@ export const Strings = {
   'batch-cancel-all-success':
     'The batch $t(cancel) request is processing in the background.',
   'batch-terminate-success': 'Successfully $t(terminated) {{count}} workflows.',
-  'batch-cancel-success': 'Successfully $(canceled) {{count}} workflows.',
+  'batch-cancel-success': 'Successfully $t(canceled) {{count}} workflows.',
   'configure-workflows': 'Configure Workflow List',
   'configure-workflows-description':
     'Add (<1></1>), re-arrange (<2></2>), and remove (<3></3>), Workflow Headings to personalize the Workflow List Table.',
@@ -46,6 +46,7 @@ export const Strings = {
   terminated: 'Terminated',
   canceled: 'Canceled',
   paused: 'Paused',
+  reset: 'Reset',
   'n-selected': '{{count, number}} selected',
   'all-selected': 'All {{count, number}} selected.',
   'select-all': 'select all {{count, number}}',

@@ -5,6 +5,7 @@ import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { isVersionNewer } from '$lib/utilities/version-check';
 import { temporalVersion } from '$lib/stores/versions';
+import { getAuthUser } from '$lib/stores/auth-user';
 
 import type {
   StartBatchOperationRequest,
@@ -152,12 +153,13 @@ async function terminateWorkflows({
 }: CreateBatchOperationOptions): Promise<string> {
   const route = routeForApi('batch-operations', { namespace });
   const jobId = uuidv4();
+  const identity = getAuthUser().email;
 
   const body: StartBatchOperationRequest = {
     jobId,
     namespace,
     reason,
-    terminationOperation: {},
+    terminationOperation: { ...(identity && { identity }) },
     ...(query && { visibilityQuery: query }),
     ...(executions && { executions }),
   };
