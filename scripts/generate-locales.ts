@@ -1,16 +1,12 @@
 import ts from 'typescript';
-import path, { join, relative } from 'path';
+import path, { relative } from 'path';
 import { writeFile, mkdir, stat } from 'fs/promises';
 import { $, glob, chalk } from 'zx';
 
 const SRC_DIR = path.resolve('./src/lib/i18n/locales');
 const DEST_DIR = path.resolve('./static/i18n/locales');
 
-const logAndExit = (
-  msg: string,
-  logError: (msg: string) => void,
-  err?: Error,
-) => {
+const logAndExit = (msg: string, logError: (msg: string) => void) => {
   logError(chalk.red(msg));
 
   if (logError === console.error) {
