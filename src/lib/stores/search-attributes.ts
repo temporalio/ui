@@ -1,4 +1,3 @@
-import { omit } from '$lib/utilities/omit';
 import { writable, get, derived, type Readable } from 'svelte/store';
 import type { WorkflowExecution, SearchAttributes } from '$lib/types/workflows';
 

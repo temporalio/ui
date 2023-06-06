@@ -1,7 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import {
   allSearchAttributes,
-  searchAttributes,
   isCustomSearchAttribute,
   workflowIncludesSearchAttribute,
 } from './search-attributes';

@@ -1,9 +1,6 @@
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
-import type {
-  SearchAttributesResponse,
-  SearchAttributes,
-} from '$lib/types/workflows';
+import type { SearchAttributesResponse } from '$lib/types/workflows';
 
 export const fetchSearchAttributesForNamespace = async (
   namespace: string,
