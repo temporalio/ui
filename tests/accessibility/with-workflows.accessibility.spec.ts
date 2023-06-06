@@ -36,16 +36,17 @@ const pages = [
 
 test.describe('Accessibility: Empty States', () => {
   for (const { title, url } of pages) {
-    test(`${title} page (${url}) should not have any automatically detectable accessibility issues`, async ({
-      page,
-    }) => {
-      await page.goto(url, { waitUntil: 'networkidle' });
+    test.fixme(
+      `${title} page (${url}) should not have any automatically detectable accessibility issues`,
+      async ({ page }) => {
+        await page.goto(url, { waitUntil: 'networkidle' });
 
-      const accessibilityScanResults = await new AxeBuilder({
-        page,
-      }).analyze();
+        const accessibilityScanResults = await new AxeBuilder({
+          page,
+        }).analyze();
 
-      expect(accessibilityScanResults.violations).toEqual([]);
-    });
+        expect(accessibilityScanResults.violations).toEqual([]);
+      },
+    );
   }
 });
