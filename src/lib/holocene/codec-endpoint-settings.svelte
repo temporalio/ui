@@ -9,25 +9,28 @@
 
 <div class="flex flex-col gap-4">
   <div class="flex flex-col gap-2">
-    <h3 class="text-lg" data-testid="data-encoder-endpoint-title">
-      Remote codec endpoint
+    <h3 class="text-sm font-medium" data-testid="data-encoder-endpoint-title">
+      Local Remote Codec Endpoint Override
     </h3>
-    <p class="text-base">
-      Enter your remote codec endpoint to decrypt your payloads.
+    <p class="text-sm">
+      Enter a local remote codec endpoint to override any configured at the
+      Namespace-level. This will be stored in your local browser and will only
+      be accessible by you.
     </p>
-    {#if error}
-      <small data-testid="data-encoder-endpoint-error" class="text-red-700"
-        >{error}</small
-      >
-    {/if}
     <textarea
       class="block w-full rounded-md border-2 border-gray-900 p-2"
       rows={3}
       placeholder="Paste your endpoint here"
       data-testid="data-encoder-endpoint-input"
+      class:error
       bind:value={endpoint}
       on:keydown|stopPropagation
     />
+    {#if error}
+      <small data-testid="data-encoder-endpoint-error" class="text-red-700"
+        >{error}</small
+      >
+    {/if}
     <label
       for="pass-access-token"
       class="flex items-center gap-4 font-secondary text-sm"
@@ -54,3 +57,9 @@
     {/if}
   </div>
 </div>
+
+<style lang="postcss">
+  .error {
+    @apply outline-red-700;
+  }
+</style>

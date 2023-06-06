@@ -16,6 +16,12 @@ export const includeCredentials = persistStore<boolean>(
   true,
 );
 
+export const overrideRemoteCodecConfiguration = persistStore<boolean>(
+  'overrideRemoteCodecConfiguration',
+  false,
+  true,
+);
+
 export const lastDataEncoderStatus =
   writable<DataEncoderStatus>('notRequested');
 

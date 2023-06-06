@@ -10,7 +10,6 @@ import { authUser } from './auth-user';
 type DataEncoder = {
   namespace: string;
   settingsEndpoint?: string;
-  settingsEndpointOverridden: boolean;
   settingsPassAccessToken: boolean;
   settingsIncludeCredentials: boolean;
   endpoint: string;
@@ -48,8 +47,6 @@ export const dataEncoder = derived(
       $page?.data?.settings?.codec?.includeCredentials,
     );
     const endpoint = $codecEndpoint || settingsEndpoint;
-    const settingsEndpointOverridden =
-      Boolean($codecEndpoint) && Boolean(settingsEndpoint);
     const accessToken = $authUser?.accessToken;
     const hasNotRequested = endpoint
       ? $lastDataEncoderStatus === 'notRequested'
@@ -66,7 +63,6 @@ export const dataEncoder = derived(
     return {
       namespace,
       settingsEndpoint,
-      settingsEndpointOverridden,
       settingsPassAccessToken,
       settingsIncludeCredentials,
       endpoint,
