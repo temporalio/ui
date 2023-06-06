@@ -11,3 +11,5 @@ ignore:
   - .vercel
   - build
   - node_modules
+  - dist
+  - server
