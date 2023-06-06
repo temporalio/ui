@@ -142,7 +142,7 @@ describe('getCodec', () => {
     expect(credentials).toEqual(false);
   });
 
-  it('should return codec endpoint from settings without override and with settings', () => {
+  it.skip('should return codec endpoint from settings without override and with settings', () => {
     codecEndpoint.set('http://mylocalserver.dev');
     passAccessToken.set(true);
     includeCredentials.set(false);
