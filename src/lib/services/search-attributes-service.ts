@@ -1,23 +1,19 @@
-import { searchAttributes } from '$lib/stores/search-attributes';
 import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
-import type { Settings } from '$lib/types/global';
-import type { SearchAttributesResponse } from '$lib/types/workflows';
+import type {
+  SearchAttributesResponse,
+  SearchAttributes,
+} from '$lib/types/workflows';
 
-export const fetchSearchAttributes = async (
-  settings: Settings,
+export const fetchSearchAttributesForNamespace = async (
+  namespace: string,
   request = fetch,
-): Promise<SearchAttributesResponse> => {
-  if (settings.runtimeEnvironment.isCloud) return;
-
-  const route = routeForApi('search-attributes');
-  return await requestFromAPI<SearchAttributesResponse>(route, {
+): Promise<Omit<SearchAttributesResponse, 'storageSchema'>> => {
+  const route = routeForApi('search-attributes', { namespace });
+  return requestFromAPI<SearchAttributesResponse>(route, {
     request,
-  }).then((searchAttributesResponse) => {
-    if (searchAttributesResponse?.keys) {
-      searchAttributes.set(searchAttributesResponse.keys);
-    }
-
-    return searchAttributesResponse;
-  });
+  }).then((searchAttributesResponse) => ({
+    customAttributes: searchAttributesResponse.customAttributes,
+    systemAttributes: searchAttributesResponse.systemAttributes,
+  }));
 };

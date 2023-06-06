@@ -57,6 +57,10 @@ export type APIRouteParameters = {
 export type WorkflowListRouteParameters = Pick<APIRouteParameters, 'namespace'>;
 export type NamespaceRouteParameters = Pick<APIRouteParameters, 'namespace'>;
 export type ScheduleListRouteParameters = Pick<APIRouteParameters, 'namespace'>;
+export type SearchAttributesRouteParameters = Pick<
+  APIRouteParameters,
+  'namespace'
+>;
 
 export type WorkflowRouteParameters = Pick<
   APIRouteParameters,

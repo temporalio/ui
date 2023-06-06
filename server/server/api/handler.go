@@ -32,6 +32,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
+	"github.com/temporalio/ui-server/v2/api/operatorservice/v1"
 	"github.com/temporalio/ui-server/v2/api/workflowservice/v1"
 	"github.com/temporalio/ui-server/v2/server/auth"
 	"github.com/temporalio/ui-server/v2/server/config"
@@ -155,8 +156,12 @@ func getTemporalClientMux(c echo.Context, temporalConn *grpc.ClientConn, apiMidd
 		)...,
 	)
 
-	if err := workflowservice.RegisterWorkflowServiceHandler(context.Background(), tMux, temporalConn); err != nil {
-		return nil, err
+	if wfErr := workflowservice.RegisterWorkflowServiceHandler(context.Background(), tMux, temporalConn); wfErr != nil {
+		return nil, wfErr
+	}
+
+	if opErr := operatorservice.RegisterOperatorServiceHandler(context.Background(), tMux, temporalConn); opErr != nil {
+		return nil, opErr
 	}
 	return tMux, nil
 }
