@@ -11,7 +11,7 @@ test.beforeEach(async ({ page }) => {
     './tests/accessibility/network-requests/empty-states.har',
     {
       updateMode: 'full',
-      update: true,
+      update: false,
       updateContent: 'embed',
       notFound: 'fallback',
       url: '**/api/v1/**',
