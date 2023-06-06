@@ -8,6 +8,7 @@
   import {
     allSelected,
     selectedWorkflows,
+    cancelableWorkflows,
     handleSelectAll,
     openBatchCancelConfirmationModal,
     openBatchTerminateConfirmationModal,
@@ -72,7 +73,7 @@
   {#if cancelEnabled}
     <BulkActionButton
       testId="bulk-cancel-button"
-      disabled={namespaceWriteDisabled}
+      disabled={namespaceWriteDisabled || !$cancelableWorkflows.length}
       on:click={openBatchCancelConfirmationModal}
       >{translate('workflows', 'request-cancellation')}</BulkActionButton
     >
