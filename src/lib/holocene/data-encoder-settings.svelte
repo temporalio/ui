@@ -52,10 +52,10 @@
   }
 
   $: if (!$viewDataEncoderSettings) {
-    onReset();
+    onCancel();
   }
 
-  const onReset = () => {
+  const onCancel = () => {
     endpoint = $codecEndpoint;
     port = $dataConverterPort;
     passToken = $passAccessToken;
@@ -155,8 +155,8 @@
           thin
           variant="link"
           disabled={!editing}
-          testId="reset-data-encoder-button"
-          on:click={onReset}>Cancel</Button
+          testId="cancel-data-encoder-button"
+          on:click={onCancel}>Cancel</Button
         >
       </div>
     </div>

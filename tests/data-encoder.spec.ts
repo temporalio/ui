@@ -62,7 +62,7 @@ test.describe('Data Encoder without Configuration Settings', () => {
     ).toBe('http://localhost:8080');
   });
 
-  test('Navigate to Data Encoder UI and configure and reset Local Settings', async ({
+  test('Navigate to Data Encoder UI and configure and cancel Local Settings', async ({
     page,
   }) => {
     const dataEncoderStatusButton = await page.getByTestId(
@@ -99,10 +99,13 @@ test.describe('Data Encoder without Configuration Settings', () => {
       .getByTestId('data-encoder-endpoint-input')
       .fill('http://localhost:9999');
 
-    const dataEncoderResetButton = await page.getByTestId(
-      'reset-data-encoder-button',
+    const dataEncoderCancelButton = await page.getByTestId(
+      'cancel-data-encoder-button',
     );
-    await dataEncoderResetButton.click();
+    await dataEncoderCancelButton.click();
+    await expect(dataEncoderStatusConfiguredButton).toBeVisible();
+    await dataEncoderStatusConfiguredButton.click();
+
     await expect(
       await page.getByTestId('data-encoder-endpoint-input').inputValue(),
     ).toBe('https://localhost:8080');
