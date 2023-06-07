@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import mockQueryApiWithStackTraceError from '../test-utilities/mocks/query-stack-trace-error';
 
 test.beforeEach(async ({ page, baseURL }) => {
   await page.goto(baseURL);
@@ -30,6 +31,22 @@ test.describe('Stack Trace with Running Workflow', () => {
 
     await expect(page.getByTestId('query-stack-trace')).toContainText(
       'at RunningWorkflow',
+    );
+  });
+
+  test('should handle errors when the stack trace is not formatted as we expect', async ({
+    page,
+  }) => {
+    await page
+      .getByText('running-workflow')
+      .click({ position: { x: 0, y: 0 } });
+
+    await page.getByText('Stack Trace').click();
+
+    await mockQueryApiWithStackTraceError(page);
+
+    await expect(page.getByTestId('query-stack-trace')).toHaveText(
+      '{"an":"error"}',
     );
   });
 });
