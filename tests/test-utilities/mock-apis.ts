@@ -5,6 +5,8 @@ export const workflowsApi = apiUrl + '/namespaces/default/workflows?query=';
 export const settingsApi = apiUrl + '/settings**';
 
 const clusterApi = apiUrl + '/cluster**';
+const namespaceApi = apiUrl + '/namespaces/**';
+
 const clusterInfo = {
   supportedClients: {
     'temporal-cli': '\u003c2.0.0',
@@ -27,5 +29,43 @@ const clusterInfo = {
 export const mockClusterApi = async (page: Page) => {
   await page.route(clusterApi, async (route) => {
     route.fulfill({ json: clusterInfo });
+  });
+};
+
+const archivalNamespace = {
+  namespaceInfo: {
+    name: 'some-archived-namespace',
+    state: 'Registered',
+    description: '',
+    ownerEmail: '',
+    data: {},
+    id: '5411056f-9bd0-4b4e-90fa-e88e3031a0d0',
+  },
+  config: {
+    workflowExecutionRetentionTtl: '259200s',
+    badBinaries: {
+      binaries: {},
+    },
+    historyArchivalState: 'Enabled',
+    historyArchivalUri: '',
+    visibilityArchivalState: 'Enabled',
+    visibilityArchivalUri: '',
+  },
+  replicationConfig: {
+    activeClusterName: 'active',
+    clusters: [
+      {
+        clusterName: 'active',
+      },
+    ],
+    state: 'Unspecified',
+  },
+  failoverVersion: '0',
+  isGlobalNamespace: false,
+};
+
+export const mockNamespaceApi = async (page: Page) => {
+  await page.route(namespaceApi, async (route) => {
+    route.fulfill({ json: archivalNamespace });
   });
 };

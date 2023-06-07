@@ -3,3 +3,9 @@ export enum ResetReapplyType {
   Signal = 1,
   None = 2,
 }
+
+export enum Action {
+  Cancel,
+  Reset,
+  Terminate,
+}

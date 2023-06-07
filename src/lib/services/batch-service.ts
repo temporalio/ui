@@ -5,6 +5,7 @@ import { requestFromAPI } from '$lib/utilities/request-from-api';
 import { routeForApi } from '$lib/utilities/route-for-api';
 import { isVersionNewer } from '$lib/utilities/version-check';
 import { temporalVersion } from '$lib/stores/versions';
+import { getAuthUser } from '$lib/stores/auth-user';
 
 import type {
   StartBatchOperationRequest,
@@ -79,7 +80,7 @@ const createBatchOperationOptions = ({
 
 export async function bulkTerminateByIDs(
   options: CreateBatchOperationWithIDsOptions,
-): Promise<string> {
+): Promise<number> {
   const fullOptions = createBatchOperationOptions(options);
   const jobId = await terminateWorkflows(fullOptions);
   return pollBatchOperation({
@@ -98,7 +99,7 @@ export function batchTerminateByQuery({
 
 export async function bulkCancelByIDs(
   options: CreateBatchOperationWithIDsOptions,
-): Promise<string> {
+): Promise<number> {
   const fullOptions = createBatchOperationOptions(options);
   const jobId = await cancelWorkflows(fullOptions);
   return pollBatchOperation({
@@ -152,12 +153,13 @@ async function terminateWorkflows({
 }: CreateBatchOperationOptions): Promise<string> {
   const route = routeForApi('batch-operations', { namespace });
   const jobId = uuidv4();
+  const identity = getAuthUser().email;
 
   const body: StartBatchOperationRequest = {
     jobId,
     namespace,
     reason,
-    terminationOperation: {},
+    terminationOperation: { ...(identity && { identity }) },
     ...(query && { visibilityQuery: query }),
     ...(executions && { executions }),
   };
@@ -176,14 +178,14 @@ async function terminateWorkflows({
 export async function pollBatchOperation({
   namespace,
   jobId,
-}: DescribeBatchOperationOptions): Promise<string> {
-  return new Promise<string>((resolve, reject) => {
+}: DescribeBatchOperationOptions): Promise<number> {
+  return new Promise<number>((resolve, reject) => {
     describeBatchOperation({ namespace, jobId }).then(
       ({ state, completeOperationCount }) => {
         if (state === 'Failed') {
           reject();
         } else if (state !== 'Running') {
-          resolve(completeOperationCount);
+          resolve(parseInt(completeOperationCount, 10));
         } else {
           setTimeout(() => {
             try {

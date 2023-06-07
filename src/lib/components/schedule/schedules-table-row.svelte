@@ -37,14 +37,13 @@
     );
   };
 
-  const getRoute = () =>
-    routeForSchedule({
-      namespace,
-      scheduleId: schedule?.scheduleId as string,
-    });
+  $: route = routeForSchedule({
+    namespace,
+    scheduleId: schedule?.scheduleId as string,
+  });
 </script>
 
-<TableRow href={getRoute()} class="schedule-row">
+<TableRow href={route} class="schedule-row">
   <td class="cell">
     <WorkflowStatus status={schedule?.info?.paused ? 'Paused' : 'Running'} />
   </td>
