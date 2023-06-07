@@ -7,7 +7,7 @@ settings:
 dependencies:
   '@codemirror/autocomplete':
     specifier: ^6.3.4
-    version: 6.4.0(@codemirror/language@6.3.2)(@codemirror/state@6.2.0)(@codemirror/view@6.7.2)(@lezer/common@1.0.2)
+    version: 6.4.0(@codemirror/language@6.3.2)(@codemirror/state@6.2.0)(@codemirror/view@6.7.2)(@lezer/common@1.0.3)
   '@codemirror/commands':
     specifier: ^6.1.2
     version: 6.1.3
@@ -76,6 +76,9 @@ dependencies:
     version: 2.0.1
 
 devDependencies:
+  '@axe-core/playwright':
+    specifier: ^4.7.2
+    version: 4.7.2(playwright-core@1.34.3)
   '@babel/core':
     specifier: ^7.17.9
     version: 7.20.12
@@ -95,8 +98,8 @@ devDependencies:
     specifier: ^0.16.1
     version: 0.16.1(vite@4.0.4)
   '@playwright/test':
-    specifier: ^1.30.0
-    version: 1.30.0
+    specifier: ^1.34.3
+    version: 1.34.3
   '@sveltejs/adapter-static':
     specifier: ^1.0.5
     version: 1.0.5(@sveltejs/kit@1.15.4)
@@ -336,6 +339,15 @@ packages:
     dependencies:
       '@jridgewell/gen-mapping': 0.1.1
       '@jridgewell/trace-mapping': 0.3.17
+    dev: true
+
+  /@axe-core/playwright@4.7.2(playwright-core@1.34.3):
+    resolution: {integrity: sha512-k5f6KGVkPsZ7wR56XnRZYS4b1Wd8wkVTpjqeScFYZMTJxKVv3FGKoBqQVBoCphWtP0oMWQc41zQgHO6gaYTcQw==}
+    peerDependencies:
+      playwright-core: '>= 1.0.0'
+    dependencies:
+      axe-core: 4.7.2
+      playwright-core: 1.34.3
     dev: true
 
   /@babel/code-frame@7.18.6:
@@ -646,7 +658,7 @@ packages:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
     dev: true
 
-  /@codemirror/autocomplete@6.4.0(@codemirror/language@6.3.2)(@codemirror/state@6.2.0)(@codemirror/view@6.7.2)(@lezer/common@1.0.2):
+  /@codemirror/autocomplete@6.4.0(@codemirror/language@6.3.2)(@codemirror/state@6.2.0)(@codemirror/view@6.7.2)(@lezer/common@1.0.3):
     resolution: {integrity: sha512-HLF2PnZAm1s4kGs30EiqKMgD7XsYaQ0XJnMR0rofEWQ5t5D60SfqpDIkIh1ze5tiEbyUWm8+VJ6W1/erVvBMIA==}
     peerDependencies:
       '@codemirror/language': ^6.0.0
@@ -657,7 +669,7 @@ packages:
       '@codemirror/language': 6.3.2
       '@codemirror/state': 6.2.0
       '@codemirror/view': 6.7.2
-      '@lezer/common': 1.0.2
+      '@lezer/common': 1.0.3
     dev: false
 
   /@codemirror/commands@6.1.3:
@@ -1430,6 +1442,10 @@ packages:
   /@lezer/common@1.0.2:
     resolution: {integrity: sha512-SVgiGtMnMnW3ActR8SXgsDhw7a0w0ChHSYAyAUxxrOiJ1OqYWEKk/xJd84tTSPo1mo6DXLObAJALNnd0Hrv7Ng==}
 
+  /@lezer/common@1.0.3:
+    resolution: {integrity: sha512-JH4wAXCgUOcCGNekQPLhVeUtIqjH0yPBs7vvUdSjyQama9618IOKFJwkv2kcqdhF0my8hQEgCTEJU0GIgnahvA==}
+    dev: false
+
   /@lezer/highlight@1.1.3:
     resolution: {integrity: sha512-3vLKLPThO4td43lYRBygmMY18JN3CPh9w+XS2j8WC30vR4yZeFG4z1iFe4jXE43NtGqe//zHW5q8ENLlHvz9gw==}
     dependencies:
@@ -1490,13 +1506,15 @@ packages:
     engines: {node: '>=8.0.0'}
     dev: true
 
-  /@playwright/test@1.30.0:
-    resolution: {integrity: sha512-SVxkQw1xvn/Wk/EvBnqWIq6NLo1AppwbYOjNLmyU0R1RoQ3rLEBtmjTnElcnz8VEtn11fptj1ECxK0tgURhajw==}
+  /@playwright/test@1.34.3:
+    resolution: {integrity: sha512-zPLef6w9P6T/iT6XDYG3mvGOqOyb6eHaV9XtkunYs0+OzxBtrPAAaHotc0X+PJ00WPPnLfFBTl7mf45Mn8DBmw==}
     engines: {node: '>=14'}
     hasBin: true
     dependencies:
       '@types/node': 16.18.11
-      playwright-core: 1.30.0
+      playwright-core: 1.34.3
+    optionalDependencies:
+      fsevents: 2.3.2
     dev: true
 
   /@polka/url@1.0.0-next.21:
@@ -2743,6 +2761,11 @@ packages:
 
   /aws4@1.12.0:
     resolution: {integrity: sha512-NmWvPnx0F1SfrQbYwOi7OeaNGokp9XhzNioJ/CSBs8Qa4vxug81mhJEAVZwxXuBmYB5KDRfMq/F3RR0BIU7sWg==}
+    dev: true
+
+  /axe-core@4.7.2:
+    resolution: {integrity: sha512-zIURGIS1E1Q4pcrMjp+nnEh+16G56eG/MUllJH8yEvw7asDo7Ac9uhC9KIH5jzpITueEZolfYglnCGIuSBz39g==}
+    engines: {node: '>=4'}
     dev: true
 
   /babel-loader@8.3.0(@babel/core@7.20.12)(webpack@5.75.0):
@@ -6811,8 +6834,8 @@ packages:
       pathe: 1.0.0
     dev: true
 
-  /playwright-core@1.30.0:
-    resolution: {integrity: sha512-7AnRmTCf+GVYhHbLJsGUtskWTE33SwMZkybJ0v6rqR1boxq2x36U7p1vDRV7HO2IwTZgmycracLxPEJI49wu4g==}
+  /playwright-core@1.34.3:
+    resolution: {integrity: sha512-2pWd6G7OHKemc5x1r1rp8aQcpvDh7goMBZlJv6Co5vCNLVcQJdhxRL09SGaY6HcyHH9aT4tiynZabMofVasBYw==}
     engines: {node: '>=14'}
     hasBin: true
     dev: true

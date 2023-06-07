@@ -45,6 +45,7 @@
 </script>
 
 <Modal
+  id="batch-operation-confirmation-modal"
   bind:this={modal}
   data-testid="batch-{actionText}-confirmation"
   confirmType="destructive"
