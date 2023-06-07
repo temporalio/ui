@@ -33,7 +33,7 @@
     "dev": "vite dev --mode temporal-server --port 3333",
     "start": "pnpm dev:local -- --open",
     "prepare": "svelte-kit sync && esno scripts/download-temporal.ts && husky install",
-    "dev:local": ". ./.env && VITE_TEMPORAL_UI_BUILD_TARGET=local vite dev --port 3000",
+    "dev:local": ". ./.env && VITE_TEMPORAL_UI_BUILD_TARGET=local vite dev --mode temporal-server --port 3000",
     "dev:docker": ". ./.env && VITE_API=http://localhost:8080 vite dev --port 3000",
     "dev:cloud": "VITE_TEMPORAL_UI_BUILD_TARGET=cloud vite dev --port 3000",
     "dev:ui-server": ". ./.env.ui-server && vite dev --mode ui-server --port 3000",
