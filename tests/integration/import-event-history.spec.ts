@@ -1,11 +1,15 @@
 import { test, expect } from '@playwright/test';
-import { settingsApi } from '~/test-utilities/mock-apis';
+import { mockGlobalApis, SETTINGS_API } from '~/test-utilities/mock-apis';
 import { setLocalStorage } from '~/test-utilities/mock-local-storage';
 
 const importUrl = '/import/events';
 const importEventHistoryUrl =
   '/import/events/default/workflow/run/history/feed';
 const workflowsUrl = '/namespaces/default/workflows';
+
+test.beforeEach(async ({ page }) => {
+  await mockGlobalApis(page);
+});
 
 test('Navigate to import page from nav', async ({ page }) => {
   await page.goto(workflowsUrl);
@@ -15,7 +19,7 @@ test('Navigate to import page from nav', async ({ page }) => {
   expect(namespace).toBe('default');
 
   await page.goto(importUrl);
-  await page.waitForRequest(settingsApi);
+  await page.waitForRequest(SETTINGS_API);
 
   await page.getByTestId('import-button').click();
 
@@ -30,7 +34,7 @@ test('Navigate to import page directly and upload a json file for event history 
   page,
 }) => {
   await page.goto(importUrl);
-  await page.waitForRequest(settingsApi);
+  await page.waitForRequest(SETTINGS_API);
   await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
 
   const title = await page.getByTestId('import-event-history').innerText();
@@ -60,7 +64,7 @@ test('Navigate to import event history page directly to import event history', a
   page,
 }) => {
   await page.goto(importEventHistoryUrl);
-  await page.waitForRequest(settingsApi);
+  await page.waitForRequest(SETTINGS_API);
   await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
 
   const table = await page.locator('table');

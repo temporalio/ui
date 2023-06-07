@@ -1,16 +1,20 @@
 import { test, expect } from '@playwright/test';
-import { mockNamespaceApi } from '~/test-utilities/mock-apis';
+import { mockNamespaceApi, mockGlobalApis } from '~/test-utilities/mock-apis';
 
 const archivalWorkflowsUrl = '/namespaces/default/archival';
-
-const address = process.env.E2E_UI_ADDRESS ?? 'http://localhost:8233';
+let archived: boolean;
 
 test.beforeEach(async ({ page }) => {
-  await page.goto(address);
+  await mockGlobalApis(page);
 });
 
 test.describe('Archival - Archival disabled', () => {
+  test.beforeAll(() => {
+    archived = false;
+  });
+
   test('it have the correct title on archival page', async ({ page }) => {
+    await mockNamespaceApi(page, archived);
     await page.goto(archivalWorkflowsUrl);
     const title = await page.getByTestId('archived-disabled-title').innerText();
     expect(title).toBe('This namespace is currently not enabled for archival.');
@@ -18,8 +22,12 @@ test.describe('Archival - Archival disabled', () => {
 });
 
 test.describe('Archival - Archival enabled', () => {
+  test.beforeAll(() => {
+    archived = true;
+  });
+
   test('it have the correct title on archival page', async ({ page }) => {
-    await mockNamespaceApi(page);
+    await mockNamespaceApi(page, archived);
     await page.goto(archivalWorkflowsUrl);
     const title = await page.getByTestId('archived-enabled-title').innerText();
     expect(title).toBe('Archived Workflows');
