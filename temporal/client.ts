@@ -1,13 +1,13 @@
 import { Connection, Client } from '@temporalio/client';
 import { Workflow, BlockingWorkflow } from './workflows';
-import { defaultDataConverter } from '@temporalio/common';
+import { getDataConverter } from './data-converter';
 
 export const connect = async () => {
   const connection = await Connection.connect();
 
   const client = new Client({
     connection,
-    dataConverter: defaultDataConverter,
+    dataConverter: getDataConverter(),
   });
 
   return client;

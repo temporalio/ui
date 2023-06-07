@@ -15,40 +15,35 @@ test.describe('Workflows list', () => {
 
     toggle = region.getByRole('heading', { name: 'Input and Results' });
     await toggle.click();
-    await expect(region.getByText('"Plain text input 1"')).toBeVisible();
+    const input = page.getByTestId('workflow-input');
+    await expect(input).toContainText('"Mock decoded payload"');
     await toggle.click();
 
     region = page.locator('.expanded-cell');
 
     toggle = page.getByRole('cell', { name: 'WorkflowExecutionStarted' });
     await toggle.click();
-    await expect(region.getByText('"Plain text input 1"')).toBeVisible();
+    await expect(region.getByText('"Mock decoded payload"')).toBeVisible();
     await toggle.click();
 
     toggle = page.getByRole('cell', { name: 'MarkerRecorded' }).first();
     await toggle.click();
-    await expect(
-      region.getByText('"Received Plain text input 1"'),
-    ).toBeVisible();
+    await expect(region.getByText('"Mock decoded payload"')).toBeVisible();
     await toggle.click();
 
     toggle = page.getByRole('cell', { name: 'ActivityTaskScheduled' }).first();
     await toggle.click();
-    await expect(region.getByText('"Plain text input 1"')).toBeVisible();
+    await expect(region.getByText('"Mock decoded payload"')).toBeVisible();
     await toggle.click();
 
     toggle = page.getByRole('cell', { name: 'ActivityTaskCompleted' }).first();
     await toggle.click();
-    await expect(
-      region.getByText('"Received Plain text input 1"'),
-    ).toBeVisible();
+    await expect(region.getByText('"Mock decoded payload"')).toBeVisible();
     await toggle.click();
 
     toggle = page.getByRole('cell', { name: 'WorkflowExecutionCompleted' });
     await toggle.click();
-    await expect(
-      region.getByText('"Received Plain text input 1"'),
-    ).toBeVisible();
+    await expect(region.getByText('"Mock decoded payload"')).toBeVisible();
     await toggle.click();
   });
 
@@ -57,11 +52,9 @@ test.describe('Workflows list', () => {
 
     await page.getByText('Stack Trace').click();
 
-    await expect(
-      page.getByRole('code').filter({
-        hasText: 'temporal/workflows.ts',
-      }),
-    ).toBeVisible();
+    await expect(page.getByRole('code')).toContainText(
+      '"Mock decoded payload"',
+    );
   });
 
   test('should render decoded query results', async ({ page }) => {
@@ -70,8 +63,8 @@ test.describe('Workflows list', () => {
     await page.getByText('Queries').click();
     await page.getByLabel('Query Type').selectOption('is-blocked');
 
-    await expect(
-      page.getByRole('code').filter({ hasText: 'true' }),
-    ).toBeVisible();
+    await expect(page.getByRole('code')).toContainText(
+      '"Mock decoded payload"',
+    );
   });
 });
