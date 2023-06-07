@@ -57,7 +57,7 @@ export const startWorkflows = async (
 
   workflows.push(wf1, wf2, wf3, wf4);
 
-  return Promise.all([wf1.result(), wf3.result(), wf4.result()]);
+  return Promise.all([wf1.result(), wf3.result()]);
 };
 
 export const stopWorkflows = (): Promise<void[]> => {
