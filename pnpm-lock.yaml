@@ -76,15 +76,18 @@ dependencies:
     version: 2.0.1
 
 devDependencies:
+  '@axe-core/playwright':
+    specifier: ^4.7.2
+    version: 4.7.2(playwright-core@1.34.3)
   '@babel/core':
-    specifier: ^7.20.12
+    specifier: ^7.17.9
     version: 7.20.12
   '@babel/preset-typescript':
-    specifier: ^7.18.6
+    specifier: ^7.16.7
     version: 7.18.6(@babel/core@7.20.12)
   '@grpc/grpc-js':
-    specifier: ^1.8.3
-    version: 1.8.3
+    specifier: ^1.3.7
+    version: 1.7.3
   '@histoire/controls':
     specifier: ^0.16.1
     version: 0.16.1(vite@4.0.4)
@@ -336,6 +339,15 @@ packages:
     dependencies:
       '@jridgewell/gen-mapping': 0.1.1
       '@jridgewell/trace-mapping': 0.3.17
+    dev: true
+
+  /@axe-core/playwright@4.7.2(playwright-core@1.34.3):
+    resolution: {integrity: sha512-k5f6KGVkPsZ7wR56XnRZYS4b1Wd8wkVTpjqeScFYZMTJxKVv3FGKoBqQVBoCphWtP0oMWQc41zQgHO6gaYTcQw==}
+    peerDependencies:
+      playwright-core: '>= 1.0.0'
+    dependencies:
+      axe-core: 4.7.2
+      playwright-core: 1.34.3
     dev: true
 
   /@babel/code-frame@7.18.6:
@@ -1258,14 +1270,6 @@ packages:
       '@types/node': 16.18.11
     dev: true
 
-  /@grpc/grpc-js@1.8.3:
-    resolution: {integrity: sha512-1oO40SPA9nyBEsSMg0Mq7aMxQMVH009NJLG4HeMPQ7kdDGWuC5fI6dmEjaEJzUbtmC1S2leLaDRMB4ByZ1cFew==}
-    engines: {node: ^8.13.0 || >=10.10.0}
-    dependencies:
-      '@grpc/proto-loader': 0.7.4
-      '@types/node': 16.18.11
-    dev: true
-
   /@grpc/proto-loader@0.7.4:
     resolution: {integrity: sha512-MnWjkGwqQ3W8fx94/c1CwqLsNmHHv2t0CFn+9++6+cDphC1lolpg9M2OU0iebIjK//pBNX9e94ho+gjx6vz39w==}
     engines: {node: '>=6'}
@@ -1274,7 +1278,7 @@ packages:
       '@types/long': 4.0.2
       lodash.camelcase: 4.3.0
       long: 4.0.0
-      protobufjs: 7.1.2
+      protobufjs: 7.2.2
       yargs: 16.2.0
     dev: true
 
@@ -2749,6 +2753,11 @@ packages:
 
   /aws4@1.12.0:
     resolution: {integrity: sha512-NmWvPnx0F1SfrQbYwOi7OeaNGokp9XhzNioJ/CSBs8Qa4vxug81mhJEAVZwxXuBmYB5KDRfMq/F3RR0BIU7sWg==}
+    dev: true
+
+  /axe-core@4.7.2:
+    resolution: {integrity: sha512-zIURGIS1E1Q4pcrMjp+nnEh+16G56eG/MUllJH8yEvw7asDo7Ac9uhC9KIH5jzpITueEZolfYglnCGIuSBz39g==}
+    engines: {node: '>=4'}
     dev: true
 
   /babel-loader@8.3.0(@babel/core@7.20.12)(webpack@5.75.0):
@@ -7378,25 +7387,6 @@ packages:
       '@types/long': 4.0.2
       '@types/node': 16.18.11
       long: 4.0.0
-    dev: true
-
-  /protobufjs@7.1.2:
-    resolution: {integrity: sha512-4ZPTPkXCdel3+L81yw3dG6+Kq3umdWKh7Dc7GW/CpNk4SX3hK58iPCWeCyhVTDrbkNeKrYNZ7EojM5WDaEWTLQ==}
-    engines: {node: '>=12.0.0'}
-    requiresBuild: true
-    dependencies:
-      '@protobufjs/aspromise': 1.1.2
-      '@protobufjs/base64': 1.1.2
-      '@protobufjs/codegen': 2.0.4
-      '@protobufjs/eventemitter': 1.1.0
-      '@protobufjs/fetch': 1.1.0
-      '@protobufjs/float': 1.0.2
-      '@protobufjs/inquire': 1.1.0
-      '@protobufjs/path': 1.1.2
-      '@protobufjs/pool': 1.1.0
-      '@protobufjs/utf8': 1.1.0
-      '@types/node': 16.18.11
-      long: 5.2.1
     dev: true
 
   /protobufjs@7.2.2:
