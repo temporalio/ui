@@ -13,13 +13,13 @@
 
   const cluster: ClusterInformation = $page.data.cluster;
 
-  const { recommended, current } = cluster.versionInfo;
-  const [alert] = cluster?.versionInfo?.alerts;
-  const severity = alert.severity;
-  const key = `server-v${current.version}`;
+  const { recommended, current, alerts } = cluster?.versionInfo;
+  const alert = alerts?.[0];
+  const severity = alert?.severity;
+  const key = `server-v${current?.version}`;
   const link = getLinkForTemporalVersion(cluster);
   const message =
-    alert.severity === 'Low'
+    alert?.severity === 'Low'
       ? `📥 Temporal v${recommended?.version} is available`
       : `📥 ${alert?.message}`;
 </script>
