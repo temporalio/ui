@@ -19,10 +19,10 @@
     </p>
     <textarea
       class="block w-full rounded-xl border-2 border-gray-900 p-2"
+      class:error
       rows={3}
       placeholder="Paste your endpoint here"
       data-testid="data-encoder-endpoint-input"
-      class:error
       bind:value={endpoint}
       on:keydown|stopPropagation
     />
