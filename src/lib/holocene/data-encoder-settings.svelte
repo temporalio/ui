@@ -37,6 +37,9 @@
     override !== $overrideRemoteCodecConfiguration;
 
   $: error = '';
+  $: namespaceOrCluster = $page.data?.settings?.runtimeEnvironment?.isCloud
+    ? 'Namespace'
+    : 'Cluster';
 
   $: {
     if (passToken && !validateHttps(endpoint)) {
@@ -58,7 +61,6 @@
     passToken = $passAccessToken;
     includeCreds = $includeCredentials;
     override = $overrideRemoteCodecConfiguration;
-    // $viewDataEncoderSettings = false;
   };
 
   const onConfirm = () => {
@@ -90,45 +92,48 @@
       <p class="text-sm">
         The Codec Server uses a remote codec endpoint to decrypt your payloads,
         ensuring that Temporal never sees your data. A remote codec endpoint can
-        be set at the Namespace-level, or locally in your browser.
+        be set at the {namespaceOrCluster}-level, or locally in your browser.
       </p>
       <Accordion
         data-testid="override-accordion"
         title={override
-          ? 'Uses my local setting and ignores Namespace-level settings.'
-          : 'Uses Namespace-level settings, where available.'}
+          ? `Uses my local setting and ignores ${namespaceOrCluster}-level settings.`
+          : `Uses ${namespaceOrCluster}-level settings, where available.`}
       >
-        <label
-          class="flex flex-row items-center gap-2 cursor-pointer"
-          for="use-configuration-endpoint-radio"
-        >
-          <input
-            on:click={() => (override = false)}
-            class="w-4 h-4 accent-gray-900"
-            type="radio"
-            checked={!override}
-            name="use-configuration-endpoint"
-            id="use-configuration-endpoint-radio"
-            data-testid="use-configuration-endpoint-input"
-          />
-          Uses Namespace-level settings, where available. Otherwise, use my local
-          setting.
-        </label>
-        <label
-          class="flex flex-row items-center gap-2 cursor-pointer"
-          for="use-local-endpoint-radio"
-        >
-          <input
-            on:click={() => (override = true)}
-            class="w-4 h-4 accent-gray-900"
-            type="radio"
-            checked={override}
-            name="use-local-endpoint"
-            id="use-local-endpoint-radio"
-            data-testid="use-local-endpoint-input"
-          />
-          Uses my local setting and ignores Namespace-level settings.
-        </label>
+        <div class="flex flex-col gap-2">
+          <label
+            class="flex flex-row items-center gap-2 cursor-pointer"
+            for="use-configuration-endpoint-radio"
+          >
+            <input
+              on:click={() => (override = false)}
+              class="w-4 h-4 accent-gray-900"
+              type="radio"
+              checked={!override}
+              name="use-configuration-endpoint"
+              id="use-configuration-endpoint-radio"
+              data-testid="use-configuration-endpoint-input"
+            />
+            Uses {namespaceOrCluster}-level settings, where available.
+            Otherwise, use my local setting.
+          </label>
+          <label
+            class="flex flex-row items-center gap-2 cursor-pointer"
+            for="use-local-endpoint-radio"
+          >
+            <input
+              on:click={() => (override = true)}
+              class="w-4 h-4 accent-gray-900"
+              type="radio"
+              checked={override}
+              name="use-local-endpoint"
+              id="use-local-endpoint-radio"
+              data-testid="use-local-endpoint-input"
+            />
+            Uses my local setting and ignores {namespaceOrCluster}-level
+            settings.
+          </label>
+        </div>
       </Accordion>
       <CodecEndpointSettings
         bind:endpoint
@@ -140,7 +145,7 @@
       <div class="flex items-center gap-4">
         <Button
           thin
-          disabled={Boolean(error)}
+          disabled={Boolean(error) || (override && !endpoint)}
           testId="confirm-data-encoder-button"
           on:click={onConfirm}
           type="submit">Apply</Button

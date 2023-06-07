@@ -4,7 +4,11 @@ import {
   dataConverterPort,
   lastDataConverterStatus,
 } from './data-converter-config';
-import { codecEndpoint, lastDataEncoderStatus } from './data-encoder-config';
+import {
+  codecEndpoint,
+  lastDataEncoderStatus,
+  overrideRemoteCodecConfiguration,
+} from './data-encoder-config';
 import { authUser } from './auth-user';
 
 type DataEncoder = {
@@ -25,6 +29,7 @@ export const dataEncoder = derived(
   [
     page,
     codecEndpoint,
+    overrideRemoteCodecConfiguration,
     lastDataEncoderStatus,
     dataConverterPort,
     lastDataConverterStatus,
@@ -33,6 +38,7 @@ export const dataEncoder = derived(
   ([
     $page,
     $codecEndpoint,
+    $overrideRemoteCodecConfiguration,
     $lastDataEncoderStatus,
     $dataConverterPort,
     $lastDataConverterStatus,
@@ -46,7 +52,9 @@ export const dataEncoder = derived(
     const settingsIncludeCredentials = Boolean(
       $page?.data?.settings?.codec?.includeCredentials,
     );
-    const endpoint = $codecEndpoint || settingsEndpoint;
+    const endpoint = $overrideRemoteCodecConfiguration
+      ? $codecEndpoint
+      : settingsEndpoint || $codecEndpoint;
     const accessToken = $authUser?.accessToken;
     const hasNotRequested = endpoint
       ? $lastDataEncoderStatus === 'notRequested'
