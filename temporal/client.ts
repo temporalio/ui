@@ -44,8 +44,10 @@ export const startWorkflows = async (client: Client): Promise<string[]> => {
 export const stopWorkflows = (): Promise<void[]> => {
   return Promise.all(
     workflows.map(async (workflow) => {
-      await workflow.terminate();
-      console.log(`🔪 terminated workflow ${workflow.workflowId}`);
+      try {
+        await workflow.terminate();
+        console.log(`🔪 terminated workflow ${workflow.workflowId}`);
+      } catch {} // eslint-disable-line no-empty
     }),
   );
 };
