@@ -1,5 +1,5 @@
 import { Plugin } from 'vite';
-import { generateLocales } from '../scripts/generate-locales';
+import { generateLocales } from '../utilities/generate-locales';
 
 type PluginOptions = {
   src: string;
