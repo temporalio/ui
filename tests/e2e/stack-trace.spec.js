@@ -19,3 +19,17 @@ test.describe('Stack Trace With Completed Workflow', () => {
     );
   });
 });
+
+test.describe('Stack Trace with Running Workflow', () => {
+  test('should show stack trace for running workflow', async ({ page }) => {
+    await page
+      .getByText('running-workflow')
+      .click({ position: { x: 0, y: 0 } });
+
+    await page.getByText('Stack Trace').click();
+
+    await expect(page.getByTestId('query-stack-trace')).toContainText(
+      'at RunningWorkflow',
+    );
+  });
+});

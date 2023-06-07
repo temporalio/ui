@@ -1,5 +1,10 @@
 import { Connection, Client, WorkflowHandle } from '@temporalio/client';
-import { Workflow, BlockingWorkflow, CompletedWorkflow } from './workflows';
+import {
+  Workflow,
+  BlockingWorkflow,
+  CompletedWorkflow,
+  RunningWorkflow,
+} from './workflows';
 import { getDataConverter } from './data-converter';
 
 let connection: Connection;
@@ -25,7 +30,7 @@ const workflows: WorkflowHandle[] = [];
 
 export const startWorkflows = async (
   client: Client,
-): Promise<(string | number)[]> => {
+): Promise<(string | number | void)[]> => {
   const wf1 = await client.workflow.start(Workflow, {
     taskQueue: 'e2e-1',
     args: ['Plain text input 1'],
@@ -44,9 +49,15 @@ export const startWorkflows = async (
     workflowId: 'completed-workflow',
   });
 
-  workflows.push(wf1, wf2, wf3);
+  const wf4 = await client.workflow.start(RunningWorkflow, {
+    taskQueue: 'e2e-1',
+    args: [],
+    workflowId: 'running-workflow',
+  });
 
-  return Promise.all([wf1.result(), wf3.result()]);
+  workflows.push(wf1, wf2, wf3, wf4);
+
+  return Promise.all([wf1.result(), wf3.result(), wf4.result()]);
 };
 
 export const stopWorkflows = (): Promise<void[]> => {

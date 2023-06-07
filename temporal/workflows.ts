@@ -61,3 +61,7 @@ export async function CompletedWorkflow(
 
   return await double(amount);
 }
+
+export async function RunningWorkflow(): Promise<void> {
+  return await workflow.sleep('10 days');
+}
