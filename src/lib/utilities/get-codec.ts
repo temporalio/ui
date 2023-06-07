@@ -23,9 +23,10 @@ export const getCodecPassAccessToken = (
   override = overrideRemoteCodecConfiguration,
 ): boolean => {
   const overrideEndpoint = get(override) && get(endpoint);
-  return overrideEndpoint
-    ? !!get(passToken)
-    : !!settings?.codec?.passAccessToken || !!get(passToken);
+  const nonOverrideOption = settings?.codec?.endpoint
+    ? !!settings?.codec?.passAccessToken
+    : !!get(passToken);
+  return overrideEndpoint ? !!get(passToken) : nonOverrideOption;
 };
 
 export const getCodecIncludeCredentials = (
@@ -35,7 +36,8 @@ export const getCodecIncludeCredentials = (
   override = overrideRemoteCodecConfiguration,
 ): boolean => {
   const overrideEndpoint = get(override) && get(endpoint);
-  return overrideEndpoint
-    ? !!get(includeCreds)
-    : !!settings?.codec?.includeCredentials || !!get(includeCreds);
+  const nonOverrideOption = settings?.codec?.endpoint
+    ? !!settings?.codec?.includeCredentials
+    : !!get(includeCreds);
+  return overrideEndpoint ? !!get(includeCreds) : nonOverrideOption;
 };
