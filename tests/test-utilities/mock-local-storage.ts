@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
 export const setLocalStorage = async (
   key: string,
@@ -14,9 +14,10 @@ export const setLocalStorage = async (
   await page.reload();
 };
 
-export const clearLocalStorage = async (page: Page) => {
-  await page.addInitScript(() => {
-    window.localStorage.clear();
-  });
+export const removeLocalStorageItem = async (
+  key: string,
+  page: Page,
+): Promise<void> => {
+  await page.addInitScript((key) => window.localStorage.removeItem(key), key);
   await page.reload();
 };

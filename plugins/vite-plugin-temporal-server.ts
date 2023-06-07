@@ -3,7 +3,7 @@ import type { Plugin } from 'vite';
 import {
   type TemporalServer,
   createTemporalServer,
-} from '../scripts/start-temporal-server';
+} from '../utilities/temporal-server';
 import { ViteDevServer } from 'vite';
 
 const { cyan, magenta } = chalk;
@@ -16,7 +16,7 @@ const shouldSkip = (server: ViteDevServer): boolean => {
   if (process.env.VITEST) return true;
   if (temporal) return true;
   if (process.platform === 'win32') return true;
-  if (server.config.mode === 'ui-server') return true;
+  if (server.config.mode !== 'temporal-server') return true;
 
   return false;
 };
