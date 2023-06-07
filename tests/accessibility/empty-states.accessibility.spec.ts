@@ -6,7 +6,7 @@ test.beforeEach(async ({ page }) => {
   await page.routeFromHAR(
     './tests/accessibility/network-requests/empty-states.har',
     {
-      updateMode: 'full',
+      updateMode: 'minimal',
       update: false,
       updateContent: 'embed',
       notFound: 'fallback',
@@ -37,10 +37,6 @@ test.describe('Accessibility: Empty States', () => {
       async ({ page }) => {
         await page.goto(url);
         await page.waitForRequest('**/api/v1/**');
-
-        await page.screenshot({
-          path: `./tests/accessibility/empty-states/${title}.png`,
-        });
 
         const accessibilityScanResults = await new AxeBuilder({
           page,
