@@ -11,7 +11,7 @@ export {
   mockSearchAttributesApi,
   SEARCH_ATTRIBUTES_API,
 } from './mocks/search-attributes';
-export { WORKFLOWS_API } from './mocks/workflows';
+export { WORKFLOWS_API, mockWorkflowsApi } from './mocks/workflows';
 
 export const mockGlobalApis = (page: Page) => {
   return Promise.all([

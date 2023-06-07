@@ -1,8 +1,8 @@
 import type { Page } from '@playwright/test';
+import { SettingsResponse } from '$src/lib/types';
 
 export const SETTINGS_API = 'http://localhost:8233/api/v1/settings**';
-
-const MOCK_SETTINGS = {
+const defaultSettings = {
   Auth: {
     Enabled: false,
     Options: null,
@@ -26,8 +26,11 @@ const MOCK_SETTINGS = {
   BatchActionsDisabled: false,
 };
 
-export const mockSettingsApi = (page: Page) => {
-  return page.route(SETTINGS_API, (route) => {
-    route.fulfill({ json: MOCK_SETTINGS });
+export const mockSettingsApi = async (
+  page: Page,
+  customSettings: Partial<SettingsResponse> = {},
+) => {
+  await page.route(SETTINGS_API, async (route) => {
+    route.fulfill({ json: { ...defaultSettings, ...customSettings } });
   });
 };

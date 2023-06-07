@@ -4,49 +4,51 @@
   import { dataEncoder } from '$lib/stores/data-encoder';
 
   import Tooltip from '$lib/holocene/tooltip.svelte';
-  import DataEncoderSettings, {
-    dataEncoderSettings,
-  } from './data-encoder-settings.svelte';
+  import { viewDataEncoderSettings } from './data-encoder-settings.svelte';
 
-  const onIconClick = () => $dataEncoderSettings.open();
+  const onIconClick = () => {
+    $viewDataEncoderSettings = !$viewDataEncoderSettings;
+    if ($viewDataEncoderSettings) {
+      document.getElementById('content')?.scrollTo(0, 0);
+    }
+  };
 </script>
 
-<DataEncoderSettings />
 {#if $dataEncoder?.hasEndpointOrPortConfigured}
   {#if $dataEncoder?.hasNotRequested}
-    <Tooltip bottomRight text={'Codec Server is configured'}>
+    <Tooltip bottomRight text="Codec Server is configured">
       <button
         class="relative flex items-center"
         data-testid="data-encoder-status-configured"
         on:click={onIconClick}
       >
-        <div class="mr-2 ml-1 flex items-center">
+        <div class="mx-1 flex items-center">
           <Icon name="transcoder-on" />
         </div>
         <slot />
       </button>
     </Tooltip>
   {:else if $dataEncoder.hasError}
-    <Tooltip bottomRight text={`Codec Server could not connect`}>
+    <Tooltip bottomRight text="Codec Server could not connect">
       <button
         class="relative flex items-center"
         data-testid="data-encoder-status-error"
         on:click={onIconClick}
       >
-        <div class="mr-2 ml-1 flex items-center">
+        <div class="mx-1 flex items-center">
           <Icon name="transcoder-error" />
         </div>
         <slot />
       </button>
     </Tooltip>
   {:else if $dataEncoder.hasSuccess}
-    <Tooltip bottomRight text={'Codec Server succesfully converted content'}>
+    <Tooltip bottomRight text="Codec Server succesfully converted content">
       <button
         class="relative flex items-center"
         data-testid="data-encoder-status-success"
         on:click={onIconClick}
       >
-        <div class="mr-2 ml-1 flex items-center">
+        <div class="mx-1 flex items-center">
           <Icon name="transcoder-on" />
         </div>
         <slot />
@@ -60,7 +62,7 @@
       data-testid="data-encoder-status"
       on:click={onIconClick}
     >
-      <div class="mr-2 ml-1 flex items-center">
+      <div class="mx-1 flex items-center">
         <Icon name="transcoder-off" />
       </div>
       <slot />
