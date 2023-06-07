@@ -48,6 +48,10 @@ const getCLIPath = async (cliPath = localCLIPath): Promise<string | void> => {
   warn("Couldn't find Temporal CLI. Skipping…");
 };
 
+let temporalServer: TemporalServer;
+
+export const getTemporalServer = (): TemporalServer => temporalServer;
+
 export const createTemporalServer = async ({
   port = 7233,
   uiPort = port + 1000,
@@ -89,6 +93,7 @@ export const createTemporalServer = async ({
 
   const shutdown = async () => {
     await temporal.kill();
+    console.log('🔪 killed temporal server');
     return await temporal.exitCode;
   };
 
@@ -100,8 +105,10 @@ export const createTemporalServer = async ({
     return ports.every(({ open }) => open);
   };
 
-  return {
+  temporalServer = {
     ready,
     shutdown,
   };
+
+  return temporalServer;
 };

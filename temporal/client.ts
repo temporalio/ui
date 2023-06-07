@@ -1,9 +1,17 @@
-import { Connection, Client } from '@temporalio/client';
+import { Connection, Client, WorkflowHandle } from '@temporalio/client';
 import { Workflow, BlockingWorkflow } from './workflows';
 import { getDataConverter } from './data-converter';
 
+let connection: Connection;
+
+export const disconnect = async () => {
+  if (connection) {
+    connection.close();
+  }
+};
+
 export const connect = async () => {
-  const connection = await Connection.connect();
+  connection = await Connection.connect();
 
   const client = new Client({
     connection,
@@ -12,6 +20,8 @@ export const connect = async () => {
 
   return client;
 };
+
+const workflows: WorkflowHandle[] = [];
 
 export const startWorkflows = async (client: Client): Promise<string[]> => {
   const wf1 = await client.workflow.start(Workflow, {
@@ -26,5 +36,16 @@ export const startWorkflows = async (client: Client): Promise<string[]> => {
     workflowId: 'e2e-workflow-2',
   });
 
-  return Promise.all([wf1.result(), wf2.result()]);
+  workflows.push(wf1, wf2);
+
+  return Promise.all([wf1.result()]);
+};
+
+export const stopWorkflows = (): Promise<void[]> => {
+  return Promise.all(
+    workflows.map(async (workflow) => {
+      await workflow.terminate();
+      console.log(`🔪 terminated workflow ${workflow.workflowId}`);
+    }),
+  );
 };

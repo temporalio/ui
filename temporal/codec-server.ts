@@ -30,6 +30,9 @@ const MOCK_DECODED_PAYLOAD = {
   data: 'Mock decoded payload',
 };
 
+let codecServer: CodecServer;
+export const getCodecServer = (): CodecServer => codecServer;
+
 export async function createCodecServer(
   { port }: CodecServerOptions = { port: PORT },
 ): Promise<CodecServer> {
@@ -52,7 +55,7 @@ export async function createCodecServer(
   const start = () =>
     new Promise<Server>((resolve, reject) => {
       server = app.listen(port, () => {
-        console.log(`Codec server listening on http://127.0.0.1:${port}`);
+        console.log(`✨ codec server listening on http://127.0.0.1:${port}`);
         app.on('error', (error) => {
           reject(error);
         });
@@ -68,12 +71,15 @@ export async function createCodecServer(
           return;
         }
 
+        console.log('🔪 killed codec server');
         resolve();
       });
     });
 
-  return {
+  codecServer = {
     start,
     stop,
   };
+
+  return codecServer;
 }

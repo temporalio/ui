@@ -12,3 +12,4 @@ pnpm-lock.yaml
 README.md
 playwright-report
 dist/**/*
+tests/storageState.json

@@ -29,7 +29,7 @@ async function globalSetup(config: FullConfig) {
   if (mode === 'e2e') {
     const client = await connect();
     await runWorker();
-    startWorkflows(client);
+    await startWorkflows(client);
   }
 }
 
