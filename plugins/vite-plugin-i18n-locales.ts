@@ -17,10 +17,7 @@ export function i18nPlugin(options: PluginOptions): Plugin {
     async handleHotUpdate(ctx) {
       if (ctx.file.match(/src\/lib\/i18n\/locales\/\w+\/\w+\.ts/) !== null) {
         await generateLocales(src, dest, console.error);
-        return [];
       }
-
-      return [];
     },
   };
 }
