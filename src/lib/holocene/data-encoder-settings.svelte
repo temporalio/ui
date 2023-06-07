@@ -59,6 +59,7 @@
 </script>
 
 <Modal
+  id="data-encoder-settings"
   bind:this={$dataEncoderSettings}
   on:cancelModal={onCancel}
   on:confirmModal={onConfirm}

@@ -45,6 +45,7 @@ func SetUIRoutes(e *echo.Echo, publicPath string, assets fs.FS) error {
 	e.GET("/logo*", assetsHandler)
 	e.GET("/Temporal_Logo_Animation.gif", assetsHandler)
 	e.GET("/site.webmanifest", assetsHandler)
+	e.GET("/i18n/*", assetsHandler)
 	indexHandler, err := buildUIIndexHandler(publicPath, assets)
 	if err != nil {
 		return err

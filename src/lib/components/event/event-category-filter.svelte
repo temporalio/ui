@@ -32,7 +32,8 @@
       value: _value,
       url: $page.url,
     }).then((v) => {
-      _value = v?.toString() ?? null;
+      const visibleOption = options.find(({ option }) => option === v);
+      _value = visibleOption?.option?.toString() ?? null;
       $eventCategoryFilter = _value;
     });
   }

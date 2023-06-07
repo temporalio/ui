@@ -5,7 +5,10 @@
     signalWorkflow,
     terminateWorkflow,
   } from '$lib/services/workflow-service';
+  import { authUser } from '$lib/stores/auth-user';
 
+  import { formatReason } from '$lib/utilities/workflow-actions';
+  import { Action } from '$lib/models/workflow-actions';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
   import { ResetReapplyType } from '$lib/models/workflow-actions';
 
@@ -90,7 +93,12 @@
     terminateWorkflow({
       workflow,
       namespace,
-      reason,
+      reason: formatReason({
+        action: Action.Terminate,
+        reason,
+        email: $authUser.email,
+      }),
+      identity: $authUser.email,
     })
       .then(handleSuccessfulTermination)
       .catch(handleTerminationError);
@@ -153,7 +161,11 @@
         workflowId: workflow.id,
         runId: workflow.runId,
         eventId: resetId,
-        reason: resetReason,
+        reason: formatReason({
+          action: Action.Reset,
+          reason: resetReason,
+          email: $authUser.email,
+        }),
         resetReapplyType,
       });
 
@@ -259,6 +271,7 @@
 </SplitButton>
 
 <Modal
+  id="reset-confirmation-modal"
   data-testid="reset-confirmation-modal"
   bind:this={resetConfirmationModal}
   on:confirmModal={reset}
@@ -275,6 +288,7 @@
   </svelte:fragment>
 </Modal>
 <Modal
+  id="cancel-confirmation-modal"
   data-testid="cancel-confirmation-modal"
   bind:this={cancelConfirmationModal}
   {loading}
@@ -290,6 +304,7 @@
   </svelte:fragment>
 </Modal>
 <Modal
+  id="terminate-confirmation-modal"
   data-testid="terminate-confirmation-modal"
   bind:this={terminateConfirmationModal}
   confirmText="Terminate"
@@ -312,6 +327,7 @@
   </div>
 </Modal>
 <Modal
+  id="signal-confirmation-modal"
   data-testid="signal-confirmation-modal"
   bind:this={signalConfirmationModal}
   confirmText="Submit"
