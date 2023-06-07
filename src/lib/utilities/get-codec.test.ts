@@ -11,7 +11,6 @@ import {
   includeCredentials,
   overrideRemoteCodecConfiguration,
 } from '$lib/stores/data-encoder-config';
-import { get } from 'svelte/store';
 
 const defaultSettings = {
   auth: {

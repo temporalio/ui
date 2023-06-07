@@ -93,6 +93,7 @@
         be set at the Namespace-level, or locally in your browser.
       </p>
       <Accordion
+        data-testid="override-accordion"
         title={override
           ? 'Uses my local setting and ignores Namespace-level settings.'
           : 'Uses Namespace-level settings, where available.'}
@@ -108,6 +109,7 @@
             checked={!override}
             name="use-configuration-endpoint"
             id="use-configuration-endpoint-radio"
+            data-testid="use-configuration-endpoint-input"
           />
           Uses Namespace-level settings, where available. Otherwise, use my local
           setting.
@@ -123,6 +125,7 @@
             checked={override}
             name="use-local-endpoint"
             id="use-local-endpoint-radio"
+            data-testid="use-local-endpoint-input"
           />
           Uses my local setting and ignores Namespace-level settings.
         </label>
@@ -146,7 +149,7 @@
           thin
           variant="link"
           disabled={!editing}
-          testId="clear-data-encoder-button"
+          testId="reset-data-encoder-button"
           on:click={onReset}>Reset</Button
         >
       </div>
