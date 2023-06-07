@@ -17,10 +17,21 @@ const createWorker = async (): Promise<Worker> => {
   });
 };
 
-export const runWorker = async () => {
+const workerIsRunning = () => {
+  return worker.getState() === 'RUNNING';
+};
+
+export const runWorker = async (): Promise<void> => {
   worker = await createWorker();
 
-  return worker.run();
+  worker.run();
+
+  return new Promise<void>((resolve) => {
+    (function waitForWorkerToBeRunning() {
+      if (workerIsRunning()) return resolve();
+      setTimeout(waitForWorkerToBeRunning, 100);
+    })();
+  });
 };
 
 export const runWorkerUntil = async (completed: Promise<unknown>) => {
@@ -30,7 +41,7 @@ export const runWorkerUntil = async (completed: Promise<unknown>) => {
 };
 
 export const stopWorker = async () => {
-  if (worker && worker.getState() === 'RUNNING') {
+  if (worker && workerIsRunning()) {
     worker.shutdown();
   }
 };
