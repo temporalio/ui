@@ -3,14 +3,10 @@ import AxeBuilder from '@axe-core/playwright';
 import { setLocalStorage } from '$utilities/mock-local-storage';
 
 test.beforeEach(async ({ page }) => {
-  await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
-});
-
-test.beforeEach(async ({ page }) => {
   await page.routeFromHAR(
     './tests/accessibility/network-requests/with-schedules.har',
     {
-      updateMode: 'full',
+      updateMode: 'minimal',
       update: false,
       updateContent: 'embed',
       notFound: 'fallback',
@@ -24,7 +20,7 @@ const pages = [
   { title: 'Schedules', url: '/namespaces/default/schedules' },
   {
     title: 'View Schedule',
-    url: 'http://localhost:3000/namespaces/default/schedules/Scheduled%20Workflow',
+    url: '/namespaces/default/schedules/Scheduled%20Workflow',
   },
 ];
 
@@ -33,13 +29,14 @@ test.describe('Accessibility: With Schedules', () => {
     test.fixme(
       `${title} page (${url}) should not have any automatically detectable accessibility issues`,
       async ({ page }) => {
-        await page.goto(url, { waitUntil: 'networkidle' });
+        await page.goto(url);
+        await page.waitForRequest('**/api/v1/**');
 
         const accessibilityScanResults = await new AxeBuilder({
           page,
         }).analyze();
 
-        expect(JSON.stringify(accessibilityScanResults.violations)).toEqual([]);
+        expect(accessibilityScanResults.violations).toEqual([]);
       },
     );
   }

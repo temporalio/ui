@@ -3,14 +3,10 @@ import AxeBuilder from '@axe-core/playwright';
 import { setLocalStorage } from '$utilities/mock-local-storage';
 
 test.beforeEach(async ({ page }) => {
-  await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
-});
-
-test.beforeEach(async ({ page }) => {
   await page.routeFromHAR(
-    './tests/accessibility/network-requests/empty-states.har',
+    './tests/accessibility/network-requests/with-workflows.har',
     {
-      updateMode: 'full',
+      updateMode: 'minimal',
       update: false,
       updateContent: 'embed',
       notFound: 'fallback',
@@ -20,26 +16,40 @@ test.beforeEach(async ({ page }) => {
   await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
 });
 
+const workflowId =
+  '/namespaces/default/workflows/Running-PGlmzINUdHKb_MRK9uhf5/bab2d175-4dc5-476e-b6c7-aa3d98ae73d5';
+
 const pages = [
-  { title: 'Namespaces', url: '/namespaces' },
-  { title: 'Select Namespace', url: '/select-namespace' },
-  { title: 'Namespace', url: '/namespaces/default' },
   { title: 'Workflow List', url: '/namespaces/default/workflows' },
-  { title: 'Schedules', url: '/namespaces/default/schedules' },
-  { title: 'Create Schedule', url: '/namespaces/default/schedules/new' },
   {
-    title: 'Archived Workflows',
-    url: '/namespaces/default/archived-workflows',
+    title: 'Workflow Details',
+    url: workflowId + '/history',
   },
-  { title: 'Event Import', url: 'import/events' },
+  {
+    title: 'Pending Activities',
+    url: workflowId + '/pending-activities',
+  },
+  {
+    title: 'Stack Trace',
+    url: workflowId + '/stack-trace',
+  },
+  {
+    title: 'Query',
+    url: workflowId + '/query',
+  },
+  {
+    title: 'Workers',
+    url: workflowId + '/workers',
+  },
 ];
 
-test.describe('Accessibility: Empty States', () => {
+test.describe('Accessibility: With Workflows', () => {
   for (const { title, url } of pages) {
     test.fixme(
       `${title} page (${url}) should not have any automatically detectable accessibility issues`,
       async ({ page }) => {
-        await page.goto(url, { waitUntil: 'networkidle' });
+        await page.goto(url);
+        await page.waitForRequest('**/api/v1/**');
 
         const accessibilityScanResults = await new AxeBuilder({
           page,
