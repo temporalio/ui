@@ -61,6 +61,7 @@
     passToken = $passAccessToken;
     includeCreds = $includeCredentials;
     override = $overrideRemoteCodecConfiguration;
+    $viewDataEncoderSettings = false;
   };
 
   const onConfirm = () => {
@@ -155,7 +156,7 @@
           variant="link"
           disabled={!editing}
           testId="reset-data-encoder-button"
-          on:click={onReset}>Reset</Button
+          on:click={onReset}>Cancel</Button
         >
       </div>
     </div>

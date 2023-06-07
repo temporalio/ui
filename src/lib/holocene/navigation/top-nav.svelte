@@ -33,7 +33,6 @@
   class="sticky top-0 z-30 flex h-10 w-full items-center justify-between border-b-2 bg-gray-100 p-1 px-4 md:px-10"
   data-testid="top-nav"
   class:bg-red-50={$dataEncoder.hasError}
-  class:bg-blue-50={$dataEncoder.endpoint}
 >
   <div class="flex items-center gap-2" />
   <div class="flex items-center gap-2">

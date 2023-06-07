@@ -18,7 +18,7 @@
       be accessible by you.
     </p>
     <textarea
-      class="block w-full rounded-md border-2 border-gray-900 p-2"
+      class="block w-full rounded-xl border-2 border-gray-900 p-2"
       rows={3}
       placeholder="Paste your endpoint here"
       data-testid="data-encoder-endpoint-input"
