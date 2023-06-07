@@ -26,6 +26,8 @@
     action === Action.Cancel
       ? translate('workflows', 'cancel')
       : translate('workflows', 'terminate');
+  $: confirmText =
+    action === Action.Cancel ? translate('workflows', 'confirm') : actionText;
 
   $: placeholder = getPlacholder(action, $authUser.email);
 
@@ -43,10 +45,11 @@
 </script>
 
 <Modal
+  id="batch-operation-confirmation-modal"
   bind:this={modal}
   data-testid="batch-{actionText}-confirmation"
   confirmType="destructive"
-  confirmText={actionText}
+  {confirmText}
   on:cancelModal={handleCancelModal}
   on:confirmModal={handleConfirmModal}
 >

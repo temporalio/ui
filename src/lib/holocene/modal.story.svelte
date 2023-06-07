@@ -51,6 +51,7 @@
     <Button on:click={openModal}>Open Modal</Button>
     <Modal
       bind:this={modal}
+      id="basic-modal"
       confirmType="destructive"
       confirmText="Delete"
       on:confirmModal={handleConfirm}
@@ -65,6 +66,7 @@
   <Hst.Variant title="A Modal with a Form">
     <Button on:click={openModal}>Open Modal</Button>
     <Modal
+      id="form-modal"
       bind:this={modal}
       confirmType="destructive"
       confirmText="Delete"
