@@ -197,7 +197,7 @@ describe('Workflow Executions List With Search', () => {
 
         cy.get('[data-testid="namespaces-button"]').as('namespaces-button');
         cy.get('[data-testid="workflows-button"]').as('workflows-button');
-        cy.get('[data-testid="namespace-select-button"').as(
+        cy.get('[data-testid="namespace-select-button"]').as(
           'namespace-select-button',
         );
       });
@@ -342,10 +342,10 @@ describe('Workflow Executions List With Search', () => {
         cy.get('#manual-search').should('contain.value', 'CloseTime > ');
 
         const namespaces = ['default', 'some-other-namespace'];
-        cy.get('@namespace-select-button').click();
+        cy.get('@namespace-select-button]').click();
         cy.get('[data-testid="namespace-select-list"]').contains(namespaces[0]);
         cy.get('[data-test="namespace-list"] > :nth-child(2)').click();
-        cy.get('@namespace-select-button').contains(namespaces[1]);
+        cy.get('@namespace-select-button]').contains(namespaces[1]);
 
         cy.url().should(
           'not.contain',
@@ -355,9 +355,9 @@ describe('Workflow Executions List With Search', () => {
         cy.get('#time-range-filter').should('have.text', '1 hour');
         cy.get('#manual-search').should('contain.value', 'CloseTime > ');
 
-        cy.get('@namespace-select-button').click();
+        cy.get('@namespace-select-button]').click();
         cy.get('[data-test="namespace-list"] > :nth-child(1)').click();
-        cy.get('@namespace-select-button').contains(namespaces[0]);
+        cy.get('@namespace-select-button]').contains(namespaces[0]);
 
         cy.url().should(
           'not.contain',
