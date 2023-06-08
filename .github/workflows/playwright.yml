@@ -45,7 +45,7 @@ jobs:
       - name: Build App
         run: pnpm build:local
       - name: Install Protobuf Compiler
-        run: apt install -y protobuf-compiler
+        run: sudo apt-get install -y protobuf-compiler
       - name: Install UI Server Dependencies
         working-directory: ./server
         run: make install-utils
