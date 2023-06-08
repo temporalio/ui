@@ -1,6 +1,6 @@
 import { join } from 'path';
 import waitForPort from 'wait-port';
-import { $ } from 'zx';
+import { $, chalk } from 'zx';
 
 export type UIServer = {
   shutdown: () => Promise<number | null>;
@@ -8,6 +8,30 @@ export type UIServer = {
 };
 
 let uiServer: UIServer;
+
+const uiServerExecutablePath = join(process.cwd(), 'server', 'ui-server');
+
+const validateUIServerPath = async (): Promise<void> => {
+  const stylizedPath = chalk.yellowBright(uiServerExecutablePath);
+
+  console.log(`Checking UI Server at ${stylizedPath}…`);
+
+  const { stdout, exitCode } = await $`${uiServerExecutablePath} -v`
+    .quiet()
+    .nothrow();
+
+  if (exitCode === 0) {
+    console.log(
+      chalk.greenBright(
+        `UI Server found at ${stylizedPath}\n\t`,
+        '→',
+        chalk.green(stdout.trim()),
+      ),
+    );
+  } else {
+    throw new Error();
+  }
+};
 
 export const getUIServer = (): UIServer => {
   return uiServer;
@@ -25,7 +49,12 @@ export const createUIServer = async (
 ) => {
   $.cwd = join(process.cwd(), 'server');
 
-  await $`make build`;
+  try {
+    await validateUIServerPath();
+  } catch {
+    console.warn(chalk.bgYellow("Couldn't find UI Server. Building"));
+    await $`make build-server`;
+  }
 
   const uiServerProcess = $`./ui-server --env ${env} start`.quiet();
   console.log(`✨ ui-server running in ${env} mode on port ${portForEnv(env)}`);

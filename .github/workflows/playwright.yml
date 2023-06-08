@@ -44,6 +44,12 @@ jobs:
         run: pnpm exec playwright install --with-deps
       - name: Build App
         run: pnpm build:local
+      - name: Install UI Server Dependencies
+        working-directory: ./server
+        run: make install-utlils
+      - name: Build UI Server
+        working-directory: ./server
+        run: make build
       - name: Run E2E tests
         run: pnpm test:e2e
       - uses: actions/upload-artifact@v3
