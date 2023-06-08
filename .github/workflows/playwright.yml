@@ -21,8 +21,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          submodules: 'recursive'
       - name: Checkout and Setup Node
         uses: ./.github/actions/checkout-and-setup
       - name: Install Playwright Browsers
@@ -40,6 +38,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
       - name: Checkout and Setup Node
         uses: ./.github/actions/checkout-and-setup
       - name: Install Playwright Browsers
