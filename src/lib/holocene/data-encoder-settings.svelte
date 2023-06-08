@@ -29,13 +29,6 @@
   let includeCreds = $includeCredentials ?? false;
   let override = $overrideRemoteCodecConfiguration ?? false;
 
-  $: editing =
-    endpoint !== $codecEndpoint ||
-    passToken !== $passAccessToken ||
-    includeCreds !== $includeCredentials ||
-    port !== $dataConverterPort ||
-    override !== $overrideRemoteCodecConfiguration;
-
   $: error = '';
   $: namespaceOrCluster = $page.data?.settings?.runtimeEnvironment?.isCloud
     ? 'Namespace'
@@ -154,7 +147,6 @@
         <Button
           thin
           variant="link"
-          disabled={!editing}
           testId="cancel-data-encoder-button"
           on:click={onCancel}>Cancel</Button
         >
