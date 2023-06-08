@@ -44,16 +44,20 @@ jobs:
         uses: ./.github/actions/checkout-and-setup
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
-      - name: Build App
-        run: pnpm build:server
-      - name: Install Protobuf Compiler
-        run: sudo apt-get install -y protobuf-compiler
-      - name: Install UI Server Dependencies
-        working-directory: ./server
-        run: make install-utils
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: server/go.mod
+          cache-dependency-path: server/go.sum
+          cache: true
+          check-latest: true
+      - name: Set up Protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          version: '3.x'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build UI Server
-        working-directory: ./server
-        run: make build
+        working-directory: server
+        run: make install-utils build
       - name: Run E2E tests
         run: pnpm test:e2e
       - uses: actions/upload-artifact@v3
