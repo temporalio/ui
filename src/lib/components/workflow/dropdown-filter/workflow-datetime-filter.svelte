@@ -187,7 +187,7 @@
       id="time-range-filter"
       hasIndicator
       controls="time-range-filter-menu"
-      class="flex flex-row items-center p-2 bg-white border border-r-0 border-primary rounded-l h-10 w-44 {disabled
+      class="flex flex-row items-center p-2 bg-white border border-r-0 border-primary rounded-l h-10 min-w-[176px] w-auto {disabled
         ? 'bg-gray-200'
         : ''}"
       {disabled}
