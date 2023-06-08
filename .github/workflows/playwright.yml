@@ -46,7 +46,7 @@ jobs:
         run: pnpm build:local
       - name: Install UI Server Dependencies
         working-directory: ./server
-        run: make install-utlils
+        run: make install-utils
       - name: Build UI Server
         working-directory: ./server
         run: make build
