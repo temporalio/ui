@@ -13,7 +13,7 @@ test.describe('Stack Trace With Completed Workflow', () => {
       .getByText('completed-workflow')
       .click({ position: { x: 0, y: 0 } });
 
-    await page.getByText('Stack Trace').click();
+    await page.getByTestId('stack-trace-tab').click();
 
     await expect(page.getByTestId('query-stack-trace-empty')).toHaveText(
       'No Stack Traces Found',
@@ -27,7 +27,7 @@ test.describe('Stack Trace with Running Workflow', () => {
       .getByText('running-workflow')
       .click({ position: { x: 0, y: 0 } });
 
-    await page.getByText('Stack Trace').click();
+    await page.getByTestId('stack-trace-tab').click();
 
     await expect(page.getByTestId('query-stack-trace')).toBeVisible();
   });
@@ -39,7 +39,7 @@ test.describe('Stack Trace with Running Workflow', () => {
       .getByText('running-workflow')
       .click({ position: { x: 0, y: 0 } });
 
-    await page.getByText('Stack Trace').click();
+    await page.getByTestId('stack-trace-tab').click();
 
     await mockQueryApiWithStackTraceError(page);
 
