@@ -193,6 +193,7 @@
       </div>
     </div>
     <Modal
+      id="pause-schedule-modal"
       bind:this={pauseConfirmationModal}
       confirmType="primary"
       confirmText={schedule.schedule.state.paused ? 'Unpause' : 'Pause'}
@@ -223,6 +224,7 @@
       </div>
     </Modal>
     <Modal
+      id="delete-schedule-modal"
       bind:this={deleteConfirmationModal}
       confirmType="destructive"
       confirmText={'Delete'}

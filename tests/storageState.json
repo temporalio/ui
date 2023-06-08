@@ -1,0 +1,14 @@
+{
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "http://localhost:3333",
+      "localStorage": [
+        {
+          "name": "viewedFeatureTags",
+          "value": "[\"topNav\"]"
+        }
+      ]
+    }
+  ]
+}

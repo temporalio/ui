@@ -1,13 +1,16 @@
 import { Page } from '@playwright/test';
+import type { SettingsResponse } from '../../src/lib/types';
 
 export const apiUrl = 'http://localhost:8233/api/v1';
+
+export const clusterApi = apiUrl + '/cluster**';
+export const namespacesApi = apiUrl + '/namespaces**';
 export const workflowsApi = apiUrl + '/namespaces/default/workflows?query=';
 export const settingsApi = apiUrl + '/settings**';
 
-const clusterApi = apiUrl + '/cluster**';
 const namespaceApi = apiUrl + '/namespaces/**';
 
-const clusterInfo = {
+const cluster = {
   supportedClients: {
     'temporal-cli': '\u003c2.0.0',
     'temporal-go': '\u003c2.0.0',
@@ -26,9 +29,117 @@ const clusterInfo = {
   visibilityStore: 'sqlite',
 };
 
+const namespaces = {
+  namespaces: [
+    {
+      namespaceInfo: {
+        name: 'temporal-system',
+        state: 'Registered',
+        description: 'Temporal internal system namespace',
+        ownerEmail: 'temporal-core@temporal.io',
+        data: {},
+        id: '32049b68-7872-4094-8e63-d0dd59896a83',
+      },
+      config: {
+        workflowExecutionRetentionTtl: '604800s',
+        badBinaries: {
+          binaries: {},
+        },
+        historyArchivalState: 'Disabled',
+        historyArchivalUri: '',
+        visibilityArchivalState: 'Disabled',
+        visibilityArchivalUri: '',
+      },
+      replicationConfig: {
+        activeClusterName: 'active',
+        clusters: [
+          {
+            clusterName: 'active',
+          },
+        ],
+        state: 'Unspecified',
+      },
+      failoverVersion: '0',
+      isGlobalNamespace: false,
+    },
+    {
+      namespaceInfo: {
+        name: 'default',
+        state: 'Registered',
+        description: 'Default namespace for Temporal Server.',
+        ownerEmail: '',
+        data: {},
+        id: '398cb3a0-112f-4a36-991c-766dd8001649',
+      },
+      config: {
+        workflowExecutionRetentionTtl: '86400s',
+        badBinaries: {
+          binaries: {},
+        },
+        historyArchivalState: 'Disabled',
+        historyArchivalUri: '',
+        visibilityArchivalState: 'Disabled',
+        visibilityArchivalUri: '',
+      },
+      replicationConfig: {
+        activeClusterName: 'us-east1',
+        clusters: [
+          {
+            clusterName: 'us-east1',
+          },
+          {
+            clusterName: 'us-east2',
+          },
+        ],
+        state: 'Unspecified',
+      },
+      failoverVersion: '0',
+      isGlobalNamespace: false,
+    },
+    {
+      namespaceInfo: {
+        name: 'some-other-namespace',
+        state: 'Registered',
+        description: '',
+        ownerEmail: '',
+        data: {},
+        id: '5411056f-9bd0-4b4e-90fa-e88e3031a0d0',
+      },
+      config: {
+        workflowExecutionRetentionTtl: '259200s',
+        badBinaries: {
+          binaries: {},
+        },
+        historyArchivalState: 'Enabled',
+        historyArchivalUri: '',
+        visibilityArchivalState: 'Enabled',
+        visibilityArchivalUri: '',
+      },
+      replicationConfig: {
+        activeClusterName: 'active',
+        clusters: [
+          {
+            clusterName: 'active',
+          },
+        ],
+        state: 'Unspecified',
+      },
+      failoverVersion: '0',
+      isGlobalNamespace: false,
+    },
+  ],
+  nextPageToken: null,
+};
+
+export const mockNamespacesApi = async (page: Page) => {
+  await page.route(namespacesApi, async (route) => {
+    route.fulfill({ json: namespaces });
+  });
+};
+
 export const mockClusterApi = async (page: Page) => {
   await page.route(clusterApi, async (route) => {
-    route.fulfill({ json: clusterInfo });
+    route.fulfill({ json: cluster });
   });
 };
 
@@ -67,5 +178,38 @@ const archivalNamespace = {
 export const mockNamespaceApi = async (page: Page) => {
   await page.route(namespaceApi, async (route) => {
     route.fulfill({ json: archivalNamespace });
+  });
+};
+
+const defaultSettings = {
+  Auth: {
+    Enabled: false,
+    Options: null,
+  },
+  DefaultNamespace: '',
+  ShowTemporalSystemNamespace: false,
+  FeedbackURL: '',
+  NotifyOnNewVersion: false,
+  Codec: {
+    Endpoint: '',
+    PassAccessToken: false,
+    IncludeCredentials: false,
+    DecodeEventHistoryDownload: false,
+  },
+  Version: '2.15.0',
+  DisableWriteActions: false,
+  WorkflowTerminateDisabled: false,
+  WorkflowCancelDisabled: false,
+  WorkflowSignalDisabled: false,
+  WorkflowResetDisabled: false,
+  BatchActionsDisabled: false,
+};
+
+export const mockSettingsApi = async (
+  page: Page,
+  customSettings: Partial<SettingsResponse> = {},
+) => {
+  await page.route(settingsApi, async (route) => {
+    route.fulfill({ json: { ...defaultSettings, ...customSettings } });
   });
 };

@@ -271,6 +271,7 @@
 </SplitButton>
 
 <Modal
+  id="reset-confirmation-modal"
   data-testid="reset-confirmation-modal"
   bind:this={resetConfirmationModal}
   on:confirmModal={reset}
@@ -287,6 +288,7 @@
   </svelte:fragment>
 </Modal>
 <Modal
+  id="cancel-confirmation-modal"
   data-testid="cancel-confirmation-modal"
   bind:this={cancelConfirmationModal}
   {loading}
@@ -302,6 +304,7 @@
   </svelte:fragment>
 </Modal>
 <Modal
+  id="terminate-confirmation-modal"
   data-testid="terminate-confirmation-modal"
   bind:this={terminateConfirmationModal}
   confirmText="Terminate"
@@ -324,6 +327,7 @@
   </div>
 </Modal>
 <Modal
+  id="signal-confirmation-modal"
   data-testid="signal-confirmation-modal"
   bind:this={signalConfirmationModal}
   confirmText="Submit"

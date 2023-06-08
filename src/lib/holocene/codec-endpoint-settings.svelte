@@ -1,7 +1,4 @@
 <script lang="ts">
-  import { codecEndpoint } from '$lib/stores/data-encoder-config';
-  import { dataEncoder } from '$lib/stores/data-encoder';
-
   import ToggleSwitch from './toggle-switch.svelte';
 
   export let endpoint = '';
@@ -10,27 +7,30 @@
   export let error = '';
 </script>
 
-<div class="mb-8 flex flex-col gap-8">
-  <p class="text-base">
-    Enter your remote codec endpoint to decrypt your payloads.
-  </p>
+<div class="flex flex-col gap-4">
   <div class="flex flex-col gap-2">
-    <h3 class="text-lg" data-testid="data-encoder-endpoint-title">
-      Remote codec endpoint
+    <h3 class="text-sm font-medium" data-testid="data-encoder-endpoint-title">
+      Local Remote Codec Endpoint Override
     </h3>
-    {#if error}
-      <small data-testid="data-encoder-endpoint-error" class="text-red-700"
-        >{error}</small
-      >
-    {/if}
+    <p class="text-sm">
+      Enter a local remote codec endpoint to override any configured at the
+      Namespace-level. This will be stored in your local browser and will only
+      be accessible by you.
+    </p>
     <textarea
-      class="block w-full rounded-md border-2 border-gray-900 p-2"
-      rows={5}
+      class="block w-full rounded-xl border-2 border-gray-900 p-2"
+      class:error
+      rows={3}
       placeholder="Paste your endpoint here"
       data-testid="data-encoder-endpoint-input"
       bind:value={endpoint}
       on:keydown|stopPropagation
     />
+    {#if error}
+      <small data-testid="data-encoder-endpoint-error" class="text-red-700"
+        >{error}</small
+      >
+    {/if}
     <label
       for="pass-access-token"
       class="flex items-center gap-4 font-secondary text-sm"
@@ -55,18 +55,11 @@
         decode if incorrectly configured.</small
       >
     {/if}
-    {#if $dataEncoder.settingsEndpoint}
-      <div class="flex items-center justify-between">
-        <p data-testid="data-encoder-site-endpoint">
-          {$dataEncoder.settingsEndpoint}
-        </p>
-        <p data-testid="data-encoder-site-settings">Site setting</p>
-      </div>
-      {#if $codecEndpoint}
-        <small class="text-yellow-900" data-testid="data-encoder-endpoint-info"
-          >Set endpoint overrides site setting endpoint.</small
-        >
-      {/if}
-    {/if}
   </div>
 </div>
+
+<style lang="postcss">
+  .error {
+    @apply outline-red-700;
+  }
+</style>
