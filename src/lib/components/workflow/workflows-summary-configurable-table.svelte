@@ -72,6 +72,7 @@
   open={customizationDrawerOpen}
   onClick={closeCustomizationDrawer}
   position="right"
+  id="workflows-summary-table-configuration-drawer"
   dark={false}
   title={translate('workflows', 'configure-workflows')}
 >

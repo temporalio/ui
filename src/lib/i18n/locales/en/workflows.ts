@@ -8,6 +8,7 @@ export const Strings = {
     'Results {{filtered, number}} of {{total, number}} workflows',
   terminate: 'Terminate',
   cancel: 'Cancel',
+  confirm: 'Confirm',
   reason: 'Reason',
   'batch-operation-modal-title': '{{action}} Workflows',
   'workflow-action-reason-placeholder': '{{action}} from the Web UI',

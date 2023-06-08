@@ -5,15 +5,16 @@
   import IconButton from './icon-button.svelte';
 
   interface $$Props extends HTMLAttributes<HTMLDialogElement> {
-    hideConfirm?: boolean;
-    confirmText?: string;
     cancelText?: string;
-    confirmType?: ComponentProps<Button>['variant'];
     confirmDisabled?: boolean;
+    confirmText?: string;
+    confirmType?: ComponentProps<Button>['variant'];
+    hideConfirm?: boolean;
+    hightlightNav?: boolean;
+    id: string;
     large?: boolean;
     loading?: boolean;
     'data-testid'?: string;
-    hightlightNav?: boolean;
   }
 
   export let hideConfirm = false;
@@ -24,6 +25,7 @@
   export let large = false;
   export let loading = false;
   export let hightlightNav = false;
+  export let id: string;
 
   let error: string;
 
@@ -102,6 +104,7 @@
   on:keydown|stopPropagation={handleKeyboardNavigation}
 />
 <dialog
+  {id}
   bind:this={modalElement}
   class="body {className}"
   class:large
@@ -119,13 +122,13 @@
       on:click={handleCancel}
     />
   {/if}
-  <div id="modal-title" class="title">
+  <div id="modal-title-{id}" class="title">
     <slot name="title">
       <h3>Title</h3>
     </slot>
   </div>
   <form on:submit|preventDefault={confirmModal} method="dialog">
-    <div id="modal-content" class="content">
+    <div id="modal-content-{id}" class="content">
       <slot name="content">
         <span>Content</span>
       </slot>

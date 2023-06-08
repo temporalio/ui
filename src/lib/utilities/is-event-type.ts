@@ -157,8 +157,6 @@ export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
   'signalExternalWorkflowExecutionFailedEventAttributes',
   'externalWorkflowExecutionSignaledEventAttributes',
   'upsertWorkflowSearchAttributesEventAttributes',
-  'workflowUpdateAcceptedEventAttributes',
-  'workflowUpdateCompletedEventAttributes',
 ] as const;
 
 export type ResetEventType = (typeof validResetEventTypes)[number];
