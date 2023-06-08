@@ -1,11 +1,14 @@
 import { test, expect } from '@playwright/test';
-import { mockNamespaceApi, mockGlobalApis } from '~/test-utilities/mock-apis';
+import {
+  mockNamespaceApi,
+  mockNamespaceApis,
+} from '~/test-utilities/mock-apis';
 
 const archivalWorkflowsUrl = '/namespaces/default/archival';
 let archived: boolean;
 
 test.beforeEach(async ({ page }) => {
-  await mockGlobalApis(page);
+  await mockNamespaceApis(page);
 });
 
 test.describe('Archival - Archival disabled', () => {

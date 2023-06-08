@@ -1,8 +1,6 @@
 import type { Page } from '@playwright/test';
 import type { SearchAttributesResponse } from '$src/lib/types/workflows';
 
-export const SEARCH_ATTRIBUTES_API =
-  'http://localhost:8233/api/v1/namespaces/*/search-attributes**';
 const MOCK_SEARCH_ATTRIBUTES: SearchAttributesResponse = {
   systemAttributes: {
     BatcherNamespace: 'Keyword',
@@ -45,7 +43,7 @@ export const mockSearchAttributesApi = (
   page: Page,
   searchAttributes?: Partial<SearchAttributesResponse>,
 ) => {
-  return page.route(SEARCH_ATTRIBUTES_API, (route) => {
+  return page.route('**/api/v1/namespaces/*/search-attributes?', (route) => {
     route.fulfill({ json: mergeSearchAttributes(searchAttributes) });
   });
 };

@@ -1,26 +1,15 @@
 import { test, expect } from '@playwright/test';
 
-import {
-  WORKFLOWS_API,
-  mockGlobalApis,
-  mockSettingsApi,
-  mockWorkflowsApi,
-} from '~/test-utilities/mock-apis';
-import { setLocalStorage } from '~/test-utilities/mock-local-storage';
+import { mockSettingsApi, mockWorkflowsApis } from '~/test-utilities/mock-apis';
 
 const workflowsUrl = '/namespaces/default/workflows';
+const workflowsAPI = '**/api/v1/namespaces/default/workflows?query=';
 
 test.describe('Data Encoder without Configuration Settings', () => {
   test.beforeEach(async ({ page }) => {
-    await mockGlobalApis(page);
-    await mockWorkflowsApi(page);
+    await mockWorkflowsApis(page);
     await page.goto(workflowsUrl);
-    await setLocalStorage(
-      'viewedFeatureTags',
-      JSON.stringify(['topNav']),
-      page,
-    );
-    await page.waitForRequest(WORKFLOWS_API);
+    await page.waitForRequest(workflowsAPI);
   });
 
   test('Navigate to Data Encoder UI and configure Local Setting', async ({
@@ -238,8 +227,7 @@ test.describe('Data Encoder without Configuration Settings', () => {
 
 test.describe('Data Encoder with Configuration Settings', () => {
   test.beforeEach(async ({ page }) => {
-    await mockGlobalApis(page);
-    await mockWorkflowsApi(page);
+    await mockWorkflowsApis(page);
     await mockSettingsApi(page, {
       Codec: {
         Endpoint: 'https://localhost:8081',
@@ -248,12 +236,7 @@ test.describe('Data Encoder with Configuration Settings', () => {
       },
     });
     await page.goto(workflowsUrl);
-    await setLocalStorage(
-      'viewedFeatureTags',
-      JSON.stringify(['topNav']),
-      page,
-    );
-    await page.waitForRequest(WORKFLOWS_API);
+    await page.waitForRequest(workflowsAPI);
   });
 
   test('Navigate to Data Encoder UI', async ({ page }) => {

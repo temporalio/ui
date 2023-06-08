@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { mockDate } from '~/test-utilities/mock-date';
-import { mockGlobalApis } from '~/test-utilities/mock-apis';
+import { mockWorkflowsApis } from '~/test-utilities/mock-apis';
 import { setLocalStorage } from '~/test-utilities/mock-local-storage';
 
 const workflowsUrl = '/namespaces/default/workflows';
@@ -8,7 +8,7 @@ const workflowsApiMatch = new RegExp('/api/v1/namespaces/default/workflows');
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(mockDate);
-  await mockGlobalApis(page);
+  await mockWorkflowsApis(page);
   await page.goto(workflowsUrl);
   await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
 });

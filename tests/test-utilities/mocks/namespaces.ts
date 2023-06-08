@@ -1,6 +1,5 @@
 import { Page } from '@playwright/test';
 
-export const NAMESPACES_API = 'http://localhost:8233/api/v1/namespaces/**';
 const MOCK_NAMESPACES = {
   namespaces: [
     {
@@ -104,7 +103,7 @@ const MOCK_NAMESPACES = {
 };
 
 export const mockNamespacesApi = (page: Page) => {
-  page.route(NAMESPACES_API, (route) => {
+  return page.route('**/api/v1/namespaces?', (route) => {
     route.fulfill({ json: MOCK_NAMESPACES });
   });
 };

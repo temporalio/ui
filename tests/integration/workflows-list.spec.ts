@@ -1,17 +1,18 @@
 import { test, expect } from '@playwright/test';
-import { mockGlobalApis, WORKFLOWS_API } from '~/test-utilities/mock-apis';
+import {
+  mockGlobalApis,
+  mockSearchAttributesApi,
+} from '~/test-utilities/mock-apis';
 import { setLocalStorage } from '~/test-utilities/mock-local-storage';
 
 const workflowsUrl = '/namespaces/default/workflows';
+const workflowsAPI =
+  'http://localhost:8233/api/v1/namespaces/*/workflows?query=';
 
 test.beforeEach(async ({ page }) => {
   await mockGlobalApis(page);
+  await mockSearchAttributesApi(page);
   await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
-});
-
-test('requests workflows', async ({ page }) => {
-  await page.goto(workflowsUrl);
-  await page.waitForRequest(WORKFLOWS_API);
 });
 
 test('it displays the namespace', async ({ page }) => {
@@ -56,7 +57,7 @@ for (const [selector, parameter] of [
 
     await page.fill(selector, input);
 
-    await page.waitForRequest(WORKFLOWS_API + expectedQuery);
+    await page.waitForRequest(workflowsAPI + expectedQuery);
 
     expect(page.url()).toMatch(expectedQuery);
   });
@@ -80,7 +81,7 @@ for (const status of [
 
     await page.locator('#execution-status-filter').selectOption(status);
 
-    await page.waitForRequest(WORKFLOWS_API + expectedQuery);
+    await page.waitForRequest(workflowsAPI + expectedQuery);
 
     expect(page.url()).toMatch(expectedQuery);
   });

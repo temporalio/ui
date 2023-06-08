@@ -29,11 +29,8 @@ export async function BlockingWorkflow(input: string): Promise<string> {
   workflow.setHandler(unblockSignal, () => void (isBlocked = false));
   workflow.setHandler(isBlockedQuery, () => isBlocked);
 
-  console.log('Blocked');
-
   try {
     await workflow.condition(() => !isBlocked);
-    console.log('Unblocked');
   } catch (err) {
     if (err instanceof workflow.CancelledFailure) {
       console.log('Cancelled');
