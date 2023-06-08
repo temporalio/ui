@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          submodules: 'true'
+          submodules: 'recursive'
       - name: Checkout and Setup Node
         uses: ./.github/actions/checkout-and-setup
       - name: Install Playwright Browsers
