@@ -42,8 +42,8 @@ jobs:
           submodules: true
       - name: Checkout and Setup Node
         uses: ./.github/actions/checkout-and-setup
-      - name: Install Playwright Browsers
-        run: pnpm exec playwright install --with-deps
+      - name: Build UI
+        run: pnpm build:server
       - uses: actions/setup-go@v3
         with:
           go-version-file: server/go.mod
@@ -58,6 +58,8 @@ jobs:
       - name: Build UI Server
         working-directory: server
         run: make install-utils build
+      - name: Install Playwright Browsers
+        run: pnpm exec playwright install --with-deps
       - name: Run E2E tests
         run: pnpm test:e2e
       - uses: actions/upload-artifact@v3
