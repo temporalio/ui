@@ -265,14 +265,14 @@
   <MenuContainer>
     <MenuButton
       class="p-2 bg-white border border-primary rounded-r h-10 w-32"
-      id="datetime"
-      controls="datetime-menu"
+      id="datetime-filter"
+      controls="datetime-filter-menu"
       hasIndicator
       icon="clock"
     >
       {capitalize($timeFormat)}
     </MenuButton>
-    <Menu id="datetime-menu">
+    <Menu id="datetime-filter-menu">
       <MenuItem on:click={() => ($timeFormat = 'relative')}
         >{translate('relative')}</MenuItem
       >
