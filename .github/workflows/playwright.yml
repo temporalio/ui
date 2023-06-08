@@ -45,7 +45,7 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
       - name: Build App
-        run: pnpm build:local
+        run: pnpm build:server
       - name: Install Protobuf Compiler
         run: sudo apt-get install -y protobuf-compiler
       - name: Install UI Server Dependencies
