@@ -356,8 +356,10 @@ describe('Workflow Executions List With Search', () => {
         cy.get('#manual-search').should('contain.value', 'CloseTime > ');
 
         cy.get('@namespace-select-button').click();
-        cy.get('[data-test="namespace-list"] > :nth-child(1)').click();
-        cy.get('@namespace-select-button').contains(namespaces[0]);
+        cy.get('[data-testid="namespace-list-item"]').first().click();
+        cy.get('[data-testid="namespace-select-button"]').contains(
+          namespaces[0],
+        );
 
         cy.url().should(
           'not.contain',
