@@ -23,7 +23,7 @@ export default defineConfig({
     baseURL: `http://localhost:${PORT}`,
     trace: 'on-first-retry',
     timezoneId: 'America/Denver',
-    storageState: './tests/storageState.json',
+    storageState: `./tests/${PLAYWRIGHT_MODE}/storageState.json`,
   },
   projects: [
     {
