@@ -40,7 +40,8 @@
     "src/lib/models/**/*.test.ts",
     "utilities/**/*.ts",
     "temporal/**/*.ts",
-    "cypress/**/*.ts"
+    "cypress/**/*.ts",
+    "plugins/**/*.ts"
   ],
   "exclude": [
     "src/lib/services/**/*.test.ts",

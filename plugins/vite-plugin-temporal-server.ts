@@ -4,7 +4,7 @@ import {
   type TemporalServer,
   createTemporalServer,
 } from '../utilities/temporal-server';
-import { ViteDevServer } from 'vite';
+import type { ViteDevServer } from 'vite';
 
 const { cyan, magenta } = chalk;
 

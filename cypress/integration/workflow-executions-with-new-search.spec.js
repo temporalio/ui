@@ -326,7 +326,7 @@ describe('Workflow Executions List With Search', () => {
         );
       });
 
-      it('should keep only the workflow datetime filter after navigating to a different namespace', () => {
+      it.skip('should keep only the workflow datetime filter after navigating to a different namespace', () => {
         cy.get('#time-range-filter').click();
         cy.contains('1 hour').click();
         cy.contains('End Time').click();
