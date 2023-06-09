@@ -30,7 +30,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: playwright-report
+          name: playwright-report-integration
           path: playwright-report/
           retention-days: 30
   e2e-tests:
@@ -65,6 +65,6 @@ jobs:
       - uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: playwright-report
+          name: playwright-report-e2e
           path: playwright-report/
           retention-days: 30
