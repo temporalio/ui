@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import mockQueryApiWithStackTraceError from '../test-utilities/mocks/query-stack-trace-error';
+import mockQueryApiWithStackTraceError from '~/test-utilities/mocks/query';
 
 test.beforeEach(async ({ page, baseURL }) => {
   await page.goto(baseURL);

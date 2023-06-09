@@ -119,12 +119,14 @@ test.describe('Workflows Table Configuration', () => {
       .locator('.workflows-summary-table-header-cell')
       .all();
 
-    reorderedThs.forEach(async (th, idx) => {
-      await expect(th).toHaveAttribute(
-        'data-testid',
-        `workflows-summary-table-header-cell-${reorderedHeaders[idx]}`,
-      );
-    });
+    await Promise.allSettled(
+      reorderedThs.map((th, idx) => {
+        return expect(th).toHaveAttribute(
+          'data-testid',
+          `workflows-summary-table-header-cell-${reorderedHeaders[idx]}`,
+        );
+      }),
+    );
   });
 
   test('allows reordering columns in the table via drag and drop', async ({
@@ -179,11 +181,13 @@ test.describe('Workflows Table Configuration', () => {
       .locator('.workflows-summary-table-header-cell')
       .all();
 
-    reorderedThs.forEach(async (th, idx) => {
-      await expect(th).toHaveAttribute(
-        'data-testid',
-        `workflows-summary-table-header-cell-${reorderedHeaders[idx]}`,
-      );
-    });
+    await Promise.allSettled(
+      reorderedThs.map((th, idx) => {
+        return expect(th).toHaveAttribute(
+          'data-testid',
+          `workflows-summary-table-header-cell-${reorderedHeaders[idx]}`,
+        );
+      }),
+    );
   });
 });

@@ -17,6 +17,7 @@ async function globalSetup(config: FullConfig) {
 
   await page.goto(baseURL);
   await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
+  await setLocalStorage('lastNamespace', 'deafult', page);
   await page.context().storageState({ path: './tests/storageState.json' });
 
   if (mode === 'e2e') {

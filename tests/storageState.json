@@ -5,6 +5,10 @@
       "origin": "http://localhost:3000",
       "localStorage": [
         {
+          "name": "lastNamespace",
+          "value": "deafult"
+        },
+        {
           "name": "viewedFeatureTags",
           "value": "[\"topNav\"]"
         }
