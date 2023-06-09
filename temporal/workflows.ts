@@ -14,6 +14,13 @@ const { echo: LocalActivity } = workflow.proxyLocalActivities<
 const isBlockedQuery = workflow.defineQuery<boolean>('is-blocked');
 const unblockSignal = workflow.defineSignal('unblock');
 
+const { double } = workflow.proxyActivities<typeof activities>({
+  startToCloseTimeout: '1 hour',
+  retry: {
+    maximumAttempts: 1,
+  },
+});
+
 export async function Workflow(input: string): Promise<string> {
   let result: string;
 
@@ -39,4 +46,19 @@ export async function BlockingWorkflow(input: string): Promise<string> {
   }
 
   return Activity(input);
+}
+
+export async function CompletedWorkflow(
+  amount: number,
+  iterations = 0,
+): Promise<number> {
+  if (iterations) {
+    await workflow.continueAsNew(amount, iterations - 1);
+  }
+
+  return await double(amount);
+}
+
+export async function RunningWorkflow(): Promise<void> {
+  return await workflow.sleep('10 days');
 }
