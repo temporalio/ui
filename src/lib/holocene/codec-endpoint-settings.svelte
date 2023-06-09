@@ -10,12 +10,11 @@
 <div class="flex flex-col gap-4">
   <div class="flex flex-col gap-2">
     <h3 class="text-sm font-medium" data-testid="data-encoder-endpoint-title">
-      Local Remote Codec Endpoint Override
+      Codec Server endpoint browser override
     </h3>
     <p class="text-sm">
-      Enter a local remote codec endpoint to override any configured at the
-      Namespace-level. This will be stored in your local browser and will only
-      be accessible by you.
+      Enter a Codec Server endpoint for this browser to override any Namespace-level endpoints. This will be stored in
+      your browser and will only be accessible by you.
     </p>
     <textarea
       class="block w-full rounded-xl border-2 border-gray-900 p-2"
