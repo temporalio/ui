@@ -58,7 +58,7 @@
 
 <style lang="postcss">
   .workflows-summary-table-wrapper {
-    @apply flex overflow-y-visible;
+    @apply overflow-y-visible;
 
     &.pinned {
       @apply shrink-0 overflow-x-hidden rounded-l-lg max-md:max-w-[50%] max-md:overflow-x-scroll max-w-fit min-w-[40px];

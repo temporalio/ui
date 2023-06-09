@@ -1,6 +1,6 @@
 import { chalk } from 'zx';
 import type { Plugin } from 'vite';
-import { createUIServer, UIServer } from '../scripts/start-ui-server';
+import { createUIServer, UIServer } from '../utilities/ui-server';
 import { ViteDevServer } from 'vite';
 
 const { cyan } = chalk;
