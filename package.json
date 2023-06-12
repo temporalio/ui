@@ -95,6 +95,8 @@
     "svelte-motion": "^0.11.5",
     "url-pattern": "^1.0.3",
     "uuid": "^9.0.0",
+    "vis-network": "^9.1.6",
+    "vis-timeline": "^7.7.2",
     "websocket-as-promised": "^2.0.1"
   },
   "devDependencies": {

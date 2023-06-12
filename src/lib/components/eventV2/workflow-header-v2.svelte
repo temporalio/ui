@@ -7,7 +7,6 @@
 
   import {
     routeForEventHistory,
-    routeForEventHistoryV2,
     routeForPendingActivities,
     routeForStackTrace,
     routeForWorkers,
@@ -70,29 +69,18 @@
     >
       <Icon name="chevron-left" class="inline" />Back to Workflows
     </a>
-    <!-- <a
-      href={`${routeForEventHistoryV2({
-        namespace,
-        workflow: workflow.id,
-        run: workflow.runId,
-      })}?${$workflowsSearchParams}`}
-      data-testid="history-v2"
-      class="back-to-workflows"
-    >
-      Switch to v2 Workflow UI
-    </a> -->
   </div>
   <Tabs class="mb-4">
     <TabList class="flex flex-wrap gap-6" label="workflow detail">
       <Tab
         label="History"
-        href={routeForEventHistoryV2({
+        href={routeForEventHistory({
           ...routeParameters,
         })}
         id="history-tab"
         active={pathMatches(
           $page.url.pathname,
-          routeForEventHistoryV2({
+          routeForEventHistory({
             ...routeParameters,
           }),
         )}

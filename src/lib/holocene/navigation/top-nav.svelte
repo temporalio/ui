@@ -10,6 +10,7 @@
   import { authUser } from '$lib/stores/auth-user';
   import type { NamespaceListItem } from '$lib/types/global';
   import { dataEncoder } from '$lib/stores/data-encoder';
+  import LabsMode from '../labs-mode.svelte';
 
   export let logout: () => void;
   export let namespaceList: NamespaceListItem[] = [];
@@ -62,6 +63,7 @@
         </DropdownMenu>
       {/key}
       <DataEncoderStatus />
+      <LabsMode />
     {/if}
     {#if $authUser.accessToken}
       <DropdownMenu id="user" position="right">

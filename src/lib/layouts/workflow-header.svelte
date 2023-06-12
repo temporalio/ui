@@ -9,7 +9,6 @@
 
   import {
     routeForEventHistory,
-    routeForEventHistoryV2,
     routeForPendingActivities,
     routeForStackTrace,
     routeForWorkers,

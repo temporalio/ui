@@ -10,6 +10,7 @@ type UpdateQueryParams = {
   goto?: typeof navigateTo;
   allowEmpty?: boolean;
   invalidate?: typeof invalidate;
+  invalidatePage?: boolean;
 };
 
 export const gotoOptions = {
@@ -23,6 +24,7 @@ export const updateQueryParameters = async ({
   url,
   goto = navigateTo,
   allowEmpty = false,
+  invalidatePage = false,
 }: UpdateQueryParams): Promise<typeof value> => {
   const next = String(value);
 
@@ -40,6 +42,10 @@ export const updateQueryParameters = async ({
 
     if (url.pathname === workflowsPath) {
       await invalidate((url) => url.pathname === workflowsPath);
+    }
+
+    if (invalidatePage) {
+      await invalidate((url) => true);
     }
 
     goto(url, gotoOptions);
