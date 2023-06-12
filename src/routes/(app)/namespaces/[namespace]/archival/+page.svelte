@@ -11,7 +11,7 @@
   import CodeBlock from '$lib/holocene/code-block.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
 
-  export let data: PageData & { isS3Bucket: boolean };
+  export let data: PageData & { archivalQueryingNotSupported: boolean };
 
   $: ({
     namespace: {
@@ -20,7 +20,7 @@
     workflows,
     archivalEnabled,
     visibilityArchivalEnabled,
-    isS3Bucket,
+    archivalQueryingNotSupported,
   } = data);
 </script>
 
@@ -29,7 +29,7 @@
   <h1 class="text-2xl" data-testid="archived-enabled-title">
     Archived Workflows
   </h1>
-  {#if !isS3Bucket}<WorkflowFilters />{/if}
+  {#if !archivalQueryingNotSupported}<WorkflowFilters />{/if}
   {#if workflows?.length}
     <Pagination
       items={workflows}

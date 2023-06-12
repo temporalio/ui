@@ -45,9 +45,10 @@ type Auth struct {
 }
 
 type CodecResponse struct {
-	Endpoint           string
-	PassAccessToken    bool
-	IncludeCredentials bool
+	Endpoint                   string
+	PassAccessToken            bool
+	IncludeCredentials         bool
+	DecodeEventHistoryDownload bool
 }
 
 type SettingsResponse struct {
@@ -68,7 +69,7 @@ type SettingsResponse struct {
 
 func TemporalAPIHandler(cfgProvider *config.ConfigProviderWithRefresh, apiMiddleware []Middleware) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		err := auth.ValidateAuth(c, cfgProvider)
+		err := auth.ValidateAuthHeaderExists(c, cfgProvider)
 		if err != nil {
 			return err
 		}
@@ -120,9 +121,10 @@ func GetSettings(cfgProvier *config.ConfigProviderWithRefresh) func(echo.Context
 			FeedbackURL:                 cfg.FeedbackURL,
 			NotifyOnNewVersion:          cfg.NotifyOnNewVersion,
 			Codec: &CodecResponse{
-				Endpoint:           cfg.Codec.Endpoint,
-				PassAccessToken:    cfg.Codec.PassAccessToken,
-				IncludeCredentials: cfg.Codec.IncludeCredentials,
+				Endpoint:                   cfg.Codec.Endpoint,
+				PassAccessToken:            cfg.Codec.PassAccessToken,
+				IncludeCredentials:         cfg.Codec.IncludeCredentials,
+				DecodeEventHistoryDownload: cfg.Codec.DecodeEventHistoryDownload,
 			},
 			Version:                   version.UIVersion,
 			DisableWriteActions:       cfg.DisableWriteActions,

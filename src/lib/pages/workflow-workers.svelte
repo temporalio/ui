@@ -6,4 +6,4 @@
   $: ({ workers, workflow } = $workflowRun);
 </script>
 
-<WorkersList taskQueue={workflow.taskQueue} {workers} />
+<WorkersList taskQueue={workflow?.taskQueue} {workers} />

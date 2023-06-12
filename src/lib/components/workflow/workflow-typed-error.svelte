@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-
   import Alert from '$lib/holocene/alert.svelte';
   import Link from '$lib/holocene/link.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
@@ -13,8 +11,7 @@
   const WORKFLOW_TASK_FAILED_ERROR_COPY = {
     Unspecified: {
       title: 'Unspecified',
-      copy: 'The Workflow Task failed for an unknown reason.',
-      contactSupport: true,
+      copy: 'The Workflow Task failed. See error for details.',
     },
     UnhandledCommand: {
       title: 'Unhandled Command',
@@ -140,6 +137,14 @@
       title: 'Pending Request Cancel Limit Exceeded',
       copy: 'The capacity for pending requests to cancel other Workflows has been reached.',
     },
+    BadUpdateWorkflowExecutionMessage: {
+      title: 'Bad Update',
+      copy: 'A Workflow Execution tried to complete before receiving an Update.',
+    },
+    UnhandledUpdate: {
+      title: 'Unhandled Update',
+      copy: 'A Workflow Update was received by the Temporal Server while a Workflow Task was being processed on a Worker.',
+    },
   };
 
   function getErrorCause(
@@ -165,25 +170,13 @@
 
   $: cause = getErrorCause(error);
   $: errorCopy = WORKFLOW_TASK_FAILED_ERROR_COPY[cause] ?? {};
-  $: ({
-    title = '',
-    copy = '',
-    actionCopy = '',
-    link = '',
-    contactSupport = false,
-  } = errorCopy);
-  $: isCloud = $page.data?.settings?.runtimeEnvironment?.isCloud;
+  $: ({ title = '', copy = '', actionCopy = '', link = '' } = errorCopy);
 </script>
 
 {#if title || copy}
   <Alert bold icon="warning" intent="warning" {title} role="status">
     <p>
       {copy}
-      {#if contactSupport && isCloud}
-        Please <Link newTab href="http://support.temporal.io/"
-          >contact support</Link
-        >.
-      {/if}
     </p>
     {#if actionCopy && link}
       <p>

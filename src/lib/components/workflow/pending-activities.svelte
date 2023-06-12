@@ -89,7 +89,10 @@
                     <div class="pending-activity-detail">
                       <h4 class="pending-activity-detail-header">Next Retry</h4>
                       <Badge type={failed ? 'error' : 'default'}>
-                        {toTimeDifference(pendingActivity.scheduledTime)}
+                        {toTimeDifference({
+                          date: pendingActivity.scheduledTime,
+                          negativeDefault: 'None',
+                        })}
                       </Badge>
                     </div>
                   {/if}

@@ -10,11 +10,6 @@
   } from 'date-fns';
 
   import { columnOrderedDurations } from '$lib/utilities/to-duration';
-  import { clickOutside } from '$lib/holocene/outside-click';
-
-  import Select from '$lib/holocene/select/select.svelte';
-  import Option from '$lib/holocene/select/option.svelte';
-  import SimpleSplitButton from '$lib/holocene/simple-split-button.svelte';
   import {
     persistedTimeFilter,
     workflowFilters,
@@ -25,12 +20,14 @@
   import TimePicker from '$lib/holocene/time-picker.svelte';
   import { updateQueryParamsFromFilter } from '$lib/utilities/query/to-list-workflow-filters';
   import { page } from '$app/stores';
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
+  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
+  import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
+  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   let custom = false;
-  let show = false;
   let value = 'All Time';
   let timeField = 'StartTime';
 
@@ -173,22 +170,21 @@
   };
 </script>
 
-<div
-  class="flex items-center"
-  use:clickOutside
-  on:click-outside={() => (show = false)}
->
-  <Select
-    class="w-44 rounded"
-    id="time-range-filter"
-    placeholder="All Time"
-    unroundRight
-    bind:show
-    keepOpen={true}
-    {value}
-    {onChange}
-  >
-    <div class="flex rounded h-auto w-[400px] flex-col gap-8 bg-white p-4">
+<div class="flex items-center">
+  <MenuContainer>
+    <MenuButton
+      id="time-range-filter"
+      hasIndicator
+      controls="time-range-filter-menu"
+      class="flex flex-row items-center p-2 bg-white border border-r-0 border-primary rounded-l h-10 w-44"
+    >
+      {value}
+    </MenuButton>
+    <Menu
+      keepOpen
+      id="time-range-filter-menu"
+      class="flex rounded h-auto w-[400px] flex-col gap-8 bg-white p-2"
+    >
       {#if custom}
         <div class="flex flex-col">
           <p class="text-sm">Start</p>
@@ -218,79 +214,74 @@
           </div>
         </div>
         <div class="flex gap-2">
-          <Button on:click={onApply}>Apply</Button>
+          <Button on:click={onApply}>{translate('apply')}</Button>
           <Button variant="secondary" on:click={() => (custom = false)}
-            >Cancel</Button
+            >{translate('cancel')}</Button
           >
         </div>
       {:else}
         <div>
           <div class="flex w-full flex-wrap">
             <div class="flex w-1/2 flex-col border-b border-gray-300">
-              <Option value={'All Time'}>All Time</Option>
+              <MenuItem on:click={() => onChange('All Time')}
+                >{translate('all-time')}</MenuItem
+              >
             </div>
             <div class="flex w-1/2 flex-col border-b border-gray-300">
-              <Option value={'Custom'}>Custom</Option>
+              <MenuItem on:click={() => onChange('Custom')}
+                >{translate('custom')}</MenuItem
+              >
             </div>
             {#each columnOrderedDurations as duration}
               <div class="flex w-1/2 flex-col justify-center">
-                <Option value={duration}>{duration}</Option>
+                <MenuItem on:click={() => onChange(duration)}
+                  >{duration}</MenuItem
+                >
               </div>
             {/each}
             <div class="flex w-full flex-wrap">
               <div class="flex w-1/2 flex-col border-t border-gray-300">
-                <button
-                  class="time-label"
-                  class:active={timeField === 'StartTime'}
+                <MenuItem
+                  selected={timeField === 'StartTime'}
                   on:click={() => onTimeFieldChange('StartTime')}
                 >
-                  <div class="mr-2 w-6">
-                    {#if timeField === 'StartTime'}
-                      <Icon name="checkmark" />
-                    {/if}
-                  </div>
-                  Start Time
-                </button>
+                  {translate('start-time')}
+                </MenuItem>
               </div>
               <div class="flex w-1/2 flex-col border-t border-gray-300">
-                <button
-                  class="time-label"
-                  class:active={timeField === 'CloseTime'}
+                <MenuItem
+                  selected={timeField === 'CloseTime'}
                   on:click={() => onTimeFieldChange('CloseTime')}
                 >
-                  <div class="mr-2 w-6">
-                    {#if timeField === 'CloseTime'}
-                      <Icon name="checkmark" />
-                    {/if}
-                  </div>
-                  End Time
-                </button>
+                  {translate('end-time')}
+                </MenuItem>
               </div>
             </div>
           </div>
         </div>
       {/if}
-    </div>
-  </Select>
-  <SimpleSplitButton
-    class="rounded-tr rounded-br bg-white"
-    buttonClass="border border-gray-900"
-    id="datetime"
-    label={capitalize($timeFormat)}
-    icon="clock"
-  >
-    <MenuItem on:click={() => ($timeFormat = 'relative')}>Relative</MenuItem>
-    <MenuItem on:click={() => ($timeFormat = 'UTC')}>UTC</MenuItem>
-    <MenuItem on:click={() => ($timeFormat = 'local')}>Local</MenuItem>
-  </SimpleSplitButton>
+    </Menu>
+  </MenuContainer>
+  <MenuContainer>
+    <MenuButton
+      class="p-2 bg-white border border-primary rounded-r h-10 w-32"
+      id="datetime-filter"
+      controls="datetime-filter-menu"
+      hasIndicator
+      icon="clock"
+    >
+      {capitalize($timeFormat)}
+    </MenuButton>
+    <Menu id="datetime-filter-menu">
+      <MenuItem on:click={() => ($timeFormat = 'relative')}
+        >{translate('relative')}</MenuItem
+      >
+      <MenuItem on:click={() => ($timeFormat = 'UTC')}
+        >{translate('utc')}</MenuItem
+      >
+      <MenuItem on:click={() => ($timeFormat = 'local')}
+        >{translate('local')}</MenuItem
+      >
+    </Menu>
+  </MenuContainer>
 </div>
-
-<style lang="postcss">
-  .time-label {
-    @apply flex cursor-pointer whitespace-nowrap px-4 py-3 font-secondary text-sm font-medium hover:bg-gray-50;
-  }
-
-  .active {
-    @apply text-blue-700;
-  }
-</style>

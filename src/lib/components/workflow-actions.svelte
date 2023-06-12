@@ -5,9 +5,12 @@
     signalWorkflow,
     terminateWorkflow,
   } from '$lib/services/workflow-service';
+  import { authUser } from '$lib/stores/auth-user';
 
+  import { formatReason } from '$lib/utilities/workflow-actions';
+  import { Action } from '$lib/models/workflow-actions';
   import { writeActionsAreAllowed } from '$lib/utilities/write-actions-are-allowed';
-  import { ResetType, ResetReapplyType } from '$lib/models/workflow-actions';
+  import { ResetReapplyType } from '$lib/models/workflow-actions';
 
   import { refresh } from '$lib/stores/workflow-run';
   import { settings } from '$lib/stores/settings';
@@ -21,8 +24,7 @@
   import Input from '$lib/holocene/input/input.svelte';
   import MenuDivider from '$lib/holocene/primitives/menu/menu-divider.svelte';
   import JSONEditor from '$lib/holocene/json-editor.svelte';
-  import { eventHistory } from '$lib/stores/events';
-  import { getFirstResetEventID } from '$lib/utilities/get-first-reset-event-id';
+  import { resetEvents } from '$lib/stores/events';
   import { resetWorkflows } from '$lib/stores/reset-workflows';
   import WorkflowResetForm from '$lib/components/workflow/workflow-reset-form.svelte';
   import { workflowCancelEnabled } from '$lib/utilities/workflow-cancel-enabled';
@@ -43,10 +45,9 @@
   let terminateConfirmationModal: Modal;
   let resetConfirmationModal: Modal;
   let signalConfirmationModal: Modal;
-  let resetType: ResetType = ResetType.FirstWorkflowTask;
   let resetReapplyType: ResetReapplyType = ResetReapplyType.Unspecified;
-  let resetId: string | undefined = undefined;
-  let resetReason: string | undefined = undefined;
+  let resetId: string;
+  let resetReason: string;
   let eventIdValid: boolean = true;
   let loading = false;
 
@@ -65,7 +66,6 @@
   };
 
   const hideResetModal = () => {
-    resetType = ResetType.FirstWorkflowTask;
     resetReapplyType = ResetReapplyType.Unspecified;
     resetId = undefined;
     resetReason = undefined;
@@ -73,7 +73,7 @@
   };
 
   const handleSuccessfulTermination = async () => {
-    terminateConfirmationModal.close();
+    terminateConfirmationModal?.close();
     $refresh = Date.now();
     toaster.push({
       id: 'workflow-termination-success-toast',
@@ -83,7 +83,7 @@
 
   const handleTerminationError = (error: NetworkError) => {
     reason = '';
-    terminateConfirmationModal.setError(
+    terminateConfirmationModal?.setError(
       error?.message ?? 'An unknown error occurred.',
     );
   };
@@ -93,7 +93,12 @@
     terminateWorkflow({
       workflow,
       namespace,
-      reason,
+      reason: formatReason({
+        action: Action.Terminate,
+        reason,
+        email: $authUser.email,
+      }),
+      identity: $authUser.email,
     })
       .then(handleSuccessfulTermination)
       .catch(handleTerminationError);
@@ -107,7 +112,7 @@
         workflowId: workflow.id,
         runId: workflow.runId,
       });
-      cancelConfirmationModal.close();
+      cancelConfirmationModal?.close();
       loading = false;
       $refresh = Date.now();
       toaster.push({
@@ -115,7 +120,7 @@
         message: 'Workflow canceled.',
       });
     } catch (error) {
-      cancelConfirmationModal.setError(
+      cancelConfirmationModal?.setError(
         error?.message ?? 'An unknown error occurred.',
       );
     }
@@ -134,14 +139,14 @@
         signalInput,
         signalName,
       });
-      signalConfirmationModal.close();
+      signalConfirmationModal?.close();
       $refresh = Date.now();
       toaster.push({
         message: 'Workflow signaled.',
         id: 'workflow-signal-success-toast',
       });
     } catch (error) {
-      signalConfirmationModal.setError(
+      signalConfirmationModal?.setError(
         error?.message ?? 'An unknown error occurred.',
       );
     }
@@ -150,23 +155,17 @@
   };
 
   const reset = async () => {
-    switch (resetType) {
-      case ResetType.FirstWorkflowTask:
-        resetId = getFirstResetEventID($eventHistory.start);
-        break;
-      case ResetType.LastWorkflowTask: {
-        resetId = getFirstResetEventID($eventHistory.end);
-        break;
-      }
-    }
-
     try {
       const response = await resetWorkflow({
         namespace,
         workflowId: workflow.id,
         runId: workflow.runId,
         eventId: resetId,
-        reason: resetReason,
+        reason: formatReason({
+          action: Action.Reset,
+          reason: resetReason,
+          email: $authUser.email,
+        }),
         resetReapplyType,
       });
 
@@ -176,10 +175,10 @@
           [workflow.runId]: response.runId,
         }));
       }
-      resetConfirmationModal.close();
+      resetConfirmationModal?.close();
       $refresh = Date.now();
     } catch (error) {
-      resetConfirmationModal.setError(
+      resetConfirmationModal?.setError(
         error?.message ?? 'An unknown error occurred.',
       );
     }
@@ -200,6 +199,12 @@
       return 'Resetting workflows is not enabled, please contact your administrator for assistance.';
     if (resetEnabled && workflow?.pendingChildren?.length > 0)
       return 'Cannot reset workflows with pending children.';
+    if (
+      resetEnabled &&
+      workflow?.pendingChildren?.length === 0 &&
+      $resetEvents.length === 0
+    )
+      return 'Cannot reset workflows without WorkflowTaskStarted, WorkflowTaskCompleted, or WorkflowTaskTimedOut events.';
   };
 
   $: workflowActions = [
@@ -207,7 +212,10 @@
       label: 'Reset',
       onClick: () => resetConfirmationModal.open(),
       testId: 'reset-button',
-      allowed: resetEnabled && workflow?.pendingChildren?.length === 0,
+      allowed:
+        resetEnabled &&
+        workflow?.pendingChildren?.length === 0 &&
+        $resetEvents.length > 0,
       tooltip: resetTooltipText(),
     },
     {
@@ -263,25 +271,24 @@
 </SplitButton>
 
 <Modal
+  id="reset-confirmation-modal"
   data-testid="reset-confirmation-modal"
   bind:this={resetConfirmationModal}
   on:confirmModal={reset}
   on:cancelModal={hideResetModal}
-  confirmDisabled={resetType === ResetType.EventId && !eventIdValid}
+  confirmDisabled={!resetId}
 >
   <h3 slot="title">Reset Workflow</h3>
   <svelte:fragment slot="content">
     <WorkflowResetForm
       bind:eventId={resetId}
-      bind:eventIdValid
-      bind:resetType
       bind:resetReapplyType
       bind:reason={resetReason}
-      lastEvent={$eventHistory.end[0]}
     />
   </svelte:fragment>
 </Modal>
 <Modal
+  id="cancel-confirmation-modal"
   data-testid="cancel-confirmation-modal"
   bind:this={cancelConfirmationModal}
   {loading}
@@ -297,6 +304,7 @@
   </svelte:fragment>
 </Modal>
 <Modal
+  id="terminate-confirmation-modal"
   data-testid="terminate-confirmation-modal"
   bind:this={terminateConfirmationModal}
   confirmText="Terminate"
@@ -319,6 +327,7 @@
   </div>
 </Modal>
 <Modal
+  id="signal-confirmation-modal"
   data-testid="signal-confirmation-modal"
   bind:this={signalConfirmationModal}
   confirmText="Submit"

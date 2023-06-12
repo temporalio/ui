@@ -60,6 +60,7 @@ type TerminateWorkflowOptions = {
   workflow: WorkflowExecution;
   namespace: string;
   reason: string;
+  identity?: string;
 };
 
 export type ResetWorkflowOptions = {
@@ -85,7 +86,7 @@ export const fetchWorkflowCount = async (
   try {
     const countRoute = routeForApi('workflows.count', { namespace });
     if (!query) {
-      const totalCountResult = await requestFromAPI<{ count: number }>(
+      const totalCountResult = await requestFromAPI<{ count: string }>(
         countRoute,
         {
           params: {},
@@ -94,15 +95,15 @@ export const fetchWorkflowCount = async (
           request,
         },
       );
-      totalCount = totalCountResult?.count;
+      totalCount = parseInt(totalCountResult?.count);
     } else {
-      const countPromise = requestFromAPI<{ count: number }>(countRoute, {
+      const countPromise = requestFromAPI<{ count: string }>(countRoute, {
         params: { query },
         onError: noop,
         handleError: noop,
         request,
       });
-      const totalCountPromise = requestFromAPI<{ count: number }>(countRoute, {
+      const totalCountPromise = requestFromAPI<{ count: string }>(countRoute, {
         params: { query: '' },
         onError: noop,
         handleError: noop,
@@ -112,8 +113,8 @@ export const fetchWorkflowCount = async (
         countPromise,
         totalCountPromise,
       ]);
-      count = countResult?.count;
-      totalCount = totalCountResult?.count;
+      count = parseInt(countResult?.count);
+      totalCount = parseInt(totalCountResult?.count);
     }
   } catch (e) {
     // Don't fail the workflows call due to count
@@ -244,6 +245,7 @@ export async function terminateWorkflow({
   workflow,
   namespace,
   reason,
+  identity,
 }: TerminateWorkflowOptions): Promise<null> {
   const route = routeForApi('workflow.terminate', {
     namespace,
@@ -251,7 +253,10 @@ export async function terminateWorkflow({
     runId: workflow.runId,
   });
   return await requestFromAPI<null>(route, {
-    options: { method: 'POST', body: stringifyWithBigInt({ reason }) },
+    options: {
+      method: 'POST',
+      body: stringifyWithBigInt({ reason, ...(identity && { identity }) }),
+    },
     notifyOnError: false,
   });
 }

@@ -1,30 +1,38 @@
 <script lang="ts" context="module">
   import { writable } from 'svelte/store';
 
-  export const dataEncoderSettings = writable<Modal>(null);
+  export const viewDataEncoderSettings = writable<boolean>(false);
 </script>
 
 <script lang="ts">
+  import { fly } from 'svelte/transition';
   import { dataConverterPort } from '$lib/stores/data-converter-config';
   import {
     codecEndpoint,
     passAccessToken,
     includeCredentials,
+    overrideRemoteCodecConfiguration,
   } from '$lib/stores/data-encoder-config';
   import { validateHttpOrHttps, validateHttps } from '$lib/utilities/is-http';
+  import { clickOutside } from '$lib/holocene/outside-click';
 
-  import Modal from '$lib/holocene/modal.svelte';
   import CodecEndpointSettings from './codec-endpoint-settings.svelte';
   import DataConverterPortSettings from './data-converter-port-settings.svelte';
   import { page } from '$app/stores';
   import { refresh } from '$lib/stores/workflow-run';
+  import Button from './button.svelte';
+  import Accordion from './accordion.svelte';
 
   let endpoint = $codecEndpoint ?? '';
   let port = $dataConverterPort ?? '';
   let passToken = $passAccessToken ?? false;
   let includeCreds = $includeCredentials ?? false;
+  let override = $overrideRemoteCodecConfiguration ?? false;
 
   $: error = '';
+  $: namespaceOrCluster = $page.data?.settings?.runtimeEnvironment?.isCloud
+    ? 'Namespace'
+    : 'Cluster';
 
   $: {
     if (passToken && !validateHttps(endpoint)) {
@@ -36,12 +44,17 @@
     }
   }
 
+  $: if (!$viewDataEncoderSettings) {
+    onCancel();
+  }
+
   const onCancel = () => {
-    endpoint = $codecEndpoint ?? '';
-    port = $dataConverterPort ?? '';
-    passToken = $passAccessToken ?? false;
-    includeCreds = $includeCredentials ?? false;
-    $dataEncoderSettings.close();
+    endpoint = $codecEndpoint;
+    port = $dataConverterPort;
+    passToken = $passAccessToken;
+    includeCreds = $includeCredentials;
+    override = $overrideRemoteCodecConfiguration;
+    $viewDataEncoderSettings = false;
   };
 
   const onConfirm = () => {
@@ -50,7 +63,8 @@
     $passAccessToken = passToken;
     $includeCredentials = includeCreds;
     $dataConverterPort = port;
-    $dataEncoderSettings.close();
+    $overrideRemoteCodecConfiguration = override;
+    $viewDataEncoderSettings = false;
 
     if ($page.url.pathname.endsWith('history')) {
       $refresh = Date.now();
@@ -58,24 +72,85 @@
   };
 </script>
 
-<Modal
-  bind:this={$dataEncoderSettings}
-  on:cancelModal={onCancel}
-  on:confirmModal={onConfirm}
-  cancelText="Cancel"
-  confirmDisabled={Boolean(error)}
->
-  <h3 slot="title" data-testid="data-encoder-title">Codec Server</h3>
-  <div slot="content">
-    <CodecEndpointSettings
-      bind:endpoint
-      bind:passToken
-      bind:includeCreds
-      {error}
-    />
-    <DataConverterPortSettings bind:port />
-    <p data-testid="data-encoder-info">
-      *If both are set, the remote codec endpoint will be used.
-    </p>
+{#if $viewDataEncoderSettings}
+  <div
+    use:clickOutside
+    on:click-outside={() => ($viewDataEncoderSettings = false)}
+    in:fly={{ y: -50, delay: 0, duration: 500 }}
+    class="relative w-full h-auto p-12 bg-blue-50 border-b border-blue-100 flex flex-col gap-6"
+  >
+    <div class="w-full xl:w-1/2 flex flex-col gap-4">
+      <div class="flex items-center justify-between space-x-2">
+        <h3 data-testid="data-encoder-title" class="text-xl">Codec Server</h3>
+      </div>
+      <p class="text-sm">
+        The Codec Server uses a remote codec endpoint to decrypt your payloads,
+        ensuring that Temporal never sees your data. A remote codec endpoint can
+        be set at the {namespaceOrCluster}-level, or locally in your browser.
+      </p>
+      <Accordion
+        data-testid="override-accordion"
+        title={override
+          ? `Uses my local setting and ignores ${namespaceOrCluster}-level settings.`
+          : `Uses ${namespaceOrCluster}-level settings, where available.`}
+      >
+        <div class="flex flex-col gap-2">
+          <label
+            class="flex flex-row items-center gap-2 cursor-pointer"
+            for="use-configuration-endpoint-radio"
+          >
+            <input
+              on:click={() => (override = false)}
+              class="w-4 h-4 accent-gray-900"
+              type="radio"
+              checked={!override}
+              name="use-configuration-endpoint"
+              id="use-configuration-endpoint-radio"
+              data-testid="use-configuration-endpoint-input"
+            />
+            Uses {namespaceOrCluster}-level settings, where available.
+            Otherwise, use my local setting.
+          </label>
+          <label
+            class="flex flex-row items-center gap-2 cursor-pointer"
+            for="use-local-endpoint-radio"
+          >
+            <input
+              on:click={() => (override = true)}
+              class="w-4 h-4 accent-gray-900"
+              type="radio"
+              checked={override}
+              name="use-local-endpoint"
+              id="use-local-endpoint-radio"
+              data-testid="use-local-endpoint-input"
+            />
+            Uses my local setting and ignores {namespaceOrCluster}-level
+            settings.
+          </label>
+        </div>
+      </Accordion>
+      <CodecEndpointSettings
+        bind:endpoint
+        bind:passToken
+        bind:includeCreds
+        {error}
+      />
+      <DataConverterPortSettings bind:port />
+      <div class="flex items-center gap-4">
+        <Button
+          thin
+          disabled={Boolean(error) || (override && !endpoint)}
+          testId="confirm-data-encoder-button"
+          on:click={onConfirm}
+          type="submit">Apply</Button
+        >
+        <Button
+          thin
+          variant="link"
+          testId="cancel-data-encoder-button"
+          on:click={onCancel}>Cancel</Button
+        >
+      </div>
+    </div>
   </div>
-</Modal>
+{/if}

@@ -10,6 +10,7 @@
   import type { ChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
   import ParentWorkflowTable from './parent-workflow-table.svelte';
   import FirstPreviousNextWorkflowTable from './first-previous-next-workflow-table.svelte';
+  import SchedulerTable from './scheduler-table.svelte';
 
   export let hasChildren: boolean;
   export let hasRelationships: boolean;
@@ -19,6 +20,7 @@
   export let children: ChildWorkflowClosedEvent[];
   export let next: string | undefined;
   export let previous: string | undefined;
+  export let scheduleId: string | undefined;
 
   $: ({ workflow, namespace } = $page.params);
 </script>
@@ -26,6 +28,9 @@
 <section>
   <Accordion title="Relationships" icon="relationship">
     <div slot="summary" class="hidden flex-row gap-2 lg:flex">
+      {#if scheduleId}
+        <Badge type="purple">Scheduled</Badge>
+      {/if}
       <Badge type={parent ? 'purple' : 'gray'}>{parent ? 1 : 0} Parent</Badge>
       <Badge
         type={$workflowRun.workflow.pendingChildren.length ? 'purple' : 'gray'}
@@ -42,6 +47,9 @@
     </div>
     {#if hasRelationships}
       <div class="flex w-full flex-wrap gap-4">
+        {#if scheduleId}
+          <SchedulerTable {scheduleId} {namespace} />
+        {/if}
         {#if parent}
           <ParentWorkflowTable {parent} {parentNamespaceName} {namespace} />
         {/if}

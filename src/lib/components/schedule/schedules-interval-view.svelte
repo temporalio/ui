@@ -1,6 +1,9 @@
 <script lang="ts">
   import Input from '$lib/holocene/input/input.svelte';
-  import SimpleSplitButton from '$lib/holocene/simple-split-button.svelte';
+  import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
+  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
+  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
+  import Menu from '$lib/holocene/primitives/menu/menu.svelte';
 
   import type { ScheduleOffsetUnit } from '$lib/types/schedule';
 
@@ -102,27 +105,21 @@
       unroundRight
       class="h-10"
     />
-    <SimpleSplitButton
-      class="rounded-tr rounded-br bg-offWhite"
-      buttonClass="border border-gray-900 border-l-0"
-      id="phase"
-      label={offsetUnit}
-      position="right"
-    >
-      <div class="flex flex-col gap-4 p-4">
-        <button on:click={() => onPhaseClick('days')} class="days-label"
-          >days</button
-        >
-        <button on:click={() => onPhaseClick('hrs')} class="hrs-label"
-          >hrs</button
-        >
-        <button on:click={() => onPhaseClick('min')} class="min-label"
-          >min</button
-        >
-        <button on:click={() => onPhaseClick('sec')} class="sec-label"
-          >sec</button
-        >
-      </div>
-    </SimpleSplitButton>
+    <MenuContainer>
+      <MenuButton
+        hasIndicator
+        id="phase"
+        controls="phase-menu"
+        class="rounded-r bg-offWhite border border-primary border-l-0 h-10 w-16 px-2"
+      >
+        {offsetUnit}
+      </MenuButton>
+      <Menu id="phase-menu">
+        <MenuItem on:click={() => onPhaseClick('days')}>days</MenuItem>
+        <MenuItem on:click={() => onPhaseClick('hrs')}>hrs</MenuItem>
+        <MenuItem on:click={() => onPhaseClick('min')}>min</MenuItem>
+        <MenuItem on:click={() => onPhaseClick('sec')}>sec</MenuItem>
+      </Menu>
+    </MenuContainer>
   </div>
 </div>

@@ -10,6 +10,7 @@
   import TableHeaderRow from './workflows-summary-configurable-table/table-header-row.svelte';
   import TableBodyCell from './workflows-summary-configurable-table/table-body-cell.svelte';
   import WorkflowColumnsOrderableList from './workflows-summary-configurable-table/orderable-list.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   export let workflows: WorkflowExecution[];
 
@@ -71,17 +72,16 @@
   open={customizationDrawerOpen}
   onClick={closeCustomizationDrawer}
   position="right"
+  id="workflows-summary-table-configuration-drawer"
   dark={false}
-  title="Configure Workflow List"
+  title={translate('workflows', 'configure-workflows')}
 >
   <svelte:fragment slot="subtitle">
-    <span>Add (</span><Icon class="inline" name="add" /><span
-      >), re-arrange (</span
-    ><Icon class="inline" name="chevron-selector-vertical" /><span
-      >), and remove (</span
-    ><Icon class="inline" name="hyphen" /><span
-      >), Workflow<br />Headings to personalize the Workflow List Table.</span
-    >
+    Add (<Icon class="inline" name="add" />), re-arrange (<Icon
+      class="inline"
+      name="chevron-selector-vertical"
+    />), and remove (<Icon class="inline" name="hyphen" />), Workflow Headings
+    to personalize the Workflow List Table.
   </svelte:fragment>
   <WorkflowColumnsOrderableList />
 </Drawer>

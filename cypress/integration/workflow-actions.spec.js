@@ -96,47 +96,11 @@ describe('Workflow Actions', () => {
     const confirmBtn =
       '[data-testid="reset-confirmation-modal"] [data-testid="confirm-modal-button"]';
 
-    it('to the first workflow task if the workflow is running, and the action is enabled', () => {
-      cy.get('#workflow-actions-menu-button').click();
-      cy.get('#workflow-actions-menu >> [data-testid="reset-button"]').click();
-      cy.get('[data-testid="workflow-reset-type-select"]').click();
-      cy.get('#reset-type-select-menu >> li[role="menuitem"]').first().click();
-      cy.get('#reset-reason').type('test');
-      cy.get(confirmBtn).click();
-
-      cy.wait('@reset-workflow-api');
-      cy.waitForWorkflowAPIs();
-
-      cy.get('[data-testid="workflow-reset-alert"]').should('be.visible');
-      cy.get(confirmBtn).should('not.be.visible');
-    });
-
-    it('to the last workflow task if the workflow is running, and the action is enabled', () => {
-      cy.get('#workflow-actions-menu-button').click();
-      cy.get('#workflow-actions-menu >> [data-testid="reset-button"]').click();
-      cy.get('[data-testid="workflow-reset-type-select"]').click();
-      cy.get(
-        '#reset-type-select-menu > div:nth-child(2) > li[role="menuitem"]',
-      ).click();
-      cy.get('#reset-reason').type('test');
-      cy.get(confirmBtn).click();
-
-      cy.wait('@reset-workflow-api');
-      cy.waitForWorkflowAPIs();
-
-      cy.get('[data-testid="workflow-reset-alert"]').should('be.visible');
-      cy.get(confirmBtn).should('not.be.visible');
-    });
-
     it('to an arbitrary workflow task if the workflow is running, and the action is enabled', () => {
       cy.get('#workflow-actions-menu-button').click();
       cy.get('#workflow-actions-menu >> [data-testid="reset-button"]').click();
-      cy.get('[data-testid="workflow-reset-type-select"]').click();
-      cy.get(
-        '#reset-type-select-menu > div:nth-child(3) > li[role="menuitem"]',
-      ).click();
+      cy.get('input[name="reset-event-id"').first().click();
       cy.get('#reset-reason').type('test');
-      cy.get('#reset-event-id').type('1');
       cy.get(confirmBtn).click();
 
       cy.wait('@reset-workflow-api');

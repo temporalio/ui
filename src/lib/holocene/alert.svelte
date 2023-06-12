@@ -5,7 +5,7 @@
 
   interface $$Props extends HTMLAttributes<HTMLDivElement> {
     intent: 'warning' | 'error' | 'success' | 'info';
-    title: string;
+    title?: string;
     icon?: IconName;
     bold?: boolean;
     regular?: boolean;
@@ -13,7 +13,7 @@
   }
 
   export let intent: 'warning' | 'error' | 'success' | 'info';
-  export let title: string;
+  export let title = '';
   export let icon: IconName = null;
   export let regular = true;
   export let bold = false;
@@ -35,7 +35,9 @@
     </div>
   {/if}
   <div class="ml-1">
-    <h5 class="font-semibold leading-6">{title}</h5>
+    <h5 class="font-semibold leading-6" class:hidden={!title}>
+      {title}
+    </h5>
     {#if $$slots.default}
       <div class="content">
         <slot />

@@ -8,7 +8,7 @@ export type EventHistory = Replace<
 
 export type HistoryEvent = Replace<
   import('$lib/types').HistoryEvent,
-  { eventType: EventType }
+  { eventType: EventType; eventId: string }
 >;
 
 export type GetWorkflowExecutionHistoryResponse = Replace<
@@ -58,6 +58,8 @@ export type EventsWithMetadata = {
 } & EventRequestMetadata;
 
 export type EventType = import('$lib/utilities/is-event-type').EventType;
+export type ResetEventType =
+  import('$lib/utilities/is-event-type').ResetEventType;
 
 export type EventTypeCategory =
   import('$lib/models/event-history/get-event-categorization').EventTypeCategory;

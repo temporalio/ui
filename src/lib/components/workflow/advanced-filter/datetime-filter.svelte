@@ -2,14 +2,15 @@
   import Select from '$lib/holocene/select/select.svelte';
   import Option from '$lib/holocene/select/option.svelte';
   import { durations } from '$lib/utilities/to-duration';
+  import { translate } from '$lib/i18n/translate';
 
   export let value = '';
   export let conditional = '';
 
   const operations = {
-    'In Last': 'In Last',
-    After: 'After',
-    Before: 'Before',
+    'In Last': translate('in-last'),
+    After: translate('after'),
+    Before: translate('before'),
   };
 </script>
 

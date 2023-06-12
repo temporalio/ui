@@ -9,13 +9,14 @@
   import DataEncoderStatus from '$lib/holocene/data-encoder-status.svelte';
   import { authUser } from '$lib/stores/auth-user';
   import type { NamespaceListItem } from '$lib/types/global';
+  import { dataEncoder } from '$lib/stores/data-encoder';
 
   export let logout: () => void;
   export let namespaceList: NamespaceListItem[] = [];
 
   $: namespace = $page.params.namespace;
   $: pathNameSplit = $page.url.pathname.split('/');
-  $: showNamespaceSelect =
+  $: showNamespaceSpecificNav =
     namespace &&
     (pathNameSplit.includes('workflows') ||
       pathNameSplit.includes('schedules') ||
@@ -31,10 +32,11 @@
 <div
   class="sticky top-0 z-30 flex h-10 w-full items-center justify-between border-b-2 bg-gray-100 p-1 px-4 md:px-10"
   data-testid="top-nav"
+  class:bg-red-50={$dataEncoder.hasError && showNamespaceSpecificNav}
 >
   <div class="flex items-center gap-2" />
   <div class="flex items-center gap-2">
-    {#if showNamespaceSelect}
+    {#if showNamespaceSpecificNav}
       {#key namespace}
         <DropdownMenu
           id="namespace"
@@ -52,22 +54,22 @@
           <div
             class="h-auto max-h-[400px] w-[220px] max-w-[220px] overflow-auto md:w-[360px] md:max-w-[360px] lg:w-[500px] lg:max-w-[500px]"
             slot="items"
-            let:show
+            let:open
             data-testid="namespace-select-list"
           >
-            <NamespaceList {namespaceList} {show} />
+            <NamespaceList {namespaceList} {open} />
           </div>
         </DropdownMenu>
       {/key}
+      <DataEncoderStatus />
     {/if}
-    <DataEncoderStatus />
     {#if $authUser.accessToken}
-      <DropdownMenu id="namespace" position="right">
+      <DropdownMenu id="user" position="right">
         <div slot="trigger" class="flex items-center gap-1">
           <img
             src={$authUser?.picture}
             alt={$authUser?.profile ?? 'user profile'}
-            class="mt-2 h-[24px] w-[24px] cursor-pointer rounded-md"
+            class="h-[24px] w-[24px] cursor-pointer rounded-md"
             on:error={fixImage}
             class:hidden={!showProfilePic}
           />

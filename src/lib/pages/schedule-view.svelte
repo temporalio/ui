@@ -31,6 +31,7 @@
   import Loading from '$lib/holocene/loading.svelte';
   import type { DescribeScheduleResponse } from '$types';
   import { coreUserStore } from '$lib/stores/core-user';
+  import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
 
   let namespace = $page.params.namespace;
   let scheduleId = $page.params.schedule;
@@ -51,15 +52,17 @@
 
   const handleDelete = async () => {
     try {
-      deleteConfirmationModal.close();
       $loading = true;
       await deleteSchedule({ namespace, scheduleId });
+      deleteConfirmationModal?.close();
       setTimeout(() => {
         $loading = false;
         goto(routeForSchedules({ namespace }));
       }, 2000);
     } catch (e) {
-      deleteConfirmationModal.setError(`Cannot delete schedule. ${e?.message}`);
+      deleteConfirmationModal?.setError(
+        `Cannot delete schedule. ${e?.message}`,
+      );
       $loading = false;
     }
   };
@@ -77,22 +80,8 @@
           reason,
         });
     scheduleFetch = fetchSchedule(parameters, fetch);
-    pauseConfirmationModal.close();
     reason = '';
   };
-
-  let options = [
-    {
-      label: 'Edit',
-      onClick: () => goto(routeForScheduleEdit({ namespace, scheduleId })),
-      class: 'edit',
-    },
-    {
-      label: 'Delete Schedule',
-      onClick: () => deleteConfirmationModal.open(),
-      class: 'text-red-500 terminate',
-    },
-  ];
 </script>
 
 {#await scheduleFetch}
@@ -152,14 +141,19 @@
         disabled={editDisabled}
         on:click={() => pauseConfirmationModal.open()}
       >
-        {#each options as option}
-          <button
-            class="cursor-pointer flex gap-2 py-3 px-4 items-center w-full hover:bg-gray-50 {option?.class}"
-            on:click={option.onClick}
-          >
-            {option.label}
-          </button>
-        {/each}
+        <MenuItem
+          testId="edit-schedule"
+          href={routeForScheduleEdit({ namespace, scheduleId })}
+        >
+          Edit
+        </MenuItem>
+        <MenuItem
+          testId="delete-schedule"
+          destructive
+          on:click={() => deleteConfirmationModal.open()}
+        >
+          Delete Schedule
+        </MenuItem>
       </SplitButton>
     </header>
     <div class="flex flex-col gap-4 pb-24">
@@ -199,6 +193,7 @@
       </div>
     </div>
     <Modal
+      id="pause-schedule-modal"
       bind:this={pauseConfirmationModal}
       confirmType="primary"
       confirmText={schedule.schedule.state.paused ? 'Unpause' : 'Pause'}
@@ -229,6 +224,7 @@
       </div>
     </Modal>
     <Modal
+      id="delete-schedule-modal"
       bind:this={deleteConfirmationModal}
       confirmType="destructive"
       confirmText={'Delete'}

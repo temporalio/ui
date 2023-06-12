@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-Temporal must be running in development. (For details, see [Run a dev Cluster](https://docs.temporal.io/application-development/foundations#run-a-development-cluster) in the documentation.)
+Temporal must be running in development.
 
 Temporal UI requires [Temporal v1.16.0](https://github.com/temporalio/temporal/releases/tag/v1.16.0) or later.
 
@@ -22,7 +22,7 @@ You can start a Temporal server in development using the following command:
 temporal server start-dev
 ```
 
-You can access the UI by visiting `http://localhost:8233`.
+You can access the UI by visiting `http://localhost:8233`. OpenAPI is accessible at `http://localhost:8233/openapi/`.
 
 [temporal cli]: https://github.com/temporalio/cli
 [homebrew]: https://brew.sh

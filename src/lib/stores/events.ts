@@ -12,6 +12,7 @@ import { eventFilterSort } from './event-view';
 import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
 import { refresh } from '$lib/stores/workflow-run';
 import { authUser } from '$lib/stores/auth-user';
+import { isResetEvent } from '$lib/utilities/is-event-type';
 
 const namespace = derived([page], ([$page]) => {
   if ($page.params.namespace) {
@@ -84,3 +85,7 @@ export const timelineEvents = writable(null);
 export const fullEventHistory = writable<WorkflowEvents>([]);
 
 export const newEvents = writable<WorkflowEvents>([]);
+
+export const resetEvents = derived(fullEventHistory, (events) =>
+  events.filter(isResetEvent),
+);

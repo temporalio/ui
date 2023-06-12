@@ -112,6 +112,8 @@ export const eventTypes = [
   'RequestCancelExternalWorkflowExecutionFailed',
   'RequestCancelExternalWorkflowExecutionInitiated',
   'UpsertWorkflowSearchAttributes',
+  'WorkflowUpdateAccepted',
+  'WorkflowUpdateCompleted',
 ] as const;
 
 export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
@@ -156,6 +158,13 @@ export const eventAttributeKeys: Readonly<EventAttributeKey[]> = [
   'externalWorkflowExecutionSignaledEventAttributes',
   'upsertWorkflowSearchAttributesEventAttributes',
 ] as const;
+
+export type ResetEventType = (typeof validResetEventTypes)[number];
+export const validResetEventTypes = [
+  'WorkflowTaskCompleted',
+  'WorkflowTaskFailed',
+  'WorkflowTaskTimedOut',
+];
 
 export const findAttributeKey = (event: HistoryEvent): EventAttributeKey => {
   for (const key of eventAttributeKeys) {
@@ -381,6 +390,10 @@ export const isUpsertWorkflowSearchAttributesEvent =
   hasAttributes<UpsertWorkflowSearchAttributesEvent>(
     'upsertWorkflowSearchAttributesEventAttributes',
   );
+
+export const isResetEvent = (event: WorkflowEvent): boolean => {
+  return validResetEventTypes.includes(event.eventType);
+};
 
 export const isLocalActivityMarkerEvent = (
   event: IterableEvent | CommonHistoryEvent,

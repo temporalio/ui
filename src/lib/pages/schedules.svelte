@@ -129,14 +129,16 @@
             href="https://docs.temporal.io/cli/schedule">Temporal CLI</Link
           >.
         </p>
-        <Button
-          class="mt-4"
-          testId="create-schedule"
-          disabled={createDisabled}
-          on:click={() => goto(routeForScheduleCreate({ namespace }))}
-        >
-          Create Schedule
-        </Button>
+        {#if !error}
+          <Button
+            class="mt-4"
+            testId="create-schedule"
+            disabled={createDisabled}
+            on:click={() => goto(routeForScheduleCreate({ namespace }))}
+          >
+            Create Schedule
+          </Button>
+        {/if}
       </EmptyState>
     </div>
   {/if}

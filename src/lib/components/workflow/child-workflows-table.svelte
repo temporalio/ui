@@ -16,7 +16,12 @@
   export let namespace: string;
 
   $: formattedPending = pendingChildren.map((c) => {
-    return { runId: c.runId, workflowId: c.workflowId, status: 'Running' };
+    return {
+      runId: c.runId,
+      workflowId: c.workflowId,
+      status: 'Running' as const,
+      namespace,
+    };
   });
 
   $: formattedCompleted = children.map((c) => {
@@ -24,6 +29,7 @@
       runId: c.attributes.workflowExecution.runId,
       workflowId: c.attributes.workflowExecution.workflowId,
       status: c.classification,
+      namespace: c.attributes?.namespace || namespace,
     };
   });
 
@@ -52,7 +58,7 @@
           <Link
             newTab
             href={routeForEventHistory({
-              namespace,
+              namespace: child.namespace,
               workflow: child.workflowId,
               run: child.runId,
             })}
@@ -64,7 +70,7 @@
           <Link
             newTab
             href={routeForEventHistory({
-              namespace,
+              namespace: child.namespace,
               workflow: child.workflowId,
               run: child.runId,
             })}

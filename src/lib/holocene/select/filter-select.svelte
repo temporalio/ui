@@ -31,7 +31,7 @@
   {id}
   bind:value={_value}
   {...$$props}
-  class="border-[1px] border-gray-900 outline-none"
+  class="border-[1px] border-gray-900 outline-none focus-visible:outline focus-visible:outline-blue-700"
 >
   <slot>
     {#each options.map((o) => o.toString()) as option}

@@ -31,7 +31,7 @@
 
   let stackTrace: Eventual<ParsedQuery>;
   $: {
-    if (workflow.isRunning) stackTrace = getStackTrace();
+    if (workflow?.isRunning) stackTrace = getStackTrace();
   }
 
   const refreshStackTrace = () => {

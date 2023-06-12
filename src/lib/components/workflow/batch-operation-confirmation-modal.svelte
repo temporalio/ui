@@ -1,12 +1,13 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import Modal from '$lib/holocene/modal.svelte';
-  import { pluralize } from '$lib/utilities/pluralize';
   import Input from '$lib/holocene/input/input.svelte';
   import { authUser } from '$lib/stores/auth-user';
   import { allSelected } from '$lib/pages/workflows-with-new-search.svelte';
-
-  type Action = 'Terminate' | 'Cancel';
+  import { translate } from '$lib/i18n/translate';
+  import Translate from '$lib/i18n/translate.svelte';
+  import { formatReason, getPlacholder } from '$lib/utilities/workflow-actions';
+  import { Action } from '$lib/models/workflow-actions';
 
   export let action: Action;
   export let actionableWorkflowsLength: number;
@@ -21,20 +22,21 @@
     confirm: { reason: string };
   }>();
 
-  $: confirmText = action === 'Cancel' ? 'Confirm' : action;
-  $: placeholder = `${pastTense(action)} from Web UI${
-    $authUser?.email ? ` by ${$authUser.email}` : ''
-  }`;
+  $: actionText =
+    action === Action.Cancel
+      ? translate('workflows', 'cancel')
+      : translate('workflows', 'terminate');
+  $: confirmText =
+    action === Action.Cancel ? translate('workflows', 'confirm') : actionText;
+
+  $: placeholder = getPlacholder(action, $authUser.email);
 
   let reason: string = '';
 
-  const pastTense = (action: Action) => {
-    if (action === 'Cancel') return 'Canceled';
-    return 'Terminated';
-  };
-
   const handleConfirmModal = () => {
-    dispatch('confirm', { reason: [reason.trim(), placeholder].join(' ') });
+    dispatch('confirm', {
+      reason: formatReason({ action, reason, email: $authUser.email }),
+    });
   };
 
   const handleCancelModal = () => {
@@ -43,20 +45,30 @@
 </script>
 
 <Modal
+  id="batch-operation-confirmation-modal"
   bind:this={modal}
-  data-testid="batch-{action}-confirmation"
+  data-testid="batch-{actionText}-confirmation"
   confirmType="destructive"
   {confirmText}
   on:cancelModal={handleCancelModal}
   on:confirmModal={handleConfirmModal}
 >
-  <h3 slot="title">{action} Workflows</h3>
+  <h3 slot="title">
+    <Translate
+      namespace="workflows"
+      key="batch-operation-modal-title"
+      replace={{ action: actionText }}
+    />
+  </h3>
   <svelte:fragment slot="content">
     <div class="mb-4 flex flex-col">
       {#if $allSelected}
         <p class="mb-2">
-          Are you sure you want to {action.toLowerCase()} all worklfows matching
-          the following query? This action cannot be undone.
+          <Translate
+            namespace="workflows"
+            key="batch-operation-confirmation-all"
+            replace={{ action: actionText }}
+          />
         </p>
         <div
           class="mb-2 overflow-scroll whitespace-nowrap rounded border border-primary bg-gray-100 p-2"
@@ -65,29 +77,35 @@
             {query}
           </code>
         </div>
-        <span class="text-xs"
-          >Note: The actual count of workflows that will be affected is the
-          total number of running workflows matching this query at the time of
-          clicking "{confirmText}".</span
-        >
+        <span class="text-xs">
+          <Translate
+            namespace="workflows"
+            key="batch-operation-count-disclaimer"
+            replace={{ action: actionText }}
+          />
+        </span>
       {:else}
         <p>
-          Are you sure you want to {action.toLowerCase()}
-          <strong
-            >{actionableWorkflowsLength} running {pluralize(
-              'workflow',
-              actionableWorkflowsLength,
-            )}</strong
-          >?
+          <Translate
+            namespace="workflows"
+            key={action === Action.Cancel
+              ? 'batch-cancel-confirmation'
+              : 'batch-terminate-confirmation'}
+            count={actionableWorkflowsLength}
+          />
         </p>
       {/if}
     </div>
     <Input
-      label="Reason"
       id="bulk-action-reason"
       bind:value={reason}
+      label={translate('workflows', 'reason')}
+      hintText={translate(
+        'workflows',
+        'batch-operation-confirmation-input-hint',
+        { placeholder },
+      )}
       {placeholder}
-      hintText={`If you supply a custom reason, "${placeholder}" will be appended to it.`}
     />
   </svelte:fragment>
 </Modal>

@@ -59,6 +59,7 @@ type WorkflowRelationships = {
   parent: WorkflowIdentifier | undefined;
   parentNamespaceName: string | undefined;
   next: string | undefined;
+  scheduleId: string | undefined;
 };
 
 export const getWorkflowRelationships = (
@@ -95,12 +96,16 @@ export const getWorkflowRelationships = (
   const previous =
     workflowExecutionStartedEvent?.attributes?.continuedExecutionRunId;
 
+  const scheduleId = workflowExecutionStartedEvent?.attributes?.searchAttributes
+    ?.indexedFields?.TemporalScheduledById as string;
+
   const hasRelationships = !!(
     parent ||
     hasChildren ||
     first ||
     previous ||
-    newExecutionRunId
+    newExecutionRunId ||
+    scheduleId
   );
 
   return {
@@ -113,5 +118,6 @@ export const getWorkflowRelationships = (
     parent,
     parentNamespaceName,
     next: newExecutionRunId,
+    scheduleId,
   };
 };
