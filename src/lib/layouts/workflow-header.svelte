@@ -91,7 +91,7 @@
 </script>
 
 <header class="mb-4 flex flex-col gap-1">
-  <div class="mb-4 block flex justify-between">
+  <div class="mb-4 block">
     <a
       href={`${routeForWorkflows({
         namespace,

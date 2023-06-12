@@ -12,7 +12,6 @@
   } from '$lib/stores/events';
   import { authUser } from '$lib/stores/auth-user';
 
-  import Header from '$lib/layouts/workflow-header.svelte';
   import Loading from '$lib/holocene/loading.svelte';
   import { onDestroy, onMount } from 'svelte';
   import { type EventSortOrder, eventFilterSort } from '$lib/stores/event-view';
@@ -20,10 +19,7 @@
   import { getPollers } from '$lib/services/pollers-service';
   import { toDecodedPendingActivities } from '$lib/models/pending-activities';
   import { fetchStartAndEndEvents } from '$lib/services/events-service';
-  import WorkflowHistoryLayoutV2 from '$lib/components/eventV2/workflow-history-layout-v2.svelte';
   import WorkflowHeaderV2 from '$lib/components/eventV2/workflow-header-v2.svelte';
-  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
-  import { featureFlags } from '$lib/stores/feature-flags';
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
 
