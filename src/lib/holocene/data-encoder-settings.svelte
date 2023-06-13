@@ -90,7 +90,7 @@
           href="https://docs.temporal.io/dataconversion#codec-server"
           class="text-blue-700 underline decoration-blue-700">Codec Server</a
         >
-        decodes your payloads, ensuring that Temporal never sees your data. A Codec
+        decodes your data. A Codec
         Server endpoint can be set at the {namespaceOrCluster} level, or locally
         in your browser.
       </p>
