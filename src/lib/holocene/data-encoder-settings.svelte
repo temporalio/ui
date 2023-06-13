@@ -90,15 +90,14 @@
           href="https://docs.temporal.io/dataconversion#codec-server"
           class="text-blue-700 underline decoration-blue-700">Codec Server</a
         >
-        decodes your data. A Codec
-        Server endpoint can be set at the {namespaceOrCluster} level, or locally
-        in your browser.
+        decodes your data. A Codec Server endpoint can be set at the {namespaceOrCluster}
+        level, or locally in your browser.
       </p>
       <Accordion
         data-testid="override-accordion"
         title={override
-          ? `Uses my browser setting and ignores ${namespaceOrCluster}-level settings.`
-          : `Uses ${namespaceOrCluster}-level settings, where available.`}
+          ? `Use my browser setting and ignore ${namespaceOrCluster}-level setting.`
+          : `Use ${namespaceOrCluster}-level setting, where available.`}
       >
         <div class="flex flex-col gap-2">
           <label
@@ -131,7 +130,7 @@
               data-testid="use-local-endpoint-input"
             />
             Use my browser setting and ignore {namespaceOrCluster}-level
-            settings.
+            setting.
           </label>
         </div>
       </Accordion>
