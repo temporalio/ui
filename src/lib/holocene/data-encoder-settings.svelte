@@ -96,7 +96,7 @@
       <Accordion
         data-testid="override-accordion"
         title={override
-          ? `Use my browser setting and ignores ${namespaceOrCluster}-level setting.`
+          ? `Use my browser setting and ignore ${namespaceOrCluster}-level setting.`
           : `Use ${namespaceOrCluster}-level setting, where available.`}
       >
         <div class="flex flex-col gap-2">
