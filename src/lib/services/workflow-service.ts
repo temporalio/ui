@@ -6,7 +6,7 @@ import {
 } from '$lib/models/workflow-execution';
 
 import { requestFromAPI } from '$lib/utilities/request-from-api';
-import { routeForApi } from '$lib/utilities/route-for-api';
+import { base, pathForApi, routeForApi } from '$lib/utilities/route-for-api';
 import { toListWorkflowQuery } from '$lib/utilities/query/list-workflow-query';
 import {
   handleUnauthorizedOrForbiddenError,
@@ -171,14 +171,20 @@ export const fetchAllWorkflows = async (
   };
 };
 
+type WorkflowForRunIdParams = {
+  namespace: string;
+  workflowId: string;
+  url?: string;
+};
+
 export const fetchWorkflowForRunId = async (
-  parameters: { namespace: string; workflowId: string },
+  { namespace, workflowId, url }: WorkflowForRunIdParams,
   request = fetch,
 ): Promise<{ runId: string }> => {
-  const { namespace, workflowId } = parameters;
   const endpoint: ValidWorkflowEndpoints = 'workflows';
-
-  const route = routeForApi(endpoint, { namespace });
+  const baseUrl = url ?? base(namespace);
+  const path = pathForApi(endpoint, { namespace });
+  const route = baseUrl + path;
   const { executions } = (await requestFromAPI<ListWorkflowExecutionsResponse>(
     route,
     {
