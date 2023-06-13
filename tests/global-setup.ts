@@ -20,15 +20,6 @@ const setupDependencies = async () => {
   const client = await connect();
   await runWorker();
   await startWorkflows(client);
-
-  return new Promise<void>((resolve) => {
-    const waitInMS = 15000;
-    console.log('⏳ Waiting for temporal server to warm up');
-    setTimeout(() => {
-      console.log(`⌛️ Waited for ${waitInMS / 1000} Seconds.`);
-      resolve();
-    }, waitInMS);
-  });
 };
 
 async function globalSetup(config: FullConfig) {
