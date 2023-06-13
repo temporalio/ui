@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import mockQueryApiWithStackTraceError from '~/test-utilities/mocks/query';
 
 test.beforeEach(async ({ page, baseURL }) => {
-  await page.goto(baseURL);
+  await page.goto(`${baseURL}/namespaces/default/workflows`);
 });
 
 test.describe('Stack Trace With Completed Workflow', () => {
