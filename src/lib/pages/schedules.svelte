@@ -47,7 +47,7 @@
 <header class="flex flex-col justify-between gap-2 md:flex-row">
   <div>
     <h1 class="flex items-center gap-2 text-2xl">
-      Schedules<Badge type="beta">Beta</Badge>
+      Schedules<Badge type="beta">Preview</Badge>
     </h1>
     <p class="text-sm text-gray-600" data-testid="namespace-name">
       {namespace}
