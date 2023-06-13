@@ -3,7 +3,6 @@ import mockQueryApiWithStackTraceError from '~/test-utilities/mocks/query';
 
 test.beforeEach(async ({ page, baseURL }) => {
   await page.goto(baseURL);
-  await page.waitForResponse(`**/api/v1/namespaces/*/workflows*`);
 });
 
 test.describe('Stack Trace With Completed Workflow', () => {
