@@ -34,6 +34,12 @@ async function globalSetup(config: FullConfig) {
     const client = await connect();
     await runWorker();
     await startWorkflows(client);
+
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, 10000);
+    });
   }
 }
 
