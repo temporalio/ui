@@ -291,11 +291,11 @@ test.describe('Data Encoder with Configuration Settings', () => {
 
     await page
       .getByRole('button', {
-        name: 'Uses my local setting and ignores Cluster-level settings.',
+        name: 'Uses my browser setting and ignores Cluster-level settings.',
       })
       .click();
     await expect(await page.getByTestId('override-accordion').innerText()).toBe(
-      'Uses my local setting and ignores Cluster-level settings.',
+      'Uses my browser setting and ignores Cluster-level settings.',
     );
 
     await dataEncoderConfirmButton.click();
@@ -305,7 +305,7 @@ test.describe('Data Encoder with Configuration Settings', () => {
     await dataEncoderStatusConfiguredButton.click();
 
     await expect(await page.getByTestId('override-accordion').innerText()).toBe(
-      'Uses my local setting and ignores Cluster-level settings.',
+      'Uses my browser setting and ignores Cluster-level settings.',
     );
   });
 });
