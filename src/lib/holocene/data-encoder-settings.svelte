@@ -130,7 +130,7 @@
               data-testid="use-local-endpoint-input"
             />
             Use my browser setting and ignore {namespaceOrCluster}-level
-            settings.
+            setting.
           </label>
         </div>
       </Accordion>
