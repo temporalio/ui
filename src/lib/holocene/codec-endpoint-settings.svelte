@@ -10,10 +10,10 @@
 <div class="flex flex-col gap-4">
   <div class="flex flex-col gap-2">
     <h3 class="text-sm font-medium" data-testid="data-encoder-endpoint-title">
-      Codec Server endpoint browser override
+      Codec Server browser endpoint
     </h3>
     <p class="text-sm">
-      Enter a Codec Server endpoint for this browser to override any Namespace-level endpoints. This will be stored in
+      Enter a Codec Server endpoint for this browser. This will be stored in
       your browser and will only be accessible by you.
     </p>
     <textarea
