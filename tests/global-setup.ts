@@ -8,6 +8,29 @@ import { startWorkflows } from '../temporal/client';
 import { connect } from '../temporal/client';
 import { setLocalStorage } from './test-utilities/mock-local-storage';
 
+const setupDependencies = async () => {
+  const codecServer = await createCodecServer({ port: 8888 });
+  const temporalServer = await createTemporalServer();
+  const uiServer = await createUIServer('e2e');
+
+  await uiServer.ready();
+  await codecServer.start();
+  await temporalServer.ready();
+
+  const client = await connect();
+  await runWorker();
+  await startWorkflows(client);
+
+  return new Promise<void>((resolve) => {
+    const waitInMS = 15000;
+    console.log('⏳ Waiting for temporal server to warm up');
+    setTimeout(() => {
+      console.log(`⌛️ Waited for ${waitInMS / 1000} Seconds.`);
+      resolve();
+    }, waitInMS);
+  });
+};
+
 async function globalSetup(config: FullConfig) {
   const { mode } = config.metadata;
   const { baseURL } = config.projects[0].use;
@@ -15,35 +38,16 @@ async function globalSetup(config: FullConfig) {
   const browser = await chromium.launch();
   const page = await browser.newPage();
 
+  if (mode === 'e2e') {
+    await setupDependencies();
+  }
+
   await page.goto(baseURL);
   await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
 
   await page
     .context()
     .storageState({ path: `./tests/${mode}/storageState.json` });
-
-  if (mode === 'e2e') {
-    const codecServer = await createCodecServer({ port: 8888 });
-    const temporalServer = await createTemporalServer();
-    const uiServer = await createUIServer('e2e');
-
-    await uiServer.ready();
-    await codecServer.start();
-    await temporalServer.ready();
-
-    const client = await connect();
-    await runWorker();
-    await startWorkflows(client);
-
-    return new Promise<void>((resolve) => {
-      const waitInMS = 15000;
-      console.log('⏳ Waiting for temporal server to warm up');
-      setTimeout(() => {
-        console.log(`⌛️ Waited for ${waitInMS / 1000} Seconds.`);
-        resolve();
-      }, waitInMS);
-    });
-  }
 }
 
 export default globalSetup;
