@@ -21,7 +21,7 @@ export default defineConfig({
   use: {
     actionTimeout: 0,
     baseURL: `http://localhost:${PORT}`,
-    trace: 'on-first-retry',
+    trace: 'retain-on-failure',
     timezoneId: 'America/Denver',
     storageState: `./tests/${PLAYWRIGHT_MODE}/storageState.json`,
   },

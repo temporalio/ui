@@ -3,9 +3,10 @@ import mockQueryApiWithStackTraceError from '~/test-utilities/mocks/query';
 
 test.beforeEach(async ({ page, baseURL }) => {
   await page.goto(baseURL);
+  await page.waitForResponse(`**/api/v1/namespaces/*/workflows*`);
 });
 
-test.skip('Stack Trace With Completed Workflow', () => {
+test.describe('Stack Trace With Completed Workflow', () => {
   test('should show No Stack Trace for completed workflow', async ({
     page,
   }) => {
@@ -21,7 +22,7 @@ test.skip('Stack Trace With Completed Workflow', () => {
   });
 });
 
-test.skip('Stack Trace with Running Workflow', () => {
+test.describe('Stack Trace with Running Workflow', () => {
   test('should show stack trace for running workflow', async ({ page }) => {
     await page
       .getByText('running-workflow')

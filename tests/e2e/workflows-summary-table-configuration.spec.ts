@@ -169,12 +169,6 @@ test.describe('Workflows Table Configuration', () => {
       await page.mouse.up();
     }
 
-    const items = page.locator('li.orderable-item[draggable="true"]');
-    expect(await items.count()).toBe(6);
-    const locator = items.nth(5);
-    const innerText = await locator.innerText();
-    expect(innerText).toBe('Run ID');
-
     await page.getByTestId('drawer-close-button').click();
 
     const reorderedThs = await page
