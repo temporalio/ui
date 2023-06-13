@@ -109,7 +109,12 @@ export const createTemporalServer = async ({
       !headless && waitForPort({ port: uiPort, output: 'silent' }),
     ];
 
-    const portsPromise = await Promise.all(ports);
+    const portsPromise = await Promise.all(ports).then((ports) => {
+      console.log(`✨ temporal dev server running on port: ${port}`);
+
+      return ports;
+    });
+
     return portsPromise.every(({ open }) => open);
   };
 
