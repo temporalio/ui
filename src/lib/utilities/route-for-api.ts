@@ -35,7 +35,7 @@ const replaceNamespaceInApiUrl = (
   return '';
 };
 
-const base = (namespace?: string): string => {
+export const base = (namespace?: string): string => {
   let baseUrl = '';
   const webUrl: string | undefined = get(page).data?.webUrl;
 
@@ -57,13 +57,19 @@ const base = (namespace?: string): string => {
   return baseUrl;
 };
 
-const withBase = (endpoint: string, namespace?: string): string => {
+const getPath = (endpoint: string): string => {
   if (endpoint.startsWith('/')) endpoint = endpoint.slice(1);
-  const baseUrl = base(namespace);
-  return `${baseUrl}/api/v1/${endpoint}`;
+  return `/api/v1/${endpoint}`;
 };
 
-const encode = (parameters: APIRouteParameters): APIRouteParameters => {
+const withBase = (path: string, namespace?: string): string => {
+  const baseUrl = base(namespace);
+  return `${baseUrl}${path}`;
+};
+
+const encode = (
+  parameters: Partial<APIRouteParameters>,
+): APIRouteParameters => {
   return Object.keys(parameters ?? {}).reduce(
     (acc, key) => {
       acc[key] = encodeURIComponent(encodeURIComponent(parameters[key]));
@@ -79,6 +85,44 @@ const encode = (parameters: APIRouteParameters): APIRouteParameters => {
     },
   );
 };
+
+export function pathForApi(
+  route: APIRoutePath,
+  parameters?: Partial<APIRouteParameters>,
+  shouldEncode = true,
+): string {
+  if (shouldEncode) parameters = encode(parameters);
+
+  const routes: { [K in APIRoutePath]: string } = {
+    cluster: '/cluster',
+    'events.ascending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/events`,
+    'events.descending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/events/reverse`,
+    namespaces: '/namespaces',
+    namespace: `/namespaces/${parameters?.namespace}`,
+    query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/query`,
+    'schedule.delete': `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}`,
+    schedule: `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}`,
+    schedules: `/namespaces/${parameters?.namespace}/schedules`,
+    'search-attributes': '/search-attributes',
+    settings: '/settings',
+    'task-queue': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}`,
+    user: '/me',
+    'workflow.terminate': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/terminate`,
+    'workflow.cancel': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/runs/${parameters.runId}/cancel`,
+    'workflow.signal': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/runs/${parameters.runId}/signal`,
+    'workflow.reset': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/runs/${parameters.runId}/reset`,
+    workflow: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}`,
+    'workflows.archived': `/namespaces/${parameters?.namespace}/workflows/archived`,
+    workflows: `/namespaces/${parameters?.namespace}/workflows`,
+    'workflows.count': `/namespaces/${parameters?.namespace}/workflows/count`,
+    'activity.complete': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/runs/${parameters.runId}/activities/${parameters.activityId}/complete`,
+    'activity.fail': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/runs/${parameters.runId}/activities/${parameters.activityId}/fail`,
+    'batch-operations': `/namespaces/${parameters.namespace}/batch-operations`,
+    'batch-operation.describe': `/namespaces/${parameters.namespace}/batch-operations/describe`,
+  };
+
+  return getPath(routes[route]);
+}
 
 export function routeForApi(
   route: WorkflowsAPIRoutePath,
@@ -127,35 +171,7 @@ export function routeForApi(
   parameters?: APIRouteParameters,
   shouldEncode = true,
 ): string {
-  if (shouldEncode) parameters = encode(parameters);
+  const path = pathForApi(route, parameters, shouldEncode);
 
-  const routes: { [K in APIRoutePath]: string } = {
-    cluster: '/cluster',
-    'events.ascending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/events`,
-    'events.descending': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/events/reverse`,
-    namespaces: '/namespaces',
-    namespace: `/namespaces/${parameters?.namespace}`,
-    query: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/query`,
-    'schedule.delete': `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}`,
-    schedule: `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}`,
-    schedules: `/namespaces/${parameters?.namespace}/schedules`,
-    'search-attributes': '/search-attributes',
-    settings: '/settings',
-    'task-queue': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}`,
-    user: '/me',
-    'workflow.terminate': `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}/terminate`,
-    'workflow.cancel': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/runs/${parameters.runId}/cancel`,
-    'workflow.signal': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/runs/${parameters.runId}/signal`,
-    'workflow.reset': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/runs/${parameters.runId}/reset`,
-    workflow: `/namespaces/${parameters?.namespace}/workflows/${parameters?.workflowId}/runs/${parameters?.runId}`,
-    'workflows.archived': `/namespaces/${parameters?.namespace}/workflows/archived`,
-    workflows: `/namespaces/${parameters?.namespace}/workflows`,
-    'workflows.count': `/namespaces/${parameters?.namespace}/workflows/count`,
-    'activity.complete': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/runs/${parameters.runId}/activities/${parameters.activityId}/complete`,
-    'activity.fail': `/namespaces/${parameters.namespace}/workflows/${parameters.workflowId}/runs/${parameters.runId}/activities/${parameters.activityId}/fail`,
-    'batch-operations': `/namespaces/${parameters.namespace}/batch-operations`,
-    'batch-operation.describe': `/namespaces/${parameters.namespace}/batch-operations/describe`,
-  };
-
-  return withBase(routes[route], parameters?.namespace);
+  return withBase(path, parameters?.namespace);
 }
