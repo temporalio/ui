@@ -104,7 +104,7 @@ The e2e tests run against the UI with workflows via the [TypeScript SDK](https:/
 `pnpm test:e2e`
 
 ### Running the Integration tests
-The integration tests run against a the UI using Mocks
+The integration tests run against the UI using Mocks
 
 `pnpm test:integration`
 
