@@ -95,6 +95,21 @@ The resulting assets will be placed in `./build`.
 
 > You can preview the built app with `pnpm run preview`, regardless of whether you installed an adapter. This should _not_ be used to serve your app in production.
 
+## Testing
+We use [Playwright](https://playwright.dev) to interactively test the Temporal UI.
+
+### Running the E2E tests
+The e2e tests run against the UI with workflows via the [TypeScript SDK](https://github.com/temporalio/sdk-typescript), a locally built version of the UI Server, a NodeJS/Express Codec Server, and a Temporal dev server via [Temporal CLI](https://github.com/temporalio/cli)
+
+`pnpm test:e2e`
+
+### Running the Integration tests
+The integration tests run against a the UI using Mocks
+
+`pnpm test:integration`
+
+Both `pnpm test:e2e` and `pnpm test:integration` use the `playwright.config.ts` at the root of the repo. This file will [run the UI via the vite development server](https://playwright.dev/docs/api/class-testconfig#test-config-web-server) with the correct configuration by running either `pnpm dev:playwright:e2e` or `pnpm dev:playwright:integration`. It will also invoke the default function in `tests/globalSetup.ts`, which instantiates all of the necessary dependencies (UI Server, Codec Server, Temporal Server, Temporl Workers, etc.) when running in e2e mode.
+
 ## Configuration
 
 Set these environment variables if you want to change their defaults
