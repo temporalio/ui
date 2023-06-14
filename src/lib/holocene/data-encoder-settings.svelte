@@ -113,7 +113,7 @@
               id="use-configuration-endpoint-radio"
               data-testid="use-configuration-endpoint-input"
             />
-            Use {namespaceOrCluster}-level settings, where available. Otherwise,
+            Use {namespaceOrCluster}-level setting, where available. Otherwise,
             use my browser setting.
           </label>
           <label
