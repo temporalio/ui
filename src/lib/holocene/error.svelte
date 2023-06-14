@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import { beforeNavigate } from '$app/navigation';
+  import { afterNavigate } from '$app/navigation';
   import { BROWSER } from 'esm-env';
   import { page } from '$app/stores';
 
@@ -21,7 +21,7 @@
 
   $: currentLocation = $page.url.toString();
 
-  beforeNavigate(() => {
+  afterNavigate(() => {
     dispatch('clearError', {});
   });
 </script>
