@@ -15,7 +15,6 @@
   export let fullHistory: CommonHistoryEvent[] = [];
   export let importingHistory: boolean = false;
   export let showCompleted = false;
-  export let showNonCompleted = false;
   export let expandAll = false;
   export let showWorkflowTasks = false;
 

@@ -17,7 +17,7 @@
       <HistoryImport />
     </div>
   </nav>
-  <!-- <nav
+  <nav
     class="my-4 flex items-end justify-end gap-4"
     aria-label="event history view"
   >
@@ -34,17 +34,12 @@
           >Compact</ToggleButton
         >
         <ToggleButton
-          icon="compact"
-          href={routeForEventHistoryImport($lastUsedNamespace, 'compactV2')}
-          >Compact v2</ToggleButton
-        >
-        <ToggleButton
           icon="json"
           href={routeForEventHistoryImport($lastUsedNamespace, 'json')}
           >JSON</ToggleButton
         >
       </ToggleButtons>
     </div>
-  </nav> -->
+  </nav>
   <slot />
 </section>

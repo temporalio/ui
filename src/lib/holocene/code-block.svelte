@@ -13,7 +13,6 @@
   export let copyable = true;
   export let title = '';
   export let icon: IconName | undefined = undefined;
-  export let unroundTitle = false;
   export let titleColor = 'text-white';
   export let async = true;
 
@@ -57,7 +56,6 @@
   {#if title}
     <p
       class="-mb-2 flex items-center gap-2 rounded-t-lg py-2 px-4 text-sm {titleColor}"
-      class:unround-title={unroundTitle}
     >
       {#if icon}<Icon name={icon} />{/if}
       {title}
@@ -85,7 +83,7 @@
       {#if copyable}
         <button
           on:click={(e) => copy(e, parsedContent)}
-          class="absolute top-0 right-2.5 rounded-md bg-gray-900 opacity-90 hover:bg-white"
+          class="absolute top-2.5 right-2.5 rounded-md bg-gray-900 opacity-90 hover:bg-white"
         >
           <Icon
             name={$copied ? 'checkmark' : 'copy'}
@@ -103,10 +101,6 @@
   }
 
   .title {
-    @apply rounded-t-none;
-  }
-
-  .unround-title {
     @apply rounded-t-none;
   }
 </style>

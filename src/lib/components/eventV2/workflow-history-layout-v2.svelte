@@ -112,13 +112,13 @@
     {showCompleted}
     onShowCompletedToggle={() => (showCompleted = !showCompleted)}
   />
-  <!-- <WorkflowOptionsV2
+  <WorkflowOptionsV2
     {showWorkflowTasks}
     {showNonCompleted}
     {expandAll}
     onExpandClick={() => (expandAll = !expandAll)}
     onAdvancedClick={() => (showWorkflowTasks = !showWorkflowTasks)}
-  /> -->
+  />
   <EventSummaryV2
     {fullHistory}
     {showCompleted}

@@ -5,11 +5,7 @@
     refresh,
     workflowRun,
   } from '$lib/stores/workflow-run';
-  import {
-    timelineEvents,
-    eventHistory,
-    initialEventHistory,
-  } from '$lib/stores/events';
+  import { eventHistory, initialEventHistory } from '$lib/stores/events';
   import { authUser } from '$lib/stores/auth-user';
 
   import Loading from '$lib/holocene/loading.svelte';
@@ -19,7 +15,7 @@
   import { getPollers } from '$lib/services/pollers-service';
   import { toDecodedPendingActivities } from '$lib/models/pending-activities';
   import { fetchStartAndEndEvents } from '$lib/services/events-service';
-  import WorkflowHeaderV2 from '$lib/components/eventV2/workflow-header-v2.svelte';
+  import WorkflowHeader from './workflow-header.svelte';
 
   $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
 
@@ -62,7 +58,6 @@
   });
 
   onDestroy(() => {
-    $timelineEvents = null;
     $workflowRun = initialWorkflowRun;
     $eventHistory = initialEventHistory;
   });
@@ -72,7 +67,7 @@
   {#if !$workflowRun.workflow}
     <Loading />
   {:else}
-    <WorkflowHeaderV2 namespace={$page.params.namespace} />
+    <WorkflowHeader namespace={$page.params.namespace} />
     <slot />
   {/if}
 </div>

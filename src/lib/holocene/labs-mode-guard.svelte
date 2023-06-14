@@ -5,7 +5,7 @@
 </script>
 
 {#if labsModeOn}
-  <slot name="labsMode" />
+  <slot name="labs" />
 {:else}
   <slot />
 {/if}

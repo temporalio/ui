@@ -1,5 +1,4 @@
 <script lang="ts">
-  import CodeBlock from '$lib/holocene/code-block.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { EventGroup } from '$lib/models/event-groups/event-groups';
   import { timeFormat } from '$lib/stores/time-format';
@@ -9,9 +8,6 @@
   import { formatAttributes } from '$lib/utilities/format-event-attributes';
   import { getCodeBlockValueWithoutNullPayloads } from '$lib/utilities/get-single-attribute-for-event';
   import { getAttributePayloads } from './event-detail-keys';
-  import AttributesCodeBlock from './event-summary-card/attributes-code-block.svelte';
-  import EventClassification from './event-summary-card/event-classification.svelte';
-  import { format } from '$lib/utilities/format-camel-case';
   import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
 
   export let group: EventGroup;
@@ -43,10 +39,10 @@
     failure?.message;
 </script>
 
-<div class="h-auto text-white w-full">
+<div class="h-auto w-full">
   <div class="flex h-full">
     <div
-      class="w-1/2 flex flex-col gap-4 bg-blueGray-800 border-r border-blueGray-800 p-4 h-full"
+      class="w-1/2 flex flex-col gap-4 border-r border-blueGray-800 text-gray-900 p-4 h-full"
     >
       <div class="flex items-center gap-2">
         <span class="time text-[12px]">{group.lastEvent.id}</span>
@@ -75,100 +71,46 @@
         {/each}
       </div>
     </div>
-    <div class="w-1/2 flex flex-col gap-4 bg-gray-900 p-4">
-      <div class="flex items-center gap-2">
-        <Icon name="json" />
-        <ul class="tabs">
-          <li>
-            <input id="tab1" type="radio" name="tabs" />
-            <label class="flex gap-2" for="tab1">Input</label>
-            <div id="tab-panel-input" class="tab-panel">
-              {#each getPayloadAttributes(group.initialEvent) as attribute}
-                {@const isFailure = attribute.key === 'failure'}
-                {@const codeBlockValue = isFailure
-                  ? getFailureMessage(attribute.value)
-                  : getCodeBlockValueWithoutNullPayloads(attribute.value)}
-                {#if codeBlockValue}
-                  <div class="h-full">
-                    <pre><code>{stringifyWithBigInt(codeBlockValue)}</code
-                      ></pre>
-                  </div>
-                {/if}
-              {/each}
-            </div>
-          </li>
-          <li>
-            <input id="result" type="radio" name="tabs" />
-            <label for="result">Result</label>
-            <div id="tab-result" class="tab-panel">
-              {#each getPayloadAttributes(group.lastEvent) as attribute}
-                {@const isFailure = attribute.key === 'failure'}
-                {@const codeBlockValue = isFailure
-                  ? getFailureMessage(attribute.value)
-                  : getCodeBlockValueWithoutNullPayloads(attribute.value)}
-                {#if codeBlockValue}
-                  <div class="h-full">
-                    <pre><code>{stringifyWithBigInt(codeBlockValue)}</code
-                      ></pre>
-                  </div>
-                {/if}
-              {/each}
-            </div>
-          </li>
-          <li>
-            <input id="json" type="radio" name="tabs" />
-            <label for="json">JSON</label>
-            <div id="tab-json" class="tab-panel">
-              <pre><code>{stringifyWithBigInt(group)}</code></pre>
-            </div>
-          </li>
-        </ul>
+    <div class="w-1/2 flex flex-col gap-4 bg-gray-900 text-white p-4">
+      <div class="flex flex-col gap-2 h-full">
+        <div class="h-1/2 grow overflow-auto">
+          <h3 class="text-sm flex items-center gap-2">
+            <Icon name="json" /> Input
+          </h3>
+          <div data-testid="tab-panel-input">
+            {#each getPayloadAttributes(group.initialEvent) as attribute}
+              {@const isFailure = attribute.key === 'failure'}
+              {@const codeBlockValue = isFailure
+                ? getFailureMessage(attribute.value)
+                : getCodeBlockValueWithoutNullPayloads(attribute.value)}
+              {#if codeBlockValue}
+                <div class="h-full">
+                  <span class="time">{stringifyWithBigInt(codeBlockValue)}</span
+                  >
+                </div>
+              {/if}
+            {/each}
+          </div>
+        </div>
+        <div class="h-1/2 grow overflow-auto">
+          <h3 class="text-sm flex items-center gap-2">
+            <Icon name="json" /> Result
+          </h3>
+          <div data-testid="tab-result">
+            {#each getPayloadAttributes(group.lastEvent) as attribute}
+              {@const isFailure = attribute.key === 'failure'}
+              {@const codeBlockValue = isFailure
+                ? getFailureMessage(attribute.value)
+                : getCodeBlockValueWithoutNullPayloads(attribute.value)}
+              {#if codeBlockValue}
+                <div class="h-full">
+                  <pre><code>{stringifyWithBigInt(codeBlockValue)}</code></pre>
+                </div>
+              {/if}
+            {/each}
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
-
-<style lang="postcss">
-  .tabs {
-    list-style: none;
-    position: relative;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-  }
-
-  .tabs li {
-    display: inline-block;
-  }
-
-  .tabs input[type='radio'] {
-    display: none;
-  }
-
-  .tabs label {
-    display: block;
-    cursor: pointer;
-    padding: 10px 15px;
-  }
-
-  .tabs .tab-panel {
-    display: none;
-    overflow: hidden;
-    width: 100%;
-    position: absolute;
-    left: 0;
-  }
-
-  #tab-panel-input {
-    display: block;
-  }
-
-  .tabs [id^='tab']:checked + label {
-    background-color: black;
-    color: #fff;
-  }
-
-  .tabs [id^='tab']:checked ~ [id^='tab-panel'] {
-    display: block;
-  }
-</style>

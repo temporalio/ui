@@ -17,7 +17,7 @@
   } from '$lib/models/event-groups/get-event-in-group';
 
   export let fullHistory: CommonHistoryEvent[] = [];
-  export let showCompleted = false;
+  export let showCompleted = true;
   export let onShowCompletedToggle: () => void;
 
   let visualizationRef;
@@ -51,11 +51,14 @@
 
     const firstEvent = fullHistory[0];
     const finalEvent = fullHistory[fullHistory.length - 1];
-    groups.add({
-      id: 'workflow',
-      content: renderExecutionName($workflowRun.workflow.status),
-      order: -1,
-    });
+
+    if ($workflowRun?.workflow?.status) {
+      groups.add({
+        id: 'workflow',
+        content: renderExecutionName($workflowRun.workflow.status),
+        order: -1,
+      });
+    }
     if (isRunning) {
       items.add({
         id: 'workflow',
@@ -114,9 +117,10 @@
     visibleGroups.forEach((group, i) => {
       const initialEvent = group.initialEvent;
       const lastEvent = group?.lastEvent;
-      const groupPendingActivity = $workflowRun.workflow.pendingActivities.find(
-        (activity) => group.eventList.find((e) => e.id === activity.activityId),
-      );
+      const groupPendingActivity =
+        $workflowRun?.workflow?.pendingActivities.find((activity) =>
+          group.eventList.find((e) => e.id === activity.activityId),
+        );
 
       if (groupPendingActivity && isRunning) {
         items.add({
@@ -149,23 +153,23 @@
         id: group.id,
         content: renderGroupName(group, lastEvent.classification),
         order: i,
-        nestedGroups: [`${group.id}-nested`],
-        showNested: false,
+        // nestedGroups: [`${group.id}-nested`],
+        // showNested: false,
       });
-      groups.add({
-        id: `${group.id}-nested`,
-        content: '',
-      });
-      items.add({
-        id: `${group.id}-info`,
-        group: `${group.id}-nested`,
-        start: firstEvent.eventTime,
-        end: finalEvent.eventTime,
-        content: renderComponentToHTML(EventTimelineCard, {
-          group,
-        }),
-        className: 'Card',
-      });
+      // groups.add({
+      //   id: `${group.id}-nested`,
+      //   content: '',
+      // });
+      // items.add({
+      //   id: `${group.id}-info`,
+      //   group: `${group.id}-nested`,
+      //   start: firstEvent.eventTime,
+      //   end: finalEvent.eventTime,
+      //   content: renderComponentToHTML(EventTimelineCard, {
+      //     group,
+      //   }),
+      //   className: 'Card',
+      // });
     });
 
     return { items, groups };
@@ -174,7 +178,7 @@
   const options = {
     stack: false,
     stackSubgroups: true,
-    maxHeight: 800,
+    maxHeight: 600,
     horizontalScroll: true,
     verticalScroll: true,
     groupHeightMode: 'fixed',

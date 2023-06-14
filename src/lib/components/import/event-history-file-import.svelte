@@ -11,38 +11,12 @@
   import { page } from '$app/stores';
   import { authUser } from '$lib/stores/auth-user';
   import { lastUsedNamespace } from '$lib/stores/namespaces';
-  import workflowImportEvents from './workflow-import-events.json';
 
   import type { HistoryEvent } from '$lib/types/events';
   import { onMount } from 'svelte';
 
   let rawEvents: HistoryEvent[] | { events: HistoryEvent[] };
   let fileLoaded = false;
-
-  // Temporary: Just so I don't have to keep importing a file
-  onMount(async () => {
-    const { settings } = $page.data;
-    try {
-      const events = await toEventHistory({
-        response: workflowImportEvents.events,
-        namespace: $lastUsedNamespace,
-        settings,
-        accessToken: $authUser.accessToken,
-      });
-      const eventGroups = groupEvents(events);
-      importEvents.set(events);
-      importEventGroups.set(eventGroups);
-      fileLoaded = false;
-      const path = routeForEventHistoryImport($lastUsedNamespace, 'compactV2');
-      goto(path);
-    } catch (e) {
-      console.error(e);
-      toaster.push({
-        variant: 'error',
-        message: 'Could not create event history from JSON',
-      });
-    }
-  });
 
   const onFileSelect = async (e: Event) => {
     const target = e.target as HTMLInputElement;
@@ -76,7 +50,7 @@
       importEvents.set(events);
       importEventGroups.set(eventGroups);
       fileLoaded = false;
-      const path = routeForEventHistoryImport($lastUsedNamespace, 'compactV2');
+      const path = routeForEventHistoryImport($lastUsedNamespace, 'feed');
       goto(path);
     } catch (e) {
       console.error(e);

@@ -5,11 +5,7 @@
     refresh,
     workflowRun,
   } from '$lib/stores/workflow-run';
-  import {
-    timelineEvents,
-    eventHistory,
-    initialEventHistory,
-  } from '$lib/stores/events';
+  import { eventHistory, initialEventHistory } from '$lib/stores/events';
   import { authUser } from '$lib/stores/auth-user';
 
   import Loading from '$lib/holocene/loading.svelte';
@@ -63,7 +59,6 @@
   });
 
   onDestroy(() => {
-    $timelineEvents = null;
     $workflowRun = initialWorkflowRun;
     $eventHistory = initialEventHistory;
   });

@@ -1,21 +1,13 @@
 <script lang="ts">
-  import { page } from '$app/stores';
-  import {
-    eventFilterSort,
-    type EventSortOrder,
-    expandAllEvents,
-  } from '$lib/stores/event-view';
-  import { refresh } from '$lib/stores/workflow-run';
+  import { eventFilterSort, expandAllEvents } from '$lib/stores/event-view';
   import { eventHistory, fullEventHistory } from '$lib/stores/events';
   import { eventCategoryFilter } from '$lib/stores/filters';
-  import { authUser } from '$lib/stores/auth-user';
 
   import EventSummaryTable from '$lib/components/event/event-summary-table.svelte';
   import EventSummaryRow from '$lib/components/event/event-summary-row.svelte';
   import EventEmptyRow from './event-empty-row.svelte';
   import { groupEvents } from '$lib/models/event-groups';
   import Pagination from '$lib/holocene/pagination.svelte';
-  import { fetchAllEvents } from '$lib/services/events-service';
   import { isLocalActivityMarkerEvent } from '$lib/utilities/is-event-type';
   import { CATEGORIES } from '$lib/models/event-history/get-event-categorization';
 
@@ -27,35 +19,7 @@
 
   export let compact = false;
 
-  $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
-
   let loading: boolean = true;
-
-  const resetFullHistory = () => {
-    $fullEventHistory = [];
-    loading = true;
-  };
-
-  const fetchEvents = async (
-    namespace: string,
-    workflowId: string,
-    runId: string,
-    sort: EventSortOrder,
-  ) => {
-    const { settings } = $page.data;
-    resetFullHistory();
-    $fullEventHistory = await fetchAllEvents({
-      namespace,
-      workflowId,
-      runId,
-      settings,
-      accessToken: $authUser?.accessToken,
-      sort: compact ? 'ascending' : sort,
-    });
-    loading = false;
-  };
-
-  $: $refresh, fetchEvents(namespace, workflowId, runId, $eventFilterSort);
 
   function handleExpandChange(event: CustomEvent) {
     $expandAllEvents = event.detail.expanded;

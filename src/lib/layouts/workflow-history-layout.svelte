@@ -1,7 +1,10 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { eventViewType } from '$lib/stores/event-view';
-  import { getWorkflowStartedCompletedAndTaskFailedEvents } from '$lib/utilities/get-started-completed-and-task-failed-events';
+  import {
+    getWorkflowStartedCompletedAndTaskFailedEvents,
+    isCompletionEvent,
+  } from '$lib/utilities/get-started-completed-and-task-failed-events';
   import { getWorkflowRelationships } from '$lib/utilities/get-workflow-relationships';
   import { exportHistory } from '$lib/utilities/export-history';
   import { workflowRun } from '$lib/stores/workflow-run';
@@ -19,21 +22,33 @@
   import Accordion from '$lib/holocene/accordion.svelte';
   import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
 
-  import type { EventView } from '$lib/types/events';
+  import type { CommonHistoryEvent, EventView } from '$lib/types/events';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { authUser } from '$lib/stores/auth-user';
+  import EventSummaryTimeline from '$lib/components/eventV2/event-summary-timeline.svelte';
+  import { noop, onDestroy } from 'svelte/internal';
+  import { fetchAllEvents } from '$lib/services/events-service';
+  import { toEventHistory } from '$lib/models/event-history';
+  import debounce from 'just-debounce';
+  import { refresh } from '$lib/stores/workflows';
+  import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
 
   let showShortcuts = false;
+  let controller;
 
   $: workflowEvents =
     getWorkflowStartedCompletedAndTaskFailedEvents($eventHistory);
+  $: ({ namespace, workflow: workflowId, run: runId } = $page.params);
   $: ({ workflow } = $workflowRun);
+
   $: workflowRelationships = getWorkflowRelationships(
     workflow,
     $eventHistory,
-    $fullEventHistory,
+    fullHistory,
     $namespaces,
   );
+
+  let fullHistory: CommonHistoryEvent[] = [];
 
   const onViewClick = (view: EventView) => {
     if ($page.url.searchParams.get('page')) {
@@ -41,6 +56,61 @@
     }
     $eventViewType = view;
   };
+
+  const setFullHistory = async (events) => {
+    const { settings } = $page.data;
+    const newHistory = await toEventHistory({
+      response: events.slice(fullHistory.length),
+      namespace,
+      settings,
+      accessToken: $authUser?.accessToken,
+    });
+    $fullEventHistory = [...$fullEventHistory, ...newHistory];
+    const lastEvent = events[events.length - 1];
+    if (isCompletionEvent(lastEvent)) {
+      $refresh = Date.now();
+    }
+  };
+
+  const debounceSetFullHistory = debounce(async (events) => {
+    setFullHistory(events);
+  }, 250);
+
+  const onUpdate = async ({ history }) => {
+    const { events } = history;
+    if (!$fullEventHistory.length && events.length) {
+      setFullHistory(events);
+    } else if (events.length > $fullEventHistory.length) {
+      debounceSetFullHistory(events);
+    }
+  };
+
+  const fetchEvents = async (
+    namespace: string,
+    workflowId: string,
+    runId: string,
+  ) => {
+    controller = new AbortController();
+    const signal = controller.signal;
+    const { settings } = $page.data;
+    fetchAllEvents({
+      namespace,
+      workflowId,
+      runId,
+      settings,
+      params: { waitNewEvent: 'true' },
+      accessToken: $authUser?.accessToken,
+      sort: 'ascending',
+      onUpdate,
+      signal,
+    });
+  };
+
+  $: fetchEvents(namespace, workflowId, runId);
+
+  onDestroy(() => {
+    controller.abort();
+  });
 </script>
 
 <div class="flex flex-col gap-4">
@@ -72,7 +142,13 @@
       </div>
     </Accordion>
   </section>
-  <slot name="timeline" />
+  <LabsModeGuard>
+    <EventSummaryTimeline
+      slot="labs"
+      fullHistory={$fullEventHistory}
+      onShowCompletedToggle={noop}
+    />
+  </LabsModeGuard>
   <section id="event-history">
     <nav
       class="flex flex-col items-center justify-between gap-4 pb-4 lg:flex-row lg:items-end"
