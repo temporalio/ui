@@ -1,5 +1,4 @@
 import { Page } from '@playwright/test';
-import { apiUrl } from '~test-utilities/mock-apis';
 
 const json = {
   queryResult: {
@@ -14,7 +13,7 @@ const json = {
 
 export default async function mockQueryApiWithStackTraceError(page: Page) {
   await page.route(
-    apiUrl + '/namespaces/default/workflows/*/runs/*/query*',
+    '**/api/v1/namespaces/default/workflows/*/runs/*/query*',
     async (route) => {
       route.fulfill({ json });
     },

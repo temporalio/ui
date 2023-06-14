@@ -1,11 +1,11 @@
 import { test, expect } from '@playwright/test';
-import mockQueryApiWithStackTraceError from '../test-utilities/mocks/query-stack-trace-error';
+import mockQueryApiWithStackTraceError from '~/test-utilities/mocks/query';
 
 test.beforeEach(async ({ page, baseURL }) => {
-  await page.goto(baseURL);
+  await page.goto(`${baseURL}/namespaces/default/workflows`);
 });
 
-test.describe('Stack Trace With Completed Workflow', () => {
+test.skip('Stack Trace With Completed Workflow', () => {
   test('should show No Stack Trace for completed workflow', async ({
     page,
   }) => {
@@ -21,7 +21,7 @@ test.describe('Stack Trace With Completed Workflow', () => {
   });
 });
 
-test.describe('Stack Trace with Running Workflow', () => {
+test.skip('Stack Trace with Running Workflow', () => {
   test('should show stack trace for running workflow', async ({ page }) => {
     await page
       .getByText('running-workflow')

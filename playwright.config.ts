@@ -1,5 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const PLAYWRIGHT_MODE = process.env.PW_MODE;
+const PORT = PLAYWRIGHT_MODE === 'e2e' ? 3000 : 3333;
+
 export default defineConfig({
   testDir: './tests',
   timeout: 10 * 1000,
@@ -17,10 +20,10 @@ export default defineConfig({
   ],
   use: {
     actionTimeout: 0,
-    baseURL: 'http://localhost:3333',
-    trace: 'on-first-retry',
+    baseURL: `http://localhost:${PORT}`,
+    trace: 'retain-on-failure',
     timezoneId: 'America/Denver',
-    storageState: './tests/storageState.json',
+    storageState: `./tests/${PLAYWRIGHT_MODE}/storageState.json`,
   },
   projects: [
     {
@@ -29,12 +32,12 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm dev:playwright',
-    port: 3333,
+    command: `pnpm dev:playwright:${PLAYWRIGHT_MODE}`,
+    port: PORT,
   },
   globalSetup: './tests/global-setup.ts',
   globalTeardown: './tests/global-teardown.ts',
   metadata: {
-    mode: process.env.PW_MODE,
+    mode: PLAYWRIGHT_MODE,
   },
 });

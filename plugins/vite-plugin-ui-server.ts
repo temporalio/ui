@@ -1,12 +1,11 @@
 import { chalk } from 'zx';
 import type { Plugin } from 'vite';
 import { createUIServer, UIServer } from '../utilities/ui-server';
-import { ViteDevServer } from 'vite';
+import type { ViteDevServer } from 'vite';
 
 const { cyan } = chalk;
 
 let uiServer: UIServer;
-const PORT = 8081;
 
 const shouldSkip = (server: ViteDevServer): boolean => {
   if (process.env.VERCEL) return true;
@@ -27,10 +26,8 @@ export function uiServerPlugin(): Plugin {
       if (shouldSkip(server)) return;
 
       if (server.config.mode === 'ui-server') {
-        console.log(cyan(`Starting local UI Server on Port ${PORT}...`));
-        uiServer = await createUIServer(PORT);
+        uiServer = await createUIServer();
         await uiServer.ready();
-        console.log(cyan(`UI Server is running on Port ${PORT}`));
       }
     },
     async closeBundle() {

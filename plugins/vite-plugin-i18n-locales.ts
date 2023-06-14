@@ -1,4 +1,4 @@
-import { Plugin } from 'vite';
+import type { Plugin } from 'vite';
 import { generateLocales } from '../utilities/generate-locales';
 
 type PluginOptions = {

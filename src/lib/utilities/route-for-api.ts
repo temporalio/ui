@@ -23,6 +23,7 @@ import type {
   WorkflowAPIRoutePath,
   WorkflowRouteParameters,
   WorkflowActivitiesRouteParameters,
+  SearchAttributesRouteParameters,
 } from '$lib/types/api';
 
 const replaceNamespaceInApiUrl = (
@@ -103,7 +104,7 @@ export function pathForApi(
     'schedule.delete': `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}`,
     schedule: `/namespaces/${parameters?.namespace}/schedules/${parameters?.scheduleId}`,
     schedules: `/namespaces/${parameters?.namespace}/schedules`,
-    'search-attributes': '/search-attributes',
+    'search-attributes': `/namespaces/${parameters.namespace}/search-attributes`,
     settings: '/settings',
     'task-queue': `/namespaces/${parameters?.namespace}/task-queues/${parameters?.queue}`,
     user: '/me',
@@ -164,8 +165,10 @@ export function routeForApi(
   shouldEncode?: boolean,
 ): string;
 export function routeForApi(
-  route: ParameterlessAPIRoutePath | SearchAttributesRoutePath,
+  route: SearchAttributesRoutePath,
+  parameters: SearchAttributesRouteParameters,
 ): string;
+export function routeForApi(route: ParameterlessAPIRoutePath): string;
 export function routeForApi(
   route: APIRoutePath,
   parameters?: APIRouteParameters,

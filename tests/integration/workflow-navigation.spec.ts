@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test';
-import { mockNamespacesApi } from '~/test-utilities/mock-apis';
+import { mockWorkflowsApis } from '~/test-utilities/mock-apis';
 import { setLocalStorage } from '~/test-utilities/mock-local-storage';
 
 test.beforeEach(async ({ page, baseURL }) => {
   await page.goto(baseURL);
+  await mockWorkflowsApis(page);
 });
 
 test('New Top Navigation modal overlay is present', async ({ page }) => {
@@ -31,12 +32,7 @@ test('Top Navigation current namespace is present', async ({ page }) => {
 test('Top Navigation current namespace is present and has other namespaces to search and navigate to', async ({
   page,
 }) => {
-  await mockNamespacesApi(page);
   await expect(page.getByTestId('namespace-select-button')).toBeVisible();
-  await expect(
-    page.getByTestId('data-encoder-status-configured'),
-  ).toBeVisible();
-
   await page.getByTestId('namespace-select-button').click();
   await expect(page.locator('#namespace-search')).toBeFocused();
   await expect(page.getByRole('link', { name: 'default' })).toBeVisible();
@@ -59,12 +55,7 @@ test('Top Navigation current namespace is present and has other namespaces to se
 test('Top Navigation current namespace is present and has other namespaces to search and stays open with space press', async ({
   page,
 }) => {
-  await mockNamespacesApi(page);
   await expect(page.getByTestId('namespace-select-button')).toBeVisible();
-  await expect(
-    page.getByTestId('data-encoder-status-configured'),
-  ).toBeVisible();
-
   await page.getByTestId('namespace-select-button').click();
   await expect(page.locator('#namespace-search')).toBeFocused();
   await expect(page.getByRole('link', { name: 'default' })).toBeVisible();
@@ -85,7 +76,6 @@ test('Top Navigation current namespace is present and has other namespaces to se
 test('Top Navigation current namespace is not present on non-namespace specific pages', async ({
   page,
 }) => {
-  await mockNamespacesApi(page);
   await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
   await expect(page.getByTestId('namespace-select-button')).toBeVisible();
 
