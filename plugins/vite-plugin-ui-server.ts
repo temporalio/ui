@@ -11,7 +11,8 @@ const shouldSkip = (server: ViteDevServer): boolean => {
   if (process.env.CI) return true;
   if (
     server.config.mode === 'docker' ||
-    server.config.mode === 'temporal-server'
+    server.config.mode === 'temporal-server' ||
+    server.config.mode.includes('test')
   )
     return true;
 
