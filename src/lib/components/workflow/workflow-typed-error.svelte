@@ -5,145 +5,154 @@
   import Icon from '$lib/holocene/icon/icon.svelte';
   import Table from '$lib/holocene/table/table.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
-  import type { WorkflowTaskFailedCause } from '$types';
   import type { WorkflowTaskFailedEvent } from '$lib/types/events';
+  import { translate } from '$lib/i18n/translate';
+  import type { WorkflowTaskFailedCause } from '$lib/types';
+  import type { I18nKey } from '$lib/i18n';
 
-  const WORKFLOW_TASK_FAILED_ERROR_COPY = {
+  type CopyKeys = {
+    title: I18nKey<'typed-errors'>;
+    description: I18nKey<'typed-errors'>;
+    action?: I18nKey<'typed-errors'>;
+    link?: I18nKey<'typed-errors'>;
+  };
+
+  const WORKFLOW_TASK_FAILED_ERROR_COPY_KEYS: Record<string, CopyKeys> = {
     Unspecified: {
-      title: 'Unspecified',
-      copy: 'The Workflow Task failed. See error for details.',
+      title: 'unspecified-title',
+      description: 'unspecified-description',
     },
     UnhandledCommand: {
-      title: 'Unhandled Command',
-      copy: 'The Workflow Task failed because there are new available events since the last Workflow Task started. A retry Workflow Task has been scheduled and the Workflow will have a chance to handle those new events.',
+      title: 'unhandled-command-title',
+      description: 'unhandled-command-description',
     },
     BadScheduleActivityAttributes: {
-      title: 'Bad Schedule Activity Attributes',
-      copy: 'The Workflow Task failed because of missing or incorrect ScheduleActivity attributes.',
+      title: 'bad-schedule-activity-attributes-title',
+      description: 'bad-schedule-activity-attributes-description',
     },
     BadRequestCancelActivityAttributes: {
-      title: 'Bad Request Cancel Activity Attributes',
-      copy: 'The Workflow Task failed because of bad RequestCancelActivity attributes. An Activity was scheduled to cancel, but the scheduled event id was never set.',
+      title: 'bad-request-cancel-activity-attributes-title',
+      description: 'bad-request-cancel-activity-attributes-desccription',
     },
     BadStartTimerAttributes: {
-      title: 'Bad Start Timer Attributes',
-      copy: 'The Workflow Task failed because the scheduled event is missing a timer id.',
+      title: 'bad-start-timer-attributes-title',
+      description: 'bad-start-timer-attributes-description',
     },
     BadCancelTimerAttributes: {
-      title: 'Bad Cancel Timer Attributes',
-      copy: 'The Workflow Task failed when trying to cancel a timer due to an unset timer id.',
+      title: 'bad-cancel-timer-attributes-title',
+      description: 'bad-cancel-timer-attributes-description',
     },
     BadRecordMarkerAttributes: {
-      title: 'Bad Record Marker Attributes',
-      copy: 'The Workflow Task failed because of a missing or invalid Marker name.',
+      title: 'bad-record-marker-attributes-title',
+      description: 'bad-record-marker-attributes-description',
     },
     BadCompleteWorkflowExecutionAttributes: {
-      title: 'Bad Complete Workflow Execution Attributes',
-      copy: 'The Workflow Task failed because of an unset attribute on CompleteWorkflowExecution.',
+      title: 'bad-complete-workflow-execution-attributes-title',
+      description: 'bad-complete-workflow-execution-attributes-description',
     },
     BadFailWorkflowExecutionAttribute: {
-      title: 'Bad Fail Workflow Execution Attributes',
-      copy: 'The Workflow Task failed because of an unset FailWorkflowExecution attribute or failure.',
+      title: 'bad-fail-workflow-execution-attributes-title',
+      description: 'bad-fail-workflow-execution-attributes-description',
     },
     BadCancelWorkflowExecutionAttributes: {
-      title: 'Bad Cancel Workflow Execution Attributes',
-      copy: 'The Workflow Task failed because of an unset attribute on CancelWorkflowExecution.',
+      title: 'bad-cancel-workflow-execution-attributes-title',
+      description: 'bad-cancel-workflow-execution-attributes-description',
     },
     BadRequestCancelExternalAttributes: {
-      title: 'Bad Request Cancel External Attributes',
-      copy: 'The Workflow Task failed due to an invalid attribute on a request to cancel an external Workflow. Check the Failure Message for more details.',
+      title: 'bad-request-cancel-external-attributes-title',
+      description: 'bad-request-cancel-external-attributes-description',
     },
     BadContinueAsNewAttributes: {
-      title: 'Bad Continue As New Attributes',
-      copy: 'The Workflow Task failed because it failed to validate on a ContinueAsNew attribute. Check the Failure Message for more details.',
+      title: 'bad-continue-as-new-attributes-title',
+      description: 'bad-continue-as-new-attributes-description',
     },
     StartTimerDuplicateId: {
-      title: 'Start Timer Duplicate',
-      copy: 'The Workflow Task failed because a timer with the given timer id has already started.',
+      title: 'start-timer-duplicate-id-title',
+      description: 'start-timer-duplicate-id-description',
     },
     ResetStickyTaskQueue: {
-      title: 'Reset Sticky Task Queue',
-      copy: 'The Workflow Task failed because the Sticky Task Queue needs to be reset. The system will automatically retry.',
+      title: 'reset-sticky-task-queue-title',
+      description: 'reset-sticky-task-queue-description',
     },
     WorkflowWorkerUnhandledFailure: {
-      title: 'Workflow Worker Unhandled Failure',
-      copy: 'The Workflow Task failed due to an unhandled failure from the Workflow code.',
-      actionCopy: 'deterministic constraints',
-      link: 'https://docs.temporal.io/workflows/#deterministic-constraints',
+      title: 'workflow-worker-unhandled-failure-title',
+      description: 'workflow-worker-unhandled-failure-description',
+      action: 'workflow-worker-unhandled-failure-action',
+      link: 'workflow-worker-unhandled-failure-link',
     },
     WorkflowTaskHeartbeatError: {
-      title: 'Workflow Task Heartbeat Error',
-      copy: 'The Workflow Task failed to send a heartbeat while executing long-running local Activities. These local Activities will re-execute on the next Workflow Task attempt. If this error is persistent, these local Activities will run repeatedly until the Workflow times out.',
+      title: 'workflow-task-heartbeat-error-title',
+      description: 'workflow-task-heartbeat-error-description',
     },
     BadSignalWorkflowExecutionAttributes: {
-      title: 'Bad Signal Workflow Execution Attributes',
-      copy: 'The Workflow Task failed to validate attributes for SignalWorkflowExecution. Check the Failure Message for more details.',
+      title: 'bad-signal-workflow-execution-attributes-title',
+      description: 'bad-signal-workflow-execution-attributes-description',
     },
     BadStartChildExecutionAttributes: {
-      title: 'Bad Start Child Execution Attributes',
-      copy: 'The Workflow Task failed to validate attributes needed for StartChildWorkflowExecution. Check the Failure Message for more details.',
+      title: 'bad-start-child-execution-attributes-title',
+      description: 'bad-start-child-execution-attributes-description',
     },
     ForceCloseCommand: {
-      title: 'Force Close Command',
-      copy: 'The Workflow Task was forced to close. A retry will be scheduled if the error is recoverable.',
+      title: 'force-close-command-title',
+      description: 'force-close-command-description',
     },
     FailoverCloseCommand: {
-      title: 'Failover Close Command',
-      copy: 'The Workflow Task was forced to close due to a Namespace failover. A retry will be scheduled automatically.',
+      title: 'failover-close-command-title',
+      description: 'failover-close-command-description',
     },
     BadSignalInputSize: {
-      title: 'Bad Signal Input Size',
-      copy: 'The payload has exceeded the available input size on a Signal.',
+      title: 'bad-signal-input-size-title',
+      description: 'bad-signal-input-size-description',
     },
     ResetWorkflow: {
-      title: 'Reset Workflow',
-      copy: 'The system failed this Workflow Task. If a reset for this Workflow was requested check the progress on the new Workflow, otherwise reset this Workflow.',
+      title: 'reset-workflow-title',
+      description: 'reset-workflow-description',
     },
     BadBinary: {
-      title: 'Bad Binary',
-      copy: 'The system failed this Workflow Task because the deployment of this Worker is marked as bad binary.',
+      title: 'bad-binary-title',
+      description: 'bad-binary-description',
     },
-    ScheduleActivityDuplicatId: {
-      title: 'Schedule Activity Duplicate ID',
-      copy: 'The Workflow Task failed because the Activity ID is already in use, please check if you have specified the same Activity ID in your workflow.',
+    ScheduleActivityDuplicateId: {
+      title: 'schedule-activity-duplicate-id-title',
+      description: 'schedule-activity-duplicate-id-description',
     },
     BadSearchAttributes: {
-      title: 'Bad Search Attributes',
-      copy: 'A Search attribute is either missing or the value exceeds the limit. This might cause Workflow tasks to continue to retry without success.',
-      actionCopy: 'configuring search attributes',
-      link: 'https://docs.temporal.io/visibility#search-attribute',
+      title: 'bad-search-attributes-title',
+      description: 'bad-search-attributes-description',
+      action: 'bad-search-attributes-action',
+      link: 'bad-search-attributes-link',
     },
     NonDeterministicError: {
-      title: 'Non Deterministic Error',
-      copy: 'A non-deterministic error has caused the Workflow Task to fail. This usually means the workflow code has a non-backward compatible change without a proper versioning branch.',
+      title: 'non-deterministic-error-title',
+      description: 'non-deterministic-error-description',
     },
     BadModifyWorkflowPropertiesAttributes: {
-      title: 'Bad Modify Workflow Properties Attributes',
-      copy: 'The Workflow Task failed to validate attributes on ModifyWorkflowProperty on the upsert memo. Check the Failure Message for more details.',
+      title: 'bad-modify-workflow-properties-attributes-title',
+      description: 'bad-modify-workflow-properties-attributes-description',
     },
     PendingChildWorkflowsLimitExceeded: {
-      title: 'Pending Child Workflows Limit Exceeded',
-      copy: 'The capacity for pending child Workflows has been reached. The Workflow Task was failed to prevent any more child Workflows from being added.',
+      title: 'pending-child-workflows-limit-exceeded-title',
+      description: 'pending-child-workflows-limit-exceeded-description',
     },
     PendingActivitiesLimitExceeded: {
-      title: 'Pending Activities Limit Exceeded',
-      copy: 'The capacity for pending Activities has been reached. The Workflow Task was failed to prevent another Activity from being created.',
+      title: 'pending-activities-limit-exceeded-title',
+      description: 'pending-activities-limit-exceeded-description',
     },
     PendingSignalsLimitExceeded: {
-      title: 'Pending Signals Limit Exceeded',
-      copy: 'The capacity for pending Signals to be sent from this Workflow has been reached.',
+      title: 'pending-signals-limit-exceeded-title',
+      description: 'pending-signals-limit-exceeded-description',
     },
     PendingRequestCancelLimitExceeded: {
-      title: 'Pending Request Cancel Limit Exceeded',
-      copy: 'The capacity for pending requests to cancel other Workflows has been reached.',
+      title: 'pending-request-cancel-limit-exceeded-title',
+      description: 'pending-request-cancel-limit-exceeded-description',
     },
     BadUpdateWorkflowExecutionMessage: {
-      title: 'Bad Update',
-      copy: 'A Workflow Execution tried to complete before receiving an Update.',
+      title: 'bad-update-workflow-execution-message-title',
+      description: 'bad-update-workflow-execution-message-description',
     },
     UnhandledUpdate: {
-      title: 'Unhandled Update',
-      copy: 'A Workflow Update was received by the Temporal Server while a Workflow Task was being processed on a Worker.',
+      title: 'unhandled-update-title',
+      description: 'unhandled-update-description',
     },
   };
 
@@ -163,24 +172,42 @@
     ) {
       return 'WorkflowTaskHeartbeatError';
     }
+
     return cause;
   }
 
   export let error: WorkflowTaskFailedEvent;
 
-  $: cause = getErrorCause(error);
-  $: errorCopy = WORKFLOW_TASK_FAILED_ERROR_COPY[cause] ?? {};
-  $: ({ title = '', copy = '', actionCopy = '', link = '' } = errorCopy);
+  let title: I18nKey<'typed-errors'>;
+  let description: I18nKey<'typed-errors'>;
+  let action: I18nKey<'typed-errors'> | undefined;
+  let link: I18nKey<'typed-errors'> | undefined;
+
+  $: {
+    if (error) {
+      const cause = getErrorCause(error);
+      const errorCopyKeys = WORKFLOW_TASK_FAILED_ERROR_COPY_KEYS[cause];
+      ({ title, description, action, link } = errorCopyKeys);
+    }
+  }
 </script>
 
-{#if title || copy}
-  <Alert bold icon="warning" intent="warning" {title} role="status">
+{#if title && description}
+  <Alert
+    bold
+    icon="warning"
+    intent="warning"
+    title={translate('typed-errors', title)}
+    role="status"
+  >
     <p>
-      {copy}
+      {translate('typed-errors', description)}
     </p>
-    {#if actionCopy && link}
+    {#if action && link}
       <p>
-        Learn more about <Link newTab href={link}>{actionCopy}</Link>.
+        Learn more about <Link newTab href={translate('typed-errors', link)}
+          >{translate('typed-errors', action)}</Link
+        >.
       </p>
     {/if}
     <div class="mt-2 bg-white">
@@ -188,10 +215,10 @@
         <TableHeaderRow slot="headers">
           <th class="w-14 xl:w-10" />
           <th class="w-16 md:w-32">
-            <span class="max-md:hidden">Date & Time</span>
+            <span class="max-md:hidden">{translate('date-and-time')}</span>
             <span class="md:hidden"><Icon name="clock" /></span>
           </th>
-          <th class="w-44">Event</th>
+          <th class="w-44">{translate('event')}</th>
           <th class="w-auto xl:w-80" />
         </TableHeaderRow>
         <EventSummaryRow

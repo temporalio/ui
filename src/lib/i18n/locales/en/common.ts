@@ -39,4 +39,6 @@ export const Strings = {
   schedule: 'Schedule',
   scheduled: 'Scheduled',
   'show-all': 'Show all',
+  'date-and-time': 'Date & Time',
+  event: 'Event',
 } as const;

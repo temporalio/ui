@@ -36,5 +36,7 @@
   "summary": "Summary",
   "schedule": "Schedule",
   "scheduled": "Scheduled",
-  "show-all": "Show all"
+  "show-all": "Show all",
+  "date-and-time": "Date & Time",
+  "event": "Event"
 }
