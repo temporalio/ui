@@ -12,7 +12,6 @@ import { getAuthUser, setAuthUser } from '$lib/stores/auth-user';
 import { fetchCluster } from '$lib/services/cluster-service';
 import { fetchNamespaces } from '$lib/services/namespaces-service';
 import { fetchLatestUiVersion } from '$lib/services/github-service';
-import { fetchSearchAttributes } from '$lib/services/search-attributes-service';
 import { isAuthorized } from '$lib/utilities/is-authorized';
 import { routeForLoginPage } from '$lib/utilities/route-for';
 import {
@@ -39,7 +38,6 @@ export const load: LayoutLoad = async function ({
   }
 
   fetchNamespaces(settings, fetch);
-  fetchSearchAttributes(settings, fetch);
 
   const cluster: GetClusterInfoResponse = await fetchCluster(settings, fetch);
 

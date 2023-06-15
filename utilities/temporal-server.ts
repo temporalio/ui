@@ -15,6 +15,7 @@ export type TemporalServerOptions = {
   path?: string;
   logLevel?: string;
   codecEndpoint?: string;
+  headless?: boolean;
 };
 
 const warn = (message: Parameters<typeof console.warn>[0]) => {
@@ -58,6 +59,7 @@ export const createTemporalServer = async ({
   path = localCLIPath,
   logLevel = 'fatal',
   codecEndpoint,
+  headless = false,
 }: TemporalServerOptions = {}) => {
   const cliPath = await getCLIPath(path);
 
@@ -69,6 +71,10 @@ export const createTemporalServer = async ({
 
   if (codecEndpoint) {
     flags.push(`--ui-codec-endpoint=${codecEndpoint}`);
+  }
+
+  if (headless) {
+    flags.push('--headless');
   }
 
   const temporal = $`${cliPath} server start-dev ${flags}`.quiet();
@@ -98,11 +104,18 @@ export const createTemporalServer = async ({
   };
 
   const ready = async () => {
-    const ports = await Promise.all([
+    const ports = [
       waitForPort({ port, output: 'silent' }),
-      waitForPort({ port: uiPort, output: 'silent' }),
-    ]);
-    return ports.every(({ open }) => open);
+      !headless && waitForPort({ port: uiPort, output: 'silent' }),
+    ];
+
+    const portsPromise = await Promise.all(ports).then((ports) => {
+      console.log(`✨ temporal dev server running on port: ${port}`);
+
+      return ports;
+    });
+
+    return portsPromise.every(({ open }) => open);
   };
 
   temporalServer = {

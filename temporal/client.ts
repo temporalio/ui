@@ -1,5 +1,10 @@
 import { Connection, Client, WorkflowHandle } from '@temporalio/client';
-import { Workflow, BlockingWorkflow } from './workflows';
+import {
+  Workflow,
+  BlockingWorkflow,
+  CompletedWorkflow,
+  RunningWorkflow,
+} from './workflows';
 import { getDataConverter } from './data-converter';
 
 let connection: Connection;
@@ -23,7 +28,9 @@ export const connect = async () => {
 
 const workflows: WorkflowHandle[] = [];
 
-export const startWorkflows = async (client: Client): Promise<string[]> => {
+export const startWorkflows = async (
+  client: Client,
+): Promise<(string | number | void)[]> => {
   const wf1 = await client.workflow.start(Workflow, {
     taskQueue: 'e2e-1',
     args: ['Plain text input 1'],
@@ -36,9 +43,21 @@ export const startWorkflows = async (client: Client): Promise<string[]> => {
     workflowId: 'e2e-workflow-2',
   });
 
-  workflows.push(wf1, wf2);
+  const wf3 = await client.workflow.start(CompletedWorkflow, {
+    taskQueue: 'e2e-1',
+    args: [2],
+    workflowId: 'completed-workflow',
+  });
 
-  return Promise.all([wf1.result()]);
+  const wf4 = await client.workflow.start(RunningWorkflow, {
+    taskQueue: 'e2e-1',
+    args: [],
+    workflowId: 'running-workflow',
+  });
+
+  workflows.push(wf1, wf2, wf3, wf4);
+
+  return Promise.all([wf1.result(), wf3.result()]);
 };
 
 export const stopWorkflows = (): Promise<void[]> => {

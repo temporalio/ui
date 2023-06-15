@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import {
-  searchAttributes,
+  allSearchAttributes,
   isCustomSearchAttribute,
   workflowIncludesSearchAttribute,
 } from './search-attributes';
@@ -8,12 +8,18 @@ import {
 describe('search attributes store', () => {
   describe('isCustomSearchAttribute', () => {
     test('returns false when the key is not a custom search attribute', () => {
-      searchAttributes.set({ WorkflowType: 'Keyword' });
+      allSearchAttributes.set({
+        systemAttributes: { WorkflowType: 'Keyword' },
+        customAttributes: {},
+      });
       expect(isCustomSearchAttribute('CustomBool')).toBe(false);
     });
 
     test('returns true when the key is a custom search attribute', () => {
-      searchAttributes.set({ WorkflowType: 'Keyword', CustomBool: 'Bool' });
+      allSearchAttributes.set({
+        systemAttributes: { WorkflowType: 'Keyword' },
+        customAttributes: { CustomBool: 'Bool' },
+      });
       expect(isCustomSearchAttribute('CustomBool')).toBe(true);
     });
   });

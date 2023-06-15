@@ -2,7 +2,10 @@ window.onload = function() {
   //<editor-fold desc="Changeable Configuration Block">
 
   window.ui = SwaggerUIBundle({
-    url: "./temporal/api/workflowservice/v1/service.swagger.json",
+    urls: [
+      { url: "./temporal/api/workflowservice/v1/service.swagger.json", name: "workflowservice" },
+      { url: "./temporal/api/operatorservice/v1/service.swagger.json", name: "operatorservice" },
+    ],
     dom_id: '#swagger-ui',
     deepLinking: true,
     presets: [

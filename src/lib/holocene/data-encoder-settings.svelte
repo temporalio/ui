@@ -84,15 +84,20 @@
         <h3 data-testid="data-encoder-title" class="text-xl">Codec Server</h3>
       </div>
       <p class="text-sm">
-        The Codec Server uses a remote codec endpoint to decrypt your payloads,
-        ensuring that Temporal never sees your data. A remote codec endpoint can
-        be set at the {namespaceOrCluster}-level, or locally in your browser.
+        A <a
+          rel="noreferrer"
+          target="_blank"
+          href="https://docs.temporal.io/dataconversion#codec-server"
+          class="text-blue-700 underline decoration-blue-700">Codec Server</a
+        >
+        decodes your data. A Codec Server endpoint can be set at the {namespaceOrCluster}
+        level, or locally in your browser.
       </p>
       <Accordion
         data-testid="override-accordion"
         title={override
-          ? `Uses my local setting and ignores ${namespaceOrCluster}-level settings.`
-          : `Uses ${namespaceOrCluster}-level settings, where available.`}
+          ? `Use my browser setting and ignore ${namespaceOrCluster}-level setting.`
+          : `Use ${namespaceOrCluster}-level setting, where available.`}
       >
         <div class="flex flex-col gap-2">
           <label
@@ -108,8 +113,8 @@
               id="use-configuration-endpoint-radio"
               data-testid="use-configuration-endpoint-input"
             />
-            Uses {namespaceOrCluster}-level settings, where available.
-            Otherwise, use my local setting.
+            Use {namespaceOrCluster}-level setting, where available. Otherwise,
+            use my browser setting.
           </label>
           <label
             class="flex flex-row items-center gap-2 cursor-pointer"
@@ -124,8 +129,8 @@
               id="use-local-endpoint-radio"
               data-testid="use-local-endpoint-input"
             />
-            Uses my local setting and ignores {namespaceOrCluster}-level
-            settings.
+            Use my browser setting and ignore {namespaceOrCluster}-level
+            setting.
           </label>
         </div>
       </Accordion>

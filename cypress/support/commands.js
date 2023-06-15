@@ -40,9 +40,12 @@ Cypress.Commands.add('interceptNamespaceApi', ({ archived }) => {
 });
 
 Cypress.Commands.add('interceptSearchAttributesApi', () => {
-  cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/search-attributes*', {
-    fixture: 'search-attributes.json',
-  }).as('search-attributes-api');
+  cy.intercept(
+    Cypress.env('VITE_API_HOST') + '/api/v1/namespaces/*/search-attributes*',
+    {
+      fixture: 'search-attributes.json',
+    },
+  ).as('search-attributes-api');
 });
 
 Cypress.Commands.add('interceptWorkflowsApi', () => {

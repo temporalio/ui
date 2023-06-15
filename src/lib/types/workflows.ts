@@ -80,7 +80,9 @@ export type SearchAttributes = {
 };
 
 export type SearchAttributesResponse = {
-  keys: SearchAttributes;
+  customAttributes: Record<string, SearchAttributesValue>;
+  systemAttributes: Record<string, SearchAttributesValue>;
+  storageSchema: import('$lib/types').ListSearchAttributesResponse['storageSchema'];
 };
 
 export type WorkflowSearchAttributes = {

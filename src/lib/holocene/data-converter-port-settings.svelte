@@ -18,7 +18,7 @@
       on:keydown|stopPropagation
     />
     <p data-testid="data-encoder-info" class="text-sm w-[220px]">
-      *If both are set, the remote codec endpoint will be used.
+      *If both are set, the Codec Server endpoint will be used.
     </p>
   </div>
 </div>
