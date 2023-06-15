@@ -65,8 +65,10 @@ export const dataEncoder = derived(
     const hasSuccess = endpoint
       ? $lastDataEncoderStatus === 'success'
       : $lastDataConverterStatus === 'success';
-    const hasEndpointAndPortConfigured = endpoint && $dataConverterPort;
-    const hasEndpointOrPortConfigured = endpoint || $dataConverterPort;
+    const hasEndpointAndPortConfigured = Boolean(
+      endpoint && $dataConverterPort,
+    );
+    const hasEndpointOrPortConfigured = Boolean(endpoint || $dataConverterPort);
 
     return {
       namespace,
