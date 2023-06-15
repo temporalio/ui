@@ -7,6 +7,7 @@
 
   import Copyable from '../copyable.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   export let workflow: string;
   export let namespace: string;
@@ -18,9 +19,9 @@
 
 <Table class="w-full">
   <TableHeaderRow slot="headers">
-    <th>First Execution</th>
-    <th>Previous Execution</th>
-    <th>Next Execution</th>
+    <th>{translate('workflows', 'first-execution')}</th>
+    <th>{translate('workflows', 'previous-execution')}</th>
+    <th>{translate('workflows', 'next-execution')}</th>
   </TableHeaderRow>
   <TableRow>
     <td class="w-1/3 hover:text-blue-700 hover:underline">
