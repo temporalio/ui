@@ -25,4 +25,7 @@ export default defineConfig({
       $components: path.resolve('./src/lib/components/'),
     },
   },
+  server: {
+    port: 3000,
+  },
 });

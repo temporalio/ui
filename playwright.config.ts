@@ -32,7 +32,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `pnpm dev:playwright:${PLAYWRIGHT_MODE}`,
+    command: `pnpm serve:playwright:${PLAYWRIGHT_MODE}`,
     port: PORT,
   },
   globalSetup: './tests/global-setup.ts',

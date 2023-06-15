@@ -6,8 +6,6 @@ Temporal must be running in development.
 
 Temporal UI requires [Temporal v1.16.0](https://github.com/temporalio/temporal/releases/tag/v1.16.0) or later.
 
-## Trying it out
-
 ### Using Temporal CLI
 
 You can install [Temporal CLI][] using [Homebrew][]:
@@ -27,19 +25,14 @@ You can access the UI by visiting `http://localhost:8233`. OpenAPI is accessible
 [temporal cli]: https://github.com/temporalio/cli
 [homebrew]: https://brew.sh
 
-### Using Docker
+## Development
 
-After pulling down the lastest version of Temporal's [`docker-compose`](https://github.com/temporalio/docker-compose), you can access the UI by visiting `http://localhost:8080`.
-
-## Trying it out: Bleeding edge
-
-If you want to use the most recent commit to `main`, you can spin up a bleeding-edge build as described below.
+### Local Development
 
 Once you have the prerequisites going, run the following:
 
 ```bash
 pnpm install
-pnpm start
 ```
 
 Running `pnpm install` will attempt to download and install the most recent version of [Temporal CLI][] into `./bin/cli/temporal`. The development server will attempt to use use this version of this Temporal when starting up.
@@ -48,52 +41,53 @@ Running `pnpm install` will attempt to download and install the most recent vers
 - If you do not have a version of Temporal CLI at `./bin/cli/temporal`, the development server will look for a version of Temporal CLI in your path.
 - For Windows users, you will need to start Temporal using one of the methods listed above until we have sufficiently tested this functionality on Windows. (We would absolutely welcome a pull request.)
 
-### Using Docker
 
-If you're running the development version of the UI and you want to point it at the `docker-compose` version of Temporal, you can run this command:
-
-```
-pnpn run build:docker
-pnpn run preview:docker
-```
-
-## Developing
-
-Developing the UI has the same prequisites as trying it out. Once you've created a project and installed dependencies with `pnpm install`, start the development server:
+#### Running the UI
 
 ```bash
-pnpm start
+pnpm dev
 ```
 
-and open [`localhost:3000`](http://localhost:3000).
+By default, the application will start up the UI with a local ui-server running along with Temporal server from the temporal-cli on port 3000.
 
-By default, the application will start up with a version of the UI for the local version of Temporal. You can start the UI for Temporal Cloud by setting the `VITE_TEMPORAL_UI_BUILD_TARGET` target to `cloud`. Alternatively, you can use either of the following scripts:
+Alternatively, you can run `pnpm dev:temporal-cli` to run both ui-server and Temporal server from temporal-cli.
 
 ```bash
-pnpm run dev:local
-pnpm run dev:cloud
+pnpm dev:temporal-cli
+```
+
+### Building the UI
+
+The Temporal UI can be built for local preview. You must set the `VITE_TEMPORAL_UI_BUILD_TARGET` environment variable in order to build the assets. This will be set for you if you use either of the following `pnpm` scripts. The resulting assets will be placed in `./dist`.
+
+> You can preview the built app with `pnpm run preview`, regardless of whether you installed an adapter. This should _not_ be used to serve your app in production.
+
+
+```bash
+pnpm build:local
+```
+
+
+The Temporal UI can build assets for ui-server. The resulting assets will be placed in `./server/ui/assets`.
+
+```bash
+pnpm build:server
 ```
 
 ### Using Docker
+
+After pulling down the lastest version of Temporal's [`docker-compose`](https://github.com/temporalio/docker-compose), you can access the UI by visiting `http://localhost:8080`.
 
 If you want to point the development environment at the `docker-compose` version of Temporal, you can use the following command:
 
+```bash
+pnpm dev:docker
 ```
-pnpm run dev:docker
-```
-
-## Building
-
-The Temporal UI _must_ be built for either the local version or Temporal Cloud. You must set the `VITE_TEMPORAL_UI_BUILD_TARGET` environment variable in order to build the assets. This will be set for you if you use either of the following `pnpm` scripts.
 
 ```bash
-pnpm run build:local
-pnpm run build:cloud
+pnpn run build:docker
+pnpn run preview:docker
 ```
-
-The resulting assets will be placed in `./build`.
-
-> You can preview the built app with `pnpm run preview`, regardless of whether you installed an adapter. This should _not_ be used to serve your app in production.
 
 ## Testing
 We use [Playwright](https://playwright.dev) to interactively test the Temporal UI.

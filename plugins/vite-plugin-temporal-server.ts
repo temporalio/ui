@@ -16,7 +16,7 @@ const shouldSkip = (server: ViteDevServer): boolean => {
   if (process.env.VITEST) return true;
   if (temporal) return true;
   if (process.platform === 'win32') return true;
-  if (server.config.mode !== 'temporal-server') return true;
+  if (server.config.mode === 'docker') return true;
 
   return false;
 };
