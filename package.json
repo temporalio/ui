@@ -42,7 +42,7 @@
     "codec-server": "esno ./scripts/start-codec-server.ts --port 8888",
     "serve:playwright:e2e": "vite dev --mode test.e2e",
     "serve:playwright:integration": "vite dev --mode test.integration --port 3333",
-    "serve:cypress": ". ./.env && VITE_TEMPORAL_UI_BUILD_TARGET=local VITE_MODE=test vite dev",
+    "serve:cypress": ". ./.env && VITE_TEMPORAL_UI_BUILD_TARGET=local VITE_MODE=test vite dev --mode test.cypress",
     "test": "TZ=UTC vitest",
     "test:ui": "TZ=UTC vitest --ui",
     "test:coverage": "TZ=UTC vitest run --coverage",
