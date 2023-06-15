@@ -6,11 +6,25 @@ export const fetchSearchAttributesForNamespace = async (
   namespace: string,
   request = fetch,
 ): Promise<Omit<SearchAttributesResponse, 'storageSchema'>> => {
-  const route = routeForApi('search-attributes', { namespace });
-  return requestFromAPI<SearchAttributesResponse>(route, {
-    request,
-  }).then((searchAttributesResponse) => ({
-    customAttributes: searchAttributesResponse.customAttributes,
-    systemAttributes: searchAttributesResponse.systemAttributes,
-  }));
+  try {
+    const route = routeForApi('search-attributes', { namespace });
+    const searchAttributesResponse =
+      await requestFromAPI<SearchAttributesResponse>(route, {
+        request,
+      });
+    return {
+      customAttributes: searchAttributesResponse.customAttributes,
+      systemAttributes: searchAttributesResponse.systemAttributes,
+    };
+  } catch (e) {
+    console.error(
+      'Error fetching search attributes for namespace',
+      namespace,
+      e,
+    );
+    return {
+      customAttributes: {},
+      systemAttributes: {},
+    };
+  }
 };
