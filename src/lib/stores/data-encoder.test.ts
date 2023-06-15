@@ -1,10 +1,6 @@
 import { get } from 'svelte/store';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { dataEncoder } from './data-encoder';
-import {
-  dataConverterPort,
-  lastDataConverterStatus,
-} from './data-converter-config';
 import {
   codecEndpoint,
   overrideRemoteCodecConfiguration,
