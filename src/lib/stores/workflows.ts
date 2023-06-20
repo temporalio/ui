@@ -12,17 +12,34 @@ import type { StartStopNotifier } from 'svelte/store';
 import type { FilterParameters, WorkflowExecution } from '$lib/types/workflows';
 
 export const refresh = writable(0);
+export const hideWorkflowQueryErrors = derived(
+  [page],
+  ([$page]) => $page.data?.settings?.hideWorkflowQueryErrors,
+);
 
 const namespace = derived([page], ([$page]) => $page.params.namespace);
 const query = derived([page], ([$page]) => $page.url.searchParams.get('query'));
 const parameters = derived(
-  [namespace, query, refresh, supportsAdvancedVisibility],
-  ([$namespace, $query, $refresh, $supportsAdvancedVisibility]) => {
+  [
+    namespace,
+    query,
+    refresh,
+    supportsAdvancedVisibility,
+    hideWorkflowQueryErrors,
+  ],
+  ([
+    $namespace,
+    $query,
+    $refresh,
+    $supportsAdvancedVisibility,
+    $hideWorkflowQueryErrors,
+  ]) => {
     return {
       namespace: $namespace,
       query: $query,
       refresh: $refresh,
       supportsAdvancedVisibility: $supportsAdvancedVisibility,
+      hideWorkflowQueryErrors: $hideWorkflowQueryErrors,
     };
   },
 );
@@ -33,7 +50,12 @@ const setCounts = (_workflowCount: { totalCount: number; count: number }) => {
 
 const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
   return parameters.subscribe(
-    ({ namespace, query, supportsAdvancedVisibility }) => {
+    ({
+      namespace,
+      query,
+      supportsAdvancedVisibility,
+      hideWorkflowQueryErrors,
+    }) => {
       withLoading(loading, updating, async () => {
         const { workflows, error } = await fetchAllWorkflows(namespace, {
           query,
@@ -46,7 +68,13 @@ const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
         }
 
         if (error) {
-          workflowError.set(error);
+          if (hideWorkflowQueryErrors) {
+            workflowError.set(
+              'A error has occurred while querying for Workflows.',
+            );
+          } else {
+            workflowError.set(error);
+          }
         } else {
           workflowError.set('');
         }
