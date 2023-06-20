@@ -92,6 +92,7 @@
     "sanitize-html": "^2.8.1",
     "url-pattern": "^1.0.3",
     "uuid": "^9.0.0",
+    "vis-timeline": "^7.7.2",
     "websocket-as-promised": "^2.0.1"
   },
   "devDependencies": {
