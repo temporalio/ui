@@ -14,7 +14,7 @@
 <div class="flex flex-col {$$props.class}">
   {#if calendar}
     <p data-testid="schedule-calendar-frequency">
-      {structuredCalendarToFrequency(calendar)}
+      {structuredCalendarToFrequency(calendar) || calendar?.comment || ''}
     </p>
   {:else}
     <p data-testid="schedule-interval-frequency">
