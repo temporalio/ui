@@ -29,14 +29,13 @@
   export let compact = false;
   export let expandAll = false;
   export let typedError = false;
-  export let active = false;
   export let onRowClick: () => void = noop;
 
   let selectedId = isEventGroup(event)
     ? Array.from(event.events.keys()).pop()
     : event.id;
 
-  $: expanded = expandAll || active;
+  $: expanded = expandAll;
 
   $: currentEvent = isEventGroup(event) ? event.events.get(selectedId) : event;
   $: descending = $eventFilterSort === 'descending';
@@ -75,7 +74,6 @@
   id={event.id}
   class:expanded={expanded && !expandAll}
   aria-expanded={expanded || expandAll}
-  class:active
   class:failure
   class:canceled
   class:terminated
@@ -159,7 +157,7 @@
     @apply bg-blue-50;
   }
 
-  .failure {
+  .failure.row {
     @apply bg-red-50;
   }
 
@@ -167,7 +165,7 @@
     @apply text-red-700;
   }
 
-  .canceled {
+  .canceled.row {
     @apply bg-yellow-50;
   }
 
@@ -175,12 +173,24 @@
     @apply text-yellow-700;
   }
 
-  .terminated {
+  .terminated.row {
     @apply bg-pink-50;
   }
 
   .terminated .event-name {
     @apply text-pink-700;
+  }
+
+  .canceled:hover {
+    @apply bg-gradient-to-br from-yellow-100 to-yellow-200 bg-fixed;
+  }
+
+  .failure:hover {
+    @apply bg-gradient-to-br from-red-100 to-red-200 bg-fixed;
+  }
+
+  .terminated:hover {
+    @apply bg-gradient-to-br from-pink-100 to-pink-200 bg-fixed;
   }
 
   .expanded-cell {
@@ -197,24 +207,5 @@
     &.expanded {
       @apply rounded-b-none;
     }
-  }
-
-  .active {
-    @apply z-50 cursor-pointer bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
-  }
-
-  .canceled:hover,
-  .active.canceled {
-    @apply bg-gradient-to-br from-yellow-100 to-yellow-200 bg-fixed;
-  }
-
-  .failure:hover,
-  .active.failure {
-    @apply bg-gradient-to-br from-red-100 to-red-200 bg-fixed;
-  }
-
-  .terminated:hover,
-  .active.terminated {
-    @apply bg-gradient-to-br from-pink-100 to-pink-200 bg-fixed;
   }
 </style>

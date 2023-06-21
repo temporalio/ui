@@ -97,7 +97,6 @@
   {items}
   {updating}
   let:visibleItems
-  let:activeRowIndex
   let:setActiveRowIndex
   aria-label="recent events"
 >
@@ -109,7 +108,6 @@
         {visibleItems}
         expandAll={$expandAllEvents === 'true'}
         {initialItem}
-        active={activeRowIndex === index}
         onRowClick={() => setActiveRowIndex(index)}
       />
     {:else}
