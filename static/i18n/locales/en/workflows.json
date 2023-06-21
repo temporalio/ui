@@ -2,6 +2,7 @@
   "recent-workflows": "Recent Workflows",
   "workflows-count_one": "{{count, number}} workflow",
   "workflows-count_other": "{{count, number}} workflows",
+  "workflows-error-querying": "A error has occurred while querying for Workflows.",
   "filtered-workflows-count": "Results {{filtered, number}} of {{total, number}} workflows",
   "terminate": "Terminate",
   "cancel": "Cancel",

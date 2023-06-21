@@ -30,6 +30,7 @@ const settings: Settings = {
   workflowCancelDisabled: false,
   workflowSignalDisabled: false,
   workflowTerminateDisabled: false,
+  hideWorkflowQueryErrors: false,
   notifyOnNewVersion: true,
   feedbackURL: '',
   runtimeEnvironment: {

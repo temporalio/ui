@@ -19,6 +19,7 @@ export const settings = writable<Settings>({
   workflowCancelDisabled: false,
   workflowSignalDisabled: false,
   workflowResetDisabled: false,
+  hideWorkflowQueryErrors: false,
   showTemporalSystemNamespace: false,
   notifyOnNewVersion: false,
   feedbackURL: '',
