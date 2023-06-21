@@ -19,7 +19,7 @@ test.describe('Workflows list', () => {
     await expect(input).toContainText('"Mock decoded payload"');
     await toggle.click();
 
-    region = page.locator('.expanded-cell');
+    region = page.locator('.expanded-cell >> code.language-json');
 
     toggle = page.getByRole('cell', { name: 'WorkflowExecutionStarted' });
     await toggle.click();
