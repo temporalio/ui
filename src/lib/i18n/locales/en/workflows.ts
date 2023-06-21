@@ -54,7 +54,7 @@ export const Strings = {
   'auto-refresh': 'Auto refresh',
   'auto-refresh-tooltip': '15 second page refresh',
   input: 'Input',
-  'input-and-results': 'Input and Result',
+  'input-and-results': 'Input and Results',
   'continued-as-new-with-input': 'Continued as New with Input',
   results: 'Results',
   'recent-events': 'Recent Events',

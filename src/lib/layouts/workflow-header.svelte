@@ -213,7 +213,7 @@
         </Badge>
       </Tab>
       <Tab
-        label=""
+        label={translate('workflows', 'stack-trace-tab')}
         id="stack-trace-tab"
         href={routeForStackTrace(routeParameters)}
         active={pathMatches(
