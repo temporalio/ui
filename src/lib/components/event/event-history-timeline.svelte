@@ -123,6 +123,20 @@
       axis: 'both',
       item: 'center',
     },
+    xss: {
+      disabled: true,
+      filterOptions: {
+        whiteList: {
+          p: ['class'],
+          div: ['class'],
+          h1: ['class'],
+          input: ['class', 'id', 'check'],
+          label: ['class', 'id', 'for'],
+          li: ['class'],
+          ul: ['class'],
+        },
+      },
+    },
   };
   onMount(() => {
     timeline = new Timeline(
