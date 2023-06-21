@@ -26,8 +26,8 @@ const isDailyForTheWeek = (calendar: StructuredCalendar) => {
 const isMonthly = (calendar: StructuredCalendar) => {
   return (
     calendar?.month.length === 1 &&
-    calendar?.month[0].start === 1 &&
-    calendar?.month[0].end === 12
+    calendar?.month[0]?.start === 1 &&
+    calendar?.month[0]?.end === 12
   );
 };
 
@@ -191,8 +191,6 @@ const getTime = (calendar: StructuredCalendar) => {
 export const structuredCalendarToFrequency = (
   calendar: StructuredCalendar,
 ): string => {
-  const frequency = '';
-
   const time = getTime(calendar);
 
   if (isDaily(calendar)) {
@@ -205,5 +203,5 @@ export const structuredCalendarToFrequency = (
     )} at ${time}`;
   }
 
-  return frequency;
+  return calendar?.comment || '';
 };
