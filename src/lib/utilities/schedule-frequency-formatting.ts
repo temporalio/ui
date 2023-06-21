@@ -203,5 +203,10 @@ export const structuredCalendarToFrequency = (
     )} at ${time}`;
   }
 
-  return calendar?.comment || '';
+  return '';
+};
+
+export const commentOrCalendarToFrequency = (calendar: StructuredCalendar) => {
+  if (calendar?.comment) return `${calendar?.comment} UTC`;
+  return structuredCalendarToFrequency(calendar);
 };
