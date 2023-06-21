@@ -46,7 +46,9 @@
 
 <div class="flex flex-col gap-4">
   <WorkflowStackTraceError />
-  <WorkflowTypedError error={workflowEvents.error} />
+  {#if workflowEvents.error}
+    <WorkflowTypedError error={workflowEvents.error} />
+  {/if}
   <WorkflowSummary />
   <WorkflowRelationships {...workflowRelationships} />
   <PendingActivities />

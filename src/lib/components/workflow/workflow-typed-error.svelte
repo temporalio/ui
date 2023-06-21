@@ -159,10 +159,6 @@
   function getErrorCause(
     error: WorkflowTaskFailedEvent,
   ): WorkflowTaskFailedCause | 'WorkflowTaskHeartbeatError' {
-    if (!error || !error.workflowTaskFailedEventAttributes) {
-      return;
-    }
-
     const {
       workflowTaskFailedEventAttributes: { failure, cause },
     } = error;
@@ -184,11 +180,9 @@
   let link: I18nKey<'typed-errors'> | undefined;
 
   $: {
-    if (error) {
-      const cause = getErrorCause(error);
-      const errorCopyKeys = WORKFLOW_TASK_FAILED_ERROR_COPY_KEYS[cause];
-      ({ title, description, action, link } = errorCopyKeys);
-    }
+    const cause = getErrorCause(error);
+    const errorCopyKeys = WORKFLOW_TASK_FAILED_ERROR_COPY_KEYS[cause];
+    ({ title, description, action, link } = errorCopyKeys);
   }
 </script>
 
