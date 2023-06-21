@@ -80,7 +80,7 @@
   {:else if shouldDisplayAsTaskQueueLink(key)}
     <div class="flex w-full flex-wrap items-center gap-1 pr-1">
       <p class="mr-3 truncate text-sm">{format(key)}</p>
-      <div class="truncate  text-sm ">
+      <div class="truncate text-sm">
         <Copyable content={value} container-class="">
           <Link
             class="truncate"

@@ -69,8 +69,8 @@ export const eventTypeCategorizations: Readonly<
 
   UpsertWorkflowSearchAttributes: CATEGORIES.COMMAND,
 
-  WorkflowUpdateAccepted: CATEGORIES.UPDATE,
-  WorkflowUpdateCompleted: CATEGORIES.UPDATE,
+  WorkflowExecutionUpdateAccepted: CATEGORIES.UPDATE,
+  WorkflowExecutionUpdateCompleted: CATEGORIES.UPDATE,
 };
 
 export type EventTypeOption = {
