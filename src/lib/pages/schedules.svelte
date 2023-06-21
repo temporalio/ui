@@ -44,9 +44,11 @@
       : schedules;
 </script>
 
-<header class="flex flex-col justify-between gap-2 md:flex-row">
+<header class="flex flex-row justify-between gap-2">
   <div>
-    <h1 class="flex items-center gap-2 text-2xl">
+    <h1
+      class="flex flex-col gap-0 text-lg md:flex-row md:items-center md:gap-2 md:text-2xl"
+    >
       Schedules<Badge type="beta">Preview</Badge>
     </h1>
     <p class="text-sm text-gray-600" data-testid="namespace-name">
