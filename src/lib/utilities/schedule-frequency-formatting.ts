@@ -1,9 +1,8 @@
-import { genericWeekDays, monthNames, weekDays } from './calendar';
+import { monthNames, weekDays } from './calendar';
 import type { ScheduleRange, StructuredCalendar } from '$lib/types/schedule';
 
 // Examples of output
-// Every 3hrs:5min:20 sec 30 min offset
-// Weekends at 12:00pm PST
+// Wednesday at 06:30pm UTC
 // Sunday, Monday, Tuesday, Wednesday, Thursday, Friday at 12:00pm UTC
 // Every 1, 15, 31 of the month at 12:00pm UTC
 // Every 1, 15, 31 of January, March, April, June, July, September, December at 12:00pm UTC
