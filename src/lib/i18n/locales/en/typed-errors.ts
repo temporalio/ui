@@ -1,6 +1,7 @@
 export const Namespace = 'typed-errors';
 
 export const Strings = {
+  'link-preface': 'Learn more about ',
   'unspecified-title': 'Unspecified',
   'unspecified-description': 'The Workflow Task failed. See error for details.',
   'unhandled-command-title': 'Unhandled Command',

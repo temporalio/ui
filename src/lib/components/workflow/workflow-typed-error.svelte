@@ -50,7 +50,7 @@
       title: 'bad-complete-workflow-execution-attributes-title',
       description: 'bad-complete-workflow-execution-attributes-description',
     },
-    BadFailWorkflowExecutionAttribute: {
+    BadFailWorkflowExecutionAttributes: {
       title: 'bad-fail-workflow-execution-attributes-title',
       description: 'bad-fail-workflow-execution-attributes-description',
     },
@@ -205,7 +205,9 @@
     </p>
     {#if action && link}
       <p>
-        Learn more about <Link newTab href={translate('typed-errors', link)}
+        {translate('typed-errors', 'link-preface')}<Link
+          newTab
+          href={translate('typed-errors', link)}
           >{translate('typed-errors', action)}</Link
         >.
       </p>
