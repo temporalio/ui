@@ -19,7 +19,7 @@
   aria-label="primary"
   {...$$restProps}
 >
-  <div class="h-32 relative">
+  <div class="h-32 min-h-[84px] relative">
     <a
       href={linkList.home}
       class="absolute block z-[51]"

@@ -175,7 +175,7 @@
             recentRuns={schedule?.info?.recentActions}
           />
         </div>
-        <div class="w-full xl:w-1/4">
+        <div class="w-full xl:w-1/4 xl:min-w-[320px]">
           <ScheduleUpcomingRuns
             futureRuns={schedule?.info?.futureActionTimes}
           />
