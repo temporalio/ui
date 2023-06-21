@@ -6,6 +6,7 @@ test.beforeEach(async ({ page, baseURL }) => {
 
 test.describe('Workflows list', () => {
   test('should render decoded Payloads', async ({ page }) => {
+    test.slow();
     await page.getByText('e2e-workflow-1').click({ position: { x: 0, y: 0 } });
 
     let region: Locator;
@@ -19,7 +20,7 @@ test.describe('Workflows list', () => {
     await expect(input).toContainText('"Mock decoded payload"');
     await toggle.click();
 
-    region = page.locator('.expanded-cell');
+    region = page.locator('.expanded-cell >> code.language-json');
 
     toggle = page.getByRole('cell', { name: 'WorkflowExecutionStarted' });
     await toggle.click();

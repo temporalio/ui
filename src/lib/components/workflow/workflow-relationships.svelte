@@ -11,6 +11,7 @@
   import ParentWorkflowTable from './parent-workflow-table.svelte';
   import FirstPreviousNextWorkflowTable from './first-previous-next-workflow-table.svelte';
   import SchedulerTable from './scheduler-table.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   export let hasChildren: boolean;
   export let hasRelationships: boolean;
@@ -26,24 +27,37 @@
 </script>
 
 <section>
-  <Accordion title="Relationships" icon="relationship">
+  <Accordion
+    title={translate('workflows', 'relationships')}
+    icon="relationship"
+  >
     <div slot="summary" class="hidden flex-row gap-2 lg:flex">
       {#if scheduleId}
-        <Badge type="purple">Scheduled</Badge>
+        <Badge type="purple">{translate('scheduled')}</Badge>
       {/if}
-      <Badge type={parent ? 'purple' : 'gray'}>{parent ? 1 : 0} Parent</Badge>
+      <Badge type={parent ? 'purple' : 'gray'}
+        >{translate('workflows', 'parents', parent ? 1 : 0)}</Badge
+      >
       <Badge
         type={$workflowRun.workflow.pendingChildren.length ? 'purple' : 'gray'}
-        >{$workflowRun.workflow.pendingChildren.length} Pending Children</Badge
-      >
-      <Badge type={children.length ? 'purple' : 'gray'}
-        >{children.length} Children</Badge
-      >
-      <Badge type={first ? 'purple' : 'gray'}>{first ? 1 : 0} First</Badge>
-      <Badge type={previous ? 'purple' : 'gray'}>
-        {previous ? 1 : 0} Previous
+        >{translate(
+          'workflows',
+          'pending-children',
+          $workflowRun.workflow.pendingChildren.length,
+        )}
       </Badge>
-      <Badge type={next ? 'purple' : 'gray'}>{next ? 1 : 0} Next</Badge>
+      <Badge type={children.length ? 'purple' : 'gray'}
+        >{translate('workflows', 'children', children.length)}</Badge
+      >
+      <Badge type={first ? 'purple' : 'gray'}
+        >{translate('workflows', 'first', first ? 1 : 0)}</Badge
+      >
+      <Badge type={previous ? 'purple' : 'gray'}>
+        {translate('workflows', 'previous', previous ? 1 : 0)}
+      </Badge>
+      <Badge type={next ? 'purple' : 'gray'}>
+        {translate('workflows', 'next', next ? 1 : 0)}
+      </Badge>
     </div>
     {#if hasRelationships}
       <div class="flex w-full flex-wrap gap-4">
@@ -71,7 +85,7 @@
         />
       {/if}
     {:else}
-      <p>This workflow doesn’t have any relationships</p>
+      <p>{translate('workflows', 'no-relationships')}</p>
     {/if}
   </Accordion>
 </section>

@@ -10,6 +10,7 @@
   import type { ChildWorkflowClosedEvent } from '$lib/utilities/get-workflow-relationships';
   import WorkflowStatus from '../workflow-status.svelte';
   import Link from '$lib/holocene/link.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   export let children: ChildWorkflowClosedEvent[] = [];
   export let pendingChildren: WorkflowExecution['pendingChildren'] = [];
@@ -46,8 +47,8 @@
   <Table class="w-full">
     <TableHeaderRow slot="headers">
       <th class="max-md:hidden">Status</th>
-      <th>Child Workflow ID</th>
-      <th>Child Run ID</th>
+      <th>{translate('workflows', 'child-id')}</th>
+      <th>{translate('workflows', 'child-run-id')}</th>
     </TableHeaderRow>
     {#each visibleItems as child (child.runId)}
       <TableRow>

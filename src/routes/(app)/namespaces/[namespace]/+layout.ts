@@ -2,8 +2,14 @@ import { fetchSearchAttributesForNamespace } from '$lib/services/search-attribut
 import { allSearchAttributes } from '$lib/stores/search-attributes';
 import type { LayoutData, LayoutLoad } from './$types';
 
-export const load: LayoutLoad = async ({ params }): Promise<LayoutData> => {
-  const attributes = await fetchSearchAttributesForNamespace(params.namespace);
+export const load: LayoutLoad = async ({
+  params,
+  fetch,
+}): Promise<LayoutData> => {
+  const attributes = await fetchSearchAttributesForNamespace(
+    params.namespace,
+    fetch,
+  );
 
   allSearchAttributes.set(attributes);
 };
