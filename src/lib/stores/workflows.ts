@@ -1,5 +1,6 @@
 import { derived, readable, writable } from 'svelte/store';
 import { page } from '$app/stores';
+import { translate } from '$lib/i18n/translate';
 
 import {
   fetchAllWorkflows,
@@ -70,7 +71,7 @@ const updateWorkflows: StartStopNotifier<WorkflowExecution[]> = (set) => {
         if (error) {
           if (hideWorkflowQueryErrors) {
             workflowError.set(
-              'A error has occurred while querying for Workflows.',
+              translate('workflows', 'workflows-error-querying'),
             );
           } else {
             workflowError.set(error);
