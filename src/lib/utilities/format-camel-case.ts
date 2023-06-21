@@ -8,9 +8,11 @@ export const capitalize = (word: string): string => {
 };
 
 const labelsToAddName: Readonly<Set<string>> = new Set(['workflowType']);
-const labelsToShorten: Readonly<{ [key: string]: string }> = {
-  workflowExecutionWorkflowId: 'workflowExecution',
-  workflowExecutionRunId: 'workflowExecution',
+const labelsToChange: Readonly<{ [key: string]: string }> = {
+  workflowExecutionWorkflowId: 'workflowId',
+  workflowExecutionRunId: 'runId',
+  protocolInstanceId: 'updateId',
+  metaUpdateId: 'updateId',
 };
 
 const formatLabel = (label?: string): string => {
@@ -20,9 +22,9 @@ const formatLabel = (label?: string): string => {
   if (labelsToAddName.has(label)) {
     return `${label}Name`;
   }
-  // Shorten label if needed
-  if (labelsToShorten[label]) {
-    return label.replace(labelsToShorten[label], '');
+  // Change label if needed
+  if (labelsToChange[label]) {
+    return labelsToChange[label];
   }
 
   return label;

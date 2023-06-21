@@ -30,6 +30,7 @@ const keysToExpand: Readonly<Set<string>> = new Set([
   'retryPolicy',
   'parentWorkflowExecution',
   'workflowExecution',
+  'meta',
 ]);
 
 const keysToFormat: Readonly<Set<string>> = new Set(['maximumAttempts']);
