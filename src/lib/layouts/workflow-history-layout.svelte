@@ -18,11 +18,13 @@
   import InputAndResults from '$lib/components/workflow/input-and-results.svelte';
   import Accordion from '$lib/holocene/accordion.svelte';
   import EventShortcutKeys from '$lib/components/event/event-shortcut-keys.svelte';
+  import EventHistoryTimeline from '$lib/components/event/event-history-timeline.svelte';
 
   import type { EventView } from '$lib/types/events';
   import { decodeURIForSvelte } from '$lib/utilities/encode-uri';
   import { authUser } from '$lib/stores/auth-user';
   import { translate } from '$lib/i18n/translate';
+  import LabsModeGuard from '$lib/holocene/labs-mode-guard.svelte';
 
   let showShortcuts = false;
 
@@ -77,7 +79,9 @@
       </div>
     </Accordion>
   </section>
-  <slot name="timeline" />
+  <LabsModeGuard>
+    <EventHistoryTimeline history={$fullEventHistory} />
+  </LabsModeGuard>
   <section id="event-history">
     <nav
       class="flex flex-col items-center justify-between gap-4 pb-4 lg:flex-row lg:items-end"
