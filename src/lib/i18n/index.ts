@@ -1,6 +1,7 @@
 import * as Common from './locales/en/common';
 import * as Workflows from './locales/en/workflows';
 import * as TypedErrors from './locales/en/typed-errors';
+import * as Events from './locales/en/events';
 
 /**
  * https://www.i18next.com/translation-function/plurals#singular-plural
@@ -19,6 +20,7 @@ export const I18nMap = {
   [Common.Namespace]: Common.Strings,
   [Workflows.Namespace]: Workflows.Strings,
   [TypedErrors.Namespace]: TypedErrors.Strings,
+  [Events.Namespace]: Events.Strings,
 } as const;
 
 export const I18nNamespaces = Object.keys(I18nMap);

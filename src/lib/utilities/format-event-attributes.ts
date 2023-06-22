@@ -12,6 +12,7 @@ import {
 } from '$lib/utilities/get-single-attribute-for-event';
 import { capitalize } from '$lib/utilities/format-camel-case';
 import { formatDate } from '$lib/utilities/format-date';
+import { translate } from '$lib/i18n/translate';
 
 export type CombinedAttributes = EventAttribute & {
   eventTime?: string;
@@ -35,8 +36,8 @@ const keysToExpand: Readonly<Set<string>> = new Set([
 
 const keysToFormat: Readonly<Set<string>> = new Set(['maximumAttempts']);
 
-export const UnlimitedAttempts = 'Unlimited';
-export const NoExpiration = 'No Expiration';
+export const UnlimitedAttempts = translate('unlimited');
+export const NoExpiration = translate('no-expiration');
 
 export const formatRetryExpiration = (
   maxAttempts: number,
@@ -142,14 +143,16 @@ type GroupingOption = {
 export const attributeGroupingProperties: Readonly<
   Record<AttributeGroup, GroupingOption>
 > = {
-  activity: { label: 'Activity' },
-  parent: { label: 'Parent' },
-  retryPolicy: { label: 'Retry Policy' },
-  schedule: { label: 'Schedule' },
-  searchAttributes: { label: 'Search Attributes' },
-  summary: { label: 'Summary' },
-  taskQueue: { label: 'Task Queue' },
-  workflow: { label: 'Workflow' },
+  activity: { label: translate('events', 'attribute-group-activity') },
+  parent: { label: translate('events', 'attribute-group-parent') },
+  retryPolicy: { label: translate('events', 'attribute-group-retry-policy') },
+  schedule: { label: translate('events', 'attribute-group-schedule') },
+  searchAttributes: {
+    label: translate('events', 'attribute-group-search-attributes'),
+  },
+  summary: { label: translate('events', 'attribute-group-summary') },
+  taskQueue: { label: translate('events', 'attribute-group-task-queue') },
+  workflow: { label: translate('events', 'attribute-group-workflow') },
 };
 
 export type AttributeGrouping = Partial<

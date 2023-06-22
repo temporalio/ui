@@ -7,6 +7,7 @@
   import Table from '$lib/holocene/table/table.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   export let compact = false;
   export let updating = false;
@@ -37,7 +38,7 @@
           on:click={handleChange}
         >
           <span class="hidden sm:block">
-            {expandAll ? 'Collapse all' : 'Expand All'}
+            {expandAll ? translate('collapse-all') : translate('expand-all')}
           </span>
           <Icon name={expandAll ? 'chevron-up' : 'chevron-down'} />
         </button>

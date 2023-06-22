@@ -1,3 +1,5 @@
+import type { I18nKey } from '$lib/i18n';
+import { translate } from '$lib/i18n/translate';
 import type {
   EventType,
   WorkflowEvents,
@@ -80,20 +82,47 @@ export type EventTypeOption = {
 };
 
 export const allEventTypeOptions: EventTypeOption[] = [
-  { label: 'All', option: undefined },
-  { label: 'Activity', option: CATEGORIES.ACTIVITY, color: '#8B5CF6' },
+  { label: translate('events', 'category-all'), option: undefined },
   {
-    label: 'Child Workflow',
+    label: translate('events', 'category-activity'),
+    option: CATEGORIES.ACTIVITY,
+    color: '#8B5CF6',
+  },
+  {
+    label: translate('events', 'category-child-workflow'),
     option: CATEGORIES.CHILD_WORKFLOW,
     color: '#F59E0B',
   },
-  { label: 'Command', option: CATEGORIES.COMMAND, color: '#10B981' },
-  { label: 'Local Activity', option: CATEGORIES.LOCAL_ACTIVITY },
-  { label: 'Marker', option: CATEGORIES.MARKER, color: '#EC4899' },
-  { label: 'Signal', option: CATEGORIES.SIGNAL, color: '#DD6B20' },
-  { label: 'Timer', option: CATEGORIES.TIMER, color: '#1D4ED8' },
-  { label: 'Update', option: CATEGORIES.UPDATE },
-  { label: 'Workflow', option: CATEGORIES.WORKFLOW, color: '#10B981' },
+  {
+    label: translate('events', 'category-command'),
+    option: CATEGORIES.COMMAND,
+    color: '#10B981',
+  },
+  {
+    label: translate('events', 'category-local-activity'),
+    option: CATEGORIES.LOCAL_ACTIVITY,
+  },
+  {
+    label: translate('events', 'category-marker'),
+    option: CATEGORIES.MARKER,
+    color: '#EC4899',
+  },
+  {
+    label: translate('events', 'category-signal'),
+    option: CATEGORIES.SIGNAL,
+    color: '#DD6B20',
+  },
+  {
+    label: translate('events', 'category-timer'),
+    option: CATEGORIES.TIMER,
+    color: '#1D4ED8',
+  },
+  { label: translate('events', 'category-update'), option: CATEGORIES.UPDATE },
+  {
+    label: translate('events', 'category-workflow'),
+    option: CATEGORIES.WORKFLOW,
+    color: '#10B981',
+  },
 ];
 
 const compactEventTypes: (EventTypeCategory | undefined)[] = [

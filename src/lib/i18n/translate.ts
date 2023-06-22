@@ -1,6 +1,4 @@
-import type { TOptions } from 'i18next';
-import { page } from '$app/stores';
-import { get } from 'svelte/store';
+import { type TOptions, t } from 'i18next';
 import { type I18nKey, type I18nNamespace, type I18nReplace, I18nMap } from '.';
 import { isObject } from '$lib/utilities/is';
 
@@ -43,8 +41,6 @@ export function translate<Namespace extends I18nNamespace>(
   replaceOrCount?: I18nReplace | number,
   replaceOrUndef?: I18nReplace,
 ): string {
-  const { t } = get(page).data.i18n();
-
   let namespace: Namespace;
   let key: I18nKey<Namespace>;
   let count: number;
