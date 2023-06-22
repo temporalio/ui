@@ -33,6 +33,7 @@
   import { workflowResetEnabled } from '$lib/utilities/workflow-reset-enabled';
   import type { NetworkError } from '$lib/types/global';
   import type { WorkflowExecution } from '$lib/types/workflows';
+  import { translate } from '$lib/i18n/translate';
 
   export let workflow: WorkflowExecution;
   export let namespace: string;
@@ -48,7 +49,6 @@
   let resetReapplyType: ResetReapplyType = ResetReapplyType.Unspecified;
   let resetId: string;
   let resetReason: string;
-  let eventIdValid: boolean = true;
   let loading = false;
 
   $: cancelEnabled = workflowCancelEnabled($page.data.settings);
@@ -69,7 +69,6 @@
     resetReapplyType = ResetReapplyType.Unspecified;
     resetId = undefined;
     resetReason = undefined;
-    eventIdValid = true;
   };
 
   const handleSuccessfulTermination = async () => {
@@ -77,14 +76,14 @@
     $refresh = Date.now();
     toaster.push({
       id: 'workflow-termination-success-toast',
-      message: 'Workflow terminated.',
+      message: translate('workflows', 'terminate-success'),
     });
   };
 
   const handleTerminationError = (error: NetworkError) => {
     reason = '';
     terminateConfirmationModal?.setError(
-      error?.message ?? 'An unknown error occurred.',
+      error?.message ?? translate('unknown-error'),
     );
   };
 
@@ -117,11 +116,11 @@
       $refresh = Date.now();
       toaster.push({
         id: 'workflow-cancelation-success-toast',
-        message: 'Workflow canceled.',
+        message: translate('workflows', 'cancel-success'),
       });
     } catch (error) {
       cancelConfirmationModal?.setError(
-        error?.message ?? 'An unknown error occurred.',
+        error?.message ?? translate('unknown-error'),
       );
     }
   };
@@ -142,12 +141,12 @@
       signalConfirmationModal?.close();
       $refresh = Date.now();
       toaster.push({
-        message: 'Workflow signaled.',
+        message: translate('workflows', 'signal-success'),
         id: 'workflow-signal-success-toast',
       });
     } catch (error) {
       signalConfirmationModal?.setError(
-        error?.message ?? 'An unknown error occurred.',
+        error?.message ?? translate('unknown-error'),
       );
     }
 
@@ -179,7 +178,7 @@
       $refresh = Date.now();
     } catch (error) {
       resetConfirmationModal?.setError(
-        error?.message ?? 'An unknown error occurred.',
+        error?.message ?? translate('unknown-error'),
       );
     }
     hideResetModal();
@@ -195,21 +194,20 @@
   }[];
 
   const resetTooltipText = (): string | undefined => {
-    if (!resetEnabled)
-      return 'Resetting workflows is not enabled, please contact your administrator for assistance.';
+    if (!resetEnabled) return translate('workflows', 'reset-disabled');
     if (resetEnabled && workflow?.pendingChildren?.length > 0)
-      return 'Cannot reset workflows with pending children.';
+      return translate('workflows', 'reset-disabled-pending-children');
     if (
       resetEnabled &&
       workflow?.pendingChildren?.length === 0 &&
       $resetEvents.length === 0
     )
-      return 'Cannot reset workflows without WorkflowTaskStarted, WorkflowTaskCompleted, or WorkflowTaskTimedOut events.';
+      return translate('workflows', 'reset-disabled-no-events');
   };
 
   $: workflowActions = [
     {
-      label: 'Reset',
+      label: translate('workflows', 'reset'),
       onClick: () => resetConfirmationModal.open(),
       testId: 'reset-button',
       allowed:
@@ -219,23 +217,21 @@
       tooltip: resetTooltipText(),
     },
     {
-      label: 'Send a Signal',
+      label: translate('workflows', 'signal'),
       onClick: () => signalConfirmationModal.open(),
       testId: 'signal-button',
       allowed: signalEnabled,
-      tooltip: signalEnabled
-        ? ''
-        : 'Signaling workflows is not enabled, please contact your administrator for assistance.',
+      tooltip: signalEnabled ? '' : translate('workflows', 'signal-disabled'),
     },
     {
-      label: 'Terminate',
+      label: translate('workflows', 'terminate'),
       onClick: () => terminateConfirmationModal.open(),
       testId: 'terminate-button',
       allowed: terminateEnabled,
       destructive: true,
       tooltip: terminateEnabled
         ? ''
-        : 'Terminating workflows is not enabled, please contact your adminstrator for assistance.',
+        : translate('workflows', 'terminate-disabled'),
     },
   ];
 
@@ -252,7 +248,7 @@
   disabled={actionsDisabled}
   primaryActionDisabled={!cancelEnabled || cancelInProgress}
   on:click={() => cancelConfirmationModal.open()}
-  label="Request Cancellation"
+  label={translate('workflows', 'request-cancellation')}
 >
   {#each workflowActions as { onClick, destructive, label, allowed, testId, tooltip }}
     {#if destructive}
@@ -278,7 +274,7 @@
   on:cancelModal={hideResetModal}
   confirmDisabled={!resetId}
 >
-  <h3 slot="title">Reset Workflow</h3>
+  <h3 slot="title">{translate('workflows', 'reset-modal-title')}</h3>
   <svelte:fragment slot="content">
     <WorkflowResetForm
       bind:eventId={resetId}
@@ -295,11 +291,10 @@
   confirmType="destructive"
   on:confirmModal={cancel}
 >
-  <h3 slot="title">Cancel Workflow</h3>
+  <h3 slot="title">{translate('workflows', 'cancel-modal-title')}</h3>
   <svelte:fragment slot="content">
     <p>
-      Are you sure you want to cancel this workflow? This action cannot be
-      undone.
+      {translate('workflows', 'cancel-modal-confirmation')}
     </p>
   </svelte:fragment>
 </Modal>
@@ -307,21 +302,20 @@
   id="terminate-confirmation-modal"
   data-testid="terminate-confirmation-modal"
   bind:this={terminateConfirmationModal}
-  confirmText="Terminate"
+  confirmText={translate('workflows', 'terminate')}
   confirmType="destructive"
   on:cancelModal={hideTerminationModal}
   on:confirmModal={terminate}
 >
-  <h3 slot="title">Terminate Workflow</h3>
+  <h3 slot="title">{translate('workflows', 'terminate-modal-title')}</h3>
   <div slot="content">
     <p>
-      Are you sure you want to terminate this workflow? This action cannot be
-      undone.
+      {translate('workflows', 'terminate-modal-confirmation')}
     </p>
     <Input
       id="workflow-termination-reason"
       class="mt-4"
-      placeholder="Enter a reason"
+      placeholder={translate('workflows', 'terminate-reason-input-placeholder')}
       bind:value={reason}
     />
   </div>
@@ -330,23 +324,25 @@
   id="signal-confirmation-modal"
   data-testid="signal-confirmation-modal"
   bind:this={signalConfirmationModal}
-  confirmText="Submit"
+  confirmText={translate('submit')}
   confirmDisabled={!signalName}
   on:cancelModal={hideSignalModal}
   on:confirmModal={signal}
 >
-  <h3 slot="title">Send a Signal</h3>
+  <h3 slot="title">{translate('workflows', 'signal-modal-title')}</h3>
   <div slot="content" class="flex flex-col gap-4">
     <Input
       id="signal-name"
-      label="Signal name"
+      label={translate('workflows', 'signal-name-label')}
       required
       bind:value={signalName}
     />
     <div>
-      <span class="font-secondary text-sm font-medium">Input</span>
+      <span class="font-secondary text-sm font-medium"
+        >{translate('workflows', 'signal-payload-input-label')}</span
+      >
       <span class="font-secondary text-xs font-light italic">
-        (only JSON payloads are supported)
+        {translate('workflows', 'signal-payload-input-label-hint')}
       </span>
       <JSONEditor
         class="max-h-80 overflow-y-scroll overscroll-contain"

@@ -167,6 +167,8 @@ export type CalendarSpec = temporal.api.schedule.v1.ICalendarSpec;
 export type StructuredCalendarSpec =
   temporal.api.schedule.v1.IStructuredCalendarSpec;
 export type IntervalSpec = temporal.api.schedule.v1.IIntervalSpec;
+export type RangeSpec = temporal.api.schedule.v1.IRange;
+
 export type ScheduleActionResult =
   temporal.api.schedule.v1.IScheduleActionResult;
 
@@ -197,6 +199,7 @@ export type SettingsResponse = {
   WorkflowSignalDisabled: boolean;
   WorkflowResetDisabled: boolean;
   BatchActionsDisabled: boolean;
+  HideWorkflowQueryErrors: boolean;
   ShowTemporalSystemNamespace: boolean;
   NotifyOnNewVersion: boolean;
   FeedbackURL: string;

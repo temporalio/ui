@@ -66,6 +66,7 @@ type SettingsResponse struct {
 	WorkflowSignalDisabled      bool
 	WorkflowResetDisabled       bool
 	BatchActionsDisabled        bool
+	HideWorkflowQueryErrors     bool
 }
 
 func TemporalAPIHandler(cfgProvider *config.ConfigProviderWithRefresh, apiMiddleware []Middleware) echo.HandlerFunc {
@@ -97,9 +98,9 @@ func TemporalAPIHandler(cfgProvider *config.ConfigProviderWithRefresh, apiMiddle
 	}
 }
 
-func GetSettings(cfgProvier *config.ConfigProviderWithRefresh) func(echo.Context) error {
+func GetSettings(cfgProvider *config.ConfigProviderWithRefresh) func(echo.Context) error {
 	return func(c echo.Context) error {
-		cfg, err := cfgProvier.GetConfig()
+		cfg, err := cfgProvider.GetConfig()
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err)
 		}
@@ -134,6 +135,7 @@ func GetSettings(cfgProvier *config.ConfigProviderWithRefresh) func(echo.Context
 			WorkflowSignalDisabled:    cfg.WorkflowSignalDisabled,
 			WorkflowResetDisabled:     cfg.WorkflowResetDisabled,
 			BatchActionsDisabled:      cfg.BatchActionsDisabled,
+			HideWorkflowQueryErrors:   cfg.HideWorkflowQueryErrors,
 		}
 
 		return c.JSON(http.StatusOK, settings)

@@ -7,8 +7,8 @@
 
   import type { WorkflowIdentifier } from '$lib/types/workflows';
   import Copyable from '../copyable.svelte';
-  import { goto } from '$app/navigation';
   import Link from '$lib/holocene/link.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   export let parent: WorkflowIdentifier;
   export let parentNamespaceName: string | undefined;
@@ -17,8 +17,8 @@
 
 <Table class="w-full">
   <TableHeaderRow slot="headers">
-    <th>Parent Workflow ID</th>
-    <th>Parent Run ID</th>
+    <th>{translate('workflows', 'parent-id')}</th>
+    <th>{translate('workflows', 'parent-run-id')}</th>
   </TableHeaderRow>
   <TableRow class="hover:text-blue-700 hover:underline">
     <td>

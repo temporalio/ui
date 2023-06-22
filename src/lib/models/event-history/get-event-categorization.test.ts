@@ -54,13 +54,13 @@ describe('Event Category Data Structures', () => {
         "WorkflowExecutionStarted": "workflow",
         "WorkflowExecutionTerminated": "workflow",
         "WorkflowExecutionTimedOut": "workflow",
+        "WorkflowExecutionUpdateAccepted": "update",
+        "WorkflowExecutionUpdateCompleted": "update",
         "WorkflowTaskCompleted": "workflow",
         "WorkflowTaskFailed": "workflow",
         "WorkflowTaskScheduled": "workflow",
         "WorkflowTaskStarted": "workflow",
         "WorkflowTaskTimedOut": "workflow",
-        "WorkflowUpdateAccepted": "update",
-        "WorkflowUpdateCompleted": "update",
       }
     `);
   });
@@ -207,7 +207,10 @@ const categories: Record<
 
   command: ['UpsertWorkflowSearchAttributes'],
 
-  update: ['WorkflowUpdateAccepted', 'WorkflowUpdateCompleted'],
+  update: [
+    'WorkflowExecutionUpdateAccepted',
+    'WorkflowExecutionUpdateCompleted',
+  ],
 };
 
 describe('getEventCategory', () => {

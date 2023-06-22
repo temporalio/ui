@@ -56,6 +56,7 @@ export type Settings = {
   workflowCancelDisabled: boolean;
   workflowSignalDisabled: boolean;
   workflowResetDisabled: boolean;
+  hideWorkflowQueryErrors: boolean;
   batchActionsDisabled: boolean;
   showTemporalSystemNamespace: boolean;
   notifyOnNewVersion: boolean;

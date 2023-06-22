@@ -8,6 +8,7 @@
   "custom": "Custom",
   "start-time": "Start Time",
   "end-time": "End Time",
+  "close-time": "Close Time",
   "relative": "Relative",
   "utc": "UTC",
   "local": "Local",
@@ -28,5 +29,14 @@
   "less-than-or-equal-to": "Less than or equal to",
   "is": "Is",
   "is-not": "Is Not",
-  "all": "All"
+  "all": "All",
+  "submit": "Submit",
+  "reason": "Reason",
+  "confirm": "Confirm",
+  "summary": "Summary",
+  "schedule": "Schedule",
+  "scheduled": "Scheduled",
+  "show-all": "Show all",
+  "date-and-time": "Date & Time",
+  "event": "Event"
 }

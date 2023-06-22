@@ -24,10 +24,9 @@
 
   $: actionText =
     action === Action.Cancel
-      ? translate('workflows', 'cancel')
+      ? translate('cancel')
       : translate('workflows', 'terminate');
-  $: confirmText =
-    action === Action.Cancel ? translate('workflows', 'confirm') : actionText;
+  $: confirmText = action === Action.Cancel ? translate('confirm') : actionText;
 
   $: placeholder = getPlacholder(action, $authUser.email);
 
@@ -99,7 +98,7 @@
     <Input
       id="bulk-action-reason"
       bind:value={reason}
-      label={translate('workflows', 'reason')}
+      label={translate('reason')}
       hintText={translate(
         'workflows',
         'batch-operation-confirmation-input-hint',

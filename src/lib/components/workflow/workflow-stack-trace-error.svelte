@@ -1,5 +1,6 @@
 <script lang="ts">
   import EmptyState from '$lib/holocene/empty-state.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   import { workflowRun } from '$lib/stores/workflow-run';
 
@@ -11,9 +12,10 @@
   <section class="stack-trace">
     <EmptyState
       icon="warning"
-      title="No Workers Running"
-      content="Please make sure you have at least one worker connected to the {workflow?.taskQueue ??
-        ''} Task Queue."
+      title={translate('workflows', 'workflow-error-no-workers-title')}
+      content={translate('workflows', 'workflow-error-no-workers-description', {
+        taskQueue: workflow?.taskQueue,
+      })}
       class="my-0"
     />
   </section>
