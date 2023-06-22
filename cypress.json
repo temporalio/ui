@@ -6,5 +6,7 @@
     "VITE_MODE": "test",
     "VITE_TEMPORAL_UI_BUILD_TARGET": "local"
   },
-  "viewportWidth": 1280
+  "viewportWidth": 1280,
+  "defaultCommandTimeout": 10000,
+  "requestTimeout": 10000
 }
