@@ -1,5 +1,4 @@
 import type { I18nKey } from '$lib/i18n';
-import { translate } from '$lib/i18n/translate';
 import type {
   EventType,
   WorkflowEvents,
@@ -76,50 +75,50 @@ export const eventTypeCategorizations: Readonly<
 };
 
 export type EventTypeOption = {
-  label: string;
+  label: I18nKey<'events'>;
   option: EventTypeCategory | undefined;
   color?: string;
 };
 
 export const allEventTypeOptions: EventTypeOption[] = [
-  { label: translate('events', 'category-all'), option: undefined },
+  { label: 'category-all', option: undefined },
   {
-    label: translate('events', 'category-activity'),
+    label: 'category-activity',
     option: CATEGORIES.ACTIVITY,
     color: '#8B5CF6',
   },
   {
-    label: translate('events', 'category-child-workflow'),
+    label: 'category-child-workflow',
     option: CATEGORIES.CHILD_WORKFLOW,
     color: '#F59E0B',
   },
   {
-    label: translate('events', 'category-command'),
+    label: 'category-command',
     option: CATEGORIES.COMMAND,
     color: '#10B981',
   },
   {
-    label: translate('events', 'category-local-activity'),
+    label: 'category-local-activity',
     option: CATEGORIES.LOCAL_ACTIVITY,
   },
   {
-    label: translate('events', 'category-marker'),
+    label: 'category-marker',
     option: CATEGORIES.MARKER,
     color: '#EC4899',
   },
   {
-    label: translate('events', 'category-signal'),
+    label: 'category-signal',
     option: CATEGORIES.SIGNAL,
     color: '#DD6B20',
   },
   {
-    label: translate('events', 'category-timer'),
+    label: 'category-timer',
     option: CATEGORIES.TIMER,
     color: '#1D4ED8',
   },
-  { label: translate('events', 'category-update'), option: CATEGORIES.UPDATE },
+  { label: 'category-update', option: CATEGORIES.UPDATE },
   {
-    label: translate('events', 'category-workflow'),
+    label: 'category-workflow',
     option: CATEGORIES.WORKFLOW,
     color: '#10B981',
   },

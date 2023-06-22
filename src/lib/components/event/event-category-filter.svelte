@@ -62,7 +62,7 @@
           data-testid="event-category-option"
           on:click={() => onOptionClick(option)}
         >
-          {label}
+          {translate('events', label)}
         </button>
       </div>
     {/each}
