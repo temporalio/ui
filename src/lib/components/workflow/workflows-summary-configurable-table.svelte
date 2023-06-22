@@ -11,14 +11,17 @@
   import TableBodyCell from './workflows-summary-configurable-table/table-body-cell.svelte';
   import WorkflowColumnsOrderableList from './workflows-summary-configurable-table/orderable-list.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { page } from '$app/stores';
 
   export let workflows: WorkflowExecution[];
 
   let customizationDrawerOpen: boolean = false;
 
-  $: empty = workflows.length === 0 || $workflowTableColumns.length === 0;
-  $: pinnedColumns = $workflowTableColumns.filter((column) => column.pinned);
-  $: otherColumns = $workflowTableColumns.filter((column) => !column.pinned);
+  $: ({ namespace } = $page.params);
+  $: columns = $workflowTableColumns[namespace];
+  $: empty = workflows.length === 0 || columns.length === 0;
+  $: pinnedColumns = columns.filter((column) => column.pinned);
+  $: otherColumns = columns.filter((column) => !column.pinned);
 
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
@@ -83,7 +86,7 @@
     />), and remove (<Icon class="inline" name="hyphen" />), Workflow Headings
     to personalize the Workflow List Table.
   </svelte:fragment>
-  <WorkflowColumnsOrderableList />
+  <WorkflowColumnsOrderableList {namespace} />
 </Drawer>
 
 <style lang="postcss">
