@@ -12,24 +12,86 @@ on:
       - 'CODEOWNERS'
 
 jobs:
-  cypress-run:
+  install:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          registry-url: 'https://registry.npmjs.org'
+      - name: Setup pnpm
         uses: pnpm/action-setup@v2.2.4
         with:
           version: 8
-      - name: Install dependencies
-        run: pnpm install
-      - name: Build assets
-        run: VITE_MODE=test pnpm run build:local
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Verify Cypress Binary
+        shell: bash
+        run: |
+          pnpm exec cypress cache list
+          pnpm exec cypress verify
+          pnpm exec cypress info
+      - name: Cache Cypress Binary
+        uses: actions/cache/save@v3
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ github.ref }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+      - name: Build App
+        run: pnpm build:local
+      - name: Save build folder
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          if-no-files-found: error
+          path: ./.svelte-kit/output
+
+  cypress-run:
+    runs-on: ubuntu-latest
+    needs: install
+    strategy:
+      # don't fail the entire matrix on failure
+      fail-fast: false
+      matrix:
+        # run copies of the current job in parallel
+        containers: [1, 2, 3, 4]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          registry-url: 'https://registry.npmjs.org'
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2.2.4
+        with:
+          version: 8
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Download the build folder
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: ./.svelte-kit/output
+      - name: Restore Cypress cache
+        uses: actions/cache/restore@v3
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ github.ref }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+      - name: Verify Cypress Binary
+        shell: bash
+        run: |
+          pnpm exec cypress cache list
+          pnpm exec cypress verify
+          pnpm exec cypress info
       - name: Run Cypress tests
         uses: cypress-io/github-action@v5
         with:
           install: false
-          start: pnpm run preview:local
+          start: pnpm preview:local
           wait-on: 'pnpm dlx wait-on --timeout 60000 tcp:3000'
           wait-on-timeout: 120
           browser: chrome
