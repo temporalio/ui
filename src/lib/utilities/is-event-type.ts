@@ -46,6 +46,7 @@ import type {
   WorkflowTaskTimedOutEvent,
   WorkflowExecutionCancelRequestedEvent,
   StartChildWorkflowExecutionInitiatedEvent,
+  WorkflowExecutionUpdateCompletedEvent,
 } from '$lib/types/events';
 
 export type ActivityType = (typeof activityEvents)[number];
@@ -408,3 +409,16 @@ export const isLocalActivityMarkerEvent = (
 
   return true;
 };
+
+const isWorkflowExecutionUpdateCompletedEvent =
+  hasAttributes<WorkflowExecutionUpdateCompletedEvent>(
+    'workflowExecutionUpdateCompletedEventAttributes',
+  );
+
+export const isFailedWorkflowExecutionUpdateCompletedEvent = (
+  event: WorkflowEvent,
+): boolean =>
+  isWorkflowExecutionUpdateCompletedEvent(event) &&
+  Boolean(
+    event.workflowExecutionUpdateCompletedEventAttributes.outcome?.failure,
+  );

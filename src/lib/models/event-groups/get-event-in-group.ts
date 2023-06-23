@@ -14,6 +14,7 @@ import {
   isWorkflowExecutionTimedOutEvent,
   isWorkflowTaskTimedOutEvent,
   isWorkflowTaskFailedEvent,
+  isFailedWorkflowExecutionUpdateCompletedEvent,
 } from '$lib/utilities/is-event-type';
 import { isEventGroup } from '$lib/models/event-groups';
 import type { IterableEvent, WorkflowEvent } from '$lib/types/events';
@@ -28,7 +29,8 @@ export const eventIsFailureOrTimedOut = (event: WorkflowEvent): boolean => {
     isWorkflowTaskFailedEvent(event) ||
     isChildWorkflowExecutionFailedEvent(event) ||
     isChildWorkflowExecutionTimedOutEvent(event) ||
-    isSignalExternalWorkflowExecutionFailedEvent(event)
+    isSignalExternalWorkflowExecutionFailedEvent(event) ||
+    isFailedWorkflowExecutionUpdateCompletedEvent(event)
   );
 };
 
