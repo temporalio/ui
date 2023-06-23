@@ -45,4 +45,5 @@ export const Strings = {
   'expand-all': 'Expand All',
   unlimited: 'Unlimited',
   'no-expiration': 'No Expiration',
+  workflow: 'Workflow',
 } as const;
