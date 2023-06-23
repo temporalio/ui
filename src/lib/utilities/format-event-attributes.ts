@@ -137,7 +137,7 @@ const attributeGroupings: Readonly<AttributeGroup[]> = [
 ];
 
 type GroupingOption = {
-  label: I18nKey<'events'> | I18nKey<'common'>;
+  label: I18nKey<'events'>;
 };
 
 export const attributeGroupingProperties: Readonly<
@@ -152,7 +152,7 @@ export const attributeGroupingProperties: Readonly<
   },
   summary: { label: 'attribute-group-summary' },
   taskQueue: { label: 'attribute-group-task-queue' },
-  workflow: { label: 'workflow' },
+  workflow: { label: 'attribute-group-workflow' },
 };
 
 export type AttributeGrouping = Partial<

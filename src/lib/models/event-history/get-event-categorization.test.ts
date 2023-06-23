@@ -112,7 +112,7 @@ describe('Event Category Data Structures', () => {
         },
         {
           "color": "#10B981",
-          "label": "workflow",
+          "label": "category-workflow",
           "option": "workflow",
         },
       ]

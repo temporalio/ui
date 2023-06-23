@@ -19,6 +19,7 @@ export const Strings = {
   'category-signal': 'Signal',
   'category-timer': 'Timer',
   'category-update': 'Update',
+  'category-workflow': 'Workflow',
   'attribute-group-activity': 'Activity',
   'attribute-group-parent': 'Parent',
   'attribute-group-retry-policy': 'Retry Policy',
@@ -26,4 +27,5 @@ export const Strings = {
   'attribute-group-search-attributes': 'Search Attributes',
   'attribute-group-summary': 'Summary',
   'attribute-group-task-queue': 'Task Queue',
+  'attribute-group-workflow': 'Workflow',
 } as const;

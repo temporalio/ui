@@ -75,7 +75,7 @@ export const eventTypeCategorizations: Readonly<
 };
 
 export type EventTypeOption = {
-  label: I18nKey<'events'> | I18nKey<'common'>;
+  label: I18nKey<'events'>;
   option: EventTypeCategory | undefined;
   color?: string;
 };
@@ -118,7 +118,7 @@ export const allEventTypeOptions: EventTypeOption[] = [
   },
   { label: 'category-update', option: CATEGORIES.UPDATE },
   {
-    label: 'workflow',
+    label: 'category-workflow',
     option: CATEGORIES.WORKFLOW,
     color: '#10B981',
   },
