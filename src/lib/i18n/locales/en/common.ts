@@ -43,6 +43,4 @@ export const Strings = {
   event: 'Event',
   'collapse-all': 'Collapse All',
   'expand-all': 'Expand All',
-  unlimited: 'Unlimited',
-  'no-expiration': 'No Expiration',
 } as const;
