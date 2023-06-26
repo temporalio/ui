@@ -26,7 +26,7 @@ jobs:
       - name: Build assets
         run: VITE_MODE=test pnpm run build:local
       - name: Run Cypress tests
-        uses: cypress-io/github-action@v5
+        uses: cypress-io/github-action@v2
         with:
           install: false
           start: pnpm run preview:local
@@ -34,7 +34,6 @@ jobs:
           wait-on-timeout: 120
           browser: chrome
           record: true
-          parallel: true
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           VITE_MODE: test
