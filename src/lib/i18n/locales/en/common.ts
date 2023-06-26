@@ -41,4 +41,6 @@ export const Strings = {
   'show-all': 'Show all',
   'date-and-time': 'Date & Time',
   event: 'Event',
+  'collapse-all': 'Collapse All',
+  'expand-all': 'Expand All',
 } as const;

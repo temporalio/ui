@@ -7,12 +7,13 @@ describe('translate', () => {
   beforeEach(() => {
     vi.mock('i18next', async () => {
       const actual: i18n = await vi.importActual('i18next');
-
+      const mockT = vi.fn();
       return {
         default: {
           ...actual,
-          t: vi.fn(),
+          t: mockT,
         },
+        t: mockT,
       };
     });
   });

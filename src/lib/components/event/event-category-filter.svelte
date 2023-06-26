@@ -12,10 +12,13 @@
   import { isVersionNewer } from '$lib/utilities/version-check';
   import { eventCategoryFilter } from '$lib/stores/filters';
   import { temporalVersion } from '$lib/stores/versions';
+  import { translate } from '$lib/i18n/translate';
 
   export let compact: boolean = false;
 
-  $: label = compact ? 'Event Type' : 'Workflow Events';
+  $: label = compact
+    ? translate('events', 'event-type')
+    : translate('events', 'workflow-events');
 
   let parameter = 'category';
   let options = compact ? compactEventTypeOptions : allEventTypeOptions;
@@ -59,7 +62,7 @@
           data-testid="event-category-option"
           on:click={() => onOptionClick(option)}
         >
-          {label}
+          {translate('events', label)}
         </button>
       </div>
     {/each}

@@ -1,6 +1,7 @@
 <script lang="ts">
   import EmptyState from '$lib/holocene/empty-state.svelte';
   import Loading from '$lib/holocene/loading.svelte';
+  import { translate } from '$lib/i18n/translate';
 
   export let loading = false;
 </script>
@@ -11,8 +12,8 @@
       <Loading />
     {:else}
       <EmptyState
-        title="No Events Match"
-        content="There are no events that match your filters or selected view. Adjust your filters or view to see your events."
+        title={translate('events', 'empty-state-title')}
+        content={translate('events', 'empty-state-description')}
       />
     {/if}
   </td>

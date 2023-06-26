@@ -12,6 +12,7 @@ import {
 } from '$lib/utilities/get-single-attribute-for-event';
 import { capitalize } from '$lib/utilities/format-camel-case';
 import { formatDate } from '$lib/utilities/format-date';
+import type { I18nKey } from '$lib/i18n';
 
 export type CombinedAttributes = EventAttribute & {
   eventTime?: string;
@@ -136,20 +137,22 @@ const attributeGroupings: Readonly<AttributeGroup[]> = [
 ];
 
 type GroupingOption = {
-  label: string;
+  label: I18nKey<'events'>;
 };
 
 export const attributeGroupingProperties: Readonly<
   Record<AttributeGroup, GroupingOption>
 > = {
-  activity: { label: 'Activity' },
-  parent: { label: 'Parent' },
-  retryPolicy: { label: 'Retry Policy' },
-  schedule: { label: 'Schedule' },
-  searchAttributes: { label: 'Search Attributes' },
-  summary: { label: 'Summary' },
-  taskQueue: { label: 'Task Queue' },
-  workflow: { label: 'Workflow' },
+  activity: { label: 'attribute-group-activity' },
+  parent: { label: 'attribute-group-parent' },
+  retryPolicy: { label: 'attribute-group-retry-policy' },
+  schedule: { label: 'attribute-group-schedule' },
+  searchAttributes: {
+    label: 'attribute-group-search-attributes',
+  },
+  summary: { label: 'attribute-group-summary' },
+  taskQueue: { label: 'attribute-group-task-queue' },
+  workflow: { label: 'attribute-group-workflow' },
 };
 
 export type AttributeGrouping = Partial<

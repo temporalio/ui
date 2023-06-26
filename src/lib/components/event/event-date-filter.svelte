@@ -18,18 +18,19 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
   import { getDateFilterValue } from '$lib/utilities/event-formatting';
   import type { TimeFormat } from '$lib/types/global';
+  import { translate } from '$lib/i18n/translate';
 
   export let compact: boolean;
 
   let sortOptions: EventSortOrderOptions = [
-    { label: 'Sort 1-9', option: 'ascending' },
-    { label: 'Sort 9-1', option: 'descending' },
+    { label: translate('events', 'sort-ascending'), option: 'ascending' },
+    { label: translate('events', 'sort-descending'), option: 'descending' },
   ];
 
   let dateOptions: TimeFormatOptions = [
-    { label: 'Relative', option: 'relative' },
-    { label: 'UTC', option: 'UTC' },
-    { label: 'Local', option: 'local' },
+    { label: translate('relative'), option: 'relative' },
+    { label: translate('utc'), option: 'UTC' },
+    { label: translate('local'), option: 'local' },
   ];
 
   const onSortOptionClick = (option: EventSortOrder) => {
@@ -63,7 +64,7 @@
 
 <DropdownMenu {value} testId="event-date-filter">
   <svelte:fragment slot="label">
-    <span class="hidden md:block">Date & Time</span>
+    <span class="hidden md:block">{translate('date-and-time')}</span>
     <span class="block md:hidden"><Icon name="clock" /></span>
   </svelte:fragment>
   <div class="w-56">
@@ -109,7 +110,9 @@
           <Icon name="checkmark" />
         {/if}
       </div>
-      <button on:click={onShowElapsedClick}>Show Elapsed Time</button>
+      <button on:click={onShowElapsedClick}
+        >{translate('events', 'show-elapsed-time')}</button
+      >
     </div>
   </div>
 </DropdownMenu>

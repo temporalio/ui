@@ -13,6 +13,5 @@ declare namespace App {
     settings?: import('$types').Settings;
     workers?: import('$types').GetPollersResponse;
     cluster?: import('$types').ClusterInformation;
-    i18n?: () => import('i18next').i18n;
   }
 }
