@@ -32,9 +32,7 @@
     import Link from '$lib/holocene/link.svelte';
     import Tabs from '$lib/holocene/tab/tabs.svelte';
     import TabList from '$lib/holocene/tab/tab-list.svelte';
-    import Modal from '$lib/holocene/modal.svelte';
-    import Input from "$lib/holocene/input/input.svelte";
-    import {retriggerWorkflow} from "$lib/services/workflow-service";
+    import RetriggerButton from '$lib/components/workflow/retrigger-button.svelte';
 
     export let namespace: string;
 
@@ -44,8 +42,6 @@
     const refreshRate = 15000;
     let reason = '';
     let eventId = '';
-
-    let retriggerConfirmationModal: Modal
 
     $: routeParameters = {
         namespace,
@@ -84,26 +80,6 @@
             refreshInterval = setInterval(() => ($refresh = Date.now()), refreshRate);
         }
     };
-
-    const hideRetriggerModal = () => {
-        reason = '';
-    }
-
-    const onRetrigger = () => {
-        retriggerConfirmationModal.open()
-    }
-
-    const retrigger = async () => {
-        const res = await retriggerWorkflow({
-            namespace, workflowId: $workflowRun?.workflow.id, runId: $workflowRun?.workflow.runId, reason, eventId
-        });
-
-        if (res.ok) {
-            reason = '';
-            eventId = '';
-            retriggerConfirmationModal.close();
-        }
-    }
 
     onDestroy(() => {
         clearInterval(refreshInterval);
@@ -157,10 +133,8 @@
                     <AutoRefreshWorkflow onChange={onRefreshChange}/>
                     <WorkflowActions {cancelInProgress} {workflow} {namespace}/>
                 </div>
-            {:else}
-                <button class="bg-black text-offWhite p-2 rounded" on:click={() => onRetrigger()}>Re-trigger Workflow
-                </button>
             {/if}
+          <RetriggerButton namespace={namespace} isRunning={isRunning} />
         </div>
     </div>
     {#if cancelInProgress}
@@ -271,41 +245,7 @@
     </Tabs>
 </header>
 
-<Modal
-        data-testid="terminate-confirmation-modal"
-        bind:this={retriggerConfirmationModal}
-        confirmText="Retrigger"
-        on:cancelModal={hideRetriggerModal}
-        on:confirmModal={retrigger}
->
-    <h3 slot="title">Re-trigger Workflow</h3>
-    <div slot="content">
-        <p>
-            Are you sure you want to re-trigger this workflow? This action cannot be
-            undone.
-        </p>
-        <Input
-                id="workflow-retrigger-reason"
-                class="mt-4"
-                placeholder="Enter a reason"
-                bind:value={reason}
-        />
-        <Input
-                id="workflow-retrigger-reason"
-                class="mt-4"
-                placeholder="Enter a namespace"
-                bind:value={namespace}
-                disabled="disabled"
-        />
-        <Input
-                id="workflow-retrigger-event-id"
-                class="mt-4"
-                placeholder="Enter Event Id"
-                bind:value={eventId}
-                type="number"
-        />
-    </div>
-</Modal>
+
 
 <style lang="postcss">
     .back-to-workflows {
