@@ -29,6 +29,6 @@ runs:
           ${{ runner.os }}-pnpm-store-
     - name: Install dependencies
       shell: bash
-      run: pnpm install --frozen-lockfile
+      run: pnpm install
       env:
         HUSKY: '0'
