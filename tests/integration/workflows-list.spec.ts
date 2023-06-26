@@ -1,13 +1,12 @@
 import { test, expect } from '@playwright/test';
 import {
+  WORKFLOWS_API,
   mockGlobalApis,
   mockSearchAttributesApi,
 } from '~/test-utilities/mock-apis';
 import { setLocalStorage } from '~/test-utilities/mock-local-storage';
 
 const workflowsUrl = '/namespaces/default/workflows';
-const workflowsAPI =
-  'http://localhost:8233/api/v1/namespaces/*/workflows?query=';
 
 test.beforeEach(async ({ page }) => {
   await mockGlobalApis(page);
@@ -57,7 +56,7 @@ for (const [selector, parameter] of [
 
     await page.fill(selector, input);
 
-    await page.waitForRequest(workflowsAPI + expectedQuery);
+    await page.waitForRequest(WORKFLOWS_API);
 
     expect(page.url()).toMatch(expectedQuery);
   });
@@ -81,7 +80,7 @@ for (const status of [
 
     await page.locator('#execution-status-filter').selectOption(status);
 
-    await page.waitForRequest(workflowsAPI + expectedQuery);
+    await page.waitForRequest(WORKFLOWS_API);
 
     expect(page.url()).toMatch(expectedQuery);
   });

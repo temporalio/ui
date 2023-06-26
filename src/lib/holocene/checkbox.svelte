@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { omit } from '$lib/utilities/omit';
+
   import { createEventDispatcher } from 'svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
   import type { HTMLInputAttributes } from 'svelte/elements';
@@ -53,6 +55,7 @@
 </script>
 
 <div
+  data-testid={$$restProps['data-testid'] ?? null}
   on:click|stopPropagation
   on:keypress|stopPropagation
   class="relative {$$props.class}"
@@ -80,7 +83,7 @@
       {indeterminate}
       {disabled}
       class:indeterminate
-      {...$$restProps}
+      {...omit($$restProps, 'data-testid')}
     />
     <span class="checkmark" class:hoverable class:on-dark={onDark}>
       {#if indeterminate}
