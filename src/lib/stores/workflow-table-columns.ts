@@ -1,4 +1,4 @@
-import { derived, type Readable } from 'svelte/store';
+import { derived, get, type Readable } from 'svelte/store';
 import { persistStore } from './persist-store';
 import { customSearchAttributes } from './search-attributes';
 import { namespaces } from './namespaces';
@@ -76,6 +76,23 @@ const DEFAULT_AVAILABLE_COLUMNS: WorkflowHeader[] = [
   { label: 'Task Queue', pinned: false },
 ];
 
+const getDefaultColumns = (): WorkflowHeader[] => {
+  let columns: WorkflowHeader[];
+  try {
+    // try to get the list of columns that was stored last time they interacted
+    // with the table before we made it namespace-specific
+    const stringifiedOldColumns = window.localStorage.getItem(
+      'workflow-table-columns',
+    );
+
+    columns = JSON.parse(stringifiedOldColumns);
+  } catch {
+    columns = DEFAULT_COLUMNS;
+  }
+
+  return columns;
+};
+
 export const persistedWorkflowTableColumns = persistStore<State>(
   'namespace-workflow-table-columns',
   {},
@@ -89,7 +106,7 @@ export const workflowTableColumns: Readable<State> = derived(
       (namespaceToColumnsMap, { namespaceInfo: { name } }) => {
         return {
           ...namespaceToColumnsMap,
-          [name]: $persistedWorkflowTableColumns[name] ?? DEFAULT_COLUMNS,
+          [name]: $persistedWorkflowTableColumns[name] ?? getDefaultColumns(),
         };
       },
       state,
