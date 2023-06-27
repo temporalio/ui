@@ -52,10 +52,10 @@ test.describe('Batch and Bulk Workflow Actions', () => {
       await page.getByTestId('batch-actions-checkbox').click();
       await page.click('[data-testid="select-all-workflows"]');
       await page.click('[data-testid="bulk-terminate-button"]');
-      const batchActionWorkflowsQuery = await page.$(
-        '[data-testid="batch-Terminate-confirmation"] [data-testid="batch-action-workflows-query"]',
-      );
-      expect(await batchActionWorkflowsQuery.innerText()).toBe(
+      const batchActionWorkflowsQuery = page
+        .getByTestId('batch-Terminate-confirmation')
+        .getByTestId('batch-action-workflows-query');
+      await expect(batchActionWorkflowsQuery).toHaveText(
         'ExecutionStatus="Running"',
       );
       await page.fill(
@@ -85,10 +85,10 @@ test.describe('Batch and Bulk Workflow Actions', () => {
       await page.getByTestId('batch-actions-checkbox').click();
       await page.click('[data-testid="select-all-workflows"]');
       await page.click('[data-testid="bulk-cancel-button"]');
-      const batchActionWorkflowsQuery = await page.$(
-        '[data-testid="batch-Cancel-confirmation"] [data-testid="batch-action-workflows-query"]',
-      );
-      expect(await batchActionWorkflowsQuery.innerText()).toBe(
+      const batchActionWorkflowsQuery = page
+        .getByTestId('batch-Cancel-confirmation')
+        .getByTestId('batch-action-workflows-query');
+      await expect(batchActionWorkflowsQuery).toHaveText(
         'ExecutionStatus="Running"',
       );
       await page.fill(

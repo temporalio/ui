@@ -245,7 +245,7 @@
       </p>
       {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility}
         <div class="h-1 w-1 rounded-full bg-gray-400" />
-        <p data-testid="workflow-count" data-loaded={!$loading}>
+        <p data-testid="workflow-count" data-loaded={!$loading && !$updating}>
           {#if $loading}
             <span class="text-gray-400"
               ><Translate namespace="common" key="loading" /></span
