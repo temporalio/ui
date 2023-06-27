@@ -89,7 +89,7 @@ export const mockWorkflowApis = (page: Page) => {
 };
 
 /**
- * Waits for requests that occur on initial load of ever page, i.e. cluster, settings, etc.
+ * Waits for requests that occur on initial load of every page, i.e. cluster, settings, etc.
  * @param page a playwright Page object
  * @returns Promise<Request[]>
  */
@@ -102,17 +102,13 @@ export const waitForGlobalApis = (page: Page) => {
 };
 
 /**
- * Waits for requests that occur on the initial load of the Workflows page
+ * Waits for requests that occur on navigation to the Workflows page, excluding global APIs
  * @param page a playwright Page object
  * @param waitForCount boolean - whether to wait for the Workflows Count Api - which only gets requested when advanced visibility in enabled
  * @returns Promise<Request[]>
  */
 export const waitForWorkflowsApis = (page: Page, waitForCount = true) => {
-  const requests = [
-    waitForGlobalApis(page),
-    page.waitForResponse(WORKFLOWS_API),
-    page.waitForResponse(SEARCH_ATTRIBUTES_API),
-  ];
+  const requests = [page.waitForResponse(WORKFLOWS_API)];
 
   if (waitForCount) requests.push(page.waitForResponse(WORKFLOWS_COUNT_API));
 
