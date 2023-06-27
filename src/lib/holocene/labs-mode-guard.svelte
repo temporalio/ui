@@ -15,4 +15,6 @@
 
 {#if $labsMode}
   <slot />
+{:else}
+  <slot name="fallback" />
 {/if}
