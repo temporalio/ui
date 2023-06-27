@@ -52,11 +52,11 @@
   }
 </script>
 
-<div class="flex-items-center flex grow gap-4">
-  <div class="flex h-12 w-full items-center gap-0" in:fade>
+<div class="flex grow gap-4">
+  <div class="flex w-full items-center gap-0" in:fade>
     <form
       on:submit|preventDefault={onSearch}
-      class="relative flex h-12 w-full items-center gap-0"
+      class="relative flex w-full items-center gap-0"
       in:fly={{ x: -100, duration: 150 }}
       role="search"
     >
@@ -65,7 +65,7 @@
         type="search"
         placeholder={translate('search-placeholder')}
         icon="search"
-        class="w-3/4"
+        class="w-full lg:w-3/4"
         clearable
         unroundRight
         on:clear={handleClearInput}

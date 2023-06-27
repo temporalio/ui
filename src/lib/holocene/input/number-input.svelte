@@ -1,4 +1,8 @@
 <script lang="ts">
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import type { IconName } from '$lib/holocene/icon/paths';
+
+  export let icon: IconName = null;
   export let id: string;
   export let value: string;
   export let label = '';
@@ -8,9 +12,12 @@
   export let disabled = false;
   export let theme: 'dark' | 'light' = 'light';
   export let autocomplete = false;
+  export let search = false;
   export let hintText = '';
   export let max: null | number = null;
   export let spellcheck: boolean = null;
+  export let unroundRight: boolean = false;
+  export let unroundLeft: boolean = false;
 
   let valid = true;
 
@@ -51,7 +58,19 @@
     <label for={id}>{label}</label>
   {/if}
   <div class="flex items-center gap-2">
-    <div class="input-container {theme}" class:disabled class:invalid={!valid}>
+    <div
+      class="input-container {theme}"
+      class:disabled
+      class:search
+      class:unroundRight
+      class:unroundLeft
+      class:invalid={!valid}
+    >
+      {#if icon}
+        <span class="icon-container">
+          <Icon name={icon} />
+        </span>
+      {/if}
       <input
         class="m-2 block w-full bg-white text-center focus:outline-none"
         class:disabled
@@ -67,6 +86,7 @@
         on:change
         on:focus
         on:blur
+        on:keydown
       />
     </div>
     <div class="units">{units}</div>
@@ -88,6 +108,14 @@
 
   .input-container {
     @apply relative box-border flex h-10 w-16 items-center rounded border border-gray-900 text-sm focus-within:border-blue-700;
+  }
+
+  .input-container.search {
+    @apply w-fit;
+
+    input {
+      @apply text-left;
+    }
   }
 
   .input-container.disabled {
@@ -149,5 +177,13 @@
   .input-container.dark.disabled .copy-icon-container,
   .input-container.dark.disabled input {
     @apply border-gray-900 bg-gray-900;
+  }
+
+  .unroundRight {
+    @apply rounded-tr-none rounded-br-none;
+  }
+
+  .unroundLeft {
+    @apply rounded-tl-none rounded-bl-none border-l-0;
   }
 </style>

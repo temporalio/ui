@@ -41,7 +41,7 @@ export const getLargestDurationUnit = (duration: Duration): Duration => {
 
 const isDatetimeStatement = is('Datetime');
 
-const emptyFilter = () => ({
+export const emptyFilter = () => ({
   attribute: '',
   value: '',
   operator: '',

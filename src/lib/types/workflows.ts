@@ -73,7 +73,8 @@ type SearchAttributesValue =
   | 'Double'
   | 'Int'
   | 'Keyword'
-  | 'Text';
+  | 'Text'
+  | 'KeywordList';
 
 export type SearchAttributes = {
   [k: string]: SearchAttributesValue;

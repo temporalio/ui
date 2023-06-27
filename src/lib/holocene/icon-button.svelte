@@ -26,7 +26,7 @@
 >
   {#if icon}
     <div class="flex items-center justify-center gap-2 {classes}">
-      <Icon name={icon} />
+      <Icon name={icon} class="h-fit" />
       <slot />
     </div>
   {:else}

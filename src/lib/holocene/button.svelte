@@ -7,6 +7,7 @@
   export let variant:
     | 'primary'
     | 'secondary'
+    | 'search'
     | 'destructive'
     | 'login'
     | 'link' = 'primary';
@@ -23,10 +24,12 @@
   export let classes: string = $$props.class;
   export let testId: string = $$props.testId;
   export let count = 0;
-  export let type = 'button';
+  export let type: 'button' | 'submit' | 'reset' = 'button';
   export let unround = false;
   export let unroundRight = false;
   export let unroundLeft = false;
+  export let noBorderRight = false;
+  export let noBorderLeft = false;
   export let id: string = null;
 </script>
 
@@ -40,6 +43,8 @@
     class:unround
     class:unroundRight
     class:unroundLeft
+    class:noBorderRight
+    class:noBorderLeft
     data-testid={testId}
     {type}
     {disabled}
@@ -92,6 +97,10 @@
     @apply border-2 py-2 px-4 transition-colors;
   }
 
+  .search {
+    @apply border py-2 px-4 h-10 transition-colors;
+  }
+
   .button:disabled {
     @apply cursor-not-allowed;
   }
@@ -114,11 +123,13 @@
     @apply text-white opacity-75 hover:from-primary hover:to-primary;
   }
 
-  .secondary {
+  .secondary,
+  .search {
     @apply border-gray-800 bg-white text-gray-800 hover:border-primary hover:bg-primary hover:text-white;
   }
 
-  .secondary:disabled {
+  .secondary:disabled,
+  .search:disabled {
     @apply opacity-75 hover:border-gray-800 hover:bg-white hover:text-gray-800;
   }
 
@@ -156,5 +167,13 @@
 
   .unroundRight {
     @apply rounded-tr-none rounded-br-none;
+  }
+
+  .noBorderLeft {
+    @apply border-l-0;
+  }
+
+  .noBorderRight {
+    @apply border-r-0;
   }
 </style>
