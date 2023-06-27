@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
 import {
-  WORKFLOWS_API,
   mockGlobalApis,
   mockSearchAttributesApi,
 } from '~/test-utilities/mock-apis';
@@ -56,9 +55,7 @@ for (const [selector, parameter] of [
 
     await page.fill(selector, input);
 
-    await page.waitForRequest(WORKFLOWS_API);
-
-    expect(page.url()).toMatch(expectedQuery);
+    await expect(page).toHaveURL(new RegExp(expectedQuery));
   });
 }
 
@@ -80,9 +77,7 @@ for (const status of [
 
     await page.locator('#execution-status-filter').selectOption(status);
 
-    await page.waitForRequest(WORKFLOWS_API);
-
-    expect(page.url()).toMatch(expectedQuery);
+    await expect(page).toHaveURL(new RegExp(expectedQuery));
   });
 
   test(`sets the basic query filters correctly when navigating to ?query=${expectedQuery}`, async ({
@@ -112,7 +107,7 @@ test('toggle to advanced search', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'Basic Search' })).toBeVisible();
   await expect(page.locator('#advanced-search')).toBeVisible();
 
-  expect(page.url()).toMatch('?search=advanced');
+  await expect(page).toHaveURL(/\?search=advanced/);
 });
 
 test('it loads the basic search when the parameter is set', async ({
