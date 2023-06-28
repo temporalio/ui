@@ -5,7 +5,7 @@ import { setLocalStorage } from '~/test-utilities/mock-local-storage';
 const workflowsUrl = '/namespaces/default/workflows';
 
 test.beforeEach(async ({ page }) => {
-  mockWorkflowsApis(page);
+  await mockWorkflowsApis(page);
   await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
 });
 
