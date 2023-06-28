@@ -11,7 +11,6 @@
   import { supportsBulkActions } from '$lib/stores/bulk-actions';
 
   export let workflow: WorkflowExecution;
-  export let pinned = false;
   $: namespace = $page.params.namespace;
 
   const goToEventHistory = (event: MouseEvent) => {
@@ -26,11 +25,8 @@
   };
 </script>
 
-<tr
-  class="workflows-summary-configurable-table-row"
-  on:click={goToEventHistory}
->
-  {#if pinned && $supportsBulkActions}
+<tr on:click={goToEventHistory}>
+  {#if $supportsBulkActions}
     <td>
       <Checkbox
         hoverable
@@ -42,22 +38,5 @@
     </td>
   {/if}
   <slot />
-  {#if !pinned}
-    <td />
-  {/if}
+  <td />
 </tr>
-
-<style lang="postcss">
-  .workflows-summary-configurable-table-row {
-    @apply border-b border-primary cursor-pointer h-11 last-of-type:border-b-0;
-  }
-
-  .workflows-summary-configurable-table-row:hover {
-    /* bg-fixed solves an issue with safari applying the gradient on each td instead of across the entire row */
-    @apply bg-gradient-to-br from-blue-100 to-purple-100 bg-fixed;
-
-    :global(.table-link) {
-      @apply text-blue-700 underline decoration-blue-700;
-    }
-  }
-</style>

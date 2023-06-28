@@ -4,7 +4,7 @@
 
 <Svg {...$$props}>
   <path
-    d="M14 18L20 12M20 12L14 6M20 12L4 12"
+    d="M10 18L4 12M4 12L10 6M4 12L20 12"
     stroke="currentcolor"
     stroke-width="2"
     stroke-linecap="round"

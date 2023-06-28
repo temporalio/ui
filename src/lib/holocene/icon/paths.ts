@@ -1,5 +1,6 @@
 import add from './svg/add.svelte';
 import archives from './svg/archives.svelte';
+import arrowLeft from './svg/arrow-left.svelte';
 import arrowUp from './svg/arrow-up.svelte';
 import arrowRight from './svg/arrow-right.svelte';
 import ascending from './svg/ascending.svelte';
@@ -80,6 +81,7 @@ export type IconName = keyof typeof icons;
 export const icons = {
   add,
   archives,
+  'arrow-left': arrowLeft,
   'arrow-up': arrowUp,
   'arrow-right': arrowRight,
   ascending,
