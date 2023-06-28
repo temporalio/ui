@@ -13,7 +13,6 @@ const { name } = workflowCompletedFixture.executionConfig.taskQueue;
 describe('Workflow Workers', () => {
   beforeEach(() => {
     cy.interceptApi();
-    cy.setTopNavFeatureTag();
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
@@ -48,7 +47,6 @@ describe('Workflow Workers', () => {
 describe.skip('Navigate to Workflow Workers', () => {
   beforeEach(() => {
     cy.interceptApi();
-    cy.setTopNavFeatureTag();
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
@@ -112,7 +110,6 @@ describe.skip('Navigate to Workflow Workers', () => {
 describe('Workflow Workers - Workflow Worker Only', () => {
   beforeEach(() => {
     cy.interceptApi();
-    cy.setTopNavFeatureTag();
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
@@ -157,7 +154,6 @@ describe('Workflow Workers - Workflow Worker Only', () => {
 describe('Workflow Workers - Activity Worker Only', () => {
   beforeEach(() => {
     cy.interceptApi();
-    cy.setTopNavFeatureTag();
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +

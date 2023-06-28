@@ -34,7 +34,6 @@ async function globalSetup(config: FullConfig) {
   }
 
   await page.goto(baseURL);
-  await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
 
   await page
     .context()

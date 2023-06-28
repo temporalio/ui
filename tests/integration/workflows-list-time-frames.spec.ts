@@ -10,7 +10,6 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(mockDate);
   await mockWorkflowsApis(page);
   await page.goto(workflowsUrl);
-  await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
 });
 
 const timeFrames = [

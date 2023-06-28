@@ -76,7 +76,6 @@ test('Top Navigation current namespace is present and has other namespaces to se
 test('Top Navigation current namespace is not present on non-namespace specific pages', async ({
   page,
 }) => {
-  await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
   await expect(page.getByTestId('namespace-select-button')).toBeVisible();
 
   await page.getByRole('link', { name: 'Namespaces' }).click();

@@ -8,7 +8,6 @@ import atq from '../fixtures/activity-task-queues.json';
 describe('Task Queues Page', () => {
   beforeEach(() => {
     cy.interceptApi();
-    cy.setTopNavFeatureTag();
 
     cy.visit(`/namespaces/default/task-queues/a-task-queue`);
 

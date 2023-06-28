@@ -4,7 +4,6 @@ describe('Batch and Bulk Workflow Actions', () => {
   describe('when advanced visibility is disabled', () => {
     it('disallows bulk and batch actions', () => {
       cy.interceptApi();
-      cy.setTopNavFeatureTag();
 
       cy.visit('/namespaces/default/workflows');
 
@@ -18,7 +17,6 @@ describe('Batch and Bulk Workflow Actions', () => {
   describe('when advanced visibility is enabled', () => {
     beforeEach(() => {
       cy.interceptApi();
-      cy.setTopNavFeatureTag();
 
       cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/cluster*', {
         fixture: 'cluster-with-elasticsearch.json',

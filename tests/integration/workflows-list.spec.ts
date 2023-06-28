@@ -12,7 +12,6 @@ const workflowsAPI =
 test.beforeEach(async ({ page }) => {
   await mockGlobalApis(page);
   await mockSearchAttributesApi(page);
-  await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
 });
 
 test('it displays the namespace', async ({ page }) => {

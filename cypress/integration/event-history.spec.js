@@ -15,7 +15,6 @@ const { workflowId, runId } =
 describe('Workflow Events', () => {
   beforeEach(() => {
     cy.interceptApi();
-    cy.setTopNavFeatureTag();
 
     cy.intercept(
       Cypress.env('VITE_API_HOST') +
@@ -50,7 +49,6 @@ describe('Workflow Events', () => {
 
   it('default to the summary page when visiting a workflow', () => {
     cy.clearLocalStorage();
-    cy.setTopNavFeatureTag();
 
     cy.visit(`/namespaces/default/workflows/${workflowId}/${runId}`);
 

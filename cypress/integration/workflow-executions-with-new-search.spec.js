@@ -8,7 +8,6 @@ const { workflowId, runId } = workflowRunningFixture.execution;
 describe('Workflow Executions List With Search', () => {
   beforeEach(() => {
     cy.interceptApi();
-    cy.setTopNavFeatureTag();
     cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/cluster*', {
       fixture: 'cluster-with-elasticsearch.json',
     }).as('cluster-api-elasticsearch');
@@ -376,7 +375,6 @@ describe('Workflow Executions List With Search', () => {
 describe('Workflow Executions List With Search using only MySql on 1.20', () => {
   beforeEach(() => {
     cy.interceptApi();
-    cy.setTopNavFeatureTag();
     cy.intercept(Cypress.env('VITE_API_HOST') + '/api/v1/cluster*', {
       fixture: 'cluster-with-mysql.json',
     }).as('cluster-api-elasticsearch');
