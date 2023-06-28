@@ -1,5 +1,7 @@
 import type { Page } from '@playwright/test';
 
+export const NAMESPACE_API = '**/api/v1/namespaces/*?';
+
 const MOCK_ARCHIVED_NAMESPACE = {
   namespaceInfo: {
     name: 'some-archived-namespace',
@@ -68,7 +70,7 @@ const MOCK_DEFAULT_NAMESPACE = {
 };
 
 export const mockNamespaceApi = (page: Page, archived = false) => {
-  return page.route('**/api/v1/namespaces/*?', (route) => {
+  return page.route(NAMESPACE_API, (route) => {
     route.fulfill({
       json: archived ? MOCK_ARCHIVED_NAMESPACE : MOCK_DEFAULT_NAMESPACE,
     });
