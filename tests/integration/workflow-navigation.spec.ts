@@ -7,21 +7,6 @@ test.beforeEach(async ({ page, baseURL }) => {
   await mockWorkflowsApis(page);
 });
 
-test('New Top Navigation modal overlay is present', async ({ page }) => {
-  await setLocalStorage('viewedFeatureTags', JSON.stringify([]), page);
-  await expect(page.getByTestId('overlay-modal')).toBeVisible();
-  await expect(page.getByTestId('overlay-title')).toBeVisible();
-  await expect(page.getByTestId('overlay-title')).toHaveText(
-    'Check out the new top navigation!',
-  );
-  await expect(
-    page.getByRole('button', { name: 'Got it!' }).first(),
-  ).toBeVisible();
-  await page.getByRole('button', { name: 'Got it!' }).first().click();
-
-  await expect(page.getByTestId('overlay-modal')).toBeHidden();
-});
-
 test('Top Navigation current namespace is present', async ({ page }) => {
   await expect(page.getByTestId('namespace-select-button')).toBeVisible();
   await page.getByTestId('namespace-select-button').click();
