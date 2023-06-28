@@ -35,6 +35,7 @@
       {#if !empty}
         <Checkbox
           id="select-visible-workflows"
+          data-testid="batch-actions-checkbox"
           aria-label="select all workflows"
           onDark
           hoverable
