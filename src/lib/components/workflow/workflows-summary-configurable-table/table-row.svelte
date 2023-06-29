@@ -10,7 +10,8 @@
   import { routeForEventHistory } from '$lib/utilities/route-for';
   import { supportsBulkActions } from '$lib/stores/bulk-actions';
 
-  export let workflow: WorkflowExecution;
+  export let workflow: WorkflowExecution | undefined = undefined;
+  export let empty: boolean = false;
   $: namespace = $page.params.namespace;
 
   const goToEventHistory = (event: MouseEvent) => {
@@ -25,8 +26,8 @@
   };
 </script>
 
-<tr on:click={goToEventHistory}>
-  {#if $supportsBulkActions}
+<tr on:click={goToEventHistory} class:empty>
+  {#if !empty && $supportsBulkActions}
     <td>
       <Checkbox
         hoverable

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import ProgressBar from '../progress-bar.svelte';
+
   import { page } from '$app/stores';
 
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
@@ -18,6 +20,7 @@
   type Item = $$Generic;
 
   export let items: Item[];
+  export let updating: boolean = false;
 
   $: url = $page.url;
   $: perPage = url.searchParams.get(perPageKey) ?? String(defaultItemsPerPage);
@@ -113,6 +116,9 @@
   <table class="paginated-table">
     <thead class="paginated-table-header">
       <slot name="headers" />
+      {#if updating}
+        <ProgressBar />
+      {/if}
     </thead>
     <tbody class="paginated-table-body">
       <slot visibleItems={$store.items} />
@@ -179,7 +185,7 @@
   .paginated-table-body {
     @apply bg-white;
 
-    :global(tr) {
+    :global(tr:not(.empty)) {
       @apply h-12 border-b border-primary cursor-pointer last-of-type:border-0 hover:bg-gradient-to-br hover:from-blue-100 hover:to-purple-100 hover:bg-fixed;
     }
 

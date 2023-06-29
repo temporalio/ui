@@ -28,20 +28,18 @@
 </script>
 
 <tr>
-  {#if $supportsBulkActions}
+  {#if !empty && $supportsBulkActions}
     <th class="batch-actions-checkbox-table-cell">
-      {#if !empty}
-        <Checkbox
-          id="select-visible-workflows"
-          data-testid="batch-actions-checkbox"
-          aria-label="select all workflows"
-          onDark
-          hoverable
-          bind:checked={$pageSelected}
-          {indeterminate}
-          on:change={handleCheckboxChange}
-        />
-      {/if}
+      <Checkbox
+        id="select-visible-workflows"
+        data-testid="batch-actions-checkbox"
+        aria-label="select all workflows"
+        onDark
+        hoverable
+        bind:checked={$pageSelected}
+        {indeterminate}
+        on:change={handleCheckboxChange}
+      />
     </th>
   {/if}
   {#if $supportsBulkActions && $batchActionsVisible}
