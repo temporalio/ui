@@ -1,24 +1,113 @@
-<script lang="ts" generics="Item">
-  import { pagination } from '$lib/stores/pagination';
+<script lang="ts">
+  import { page } from '$app/stores';
 
-  import Icon from '../icon/icon.svelte';
-  import SimpleSelect from '../select/simple-select.svelte';
-  import SimpleOption from '../select/simple-option.svelte';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+
+  import {
+    MAX_PAGE_SIZE,
+    defaultItemsPerPage,
+    pagination,
+    perPageKey,
+    currentPageKey,
+    options,
+  } from '$lib/stores/pagination';
+
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import FilterSelect from '$lib/holocene/select/filter-select.svelte';
+
+  type Item = $$Generic;
 
   export let items: Item[];
-  export let perPage: string = '20';
-  export let startingIndex: number = 0;
 
-  $: store = pagination(items, perPage, startingIndex);
-  $: current = $store.currentPage;
-  $: shortcuts = $store.pageShortcuts;
+  $: url = $page.url;
+  $: perPage = url.searchParams.get(perPageKey) ?? String(defaultItemsPerPage);
+  $: currentPage = url.searchParams.get(currentPageKey);
+  $: store = pagination(items, perPage, currentPage);
 
-  const handlePageSizeChange = (event: Event) => {
-    const { value } = event.target as HTMLSelectElement;
-    perPage = value;
-    store.adjustPageSize(value);
+  // keep the 'page-size' url search param within the supported options
+  $: {
+    if (parseInt(perPage, 10) > parseInt(MAX_PAGE_SIZE, 10)) {
+      updateQueryParameters({
+        parameter: perPageKey,
+        value: MAX_PAGE_SIZE,
+        url,
+      });
+    } else if (!options.includes(perPage)) {
+      updateQueryParameters({
+        parameter: perPageKey,
+        value: defaultItemsPerPage,
+        url,
+      });
+    } else {
+      updateQueryParameters({
+        parameter: perPageKey,
+        value: perPage,
+        url,
+      });
+    }
+  }
+
+  // Keep the 'page' url search param within 1 and the total number of pages
+  $: {
+    if ($store.totalPages && parseInt(currentPage, 10) > $store.totalPages) {
+      updateQueryParameters({
+        parameter: currentPageKey,
+        value: $store.totalPages,
+        url,
+      });
+    } else if (currentPage === null || parseInt(currentPage, 10) < 0) {
+      updateQueryParameters({
+        parameter: currentPageKey,
+        value: '1',
+        url,
+      });
+    } else {
+      updateQueryParameters({
+        parameter: currentPageKey,
+        value: currentPage,
+        url,
+      });
+    }
+  }
+
+  const handlePageChange = (page: number) => {
+    updateQueryParameters({
+      parameter: currentPageKey,
+      value: page,
+      url,
+    });
   };
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    switch (event.key) {
+      case 'ArrowRight':
+      case 'KeyL': {
+        if ($store.hasNext) {
+          event.preventDefault();
+          handlePageChange($store.currentPage + 1);
+        }
+        break;
+      }
+      case 'ArrowLeft':
+      case 'KeyH': {
+        if ($store.hasPrevious) {
+          event.preventDefault();
+          handlePageChange($store.currentPage - 1);
+        }
+        break;
+      }
+      default:
+        break;
+    }
+  };
+
+  $: {
+    if (perPage) store.jumpToPage(currentPage);
+    if (currentPage) store.adjustPageSize(perPage);
+  }
 </script>
+
+<svelte:window on:keydown={handleKeyDown} />
 
 <div class="paginated-table-wrapper">
   <table class="paginated-table">
@@ -31,27 +120,22 @@
   </table>
   <div class="paginated-table-controls">
     <div class="flex flex-row items-center justify-start mx-8">
-      <SimpleSelect
-        on:change={handlePageSizeChange}
-        class="w-40"
+      <FilterSelect
+        label="Per Page"
+        parameter={perPageKey}
         value={perPage}
-        id="paginated-table-page-size-select"
-      >
-        <SimpleOption value="20">20</SimpleOption>
-        <SimpleOption value="100">100</SimpleOption>
-        <SimpleOption value="250">250</SimpleOption>
-        <SimpleOption value="500">500</SimpleOption>
-      </SimpleSelect>
+        {options}
+      />
     </div>
     <div class="flex flex-row items-center justify-center gap-2">
-      {#each shortcuts as page}
+      {#each $store.pageShortcuts as page}
         {#if isNaN(page)}
           <span>...</span>
         {:else}
           <button
             class="page-btn"
-            class:active={page === current}
-            on:click={() => store.jumpToPage(page)}>{page}</button
+            class:active={page === parseInt(currentPage, 10)}
+            on:click={() => handlePageChange(page)}>{page}</button
           >
         {/if}
       {/each}
@@ -59,12 +143,12 @@
     <div class="flex flex-row items-center justify-end mx-8 gap-2">
       <button
         disabled={!$store.hasPrevious}
-        on:click={() => store.previous()}
+        on:click={() => handlePageChange($store.currentPage - 1)}
         class="nav-btn"><Icon name="arrow-left" /></button
       >
       <button
         disabled={!$store.hasNext}
-        on:click={() => store.next()}
+        on:click={() => handlePageChange($store.currentPage + 1)}
         class="nav-btn"><Icon name="arrow-right" /></button
       >
     </div>
