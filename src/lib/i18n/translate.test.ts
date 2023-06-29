@@ -1,12 +1,12 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
-import i18next, { i18n } from 'i18next';
+import * as i18next from 'i18next';
 
 import { translate } from './translate';
 
 describe('translate', () => {
   beforeEach(() => {
-    vi.mock('i18next', async () => {
-      const actual: i18n = await vi.importActual('i18next');
+    vi.mock('i18next', (importOriginal) => {
+      const actual: i18next.i18n = importOriginal('i18next');
       const mockT = vi.fn();
       return {
         default: {
