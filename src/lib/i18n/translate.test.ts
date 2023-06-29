@@ -5,8 +5,8 @@ import { translate } from './translate';
 
 describe('translate', () => {
   beforeEach(() => {
-    vi.mock('i18next', (importOriginal) => {
-      const actual: i18next.i18n = importOriginal('i18next');
+    vi.mock('i18next', async (importOriginal) => {
+      const actual = (await importOriginal()) as i18next.i18n;
       const mockT = vi.fn();
       return {
         default: {
