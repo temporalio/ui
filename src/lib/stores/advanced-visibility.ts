@@ -10,7 +10,6 @@ import {
 } from '$lib/utilities/advanced-visibility-enabled';
 
 export const isCloud = derived([page], ([$page]) => {
-  console.log($page.data.settings);
   return $page.data?.settings?.runtimeEnvironment?.isCloud;
 });
 
