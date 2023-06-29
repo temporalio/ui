@@ -3,8 +3,6 @@ import cluster from '../fixtures/cluster.json';
 describe('Banner', () => {
   beforeEach(() => {
     cy.interceptApi();
-    cy.setTopNavFeatureTag();
-
     cy.visit('/');
   });
 

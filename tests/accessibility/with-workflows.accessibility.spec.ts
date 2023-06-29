@@ -13,7 +13,6 @@ test.beforeEach(async ({ page }) => {
       url: '**/api/v1/**',
     },
   );
-  await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
 });
 
 const workflowId =

@@ -1,12 +1,10 @@
 import { test, expect } from '@playwright/test';
 import { mockWorkflowsApis } from '~/test-utilities/mock-apis';
-import { setLocalStorage } from '~/test-utilities/mock-local-storage';
 
 const workflowsUrl = '/namespaces/default/workflows';
 
 test.beforeEach(async ({ page }) => {
   await mockWorkflowsApis(page);
-  await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
 });
 
 test('it displays the namespace', async ({ page }) => {

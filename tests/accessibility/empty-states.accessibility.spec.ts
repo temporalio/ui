@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { setLocalStorage } from '$utilities/mock-local-storage';
 
 test.beforeEach(async ({ page }) => {
   await page.routeFromHAR(
@@ -13,7 +12,6 @@ test.beforeEach(async ({ page }) => {
       url: '**/api/v1/**',
     },
   );
-  await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
 });
 
 const pages = [

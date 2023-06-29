@@ -1,7 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { mockDate } from '~/test-utilities/mock-date';
 import { mockWorkflowsApis } from '~/test-utilities/mock-apis';
-import { setLocalStorage } from '~/test-utilities/mock-local-storage';
 
 const workflowsUrl = '/namespaces/default/workflows';
 
@@ -9,7 +8,6 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(mockDate);
   await mockWorkflowsApis(page);
   await page.goto(workflowsUrl);
-  await setLocalStorage('viewedFeatureTags', JSON.stringify(['topNav']), page);
 });
 
 const timeFrames = [
