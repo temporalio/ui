@@ -12,6 +12,7 @@
 
 <script lang="ts">
   import { setContext } from 'svelte';
+  import { noop } from 'svelte/internal';
   import { writable } from 'svelte/store';
   import { fly } from 'svelte/transition';
   import { page } from '$app/stores';
@@ -27,6 +28,7 @@
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
 
   import Button from '$lib/holocene/button.svelte';
+  import Input from '$lib/holocene/input/input.svelte';
   import Menu from '$lib/holocene/primitives/menu/menu.svelte';
   import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
@@ -83,6 +85,7 @@
       $workflowFilters = [...$workflowFilters, $filter];
     }
     filter.set(emptyFilter());
+    searchAttributeValue = '';
     onSearch();
   }
 
@@ -94,6 +97,15 @@
   function handleNewQuery(value: string) {
     filter.set({ ...emptyFilter(), attribute: value, conditional: '=' });
   }
+
+  let searchAttributeValue = '';
+  let options = searchAttributeOptions();
+
+  $: filteredOptions = !searchAttributeValue
+    ? options
+    : options.filter((option) =>
+        option.value.toLowerCase().includes(searchAttributeValue.toLowerCase()),
+      );
 </script>
 
 <div class="flex w-full gap-4">
@@ -109,8 +121,19 @@
       >
         {$filter.attribute || 'Filter'}
       </Button>
-      <Menu class="max-h-80 overflow-y-scroll w-fit" id="search-attribute-menu">
-        {#each searchAttributeOptions() as { value, label }}
+      <Menu
+        class="max-h-80 overflow-y-scroll w-fit whitespace-nowrap"
+        id="search-attribute-menu"
+      >
+        <Input
+          id="filter-search"
+          noBorder
+          bind:value={searchAttributeValue}
+          icon="search"
+          placeholder="Search"
+        />
+
+        {#each filteredOptions as { value, label }}
           <MenuItem
             on:click={() => {
               handleNewQuery(value);
@@ -118,6 +141,8 @@
           >
             {label}
           </MenuItem>
+        {:else}
+          <MenuItem on:click={noop}>No Results</MenuItem>
         {/each}
       </Menu>
     </MenuContainer>
