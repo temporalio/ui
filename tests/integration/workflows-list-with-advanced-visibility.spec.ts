@@ -150,7 +150,7 @@ test.describe('Workflows List with Advanced Visibility', () => {
       await expect(page).toHaveURL(/ExecutionStatus%3D%22Running%22/);
 
       await page
-        .locator('.workflows-summary-configurable-table-row')
+        .getByTestId('workflows-summary-configurable-table-row')
         .first()
         .click();
 

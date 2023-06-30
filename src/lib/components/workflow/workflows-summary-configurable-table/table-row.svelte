@@ -26,7 +26,11 @@
   };
 </script>
 
-<tr on:click={goToEventHistory} class:empty>
+<tr
+  data-testid="workflows-summary-configurable-table-row"
+  on:click={goToEventHistory}
+  class:empty
+>
   {#if !empty && $supportsBulkActions}
     <td>
       <Checkbox
