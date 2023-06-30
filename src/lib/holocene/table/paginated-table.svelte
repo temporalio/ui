@@ -163,11 +163,11 @@
 
 <style lang="postcss">
   .paginated-table-wrapper {
-    @apply relative flex flex-col w-full h-auto border-2 border-primary rounded-lg overflow-y-auto;
+    @apply border-2 border-primary rounded-lg overflow-scroll;
   }
 
   .paginated-table {
-    @apply table-auto w-full h-fit;
+    @apply table-auto;
   }
 
   .paginated-table-header {

@@ -232,60 +232,58 @@
   on:confirm={cancelWorkflows}
 />
 
-<div class="flex flex-col h-full gap-4">
-  <header class="flex flex-initial justify-between">
-    <div>
-      <h1 class="text-2xl" data-cy="workflows-title">
-        <Translate namespace="workflows" key="recent-workflows" />
-      </h1>
-      <div class="flex items-center gap-2 text-sm">
-        <p data-testid="namespace-name">
-          {$page.params.namespace}
+<header class="flex flex-initial justify-between">
+  <div>
+    <h1 class="text-2xl" data-cy="workflows-title">
+      <Translate namespace="workflows" key="recent-workflows" />
+    </h1>
+    <div class="flex items-center gap-2 text-sm">
+      <p data-testid="namespace-name">
+        {$page.params.namespace}
+      </p>
+      {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility}
+        <div class="h-1 w-1 rounded-full bg-gray-400" />
+        <p data-testid="workflow-count" data-loaded={!$loading && !$updating}>
+          {#if $loading}
+            <span class="text-gray-400"
+              ><Translate namespace="common" key="loading" /></span
+            >
+          {:else if $updating}
+            <span class="text-gray-400"
+              ><Translate namespace="common" key="filtering" /></span
+            >
+          {:else if query}
+            <Translate
+              namespace="workflows"
+              key="filtered-workflows-count"
+              replace={{
+                filtered: $workflowCount.count,
+                total: $workflowCount.totalCount,
+              }}
+            />
+          {:else}
+            <Translate
+              namespace="workflows"
+              key="workflows-count"
+              count={$workflowCount.totalCount}
+            />
+          {/if}
         </p>
-        {#if $workflowCount?.totalCount >= 0 && $supportsAdvancedVisibility}
-          <div class="h-1 w-1 rounded-full bg-gray-400" />
-          <p data-testid="workflow-count" data-loaded={!$loading && !$updating}>
-            {#if $loading}
-              <span class="text-gray-400"
-                ><Translate namespace="common" key="loading" /></span
-              >
-            {:else if $updating}
-              <span class="text-gray-400"
-                ><Translate namespace="common" key="filtering" /></span
-              >
-            {:else if query}
-              <Translate
-                namespace="workflows"
-                key="filtered-workflows-count"
-                replace={{
-                  filtered: $workflowCount.count,
-                  total: $workflowCount.totalCount,
-                }}
-              />
-            {:else}
-              <Translate
-                namespace="workflows"
-                key="workflows-count"
-                count={$workflowCount.totalCount}
-              />
-            {/if}
-          </p>
-        {/if}
-      </div>
+      {/if}
     </div>
-    <div>
-      <button
-        aria-label="retry workflows"
-        class="cursor-pointer rounded-full p-1 hover:bg-gray-900 hover:text-white"
-        on:click={refreshWorkflows}
-      >
-        <Icon name="retry" class="h-8 w-8" />
-      </button>
-    </div>
-  </header>
-  <div class="flex flex-initial flex-row">
-    <WorkflowAdvancedSearch />
-    <WorkflowDateTimeFilter />
   </div>
-  <WorkflowsSummaryConfigurableTable />
+  <div>
+    <button
+      aria-label="retry workflows"
+      class="cursor-pointer rounded-full p-1 hover:bg-gray-900 hover:text-white"
+      on:click={refreshWorkflows}
+    >
+      <Icon name="retry" class="h-8 w-8" />
+    </button>
+  </div>
+</header>
+<div class="flex flex-initial flex-row">
+  <WorkflowAdvancedSearch />
+  <WorkflowDateTimeFilter />
 </div>
+<WorkflowsSummaryConfigurableTable />

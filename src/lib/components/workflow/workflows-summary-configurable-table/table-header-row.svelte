@@ -68,6 +68,6 @@
   }
 
   .configuration-button-table-cell {
-    @apply h-10 leading-[48px] text-right sticky right-0 block w-auto bg-primary;
+    @apply h-10 leading-[48px] sticky right-0 block w-10 bg-primary;
   }
 </style>
