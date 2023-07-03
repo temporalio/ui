@@ -9,6 +9,7 @@
   let error = '';
   let value = '';
   let label = 'Label';
+  let required = true;
 </script>
 
 <Hst.Story>
@@ -28,12 +29,12 @@
     {isValid}
     {error}
     {label}
+    {required}
     bind:value
   />
 
   <svelte:fragment slot="controls">
-    <Hst.Checkbox title="Disabled: " bind:value={disabled} />
-    <Hst.Checkbox title="Valid: " bind:value={isValid} />
-    <Hst.Text title="Error: " bind:value={error} />
+    <Hst.Text title="Label: " bind:value={label} />
+    <Hst.Checkbox title="Required: " bind:value={required} />
   </svelte:fragment>
 </Hst.Story>
