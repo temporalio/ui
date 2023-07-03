@@ -1,5 +1,6 @@
 import { Writable, writable } from 'svelte/store';
 import { describe, expect, it } from 'vitest';
+
 import { writeActionsAreAllowed } from './write-actions-are-allowed';
 import type { Settings } from '../../types/global';
 

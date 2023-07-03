@@ -1,7 +1,7 @@
 import * as Common from './locales/en/common';
-import * as Workflows from './locales/en/workflows';
-import * as TypedErrors from './locales/en/typed-errors';
 import * as Events from './locales/en/events';
+import * as TypedErrors from './locales/en/typed-errors';
+import * as Workflows from './locales/en/workflows';
 
 /**
  * https://www.i18next.com/translation-function/plurals#singular-plural

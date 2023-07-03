@@ -1,13 +1,13 @@
 import { isEventGroup } from '$lib/models/event-groups';
-import { capitalize } from '$lib/utilities/format-camel-case';
-import { has } from './has';
-import { isLocalActivityMarkerEvent } from './is-event-type';
-import { isObject } from './is';
-
-import type { Payload } from '$lib/types';
-import type { CombinedAttributes } from './format-event-attributes';
-import type { MarkerRecordedEvent, WorkflowEvent } from '$lib/types/events';
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
+import type { Payload } from '$lib/types';
+import type { MarkerRecordedEvent, WorkflowEvent } from '$lib/types/events';
+import { capitalize } from '$lib/utilities/format-camel-case';
+
+import type { CombinedAttributes } from './format-event-attributes';
+import { has } from './has';
+import { isObject } from './is';
+import { isLocalActivityMarkerEvent } from './is-event-type';
 
 type SummaryAttribute = {
   key: string;

@@ -1,21 +1,22 @@
 import type { StartAndEndEventHistory } from '$lib/stores/events';
+import type {
+  WorkflowEvent,
+  WorkflowExecutionCanceledEvent,
+  WorkflowExecutionCompletedEvent,
+  WorkflowExecutionContinuedAsNewEvent,
+  WorkflowExecutionFailedEvent,
+  WorkflowExecutionStartedEvent,
+  WorkflowExecutionTerminatedEvent,
+  WorkflowExecutionTimedOutEvent,
+  WorkflowTaskCompletedEvent,
+  WorkflowTaskFailedEvent,
+} from '$lib/types/events';
+
 import {
   isWorkflowExecutionCompletedEvent,
   isWorkflowExecutionContinuedAsNewEvent,
 } from './is-event-type';
 import { stringifyWithBigInt } from './parse-with-big-int';
-import type {
-  WorkflowExecutionFailedEvent,
-  WorkflowExecutionCompletedEvent,
-  WorkflowExecutionContinuedAsNewEvent,
-  WorkflowExecutionTimedOutEvent,
-  WorkflowExecutionCanceledEvent,
-  WorkflowExecutionTerminatedEvent,
-  WorkflowExecutionStartedEvent,
-  WorkflowTaskCompletedEvent,
-  WorkflowEvent,
-  WorkflowTaskFailedEvent,
-} from '$lib/types/events';
 
 type WorkflowInputAndResults = {
   input: string;

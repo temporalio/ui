@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { isValidSearchType, getSearchType } from './search-type-parameter';
+
+import { getSearchType, isValidSearchType } from './search-type-parameter';
 
 const invalidInputs = {
   number: 24,

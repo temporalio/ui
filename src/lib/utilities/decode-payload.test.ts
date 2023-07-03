@@ -1,25 +1,28 @@
-import { describe, expect, it, afterEach } from 'vitest';
+import WS from 'jest-websocket-mock';
+import { get } from 'svelte/store';
+import { afterEach, describe, expect, it } from 'vitest';
+import { vi } from 'vitest';
 
-import {
-  decodePayload,
-  decodePayloadAttributes,
-  decodeAllPotentialPayloadsWithCodec,
-  decodeAllPotentialPayloadsWithWebsockets,
-  convertPayloadToJsonWithWebsocket,
-  convertPayloadToJsonWithCodec,
-} from './decode-payload';
-import { getEventAttributes } from '../../lib/models/event-history';
 import { createWebsocket } from './data-converter-websocket';
 import {
-  noRemoteDataConverterWorkflowStartedEvent,
+  convertPayloadToJsonWithCodec,
+  convertPayloadToJsonWithWebsocket,
+  decodeAllPotentialPayloadsWithCodec,
+  decodeAllPotentialPayloadsWithWebsockets,
+  decodePayload,
+  decodePayloadAttributes,
+} from './decode-payload';
+import {
   dataConvertedFailureWorkflowStartedEvent,
   dataConvertedWorkflowStartedEvent,
-  workflowStartedEvent,
-  workflowStartedHistoryEvent,
   getTestPayloadEvent,
   getTestPayloadEventWithNullEncodedAttributes,
+  noRemoteDataConverterWorkflowStartedEvent,
+  workflowStartedEvent,
+  workflowStartedHistoryEvent,
 } from './decode-payload-test-fixtures';
-import WS from 'jest-websocket-mock';
+import { parseWithBigInt, stringifyWithBigInt } from './parse-with-big-int';
+import { getEventAttributes } from '../../lib/models/event-history';
 import {
   dataConverterPort,
   lastDataConverterStatus,
@@ -30,10 +33,6 @@ import {
   lastDataEncoderStatus,
   resetLastDataEncoderSuccess,
 } from '../stores/data-encoder-config';
-
-import { get } from 'svelte/store';
-import { vi } from 'vitest';
-import { parseWithBigInt, stringifyWithBigInt } from './parse-with-big-int';
 
 const WebDecodePayload = {
   metadata: {

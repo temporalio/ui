@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import settingsFixture from '$fixtures/settings.json';
-import pendingActivityWorkflow from '$fixtures/workflow.pending-activities.json';
-import { toDecodedPendingActivities } from './index';
-
 import type { Settings } from '$lib/types/global';
 import type { WorkflowExecution } from '$lib/types/workflows';
+
+import { toDecodedPendingActivities } from './index';
+
+import settingsFixture from '$fixtures/settings.json';
+import pendingActivityWorkflow from '$fixtures/workflow.pending-activities.json';
 
 const namespace = 'unit-tests';
 const settings = settingsFixture as unknown as Settings;

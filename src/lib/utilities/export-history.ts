@@ -1,5 +1,6 @@
 import { fetchAllEvents, fetchRawEvents } from '$lib/services/events-service';
 import type { Settings } from '$lib/types/global';
+
 import { stringifyWithBigInt } from './parse-with-big-int';
 
 export const exportHistory = async ({

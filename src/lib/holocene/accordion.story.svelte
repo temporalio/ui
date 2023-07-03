@@ -1,11 +1,13 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
+  
+  import CodeBlock from '$lib/holocene/code-block.svelte';
+  
   import Accordion from './accordion.svelte';
+  import IconButton from './icon-button.svelte';
   import TableHeaderRow from './table/table-header-row.svelte';
   import TableRow from './table/table-row.svelte';
   import Table from './table/table.svelte';
-  import CodeBlock from '$lib/holocene/code-block.svelte';
-  import IconButton from './icon-button.svelte';
 
   export let Hst: HST;
 </script>

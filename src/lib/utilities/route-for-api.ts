@@ -1,30 +1,33 @@
-import { page } from '$app/stores';
 import { get } from 'svelte/store';
-import { getApiOrigin } from './get-api-origin';
+
 import { base as basePath } from '$app/paths';
+import { page } from '$app/stores';
+
 import type {
-  APIRoutePath,
   APIRouteParameters,
-  WorkflowListRouteParameters,
-  NamespaceAPIRoutePath,
-  NamespaceRouteParameters,
-  TaskQueueAPIRoutePath,
-  ScheduleRouteParameters,
-  ParameterlessAPIRoutePath,
-  SearchAttributesRoutePath,
-  TaskQueueRouteParameters,
+  APIRoutePath,
   BatchAPIRoutePath,
   BatchRouteParameters,
+  NamespaceAPIRoutePath,
+  NamespaceRouteParameters,
+  ParameterlessAPIRoutePath,
   ScheduleAPIRoutePath,
-  SchedulesAPIRoutePath,
   ScheduleListRouteParameters,
-  WorkflowsAPIRoutePath,
-  WorkflowActivitiesAPIRoutePath,
-  WorkflowAPIRoutePath,
-  WorkflowRouteParameters,
-  WorkflowActivitiesRouteParameters,
+  ScheduleRouteParameters,
+  SchedulesAPIRoutePath,
   SearchAttributesRouteParameters,
+  SearchAttributesRoutePath,
+  TaskQueueAPIRoutePath,
+  TaskQueueRouteParameters,
+  WorkflowActivitiesAPIRoutePath,
+  WorkflowActivitiesRouteParameters,
+  WorkflowAPIRoutePath,
+  WorkflowListRouteParameters,
+  WorkflowRouteParameters,
+  WorkflowsAPIRoutePath,
 } from '$lib/types/api';
+
+import { getApiOrigin } from './get-api-origin';
 
 const replaceNamespaceInApiUrl = (
   apiUrl: string,

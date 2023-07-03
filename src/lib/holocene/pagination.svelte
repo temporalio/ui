@@ -1,20 +1,22 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import type { HTMLAttributes } from 'svelte/elements';
+  
   import { page } from '$app/stores';
+  
+  import FilterSelect from '$lib/holocene/select/filter-select.svelte';
+  import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import {
+    defaultItemsPerPage,
     MAX_PAGE_SIZE,
+    options,
     pagination,
     perPageFromSearchParameter,
-    options,
-    defaultItemsPerPage,
     perPageKey,
   } from '$lib/stores/pagination';
-  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  import FilterSelect from '$lib/holocene/select/filter-select.svelte';
   import { getFloatStyle } from '$lib/utilities/get-float-style';
-  import Skeleton from '$lib/holocene/skeleton/index.svelte';
-
-  import type { HTMLAttributes } from 'svelte/elements';
+  import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
+  
 
   type T = $$Generic;
   interface $$Props extends HTMLAttributes<HTMLDivElement> {

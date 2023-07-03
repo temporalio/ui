@@ -1,6 +1,8 @@
 <script lang="ts">
-  import Icon from '$lib/holocene/icon/icon.svelte';
   import type { HTMLAttributes } from 'svelte/elements';
+  
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  
   import type { IconName } from './icon/paths';
 
   interface $$Props extends HTMLAttributes<HTMLDivElement> {

@@ -1,10 +1,12 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
-  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
   import MenuButton from '$lib/holocene/primitives/menu/menu-button.svelte';
+  import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
   import Menu from '$lib/holocene/primitives/menu/menu.svelte';
-  import Button from './button.svelte';
+  
   import type { IconName } from './icon/paths';
+  
+  import Button from './button.svelte';
 
   export let label = '';
   export let icon: IconName | undefined = undefined;

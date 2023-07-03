@@ -1,6 +1,7 @@
 <script lang="ts">
-  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
   import type { Hst as HST } from '@histoire/plugin-svelte';
+  
+  import ToggleSwitch from '$lib/holocene/toggle-switch.svelte';
 
   export let Hst: HST;
   let checked = false;

@@ -1,8 +1,10 @@
 <script lang="ts">
   import { fly } from 'svelte/transition';
+  
   import { clickOutside } from '$lib/holocene/outside-click';
-
+  
   import IconButton from './icon-button.svelte';
+  
 
   export let open = false;
   export let title: string;

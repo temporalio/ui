@@ -1,5 +1,7 @@
 import { get } from 'svelte/store';
+
 import { searchAttributes } from '$lib/stores/search-attributes';
+
 import { isString } from '../is';
 
 export const isSearchAttribute = (

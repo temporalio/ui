@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
+  
   import ScrollToTop from './scroll-to-top.svelte';
 
   export let Hst: HST;

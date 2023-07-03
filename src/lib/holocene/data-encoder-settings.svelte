@@ -6,22 +6,25 @@
 
 <script lang="ts">
   import { fly } from 'svelte/transition';
+  
+  import { page } from '$app/stores';
+  
+  import { clickOutside } from '$lib/holocene/outside-click';
   import { dataConverterPort } from '$lib/stores/data-converter-config';
   import {
     codecEndpoint,
-    passAccessToken,
     includeCredentials,
     overrideRemoteCodecConfiguration,
+    passAccessToken,
   } from '$lib/stores/data-encoder-config';
+  import { refresh } from '$lib/stores/workflow-run';
   import { validateHttpOrHttps, validateHttps } from '$lib/utilities/is-http';
-  import { clickOutside } from '$lib/holocene/outside-click';
-
+  
+  import Accordion from './accordion.svelte';
+  import Button from './button.svelte';
   import CodecEndpointSettings from './codec-endpoint-settings.svelte';
   import DataConverterPortSettings from './data-converter-port-settings.svelte';
-  import { page } from '$app/stores';
-  import { refresh } from '$lib/stores/workflow-run';
-  import Button from './button.svelte';
-  import Accordion from './accordion.svelte';
+  
 
   let endpoint = $codecEndpoint ?? '';
   let port = $dataConverterPort ?? '';

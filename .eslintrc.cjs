@@ -6,7 +6,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'prettier',
   ],
-  plugins: ['svelte3', '@typescript-eslint', 'vitest'],
+  plugins: ['svelte3', '@typescript-eslint', 'vitest', 'import'],
   ignorePatterns: ['*.cjs', 'prism.cjs', '/server'],
   overrides: [
     {
@@ -77,6 +77,43 @@ module.exports = {
             message: 'Please use esm-env instead.',
           },
         ],
+      },
+    ],
+    'sort-imports': [
+      'error',
+      { ignoreCase: true, ignoreDeclarationSort: true },
+    ],
+    'import/order': [
+      'error',
+      {
+        groups: [
+          ['builtin', 'external'],
+          'internal',
+          ['parent', 'sibling', 'index'],
+        ],
+        pathGroups: [
+          {
+            pattern: 'svelte',
+            group: 'builtin',
+            position: 'before',
+            patternOptions: { matchBase: true },
+          },
+          { pattern: '$app/**', group: 'external', position: 'after' },
+          { pattern: './$types', group: 'external', position: 'after' },
+          { pattern: '$lib/**', group: 'internal', position: 'before' },
+          {
+            pattern: '$components/**/*.svelte',
+            group: 'internal',
+            position: 'after',
+          },
+          { pattern: './**/*.svelte', group: 'index', position: 'after' },
+        ],
+        'newlines-between': 'always-and-inside-groups',
+        alphabetize: {
+          order: 'asc',
+          caseInsensitive: false,
+          orderImportKind: 'asc',
+        },
       },
     ],
   },

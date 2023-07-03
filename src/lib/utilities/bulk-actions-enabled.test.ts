@@ -1,4 +1,5 @@
-import { expect, describe, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
+
 import { bulkActionsEnabled } from './bulk-actions-enabled';
 
 describe('bulkActionsEnabled', () => {

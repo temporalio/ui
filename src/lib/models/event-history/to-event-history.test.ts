@@ -1,11 +1,13 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { writable } from 'svelte/store';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import type { HistoryEvent } from '$lib/types/events';
+import type { Settings } from '$lib/types/global';
+
 import { getEventAttributes, toEventHistory } from '.';
 
-import settingsFixture from '$fixtures/settings.json';
 import eventsFixture from '$fixtures/raw-events.descending.completed.json';
-import type { Settings } from '$lib/types/global';
-import type { HistoryEvent } from '$lib/types/events';
+import settingsFixture from '$fixtures/settings.json';
 
 const historyEvent = {
   eventId: '1',

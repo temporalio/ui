@@ -1,7 +1,9 @@
-import { getLastEvent } from './get-last-event';
 import { describe, expect, it } from 'vitest';
-import { groupEvents } from '.';
+
 import type { WorkflowEvents } from '$lib/types/events';
+
+import { groupEvents } from '.';
+import { getLastEvent } from './get-last-event';
 
 const scheduledEvent = {
   id: '5',

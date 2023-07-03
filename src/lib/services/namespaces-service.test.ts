@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
-import { namespaces } from '../stores/namespaces';
-import { fetchNamespaces } from './namespaces-service';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { fetchNamespaces } from './namespaces-service';
+import { namespaces } from '../stores/namespaces';
 import { toaster } from '../stores/toaster';
 
 vi.mock('../stores/toaster', () => ({ toaster: { push: vi.fn() } }));

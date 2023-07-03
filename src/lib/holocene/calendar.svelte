@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { noop } from 'svelte/internal';
+  
   import { getDateRows, weekDays } from '$lib/utilities/calendar';
 
   const dispatch = createEventDispatcher();

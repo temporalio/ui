@@ -1,11 +1,12 @@
 import { get } from 'svelte/store';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
+
+import { authUser } from './auth-user';
 import { dataEncoder } from './data-encoder';
 import {
   codecEndpoint,
   overrideRemoteCodecConfiguration,
 } from './data-encoder-config';
-import { authUser } from './auth-user';
 
 const clearLocalStorageAndStores = () => {
   localStorage.clear();

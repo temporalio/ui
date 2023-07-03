@@ -1,12 +1,14 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-  import { afterNavigate } from '$app/navigation';
   import { BROWSER } from 'esm-env';
+  import { createEventDispatcher } from 'svelte';
+  
+  import { afterNavigate } from '$app/navigation';
   import { page } from '$app/stores';
-  import { has } from '$lib/utilities/has';
-
+  
   import Link from '$lib/holocene/link.svelte';
   import type { NetworkError } from '$lib/types/global';
+  import { has } from '$lib/utilities/has';
+  
 
   export let error: App.Error | NetworkError = null;
   export let status = 500;

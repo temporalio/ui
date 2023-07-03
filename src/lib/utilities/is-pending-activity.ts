@@ -1,5 +1,6 @@
-import { has } from './has';
 import type { PendingActivity } from '$lib/types/events';
+
+import { has } from './has';
 
 export const isPendingActivity = (event: unknown): event is PendingActivity => {
   if (event === null) return false;

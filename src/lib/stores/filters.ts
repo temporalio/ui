@@ -1,11 +1,13 @@
+import type { StartStopNotifier } from 'svelte/store';
+import { derived, get, writable } from 'svelte/store';
+
+import { page } from '$app/stores';
+
 import type {
   WorkflowFilter,
   WorkflowSort,
 } from '$lib/models/workflow-filters';
 import { persistStore } from '$lib/stores/persist-store';
-import { writable, derived, get } from 'svelte/store';
-import { page } from '$app/stores';
-import type { StartStopNotifier } from 'svelte/store';
 
 const query = derived([page], ([$page]) => $page.url.searchParams.get('query'));
 const category = derived([page], ([$page]) =>
