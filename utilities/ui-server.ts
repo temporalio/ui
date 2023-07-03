@@ -1,6 +1,6 @@
 import { join } from 'path';
 import waitForPort from 'wait-port';
-import { $, chalk } from 'zx';
+import { $ } from 'zx';
 
 export type UIServer = {
   shutdown: () => Promise<number | null>;
