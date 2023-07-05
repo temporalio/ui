@@ -1,6 +1,5 @@
 import { chromium, FullConfig } from '@playwright/test';
 
-import { setLocalStorage } from './test-utilities/mock-local-storage';
 import { startWorkflows } from '../temporal/client';
 import { connect } from '../temporal/client';
 import { createCodecServer } from '../temporal/codec-server';

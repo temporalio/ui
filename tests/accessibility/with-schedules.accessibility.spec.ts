@@ -1,8 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
-import { setLocalStorage } from '$utilities/mock-local-storage';
-
 test.beforeEach(async ({ page }) => {
   await page.routeFromHAR(
     './tests/accessibility/network-requests/with-schedules.har',
