@@ -1,4 +1,5 @@
 import { get } from 'svelte/store';
+
 import WebSocketAsPromised from 'websocket-as-promised';
 import type Options from 'websocket-as-promised/types/options';
 

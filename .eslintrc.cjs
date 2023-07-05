@@ -87,20 +87,20 @@ module.exports = {
       'error',
       {
         groups: [
-          ['builtin', 'external'],
+          'builtin',
+          'external',
           'internal',
           ['parent', 'sibling', 'index'],
         ],
         pathGroups: [
           {
-            pattern: 'svelte',
-            group: 'builtin',
+            pattern: 'svelte/**',
+            group: 'external',
             position: 'before',
-            patternOptions: { matchBase: true },
           },
           { pattern: '$app/**', group: 'external', position: 'after' },
           { pattern: './$types', group: 'external', position: 'after' },
-          { pattern: '$lib/**', group: 'internal', position: 'before' },
+          { pattern: '$lib/**', group: 'internal' },
           {
             pattern: '$components/**/*.svelte',
             group: 'internal',
@@ -108,7 +108,8 @@ module.exports = {
           },
           { pattern: './**/*.svelte', group: 'index', position: 'after' },
         ],
-        'newlines-between': 'always-and-inside-groups',
+        pathGroupsExcludedImportTypes: ['svelte'],
+        'newlines-between': 'always',
         alphabetize: {
           order: 'asc',
           caseInsensitive: false,

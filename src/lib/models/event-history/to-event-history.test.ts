@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store';
+
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { HistoryEvent } from '$lib/types/events';

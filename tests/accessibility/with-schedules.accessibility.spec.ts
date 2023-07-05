@@ -1,5 +1,6 @@
-import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expect, test } from '@playwright/test';
+
 import { setLocalStorage } from '$utilities/mock-local-storage';
 
 test.beforeEach(async ({ page }) => {

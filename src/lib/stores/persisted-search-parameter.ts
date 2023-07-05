@@ -1,5 +1,6 @@
-import { BROWSER } from 'esm-env';
 import { get, Writable, writable } from 'svelte/store';
+
+import { BROWSER } from 'esm-env';
 
 import { page } from '$app/stores';
 

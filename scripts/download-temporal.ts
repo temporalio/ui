@@ -1,13 +1,13 @@
-import { join } from 'path';
 import { chmod } from 'fs/promises';
-import { finished } from 'stream/promises';
 import zlib from 'node:zlib';
+import { join } from 'path';
+import { finished } from 'stream/promises';
 
-import fetch from 'node-fetch';
-import { chalk } from 'zx';
 import mkdirp from 'mkdirp';
+import fetch from 'node-fetch';
 import rimraf from 'rimraf';
 import tar from 'tar-fs';
+import { chalk } from 'zx';
 
 console.log(chalk.cyan('Getting ready to download Temporal CLI…'));
 

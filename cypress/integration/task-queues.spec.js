@@ -2,8 +2,8 @@
 
 import * as dateTz from 'date-fns-tz';
 
-import wtq from '../fixtures/worker-task-queues.json';
 import atq from '../fixtures/activity-task-queues.json';
+import wtq from '../fixtures/worker-task-queues.json';
 
 describe('Task Queues Page', () => {
   beforeEach(() => {

@@ -1,5 +1,6 @@
-import { BROWSER } from 'esm-env';
 import { get } from 'svelte/store';
+
+import { BROWSER } from 'esm-env';
 
 import { invalidate, goto as navigateTo } from '$app/navigation';
 import { page } from '$app/stores';

@@ -8,12 +8,6 @@ import { fetchNamespaces } from '$lib/services/namespaces-service';
 import { fetchSettings } from '$lib/services/settings-service';
 import { getAuthUser, setAuthUser } from '$lib/stores/auth-user';
 import type { GetClusterInfoResponse } from '$lib/types';
-
-import '$lib/vendor/prism/prism.css';
-import '$lib/vendor/prism/prism.cjs';
-
-import '../../app.css';
-
 import type { Settings, UiVersionInfo } from '$lib/types/global';
 import {
   cleanAuthUserCookie,
@@ -21,6 +15,10 @@ import {
 } from '$lib/utilities/auth-user-cookie';
 import { isAuthorized } from '$lib/utilities/is-authorized';
 import { routeForLoginPage } from '$lib/utilities/route-for';
+import '$lib/vendor/prism/prism.css';
+import '$lib/vendor/prism/prism.cjs';
+
+import '../../app.css';
 
 export const load: LayoutLoad = async function ({
   fetch,

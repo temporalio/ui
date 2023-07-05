@@ -1,14 +1,9 @@
 <script lang="ts" context="module">
   import { writable } from 'svelte/store';
-
-  export const viewDataEncoderSettings = writable<boolean>(false);
-</script>
-
-<script lang="ts">
   import { fly } from 'svelte/transition';
-  
+
   import { page } from '$app/stores';
-  
+
   import { clickOutside } from '$lib/holocene/outside-click';
   import { dataConverterPort } from '$lib/stores/data-converter-config';
   import {
@@ -19,13 +14,16 @@
   } from '$lib/stores/data-encoder-config';
   import { refresh } from '$lib/stores/workflow-run';
   import { validateHttpOrHttps, validateHttps } from '$lib/utilities/is-http';
-  
+
   import Accordion from './accordion.svelte';
   import Button from './button.svelte';
   import CodecEndpointSettings from './codec-endpoint-settings.svelte';
   import DataConverterPortSettings from './data-converter-port-settings.svelte';
-  
 
+  export const viewDataEncoderSettings = writable<boolean>(false);
+</script>
+
+<script lang="ts">
   let endpoint = $codecEndpoint ?? '';
   let port = $dataConverterPort ?? '';
   let passToken = $passAccessToken ?? false;

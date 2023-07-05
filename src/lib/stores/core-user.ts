@@ -1,5 +1,6 @@
-import { getContext, hasContext } from 'svelte';
 import { readable, type Readable } from 'svelte/store';
+
+import { getContext, hasContext } from 'svelte';
 
 import { type CoreUser, CoreUserKey } from '$lib/models/core-user';
 

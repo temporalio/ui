@@ -1,4 +1,5 @@
 import { get } from 'svelte/store';
+
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { authUser } from './auth-user';

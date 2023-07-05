@@ -1,4 +1,5 @@
 import { get } from 'svelte/store';
+
 import { describe, expect, it } from 'vitest';
 
 import { importEventGroups, importEvents } from './import-events';

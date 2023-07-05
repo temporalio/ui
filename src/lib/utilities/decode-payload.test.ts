@@ -1,5 +1,6 @@
-import WS from 'jest-websocket-mock';
 import { get } from 'svelte/store';
+
+import WS from 'jest-websocket-mock';
 import { afterEach, describe, expect, it } from 'vitest';
 import { vi } from 'vitest';
 

@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
+  
+  import { onMount } from 'svelte';
   
   import Alert from '$lib/holocene/alert.svelte';
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';

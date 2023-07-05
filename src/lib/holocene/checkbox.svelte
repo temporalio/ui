@@ -1,7 +1,8 @@
 <script lang="ts">
   
-  import { createEventDispatcher } from 'svelte';
   import type { HTMLInputAttributes } from 'svelte/elements';
+  
+  import { createEventDispatcher } from 'svelte';
   
   import Icon from '$lib/holocene/icon/icon.svelte';
   import { omit } from '$lib/utilities/omit';
