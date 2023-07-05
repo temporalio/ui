@@ -483,6 +483,10 @@ describe('getStartingIndexForPage', () => {
     expect(getStartingIndexForPage(100, 20, oneHundredResolutions)).toBe(80);
   });
 
+  it('should return 0 for the something out of bounds if the total number of items is less than itemsPerPage', () => {
+    expect(getStartingIndexForPage(3, 101, oneHundredResolutions)).toBe(0);
+  });
+
   it('should return 0 if given a negative number for the page', () => {
     expect(getStartingIndexForPage(-10, 20, oneHundredResolutions)).toBe(0);
   });
