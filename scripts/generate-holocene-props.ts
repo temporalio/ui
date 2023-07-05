@@ -55,4 +55,7 @@ const holoceneComponents = holoceneFilePaths
     return acc;
   }, {});
 
-console.log(JSON.stringify(holoceneComponents));
+fs.writeFileSync(
+  path.join(holocenePath, 'holocene-components.json'),
+  JSON.stringify(holoceneComponents, null, 2),
+);

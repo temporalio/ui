@@ -67,6 +67,7 @@
     "story:build": "histoire build",
     "story:preview": "histoire preview",
     "generate:locales": "esno scripts/generate-locales.ts",
+    "generate:holocene-props": "esno scripts/generate-holocene-props.ts",
     "workflows": "esno scripts/workflows.ts"
   },
   "dependencies": {
