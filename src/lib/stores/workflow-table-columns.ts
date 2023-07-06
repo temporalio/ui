@@ -5,7 +5,6 @@ import { persistStore } from './persist-store';
 import { customSearchAttributes } from './search-attributes';
 
 export const MAX_PINNED_COLUMNS = 2;
-
 export const WorkflowHeaderLabels = [
   'Status',
   'Workflow ID',
