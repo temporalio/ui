@@ -1,22 +1,24 @@
 <script lang="ts">
-  import { onMount, createEventDispatcher } from 'svelte';
-  import { EditorView } from '@codemirror/view';
-  import { EditorState } from '@codemirror/state';
-  import { json } from '@codemirror/lang-json';
-  import { keymap } from '@codemirror/view';
-  import {
-    syntaxHighlighting,
-    indentOnInput,
-    bracketMatching,
-    indentUnit,
-  } from '@codemirror/language';
-  import { historyKeymap, standardKeymap } from '@codemirror/commands';
+  import type { HTMLAttributes } from 'svelte/elements';
+  
   import { autocompletion, closeBrackets } from '@codemirror/autocomplete';
+  import { historyKeymap, standardKeymap } from '@codemirror/commands';
+  import { json } from '@codemirror/lang-json';
+  import {
+    bracketMatching,
+    indentOnInput,
+    indentUnit,
+    syntaxHighlighting,
+  } from '@codemirror/language';
+  import { EditorState } from '@codemirror/state';
+  import { EditorView } from '@codemirror/view';
+  import { keymap } from '@codemirror/view';
+  import { createEventDispatcher, onMount } from 'svelte';
+  
   import {
     TEMPORAL_SYNTAX,
     TEMPORAL_THEME,
   } from '$lib/vendor/codemirror/theme';
-  import type { HTMLAttributes } from 'svelte/elements';
 
   interface $$Props extends HTMLAttributes<HTMLDivElement> {
     value: string;

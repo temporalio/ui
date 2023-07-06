@@ -1,10 +1,10 @@
+import yargs from 'yargs/yargs';
+
 import {
+  createTemporalServer,
   type TemporalServer,
   type TemporalServerOptions,
-  createTemporalServer,
 } from '../utilities/temporal-server';
-
-import yargs from 'yargs/yargs';
 
 const args = yargs(process.argv.slice(2)).parse();
 

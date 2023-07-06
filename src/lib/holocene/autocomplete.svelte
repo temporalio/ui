@@ -1,11 +1,13 @@
 <script lang="ts">
-  import { noop } from 'svelte/internal';
-  import Input from '$lib/holocene/input/input.svelte';
-  import Menu from './primitives/menu/menu.svelte';
-  import MenuItem from './primitives/menu/menu-item.svelte';
   import type { HTMLInputAttributes } from 'svelte/elements';
+  import { noop } from 'svelte/internal';
+  
   import type { IconName } from '$lib/holocene/icon/paths';
+  import Input from '$lib/holocene/input/input.svelte';
+  
   import MenuContainer from './primitives/menu/menu-container.svelte';
+  import MenuItem from './primitives/menu/menu-item.svelte';
+  import Menu from './primitives/menu/menu.svelte';
 
   interface $$Props extends HTMLInputAttributes {
     id: string;

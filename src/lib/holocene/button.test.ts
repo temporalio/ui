@@ -1,5 +1,6 @@
-import Button from '$lib/holocene/button.svelte';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+
+import Button from '$lib/holocene/button.svelte';
 
 let host: HTMLElement;
 

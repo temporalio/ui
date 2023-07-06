@@ -1,9 +1,10 @@
 import '../../app.css';
 
 import { error } from '@sveltejs/kit';
-import { fetchSettings } from '$lib/services/settings-service';
 
 import type { LayoutLoad } from './$types';
+
+import { fetchSettings } from '$lib/services/settings-service';
 import type { Settings } from '$lib/types/global';
 
 export const ssr = false;

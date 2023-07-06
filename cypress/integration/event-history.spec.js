@@ -3,9 +3,9 @@
 import { formatDistanceToNow } from 'date-fns';
 import * as dateTz from 'date-fns-tz';
 
-import workflowCompletedFixture from '../fixtures/workflow-completed.json';
 import eventsFixtureDescending from '../fixtures/event-history-completed-reverse.json';
 import eventsFixtureAscending from '../fixtures/event-history-completed.json';
+import workflowCompletedFixture from '../fixtures/workflow-completed.json';
 
 const [firstEventInDescendingOrder] = eventsFixtureDescending.history.events;
 

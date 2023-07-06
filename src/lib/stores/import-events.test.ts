@@ -1,6 +1,8 @@
 import { get } from 'svelte/store';
-import { describe, it, expect } from 'vitest';
-import { importEvents, importEventGroups } from './import-events';
+
+import { describe, expect, it } from 'vitest';
+
+import { importEventGroups, importEvents } from './import-events';
 
 describe('ImportEvents', () => {
   it('should get default values', () => {

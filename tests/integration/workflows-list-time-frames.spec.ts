@@ -1,6 +1,7 @@
-import { test, expect } from '@playwright/test';
-import { mockDate } from '~/test-utilities/mock-date';
+import { expect, test } from '@playwright/test';
+
 import { mockWorkflowsApis } from '~/test-utilities/mock-apis';
+import { mockDate } from '~/test-utilities/mock-date';
 
 const workflowsUrl = '/namespaces/default/workflows';
 

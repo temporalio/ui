@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { getGroupId } from './get-group-id';
-import allEventTypesFixture from '$fixtures/all-event-types.json';
+
 import type { CommonHistoryEvent } from '$lib/types/events';
+
+import { getGroupId } from './get-group-id';
+
+import allEventTypesFixture from '$fixtures/all-event-types.json';
 
 const events = allEventTypesFixture as unknown as CommonHistoryEvent[];
 

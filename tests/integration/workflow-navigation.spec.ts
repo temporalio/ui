@@ -1,4 +1,5 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+
 import { mockWorkflowsApis } from '~/test-utilities/mock-apis';
 
 test.beforeEach(async ({ page, baseURL }) => {

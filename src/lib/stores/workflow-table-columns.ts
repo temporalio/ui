@@ -1,7 +1,8 @@
-import { derived, get, type Readable } from 'svelte/store';
+import { derived, type Readable } from 'svelte/store';
+
+import { namespaces } from './namespaces';
 import { persistStore } from './persist-store';
 import { customSearchAttributes } from './search-attributes';
-import { namespaces } from './namespaces';
 
 export const MAX_PINNED_COLUMNS = 2;
 

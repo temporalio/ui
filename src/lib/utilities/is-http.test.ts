@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { validateHttps, validateHttp, validateHttpOrHttps } from './is-http';
+
+import { validateHttp, validateHttpOrHttps, validateHttps } from './is-http';
 
 describe('validateHttps', () => {
   it('Should return true with valid https endpoint', () => {

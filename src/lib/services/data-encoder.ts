@@ -2,9 +2,9 @@ import {
   setLastDataEncoderFailure,
   setLastDataEncoderSuccess,
 } from '$lib/stores/data-encoder-config';
+import type { Settings } from '$lib/types/global';
 import { validateHttps } from '$lib/utilities/is-http';
 import { stringifyWithBigInt } from '$lib/utilities/parse-with-big-int';
-import type { Settings } from '$lib/types/global';
 
 type PotentialPayloads = { payloads: unknown[] };
 

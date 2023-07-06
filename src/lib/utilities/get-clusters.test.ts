@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { getClusters } from './get-clusters';
 
 const getNamespace = (clusters: string[], activeClusterName: string) => ({

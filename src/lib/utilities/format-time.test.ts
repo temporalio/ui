@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
+
 import {
-  getDuration,
   formatDistance,
   formatDistanceAbbreviated,
-  fromSecondsToMinutesAndSeconds,
   fromSecondsToDaysOrHours,
+  fromSecondsToMinutesAndSeconds,
+  getDuration,
   getTimestampDifference,
 } from './format-time';
 

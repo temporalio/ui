@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { groupEvents, getGroupForEvent } from '.';
+
 import type {
-  ActivityTaskStartedEvent,
-  ActivityTaskScheduledEvent,
   ActivityTaskCompletedEvent,
+  ActivityTaskScheduledEvent,
+  ActivityTaskStartedEvent,
 } from '$lib/types/events';
+
+import { getGroupForEvent, groupEvents } from '.';
 
 const eventHistory = [
   {

@@ -1,6 +1,8 @@
-import { BROWSER } from 'esm-env';
-import { writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
+import { writable } from 'svelte/store';
+
+import { BROWSER } from 'esm-env';
+
 import { isFunction } from '$lib/utilities/is-function';
 import {
   parseWithBigInt,

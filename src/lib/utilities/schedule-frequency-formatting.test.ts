@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { structuredCalendarToFrequency } from './schedule-frequency-formatting';
+
 import type { ScheduleRange } from '$lib/types/schedule';
+
+import { structuredCalendarToFrequency } from './schedule-frequency-formatting';
 
 const generateCalendar = ({
   minute = 0,

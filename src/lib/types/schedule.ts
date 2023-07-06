@@ -1,11 +1,11 @@
 import type {
+  CalendarSpec,
   DescribeScheduleResponse,
+  IntervalSpec,
+  RangeSpec,
   Schedule,
   ScheduleSpec,
-  CalendarSpec,
   StructuredCalendarSpec,
-  RangeSpec,
-  IntervalSpec,
 } from '$lib/types';
 
 export type DescribeFullSchedule = DescribeScheduleResponse & {

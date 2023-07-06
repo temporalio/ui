@@ -1,8 +1,10 @@
 import path from 'path';
-import { defineConfig } from 'vite';
+
 import { sveltekit } from '@sveltejs/kit/vite';
-import { temporalServer } from './plugins/vite-plugin-temporal-server';
+import { defineConfig } from 'vite';
+
 import { i18nPlugin } from './plugins/vite-plugin-i18n-locales';
+import { temporalServer } from './plugins/vite-plugin-temporal-server';
 import { uiServerPlugin } from './plugins/vite-plugin-ui-server';
 
 export default defineConfig({

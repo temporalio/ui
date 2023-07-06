@@ -1,15 +1,17 @@
+import { get } from 'svelte/store';
+
 import type {
   WorkflowFilter,
   WorkflowSort,
 } from '$lib/models/workflow-filters';
-import { isDuration, isDurationString, toDate, tomorrow } from '../to-duration';
 import { supportsAdvancedVisibility } from '$lib/stores/advanced-visibility';
-import { get } from 'svelte/store';
 import type {
   ArchiveFilterParameters,
   FilterParameters,
   SearchAttributes,
 } from '$lib/types/workflows';
+
+import { isDuration, isDurationString, toDate, tomorrow } from '../to-duration';
 
 export type QueryKey =
   | 'WorkflowId'

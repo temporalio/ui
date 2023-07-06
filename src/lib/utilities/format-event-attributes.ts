@@ -1,18 +1,18 @@
 import { get } from 'svelte/store';
+
+import type { I18nKey } from '$lib/i18n';
 import { timeFormat } from '$lib/stores/time-format';
 import type {
   EventAttribute,
   EventAttributeKey,
   IterableEvent,
 } from '$lib/types/events';
-
+import { capitalize } from '$lib/utilities/format-camel-case';
+import { formatDate } from '$lib/utilities/format-date';
 import {
   shouldDisplayAttribute,
   shouldDisplayNestedAttribute,
 } from '$lib/utilities/get-single-attribute-for-event';
-import { capitalize } from '$lib/utilities/format-camel-case';
-import { formatDate } from '$lib/utilities/format-date';
-import type { I18nKey } from '$lib/i18n';
 
 export type CombinedAttributes = EventAttribute & {
   eventTime?: string;

@@ -1,6 +1,8 @@
 import { get } from 'svelte/store';
+
 import { BROWSER } from 'esm-env';
-import { goto as navigateTo, invalidate } from '$app/navigation';
+
+import { invalidate, goto as navigateTo } from '$app/navigation';
 import { page } from '$app/stores';
 
 type UpdateQueryParams = {

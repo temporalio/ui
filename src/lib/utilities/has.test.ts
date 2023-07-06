@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { has, hasAnyKeys } from './has';
 
 describe('has', () => {

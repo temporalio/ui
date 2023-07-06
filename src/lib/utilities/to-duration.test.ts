@@ -1,15 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import {
-  toDuration,
-  toDate,
-  fromDate,
-  isDurationString,
-  isDurationKey,
-  toString,
-  isDuration,
-  fromSeconds,
-  tomorrow,
   durations,
+  fromDate,
+  fromSeconds,
+  isDuration,
+  isDurationKey,
+  isDurationString,
+  toDate,
+  toDuration,
+  tomorrow,
+  toString,
 } from './to-duration';
 
 describe('toDuration', () => {

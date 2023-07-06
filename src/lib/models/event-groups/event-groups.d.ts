@@ -1,5 +1,5 @@
-import type { EventType } from '$lib/utilities/is-event-type';
 import type { WorkflowEvent } from '$lib/types/events';
+import type { EventType } from '$lib/utilities/is-event-type';
 
 type EventId = EventType['id'];
 
