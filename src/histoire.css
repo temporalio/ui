@@ -15,7 +15,8 @@
 
   @font-face {
     font-family: 'Poppins';
-    src: local('Poppins'), local('poppins'), url('/src/lib/vendor/css/fonts/Poppins/Poppins-Regular.ttf');
+    src: local('Poppins'), local('poppins'),
+      url('/src/lib/vendor/css/fonts/Poppins/Poppins-Regular.ttf');
     font-style: normal;
     font-weight: 400;
     font-display: swap;
@@ -23,7 +24,8 @@
 
   @font-face {
     font-family: 'Poppins';
-    src: local('Poppins'), local('poppins'), url('/src/lib/vendor/css/fonts/Poppins/Poppins-Medium.ttf');
+    src: local('Poppins'), local('poppins'),
+      url('/src/lib/vendor/css/fonts/Poppins/Poppins-Medium.ttf');
     font-style: medium;
     font-weight: 500;
     font-display: swap;
