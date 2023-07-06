@@ -131,7 +131,7 @@ export const availableSystemSearchAttributeColumns: (
   derived(workflowTableColumns, ($workflowTableColumns) =>
     [...DEFAULT_COLUMNS, ...DEFAULT_AVAILABLE_COLUMNS].filter(
       (header) =>
-        !$workflowTableColumns?.[namespace]?.some(
+        !$workflowTableColumns[namespace]?.some(
           (column) => column.label === header.label,
         ),
     ),
@@ -146,7 +146,7 @@ export const availableCustomSearchAttributeColumns: (
       Object.keys($customSearchAttributes)
         .filter(
           (searchAttribute) =>
-            !$workflowTableColumns?.[namespace]?.some(
+            !$workflowTableColumns[namespace]?.some(
               (column) => column.label === searchAttribute,
             ),
         )
