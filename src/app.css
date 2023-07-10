@@ -13,6 +13,15 @@
   @font-face {
     font-family: 'Poppins';
     src: local('Poppins'), local('poppins'),
+      url('/src/lib/vendor/css/fonts/Poppins/Poppins-Light.ttf');
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Poppins';
+    src: local('Poppins'), local('poppins'),
       url('/src/lib/vendor/css/fonts/Poppins/Poppins-Regular.ttf');
     font-style: normal;
     font-weight: 400;
@@ -25,6 +34,15 @@
       url('/src/lib/vendor/css/fonts/Poppins/Poppins-Medium.ttf');
     font-style: medium;
     font-weight: 500;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Poppins';
+    src: local('Poppins'), local('poppins'),
+      url('/src/lib/vendor/css/fonts/Poppins/Poppins-SemiBold.ttf');
+    font-style: medium;
+    font-weight: 600;
     font-display: swap;
   }
 }
