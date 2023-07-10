@@ -15,8 +15,10 @@
   export let namespace: string;
 
   $: columnsInUse = getNamespaceColumns(namespace);
-  $: availableSystemColumns = availableSystemSearchAttributeColumns(namespace);
-  $: availableCustomColumns = availableCustomSearchAttributeColumns(namespace);
+  $: availableSystemColumns =
+    availableSystemSearchAttributeColumns(columnsInUse);
+  $: availableCustomColumns =
+    availableCustomSearchAttributeColumns(columnsInUse);
 </script>
 
 <div class="flex flex-col gap-4">

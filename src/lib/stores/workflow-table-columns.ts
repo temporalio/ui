@@ -1,4 +1,4 @@
-import { derived, get, type Readable } from 'svelte/store';
+import { derived, get, readable, type Readable } from 'svelte/store';
 
 import { namespaces } from './namespaces';
 import { persistStore } from './persist-store';
@@ -144,34 +144,27 @@ export const pinnedColumnsWidth = persistStore<number>(
 );
 
 export const availableSystemSearchAttributeColumns: (
-  namespace: string,
-) => Readable<WorkflowHeader[]> = (namespace) =>
-  derived(workflowTableColumns, ($workflowTableColumns) =>
+  columnsInUse: WorkflowHeader[],
+) => Readable<WorkflowHeader[]> = (columnsInUse: WorkflowHeader[]) =>
+  readable(
     [...DEFAULT_COLUMNS, ...DEFAULT_AVAILABLE_COLUMNS].filter(
-      (header) =>
-        !$workflowTableColumns[namespace]?.some(
-          (column) => column.label === header.label,
-        ),
+      (header) => !columnsInUse.some((column) => column.label === header.label),
     ),
   );
 
 export const availableCustomSearchAttributeColumns: (
-  namespace: string,
-) => Readable<WorkflowHeader[]> = (namespace: string) =>
-  derived(
-    [customSearchAttributes, workflowTableColumns],
-    ([$customSearchAttributes, $workflowTableColumns]) =>
-      Object.keys($customSearchAttributes)
-        .filter(
-          (searchAttribute) =>
-            !$workflowTableColumns[namespace]?.some(
-              (column) => column.label === searchAttribute,
-            ),
-        )
-        .map((key) => ({
-          label: key,
-          pinned: false,
-        })),
+  columnsInUse: WorkflowHeader[],
+) => Readable<WorkflowHeader[]> = (columnsInUse: WorkflowHeader[]) =>
+  derived([customSearchAttributes], ([$customSearchAttributes]) =>
+    Object.keys($customSearchAttributes)
+      .filter(
+        (searchAttribute) =>
+          !columnsInUse.some((column) => column.label === searchAttribute),
+      )
+      .map((key) => ({
+        label: key,
+        pinned: false,
+      })),
   );
 
 const reducer = (action: Action, state: State): State => {
