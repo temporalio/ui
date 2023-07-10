@@ -1,5 +1,8 @@
 <script lang="ts">
-  import { workflowTableColumns } from '$lib/stores/workflow-table-columns';
+  import {
+    getDefaultColumns,
+    workflowTableColumns,
+  } from '$lib/stores/workflow-table-columns';
   import type { WorkflowExecution } from '$lib/types/workflows';
   import Drawer from '$lib/holocene/drawer.svelte';
   import Icon from '$lib/holocene/icon/icon.svelte';
@@ -18,7 +21,7 @@
   let customizationDrawerOpen: boolean = false;
 
   $: ({ namespace } = $page.params);
-  $: columns = $workflowTableColumns?.[namespace] ?? [];
+  $: columns = $workflowTableColumns?.[namespace] ?? getDefaultColumns();
   $: empty = workflows.length === 0;
   $: pinnedColumns = columns.filter((column) => column.pinned);
   $: otherColumns = columns.filter((column) => !column.pinned);

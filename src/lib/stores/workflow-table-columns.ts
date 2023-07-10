@@ -76,7 +76,7 @@ const DEFAULT_AVAILABLE_COLUMNS: WorkflowHeader[] = [
   { label: 'Task Queue', pinned: false },
 ];
 
-const getDefaultColumns = (): WorkflowHeader[] => {
+export const getDefaultColumns = (): WorkflowHeader[] => {
   let columns: WorkflowHeader[];
   try {
     // try to get the list of columns that was stored last time they interacted
