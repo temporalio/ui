@@ -19,7 +19,7 @@
 
   $: ({ namespace } = $page.params);
   $: columns = $workflowTableColumns?.[namespace] ?? [];
-  $: empty = workflows.length === 0 || columns.length === 0;
+  $: empty = workflows.length === 0;
   $: pinnedColumns = columns.filter((column) => column.pinned);
   $: otherColumns = columns.filter((column) => !column.pinned);
 

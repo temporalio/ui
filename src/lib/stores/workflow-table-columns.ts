@@ -106,13 +106,27 @@ export const workflowTableColumns: Readable<State> = derived(
   [namespaces, persistedWorkflowTableColumns],
   ([$namespaces, $persistedWorkflowTableColumns]) => {
     const state: State = {};
+
+    const useOrAddDefaultTableColumnsToNamespace = (
+      columns: State,
+      namespace: string,
+    ) => {
+      if (!columns?.[namespace]?.length) {
+        columns[namespace] = [...getDefaultColumns()];
+        return columns[namespace];
+      }
+      return columns[namespace];
+    };
+
     return (
       $namespaces?.reduce(
         (namespaceToColumnsMap, { namespaceInfo: { name } }) => {
           return {
             ...namespaceToColumnsMap,
-            [name]:
-              $persistedWorkflowTableColumns?.[name] ?? getDefaultColumns(),
+            [name]: useOrAddDefaultTableColumnsToNamespace(
+              $persistedWorkflowTableColumns,
+              name,
+            ),
           };
         },
         state,
