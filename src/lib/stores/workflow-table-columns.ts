@@ -1,4 +1,6 @@
-import { derived, get, readable, type Readable } from 'svelte/store';
+import { derived, type Readable } from 'svelte/store';
+
+import { page } from '$app/stores';
 
 import { namespaces } from './namespaces';
 import { persistStore } from './persist-store';
@@ -104,8 +106,8 @@ export const persistedWorkflowTableColumns = persistStore<State>(
 );
 
 export const workflowTableColumns: Readable<State> = derived(
-  [namespaces, persistedWorkflowTableColumns],
-  ([$namespaces, $persistedWorkflowTableColumns]) => {
+  [namespaces, page, persistedWorkflowTableColumns],
+  ([$namespaces, $page, $persistedWorkflowTableColumns]) => {
     const state: State = {};
 
     const useOrAddDefaultTableColumnsToNamespace = (
@@ -119,7 +121,7 @@ export const workflowTableColumns: Readable<State> = derived(
       return columns[namespace];
     };
 
-    return (
+    const namespaceColumns =
       $namespaces?.reduce(
         (namespaceToColumnsMap, { namespaceInfo: { name } }) => {
           return {
@@ -131,40 +133,54 @@ export const workflowTableColumns: Readable<State> = derived(
           };
         },
         state,
-      ) ?? {}
-    );
+      ) ?? {};
+    const { namespace: currentNamespace } = $page.params;
+
+    return namespaceColumns[currentNamespace]
+      ? namespaceColumns
+      : {
+          ...namespaceColumns,
+          [currentNamespace]: useOrAddDefaultTableColumnsToNamespace(
+            $persistedWorkflowTableColumns,
+            currentNamespace,
+          ),
+        };
   },
 );
-
-export const getNamespaceColumns = (namespace: string): WorkflowHeader[] =>
-  get(workflowTableColumns)?.[namespace] ?? getDefaultColumns();
 
 export const pinnedColumnsWidth = persistStore<number>(
   'workflow-table-pinned-columns-width',
 );
 
 export const availableSystemSearchAttributeColumns: (
-  columnsInUse: WorkflowHeader[],
-) => Readable<WorkflowHeader[]> = (columnsInUse: WorkflowHeader[]) =>
-  readable(
+  namespace: string,
+) => Readable<WorkflowHeader[]> = (namespace) =>
+  derived(workflowTableColumns, ($workflowTableColumns) =>
     [...DEFAULT_COLUMNS, ...DEFAULT_AVAILABLE_COLUMNS].filter(
-      (header) => !columnsInUse.some((column) => column.label === header.label),
+      (header) =>
+        !$workflowTableColumns[namespace]?.some(
+          (column) => column.label === header.label,
+        ),
     ),
   );
 
 export const availableCustomSearchAttributeColumns: (
-  columnsInUse: WorkflowHeader[],
-) => Readable<WorkflowHeader[]> = (columnsInUse: WorkflowHeader[]) =>
-  derived([customSearchAttributes], ([$customSearchAttributes]) =>
-    Object.keys($customSearchAttributes)
-      .filter(
-        (searchAttribute) =>
-          !columnsInUse.some((column) => column.label === searchAttribute),
-      )
-      .map((key) => ({
-        label: key,
-        pinned: false,
-      })),
+  namespace: string,
+) => Readable<WorkflowHeader[]> = (namespace: string) =>
+  derived(
+    [customSearchAttributes, workflowTableColumns],
+    ([$customSearchAttributes, $workflowTableColumns]) =>
+      Object.keys($customSearchAttributes)
+        .filter(
+          (searchAttribute) =>
+            !$workflowTableColumns[namespace]?.some(
+              (column) => column.label === searchAttribute,
+            ),
+        )
+        .map((key) => ({
+          label: key,
+          pinned: false,
+        })),
   );
 
 const reducer = (action: Action, state: State): State => {

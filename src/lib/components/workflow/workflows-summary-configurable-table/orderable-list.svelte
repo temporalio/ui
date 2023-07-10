@@ -1,5 +1,6 @@
 <script lang="ts">
   import {
+    workflowTableColumns,
     availableSystemSearchAttributeColumns,
     availableCustomSearchAttributeColumns,
     addColumn,
@@ -7,18 +8,15 @@
     moveColumn,
     pinColumn,
     MAX_PINNED_COLUMNS,
-    getNamespaceColumns,
   } from '$lib/stores/workflow-table-columns';
   import OrderableList from '$lib/holocene/orderable-list/orderable-list.svelte';
   import OrderableListItem from '$lib/holocene/orderable-list/orderable-list-item.svelte';
 
   export let namespace: string;
 
-  $: columnsInUse = getNamespaceColumns(namespace);
-  $: availableSystemColumns =
-    availableSystemSearchAttributeColumns(columnsInUse);
-  $: availableCustomColumns =
-    availableCustomSearchAttributeColumns(columnsInUse);
+  $: columnsInUse = $workflowTableColumns?.[namespace] ?? [];
+  $: availableSystemColumns = availableSystemSearchAttributeColumns(namespace);
+  $: availableCustomColumns = availableCustomSearchAttributeColumns(namespace);
 </script>
 
 <div class="flex flex-col gap-4">
