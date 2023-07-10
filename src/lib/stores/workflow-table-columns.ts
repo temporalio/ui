@@ -1,4 +1,4 @@
-import { derived, type Readable } from 'svelte/store';
+import { derived, get, type Readable } from 'svelte/store';
 
 import { namespaces } from './namespaces';
 import { persistStore } from './persist-store';
@@ -135,6 +135,9 @@ export const workflowTableColumns: Readable<State> = derived(
     );
   },
 );
+
+export const getNamespaceColumns = (namespace: string): WorkflowHeader[] =>
+  get(workflowTableColumns)?.[namespace] ?? getDefaultColumns();
 
 export const pinnedColumnsWidth = persistStore<number>(
   'workflow-table-pinned-columns-width',
