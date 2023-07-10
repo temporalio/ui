@@ -1,4 +1,5 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+
 import { mockWorkflowsApis, SETTINGS_API } from '~/test-utilities/mock-apis';
 
 const importUrl = '/import/events';

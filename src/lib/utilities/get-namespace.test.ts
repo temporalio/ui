@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { getNamespace } from './get-namespace';
 
 const canaryNamespace = {

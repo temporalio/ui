@@ -1,6 +1,8 @@
 import { redirect } from '@sveltejs/kit';
-import { routeForEventHistory } from '$lib/utilities/route-for';
+
 import type { PageLoad } from './$types';
+
+import { routeForEventHistory } from '$lib/utilities/route-for';
 
 export const load: PageLoad = async function ({ params }) {
   const { namespace, workflow, run } = params;

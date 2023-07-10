@@ -1,14 +1,14 @@
+import type { CommonHistoryEvent } from '$lib/types/events';
+import { formatDurationAbbreviated } from '$lib/utilities/format-time';
 import {
   isActivityTaskScheduledEvent,
+  isLocalActivityMarkerEvent,
   isMarkerRecordedEvent,
   isSignalExternalWorkflowExecutionInitiatedEvent,
   isStartChildWorkflowExecutionInitiatedEvent,
-  isWorkflowExecutionSignaledEvent,
   isTimerStartedEvent,
-  isLocalActivityMarkerEvent,
+  isWorkflowExecutionSignaledEvent,
 } from '$lib/utilities/is-event-type';
-import { formatDurationAbbreviated } from '$lib/utilities/format-time';
-import type { CommonHistoryEvent } from '$lib/types/events';
 
 export const getEventGroupName = (event: CommonHistoryEvent): string => {
   if (!event) return;

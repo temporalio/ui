@@ -1,13 +1,14 @@
 import {
-  parseJSON,
   formatDuration as durationToString,
-  intervalToDuration,
   getMilliseconds as getSecondAsMilliseconds,
+  intervalToDuration,
+  parseJSON,
 } from 'date-fns';
 
 import type { Timestamp } from '$lib/types';
-import { fromSeconds } from './to-duration';
+
 import { has } from './has';
+import { fromSeconds } from './to-duration';
 
 export type ValidTime = Parameters<typeof parseJSON>[0] | Timestamp;
 

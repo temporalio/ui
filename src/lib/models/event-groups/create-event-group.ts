@@ -1,31 +1,31 @@
+import type {
+  ActivityTaskScheduledEvent,
+  CommonHistoryEvent,
+  MarkerRecordedEvent,
+  SignalExternalWorkflowExecutionInitiatedEvent,
+  StartChildWorkflowExecutionInitiatedEvent,
+  TimerStartedEvent,
+  WorkflowExecutionSignaledEvent,
+} from '$lib/types/events';
 import {
   isActivityTaskScheduledEvent,
-  isMarkerRecordedEvent,
   isLocalActivityMarkerEvent,
+  isMarkerRecordedEvent,
   isSignalExternalWorkflowExecutionInitiatedEvent,
   isStartChildWorkflowExecutionInitiatedEvent,
-  isWorkflowExecutionSignaledEvent,
   isTimerStartedEvent,
+  isWorkflowExecutionSignaledEvent,
 } from '$lib/utilities/is-event-type';
+
+import type { EventGroup } from './event-groups';
 import {
-  eventIsFailureOrTimedOut,
   eventIsCanceled,
+  eventIsFailureOrTimedOut,
   eventIsTerminated,
 } from './get-event-in-group';
-
 import { getGroupId } from './get-group-id';
 import { getEventGroupName } from './get-group-name';
 import { getLastEvent } from './get-last-event';
-import type {
-  ActivityTaskScheduledEvent,
-  StartChildWorkflowExecutionInitiatedEvent,
-  TimerStartedEvent,
-  SignalExternalWorkflowExecutionInitiatedEvent,
-  WorkflowExecutionSignaledEvent,
-  MarkerRecordedEvent,
-  CommonHistoryEvent,
-} from '$lib/types/events';
-import type { EventGroup } from './event-groups';
 
 type StartingEvents = {
   Activity: ActivityTaskScheduledEvent;

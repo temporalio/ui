@@ -1,8 +1,6 @@
-<script lang="ts" context="module">
-  import type { Toaster } from '../stores/toaster';
-</script>
-
 <script lang="ts">
+  import type { Toaster } from '../stores/toaster';
+  
   import ToastComponent from './toast.svelte';
 
   export let pop: Toaster['pop'];

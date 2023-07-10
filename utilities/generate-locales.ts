@@ -1,7 +1,8 @@
-import ts from 'typescript';
+import { mkdir, stat, writeFile } from 'fs/promises';
 import path, { relative } from 'path';
-import { writeFile, mkdir, stat } from 'fs/promises';
-import { $, glob, chalk } from 'zx';
+
+import ts from 'typescript';
+import { $, chalk, glob } from 'zx';
 
 const SRC_DIR = path.resolve('./src/lib/i18n/locales');
 const DEST_DIR = path.resolve('./static/i18n/locales');

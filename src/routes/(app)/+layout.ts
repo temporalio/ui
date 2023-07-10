@@ -1,24 +1,24 @@
 import { redirect } from '@sveltejs/kit';
-import type { LayoutLoad, LayoutData } from './$types';
-import type { GetClusterInfoResponse } from '$lib/types';
 
+import type { LayoutData, LayoutLoad } from './$types';
+
+import { fetchCluster } from '$lib/services/cluster-service';
+import { fetchLatestUiVersion } from '$lib/services/github-service';
+import { fetchNamespaces } from '$lib/services/namespaces-service';
+import { fetchSettings } from '$lib/services/settings-service';
+import { getAuthUser, setAuthUser } from '$lib/stores/auth-user';
+import type { GetClusterInfoResponse } from '$lib/types';
+import type { Settings, UiVersionInfo } from '$lib/types/global';
+import {
+  cleanAuthUserCookie,
+  getAuthUserCookie,
+} from '$lib/utilities/auth-user-cookie';
+import { isAuthorized } from '$lib/utilities/is-authorized';
+import { routeForLoginPage } from '$lib/utilities/route-for';
 import '$lib/vendor/prism/prism.css';
 import '$lib/vendor/prism/prism.cjs';
 
 import '../../app.css';
-
-import { fetchSettings } from '$lib/services/settings-service';
-import { getAuthUser, setAuthUser } from '$lib/stores/auth-user';
-import { fetchCluster } from '$lib/services/cluster-service';
-import { fetchNamespaces } from '$lib/services/namespaces-service';
-import { fetchLatestUiVersion } from '$lib/services/github-service';
-import { isAuthorized } from '$lib/utilities/is-authorized';
-import { routeForLoginPage } from '$lib/utilities/route-for';
-import {
-  getAuthUserCookie,
-  cleanAuthUserCookie,
-} from '$lib/utilities/auth-user-cookie';
-import type { Settings, UiVersionInfo } from '$lib/types/global';
 
 export const load: LayoutLoad = async function ({
   fetch,

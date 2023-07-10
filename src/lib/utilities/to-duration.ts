@@ -1,5 +1,6 @@
-import { formatISO, sub, add, intervalToDuration, parseISO } from 'date-fns';
-import { isString, isObject } from './is';
+import { add, formatISO, intervalToDuration, parseISO, sub } from 'date-fns';
+
+import { isObject, isString } from './is';
 
 type DurationKey = keyof Duration;
 

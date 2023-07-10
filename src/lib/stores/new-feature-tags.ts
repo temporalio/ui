@@ -1,4 +1,5 @@
 import { get } from 'svelte/store';
+
 import { persistStore } from './persist-store';
 
 export const viewedFeatureTags = persistStore('viewedFeatureTags', null);

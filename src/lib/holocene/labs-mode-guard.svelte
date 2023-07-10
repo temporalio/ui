@@ -1,5 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  
   import { labsMode } from '$lib/stores/labs-mode';
   $: labsModeParamOn = $page.url.searchParams.get('labs') === 'true';
   $: labsModeParamOff = $page.url.searchParams.get('labs') === 'false';

@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
   import { logEvent } from 'histoire/client';
+  
   import Button from './button.svelte';
 
   let disabled = false;

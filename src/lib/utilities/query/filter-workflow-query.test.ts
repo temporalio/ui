@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { isVersionNewer } from '../version-check';
+
 import { toListWorkflowQueryFromFilters } from './list-workflow-query';
 import { combineDropdownFilters } from './to-list-workflow-filters';
+import { isVersionNewer } from '../version-check';
 
 describe('toListWorkflowQueryFromFilters', () => {
   beforeEach(() => {

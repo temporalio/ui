@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { toURL } from './to-url';
 
 describe('toURL', () => {

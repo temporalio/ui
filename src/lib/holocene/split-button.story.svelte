@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Hst as HST } from '@histoire/plugin-svelte';
+  
   import MenuItem from './primitives/menu/menu-item.svelte';
   import SplitButton from './split-button.svelte';
 

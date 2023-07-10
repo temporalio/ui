@@ -1,4 +1,5 @@
 import type { DataConverter } from '@temporalio/common';
+
 import { PayloadCodec } from './payload-codec';
 
 let dataConverter: DataConverter;

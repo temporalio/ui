@@ -2,9 +2,11 @@
   // https://svelte.dev/repl/6116680a6c3e49d0908624105018efb7?version=3.12.1
 
   import { createEventDispatcher } from 'svelte';
+  
   import { clickOutside } from '$lib/holocene/outside-click';
-  import Calender from './calendar.svelte';
   import { getMonthName } from '$lib/utilities/calendar';
+  
+  import Calender from './calendar.svelte';
   import Icon from './icon/icon.svelte';
   import Input from './input/input.svelte';
 

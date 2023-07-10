@@ -1,10 +1,10 @@
-import { derived, get, type Readable } from 'svelte/store';
+import { derived, type Readable } from 'svelte/store';
+
+import { namespaces } from './namespaces';
 import { persistStore } from './persist-store';
 import { customSearchAttributes } from './search-attributes';
-import { namespaces } from './namespaces';
 
 export const MAX_PINNED_COLUMNS = 2;
-
 export const WorkflowHeaderLabels = [
   'Status',
   'Workflow ID',
@@ -106,14 +106,17 @@ export const workflowTableColumns: Readable<State> = derived(
   [namespaces, persistedWorkflowTableColumns],
   ([$namespaces, $persistedWorkflowTableColumns]) => {
     const state: State = {};
-    return $namespaces.reduce(
-      (namespaceToColumnsMap, { namespaceInfo: { name } }) => {
-        return {
-          ...namespaceToColumnsMap,
-          [name]: $persistedWorkflowTableColumns[name] ?? getDefaultColumns(),
-        };
-      },
-      state,
+    return (
+      $namespaces?.reduce(
+        (namespaceToColumnsMap, { namespaceInfo: { name } }) => {
+          return {
+            ...namespaceToColumnsMap,
+            [name]:
+              $persistedWorkflowTableColumns?.[name] ?? getDefaultColumns(),
+          };
+        },
+        state,
+      ) ?? {}
     );
   },
 );
@@ -128,7 +131,7 @@ export const availableSystemSearchAttributeColumns: (
   derived(workflowTableColumns, ($workflowTableColumns) =>
     [...DEFAULT_COLUMNS, ...DEFAULT_AVAILABLE_COLUMNS].filter(
       (header) =>
-        !$workflowTableColumns[namespace].some(
+        !$workflowTableColumns[namespace]?.some(
           (column) => column.label === header.label,
         ),
     ),
@@ -143,7 +146,7 @@ export const availableCustomSearchAttributeColumns: (
       Object.keys($customSearchAttributes)
         .filter(
           (searchAttribute) =>
-            !$workflowTableColumns[namespace].some(
+            !$workflowTableColumns[namespace]?.some(
               (column) => column.label === searchAttribute,
             ),
         )
@@ -157,7 +160,7 @@ const reducer = (action: Action, state: State): State => {
   switch (action.type) {
     case 'WORKFLOW_COLUMN.ADD': {
       const { label, namespace } = action.payload;
-      const columns = state[namespace] ?? DEFAULT_COLUMNS;
+      const columns = state?.[namespace] ?? DEFAULT_COLUMNS;
 
       return {
         ...state,
@@ -166,7 +169,7 @@ const reducer = (action: Action, state: State): State => {
     }
     case 'WORKFLOW_COLUMN.REMOVE': {
       const { label: labelToRemove, namespace } = action.payload;
-      const columns = state[namespace] ?? DEFAULT_COLUMNS;
+      const columns = state?.[namespace] ?? DEFAULT_COLUMNS;
 
       return {
         ...state,
@@ -175,7 +178,7 @@ const reducer = (action: Action, state: State): State => {
     }
     case 'WORKFLOW_COLUMN.PIN': {
       const { label: labelToPin, namespace } = action.payload;
-      const columns = state[namespace] ?? DEFAULT_COLUMNS;
+      const columns = state?.[namespace] ?? DEFAULT_COLUMNS;
       const index = columns.findIndex(({ label }) => label === labelToPin);
 
       const isPinned = columns[index].pinned;
@@ -204,7 +207,7 @@ const reducer = (action: Action, state: State): State => {
     }
     case 'WORKFLOW_COLUMN.MOVE': {
       const { from, to, namespace } = action.payload;
-      const columns = state[namespace] ?? DEFAULT_COLUMNS;
+      const columns = state?.[namespace] ?? DEFAULT_COLUMNS;
       const isPinned = columns[from].pinned;
 
       let lastPinned = 0;

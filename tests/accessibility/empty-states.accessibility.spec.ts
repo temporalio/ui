@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expect, test } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
   await page.routeFromHAR(

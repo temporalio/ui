@@ -1,9 +1,11 @@
 <script lang="ts">
-  import { omit } from '$lib/utilities/omit';
-
-  import { createEventDispatcher } from 'svelte';
-  import Icon from '$lib/holocene/icon/icon.svelte';
+  
   import type { HTMLInputAttributes } from 'svelte/elements';
+  
+  import { createEventDispatcher } from 'svelte';
+  
+  import Icon from '$lib/holocene/icon/icon.svelte';
+  import { omit } from '$lib/utilities/omit';
 
   type T = $$Generic;
 

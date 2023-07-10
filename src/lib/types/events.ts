@@ -1,4 +1,5 @@
 import type { EventGroup } from '$lib/models/event-groups/event-groups';
+
 import type { Replace, Settings } from './global';
 
 export type EventHistory = Replace<

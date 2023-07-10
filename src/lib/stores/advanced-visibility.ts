@@ -1,13 +1,14 @@
 import { derived } from 'svelte/store';
-import { page } from '$app/stores';
 
-import { cluster } from './cluster';
-import { temporalVersion } from './versions';
+import { page } from '$app/stores';
 
 import {
   advancedVisibilityEnabled,
   advancedVisibilityEnabledWithOrderBy,
 } from '$lib/utilities/advanced-visibility-enabled';
+
+import { cluster } from './cluster';
+import { temporalVersion } from './versions';
 
 export const isCloud = derived(
   [page],

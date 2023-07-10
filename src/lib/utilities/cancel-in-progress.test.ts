@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
+
 import { isCancelInProgress } from './cancel-in-progress';
 
-import runningEvents from '$fixtures/events.running.json';
 import canceledEvents from '$fixtures/events.canceled.json';
 import failedEvents from '$fixtures/events.failed.json';
+import runningEvents from '$fixtures/events.running.json';
 
 describe('isCancelInProgress', () => {
   it('should return true if running and not updating and CancelRequested event', () => {

@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store';
+
 import { persistStore } from '$lib/stores/persist-store';
 import type { DataEncoderStatus } from '$lib/types/global';
 

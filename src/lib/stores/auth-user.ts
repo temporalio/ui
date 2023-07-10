@@ -1,4 +1,5 @@
 import { get } from 'svelte/store';
+
 import { persistStore } from '$lib/stores/persist-store';
 import type { User } from '$lib/types/global';
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { afterNavigate } from '$app/navigation';
   import type { PageData } from './$types';
   import type { DescribeNamespaceResponse as Namespace } from '$types';
   import { page, updated } from '$app/stores';
@@ -82,6 +83,10 @@
       // Hard refresh when version does not match
       window.location.reload();
     }
+  });
+
+  afterNavigate(() => {
+    document.getElementById('content')?.scrollTo(0, 0);
   });
 </script>
 

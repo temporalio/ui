@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
+
 import {
-  timeToInterval,
   convertDaysAndMonths,
+  timeToInterval,
 } from './schedule-data-formatting';
 
 describe('convertDaysAndMonths', () => {

@@ -1,5 +1,5 @@
-import { derived, writable, get } from 'svelte/store';
 import type { Readable } from 'svelte/store';
+import { derived, get, writable } from 'svelte/store';
 
 export const defaultItemsPerPage = 100;
 export const options: string[] = ['100', '250', '500'];

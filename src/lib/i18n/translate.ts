@@ -1,6 +1,8 @@
-import { type TOptions, t } from 'i18next';
-import { type I18nKey, type I18nNamespace, type I18nReplace, I18nMap } from '.';
+import { t, type TOptions } from 'i18next';
+
 import { isObject } from '$lib/utilities/is';
+
+import { type I18nKey, I18nMap, type I18nNamespace, type I18nReplace } from '.';
 
 // no namespace
 export function translate(key: I18nKey<'common'>): string;

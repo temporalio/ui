@@ -38,6 +38,7 @@ body {
 body {
   font-family: Inter, sans-serif;
   position: relative;
+  overscroll-behavior: none;
 }
 
 h1,

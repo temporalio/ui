@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { updateQueryParameters, gotoOptions } from './update-query-parameters';
+import { gotoOptions, updateQueryParameters } from './update-query-parameters';
 
 const url = new URL('https://temporal.io');
 

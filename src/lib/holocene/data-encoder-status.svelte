@@ -1,10 +1,10 @@
 <script lang="ts">
   import Icon from '$lib/holocene/icon/icon.svelte';
-
-  import { dataEncoder } from '$lib/stores/data-encoder';
-
   import Tooltip from '$lib/holocene/tooltip.svelte';
+  import { dataEncoder } from '$lib/stores/data-encoder';
+  
   import { viewDataEncoderSettings } from './data-encoder-settings.svelte';
+  
 
   const onIconClick = () => {
     $viewDataEncoderSettings = !$viewDataEncoderSettings;

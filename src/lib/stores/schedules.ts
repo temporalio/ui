@@ -1,17 +1,17 @@
-import { goto } from '$app/navigation';
 import { writable } from 'svelte/store';
+
+import { goto } from '$app/navigation';
+
+import { createSchedule, editSchedule } from '$lib/services/schedule-service';
 import type { Schedule } from '$lib/types';
 import type {
   DescribeFullSchedule,
-  ScheduleSpecParameters,
-  SchedulePresetsParameters,
   ScheduleActionParameters,
   ScheduleInterval,
+  SchedulePresetsParameters,
+  ScheduleSpecParameters,
 } from '$lib/types/schedule';
-
 import { routeForSchedule, routeForSchedules } from '$lib/utilities/route-for';
-
-import { createSchedule, editSchedule } from '$lib/services/schedule-service';
 import { calendarToComment } from '$lib/utilities/schedule-comment-formatting';
 import {
   convertDaysAndMonths,

@@ -1,7 +1,8 @@
-import { afterEach, beforeEach, describe, test, expect } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+
+import { WorkflowHeaderLabels } from '$lib/stores/workflow-table-columns';
 
 import TableHeaderCell from '../table-header-cell.svelte';
-import { WorkflowHeaderLabels } from '$lib/stores/workflow-table-columns';
 
 let target: HTMLElement;
 

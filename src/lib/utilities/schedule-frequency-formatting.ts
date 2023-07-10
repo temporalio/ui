@@ -1,5 +1,6 @@
-import { monthNames, weekDays } from './calendar';
 import type { ScheduleRange, StructuredCalendar } from '$lib/types/schedule';
+
+import { monthNames, weekDays } from './calendar';
 
 // Examples of output
 // Wednesday at 06:30pm UTC
