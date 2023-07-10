@@ -17,7 +17,10 @@
   import { onDestroy, onMount } from 'svelte';
   import { type EventSortOrder, eventFilterSort } from '$lib/stores/event-view';
   import { fetchWorkflow } from '$lib/services/workflow-service';
-  import { getPollers } from '$lib/services/pollers-service';
+  import {
+    getPollers,
+    getTaskQueueCompatibility,
+  } from '$lib/services/pollers-service';
   import { toDecodedPendingActivities } from '$lib/models/pending-activities';
   import { fetchStartAndEndEvents } from '$lib/services/events-service';
 
@@ -37,13 +40,17 @@
     });
     const { taskQueue } = workflow;
     const workers = await getPollers({ queue: taskQueue, namespace });
+    const compatibility = await getTaskQueueCompatibility({
+      queue: taskQueue,
+      namespace,
+    });
     workflow.pendingActivities = await toDecodedPendingActivities(
       workflow,
       namespace,
       settings,
       $authUser?.accessToken,
     );
-    $workflowRun = { workflow, workers };
+    $workflowRun = { workflow, workers, compatibility };
     const events = await fetchStartAndEndEvents({
       namespace,
       workflowId,

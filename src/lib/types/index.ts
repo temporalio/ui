@@ -155,6 +155,8 @@ export type Header = temporal.api.common.v1.IHeader;
 
 export type PollerInfo = temporal.api.taskqueue.v1.IPollerInfo;
 export type TaskQueueStatus = temporal.api.taskqueue.v1.ITaskQueueStatus;
+export type TaskQueueCompatibleVersionSet =
+  temporal.api.taskqueue.v1.ICompatibleVersionSet;
 
 // api.schedule
 

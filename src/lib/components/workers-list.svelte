@@ -8,16 +8,48 @@
   import Table from '$lib/holocene/table/table.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
-  import type { GetPollersResponse } from '$lib/services/pollers-service';
+  import type {
+    GetPollersResponse,
+    TaskQueueCompatibility,
+  } from '$lib/services/pollers-service';
 
   export let taskQueue: string;
   export let workers: GetPollersResponse;
+  export let compatibility: TaskQueueCompatibility;
 </script>
 
 <section class="flex flex-col gap-4">
   <h2 class="text-lg font-medium" data-testid="task-queue-name">
     Task Queue: <span class="select-all font-normal">{taskQueue}</span>
   </h2>
+
+  <h2 class="text-base font-medium" data-testid="version-sets">Version Sets</h2>
+  <Table class="mb-6 w-full min-w-[600px] table-fixed">
+    <TableHeaderRow slot="headers">
+      <th class="w-3/12">Default</th>
+      <th class="w-9/12">Compatible Build Ids</th>
+    </TableHeaderRow>
+    {#each compatibility.majorVersionSets as set}
+      <TableRow data-testid="worker-row">
+        <td class="text-left" data-testid="worker-identity">
+          <p class="select-all">{set.buildIds[0]}</p>
+        </td>
+        <td class="text-left flex gap-2" data-testid="worker-last-access-time">
+          {#each set.buildIds as buildId}
+            <p class="select-all">{buildId}</p>
+          {/each}
+        </td>
+      </TableRow>
+    {:else}
+      <tr class="w-full">
+        <td colspan="6">
+          <EmptyState title={'No Workers Found'} />
+        </td>
+      </tr>
+    {/each}
+  </Table>
+
+  <h2 class="text-base font-medium" data-testid="workers">Workers</h2>
   <Table class="mb-6 w-full min-w-[600px] table-fixed">
     <TableHeaderRow slot="headers">
       <th class="w-6/12">ID</th>

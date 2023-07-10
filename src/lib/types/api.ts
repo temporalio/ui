@@ -23,7 +23,7 @@ export type BatchAPIRoutePath = 'batch-operations' | 'batch-operation.describe';
 
 export type NamespaceAPIRoutePath = 'namespace';
 
-export type TaskQueueAPIRoutePath = 'task-queue';
+export type TaskQueueAPIRoutePath = 'task-queue' | 'task-queue.compatibility';
 export type ParameterlessAPIRoutePath =
   | 'cluster'
   | 'settings'
