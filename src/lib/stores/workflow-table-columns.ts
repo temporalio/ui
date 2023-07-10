@@ -84,9 +84,10 @@ export const getDefaultColumns = (): WorkflowHeader[] => {
     const stringifiedOldColumns = window.localStorage.getItem(
       'workflow-table-columns',
     );
+    const parsedOldColumns = JSON.parse(stringifiedOldColumns);
 
-    if (stringifiedOldColumns) {
-      columns = JSON.parse(stringifiedOldColumns);
+    if (stringifiedOldColumns && parsedOldColumns?.length) {
+      columns = parsedOldColumns;
     } else {
       columns = DEFAULT_COLUMNS;
     }
