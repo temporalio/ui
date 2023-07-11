@@ -34,21 +34,24 @@
       <th class="w-9/12">Compatible Build Ids</th>
     </TableHeaderRow>
     {#each compatibility?.majorVersionSets?.reverse() as set, index (index)}
-      <TableRow data-testid="worker-row">
-        <td class="text-left" data-testid="worker-identity">
-          <p class="select-all w-auto">
-            <span class="active-version"
+      {@const overallDefault = index === 0}
+      <TableRow data-testid="version-row">
+        <td class="text-left" data-testid="version-default">
+          <p class="select-all flex gap-2">
+            <span class={overallDefault ? 'active-version' : 'version'}
               ><Icon name="merge" />{getDefaultVersionForSet(set.buildIds)}
-              {#if index === 0}Overall{/if} Default</span
+              {#if overallDefault}Overall{/if} Default</span
             >
           </p>
         </td>
-        <td class="text-left flex gap-2" data-testid="worker-last-access-time">
-          {#each getNonDefaultVersionsForSet(set.buildIds) as buildId}
-            <p class="select-all">
-              <span class="version"><Icon name="merge" />{buildId}</span>
-            </p>
-          {/each}
+        <td class="text-left" data-testid="version-compatible-builds">
+          <div class="flex gap-2">
+            {#each getNonDefaultVersionsForSet(set.buildIds) as buildId}
+              <p class="select-all">
+                <span class="version"><Icon name="merge" />{buildId}</span>
+              </p>
+            {/each}
+          </div>
         </td>
       </TableRow>
     {:else}

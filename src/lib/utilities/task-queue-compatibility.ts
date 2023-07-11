@@ -1,9 +1,7 @@
 export const getDefaultVersionForSet = (buildIds: string[]) => {
-  const reverseSortedBuildIds = buildIds.reverse();
-  return reverseSortedBuildIds[0];
+  return buildIds[buildIds.length - 1];
 };
 
 export const getNonDefaultVersionsForSet = (buildIds: string[]) => {
-  const reverseSortedBuildIds = buildIds.reverse();
-  return reverseSortedBuildIds.slice(1);
+  return buildIds.slice(0, buildIds.length - 1).reverse();
 };
