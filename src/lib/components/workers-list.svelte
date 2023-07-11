@@ -15,6 +15,7 @@
   import {
     getDefaultVersionForSet,
     getNonDefaultVersionsForSet,
+    getOrderedVersionSets,
   } from '$lib/utilities/task-queue-compatibility';
 
   export let taskQueue: string;
@@ -31,13 +32,13 @@
   <Table class="mb-6 w-full min-w-[600px] table-fixed">
     <TableHeaderRow slot="headers">
       <th class="w-3/12">Default</th>
-      <th class="w-9/12">Compatible Build Ids</th>
+      <th class="w-9/12">Compatible Build IDs</th>
     </TableHeaderRow>
-    {#each compatibility?.majorVersionSets?.reverse() as set, index (index)}
+    {#each getOrderedVersionSets(compatibility) as set, index (index)}
       {@const overallDefault = index === 0}
       <TableRow data-testid="version-row">
         <td class="text-left" data-testid="version-default">
-          <p class="select-all flex gap-2">
+          <p class="select-all flex gap-2 noto">
             <span class={overallDefault ? 'active-version' : 'version'}
               ><Icon name="merge" />{getDefaultVersionForSet(set.buildIds)}
               {#if overallDefault}Overall{/if} Default</span
@@ -45,7 +46,7 @@
           </p>
         </td>
         <td class="text-left" data-testid="version-compatible-builds">
-          <div class="flex gap-2">
+          <div class="flex gap-2 noto">
             {#each getNonDefaultVersionsForSet(set.buildIds) as buildId}
               <p class="select-all">
                 <span class="version"><Icon name="merge" />{buildId}</span>

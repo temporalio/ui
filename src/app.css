@@ -45,6 +45,13 @@
     font-weight: 600;
     font-display: swap;
   }
+
+  @font-face {
+    font-family: 'Noto Sans Mono';
+    src: local('Noto Sans Mono'), local('noto sans mono'),
+      url('/src/lib/vendor/css/fonts/NotoSansMono/NotoSansMono-VariableFont_wdth\,wght.ttf');
+    font-display: swap;
+  }
 }
 
 *,
@@ -73,6 +80,10 @@ labels {
 .hljs {
   max-height: 25em;
   overflow-y: scroll;
+}
+
+.noto {
+  font-family: 'Noto Sans Mono', monospace;
 }
 
 input[type='search']::-webkit-search-cancel-button {

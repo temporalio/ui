@@ -1,3 +1,14 @@
+import type { TaskQueueCompatibility } from '$lib/services/pollers-service';
+
+export const getOrderedVersionSets = (
+  compatibility: TaskQueueCompatibility,
+) => {
+  const sets = compatibility?.majorVersionSets
+    ? [...compatibility.majorVersionSets]
+    : [];
+  return sets.reverse();
+};
+
 export const getDefaultVersionForSet = (buildIds: string[]) => {
   return buildIds[buildIds.length - 1];
 };
