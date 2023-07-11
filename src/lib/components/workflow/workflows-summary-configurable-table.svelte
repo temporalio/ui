@@ -19,9 +19,10 @@
 
   $: ({ namespace } = $page.params);
   $: columns = $workflowTableColumns?.[namespace] ?? [];
-  $: empty = workflows.length === 0 || columns.length === 0;
+  $: empty = workflows.length === 0;
   $: pinnedColumns = columns.filter((column) => column.pinned);
   $: otherColumns = columns.filter((column) => !column.pinned);
+  $: totalColumnCount = pinnedColumns.length + otherColumns.length;
 
   const openCustomizationDrawer = () => {
     customizationDrawerOpen = true;
@@ -34,7 +35,7 @@
 
 <div class="workflows-summary-configurable-table">
   <TableWrapper noPinnedColumns={pinnedColumns.length === 0}>
-    <Table pinned {empty} columns={pinnedColumns}>
+    <Table pinned {empty} {totalColumnCount} columns={pinnedColumns}>
       <TableHeaderRow pinned {workflows} {pinnedColumns} {empty} slot="headers">
         {#each pinnedColumns as column}
           <TableHeaderCell {column} />
@@ -48,7 +49,12 @@
         </TableRow>
       {/each}
     </Table>
-    <Table {empty} columns={otherColumns} slot="unpinned-columns">
+    <Table
+      {empty}
+      {totalColumnCount}
+      columns={otherColumns}
+      slot="unpinned-columns"
+    >
       <TableHeaderRow
         onClickConfigure={openCustomizationDrawer}
         {workflows}

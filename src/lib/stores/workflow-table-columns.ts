@@ -1,5 +1,7 @@
 import { derived, type Readable } from 'svelte/store';
 
+import { page } from '$app/stores';
+
 import { namespaces } from './namespaces';
 import { persistStore } from './persist-store';
 import { customSearchAttributes } from './search-attributes';
@@ -76,7 +78,7 @@ const DEFAULT_AVAILABLE_COLUMNS: WorkflowHeader[] = [
   { label: 'Task Queue', pinned: false },
 ];
 
-const getDefaultColumns = (): WorkflowHeader[] => {
+export const getDefaultColumns = (): WorkflowHeader[] => {
   let columns: WorkflowHeader[];
   try {
     // try to get the list of columns that was stored last time they interacted
@@ -84,9 +86,10 @@ const getDefaultColumns = (): WorkflowHeader[] => {
     const stringifiedOldColumns = window.localStorage.getItem(
       'workflow-table-columns',
     );
+    const parsedOldColumns = JSON.parse(stringifiedOldColumns);
 
-    if (stringifiedOldColumns) {
-      columns = JSON.parse(stringifiedOldColumns);
+    if (stringifiedOldColumns && parsedOldColumns?.length) {
+      columns = parsedOldColumns;
     } else {
       columns = DEFAULT_COLUMNS;
     }
@@ -103,21 +106,45 @@ export const persistedWorkflowTableColumns = persistStore<State>(
 );
 
 export const workflowTableColumns: Readable<State> = derived(
-  [namespaces, persistedWorkflowTableColumns],
-  ([$namespaces, $persistedWorkflowTableColumns]) => {
+  [namespaces, page, persistedWorkflowTableColumns],
+  ([$namespaces, $page, $persistedWorkflowTableColumns]) => {
     const state: State = {};
-    return (
+
+    const useOrAddDefaultTableColumnsToNamespace = (
+      columns: State,
+      namespace: string,
+    ) => {
+      if (!columns?.[namespace]?.length) {
+        columns[namespace] = [...getDefaultColumns()];
+        return columns[namespace];
+      }
+      return columns[namespace];
+    };
+
+    const namespaceColumns =
       $namespaces?.reduce(
         (namespaceToColumnsMap, { namespaceInfo: { name } }) => {
           return {
             ...namespaceToColumnsMap,
-            [name]:
-              $persistedWorkflowTableColumns?.[name] ?? getDefaultColumns(),
+            [name]: useOrAddDefaultTableColumnsToNamespace(
+              $persistedWorkflowTableColumns,
+              name,
+            ),
           };
         },
         state,
-      ) ?? {}
-    );
+      ) ?? {};
+    const { namespace: currentNamespace } = $page.params;
+
+    return namespaceColumns[currentNamespace]
+      ? namespaceColumns
+      : {
+          ...namespaceColumns,
+          [currentNamespace]: useOrAddDefaultTableColumnsToNamespace(
+            $persistedWorkflowTableColumns,
+            currentNamespace,
+          ),
+        };
   },
 );
 
