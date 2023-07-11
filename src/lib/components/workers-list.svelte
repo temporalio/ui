@@ -12,6 +12,10 @@
     GetPollersResponse,
     TaskQueueCompatibility,
   } from '$lib/services/pollers-service';
+  import {
+    getDefaultVersionForSet,
+    getNonDefaultVersionsForSet,
+  } from '$lib/utilities/task-queue-compatibility';
 
   export let taskQueue: string;
   export let workers: GetPollersResponse;
@@ -29,14 +33,21 @@
       <th class="w-3/12">Default</th>
       <th class="w-9/12">Compatible Build Ids</th>
     </TableHeaderRow>
-    {#each compatibility.majorVersionSets as set}
+    {#each compatibility?.majorVersionSets?.reverse() as set, index (index)}
       <TableRow data-testid="worker-row">
         <td class="text-left" data-testid="worker-identity">
-          <p class="select-all">{set.buildIds[0]}</p>
+          <p class="select-all w-auto">
+            <span class="active-version"
+              ><Icon name="merge" />{getDefaultVersionForSet(set.buildIds)}
+              {#if index === 0}Overall{/if} Default</span
+            >
+          </p>
         </td>
         <td class="text-left flex gap-2" data-testid="worker-last-access-time">
-          {#each set.buildIds as buildId}
-            <p class="select-all">{buildId}</p>
+          {#each getNonDefaultVersionsForSet(set.buildIds) as buildId}
+            <p class="select-all">
+              <span class="version"><Icon name="merge" />{buildId}</span>
+            </p>
           {/each}
         </td>
       </TableRow>
@@ -95,3 +106,13 @@
     {/each}
   </Table>
 </section>
+
+<style lang="postcss">
+  .version {
+    @apply p-1 flex gap-1 items-center border border-gray-900 rounded;
+  }
+
+  .active-version {
+    @apply p-1 flex gap-1 items-center bg-green-100 text-green-700 rounded;
+  }
+</style>
