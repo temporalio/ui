@@ -139,4 +139,8 @@ export const Strings = {
   expiration: 'Expiration',
   'heartbeat-details': 'Heartbeat Details',
   'last-failure': 'Last Failure',
+  'last-accessed': 'Last Accessed',
+  'workflow-task-handler': 'Workflow Task Handler',
+  'activity-handler': 'Activity Handler',
+  'workers-empty-state': 'No Workers Found',
 } as const;

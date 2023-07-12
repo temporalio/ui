@@ -43,4 +43,7 @@ export const Strings = {
   event: 'Event',
   'collapse-all': 'Collapse All',
   'expand-all': 'Expand All',
+  id: 'ID',
+  yes: 'yes',
+  no: 'no',
 } as const;
