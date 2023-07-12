@@ -1,6 +1,5 @@
 <script lang="ts">
   import { translate } from '$lib/i18n/translate';
-
   import Logo from '$lib/vendor/Temporal_Logo_Animation.gif';
 
   export let title = translate('loading');
