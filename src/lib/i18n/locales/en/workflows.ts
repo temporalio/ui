@@ -100,6 +100,7 @@ export const Strings = {
   'reset-success-alert-description':
     'You can find the resulting Workflow Execution <1>here</1>.',
   'history-tab': 'History',
+  'workflow-history': 'Workflow History',
   'workers-tab': 'Workers',
   'pending-activities-tab': 'Pending Activities',
   'stack-trace-tab': 'Stack Trace',
