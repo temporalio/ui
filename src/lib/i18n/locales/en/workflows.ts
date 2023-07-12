@@ -143,4 +143,14 @@ export const Strings = {
   'workflow-task-handler': 'Workflow Task Handler',
   'activity-handler': 'Activity Handler',
   'workers-empty-state': 'No Workers Found',
+  'stack-trace-empty-state': 'No Stack Traces Found',
+  'no-workers-failure-message':
+    'This will fail if you have no workers running.',
+  'no-workers-running-message':
+    'Please make sure you have at least one worker running.',
+  'stack-trace-at': 'Stack Trace at',
+  'stack-trace-link-preface': 'To enable ',
+  'stack-trace-link': 'stack traces',
+  'stack-trace-link-postface':
+    ', run a Worker on the {{taskQueue}} Task Queue.',
 } as const;

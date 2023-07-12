@@ -1,5 +1,5 @@
 {
-  "loading": "loading",
+  "loading": "Loading...",
   "filtering": "filtering",
   "unknown-error": "An unknown error occurred.",
   "search-placeholder": "Enter a query",
@@ -43,5 +43,7 @@
   "expand-all": "Expand All",
   "id": "ID",
   "yes": "yes",
-  "no": "no"
+  "no": "no",
+  "refresh": "Refresh",
+  "error-occurred": "An Error Occurred"
 }
