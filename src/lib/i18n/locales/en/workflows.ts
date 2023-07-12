@@ -153,4 +153,6 @@ export const Strings = {
   'stack-trace-link': 'stack traces',
   'stack-trace-link-postface':
     ', run a Worker on the {{taskQueue}} Task Queue.',
+  'json-formatting': 'JSON Formatting',
+  'query-type': 'Query Type',
 } as const;

@@ -124,5 +124,7 @@
   "stack-trace-at": "Stack Trace at",
   "stack-trace-link-preface": "To enable ",
   "stack-trace-link": "stack traces",
-  "stack-trace-link-postface": ", run a Worker on the {{taskQueue}} Task Queue."
+  "stack-trace-link-postface": ", run a Worker on the {{taskQueue}} Task Queue.",
+  "json-formatting": "JSON Formatting",
+  "query-type": "Query Type"
 }
