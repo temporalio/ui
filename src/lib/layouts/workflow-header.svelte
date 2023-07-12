@@ -33,10 +33,12 @@
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import { translate } from '$lib/i18n/translate';
+  import { getCurrentDefaultVersion } from '$lib/utilities/task-queue-compatibility';
+  import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
 
   export let namespace: string;
 
-  $: ({ workflow, workers } = $workflowRun);
+  $: ({ workflow, workers, compatibility } = $workflowRun);
 
   let refreshInterval: NodeJS.Timer;
   const refreshRate = 15000;
@@ -108,9 +110,8 @@
     class="mb-8 flex w-full flex-col items-center justify-between gap-4 lg:flex-row"
   >
     <div
-      class="flex w-full items-center justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
+      class="flex flex-col gap-2 w-full justify-start gap-4 overflow-hidden whitespace-nowrap lg:w-auto"
     >
-      <WorkflowStatus status={workflow?.status} />
       <h1
         data-testid="workflow-id-heading"
         class="overflow-hidden text-2xl font-medium"
@@ -122,6 +123,21 @@
           class="overflow-hidden text-ellipsis"
         />
       </h1>
+      <div class="flex gap-2 items-center">
+        <WorkflowStatus status={workflow?.status} />
+        <p class="flex gap-2 items-center">
+          <span>Last used version: </span><CompatibilityBadge
+            buildId={workflow?.mostRecentWorkerVersionStamp?.buildId}
+          />
+        </p>
+        <p class="flex gap-2 items-center">
+          <span>Next version:</span><CompatibilityBadge
+            defaultVersion
+            active
+            buildId={getCurrentDefaultVersion(compatibility)}
+          />
+        </p>
+      </div>
     </div>
     {#if isRunning}
       <div

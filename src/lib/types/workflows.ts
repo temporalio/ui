@@ -1,3 +1,5 @@
+import type { WorkflowVersionTimpstamp } from '$lib/types';
+
 import type {
   Payload,
   PendingActivity,
@@ -104,6 +106,7 @@ export type WorkflowExecution = {
   taskQueue?: string;
   historyEvents: string;
   historySizeBytes: string;
+  mostRecentWorkerVersionStamp?: WorkflowVersionTimpstamp;
   searchAttributes?: DecodedWorkflowSearchAttributes;
   pendingChildren: PendingChildren[];
   pendingActivities: PendingActivity[];

@@ -17,6 +17,7 @@
     getNonDefaultVersionsForSet,
     getOrderedVersionSets,
   } from '$lib/utilities/task-queue-compatibility';
+  import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
 
   export let taskQueue: string;
   export let workers: GetPollersResponse;
@@ -35,22 +36,18 @@
       <th class="w-9/12">Compatible Build IDs</th>
     </TableHeaderRow>
     {#each getOrderedVersionSets(compatibility) as set, index (index)}
-      {@const overallDefault = index === 0}
       <TableRow data-testid="version-row">
         <td class="text-left" data-testid="version-default">
-          <p class="select-all flex gap-2 noto">
-            <span class={overallDefault ? 'active-version' : 'version'}
-              ><Icon name="merge" />{getDefaultVersionForSet(set.buildIds)}
-              {#if overallDefault}Overall{/if} Default</span
-            >
-          </p>
+          <CompatibilityBadge
+            defaultVersion
+            active={index === 0}
+            buildId={getDefaultVersionForSet(set.buildIds)}
+          />
         </td>
         <td class="text-left" data-testid="version-compatible-builds">
           <div class="flex gap-2 noto">
             {#each getNonDefaultVersionsForSet(set.buildIds) as buildId}
-              <p class="select-all">
-                <span class="version"><Icon name="merge" />{buildId}</span>
-              </p>
+              <CompatibilityBadge active={false} {buildId} />
             {/each}
           </div>
         </td>
@@ -110,13 +107,3 @@
     {/each}
   </Table>
 </section>
-
-<style lang="postcss">
-  .version {
-    @apply p-1 flex gap-1 items-center border border-gray-900 rounded;
-  }
-
-  .active-version {
-    @apply p-1 flex gap-1 items-center bg-green-100 text-green-700 rounded;
-  }
-</style>

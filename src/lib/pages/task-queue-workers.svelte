@@ -2,13 +2,20 @@
   import { page } from '$app/stores';
 
   import WorkersList from '$lib/components/workers-list.svelte';
-  import { getPollers } from '$lib/services/pollers-service';
+  import {
+    getPollers,
+    getTaskQueueCompatibility,
+  } from '$lib/services/pollers-service';
 
   let { queue, namespace } = $page.params;
 
-  let workers = getPollers({ queue, namespace });
+  let getWorkers = getPollers({ queue, namespace });
+  let getCompatibility = getTaskQueueCompatibility({
+    queue,
+    namespace,
+  });
 </script>
 
-{#await workers then workers}
-  <WorkersList taskQueue={queue} {workers} />
+{#await Promise.all( [getWorkers, getCompatibility], ) then [workers, compatibility]}
+  <WorkersList taskQueue={queue} {workers} {compatibility} />
 {/await}

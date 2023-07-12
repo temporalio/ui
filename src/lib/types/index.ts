@@ -143,6 +143,8 @@ export type WorkflowExecutionConfig =
   temporal.api.workflow.v1.IWorkflowExecutionConfig;
 export type WorkflowExecutionInfo =
   temporal.api.workflow.v1.IWorkflowExecutionInfo;
+export type WorkflowVersionTimpstamp =
+  temporal.api.common.v1.IWorkerVersionStamp;
 
 // api response
 export type Payload = temporal.api.common.v1.IPayload;

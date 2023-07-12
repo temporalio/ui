@@ -16,3 +16,10 @@ export const getDefaultVersionForSet = (buildIds: string[]) => {
 export const getNonDefaultVersionsForSet = (buildIds: string[]) => {
   return buildIds.slice(0, buildIds.length - 1).reverse();
 };
+
+export const getCurrentDefaultVersion = (
+  compatibility: TaskQueueCompatibility,
+) => {
+  const orderedSets = getOrderedVersionSets(compatibility);
+  return getDefaultVersionForSet(orderedSets[0].buildIds);
+};
