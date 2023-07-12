@@ -126,5 +126,17 @@
   "stack-trace-link": "stack traces",
   "stack-trace-link-postface": ", run a Worker on the {{taskQueue}} Task Queue.",
   "json-formatting": "JSON Formatting",
-  "query-type": "Query Type"
+  "query-type": "Query Type",
+  "pending-activities-empty-state": "No Pending Activities",
+  "activity-id": "Activity ID",
+  "details": "Details",
+  "maximum-attempts": "Maximum Attempts",
+  "retry-expiration": "Retry Expiration",
+  "state": "State",
+  "last-started-time": "Last Started Time",
+  "scheduled-time": "Scheduled Time",
+  "last-worker-identity": "Last Worker Identity",
+  "unlimited": "Unlimited",
+  "no-expiration": "No Expiration",
+  "no-retry": "None"
 }
