@@ -10,11 +10,7 @@
   } from 'date-fns';
 
   import { columnOrderedDurations } from '$lib/utilities/to-duration';
-  import {
-    persistedTimeFilter,
-    workflowFilters,
-    workflowSorts,
-  } from '$lib/stores/filters';
+  import { persistedTimeFilter, workflowFilters } from '$lib/stores/filters';
   import DatePicker from '$lib/holocene/date-picker.svelte';
   import Button from '$lib/holocene/button.svelte';
   import TimePicker from '$lib/holocene/time-picker.svelte';
@@ -94,7 +90,7 @@
       custom = false;
     }
 
-    updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
+    updateQueryParamsFromFilter($page.url, $workflowFilters);
   };
 
   const onTimeFieldChange = (field: 'StartTime' | 'CloseTime') => {
@@ -166,7 +162,7 @@
     };
     $workflowFilters = [...getOtherFilters(), filter];
 
-    updateQueryParamsFromFilter($page.url, $workflowFilters, $workflowSorts);
+    updateQueryParamsFromFilter($page.url, $workflowFilters);
   };
 </script>
 
