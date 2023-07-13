@@ -23,6 +23,7 @@
 
   const handleKeyUp = (event: KeyboardEvent) => {
     if (event.key === ' ' || event.key === 'Enter') {
+      if (!$keepOpen) closeMenu();
       dispatch('click');
     }
   };

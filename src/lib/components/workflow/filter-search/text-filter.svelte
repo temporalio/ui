@@ -17,7 +17,7 @@
 </script>
 
 <Input
-  id="filter-search"
+  id="text-filter-search"
   type="search"
   placeholder={`Enter ${$filter.attribute}`}
   icon="search"
@@ -25,5 +25,4 @@
   unroundLeft
   bind:value={$filter.value}
   on:keydown={handleKeydown}
-  autoFocus
 />

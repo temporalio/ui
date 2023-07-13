@@ -9,19 +9,24 @@
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
   import WorkflowStatus from '$lib/components/workflow-status.svelte';
 
+  import type { WorkflowStatus as Status } from '$lib/types/workflows';
+
   type T = $$Generic;
 
   const { filter, handleSubmit } = getContext<FilterContext<T>>(FILTER_CONTEXT);
+
+  $: status = $filter.value as Status;
 </script>
 
 <MenuContainer let:open>
   <Button
+    id="status-filter"
     variant="search"
     unroundLeft
     on:click={() => open.update((previous) => !previous)}
   >
-    {#if $filter.value}
-      <WorkflowStatus status={$filter.value} />
+    {#if status}
+      <WorkflowStatus {status} />
     {:else}
       Select a status
     {/if}

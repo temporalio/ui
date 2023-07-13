@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContext, onMount } from 'svelte';
+  import { getContext } from 'svelte';
   import { type FilterContext, FILTER_CONTEXT } from './index.svelte';
   import {
     addHours,
@@ -47,7 +47,6 @@
     value = _value;
     if (value === 'Custom') {
       $filter.customDate = true;
-      $filter.conditional = 'BETWEEN';
     } else {
       $filter.value = value;
       $filter.customDate = false;
@@ -110,28 +109,22 @@
     $filter.value = value;
     handleSubmit();
   };
-
-  onMount(() => {
-    $filter.conditional = '>=';
-  });
 </script>
 
 <div class="flex items-center">
-  {#if $filter.customDate}
-    <ConditionalMenu options={[{ value: 'BETWEEN' }]} disabled />
-  {:else}
-    <ConditionalMenu
-      options={[
-        { value: '>=', label: 'BEFORE' },
-        { value: '<=', label: 'AFTER' },
-      ]}
-    />
-  {/if}
+  <ConditionalMenu
+    inputId="time-range-filter"
+    options={[
+      { value: '>=', label: 'BEFORE' },
+      { value: '', label: 'BETWEEN' },
+      { value: '<=', label: 'AFTER' },
+    ]}
+  />
   <MenuContainer>
     <MenuButton
       id="time-range-filter"
       controls="time-range-filter-menu"
-      class="flex flex-row items-center p-2 bg-white text-gray-800 hover:border-primary hover:bg-primary hover:text-white border border-l-0  border-gray-800 rounded-r h-10"
+      class="flex flex-row items-center p-2 bg-white text-gray-800 hover:border-primary hover:bg-primary hover:text-white border border-gray-800 rounded-r h-10"
     >
       {value || 'Select Time'}
     </MenuButton>

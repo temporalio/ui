@@ -9,7 +9,8 @@
 
   type T = $$Generic;
 
-  const { filter } = getContext<FilterContext<T>>(FILTER_CONTEXT);
+  const { filter, focusedElementId } =
+    getContext<FilterContext<T>>(FILTER_CONTEXT);
   const defaultConditionOptions = [
     { value: '>' },
     { value: '>=' },
@@ -21,16 +22,18 @@
   export let options: { value: string; label?: string }[] =
     defaultConditionOptions;
   export let disabled = false;
+  export let inputId: string;
 
-  $: selectedOption = options.find((o) => o.value === $filter.conditional);
+  $: selectedOption =
+    options.find((o) => o.value === $filter.conditional) ?? options[0];
   $: selectedLabel = selectedOption?.label ?? selectedOption?.value;
 </script>
 
 <MenuContainer>
   <MenuButton
-    id="conditional"
+    id="conditional-menu-button"
     controls="conditional-menu"
-    class="border-l-0 border border-gray-800 bg-white text-gray-800 hover:border-primary hover:bg-primary hover:text-white h-10 p-2"
+    class="border-l-0 border-r-0 border border-gray-800 bg-white text-gray-800 hover:border-primary hover:bg-primary hover:text-white h-10 p-2"
     {disabled}
   >
     {selectedLabel}
@@ -40,6 +43,7 @@
       <MenuItem
         on:click={() => {
           $filter.conditional = value;
+          $focusedElementId = inputId;
         }}
       >
         {label ?? value}

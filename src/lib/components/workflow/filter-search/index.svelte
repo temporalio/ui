@@ -7,12 +7,13 @@
     filter: Writable<WorkflowFilter>;
     activeQueryIndex: Writable<number>;
     handleSubmit: () => void;
+    focusedElementId: Writable<any>;
   }
 </script>
 
 <script lang="ts">
   import { setContext } from 'svelte';
-  import { noop } from 'svelte/internal';
+  import { afterUpdate, noop } from 'svelte/internal';
   import { writable } from 'svelte/store';
   import { fly } from 'svelte/transition';
   import { page } from '$app/stores';
@@ -32,6 +33,7 @@
   import Menu from '$lib/holocene/primitives/menu/menu.svelte';
   import MenuContainer from '$lib/holocene/primitives/menu/menu-container.svelte';
   import MenuItem from '$lib/holocene/primitives/menu/menu-item.svelte';
+  import BooleanFilter from './boolean-filter.svelte';
   import FilterList from './filter-list.svelte';
   import DateTimeFilter from './datetime-filter.svelte';
   import NumberFilter from './number-filter.svelte';
@@ -44,8 +46,8 @@
 
   const filter = writable<WorkflowFilter>(emptyFilter());
   const activeQueryIndex = writable<number>(null);
+  const focusedElementId = writable<string>('');
 
-  $: searchAttributeType = $searchAttributes[$filter.attribute];
   $: searchParamQuery = $page.url.searchParams.get('query');
   $: showClearAllButton = $workflowFilters.length && !$filter.attribute;
 
@@ -53,6 +55,7 @@
     filter,
     activeQueryIndex,
     handleSubmit,
+    focusedElementId,
   });
 
   function onSearch() {
@@ -94,8 +97,46 @@
     onSearch();
   }
 
+  function isStatusFilter(attribute: string) {
+    return attribute === 'ExecutionStatus';
+  }
+
+  function isTextFilter(attribute: string) {
+    const searchAttributeType = $searchAttributes[attribute];
+    return ['Keyword', 'KeywordList', 'Text'].includes(searchAttributeType);
+  }
+
+  function isNumberFilter(attribute: string) {
+    const searchAttributeType = $searchAttributes[attribute];
+    return ['Int', 'Double'].includes(searchAttributeType);
+  }
+
+  function isDateTimeFilter(attribute: string) {
+    const searchAttributeType = $searchAttributes[attribute];
+    return searchAttributeType === 'Datetime';
+  }
+
+  function isBooleanFilter(attribute: string) {
+    const searchAttributeType = $searchAttributes[attribute];
+    return searchAttributeType === 'Bool';
+  }
+
+  function getFocusedElementId(attribute: string): string {
+    if (isStatusFilter(attribute)) return 'status-filter';
+
+    if (isTextFilter(attribute)) return 'text-filter-search';
+
+    if (isNumberFilter(attribute) || isDateTimeFilter(attribute))
+      return 'conditional-menu-button';
+
+    if (isBooleanFilter(attribute)) return 'boolean-filter';
+
+    return '';
+  }
+
   function handleNewQuery(value: string) {
     filter.set({ ...emptyFilter(), attribute: value, conditional: '=' });
+    $focusedElementId = getFocusedElementId(value);
   }
 
   let searchAttributeValue = '';
@@ -106,6 +147,22 @@
     : options.filter((option) =>
         option.value.toLowerCase().includes(searchAttributeValue.toLowerCase()),
       );
+
+  function updateFocus() {
+    if ($focusedElementId) {
+      const element = document.getElementById($focusedElementId);
+      if (element) {
+        element.focus();
+        if (element instanceof HTMLButtonElement) {
+          element.click();
+        }
+      }
+    }
+  }
+
+  afterUpdate(() => {
+    updateFocus();
+  });
 </script>
 
 <div class="flex w-full gap-4">
@@ -147,25 +204,26 @@
       </Menu>
     </MenuContainer>
 
-    {#if $filter.attribute === 'ExecutionStatus'}
+    {#if isStatusFilter($filter.attribute)}
       <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
         <StatusFilter />
       </div>
-    {:else if ['Keyword', 'KeywordList', 'Text'].includes(searchAttributeType)}
+    {:else if isTextFilter($filter.attribute)}
       <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
         <TextFilter />
       </div>
-    {:else if ['Int', 'Double'].includes(searchAttributeType)}
+    {:else if isNumberFilter($filter.attribute)}
       <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
         <NumberFilter />
       </div>
-    {:else if searchAttributeType === 'Datetime'}
+    {:else if isDateTimeFilter($filter.attribute)}
       <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
         <DateTimeFilter />
       </div>
-
-      <!-- TODO: Handle boolean search attributes? -->
-      <!-- {:else if searchAttributeType === 'Bool'} -->
+    {:else if isBooleanFilter($filter.attribute)}
+      <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
+        <BooleanFilter />
+      </div>
     {/if}
   </div>
 

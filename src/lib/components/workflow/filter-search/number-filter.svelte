@@ -23,7 +23,7 @@
 </script>
 
 <div class="flex items-center">
-  <ConditionalMenu />
+  <ConditionalMenu inputId="number-filter-search" />
   <NumberInput
     id="number-filter-search"
     icon="search"
