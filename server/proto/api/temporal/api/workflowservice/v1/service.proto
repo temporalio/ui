@@ -439,7 +439,11 @@ service WorkflowService {
     //
     // Open source users can adjust this limit by setting the server's dynamic config value for
     // `limit.reachabilityTaskQueueScan` with the caveat that this call can strain the visibility store.
-    rpc GetWorkerTaskReachability (GetWorkerTaskReachabilityRequest) returns (GetWorkerTaskReachabilityResponse) {}
+    rpc GetWorkerTaskReachability (GetWorkerTaskReachabilityRequest) returns (GetWorkerTaskReachabilityResponse) {
+        option (google.api.http) = {
+            get: "/api/v1/namespaces/{namespace}/worker-task-reachability"
+        };
+    }
 
 
     // Creates a new schedule.

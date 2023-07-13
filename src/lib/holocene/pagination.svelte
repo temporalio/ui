@@ -1,10 +1,10 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  
+
   import { onMount } from 'svelte';
-  
+
   import { page } from '$app/stores';
-  
+
   import FilterSelect from '$lib/holocene/select/filter-select.svelte';
   import Skeleton from '$lib/holocene/skeleton/index.svelte';
   import {
@@ -17,7 +17,6 @@
   } from '$lib/stores/pagination';
   import { getFloatStyle } from '$lib/utilities/get-float-style';
   import { updateQueryParameters } from '$lib/utilities/update-query-parameters';
-  
 
   type T = $$Generic;
   interface $$Props extends HTMLAttributes<HTMLDivElement> {

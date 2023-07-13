@@ -8,20 +8,34 @@
   import Table from '$lib/holocene/table/table.svelte';
   import TableHeaderRow from '$lib/holocene/table/table-header-row.svelte';
   import TableRow from '$lib/holocene/table/table-row.svelte';
-  import type {
-    GetPollersResponse,
-    TaskQueueCompatibility,
+  import {
+    getWorkerTaskReachability,
+    type GetPollersResponse,
+    type TaskQueueCompatibility,
   } from '$lib/services/pollers-service';
   import {
+    getCurrentCompatibilityDefaultVersion,
+    getCurrentPollerBuildId,
     getDefaultVersionForSet,
     getNonDefaultVersionsForSet,
     getOrderedVersionSets,
   } from '$lib/utilities/task-queue-compatibility';
   import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
+  import { page } from '$app/stores';
+  import { onMount } from 'svelte';
 
   export let taskQueue: string;
   export let workers: GetPollersResponse;
   export let compatibility: TaskQueueCompatibility;
+
+  // onMount(async () => {
+  //   const namespace = $page.params.namespace;
+  //   let fetchWorkerTaskReachability = await getWorkerTaskReachability({
+  //     namespace,
+  //   });
+  // });
+
+  $: defaultVersion = getCurrentCompatibilityDefaultVersion(compatibility);
 </script>
 
 <section class="flex flex-col gap-4">
@@ -45,7 +59,7 @@
           />
         </td>
         <td class="text-left" data-testid="version-compatible-builds">
-          <div class="flex gap-2 noto">
+          <div class="flex gap-2 noto flex-wrap">
             {#each getNonDefaultVersionsForSet(set.buildIds) as buildId}
               <CompatibilityBadge active={false} {buildId} />
             {/each}
@@ -64,7 +78,8 @@
   <h2 class="text-base font-medium" data-testid="workers">Workers</h2>
   <Table class="mb-6 w-full min-w-[600px] table-fixed">
     <TableHeaderRow slot="headers">
-      <th class="w-6/12">ID</th>
+      <th class="w-3/12">ID</th>
+      <th class="w-3/12">Version</th>
       <th class="w-2/12">Last Accessed</th>
       <th class="w-2/12">
         <p class="text-center">Workflow Task Handler</p>
@@ -77,6 +92,16 @@
       <TableRow data-testid="worker-row">
         <td class="text-left" data-testid="worker-identity">
           <p class="select-all">{poller.identity}</p>
+        </td>
+        <td class="text-left" data-testid="worker-identity">
+          <p class="select-all">
+            <CompatibilityBadge
+              defaultVersion={getCurrentPollerBuildId(poller) ===
+                defaultVersion}
+              active={getCurrentPollerBuildId(poller) === defaultVersion}
+              buildId={getCurrentPollerBuildId(poller)}
+            />
+          </p>
         </td>
         <td class="text-left" data-testid="worker-last-access-time">
           <p class="select-all">

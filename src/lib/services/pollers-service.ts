@@ -9,6 +9,11 @@ import { routeForApi } from '$lib/utilities/route-for-api';
 
 export type GetAllPollersRequest = NamespaceScopedRequest & { queue: string };
 
+export type GetWorkerTasReachabilityRequest = NamespaceScopedRequest & {
+  buildIds?: string[];
+  taskQueues?: string[];
+};
+
 export type GetPollersResponse = {
   pollers: PollerWithTaskQueueTypes[];
   taskQueueStatus: TaskQueueStatus;
@@ -110,4 +115,16 @@ export async function getTaskQueueCompatibility(
 ): Promise<TaskQueueCompatibility> {
   const route = routeForApi('task-queue.compatibility', parameters);
   return requestFromAPI(route, { request });
+}
+
+export async function getWorkerTaskReachability(
+  parameters: GetWorkerTasReachabilityRequest,
+  request = fetch,
+): Promise<TaskQueueCompatibility> {
+  const { namespace } = parameters;
+  const route = routeForApi('worker-task-reachability', { namespace });
+  return requestFromAPI(route, {
+    request,
+    params: { buildIds: '', taskQueues: '' },
+  });
 }

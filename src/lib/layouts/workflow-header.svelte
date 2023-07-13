@@ -127,19 +127,19 @@
           class="overflow-hidden text-ellipsis"
         />
       </h1>
-      <div class="flex gap-2 items-center">
+      <div class="flex gap-4 items-center">
         <WorkflowStatus status={workflow?.status} />
-        {#if workflow.mostRecentWorkerVersionStamp?.useVersioning}
-          <p class="flex gap-2 items-center">
-            <span>Last used version: </span><CompatibilityBadge
+        {#if defaultVersion}
+          <p class="flex gap-1 items-center">
+            <span>Last used version</span><CompatibilityBadge
               defaultVersion={getCurrentWorkflowBuildId(workflow) ===
                 defaultVersion}
               active={getCurrentWorkflowBuildId(workflow) === defaultVersion}
               buildId={getCurrentWorkflowBuildId(workflow)}
             />
           </p>
-          <p class="flex gap-2 items-center">
-            <span>Next version:</span><CompatibilityBadge
+          <p class="flex gap-1 items-center">
+            <span>Next version</span><CompatibilityBadge
               defaultVersion={!!defaultVersion}
               active={!!defaultVersion}
               buildId={defaultVersion}

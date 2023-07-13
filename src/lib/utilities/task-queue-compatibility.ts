@@ -1,5 +1,5 @@
 import type { TaskQueueCompatibility } from '$lib/services/pollers-service';
-import type { TaskQueueCompatibleVersionSet } from '$lib/types';
+import type { PollerInfo, TaskQueueCompatibleVersionSet } from '$lib/types';
 import type { WorkflowExecution } from '$lib/types/workflows';
 
 export const getOrderedVersionSets = (
@@ -40,6 +40,15 @@ export const getCurrentWorkflowBuildId = (
 ): string | undefined => {
   if (workflow?.mostRecentWorkerVersionStamp?.useVersioning) {
     return workflow.mostRecentWorkerVersionStamp?.buildId || undefined;
+  }
+  return undefined;
+};
+
+export const getCurrentPollerBuildId = (
+  poller: PollerInfo,
+): string | undefined => {
+  if (poller.workerVersionCapabilities?.useVersioning) {
+    return poller.workerVersionCapabilities?.buildId || undefined;
   }
   return undefined;
 };

@@ -29,6 +29,7 @@ export type ParameterlessAPIRoutePath =
   | 'settings'
   | 'user'
   | 'namespaces';
+export type WorkerAPIRoutePath = 'worker-task-reachability';
 export type SchedulesAPIRoutePath = 'schedules';
 export type ScheduleAPIRoutePath = 'schedule' | 'schedule.delete';
 export type SearchAttributesRoutePath = 'search-attributes';
@@ -39,6 +40,7 @@ export type APIRoutePath =
   | SchedulesAPIRoutePath
   | SearchAttributesRoutePath
   | TaskQueueAPIRoutePath
+  | WorkerAPIRoutePath
   | WorkflowAPIRoutePath
   | WorkflowActivitiesAPIRoutePath
   | WorkflowsAPIRoutePath
