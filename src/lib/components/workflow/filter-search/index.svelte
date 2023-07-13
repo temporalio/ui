@@ -141,10 +141,19 @@
     return '';
   }
 
+  function isOptionDisabled(value: string) {
+    return $workflowFilters.some(
+      (filter) => filter.conditional === '=' && filter.attribute === value,
+    );
+  }
+
   function handleNewQuery(value: string) {
     filter.set({ ...emptyFilter(), attribute: value, conditional: '=' });
     $focusedElementId = getFocusedElementId(value);
   }
+
+  $: $activeQueryIndex,
+    ($focusedElementId = getFocusedElementId($filter.attribute));
 
   let searchAttributeValue = '';
   //  TODO: Add KeywordList support
@@ -173,10 +182,18 @@
   afterUpdate(() => {
     updateFocus();
   });
+
+  function handleKeyUp(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      activeQueryIndex.set(null);
+      filter.set(emptyFilter());
+      searchAttributeValue = '';
+    }
+  }
 </script>
 
 <div class="flex w-full gap-4">
-  <div class="flex" class:filter={!showClearAllButton}>
+  <div class="flex" class:filter={!showClearAllButton} on:keyup={handleKeyUp}>
     <MenuContainer let:open>
       <Button
         variant="search"
@@ -201,10 +218,12 @@
         />
 
         {#each filteredOptions as { value, label }}
+          {@const disabled = isOptionDisabled(value)}
           <MenuItem
             on:click={() => {
               handleNewQuery(value);
             }}
+            {disabled}
           >
             {label}
           </MenuItem>
