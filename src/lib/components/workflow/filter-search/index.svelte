@@ -103,7 +103,12 @@
 
   function isTextFilter(attribute: string) {
     const searchAttributeType = $searchAttributes[attribute];
-    return ['Keyword', 'KeywordList', 'Text'].includes(searchAttributeType);
+    return ['Keyword', 'Text'].includes(searchAttributeType);
+  }
+
+  function isListFilter(attribute: string) {
+    const searchAttributeType = $searchAttributes[attribute];
+    return searchAttributeType === 'KeywordList';
   }
 
   function isNumberFilter(attribute: string) {
@@ -121,10 +126,12 @@
     return searchAttributeType === 'Bool';
   }
 
-  function getFocusedElementId(attribute: string): string {
+  function getFocusedElementId(attribute: string) {
     if (isStatusFilter(attribute)) return 'status-filter';
 
     if (isTextFilter(attribute)) return 'text-filter-search';
+
+    if (isListFilter(attribute)) return 'list-filter-search';
 
     if (isNumberFilter(attribute) || isDateTimeFilter(attribute))
       return 'conditional-menu-button';
@@ -140,7 +147,10 @@
   }
 
   let searchAttributeValue = '';
-  let options = searchAttributeOptions();
+  //  TODO: Add KeywordList support
+  let options = searchAttributeOptions().filter(
+    (option) => !isListFilter(option.value),
+  );
 
   $: filteredOptions = !searchAttributeValue
     ? options
@@ -212,6 +222,11 @@
       <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
         <TextFilter />
       </div>
+      <!-- TODO: Add KeywordList support -->
+      <!-- {:else if isListFilter($filter.attribute)}
+      <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
+        <ListFilter />
+      </div> -->
     {:else if isNumberFilter($filter.attribute)}
       <div class="w-full" in:fly={{ x: -100, duration: 150 }}>
         <NumberFilter />
