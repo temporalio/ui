@@ -33,7 +33,10 @@
   import Tabs from '$lib/holocene/tab/tabs.svelte';
   import TabList from '$lib/holocene/tab/tab-list.svelte';
   import { translate } from '$lib/i18n/translate';
-  import { getCurrentDefaultVersion } from '$lib/utilities/task-queue-compatibility';
+  import {
+    getCurrentCompatibilityDefaultVersion,
+    getCurrentWorkflowBuildId,
+  } from '$lib/utilities/task-queue-compatibility';
   import CompatibilityBadge from '$lib/holocene/compatibility-badge.svelte';
 
   export let namespace: string;
@@ -91,6 +94,7 @@
   );
 
   $: workflowHasBeenReset = has($resetWorkflows, $workflowRun?.workflow?.runId);
+  $: defaultVersion = getCurrentCompatibilityDefaultVersion(compatibility);
 </script>
 
 <header class="mb-4 flex flex-col gap-1">
@@ -125,18 +129,23 @@
       </h1>
       <div class="flex gap-2 items-center">
         <WorkflowStatus status={workflow?.status} />
-        <p class="flex gap-2 items-center">
-          <span>Last used version: </span><CompatibilityBadge
-            buildId={workflow?.mostRecentWorkerVersionStamp?.buildId}
-          />
-        </p>
-        <p class="flex gap-2 items-center">
-          <span>Next version:</span><CompatibilityBadge
-            defaultVersion
-            active
-            buildId={getCurrentDefaultVersion(compatibility)}
-          />
-        </p>
+        {#if workflow.mostRecentWorkerVersionStamp?.useVersioning}
+          <p class="flex gap-2 items-center">
+            <span>Last used version: </span><CompatibilityBadge
+              defaultVersion={getCurrentWorkflowBuildId(workflow) ===
+                defaultVersion}
+              active={getCurrentWorkflowBuildId(workflow) === defaultVersion}
+              buildId={getCurrentWorkflowBuildId(workflow)}
+            />
+          </p>
+          <p class="flex gap-2 items-center">
+            <span>Next version:</span><CompatibilityBadge
+              defaultVersion={!!defaultVersion}
+              active={!!defaultVersion}
+              buildId={defaultVersion}
+            />
+          </p>
+        {/if}
       </div>
     </div>
     {#if isRunning}
